@@ -28,17 +28,19 @@ struct RegisteredJitResource {
 
 class JitResourceRegistryAdapter final {
 public:
-    using LoadAndLookupFunction = aclError (*)(const std::string& resourceId, RegisteredJitResource& resource,
-                                               void* functionContext);
+    using LoadAndLookupFunction = aclError (*)(const std::string& resourceId,
+                                               RegisteredJitResource& registeredResource,
+                                               void* callbackContext);
 
     JitResourceRegistryAdapter() = default;
-    JitResourceRegistryAdapter(LoadAndLookupFunction loadAndLookupFunction, void* functionContext) noexcept;
+    JitResourceRegistryAdapter(LoadAndLookupFunction loadAndLookupFunction, void* callbackContext) noexcept;
 
-    aclError LoadAndLookupJitResource(const std::string& resourceId, RegisteredJitResource& resource) const;
+    aclError LoadAndLookupJitResource(
+        const std::string& resourceId, RegisteredJitResource& registeredResource) const;
 
 private:
     LoadAndLookupFunction loadAndLookupFunction_ {nullptr};
-    void* functionContext_ {nullptr};
+    void* callbackContext_ {nullptr};
 };
 
 } // namespace aclrtc

@@ -27,7 +27,7 @@ public:
     aclError RunKernelSpecialization(const aclrtcKernelSpecRequest* apiRequest, const char* outputElfPath);
 
 private:
-    static aclError FinishSpecialization(
+    static aclError ReportAndReturnSpecializationResult(
         const NormalizedKernelSpecializationRequest& specializationRequest,
         KernelSpecializationDiagnostics& diagnostics, aclError specializationResult) noexcept;
 

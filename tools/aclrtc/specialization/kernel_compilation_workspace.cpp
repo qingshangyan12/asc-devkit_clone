@@ -27,43 +27,43 @@ namespace aclrtc {
 namespace {
 namespace fs = boost::filesystem;
 
-bool ReadFile(const fs::path& filePath, std::string& contents)
+bool ReadSourceFileContents(const fs::path& sourceFilePath, std::string& sourceFileContents)
 {
-    std::ifstream inputStream(filePath, std::ios::in | std::ios::binary);
+    std::ifstream inputStream(sourceFilePath, std::ios::in | std::ios::binary);
     if (!inputStream) {
         const int openError = errno;
         ACLRTC_LOG_ERROR("Failed to open source patch file: path=%s errno=%d message=%s",
-                         filePath.c_str(), openError, std::strerror(openError));
+                         sourceFilePath.c_str(), openError, std::strerror(openError));
         return false;
     }
-    std::ostringstream contentsStream;
-    contentsStream << inputStream.rdbuf();
+    std::ostringstream sourceFileContentsStream;
+    sourceFileContentsStream << inputStream.rdbuf();
     if (inputStream.bad()) {
         const int readError = errno;
         ACLRTC_LOG_ERROR("Failed to read source patch file: path=%s errno=%d message=%s",
-                         filePath.c_str(), readError, std::strerror(readError));
+                         sourceFilePath.c_str(), readError, std::strerror(readError));
         return false;
     }
-    contents = contentsStream.str();
+    sourceFileContents = sourceFileContentsStream.str();
     return true;
 }
 
-bool ReplaceTemplateOnce(std::string& sourceText, const std::string& templateText,
-                         const std::string& replacementText)
+bool ReplaceFirstSourceTemplateOccurrence(std::string& sourceFileContents, const std::string& sourceTemplateText,
+                                          const std::string& replacementText)
 {
-    const size_t templatePosition = sourceText.find(templateText);
+    const size_t templatePosition = sourceFileContents.find(sourceTemplateText);
     if (templatePosition == std::string::npos) {
         return false;
     }
-    sourceText.replace(templatePosition, templateText.size(), replacementText);
+    sourceFileContents.replace(templatePosition, sourceTemplateText.size(), replacementText);
     return true;
 }
 
-bool ReplaceFileAtomically(const fs::path& targetFilePath, const std::string& contents)
+bool WritePatchedSourceFileAtomically(const fs::path& sourceFilePath, const std::string& patchedSourceFileContents)
 {
     static std::atomic<uint64_t> temporaryPatchFileSequence {0};
     const fs::path temporaryFilePath =
-        targetFilePath.string() + ".aclrtc_patch_" + std::to_string(getpid()) + "_" +
+        sourceFilePath.string() + ".aclrtc_patch_" + std::to_string(getpid()) + "_" +
         std::to_string(temporaryPatchFileSequence.fetch_add(1U, std::memory_order_relaxed));
     {
         std::ofstream outputStream(temporaryFilePath, std::ios::out | std::ios::binary | std::ios::trunc);
@@ -73,7 +73,8 @@ bool ReplaceFileAtomically(const fs::path& targetFilePath, const std::string& co
                              temporaryFilePath.c_str(), createError, std::strerror(createError));
             return false;
         }
-        outputStream.write(contents.data(), static_cast<std::streamsize>(contents.size()));
+        outputStream.write(patchedSourceFileContents.data(),
+                           static_cast<std::streamsize>(patchedSourceFileContents.size()));
         if (!outputStream) {
             const int writeError = errno;
             ACLRTC_LOG_ERROR("Failed to write temporary source patch file: path=%s errno=%d message=%s",
@@ -84,10 +85,10 @@ bool ReplaceFileAtomically(const fs::path& targetFilePath, const std::string& co
         }
     }
     boost::system::error_code renameError;
-    fs::rename(temporaryFilePath, targetFilePath, renameError);
+    fs::rename(temporaryFilePath, sourceFilePath, renameError);
     if (renameError) {
         ACLRTC_LOG_ERROR("Failed to replace patched source file: source=%s target=%s error=%d message=%s",
-                         temporaryFilePath.c_str(), targetFilePath.c_str(), renameError.value(),
+                         temporaryFilePath.c_str(), sourceFilePath.c_str(), renameError.value(),
                          renameError.message().c_str());
         boost::system::error_code ignoredError;
         fs::remove(temporaryFilePath, ignoredError);
@@ -104,8 +105,7 @@ KernelCompilationWorkspace::KernelCompilationWorkspace(
 
 KernelCompilationWorkspace::~KernelCompilationWorkspace()
 {
-    if (worktreeDispositionFinalized_ || retentionPolicy_ == WorktreeRetentionPolicy::RetainForDiagnostics ||
-        worktreePath_.empty()) {
+    if (retentionPolicy_ == WorktreeRetentionPolicy::RetainForDiagnostics || worktreePath_.empty()) {
         return;
     }
     boost::system::error_code cleanupError;
@@ -121,7 +121,8 @@ const fs::path& KernelCompilationWorkspace::GetWorktreePath() const noexcept
     return worktreePath_;
 }
 
-aclError KernelCompilationWorkspace::MaterializeCompilationInputs(const KernelCompilationPlan& compilationPlan)
+aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatches(
+    const KernelCompilationPlan& compilationPlan)
 {
     for (const fs::path& outputDirectoryPath : compilationPlan.requiredOutputDirectoryPaths) {
         boost::system::error_code directoryError;
@@ -140,12 +141,13 @@ aclError KernelCompilationWorkspace::MaterializeCompilationInputs(const KernelCo
     }
     for (const auto& filePatches : patchesByFile) {
         std::string patchedSourceText;
-        if (!ReadFile(filePatches.first, patchedSourceText)) {
+        if (!ReadSourceFileContents(filePatches.first, patchedSourceText)) {
             return ACLRTC_ERROR_FAILURE;
         }
         for (size_t patchIndex = 0U; patchIndex < filePatches.second.size(); ++patchIndex) {
             const KernelSourcePatch* sourcePatch = filePatches.second[patchIndex];
-            if (!ReplaceTemplateOnce(patchedSourceText, sourcePatch->templateText, sourcePatch->replacementText)) {
+            if (!ReplaceFirstSourceTemplateOccurrence(
+                    patchedSourceText, sourcePatch->templateText, sourcePatch->replacementText)) {
                 ACLRTC_LOG_ERROR(
                     "Source patch template was not found: path=%s patch_index=%zu; regenerate the JIT resource "
                     "from matching source files",
@@ -153,20 +155,19 @@ aclError KernelCompilationWorkspace::MaterializeCompilationInputs(const KernelCo
                 return ACLRTC_ERROR_FAILURE;
             }
         }
-        if (!ReplaceFileAtomically(filePatches.first, patchedSourceText)) {
+        if (!WritePatchedSourceFileAtomically(filePatches.first, patchedSourceText)) {
             return ACLRTC_ERROR_FAILURE;
         }
     }
     return ACLRTC_SUCCESS;
 }
 
-aclError KernelCompilationWorkspace::FinalizeBeforePublishingKernelElf()
+aclError KernelCompilationWorkspace::RemoveWorktreeBeforePublishingElfIfNeeded()
 {
-    if (worktreeDispositionFinalized_) {
+    if (worktreePath_.empty()) {
         return ACLRTC_SUCCESS;
     }
     if (retentionPolicy_ == WorktreeRetentionPolicy::RetainForDiagnostics) {
-        worktreeDispositionFinalized_ = true;
         return ACLRTC_SUCCESS;
     }
     boost::system::error_code cleanupError;
@@ -177,7 +178,7 @@ aclError KernelCompilationWorkspace::FinalizeBeforePublishingKernelElf()
             worktreePath_.c_str(), cleanupError.value(), cleanupError.message().c_str());
         return ACLRTC_ERROR_FAILURE;
     }
-    worktreeDispositionFinalized_ = true;
+    worktreePath_.clear();
     return ACLRTC_SUCCESS;
 }
 

@@ -60,7 +60,7 @@ TEST(KernelCompilationWorkspaceTest, CreatesOutputDirectoriesAndAppliesAllPatche
     };
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
-    EXPECT_EQ(workspace.MaterializeCompilationInputs(plan), 0);
+    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), 0);
     EXPECT_TRUE(fs::is_directory(worktreePath / "outputs/nested"));
     EXPECT_EQ(ReadFile(sourcePath), "A={0x01}; B={0x02};\n");
 
@@ -78,7 +78,8 @@ TEST(KernelCompilationWorkspaceTest, ReportsMissingPatchTemplateAsResourceFailur
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
-    EXPECT_EQ(workspace.MaterializeCompilationInputs(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan),
+              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
         "patch template was not found"));
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
@@ -98,7 +99,8 @@ TEST(KernelCompilationWorkspaceTest, ReportsUnreadablePatchFileWithSystemReason)
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
-    EXPECT_EQ(workspace.MaterializeCompilationInputs(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan),
+              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(missingSourcePath.string()));
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("message="));
 
@@ -123,11 +125,11 @@ TEST(KernelCompilationWorkspaceTest, DeletesWorktreeByDefaultAndRetainsItWhenReq
     fs::remove_all(retainedWorktreePath, ignoredError);
 }
 
-TEST(KernelCompilationWorkspaceTest, FinalizesCleanupBeforeOutputPublication)
+TEST(KernelCompilationWorkspaceTest, RemovesWorktreeBeforeOutputPublicationWhenNotRetained)
 {
-    const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_finalize");
+    const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_prepublish_cleanup");
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RemoveAfterCompilation);
-    EXPECT_EQ(workspace.FinalizeBeforePublishingKernelElf(), 0);
+    EXPECT_EQ(workspace.RemoveWorktreeBeforePublishingElfIfNeeded(), 0);
     EXPECT_FALSE(fs::exists(worktreePath));
 }
 } // namespace

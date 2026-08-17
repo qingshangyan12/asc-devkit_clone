@@ -16,12 +16,12 @@ namespace ascendc {
 namespace aclrtc {
 
 JitResourceRegistryAdapter::JitResourceRegistryAdapter(
-    LoadAndLookupFunction loadAndLookupFunction, void* functionContext) noexcept
-    : loadAndLookupFunction_(loadAndLookupFunction), functionContext_(functionContext)
+    LoadAndLookupFunction loadAndLookupFunction, void* callbackContext) noexcept
+    : loadAndLookupFunction_(loadAndLookupFunction), callbackContext_(callbackContext)
 {}
 
 aclError JitResourceRegistryAdapter::LoadAndLookupJitResource(
-    const std::string& resourceId, RegisteredJitResource& resource) const
+    const std::string& resourceId, RegisteredJitResource& registeredResource) const
 {
     if (loadAndLookupFunction_ == nullptr) {
         ACLRTC_LOG_ERROR(
@@ -30,7 +30,7 @@ aclError JitResourceRegistryAdapter::LoadAndLookupJitResource(
         return ACLRTC_ERROR_FAILURE;
     }
     RegisteredJitResource loadedResource;
-    const aclError result = loadAndLookupFunction_(resourceId, loadedResource, functionContext_);
+    const aclError result = loadAndLookupFunction_(resourceId, loadedResource, callbackContext_);
     if (result != ACLRTC_SUCCESS) {
         ACLRTC_LOG_ERROR(
             "ResourceRegistry Load/Lookup failed for resourceId '%s' with aclError %d; verify the resource was "
@@ -38,7 +38,7 @@ aclError JitResourceRegistryAdapter::LoadAndLookupJitResource(
             resourceId.c_str(), result);
         return result;
     }
-    resource = std::move(loadedResource);
+    registeredResource = std::move(loadedResource);
     return ACLRTC_SUCCESS;
 }
 

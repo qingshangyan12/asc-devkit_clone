@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef ASCENDC_ACLRTC_COMPILATION_COMMAND_EXECUTOR_H
-#define ASCENDC_ACLRTC_COMPILATION_COMMAND_EXECUTOR_H
+#ifndef ASCENDC_ACLRTC_COMPILATION_PLAN_EXECUTOR_H
+#define ASCENDC_ACLRTC_COMPILATION_PLAN_EXECUTOR_H
 
 #include "kernel_specialization_types.h"
 
@@ -30,10 +30,10 @@ struct CompilationCommandExecutionLimits {
     static CompilationCommandExecutionLimits ProductionDefaults() noexcept;
 };
 
-class CompilationCommandExecutor final {
+class CompilationPlanExecutor final {
 public:
-    CompilationCommandExecutor(KernelSpecializationDiagnostics& specializationDiagnostics,
-                               CompilationCommandExecutionLimits executionLimits);
+    CompilationPlanExecutor(KernelSpecializationDiagnostics& specializationDiagnostics,
+                            CompilationCommandExecutionLimits executionLimits);
 
     aclError ExecuteCompilationPlan(const KernelCompilationPlan& compilationPlan) const;
 
@@ -49,4 +49,4 @@ private:
 } // namespace aclrtc
 } // namespace ascendc
 
-#endif // ASCENDC_ACLRTC_COMPILATION_COMMAND_EXECUTOR_H
+#endif // ASCENDC_ACLRTC_COMPILATION_PLAN_EXECUTOR_H
