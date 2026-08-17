@@ -93,6 +93,14 @@ class SingleOpCompile:
                     "[asc_opc] extra_params is {}".format(context_op_info.extra_params)
                 )
 
+    def set_kernel_spec_for_context(self, context):
+        kernel_spec_mode = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC, "None")
+        kernel_spec_dir = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC_DIR)
+        context.add_addition("kernel_spec_mode", kernel_spec_mode)
+        context.add_addition("kernel_spec_dir", kernel_spec_dir)
+        if kernel_spec_mode == "SK":
+            context.add_addition("super_kernel_sub_combine", True)
+
     def __get_single_check_impl_mode(self, op_info, impl_mode):
         op_func = op_info.get(OpcOptions.OP_FUNC_ATTR)
         impl_mode_default = inspect.signature(op_func).parameters.get(
@@ -219,6 +227,7 @@ class SingleOpCompile:
                 self.set_extra_settings_for_context(
                     extra_settings, context, context_op_info
                 )
+                self.set_kernel_spec_for_context(context)
                 context.add_op_info(context_op_info)
                 context.add_addition(OpcOptions.OPTIONAL_INPUT_MODE, opt_input_mode)
                 context.add_addition(OpcOptions.OPTIONAL_OUTPUT_MODE, opt_output_mode)
@@ -252,6 +261,7 @@ class SingleOpCompile:
                 self.set_extra_settings_for_context(
                     extra_settings, context, context_op_info
                 )
+                self.set_kernel_spec_for_context(context)
                 context.add_op_info(context_op_info)
                 context.add_addition(OpcOptions.OPTIONAL_OUTPUT_MODE, opt_output_mode)
                 context.add_addition(OpcOptions.OPTIONAL_INPUT_MODE, opt_input_mode)
@@ -283,6 +293,7 @@ class SingleOpCompile:
                 self.set_extra_settings_for_context(
                     extra_settings, context, context_op_info
                 )
+                self.set_kernel_spec_for_context(context)
                 context.add_op_info(context_op_info)
                 context.add_addition(OpcOptions.OPTIONAL_OUTPUT_MODE, opt_output_mode)
                 context.add_addition(OpcOptions.OPTIONAL_INPUT_MODE, opt_input_mode)
@@ -346,9 +357,11 @@ class SingleOpCompile:
         op_relocatable_bin = self.__opc_compile_args.get(
             OpcOptions.RELOCATABLE_BIN, False
         )
+        kernel_spec_mode = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC, "None")
+        enable_super_kernel = op_relocatable_bin or kernel_spec_mode == "SK"
         logger.debug(
             "debug_config {}, enable_super_kernel {}.".format(
-                debug_config, op_relocatable_bin
+                debug_config, enable_super_kernel
             )
         )
 
@@ -366,7 +379,7 @@ class SingleOpCompile:
             "enable_deterministic_mode": deterministic,
             "jit_compile_mode": jit_compile_mode,
             "enable_vector_core": enable_vector_core,
-            "enable_super_kernel": op_relocatable_bin,
+            "enable_super_kernel": enable_super_kernel,
         }
 
         if deterministic_level != "":
