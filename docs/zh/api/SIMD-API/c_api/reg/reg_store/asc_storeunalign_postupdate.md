@@ -167,9 +167,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 
 - 连续调用时须复用同一个`unalign_reg`。
 - 掩码寄存器连续搬出模式须使用[asc_storeunalign_post](asc_storeunalign_post.md)的立即数偏移搬出模式收尾，复用同一个`unalign_reg`。
-- 立即数计数偏移搬出模式须使用[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)收尾，并复用同一个`unalign_reg`。
+- 立即数偏移搬出模式须使用[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)收尾，并复用同一个`unalign_reg`。
 - 地址寄存器偏移搬出模式的`addr_reg`须通过[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)预先构造，并在内层循环体内赋值使用。须使用[asc_storeunalign_post](asc_storeunalign_post.md)收尾，并复用同一个`unalign_reg`及地址寄存器。
-- 立即数计数偏移搬出模式下，`count`最大值不超过单个矢量数据寄存器可容纳的元素个数。
+- 立即数偏移搬出模式下，`count`最大值不超过单个矢量数据寄存器可容纳的元素个数。
 - 矢量数据寄存器搬出场景目的地址无需32字节对齐，但须按`sizeof(dtype)`字节对齐。
 - 掩码寄存器搬出场景，b16类型目的地址需16字节对齐，b32类型目的地址需8字节对齐。
 

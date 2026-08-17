@@ -46,7 +46,7 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 | :----- | :------- | :------- |
 | mem_type | 输入 | 同步流水线的类型，类型为MEM_TYPE，取值范围见表2 mem_type取值说明。 |
 
-**表2** mem_type取值说明（源流水线/目的流水线表示的含义见表3 Reg计算流水线说明）
+**表2** 本接口支持的mem_type取值范围说明（源流水线/目的流水线表示的含义见表3 Reg计算流水线说明）
 | 值  | 源流水线 | 目的流水线 |
 | ------ | -------- | -------- |
 | VV_ALL | VEC_ALL | VEC_ALL |
@@ -61,10 +61,6 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 | ST_VLD | SCALAR_STORE | VEC_LOAD |
 | LD_VST | SCALAR_LOAD | VEC_STORE |
 | ST_VST | SCALAR_STORE | VEC_STORE |
-| SS_ALL | SCALAR_ALL | SCALAR_ALL |
-| ST_LD | SCALAR_STORE | SCALAR_LOAD |
-| LD_ST | SCALAR_LOAD | SCALAR_STORE |
-| ST_ST | SCALAR_STORE | SCALAR_STORE |
 
 **表3** Reg计算流水线说明
 | 流水线 | 含义 |

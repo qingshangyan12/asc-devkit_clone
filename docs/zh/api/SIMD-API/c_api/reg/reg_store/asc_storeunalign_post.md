@@ -117,7 +117,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst,
 ### 立即数偏移搬出模式
 
 - 与[asc_storeunalign](asc_storeunalign.md)或[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**掩码寄存器搬出模式**配套使用，需要复用同一个`unalign_reg`。
-- 需要保证目的地址加上偏移后的地址，等于[asc_storeunalign](asc_storeunalign.md)搬运的结束地址，否则无法正确收尾。
+- 需要保证目的地址加上偏移后的地址，等于[asc_storeunalign](asc_storeunalign.md)或[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**掩码寄存器搬出模式**搬运的结束地址，否则无法正确收尾。
 
 ### 地址寄存器偏移搬出模式
 

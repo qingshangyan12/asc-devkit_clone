@@ -29,11 +29,11 @@
 根据掩码将两个源矢量数据寄存器中的有效元素相乘，数据类型位宽为32位的元素相乘得到64位乘积，拆分为低32位与高32位分别写入两个目的矢量数据寄存器。掩码对应位置为1的元素参与计算，为0的元素在目的矢量数据寄存器中置零。计算公式如下：
 
 $$
-dst0_i = (src0_i \times src1_i) \bmod 2^{bit}
+dst0_i = (src0_i \times src1_i) \& ((1 \ll bit) - 1)
 $$
 
 $$
-dst1_i = (src0_i \times src1_i) / 2^{bit}
+dst1_i = (src0_i \times src1_i) \gg bit
 $$
 
 其中，bit表示src0和src1的数据类型位宽。
@@ -98,7 +98,7 @@ __simd_callee__ inline void asc_mull(vector_uint32_t& dst0,
 ### 计算约束
 
 - dst0与dst1必须为不同的矢量数据寄存器，否则存在未定义行为。
-- 源操作数和目的操作数可以是相同的矢量数据寄存器，例如`asc_mull(src0, src1, src0, src1);`。
+- 源操作数和目的操作数可以是相同的矢量数据寄存器，例如`asc_mull(src0, src1, src0, src1, mask);`。
 
 ## 调用示例
 
@@ -120,7 +120,7 @@ bisheng examples.asc -o main --npu-arch=dav-3510; ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 128;
+constexpr uint32_t ELEMENT_COUNT = 64;
 constexpr uint32_t BUFFER_BYTES = ELEMENT_COUNT * sizeof(uint32_t);
 
 __simd_vf__ inline void mull_vf(__ubuf__ uint32_t* output_low,

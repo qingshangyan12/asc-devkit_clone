@@ -107,7 +107,7 @@ bisheng examples.asc -o main --npu-arch=dav-3510; ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t ELEMENT_COUNT = 128;
+constexpr uint32_t ELEMENT_COUNT = 64;
 constexpr uint32_t BUFFER_BYTES = ELEMENT_COUNT * sizeof(float);
 constexpr float ALPHA = 0.1f;
 
