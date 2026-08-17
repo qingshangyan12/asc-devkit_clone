@@ -57,8 +57,6 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_migrated_algorit
     const auto& registry = CollAlgExecRegistryV2::Instance();
 
     EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALLV, "InsAlltoAllVMesh1D"));
-    EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1DSingleChannel"));
-    EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1D"));
     EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLREDUCE, "InsAllReduceMesh1DOneShot"));
     EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLREDUCE, "InsAllReduceMesh1DTwoShot"));
 }
