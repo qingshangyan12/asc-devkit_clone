@@ -46,7 +46,7 @@ public:
                                    OutputPublicationStatus publicationStatus) noexcept;
 
 private:
-    void AppendDiagnosticText(const boost::filesystem::path& filePath, const std::string& text) noexcept;
+    void AppendTextToDiagnosticFile(const boost::filesystem::path& filePath, const std::string& text) noexcept;
 
     std::string specializationSessionId_;
     bool diagnosticsEnabled_ {false};
