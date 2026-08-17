@@ -118,6 +118,8 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
 {
     ccu::Variable opType;
     opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
+#if 0
+    // Temporarily isolate AllToAllV to verify the 8-rank KFC instruction resource failure.
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
     {
         CcuKfcAllGatherMesh1DMem2MemKernel(
@@ -133,6 +135,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
             ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
     }
+#endif
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLTOALLV))
     {
         CcuAlltoAllVMesh1DKernel(
