@@ -21,6 +21,11 @@
 namespace asc {
 namespace te {
 template <typename T>
+struct reg_pair {
+    reg_tensor<T> first;  ///< First output.
+    reg_tensor<T> second; ///< Second output.
+};
+template <typename T>
 __simd_callee__ inline decltype(auto) interleave(reg_tensor<T> src0, reg_tensor<T> src1);
 
 template <typename T>
