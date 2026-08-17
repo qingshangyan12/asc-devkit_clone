@@ -30,14 +30,42 @@
 
 由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。
 
+参考伪代码如下：
+
+```python
+def asc_bfloat162float(dst, src, mask, src_pos):
+    for i in range(64):
+        if mask[i]:
+            dst[2 * i] = bfloat16(src[i])   # float -> bfloat16, RINT舍入, 写入偶数索引
+        else:
+            dst[2 * i] = 0
+    for i in range(64):
+        dst[2 * i + 1] = 0                  # 奇数索引置零
+    for i in range(64):
+        dst[2 * i] = 0                      # 偶数索引置零
+        if mask[i]:
+            dst[2 * i + 1] = bfloat16(src[i])  # float -> bfloat16, RINT舍入, 写入奇数索引
+        else:
+            dst[2 * i + 1] = 0
+```
+
 ## 函数原型
 
-```cpp
-// 数据读取索引为偶数的位置
-__simd_callee__ inline void asc_bfloat162float(vector_float& dst, vector_bfloat16_t src, vector_bool mask)
-// 数据读取索引为奇数的位置
-__simd_callee__ inline void asc_bfloat162float_v2(vector_float& dst, vector_bfloat16_t src, vector_bool mask)
+```c
+__simd_callee__ inline void asc_bfloat162float(vector_float& dst,
+                                               vector_bfloat16_t src,
+                                               vector_bool mask,
+                                               std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 ```
+
+定义在 C:/Users/admin/asc-devkit_7540/include/c_api/utils/enum.h:35：
+
+  enum class asc_position_mode { EVEN = 0, ODD };
+
+  constexpr std::integral_constant<
+      asc_position_mode, asc_position_mode::EVEN> ASC_POSITION_EVEN;
+
+  ASC_POSITION_EVEN 是一个 constexpr 标签对象，而非运行时枚举参数。
 
 ## 参数说明
 
@@ -57,7 +85,10 @@ __simd_callee__ inline void asc_bfloat162float_v2(vector_float& dst, vector_bflo
 
 ## 约束说明
 
-mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src、dst为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- src的dtype必须为`bfloat16_t`，dst的dtype必须为`float`，dtype固定不可混用，否则触发异常。
+- mask为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 
 ## 调用示例
 

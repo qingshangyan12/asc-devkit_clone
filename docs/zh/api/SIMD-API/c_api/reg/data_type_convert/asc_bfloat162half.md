@@ -28,31 +28,43 @@
 
 将bfloat16_t类型转化为half类型，并支持多种舍入模式、饱和/非饱和模式。
 
-关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../data_type_convert/rounding_mode.md)。
+参考伪代码如下：
+
+```python
+def asc_float2half_rn(dst, src, mask):
+    for i in range(64):
+        if mask[i]:
+            dst[i] = half(src[i])   # float -> half, RINT舍入
+        else:
+            dst[i] = 0
+```
 
 ## 函数原型
 
-```cpp
-// RINT舍入模式,非饱和模式
-__simd_callee__ inline void asc_bfloat162half_rn(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
-// RINT舍入模式,饱和模式
-__simd_callee__ inline void asc_bfloat162half_rn_sat(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
-// ROUND舍入模式,非饱和模式
-__simd_callee__ inline void asc_bfloat162half_rna(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
-// ROUND舍入模式,饱和模式
-__simd_callee__ inline void asc_bfloat162half_rna_sat(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
-// FLOOR舍入模式,非饱和模式
-__simd_callee__ inline void asc_bfloat162half_rd(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
-// FLOOR舍入模式,饱和模式
-__simd_callee__ inline void asc_bfloat162half_rd_sat(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
-// CEIL舍入模式,非饱和模式
-__simd_callee__ inline void asc_bfloat162half_ru(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
-// CEIL舍入模式,饱和模式
-__simd_callee__ inline void asc_bfloat162half_ru_sat(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
-// TRUNC舍入模式,非饱和模式
-__simd_callee__ inline void asc_bfloat162half_rz(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
-// TRUNC舍入模式,饱和模式
-__simd_callee__ inline void asc_bfloat162half_rz_sat(vector_half& dst, vector_bfloat16_t src, vector_bool mask)
+### 模板原型（占位符形式）
+
+本接口为支持多种舍入模式、饱和模式组合的复合接口，模板原型如下：
+
+```c
+__simd_callee__ inline void asc_bfloat162half_<round_mode><sat_mode>(vector_half& dst,
+                                                                     vector_bfloat16_t src,
+                                                                     vector_bool mask)
+```
+
+### 模式说明
+
+- `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
+- `<sat_suffix>`为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
+
+关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../data_type_convert/rounding_mode.md)。
+
+### 典型示例
+
+```c
+// RINT舍入模式，非饱和模式
+__simd_callee__ inline void asc_float2half_rn(vector_half& dst,
+                                              vector_bfloat16_t src,
+                                              vector_bool mask)
 ```
 
 ## 参数说明
@@ -73,8 +85,11 @@ __simd_callee__ inline void asc_bfloat162half_rz_sat(vector_half& dst, vector_bf
 
 ## 约束说明
 
-- mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
-- 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../../sys_var/asc_set_ctrl.md)。
+- 本接口仅在AIV上生效，非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src、dst为矢量数据寄存器，不涉及UB地址，无UB容量与地址对齐约束。
+- src的dtype必须为`bfloat16_t`，dst的dtype必须为`half`，dtype固定不可混用，否则触发异常。
+- mask为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- 开启接口单指令饱和模式和非饱和模式时，需配置ctrl寄存器CTRL[60]为`1'b0`，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../../sys_var/asc_set_ctrl.md)。
 
 ## 调用示例
 

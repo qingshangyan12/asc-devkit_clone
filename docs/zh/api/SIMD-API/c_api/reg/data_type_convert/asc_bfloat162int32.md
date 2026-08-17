@@ -28,8 +28,6 @@
 
 将bfloat16_t类型数据转换为int32_t，并支持多种舍入模式，饱和/非饱和模式。
 
-关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../data_type_convert/rounding_mode.md)。
-
 由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。
 
 ## 函数原型
@@ -76,6 +74,10 @@ __simd_callee__ inline void asc_bfloat162int32_rz_v2(vector_int32_t& dst, vector
 // TRUNC舍入模式，饱和模式，数据读取索引为奇数的位置
 __simd_callee__ inline void asc_bfloat162int32_rz_sat_v2(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask)
 ```
+
+
+
+关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../data_type_convert/rounding_mode.md)。
 
 ## 参数说明
 

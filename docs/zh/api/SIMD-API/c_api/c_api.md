@@ -586,4 +586,6 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 **表14** 废弃接口列表
 | 废弃接口 | 说明 |
 | [asc_abs_sync（废弃）](deprecated_interface/asc_abs_sync_deprecated.md) | 按元素取绝对值同步接口。 |
+| [asc_copy_gm2ub_align_arch_3510（废弃）](deprecated_interface/asc_copy_gm2ub_align_arch_3510_deprecated.md) | 提供数据非对齐搬运的功能，将数据从Global Memory搬运到Unified Buffer，并支持8位/16位/32位数据类型搬运。 |
+| [asc_copy_gm2ub_align_arch_2201（废弃）](deprecated_interface/asc_copy_gm2ub_align_arch_2201_deprecated.md) | 提供数据非对齐搬运的功能，将数据从Global Memory搬运到Unified Buffer，并支持8位/16位/32位数据类型搬运。 |
 | [asc_set_atomic_add_int（废弃）](deprecated_interface/asc_set_atomic_add_int_deprecated.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int32_t。 |
