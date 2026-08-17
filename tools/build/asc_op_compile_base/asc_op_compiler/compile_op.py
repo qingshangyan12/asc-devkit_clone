@@ -835,6 +835,11 @@ def gen_kernel_fun(
     need_ffts = is_mix or is_single_and_using_hard_sync
 
     # call usr kernel function call
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        source += "#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)\n"
+        source += "    AscendC::g_superKernelSetWaitFlagCountDifference = "
+        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;\n"
+        source += "#endif\n"
     source += "#if defined(TEMPLATE_PARAMS_LEN) && TEMPLATE_PARAMS_LEN != 0\n"
     source += gen_usr_origin_kernel_function_call(
         func_name, opinfo, tiling_info, has_template=True
@@ -844,6 +849,22 @@ def gen_kernel_fun(
         func_name, opinfo, tiling_info, has_template=False
     )
     source += "#endif\n"
+    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
+        source += "#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)\n"
+        source += "    if (AscendC::g_superKernelSetWaitFlagCountDifference > "
+        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
+        source += "        assert(false, \"SuperKernel: current operator has %d more "
+        source += "SetFlag calls than WaitFlag calls; Please check synchronization within the current operator.\\n\", "
+        source += "AscendC::g_superKernelSetWaitFlagCountDifference - "
+        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE);\n"
+        source += "    } else if (AscendC::g_superKernelSetWaitFlagCountDifference < "
+        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
+        source += "        assert(false, \"SuperKernel: current operator has %d more "
+        source += "WaitFlag calls than SetFlag calls; Please check synchronization within the current operator.\\n\", "
+        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE - "
+        source += "AscendC::g_superKernelSetWaitFlagCountDifference);\n"
+        source += "    }\n"
+        source += "#endif\n"
 
     if len(compile_info.tiling_key_struct_map) > 0:
         source += _gen_tpl_tiling_struct_section(compile_info, tiling_info)
