@@ -22,6 +22,8 @@ import {
   extractUnsupportedProducts,
   normalizeApiRoute,
 } from '../../scripts/api-support.mjs'
+import { addHeadingAnchors } from '../../scripts/heading-utils.mjs'
+import { replaceProductFilterTags } from '../../scripts/product-filter-tags.mjs'
 
 const docsRoot = resolve(import.meta.dirname, '..')
 const repoRoot = resolve(import.meta.dirname, '..', '..', '..', '..', '..')
@@ -188,6 +190,25 @@ for (const { prefix, sourceFileName } of sidebarConfigs) {
   filteredSidebars[prefix] = filterEmptyPages(items, docsRoot)
 }
 
+const navigationDataId = 'virtual:api-navigation-data'
+const resolvedNavigationDataId = '\0' + navigationDataId
+
+function navigationDataPlugin() {
+  return {
+    name: 'vitepress-navigation-data',
+    resolveId(source) {
+      if (source === navigationDataId) return resolvedNavigationDataId
+    },
+    load(id) {
+      if (id !== resolvedNavigationDataId) return null
+      return [
+        `export const sidebarConfig = ${JSON.stringify(filteredSidebars)}`,
+        `export const apiUnsupportedIndex = ${JSON.stringify(apiUnsupportedIndex)}`,
+      ].join('\n')
+    },
+  }
+}
+
 function extractBodyContent(html) {
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
   if (bodyMatch) return bodyMatch[1]
@@ -328,67 +349,6 @@ function placeholderPlugin() {
   }
 }
 
-function replaceNpuCommentTags(html) {
-  const tokenRegex = /<!--\s*(?:npu\s*=\s*"([^"]*)"\s+(\w+)|end\s+(\w+))\s*-->/g
-  const parts = []
-  const stack = []
-  let lastIdx = 0
-  let match
-  while ((match = tokenRegex.exec(html)) !== null) {
-    const pos = match.index
-    const npuType = match[1]
-    const openId = match[2]
-    const closeId = match[3]
-    parts.push(html.slice(lastIdx, pos))
-    lastIdx = pos + match[0].length
-    if (closeId) {
-      if (stack.length > 0 && stack[stack.length - 1].id === closeId) {
-        stack.pop()
-        parts.push('</div>')
-      }
-    } else if (npuType && openId) {
-      stack.push({ id: openId })
-      parts.push(`<div data-filter="${npuType}">`)
-    }
-  }
-  parts.push(html.slice(lastIdx))
-  while (stack.length > 0) {
-    stack.pop()
-    parts.push('</div>')
-  }
-  return parts.join('')
-}
-
-function replaceCannFilterTags(src, replacer) {
-  const tagRegex = /<(\/?)(cann-filter)((?:\s[^>]*)?)>/gi
-  const stack = []
-  const parts = []
-  let lastIdx = 0
-  let match
-  while ((match = tagRegex.exec(src)) !== null) {
-    const pos = match.index
-    const isClose = match[1] === '/'
-    const attrs = match[3]
-    parts.push(src.slice(lastIdx, pos))
-    lastIdx = pos + match[0].length
-    if (isClose) {
-      if (stack.length > 0) {
-        const opener = stack.pop()
-        parts.push(replacer.end(opener.type, opener.contentStart, lastIdx))
-      }
-    } else {
-      const attrMatch = attrs.match(/npu[_-]type\s*=\s*"([^"]+)"/i)
-      if (attrMatch) {
-        stack.push({ type: attrMatch[1], contentStart: lastIdx })
-        parts.push(replacer.start(attrMatch[1]))
-      }
-    }
-  }
-  const end = src.slice(lastIdx)
-  parts.push(end)
-  return parts.join('')
-}
-
 function fixCannFilterTags(src) {
   if (!/<(cann-filter|term|ph|__gm__|__ubuf__)\b/i.test(src)) return src
 
@@ -496,22 +456,6 @@ function escapeVueInterpolations(html) {
   )
 }
 
-function addHeadingAnchors(html) {
-  const headingRegex = /<h([23456])((?:\s[^>]*)?)>([\s\S]*?)<\/h\1>/gi
-  const seen = new Map()
-  return html.replace(headingRegex, (match, level, attrs, content) => {
-    const text = content.replace(/<[^>]+>/g, '').trim()
-    if (!text) return match
-    const baseSlug = text.replace(/\s+/g, '-')
-    const count = seen.get(baseSlug) || 0
-    const slug = count === 0 ? baseSlug : `${baseSlug}-${count}`
-    seen.set(baseSlug, count + 1)
-    const idAttr = attrs.match(/\sid\s*=\s*["']/) ? '' : ` id="${slug}"`
-    const anchor = `<a class="header-anchor" href="#${slug}">&#x200B;</a>`
-    return `<h${level}${attrs}${idAttr}>${content}${anchor}</h${level}>`
-  })
-}
-
 function loadHeaderCache(filePath) {
   const absPath = resolve(import.meta.dirname, '..', filePath)
   const cachePath = absPath + '.header'
@@ -585,11 +529,7 @@ function balanceDivTags(html) {
   return parts.join('')
 }
 
-          html = replaceNpuCommentTags(html)
-          html = replaceCannFilterTags(html, {
-            start(type) { return `<div data-filter="${type}">` },
-            end() { return '</div>' },
-          })
+          html = replaceProductFilterTags(html)
           html = html.replace(
             /<tr\b[^>]*>((?:(?!<\/tr>)[\s\S])*?)<\/tr>/gi,
             (rowMatch) => {
@@ -718,6 +658,7 @@ function balanceDivTags(html) {
         external: ['/pagefind/pagefind.js'],
         output: {
           manualChunks(id) {
+            if (id.includes(navigationDataId)) return 'navigation-data'
             if (id.includes('node_modules')) return 'vendor'
           },
         },
@@ -726,9 +667,9 @@ function balanceDivTags(html) {
     resolve: {
       preserveSymlinks: true,
     },
-    plugins: [htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
+    plugins: [navigationDataPlugin(), htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
       btnPlaceholder: '搜索',
-      placeholder: '简易搜索，暂不支持多语言和特殊符号',
+      placeholder: '搜索文档、API与示例',
       emptyText: '未找到结果',
       heading: '共: {{searchResult}} 条结果',
       forceLanguage: 'zh',
@@ -766,15 +707,20 @@ function balanceDivTags(html) {
         if (normalizedId.includes('vitepress/dist/client/theme-default/composables/sidebar.js')) {
           const result = code.replace(
             'const sidebarConfig = theme.value.sidebar;',
-            'const sidebarConfig = getProductFilteredSidebarConfig(theme.value);'
+            'const sidebarConfig = getProductFilteredSidebarConfig();'
           )
           return result === code ? null : importLine + result
         }
 
         if (normalizedId.includes('vitepress/dist/client/theme-default/composables/prev-next.js')) {
-          const original = "const candidates = uniqBy(links, (link) => link.link.replace(/[?#].*$/, ''));"
-          const replacement = "const candidates = getProductFilteredNavigationCandidates(uniqBy(links, (link) => link.link.replace(/[?#].*$/, '')), page.value.relativePath, theme.value);"
-          const result = code.replace(original, replacement)
+          let result = code.replace(
+            'const sidebar = getSidebar(theme.value.sidebar, page.value.relativePath);',
+            'const sidebar = getSidebar(getProductFilteredSidebarConfig(), page.value.relativePath);'
+          )
+          result = result.replace(
+            "const candidates = uniqBy(links, (link) => link.link.replace(/[?#].*$/, ''));",
+            "const candidates = getProductFilteredNavigationCandidates(uniqBy(links, (link) => link.link.replace(/[?#].*$/, '')), page.value.relativePath);"
+          )
           return result === code ? null : importLine + result
         }
 
@@ -786,7 +732,7 @@ function balanceDivTags(html) {
       transform(code, id) {
         if (!id.includes('VPSidebarItem') || !id.includes('vitepress')) return null
         let result = code
-        result = result.replace('depth < 5', 'true')
+        result = result.replace('v-if="depth < 5"', 'v-if="!collapsed || hasActiveLink"')
         result = result.replace('props.depth + 2 === 7', 'props.depth + 2 >= 7')
         if (result === code) return null
         return result
@@ -804,22 +750,20 @@ function balanceDivTags(html) {
     },
   },
 
-  head: [],
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+  ],
 
   themeConfig: {
     nav: [
       { text: '首页', link: '/' },
-      { text: 'AscendC算子开发指南', link: '/guide/入门教程/Ascend-C概述与学习路径' },
+      { text: 'AscendC算子开发指南', link: '/guide/getting_started/ascend_c_overview_and_learning_path' },
       { text: 'Ascend C API', link: '/api/README' },
     ],
 
     search: {
       provider: 'algolia',
     },
-
-    sidebar: filteredSidebars,
-    apiSidebarSource: filteredSidebars['/api/'],
-    apiUnsupportedIndex,
 
     outline: false,
 

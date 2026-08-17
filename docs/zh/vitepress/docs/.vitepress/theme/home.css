@@ -1,0 +1,118 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+.home-layout .VPHome {
+  padding-bottom: 72px;
+}
+
+.home-layout .VPHero {
+  min-height: 450px;
+  padding: 92px 24px 78px;
+  background:
+    linear-gradient(90deg, rgba(240, 239, 250, 0.99) 0%, rgba(240, 239, 250, 0.95) 43%, rgba(232, 247, 251, 0.8) 63%, rgba(232, 247, 251, 0.18) 100%),
+    url('/assets/home/architecture_ascendc.png') right 4% center / min(58%, 820px) auto no-repeat,
+    var(--asc-purple-light);
+  overflow: hidden;
+}
+
+.dark .home-layout .VPHero {
+  background:
+    linear-gradient(90deg, rgba(24, 33, 48, 0.99) 0%, rgba(24, 33, 48, 0.96) 45%, rgba(29, 40, 56, 0.84) 66%, rgba(29, 40, 56, 0.42) 100%),
+    url('/assets/home/architecture_ascendc.png') right 4% center / min(58%, 820px) auto no-repeat,
+    #182130;
+}
+
+.home-layout .VPHero .container {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.home-layout .VPHero .main {
+  max-width: 650px;
+}
+
+.home-layout .VPHero .name {
+  background: none;
+  color: var(--asc-purple-dark);
+  -webkit-text-fill-color: currentColor;
+  font-size: 52px;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.dark .home-layout .VPHero .name {
+  color: #dcd2ff;
+}
+
+.home-layout .VPHero .tagline {
+  max-width: 620px;
+  margin-top: 18px;
+  color: var(--vp-c-text-2);
+  font-size: 20px;
+  line-height: 1.65;
+  white-space: normal;
+  letter-spacing: 0;
+}
+
+.home-layout .VPHero .actions {
+  padding-top: 24px;
+}
+
+.home-layout .VPFeatures {
+  display: none;
+}
+
+@media (max-width: 959px) {
+  .home-layout .VPHero {
+    min-height: 420px;
+    padding: 76px 24px 64px;
+    background:
+      linear-gradient(90deg, rgba(240, 239, 250, 0.99), rgba(240, 239, 250, 0.9)),
+      url('/assets/home/architecture_ascendc.png') right -180px center / 720px auto no-repeat,
+      var(--asc-purple-light);
+  }
+
+  .dark .home-layout .VPHero {
+    background:
+      linear-gradient(90deg, rgba(24, 33, 48, 0.99), rgba(24, 33, 48, 0.9)),
+      url('/assets/home/architecture_ascendc.png') right -180px center / 720px auto no-repeat,
+      #182130;
+  }
+
+  .home-layout .VPHero .name {
+    font-size: 44px;
+  }
+}
+
+@media (max-width: 640px) {
+  .home-layout .VPHero {
+    min-height: 430px;
+    padding: 58px 20px 48px;
+    background:
+      linear-gradient(180deg, rgba(240, 239, 250, 0.99) 0%, rgba(240, 239, 250, 0.94) 72%, rgba(232, 247, 251, 0.86) 100%),
+      url('/assets/home/architecture_ascendc.png') center bottom -28px / 660px auto no-repeat,
+      var(--asc-purple-light);
+  }
+
+  .dark .home-layout .VPHero {
+    background:
+      linear-gradient(180deg, rgba(24, 33, 48, 0.99) 0%, rgba(24, 33, 48, 0.95) 72%, rgba(29, 40, 56, 0.9) 100%),
+      url('/assets/home/architecture_ascendc.png') center bottom -28px / 660px auto no-repeat,
+      #182130;
+  }
+
+  .home-layout .VPHero .name {
+    font-size: 36px;
+  }
+
+  .home-layout .VPHero .tagline {
+    font-size: 17px;
+  }
+}

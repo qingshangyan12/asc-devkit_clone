@@ -10,15 +10,15 @@
 
 <script setup>
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { useData, useRoute } from 'vitepress'
+import { useRoute } from 'vitepress'
 import {
   isApiRouteUnsupported,
 } from '../../../scripts/api-support.mjs'
+import { apiUnsupportedIndex } from './api-navigation-filter.mjs'
 import { selectedFilter } from './filter-state.js'
 
 const route = useRoute()
-const { theme } = useData()
-const isApiPage = ref(false)
+const isApiPage = ref(route.path.startsWith('/api/'))
 
 const filterOptions = [
   { value: 'all', label: '全量' },
@@ -47,7 +47,7 @@ function applyPageSupportFilter(content) {
   })
 
   const unsupported = isApiRouteUnsupported(
-    theme.value.apiUnsupportedIndex,
+    apiUnsupportedIndex,
     route.path,
     selectedFilter.value
   )
@@ -131,9 +131,15 @@ onUnmounted(() => clearTimeout(filterTimer))
 </script>
 
 <template>
-  <div class="cann-filter-bar" :class="{ hidden: !isApiPage }">
-    <span class="filter-label">版本</span>
-    <select v-model="selectedFilter" class="filter-select" :disabled="!isApiPage" @change="onFilterChange">
+  <div v-if="isApiPage" class="cann-filter-bar">
+    <label class="filter-label" for="cann-product-filter">适用产品</label>
+    <select
+      id="cann-product-filter"
+      v-model="selectedFilter"
+      class="filter-select"
+      aria-label="筛选API适用产品"
+      @change="onFilterChange"
+    >
       <option v-for="opt in filterOptions" :key="opt.value" :value="opt.value">
         {{ opt.label }}
       </option>

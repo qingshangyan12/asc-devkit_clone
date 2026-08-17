@@ -9,27 +9,70 @@
 */
 
 
-const { existsSync, unlinkSync, readFileSync } = require('node:fs')
-const { resolve } = require('node:path')
+const { existsSync, unlinkSync, readFileSync, readdirSync, statSync } = require('node:fs')
+const { isAbsolute, relative, resolve } = require('node:path')
 
-const manifestFile = resolve(__dirname, '..', '.stubs-manifest.json')
-if (!existsSync(manifestFile)) {
-  console.log('No stubs manifest found, nothing to clean')
-  process.exit(0)
+const root = resolve(__dirname, '..')
+const docsDir = resolve(root, 'docs')
+const manifestFile = resolve(root, '.stubs-manifest.json')
+const generatedFiles = new Set()
+const generatedHeaders = new Set()
+
+function isInsideRoot(file) {
+  const rel = relative(root, resolve(file))
+  return rel !== '' && !rel.startsWith('..') && !isAbsolute(rel)
 }
 
-const stubs = JSON.parse(readFileSync(manifestFile, 'utf-8'))
-let removed = 0
-for (const stub of stubs) {
-  if (existsSync(stub)) {
-    unlinkSync(stub)
-    removed++
+function discoverGeneratedFiles(directory) {
+  if (!existsSync(directory)) return
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const fullPath = resolve(directory, entry.name)
+    if (entry.isDirectory()) {
+      discoverGeneratedFiles(fullPath)
+      continue
+    }
+    if (!entry.isFile()) continue
+
+    if (entry.name.endsWith('.md.header')) {
+      const htmlPath = fullPath.slice(0, -'.md.header'.length) + '.html'
+      if (existsSync(htmlPath)) generatedHeaders.add(fullPath)
+      continue
+    }
+
+    if (entry.name.endsWith('.md') && statSync(fullPath).size === 0) {
+      const htmlPath = fullPath.slice(0, -'.md'.length) + '.html'
+      if (existsSync(htmlPath)) generatedFiles.add(fullPath)
+    }
   }
-  const headerFile = stub + '.header'
+}
+
+if (existsSync(manifestFile)) {
+  try {
+    for (const file of JSON.parse(readFileSync(manifestFile, 'utf-8'))) {
+      if (isInsideRoot(file)) generatedFiles.add(resolve(file))
+    }
+  } catch {}
+}
+
+discoverGeneratedFiles(resolve(docsDir, 'api'))
+discoverGeneratedFiles(resolve(docsDir, 'guide'))
+
+let removedFiles = 0
+let removedHeaders = 0
+for (const file of generatedFiles) {
+  if (existsSync(file)) {
+    unlinkSync(file)
+    removedFiles++
+  }
+  const headerFile = file + '.header'
+  if (existsSync(headerFile)) generatedHeaders.add(headerFile)
+}
+for (const headerFile of generatedHeaders) {
   if (existsSync(headerFile)) {
     unlinkSync(headerFile)
+    removedHeaders++
   }
 }
 
-unlinkSync(manifestFile)
-console.log(`Cleaned up ${removed} .md stubs`)
+if (existsSync(manifestFile)) unlinkSync(manifestFile)
+console.log(`Cleaned up ${removedFiles} generated files and ${removedHeaders} header caches`)

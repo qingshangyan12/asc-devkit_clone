@@ -181,8 +181,7 @@ build_docs() {
     cd "$SCRIPT_DIR"
 
     log "开始构建VitePress站点..."
-    npm run docs:prebuild 2>&1 | tee -a "$LOG_FILE"
-    npx cross-env NODE_OPTIONS=--max-old-space-size=14336 vitepress build docs 2>&1 | tee -a "$LOG_FILE"
+    npm run docs:build 2>&1 | tee -a "$LOG_FILE"
 
     DIST_DIR="$SCRIPT_DIR/docs/.vitepress/dist"
     if [ ! -d "$DIST_DIR" ]; then
