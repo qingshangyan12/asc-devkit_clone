@@ -606,21 +606,32 @@ __aicore__ constexpr HardEvent GetQueEvt(
             return fwdDirect ? HardEvent::MTE2_MTE3 : HardEvent::MTE3_MTE2;
         }
     } else if (src == Hardware::L1) { // MTE1
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 5162)
         ASSERT(dst != Hardware::GM);
         ASSERT(dst != Hardware::L1);
+#endif
         ASSERT(dst != Hardware::L0C);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
         ASSERT(dst != Hardware::BIAS);
         ASSERT(dst != Hardware::FIXBUF);
 #endif
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+        if (dst == Hardware::UB || dst == Hardware::GM || dst == Hardware::L1) {
+            return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
+#else
         if (dst == Hardware::UB) {
             return fwdDirect ? HardEvent::MTE1_V : HardEvent::V_MTE1;
+#endif
         } else if (dst == Hardware::L0A) {
             return fwdDirect ? HardEvent::MTE1_M : HardEvent::M_MTE1;
         } else if (dst == Hardware::L0B) {
             return fwdDirect ? HardEvent::MTE1_M : HardEvent::M_MTE1;
         } else if (dst == Hardware::FIXBUF) {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+            return fwdDirect ? HardEvent::MTE1_M : HardEvent::M_MTE1;
+#else
             return fwdDirect ? HardEvent::MTE1_FIX : HardEvent::FIX_MTE1;
+#endif
         } else if (dst == Hardware::BIAS) {
             return fwdDirect ? HardEvent::MTE1_M : HardEvent::M_MTE1;
         }
@@ -655,7 +666,7 @@ __aicore__ constexpr HardEvent GetQueEvt(
         ASSERT(dst == Hardware::GM || dst == Hardware::UB);
         return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
     }
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5162))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113))
     } else if (src == Hardware::L0C) {
         ASSERT(dst == Hardware::GM || dst == Hardware::UB || dst == Hardware::L1);
         return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
