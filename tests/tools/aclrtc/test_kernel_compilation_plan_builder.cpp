@@ -68,12 +68,12 @@ public:
                     ("aclrtc_plan_test_" + std::to_string(getpid()) + "_" + std::to_string(sequence++));
         resourcePath_ = rootPath_ / "resource";
         toolchainPath_ = rootPath_ / "toolchain";
-        sourceFilePath_ = rootPath_ / "user_source" / "add_custom.cpp";
+        sourceDirectoryPath_ = rootPath_ / "user_source";
         fs::create_directories(resourcePath_ / "resources/include");
         fs::create_directories(resourcePath_ / "resources/src");
         fs::create_directories(toolchainPath_ / "bin");
-        fs::create_directories(sourceFilePath_.parent_path());
-        WriteFile(sourceFilePath_, "// user source\n");
+        fs::create_directories(sourceDirectoryPath_);
+        WriteFile(sourceDirectoryPath_ / "add_custom.cpp", "// user source\n");
         WriteFile(resourcePath_ / "resources/include/constants.h", "@@STATIC_TILING@@\n");
         WriteFile(resourcePath_ / "resources/src/basic.cpp", "// basic\n");
         WriteFile(resourcePath_ / "resources/src/sk.cpp", "// sk\n");
@@ -90,7 +90,7 @@ public:
 
     const fs::path& ResourcePath() const { return resourcePath_; }
     const fs::path& ToolchainPath() const { return toolchainPath_; }
-    const fs::path& SourceFilePath() const { return sourceFilePath_; }
+    const fs::path& SourceDirectoryPath() const { return sourceDirectoryPath_; }
 
 private:
     static void WriteFile(const fs::path& path, const std::string& contents)
@@ -108,7 +108,7 @@ private:
     fs::path rootPath_;
     fs::path resourcePath_;
     fs::path toolchainPath_;
-    fs::path sourceFilePath_;
+    fs::path sourceDirectoryPath_;
 };
 
 Json CreateManifest()
@@ -188,7 +188,7 @@ TEST(KernelCompilationPlanBuilderTest, BuildsBasicPlanFromOnlySelectedManifestFi
 
     KernelCompilationPlan plan;
     EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
-                                           workspace.SourceFilePath())
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               0);
 
@@ -202,7 +202,7 @@ TEST(KernelCompilationPlanBuilderTest, BuildsBasicPlanFromOnlySelectedManifestFi
     EXPECT_EQ(compileCommand.commandKind, CompilationCommandKind::Compile);
     EXPECT_EQ(compileCommand.executablePath, workspace.ToolchainPath() / "bin/bisheng");
     EXPECT_EQ(compileCommand.commandArguments,
-              (std::vector<std::string>{"-I", workspace.SourceFilePath().parent_path().string(),
+              (std::vector<std::string>{"-I", workspace.SourceDirectoryPath().string(),
                                         "-I" + (workspace.ToolchainPath() / "include").string(),
                                         (workspace.ResourcePath() / "resources/src/basic.cpp").string(), "-g",
                                         "-DVALUE=1", "-o",
@@ -227,7 +227,7 @@ TEST(KernelCompilationPlanBuilderTest, AcceptsCommandWithoutStageAndPreservesMan
     manifest["kernels"][1]["objects"][0]["commands"][0].erase("stage");
 
     KernelCompilationPlan plan;
-    ASSERT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceFilePath())
+    ASSERT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               0);
     ASSERT_EQ(plan.compilationCommands.size(), 2U);
@@ -254,7 +254,7 @@ TEST(KernelCompilationPlanBuilderTest, PreservesExplicitStagesAndManifestCommand
 
     KernelCompilationPlan plan;
     ASSERT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
-                                           workspace.SourceFilePath())
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               0);
     ASSERT_EQ(plan.compilationCommands.size(), 4U);
@@ -302,7 +302,7 @@ TEST(KernelCompilationPlanBuilderTest, SelectsAllRequestedObjectsInManifestOrder
     manifest["kernels"][1]["objects"].push_back(secondSuperKernelObject);
 
     KernelCompilationPlan plan;
-    ASSERT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceFilePath())
+    ASSERT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               0);
 
@@ -338,13 +338,13 @@ TEST(KernelCompilationPlanBuilderTest, RequiresOnlyEnvironmentUsedBySelectedObje
 
     KernelCompilationPlan plan;
     EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
-                                           workspace.SourceFilePath())
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               0);
 
     request.compilationVariant = CompilationVariant::BasicWithSuperKernel;
     EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
-                                           workspace.SourceFilePath())
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
@@ -366,7 +366,7 @@ TEST(KernelCompilationPlanBuilderTest, ReportsMalformedEnvironmentPlaceholderDet
         "${env:ACLRTC_TEST_TOOLCHAIN";
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithUnterminatedPlaceholder, workspace.ResourcePath(),
-                                           workspace.SourceFilePath())
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
@@ -377,7 +377,7 @@ TEST(KernelCompilationPlanBuilderTest, ReportsMalformedEnvironmentPlaceholderDet
     manifestWithEmptyEnvironmentName["kernels"][1]["objects"][0]["commands"][0]["cmd"][2] = "${env:}";
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithEmptyEnvironmentName, workspace.ResourcePath(),
-                                           workspace.SourceFilePath())
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
@@ -400,7 +400,7 @@ TEST(KernelCompilationPlanBuilderTest, ReportsUndefinedOptionReferenceLocation)
 
     KernelCompilationPlan plan;
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
-    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceFilePath())
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
@@ -424,7 +424,7 @@ TEST(KernelCompilationPlanBuilderTest, DoesNotRecursivelyExpandEnvironmentOrUser
     manifest["options"]["common_compile"].push_back("${env:ACLRTC_TEST_LITERAL}");
 
     KernelCompilationPlan plan;
-    ASSERT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceFilePath())
+    ASSERT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               0);
     const std::vector<std::string>& commandArguments = plan.compilationCommands.front().commandArguments;
@@ -448,7 +448,7 @@ TEST(KernelCompilationPlanBuilderTest, AcceptsKernelWithoutLinkOptions)
         CreateRequest(workspace, argumentAddresses, argumentByteCounts);
 
     KernelCompilationPlan plan;
-    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceFilePath())
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               0);
     EXPECT_EQ(plan.sourcePatches.size(), 1U);
@@ -468,7 +468,7 @@ TEST(KernelCompilationPlanBuilderTest, RejectsKernelWithoutStaticConstants)
     manifestWithoutConstants["kernels"][1].erase("constant_infos");
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithoutConstants, workspace.ResourcePath(),
-                                           workspace.SourceFilePath())
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
@@ -477,7 +477,7 @@ TEST(KernelCompilationPlanBuilderTest, RejectsKernelWithoutStaticConstants)
     Json manifestWithEmptyConstants = CreateManifest();
     manifestWithEmptyConstants["kernels"][1]["constant_infos"] = Json::array();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithEmptyConstants, workspace.ResourcePath(),
-                                           workspace.SourceFilePath())
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
@@ -492,7 +492,7 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMissingRuntimeConstantBuffer)
     KernelCompilationPlan plan;
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
-                                           workspace.SourceFilePath())
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
@@ -513,7 +513,7 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMismatchedRuntimeConstantByteCount
     KernelCompilationPlan plan;
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
-                                           workspace.SourceFilePath())
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
@@ -534,21 +534,22 @@ TEST(KernelCompilationPlanBuilderTest, ReportsMissingRegistryPathsWithoutSuccess
     const fs::path missingWorktreePath = workspace.ResourcePath() / "missing";
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), missingWorktreePath,
-                                           workspace.SourceFilePath())
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
         "Resource worktree must be an existing directory"));
     EXPECT_FALSE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("message=Success"));
 
-    const fs::path missingSourceFilePath = workspace.SourceFilePath().parent_path() / "missing.cpp";
+    Json manifestWithMissingSource = CreateManifest();
+    manifestWithMissingSource["source_file"] = "missing.cpp";
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
-    EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
-                                           missingSourceFilePath)
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithMissingSource, workspace.ResourcePath(),
+                                           workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "sourceFilePath must be an existing regular file"));
+        "Manifest source file must be an existing regular file"));
     EXPECT_FALSE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("message=Success"));
 }
 } // namespace

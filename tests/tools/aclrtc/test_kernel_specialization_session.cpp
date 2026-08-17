@@ -68,6 +68,24 @@ private:
     bool wasSet_ {false};
 };
 
+class ScopedCurrentDirectory final {
+public:
+    explicit ScopedCurrentDirectory(const fs::path& currentDirectory)
+        : previousDirectory_(fs::current_path())
+    {
+        fs::current_path(currentDirectory);
+    }
+
+    ~ScopedCurrentDirectory()
+    {
+        boost::system::error_code ignoredError;
+        fs::current_path(previousDirectory_, ignoredError);
+    }
+
+private:
+    fs::path previousDirectory_;
+};
+
 class EndToEndTestResource final {
 public:
     explicit EndToEndTestResource(FakeCompilerOutcome compilerOutcome)
@@ -76,15 +94,15 @@ public:
         rootPath_ = fs::temp_directory_path() /
                     ("aclrtc_session_test_" + std::to_string(getpid()) + "_" + std::to_string(sequence++));
         worktreePath_ = rootPath_ / "worktree";
-        sourceFilePath_ = rootPath_ / "user/add_custom.cpp";
+        sourceDirectoryPath_ = rootPath_ / "user";
         toolchainPath_ = rootPath_ / "toolchain";
         outputElfPath_ = rootPath_ / "output/kernel.elf";
         fs::create_directories(worktreePath_ / "resources/include");
         fs::create_directories(worktreePath_ / "resources/src");
-        fs::create_directories(sourceFilePath_.parent_path());
+        fs::create_directories(sourceDirectoryPath_);
         fs::create_directories(toolchainPath_ / "bin");
         fs::create_directories(outputElfPath_.parent_path());
-        WriteFile(sourceFilePath_, "// user source\n");
+        WriteFile(sourceDirectoryPath_ / "add_custom.cpp", "// user source\n");
         WriteFile(worktreePath_ / "resources/include/constants.h", "TILING=@@STATIC_TILING@@;\n");
         WriteFile(worktreePath_ / "resources/src/basic.cpp", "// basic source\n");
         WriteExecutable(toolchainPath_ / "bin/bisheng",
@@ -109,7 +127,7 @@ public:
         }
         resource.borrowedManifest = &testResource.manifest_;
         resource.ownedWorktreePath = testResource.worktreePath_;
-        resource.externalSourceFilePath = testResource.sourceFilePath_;
+        resource.externalSourceDirectoryPath = testResource.sourceDirectoryPath_;
         return 0;
     }
 
@@ -149,6 +167,7 @@ private:
     {
         return Json {
             {"schema_version", "1.0"},
+            {"source_file", "add_custom.cpp"},
             {"kernels",
              Json::array({{{"kernel_name", "add_custom_100000"},
                            {"constant_infos",
@@ -172,7 +191,7 @@ private:
 
     fs::path rootPath_;
     fs::path worktreePath_;
-    fs::path sourceFilePath_;
+    fs::path sourceDirectoryPath_;
     fs::path toolchainPath_;
     fs::path outputElfPath_;
     Json manifest_;
@@ -277,6 +296,13 @@ TEST(KernelSpecializationSessionTest, ReportsHowToCorrectMissingOutputDirectory)
 TEST(KernelSpecializationSessionTest, RetainsWorktreeWhenKernelMetaSavingIsEnabled)
 {
     EndToEndTestResource testResource(FakeCompilerOutcome::Success);
+    static uint64_t diagnosticSequence = 0U;
+    const fs::path diagnosticRoot =
+        fs::temp_directory_path() /
+        ("aclrtc_session_diagnostics_" + std::to_string(getpid()) + "_" +
+         std::to_string(diagnosticSequence++));
+    fs::create_directories(diagnosticRoot);
+    ScopedCurrentDirectory currentDirectory(diagnosticRoot);
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
     ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "1");
     JitResourceRegistryAdapter registryAdapter(EndToEndTestResource::Lookup, &testResource);
@@ -287,7 +313,19 @@ TEST(KernelSpecializationSessionTest, RetainsWorktreeWhenKernelMetaSavingIsEnabl
 
     KernelSpecializationSession session(registryAdapter);
     EXPECT_EQ(session.RunKernelSpecialization(&request, testResource.OutputElfPath().c_str()), 0);
-    EXPECT_TRUE(fs::is_directory(testResource.WorktreePath()));
+    EXPECT_FALSE(fs::exists(testResource.WorktreePath()));
+
+    const fs::path processDiagnosticDirectory = diagnosticRoot / "kernel_meta" / std::to_string(getpid());
+    const fs::directory_iterator sessionDirectory = fs::directory_iterator(processDiagnosticDirectory);
+    ASSERT_NE(sessionDirectory, fs::directory_iterator());
+    const fs::path retainedWorktreePath = sessionDirectory->path() / "resource_worktree";
+    EXPECT_TRUE(fs::is_directory(retainedWorktreePath));
+    const std::string replayScript = ReadFile(sessionDirectory->path() / "replay.sh");
+    EXPECT_NE(replayScript.find(retainedWorktreePath.string()), std::string::npos);
+    EXPECT_EQ(replayScript.find(testResource.WorktreePath().string()), std::string::npos);
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(diagnosticRoot, ignoredError);
 }
 
 TEST(KernelSpecializationSessionTest, CleansWorktreeWhenRegistryReturnsIncompleteData)

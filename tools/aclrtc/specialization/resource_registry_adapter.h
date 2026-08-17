@@ -23,7 +23,7 @@ namespace aclrtc {
 struct RegisteredJitResource {
     const nlohmann::json* borrowedManifest {nullptr};
     boost::filesystem::path ownedWorktreePath;
-    boost::filesystem::path externalSourceFilePath;
+    boost::filesystem::path externalSourceDirectoryPath;
 };
 
 class JitResourceRegistryAdapter final {

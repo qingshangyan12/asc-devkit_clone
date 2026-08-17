@@ -143,6 +143,22 @@ KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
     }
 }
 
+bool KernelSpecializationDiagnostics::GetResourceWorktreeRetentionPath(
+    fs::path& resourceWorktreeRetentionPath) const noexcept
+{
+    if (!diagnosticsEnabled_) {
+        return false;
+    }
+    try {
+        resourceWorktreeRetentionPath = diagnosticDirectoryPath_ / "resource_worktree";
+        return true;
+    } catch (...) {
+        ACLRTC_LOG_WARNING("Failed to construct retained resource worktree path: diagnostic_directory=%s",
+                           diagnosticDirectoryPath_.c_str());
+        return false;
+    }
+}
+
 void KernelSpecializationDiagnostics::WriteManifestSnapshot(const nlohmann::json& resourceManifest) noexcept
 {
     if (!diagnosticsEnabled_) {

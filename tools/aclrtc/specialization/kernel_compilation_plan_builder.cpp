@@ -44,7 +44,7 @@ struct ManifestExpansionContext {
     const Json& resourceManifest;
     const fs::path& resourceWorktreePath;
     const fs::path& outputDirectoryPath;
-    const fs::path& externalSourceFilePath;
+    const fs::path& externalSourceDirectoryPath;
 };
 
 void ReplaceAllLiteralOccurrences(std::string& text, const std::string& literalText,
@@ -110,7 +110,7 @@ bool ExpandPathAndEnvironmentPlaceholders(
     ReplaceAllLiteralOccurrences(pathResolvedText, "${resource}", expansionContext.resourceWorktreePath.string());
     ReplaceAllLiteralOccurrences(pathResolvedText, "${output}", expansionContext.outputDirectoryPath.string());
     ReplaceAllLiteralOccurrences(pathResolvedText, "${source_file_path}",
-                                 expansionContext.externalSourceFilePath.parent_path().string());
+                                 expansionContext.externalSourceDirectoryPath.string());
     return ExpandEnvironmentVariablePlaceholders(pathResolvedText, manifestValueLocation, resolvedText);
 }
 
@@ -452,10 +452,10 @@ aclError BuildLinkCommand(const Json& selectedKernel, const std::vector<Selected
 
 KernelCompilationPlanBuilder::KernelCompilationPlanBuilder(
     const NormalizedKernelSpecializationRequest& specializationRequest, const nlohmann::json& resourceManifest,
-    fs::path resourceWorktreePath, fs::path externalSourceFilePath)
+    fs::path resourceWorktreePath, fs::path externalSourceDirectoryPath)
     : specializationRequest_(specializationRequest), resourceManifest_(resourceManifest),
       resourceWorktreePath_(std::move(resourceWorktreePath)),
-      externalSourceFilePath_(std::move(externalSourceFilePath))
+      externalSourceDirectoryPath_(std::move(externalSourceDirectoryPath))
 {}
 
 aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPlan& compilationPlan) const
@@ -482,25 +482,26 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
                 resourceWorktreePath_.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
-        if (!externalSourceFilePath_.is_absolute()) {
+        if (!externalSourceDirectoryPath_.is_absolute()) {
             ACLRTC_LOG_ERROR(
-                "ResourceRegistry returned a non-absolute sourceFilePath: %s; fix the registry integration",
-                externalSourceFilePath_.c_str());
+                "ResourceRegistry returned a non-absolute sourceFilePath directory: %s; fix the registry integration",
+                externalSourceDirectoryPath_.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
-        boost::system::error_code sourceFileError;
-        const bool sourcePathIsRegularFile = fs::is_regular_file(externalSourceFilePath_, sourceFileError);
-        if (sourceFileError && !IsMissingPathError(sourceFileError)) {
-            ACLRTC_LOG_ERROR("Failed to inspect sourceFilePath: path=%s error=%d message=%s; fix the registered "
-                             "resource data",
-                             externalSourceFilePath_.c_str(), sourceFileError.value(),
-                             sourceFileError.message().c_str());
+        boost::system::error_code sourceDirectoryError;
+        const bool sourcePathIsDirectory = fs::is_directory(externalSourceDirectoryPath_, sourceDirectoryError);
+        if (sourceDirectoryError && !IsMissingPathError(sourceDirectoryError)) {
+            ACLRTC_LOG_ERROR(
+                "Failed to inspect sourceFilePath directory: path=%s error=%d message=%s; fix the registered "
+                "resource data",
+                externalSourceDirectoryPath_.c_str(), sourceDirectoryError.value(),
+                sourceDirectoryError.message().c_str());
             return ACLRTC_ERROR_FAILURE;
         }
-        if (!sourcePathIsRegularFile) {
+        if (!sourcePathIsDirectory) {
             ACLRTC_LOG_ERROR(
-                "sourceFilePath must be an existing regular file: path=%s; fix the registered resource data",
-                externalSourceFilePath_.c_str());
+                "sourceFilePath must be an existing directory: path=%s; fix the registered resource data",
+                externalSourceDirectoryPath_.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
         const std::string schemaVersion = resourceManifest_.at("schema_version").get<std::string>();
@@ -509,6 +510,25 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
                 "Unsupported Manifest schema_version '%s'; expected '%s'. Regenerate the JIT resource with a "
                 "compatible pack tool",
                 schemaVersion.c_str(), SUPPORTED_MANIFEST_SCHEMA_VERSION);
+            return ACLRTC_ERROR_FAILURE;
+        }
+
+        const fs::path manifestSourceFilePath =
+            externalSourceDirectoryPath_ / resourceManifest_.at("source_file").get<std::string>();
+        boost::system::error_code sourceFileError;
+        const bool sourceFileIsRegular = fs::is_regular_file(manifestSourceFilePath, sourceFileError);
+        if (sourceFileError && !IsMissingPathError(sourceFileError)) {
+            ACLRTC_LOG_ERROR(
+                "Failed to inspect Manifest source file: path=%s error=%d message=%s; fix the registered resource "
+                "data",
+                manifestSourceFilePath.c_str(), sourceFileError.value(), sourceFileError.message().c_str());
+            return ACLRTC_ERROR_FAILURE;
+        }
+        if (!sourceFileIsRegular) {
+            ACLRTC_LOG_ERROR(
+                "Manifest source file must be an existing regular file: path=%s; regenerate the JIT resource from "
+                "the matching operator source",
+                manifestSourceFilePath.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
 
@@ -530,7 +550,7 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
         const fs::path outputDirectoryPath =
             resourceWorktreePath_ / (".aclrtc_" + specializationRequest_.specializationSessionId) / "outputs";
         const ManifestExpansionContext expansionContext {
-            resourceManifest_, resourceWorktreePath_, outputDirectoryPath, externalSourceFilePath_};
+            resourceManifest_, resourceWorktreePath_, outputDirectoryPath, externalSourceDirectoryPath_};
         aclError result = BuildConstantSourcePatches(*selectedKernel, specializationRequest_, expansionContext,
                                                      builtPlan.sourcePatches);
         if (result != ACLRTC_SUCCESS) {
