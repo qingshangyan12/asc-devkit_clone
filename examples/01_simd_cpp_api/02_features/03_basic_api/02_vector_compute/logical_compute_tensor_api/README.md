@@ -6,9 +6,11 @@
 
 样例同时使用寄存器与寄存器、寄存器与右标量、左标量与寄存器三种操作数组合，展示Tensor API如何以C++运算符形式表达逐lane逻辑计算。有效lane的mask由参与计算的`reg_tensor`提供，并随结果继续传递。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+| :--- | :----------- |
+| Ascend 950PR/Ascend 950DT | CANN master（包含本样例依赖的experimental Tensor API接口） |
 
 ## 目录结构介绍
 

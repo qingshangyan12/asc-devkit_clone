@@ -6,9 +6,11 @@
 
 `uint8_t`输入的取值范围为0到255，一个`uint16_t`目的寄存器在一个256Byte的Vector Length内可保存128个统计结果，因此接口将完整取值范围拆分为`low`和`high`两个区间。目标寄存器既是统计结果的初值，也是本次统计的累加目标。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+| :--- | :----------- |
+| Ascend 950PR/Ascend 950DT | CANN master（包含本样例依赖的experimental Tensor API接口） |
 
 ## 目录结构介绍
 
