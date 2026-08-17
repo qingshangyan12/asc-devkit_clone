@@ -36,17 +36,15 @@ $$
 
 ## 函数原型
 
-### 模板原型（占位符形式）
-
 ```c
 __simd_callee__ inline void asc_reduce_max_datablock(vector_<dtype>& dst,
                                                      vector_<dtype> src,
                                                      vector_bool mask)
 ```
 
-### dtype支持的数据类型
+### dtype取值
 
-`dtype`支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
+`dtype`支持的取值为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
@@ -75,23 +73,22 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst,
 
 ## 约束说明
 
+- 比较时遵循$max(-0, +0) = +0$。
 - `dst`与`src`的数据类型需要保持一致。
-- 每个`DataBlock`内的最大值连续写入`dst`，`dst`中的其他元素置0。
+- 每个`DataBlock`内的最大值连续写入`dst`的前8个元素，这8个元素为有效输出，`dst`中的其他元素置0。
 - 未被`mask`选中的元素被视为对应数据类型的最小值，浮点数类型的最小值为`-inf`。如果一个`DataBlock`中的所有元素均未被`mask`选中，则将该最小值写入`dst`的对应位置。
 - 仅输出最大值，不输出索引。
 
+<!-- npu="950" id8 -->
 ## 调用示例
 
-将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-<!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-"$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 \
-  -Wno-deprecated-declarations --asc-aicore-lang example.asc -lm -o main && ./main
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
-<!-- end id8 -->
 
 ```cpp
 #include <cstdint>
@@ -101,7 +98,7 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst,
 #include "acl/acl.h"
 namespace {
 template <typename T>
-void PrintData(const char* label, const std::vector<T>& values)
+void print_data(const char* label, const std::vector<T>& values)
 {
     std::cout << label << ":";
     const size_t count = values.size() < 8 ? values.size() : 8;
@@ -111,7 +108,7 @@ void PrintData(const char* label, const std::vector<T>& values)
 }
 
 template <typename T>
-bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
@@ -122,23 +119,8 @@ bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, d
     return true;
 }
 
-template <typename T>
-bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
-    size_t begin, size_t count, double tolerance = 0.0)
-{
-    if (begin + count > actual.size() || begin + count > expected.size()) return false;
-    for (size_t i = begin; i < begin + count; ++i) {
-        if (actual[i] == expected[i]) continue;
-        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
-        if (diff > tolerance || diff < -tolerance) return false;
-    }
-    return true;
-}
-
-
-
 constexpr uint32_t ELEMENT_COUNT = 64;
-__simd_vf__ inline void Reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
+__simd_vf__ inline void reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
 {
     vector_uint32_t dst_reg, src_reg;
     uint32_t count = ELEMENT_COUNT;
@@ -147,14 +129,14 @@ __simd_vf__ inline void Reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
     asc_reduce_max_datablock(dst_reg, src_reg, mask);
     asc_storealign(dst, dst_reg, mask);
 }
-__global__ __vector__ void AscReduceMaxDatablockKernel(__gm__ uint32_t* dst, __gm__ uint32_t* src)
+__global__ __vector__ void asc_reduce_max_datablock_kernel(__gm__ uint32_t* dst, __gm__ uint32_t* src)
 {
     asc_init();
     __ubuf__ uint32_t dst_local[ELEMENT_COUNT], src_local[ELEMENT_COUNT];
     asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(uint32_t));
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    Reduce(dst_local, src_local);
+    reduce(dst_local, src_local);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(uint32_t));
@@ -176,14 +158,14 @@ int main()
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(src_device, src.size() * sizeof(uint32_t), src.data(), src.size() * sizeof(uint32_t),
         ACL_MEMCPY_HOST_TO_DEVICE);
-    AscReduceMaxDatablockKernel<<<1, 0>>>(dst_device, src_device);
+    asc_reduce_max_datablock_kernel<<<1, 0>>>(dst_device, src_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(uint32_t), dst_device, output.size() * sizeof(uint32_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    PrintData("Input", src);
-    PrintData("Output", output);
-    PrintData("Golden", golden);
-    const bool passed = CompareData(output, golden);
+    print_data("Input", src);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = compare_data(output, golden);
     std::cout << (passed ? "[Success] asc_reduce_max_datablock passed." : "[Failed] asc_reduce_max_datablock failed.") << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src_device);
@@ -192,3 +174,4 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+<!-- end id8 -->

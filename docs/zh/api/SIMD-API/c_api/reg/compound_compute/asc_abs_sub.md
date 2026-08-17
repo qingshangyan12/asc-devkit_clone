@@ -34,8 +34,6 @@ $$
 
 ## 函数原型
 
-### 模板原型（占位符形式）
-
 ```c
 __simd_callee__ inline void asc_abs_sub(vector_<dtype>& dst,
                                         vector_<dtype> src0,
@@ -43,9 +41,9 @@ __simd_callee__ inline void asc_abs_sub(vector_<dtype>& dst,
                                         vector_bool mask)
 ```
 
-### dtype支持的数据类型
+### dtype取值
 
-`dtype`支持的数据类型为`half`、`float`。
+`dtype`支持的取值为`half`、`float`。
 
 ### 典型示例
 
@@ -79,18 +77,16 @@ __simd_callee__ inline void asc_abs_sub(vector_float& dst,
 - `dst`、`src0`和`src1`的数据类型需要保持一致。
 - `mask`掩码位为0时，`dst`对应元素置0。
 
+<!-- npu="950" id8 -->
 ## 调用示例
 
-将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-<!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-"$ASCEND_HOME_PATH/bin/bisheng" --npu-arch=dav-3510 -std=c++17 \
-  -Wno-deprecated-declarations --asc-aicore-lang example.asc -lm -o main && ./main
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
-<!-- end id8 -->
 
 ```cpp
 #include <cmath>
@@ -103,7 +99,7 @@ __simd_callee__ inline void asc_abs_sub(vector_float& dst,
 
 namespace {
 template <typename T>
-void PrintData(const char* label, const std::vector<T>& values)
+void print_data(const char* label, const std::vector<T>& values)
 {
     std::cout << label << ":";
     const size_t count = values.size() < 8 ? values.size() : 8;
@@ -113,7 +109,7 @@ void PrintData(const char* label, const std::vector<T>& values)
 }
 
 template <typename T>
-bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
@@ -124,25 +120,10 @@ bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, d
     return true;
 }
 
-template <typename T>
-bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
-    size_t begin, size_t count, double tolerance = 0.0)
-{
-    if (begin + count > actual.size() || begin + count > expected.size()) return false;
-    for (size_t i = begin; i < begin + count; ++i) {
-        if (actual[i] == expected[i]) continue;
-        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
-        if (diff > tolerance || diff < -tolerance) return false;
-    }
-    return true;
-}
-
-
-
 constexpr uint32_t ELEMENT_COUNT = 64;
 constexpr float SCALAR_VALUE = 0.5f;
 
-__simd_vf__ inline void Compute(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1)
+__simd_vf__ inline void compute(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1)
 {
     vector_float dst_reg;
     vector_float src0_reg;
@@ -156,7 +137,7 @@ __simd_vf__ inline void Compute(__ubuf__ float* dst, __ubuf__ float* src0, __ubu
     asc_storealign(dst, dst_reg, mask);
 }
 
-__global__ __vector__ void AscAbsSubKernel(__gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
+__global__ __vector__ void asc_abs_sub_kernel(__gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
 {
     asc_init();
     __ubuf__ float dst_local[ELEMENT_COUNT];
@@ -167,7 +148,7 @@ __global__ __vector__ void AscAbsSubKernel(__gm__ float* dst, __gm__ float* src0
     asc_copy_gm2ub_align(src1_local, src1, ELEMENT_COUNT * sizeof(float));
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    Compute(dst_local, src0_local, src1_local);
+    compute(dst_local, src0_local, src1_local);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(float));
@@ -206,16 +187,16 @@ int main()
         ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(src1_device, src1.size() * sizeof(float), src1.data(), src1.size() * sizeof(float),
         ACL_MEMCPY_HOST_TO_DEVICE);
-    AscAbsSubKernel<<<1, 0>>>(dst_device, src0_device, src1_device);
+    asc_abs_sub_kernel<<<1, 0>>>(dst_device, src0_device, src1_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    PrintData("Initial dst", initial);
-    PrintData("Input src0", src0);
-    PrintData("Input src1", src1);
-    PrintData("Output", output);
-    PrintData("Golden", golden);
-    const bool passed = CompareData(output, golden, 1e-6);
+    print_data("Initial dst", initial);
+    print_data("Input src0", src0);
+    print_data("Input src1", src1);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = compare_data(output, golden, 1e-6);
     std::cout << (passed ? "[Success] asc_abs_sub passed." : "[Failed] asc_abs_sub failed.") << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src0_device);
@@ -225,3 +206,4 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+<!-- end id8 -->
