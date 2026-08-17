@@ -38,7 +38,37 @@ void LibraryDeleter::operator()(void* handle) const noexcept
     }
 }
 
-const char* ResourceStatusToString(ResourceStatus status) noexcept
+namespace {
+
+namespace fs = boost::filesystem;
+using Json = nlohmann::json;
+
+constexpr char RELATIVE_JIT_ROOT[] = "op_impl/ai_core/tbe/kernel/jit";
+constexpr char LIBRARY_NAME_SUFFIX[] = "_compile_database.so";
+constexpr uint64_t MAX_MANIFEST_SIZE = 8U * 1024U * 1024U;
+constexpr uint64_t MAX_PATH_SIZE = 4096U;
+constexpr uint64_t MAX_RESOURCE_FILE_SIZE = 256U * 1024U * 1024U;
+constexpr uint64_t MAX_MANIFEST_RESOURCE_SIZE = 512U * 1024U * 1024U;
+constexpr uint64_t MAX_REGISTRY_RESOURCE_SIZE = 1024U * 1024U * 1024U;
+constexpr uint64_t MAX_MANIFEST_COUNT = 4096U;
+constexpr uint64_t MAX_EXTENSION_COUNT = 4096U;
+constexpr uint64_t MAX_FILE_COUNT = 65536U;
+constexpr uint64_t MAX_REGISTRY_FILE_COUNT = 131072U;
+
+const char* SourceTypeName(ResourceSourceType sourceType) noexcept
+{
+    switch (sourceType) {
+        case ResourceSourceType::External:
+            return "external";
+        case ResourceSourceType::Custom:
+            return "custom";
+        case ResourceSourceType::BuiltIn:
+            return "built-in";
+    }
+    return "unknown";
+}
+
+const char* ResourceStatusName(ResourceStatus status) noexcept
 {
     switch (status) {
         case ResourceStatus::Success:
@@ -59,35 +89,6 @@ const char* ResourceStatusToString(ResourceStatus status) noexcept
     return "unknown";
 }
 
-namespace {
-
-namespace fs = boost::filesystem;
-using Json = nlohmann::json;
-
-constexpr char RELATIVE_JIT_ROOT[] = "op_impl/ai_core/tbe/kernel/jit";
-constexpr char LIBRARY_NAME_SUFFIX[] = "_compile_database.so";
-constexpr uint64_t MAX_MANIFEST_SIZE = 8U * 1024U * 1024U;
-constexpr uint64_t MAX_PATH_SIZE = 4096U;
-constexpr uint64_t MAX_RESOURCE_FILE_SIZE = 256U * 1024U * 1024U;
-constexpr uint64_t MAX_MANIFEST_RESOURCE_SIZE = 512U * 1024U * 1024U;
-constexpr uint64_t MAX_REGISTRY_RESOURCE_SIZE = 1024U * 1024U * 1024U;
-constexpr uint64_t MAX_MANIFEST_COUNT = 4096U;
-constexpr uint64_t MAX_FILE_COUNT = 65536U;
-constexpr uint64_t MAX_REGISTRY_FILE_COUNT = 131072U;
-
-const char* SourceTypeName(ResourceSourceType sourceType) noexcept
-{
-    switch (sourceType) {
-        case ResourceSourceType::External:
-            return "external";
-        case ResourceSourceType::Custom:
-            return "custom";
-        case ResourceSourceType::BuiltIn:
-            return "built-in";
-    }
-    return "unknown";
-}
-
 void CleanupPath(const std::string& path) noexcept
 {
     if (path.empty()) {
@@ -96,6 +97,29 @@ void CleanupPath(const std::string& path) noexcept
     if (!FileUtils::RemoveAll(path)) {
         ASCENDLOGW("Failed to remove compile resource path: path=%s reason=recursive removal failed", path.c_str());
     }
+}
+
+bool ShouldKeepTemporaryRoot() noexcept
+{
+    const char* environment = std::getenv("ASCEND_OP_COMPILE_SAVE_KERNEL_META");
+    if (environment == nullptr) {
+        return false;
+    }
+    auto isWhitespace = [](char value) {
+        return value == ' ' || value == '\t' || value == '\n' || value == '\r' || value == '\f' || value == '\v';
+    };
+    const char* begin = environment;
+    while (*begin != '\0' && isWhitespace(*begin)) {
+        ++begin;
+    }
+    const char* end = begin;
+    while (*end != '\0') {
+        ++end;
+    }
+    while (end != begin && isWhitespace(*(end - 1))) {
+        --end;
+    }
+    return end == begin + 1 && *begin == '1';
 }
 
 ResourceStatus CreateTemporaryRoot(std::string& temporaryRoot)
@@ -263,6 +287,60 @@ ResourceStatus ValidateManifestTable(const AcCompileResourceBundle& bundle, cons
     return ResourceStatus::Success;
 }
 
+ResourceStatus ValidateExtensionTable(const AcCompileResourceBundle& bundle, const LibrarySpec& spec)
+{
+    if (bundle.extensionCount == 0U) {
+        if (bundle.extensions != nullptr) {
+            ASCENDLOGE(
+                "Compile resource extension table is inconsistent: source_type=%s so=%s count=0 pointer=%p "
+                "expected=null",
+                SourceTypeName(spec.sourceType), spec.path.c_str(), static_cast<const void*>(bundle.extensions));
+            return ResourceStatus::InvalidResource;
+        }
+        return ResourceStatus::Success;
+    }
+    if (bundle.extensionCount > MAX_EXTENSION_COUNT) {
+        ASCENDLOGE(
+            "Compile resource extension count exceeds limit: source_type=%s so=%s actual=%" PRIu64 " limit=%" PRIu64,
+            SourceTypeName(spec.sourceType), spec.path.c_str(), bundle.extensionCount, MAX_EXTENSION_COUNT);
+        return ResourceStatus::InvalidResource;
+    }
+    if (bundle.extensions == nullptr) {
+        ASCENDLOGE(
+            "Compile resource extension table is null: source_type=%s so=%s count=%" PRIu64,
+            SourceTypeName(spec.sourceType), spec.path.c_str(), bundle.extensionCount);
+        return ResourceStatus::InvalidResource;
+    }
+    for (uint64_t index = 0U; index < bundle.extensionCount; ++index) {
+        const AcCompileResourceExtension& extension = bundle.extensions[index];
+        const uint64_t unsupportedFlags = extension.flags & ~AC_COMPILE_RESOURCE_EXTENSION_REQUIRED;
+        if (unsupportedFlags != 0U) {
+            ASCENDLOGE(
+                "Compile resource extension has unsupported flags: source_type=%s so=%s extension=%" PRIu64
+                " type=%u version=%u flags=0x%" PRIx64 " supported_mask=0x%" PRIx64,
+                SourceTypeName(spec.sourceType), spec.path.c_str(), index, extension.type, extension.version,
+                extension.flags, static_cast<uint64_t>(AC_COMPILE_RESOURCE_EXTENSION_REQUIRED));
+            return ResourceStatus::InvalidResource;
+        }
+        if (extension.dataSize != 0U && extension.data == nullptr) {
+            ASCENDLOGE(
+                "Compile resource extension has null data: source_type=%s so=%s extension=%" PRIu64
+                " type=%u version=%u size=%" PRIu64 " expected=non-null data",
+                SourceTypeName(spec.sourceType), spec.path.c_str(), index, extension.type, extension.version,
+                extension.dataSize);
+            return ResourceStatus::InvalidResource;
+        }
+        if ((extension.flags & AC_COMPILE_RESOURCE_EXTENSION_REQUIRED) != 0U) {
+            ASCENDLOGE(
+                "Compile resource bundle requires an unsupported extension: source_type=%s so=%s extension=%" PRIu64
+                " type=%u version=%u",
+                SourceTypeName(spec.sourceType), spec.path.c_str(), index, extension.type, extension.version);
+            return ResourceStatus::InvalidResource;
+        }
+    }
+    return ResourceStatus::Success;
+}
+
 struct ManifestOwnership {
     Json document;
     std::string resourceId;
@@ -288,13 +366,6 @@ ResourceStatus ParseResourceId(
         return ResourceStatus::InvalidResource;
     }
     resourceId = document.at("resource_id").get<std::string>();
-    if (!IsPlainName(resourceId)) {
-        ASCENDLOGE(
-            "Compile resource manifest has unsafe resource identifier: source_type=%s so=%s manifest=%" PRIu64
-            " resource_id=%s expected=non-empty file-name-safe value",
-            SourceTypeName(spec.sourceType), spec.path.c_str(), manifestIndex, resourceId.c_str());
-        return ResourceStatus::InvalidResource;
-    }
     return ResourceStatus::Success;
 }
 
@@ -370,26 +441,25 @@ ResourceStatus PrepareMaterializationRoot(
     }
     const std::string categoryParent = FileUtils::JoinPath(temporaryRoot, SourceTypeName(sourceType));
     categoryRoot = FileUtils::JoinPath(categoryParent, randomComponent.string());
-    const std::string resourceRoot = FileUtils::JoinPath(categoryRoot, resourceId);
-    if (!FileUtils::CreateDirectories(resourceRoot)) {
+    if (!FileUtils::CreateDirectories(categoryRoot)) {
         ASCENDLOGE(
             "Failed to create compile resource materialization directory: resource_id=%s source_type=%s path=%s",
-            resourceId.c_str(), SourceTypeName(sourceType), resourceRoot.c_str());
+            resourceId.c_str(), SourceTypeName(sourceType), categoryRoot.c_str());
         return ResourceStatus::IoError;
     }
-    const fs::path canonical = fs::canonical(resourceRoot, error);
+    const fs::path canonical = fs::canonical(categoryRoot, error);
     if (error) {
         ASCENDLOGE(
             "Failed to resolve compile resource materialization directory: resource_id=%s source_type=%s path=%s "
             "error=%s",
-            resourceId.c_str(), SourceTypeName(sourceType), resourceRoot.c_str(), error.message().c_str());
+            resourceId.c_str(), SourceTypeName(sourceType), categoryRoot.c_str(), error.message().c_str());
         return ResourceStatus::IoError;
     }
-    if (canonical != fs::path(resourceRoot).lexically_normal()) {
+    if (canonical != fs::path(categoryRoot).lexically_normal()) {
         ASCENDLOGE(
             "Compile resource materialization directory identity mismatch: resource_id=%s source_type=%s expected=%s "
             "actual=%s",
-            resourceId.c_str(), SourceTypeName(sourceType), resourceRoot.c_str(), canonical.c_str());
+            resourceId.c_str(), SourceTypeName(sourceType), categoryRoot.c_str(), canonical.c_str());
         return ResourceStatus::IoError;
     }
     canonicalRoot = canonical.string();
@@ -765,9 +835,12 @@ ResourceStatus ResourceRegistry::GetBundle(
     bundle = reinterpret_cast<const AcCompileResourceBundle*>(header);
     status = ValidateManifestTable(*bundle, spec);
     if (status == ResourceStatus::Success) {
+        status = ValidateExtensionTable(*bundle, spec);
+    }
+    if (status == ResourceStatus::Success) {
         ASCENDLOGD(
-            "Validated compile resource bundle: source_type=%s so=%s manifests=%" PRIu64,
-            SourceTypeName(spec.sourceType), spec.path.c_str(), bundle->manifestCount);
+            "Validated compile resource bundle: source_type=%s so=%s manifests=%" PRIu64 " extensions=%" PRIu64,
+            SourceTypeName(spec.sourceType), spec.path.c_str(), bundle->manifestCount, bundle->extensionCount);
     }
     return status;
 }
@@ -1044,7 +1117,7 @@ ResourceStatus ResourceRegistry::LoadLibrary(const LibrarySpec& spec, StageState
             ASCENDLOGE(
                 "Stopped loading compile resource SO at manifest: source_type=%s so=%s manifest=%" PRIu64
                 " status=%s(%d)",
-                SourceTypeName(spec.sourceType), spec.path.c_str(), manifestIndex, ResourceStatusToString(status),
+                SourceTypeName(spec.sourceType), spec.path.c_str(), manifestIndex, ResourceStatusName(status),
                 static_cast<int>(status));
             return status;
         }
@@ -1064,7 +1137,7 @@ ResourceStatus ResourceRegistry::LoadLibraries(const std::vector<LibrarySpec>& l
         if (status != ResourceStatus::Success) {
             ASCENDLOGE(
                 "Stopped loading compile resource SO list: source_type=%s so=%s status=%s(%d)",
-                SourceTypeName(library.sourceType), library.path.c_str(), ResourceStatusToString(status),
+                SourceTypeName(library.sourceType), library.path.c_str(), ResourceStatusName(status),
                 static_cast<int>(status));
             return status;
         }
@@ -1121,7 +1194,12 @@ ResourceRegistry& ResourceRegistry::Instance()
 
 ResourceRegistry::ResourceRegistry() = default;
 
-ResourceRegistry::~ResourceRegistry() { CleanupPath(temporaryRoot_); }
+ResourceRegistry::~ResourceRegistry()
+{
+    if (!keepTemporaryRoot_) {
+        CleanupPath(temporaryRoot_);
+    }
+}
 
 ResourceEntry* ResourceRegistry::FindResource(const std::string& resourceId) noexcept
 {
@@ -1202,7 +1280,7 @@ ResourceStatus ResourceRegistry::Commit(StageState& stage)
     ASCENDLOGI(
         "Finished committing compile resources: status=%s(%d) registered_external=%zu registered_custom=%zu "
         "registered_built_in=%zu total_files=%" PRIu64 " total_bytes=%" PRIu64,
-        ResourceStatusToString(status), static_cast<int>(status), externalResources_.size(), customResources_.size(),
+        ResourceStatusName(status), static_cast<int>(status), externalResources_.size(), customResources_.size(),
         builtInResources_.size(), resourceFileCount_, resourceBytes_);
     return status;
 }
@@ -1214,7 +1292,7 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
     if (automatic && automaticLoadAttempted_) {
         ASCENDLOGI(
             "Returning cached automatic compile resource load result: status=%s(%d)",
-            ResourceStatusToString(automaticLoadStatus_), static_cast<int>(automaticLoadStatus_));
+            ResourceStatusName(automaticLoadStatus_), static_cast<int>(automaticLoadStatus_));
         return automaticLoadStatus_;
     }
     ASCENDLOGI(
@@ -1225,8 +1303,7 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
     if (status != ResourceStatus::Success) {
         ASCENDLOGE(
             "Compile resource load stopped during discovery: mode=%s path=%s status=%s(%d)",
-            automatic ? "automatic" : "explicit", automatic ? "<environment>" : directory,
-            ResourceStatusToString(status),
+            automatic ? "automatic" : "explicit", automatic ? "<environment>" : directory, ResourceStatusName(status),
             static_cast<int>(status));
     } else {
         ASCENDLOGI(
@@ -1245,13 +1322,14 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
     if (status == ResourceStatus::Success) {
         ASCENDLOGI(
             "Finished loading compile resources: mode=%s libraries=%zu status=%s(%d)",
-            automatic ? "automatic" : "explicit", libraries.size(), ResourceStatusToString(status),
+            automatic ? "automatic" : "explicit", libraries.size(), ResourceStatusName(status),
             static_cast<int>(status));
     }
     return status;
 }
 
-ResourceStatus ResourceRegistry::Materialize(const std::string& resourceId, ResourceEntry& entry)
+ResourceStatus ResourceRegistry::Materialize(
+    const std::string& resourceId, const ResourceEntry& entry, ResourceData& resource)
 {
     ASCENDLOGI(
         "Materializing compile resource: resource_id=%s source_type=%s so=%s files=%zu", resourceId.c_str(),
@@ -1260,6 +1338,7 @@ ResourceStatus ResourceRegistry::Materialize(const std::string& resourceId, Reso
     {
         std::lock_guard<std::mutex> lock(registryMutex_);
         if (temporaryRoot_.empty()) {
+            keepTemporaryRoot_ = ShouldKeepTemporaryRoot();
             const ResourceStatus status = CreateTemporaryRoot(temporaryRoot_);
             if (status != ResourceStatus::Success) {
                 return status;
@@ -1280,21 +1359,22 @@ ResourceStatus ResourceRegistry::Materialize(const std::string& resourceId, Reso
         status = WriteMaterializedFiles(entry.files, canonicalRoot);
     }
     if (status != ResourceStatus::Success) {
-        CleanupPath(categoryRoot);
-        entry.data.resourceDir.clear();
+        if (!keepTemporaryRoot_) {
+            CleanupPath(categoryRoot);
+        }
+        resource.resourceDir.clear();
         return status;
     }
-    entry.data.resourceDir = canonicalRoot;
+    resource.resourceDir = canonicalRoot;
     ASCENDLOGI(
         "Compile resource materialized: resource_id=%s source_type=%s so=%s files=%zu directory=%s", resourceId.c_str(),
-        SourceTypeName(entry.sourceType), entry.sourceSoPath.c_str(), entry.files.size(),
-        entry.data.resourceDir.c_str());
+        SourceTypeName(entry.sourceType), entry.sourceSoPath.c_str(), entry.files.size(), resource.resourceDir.c_str());
     return ResourceStatus::Success;
 }
 
-ResourceStatus ResourceRegistry::Lookup(const char* resourceId, const ResourceData*& resource)
+ResourceStatus ResourceRegistry::Lookup(const char* resourceId, ResourceData& resource)
 {
-    resource = nullptr;
+    resource = ResourceData{};
     if (resourceId == nullptr) {
         ASCENDLOGE("Compile resource lookup rejected: resource_id=<null> reason=identifier pointer is null");
         return ResourceStatus::InvalidResource;
@@ -1317,12 +1397,13 @@ ResourceStatus ResourceRegistry::Lookup(const char* resourceId, const ResourceDa
         "Compile resource lookup matched: resource_id=%s source_type=%s so=%s", resourceId,
         SourceTypeName(entry->sourceType), entry->sourceSoPath.c_str());
     std::lock_guard<std::mutex> materializeLock(entry->materializeMutex);
-    const ResourceStatus status = Materialize(resourceId, *entry);
+    ResourceData materialized = entry->data;
+    materialized.resourceDir.clear();
+    const ResourceStatus status = Materialize(resourceId, *entry, materialized);
     if (status == ResourceStatus::Success) {
-        resource = &entry->data;
+        resource = std::move(materialized);
         ASCENDLOGD(
-            "Compile resource lookup completed: resource_id=%s directory=%s", resourceId,
-            resource->resourceDir.c_str());
+            "Compile resource lookup completed: resource_id=%s directory=%s", resourceId, resource.resourceDir.c_str());
     }
     return status;
 }

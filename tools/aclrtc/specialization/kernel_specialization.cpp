@@ -25,7 +25,6 @@
 #include <cstring>
 #include <fcntl.h>
 #include <memory>
-#include <mutex>
 #include <unistd.h>
 
 namespace ascendc {
@@ -35,7 +34,6 @@ namespace fs = boost::filesystem;
 using specialization_compile::ResourceData;
 using specialization_compile::ResourceRegistry;
 using specialization_compile::ResourceStatus;
-using specialization_compile::ResourceStatusToString;
 
 bool IsKernelMetaSavingEnabled()
 {
@@ -130,36 +128,25 @@ aclError KernelSpecializationSession::PrepareCompilationResource(
     const ResourceStatus loadStatus = resourceRegistry.Load(nullptr);
     if (loadStatus != ResourceStatus::Success) {
         ACLRTC_LOG_ERROR(
-            "Failed to load compilation resources before specializing resourceId '%s': status=%s(%d); check the "
+            "Failed to load compilation resources before specializing resourceId '%s': status=%d; check the "
             "preceding ResourceRegistry logs and configured OPP paths",
-            resourceId.c_str(), ResourceStatusToString(loadStatus), static_cast<int32_t>(loadStatus));
+            resourceId.c_str(), static_cast<int32_t>(loadStatus));
         return ACLRTC_ERROR_FAILURE;
     }
 
-    // ResourceRegistry refreshes resourceDir on every lookup. Serialize specialization lookups until the returned
-    // paths are copied so another specialization request cannot replace them between Lookup and the copies.
-    static std::mutex resourceLookupMutex;
-    std::lock_guard<std::mutex> resourceLookupLock(resourceLookupMutex);
-    const ResourceData* resourceData = nullptr;
+    ResourceData resourceData;
     const ResourceStatus lookupStatus = resourceRegistry.Lookup(resourceId.c_str(), resourceData);
     if (lookupStatus != ResourceStatus::Success) {
         ACLRTC_LOG_ERROR(
-            "Failed to find or materialize compilation resource '%s': status=%s(%d); check resourceId and the "
+            "Failed to find or materialize compilation resource '%s': status=%d; verify resourceId and check the "
             "preceding ResourceRegistry logs",
-            resourceId.c_str(), ResourceStatusToString(lookupStatus), static_cast<int32_t>(lookupStatus));
-        return ACLRTC_ERROR_FAILURE;
-    }
-    if (resourceData == nullptr) {
-        ACLRTC_LOG_ERROR(
-            "ResourceRegistry returned success without resource data for resourceId '%s'; report this internal "
-            "ResourceRegistry error",
-            resourceId.c_str());
+            resourceId.c_str(), static_cast<int32_t>(lookupStatus));
         return ACLRTC_ERROR_FAILURE;
     }
 
-    compilationResource.borrowedManifest = &resourceData->json;
-    compilationResource.ownedResourceDirectoryPath = resourceData->resourceDir;
-    compilationResource.externalSourceDirectoryPath = resourceData->sourceFilePath;
+    compilationResource.manifest = std::move(resourceData.json);
+    compilationResource.ownedResourceDirectoryPath = std::move(resourceData.resourceDir);
+    compilationResource.externalSourceDirectoryPath = std::move(resourceData.sourceFilePath);
     return ACLRTC_SUCCESS;
 }
 
@@ -231,11 +218,11 @@ aclError KernelSpecializationSession::RunSpecializationWithMaterializedResource(
         }
     }
     diagnostics.RecordWorktreePath(compilationWorkspace.GetWorktreePath());
-    diagnostics.WriteManifestSnapshot(*compilationResource.borrowedManifest);
+    diagnostics.WriteManifestSnapshot(compilationResource.manifest);
 
     KernelCompilationPlan compilationPlan;
     aclError specializationResult =
-        KernelCompilationPlanBuilder(specializationRequest, *compilationResource.borrowedManifest,
+        KernelCompilationPlanBuilder(specializationRequest, compilationResource.manifest,
                                      compilationWorkspace.GetWorktreePath(),
                                      compilationResource.externalSourceDirectoryPath)
             .BuildCompilationPlan(compilationPlan);

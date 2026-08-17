@@ -38,6 +38,7 @@ constexpr uint64_t TEST_MAX_RESOURCE_FILE_SIZE = 256U * 1024U * 1024U;
 constexpr uint64_t TEST_MAX_MANIFEST_RESOURCE_SIZE = 512U * 1024U * 1024U;
 constexpr uint64_t TEST_MAX_REGISTRY_RESOURCE_SIZE = 1024U * 1024U * 1024U;
 constexpr uint64_t TEST_MAX_MANIFEST_COUNT = 4096U;
+constexpr uint64_t TEST_MAX_EXTENSION_COUNT = 4096U;
 constexpr uint64_t TEST_MAX_FILE_COUNT = 65536U;
 constexpr uint64_t TEST_MAX_REGISTRY_FILE_COUNT = 131072U;
 
@@ -520,6 +521,48 @@ TEST_F(ResourceRegistryTest, GetBundleValidatesEveryHeaderAndManifestField)
     EXPECT_EQ(output, &bundle);
 }
 
+TEST_F(ResourceRegistryTest, GetBundleValidatesExtensionTable)
+{
+    const std::string json = "{}";
+    AcCompileResourceManifest manifest{StringView(json), nullptr, 0U};
+    AcCompileResourceBundle bundle = MakeBundle(&manifest, 1U);
+    LibraryHandle library(nullptr);
+    const LibrarySpec spec{"bundle.so", ResourceSourceType::External};
+    const AcCompileResourceBundle* output = nullptr;
+    MOCKER(dlsym).stubs().will(invoke(DlsymBundle));
+    MOCKER(dlerror).stubs().will(invoke(DlerrorControlled));
+    gBundleHeader = &bundle.header;
+
+    const uint8_t payload = 0U;
+    AcCompileResourceExtension extension{1000U, 1U, 0U, &payload, sizeof(payload)};
+    bundle.extensions = &extension;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+
+    bundle.extensions = nullptr;
+    bundle.extensionCount = 1U;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+
+    bundle.extensionCount = TEST_MAX_EXTENSION_COUNT + 1U;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+
+    bundle.extensions = &extension;
+    bundle.extensionCount = 1U;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::Success);
+
+    extension.data = nullptr;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+    extension.data = &payload;
+    extension.flags = 2U;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+    extension.flags = AC_COMPILE_RESOURCE_EXTENSION_REQUIRED;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+
+    extension.flags = 0U;
+    extension.data = nullptr;
+    extension.dataSize = 0U;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::Success);
+}
+
 TEST_F(ResourceRegistryTest, AppendFileCopiesPayloadAndRejectsInvalidFieldsAndLimits)
 {
     const std::string name = "resource.bin";
@@ -676,7 +719,8 @@ TEST_F(ResourceRegistryTest, LoadManifestValidatesJsonOwnershipSourceAndDuplicat
     EXPECT_EQ(loadText(R"({"resource_id":"metadata-only"})"), ResourceStatus::Success);
     EXPECT_TRUE(stage.external.resources.at("metadata-only")->data.sourceFilePath.empty());
     EXPECT_EQ(loadText(R"({"resource_id":"resource","source_file":1})"), ResourceStatus::InvalidResource);
-    EXPECT_EQ(loadText(R"({"resource_id":"../bad","source_file":"source.cpp"})"), ResourceStatus::InvalidResource);
+    EXPECT_EQ(loadText(R"({"resource_id":"../bad","source_file":"source.cpp"})"), ResourceStatus::Success);
+    EXPECT_NE(stage.external.resources.find("../bad"), stage.external.resources.end());
     EXPECT_EQ(loadText(R"({"resource_id":"resource","source_file":"../source.cpp"})"), ResourceStatus::InvalidResource);
     EXPECT_EQ(loadText(R"({"resource_id":"missing","source_file":"missing.cpp"})"), ResourceStatus::InvalidResource);
 
@@ -901,49 +945,115 @@ TEST_F(ResourceRegistryTest, WriteMaterializedFilesWritesNestedAndEmptyPayloadsA
     EXPECT_EQ(ResourceRegistry::WriteMaterializedFiles(direct, directoryTarget.string()), ResourceStatus::IoError);
 }
 
-TEST_F(ResourceRegistryTest, LookupValidatesInputsAndRematerializesEachTime)
+TEST_F(ResourceRegistryTest, LookupValidatesInputsAndReturnsIndependentMaterializations)
 {
-    const ResourceData* output = reinterpret_cast<const ResourceData*>(static_cast<uintptr_t>(0x1U));
+    ResourceData output;
+    output.resourceDir = "stale";
     EXPECT_EQ(registry_->Lookup(nullptr, output), ResourceStatus::InvalidResource);
-    EXPECT_EQ(output, nullptr);
+    EXPECT_TRUE(output.json.is_null());
+    EXPECT_TRUE(output.resourceDir.empty());
+    EXPECT_TRUE(output.sourceFilePath.empty());
+    output.resourceDir = "stale";
     EXPECT_EQ(registry_->Lookup("", output), ResourceStatus::InvalidResource);
+    EXPECT_TRUE(output.resourceDir.empty());
+    output.resourceDir = "stale";
     EXPECT_EQ(registry_->Lookup("missing", output), ResourceStatus::NotFound);
+    EXPECT_TRUE(output.resourceDir.empty());
 
     std::unique_ptr<ResourceEntry> entry = MakeEntry(ResourceSourceType::External);
     entry->files.push_back({"payload.bin", "nested/payload.bin", {4U, 5U, 6U}});
-    registry_->externalResources_.emplace("resource", std::move(entry));
-    EXPECT_EQ(registry_->Lookup("resource", output), ResourceStatus::Success);
-    ASSERT_NE(output, nullptr);
-    const std::string firstDirectory = output->resourceDir;
+    const std::string resourceId = "resource/with/slash";
+    registry_->externalResources_.emplace(resourceId, std::move(entry));
+    ResourceData firstOutput;
+    EXPECT_EQ(registry_->Lookup(resourceId.c_str(), firstOutput), ResourceStatus::Success);
+    const std::string firstDirectory = firstOutput.resourceDir;
+    const fs::path firstPath(firstDirectory);
+    EXPECT_EQ(firstPath.filename().string().find("materialize-"), 0U);
+    EXPECT_EQ(firstPath.parent_path().filename(), "external");
     EXPECT_EQ(ReadFile(fs::path(firstDirectory) / "nested/payload.bin"), std::string("\4\5\6", 3U));
-    EXPECT_EQ(registry_->Lookup("resource", output), ResourceStatus::Success);
-    EXPECT_NE(output->resourceDir, firstDirectory);
-    EXPECT_EQ(ReadFile(fs::path(output->resourceDir) / "nested/payload.bin"), std::string("\4\5\6", 3U));
+    ResourceData secondOutput;
+    EXPECT_EQ(registry_->Lookup(resourceId.c_str(), secondOutput), ResourceStatus::Success);
+    EXPECT_EQ(firstOutput.resourceDir, firstDirectory);
+    EXPECT_NE(secondOutput.resourceDir, firstDirectory);
+    EXPECT_EQ(ReadFile(fs::path(firstOutput.resourceDir) / "nested/payload.bin"), std::string("\4\5\6", 3U));
+    EXPECT_EQ(ReadFile(fs::path(secondOutput.resourceDir) / "nested/payload.bin"), std::string("\4\5\6", 3U));
+    EXPECT_TRUE(registry_->externalResources_.at(resourceId)->data.resourceDir.empty());
 
     std::unique_ptr<ResourceEntry> unknown = MakeEntry(static_cast<ResourceSourceType>(99));
     registry_->builtInResources_.emplace("unknown", std::move(unknown));
-    EXPECT_EQ(registry_->Lookup("unknown", output), ResourceStatus::Success);
-    const fs::path unknownPath(output->resourceDir);
-    EXPECT_EQ(unknownPath.filename(), "unknown");
-    EXPECT_EQ(unknownPath.parent_path().parent_path().filename(), "unknown");
+    ResourceData unknownOutput;
+    EXPECT_EQ(registry_->Lookup("unknown", unknownOutput), ResourceStatus::Success);
+    const fs::path unknownPath(unknownOutput.resourceDir);
+    EXPECT_EQ(unknownPath.filename().string().find("materialize-"), 0U);
+    EXPECT_EQ(unknownPath.parent_path().filename(), "unknown");
 }
 
 TEST_F(ResourceRegistryTest, LookupReportsTemporaryRootAndMaterializationFailures)
 {
-    const ResourceData* output = nullptr;
+    ResourceData output;
     std::unique_ptr<ResourceEntry> entry = MakeEntry(ResourceSourceType::External);
     registry_->externalResources_.emplace("bad-temp", std::move(entry));
+    output.resourceDir = "stale";
     SetEnvironment("TMPDIR", Path("missing-temp").string());
     EXPECT_EQ(registry_->Lookup("bad-temp", output), ResourceStatus::IoError);
-    EXPECT_EQ(output, nullptr);
+    EXPECT_TRUE(output.resourceDir.empty());
 
+    output.resourceDir = "stale";
     SetEnvironment("TMPDIR", "/proc");
     EXPECT_EQ(registry_->Lookup("bad-temp", output), ResourceStatus::IoError);
+    EXPECT_TRUE(output.resourceDir.empty());
 
     registry_->temporaryRoot_ = Path("forced-materialize").string();
     WriteFile(fs::path(registry_->temporaryRoot_) / "external", "blocking file");
+    output.resourceDir = "stale";
     EXPECT_EQ(registry_->Lookup("bad-temp", output), ResourceStatus::IoError);
+    EXPECT_TRUE(output.resourceDir.empty());
     EXPECT_TRUE(registry_->externalResources_.at("bad-temp")->data.resourceDir.empty());
+}
+
+TEST_F(ResourceRegistryTest, DestructorHonorsSaveKernelMetaAtTemporaryRootCreation)
+{
+    SetEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "1");
+    registry_->externalResources_.emplace("keep-temp", MakeEntry(ResourceSourceType::External));
+    ResourceData output;
+    EXPECT_EQ(registry_->Lookup("keep-temp", output), ResourceStatus::Success);
+    const std::string retainedRoot = registry_->temporaryRoot_;
+    ASSERT_TRUE(fs::is_directory(retainedRoot));
+    registry_.reset();
+    EXPECT_TRUE(fs::is_directory(retainedRoot));
+
+    registry_.reset(new ResourceRegistry());
+    SetEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "true");
+    registry_->externalResources_.emplace("remove-temp", MakeEntry(ResourceSourceType::External));
+    EXPECT_EQ(registry_->Lookup("remove-temp", output), ResourceStatus::Success);
+    const std::string removedRoot = registry_->temporaryRoot_;
+    ASSERT_TRUE(fs::is_directory(removedRoot));
+    registry_.reset();
+    EXPECT_FALSE(fs::exists(removedRoot));
+}
+
+TEST_F(ResourceRegistryTest, SaveKernelMetaTrimsWhitespaceAndKeepsFailedMaterialization)
+{
+    SetEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", " \t1\r\n");
+    std::unique_ptr<ResourceEntry> entry = MakeEntry(ResourceSourceType::External);
+    entry->files.push_back({"invalid.bin", ".", {1U}});
+    registry_->externalResources_.emplace("failed-materialization", std::move(entry));
+
+    ResourceData output;
+    EXPECT_EQ(registry_->Lookup("failed-materialization", output), ResourceStatus::IoError);
+    EXPECT_TRUE(output.resourceDir.empty());
+    EXPECT_TRUE(registry_->keepTemporaryRoot_);
+    const fs::path retainedRoot(registry_->temporaryRoot_);
+    const fs::path categoryParent = retainedRoot / "external";
+    std::vector<fs::path> retainedCategories;
+    for (fs::directory_iterator current(categoryParent), end; current != end; ++current) {
+        retainedCategories.push_back(current->path());
+    }
+    ASSERT_EQ(retainedCategories.size(), 1U);
+    EXPECT_TRUE(fs::is_directory(retainedCategories.front()));
+
+    registry_.reset();
+    EXPECT_TRUE(fs::is_directory(retainedRoot));
 }
 
 TEST_F(ResourceRegistryTest, LoadExplicitResourceEndToEnd)
@@ -960,12 +1070,11 @@ TEST_F(ResourceRegistryTest, LoadExplicitResourceEndToEnd)
     MockSuccessfulLoader();
 
     EXPECT_EQ(registry_->Load(layout.soPath.c_str()), ResourceStatus::Success);
-    const ResourceData* output = nullptr;
+    ResourceData output;
     EXPECT_EQ(registry_->Lookup("public", output), ResourceStatus::Success);
-    ASSERT_NE(output, nullptr);
-    EXPECT_EQ(output->json.at("kind"), "test");
-    EXPECT_EQ(output->sourceFilePath, fs::canonical(layout.sourcePath).parent_path().string());
-    EXPECT_EQ(ReadFile(fs::path(output->resourceDir) / relative), std::string("\10\11", 2U));
+    EXPECT_EQ(output.json.at("kind"), "test");
+    EXPECT_EQ(output.sourceFilePath, fs::canonical(layout.sourcePath).parent_path().string());
+    EXPECT_EQ(ReadFile(fs::path(output.resourceDir) / relative), std::string("\10\11", 2U));
 }
 
 TEST_F(ResourceRegistryTest, LoadReportsDiscoveryAndDynamicLoaderFailures)
