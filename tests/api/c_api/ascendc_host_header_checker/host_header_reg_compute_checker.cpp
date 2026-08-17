@@ -15,6 +15,7 @@
 
 static void test_host_c_api_reg_compute_0()
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     using ::asc_abs;
     using ::asc_abs_sub;
     using ::asc_add;
@@ -678,4 +679,5 @@ static void test_host_c_api_reg_compute_19()
     using ::asc_update_mask_b32;
     using ::asc_update_mask_b8;
     using ::asc_xor;
+#endif
 }

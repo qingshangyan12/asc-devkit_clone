@@ -93,11 +93,12 @@ function(create_check_targets MODE_SUFFIX MODE_DEFINES)
         string(REPLACE "-" "_" TEST_FILE_ID ${TEST_FILE_ID})
         foreach(ARCH IN LISTS ARCH_LIST)
             set(ARCH_FLAG "--npu-arch=dav-${ARCH}")
+            set(ARCH_DEFINE "-D__NPU_ARCH__=${ARCH}")
 
             # 创建子 Target
             set(TARGET_NAME "c_api_host_check_npu${MODE_SUFFIX}_${ARCH}_${TEST_FILE_ID}")
             add_custom_target(${TARGET_NAME}
-                COMMAND ${COMPILER} ${COMPILER_FLAGS} ${INC_FLAGS} ${MODE_DEFINES}
+                COMMAND ${COMPILER} ${COMPILER_FLAGS} ${INC_FLAGS} ${MODE_DEFINES} ${ARCH_DEFINE}
                     -fsyntax-only ${TEST_FILE} ${ARCH_FLAG}
                 COMMENT "Checking C API host (${COMPILER_TYPE})${MODE_SUFFIX} ${ARCH} ${REL_TEST_FILE}"
                 VERBATIM

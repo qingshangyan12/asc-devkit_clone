@@ -12,7 +12,9 @@
 
 static void test_host_c_api_sys_var_0()
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     using ::asc_get_ar_spr;
+#endif
     using ::asc_get_arch_ver;
     using ::asc_get_block_idx;
     using ::asc_get_block_num;
@@ -24,7 +26,9 @@ static void test_host_c_api_sys_var_0()
     using ::asc_get_phy_stack_base;
     using ::asc_get_program_counter;
     using ::asc_get_smmu_tag_version;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     using ::asc_get_squeeze_status;
+#endif
     using ::asc_get_status;
     using ::asc_get_sub_block_id;
     using ::asc_get_sub_block_num;
