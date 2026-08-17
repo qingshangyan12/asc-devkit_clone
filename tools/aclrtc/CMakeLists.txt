@@ -82,7 +82,6 @@ target_link_options(acl_rtc PRIVATE
     -Wl,-z,relro,-z,now,-z,noexecstack
     -Wl,-Bsymbolic
     -Wl,--exclude-libs,ALL
-    -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/acl_rtc.map
     -Wl,--gc-sections
     $<$<CONFIG:Release>:-s>
 )

@@ -123,6 +123,63 @@ const fs::path& KernelCompilationWorkspace::GetWorktreePath() const noexcept
     return worktreePath_;
 }
 
+bool KernelCompilationWorkspace::TryMoveWorktreeToDiagnosticsDirectory(
+    const fs::path& diagnosticWorktreePath) noexcept
+{
+    if (worktreePath_.empty() || diagnosticWorktreePath.empty()) {
+        ACLRTC_LOG_WARNING(
+            "Cannot retain resource worktree because its source or diagnostic path is empty: source=%s target=%s",
+            worktreePath_.c_str(), diagnosticWorktreePath.c_str());
+        return false;
+    }
+
+    boost::system::error_code pathError;
+    const bool diagnosticPathExists = fs::exists(diagnosticWorktreePath, pathError);
+    const bool diagnosticPathInspectionFailed =
+        pathError && pathError.value() != ENOENT && pathError.value() != ENOTDIR;
+    if (diagnosticPathInspectionFailed || diagnosticPathExists) {
+        ACLRTC_LOG_WARNING(
+            "Cannot retain resource worktree because the diagnostic target is unavailable: source=%s target=%s "
+            "error=%d message=%s",
+            worktreePath_.c_str(), diagnosticWorktreePath.c_str(), pathError.value(),
+            pathError ? pathError.message().c_str() : "target already exists");
+        return false;
+    }
+
+    pathError.clear();
+    fs::rename(worktreePath_, diagnosticWorktreePath, pathError);
+    if (!pathError) {
+        worktreePath_ = diagnosticWorktreePath;
+        return true;
+    }
+
+    boost::system::error_code copyError;
+    fs::copy(worktreePath_, diagnosticWorktreePath, fs::copy_options::recursive, copyError);
+    if (copyError) {
+        boost::system::error_code ignoredError;
+        fs::remove_all(diagnosticWorktreePath, ignoredError);
+        ACLRTC_LOG_WARNING(
+            "Failed to retain resource worktree in the diagnostic directory: source=%s target=%s rename_error=%s "
+            "copy_error=%s; compilation will continue using the original worktree",
+            worktreePath_.c_str(), diagnosticWorktreePath.c_str(), pathError.message().c_str(),
+            copyError.message().c_str());
+        return false;
+    }
+
+    const fs::path originalWorktreePath = worktreePath_;
+    worktreePath_ = diagnosticWorktreePath;
+    boost::system::error_code cleanupError;
+    fs::remove_all(originalWorktreePath, cleanupError);
+    if (cleanupError) {
+        ACLRTC_LOG_WARNING(
+            "Retained resource worktree but failed to remove its original copy: source=%s retained=%s error=%d "
+            "message=%s",
+            originalWorktreePath.c_str(), worktreePath_.c_str(), cleanupError.value(),
+            cleanupError.message().c_str());
+    }
+    return true;
+}
+
 aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatches(
     const KernelCompilationPlan& compilationPlan)
 {

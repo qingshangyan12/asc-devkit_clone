@@ -33,6 +33,8 @@ public:
     KernelCompilationWorkspace& operator=(const KernelCompilationWorkspace&) = delete;
 
     const boost::filesystem::path& GetWorktreePath() const noexcept;
+    bool TryMoveWorktreeToDiagnosticsDirectory(
+        const boost::filesystem::path& diagnosticWorktreePath) noexcept;
     aclError CreateOutputDirectoriesAndApplySourcePatches(const KernelCompilationPlan& compilationPlan);
     aclError RemoveWorktreeBeforePublishingElfIfNeeded();
 
