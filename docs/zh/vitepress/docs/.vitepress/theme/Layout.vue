@@ -16,16 +16,12 @@ import CustomOutline from './CustomOutline.vue'
 import ApiDownload from './ApiDownload.vue'
 import EditOnGitcode from './EditOnGitcode.vue'
 import HomeHeroExtras from './HomeHeroExtras.vue'
-import HomeSections from './HomeSections.vue'
 </script>
 
 <template>
   <DefaultTheme.Layout>
     <template #home-hero-info-after>
       <HomeHeroExtras />
-    </template>
-    <template #home-hero-after>
-      <HomeSections />
     </template>
     <template #nav-bar-content-after>
       <FilterToggle />

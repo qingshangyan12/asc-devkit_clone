@@ -11,7 +11,7 @@
 
 const { spawnSync } = require('node:child_process')
 const { resolve, join } = require('node:path')
-const { copyFileSync, cpSync, existsSync, mkdirSync, rmSync } = require('node:fs')
+const { cpSync, existsSync, rmSync } = require('node:fs')
 
 const scriptsDir = resolve(__dirname)
 const root = resolve(scriptsDir, '..')
@@ -59,14 +59,6 @@ if (existsSync(srcFigures)) {
   console.log(`Copying figures/...`)
   cpSync(srcFigures, dstFigures, { recursive: true })
   console.log(`  ${srcFigures} -> ${dstFigures}`)
-}
-
-const homeArchitectureSrc = resolve(repoRoot, 'docs', 'zh', 'guide', 'figures', 'architecture_ascendc.png')
-const homeAssetsDir = resolve(root, 'docs', 'public', 'assets', 'home')
-if (existsSync(homeArchitectureSrc)) {
-  mkdirSync(homeAssetsDir, { recursive: true })
-  copyFileSync(homeArchitectureSrc, resolve(homeAssetsDir, 'architecture_ascendc.png'))
-  console.log('Copied Ascend C architecture asset for the home page')
 }
 
 console.log('Conversion complete')

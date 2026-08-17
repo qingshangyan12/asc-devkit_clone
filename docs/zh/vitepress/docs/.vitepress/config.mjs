@@ -23,6 +23,7 @@ import {
   normalizeApiRoute,
 } from '../../scripts/api-support.mjs'
 import { addHeadingAnchors } from '../../scripts/heading-utils.mjs'
+import { replaceProductFilterTags } from '../../scripts/product-filter-tags.mjs'
 
 const docsRoot = resolve(import.meta.dirname, '..')
 const repoRoot = resolve(import.meta.dirname, '..', '..', '..', '..', '..')
@@ -348,67 +349,6 @@ function placeholderPlugin() {
   }
 }
 
-function replaceNpuCommentTags(html) {
-  const tokenRegex = /<!--\s*(?:npu\s*=\s*"([^"]*)"\s+(\w+)|end\s+(\w+))\s*-->/g
-  const parts = []
-  const stack = []
-  let lastIdx = 0
-  let match
-  while ((match = tokenRegex.exec(html)) !== null) {
-    const pos = match.index
-    const npuType = match[1]
-    const openId = match[2]
-    const closeId = match[3]
-    parts.push(html.slice(lastIdx, pos))
-    lastIdx = pos + match[0].length
-    if (closeId) {
-      if (stack.length > 0 && stack[stack.length - 1].id === closeId) {
-        stack.pop()
-        parts.push('</div>')
-      }
-    } else if (npuType && openId) {
-      stack.push({ id: openId })
-      parts.push(`<div data-filter="${npuType}">`)
-    }
-  }
-  parts.push(html.slice(lastIdx))
-  while (stack.length > 0) {
-    stack.pop()
-    parts.push('</div>')
-  }
-  return parts.join('')
-}
-
-function replaceCannFilterTags(src, replacer) {
-  const tagRegex = /<(\/?)(cann-filter)((?:\s[^>]*)?)>/gi
-  const stack = []
-  const parts = []
-  let lastIdx = 0
-  let match
-  while ((match = tagRegex.exec(src)) !== null) {
-    const pos = match.index
-    const isClose = match[1] === '/'
-    const attrs = match[3]
-    parts.push(src.slice(lastIdx, pos))
-    lastIdx = pos + match[0].length
-    if (isClose) {
-      if (stack.length > 0) {
-        const opener = stack.pop()
-        parts.push(replacer.end(opener.type, opener.contentStart, lastIdx))
-      }
-    } else {
-      const attrMatch = attrs.match(/npu[_-]type\s*=\s*"([^"]+)"/i)
-      if (attrMatch) {
-        stack.push({ type: attrMatch[1], contentStart: lastIdx })
-        parts.push(replacer.start(attrMatch[1]))
-      }
-    }
-  }
-  const end = src.slice(lastIdx)
-  parts.push(end)
-  return parts.join('')
-}
-
 function fixCannFilterTags(src) {
   if (!/<(cann-filter|term|ph|__gm__|__ubuf__)\b/i.test(src)) return src
 
@@ -589,11 +529,7 @@ function balanceDivTags(html) {
   return parts.join('')
 }
 
-          html = replaceNpuCommentTags(html)
-          html = replaceCannFilterTags(html, {
-            start(type) { return `<div data-filter="${type}">` },
-            end() { return '</div>' },
-          })
+          html = replaceProductFilterTags(html)
           html = html.replace(
             /<tr\b[^>]*>((?:(?!<\/tr>)[\s\S])*?)<\/tr>/gi,
             (rowMatch) => {
@@ -821,7 +757,7 @@ function balanceDivTags(html) {
   themeConfig: {
     nav: [
       { text: '首页', link: '/' },
-      { text: 'AscendC算子开发指南', link: '/guide/入门教程/Ascend-C概述与学习路径' },
+      { text: 'AscendC算子开发指南', link: '/guide/getting_started/ascend_c_overview_and_learning_path' },
       { text: 'Ascend C API', link: '/api/README' },
     ],
 
