@@ -65,7 +65,7 @@ __aicore__ inline void asc_sync_pipe(pipe_t pipe)
 - 针对Ascend 950PR/Ascend 950DT，`PIPE_V`流水之间的同步由硬件自动保证。
 <!-- end id9 -->
 - `asc_sync_pipe(PIPE_ALL)`会等待所有流水线中所有先前提交的接口完成，这会对性能产生影响。若仅阻塞单条流水线即可解决问题，应避免随意调用`asc_sync_pipe(PIPE_ALL)`。
-- `PIPE_MTE2`/`PIPE_MTE3`在搬运的目的地址有重叠的情况下需要开发者插入同步，保证多个搬运指令的串行化，防止出现异常数据，具体场景可以参考以下[调用示例](#调用示例)。
+- `PIPE_MTE2`/`PIPE_MTE3`在搬运的目的地址有重叠的情况下需要开发者插入同步，保证多个搬运指令的串行化，防止出现异常数据。
 
 ## 调用示例
 
@@ -80,7 +80,7 @@ bisheng example.asc -o main --npu-arch=dav-3510; ./main
 
 <!-- end id8 -->
 
-```c
+```cpp
 #include <cstdint>
 #include <iostream>
 #include <vector>
