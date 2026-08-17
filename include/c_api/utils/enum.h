@@ -55,6 +55,8 @@ enum class asc_relu_pre_mode : uint8_t {
     PIECEWISE_LINEAR = 4
 };
 
+using asc_quant_mode = QuantMode_t;
+
 enum class asc_hf32_round_mode : uint8_t { NEAREST_ZERO, NEAREST_EVEN };
 
 enum class asc_position_mode { EVEN = 0, ODD };
