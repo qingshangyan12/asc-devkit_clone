@@ -12,6 +12,8 @@ import assert from 'node:assert/strict'
 import { resolve } from 'node:path'
 import { test } from 'node:test'
 
+import { load as loadHtml } from 'cheerio'
+
 import {
   findKernelLaunch,
   kernelLaunchMatches,
@@ -30,8 +32,13 @@ import {
   MAX_CJK_SUBPHRASES,
   MAX_QUERY_LENGTH,
   mergeRouteResult,
+  rankIdentifierIndex,
+  searchPagefind,
 } from '../../docs/.vitepress/theme/pagefind-search.mjs'
-import { sourcePathsForRoute } from '../../docs/.vitepress/build-pagefind-title-index.mjs'
+import {
+  isCatalogOnlyArticle,
+  sourcePathsForRoute,
+} from '../../docs/.vitepress/build-pagefind-title-index.mjs'
 
 test('normalizes kernel launch syntax queries and prefixes', () => {
   for (const query of [
@@ -125,6 +132,117 @@ test('weights title alias candidates above content candidates', async () => {
 
   assert.equal(content.get('content:page').retrievalScore, 1 / 61)
   assert.equal(title.get('title-alias:page').retrievalScore, 1.3 / 61)
+})
+
+test('filters Pagefind candidates before applying the Top 20 result limit', async () => {
+  const pagefindResults = Array.from({ length: 21 }, (_, index) => {
+    const route = index === 20 ? '/api/supported.html' : `/api/unsupported-${index}.html`
+    return {
+      id: route,
+      score: 21 - index,
+      async data() {
+        return {
+          url: route,
+          meta: { title: `过滤测试 ${index}` },
+          content: '过滤测试',
+          excerpt: '过滤测试',
+        }
+      },
+    }
+  })
+  const pagefind = {
+    async search() {
+      return { results: pagefindResults }
+    },
+  }
+
+  const results = await searchPagefind(
+    pagefind,
+    '过滤测试',
+    route => route === '/api/supported.html',
+  )
+
+  assert.deepEqual(results.map(result => result.route), ['/api/supported.html'])
+})
+
+test('prefers concrete identifier owners and references over navigation catalogs', () => {
+  const identifier = 'asc_copy_gm2ub_align'
+  const index = {
+    p: [
+      ['/api/copy/asc_copy_gm2ub_align_arch_3510.html', identifier, '', 0],
+      ['/api/copy/asc_copy_gm2ub_align_arch_2201.html', identifier, '', 0],
+      ['/api/copy/asc_copy_gm2ub_align.html', identifier, '', 1],
+      ['/api/vector_data_move.html', '矢量数据搬运', '', 1],
+      ['/api/asc_set_copy_pad_val.html', 'asc_set_copy_pad_val', '', 0],
+    ],
+    i: [[identifier, [0, 1, 2, 3, 4], [0, 0, 1, 1, 2], [0, 0, -1, -1, 1]]],
+    s: [
+      `约束说明 ${identifier} 指令`,
+      identifier,
+      `该接口仅对${identifier}接口有效。`,
+    ],
+    h: [
+      ['约束说明', '约束说明'],
+      ['功能说明', '功能说明'],
+    ],
+  }
+  const results = rankIdentifierIndex(
+    index,
+    createQueryPlan(identifier),
+    route => !route.includes('arch_2201'),
+  )
+
+  assert.deepEqual(results.results.map(result => result.route), [
+    '/api/copy/asc_copy_gm2ub_align_arch_3510.html#%E7%BA%A6%E6%9D%9F%E8%AF%B4%E6%98%8E',
+    '/api/asc_set_copy_pad_val.html#%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E',
+    '/api/copy/asc_copy_gm2ub_align.html',
+    '/api/vector_data_move.html',
+  ])
+  assert.match(results.results[0].description, /<mark>asc_copy_gm2ub_align<\/mark>/)
+  assert.equal(
+    results.results[1].description,
+    '该接口仅对<mark>asc_copy_gm2ub_align</mark>接口有效。',
+  )
+})
+
+test('keeps a catalog authoritative when no concrete identifier owner is visible', () => {
+  const identifier = 'catalog_identifier'
+  const index = {
+    p: [
+      ['/api/catalog_identifier.html', identifier, identifier, 1],
+      ['/api/catalog_identifier_arch.html', identifier, identifier, 0],
+    ],
+    i: [[identifier, [0, 1], [0, 0]]],
+    s: [identifier],
+    h: [],
+  }
+  const results = rankIdentifierIndex(
+    index,
+    createQueryPlan(identifier),
+    route => !route.endsWith('_arch.html'),
+  )
+
+  assert.equal(results.results[0].route, '/api/catalog_identifier.html')
+  assert.equal(results.results[0].score, 3720000)
+})
+
+test('classifies link-only navigation pages without treating content pages as catalogs', () => {
+  const catalog = loadHtml(`
+    <article class="markdown-body">
+      <h1>API</h1>
+      <ul><li><p><a href="child.html">child</a></p></li></ul>
+    </article>
+  `)
+  const content = loadHtml(`
+    <article class="markdown-body">
+      <h1>API</h1>
+      <p>API behavior and constraints.</p>
+      <ul><li><a href="related.html">related</a></li></ul>
+    </article>
+  `)
+
+  assert.equal(isCatalogOnlyArticle(catalog, catalog('.markdown-body')), true)
+  assert.equal(isCatalogOnlyArticle(content, content('.markdown-body')), false)
 })
 
 test('continues with the primary index when the title index is unavailable', async () => {

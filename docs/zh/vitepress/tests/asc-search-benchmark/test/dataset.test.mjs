@@ -15,7 +15,7 @@ import { test } from 'node:test'
 const dataset = JSON.parse(await readFile(new URL('../cases/ascendc.json', import.meta.url), 'utf8'))
 
 test('dataset has unique and complete cases', () => {
-  assert.equal(dataset.cases.length, 162)
+  assert.equal(dataset.cases.length, 170)
   assert.equal(new Set(dataset.cases.map(item => item.id)).size, dataset.cases.length)
   for (const item of dataset.cases) {
     assert.ok(item.id)
@@ -25,6 +25,8 @@ test('dataset has unique and complete cases', () => {
     for (const key of [
       'descriptionIncludes',
       'highlightIncludes',
+      'titleHighlightIncludes',
+      'descriptionHighlightIncludes',
       'sectionTitleIncludes',
       'sectionHighlightIncludes',
     ]) {
@@ -40,7 +42,18 @@ test('dataset has unique and complete cases', () => {
       assert.ok(Number.isInteger(item.expect.maxFirstRelevantRank))
       assert.ok(item.expect.maxFirstRelevantRank >= 1 && item.expect.maxFirstRelevantRank <= 10)
     }
-    for (const target of item.expect.targets) {
+    if (item.expect.minFirstRelevantRank !== undefined) {
+      assert.ok(Number.isInteger(item.expect.minFirstRelevantRank))
+      assert.ok(item.expect.minFirstRelevantRank >= 1 && item.expect.minFirstRelevantRank <= 10)
+      if (item.expect.maxFirstRelevantRank !== undefined) {
+        assert.ok(item.expect.minFirstRelevantRank <= item.expect.maxFirstRelevantRank)
+      }
+    }
+    if (item.productFilter !== undefined) {
+      assert.ok(['all', '950', 'A3', '910b', '910', '310p', '310b', 'x90', '9030'].includes(item.productFilter))
+    }
+    if (item.expect.excludedTargets !== undefined) assert.ok(Array.isArray(item.expect.excludedTargets))
+    for (const target of [...item.expect.targets, ...(item.expect.excludedTargets || [])]) {
       assert.equal(['exact', 'prefix', 'contains'].filter(key => key in target).length, 1)
       assert.ok([1, 2, 3].includes(target.grade))
     }
@@ -153,4 +166,47 @@ test('dataset targets only current multicore and lowercase API routes', () => {
   ]) {
     assert.equal(targets.some(target => target.includes(staleRoute)), false, `stale target ${staleRoute}`)
   }
+})
+
+test('dataset covers product-filtered API and guide search', () => {
+  const excluded = dataset.cases.find(item => item.id === 'product-filter-310p-excludes-datastorebarrier')
+  assert.equal(excluded.productFilter, '310p')
+  assert.deepEqual(excluded.expect.excludedTargets, [{
+    exact: '/api/AI-CPU-API/DataStoreBarrier',
+    grade: 3,
+  }])
+
+  const supported = dataset.cases.find(item => item.id === 'product-filter-950-keeps-datastorebarrier')
+  assert.equal(supported.productFilter, '950')
+  assert.deepEqual(supported.expect.targets[0], {
+    exact: '/api/AI-CPU-API/DataStoreBarrier',
+    grade: 3,
+  })
+
+  const guide = dataset.cases.find(item => item.id === 'product-filter-keeps-guide-results')
+  assert.equal(guide.productFilter, '310p')
+  assert.ok(guide.expect.targets[0].exact.startsWith('/guide/'))
+
+  const definition = dataset.cases.find(item => item.id === 'product-filter-950-prefers-copy-align-definition')
+  assert.equal(definition.productFilter, '950')
+  assert.equal(definition.expect.maxFirstRelevantRank, 1)
+  assert.deepEqual(definition.expect.titleHighlightIncludes, ['asc_copy_gm2ub_align'])
+  assert.deepEqual(definition.expect.descriptionHighlightIncludes, ['asc_copy_gm2ub_align'])
+
+  const reference = dataset.cases.find(item => item.id === 'product-filter-950-copy-align-reference-context')
+  assert.deepEqual(reference.expect.descriptionIncludes, ['该接口仅对asc_copy_gm2ub_align接口有效'])
+  assert.equal(reference.expect.sectionHash, '#功能说明')
+
+  for (const id of [
+    'product-filter-950-demotes-copy-align-catalog',
+    'product-filter-950-demotes-vector-catalog',
+  ]) {
+    const item = dataset.cases.find(candidate => candidate.id === id)
+    assert.equal(item.expect.minFirstRelevantRank, 3)
+    assert.equal(item.expect.maxFirstRelevantRank, 10)
+  }
+
+  const catalog = dataset.cases.find(item => item.id === 'catalog-title-remains-authoritative')
+  assert.equal(catalog.expect.maxFirstRelevantRank, 1)
+  assert.deepEqual(catalog.expect.titleHighlightIncludes, ['矢量数据搬运'])
 })
