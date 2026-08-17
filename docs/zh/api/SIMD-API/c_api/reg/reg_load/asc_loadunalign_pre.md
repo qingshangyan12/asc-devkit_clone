@@ -26,12 +26,16 @@
 
 ## 功能说明
 
-根据无需32字节对齐的有效起始地址初始化[非对齐寄存器](../reg_data_types/data_type_definition.md#非对齐寄存器)，为后续非对齐搬入准备前置数据缓存。接口将有效起始地址向低地址方向对齐到32字节边界，再将包含该起始地址的一个`DataBlock`（32字节）从Unified Buffer（UB）搬入非对齐寄存器。本接口只负责初始化，不会生成VL长度的搬入结果。
+根据无需32字节对齐的有效起始地址初始化[非对齐寄存器](../reg_data_types/data_type_definition.md#非对齐寄存器)，为后续非对齐搬入准备前置数据缓存。本接口只负责初始化，不会生成VL长度的搬入结果。
+
+具体而言，设有效起始地址为`src_start`，将`src_start`向低地址方向对齐到32字节边界得到`aligned_src_start`，本接口将Unified Buffer（UB）中地址范围为`[aligned_src_start, aligned_src_start + 32)`的一个`DataBlock`搬入非对齐寄存器。
+
+本接口输出的非对齐寄存器作为[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的`src0`。`asc_loadunalign`使用该状态完成一次搬入，但不会更新该状态；`asc_loadunalign_postupdate`使用该状态完成搬入后，会同步更新地址和非对齐寄存器状态。
 
 本接口提供两种功能模式：
 
-- **源地址预处理模式**：以UB源地址作为有效起始地址，为[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的源地址Post Update搬入模式准备前置数据缓存。
-- **地址寄存器偏移预处理模式**：以UB源基地址与地址寄存器记录的实际字节偏移之和作为有效起始地址，为`asc_loadunalign_postupdate`的地址寄存器Post Update搬入模式准备前置数据缓存。
+- **源地址预处理模式**：以UB源地址作为有效起始地址，为[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的连续非对齐搬入模式准备前置数据缓存。
+- **地址寄存器偏移预处理模式**：以UB源基地址与地址寄存器记录的实际字节偏移之和作为有效起始地址，为`asc_loadunalign_postupdate`的地址寄存器偏移搬入模式准备前置数据缓存。
 
 ## 函数原型
 
@@ -112,13 +116,13 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
 
 - 初始化和紧随其后的搬入必须使用相同的`src`地址。
 - 与[asc_loadunalign](asc_loadunalign.md)配合使用时，每次搬入前都必须调用本模式重新初始化。
-- 与[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的源地址Post Update搬入模式配合使用时，首次搬入前必须调用本模式。后续调用继续使用接口按`count`更新后的源地址时，可以复用更新后的非对齐寄存器；如果用户另外修改了源地址，必须根据新地址重新初始化。
+- 与[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的连续非对齐搬入模式配合使用时，首次搬入前必须调用本模式。后续调用继续使用接口按`count`更新后的源地址时，可以复用更新后的非对齐寄存器；如果用户另外修改了源地址，必须根据新地址重新初始化。
 
 ### 地址寄存器偏移预处理模式
 
 - 必须先调用[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)生成`offset`。
 - 初始化和紧随其后的搬入必须使用相同的`src`和`offset`。
-- 与[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的地址寄存器Post Update搬入模式配合使用时，每次循环迭代的首次搬入前都必须使用该次迭代的起始偏移重新初始化。同一次循环迭代内的后续调用继续使用接口按`inc`更新后的地址寄存器时，可以复用更新后的非对齐寄存器。
+- 与[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的地址寄存器偏移搬入模式配合使用时，每次循环迭代的首次搬入前都必须使用该次迭代的起始偏移重新初始化。同一次循环迭代内的后续调用继续使用接口按`inc`更新后的地址寄存器时，可以复用更新后的非对齐寄存器。
 
 ## 调用示例
 

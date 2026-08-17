@@ -26,17 +26,21 @@
 
 ## 功能说明
 
-将Unified Buffer（UB）中起始地址无需32字节对齐的VL长度连续数据搬入矢量数据寄存器。接口将非对齐寄存器中缓存的前置数据与从UB读取的后续数据拼接，得到从本次有效起始地址开始的VL长度数据。搬入完成后，接口自动更新源地址指针或地址寄存器记录的地址偏移，并将非对齐寄存器更新为包含下一次有效起始地址所需前置数据的缓存。本接口提供两种功能模式：
+将Unified Buffer（UB）中起始地址无需32字节对齐的VL长度连续数据搬入矢量数据寄存器。接口将非对齐寄存器中缓存的前置数据与从UB读取的后续数据拼接，得到从本次有效起始地址开始的VL长度数据。搬入完成后，接口同步更新地址和非对齐寄存器状态。
 
-- **源地址Post Update搬入模式**：以当前源地址作为本次有效起始地址。搬入完成后，将源地址增加`count × sizeof(dtype)`字节，并同步维护下一次搬入所需的非对齐寄存器状态。
+具体而言，设本次有效起始地址为`src_start`，结束地址为`src_end`，其中`src_end = src_start + VL`；将`src_start`向低地址方向对齐到32字节边界得到`aligned_src_start`。[asc_loadunalign_pre](asc_loadunalign_pre.md)将地址范围为`[aligned_src_start, aligned_src_start + 32)`的数据缓存到非对齐寄存器，本接口将该缓存与从UB读取的后续数据拼接，得到地址范围为`[src_start, src_end)`的数据。
 
-- **地址寄存器Post Update搬入模式**：以UB源基地址与地址寄存器记录的偏移之和作为有效起始地址。搬入完成后，地址偏移增加`inc × sizeof(dtype)`字节，源基地址保持不变，并同步更新非对齐寄存器。
+本接口使用`asc_loadunalign_pre`生成的非对齐寄存器状态完成首次搬入。搬入完成后，接口同步更新地址和非对齐寄存器状态；更新后的地址与非对齐寄存器相互匹配，共同构成下一次搬入的输入状态。本接口提供两种功能模式：
+
+- **连续非对齐搬入模式**：以当前源地址作为本次有效起始地址`src_start`。搬入完成后，下一次有效起始地址为`next_src_start = src_start + count × sizeof(dtype)`，接口将源地址更新为`next_src_start`，并同步更新非对齐寄存器。
+
+- **地址寄存器偏移搬入模式**：以UB源基地址与地址寄存器记录的偏移之和作为本次有效起始地址`src_start`。搬入完成后，下一次有效起始地址为`next_src_start = src_start + inc × sizeof(dtype)`，接口根据`inc`更新地址寄存器和非对齐寄存器，源基地址保持不变。
 
 `asc_update_addr_reg`根据当前循环迭代的索引生成该次迭代的起始偏移；`inc`只更新当前循环迭代内的地址偏移，不影响下一次循环迭代的起始偏移。
 
 ## 函数原型
 
-### 源地址Post Update搬入模式
+### 连续非对齐搬入模式
 
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
@@ -58,7 +62,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
                                                        uint32_t count)
 ```
 
-### 地址寄存器Post Update搬入模式
+### 地址寄存器偏移搬入模式
 
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
@@ -84,7 +88,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
 
 ## 参数说明
 
-### 源地址Post Update搬入模式
+### 连续非对齐搬入模式
 
 **表1** 参数说明
 
@@ -95,7 +99,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
 | src1 | 输入/输出 | 源UB地址，实际读取地址无需32字节对齐。 |
 | count | 输入 | Post Update步长，单位为元素个数。接口使用当前`src1`地址完成搬入后，将`src1`指针增加`count × sizeof(dtype)`字节。 |
 
-### 地址寄存器Post Update搬入模式
+### 地址寄存器偏移搬入模式
 
 **表2** 参数说明
 
@@ -121,12 +125,12 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
-### 源地址Post Update搬入模式
+### 连续非对齐搬入模式
 
 - 首次搬入前必须调用[asc_loadunalign_pre](asc_loadunalign_pre.md)，且初始化和紧随其后的首次搬入必须使用相同的`src1`地址。
 - 后续调用继续使用上一次调用更新后的`src1`时，可以复用更新后的`src0`；如果用户另外修改了`src1`，必须根据新地址重新初始化`src0`。
 
-### 地址寄存器Post Update搬入模式
+### 地址寄存器偏移搬入模式
 
 - 必须先调用`asc_update_addr_reg`接口。
 - `asc_update_addr_reg`生成当前循环迭代的起始偏移后，必须在该次迭代首次搬入前使用相同的`src1`和`offset`调用[asc_loadunalign_pre](asc_loadunalign_pre.md)重新初始化`src0`。

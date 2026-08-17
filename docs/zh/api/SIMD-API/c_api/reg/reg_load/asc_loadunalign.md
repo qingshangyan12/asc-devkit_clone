@@ -26,7 +26,9 @@
 
 ## 功能说明
 
-将Unified Buffer（UB）中起始地址无需32字节对齐的VL长度连续数据搬入矢量数据寄存器。接口将非对齐寄存器中缓存的前置数据与从UB读取的后续数据拼接，得到从本次有效起始地址开始的VL长度数据。本接口不会自动更新源地址和非对齐寄存器。
+将Unified Buffer（UB）中起始地址无需32字节对齐的VL长度连续数据搬入矢量数据寄存器。接口将非对齐寄存器中缓存的前置数据与从UB读取的后续数据拼接，得到从本次有效起始地址开始的VL长度数据。本接口使用[asc_loadunalign_pre](asc_loadunalign_pre.md)生成的非对齐寄存器状态完成一次搬入，但不会更新源地址和非对齐寄存器状态。
+
+具体而言，设本次有效起始地址为`src_start`，结束地址为`src_end`，其中`src_end = src_start + VL`；将`src_start`向低地址方向对齐到32字节边界得到`aligned_src_start`。`asc_loadunalign_pre`将地址范围为`[aligned_src_start, aligned_src_start + 32)`的数据缓存到非对齐寄存器，本接口将该缓存与从UB读取的后续数据拼接，得到地址范围为`[src_start, src_end)`的数据。
 
 ## 函数原型
 
