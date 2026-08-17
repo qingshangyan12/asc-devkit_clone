@@ -167,7 +167,7 @@ __global__ void reduce_thread_block(const int32_t* input, int32_t* total_block, 
 | 2 | 2049~3072 | 2621952 |
 | 3 | 3073~4096 | 3670528 |
 
-通式为`524800 + 1048576k`。四个部分和经`asc_atomic_add`累加，结果与block的完成顺序无关。总和由这四次累加构成，`total_block`在launch前由`aclrtMemset`清零。
+通式为`524800 + 1048576k`（`k`为block索引，取值0~3）。四个部分和经`asc_atomic_add`累加，结果与block的完成顺序无关。总和由这四次累加构成，`total_block`在launch前由`aclrtMemset`清零。
 
 #### 3：子组规约场景
 
