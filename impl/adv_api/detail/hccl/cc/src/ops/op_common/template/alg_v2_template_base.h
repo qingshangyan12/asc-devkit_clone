@@ -53,6 +53,16 @@ public:
     bool IsPcieProtocol(const std::map<u32, std::vector<ChannelInfo>>& channels);
 
 protected:
+    // 按port group权重把一份数据切分到多个channel上；channelsPerRank由派生模板自行决定
+    HcclResult CalcDataSplitByPortGroup(
+        u64 totalDataCount, u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
+        std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset,
+        u32 channelsPerRank) const
+    {
+        return CalcDataSplitByPortGroupCommon(
+            totalDataCount, dataTypeSize, channels, elemCountOut, sizeOut, elemOffset, channelsPerRank);
+    }
+
     OpMode opMode_; // 单算子还是图模式
     u32 root_ = 0;  // 一般是scatter、broadcast需要
 
