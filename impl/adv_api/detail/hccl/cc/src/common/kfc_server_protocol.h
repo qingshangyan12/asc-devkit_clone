@@ -20,11 +20,13 @@ namespace mc2_ops_hccl {
 
 using namespace HcclKfcProtocol;
 
-constexpr uint32_t KFC_SERVER_PROTOCOL_VERSION = 2U;
+constexpr uint32_t KFC_SERVER_PROTOCOL_VERSION = 3U;
 constexpr uint32_t KFC_SERVER_ARG_NUM = 6U;
 constexpr uint32_t KFC_SERVER_TOKEN_ARG_INDEX = 5U;
 constexpr uint32_t KFC_SERVER_MAX_MISSION_NUM = 2U;
-constexpr uint32_t KFC_SERVER_SIGNAL_REGION_NUM = KFC_SERVER_MAX_MISSION_NUM * 2U;
+constexpr uint32_t KFC_SERVER_SIGNAL_REGION_NUM = KFC_SIGNAL_REGION_NUM;
+
+static_assert(KFC_SERVER_SIGNAL_REGION_NUM == KFC_SERVER_MAX_MISSION_NUM * 2U, "invalid KFC signal layout");
 
 constexpr char KFC_CONCURRENT_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherConcurMeshNHRMultiLink";
 

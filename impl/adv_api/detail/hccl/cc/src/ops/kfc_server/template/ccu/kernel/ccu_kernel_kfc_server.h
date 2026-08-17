@@ -43,7 +43,7 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     std::map<uint32_t, uint32_t> nhrRank2ChannelIdx;
 };
 
-// 多mission由Host使用独立start/done区域调度；Server之间不在CCU侧同步。
+// mission 0 owns the Host queue. mission 1 follows it through the shared mission start/done regions.
 struct KfcServerContext : CcuKernelCtxBase {
     const CcuKernelArgKfcServer* arg;
 
@@ -51,6 +51,8 @@ struct KfcServerContext : CcuKernelCtxBase {
     ccu::Variable ckeAddr;
     ccu::Variable waitAddr;   // HBM上的每轮开始信号的首地址
     ccu::Variable recordAddr; // HBM上的每轮完成信号的首地址
+    ccu::Variable missionStartAddr;
+    ccu::Variable missionDoneAddr;
 
     ccu::Variable token;
     ccu::Variable dieNum; // Die数量，用于判断单双Die，默认为1即单Die
@@ -62,7 +64,7 @@ struct KfcServerContext : CcuKernelCtxBase {
     const char* exportDieSig;
     const char* importDieSig;
 
-    // 保留旧协议字段，当前双mission路径不使用CCU侧mission间同步。
+    // Reserved for a future hardware-notify implementation. The current protocol synchronizes through HBM.
     std::vector<const char*> exportMissoinSig;
     std::vector<const char*> importMissionSig;
     // 用于Mission间同步变量

@@ -98,11 +98,9 @@ private:
 
     __aicore__ inline void CcuSendMsg(uint8_t resourceId);
 
-    __aicore__ inline GM_ADDR GetCommitCkeAddr(uint8_t msgId, uint8_t missionIndex = 0);
+    __aicore__ inline GM_ADDR GetCommitCkeAddr(uint8_t msgId);
 
-    __aicore__ inline GM_ADDR GetWaitCkeAddr(uint8_t msgId, uint8_t missionIndex = 0);
-
-    __aicore__ inline uint8_t GetKfcMissionNum() const;
+    __aicore__ inline GM_ADDR GetWaitCkeAddr(uint8_t msgId);
 
     __aicore__ inline bool IsFinish(uint8_t reqId);
 

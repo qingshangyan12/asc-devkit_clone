@@ -16,11 +16,18 @@
 namespace HcclSim {
 namespace CcuSt {
 
+enum class KfcServerTestRole : uint32_t {
+    DEFAULT = 0,
+    ALL_GATHER_MESH = 1,
+    ALL_GATHER_NHR = 2,
+};
+
 struct KfcServerKernelConfig {
     uint32_t rankId{0};
     uint32_t rankSize{0};
     uint64_t opId{0};
     std::vector<ChannelHandle> channels;
+    KfcServerTestRole role{KfcServerTestRole::DEFAULT};
 };
 
 Result CaptureKfcServerKernel(void *kernelArg);

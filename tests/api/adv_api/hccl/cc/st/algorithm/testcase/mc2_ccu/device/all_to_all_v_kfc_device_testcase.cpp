@@ -214,6 +214,43 @@ TEST_F(ST_MC2_CCU_ALL_TO_ALL_V_KFC_TEST, real_server_ir_matches_current_queue_an
     EXPECT_FALSE(checker.CheckServerProgram(corrupt, FP16_ALL_TO_ALL_V_OP_ID).Ok());
 }
 
+TEST_F(ST_MC2_CCU_ALL_TO_ALL_V_KFC_TEST, concurrent_owner_and_worker_generate_mission_sync_ir)
+{
+    constexpr InstanceHandle instance = 43;
+    constexpr uint32_t rankSize = 2;
+    RegisterManager &manager = RegisterManager::Global();
+    ASSERT_EQ(manager.RegisterStart(instance), Result::SUCCESS);
+
+    KfcServerKernelConfig ownerConfig{
+        0U, rankSize, FP16_ALL_TO_ALL_V_OP_ID, BuildChannels(0U, rankSize),
+        KfcServerTestRole::ALL_GATHER_MESH};
+    KfcServerKernelConfig workerConfig{
+        0U, rankSize, FP16_ALL_TO_ALL_V_OP_ID, BuildChannels(0U, rankSize),
+        KfcServerTestRole::ALL_GATHER_NHR};
+    KernelHandle ownerKernel = 0;
+    KernelHandle workerKernel = 0;
+    ASSERT_EQ(manager.Register(instance, "CcuKfcOwnerServerKernel", CaptureKfcServerKernel,
+                  &ownerConfig, ownerKernel), Result::SUCCESS);
+    ASSERT_EQ(manager.Register(instance, "CcuKfcWorkerServerKernel", CaptureKfcServerKernel,
+                  &workerConfig, workerKernel), Result::SUCCESS);
+    ASSERT_EQ(manager.RegisterEnd(instance), Result::SUCCESS);
+
+    const Program *owner = manager.GetProgram(ownerKernel);
+    const Program *worker = manager.GetProgram(workerKernel);
+    ASSERT_NE(owner, nullptr);
+    ASSERT_NE(worker, nullptr);
+
+    const auto countCode = [](const Program &program, OpCode code) {
+        return std::count_if(program.operations.begin(), program.operations.end(),
+            [code](const Operation &operation) { return operation.code == code; });
+    };
+    EXPECT_EQ(countCode(*owner, OpCode::STORE_MEMORY), 4);
+    EXPECT_EQ(countCode(*owner, OpCode::WHILE_BEGIN), 3);
+    EXPECT_EQ(countCode(*worker, OpCode::STORE_MEMORY), 2);
+    EXPECT_EQ(countCode(*worker, OpCode::WHILE_BEGIN), 2);
+    EXPECT_GT(countCode(*owner, OpCode::LOAD_MEMORY), countCode(*worker, OpCode::LOAD_MEMORY));
+}
+
 TEST_F(ST_MC2_CCU_ALL_TO_ALL_V_KFC_TEST, startup_arguments_bind_real_server_and_queue_resources)
 {
     KfcScenario scenario = BuildScenario({{7, 11}, {13, 5}});

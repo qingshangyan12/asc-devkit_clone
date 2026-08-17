@@ -15,6 +15,14 @@
 
 namespace HcclKfcProtocol {
 
+enum KfcServerSignalRegion : uint32_t {
+    KFC_SIGNAL_HOST_START = 0,
+    KFC_SIGNAL_HOST_DONE = 1,
+    KFC_SIGNAL_MISSION_START = 2,
+    KFC_SIGNAL_MISSION_DONE = 3,
+    KFC_SIGNAL_REGION_NUM = 4,
+};
+
 enum KfcConcurrentAllGatherParamIndex : uint32_t {
     KFC_CONCURRENT_AG_OP_ID = 0,
     KFC_CONCURRENT_AG_MESH_INPUT = 1,

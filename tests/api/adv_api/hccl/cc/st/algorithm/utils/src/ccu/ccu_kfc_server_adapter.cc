@@ -18,6 +18,19 @@
 namespace HcclSim {
 namespace CcuSt {
 
+static_assert(
+    static_cast<uint32_t>(KfcServerTestRole::DEFAULT) ==
+        static_cast<uint32_t>(mc2_ops_hccl::KfcServerRole::DEFAULT),
+    "test and production KFC roles differ");
+static_assert(
+    static_cast<uint32_t>(KfcServerTestRole::ALL_GATHER_MESH) ==
+        static_cast<uint32_t>(mc2_ops_hccl::KfcServerRole::ALL_GATHER_MESH),
+    "test and production KFC roles differ");
+static_assert(
+    static_cast<uint32_t>(KfcServerTestRole::ALL_GATHER_NHR) ==
+        static_cast<uint32_t>(mc2_ops_hccl::KfcServerRole::ALL_GATHER_NHR),
+    "test and production KFC roles differ");
+
 Result CaptureKfcServerKernel(void *kernelArg)
 {
     if (kernelArg == nullptr) {
@@ -33,6 +46,7 @@ Result CaptureKfcServerKernel(void *kernelArg)
     argument.rankId = config.rankId;
     argument.rankSize = config.rankSize;
     argument.loadFromMem = true;
+    argument.role = static_cast<mc2_ops_hccl::KfcServerRole>(config.role);
     argument.channelCount = static_cast<uint32_t>(config.channels.size());
     std::copy(config.channels.begin(), config.channels.end(), argument.channels);
     mc2_ops_hccl::OpParam opParam{};

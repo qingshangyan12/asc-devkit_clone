@@ -243,6 +243,16 @@ TEST_F(AllGatherProductionSelectorTest, KfcCacheSeparatesSoleMeshAndConcurrentMe
     EXPECT_EQ(mc2_ops_hccl::GetKfcServerRole(concurrent.algName, 1U), mc2_ops_hccl::KfcServerRole::ALL_GATHER_NHR);
 }
 
+TEST_F(AllGatherProductionSelectorTest, ConcurrentMissionSyncUsesFourFixedSignalRegions)
+{
+    EXPECT_EQ(mc2_ops_hccl::KFC_SERVER_PROTOCOL_VERSION, 3U);
+    EXPECT_EQ(mc2_ops_hccl::KFC_SERVER_SIGNAL_REGION_NUM, 4U);
+    EXPECT_EQ(HcclKfcProtocol::KFC_SIGNAL_HOST_START, 0U);
+    EXPECT_EQ(HcclKfcProtocol::KFC_SIGNAL_HOST_DONE, 1U);
+    EXPECT_EQ(HcclKfcProtocol::KFC_SIGNAL_MISSION_START, 2U);
+    EXPECT_EQ(HcclKfcProtocol::KFC_SIGNAL_MISSION_DONE, 3U);
+}
+
 class AllGatherMc2HostTest : public testing::TestWithParam<uint32_t> {
 protected:
     void SetUp() override
