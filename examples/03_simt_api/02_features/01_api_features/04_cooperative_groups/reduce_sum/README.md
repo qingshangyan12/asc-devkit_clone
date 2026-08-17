@@ -1,4 +1,4 @@
-# 协作组接口实现分层规约样例
+# 协作组多粒度规约样例
 
 ## 概述
 
@@ -14,7 +14,7 @@ Ascend 950PR、Ascend 950DT。
 
 ## 支持的CANN软件版本
 
-CANN 9.2.0及以上。
+>= 9.2.0
 
 
 ## 目录结构介绍
@@ -38,20 +38,21 @@ CANN 9.2.0及以上。
 
 三个用例的规约域划分不同，但覆盖同一批数据且互不重叠，三个总和均为该解析解。三者的调用链与各自的规约层级如下：
 
-![reduce_sum的调用链与规约层级](figures/reduce_sum_dispatch.png)
+**图 1**  reduce_sum的调用链与规约层级
+
+![](./figures/reduce_sum_dispatch.png)
 
 三个用例各自具备独立kernel、独立launch与独立显存，单次执行仅运行其中一个。host侧的用例函数按暂存区所在的存储层级归并为两个：跨块规约的暂存区在全局内存，整块与子组两个场景的暂存区均在共享内存，因为case1和case2实现过程基本一致，所以将这两个case放到一个函数中。
 
 ### 样例规格
 
-三个用例统一采用同一执行配置：grid为4个线程块，每块1024线程即32个warp，共4096线程，动态ubuf为0，启动形态为`<<<dim3(4), dim3(1024), DYN_UBUF_SIZE, stream>>>`。`THREADS_PER_BLOCK`取1024，为默认线程配置下每块的线程数；`TILE_SIZE`取32以对齐warp宽度，使子组恰好落在单个warp内。
+三个用例采用同一执行配置：grid为4个线程块，每块1024线程即32个warp，共4096线程，动态ubuf为0，启动形态为`<<<dim3(4), dim3(1024), DYN_UBUF_SIZE, stream>>>`。`THREADS_PER_BLOCK`取1024，为默认线程配置下每块的线程数；`TILE_SIZE`取32以对齐warp宽度，使子组恰好落在单个warp内。
 
 
 <table>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">input</td><td align="center">[4096]</td><td align="center">int32</td><td align="center">ND</td></tr>
-<tr><td rowspan="4" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">total_grid（CASE=0）</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td rowspan="3" align="center">样例输出</td><td align="center">total_grid（CASE=0）</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
 <tr><td align="center">total_block（CASE=1）</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
 <tr><td align="center">total_tile（CASE=2）</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_grid_group / reduce_thread_block / reduce_block_tile</td></tr>
@@ -94,7 +95,9 @@ __aicore__ inline int32_t reduce_sum(const thread_group& g, PtrT x, int32_t val)
 
 每轮相加的两个值各自代表一批元素，两批之间没有重叠，相加得到的新值就代表这两批元素之和。因此每轮结束时，剩下的活跃值合起来仍然覆盖全部元素，不重不漏，只是持有值的线程数减半。这一点与规约域大小`N`无关，三种粒度算出的总和因此相同。
 
-![折半规约的实现过程](figures/halving_reduction.png)
+**图 2**  折半规约的实现过程：跨距逐轮折半，活跃线程数随之减半
+
+![](./figures/halving_reduction.png)
 
 形参`x`所指的暂存区承担组内线程交换中间值的职能。`val`位于各线程私有的寄存器，跨线程的合并经这块参与线程均可寻址的内存完成。暂存区容量按`g.size()`格开满，格号取组内rank，执行结束后其中留下的是最后一轮的中间态，不回读至host侧。所在的存储层级由规约域的跨度决定：跨越block时为全局内存，不超出block时为共享内存。
 
