@@ -162,6 +162,7 @@ private:
     uint64_t resourceBytes_ = 0U;
     uint64_t resourceFileCount_ = 0U;
     bool automaticLoadAttempted_ = false;
+    bool keepTemporaryRoot_ = false;
     ResourceStatus automaticLoadStatus_ = ResourceStatus::Success;
     std::mutex loadMutex_;
     std::mutex registryMutex_;

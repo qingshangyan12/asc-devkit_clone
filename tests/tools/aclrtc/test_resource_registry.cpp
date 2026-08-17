@@ -1011,6 +1011,51 @@ TEST_F(ResourceRegistryTest, LookupReportsTemporaryRootAndMaterializationFailure
     EXPECT_TRUE(registry_->externalResources_.at("bad-temp")->data.resourceDir.empty());
 }
 
+TEST_F(ResourceRegistryTest, DestructorHonorsSaveKernelMetaAtTemporaryRootCreation)
+{
+    SetEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "1");
+    registry_->externalResources_.emplace("keep-temp", MakeEntry(ResourceSourceType::External));
+    ResourceData output;
+    EXPECT_EQ(registry_->Lookup("keep-temp", output), ResourceStatus::Success);
+    const std::string retainedRoot = registry_->temporaryRoot_;
+    ASSERT_TRUE(fs::is_directory(retainedRoot));
+    registry_.reset();
+    EXPECT_TRUE(fs::is_directory(retainedRoot));
+
+    registry_.reset(new ResourceRegistry());
+    SetEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "true");
+    registry_->externalResources_.emplace("remove-temp", MakeEntry(ResourceSourceType::External));
+    EXPECT_EQ(registry_->Lookup("remove-temp", output), ResourceStatus::Success);
+    const std::string removedRoot = registry_->temporaryRoot_;
+    ASSERT_TRUE(fs::is_directory(removedRoot));
+    registry_.reset();
+    EXPECT_FALSE(fs::exists(removedRoot));
+}
+
+TEST_F(ResourceRegistryTest, SaveKernelMetaTrimsWhitespaceAndKeepsFailedMaterialization)
+{
+    SetEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", " \t1\r\n");
+    std::unique_ptr<ResourceEntry> entry = MakeEntry(ResourceSourceType::External);
+    entry->files.push_back({"invalid.bin", ".", {1U}});
+    registry_->externalResources_.emplace("failed-materialization", std::move(entry));
+
+    ResourceData output;
+    EXPECT_EQ(registry_->Lookup("failed-materialization", output), ResourceStatus::IoError);
+    EXPECT_TRUE(output.resourceDir.empty());
+    EXPECT_TRUE(registry_->keepTemporaryRoot_);
+    const fs::path retainedRoot(registry_->temporaryRoot_);
+    const fs::path categoryParent = retainedRoot / "external";
+    std::vector<fs::path> retainedCategories;
+    for (fs::directory_iterator current(categoryParent), end; current != end; ++current) {
+        retainedCategories.push_back(current->path());
+    }
+    ASSERT_EQ(retainedCategories.size(), 1U);
+    EXPECT_TRUE(fs::is_directory(retainedCategories.front()));
+
+    registry_.reset();
+    EXPECT_TRUE(fs::is_directory(retainedRoot));
+}
+
 TEST_F(ResourceRegistryTest, LoadExplicitResourceEndToEnd)
 {
     const SourceLayout layout = CreateLayout("public-load");

@@ -99,6 +99,29 @@ void CleanupPath(const std::string& path) noexcept
     }
 }
 
+bool ShouldKeepTemporaryRoot() noexcept
+{
+    const char* environment = std::getenv("ASCEND_OP_COMPILE_SAVE_KERNEL_META");
+    if (environment == nullptr) {
+        return false;
+    }
+    auto isWhitespace = [](char value) {
+        return value == ' ' || value == '\t' || value == '\n' || value == '\r' || value == '\f' || value == '\v';
+    };
+    const char* begin = environment;
+    while (*begin != '\0' && isWhitespace(*begin)) {
+        ++begin;
+    }
+    const char* end = begin;
+    while (*end != '\0') {
+        ++end;
+    }
+    while (end != begin && isWhitespace(*(end - 1))) {
+        --end;
+    }
+    return end == begin + 1 && *begin == '1';
+}
+
 ResourceStatus CreateTemporaryRoot(std::string& temporaryRoot)
 {
     const char* environment = std::getenv("TMPDIR");
@@ -1171,7 +1194,12 @@ ResourceRegistry& ResourceRegistry::Instance()
 
 ResourceRegistry::ResourceRegistry() = default;
 
-ResourceRegistry::~ResourceRegistry() { CleanupPath(temporaryRoot_); }
+ResourceRegistry::~ResourceRegistry()
+{
+    if (!keepTemporaryRoot_) {
+        CleanupPath(temporaryRoot_);
+    }
+}
 
 ResourceEntry* ResourceRegistry::FindResource(const std::string& resourceId) noexcept
 {
@@ -1310,6 +1338,7 @@ ResourceStatus ResourceRegistry::Materialize(
     {
         std::lock_guard<std::mutex> lock(registryMutex_);
         if (temporaryRoot_.empty()) {
+            keepTemporaryRoot_ = ShouldKeepTemporaryRoot();
             const ResourceStatus status = CreateTemporaryRoot(temporaryRoot_);
             if (status != ResourceStatus::Success) {
                 return status;
@@ -1330,7 +1359,9 @@ ResourceStatus ResourceRegistry::Materialize(
         status = WriteMaterializedFiles(entry.files, canonicalRoot);
     }
     if (status != ResourceStatus::Success) {
-        CleanupPath(categoryRoot);
+        if (!keepTemporaryRoot_) {
+            CleanupPath(categoryRoot);
+        }
         resource.resourceDir.clear();
         return status;
     }
