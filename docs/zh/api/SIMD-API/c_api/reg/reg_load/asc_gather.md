@@ -157,16 +157,11 @@ __simd_callee__ inline void asc_gather(vector_int16_t& dst,
 ### 通用约束
 
 - 本接口在非AIV上调用直接返回。
-- 本接口在Vector Function（`__simd_vf__` 标记的函数）内调用，UB源收集模式
-时源操作数为UB地址、目的操作数为矢量数据寄存器，寄存器源收集模式时源/目的均为矢量数据寄存器。
+- 本接口在Vector Function（`__simd_vf__` 标记的函数）内调用，UB源收集模式时源操作数为UB地址、目的操作数为矢量数据寄存器，寄存器源收集模式时源/目的均为矢量数据寄存器。
 
 ### UB源收集模式约束
 
 - UB地址空间外的指针不可作为`src`传入，源操作数在UB中的起始地址需要32B对齐。
-<!-- npu="950" id8 -->
-- **针对Ascend 950PR/Ascend 950DT：**
-UB容量上限请参见[存储单元规格](../../../../../guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本3510.md#section6500173264510)。
-<!-- end id8 -->
 - `mask`需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 - 对于`mask`筛选需要搬运的元素，对应的地址需要在UB有效范围内；对于`mask`未筛选的元素，对应的地址不会触发任何地址越界异常，同时`dst`中对应的元素将被置零。
 - 当`src`为b8数据类型，`dst`为b16数据类型时，目的操作数的低8位与源操作数相同，高8位自动补0。例如`src`为`int8_t`数据类型，`dst`为`int16_t`数据类型：
@@ -185,15 +180,15 @@ UB容量上限请参见[存储单元规格](../../../../../guide/编程指南/�
 
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)。
 
-<!-- npu="950" id9 -->
+<!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
-<!-- end id9 -->
+<!-- end id8 -->
 
 ```c
 #include <cstdint>
