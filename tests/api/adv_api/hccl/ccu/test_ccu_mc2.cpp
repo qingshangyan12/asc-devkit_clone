@@ -29,7 +29,7 @@ static u32 g_stubRankId = 0;
 static DevType g_stubDeviceType = DevType::DEV_TYPE_950;
 static std::vector<void*> g_allocatedPtrs;
 static std::unordered_map<uint32_t, std::string> g_opTypeToAlgName = {
-    {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1DMem2Mem"},
+    {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuKfcAllGatherMesh1DMem2Mem"},
     {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE), "CcuAllReduceMesh1D"},
     {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuKfcReduceScatterMesh1DMem2Mem"},
 };
@@ -497,8 +497,9 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AllGatherMesh1D_KfcServerArgs)
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     ASSERT_EQ(SelectAlgAndPrepareEngine(comm_, opParam, algName, topoInfo), HCCL_SUCCESS);
-    ASSERT_EQ(algName, "CcuAllGatherMesh1DMem2Mem");
+    ASSERT_EQ(algName, "CcuKfcAllGatherMesh1DMem2Mem");
     ASSERT_EQ(opParam.engine, COMM_ENGINE_CCU);
+    ASSERT_EQ(opParam.opExecuteConfig, OpExecuteConfig::CCU_SCHED);
 
     int result = sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str());
     ASSERT_GT(result, 0);
@@ -569,7 +570,7 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     ASSERT_EQ(SelectAlgAndPrepareEngine(comm_, opParam1, algName, topoInfo), HCCL_SUCCESS);
-    ASSERT_EQ(algName, "CcuAllGatherMesh1DMem2Mem");
+    ASSERT_EQ(algName, "CcuKfcAllGatherMesh1DMem2Mem");
 
     int result = sprintf_s(opParam1.algName, sizeof(opParam1.algName), "%s", algName.c_str());
     ASSERT_GT(result, 0);
@@ -598,6 +599,7 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
     OpParam opParam2{};
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "reuse_tag", &ccTiling, opParam2), HCCL_SUCCESS); // 相同tag
     ASSERT_EQ(SelectAlgAndPrepareEngine(comm_, opParam2, algName, topoInfo), HCCL_SUCCESS);
+    ASSERT_EQ(algName, "CcuKfcAllGatherMesh1DMem2Mem");
     result = sprintf_s(opParam2.algName, sizeof(opParam2.algName), "%s", algName.c_str());
     ASSERT_GT(result, 0);
     ASSERT_EQ(HandleSingleRankAndCommMode(comm_, opParam2, skipGetRes), HCCL_SUCCESS);

@@ -552,7 +552,14 @@ HcclResult PrepareTopoInfoForOp(HcclComm comm, OpParam& opParam, std::unique_ptr
 {
     HCCL_INFO("[SelectAlgAndPrepareEngine]start SelectAlgAndPrepareEngine!");
     opParam.hcclComm = comm;
-    CHK_RET(HcclGetOpExpansionMode(comm, opParam));
+    // MC2 CCU tiling 已明确指定 CCU_SCHED。不能再被全局展开模式环境变量覆盖为 CCU_MS，
+    // 否则 AllGather 会在 SelectCcuMsAlgo 中选中普通直启算法，绕过 KFC Server。
+    if (opParam.engine == COMM_ENGINE_CCU) {
+        opParam.opExecuteConfig = OpExecuteConfig::CCU_SCHED;
+        HCCL_INFO("[SelectAlgAndPrepareEngine] preserve CCU_SCHED from MC2 tiling.");
+    } else {
+        CHK_RET(HcclGetOpExpansionMode(comm, opParam));
+    }
     HCCL_INFO("[SelectAlgAndPrepareEngine]  successfully!");
     CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
     HCCL_INFO("[SelectAlgAndPrepareEngine]HcclCalcTopoInfo successfully!");
