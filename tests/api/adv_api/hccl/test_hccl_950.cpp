@@ -271,13 +271,13 @@ TEST_F(HcclSuiteAIC, AllReduce_prepareWithCommitFalse)
     }
 }
 
-TEST_F(HcclSuiteAIC, AllGather_CcuAllGatherMeshMem2Mem1D)
+TEST_F(HcclSuiteAIC, AllGather_CcuSchedAllGatherSoleMesh)
 {
     std::vector<uint8_t> workSpace(workSpaceSize);
     HcclMsgArea* hcclMsgArea = GetHcclMsgArea(workSpace.data());
     HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
     hcclCombineOpParam.opType[0] = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
-    hcclCombineOpParam.algorithmType[0] = static_cast<uint8_t>(AlgorithmType::CcuAllGatherMeshMem2Mem1D);
+    hcclCombineOpParam.algorithmType[0] = static_cast<uint8_t>(AlgorithmType::CcuSchedAllGatherSoleMesh);
 
     Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
     hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
