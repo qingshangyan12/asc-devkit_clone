@@ -12,7 +12,6 @@
 
 #include "c_api/stub/cce_stub.h"
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/data_reorder.h"
 
 class TensorApiVectorDataReorder3510 : public testing::Test {};
 
