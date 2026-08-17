@@ -32,9 +32,9 @@ inline constexpr bool is_data_reorder_support_type = Std::is_one_of_v<T, uint8_t
 
 template <typename T>
 __simd_callee__ inline decltype(auto) interleave(reg_tensor<T> src0, reg_tensor<T> src1) {
-    static_assert(detail::is_data_reorder_support_type<T>, "interleave only supports uint8_t, int8_t,
-        fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t,
-        int32_t and float.");
+    static_assert(detail::is_data_reorder_support_type<T>, "interleave only supports uint8_t, int8_t, "
+        "fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, "
+        "int32_t and float.");
     reg_tensor<T> dst0;
     reg_tensor<T> dst1;    
     asc_intlv(dst0.reg, dst1.reg, src0.reg, src1.reg);
@@ -45,9 +45,9 @@ __simd_callee__ inline decltype(auto) interleave(reg_tensor<T> src0, reg_tensor<
 
 template <typename T>
 __simd_callee__ inline decltype(auto) deinterleave(reg_tensor<T> src0, reg_tensor<T> src1) {
-    static_assert(detail::is_data_reorder_support_type<T>, "deinterleave only supports uint8_t, int8_t,
-        fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t,
-        int32_t and float.");
+    static_assert(detail::is_data_reorder_support_type<T>, "deinterleave only supports uint8_t, int8_t, "
+        "fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, "
+        "int32_t and float.");
     reg_tensor<T> dst0;
     reg_tensor<T> dst1;    
     asc_deintlv(dst0.reg, dst1.reg, src0.reg, src1.reg);

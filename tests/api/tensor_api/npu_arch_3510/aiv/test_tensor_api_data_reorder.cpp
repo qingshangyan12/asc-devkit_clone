@@ -22,8 +22,9 @@ __aicore__ inline void TestInterleave()
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
 
-    auto result = asc::te::interleave(src0, src1);
-    (void)result;
+    auto [dst0, dst1] = asc::te::interleave(src0, src1);
+    (void)dst0;
+    (void)dst1;
 }
 
 template <typename T>
@@ -32,8 +33,9 @@ __aicore__ inline void TestDeinterleave()
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
 
-    auto result = asc::te::deinterleave(src0, src1);
-    (void)result;
+    auto [dst0, dst1] = asc::te::deinterleave(src0, src1);
+    (void)dst0;
+    (void)dst1;
 }
 
 #define DATA_REORDER_TEST(Function, DataType)                                   \
