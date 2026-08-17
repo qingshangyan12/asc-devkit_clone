@@ -140,7 +140,15 @@ HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctx
             static_cast<unsigned long long>(actualSize));
         return HCCL_SUCCESS;
     }
-    return HcclEngineCtxCreate(comm, tag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx);
+    CHK_RET(HcclEngineCtxCreate(comm, tag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx));
+    aclError aclRet = aclrtMemset(*ctx, ctxSize, 0, ctxSize);
+    CHK_PRT_RET(
+        aclRet != ACL_SUCCESS,
+        HCCL_ERROR(
+            "[GetOrCreateCcuCtx] aclrtMemset failed, ret[%d], tag[%s], addr[%p], size[%llu].", aclRet, tag.c_str(),
+            *ctx, static_cast<unsigned long long>(ctxSize)),
+        HCCL_E_RUNTIME);
+    return HCCL_SUCCESS;
 }
 
 HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum)
