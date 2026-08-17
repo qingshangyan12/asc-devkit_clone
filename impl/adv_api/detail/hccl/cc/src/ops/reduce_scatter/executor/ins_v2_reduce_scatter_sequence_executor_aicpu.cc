@@ -61,7 +61,7 @@ HcclResult InsV2ReduceScatterSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0
     const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
     HCCL_DEBUG("[InsV2ReduceScatterSequenceExecutorAicpu] CalcRes start");
-    InitCommInfo(param, topoInfo, algHierarchyInfo);
+    CHK_RET(InitCommInfo(param, topoInfo, algHierarchyInfo));
     if (algHierarchyInfo.infos.size() != SEQUENCE_EXECUTOR_LEVEL_NUM) {
         HCCL_ERROR(
             "[InsV2ReduceScatterSequenceExecutorAicpu] algHierarchyInfo size should be %u",
