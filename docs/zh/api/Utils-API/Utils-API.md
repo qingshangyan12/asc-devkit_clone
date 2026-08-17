@@ -22,4 +22,4 @@
 
 -   **[调测接口](tuning_interface/tuning_interface.md)**
 
--   **[SuperKernel](SuperKernel/SuperKernel.md)**
+-   **[SuperKernel](super_kernel/SuperKernel.md)**
