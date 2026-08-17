@@ -68,7 +68,7 @@ flowchart TD
     DATA --> BUILDER[KernelCompilationPlanBuilder]
     BUILDER --> PLAN[patches / commands / linked ELF path]
     PLAN --> WORKSPACE[KernelCompilationWorkspace: 创建目录并替换常量]
-    WORKSPACE --> EXECUTOR[CompilationCommandExecutor]
+    WORKSPACE --> EXECUTOR[CompilationPlanExecutor]
     EXECUTOR --> ELF[worktree 中的 linked ELF]
     ELF --> PUBLISH[同目录临时文件 + rename]
     PUBLISH --> OUTPUT[outPath]
@@ -80,11 +80,23 @@ flowchart TD
 - `KernelSpecializationSession` 编排一次同步请求和最终发布。
 - `KernelCompilationPlanBuilder` 是 JSON 读取、占位符解析和命令后处理的唯一入口。
 - `KernelCompilationWorkspace` 接管独占 worktree，应用 source patch，并负责保留或清理。
-- `CompilationCommandExecutor` 使用 argv 直接启动进程，处理输出、超时和进程组回收。
+- `CompilationPlanExecutor` 按计划串行编排命令，并将进程结果映射为 ACLRTC 错误码。
+- `SpawnedToolProcess` 独占一条命令的子进程和输出管道，处理 argv 启动、输出限流、超时和
+  进程组回收。
 - `KernelSpecializationDiagnostics` 只提供 dlog 和可选诊断文件，不改变编译结果。
 
 specialization 内部统一使用 Boost.Filesystem 表达和操作路径，不依赖 C++17 标准库 filesystem
 运行时实现；生产库和 UT 均显式链接 `Boost::filesystem`。
+
+## 实现命名约束
+
+函数和变量必须在调用点即可判断职责，命名遵守以下规则：
+
+- 纯内存变换与文件、进程等外部副作用使用不同动词，避免两个不同层次的操作看起来功能相同。
+- 会改变调用合同的行为写入名称，例如 `First`、`All`、`Atomically` 和 `BestEffort`。
+- `Validate`、`Finalize`、`Process`、`Handle` 等宽泛动词必须补充具体校验项、处理对象或结果。
+- 跨模块数据使用 `owned`、`borrowed`、`external` 等限定词说明所有权和生命周期。
+- 类型和狭小作用域已经能消除歧义时保留简短局部变量，避免为了长度而堆叠同义词。
 
 ## Registry 接入
 
@@ -116,8 +128,12 @@ ACLRTC 只读取当前请求实际使用的字段：
 
 - 顶层：`schema_version`、`options`、`kernels`。
 - 目标 Kernel：`kernel_name`、至少包含一项的 `constant_infos`、可选的 `link_options`、`objects`。
-- 所选对象：`object_type`、`commands`、`outputs`。
+- 所选对象：`object_name`、`object_type`、`commands`、`outputs`。
 - command：`type`、`cmd`，以及可选的 `stage`。
+
+同一 `object_type` 可以对应多个对象。ACLRTC 会选择请求所需类型的全部对象，并保持 `objects`
+数组中的声明顺序；未请求 SK 时只跳过 `sk` 对象。对象名用于日志和诊断定位，不能将
+`object_type` 当作对象的唯一标识。
 
 basic 请求不深读 SK 对象，无关 Kernel 在找到目标入口后不再读取。pack 是完整 Manifest validator；
 占位符语法、字段白名单、唯一性、stage/output 依赖图和 template 唯一性均由 pack 校验。
@@ -153,7 +169,7 @@ specialization 自有枚举和跨模块传递的数值成员使用固定宽度�
 `-o`、`-o<value>`、`--output`、`--output=<value>`。引号、空格、`;`、`$()` 等字符作为单个 argv
 原样传递，不会形成 shell command injection。
 
-`CompilationCommandExecutor` 在调用 `posix_spawn` 前拒绝 executable 或 argv 中的内嵌 NUL，避免
+`CompilationPlanExecutor` 在调用 `posix_spawn` 前拒绝 executable 或 argv 中的内嵌 NUL，避免
 C++ 字符串校验内容与操作系统实际接收内容不一致。管道、spawn 配置和运行中的子进程组使用作用域资源
 管理；正常返回和异常退出都必须关闭文件描述符并回收子进程。系统调用失败记录操作名和错误信息，
 `std::bad_alloc` 映射为内存错误，其他标准异常和未知异常映射为通用错误。日志不得输出完整用户 argv，

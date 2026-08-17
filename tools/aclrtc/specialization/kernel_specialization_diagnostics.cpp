@@ -40,7 +40,7 @@ std::string QuoteShellArgument(const std::string& argument)
     return quotedArgument;
 }
 
-const char* GetTerminationName(CompilationProcessTermination termination)
+const char* GetProcessTerminationName(CompilationProcessTermination termination)
 {
     switch (termination) {
         case CompilationProcessTermination::InfrastructureFailure:
@@ -91,7 +91,7 @@ KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
     }
 }
 
-void KernelSpecializationDiagnostics::RecordManifest(const nlohmann::json& resourceManifest) noexcept
+void KernelSpecializationDiagnostics::WriteManifestSnapshot(const nlohmann::json& resourceManifest) noexcept
 {
     if (!diagnosticsEnabled_) {
         return;
@@ -117,7 +117,7 @@ void KernelSpecializationDiagnostics::RecordManifest(const nlohmann::json& resou
     }
 }
 
-void KernelSpecializationDiagnostics::RecordWorktree(const fs::path& resourceWorktreePath) noexcept
+void KernelSpecializationDiagnostics::RecordWorktreePath(const fs::path& resourceWorktreePath) noexcept
 {
     if (!diagnosticsEnabled_) {
         return;
@@ -131,7 +131,8 @@ void KernelSpecializationDiagnostics::RecordWorktree(const fs::path& resourceWor
     }
 }
 
-void KernelSpecializationDiagnostics::RecordCommand(const CompilationCommand& compilationCommand) noexcept
+void KernelSpecializationDiagnostics::AppendCommandToReplayScript(
+    const CompilationCommand& compilationCommand) noexcept
 {
     if (!diagnosticsEnabled_) {
         return;
@@ -150,7 +151,7 @@ void KernelSpecializationDiagnostics::RecordCommand(const CompilationCommand& co
     }
 }
 
-void KernelSpecializationDiagnostics::RecordCommandResult(
+void KernelSpecializationDiagnostics::AppendCommandResultToCompilationLog(
     const CompilationCommand& compilationCommand, const CompilationProcessResult& processResult) noexcept
 {
     if (!diagnosticsEnabled_) {
@@ -159,7 +160,8 @@ void KernelSpecializationDiagnostics::RecordCommandResult(
     try {
         std::ostringstream resultText;
         resultText << '[' << compilationCommand.diagnosticLabel << "] termination="
-                   << GetTerminationName(processResult.termination) << " code=" << processResult.terminationCode
+                   << GetProcessTerminationName(processResult.termination) << " code="
+                   << processResult.terminationCode
                    << " elapsed_ms=" << processResult.elapsedTime.count()
                    << " output_truncated=" << (processResult.capturedOutputTruncated ? "true" : "false") << '\n'
                    << processResult.capturedOutput;
@@ -174,7 +176,7 @@ void KernelSpecializationDiagnostics::RecordCommandResult(
     }
 }
 
-void KernelSpecializationDiagnostics::RecordFinalResult(
+void KernelSpecializationDiagnostics::WriteSpecializationResult(
     const fs::path& outputElfPath, OutputPublicationStatus publicationStatus) noexcept
 {
     if (!diagnosticsEnabled_) {
