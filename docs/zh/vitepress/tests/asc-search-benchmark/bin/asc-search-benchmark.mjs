@@ -39,6 +39,7 @@ const DEFAULT_VIEWPORT_WIDTH = 800
 const DEFAULT_VIEWPORT_HEIGHT = 600
 const POLL_INTERVAL_MS = 20
 const QUERY_TIMEOUT_MS = 15000
+const PRODUCT_FILTER_VALUES = new Set(['all', '950', 'A3', '910b', '910', '310p', '310b', 'x90', '9030'])
 
 function printHelp() {
   console.log(`Usage:
@@ -516,7 +517,11 @@ async function initializeSearchPage(client, targetUrl, timeoutMs) {
 
 async function runSearchCase(client, definition) {
   return evaluate(client, `(async () => {
-    const definition = ${JSON.stringify({ id: definition.id, query: definition.query })}
+    const definition = ${JSON.stringify({
+      id: definition.id,
+      query: definition.query,
+      productFilter: definition.productFilter || 'all',
+    })}
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
     const waitFor = async (check, timeout, description) => {
       const started = performance.now()
@@ -529,7 +534,10 @@ async function runSearchCase(client, definition) {
     }
     const input = document.querySelector('input[command-input]')
     if (!input) throw new Error('Search input is no longer available')
+    const productSelect = document.querySelector('.filter-select')
+    if (!productSelect) throw new Error('Product filter is no longer available')
     const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
+    const selectSetter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set
     const setValue = value => {
       setter.call(input, value)
       input.dispatchEvent(new Event('input', { bubbles: true }))
@@ -575,9 +583,18 @@ async function runSearchCase(client, definition) {
       sectionPlacementValid: sectionPlacementValid(element),
       description: element.querySelector('.des')?.textContent?.replace(/\\s+/g, ' ').trim() || '',
       highlights: readHighlights(element, ${JSON.stringify(RESULT_HIGHLIGHT_SELECTOR)}),
+      titleHighlights: readHighlights(element, '.headings mark'),
+      descriptionHighlights: readHighlights(element, '.des mark'),
       sectionHighlights: readHighlights(element, ${JSON.stringify(SECTION_HIGHLIGHT_SELECTOR)}),
     })).filter(result => result.route)
 
+    selectSetter.call(productSelect, definition.productFilter)
+    productSelect.dispatchEvent(new Event('change', { bubbles: true }))
+    await waitFor(
+      () => productSelect.value === definition.productFilter,
+      1000,
+      'product filter ' + definition.productFilter
+    )
     setValue('')
     await waitFor(() => !document.querySelector('.search-loading') && results().length === 0, 3000, 'search reset')
     window.__ascSearchBenchmark.errors.length = 0
@@ -599,6 +616,7 @@ async function runSearchCase(client, definition) {
       latencyMs: performance.now() - started,
       timedOut,
       errors: [...window.__ascSearchBenchmark.errors],
+      productFilter: productSelect.value,
       viewportWidth: innerWidth,
       results: results()
     }
@@ -696,10 +714,18 @@ function validateDataset(dataset) {
       && (!Number.isInteger(definition.viewportWidth) || definition.viewportWidth < 320 || definition.viewportWidth > 3840)) {
       throw new Error(`Case ${definition.id} viewportWidth must be an integer between 320 and 3840`)
     }
+    if (definition.productFilter !== undefined && !PRODUCT_FILTER_VALUES.has(definition.productFilter)) {
+      throw new Error(`Case ${definition.id} productFilter is not recognized: ${definition.productFilter}`)
+    }
     if (!Array.isArray(definition.expect.targets)) throw new Error(`Case ${definition.id} must define expect.targets`)
+    if (definition.expect.excludedTargets !== undefined && !Array.isArray(definition.expect.excludedTargets)) {
+      throw new Error(`Case ${definition.id} expect.excludedTargets must be an array`)
+    }
     for (const key of [
       'descriptionIncludes',
       'highlightIncludes',
+      'titleHighlightIncludes',
+      'descriptionHighlightIncludes',
       'sectionTitleIncludes',
       'sectionHighlightIncludes',
     ]) {
@@ -720,7 +746,18 @@ function validateDataset(dataset) {
         || definition.expect.maxFirstRelevantRank > 10)) {
       throw new Error(`Case ${definition.id} expect.maxFirstRelevantRank must be an integer between 1 and 10`)
     }
-    for (const target of definition.expect.targets) {
+    if (definition.expect.minFirstRelevantRank !== undefined
+      && (!Number.isInteger(definition.expect.minFirstRelevantRank)
+        || definition.expect.minFirstRelevantRank < 1
+        || definition.expect.minFirstRelevantRank > 10)) {
+      throw new Error(`Case ${definition.id} expect.minFirstRelevantRank must be an integer between 1 and 10`)
+    }
+    if (definition.expect.minFirstRelevantRank !== undefined
+      && definition.expect.maxFirstRelevantRank !== undefined
+      && definition.expect.minFirstRelevantRank > definition.expect.maxFirstRelevantRank) {
+      throw new Error(`Case ${definition.id} relevant rank range is empty`)
+    }
+    for (const target of [...definition.expect.targets, ...(definition.expect.excludedTargets || [])]) {
       const matchers = ['exact', 'prefix', 'contains'].filter(key => target[key] !== undefined)
       if (matchers.length !== 1) throw new Error(`Target in ${definition.id} must have exactly one matcher`)
       if (typeof target[matchers[0]] !== 'string' || !target[matchers[0]]) {
@@ -795,13 +832,19 @@ function evaluateHighlights(highlights, expectedValues) {
 function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
   const results = observed.results || []
   const targets = definition.expect.targets || []
+  const excludedTargets = definition.expect.excludedTargets || []
   const errors = observed.errors || []
+  const expectedProductFilter = definition.productFilter || 'all'
+  const productFilterValid = observed.productFilter === expectedProductFilter
   const relevantCase = targets.length > 0
   const grades = results.map(result => relevanceForRoute(result.route, targets))
   const firstRelevantIndex = grades.findIndex(grade => grade >= successGrade)
   const maxFirstRelevantRank = definition.expect.maxFirstRelevantRank ?? null
   const firstRelevantRankValid = maxFirstRelevantRank === null
     || (firstRelevantIndex >= 0 && firstRelevantIndex + 1 <= maxFirstRelevantRank)
+  const minFirstRelevantRank = definition.expect.minFirstRelevantRank ?? null
+  const firstRelevantRankLowEnough = minFirstRelevantRank === null
+    || (firstRelevantIndex >= 0 && firstRelevantIndex + 1 >= minFirstRelevantRank)
   const uniqueTargetGrades = assignUniqueTargetGrades(
     results,
     targets,
@@ -829,6 +872,15 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
   const highlightContentValid = highlightValidation.contentValid
   const highlightStyleValid = highlightValidation.styleValid
   const highlightVisibleValid = highlightValidation.visibleValid
+  const expectedTitleHighlightIncludes = definition.expect.titleHighlightIncludes || []
+  const titleHighlights = highlightResult?.titleHighlights || []
+  const titleHighlightValidation = evaluateHighlights(titleHighlights, expectedTitleHighlightIncludes)
+  const expectedDescriptionHighlightIncludes = definition.expect.descriptionHighlightIncludes || []
+  const descriptionHighlights = highlightResult?.descriptionHighlights || []
+  const descriptionHighlightValidation = evaluateHighlights(
+    descriptionHighlights,
+    expectedDescriptionHighlightIncludes,
+  )
   const expectedSectionTitleIncludes = definition.expect.sectionTitleIncludes || []
   const normalizedSectionTitle = String(highlightResult?.sectionTitle || '').normalize('NFKC').toLocaleLowerCase()
   const sectionTitleValid = expectedSectionTitleIncludes.every(value => normalizedSectionTitle.includes(
@@ -849,21 +901,32 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
     && navigation.targetExists
     && navigation.targetVisible
   )
+  const excludedResults = results.filter(result => (
+    excludedTargets.some(target => targetMatches(result.route, target))
+  ))
+  const excludedTargetsValid = excludedResults.length === 0
   const invalidResults = results.slice(0, topK).filter(result => routeValidity.get(normalizeRoute(result.route)) === false)
   return {
     id: definition.id,
     query: definition.query,
     category: definition.category,
     intent: definition.intent,
-    passed: runtimeComplete && resultCountValid && targetFound && descriptionValid
+    passed: runtimeComplete && productFilterValid && resultCountValid && targetFound && descriptionValid
       && highlightContentValid && highlightStyleValid && highlightVisibleValid
+      && titleHighlightValidation.contentValid && titleHighlightValidation.styleValid
+      && titleHighlightValidation.visibleValid && descriptionHighlightValidation.contentValid
+      && descriptionHighlightValidation.styleValid && descriptionHighlightValidation.visibleValid
       && sectionTitleValid && sectionPlacementValid && sectionHighlightValidation.contentValid
       && sectionHighlightValidation.styleValid && sectionHighlightValidation.visibleValid
-      && sectionRouteValid && sectionNavigationValid && firstRelevantRankValid
+      && sectionRouteValid && sectionNavigationValid && firstRelevantRankValid && firstRelevantRankLowEnough
+      && excludedTargetsValid
       && invalidResults.length === 0,
     runtimeComplete,
     timedOut: Boolean(observed.timedOut),
     errors,
+    expectedProductFilter,
+    productFilter: observed.productFilter,
+    productFilterValid,
     latencyMs: observed.latencyMs,
     viewportWidth: observed.viewportWidth,
     resultCount: results.length,
@@ -875,6 +938,16 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
     highlightVisibleValid,
     expectedHighlightIncludes,
     highlights,
+    titleHighlightContentValid: titleHighlightValidation.contentValid,
+    titleHighlightStyleValid: titleHighlightValidation.styleValid,
+    titleHighlightVisibleValid: titleHighlightValidation.visibleValid,
+    expectedTitleHighlightIncludes,
+    titleHighlights,
+    descriptionHighlightContentValid: descriptionHighlightValidation.contentValid,
+    descriptionHighlightStyleValid: descriptionHighlightValidation.styleValid,
+    descriptionHighlightVisibleValid: descriptionHighlightValidation.visibleValid,
+    expectedDescriptionHighlightIncludes,
+    descriptionHighlights,
     sectionTitleValid,
     sectionPlacementValid,
     expectedSectionTitleIncludes,
@@ -886,8 +959,12 @@ function evaluateCase(definition, observed, topK, successGrade, routeValidity) {
     expectedSectionHash,
     sectionRouteValid,
     sectionNavigationValid,
+    excludedTargetsValid,
+    excludedRoutes: excludedResults.map(result => result.route),
     maxFirstRelevantRank,
     firstRelevantRankValid,
+    minFirstRelevantRank,
+    firstRelevantRankLowEnough,
     navigation,
     firstRelevantRank: firstRelevantIndex >= 0 ? firstRelevantIndex + 1 : null,
     reciprocalRankAt10: firstRelevantIndex >= 0 && firstRelevantIndex < 10 ? 1 / (firstRelevantIndex + 1) : 0,
@@ -1073,16 +1150,25 @@ function formatPercent(value) {
 function failureReason(item) {
   if (item.timedOut) return '查询超时'
   if (item.errors.length) return item.errors[0].split('\n')[0]
+  if (!item.productFilterValid) return `产品筛选未生效，实际为 ${item.productFilter || '未知'}`
+  if (!item.excludedTargetsValid) return `结果包含当前产品不支持的页面：${item.excludedRoutes.join('、')}`
   if (item.invalidResultCountAt10) return `Top 10 包含 ${item.invalidResultCountAt10} 个无效链接`
   if (!item.resultCountValid) return `结果数量不符合预期，实际 ${item.resultCount}`
   if (item.firstRelevantRank === null) return '未返回主要目标'
   if (!item.firstRelevantRankValid) return `首个主要目标位于第 ${item.firstRelevantRank} 名，要求不超过第 ${item.maxFirstRelevantRank} 名`
+  if (!item.firstRelevantRankLowEnough) return `首个主要目标位于第 ${item.firstRelevantRank} 名，要求不早于第 ${item.minFirstRelevantRank} 名`
   if (!item.descriptionValid) return `摘要未包含：${item.expectedDescriptionIncludes.join('、')}`
   if (!item.sectionTitleValid) return `小标题未包含：${item.expectedSectionTitleIncludes.join('、')}`
   if (!item.sectionPlacementValid) return '小标题未紧跟大标题或换行后未左对齐'
   if (!item.highlightContentValid) return `摘要未高亮：${item.expectedHighlightIncludes.join('、')}`
   if (!item.highlightStyleValid) return `摘要高亮样式无效：${item.expectedHighlightIncludes.join('、')}`
   if (!item.highlightVisibleValid) return `摘要高亮被裁剪：${item.expectedHighlightIncludes.join('、')}`
+  if (!item.titleHighlightContentValid) return `标题未高亮：${item.expectedTitleHighlightIncludes.join('、')}`
+  if (!item.titleHighlightStyleValid) return `标题高亮样式无效：${item.expectedTitleHighlightIncludes.join('、')}`
+  if (!item.titleHighlightVisibleValid) return `标题高亮被裁剪：${item.expectedTitleHighlightIncludes.join('、')}`
+  if (!item.descriptionHighlightContentValid) return `摘要未完整高亮：${item.expectedDescriptionHighlightIncludes.join('、')}`
+  if (!item.descriptionHighlightStyleValid) return `摘要完整高亮样式无效：${item.expectedDescriptionHighlightIncludes.join('、')}`
+  if (!item.descriptionHighlightVisibleValid) return `摘要完整高亮被裁剪：${item.expectedDescriptionHighlightIncludes.join('、')}`
   if (!item.sectionHighlightContentValid) return `小标题未高亮：${item.expectedSectionHighlightIncludes.join('、')}`
   if (!item.sectionHighlightStyleValid) return `小标题高亮样式无效：${item.expectedSectionHighlightIncludes.join('、')}`
   if (!item.sectionHighlightVisibleValid) return `小标题高亮被裁剪：${item.expectedSectionHighlightIncludes.join('、')}`

@@ -20,6 +20,7 @@ const MAX_CANDIDATES = 240
 const MAX_IDENTIFIER_MATCHES = 64
 const IDENTIFIER_EXCERPT_PREFIX_CHARS = 12
 const IDENTIFIER_EXCERPT_SUFFIX_CHARS = 96
+const IDENTIFIER_CATALOG_PENALTY = 300000
 const TITLE_INDEX_SOURCE = 'title-route'
 export const MAX_QUERY_LENGTH = 256
 export const MAX_CJK_SUBPHRASES = 2048
@@ -347,7 +348,7 @@ export function createIdentifierIndexLoader(fetchIndex) {
 }
 
 const loadIdentifierIndex = createIdentifierIndexLoader(async () => {
-  const response = await fetch('/search-identifiers.json?v=7', { cache: 'no-store' })
+  const response = await fetch('/search-identifiers.json?v=8', { cache: 'no-store' })
   if (!response.ok) throw new Error(`Identifier index request failed with ${response.status}`)
   return response.json()
 })
@@ -403,12 +404,18 @@ export function highlightSearchText(value, query) {
   return `${escapeHtml(text.slice(0, position))}<mark>${escapeHtml(text.slice(position, end))}</mark>${escapeHtml(text.slice(end))}`
 }
 
-async function searchIdentifierIndex(plan) {
+function pageOwnsIdentifier(page, identifier) {
+  const [route, title] = page
+  const leaf = normalizeRoute(route).split('/').filter(Boolean).at(-1) || ''
+  const identifierKey = compactEnglish(identifier)
+  return compactEnglish(title) === identifierKey || compactEnglish(leaf) === identifierKey
+}
+
+export function rankIdentifierIndex(index, plan, includeRoute = () => true) {
   const query = plan.identifierQuery
   if (!query || (!plan.specialSyntaxIntent && compactEnglish(query).length < 3)) {
     return { exact: false, exclusive: false, strong: false, results: [] }
   }
-  const index = await loadIdentifierIndex()
   const entries = index.i
   const pages = index.p
   const snippets = Array.isArray(index.s) ? index.s : []
@@ -426,10 +433,14 @@ async function searchIdentifierIndex(plan) {
     const identifierScore = (exact ? 3300000 : 3100000)
       + priority * 1000
       - Math.max(0, identifier.length - query.length) * 1000
+    const hasConcreteOwner = pageIds.some((pageId) => {
+      const page = pages[pageId]
+      return page && page[3] !== 1 && includeRoute(page[0]) && pageOwnsIdentifier(page, identifier)
+    })
     for (let rank = 0; rank < pageIds.length; rank++) {
       const page = pages[pageIds[rank]]
       if (!page) continue
-      const [pageRoute, title, pageDescription = ''] = page
+      const [pageRoute, title, pageDescription = '', catalogOnly = 0] = page
       const contextId = contextIds[rank]
       const sourceDescription = Number.isInteger(contextId) && contextId >= 0
         ? snippets[contextId] || pageDescription
@@ -444,6 +455,7 @@ async function searchIdentifierIndex(plan) {
         pageRoute,
         sectionAnchor
       )
+      if (!includeRoute(route)) continue
       const result = {
         route,
         title: title || route,
@@ -453,7 +465,8 @@ async function searchIdentifierIndex(plan) {
           description,
           ...(sectionTitle ? { sectionTitle } : {}),
         },
-        score: identifierScore - rank * 20000,
+        score: identifierScore - rank * 20000
+          - (hasConcreteOwner && catalogOnly === 1 ? IDENTIFIER_CATALOG_PENALTY : 0),
       }
       const normalizedRoute = normalizeRoute(route)
       resultsByRoute.set(normalizedRoute, mergeRouteResult(resultsByRoute.get(normalizedRoute), result))
@@ -477,6 +490,10 @@ async function searchIdentifierIndex(plan) {
     strong: plan.specialSyntaxIntent || plan.identifierIntent || !exactIdentifier,
     results,
   }
+}
+
+async function searchIdentifierIndex(plan, includeRoute) {
+  return rankIdentifierIndex(await loadIdentifierIndex(), plan, includeRoute)
 }
 
 export async function collectCandidates(pagefind, variants, candidates = new Map(), source = 'content') {
@@ -773,11 +790,12 @@ export function mergeRouteResult(existing, result) {
   }
 }
 
-function rankCandidates(candidates, plan) {
+function rankCandidates(candidates, plan, includeRoute) {
   const resultsByRoute = new Map()
   for (const candidate of candidates) {
     const result = scoreCandidate(candidate, plan)
     if (!result) continue
+    if (!includeRoute(result.route)) continue
     const route = normalizeRoute(result.route)
     if (!route) continue
     resultsByRoute.set(route, mergeRouteResult(resultsByRoute.get(route), result))
@@ -787,9 +805,10 @@ function rankCandidates(candidates, plan) {
   return ranked.slice(0, 20)
 }
 
-function mergeRankedResults(primary, additional) {
+function mergeRankedResults(primary, additional, includeRoute) {
   const resultsByRoute = new Map()
   for (const result of [...primary, ...additional]) {
+    if (!includeRoute(result.route)) continue
     const route = normalizeRoute(result.route)
     resultsByRoute.set(route, mergeRouteResult(resultsByRoute.get(route), result))
   }
@@ -798,16 +817,16 @@ function mergeRankedResults(primary, additional) {
     .slice(0, 20)
 }
 
-export async function searchPagefind(pagefind, query) {
+export async function searchPagefind(pagefind, query, includeRoute = () => true) {
   const plan = createQueryPlan(query)
-  const identifierSearch = await searchIdentifierIndex(plan)
+  const identifierSearch = await searchIdentifierIndex(plan, includeRoute)
   if (identifierSearch.exclusive) return identifierSearch.results
   plan.strongIdentifierIntent ||= identifierSearch.strong
   const variants = primaryVariants(plan)
   const candidateMap = await collectCandidates(pagefind, variants)
   await collectCandidates(pagefind, titleVariants(plan, []), candidateMap, 'title-alias')
   let candidates = await materializeCandidates(candidateMap)
-  let ranked = rankCandidates(candidates, plan)
+  let ranked = rankCandidates(candidates, plan, includeRoute)
 
   const canTryTypoVariants = plan.cjkPhrases.length === 0
     && plan.englishParts.length === 1
@@ -821,12 +840,9 @@ export async function searchPagefind(pagefind, query) {
     }))
     await collectCandidates(pagefind, variants, candidateMap)
     candidates = await materializeCandidates(candidateMap)
-    ranked = rankCandidates(candidates, plan)
+    ranked = rankCandidates(candidates, plan, includeRoute)
   }
-  const hasExactLexicalTitle = plan.separatedIdentifierIntent
-    && identifierSearch.exact
-    && ranked.some(result => compactEnglish(result.title) === plan.compactQuery)
-  return mergeRankedResults(hasExactLexicalTitle ? [] : identifierSearch.results, ranked)
+  return mergeRankedResults(identifierSearch.results, ranked, includeRoute)
 }
 
 export async function initializePagefindSearch(pagefind) {

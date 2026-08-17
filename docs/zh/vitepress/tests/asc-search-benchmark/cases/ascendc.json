@@ -2107,6 +2107,140 @@
         "maxResults": 0,
         "targets": []
       }
+    },
+    {
+      "id": "product-filter-310p-excludes-datastorebarrier",
+      "query": "DataStoreBarrier",
+      "productFilter": "310p",
+      "category": "product-filter",
+      "intent": "Hide an API that explicitly does not support the selected Atlas inference product.",
+      "expect": {
+        "minResults": 1,
+        "maxFirstRelevantRank": 3,
+        "targets": [
+          { "exact": "/api/AI-CPU-API/AI-CPU-API", "grade": 3 },
+          { "exact": "/api/AI-CPU-API/ai_cpu_api_list", "grade": 2 }
+        ],
+        "excludedTargets": [
+          { "exact": "/api/AI-CPU-API/DataStoreBarrier", "grade": 3 }
+        ]
+      }
+    },
+    {
+      "id": "product-filter-950-keeps-datastorebarrier",
+      "query": "DataStoreBarrier",
+      "productFilter": "950",
+      "category": "product-filter",
+      "intent": "Keep an API that explicitly supports the selected Ascend 950 product.",
+      "expect": {
+        "minResults": 1,
+        "maxFirstRelevantRank": 1,
+        "targets": [
+          { "exact": "/api/AI-CPU-API/DataStoreBarrier", "grade": 3 }
+        ]
+      }
+    },
+    {
+      "id": "product-filter-keeps-guide-results",
+      "query": "NO_OVER",
+      "productFilter": "310p",
+      "category": "product-filter",
+      "intent": "Keep non-API guide results while an NPU product filter is selected.",
+      "expect": {
+        "minResults": 1,
+        "maxResults": 1,
+        "maxFirstRelevantRank": 1,
+        "targets": [
+          { "exact": "/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法", "grade": 3 }
+        ]
+      }
+    },
+    {
+      "id": "product-filter-950-prefers-copy-align-definition",
+      "query": "asc_copy_gm2ub_align",
+      "productFilter": "950",
+      "category": "product-filter",
+      "intent": "Prefer the supported concrete API definition over link-only catalog pages.",
+      "expect": {
+        "minResults": 1,
+        "maxFirstRelevantRank": 1,
+        "descriptionIncludes": ["asc_copy_gm2ub_align", "插入同步指令"],
+        "titleHighlightIncludes": ["asc_copy_gm2ub_align"],
+        "descriptionHighlightIncludes": ["asc_copy_gm2ub_align"],
+        "sectionTitleIncludes": ["约束说明"],
+        "sectionHash": "#约束说明",
+        "targets": [
+          { "exact": "/api/SIMD-API/c_api/vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510", "grade": 3 }
+        ],
+        "excludedTargets": [
+          { "exact": "/api/SIMD-API/c_api/vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201", "grade": 3 }
+        ]
+      }
+    },
+    {
+      "id": "product-filter-950-copy-align-reference-context",
+      "query": "asc_copy_gm2ub_align",
+      "productFilter": "950",
+      "category": "product-filter",
+      "intent": "Show the exact identifier context instead of unrelated product-support token highlights.",
+      "expect": {
+        "minResults": 2,
+        "maxFirstRelevantRank": 5,
+        "descriptionIncludes": ["该接口仅对asc_copy_gm2ub_align接口有效"],
+        "descriptionHighlightIncludes": ["asc_copy_gm2ub_align"],
+        "sectionTitleIncludes": ["功能说明"],
+        "sectionHash": "#功能说明",
+        "targets": [
+          { "exact": "/api/SIMD-API/c_api/vector_data_move/asc_set_copy_pad_val", "grade": 3 }
+        ]
+      }
+    },
+    {
+      "id": "product-filter-950-demotes-copy-align-catalog",
+      "query": "asc_copy_gm2ub_align",
+      "productFilter": "950",
+      "category": "product-filter",
+      "intent": "Keep the same-name navigation catalog below concrete API content and highlight its title.",
+      "expect": {
+        "minResults": 3,
+        "minFirstRelevantRank": 3,
+        "maxFirstRelevantRank": 10,
+        "titleHighlightIncludes": ["asc_copy_gm2ub_align"],
+        "descriptionHighlightIncludes": ["asc_copy_gm2ub_align"],
+        "targets": [
+          { "exact": "/api/SIMD-API/c_api/vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align", "grade": 3 }
+        ]
+      }
+    },
+    {
+      "id": "product-filter-950-demotes-vector-catalog",
+      "query": "asc_copy_gm2ub_align",
+      "productFilter": "950",
+      "category": "product-filter",
+      "intent": "Keep the parent vector navigation catalog below concrete API content and show the matching identifier context.",
+      "expect": {
+        "minResults": 3,
+        "minFirstRelevantRank": 3,
+        "maxFirstRelevantRank": 10,
+        "descriptionHighlightIncludes": ["asc_copy_gm2ub_align"],
+        "targets": [
+          { "exact": "/api/SIMD-API/c_api/vector_data_move/vector_data_move", "grade": 3 }
+        ]
+      }
+    },
+    {
+      "id": "catalog-title-remains-authoritative",
+      "query": "矢量数据搬运",
+      "category": "technical-concept",
+      "intent": "Keep a navigation catalog first when the catalog itself is the requested concept.",
+      "expect": {
+        "minResults": 1,
+        "maxFirstRelevantRank": 1,
+        "titleHighlightIncludes": ["矢量数据搬运"],
+        "targets": [
+          { "exact": "/api/SIMD-API/c_api/vector_data_move/vector_data_move", "grade": 3 }
+        ]
+      }
     }
   ]
 }
