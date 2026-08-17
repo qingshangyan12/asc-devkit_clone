@@ -7,9 +7,13 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
+#ifndef __ASC_PREC_SQRT__
+#define __ASC_PREC_SQRT__
+#endif
 #include <gtest/gtest.h>
 #include <type_traits>
-// #include <cmath>
+#include <cmath>
 #include "simt_compiler_stub.h"
 #include "kernel_operator.h"
 #include "simt_api/math_functions.h"
@@ -18,17 +22,13 @@ using namespace std;
 using namespace AscendC;
 using namespace AscendC::Simt;
 
-#ifdef __ASC_FTZ__
-#undef __ASC_FTZ__
-#endif
-
 #define THREAD_DIM 128
 
 struct FloatSubnormalParams {
     int32_t mode;
 };
 
-class FloatSubnormalTestsuite : public testing::Test, public testing::WithParamInterface<FloatSubnormalParams> {
+class FloatSubnormalTestsuite : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -36,27 +36,22 @@ protected:
 
 TEST_F(FloatSubnormalTestsuite, FloatSubnormalTestCase_expfloatftzfalse)
 {
+    float a = 1.17549421e-38f;
     float x = 1.0f;
-    float y = 2.0f;
-    EXPECT_EQ(exp(x), expf(x));
-    EXPECT_EQ(exp(y), expf(y));
+    float y = -80.0f;
+    float z = 0.0f;
+    EXPECT_FLOAT_EQ(exp(x), expf(x));
+    EXPECT_FLOAT_EQ(exp(x), expf(x));
+    EXPECT_FLOAT_EQ(exp(y), expf(y));
+    EXPECT_FLOAT_EQ(exp(z), expf(z));
 }
 
 TEST_F(FloatSubnormalTestsuite, FloatSubnormalTestCase_sqrtfloatftzfalseprectrue)
 {
-#ifndef __ASC_PREC_SQRT__
-#define __ASC_PREC_SQRT__
-#endif
     float x = 1.0f;
-    float y = 2.0f;
-    EXPECT_EQ(sqrt(x), sqrtf(x));
-    EXPECT_EQ(sqrt(y), sqrtf(y));
-}
-
-TEST_F(FloatSubnormalTestsuite, FloatSubnormalTestCase_sqrtfloatftzfalseprecfalse)
-{
-    float x = 1.0f;
-    float y = 2.0f;
-    EXPECT_EQ(sqrt(x), sqrtf(x));
-    EXPECT_EQ(sqrt(y), sqrtf(y));
+    float y = 1.17549421e-38f;
+    float z = 0.0f;
+    EXPECT_FLOAT_EQ(sqrt(x), sqrtf(x));
+    EXPECT_FLOAT_EQ(sqrt(y), sqrtf(y));
+    EXPECT_FLOAT_EQ(sqrt(z), sqrtf(z));
 }

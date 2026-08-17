@@ -129,12 +129,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x) { return _
 #ifndef __ASC_FTZ__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_expf(float x)
 {
-    float y = __expf(x);
-    if (y >= 0.0f && y < __internal_subnormal_boundary) {
+    constexpr float __internal_subnormal_input_boundary =
+        -87.3365478515625f; // Input range where expf returns a subnormal result
+    if (x <= __internal_subnormal_input_boundary) {
         float half_y = __expf(x * 0.5f);
         return half_y * half_y;
     }
-    return y;
+    return __expf(x);
 }
 
 #ifdef __ASC_PREC_SQRT__
@@ -145,7 +146,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x)
     constexpr float scale_up = 16777216.0f;       // 2^24
     constexpr float scale_down = 0.000244140625f; // 2^-12
     // Scale positive subnormal inputs to the normal range, then scale the result back.
-    if (x > 0.0f && x < __internal_subnormal_boundary) {
+    if (x < __internal_subnormal_boundary) {
         return __sqrtf(x * scale_up) * scale_down;
     }
     return __sqrtf(x);
