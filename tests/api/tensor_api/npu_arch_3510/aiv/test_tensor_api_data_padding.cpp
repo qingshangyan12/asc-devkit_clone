@@ -20,7 +20,7 @@ __aicore__ inline void TestFillScalar()
 {
     auto mask  = asc::te::make_mask<asc::te::mask_pattern::every3, T>();
     auto dst = asc::te::fill(T {}, mask);
-    EXPECT_EQ(dst.mask, mask);
+    EXPECT_EQ(dst.mask, mask.reg);
 }
 
 template <typename T>
@@ -29,7 +29,7 @@ __aicore__ inline void TestFillRegTensor()
     asc::te::reg_tensor<T> src {};
     auto mask  = asc::te::make_mask<asc::te::mask_pattern::every3, T>();
     auto dst = asc::te::fill(src, mask);
-    EXPECT_EQ(dst.mask, mask);
+    EXPECT_EQ(dst.mask, mask.reg);
 }
 
 template <typename T>
@@ -40,8 +40,8 @@ __aicore__ inline void TestFillDefaultMask()
     auto scalar_dst = asc::te::fill(T {});
     auto reg_tensor_dst = asc::te::fill(src);
     auto mask = asc::te::all_mask<T>();
-    EXPECT_EQ(scalar_dst.mask, mask);
-    EXPECT_EQ(reg_tensor_dst.mask, mask);
+    EXPECT_EQ(scalar_dst.mask, mask.reg);
+    EXPECT_EQ(reg_tensor_dst.mask, mask.reg);
 }
 
 #define DATA_PADDING_TEST(Function, DataType)                       \

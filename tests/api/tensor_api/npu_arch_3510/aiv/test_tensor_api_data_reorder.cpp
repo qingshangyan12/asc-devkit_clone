@@ -23,8 +23,8 @@ __aicore__ inline void TestInterleave()
 
     auto [dst0, dst1] = asc::te::interleave<T>(src0, src1);
     auto mask = asc::te::all_mask<uint8_t>();
-    EXPECT_EQ(dst0.mask, mask);
-    EXPECT_EQ(dst1.mask, mask);
+    EXPECT_EQ(dst0.mask, mask.reg);
+    EXPECT_EQ(dst1.mask, mask.reg);
 }
 
 template <typename T>
@@ -35,8 +35,8 @@ __aicore__ inline void TestDeinterleave()
     
     auto mask = asc::te::all_mask<uint8_t>();
     auto [dst0, dst1] = asc::te::deinterleave<T>(src0, src1);
-    EXPECT_EQ(dst0.mask, mask);
-    EXPECT_EQ(dst1.mask, mask);
+    EXPECT_EQ(dst0.mask, mask.reg);
+    EXPECT_EQ(dst1.mask, mask.reg);
 }
 
 #define DATA_REORDER_TEST(Function, DataType)                                   \
