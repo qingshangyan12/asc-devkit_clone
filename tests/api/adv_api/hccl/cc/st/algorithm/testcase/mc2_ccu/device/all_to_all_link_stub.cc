@@ -23,7 +23,7 @@ CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable, ccu::Variable, ccu::Variable,
 
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable, ccu::Variable, ccu::Variable, ccu::Variable, ccu::Variable, ccu::Variable, ccu::Variable,
-    ccu::Variable, ccu::Variable, const ChannelHandle[], uint32_t, uint32_t, uint32_t)
+    ccu::Variable, ccu::Variable, ccu::Variable, const ChannelHandle[], uint32_t, uint32_t, uint32_t)
 {
     return CCU_E_NOT_SUPPORT;
 }

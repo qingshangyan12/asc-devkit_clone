@@ -110,7 +110,7 @@ struct OpResCtx {
 
 enum AlgorithmType {
     CcuAllGatherMesh1D = 0,
-    CcuAllGatherMeshMem2Mem1D,
+    CcuSchedAllGatherSoleMesh = 1,
     CcuAllGatherMesh2D,
     CcuReduceScatterMesh1D = 50,
     CcuReduceScatterMeshMem2Mem1D,
@@ -123,8 +123,7 @@ enum AlgorithmType {
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
-    {"CcuAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
-    {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
+    {"CcuSchedAllGatherSoleMesh", CcuSchedAllGatherSoleMesh},
     {"CcuKfcReduceScatterMesh1DMem2Mem", CcuReduceScatterMeshMem2Mem1D},
     {"CcuAllReduceMesh1DMem2Mem", CcuAllReduceMeshMem2Mem1D},
     {"CcuAlltoAllVMesh1D", CcuAlltoAllVMesh1D},
