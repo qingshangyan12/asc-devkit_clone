@@ -84,29 +84,30 @@ HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::KernelRun(
     const uint64_t tmpRepeatNum = UINT64_MAX - templateDataParams.repeatNum;
     const uint64_t inputRepeatStride = templateDataParams.inputRepeatStride;
     const uint64_t outputRepeatStride = templateDataParams.outputRepeatStride;
-    const uint64_t isInputOutputEqual = (inputAddr == outputAddr) ? 1 : 0;
+    const bool inputOutputEqual = inputAddr + currentRankSliceInputOffset == outputAddr + outputOffset;
+    const uint64_t isInputOutputEqual = static_cast<uint64_t>(inputOutputEqual);
 
-    HCCL_INFO("[CcuTempKfcAllGather][KernelRun] rank[%u] rankSize[%u] inputAddr[0x%llx] outputAddr[0x%llx] "
+    HCCL_INFO(
+        "[CcuTempKfcAllGather][KernelRun] rank[%u] rankSize[%u] inputAddr[0x%llx] outputAddr[0x%llx] "
         "inBuffBaseOff[%llu] outBuffBaseOff[%llu] outputSliceStride[%llu] mySubCommRank[%u] "
         "outputOffset[%llu] sliceSize[%llu] tailSize[%llu] lastSliceSize[%llu] "
         "inputSliceStride[%llu] currentRankSliceInputOffset[%llu] "
         "repeatNum[%llu] tmpRepeatNum[0x%llx] inputRepeatStride[%llu] outputRepeatStride[%llu] "
         "isInputOutputEqual[%llu] goSize[%llu,%llu,%llu,%llu]",
-        mySubCommRank_, templateRankSize_, inputAddr, outputAddr,
-        buffInfo_.inBuffBaseOff, buffInfo_.outBuffBaseOff,
-        templateDataParams.outputSliceStride, mySubCommRank_,
-        outputOffset, sliceSize, templateDataParams.tailSize, lastSliceSize,
-        templateDataParams.inputSliceStride, currentRankSliceInputOffset,
-        templateDataParams.repeatNum, tmpRepeatNum, inputRepeatStride, outputRepeatStride,
-        isInputOutputEqual, goSize[0], goSize[1], goSize[2], goSize[3]);
+        mySubCommRank_, templateRankSize_, inputAddr, outputAddr, buffInfo_.inBuffBaseOff, buffInfo_.outBuffBaseOff,
+        templateDataParams.outputSliceStride, mySubCommRank_, outputOffset, sliceSize, templateDataParams.tailSize,
+        lastSliceSize, templateDataParams.inputSliceStride, currentRankSliceInputOffset, templateDataParams.repeatNum,
+        tmpRepeatNum, inputRepeatStride, outputRepeatStride, isInputOutputEqual, goSize[0], goSize[1], goSize[2],
+        goSize[3]);
 
     // KFC server 的 param[0] 是控制字（非 INVALID_U64 表示有效），param[1..14] 是实际参数。
     // token 由 KFC server 从 ctx.token 读取，不写入 param。参数顺序需与 DispatchKfcSubKernel 一致。
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];
-    CHK_RET(FillCachedArgs(submitInfo, 1ULL, inputAddr, outputAddr, outputOffset, sliceSize, goSize[0], goSize[1],
-        goSize[2], goSize[3], currentRankSliceInputOffset, tmpRepeatNum, inputRepeatStride, outputRepeatStride,
-        lastSliceSize, isInputOutputEqual));
+    CHK_RET(FillCachedArgs(
+        submitInfo, 1ULL, inputAddr, outputAddr, outputOffset, sliceSize, goSize[0], goSize[1], goSize[2], goSize[3],
+        currentRankSliceInputOffset, tmpRepeatNum, inputRepeatStride, outputRepeatStride, lastSliceSize,
+        isInputOutputEqual));
     templateResource.submitInfos.push_back(submitInfo);
     return HcclResult::HCCL_SUCCESS;
 }

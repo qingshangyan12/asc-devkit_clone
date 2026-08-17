@@ -94,6 +94,17 @@ struct CcuKernelCtxBase {
     std::map<std::string, CcuLoopEntity> loopMap;
     CcuLoopExecutors enginePool;
 
+    // GroupCopy 的 loop body 会持有 GroupCopyVar 的引用，变量必须与 kernel context 同生命周期。
+    // 延迟分配可避免未使用 GroupCopy 的 kernel 占用额外资源。
+    std::unique_ptr<GroupCopyVar> gcVarPtr;
+    GroupCopyVar& GetGcVar()
+    {
+        if (!gcVarPtr) {
+            gcVarPtr.reset(new GroupCopyVar());
+        }
+        return *gcVarPtr;
+    }
+
     void CreateLoopEntity(std::string loopStr) { loopMap.emplace(loopStr, CcuLoopEntity()); }
 
     bool IsLoopEntityRegistered(std::string loopStr) { return loopMap.count(loopStr) != 0; }
