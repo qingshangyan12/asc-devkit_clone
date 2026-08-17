@@ -28,7 +28,7 @@
 
 将矢量数据寄存器中的前`count`个元素连续搬出到非32字节对齐的Unified Buffer（UB）地址。`unalign_reg` 为非对齐寄存器，按引用传入并在本接口调用后被更新为本次搬出尾部数据，供下一次本接口或非对齐搬出收尾接口继续拼接使用。每次调用后，用户需手动更新目的操作数在UB中的地址。本接口在Vector Function（`__simd_vf__` 标记的函数）内使用。
 
-搬运原理如下：
+矢量数据寄存器搬运原理如下：
 记目的操作数的起始地址为dst_start，结束地址为dst_end，尾块元素个数为unalign_count = (dst_end - dst_end / 32 * 32) / sizeof(T)。
 则搬运的数据会分为两部分，分别是：
 - 32B对齐的主块部分UB[dst_start, dst_end - unalign_count * sizeof(T)]。
