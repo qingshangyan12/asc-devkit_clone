@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <gtest/gtest.h>
+#include <algorithm>
 #include <cstring>
 #include <vector>
 #include <unordered_map>
@@ -25,6 +26,13 @@
 namespace mc2_ops_hccl {
 extern bool g_stubCcuAlgorithmRegistered;
 }
+
+extern aclError g_aclrtMemsetResult;
+extern uint32_t g_aclrtMemsetCallCount;
+extern size_t g_aclrtMemsetLastCount;
+extern uint64_t g_workspaceReportedSizeOverride;
+extern bool g_workspaceGetNullPtr;
+extern uint32_t g_engineCtxDestroyCallCount;
 
 namespace {
 
@@ -47,6 +55,12 @@ static void StubCleanup()
     g_stubRankSize = 8;
     g_stubRankId = 0;
     g_stubDeviceType = DevType::DEV_TYPE_950;
+    g_aclrtMemsetResult = ACL_SUCCESS;
+    g_aclrtMemsetCallCount = 0;
+    g_aclrtMemsetLastCount = 0;
+    g_workspaceReportedSizeOverride = 0;
+    g_workspaceGetNullPtr = false;
+    g_engineCtxDestroyCallCount = 0;
     mc2_ops_hccl::g_stubCcuAlgorithmRegistered = true;
     unsetenv("HCCL_OP_EXPANSION_MODE");
 }
@@ -409,6 +423,7 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
     EXPECT_NE(ctx->ckeAddr, 0U);
     EXPECT_EQ(ctx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuAllGatherMeshMem2Mem1D));
+    EXPECT_EQ(g_aclrtMemsetCallCount, 0U);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuAlgorithmNotRegistered)
@@ -446,6 +461,70 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_AicpuPath)
     HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
     EXPECT_EQ(ret, HCCL_SUCCESS);
     ASSERT_NE(opResCtx, nullptr);
+    const auto* ctx = static_cast<const OpResCtx*>(opResCtx);
+    ASSERT_NE(ctx->workSpace, 0U);
+    EXPECT_EQ(ctx->workSpaceSize, 20ULL * 1024ULL * 1024ULL);
+    EXPECT_EQ(g_aclrtMemsetCallCount, 1U);
+    EXPECT_EQ(g_aclrtMemsetLastCount, ctx->workSpaceSize);
+    const auto* workspace = reinterpret_cast<const uint8_t*>(ctx->workSpace);
+    EXPECT_TRUE(std::all_of(workspace, workspace + ctx->workSpaceSize, [](uint8_t value) { return value == 0; }));
+}
+
+TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_AicpuWorkspaceReuseDoesNotClear)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, COMM_ENGINE_AICPU, opTypes, nullptr);
+    void* firstOpResCtx = nullptr;
+    ASSERT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &firstOpResCtx), HCCL_SUCCESS);
+    auto* firstCtx = static_cast<OpResCtx*>(firstOpResCtx);
+    auto* workspace = reinterpret_cast<uint8_t*>(firstCtx->workSpace);
+    workspace[0] = 0x5a;
+
+    void* secondOpResCtx = nullptr;
+    ASSERT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &secondOpResCtx), HCCL_SUCCESS);
+    const auto* secondCtx = static_cast<const OpResCtx*>(secondOpResCtx);
+    EXPECT_EQ(secondCtx->workSpace, firstCtx->workSpace);
+    EXPECT_EQ(g_aclrtMemsetCallCount, 1U);
+    EXPECT_EQ(workspace[0], 0x5a);
+}
+
+TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_AicpuWorkspaceMemsetFailureDestroysContext)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, COMM_ENGINE_AICPU, opTypes, nullptr);
+    g_aclrtMemsetResult = ACL_ERROR_INTERNAL_ERROR;
+    void* opResCtx = nullptr;
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_RUNTIME);
+    EXPECT_EQ(g_aclrtMemsetCallCount, 1U);
+    EXPECT_EQ(g_engineCtxDestroyCallCount, 1U);
+
+    g_aclrtMemsetResult = ACL_SUCCESS;
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_SUCCESS);
+    EXPECT_EQ(g_aclrtMemsetCallCount, 2U);
+}
+
+TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_RejectsUndersizedCachedAicpuWorkspace)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, COMM_ENGINE_AICPU, opTypes, nullptr);
+    void* opResCtx = nullptr;
+    ASSERT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_SUCCESS);
+
+    g_workspaceReportedSizeOverride = 20ULL * 1024ULL * 1024ULL - 1ULL;
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_INTERNAL);
+    EXPECT_EQ(g_aclrtMemsetCallCount, 1U);
+}
+
+TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_RejectsNullCachedAicpuWorkspace)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, COMM_ENGINE_AICPU, opTypes, nullptr);
+    void* opResCtx = nullptr;
+    ASSERT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_SUCCESS);
+
+    g_workspaceGetNullPtr = true;
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_INTERNAL);
+    EXPECT_EQ(g_aclrtMemsetCallCount, 1U);
 }
 
 TEST_F(CcuMc2TestSuite, InitOpParamByTiling_SetsExpansionMode)

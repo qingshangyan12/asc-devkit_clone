@@ -47,7 +47,8 @@ HcclResult SimContextMgr::CreateCommEngineCtx(const std::string& tag, CommEngine
         type = HCCL_MEM_TYPE_HOST;
         ctxMem = malloc(size);
         CHK_PTR_NULL(ctxMem);
-        CHK_SAFETY_FUNC_RET(memset_s(ctxMem, size, 0, size));
+        const int fillValue = (engine == COMM_ENGINE_AICPU_TS || engine == COMM_ENGINE_AICPU) ? 0x3c : 0;
+        CHK_SAFETY_FUNC_RET(memset_s(ctxMem, size, fillValue, size));
     } else {
         HCCL_ERROR("[%s] not support engine type[%d]", __func__, engine);
         return HCCL_E_PARA;

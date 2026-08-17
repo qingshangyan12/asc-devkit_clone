@@ -26,6 +26,9 @@
 using namespace hccl;
 using namespace mc2_ops_hccl;
 thread_local uint32_t curr_dev_id = UINT32_MAX;
+aclError g_aclrtMemsetResult = ACL_SUCCESS;
+uint32_t g_aclrtMemsetCallCount = 0;
+size_t g_aclrtMemsetLastCount = 0;
 
 extern "C" unsigned int HcclLaunchAicpuKernel(mc2_ops_hccl::OpParam* param);
 
@@ -93,6 +96,11 @@ aclError aclrtMemcpy(void* dst, size_t destMax, const void* src, size_t count, a
 
 aclError aclrtMemset(void* devPtr, size_t maxCount, int32_t value, size_t count)
 {
+    ++g_aclrtMemsetCallCount;
+    g_aclrtMemsetLastCount = count;
+    if (g_aclrtMemsetResult != ACL_SUCCESS) {
+        return g_aclrtMemsetResult;
+    }
     if (devPtr == nullptr || count > maxCount) {
         HCCL_ERROR("[aclrtMemset] invalid input param.");
         return ACL_ERROR_INVALID_PARAM;

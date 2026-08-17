@@ -117,6 +117,8 @@ HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint
 }
 
 namespace {
+constexpr uint64_t MC2_AICPU_WORKSPACE_SIZE = 20ULL * 1024ULL * 1024ULL;
+
 bool IsCcuKfcSupportedOp(uint32_t opType)
 {
     return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
@@ -256,23 +258,52 @@ HcclResult AllocOpParamMemory(
 HcclResult AllocWorkspaceMemory(
     HcclComm comm, const std::string& ctxTag, const Mc2CcTilingInner* ccTiling, OpResCtx& resCtx)
 {
-    uint64_t memSize = 20 * 1024 * 1024;
-    resCtx.workSpaceSize = memSize;
+    const uint64_t requestedSize = MC2_AICPU_WORKSPACE_SIZE;
     std::string tagWorkSpace = ctxTag + "_workSpace";
+    const CommEngine engine = OpExecuteConfigToCommEngine(ccTiling->commEngine);
     void* workSpacePtr = nullptr;
-    if (HcclEngineCtxGet(
-            comm, tagWorkSpace.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), &workSpacePtr, &memSize) ==
-        HCCL_SUCCESS) {
+    uint64_t actualSize = requestedSize;
+    if (HcclEngineCtxGet(comm, tagWorkSpace.c_str(), engine, &workSpacePtr, &actualSize) == HCCL_SUCCESS) {
+        if (workSpacePtr == nullptr || actualSize < requestedSize) {
+            HCCL_ERROR(
+                "[%s] invalid cached workspace, tag[%s], addr[%p], actualSize[%llu], requiredSize[%llu]", __func__,
+                tagWorkSpace.c_str(), workSpacePtr, actualSize, requestedSize);
+            return HCCL_E_INTERNAL;
+        }
         HCCL_INFO(
-            "HcclEngineCtxGet success, tagWorkSpace[%s], workSpaceAddr[%p], workSpaceSize[%u]", tagWorkSpace.c_str(),
-            workSpacePtr, memSize);
-        resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
+            "HcclEngineCtxGet success, tagWorkSpace[%s], workSpaceAddr[%p], workSpaceSize[%llu]", tagWorkSpace.c_str(),
+            workSpacePtr, actualSize);
     } else {
-        CHK_RET(HcclEngineCtxCreate(
-            comm, tagWorkSpace.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), memSize, &workSpacePtr));
-        resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
+        CHK_RET(HcclEngineCtxCreate(comm, tagWorkSpace.c_str(), engine, requestedSize, &workSpacePtr));
+        if (workSpacePtr == nullptr) {
+            HCCL_ERROR("[%s] workspace create returned a null address, tag[%s]", __func__, tagWorkSpace.c_str());
+            HcclResult destroyRet = HcclEngineCtxDestroy(comm, tagWorkSpace.c_str(), engine);
+            if (destroyRet != HCCL_SUCCESS) {
+                HCCL_ERROR(
+                    "[%s] failed to destroy invalid workspace, tag[%s], ret[%d]", __func__, tagWorkSpace.c_str(),
+                    destroyRet);
+            }
+            return HCCL_E_INTERNAL;
+        }
+        if (engine == COMM_ENGINE_AICPU) {
+            aclError aclRet = aclrtMemset(workSpacePtr, requestedSize, 0, requestedSize);
+            if (aclRet != ACL_ERROR_NONE) {
+                HCCL_ERROR(
+                    "[%s] failed to initialize workspace, tag[%s], addr[%p], size[%llu], aclRet[%d]", __func__,
+                    tagWorkSpace.c_str(), workSpacePtr, requestedSize, aclRet);
+                HcclResult destroyRet = HcclEngineCtxDestroy(comm, tagWorkSpace.c_str(), engine);
+                if (destroyRet != HCCL_SUCCESS) {
+                    HCCL_ERROR(
+                        "[%s] failed to destroy workspace after initialization failure, tag[%s], ret[%d]", __func__,
+                        tagWorkSpace.c_str(), destroyRet);
+                }
+                return HCCL_E_RUNTIME;
+            }
+        }
     }
-    HCCL_INFO("HcclAllocOpResCtx the workSpace: workSpaceAddr[%u], workSpaceSize[%u]", resCtx.workSpace, memSize);
+    resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
+    resCtx.workSpaceSize = requestedSize;
+    HCCL_INFO("HcclAllocOpResCtx the workSpace: workSpaceAddr[%p], workSpaceSize[%llu]", workSpacePtr, requestedSize);
     return HCCL_SUCCESS;
 }
 
