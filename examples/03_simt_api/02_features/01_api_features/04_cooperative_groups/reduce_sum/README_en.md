@@ -39,7 +39,9 @@ The input is an `int32` array with `input[i] = i + 1`, 4096 elements in ND forma
 
 The three cases partition the reduction domain differently, but they cover the same data without overlap, and all three totals equal that analytical result. The call chains and reduction levels are shown below:
 
-![Call chain and reduction levels of reduce_sum](figures/reduce_sum_dispatch_en.png)
+**Figure 1**  Call chain and reduction levels of reduce_sum
+
+![](./figures/reduce_sum_dispatch_en.png)
 
 Each case has its own kernel, its own launch, and its own device memory. A single execution runs exactly one of them. The host-side case functions are grouped by the storage level of the workspace into two: the cross-block reduction places its workspace in global memory, while the whole-block and sub-group scenarios both place theirs in shared memory. The latter two share an identical host-side flow and are therefore combined into one function.
 
@@ -59,8 +61,7 @@ constexpr uint32_t DYN_UBUF_SIZE    = 0;     // pure SIMT, no dynamic ubuf
 <table>
 <tr><td rowspan="2" align="center">Sample input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">input</td><td align="center">[4096]</td><td align="center">int32</td><td align="center">ND</td></tr>
-<tr><td rowspan="4" align="center">Sample output</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">total_grid (CASE=0)</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td rowspan="3" align="center">Sample output</td><td align="center">total_grid (CASE=0)</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
 <tr><td align="center">total_block (CASE=1)</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
 <tr><td align="center">total_tile (CASE=2)</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
 <tr><td rowspan="1" align="center">Kernel names</td><td colspan="4" align="center">reduce_grid_group / reduce_thread_block / reduce_block_tile</td></tr>
@@ -129,7 +130,9 @@ Let the reduction domain size be `N = g.size()`. The stride `i` starts at `N / 2
 
 The two values added each round each stand for a batch of elements, the two batches do not overlap, and the sum stands for both batches together. So at the end of every round the live values still cover all elements between them, with nothing missed and nothing counted twice, only the number of threads holding a value is halved. This holds regardless of the reduction domain size `N`, so the totals are identical at all three granularities.
 
-![The halving reduction process](figures/halving_reduction_en.png)
+**Figure 2**  The halving reduction: stride and active thread count both halve each round
+
+![](./figures/halving_reduction_en.png)
 
 The workspace pointed to by parameter `x` carries the job of exchanging intermediate values among threads in the group. `val` lives in a register private to each thread, and cross-thread merging happens through this block of memory addressable by all participating threads. The workspace is sized to `g.size()` slots, indexed by rank within the group; what remains in it after execution is the last round's intermediate state, which is not read back to the host. Its storage level is determined by the span of the reduction domain: global memory when the domain crosses blocks, shared memory when it does not.
 
@@ -137,7 +140,7 @@ Template parameter `PtrT` carries the address space qualifier of the workspace p
 
 The last parameter of all three kernels is `uint32_t num_elements`, and each has one statement at the point of reading input: `global_idx < num_elements ? input[global_idx] : 0`. The thread count is fixed at 4096 by the execution configuration; threads whose index exceeds the element count take the additive identity 0 into the sum and write their slots and complete every round of halving and synchronization alongside the rest.
 
-#### 1: Cross-block reduction
+#### Cross-block Reduction
 
 The reduction domain is all 4096 threads in the grid, and one `reduce_sum` call produces the total.
 
@@ -168,7 +171,7 @@ Although the additions in the last ten rounds have converged to block 0, the gro
 
 After 12 rounds only rank 0 of the grid holds the total, written out by `*total_grid = val`. With a single writer, no atomic addition is needed and `total_grid` does not need to be zeroed beforehand.
 
-#### 2: Whole-block reduction
+#### Whole-block Reduction
 
 The reduction domain is the 1024 threads of one thread block. Each of the four blocks reduces to a partial sum, and the partial sums are aggregated by atomic addition.
 
@@ -208,7 +211,7 @@ Partial sums of the four blocks and their aggregation:
 
 The general form is `524800 + 1048576k` (where `k` is the block index, ranging from 0 to 3). The four partial sums are accumulated by `asc_atomic_add`, and the result is independent of the order in which the blocks complete. The total consists of these four accumulations, and `total_block` is zeroed by `aclrtMemset` before launch.
 
-#### 3: Sub-group reduction
+#### Sub-group Reduction
 
 The reduction is completed in two levels. `reduce_sum` is called twice within the same kernel, with a reduction domain of 32 both times.
 
@@ -274,7 +277,7 @@ The same implementation is instantiated twice within one kernel, with no change 
 
 Summing the partial sums of the 32 warps within a block gives that block's partial sum, matching the whole-block scenario. After atomic addition across the four blocks the total is 8390656.
 
-#### 4: Host-side implementation
+#### Host-side Implementation
 
 `main` performs seven steps in order: parse arguments; build the input and the expected value; initialize the runtime through `aclInit`, `aclrtSetDevice`, and `aclrtCreateStream`; allocate input device memory and copy the data in; dispatch by case to one of the two case functions and retrieve the total; release memory and deinitialize; finally call `verify_result` and use its return value as the process exit code.
 
