@@ -7,7 +7,7 @@
 -   图模式调用：自定义算子在Pytorch图模式下的适配开发指导请参见 [《TorchNPU》](https://www.hiascend.com/document/detail/zh/Pytorch/latest/index/index.html)中的“TorchAir > 自定义算子入图”章节。
 
 **图1**  Pytorch框架部署方式<a name="fig1969201074516"></a>  
-![](../../../figures/Pytorch框架部署方式.png "Pytorch框架部署方式")
+![](../../../figures/pytorch_deploy.png "Pytorch框架部署方式")
 
 **本节主要提供通过torch.library与Pybind注册自定义算子并实现PyTorch框架调用算子Kernel程序的指导。**
 
@@ -22,7 +22,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
 1.  环境准备。
 
-    除了按照[环境准备](../../../入门教程/环境准备.md)进行CANN软件包的安装，还需要安装以下依赖：
+    除了按照[环境准备](../../../getting_started/environment_setup.md)进行CANN软件包的安装，还需要安装以下依赖：
 
     [安装TorchNPU](https://www.hiascend.com/document/detail/zh/Pytorch/latest/configandinstg/instg/docs/zh/installation_guide/installation_description.md)
 
@@ -82,7 +82,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
 1.  环境准备。
 
-    除了按照[环境准备](../../../入门教程/环境准备.md)进行CANN软件包的安装，还需要安装以下依赖：
+    除了按照[环境准备](../../../getting_started/environment_setup.md)进行CANN软件包的安装，还需要安装以下依赖：
 
     - [安装TorchNPU](https://www.hiascend.com/document/detail/zh/Pytorch/latest/configandinstg/instg/docs/zh/installation_guide/installation_description.md)
 
