@@ -18,7 +18,7 @@ class TensorApiVectorDataPadding3510 : public testing::Test {};
 template <typename T>
 __aicore__ inline void TestFillScalar()
 {
-    auto mask  = make_mask<mask_pattern::every3, T>();
+    auto mask  = asc::te::make_mask<asc::te::mask_pattern::every3, T>();
     auto dst = asc::te::fill(T {}, mask);
     EXPECT_EQ(dst.mask, mask);
 }
@@ -27,7 +27,7 @@ template <typename T>
 __aicore__ inline void TestFillRegTensor()
 {
     asc::te::reg_tensor<T> src {};
-    auto mask  = make_mask<mask_pattern::every3, T>();
+    auto mask  = asc::te::make_mask<asc::te::mask_pattern::every3, T>();
     auto dst = asc::te::fill(src, mask);
     EXPECT_EQ(dst.mask, mask);
 }
@@ -39,7 +39,7 @@ __aicore__ inline void TestFillDefaultMask()
 
     auto scalar_dst = asc::te::fill(T {});
     auto reg_tensor_dst = asc::te::fill(src);
-    auto mask = all_mask<T>();
+    auto mask = asc::te::all_mask<T>();
     EXPECT_EQ(scalar_dst.mask, mask);
     EXPECT_EQ(reg_tensor_dst.mask, mask);
 }

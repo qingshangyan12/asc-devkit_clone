@@ -36,7 +36,7 @@ __simd_callee__ inline decltype(auto) fill(T value, reg_tensor<bool> mask) {
         "and float.");
     static_assert(N == 1, "fill only supports N==1.");
     reg_tensor<T> dst;
-    asc_duplicate(dst.reg, value, mask.reg);
+    asc_duplicate_scalar(dst.reg, value, mask.reg);
     dst.mask = mask.reg;
     return dst;
 }
@@ -48,7 +48,7 @@ __simd_callee__ inline decltype(auto) fill(reg_tensor<T> val, reg_tensor<bool> m
         "and float.");
     static_assert(N == 1, "fill only supports N==1.");
     reg_tensor<T> dst;
-    asc_duplicate_scalar(dst.reg, val.reg, mask.reg);
+    asc_duplicate(dst.reg, val.reg, mask.reg);
     dst.mask = mask.reg;
     return dst;
 }
