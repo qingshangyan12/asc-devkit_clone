@@ -209,6 +209,12 @@ aclrtcKernelSpecRequest CreateRequest(const uint64_t* constantByteCounts, const 
     return request;
 }
 
+aclError ReturnInjectedRegistryFailure(
+    const std::string&, RegisteredJitResource&, void*)
+{
+    return ascendc::aclrtc::ACLRTC_ERROR_FAILURE;
+}
+
 std::string ReadFile(const fs::path& path)
 {
     std::ifstream stream(path);
@@ -255,16 +261,16 @@ TEST(KernelSpecializationSessionTest, DoesNotReplaceExistingOutputWhenCompilatio
         "specialization failed with aclError"));
 }
 
-TEST(KernelSpecializationSessionTest, ReportsUnavailableRegistryAsAnIntegrationProblem)
+TEST(KernelSpecializationSessionTest, ReportsInjectedRegistryFailure)
 {
-    JitResourceRegistryAdapter registryAdapter;
+    JitResourceRegistryAdapter registryAdapter(ReturnInjectedRegistryFailure, nullptr);
     RegisteredJitResource resource;
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
 
     EXPECT_EQ(registryAdapter.LoadAndLookupJitResource("resource-id", resource),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "JIT ResourceRegistry integration is unavailable in this build"));
+        "JIT ResourceRegistry Load/Lookup failed for resourceId 'resource-id'"));
     EXPECT_FALSE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
         "resource_registry_adapter.cpp"));
 }
