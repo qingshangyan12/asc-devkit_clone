@@ -84,6 +84,7 @@
 #include "math/xor.h"
 #include "math/where.h"
 #include "math/axpy.h"
+#include "math/bessel_i0.h"
 #include "normalization/layernorm.h"
 #include "normalization/layernormgrad.h"
 #include "normalization/layernormgradbeta.h"

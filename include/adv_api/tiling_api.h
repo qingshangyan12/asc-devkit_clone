@@ -66,6 +66,7 @@
 #include "math/log_tiling.h"
 #include "math/cosh_tiling.h"
 #include "math/clamp_tiling.h"
+#include "math/bessel_i0_tiling.h"
 #include "math/erf_tiling.h"
 #include "math/erfc_tiling.h"
 #include "math/round_tiling.h"
