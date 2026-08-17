@@ -30,8 +30,8 @@
 
 针对矢量数据寄存器，本接口提供以下两种模式：
 
-- **立即数PostUpdate模式：** 使用`count`指定搬出的元素个数，并将`dst`指针往后更新`count`个元素。需配合后处理接口[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)使用。
-- **地址寄存器PostUpdate模式：** 固定搬出VL（256字节）长度，使用`addr_reg`指定目的地址的迭代偏移，指令搬出数据后地址寄存器中的偏移累加VL（256字节）。需配合后处理接口[asc_storeunalign_post](asc_storeunalign_post.md)使用。
+- **立即数偏移搬出模式：** 使用`count`指定搬出的元素个数，并将`dst`指针往后更新`count`个元素。需配合后处理接口[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)使用。
+- **地址寄存器偏移搬出模式：** 固定搬出VL（256字节）长度，使用`addr_reg`指定目的地址的迭代偏移，指令搬出数据后地址寄存器中的偏移累加VL（256字节）。需配合后处理接口[asc_storeunalign_post](asc_storeunalign_post.md)使用。
 
 搬运原理如下：
 
@@ -50,7 +50,7 @@
 
 ## 函数原型
 
-### 立即数PostUpdate模式
+### 立即数偏移搬出模式
 
 ```c
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
@@ -72,7 +72,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
                                                         uint32_t count)
 ```
 
-### 地址寄存器PostUpdate模式
+### 地址寄存器偏移搬出模式
 
 ```c
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>* dst,
@@ -116,9 +116,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 
 ## 参数说明
 
-### 立即数PostUpdate模式
+### 立即数偏移搬出模式
 
-**表 2**  参数说明
+**表 1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -127,9 +127,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 | src | 输入 | 源操作数（矢量数据寄存器），类型为`vector_<dtype>`，dtype须与`dst`指向的数据类型一致。 |
 | count | 输入 | 本次搬出的元素个数，类型为`uint32_t`。 |
 
-### 地址寄存器PostUpdate模式
+### 地址寄存器偏移搬出模式
 
-**表 3**  参数说明
+**表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -140,11 +140,11 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 
 ### 掩码寄存器搬出模式
 
-**表 1**  参数说明
+**表 3**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输入/输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*&`。地址无需32字节对齐，但须按`sizeof(dtype)`字节对齐。搬出后，`dst`自动更新至本次搬出的结束地址。 |
+| dst | 输入/输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*&`。b16类型目的地址需16字节对齐，b32类型目的地址需8字节对齐。搬出后，`dst`自动更新至本次搬出的结束地址。 |
 | unalign_reg | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign&`，长度为32字节。 |
 | src | 输入 | 源操作数（掩码寄存器），类型为`vector_bool`。 |
 
@@ -167,9 +167,9 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 
 - 连续调用时须复用同一个`unalign_reg`。
 - 掩码寄存器连续搬出模式须使用[asc_storeunalign_post](asc_storeunalign_post.md)的立即数偏移搬出模式收尾，复用同一个`unalign_reg`。
-- 立即数计数PostUpdate模式须使用[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)收尾，并复用同一个`unalign_reg`。
-- 地址寄存器PostUpdate模式的`addr_reg`须通过[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)预先构造，并在内层循环体内赋值使用。须使用[asc_storeunalign_post](asc_storeunalign_post.md)收尾，并复用同一个`unalign_reg`及地址寄存器。
-- 立即数计数PostUpdate模式下，`count`最大值不超过单个矢量数据寄存器可容纳的元素个数。
+- 立即数计数偏移搬出模式须使用[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)收尾，并复用同一个`unalign_reg`。
+- 地址寄存器偏移搬出模式的`addr_reg`须通过[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)预先构造，并在内层循环体内赋值使用。须使用[asc_storeunalign_post](asc_storeunalign_post.md)收尾，并复用同一个`unalign_reg`及地址寄存器。
+- 立即数计数偏移搬出模式下，`count`最大值不超过单个矢量数据寄存器可容纳的元素个数。
 - 矢量数据寄存器搬出场景目的地址无需32字节对齐，但须按`sizeof(dtype)`字节对齐。
 - 掩码寄存器搬出场景，b16类型目的地址需16字节对齐，b32类型目的地址需8字节对齐。
 

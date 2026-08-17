@@ -28,8 +28,8 @@
 
 将非对齐寄存器中暂存的尾块写入Unified Buffer（UB），用于连续非对齐搬运收尾。本接口提供以下两种模式：
 
-- **立即数偏移搬出模式**：通过立即数指定相对目的起始地址的偏移，单位为元素，用户可选择更新偏移或更新目的地址，用于配合前序非对齐搬出接口[asc_storeunalign](asc_storeunalign.md)或[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**掩码寄存器搬出模式**收尾。
-- **地址寄存器偏移搬出模式**：通过地址寄存器指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。用于配合前序非对齐搬出接口[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)中**地址寄存器偏移搬出模式**收尾。
+- **立即数偏移搬出模式**：通过立即数指定相对目的起始地址的偏移，单位为元素，用户可选择手动更新偏移或更新目的地址，用于配合前序非对齐搬出接口[asc_storeunalign](asc_storeunalign.md)或[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**掩码寄存器搬出模式**收尾。
+- **地址寄存器偏移搬出模式**：通过地址寄存器指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的搬出场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。用于配合前序非对齐搬出接口[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)中**地址寄存器偏移搬出模式**收尾。
 
 本接口仅在AIV上生效。
 
@@ -116,12 +116,12 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst,
 
 ### 立即数偏移搬出模式
 
-- 与[asc_storeunalign](asc_storeunalign.md)的立即数偏移搬出模式配套使用，需要复用同一个`unalign_reg`。
+- 与[asc_storeunalign](asc_storeunalign.md)或[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**掩码寄存器搬出模式**配套使用，需要复用同一个`unalign_reg`。
 - 需要保证目的地址加上偏移后的地址，等于[asc_storeunalign](asc_storeunalign.md)搬运的结束地址，否则无法正确收尾。
 
 ### 地址寄存器偏移搬出模式
 
-- 与[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的地址寄存器偏移搬出模式配套使用，需要复用同一个非对齐寄存器`unalign_reg`及地址寄存器。
+- 与[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**地址寄存器偏移搬出模式**配套使用，需要复用同一个非对齐寄存器`unalign_reg`及地址寄存器。
 
 ## 调用示例
 

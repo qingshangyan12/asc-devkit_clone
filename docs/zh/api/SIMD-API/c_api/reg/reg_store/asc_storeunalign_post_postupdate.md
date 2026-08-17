@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-将非对齐寄存器中暂存的尾块写入Unified Buffer（UB），用于搬出[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**立即数PostUpdate模式**产生的非对齐寄存器。启用Post Update模式在搬出后自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。搬出结束后，目的地址向后偏移立即数`offset`个元素。
+将非对齐寄存器中暂存的尾块写入Unified Buffer（UB），用于搬出[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**立即数偏移搬出模式**产生的非对齐寄存器。启用Post Update模式在搬出后自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。搬出结束后，目的地址向后偏移立即数`offset`个元素。
 
 本接口在Vector Function（`__simd_vf__` 标记的函数）内使用。本接口仅在AIV上生效。
 
@@ -71,14 +71,14 @@ __simd_callee__ inline void asc_storeunalign_post_postupdate(__ubuf__ uint8_t*& 
 ### 通用约束
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
-- 调用本接口前，须调用[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的`uint32_t count`模式，并复用同一个unalign_reg。
+- 调用本接口前，须调用[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**立即数偏移搬出模式**，并复用同一个unalign_reg。
 - dst无需32字节对齐，但须按`sizeof(dtype)`字节对齐。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的操作数地址更新后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 指令约束
 
-- 调用本接口之前，需要调用[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)使用uint32_t作为存储偏移量的接口，且本接口与前序接口的非对齐寄存器要保持一致。
+- 调用本接口之前，需要调用[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)**立即数偏移搬出模式**，且本接口与前序接口的非对齐寄存器要保持一致。
 
 ## 调用示例
 
