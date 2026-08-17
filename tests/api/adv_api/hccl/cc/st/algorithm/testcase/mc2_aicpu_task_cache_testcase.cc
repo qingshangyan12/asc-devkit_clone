@@ -178,6 +178,17 @@ TEST_F(Mc2AicpuTaskCacheTest, BuildsPlansForAllSupportedOperations)
     }
 }
 
+TEST_F(Mc2AicpuTaskCacheTest, BuildsPlanForPcieChannel)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
+    inputs.resCtx.channels[0][0].protocol = CommProtocol::COMM_PROTOCOL_PCIE;
+
+    Mc2AicpuTaskCachePlan plan;
+    ASSERT_EQ(BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, plan), HCCL_SUCCESS);
+    EXPECT_TRUE(plan.enabled);
+    EXPECT_EQ(plan.tag.find("mc2tc:v1:"), 0U);
+}
+
 TEST_F(Mc2AicpuTaskCacheTest, ShapeAndAllToAllVArraysChangeTheTag)
 {
     auto regular = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
