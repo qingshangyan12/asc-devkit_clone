@@ -179,6 +179,24 @@ __aicore__ inline void asc_transpose_sync(__ubuf__ int16_t* dst, __ubuf__ int16_
 __aicore__ inline void asc_transpose(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src);
 __aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+// ==========asc_transto5hd(b8/b16/b32)==========
+__aicore__ inline void asc_transto5hd_b8(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half,
+    bool src_high_half);
+__aicore__ inline void asc_transto5hd_b8_sync(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half,
+    bool src_high_half);
+__aicore__ inline void asc_transto5hd_b16(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
+__aicore__ inline void asc_transto5hd_b16_sync(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
+__aicore__ inline void asc_transto5hd_b32(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
+__aicore__ inline void asc_transto5hd_b32_sync(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride);
+#endif
+
 // ==========asc_datablock_reduce(half/float)==========
 __aicore__ inline void asc_datablock_reduce_sum(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
