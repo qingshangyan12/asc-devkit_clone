@@ -46,13 +46,6 @@ __simd_callee__ inline void asc_duplicate_impl(vector_fp8_e5m2_t& dst, vector_fp
     }
 }
 
-__simd_callee__ inline void asc_duplicate_impl(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vdup(dst, src, mask, POS_LOWEST, MODE_ZEROING);
-    }
-}
-
 __simd_callee__ inline void asc_duplicate_impl(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
