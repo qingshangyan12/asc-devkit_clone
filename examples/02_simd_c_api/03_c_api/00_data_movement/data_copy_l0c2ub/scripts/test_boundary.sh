@@ -1,6 +1,7 @@
 #!/bin/bash
-# Run boundary value (inf/-inf/nan) tests for all 17 quantization scenarios (5-21),
-# testing both saturation (CTRL[48]=0) and non-saturation (CTRL[48]=1) modes.
+# Run boundary value (inf/-inf/nan) tests for all 21 scenarios:
+#   - Scenarios 1-4 (NoQuant, float output): test once (CTRL[48] does not affect float)
+#   - Scenarios 5-21 (quantization): test both saturation (CTRL[48]=0) and non-saturation (CTRL[48]=1)
 # Usage: bash scripts/test_boundary.sh [build_dir]
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -12,6 +13,37 @@ FAIL=0
 TOTAL=0
 FAILED_SCENARIOS=()
 
+# NoQuant scenarios 1-4: float output, CTRL[48] has no effect, test once
+for SCENARIO_NUM in $(seq 1 4); do
+    TOTAL=$((TOTAL + 1))
+    echo "=============================="
+    echo "Scenario $SCENARIO_NUM (NoQuant, boundary)"
+    echo "=============================="
+
+    rm -rf "$BUILD_DIR"
+    mkdir -p "$BUILD_DIR"
+    cmake -DSCENARIO_NUM=$SCENARIO_NUM \
+          -DCMAKE_ASC_ARCHITECTURES=dav-3510 \
+          -B "$BUILD_DIR" -S "$EXAMPLE_DIR" 2>&1 | tail -1
+    cmake --build "$BUILD_DIR" -j 2>&1 | tail -1
+
+    (cd "$BUILD_DIR" && python3 "$EXAMPLE_DIR/scripts/gen_data.py" \
+        -scenarioNum=$SCENARIO_NUM --boundary --saturation=1)
+
+    (cd "$BUILD_DIR" && ./demo)
+
+    if python3 "$EXAMPLE_DIR/scripts/verify_result.py" -scenarioNum=$SCENARIO_NUM \
+        "$BUILD_DIR/output/output.bin" "$BUILD_DIR/output/golden.bin"; then
+        echo "[PASS] Scenario $SCENARIO_NUM (NoQuant)"
+        PASS=$((PASS + 1))
+    else
+        echo "[FAIL] Scenario $SCENARIO_NUM (NoQuant)"
+        FAIL=$((FAIL + 1))
+        FAILED_SCENARIOS+=("$SCENARIO_NUM(NoQuant)")
+    fi
+done
+
+# Quantization scenarios 5-21: test both saturation and non-saturation modes
 for SAT_MODE in 1 0; do
     MODE_NAME="saturation"
     if [ "$SAT_MODE" -eq 0 ]; then
@@ -24,7 +56,6 @@ for SAT_MODE in 1 0; do
         echo "Scenario $SCENARIO_NUM ($MODE_NAME mode)"
         echo "=============================="
 
-        # Rebuild for this scenario and saturation mode
         rm -rf "$BUILD_DIR"
         mkdir -p "$BUILD_DIR"
         cmake -DSCENARIO_NUM=$SCENARIO_NUM \
@@ -33,14 +64,11 @@ for SAT_MODE in 1 0; do
               -B "$BUILD_DIR" -S "$EXAMPLE_DIR" 2>&1 | tail -1
         cmake --build "$BUILD_DIR" -j 2>&1 | tail -1
 
-        # Generate boundary value inputs in BUILD_DIR so demo can find them
         (cd "$BUILD_DIR" && python3 "$EXAMPLE_DIR/scripts/gen_data.py" \
             -scenarioNum=$SCENARIO_NUM --boundary --saturation=$SAT_MODE)
 
-        # Run kernel
         (cd "$BUILD_DIR" && ./demo)
 
-        # Verify
         if python3 "$EXAMPLE_DIR/scripts/verify_result.py" -scenarioNum=$SCENARIO_NUM \
             "$BUILD_DIR/output/output.bin" "$BUILD_DIR/output/golden.bin"; then
             echo "[PASS] Scenario $SCENARIO_NUM ($MODE_NAME)"

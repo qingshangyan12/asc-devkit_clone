@@ -675,13 +675,27 @@ def get_nz_block_columns(output_type):
     return max(CUBE_BLOCK, int(C0_BYTES / byte_size))
 
 
-def gen_noquant_data(scenario_num):
+def gen_noquant_data(scenario_num, boundary=False):
     np.random.seed(9)
     input_type = np.dtype("float16")
     output_type = np.dtype("float32")
     x1_gm = np.random.uniform(-1, 3, [M, K]).astype(input_type)
     x2_gm = np.random.uniform(-1, 3, [K, N]).astype(input_type)
+
+    if boundary:
+        x2_gm[0, :] = np.float16(1.0)
+        x1_gm[0, 0] = np.float16(np.inf)
+        x1_gm[1, 0] = np.float16(-np.inf)
+        x1_gm[2, 0] = np.float16(np.nan)
+        print("[boundary] half input: A[0,0]=+inf, A[1,0]=-inf, A[2,0]=nan, B[0,:]=1.0")
+
     golden = np.matmul(x1_gm.astype(np.float32), x2_gm.astype(np.float32)).astype(output_type)
+
+    if boundary:
+        print("[boundary] L0C contains: inf=%s, -inf=%s, nan=%s" % (
+            np.any(golden == np.inf), np.any(golden == -np.inf), np.any(np.isnan(golden))))
+        print("[boundary] output (float, NoQuant) contains: inf=%s, nan=%s" % (
+            np.any(np.isinf(golden)), np.any(np.isnan(golden))))
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
@@ -771,7 +785,7 @@ def gen_quant_data(scenario_num, boundary=False, saturation=True):
 
 def gen_golden_data(scenario_num=1, boundary=False, saturation=True):
     if scenario_num <= 4:
-        gen_noquant_data(scenario_num)
+        gen_noquant_data(scenario_num, boundary=boundary)
     else:
         gen_quant_data(scenario_num, boundary=boundary, saturation=saturation)
 
@@ -785,7 +799,4 @@ if __name__ == "__main__":
                         help="Saturation mode: 1=saturation (CTRL[48]=0, inf→±MAX, nan→0), "
                              "0=non-saturation (CTRL[48]=1, inf/nan preserved)")
     args = parser.parse_args()
-    if args.scenarioNum <= 4:
-        gen_noquant_data(args.scenarioNum)
-    else:
-        gen_quant_data(args.scenarioNum, boundary=args.boundary, saturation=bool(args.saturation))
+    gen_golden_data(args.scenarioNum, boundary=args.boundary, saturation=bool(args.saturation))
