@@ -278,6 +278,24 @@ private:
 
 static FifoTempBuf g_fifoTempBuf;
 
+/* ── WriteInfo update helpers ──────────────────────────────────────── */
+
+inline void AdvanceWriteInfo(RingBufWriteInfo* writeInfo, uint64_t newBufOff)
+{
+    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->packIdx),
+                     writeInfo->packIdx + 1U, __ATOMIC_SEQ_CST);
+    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->bufOffset),
+                     newBufOff, __ATOMIC_SEQ_CST);
+}
+
+inline void RollbackWriteInfo(RingBufWriteInfo* writeInfo, uint64_t oldBufOff)
+{
+    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->packIdx),
+                     writeInfo->packIdx - 1U, __ATOMIC_SEQ_CST);
+    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->bufOffset),
+                     oldBufOff, __ATOMIC_SEQ_CST);
+}
+
 /* ── Legacy printf (linear buffer) ──────────────────────────────────── */
 
 static void PrintfLegacy(const char* fmt, va_list otherArgs)
@@ -343,8 +361,6 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     } else {
         newBufOff = wOff + tlvLen;
     }
-    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->bufOffset),
-                     newBufOff, __ATOMIC_SEQ_CST);
     // 3. prepare PrintInfo header
     PrintfInfo infoHead;
     infoHead.printfType   = PRINT_TYPE_WRITING;
@@ -352,13 +368,26 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     infoHead.blockIdx     = 0U;
     infoHead.resv         = 0U;
     infoHead.fmtOffset    = 8U;
-    // 4. write print info
+    // 4. Write printfType=WRITING to ringbuf BEFORE updating bufOffset.
+    //    This ensures rts sees WRITING (not stale READY) when it notices
+    //    bufOffset has advanced, causing it to stop reading this round.
     if (!needSplit) {
-        uint8_t* tlvWriteAddr = ringBase + wOff;
-        // write header
-        (void)memcpy(tlvWriteAddr, &infoHead, sizeof(PrintfInfo));
-        // write formatted string directly into the ring buffer
-        char* strDest = reinterpret_cast<char*>(tlvWriteAddr + sizeof(PrintfInfo));
+        (void)memcpy(ringBase + wOff, &infoHead, sizeof(PrintfInfo));
+    } else {
+        // Split: header may span tail/head boundary, write byte-by-byte.
+        const uint8_t* headBytes = reinterpret_cast<const uint8_t*>(&infoHead);
+        for (uint32_t i = 0U; i < sizeof(PrintfInfo); ++i) {
+            ringBase[(static_cast<uint32_t>(wOff) + i) % ringBufLen] = headBytes[i];
+        }
+    }
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    // 5. Advance bufOffset and packIdx together — rts sees WRITING and stops,
+    //    and packIdx is consistent with bufOffset.
+    AdvanceWriteInfo(writeInfo, newBufOff);
+    // 6. Write the formatted string into the ringbuf.
+    if (!needSplit) {
+        // header already written, write formatted string directly
+        char* strDest = reinterpret_cast<char*>(ringBase + wOff + sizeof(PrintfInfo));
         size_t destMax = ringBufLen - static_cast<size_t>(wOff) - sizeof(PrintfInfo);
         size_t count = (strLen < destMax) ? strLen : (destMax - 1U);
         (void)vsnprintf_s(strDest, destMax, count, fmt, otherArgs);
@@ -369,8 +398,7 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
         // 3. Copy the temp buffer to ringbuf in two parts: tail then head.
         uint8_t* tempBuf = g_fifoTempBuf.Get(ringBufLen);
         if (tempBuf == nullptr) {
-            __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->bufOffset),
-                             wOff, __ATOMIC_SEQ_CST);
+            RollbackWriteInfo(writeInfo, wOff);
             return;
         }
         // Write header to temp buffer.
@@ -381,6 +409,7 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
         size_t count = (strLen < destMax) ? strLen : (destMax - 1U);
         (void)vsnprintf_s(strDest, destMax, count, fmt, otherArgs);
         // Copy tlvLen bytes from temp buffer to ringbuf with split.
+        // (Overwrites the byte-by-byte header written above with identical content.)
         uint32_t part1 = tailSpace;
         uint32_t part2 = tlvLen - part1;
         (void)memcpy(ringBase + static_cast<uint32_t>(wOff), tempBuf, part1);
@@ -404,10 +433,6 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
         }
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
     }
-
-    __atomic_fetch_add(reinterpret_cast<uint64_t*>(&writeInfo->packIdx), 1U,
-                       __ATOMIC_SEQ_CST);
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
 /* ── Public API: unified printf entry point ─────────────────────────── */
