@@ -28,9 +28,11 @@
 
 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
 
+本接口为Reg矢量计算接口，仅在AIV上生效。
+
 ## 函数原型
 
-以下使用`<dtype>`作为数据类型占位符表示各重载的函数原型：
+**占位符形式：**
 
 ```c
 __simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,
@@ -38,7 +40,9 @@ __simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,
                                           vector_bool mask)
 ```
 
-其中，`<dtype>`可取`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+**dtype支持的数据类型：**
+
+dtype可取的数据类型为`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ## 参数说明
 
@@ -58,13 +62,11 @@ __simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,
 
 ## 约束说明
 
-- 本接口为Reg矢量API，只能在使用`__simd_vf__`标记的VF函数内调用，不支持在`__aicore__`函数中直接调用；计算在AIV上执行。
+- 本接口为Reg矢量计算接口，只能在使用`__simd_vf__`标记的VF函数内调用，不支持在`__aicore__`函数中直接调用，仅在AIV上生效，在AIC上调用将直接返回。
 - dst和src的数据类型需要保持一致，仅支持[函数原型](#函数原型)中列出的数据类型。其他数据类型组合无法匹配函数重载，编译不通过。
-- dst、src和mask均为寄存器，不涉及UB地址和地址对齐。
 - 同一寄存器的数据依赖由硬件保序，无需额外插入同步指令。本接口与前后Reg数据搬运接口之间，如果不同寄存器访问同一UB地址且存在写后读或写后写依赖，需要调用[asc_mem_bar](../sync_control/asc_mem_bar.md)进行同步。
 - 使用mask前，需要通过掩码设置或搬入接口完成初始化；未初始化的掩码寄存器内容不确定。
 - mask仅筛选dst中写入广播值的位置，不筛选src中的元素。无论mask的最低位是否有效，待广播的数据均为src的最低位元素。
-- mask未筛选的元素在dst中置零。
 
 <!-- npu="950" id8 -->
 ## 调用示例

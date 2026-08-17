@@ -26,9 +26,9 @@
 
 ## 功能说明
 
-本接口用于配置GM到L1 Buffer的ND2NZ和DN2NZ搬运参数，包括矩阵数量以及目的NZ矩阵的三项步长。配置写入后，由后续的[asc_copy_gm2l1_nd2nz](../cube_data_move/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](../cube_data_move/asc_copy_gm2l1_dn2nz.md)接口使用。
+本接口用于配置Global Memory到L1 Buffer的ND2Nz和DN2Nz搬运参数。配置写入后，由后续的[asc_copy_gm2l1_nd2nz](../cube_data_move/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](../cube_data_move/asc_copy_gm2l1_dn2nz.md)接口使用。
 
-本接口只配置目的侧的NZ参数。源矩阵步长、矩阵行列数和SmallC0模式等参数由后续搬运接口配置。
+本接口为矩阵搬入相关配置接口，仅在AIC上生效。
 
 ## 函数原型
 
@@ -42,16 +42,16 @@ __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config)
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| config | 输入 | ND2NZ或DN2NZ搬运的64 bit目的侧配置。接口不检查或转换字段值，需按照[表2](#table2)完成拼装。 |
+| config | 输入 | ND2Nz或DN2Nz搬运的64bit配置参数。接口不检查或转换字段值，需按照[表2](#table2)完成拼装。 |
 
-**表2** config字段说明 <a id="table2"></a>
+**表2** config参数字段说明 <a id="table2"></a>
 
-| bit范围 | 对应Basic API参数 | 描述 |
-|---|---|---|
-| 15:0 | ndNum/dnNum | 源矩阵中ND矩阵或DN矩阵的数量，取值范围为[0, 4095]。取值为0时，后续搬运接口被视为NOP（空操作）。 |
-| 31:16 | dstNzNStride | 目的NZ矩阵中相邻行起始地址的偏移，取值范围为[1, 16384]，单位为C0_SIZE（32字节）。 |
-| 47:32 | dstNzC0Stride | 目的NZ矩阵中相邻Z矩阵起始地址的偏移，取值范围为[1, 16384]，单位为C0_SIZE（32字节）。 |
-| 63:48 | loop4DstStride（对应dstNzMatrixStride） | 目的矩阵中相邻NZ矩阵起始地址的偏移，字段取值范围为[0, 65535]，单位为C0_SIZE（32字节）。对应Basic API中以元素个数为单位的`dstNzMatrixStride`，其取值范围为[0, 16384]；本字段的计算方式为：`dstNzMatrixStride * sizeof(T) / 32`。矩阵数量为1时，本字段无意义，可设置为0；矩阵数量大于1且本字段为0时，后写入的NZ矩阵会覆盖第一个NZ矩阵。 |
+| bit范围 | 描述 |
+|---|---|
+| 15:0 | 源矩阵中ND矩阵或DN矩阵的数量，取值范围为[0, 4095]。取值为0时，后续搬运接口将被视为NOP（空操作）。 |
+| 31:16 | 目的Nz矩阵中相邻行起始地址的偏移，取值范围为[1, 16384]，单位为C0_SIZE（32字节）。 |
+| 47:32 | 目的Nz矩阵中相邻z矩阵起始地址的偏移，取值范围为[1, 16384]，单位为C0_SIZE（32字节）。 |
+| 63:48 | 目的矩阵中相邻Nz矩阵起始地址的偏移，字段取值范围为[0, 65535]，单位为C0_SIZE（32字节）。矩阵数量为1时，本字段无意义，设置为0即可；矩阵数量大于1且本字段为0时，后写入的NZ矩阵会覆盖第一个NZ矩阵。 |
 
 ## 返回值说明
 
@@ -63,11 +63,10 @@ PIPE_S
 
 ## 约束说明
 
-- 本接口仅在AIC上生效，在AIV上调用不生效。
-- 本接口需在对应的ND2NZ或DN2NZ搬运接口执行前调用。配置会持续生效，直至再次调用本接口覆盖；不同搬运任务使用的目的侧参数不同时，需分别配置。
-- `config`的四个字段均为16 bit，接口会将`config`整体写入，不会单独检查字段范围。拼装前需确保各字段满足[表2](#table2)中的取值要求；不得将超出16 bit的值直接左移，否则高位会写入相邻字段。
-- 参照Basic API的`dstNzMatrixStride`配置目的NZ矩阵间距时，`dstNzMatrixStride * sizeof(T)`需32字节对齐，再换算为[63:48]字段的值。
-- 搬运至L1 Buffer的数据不能重叠。矩阵数量大于1时，需根据单个NZ矩阵占用的空间正确设置[63:48]字段。
+- 本接口仅在AIC上生效，在AIV上调用将直接返回。
+- 本接口需在对应的ND2Nz或DN2Nz搬运接口执行前调用。配置会持续生效，直至再次调用本接口覆盖。
+- `config`的四个字段均为16bit，接口会将`config`整体写入，不会单独检查字段范围。拼装前需确保各字段满足[表2](#table2)中的取值要求；不得将超出16bit的值直接左移，否则高位会写入相邻字段。
+- 搬运至L1 Buffer的数据不能重叠。矩阵数量大于1时，需根据单个Nz矩阵占用的空间正确设置[63:48]字段。
 
 <!-- npu="950" id8 -->
 ## 调用示例
