@@ -1,0 +1,4 @@
+interface:
+  display_name: "MC2 CCU Integration"
+  short_description: "接入MC2、KFC server与CCU算法并设计专项ST验证"
+  default_prompt: "Use $mc2-ccu-integration to integrate a CCU collective algorithm into the MC2 KFC execution path and add focused ST coverage."
