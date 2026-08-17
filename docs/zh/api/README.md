@@ -571,7 +571,6 @@
             -   [CountLeadingZero](SIMD-API/basic_api/scalar_compute/CountLeadingZero.md)
             -   [CountBitsCntSameAsSignBit](SIMD-API/basic_api/scalar_compute/CountBitsCntSameAsSignBit.md)
             -   [GetSFFValue](SIMD-API/basic_api/scalar_compute/GetSFFValue.md)
-            -   [CeilDivision](SIMD-API/basic_api/scalar_compute/CeilDivision.md)
             -   [Cast（float转half/int32\_t）](SIMD-API/basic_api/scalar_compute/Cast_float_to_half_int32.md)
             -   [Cast（float转bfloat16\_t）](SIMD-API/basic_api/scalar_compute/Cast_float_to_bfloat16.md)
             -   [Cast（多类型转float）](SIMD-API/basic_api/scalar_compute/Cast_multi_type_to_float.md)
@@ -2817,6 +2816,7 @@
             -   [abs](Utils-API/cpp_stdlib/math_functions/abs.md)
             -   [sqrt](Utils-API/cpp_stdlib/math_functions/sqrt.md)
             -   [ceil\_div](Utils-API/cpp_stdlib/math_functions/ceil_div.md)
+            -   [CeilDivision（废弃）](Utils-API/cpp_stdlib/math_functions/CeilDivision.md)
 
         -   [容器函数](Utils-API/cpp_stdlib/container_functions/container_functions.md)
             -   [tuple](Utils-API/cpp_stdlib/container_functions/tuple.md)
