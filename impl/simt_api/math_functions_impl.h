@@ -139,7 +139,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_expf(float x)
 }
 
 #ifdef __ASC_PREC_SQRT__
-__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_sqrtf(float x) { return __internal_sqrtf_precise_impl(x); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_sqrtf(float x)
+{
+    return __internal_sqrtf_precise_impl(x);
+}
 #else
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_sqrtf(float x)
 {
