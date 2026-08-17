@@ -1,0 +1,122 @@
+# BesselI0
+
+## 产品支持情况
+
+<!-- npu="950" id3 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id3 -->
+<!-- npu="A3" id4 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id4 -->
+<!-- npu="910b" id5 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id5 -->
+<!-- npu="310b" id6 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id6 -->
+<!-- npu="310p" id7 -->
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id7 -->
+<!-- npu="910" id8 -->
+- Atlas 训练系列产品：不支持
+<!-- end id8 -->
+<!-- npu="x90" id1 -->
+- Kirin X90：不支持
+<!-- end id1 -->
+<!-- npu="9030" id2 -->
+- Kirin 9030：不支持
+<!-- end id2 -->
+
+## 功能说明
+
+按元素计算第一类零阶修正贝塞尔函数 I₀(x)（modified Bessel function of the first kind, order 0），语义对齐 PyTorch 的 `torch.i0`，逐元素计算、无广播。数学定义如下：
+
+```text
+I0(x) = Σ_{k=0}^{+∞} (1 / (k!)^2) * (x/2)^{2k}
+```
+
+数值行为说明：
+
+- 输出满足数学性质 I₀(x) ≥ 1，x = ±0 时输出精确 1.0；
+- 输入 NaN 输出 NaN；输入 ±Inf 输出 +Inf；
+- |x| 超过 float32 可表示边界（约 91.9）时结果上溢为 +Inf；
+- float32 下精度满足"双万分之一"要求（1 万个数据中误差超过万分之一的不超过 1 个）。
+
+## 函数原型
+
+- 通过sharedTmpBuffer入参传入临时空间
+    - 源操作数Tensor全部/部分参与计算
+
+        ```cpp
+        template <typename T, bool isReuseSource = false>
+        __aicore__ inline void BesselI0(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        ```
+
+    - 源操作数Tensor全部参与计算
+
+        ```cpp
+        template <typename T, bool isReuseSource = false>
+        __aicore__ inline void BesselI0(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        ```
+
+- 接口框架申请临时空间
+    - 源操作数Tensor全部/部分参与计算
+
+        ```cpp
+        template <typename T, bool isReuseSource = false>
+        __aicore__ inline void BesselI0(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
+        ```
+
+    - 源操作数Tensor全部参与计算
+
+        ```cpp
+        template <typename T, bool isReuseSource = false>
+        __aicore__ inline void BesselI0(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
+        ```
+
+本接口的计算不需要临时空间，[GetBesselI0MaxMinTmpSize](GetBesselI0MaxMinTmpSize.md) 获取到的最大/最小临时空间大小均为 0。传入 sharedTmpBuffer 的重载中，该参数可传入任意合法 `LocalTensor<uint8_t>`（包括零长度）。
+
+## 参数说明
+
+**表1**  模板参数说明
+
+| 参数名 | 描述 |
+| --- | --- |
+| T | 操作数的数据类型。支持的数据类型为：float。 |
+| isReuseSource | 是否允许修改源操作数，默认值为false。该参数预留，传入默认值false即可。 |
+
+**表2**  参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| dstTensor | 输出 | 目的操作数。<br><br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>目的操作数的数据类型需要与源操作数保持一致。 |
+| srcTensor | 输入 | 源操作数。<br><br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 临时缓存。<br><br>本接口的计算不需要临时空间，该参数可传入任意合法 `LocalTensor<uint8_t>`（包括零长度）。 |
+| calCount | 输入 | 参与计算的元素个数。 |
+
+## 返回值说明
+
+无
+
+## 约束说明
+
+- **不支持源操作数与目的操作数地址重叠。**
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
+- 接口按固定块长处理数据，float32 下每个计算块固定处理 64 个元素（`AscendC::GetVecLen() / sizeof(float)`）。srcTensor/dstTensor 的实际分配容量（非仅 calCount）需不小于 `ceil(calCount / 64) * 64` 个元素；按 calCount 精确分配时，需自行向上补齐到 64 的整数倍。
+
+## 调用示例
+
+```cpp
+// dstLocal: 存放计算结果的Tensor
+// srcLocal: 参与计算的输入Tensor
+// 输入tensor长度为1024,算子输入的数据类型为float,实际计算个数为512
+AscendC::BesselI0(dstLocal, srcLocal, 512);
+```
+
+结果示例如下：
+
+```text
+输入数据(srcLocal): [0.00            0.01            0.02             ...  5.10            5.11]
+输出数据(dstLocal): [1.00000000e+00  1.00002500e+00  1.00010000e+00   ...  2.97888554e+01  3.00568915e+01]
+```
