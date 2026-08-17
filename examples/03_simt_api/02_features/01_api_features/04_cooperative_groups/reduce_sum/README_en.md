@@ -209,7 +209,7 @@ Partial sums of the four blocks and their aggregation:
 | 2 | 2049 to 3072 | 2621952 |
 | 3 | 3073 to 4096 | 3670528 |
 
-The general form is `524800 + 1048576k`. The four partial sums are accumulated by `asc_atomic_add`, and the result is independent of the order in which the blocks complete. The total consists of these four accumulations, and `total_block` is zeroed by `aclrtMemset` before launch.
+The general form is `524800 + 1048576k` (where `k` is the block index, ranging from 0 to 3). The four partial sums are accumulated by `asc_atomic_add`, and the result is independent of the order in which the blocks complete. The total consists of these four accumulations, and `total_block` is zeroed by `aclrtMemset` before launch.
 
 #### 3: Sub-group reduction
 
