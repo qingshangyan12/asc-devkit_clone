@@ -16,6 +16,7 @@
 #include <boost/system/error_code.hpp>
 #include <cerrno>
 #include <cstring>
+#include <fcntl.h>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
@@ -55,6 +56,66 @@ const char* GetProcessTerminationName(CompilationProcessTermination termination)
             return "unknown";
     }
 }
+
+bool WriteCompleteReplayScriptHeader(int replayScriptFileDescriptor, const fs::path& replayScriptPath,
+                                     const fs::path& compilationWorkingDirectoryPath) noexcept
+{
+    const std::string replayScriptHeader =
+        "#!/bin/sh\nset -eu\ncd " + QuoteShellArgument(compilationWorkingDirectoryPath.string()) + "\n";
+    size_t writtenByteCount = 0U;
+    while (writtenByteCount < replayScriptHeader.size()) {
+        const ssize_t writeResult = write(replayScriptFileDescriptor,
+                                          replayScriptHeader.data() + writtenByteCount,
+                                          replayScriptHeader.size() - writtenByteCount);
+        if (writeResult > 0) {
+            writtenByteCount += static_cast<size_t>(writeResult);
+            continue;
+        }
+        if (writeResult < 0 && errno == EINTR) {
+            continue;
+        }
+        const int writeError = errno;
+        ACLRTC_LOG_WARNING("Failed to write replay script header: path=%s errno=%d message=%s",
+                           replayScriptPath.c_str(), writeError, std::strerror(writeError));
+        return false;
+    }
+    return true;
+}
+
+bool CreateExecutableReplayScript(const fs::path& replayScriptPath,
+                                  const fs::path& compilationWorkingDirectoryPath) noexcept
+{
+    constexpr mode_t REPLAY_SCRIPT_PERMISSION = S_IRUSR | S_IWUSR | S_IXUSR;
+    const int replayScriptFileDescriptor = open(
+        replayScriptPath.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, REPLAY_SCRIPT_PERMISSION);
+    if (replayScriptFileDescriptor < 0) {
+        const int openError = errno;
+        ACLRTC_LOG_WARNING("Failed to create replay script: path=%s errno=%d message=%s",
+                           replayScriptPath.c_str(), openError, std::strerror(openError));
+        return false;
+    }
+
+    bool replayScriptCreated = WriteCompleteReplayScriptHeader(
+        replayScriptFileDescriptor, replayScriptPath, compilationWorkingDirectoryPath);
+    if (replayScriptCreated && fchmod(replayScriptFileDescriptor, REPLAY_SCRIPT_PERMISSION) != 0) {
+        const int permissionError = errno;
+        ACLRTC_LOG_WARNING("Failed to make replay script executable: path=%s errno=%d message=%s",
+                           replayScriptPath.c_str(), permissionError, std::strerror(permissionError));
+        replayScriptCreated = false;
+    }
+    if (close(replayScriptFileDescriptor) != 0) {
+        const int closeError = errno;
+        ACLRTC_LOG_WARNING("Failed to close replay script: path=%s errno=%d message=%s",
+                           replayScriptPath.c_str(), closeError, std::strerror(closeError));
+        replayScriptCreated = false;
+    }
+    if (!replayScriptCreated && unlink(replayScriptPath.c_str()) != 0) {
+        const int removalError = errno;
+        ACLRTC_LOG_WARNING("Failed to remove incomplete replay script: path=%s errno=%d message=%s",
+                           replayScriptPath.c_str(), removalError, std::strerror(removalError));
+    }
+    return replayScriptCreated;
+}
 } // namespace
 
 KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
@@ -66,7 +127,8 @@ KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
         return;
     }
     try {
-        diagnosticDirectoryPath_ = fs::current_path() / "kernel_meta" / std::to_string(getpid()) /
+        const fs::path compilationWorkingDirectoryPath = fs::current_path();
+        diagnosticDirectoryPath_ = compilationWorkingDirectoryPath / "kernel_meta" / std::to_string(getpid()) /
                                    ("aclrtc_" + specializationSessionId_);
         boost::system::error_code directoryError;
         fs::create_directories(diagnosticDirectoryPath_, directoryError);
@@ -78,11 +140,8 @@ KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
             return;
         }
         const fs::path replayScriptPath = diagnosticDirectoryPath_ / "replay.sh";
-        AppendDiagnosticText(replayScriptPath, "#!/bin/sh\nset -eu\n");
-        if (chmod(replayScriptPath.c_str(), 0700) != 0) {
-            const int chmodError = errno;
-            ACLRTC_LOG_WARNING("Failed to make replay script executable: path=%s errno=%d message=%s",
-                               replayScriptPath.c_str(), chmodError, std::strerror(chmodError));
+        if (!CreateExecutableReplayScript(replayScriptPath, compilationWorkingDirectoryPath)) {
+            diagnosticsEnabled_ = false;
         }
     } catch (...) {
         diagnosticsEnabled_ = false;
