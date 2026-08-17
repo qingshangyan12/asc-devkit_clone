@@ -112,6 +112,7 @@ enum AlgorithmType {
     CcuAllGatherMesh1D = 0,
     CcuSchedAllGatherSoleMesh = 1,
     CcuAllGatherMesh2D,
+    CcuSchedAllGatherConcurMeshNHRMultiLink = 3,
     CcuReduceScatterMesh1D = 50,
     CcuReduceScatterMeshMem2Mem1D,
     CcuReduceScatterMesh2D,
@@ -124,6 +125,7 @@ enum AlgorithmType {
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuSchedAllGatherSoleMesh", CcuSchedAllGatherSoleMesh},
+    {"CcuSchedAllGatherConcurMeshNHRMultiLink", CcuSchedAllGatherConcurMeshNHRMultiLink},
     {"CcuKfcReduceScatterMesh1DMem2Mem", CcuReduceScatterMeshMem2Mem1D},
     {"CcuAllReduceMesh1DMem2Mem", CcuAllReduceMeshMem2Mem1D},
     {"CcuAlltoAllVMesh1D", CcuAlltoAllVMesh1D},

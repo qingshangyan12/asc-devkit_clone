@@ -48,7 +48,9 @@ struct CcuKernelArgBase {
     uint32_t channelCount{0};
 };
 
-struct CcuKernelCtxBase {};
+struct CcuKernelCtxBase {
+    bool resourceAllocated{false};
+};
 
 struct GroupOpSizeVars {
     ccu::Variable addrOffset;
@@ -56,6 +58,17 @@ struct GroupOpSizeVars {
     ccu::Variable parallelParam;
     ccu::Variable residual;
 };
+
+inline void InitCcuKernelCtxBase(CcuKernelCtxBase& ctx)
+{
+    ctx.resourceAllocated = false;
+}
+
+inline CcuResult GroupCopy(
+    CcuKernelCtxBase&, ccu::LocalAddr, ccu::LocalAddr, GroupOpSizeVars)
+{
+    return CCU_SUCCESS;
+}
 
 } // namespace mc2_ops_hccl
 
