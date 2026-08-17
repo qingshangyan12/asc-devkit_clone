@@ -48,6 +48,7 @@
 #include "hccl_ccu_res_dl.h"
 #include "ccu_log.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
+#include "hccl_alloc_ctx_res.h"
 
 #ifndef MC2_CLIENT_ENABLE_CCU
 #define MC2_CLIENT_ENABLE_CCU 0
@@ -115,9 +116,15 @@ static HcclResult UpdateCcuCtxTokenOnReuse(
         return HCCL_SUCCESS;
     }
 
-    // 从旧 ctx 反序列化获取完整数据
-    auto* ctxRaw = static_cast<char*>(ctx);
-    std::vector<char> seq(ctxRaw, ctxRaw + ctxSize);
+    // AIV ctx 位于 device 侧，先拷贝到 host 内存后再反序列化
+    std::vector<char> seq(ctxSize);
+    aclError aclRet = aclrtMemcpy(seq.data(), ctxSize, ctx, ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
+    if (aclRet != ACL_SUCCESS) {
+        HCCL_ERROR(
+            "[UpdateCcuCtxTokenOnReuse] aclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].", aclRet,
+            seq.data(), ctx, static_cast<unsigned long long>(ctxSize));
+        return HCCL_E_RUNTIME;
+    }
     AlgResourceCtxSerializable tempCtx;
     tempCtx.DeSerialize(seq);
 
@@ -135,11 +142,23 @@ static HcclResult UpdateCcuCtxTokenOnReuse(
             HCCL_INFO("[UpdateCcuCtxTokenOnReuse] token[%llu] updated at kfcServerArgs[5]", token);
         }
 
-        // 序列化大小不变（都是6个元素），可以安全更新
+        // 复用的 device ctx 大小不能变化
         std::vector<char> updatedSeq = tempCtx.Serialize();
-        memcpy_s(ctx, ctxSize, updatedSeq.data(), updatedSeq.size());
+        if (updatedSeq.size() != ctxSize) {
+            HCCL_ERROR(
+                "[UpdateCcuCtxTokenOnReuse] serialized ctx size changed, oldSize[%llu], newSize[%zu].",
+                static_cast<unsigned long long>(ctxSize), updatedSeq.size());
+            return HCCL_E_INTERNAL;
+        }
+        aclRet = aclrtMemcpy(ctx, ctxSize, updatedSeq.data(), updatedSeq.size(), ACL_MEMCPY_HOST_TO_DEVICE);
+        if (aclRet != ACL_SUCCESS) {
+            HCCL_ERROR(
+                "[UpdateCcuCtxTokenOnReuse] aclrtMemcpy H2D failed, ret[%d], dst[%p], src[%p], size[%zu].", aclRet, ctx,
+                updatedSeq.data(), updatedSeq.size());
+            return HCCL_E_RUNTIME;
+        }
     } else {
-        HCCL_WARNING("[UpdateCcuCtxTokenOnReuse] HcclGetHcclBuffer failed, token remains 0");
+        HCCL_WARNING("[UpdateCcuCtxTokenOnReuse] HcclGetHcclBuffer failed, device ctx remains unchanged");
     }
     return HCCL_SUCCESS;
 }
@@ -753,6 +772,9 @@ HcclResult HcclGetAlgRes(
         if (param.engine == COMM_ENGINE_CPU) {
             // host dpu申请device内存用于存放resctx
             ctxEngine = COMM_ENGINE_AICPU_TS;
+        } else if (param.engine == COMM_ENGINE_CCU) {
+            // ccu申请aiv内存用于存放resctx
+            ctxEngine = COMM_ENGINE_AIV;
         }
         if (HcclEngineCtxGet(comm, param.algTag, ctxEngine, &ctx, &size) == HCCL_SUCCESS) {
             HCCL_DEBUG("Already have context, skip create, ctxSize is %u", param.ctxSize);
@@ -1288,16 +1310,8 @@ HcclResult GetAlgResCcu(
     uint64_t size = seq.size();
 
     void* ctx = nullptr;
-    uint64_t actualSize = size;
-    if (HcclEngineCtxGet(comm, param.algTag, COMM_ENGINE_AIV, &ctx, &actualSize) == HCCL_SUCCESS) {
-        HCCL_INFO(
-            "[GetAlgResCcu]HcclEngineCtxGet success, algTag[%s], ctxAddr[%p], ctxSize[%llu].", param.algTag, ctx,
-            static_cast<unsigned long long>(actualSize));
-    } else {
-        CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AIV, size, &ctx));
-        HCCL_INFO("[GetAlgResCcu]HcclEngineCtxCreate successfully!");
-    }
-    aclError aclRet = aclrtMemcpy(ctx, actualSize, seq.data(), size, ACL_MEMCPY_HOST_TO_DEVICE);
+    CHK_RET(GetOrCreateCcuCtx(comm, param.algTag, size, &ctx));
+    aclError aclRet = aclrtMemcpy(ctx, size, seq.data(), size, ACL_MEMCPY_HOST_TO_DEVICE);
     if (aclRet != ACL_SUCCESS) {
         HCCL_ERROR(
             "[GetAlgResCcu] aclrtMemcpy H2D failed, ret[%d], dst[%p], src[%p], size[%llu].", aclRet, ctx, seq.data(),
