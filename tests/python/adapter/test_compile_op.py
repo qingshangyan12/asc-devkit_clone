@@ -2494,6 +2494,7 @@ class TestCompileOp(unittest.TestCase):
         compile_log_path = None
         infered_info_from_ifile = (
             KernelInfoInfer.get_tiling_key_list_and_simple_infer_code_channel(
+                op_info,
                 cce_file,
                 os.path.join(kernel_meta_dir, op_info.kernel_name + ".i"),
                 compile_option_tuple,
@@ -2545,7 +2546,9 @@ class TestCompileOp(unittest.TestCase):
             os.remove(compile_info.gen_kernel_func_file)
         assert os.path.exists(compile_info.gen_kernel_func_file) == False
         self.assertFalse(os.path.exists(compile_info.gen_kernel_func_file))
+        global_var_storage.set_variable("ascendc_enable_super_kernel", False)
         global_var_storage.set_variable("ascendc_recognize_simtvf", True)
+        DFXSectionGenerator().dfx_info_reset(op_info)
         gen_kernel_fun(
             compile_info,
             origin_func_name,
@@ -2558,10 +2561,12 @@ class TestCompileOp(unittest.TestCase):
             "Problems Occurred during Kernel Function Generation!!!"
         )
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
+        with open(compile_info.gen_kernel_func_file, "r") as generated_kernel_file:
+            self.assertNotIn(
+                "__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__",
+                generated_kernel_file.read(),
+            )
         os.remove(compile_info.gen_kernel_func_file)
-        compile_info.dump_info["dump_type"] = "assert"
-        set_dump_assert_flag(compile_info)
-        assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
         assert "-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options
         gen_kernel_fun(
             compile_info,
@@ -9557,6 +9562,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         compile_log_path = None
         infered_info_from_ifile = (
             KernelInfoInfer.get_tiling_key_list_and_simple_infer_code_channel(
+                op_info,
                 cce_file,
                 os.path.join(kernel_meta_dir, op_info.kernel_name + ".i"),
                 compile_option_tuple,
@@ -9614,6 +9620,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
             "ascendc_enable_super_kernel", True
         )
 
+        DFXSectionGenerator().dfx_info_reset(op_info)
         gen_kernel_fun(
             compile_info,
             origin_func_name,
@@ -9630,6 +9637,20 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
             lines = " ".join(lines)
             self.assertNotEqual(lines.find(" __attribute__((aligned(512))) "), -1)
             self.assertNotEqual(lines.find(" __sk__"), -1)
+            self.assertIn(
+                "#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)",
+                lines,
+            )
+            self.assertIn(
+                "AscendC::g_superKernelSetWaitFlagCountDifference = "
+                "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;",
+                lines,
+            )
+            self.assertIn(
+                "assert(AscendC::g_superKernelSetWaitFlagCountDifference == "
+                "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE);",
+                lines,
+            )
         os.remove(compile_info.gen_kernel_func_file)
         global_var_storage.global_storage_reset()
 
