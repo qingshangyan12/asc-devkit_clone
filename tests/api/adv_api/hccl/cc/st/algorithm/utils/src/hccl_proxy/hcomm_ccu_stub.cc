@@ -18,6 +18,7 @@
 #include "hccl_ccu_res.h"
 #include "ccu_kernel_proxy.h"
 #include "sim_communicator.h"
+#include <cstring>
 #include <vector>
 #include <string>
 #include <map>
@@ -383,10 +384,53 @@ extern "C" {
 #endif // __cplusplus
 
 static uint32_t g_ccuKernelRegisterCount = 0;
+static uint32_t g_ccuKernelLaunchCount = 0;
+static constexpr uint32_t MAX_RECORDED_CCU_LAUNCHES = 8;
+static constexpr uint32_t MAX_RECORDED_CCU_ARGS = 6;
+static ThreadHandle g_ccuLaunchThreads[MAX_RECORDED_CCU_LAUNCHES] = {};
+static CcuKernelHandle g_ccuLaunchKernels[MAX_RECORDED_CCU_LAUNCHES] = {};
+static uint32_t g_ccuLaunchArgSizes[MAX_RECORDED_CCU_LAUNCHES] = {};
+static uint64_t g_ccuLaunchArgs[MAX_RECORDED_CCU_LAUNCHES][MAX_RECORDED_CCU_ARGS] = {};
 
 void ResetCcuKernelRegisterCount() { g_ccuKernelRegisterCount = 0; }
 
 uint32_t GetCcuKernelRegisterCount() { return g_ccuKernelRegisterCount; }
+
+void ResetCcuKernelLaunchRecords()
+{
+    g_ccuKernelLaunchCount = 0;
+    std::memset(g_ccuLaunchThreads, 0, sizeof(g_ccuLaunchThreads));
+    std::memset(g_ccuLaunchKernels, 0, sizeof(g_ccuLaunchKernels));
+    std::memset(g_ccuLaunchArgSizes, 0, sizeof(g_ccuLaunchArgSizes));
+    std::memset(g_ccuLaunchArgs, 0, sizeof(g_ccuLaunchArgs));
+}
+
+uint32_t GetCcuKernelLaunchCount()
+{
+    return g_ccuKernelLaunchCount;
+}
+
+uint64_t GetCcuKernelLaunchThread(uint32_t launchIndex)
+{
+    return launchIndex < g_ccuKernelLaunchCount ? g_ccuLaunchThreads[launchIndex] : 0U;
+}
+
+uint64_t GetCcuKernelLaunchKernel(uint32_t launchIndex)
+{
+    return launchIndex < g_ccuKernelLaunchCount ? g_ccuLaunchKernels[launchIndex] : 0U;
+}
+
+uint32_t GetCcuKernelLaunchArgSize(uint32_t launchIndex)
+{
+    return launchIndex < g_ccuKernelLaunchCount ? g_ccuLaunchArgSizes[launchIndex] : 0U;
+}
+
+uint64_t GetCcuKernelLaunchArg(uint32_t launchIndex, uint32_t argIndex)
+{
+    return launchIndex < g_ccuKernelLaunchCount && argIndex < MAX_RECORDED_CCU_ARGS
+               ? g_ccuLaunchArgs[launchIndex][argIndex]
+               : 0U;
+}
 
 CcuKernelHandle RecordCcuKernelRegistrationForTest()
 {
@@ -461,6 +505,16 @@ CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle)
 CcuResult HcommCcuKernelLaunch(
     ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs, uint32_t argSize)
 {
+    if (g_ccuKernelLaunchCount < MAX_RECORDED_CCU_LAUNCHES) {
+        const uint32_t launchIndex = g_ccuKernelLaunchCount;
+        g_ccuLaunchThreads[launchIndex] = threadHandle;
+        g_ccuLaunchKernels[launchIndex] = kernelHandle;
+        g_ccuLaunchArgSizes[launchIndex] = argSize;
+        if (taskArgs != nullptr && argSize <= MAX_RECORDED_CCU_ARGS) {
+            std::memcpy(g_ccuLaunchArgs[launchIndex], taskArgs, argSize * sizeof(uint64_t));
+        }
+    }
+    ++g_ccuKernelLaunchCount;
     return CCU_SUCCESS;
 }
 

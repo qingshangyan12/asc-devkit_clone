@@ -12,6 +12,7 @@
 
 #include <vector>
 #include "alg_param.h"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 
@@ -73,10 +74,21 @@ inline uint64_t BuildKfcServerCacheHash(const char* algTag, const std::vector<Op
     constexpr uint64_t fnvOffsetBasis = 14695981039346656037ULL;
     constexpr uint64_t fnvPrime = 1099511628211ULL;
     uint64_t hash = fnvOffsetBasis;
+    for (uint32_t byte = 0; byte < sizeof(KFC_SERVER_PROTOCOL_VERSION); ++byte) {
+        hash = (hash ^ static_cast<uint8_t>(KFC_SERVER_PROTOCOL_VERSION >> (byte * 8U))) * fnvPrime;
+    }
     for (const char* cursor = algTag; cursor != nullptr && *cursor != '\0'; ++cursor) {
         hash = (hash ^ static_cast<uint8_t>(*cursor)) * fnvPrime;
     }
     for (const OpParam& param : opParams) {
+        for (const char* cursor = param.algName; cursor != nullptr && *cursor != '\0'; ++cursor) {
+            hash = (hash ^ static_cast<uint8_t>(*cursor)) * fnvPrime;
+        }
+        const uint32_t missionNum = GetKfcServerMissionNum(param.algName);
+        hash = (hash ^ static_cast<uint8_t>(missionNum)) * fnvPrime;
+        for (uint32_t mission = 0; mission < missionNum; ++mission) {
+            hash = (hash ^ static_cast<uint8_t>(GetKfcServerRole(param.algName, mission))) * fnvPrime;
+        }
         uint64_t opId = BuildKfcOpId(param);
         for (uint32_t byte = 0; byte < sizeof(opId); ++byte) {
             hash = (hash ^ static_cast<uint8_t>(opId >> (byte * 8U))) * fnvPrime;
