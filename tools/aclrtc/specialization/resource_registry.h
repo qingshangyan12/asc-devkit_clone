@@ -106,11 +106,11 @@ public:
     /**
      * @brief Looks up a registered compile resource and materializes its bundled files.
      * @param[in] resourceId Non-empty identifier of the resource to look up.
-     * @param[out] resource Receives the resource data on success. It is set to nullptr when the lookup fails.
+     * @param[out] resource Receives the resource data on success. It is reset when the lookup fails.
      * @return ResourceStatus::Success on success; otherwise, ResourceStatus::NotFound, ResourceStatus::InvalidResource,
      * or a status describing the materialization failure.
      */
-    ResourceStatus Lookup(const char* resourceId, const ResourceData*& resource);
+    ResourceStatus Lookup(const char* resourceId, ResourceData& resource);
 
     ResourceRegistry(const ResourceRegistry&) = delete;
     ResourceRegistry& operator=(const ResourceRegistry&) = delete;
@@ -151,7 +151,7 @@ private:
     static ResourceStatus WriteMaterializedFiles(const std::vector<ResourceFileData>& files, const std::string& root);
 
     ResourceEntry* FindResource(const std::string& resourceId) noexcept;
-    ResourceStatus Materialize(const std::string& resourceId, ResourceEntry& entry);
+    ResourceStatus Materialize(const std::string& resourceId, const ResourceEntry& entry, ResourceData& resource);
     ResourceStatus Commit(StageState& stage);
     bool HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed);
 

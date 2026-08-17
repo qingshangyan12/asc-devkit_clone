@@ -1250,7 +1250,8 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
     return status;
 }
 
-ResourceStatus ResourceRegistry::Materialize(const std::string& resourceId, ResourceEntry& entry)
+ResourceStatus ResourceRegistry::Materialize(
+    const std::string& resourceId, const ResourceEntry& entry, ResourceData& resource)
 {
     ASCENDLOGI(
         "Materializing compile resource: resource_id=%s source_type=%s so=%s files=%zu", resourceId.c_str(),
@@ -1280,20 +1281,19 @@ ResourceStatus ResourceRegistry::Materialize(const std::string& resourceId, Reso
     }
     if (status != ResourceStatus::Success) {
         CleanupPath(categoryRoot);
-        entry.data.resourceDir.clear();
+        resource.resourceDir.clear();
         return status;
     }
-    entry.data.resourceDir = canonicalRoot;
+    resource.resourceDir = canonicalRoot;
     ASCENDLOGI(
         "Compile resource materialized: resource_id=%s source_type=%s so=%s files=%zu directory=%s", resourceId.c_str(),
-        SourceTypeName(entry.sourceType), entry.sourceSoPath.c_str(), entry.files.size(),
-        entry.data.resourceDir.c_str());
+        SourceTypeName(entry.sourceType), entry.sourceSoPath.c_str(), entry.files.size(), resource.resourceDir.c_str());
     return ResourceStatus::Success;
 }
 
-ResourceStatus ResourceRegistry::Lookup(const char* resourceId, const ResourceData*& resource)
+ResourceStatus ResourceRegistry::Lookup(const char* resourceId, ResourceData& resource)
 {
-    resource = nullptr;
+    resource = ResourceData{};
     if (resourceId == nullptr) {
         ASCENDLOGE("Compile resource lookup rejected: resource_id=<null> reason=identifier pointer is null");
         return ResourceStatus::InvalidResource;
@@ -1316,12 +1316,13 @@ ResourceStatus ResourceRegistry::Lookup(const char* resourceId, const ResourceDa
         "Compile resource lookup matched: resource_id=%s source_type=%s so=%s", resourceId,
         SourceTypeName(entry->sourceType), entry->sourceSoPath.c_str());
     std::lock_guard<std::mutex> materializeLock(entry->materializeMutex);
-    const ResourceStatus status = Materialize(resourceId, *entry);
+    ResourceData materialized = entry->data;
+    materialized.resourceDir.clear();
+    const ResourceStatus status = Materialize(resourceId, *entry, materialized);
     if (status == ResourceStatus::Success) {
-        resource = &entry->data;
+        resource = std::move(materialized);
         ASCENDLOGD(
-            "Compile resource lookup completed: resource_id=%s directory=%s", resourceId,
-            resource->resourceDir.c_str());
+            "Compile resource lookup completed: resource_id=%s directory=%s", resourceId, resource.resourceDir.c_str());
     }
     return status;
 }
