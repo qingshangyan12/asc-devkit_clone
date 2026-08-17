@@ -517,6 +517,38 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMismatchedRuntimeConstantByteCount
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "argsBytes[0]=3 does not match required byte_size 2"));
+        "argsBytes[0]=3 does not match required byte_size 2; set argsBytes[0] to 2"));
+}
+
+TEST(KernelCompilationPlanBuilderTest, ReportsMissingRegistryPathsWithoutSuccessErrorText)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t constantBytes[] = {0x01, 0x02};
+    const void* argumentDataPointers[] = {constantBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(constantBytes)};
+    NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+    KernelCompilationPlan plan;
+
+    const fs::path missingWorktreePath = workspace.ResourcePath() / "missing";
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), missingWorktreePath,
+                                           workspace.SourceFilePath())
+                  .BuildCompilationPlan(plan),
+              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "Resource worktree must be an existing directory"));
+    EXPECT_FALSE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("message=Success"));
+
+    const fs::path missingSourceFilePath = workspace.SourceFilePath().parent_path() / "missing.cpp";
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
+                                           missingSourceFilePath)
+                  .BuildCompilationPlan(plan),
+              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "sourceFilePath must be an existing regular file"));
+    EXPECT_FALSE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("message=Success"));
 }
 } // namespace

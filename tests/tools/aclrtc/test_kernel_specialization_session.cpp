@@ -226,11 +226,28 @@ TEST(KernelSpecializationSessionTest, DoesNotReplaceExistingOutputWhenCompilatio
     const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
     aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
 
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     KernelSpecializationSession session(registryAdapter);
     EXPECT_EQ(session.RunKernelSpecialization(&request, testResource.OutputElfPath().c_str()),
               ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
     EXPECT_EQ(ReadFile(testResource.OutputElfPath()), "previous-elf");
     EXPECT_FALSE(fs::exists(testResource.WorktreePath()));
+    EXPECT_FALSE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "specialization failed with aclError"));
+}
+
+TEST(KernelSpecializationSessionTest, ReportsUnavailableRegistryAsAnIntegrationProblem)
+{
+    JitResourceRegistryAdapter registryAdapter;
+    RegisteredJitResource resource;
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+
+    EXPECT_EQ(registryAdapter.LoadAndLookupJitResource("resource-id", resource),
+              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "JIT ResourceRegistry integration is unavailable in this build"));
+    EXPECT_FALSE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "resource_registry_adapter.cpp"));
 }
 
 TEST(KernelSpecializationSessionTest, ReportsHowToCorrectMissingOutputDirectory)

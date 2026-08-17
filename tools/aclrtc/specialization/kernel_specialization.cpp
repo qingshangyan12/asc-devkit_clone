@@ -110,8 +110,10 @@ void RemoveTemporaryOutputFileBestEffort(const fs::path& temporaryOutputPath)
     boost::system::error_code removeError;
     fs::remove(temporaryOutputPath, removeError);
     if (removeError) {
-        ACLRTC_LOG_WARNING("Failed to remove temporary output ELF: path=%s error=%d message=%s",
-                           temporaryOutputPath.c_str(), removeError.value(), removeError.message().c_str());
+        ACLRTC_LOG_WARNING(
+            "Failed to remove temporary output ELF: path=%s error=%d message=%s; remove the file manually if it "
+            "remains",
+            temporaryOutputPath.c_str(), removeError.value(), removeError.message().c_str());
     }
 }
 } // namespace
@@ -120,7 +122,7 @@ KernelSpecializationSession::KernelSpecializationSession(JitResourceRegistryAdap
     : resourceRegistryAdapter_(resourceRegistryAdapter)
 {}
 
-aclError KernelSpecializationSession::ReportAndReturnSpecializationResult(
+aclError KernelSpecializationSession::FinalizeSpecializationResult(
     const NormalizedKernelSpecializationRequest& specializationRequest,
     KernelSpecializationDiagnostics& diagnostics, aclError specializationResult) noexcept
 {
@@ -129,10 +131,8 @@ aclError KernelSpecializationSession::ReportAndReturnSpecializationResult(
         : OutputPublicationStatus::NotPublished;
     diagnostics.WriteSpecializationResult(specializationRequest.outputElfPath, publicationStatus);
     if (specializationResult == ACLRTC_SUCCESS) {
-        ACLRTC_LOG_INFO("Kernel %s specialization completed", specializationRequest.kernelName.c_str());
-    } else {
-        ACLRTC_LOG_ERROR("Kernel %s specialization failed with aclError %d",
-                         specializationRequest.kernelName.c_str(), specializationResult);
+        ACLRTC_LOG_INFO("Kernel %s specialization completed: output=%s",
+                        specializationRequest.kernelName.c_str(), specializationRequest.outputElfPath.c_str());
     }
     return specializationResult;
 }
@@ -167,7 +167,7 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
     specializationResult =
         resourceRegistryAdapter_.LoadAndLookupJitResource(specializationRequest.resourceId, registeredResource);
     if (specializationResult != ACLRTC_SUCCESS) {
-        return ReportAndReturnSpecializationResult(specializationRequest, diagnostics, specializationResult);
+        return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
     }
 
     const WorktreeRetentionPolicy worktreeRetentionPolicy = saveKernelMetaEnabled
@@ -180,20 +180,20 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
         ACLRTC_LOG_ERROR(
             "ResourceRegistry returned a null Manifest for resourceId '%s'; fix the registered resource data",
             specializationRequest.resourceId.c_str());
-        return ReportAndReturnSpecializationResult(specializationRequest, diagnostics, ACLRTC_ERROR_FAILURE);
+        return FinalizeSpecializationResult(specializationRequest, diagnostics, ACLRTC_ERROR_FAILURE);
     }
     if (compilationWorkspace.GetWorktreePath().empty()) {
         ACLRTC_LOG_ERROR(
             "ResourceRegistry returned an empty worktree path for resourceId '%s'; fix the registry integration",
             specializationRequest.resourceId.c_str());
-        return ReportAndReturnSpecializationResult(specializationRequest, diagnostics, ACLRTC_ERROR_FAILURE);
+        return FinalizeSpecializationResult(specializationRequest, diagnostics, ACLRTC_ERROR_FAILURE);
     }
     if (registeredResource.externalSourceFilePath.empty()) {
         ACLRTC_LOG_ERROR(
             "ResourceRegistry returned an empty sourceFilePath for resourceId '%s'; fix the registered resource "
             "data",
             specializationRequest.resourceId.c_str());
-        return ReportAndReturnSpecializationResult(specializationRequest, diagnostics, ACLRTC_ERROR_FAILURE);
+        return FinalizeSpecializationResult(specializationRequest, diagnostics, ACLRTC_ERROR_FAILURE);
     }
     diagnostics.WriteManifestSnapshot(*registeredResource.borrowedManifest);
 
@@ -204,22 +204,22 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
                                      registeredResource.externalSourceFilePath)
             .BuildCompilationPlan(compilationPlan);
     if (specializationResult != ACLRTC_SUCCESS) {
-        return ReportAndReturnSpecializationResult(specializationRequest, diagnostics, specializationResult);
+        return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
     }
     specializationResult = compilationWorkspace.CreateOutputDirectoriesAndApplySourcePatches(compilationPlan);
     if (specializationResult != ACLRTC_SUCCESS) {
-        return ReportAndReturnSpecializationResult(specializationRequest, diagnostics, specializationResult);
+        return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
     }
 
     CompilationPlanExecutor planExecutor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     specializationResult = planExecutor.ExecuteCompilationPlan(compilationPlan);
     if (specializationResult != ACLRTC_SUCCESS) {
-        return ReportAndReturnSpecializationResult(specializationRequest, diagnostics, specializationResult);
+        return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
     }
 
     specializationResult = PublishKernelElf(compilationPlan.linkedKernelElfPath,
                                             specializationRequest.outputElfPath, compilationWorkspace);
-    return ReportAndReturnSpecializationResult(specializationRequest, diagnostics, specializationResult);
+    return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
 }
 
 aclError KernelSpecializationSession::PublishKernelElf(
