@@ -34,7 +34,15 @@ if(tikicpulib_FOUND)
     endif()
 endif()
 
-set(ARCH_LIST 3510 2201)
+# NPU checker configurations.  Keep the compiler target and C API architecture
+# macros in sync so architecture-gated declarations are checked in the proper
+# CCE environment.
+set(CONFIGS_LIST
+    "dav-c310-vec|3510|-D__DAV_C310__|-D__DAV_C310_VEC__"
+    "dav-c310-cube|3510|-D__DAV_C310__|-D__DAV_C310_CUBE__"
+    "dav-c220-vec|2201|-D__DAV_C220__|-D__DAV_C220_VEC__"
+    "dav-c220-cube|2201|-D__DAV_C220__|-D__DAV_C220_CUBE__"
+)
 
 # ==========================================
 # 测试文件
@@ -77,7 +85,7 @@ function(create_check_targets MODE_SUFFIX MODE_DEFINES)
 
     # 根据 NPU 模式设置编译器和参数
     set(COMPILER "bisheng")
-    set(COMPILER_FLAGS -x cce -std=c++17 -w)
+    set(COMPILER_FLAGS -x cce -std=c++17 --cce-aicore-only -w)
     set(COMPILER_TYPE "NPU")
 
     message(STATUS "Creating ${COMPILER_TYPE}${MODE_SUFFIX} targets")
@@ -91,15 +99,28 @@ function(create_check_targets MODE_SUFFIX MODE_DEFINES)
         string(REPLACE "/" "_" TEST_FILE_ID ${REL_TEST_FILE})
         string(REPLACE "." "_" TEST_FILE_ID ${TEST_FILE_ID})
         string(REPLACE "-" "_" TEST_FILE_ID ${TEST_FILE_ID})
-        foreach(ARCH IN LISTS ARCH_LIST)
-            set(ARCH_FLAG "--npu-arch=dav-${ARCH}")
+        list(LENGTH CONFIGS_LIST CONFIGS_COUNT)
+        math(EXPR CONFIGS_LAST "${CONFIGS_COUNT} - 1")
+        foreach(IDX RANGE ${CONFIGS_LAST})
+            list(GET CONFIGS_LIST ${IDX} CONFIG_STR)
+            string(REPLACE "|" " " CONFIG_STR_SPACE "${CONFIG_STR}")
+            separate_arguments(CONFIG_ITEMS UNIX_COMMAND "${CONFIG_STR_SPACE}")
+            list(GET CONFIG_ITEMS 0 CONFIG_NAME)
+            list(GET CONFIG_ITEMS 1 CONFIG_ARCH)
+            list(LENGTH CONFIG_ITEMS CONFIG_ITEMS_LEN)
+            if(CONFIG_ITEMS_LEN GREATER 2)
+                list(SUBLIST CONFIG_ITEMS 2 -1 CONFIG_DEFINES)
+            else()
+                set(CONFIG_DEFINES "")
+            endif()
+            set(ARCH_FLAG "--cce-aicore-arch=${CONFIG_NAME}")
 
             # 创建子 Target
-            set(TARGET_NAME "c_api_host_check_npu${MODE_SUFFIX}_${ARCH}_${TEST_FILE_ID}")
+            set(TARGET_NAME "c_api_host_check_npu${MODE_SUFFIX}_${CONFIG_NAME}_${TEST_FILE_ID}")
             add_custom_target(${TARGET_NAME}
-                COMMAND ${COMPILER} ${COMPILER_FLAGS} ${INC_FLAGS} ${MODE_DEFINES}
+                COMMAND ${COMPILER} ${COMPILER_FLAGS} ${INC_FLAGS} ${MODE_DEFINES} ${CONFIG_DEFINES}
                     -fsyntax-only ${TEST_FILE} ${ARCH_FLAG}
-                COMMENT "Checking C API host (${COMPILER_TYPE})${MODE_SUFFIX} ${ARCH} ${REL_TEST_FILE}"
+                COMMENT "Checking C API host (${COMPILER_TYPE})${MODE_SUFFIX} ${CONFIG_NAME} ${REL_TEST_FILE}"
                 VERBATIM
                 USES_TERMINAL
             )
