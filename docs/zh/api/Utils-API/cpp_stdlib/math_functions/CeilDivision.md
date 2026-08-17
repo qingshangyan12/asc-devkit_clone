@@ -1,4 +1,4 @@
-# CeilDivision（废弃）
+# CeilDivision
 
 ## 产品支持情况
 
@@ -27,8 +27,6 @@
 ## 功能说明
 
 头文件路径为：`"utils/std/cmath.h"`。
-
-**该接口已废弃，请使用[ceil\_div](ceil_div.md)接口。**
 
 计算两个整数num1和num2相除后向上取整结果。
 
