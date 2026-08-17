@@ -55,6 +55,61 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/hccl_ccu_res_dl.cc
 )
 
+set(HCCL_MC2_CCU_ST_DIR ${UTILS_DIR}/mc2_ccu)
+add_executable(${HCCL_MC2_CCU_HOST_TARGET}
+    ${ASCENDC_DIR}/tests/main.cpp
+    host/all_gather_mc2_host_testcase.cpp
+    host/all_to_all_v_mc2_host_testcase.cpp
+    ${HCCL_MC2_CCU_ST_DIR}/cann_host_bridge_stub.cc
+    ${HCCL_MC2_CCU_ST_DIR}/hccl_op_common_stub.cc
+    ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
+    ${HCCL_CC_SRC_DIR}/common/hccl_alloc_ctx_res.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/selector/auto_selector_base.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/selector/selector_registry.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/selector/all_gather_auto_selector.cc
+)
+
+target_include_directories(${HCCL_MC2_CCU_HOST_TARGET} PRIVATE
+    ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/types
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/profiling
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/toolchain
+    ${HCCL_CC_SRC_DIR}
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/types
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/utils
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/legacy/common/exception
+    ${HCCL_MC2_CCU_ST_DIR}
+)
+
+target_compile_options(${HCCL_MC2_CCU_HOST_TARGET} PRIVATE
+    -std=c++17
+    -O0
+    -g
+    -Wno-unused-variable
+    -Wno-unused-parameter
+    -Wno-attributes
+    -D_GLIBCXX_USE_CXX11_ABI=0
+)
+
+target_compile_definitions(${HCCL_MC2_CCU_HOST_TARGET} PRIVATE
+    -DUT_TEST
+    -DAICPU_COMPILE
+    -DMC2_CLIENT_ENABLE_CCU=1
+)
+
+target_link_libraries(${HCCL_MC2_CCU_HOST_TARGET} PRIVATE
+    hccl-model-proxy
+    intf_llt_pub_basic
+    c_sec
+    pthread
+    dl
+)
+
+run_llt_test(
+    TARGET ${HCCL_MC2_CCU_HOST_TARGET}
+    TASK_NUM 1
+)
+
 add_executable(
     ${HCCL_CCU_ST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
