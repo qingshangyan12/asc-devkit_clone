@@ -38,25 +38,27 @@ void LibraryDeleter::operator()(void* handle) const noexcept
     }
 }
 
-const char* ResourceStatusToString(ResourceStatus status) noexcept
+bool IsKernelMetaSavingEnabled() noexcept
 {
-    switch (status) {
-        case ResourceStatus::Success:
-            return "success";
-        case ResourceStatus::NotFound:
-            return "not_found";
-        case ResourceStatus::Conflict:
-            return "conflict";
-        case ResourceStatus::InvalidResource:
-            return "invalid_resource";
-        case ResourceStatus::IoError:
-            return "io_error";
-        case ResourceStatus::LoadError:
-            return "load_error";
-        case ResourceStatus::InternalError:
-            return "internal_error";
+    const char* environment = std::getenv("ASCEND_OP_COMPILE_SAVE_KERNEL_META");
+    if (environment == nullptr) {
+        return false;
     }
-    return "unknown";
+    const auto isWhitespace = [](char value) {
+        return value == ' ' || value == '\t' || value == '\n' || value == '\r' || value == '\f' || value == '\v';
+    };
+    const char* begin = environment;
+    while (*begin != '\0' && isWhitespace(*begin)) {
+        ++begin;
+    }
+    const char* end = begin;
+    while (*end != '\0') {
+        ++end;
+    }
+    while (end != begin && isWhitespace(*(end - 1))) {
+        --end;
+    }
+    return end == begin + 1 && *begin == '1';
 }
 
 namespace {
@@ -89,6 +91,27 @@ const char* SourceTypeName(ResourceSourceType sourceType) noexcept
     return "unknown";
 }
 
+const char* ResourceStatusName(ResourceStatus status) noexcept
+{
+    switch (status) {
+        case ResourceStatus::Success:
+            return "success";
+        case ResourceStatus::NotFound:
+            return "not_found";
+        case ResourceStatus::Conflict:
+            return "conflict";
+        case ResourceStatus::InvalidResource:
+            return "invalid_resource";
+        case ResourceStatus::IoError:
+            return "io_error";
+        case ResourceStatus::LoadError:
+            return "load_error";
+        case ResourceStatus::InternalError:
+            return "internal_error";
+    }
+    return "unknown";
+}
+
 void CleanupPath(const std::string& path) noexcept
 {
     if (path.empty()) {
@@ -97,29 +120,6 @@ void CleanupPath(const std::string& path) noexcept
     if (!FileUtils::RemoveAll(path)) {
         ASCENDLOGW("Failed to remove compile resource path: path=%s reason=recursive removal failed", path.c_str());
     }
-}
-
-bool ShouldKeepTemporaryRoot() noexcept
-{
-    const char* environment = std::getenv("ASCEND_OP_COMPILE_SAVE_KERNEL_META");
-    if (environment == nullptr) {
-        return false;
-    }
-    auto isWhitespace = [](char value) {
-        return value == ' ' || value == '\t' || value == '\n' || value == '\r' || value == '\f' || value == '\v';
-    };
-    const char* begin = environment;
-    while (*begin != '\0' && isWhitespace(*begin)) {
-        ++begin;
-    }
-    const char* end = begin;
-    while (*end != '\0') {
-        ++end;
-    }
-    while (end != begin && isWhitespace(*(end - 1))) {
-        --end;
-    }
-    return end == begin + 1 && *begin == '1';
 }
 
 ResourceStatus CreateTemporaryRoot(std::string& temporaryRoot)
@@ -1151,7 +1151,7 @@ ResourceStatus ResourceRegistry::LoadLibrary(const LibrarySpec& spec, StageState
                 "Stopped loading compile resource SO at manifest: source_type=%s so=%s manifest=%" PRIu64
                 " status=%s(%d)",
                 SourceTypeName(canonicalSpec.sourceType), canonicalSpec.path.c_str(), manifestIndex,
-                ResourceStatusToString(status), static_cast<int>(status));
+                ResourceStatusName(status), static_cast<int>(status));
             return status;
         }
     }
@@ -1185,7 +1185,7 @@ ResourceStatus ResourceRegistry::LoadLibraries(const std::vector<LibrarySpec>& l
             ASCENDLOGW(
                 "Skipping failed compile resource SO and continuing with the next SO: source_type=%s so=%s "
                 "status=%s(%d)",
-                SourceTypeName(library.sourceType), library.path.c_str(), ResourceStatusToString(status),
+                SourceTypeName(library.sourceType), library.path.c_str(), ResourceStatusName(status),
                 static_cast<int>(status));
             continue;
         }
@@ -1194,7 +1194,7 @@ ResourceStatus ResourceRegistry::LoadLibraries(const std::vector<LibrarySpec>& l
     if (loaded == 0U && !libraries.empty()) {
         ASCENDLOGW(
             "No compile resource SO was loaded successfully: total=%zu skipped=%zu first_failure=%s(%d)",
-            libraries.size(), skipped, ResourceStatusToString(firstFailure), static_cast<int>(firstFailure));
+            libraries.size(), skipped, ResourceStatusName(firstFailure), static_cast<int>(firstFailure));
         return firstFailure;
     }
     ASCENDLOGI("Loaded compile resource SO list: total=%zu loaded=%zu skipped=%zu", libraries.size(), loaded, skipped);
@@ -1353,7 +1353,7 @@ ResourceStatus ResourceRegistry::Commit(StageState& stage)
     ASCENDLOGI(
         "Finished committing compile resources: status=%s(%d) registered_external=%zu registered_custom=%zu "
         "registered_built_in=%zu total_files=%" PRIu64 " total_bytes=%" PRIu64,
-        ResourceStatusToString(status), static_cast<int>(status), externalResources_.size(), customResources_.size(),
+        ResourceStatusName(status), static_cast<int>(status), externalResources_.size(), customResources_.size(),
         builtInResources_.size(), resourceFileCount_, resourceBytes_);
     return status;
 }
@@ -1365,7 +1365,7 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
     if (automatic && automaticLoadAttempted_) {
         ASCENDLOGI(
             "Returning cached automatic compile resource load result: status=%s(%d)",
-            ResourceStatusToString(automaticLoadStatus_), static_cast<int>(automaticLoadStatus_));
+            ResourceStatusName(automaticLoadStatus_), static_cast<int>(automaticLoadStatus_));
         return automaticLoadStatus_;
     }
     ASCENDLOGI(
@@ -1376,8 +1376,7 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
     if (status != ResourceStatus::Success) {
         ASCENDLOGE(
             "Compile resource load stopped during discovery: mode=%s path=%s status=%s(%d)",
-            automatic ? "automatic" : "explicit", automatic ? "<environment>" : directory,
-            ResourceStatusToString(status),
+            automatic ? "automatic" : "explicit", automatic ? "<environment>" : directory, ResourceStatusName(status),
             static_cast<int>(status));
     } else {
         ASCENDLOGI(
@@ -1396,7 +1395,7 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
     if (status == ResourceStatus::Success) {
         ASCENDLOGI(
             "Finished loading compile resources: mode=%s libraries=%zu status=%s(%d)",
-            automatic ? "automatic" : "explicit", libraries.size(), ResourceStatusToString(status),
+            automatic ? "automatic" : "explicit", libraries.size(), ResourceStatusName(status),
             static_cast<int>(status));
     }
     return status;
@@ -1412,7 +1411,7 @@ ResourceStatus ResourceRegistry::Materialize(
     {
         std::lock_guard<std::mutex> lock(registryMutex_);
         if (temporaryRoot_.empty()) {
-            keepTemporaryRoot_ = ShouldKeepTemporaryRoot();
+            keepTemporaryRoot_ = IsKernelMetaSavingEnabled();
             const ResourceStatus status = CreateTemporaryRoot(temporaryRoot_);
             if (status != ResourceStatus::Success) {
                 return status;

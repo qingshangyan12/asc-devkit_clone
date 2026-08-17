@@ -22,7 +22,7 @@ class KernelCompilationWorkspace;
 class KernelSpecializationDiagnostics;
 
 struct MaterializedKernelCompilationResource {
-    const nlohmann::json* borrowedManifest {nullptr};
+    nlohmann::json manifest;
     boost::filesystem::path ownedResourceDirectoryPath;
     boost::filesystem::path externalSourceDirectoryPath;
 };
