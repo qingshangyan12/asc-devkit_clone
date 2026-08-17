@@ -202,7 +202,7 @@ For Ascend 950PR/Ascend 950DT products:
 
 **Requirements**:
 - When different products use different layout formats (e.g., Zz vs Nz), **separate tables are required**
-- Physical location uses Buffer names (L0A/L0B/L0C/UB, etc.)
+- Physical location uses Buffer names (L0A/L0B/L0C/Unified Buffer (UB), etc.)
 - Format uses fractal layout names (Zz/Zn/Nz/ND, etc.)
 - If a bias matrix exists, annotate in the C matrix row: "Can support bias matrix Bias initialization, dimension 1 x N"
 
