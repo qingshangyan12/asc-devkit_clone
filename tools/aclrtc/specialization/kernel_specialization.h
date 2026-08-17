@@ -13,20 +13,32 @@
 
 #include "kernel_specialization_types.h"
 
+#include <nlohmann/json.hpp>
+
 namespace ascendc {
 namespace aclrtc {
 
-class JitResourceRegistryAdapter;
 class KernelCompilationWorkspace;
 class KernelSpecializationDiagnostics;
 
+struct MaterializedKernelCompilationResource {
+    const nlohmann::json* borrowedManifest {nullptr};
+    boost::filesystem::path ownedResourceDirectoryPath;
+    boost::filesystem::path externalSourceDirectoryPath;
+};
+
 class KernelSpecializationSession final {
 public:
-    explicit KernelSpecializationSession(JitResourceRegistryAdapter& resourceRegistryAdapter) noexcept;
-
     aclError RunKernelSpecialization(const aclrtcKernelSpecRequest* apiRequest, const char* outputElfPath);
 
 private:
+    static aclError PrepareCompilationResource(
+        const std::string& resourceId, MaterializedKernelCompilationResource& compilationResource);
+
+    aclError RunSpecializationWithMaterializedResource(
+        const NormalizedKernelSpecializationRequest& specializationRequest,
+        MaterializedKernelCompilationResource compilationResource);
+
     static aclError FinalizeSpecializationResult(
         const NormalizedKernelSpecializationRequest& specializationRequest,
         KernelSpecializationDiagnostics& diagnostics, aclError specializationResult) noexcept;
@@ -34,8 +46,6 @@ private:
     aclError PublishKernelElf(const boost::filesystem::path& linkedKernelElfPath,
                               const boost::filesystem::path& outputElfPath,
                               KernelCompilationWorkspace& compilationWorkspace) const;
-
-    JitResourceRegistryAdapter& resourceRegistryAdapter_;
 };
 
 } // namespace aclrtc

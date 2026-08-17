@@ -9,7 +9,7 @@
  */
 
 #include "specialization/kernel_specialization.h"
-#include "specialization/resource_registry_adapter.h"
+#include "specialization/resource_registry.h"
 #include "stub/kernel_specialization_log.h"
 
 #include <gtest/gtest.h>
@@ -19,16 +19,22 @@
 #include <boost/system/error_code.hpp>
 #include <cstdlib>
 #include <fstream>
+#include <memory>
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <utility>
 
 namespace {
 namespace fs = boost::filesystem;
 using Json = nlohmann::json;
-using ascendc::aclrtc::JitResourceRegistryAdapter;
 using ascendc::aclrtc::KernelSpecializationSession;
-using ascendc::aclrtc::RegisteredJitResource;
+using ascendc::aclrtc::MaterializedKernelCompilationResource;
+using ascendc::aclrtc::NormalizedKernelSpecializationRequest;
+using ascendc::specialization_compile::ResourceEntry;
+using ascendc::specialization_compile::ResourceRegistry;
+using ascendc::specialization_compile::ResourceSourceType;
+using ascendc::specialization_compile::ResourceStatus;
 
 enum class FakeCompilerOutcome : uint32_t {
     Success,
@@ -118,23 +124,15 @@ public:
         fs::remove_all(rootPath_, ignoredError);
     }
 
-    static aclError Lookup(const std::string& resourceId, RegisteredJitResource& resource, void* context)
+    MaterializedKernelCompilationResource CreateMaterializedCompilationResource() const
     {
-        auto& testResource = *static_cast<EndToEndTestResource*>(context);
-        testResource.lookupCalled_ = true;
-        if (resourceId != RESOURCE_ID) {
-            return ascendc::aclrtc::ACLRTC_ERROR_FAILURE;
-        }
-        resource.borrowedManifest = &testResource.manifest_;
-        resource.ownedWorktreePath = testResource.worktreePath_;
-        resource.externalSourceDirectoryPath = testResource.sourceDirectoryPath_;
-        return 0;
+        return MaterializedKernelCompilationResource {
+            &manifest_, worktreePath_, sourceDirectoryPath_};
     }
 
     const fs::path& ToolchainPath() const { return toolchainPath_; }
     const fs::path& WorktreePath() const { return worktreePath_; }
     const fs::path& OutputElfPath() const { return outputElfPath_; }
-    bool LookupCalled() const { return lookupCalled_; }
 
 private:
     static void WriteFile(const fs::path& path, const std::string& contents)
@@ -195,7 +193,55 @@ private:
     fs::path toolchainPath_;
     fs::path outputElfPath_;
     Json manifest_;
-    bool lookupCalled_ {false};
+};
+
+class ScopedRegisteredCompilationResource final {
+public:
+    ScopedRegisteredCompilationResource(
+        std::string resourceId, const Json& manifest, const fs::path& sourceDirectoryPath)
+        : registry_(ResourceRegistry::Instance()), resourceId_(std::move(resourceId)),
+          previousTemporaryRoot_(registry_.temporaryRoot_),
+          previousAutomaticLoadAttempted_(registry_.automaticLoadAttempted_),
+          previousAutomaticLoadStatus_(registry_.automaticLoadStatus_)
+    {
+        registry_.temporaryRoot_.clear();
+        registry_.automaticLoadAttempted_ = true;
+        registry_.automaticLoadStatus_ = ResourceStatus::Success;
+
+        std::unique_ptr<ResourceEntry> resourceEntry(new ResourceEntry());
+        resourceEntry->data.json = manifest;
+        resourceEntry->data.sourceFilePath = sourceDirectoryPath.string();
+        resourceEntry->files.push_back({"payload.bin", "payload.bin", {0x01U, 0x02U}});
+        resourceEntry->sourceType = ResourceSourceType::External;
+        inserted_ = registry_.externalResources_.emplace(resourceId_, std::move(resourceEntry)).second;
+    }
+
+    ~ScopedRegisteredCompilationResource()
+    {
+        if (inserted_) {
+            registry_.externalResources_.erase(resourceId_);
+        }
+        boost::system::error_code ignoredError;
+        fs::remove_all(registry_.temporaryRoot_, ignoredError);
+        registry_.temporaryRoot_ = previousTemporaryRoot_;
+        registry_.automaticLoadAttempted_ = previousAutomaticLoadAttempted_;
+        registry_.automaticLoadStatus_ = previousAutomaticLoadStatus_;
+    }
+
+    bool WasInserted() const noexcept { return inserted_; }
+
+    void SetAutomaticLoadStatus(ResourceStatus loadStatus) noexcept
+    {
+        registry_.automaticLoadStatus_ = loadStatus;
+    }
+
+private:
+    ResourceRegistry& registry_;
+    std::string resourceId_;
+    std::string previousTemporaryRoot_;
+    bool previousAutomaticLoadAttempted_ {false};
+    ResourceStatus previousAutomaticLoadStatus_ {ResourceStatus::Success};
+    bool inserted_ {false};
 };
 
 aclrtcKernelSpecRequest CreateRequest(const uint64_t* constantByteCounts, const void* const* constantAddresses)
@@ -209,10 +255,14 @@ aclrtcKernelSpecRequest CreateRequest(const uint64_t* constantByteCounts, const 
     return request;
 }
 
-aclError ReturnInjectedRegistryFailure(
-    const std::string&, RegisteredJitResource&, void*)
+NormalizedKernelSpecializationRequest NormalizeRequestForTest(
+    const aclrtcKernelSpecRequest& request, const fs::path& outputElfPath)
 {
-    return ascendc::aclrtc::ACLRTC_ERROR_FAILURE;
+    NormalizedKernelSpecializationRequest normalizedRequest;
+    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
+                  request, outputElfPath.c_str(), normalizedRequest),
+              ascendc::aclrtc::ACLRTC_SUCCESS);
+    return normalizedRequest;
 }
 
 std::string ReadFile(const fs::path& path)
@@ -221,20 +271,21 @@ std::string ReadFile(const fs::path& path)
     return std::string(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
 }
 
-TEST(KernelSpecializationSessionTest, RunsLookupPatchCompileLinkPublishAndCleanup)
+TEST(KernelSpecializationSessionTest, RunsPatchCompileLinkPublishAndCleanupWithMaterializedResource)
 {
     EndToEndTestResource testResource(FakeCompilerOutcome::Success);
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
     ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
-    JitResourceRegistryAdapter registryAdapter(EndToEndTestResource::Lookup, &testResource);
     const uint8_t constantBytes[] = {0x01, 0xfe};
     const void* constantAddresses[] = {constantBytes};
     const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
     aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
 
-    KernelSpecializationSession session(registryAdapter);
-    EXPECT_EQ(session.RunKernelSpecialization(&request, testResource.OutputElfPath().c_str()), 0);
-    EXPECT_TRUE(testResource.LookupCalled());
+    KernelSpecializationSession session;
+    EXPECT_EQ(session.RunSpecializationWithMaterializedResource(
+                  NormalizeRequestForTest(request, testResource.OutputElfPath()),
+                  testResource.CreateMaterializedCompilationResource()),
+              0);
     EXPECT_EQ(ReadFile(testResource.OutputElfPath()), "linked-elf");
     EXPECT_FALSE(fs::exists(testResource.WorktreePath()));
 }
@@ -245,34 +296,21 @@ TEST(KernelSpecializationSessionTest, DoesNotReplaceExistingOutputWhenCompilatio
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
     ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
     std::ofstream(testResource.OutputElfPath()) << "previous-elf";
-    JitResourceRegistryAdapter registryAdapter(EndToEndTestResource::Lookup, &testResource);
     const uint8_t constantBytes[] = {0x01, 0xfe};
     const void* constantAddresses[] = {constantBytes};
     const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
     aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
 
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
-    KernelSpecializationSession session(registryAdapter);
-    EXPECT_EQ(session.RunKernelSpecialization(&request, testResource.OutputElfPath().c_str()),
+    KernelSpecializationSession session;
+    EXPECT_EQ(session.RunSpecializationWithMaterializedResource(
+                  NormalizeRequestForTest(request, testResource.OutputElfPath()),
+                  testResource.CreateMaterializedCompilationResource()),
               ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
     EXPECT_EQ(ReadFile(testResource.OutputElfPath()), "previous-elf");
     EXPECT_FALSE(fs::exists(testResource.WorktreePath()));
     EXPECT_FALSE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
         "specialization failed with aclError"));
-}
-
-TEST(KernelSpecializationSessionTest, ReportsInjectedRegistryFailure)
-{
-    JitResourceRegistryAdapter registryAdapter(ReturnInjectedRegistryFailure, nullptr);
-    RegisteredJitResource resource;
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
-
-    EXPECT_EQ(registryAdapter.LoadAndLookupJitResource("resource-id", resource),
-              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "JIT ResourceRegistry Load/Lookup failed for resourceId 'resource-id'"));
-    EXPECT_FALSE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "resource_registry_adapter.cpp"));
 }
 
 TEST(KernelSpecializationSessionTest, ReportsHowToCorrectMissingOutputDirectory)
@@ -283,15 +321,16 @@ TEST(KernelSpecializationSessionTest, ReportsHowToCorrectMissingOutputDirectory)
     boost::system::error_code removeError;
     fs::remove_all(testResource.OutputElfPath().parent_path(), removeError);
     ASSERT_FALSE(removeError);
-    JitResourceRegistryAdapter registryAdapter(EndToEndTestResource::Lookup, &testResource);
     const uint8_t constantBytes[] = {0x01, 0xfe};
     const void* constantAddresses[] = {constantBytes};
     const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
     aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
 
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
-    KernelSpecializationSession session(registryAdapter);
-    EXPECT_EQ(session.RunKernelSpecialization(&request, testResource.OutputElfPath().c_str()),
+    KernelSpecializationSession session;
+    EXPECT_EQ(session.RunSpecializationWithMaterializedResource(
+                  NormalizeRequestForTest(request, testResource.OutputElfPath()),
+                  testResource.CreateMaterializedCompilationResource()),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
         "create the output parent directory and ensure it is writable"));
@@ -311,14 +350,16 @@ TEST(KernelSpecializationSessionTest, RetainsWorktreeWhenKernelMetaSavingIsEnabl
     ScopedCurrentDirectory currentDirectory(diagnosticRoot);
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
     ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "1");
-    JitResourceRegistryAdapter registryAdapter(EndToEndTestResource::Lookup, &testResource);
     const uint8_t constantBytes[] = {0x01, 0xfe};
     const void* constantAddresses[] = {constantBytes};
     const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
     aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
 
-    KernelSpecializationSession session(registryAdapter);
-    EXPECT_EQ(session.RunKernelSpecialization(&request, testResource.OutputElfPath().c_str()), 0);
+    KernelSpecializationSession session;
+    EXPECT_EQ(session.RunSpecializationWithMaterializedResource(
+                  NormalizeRequestForTest(request, testResource.OutputElfPath()),
+                  testResource.CreateMaterializedCompilationResource()),
+              0);
     EXPECT_FALSE(fs::exists(testResource.WorktreePath()));
 
     const fs::path processDiagnosticDirectory = diagnosticRoot / "kernel_meta" / std::to_string(getpid());
@@ -334,29 +375,39 @@ TEST(KernelSpecializationSessionTest, RetainsWorktreeWhenKernelMetaSavingIsEnabl
     fs::remove_all(diagnosticRoot, ignoredError);
 }
 
-TEST(KernelSpecializationSessionTest, CleansWorktreeWhenRegistryReturnsIncompleteData)
+TEST(KernelSpecializationSessionTest, LoadsAndCopiesFreshMaterializedPathsFromRegistry)
 {
-    static uint64_t sequence = 0U;
     const fs::path testRoot = fs::temp_directory_path() /
-                              ("aclrtc_incomplete_resource_" + std::to_string(getpid()) + "_" +
-                               std::to_string(sequence++));
-    fs::path worktreePath = testRoot / "worktree";
-    fs::create_directories(worktreePath);
-    ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
-    auto returnIncompleteResource = [](const std::string&, RegisteredJitResource& resource,
-                                       void* context) -> aclError {
-        resource.ownedWorktreePath = *static_cast<const fs::path*>(context);
-        return 0;
-    };
-    JitResourceRegistryAdapter registryAdapter(returnIncompleteResource, &worktreePath);
-    aclrtcKernelSpecRequest request = CreateRequest(nullptr, nullptr);
+                              fs::unique_path("aclrtc_session_registry_%%%%-%%%%-%%%%");
+    const fs::path sourceDirectoryPath = testRoot / "source";
+    fs::create_directories(sourceDirectoryPath);
+    ScopedEnvironmentVariable temporaryDirectoryEnvironment("TMPDIR", testRoot.c_str());
+    const std::string resourceId = "aclrtc-session-registry-integration";
+    const Json manifest = {{"resource_id", resourceId}, {"schema_version", "1.0"}};
+    ScopedRegisteredCompilationResource registeredResource(resourceId, manifest, sourceDirectoryPath);
+    ASSERT_TRUE(registeredResource.WasInserted());
 
-    KernelSpecializationSession session(registryAdapter);
-    EXPECT_EQ(session.RunKernelSpecialization(&request, (testRoot / "kernel.elf").c_str()),
+    registeredResource.SetAutomaticLoadStatus(ResourceStatus::NotFound);
+    MaterializedKernelCompilationResource rejectedResource;
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(KernelSpecializationSession::PrepareCompilationResource(resourceId, rejectedResource),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_FALSE(fs::exists(worktreePath));
-    boost::system::error_code ignoredError;
-    fs::remove_all(testRoot, ignoredError);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("status=not_found(1)"));
+
+    registeredResource.SetAutomaticLoadStatus(ResourceStatus::Success);
+    MaterializedKernelCompilationResource firstResource;
+    ASSERT_EQ(KernelSpecializationSession::PrepareCompilationResource(resourceId, firstResource),
+              ascendc::aclrtc::ACLRTC_SUCCESS);
+    ASSERT_NE(firstResource.borrowedManifest, nullptr);
+    EXPECT_EQ(*firstResource.borrowedManifest, manifest);
+    EXPECT_EQ(firstResource.externalSourceDirectoryPath, sourceDirectoryPath);
+    EXPECT_TRUE(fs::is_regular_file(firstResource.ownedResourceDirectoryPath / "payload.bin"));
+
+    MaterializedKernelCompilationResource secondResource;
+    ASSERT_EQ(KernelSpecializationSession::PrepareCompilationResource(resourceId, secondResource),
+              ascendc::aclrtc::ACLRTC_SUCCESS);
+    EXPECT_NE(firstResource.ownedResourceDirectoryPath, secondResource.ownedResourceDirectoryPath);
+    EXPECT_TRUE(fs::is_regular_file(secondResource.ownedResourceDirectoryPath / "payload.bin"));
 }
 
 TEST(KernelSpecializationApiTest, RejectsNullPointersBeforeResourceLookup)

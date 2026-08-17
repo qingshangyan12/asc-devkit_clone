@@ -125,6 +125,25 @@ TEST(KernelCompilationWorkspaceTest, DeletesWorktreeByDefaultAndRetainsItWhenReq
     fs::remove_all(retainedWorktreePath, ignoredError);
 }
 
+TEST(KernelCompilationWorkspaceTest, RetainsWorktreeAfterMovingItToDiagnosticsDirectory)
+{
+    const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_move_to_diagnostics");
+    WriteFile(worktreePath / "artifact.txt", "diagnostic artifact\n");
+    const fs::path diagnosticWorktreePath =
+        worktreePath.parent_path() / fs::unique_path("aclrtc_retained_workspace_%%%%-%%%%-%%%%");
+
+    {
+        KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RemoveAfterCompilation);
+        ASSERT_TRUE(workspace.TryMoveWorktreeToDiagnosticsDirectory(diagnosticWorktreePath));
+        EXPECT_EQ(workspace.GetWorktreePath(), diagnosticWorktreePath);
+    }
+
+    EXPECT_FALSE(fs::exists(worktreePath));
+    EXPECT_EQ(ReadFile(diagnosticWorktreePath / "artifact.txt"), "diagnostic artifact\n");
+    boost::system::error_code ignoredError;
+    fs::remove_all(diagnosticWorktreePath, ignoredError);
+}
+
 TEST(KernelCompilationWorkspaceTest, RemovesWorktreeBeforeOutputPublicationWhenNotRetained)
 {
     const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_prepublish_cleanup");
