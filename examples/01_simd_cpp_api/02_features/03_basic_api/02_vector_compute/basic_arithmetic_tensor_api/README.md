@@ -6,9 +6,11 @@
 
 样例主要展示Tensor数据搬运接口与返回值风格寄存器计算接口的组合使用方式。有效lane信息保存在`reg_tensor`的mask中，并随计算结果继续传递。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+| :--- | :----------- |
+| Ascend 950PR/Ascend 950DT | CANN master（包含本样例依赖的experimental Tensor API接口） |
 
 ## 目录结构介绍
 
