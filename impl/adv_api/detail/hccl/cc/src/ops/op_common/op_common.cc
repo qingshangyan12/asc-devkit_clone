@@ -753,6 +753,9 @@ HcclResult HcclGetAlgRes(
         if (param.engine == COMM_ENGINE_CPU) {
             // host dpu申请device内存用于存放resctx
             ctxEngine = COMM_ENGINE_AICPU_TS;
+        } else if (param.engine == COMM_ENGINE_CCU) {
+            // MC2 CCU的序列化资源保存在AIV context中，复用查询需使用相同的engine key
+            ctxEngine = COMM_ENGINE_AIV;
         }
         if (HcclEngineCtxGet(comm, param.algTag, ctxEngine, &ctx, &size) == HCCL_SUCCESS) {
             HCCL_DEBUG("Already have context, skip create, ctxSize is %u", param.ctxSize);
