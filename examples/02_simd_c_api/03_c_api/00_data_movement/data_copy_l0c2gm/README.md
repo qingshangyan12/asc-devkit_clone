@@ -238,7 +238,7 @@ data_copy_l0c2gm
   全部17个场景×2种模式一键测试：
 
   ```bash
-  bash ../scripts/test_boundary.sh
+  bash scripts/test_boundary.sh
   ```
 
   各量化模式对边界值的预期行为（饱和模式，CTRL[48]=0）：
@@ -250,7 +250,7 @@ data_copy_l0c2gm
   | half | 饱和为65504 | 饱和为-65504 | 饱和为0 | CTRL[48]=0控制 |
   | bfloat16 | 饱和为max | 饱和为min | 饱和为0 | CTRL[48]=0控制 |
   | fp8_e4m3fn | 饱和为448 | 饱和为-448 | 饱和为0（CTRL[50]=0） | CTRL[48]=0+CTRL[50]=0 |
-  | hifloat8 | 饱和为240 | 饱和为-240 | 饱和为0 | CTRL[48]=0控制 |
+  | hifloat8 | 111（HiF8+inf编码） | 239（HiF8-inf编码） | 饱和为0 | CTRL[48]=0控制 |
   | float | 保持inf | 保持-inf | 保持nan | CTRL[48]不支持float，始终保持 |
 
   非饱和模式（CTRL[48]=1）预期行为：
@@ -258,7 +258,9 @@ data_copy_l0c2gm
   | 输出类型 | +inf | -inf | nan | 说明 |
   |---------|------|------|-----|------|
   | int8 | 同饱和模式 | 同饱和模式 | 同饱和模式 | 整数类型始终饱和 |
+  | int4b | 同饱和模式 | 同饱和模式 | 同饱和模式 | 同上 |
   | half | 保持inf | 保持-inf | 保持nan | float16可表示 |
   | bfloat16 | 保持inf | 保持-inf | 保持nan | bfloat16可表示 |
   | fp8_e4m3fn | 输出nan | 输出nan | 输出nan | inf或超范围值→nan |
+  | hifloat8 | 111（HiF8+inf编码） | 239（HiF8-inf编码） | 128（HiF8NAN编码） | inf/nan保持对应编码 |
   | float | 保持inf | 保持-inf | 保持nan | CTRL[48]不支持float，始终保持 |

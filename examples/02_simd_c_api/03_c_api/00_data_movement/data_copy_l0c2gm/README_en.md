@@ -238,7 +238,7 @@ Run the following steps in the example root directory.
   One-click test for all 17 scenarios × 2 modes:
 
   ```bash
-  bash ../scripts/test_boundary.sh
+  bash scripts/test_boundary.sh
   ```
 
   Expected behavior of each quantization mode for boundary values (saturation mode, CTRL[48]=0):
@@ -250,7 +250,7 @@ Run the following steps in the example root directory.
   | half | Saturate to 65504 | Saturate to -65504 | Saturate to 0 | Controlled by CTRL[48]=0 |
   | bfloat16 | Saturate to max | Saturate to min | Saturate to 0 | Controlled by CTRL[48]=0 |
   | fp8_e4m3fn | Saturate to 448 | Saturate to -448 | Saturate to 0 (CTRL[50]=0) | CTRL[48]=0 + CTRL[50]=0 |
-  | hifloat8 | Saturate to 240 | Saturate to -240 | Saturate to 0 | Controlled by CTRL[48]=0 |
+  | hifloat8 | 111 (HiF8+inf) | 239 (HiF8-inf) | Saturate to 0 | Controlled by CTRL[48]=0 |
   | float | Preserve inf | Preserve -inf | Preserve nan | CTRL[48] does not support float; always preserved |
 
   Non-saturation mode (CTRL[48]=1) expected behavior:
@@ -258,7 +258,9 @@ Run the following steps in the example root directory.
   | Output type | +inf | -inf | nan | Notes |
   |---------|------|------|-----|------|
   | int8 | Same as saturation | Same as saturation | Same as saturation | Integer types always saturate |
+  | int4b | Same as saturation | Same as saturation | Same as saturation | Same as above |
   | half | Preserve inf | Preserve -inf | Preserve nan | float16 can represent |
   | bfloat16 | Preserve inf | Preserve -inf | Preserve nan | bfloat16 can represent |
   | fp8_e4m3fn | Output nan | Output nan | Output nan | inf or out-of-range → nan |
+  | hifloat8 | 111 (HiF8+inf) | 239 (HiF8-inf) | 128 (HiF8NAN) | inf/nan preserved as encodings |
   | float | Preserve inf | Preserve -inf | Preserve nan | CTRL[48] does not support float; always preserved |
