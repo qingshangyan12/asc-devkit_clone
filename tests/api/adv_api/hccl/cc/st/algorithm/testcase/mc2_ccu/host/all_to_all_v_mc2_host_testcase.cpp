@@ -68,7 +68,7 @@ Mc2CcTilingInner BuildAllToAllVTiling(
     tiling.srcDataType = static_cast<uint8_t>(sendType);
     tiling.dstDataType = static_cast<uint8_t>(recvType);
     strcpy(tiling.groupName, "test_group");
-    strcpy(tiling.algConfig, "default");
+    strcpy(tiling.algConfig, "CcuAlltoAllVMesh1D");
     return tiling;
 }
 
@@ -77,6 +77,7 @@ Mc2CcTilingInner BuildAllToAllTiling(
 {
     Mc2CcTilingInner tiling = BuildAllToAllVTiling(sendType, recvType);
     tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL);
+    strcpy(tiling.algConfig, "CcuAlltoAllMesh1D");
     return tiling;
 }
 
@@ -90,7 +91,7 @@ Mc2CcTilingInner BuildAllReduceTiling(
     tiling.dstDataType = static_cast<uint8_t>(dataType);
     tiling.reduceType = static_cast<uint32_t>(reduceType);
     strcpy(tiling.groupName, "test_group");
-    strcpy(tiling.algConfig, "default");
+    strcpy(tiling.algConfig, "CcuAllReduceMesh1DMem2Mem");
     return tiling;
 }
 

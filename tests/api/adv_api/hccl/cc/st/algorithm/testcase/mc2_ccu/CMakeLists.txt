@@ -17,11 +17,15 @@ set(HCCL_KFC_SERVER_CCU_KERNEL_DIR
 
 add_executable(${HCCL_MC2_CCU_HOST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
+    host/all_gather_mc2_host_testcase.cpp
     host/all_to_all_v_mc2_host_testcase.cpp
     ${HCCL_MC2_CCU_ST_DIR}/cann_host_bridge_stub.cc
     ${HCCL_MC2_CCU_ST_DIR}/hccl_op_common_stub.cc
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
     ${HCCL_CC_SRC_DIR}/common/hccl_alloc_ctx_res.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/selector/auto_selector_base.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/selector/selector_registry.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/selector/all_gather_auto_selector.cc
 )
 
 target_include_directories(${HCCL_MC2_CCU_HOST_TARGET} PRIVATE
