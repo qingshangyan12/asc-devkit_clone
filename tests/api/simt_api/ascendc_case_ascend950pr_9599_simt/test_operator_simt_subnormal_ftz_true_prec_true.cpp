@@ -28,30 +28,30 @@ struct FloatSubnormalParams {
     int32_t mode;
 };
 
-class FloatSubnormalTestsuite : public testing::Test {
+class FloatSubnormalFtzTruePrecTrueTestsuite : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
 };
 
-TEST_F(FloatSubnormalTestsuite, FloatSubnormalTestCase_expfloatftzfalse)
+TEST_F(FloatSubnormalFtzTruePrecTrueTestsuite, ExpFloatFtzTruePrecTrue)
 {
     float a = 1.17549421e-38f;
     float x = 1.0f;
     float y = -80.0f;
     float z = 0.0f;
-    EXPECT_FLOAT_EQ(exp(x), expf(x));
-    EXPECT_FLOAT_EQ(exp(x), expf(x));
-    EXPECT_FLOAT_EQ(exp(y), expf(y));
-    EXPECT_FLOAT_EQ(exp(z), expf(z));
+    EXPECT_FLOAT_EQ(std::exp(x), AscendC::Simt::expf(x));
+    EXPECT_FLOAT_EQ(std::exp(a), AscendC::Simt::expf(a));
+    EXPECT_FLOAT_EQ(std::exp(y), AscendC::Simt::expf(y));
+    EXPECT_FLOAT_EQ(std::exp(z), AscendC::Simt::expf(z));
 }
 
-TEST_F(FloatSubnormalTestsuite, FloatSubnormalTestCase_sqrtfloatftzfalseprectrue)
+TEST_F(FloatSubnormalFtzTruePrecTrueTestsuite, SqrtFloatFtzTruePrecTrue)
 {
     float x = 1.0f;
     float y = 1.17549421e-38f;
     float z = 0.0f;
-    EXPECT_FLOAT_EQ(sqrt(x), sqrtf(x));
-    EXPECT_FLOAT_EQ(sqrt(y), sqrtf(y));
-    EXPECT_FLOAT_EQ(sqrt(z), sqrtf(z));
+    EXPECT_FLOAT_EQ(std::sqrt(x), AscendC::Simt::sqrtf(x));
+    EXPECT_FLOAT_EQ(std::sqrt(y), AscendC::Simt::sqrtf(y));
+    EXPECT_FLOAT_EQ(std::sqrt(z), AscendC::Simt::sqrtf(z));
 }
