@@ -35,7 +35,7 @@ inline constexpr bool is_cmp_support_type = Std::is_one_of_v<T, uint8_t, int8_t,
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) select(reg_tensor<bool> condition,reg_tensor<T> src0,
+__simd_callee__ inline decltype(auto) select(reg_tensor<bool> condition, reg_tensor<T> src0,
     reg_tensor<T> src1) {
     static_assert(detail::is_select_support_type<T>, "select only supports bool, uint8_t, int8_t, "
         "fp8_e4m3fn_t, hifloat8_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t "

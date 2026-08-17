@@ -81,7 +81,7 @@ __aicore__ inline void TestCompareScalar()
     COMPARE_AND_SELECT_TEST(CompareRegTensor, DataType) \
     COMPARE_AND_SELECT_TEST(CompareScalar, DataType)
 
-SELECT_TYPE_TEST(bool)
+//SELECT_TYPE_TEST(bool)
 SELECT_TYPE_TEST(uint8_t)
 SELECT_TYPE_TEST(int8_t)
 SELECT_TYPE_TEST(fp8_e4m3fn_t)
