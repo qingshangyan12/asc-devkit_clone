@@ -3,13 +3,9 @@
 # testing both saturation (CTRL[48]=0) and non-saturation (CTRL[48]=1) modes.
 # Usage: bash scripts/test_boundary.sh [build_dir]
 
-set -e
-
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 EXAMPLE_DIR="$(dirname "$SCRIPT_DIR")"
 BUILD_DIR="${1:-${EXAMPLE_DIR}/build_boundary}"
-
-cd "$EXAMPLE_DIR"
 
 PASS=0
 FAIL=0
@@ -28,9 +24,6 @@ for SAT_MODE in 1 0; do
         echo "Scenario $SCENARIO_NUM ($MODE_NAME mode)"
         echo "=============================="
 
-        # Generate boundary value inputs with matching saturation mode
-        python3 scripts/gen_data.py -scenarioNum=$SCENARIO_NUM --boundary --saturation=$SAT_MODE
-
         # Rebuild for this scenario and saturation mode
         rm -rf "$BUILD_DIR"
         mkdir -p "$BUILD_DIR"
@@ -40,12 +33,16 @@ for SAT_MODE in 1 0; do
               -B "$BUILD_DIR" -S "$EXAMPLE_DIR" 2>&1 | tail -1
         cmake --build "$BUILD_DIR" -j 2>&1 | tail -1
 
+        # Generate boundary value inputs in BUILD_DIR so demo can find them
+        (cd "$BUILD_DIR" && python3 "$EXAMPLE_DIR/scripts/gen_data.py" \
+            -scenarioNum=$SCENARIO_NUM --boundary --saturation=$SAT_MODE)
+
         # Run kernel
         (cd "$BUILD_DIR" && ./demo)
 
         # Verify
-        if python3 scripts/verify_result.py -scenarioNum=$SCENARIO_NUM \
-            "$BUILD_DIR/output/output.bin" ./output/golden.bin; then
+        if python3 "$EXAMPLE_DIR/scripts/verify_result.py" -scenarioNum=$SCENARIO_NUM \
+            "$BUILD_DIR/output/output.bin" "$BUILD_DIR/output/golden.bin"; then
             echo "[PASS] Scenario $SCENARIO_NUM ($MODE_NAME)"
             PASS=$((PASS + 1))
         else
