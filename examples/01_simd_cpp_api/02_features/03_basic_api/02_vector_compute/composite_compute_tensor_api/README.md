@@ -52,6 +52,10 @@ composite_compute_tensor_api
 
   `muls_cast`的接口输出为`reg_tensor<half>`。为了让5组样例结果使用同一个`float`输出Tensor保存，第4行在样例内部额外调用`asc_half2float`将`half`结果转换回`float`。该转换仅用于统一样例输出格式，不改变`muls_cast`接口本身的返回类型和计算语义。
 
+- 样例实现：
+
+  `compute`函数从UB Tensor加载两组输入，依次调用`axpy`、`absdiff`、`exp_sub`、`fma`和`muls_cast`，并按行保存计算结果。Kernel负责GM与UB之间的数据搬运和流水同步，Host侧负责加载输入、启动Kernel并保存输出。
+
 - 样例规格：
 
   <table border="2">

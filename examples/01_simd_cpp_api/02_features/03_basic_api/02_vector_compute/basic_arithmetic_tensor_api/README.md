@@ -63,6 +63,10 @@ basic_arithmetic_tensor_api
 
   `sqrt`、`log`、`log2`和`log10`使用`abs(src_a) + 0.5`作为输入，保证输入位于函数的有效数学定义域内；`src_b`始终为正数，避免除零。
 
+- 样例实现：
+
+  `compute`函数从UB Tensor加载`src_a`、`src_b`和`slope`，调用16组基础计算接口，并将每组结果写入输出Tensor的独立行。Kernel负责GM与UB之间的数据搬运和流水同步，Host侧负责加载输入、启动Kernel并保存输出。
+
 - 样例规格：
 
   <table border="2">

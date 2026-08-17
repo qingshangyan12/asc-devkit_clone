@@ -46,8 +46,6 @@ __simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src);
 
 ## 调用示例
 
-完整可运行样例请参考[逻辑计算Tensor API样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/logical_compute_tensor_api/README.md)。
-
 ```cpp
 auto is_zero = !src_reg;
 auto inverted_mask = !mask_reg;

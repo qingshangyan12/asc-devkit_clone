@@ -51,6 +51,10 @@ histogram_compute_tensor_api
 
   默认模板参数为`histogram_half::low`和`histogram_mode::frequency`，因此第0行可以直接调用`histograms(initial, src)`。其他三行通过具名的`constexpr histogram_options`传入不同配置，编译期会选择对应的底层直方图计算接口。
 
+- 样例实现：
+
+  `compute`函数从UB Tensor加载输入，将目的寄存器各lane初始化为3，再按4种`histogram_options`组合调用`histograms`并保存结果。Kernel负责GM与UB之间的数据搬运和流水同步，Host侧负责加载输入、启动Kernel并保存输出。
+
 - 类型与区间说明：
 
   | 项目 | 说明 |
