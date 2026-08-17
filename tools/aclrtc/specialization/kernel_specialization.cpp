@@ -15,7 +15,7 @@
 #include "kernel_compilation_workspace.h"
 #include "kernel_specialization_diagnostics.h"
 #include "kernel_specialization_log.h"
-#include "resource_registry_adapter.h"
+#include "resource_registry.h"
 
 #include <atomic>
 #include <boost/filesystem.hpp>
@@ -25,12 +25,17 @@
 #include <cstring>
 #include <fcntl.h>
 #include <memory>
+#include <mutex>
 #include <unistd.h>
 
 namespace ascendc {
 namespace aclrtc {
 namespace {
 namespace fs = boost::filesystem;
+using specialization_compile::ResourceData;
+using specialization_compile::ResourceRegistry;
+using specialization_compile::ResourceStatus;
+using specialization_compile::ResourceStatusToString;
 
 bool IsKernelMetaSavingEnabled()
 {
@@ -118,9 +123,45 @@ void RemoveTemporaryOutputFileBestEffort(const fs::path& temporaryOutputPath)
 }
 } // namespace
 
-KernelSpecializationSession::KernelSpecializationSession(JitResourceRegistryAdapter& resourceRegistryAdapter) noexcept
-    : resourceRegistryAdapter_(resourceRegistryAdapter)
-{}
+aclError KernelSpecializationSession::PrepareCompilationResource(
+    const std::string& resourceId, MaterializedKernelCompilationResource& compilationResource)
+{
+    ResourceRegistry& resourceRegistry = ResourceRegistry::Instance();
+    const ResourceStatus loadStatus = resourceRegistry.Load(nullptr);
+    if (loadStatus != ResourceStatus::Success) {
+        ACLRTC_LOG_ERROR(
+            "Failed to load compilation resources before specializing resourceId '%s': status=%s(%d); check the "
+            "preceding ResourceRegistry logs and configured OPP paths",
+            resourceId.c_str(), ResourceStatusToString(loadStatus), static_cast<int32_t>(loadStatus));
+        return ACLRTC_ERROR_FAILURE;
+    }
+
+    // ResourceRegistry refreshes resourceDir on every lookup. Serialize specialization lookups until the returned
+    // paths are copied so another specialization request cannot replace them between Lookup and the copies.
+    static std::mutex resourceLookupMutex;
+    std::lock_guard<std::mutex> resourceLookupLock(resourceLookupMutex);
+    const ResourceData* resourceData = nullptr;
+    const ResourceStatus lookupStatus = resourceRegistry.Lookup(resourceId.c_str(), resourceData);
+    if (lookupStatus != ResourceStatus::Success) {
+        ACLRTC_LOG_ERROR(
+            "Failed to find or materialize compilation resource '%s': status=%s(%d); check resourceId and the "
+            "preceding ResourceRegistry logs",
+            resourceId.c_str(), ResourceStatusToString(lookupStatus), static_cast<int32_t>(lookupStatus));
+        return ACLRTC_ERROR_FAILURE;
+    }
+    if (resourceData == nullptr) {
+        ACLRTC_LOG_ERROR(
+            "ResourceRegistry returned success without resource data for resourceId '%s'; report this internal "
+            "ResourceRegistry error",
+            resourceId.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+
+    compilationResource.borrowedManifest = &resourceData->json;
+    compilationResource.ownedResourceDirectoryPath = resourceData->resourceDir;
+    compilationResource.externalSourceDirectoryPath = resourceData->sourceFilePath;
+    return ACLRTC_SUCCESS;
+}
 
 aclError KernelSpecializationSession::FinalizeSpecializationResult(
     const NormalizedKernelSpecializationRequest& specializationRequest,
@@ -156,25 +197,33 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
         return specializationResult;
     }
 
+    MaterializedKernelCompilationResource compilationResource;
+    specializationResult = PrepareCompilationResource(specializationRequest.resourceId, compilationResource);
+    if (specializationResult != ACLRTC_SUCCESS) {
+        const DiagnosticCollectionMode diagnosticCollectionMode = IsKernelMetaSavingEnabled()
+            ? DiagnosticCollectionMode::Enabled
+            : DiagnosticCollectionMode::Disabled;
+        KernelSpecializationDiagnostics diagnostics(
+            specializationRequest.specializationSessionId, diagnosticCollectionMode);
+        return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
+    }
+    return RunSpecializationWithMaterializedResource(specializationRequest, std::move(compilationResource));
+}
+
+aclError KernelSpecializationSession::RunSpecializationWithMaterializedResource(
+    const NormalizedKernelSpecializationRequest& specializationRequest,
+    MaterializedKernelCompilationResource compilationResource)
+{
     const bool saveKernelMetaEnabled = IsKernelMetaSavingEnabled();
+    KernelCompilationWorkspace compilationWorkspace(
+        std::move(compilationResource.ownedResourceDirectoryPath), WorktreeRetentionPolicy::RemoveAfterCompilation);
+
     const DiagnosticCollectionMode diagnosticCollectionMode = saveKernelMetaEnabled
         ? DiagnosticCollectionMode::Enabled
         : DiagnosticCollectionMode::Disabled;
     KernelSpecializationDiagnostics diagnostics(
         specializationRequest.specializationSessionId, diagnosticCollectionMode);
 
-    RegisteredJitResource registeredResource;
-    specializationResult =
-        resourceRegistryAdapter_.LoadAndLookupJitResource(specializationRequest.resourceId, registeredResource);
-    if (specializationResult != ACLRTC_SUCCESS) {
-        return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
-    }
-
-    const WorktreeRetentionPolicy worktreeRetentionPolicy = saveKernelMetaEnabled
-        ? WorktreeRetentionPolicy::RetainForDiagnostics
-        : WorktreeRetentionPolicy::RemoveAfterCompilation;
-    KernelCompilationWorkspace compilationWorkspace(
-        std::move(registeredResource.ownedWorktreePath), worktreeRetentionPolicy);
     if (saveKernelMetaEnabled) {
         fs::path resourceWorktreeRetentionPath;
         if (diagnostics.GetResourceWorktreeRetentionPath(resourceWorktreeRetentionPath)) {
@@ -182,32 +231,13 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
         }
     }
     diagnostics.RecordWorktreePath(compilationWorkspace.GetWorktreePath());
-    if (registeredResource.borrowedManifest == nullptr) {
-        ACLRTC_LOG_ERROR(
-            "ResourceRegistry returned a null Manifest for resourceId '%s'; fix the registered resource data",
-            specializationRequest.resourceId.c_str());
-        return FinalizeSpecializationResult(specializationRequest, diagnostics, ACLRTC_ERROR_FAILURE);
-    }
-    if (compilationWorkspace.GetWorktreePath().empty()) {
-        ACLRTC_LOG_ERROR(
-            "ResourceRegistry returned an empty worktree path for resourceId '%s'; fix the registry integration",
-            specializationRequest.resourceId.c_str());
-        return FinalizeSpecializationResult(specializationRequest, diagnostics, ACLRTC_ERROR_FAILURE);
-    }
-    if (registeredResource.externalSourceDirectoryPath.empty()) {
-        ACLRTC_LOG_ERROR(
-            "ResourceRegistry returned an empty sourceFilePath directory for resourceId '%s'; fix the registered "
-            "resource data",
-            specializationRequest.resourceId.c_str());
-        return FinalizeSpecializationResult(specializationRequest, diagnostics, ACLRTC_ERROR_FAILURE);
-    }
-    diagnostics.WriteManifestSnapshot(*registeredResource.borrowedManifest);
+    diagnostics.WriteManifestSnapshot(*compilationResource.borrowedManifest);
 
     KernelCompilationPlan compilationPlan;
-    specializationResult =
-        KernelCompilationPlanBuilder(specializationRequest, *registeredResource.borrowedManifest,
+    aclError specializationResult =
+        KernelCompilationPlanBuilder(specializationRequest, *compilationResource.borrowedManifest,
                                      compilationWorkspace.GetWorktreePath(),
-                                     registeredResource.externalSourceDirectoryPath)
+                                     compilationResource.externalSourceDirectoryPath)
             .BuildCompilationPlan(compilationPlan);
     if (specializationResult != ACLRTC_SUCCESS) {
         return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
@@ -296,8 +326,7 @@ aclError KernelSpecializationSession::PublishKernelElf(
 extern "C" aclError aclrtcKernelSpecialization(const aclrtcKernelSpecRequest* request, const char* outPath)
 {
     try {
-        ascendc::aclrtc::JitResourceRegistryAdapter resourceRegistryAdapter;
-        ascendc::aclrtc::KernelSpecializationSession specializationSession(resourceRegistryAdapter);
+        ascendc::aclrtc::KernelSpecializationSession specializationSession;
         return specializationSession.RunKernelSpecialization(request, outPath);
     } catch (const std::bad_alloc&) {
         ACLRTC_LOG_ERROR("Out of memory while specializing kernel");

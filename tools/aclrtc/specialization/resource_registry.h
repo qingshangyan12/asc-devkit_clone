@@ -34,6 +34,8 @@ namespace specialization_compile {
 enum class ResourceStatus { Success, NotFound, Conflict, InvalidResource, IoError, LoadError, InternalError };
 enum class ResourceSourceType { External, Custom, BuiltIn };
 
+const char* ResourceStatusToString(ResourceStatus status) noexcept;
+
 struct ResourceData {
     nlohmann::json json;
     std::string resourceDir;
