@@ -14,13 +14,30 @@ namespace mc2_ops_hccl {
 
 constexpr u64 AR_M2M_1D_MAX_DATA_SIZE = 8 * 1024 * 1024;
 
+namespace {
+constexpr u64 AR_PCIE_PARALLEL_MAX_DATA_SIZE = 32 * 1024 * 1024;
+} // namespace
+
 SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
-    (void)topoInfo;
-    (void)opParam;
     (void)configAlgMap;
+    CHK_PRT_RET(
+        topoInfo == nullptr, HCCL_ERROR("[AllReduceAutoSelector] topoInfo is nullptr."), SelectorStatus::NOT_MATCH);
+    const u64 dataTypeSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
+    const u64 dataSize = opParam.DataDes.count * dataTypeSize;
+    const bool specialDataOrReduce =
+        Is64BitDataType(opParam.DataDes.dataType) || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
+    // PCIE 定制机型：mesh 无法全连通时，普通类型且 < 32MB 走 Parallel 四模板流水
+    // （hccl 同场景大数据走 PipeLinePcie、special 走 SequenceAicpuReducePcie，均未迁移）
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix &&
+        !IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH) && !specialDataOrReduce &&
+        dataSize < AR_PCIE_PARALLEL_MAX_DATA_SIZE) {
+        selectAlgName = "InsAllReduceParallelMesh1DNHRPcie";
+        HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
     selectAlgName = "AicpuAllReduceSoleMeshOneShot";
     return SelectorStatus::MATCH;
 }
