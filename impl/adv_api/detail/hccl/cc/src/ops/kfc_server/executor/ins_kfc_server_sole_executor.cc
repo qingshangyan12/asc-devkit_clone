@@ -61,7 +61,7 @@ HcclResult InsKfcServerSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
 {
     HCCL_INFO("[InsKfcServerSoleExecutor][Orchestrate] Orchestrate Start");
 
-    CHK_RET(InitCommInfo(param, &resCtx.topoInfo));
+    InitCommInfo(param, &resCtx.topoInfo);
 
     threads_ = resCtx.threads;
     if (param.engine != CommEngine::COMM_ENGINE_CCU) {
