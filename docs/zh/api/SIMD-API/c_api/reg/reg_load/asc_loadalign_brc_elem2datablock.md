@@ -26,19 +26,17 @@
 
 ## 功能说明
 
-从Unified Buffer（UB）连续读取8个元素，并将第i个源元素广播到目的矢量数据寄存器的第i个DataBlock（32字节）中。b16类型的实际读取地址需16字节对齐，b32类型的实际读取地址需32字节对齐。本接口提供三种功能模式：
+从Unified Buffer（UB）连续读取8个元素，并将每个元素广播到目的矢量数据寄存器对应的一个`DataBlock`（32字节）中。`b16`类型的实际读取地址需16字节对齐，`b32`类型的实际读取地址需32字节对齐。搬运过程中数据格式和内容保持不变。本接口提供三种功能模式：
 
-- 无偏移搬入：从`src`起始地址读取8个元素并分别广播到对应DataBlock。
-- 带偏移搬入：从`src`起始地址加上`offset * sizeof(dtype)`字节偏移位置读取8个元素并分别广播到对应DataBlock。
-- 带地址寄存器偏移搬入：通过`addr_reg`类型的地址寄存器指定起始地址偏移，读取8个元素并分别广播到对应DataBlock。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。接口不会修改`src`指针或按值传入的`offset`。
+- **连续对齐搬入模式**：将UB源地址的数据搬入到矢量数据寄存器，由用户自行更新源地址。
+- **立即数偏移搬入模式**：从相对源起始地址偏移指定距离的位置搬入数据。本接口不会自动更新源地址。
+- **地址寄存器偏移搬入模式**：通过地址寄存器指定相对源起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬入场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
 
-本接口仅在AIV上执行有效，在AIC上调用为空操作。
+本接口仅在AIV上生效，非AIV调用直接返回。
 
 ## 函数原型
 
-### 无偏移搬入
-
-#### 模板原型（占位符形式）
+### 连续对齐搬入模式
 
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_<dtype>& dst,
@@ -52,14 +50,12 @@ dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`i
 #### 典型示例
 
 ```c
-// 示例：从UB读取8个half元素并广播填充到目的矢量寄存器。
+// 示例：half类型。
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
                                                             __ubuf__ half* src)
 ```
 
-### 带偏移搬入
-
-#### 模板原型（占位符形式）
+### 立即数偏移搬入模式
 
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_<dtype>& dst,
@@ -74,15 +70,13 @@ dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`i
 #### 典型示例
 
 ```c
-// 示例：从UB偏移8个half元素处读取并广播。
+// 示例：half类型。
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
                                                             __ubuf__ half* src,
                                                             int32_t offset)
 ```
 
-### 带地址寄存器偏移搬入
-
-#### 模板原型（占位符形式）
+### 地址寄存器偏移搬入模式
 
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_<dtype>& dst,
@@ -97,7 +91,7 @@ dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`i
 #### 典型示例
 
 ```c
-// 示例：按地址寄存器偏移从UB读取8个half元素并广播填充。
+// 示例：half类型。
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
                                                             __ubuf__ half* src,
                                                             addr_reg offset)
@@ -105,28 +99,34 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
 
 ## 参数说明
 
-**表1** 参数说明（无偏移搬入）
+### 连续对齐搬入模式
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入VL长度数据。 |
-| src | 输入 | 源UB地址。从`src`起始位置连续读取8个元素，b16类型的实际读取地址需16字节对齐，b32类型的实际读取地址需32字节对齐。 |
+| dst | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。 |
+| src | 输入 | 源UB地址，实际读取地址需满足对齐要求：b16类型需16字节对齐，b32类型需32字节对齐。 |
 
-**表2** 参数说明（带偏移搬入）
+### 立即数偏移搬入模式
 
-| 参数名 | 输入/输出 | 描述 |
-|---|---|---|
-| dst | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入VL长度数据。 |
-| src | 输入 | 源UB地址。从`src`起始位置连续读取8个元素，b16类型的实际读取地址需16字节对齐，b32类型的实际读取地址需32字节对齐。 |
-| offset | 输入 | 相对`src`起始地址的偏移，单位为元素个数。`offset`为负值表示源地址向低地址方向移动。 |
-
-**表3** 参数说明（带地址寄存器偏移搬入）
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入VL长度数据。 |
-| src | 输入 | 源UB地址。从`src`起始位置连续读取8个元素，b16类型的实际读取地址需16字节对齐，b32类型的实际读取地址需32字节对齐。 |
-| offset | 输入 | 地址寄存器，类型为`addr_reg`，须通过[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。 |
+| dst | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。 |
+| src | 输入 | 源UB地址，实际读取地址需满足对齐要求：b16类型需16字节对齐，b32类型需32字节对齐。 |
+| offset | 输入 | 相对`src`起始地址的偏移，单位为元素个数。 |
+
+### 地址寄存器偏移搬入模式
+
+**表3** 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。 |
+| src | 输入 | 源UB地址，实际读取地址需满足对齐要求：b16类型需16字节对齐，b32类型需32字节对齐。 |
+| offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。 |
 
 矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -134,24 +134,101 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
+
+### 通用约束
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- src与dst的dtype必须完全一致，dtype不一致触发异常。
-- b16类型的实际读取地址和偏移后地址需16字节对齐，b32类型的实际读取地址和偏移后地址需32字节对齐，并且在UB地址空间内且不越界，否则会报错。
+- b16类型的实际读取地址和偏移后的UB地址必须16字节对齐，b32类型的实际读取地址和偏移后的UB地址必须32字节对齐，并且在UB地址空间内且不越界，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
-- 针对带地址寄存器偏移搬入：必须先调用`asc_update_addr_reg`接口。
+
+### 地址寄存器偏移搬入模式
+
+必须先调用`asc_update_addr_reg`接口。
 
 ## 调用示例
 
+将以下代码保存为`example.asc`后，执行对应的编译运行命令。
+
+<!-- npu="950" id8 -->
+
+在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
+
 ```cpp
-vector_half dst;
-__ubuf__ half* src;
-asc_loadalign_brc_elem2datablock(dst, src);
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr uint32_t INPUT_ELEMENTS = 128;
+constexpr uint32_t OUTPUT_ELEMENTS = 128;
+constexpr uint32_t INPUT_BYTES = INPUT_ELEMENTS * sizeof(uint16_t);
+constexpr uint32_t OUTPUT_BYTES = OUTPUT_ELEMENTS * sizeof(uint16_t);
+
+__simd_vf__ inline void asc_loadalign_brc_elem2datablock_vf(
+    __ubuf__ uint16_t* output, __ubuf__ uint16_t* input)
+{
+    vector_bool mask = asc_create_mask_b16(PAT_ALL);
+    vector_uint16_t value;
+    asc_loadalign_brc_elem2datablock(value, input);
+    asc_storealign(output, value, mask);
+}
+
+__global__ __vector__ void asc_loadalign_brc_elem2datablock_kernel(
+    __gm__ uint16_t* output, __gm__ uint16_t* input)
+{
+    asc_init();
+    __ubuf__ uint16_t input_local[INPUT_ELEMENTS];
+    __ubuf__ uint16_t output_local[OUTPUT_ELEMENTS];
+    asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_vf_call<asc_loadalign_brc_elem2datablock_vf>(output_local, input_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint16_t> input(INPUT_ELEMENTS);
+    std::vector<uint16_t> output(OUTPUT_ELEMENTS, 0xffff);
+    std::vector<uint16_t> golden(OUTPUT_ELEMENTS, 0);
+    for (uint32_t i = 0; i < INPUT_ELEMENTS; ++i) input[i] = static_cast<uint16_t>(i + 1);
+    for (uint32_t block = 0; block < 8; ++block) {
+        for (uint32_t i = 0; i < 16; ++i) {
+            golden[block * 16 + i] = input[block];
+        }
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint16_t* input_device = nullptr;
+    uint16_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_loadalign_brc_elem2datablock_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success]" : "[Failed]") << " asc_loadalign_brc_elem2datablock example." << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

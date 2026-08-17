@@ -39,7 +39,7 @@ __aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits,
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -60,8 +60,83 @@ PIPE_S
 
 ## 调用示例
 
+将以下代码保存为`example.asc`后，执行对应的编译运行命令。
+
+<!-- npu="950" id8 -->
+
+在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
+
 ```cpp
-uint64_t bits = 0x7;
-int64_t idx = 0x2;
-uint64_t res = asc_clear_nthbit(bits, idx);
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void print_data(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+constexpr uint32_t ELEMENTS = 8;
+
+__global__ __vector__ void asc_clear_nthbit_kernel(__gm__ uint64_t* output)
+{
+    asc_init();
+    output[0] = asc_clear_nthbit(15, 1);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint64_t> input = {0};
+    std::vector<uint64_t> golden = {13};
+    input.resize(ELEMENTS, 0);
+    golden.resize(ELEMENTS, 0);
+    std::vector<uint64_t> output(ELEMENTS, 0xffffffffffffffffULL);
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint64_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (ELEMENTS) * sizeof(uint64_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(output_device, input.size() * sizeof(uint64_t), input.data(), input.size() * sizeof(uint64_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_clear_nthbit_kernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(uint64_t), output_device, output.size() * sizeof(uint64_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = compare_data(output, golden);
+    std::cout << (passed ? "[Success] asc_clear_nthbit passed." : "[Failed] asc_clear_nthbit failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

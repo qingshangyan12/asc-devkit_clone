@@ -26,18 +26,16 @@
 
 ## 功能说明
 
-将Unified Buffer（UB）中从任意字节地址开始的32字节数据搬入非对齐寄存器[vector_load_unalign](../reg_data_types/data_type_definition.md#非对齐寄存器)，作为非对齐搬入的预处理阶段。本接口需要与[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)配合使用。本接口提供两种功能模式：
+根据无需32字节对齐的有效起始地址初始化[非对齐寄存器](../reg_data_types/data_type_definition.md#非对齐寄存器)，为后续非对齐搬入准备前置数据缓存。接口将有效起始地址向低地址方向对齐到32字节边界，再将包含该起始地址的一个`DataBlock`（32字节）从Unified Buffer（UB）搬入非对齐寄存器。本接口只负责初始化，不会生成VL长度的搬入结果。
 
-- 无偏移预处理搬入：从`src`起始地址搬入数据。
-- 带地址寄存器偏移预处理搬入：通过`addr_reg`类型的地址寄存器指定起始地址偏移并搬入数据。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。接口不会修改`src`指针或按值传入的`offset`。
+本接口提供两种功能模式：
 
-本接口仅在AIV上执行有效，在AIC上调用为空操作。
+- **源地址预处理模式**：以UB源地址作为有效起始地址，为[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的源地址Post Update搬入模式准备前置数据缓存。
+- **地址寄存器偏移预处理模式**：以UB源基地址与地址寄存器记录的实际字节偏移之和作为有效起始地址，为`asc_loadunalign_postupdate`的地址寄存器Post Update搬入模式准备前置数据缓存。
 
 ## 函数原型
 
-### 无偏移预处理搬入
-
-#### 模板原型（占位符形式）
+### 源地址预处理模式
 
 ```c
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
@@ -55,9 +53,7 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
                                                 __ubuf__ float* src)
 ```
 
-### 带地址寄存器偏移预处理搬入
-
-#### 模板原型（占位符形式）
+### 地址寄存器偏移预处理模式
 
 ```c
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
@@ -79,42 +75,138 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
 
 ## 参数说明
 
-**表1** 参数说明（无偏移预处理搬入）
+### 源地址预处理模式
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的非对齐寄存器。搬入32字节数据。 |
-| src | 输入 | 源UB地址。起始地址无需32字节对齐。 |
+| dst | 输出 | 目的非对齐寄存器。保存包含有效起始地址的一个`DataBlock`，作为后续非对齐搬入的前置数据缓存。 |
+| src | 输入 | 源UB地址，也是本次初始化的有效起始地址，无需32字节对齐。 |
 
-**表2** 参数说明（带地址寄存器偏移预处理搬入）
+### 地址寄存器偏移预处理模式
+
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的非对齐寄存器。搬入32字节数据。 |
-| src | 输入 | 源UB地址。起始地址无需32字节对齐。 |
-| offset | 输入 | 地址寄存器，类型为`addr_reg`，须通过[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。 |
+| dst | 输出 | 目的非对齐寄存器。保存包含有效起始地址的一个`DataBlock`，作为后续非对齐搬入的前置数据缓存。 |
+| src | 输入 | 源UB基地址。该地址与`offset`共同确定本次初始化的有效起始地址。 |
+| offset | 输入 | 地址寄存器，类型为`addr_reg`。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：`b8`、`b16`、`b32`模式分别以1字节、2字节、4字节为偏移单位。 |
 
 ## 返回值说明
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
+
+### 通用约束
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- 实际访问地址在接口内部向低地址方向对齐到32字节边界后读取数据。传入的`src`或`src`与`offset`确定的地址无需32字节对齐，对齐后的32字节读取范围须在UB地址空间内，否则会报错。
+- 实际访问地址在接口内部向低地址方向对齐到32字节边界后读取数据。传入的`src`或`src`与`offset`确定的地址无需32字节对齐，对齐后的32字节读取范围必须在UB地址空间内，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
-- 该接口必须与[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)配合使用。
+- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+
+### 源地址预处理模式
+
+- 初始化和紧随其后的搬入必须使用相同的`src`地址。
+- 与[asc_loadunalign](asc_loadunalign.md)配合使用时，每次搬入前都必须调用本模式重新初始化。
+- 与[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的源地址Post Update搬入模式配合使用时，首次搬入前必须调用本模式。后续调用继续使用接口按`count`更新后的源地址时，可以复用更新后的非对齐寄存器；如果用户另外修改了源地址，必须根据新地址重新初始化。
+
+### 地址寄存器偏移预处理模式
+
+- 必须先调用[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)生成`offset`。
+- 初始化和紧随其后的搬入必须使用相同的`src`和`offset`。
+- 与[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)的地址寄存器Post Update搬入模式配合使用时，每次循环迭代的首次搬入前都必须使用该次迭代的起始偏移重新初始化。同一次循环迭代内的后续调用继续使用接口按`inc`更新后的地址寄存器时，可以复用更新后的非对齐寄存器。
 
 ## 调用示例
 
+将以下代码保存为`example.asc`后，执行对应的编译运行命令。
+
+<!-- npu="950" id8 -->
+
+在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
+
 ```cpp
-vector_load_unalign dst;
-__ubuf__ int8_t* src;
-asc_loadunalign_pre(dst, src);
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr uint32_t INPUT_BYTES = 288;
+constexpr uint32_t OUTPUT_BYTES = 512;
+
+__simd_vf__ inline void asc_loadunalign_pre_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+{
+    vector_bool mask = asc_create_mask_b8(PAT_ALL);
+    vector_load_unalign unalign;
+    __ubuf__ uint8_t* src = input + 1;
+    asc_loadunalign_pre(unalign, src);
+    vector_uint8_t value;
+    asc_loadunalign(value, unalign, src);
+    asc_storealign(output, value, mask);
+
+    for (uint16_t i = 0; i < 1; ++i) {
+        addr_reg offset = asc_update_addr_reg_b8(256);
+        vector_load_unalign offset_unalign;
+        asc_loadunalign_pre(offset_unalign, src, offset);
+        asc_loadunalign_postupdate(value, offset_unalign, src, offset, 0);
+        asc_storealign(output + 256, value, mask);
+    }
+}
+
+__global__ __vector__ void asc_loadunalign_pre_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+{
+    asc_init();
+    __ubuf__ uint8_t input_local[INPUT_BYTES];
+    __ubuf__ uint8_t output_local[OUTPUT_BYTES];
+    asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_vf_call<asc_loadunalign_pre_vf>(output_local, input_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint8_t> input(INPUT_BYTES);
+    std::vector<uint8_t> output(OUTPUT_BYTES, 0xff);
+    std::vector<uint8_t> golden(OUTPUT_BYTES, 0);
+    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
+    for (uint32_t i = 0; i < 256; ++i) {
+        golden[i] = input[i + 1];
+        golden[i + 256] = input[i + 1];
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t* input_device = nullptr;
+    uint8_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_loadunalign_pre_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success]" : "[Failed]") << " asc_loadunalign_pre example." << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

@@ -72,12 +72,92 @@ PIPE_S
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口仅设置填充值，实际填充由后续调用的多维数据搬运接口在搬运过程中取用该填充值完成，须先调用本接口写入配置，再调用对应搬运接口。
 - 常数填充模式下，还需配置各维左右两侧的填充元素数。`loop0`的左右填充元素数通过`asc_ndim_copy_gm2ub`的`loop0_lp_count`和`loop0_rp_count`参数配置，`loop1`至`loop4`的左右填充元素数通过[asc_set_ndim_pad_count](./asc_set_ndim_pad_count.md)配置。
-- 配置写入后对后续所有`asc_ndim_copy_gm2ub`接口调用生效，直至再次调用本接口覆盖配置；不同搬运任务间若需不同填充值，应在调用搬运接口前重新调用本接口设置。
+- 填充值配置会持续生效，直至重新配置。若后续搬运任务使用不同的填充值，应在调用`asc_ndim_copy_gm2ub`前调用本接口重新配置。
 - 填充值仅在搬运接口选择常数填充模式时被取用；若选为最近值填充模式，本接口设置不生效。
 
 ## 调用示例
 
+将以下代码保存为`example.asc`后，执行对应的编译运行命令。
+
+<!-- npu="950" id8 -->
+
+在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
+
 ```cpp
-half pad_value = 2.0;
-asc_set_ndim_pad_value(pad_value);
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+
+constexpr uint32_t INPUT_BYTES = 6;
+constexpr uint32_t OUTPUT_BYTES = 20;
+
+__global__ __vector__ void asc_set_ndim_pad_value_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+{
+    asc_init();
+    __ubuf__ uint8_t local[32];
+    asc_set_ndim_loop0_stride(1, 1);
+    asc_set_ndim_loop1_stride(5, 3);
+    asc_set_ndim_loop2_stride(0, 0);
+    asc_set_ndim_loop3_stride(0, 0);
+    asc_set_ndim_loop4_stride(0, 0);
+    asc_set_ndim_pad_value(static_cast<uint8_t>(42));
+    asc_ndim_pad_count_config config;
+    config.loop1_lp_count = 1;
+    config.loop1_rp_count = 1;
+    asc_set_ndim_pad_count(config);
+    asc_ndim_copy_gm2ub(local, input, 3, 2, 1, 1, 1, 1, 1, true,
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
+    asc_sync_mte2(0);
+    asc_copy_ub2gm_align(output, local, OUTPUT_BYTES);
+    asc_sync_mte3(0);
+}
+
+void print_data(const char* name, const std::vector<uint8_t>& data)
+{
+    std::cout << name << ":";
+    const uint32_t count = data.size() < 32 ? data.size() : 32;
+    for (uint32_t i = 0; i < count; ++i) std::cout << ' ' << +data[i];
+    if (data.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint8_t> input(INPUT_BYTES), output(OUTPUT_BYTES, 0), golden(OUTPUT_BYTES, 0);
+    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i + 1);
+    for (uint32_t i = 0; i < OUTPUT_BYTES; ++i) golden[i] = 42;
+    for (uint32_t row = 0; row < 2; ++row) {
+        for (uint32_t column = 0; column < 3; ++column) golden[(row + 1) * 5 + column + 1] = input[row * 3 + column];
+    }
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t *input_device = nullptr, *output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(output_device, OUTPUT_BYTES, output.data(), OUTPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_set_ndim_pad_value_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_set_ndim_pad_value passed." : "[Failed] asc_set_ndim_pad_value failed.") << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

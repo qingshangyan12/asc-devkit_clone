@@ -26,21 +26,17 @@
 
 ## 功能说明
 
-将Unified Buffer（UB）中起始地址任意字节对齐的连续数据搬入矢量数据寄存器，搬入数据量为VL。搬运完成后启用Post Update模式，自动更新源地址指针或地址寄存器记录的地址偏移量。本接口是非对齐搬入的第二阶段，需要先调用[asc_loadunalign_pre](asc_loadunalign_pre.md)初始化非对齐寄存器[vector_load_unalign](../reg_data_types/data_type_definition.md#非对齐寄存器)。本接口提供两种功能模式：
+将Unified Buffer（UB）中起始地址无需32字节对齐的VL长度连续数据搬入矢量数据寄存器。接口将非对齐寄存器中缓存的前置数据与从UB读取的后续数据拼接，得到从本次有效起始地址开始的VL长度数据。搬入完成后，接口自动更新源地址指针或地址寄存器记录的地址偏移，并将非对齐寄存器更新为包含下一次有效起始地址所需前置数据的缓存。本接口提供两种功能模式：
 
-- Post Update搬入：从`src1`起始地址搬运数据，搬运完成后启用Post Update模式，自动将传入的源地址指针向后偏移`count * sizeof(dtype)`字节，无需手动偏移地址。
+- **源地址Post Update搬入模式**：以当前源地址作为本次有效起始地址。搬入完成后，将源地址增加`count × sizeof(dtype)`字节，并同步维护下一次搬入所需的非对齐寄存器状态。
 
-- 带地址寄存器偏移Post Update搬入：`src1`为固定的基地址指针，接口不会修改该指针。实际搬入地址为`src1`的底层UB地址与`offset`记录的实际字节偏移之和。接口先使用当前`offset`搬入数据，搬入完成后再将`offset`记录的地址偏移量增加`inc`个元素。该模式需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
+- **地址寄存器Post Update搬入模式**：以UB源基地址与地址寄存器记录的偏移之和作为有效起始地址。搬入完成后，地址偏移增加`inc × sizeof(dtype)`字节，源基地址保持不变，并同步更新非对齐寄存器。
 
-`asc_update_addr_reg`根据循环索引生成每轮起始偏移；`inc`仅在当前循环迭代内更新`offset`，不会影响下一轮的起始偏移。本轮最后一次使用`offset`时，可将`inc`设置为0。
-
-本接口仅在AIV上执行有效，在AIC上调用为空操作。
+`asc_update_addr_reg`根据当前循环迭代的索引生成该次迭代的起始偏移；`inc`只更新当前循环迭代内的地址偏移，不影响下一次循环迭代的起始偏移。
 
 ## 函数原型
 
-### Post Update搬入
-
-#### 模板原型（占位符形式）
+### 源地址Post Update搬入模式
 
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
@@ -51,7 +47,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。当dtype为`int4b_t`时，`dst`的实际类型为`vector_int4x2_t`。
 
 #### 典型示例
 
@@ -62,9 +58,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
                                                        uint32_t count)
 ```
 
-### 带地址寄存器偏移Post Update搬入
-
-#### 模板原型（占位符形式）
+### 地址寄存器Post Update搬入模式
 
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
@@ -76,7 +70,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。当dtype为`int4b_t`时，`dst`的实际类型为`vector_int4x2_t`。
 
 #### 典型示例
 
@@ -90,92 +84,147 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
 
 ## 参数说明
 
-**表1** 参数说明（Post Update搬入）
+### 源地址Post Update搬入模式
+
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器。dtype须与src1一致，搬入VL长度数据。 |
-| src0 | 输入 | 非对齐寄存器。保存非32字节对齐的数据，该寄存器大小为32字节，须通过[asc_loadunalign_pre](asc_loadunalign_pre.md)预先初始化。 |
+| dst | 输出 | 目的矢量数据寄存器。dtype必须与`src1`一致，搬入VL长度数据。 |
+| src0 | 输入/输出 | 非对齐寄存器，大小为32字节。本接口调用后，`src0`更新为包含下一次有效起始地址所需前置数据的缓存。 |
 | src1 | 输入/输出 | 源UB地址，实际读取地址无需32字节对齐。 |
-| count | 输入 | Post Update步长，单位为元素个数。接口使用当前`src1`地址完成搬入后，将`src1`指针增加`count * sizeof(dtype)`字节。 |
+| count | 输入 | Post Update步长，单位为元素个数。接口使用当前`src1`地址完成搬入后，将`src1`指针增加`count × sizeof(dtype)`字节。 |
 
-**表2** 参数说明（带地址寄存器偏移Post Update搬入）
+### 地址寄存器Post Update搬入模式
+
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器。dtype须与src1一致，搬入VL长度数据。 |
-| src0 | 输入 | 非对齐寄存器。保存非32字节对齐的数据，该寄存器大小为32字节，须通过[asc_loadunalign_pre](asc_loadunalign_pre.md)预先初始化。 |
-| src1 | 输入 | 源UB地址，实际读取地址无需32字节对齐。 |
-| offset | 输入 | 地址寄存器，类型为`addr_reg`，须通过[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。 |
-| inc | 输入 | Post Update步长，单位为元素个数。接口使用当前`offset`完成搬入后，将`offset`记录的地址偏移量增加`inc * sizeof(dtype)`字节。 |
+| dst | 输出 | 目的矢量数据寄存器。dtype必须与`src1`一致，搬入VL长度数据。 |
+| src0 | 输入/输出 | 非对齐寄存器，大小为32字节。本接口调用后，`src0`更新为包含当前循环迭代内下一次有效起始地址所需前置数据的缓存。 |
+| src1 | 输入 | 源UB基地址。该地址与`offset`共同确定实际读取地址，实际读取地址无需32字节对齐。 |
+| offset | 输入/输出 | 地址寄存器，类型为`addr_reg`。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：`b8`、`b16`、`b32`模式分别以1字节、2字节、4字节为偏移单位。本接口完成搬入后会根据`inc`更新`offset`。 |
+| inc | 输入 | Post Update步长，单位为元素个数。接口使用当前`offset`完成搬入后，将`offset`记录的地址偏移量增加`inc × sizeof(dtype)`字节。 |
 
 ## 返回值说明
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
+
+### 通用约束
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- src1与dst的dtype必须完全一致，dtype不一致触发异常。
-- `src1`起始地址或`src1`与`offset`确定的实际访问地址无需32字节对齐，但实际访问范围须在UB地址空间内，否则会报错。
+- `src1`起始地址或`src1`与`offset`确定的实际访问地址无需32字节对齐，但实际访问范围必须在UB地址空间内，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
-- 针对带地址寄存器偏移搬入：必须先调用`asc_update_addr_reg`接口。
-- 该接口必须与[asc_loadunalign_pre](asc_loadunalign_pre.md)配合使用。
+- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+
+### 源地址Post Update搬入模式
+
+- 首次搬入前必须调用[asc_loadunalign_pre](asc_loadunalign_pre.md)，且初始化和紧随其后的首次搬入必须使用相同的`src1`地址。
+- 后续调用继续使用上一次调用更新后的`src1`时，可以复用更新后的`src0`；如果用户另外修改了`src1`，必须根据新地址重新初始化`src0`。
+
+### 地址寄存器Post Update搬入模式
+
+- 必须先调用`asc_update_addr_reg`接口。
+- `asc_update_addr_reg`生成当前循环迭代的起始偏移后，必须在该次迭代首次搬入前使用相同的`src1`和`offset`调用[asc_loadunalign_pre](asc_loadunalign_pre.md)重新初始化`src0`。
+- 同一次循环迭代内的后续调用继续使用接口按`inc`更新后的`offset`时，可以复用更新后的`src0`。
+- 当前循环迭代中最后一次使用`offset`时，可将`inc`设置为0。
 
 ## 调用示例
 
-### Post Update搬入
+将以下代码保存为`example.asc`后，执行对应的编译运行命令。
 
-下面以`int8_t`为例，通过Post Update模式将数据从非对齐源地址连续搬运到非对齐目的地址。`count`表示相邻两次搬运起始地址之间的元素间隔；连续搬运完整VL时，`count`应设置为一个VL包含的`int8_t`元素个数。搬入侧的非对齐寄存器只需在循环前初始化一次，循环内每次调用`asc_loadunalign_postupdate`后，`src_addr`都会自动增加`count`个元素。搬出侧使用[asc_storeunalign_postupdate](../reg_store/asc_storeunalign_postupdate.md)，每次搬出后`dst_addr`同样增加`count`个元素；该接口会在非对齐寄存器中缓存尾部数据，因此循环结束后必须调用[asc_storeunalign_post_postupdate](../reg_store/asc_storeunalign_post_postupdate.md)完成尾部写回。
+<!-- npu="950" id8 -->
 
-```cpp
-__simd_vf__ inline void load_store_postupdate(
-    __ubuf__ int8_t* dst_base, __ubuf__ int8_t* src_base,
-    uint32_t count, uint16_t repeat_times)
-{
-    vector_int8_t data;
-    vector_load_unalign load_unalign_reg;
-    vector_store_unalign store_unalign_reg;
-    __ubuf__ int8_t* src_addr = src_base;
-    __ubuf__ int8_t* dst_addr = dst_base;
-    asc_loadunalign_pre(load_unalign_reg, src_addr);
-    for (uint16_t i = 0; i < repeat_times; ++i) {
-        asc_loadunalign_postupdate(data, load_unalign_reg, src_addr, count);
-        asc_storeunalign_postupdate(dst_addr, store_unalign_reg, data, count);
-    }
-    asc_storeunalign_post_postupdate(dst_addr, store_unalign_reg, 0);
-}
+在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
-
-### 每轮调用两次带地址寄存器偏移Post Update搬入
-
-下面以`int8_t`为例，每轮循环连续搬运两个VL。`asc_update_addr_reg_b8`的迭代偏移量为`2 * vl_elements`。第一次调用将`inc`设置为`vl_elements`，使`offset`在搬运完成后增加一个VL；第二次调用使用更新后的`offset`搬运同一轮内的第二个VL。第二次调用后不再使用当前`offset`，因此其`inc`设置为0。两次搬入的数据分别搬出，目的地址随每次搬出自动推进一个VL；循环结束后再统一完成尾部写回。
+<!-- end id8 -->
 
 ```cpp
-__simd_vf__ inline void load_store_two_vl_per_loop(
-    __ubuf__ int8_t* dst_base, __ubuf__ int8_t* src_addr,
-    uint32_t vl_elements, uint16_t repeat_times)
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr uint32_t INPUT_BYTES = 544;
+constexpr uint32_t OUTPUT_BYTES = 1024;
+
+__simd_vf__ inline void asc_loadunalign_postupdate_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
-    vector_int8_t data0;
-    vector_int8_t data1;
-    vector_load_unalign load_unalign_reg;
-    vector_store_unalign store_unalign_reg;
-    __ubuf__ int8_t* dst_addr = dst_base;
-    addr_reg offset;
-    for (uint16_t i = 0; i < repeat_times; ++i) {
-        offset = asc_update_addr_reg_b8(2 * vl_elements);
-        asc_loadunalign_pre(load_unalign_reg, src_addr, offset);
-        asc_loadunalign_postupdate(data0, load_unalign_reg, src_addr, offset, vl_elements);
-        asc_storeunalign_postupdate(dst_addr, store_unalign_reg, data0, vl_elements);
-        asc_loadunalign_postupdate(data1, load_unalign_reg, src_addr, offset, 0);
-        asc_storeunalign_postupdate(dst_addr, store_unalign_reg, data1, vl_elements);
+    vector_bool mask = asc_create_mask_b8(PAT_ALL);
+    vector_load_unalign unalign;
+    __ubuf__ uint8_t* src = input + 1;
+    asc_loadunalign_pre(unalign, src);
+    vector_uint8_t value;
+    asc_loadunalign_postupdate(value, unalign, src, 256);
+    asc_storealign(output, value, mask);
+    asc_loadunalign_postupdate(value, unalign, src, 256);
+    asc_storealign(output + 256, value, mask);
+
+    __ubuf__ uint8_t* base = input + 1;
+    for (uint16_t i = 0; i < 1; ++i) {
+        addr_reg offset = asc_update_addr_reg_b8(256);
+        vector_load_unalign offset_unalign;
+        asc_loadunalign_pre(offset_unalign, base, offset);
+        asc_loadunalign_postupdate(value, offset_unalign, base, offset, 256);
+        asc_storealign(output + 512, value, mask);
+        asc_loadunalign_postupdate(value, offset_unalign, base, offset, 0);
+        asc_storealign(output + 768, value, mask);
     }
-    asc_storeunalign_post_postupdate(dst_addr, store_unalign_reg, 0);
+}
+
+__global__ __vector__ void asc_loadunalign_postupdate_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+{
+    asc_init();
+    __ubuf__ uint8_t input_local[INPUT_BYTES];
+    __ubuf__ uint8_t output_local[OUTPUT_BYTES];
+    asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_vf_call<asc_loadunalign_postupdate_vf>(output_local, input_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint8_t> input(INPUT_BYTES);
+    std::vector<uint8_t> output(OUTPUT_BYTES, 0xff);
+    std::vector<uint8_t> golden(OUTPUT_BYTES, 0);
+    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
+    for (uint32_t i = 0; i < 512; ++i) {
+        golden[i] = input[i + 1];
+        golden[i + 512] = input[i + 1];
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t* input_device = nullptr;
+    uint8_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_loadunalign_postupdate_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success]" : "[Failed]") << " asc_loadunalign_postupdate example." << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```

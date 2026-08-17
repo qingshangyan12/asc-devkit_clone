@@ -26,13 +26,13 @@
 
 ## 功能说明
 
-从Unified Buffer（UB）中起始地址32字节对齐的位置读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`，每个矢量数据寄存器写入VL长度数据。搬运完成后启用Post Update模式，自动将传入的源地址指针向后偏移`offset * sizeof(dtype)`字节，无需手动偏移地址。
+从Unified Buffer（UB）中起始地址32字节对齐的位置读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。搬运完成后启用Post Update模式，自动更新源地址指针。
 
-本接口仅在AIV上执行有效，在AIC上调用为空操作。
+本接口仅在AIV上生效，非AIV调用直接返回。
 
 ## 函数原型
 
-### 模板原型（占位符形式）
+### 立即数偏移搬入模式
 
 ```c
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_<dtype>& dst0,
@@ -43,7 +43,7 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_<dtype>& dst
 
 ### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。当dtype为`int4b_t`时，`dst0`和`dst1`的实际类型均为`vector_int4x2_t`。
 
 ### 典型示例
 
@@ -57,41 +57,118 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_int16_t& dst
 
 ## 参数说明
 
+### 立即数偏移搬入模式
+
 **表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst0 | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入源数据中的偶数下标元素，数据长度为VL。 |
-| dst1 | 输出 | 目的矢量数据寄存器。dtype须与src一致，搬入源数据中的奇数下标元素，数据长度为VL。 |
-| src | 输入/输出 | 源UB地址，实际读取地址需32字节对齐。从`src`起始位置读取2×VL长度数据。 |
-| offset | 输入 | Post Update步长，单位为元素个数。接口使用当前`src`地址完成搬入后，将`src`指针增加`offset * sizeof(dtype)`字节。`offset`为负值表示源地址向低地址方向移动。 |
+| dst0 | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入源数据中的偶数下标元素，数据长度为VL。 |
+| dst1 | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入源数据中的奇数下标元素，数据长度为VL。 |
+| src | 输入/输出 | 源UB地址，实际读取地址需32字节对齐。 |
+| offset | 输入 | Post Update步长，单位为元素个数。接口从当前`src`地址完成搬入后更新`src`，`src`增加`offset × sizeof(dtype)`字节。 |
+
+矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
+
+### 通用约束
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- src与dst0、dst1的dtype必须完全一致，dtype不一致触发异常。
 - 实际读取的UB地址和偏移后的UB地址必须32字节对齐，并且在UB地址空间内且不越界，否则会报错。
-- dst0与dst1必须为不同的矢量数据寄存器。
-- offset取0时，接口仍从当前src地址搬入数据，src指针保持不变，可重复读取同一组源数据。
+- `dst0`与`dst1`必须为不同的矢量数据寄存器。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ## 调用示例
 
-从UB中连续读取以32B对齐地址`src`为起始位置的`float`数据，并在每次调用后自动更新地址。
+将以下代码保存为`example.asc`后，执行对应的编译运行命令。
+
+<!-- npu="950" id8 -->
+
+在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
 
 ```cpp
-for (uint16_t i = 0; i < repeat_times; i++) {
-    asc_loadalign_deintlv_postupdate(reg0, reg1, src, one_repeat_size);
-    ...
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr uint32_t INPUT_BYTES = 1024;
+constexpr uint32_t OUTPUT_BYTES = 1024;
+
+__simd_vf__ inline void asc_loadalign_deintlv_postupdate_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+{
+    vector_bool mask = asc_create_mask_b8(PAT_ALL);
+    vector_uint8_t even;
+    vector_uint8_t odd;
+    __ubuf__ uint8_t* src = input;
+    asc_loadalign_deintlv_postupdate(even, odd, src, 512);
+    asc_storealign(output, even, mask);
+    asc_storealign(output + 256, odd, mask);
+    asc_loadalign_deintlv_postupdate(even, odd, src, 512);
+    asc_storealign(output + 512, even, mask);
+    asc_storealign(output + 768, odd, mask);
+}
+
+__global__ __vector__ void asc_loadalign_deintlv_postupdate_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+{
+    asc_init();
+    __ubuf__ uint8_t input_local[INPUT_BYTES];
+    __ubuf__ uint8_t output_local[OUTPUT_BYTES];
+    asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_vf_call<asc_loadalign_deintlv_postupdate_vf>(output_local, input_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint8_t> input(INPUT_BYTES);
+    std::vector<uint8_t> output(OUTPUT_BYTES, 0xff);
+    std::vector<uint8_t> golden(OUTPUT_BYTES, 0);
+    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
+    for (uint32_t call = 0; call < 2; ++call) {
+        for (uint32_t i = 0; i < 256; ++i) {
+            golden[call * 512 + i] = input[call * 512 + 2 * i];
+            golden[call * 512 + 256 + i] = input[call * 512 + 2 * i + 1];
+        }
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t* input_device = nullptr;
+    uint8_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_loadalign_deintlv_postupdate_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success]" : "[Failed]") << " asc_loadalign_deintlv_postupdate example." << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```

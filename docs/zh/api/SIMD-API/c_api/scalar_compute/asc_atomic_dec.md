@@ -55,12 +55,12 @@ __aicore__ inline uint32_t asc_atomic_dec(__gm__ uint32_t* address,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| address | 输出 | Global Memory的地址。 |
+| address | 输入/输出 | Global Memory的地址。 |
 | val | 输入 | 源操作数。 |
 
 ## 返回值说明
 
-address地址中计算前的原始数据。
+`address`地址中计算前的原始数据。
 
 ## 流水类型
 
@@ -73,8 +73,88 @@ PIPE_S
 
 ## 调用示例
 
+将以下代码保存为`example.asc`后，执行对应的编译运行命令。
+
+<!-- npu="950" id8 -->
+
+在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
+
 ```cpp
-// counter为外部输入的uint32_t类型的GM内存，此示例的初始值为5
-asc_dcci_entire_all();            // 手动同步
-uint32_t old = asc_atomic_dec(counter, 9);  // 计算后counter = 4, old = 5
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void print_data(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+constexpr uint32_t ELEMENTS = 8;
+
+__global__ __vector__ void asc_atomic_dec_kernel(__gm__ uint32_t* output)
+{
+    asc_init();
+    __gm__ uint32_t* address = output;
+    asc_dcci_entire_all();
+    const uint32_t old_value = asc_atomic_dec(address, 20U);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    asc_dcci_entire_all();
+    output[1] = old_value;
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint32_t> input = {10, 0};
+    std::vector<uint32_t> golden = {9, 10};
+    input.resize(ELEMENTS, 0);
+    golden.resize(ELEMENTS, 0);
+    std::vector<uint32_t> output(ELEMENTS, 0xffffffffU);
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint32_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (ELEMENTS) * sizeof(uint32_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(output_device, input.size() * sizeof(uint32_t), input.data(), input.size() * sizeof(uint32_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_atomic_dec_kernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(uint32_t), output_device, output.size() * sizeof(uint32_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = compare_data(output, golden);
+    std::cout << (passed ? "[Success] asc_atomic_dec passed." : "[Failed] asc_atomic_dec failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
