@@ -23,7 +23,13 @@
 #include "tensor_api/arch/cube/mmad_op.h"
 #include "tensor_api/arch/cube/copy_op.h"
 #include "tensor_api/arch/vector/copy_op.h"
+<<<<<<< HEAD
 #include "tensor_api/arch/vector/experimental/reduction_compute.h"
+=======
+#include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/arch/vector/experimental/MaskReg_compute.h"
+#include "tensor_api/arch/vector/experimental/data_reorder.h"
+>>>>>>> upstream/feature/tensor_api_from_9.0.0
 
 #endif // INCLUDE_TENSOR_API_ARCH_ARCH_H
 
