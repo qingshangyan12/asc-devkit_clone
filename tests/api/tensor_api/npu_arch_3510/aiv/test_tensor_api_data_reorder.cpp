@@ -22,7 +22,7 @@ __aicore__ inline void TestInterleave()
     asc::te::reg_tensor<T> src1 {};
 
     auto [dst0, dst1] = asc::te::interleave<T>(src0, src1);
-    auto mask = all_mask<uint8_t>();
+    auto mask = asc::te::all_mask<uint8_t>();
     EXPECT_EQ(dst0.mask, mask);
     EXPECT_EQ(dst1.mask, mask);
 }
