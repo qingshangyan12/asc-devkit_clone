@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample is based on the Ascend C SIMT programming model. It demonstrates how the cooperative_groups library organizes threads into different hierarchy levels and performs efficient parallel reduction.
+This sample is based on the Ascend C SIMT programming model. It demonstrates how the [cooperative_groups library](../../../../../../docs/zh/api/SIMT-API/协作组/协作组.md) organizes threads into different hierarchy levels and performs efficient parallel reduction.
 
 The sample defines one generic reduction interface, `reduce_sum`, whose parameter takes the `thread_group` base class. Three cases are built around this interface, using cross-block (`grid_group`), whole-block (`thread_block`), and sub-group (`thread_block_tile`) reduction domains respectively. The three call sites are written identically; the granularity difference is carried by the group object passed in. The project keeps a single `reduce_sum` implementation, shared by four call sites across the three cases. Its body contains no granularity-specific index arithmetic and no conditional branch on group type.
 
@@ -343,76 +343,85 @@ Terminating on error keeps the subsequent launch and read-back from running, so 
 
 ## Build and Run
 
-Perform the following steps in the sample root directory to build and run.
+Run the following steps in the root directory of this example to build and execute the example.
 
-Set up environment variables, where `${install_path}` is the CANN installation directory, defaulting to `/usr/local/Ascend` if not specified at install time:
+- Configure Environment Variables  
+  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
-```bash
-source ${install_path}/cann/set_env.sh
-```
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-`CMakeLists.txt` does not hardcode the CANN path. The toolchain, headers, and runtime libraries all come from environment variables, `find_package(ASC)` locates the version accordingly, and both the build and run stages draw on this same set of variables. When multiple CANN versions are installed, the following two items confirm which one is in effect:
+  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
 
-```bash
-which bisheng            # should point to ${install_path}/cann-9.2.0/bin/bisheng
-echo $ASCEND_HOME_PATH   # should be ${install_path}/cann-9.2.0
-```
+- Run the Example
 
-CMake writes the compiler path into the cache of the `build` directory; after switching CANN versions, delete that directory and configure again.
+  Run the following commands in this example directory. The case number is given as an argument, 0, 1, or 2, and a single execution runs only that one case. If the argument is missing or invalid, the usage is printed and the process returns with exit code 1.
 
-Build and run:
+  ```bash
+  mkdir -p build && cd build;                              # Create and enter the build directory
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # Build the project
+  ./cooperative_groups 0                                   # Run the cross-block reduction
+  ./cooperative_groups 1                                   # Run the whole-block reduction
+  ./cooperative_groups 2                                   # Run the sub-group reduction
+  ```
 
-```bash
-mkdir build && cd build;
-cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
-./cooperative_groups 0
-```
+  Build Options Description
 
-The only build option is `CMAKE_ASC_ARCHITECTURES`, whose value is `dav-3510`, corresponding to the NPU architecture of Ascend 950PR/950DT. The options passed to the compiler are `--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt`.
+  | Option | Values | Description |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
-At run time the case number is given as an argument, 0, 1, or 2, and a single execution runs that one case. If the argument is missing or invalid, the usage is printed and the process returns with exit code 1:
+  Taking the whole-block reduction as an example, the following output indicates that the accuracy verification is successful.
 
-```bash
-./cooperative_groups 0    # cross-block reduction
-./cooperative_groups 1    # whole-block reduction
-./cooperative_groups 2    # sub-group reduction
-```
-
-Taking the whole-block scenario as an example, a passing verification prints the following, with exit code 0:
-
-```text
-Case 1: whole-block reduction (thread_block), reduce domain = 1024
-num_elements = 4096, threads = 4096
-grid = 4 blocks x 1024 threads, reduce domain = 1024 per block, workspace in shared memory
-Output: 8390656
-Golden: 8390656
-[Success] Case accuracy verification passed.
-```
+  ```text
+  Case 1: whole-block reduction (thread_block), reduce domain = 1024
+  num_elements = 4096, threads = 4096
+  grid = 4 blocks x 1024 threads, reduce domain = 1024 per block, workspace in shared memory
+  Output: 8390656
+  Golden: 8390656
+  [Success] Case accuracy verification passed.
+  ```
 
 ## Performance Analysis
 
-Single-operator performance data is collected with `msopprof`; arguments for the command under test follow the executable directly:
+Use the `msOpProf` tool to collect detailed performance data:
 
 ```bash
 msopprof ./cooperative_groups 1   # Analyze whole-block reduction case performance
 msopprof ./cooperative_groups 2   # Analyze sub-group reduction case performance
 ```
 
-The tool prints `Op Name`, `Task Duration(us)`, `Block Dim` and tuning suggestions straight to the terminal; full results land in an `OPPROF_*` directory under the current path. Three runs each, `Task Duration(us)`:
+After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:
+
+```text
+├──dump                       # Raw performance data, no user attention needed
+├──ArithmeticUtilization.csv  # cube/vector instruction cycle ratio
+├──L2Cache.csv                # L2 Cache hit rate
+├──Memory.csv                 # UB, L1, and main memory read/write bandwidth
+├──MemoryL0.csv               # L0A, L0B, and L0C read/write bandwidth
+├──MemoryUB.csv               # Vector and Scalar to UB read/write bandwidth
+├──OpBasicInfo.csv            # Operator basic information
+├──PipeUtilization.csv        # Compute unit and transfer unit duration and ratio
+├──ResourceConflictRatio.csv  # UB bank group, bank conflict, and resource conflict ratio across all instructions
+└──visualize_data.bin         # MindStudio Insight presentation file
+```
+
+View specific performance analysis results:
+
+```bash
+# For example, view operator basic information
+cat ./OPPROF_*/OpBasicInfo.csv
+
+# For example, view memory-related data
+cat ./OPPROF_*/Memory.csv
+```
+
+Three runs each, `Task Duration(us)`:
 
 | Case | Reduction domain | Synchronization | Task Duration(us) |
 |---|---|---|---|
 | Whole-block | 1024 | 20 block-level | 7.01 / 7.12 / 7.22 |
 | Sub-group | 32 | 10 warp-internal + 1 block-level | 6.11 / 6.29 / 6.58 |
 
-Sub-group reduction is roughly 10% to 13% faster than whole-block reduction, and the ranges of the three runs do not overlap.
-
-To narrow down bottlenecks further, split the collection dimensions with `--aic-metrics`, for example `msopprof --aic-metrics=PipeUtilization,Memory ./cooperative_groups 2`. Without NPU hardware, use simulation mode instead:
-
-```bash
-msopprof simulator --soc-version=<soc_version> ./cooperative_groups 2
-```
-
-The two scenarios have the same input size, the same memory traffic, and the same workspace storage level. They differ in synchronization scope: the 5 rounds of level one in sub-group reduction use warp-internal synchronization, with a single block-level barrier between the two levels, whereas all 10 rounds of whole-block reduction use block-level barriers. The smaller the synchronization scope, the fewer threads a single barrier must wait for.
-
-The reduction domain of cross-block reduction spans blocks, with two full-grid barriers in each of its 12 rounds, and its workspace is in global memory so every round's reads and writes leave the core. It is not on the same scale as the two scenarios in the table above and is therefore not included in the comparison.
+Sub-group reduction is roughly 10% to 13% faster than whole-block reduction, and the ranges of the three runs do not overlap. The two scenarios have the same input size, the same memory traffic, and the same workspace storage level. They differ in synchronization scope: the 5 rounds of level one in sub-group reduction use warp-internal synchronization, with a single block-level barrier between the two levels, whereas all 10 rounds of whole-block reduction use block-level barriers. The smaller the synchronization scope, the fewer threads a single barrier must wait for.
