@@ -30,21 +30,31 @@ SelectorStatus AllGatherAutoSelector::SelectCcuMsAlgo(
 SelectorStatus AllGatherAutoSelector::SelectCcuScheduleUBXAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName, const u64 dataSize) const
 {
-    (void)topoInfo;
-    (void)selectAlgName;
-    (void)dataSize;
-    // Temporary KFC convergence: UBX CCU schedule variants are kept disabled until their registration path is restored.
-    HCCL_DEBUG("[AllGatherAutoSelector][%s] UBX topo is not supported for ccu schedule mode.", __func__);
+    if (topoInfo->level0PcieMix) {
+        return SelectorStatus::NOT_MATCH;
+    }
+    bool meshNumEqualsClosNum = false;
+    CHK_PRT_RET(
+        CheckMeshNumEqualToClosNum(topoInfo, meshNumEqualsClosNum) != HCCL_SUCCESS,
+        HCCL_DEBUG("[AllGatherAutoSelector] CheckMeshNumEqualToClosNum failed."), SelectorStatus::NOT_MATCH);
+    if (dataSize <= SMALL_COUNT_512KB) {
+        selectAlgName = "CcuSchedAllGatherSoleMesh";
+        return SelectorStatus::MATCH;
+    }
+    if (meshNumEqualsClosNum && topoInfo->userRankSize <= MAX_RANK_NUM_FOR_CONCURRENT_ALGO) {
+        selectAlgName = "CcuSchedAllGatherConcurMeshNHRMultiLink";
+        return SelectorStatus::MATCH;
+    }
     return SelectorStatus::NOT_MATCH;
 }
 
 SelectorStatus AllGatherAutoSelector::SelectCcuScheduleLevel0Algo(
     const TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName, const u64 dataSize) const
 {
-    (void)dataSize;
-    // Temporary KFC convergence: route only regular Mesh1D to the KFC Mem2Mem implementation.
-    if (topoInfo->level0Topo != Level0Shape::MESH_1D ||
-        topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE) {
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
+        return SelectCcuScheduleUBXAlgo(topoInfo, selectAlgName, dataSize);
+    }
+    if (topoInfo->level0Topo != Level0Shape::MESH_1D || topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE) {
         HCCL_DEBUG(
             "[AllGatherAutoSelector] level0Topo[%d], level0MeshType[%d] is not supported for ccu schedule mode.",
             topoInfo->level0Topo, topoInfo->level0MeshType);

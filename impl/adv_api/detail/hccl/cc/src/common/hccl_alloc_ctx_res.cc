@@ -9,6 +9,7 @@
  */
 #include "hccl_alloc_ctx_res.h"
 #include "kfc_server_config.h"
+#include "kfc_server_protocol.h"
 
 using namespace mc2_ops_hccl;
 using namespace hcomm::CcuRep;
@@ -162,7 +163,7 @@ HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], ui
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx)
 {
     // 1. 分配workspace、scratch、comParam（XN）、comSync（CKE）
-    constexpr uint32_t comSyncNum = 2;
+    constexpr uint32_t comSyncNum = KFC_SERVER_SIGNAL_REGION_NUM;
     constexpr uint64_t scratchSize = Hccl::MC2_WORKSPACE_SIZE;
     uint64_t comParamBufSize = Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_PARAM_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
     uint64_t comSyncBufSize = Hccl::CCU_TASK_NUM_MAX * comSyncNum * Hccl::CCU_ONE_PARAM_SIZE;
@@ -720,25 +721,20 @@ static HcclResult AcquireAlgResources(
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     if (opParam.engine == COMM_ENGINE_CCU) {
-        // 填充 kfcServerArgs 的所有6个字段（最后一个为 token 占位符，后续更新）
-        resCtxHost->kfcServerArgs = {
-            opResCtx.xnAddr,          opResCtx.ckeAddr,
-            static_cast<uint64_t>(1), // dieNum
-            static_cast<uint64_t>(1), // missionNum
-            static_cast<uint64_t>(0), // missionIndex
-            static_cast<uint64_t>(0), // token 占位符，后续在 GetAlgResCcu 中更新
-        };
-        resCtxHost->kfcServerArgSize = 6;
+        const uint32_t missionNum = GetKfcServerMissionNum(opParam.algName);
+        resCtxHost->kfcServerArgs.clear();
+        resCtxHost->kfcServerArgs.reserve(missionNum * KFC_SERVER_ARG_NUM);
+        for (uint32_t missionIndex = 0; missionIndex < missionNum; ++missionIndex) {
+            resCtxHost->kfcServerArgs.insert(
+                resCtxHost->kfcServerArgs.end(),
+                {opResCtx.xnAddr, opResCtx.ckeAddr, 1U, missionNum, missionIndex, 0U});
+        }
+        resCtxHost->kfcServerArgSize = KFC_SERVER_ARG_NUM;
         HCCL_INFO(
-            "[AcquireAlgResources] kfcServerArgs generated: "
-            "argSize[%u], xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], "
-            "missionNum[%llu], missionIndex[%llu], token[%llu]",
-            resCtxHost->kfcServerArgSize, static_cast<unsigned long long>(resCtxHost->kfcServerArgs[0]),
-            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[1]),
-            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[2]),
-            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[3]),
-            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[4]),
-            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[5]));
+            "[AcquireAlgResources] generated [%u] KFC mission args, argSize[%u], xnAddr[0x%llx], "
+            "ckeAddr[0x%llx]",
+            missionNum, resCtxHost->kfcServerArgSize,
+            static_cast<unsigned long long>(opResCtx.xnAddr), static_cast<unsigned long long>(opResCtx.ckeAddr));
 
         CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
         opParam.resCtx = *resCtxOut;
@@ -1017,6 +1013,14 @@ HcclResult CcuSelectAlg(
     }
 
     CHK_PRT_RET(opParams.empty(), HCCL_ERROR("[CcuSelectAlg] no primitive selected."), HCCL_E_PARA);
+
+    bool hasConcurrentAllGather = false;
+    for (const std::string& algName : algNames) {
+        hasConcurrentAllGather = hasConcurrentAllGather || algName == KFC_CONCURRENT_ALL_GATHER_ALG_NAME;
+    }
+    CHK_PRT_RET(
+        hasConcurrentAllGather && (tilingNum != 1U || algNames[0] != KFC_CONCURRENT_ALL_GATHER_ALG_NAME),
+        HCCL_ERROR("[CcuSelectAlg] concurrent AllGather must own a single-op MC2 context."), HCCL_E_NOT_SUPPORT);
 
     // One MC2 context owns one persistent server. Include the primitive set in
     // the cache tag so contexts with different dispatch tables are not reused.
