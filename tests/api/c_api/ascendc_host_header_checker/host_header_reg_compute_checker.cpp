@@ -13,6 +13,16 @@
 #include "c_api/reg_compute/reg_store.h"
 #include "c_api/reg_compute/reg_vector.h"
 
+__simd_vf__ inline void TestCapiClearArSprVf()
+{
+    ::asc_clear_ar_spr();
+}
+
+extern "C" __global__ __aicore__ void KernelTestCapiClearArSprAicore()
+{
+    AscendC::asc_clear_ar_spr();
+}
+
 static void test_host_c_api_reg_compute_0()
 {
     using ::asc_abs;

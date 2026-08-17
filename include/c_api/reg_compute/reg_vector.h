@@ -1406,6 +1406,10 @@ __simd_callee__ inline void asc_prelu(vector_half& dst, vector_half src0, vector
 //===================asc_clear_ar_spr=====================
 __simd_callee__ inline void asc_clear_ar_spr();
 
+namespace AscendC {
+__aicore__ inline void asc_clear_ar_spr();
+} // namespace AscendC
+
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int16_t part);
 
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint32_t src, int16_t part);

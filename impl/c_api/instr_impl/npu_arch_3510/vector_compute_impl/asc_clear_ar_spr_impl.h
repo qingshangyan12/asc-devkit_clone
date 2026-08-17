@@ -18,11 +18,23 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
+__simd_vf__ inline void asc_clear_ar_spr_vf_impl()
+{
+    sprclr(SPR_AR);
+}
+
 __simd_callee__ inline void asc_clear_ar_spr_impl()
 {
+    asc_clear_ar_spr_vf_impl();
+}
+
+namespace AscendC {
+__aicore__ inline void asc_clear_ar_spr_impl()
+{
     if ASC_IS_AIV {
-        sprclr(SPR_AR);
+        ::asc_clear_ar_spr_vf_impl();
     }
 }
+} // namespace AscendC
 
 #endif

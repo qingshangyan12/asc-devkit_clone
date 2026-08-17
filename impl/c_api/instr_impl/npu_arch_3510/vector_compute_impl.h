@@ -6474,6 +6474,10 @@ __simd_callee__ inline void asc_mull(
 
 __simd_callee__ inline void asc_clear_ar_spr() { asc_clear_ar_spr_impl(); }
 
+namespace AscendC {
+__aicore__ inline void asc_clear_ar_spr() { asc_clear_ar_spr_impl(); }
+} // namespace AscendC
+
 // ==========asc_bitsort(half/float)==========
 __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
 {

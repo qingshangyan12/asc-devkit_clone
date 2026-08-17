@@ -32,6 +32,10 @@
 
 ```cpp
 __simd_callee__ inline void asc_clear_ar_spr()
+
+namespace AscendC {
+__aicore__ inline void asc_clear_ar_spr()
+}
 ```
 
 ## 参数说明
@@ -44,7 +48,7 @@ __simd_callee__ inline void asc_clear_ar_spr()
 
 ## 约束说明
 
-无
+本接口可在VF函数内或VF函数外调用。VF函数内调用全局作用域接口，函数标记符为__simd_callee__；VF函数外调用AscendC命名空间接口，函数标记符为__aicore__。
 
 ## 调用示例
 
