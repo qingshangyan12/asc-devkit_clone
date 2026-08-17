@@ -37,6 +37,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.root = self.temp_dir.name
         self.input_root = os.path.join(self.root, "inputs")
         self.output_root = os.path.join(self.root, "output")
+        self.output_dir = os.path.join(self.output_root, "add_custom")
+        self.manifest_name = "add_custom_manifest.json"
         self.cann_root = os.path.join(self.root, "cann")
         os.makedirs(os.path.join(self.cann_root, "bin"))
         os.makedirs(os.path.join(self.cann_root, "include"))
@@ -245,13 +247,16 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         sk_kernel_attribute="",
         basic_kernel_attribute="",
         sk_bind_compile_options=(),
+        output_dir=None,
+        manifest_name=None,
     ):
         return generator.ManifestGenerationRequest(
             soc_version="Ascend910B",
             resource_id=self.resource_id,
             source_file_path=self.source_path,
             origin_func_name="add_custom",
-            output_root=self.output_root,
+            output_dir=output_dir or self.output_dir,
+            manifest_name=manifest_name or self.manifest_name,
             kernels=tuple(records),
             chip_version="c220",
             sk_cap_bitmap=sk_cap_bitmap,
@@ -274,6 +279,46 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         result = generator.generate_manifest(request)
 
         self.assertTrue(os.path.isfile(result.manifest_path))
+
+    def test_generate_manifest_uses_requested_name_and_kernel_directory(self):
+        request = self.make_request(self.make_records())
+
+        result = self.generate(request)
+
+        expected_path = os.path.join(
+            request.output_dir,
+            request.manifest_name,
+        )
+        self.assertEqual(result.manifest_path, expected_path)
+        self.assertTrue(os.path.isfile(expected_path))
+        self.assertTrue(os.path.isdir(os.path.join(request.output_dir, "resources")))
+
+    def test_generate_manifest_keeps_different_kernels(self):
+        first_request = self.make_request(self.make_records())
+        second_request = self.make_request(
+            self.make_records(),
+            output_dir=os.path.join(self.output_root, "other_kernel"),
+            manifest_name="other_kernel_manifest.json",
+        )
+
+        first_result = self.generate(first_request)
+        second_result = self.generate(second_request)
+
+        self.assertTrue(os.path.isfile(first_result.manifest_path))
+        self.assertTrue(os.path.isfile(second_result.manifest_path))
+        self.assertNotEqual(first_result.manifest_path, second_result.manifest_path)
+
+    def test_generate_manifest_uses_per_kernel_lock(self):
+        request = self.make_request(self.make_records())
+
+        self.generate(request)
+
+        self.assertTrue(
+            os.path.isfile(os.path.join(self.output_root, ".add_custom.manifest.lock"))
+        )
+        self.assertFalse(
+            os.path.exists(os.path.join(self.output_root, ".manifest.lock"))
+        )
 
     def test_manifest_generation_does_not_resolve_physical_paths(self):
         request = self.make_request(self.make_records())
@@ -361,8 +406,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             "${resource}/resources/include/add_custom_tiling_data.h",
         )
         template_path = os.path.join(
-            self.output_root,
-            "manifest",
+            self.output_dir,
             "resources",
             self.resource_logical_path(manifest, constant_info["file"]),
         )
@@ -391,7 +435,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         ):
             self.assertNotIn(f'"{old_name}"', serialized)
         self.assertNotIn(self.root, serialized)
-        resource_root = os.path.join(self.output_root, "manifest", "resources")
+        resource_root = os.path.join(self.output_dir, "resources")
         self.assertEqual(
             {
                 os.path.relpath(path, resource_root)
@@ -449,8 +493,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             if arg.startswith("${resource}/resources/src/")
         )
         wrapper_path = os.path.join(
-            self.output_root,
-            "manifest",
+            self.output_dir,
             "resources",
             self.resource_logical_path(manifest, wrapper_reference),
         )
@@ -522,8 +565,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             ],
         )
         template_path = os.path.join(
-            self.output_root,
-            "manifest",
+            self.output_dir,
             "resources",
             "include",
             "add_custom_tiling_data.h",
@@ -830,8 +872,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             if value.startswith("${resource}/resources/src/sk_bind_")
         )
         bind_source = Path(
-            self.output_root,
-            "manifest",
+            self.output_dir,
             "resources",
             self.resource_logical_path(manifest, bind_reference),
         ).read_text(encoding="utf-8")
@@ -847,8 +888,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             if value.startswith("${resource}/resources/src/")
         )
         static_sk_wrapper = Path(
-            self.output_root,
-            "manifest",
+            self.output_dir,
             "resources",
             self.resource_logical_path(manifest, sk_wrapper_reference),
         ).read_text(encoding="utf-8")
@@ -935,8 +975,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             if value.startswith("${resource}/resources/src/sk_bind_")
         )
         bind_path = os.path.join(
-            self.output_root,
-            "manifest",
+            self.output_dir,
             "resources",
             self.resource_logical_path(manifest, bind_reference),
         )
@@ -944,18 +983,17 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertIn("add_custom_100000_static_sk", bind_text)
         self.assertNotIn(dynamic_sk_symbol, bind_text)
 
-    def test_publish_failure_restores_previous_manifest(self):
+    def test_publish_failure_restores_previous_kernel(self):
         request = self.make_request(self.make_records())
-        self.generate(request)
-        marker = os.path.join(self.output_root, "manifest", "previous.txt")
+        os.makedirs(request.output_dir)
+        marker = os.path.join(request.output_dir, "previous.txt")
         Path(marker).write_text("previous\n", encoding="utf-8")
         real_replace = os.replace
-        replace_count = 0
 
         def fail_stage_publish(source, destination):
-            nonlocal replace_count
-            replace_count += 1
-            if replace_count == 2:
+            if destination == request.output_dir and os.path.basename(
+                source
+            ).startswith(".add_custom.stage."):
                 raise OSError("publish failed")
             return real_replace(source, destination)
 
@@ -968,7 +1006,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertEqual(Path(marker).read_text(encoding="utf-8"), "previous\n")
         self.assertFalse(
             any(
-                name.startswith(".manifest.stage.")
+                name.startswith(".add_custom.stage.")
                 for name in os.listdir(self.output_root)
             )
         )

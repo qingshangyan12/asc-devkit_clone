@@ -80,7 +80,8 @@ class ManifestGenerationRequest:
     resource_id: str
     source_file_path: str
     origin_func_name: str
-    output_root: str
+    output_dir: str
+    manifest_name: str
     kernels: Tuple[KernelCompileRecord, ...]
     chip_version: str
     sk_cap_bitmap: Optional[int] = None
@@ -640,16 +641,19 @@ def _publish_directory(stage_dir, target_dir):
 
 
 def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationResult:
-    output_root = os.path.abspath(request.output_root)
-    os.makedirs(output_root, exist_ok=True)
-    lock_path = os.path.join(output_root, ".manifest.lock")
-    target_dir = os.path.join(output_root, "manifest")
+    target_dir = os.path.abspath(request.output_dir)
+    parent_dir = os.path.dirname(target_dir)
+    kernel_name = os.path.basename(target_dir)
+    os.makedirs(parent_dir, exist_ok=True)
+    lock_path = os.path.join(parent_dir, f".{kernel_name}.manifest.lock")
     stage_dir = ""
     resource_path = "resources"
     with open(lock_path, "a+", encoding="utf-8") as lock_file:
         fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
         try:
-            stage_dir = tempfile.mkdtemp(prefix=".manifest.stage.", dir=output_root)
+            stage_dir = tempfile.mkdtemp(
+                prefix=f".{kernel_name}.stage.", dir=parent_dir
+            )
             resources = {}
 
             all_records = [
@@ -922,7 +926,7 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                 "kernels": manifest_kernels,
             }
             _write_resources(stage_dir, resource_path, resources)
-            manifest_path = os.path.join(stage_dir, "manifest.json")
+            manifest_path = os.path.join(stage_dir, request.manifest_name)
             with open(manifest_path, "w", encoding="utf-8") as file_obj:
                 json.dump(manifest, file_obj, indent=2, ensure_ascii=False)
                 file_obj.write("\n")
@@ -930,7 +934,7 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
             _publish_directory(stage_dir, target_dir)
             stage_dir = ""
             return ManifestGenerationResult(
-                manifest_path=os.path.join(target_dir, "manifest.json"),
+                manifest_path=os.path.join(target_dir, request.manifest_name),
                 resource_id=request.resource_id,
                 kernel_count=len(request.kernels),
                 resource_count=len(resources),
