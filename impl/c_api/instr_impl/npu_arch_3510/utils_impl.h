@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * Copyright (c) 202 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_H
 
-#include "c_api/utils/enum.h"
+#include "c_api/defs/enum.h"
+#include "c_api/defs/type.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 
 #endif
 
