@@ -259,10 +259,10 @@ __aicore__ inline void TransDataTo5HDImpl(
     static_assert(
         (SupportType<T, half, bfloat16_t, float, int16_t, uint16_t, int32_t, uint32_t, int8_t, uint8_t>()),
         "TransDataTo5HD does not support current datatype!");
-    if ASCEND_IS_AIV {
+    // if ASCEND_IS_AIV {
         SetVaReg(dstList, srcList);
         TransDataTo5HDIntrinsicsImpl(dstList, srcList, transDataTo5HDParams);
-    }
+    // }
 }
 
 template <typename T>
@@ -270,10 +270,10 @@ __aicore__ inline void TransDataTo5HDImpl(
     uint64_t dstList[NCHW_CONV_ADDR_LIST_SIZE], uint64_t srcList[NCHW_CONV_ADDR_LIST_SIZE],
     const TransDataTo5HDParams& transDataTo5HDParams)
 {
-    if ASCEND_IS_AIV {
+    // if ASCEND_IS_AIV {
         SetVaReg(dstList, srcList);
         TransDataTo5HDIntrinsicsImpl<T>(dstList, srcList, transDataTo5HDParams);
-    }
+    // }
 }
 
 // template <typename T>
