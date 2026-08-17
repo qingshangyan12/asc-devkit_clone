@@ -175,6 +175,12 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
         : WorktreeRetentionPolicy::RemoveAfterCompilation;
     KernelCompilationWorkspace compilationWorkspace(
         std::move(registeredResource.ownedWorktreePath), worktreeRetentionPolicy);
+    if (saveKernelMetaEnabled) {
+        fs::path resourceWorktreeRetentionPath;
+        if (diagnostics.GetResourceWorktreeRetentionPath(resourceWorktreeRetentionPath)) {
+            compilationWorkspace.TryMoveWorktreeToDiagnosticsDirectory(resourceWorktreeRetentionPath);
+        }
+    }
     diagnostics.RecordWorktreePath(compilationWorkspace.GetWorktreePath());
     if (registeredResource.borrowedManifest == nullptr) {
         ACLRTC_LOG_ERROR(
@@ -188,10 +194,10 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
             specializationRequest.resourceId.c_str());
         return FinalizeSpecializationResult(specializationRequest, diagnostics, ACLRTC_ERROR_FAILURE);
     }
-    if (registeredResource.externalSourceFilePath.empty()) {
+    if (registeredResource.externalSourceDirectoryPath.empty()) {
         ACLRTC_LOG_ERROR(
-            "ResourceRegistry returned an empty sourceFilePath for resourceId '%s'; fix the registered resource "
-            "data",
+            "ResourceRegistry returned an empty sourceFilePath directory for resourceId '%s'; fix the registered "
+            "resource data",
             specializationRequest.resourceId.c_str());
         return FinalizeSpecializationResult(specializationRequest, diagnostics, ACLRTC_ERROR_FAILURE);
     }
@@ -201,7 +207,7 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
     specializationResult =
         KernelCompilationPlanBuilder(specializationRequest, *registeredResource.borrowedManifest,
                                      compilationWorkspace.GetWorktreePath(),
-                                     registeredResource.externalSourceFilePath)
+                                     registeredResource.externalSourceDirectoryPath)
             .BuildCompilationPlan(compilationPlan);
     if (specializationResult != ACLRTC_SUCCESS) {
         return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);

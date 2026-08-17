@@ -36,6 +36,8 @@ public:
     KernelSpecializationDiagnostics(std::string specializationSessionId,
                                     DiagnosticCollectionMode collectionMode);
 
+    bool GetResourceWorktreeRetentionPath(
+        boost::filesystem::path& resourceWorktreeRetentionPath) const noexcept;
     void WriteManifestSnapshot(const nlohmann::json& resourceManifest) noexcept;
     void RecordWorktreePath(const boost::filesystem::path& resourceWorktreePath) noexcept;
     void AppendCommandToReplayScript(const CompilationCommand& compilationCommand) noexcept;
