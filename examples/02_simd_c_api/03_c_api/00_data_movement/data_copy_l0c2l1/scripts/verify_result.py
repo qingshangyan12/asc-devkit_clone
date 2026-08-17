@@ -5,7 +5,7 @@
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
-# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
@@ -17,14 +17,7 @@ import numpy as np
 M = 128
 N = 128
 
-# scenario_num -> output_type
-#   'half'        -> golden np.float16,  output np.float32 (half Mmad output)
-#   'int8'        -> golden np.int8,     output np.int32  (int8 Mmad output)
-#   'bfloat16'    -> golden np.uint16,   output np.float32 (bf16 Mmad output)
-#   'int4b'       -> golden np.uint8(packed), output np.int32 (int4 Mmad output)
-#   'fp8_e4m3fn'  -> golden np.uint8,    output np.float32 (fp8 Mmad output)
-#   'hifloat8'    -> golden np.uint8,    output np.float32 (hif8 Mmad output)
-#   'float'       -> golden np.float32,  output np.float32 (float Mmad output)
+# scenario_num -> output_type (quantization target type, not second Mmad output type)
 SCENARIO_OUTPUT = {
     1: 'int8',       2: 'int8',       3: 'int8',       4: 'int8',
     5: 'half',       6: 'half',       7: 'half',       8: 'half',
@@ -34,51 +27,30 @@ SCENARIO_OUTPUT = {
     17: 'float',
 }
 
+# Golden and output are both saved in the second Mmad output type:
+#   int8/int4b output -> int32 (int8/int4b × identity int8/int4b → int32)
+#   half/bf16/fp8/hif8/float output -> float32 (× identity → float)
 GOLDEN_DTYPE = {
-    'half': np.float16, 'int8': np.int8, 'int4b': np.uint8,
-    'bfloat16': np.uint16, 'fp8_e4m3fn': np.uint8,
-    'hifloat8': np.uint8, 'float': np.float32,
-}
-
-OUTPUT_DTYPE = {
     'half': np.float32, 'int8': np.int32, 'int4b': np.int32,
     'bfloat16': np.float32, 'fp8_e4m3fn': np.float32,
     'hifloat8': np.float32, 'float': np.float32,
 }
 
-
-def unpack_int4b(packed):
-    low = (packed & 0x0F).astype(np.int8)
-    high = ((packed >> 4) & 0x0F).astype(np.int8)
-    low[low >= 8] -= 16
-    high[high >= 8] -= 16
-    result = np.empty(packed.size * 2, dtype=np.int8)
-    result[0::2] = low
-    result[1::2] = high
-    return result
-
-
-def bf16_to_float32(bf16_arr):
-    return (bf16_arr.astype(np.uint32) << 16).view(np.float32).astype(np.float64)
+OUTPUT_DTYPE = GOLDEN_DTYPE  # same as golden
 
 
 def verify_result(scenario_num, output_path, golden_path):
     output_type = SCENARIO_OUTPUT[scenario_num]
+    dtype = GOLDEN_DTYPE[output_type]
 
-    golden = np.fromfile(golden_path, dtype=GOLDEN_DTYPE[output_type]).reshape(-1)
-    output = np.fromfile(output_path, dtype=OUTPUT_DTYPE[output_type]).reshape(-1)
-
-    if output_type == 'int4b':
-        golden = unpack_int4b(golden)
+    golden = np.fromfile(golden_path, dtype=dtype).reshape(-1)
+    output = np.fromfile(output_path, dtype=dtype).reshape(-1)
 
     if output.size != golden.size:
         print("element count mismatch: expected %d, actual %d" % (golden.size, output.size))
         return False
 
-    if output_type == 'bfloat16':
-        golden_f64 = bf16_to_float32(golden)
-    else:
-        golden_f64 = golden.astype(np.float64)
+    golden_f64 = golden.astype(np.float64)
     output_f64 = output.astype(np.float64)
 
     if output_type in ('float', 'half', 'bfloat16'):
@@ -88,11 +60,11 @@ def verify_result(scenario_num, output_path, golden_path):
     elif output_type in ('int8', 'int4b', 'fp8_e4m3fn', 'hifloat8'):
         relative_tol = 0
         absolute_tol = 1
-        error_tol = 1e-3
+        error_tol = 1e-4
     else:
         relative_tol = 1e-6
         absolute_tol = 1e-9
-        error_tol = 1e-3
+        error_tol = 1e-4
 
     match = np.isclose(
         output_f64, golden_f64, rtol=relative_tol, atol=absolute_tol, equal_nan=True

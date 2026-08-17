@@ -30,9 +30,14 @@ if(NOT SCENARIO_NUM MATCHES "^([1-9]|1[0-7])$")
     message(FATAL_ERROR "SCENARIO_NUM must be 1-17, but got ${SCENARIO_NUM}")
 endif()
 
+set(SATURATION_MODE "1" CACHE STRING "Saturation mode: 1=saturation (CTRL[48]=0), 0=non-saturation (CTRL[48]=1)")
+if(NOT SATURATION_MODE MATCHES "^[01]$")
+    message(FATAL_ERROR "SATURATION_MODE must be 0 or 1, but got ${SATURATION_MODE}")
+endif()
+
 add_executable(demo data_copy_l0c2l1.asc)
 
-add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM} -DSATURATION_MODE=${SATURATION_MODE})
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
