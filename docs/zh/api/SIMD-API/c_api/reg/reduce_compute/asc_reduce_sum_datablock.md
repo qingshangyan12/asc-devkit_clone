@@ -47,8 +47,6 @@ def asc_reduce_sum_datablock(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型（占位符形式）
-
 ```c
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_<dst_dtype>& dst,
                                                      vector_<src_dtype> src,
@@ -121,7 +119,7 @@ __simd_callee__ inline void asc_reduce_sum_datablock(vector_half& dst,
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 

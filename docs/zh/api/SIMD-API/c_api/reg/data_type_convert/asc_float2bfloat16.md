@@ -44,8 +44,6 @@ def asc_float2bfloat16_rn(dst, src, mask, dst_pos):
 
 ## 函数原型
 
-### 模板原型（占位符形式）
-
 ```c
 __simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode>(vector_bfloat16_t& dst,
                                                                       vector_float src,
@@ -104,7 +102,7 @@ __simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst,
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 
 <!-- end id8 -->

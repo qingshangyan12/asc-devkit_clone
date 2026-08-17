@@ -43,8 +43,6 @@ def asc_int322int16(dst, src, mask, dst_pos):
 
 ## 函数原型
 
-### 模板原型（占位符形式）
-
 ```c
 __simd_callee__ inline void asc_int322int16<sat_mode>(vector_int16_t& dst,
                                                       vector_int32_t src,
@@ -100,7 +98,7 @@ __simd_callee__ inline void asc_int322int16(vector_int16_t& dst,
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
