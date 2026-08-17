@@ -177,8 +177,8 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 | left_height | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
 | n_dim | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]。 |
 | right_width | 输入 | 右矩阵B和结果矩阵C的N维大小，单位为元素，取值范围为[0, 4095]。 |
-| feat_offset | 输入 | 保留参数。 |
-| smask_offset | 输入 | 权重矩阵的偏移位。 |
+| feat_offset | 输入 | 无效参数，用户无需关注，传入0即可。 |
+| smask_offset | 输入 | 无效参数，用户无需关注，传入0即可。 |
 | unit_flag | 输入 | 用于控制矩阵乘加指令与矩阵搬出指令的细粒度并行，开启UnitFlag后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0：不开启UnitFlag。<br>&nbsp;&nbsp;&bull; 2：开启UnitFlag，硬件执行完指令后不改变单元标志位。<br>&nbsp;&nbsp;&bull; 3：开启UnitFlag，硬件执行完指令后改变单元标志位。<br>矩阵乘加指令与对应的矩阵搬出指令必须都开启或都不开启UnitFlag，开启后指令之间无需再插入同步指令。 |
 | k_direction_align | 输入 | K方向对齐的核心功能是通过`k_direction_align`参数控制在使用float数据类型时，L0A Buffer和L0B Buffer矩阵在K方向上的对齐方式。<br>取值说明如下：<br>&nbsp;&nbsp;&bull; false：K方向对齐到`ceil(n_dim / 8) * 8`。<br>&nbsp;&nbsp;&bull; true：K方向对齐到`ceil(n_dim / 16) * 16`。 |
 | is_weight_offset | 输入 | 启用weight matrix offset。 |

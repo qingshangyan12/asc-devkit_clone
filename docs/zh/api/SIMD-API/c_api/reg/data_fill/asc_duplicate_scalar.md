@@ -81,18 +81,101 @@
 - 带mask的重载中，mask未筛选的元素在dst中置零。
 - 不带mask的重载将dst中的全部元素置为value，不保留dst中的原始数据。
 
+<!-- npu="950" id8 -->
 ## 调用示例
 
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
+```
+
+以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
+
 ```cpp
-__simd_vf__ inline void duplicate_scalar_vf(__ubuf__ half* dst_addr, uint32_t count, uint16_t one_repeat_size, uint16_t repeat_time)
+#include <cstdint>
+#include <iostream>
+#include <vector>
+
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+template <typename T>
+void print_data(const char* label, const std::vector<T>& values, uint32_t offset = 0)
 {
-    vector_half dst;
-    vector_bool mask;
-    half value = 1.0;
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        mask = asc_update_mask_b16(count);
-        asc_duplicate_scalar(dst, value, mask);
-        asc_storealign(dst_addr + i * one_repeat_size, dst, mask);
-    }
+    std::cout << label << ":";
+    const size_t remaining = values.size() - offset;
+    const size_t count = remaining < 8 ? remaining : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[offset + i];
+    if (remaining > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+constexpr uint32_t ELEMENT_COUNT = 64;
+constexpr float FILL_VALUE = 3.5f;
+
+__simd_vf__ inline void fill(__ubuf__ float* dst, __ubuf__ float* src)
+{
+    vector_float dst_reg;
+    vector_float src_reg;
+    uint32_t count = ELEMENT_COUNT;
+    vector_bool mask = asc_update_mask_b32(count);
+    asc_loadalign(dst_reg, dst);
+    asc_loadalign(src_reg, src);
+    asc_duplicate_scalar(dst_reg, FILL_VALUE, mask);
+    asc_storealign(dst, dst_reg, mask);
+}
+
+__global__ __vector__ void asc_duplicate_scalar_kernel(__gm__ float* dst, __gm__ float* src)
+{
+    asc_init();
+    __ubuf__ float dst_local[ELEMENT_COUNT];
+    __ubuf__ float src_local[ELEMENT_COUNT];
+    asc_copy_gm2ub_align(dst_local, dst, sizeof(dst_local));
+    asc_copy_gm2ub_align(src_local, src, sizeof(src_local));
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    fill(dst_local, src_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(dst, dst_local, sizeof(dst_local));
+    asc_sync();
+}
+
+int main()
+{
+    std::vector<float> src(ELEMENT_COUNT);
+    std::vector<float> output(ELEMENT_COUNT, -1.0f);
+    std::vector<float> golden(ELEMENT_COUNT, FILL_VALUE);
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) src[i] = static_cast<float>(i) * 0.25f + 1.0f;
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    float *src_device = nullptr, *dst_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src_device), src.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&dst_device), output.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src_device, src.size() * sizeof(float), src.data(), src.size() * sizeof(float),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(dst_device, output.size() * sizeof(float), output.data(), output.size() * sizeof(float),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_duplicate_scalar_kernel<<<1, 0>>>(dst_device, src_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+
+    print_data("Input", src);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_duplicate_scalar passed."
+                        : "[Failed] asc_duplicate_scalar failed.") << std::endl;
+    aclrtFree(dst_device);
+    aclrtFree(src_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```
+<!-- end id8 -->

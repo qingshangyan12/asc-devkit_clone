@@ -58,11 +58,97 @@ PIPE_S
 
 - 调用L0C Buffer搬出接口并且需要进行随路Nz格式转换为ND格式之前，必须先调用本接口配置格式转换参数。
 
+<!-- npu="950" id8 -->
 ## 调用示例
 
-```cpp
-uint64_t nd_num = 2;
-uint64_t src_nd_stride = 2;
-uint64_t dst_nd_stride = 1;
-asc_set_l0c2gm_nz2nd(nd_num, src_nd_stride, dst_nd_stride);
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
+
+以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
+
+```cpp
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+constexpr uint32_t DIM = 16, ELEMENTS = DIM * DIM;
+constexpr uint16_t HALF_ONE = 0x3c00;
+
+__global__ __cube__ void asc_set_l0c2gm_nz2nd_kernel(
+    __gm__ uint16_t* a, __gm__ uint16_t* b, __gm__ float* output)
+{
+    asc_init();
+    __cbuf__ half a_l1[ELEMENTS], b_l1[ELEMENTS];
+    __ca__ half a_l0[ELEMENTS];
+    __cb__ half b_l0[ELEMENTS];
+    __cc__ float c_l0[ELEMENTS];
+    constexpr uint64_t nz_config = (16ULL << 32) | (1ULL << 16) | 1ULL;
+    asc_set_gm2l1_nz_para(nz_config);
+    asc_copy_gm2l1_nd2nz(a_l1, reinterpret_cast<__gm__ half*>(a), DIM * sizeof(half), 0, DIM, DIM, 0, false);
+    asc_set_gm2l1_nz_para(nz_config);
+    asc_copy_gm2l1_nd2nz(b_l1, reinterpret_cast<__gm__ half*>(b), DIM * sizeof(half), 0, DIM, DIM, 0, false);
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
+    asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);
+    asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0, 1, 1, 1, 1);
+    asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
+    asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, 0, true, false, true);
+    asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
+    asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
+    // Fixpipe produces NZ internally; LOOP3 parameters make the GM result row-major ND.
+    asc_set_l0c2gm_nz2nd(1, 0, 0);
+    asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
+        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
+        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    asc_sync_pipe(PIPE_ALL);
+}
+
+void print_row(const char* label, const std::vector<float>& data)
+{
+    std::cout << label << ':';
+    for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
+    std::cout << " ..." << std::endl;
+}
+
+int main()
+{
+    std::vector<uint16_t> a(ELEMENTS), b(ELEMENTS);
+    std::vector<float> output(ELEMENTS), golden(ELEMENTS);
+    for (uint32_t i = 0; i < DIM; ++i) {
+        a[i * DIM + i] = HALF_ONE;
+        b[i * DIM + i] = HALF_ONE;
+        golden[i * DIM + i] = 1.0f;
+    }
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint16_t *a_device = nullptr, *b_device = nullptr;
+    float* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&a_device), a.size() * sizeof(uint16_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&b_device), b.size() * sizeof(uint16_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(a_device, a.size() * sizeof(uint16_t), a.data(), a.size() * sizeof(uint16_t), ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(b_device, b.size() * sizeof(uint16_t), b.data(), b.size() * sizeof(uint16_t), ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_set_l0c2gm_nz2nd_kernel<<<1, 0>>>(a_device, b_device, output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(float), output_device, output.size() * sizeof(float),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    print_row("ND output row 0", output);
+    print_row("Golden row 0", golden);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_set_l0c2gm_nz2nd produced row-major ND output."
+                         : "[Failed] asc_set_l0c2gm_nz2nd result mismatch.") << std::endl;
+    aclrtFree(a_device); aclrtFree(b_device); aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
+```
+<!-- end id8 -->
