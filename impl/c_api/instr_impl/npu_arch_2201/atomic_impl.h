@@ -45,7 +45,9 @@
 
 __aicore__ inline void asc_set_atomic_none() { asc_set_atomic_none_impl(); }
 
-__aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config)
+[[deprecated("NOTICE: asc_get_store_atomic_config is deprecated."
+             "Please use asc_atomic_add instead for atomic add operation.")]] __aicore__ inline void
+asc_get_store_atomic_config(asc_store_atomic_config& config)
 {
     asc_get_store_atomic_config_impl(config);
 }
