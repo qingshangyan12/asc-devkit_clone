@@ -47,13 +47,17 @@ CANN 9.2.0及以上。
 三个用例统一采用同一执行配置：grid为4个线程块，每块1024线程即32个warp，共4096线程，动态ubuf为0，启动形态为`<<<dim3(4), dim3(1024), DYN_UBUF_SIZE, stream>>>`。`THREADS_PER_BLOCK`取1024，为默认线程配置下每块的线程数；`TILE_SIZE`取32以对齐warp宽度，使子组恰好落在单个warp内。
 
 
-| 规格项 | CASE=0（跨块规约场景） | CASE=1（整块规约场景） | CASE=2（子组规约场景） |
-|---|---|---|---|
-| OpType | `ReduceGridGroup` | `ReduceThreadBlock` | `ReduceBlockTile` |
-| 输入 | `[4096]`，`int32`，ND | `[4096]`，`int32`，ND | `[4096]`，`int32`，ND |
-| 输出 | `[1]`，`int32`，ND | `[1]`，`int32`，ND | `[1]`，`int32`，ND |
-| gridDim | (4, 1, 1) | (4, 1, 1) | (4, 1, 1) |
-| blockDim | (1024, 1, 1) | (1024, 1, 1) | (1024, 1, 1) |
+<table>
+<tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">input</td><td align="center">[4096]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td rowspan="4" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">total_grid（CASE=0）</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td align="center">total_block（CASE=1）</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td align="center">total_tile（CASE=2）</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_grid_group / reduce_thread_block / reduce_block_tile</td></tr>
+<tr><td rowspan="1" align="center">gridDim</td><td colspan="4" align="center">(4, 1, 1)</td></tr>
+<tr><td rowspan="1" align="center">blockDim</td><td colspan="4" align="center">(1024, 1, 1)</td></tr>
+</table>
 
 
 ### 样例实现

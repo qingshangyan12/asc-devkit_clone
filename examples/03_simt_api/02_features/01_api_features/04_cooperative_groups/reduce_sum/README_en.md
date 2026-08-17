@@ -56,15 +56,22 @@ constexpr int32_t WARPS_PER_BLOCK   = 32;    // THREADS_PER_BLOCK / TILE_SIZE
 constexpr uint32_t DYN_UBUF_SIZE    = 0;     // pure SIMT, no dynamic ubuf
 ```
 
+<table>
+<tr><td rowspan="2" align="center">Sample input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">input</td><td align="center">[4096]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td rowspan="4" align="center">Sample output</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td align="center">total_grid (CASE=0)</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td align="center">total_block (CASE=1)</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td align="center">total_tile (CASE=2)</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">Kernel names</td><td colspan="4" align="center">reduce_grid_group / reduce_thread_block / reduce_block_tile</td></tr>
+<tr><td rowspan="1" align="center">gridDim</td><td colspan="4" align="center">(4, 1, 1)</td></tr>
+<tr><td rowspan="1" align="center">blockDim</td><td colspan="4" align="center">(1024, 1, 1)</td></tr>
+</table>
+
 #### CASE=0 (cross-block reduction)
 
 | Item | Description |
 |---|---|
-| OpType | `ReduceGridGroup` |
-| Input | `[4096]`, `int32`, ND |
-| Output | `[1]`, `int32`, ND |
-| gridDim | (4, 1, 1) |
-| blockDim | (1024, 1, 1) |
 | Group object | `this_grid()`, reduction domain of 4096 threads |
 | Synchronization | Grid-level barrier, 24 times across 12 rounds |
 | Workspace | 4096 slots in global memory, 16 KB |
@@ -74,11 +81,6 @@ constexpr uint32_t DYN_UBUF_SIZE    = 0;     // pure SIMT, no dynamic ubuf
 
 | Item | Description |
 |---|---|
-| OpType | `ReduceThreadBlock` |
-| Input | `[4096]`, `int32`, ND |
-| Output | `[1]`, `int32`, ND |
-| gridDim | (4, 1, 1) |
-| blockDim | (1024, 1, 1) |
 | Group object | `this_thread_block()`, reduction domain of 1024 threads |
 | Synchronization | Block-level barrier `asc_syncthreads()`, 20 times across 10 rounds |
 | Workspace | 1024 slots in shared memory, one copy per block |
@@ -88,11 +90,6 @@ constexpr uint32_t DYN_UBUF_SIZE    = 0;     // pure SIMT, no dynamic ubuf
 
 | Item | Description |
 |---|---|
-| OpType | `ReduceBlockTile` |
-| Input | `[4096]`, `int32`, ND |
-| Output | `[1]`, `int32`, ND |
-| gridDim | (4, 1, 1) |
-| blockDim | (1024, 1, 1) |
 | Group object | `tiled_partition<32>(block)`, reduction domain of 32 threads |
 | Synchronization | Warp-internal, 10 times across two levels of 5 rounds, plus 1 block-level between levels |
 | Workspace | Shared memory, 32 slots per warp at level one, plus `ub_partial[32]` to relay partial sums |
