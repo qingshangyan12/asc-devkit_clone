@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Ascend C SIMT编程模型，演示cooperative_groups协作组库如何将线程组织为不同层级并执行高效的并行规约。
+本样例基于Ascend C SIMT编程模型，演示[cooperative_groups协作组库](../../../../../../docs/zh/api/SIMT-API/协作组/协作组.md)如何将线程组织为不同层级并执行高效的并行规约。
 
 样例设计一个通用规约接口`reduce_sum`，形参取`thread_group`基类；围绕该接口构造三个用例，分别以跨块（`grid_group`）、整块（`thread_block`）、子组（`thread_block_tile`）为规约域。三处调用的书写形式一致，粒度差异由传入的组对象承载。
 
@@ -103,7 +103,7 @@ __aicore__ inline int32_t reduce_sum(const thread_group& g, PtrT x, int32_t val)
 
 三个kernel的参数表末位均带`uint32_t num_elements`，取输入处各有一句`global_idx < num_elements ? input[global_idx] : 0`。线程数由执行配置固定为4096，下标超出元素个数的线程取加法单位元0参与求和，与其余线程一同写入格位并走完各轮折半与同步。
 
-#### 1：跨块规约场景
+#### Case0：跨块规约
 
 规约域为grid内全部4096个线程，一次`reduce_sum`调用得出总和。
 
@@ -134,7 +134,7 @@ __global__ void reduce_grid_group(
 
 12轮结束后全grid仅rank 0持有总和，由`*total_grid = val`直接写出。写者唯一，不需要原子加，`total_grid`也不需要预先清零。
 
-#### 2：整块规约场景
+#### Case1：整块规约
 
 规约域为一个线程块的1024个线程，四个block各自规约出部分和，再经原子加汇总。
 
@@ -174,7 +174,7 @@ __global__ void reduce_thread_block(const int32_t* input, int32_t* total_block, 
 
 通式为`524800 + 1048576k`（`k`为block索引，取值0~3）。四个部分和经`asc_atomic_add`累加，结果与block的完成顺序无关。总和由这四次累加构成，`total_block`在launch前由`aclrtMemset`清零。
 
-#### 3：子组规约场景
+#### Case2：子组规约
 
 规约分两级完成，`reduce_sum`在同一个kernel内被调用两次，两次的规约域均为32。
 
@@ -243,75 +243,85 @@ __global__ void reduce_block_tile(const int32_t* input, int32_t* total_tile, uin
 
 ## 编译运行
 
-在样例根目录下执行以下步骤完成编译与运行。
+在本样例根目录下执行如下步骤，编译并执行样例。
 
-配置环境变量，其中`${install_path}`为CANN软件的安装目录，若安装时未指定则默认为`/usr/local/Ascend`：
+- 配置环境变量  
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
-```bash
-source ${install_path}/cann/set_env.sh
-```
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-`CMakeLists.txt`中不写入CANN路径，工具链、头文件与运行时库均由环境变量给出，`find_package(ASC)`据此定位所用版本，编译与运行两个阶段都取自这套环境变量。机器上装有多个CANN版本时，可核对以下两项确认当前生效的是哪一份：
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
-```bash
-which bisheng            # 应指向 ${install_path}/cann-9.2.0/bin/bisheng
-echo $ASCEND_HOME_PATH   # 应为 ${install_path}/cann-9.2.0
-```
+- 样例执行
 
-CMake将编译器路径写入`build`目录的缓存，切换CANN版本后删除该目录重新配置即可。
+  在本样例目录下执行如下命令。运行时以参数指定用例号，取0、1、2之一，单次执行仅运行指定的那一个用例；参数缺失或非法时打印用法并以退出码1返回。
 
-编译并运行：
+  ```bash
+  mkdir -p build && cd build;                              # 创建并进入build目录
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # 编译工程
+  ./cooperative_groups 0                                   # 执行跨块规约场景
+  ./cooperative_groups 1                                   # 执行整块规约场景
+  ./cooperative_groups 2                                   # 执行子组规约场景
+  ```
 
-```bash
-mkdir build && cd build;
-cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
-./cooperative_groups 0
-```
+  编译选项说明
 
-编译选项仅`CMAKE_ASC_ARCHITECTURES`一项，取值为`dav-3510`，对应Ascend 950PR/950DT的NPU架构。传给编译器的选项为`--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt`。
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
-运行时以参数指定用例号，取0、1、2之一，单次执行运行指定的那一个用例。参数缺失或非法时打印用法并以退出码1返回：
+  以整块规约场景为例，执行结果如下，说明精度对比成功。
 
-```bash
-./cooperative_groups 0    # 跨块规约场景
-./cooperative_groups 1    # 整块规约场景
-./cooperative_groups 2    # 子组规约场景
-```
-
-以整块规约场景为例，校验通过时打印如下，退出码为0：
-
-```text
-Case 1: whole-block reduction (thread_block), reduce domain = 1024
-num_elements = 4096, threads = 4096
-grid = 4 blocks x 1024 threads, reduce domain = 1024 per block, workspace in shared memory
-Output: 8390656
-Golden: 8390656
-[Success] Case accuracy verification passed.
-```
+  ```text
+  Case 1: whole-block reduction (thread_block), reduce domain = 1024
+  num_elements = 4096, threads = 4096
+  grid = 4 blocks x 1024 threads, reduce domain = 1024 per block, workspace in shared memory
+  Output: 8390656
+  Golden: 8390656
+  [Success] Case accuracy verification passed.
+  ```
 
 ## 性能分析
 
-使用`msopprof`工具采集单算子性能数据，待测命令的参数直接跟在可执行文件后：
+使用 `msOpProf` 工具获取详细性能数据：
 
 ```bash
 msopprof ./cooperative_groups 1   # 分析整块规约case的性能
 msopprof ./cooperative_groups 2   # 分析子组规约case的性能
 ```
 
-工具在终端直接打印`Op Name`、`Task Duration(us)`、`Block Dim`等基础信息与调优建议，完整结果落在当前目录的`OPPROF_*`目录下。各跑3次实测`Task Duration(us)`：
+命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹，性能数据文件夹结构示例如下：
+
+```text
+├──dump                       # 原始的性能数据，用户无需关注
+├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+├──L2Cache.csv                # L2 Cache命中率
+├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+├──OpBasicInfo.csv            # 算子基础信息
+├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+├──ResourceConflictRatio.csv  # UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
+└──visualize_data.bin         # MindStudio Insight呈现文件
+```
+
+查看具体的性能分析结果：
+
+```bash
+# 如查看算子基础信息
+cat ./OPPROF_*/OpBasicInfo.csv
+
+# 如查看内存相关数据
+cat ./OPPROF_*/Memory.csv
+```
+
+各跑3次实测`Task Duration(us)`：
 
 | 用例 | 规约域 | 同步 | Task Duration(us) |
 |---|---|---|---|
 | 整块规约 | 1024 | 20次块级 | 7.01 / 7.12 / 7.22 |
 | 子组规约 | 32 | 10次warp内 + 1次块级 | 6.11 / 6.29 / 6.58 |
 
-子组规约比整块规约快约10%~13%，两者三次运行的区间不重叠。
-
-需要进一步定位瓶颈时，可通过`--aic-metrics`细分采集维度，例如`msopprof --aic-metrics=PipeUtilization,Memory ./cooperative_groups 2`。无NPU硬件时可改用仿真模式：
-
-```bash
-msopprof simulator --soc-version=<soc_version> ./cooperative_groups 2
-```
-
-两个场景的输入规模、访存量与暂存区所在层级相同，区别在同步的作用域：子组规约的第一级5轮走warp内同步，仅两级之间用一次块级屏障；整块规约的10轮全部走块级屏障。同步作用域越小，单次屏障需等齐的线程数越少。
-
+子组规约比整块规约快约10%~13%，两者三次运行的区间不重叠。两个场景的输入规模、访存量与暂存区所在层级相同，区别在同步的作用域：子组规约的第一级5轮走warp内同步，仅两级之间用一次块级屏障；整块规约的10轮全部走块级屏障。同步作用域越小，单次屏障需等齐的线程数越少。
