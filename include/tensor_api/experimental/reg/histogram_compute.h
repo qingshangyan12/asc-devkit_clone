@@ -39,7 +39,8 @@ struct histogram_options {
 inline constexpr histogram_options default_histogram_options {};
 
 template <const histogram_options& options = default_histogram_options>
-__simd_callee__ inline decltype(auto) histograms(reg_tensor<uint16_t> dst, reg_tensor<uint8_t> src);
+__simd_callee__ inline decltype(auto) histograms(
+    const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src);
 
 } // namespace te
 } // namespace asc

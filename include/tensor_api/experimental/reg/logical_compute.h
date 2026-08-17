@@ -22,22 +22,22 @@ namespace asc {
 namespace te {
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator!(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator&(T a, U b);
+__simd_callee__ inline decltype(auto) operator&(const T& a, const U& b);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator|(T a, U b);
+__simd_callee__ inline decltype(auto) operator|(const T& a, const U& b);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator^(T a, U b);
+__simd_callee__ inline decltype(auto) operator^(const T& a, const U& b);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator<<(reg_tensor<T> src, U shift);
+__simd_callee__ inline decltype(auto) operator<<(const reg_tensor<T>& src, const U& shift);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator>>(reg_tensor<T> src, U shift);
+__simd_callee__ inline decltype(auto) operator>>(const reg_tensor<T>& src, const U& shift);
 
 } // namespace te
 } // namespace asc

@@ -23,7 +23,7 @@ $$
 ```cpp
 template <typename T, typename scalar_type>
 __simd_callee__ inline decltype(auto) leaky_relu(
-    reg_tensor<T> src_reg, scalar_type slope);
+    const reg_tensor<T>& src_reg, const scalar_type& slope);
 ```
 
 ## 参数说明

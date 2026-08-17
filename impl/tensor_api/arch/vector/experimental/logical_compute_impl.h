@@ -37,7 +37,7 @@ __simd_callee__ inline vector_bool full_predicate_mask()
 }
 
 template <typename T, typename U>
-__simd_callee__ inline reg_tensor<T> make_logic_operand(U value, vector_bool mask)
+__simd_callee__ inline reg_tensor<T> make_logic_operand(const U& value, const vector_bool& mask)
 {
     if constexpr (is_reg_tensor_v<U>) {
         return value;
@@ -50,7 +50,7 @@ __simd_callee__ inline reg_tensor<T> make_logic_operand(U value, vector_bool mas
 }
 
 template <typename T, typename U>
-__simd_callee__ inline vector_bool logic_mask(T a, U b)
+__simd_callee__ inline vector_bool logic_mask(const T& a, const U& b)
 {
     static_assert(is_reg_tensor_v<T> || is_reg_tensor_v<U>, "at least one operand must be reg_tensor");
     if constexpr (is_reg_tensor_v<T>) {
@@ -82,7 +82,7 @@ __simd_callee__ inline void check_bitwise_type()
 }
 
 template <bitwise_op op, typename T, typename U>
-__simd_callee__ inline decltype(auto) bitwise_compute(T a, U b)
+__simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
 {
     using elem_type = binary_elem_t<T, U>;
     check_logic_reg_types<T, U>();
@@ -121,7 +121,7 @@ __simd_callee__ inline decltype(auto) bitwise_compute(T a, U b)
 } // namespace detail
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator!(reg_tensor<T> src)
+__simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src)
 {
     static_assert(detail::supports_not_v<T>, "operator! does not support this element type");
 
@@ -141,25 +141,25 @@ __simd_callee__ inline decltype(auto) operator!(reg_tensor<T> src)
 }
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator&(T a, U b)
+__simd_callee__ inline decltype(auto) operator&(const T& a, const U& b)
 {
     return detail::bitwise_compute<detail::bitwise_op::bit_and>(a, b);
 }
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator|(T a, U b)
+__simd_callee__ inline decltype(auto) operator|(const T& a, const U& b)
 {
     return detail::bitwise_compute<detail::bitwise_op::bit_or>(a, b);
 }
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator^(T a, U b)
+__simd_callee__ inline decltype(auto) operator^(const T& a, const U& b)
 {
     return detail::bitwise_compute<detail::bitwise_op::bit_xor>(a, b);
 }
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator<<(reg_tensor<T> src, U shift)
+__simd_callee__ inline decltype(auto) operator<<(const reg_tensor<T>& src, const U& shift)
 {
     static_assert(detail::supports_shift_v<T>, "operator<< does not support this element type");
 
@@ -179,7 +179,7 @@ __simd_callee__ inline decltype(auto) operator<<(reg_tensor<T> src, U shift)
 }
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator>>(reg_tensor<T> src, U shift)
+__simd_callee__ inline decltype(auto) operator>>(const reg_tensor<T>& src, const U& shift)
 {
     static_assert(detail::supports_shift_v<T>, "operator>> does not support this element type");
 

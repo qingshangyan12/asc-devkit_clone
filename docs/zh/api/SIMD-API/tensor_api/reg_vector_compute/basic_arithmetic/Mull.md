@@ -17,8 +17,8 @@
 template <typename T>
 __simd_callee__ inline decltype(auto) mull(
     reg_tensor<T>& high,
-    reg_tensor<T> src0,
-    reg_tensor<T> src1);
+    const reg_tensor<T>& src0,
+    const reg_tensor<T>& src1);
 ```
 
 ## 参数说明

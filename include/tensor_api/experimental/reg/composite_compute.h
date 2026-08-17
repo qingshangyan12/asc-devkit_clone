@@ -22,19 +22,20 @@ namespace asc {
 namespace te {
 
 template <typename T, typename scalar_type>
-__simd_callee__ inline decltype(auto) axpy(reg_tensor<T> dst, reg_tensor<T> src, scalar_type scalar);
+__simd_callee__ inline decltype(auto) axpy(
+    const reg_tensor<T>& dst, const reg_tensor<T>& src, const scalar_type& scalar);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) absdiff(reg_tensor<T> src0, reg_tensor<T> src1);
+__simd_callee__ inline decltype(auto) absdiff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) exp_sub(reg_tensor<T> src0, reg_tensor<T> src1);
+__simd_callee__ inline decltype(auto) exp_sub(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) fma(
-    reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<T> src2);
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2);
 
-__simd_callee__ inline decltype(auto) muls_cast(reg_tensor<float> src, float scalar);
+__simd_callee__ inline decltype(auto) muls_cast(const reg_tensor<float>& src, const float& scalar);
 
 } // namespace te
 } // namespace asc
