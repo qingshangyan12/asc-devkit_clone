@@ -63,17 +63,12 @@ PIPE_S
 
 ## 约束说明
 
-- 需要保证每一个ID的4位计数器不会溢出，否则会出现异常。
-- 需要保证相同的ID只会被一个流水线控制。
-- 每个ID对应一个4位计数器，特定CORE的同步ID计数器可通过其他CORE发起的asc_sync_intra_arrive递增；也可通过本身发起的asc_sync_intra_wait递减。 
-- 三个CORE的ID映射规则如下：
-    - ID为0~15的Vector Core 0的asc_sync_intra_arrive指令会被映射到Cube Core的0~15的ID。 
-    - ID为0~15的Vector Core 1的asc_sync_intra_arrive指令会被映射到Cube Core的16~31的ID。 
-    - ID为0~15的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 0的0~15的ID。 
-    - ID为16~31的Cube Core的asc_sync_intra_arrive指令会被映射到Vector Core 1的0~15的ID。 
-
-- 必须保证配套使用[asc_sync_intra_arrive](asc_sync_intra_arrive.md)和asc_sync_intra_wait，避免计算核一直处于阻塞阶段。
-- pipe支持的流水类型为PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_S，不支持PIPE_ALL。
+- 用户需要确保配套使用（`sync_id`必须完全一致）`asc_sync_intra_arrive`和`asc_sync_intra_wait`，否则会出现未定义行为。
+- 每个计数器取值范围为[0, 15]，必须保证计数器的值不会溢出，否则触发异常。
+- 本接口不阻塞`pipe`流水中的后续指令。
+- AIC的`sync_id`取值范围为[0, 31]，超出范围值会被按位宽截断处理为低5位（如32->0、33->1）。
+- AIV的`sync_id`取值范围为[0, 15]，超出范围值会被按位宽截断处理为低4位（如16->0、17->1）。
+- 调用本接口的核函数必须使用`__mix__(1, 2)`修饰。
 
 ## 调用示例
 

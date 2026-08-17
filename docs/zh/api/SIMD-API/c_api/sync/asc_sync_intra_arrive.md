@@ -53,7 +53,7 @@ __aicore__ inline void asc_sync_intra_arrive(pipe_t pipe,
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
 | pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。|
-| sync_id | 输入 | 事件标号。AIC的取值范围为[0, 31]，AIV的取值范围为[0, 15]。|
+| sync_id | 输入 | 核间同步的标记，用于标识同一组同步信号。每个`sync_id`各自拥有独立的4位计数器。<br>一个AI Core由1个AIC与2个AIV构成，AIC侧拥有32个`sync_id`（0~31），每个AIV侧各拥有16个`sync_id`（0~15）。<br>跨核ID映射规则如下：<br>• 第一个AIV的ID 0~15映射到AIC的ID 0~15；第二个AIV的ID 0~15映射到AIC的ID 16~31。<br>• AIC的ID 0~15映射到第一个AIV的ID 0~15；AIC的ID 16~31映射到第二个AIV的ID 0~15。 |
 
 ## 返回值说明
 
@@ -65,22 +65,16 @@ PIPE_S
 
 ## 约束说明
 
-- 需要保证每一个ID的计数器不会溢出，否则会出现异常。
-- 需要保证相同的ID只会被一个流水线控制。
-- 每个ID对应一个计数器，特定CORE的同步ID计数器可通过其他CORE发起的`asc_sync_intra_arrive`递增；也可通过本身发起的`asc_sync_intra_wait`递减。
-- 三个CORE的ID映射规则如下：
-    - ID为0~15的Vector Core 0的`asc_sync_intra_arrive`指令会被映射到Cube Core的0~15的ID。
-    - ID为0~15的Vector Core 1的`asc_sync_intra_arrive`指令会被映射到Cube Core的16~31的ID。
-    - ID为0~15的Cube Core的`asc_sync_intra_arrive`指令会被映射到Vector Core 0的0~15的ID。
-    - ID为16~31的Cube Core的`asc_sync_intra_arrive`指令会被映射到Vector Core 1的0~15的ID。
-
-- 必须保证配套使用`asc_sync_intra_arrive`和[asc_sync_intra_wait](asc_sync_intra_wait.md)，否则会出现未定义行为。
-- `pipe`支持的流水类型为`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`、`PIPE_S`，不支持`PIPE_ALL`。
-- 一个核连续发出的`asc_sync_intra_arrive`，硬件不保证执行顺序。
+- 用户需要确保配套使用（`sync_id`必须完全一致）`asc_sync_intra_arrive`和`asc_sync_intra_wait`，否则会出现未定义行为。
+- 每个计数器取值范围为[0, 15]，必须保证计数器的值不会溢出，否则触发异常。
+- 本接口不阻塞`pipe`流水中的后续指令。
+- AIC的`sync_id`取值范围为[0, 31]，超出范围值会被按位宽截断处理为低5位（如32->0、33->1）。
+- AIV的`sync_id`取值范围为[0, 15]，超出范围值会被按位宽截断处理为低4位（如16->0、17->1）。
+- 调用本接口的核函数必须使用`__mix__(1, 2)`修饰。
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`标识核函数。AIV0在UB中构造矩阵A和矩阵B，将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行`asc_sync_intra_arrive`向调度模块发送通知。AIC中从L1 Buffer搬运数据到L0A、L0B（PIPE_MTE1）的操作被`asc_sync_intra_wait`阻塞，直到AIV0执行了`asc_sync_intra_arrive`后才能执行。通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)区分不同的AIV，仅AIV0参与该次同步，AIV1不参与该次同步。
+本示例采用`__mix__(1, 2)`标识核函数，核函数启动1个AI Core，共包含1个AIC和2个AIV。AIV0在UB中构造矩阵A和矩阵B，将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行`asc_sync_intra_arrive`向调度模块发送通知。AIC中从L1 Buffer搬运数据到L0A、L0B（PIPE_MTE1）的操作被`asc_sync_intra_wait`阻塞，直到AIV0执行了`asc_sync_intra_arrive`后才能执行。通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)区分不同的AIV，仅AIV0参与该次同步，AIV1不参与该次同步。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
