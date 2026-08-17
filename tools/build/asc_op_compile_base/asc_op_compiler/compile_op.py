@@ -1922,7 +1922,7 @@ def compile_op_common_part(
     enable_static_manifest = not tiling_info.static_shape_flag and (
         CommonUtility.is_v220() or CommonUtility.is_c310()
     )
-    record_sk_commands_only = enable_static_manifest and is_sk_double_compile
+    record_sk_commands = enable_static_manifest and is_sk_double_compile
     basic_compile_info = compile_info
     basic_compile_option_tuple = compile_option_tuple
     sk_compile_info = None
@@ -1948,7 +1948,7 @@ def compile_op_common_part(
     compile_option_tuple_origin = None
     if is_sk_double_compile:
         global_var_storage.set_variable("ascendc_sk_double_compile", True)
-        if record_sk_commands_only:
+        if record_sk_commands:
             sk_compile_info = copy.deepcopy(compile_info)
             sk_compile_option_tuple = copy.deepcopy(compile_option_tuple)
             global_var_storage.set_variable("ascendc_enable_super_kernel", False)
@@ -1992,7 +1992,7 @@ def compile_op_common_part(
     link_kernel_obj(compile_info, op_info, tiling_info)
 
     # aclnn sk combine compile workflow
-    if is_sk_double_compile and not record_sk_commands_only:
+    if is_sk_double_compile and not enable_static_manifest:
         # reset sk opt
         global_var_storage.set_variable("ascendc_enable_super_kernel", False)
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
@@ -2026,20 +2026,14 @@ def compile_op_common_part(
         sk_bind_dst_file = compile_sk_bind(
             compile_info, compile_info_origin, compile_option_tuple, kernel_meta_dir
         )
-        sk_cap_bitmap = _get_sk_cap_bitmap(
-            compile_info, compile_info_origin.global_kernel_symbols
-        )
 
-        # Dynamic SK output is already a relocatable ELF. Static SK output is
-        # the archive consumed by link_sk_norm_combine.
-        if tiling_info.static_shape_flag:
-            link_sk_norm_combine(
-                compile_info.dst_file,
-                compile_info_origin.dst_file,
-                sk_bind_dst_file,
-                compile_info_origin.tiling_and_dfx_utils_bin_path,
-                compile_info.compile_log_path,
-            )
+        link_sk_norm_combine(
+            compile_info.dst_file,
+            compile_info_origin.dst_file,
+            sk_bind_dst_file,
+            compile_info_origin.tiling_and_dfx_utils_bin_path,
+            compile_info.compile_log_path,
+        )
 
         global_var_storage.set_variable("ascendc_enable_super_kernel", True)
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", False)
@@ -2058,7 +2052,7 @@ def compile_op_common_part(
         output_gen_placehoder,
         compile_log_path,
     )
-    if record_sk_commands_only:
+    if record_sk_commands:
         sk_cap_bitmap = prepare_sk_manifest_context(
             sk_compile_info,
             sk_compile_option_tuple,
@@ -2129,7 +2123,7 @@ def compile_op_common_part(
     if not global_var_storage.get_variable("ascendc_compile_debug_config"):
         tiling_info.remove_file()
         CommonUtility.remove_temp_file(compile_info.gen_kernel_func_file)
-        if record_sk_commands_only:
+        if record_sk_commands:
             CommonUtility.remove_temp_file(sk_compile_info.gen_kernel_func_file)
         CommonUtility.remove_temp_file(compile_info.tiling_and_dfx_utils_file)
     CommonUtility.print_compile_log(

@@ -209,8 +209,8 @@ def compile_manifest_resources(manifest, manifest_dir, source_file_path):
                     argv = []
                     for argument in command["cmd"]:
                         values = (
-                            manifest["option"]["common_compile"]
-                            if argument == "${option:common_compile}"
+                            manifest["options"]["common_compile"]
+                            if argument == "${options:common_compile}"
                             else [argument]
                         )
                         for value in values:

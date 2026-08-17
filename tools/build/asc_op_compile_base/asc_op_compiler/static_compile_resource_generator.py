@@ -71,7 +71,7 @@ class KernelCompileRecord:
     compile_tiling_key: str
     constant_infos: Tuple[ConstantInfoRecord, ...]
     commands: Tuple[StaticCompileCommand, ...]
-    link_option: Tuple[str, ...] = _LINK_OPTION
+    link_options: Tuple[str, ...] = _LINK_OPTION
 
 
 @dataclass(frozen=True)
@@ -189,7 +189,7 @@ def build_kernel_compile_records(
     constant_info_size_by_tiling_key: Optional[dict] = None,
     sk_compile_info=None,
     sk_compile_option_tuple=None,
-    link_option: Sequence[str] = _LINK_OPTION,
+    link_options: Sequence[str] = _LINK_OPTION,
 ):
     constant_infos = tuple(constant_infos)
     constant_info_files = tuple(
@@ -285,7 +285,7 @@ def build_kernel_compile_records(
                 compile_tiling_key=compile_tiling_key,
                 constant_infos=tuple(resolved_constant_infos),
                 commands=tuple(commands),
-                link_option=tuple(link_option),
+                link_options=tuple(link_options),
             )
         )
     return tuple(records)
@@ -584,7 +584,7 @@ def _factor_common_compile(commands, resource_path):
             length += 1
         common = common[:length]
     for command in commands:
-        command["cmd"][1 : 1 + len(common)] = ["${option:common_compile}"]
+        command["cmd"][1 : 1 + len(common)] = ["${options:common_compile}"]
     return common
 
 
@@ -906,7 +906,7 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                             }
                             for constant_info in kernel.constant_infos
                         ],
-                        "link_option": list(kernel.link_option),
+                        "link_options": list(kernel.link_options),
                         "objects": objects,
                     }
                 )
@@ -918,7 +918,7 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                 "resource_id": request.resource_id,
                 "source_file": os.path.basename(request.source_file_path),
                 "resource_path": resource_path,
-                "option": {"common_compile": common_compile},
+                "options": {"common_compile": common_compile},
                 "kernels": manifest_kernels,
             }
             _write_resources(stage_dir, resource_path, resources)
