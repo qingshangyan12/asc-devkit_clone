@@ -58,7 +58,8 @@ inline void asc_half2int32_rd(vector_int32_t& dst,
 | `dst` | 输出 | 目的操作数（矢量数据寄存器）。 |
 | `src` | 输入 | 源操作数（矢量数据寄存器）。 |
 | `mask` | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
-[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
