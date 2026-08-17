@@ -16,7 +16,6 @@
 #include <boost/system/error_code.hpp>
 #include <cerrno>
 #include <cstring>
-#include <fcntl.h>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
@@ -27,7 +26,7 @@ namespace aclrtc {
 namespace {
 namespace fs = boost::filesystem;
 
-std::string QuoteShellArgument(const std::string& argument)
+std::string QuoteArgumentForReplayScript(const std::string& argument)
 {
     std::string quotedArgument("'");
     for (char character : argument) {
@@ -57,64 +56,57 @@ const char* GetProcessTerminationName(CompilationProcessTermination termination)
     }
 }
 
-bool WriteCompleteReplayScriptHeader(int replayScriptFileDescriptor, const fs::path& replayScriptPath,
-                                     const fs::path& compilationWorkingDirectoryPath) noexcept
+bool WriteDiagnosticTextFile(const fs::path& filePath, const std::string& text, std::ios::openmode writeMode)
 {
-    const std::string replayScriptHeader =
-        "#!/bin/sh\nset -eu\ncd " + QuoteShellArgument(compilationWorkingDirectoryPath.string()) + "\n";
-    size_t writtenByteCount = 0U;
-    while (writtenByteCount < replayScriptHeader.size()) {
-        const ssize_t writeResult = write(replayScriptFileDescriptor,
-                                          replayScriptHeader.data() + writtenByteCount,
-                                          replayScriptHeader.size() - writtenByteCount);
-        if (writeResult > 0) {
-            writtenByteCount += static_cast<size_t>(writeResult);
-            continue;
-        }
-        if (writeResult < 0 && errno == EINTR) {
-            continue;
-        }
-        const int writeError = errno;
-        ACLRTC_LOG_WARNING("Failed to write replay script header: path=%s errno=%d message=%s",
-                           replayScriptPath.c_str(), writeError, std::strerror(writeError));
+    std::ofstream outputStream(filePath, std::ios::out | writeMode);
+    if (!outputStream) {
+        const int openError = errno;
+        ACLRTC_LOG_WARNING("Failed to open diagnostic file for writing: path=%s errno=%d message=%s",
+                           filePath.c_str(), openError, std::strerror(openError));
         return false;
     }
-    return true;
+
+    outputStream << text;
+    outputStream.close();
+    if (outputStream) {
+        return true;
+    }
+    const int writeError = errno;
+    ACLRTC_LOG_WARNING("Failed to write diagnostic file: path=%s errno=%d message=%s",
+                       filePath.c_str(), writeError, std::strerror(writeError));
+    return false;
+}
+
+void RemoveIncompleteReplayScript(const fs::path& replayScriptPath) noexcept
+{
+    boost::system::error_code removalError;
+    fs::remove(replayScriptPath, removalError);
+    if (removalError) {
+        ACLRTC_LOG_WARNING("Failed to remove incomplete replay script: path=%s error=%d message=%s",
+                           replayScriptPath.c_str(), removalError.value(), removalError.message().c_str());
+    }
 }
 
 bool CreateExecutableReplayScript(const fs::path& replayScriptPath,
-                                  const fs::path& compilationWorkingDirectoryPath) noexcept
+                                  const fs::path& compilationWorkingDirectoryPath)
 {
-    constexpr mode_t REPLAY_SCRIPT_PERMISSION = S_IRUSR | S_IWUSR | S_IXUSR;
-    const int replayScriptFileDescriptor = open(
-        replayScriptPath.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, REPLAY_SCRIPT_PERMISSION);
-    if (replayScriptFileDescriptor < 0) {
-        const int openError = errno;
-        ACLRTC_LOG_WARNING("Failed to create replay script: path=%s errno=%d message=%s",
-                           replayScriptPath.c_str(), openError, std::strerror(openError));
+    const std::string replayScriptHeader =
+        "#!/bin/sh\nset -eu\ncd " + QuoteArgumentForReplayScript(compilationWorkingDirectoryPath.string()) + "\n";
+    if (!WriteDiagnosticTextFile(replayScriptPath, replayScriptHeader, std::ios::trunc)) {
+        RemoveIncompleteReplayScript(replayScriptPath);
         return false;
     }
 
-    bool replayScriptCreated = WriteCompleteReplayScriptHeader(
-        replayScriptFileDescriptor, replayScriptPath, compilationWorkingDirectoryPath);
-    if (replayScriptCreated && fchmod(replayScriptFileDescriptor, REPLAY_SCRIPT_PERMISSION) != 0) {
-        const int permissionError = errno;
-        ACLRTC_LOG_WARNING("Failed to make replay script executable: path=%s errno=%d message=%s",
-                           replayScriptPath.c_str(), permissionError, std::strerror(permissionError));
-        replayScriptCreated = false;
+    constexpr mode_t REPLAY_SCRIPT_PERMISSION = S_IRUSR | S_IWUSR | S_IXUSR;
+    if (chmod(replayScriptPath.c_str(), REPLAY_SCRIPT_PERMISSION) == 0) {
+        return true;
     }
-    if (close(replayScriptFileDescriptor) != 0) {
-        const int closeError = errno;
-        ACLRTC_LOG_WARNING("Failed to close replay script: path=%s errno=%d message=%s",
-                           replayScriptPath.c_str(), closeError, std::strerror(closeError));
-        replayScriptCreated = false;
-    }
-    if (!replayScriptCreated && unlink(replayScriptPath.c_str()) != 0) {
-        const int removalError = errno;
-        ACLRTC_LOG_WARNING("Failed to remove incomplete replay script: path=%s errno=%d message=%s",
-                           replayScriptPath.c_str(), removalError, std::strerror(removalError));
-    }
-    return replayScriptCreated;
+
+    const int permissionError = errno;
+    ACLRTC_LOG_WARNING("Failed to make replay script executable: path=%s errno=%d message=%s",
+                       replayScriptPath.c_str(), permissionError, std::strerror(permissionError));
+    RemoveIncompleteReplayScript(replayScriptPath);
+    return false;
 }
 } // namespace
 
@@ -157,19 +149,7 @@ void KernelSpecializationDiagnostics::WriteManifestSnapshot(const nlohmann::json
     }
     try {
         const fs::path manifestPath = diagnosticDirectoryPath_ / "manifest.json";
-        std::ofstream manifestStream(manifestPath, std::ios::out | std::ios::trunc);
-        if (!manifestStream) {
-            const int openError = errno;
-            ACLRTC_LOG_WARNING("Failed to open specialization manifest for writing: path=%s errno=%d message=%s",
-                               manifestPath.c_str(), openError, std::strerror(openError));
-            return;
-        }
-        manifestStream << resourceManifest.dump(2) << '\n';
-        if (!manifestStream) {
-            const int writeError = errno;
-            ACLRTC_LOG_WARNING("Failed to write specialization manifest: path=%s errno=%d message=%s",
-                               manifestPath.c_str(), writeError, std::strerror(writeError));
-        }
+        WriteDiagnosticTextFile(manifestPath, resourceManifest.dump(2) + '\n', std::ios::trunc);
     } catch (...) {
         ACLRTC_LOG_WARNING("Failed to record specialization manifest: path=%s",
                            (diagnosticDirectoryPath_ / "manifest.json").c_str());
@@ -182,8 +162,8 @@ void KernelSpecializationDiagnostics::RecordWorktreePath(const fs::path& resourc
         return;
     }
     try {
-        AppendDiagnosticText(diagnosticDirectoryPath_ / "compile.log",
-                             "resource_worktree=" + resourceWorktreePath.string() + "\n");
+        AppendTextToDiagnosticFile(diagnosticDirectoryPath_ / "compile.log",
+                                   "resource_worktree=" + resourceWorktreePath.string() + "\n");
     } catch (...) {
         ACLRTC_LOG_WARNING("Failed to record resource worktree path: path=%s",
                            (diagnosticDirectoryPath_ / "compile.log").c_str());
@@ -197,12 +177,12 @@ void KernelSpecializationDiagnostics::AppendCommandToReplayScript(
         return;
     }
     try {
-        std::string replayLine = QuoteShellArgument(compilationCommand.executablePath.string());
+        std::string replayLine = QuoteArgumentForReplayScript(compilationCommand.executablePath.string());
         for (const std::string& argument : compilationCommand.commandArguments) {
-            replayLine += " " + QuoteShellArgument(argument);
+            replayLine += " " + QuoteArgumentForReplayScript(argument);
         }
         replayLine += '\n';
-        AppendDiagnosticText(diagnosticDirectoryPath_ / "replay.sh", replayLine);
+        AppendTextToDiagnosticFile(diagnosticDirectoryPath_ / "replay.sh", replayLine);
     } catch (...) {
         ACLRTC_LOG_WARNING("Failed to record command %s: path=%s",
                            compilationCommand.diagnosticLabel.c_str(),
@@ -227,7 +207,7 @@ void KernelSpecializationDiagnostics::AppendCommandResultToCompilationLog(
         if (!processResult.capturedOutput.empty() && processResult.capturedOutput.back() != '\n') {
             resultText << '\n';
         }
-        AppendDiagnosticText(diagnosticDirectoryPath_ / "compile.log", resultText.str());
+        AppendTextToDiagnosticFile(diagnosticDirectoryPath_ / "compile.log", resultText.str());
     } catch (...) {
         ACLRTC_LOG_WARNING("Failed to record result for command %s: path=%s",
                            compilationCommand.diagnosticLabel.c_str(),
@@ -248,45 +228,21 @@ void KernelSpecializationDiagnostics::WriteSpecializationResult(
             {"output_published", publicationStatus == OutputPublicationStatus::Published},
         };
         const fs::path resultPath = diagnosticDirectoryPath_ / "result.json";
-        std::ofstream resultStream(resultPath, std::ios::out | std::ios::trunc);
-        if (!resultStream) {
-            const int openError = errno;
-            ACLRTC_LOG_WARNING("Failed to open specialization result for writing: path=%s errno=%d message=%s",
-                               resultPath.c_str(), openError, std::strerror(openError));
-            return;
-        }
-        resultStream << resultJson.dump(2) << '\n';
-        if (!resultStream) {
-            const int writeError = errno;
-            ACLRTC_LOG_WARNING("Failed to write specialization result: path=%s errno=%d message=%s",
-                               resultPath.c_str(), writeError, std::strerror(writeError));
-        }
+        WriteDiagnosticTextFile(resultPath, resultJson.dump(2) + '\n', std::ios::trunc);
     } catch (...) {
         ACLRTC_LOG_WARNING("Failed to record specialization result: path=%s",
                            (diagnosticDirectoryPath_ / "result.json").c_str());
     }
 }
 
-void KernelSpecializationDiagnostics::AppendDiagnosticText(
+void KernelSpecializationDiagnostics::AppendTextToDiagnosticFile(
     const fs::path& filePath, const std::string& text) noexcept
 {
     if (!diagnosticsEnabled_) {
         return;
     }
     try {
-        std::ofstream diagnosticStream(filePath, std::ios::out | std::ios::app);
-        if (!diagnosticStream) {
-            const int openError = errno;
-            ACLRTC_LOG_WARNING("Failed to open diagnostic file for append: path=%s errno=%d message=%s",
-                               filePath.c_str(), openError, std::strerror(openError));
-            return;
-        }
-        diagnosticStream << text;
-        if (!diagnosticStream) {
-            const int writeError = errno;
-            ACLRTC_LOG_WARNING("Failed to append diagnostic file: path=%s errno=%d message=%s",
-                               filePath.c_str(), writeError, std::strerror(writeError));
-        }
+        WriteDiagnosticTextFile(filePath, text, std::ios::app);
     } catch (...) {
         ACLRTC_LOG_WARNING("Failed to append diagnostic file: path=%s", filePath.c_str());
     }
