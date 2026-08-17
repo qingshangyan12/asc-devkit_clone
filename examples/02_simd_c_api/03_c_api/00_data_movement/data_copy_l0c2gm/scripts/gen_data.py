@@ -545,8 +545,7 @@ def apply_qf322fp8(value, quant_pre, relu_pre):
         value = saturate(value / (2**shift), -448, 448, np.float32)
     value = np.float32(value)
     value *= alpha if value >= 0 else decode_relu_pre(relu_pre)
-    if not np.isinf(value):
-        value = np.clip(value + offset, -448, 448)
+    value = np.float32(value + offset)
     return float32_to_fp8_e4m3fn(float(value))
 
 
@@ -681,7 +680,9 @@ def apply_non_saturation_override(result, l0c_matrix, output_type):
         # Non-saturation: inf or |val| > max → nan
         fp8_nan = np.uint8(0x7F)  # fp8_e4m3fn nan encoding
         result[inf_mask | nan_mask] = fp8_nan
-    # Integer types (int8, int4b) and hifloat8: always saturation, no override
+    # hifloat8: _cvt_float32_to_hifuint8(over_mode=True) returns inf/nan
+    # encodings (111/239/128) that already match non-saturation behavior
+    # Integer types: always saturation, no override
 
     return result
 
