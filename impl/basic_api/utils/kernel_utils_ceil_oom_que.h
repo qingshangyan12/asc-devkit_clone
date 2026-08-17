@@ -370,8 +370,7 @@ __aicore__ constexpr bool SupportBytes()
     }
     return sizeof(T) == U;
 }
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 template <auto funcPtr, typename... Args>
 __aicore__ inline void VF_CALL(Args&&... args)
 {
