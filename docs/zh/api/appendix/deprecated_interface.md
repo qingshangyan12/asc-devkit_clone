@@ -303,13 +303,3 @@
 - [asc_abs_sync](../SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md)接口
 
     `asc_abs_sync()`接口已废弃。请使用[asc_abs](../SIMD-API/c_api/vector_compute/asc_abs.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
-
-## Utils API
-
-<!-- npu="950" id9 -->
-### C++标准库
-
-- [CeilDivision](../Utils-API/cpp_stdlib/math_functions/CeilDivision.md)接口
-
-    此接口已废弃，请使用[ceil\_div](../Utils-API/cpp_stdlib/math_functions/ceil_div.md)接口。
-<!-- end id9 -->
