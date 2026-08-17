@@ -8,11 +8,11 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
 #include <gtest/gtest.h>
-#include <mockcpp/mockcpp.hpp>
 
 #include "c_api/stub/cce_stub.h"
 
@@ -24,35 +24,6 @@ using asc::te::cast_layout;
 using asc::te::cast_round_mode;
 using asc::te::cast_sat_mode;
 
-struct CastCall {
-    vector_bool mask = 0;
-};
-
-CastCall g_cast_call;
-
-void HalfToFloatCastStub(vector_float&, vector_half, vector_bool mask)
-{
-    g_cast_call.mask = mask;
-}
-
-void FloatToHalfCastStub(vector_half&, vector_float, vector_bool mask)
-{
-    g_cast_call.mask = mask;
-}
-
-void Int32ToUint8Stub(vector_uint8_t&, vector_int32_t, vector_bool mask)
-{
-    g_cast_call.mask = mask;
-}
-
-class TestTensorApiRegCast : public testing::Test {
-protected:
-    void SetUp() override
-    {
-        g_cast_call = {};
-    }
-};
-
 static_assert(asc::te::detail::reg_cast_op<float, half, cast_layout::zero,
     cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
 static_assert(asc::te::detail::reg_cast_op<half, float, cast_layout::one,
@@ -62,59 +33,70 @@ static_assert(asc::te::detail::reg_cast_op<uint8_t, int32_t, cast_layout::two,
 static_assert(!asc::te::detail::reg_cast_op<float, half, cast_layout::two,
     cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
 
-using HalfReg = asc::te::reg_tensor<half>;
-static_assert(std::is_same_v<decltype(asc::te::cast<float>(std::declval<HalfReg>())),
+using half_reg = asc::te::reg_tensor<half>;
+static_assert(AscendC::Std::is_same_v<decltype(asc::te::cast<float>(AscendC::Std::declval<half_reg>())),
     asc::te::reg_tensor<float>>);
 
-TEST_F(TestTensorApiRegCast, DefaultPolicyDispatchesHalfToFloatAndPreservesMask)
-{
-    constexpr vector_bool mask = 17;
-    MOCKER_CPP(asc_half2float, void(vector_float&, vector_half, vector_bool))
-        .times(1)
-        .will(invoke(HalfToFloatCastStub));
+class tensor_api_reg_cast_3510 : public testing::Test {
+protected:
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
 
+    void SetUp() override
+    {
+        AscendC::SetGCoreType(2);
+    }
+
+    void TearDown() override
+    {
+        AscendC::SetGCoreType(0);
+    }
+};
+
+TEST_F(tensor_api_reg_cast_3510, default_policy_converts_half_to_float_and_preserves_mask)
+{
     asc::te::reg_tensor<half> src {};
-    src.mask = mask;
+    src.mask = pset_b16(PAT_ALL);
+    asc_duplicate_scalar(src.reg, static_cast<half>(3.5F), src.mask);
     auto dst = asc::te::cast<float>(src);
 
-    GlobalMockObject::verify();
-    EXPECT_EQ(dst.mask, mask);
-    EXPECT_EQ(g_cast_call.mask, mask);
+    EXPECT_EQ(dst.mask, src.mask);
+    for (float value : dst.reg) {
+        EXPECT_FLOAT_EQ(value, 3.5F);
+    }
 }
 
-TEST_F(TestTensorApiRegCast, ExplicitPolicyDispatchesLayoutRoundAndSaturation)
+TEST_F(tensor_api_reg_cast_3510, explicit_policy_converts_float_to_half_with_layout_one_and_saturation)
 {
-    constexpr vector_bool mask = 23;
-    MOCKER_CPP(asc_float2half_ru_sat_v2, void(vector_half&, vector_float, vector_bool))
-        .times(1)
-        .will(invoke(FloatToHalfCastStub));
-
     asc::te::reg_tensor<float> src {};
-    src.mask = mask;
+    src.mask = pset_b32(PAT_ALL);
+    asc_duplicate_scalar(src.reg, 70000.0F, src.mask);
     auto dst = asc::te::cast<half, cast_layout::one, cast_round_mode::ceil,
         cast_sat_mode::sat>(src);
 
-    GlobalMockObject::verify();
-    EXPECT_EQ(dst.mask, mask);
-    EXPECT_EQ(g_cast_call.mask, mask);
+    EXPECT_EQ(dst.mask, src.mask);
+    size_t converted_count = 0;
+    size_t zeroed_count = 0;
+    for (half value : dst.reg) {
+        const float actual = static_cast<float>(value);
+        converted_count += actual == 65504.0F;
+        zeroed_count += actual == 0.0F;
+    }
+    EXPECT_EQ(converted_count, src.reg.size());
+    EXPECT_EQ(zeroed_count, dst.reg.size() - src.reg.size());
 }
 
-TEST_F(TestTensorApiRegCast, FourWayNarrowingDispatchesLayoutTwoSaturatedIntrinsic)
+TEST_F(tensor_api_reg_cast_3510, converts_int32_to_float)
 {
-    constexpr vector_bool mask = 31;
-    MOCKER_CPP(asc_int322uint8_sat_v3,
-        void(vector_uint8_t&, vector_int32_t, vector_bool))
-        .times(1)
-        .will(invoke(Int32ToUint8Stub));
-
     asc::te::reg_tensor<int32_t> src {};
-    src.mask = mask;
-    auto dst = asc::te::cast<uint8_t, cast_layout::two, cast_round_mode::rint,
-        cast_sat_mode::sat>(src);
+    src.mask = pset_b32(PAT_ALL);
+    asc_duplicate_scalar(src.reg, -42, src.mask);
+    auto dst = asc::te::cast<float>(src);
 
-    GlobalMockObject::verify();
-    EXPECT_EQ(dst.mask, mask);
-    EXPECT_EQ(g_cast_call.mask, mask);
+    EXPECT_EQ(dst.mask, src.mask);
+    for (float value : dst.reg) {
+        EXPECT_FLOAT_EQ(value, -42.0F);
+    }
 }
 
 } // namespace

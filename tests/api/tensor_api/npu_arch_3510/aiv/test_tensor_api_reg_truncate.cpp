@@ -8,11 +8,11 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
 #include <gtest/gtest.h>
-#include <mockcpp/mockcpp.hpp>
 
 #include "c_api/stub/cce_stub.h"
 
@@ -20,92 +20,63 @@
 
 namespace {
 
-struct TruncateCall {
-    vector_bool mask = 0;
-};
-
-TruncateCall g_truncate_call;
-
-void HalfTruncateStub(vector_half&, vector_half, vector_bool mask)
-{
-    g_truncate_call.mask = mask;
-}
-
-void Bfloat16TruncateStub(vector_bfloat16_t&, vector_bfloat16_t, vector_bool mask)
-{
-    g_truncate_call.mask = mask;
-}
-
-void FloatTruncateStub(vector_float&, vector_float, vector_bool mask)
-{
-    g_truncate_call.mask = mask;
-}
-
 template <typename T>
-using TruncateResult = decltype(asc::te::trunc(std::declval<asc::te::reg_tensor<T>>()));
+using truncate_result = decltype(asc::te::trunc(AscendC::Std::declval<asc::te::reg_tensor<T>>()));
 
 static_assert(asc::te::detail::is_supported<half>::value);
 static_assert(asc::te::detail::is_supported<bfloat16_t>::value);
 static_assert(asc::te::detail::is_supported<float>::value);
 static_assert(!asc::te::detail::is_supported<int32_t>::value);
-static_assert(std::is_same_v<TruncateResult<half>, asc::te::reg_tensor<half>>);
-static_assert(std::is_same_v<TruncateResult<bfloat16_t>, asc::te::reg_tensor<bfloat16_t>>);
-static_assert(std::is_same_v<TruncateResult<float>, asc::te::reg_tensor<float>>);
+static_assert(AscendC::AscendC::Std::is_same_v<truncate_result<half>, asc::te::reg_tensor<half>>);
+static_assert(AscendC::Std::is_same_v<truncate_result<bfloat16_t>, asc::te::reg_tensor<bfloat16_t>>);
+static_assert(AscendC::Std::is_same_v<truncate_result<float>, asc::te::reg_tensor<float>>);
 
-class TestTensorApiRegTruncate : public testing::Test {
+class tensor_api_reg_truncate_3510 : public testing::Test {
 protected:
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
+
     void SetUp() override
     {
-        g_truncate_call = {};
+        AscendC::SetGCoreType(2);
+    }
+
+    void TearDown() override
+    {
+        AscendC::SetGCoreType(0);
     }
 };
 
-TEST_F(TestTensorApiRegTruncate, DispatchesHalfAndPreservesMask)
+template <typename T>
+void expect_truncate_result(vector_bool mask)
 {
-    constexpr vector_bool mask = 17;
-    MOCKER_CPP(asc_trunc, void(vector_half&, vector_half, vector_bool))
-        .times(1)
-        .will(invoke(HalfTruncateStub));
-
-    asc::te::reg_tensor<half> src {};
+    asc::te::reg_tensor<T> src {};
+    for (size_t i = 0; i < src.reg.size(); ++i) {
+        src.reg[i] = static_cast<T>(i % 2 == 0 ? 3.75F : -2.5F);
+    }
     src.mask = mask;
     auto dst = asc::te::trunc(src);
 
-    GlobalMockObject::verify();
     EXPECT_EQ(dst.mask, mask);
-    EXPECT_EQ(g_truncate_call.mask, mask);
+    for (size_t i = 0; i < dst.reg.size(); ++i) {
+        const float expected = i % 2 == 0 ? 3.0F : -2.0F;
+        EXPECT_FLOAT_EQ(static_cast<float>(dst.reg[i]), expected);
+    }
 }
 
-TEST_F(TestTensorApiRegTruncate, DispatchesBfloat16AndPreservesMask)
+TEST_F(tensor_api_reg_truncate_3510, truncates_half_and_preserves_mask)
 {
-    constexpr vector_bool mask = 23;
-    MOCKER_CPP(asc_trunc, void(vector_bfloat16_t&, vector_bfloat16_t, vector_bool))
-        .times(1)
-        .will(invoke(Bfloat16TruncateStub));
-
-    asc::te::reg_tensor<bfloat16_t> src {};
-    src.mask = mask;
-    auto dst = asc::te::trunc(src);
-
-    GlobalMockObject::verify();
-    EXPECT_EQ(dst.mask, mask);
-    EXPECT_EQ(g_truncate_call.mask, mask);
+    expect_truncate_result<half>(pset_b16(PAT_ALL));
 }
 
-TEST_F(TestTensorApiRegTruncate, DispatchesFloatAndPreservesMask)
+TEST_F(tensor_api_reg_truncate_3510, truncates_bfloat16_and_preserves_mask)
 {
-    constexpr vector_bool mask = 31;
-    MOCKER_CPP(asc_trunc, void(vector_float&, vector_float, vector_bool))
-        .times(1)
-        .will(invoke(FloatTruncateStub));
+    expect_truncate_result<bfloat16_t>(pset_b16(PAT_ALL));
+}
 
-    asc::te::reg_tensor<float> src {};
-    src.mask = mask;
-    auto dst = asc::te::trunc(src);
-
-    GlobalMockObject::verify();
-    EXPECT_EQ(dst.mask, mask);
-    EXPECT_EQ(g_truncate_call.mask, mask);
+TEST_F(tensor_api_reg_truncate_3510, truncates_float_and_preserves_mask)
+{
+    expect_truncate_result<float>(pset_b32(PAT_ALL));
 }
 
 } // namespace
