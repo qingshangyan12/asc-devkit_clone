@@ -30,9 +30,11 @@ CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
     CCU_CHK_RET(CcuReduceScatterMesh1DMem2MemKernel(
         inputAddr, reducedSliceAddr, tokenInfo, scratchAddr, sliceOffset, sliceSize, repeatNum, channels,
         channelCount, rankSize, rankId, dataType, outputType, reduceType));
+    ccu::Variable isInputOutputEqual;
+    isInputOutputEqual = 1;
     CCU_CHK_RET(CcuKfcAllGatherMesh1DMem2MemKernel(
         reducedSliceAddr, outputAddr, tokenInfo, sliceOffset, sliceSize, goSize0, goSize1, goSize2, goSize3,
-        channels, channelCount, rankSize, rankId));
+        isInputOutputEqual, channels, channelCount, rankSize, rankId));
     return CCU_SUCCESS;
 }
 

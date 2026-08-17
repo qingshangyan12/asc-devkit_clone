@@ -19,7 +19,7 @@ namespace AscendC {
 
 enum class AlgorithmType : uint8_t {
     CcuAllGatherMesh1D = 0,
-    CcuAllGatherMeshMem2Mem1D,
+    CcuSchedAllGatherSoleMesh = 1,
     CcuAllGatherMesh2D,
     CcuReduceScatterMesh1D,
     CcuReduceScatterMeshMem2Mem1D,

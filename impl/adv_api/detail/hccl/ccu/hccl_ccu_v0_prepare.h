@@ -216,6 +216,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[3] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
     xnData_[4] = sliceSize;
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
+    xnData_[9] = (xnData_[1] == xnData_[2] + xnData_[3]) ? 1 : 0;
 }
 
 template <const auto& config>
