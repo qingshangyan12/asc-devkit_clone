@@ -50,8 +50,8 @@ __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。|
-| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0,15]，每个flag ID各自拥有独立的4位计数器。|
+| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。 |
+| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。 |
 
 ## 返回值说明
 
@@ -59,7 +59,7 @@ __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe,
 
 ## 流水类型
 
-PIPE_S
+`PIPE_S`
 
 ## 约束说明
 
@@ -81,6 +81,7 @@ PIPE_S
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
+
 <!-- end id17 -->
 
 ```c

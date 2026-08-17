@@ -30,20 +30,21 @@
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_set_atomic_none()
 ```
 
 ## 参数说明
 
 无
+
 ## 返回值说明
 
 无
 
 ## 流水类型
 
-PIPE_S
+`PIPE_S`
 
 ## 约束说明
 
@@ -51,4 +52,9 @@ PIPE_S
 
 ## 调用示例
 
-与[asc_set_atomic_add](asc_set_atomic_add.md)接口配合使用，调用示例参考[asc_set_atomic_add](asc_set_atomic_add.md#调用示例)调用示例。
+```c
+asc_set_atomic_add_int8();
+asc_copy_ub2gm(dst, src, total_length * sizeof(int8_t));
+// 关闭原子操作。
+asc_set_atomic_none();
+```
