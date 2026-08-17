@@ -245,24 +245,73 @@ test('classifies link-only navigation pages without treating content pages as ca
   assert.equal(isCatalogOnlyArticle(content, content('.markdown-body')), false)
 })
 
-test('continues with the primary index when the title index is unavailable', async () => {
+test('restores the primary index when a failed title merge poisons Pagefind state', async () => {
   let mergeCalls = 0
+  let destroyCalls = 0
+  let initCalls = 0
+  let poisoned = false
   const pagefind = {
     async mergeIndex() {
       mergeCalls++
+      poisoned = true
       throw new Error('404')
+    },
+    async destroy() {
+      destroyCalls++
+      poisoned = false
+    },
+    async init() {
+      initCalls++
+    },
+    async search() {
+      if (poisoned) throw new Error('404')
+      return { results: ['primary'] }
     },
   }
   const originalWarn = console.warn
   console.warn = () => {}
   try {
     assert.equal(await initializePagefindSearch(pagefind), pagefind)
+    assert.deepEqual(await pagefind.search('query'), { results: ['primary'] })
     assert.equal(await initializePagefindSearch(pagefind), pagefind)
   }
   finally {
     console.warn = originalWarn
   }
   assert.equal(mergeCalls, 1)
+  assert.equal(destroyCalls, 1)
+  assert.equal(initCalls, 1)
+})
+
+test('retries title initialization when primary index recovery fails', async () => {
+  let mergeCalls = 0
+  let destroyCalls = 0
+  let initCalls = 0
+  const pagefind = {
+    async mergeIndex() {
+      mergeCalls++
+      throw new Error('404')
+    },
+    async destroy() {
+      destroyCalls++
+      if (destroyCalls === 1) throw new Error('destroy failed')
+    },
+    async init() {
+      initCalls++
+    },
+  }
+  const originalWarn = console.warn
+  console.warn = () => {}
+  try {
+    await assert.rejects(initializePagefindSearch(pagefind), /destroy failed/)
+    assert.equal(await initializePagefindSearch(pagefind), pagefind)
+  }
+  finally {
+    console.warn = originalWarn
+  }
+  assert.equal(mergeCalls, 2)
+  assert.equal(destroyCalls, 2)
+  assert.equal(initCalls, 1)
 })
 
 test('retries the identifier index after a temporary request failure', async () => {

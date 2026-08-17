@@ -851,7 +851,10 @@ export async function initializePagefindSearch(pagefind) {
     await pagefind.mergeIndex('/pagefind-titles/', { indexWeight: 2 })
   }
   catch (error) {
-    console.warn('[search] Title index is unavailable; continuing with the primary Pagefind index.', error)
+    console.warn('[search] Title index is unavailable; restoring the primary Pagefind index.', error)
+    // Pagefind 1.5.2 retains a failed merged instance, so the primary instance must be rebuilt.
+    await pagefind.destroy()
+    await pagefind.init()
   }
   initializedPagefindInstances.add(pagefind)
   return pagefind
