@@ -557,8 +557,7 @@ def apply_qf322hif8(value, quant_pre, relu_pre, hybrid=False):
         value = saturate(value / (2**shift), -240, 240, np.float32)
     value = np.float32(value)
     value *= alpha if value >= 0 else decode_relu_pre(relu_pre)
-    if not np.isinf(value):
-        value = np.clip(value + offset, -240, 240)
+    value = np.float32(value + offset)
     return float32_to_hifloat8(float(value), hybrid=hybrid)
 
 
@@ -655,7 +654,9 @@ def apply_non_saturation_override(result, l0c_matrix, output_type):
     In non-saturation mode (CTRL[48]=1):
     - Float types (half, bfloat16, float): preserve inf/nan
     - fp8_e4m3fn: inf → nan, nan → nan
-    - Integer types and hifloat8: always saturation (no override)
+    - hifloat8: _cvt_float32_to_hifuint8(over_mode=True) already returns the
+      inf/nan encodings (111/239/128) that match the non-saturation behavior
+    - Integer types: always saturation (no override)
     """
     inf_mask = np.isinf(l0c_matrix)
     nan_mask = np.isnan(l0c_matrix)
@@ -689,24 +690,35 @@ def apply_saturation_override(result, l0c_matrix, output_type):
     """Override quantized result for positions where L0C had inf/nan in saturation mode.
 
     In saturation mode (CTRL[48]=0):
-    - half/bfloat16: inf → ±MAX, nan → 0 (CTRL[48] controls these types)
+    - half: inf → ±MAX(65504), nan → 0
+    - bfloat16: inf → ±MAX(0x7F7F/0xFF7F), nan → 0
+    - fp8_e4m3fn: inf → ±MAX(448=0x7E/-448=0xFE), nan → 0
+    - hifloat8: inf → overflow encoding(111/239) via over_mode=True, nan → 0
     - float: CTRL[48] does NOT support float; inf/nan are preserved
-    - fp8/hifloat8/integer: already handled by their conversion functions
+    - Integer types: always saturation, already handled by their functions
     """
     nan_mask = np.isnan(l0c_matrix)
     pos_inf_mask = l0c_matrix == np.inf
     neg_inf_mask = l0c_matrix == -np.inf
 
     if output_type == 'half':
-        # np.clip clips inf but not nan; fix nan → 0
+        result[pos_inf_mask] = np.float16(65504)
+        result[neg_inf_mask] = np.float16(-65504)
         result[nan_mask] = np.float16(0)
     elif output_type == 'bfloat16':
-        # float32_to_bfloat16 preserves inf/nan; saturate both
         result[pos_inf_mask] = np.uint16(0x7F7F)   # bfloat16 max
         result[neg_inf_mask] = np.uint16(0xFF7F)   # bfloat16 min
         result[nan_mask] = np.uint16(0)
+    elif output_type == 'fp8_e4m3fn':
+        result[pos_inf_mask] = np.uint8(0x7E)   # fp8_e4m3fn max (448)
+        result[neg_inf_mask] = np.uint8(0xFE)   # fp8_e4m3fn min (-448)
+        result[nan_mask] = np.uint8(0)
+    elif output_type == 'hifloat8':
+        # inf → overflow encoding (111/239) already set by _cvt_float32_to_hifuint8
+        # nan → 0 in saturation mode
+        result[nan_mask] = np.uint8(0)
     # float: CTRL[48] does not support float type, inf/nan preserved as-is
-    # fp8, hifloat8, integer types: already saturate correctly in their functions
+    # Integer types: always saturation, already handled by their functions
 
     return result
 
