@@ -5,7 +5,7 @@
 本案例呈现了在矩阵乘算子场景中，开启Matmul高阶API的纯Cube模式对算子性能的提升效果。如下图所示，Matmul API默认使用MIX模式，即用户从AIV侧发起消息，通过消息通信框架中转消息后，在AIC侧执行Matmul计算。这套消息处理机制会带来额外的Scalar性能开销。相较于MIX模式，纯Cube模式可以直接跳过消息通信框架，完成Matmul计算，提升算子性能。
 
 **图1**  默认MIX模式的Matmul流程示意图<a name="fig0672118378"></a>  
-![](../../../figures/默认MIX模式的Matmul流程示意图.png "默认MIX模式的Matmul流程示意图")
+![](../../../figures/mix_matmul.png "默认MIX模式的Matmul流程示意图")
 
 -   开启纯Cube模式的适用场景
 
@@ -98,7 +98,7 @@ Tiling参数如下：
     cubeTiling.SetDim(numBlocks);
     ```
 
-3.  调用核函数，参考[核函数定义和调用](../../../编程指南/编程模型/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)，设置核函数的numBlocks参数配置。
+3.  调用核函数，参考[核函数定义和调用](../../../programming_guide/programming_model/ai_core_simd_programming/kernel_function.md#zh-cn_topic_0000001447989210_section1915102519220)，设置核函数的numBlocks参数配置。
 
     ```
     matmul_custom_do(ascendcPlatform->GetCoreNumAic(), stream, x1, x2, bias, y, workspaceDevice, tilingDevice); // MIX模式下，启动时，按照AIV和AIC组合启动，numBlocks用于设置启动多少个AI Core。
@@ -107,7 +107,7 @@ Tiling参数如下：
 在没有矢量计算的算子场景下，可以跳过消息通信框架的机制，开启纯Cube模式完成Matmul计算，减少消息通信的性能开销，提升算子性能。
 
 **图2**  纯Cube模式的Matmul流程示意图<a name="fig20558182319127"></a>  
-![](../../../figures/纯Cube模式的Matmul流程示意图.png "纯Cube模式的Matmul流程示意图")
+![](../../../figures/cube_matmul.png "纯Cube模式的Matmul流程示意图")
 
 Matmul API开启纯Cube模式的完整样例请参考[纯Cube模式的Matmul样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul)。开启纯Cube模式的主要步骤如下：
 
@@ -133,7 +133,7 @@ Matmul API开启纯Cube模式的完整样例请参考[纯Cube模式的Matmul样�
     cubeTiling.SetDim(numBlocks);
     ```
 
-3.  调用核函数，参考[核函数定义和调用](../../../编程指南/编程模型/AI-Core-SIMD编程/核函数.md#zh-cn_topic_0000001447989210_section1915102519220)，设置核函数的numBlocks参数配置。
+3.  调用核函数，参考[核函数定义和调用](../../../programming_guide/programming_model/ai_core_simd_programming/kernel_function.md#zh-cn_topic_0000001447989210_section1915102519220)，设置核函数的numBlocks参数配置。
 
     ```
     matmul_custom_do(ascendcPlatform->GetCoreNumAic(), stream, x1, x2, bias, y, workspaceDevice, tilingDevice); // 仅包含Cube计算的算子，numBlocks用于设置启动多少个AIC。

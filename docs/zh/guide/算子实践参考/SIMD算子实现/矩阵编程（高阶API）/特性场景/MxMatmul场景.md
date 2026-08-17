@@ -15,7 +15,7 @@ MX格式是一种块数据格式，若干个数据可以组成一个块（或者
 下图为MX格式的浮点数的数据结构，S、E和M分别用于表示浮点数的符号、指数和尾数字段的值。其中，共享缩放因子X是一个用于整个数据块的缩放比例因子，它决定了数据块中所有元素的动态范围。通过引入共享缩放因子，MX格式的数据能够在保持低位宽的同时，灵活地表示不同范围的数据。块大小k指的是组成一个数据块（或组）的低比特数据的数量。私有元素P<sub>i</sub>是指数据块中的每个低比特数据元素。这些元素经过缩放因子X的调整后，共同表示了一个高精度的浮点数或整数。
 
 **图1**  MX格式组成示意图  
-![](../../../../figures/MX格式组成示意图.png "MX格式组成示意图")
+![](../../../../figures/mx_format.png "MX格式组成示意图")
 
 MX格式的数据类型包含多种，例如MXFP8、MXFP4、MXFP16、MXINT4等。下表列举了[MxMatmul场景](#zh-cn_topic_0000002270097206_section310824820358)（全称Microscaling Matmul）支持的数据类型。
 
@@ -40,21 +40,21 @@ MxMatmul的计算公式为：C = \(scaleA ⊗ A\) \* \(scaleB ⊗ B\) + Bias，�
 -   Bias为矩阵乘偏置，形状为\[1, N\]。对\(scaleA ⊗ A\) \* \(scaleB ⊗ B\)结果矩阵的每一行都采用该Bias进行偏置。
 
 **图2**  MxMatmul矩阵乘示意图<a name="zh-cn_topic_0000002270097206_fig1942919398330"></a>  
-![](../../../../figures/MxMatmul矩阵乘示意图.png "MxMatmul矩阵乘示意图")
+![](../../../../figures/mx_matmul.png "MxMatmul矩阵乘示意图")
 
 矩阵A、scaleA、B、scaleB在不同位置中的排布格式分别如下图所示。
 
 **图3**  A矩阵在不同位置的排布格式  
-![](../../../../figures/A矩阵在不同位置的排布格式.png "A矩阵在不同位置的排布格式")
+![](../../../../figures/a_matrix_pos.png "A矩阵在不同位置的排布格式")
 
 **图4**  B矩阵在不同位置的排布格式  
-![](../../../../figures/B矩阵在不同位置的排布格式.png "B矩阵在不同位置的排布格式")
+![](../../../../figures/b_matrix_pos.png "B矩阵在不同位置的排布格式")
 
 **图5**  scaleA矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig107863142019"></a>  
-![](../../../../figures/scaleA矩阵在不同位置的排布格式.png "scaleA矩阵在不同位置的排布格式")
+![](../../../../figures/scale_a_pos.png "scaleA矩阵在不同位置的排布格式")
 
 **图6**  scaleB矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig76682054103416"></a>  
-![](../../../../figures/scaleB矩阵在不同位置的排布格式.png "scaleB矩阵在不同位置的排布格式")
+![](../../../../figures/scale_b_pos.png "scaleB矩阵在不同位置的排布格式")
 
 ## 使用场景
 
@@ -215,7 +215,7 @@ Kernel侧的关键步骤介绍如下：
 | TYPE | 数据类型。<!-- npu="950" id5 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t<br><br>B矩阵可设置为fp4x2_e1m2_t、fp4x2_e2m1_t、fp8_e4m3fn_t、fp8_e5m2_t<!-- end id5 --><br><br>注意：具体数据类型组合关系请参考[MxMatmul支持数据类型](#zh-cn_topic_0000002270097206_table5383144710452)。 |
 | ISTRANS | 是否开启A、B矩阵转置的功能。默认值为false。参数支持的取值如下：<br><br>true：开启矩阵转置的功能，开启后，分别通过SetTensorA和SetTensorB中的isTransposeA、isTransposeB参数设置A、B矩阵是否转置。若设置A、B矩阵转置，Matmul会认为A矩阵形状为[K, M]，B矩阵形状为[N, K]。<br><br>false：不开启矩阵转置的功能，通过SetTensorA和SetTensorB不能设置A、B矩阵的转置情况。Matmul会认为A矩阵形状为[M, K]，B矩阵形状为[K, N]。 |
 | SRCPOS | A/B矩阵的POSITION参数配置为TPosition::TSCM时，要设置TSCM中矩阵数据的来源的内存逻辑位置，默认为TPosition::GM。<!-- npu="950" id6 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>A矩阵可设置为TPosition::GM，TPosition::VECOUT<br><br>B矩阵可设置为TPosition::GM，TPosition::VECOUT<!-- end id6 --> |
-| SCALE_FORMAT | 量化系数矩阵的物理排布格式，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig107863142019)。默认值为FORMAT参数的取值。<!-- npu="950" id7 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR<br><br>scaleB矩阵可设置为CubeFormat::ND，CubeFormat::NZ<!-- end id7 --><br><br>注意：<br><br>NZ排布格式请参考[NZ](../../../../技术附录/概念原理和术语/神经网络和算子/数据排布格式.md#li19960204116136)。MxMatmul场景，scaleA、scaleB的数据类型为fp8_e8m0_t，分形大小H0=16，W0=2。<br><br>在Scale矩阵为ND格式的场景中，当通过SetTensorScaleA接口设置scaleA矩阵转置时，scaleA内存排布格式必须按照(K/64, M，2)排布，通过SetTensorScaleB接口设置scaleB矩阵不转置时，scaleB内存排布格式必须按照(K/64，N， 2)排布，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig76682054103416)。 |
+| SCALE_FORMAT | 量化系数矩阵的物理排布格式，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig107863142019)。默认值为FORMAT参数的取值。<!-- npu="950" id7 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR<br><br>scaleB矩阵可设置为CubeFormat::ND，CubeFormat::NZ<!-- end id7 --><br><br>注意：<br><br>NZ排布格式请参考[NZ](../../../../technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md#li19960204116136)。MxMatmul场景，scaleA、scaleB的数据类型为fp8_e8m0_t，分形大小H0=16，W0=2。<br><br>在Scale矩阵为ND格式的场景中，当通过SetTensorScaleA接口设置scaleA矩阵转置时，scaleA内存排布格式必须按照(K/64, M，2)排布，通过SetTensorScaleB接口设置scaleB矩阵不转置时，scaleB内存排布格式必须按照(K/64，N， 2)排布，详细介绍请参考[数据格式](#zh-cn_topic_0000002270097206_fig76682054103416)。 |
 | SCALE_ISTRANS | 是否开启scaleA、scaleB矩阵转置的功能。默认值为ISTRANS参数的取值。参数支持的取值如下：<br><br>true：开启矩阵转置的功能。开启后，分别通过SetTensorScaleA和SetTensorScaleB中的isTransposeScaleA、isTransposeScaleB参数设置scaleA、scaleB矩阵是否转置。在Scale矩阵为ND格式的场景中，若设置scaleA、scaleB矩阵转置，Matmul会认为scaleA矩阵形状为[Ceil(K/64), M, 2]，scaleB矩阵形状为[N, Ceil(K/64), 2]。<br><br>false：不开启矩阵转置的功能。通过SetTensorScaleA和SetTensorScaleB不能设置scaleA、scaleB矩阵的转置情况。Matmul会认为scaleA矩阵形状为[M, Ceil(K/64), 2]，scaleB矩阵形状为[Ceil(K/64), N, 2]。 |
 | SCALE_SRCPOS | scaleA、scaleB矩阵的SCALE_POSITION参数设置为TPosition::TSCM时，需要通过本参数设置TSCM中矩阵数据来源的内存逻辑位置，默认值为SRCPOS参数的取值。<!-- npu="950" id8 --><br><br>针对Ascend 950PR/Ascend 950DT：<br><br>scaleA矩阵可设置为TPosition::GM，TPosition::VECOUT<br><br>scaleB矩阵可设置为TPosition::GM，TPosition::VECOUT<!-- end id8 --> |
 
