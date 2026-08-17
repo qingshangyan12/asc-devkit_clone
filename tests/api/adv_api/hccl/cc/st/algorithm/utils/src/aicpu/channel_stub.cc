@@ -101,6 +101,31 @@ HcclResult CalcChannelRequestNhr(
     return CalcChannelRequestMesh1D(comm, param, topoInfo, subcommInfo, channels);
 }
 
+HcclResult ProcessLinksForChannelMutiJetty(
+    HcclComm comm, CommProtocol& expectedProtocol, std::vector<CommLink>& linkList, u32 myRank, u32 remoteRank,
+    uint32_t netLayer, std::vector<HcclChannelDesc>& channels, bool execptMesh, bool isIsolation)
+{
+    (void)comm;
+    (void)expectedProtocol;
+    (void)linkList;
+    (void)myRank;
+    (void)remoteRank;
+    (void)netLayer;
+    (void)channels;
+    (void)execptMesh;
+    (void)isIsolation;
+    return HCCL_SUCCESS;
+}
+
+// ST环境没有真实RankGraph链路，退化为与普通NHR一致的单channel请求
+HcclResult CalcChannelRequestNhrMultiJetty(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation)
+{
+    (void)isIsolation;
+    return CalcChannelRequestNhr(comm, param, topoInfo, subcommInfo, channels);
+}
+
 HcclResult CalcChannelRequestMesh2D(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels)
