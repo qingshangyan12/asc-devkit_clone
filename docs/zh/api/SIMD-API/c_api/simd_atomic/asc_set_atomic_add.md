@@ -108,7 +108,7 @@ bisheng examples.asc -o main --npu-arch=dav-3510; ./main
 
 namespace {
 template <typename T>
-void PrintData(const char* label, const std::vector<T>& values)
+void print_data(const char* label, const std::vector<T>& values)
 {
     std::cout << label << ":";
     const size_t count = values.size() < 8 ? values.size() : 8;
@@ -118,7 +118,7 @@ void PrintData(const char* label, const std::vector<T>& values)
 }
 
 template <typename T>
-bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
@@ -130,7 +130,7 @@ bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, d
 }
 
 template <typename T>
-bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expected,
     size_t begin, size_t count, double tolerance = 0.0)
 {
     if (begin + count > actual.size() || begin + count > expected.size()) return false;
@@ -146,7 +146,7 @@ bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expect
 
 constexpr uint32_t ELEMENTS = 8;
 
-__global__ __vector__ void AscAtomicAddKernel(__gm__ int64_t* output)
+__global__ __vector__ void asc_atomic_add_kernel(__gm__ int64_t* output)
 {
     asc_init();
     __gm__ uint32_t* address = reinterpret_cast<__gm__ uint32_t*>(output);
@@ -173,14 +173,14 @@ int main()
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(output_device, input.size() * sizeof(int64_t), input.data(), input.size() * sizeof(int64_t),
         ACL_MEMCPY_HOST_TO_DEVICE);
-    AscAtomicAddKernel<<<1, 0>>>(output_device);
+    asc_atomic_add_kernel<<<1, 0>>>(output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(int64_t), output_device, output.size() * sizeof(int64_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    PrintData("Input", input);
-    PrintData("Output", output);
-    PrintData("Golden", golden);
-    const bool passed = CompareData(output, golden);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = compare_data(output, golden);
     std::cout << (passed ? "[Success] asc_atomic_add passed." : "[Failed] asc_atomic_add failed.") << std::endl;
     aclrtFree(output_device);
     aclrtResetDevice(0);
