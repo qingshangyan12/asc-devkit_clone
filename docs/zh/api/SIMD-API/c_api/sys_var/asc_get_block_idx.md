@@ -28,6 +28,8 @@
 
 获取当前运行核的索引。
 
+**此接口后续版本会废弃，请使用内置变量[block_idx](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#内置变量)。**
+
 ## 函数原型
 
 ```cpp
@@ -44,7 +46,7 @@ __aicore__ inline int64_t asc_get_block_idx()
 
 ## 流水类型
 
-PIPE_S
+`PIPE_S`
 
 ## 约束说明
 

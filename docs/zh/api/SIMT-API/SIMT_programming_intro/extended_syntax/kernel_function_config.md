@@ -20,7 +20,7 @@ __global__ void kernel_name(uint32_t* param1, float* param2, ...);
 
 ## \_\_launch\_bounds\_\_\(N\)
 
-在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程和线程块驻留在AI处理器上，从而提升性能。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
+在多线程并发执行时，每个线程使用较少的寄存器可以让单个线程块内启动更多的线程，从而提升性能。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
 \_\_launch\_bounds\_\_\(\)：函数标记宏，在核函数上可选配置，用于在编译期指定核函数启动的最大线程数。若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。参数N需要满足：
 
@@ -46,11 +46,11 @@ __global__ void kernel_name(uint32_t* param1, float* param2, ...);
 <<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>
 ```
 
-执行配置由4个参数决定，详细用法说明参考[核函数配置](../../../../guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#核函数配置)：
+执行配置由4个参数决定，详细用法说明参考[核函数配置](../../../../guide/programming_guide/language_extension/simt_builtin_keywords.md#核函数配置)：
 
 -   blocks\_per\_grid：[dim3](./builtin_data_types.md#dim3)类型，用于指定网格（grid）的维度与规模，blocks\_per\_grid.x \* blocks\_per\_grid.y \* blocks\_per\_grid.z等于启动的线程块总数，且不能超过65535。
 -   threads\_per\_block：[dim3](./builtin_data_types.md#dim3)类型，用于指定每个线程块（block）的维度与规模，threads\_per\_block.x \* threads\_per\_block.y \* threads\_per\_block.z等于每个线程块包含的线程数，需要小于等于\_\_launch\_bounds\_\_配置。
--   dyn\_ubuf\_size：size\_t类型，用于指定每个线程块动态分配的共享内存大小，单位为字节。这部分内存供数组使用，具体用法请参考[共享内存](../../../../guide/编程指南/编程模型/AI-Core-SIMT编程/内存层级.md#共享内存)中的“动态申请”方式。
+-   dyn\_ubuf\_size：size\_t类型，用于指定每个线程块动态分配的共享内存大小，单位为字节。这部分内存供数组使用，具体用法请参考[共享内存](../../../../guide/programming_guide/programming_model/ai_core_simt_programming/memory_hierarchy.md#共享内存)中的“动态申请”方式。
 -   stream：aclrtStream类型指针，指定关联的流，用于维护异步操作的执行顺序。
 
 以下示例展示了内核函数的声明与调用方式。
