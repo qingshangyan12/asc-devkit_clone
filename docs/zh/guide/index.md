@@ -190,17 +190,17 @@
             -   [算子包部署时出现权限不足报错](programming_guide/appendix/faq/operator_deploy_permission_error.md)
 
 
--   [算子实践参考](算子实践参考/document_structure.md)
-    -   [本文档组织结构](算子实践参考/document_structure.md)
+-   [算子实践参考](算子实践参考/本文档组织结构.md)
+    -   [本文档组织结构](算子实践参考/本文档组织结构.md)
     -   [异构计算](算子实践参考/异构计算.md)
     -   [SIMD算子实现](算子实践参考/SIMD算子实现/SIMD算子实现.md)
-        -   [概述](算子实践参考/SIMD算子实现/overview.md)
+        -   [概述](算子实践参考/SIMD算子实现/概述.md)
         -   [矢量编程](算子实践参考/SIMD算子实现/矢量编程/矢量编程.md)
-            -   [概述](算子实践参考/SIMD算子实现/矢量编程/overview.md)
+            -   [概述](算子实践参考/SIMD算子实现/矢量编程/概述.md)
             -   [基础矢量算子](算子实践参考/SIMD算子实现/矢量编程/基础矢量算子.md)
             -   [TBuf的使用](算子实践参考/SIMD算子实现/矢量编程/TBuf的使用.md)
-            -   [多核Tiling切分](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/overview.md)
-                -   [概述](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/overview.md)
+            -   [多核Tiling切分](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/概述.md)
+                -   [概述](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/概述.md)
                 -   [主块均分](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/主块均分.md)
                 -   [尾块均分](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/尾块均分.md)
                 -   [尾核切分](算子实践参考/SIMD算子实现/矢量编程/多核Tiling切分/尾核切分.md)
@@ -252,10 +252,10 @@
         -   [基础知识](算子实践参考/SIMD与SIMT混合算子实现/基础知识.md)
         -   [算子实现](算子实践参考/SIMD与SIMT混合算子实现/算子实现.md)
 
-    -   [功能调试](算子实践参考/functional_debug/functional_debug.md)
-        -   [运行正常](算子实践参考/functional_debug/运行正常.md)
-        -   [精度正常](算子实践参考/functional_debug/精度正常.md)
-        -   [算子调试](算子实践参考/functional_debug/算子调试.md)
+    -   [功能调试](算子实践参考/功能调试/功能调试.md)
+        -   [运行正常](算子实践参考/功能调试/运行正常.md)
+        -   [精度正常](算子实践参考/功能调试/精度正常.md)
+        -   [算子调试](算子实践参考/功能调试/算子调试.md)
 
     -   [性能分析](算子实践参考/性能分析/性能分析.md)
         -   [获取性能数据](算子实践参考/性能分析/获取性能数据.md)
@@ -289,7 +289,7 @@
             -   [纯搬运类算子VECIN和VECOUT建议复用](算子实践参考/SIMD算子性能优化/内存访问/纯搬运类算子VECIN和VECOUT建议复用.md)
             -   [通过缩减Tensor ShapeInfo维度，优化栈空间](算子实践参考/SIMD算子性能优化/内存访问/通过缩减Tensor-ShapeInfo维度-优化栈空间.md)
             -   [避免UB的bank冲突](算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免UB的bank冲突.md)
-                -   [概述](算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/overview.md)
+                -   [概述](算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/概述.md)
                 -   [避免bank冲突（NPU架构版本2201）](算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/avoid_bank_conflict_npu_arch_2201.md)
                 -   [避免bank冲突（NPU架构版本3510）](算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/avoid_bank_conflict_npu_arch_3510.md)
 
@@ -313,7 +313,7 @@
             -   [Matmul开启AtomicAdd选项](算子实践参考/SIMD算子性能优化/矩阵计算/Matmul使能AtomicAdd选项.md)
 
     -   [SIMT算子性能优化](算子实践参考/SIMT算子性能优化/SIMT算子性能优化.md)
-        -   [概述](算子实践参考/SIMT算子性能优化/overview.md)
+        -   [概述](算子实践参考/SIMT算子性能优化/概述.md)
         -   [内存访问](算子实践参考/SIMT算子性能优化/内存访问/访存合并.md)
             -   [访存合并](算子实践参考/SIMT算子性能优化/内存访问/访存合并.md)
             -   [避免UB的Bank冲突](算子实践参考/SIMT算子性能优化/内存访问/避免UB的Bank冲突.md)
@@ -329,7 +329,7 @@
             -   [原子操作指令优化](算子实践参考/SIMT算子性能优化/指令优化/原子操作指令优化.md)
 
     -   [SIMD与SIMT混合算子性能优化](算子实践参考/SIMD与SIMT混合算子性能优化/SIMD与SIMT混合算子性能优化.md)
-        -   [概述](算子实践参考/SIMD与SIMT混合算子性能优化/overview.md)
+        -   [概述](算子实践参考/SIMD与SIMT混合算子性能优化/概述.md)
         -   [内存访问](算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md)
             -   [使用Unified Buffer提升内存访问效率](算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md)
 
