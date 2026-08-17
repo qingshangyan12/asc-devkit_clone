@@ -45,6 +45,7 @@
         <path value="$(TARGET_ENV)/tikcpp/ascendc_kernel_cmake/fwk_modules/util"/>
         <path value="$(TARGET_ENV)/tikcpp/ascendc_kernel_cmake/fwk_modules/util/makeself"/>
         <path value="$(TARGET_ENV)/pkg_inc" install_softlink="pkg_inc"/>
+        <path value="$(TARGET_ENV)/pkg_inc/ccu"/>
         <path value="$(TARGET_ENV)/pkg_inc/asc"/>
         <path value="$(TARGET_ENV)/pkg_inc/asc/hccl"/>
         <path value="$(TARGET_ENV)/ascendc" install_softlink="compiler/ascendc"/>
