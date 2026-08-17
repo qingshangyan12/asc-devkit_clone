@@ -251,7 +251,7 @@ Run the following steps in the example root directory.
   | bfloat16 | Saturate to max | Saturate to min | Saturate to 0 | Controlled by CTRL[48]=0 |
   | fp8_e4m3fn | Saturate to 448 | Saturate to -448 | Saturate to 0 (CTRL[50]=0) | CTRL[48]=0 + CTRL[50]=0 |
   | hifloat8 | Saturate to 240 | Saturate to -240 | Saturate to 0 | Controlled by CTRL[48]=0 |
-  | float | Saturate to MAX | Saturate to -MAX | Saturate to 0 | Controlled by CTRL[48]=0 |
+  | float | Preserve inf | Preserve -inf | Preserve nan | CTRL[48] does not support float; always preserved |
 
   Non-saturation mode (CTRL[48]=1) expected behavior:
 
@@ -261,4 +261,4 @@ Run the following steps in the example root directory.
   | half | Preserve inf | Preserve -inf | Preserve nan | float16 can represent |
   | bfloat16 | Preserve inf | Preserve -inf | Preserve nan | bfloat16 can represent |
   | fp8_e4m3fn | Output nan | Output nan | Output nan | inf or out-of-range → nan |
-  | float | Preserve inf | Preserve -inf | Preserve nan | float32 can represent |
+  | float | Preserve inf | Preserve -inf | Preserve nan | CTRL[48] does not support float; always preserved |

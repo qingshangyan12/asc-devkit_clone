@@ -251,7 +251,7 @@ data_copy_l0c2gm
   | bfloat16 | 饱和为max | 饱和为min | 饱和为0 | CTRL[48]=0控制 |
   | fp8_e4m3fn | 饱和为448 | 饱和为-448 | 饱和为0（CTRL[50]=0） | CTRL[48]=0+CTRL[50]=0 |
   | hifloat8 | 饱和为240 | 饱和为-240 | 饱和为0 | CTRL[48]=0控制 |
-  | float | 饱和为MAX | 饱和为-MAX | 饱和为0 | CTRL[48]=0控制 |
+  | float | 保持inf | 保持-inf | 保持nan | CTRL[48]不支持float，始终保持 |
 
   非饱和模式（CTRL[48]=1）预期行为：
 
@@ -261,4 +261,4 @@ data_copy_l0c2gm
   | half | 保持inf | 保持-inf | 保持nan | float16可表示 |
   | bfloat16 | 保持inf | 保持-inf | 保持nan | bfloat16可表示 |
   | fp8_e4m3fn | 输出nan | 输出nan | 输出nan | inf或超范围值→nan |
-  | float | 保持inf | 保持-inf | 保持nan | float32可表示 |
+  | float | 保持inf | 保持-inf | 保持nan | CTRL[48]不支持float，始终保持 |

@@ -106,6 +106,8 @@ def decode_relu_pre(relu_pre):
     sign_bit = (alpha_bits >> 18) & 0x1
     exponent = (alpha_bits >> 10) & 0xFF
     mantissa = alpha_bits & 0x3FF
+    if exponent == 0:
+        return (-1) ** sign_bit * (mantissa / 1024) * (2 ** (-126))
     return (-1) ** sign_bit * (1 + mantissa / 1024) * (2 ** (exponent - 127))
 
 
@@ -543,7 +545,8 @@ def apply_qf322fp8(value, quant_pre, relu_pre):
         value = saturate(value / (2**shift), -448, 448, np.float32)
     value = np.float32(value)
     value *= alpha if value >= 0 else decode_relu_pre(relu_pre)
-    value = np.clip(value + offset, -448, 448)
+    if not np.isinf(value):
+        value = np.clip(value + offset, -448, 448)
     return float32_to_fp8_e4m3fn(float(value))
 
 
@@ -554,7 +557,8 @@ def apply_qf322hif8(value, quant_pre, relu_pre, hybrid=False):
         value = saturate(value / (2**shift), -240, 240, np.float32)
     value = np.float32(value)
     value *= alpha if value >= 0 else decode_relu_pre(relu_pre)
-    value = np.clip(value + offset, -240, 240)
+    if not np.isinf(value):
+        value = np.clip(value + offset, -240, 240)
     return float32_to_hifloat8(float(value), hybrid=hybrid)
 
 
@@ -667,7 +671,7 @@ def apply_non_saturation_override(result, l0c_matrix, output_type):
         elif output_type == 'bfloat16':
             result[pos_inf_mask] = np.uint16(0x7F80)  # bfloat16 +inf
             result[neg_inf_mask] = np.uint16(0xFF80)  # bfloat16 -inf
-            result[nan_mask] = np.uint16(0x7FC0)      # bfloat16 nan
+            result[nan_mask] = np.uint16(0x7FFF)      # bfloat16 nan (hardware pattern)
         else:  # float
             result[pos_inf_mask] = np.float32(np.inf)
             result[neg_inf_mask] = np.float32(-np.inf)
@@ -685,7 +689,8 @@ def apply_saturation_override(result, l0c_matrix, output_type):
     """Override quantized result for positions where L0C had inf/nan in saturation mode.
 
     In saturation mode (CTRL[48]=0):
-    - Float types (half, bfloat16, float): inf → ±MAX, nan → 0
+    - half/bfloat16: inf → ±MAX, nan → 0 (CTRL[48] controls these types)
+    - float: CTRL[48] does NOT support float; inf/nan are preserved
     - fp8/hifloat8/integer: already handled by their conversion functions
     """
     nan_mask = np.isnan(l0c_matrix)
@@ -700,11 +705,7 @@ def apply_saturation_override(result, l0c_matrix, output_type):
         result[pos_inf_mask] = np.uint16(0x7F7F)   # bfloat16 max
         result[neg_inf_mask] = np.uint16(0xFF7F)   # bfloat16 min
         result[nan_mask] = np.uint16(0)
-    elif output_type == 'float':
-        # to_processor_float32 preserves inf/nan; saturate both
-        result[pos_inf_mask] = np.float32(np.finfo(np.float32).max)
-        result[neg_inf_mask] = np.float32(np.finfo(np.float32).min)
-        result[nan_mask] = np.float32(0)
+    # float: CTRL[48] does not support float type, inf/nan preserved as-is
     # fp8, hifloat8, integer types: already saturate correctly in their functions
 
     return result
