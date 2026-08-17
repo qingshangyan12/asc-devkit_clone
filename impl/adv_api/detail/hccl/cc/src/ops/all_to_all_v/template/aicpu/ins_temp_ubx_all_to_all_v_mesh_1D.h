@@ -34,7 +34,7 @@ public:
 
     // 现在的RunAsync就是之前的GenExtIns
     HcclResult KernelRun(
-        const OpParam& param, const TemplateDataParams& tempAlgParams, TemplateResource& templateResource) override;
+        const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource) override;
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         AlgResourceRequest& resourceRequest) override;
@@ -49,14 +49,14 @@ private:
     void GetNotifyIdxMainToFullMesh(std::vector<u32>& notifyIdxMianToSub);
     void GetNotifyIdxFullMeshToMain(std::vector<u32>& notifyIdxSubToMain);
     HcclResult
-    InitParam(const OpParam& param, const TemplateDataParams& tempAlgParams, TemplateResource& templateResource);
+    InitParam(const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource);
     HcclResult GetBoardSendRecvMatrix(u32 n, std::vector<std::vector<u32>>& sendRecvMatrix);
     HcclResult GetRankSendRecvMatrix(u32 board1, u32 board2, std::vector<std::vector<u32>>& rankSendRecvMatrix);
-    HcclResult GetRankNumPerBoard(TemplateResource& templateResource);
-    HcclResult CheckPathNum(TemplateResource& templateResource);
-    HcclResult RunFullMesh(const TemplateDataParams& tempAlgParams, TemplateResource& templateResource);
+    HcclResult GetRankNumPerBoard(const TemplateResource& templateResource);
+    HcclResult CheckPathNum(const TemplateResource& templateResource);
+    HcclResult RunFullMesh(const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource);
     HcclResult
-    RunPairwise(const TemplateDataParams& tempAlgParams, TemplateResource& templateResource, u32 targetBoard);
+    RunPairwise(const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource, u32 targetBoard);
 
     u64 dataTypeSize_{0};
     bool isDmaRead_{false};

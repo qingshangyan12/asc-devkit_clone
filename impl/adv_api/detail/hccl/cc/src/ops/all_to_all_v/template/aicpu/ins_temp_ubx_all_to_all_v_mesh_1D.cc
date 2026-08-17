@@ -154,12 +154,12 @@ HcclResult InsTempUBXAllToAllVMesh1D::GetRankSendRecvMatrix(
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult InsTempUBXAllToAllVMesh1D::GetRankNumPerBoard(TemplateResource& templateResource)
+HcclResult InsTempUBXAllToAllVMesh1D::GetRankNumPerBoard(const TemplateResource& templateResource)
 {
     // 根据channel，和远端rank只有一条链路的，说明是fullmesh内的
     // 遍历所有卡
     u32 fullMeshRankNum = 1;
-    std::map<u32, std::vector<ChannelInfo>>& channels = templateResource.channels;
+    const std::map<u32, std::vector<ChannelInfo>>& channels = templateResource.channels;
     for (u32 rank = 0; rank < templateRankSize_; rank++) {
         if (rank == myAlgRank_) {
             continue;
@@ -206,10 +206,10 @@ HcclResult InsTempUBXAllToAllVMesh1D::GetRankNumPerBoard(TemplateResource& templ
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult InsTempUBXAllToAllVMesh1D::CheckPathNum(TemplateResource& templateResource)
+HcclResult InsTempUBXAllToAllVMesh1D::CheckPathNum(const TemplateResource& templateResource)
 {
     // 校验是不是最多4jetty
-    std::map<u32, std::vector<ChannelInfo>>& channels = templateResource.channels;
+    const std::map<u32, std::vector<ChannelInfo>>& channels = templateResource.channels;
     for (u32 rank = 0; rank < templateRankSize_; rank++) {
         if (rank == myAlgRank_) {
             continue;
@@ -227,10 +227,10 @@ HcclResult InsTempUBXAllToAllVMesh1D::CheckPathNum(TemplateResource& templateRes
 }
 
 HcclResult
-InsTempUBXAllToAllVMesh1D::RunFullMesh(const TemplateDataParams& tempAlgParams, TemplateResource& templateResource)
+InsTempUBXAllToAllVMesh1D::RunFullMesh(const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
 {
-    std::map<u32, std::vector<ChannelInfo>>& channels = templateResource.channels;
-    std::vector<ThreadHandle>& threads = templateResource.threads;
+    const std::map<u32, std::vector<ChannelInfo>>& channels = templateResource.channels;
+    const std::vector<ThreadHandle>& threads = templateResource.threads;
     // 用后面的 maxRankNumPerBoard_ 条流做fullmesh内的收发
     localCopyInfoFullMesh_.clear();
     for (u32 i = 0; i < rankNumPerBoard_; i++) {
@@ -292,10 +292,10 @@ InsTempUBXAllToAllVMesh1D::RunFullMesh(const TemplateDataParams& tempAlgParams, 
 }
 
 HcclResult InsTempUBXAllToAllVMesh1D::RunPairwise(
-    const TemplateDataParams& tempAlgParams, TemplateResource& templateResource, u32 targetBoard)
+    const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource, u32 targetBoard)
 {
-    std::map<u32, std::vector<ChannelInfo>>& channels = templateResource.channels;
-    std::vector<ThreadHandle>& threads = templateResource.threads;
+    const std::map<u32, std::vector<ChannelInfo>>& channels = templateResource.channels;
+    const std::vector<ThreadHandle>& threads = templateResource.threads;
 
     // curBoard 和 targetBoard 两两收发，要按照编排好的次序
     std::vector<std::vector<u32>> rankSendRecvMatrix(
@@ -418,7 +418,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunPairwise(
 }
 
 HcclResult InsTempUBXAllToAllVMesh1D::InitParam(
-    const OpParam& param, const TemplateDataParams& tempAlgParams, TemplateResource& templateResource)
+    const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
 {
     HCCL_INFO("[InsTempUBXAllToAllVMesh1D][InitParam] Run Start");
 
@@ -475,7 +475,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::InitParam(
             tempAlgParams.rdispls[i]);
     }
 
-    std::vector<ThreadHandle>& threads = templateResource.threads;
+    const std::vector<ThreadHandle>& threads = templateResource.threads;
     if (threadNum_ > 1) {
         subThreadsBoard_.assign(threads.begin() + 1, threads.begin() + 1 + maxPathNum_); // clos用
         subThreadsFullMesh_.assign(
@@ -487,7 +487,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::InitParam(
 }
 
 HcclResult InsTempUBXAllToAllVMesh1D::KernelRun(
-    const OpParam& param, const TemplateDataParams& tempAlgParams, TemplateResource& templateResource)
+    const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
 {
     HCCL_INFO("[InsTempUBXAllToAllVMesh1D][KernelRun] Run Start");
 
@@ -496,7 +496,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::KernelRun(
     localCopyInfo_.clear();
     localCopyInfoFullMesh_.clear();
 
-    std::vector<ThreadHandle>& threads = templateResource.threads;
+    const std::vector<ThreadHandle>& threads = templateResource.threads;
     std::vector<std::vector<u32>> sendRecvMatrix(algBoardNum_, std::vector<u32>(algBoardNum_ - 1, 0));
     CHK_RET(GetBoardSendRecvMatrix(algBoardNum_, sendRecvMatrix));
 
