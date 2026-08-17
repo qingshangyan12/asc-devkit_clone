@@ -8,10 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "tensor.h cannot be used with compile flag --enable-simt enabled."
-#endif
-
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_TENSOR_API_H
@@ -32,6 +28,7 @@
 #include "tensor_api/tensor/tensor.h"
 #include "tensor_api/tensor/pointer.h"
 #include "tensor_api/utils/utils.h"
+#include "impl/tensor_api/legacy/legacy.h"
 
 #endif // INCLUDE_TENSOR_API_TENSOR_H
 

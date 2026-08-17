@@ -1,16 +1,13 @@
 /**
- * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
 
-#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#error "tensor.h cannot be used with compile flag --enable-simt enabled."
-#endif
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
@@ -26,16 +23,17 @@
 
 #include "impl/tensor_api/tensor/tuple_impl.h"
 #include "impl/tensor_api/tensor/tensor_impl.h"
+#include "tensor_api/tensor/local_tensor.h"
 
 // tensor construction
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args);
+__aicore__ inline constexpr auto make_tensor(const Iterator& iter, const Args&... args);
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // INCLUDE_TENSOR_API_TENSOR_TENSOR_H
 
