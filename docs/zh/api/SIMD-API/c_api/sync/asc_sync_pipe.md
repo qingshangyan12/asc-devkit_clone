@@ -32,7 +32,8 @@
 - 传入其他合法流水值时仅阻塞该流水线的后续指令，直至该流水线前序指令全部完成，不影响其他流水线的指令执行。
 
 如图1所示，其作用是保证指定流水线中前序指令的所有数据读写全部完成后，该流水线的后序指令才能开始执行。
-**图1**  asc_sync_pipe接口功能示意图    
+
+**图1**  `asc_sync_pipe`接口功能示意图    
 ![](../../c_api/figures/asc_sync_pipe.png)
 
 ## 函数原型
@@ -47,7 +48,7 @@ __aicore__ inline void asc_sync_pipe(pipe_t pipe)
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| pipe | 输入 | 阻塞的流水类别。支持的取值有PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_ALL，不支持PIPE_S。如果不关注流水类别，希望阻塞所有流水，可以传入PIPE_ALL。各流水类别的含义请参考[流水类型说明](intra_core_sync_overview.md)。 |
+| pipe | 输入 | 阻塞的流水类别。支持的取值有`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`、`PIPE_ALL`，不支持`PIPE_S`。如果不关注流水类别，希望阻塞所有流水，可以传入`PIPE_ALL`。各流水类别的含义请参考[流水类型说明](intra_core_sync_overview.md)。 |
 
 ## 返回值说明
 
@@ -55,13 +56,16 @@ __aicore__ inline void asc_sync_pipe(pipe_t pipe)
 
 ## 流水类型
 
-PIPE_S
+`PIPE_S`
 
 ## 约束说明
 
-- Scalar流水之间的同步由硬件自动保证，`asc_sync_pipe`接口不支持PIPE_S单流水的同步。
+- Scalar流水之间的同步由硬件自动保证，`asc_sync_pipe`接口不支持`PIPE_S`单流水的同步。
+<!-- npu="950" id9 -->
+- 针对Ascend 950PR/Ascend 950DT，`PIPE_V`流水之间的同步由硬件自动保证。
+<!-- end id9 -->
 - `asc_sync_pipe(PIPE_ALL)`会等待所有流水线中所有先前提交的接口完成，这会对性能产生影响。若仅阻塞单条流水线即可解决问题，应避免随意调用`asc_sync_pipe(PIPE_ALL)`。
-- PIPE_MTE2/PIPE_MTE3在搬运的目的地址有重叠的情况下需要开发者插入同步，保证多个搬运指令的串行化，防止出现异常数据，具体场景可以参考以下[调用示例](#调用示例)。
+- `PIPE_MTE2`/`PIPE_MTE3`在搬运的目的地址有重叠的情况下需要开发者插入同步，保证多个搬运指令的串行化，防止出现异常数据，具体场景可以参考以下[调用示例](#调用示例)。
 
 ## 调用示例
 
@@ -73,6 +77,7 @@ PIPE_S
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
+
 <!-- end id8 -->
 
 ```c
