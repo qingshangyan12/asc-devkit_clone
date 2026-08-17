@@ -19,15 +19,12 @@
 
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
-#include "impl/utils/common_types.h"
 #include "c_api/utils/enum.h"
-#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
+#include "c_api/defs/defs.h"
 
-#include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
-#endif
 
 // ==========asc_bfloat162half(rd/ru/rz/rn/rna)==========
 __simd_callee__ inline void asc_bfloat162half_rd(vector_half& dst, vector_bfloat16_t src, vector_bool mask);
@@ -3466,6 +3463,8 @@ asc_float2e5m2_rn_sat_v4(vector_fp8_e5m2_t& dst, vector_float src, vector_bool m
 [[deprecated("NOTICE: asc_half2float_v2 is deprecated. "
              "Currently asc_half2float_v2 is an unsupported API on current device.")]] __simd_callee__ inline void
 asc_half2float_v2(vector_float& dst, vector_half src, vector_bool mask);
+
+#endif
 
 #endif
 
