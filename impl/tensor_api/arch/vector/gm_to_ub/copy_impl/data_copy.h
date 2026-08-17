@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
+#warning                                                                                                               \
     "impl/tensor_api/arch/vector/gm_to_ub/copy_impl/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -23,41 +23,34 @@
 #define IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_IMPL_DATA_COPY_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
+#include "impl/tensor_api/arch/vector/utils/copy_utils.h"
 #include "impl/tensor_api/arch/vector/gm_to_ub/copy_impl/instruction.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-struct CopyGM2UBTrait {};
+struct copy_gm_to_ub_trait {};
 
-class CopyGmToUbufAlignV2Common {
+class copy_gm_to_ub_common {
 protected:
     template <typename T, typename U>
-    __aicore__ inline static void EmitCopy(
-        const T& dst, const U& src, uint16_t blockCount, uint32_t blockLen, int64_t srcStride, int64_t dstStride)
+    __aicore__ inline static void emit_copy(const T& dst, const U& src, uint16_t block_count, uint32_t block_len,
+                                            int64_t src_stride, int64_t dst_stride, const copy_gm_to_ub_params& params)
     {
-        using SrcType = typename U::elementType;
-        using DstType = typename T::elementType;
+        using src_type = typename U::element_type;
+        using dst_type = typename T::element_type;
 
-        if constexpr (IsB4Type<SrcType>) {
-            blockLen = blockLen >> 1;
-            srcStride = srcStride >> 1;
-        }
+        adjust_b4_copy_params<src_type, dst_type>(block_len, src_stride, dst_stride);
 
-        if constexpr (IsB4Type<DstType>) {
-            dstStride = dstStride >> 1;
-        }
-
-        constexpr uint8_t leftPaddingCnt = 0;
-        constexpr uint8_t rightPaddingCnt = 0;
-        uint8_t cacheMode = src.Engine().GetCacheMode();
-        CopyGmToUbufAlignV2Instr::DataCopy(
-            dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, srcStride, dstStride, cacheMode);
+        auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
+        copy_gm_to_ub_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len,
+                                                   params.left_padding_count, params.right_padding_count,
+                                                   params.enable_constant_pad, cache_mode, src_stride, dst_stride);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_IMPL_DATA_COPY_H
 
