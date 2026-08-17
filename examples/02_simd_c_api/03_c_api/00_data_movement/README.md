@@ -14,3 +14,4 @@
 | [reg_load_gather](./reg_load_gather) | 本样例演示离散数据搬入的过程，包含按元素索引的`asc_gather`和按数据块（DataBlock）索引的`asc_gather_datablock`两种场景。 | Ascend 950PR/Ascend 950DT |
 | [reg_load_store_align](./reg_load_store_align) | 本样例展示使用Reg矢量计算接口实现UB（Unified Buffer）与矢量数据寄存器之间的连续和非连续的对齐数据搬运。 | Ascend 950PR/Ascend 950DT |
 | [reg_load_store_mask](./reg_load_store_mask) | 本样例展示使用Reg矢量计算接口实现UB（Unified Buffer）与掩码寄存器之间的加载和存储，以及基于掩码寄存器进行数据选择的操作。 | Ascend 950PR/Ascend 950DT |
+| [reg_storealign_mask_preserve](./reg_storealign_mask_preserve) | 本样例使用`half`类型的`asc_storealign`验证`mask`未选中元素保留目的UB原值。 | Ascend 950PR/Ascend 950DT |
