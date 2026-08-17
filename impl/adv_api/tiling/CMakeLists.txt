@@ -71,6 +71,7 @@ add_library(
   ${CMAKE_CURRENT_SOURCE_DIR}/math/is_nan_tiling_impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/math/cos_tiling_impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/math/cosh_tiling_impl.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/math/bessel_i0_tiling_impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/math/erf_tiling_impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/math/erfc_tiling_impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/math/exp_tiling_impl.cpp
