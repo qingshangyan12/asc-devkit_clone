@@ -2439,7 +2439,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2463,7 +2463,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2487,7 +2487,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2511,7 +2511,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2535,7 +2535,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2559,7 +2559,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2583,7 +2583,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2607,7 +2607,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2631,7 +2631,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2656,7 +2656,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2694,7 +2694,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2731,7 +2731,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
@@ -2756,7 +2756,7 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, false, unit_flag_mode, quant_pre_mode,
+        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
         relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
