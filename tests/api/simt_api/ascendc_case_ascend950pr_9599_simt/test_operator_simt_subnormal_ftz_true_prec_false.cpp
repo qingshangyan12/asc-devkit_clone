@@ -36,10 +36,10 @@ TEST_F(FloatSubnormalFtzTruePrecFalseTestsuite, ExpFloatFtzTruePrecFalse)
     float x = 1.0f;
     float y = -80.0f;
     float z = 0.0f;
-    EXPECT_FLOAT_EQ(std::exp(x), AscendC::Simt::expf(x));
-    EXPECT_FLOAT_EQ(std::exp(a), AscendC::Simt::expf(a));
-    EXPECT_FLOAT_EQ(std::exp(y), AscendC::Simt::expf(y));
-    EXPECT_FLOAT_EQ(std::exp(z), AscendC::Simt::expf(z));
+    EXPECT_FLOAT_EQ(std::exp(x), expf(x));
+    EXPECT_FLOAT_EQ(std::exp(a), expf(a));
+    EXPECT_FLOAT_EQ(std::exp(y), expf(y));
+    EXPECT_FLOAT_EQ(std::exp(z), expf(z));
 }
 
 TEST_F(FloatSubnormalFtzTruePrecFalseTestsuite, SqrtFloatFtzTruePrecFalse)
@@ -47,7 +47,7 @@ TEST_F(FloatSubnormalFtzTruePrecFalseTestsuite, SqrtFloatFtzTruePrecFalse)
     float x = 1.0f;
     float y = 1.17549421e-38f;
     float z = 0.0f;
-    EXPECT_FLOAT_EQ(std::sqrt(x), AscendC::Simt::sqrtf(x));
-    EXPECT_FLOAT_EQ(std::sqrt(y), AscendC::Simt::sqrtf(y));
-    EXPECT_FLOAT_EQ(std::sqrt(z), AscendC::Simt::sqrtf(z));
+    EXPECT_FLOAT_EQ(std::sqrt(x), sqrtf(x));
+    EXPECT_FLOAT_EQ(std::sqrt(y), sqrtf(y));
+    EXPECT_FLOAT_EQ(std::sqrt(z), sqrtf(z));
 }
