@@ -4,7 +4,7 @@
 
 本样例基于Ascend C SIMT编程模型，演示cooperative_groups协作组库如何将线程组织为不同层级并执行高效的并行规约。
 
-样例设计一个通用规约接口`reduce_sum`，形参取`thread_group`基类；围绕该接口构造三个用例，分别以跨块（`grid_group`）、整块（`thread_block`）、子组（`thread_block_tile`）为规约域。三处调用的书写形式一致，粒度差异由传入的组对象承载。全工程仅保留一份`reduce_sum`实现体，由三个用例的四处调用点共用，函数体不含粒度专属的索引计算，亦不含针对组类型的条件分支。
+样例设计一个通用规约接口`reduce_sum`，形参取`thread_group`基类；围绕该接口构造三个用例，分别以跨块（`grid_group`）、整块（`thread_block`）、子组（`thread_block_tile`）为规约域。三处调用的书写形式一致，粒度差异由传入的组对象承载。
 
 编程模型为纯SIMT形态。`grid_group`不支持SIMD与SIMT混合编程场景，本样例不涉及该场景。
 
