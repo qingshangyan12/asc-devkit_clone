@@ -52,7 +52,8 @@ __aicore__ inline void SetHF32TransMode(HF32TransMode mode)
 
 ## 调用示例
 
-设置HF32模式取整的具体方式，需要先使用[SetHF32Mode](SetHF32Mode.md)开启HF32取整模式。
+- 设置HF32模式取整的具体方式，需要先使用[SetHF32Mode](SetHF32Mode.md)开启HF32取整模式。
+- 本接口兼容枚举值`NEAREST_ZERO`，但不推荐使用，实际行为等同于`NEAREST_AWAY`。
 
 ```cpp
 AscendC::SetHF32TransMode(HF32TransMode::NEAREST_AWAY);
