@@ -50,8 +50,8 @@ __aicore__ inline void asc_sync_block_arrive(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。|
-| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0,15]，每个flag ID各自拥有独立的4位计数器。|
+| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。 |
+| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。 |
 
 ## 返回值说明
 
@@ -59,7 +59,7 @@ __aicore__ inline void asc_sync_block_arrive(pipe_t pipe,
 
 ## 流水类型
 
-PIPE_S
+`PIPE_S`
 
 ## 约束说明
 
@@ -71,7 +71,7 @@ PIPE_S
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`标识核函数，同一AI Core内包含1个AIC和2个AIV。AIV0和AIV1分别在UB中构造矩阵A和矩阵B，通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)区分不同的AIV。两个AIV中将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行`asc_sync_block_arrive`向调度模块发送通知。AIC中从L1 Buffer搬运数据到L0A、L0B（PIPE_MTE1）的操作被`asc_sync_block_wait`阻塞，直到两个AIV均执行了`asc_sync_block_arrive`后才能执行。
+本示例采用`__mix__(1, 2)`标识核函数，同一AI Core内包含1个AIC和2个AIV。AIV0和AIV1分别在UB中构造矩阵A和矩阵B，通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)区分不同的AIV。两个AIV中将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行`asc_sync_block_arrive`向调度模块发送通知。AIC中从L1 Buffer搬运数据到L0A Buffer、L0B Buffer（PIPE_MTE1）的操作被`asc_sync_block_wait`阻塞，直到两个AIV均执行了`asc_sync_block_arrive`后才能执行。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
@@ -81,6 +81,7 @@ PIPE_S
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510; ./main
 ```
+
 <!-- end id8 -->
 
 ```c

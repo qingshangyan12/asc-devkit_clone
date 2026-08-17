@@ -47,8 +47,8 @@ __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。|
-| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0,15]，每个flag ID各自拥有独立的4位计数器。|
+| pipe | 输入 | 标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。 |
+| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。 |
 
 ## 返回值说明
 
@@ -56,11 +56,11 @@ __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe,
 
 ## 流水类型
 
-PIPE_S
+`PIPE_S`
 
 ## 约束说明
 
-- 不同产品对模板参数`modeId`和`pipe`的生效情况如下：
+- 不同产品对参数`pipe`的生效情况如下：
     <!-- npu="950" id8 -->
     - Ascend 950PR/Ascend 950DT，硬件支持配置核间同步模式和流水类型，输入参数`pipe`**生效**，此时`asc_sync_subblock_wait`会阻塞**指定流水**的后续指令。
     <!-- end id8 -->
