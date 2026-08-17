@@ -380,8 +380,11 @@ TEST_F(CcuMc2TestSuite, ObtainCommEngine_UnsupportedEngine)
 TEST_F(CcuMc2TestSuite, algorithmMap_AllEntries)
 {
     EXPECT_EQ(algorithmMap.at("CcuSchedAllGatherSoleMesh"), CcuSchedAllGatherSoleMesh);
+    EXPECT_EQ(
+        algorithmMap.at("CcuSchedAllGatherConcurMeshNHRMultiLink"),
+        CcuSchedAllGatherConcurMeshNHRMultiLink);
     EXPECT_EQ(algorithmMap.at("CcuKfcReduceScatterMesh1DMem2Mem"), CcuReduceScatterMeshMem2Mem1D);
-    EXPECT_EQ(algorithmMap.size(), 5U);
+    EXPECT_EQ(algorithmMap.size(), 6U);
 }
 
 TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
@@ -389,6 +392,7 @@ TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
     EXPECT_EQ(CcuAllGatherMesh1D, 0);
     EXPECT_EQ(CcuSchedAllGatherSoleMesh, 1);
     EXPECT_EQ(CcuAllGatherMesh2D, 2);
+    EXPECT_EQ(CcuSchedAllGatherConcurMeshNHRMultiLink, 3);
     EXPECT_EQ(CcuReduceScatterMesh1D, 50);
     EXPECT_EQ(CcuReduceScatterMeshMem2Mem1D, 51);
     EXPECT_EQ(CcuReduceScatterMesh2D, 52);

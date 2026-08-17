@@ -11,6 +11,7 @@
 #include "hccl_ccu_res.h"
 #include "ccu_assist_pub.h"
 #include "alg_data_trans_wrapper.h"
+#include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #include "kernel/ccu_kernel_kfc_server.h"
 #include "ccu_temp_kfc_server.h"
 #include "ccu_launch_dl.h"
@@ -18,9 +19,9 @@
 
 namespace mc2_ops_hccl {
 // 从源 CcuKernelInfo 继承属性到 KfcServer 的 CcuKernelInfo
-void InheritKfcServerKernelArg(
+HcclResult InheritKfcServerKernelArg(
     const CcuKernelInfo& srcKernel, CcuKernelInfo& dstKernel, const OpParam& param, uint32_t rankId,
-    const std::vector<std::vector<u32>>& subCommRanks)
+    const std::vector<std::vector<u32>>& subCommRanks, uint32_t missionIndex)
 {
     std::string srcName(srcKernel.kernelFuncName);
     auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
@@ -31,9 +32,12 @@ void InheritKfcServerKernelArg(
     }
     kfcArg->supportedOpIds = std::move(config.opIds);
     kfcArg->supportedOpParams = std::move(config.opParams);
+    kfcArg->role = GetKfcServerRole(param.algName, missionIndex);
 
     const bool isAllGather =
         srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+    const bool isAllGatherNhr = srcName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" &&
+                                param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isReduceScatter =
         srcName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
     const bool isAllReduce =
@@ -41,7 +45,17 @@ void InheritKfcServerKernelArg(
     const bool isAllToAll = srcName == "CcuKernelAlltoAllMesh1D" &&
                             (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL ||
                              param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV);
-    if (isAllToAll) {
+    if (isAllGatherNhr) {
+        const auto* srcArg = static_cast<const CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem*>(srcKernel.kernelArg);
+        CHK_PTR_NULL(srcArg);
+        kfcArg->rankSize = srcArg->rankSize;
+        kfcArg->rankId = srcArg->rankId;
+        kfcArg->jettyNum = srcArg->jettyNum;
+        kfcArg->opParam = srcArg->opParam;
+        kfcArg->subCommRanks = srcArg->subCommRanks;
+        kfcArg->nhrStepInfoVector = srcArg->stepInfoVector;
+        kfcArg->nhrRank2ChannelIdx = srcArg->rank2ChannelIdx;
+    } else if (isAllToAll) {
         const auto* srcArg = static_cast<const CcuKernelArgAlltoAllMesh1D*>(srcKernel.kernelArg);
         kfcArg->rankSize = srcArg->rankSize;
         kfcArg->rankId = srcArg->rankId;
@@ -62,6 +76,7 @@ void InheritKfcServerKernelArg(
     dstKernel.setKernelArg(kfcArg);
     // 继承源 kernelInfo 的 channels（由 CalcChannelRequestMesh1D 在 CalcRes 中赋值）
     dstKernel.channels = srcKernel.channels;
+    return HCCL_SUCCESS;
 }
 
 CcuTempKfcServer::CcuTempKfcServer(
@@ -90,21 +105,29 @@ HcclResult CcuTempKfcServer::CalcRes(
     }
     // 不需要从流
     resourceRequest.notifyNumOnMainThread = 0;
-    resourceRequest.slaveThreadNum = 0;
+    resourceRequest.notifyNumPerThread.clear();
     HCCL_DEBUG(
         "[CcuTempKfcServer::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
         resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
 
-    // 构建 KfcServer kernelInfo
-    CcuKernelInfo kernelInfo;
-    strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcServer");
-    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuKfcServerKernel);
+    const uint32_t missionNum = GetKfcServerMissionNum(param.algName);
+    CHK_PRT_RET(
+        resourceRequest.ccuKernelInfos.size() != missionNum,
+        HCCL_ERROR(
+            "[CcuTempKfcServer::CalcRes] kernel count[%zu] does not match mission count[%u]",
+            resourceRequest.ccuKernelInfos.size(), missionNum),
+        HCCL_E_PARA);
+    resourceRequest.slaveThreadNum = missionNum - 1U;
 
-    // 从 ccuKernelInfos 最后一项继承属性到当前 KfcServer kernel，然后替换最后一项
-    if (!resourceRequest.ccuKernelInfos.empty()) {
-        const std::string sourceName(resourceRequest.ccuKernelInfos.back().kernelFuncName);
+    for (uint32_t missionIndex = 0; missionIndex < missionNum; ++missionIndex) {
+        CcuKernelInfo kernelInfo{};
+        strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcServer");
+        kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuKfcServerKernel);
+        const std::string sourceName(resourceRequest.ccuKernelInfos[missionIndex].kernelFuncName);
         const bool isAllGather =
             sourceName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+        const bool isAllGatherNhr = sourceName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" &&
+                                    param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
         const bool isReduceScatter = sourceName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" &&
                                      param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
         const bool isAllReduce = sourceName == "CcuKernelKfcAllReduceMesh1DMem2Mem" &&
@@ -112,22 +135,19 @@ HcclResult CcuTempKfcServer::CalcRes(
         const bool isAllToAll = sourceName == "CcuKernelAlltoAllMesh1D" &&
                                 (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL ||
                                  param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV);
-        if (!isAllGather && !isReduceScatter && !isAllReduce && !isAllToAll) {
+        if (!isAllGather && !isAllGatherNhr && !isReduceScatter && !isAllReduce && !isAllToAll) {
             HCCL_ERROR(
                 "[CcuTempKfcServer::CalcRes] unsupported source kernel[%s]",
-                resourceRequest.ccuKernelInfos.back().kernelFuncName);
+                resourceRequest.ccuKernelInfos[missionIndex].kernelFuncName);
             return HCCL_E_NOT_SUPPORT;
         }
         HCCL_INFO(
-            "[CcuTempKfcServer::CalcRes] inheriting kernelargs from[%s]",
-            resourceRequest.ccuKernelInfos.back().kernelFuncName);
-        InheritKfcServerKernelArg(
-            resourceRequest.ccuKernelInfos.back(), kernelInfo, param, mySubCommRank_, subCommRanks_);
-        resourceRequest.ccuKernelInfos.back() = kernelInfo;
-    } else {
-        HCCL_ERROR(
-            "[CcuTempKfcServer::CalcRes] no preceding kernel to inherit from, KfcServer requires a source kernel");
-        return HCCL_E_PARA;
+            "[CcuTempKfcServer::CalcRes] mission[%u] inheriting kernelargs from[%s]",
+            missionIndex, resourceRequest.ccuKernelInfos[missionIndex].kernelFuncName);
+        CHK_RET(InheritKfcServerKernelArg(
+            resourceRequest.ccuKernelInfos[missionIndex], kernelInfo, param, mySubCommRank_, subCommRanks_,
+            missionIndex));
+        resourceRequest.ccuKernelInfos[missionIndex] = kernelInfo;
     }
 
     HCCL_DEBUG(

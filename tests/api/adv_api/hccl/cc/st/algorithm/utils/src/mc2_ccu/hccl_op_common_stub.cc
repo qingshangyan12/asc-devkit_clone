@@ -18,6 +18,7 @@
 #include "executor_v2_base.h"
 #include "alg_env_config.h"
 #include "param_check.h"
+#include "kfc_server_protocol.h"
 #include "sal.h"
 #include "hcomm/hccl/hccl_res.h"
 #include "hcomm/pkg_inc/hcomm/ccu/ccu_assist_pub.h"
@@ -347,14 +348,19 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
             uint64_t cclBufferAddr = reinterpret_cast<uint64_t>(cclBufferPtr);
             uint64_t token = hcomm::CcuRep::GetTokenInfo(cclBufferAddr, cclBufferSize);
 
-            if (resCtxHost->kfcServerArgs.size() >= 6U) {
-                resCtxHost->kfcServerArgs[5] = token;
+            for (size_t offset = 0;
+                 offset + KFC_SERVER_TOKEN_ARG_INDEX < resCtxHost->kfcServerArgs.size();
+                 offset += KFC_SERVER_ARG_NUM) {
+                resCtxHost->kfcServerArgs[offset + KFC_SERVER_TOKEN_ARG_INDEX] = token;
             }
         }
         if (param.isKfc) {
-            CcuKernelHandle kernelHandle = RecordCcuKernelRegistrationForTest();
-            resCtxHost->ccuKernels.push_back(kernelHandle);
-            resCtxHost->ccuKernelNum.push_back(1);
+            const uint32_t missionNum = GetKfcServerMissionNum(param.algName);
+            for (uint32_t missionIndex = 0; missionIndex < missionNum; ++missionIndex) {
+                resCtxHost->threads.push_back(static_cast<ThreadHandle>(missionIndex + 1U));
+                resCtxHost->ccuKernels.push_back(RecordCcuKernelRegistrationForTest());
+                resCtxHost->ccuKernelNum.push_back(1U);
+            }
         }
     }
 

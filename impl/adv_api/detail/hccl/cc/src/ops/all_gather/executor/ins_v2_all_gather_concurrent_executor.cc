@@ -9,6 +9,7 @@
  */
 #include "ins_v2_all_gather_concurrent_executor.h"
 #include "math.h"
+#include <type_traits>
 #include "alg_data_trans_wrapper.h"
 #include "hccl_res.h"
 #include "ccu_alg_template_base.h"
@@ -16,12 +17,32 @@
 // AICPU template 头文件
 #include "ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
+#include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+#endif
 
 namespace mc2_ops_hccl {
 
 constexpr u32 CLOS_JETTY = 4;
 constexpr u32 MESH_BW_AICPU = 37;
 constexpr u32 CLOS_BW_AICPU = 25;
+constexpr u32 MESH_BW_CCU = 11;
+constexpr u32 CLOS_BW_CCU = 10;
+
+template <typename AlgTemplate, typename ChannelsPerRank>
+HcclResult SetChannelsPerRank(
+    AlgTemplate& algTemplate, const ChannelsPerRank& channelsPerRank, std::false_type)
+{
+    return algTemplate.SetchannelsPerRank(channelsPerRank);
+}
+
+template <typename AlgTemplate, typename ChannelsPerRank>
+HcclResult SetChannelsPerRank(
+    AlgTemplate&, const ChannelsPerRank&, std::true_type)
+{
+    return HCCL_SUCCESS;
+}
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::InsV2AllGatherConcurrentExecutor()
@@ -164,6 +185,9 @@ void InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
     if (param.opExecuteConfig == OpExecuteConfig::AICPU_TS) {
         portNum0 = MESH_BW_AICPU;
         portNum1 = CLOS_BW_AICPU;
+    } else if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+        portNum0 = MESH_BW_CCU;
+        portNum1 = CLOS_BW_CCU;
     }
     double splitData = static_cast<double>(portNum0) / (portNum0 + portNum1);
     splitDataSize.push_back(splitData);
@@ -254,8 +278,10 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
             auto& targetMap = (i < splitIndex) ? tmp0LinkMap_ : tmp1LinkMap_;
             targetMap[channel.remoteRank].push_back(channel);
         }
-        CHK_RET(algTemplate0.SetchannelsPerRank(tmp0LinkMap_));
-        CHK_RET(algTemplate1.SetchannelsPerRank(tmp1LinkMap_));
+        CHK_RET(SetChannelsPerRank(
+            algTemplate0, tmp0LinkMap_, std::is_base_of<CcuAlgTemplateBase, InsAlgTemplate0>()));
+        CHK_RET(SetChannelsPerRank(
+            algTemplate1, tmp1LinkMap_, std::is_base_of<CcuAlgTemplateBase, InsAlgTemplate1>()));
     }
 
     // 算法展开
@@ -399,5 +425,12 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherConcurMeshNHR, InsV2AllGatherConcurrentExecutor, TopoMatchUBX,
     InsTempAllGatherMesh1D, InsTempAllGatherNHR);
+
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+REGISTER_EXECUTOR_BY_TWO_TEMPS(
+    HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherConcurMeshNHRMultiLink,
+    InsV2AllGatherConcurrentExecutor, TopoMatchUBX, CcuTempKfcAllGatherMesh1DMem2Mem,
+    CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem);
+#endif
 
 } // namespace mc2_ops_hccl
