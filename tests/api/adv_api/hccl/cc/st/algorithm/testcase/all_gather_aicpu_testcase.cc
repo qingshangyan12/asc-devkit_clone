@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <map>
 #include <thread>
 #include <vector>
 
@@ -22,8 +23,10 @@
 #include "hccl_verifier.h"
 #include "hccl_alloc_ctx_res.h"
 #include "hccl_mc2.h"
+#include "ins_temp_all_gather_nhr.h"
 #include "sim_world.h"
 #include "task_cache_test_stub.h"
+#include "template_utils.h"
 
 using namespace HcclSim;
 
@@ -272,6 +275,30 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, st_all_gather_a5_aicpu_ubx_4rank_concurrent_mes
     TopoMeta topoMeta{{{0, 1, 2, 3}}};
     RunAllGatherAicpuA5(
         topoMeta, 600U * 1024U, HcclDataType::HCCL_DATA_TYPE_UINT8, "AicpuAllGatherConcurMeshNHR", true);
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, st_all_gather_nhr_uneven_channels_use_min_for_data_and_max_for_threads)
+{
+    std::vector<HcclChannelDesc> channelDescs(4U);
+    channelDescs[0U].remoteRank = 1U;
+    channelDescs[1U].remoteRank = 2U;
+    channelDescs[2U].remoteRank = 2U;
+    channelDescs[3U].remoteRank = 2U;
+    EXPECT_EQ(mc2_ops_hccl::CalcChannelsPerRankMin(channelDescs), 1U);
+    EXPECT_EQ(mc2_ops_hccl::CalcChannelsPerRank(channelDescs), 3U);
+
+    std::map<u32, std::vector<ChannelInfo>> channels;
+    channels[1U].resize(1U);
+    channels[2U].resize(3U);
+
+    EXPECT_EQ(mc2_ops_hccl::CalcChannelsPerRankMin(channels), 1U);
+    EXPECT_EQ(mc2_ops_hccl::CalcChannelsPerRank(channels), 3U);
+
+    mc2_ops_hccl::OpParam opParam{};
+    std::vector<std::vector<u32>> subCommRanks{{0U, 1U, 2U}};
+    mc2_ops_hccl::InsTempAllGatherNHR nhrTemplate(opParam, 0U, subCommRanks);
+    ASSERT_EQ(nhrTemplate.SetchannelsPerRank(channels), HCCL_SUCCESS);
+    EXPECT_EQ(nhrTemplate.GetThreadNum(), 6U);
 }
 
 TEST_F(ST_ALL_GATHER_AICPU_TEST, st_all_gather_a5_aicpu_ubx_4rank_concurrent_mc2_open_executor_e2e_test)
