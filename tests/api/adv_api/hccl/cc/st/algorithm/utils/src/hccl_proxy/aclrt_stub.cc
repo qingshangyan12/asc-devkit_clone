@@ -30,7 +30,7 @@ thread_local uint32_t curr_dev_id = UINT32_MAX;
 namespace mc2_ops_hccl {
 bool g_rejectDirectAclrtMemcpy = false;
 uint32_t g_aclrtMemcpyCallCount = 0;
-}
+} // namespace mc2_ops_hccl
 
 extern "C" unsigned int HcclLaunchAicpuKernel(OpParam* param);
 
