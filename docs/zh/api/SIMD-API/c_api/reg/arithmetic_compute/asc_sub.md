@@ -30,7 +30,7 @@
 
 Carry flag（进位/借位标志）用于表示加法进位或者减法无借位。减法运算在硬件底层通过补码加法实现，该接口可以在`carry`（掩码寄存器）中标记每次补码加法是否产生进位，若`src0`，`~src1`，`33'b1`，按位相加后最高位有进位，在`carry`中对应位置每4bit的最低位写1，否则写0。
 
-**[无进位输出加法](#无进位输出加法)**：单目的操作数，矢量数据寄存器写入减法结果，计算公式如下：
+**[无进位输出减法](#无进位输出减法)**：单目的操作数，矢量数据寄存器写入减法结果，计算公式如下：
 
 $$
 dst_i = src0_i - src1_i
@@ -50,7 +50,7 @@ $$
 
 ## 函数原型
 
-### 无进位输出加法
+### 无进位输出减法
 
 ```c
 __simd_callee__ inline void asc_sub(vector_<dtype>& dst,
@@ -64,7 +64,7 @@ dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`ha
 #### 典型示例
 
 ```c
-// 示例：float类型无进位输出加法
+// 示例：float类型无进位输出减法
 __simd_callee__ inline void asc_sub(vector_float& dst,
                                     vector_float src0,
                                     vector_float src1,
@@ -83,7 +83,7 @@ __simd_callee__ inline void asc_sub(vector_bool& carry,
 
 ## 参数说明
 
-### 无进位输出加法
+### 无进位输出减法
 
 **表1** 参数说明
 
@@ -119,7 +119,7 @@ __simd_callee__ inline void asc_sub(vector_bool& carry,
 - 本接口在非AIV上调用直接返回。
 - `mask`需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 
-### 无进位输出加法约束
+### 无进位输出减法约束
 
 - 整型dtype减法溢出时按环绕（wrap-around）策略处理：有符号类型溢出回绕到对应dtype的最小值或最大值（MIN-1->MAX，MAX+1->MIN），无符号类型下溢回绕到对应dtype的最大值（0-1->UMAX）。
 - 浮点dtype（half、bfloat16_t、float）减法按IEEE 754浮点减法语义执行，溢出与无效输入（如nan、inf）的处理遵循浮点运算规则。

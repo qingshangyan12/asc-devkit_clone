@@ -114,7 +114,7 @@ constexpr uint32_t BUFFER_BYTES = 256;
 
 __simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
+    vector_bool mask = asc_create_mask_b16(PAT_ALL);
     vector_int32_t dst_0;
     vector_half src_0;
     asc_loadalign(dst_0, reinterpret_cast<__ubuf__ int32_t*>(output));

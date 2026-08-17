@@ -70,6 +70,7 @@ inline void asc_bfloat162half_rn(vector_half& dst,
 - 本接口在非AIV上调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - mask需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)。
 - `mask`掩码位为0时，`dst`对应元素置0。
 
 ## 调用示例
@@ -117,7 +118,7 @@ constexpr uint32_t BUFFER_BYTES = 256;
 
 __simd_vf__ inline void convert_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
+    vector_bool mask = asc_create_mask_b16(PAT_ALL);
     vector_half dst_0;
     vector_bfloat16_t src_0;
     asc_loadalign(dst_0, reinterpret_cast<__ubuf__ half*>(output));

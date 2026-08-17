@@ -72,6 +72,7 @@ inline void asc_half2hif8_rna(vector_hifloat8_t& dst,
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - mask需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 - 当数据写入目的操作数索引为奇数的位置，索引为偶数位置的数值置零。反之亦然。
+- 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)。
 - `mask`掩码位为0时，`dst`对应元素置0。
 
 ## 调用示例
