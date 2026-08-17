@@ -124,32 +124,6 @@ bool IsCcuKfcSupportedOp(uint32_t opType)
 }
 } // namespace
 
-HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
-{
-    uint64_t actualSize = ctxSize;
-    if (HcclEngineCtxGet(comm, tag.c_str(), COMM_ENGINE_AIV, ctx, &actualSize) == HCCL_SUCCESS) {
-        CHK_PRT_RET(
-            actualSize < ctxSize,
-            HCCL_ERROR(
-                "[GetOrCreateCcuCtx] Context size is insufficient, tag[%s], actualSize[%llu], ctxSize[%llu].",
-                tag.c_str(), static_cast<unsigned long long>(actualSize), static_cast<unsigned long long>(ctxSize)),
-            HCCL_E_INTERNAL);
-        HCCL_INFO(
-            "[GetOrCreateCcuCtx] HcclEngineCtxGet success, tag[%s], ctxAddr[%p], ctxSize[%llu]", tag.c_str(), *ctx,
-            static_cast<unsigned long long>(actualSize));
-        return HCCL_SUCCESS;
-    }
-    CHK_RET(HcclEngineCtxCreate(comm, tag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx));
-    aclError aclRet = aclrtMemset(*ctx, ctxSize, 0, ctxSize);
-    CHK_PRT_RET(
-        aclRet != ACL_SUCCESS,
-        HCCL_ERROR(
-            "[GetOrCreateCcuCtx] aclrtMemset failed, ret[%d], tag[%s], addr[%p], size[%llu].", aclRet, tag.c_str(),
-            *ctx, static_cast<unsigned long long>(ctxSize)),
-        HCCL_E_RUNTIME);
-    return HCCL_SUCCESS;
-}
-
 HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum)
 {
     CHK_PTR_NULL(mc2Tiling);

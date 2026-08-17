@@ -48,7 +48,6 @@
 #include "hccl_ccu_res_dl.h"
 #include "ccu_log.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
-#include "hccl_alloc_ctx_res.h"
 
 #ifndef MC2_CLIENT_ENABLE_CCU
 #define MC2_CLIENT_ENABLE_CCU 0
@@ -95,6 +94,32 @@ namespace mc2_ops_hccl {
 // 用于维护增量建链算子的host ctx信息
 thread_local std::map<std::string, std::unique_ptr<AlgResourceCtxSerializable>> g_hostCtx;
 constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0; // host主流wait aicpu流的notify idx
+
+HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
+{
+    uint64_t actualSize = ctxSize;
+    if (HcclEngineCtxGet(comm, tag.c_str(), COMM_ENGINE_AIV, ctx, &actualSize) == HCCL_SUCCESS) {
+        CHK_PRT_RET(
+            actualSize < ctxSize,
+            HCCL_ERROR(
+                "[GetOrCreateCcuCtx] Context size is insufficient, tag[%s], actualSize[%llu], ctxSize[%llu].",
+                tag.c_str(), static_cast<unsigned long long>(actualSize), static_cast<unsigned long long>(ctxSize)),
+            HCCL_E_INTERNAL);
+        HCCL_INFO(
+            "[GetOrCreateCcuCtx] HcclEngineCtxGet success, tag[%s], ctxAddr[%p], ctxSize[%llu]", tag.c_str(), *ctx,
+            static_cast<unsigned long long>(actualSize));
+        return HCCL_SUCCESS;
+    }
+    CHK_RET(HcclEngineCtxCreate(comm, tag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx));
+    aclError aclRet = aclrtMemset(*ctx, ctxSize, 0, ctxSize);
+    CHK_PRT_RET(
+        aclRet != ACL_SUCCESS,
+        HCCL_ERROR(
+            "[GetOrCreateCcuCtx] aclrtMemset failed, ret[%d], tag[%s], addr[%p], size[%llu].", aclRet, tag.c_str(),
+            *ctx, static_cast<unsigned long long>(ctxSize)),
+        HCCL_E_RUNTIME);
+    return HCCL_SUCCESS;
+}
 
 static uint64_t GetTokenFromBuffInfo(void* bufferAddr, uint64_t bufferSize)
 {
