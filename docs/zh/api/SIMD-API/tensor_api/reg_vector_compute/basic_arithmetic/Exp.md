@@ -43,8 +43,6 @@ __simd_callee__ inline decltype(auto) exp(const reg_tensor<T>& src_reg);
 
 ## 调用示例
 
-完整可运行样例请参考[基础计算Tensor API样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/README.md)。
-
 ```cpp
 auto src_reg = input.load(make_coord(0, 0)).with_mask(asc::te::ones<float>());
 auto dst_reg = asc::te::exp(src_reg);

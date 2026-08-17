@@ -55,6 +55,10 @@ logical_compute_tensor_api
 
   本样例中的`operator!`表示逻辑非，不是按位取反。移位量由`0`到`3`循环生成，处于`int32_t`移位的有效范围内。
 
+- 样例实现：
+
+  `compute`函数从UB Tensor加载`src_a`、`src_b`和`shifts`，使用C++逻辑与移位运算符完成8组计算，并将结果写入输出Tensor的独立行。Kernel负责GM与UB之间的数据搬运和流水同步，Host侧负责加载输入、启动Kernel并保存输出。
+
 - 样例规格：
 
   <table border="2">

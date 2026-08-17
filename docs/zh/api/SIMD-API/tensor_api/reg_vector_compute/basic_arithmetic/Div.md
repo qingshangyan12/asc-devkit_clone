@@ -42,8 +42,6 @@ __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b);
 
 ## 调用示例
 
-完整可运行样例请参考[基础计算Tensor API样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/README.md)。
-
 ```cpp
 auto quotient0 = src0 / src1;
 auto quotient1 = src0 / 2.0f;
