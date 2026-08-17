@@ -37,7 +37,7 @@ def asc_int322float_rn(dst, src, mask):
             dst[i] = 0.0                 # mask未选中, 置零
 ```
 
-关于舍入模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
+关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
 ## 函数原型
 

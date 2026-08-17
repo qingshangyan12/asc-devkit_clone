@@ -48,7 +48,7 @@ def asc_float2bfloat16_rn_v2(dst, src, mask):
             dst[2 * i + 1] = 0
 ```
 
-关于舍入模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
+关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
 ## 函数原型
 

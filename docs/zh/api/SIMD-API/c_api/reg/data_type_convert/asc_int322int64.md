@@ -62,7 +62,7 @@ __simd_callee__ inline void asc_int322int64<position_mode>(vector_int64_t& dst,
 ### 典型示例
 
 ```c
-// 数据写入索引为偶数的位置
+// 数据读入索引为偶数的位置
 __simd_callee__ inline void asc_int322int64(vector_int64_t& dst,
                                             vector_int32_t src,
                                             vector_bool mask)

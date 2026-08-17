@@ -26,10 +26,14 @@
 
 ## 功能说明
 
-计算公式如下：
+根据`mask`将源操作数`src`按元素与标量`value`进行比较，若$src_i > value$，则目的操作数对应结果位为1，否则为0。每个元素的比较结果占一个比特。计算公式如下：
 
 $$
-dst_i = \begin{cases} 1, & src_i > value \\ 0, & src_i \leq value \end{cases}
+dst_i = 
+\begin{cases}
+ 1, & src_i > value \\
+ 0, & src_i \leq value \\
+ \end{cases}
 $$
 
 ## 函数原型

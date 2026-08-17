@@ -29,7 +29,7 @@
 对源操作数src、value进行按元素做乘操作，将结果写入目的操作数dst。计算公式如下：
 
 $$
-dst = src * value
+dst_i = src_i * value
 $$
 
 ## 函数原型
