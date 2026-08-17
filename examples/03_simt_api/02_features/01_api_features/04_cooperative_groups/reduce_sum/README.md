@@ -6,11 +6,10 @@
 
 样例设计一个通用规约接口`reduce_sum`，形参取`thread_group`基类；围绕该接口构造三个用例，分别以跨块（`grid_group`）、整块（`thread_block`）、子组（`thread_block_tile`）为规约域。三处调用的书写形式一致，粒度差异由传入的组对象承载。
 
-编程模型为纯SIMT形态。`grid_group`不支持SIMD与SIMT混合编程场景，本样例不涉及该场景。
 
 ## 支持的产品
 
-Ascend 950PR、Ascend 950DT。
+Ascend 950PR/Ascend 950DT。
 
 ## 支持的CANN软件版本
 
@@ -28,7 +27,6 @@ CANN 9.2.0及以上。
 │   └── README_en.md                        
 ```
 
-`CMakeLists.txt`为编译工程文件；`reduce_sum.asc`中包含通用规约接口`reduce_sum`、三个用例的SIMT kernel实现，以及host侧的参数解析、用例分发与结果校验。
 
 ## 样例描述
 
@@ -91,7 +89,7 @@ __aicore__ inline int32_t reduce_sum(const thread_group& g, PtrT x, int32_t val)
 }
 ```
 
-记规约域大小为`N = g.size()`，跨距`i`自`N / 2`起逐轮折半，共`log2(N)`轮。每轮的四步操作与最终的返回值为三个用例所共用：全组`N`个线程各执行`x[lane] = val`，将当前持有的值写入暂存区中与自身rank对应的格位；`g.sync()`等待全组写入完成；`lane < i`的线程执行`val += x[lane + i]`，读取跨距为`i`的伙伴格位并在寄存器内累加，本轮活跃值由`i × 2`个减至`i`个；`g.sync()`等待全组读取完成，以免下一轮的写入覆盖尚未读走的格位。循环在`i`减至0时结束，此时lane 0持有全组之和，其余线程返回−1，交由调用方按各自的汇总方式处置。
+记规约域大小为`N = g.size()`，跨距`i`自`N / 2`起逐轮折半，共log<sub>2</sub>N轮。每轮的四步操作与最终的返回值为三个用例所共用：全组`N`个线程各执行`x[lane] = val`，将当前持有的值写入暂存区中与自身rank对应的格位；`g.sync()`等待全组写入完成；`lane < i`的线程执行`val += x[lane + i]`，读取跨距为`i`的伙伴格位并在寄存器内累加，本轮活跃值由`i × 2`个减至`i`个；`g.sync()`等待全组读取完成，以免下一轮的写入覆盖尚未读走的格位。循环在`i`减至0时结束，此时lane 0持有全组之和，其余线程返回−1，交由调用方按各自的汇总方式处置。
 
 每轮相加的两个值各自代表一批元素，两批之间没有重叠，相加得到的新值就代表这两批元素之和。因此每轮结束时，剩下的活跃值合起来仍然覆盖全部元素，不重不漏，只是持有值的线程数减半。这一点与规约域大小`N`无关，三种粒度算出的总和因此相同。
 
@@ -242,69 +240,6 @@ __global__ void reduce_block_tile(const int32_t* input, int32_t* total_tile, uin
 
 同一block内32个warp的部分和相加即得该块的部分和，数值与整块规约场景一致，四块经原子加后总和为8390656。
 
-#### 4：host侧实现
-
-`main`依次完成七步：解析参数，构造输入与期望值，经`aclInit`、`aclrtSetDevice`、`aclrtCreateStream`初始化运行环境，申请输入显存并拷入，按用例分发至两个用例函数之一取回总和，释放显存与去初始化，最后调用`verify_result`校验并以其返回值作为进程退出码。
-
-```cpp
-// case0：暂存区在全局内存
-int32_t run_global_workspace_case(int32_t* input_device, int32_t num_elements, aclrtStream stream);
-// case1与case2：暂存区在共享内存，由kernel形参选定发射哪一个
-int32_t run_shared_workspace_case(KernelType kernel, int32_t* input_device, int32_t num_elements, aclrtStream stream);
-```
-
-两个用例函数互不调用，各自完成本场景所需显存的分配、kernel发射、流同步、总和回读与显存释放，返回该总和。结果的比对不在用例函数内进行，集中在`verify_result`处。
-
-划分依据为暂存区所在的存储层级，该层级决定host侧是否需要额外分配显存。跨块规约的暂存区在全局内存，须在host侧另开一块`TOTAL_THREADS`个`int32`的显存并列入kernel参数表；其总和由grid内rank 0唯一写出，不经原子加，因而不需要预先清零。整块与子组两个场景的暂存区以`__ubuf__ static`声明于kernel内，host侧无对应的分配动作，两者的显存需求同为一个`int32`的总和；汇总均经`asc_atomic_add`完成，故总和在launch前由`aclrtMemset`清零。
-
-后两个场景的host侧流程由此完全一致，差异仅在发射哪一个kernel，`run_shared_workspace_case`以形参`KernelType kernel`承接该差异：
-
-```cpp
-if (kernel == KernelType::THREAD_BLOCK) {
-    reduce_thread_block<<<BLOCKS_PER_GRID, THREADS_PER_BLOCK, DYN_UBUF_SIZE, stream>>>(
-        input_device, total_device, num_elements);
-} else {
-    reduce_block_tile<<<BLOCKS_PER_GRID, THREADS_PER_BLOCK, DYN_UBUF_SIZE, stream>>>(
-        input_device, total_device, num_elements);
-}
-```
-
-显存分配、清零、流同步、总和回读与释放五步在该分支之外，两个场景共用一份。单次执行仍只发射一个kernel，用例的选定由`main`中的分发完成。
-
-期望值由元素个数在代码中算出，与解析解公式一致。`num_elements`取`TOTAL_THREADS`即`BLOCKS_PER_GRID * THREADS_PER_BLOCK`合4096，golden为8390656：
-
-```cpp
-const int32_t golden = static_cast<int32_t>(num_elements * (num_elements + 1) / 2);  // 4096 → 8390656
-```
-
-用例函数返回后，`main`按释放输入显存、销毁stream、复位device、去初始化的顺序收尾，最后返回校验结果：
-
-```cpp
-CHECK_ACL(aclrtFree(input_device));
-CHECK_ACL(aclrtDestroyStream(stream));
-CHECK_ACL(aclrtResetDevice(device_id));
-CHECK_ACL(aclFinalize());
-
-return verify_result(output, golden);
-```
-
-全部ACL调用经`CHECK_ACL`包裹。返回码非`ACL_SUCCESS`时，宏打印所在文件与行号、错误码、`aclGetRecentErrMsg()`取得的运行时信息与出错调用的字面文本，随即以`EXIT_FAILURE`终止进程。`aclGetRecentErrMsg()`在无错误详情时可能返回`nullptr`，直接传给`%s`是未定义行为，故做空指针兜底：
-
-```cpp
-#define CHECK_ACL(expr)                                                                       \
-    do {                                                                                      \
-        aclError ret = (expr);                                                                \
-        if (ret != ACL_SUCCESS) {                                                             \
-            const char* msg = aclGetRecentErrMsg();                                           \
-            fprintf(                                                                          \
-                stderr, "Ascend Error: %s:%d code=%d %s \"%s\"\n", __FILE__, __LINE__,        \
-                static_cast<int>(ret), (msg != nullptr) ? msg : "no detail", #expr);          \
-            exit(EXIT_FAILURE);                                                               \
-        }                                                                                     \
-    } while (0)
-```
-
-出错即终止，不再进入后续的launch与回读，避免在运行环境已然异常的前提下比对结果。规约结果的正确性由`verify_result`比对总和与golden得出，其返回值即进程退出码。
 
 ## 编译运行
 
