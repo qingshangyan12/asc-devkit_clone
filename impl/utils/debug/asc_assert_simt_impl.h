@@ -33,7 +33,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap()
 #endif
 }
 
-static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void __assert_fail(
+inline __SIMT_DEVICE_FUNCTIONS_DECL__ void __assert_fail(
     const char* __assertion, const char* __file, unsigned int __line, const char* __function) noexcept
 {
     simt_printf_impl(
@@ -43,7 +43,7 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void __assert_fa
 }
 
 template <typename... Args>
-static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void __assert_fail_msg(
+inline __SIMT_DEVICE_FUNCTIONS_DECL__ void __assert_fail_msg(
     const char* __assertion, const char* __file, unsigned int __line, const char* __function, const char* fmt,
     Args&&... args) noexcept
 {
@@ -57,7 +57,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap()
 #endif
 }
 
-static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void __assert_fail(
+inline __SIMT_DEVICE_FUNCTIONS_DECL__ void __assert_fail(
     const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line,
     const __gm__ char* __function) noexcept
 {
@@ -68,7 +68,7 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void __assert_fa
 }
 
 template <typename... Args>
-static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void __assert_fail_msg(
+inline __SIMT_DEVICE_FUNCTIONS_DECL__ void __assert_fail_msg(
     const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line, const __gm__ char* __function,
     const __gm__ char* fmt, Args&&... args) noexcept
 {
