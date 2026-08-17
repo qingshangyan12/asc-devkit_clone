@@ -2802,7 +2802,7 @@
         -   [tiled_partition](SIMT-API/cooperative_groups/tiled_partition.md)
         -   [binary_partition](SIMT-API/cooperative_groups/binary_partition.md)
 
--   [Utils API](Utils-API/Utils-API.md)
+-   [Utils API](Utils-API/utils_api.md)
     -   [Utils API列表](Utils-API/utils_api_list.md)
     -   [C++标准库](Utils-API/cpp_stdlib/cpp_stdlib.md)
         -   [算法](Utils-API/cpp_stdlib/algorithms/algorithms.md)
@@ -3033,8 +3033,8 @@
         -   [TRACE\_START](Utils-API/tuning_interface/TRACE_START.md)
         -   [TRACE\_STOP](Utils-API/tuning_interface/TRACE_STOP.md)
 
-    -   [SuperKernel](Utils-API/SuperKernel/SuperKernel.md)
-        -   [SK\_BIND](Utils-API/SuperKernel/SK_BIND.md)
+    -   [SuperKernel](Utils-API/super_kernel/SuperKernel.md)
+        -   [SK\_BIND](Utils-API/super_kernel/SK_BIND.md)
 
 -   [AI CPU API](AI-CPU-API/AI-CPU-API.md)
     -   [AI CPU API列表](AI-CPU-API/ai_cpu_api_list.md)
