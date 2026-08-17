@@ -30,7 +30,13 @@ for SAT_MODE in 1 0; do
               -DSATURATION_MODE=$SAT_MODE \
               -DCMAKE_ASC_ARCHITECTURES=dav-3510 \
               -B "$BUILD_DIR" -S "$EXAMPLE_DIR" 2>&1 | tail -1
-        cmake --build "$BUILD_DIR" -j 2>&1 | tail -1
+        cmake --build "$BUILD_DIR" -j 2>&1
+        if [ ! -f "$BUILD_DIR/demo" ]; then
+            echo "[BUILD FAIL] Scenario $SCENARIO_NUM ($MODE_NAME)"
+            FAIL=$((FAIL + 1))
+            FAILED_SCENARIOS+=("$SCENARIO_NUM($MODE_NAME)")
+            continue
+        fi
 
         (cd "$BUILD_DIR" && python3 "$EXAMPLE_DIR/scripts/gen_data.py" \
             -scenarioNum=$SCENARIO_NUM --boundary --saturation=$SAT_MODE)
