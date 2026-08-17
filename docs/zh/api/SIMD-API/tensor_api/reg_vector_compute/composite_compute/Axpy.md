@@ -50,8 +50,6 @@ __simd_callee__ inline decltype(auto) axpy(
 
 ## 调用示例
 
-完整可运行样例请参考[复合计算Tensor API样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/composite_compute_tensor_api/README.md)。
-
 ```cpp
 auto result = asc::te::axpy(dst_reg, src_reg, 0.25f);
 ```

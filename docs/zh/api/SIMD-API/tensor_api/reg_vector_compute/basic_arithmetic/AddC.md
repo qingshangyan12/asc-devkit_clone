@@ -48,8 +48,6 @@ __simd_callee__ inline decltype(auto) add_c(
 
 ## 调用示例
 
-完整可运行样例请参考[基础计算Tensor API样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/README.md)。
-
 ```cpp
 asc::te::reg_tensor<bool> carry_out;
 auto high = asc::te::add_c(carry_out, high0, high1, carry_in);
