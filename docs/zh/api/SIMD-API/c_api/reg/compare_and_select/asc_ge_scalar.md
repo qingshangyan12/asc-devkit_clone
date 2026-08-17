@@ -84,9 +84,9 @@ __simd_callee__ inline void asc_ge_scalar(vector_bool& dst,
 - `mask`掩码位为0时，`dst`对应比特位置0。
 - 浮点比较输入包含nan时，`dst`对应比特位写0。
 
-<!-- npu="950" id8 -->
 ## 调用示例
 
+<!-- npu="950" id8 -->
 将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -197,4 +197,5 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
 <!-- end id8 -->

@@ -82,9 +82,9 @@ __simd_callee__ inline void asc_reduce_min(vector_half& dst,
 
 `dst`的索引按照`dst`的数据类型存储，比如`dst`为half类型时，索引按照half类型存储，因此读取索引需要使用  reinterpret\_cast方法转换到整数类型。若数据类型是half，需要使用reinterpret\_cast\<uint16_t\*\>；若数据类型是float，需要使用reinterpret\_cast\<uint32\_t\*\>。
 
-<!-- npu="950" id8 -->
 ## 调用示例
 
+<!-- npu="950" id8 -->
 将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -177,4 +177,5 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
 <!-- end id8 -->

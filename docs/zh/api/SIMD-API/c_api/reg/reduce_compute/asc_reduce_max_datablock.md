@@ -79,9 +79,9 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_half& dst,
 - 未被`mask`选中的元素被视为对应数据类型的最小值，浮点数类型的最小值为`-inf`。如果一个`DataBlock`中的所有元素均未被`mask`选中，则将该最小值写入`dst`的对应位置。
 - 仅输出最大值，不输出索引。
 
-<!-- npu="950" id8 -->
 ## 调用示例
 
+<!-- npu="950" id8 -->
 将以下代码保存为`example.asc`后，可通过`bisheng`命令编译运行。其中，`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -174,4 +174,5 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
 <!-- end id8 -->
