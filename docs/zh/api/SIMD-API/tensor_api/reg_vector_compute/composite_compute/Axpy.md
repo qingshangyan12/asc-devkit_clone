@@ -20,9 +20,9 @@ $$
 ```cpp
 template <typename T, typename scalar_type>
 __simd_callee__ inline decltype(auto) axpy(
-    reg_tensor<T> dst,
-    reg_tensor<T> src,
-    scalar_type scalar);
+    const reg_tensor<T>& dst,
+    const reg_tensor<T>& src,
+    const scalar_type& scalar);
 ```
 
 ## 参数说明

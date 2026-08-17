@@ -17,13 +17,13 @@
 
 ```cpp
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator-(T a, U b);
+__simd_callee__ inline decltype(auto) operator-(const T& a, const U& b);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) sub(
     reg_tensor<bool>& carry,
-    reg_tensor<T> src0,
-    reg_tensor<T> src1);
+    const reg_tensor<T>& src0,
+    const reg_tensor<T>& src1);
 ```
 
 ## 参数说明

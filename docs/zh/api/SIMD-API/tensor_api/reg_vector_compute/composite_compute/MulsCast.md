@@ -19,8 +19,8 @@ $$
 
 ```cpp
 __simd_callee__ inline decltype(auto) muls_cast(
-    reg_tensor<float> src,
-    float scalar);
+    const reg_tensor<float>& src,
+    const float& scalar);
 ```
 
 ## 参数说明

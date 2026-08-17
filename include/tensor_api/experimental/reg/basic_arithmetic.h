@@ -22,78 +22,80 @@ namespace asc {
 namespace te {
 
 template <typename T>
-__simd_callee__ inline decltype(auto) abs(reg_tensor<T> src_reg);
+__simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) exp(reg_tensor<T> src_reg);
+__simd_callee__ inline decltype(auto) exp(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) sqrt(reg_tensor<T> src_reg);
+__simd_callee__ inline decltype(auto) sqrt(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) log(reg_tensor<T> src_reg);
+__simd_callee__ inline decltype(auto) log(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) log2(reg_tensor<T> src_reg);
+__simd_callee__ inline decltype(auto) log2(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) log10(reg_tensor<T> src_reg);
+__simd_callee__ inline decltype(auto) log10(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator-(reg_tensor<T> src_reg);
+__simd_callee__ inline decltype(auto) operator-(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) relu(reg_tensor<T> src_reg);
+__simd_callee__ inline decltype(auto) relu(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) prelu(reg_tensor<T> src_reg, reg_tensor<T> slope);
+__simd_callee__ inline decltype(auto) prelu(const reg_tensor<T>& src_reg, const reg_tensor<T>& slope);
 
 template <typename T, typename scalar_type>
-__simd_callee__ inline decltype(auto) leaky_relu(reg_tensor<T> src_reg, scalar_type slope);
+__simd_callee__ inline decltype(auto) leaky_relu(const reg_tensor<T>& src_reg, const scalar_type& slope);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator+(reg_tensor<T> src0, reg_tensor<T> src1);
+__simd_callee__ inline decltype(auto) operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator+(reg_tensor<T> src, T scalar);
+__simd_callee__ inline decltype(auto) operator+(const reg_tensor<T>& src, const T& scalar);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator+(T scalar, reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) operator+(const T& scalar, const reg_tensor<T>& src);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) add(
-    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1);
+    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) add_c(
-    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<bool> carry_src);
+    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
+    const reg_tensor<bool>& carry_src);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator-(T a, U b);
+__simd_callee__ inline decltype(auto) operator-(const T& a, const U& b);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) sub(
-    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1);
+    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) sub_c(
-    reg_tensor<bool>& carry, reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<bool> carry_src);
+    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
+    const reg_tensor<bool>& carry_src);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator*(T a, U b);
+__simd_callee__ inline decltype(auto) operator*(const T& a, const U& b);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) mull(
-    reg_tensor<T>& high, reg_tensor<T> src0, reg_tensor<T> src1);
+    reg_tensor<T>& high, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator/(T a, U b);
+__simd_callee__ inline decltype(auto) operator/(const T& a, const U& b);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) max(T a, U b);
+__simd_callee__ inline decltype(auto) max(const T& a, const U& b);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) min(T a, U b);
+__simd_callee__ inline decltype(auto) min(const T& a, const U& b);
 
 } // namespace te
 } // namespace asc

@@ -15,7 +15,7 @@
 
 ```cpp
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) max(T a, U b);
+__simd_callee__ inline decltype(auto) max(const T& a, const U& b);
 ```
 
 ## 参数说明

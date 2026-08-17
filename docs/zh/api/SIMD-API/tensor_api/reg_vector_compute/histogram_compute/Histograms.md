@@ -42,8 +42,8 @@ inline constexpr histogram_options default_histogram_options {};
 ```cpp
 template <const histogram_options& options = default_histogram_options>
 __simd_callee__ inline decltype(auto) histograms(
-    reg_tensor<uint16_t> dst,
-    reg_tensor<uint8_t> src);
+    const reg_tensor<uint16_t>& dst,
+    const reg_tensor<uint8_t>& src);
 ```
 
 ## 参数说明

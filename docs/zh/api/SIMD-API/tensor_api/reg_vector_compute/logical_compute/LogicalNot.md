@@ -21,7 +21,7 @@ $$
 
 ```cpp
 template <typename T>
-__simd_callee__ inline decltype(auto) operator!(reg_tensor<T> src);
+__simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src);
 ```
 
 ## 参数说明

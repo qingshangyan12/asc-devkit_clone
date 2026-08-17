@@ -15,7 +15,7 @@
 
 ```cpp
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator|(T a, U b);
+__simd_callee__ inline decltype(auto) operator|(const T& a, const U& b);
 ```
 
 ## 参数说明

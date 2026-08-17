@@ -16,21 +16,31 @@
 ## 函数原型
 
 ```cpp
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator+(T a, U b);
+template <typename T>
+__simd_callee__ inline decltype(auto) operator+(
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+template <typename T>
+__simd_callee__ inline decltype(auto) operator+(
+    const reg_tensor<T>& src, const T& scalar);
+
+template <typename T>
+__simd_callee__ inline decltype(auto) operator+(
+    const T& scalar, const reg_tensor<T>& src);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) add(
     reg_tensor<bool>& carry,
-    reg_tensor<T> src0,
-    reg_tensor<T> src1);
+    const reg_tensor<T>& src0,
+    const reg_tensor<T>& src1);
 ```
 
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `a`、`b` | 输入 | 至少一个操作数必须是 `reg_tensor<T>`；另一个可以是相同元素类型的寄存器或可转换标量。 |
+| `src0`、`src1` | 输入 | 双寄存器重载的两个同类型输入。 |
+| `src`、`scalar` | 输入 | 标量重载的寄存器输入和同元素类型标量输入。 |
 | `carry` | 输出 | `add` 返回的逐元素进位信息。 |
 | `src0`、`src1` | 输入 | `add` 的两个同类型 32 位整数寄存器输入。 |
 
