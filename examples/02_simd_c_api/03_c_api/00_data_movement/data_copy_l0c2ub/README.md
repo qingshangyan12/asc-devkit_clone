@@ -230,6 +230,7 @@ data_copy_l0c2ub
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | 1-21 | 场景编号 |
+  | `SATURATION_MODE` | 0、1（默认） | 饱和模式：1=饱和（CTRL[48]=0，inf→±MAX，nan→0），0=非饱和（CTRL[48]=1，inf/nan保持） |
 
 - 执行结果
 
@@ -238,3 +239,37 @@ data_copy_l0c2ub
   ```bash
   test pass!
   ```
+
+## 边界值测试
+
+边界值测试通过向输入矩阵A注入inf/-inf/nan（配合B矩阵对应行设为1.0），使L0C = A×B中产生inf/-inf/nan，验证各输出类型在饱和模式和非饱和模式下的inf/nan处理是否符合预期。对于int8_t输入场景，使用极端值（A某行设为-128、其余设为127）验证整数溢出饱和行为。
+
+全部17个量化场景（场景5-21）×2种模式一键测试：
+
+```bash
+bash scripts/test_boundary.sh
+```
+
+各量化模式对边界值的预期行为（饱和模式，CTRL[48]=0）：
+
+| 输出类型 | +inf | -inf | nan | 说明 |
+|---------|------|------|-----|------|
+| int8 | 饱和为127 | 饱和为-128或0 | 饱和为0 | 整数类型始终饱和 |
+| int4b | 饱和为7 | 饱和为-8或0 | 饱和为0 | 同上 |
+| half | 饱和为65504 | 饱和为-65504 | 饱和为0 | CTRL[48]=0控制 |
+| bfloat16 | 饱和为max | 饱和为min | 饱和为0 | CTRL[48]=0控制 |
+| fp8_e4m3fn | 饱和为448 | 饱和为-448 | 饱和为0（CTRL[50]=0） | CTRL[48]=0+CTRL[50]=0 |
+| hifloat8 | 111（HiF8+inf编码） | 239（HiF8-inf编码） | 饱和为0 | CTRL[48]=0控制 |
+| float | 保持inf | 保持-inf | 保持nan | CTRL[48]不支持float，始终保持 |
+
+非饱和模式（CTRL[48]=1）预期行为：
+
+| 输出类型 | +inf | -inf | nan | 说明 |
+|---------|------|------|-----|------|
+| int8 | 同饱和模式 | 同饱和模式 | 同饱和模式 | 整数类型始终饱和 |
+| int4b | 同饱和模式 | 同饱和模式 | 同饱和模式 | 同上 |
+| half | 保持inf | 保持-inf | 保持nan | float16可表示 |
+| bfloat16 | 保持inf | 保持-inf | 保持nan | bfloat16可表示 |
+| fp8_e4m3fn | 输出nan | 输出nan | 输出nan | inf或超范围值→nan |
+| hifloat8 | 111（HiF8+inf编码） | 239（HiF8-inf编码） | 128（HiF8NAN编码） | inf/nan保持对应编码 |
+| float | 保持inf | 保持-inf | 保持nan | CTRL[48]不支持float，始终保持 |

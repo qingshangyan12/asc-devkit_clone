@@ -100,6 +100,8 @@ def decode_relu_pre(relu_pre):
     sign_bit = (alpha_bits >> 18) & 0x1
     exponent = (alpha_bits >> 10) & 0xFF
     mantissa = alpha_bits & 0x3FF
+    if exponent == 0:
+        return (-1) ** sign_bit * (mantissa / 1024) * (2 ** (-126))
     return (-1) ** sign_bit * (1 + mantissa / 1024) * (2 ** (exponent - 127))
 
 
@@ -500,7 +502,7 @@ def apply_qf322fp8(value, quant_pre, relu_pre):
         value = saturate(value / (2**shift), -448, 448, np.float32)
     value = np.float32(value)
     value *= alpha if value >= 0 else decode_relu_pre(relu_pre)
-    value = np.clip(value + offset, -448, 448)
+    value = np.float32(value + offset)
     return float32_to_fp8_e4m3fn(float(value))
 
 
@@ -510,7 +512,7 @@ def apply_qf322hif8(value, quant_pre, relu_pre, hybrid=False):
         value = saturate(value / (2**shift), -240, 240, np.float32)
     value = np.float32(value)
     value *= alpha if value >= 0 else decode_relu_pre(relu_pre)
-    value = np.clip(value + offset, -240, 240)
+    value = np.float32(value + offset)
     return float32_to_hifloat8(float(value), hybrid=hybrid)
 
 
@@ -592,6 +594,78 @@ def apply_prequant(matrix, scenario_num, quant_params, output_type, quant_mode, 
     return result
 
 
+def apply_non_saturation_override(result, l0c_matrix, output_type):
+    """Override quantized result for positions where L0C had inf/nan in non-saturation mode.
+
+    In non-saturation mode (CTRL[48]=1):
+    - Float types (half, bfloat16, float): preserve inf/nan
+    - fp8_e4m3fn: inf → nan, nan → nan
+    - hifloat8: _cvt_float32_to_hifuint8(over_mode=True) already returns the
+      inf/nan encodings (111/239/128) that match the non-saturation behavior
+    - Integer types: always saturation (no override)
+    """
+    inf_mask = np.isinf(l0c_matrix)
+    nan_mask = np.isnan(l0c_matrix)
+
+    if output_type in ('half', 'bfloat16', 'float'):
+        pos_inf_mask = l0c_matrix == np.inf
+        neg_inf_mask = l0c_matrix == -np.inf
+        if output_type == 'half':
+            result[pos_inf_mask] = np.float16(np.inf)
+            result[neg_inf_mask] = np.float16(-np.inf)
+            result[nan_mask] = np.float16(np.nan)
+        elif output_type == 'bfloat16':
+            result[pos_inf_mask] = np.uint16(0x7F80)
+            result[neg_inf_mask] = np.uint16(0xFF80)
+            result[nan_mask] = np.uint16(0x7FFF)
+        else:
+            result[pos_inf_mask] = np.float32(np.inf)
+            result[neg_inf_mask] = np.float32(-np.inf)
+            result[nan_mask] = np.float32(np.nan)
+    elif output_type == 'fp8_e4m3fn':
+        fp8_nan = np.uint8(0x7F)
+        result[inf_mask | nan_mask] = fp8_nan
+    # hifloat8: over_mode=True encodings already match non-saturation behavior
+    # Integer types: always saturation, no override
+
+    return result
+
+
+def apply_saturation_override(result, l0c_matrix, output_type):
+    """Override quantized result for positions where L0C had inf/nan in saturation mode.
+
+    In saturation mode (CTRL[48]=0):
+    - half: inf → ±MAX(65504), nan → 0
+    - bfloat16: inf → ±MAX(0x7F7F/0xFF7F), nan → 0
+    - fp8_e4m3fn: inf → ±MAX(448=0x7E/-448=0xFE), nan → 0
+    - hifloat8: inf → overflow encoding(111/239) via over_mode=True, nan → 0
+    - float: CTRL[48] does NOT support float; inf/nan are preserved
+    - Integer types: always saturation, already handled by their functions
+    """
+    nan_mask = np.isnan(l0c_matrix)
+    pos_inf_mask = l0c_matrix == np.inf
+    neg_inf_mask = l0c_matrix == -np.inf
+
+    if output_type == 'half':
+        result[pos_inf_mask] = np.float16(65504)
+        result[neg_inf_mask] = np.float16(-65504)
+        result[nan_mask] = np.float16(0)
+    elif output_type == 'bfloat16':
+        result[pos_inf_mask] = np.uint16(0x7F7F)
+        result[neg_inf_mask] = np.uint16(0xFF7F)
+        result[nan_mask] = np.uint16(0)
+    elif output_type == 'fp8_e4m3fn':
+        result[pos_inf_mask] = np.uint8(0x7E)
+        result[neg_inf_mask] = np.uint8(0xFE)
+        result[nan_mask] = np.uint8(0)
+    elif output_type == 'hifloat8':
+        result[nan_mask] = np.uint8(0)
+    # float: CTRL[48] does not support float type, inf/nan preserved as-is
+    # Integer types: always saturation, already handled by their functions
+
+    return result
+
+
 # ============================================================================
 # Golden data generation
 # ============================================================================
@@ -627,7 +701,7 @@ def gen_noquant_data(scenario_num):
     golden.astype(output_type).tofile("./output/golden.bin")
 
 
-def gen_quant_data(scenario_num):
+def gen_quant_data(scenario_num, boundary=False, saturation=True):
     np.random.seed(9)
     input_type, l0c_type, output_type, quant_mode, is_relu, is_nz2nd, is_tensor = SCENARIOS[scenario_num]
 
@@ -636,16 +710,42 @@ def gen_quant_data(scenario_num):
         mm_dtype = np.int32
         x1 = np.random.randint(-3, 3, (M, K)).astype(input_dtype)
         x2 = np.random.randint(-3, 3, (K, N)).astype(input_dtype)
+        if boundary:
+            x1[:] = 127
+            x2[:] = 127
+            x1[0, :] = -128
+            print("[boundary] int8 input: row 0 = -128, rest = 127 → extreme int32 L0C")
     else:
         input_dtype = np.float16
         mm_dtype = np.float32
         x1 = np.random.uniform(-3.0, 3.0, (M, K)).astype(input_dtype)
         x2 = np.random.uniform(-3.0, 3.0, (K, N)).astype(input_dtype)
+        if boundary:
+            x2[0, :] = np.float16(1.0)
+            x1[0, 0] = np.float16(np.inf)
+            x1[1, 0] = np.float16(-np.inf)
+            x1[2, 0] = np.float16(np.nan)
+            print("[boundary] half input: A[0,0]=+inf, A[1,0]=-inf, A[2,0]=nan, B[0,:]=1.0")
 
-    golden = np.matmul(x1.astype(mm_dtype), x2.astype(mm_dtype)).astype(mm_dtype)
+    l0c = np.matmul(x1.astype(mm_dtype), x2.astype(mm_dtype)).astype(mm_dtype)
+
+    if boundary:
+        print("[boundary] L0C contains: inf=%s, -inf=%s, nan=%s" % (
+            np.any(l0c == np.inf), np.any(l0c == -np.inf), np.any(np.isnan(l0c))))
 
     quant_params = make_quant_params(output_type)
-    golden = apply_prequant(golden, scenario_num, quant_params, output_type, quant_mode, is_relu)
+    golden = apply_prequant(l0c, scenario_num, quant_params, output_type, quant_mode, is_relu)
+
+    if not saturation:
+        golden = apply_non_saturation_override(golden, l0c, output_type)
+    else:
+        golden = apply_saturation_override(golden, l0c, output_type)
+
+    if boundary:
+        has_inf_out = np.any(np.isinf(golden.astype(np.float64)))
+        has_nan_out = np.any(np.isnan(golden.astype(np.float64)))
+        print("[boundary] output (%s, saturation=%s) contains: inf=%s, nan=%s" % (
+            output_type, saturation, has_inf_out, has_nan_out))
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
@@ -669,15 +769,23 @@ def gen_quant_data(scenario_num):
     golden.astype(SAVE_DTYPE[output_type]).tofile("./output/golden.bin")
 
 
-def gen_golden_data(scenario_num=1):
+def gen_golden_data(scenario_num=1, boundary=False, saturation=True):
     if scenario_num <= 4:
         gen_noquant_data(scenario_num)
     else:
-        gen_quant_data(scenario_num)
+        gen_quant_data(scenario_num, boundary=boundary, saturation=saturation)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 22))
+    parser.add_argument("--boundary", action="store_true",
+                        help="Generate boundary value inputs (inf/-inf/nan) to test saturation behavior")
+    parser.add_argument("--saturation", type=int, default=1, choices=[0, 1],
+                        help="Saturation mode: 1=saturation (CTRL[48]=0, inf→±MAX, nan→0), "
+                             "0=non-saturation (CTRL[48]=1, inf/nan preserved)")
     args = parser.parse_args()
-    gen_golden_data(args.scenarioNum)
+    if args.scenarioNum <= 4:
+        gen_noquant_data(args.scenarioNum)
+    else:
+        gen_quant_data(args.scenarioNum, boundary=args.boundary, saturation=bool(args.saturation))
