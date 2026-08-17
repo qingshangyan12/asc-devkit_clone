@@ -198,6 +198,7 @@ Run the following steps in the example root directory.
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture for Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | 1-17 | Scenario number |
+  | `SATURATION_MODE` | 0, 1 (default) | Floating-point saturation mode: 1=saturation (CTRL[48]=0, inf→±MAX, nan→0), 0=non-saturation (CTRL[48]=1, inf/nan preserved). Integer types always use saturation. |
 
 - Expected result
 
@@ -206,3 +207,58 @@ Run the following steps in the example root directory.
   ```bash
   test pass!
   ```
+
+- Boundary value testing (inf/-inf/nan)
+
+  `gen_data.py` supports the `--boundary` parameter for generating input data containing `+inf`/`-inf`/`nan` special values to test the saturation/propagation behavior of each quantization mode under boundary values.
+
+  - half input scenarios: inject `+inf`/`-inf`/`nan` into matrix A (the half type can represent these special values). The L0C result will contain the corresponding special values, which are saturated or propagated to the output during quantization.
+  - int8 input scenarios: int8 cannot represent `inf`/`nan`, so extreme values (127/-128) are used to produce extreme int32 L0C values and test quantization saturation behavior.
+  - Use the `--saturation` parameter and `-DSATURATION_MODE` build option to control the CTRL[48] bit, testing both saturation and non-saturation modes.
+
+  Single scenario test (saturation mode):
+
+  ```bash
+  SCENARIO_NUM=3
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM --boundary --saturation=1
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DSATURATION_MODE=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j
+  ./demo
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin ./output/golden.bin
+  ```
+
+  Single scenario test (non-saturation mode):
+
+  ```bash
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM --boundary --saturation=0
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DSATURATION_MODE=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j
+  ./demo
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin ./output/golden.bin
+  ```
+
+  One-click test for all 17 scenarios × 2 modes:
+
+  ```bash
+  bash ../scripts/test_boundary.sh
+  ```
+
+  Expected behavior of each quantization mode for boundary values (saturation mode, CTRL[48]=0):
+
+  | Output type | +inf | -inf | nan | Notes |
+  |---------|------|------|-----|------|
+  | int8 | Saturate to 127 | Saturate to -128 or 0 | Saturate to 0 | Integer types always saturate |
+  | int4b | Saturate to 7 | Saturate to -8 or 0 | Saturate to 0 | Same as above |
+  | half | Saturate to 65504 | Saturate to -65504 | Saturate to 0 | Controlled by CTRL[48]=0 |
+  | bfloat16 | Saturate to max | Saturate to min | Saturate to 0 | Controlled by CTRL[48]=0 |
+  | fp8_e4m3fn | Saturate to 448 | Saturate to -448 | Saturate to 0 (CTRL[50]=0) | CTRL[48]=0 + CTRL[50]=0 |
+  | hifloat8 | Saturate to 240 | Saturate to -240 | Saturate to 0 | Controlled by CTRL[48]=0 |
+  | float | Saturate to MAX | Saturate to -MAX | Saturate to 0 | Controlled by CTRL[48]=0 |
+
+  Non-saturation mode (CTRL[48]=1) expected behavior:
+
+  | Output type | +inf | -inf | nan | Notes |
+  |---------|------|------|-----|------|
+  | int8 | Same as saturation | Same as saturation | Same as saturation | Integer types always saturate |
+  | half | Preserve inf | Preserve -inf | Preserve nan | float16 can represent |
+  | bfloat16 | Preserve inf | Preserve -inf | Preserve nan | bfloat16 can represent |
+  | fp8_e4m3fn | Output nan | Output nan | Output nan | inf or out-of-range → nan |
+  | float | Preserve inf | Preserve -inf | Preserve nan | float32 can represent |

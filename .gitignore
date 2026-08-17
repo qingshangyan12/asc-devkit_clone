@@ -10,6 +10,8 @@ __pycache__/
 /examples/**/build_npu*/
 /examples/**/build_cpu*/
 /examples/**/build_sim*/
+/examples/**/build_test*/
+/examples/**/input/
 AGENTS.md
 CLAUDE.md
 oat_reports/

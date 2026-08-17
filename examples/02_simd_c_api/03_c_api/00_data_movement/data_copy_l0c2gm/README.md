@@ -175,26 +175,12 @@ data_copy_l0c2gm
 - NPU运行
 
   ```bash
-  
-9 还有2个报错
-14报错
-9 14 15 16有问题
-
-
-
-1-8 pass 11 13 12  17 10
-
-
-9 14 15 16有问题
-一点报错没有的  1-8 10 11 12 13 17
-cd ..
-rm -rf build
-SCENARIO_NUM=14
-mkdir -p build && cd build;      # 创建并进入build目录
-cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # 编译工程，默认NPU模式
-python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据和真值数据
-./demo                           # 执行编译生成的可执行程序，执行样例
-python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin ./output/golden.bin  # 验证输出结果是否正确
+  SCENARIO_NUM=1
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # 编译工程，默认NPU模式
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据和真值数据
+  ./demo                           # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin ./output/golden.bin  # 验证输出结果是否正确
   ```
 
 - NPU仿真
@@ -212,6 +198,7 @@ python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | 1-17 | 场景编号 |
+  | `SATURATION_MODE` | 0、1（默认） | 浮点饱和模式：1=饱和（CTRL[48]=0，inf→±MAX，nan→0），0=非饱和（CTRL[48]=1，inf/nan保持）。整数类型始终饱和。 |
 
 - 执行结果
 
@@ -220,3 +207,58 @@ python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin
   ```bash
   test pass!
   ```
+
+- 边界值测试（inf/-inf/nan）
+
+  `gen_data.py`支持`--boundary`参数，用于生成包含`+inf`/`-inf`/`nan`特殊值的输入数据，测试各量化模式在边界值下的饱和/传播行为。
+
+  - half输入场景：在矩阵A中注入`+inf`/`-inf`/`nan`（half类型可表示这些特殊值），L0C结果将包含对应的特殊值，量化时被饱和或传播到输出。
+  - int8输入场景：int8无法表示`inf`/`nan`，改用极值（127/-128）产生极端int32 L0C值，测试量化饱和行为。
+  - 通过`--saturation`参数和`-DSATURATION_MODE`编译选项控制CTRL[48]比特位，测试饱和/非饱和两种模式。
+
+  单个场景测试（饱和模式）：
+
+  ```bash
+  SCENARIO_NUM=3
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM --boundary --saturation=1
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DSATURATION_MODE=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j
+  ./demo
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin ./output/golden.bin
+  ```
+
+  单个场景测试（非饱和模式）：
+
+  ```bash
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM --boundary --saturation=0
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DSATURATION_MODE=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j
+  ./demo
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin ./output/golden.bin
+  ```
+
+  全部17个场景×2种模式一键测试：
+
+  ```bash
+  bash ../scripts/test_boundary.sh
+  ```
+
+  各量化模式对边界值的预期行为（饱和模式，CTRL[48]=0）：
+
+  | 输出类型 | +inf | -inf | nan | 说明 |
+  |---------|------|------|-----|------|
+  | int8 | 饱和为127 | 饱和为-128或0 | 饱和为0 | 整数类型始终饱和 |
+  | int4b | 饱和为7 | 饱和为-8或0 | 饱和为0 | 同上 |
+  | half | 饱和为65504 | 饱和为-65504 | 饱和为0 | CTRL[48]=0控制 |
+  | bfloat16 | 饱和为max | 饱和为min | 饱和为0 | CTRL[48]=0控制 |
+  | fp8_e4m3fn | 饱和为448 | 饱和为-448 | 饱和为0（CTRL[50]=0） | CTRL[48]=0+CTRL[50]=0 |
+  | hifloat8 | 饱和为240 | 饱和为-240 | 饱和为0 | CTRL[48]=0控制 |
+  | float | 饱和为MAX | 饱和为-MAX | 饱和为0 | CTRL[48]=0控制 |
+
+  非饱和模式（CTRL[48]=1）预期行为：
+
+  | 输出类型 | +inf | -inf | nan | 说明 |
+  |---------|------|------|-----|------|
+  | int8 | 同饱和模式 | 同饱和模式 | 同饱和模式 | 整数类型始终饱和 |
+  | half | 保持inf | 保持-inf | 保持nan | float16可表示 |
+  | bfloat16 | 保持inf | 保持-inf | 保持nan | bfloat16可表示 |
+  | fp8_e4m3fn | 输出nan | 输出nan | 输出nan | inf或超范围值→nan |
+  | float | 保持inf | 保持-inf | 保持nan | float32可表示 |

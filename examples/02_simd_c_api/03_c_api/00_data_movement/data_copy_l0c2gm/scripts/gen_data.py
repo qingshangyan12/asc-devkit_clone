@@ -645,6 +645,71 @@ def apply_prequant(matrix, scenario_num, quant_params, output_type, quant_mode, 
     return result
 
 
+def apply_non_saturation_override(result, l0c_matrix, output_type):
+    """Override quantized result for positions where L0C had inf/nan in non-saturation mode.
+
+    In non-saturation mode (CTRL[48]=1):
+    - Float types (half, bfloat16, float): preserve inf/nan
+    - fp8_e4m3fn: inf → nan, nan → nan
+    - Integer types and hifloat8: always saturation (no override)
+    """
+    inf_mask = np.isinf(l0c_matrix)
+    nan_mask = np.isnan(l0c_matrix)
+
+    if output_type in ('half', 'bfloat16', 'float'):
+        # Preserve inf/-inf/nan in the output type
+        pos_inf_mask = l0c_matrix == np.inf
+        neg_inf_mask = l0c_matrix == -np.inf
+        if output_type == 'half':
+            result[pos_inf_mask] = np.float16(np.inf)
+            result[neg_inf_mask] = np.float16(-np.inf)
+            result[nan_mask] = np.float16(np.nan)
+        elif output_type == 'bfloat16':
+            result[pos_inf_mask] = np.uint16(0x7F80)  # bfloat16 +inf
+            result[neg_inf_mask] = np.uint16(0xFF80)  # bfloat16 -inf
+            result[nan_mask] = np.uint16(0x7FC0)      # bfloat16 nan
+        else:  # float
+            result[pos_inf_mask] = np.float32(np.inf)
+            result[neg_inf_mask] = np.float32(-np.inf)
+            result[nan_mask] = np.float32(np.nan)
+    elif output_type == 'fp8_e4m3fn':
+        # Non-saturation: inf or |val| > max → nan
+        fp8_nan = np.uint8(0x7F)  # fp8_e4m3fn nan encoding
+        result[inf_mask | nan_mask] = fp8_nan
+    # Integer types (int8, int4b) and hifloat8: always saturation, no override
+
+    return result
+
+
+def apply_saturation_override(result, l0c_matrix, output_type):
+    """Override quantized result for positions where L0C had inf/nan in saturation mode.
+
+    In saturation mode (CTRL[48]=0):
+    - Float types (half, bfloat16, float): inf → ±MAX, nan → 0
+    - fp8/hifloat8/integer: already handled by their conversion functions
+    """
+    nan_mask = np.isnan(l0c_matrix)
+    pos_inf_mask = l0c_matrix == np.inf
+    neg_inf_mask = l0c_matrix == -np.inf
+
+    if output_type == 'half':
+        # np.clip clips inf but not nan; fix nan → 0
+        result[nan_mask] = np.float16(0)
+    elif output_type == 'bfloat16':
+        # float32_to_bfloat16 preserves inf/nan; saturate both
+        result[pos_inf_mask] = np.uint16(0x7F7F)   # bfloat16 max
+        result[neg_inf_mask] = np.uint16(0xFF7F)   # bfloat16 min
+        result[nan_mask] = np.uint16(0)
+    elif output_type == 'float':
+        # to_processor_float32 preserves inf/nan; saturate both
+        result[pos_inf_mask] = np.float32(np.finfo(np.float32).max)
+        result[neg_inf_mask] = np.float32(np.finfo(np.float32).min)
+        result[nan_mask] = np.float32(0)
+    # fp8, hifloat8, integer types: already saturate correctly in their functions
+
+    return result
+
+
 # ============================================================================
 # Golden data generation
 # ============================================================================
@@ -655,7 +720,7 @@ def get_nz_block_columns(output_type):
     return max(CUBE_BLOCK, int(C0_BYTES / byte_size))
 
 
-def gen_golden_data(scenario_num):
+def gen_golden_data(scenario_num, boundary=False, saturation=True):
     np.random.seed(9)
     input_type, l0c_type, output_type, quant_mode, is_relu, is_nz2nd, is_tensor = SCENARIOS[scenario_num]
 
@@ -664,16 +729,48 @@ def gen_golden_data(scenario_num):
         mm_dtype = np.int32
         x1 = np.random.randint(-3, 3, (M, K)).astype(input_dtype)
         x2 = np.random.randint(-3, 3, (K, N)).astype(input_dtype)
+        if boundary:
+            # int8 cannot represent inf/nan; use extreme values to test saturation
+            x1[:] = 127
+            x2[:] = 127
+            x1[0, :] = -128  # row 0: large negative L0C
+            print("[boundary] int8 input: row 0 = -128, rest = 127 → extreme int32 L0C")
     else:
         input_dtype = np.float16
         mm_dtype = np.float32
         x1 = np.random.uniform(-3.0, 3.0, (M, K)).astype(input_dtype)
         x2 = np.random.uniform(-3.0, 3.0, (K, N)).astype(input_dtype)
+        if boundary:
+            # Inject inf/-inf/nan into A so that L0C = A×B contains special values.
+            # B[0, :] = 1.0 ensures clean propagation from the K=0 dimension.
+            x2[0, :] = np.float16(1.0)
+            x1[0, 0] = np.float16(np.inf)    # C[0, :] = +inf
+            x1[1, 0] = np.float16(-np.inf)   # C[1, :] = -inf
+            x1[2, 0] = np.float16(np.nan)    # C[2, :] = nan
+            print("[boundary] half input: A[0,0]=+inf, A[1,0]=-inf, A[2,0]=nan, B[0,:]=1.0")
 
-    golden = np.matmul(x1.astype(mm_dtype), x2.astype(mm_dtype)).astype(mm_dtype)
+    l0c = np.matmul(x1.astype(mm_dtype), x2.astype(mm_dtype)).astype(mm_dtype)
+
+    if boundary:
+        # Report special values found in L0C (before quantization)
+        print("[boundary] L0C contains: inf=%s, -inf=%s, nan=%s" % (
+            np.any(l0c == np.inf), np.any(l0c == -np.inf), np.any(np.isnan(l0c))))
 
     quant_params = make_quant_params(output_type)
-    golden = apply_prequant(golden, scenario_num, quant_params, output_type, quant_mode, is_relu)
+    golden = apply_prequant(l0c, scenario_num, quant_params, output_type, quant_mode, is_relu)
+
+    # Apply CTRL[48] saturation mode override for inf/nan positions
+    if not saturation:
+        golden = apply_non_saturation_override(golden, l0c, output_type)
+    else:
+        golden = apply_saturation_override(golden, l0c, output_type)
+
+    if boundary:
+        # Report special values in quantized output
+        has_inf_out = np.any(np.isinf(golden.astype(np.float64)))
+        has_nan_out = np.any(np.isnan(golden.astype(np.float64)))
+        print("[boundary] output (%s, saturation=%s) contains: inf=%s, nan=%s" % (
+            output_type, saturation, has_inf_out, has_nan_out))
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
@@ -701,5 +798,10 @@ def gen_golden_data(scenario_num):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 18))
+    parser.add_argument("--boundary", action="store_true",
+                        help="Generate boundary value inputs (inf/-inf/nan) to test saturation behavior")
+    parser.add_argument("--saturation", type=int, default=1, choices=[0, 1],
+                        help="Saturation mode: 1=saturation (CTRL[48]=0, inf→±MAX, nan→0), "
+                             "0=non-saturation (CTRL[48]=1, inf/nan preserved)")
     args = parser.parse_args()
-    gen_golden_data(args.scenarioNum)
+    gen_golden_data(args.scenarioNum, boundary=args.boundary, saturation=bool(args.saturation))
