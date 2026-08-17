@@ -226,6 +226,19 @@ private:
 
 // 全局缓存管理器实例
 thread_local CommDomainCacheManager g_cacheManager;
+
+bool IsDeviceProfilingReportSupported()
+{
+    return HcommIsSupportHcommProfilingReportKernelStartTask() && HcommIsSupportHcommProfilingReportDeviceOp() &&
+           HcommIsSupportHcommProfilingReportKernelEndTask();
+}
+
+bool IsLegacyDeviceProfilingSupported()
+{
+    return HcommIsSupportHcommProfilingInit() && HcommIsSupportHcommProfilingReportMainStreamAndFirstTask() &&
+           HcommIsSupportHcommProfilingReportDeviceHcclOpInfo() &&
+           HcommIsSupportHcommProfilingReportMainStreamAndLastTask() && HcommIsSupportHcommProfilingEnd();
+}
 } // namespace
 
 extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKernel(OpParam* param)
@@ -330,12 +343,17 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             return 1;
         }
 
-        // 上报主流和第一个task  wait之前
-        if (HcommProfilingReportKernelStartTask(thread, param->commName) != HCCL_SUCCESS) {
-            HCCL_ERROR(
-                "%sfailed to report MainStream And FirstTask, thread %lu, param->commName %s.", __func__, thread,
-                param->commName);
-            return 1;
+        bool profilingSupported = IsDeviceProfilingReportSupported();
+        if (profilingSupported) {
+            // 上报主流和第一个task  wait之前
+            HcclResult profRet = HcommProfilingReportKernelStartTask(thread, param->commName);
+            if (profRet != HCCL_SUCCESS) {
+                HCCL_WARNING(
+                    "%s failed to report KernelStartTask, thread %lu, param->commName %s, ret %d.", __func__, thread,
+                    param->commName, profRet);
+            }
+        } else {
+            HCCL_WARNING("%s device profiling report is not supported, skip profiling.", __func__);
         }
 
         // 主thread等待Host stream的通知
@@ -363,9 +381,12 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             return 1;
         }
 
-        if (HcommProfilingReportDeviceOp(param->commName) != HCCL_SUCCESS) {
-            HCCL_ERROR("%s HcommProfilingReportDeviceOp fail, commName[%s]", __func__, param->commName);
-            return 1;
+        if (profilingSupported) {
+            HcclResult profRet = HcommProfilingReportDeviceOp(param->commName);
+            if (profRet != HCCL_SUCCESS) {
+                HCCL_WARNING("%s HcommProfilingReportDeviceOp fail, commName[%s], ret %d.", __func__, param->commName,
+                    profRet);
+            }
         }
 
         constexpr u32 DEFAULT_NOTIFY_IDX = 0;
@@ -375,12 +396,14 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         CHK_RET(static_cast<HcclResult>(
             HcommThreadNotifyRecordOnThread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
 
-        // 上报主流和最后一个task 在notify之后
-        if (HcommProfilingReportKernelEndTask(thread, param->commName) != HCCL_SUCCESS) {
-            HCCL_ERROR(
-                "%s failed to report MainStream And LastTask, thread %lu, param->commName %s.", __func__, thread,
-                param->commName);
-            return 1;
+        if (profilingSupported) {
+            // 上报主流和最后一个task 在notify之后
+            HcclResult profRet = HcommProfilingReportKernelEndTask(thread, param->commName);
+            if (profRet != HCCL_SUCCESS) {
+                HCCL_WARNING(
+                    "%s failed to report KernelEndTask, thread %lu, param->commName %s, ret %d.", __func__, thread,
+                    param->commName, profRet);
+            }
         }
 
         if (HcommBatchModeEnd(param->algTag) != HCCL_SUCCESS) {
@@ -405,16 +428,24 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             return 1;
         }
 
+        bool profilingSupported = IsLegacyDeviceProfilingSupported();
         if (exportedAicpuTsThread != 0) {
-            if (HcommProfilingInit(threadHandlePtr, resCtx->slaveThreadNum + 1) != HCCL_SUCCESS) {
-                HCCL_ERROR("failed to init Profiling");
-                return 1;
+            if (profilingSupported) {
+                HcclResult profRet = HcommProfilingInit(threadHandlePtr, resCtx->slaveThreadNum + 1);
+                if (profRet != HCCL_SUCCESS) {
+                    HCCL_WARNING("failed to init Profiling, ret %d.", profRet);
+                    profilingSupported = false;
+                }
+            } else {
+                HCCL_WARNING("%s legacy device profiling is not supported, skip profiling.", __func__);
             }
 
-            // 上报主流和第一个task  wait之前
-            if (HcommProfilingReportMainStreamAndFirstTask(thread) != HCCL_SUCCESS) {
-                HCCL_ERROR("failed to report MainStream And FirstTask");
-                return 1;
+            if (profilingSupported) {
+                // 上报主流和第一个task  wait之前
+                HcclResult profRet = HcommProfilingReportMainStreamAndFirstTask(thread);
+                if (profRet != HCCL_SUCCESS) {
+                    HCCL_WARNING("failed to report MainStream And FirstTask, ret %d.", profRet);
+                }
             }
 
             // 主thread等待Host stream的通知
@@ -437,16 +468,21 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         }
 
         if (exportedAicpuTsThread != 0) {
-            // 上报device侧的op 附加信息
-            HcomProInfoTmp profInfo;
-            std::string algTypeStr(param->algTypeStr);
-            strcpy_s(profInfo.algType, sizeof(profInfo.algType), algTypeStr.c_str());
-            strcpy_s(profInfo.commName, sizeof(profInfo.commName), param->commName);
-            profInfo.commNameLen = strlen(param->commName);
-            profInfo.dataCount = param->DataDes.count;
-            profInfo.dataType = static_cast<uint8_t>(param->DataDes.dataType);
-            profInfo.rankSize = resCtx->topoInfo.userRankSize;
-            HcommProfilingReportDeviceHcclOpInfo(profInfo);
+            if (profilingSupported) {
+                // 上报device侧的op 附加信息
+                HcomProInfoTmp profInfo;
+                std::string algTypeStr(param->algTypeStr);
+                strcpy_s(profInfo.algType, sizeof(profInfo.algType), algTypeStr.c_str());
+                strcpy_s(profInfo.commName, sizeof(profInfo.commName), param->commName);
+                profInfo.commNameLen = strlen(param->commName);
+                profInfo.dataCount = param->DataDes.count;
+                profInfo.dataType = static_cast<uint8_t>(param->DataDes.dataType);
+                profInfo.rankSize = resCtx->topoInfo.userRankSize;
+                HcclResult profRet = HcommProfilingReportDeviceHcclOpInfo(profInfo);
+                if (profRet != HCCL_SUCCESS) {
+                    HCCL_WARNING("failed to report DeviceHcclOpInfo, ret %d.", profRet);
+                }
+            }
 
             // 主thread通知Host stream
             constexpr u32 DEFAULT_NOTIFY_IDX = 0;
@@ -456,10 +492,12 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             CHK_RET(static_cast<HcclResult>(
                 HcommThreadNotifyRecordOnThread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
 
-            // 上报主流和最后一个task 在notify之后
-            if (HcommProfilingReportMainStreamAndLastTask(thread) != HCCL_SUCCESS) {
-                HCCL_ERROR("failed to report MainStream And LastTask");
-                return 1;
+            if (profilingSupported) {
+                // 上报主流和最后一个task 在notify之后
+                HcclResult profRet = HcommProfilingReportMainStreamAndLastTask(thread);
+                if (profRet != HCCL_SUCCESS) {
+                    HCCL_WARNING("failed to report MainStream And LastTask, ret %d.", profRet);
+                }
             }
 
             if (HcommBatchModeEnd(param->algTag) != HCCL_SUCCESS) {
@@ -467,9 +505,11 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
                 return 1;
             }
 
-            if (HcommProfilingEnd(threadHandlePtr, resCtx->slaveThreadNum + 1) != HCCL_SUCCESS) {
-                HCCL_ERROR("failed to End Profiling");
-                return 1;
+            if (profilingSupported) {
+                HcclResult profRet = HcommProfilingEnd(threadHandlePtr, resCtx->slaveThreadNum + 1);
+                if (profRet != HCCL_SUCCESS) {
+                    HCCL_WARNING("failed to End Profiling, ret %d.", profRet);
+                }
             }
         } else {
             if (HcommAclrtNotifyRecordOnThread(thread, resCtx->notifyIds[1]) != HCCL_SUCCESS) {
