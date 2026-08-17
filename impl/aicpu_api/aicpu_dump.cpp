@@ -15,14 +15,9 @@
 
 #include <stdarg.h>
 #include <mutex>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sched.h>
 #include <time.h>
-#include <stdatomic.h>
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 
 #include "securec.h"
@@ -48,6 +43,21 @@ int32_t __attribute__((weak)) AicpuGetDfxInfo(uint64_t *infoAddr);
 namespace AscendC {
 
 /* ── Constants ──────────────────────────────────────────────────────── */
+
+enum DumpType : uint32_t {
+    DUMP_DEFAULT = 0U,
+    DUMP_SCALAR,
+    DUMP_TENSOR,
+    DUMP_SHAPE,
+    DUMP_ASSERT,
+    DUMP_META,
+    DUMP_TIME_STAMP,
+    DUMP_SIMT,
+    DUMP_BUFI,    /* 8: write info marker */
+    DUMP_BUFO,    /* 9: read  info marker */
+    DUMP_SKIP,
+    DUMP_AICPU = 11U
+};
 
 constexpr uint32_t ATTR_ID_MEM_INFO = 1U;
 constexpr uint32_t PRINT_TYPE_WRITING = 0xF0A55A0FU;
