@@ -41,8 +41,6 @@ __simd_callee__ inline void asc_min_scalar(vector_<dtype>& dst,
                                            vector_bool mask)
 ```
 
-### dtype取值
-
 `dtype`支持的取值为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例

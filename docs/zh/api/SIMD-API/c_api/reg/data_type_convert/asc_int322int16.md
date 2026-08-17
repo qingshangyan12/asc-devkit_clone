@@ -55,9 +55,7 @@ __simd_callee__ inline void asc_int322int16<sat_mode>(vector_int16_t& dst,
                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
-### 占位符说明
-
-- `<sat_mode>`表示饱和非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
+`<sat_mode>`表示饱和非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 
 ### 典型示例
 

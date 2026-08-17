@@ -56,8 +56,6 @@ __simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode>(vector_bfl
                                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
-### 占位符说明
-
 - `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 - `<sat_mode>`表示饱和非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 

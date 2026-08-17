@@ -38,8 +38,6 @@ $$
 __simd_callee__ inline void asc_relu(vector_<dtype>& dst, vector_<dtype> src, vector_bool mask)
 ```
 
-### dtype取值
-
 `dtype`支持的取值为`half`、`int32_t`、`float`。
 
 ### 典型示例
