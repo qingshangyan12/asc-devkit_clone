@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #ifndef RDMA_VENDOR_1825_OPS_H
 #define RDMA_VENDOR_1825_OPS_H
@@ -69,7 +69,7 @@ union Roce3TaskSeg {
         uint32_t opType : 5;
         uint32_t signal : 1;
         uint32_t fence : 1;
-        uint32_t se : 1; /* solited event flag; */
+        uint32_t se : 1; /* solicited event flag; */
     } dw0;
     uint32_t value;
 };
@@ -86,7 +86,7 @@ typedef struct {
             uint32_t pi : 16;
         } bs;
 
-        uint32_t feth; /* cflush feth header */
+        uint32_t feth; /* cflush fetch header */
         uint32_t value;
     } dw3;
     uint64_t va;   /* to indicate remote buf address; */

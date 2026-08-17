@@ -23,6 +23,7 @@ TEST_F(TEST_SYS_VAR, GetSystemVariable)
 
     uint32_t coreVersion = 0;
     GetArchVersion(coreVersion);
+    EXPECT_EQ(coreVersion, 2002U);
     int64_t pc = -1;
     pc = GetProgramCounter();
     EXPECT_NE(pc, -1);
