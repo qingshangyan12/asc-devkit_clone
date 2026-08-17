@@ -57,6 +57,7 @@ __aicore__ inline int16_t asc_load_dev(__gm__ int16_t* addr);
 __aicore__ inline uint16_t asc_load_dev(__gm__ uint16_t* addr);
 __aicore__ inline int32_t asc_load_dev(__gm__ int32_t* addr);
 __aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr);
+__aicore__ inline int64_t asc_load_dev(__gm__ int64_t* addr);
 __aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr);
 namespace __asc_aicore {
 __aicore__ inline int32_t asc_atomic_add(__gm__ int32_t* address, int32_t val);

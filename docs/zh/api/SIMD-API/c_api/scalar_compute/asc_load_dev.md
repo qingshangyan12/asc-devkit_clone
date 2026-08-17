@@ -44,6 +44,8 @@ __aicore__ inline int32_t asc_load_dev(__gm__ int32_t* addr)
 
 __aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr)
 
+__aicore__ inline int64_t asc_load_dev(__gm__ int64_t* addr)
+
 __aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr)
 ```
 
@@ -53,7 +55,7 @@ __aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| addr | 输入 | 源GM地址。支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`uint64_t`。 |
+| addr | 输入 | 源GM地址。支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。 |
 
 ## 返回值说明
 
