@@ -127,7 +127,7 @@ public:
     MaterializedKernelCompilationResource CreateMaterializedCompilationResource() const
     {
         return MaterializedKernelCompilationResource {
-            &manifest_, worktreePath_, sourceDirectoryPath_};
+            manifest_, worktreePath_, sourceDirectoryPath_};
     }
 
     const fs::path& ToolchainPath() const { return toolchainPath_; }
@@ -202,10 +202,12 @@ public:
         : registry_(ResourceRegistry::Instance()), resourceId_(std::move(resourceId)),
           previousTemporaryRoot_(registry_.temporaryRoot_),
           previousAutomaticLoadAttempted_(registry_.automaticLoadAttempted_),
+          previousKeepTemporaryRoot_(registry_.keepTemporaryRoot_),
           previousAutomaticLoadStatus_(registry_.automaticLoadStatus_)
     {
         registry_.temporaryRoot_.clear();
         registry_.automaticLoadAttempted_ = true;
+        registry_.keepTemporaryRoot_ = false;
         registry_.automaticLoadStatus_ = ResourceStatus::Success;
 
         std::unique_ptr<ResourceEntry> resourceEntry(new ResourceEntry());
@@ -225,6 +227,7 @@ public:
         fs::remove_all(registry_.temporaryRoot_, ignoredError);
         registry_.temporaryRoot_ = previousTemporaryRoot_;
         registry_.automaticLoadAttempted_ = previousAutomaticLoadAttempted_;
+        registry_.keepTemporaryRoot_ = previousKeepTemporaryRoot_;
         registry_.automaticLoadStatus_ = previousAutomaticLoadStatus_;
     }
 
@@ -240,6 +243,7 @@ private:
     std::string resourceId_;
     std::string previousTemporaryRoot_;
     bool previousAutomaticLoadAttempted_ {false};
+    bool previousKeepTemporaryRoot_ {false};
     ResourceStatus previousAutomaticLoadStatus_ {ResourceStatus::Success};
     bool inserted_ {false};
 };
@@ -392,14 +396,13 @@ TEST(KernelSpecializationSessionTest, LoadsAndCopiesFreshMaterializedPathsFromRe
     ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelSpecializationSession::PrepareCompilationResource(resourceId, rejectedResource),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("status=not_found(1)"));
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("status=1"));
 
     registeredResource.SetAutomaticLoadStatus(ResourceStatus::Success);
     MaterializedKernelCompilationResource firstResource;
     ASSERT_EQ(KernelSpecializationSession::PrepareCompilationResource(resourceId, firstResource),
               ascendc::aclrtc::ACLRTC_SUCCESS);
-    ASSERT_NE(firstResource.borrowedManifest, nullptr);
-    EXPECT_EQ(*firstResource.borrowedManifest, manifest);
+    EXPECT_EQ(firstResource.manifest, manifest);
     EXPECT_EQ(firstResource.externalSourceDirectoryPath, sourceDirectoryPath);
     EXPECT_TRUE(fs::is_regular_file(firstResource.ownedResourceDirectoryPath / "payload.bin"));
 
