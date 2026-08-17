@@ -49,6 +49,8 @@ __simd_callee__ inline decltype(auto) prelu(
 
 ## 调用示例
 
+完整可运行样例请参考[基础计算Tensor API样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/README.md)。
+
 ```cpp
 auto dst_reg = asc::te::prelu(src_reg, slope_reg);
 ```
