@@ -246,7 +246,7 @@ int32_t run_global_workspace_case(int32_t* input_device, int32_t num_elements, a
 int32_t run_shared_workspace_case(KernelType kernel, int32_t* input_device, int32_t num_elements, aclrtStream stream);
 ```
 
-两个用例函数互不调用，各自完成本场景所需显存的分配、kernel发射、流同步、总和回读与显存释放，返回该总和。结果的比对不在用例函数内进行，集中于`verify_result`一处。
+两个用例函数互不调用，各自完成本场景所需显存的分配、kernel发射、流同步、总和回读与显存释放，返回该总和。结果的比对不在用例函数内进行，集中在`verify_result`处。
 
 划分依据为暂存区所在的存储层级，该层级决定host侧是否需要额外分配显存。跨块规约的暂存区在全局内存，须在host侧另开一块`TOTAL_THREADS`个`int32`的显存并列入kernel参数表；其总和由grid内rank 0唯一写出，不经原子加，因而不需要预先清零。整块与子组两个场景的暂存区以`__ubuf__ static`声明于kernel内，host侧无对应的分配动作，两者的显存需求同为一个`int32`的总和；汇总均经`asc_atomic_add`完成，故总和在launch前由`aclrtMemset`清零。
 
@@ -262,7 +262,7 @@ if (kernel == KernelType::THREAD_BLOCK) {
 }
 ```
 
-显存分配、清零、流同步、总和回读与释放五步在该分支之外，两个场景共用一份。单次执行仍只发射一个kernel，用例的选定由`main`中的分发完成，与用例函数的合并无关。
+显存分配、清零、流同步、总和回读与释放五步在该分支之外，两个场景共用一份。单次执行仍只发射一个kernel，用例的选定由`main`中的分发完成。
 
 期望值由元素个数在代码中算出，与解析解公式一致。`num_elements`取`TOTAL_THREADS`即`BLOCKS_PER_GRID * THREADS_PER_BLOCK`合4096，golden为8390656：
 
