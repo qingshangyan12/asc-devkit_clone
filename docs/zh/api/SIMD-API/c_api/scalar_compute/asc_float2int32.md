@@ -26,25 +26,33 @@
 
 ## 功能说明
 
-将float类型转化为int32_t类型，并支持多种舍入模式。
+将`float`类型的标量转换为`int32_t`类型并返回。接口后缀用于指定舍入模式，支持以下4种变体：
 
-舍入模式：
-- RINT舍入模式：四舍六入五成双舍入
-- ROUND舍入模式：四舍五入舍入
-- FLOOR舍入模式：向负无穷舍入
-- CEIL舍入模式：向正无穷舍入
+- `asc_float2int32_rd`：向负无穷方向舍入，即取不大于输入值的最大整数（如1.5→1、-1.5→-2）。
+- `asc_float2int32_ru`：向正无穷方向舍入，即取不小于输入值的最小整数（如1.5→2、-1.5→-1）。
+- `asc_float2int32_rn`：向最近偶数舍入，即四舍六入五凑偶（如0.5→0、1.5→2、2.5→2）。
+- `asc_float2int32_rna`：向最近整数舍入，等值远离零舍入，即四舍五入（如0.5→1、1.5→2、-0.5→-1）。
+
+本接口为标量运算，AIC与AIV均可调用，行为一致。
 
 ## 函数原型
 
-```cpp
-// RINT舍入模式
-__aicore__ inline int32_t asc_float2int32_rn(float value)
-// ROUND舍入模式
-__aicore__ inline int32_t asc_float2int32_rna(float value)
-// FLOOR舍入模式
-__aicore__ inline int32_t asc_float2int32_rd(float value)
-// CEIL舍入模式
-__aicore__ inline int32_t asc_float2int32_ru(float value)
+### 舍入模式变体
+
+```c
+__aicore__ inline int32_t asc_float2int32_<round>(float value)
+```
+
+#### 变体支持
+
+4个舍入模式变体分别为`asc_float2int32_rd`（向负无穷方向舍入）、`asc_float2int32_ru`（向正无穷方向舍入）、`asc_float2int32_rn`（向最近偶数舍入）、`asc_float2int32_rna`（向最近整数舍入，等值远离零）。
+
+#### 典型示例
+
+```c
+// 示例：向最近偶数舍入
+__aicore__ inline int32_t asc_float2int32_rn(
+    float value)
 ```
 
 ## 参数说明
@@ -57,19 +65,121 @@ __aicore__ inline int32_t asc_float2int32_ru(float value)
 
 ## 返回值说明
 
-目的操作数（标量），value精度转换成int32_t的结果。
-
-## 流水类型
-
-PIPE_S
+目的操作数（标量），`value`精度转换成`int32_t`的结果。
 
 ## 约束说明
 
-无
+### 通用约束
+
+- 本接口为标量运算，AIC与AIV均可调用，行为一致。
+- 本接口运行在标量流水上，与后续依赖该返回值的指令之间存在标量数据依赖，由标量流水本身的顺序执行保证，无需额外插入同步指令。
+- 有限输入值超出`int32_t`的表示范围[−2^31,2^31−1]时，饱和模式下，结果钳位到`int32_t`的最大值或最小值；非饱和模式下，结果截断为低32位。接口默认采用饱和模式，配置非饱和模式请参见[asc_set_ctrl](../sys_var/asc_set_ctrl.md)。
+- 输入为nan或inf时返回0。
+
+### 舍入模式约束
+
+- 4个接口分别通过`_rd`、`_ru`、`_rn`、`_rna`后缀指定舍入模式，调用方需按所需舍入语义选择对应接口。
+- `asc_float2int32_rd`向负无穷舍入，对正数取`floor`、对负数取远离零方向舍入（如-1.5→-2）。
+- `asc_float2int32_ru`向正无穷舍入，对正数取远离零方向舍入（如1.5→2）、对负数取`ceil`（如-1.5→-1）。
+- `asc_float2int32_rn`向最近偶数舍入，0.5、2.5等恰为两整数中点的值取偶数邻值（如0.5→0、2.5→2）。
+- `asc_float2int32_rna`向最近整数舍入，等值远离零舍入，0.5、1.5等恰为两整数中点的值取绝对值更大的邻值（如0.5→1、-0.5→-1）。
 
 ## 调用示例
 
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510; ./main
+```
+<!-- end id8 -->
+
 ```cpp
-float value = 3.0;
-int32_t dst = asc_float2int32_rn(value);
+#include <cstdint>
+#include <iostream>
+#include <vector>
+
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void print_data(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+template <typename T>
+bool compare_range_data(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+constexpr uint32_t ELEMENTS = 8;
+
+__global__ __vector__ void asc_float2int32_kernel(__gm__ int64_t* output)
+{
+    asc_init();
+    constexpr float value = 1.25f;
+    output[0] = asc_float2int32_rn(value);
+    output[1] = asc_float2int32_rna(value);
+    output[2] = asc_float2int32_rd(value);
+    output[3] = asc_float2int32_ru(value);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<int64_t> input = {0, 0, 0, 0};
+    std::vector<int64_t> golden = {1, 1, 1, 2};
+    input.resize(ELEMENTS, 0);
+    golden.resize(ELEMENTS, 0);
+    std::vector<int64_t> output(ELEMENTS, -1);
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    int64_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (ELEMENTS) * sizeof(int64_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(output_device, input.size() * sizeof(int64_t), input.data(), input.size() * sizeof(int64_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_float2int32_kernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(int64_t), output_device, output.size() * sizeof(int64_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = compare_data(output, golden);
+    std::cout << (passed ? "[Success] asc_float2int32_rn/asc_float2int32_rna/asc_float2int32_rd/asc_float2int32_ru passed." : "[Failed] asc_float2int32_rn/asc_float2int32_rna/asc_float2int32_rd/asc_float2int32_ru failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
