@@ -80,6 +80,14 @@ __aicore__ inline void AssembleHcclMsgExtForCCU(
 
     for (uint32_t i = 0U; i < ccuParam.rankNum; ++i) {
         uint64_t sendSize = allToAllVParam->sendCounts[i] * dataSize;
+        KERNEL_LOG(
+            KERNEL_INFO, "ApiClient A2AV rank:%u, sendCounts:%llu, sdispls:%llu, recvCounts:%llu, rdispls:%llu, sendSizeBytes:%llu",
+            i,
+            (unsigned long long)allToAllVParam->sendCounts[i],
+            (unsigned long long)allToAllVParam->sdispls[i],
+            (unsigned long long)allToAllVParam->recvCounts[i],
+            (unsigned long long)allToAllVParam->rdispls[i],
+            (unsigned long long)sendSize);
         ccuMsgExt[i].sendSize = sendSize % CCU_MAX_COMM_DATA;
         ccuMsgExt[i].sendOffset = allToAllVParam->sdispls[i] * dataSize + sendSize * ccuParam.repeatIndex;
         ccuMsgExt[i].recvOffset =
