@@ -47,13 +47,13 @@ AI Core内部并行的指令流水类型和解释如下所示：
 
 | 流水类型 | 含义 |
 | --- | --- |
-| `PIPE_S` | 标量流水线，使用标量访存语句或标量计算接口访问GM、片上存储地址时为此流水 |
-| `PIPE_V` | 矢量计算流水及部分硬件架构下的L0C Buffer->UB数据搬运流水 |
-| `PIPE_M` | 矩阵计算流水 |
-| `PIPE_MTE1` | L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer数据搬运流水 |
-| `PIPE_MTE2` | GM->L1 Buffer、GM->UB等数据搬运流水 |
-| `PIPE_MTE3` | UB->GM等数据搬运流水 |
-| `PIPE_FIX` | L0C Buffer->GM、L0C Buffer->L1 Buffer等数据搬运流水 |
+| PIPE_S | 标量流水线，使用标量访存语句或标量计算接口访问GM、片上存储地址时为此流水 |
+| PIPE_V | 矢量计算流水及部分硬件架构下的L0C Buffer->UB数据搬运流水 |
+| PIPE_M | 矩阵计算流水 |
+| PIPE_MTE1 | L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer数据搬运流水 |
+| PIPE_MTE2 | GM->L1 Buffer、GM->UB等数据搬运流水 |
+| PIPE_MTE3 | UB->GM等数据搬运流水 |
+| PIPE_FIX | L0C Buffer->GM、L0C Buffer->L1 Buffer等数据搬运流水 |
 
 ## 核内同步分类
 
