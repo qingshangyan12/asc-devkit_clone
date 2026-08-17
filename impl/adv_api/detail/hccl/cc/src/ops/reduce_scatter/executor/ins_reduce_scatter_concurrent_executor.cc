@@ -36,7 +36,7 @@ HcclResult InsReduceScatterConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
     const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
     // 初始化一些基本成员变量
-    InitCommInfo(param, topoInfo, algHierarchyInfo);
+    CHK_RET(InitCommInfo(param, topoInfo, algHierarchyInfo));
 
     // 拆一下algHierarchyInfo
     if (algHierarchyInfo.infos.size() == 0) {

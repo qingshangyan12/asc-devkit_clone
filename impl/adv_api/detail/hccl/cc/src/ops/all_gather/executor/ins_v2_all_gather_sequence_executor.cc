@@ -52,7 +52,7 @@ HcclResult InsV2AllGatherSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
     // 初始化一些基本成员变量
-    InitCommInfo(comm, param, topoInfo, algHierarchyInfo);
+    CHK_RET(InitCommInfo(comm, param, topoInfo, algHierarchyInfo));
 
     InsAlgTemplate0 intraTempAlg(param, myRank_, algHierarchyInfo.infos[0]);
     InsAlgTemplate1 interTempAlg(param, myRank_, algHierarchyInfo.infos[1]);

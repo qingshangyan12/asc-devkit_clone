@@ -61,7 +61,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
     // 初始化一些基本成员变量
-    InitCommInfo(param, topoInfo, algHierarchyInfo);
+    CHK_RET(InitCommInfo(param, topoInfo, algHierarchyInfo));
     // 拆分algHierarchyInfo
     std::vector<std::vector<u32>> temp0HierarchyInfo = {algHierarchyInfo.infos[0][0]};
     std::vector<std::vector<u32>> temp1HierarchyInfo = {algHierarchyInfo.infos[0][1]};
