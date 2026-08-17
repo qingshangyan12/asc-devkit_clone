@@ -19,6 +19,10 @@ file(GLOB ACLRTC_SRC_FILES
     ${ASCENDC_DIR}/tools/aclrtc/specialization/*.cpp
 )
 
+set(ACLRTC_RESOURCE_REGISTRY_DEPENDENCY_SRC_FILES
+    ${ASCENDC_DIR}/tools/build/common/file_utils.cpp
+)
+
 file(GLOB TEST_ACLRTC_SRC_FILES
     ${ASCENDC_DIR}/tests/main.cpp
     stub/*.cpp
@@ -27,6 +31,7 @@ file(GLOB TEST_ACLRTC_SRC_FILES
 
 add_executable(ascendc_ut_aclrtc
     ${ACLRTC_SRC_FILES}
+    ${ACLRTC_RESOURCE_REGISTRY_DEPENDENCY_SRC_FILES}
     ${TEST_ACLRTC_SRC_FILES}
 )
 
@@ -38,12 +43,15 @@ target_compile_definitions(ascendc_ut_aclrtc PRIVATE
 target_include_directories(ascendc_ut_aclrtc PRIVATE
     ${ACLRTC_TEST_HEADERS_FILES}
     ${ASCENDC_DIR}/tools/aclrtc
+    ${ASCENDC_DIR}/tools/aclrtc/specialization
+    ${ASCENDC_DIR}/tools/build/common
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/include/acl
 )
 
 target_compile_options(ascendc_ut_aclrtc PRIVATE
     -Werror
+    -fno-access-control
 )
 
 target_link_directories(ascendc_ut_aclrtc PRIVATE
@@ -52,6 +60,8 @@ target_link_directories(ascendc_ut_aclrtc PRIVATE
 
 target_link_libraries(ascendc_ut_aclrtc PRIVATE
     $<BUILD_INTERFACE:intf_llt_pub_basic>
+    $<BUILD_INTERFACE:mmpa_headers>
+    $<BUILD_INTERFACE:metadef_headers>
     Boost::filesystem
     json
     -Wl,--no-as-needed
