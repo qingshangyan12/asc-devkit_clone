@@ -14,6 +14,8 @@ set(HCCL_ALL_TO_ALL_V_CCU_KERNEL_DIR
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel)
 set(HCCL_KFC_SERVER_CCU_KERNEL_DIR
     ${HCCL_CC_SRC_DIR}/ops/kfc_server/template/ccu/kernel)
+set(HCCL_ALL_GATHER_CCU_KERNEL_DIR
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/kernel)
 
 add_executable(${HCCL_MC2_CCU_HOST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
@@ -77,6 +79,7 @@ add_executable(${HCCL_MC2_CCU_DEVICE_TARGET}
     ${UTILS_DIR}/ccu/ccu_all_to_all_v_mesh1d_adapter.cc
     ${UTILS_DIR}/ccu/ccu_kfc_server_adapter.cc
     ${HCCL_ALL_TO_ALL_V_CCU_KERNEL_DIR}/ccu_kernel_all_to_all_v_mesh1d.cc
+    ${HCCL_ALL_GATHER_CCU_KERNEL_DIR}/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.cc
     ${HCCL_KFC_SERVER_CCU_KERNEL_DIR}/ccu_kernel_kfc_server.cc
 )
 
@@ -84,6 +87,7 @@ target_include_directories(${HCCL_MC2_CCU_DEVICE_TARGET} PRIVATE
     ${HCCL_MC2_CCU_DEVICE_DIR}/shim
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
     ${HCCL_ALL_TO_ALL_V_CCU_KERNEL_DIR}
+    ${HCCL_ALL_GATHER_CCU_KERNEL_DIR}
     ${HCCL_KFC_SERVER_CCU_KERNEL_DIR}
 )
 

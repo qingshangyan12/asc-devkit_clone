@@ -21,16 +21,17 @@ enum class AlgorithmType : uint8_t {
     CcuAllGatherMesh1D = 0,
     CcuSchedAllGatherSoleMesh = 1,
     CcuAllGatherMesh2D,
-    CcuReduceScatterMesh1D,
+    CcuSchedAllGatherConcurMeshNHRMultiLink = 3,
+    CcuReduceScatterMesh1D = 50,
     CcuReduceScatterMeshMem2Mem1D,
     CcuReduceScatterMesh2D,
-    CcuAllReduceMesh1D,
+    CcuAllReduceMesh1D = 100,
     CcuAllReduceMeshMem2Mem1D,
     CcuAllReduceMesh2DOneShot,
     CcuReduceMesh1D,
     CcuReduceMesh2D,
+    CcuAlltoAllVMesh1D = 150,
     CcuAlltoAllMesh1D,
-    CcuAlltoAllVMesh1D,
     CcuHalfAll2AllVMesh1D
 };
 
@@ -97,9 +98,11 @@ private:
 
     __aicore__ inline void CcuSendMsg(uint8_t resourceId);
 
-    __aicore__ inline GM_ADDR GetCommitCkeAddr(uint8_t msgId);
+    __aicore__ inline GM_ADDR GetCommitCkeAddr(uint8_t msgId, uint8_t missionIndex = 0);
 
-    __aicore__ inline GM_ADDR GetWaitCkeAddr(uint8_t msgId);
+    __aicore__ inline GM_ADDR GetWaitCkeAddr(uint8_t msgId, uint8_t missionIndex = 0);
+
+    __aicore__ inline uint8_t GetKfcMissionNum() const;
 
     __aicore__ inline bool IsFinish(uint8_t reqId);
 
@@ -121,6 +124,7 @@ private:
     __aicore__ inline void CcuPrepareForReduceScatter(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllReduceM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForConcurrentAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
