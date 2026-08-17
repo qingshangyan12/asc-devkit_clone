@@ -42,6 +42,7 @@ public:
     void AppendCommandResultToCompilationLog(
         const CompilationCommand& compilationCommand,
         const CompilationProcessResult& processResult) noexcept;
+    void LogCommandFailureRecoveryHint() const noexcept;
     void WriteSpecializationResult(const boost::filesystem::path& outputElfPath,
                                    OutputPublicationStatus publicationStatus) noexcept;
 
@@ -49,6 +50,7 @@ private:
     void AppendTextToDiagnosticFile(const boost::filesystem::path& filePath, const std::string& text) noexcept;
 
     std::string specializationSessionId_;
+    bool diagnosticsRequested_ {false};
     bool diagnosticsEnabled_ {false};
     boost::filesystem::path diagnosticDirectoryPath_;
 };

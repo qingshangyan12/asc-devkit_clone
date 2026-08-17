@@ -111,8 +111,10 @@ KernelCompilationWorkspace::~KernelCompilationWorkspace()
     boost::system::error_code cleanupError;
     fs::remove_all(worktreePath_, cleanupError);
     if (cleanupError) {
-        ACLRTC_LOG_WARNING("Failed to clean resource worktree: path=%s error=%d message=%s",
-                           worktreePath_.c_str(), cleanupError.value(), cleanupError.message().c_str());
+        ACLRTC_LOG_WARNING(
+            "Failed to clean resource worktree: path=%s error=%d message=%s; remove the worktree manually if it "
+            "is no longer needed",
+            worktreePath_.c_str(), cleanupError.value(), cleanupError.message().c_str());
     }
 }
 
@@ -174,7 +176,8 @@ aclError KernelCompilationWorkspace::RemoveWorktreeBeforePublishingElfIfNeeded()
     fs::remove_all(worktreePath_, cleanupError);
     if (cleanupError) {
         ACLRTC_LOG_ERROR(
-            "Failed to clean resource worktree before publishing ELF: path=%s error=%d message=%s",
+            "Failed to clean resource worktree before publishing ELF: path=%s error=%d message=%s; ensure the "
+            "path is removable and retry",
             worktreePath_.c_str(), cleanupError.value(), cleanupError.message().c_str());
         return ACLRTC_ERROR_FAILURE;
     }

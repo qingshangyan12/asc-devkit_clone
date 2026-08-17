@@ -170,6 +170,11 @@ bool IsAbsoluteExecutableRegularFile(const fs::path& executablePath)
            access(executablePath.c_str(), X_OK) == 0;
 }
 
+bool IsMissingPathError(const boost::system::error_code& pathError) noexcept
+{
+    return pathError.value() == ENOENT || pathError.value() == ENOTDIR;
+}
+
 bool FindCompilerOutputOptionPosition(const std::vector<std::string>& commandArguments,
                                       size_t& outputOptionPosition)
 {
@@ -224,22 +229,29 @@ aclError BuildConstantSourcePatches(const Json& selectedKernel,
             return ACLRTC_ERROR_INVALID_INPUT;
         }
         if (constantArgumentIndex >= specializationRequest.kernelArgumentCount) {
-            ACLRTC_LOG_ERROR("constant parameter_index %llu is outside argsCount %llu",
+            ACLRTC_LOG_ERROR(
+                "constant parameter_index %llu is outside argsCount %llu; set argsCount greater than %llu and "
+                "provide matching argsAddr and argsBytes entries",
                              static_cast<unsigned long long>(constantArgumentIndex),
-                             static_cast<unsigned long long>(specializationRequest.kernelArgumentCount));
+                             static_cast<unsigned long long>(specializationRequest.kernelArgumentCount),
+                             static_cast<unsigned long long>(constantArgumentIndex));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
         if (specializationRequest.borrowedKernelArgumentDataPointers[constantArgumentIndex] == nullptr) {
-            ACLRTC_LOG_ERROR("argsAddr[%llu] must not be null for a static constant",
+            ACLRTC_LOG_ERROR(
+                "argsAddr[%llu] must not be null for a static constant; set it to the constant data buffer",
                              static_cast<unsigned long long>(constantArgumentIndex));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
         const uint64_t suppliedConstantByteCount =
             specializationRequest.borrowedKernelArgumentByteCounts[constantArgumentIndex];
         if (suppliedConstantByteCount != requiredConstantByteCount) {
-            ACLRTC_LOG_ERROR("argsBytes[%llu]=%llu does not match required byte_size %llu",
+            ACLRTC_LOG_ERROR(
+                "argsBytes[%llu]=%llu does not match required byte_size %llu; set argsBytes[%llu] to %llu",
                              static_cast<unsigned long long>(constantArgumentIndex),
                              static_cast<unsigned long long>(suppliedConstantByteCount),
+                             static_cast<unsigned long long>(requiredConstantByteCount),
+                             static_cast<unsigned long long>(constantArgumentIndex),
                              static_cast<unsigned long long>(requiredConstantByteCount));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
@@ -304,7 +316,8 @@ aclError BuildManifestCommand(const Json& manifestCommand, const SelectedManifes
     }
     if (expandedExecutable.size() != 1U) {
         ACLRTC_LOG_ERROR(
-            "Manifest command %s executable expanded to %zu argv items; it must expand to exactly one",
+            "Manifest command %s executable expanded to %zu argv items; regenerate the JIT resource so cmd[0] "
+            "resolves to exactly one executable path",
             compilationCommand.diagnosticLabel.c_str(), expandedExecutable.size());
         return ACLRTC_ERROR_FAILURE;
     }
@@ -455,10 +468,18 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
             return ACLRTC_ERROR_FAILURE;
         }
         boost::system::error_code worktreeError;
-        if (!fs::is_directory(resourceWorktreePath_, worktreeError) || worktreeError) {
-            ACLRTC_LOG_ERROR("Resource worktree is unavailable: path=%s error=%d message=%s",
+        const bool worktreeIsDirectory = fs::is_directory(resourceWorktreePath_, worktreeError);
+        if (worktreeError && !IsMissingPathError(worktreeError)) {
+            ACLRTC_LOG_ERROR("Failed to inspect resource worktree: path=%s error=%d message=%s; fix the registry "
+                             "integration",
                              resourceWorktreePath_.c_str(), worktreeError.value(),
                              worktreeError.message().c_str());
+            return ACLRTC_ERROR_FAILURE;
+        }
+        if (!worktreeIsDirectory) {
+            ACLRTC_LOG_ERROR(
+                "Resource worktree must be an existing directory: path=%s; fix the registry integration",
+                resourceWorktreePath_.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
         if (!externalSourceFilePath_.is_absolute()) {
@@ -468,10 +489,18 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
             return ACLRTC_ERROR_FAILURE;
         }
         boost::system::error_code sourceFileError;
-        if (!fs::is_regular_file(externalSourceFilePath_, sourceFileError) || sourceFileError) {
-            ACLRTC_LOG_ERROR("sourceFilePath is unavailable: path=%s error=%d message=%s",
+        const bool sourcePathIsRegularFile = fs::is_regular_file(externalSourceFilePath_, sourceFileError);
+        if (sourceFileError && !IsMissingPathError(sourceFileError)) {
+            ACLRTC_LOG_ERROR("Failed to inspect sourceFilePath: path=%s error=%d message=%s; fix the registered "
+                             "resource data",
                              externalSourceFilePath_.c_str(), sourceFileError.value(),
                              sourceFileError.message().c_str());
+            return ACLRTC_ERROR_FAILURE;
+        }
+        if (!sourcePathIsRegularFile) {
+            ACLRTC_LOG_ERROR(
+                "sourceFilePath must be an existing regular file: path=%s; fix the registered resource data",
+                externalSourceFilePath_.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
         const std::string schemaVersion = resourceManifest_.at("schema_version").get<std::string>();

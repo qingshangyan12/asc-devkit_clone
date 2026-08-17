@@ -116,11 +116,14 @@ TEST(KernelSpecializationRequestTest, IgnoresSuperKernelOptionsWithoutEnable)
     request.skOptionCount = 2;
 
     ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               0);
     EXPECT_EQ(normalizedRequest.compilationVariant, ascendc::aclrtc::CompilationVariant::Basic);
     EXPECT_TRUE(normalizedRequest.compilerOptions.superKernelOptions.empty());
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "WARNING: skOptions were provided without --enable-super-kernel"));
 }
 
 TEST(KernelSpecializationRequestTest, RejectsInvalidAbiFields)
@@ -162,7 +165,8 @@ TEST(KernelSpecializationRequestTest, ReportsSpecificRequestValidationFailures)
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               ACL_ERROR_RTC_INVALID_INPUT);
-    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("reserved[7] must be zero"));
+    EXPECT_TRUE(CapturedKernelSpecializationLogsContain(
+        "ERROR: aclrtcKernelSpecRequest.reserved[7] must be zero"));
 
     request = CreateValidRequest();
     request.optionCount = 1U;
