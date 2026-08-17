@@ -24,7 +24,7 @@ public:
     KernelCompilationPlanBuilder(const NormalizedKernelSpecializationRequest& specializationRequest,
                                  const nlohmann::json& resourceManifest,
                                  boost::filesystem::path resourceWorktreePath,
-                                 boost::filesystem::path sourceFilePath);
+                                 boost::filesystem::path externalSourceFilePath);
 
     aclError BuildCompilationPlan(KernelCompilationPlan& compilationPlan) const;
 
@@ -32,7 +32,7 @@ private:
     const NormalizedKernelSpecializationRequest& specializationRequest_;
     const nlohmann::json& resourceManifest_;
     boost::filesystem::path resourceWorktreePath_;
-    boost::filesystem::path sourceFilePath_;
+    boost::filesystem::path externalSourceFilePath_;
 };
 
 } // namespace aclrtc

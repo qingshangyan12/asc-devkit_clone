@@ -33,13 +33,12 @@ public:
     KernelCompilationWorkspace& operator=(const KernelCompilationWorkspace&) = delete;
 
     const boost::filesystem::path& GetWorktreePath() const noexcept;
-    aclError MaterializeCompilationInputs(const KernelCompilationPlan& compilationPlan);
-    aclError FinalizeBeforePublishingKernelElf();
+    aclError CreateOutputDirectoriesAndApplySourcePatches(const KernelCompilationPlan& compilationPlan);
+    aclError RemoveWorktreeBeforePublishingElfIfNeeded();
 
 private:
     boost::filesystem::path worktreePath_;
     WorktreeRetentionPolicy retentionPolicy_ {WorktreeRetentionPolicy::RemoveAfterCompilation};
-    bool worktreeDispositionFinalized_ {false};
 };
 
 } // namespace aclrtc

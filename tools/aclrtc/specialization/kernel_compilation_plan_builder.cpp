@@ -30,38 +30,34 @@ constexpr char SUPPORTED_MANIFEST_SCHEMA_VERSION[] = "1.0";
 constexpr char OPTIONS_REFERENCE_PREFIX[] = "${options:";
 constexpr char ENVIRONMENT_REFERENCE_PREFIX[] = "${env:";
 
-enum class SelectedObjectKind : uint32_t {
+enum class ManifestObjectKind : uint32_t {
     Basic,
     SuperKernel,
 };
 
 struct SelectedManifestObject {
-    const Json* object {nullptr};
-    SelectedObjectKind kind {SelectedObjectKind::Basic};
+    const Json* manifestObject {nullptr};
+    ManifestObjectKind objectKind {ManifestObjectKind::Basic};
 };
 
 struct ManifestExpansionContext {
     const Json& resourceManifest;
     const fs::path& resourceWorktreePath;
     const fs::path& outputDirectoryPath;
-    const fs::path& sourceFilePath;
+    const fs::path& externalSourceFilePath;
 };
 
-const char* GetSelectedObjectKindName(SelectedObjectKind objectKind) noexcept
+void ReplaceAllLiteralOccurrences(std::string& text, const std::string& literalText,
+                                  const std::string& replacementText)
 {
-    return objectKind == SelectedObjectKind::Basic ? "basic" : "sk";
-}
-
-void ReplaceAllLiteralReferences(std::string& text, const std::string& reference, const std::string& value)
-{
-    size_t referencePosition = 0U;
-    while ((referencePosition = text.find(reference, referencePosition)) != std::string::npos) {
-        text.replace(referencePosition, reference.size(), value);
-        referencePosition += value.size();
+    size_t occurrencePosition = 0U;
+    while ((occurrencePosition = text.find(literalText, occurrencePosition)) != std::string::npos) {
+        text.replace(occurrencePosition, literalText.size(), replacementText);
+        occurrencePosition += replacementText.size();
     }
 }
 
-bool ResolveEnvironmentReferences(
+bool ExpandEnvironmentVariablePlaceholders(
     const std::string& text, const std::string& manifestValueLocation, std::string& resolvedText)
 {
     resolvedText.clear();
@@ -105,27 +101,27 @@ bool ResolveEnvironmentReferences(
     return true;
 }
 
-bool ResolvePathAndEnvironmentPlaceholders(
+bool ExpandPathAndEnvironmentPlaceholders(
     const std::string& manifestText, const std::string& manifestValueLocation,
     const ManifestExpansionContext& expansionContext,
     std::string& resolvedText)
 {
     std::string pathResolvedText = manifestText;
-    ReplaceAllLiteralReferences(pathResolvedText, "${resource}", expansionContext.resourceWorktreePath.string());
-    ReplaceAllLiteralReferences(pathResolvedText, "${output}", expansionContext.outputDirectoryPath.string());
-    ReplaceAllLiteralReferences(pathResolvedText, "${source_file_path}",
-                                expansionContext.sourceFilePath.parent_path().string());
-    return ResolveEnvironmentReferences(pathResolvedText, manifestValueLocation, resolvedText);
+    ReplaceAllLiteralOccurrences(pathResolvedText, "${resource}", expansionContext.resourceWorktreePath.string());
+    ReplaceAllLiteralOccurrences(pathResolvedText, "${output}", expansionContext.outputDirectoryPath.string());
+    ReplaceAllLiteralOccurrences(pathResolvedText, "${source_file_path}",
+                                 expansionContext.externalSourceFilePath.parent_path().string());
+    return ExpandEnvironmentVariablePlaceholders(pathResolvedText, manifestValueLocation, resolvedText);
 }
 
-bool ParseOptionReference(const std::string& argument, std::string& optionName)
+bool ParseWholeArgumentOptionsPlaceholder(const std::string& manifestArgument, std::string& optionName)
 {
-    if (argument.compare(0, sizeof(OPTIONS_REFERENCE_PREFIX) - 1U, OPTIONS_REFERENCE_PREFIX) != 0 ||
-        argument.size() <= sizeof(OPTIONS_REFERENCE_PREFIX) || argument.back() != '}') {
+    if (manifestArgument.compare(0, sizeof(OPTIONS_REFERENCE_PREFIX) - 1U, OPTIONS_REFERENCE_PREFIX) != 0 ||
+        manifestArgument.size() <= sizeof(OPTIONS_REFERENCE_PREFIX) || manifestArgument.back() != '}') {
         return false;
     }
-    optionName = argument.substr(sizeof(OPTIONS_REFERENCE_PREFIX) - 1U,
-                                 argument.size() - sizeof(OPTIONS_REFERENCE_PREFIX));
+    optionName = manifestArgument.substr(sizeof(OPTIONS_REFERENCE_PREFIX) - 1U,
+                                         manifestArgument.size() - sizeof(OPTIONS_REFERENCE_PREFIX));
     return !optionName.empty();
 }
 
@@ -134,9 +130,9 @@ aclError ExpandManifestArgument(const std::string& manifestArgument, const std::
                                 std::vector<std::string>& expandedArguments)
 {
     std::string optionName;
-    if (!ParseOptionReference(manifestArgument, optionName)) {
+    if (!ParseWholeArgumentOptionsPlaceholder(manifestArgument, optionName)) {
         std::string resolvedArgument;
-        if (!ResolvePathAndEnvironmentPlaceholders(
+        if (!ExpandPathAndEnvironmentPlaceholders(
                 manifestArgument, argumentLocation, expansionContext, resolvedArgument)) {
             return ACLRTC_ERROR_FAILURE;
         }
@@ -158,7 +154,7 @@ aclError ExpandManifestArgument(const std::string& manifestArgument, const std::
         std::string resolvedArgument;
         const std::string optionLocation =
             "options['" + optionName + "'][" + std::to_string(optionIndex) + "]";
-        if (!ResolvePathAndEnvironmentPlaceholders(
+        if (!ExpandPathAndEnvironmentPlaceholders(
                 optionArguments[optionIndex], optionLocation, expansionContext, resolvedArgument)) {
             return ACLRTC_ERROR_FAILURE;
         }
@@ -167,14 +163,15 @@ aclError ExpandManifestArgument(const std::string& manifestArgument, const std::
     return ACLRTC_SUCCESS;
 }
 
-bool IsExecutableRegularFile(const fs::path& executablePath)
+bool IsAbsoluteExecutableRegularFile(const fs::path& executablePath)
 {
     boost::system::error_code fileError;
     return executablePath.is_absolute() && fs::is_regular_file(executablePath, fileError) && !fileError &&
            access(executablePath.c_str(), X_OK) == 0;
 }
 
-bool FindCompilerOutputOption(const std::vector<std::string>& commandArguments, size_t& outputOptionPosition)
+bool FindCompilerOutputOptionPosition(const std::vector<std::string>& commandArguments,
+                                      size_t& outputOptionPosition)
 {
     for (size_t argumentIndex = 0; argumentIndex < commandArguments.size(); ++argumentIndex) {
         const std::string& argument = commandArguments[argumentIndex];
@@ -186,7 +183,7 @@ bool FindCompilerOutputOption(const std::vector<std::string>& commandArguments, 
     return false;
 }
 
-std::string EncodeConstantBytes(const void* constantAddress, uint64_t constantByteCount)
+std::string FormatBytesAsCppInitializerList(const void* constantAddress, uint64_t constantByteCount)
 {
     const auto* constantBytes = static_cast<const uint8_t*>(constantAddress);
     std::ostringstream encodedBytes;
@@ -202,10 +199,10 @@ std::string EncodeConstantBytes(const void* constantAddress, uint64_t constantBy
     return encodedBytes.str();
 }
 
-aclError BuildSourcePatches(const Json& selectedKernel,
-                            const NormalizedKernelSpecializationRequest& specializationRequest,
-                            const ManifestExpansionContext& expansionContext,
-                            std::vector<KernelSourcePatch>& sourcePatches)
+aclError BuildConstantSourcePatches(const Json& selectedKernel,
+                                    const NormalizedKernelSpecializationRequest& specializationRequest,
+                                    const ManifestExpansionContext& expansionContext,
+                                    std::vector<KernelSourcePatch>& sourcePatches)
 {
     const auto constantInfos = selectedKernel.find("constant_infos");
     if (constantInfos == selectedKernel.end() || constantInfos->empty()) {
@@ -216,61 +213,63 @@ aclError BuildSourcePatches(const Json& selectedKernel,
     }
     for (size_t constantIndex = 0U; constantIndex < constantInfos->size(); ++constantIndex) {
         const Json& constantInfo = constantInfos->at(constantIndex);
-        const uint64_t parameterIndex = constantInfo.at("parameter_index").get<uint64_t>();
-        const uint64_t constantByteCount = constantInfo.at("byte_size").get<uint64_t>();
+        const uint64_t constantArgumentIndex = constantInfo.at("parameter_index").get<uint64_t>();
+        const uint64_t requiredConstantByteCount = constantInfo.at("byte_size").get<uint64_t>();
         if (specializationRequest.borrowedKernelArgumentDataPointers == nullptr ||
             specializationRequest.borrowedKernelArgumentByteCounts == nullptr) {
             ACLRTC_LOG_ERROR(
                 "constant parameter_index %llu requires argsAddr and argsBytes; set both request arrays with at "
                 "least argsCount entries",
-                static_cast<unsigned long long>(parameterIndex));
+                static_cast<unsigned long long>(constantArgumentIndex));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
-        if (parameterIndex >= specializationRequest.kernelArgumentCount) {
+        if (constantArgumentIndex >= specializationRequest.kernelArgumentCount) {
             ACLRTC_LOG_ERROR("constant parameter_index %llu is outside argsCount %llu",
-                             static_cast<unsigned long long>(parameterIndex),
+                             static_cast<unsigned long long>(constantArgumentIndex),
                              static_cast<unsigned long long>(specializationRequest.kernelArgumentCount));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
-        if (specializationRequest.borrowedKernelArgumentDataPointers[parameterIndex] == nullptr) {
+        if (specializationRequest.borrowedKernelArgumentDataPointers[constantArgumentIndex] == nullptr) {
             ACLRTC_LOG_ERROR("argsAddr[%llu] must not be null for a static constant",
-                             static_cast<unsigned long long>(parameterIndex));
+                             static_cast<unsigned long long>(constantArgumentIndex));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
-        const uint64_t suppliedByteCount =
-            specializationRequest.borrowedKernelArgumentByteCounts[parameterIndex];
-        if (suppliedByteCount != constantByteCount) {
+        const uint64_t suppliedConstantByteCount =
+            specializationRequest.borrowedKernelArgumentByteCounts[constantArgumentIndex];
+        if (suppliedConstantByteCount != requiredConstantByteCount) {
             ACLRTC_LOG_ERROR("argsBytes[%llu]=%llu does not match required byte_size %llu",
-                             static_cast<unsigned long long>(parameterIndex),
-                             static_cast<unsigned long long>(suppliedByteCount),
-                             static_cast<unsigned long long>(constantByteCount));
+                             static_cast<unsigned long long>(constantArgumentIndex),
+                             static_cast<unsigned long long>(suppliedConstantByteCount),
+                             static_cast<unsigned long long>(requiredConstantByteCount));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
 
         std::string resolvedTargetFilePath;
         const std::string constantFileLocation =
             "constant_infos[" + std::to_string(constantIndex) + "].file";
-        if (!ResolvePathAndEnvironmentPlaceholders(
+        if (!ExpandPathAndEnvironmentPlaceholders(
                 constantInfo.at("file").get<std::string>(), constantFileLocation, expansionContext,
                 resolvedTargetFilePath)) {
             return ACLRTC_ERROR_FAILURE;
         }
         sourcePatches.push_back(
             {resolvedTargetFilePath, constantInfo.at("template").get<std::string>(),
-             EncodeConstantBytes(specializationRequest.borrowedKernelArgumentDataPointers[parameterIndex],
-                                 constantByteCount)});
+             FormatBytesAsCppInitializerList(
+                 specializationRequest.borrowedKernelArgumentDataPointers[constantArgumentIndex],
+                 requiredConstantByteCount)});
     }
     return ACLRTC_SUCCESS;
 }
 
-aclError BuildManifestCommand(const Json& commandJson, const SelectedManifestObject& selectedObject,
+aclError BuildManifestCommand(const Json& manifestCommand, const SelectedManifestObject& selectedObject,
                               size_t commandIndex,
                               const NormalizedKernelSpecializationRequest& specializationRequest,
                               const ManifestExpansionContext& expansionContext,
                               CompilationCommand& compilationCommand)
 {
-    const char* objectKindName = GetSelectedObjectKindName(selectedObject.kind);
-    const std::string commandType = commandJson.at("type").get<std::string>();
+    const std::string manifestObjectName =
+        selectedObject.manifestObject->at("object_name").get<std::string>();
+    const std::string commandType = manifestCommand.at("type").get<std::string>();
     if (commandType == "compile") {
         compilationCommand.commandKind = CompilationCommandKind::Compile;
     } else if (commandType == "objcopy") {
@@ -279,17 +278,18 @@ aclError BuildManifestCommand(const Json& commandJson, const SelectedManifestObj
         ACLRTC_LOG_ERROR(
             "Manifest object %s command[%zu] has unsupported type '%s'; regenerate the JIT resource using a "
             "command type supported by ACLRTC",
-            objectKindName, commandIndex, commandType.c_str());
+            manifestObjectName.c_str(), commandIndex, commandType.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
-    const auto parallelStage = commandJson.find("stage");
-    if (parallelStage != commandJson.end()) {
+    const auto parallelStage = manifestCommand.find("stage");
+    if (parallelStage != manifestCommand.end()) {
         compilationCommand.parallelStage = parallelStage->get<uint32_t>();
     }
-    compilationCommand.diagnosticLabel = std::string(objectKindName) + "/" + commandType + "[" +
+    compilationCommand.diagnosticLabel = manifestObjectName + "/" + commandType + "[" +
                                          std::to_string(commandIndex) + "]";
 
-    const std::vector<std::string> manifestArguments = commandJson.at("cmd").get<std::vector<std::string>>();
+    const std::vector<std::string> manifestArguments =
+        manifestCommand.at("cmd").get<std::vector<std::string>>();
     if (manifestArguments.empty()) {
         ACLRTC_LOG_ERROR("Manifest command %s has an empty cmd array; regenerate the JIT resource",
                          compilationCommand.diagnosticLabel.c_str());
@@ -322,21 +322,21 @@ aclError BuildManifestCommand(const Json& commandJson, const SelectedManifestObj
 
     if (compilationCommand.commandKind == CompilationCommandKind::Compile) {
         size_t outputOptionPosition = 0U;
-        if (!FindCompilerOutputOption(compilationCommand.commandArguments, outputOptionPosition)) {
+        if (!FindCompilerOutputOptionPosition(compilationCommand.commandArguments, outputOptionPosition)) {
             ACLRTC_LOG_ERROR(
                 "Manifest compile command %s must contain an output option; regenerate the JIT resource with "
                 "'-o' and its output path",
                 compilationCommand.diagnosticLabel.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
-        const std::vector<std::string>& userOptions = selectedObject.kind == SelectedObjectKind::Basic
+        const std::vector<std::string>& userOptions = selectedObject.objectKind == ManifestObjectKind::Basic
             ? specializationRequest.compilerOptions.basicOptions
             : specializationRequest.compilerOptions.superKernelOptions;
         compilationCommand.commandArguments.insert(
             compilationCommand.commandArguments.begin() + static_cast<std::ptrdiff_t>(outputOptionPosition),
             userOptions.begin(), userOptions.end());
     }
-    if (!IsExecutableRegularFile(compilationCommand.executablePath)) {
+    if (!IsAbsoluteExecutableRegularFile(compilationCommand.executablePath)) {
         ACLRTC_LOG_ERROR(
             "Manifest command %s requires an absolute path to an existing executable regular file: path=%s; "
             "check the referenced environment variable and tool installation",
@@ -346,32 +346,32 @@ aclError BuildManifestCommand(const Json& commandJson, const SelectedManifestObj
     return ACLRTC_SUCCESS;
 }
 
-aclError SelectManifestObjects(const Json& selectedKernel, CompilationVariant compilationVariant,
-                               std::vector<SelectedManifestObject>& selectedObjects)
+aclError SelectManifestObjectsForCompilation(const Json& selectedKernel, CompilationVariant compilationVariant,
+                                             std::vector<SelectedManifestObject>& selectedObjects)
 {
-    const Json* basicObject = nullptr;
-    const Json* superKernelObject = nullptr;
-    for (const Json& object : selectedKernel.at("objects")) {
-        const std::string objectType = object.at("object_type").get<std::string>();
-        if (objectType == "basic" && basicObject == nullptr) {
-            basicObject = &object;
-        } else if (objectType == "sk" && superKernelObject == nullptr) {
-            superKernelObject = &object;
+    bool foundBasicObject = false;
+    bool foundSuperKernelObject = false;
+    for (const Json& manifestObject : selectedKernel.at("objects")) {
+        const std::string objectType = manifestObject.at("object_type").get<std::string>();
+        if (objectType == "basic") {
+            foundBasicObject = true;
+            selectedObjects.push_back({&manifestObject, ManifestObjectKind::Basic});
+        } else if (objectType == "sk") {
+            foundSuperKernelObject = true;
+            if (compilationVariant == CompilationVariant::BasicWithSuperKernel) {
+                selectedObjects.push_back({&manifestObject, ManifestObjectKind::SuperKernel});
+            }
         }
     }
-    if (basicObject == nullptr) {
+    if (!foundBasicObject) {
         ACLRTC_LOG_ERROR("Selected kernel does not contain a basic object; regenerate the JIT resource");
         return ACLRTC_ERROR_FAILURE;
     }
-    selectedObjects.push_back({basicObject, SelectedObjectKind::Basic});
-    if (compilationVariant == CompilationVariant::BasicWithSuperKernel) {
-        if (superKernelObject == nullptr) {
-            ACLRTC_LOG_ERROR(
-                "Super-kernel compilation was requested but the selected kernel has no sk object; remove "
-                "--enable-super-kernel or use a JIT resource that contains an sk object");
-            return ACLRTC_ERROR_FAILURE;
-        }
-        selectedObjects.push_back({superKernelObject, SelectedObjectKind::SuperKernel});
+    if (compilationVariant == CompilationVariant::BasicWithSuperKernel && !foundSuperKernelObject) {
+        ACLRTC_LOG_ERROR(
+            "Super-kernel compilation was requested but the selected kernel has no sk object; remove "
+            "--enable-super-kernel or use a JIT resource that contains an sk object");
+        return ACLRTC_ERROR_FAILURE;
     }
     return ACLRTC_SUCCESS;
 }
@@ -383,7 +383,7 @@ aclError BuildLinkCommand(const Json& selectedKernel, const std::vector<Selected
     linkCommand.commandKind = CompilationCommandKind::Link;
     linkCommand.diagnosticLabel = "link";
     std::string linkerPath;
-    if (!ResolvePathAndEnvironmentPlaceholders(
+    if (!ExpandPathAndEnvironmentPlaceholders(
             "${env:ASCEND_HOME_PATH}/bin/ld.lld", "internal linker executable", expansionContext,
             linkerPath)) {
         return ACLRTC_ERROR_FAILURE;
@@ -397,7 +397,7 @@ aclError BuildLinkCommand(const Json& selectedKernel, const std::vector<Selected
             std::string resolvedLinkOption;
             const std::string linkOptionLocation =
                 "link_options[" + std::to_string(linkOptionIndex) + "]";
-            if (!ResolvePathAndEnvironmentPlaceholders(
+            if (!ExpandPathAndEnvironmentPlaceholders(
                     configuredLinkOptions[linkOptionIndex], linkOptionLocation, expansionContext,
                     resolvedLinkOption)) {
                 return ACLRTC_ERROR_FAILURE;
@@ -406,13 +406,15 @@ aclError BuildLinkCommand(const Json& selectedKernel, const std::vector<Selected
         }
     }
     for (const SelectedManifestObject& selectedObject : selectedObjects) {
+        const std::string manifestObjectName =
+            selectedObject.manifestObject->at("object_name").get<std::string>();
         const std::vector<std::string> outputs =
-            selectedObject.object->at("outputs").get<std::vector<std::string>>();
+            selectedObject.manifestObject->at("outputs").get<std::vector<std::string>>();
         for (size_t outputIndex = 0U; outputIndex < outputs.size(); ++outputIndex) {
             std::string resolvedOutput;
-            const std::string outputLocation = std::string(GetSelectedObjectKindName(selectedObject.kind)) +
-                                               ".outputs[" + std::to_string(outputIndex) + "]";
-            if (!ResolvePathAndEnvironmentPlaceholders(
+            const std::string outputLocation = manifestObjectName + ".outputs[" +
+                                               std::to_string(outputIndex) + "]";
+            if (!ExpandPathAndEnvironmentPlaceholders(
                     outputs[outputIndex], outputLocation, expansionContext, resolvedOutput)) {
                 return ACLRTC_ERROR_FAILURE;
             }
@@ -424,7 +426,7 @@ aclError BuildLinkCommand(const Json& selectedKernel, const std::vector<Selected
     requiredOutputDirectories.emplace(linkedKernelElfPath.parent_path());
     linkCommand.commandArguments.emplace_back("-o");
     linkCommand.commandArguments.emplace_back(linkedKernelElfPath.string());
-    if (!IsExecutableRegularFile(linkCommand.executablePath)) {
+    if (!IsAbsoluteExecutableRegularFile(linkCommand.executablePath)) {
         ACLRTC_LOG_ERROR(
             "Linker requires an absolute path to an existing executable regular file: path=%s; verify "
             "ASCEND_HOME_PATH points to a complete CANN installation",
@@ -437,9 +439,10 @@ aclError BuildLinkCommand(const Json& selectedKernel, const std::vector<Selected
 
 KernelCompilationPlanBuilder::KernelCompilationPlanBuilder(
     const NormalizedKernelSpecializationRequest& specializationRequest, const nlohmann::json& resourceManifest,
-    fs::path resourceWorktreePath, fs::path sourceFilePath)
+    fs::path resourceWorktreePath, fs::path externalSourceFilePath)
     : specializationRequest_(specializationRequest), resourceManifest_(resourceManifest),
-      resourceWorktreePath_(std::move(resourceWorktreePath)), sourceFilePath_(std::move(sourceFilePath))
+      resourceWorktreePath_(std::move(resourceWorktreePath)),
+      externalSourceFilePath_(std::move(externalSourceFilePath))
 {}
 
 aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPlan& compilationPlan) const
@@ -458,16 +461,16 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
                              worktreeError.message().c_str());
             return ACLRTC_ERROR_FAILURE;
         }
-        if (!sourceFilePath_.is_absolute()) {
+        if (!externalSourceFilePath_.is_absolute()) {
             ACLRTC_LOG_ERROR(
                 "ResourceRegistry returned a non-absolute sourceFilePath: %s; fix the registry integration",
-                sourceFilePath_.c_str());
+                externalSourceFilePath_.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
         boost::system::error_code sourceFileError;
-        if (!fs::is_regular_file(sourceFilePath_, sourceFileError) || sourceFileError) {
+        if (!fs::is_regular_file(externalSourceFilePath_, sourceFileError) || sourceFileError) {
             ACLRTC_LOG_ERROR("sourceFilePath is unavailable: path=%s error=%d message=%s",
-                             sourceFilePath_.c_str(), sourceFileError.value(),
+                             externalSourceFilePath_.c_str(), sourceFileError.value(),
                              sourceFileError.message().c_str());
             return ACLRTC_ERROR_FAILURE;
         }
@@ -498,21 +501,22 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
         const fs::path outputDirectoryPath =
             resourceWorktreePath_ / (".aclrtc_" + specializationRequest_.specializationSessionId) / "outputs";
         const ManifestExpansionContext expansionContext {
-            resourceManifest_, resourceWorktreePath_, outputDirectoryPath, sourceFilePath_};
-        aclError result = BuildSourcePatches(*selectedKernel, specializationRequest_, expansionContext,
-                                             builtPlan.sourcePatches);
+            resourceManifest_, resourceWorktreePath_, outputDirectoryPath, externalSourceFilePath_};
+        aclError result = BuildConstantSourcePatches(*selectedKernel, specializationRequest_, expansionContext,
+                                                     builtPlan.sourcePatches);
         if (result != ACLRTC_SUCCESS) {
             return result;
         }
 
         std::vector<SelectedManifestObject> selectedObjects;
-        result = SelectManifestObjects(*selectedKernel, specializationRequest_.compilationVariant, selectedObjects);
+        result = SelectManifestObjectsForCompilation(
+            *selectedKernel, specializationRequest_.compilationVariant, selectedObjects);
         if (result != ACLRTC_SUCCESS) {
             return result;
         }
 
         for (const SelectedManifestObject& selectedObject : selectedObjects) {
-            const Json& commands = selectedObject.object->at("commands");
+            const Json& commands = selectedObject.manifestObject->at("commands");
             for (size_t commandIndex = 0U; commandIndex < commands.size(); ++commandIndex) {
                 CompilationCommand command;
                 result = BuildManifestCommand(commands.at(commandIndex), selectedObject, commandIndex,

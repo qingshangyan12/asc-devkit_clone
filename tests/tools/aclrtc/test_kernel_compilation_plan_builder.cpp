@@ -271,6 +271,59 @@ TEST(KernelCompilationPlanBuilderTest, PreservesExplicitStagesAndManifestCommand
               plan.compilationCommands[1].commandArguments.end());
 }
 
+TEST(KernelCompilationPlanBuilderTest, SelectsAllRequestedObjectsInManifestOrder)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable skToolchainEnvironment("ACLRTC_TEST_SK_TOOLCHAIN",
+                                                      workspace.ToolchainPath().string());
+    const uint8_t tilingBytes[] = {0x01, 0x02};
+    const void* argumentAddresses[] = {tilingBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(tilingBytes)};
+    NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, argumentAddresses, argumentByteCounts);
+    request.compilationVariant = CompilationVariant::BasicWithSuperKernel;
+
+    Json manifest = CreateManifest();
+    Json secondBasicObject = manifest["kernels"][1]["objects"][0];
+    secondBasicObject["object_name"] = "basic_aux";
+    secondBasicObject["commands"][0]["cmd"][4] = "${output}/basic_aux.o";
+    secondBasicObject["outputs"][0] = "${output}/basic_aux.o";
+    manifest["kernels"][1]["objects"].push_back(secondBasicObject);
+
+    Json secondSuperKernelObject = manifest["kernels"][1]["objects"][1];
+    secondSuperKernelObject["object_name"] = "sk_aux";
+    secondSuperKernelObject["commands"][0]["cmd"][3] = "${output}/sk_aux.o";
+    secondSuperKernelObject["commands"][1]["cmd"][2] = "${output}/sk_aux.o";
+    secondSuperKernelObject["commands"][1]["cmd"][3] = "${output}/sk_aux_split.o";
+    secondSuperKernelObject["outputs"] =
+        Json::array({"${output}/sk_aux.o", "${output}/sk_aux_split.o"});
+    manifest["kernels"][1]["objects"].push_back(secondSuperKernelObject);
+
+    KernelCompilationPlan plan;
+    ASSERT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceFilePath())
+                  .BuildCompilationPlan(plan),
+              0);
+
+    ASSERT_EQ(plan.compilationCommands.size(), 7U);
+    EXPECT_EQ(plan.compilationCommands[0].diagnosticLabel, "basic/compile[0]");
+    EXPECT_EQ(plan.compilationCommands[1].diagnosticLabel, "sk/compile[0]");
+    EXPECT_EQ(plan.compilationCommands[2].diagnosticLabel, "sk/objcopy[1]");
+    EXPECT_EQ(plan.compilationCommands[3].diagnosticLabel, "basic_aux/compile[0]");
+    EXPECT_EQ(plan.compilationCommands[4].diagnosticLabel, "sk_aux/compile[0]");
+    EXPECT_EQ(plan.compilationCommands[5].diagnosticLabel, "sk_aux/objcopy[1]");
+    EXPECT_EQ(plan.compilationCommands[6].diagnosticLabel, "link");
+
+    const std::vector<std::string>& linkArguments = plan.compilationCommands.back().commandArguments;
+    EXPECT_NE(std::find(linkArguments.begin(), linkArguments.end(),
+                        (workspace.ResourcePath() / ".aclrtc_session_1/outputs/basic_aux.o").string()),
+              linkArguments.end());
+    EXPECT_NE(std::find(linkArguments.begin(), linkArguments.end(),
+                        (workspace.ResourcePath() / ".aclrtc_session_1/outputs/sk_aux_split.o").string()),
+              linkArguments.end());
+}
+
 TEST(KernelCompilationPlanBuilderTest, RequiresOnlyEnvironmentUsedBySelectedObjects)
 {
     KernelPlanTestWorkspace workspace;
