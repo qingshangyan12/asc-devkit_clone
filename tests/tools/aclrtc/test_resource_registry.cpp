@@ -38,6 +38,7 @@ constexpr uint64_t TEST_MAX_RESOURCE_FILE_SIZE = 256U * 1024U * 1024U;
 constexpr uint64_t TEST_MAX_MANIFEST_RESOURCE_SIZE = 512U * 1024U * 1024U;
 constexpr uint64_t TEST_MAX_REGISTRY_RESOURCE_SIZE = 1024U * 1024U * 1024U;
 constexpr uint64_t TEST_MAX_MANIFEST_COUNT = 4096U;
+constexpr uint64_t TEST_MAX_EXTENSION_COUNT = 4096U;
 constexpr uint64_t TEST_MAX_FILE_COUNT = 65536U;
 constexpr uint64_t TEST_MAX_REGISTRY_FILE_COUNT = 131072U;
 
@@ -520,6 +521,48 @@ TEST_F(ResourceRegistryTest, GetBundleValidatesEveryHeaderAndManifestField)
     EXPECT_EQ(output, &bundle);
 }
 
+TEST_F(ResourceRegistryTest, GetBundleValidatesExtensionTable)
+{
+    const std::string json = "{}";
+    AcCompileResourceManifest manifest{StringView(json), nullptr, 0U};
+    AcCompileResourceBundle bundle = MakeBundle(&manifest, 1U);
+    LibraryHandle library(nullptr);
+    const LibrarySpec spec{"bundle.so", ResourceSourceType::External};
+    const AcCompileResourceBundle* output = nullptr;
+    MOCKER(dlsym).stubs().will(invoke(DlsymBundle));
+    MOCKER(dlerror).stubs().will(invoke(DlerrorControlled));
+    gBundleHeader = &bundle.header;
+
+    const uint8_t payload = 0U;
+    AcCompileResourceExtension extension{1000U, 1U, 0U, &payload, sizeof(payload)};
+    bundle.extensions = &extension;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+
+    bundle.extensions = nullptr;
+    bundle.extensionCount = 1U;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+
+    bundle.extensionCount = TEST_MAX_EXTENSION_COUNT + 1U;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+
+    bundle.extensions = &extension;
+    bundle.extensionCount = 1U;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::Success);
+
+    extension.data = nullptr;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+    extension.data = &payload;
+    extension.flags = 2U;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+    extension.flags = AC_COMPILE_RESOURCE_EXTENSION_REQUIRED;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::InvalidResource);
+
+    extension.flags = 0U;
+    extension.data = nullptr;
+    extension.dataSize = 0U;
+    EXPECT_EQ(ResourceRegistry::GetBundle(library, spec, output), ResourceStatus::Success);
+}
+
 TEST_F(ResourceRegistryTest, AppendFileCopiesPayloadAndRejectsInvalidFieldsAndLimits)
 {
     const std::string name = "resource.bin";
@@ -676,7 +719,8 @@ TEST_F(ResourceRegistryTest, LoadManifestValidatesJsonOwnershipSourceAndDuplicat
     EXPECT_EQ(loadText(R"({"resource_id":"metadata-only"})"), ResourceStatus::Success);
     EXPECT_TRUE(stage.external.resources.at("metadata-only")->data.sourceFilePath.empty());
     EXPECT_EQ(loadText(R"({"resource_id":"resource","source_file":1})"), ResourceStatus::InvalidResource);
-    EXPECT_EQ(loadText(R"({"resource_id":"../bad","source_file":"source.cpp"})"), ResourceStatus::InvalidResource);
+    EXPECT_EQ(loadText(R"({"resource_id":"../bad","source_file":"source.cpp"})"), ResourceStatus::Success);
+    EXPECT_NE(stage.external.resources.find("../bad"), stage.external.resources.end());
     EXPECT_EQ(loadText(R"({"resource_id":"resource","source_file":"../source.cpp"})"), ResourceStatus::InvalidResource);
     EXPECT_EQ(loadText(R"({"resource_id":"missing","source_file":"missing.cpp"})"), ResourceStatus::InvalidResource);
 
@@ -918,26 +962,30 @@ TEST_F(ResourceRegistryTest, LookupValidatesInputsAndReturnsIndependentMateriali
 
     std::unique_ptr<ResourceEntry> entry = MakeEntry(ResourceSourceType::External);
     entry->files.push_back({"payload.bin", "nested/payload.bin", {4U, 5U, 6U}});
-    registry_->externalResources_.emplace("resource", std::move(entry));
+    const std::string resourceId = "resource/with/slash";
+    registry_->externalResources_.emplace(resourceId, std::move(entry));
     ResourceData firstOutput;
-    EXPECT_EQ(registry_->Lookup("resource", firstOutput), ResourceStatus::Success);
+    EXPECT_EQ(registry_->Lookup(resourceId.c_str(), firstOutput), ResourceStatus::Success);
     const std::string firstDirectory = firstOutput.resourceDir;
+    const fs::path firstPath(firstDirectory);
+    EXPECT_EQ(firstPath.filename().string().find("materialize-"), 0U);
+    EXPECT_EQ(firstPath.parent_path().filename(), "external");
     EXPECT_EQ(ReadFile(fs::path(firstDirectory) / "nested/payload.bin"), std::string("\4\5\6", 3U));
     ResourceData secondOutput;
-    EXPECT_EQ(registry_->Lookup("resource", secondOutput), ResourceStatus::Success);
+    EXPECT_EQ(registry_->Lookup(resourceId.c_str(), secondOutput), ResourceStatus::Success);
     EXPECT_EQ(firstOutput.resourceDir, firstDirectory);
     EXPECT_NE(secondOutput.resourceDir, firstDirectory);
     EXPECT_EQ(ReadFile(fs::path(firstOutput.resourceDir) / "nested/payload.bin"), std::string("\4\5\6", 3U));
     EXPECT_EQ(ReadFile(fs::path(secondOutput.resourceDir) / "nested/payload.bin"), std::string("\4\5\6", 3U));
-    EXPECT_TRUE(registry_->externalResources_.at("resource")->data.resourceDir.empty());
+    EXPECT_TRUE(registry_->externalResources_.at(resourceId)->data.resourceDir.empty());
 
     std::unique_ptr<ResourceEntry> unknown = MakeEntry(static_cast<ResourceSourceType>(99));
     registry_->builtInResources_.emplace("unknown", std::move(unknown));
     ResourceData unknownOutput;
     EXPECT_EQ(registry_->Lookup("unknown", unknownOutput), ResourceStatus::Success);
     const fs::path unknownPath(unknownOutput.resourceDir);
-    EXPECT_EQ(unknownPath.filename(), "unknown");
-    EXPECT_EQ(unknownPath.parent_path().parent_path().filename(), "unknown");
+    EXPECT_EQ(unknownPath.filename().string().find("materialize-"), 0U);
+    EXPECT_EQ(unknownPath.parent_path().filename(), "unknown");
 }
 
 TEST_F(ResourceRegistryTest, LookupReportsTemporaryRootAndMaterializationFailures)

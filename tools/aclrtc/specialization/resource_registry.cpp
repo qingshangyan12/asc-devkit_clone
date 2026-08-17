@@ -51,6 +51,7 @@ constexpr uint64_t MAX_RESOURCE_FILE_SIZE = 256U * 1024U * 1024U;
 constexpr uint64_t MAX_MANIFEST_RESOURCE_SIZE = 512U * 1024U * 1024U;
 constexpr uint64_t MAX_REGISTRY_RESOURCE_SIZE = 1024U * 1024U * 1024U;
 constexpr uint64_t MAX_MANIFEST_COUNT = 4096U;
+constexpr uint64_t MAX_EXTENSION_COUNT = 4096U;
 constexpr uint64_t MAX_FILE_COUNT = 65536U;
 constexpr uint64_t MAX_REGISTRY_FILE_COUNT = 131072U;
 
@@ -263,6 +264,60 @@ ResourceStatus ValidateManifestTable(const AcCompileResourceBundle& bundle, cons
     return ResourceStatus::Success;
 }
 
+ResourceStatus ValidateExtensionTable(const AcCompileResourceBundle& bundle, const LibrarySpec& spec)
+{
+    if (bundle.extensionCount == 0U) {
+        if (bundle.extensions != nullptr) {
+            ASCENDLOGE(
+                "Compile resource extension table is inconsistent: source_type=%s so=%s count=0 pointer=%p "
+                "expected=null",
+                SourceTypeName(spec.sourceType), spec.path.c_str(), static_cast<const void*>(bundle.extensions));
+            return ResourceStatus::InvalidResource;
+        }
+        return ResourceStatus::Success;
+    }
+    if (bundle.extensionCount > MAX_EXTENSION_COUNT) {
+        ASCENDLOGE(
+            "Compile resource extension count exceeds limit: source_type=%s so=%s actual=%" PRIu64 " limit=%" PRIu64,
+            SourceTypeName(spec.sourceType), spec.path.c_str(), bundle.extensionCount, MAX_EXTENSION_COUNT);
+        return ResourceStatus::InvalidResource;
+    }
+    if (bundle.extensions == nullptr) {
+        ASCENDLOGE(
+            "Compile resource extension table is null: source_type=%s so=%s count=%" PRIu64,
+            SourceTypeName(spec.sourceType), spec.path.c_str(), bundle.extensionCount);
+        return ResourceStatus::InvalidResource;
+    }
+    for (uint64_t index = 0U; index < bundle.extensionCount; ++index) {
+        const AcCompileResourceExtension& extension = bundle.extensions[index];
+        const uint64_t unsupportedFlags = extension.flags & ~AC_COMPILE_RESOURCE_EXTENSION_REQUIRED;
+        if (unsupportedFlags != 0U) {
+            ASCENDLOGE(
+                "Compile resource extension has unsupported flags: source_type=%s so=%s extension=%" PRIu64
+                " type=%u version=%u flags=0x%" PRIx64 " supported_mask=0x%" PRIx64,
+                SourceTypeName(spec.sourceType), spec.path.c_str(), index, extension.type, extension.version,
+                extension.flags, static_cast<uint64_t>(AC_COMPILE_RESOURCE_EXTENSION_REQUIRED));
+            return ResourceStatus::InvalidResource;
+        }
+        if (extension.dataSize != 0U && extension.data == nullptr) {
+            ASCENDLOGE(
+                "Compile resource extension has null data: source_type=%s so=%s extension=%" PRIu64
+                " type=%u version=%u size=%" PRIu64 " expected=non-null data",
+                SourceTypeName(spec.sourceType), spec.path.c_str(), index, extension.type, extension.version,
+                extension.dataSize);
+            return ResourceStatus::InvalidResource;
+        }
+        if ((extension.flags & AC_COMPILE_RESOURCE_EXTENSION_REQUIRED) != 0U) {
+            ASCENDLOGE(
+                "Compile resource bundle requires an unsupported extension: source_type=%s so=%s extension=%" PRIu64
+                " type=%u version=%u",
+                SourceTypeName(spec.sourceType), spec.path.c_str(), index, extension.type, extension.version);
+            return ResourceStatus::InvalidResource;
+        }
+    }
+    return ResourceStatus::Success;
+}
+
 struct ManifestOwnership {
     Json document;
     std::string resourceId;
@@ -288,13 +343,6 @@ ResourceStatus ParseResourceId(
         return ResourceStatus::InvalidResource;
     }
     resourceId = document.at("resource_id").get<std::string>();
-    if (!IsPlainName(resourceId)) {
-        ASCENDLOGE(
-            "Compile resource manifest has unsafe resource identifier: source_type=%s so=%s manifest=%" PRIu64
-            " resource_id=%s expected=non-empty file-name-safe value",
-            SourceTypeName(spec.sourceType), spec.path.c_str(), manifestIndex, resourceId.c_str());
-        return ResourceStatus::InvalidResource;
-    }
     return ResourceStatus::Success;
 }
 
@@ -370,26 +418,25 @@ ResourceStatus PrepareMaterializationRoot(
     }
     const std::string categoryParent = FileUtils::JoinPath(temporaryRoot, SourceTypeName(sourceType));
     categoryRoot = FileUtils::JoinPath(categoryParent, randomComponent.string());
-    const std::string resourceRoot = FileUtils::JoinPath(categoryRoot, resourceId);
-    if (!FileUtils::CreateDirectories(resourceRoot)) {
+    if (!FileUtils::CreateDirectories(categoryRoot)) {
         ASCENDLOGE(
             "Failed to create compile resource materialization directory: resource_id=%s source_type=%s path=%s",
-            resourceId.c_str(), SourceTypeName(sourceType), resourceRoot.c_str());
+            resourceId.c_str(), SourceTypeName(sourceType), categoryRoot.c_str());
         return ResourceStatus::IoError;
     }
-    const fs::path canonical = fs::canonical(resourceRoot, error);
+    const fs::path canonical = fs::canonical(categoryRoot, error);
     if (error) {
         ASCENDLOGE(
             "Failed to resolve compile resource materialization directory: resource_id=%s source_type=%s path=%s "
             "error=%s",
-            resourceId.c_str(), SourceTypeName(sourceType), resourceRoot.c_str(), error.message().c_str());
+            resourceId.c_str(), SourceTypeName(sourceType), categoryRoot.c_str(), error.message().c_str());
         return ResourceStatus::IoError;
     }
-    if (canonical != fs::path(resourceRoot).lexically_normal()) {
+    if (canonical != fs::path(categoryRoot).lexically_normal()) {
         ASCENDLOGE(
             "Compile resource materialization directory identity mismatch: resource_id=%s source_type=%s expected=%s "
             "actual=%s",
-            resourceId.c_str(), SourceTypeName(sourceType), resourceRoot.c_str(), canonical.c_str());
+            resourceId.c_str(), SourceTypeName(sourceType), categoryRoot.c_str(), canonical.c_str());
         return ResourceStatus::IoError;
     }
     canonicalRoot = canonical.string();
@@ -765,9 +812,12 @@ ResourceStatus ResourceRegistry::GetBundle(
     bundle = reinterpret_cast<const AcCompileResourceBundle*>(header);
     status = ValidateManifestTable(*bundle, spec);
     if (status == ResourceStatus::Success) {
+        status = ValidateExtensionTable(*bundle, spec);
+    }
+    if (status == ResourceStatus::Success) {
         ASCENDLOGD(
-            "Validated compile resource bundle: source_type=%s so=%s manifests=%" PRIu64,
-            SourceTypeName(spec.sourceType), spec.path.c_str(), bundle->manifestCount);
+            "Validated compile resource bundle: source_type=%s so=%s manifests=%" PRIu64 " extensions=%" PRIu64,
+            SourceTypeName(spec.sourceType), spec.path.c_str(), bundle->manifestCount, bundle->extensionCount);
     }
     return status;
 }
