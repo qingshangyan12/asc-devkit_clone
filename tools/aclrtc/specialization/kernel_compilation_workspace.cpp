@@ -150,6 +150,7 @@ bool KernelCompilationWorkspace::TryMoveWorktreeToDiagnosticsDirectory(
     fs::rename(worktreePath_, diagnosticWorktreePath, pathError);
     if (!pathError) {
         worktreePath_ = diagnosticWorktreePath;
+        retentionPolicy_ = WorktreeRetentionPolicy::RetainForDiagnostics;
         return true;
     }
 
@@ -168,6 +169,7 @@ bool KernelCompilationWorkspace::TryMoveWorktreeToDiagnosticsDirectory(
 
     const fs::path originalWorktreePath = worktreePath_;
     worktreePath_ = diagnosticWorktreePath;
+    retentionPolicy_ = WorktreeRetentionPolicy::RetainForDiagnostics;
     boost::system::error_code cleanupError;
     fs::remove_all(originalWorktreePath, cleanupError);
     if (cleanupError) {

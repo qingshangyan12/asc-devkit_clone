@@ -38,6 +38,27 @@ void LibraryDeleter::operator()(void* handle) const noexcept
     }
 }
 
+const char* ResourceStatusToString(ResourceStatus status) noexcept
+{
+    switch (status) {
+        case ResourceStatus::Success:
+            return "success";
+        case ResourceStatus::NotFound:
+            return "not_found";
+        case ResourceStatus::Conflict:
+            return "conflict";
+        case ResourceStatus::InvalidResource:
+            return "invalid_resource";
+        case ResourceStatus::IoError:
+            return "io_error";
+        case ResourceStatus::LoadError:
+            return "load_error";
+        case ResourceStatus::InternalError:
+            return "internal_error";
+    }
+    return "unknown";
+}
+
 namespace {
 
 namespace fs = boost::filesystem;
@@ -63,27 +84,6 @@ const char* SourceTypeName(ResourceSourceType sourceType) noexcept
             return "custom";
         case ResourceSourceType::BuiltIn:
             return "built-in";
-    }
-    return "unknown";
-}
-
-const char* ResourceStatusName(ResourceStatus status) noexcept
-{
-    switch (status) {
-        case ResourceStatus::Success:
-            return "success";
-        case ResourceStatus::NotFound:
-            return "not_found";
-        case ResourceStatus::Conflict:
-            return "conflict";
-        case ResourceStatus::InvalidResource:
-            return "invalid_resource";
-        case ResourceStatus::IoError:
-            return "io_error";
-        case ResourceStatus::LoadError:
-            return "load_error";
-        case ResourceStatus::InternalError:
-            return "internal_error";
     }
     return "unknown";
 }
@@ -1044,7 +1044,7 @@ ResourceStatus ResourceRegistry::LoadLibrary(const LibrarySpec& spec, StageState
             ASCENDLOGE(
                 "Stopped loading compile resource SO at manifest: source_type=%s so=%s manifest=%" PRIu64
                 " status=%s(%d)",
-                SourceTypeName(spec.sourceType), spec.path.c_str(), manifestIndex, ResourceStatusName(status),
+                SourceTypeName(spec.sourceType), spec.path.c_str(), manifestIndex, ResourceStatusToString(status),
                 static_cast<int>(status));
             return status;
         }
@@ -1064,7 +1064,7 @@ ResourceStatus ResourceRegistry::LoadLibraries(const std::vector<LibrarySpec>& l
         if (status != ResourceStatus::Success) {
             ASCENDLOGE(
                 "Stopped loading compile resource SO list: source_type=%s so=%s status=%s(%d)",
-                SourceTypeName(library.sourceType), library.path.c_str(), ResourceStatusName(status),
+                SourceTypeName(library.sourceType), library.path.c_str(), ResourceStatusToString(status),
                 static_cast<int>(status));
             return status;
         }
@@ -1202,7 +1202,7 @@ ResourceStatus ResourceRegistry::Commit(StageState& stage)
     ASCENDLOGI(
         "Finished committing compile resources: status=%s(%d) registered_external=%zu registered_custom=%zu "
         "registered_built_in=%zu total_files=%" PRIu64 " total_bytes=%" PRIu64,
-        ResourceStatusName(status), static_cast<int>(status), externalResources_.size(), customResources_.size(),
+        ResourceStatusToString(status), static_cast<int>(status), externalResources_.size(), customResources_.size(),
         builtInResources_.size(), resourceFileCount_, resourceBytes_);
     return status;
 }
@@ -1214,7 +1214,7 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
     if (automatic && automaticLoadAttempted_) {
         ASCENDLOGI(
             "Returning cached automatic compile resource load result: status=%s(%d)",
-            ResourceStatusName(automaticLoadStatus_), static_cast<int>(automaticLoadStatus_));
+            ResourceStatusToString(automaticLoadStatus_), static_cast<int>(automaticLoadStatus_));
         return automaticLoadStatus_;
     }
     ASCENDLOGI(
@@ -1225,7 +1225,8 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
     if (status != ResourceStatus::Success) {
         ASCENDLOGE(
             "Compile resource load stopped during discovery: mode=%s path=%s status=%s(%d)",
-            automatic ? "automatic" : "explicit", automatic ? "<environment>" : directory, ResourceStatusName(status),
+            automatic ? "automatic" : "explicit", automatic ? "<environment>" : directory,
+            ResourceStatusToString(status),
             static_cast<int>(status));
     } else {
         ASCENDLOGI(
@@ -1244,7 +1245,7 @@ ResourceStatus ResourceRegistry::Load(const char* directory)
     if (status == ResourceStatus::Success) {
         ASCENDLOGI(
             "Finished loading compile resources: mode=%s libraries=%zu status=%s(%d)",
-            automatic ? "automatic" : "explicit", libraries.size(), ResourceStatusName(status),
+            automatic ? "automatic" : "explicit", libraries.size(), ResourceStatusToString(status),
             static_cast<int>(status));
     }
     return status;
