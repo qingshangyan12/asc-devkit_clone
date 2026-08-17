@@ -122,7 +122,10 @@ TEST(CompilationPlanExecutorTest, MapsCompileAndLinkFailuresToDifferentErrors)
     CompilationPlanExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/false", {}));
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "INFO: Set ASCEND_OP_COMPILE_SAVE_KERNEL_META=1 and retry"));
 
     plan.compilationCommands[0].commandKind = CompilationCommandKind::Link;
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_LINKING);
@@ -235,7 +238,28 @@ TEST(CompilationPlanExecutorTest, ReportsSpawnFailureAsInfrastructureFailure)
     const std::string compilationLog = ReadTextFile(diagnosticDirectoryPath / "compile.log");
     EXPECT_NE(compilationLog.find("termination=infrastructure_failure"), std::string::npos);
     EXPECT_EQ(compilationLog.find("termination=exited code=0"), std::string::npos);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "INFO: Compilation diagnostics saved:"));
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        (diagnosticDirectoryPath / "replay.sh").string()));
     fs::remove_all(diagnosticDirectoryPath, ignoredError);
+}
+
+TEST(CompilationPlanExecutorTest, DistinguishesCapturedAndLoggedOutputTruncation)
+{
+    KernelSpecializationDiagnostics diagnostics(
+        "executor_logged_output_limit", DiagnosticCollectionMode::Disabled);
+    CompilationCommandExecutionLimits limits = CompilationCommandExecutionLimits::ProductionDefaults();
+    limits.capturedOutputByteLimit = 8192U;
+    CompilationPlanExecutor executor(diagnostics, limits);
+    KernelCompilationPlan plan;
+    plan.compilationCommands.push_back(CreateCommand(
+        CompilationCommandKind::Compile, "/bin/sh", {"-c", "yes x | head -c 5000; exit 1"}));
+
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "captured_output_truncated=false logged_output_truncated=true output_prefix_bytes=4096"));
 }
 
 TEST(CompilationPlanExecutorTest, BoundsCapturedProcessOutput)

@@ -113,6 +113,7 @@ bool CreateExecutableReplayScript(const fs::path& replayScriptPath,
 KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
     std::string specializationSessionId, DiagnosticCollectionMode collectionMode)
     : specializationSessionId_(std::move(specializationSessionId)),
+      diagnosticsRequested_(collectionMode == DiagnosticCollectionMode::Enabled),
       diagnosticsEnabled_(collectionMode == DiagnosticCollectionMode::Enabled)
 {
     if (!diagnosticsEnabled_) {
@@ -212,6 +213,33 @@ void KernelSpecializationDiagnostics::AppendCommandResultToCompilationLog(
         ACLRTC_LOG_WARNING("Failed to record result for command %s: path=%s",
                            compilationCommand.diagnosticLabel.c_str(),
                            (diagnosticDirectoryPath_ / "compile.log").c_str());
+    }
+}
+
+void KernelSpecializationDiagnostics::LogCommandFailureRecoveryHint() const noexcept
+{
+    if (!diagnosticsEnabled_) {
+        if (diagnosticsRequested_) {
+            ACLRTC_LOG_INFO(
+                "Compilation diagnostics were requested but could not be initialized; fix the preceding diagnostic "
+                "warning and retry");
+            return;
+        }
+        ACLRTC_LOG_INFO(
+            "Set ASCEND_OP_COMPILE_SAVE_KERNEL_META=1 and retry to save compile.log, replay.sh, and the resource "
+            "worktree");
+        return;
+    }
+    try {
+        const fs::path compilationLogPath = diagnosticDirectoryPath_ / "compile.log";
+        const fs::path replayScriptPath = diagnosticDirectoryPath_ / "replay.sh";
+        ACLRTC_LOG_INFO(
+            "Compilation diagnostics saved: compile_log=%s replay_script=%s; inspect compile.log or run replay.sh "
+            "to reproduce the failed command",
+            compilationLogPath.c_str(), replayScriptPath.c_str());
+    } catch (...) {
+        ACLRTC_LOG_INFO(
+            "Compilation diagnostics were enabled; inspect kernel_meta for compile.log and replay.sh");
     }
 }
 

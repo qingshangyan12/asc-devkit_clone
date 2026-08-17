@@ -47,7 +47,8 @@ bool CopyRequiredBoundedCString(const char* input, const char* inputLocation, st
     }
     if (inputLength > MAX_REQUEST_TEXT_BYTES - copiedRequestTextByteCount) {
         ACLRTC_LOG_ERROR(
-            "%s would exceed the %zu-byte combined request text limit: already_copied=%zu field_bytes=%zu",
+            "%s would exceed the %zu-byte combined request text limit: already_copied=%zu field_bytes=%zu; reduce "
+            "the number or length of compiler options",
             inputLocation, MAX_REQUEST_TEXT_BYTES, copiedRequestTextByteCount, inputLength);
         return false;
     }
@@ -252,7 +253,8 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
     if (apiRequest.optionCount > MAX_USER_OPTION_COUNT ||
         apiRequest.skOptionCount > MAX_USER_OPTION_COUNT - apiRequest.optionCount) {
         ACLRTC_LOG_ERROR(
-            "optionCount + skOptionCount must not exceed %zu: optionCount=%llu skOptionCount=%llu",
+            "optionCount + skOptionCount must not exceed %zu: optionCount=%llu skOptionCount=%llu; remove excess "
+            "compiler options",
             MAX_USER_OPTION_COUNT, static_cast<unsigned long long>(apiRequest.optionCount),
             static_cast<unsigned long long>(apiRequest.skOptionCount));
         return ACLRTC_ERROR_INVALID_INPUT;
