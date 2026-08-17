@@ -10,7 +10,7 @@
 
 本文同时说明桩替代了哪些硬件或运行时能力、哪些生产代码被真实执行、哪些结论不能由当前ST推出，并给出覆盖率报告的统计口径和产物位置。
 
-本文基于asc-devkit `cc0806_2`分支提交`58431d84d`编写。当前验证记录为AICPU主目标85/85通过，其中AllGather测试18/18通过。临时恢复rebase后缺失的CMake入口和链接桩，并按最新tiling合同修正测量fixture后，CCU host测试12/12通过。临时源码改动不属于最终文档patch，当前仓内接入缺口见“构建与执行”章节。
+本文已基于asc-devkit `cc0806_2`分支提交`6e3d9c579`刷新，对应同步的HCCL revision为`33034c841f5efdf8cf54a4ee6e145a0036a533f2`。当前验证记录为AICPU主目标86/86通过，其中AllGather测试19/19通过；19项中包含18项MC2 tiling到AICPU launch流程测试和1项NHR非均匀通道资源公式回归测试。临时恢复rebase后缺失的CMake入口和链接桩，并按最新tiling合同修正测量fixture后，CCU host测试12/12通过。临时源码改动不属于最终文档patch，当前仓内接入缺口见“构建与执行”章节。
 
 ## 核心结论
 
@@ -24,8 +24,8 @@ CCU host ST的真实性边界与AICPU不同。它真实执行`hccl_mc2.cc`和`hc
 
 | 测试层 | 当前用例 | 已验证结果 | 能证明的核心结论 |
 | --- | ---: | --- | --- |
-| AICPU主ST | 85 | 85/85通过 | 本仓AICPU算法、任务模型和语义检查整体可运行 |
-| AllGather ST | 18 | 18/18通过 | MC2 tiling入口、算法命中、双template任务图和AllGather符号语义正确 |
+| AICPU主ST | 86 | 86/86通过 | 本仓AICPU算法、任务模型和语义检查整体可运行 |
+| AllGather ST | 19 | 19/19通过 | 18项MC2流程测试验证算法命中、双template任务图和AllGather符号语义，1项资源测试验证NHR非均匀通道公式 |
 | CCU host ST | 12 | 本轮测量12/12通过 | MC2 host资源、KFC opId、Server共享与隔离逻辑符合断言 |
 | CCU device或硬件ST | 不在本轮范围 | 未执行 | 当前不能证明CCU IR和硬件执行正确 |
 
@@ -49,6 +49,7 @@ CCU host ST的真实性边界与AICPU不同。它真实执行`hccl_mc2.cc`和`hc
 - 覆盖小数据、大数据、分段loop和尾块路径。
 - 覆盖`int8_t`、`uint8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`、`double`对应的HCCL枚举路径。
 - 对Concurrent用例额外验证算法名和活跃task queue数量。
+- 对NHR非均匀通道场景验证数据面使用最小通道数、资源申请使用最大通道数，并验证线程数按最大通道数的两倍计算。
 - 对open executor用例证明产品`LaunchOpenOpParamDataImpl`入口可达。
 
 ### CCU host目标
@@ -72,7 +73,7 @@ CCU host ST的真实性边界与AICPU不同。它真实执行`hccl_mc2.cc`和`hc
 | AICPU | selector、executor、template、Hcomm任务、任务图和语义 | AICPU真实硬件时延、带宽和固件行为 |
 | CCU | host资源、KFC配置、opId、cache和参数合同 | CCU硬件执行、设备IR时序和真实链路数据搬运 |
 | 拓扑 | 当前用例中的单die、Mesh、NHR、多层和UBX模拟拓扑 | 双die |
-| Jetty | 第一阶段单Jetty可达路径 | 真实多Jetty端到端执行 |
+| Jetty | 第一阶段可达路径，以及非均匀通道`1/3`配置下的最小/最大通道资源公式 | 真实多Jetty硬件数据面端到端执行 |
 | 算法 | AllGather及CCU host中的AllReduce、AllToAll、AllToAllV配置 | HalfAllToAllV |
 | 校验 | 返回值、算法名、task queue、依赖图、内存语义、配置字段 | 性能收益、功耗、拥塞和真实故障恢复 |
 
@@ -109,6 +110,8 @@ flowchart TB
 | Concurrent executor | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_concurrent_executor.cc` | 合并并拆分Mesh/NHR资源，按37:25切分数据 |
 | Mesh template | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc` | 生成Mesh LocalCopy、Read和同步任务 |
 | NHR template | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc` | 生成NHR多轮传播、末步读取和PostCopy任务 |
+| template通道工具 | `impl/adv_api/detail/hccl/cc/src/ops/op_common/template/template_utils.h` | 分别计算各远端rank通道数的最小值和最大值 |
+| 生产channel实现 | `impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/channel/channel.cc` | 按最新HCCL规则选择NHR拓扑层并创建远端rank channel；AICPU ST中由`channel_stub.cc`替代 |
 | 仿真运行时 | `tests/api/adv_api/hccl/cc/st/algorithm/utils/src/sim_world` | 建立rank、stream、notify、channel和task queue模型 |
 | Hcomm桩 | `tests/api/adv_api/hccl/cc/st/algorithm/utils/src/hccl_proxy/hccl_stub.cc` | 把Hcomm调用转换为带地址和依赖信息的`TaskStub` |
 | ACL Runtime桩 | `tests/api/adv_api/hccl/cc/st/algorithm/utils/src/hccl_proxy/aclrt_stub.cc` | 保存kernel参数并转入产品AICPU入口 |
@@ -400,6 +403,7 @@ flowchart TD
 | 单层Mesh | 5 | 2、3、4、5、8rank | 100个元素 | Mesh直连、多rank和多dtype |
 | NHR | 6 | 2、3、4、6、8rank | 100个元素、1Gi个元素 | 非2次幂、不同dtype、大数据分段 |
 | Parallel Mesh+NHR | 4 | 2x2、2x3、3x3 | 100个元素、300Mi个元素 | 多层并行、loop和尾块 |
+| NHR非均匀通道资源 | 1 | 远端rank通道数为1和3 | 不涉及数据buffer | 最小通道数、最大通道数和线程数公式 |
 
 代码中名为`st_all_gather_a5_aicpu_mesh_1d_6rank_int16_small_data_test`的用例实际`TopoMeta`为`{0,1,2,3,5}`，只包含5个rank。当前ST因此没有真正覆盖单层Mesh 6rank，该问题应在后续用例修正中处理。
 
@@ -413,7 +417,16 @@ flowchart TD
 | 集合通信语义正确 | `CheckAllGather` | 数据来源、slice、依赖、内存覆盖和通信对端错误 |
 | 算法名正确 | `GetAicpuLaunchAlgNames` | selector未命中或错误转发到其他算法 |
 | Concurrent具备多thread任务 | 活跃queue数量至少为4 | 双template资源未拆分或子thread未下发任务 |
+| NHR通道语义正确 | `CalcChannelsPerRankMin`、`CalcChannelsPerRank`和`GetThreadNum` | 非均匀通道下数据面越界、资源少申请或线程数不足 |
 | open入口真实到达 | `GetOpenExecutorLaunchCount` | 测试只走普通入口、open bridge未执行 |
+
+### NHR非均匀通道资源回归
+
+最新HCCL把NHR的通道数拆成两个语义：`channelsPerRank_`保存各远端rank通道数的最小值，控制实际数据传输能够共同使用的Jetty数量；`maxChannelsPerRank_`保存最大值，控制thread和notify等资源按最坏情况足量申请。`GetThreadNum`返回`maxChannelsPerRank_ * 2`，其中后一半thread用于NHR最后一步和PostCopy并行。
+
+`st_all_gather_nhr_uneven_channels_use_min_for_data_and_max_for_threads`构造远端rank通道数为`1/3`的两类输入。第一类是资源计算阶段使用的`std::vector<HcclChannelDesc>`，第二类是资源恢复阶段使用的`std::map<u32, std::vector<ChannelInfo>>`。用例分别断言最小值为1、最大值为3，再调用`InsTempAllGatherNHR::SetchannelsPerRank`恢复template状态，并断言`GetThreadNum`为6。
+
+该用例是针对最新通道公式的组件级回归，不经过`HcclAllocComResourceByTiling`和`SimulateMc2AllGatherLaunch`，因此不能单独作为MC2 E2E证据。其价值在于直接锁定MC2 E2E任务图不容易精确观察的资源边界；其余18项用例继续负责MC2入口、selector、executor、template和集合通信语义验证。
 
 ### Concurrent双template关键流程
 
@@ -489,7 +502,7 @@ sequenceDiagram
 | `hccl_stub.cc` | Hcomm和HCCL运行时 | rank、thread、notify、channel、地址、slice、dtype和reduce op | 驱动、链路传输和硬件错误码 |
 | `sim_communicator.cc` | 通信域 | rank到拓扑位置、context和资源管理 | 多进程通信域和真实网络发现 |
 | `topo_model.cc` | RankGraph拓扑 | Mesh、NHR、Parallel和测试UBX逻辑视图 | 真实Fabric探测和链路状态变化 |
-| `channel_stub.cc` | Channel创建 | 本地/远端rank和channel描述 | 真实Jetty资源、拥塞和带宽 |
+| `channel_stub.cc` | Channel创建 | 确定性的本地/远端rank和channel描述 | 生产`channel.cc`的拓扑层选择、真实Jetty资源、拥塞和带宽 |
 | `mc2_ccu/cann_host_bridge_stub.cc` | 安装版HCCL bridge | 强制不转发，避免绕开本仓公共代码 | 安装版HCCL兼容路径 |
 | `mc2_ccu/hccl_op_common_stub.cc` | CCU selector和executor依赖 | 固定算法映射、资源序列化、cache复用和kernel注册计数 | 生产selector拓扑判断和真实executor `CalcRes` |
 | `hcomm_ccu_stub.cc` | CCU资源和kernel注册 | token派生、注册次数和资源句柄关系 | CCU编译器、IR下发和设备执行 |
@@ -651,6 +664,7 @@ flowchart TD
 - input/output overlap等selector拒绝路径。
 - 普通AICPU入口和open executor入口。
 - Concurrent的Mesh/NHR准确thread数量、channel分段和37:25字节范围。
+- NHR远端rank通道数不一致时的最小数据面通道数、最大资源通道数，以及从MC2资源阶段恢复后的thread数量。
 
 ### 新增CCU host算法
 
@@ -672,10 +686,10 @@ flowchart TD
 
 报告拆分为两个独立数据集：
 
-- AICPU AllGather：只运行`ST_ALL_GATHER_AICPU_TEST.*`的18个用例。
+- AICPU AllGather最新同步范围：只运行`ST_ALL_GATHER_AICPU_TEST.*`的19个用例，提取`AicpuAllGatherSoleMesh`、`AicpuAllGatherConcurMeshNHR`及其MC2公共路径生产文件。
 - CCU host：只运行`CcuMc2AllToAllVTest.*`的12个用例。
 
-每次采集前使用`lcov --zerocounters`清理旧计数，避免其他85项ST或历史运行污染结果。采集后使用`lcov --extract`保留对应生产目录，再由`genhtml`生成逐文件源码视图。HTML中每个可执行代码行都会显示执行次数，能够精确区分已覆盖行和未覆盖行。
+每次采集前使用`lcov --zerocounters`清理旧计数，避免主目标中其他用例或历史运行污染结果。采集后使用`lcov --extract`保留对应生产目录，再由`genhtml`生成逐文件源码视图。HTML中每个可执行代码行都会显示执行次数，能够精确区分已覆盖行和未覆盖行。
 
 **图 15**  精确覆盖率采集流程
 
@@ -691,26 +705,24 @@ flowchart LR
 
 ### 实测结果与产物
 
-AllGather 18项用例的生产代码行覆盖率为57.6%，函数覆盖率为58.7%。该分母只包含11个指定生产文件，不包含测试、桩、第三方库、ReduceScatter、AllReduce、AllToAll和DPU文件。
+AllGather 19项用例在最新HCCL同步关注范围内的生产代码行覆盖率为57.0%，函数覆盖率为61.8%。该分母只包含9个指定生产文件，不包含测试、桩、第三方库、Parallel和Sequence executor、open executor、其他集合通信、DPU、双die及HalfAllToAllV文件。
 
 **表 8**  AICPU AllGather逐文件覆盖率
 
 | 生产文件 | 行覆盖 | 函数覆盖 |
 | --- | ---: | ---: |
-| `comm_kfc_open_kernel_executor.cc` | 42/88（47.7%） | 5/7（71.4%） |
 | `common/hccl_alloc_ctx_res.cc` | 272/628（43.3%） | 26/46（56.5%） |
 | `common/hccl_mc2.cc` | 59/270（21.9%） | 5/25（20.0%） |
 | `ins_v2_all_gather_concurrent_executor.cc` | 205/217（94.5%） | 9/9（100.0%） |
-| `ins_v2_all_gather_parallel_executor.cc` | 252/282（89.4%） | 12/24（50.0%） |
-| `ins_v2_all_gather_sequence_executor.cc` | 0/116（0.0%） | 0/5（0.0%） |
 | `ins_v2_all_gather_sole_executor.cc` | 87/90（96.7%） | 10/10（100.0%） |
 | `all_gather_auto_selector.cc` | 17/97（17.5%） | 1/8（12.5%） |
 | `ins_temp_all_gather_mesh_1D.cc` | 161/206（78.2%） | 12/15（80.0%） |
-| `ins_temp_all_gather_nhr.cc` | 286/302（94.7%） | 22/23（95.7%） |
+| `ins_temp_all_gather_nhr.cc` | 293/309（94.8%） | 23/24（95.8%） |
 | `kernel_launch.cc` | 97/269（36.1%） | 9/17（52.9%） |
-| 合计 | 1478/2565（57.6%） | 111/189（58.7%） |
+| `template_utils.h` | 66/121（54.5%） | 12/19（63.2%） |
+| 合计 | 1257/2207（57.0%） | 107/173（61.8%） |
 
-Sequence executor为0%并不表示NHR template未运行。当前NHR和Parallel场景由Sole、Parallel和Concurrent executor组织，NHR template本身达到286/302行；`ins_v2_all_gather_sequence_executor.cc`没有被这18项用例选择，必须作为明确的executor覆盖缺口保留。
+最新数据集绑定HCCL revision `33034c841f5efdf8cf54a4ee6e145a0036a533f2`。报告中的目标基线为asc-devkit `ad0c8d44e`加本次同步patch，该patch现已提交为`6e3d9c579`。新增资源回归使NHR template达到293/309行，并把`template_utils.h`纳入逐行统计。AICPU ST为保证channel确定性而链接`channel_stub.cc`，所以生产`channel.cc`不在该覆盖率分母中；其最新拓扑层门禁和诊断日志已经通过真实`mc2_client`目标编译，但没有ST逐行覆盖证据。
 
 CCU host 12项用例的生产代码行覆盖率为48.5%，函数覆盖率为52.6%。该口径只包含MC2公共入口、公共资源流程和KFC配置头文件。
 
@@ -727,15 +739,16 @@ CCU host 12项用例的生产代码行覆盖率为48.5%，函数覆盖率为52.6
 
 | 产物 | 说明 |
 | --- | --- |
-| `build_out/mc2_st_coverage/aicpu_allgather/coverage.info` | AllGather 18项用例的LCOV数据 |
-| `build_out/mc2_st_coverage/aicpu_allgather/html/index.html` | AllGather逐文件源码报告，每行显示执行次数 |
-| `build_out/mc2_st_coverage/aicpu_allgather/line_coverage.tsv` | 2565条生产代码行的文件、行号、命中次数和覆盖状态 |
-| `build_out/mc2_st_coverage/aicpu_allgather/test.log` | AllGather 18/18过滤运行日志 |
+| `build_out/mc2_st_coverage/aicpu_allgather_hccl_33034c84/coverage.info` | AllGather 19项用例的最新同步范围LCOV数据 |
+| `build_out/mc2_st_coverage/aicpu_allgather_hccl_33034c84/html/index.html` | AllGather最新同步范围逐文件源码报告，每行显示执行次数 |
+| `build_out/mc2_st_coverage/aicpu_allgather_hccl_33034c84/line_coverage.tsv` | 2207条生产代码行的文件、行号、命中次数和覆盖状态 |
+| `build_out/mc2_st_coverage/aicpu_allgather_hccl_33034c84/test.log` | AllGather 19/19过滤运行日志 |
+| `build_out/mc2_st_coverage/aicpu_allgather_hccl_33034c84/coverage_summary.txt` | HCCL revision、目标基线、逐文件覆盖率和限制说明 |
 | `build_out/mc2_st_coverage/ccu_host/coverage.info` | CCU host 12项用例的LCOV数据 |
 | `build_out/mc2_st_coverage/ccu_host/html/index.html` | CCU host逐文件源码报告，每行显示执行次数 |
 | `build_out/mc2_st_coverage/ccu_host/line_coverage.tsv` | 943条生产代码行的文件、行号、命中次数和覆盖状态 |
 | `build_out/mc2_st_coverage/ccu_host/test.log` | CCU host 12/12过滤运行日志 |
-| `build_out/mc2_st_coverage/coverage_summary.txt` | 两个数据集的文件、函数、行覆盖率和测量约束汇总 |
+| `build_out/mc2_st_coverage/coverage_summary.txt` | 历史AICPU和CCU两个数据集的汇总；最新AICPU结论以上述revision目录为准 |
 
 `line_coverage.tsv`每一行均包含`covered`或`uncovered`、仓内相对文件路径、准确行号和命中次数。HTML报告在同一行展示源码，因此可以从汇总下钻到“哪个文件的哪一行是否执行”。解读覆盖率时必须结合断言强度：代码行执行过不等于行为正确；相反，selector桩返回了目标算法名，也不能证明生产CCU selector已执行。
 
@@ -755,6 +768,8 @@ CCU host 12项用例的生产代码行覆盖率为48.5%，函数覆盖率为52.6
 | AICPU launch入口 | `impl/adv_api/detail/hccl/cc/src/ops/op_common/template/aicpu/kernel_launch.cc` | 从launch参数恢复`OpParam`和算法资源，查找executor并调用`Orchestrate` |
 | AICPU launch接口 | `impl/adv_api/detail/hccl/cc/src/ops/op_common/template/aicpu/kernel_launch.h` | 声明普通AICPU入口和主thread资源查询接口 |
 | open executor入口 | `impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_open_kernel_executor.cc` | 在open模式下恢复资源，进入本地registry和task cache执行路径 |
+| 通道数公共工具 | `impl/adv_api/detail/hccl/cc/src/ops/op_common/template/template_utils.h` | 为descriptor和运行期channel map分别计算每rank最小及最大通道数 |
+| 生产channel构造 | `impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/channel/channel.cc` | 执行NHR拓扑层过滤和channel创建；当前AICPU ST使用桩替代，只通过`mc2_client`编译验证 |
 
 ### AICPU MC2测试机制文件
 
@@ -767,7 +782,7 @@ CCU host 12项用例的生产代码行覆盖率为48.5%，函数覆盖率为52.6
 | 测试工具构建入口 | `tests/api/adv_api/hccl/cc/st/algorithm/utils/CMakeLists.txt` | 接入测试工具源码目录 |
 | 测试工具源码入口 | `tests/api/adv_api/hccl/cc/st/algorithm/utils/src/CMakeLists.txt` | 组装仿真世界、Hcomm代理、验证器和AICPU目标 |
 | AICPU产品源码接入 | `tests/api/adv_api/hccl/cc/st/algorithm/utils/src/aicpu/CMakeLists.txt` | 编译MC2公共入口、selector、executor、template、kernel launch和open executor |
-| AllGather E2E用例 | `tests/api/adv_api/hccl/cc/st/algorithm/testcase/all_gather_aicpu_testcase.cc` | 构造MC2 tiling、多rank环境、buffer和模拟launch，并触发结果校验 |
+| AllGather用例 | `tests/api/adv_api/hccl/cc/st/algorithm/testcase/all_gather_aicpu_testcase.cc` | 包含18项MC2流程测试和1项NHR非均匀通道资源公式回归测试 |
 | AllToAll AICPU用例 | `tests/api/adv_api/hccl/cc/st/algorithm/testcase/all_to_all_mesh1d_aicpu_testcase.cc` | 验证本地registry、channel阈值和peer分组轮次 |
 | MC2 AICPU task cache用例 | `tests/api/adv_api/hccl/cc/st/algorithm/testcase/mc2_aicpu_task_cache_testcase.cc` | 验证task cache计划、tag、容量、命中、淘汰和失败回退 |
 | AllReduce用例 | `tests/api/adv_api/hccl/cc/st/algorithm/testcase/all_reduce_testcase.cc` | 验证AllReduce算法边界、分段和任务语义 |
@@ -792,23 +807,23 @@ CCU host 12项用例的生产代码行覆盖率为48.5%，函数覆盖率为52.6
 | 任务图修整 | `tests/api/adv_api/hccl/cc/st/algorithm/utils/src/hccl_verifier/mem_conflict_check/task_graph_revamp.cc` | 补全通信双边关系，形成可做语义传播的任务图 |
 | AllGather语义检查 | `tests/api/adv_api/hccl/cc/st/algorithm/utils/src/hccl_verifier/semantics_check/allgather_semantics_checker.cc` | 验证每个rank输出是否包含全部rank的输入来源标签 |
 
-上述5个测试源文件共同组成当前AICPU主目标的85项用例。其中`all_gather_aicpu_testcase.cc`采用本文重点讲解的MC2 tiling到AICPU launch端到端机制；其他文件分别验证本地注册、task cache或已有算法任务语义，不能统一描述为已经从MC2 tiling起步。
+上述5个测试源文件共同组成当前AICPU主目标的86项用例。`all_gather_aicpu_testcase.cc`中的18项用例采用本文重点讲解的MC2 tiling到AICPU launch流程，新增的非均匀通道用例直接验证资源公式；其他文件分别验证本地注册、task cache或已有算法任务语义，不能统一描述为已经从MC2 tiling起步。
 
 ### AllGather分算法文件
 
-AllGather的18项AICPU用例共用`tests/api/adv_api/hccl/cc/st/algorithm/testcase/all_gather_aicpu_testcase.cc`，并未按算法拆成多个测试源文件。下表通过用例名前缀标识该文件中的算法测试段。
+AllGather的19项AICPU用例共用`tests/api/adv_api/hccl/cc/st/algorithm/testcase/all_gather_aicpu_testcase.cc`，并未按算法拆成多个测试源文件。下表通过用例名前缀标识该文件中的算法测试段，并区分MC2流程测试与直接资源公式回归。
 
 **表 13**  AllGather分算法生产文件与测试用例位置
 
 | 算法或场景 | 生产算法文件 | 共用测试文件中的用例标识 | 当前覆盖状态 |
 | --- | --- | --- | --- |
-| 公共selector | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/selector/all_gather_auto_selector.cc` | 全部`ST_ALL_GATHER_AICPU_TEST`用例 | 18项用例均经过selector |
+| 公共selector | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/selector/all_gather_auto_selector.cc` | 除非均匀通道资源回归外的`ST_ALL_GATHER_AICPU_TEST`用例 | 18项MC2流程测试经过selector |
 | `AicpuAllGatherSoleMesh` | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_sole_executor.cc`；`impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc` | `st_all_gather_a5_aicpu_ubx_4rank_512kb_selects_sole_mesh_test`；`st_all_gather_a5_aicpu_mesh_1d_*` | 覆盖512KiB阈值及2、3、4、5、8rank Mesh场景 |
-| `InsAllGatherNHR` | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_sole_executor.cc`；`impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc` | `st_all_gather_a5_aicpu_nhr_*` | 覆盖2、3、4、6、8rank及大数据分段 |
+| `InsAllGatherNHR` | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_sole_executor.cc`；`impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc`；`impl/adv_api/detail/hccl/cc/src/ops/op_common/template/template_utils.h` | `st_all_gather_a5_aicpu_nhr_*`；`st_all_gather_nhr_uneven_channels_use_min_for_data_and_max_for_threads` | 覆盖2、3、4、6、8rank、大数据分段及非均匀通道资源公式 |
 | `InsAllGatherParallelMesh1DNHR` | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_parallel_executor.cc`；Mesh和NHR两个template文件 | `st_all_gather_a5_aicpu_parallel_nhr_mesh1d_*` | 覆盖2x2、2x3、3x3拓扑及大数据尾块 |
-| `InsAllGatherParallelMesh1DNHRUBX` | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_parallel_executor.cc`；Mesh和NHR两个template文件 | 无独立强制命名用例 | 生产注册存在，当前18项用例没有算法名断言证据 |
-| `AicpuAllGatherConcurMeshNHR` | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_concurrent_executor.cc`；`impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc`；`impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc` | `st_all_gather_a5_aicpu_ubx_4rank_concurrent_mesh_nhr_e2e_test`；`st_all_gather_a5_aicpu_ubx_4rank_concurrent_mc2_open_executor_e2e_test` | 覆盖普通入口、open入口和多thread任务生成 |
-| `InsAllGatherMeshNhrDPU` | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc`；`impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc` | 当前无对应AICPU MC2用例 | DPU不在本轮范围，Sequence executor覆盖率为0/116行 |
+| `InsAllGatherParallelMesh1DNHRUBX` | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_parallel_executor.cc`；Mesh和NHR两个template文件 | 无独立强制命名用例 | 生产注册存在，当前19项用例没有算法名断言证据 |
+| `AicpuAllGatherConcurMeshNHR` | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_concurrent_executor.cc`；`impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc`；`impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc`；`impl/adv_api/detail/hccl/cc/src/ops/op_common/template/template_utils.h` | `st_all_gather_a5_aicpu_ubx_4rank_concurrent_mesh_nhr_e2e_test`；`st_all_gather_a5_aicpu_ubx_4rank_concurrent_mc2_open_executor_e2e_test`；非均匀通道资源回归 | 覆盖普通入口、open入口、多thread任务生成，以及NHR最小/最大通道资源语义 |
+| `InsAllGatherMeshNhrDPU` | `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc`；`impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc` | 当前无对应AICPU MC2用例 | DPU不在本轮范围；历史宽口径报告中Sequence executor覆盖率为0/116行，最新同步范围报告已将其排除 |
 
 表13中的“Mesh和NHR两个template文件”分别指`ins_temp_all_gather_mesh_1D.cc`和`ins_temp_all_gather_nhr.cc`。用例文件中的`st_all_gather_a5_aicpu_mesh_1d_6rank_int16_small_data_test`当前实际构造5rank，这也是表15保留的测试缺口。
 
@@ -851,6 +866,8 @@ build/tests/api/adv_api/hccl/cc/ut/algorithm/testcase/\
 ascendc_ut_adv_api_hccl_cc_algorithm_ascend950pr_9599_AIC \
   --gtest_filter='ST_ALL_GATHER_AICPU_TEST.*'
 ```
+
+在2026年8月17日对当前HEAD重新执行，AllGather过滤用例19/19通过，完整AICPU主目标86/86通过。完整目标可直接运行同一二进制而不设置`--gtest_filter`。
 
 ### CCU host目标
 
@@ -910,11 +927,12 @@ ascendc_ut_adv_api_hccl_ccu_mc2_host \
 | --- | --- | --- | --- |
 | AICPU真实硬件执行 | 当前为CPU任务模型 | 驱动、固件、DMA和时序问题无法发现 | 增加上板MC2 E2E |
 | open executor完整任务图语义 | 初始常驻thread wait不在捕获窗口 | open路径只证明入口可达 | 扩展捕获窗口或提供Server生命周期fixture |
-| 真实多Jetty Concurrent | 第一阶段仍受channel数量门禁约束 | 多Jetty资源拆分和thread公式未验证 | 第二阶段补多Jetty资源与E2E |
+| 真实多Jetty Concurrent | 当前只用`1/3`非均匀通道输入直接验证最小/最大通道和thread公式，MC2流程仍使用`channel_stub.cc` | 真实channel创建、资源拆分和硬件数据面未验证 | 增加多Jetty MC2资源E2E，并在硬件验证数据面 |
+| 生产`channel.cc`的NHR拓扑层选择 | AICPU ST链接`channel_stub.cc` | 最新拓扑层门禁回归只能由编译发现，无法由当前ST逐行和行为断言发现 | 增加可注入RankGraph的生产channel Host测试 |
 | Concurrent精确37:25切分断言 | 当前只断言活跃queue数量 | 比例或offset错误可能依赖语义校验间接发现 | 直接检查两段slice边界和总和 |
 | 单层Mesh 6rank | 用例名为6rank，实际只有5rank | 6rank Mesh路径没有证据 | 修正`TopoMeta`为6个元素 |
 | AICPU错误路径 | 主要为成功场景 | tiling版本、offset、混合engine和空资源校验不足 | 增加参数化负向用例 |
-| AllGather Sequence executor | 18项用例未选择该executor，覆盖率为0/116行 | Sequence组织逻辑发生回归时当前ST无法发现 | 增加明确强制或命中Sequence executor的E2E用例 |
+| AllGather Sequence executor | 19项用例未选择该executor，历史宽口径覆盖率为0/116行 | Sequence组织逻辑发生回归时当前ST无法发现 | 增加明确强制或命中Sequence executor的E2E用例 |
 | 生产CCU selector | host测试使用固定映射桩 | 真实拓扑条件和优先级错误无法发现 | 新增链接生产selector的host测试 |
 | 生产CCU executor `CalcRes` | host测试返回`MockInsCollAlgBase` | channel、token和kernel资源请求错误无法发现 | 拆分最小依赖并链接真实executor |
 | 外层CCU多tiling E2E | `CheckCcuAlgorithmsRegistered`当前拒绝`tilingNum > 1` | 多primitive共享只在内部函数层得到验证 | 框架开放多tiling后从`HcclAllocComResourceByTiling`补E2E |
