@@ -23,7 +23,6 @@
 namespace asc {
 namespace te {
 namespace detail {
-template <typename T>
 //TODO: support uint64_t/int64_t
 template <typename T>
 inline constexpr bool is_select_support_type = Std::is_one_of_v<T, bool, uint8_t, int8_t, fp8_e4m3fn_t,

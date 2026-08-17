@@ -22,7 +22,7 @@ __aicore__ inline void TestInterleave()
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
 
-    auto [dst0, dst1] = asc::te::interleave(src0, src1);
+    auto [dst0, dst1] = asc::te::interleave<T>(src0, src1);
     (void)dst0;
     (void)dst1;
 }
@@ -33,7 +33,7 @@ __aicore__ inline void TestDeinterleave()
     asc::te::reg_tensor<T> src0 {};
     asc::te::reg_tensor<T> src1 {};
 
-    auto [dst0, dst1] = asc::te::deinterleave(src0, src1);
+    auto [dst0, dst1] = asc::te::deinterleave<T>(src0, src1);
     (void)dst0;
     (void)dst1;
 }

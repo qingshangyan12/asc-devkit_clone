@@ -67,26 +67,26 @@ __simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_te
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) interleave(reg_tensor<T> src0, reg_tensor<T> src1) {
+__simd_callee__ inline reg_pair<T> interleave(reg_tensor<T> src0, reg_tensor<T> src1) {
     static_assert(detail::is_data_reorder_support_type<T>, "interleave only supports uint8_t, int8_t, "
         "fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, "
         "int32_t and float.");
     reg_pair<T> dst;   
     asc_intlv(dst.first.reg, dst.second.reg, src0.reg, src1.reg);
-    dst0.mask = with_mask(all_mask<uint8_t>());;
-    dst1.mask = dst0.mask;
+    dst.first.mask = with_mask(all_mask<uint8_t>());;
+    dst.second.mask = dst.first.mask;
     return dst;
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) deinterleave(reg_tensor<T> src0, reg_tensor<T> src1) {
+__simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T> src1) {
     static_assert(detail::is_data_reorder_support_type<T>, "deinterleave only supports uint8_t, int8_t, "
         "fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, "
         "int32_t and float.");
     reg_pair<T> dst;   
     asc_deintlv(dst.first.reg, dst.second.reg, src0.reg, src1.reg);
-    dst0.mask = with_mask(all_mask<uint8_t>());;
-    dst1.mask = dst0.mask;
+    dst.first.mask = with_mask(all_mask<uint8_t>());;
+    dst.second.mask = dst.first.mask;
     return dst;
 }
 } // namespace te
