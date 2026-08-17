@@ -340,16 +340,20 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 "resource_id",
                 "source_file",
                 "resource_path",
-                "option",
+                "options",
                 "kernels",
             },
         )
         self.assertEqual(manifest["schema_version"], "1.0")
         self.assertEqual(manifest["source_file"], "add_custom.cpp")
         self.assertEqual(manifest["resource_path"], "resources")
-        self.assertEqual(manifest["option"]["common_compile"][:2], ["-c", "-O3"])
+        self.assertEqual(manifest["options"]["common_compile"][:2], ["-c", "-O3"])
 
         kernel = manifest["kernels"][0]
+        self.assertEqual(
+            kernel["link_options"],
+            ["-m", "aicorelinux", "-r", "-Ttext=0", "-q", "-x"],
+        )
         constant_info = kernel["constant_infos"][0]
         self.assertEqual(constant_info["template"], "@@STATIC_VALUE_tiling_data@@")
         self.assertEqual(
@@ -377,7 +381,14 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
         serialized = json.dumps(manifest)
         self.assertNotIn("intermediates", serialized)
-        for old_name in ("static_inputs", "token", "obj_name", "obj_type"):
+        for old_name in (
+            "static_inputs",
+            "token",
+            "obj_name",
+            "obj_type",
+            "option",
+            "link_option",
+        ):
             self.assertNotIn(f'"{old_name}"', serialized)
         self.assertNotIn(self.root, serialized)
         resource_root = os.path.join(self.output_root, "manifest", "resources")
@@ -400,8 +411,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             self.assertEqual(command["type"], "compile")
             self.assertNotIn("stage", command)
             expanded_cmd = list(command["cmd"])
-            option_index = expanded_cmd.index("${option:common_compile}")
-            expanded_cmd[option_index : option_index + 1] = manifest["option"][
+            option_index = expanded_cmd.index("${options:common_compile}")
+            expanded_cmd[option_index : option_index + 1] = manifest["options"][
                 "common_compile"
             ]
             self.assertIn("-DCONST_TILING", expanded_cmd)
@@ -522,8 +533,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             self.assertEqual(template_text.count(constant_info["template"]), 1)
         for command in kernel["objects"][0]["commands"]:
             expanded_cmd = list(command["cmd"])
-            option_index = expanded_cmd.index("${option:common_compile}")
-            expanded_cmd[option_index : option_index + 1] = manifest["option"][
+            option_index = expanded_cmd.index("${options:common_compile}")
+            expanded_cmd[option_index : option_index + 1] = manifest["options"][
                 "common_compile"
             ]
             self.assertEqual(
@@ -893,8 +904,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
         sk_compile = sk_object["commands"][0]["cmd"]
         expanded_sk_compile = list(sk_compile)
-        option_index = expanded_sk_compile.index("${option:common_compile}")
-        expanded_sk_compile[option_index : option_index + 1] = manifest["option"][
+        option_index = expanded_sk_compile.index("${options:common_compile}")
+        expanded_sk_compile[option_index : option_index + 1] = manifest["options"][
             "common_compile"
         ]
         self.assertTrue(
