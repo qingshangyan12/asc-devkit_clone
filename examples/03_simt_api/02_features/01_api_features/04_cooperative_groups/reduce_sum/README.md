@@ -50,8 +50,7 @@ CANN 9.2.0及以上。
 <table>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">input</td><td align="center">[4096]</td><td align="center">int32</td><td align="center">ND</td></tr>
-<tr><td rowspan="4" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">total_grid（CASE=0）</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
+<tr><td rowspan="3" align="center">样例输出</td><td align="center">total_grid（CASE=0）</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
 <tr><td align="center">total_block（CASE=1）</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
 <tr><td align="center">total_tile（CASE=2）</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_grid_group / reduce_thread_block / reduce_block_tile</td></tr>
