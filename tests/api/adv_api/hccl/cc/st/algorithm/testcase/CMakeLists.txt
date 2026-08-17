@@ -10,8 +10,11 @@
 
 set(src_list
     main.cc
+    all_gather_aicpu_testcase.cc
     all_to_all_mesh1d_aicpu_testcase.cc
     mc2_aicpu_task_cache_testcase.cc
+    all_reduce_testcase.cc
+    alltoallv_testcase.cc
 )
 
 add_executable(${HCCL_CHECKER_TARGET} ${src_list})
@@ -58,3 +61,5 @@ run_llt_test(
     TARGET ${HCCL_CHECKER_TARGET}
     TASK_NUM 1
 )
+
+add_subdirectory(mc2_ccu)

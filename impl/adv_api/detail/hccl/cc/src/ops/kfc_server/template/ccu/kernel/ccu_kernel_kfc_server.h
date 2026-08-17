@@ -16,6 +16,10 @@
 #include "utils.h"
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
+#include "../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
+#include "../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
+#include "../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 constexpr uint64_t INVALID_U64 = UINT64_MAX;
@@ -26,15 +30,20 @@ constexpr uint32_t CCU_TASK_NUM_MAX = 64;
 
 // new---20260603
 struct CcuKernelArgKfcServer : CcuKernelArgBase {
-    uint64_t rankSize;
-    uint32_t rankId;
-    bool loadFromMem;
+    uint64_t rankSize = 0;
+    uint32_t rankId = 0;
+    bool loadFromMem = false;
+    KfcServerRole role = KfcServerRole::DEFAULT;
+    uint32_t jettyNum = 1;
     OpParam opParam;
     std::vector<std::vector<uint32_t>> subCommRanks;
+    std::vector<uint64_t> supportedOpIds;
+    std::vector<OpParam> supportedOpParams;
+    std::vector<KfcNhrStepInfo> nhrStepInfoVector;
+    std::map<uint32_t, uint32_t> nhrRank2ChannelIdx;
 };
 
-// 第一层同步：missionId=0 与missionId>0之间的
-// 第二层同步：在missionId=0中，dieId=0与dieId=1之间的同步
+// mission 0 owns the Host queue. mission 1 follows it through the shared mission start/done regions.
 struct KfcServerContext : CcuKernelCtxBase {
     const CcuKernelArgKfcServer* arg;
 
@@ -42,6 +51,8 @@ struct KfcServerContext : CcuKernelCtxBase {
     ccu::Variable ckeAddr;
     ccu::Variable waitAddr;   // HBM上的每轮开始信号的首地址
     ccu::Variable recordAddr; // HBM上的每轮完成信号的首地址
+    ccu::Variable missionStartAddr;
+    ccu::Variable missionDoneAddr;
 
     ccu::Variable token;
     ccu::Variable dieNum; // Die数量，用于判断单双Die，默认为1即单Die
@@ -53,8 +64,7 @@ struct KfcServerContext : CcuKernelCtxBase {
     const char* exportDieSig;
     const char* importDieSig;
 
-    // TODO：当前missionNum_=1，missionIndex_=0---
-    // 用于Mission间同步信号
+    // Reserved for a future hardware-notify implementation. The current protocol synchronizes through HBM.
     std::vector<const char*> exportMissoinSig;
     std::vector<const char*> importMissionSig;
     // 用于Mission间同步变量

@@ -19,66 +19,49 @@ SelectorStatus AllGatherAutoSelector::SelectCcuMsAlgo(
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
     HCCL_DEBUG("[AllGatherAutoSelector][%s] start, topoInfo topoLevelNums[%u]", __func__, topoInfo->topoLevelNums);
+    (void)topoInfo;
+    (void)opParam;
     (void)configAlgMap;
-    // Temporary KFC convergence: only enable single-level Mesh1D Mem2Mem before other CCU paths are verified.
-    if (topoInfo->topoLevelNums > 1 || topoInfo->level0Topo != Level0Shape::MESH_1D) {
-        HCCL_DEBUG("[AllGatherAutoSelector] only single level MESH_1D is supported for ccu_ms mode.");
-        return SelectorStatus::NOT_MATCH;
-    }
-    if (IsInputOutputOverlap(opParam)) {
-        HCCL_WARNING("[Algo][AllGatherAutoSelector] ccu_ms does not support inplace allgather.");
-        return SelectorStatus::NOT_MATCH;
-    }
-    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
-    HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
-    return SelectorStatus::MATCH;
-}
-
-SelectorStatus AllGatherAutoSelector::SelectMeshAlgo(
-    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
-{
-    HCCL_DEBUG("[AllGatherAutoSelector][%s] start", __func__);
-    // Temporary KFC convergence: keep ccu_ms selection on Mesh1D Mem2Mem only.
-    if (topoInfo->level0Topo != Level0Shape::MESH_1D) {
-        HCCL_DEBUG(
-            "[AllGatherAutoSelector] Level0Topo[%u] is not supported for ccu_ms mode, reset to default.",
-            topoInfo->level0Topo);
-        return SelectorStatus::NOT_MATCH;
-    }
-    if (IsInputOutputOverlap(opParam)) {
-        HCCL_WARNING("[Algo][AllGatherAutoSelector] ccu_ms does not support inplace allgather.");
-        return SelectorStatus::NOT_MATCH;
-    }
-    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
-    HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
-    return SelectorStatus::MATCH;
+    (void)selectAlgName;
+    HCCL_DEBUG("[AllGatherAutoSelector] CcuSchedAllGatherSoleMesh is not a ccu_ms algorithm.");
+    return SelectorStatus::NOT_MATCH;
 }
 
 SelectorStatus AllGatherAutoSelector::SelectCcuScheduleUBXAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName, const u64 dataSize) const
 {
-    (void)topoInfo;
-    (void)selectAlgName;
-    (void)dataSize;
-    // Temporary KFC convergence: UBX CCU schedule variants are kept disabled until their registration path is restored.
-    HCCL_DEBUG("[AllGatherAutoSelector][%s] UBX topo is not supported for ccu schedule mode.", __func__);
+    if (topoInfo->level0PcieMix) {
+        return SelectorStatus::NOT_MATCH;
+    }
+    bool meshNumEqualsClosNum = false;
+    CHK_PRT_RET(
+        CheckMeshNumEqualToClosNum(topoInfo, meshNumEqualsClosNum) != HCCL_SUCCESS,
+        HCCL_DEBUG("[AllGatherAutoSelector] CheckMeshNumEqualToClosNum failed."), SelectorStatus::NOT_MATCH);
+    if (dataSize <= SMALL_COUNT_512KB) {
+        selectAlgName = "CcuSchedAllGatherSoleMesh";
+        return SelectorStatus::MATCH;
+    }
+    if (meshNumEqualsClosNum && topoInfo->userRankSize <= MAX_RANK_NUM_FOR_CONCURRENT_ALGO) {
+        selectAlgName = "CcuSchedAllGatherConcurMeshNHRMultiLink";
+        return SelectorStatus::MATCH;
+    }
     return SelectorStatus::NOT_MATCH;
 }
 
 SelectorStatus AllGatherAutoSelector::SelectCcuScheduleLevel0Algo(
     const TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName, const u64 dataSize) const
 {
-    (void)dataSize;
-    // Temporary KFC convergence: route only regular Mesh1D to the KFC Mem2Mem implementation.
-    if (topoInfo->level0Topo != Level0Shape::MESH_1D ||
-        topoInfo->level0MeshType == Level0MeshType::TWO_DIE_NOT_REGULAR) {
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
+        return SelectCcuScheduleUBXAlgo(topoInfo, selectAlgName, dataSize);
+    }
+    if (topoInfo->level0Topo != Level0Shape::MESH_1D || topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE) {
         HCCL_DEBUG(
             "[AllGatherAutoSelector] level0Topo[%d], level0MeshType[%d] is not supported for ccu schedule mode.",
             topoInfo->level0Topo, topoInfo->level0MeshType);
         return SelectorStatus::NOT_MATCH;
     }
 
-    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
+    selectAlgName = "CcuSchedAllGatherSoleMesh";
     HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
@@ -95,16 +78,14 @@ SelectorStatus AllGatherAutoSelector::SelectCcuScheduleAlgo(
         HCCL_WARNING("[Algo][AllGatherAutoSelector] ccu schedule does not support inplace allgather.");
         return SelectorStatus::NOT_MATCH;
     }
-    if (topoInfo->topoLevelNums > 1) {
-        // Temporary KFC convergence: multilevel NHR/parallel CCU variants are not selected until they are
-        // re-registered.
-        HCCL_DEBUG("[AllGatherAutoSelector] multi-level topo is not supported for ccu schedule mode.");
+    if (topoInfo->topoLevelNums != 1) {
+        // Temporary KFC convergence: only a single topology level is enabled for this CCU schedule path.
+        HCCL_DEBUG(
+            "[AllGatherAutoSelector] topoLevelNums[%u] is not supported for ccu schedule mode.",
+            topoInfo->topoLevelNums);
         return SelectorStatus::NOT_MATCH;
-    } else {
-        return SelectCcuScheduleLevel0Algo(topoInfo, selectAlgName, dataSize);
     }
-    HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
-    return SelectorStatus::MATCH;
+    return SelectCcuScheduleLevel0Algo(topoInfo, selectAlgName, dataSize);
 }
 
 SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
@@ -135,7 +116,7 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
         }
     } else {
         if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
-            selectAlgName = "InsAllGatherMesh1D";
+            selectAlgName = "AicpuAllGatherSoleMesh";
         } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
             // UBX机型
             bool isMeshNumEqualToClosNum = false;
@@ -148,9 +129,9 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
                 HCCL_ERROR("[AllGatherAutoSelector] CheckClosNumMultipleOfMeshNum failed."), SelectorStatus::NOT_MATCH);
             if (isMeshNumEqualToClosNum && (topoInfo->userRankSize <= MAX_RANK_NUM_FOR_CONCURRENT_ALGO)) {
                 if (dataSize > SMALL_COUNT_512KB) {
-                    selectAlgName = "InsAllGatherConcurrentMesh1DNHR";
+                    selectAlgName = "AicpuAllGatherConcurMeshNHR";
                 } else {
-                    selectAlgName = "InsAllGatherMesh1D";
+                    selectAlgName = "AicpuAllGatherSoleMesh";
                 }
             } else if (isClosNumMultipleOfMeshNum && dataSize > SMALL_COUNT_512KB) {
                 selectAlgName = "InsAllGatherParallelMesh1DNHRUBX";

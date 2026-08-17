@@ -253,8 +253,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     FlushDataCache(&handleParamGM_[handleId]);
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
-        ccuUsedXnNum_ = 9;
-        CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
+        if (newCcuFlag_ && hcclNewContext_->algorithmType[0] ==
+                               static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink)) {
+            ccuUsedXnNum_ = KFC_CONCURRENT_AG_PARAM_NUM;
+            CcuPrepareForConcurrentAllGatherM2M(&handleParamGM_[handleId]);
+        } else {
+            ccuUsedXnNum_ = 10;
+            CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
+        }
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
         ccuUsedXnNum_ = 15;
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
@@ -406,7 +412,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         resourceId);
     GM_ADDR xnAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr) : hcclContext_->xnOffset;
     ccuMsg_.xnAddr = xnAddr + static_cast<uint64_t>(resourceId) * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
-    ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId);
 
     for (int i = 0; i < ccuUsedXnNum_; i++) {
         *(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i)) = xnData_[i];
@@ -437,21 +442,23 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112));
 
+    ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId);
     WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
 }
 
 template <const auto& config>
-__aicore__ inline GM_ADDR HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetCommitCkeAddr(uint8_t msgId)
+__aicore__ inline GM_ADDR HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetCommitCkeAddr(
+    uint8_t msgId)
 {
     GM_ADDR ckeAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->ckeAddr) : hcclContext_->ckeOffset;
     return ckeAddr + static_cast<uint64_t>(msgId) * CCU_CKE_SIZE;
 }
 
 template <const auto& config>
-__aicore__ inline GM_ADDR HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetWaitCkeAddr(uint8_t msgId)
+__aicore__ inline GM_ADDR HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetWaitCkeAddr(
+    uint8_t msgId)
 {
-    uint64_t offset =
-        static_cast<uint64_t>(msgId) * CCU_CKE_SIZE + static_cast<uint64_t>(CCU_CKE_SIZE) * CCU_MAX_MSG_NUM;
+    uint64_t offset = CCU_MAX_MSG_NUM * CCU_CKE_SIZE + static_cast<uint64_t>(msgId) * CCU_CKE_SIZE;
     GM_ADDR ckeAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->ckeAddr) : hcclContext_->ckeOffset;
     return ckeAddr + offset;
 }
@@ -521,20 +528,20 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     }
     uint8_t reqId = handleReqId_[handleId] + handleFinishCnt_[handleId];
     reqId %= CCU_MAX_MSG_NUM;
-    GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
-
 #ifndef ASCENDC_CPU_DEBUG
-    while (true) {
-        uint64_t waitCke = ReadHBMData(waitCKEAddr);
-        if (waitCke != 0) {
-            if (workingFlag_) {
-                finishNumTemp_++;
-                WriteHBMData(finishCntGM_, finishNumTemp_);
+    if (workingFlag_) {
+        GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
+        while (true) {
+            uint64_t waitCke = ReadHBMData(waitCKEAddr);
+            if (waitCke != 0) {
                 WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(waitCKEAddr), CCU_MSG_CKE_INIT_VALUE);
+                break;
             }
-            break;
         }
-        if (!workingFlag_) {
+        finishNumTemp_++;
+        WriteHBMData(finishCntGM_, finishNumTemp_);
+    } else {
+        while (true) {
             uint64_t finshCnt = ReadHBMData(finishCntGM_);
             if (finshCnt > finishNum_) {
                 break;
@@ -582,11 +589,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
 
         KERNEL_LOG(KERNEL_INFO, "ApiClient Finalize handleId:%d, globalCurWaitId_:%d", handleId, globalCurWaitId_);
 
-        ccuMsg_.commitCKEAddr = GetCommitCkeAddr(globalCurWaitId_);
         GM_ADDR xnAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr) : hcclContext_->xnOffset;
         ccuMsg_.xnAddr = xnAddr + CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE * globalCurWaitId_;
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr) = 0xffffffffffffffff;
         FlushDataCache(ccuMsg_.xnAddr);
+        ccuMsg_.commitCKEAddr = GetCommitCkeAddr(globalCurWaitId_);
         WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
         KERNEL_LOG(
             KERNEL_INFO, "ApiClient Finalize success handleId:%d, globalCurWaitId_:%d", handleId, globalCurWaitId_);

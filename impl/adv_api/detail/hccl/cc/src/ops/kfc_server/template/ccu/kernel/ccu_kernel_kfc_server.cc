@@ -10,6 +10,7 @@
 
 #include "ccu_kernel_alg_base.h"
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
+#include "../../../../all_reduce/template/ccu/kernel/ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.h"
 #include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
@@ -31,6 +32,10 @@ const uint32_t HBM_PARAM_IDX_5 = 5;
 const uint32_t HBM_PARAM_IDX_6 = 6;
 const uint32_t HBM_PARAM_IDX_7 = 7;
 const uint32_t HBM_PARAM_IDX_8 = 8;
+const uint32_t HBM_PARAM_IDX_9 = 9;
+const uint32_t HBM_PARAM_IDX_10 = 10;
+
+static_assert(KFC_CONCURRENT_AG_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE, "concurrent AllGather exceeds one XN mission");
 
 const uint32_t SINGLE_DIE = 1;
 const uint32_t DOUBLE_DIE = 2;
@@ -64,21 +69,14 @@ static CcuResult LoadArgs(KfcServerContext& ctx)
 
 static CcuResult CompArgs(KfcServerContext& ctx)
 {
-    // 1、Addr处理
-    ccu::Variable addrBias;
+    ccu::Variable regionSize;
     ctx.waitAddr = ctx.ckeAddr;
-    addrBias = CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE; // 偏移8轮的总宽度
-    ctx.recordAddr = ctx.ckeAddr + addrBias;
+    regionSize = CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE;
+    ctx.recordAddr = ctx.ckeAddr + regionSize;
+    ctx.missionStartAddr = ctx.recordAddr + regionSize;
+    ctx.missionDoneAddr = ctx.missionStartAddr + regionSize;
     return CCU_SUCCESS;
 }
-
-void MissionPreSync(ccu::Variable& func, KfcServerContext& ctx)
-{
-    (void)func;
-    (void)ctx;
-}
-
-void MissionPostSync(KfcServerContext& ctx) { (void)ctx; }
 
 CcuResult WaitTurnStartSig(const ccu::Variable& hbmSigAddr, ccu::Variable& turnStartSig, KfcServerContext& ctx)
 {
@@ -100,6 +98,22 @@ CcuResult SetTurnEndSig(const ccu::Variable& hbmSigAddr, const ccu::Variable& tu
     return CCU_SUCCESS;
 }
 
+CcuResult MissionPreSync(ccu::Variable& missionSig, KfcServerContext& ctx)
+{
+    if (ctx.arg->role == KfcServerRole::ALL_GATHER_MESH) {
+        return SetTurnEndSig(ctx.missionStartAddr, missionSig, ctx);
+    }
+    return WaitTurnStartSig(ctx.missionStartAddr, missionSig, ctx);
+}
+
+CcuResult MissionPostSync(ccu::Variable& missionSig, KfcServerContext& ctx)
+{
+    if (ctx.arg->role == KfcServerRole::ALL_GATHER_MESH) {
+        return WaitTurnStartSig(ctx.missionDoneAddr, missionSig, ctx);
+    }
+    return SetTurnEndSig(ctx.missionDoneAddr, missionSig, ctx);
+}
+
 CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
     // 双Die场景Die1需要读后32个参数，其他场景都是读取前32个参数
@@ -115,22 +129,75 @@ CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Vari
 
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
-    ccu::Variable opType;
-    opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
-    CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
-    {
-        CcuKfcAllGatherMesh1DMem2MemKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
-            ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
-    }
-    CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER))
-    {
-        CcuReduceScatterMesh1DMem2MemKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
-            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
-            ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
+    for (uint32_t i = 0; i < ctx.arg->supportedOpIds.size(); ++i) {
+        const uint64_t opId = ctx.arg->supportedOpIds[i];
+        const OpParam& opParam = ctx.arg->supportedOpParams[i];
+        if (opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
+            if (ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
+                CCU_IF(param[HBM_PARAM_IDX_0] == opId) {
+                    CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
+                        param[KFC_CONCURRENT_AG_NHR_INPUT], param[KFC_CONCURRENT_AG_NHR_OUTPUT], ctx.token,
+                        param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE],
+                        param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE_PER_JETTY],
+                        param[KFC_CONCURRENT_AG_NHR_LAST_SLICE_SIZE_PER_JETTY],
+                        param[KFC_CONCURRENT_AG_NHR_REPEAT_NUM_INV],
+                        param[KFC_CONCURRENT_AG_NHR_INPUT_SLICE_STRIDE],
+                        param[KFC_CONCURRENT_AG_NHR_OUTPUT_SLICE_STRIDE],
+                        param[KFC_CONCURRENT_AG_NHR_INPUT_REPEAT_STRIDE],
+                        param[KFC_CONCURRENT_AG_NHR_OUTPUT_REPEAT_STRIDE],
+                        param[KFC_CONCURRENT_AG_NHR_INPUT_OUTPUT_EQUAL], param[KFC_CONCURRENT_AG_NHR_GO_SIZE_0],
+                        param[KFC_CONCURRENT_AG_NHR_GO_SIZE_1], param[KFC_CONCURRENT_AG_NHR_GO_SIZE_2],
+                        param[KFC_CONCURRENT_AG_NHR_GO_SIZE_3],
+                        ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
+                        ctx.arg->rankId, ctx.arg->jettyNum, ctx.arg->nhrStepInfoVector,
+                        ctx.arg->nhrRank2ChannelIdx);
+                }
+            } else {
+                CCU_IF(param[HBM_PARAM_IDX_0] == opId) {
+                    CcuKfcAllGatherMesh1DMem2MemKernel(
+                        param[KFC_CONCURRENT_AG_MESH_INPUT], param[KFC_CONCURRENT_AG_MESH_OUTPUT], ctx.token,
+                        param[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET], param[KFC_CONCURRENT_AG_MESH_SLICE_SIZE],
+                        param[KFC_CONCURRENT_AG_MESH_GO_SIZE_0], param[KFC_CONCURRENT_AG_MESH_GO_SIZE_1],
+                        param[KFC_CONCURRENT_AG_MESH_GO_SIZE_2], param[KFC_CONCURRENT_AG_MESH_GO_SIZE_3],
+                        param[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL], ctx.arg->channels,
+                        ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+                }
+            }
+        } else if (opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+            CCU_IF(param[HBM_PARAM_IDX_0] == opId) {
+                CcuReduceScatterMesh1DMem2MemKernel(
+                    param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
+                    param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels,
+                    ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId,
+                    opParam.DataDes.dataType, opParam.DataDes.outputType, opParam.reduceType);
+            }
+        } else if (opParam.opType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
+            CCU_IF(param[HBM_PARAM_IDX_0] == opId) {
+                CcuKfcAllReduceMesh1DMem2MemKernel(
+                    param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
+                    param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
+                    param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9], ctx.arg->channels, ctx.arg->channelCount,
+                    static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, opParam.DataDes.dataType,
+                    opParam.DataDes.outputType, opParam.reduceType);
+            }
+        } else if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
+            CCU_IF(param[HBM_PARAM_IDX_0] == opId) {
+                CcuKfcAlltoAllMesh1DKernel(
+                    param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_4],
+                    param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_3],
+                    param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
+                    param[HBM_PARAM_IDX_10], ctx.arg->channels, ctx.arg->channelCount,
+                    static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+            }
+        } else if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+            CCU_IF(param[HBM_PARAM_IDX_0] == opId) {
+                CcuAlltoAllVMesh1DKernel(
+                    param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
+                    param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
+                    param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
+                    static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+            }
+        }
     }
 }
 
@@ -175,9 +242,7 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
-            MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
             DispatchKfcSubKernel(param, ctx);
-            MissionPostSync(ctx);
             CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
         }
         waitAddr += ckeSize;
@@ -195,26 +260,99 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
     return CCU_SUCCESS;
 }
 
-CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
+CcuResult MasterKfcServerGenCircularQueue(KfcServerContext& ctx)
 {
-    ccu::Variable signature; // 算子签名
-
-    ccu::Variable repeatCond; // 存放《控制repeat循环执行的条件》的寄存器
+    ccu::Variable repeatCond;
     repeatCond = 0;
+    ccu::Variable turnStartSig;
+    turnStartSig = 0;
+    ccu::Variable missionSig;
+    missionSig = 1;
+    ccu::Variable turnEndSig;
+    turnEndSig = 1;
 
+    ccu::Variable waitAddr;
+    ccu::Variable recordAddr;
     ccu::Variable paramAddr;
+    waitAddr = ctx.waitAddr;
+    recordAddr = ctx.recordAddr;
     paramAddr = ctx.xnAddr;
 
-    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE); // 存放<每轮算子参数>的寄存器
+    ccu::Variable ckeSize;
+    ckeSize = CCU_ONE_PARAM_SIZE;
+    ccu::Variable paramSize;
+    paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
+    ccu::Variable queueIdx;
+    ccu::Variable one;
+    queueIdx = 0;
+    one = 1;
+
+    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
 
     CCU_WHILE(repeatCond == 0)
     {
-        MissionPreSync(signature, ctx);                              // 在context中依次加入8轮指令
-        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
-
+        CCU_CHK_RET(WaitTurnStartSig(waitAddr, turnStartSig, ctx));
+        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx));
+        CCU_CHK_RET(MissionPreSync(missionSig, ctx));
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64) { DispatchKfcSubKernel(param, ctx); }
-        MissionPostSync(ctx);
+        missionSig = 0;
+        CCU_CHK_RET(MissionPostSync(missionSig, ctx));
+        missionSig = 1;
+        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
+        {
+            CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
+        }
+
+        waitAddr += ckeSize;
+        recordAddr += ckeSize;
+        paramAddr += paramSize;
+        queueIdx += one;
+        CCU_IF(queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX))
+        {
+            waitAddr = ctx.waitAddr;
+            recordAddr = ctx.recordAddr;
+            paramAddr = ctx.xnAddr;
+            queueIdx = 0;
+        }
+    }
+    return CCU_SUCCESS;
+}
+
+CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
+{
+    ccu::Variable repeatCond;
+    repeatCond = 0;
+    ccu::Variable missionSig;
+    missionSig = 0;
+    ccu::Variable paramAddr;
+    paramAddr = ctx.xnAddr;
+    ccu::Variable paramSize;
+    paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
+    ccu::Variable queueIdx;
+    ccu::Variable one;
+    queueIdx = 0;
+    one = 1;
+
+    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
+
+    CCU_WHILE(repeatCond == 0)
+    {
+        CCU_CHK_RET(MissionPreSync(missionSig, ctx));
+        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx));
+        CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
+        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64) { DispatchKfcSubKernel(param, ctx); }
+        missionSig = 1;
+        CCU_CHK_RET(MissionPostSync(missionSig, ctx));
+        missionSig = 0;
+
+        paramAddr += paramSize;
+        queueIdx += one;
+        CCU_IF(queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX))
+        {
+            paramAddr = ctx.xnAddr;
+            queueIdx = 0;
+        }
     }
     return CCU_SUCCESS;
 }
@@ -236,8 +374,13 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     CCU_CHK_RET(CompArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
-    CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(KfcServerGenCircularQueue(ctx)); }
-    CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
+    if (ctx.arg->role == KfcServerRole::ALL_GATHER_MESH) {
+        CCU_CHK_RET(MasterKfcServerGenCircularQueue(ctx));
+    } else if (ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
+        CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx));
+    } else {
+        CCU_CHK_RET(KfcServerGenCircularQueue(ctx));
+    }
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }

@@ -10,8 +10,11 @@
 
 #include <vector>
 #include <atomic>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include "acl/acl_rt.h"
+#include "task_cache_test_stub.h"
 #include "acl/acl_base.h"
 #include "runtime/base.h"
 #include "runtime/stream.h"
@@ -28,6 +31,8 @@ using namespace mc2_ops_hccl;
 thread_local uint32_t curr_dev_id = UINT32_MAX;
 
 extern "C" unsigned int HcclLaunchAicpuKernel(OpParam* param);
+HcclResult LaunchOpenOpParamDataImpl(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,9 +67,9 @@ aclError aclrtMalloc(void** devPtr, size_t size, aclrtMemMallocPolicy policy)
     u32 memType = static_cast<u32>(policy);
     HcclSim::SimNpu& simNpu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(curr_dev_id);
     if (memType == BUFFER_INPUT_MARK) {
-        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(BufferType::INPUT, size));
+        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(HcclSim::BufferType::INPUT, size));
     } else if (memType == BUFFER_OUTPUT_MARK) {
-        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(BufferType::OUTPUT, size));
+        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(HcclSim::BufferType::OUTPUT, size));
     }
     return ACL_SUCCESS;
 }
@@ -286,7 +291,22 @@ aclError aclrtLaunchKernelWithConfig(
 
     ArgsBuffer* buffer = reinterpret_cast<ArgsBuffer*>(argsHandle);
     OpParam* param = reinterpret_cast<OpParam*>(buffer->data);
-    HcclLaunchAicpuKernel(param);
+    RecordAicpuLaunchAlgName(param->algName);
+    const char* useOpenExecutor = std::getenv("HCCL_ST_USE_OPEN_EXECUTOR");
+    if (useOpenExecutor != nullptr && std::strcmp(useOpenExecutor, "1") == 0) {
+        std::vector<char> serializedCtx(
+            static_cast<char*>(param->resCtx), static_cast<char*>(param->resCtx) + param->ctxSize);
+        AlgResourceCtxSerializable resCtx;
+        resCtx.DeSerialize(serializedCtx);
+        std::vector<uint8_t> openParam(sizeof(OpParam) + param->varMemSize);
+        std::memcpy(openParam.data(), param, openParam.size());
+        RecordOpenExecutorLaunch();
+        if (LaunchOpenOpParamDataImpl(openParam, resCtx) != HCCL_SUCCESS) {
+            return ACL_ERROR_INTERNAL_ERROR;
+        }
+    } else {
+        HcclLaunchAicpuKernel(param);
+    }
 
     if (argsHandle != nullptr) {
         // argsHandle内存由aclrtKernelArgsInit开辟此处释放

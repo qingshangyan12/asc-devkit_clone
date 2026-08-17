@@ -8,6 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "hccl_alloc_ctx_res.h"
+#include "kfc_server_config.h"
+#include "kfc_server_protocol.h"
 
 using namespace mc2_ops_hccl;
 using namespace hcomm::CcuRep;
@@ -24,7 +26,8 @@ CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine)
 {
     if (static_cast<OpExecuteConfig>(commEngine) == OpExecuteConfig::AICPU_TS) {
         return COMM_ENGINE_AICPU;
-    } else if (static_cast<OpExecuteConfig>(commEngine) == OpExecuteConfig::CCU_SCHED) {
+    } else if (static_cast<OpExecuteConfig>(commEngine) == OpExecuteConfig::CCU_MS ||
+               static_cast<OpExecuteConfig>(commEngine) == OpExecuteConfig::CCU_SCHED) {
         return COMM_ENGINE_CCU;
     }
     return COMM_ENGINE_RESERVED;
@@ -109,6 +112,7 @@ HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint
     }
 
     if (commEngine != static_cast<uint8_t>(OpExecuteConfig::AICPU_TS) &&
+        commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_MS) &&
         commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
         HCCL_ERROR("Invalid commEngine %u.", commEngine);
         return HCCL_E_NOT_SUPPORT;
@@ -120,7 +124,10 @@ namespace {
 bool IsCcuKfcSupportedOp(uint32_t opType)
 {
     return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
-           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV);
 }
 
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
@@ -149,16 +156,12 @@ HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], ui
         HCCL_ERROR("Invalid CCU KFC tiling number %u, init tiling number %u.", tilingNum, initTiling->mc2HcommCnt);
         return HCCL_E_NOT_SUPPORT;
     }
-    uint32_t expectedOpType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_INVALID);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         CHK_PTR_NULL(ccTiling);
-        if (expectedOpType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_INVALID)) {
-            expectedOpType = ccTiling->opType;
-        }
         if (!IsCcuKfcSupportedOp(ccTiling->opType) ||
-            ccTiling->commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED) ||
-            ccTiling->opType != expectedOpType) {
+            (ccTiling->commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_MS) &&
+             ccTiling->commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED))) {
             HCCL_ERROR(
                 "Unsupported CCU KFC tiling at index %u, opType %u, commEngine %u.", i, ccTiling->opType,
                 ccTiling->commEngine);
@@ -172,7 +175,7 @@ HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], ui
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx)
 {
     // 1. 分配workspace、scratch、comParam（XN）、comSync（CKE）
-    constexpr uint32_t comSyncNum = 2;
+    constexpr uint32_t comSyncNum = KFC_SERVER_SIGNAL_REGION_NUM;
     constexpr uint64_t scratchSize = Hccl::MC2_WORKSPACE_SIZE;
     uint64_t comParamBufSize = Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_PARAM_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
     uint64_t comSyncBufSize = Hccl::CCU_TASK_NUM_MAX * comSyncNum * Hccl::CCU_ONE_PARAM_SIZE;
@@ -737,25 +740,20 @@ static HcclResult AcquireAlgResources(
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     if (opParam.engine == COMM_ENGINE_CCU) {
-        // 填充 kfcServerArgs 的所有6个字段（最后一个为 token 占位符，后续更新）
-        resCtxHost->kfcServerArgs = {
-            opResCtx.xnAddr,          opResCtx.ckeAddr,
-            static_cast<uint64_t>(1), // dieNum
-            static_cast<uint64_t>(1), // missionNum
-            static_cast<uint64_t>(0), // missionIndex
-            static_cast<uint64_t>(0), // token 占位符，后续在 GetAlgResCcu 中更新
-        };
-        resCtxHost->kfcServerArgSize = 6;
+        const uint32_t missionNum = GetKfcServerMissionNum(opParam.algName);
+        resCtxHost->kfcServerArgs.clear();
+        resCtxHost->kfcServerArgs.reserve(missionNum * KFC_SERVER_ARG_NUM);
+        for (uint32_t missionIndex = 0; missionIndex < missionNum; ++missionIndex) {
+            resCtxHost->kfcServerArgs.insert(
+                resCtxHost->kfcServerArgs.end(),
+                {opResCtx.xnAddr, opResCtx.ckeAddr, 1U, missionNum, missionIndex, 0U});
+        }
+        resCtxHost->kfcServerArgSize = KFC_SERVER_ARG_NUM;
         HCCL_INFO(
-            "[AcquireAlgResources] kfcServerArgs generated: "
-            "argSize[%u], xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], "
-            "missionNum[%llu], missionIndex[%llu], token[%llu]",
-            resCtxHost->kfcServerArgSize, static_cast<unsigned long long>(resCtxHost->kfcServerArgs[0]),
-            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[1]),
-            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[2]),
-            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[3]),
-            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[4]),
-            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[5]));
+            "[AcquireAlgResources] generated [%u] KFC mission args, argSize[%u], xnAddr[0x%llx], "
+            "ckeAddr[0x%llx]",
+            missionNum, resCtxHost->kfcServerArgSize,
+            static_cast<unsigned long long>(opResCtx.xnAddr), static_cast<unsigned long long>(opResCtx.ckeAddr));
 
         CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
         opParam.resCtx = *resCtxOut;
@@ -793,6 +791,7 @@ HcclResult GetOpParamResCtx(
     if ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU)) {
         CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
+        opParam.opThread = exportedAicpuTsThread;
     }
     CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
     opParam.cacheValid = isResourceReused;
@@ -1014,10 +1013,59 @@ HcclResult CcuSelectAlg(
     HCCL_INFO("[CcuSelectAlg]start CcuSelectAlg!");
     HCCL_INFO("[CcuSelectAlg]received: workspace[%p], size[%llu]", (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
     Mc2InitTilingInner* initTiling = static_cast<Mc2InitTilingInner*>(mc2Tiling);
+
+    std::vector<OpParam> opParams(tilingNum);
+    std::vector<std::string> algNames(tilingNum);
+    std::vector<std::unique_ptr<TopoInfoWithNetLayerDetails>> topoInfos;
+    topoInfos.reserve(tilingNum);
+
+    // Select all primitives before registering the persistent queue consumer.
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
-        CHK_RET(ProcessCcuTiling(comm, stream, topoTag[i], ccTiling, i, initTiling, opResCtx));
+        RunCcuSelectAlgCheck(ccTiling, i);
+
+        auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+        AlgorithmType algorithmType;
+        CHK_RET(SelectCcuAlgorithm(
+            comm, stream, topoTag[i], ccTiling, i, opParams[i], algNames[i], topoInfo, algorithmType));
+        FillCcuAlgorithmInfo(i, ccTiling, algNames[i], algorithmType, opParams[i], opResCtx);
+
+        bool skipGetRes = false;
+        CHK_RET(HandleSingleRankAndCommMode(comm, opParams[i], skipGetRes));
+        CHK_PRT_RET(skipGetRes, HCCL_ERROR("[CcuSelectAlg] single-rank CCU KFC is not supported."),
+            HCCL_E_NOT_SUPPORT);
+        topoInfos.push_back(std::move(topoInfo));
     }
 
+    CHK_PRT_RET(opParams.empty(), HCCL_ERROR("[CcuSelectAlg] no primitive selected."), HCCL_E_PARA);
+
+    bool hasConcurrentAllGather = false;
+    for (const std::string& algName : algNames) {
+        hasConcurrentAllGather = hasConcurrentAllGather || algName == KFC_CONCURRENT_ALL_GATHER_ALG_NAME;
+    }
+    CHK_PRT_RET(
+        hasConcurrentAllGather && (tilingNum != 1U || algNames[0] != KFC_CONCURRENT_ALL_GATHER_ALG_NAME),
+        HCCL_ERROR("[CcuSelectAlg] concurrent AllGather must own a single-op MC2 context."), HCCL_E_NOT_SUPPORT);
+
+    // One MC2 context owns one persistent server. Include the primitive set in
+    // the cache tag so contexts with different dispatch tables are not reused.
+    const uint64_t cacheHash = BuildKfcServerCacheHash(opParams[0].algTag, opParams);
+    int tagResult = sprintf_s(
+        opParams[0].algTag, sizeof(opParams[0].algTag), "CcuKfcServer_%016llx",
+        static_cast<unsigned long long>(cacheHash));
+    CHK_PRT_RET(tagResult <= 0, HCCL_ERROR("[CcuSelectAlg] failed to build shared server cache tag."), HCCL_E_PARA);
+
+    ConfigureKfcServerOps(opParams);
+    void* sharedResCtx = nullptr;
+    HcclResult resourceRet = GetCcuOpParamResCtx(
+        comm, algNames[0], opParams[0], topoInfos[0].get(), opResCtx, &sharedResCtx);
+    ConfigureKfcServerOps({});
+    CHK_RET(resourceRet);
+
+    for (uint32_t i = 0U; i < tilingNum; ++i) {
+        opParams[i].resCtx = sharedResCtx;
+        opParams[i].ctxSize = opParams[0].ctxSize;
+        CHK_RET(CopyCcuOpParamToDevice(comm, i, initTiling, opParams[i], opResCtx));
+    }
     return HCCL_SUCCESS;
 }
