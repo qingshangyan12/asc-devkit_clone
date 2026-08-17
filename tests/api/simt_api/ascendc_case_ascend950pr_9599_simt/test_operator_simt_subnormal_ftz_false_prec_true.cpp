@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 #include <type_traits>
 #include <cmath>
+#include <limits>
 #include "simt_compiler_stub.h"
 #include "kernel_operator.h"
 #include "simt_api/math_functions.h"
@@ -41,6 +42,14 @@ TEST_F(FloatSubnormalFtzFalsePrecTrueTestsuite, ExpFloatFtzFalsePrecTrue)
     EXPECT_FLOAT_EQ(std::exp(z), expf(z));
 }
 
+TEST_F(FloatSubnormalFtzFalsePrecTrueTestsuite, InternalExpFloatFtzFalsePrecTrue)
+{
+    volatile float normalInput = -80.0f;
+    volatile float subnormalOutputInput = -90.0f;
+    EXPECT_FLOAT_EQ(std::exp(static_cast<float>(normalInput)), __internal_expf(normalInput));
+    EXPECT_NEAR(std::exp(static_cast<float>(subnormalOutputInput)), __internal_expf(subnormalOutputInput), 1e-43f);
+}
+
 TEST_F(FloatSubnormalFtzFalsePrecTrueTestsuite, SqrtFloatFtzFalsePrecTrue)
 {
     float x = 1.0f;
@@ -54,4 +63,30 @@ TEST_F(FloatSubnormalFtzFalsePrecTrueTestsuite, SqrtFloatFtzFalsePrecTrue)
     EXPECT_NEAR(std::sqrt(scaledNormal), sqrtf(scaledNormal), 1e-6f);
     EXPECT_NEAR(std::sqrt(normal), sqrtf(normal), 1e-6f);
     EXPECT_TRUE(std::isinf(sqrtf(ASCRT_INF_F)));
+}
+
+TEST_F(FloatSubnormalFtzFalsePrecTrueTestsuite, InternalSqrtFloatFtzFalsePrecTrue)
+{
+    volatile float zero = 0.0f;
+    volatile float inf = ASCRT_INF_F;
+    volatile float subnormal = std::numeric_limits<float>::denorm_min();
+    volatile float scaledNormal = 0.25f;
+    volatile float normal = 4.0f;
+    EXPECT_FLOAT_EQ(0.0f, __internal_sqrtf(zero));
+    EXPECT_TRUE(std::isinf(__internal_sqrtf(inf)));
+    EXPECT_NEAR(std::sqrt(static_cast<float>(subnormal)), __internal_sqrtf(subnormal), 1e-24f);
+    EXPECT_NEAR(std::sqrt(static_cast<float>(scaledNormal)), __internal_sqrtf(scaledNormal), 1e-6f);
+    EXPECT_NEAR(std::sqrt(static_cast<float>(normal)), __internal_sqrtf(normal), 1e-6f);
+}
+
+TEST_F(FloatSubnormalFtzFalsePrecTrueTestsuite, InternalPreciseSqrtFloatCommon)
+{
+    volatile float zero = 0.0f;
+    volatile float inf = ASCRT_INF_F;
+    volatile float scaled = 0.25f;
+    volatile float normal = 4.0f;
+    EXPECT_FLOAT_EQ(0.0f, __internal_sqrtf_precise_impl(zero));
+    EXPECT_TRUE(std::isinf(__internal_sqrtf_precise_impl(inf)));
+    EXPECT_NEAR(std::sqrt(static_cast<float>(scaled)), __internal_sqrtf_precise_impl(scaled), 1e-6f);
+    EXPECT_NEAR(std::sqrt(static_cast<float>(normal)), __internal_sqrtf_precise_impl(normal), 1e-6f);
 }

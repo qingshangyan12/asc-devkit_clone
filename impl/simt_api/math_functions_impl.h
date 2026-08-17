@@ -110,10 +110,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_sqrtf_precise_impl
 }
 
 #ifdef __ASC_FTZ__
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_expf(float x) { return __expf(x); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_expf(float x) { return __expf(x); }
 
 #ifdef __ASC_PREC_SQRT__
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_sqrtf(float x)
 {
     // Treat positive subnormal inputs as 0 before entering the precise sqrt path.
     if (x > 0.0f && x < __internal_subnormal_boundary) {
@@ -122,12 +122,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x)
     return __internal_sqrtf_precise_impl(x);
 }
 #else
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x) { return __sqrtf(x); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_sqrtf(float x) { return __sqrtf(x); }
 #endif
 #endif
 
 #ifndef __ASC_FTZ__
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_expf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_expf(float x)
 {
     constexpr float __internal_subnormal_input_boundary =
         -87.3365478515625f; // Input range where expf returns a subnormal result
@@ -139,9 +139,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_expf(float x)
 }
 
 #ifdef __ASC_PREC_SQRT__
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x) { return __internal_sqrtf_precise_impl(x); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_sqrtf(float x) { return __internal_sqrtf_precise_impl(x); }
 #else
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x)
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __internal_sqrtf(float x)
 {
     constexpr float scale_up = 16777216.0f;       // 2^24
     constexpr float scale_down = 0.000244140625f; // 2^-12

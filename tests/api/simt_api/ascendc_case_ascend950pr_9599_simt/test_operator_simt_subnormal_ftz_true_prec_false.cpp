@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 #include <type_traits>
 #include <cmath>
+#include <limits>
 #include "simt_compiler_stub.h"
 #include "kernel_operator.h"
 #include "simt_api/math_functions.h"
@@ -34,6 +35,14 @@ TEST_F(FloatSubnormalFtzTruePrecFalseTestsuite, ExpFloatFtzTruePrecFalse)
     EXPECT_FLOAT_EQ(std::exp(z), expf(z));
 }
 
+TEST_F(FloatSubnormalFtzTruePrecFalseTestsuite, InternalExpFloatFtzTruePrecFalse)
+{
+    volatile float normalInput = -80.0f;
+    volatile float subnormalOutputInput = -90.0f;
+    EXPECT_FLOAT_EQ(std::exp(static_cast<float>(normalInput)), __internal_expf(normalInput));
+    EXPECT_FLOAT_EQ(std::exp(static_cast<float>(subnormalOutputInput)), __internal_expf(subnormalOutputInput));
+}
+
 TEST_F(FloatSubnormalFtzTruePrecFalseTestsuite, SqrtFloatFtzTruePrecFalse)
 {
     float x = 1.0f;
@@ -44,4 +53,24 @@ TEST_F(FloatSubnormalFtzTruePrecFalseTestsuite, SqrtFloatFtzTruePrecFalse)
     EXPECT_FLOAT_EQ(std::sqrt(y), sqrtf(y));
     EXPECT_FLOAT_EQ(std::sqrt(z), sqrtf(z));
     EXPECT_FLOAT_EQ(std::sqrt(normal), sqrtf(normal));
+}
+
+TEST_F(FloatSubnormalFtzTruePrecFalseTestsuite, InternalSqrtFloatFtzTruePrecFalse)
+{
+    volatile float subnormal = std::numeric_limits<float>::denorm_min();
+    volatile float normal = 4.0f;
+    EXPECT_FLOAT_EQ(std::sqrt(static_cast<float>(subnormal)), __internal_sqrtf(subnormal));
+    EXPECT_FLOAT_EQ(std::sqrt(static_cast<float>(normal)), __internal_sqrtf(normal));
+}
+
+TEST_F(FloatSubnormalFtzTruePrecFalseTestsuite, InternalPreciseSqrtFloatCommon)
+{
+    volatile float zero = 0.0f;
+    volatile float inf = ASCRT_INF_F;
+    volatile float scaled = 0.25f;
+    volatile float normal = 4.0f;
+    EXPECT_FLOAT_EQ(0.0f, __internal_sqrtf_precise_impl(zero));
+    EXPECT_TRUE(std::isinf(__internal_sqrtf_precise_impl(inf)));
+    EXPECT_NEAR(std::sqrt(static_cast<float>(scaled)), __internal_sqrtf_precise_impl(scaled), 1e-6f);
+    EXPECT_NEAR(std::sqrt(static_cast<float>(normal)), __internal_sqrtf_precise_impl(normal), 1e-6f);
 }
