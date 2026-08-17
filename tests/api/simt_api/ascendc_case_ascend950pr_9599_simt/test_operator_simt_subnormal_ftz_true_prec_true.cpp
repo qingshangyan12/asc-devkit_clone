@@ -18,16 +18,6 @@
 #include "kernel_operator.h"
 #include "simt_api/math_functions.h"
 
-using namespace std;
-using namespace AscendC;
-using namespace AscendC::Simt;
-
-#define THREAD_DIM 128
-
-struct FloatSubnormalParams {
-    int32_t mode;
-};
-
 class FloatSubnormalFtzTruePrecTrueTestsuite : public testing::Test {
 protected:
     void SetUp() {}
@@ -39,10 +29,12 @@ TEST_F(FloatSubnormalFtzTruePrecTrueTestsuite, ExpFloatFtzTruePrecTrue)
     float a = 1.17549421e-38f;
     float x = 1.0f;
     float y = -80.0f;
+    float subnormalOutputInput = -90.0f;
     float z = 0.0f;
     EXPECT_FLOAT_EQ(std::exp(x), expf(x));
     EXPECT_FLOAT_EQ(std::exp(a), expf(a));
     EXPECT_FLOAT_EQ(std::exp(y), expf(y));
+    EXPECT_FLOAT_EQ(std::exp(subnormalOutputInput), expf(subnormalOutputInput));
     EXPECT_FLOAT_EQ(std::exp(z), expf(z));
 }
 
@@ -51,7 +43,12 @@ TEST_F(FloatSubnormalFtzTruePrecTrueTestsuite, SqrtFloatFtzTruePrecTrue)
     float x = 1.0f;
     float y = 1.17549421e-38f;
     float z = 0.0f;
+    float scaledNormal = 0.25f;
+    float normal = 4.0f;
     EXPECT_FLOAT_EQ(std::sqrt(x), sqrtf(x));
-    EXPECT_FLOAT_EQ(std::sqrt(y), sqrtf(y));
+    EXPECT_FLOAT_EQ(0.0f, sqrtf(y));
     EXPECT_FLOAT_EQ(std::sqrt(z), sqrtf(z));
+    EXPECT_NEAR(std::sqrt(scaledNormal), sqrtf(scaledNormal), 1e-6f);
+    EXPECT_NEAR(std::sqrt(normal), sqrtf(normal), 1e-6f);
+    EXPECT_TRUE(std::isinf(sqrtf(ASCRT_INF_F)));
 }
