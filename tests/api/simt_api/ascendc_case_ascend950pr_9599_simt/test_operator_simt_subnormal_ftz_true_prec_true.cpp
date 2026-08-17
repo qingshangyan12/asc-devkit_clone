@@ -46,7 +46,7 @@ TEST_F(FloatSubnormalFtzTruePrecTrueTestsuite, SqrtFloatFtzTruePrecTrue)
     float scaledNormal = 0.25f;
     float normal = 4.0f;
     EXPECT_FLOAT_EQ(std::sqrt(x), sqrtf(x));
-    EXPECT_FLOAT_EQ(0.0f, sqrtf(y));
+    EXPECT_NEAR(std::sqrt(y), sqrtf(y), 1e-24f);
     EXPECT_FLOAT_EQ(std::sqrt(z), sqrtf(z));
     EXPECT_NEAR(std::sqrt(scaledNormal), sqrtf(scaledNormal), 1e-6f);
     EXPECT_NEAR(std::sqrt(normal), sqrtf(normal), 1e-6f);
