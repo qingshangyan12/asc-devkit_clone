@@ -38,8 +38,6 @@ inline void asc_bfloat162int32<round_mode><sat_mode><position_mode>(vector_int32
                                                                     vector_bool mask)
 ```
 
-### 占位符说明
-
 - `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 - `<position_mode>`表示`src`读取的位置，为空时读取`src`的偶数索引位置；取值为`_v2`时读取`src`的奇数索引位置。
@@ -58,9 +56,9 @@ inline void asc_bfloat162int32_rn(vector_int32_t& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 | ------ | --------- | ---- |
-| `dst` | 输出 | 目的操作数（矢量数据寄存器）。 |
-| `src` | 输入 | 源操作数（矢量数据寄存器）。 |
-| `mask` | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。 |
+| mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -73,7 +71,6 @@ inline void asc_bfloat162int32_rn(vector_int32_t& dst,
 - 本接口在非AIV上调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - mask需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
-- `src`与`dst`的数据类型需要与函数原型匹配。
 - `mask`掩码位为0时，`dst`对应元素置0。
 
 ## 调用示例
