@@ -21,9 +21,9 @@ $$
 template <typename T>
 __simd_callee__ inline decltype(auto) add_c(
     reg_tensor<bool>& carry,
-    reg_tensor<T> src0,
-    reg_tensor<T> src1,
-    reg_tensor<bool> carry_src);
+    const reg_tensor<T>& src0,
+    const reg_tensor<T>& src1,
+    const reg_tensor<bool>& carry_src);
 ```
 
 ## 参数说明

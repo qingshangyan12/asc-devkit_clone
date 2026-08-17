@@ -23,7 +23,7 @@ $$
 ```cpp
 template <typename T>
 __simd_callee__ inline decltype(auto) prelu(
-    reg_tensor<T> src_reg, reg_tensor<T> slope);
+    const reg_tensor<T>& src_reg, const reg_tensor<T>& slope);
 ```
 
 ## 参数说明

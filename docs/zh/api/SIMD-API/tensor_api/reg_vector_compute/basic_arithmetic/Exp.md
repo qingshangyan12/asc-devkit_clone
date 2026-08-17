@@ -19,7 +19,7 @@ $$
 
 ```cpp
 template <typename T>
-__simd_callee__ inline decltype(auto) exp(reg_tensor<T> src_reg);
+__simd_callee__ inline decltype(auto) exp(const reg_tensor<T>& src_reg);
 ```
 
 ## 参数说明

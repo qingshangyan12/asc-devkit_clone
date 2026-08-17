@@ -24,17 +24,19 @@ namespace asc {
 namespace te {
 
 template <typename T, typename scalar_type>
-__simd_callee__ inline decltype(auto) axpy(reg_tensor<T> dst, reg_tensor<T> src, scalar_type scalar)
+__simd_callee__ inline decltype(auto) axpy(
+    const reg_tensor<T>& dst, const reg_tensor<T>& src, const scalar_type& scalar)
 {
     static_assert(detail::supports_axpy_v<T>, "axpy supports half and float");
     static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<scalar_type>, T>,
         "axpy requires the scalar and reg_tensor element types to match");
-    asc_axpy(dst.reg, src.reg, scalar, dst.mask);
-    return dst;
+    reg_tensor<T> result = dst;
+    asc_axpy(result.reg, src.reg, scalar, dst.mask);
+    return result;
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) absdiff(reg_tensor<T> src0, reg_tensor<T> src1)
+__simd_callee__ inline decltype(auto) absdiff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_absdiff_v<T>, "absdiff supports half and float");
     reg_tensor<T> dst;
@@ -44,7 +46,7 @@ __simd_callee__ inline decltype(auto) absdiff(reg_tensor<T> src0, reg_tensor<T> 
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) exp_sub(reg_tensor<T> src0, reg_tensor<T> src1)
+__simd_callee__ inline decltype(auto) exp_sub(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_exp_sub_v<T>, "exp_sub supports half and float");
     reg_tensor<float> dst;
@@ -56,7 +58,7 @@ __simd_callee__ inline decltype(auto) exp_sub(reg_tensor<T> src0, reg_tensor<T> 
 
 template <typename T>
 __simd_callee__ inline decltype(auto) fma(
-    reg_tensor<T> src0, reg_tensor<T> src1, reg_tensor<T> src2)
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2)
 {
     static_assert(detail::supports_fma_v<T>, "fma supports half and float");
     reg_tensor<T> dst = src0;
@@ -65,7 +67,7 @@ __simd_callee__ inline decltype(auto) fma(
     return dst;
 }
 
-__simd_callee__ inline decltype(auto) muls_cast(reg_tensor<float> src, float scalar)
+__simd_callee__ inline decltype(auto) muls_cast(const reg_tensor<float>& src, const float& scalar)
 {
     reg_tensor<half> dst;
     asc_muls(dst.reg, src.reg, scalar, src.mask);

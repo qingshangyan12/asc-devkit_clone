@@ -16,7 +16,7 @@
 ```cpp
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator>>(
-    reg_tensor<T> src, U shift);
+    const reg_tensor<T>& src, const U& shift);
 ```
 
 ## 参数说明
