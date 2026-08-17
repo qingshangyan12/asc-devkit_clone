@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "ascendc_manifest_abi.h"
-#include "specialization_compile_types.h"
+#include "nlohmann/json.hpp"
 
 namespace boost {
 namespace filesystem {
@@ -33,6 +33,12 @@ namespace specialization_compile {
 
 enum class ResourceStatus { Success, NotFound, Conflict, InvalidResource, IoError, LoadError, InternalError };
 enum class ResourceSourceType { External, Custom, BuiltIn };
+
+struct ResourceData {
+    nlohmann::json json;
+    std::string resourceDir;
+    std::string sourceFilePath;
+};
 
 struct ResourceFileData {
     std::string fileName;
