@@ -34,6 +34,7 @@
 #include "math/atan.h"
 #include "math/atanh.h"
 #include "math/axpy.h"
+#include "math/bessel_i0.h"
 #include "math/bitwise_and.h"
 #include "math/bitwise_not.h"
 #include "math/bitwise_or.h"
