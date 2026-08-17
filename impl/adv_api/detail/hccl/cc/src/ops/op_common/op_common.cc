@@ -37,7 +37,7 @@
 #include "alg_type.h"
 #include "op_common.h"
 #include "dpu/kernel_launch.h"
-#include "hcomm_host_profiling_dl.h"
+#include "hccl_diag.h"
 #include "hcomm_primitives_dl.h"
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
@@ -51,43 +51,6 @@
 
 #ifndef MC2_CLIENT_ENABLE_CCU
 #define MC2_CLIENT_ENABLE_CCU 0
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-// 兼容性处理
-uint64_t __attribute__((weak)) HcommGetProfilingSysCycleTime();
-HcclResult __attribute__((weak)) HcclDfxRegOpInfo(HcclComm comm, void* dfxOpInfo);
-HcclResult __attribute__((weak)) HcclDfxRegOpInfoByCommId(char* commId, void* dfxOpInfo);
-HcclResult __attribute__((weak)) HcclProfilingReportOp(HcclComm comm, uint64_t beginTime);
-HcclResult __attribute__((weak)) HcclReportAicpuKernel(HcclComm comm, uint64_t beginTime, char* kernelName);
-
-struct HcclDfxOpInfo {
-    CommAbiHeader header;
-    // DfxOpInfo_base
-    uint64_t beginTime = 0;
-    uint64_t endTime = 0;
-    // baseCollOperator
-    uint32_t opMode = 0; // 单算子和图模式
-    uint32_t opType = 0; // 算子名称类型
-    uint32_t reduceOp = 0;
-    uint32_t dataType = 0;
-    uint32_t outputType = 0; // 暂不删除，考虑后续算子使用
-    uint64_t dataCount = 0;
-    uint32_t root = INVALID_VALUE_RANKID;
-    char algTag[288]; // 算法名 = "算子类型 + 通信域id + 选择的算法"
-    CommEngine engine = COMM_ENGINE_RESERVED;
-    // task_exception
-    uint64_t cpuTsThread = 0;                      // host侧算子主流的threadhandle
-    uint32_t cpuWaitAicpuNotifyIdx = INVALID_UINT; // host wait device notifyIdx
-    uint32_t cpuWaitAicpuNotifyId = INVALID_UINT;  // host wait device notifyId
-    int8_t reserve[128];                           // 预留扩展字段
-};
-
-#ifdef __cplusplus
-}
 #endif
 
 namespace mc2_ops_hccl {
@@ -267,6 +230,52 @@ uint32_t GetHcclDfxOpInfoDataType(const OpParam& param)
         dataType = static_cast<u32>(param.DataDes.dataType);
     }
     return dataType;
+}
+
+uint32_t GetHcclDfxOpInfoOutputType(const OpParam& param)
+{
+    if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
+        return static_cast<u32>(param.all2AllDataDes.recvType);
+    }
+    if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        return static_cast<u32>(param.all2AllVDataDes.recvType);
+    }
+    if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC) {
+        return static_cast<u32>(param.all2AllVCDataDes.recvType);
+    }
+    return static_cast<u32>(param.DataDes.outputType);
+}
+
+HcclResult BuildHcclDfxOpInfo(
+    HcclComm comm, const OpParam& param, uint64_t beginTime, ThreadHandle cpuTsThread, uint32_t waitNotifyIdx,
+    HcclDfxOpInfo& hcclDfxOpInfo)
+{
+    hcclDfxOpInfo.beginTime = beginTime;
+    hcclDfxOpInfo.opMode = static_cast<u32>(param.opMode);
+    hcclDfxOpInfo.opType = static_cast<u32>(param.opType);
+    hcclDfxOpInfo.reduceOp = static_cast<u32>(param.reduceType);
+    hcclDfxOpInfo.dataType = GetHcclDfxOpInfoDataType(param);
+    hcclDfxOpInfo.outputType = GetHcclDfxOpInfoOutputType(param);
+
+    u32 userRankSize{0};
+    CHK_RET(HcclGetRankSize(comm, &userRankSize));
+    hcclDfxOpInfo.dataCount = GetHcclDfxOpInfoDataCount(param, userRankSize);
+    hcclDfxOpInfo.root = param.root;
+    hcclDfxOpInfo.engine = param.engine;
+    hcclDfxOpInfo.cpuTsThread = cpuTsThread;
+    hcclDfxOpInfo.cpuWaitAicpuNotifyIdx = waitNotifyIdx;
+    hcclDfxOpInfo.inputMemAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(param.inputPtr));
+    hcclDfxOpInfo.inputMemSize = param.inputSize;
+    hcclDfxOpInfo.outputMemAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(param.outputPtr));
+    hcclDfxOpInfo.outputMemSize = param.outputSize;
+
+    const s32 sRet = strncpy_s(
+        hcclDfxOpInfo.algTag, sizeof(hcclDfxOpInfo.algTag), param.algTag, sizeof(hcclDfxOpInfo.algTag) - 1);
+    CHK_PRT_RET(
+        sRet != EOK,
+        HCCL_ERROR("%s call strncpy_s failed, param.algTag %s, return %d.", __func__, param.algTag, sRet),
+        HCCL_E_MEMORY);
+    return HCCL_SUCCESS;
 }
 
 HcclResult SetOpParamFastLaunchTag(OpParam& param)
@@ -454,29 +463,9 @@ HcclResult HcclExecOp(
         getAlgResRet, resCtxSequence, isResourceReused, param.ctxSize);
     CHK_RET(getAlgResRet);
 
-    // Op注册
     HcclDfxOpInfo hcclDfxOpInfo{};
-    hcclDfxOpInfo.opMode = static_cast<u32>(param.opMode);
-    hcclDfxOpInfo.opType = static_cast<u32>(param.opType);
-    hcclDfxOpInfo.reduceOp = static_cast<u32>(param.reduceType);
-    hcclDfxOpInfo.dataType = GetHcclDfxOpInfoDataType(param);
-
-    // rankSize获取指定算子的dataCount
-    u32 userRankSize{0};
-    CHK_RET(HcclGetRankSize(comm, &userRankSize));
-    hcclDfxOpInfo.dataCount = GetHcclDfxOpInfoDataCount(param, userRankSize);
-    hcclDfxOpInfo.root = param.root;
-    hcclDfxOpInfo.engine = param.engine;
-    hcclDfxOpInfo.cpuTsThread = cpuTsThread;
-    hcclDfxOpInfo.cpuWaitAicpuNotifyIdx = HOST_WAIT_AICPU_NOTIFYIDX;
-    s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
-    CHK_PRT_RET(
-        sRet != EOK,
-        HCCL_ERROR("%s call strncpy_s failed, param.algTag %s,  return %d.", "HcclGetCcuKernel", param.algTag, sRet),
-        HCCL_E_MEMORY);
-    HcclDfxOpInfo* tempOp = &hcclDfxOpInfo;
-
-    CHK_RET(HcclDfxRegOpInfo(comm, static_cast<void*>(tempOp)));
+    CHK_RET(BuildHcclDfxOpInfo(comm, param, beginTime, cpuTsThread, HOST_WAIT_AICPU_NOTIFYIDX, hcclDfxOpInfo));
+    CHK_RET(HcclDfxRegOpInfoByCommId(const_cast<char*>(param.commName), static_cast<void*>(&hcclDfxOpInfo)));
     ThreadHandle exportedCpuTsThread;
     ThreadHandle mainThread;
     u32 notifyNumOnMainThread;
@@ -1460,20 +1449,7 @@ HcclResult ValidateCcuKernelRequest(const AlgResourceRequest& resRequest, u32& t
 HcclResult RegisterCcuDfxOpInfo(HcclComm comm, const OpParam& param)
 {
     HcclDfxOpInfo hcclDfxOpInfo{};
-    hcclDfxOpInfo.opMode = static_cast<u32>(param.opMode);
-    hcclDfxOpInfo.opType = static_cast<u32>(param.opType);
-    hcclDfxOpInfo.reduceOp = static_cast<u32>(param.reduceType);
-    hcclDfxOpInfo.dataType = GetHcclDfxOpInfoDataType(param);
-
-    u32 userRankSize{0};
-    CHK_RET(HcclGetRankSize(comm, &userRankSize));
-    hcclDfxOpInfo.root = param.root;
-    hcclDfxOpInfo.engine = param.engine;
-    s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
-    CHK_PRT_RET(
-        sRet != EOK, HCCL_ERROR("%s call strncpy_s failed, param.algTag %s,  return %d.", __func__, param.algTag, sRet),
-        HCCL_E_MEMORY);
-
+    CHK_RET(BuildHcclDfxOpInfo(comm, param, 0, 0, INVALID_UINT, hcclDfxOpInfo));
     CHK_RET(HcclDfxRegOpInfoByCommId(const_cast<char*>(param.commName), static_cast<void*>(&hcclDfxOpInfo)));
     HCCL_INFO("[HcclGetCcuKernel] RegisterCcuDfxOpInfo success.");
     return HCCL_SUCCESS;
