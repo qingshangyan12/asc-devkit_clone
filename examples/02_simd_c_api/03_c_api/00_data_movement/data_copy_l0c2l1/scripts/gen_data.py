@@ -18,8 +18,6 @@ import struct
 
 import numpy as np
 
-np.random.seed(9)
-
 M = 128
 K = 128
 N = 128
@@ -96,6 +94,8 @@ def extract_relu_params(relu_pre):
     sign_bit = (alpha_bits >> 18) & 0x1
     exponent = (alpha_bits >> 10) & 0xFF
     mantissa = alpha_bits & 0x3FF
+    if exponent == 0:
+        return (-1) ** sign_bit * (mantissa / 1024) * (2 ** (-126))
     return (-1) ** sign_bit * (1 + mantissa / 1024) * (2 ** (exponent - 127))
 
 
@@ -354,6 +354,107 @@ def _cvt_float32_to_hifuint8(x, round_mode="round", over_mode=True):
     return _get_hif8_int_value(exponent, hif8_collect)
 
 
+def cvt_hifuint8_to_float_else(x, sign):
+    dot_4_bits = x & 120
+    dot_4_value = dot_4_bits >> 3
+    if dot_4_value >= 12:
+        exponet = x & 30
+        exponet_int = exponet >> 1
+        if exponet_int >= 8:
+            exponet_value = -exponet_int
+        else:
+            exponet_value = exponet_int + 8
+        fra_int = x & 1
+        m_value = 1.0 + fra_int * 0.5
+    elif dot_4_value >= 8:
+        exponet = x & 28
+        exponet_int = exponet >> 2
+        if exponet_int >= 4:
+            exponet_value = -exponet_int
+        else:
+            exponet_value = exponet_int + 4
+        fra_int = x & 3
+        m_value = 1.0 + fra_int * 0.25
+    elif dot_4_value >= 4:
+        exponet = x & 24
+        exponet_int = exponet >> 3
+        if exponet_int >= 2:
+            exponet_value = -exponet_int
+        else:
+            exponet_value = exponet_int + 2
+        fra_int = x & 7
+        m_value = 1.0 + fra_int * 0.125
+    elif dot_4_value >= 2:
+        exponet = x & 8
+        exponet_sign = exponet >> 3
+        if exponet_sign >= 1:
+            exponet_value = -1
+        else:
+            exponet_value = 1
+        fra_int = x & 7
+        m_value = 1.0 + fra_int * 0.125
+    elif dot_4_value == 1:
+        exponet_value = 0
+        fra_int = x & 7
+        m_value = 1.0 + fra_int * 0.125
+    elif dot_4_value == 0:
+        m_value = 1
+        exponet_value = (x & 7) - 23
+    else:
+        m_value = 0.0
+        exponet_value = 0
+    return sign * pow(2.0, exponet_value) * m_value
+
+
+def cvt_hifuint8_to_float(x, over_mode=True):
+    if x == 0:
+        return float(0)
+    elif x == 128:
+        if over_mode:
+            return np.nan
+        else:
+            return float(0)
+    elif x == 239:
+        if over_mode:
+            return -np.inf
+        else:
+            return -32768
+    elif x == 111:
+        if over_mode:
+            return np.inf
+        else:
+            return 32768
+    else:
+        if x >= 128:
+            sign = -1.0
+        else:
+            sign = 1.0
+        return cvt_hifuint8_to_float_else(x, sign)
+
+
+def bf16_to_float32(bf16_arr):
+    return (bf16_arr.astype(np.uint32) << 16).view(np.float32).astype(np.float64)
+
+
+def fp8_e4m3fn_to_float32(byte_val):
+    """Convert a raw fp8_e4m3fn byte to its float32 value."""
+    b = int(byte_val) & 0xFF
+    sign = (b >> 7) & 1
+    exp = (b >> 3) & 0xF
+    mant = b & 0x7
+    if exp == 0 and mant == 0:
+        return 0.0
+    if exp == 0:
+        val = mant * (2.0 ** -6) * (2.0 ** -6)
+    elif exp == 15 and mant == 7:
+        return float('nan')
+    elif exp == 15:
+        val = (1 + mant / 8.0) * (2.0 ** 8)
+    else:
+        val = (1 + mant / 8.0) * (2.0 ** (exp - 7))
+    return -val if sign else val
+
+
 # ============================================================================
 # Quantization functions
 # ============================================================================
@@ -465,7 +566,7 @@ def apply_qf322fp8(value, quant_pre, relu_pre):
         value = saturation(value / (2**n_shift), -448, 448, np.float32)
     value = np.float32(value)
     value *= alpha if value >= 0 else extract_relu_params(relu_pre)
-    value = np.clip(value + offset, -448, 448)
+    value = np.float32(value + offset)
     return float32_to_fp8_e4m3fn(float(value))
 
 
@@ -475,7 +576,7 @@ def apply_qf322hif8(value, quant_pre, relu_pre, hybrid=False):
         value = saturation(value / (2**n_shift), -240, 240, np.float32)
     value = np.float32(value)
     value *= alpha if value >= 0 else extract_relu_params(relu_pre)
-    value = np.clip(value + offset, -240, 240)
+    value = np.float32(value + offset)
     return float32_to_hifloat8(float(value), hybrid=hybrid)
 
 
@@ -584,49 +685,164 @@ def generate_d_matrix(output_type):
         raise ValueError("Unsupported output type: %s" % output_type)
 
 
+def apply_non_saturation_override(result, l0c_matrix, output_type):
+    """Override quantized result for positions where L0C had inf/nan in non-saturation mode.
+
+    In non-saturation mode (CTRL[48]=1):
+    - Float types (half, bfloat16, float): preserve inf/nan
+    - fp8_e4m3fn: inf → nan, nan → nan
+    - hifloat8: _cvt_float32_to_hifuint8(over_mode=True) already returns the
+      inf/nan encodings (111/239/128) that match the non-saturation behavior
+    - Integer types: always saturation (no override)
+    """
+    inf_mask = np.isinf(l0c_matrix)
+    nan_mask = np.isnan(l0c_matrix)
+
+    if output_type in ('half', 'bfloat16', 'float'):
+        pos_inf_mask = l0c_matrix == np.inf
+        neg_inf_mask = l0c_matrix == -np.inf
+        if output_type == 'half':
+            result[pos_inf_mask] = np.float16(np.inf)
+            result[neg_inf_mask] = np.float16(-np.inf)
+            result[nan_mask] = np.float16(np.nan)
+        elif output_type == 'bfloat16':
+            result[pos_inf_mask] = np.uint16(0x7F80)  # bfloat16 +inf
+            result[neg_inf_mask] = np.uint16(0xFF80)  # bfloat16 -inf
+            result[nan_mask] = np.uint16(0x7FFF)      # bfloat16 nan (hardware pattern)
+        else:  # float
+            result[pos_inf_mask] = np.float32(np.inf)
+            result[neg_inf_mask] = np.float32(-np.inf)
+            result[nan_mask] = np.float32(np.nan)
+    elif output_type == 'fp8_e4m3fn':
+        fp8_nan = np.uint8(0x7F)  # fp8_e4m3fn nan encoding
+        result[inf_mask | nan_mask] = fp8_nan
+
+    return result
+
+
+def apply_saturation_override(result, l0c_matrix, output_type):
+    """Override quantized result for positions where L0C had inf/nan in saturation mode.
+
+    In saturation mode (CTRL[48]=0):
+    - half: inf → ±MAX(65504), nan → 0
+    - bfloat16: inf → ±MAX(0x7F7F/0xFF7F), nan → 0
+    - fp8_e4m3fn: inf → ±MAX(448=0x7E/-448=0xFE), nan → 0
+    - hifloat8: inf → overflow encoding(111/239) via over_mode=True, nan → 0
+    - float: CTRL[48] does NOT support float; inf/nan are preserved
+    - Integer types: always saturation, already handled by their functions
+    """
+    nan_mask = np.isnan(l0c_matrix)
+    pos_inf_mask = l0c_matrix == np.inf
+    neg_inf_mask = l0c_matrix == -np.inf
+
+    if output_type == 'half':
+        result[pos_inf_mask] = np.float16(65504)
+        result[neg_inf_mask] = np.float16(-65504)
+        result[nan_mask] = np.float16(0)
+    elif output_type == 'bfloat16':
+        result[pos_inf_mask] = np.uint16(0x7F7F)   # bfloat16 max
+        result[neg_inf_mask] = np.uint16(0xFF7F)   # bfloat16 min
+        result[nan_mask] = np.uint16(0)
+    elif output_type == 'fp8_e4m3fn':
+        result[pos_inf_mask] = np.uint8(0x7E)   # fp8_e4m3fn max (448)
+        result[neg_inf_mask] = np.uint8(0xFE)   # fp8_e4m3fn min (-448)
+        result[nan_mask] = np.uint8(0)
+    elif output_type == 'hifloat8':
+        result[nan_mask] = np.uint8(0)
+
+    return result
+
+
 # ============================================================================
 # Golden data generation
 # ============================================================================
 
-def gen_golden_data(scenario_num):
+def gen_golden_data(scenario_num, boundary=False, saturation=True):
+    np.random.seed(9)
     input_type, output_type, quant_mode, is_tensor = SCENARIOS[scenario_num]
 
     if input_type == 'int8':
-        x1 = np.random.randint(-3, 3, (M, K)).astype(np.int8)
-        x2 = np.random.randint(-3, 3, (K, N)).astype(np.int8)
-        golden = np.matmul(x1.astype(np.int32), x2.astype(np.int32)).astype(np.int32)
+        input_dtype = np.int8
+        mm_dtype = np.int32
+        x1 = np.random.randint(-3, 3, (M, K)).astype(input_dtype)
+        x2 = np.random.randint(-3, 3, (K, N)).astype(input_dtype)
+        if boundary:
+            x1[:] = 127
+            x2[:] = 127
+            x1[0, :] = -128
+            print("[boundary] int8 input: row 0 = -128, rest = 127 → extreme int32 L0C")
     else:
-        x1 = np.random.uniform(-3.0, 3.0, (M, K)).astype(np.float16)
-        x2 = np.random.uniform(-3.0, 3.0, (K, N)).astype(np.float16)
-        golden = np.matmul(x1.astype(np.float32), x2.astype(np.float32)).astype(np.float32)
+        input_dtype = np.float16
+        mm_dtype = np.float32
+        x1 = np.random.uniform(-3.0, 3.0, (M, K)).astype(input_dtype)
+        x2 = np.random.uniform(-3.0, 3.0, (K, N)).astype(input_dtype)
+        if boundary:
+            x2[0, :] = np.float16(1.0)
+            x1[0, 0] = np.float16(np.inf)
+            x1[1, 0] = np.float16(-np.inf)
+            x1[2, 0] = np.float16(np.nan)
+            print("[boundary] half input: A[0,0]=+inf, A[1,0]=-inf, A[2,0]=nan, B[0,:]=1.0")
+
+    l0c = np.matmul(x1.astype(mm_dtype), x2.astype(mm_dtype)).astype(mm_dtype)
+
+    if boundary:
+        print("[boundary] L0C contains: inf=%s, -inf=%s, nan=%s" % (
+            np.any(l0c == np.inf), np.any(l0c == -np.inf), np.any(np.isnan(l0c))))
 
     quant_params = make_quant_params(output_type)
-    golden = apply_prequant(golden, quant_mode, quant_params, output_type, False)
+    golden = apply_prequant(l0c, quant_mode, quant_params, output_type, False)
+
+    if not saturation:
+        golden = apply_non_saturation_override(golden, l0c, output_type)
+    else:
+        golden = apply_saturation_override(golden, l0c, output_type)
+
+    if boundary:
+        has_inf_out = np.any(np.isinf(golden.astype(np.float64)))
+        has_nan_out = np.any(np.isnan(golden.astype(np.float64)))
+        print("[boundary] output (%s, saturation=%s) contains: inf=%s, nan=%s" % (
+            output_type, saturation, has_inf_out, has_nan_out))
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
-    # D matrix (identity) in output type format
     d_gm = generate_d_matrix(output_type)
     d_gm.tofile("./input/x3_gm.bin")
 
     if is_tensor:
         quant_params.tofile("./input/quant_pre.bin")
 
-    # K-axis reorder for x1
-    x1.reshape(M, K_ROUND, K // K_ROUND).transpose(1, 0, 2).astype(
-        np.int8 if input_type == 'int8' else np.float16
-    ).tofile("./input/x1_gm.bin")
-    x2.astype(np.int8 if input_type == 'int8' else np.float16).tofile("./input/x2_gm.bin")
+    x1.reshape(M, K_ROUND, K // K_ROUND).transpose(1, 0, 2).astype(input_dtype).tofile(
+        "./input/x1_gm.bin")
+    x2.astype(input_dtype).tofile("./input/x2_gm.bin")
 
-    # Golden in output type's file I/O format (ND layout)
-    if output_type == 'int4b':
-        golden = pack_int4b(golden)
-    golden.astype(SAVE_DTYPE[output_type]).tofile("./output/golden.bin")
+    if output_type == 'int8':
+        golden = golden.astype(np.int32)
+    elif output_type == 'int4b':
+        golden = golden.astype(np.int32)
+    elif output_type == 'half':
+        golden = golden.astype(np.float32)
+    elif output_type == 'bfloat16':
+        golden = bf16_to_float32(golden.astype(np.uint16)).astype(np.float32)
+    elif output_type == 'fp8_e4m3fn':
+        golden = np.array([fp8_e4m3fn_to_float32(b) for b in golden.ravel()],
+                         dtype=np.float32).reshape(M, N)
+    elif output_type == 'hifloat8':
+        golden = np.array([cvt_hifuint8_to_float(b) for b in golden.ravel()],
+                         dtype=np.float32).reshape(M, N)
+    elif output_type == 'float':
+        golden = golden.astype(np.float32)
+
+    golden.tofile("./output/golden.bin")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 18))
+    parser.add_argument("--boundary", action="store_true",
+                        help="Generate boundary value inputs (inf/-inf/nan) to test saturation behavior")
+    parser.add_argument("--saturation", type=int, default=1, choices=[0, 1],
+                        help="Saturation mode: 1=saturation (CTRL[48]=0, inf→±MAX, nan→0), "
+                             "0=non-saturation (CTRL[48]=1, inf/nan preserved)")
     args = parser.parse_args()
-    gen_golden_data(args.scenarioNum)
+    gen_golden_data(args.scenarioNum, boundary=args.boundary, saturation=bool(args.saturation))

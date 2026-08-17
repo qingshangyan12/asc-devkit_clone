@@ -98,22 +98,29 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 
 ## NoQuant（无量化）场景
 
-NoQuant模式不做类型转换和量化，L0C中的float数据原样搬运到UB。由于CTRL\[48\]不支持float数据类型，饱和模式和非饱和模式下inf/nan均保持原样输出。
+NoQuant模式不做类型转换和量化，L0C中的float数据原样搬运到UB。由于CTRL\[48\]不支持float数据类型，饱和模式和非饱和模式下inf/nan均保持原样输出。NoQuant场景还覆盖了NZ2NZ、NZ2ND、双目标按M维度拆分、双目标按N维度拆分等输出格式，验证inf/-inf/nan在各种格式转换和双目标拆分场景下均能正确传递。
 
 **表3** NoQuant模式下float类型L0C中存在inf/-inf/nan时的输出结果
 
 <a name="table_fixpipe_l0c2ub_noquant_boundary"></a>
 
-| L0C中的元素取值 | 输出元素取值 | 说明 |
-| --- | --- | --- |
-| +inf | +inf | 原样保留 |
-| -inf | -inf | 原样保留 |
-| nan | nan | 原样保留 |
+| 场景 | 输出格式 | 双目标 | L0C中的元素取值 | 输出元素取值 | 说明 |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Nz | 否 | +inf/-inf/nan | +inf/-inf/nan | 原样保留 |
+| 2 | ND | 否 | +inf/-inf/nan | +inf/-inf/nan | 原样保留 |
+| 3 | ND | 是（按M拆分） | +inf/-inf/nan | +inf/-inf/nan | 双目标均正确传递 |
+| 4 | ND | 是（按N拆分） | +inf/-inf/nan | +inf/-inf/nan | 双目标均正确传递 |
 
-注：NoQuant场景的输出为float类型，CTRL\[48\]不生效，饱和模式和非饱和模式结果一致。
+注：NoQuant场景的输出为float类型，CTRL\[48\]不生效，饱和模式和非饱和模式结果一致。场景3按M维度拆分时M必须为2的倍数，场景4按N维度拆分时N必须为32的倍数。
 
 ## 测试验证
 
-以上边界值汇总通过[data_copy_l0c2ub样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub)的边界测试脚本`scripts/test_boundary.sh`在NPU上实测验证，共覆盖21种场景：4种NoQuant场景（场景1-4，float输出，测试1次）+ 17种量化场景（场景5-21，×2种饱和模式）= 38项测试。
+以上边界值汇总通过[data_copy_l0c2ub样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub)的边界测试脚本`scripts/test_boundary.sh`在NPU上实测验证，结果为**38/38项全部通过**。共覆盖21种场景：
 
-测试通过向输入矩阵A注入inf/-inf/nan（配合B矩阵对应行设为1.0），使L0C = A×B中产生inf/-inf/nan，验证各输出类型在饱和模式和非饱和模式下的inf/nan处理是否符合预期。对于int8\_t输入场景，使用极端值（A某行设为-128、其余设为127）验证整数溢出饱和行为。
+| 场景范围 | 场景数 | 测试模式 | 测试项 | 说明 |
+| --- | --- | --- | --- | --- |
+| 1-4（NoQuant） | 4 | 仅测试1次 | 4 | float输出，CTRL[48]不生效，饱和/非饱和结果一致 |
+| 5-21（量化） | 17 | 饱和+非饱和 | 34 | 每种量化场景×2种CTRL[48]模式 |
+| **合计** | **21** | | **38** | |
+
+测试通过向输入矩阵A注入inf/-inf/nan（配合B矩阵对应行设为1.0），使L0C = A×B中产生inf/-inf/nan，验证各输出类型在饱和模式和非饱和模式下的inf/nan处理是否符合预期。对于int8\_t输入场景，使用极端值（A某行设为-128、其余设为127）验证整数溢出饱和行为。对于NoQuant场景，验证inf/-inf/nan在NZ2NZ、NZ2ND及双目标拆分模式下的正确传递。
