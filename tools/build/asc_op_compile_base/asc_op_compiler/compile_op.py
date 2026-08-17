@@ -1919,10 +1919,26 @@ def compile_op_common_part(
         get_context().get_addition("super_kernel_sub_combine") is True
         and global_var_storage.get_variable("ascendc_enable_super_kernel") is True
     )
-    enable_static_manifest = not tiling_info.static_shape_flag and (
-        CommonUtility.is_v220() or CommonUtility.is_c310()
+    kernel_spec_mode = get_context().get_addition("kernel_spec_mode") or "None"
+    kernel_spec_dir = get_context().get_addition("kernel_spec_dir")
+    generate_normal_manifest = kernel_spec_mode == "Normal"
+    generate_sk_manifest = kernel_spec_mode == "SK"
+    manifest_requested = generate_normal_manifest or generate_sk_manifest
+    enable_static_manifest = manifest_requested and not tiling_info.static_shape_flag
+    if enable_static_manifest:
+        if not (CommonUtility.is_v220() or CommonUtility.is_c310()):
+            raise_tbe_python_err(
+                TBE_DEFAULT_PYTHON_ERROR_CODE,
+                "Kernel Spec only supports v220 and c310 architectures.",
+            )
+        if not kernel_spec_dir:
+            raise_tbe_python_err(
+                TBE_DEFAULT_PYTHON_ERROR_CODE,
+                "kernel_spec_dir is required when kernel_spec_mode is Normal or SK.",
+            )
+    record_sk_commands = (
+        enable_static_manifest and generate_sk_manifest and is_sk_double_compile
     )
-    record_sk_commands = enable_static_manifest and is_sk_double_compile
     basic_compile_info = compile_info
     basic_compile_option_tuple = compile_option_tuple
     sk_compile_info = None
@@ -1960,8 +1976,6 @@ def compile_op_common_part(
             compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
             basic_compile_info = compile_info_origin
             basic_compile_option_tuple = compile_option_tuple_origin
-            sk_compile_info = compile_info
-            sk_compile_option_tuple = compile_option_tuple
 
     # dump ktype handle
     compile_info.raw_tiling_key_kernel_type = copy.deepcopy(
@@ -1992,7 +2006,7 @@ def compile_op_common_part(
     link_kernel_obj(compile_info, op_info, tiling_info)
 
     # aclnn sk combine compile workflow
-    if is_sk_double_compile and not enable_static_manifest:
+    if is_sk_double_compile and not record_sk_commands:
         # reset sk opt
         global_var_storage.set_variable("ascendc_enable_super_kernel", False)
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
@@ -2091,6 +2105,8 @@ def compile_op_common_part(
             ),
             constant_info_size_by_tiling_key={"tiling_data": manifest_tiling_sizes},
         )
+        kernel_output_dir = os.path.join(kernel_spec_dir, compile_info.kernel_name)
+        manifest_name = f"{compile_info.kernel_name}_manifest.json"
         generate_manifest(
             ManifestGenerationRequest(
                 soc_version=global_var_storage.get_variable(
@@ -2099,7 +2115,8 @@ def compile_op_common_part(
                 resource_id=resource_id,
                 source_file_path=cce_file,
                 origin_func_name=origin_func_name,
-                output_root=kernel_meta_dir,
+                output_dir=kernel_output_dir,
+                manifest_name=manifest_name,
                 kernels=kernel_records,
                 chip_version=CommonUtility.get_chip_version(),
                 sk_cap_bitmap=sk_cap_bitmap,

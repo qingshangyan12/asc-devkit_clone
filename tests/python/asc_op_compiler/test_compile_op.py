@@ -21,6 +21,7 @@ from pathlib import Path
 import re
 import subprocess
 from collections import namedtuple
+from contextlib import ExitStack
 
 
 THIS_FILE_NAME = __file__
@@ -28,6 +29,7 @@ FILE_PATH = os.path.dirname(os.path.realpath(THIS_FILE_NAME))
 TOP_PATH = os.path.join(FILE_PATH, "../../../")
 API_ROOT_PATH = os.path.join(TOP_PATH, "build/adapter_ut")
 FRAMEWORK_PATH = os.path.join(TOP_PATH, "tools/build/")
+KERNEL_SPEC_ROOT = os.path.join(TOP_PATH, "kernel_meta", "kernel_spec")
 sys.path.insert(0, FRAMEWORK_PATH)
 import asc_op_compile_base
 from asc_op_compile_base.common.platform import (
@@ -316,7 +318,10 @@ class TestCompileOp(unittest.TestCase):
         kernel_meta_dir = os.path.join(TOP_PATH, "kernel_meta")
         binary_file = os.path.join(kernel_meta_dir, op_info.kernel_name + ".o")
         json_file = os.path.join(kernel_meta_dir, op_info.kernel_name + ".json")
-        manifest_file = os.path.join(kernel_meta_dir, "manifest", "manifest.json")
+        manifest_dir = os.path.join(KERNEL_SPEC_ROOT, op_info.kernel_name)
+        manifest_file = os.path.join(
+            manifest_dir, op_info.kernel_name + "_manifest.json"
+        )
         self.assertTrue(os.path.isfile(binary_file))
         resource_id = read_resource_id_section(binary_file)
         with open(json_file, "r", encoding="utf-8") as file_obj:
@@ -329,11 +334,266 @@ class TestCompileOp(unittest.TestCase):
             manifest = json.load(file_obj)
         self.assertEqual(manifest["resource_id"], resource_id)
         self.assertTrue(manifest["kernels"])
-        self.assertTrue(
-            os.path.isdir(os.path.join(kernel_meta_dir, "manifest", "resources"))
-        )
+        self.assertTrue(os.path.isdir(os.path.join(manifest_dir, "resources")))
         os.remove(binary_file)
         os.remove(json_file)
+
+    def _run_kernel_spec_common_part(
+        self,
+        mode,
+        *,
+        kernel_spec_dir="/tmp/kernel_spec",
+        static_shape=False,
+        enable_sk=False,
+        supported_arch=True,
+    ):
+        op_info = OpInfo(
+            kernel_name="TestKernel", op_type="TestOp", inputs=[], outputs=[]
+        )
+        infered_info = InferChannelParamsFromIFile(
+            tiling_key_list=[0],
+            code_channel=CORE_TYPE_VEC,
+            hard_sync=False,
+            no_kfc_server_flag=False,
+            enable_deterministic=False,
+            tiling_key_kernel_type={},
+            no_set_kernel_type=False,
+            default_kernel_type=KernelMetaType.KERNEL_TYPE_MAX,
+            dump_info={},
+            template_tiling_info={},
+            default_tiling_struct="",
+            tiling_struct_expr_map={},
+            tiling_key_struct_map={},
+            register_tiling_struct=set(),
+            tpl_tiling_struct=set(),
+            super_kernel_early_start_set_flag=False,
+            super_kernel_early_start_wait_flag=False,
+            tiling_key_deterministic={},
+            tiling_key_group_map={},
+        )
+        tiling_info = TilingInfo()
+        tiling_info.static_shape_flag = static_shape
+        global_var_storage.set_variable("ascendc_enable_super_kernel", enable_sk)
+        try:
+            with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
+                ctx.add_addition("kernel_spec_mode", mode)
+                ctx.add_addition("kernel_spec_dir", kernel_spec_dir)
+                if enable_sk:
+                    ctx.add_addition("super_kernel_sub_combine", True)
+                with ExitStack() as stack:
+                    stack.enter_context(
+                        mock.patch.object(
+                            CommonUtility,
+                            "get_kernel_meta_dir",
+                            return_value="/tmp/kernel_meta",
+                        )
+                    )
+                    stack.enter_context(
+                        mock.patch.object(
+                            CommonUtility,
+                            "get_distinct_filename_tag",
+                            return_value="_tag",
+                        )
+                    )
+                    stack.enter_context(
+                        mock.patch.object(
+                            CommonUtility, "is_v220", return_value=supported_arch
+                        )
+                    )
+                    stack.enter_context(
+                        mock.patch.object(CommonUtility, "is_c310", return_value=False)
+                    )
+                    stack.enter_context(
+                        mock.patch.object(
+                            CommonUtility, "get_chip_version", return_value="c220"
+                        )
+                    )
+                    stack.enter_context(
+                        mock.patch.object(CommonUtility, "remove_temp_file")
+                    )
+                    stack.enter_context(
+                        mock.patch.object(
+                            compile_op_module,
+                            "check_if_gen_placehoder",
+                            return_value=False,
+                        )
+                    )
+                    stack.enter_context(
+                        mock.patch.object(
+                            compile_op_module,
+                            "get_tiling_info_by_tiling",
+                            return_value=tiling_info,
+                        )
+                    )
+                    stack.enter_context(mock.patch.object(tiling_info, "save_file"))
+                    stack.enter_context(mock.patch.object(tiling_info, "remove_file"))
+                    stack.enter_context(
+                        mock.patch.object(
+                            compile_op_module, "handle_sk_codegen_options"
+                        )
+                    )
+                    stack.enter_context(
+                        mock.patch.object(
+                            compile_op_module,
+                            "gen_op_stub_kernel_func",
+                            return_value=0,
+                        )
+                    )
+                    stack.enter_context(
+                        mock.patch.object(compile_op_module, "handle_compile_options")
+                    )
+                    mock_compile_kernel = stack.enter_context(
+                        mock.patch.object(compile_op_module, "compile_kernel_and_meta")
+                    )
+                    mock_link_kernel = stack.enter_context(
+                        mock.patch.object(compile_op_module, "link_kernel_obj")
+                    )
+                    mock_compile_sk_bind = stack.enter_context(
+                        mock.patch.object(compile_op_module, "compile_sk_bind")
+                    )
+                    mock_link_sk_norm = stack.enter_context(
+                        mock.patch.object(compile_op_module, "link_sk_norm_combine")
+                    )
+                    stack.enter_context(
+                        mock.patch.object(compile_op_module, "_json_post_process")
+                    )
+                    mock_write_resource_id = stack.enter_context(
+                        mock.patch.object(
+                            compile_op_module,
+                            "generate_and_write_resource_id",
+                            return_value="resource-id",
+                        )
+                    )
+                    mock_prepare_sk = stack.enter_context(
+                        mock.patch.object(
+                            compile_op_module,
+                            "prepare_sk_manifest_context",
+                            return_value=7,
+                        )
+                    )
+                    mock_build_records = stack.enter_context(
+                        mock.patch.object(
+                            compile_op_module,
+                            "build_kernel_compile_records",
+                            return_value=(),
+                        )
+                    )
+                    mock_generate_manifest = stack.enter_context(
+                        mock.patch.object(compile_op_module, "generate_manifest")
+                    )
+                    compile_op_common_part(
+                        "test.cpp",
+                        "test",
+                        op_info,
+                        CompileOptionTuple([], []),
+                        infered_info,
+                        {},
+                    )
+        finally:
+            global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+            global_var_storage.set_variable(
+                "ascendc_sk_sub_combine_norm_workflow", False
+            )
+
+        return {
+            "compile_kernel": mock_compile_kernel,
+            "link_kernel": mock_link_kernel,
+            "compile_sk_bind": mock_compile_sk_bind,
+            "link_sk_norm": mock_link_sk_norm,
+            "write_resource_id": mock_write_resource_id,
+            "prepare_sk": mock_prepare_sk,
+            "build_records": mock_build_records,
+            "generate_manifest": mock_generate_manifest,
+        }
+
+    def test_kernel_spec_none_does_not_generate_manifest(self):
+        calls = self._run_kernel_spec_common_part("None")
+
+        calls["compile_kernel"].assert_called_once()
+        calls["link_kernel"].assert_called_once()
+        calls["write_resource_id"].assert_not_called()
+        calls["build_records"].assert_not_called()
+        calls["generate_manifest"].assert_not_called()
+
+    def test_kernel_spec_normal_builds_basic_manifest_only(self):
+        calls = self._run_kernel_spec_common_part("Normal")
+
+        calls["compile_kernel"].assert_called_once()
+        calls["link_kernel"].assert_called_once()
+        calls["write_resource_id"].assert_called_once_with(
+            "/tmp/kernel_meta/TestKernel.o"
+        )
+        calls["prepare_sk"].assert_not_called()
+        calls["compile_sk_bind"].assert_not_called()
+        calls["link_sk_norm"].assert_not_called()
+        self.assertIsNone(calls["build_records"].call_args.kwargs["sk_compile_info"])
+        calls["generate_manifest"].assert_called_once()
+        request = calls["generate_manifest"].call_args.args[0]
+        self.assertEqual(
+            getattr(request, "output_dir", None),
+            "/tmp/kernel_spec/TestKernel",
+        )
+        self.assertEqual(
+            getattr(request, "manifest_name", None),
+            "TestKernel_manifest.json",
+        )
+
+    def test_kernel_spec_sk_records_commands_without_sk_compile(self):
+        calls = self._run_kernel_spec_common_part("SK", enable_sk=True)
+
+        calls["compile_kernel"].assert_called_once()
+        calls["link_kernel"].assert_called_once()
+        calls["compile_sk_bind"].assert_not_called()
+        calls["link_sk_norm"].assert_not_called()
+        calls["prepare_sk"].assert_called_once()
+        calls["write_resource_id"].assert_called_once_with(
+            "/tmp/kernel_meta/TestKernel.o"
+        )
+        self.assertIsNotNone(calls["build_records"].call_args.kwargs["sk_compile_info"])
+        calls["generate_manifest"].assert_called_once()
+
+    def test_kernel_spec_static_shape_skips_manifest(self):
+        calls = self._run_kernel_spec_common_part("Normal", static_shape=True)
+
+        calls["compile_kernel"].assert_called_once()
+        calls["link_kernel"].assert_called_once()
+        calls["write_resource_id"].assert_not_called()
+        calls["prepare_sk"].assert_not_called()
+        calls["build_records"].assert_not_called()
+        calls["generate_manifest"].assert_not_called()
+
+    def test_kernel_spec_sk_falls_back_to_basic_manifest(self):
+        calls = self._run_kernel_spec_common_part("SK")
+
+        calls["compile_kernel"].assert_called_once()
+        calls["link_kernel"].assert_called_once()
+        calls["write_resource_id"].assert_called_once_with(
+            "/tmp/kernel_meta/TestKernel.o"
+        )
+        calls["prepare_sk"].assert_not_called()
+        self.assertIsNone(calls["build_records"].call_args.kwargs["sk_compile_info"])
+        calls["generate_manifest"].assert_called_once()
+
+    def test_kernel_spec_normal_keeps_dynamic_sk_and_builds_basic_manifest(self):
+        calls = self._run_kernel_spec_common_part("Normal", enable_sk=True)
+
+        self.assertEqual(calls["compile_kernel"].call_count, 2)
+        calls["link_kernel"].assert_called_once()
+        calls["compile_sk_bind"].assert_called_once()
+        calls["link_sk_norm"].assert_called_once()
+        calls["prepare_sk"].assert_not_called()
+        self.assertIsNone(calls["build_records"].call_args.kwargs["sk_compile_info"])
+        calls["generate_manifest"].assert_called_once()
+
+    def test_kernel_spec_rejects_unsupported_compile_context(self):
+        cases = (
+            ("Normal", {"supported_arch": False}, "v220 and c310"),
+            ("Normal", {"kernel_spec_dir": None}, "kernel_spec_dir"),
+        )
+        for mode, options, message in cases:
+            with self.subTest(mode=mode, options=options):
+                with self.assertRaisesRegex(RuntimeError, message):
+                    self._run_kernel_spec_common_part(mode, **options)
 
     def test_decode_mode(self):
         mode1 = decode_mode(10)
@@ -539,6 +799,8 @@ class TestCompileOp(unittest.TestCase):
         )
         with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
             ctx.add_addition("super_kernel_sub_combine", True)
+            ctx.add_addition("kernel_spec_mode", "SK")
+            ctx.add_addition("kernel_spec_dir", KERNEL_SPEC_ROOT)
             with buildcfg.build_config(
                 enable_super_kernel=True, kernel_meta_parent_dir=TOP_PATH
             ):
@@ -583,8 +845,10 @@ class TestCompileOp(unittest.TestCase):
         )
         mock_compile_sk_bind.assert_not_called()
         json_file = os.path.join(TOP_PATH, "kernel_meta", op_info.kernel_name + ".json")
-        manifest_dir = os.path.join(TOP_PATH, "kernel_meta", "manifest")
-        manifest_file = os.path.join(manifest_dir, "manifest.json")
+        manifest_dir = os.path.join(KERNEL_SPEC_ROOT, op_info.kernel_name)
+        manifest_file = os.path.join(
+            manifest_dir, op_info.kernel_name + "_manifest.json"
+        )
         self.assertTrue(os.path.exists(binary_file))
         resource_id = read_resource_id_section(binary_file)
         with open(binary_file, "rb") as file_obj:
@@ -804,7 +1068,9 @@ class TestCompileOp(unittest.TestCase):
         ascendc_common_utilityop_module = importlib.import_module(
             "asc_op_compile_base.asc_op_compiler.ascendc_common_utility"
         )
-        with asc_op_compile_base.common.context.op_context.OpContext():
+        with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
+            ctx.add_addition("kernel_spec_mode", "Normal")
+            ctx.add_addition("kernel_spec_dir", KERNEL_SPEC_ROOT)
             with buildcfg.build_config():
                 with (
                     mock.patch.object(
@@ -950,7 +1216,9 @@ class TestCompileOp(unittest.TestCase):
             "ascendc_recognize_simtvf", True
         )
         original_search = re.search
-        with asc_op_compile_base.common.context.op_context.OpContext():
+        with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
+            ctx.add_addition("kernel_spec_mode", "Normal")
+            ctx.add_addition("kernel_spec_dir", KERNEL_SPEC_ROOT)
             with buildcfg.build_config():
                 with (
                     mock.patch.object(
@@ -1606,6 +1874,8 @@ class TestCompileOp(unittest.TestCase):
         )
         with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
             ctx.add_addition("super_kernel_sub_combine", True)
+            ctx.add_addition("kernel_spec_mode", "SK")
+            ctx.add_addition("kernel_spec_dir", KERNEL_SPEC_ROOT)
             with buildcfg.build_config(enable_super_kernel=True):
                 with (
                     mock.patch.object(
