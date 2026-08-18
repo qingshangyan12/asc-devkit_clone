@@ -108,6 +108,7 @@ __simd_callee__ inline void asc_gather(vector_<dtype>& dst,
 | bfloat16_t | uint16_t |
 | int32_t | uint32_t |
 | uint32_t | uint32_t |
+| float | uint32_t |
 
 **典型示例**
 
