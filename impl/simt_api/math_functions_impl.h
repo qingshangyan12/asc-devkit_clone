@@ -1288,7 +1288,65 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, __gm__ float* a) { ret
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log10f(float x) { return logf(x) / logf(10.0f); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x) { return logf(1.0f + x); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x)
+{
+    // 常量对应反汇编中的立即数：0xff800000、0x3f400000、0x40800000 以及特殊值边界。
+    constexpr uint32_t log1pReductionMask = 0xFF800000U;
+    constexpr uint32_t fp32OneHalfBits = 0x3F400000U;
+    constexpr uint32_t fp32FourBits = 0x40800000U;
+    constexpr uint32_t fp32PositiveInfBits = 0x7F800000U;
+    constexpr uint32_t fp32SignBit = 0x80000000U;
+    constexpr uint32_t log1pLowerBoundBits = 0xBF800001U;
+    constexpr float polyFirstCoeff = 0.04534861445426940918f; // 0x3d39bf78，对应反汇编中的 R5。
+
+    // 对应 FADD.RZ R0, R4, 1；当前 SIMT C++ 未暴露专用的 RZ 浮点加法接口。
+    const float oneAddX = 1.0f + x;
+    // 对应 MOV/位解释：R4 保存 x 的原始位，R0 保存 1 + x 的原始位。
+    const uint32_t xBits = __builtin_bit_cast(uint32_t, x);
+    const uint32_t oneAddXBits = __builtin_bit_cast(uint32_t, oneAddX);
+
+    // 对应 IADD3 + LOP3：从 1 + x 中提取指数区间分量 reductionBits。
+    const uint32_t reductionBits = (oneAddXBits - fp32OneHalfBits) & log1pReductionMask;
+    // 对应 IADD3：构造归一化后的 x 位模式，以及用于区间缩放的位模式。
+    const uint32_t normalizedXBits = xBits - reductionBits;
+    const uint32_t rangeScaleBits = fp32FourBits - reductionBits;
+    const float normalizedX = __builtin_bit_cast(float, normalizedXBits);
+    const float rangeScale = __builtin_bit_cast(float, rangeScaleBits);
+    // 对应 FFMA R3, R3, 0.25, -1 与 FADD：得到多项式输入 reduced。
+    const float reduced = fmaf(0.25f, rangeScale, -1.0f) + normalizedX;
+    // 对应 I2F 后乘以 2^-23，得到指数补偿项。
+    const float exponent = static_cast<float>(static_cast<int32_t>(reductionBits)) * 1.1920928955078125e-07f;
+
+    // 对应连续 FFMA：按反汇编顺序计算 log1p(reduced) 的多项式部分。
+    float poly = fmaf(-polyFirstCoeff, reduced, 0.10546888411045074463f);
+    poly = fmaf(poly, reduced, -0.13229703903198242188f);
+    poly = fmaf(poly, reduced, 0.14491446316242218018f);
+    poly = fmaf(poly, reduced, -0.16641564667224884033f);
+    poly = fmaf(poly, reduced, 0.19988867640495300293f);
+    poly = fmaf(poly, reduced, -0.25000196695327758789f);
+    poly = fmaf(poly, reduced, 0.33333510160446166992f);
+    poly = fmaf(poly, reduced, -0.5f);
+
+    const float reducedPoly = reduced * poly;
+    // 对应 FMUL + FFMA：reduced + reduced * reduced * poly。
+    float output = fmaf(reducedPoly, reduced, reduced);
+    // 对应最后一次 FFMA：加上 exponent * ln2。
+    output = fmaf(exponent, 0.69314718246459960938f, output);
+
+    // 对应 ISETP.GE.U32：正无穷/NaN 以及所有负数进入尾部修正逻辑。
+    if (xBits >= fp32PositiveInfBits) {
+        // 对应有符号 ISETP.GE：x 为 +inf/NaN 或 x < -1 时，用 x * +inf + +inf 生成结果。
+        // x == -1 保留前面规约和多项式路径得到的 -inf。
+        if (!(xBits >= fp32SignBit && xBits < log1pLowerBoundBits)) {
+            output = fmaf(x, ASCRT_INF_F, ASCRT_INF_F);
+        }
+        // 对应 FSETP.NEU + FSEL：当输入按浮点比较等于 0 时选择 -0。
+        if (x == 0.0f) {
+            output = ASCRT_NEG_ZERO_F;
+        }
+    }
+    return output;
+}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logbf(float x)
 {
