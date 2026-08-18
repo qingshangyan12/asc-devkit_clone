@@ -71,9 +71,12 @@ inline int __float2int_rz(const float x)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__float2int_rz(int32_t* dst, float* x)
+    __global__ __launch_bounds__(1024) void kernel__float2int_rz(int32_t* dst, float* x, uint32_t count)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= count) {
+            return;
+        }
         dst[idx] = __float2int_rz(x[idx]);
     }
     ```
@@ -85,5 +88,10 @@ inline int __float2int_rz(const float x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __float2int_rz(x[idx]);
+    }
+
+    __global__ __vector__ void run_kernel__float2int_rz(__gm__ int32_t* dst, __gm__ float* x)
+    {
+        asc_vf_call<kernel__float2int_rz>(dim3(256), dst, x);
     }
     ```
