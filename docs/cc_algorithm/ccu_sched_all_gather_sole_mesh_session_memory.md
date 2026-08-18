@@ -401,3 +401,87 @@ output/pdf/ccu_sched_all_gather_concur_mesh_nhr_multi_link_detailed_design_missi
    工作树和revision；不要只按本文中的历史revision盲目继续。
 5. 若修改CCU kernel代码，按`.agent/skills/asc-ar-dev/SKILL.md`查询当前devkit API文档并记录证据；本会话未修改
    kernel代码。
+
+## 12. 2026-08-18 `cc0806_2` rebase 到最新 trunk
+
+### 12.1 当前仓库快照
+
+| 项目 | 当前值 |
+| --- | --- |
+| 当前分支 | `cc0806_2` |
+| 当前 HEAD | `370eb42da concept md update` |
+| `origin/cc0806_2` | 与当前 HEAD 相同 |
+| rebase 基线 | `trunk/master` 的 `9a8f862ef fix code check` |
+| 工作树 | 本节写入前为干净状态；写入本文后会有本文档的未提交修改 |
+
+本轮执行了：
+
+```bash
+git pull --rebase trunk master
+```
+
+rebase 已完成，当前分支相对 `trunk/master` 的 14 个提交为：
+
+```text
+76ad82e03 cc migrate iter1 yhy impl
+79e775899 ubx kfc allgather concurrent
+fe3a0e4b9 CalcChannelRequestNhrMultiJetty same update
+1fb3cfbdd concur aicpu sd
+4a0a4b869 fix: adapt MC2 resources after rebase
+429ee8032 test: run allgather AICPU ST through MC2
+147cf270f add st design
+d229a3cc1 update  migrate skill after concurrent and st
+e8eb3af6f sync hccl 0815, impl and test codes updated
+726974558 aicpu st test sd update
+88fd63891 ccu ag fullmesh 1d update 1 step
+36e00ec02 fix: resolve trunk rebase conflict
+9413b2086 feat: migrate concurrent mesh NHR allgather with host coordination
+370eb42da concept md update
+```
+
+### 12.2 冲突与决议
+
+唯一冲突出现在：
+
+```text
+tests/api/adv_api/hccl/cc/st/algorithm/testcase/CMakeLists.txt
+```
+
+冲突发生于重放 `3d2effae4 ccu ag fullmesh 1d update 1 step`。主线新增了
+`HCCL_AICPU_ALLOC_CTX_TARGET` 的 AICPU allocation-context 测试目标，分支新增了
+`add_subdirectory(mc2_ccu)`。两者没有资源或目标名冲突，最终同时保留：先保留主线的完整
+AICPU 测试目标定义，再保留分支的 `add_subdirectory(mc2_ccu)`。
+
+### 12.3 本轮补充的源码定位
+
+Concurrent Mesh + NHR 的 KFC adapter 将原始 Mesh/NHR `CcuKernelInfo` 按 mission 逐项替换为
+Server kernel的代码位于：
+
+```text
+impl/adv_api/detail/hccl/cc/src/ops/kfc_server/template/ccu/ccu_temp_kfc_server.cc
+```
+
+- `CcuTempKfcServer::CalcRes` 中以 `missionIndex` 遍历，并将每一项设置为
+  `CcuKernelKfcServer`；`resourceRequest.ccuKernelInfos[missionIndex] = kernelInfo` 完成原位替换。
+- `InheritKfcServerKernelArg` 复制原始 kernel 的 channel 和静态参数；NHR 路径额外复制 rank、jetty、
+  `opParam`、子通信域和 NHR step/channel 映射，并按 `missionIndex` 设置 role。
+- 原始两项 `ccuKernelInfos` 由
+  `impl/adv_api/detail/hccl/cc/src/ops/all_gather/executor/ins_v2_all_gather_concurrent_executor.cc`
+  先按 Mesh、NHR 顺序合并。
+
+### 12.4 验证边界与恢复步骤
+
+- 已通过：`git diff --check trunk/master..HEAD`；仓库范围内冲突标记扫描未发现残留。
+- 本轮未重新配置、编译或运行测试；不要将先前 host ST 结果外推为本次 rebase 后的验证结果。
+- 新 Session 应先读取本文第 12 节，然后执行：
+
+```bash
+cd /mnt/c/data/gitcodes/asc-devkit
+git branch --show-current
+git rev-parse HEAD
+git status --short
+git log -1 --oneline
+git merge-base --is-ancestor trunk/master HEAD
+```
+
+以用户的新命令为准；不要自动推送或继续构建。
