@@ -322,3 +322,82 @@ f02947e8a add st design
 - MC2 CCU host 目标重新构建，`22/22` 通过。
 - AllGather 专项包含在 host 结果中，`10/10` 通过。
 - `ascendc_ut_adv_api_tiling_ascend610` 因现存 Conv3D 未定义符号失败，与本次冲突文件和 HCCL 目标无关。
+
+## 11. 2026-08-18 Concurrent Mesh + NHR 会话恢复记忆
+
+### 11.1 当前任务和已确认原则
+
+本轮用户要求将HCCL的`CcuSchedAllAGatherConcurMeshNHRMultiLink`（历史名称
+`CcuAllGatherConcurrentMesh1DNHRMem`）迁移到asc-devkit，并先后保留两种设计：
+
+- `cc0806_2`：原则X，即“Host优先、双独立队列而非CCU mission间同步”。
+- `ccuCurMisSyn`：取消原则X，使用CCU mission间同步的设计。
+
+用户已要求忽略Ascend 610。后续不要为该算法补充Ascend 610适配或将其作为验证目标。
+
+### 11.2 当前仓库快照
+
+| 项目 | 当前值 |
+| --- | --- |
+| 记录时间 | 2026-08-18，Asia/Shanghai |
+| asc-devkit路径 | `/mnt/c/data/gitcodes/asc-devkit` |
+| 当前分支 | `ccuCurMisSyn` |
+| 当前HEAD | `b86b00f77 add sd files` |
+| 当前未提交变更 | `docs/cc_algorithm/cc-concept.md`，本节所记录的会话记忆文件也将随本次记录变更 |
+| HCCL路径 | `/mnt/c/data/gitcodes/hccl` |
+
+本会话只进行了源码结构定位和文档更新，未重新运行构建或测试；不能把此前分支的验证结果外推为本轮文档变更后的新验证结果。
+
+### 11.3 两份详细设计文档和PDF
+
+已提交的详细设计文档：
+
+```text
+docs/cc_algorithm/ccu_sched_all_gather_concur_mesh_nhr_multi_link_detailed_design_host_dual_queue.md
+docs/cc_algorithm/ccu_sched_all_gather_concur_mesh_nhr_multi_link_detailed_design_mission_sync.md
+```
+
+两份文档分别描述`cc0806_2`的Host双独立队列设计和`ccuCurMisSyn`的CCU mission同步设计。内容包括：
+
+- 从HCCL同步的代码与为asc-devkit MC2/KFC新增的代码标记；
+- selector、executor、template、kernel、资源申请和KFC适配的职责；
+- 双kernel机制的简化流程图、泳道图；
+- 从MC2 tiling到双kernel运行结束的E2E流程图、泳道图；
+- 两分支的核心差异和选择建议。
+
+对应PDF已生成，但位于被`.gitignore`忽略的目录，未随Git提交：
+
+```text
+output/pdf/ccu_sched_all_gather_concur_mesh_nhr_multi_link_detailed_design_host_dual_queue.pdf
+output/pdf/ccu_sched_all_gather_concur_mesh_nhr_multi_link_detailed_design_mission_sync.pdf
+```
+
+### 11.4 本次补充的CCU概念
+
+`docs/cc_algorithm/cc-concept.md`已追加“CCU Kernel参数与资源描述”章节，记录以下源码结论：
+
+1. `AlgResourceRequest::ccuKernelInfos`定义于
+   `impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h`，类型为
+   `std::vector<CcuKernelInfo>`。
+2. 同文件的`CcuKernelInfo`含`resGroup`、`dieId`、`kernelFuncName`、`kernelFunc`、`kernelArg`和
+   `channels`；私有`kernelArgSmartPtr`通过`setKernelArg`维持裸指针`kernelArg`的生命周期。
+3. `CcuKernelInfo`使用的参数基类是同文件的`CcuKernelArgBase`，其含定长
+   `ChannelHandle channels[CCU_MAX_RANK_SIZE]`和`channelCount`。
+4. `hcomm::CcuKernelArg`是不同的传统CCU对象模型抽象基类，定义于
+   `include/adv_api/hccl/internal/hcomm/pkg_inc/hcomm/ccu/ccu_kernel_arg.h`；它要求派生类实现
+   `GetKernelSignature()`，并以`std::vector<ChannelHandle> channels`保存通道。
+5. `include/adv_api/hccl/internal/hcomm/ccu/ccu_types.h`中的无命名空间`CcuKernelArg`只是
+   `typedef void* CcuKernelArg`。不能把它或`hcomm::CcuKernelArg`与MC2/KFC的`CcuKernelArgBase`混用。
+6. Concurrent Mesh + NHR MultiLink executor会按Mesh、NHR顺序合并两项`ccuKernelInfos`，并设置
+   `ccuKernelNum = {1, 1}`；KFC适配层据mission分组将两个原始kernel分别转换为KFC server kernel。
+
+### 11.5 下个Session恢复顺序
+
+1. 读取本文第11节，再运行`git branch --show-current`、`git log -1 --oneline`和`git status --short`确认状态。
+2. 阅读两份Concurrent算法详细设计文档，明确当前任务应针对Host双队列设计还是mission同步设计。
+3. 阅读`docs/cc_algorithm/cc-concept.md`的“CCU Kernel参数与资源描述”章节，避免混淆三种
+   `CcuKernelArg`相关类型。
+4. 若要继续代码同步或迁移，完整阅读`.agent/skills/migrate-hccl-kfc-algorithms/SKILL.md`，并先检查HCCL
+   工作树和revision；不要只按本文中的历史revision盲目继续。
+5. 若修改CCU kernel代码，按`.agent/skills/asc-ar-dev/SKILL.md`查询当前devkit API文档并记录证据；本会话未修改
+   kernel代码。
