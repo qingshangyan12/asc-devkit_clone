@@ -45,8 +45,8 @@ bool __hbgeux2(bfloat16x2_t x, bfloat16x2_t y)
 
 比较输入各分量是否均满足第一个数大于或等于第二个数的结果。
 
--   true：各分量均满足第一个数大于或等于第二个数。
--   false：任一分量不满足第一个数大于或等于第二个数。
+-   `true`：各分量均满足第一个数大于或等于第二个数。
+-   `false`：任一分量不满足第一个数大于或等于第二个数。
 
 特殊值如下：
 
@@ -92,7 +92,7 @@ bool __hbgeux2(bfloat16x2_t x, bfloat16x2_t y)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用该接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"
