@@ -227,6 +227,7 @@
         ```
 
     对于整数类型只有饱和模式。
+    Fixpipe接口边界值情况说明请见[Fixpipe接口边界值汇总](../../../../appendix/fixpipe_interface_boundary_value_summary.md)。
 <!-- end id28 -->
 <!-- npu="950" id31 -->
 - Ascend 950PR/Ascend 950DT特殊值/边界值约束说明：
