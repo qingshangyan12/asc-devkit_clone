@@ -138,6 +138,7 @@ bool __hbgeux2(half2 x, half2 y)
         if (idx >= input_total_length / 2) {
             return;
         }
+        // 要求x、y指向的内存地址按4字节对齐
         half2* input1 = (half2*)x;
         half2* input2 = (half2*)y;
         dst[idx] = __hbgeux2(input1[idx], input2[idx]);
