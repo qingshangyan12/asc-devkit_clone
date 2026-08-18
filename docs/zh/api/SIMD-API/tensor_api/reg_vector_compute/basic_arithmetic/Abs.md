@@ -39,13 +39,12 @@ __simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg);
 
 ## 约束说明
 
-- 接口不检查整数溢出。例如 `int8_t` 的最小值取绝对值后仍按底层指令规则截断。
-- 不支持的元素类型会在编译期报错。
+- 接口不会扩展整数结果的类型。对有符号整数的最小值取绝对值时，数学结果超出原类型的表示范围，返回值仍为该最小值。例如，`abs(int8_t(-128))` 返回 `int8_t(-128)`。
 
 ## 调用示例
 
 ```cpp
-auto src_reg = input.load(make_coord(0, 0)).with_mask(asc::te::ones<float>());
+auto src_reg = input.load(make_coord(0, 0)).with_mask(asc::te::all_mask<float>());
 auto dst_reg = asc::te::abs(src_reg);
 output.store(make_coord(0, 0), dst_reg);
 ```

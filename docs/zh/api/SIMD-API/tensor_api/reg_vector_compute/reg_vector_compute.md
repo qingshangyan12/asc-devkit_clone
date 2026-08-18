@@ -19,7 +19,7 @@ Tensor API Reg 矢量计算接口以 `asc::te::reg_tensor<T>` 为输入和返回
 ## 编程模型
 
 ```cpp
-auto mask = asc::te::ones<float>();
+auto mask = asc::te::all_mask<float>();
 auto src0 = input0.load(make_coord(0, 0)).with_mask(mask);
 auto src1 = input1.load(make_coord(0, 0)).with_mask(mask);
 auto result = asc::te::abs(src0) + src1;

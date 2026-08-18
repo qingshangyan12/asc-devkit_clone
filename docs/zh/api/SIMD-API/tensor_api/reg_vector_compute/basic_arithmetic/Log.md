@@ -45,6 +45,6 @@ __simd_callee__ inline decltype(auto) log(const reg_tensor<T>& src_reg);
 ## 调用示例
 
 ```cpp
-auto src_reg = input.load(make_coord(0, 0)).with_mask(asc::te::ones<float>());
+auto src_reg = input.load(make_coord(0, 0)).with_mask(asc::te::all_mask<float>());
 auto dst_reg = asc::te::log(src_reg);
 ```

@@ -28,4 +28,3 @@
 
 - 普通 `reg_tensor<T>` 的结果 mask 跟随参与计算的输入寄存器。
 - `reg_tensor<bool>` 表示 predicate 数据，本身不再携带独立 mask 成员。
-- 类型和操作数组合不受支持时会在编译期报错。

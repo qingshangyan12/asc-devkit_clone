@@ -16,7 +16,7 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_REG_BASIC_ARITHMETIC_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_REG_BASIC_ARITHMETIC_H
 
-#include "impl/tensor_api/experimental/reg/reg_tensor_impl.h"
+#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 
 namespace asc {
 namespace te {
