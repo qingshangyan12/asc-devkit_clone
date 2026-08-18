@@ -31,6 +31,30 @@
 namespace ascendc {
 namespace specialization_compile {
 
+bool IsKernelMetaSavingEnabled() noexcept
+{
+    const char* environmentValue = std::getenv("ASCEND_OP_COMPILE_SAVE_KERNEL_META");
+    if (environmentValue == nullptr) {
+        return false;
+    }
+
+    const auto isWhitespace = [](char value) {
+        return value == ' ' || value == '\t' || value == '\n' || value == '\r' || value == '\f' || value == '\v';
+    };
+    const char* firstValueCharacter = environmentValue;
+    while (*firstValueCharacter != '\0' && isWhitespace(*firstValueCharacter)) {
+        ++firstValueCharacter;
+    }
+    const char* valueEnd = firstValueCharacter;
+    while (*valueEnd != '\0') {
+        ++valueEnd;
+    }
+    while (valueEnd != firstValueCharacter && isWhitespace(*(valueEnd - 1))) {
+        --valueEnd;
+    }
+    return valueEnd == firstValueCharacter + 1 && *firstValueCharacter == '1';
+}
+
 void LibraryDeleter::operator()(void* handle) const noexcept
 {
     if (handle != nullptr && dlclose(handle) != 0) {

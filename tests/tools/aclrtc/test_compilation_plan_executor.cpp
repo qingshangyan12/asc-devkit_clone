@@ -186,6 +186,20 @@ TEST(CompilationPlanExecutorTest, WaitsWithoutBusyPollingAfterCommandOutputClose
     EXPECT_LT(consumedCpuNanoseconds, 100000000LL);
 }
 
+TEST(CompilationPlanExecutorTest, WaitsForOutputPipeClosureAfterCommandLeaderExits)
+{
+    KernelSpecializationDiagnostics diagnostics("executor_leader_exit", DiagnosticCollectionMode::Disabled);
+    CompilationCommandExecutionLimits limits {500ms, 500ms, 20ms, 1024U};
+    CompilationPlanExecutor executor(diagnostics, limits);
+    KernelCompilationPlan plan;
+    plan.compilationCommands.push_back(CreateCommand(
+        CompilationCommandKind::Compile, "/bin/sh", {"-c", "sleep 0.3 & exec /bin/true"}));
+
+    const auto startedAt = std::chrono::steady_clock::now();
+    EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_SUCCESS);
+    EXPECT_GE(std::chrono::steady_clock::now() - startedAt, 200ms);
+}
+
 TEST(CompilationPlanExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeaderExits)
 {
     static uint64_t sequence = 0U;
@@ -197,8 +211,8 @@ TEST(CompilationPlanExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeader
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     const std::string commandScript =
-        "trap 'exit 0' TERM; (trap '' TERM; sleep 10) & echo $! > '" +
-        descendantProcessIdPath.string() + "'; wait";
+        "(trap '' TERM; sleep 10) & echo $! > '" + descendantProcessIdPath.string() +
+        "'; exec /bin/true";
     plan.compilationCommands.push_back(
         CreateCommand(CompilationCommandKind::Compile, "/bin/sh", {"-c", commandScript}));
 

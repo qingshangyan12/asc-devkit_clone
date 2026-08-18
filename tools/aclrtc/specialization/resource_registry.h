@@ -31,8 +31,28 @@ class path;
 namespace ascendc {
 namespace specialization_compile {
 
-enum class ResourceStatus { Success, NotFound, Conflict, InvalidResource, IoError, LoadError, InternalError };
-enum class ResourceSourceType { External, Custom, BuiltIn };
+enum class ResourceStatus : uint32_t {
+    Success,
+    NotFound,
+    Conflict,
+    InvalidResource,
+    IoError,
+    LoadError,
+    InternalError,
+};
+
+enum class ResourceSourceType : uint32_t {
+    External,
+    Custom,
+    BuiltIn,
+};
+
+/**
+ * @brief Returns whether kernel metadata and diagnostic artifacts are retained.
+ * @return true only when ASCEND_OP_COMPILE_SAVE_KERNEL_META, after surrounding
+ * whitespace is ignored, is exactly "1".
+ */
+bool IsKernelMetaSavingEnabled() noexcept;
 
 /**
  * @brief Returns whether kernel metadata and diagnostic artifacts are retained.

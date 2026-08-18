@@ -342,7 +342,7 @@ TEST(KernelSpecializationSessionTest, ReportsHowToCorrectMissingOutputDirectory)
         testResource.OutputElfPath().parent_path().string()));
 }
 
-TEST(KernelSpecializationSessionTest, RetainsWorktreeWhenKernelMetaSavingIsEnabled)
+TEST(KernelSpecializationSessionTest, RetainsWorktreeWhenKernelMetaSavingValueHasWhitespace)
 {
     EndToEndTestResource testResource(FakeCompilerOutcome::Success);
     static uint64_t diagnosticSequence = 0U;
@@ -353,7 +353,7 @@ TEST(KernelSpecializationSessionTest, RetainsWorktreeWhenKernelMetaSavingIsEnabl
     fs::create_directories(diagnosticRoot);
     ScopedCurrentDirectory currentDirectory(diagnosticRoot);
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
-    ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "1");
+    ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", " \t1\r\n");
     const uint8_t constantBytes[] = {0x01, 0xfe};
     const void* constantAddresses[] = {constantBytes};
     const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
