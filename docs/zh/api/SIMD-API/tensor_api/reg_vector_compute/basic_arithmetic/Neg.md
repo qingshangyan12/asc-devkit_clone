@@ -39,7 +39,7 @@ __simd_callee__ inline decltype(auto) operator-(const reg_tensor<T>& src_reg);
 
 ## 约束说明
 
-接口不检查整数溢出，计算结果遵循底层指令规则。
+接口不会扩展整数结果的类型。对有符号整数的最小值取负时，数学结果超出原类型的表示范围，返回值仍为该最小值。例如，`-int8_t(-128)` 的结果为 `int8_t(-128)`。
 
 ## 调用示例
 

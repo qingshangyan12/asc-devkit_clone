@@ -18,7 +18,7 @@
 #ifndef IMPL_TENSOR_API_ARCH_UTILS_REG_COMPUTE_TRAITS_H
 #define IMPL_TENSOR_API_ARCH_UTILS_REG_COMPUTE_TRAITS_H
 
-#include "impl/tensor_api/experimental/reg/reg_tensor_impl.h"
+#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "impl/tensor_api/utils/utils_impl.h"
 
 namespace asc {
