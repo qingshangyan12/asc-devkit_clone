@@ -49,6 +49,7 @@ inline bfloat16_t htrunc(bfloat16_t x)
 | ±0 | ±0 | ±0 |
 | ±0 | ±0 | ±0 |
 | ±0 | ±0 | ±0 |
+| ±0 | ±0 | ±0 |
 | inf | inf | ASCRT_MAX_NORMAL_BF16 |
 | -inf | -inf | -ASCRT_MAX_NORMAL_BF16 |
 | nan | nan | 0 |
