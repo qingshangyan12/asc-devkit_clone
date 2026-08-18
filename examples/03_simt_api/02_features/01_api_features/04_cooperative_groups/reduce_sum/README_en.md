@@ -2,21 +2,17 @@
 
 ## Overview
 
-This sample is based on the Ascend C SIMT programming model. It demonstrates how the [cooperative_groups library](../../../../../../docs/zh/api/SIMT-API/协作组/协作组.md) organizes threads into different hierarchy levels and performs efficient parallel reduction.
+This sample demonstrates the basic usage of the [cooperative groups API](../../../../../../docs/zh/api/SIMT-API/cooperative_groups/cooperative_groups.md) through reduction sum operations, highlighting the code abstraction capabilities provided by cooperative groups.
 
-The sample defines one generic reduction interface, `reduce_sum`, whose parameter takes the `thread_group` base class. Three cases are built around this interface, using cross-block (`grid_group`), whole-block (`thread_block`), and sub-group (`thread_block_tile`) reduction domains respectively. The three call sites are written identically; the granularity difference is carried by the group object passed in. The project keeps a single `reduce_sum` implementation, shared by four call sites across the three cases. Its body contains no granularity-specific index arithmetic and no conditional branch on group type.
-
-The programming model is pure SIMT. `grid_group` does not support mixed SIMD and SIMT programming scenarios, which this sample does not cover.
 
 ## Supported Products
 
-Ascend 950PR, Ascend 950DT.
+Ascend 950PR/Ascend 950DT
 
 ## Supported CANN Versions
 
 - \>= CANN 9.2.0
 
-`simt_api/cooperative_groups.h` is provided starting from 9.2.0. Earlier versions report `'simt_api/cooperative_groups.h' file not found` at compile time.
 
 ## Directory Structure
 
@@ -25,89 +21,37 @@ Ascend 950PR, Ascend 950DT.
 │   ├── figures                             // Image resources for the README
 │   ├── CMakeLists.txt                      // Build project file
 │   ├── reduce_sum.asc                      // Sample implementation, three kernels plus host-side invocation
-│   ├── README.md                           
-│   └── README_en.md                        
+│   ├── README.md
+│   └── README_en.md
 ```
 
-`CMakeLists.txt` is the build project file. `reduce_sum.asc` contains the generic reduction interface `reduce_sum`, the SIMT kernel implementations for the three cases, and the host-side argument parsing, case dispatch, and result verification.
 
 ## Sample Description
 
 ### Functionality
 
-The input is an `int32` array with `input[i] = i + 1`, 4096 elements in ND format. The output is a single `int32`, the reduction total. Summing the arithmetic sequence gives the analytical result `4096 × 4097 / 2 = 8390656`; the expected value for verification is computed from this formula in the code.
-
-The three cases partition the reduction domain differently, but they cover the same data without overlap, and all three totals equal that analytical result. The call chains and reduction levels are shown below:
-
-**Figure 1**  Call chain and reduction levels of reduce_sum
-
-![](./figures/reduce_sum_dispatch_en.png)
-
-Each case has its own kernel, its own launch, and its own device memory. A single execution runs exactly one of them. The host-side case functions are grouped by the storage level of the workspace into two: the cross-block reduction places its workspace in global memory, while the whole-block and sub-group scenarios both place theirs in shared memory. The latter two share an identical host-side flow and are therefore combined into one function.
+This sample provides three implementations of reduction sum operations, demonstrating how cooperative groups control thread collaboration at `grid`, `thread block`, and `Warp` granularities. The reduction sum operation is abstracted into a common function `reduce_sum`, which achieves reductions at different granularities by accepting different cooperative group objects, showcasing the code abstraction capabilities of cooperative groups.
 
 ### Specifications
 
-All three cases use the same execution configuration: a grid of 4 thread blocks, 1024 threads per block (32 warps), 4096 threads in total, with dynamic ubuf set to 0. The launch form is `<<<dim3(4), dim3(1024), DYN_UBUF_SIZE, stream>>>`. `THREADS_PER_BLOCK` is 1024, the number of threads per block under the default thread configuration. `TILE_SIZE` is 32 to match the warp width, placing each sub-group within a single warp.
+All three cases use the same execution configuration: a grid of 4 thread blocks, 1024 threads per block (32 warps), 4096 threads in total, with dynamic ubuf set to 0. The launch form is `<<<dim3(4), dim3(1024), DYN_UBUF_SIZE, stream>>>`. `THREADS_PER_BLOCK` is 1024, the number of threads per block under the default thread configuration.
 
-```cpp
-constexpr int32_t BLOCKS_PER_GRID   = 4;     // thread blocks per grid
-constexpr int32_t THREADS_PER_BLOCK = 1024;  // threads per block, i.e. 32 warps
-constexpr int32_t TILE_SIZE         = 32;    // case2 sub-group width, equals warpSize
-constexpr int32_t TOTAL_THREADS     = 4096;  // BLOCKS_PER_GRID * THREADS_PER_BLOCK
-constexpr int32_t WARPS_PER_BLOCK   = 32;    // THREADS_PER_BLOCK / TILE_SIZE
-constexpr uint32_t DYN_UBUF_SIZE    = 0;     // pure SIMT, no dynamic ubuf
-```
 
 <table>
+<tr><td rowspan="1" align="center">OpType</td><td colspan="4" align="center">Cooperative Groups</td></tr>
 <tr><td rowspan="2" align="center">Sample input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
 <tr><td align="center">input</td><td align="center">[4096]</td><td align="center">int32</td><td align="center">ND</td></tr>
-<tr><td rowspan="3" align="center">Sample output</td><td align="center">total_grid (CASE=0)</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
-<tr><td align="center">total_block (CASE=1)</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
-<tr><td align="center">total_tile (CASE=2)</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
-<tr><td rowspan="1" align="center">Kernel names</td><td colspan="4" align="center">reduce_grid_group / reduce_thread_block / reduce_block_tile</td></tr>
-<tr><td rowspan="1" align="center">gridDim</td><td colspan="4" align="center">(4, 1, 1)</td></tr>
-<tr><td rowspan="1" align="center">blockDim</td><td colspan="4" align="center">(1024, 1, 1)</td></tr>
+<tr><td rowspan="1" align="center">Sample output</td><td align="center">output</td><td align="center">[1]</td><td align="center">int32</td><td align="center">ND</td></tr>
 </table>
 
-#### CASE=0 (cross-block reduction)
-
-| Item | Description |
-|---|---|
-| Group object | `this_grid()`, reduction domain of 4096 threads |
-| Synchronization | Grid-level barrier, 24 times across 12 rounds |
-| Workspace | 4096 slots in global memory, 16 KB |
-| Aggregation | Direct assignment by rank 0 |
-
-#### CASE=1 (whole-block reduction)
-
-| Item | Description |
-|---|---|
-| Group object | `this_thread_block()`, reduction domain of 1024 threads |
-| Synchronization | Block-level barrier `asc_syncthreads()`, 20 times across 10 rounds |
-| Workspace | 1024 slots in shared memory, one copy per block |
-| Aggregation | `asc_atomic_add` by rank 0 of each block |
-
-#### CASE=2 (sub-group reduction)
-
-| Item | Description |
-|---|---|
-| Group object | `tiled_partition<32>(block)`, reduction domain of 32 threads |
-| Synchronization | Warp-internal, 10 times across two levels of 5 rounds, plus 1 block-level between levels |
-| Workspace | Shared memory, 32 slots per warp at level one, plus `ub_partial[32]` to relay partial sums |
-| Aggregation | `asc_atomic_add` by rank 0 of warp 0 in each block |
 
 ### Implementation
 
-The three cases share one reduction implementation, differing only in the group object, the workspace, and the initial value passed in:
+**Figure 1**  The halving reduction process
 
-```cpp
-reduce_sum(grid,  ws,                    input[global_idx]);          // case0
-reduce_sum(block, ub_workspace,          input[global_idx]);          // case1
-reduce_sum(tile,  ub_workspace + offset, input[global_idx]);          // case2 level one
-reduce_sum(tile,  ub_workspace,          ub_partial[thread_rank()]);  // case2 level two
-```
+![](./figures/halving_reduction_en.png)
 
-The parameter takes the `thread_group` base class, and the body uses only three base-class interfaces: `thread_rank()`, `size()`, and `sync()`. Whether `g.sync()` resolves to warp-internal synchronization, a block-level barrier, or a grid-level barrier is dispatched by the base class according to the actual group type; the interface itself is unaware of that dispatch:
+The figure takes 16 threads as an example. In each round, every active thread adds the value it holds to the value held `i` threads away, after which the number of active threads is halved and the stride `i` halves along with it.
 
 ```cpp
 template <typename PtrT>
@@ -115,10 +59,10 @@ __aicore__ inline int32_t reduce_sum(const thread_group& g, PtrT x, int32_t val)
 {
     const int32_t lane = static_cast<int32_t>(g.thread_rank());
     for (int32_t i = static_cast<int32_t>(g.size()) / 2; i > 0; i /= 2) {
-        x[lane] = val;              // (1) write to this thread's slot
+        x[lane] = val;              // (1) write to the slot of this thread
         g.sync();                   // (2) wait for the whole group to finish writing
         if (lane < i) {
-            val += x[lane + i];     // (3) lower half reads its partner's slot
+            val += x[lane + i];     // (3) read the slot i threads away
         }
         g.sync();                   // (4) wait for the whole group to finish reading
     }
@@ -126,30 +70,32 @@ __aicore__ inline int32_t reduce_sum(const thread_group& g, PtrT x, int32_t val)
 }
 ```
 
-Let the reduction domain size be `N = g.size()`. The stride `i` starts at `N / 2` and halves each round, for log<sub>2</sub>N rounds in total. The four steps per round and the final return are common to all three cases: all `N` threads execute `x[lane] = val`, writing the value they currently hold into slot `lane` of the workspace; `g.sync()` waits for the whole group to finish writing; threads with `lane < i` execute `val += x[lane + i]`, reading the partner slot at stride `i` and accumulating in a register, which reduces the count of live values from `i × 2` to `i`; `g.sync()` waits for the whole group to finish reading, so the next round's writes do not overwrite slots that have not yet been read. When `i` reaches 0 the loop ends, lane 0 holds the group total, and the remaining threads return −1 for the caller to handle according to its own aggregation method.
+The number of threads participating in the reduction is `N = g.size()`. The distance `i` between adjacent threads involved in the computation starts at `N/2` and halves each round. Since `val` is stored in registers private to each thread and is not accessible to other threads, the parameter `x` is provided to point at a workspace, which is used to store intermediate values of the computation.
 
-The two values added each round each stand for a batch of elements, the two batches do not overlap, and the sum stands for both batches together. So at the end of every round the live values still cover all elements between them, with nothing missed and nothing counted twice, only the number of threads holding a value is halved. This holds regardless of the reduction domain size `N`, so the totals are identical at all three granularities.
+> [!NOTE]Note
+> When a case calls the `reduce_sum` interface, `global_idx < num_elements ? input[global_idx] : 0` is required to guard against reading past the end of the input.
 
-**Figure 2**  The halving reduction: stride and active thread count both halve each round
+#### Performance Metric
 
-![](./figures/halving_reduction_en.png)
 
-The workspace pointed to by parameter `x` carries the job of exchanging intermediate values among threads in the group. `val` lives in a register private to each thread, and cross-thread merging happens through this block of memory addressable by all participating threads. The workspace is sized to `g.size()` slots, indexed by rank within the group; what remains in it after execution is the last round's intermediate state, which is not read back to the host. Its storage level is determined by the span of the reduction domain: global memory when the domain crosses blocks, shared memory when it does not.
+| Metric | Description |
+| --- | --- |
+| Task Duration (μs) | Total task duration, including the time scheduled onto the accelerator, the execution time on the accelerator, and the response/completion time |
 
-Template parameter `PtrT` carries the address space qualifier of the workspace pointer, either a raw global memory pointer or `__ubuf__ int32_t*`. Granularity dispatch is still performed by the group object `g`.
+#### Case0: Cross-block Reduction
 
-The last parameter of all three kernels is `uint32_t num_elements`, and each has one statement at the point of reading input: `global_idx < num_elements ? input[global_idx] : 0`. The thread count is fixed at 4096 by the execution configuration; threads whose index exceeds the element count take the additive identity 0 into the sum and write their slots and complete every round of halving and synchronization alongside the rest.
+All threads in the grid are joined into a single group participating in the reduction, and one call to `reduce_sum` produces the total. The reduction takes 12 rounds of halving, each synchronized by a grid-level barrier: the additions in the first two rounds cross block boundaries, after which the reduction converges inside block 0, but the group object passed to `reduce_sum` is still `grid_group`, so each round of synchronization continues to require all 4096 threads of the grid to arrive, and the thread with rank 0 finally writes out the result directly.
 
-#### Cross-block Reduction
+**Figure 2**  Case0 cross-block reduction
 
-The reduction domain is all 4096 threads in the grid, and one `reduce_sum` call produces the total.
+![](./figures/reduce_sum_case0_en.png)
 
 ```cpp
 __global__ void reduce_grid_group(
-    const int32_t* input, int32_t* grid_workspace, int32_t* total_grid, uint32_t num_elements)
+    const int32_t* input, int32_t* grid_workspace, int32_t* total_grid, int32_t num_elements)
 {
     grid_group grid = this_grid();
-    const uint32_t global_idx = static_cast<uint32_t>(grid.thread_rank());
+    const int32_t global_idx = (int32_t)grid.thread_rank();
     volatile int32_t* ws = grid_workspace;
     const int32_t in_val = global_idx < num_elements ? input[global_idx] : 0;
     const int32_t val = reduce_sum(grid, ws, in_val);
@@ -159,87 +105,72 @@ __global__ void reduce_grid_group(
 }
 ```
 
-`thread_rank()` of `grid_group` is the global index 0 to 4095, used directly as the subscript into `input`.
+The threads participating in the reduction are all 4096 threads of the grid. The reduction has to cross blocks, and GM is the memory shared by all blocks in the grid, so the workspace `grid_workspace` must be allocated in GM, and `ws` must be qualified with `volatile` so that every read lands in GM rather than in the Data Cache private to each core, which keeps the data consistent from round to round.
 
-The reduction domain crosses blocks, so the workspace must be visible at Grid scope, and of the four storage levels only global memory satisfies it. Global memory is allocated and initialized on the host side, and the device side obtains the pointer through a kernel parameter, so the workspace enters the parameter list as `int32_t* grid_workspace`. Among the three kernels, only this scenario carries a workspace parameter.
+**Performance data**:
 
-The reduction domain is 4096, giving 12 rounds. The reads in the first two rounds cross block boundaries: at `i = 2048`, lanes 0 to 2047 of blocks 0 and 1 read slots written by blocks 2 and 3; at `i = 1024`, lanes 0 to 1023 of block 0 read slots written by block 1. From the third round on the stride drops below 512 and the additions converge inside block 0.
+| Task Duration(us) |
+| :---------------: |
+|      16.101       |
 
-The workspace pointer is converted to `volatile int32_t*` before being passed to `reduce_sum`. The Data Cache is private to each core, and `grid.sync()` only aligns the execution progress of the cores without invalidating existing cache copies; cross-block reads must bypass the cache through `volatile` to obtain the value the partner block wrote in the current round.
+#### Case1: Whole-block Reduction
 
-Although the additions in the last ten rounds have converged to block 0, the group object is still `grid_group`, so each `g.sync()` still requires all 4096 threads of the grid to arrive, and the 3072 threads of blocks 1 through 3 follow along through each round's write and two synchronizations. When the reduction domain is at grid granularity, the synchronization scope always covers all 4096 threads.
+The threads participating in the reduction are the 1024 threads of one block, and the 4 blocks reduce independently. The reduction takes 10 rounds of halving, all synchronized by block-level barriers. Rank 0 of each block accumulates the sum of that block into the same output through `asc_atomic_add`, which aggregates the total.
 
-After 12 rounds only rank 0 of the grid holds the total, written out by `*total_grid = val`. With a single writer, no atomic addition is needed and `total_grid` does not need to be zeroed beforehand.
+**Figure 3**  Case1 whole-block reduction
 
-#### Whole-block Reduction
-
-The reduction domain is the 1024 threads of one thread block. Each of the four blocks reduces to a partial sum, and the partial sums are aggregated by atomic addition.
+![](./figures/reduce_sum_case1_en.png)
 
 ```cpp
-__global__ void reduce_thread_block(const int32_t* input, int32_t* total_block, uint32_t num_elements)
+__global__ void reduce_thread_block(const int32_t* input, int32_t* total_block, int32_t num_elements)
 {
-    __ubuf__ static int32_t ub_workspace[THREADS_PER_BLOCK];
-
+    __ubuf__ int32_t ub_workspace[THREADS_PER_BLOCK];
     thread_block block = this_thread_block();
-    const uint32_t global_idx = static_cast<uint32_t>(blockIdx.x) * static_cast<uint32_t>(blockDim.x)
-                              + static_cast<uint32_t>(block.thread_rank());
+    const int32_t global_idx = (int32_t)(blockIdx.x * blockDim.x + block.thread_rank());
     const int32_t in_val = global_idx < num_elements ? input[global_idx] : 0;
     const int32_t val = reduce_sum(block, ub_workspace, in_val);
-
     if (block.thread_rank() == 0) {
         asc_atomic_add(total_block, val);
     }
 }
 ```
 
-The reduction domain no longer crosses blocks, so the workspace visibility drops from Grid to Block and shared memory suffices. The on-chip offset of shared memory is laid out by the compiler at compile time, so the workspace is declared inside the kernel as `__ubuf__ static` and does not enter the parameter list, leaving the signature one parameter shorter than the cross-block scenario. A static declaration takes a compile-time constant length, so the capacity is `constexpr int32_t THREADS_PER_BLOCK`.
+The threads participating in this reduction are inside a block, so the workspace resides in UB and is defined statically inside the kernel with `THREADS_PER_BLOCK`, without being passed as a parameter.
 
-`block.thread_rank()` is the index within the block, 0 to 1023, and reading input converts it to a global subscript through `blockIdx.x * blockDim.x + block.thread_rank()`. The rank semantics narrowing from global to within-block is the main difference between this scenario and the cross-block one. Block numbering starts at 0 in each block, so every block has its own rank 0 and the four blocks each produce one partial sum.
+**Performance data**:
 
-The reduction domain is 1024, giving 10 rounds. In the first 5 rounds `i` decreases from 512 to 32, live threads span multiple warps, and synchronization is covered by the block-level barrier. After `i = 32` the live threads shrink to lanes 0 through 31, exactly one warp, while the group object remains `thread_block` and synchronization still dispatches to the block-level barrier. The sub-group scenario replaces the synchronization of these last 5 rounds with warp-internal synchronization.
+| Task Duration(us) |
+| :---------------: |
+|       3.514       |
 
-Workspace reads and writes do not leave the core. `x[lane] = val` and `val += x[lane + i]` act directly on the Unified Buffer of the local core, participating threads share the same block of on-chip memory, and after `asc_syncthreads()` a write is visible to all threads in the block, so reads do not need `volatile`.
+#### Case2: Warp-internal Reduction
 
-Partial sums of the four blocks and their aggregation:
+The threads participating in the reduction are the 32 threads of one warp, and the reduction is done in two levels. At the first level, the 32 warps of a block each reduce independently: every group of 32 threads performs 5 rounds of halving, each round synchronized by a warp-level barrier, and rank 0 of each warp writes its partial sum into `ub_partial`. The two levels are joined by one block-level barrier, which ensures that all 32 partial sums have been written. At the second level, warp 0 reads these 32 partial sums and performs another 5 rounds of halving, again synchronizing only within the warp, after which its rank 0 accumulates the block sum into the same output through `asc_atomic_add`, and the 4 blocks aggregate the total.
 
-| Block | Elements covered | Partial sum |
-|---|---|---|
-| 0 | 1 to 1024 | 524800 |
-| 1 | 1025 to 2048 | 1573376 |
-| 2 | 2049 to 3072 | 2621952 |
-| 3 | 3073 to 4096 | 3670528 |
+**Figure 4**  Case2 warp-internal reduction
 
-The general form is `524800 + 1048576k` (where `k` is the block index, ranging from 0 to 3). The four partial sums are accumulated by `asc_atomic_add`, and the result is independent of the order in which the blocks complete. The total consists of these four accumulations, and `total_block` is zeroed by `aclrtMemset` before launch.
-
-#### Sub-group Reduction
-
-The reduction is completed in two levels. `reduce_sum` is called twice within the same kernel, with a reduction domain of 32 both times.
+![](./figures/reduce_sum_case2_en.png)
 
 ```cpp
-__global__ void reduce_block_tile(const int32_t* input, int32_t* total_tile, uint32_t num_elements)
+__global__ void reduce_block_tile(const int32_t* input, int32_t* total_tile, int32_t num_elements)
 {
-    __ubuf__ static int32_t ub_workspace[THREADS_PER_BLOCK];   // level one, shared as 32 segments
-    __ubuf__ static int32_t ub_partial[WARPS_PER_BLOCK];       // relays partial sums between levels
-
+    __ubuf__ int32_t ub_workspace[THREADS_PER_BLOCK];
+    __ubuf__ int32_t ub_partial[WARPS_PER_BLOCK];
     thread_block block = this_thread_block();
-    const uint32_t global_idx = static_cast<uint32_t>(blockIdx.x) * static_cast<uint32_t>(blockDim.x)
-                              + static_cast<uint32_t>(block.thread_rank());
-
+    const int32_t global_idx = (int32_t)(blockIdx.x * blockDim.x + block.thread_rank());
     auto tile = tiled_partition<TILE_SIZE>(block);
-    const int32_t offset = static_cast<int32_t>(tile.meta_group_rank()) * TILE_SIZE;
-
-    // level one: 32-way parallel, reduction domain 32
+    const int32_t offset = (int32_t)tile.meta_group_rank() * TILE_SIZE;
     const int32_t in_val = global_idx < num_elements ? input[global_idx] : 0;
     int32_t val = reduce_sum(tile, ub_workspace + offset, in_val);
+
     if (tile.thread_rank() == 0) {
         ub_partial[tile.meta_group_rank()] = val;
     }
-
     block.sync();
 
-    // level two: warp 0 only, reduction domain still 32, input becomes the partial sums
     if (tile.meta_group_rank() == 0) {
         val = reduce_sum(tile, ub_workspace, ub_partial[tile.thread_rank()]);
+
         if (tile.thread_rank() == 0) {
             asc_atomic_add(total_tile, val);
         }
@@ -247,105 +178,35 @@ __global__ void reduce_block_tile(const int32_t* input, int32_t* total_tile, uin
 }
 ```
 
-`tiled_partition<32>(block)` takes the thread block as the parent group and splits it into `1024 / 32 = 32` sub-groups, 128 across the grid. The sub-group width equals the warp width, so `sync()` dispatches to the warp-internal synchronization path. The return type is `thread_block_tile<TILE_SIZE, thread_block>`, determined by two template parameters, the sub-group width and the parent group type; `auto` receives it at the call site, so the type never has to be spelled out.
+`TILE_SIZE` is 32, the width of one warp, so that each sub-group produced by `tiled_partition<TILE_SIZE>(block)` falls exactly within one warp. A `sync()` within such a group then only has to wait for 32 threads, which costs less than a block-level barrier that waits for 1024 threads. A value greater than 32 makes a sub-group span warps, its `sync()` degrades to a block-level barrier, and this advantage no longer holds.
 
-After partitioning there are two ranks: `tile.thread_rank()` is the index within the warp, 0 to 31, which `lane` inside `reduce_sum` takes; `tile.meta_group_rank()` is the index of the sub-group within the parent group, 0 to 31, that is the warp number. `offset = tile.meta_group_rank() * TILE_SIZE` uses the warp number to give each of the 32 warps an exclusive 32-slot segment in the same `ub_workspace`.
+**Performance data**:
 
-Level one has a reduction domain of 32 and 5 rounds of halving, with all 128 warps executing in parallel. Warp w covers global subscripts `32w` through `32w+31`, that is element values `32w+1` through `32w+32`, giving a partial sum of `32 × 32w + 32 × 33 / 2 = 1024w + 528`:
+| Task Duration(us) |
+| :---------------: |
+|       2.397       |
 
-| Warp | Elements covered | Partial sum |
-|---|---|---|
-| 0 | 1 to 32 | 528 |
-| 1 | 33 to 64 | 1552 |
-| … | … | … |
-| 127 | 4065 to 4096 | 130576 |
+## Performance Comparison
 
-Rank 0 of each segment then writes its partial sum into `ub_partial`, subscripted by warp number, one slot per sub-group.
+The performance data of the three cases is listed below:
 
-The two levels are joined by `block.sync()`, at block granularity. The 32 writers of `ub_partial` belong to 32 different warps and the readers are the 32 lanes of warp 0, so the write and read cross warp boundaries; the block-level barrier ensures all 32 slots have landed before level two reads them.
+| Case | Threads in the reduction | Halving rounds | Synchronization count and scope | Task Duration(us) |
+| :--: | :----: | :--: | :--: | :-----------------: |
+| Cross-block reduction | 4096 | 12 | 24 grid-level | 16.101 |
+| Whole-block reduction | 1024 | 10 | 20 block-level | 3.514 |
+| Warp-internal reduction | 32 | 5 + 5 | 20 warp-internal + 1 block-level | 2.397 |
 
-Level two is confined to warp 0 by `if (tile.meta_group_rank() == 0)`, with the other 31 warps skipping it. Its 32 lanes each read one partial sum as the initial value and reduce once more to obtain the block total. `g.sync()` inside `reduce_sum` is warp-internal at this point, scoped to the single warp that entered the branch, and the 31 skipped warps do not participate in that synchronization. The level-two workspace is the first 32 slots of `ub_workspace`, the segment tile 0 used at level one; those partial sums have already been relayed to `ub_partial` after `block.sync()`, so the level-two writes overwrite the old contents without needing a separate allocation.
+The three cases have the same input size and the same memory traffic, so the performance difference comes mainly from the scope of synchronization: the more threads a single synchronization has to wait for, the longer the threads that arrive early sit idle at the barrier.
 
-Both calls pass the same `tile` group object, with a reduction domain of 32 and 5 rounds each, and an identical halving process. Only the values of the three arguments differ:
-
-| | Input | Workspace | Execution scope |
-|---|---|---|---|
-| Level one | `input[global_idx]` | `ub_workspace + offset` | All 32 warps |
-| Level two | `ub_partial[thread_rank()]` | `ub_workspace` | Warp 0 only |
-
-The same implementation is instantiated twice within one kernel, with no change to the function body. The two levels total 10 warp-internal synchronizations plus 1 block-level synchronization, level one runs 128-way parallel, and the extra on-chip space is `ub_partial[32]`, 128 B.
-
-Summing the partial sums of the 32 warps within a block gives that block's partial sum, matching the whole-block scenario. After atomic addition across the four blocks the total is 8390656.
-
-#### Host-side Implementation
-
-`main` performs seven steps in order: parse arguments; build the input and the expected value; initialize the runtime through `aclInit`, `aclrtSetDevice`, and `aclrtCreateStream`; allocate input device memory and copy the data in; dispatch by case to one of the two case functions and retrieve the total; release memory and deinitialize; finally call `verify_result` and use its return value as the process exit code.
-
-```cpp
-// case0: workspace in global memory
-int32_t run_global_workspace_case(int32_t* input_device, int32_t num_elements, aclrtStream stream);
-// case1 and case2: workspace in shared memory, the kernel parameter selects which one to launch
-int32_t run_shared_workspace_case(KernelType kernel, int32_t* input_device, int32_t num_elements, aclrtStream stream);
-```
-
-The two case functions do not call each other. Each allocates the device memory its scenario needs, launches the kernel, synchronizes the stream, reads the total back, releases its memory, and returns that total. Result comparison does not happen inside the case functions; it is centralized in `verify_result`.
-
-The split follows the storage level of the workspace, since that level determines whether the host side needs an additional allocation. The cross-block reduction places its workspace in global memory, so the host must allocate a separate block of `TOTAL_THREADS` `int32` values and pass it in the kernel parameter list; its total is written solely by rank 0 of the grid, without atomic addition, and therefore needs no zeroing beforehand. The whole-block and sub-group scenarios declare their workspace inside the kernel as `__ubuf__ static`, so the host performs no corresponding allocation, and both need device memory only for the one `int32` total; aggregation in both uses `asc_atomic_add`, so that total is zeroed by `aclrtMemset` before launch.
-
-The host-side flow of the latter two scenarios is thus identical, differing only in which kernel is launched. `run_shared_workspace_case` carries that difference in its `KernelType kernel` parameter:
-
-```cpp
-if (kernel == KernelType::THREAD_BLOCK) {
-    reduce_thread_block<<<BLOCKS_PER_GRID, THREADS_PER_BLOCK, DYN_UBUF_SIZE, stream>>>(
-        input_device, total_device, num_elements);
-} else {
-    reduce_block_tile<<<BLOCKS_PER_GRID, THREADS_PER_BLOCK, DYN_UBUF_SIZE, stream>>>(
-        input_device, total_device, num_elements);
-}
-```
-
-Allocation, zeroing, stream synchronization, reading the total back, and releasing memory all sit outside that branch, shared by both scenarios. A single execution still launches exactly one kernel; case selection is performed by the dispatch in `main` and is unaffected by the merging of the case functions.
-
-The expected value is computed in code from the element count, matching the analytical formula. `num_elements` takes `TOTAL_THREADS`, that is `BLOCKS_PER_GRID * THREADS_PER_BLOCK` or 4096, so golden is 8390656:
-
-```cpp
-const int32_t golden = static_cast<int32_t>(num_elements * (num_elements + 1) / 2);  // 4096 -> 8390656
-```
-
-After the case function returns, `main` finishes by releasing the input device memory, destroying the stream, resetting the device, and deinitializing, then returns the verification result:
-
-```cpp
-CHECK_ACL(aclrtFree(input_device));
-CHECK_ACL(aclrtDestroyStream(stream));
-CHECK_ACL(aclrtResetDevice(device_id));
-CHECK_ACL(aclFinalize());
-
-return verify_result(output, golden);
-```
-
-Every ACL call is wrapped in `CHECK_ACL`. When the return code is not `ACL_SUCCESS`, the macro prints its file and line, the error code, the runtime message obtained from `aclGetRecentErrMsg()`, and the literal text of the failing call, then terminates the process with `EXIT_FAILURE`. `aclGetRecentErrMsg()` may return `nullptr` when no detail is available, and passing that to `%s` is undefined behavior, so the macro guards against it:
-
-```cpp
-#define CHECK_ACL(expr)                                                                       \
-    do {                                                                                      \
-        aclError ret = (expr);                                                                \
-        if (ret != ACL_SUCCESS) {                                                             \
-            const char* msg = aclGetRecentErrMsg();                                           \
-            fprintf(                                                                          \
-                stderr, "Ascend Error: %s:%d code=%d %s \"%s\"\n", __FILE__, __LINE__,        \
-                static_cast<int>(ret), (msg != nullptr) ? msg : "no detail", #expr);          \
-            exit(EXIT_FAILURE);                                                               \
-        }                                                                                     \
-    } while (0)
-```
-
-Terminating on error keeps the subsequent launch and read-back from running, so results are never compared while the runtime is already in an abnormal state. The correctness of the reduction result is determined by `verify_result` comparing the total against golden, and its return value is the process exit code.
+- Warp-internal reduction is roughly 31.8% faster than whole-block reduction. The two have the same number of halving rounds and both keep the workspace in UB; they differ only in the scope of synchronization. Each of the 20 synchronizations in warp-internal reduction waits for only 32 threads, with a single block-level barrier used between the two levels, whereas each of the 20 synchronizations in whole-block reduction waits for all 1024 threads of the block.
+- Cross-block reduction takes roughly 4.6 times as long as whole-block reduction, for two reasons. First, every synchronization has to wait for all 4096 threads of the grid, the widest scope of the three. Second, the workspace can only be placed in GM and the pointer additionally needs `volatile`, so every read and write of each round accesses GM directly, and the access latency of GM is far higher than that of UB.
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and execute the example.
 
-- Configure Environment Variables  
+- Configure Environment Variables
+
   Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
@@ -356,54 +217,26 @@ Run the following steps in the root directory of this example to build and execu
 
 - Run the Example
 
-  Run the following commands in this example directory. The case number is given as an argument, 0, 1, or 2, and a single execution runs only that one case. If the argument is missing or invalid, the usage is printed and the process returns with exit code 1.
+  Run the following commands in this example directory. The case number is given as an argument at run time, and a single execution runs only that one case.
 
   ```bash
-  mkdir -p build && cd build;                              # Create and enter the build directory
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # Build the project
-  ./cooperative_groups 0                                   # Run the cross-block reduction
-  ./cooperative_groups 1                                   # Run the whole-block reduction
-  ./cooperative_groups 2                                   # Run the sub-group reduction
+  mkdir -p build && cd build;                             # Create and enter the build directory
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # Build the project
+  ./cooperative_groups 0                                  # Run the cross-block reduction case
+  ./cooperative_groups 1                                  # Run the whole-block reduction case
+  ./cooperative_groups 2                                  # Run the warp-internal reduction case
   ```
 
-  Build Options Description
+- Build Options Description
 
   | Option | Values | Description |
-  |------|--------|------|
+  |---------------------------|------------|---------------------------------------------------|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
-  The output of the three cases is as follows. Each indicates that the accuracy verification is successful.
 
-  Cross-block reduction:
-
-  ```text
-  Case 0: cross-block reduction (grid_group), reduce domain = 4096
-  num_elements = 4096, threads = 4096
-  grid = 4 blocks x 1024 threads, reduce domain = 4096, workspace in global memory
-  Output: 8390656
-  Golden: 8390656
-  [Success] Case accuracy verification passed.
-  ```
-
-  Whole-block reduction:
+  The output is as follows, which indicates that the accuracy verification passed.
 
   ```text
-  Case 1: whole-block reduction (thread_block), reduce domain = 1024
-  num_elements = 4096, threads = 4096
-  grid = 4 blocks x 1024 threads, reduce domain = 1024 per block, workspace in shared memory
-  Output: 8390656
-  Golden: 8390656
-  [Success] Case accuracy verification passed.
-  ```
-
-  Sub-group reduction:
-
-  ```text
-  Case 2: sub-group reduction (thread_block_tile<32>), reduce domain = 32
-  num_elements = 4096, threads = 4096
-  grid = 4 blocks x 1024 threads, 32 tiles per block, reduce domain = 32, workspace in shared memory
-  Output: 8390656
-  Golden: 8390656
   [Success] Case accuracy verification passed.
   ```
 
@@ -412,8 +245,9 @@ Run the following steps in the root directory of this example to build and execu
 Use the `msOpProf` tool to collect detailed performance data:
 
 ```bash
-msopprof ./cooperative_groups 1   # Analyze whole-block reduction case performance
-msopprof ./cooperative_groups 2   # Analyze sub-group reduction case performance
+msopprof ./cooperative_groups 0   # Analyze the performance of the cross-block reduction case
+msopprof ./cooperative_groups 1   # Analyze the performance of the whole-block reduction case
+msopprof ./cooperative_groups 2   # Analyze the performance of the warp-internal reduction case
 ```
 
 After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:
@@ -430,22 +264,3 @@ After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generate
 ├──ResourceConflictRatio.csv  # UB bank group, bank conflict, and resource conflict ratio across all instructions
 └──visualize_data.bin         # MindStudio Insight presentation file
 ```
-
-View specific performance analysis results:
-
-```bash
-# For example, view operator basic information
-cat ./OPPROF_*/OpBasicInfo.csv
-
-# For example, view memory-related data
-cat ./OPPROF_*/Memory.csv
-```
-
-Three runs each, `Task Duration(us)`:
-
-| Case | Reduction domain | Synchronization | Task Duration(us) |
-|---|---|---|---|
-| Whole-block | 1024 | 20 block-level | 7.01 / 7.12 / 7.22 |
-| Sub-group | 32 | 10 warp-internal + 1 block-level | 6.11 / 6.29 / 6.58 |
-
-Sub-group reduction is roughly 10% to 13% faster than whole-block reduction, and the ranges of the three runs do not overlap. The two scenarios have the same input size, the same memory traffic, and the same workspace storage level. They differ in synchronization scope: the 5 rounds of level one in sub-group reduction use warp-internal synchronization, with a single block-level barrier between the two levels, whereas all 10 rounds of whole-block reduction use block-level barriers. The smaller the synchronization scope, the fewer threads a single barrier must wait for.
