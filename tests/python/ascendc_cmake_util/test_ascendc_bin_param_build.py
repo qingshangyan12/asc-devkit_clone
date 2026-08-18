@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
 
 import sys
 from collections import defaultdict
@@ -81,8 +90,8 @@ def test_build_command_passes_default_numeric_mode(tmp_path):
         str(tmp_path),
     )
 
-    command = (
-        tmp_path / "AddCustomTemplate-add_custom_template-0.sh"
-    ).read_text(encoding="utf-8")
+    command = (tmp_path / "AddCustomTemplate-add_custom_template-0.sh").read_text(
+        encoding="utf-8"
+    )
     assert "--simplified_key_mode=0" in command
     assert "--simplified_key_mode=None" not in command
