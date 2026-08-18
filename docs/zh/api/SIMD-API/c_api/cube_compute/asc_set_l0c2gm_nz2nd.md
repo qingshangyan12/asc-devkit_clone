@@ -45,7 +45,7 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num,
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | nd_num | 输入 | ND矩阵的数量，取值范围为[1, 65535]。 |
-| src_nd_stride | 输入 | 源相邻Nz矩阵之间的偏移（相邻Nz矩阵头与头的间隔）。当nd_num配置为1时，src_nd_stride不生效，配置为0即可。取值范围为[0, 65535]，单位为64字节（`16 × sizeof(dtype)`，`dtype`为L0C Buffer上数据的类型，支持`float`和`int32_t`）。 |
+| src_nd_stride | 输入 | 源相邻Nz矩阵之间的偏移（相邻Nz矩阵头与头的间隔）。当nd_num配置为1时，src_nd_stride不生效，配置为0即可。取值范围为[0, 65535]，单位为64字节（`16 × sizeof(dtype)`，`dtype`为L0C Buffer上数据的类型，支持`int32_t`和`float`）。 |
 | dst_nd_stride | 输入 | 目的相邻ND矩阵之间的偏移（相邻ND矩阵头与头的间隔）。当nd_num配置为1时，dst_nd_stride不生效，配置为0即可。取值范围为[0, 2^32-1]，单位为element。 |
 
 ## 返回值说明

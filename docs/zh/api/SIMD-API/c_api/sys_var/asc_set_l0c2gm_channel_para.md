@@ -49,7 +49,7 @@ __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config)
 | bit范围 | 描述 |
 |---|---|
 | 47:0 | 无效bit位，用户无需关注，设置为0即可。 |
-| 63:48 | 源矩阵Nz分形中相邻行的地址偏移，取值范围为[1, 65535]，单位为64字节（`16 × sizeof(dtype)`，`dtype`为L0C Buffer上数据的类型，支持`float`和`int32_t`）。 |
+| 63:48 | 源矩阵Nz分形中相邻行的地址偏移，取值范围为[1, 65535]，单位为64字节（`16 × sizeof(dtype)`，`dtype`为L0C Buffer上数据的类型，支持`int32_t`和`float`）。 |
 
 ## 返回值说明
 
