@@ -65,7 +65,8 @@ public:
         }
 
         asc_copy_gm2l1_align(
-            dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, true, cacheMode, srcStride, dstStride);
+            dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, true,
+            static_cast<asc_load_l2_cache_mode>(cacheMode), srcStride, dstStride);
     }
 };
 
