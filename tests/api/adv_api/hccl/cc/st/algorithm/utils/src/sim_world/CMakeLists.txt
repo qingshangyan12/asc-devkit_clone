@@ -9,6 +9,8 @@
 # -----------------------------------------------------------------------------------------------------------
 
 target_sources(hccl-model-proxy PRIVATE
+    ccu_kfc_sim_world.cc
+    ccu_sim_world.cc
     comm_domain.cc
     sim_npu.cc
     sim_world.cc
