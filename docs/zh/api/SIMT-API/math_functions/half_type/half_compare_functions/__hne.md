@@ -47,9 +47,9 @@ bool __hne(half x, half y)
 
 | x值 | y值 | 返回值 |
 | --- | --- | --- |
-| nan | 任意值 | true |
-| 任意值 | nan | true |
-| nan | nan | true |
+| nan | 任意值 | false |
+| 任意值 | nan | false |
+| nan | nan | false |
 | 0 | -0 | false |
 | -0 | 0 | false |
 | inf | inf | false |
