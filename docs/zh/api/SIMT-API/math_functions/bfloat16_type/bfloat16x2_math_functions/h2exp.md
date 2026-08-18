@@ -58,6 +58,7 @@ inline bfloat16x2_t h2exp(bfloat16x2_t x)
 | -ASCRT_MAX_NORMAL_BF16 | 0 | 0 |
 | -ASCRT_MAX_NORMAL_BF16 | 0 | 0 |
 | -ASCRT_MAX_NORMAL_BF16 | 0 | 0 |
+| -ASCRT_MAX_NORMAL_BF16 | 0 | 0 |
 
 ## 约束说明
 
