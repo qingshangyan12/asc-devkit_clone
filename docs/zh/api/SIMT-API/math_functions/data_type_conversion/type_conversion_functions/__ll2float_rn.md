@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-遵循CAST\_RINT模式，将int64类型数据转换为浮点数，返回转换后的值。
+遵循`CAST_RINT`模式，将int64类型数据转换为浮点数，返回转换后的值。
 
 ## 函数原型
 
@@ -57,7 +57,7 @@ inline float __ll2float_rn(const long long int x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/device\_functions.h"头文件。
+使用该接口需要包含`simt_api/device_functions.h`头文件。
 
 ```cpp
 #include "simt_api/device_functions.h"
