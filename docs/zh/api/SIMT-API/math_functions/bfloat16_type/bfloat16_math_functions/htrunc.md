@@ -46,6 +46,7 @@ inline bfloat16_t htrunc(bfloat16_t x)
 
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
+| ±0 | ±0 | ±0 |
 | inf | inf | ASCRT_MAX_NORMAL_BF16 |
 | -inf | -inf | -ASCRT_MAX_NORMAL_BF16 |
 | nan | nan | 0 |
