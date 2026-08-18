@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-将bfloat16类型数据转换为half类型数据，并遵循CAST\_RINT模式，返回转换后的值。
+将bfloat16类型数据转换为half类型数据，并遵循`CAST_RINT`模式，返回转换后的值。
 
 ## 函数原型
 
@@ -56,13 +56,13 @@ inline half __bfloat162half_rn_sat(const bfloat16_t x)
 
 ## 约束说明
 
-使用此接口前需将CTRL\[60\]寄存器设置为0，否则饱和模式不生效。设置方式请参见[控制饱和行为的方式](../../data_type_conversion/overview.md#section1194916101549)。
+使用此接口前需将`CTRL[60]`寄存器设置为0，否则饱和模式不生效。设置方式请参见[控制饱和行为的方式](../../data_type_conversion/overview.md#section1194916101549)。
 
 SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生效。
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用该接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"
