@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-按照CAST\_FLOOR模式将int32类型数据转换为half类型数据。
+按照`CAST_FLOOR`模式将`int32`类型数据转换为`half`类型数据。
 
 ## 函数原型
 
@@ -55,11 +55,11 @@ inline half __int2half_rd_sat(const int x)
 
 ## 约束说明
 
-SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生效。
+SIMT编程场景由于无法设置`CTRL`寄存器，本接口的饱和模式不生效。
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用该接口需要包含`simt_api/asc_fp16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_fp16.h"
