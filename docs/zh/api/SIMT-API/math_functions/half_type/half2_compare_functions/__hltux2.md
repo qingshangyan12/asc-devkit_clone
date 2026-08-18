@@ -58,7 +58,7 @@ half2 __hltux2(half2 x, half2 y)
 
 ## 约束说明
 
-无
+调用示例中将half*强转为half2*进行向量访问，要求地址4字节对齐，且按half2个数计算任务（idx >= input_total_length / 2的线程不处理数据）；当input_total_length为奇数时，最后一个half分量不参与计算。
 
 ## 需要包含的头文件
 
