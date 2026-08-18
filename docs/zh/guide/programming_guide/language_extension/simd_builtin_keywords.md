@@ -438,21 +438,22 @@ __ubuf__ int * __gm__ ptr;
 
 ## 内置变量<a name="section199434523343"></a>
 
-| 变量名 | 相关API | 功能 |
+| 变量名 | 相关基础API | 功能 |
 |-------|---------|------|
 | block_num | GetBlockNum | 当前任务配置的核数，用于代码内部的多核逻辑控制等。内置变量block_num的值与通过相关API GetBlockNum获取的值保持一致。 |
 | block_idx | GetBlockIdx | 当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。注意，内置变量block_idx的值与通过相关API GetBlockIdx获取的值在部分场景下并不一致，具体说明及场景示例请参考下文描述。 |
-通常，建议用户使用内置变量对应的API获取所需值，不建议用户直接使用内置变量。因为内置变量反映的是单个硬件资源的配置信息，对于软件栈整合硬件资源、扩展硬件的功能，内置变量的值与实际语义可能不符。
 
-在Mix场景（使用`__mix__`函数执行空间限定符）下，Vector核（AIV）的逻辑位置需要通过block_idx和sub_block_idx共同确定：`logic_idx = block_idx * sub_block_num + sub_block_idx`。其中block_idx标识当前组合在整个grid中的位置，sub_block_idx标识当前AIV在组合内的位置。开发者应使用GetBlockIdx和GetSubBlockIdx API组合获取完整的逻辑位置信息，而非直接使用内置变量。
+在Mix场景（使用`__mix__`函数执行空间限定符）下，Vector核（AIV）的逻辑位置需要通过block_idx和sub_block_idx共同确定：`logic_idx = block_idx * sub_block_num + sub_block_idx`。其中block_idx标识当前组合在整个grid中的位置，sub_block_idx标识当前AIV在组合内的位置。
 
-**示例：**
-
-例如，在任务配置的核数为3（block_num = 3）的场景下，当使用`__mix__(1, 2)`作为函数执行空间限定符时，任务会启动3个Cube Core和6个Vector Core，内置变量block_idx在6个Vector Core上的取值分别为：0、0、1、1、2、2，即位于同一核上的两个Vector Core取值相同，而GetBlockIdx API获取的值分别为：0、1、2、3、4、5，两者并不相同。在3个Cube Core上两者的取值相同，均为：0、1、2。
+**使用基础API进行编程时，开发者应使用GetBlockIdx和GetSubBlockIdx API组合获取完整的逻辑位置信息，而非直接使用内置变量。例如：**
+在任务配置的核数为3（block_num = 3）的场景下，当使用`__mix__(1, 2)`作为函数执行空间限定符时，任务会启动3个Cube Core和6个Vector Core，内置变量block_idx在6个Vector Core上的取值分别为：0、0、1、1、2、2，即位于同一核上的两个Vector Core取值相同，而GetBlockIdx API获取的值分别为：0、1、2、3、4、5，两者并不相同。在3个Cube Core上两者的取值相同，均为：0、1、2。
 
 <!-- npu="310p" id7 -->
-例如，在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
+在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
 <!-- end id7 -->
+
+**使用C API进行编程时，开发者应使用内置变量。例如：**
+例如，在任务配置的核数为3（block_num = 3）的场景下，当使用`__mix__(1, 2)`作为函数执行空间限定符时，任务会启动3个Cube Core和6个Vector Core，内置变量block_idx在6个Vector Core上的取值分别为：0、0、1、1、2、2，即位于同一核上的两个Vector Core取值相同，asc_get_sub_block_idx获取的sub_block_idx值分别0、1、0、1、0、1，根据公式`logic_idx = block_idx * sub_block_num + sub_block_idx`，最终计算的得到6个Vector Core的logic_idx值分别为：0、1、2、3、4、5，3个Cube Core可以直接使用block_idx变量作为logic_idx，分别为0、1、2。
 
 ## 核函数（Kernel）配置<a name="核函数配置"></a><a name="section97005415463"></a>
 
