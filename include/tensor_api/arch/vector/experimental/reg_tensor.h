@@ -31,9 +31,23 @@ struct reg_tensor<bool> {
     using reg_type = typename detail::type_get<bool>::type;
 
     __simd_callee__ reg_tensor() = default;
-    __simd_callee__ reg_tensor(reg_type regValue) : reg(regValue) {}
+    __simd_callee__ reg_tensor(vector_bool maskValue) : mask(maskValue) {}
+
+    template <typename ScalarType>
+    __simd_callee__ inline reg_tensor& operator=(ScalarType src)
+    {
+        asc_duplicate_scalar(reinterpret_cast<vector_int8_t&>(reg), static_cast<int8_t>(src), mask);
+        return *this;
+    }
+
+    __simd_callee__ inline reg_tensor& with_mask(const reg_tensor<bool>& maskReg)
+    {
+        mask = maskReg.reg;
+        return *this;
+    }
 
     reg_type reg;
+    vector_bool mask;
 };
 
 template <typename DataType>
