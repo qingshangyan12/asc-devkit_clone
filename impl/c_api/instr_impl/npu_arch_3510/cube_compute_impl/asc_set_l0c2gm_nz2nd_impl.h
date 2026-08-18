@@ -28,6 +28,14 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd_impl(uint64_t nd_num, uint64_t src_n
     }
 }
 
+__aicore__ inline void asc_set_l0c_copy_nz_para_impl(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride)
+{
+    if ASC_IS_AIC {
+        uint64_t config = (dst_nd_stride << 32) | (src_nd_stride << 16) | nd_num;
+        set_loop3_para(config);
+    }
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
