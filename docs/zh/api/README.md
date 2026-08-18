@@ -3107,6 +3107,7 @@
     -   [Vector指令理论性能汇总](appendix/vector_instruction_theoretical_perf_summary.md)
     -   [Mask接口汇总](appendix/Mask_interface_summary.md)
     -   [Mmad接口边界值汇总](appendix/mmad_interface_boundary_value_summary.md)
+    -   [Fixpipe接口边界值汇总](appendix/fixpipe_interface_boundary_value_summary.md)
     -   [Memory矢量计算接口边界值汇总](appendix/memory_vector_compute_interface_boundary_value_summary.md)
     -   [Reg矢量计算接口边界值汇总](appendix/reg_vector_compute_interface_boundary_value_summary.md)
     -   [Reg矢量计算接口MergeMode支持情况汇总](appendix/reg_vector_compute_interface_mergemode_support_summary.md)
