@@ -15,9 +15,6 @@
 #ifndef IMPL_STD_CEIL_DIVISION_H
 #define IMPL_STD_CEIL_DIVISION_H
 
-// #include "../algorithm/min.h"
-// #include "../type_traits/is_integral.h"
-
 namespace AscendC {
 namespace Std {
 
@@ -27,48 +24,6 @@ __host__ __aicore__ inline constexpr auto ceil_division(const T& num1, const U& 
     return (num1 + num2 - 1) / num2;
 }
 
-// template <typename T>
-// struct integer_traits {
-//     static constexpr bool is_signed = false;
-//     using unsigned_type = T;
-// };
-
-// template <>
-// struct integer_traits<signed char> {
-//     static constexpr bool is_signed = true;
-//     using unsigned_type = unsigned char;
-// };
-
-// template <>
-// struct integer_traits<short> {
-//     static constexpr bool is_signed = true;
-//     using unsigned_type = unsigned short;
-// };
-
-// template <>
-// struct integer_traits<int> {
-//     static constexpr bool is_signed = true;
-//     using unsigned_type = unsigned int;
-// };
-
-// template <>
-// struct integer_traits<long> {
-//     static constexpr bool is_signed = true;
-//     using unsigned_type = unsigned long;
-// };
-
-// template <>
-// struct integer_traits<long long> {
-//     static constexpr bool is_signed = true;
-//     using unsigned_type = unsigned long long;
-// };
-
-// template <typename T>
-// static constexpr bool is_signed_impl_v = integer_traits<T>::is_signed;
-
-// template <typename T>
-// using make_unsigned_t = typename integer_traits<T>::unsigned_type;
-
 /*!
  * \brief Divide a by b and round the result up.
  *
@@ -77,24 +32,7 @@ __host__ __aicore__ inline constexpr auto ceil_division(const T& num1, const U& 
 template <typename T, typename U>
 __host__ __aicore__ inline constexpr auto ceil_div_generic(const T& a, const U& b)
 {
-    // static_assert(is_integral_v<T>, "AscendC::Std::ceil_div: T must be an integral type");
-    // static_assert(is_integral_v<U>, "AscendC::Std::ceil_div: U must be an integral type");
     return (a + b - 1) / b;
-    // using Prom = decltype(T{} / U{});
-    // using UProm = make_unsigned_t<Prom>;
-
-    // auto a1 = static_cast<UProm>(a);
-    // auto b1 = static_cast<UProm>(b);
-
-    // // When _Prom is signed, (a + b - 1) / b is safe because:
-    // // a <= INT_MAX, b <= INT_MAX, INT_MAX + INT_MAX fits in unsigned
-    // if constexpr (is_signed_impl_v<Prom>) {
-    //     return static_cast<Prom>((a1 + b1 - 1) / b1);
-    // } else {
-    //     // When _Prom is unsigned, a could be near UINT_MAX, so (a + b - 1) could overflow/wrap.
-    //     // Use min-based branchless form: min(a, 1 + (a - 1) / b) avoids overflow risk.
-    //     return min(a1, static_cast<UProm>(1) + ((a1 - 1) / b1));
-    // }
 }
 
 template <typename T, typename U>
