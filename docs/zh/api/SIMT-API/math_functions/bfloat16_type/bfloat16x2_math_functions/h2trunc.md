@@ -50,7 +50,7 @@ inline bfloat16x2_t h2trunc(bfloat16x2_t x)
 | -0 | 0 | 0 |
 | nan | nan | 0 |
 | inf | inf | ASCRT_MAX_NORMAL_BF16 |
-| -inf | -inf | ASCRT_MIN_NORMAL_BF16 |
+| -inf | -inf | -ASCRT_MAX_NORMAL_BF16 |
 
 ## 约束说明
 

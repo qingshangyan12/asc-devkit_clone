@@ -52,7 +52,7 @@ inline bfloat16_t hexp10(bfloat16_t x)
 | -inf | 0 | 0 |
 | nan | nan | 0（nan被饱和为0） |
 | 38 | 接近bfloat16_t最大有限值 | 接近bfloat16_t最大有限值 |
-| >40 | inf | ASCRT_MAX_NORMAL_BF16 |
+| >38.5 | inf | ASCRT_MAX_NORMAL_BF16 |
 
 ## 约束说明
 

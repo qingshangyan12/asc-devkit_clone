@@ -53,7 +53,7 @@ inline half2 __floats2half2_rn(const float x, const float y)
 | inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | x>ASCRT\_MAX\_NORMAL\_FP16 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | -inf | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
-| x<-ASCRT\_MAX\_NORMAL\_FP16 | -inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| x<-ASCRT\_MAX\_NORMAL\_FP16 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 
@@ -76,7 +76,7 @@ inline half2 __floats2half2_rn(const float x, const float y)
     __aicore__ void simt_floats2half2_rn(float* input1, float* input2, half2* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx > input_total_length) {
+        if (idx >= input_total_length) {
             return;
         }
         output[idx] = __floats2half2_rn(input1[idx], input2[idx]);

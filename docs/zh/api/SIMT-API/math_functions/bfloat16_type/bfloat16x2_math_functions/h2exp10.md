@@ -48,8 +48,8 @@ inline bfloat16x2_t h2exp10(bfloat16x2_t x)
 
 | 输入 | 非饱和模式返回值 | 饱和模式返回值 |
 |---|---|---|
-| 0 | 0 | 0 |
-| -0 | 0 | 0 |
+| 0 | 1.0 | 1.0 |
+| -0 | 1.0 | 1.0 |
 | nan | nan | 0 |
 | inf | inf | ASCRT_MAX_NORMAL_BF16 |
 | -inf | 0 | 0 |

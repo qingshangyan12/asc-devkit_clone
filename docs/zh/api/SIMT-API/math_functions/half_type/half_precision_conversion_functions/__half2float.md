@@ -84,4 +84,8 @@ inline float __half2float(const half x)
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __half2float(x[idx]);
     }
+    __global__ __vector__ void cast_kernel(__gm__ float* dst, __gm__ half* x)
+    {
+        asc_vf_call<kernel__half2float>(dim3(1024), dst, x);
+    }
     ```

@@ -61,7 +61,7 @@ bool __hbltux2(bfloat16x2_t x, bfloat16x2_t y)
   <tbody>
     <tr>
       <td colspan="2">任一分量含nan</td>
-      <td>true</td>
+      <td>该分量比较结果为true，但整体结果取决于其余分量</td>
     </tr>
     <tr>
       <td>-inf</td>
@@ -101,6 +101,7 @@ bool __hbltux2(bfloat16x2_t x, bfloat16x2_t y)
         if (idx >= input_total_length / 2) {
             return;
         }
+        // 要求x、y指向的起始地址4字节对齐，且元素数量为2的整数倍
         bfloat16x2_t* input1 = (bfloat16x2_t*)x;
         bfloat16x2_t* input2 = (bfloat16x2_t*)y;
         dst[idx] = __hbltux2(input1[idx], input2[idx]);

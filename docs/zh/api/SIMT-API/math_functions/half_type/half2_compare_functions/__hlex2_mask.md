@@ -73,7 +73,7 @@ unsigned int __hlex2_mask(half2 x, half2 y)
 -   SIMT编程场景：
 
     ```cpp
-    // 使用短向量可提升数据搬运效率
+    // 使用短向量可提升数据搬运效率，前提：x、y指向4字节对齐的half数组且input_total_length为偶数
     __global__ __launch_bounds__(1024) void simt_hlex2_mask(half* x, half* y, unsigned int* dst, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;

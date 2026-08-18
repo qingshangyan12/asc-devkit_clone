@@ -44,14 +44,15 @@ inline half hexp2(half x)
 
 ## 返回值说明
 
-2的x次方。特殊值如下：
+2的x次方。本接口受全局饱和寄存器的影响，特殊值如下：
 
-| x值 | 返回值 |
-| --- | --- |
-| inf | inf |
-| -inf | 0 |
-| nan | nan |
-| x>ASCRT\_MAX\_NORMAL\_F | inf |
+| x值 | 非饱和模式返回值 | 饱和模式返回值 |
+| --- | --- | --- |
+| ±0 | 1 | 1 |
+| inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| -inf | 0 | 0 |
+| nan | nan | 0 |
+| 其他 | 2的x次方，当结果超出half最大有限值时，结果为inf | 2的x次方，当结果超出half最大有限值时，结果为ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 

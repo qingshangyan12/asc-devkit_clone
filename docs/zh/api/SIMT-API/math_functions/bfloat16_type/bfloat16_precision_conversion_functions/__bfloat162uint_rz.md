@@ -73,7 +73,9 @@ inline unsigned int __bfloat162uint_rz(const bfloat16_t x)
     __global__ __launch_bounds__(1024) void kernel__bfloat162uint_rz(uint32_t* dst, bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = __bfloat162uint_rz(x[idx]);
+        if (idx < numElements) {
+            dst[idx] = __bfloat162uint_rz(x[idx]);
+        }
     }
     ```
 
