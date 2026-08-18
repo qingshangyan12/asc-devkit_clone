@@ -216,20 +216,16 @@ __simd_vf__ inline void DigammaImpl(__ubuf__ float* dstUb, __ubuf__ float* srcUb
 
             // Inline DigammaNegPicotPix: reuse dead RegTensor values for the integer cast and select scratch.
             Reg::Add(tmpReg1, srcReg, srcReg, fullMask);
-            Reg::Cast<int32_t, float, FLOAT_TO_INT_CAST_TRAIT>(
-                (Reg::RegTensor<int32_t>&)tmpReg4, tmpReg1, fullMask);
-            Reg::Cast<float, int32_t, INT_TO_FLOAT_CAST_TRAIT>(
-                tmpReg2, (Reg::RegTensor<int32_t>&)tmpReg4, fullMask);
+            Reg::Cast<int32_t, float, FLOAT_TO_INT_CAST_TRAIT>((Reg::RegTensor<int32_t>&)tmpReg4, tmpReg1, fullMask);
+            Reg::Cast<float, int32_t, INT_TO_FLOAT_CAST_TRAIT>(tmpReg2, (Reg::RegTensor<int32_t>&)tmpReg4, fullMask);
             Reg::Sub(tmpReg1, tmpReg1, tmpReg2, fullMask);
             Reg::Muls(tmpReg1, tmpReg1, 1.5707963267948966f, fullMask);
-            Reg::Cast<int32_t, float, FLOAT_TO_INT_CAST_TRAIT>(
-                (Reg::RegTensor<int32_t>&)tmpReg4, tmpReg2, fullMask);
+            Reg::Cast<int32_t, float, FLOAT_TO_INT_CAST_TRAIT>((Reg::RegTensor<int32_t>&)tmpReg4, tmpReg2, fullMask);
             Reg::Duplicate((Reg::RegTensor<int32_t>&)negArgReg, 1, fullMask);
             Reg::And<uint16_t>(
                 (Reg::RegTensor<uint16_t>&)tmpReg4, (Reg::RegTensor<uint16_t>&)tmpReg4,
                 (Reg::RegTensor<uint16_t>&)negArgReg, fullMask);
-            Reg::Cast<float, int32_t, INT_TO_FLOAT_CAST_TRAIT>(
-                tmpReg2, (Reg::RegTensor<int32_t>&)tmpReg4, fullMask);
+            Reg::Cast<float, int32_t, INT_TO_FLOAT_CAST_TRAIT>(tmpReg2, (Reg::RegTensor<int32_t>&)tmpReg4, fullMask);
             DigammaGenCompareMask<CMPMODE::LT>(mask1, tmpReg2, 0.5f, fullMask);
             DigammaGenCompareMask<CMPMODE::GE>(mask2, tmpReg2, 0.5f, fullMask);
             Reg::Mul(tmpReg2, tmpReg1, tmpReg1, fullMask);
