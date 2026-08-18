@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-获取输入数据的三角函数双曲正切值。
+获取输入数据的双曲正切值。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002576421043.png)
 
@@ -58,7 +58,7 @@ inline bfloat16_t htanh(bfloat16_t x)
 
 ## 需要包含的头文件
 
-使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用`bfloat16_t`类型接口需要包含"`simt_api/asc_bf16.h`"头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"
