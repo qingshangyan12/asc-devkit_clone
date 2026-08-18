@@ -71,33 +71,32 @@ typedef struct {
  */
 static inline HcclResult HcclChannelDescInit(HcclChannelDesc* channelDesc, uint32_t descNum)
 {
+    if (channelDesc == nullptr) {
+        return HCCL_E_PTR;
+    }
     for (uint32_t idx = 0; idx < descNum; idx++) {
-        if (channelDesc != nullptr) {
-            // 先用0xFF填充整个结构体
-            (void)memset_s(channelDesc, sizeof(HcclChannelDesc), 0xFF, sizeof(HcclChannelDesc));
+        // 先用0xFF填充整个结构体
+        (void)memset_s(channelDesc, sizeof(HcclChannelDesc), 0xFF, sizeof(HcclChannelDesc));
 
-            // 初始化ABI头信息
-            channelDesc->header.version = HCCL_CHANNEL_VERSION;
-            channelDesc->header.magicWord = HCCL_CHANNEL_MAGIC_WORD;
-            channelDesc->header.size = sizeof(HcclChannelDesc);
-            channelDesc->header.reserved = 0;
+        // 初始化ABI头信息
+        channelDesc->header.version = HCCL_CHANNEL_VERSION;
+        channelDesc->header.magicWord = HCCL_CHANNEL_MAGIC_WORD;
+        channelDesc->header.size = sizeof(HcclChannelDesc);
+        channelDesc->header.reserved = 0;
 
-            // 初始化关键字段
-            channelDesc->remoteRank = ~0U; // 保持原始无效值标记
-            channelDesc->channelProtocol = COMM_PROTOCOL_RESERVED;
-            channelDesc->notifyNum = 0;
-            channelDesc->memHandles = nullptr;
-            channelDesc->memHandleNum = 0;
+        // 初始化关键字段
+        channelDesc->remoteRank = ~0U; // 保持原始无效值标记
+        channelDesc->channelProtocol = COMM_PROTOCOL_RESERVED;
+        channelDesc->notifyNum = 0;
+        channelDesc->memHandles = nullptr;
+        channelDesc->memHandleNum = 0;
 
-            // 显式设置EndpointDesc相关字段为无效值
-            if (UNLIKELY(EndpointDescInit(&channelDesc->localEndpoint, 1) != HCCL_SUCCESS) ||
-                UNLIKELY(EndpointDescInit(&channelDesc->remoteEndpoint, 1) != HCCL_SUCCESS)) {
-                return HCCL_E_INTERNAL;
-            }
-            channelDesc++; // 移动到下一个描述符
-        } else {
-            return HCCL_E_PTR;
+        // 显式设置EndpointDesc相关字段为无效值
+        if (UNLIKELY(EndpointDescInit(&channelDesc->localEndpoint, 1) != HCCL_SUCCESS) ||
+            UNLIKELY(EndpointDescInit(&channelDesc->remoteEndpoint, 1) != HCCL_SUCCESS)) {
+            return HCCL_E_INTERNAL;
         }
+        channelDesc++; // 移动到下一个描述符
     }
     return HCCL_SUCCESS;
 }

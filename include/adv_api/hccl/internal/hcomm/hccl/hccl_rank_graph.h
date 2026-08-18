@@ -83,29 +83,28 @@ typedef struct {
  */
 static inline HcclResult CommLinkInit(CommLink* commLink, uint32_t linkNum)
 {
+    if (commLink == nullptr) {
+        return HCCL_E_PTR;
+    }
     for (uint32_t idx = 0; idx < linkNum; idx++) {
-        if (commLink != nullptr) {
-            // 先用0xFF填充整个结构体
-            (void)memset_s(commLink, sizeof(CommLink), 0xFF, sizeof(CommLink));
+        // 先用0xFF填充整个结构体
+        (void)memset_s(commLink, sizeof(CommLink), 0xFF, sizeof(CommLink));
 
-            // 初始化ABI头信息
-            commLink->header.version = COMM_LINK_VERSION;
-            commLink->header.magicWord = COMM_LINK_MAGIC_WORD;
-            commLink->header.size = sizeof(CommLink);
-            commLink->header.reserved = 0;
+        // 初始化ABI头信息
+        commLink->header.version = COMM_LINK_VERSION;
+        commLink->header.magicWord = COMM_LINK_MAGIC_WORD;
+        commLink->header.size = sizeof(CommLink);
+        commLink->header.reserved = 0;
 
-            // 初始化源端点和目的端点的关键字段
-            if (UNLIKELY(EndpointDescInit(&commLink->srcEndpointDesc, 1) != HCCL_SUCCESS) ||
-                UNLIKELY(EndpointDescInit(&commLink->dstEndpointDesc, 1) != HCCL_SUCCESS)) {
-                return HCCL_E_INTERNAL;
-            }
-            // 初始化链路属性（显式设置保留值）
-            commLink->linkAttr.linkProtocol = COMM_PROTOCOL_RESERVED;
-            commLink->linkAttr.hop = 1;
-            commLink++; // 移动到下一个描述符
-        } else {
-            return HCCL_E_PTR;
+        // 初始化源端点和目的端点的关键字段
+        if (UNLIKELY(EndpointDescInit(&commLink->srcEndpointDesc, 1) != HCCL_SUCCESS) ||
+            UNLIKELY(EndpointDescInit(&commLink->dstEndpointDesc, 1) != HCCL_SUCCESS)) {
+            return HCCL_E_INTERNAL;
         }
+        // 初始化链路属性（显式设置保留值）
+        commLink->linkAttr.linkProtocol = COMM_PROTOCOL_RESERVED;
+        commLink->linkAttr.hop = 1;
+        commLink++; // 移动到下一个描述符
     }
     return HCCL_SUCCESS;
 }
