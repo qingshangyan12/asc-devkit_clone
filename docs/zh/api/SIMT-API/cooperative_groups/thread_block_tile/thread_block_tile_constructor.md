@@ -78,7 +78,7 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
     int main()
     {
         ...
-        simt_kernel<<<dim3(1), dim3(THREAD_NUM), 0, stream>>>(...);             // 线程块中创建的线程数必须小于等于 block_tile_memory 的模板参数
+        simt_kernel<<<dim3(1), dim3(THREAD_NUM), 0, stream>>>(...);             // 线程块中创建的线程数必须小于等于`block_tile_memory`的模板参数
         ...
     }
     ```
