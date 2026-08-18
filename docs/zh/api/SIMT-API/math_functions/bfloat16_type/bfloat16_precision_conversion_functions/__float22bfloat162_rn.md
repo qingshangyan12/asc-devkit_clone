@@ -57,7 +57,7 @@ inline bfloat16x2_t __float22bfloat162_rn(const float2 x)
 
 ## 约束说明
 
-无
+使用此接口前需将CTRL[60]寄存器设置为0，否则饱和模式不生效；SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生效。
 
 ## 需要包含的头文件
 
