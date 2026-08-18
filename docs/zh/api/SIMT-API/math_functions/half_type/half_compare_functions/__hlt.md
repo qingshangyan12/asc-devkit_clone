@@ -78,4 +78,9 @@ bool __hlt(half x, half y)
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __hlt(x[idx], y[idx]);
     }
+
+    __global__ __vector__ void runKernelHlt(__gm__ bool* dst, __gm__ half* x, __gm__ half* y)
+    {
+        asc_vf_call<KernelHlt>(dim3(1024), dst, x, y);
+    }
     ```
