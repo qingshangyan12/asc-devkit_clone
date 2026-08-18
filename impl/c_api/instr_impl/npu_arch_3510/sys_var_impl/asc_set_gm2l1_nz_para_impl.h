@@ -27,6 +27,17 @@ __aicore__ inline void asc_set_gm2l1_nz_para_impl(uint64_t config)
     }
 }
 
+__aicore__ inline void asc_set_gm2l1_nz_para_impl(
+    uint16_t matrix_num, uint16_t dst_nz_n_stride, uint16_t dst_nz_c0_stride, uint16_t dst_nz_matrix_stride)
+{
+    if ASC_IS_AIC {
+        uint64_t config = (static_cast<uint64_t>(dst_nz_matrix_stride) << 48) |
+                          (static_cast<uint64_t>(dst_nz_c0_stride) << 32) |
+                          (static_cast<uint64_t>(dst_nz_n_stride) << 16) | static_cast<uint64_t>(matrix_num);
+        set_mte2_nz_para(config);
+    }
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
