@@ -64,7 +64,7 @@ inline bfloat16_t __hmax(bfloat16_t x, bfloat16_t y)
 
 ## 需要包含的头文件
 
-使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用`bfloat16_t`类型接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"
