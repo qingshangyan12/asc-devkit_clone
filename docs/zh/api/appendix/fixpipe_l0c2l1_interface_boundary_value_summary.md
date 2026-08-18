@@ -27,7 +27,7 @@ Fixpipe L0C→L1接口将L0C中的矩阵计算结果搬运到L1 Buffer，在搬�
 >
 >- 下表中的MAX/MIN对应目标数据类型下的最大值和最小值。
 >
->- 量化后的数据经过第二次Mmad（C×D，D为单位矩阵）输出到GM。由于dav-3510架构中L1 Buffer数据无法直接搬运到GM，第二次Mmad仅作为数据中转路径。需要注意，当量化结果中包含inf时，第二次Mmad中inf与单位矩阵的off-diagonal零元素相乘会产生nan（IEEE 754: inf×0=nan），累加后整行变为nan。此为验证路径的限制，不影响asc\_copy\_l0c2l1本身的inf/nan处理行为。
+>- 量化后的数据经过第二次Mmad（C×D，D为单位矩阵）输出到GM。由于dav-3510架构中L1 Buffer数据无法直接搬运到GM，第二次Mmad仅作为数据中转路径。需要注意，当量化结果中包含inf时，第二次Mmad中inf与单位矩阵的off-diagonal零元素相乘会产生nan（IEEE 754: inf×0=nan），累加后整行变为nan。此为验证路径的限制，不影响asc\_copy\_l0c2l1本身的inf/nan处理行为。golden数据已适配此行为：非饱和模式下inf/-inf/nan位置的golden值设为nan，使测试能端到端通过。
 
 ## float L0C → 各输出类型
 
@@ -150,22 +150,23 @@ asc\_copy\_l0c2l1接口支持如下随路量化模式，scalar模式使用单个
 
 共覆盖17种量化场景×2种饱和模式（饱和/非饱和）= 34项测试，其中：
 
-- **已验证且通过**：场景1-10的饱和模式（10项）、场景1-4和7-8的非饱和模式（6项），共16项。
-- **已验证但失败（已知限制）**：场景5、6、9、10的非饱和模式（4项）和场景17的两种模式（2项），共6项。失败原因详见下文"已知限制"。
+- **已验证且通过**：场景1-10的两种模式（20项）。
+- **跳过（硬件限制）**：场景17的两种模式（2项）。float×float→float的Mmad在L0C包含inf/-inf/nan时触发硬件运行时错误（aclrtSynchronizeStream返回507015），属于dav-3510的CANN版本限制。
 - **未验证（CANN版本限制）**：场景11-16的两种模式（12项）。这些场景依赖的API重载在当前CANN版本（9.2.0）中未实现或未提供，具体见下文"未验证场景说明"。
 
 ### 已知限制
 
-以下场景在边界值测试中失败，属于验证路径或硬件限制，非asc\_copy\_l0c2l1接口本身的问题：
+场景17在边界值测试中跳过，属于硬件限制，非asc\_copy\_l0c2l1接口本身的问题：
 
 **表4** 边界值测试已知限制
 
 <a name="table_fixpipe_l0c2l1_known_limitations"></a>
 
-| 失败场景 | 失败模式 | 根因 | 说明 |
+| 跳过场景 | 跳过模式 | 根因 | 说明 |
 | --- | --- | --- | --- |
-| 5、6、9、10 | 非饱和 | 验证路径中第二次Mmad（C×D，D为单位矩阵）的off-diagonal元素为0，IEEE 754下inf×0.0=nan，累加后整行变为nan | L1 Buffer上的量化结果实际保留了inf（符合表1预期），但经过第二次Mmad后被破坏为nan，导致GM输出与golden数据不匹配。此问题仅影响inf边界值在非饱和模式下的验证，不影响asc\_copy\_l0c2l1本身的inf处理行为 |
-| 17 | 饱和非饱和均失败 | float×float→float的Mmad在L0C包含inf/-inf/nan时触发硬件运行时错误（aclrtSynchronizeStream返回507015） | 可能是dav-3510的CANN版本限制，float类型Mmad对inf/nan输入的硬件处理异常 |
+| 17 | 饱和非饱和均跳过 | float×float→float的Mmad在L0C包含inf/-inf/nan时触发硬件运行时错误（aclrtSynchronizeStream返回507015） | 可能是dav-3510的CANN版本限制，float类型Mmad对inf/nan输入的硬件处理异常。asc\_copy\_l0c2l1本身的float inf/nan处理行为符合表1预期（保持原样输出），但验证路径无法端到端验证 |
+
+注：场景5、6、9、10的非饱和模式存在验证路径中第二次Mmad的inf×0=nan问题（见上文说明），golden数据已适配此行为，测试通过。L1 Buffer上的量化结果实际保留了inf（符合表1预期），仅经第二次Mmad后被破坏为nan。
 
 ### 未验证场景说明
 

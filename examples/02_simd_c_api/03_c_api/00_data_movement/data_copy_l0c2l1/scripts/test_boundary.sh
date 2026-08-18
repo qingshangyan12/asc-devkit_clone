@@ -26,6 +26,8 @@ for SAT_MODE in 1 0; do
         #   (ASC_HAS_L0C2L1_FP8).
         # Scenarios 15, 16 require asc_copy_l0c2l1 hifloat8_t/float overload
         #   (ASC_HAS_L0C2L1_HIF8).
+        # Scenario 17: float×float→float Mmad crashes (ret=507015) when L0C
+        #   contains inf/-inf/nan (hardware/CANN limitation on dav-3510).
         # Toggle the feature macros in data_copy_l0c2l1.asc when upgrading CANN.
         case "$SCENARIO_NUM" in
             11|13)
@@ -54,6 +56,13 @@ for SAT_MODE in 1 0; do
                 echo "Scenario $SCENARIO_NUM ($MODE_NAME mode)"
                 echo "=============================="
                 echo "[SKIP] Scenario $SCENARIO_NUM ($MODE_NAME) — ASC_HAS_L0C2L1_HIF8=0"
+                continue
+                ;;
+            17)
+                echo "=============================="
+                echo "Scenario $SCENARIO_NUM ($MODE_NAME mode)"
+                echo "=============================="
+                echo "[SKIP] Scenario $SCENARIO_NUM ($MODE_NAME) — float×float Mmad crashes with inf (ret=507015)"
                 continue
                 ;;
         esac

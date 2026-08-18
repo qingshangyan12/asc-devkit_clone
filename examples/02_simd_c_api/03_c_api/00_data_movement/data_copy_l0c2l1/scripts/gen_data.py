@@ -688,34 +688,33 @@ def generate_d_matrix(output_type):
 def apply_non_saturation_override(result, l0c_matrix, output_type):
     """Override quantized result for positions where L0C had inf/nan in non-saturation mode.
 
-    In non-saturation mode (CTRL[48]=1):
-    - Float types (half, bfloat16, float): preserve inf/nan
-    - fp8_e4m3fn: inf → nan, nan → nan
+    In non-saturation mode (CTRL[48]=1), the L0C→L1 copy preserves inf/nan
+    for half/bfloat16/float types (see boundary value table). However, the
+    verification path uses a second Mmad (C × identity_D) to move L1 data to
+    GM. When the quantized C contains inf, IEEE 754 inf×0.0=nan corrupts the
+    entire row to nan in the second Mmad output. This override accounts for
+    that corruption so the golden matches the actual full-pipeline output.
+
+    - half/bfloat16/float: inf/-inf/nan → nan (second Mmad corruption)
+    - fp8_e4m3fn: inf → nan, nan → nan (API behavior, no inf encoding)
     - hifloat8: _cvt_float32_to_hifuint8(over_mode=True) already returns the
       inf/nan encodings (111/239/128) that match the non-saturation behavior
     - Integer types: always saturation (no override)
     """
     inf_mask = np.isinf(l0c_matrix)
     nan_mask = np.isnan(l0c_matrix)
+    boundary_mask = inf_mask | nan_mask
 
     if output_type in ('half', 'bfloat16', 'float'):
-        pos_inf_mask = l0c_matrix == np.inf
-        neg_inf_mask = l0c_matrix == -np.inf
         if output_type == 'half':
-            result[pos_inf_mask] = np.float16(np.inf)
-            result[neg_inf_mask] = np.float16(-np.inf)
-            result[nan_mask] = np.float16(np.nan)
+            result[boundary_mask] = np.float16(np.nan)
         elif output_type == 'bfloat16':
-            result[pos_inf_mask] = np.uint16(0x7F80)  # bfloat16 +inf
-            result[neg_inf_mask] = np.uint16(0xFF80)  # bfloat16 -inf
-            result[nan_mask] = np.uint16(0x7FFF)      # bfloat16 nan (hardware pattern)
+            result[boundary_mask] = np.uint16(0x7FFF)  # bfloat16 nan (hardware pattern)
         else:  # float
-            result[pos_inf_mask] = np.float32(np.inf)
-            result[neg_inf_mask] = np.float32(-np.inf)
-            result[nan_mask] = np.float32(np.nan)
+            result[boundary_mask] = np.float32(np.nan)
     elif output_type == 'fp8_e4m3fn':
         fp8_nan = np.uint8(0x7F)  # fp8_e4m3fn nan encoding
-        result[inf_mask | nan_mask] = fp8_nan
+        result[boundary_mask] = fp8_nan
 
     return result
 

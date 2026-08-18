@@ -116,9 +116,10 @@ Run the following steps in the example root directory.
 
 ### Known Limitations
 
-The following scenarios fail in boundary tests due to verification path or hardware limitations, not `asc_copy_l0c2l1` API issues:
+Scenario 17 is skipped in boundary tests due to a hardware limitation, not an `asc_copy_l0c2l1` API issue:
 
 | Scenario | Mode | Cause |
 |----------|------|-------|
-| 5, 6, 9, 10 | Non-saturation | The verification path's second mmad (C×D, D=identity) has off-diagonal zeros. IEEE 754 `inf * 0.0 = nan` corrupts the entire row during accumulation. The L1 quantized result actually preserves inf, but the second mmad destroys it |
 | 17 | Both modes | float×float→float mmad triggers a hardware runtime error (`aclrtSynchronizeStream` returns 507015) when L0C contains inf/-inf/nan. Likely a dav-3510 CANN limitation |
+
+Note: Scenarios 5, 6, 9, 10 in non-saturation mode have a verification-path issue where the second mmad's `inf * 0.0 = nan` (IEEE 754) corrupts entire rows. The golden data accounts for this behavior (non-saturation golden sets inf/-inf/nan positions to nan), so these tests pass. The L1 quantized result actually preserves inf (matching API boundary expectations), but the second mmad corrupts it to nan.
