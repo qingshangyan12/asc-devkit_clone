@@ -49,8 +49,12 @@ inline half __hmin(half x, half y)
 
 | x值 | y值 | 返回值 |
 | --- | --- | --- |
-| ±0 | ±0 | 0 |
+| 0 | 0 | 0 |
+| 0 | -0 | -0 |
+| -0 | 0 | -0 |
+| -0 | -0 | -0 |
 | nan | normal | normal |
+| normal | nan | normal |
 | nan | nan | nan |
 | -inf | normal | -inf |
 | normal | -inf | -inf |
