@@ -17,7 +17,7 @@
 
 namespace mc2_ops_hccl {
 // 从源 CcuKernelInfo 继承属性到 KfcServer 的 CcuKernelInfo
-void InheritKfcServerKernelArg(
+HcclResult InheritKfcServerKernelArg(
     const CcuKernelInfo& srcKernel, CcuKernelInfo& dstKernel, const OpParam& param, uint32_t rankId,
     const std::vector<std::vector<u32>>& subCommRanks)
 {
@@ -35,13 +35,14 @@ void InheritKfcServerKernelArg(
         kfcArg->opParam = param;
         kfcArg->subCommRanks = subCommRanks;
     } else {
-        HCCL_WARNING(
-            "[InheritKfcServerKernelArg] unknown src kernel type[%s], no attributes inherited", srcName.c_str());
+        HCCL_ERROR("[InheritKfcServerKernelArg] unknown src kernel type[%s]", srcName.c_str());
+        return HCCL_E_NOT_SUPPORT;
     }
 
     dstKernel.setKernelArg(kfcArg);
     // 继承源 kernelInfo 的 channels（由 CalcChannelRequestMesh1D 在 CalcRes 中赋值）
     dstKernel.channels = srcKernel.channels;
+    return HCCL_SUCCESS;
 }
 
 CcuTempKfcServer::CcuTempKfcServer(
@@ -94,8 +95,8 @@ HcclResult CcuTempKfcServer::CalcRes(
         HCCL_INFO(
             "[CcuTempKfcServer::CalcRes] inheriting kernelargs from[%s]",
             resourceRequest.ccuKernelInfos.back().kernelFuncName);
-        InheritKfcServerKernelArg(
-            resourceRequest.ccuKernelInfos.back(), kernelInfo, param, mySubCommRank_, subCommRanks_);
+        CHK_RET(InheritKfcServerKernelArg(
+            resourceRequest.ccuKernelInfos.back(), kernelInfo, param, mySubCommRank_, subCommRanks_));
         resourceRequest.ccuKernelInfos.back() = kernelInfo;
     } else {
         HCCL_ERROR(

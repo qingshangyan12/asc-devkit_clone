@@ -36,7 +36,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     uint64_t loopCount = 8;
     auto dataSlice =
         ((allToAllVParam->sendCounts[ccuParam_.rankId]) * DATA_TYPE_MAP[commParam->dataType]) % CCU_MAX_COMM_DATA;
-    CalcGoSize(dataSlice, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
+    CalcGoSize(dataSlice, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5], ccuProtocolVersion_);
     xnData_[9] = reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt) + CCU_MSG_EXT_RANK_OFFSET * ccuParam_.alltoallvCnt;
     return;
 }
@@ -57,7 +57,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[5] = 0;
     xnData_[6] = strideSize * ccuParam_.rankId;
     uint64_t loopCount = 8;
-    CalcGoSize(sliceSizeAlltoall, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[7]);
+    CalcGoSize(sliceSizeAlltoall, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[7], ccuProtocolVersion_);
     return;
 }
 
@@ -78,7 +78,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     uint64_t sliceSize = commParam->count;
 
     xnData_[3] = commParam->wParamExt.sendOffsets; // 3 is index of xnData
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[4]);
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[4], ccuProtocolVersion_);
 }
 
 template <const auto& config>
@@ -108,7 +108,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
                      (commParam->strideCount * dataSize * ccuParam_.rankId); // 3 is index of xnData
     xnData_[4] = loopSize * m;                                               // 4 is index of xnData
     xnData_[5] = m;                                                          // 5 is index of xnData
-    CalcLoopGroupParam(xnData_, m, n, p);
+    CalcLoopGroupParam(xnData_, m, n, p, ccuProtocolVersion_);
 }
 
 template <const auto& config>
@@ -137,7 +137,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
                      (commParam->strideCount * dataSize * ccuParam_.rankId); // 3 is index of xnData
     xnData_[4] = loopSize * m;                                               // 4 is index of xnData
     xnData_[5] = m;                                                          // 5 is index of xnData
-    CalcLoopGroupParam(xnData_, m, n, p);
+    CalcLoopGroupParam(xnData_, m, n, p, ccuProtocolVersion_);
 }
 
 template <const auto& config>
@@ -193,9 +193,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[9] = ccuParam_.rankId * normalSliceSize;
     xnData_[10] = 0; // input output not equals
     if (ccuParam_.rankId == ccuParam_.rankNum - 1) {
-        CalcGoSize(lastSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11]);
+        CalcGoSize(lastSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11], ccuProtocolVersion_);
     } else {
-        CalcGoSize(normalSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11]);
+        CalcGoSize(normalSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11], ccuProtocolVersion_);
     }
 }
 
@@ -215,7 +215,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
     xnData_[3] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
     xnData_[4] = sliceSize;
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5], ccuProtocolVersion_);
 }
 
 template <const auto& config>
@@ -241,7 +241,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[4] = rankSliceOffset;
     xnData_[7] = sliceSize;
     xnData_[8] = UINT64_MAX - 1;
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9], ccuProtocolVersion_);
 }
 } // namespace AscendC
 
