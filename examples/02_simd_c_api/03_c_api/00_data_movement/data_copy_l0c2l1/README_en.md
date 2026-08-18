@@ -111,5 +111,14 @@ Run the following steps in the example root directory.
   Successful output-to-golden verification prints:
 
   ```bash
-  test pass!
-  ```
+   test pass!
+   ```
+
+### Known Limitations
+
+The following scenarios fail in boundary tests due to verification path or hardware limitations, not `asc_copy_l0c2l1` API issues:
+
+| Scenario | Mode | Cause |
+|----------|------|-------|
+| 5, 6, 9, 10 | Non-saturation | The verification path's second mmad (C×D, D=identity) has off-diagonal zeros. IEEE 754 `inf * 0.0 = nan` corrupts the entire row during accumulation. The L1 quantized result actually preserves inf, but the second mmad destroys it |
+| 17 | Both modes | float×float→float mmad triggers a hardware runtime error (`aclrtSynchronizeStream` returns 507015) when L0C contains inf/-inf/nan. Likely a dav-3510 CANN limitation |

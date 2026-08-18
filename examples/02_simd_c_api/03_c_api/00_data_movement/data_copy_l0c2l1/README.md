@@ -150,3 +150,12 @@ bash scripts/test_boundary.sh
 | fp8_e4m3fn | 输出nan | 输出nan | 输出nan | inf或超范围值→nan |
 | hifloat8 | 111（HiF8+inf编码） | 239（HiF8-inf编码） | 128（HiF8NAN编码） | inf/nan保持对应编码 |
 | float | 保持inf | 保持-inf | 保持nan | CTRL[48]不支持float，始终保持 |
+
+### 已知限制
+
+以下场景在边界值测试中失败，属于验证路径或硬件限制，非 `asc_copy_l0c2l1` API 本身问题：
+
+| 场景 | 模式 | 原因 |
+|------|------|------|
+| 5, 6, 9, 10 | 非饱和 | 验证路径的第二次 mmad（C×D，D为单位矩阵）中，off-diagonal 元素为 0，IEEE 754 下 `inf * 0.0 = nan`，累加后整行变为 nan。L1 上的量化结果实际保留了 inf，但经过第二次 mmad 后被破坏 |
+| 17 | 两种模式 | float×float→float mmad 在 L0C 包含 inf/-inf/nan 时触发硬件运行时错误（`aclrtSynchronizeStream` 返回 507015），可能是 dav-3510 的 CANN 限制 |
