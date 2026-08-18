@@ -36,39 +36,6 @@ __simd_callee__ inline vector_bool full_predicate_mask()
     return asc_create_mask_b8(PAT_ALL);
 }
 
-template <typename T, typename U>
-__simd_callee__ inline reg_tensor<T> make_logic_operand(const U& value, const vector_bool& mask)
-{
-    if constexpr (is_reg_tensor_v<U>) {
-        return value;
-    } else {
-        reg_tensor<T> dst;
-        asc_duplicate_scalar(dst.reg, static_cast<T>(value), mask);
-        dst.mask = mask;
-        return dst;
-    }
-}
-
-template <typename T, typename U>
-__simd_callee__ inline vector_bool logic_mask(const T& a, const U& b)
-{
-    static_assert(is_reg_tensor_v<T> || is_reg_tensor_v<U>, "at least one operand must be reg_tensor");
-    if constexpr (is_reg_tensor_v<T>) {
-        return a.mask;
-    } else {
-        return b.mask;
-    }
-}
-
-template <typename T, typename U>
-__simd_callee__ inline void check_logic_reg_types()
-{
-    if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
-        static_assert(Std::is_same_v<reg_elem_t<T>, reg_elem_t<U>>,
-            "the reg_tensor operands must have the same element type");
-    }
-}
-
 template <bitwise_op op, typename T>
 __simd_callee__ inline void check_bitwise_type()
 {
@@ -85,7 +52,7 @@ template <bitwise_op op, typename T, typename U>
 __simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
 {
     using elem_type = binary_elem_t<T, U>;
-    check_logic_reg_types<T, U>();
+    check_binary_reg_types<T, U>();
     check_bitwise_type<op, elem_type>();
 
     if constexpr (Std::is_same_v<elem_type, bool>) {
@@ -102,9 +69,9 @@ __simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
         }
         return dst;
     } else {
-        vector_bool mask = logic_mask(a, b);
-        auto left = make_logic_operand<elem_type>(a, mask);
-        auto right = make_logic_operand<elem_type>(b, mask);
+        vector_bool mask = binary_mask(a, b);
+        auto left = make_reg_operand<elem_type>(a, mask);
+        auto right = make_reg_operand<elem_type>(b, mask);
         reg_tensor<elem_type> dst;
         if constexpr (op == bitwise_op::bit_and) {
             asc_and(dst.reg, left.reg, right.reg, mask);
