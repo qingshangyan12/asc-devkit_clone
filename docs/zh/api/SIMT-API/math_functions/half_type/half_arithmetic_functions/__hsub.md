@@ -78,7 +78,7 @@ half __hsub(const half x, const half y)
   </tr>
   <tr>
     <td>有限值（包括±0）</td>
-    <td>-x</td>
+    <td>x</td>
     <td>+0</td>
     <td>+0</td>
   </tr>
