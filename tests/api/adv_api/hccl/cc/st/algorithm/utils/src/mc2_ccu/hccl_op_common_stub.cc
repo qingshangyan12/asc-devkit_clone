@@ -50,6 +50,16 @@ extern "C" unsigned int HcclLaunchAicpuKernel(mc2_ops_hccl::OpParam* param)
 
 namespace mc2_ops_hccl {
 
+HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
+{
+    uint64_t actualSize = ctxSize;
+    if (HcclEngineCtxGet(comm, tag.c_str(), COMM_ENGINE_AIV, ctx, &actualSize) == HCCL_SUCCESS) {
+        return actualSize >= ctxSize ? HCCL_SUCCESS : HCCL_E_INTERNAL;
+    }
+    CHK_RET(HcclEngineCtxCreate(comm, tag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx));
+    return aclrtMemset(*ctx, ctxSize, 0, ctxSize) == ACL_SUCCESS ? HCCL_SUCCESS : HCCL_E_RUNTIME;
+}
+
 InsCollAlgBase::InsCollAlgBase() {}
 InsCollAlgBase::~InsCollAlgBase() {}
 std::string InsCollAlgBase::Describe() const { return "InsCollAlgBase"; }
@@ -323,7 +333,8 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
     // 资源复用逻辑：先尝试获取已存在的资源
     void *ctx = nullptr;
     uint64_t size = 0;
-    if (HcclEngineCtxGet(comm, param.algTag, param.engine, &ctx, &size) == HCCL_SUCCESS) {
+    CommEngine ctxEngine = param.engine == COMM_ENGINE_CCU ? COMM_ENGINE_AIV : param.engine;
+    if (HcclEngineCtxGet(comm, param.algTag, ctxEngine, &ctx, &size) == HCCL_SUCCESS) {
         isResourceReused = true;
         *resCtxDevice = ctx;
         param.ctxSize = size;
@@ -357,7 +368,7 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
     std::vector<char> seq = resCtxHost->Serialize();
     uint64_t newSize = seq.size();
 
-    HcclResult ret = HcclEngineCtxCreate(comm, param.algTag, param.engine, newSize, resCtxDevice);
+    HcclResult ret = HcclEngineCtxCreate(comm, param.algTag, ctxEngine, newSize, resCtxDevice);
     if (ret != HCCL_SUCCESS || *resCtxDevice == nullptr) {
         return HCCL_E_PTR;
     }
