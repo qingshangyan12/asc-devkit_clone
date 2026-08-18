@@ -121,7 +121,7 @@ const char* aclrtGetSocName()
 
 HcclResult hrtGetDeviceType(DevType& devType)
 {
-    devType = DevType::DEV_TYPE_950;
+    devType = HcclSim::SimWorld::Global()->GetSimNpuByRankId(curr_dev_id).GetDevType();
     return HCCL_SUCCESS;
 }
 
