@@ -85,7 +85,7 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ bfloat16_t* dst,
 ```c
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ <dtype>* dst,
                                             __gm__ <dtype>* src,
-                                            uint16_t n_burst,
+                                            uint32_t n_burst,
                                             uint32_t len_burst,
                                             uint8_t left_padding_num,
                                             uint8_t right_padding_num,
@@ -103,7 +103,7 @@ dtype可取的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`�
 // 示例：源与目的数据类型为bfloat16_t
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ bfloat16_t* dst,
                                             __gm__ bfloat16_t* src,
-                                            uint16_t n_burst,
+                                            uint32_t n_burst,
                                             uint32_t len_burst,
                                             uint8_t left_padding_num,
                                             uint8_t right_padding_num,
