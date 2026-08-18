@@ -1,21 +1,16 @@
-# Ndtri接口测试用例
+# Ndtri样例
 
 ## 概述
 
-本用例用于验证Ndtri高阶API的功能与性能。Ndtri按元素计算标准正态分布的CDF逆函数（分位函数），即给定概率值p，返回满足Φ(x)=p的分位数x。
+本样例演示 Ndtri 高阶 API 的调用方式和功能、性能验证方法。Ndtri 按元素计算标准正态分布累积分布函数的反函数：给定概率值 p，返回满足 $\Phi(x)=p$ 的分位数 x。
 
-$$
-\mathrm{Ndtri}(p)=\sqrt{2}\,\sum_{k=0}^{\infty}c_k
-\left(\frac{p-1/2}{1/2}\right)^{2k+1}
-$$
-
-接口在$|2p-1|\le0.85$时直接计算任务书级数的前24项，在接近0或1时使用尾部延拓，并分别处理0、1、越界值、NaN和Inf。
+输入 p 为 0 时输出负无穷，为 1 时输出正无穷；p 在 (0, 1) 时返回对应分位数；p 越界或为 NaN、无穷时输出 NaN。
 
 ## 支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -33,9 +28,9 @@ $$
 
 ## 用例规格
 
-- 接口功能：按元素计算标准正态分布CDF逆函数Φ⁻¹(p)，并处理0、1、越界值、NaN及Inf。
+- 样例功能：按元素计算标准正态分布 CDF 逆函数 $\Phi^{-1}(p)$，并处理 0、1、越界值、NaN 及 Inf。
   $$dstTensor_i = \Phi^{-1}(srcTensor_i)$$
-- 接口规格：
+- 样例规格：
 
   <table>
   <tr><td rowspan="1" align="center">用例类型</td><td colspan="4" align="center">NdtriCustom</td></tr>
@@ -51,7 +46,7 @@ $$
 
 ## 用例说明
 
-默认shape为输入x[2048]、输出y[2048]，可通过`--size`修改数据量。用例使用单核处理，并根据UB容量分块搬运和计算。
+默认 shape 为输入 x[2048]、输出 y[2048]，可通过 `--size` 修改数据量。样例使用单核处理，并根据 UB 容量分块搬运和计算。
 
 ### 1. 功能验证
 
@@ -61,7 +56,7 @@ CopyIn → Compute(Ndtri) → CopyOut，输出与真值对比验证精度。功�
 - `api_mode=2`：不传`calCount`，验证整Tensor重载与指定`calCount`重载结果一致。
 - `api_mode=3`：整Tensor重载的输入输出使用完全相同的LocalTensor，验证原地计算结果。
 
-`tests/api/adv_api/math/ndtri/test_operator_ndtri.cpp` 是纳入 adv_api UT 构建的接口调用检查；本目录的 `run_all.sh` 是本次任务的 NPU 功能、精度和性能自验证入口。
+`tests/api/adv_api/math/ndtri/test_operator_ndtri.cpp` 是纳入 adv_api UT 构建的接口调用检查；本目录的 `run_all.sh` 是样例的 NPU 功能、精度和性能验证入口。
 
 ### 2. 性能验证
 
@@ -92,6 +87,7 @@ $$\text{AIV\_VEC占比} = \frac{\text{computeTime}}{\text{total2} - \text{total1
 | aiv_mte3_ratio | mte3类型指令的cycle数在total cycle数中的占用比。 |
 
 本用例性能验证实际采集以下字段用于占比计算：
+
 - `aiv_time`：分别取 TEST_MODE=2（空跑基线）的值作为 `total1`、TEST_MODE=3（计算场景）的值作为 `total2`。
 - `aiv_vec_time`：取 TEST_MODE=3 的值作为 `computeTime`（AIV_VEC计算时间）。
 
@@ -107,7 +103,9 @@ $$\text{AIV\_VEC占比} = \frac{\text{computeTime}}{\text{total2} - \text{total1
 ## 编译运行
 
 - 配置环境变量
+
   请先根据当前环境的CANN软件安装指南完成开发套件安装，再配置环境变量。
+
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -138,6 +136,7 @@ $$\text{AIV\_VEC占比} = \frac{\text{computeTime}}{\text{total2} - \text{total1
   | `--api_mode` | `1`、`2`、`3` | 可选，依次表示指定`calCount`、整Tensor重载和整Tensor重载完全同址原地计算；默认值为`1`，性能模式只支持`1` |
 
   示例：
+
   ```bash
   bash run.sh -r cpu  --size 2048 --is_perf 0   # CPU功能验证
   bash run.sh -r sim  --size 4096 --is_perf 0   # NPU仿真功能验证
@@ -157,11 +156,15 @@ $$\text{AIV\_VEC占比} = \frac{\text{computeTime}}{\text{total2} - \text{total1
 - 执行结果
 
   功能验证（`--is_perf 0`）通过时输出：
+
   ```bash
   test pass!
   ```
+
   性能验证（`--is_perf 1`）达标时输出：
+
   ```bash
   性能验证达标，当前占比: xx%
   ```
+
   > `--is_perf 1` 用于性能验证，输出非计算结果，不做精度对比。
