@@ -285,6 +285,21 @@ TEST_F(ResourceRegistryTest, AutomaticSearchRootsParsesCustomVendorAndBuiltInPat
     ASSERT_EQ(roots.builtIn.size(), 1U);
     EXPECT_EQ(roots.builtIn[0], (canonicalOpp / "built-in/op_impl/ai_core/tbe/kernel/jit").string());
 
+    SetEnvironment("ASCEND_OPP_PATH", Path("missing-opp").string());
+    const AutomaticRoots missingOpp = ResourceRegistry::AutomaticSearchRoots();
+    EXPECT_EQ(missingOpp.custom.size(), 2U);
+    EXPECT_TRUE(missingOpp.builtIn.empty());
+
+    const fs::path oppWithoutVendorConfig = Path("opp-without-vendor-config");
+    MakeDirectory(oppWithoutVendorConfig);
+    SetEnvironment("ASCEND_OPP_PATH", oppWithoutVendorConfig.string());
+    const AutomaticRoots missingVendorConfig = ResourceRegistry::AutomaticSearchRoots();
+    EXPECT_EQ(missingVendorConfig.custom.size(), 2U);
+    ASSERT_EQ(missingVendorConfig.builtIn.size(), 1U);
+    EXPECT_EQ(
+        missingVendorConfig.builtIn[0],
+        (fs::canonical(oppWithoutVendorConfig) / "built-in/op_impl/ai_core/tbe/kernel/jit").string());
+
     UnsetEnvironment("ASCEND_OPP_PATH");
     const AutomaticRoots noOpp = ResourceRegistry::AutomaticSearchRoots();
     EXPECT_EQ(noOpp.custom.size(), 2U);
@@ -926,6 +941,54 @@ TEST_F(ResourceRegistryTest, LoadLibrariesDiscardsPartialManifestsFromFailedSo)
     EXPECT_TRUE(stage.external.discovered);
     EXPECT_TRUE(stage.external.resources.empty());
     EXPECT_EQ(stage.external.bytes, 0U);
+    EXPECT_EQ(stage.external.files, 0U);
+}
+
+TEST_F(ResourceRegistryTest, LoadLibrariesSkipsResourcesConflictingWithAnEarlierSo)
+{
+    const std::string json = R"({"resource_id":"conflict"})";
+    AcCompileResourceManifest manifest{StringView(json), nullptr, 0U};
+    AcCompileResourceBundle bundle = MakeBundle(&manifest, 1U);
+    gBundleHeader = &bundle.header;
+    MockSuccessfulLoader();
+    const fs::path first = Path("conflict-first.so");
+    const fs::path second = Path("conflict-second.so");
+    WriteFile(first);
+    WriteFile(second);
+
+    StageState stage;
+    EXPECT_EQ(
+        ResourceRegistry::LoadLibraries(
+            {{first.string(), ResourceSourceType::External}, {second.string(), ResourceSourceType::External}}, stage),
+        ResourceStatus::Success);
+    EXPECT_EQ(gDlopenCalls, 2U);
+    ASSERT_EQ(stage.external.resources.size(), 1U);
+    EXPECT_EQ(stage.external.resources.at("conflict")->sourceSoPath, fs::canonical(first).string());
+}
+
+TEST_F(ResourceRegistryTest, LoadLibrariesSkipsResourcesThatExceedCumulativeLimits)
+{
+    const std::string json = R"({"resource_id":"limited"})";
+    const std::string name = "payload.bin";
+    const std::string path = "payload.bin";
+    const std::vector<uint8_t> payload = {1U};
+    AcCompileResourceFile file{StringView(name), StringView(path), payload.data(), payload.size()};
+    AcCompileResourceManifest manifest{StringView(json), &file, 1U};
+    AcCompileResourceBundle bundle = MakeBundle(&manifest, 1U);
+    gBundleHeader = &bundle.header;
+    MockSuccessfulLoader();
+    const fs::path so = Path("limit.so");
+    WriteFile(so);
+
+    StageState stage;
+    stage.external.bytes = TEST_MAX_REGISTRY_RESOURCE_SIZE;
+    EXPECT_EQ(
+        ResourceRegistry::LoadLibraries({{so.string(), ResourceSourceType::External}}, stage),
+        ResourceStatus::InvalidResource);
+    EXPECT_EQ(gDlopenCalls, 1U);
+    EXPECT_TRUE(stage.external.discovered);
+    EXPECT_TRUE(stage.external.resources.empty());
+    EXPECT_EQ(stage.external.bytes, TEST_MAX_REGISTRY_RESOURCE_SIZE);
     EXPECT_EQ(stage.external.files, 0U);
 }
 
