@@ -200,12 +200,14 @@ inline RingBufWriteInfo* GetRingBufWriteInfo(BlockRingBufInfo* blockInfo)
     return reinterpret_cast<RingBufWriteInfo*>(ringBase + blockInfo->ringBufLen);
 }
 
-inline uint32_t CalcFormattedLen(const char* fmt, va_list args)
+inline uint32_t CalcFormattedLen(const char* fmt, va_list args, uint8_t* tempBuf, uint32_t ringBufLen)
 {
-    va_list argsCopy;
-    va_copy(argsCopy, args);
-    int32_t len = vsnprintf(nullptr, 0, fmt, argsCopy);
-    va_end(argsCopy);
+    /* Format into tempBuf (after header space) to get the actual length.
+     * This avoids va_copy (which crashes on the AICPU cross-compiler).
+     * The formatted string stays in tempBuf for later use by PrintfFifo. */
+    char* strDest = reinterpret_cast<char*>(tempBuf + sizeof(PrintfInfo));
+    size_t destMax = static_cast<size_t>(ringBufLen) - sizeof(PrintfInfo);
+    int32_t len = vsnprintf_s(strDest, destMax, destMax - 1U, fmt, args);
     return (len > 0) ? static_cast<uint32_t>(len) : 0U;
 }
 
@@ -351,10 +353,20 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
         return;
     }
 
-    // 1. calculate write info length and check whether there is enough free space
-    uint32_t strLen = CalcFormattedLen(fmt, otherArgs);
+    // 1. Format the string into g_fifoTempBuf to get the actual length.
+    //    This consumes va_list only once (va_copy crashes on AICPU).
+    //    The formatted string stays in tempBuf for later use.
+    uint8_t* tempBuf = g_fifoTempBuf.Get(ringBufLen);
+    if (tempBuf == nullptr) {
+        return;
+    }
+    uint32_t strLen = CalcFormattedLen(fmt, otherArgs, tempBuf, ringBufLen);
     uint32_t tlvLen = CalcTlvLen(strLen);
-    /* Lock the whole reservation + write to guarantee atomicity, auto unlock wehn return. */
+    if (tlvLen > ringBufLen) {
+        return;
+    }
+
+    /* Lock the whole reservation + write to guarantee atomicity, auto unlock when return. */
     std::lock_guard<std::mutex> lock(g_aicpuFifoMutex);
 
     if (!CheckAicpuRingBuf(blockInfo, tlvLen)) {
@@ -395,35 +407,23 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     //    and packIdx is consistent with bufOffset.
     AdvanceWriteInfo(writeInfo, newBufOff);
     // 6. Write the formatted string into the ringbuf.
+    //    (Header was already written in step 4.)
     if (!needSplit) {
-        // header already written, write formatted string directly
-        char* strDest = reinterpret_cast<char*>(ringBase + wOff + sizeof(PrintfInfo));
-        size_t destMax = ringBufLen - static_cast<size_t>(wOff) - sizeof(PrintfInfo);
-        size_t count = (strLen < destMax) ? strLen : (destMax - 1U);
-        (void)vsnprintf_s(strDest, destMax, count, fmt, otherArgs);
+        (void)memcpy(ringBase + wOff + sizeof(PrintfInfo),
+                     tempBuf + sizeof(PrintfInfo), strLen + 1U);
     } else {
-        // Split-write: entry spans the tail and the head.
-        // 1. malloc a temp buffer (ringBufLen size) if not yet allocated.
-        // 2. vsnprintf_s the formatted string into the temp buffer after the header.
-        // 3. Copy the temp buffer to ringbuf in two parts: tail then head.
-        uint8_t* tempBuf = g_fifoTempBuf.Get(ringBufLen);
-        if (tempBuf == nullptr) {
-            RollbackWriteInfo(writeInfo, wOff);
-            return;
+        // Split: header was already written in step 4 (may span boundary).
+        // String starts after header, position wraps mod ringBufLen.
+        uint32_t strOff = (static_cast<uint32_t>(wOff) + sizeof(PrintfInfo)) % ringBufLen;
+        uint32_t strTotal = strLen + 1U;
+        uint32_t tailAvail = ringBufLen - strOff;
+        if (tailAvail >= strTotal) {
+            (void)memcpy(ringBase + strOff, tempBuf + sizeof(PrintfInfo), strTotal);
+        } else {
+            uint32_t strPart2 = strTotal - tailAvail;
+            (void)memcpy(ringBase + strOff, tempBuf + sizeof(PrintfInfo), tailAvail);
+            (void)memcpy(ringBase, tempBuf + sizeof(PrintfInfo) + tailAvail, strPart2);
         }
-        // Write header to temp buffer.
-        (void)memcpy(tempBuf, &infoHead, sizeof(PrintfInfo));
-        // Write formatted string to temp buffer after header.
-        char* strDest = reinterpret_cast<char*>(tempBuf + sizeof(PrintfInfo));
-        size_t destMax = static_cast<size_t>(ringBufLen) - sizeof(PrintfInfo);
-        size_t count = (strLen < destMax) ? strLen : (destMax - 1U);
-        (void)vsnprintf_s(strDest, destMax, count, fmt, otherArgs);
-        // Copy tlvLen bytes from temp buffer to ringbuf with split.
-        // (Overwrites the byte-by-byte header written above with identical content.)
-        uint32_t part1 = tailSpace;
-        uint32_t part2 = tlvLen - part1;
-        (void)memcpy(ringBase + static_cast<uint32_t>(wOff), tempBuf, part1);
-        (void)memcpy(ringBase, tempBuf + part1, part2);
     }
 /* ── Step 7: Release the entry to the rts reader ─────────────────── */
     /* Ensure all data writes are visible before flipping the type. */
