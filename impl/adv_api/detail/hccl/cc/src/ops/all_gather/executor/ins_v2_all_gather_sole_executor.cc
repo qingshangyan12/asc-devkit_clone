@@ -202,5 +202,9 @@ REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuKfcAllGatherMesh1DMem2Mem, InsV2AllGatherSoleExecutor, TopoMatch1D,
     CcuTempKfcAllGatherMesh1DMem2Mem);
 
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
+    CcuTempAllGatherMesh1D);
+
 #endif
 } // namespace mc2_ops_hccl
