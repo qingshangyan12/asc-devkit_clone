@@ -84,6 +84,7 @@ half2 __hlex2(half2 x, half2 y)
         }
         // 输入输出缓冲需按4字节对齐，且input_total_length需为偶数
         // 输入输出缓冲需按4字节对齐，且input_total_length需为偶数
+        // 输入输出缓冲需按4字节对齐，且input_total_length需为偶数
         half2* input1 = (half2*)x;
         half2* input2 = (half2*)y;
         half2* out = (half2*)dst;
