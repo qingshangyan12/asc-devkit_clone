@@ -14,7 +14,7 @@ Ascend 950PR, Ascend 950DT.
 
 ## Supported CANN Versions
 
-CANN 9.2.0 and later.
+- \>= CANN 9.2.0
 
 `simt_api/cooperative_groups.h` is provided starting from 9.2.0. Earlier versions report `'simt_api/cooperative_groups.h' file not found` at compile time.
 
