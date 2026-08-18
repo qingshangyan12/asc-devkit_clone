@@ -68,10 +68,11 @@ SelectorStatus AllGatherAutoSelector::SelectCcuScheduleUBXAlgo(
 SelectorStatus AllGatherAutoSelector::SelectCcuScheduleLevel0Algo(
     const TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName, const u64 dataSize) const
 {
-    (void)dataSize;
-    // Temporary KFC convergence: route only regular Mesh1D to the KFC Mem2Mem implementation.
+    // The current KFC server starts one mission on die0 only.  Do not select its
+    // Mesh1D sub-kernel for a two-die topology until the die1 mission path is
+    // implemented as well.
     if (topoInfo->level0Topo != Level0Shape::MESH_1D ||
-        topoInfo->level0MeshType == Level0MeshType::TWO_DIE_NOT_REGULAR) {
+        topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE) {
         HCCL_DEBUG(
             "[AllGatherAutoSelector] level0Topo[%d], level0MeshType[%d] is not supported for ccu schedule mode.",
             topoInfo->level0Topo, topoInfo->level0MeshType);
@@ -79,6 +80,10 @@ SelectorStatus AllGatherAutoSelector::SelectCcuScheduleLevel0Algo(
     }
 
     selectAlgName = "CcuKfcAllGatherMesh1DMem2Mem";
+    HCCL_INFO(
+        "[KFC][AllGather][Select] algorithm[%s], dataSize[%llu], level0Topo[%u], level0MeshType[%u]",
+        selectAlgName.c_str(), static_cast<unsigned long long>(dataSize),
+        static_cast<uint32_t>(topoInfo->level0Topo), static_cast<uint32_t>(topoInfo->level0MeshType));
     HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
