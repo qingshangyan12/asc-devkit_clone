@@ -372,12 +372,36 @@ Run the following steps in the root directory of this example to build and execu
   |------|--------|------|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
-  Taking the whole-block reduction as an example, the following output indicates that the accuracy verification is successful.
+  The output of the three cases is as follows. Each indicates that the accuracy verification is successful.
+
+  Cross-block reduction:
+
+  ```text
+  Case 0: cross-block reduction (grid_group), reduce domain = 4096
+  num_elements = 4096, threads = 4096
+  grid = 4 blocks x 1024 threads, reduce domain = 4096, workspace in global memory
+  Output: 8390656
+  Golden: 8390656
+  [Success] Case accuracy verification passed.
+  ```
+
+  Whole-block reduction:
 
   ```text
   Case 1: whole-block reduction (thread_block), reduce domain = 1024
   num_elements = 4096, threads = 4096
   grid = 4 blocks x 1024 threads, reduce domain = 1024 per block, workspace in shared memory
+  Output: 8390656
+  Golden: 8390656
+  [Success] Case accuracy verification passed.
+  ```
+
+  Sub-group reduction:
+
+  ```text
+  Case 2: sub-group reduction (thread_block_tile<32>), reduce domain = 32
+  num_elements = 4096, threads = 4096
+  grid = 4 blocks x 1024 threads, 32 tiles per block, reduce domain = 32, workspace in shared memory
   Output: 8390656
   Golden: 8390656
   [Success] Case accuracy verification passed.
