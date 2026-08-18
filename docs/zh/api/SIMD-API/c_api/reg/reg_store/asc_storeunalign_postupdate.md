@@ -42,7 +42,7 @@
 
 针对掩码寄存器，本接口提供一种模式：
 
-- **掩码寄存器搬出模式：** UB地址上数据类型为b16时，硬件指令从每2bit数据中提取最低有效位（LSB），将掩码寄存器中32B数据打包成16B写入UB。搬运完成后UB地址按16B偏移量更新。UB地址上数据类型为b32时，硬件指令从每4bit数据中提取最低有效位（LSB），将掩码寄存器中32B数据打包成8B，写入UB。搬运完成后UB地址按8B偏移量更新。需配合后处理接口[asc_storeunalign_post](asc_storeunalign_post.md)使用。
+- **掩码寄存器搬出模式：** UB地址上数据类型为`b16`时，硬件指令从每2bit数据中提取最低有效位（LSB），将掩码寄存器中32B数据打包成16B写入UB。搬运完成后UB地址按16B偏移量更新。UB地址上数据类型为`b32`时，硬件指令从每4bit数据中提取最低有效位（LSB），将掩码寄存器中32B数据打包成8B，写入UB。搬运完成后UB地址按8B偏移量更新。需配合后处理接口[asc_storeunalign_post](asc_storeunalign_post.md)使用。
 
 本接口可以拼接上一段**连续的尾块**和本次搬运主块部分，并同时更新本次尾块数据至非对齐寄存器中。首次搬运可以使用未初始化的非对齐寄存器。若上一次搬运的尾块和本次搬运主块不连续，则每一次尾块处理都需要调用后处理接口。若连续，仅最后一次尾块处理需要调用后处理接口。
 
@@ -61,7 +61,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。对应矢量数据寄存器类型为`vector_<dtype>`，其中`int4b_t`对应`vector_int4x2_t`。
+`dtype`支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。对应矢量数据寄存器类型为`vector_<dtype>`，其中`int4b_t`对应`vector_int4x2_t`。
 
 #### 典型示例
 
@@ -83,7 +83,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。对应矢量数据寄存器类型为`vector_<dtype>`，其中`int4b_t`对应`vector_int4x2_t`。
+`dtype`支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。对应矢量数据寄存器类型为`vector_<dtype>`，其中`int4b_t`对应`vector_int4x2_t`。
 
 #### 典型示例
 
@@ -104,7 +104,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
+`dtype`支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
 #### 典型示例
 
@@ -124,7 +124,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 |---|---|---|
 | dst | 输入/输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*&`。 |
 | unalign_reg | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign&`，长度为32字节。 |
-| src | 输入 | 源操作数（矢量数据寄存器），类型为`vector_<dtype>`，dtype须与`dst`指向的数据类型一致。 |
+| src | 输入 | 源操作数（矢量数据寄存器），类型为`vector_<dtype>`，`dtype`须与`dst`指向的数据类型一致。 |
 | count | 输入 | 本次搬出的元素个数，类型为`uint32_t`。 |
 
 ### 地址寄存器偏移搬出模式
@@ -135,7 +135,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 |---|---|---|
 | dst | 输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`。 |
 | unalign_reg | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign&`，长度为32字节。 |
-| src | 输入 | 源操作数（矢量数据寄存器），类型为`vector_<dtype>`，dtype须与`dst`指向的数据类型一致。 |
+| src | 输入 | 源操作数（矢量数据寄存器），类型为`vector_<dtype>`，`dtype`须与`dst`指向的数据类型一致。 |
 | count | 输入/输出 | 目的地址的迭代偏移，类型为`addr_reg&`，由配套的地址寄存器构造接口预先构造。该参数用于更新目的地址，不控制单次搬出的数据量；指令执行后，地址寄存器中的偏移累加一个VL（256字节）。 |
 
 ### 掩码寄存器搬出模式
@@ -144,7 +144,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输入/输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*&`。b16类型目的地址需16字节对齐，b32类型目的地址需8字节对齐。搬出后，`dst`自动更新至本次搬出的结束地址。 |
+| dst | 输入/输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*&`。`b16`类型目的地址需16字节对齐，`b32`类型目的地址需8字节对齐。搬出后，`dst`自动更新至本次搬出的结束地址。 |
 | unalign_reg | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign&`，长度为32字节。 |
 | src | 输入 | 源操作数（掩码寄存器），类型为`vector_bool`。 |
 
@@ -171,7 +171,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 - 地址寄存器偏移搬出模式的`addr_reg`须通过[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)预先构造，并在内层循环体内赋值使用。须使用[asc_storeunalign_post](asc_storeunalign_post.md)收尾，并复用同一个`unalign_reg`及地址寄存器。
 - 立即数偏移搬出模式下，`count`最大值不超过单个矢量数据寄存器可容纳的元素个数。
 - 矢量数据寄存器搬出场景目的地址无需32字节对齐，但须按`sizeof(dtype)`字节对齐。
-- 掩码寄存器搬出场景，b16类型目的地址需16字节对齐，b32类型目的地址需8字节对齐。
+- 掩码寄存器搬出场景，`b16`类型目的地址需16字节对齐，`b32`类型目的地址需8字节对齐。
 
 ## 调用示例
 

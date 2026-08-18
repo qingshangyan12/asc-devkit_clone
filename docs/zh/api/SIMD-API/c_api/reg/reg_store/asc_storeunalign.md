@@ -29,12 +29,12 @@
 将矢量数据寄存器中的前`count`个元素连续搬出到非32字节对齐的Unified Buffer（UB）地址。`unalign_reg` 为非对齐寄存器，按引用传入并在本接口调用后被更新为本次搬出尾部数据，供下一次本接口或非对齐搬出收尾接口继续拼接使用。每次调用后，用户需手动更新目的操作数在UB中的地址。本接口在Vector Function（`__simd_vf__` 标记的函数）内使用。
 
 矢量数据寄存器搬运原理如下：
-记目的操作数的起始地址为dst_start，结束地址为dst_end，尾块元素个数为unalign_count = (dst_end - dst_end / 32 * 32) / sizeof(T)。
+记目的操作数的起始地址为`dst_start`，结束地址为`dst_end`，尾块元素个数为`unalign_count = (dst_end - dst_end / 32 * 32) / sizeof(T)`。
 则搬运的数据会分为两部分，分别是：
-- 32B对齐的主块部分UB[dst_start, dst_end - unalign_count * sizeof(T)]。
-- 非32B对齐的尾块部分UB[dst_end - unalign_count * sizeof(T), dst_end]。
+- 32B对齐的主块部分`UB[dst_start, dst_end - unalign_count * sizeof(T)]`。
+- 非32B对齐的尾块部分`UB[dst_end - unalign_count * sizeof(T), dst_end]`。
 
-本接口执行时，会将主块搬出至UB，尾块暂存至非对齐寄存器[0, unalign_count]。连续调用时，本接口可以拼接上一段**连续的尾块**和本次搬运主块部分，并同时更新本次尾块数据至非对齐寄存器中。首次搬运可以使用未初始化的非对齐寄存器。若上一次搬运的尾块和本次搬运主块不连续，则每一次尾块处理都需要调用后处理接口[asc_storeunalign_post](asc_storeunalign_post.md)。若连续，仅最后一次尾块处理需要调用后处理接口。
+本接口执行时，会将主块搬出至UB，尾块暂存至非对齐寄存器[0, `unalign_count`]。连续调用时，本接口可以拼接上一段**连续的尾块**和本次搬运主块部分，并同时更新本次尾块数据至非对齐寄存器中。首次搬运可以使用未初始化的非对齐寄存器。若上一次搬运的尾块和本次搬运主块不连续，则每一次尾块处理都需要调用后处理接口[asc_storeunalign_post](asc_storeunalign_post.md)。若连续，仅最后一次尾块处理需要调用后处理接口。
 
 本接口仅在AIV上生效。
 
@@ -49,7 +49,7 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ <dtype>* dst,
 
 ### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。对应矢量寄存器类型为`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
+`dtype`支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。对应矢量寄存器类型为`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
 
 ### 典型示例
 
@@ -68,7 +68,7 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ uint8_t* dst,
 |---|---|---|
 | dst | 输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*`。地址无需32字节对齐，但须按`sizeof(dtype)`字节对齐。 |
 | unalign_reg | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign`，长度为32字节。用于承接前一次搬出的尾块，并暂存本次搬出的尾块。首次调用前无需初始化。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。数据类型须与dst一致。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。数据类型须与`dst`一致。 |
 | count | 输入 | 本次搬出的元素个数，类型为`uint32_t`，最大值不超过单个矢量数据寄存器可容纳的元素个数。 |
 
 矢量数据寄存器和非对齐寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
@@ -88,7 +88,7 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ uint8_t* dst,
 
 ### 指令约束
 
-- 连续调用时须复用同一个unalign_reg，并按已搬出的元素个数更新dst。
+- 连续调用时须复用同一个`unalign_reg`，并按已搬出的元素个数更新`dst`。
 - 调用该接口之后，需要调用[asc_storeunalign_post](asc_storeunalign_post.md)处理非对齐搬出的尾块，尾块数据使用同一个非对齐寄存器存储。
 - `count`最大值不超过单个矢量数据寄存器可容纳的元素个数，目的访问范围不可越过UB可用容量上限，否则会报错。
 

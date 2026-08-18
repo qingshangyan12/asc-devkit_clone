@@ -44,33 +44,33 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 **表1** 参数说明
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| mem_type | 输入 | 同步流水线的类型，类型为MEM_TYPE，取值范围见表2 mem_type取值说明。 |
+| mem_type | 输入 | 同步流水线的类型，类型为`MEM_TYPE`，取值范围见表2 `mem_type`取值说明。 |
 
 **表2** 本接口支持的mem_type取值范围说明（源流水线/目的流水线表示的含义见表3 Reg计算流水线说明）
 | 值  | 源流水线 | 目的流水线 |
 | ------ | -------- | -------- |
-| VV_ALL | VEC_ALL | VEC_ALL |
-| VST_VLD | VEC_STORE | VEC_LOAD |
-| VLD_VST | VEC_LOAD | VEC_STORE |
-| VST_VST | VEC_STORE | VEC_STORE |
-| VS_ALL | VEC_ALL | SCALAR_ALL |
-| VST_LD | VEC_STORE | SCALAR_LOAD |
-| VLD_ST | VEC_LOAD | SCALAR_STORE |
-| VST_ST | VEC_STORE | SCALAR_STORE |
-| SV_ALL | SCALAR_ALL | VEC_ALL |
-| ST_VLD | SCALAR_STORE | VEC_LOAD |
-| LD_VST | SCALAR_LOAD | VEC_STORE |
-| ST_VST | SCALAR_STORE | VEC_STORE |
+| `VV_ALL` | `VEC_ALL` | `VEC_ALL` |
+| `VST_VLD` | `VEC_STORE` | `VEC_LOAD` |
+| `VLD_VST` | `VEC_LOAD` | `VEC_STORE` |
+| `VST_VST` | `VEC_STORE` | `VEC_STORE` |
+| `VS_ALL` | `VEC_ALL` | `SCALAR_ALL` |
+| `VST_LD` | `VEC_STORE` | `SCALAR_LOAD` |
+| `VLD_ST` | `VEC_LOAD` | `SCALAR_STORE` |
+| `VST_ST` | `VEC_STORE` | `SCALAR_STORE` |
+| `SV_ALL` | `SCALAR_ALL` | `VEC_ALL` |
+| `ST_VLD` | `SCALAR_STORE` | `VEC_LOAD` |
+| `LD_VST` | `SCALAR_LOAD` | `VEC_STORE` |
+| `ST_VST` | `SCALAR_STORE` | `VEC_STORE` |
 
 **表3** Reg计算流水线说明
 | 流水线 | 含义 |
 | ------ | -------- |
-| VEC_STORE | SIMD_VF函数内矢量写UB流水线。<br>对应寄存器到UB的搬运指令，例如[asc_storealign](../reg_store/asc_storealign.md)。 |
-| VEC_LOAD | SIMD_VF函数内矢量读UB流水线。<br>对应UB到寄存器的搬运指令，例如[asc_loadalign](../reg_load/asc_loadalign.md)。 |
-| SCALAR_STORE | SIMD_VF函数内标量写UB流水线。 |
-| SCALAR_LOAD | SIMD_VF函数内标量读UB流水线。 |
-| VEC_ALL | SIMD_VF函数内所有矢量读写UB流水线。 |
-| SCALAR_ALL | SIMD_VF函数内所有标量读写UB流水线。 |
+| `VEC_STORE` | `SIMD_VF`函数内矢量写UB流水线。<br>对应寄存器到UB的搬运指令，例如[asc_storealign](../reg_store/asc_storealign.md)。 |
+| `VEC_LOAD` | `SIMD_VF`函数内矢量读UB流水线。<br>对应UB到寄存器的搬运指令，例如[asc_loadalign](../reg_load/asc_loadalign.md)。 |
+| `SCALAR_STORE` | `SIMD_VF`函数内标量写UB流水线。 |
+| `SCALAR_LOAD` | `SIMD_VF`函数内标量读UB流水线。 |
+| `VEC_ALL` | `SIMD_VF`函数内所有矢量读写UB流水线。 |
+| `SCALAR_ALL` | `SIMD_VF`函数内所有标量读写UB流水线。 |
 
 ## 返回值说明
 
@@ -88,7 +88,7 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 - 读写依赖的场景下，如果读指令和写指令使用的寄存器相同，会触发寄存器保序，指令将会按照代码顺序执行，无需额外插入同步指令。
 - 冗余的同步指令会导致性能下降，可以通过外提出循环或者循环切分避免多次调用同步指令。
 - 当UB数据存在依赖时，才需要插入同步，判断是否有依赖取决于指令读写的内存是否有重叠。部分搬运指令读写内存的模式如下：
-    - [asc_gather](../reg_load/asc_gather.md)/[asc_scatter](../reg_store/asc_scatter.md)/[asc_gather_datablock](../reg_load/asc_gather_datablock.md)等指令取决于index地址偏移；
+    - [asc_gather](../reg_load/asc_gather.md)/[asc_scatter](../reg_store/asc_scatter.md)/[asc_gather_datablock](../reg_load/asc_gather_datablock.md)等指令取决于`index`地址偏移；
     - [asc_loadalign_brc_elem](../reg_load/asc_loadalign_brc_elem.md)单条指令读32B数据后将第一个元素进行广播；
 
 ## 调用示例
