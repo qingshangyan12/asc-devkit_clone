@@ -24,6 +24,7 @@
 
 ## 功能说明
 
+遵循CAST\_RINT模式，将bfloat16类型数据转换为half类型数据，返回转换后的值。
 
 ## 函数原型
 
@@ -41,7 +42,7 @@ inline half __bfloat162half_rn(const bfloat16_t x)
 
 ## 返回值说明
 
-输入遵循CAST\_RINT模式转换成的half类型数据。特殊值如下：
+输入遵循`CAST_RINT`模式转换成的`half`类型数据。特殊值如下：
 
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
