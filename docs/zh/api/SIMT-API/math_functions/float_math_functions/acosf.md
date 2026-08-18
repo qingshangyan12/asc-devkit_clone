@@ -28,7 +28,7 @@
 
 ![](../../../figures/zh-cn_formulaimage_0000002484776390.png)
 
-arcsin\(x\)为反正弦函数的计算。
+arccos\(x\)为反余弦函数的计算。
 
 ## 函数原型
 
