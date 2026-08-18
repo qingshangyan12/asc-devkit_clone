@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample is based on the Ascend C SIMT programming model. It demonstrates how the [cooperative_groups library](../../../../../../docs/zh/api/SIMT-API/协作组/协作组.md) organizes threads into different hierarchy levels and performs efficient parallel reduction.
+This sample is based on the Ascend C SIMT programming model. It demonstrates how the [cooperative_groups library](../../../../../../docs/zh/api/SIMT-API/cooperative_groups/cooperative_groups.md) organizes threads into different hierarchy levels and performs efficient parallel reduction.
 
 The sample defines one generic reduction interface, `reduce_sum`, whose parameter takes the `thread_group` base class. Three cases are built around this interface, using cross-block (`grid_group`), whole-block (`thread_block`), and sub-group (`thread_block_tile`) reduction domains respectively. The three call sites are written identically; the granularity difference is carried by the group object passed in. The project keeps a single `reduce_sum` implementation, shared by four call sites across the three cases. Its body contains no granularity-specific index arithmetic and no conditional branch on group type.
 
