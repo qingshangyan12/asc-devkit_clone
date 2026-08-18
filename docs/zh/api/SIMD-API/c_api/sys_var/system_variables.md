@@ -20,6 +20,10 @@
 
 - **[asc_get_program_counter](asc_get_program_counter.md)**
 
+- **[asc_get_saturation_flag](asc_get_saturation_flag.md)**
+
+- **[asc_get_saturation_strategy](asc_get_saturation_strategy.md)**
+
 - **[asc_get_smmu_tag_version](asc_get_smmu_tag_version.md)**
 
 - **[asc_get_status](asc_get_status.md)**
@@ -49,6 +53,10 @@
 - **[asc_set_l12l0_padding_val](asc_set_l12l0_padding_val.md)**
 
 - **[asc_set_l3d_rpt_b](asc_set_l3d_rpt_b.md)**
+
+- **[asc_set_saturation_flag](asc_set_saturation_flag.md)**
+
+- **[asc_set_saturation_strategy](asc_set_saturation_strategy.md)**
 
 - **[指令发射队列空闲槽位查询](asc_get_pipe_idle_slot_count.md)**
 

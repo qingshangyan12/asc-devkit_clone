@@ -289,6 +289,8 @@ C API文档目录。除试验接口外，整体使用时可以引入`asc_simd.h`
 | [asc_get_phy_buf_addr](sys_var/asc_get_phy_buf_addr.md) | 基于偏移量获取片上实际物理地址。 |
 | [asc_get_phy_stack_base](sys_var/asc_get_phy_stack_base.md) | 获取物理堆栈基地址。 |
 | [asc_get_program_counter](sys_var/asc_get_program_counter.md) | 获取程序计数器的指针，程序计数器用于记录当前程序执行的位置。 |
+| [asc_get_saturation_flag](sys_var/asc_get_saturation_flag.md) | 按饱和模式类型读取当前是否开启饱和。 |
+| [asc_get_saturation_strategy](sys_var/asc_get_saturation_strategy.md) | 读取当前饱和控制策略。 |
 | [asc_get_smmu_tag_version](sys_var/asc_get_smmu_tag_version.md) | 获取SMMU（System Memory Management Unit）版本信息。 |
 | [asc_get_status](sys_var/asc_get_status.md) | 获取状态信息。 |
 | [asc_get_sub_block_id](sys_var/asc_get_sub_block_id.md) | 获取AI Core上Vector核的ID。 |
@@ -304,6 +306,8 @@ C API文档目录。除试验接口外，整体使用时可以引入`asc_simd.h`
 | [asc_set_l0c2gm_relu_alpha](sys_var/asc_set_l0c2gm_relu_alpha.md) | 设置RELU_ALPHA寄存器的值。 |
 | [asc_set_l12l0_padding_val](sys_var/asc_set_l12l0_padding_val.md) | 设置PADDING_B寄存器的值。 |
 | [asc_set_l3d_rpt_b](sys_var/asc_set_l3d_rpt_b.md) | 用于设置接口asc_copy_l12l0a、asc_copy_l12l0b的2D格式搬运的repeat参数。 |
+| [asc_set_saturation_flag](sys_var/asc_set_saturation_flag.md) | 按饱和模式类型设置对应的饱和控制位。 |
+| [asc_set_saturation_strategy](sys_var/asc_set_saturation_strategy.md) | 设置饱和控制策略。 |
 | [指令发射队列空闲槽位查询](sys_var/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_FIX`发射队列的空闲槽位数量。本接口为试验接口。 |
 | [asc_get_ar_spr（废弃）](sys_var/asc_get_ar_spr_deprecated.md) | 读取指定特殊寄存器的值。 |
 
@@ -319,7 +323,10 @@ C API文档目录。除试验接口外，整体使用时可以引入`asc_simd.h`
 | [asc_dcci](cache_ctrl/asc_dcci.md) | 用于刷新Cache，保证Cache的一致性。 |
 | [asc_dci](cache_ctrl/asc_dci.md) | 数据缓存失效，使整个数据缓存无效化。 |
 | [asc_get_icache_preload_status](cache_ctrl/asc_get_icache_preload_status.md) | 获取ICache的Preload的状态。 |
+| [asc_get_scalar_load_cache_mode](cache_ctrl/asc_get_scalar_load_cache_mode.md) | 读取当前标量读路径的L2 Cache管理策略。 |
+| [asc_get_scalar_store_cache_mode](cache_ctrl/asc_get_scalar_store_cache_mode.md) | 读取当前标量写路径的L2 Cache管理策略。 |
 | [asc_icache_preload](cache_ctrl/asc_icache_preload.md) | 从指令所在GM地址预加载数据到对应的cacheline中。 |
+| [asc_set_scalar_cache_mode](cache_ctrl/asc_set_scalar_cache_mode.md) | 配置标量访存路径的L2 Cache管理策略。 |
 
 ## 原子操作
 
@@ -583,8 +590,10 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | 枚举类名 | 说明 |
 | ------ | ----------- |
 | [asc_hf32_round_mode](enum/asc_hf32_round_mode.md) | 表示Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略。 |
-| [asc_load_l2_cache_mode](enum/asc_load_l2_cache_mode.md) | 表示数据从GM搬运到UB时的L2 cache策略。 |
-| [asc_store_l2_cache_mode](enum/asc_store_l2_cache_mode.md) | 表示数据从UB搬运到GM时的L2 cache策略。 |
+| [asc_load_l2_cache_mode](enum/asc_load_l2_cache_mode.md) | 表示数据从GM搬运到UB时的L2 cache策略，也可用于标量load策略配置。 |
+| [asc_override_strategy](enum/asc_override_strategy.md) | 表示饱和控制策略（单指令配置或全局配置）。 |
+| [asc_saturation_mode](enum/asc_saturation_mode.md) | 表示饱和控制所作用的模式类型。 |
+| [asc_store_l2_cache_mode](enum/asc_store_l2_cache_mode.md) | 表示数据从UB搬运到GM时的L2 cache策略，也可用于标量store策略配置。 |
 
 ## 废弃接口
 
