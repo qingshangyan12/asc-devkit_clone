@@ -59,21 +59,24 @@ HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::CalcRes(
 HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::KernelRun(
     const OpParam& param, const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
 {
+    (void)param;
     buffInfo_ = templateDataParams.buffInfo;
 
     const uint64_t inputAddr = PointerToAddr(buffInfo_.inputPtr) + buffInfo_.inBuffBaseOff;
     const uint64_t outputAddr = PointerToAddr(buffInfo_.outputPtr) + buffInfo_.outBuffBaseOff;
 
     const uint64_t outputOffset = templateDataParams.outputSliceStride * mySubCommRank_;
-    uint64_t normalSliceSize = templateDataParams.sliceSize;
-    uint64_t lastSliceSize = templateDataParams.tailSize;
+    const uint64_t globalNormalSliceSize = templateDataParams.sliceSize;
+    uint64_t normalSliceSize = globalNormalSliceSize;
+    const uint64_t lastSliceSize = templateDataParams.tailSize;
     if (templateDataParams.tailSize != 0 && mySubCommRank_ == templateRankSize_ - 1) {
         normalSliceSize = templateDataParams.tailSize;
     }
-    HcclDataType dataType = param.DataDes.dataType;
-    const uint64_t dataTypeSize = DataTypeSizeGet(dataType);
-    const uint64_t dataCount = normalSliceSize / dataTypeSize;
-    if (dataCount == 0 && lastSliceSize == 0) {
+
+    // sliceSize/tailSize are byte counts.  The KFC server requires every rank
+    // to submit the same mission sequence, so this must be a global-empty check
+    // rather than a per-rank check after the tail slice is selected.
+    if (globalNormalSliceSize == 0U && lastSliceSize == 0U) {
         HCCL_INFO("[KFC][AllGather][Enqueue] empty data on all ranks, skip queue submission.");
         return HcclResult::HCCL_SUCCESS;
     }
