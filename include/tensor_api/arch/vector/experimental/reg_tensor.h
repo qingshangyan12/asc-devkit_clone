@@ -22,21 +22,6 @@ namespace asc {
 namespace te {
 
 template <typename DataType>
-struct reg_tensor;
-
-template <>
-struct reg_tensor<bool> {
-    using type = bool;
-    using elem_type = bool;
-    using reg_type = typename detail::type_get<bool>::type;
-
-    __simd_callee__ reg_tensor() = default;
-    __simd_callee__ reg_tensor(reg_type regValue) : reg(regValue) {}
-
-    reg_type reg;
-};
-
-template <typename DataType>
 struct reg_tensor {
     using type = DataType;
     using elem_type = DataType;
@@ -48,7 +33,11 @@ struct reg_tensor {
     template <typename ScalarType>
     __simd_callee__ inline reg_tensor& operator=(ScalarType src)
     {
-        asc_duplicate_scalar(reg, static_cast<DataType>(src), mask);
+        if constexpr (AscendC::Std::is_same_v<DataType, bool>) {
+            asc_duplicate_scalar(reinterpret_cast<vector_int8_t&>(reg), static_cast<int8_t>(src), mask);
+        } else {
+            asc_duplicate_scalar(reg, static_cast<DataType>(src), mask);
+        }
         return *this;
     }
 
