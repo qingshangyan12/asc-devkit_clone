@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-reg计算数据搬运接口，适用于从矢量数据寄存器中**筛选出有效元素后**按照连续非32B对齐的起始地址连续搬出到UB的场景。
+reg计算数据搬运接口，适用于从矢量数据寄存器中**筛选出有效元素后**按照连续非32B对齐的起始地址连续搬出到Unified Buffer（UB）的场景。
 
 本接口将输入矢量数据寄存器src1中被掩码squeeze_mask选择的有效元素依次复制到矢量数据寄存器dst，有效元素在dst上连续排列，dst中后续非有效元素置0。若AR寄存器（用于累加已搬出的有效数据量）中累加了前序asc_squeeze_and_storeunalign指令的有效元素总数据量，则将dst中有效数据写入dst_addr + AR寄存器数据量的地址，并将本次执行的有效数据量大小（以字节为单位）累加进AR寄存器。如[调用示例](#调用示例)所示，多次连续调用本接口时，若不清空AR寄存器，可以实现自动地址偏移，不需要手动管理地址。**调用本接口后，需要调用[asc_squeeze_and_storeunalign_finalize](asc_squeeze_and_storeunalign_finalize.md)接口进行收尾。**
 
@@ -41,7 +41,6 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(__ubuf__ int16_t* dst_a
 __simd_callee__ inline void asc_squeeze_and_storeunalign(__ubuf__ uint16_t* dst_addr, vector_uint16_t dst, vector_store_unalign& src0, vector_uint16_t src1, vector_bool squeeze_mask)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(__ubuf__ int32_t* dst_addr, vector_int32_t dst, vector_store_unalign& src0, vector_int32_t src1, vector_bool squeeze_mask)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(__ubuf__ uint32_t* dst_addr, vector_uint32_t dst, vector_store_unalign& src0, vector_uint32_t src1, vector_bool squeeze_mask)
-__simd_callee__ inline void asc_squeeze_and_storeunalign(__ubuf__ int64_t* dst_addr, vector_int64_t dst, vector_store_unalign& src0, vector_int64_t src1, vector_bool squeeze_mask)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(__ubuf__ half* dst_addr, vector_half dst, vector_store_unalign& src0, vector_half src1, vector_bool squeeze_mask)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(__ubuf__ float* dst_addr, vector_float dst, vector_store_unalign& src0, vector_float src1, vector_bool squeeze_mask)
 __simd_callee__ inline void asc_squeeze_and_storeunalign(__ubuf__ bfloat16_t* dst_addr, vector_bfloat16_t dst, vector_store_unalign& src0, vector_bfloat16_t src1, vector_bool squeeze_mask)
@@ -61,8 +60,8 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(__ubuf__ int4b_t* dst_a
 | --------- | ----- | ----------------- |
 | dst_addr  | 输出    | 目的操作数（矢量）的起始地址。 |
 | dst       | 输出    | 目的操作数（矢量数据寄存器）。 |
-| src1      | 输入、输出    | 非对齐寄存器，用于保存非对齐数据，长度32B。 |
-| src0      | 输入    | 源操作数（矢量数据寄存器）。 |
+| src0      | 输入、输出    | 非对齐寄存器，用于保存非对齐数据，长度32B。 |
+| src1      | 输入    | 源操作数（矢量数据寄存器）。 |
 | squeeze_mask      | 输入    | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。

@@ -59,7 +59,7 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。|
+| dst | 输入/输出 | 目的操作数（矢量数据寄存器）。|
 | src | 输入 | 源操作数（矢量数据寄存器）。|
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
 
@@ -71,7 +71,7 @@
 
 ## 约束说明
 
-- 该接口中mask用于筛选源操作数，不影响dst的写入行为，当mask位数为0时，源操作数src对应位置的数数值将被忽略，dst对应位置数值为忽略该位置src后计算得到的值。
+- 该接口中mask用于筛选源操作数，不影响dst的写入行为，当mask位数为0时，源操作数src对应位置的数值将被忽略，dst对应位置数值为忽略该位置src后计算得到的值。
 - dst的数据类型为uint16_t，最大值为65535，使用时需注意累加溢出问题。
 
 ## 调用示例
@@ -86,7 +86,7 @@ asc_duplicate_scalar(dst0, (uint16_t)0, mask);
 asc_duplicate_scalar(dst1, (uint16_t)0, mask);
 
 // 加载待统计的数据
-asc_loadalign(src, src_addr);  // src_addr是外部输入的UB内存空间地址
+asc_loadalign(src, src_addr);  // src_addr是外部输入的Unified Buffer（UB）内存空间地址
 
 // 分别统计低位和高位区间
 asc_frequency_histogram_bin0(dst0, src, mask);  // 统计[0,127]

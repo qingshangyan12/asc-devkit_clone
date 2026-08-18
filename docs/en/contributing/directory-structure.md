@@ -111,7 +111,7 @@ The following lists some common architecture directories; for the complete list,
 | `dav_c220` | `2201` | Atlas A2 training series products / Atlas A2 inference series products, Atlas A3 training series products / Atlas A3 inference series products |
 | `dav_3510` | `3510` | Ascend 950PR/Ascend 950DT |
 
-> For the complete mapping between product models and `__NPU_ARCH__`, see the [**NPU_ARCH** documentation](../../zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch).
+> For the complete mapping between product models and `__NPU_ARCH__`, see the [**NPU_ARCH** documentation](../../zh/guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch).
 
 ### Architecture Dispatch Pattern
 
@@ -267,9 +267,9 @@ examples/
 │   ├── 02_features/        # Advanced features
 │   ├── 03_basic_api/       # Basic API examples
 │   │   └── 00_data_movement/
-│   │       └── copy_ub2ub/ # UB to UB copy example
+│   │       └── copy_ub2ub/ # Unified Buffer (UB) to UB copy example
 │   │           ├── CMakeLists.txt
-│   │           ├── copy.asc          # Kernel source (.asc extension)
+│   │           ├── copy.asc          # Kernel function source (.asc extension)
 │   │           ├── data_utils.h     # Test data utilities
 │   │           └── README.md
 │   ├── 04_advanced_api/    # High-level API examples
@@ -287,7 +287,7 @@ examples/
 
 - Typical directory organization: `<api_type>/<category>/<api_name>/`, with some categories having deeper levels
 - Numeric prefixes ensure ordering: `00_introduction/`, `01_utilities/`
-- Kernel source files use `.asc` extension
+- Kernel function source files use `.asc` extension
 - Each example must have its own `CMakeLists.txt`
 - Each example is recommended to include `README.md`
 

@@ -1,6 +1,6 @@
 # LocalMemAllocator简介<a name="ZH-CN_TOPIC_0000002337856509"></a>
 
-LocalMemAllocator是在使用[静态Tensor编程](../../../../../guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)时用于内存管理的类，用户无需构建TPipe/TQue，而是直接创建LocalTensor对象（也可以直接通过[LocalTensor构造函数](../../data_structures/LocalTensor/LocalTensor_constructor.md)进行构造）并开发算子，从而减少运行时的开销，实现更优的性能。
+LocalMemAllocator是在使用[静态Tensor编程](../../../../../guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md)时用于内存管理的类，用户无需构建TPipe/TQue，而是直接创建LocalTensor对象（也可以直接通过[LocalTensor构造函数](../../data_structures/LocalTensor/LocalTensor_constructor.md)进行构造）并开发算子，从而减少运行时的开销，实现更优的性能。
 
 LocalMemAllocator仅支持在Ascend C静态Tensor编程方式中使用，不可以与TPipe等接口混用。
 
@@ -40,10 +40,10 @@ public:
 </thead>
 <tbody><tr id="row260915573419"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.3.1.1 "><p id="p2060925573411"><a name="p2060925573411"></a><a name="p2060925573411"></a>hard</p>
 </td>
-<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.2.3.1.2 "><p id="p823866165711"><a name="p823866165711"></a><a name="p823866165711"></a><span id="ph46543142425"><a name="ph46543142425"></a><a name="ph46543142425"></a>用于表示数据的物理位置，Hardware枚举类型，定义如下，合法位置为：UB、L1、L0A、L0B、L0C、BIAS、FIXBUF。</span></p>
+<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.2.3.1.2 "><p id="p823866165711"><a name="p823866165711"></a><a name="p823866165711"></a><span id="ph46543142425"><a name="ph46543142425"></a><a name="ph46543142425"></a>用于表示数据的物理位置，Hardware枚举类型，定义如下，合法位置为：Unified Buffer（UB）、L1、L0A、L0B、L0C、BIAS、FIXBUF。</span></p>
 <a name="screen79541519214"></a><a name="screen79541519214"></a><pre class="screen" codetype="Cpp" id="screen79541519214">enum class Hardware : uint8_t { 
 GM,     // Global Memory
-UB,     // Unified Buffer
+UB,     // UB
 L1,     // L1 Buffer
 L0A,    // L0A Buffer
 L0B,    // L0B Buffer

@@ -29,7 +29,7 @@
 对源操作数src和value进行乘法运算再按照数据类型转换的ROUND舍入模式转成half类型，根据mask将结果写入目的操作数dst。计算公式如下：
 
 $$
-dst_i = round_to_half(src_i * value)
+dst_i = round\_to\_half(src_i * value)
 $$
 
 ## 函数原型
@@ -73,6 +73,6 @@ vector_float src;
 vector_half dst;
 float value = 1.0f;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr);  // src_addr是外部输入的UB内存空间地址
+asc_loadalign(src, src_addr);  // src_addr是外部输入的Unified Buffer（UB）内存空间地址
 asc_muls(dst, src, value, mask);
 ```

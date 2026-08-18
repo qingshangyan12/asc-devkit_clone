@@ -6,13 +6,13 @@ Ascend C资料体系包含五份核心文档，开发者可以通过提交PR对�
 
 | 文档 | 内容 | 文档目录 |
 |------|------|---------|
-| 入门教程 | Ascend C概述、环境准备、快速上手（HelloWorld、首个算子） | `docs/zh/guide/入门教程` |
+| 入门教程 | Ascend C概述、环境准备、快速上手（HelloWorld、首个算子） | `docs/zh/guide/getting_started` |
 | 编程指南 | 编程模型、编程范式、编译运行、硬件架构、高级编程 | `docs/zh/guide/编程指南` |
 | API参考手册 | 接口参数、约束、示例、API关联 | `docs/zh/api/` |
-| 算子实践参考 | 算子实现、性能优化、调优案例 | `docs/zh/guide/算子实践参考/` |
-| 跨代迁移兼容性指南 | API兼容策略、架构变更映射、迁移步骤 | `docs/zh/guide/跨代迁移兼容性指南/` |
+| 算子实践参考 | 算子实现、性能优化、调优案例 | `docs/zh/guide/operator_practice/` |
+| 跨代迁移兼容性指南 | API兼容策略、架构变更映射、迁移步骤 | `docs/zh/guide/cross_gen_migration_guide/` |
 
-在阅读本文档前，请确保您已了解昇腾AI处理器硬件架构。零基础开发者推荐先阅读[入门教程](./guide/入门教程/Ascend-C概述与学习路径.md)；已有基础的开发者推荐先阅读[Ascend C编程指南](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)。
+在阅读本文档前，请确保您已了解昇腾AI处理器硬件架构。零基础开发者推荐先阅读[入门教程](./guide/getting_started/ascend_c_overview_and_learning_path.md)；已有基础的开发者推荐先阅读[Ascend C编程指南](https://www.hiascend.com/document/redirect/CannCommunityOpdevAscendC)。
 
 ---
 
@@ -38,7 +38,7 @@ Ascend C资料体系包含五份核心文档，开发者可以通过提交PR对�
 
 如果您有Ascend C算子性能优化的实战经验愿意分享：
 
-1. 参考 `算子实践参考/优秀实践/` 目录下已有的调优案例结构
+1. 参考 `operator_practice/best_practices/` 目录下已有的调优案例结构
 2. 按照本指南的"性能优化案例编写规范"编写文档
 3. 提交PR
 
@@ -76,11 +76,11 @@ Ascend C资料遵循《Ascend C资料设计规范》的三个维度要求：可�
 
 | 入门教程目录 | 对应编程指南章节 | 入门教程定位 |
 |-------------|----------------|-------------|
-| 入门教程/ | 编程模型/编程模型概述 | 概述与学习路径 |
-| 环境准备.md | 编译与运行 | 快速环境搭建，详细编译说明链接到编程指南 |
-| 快速入门/异构系统与编程模型.md | 编程模型/异构系统 + 编程模型/编程模型概述 | 入门级概念+SIMD/SIMT选型，深入链接到编程指南 |
-| 快速入门/基于SIMD编程/ | 编程模型/AI-Core-SIMD编程 | HelloWorld+Add算子快速上手 |
-| 快速入门/基于SIMT编程/ | 编程模型/AI-Core-SIMT编程 | HelloWorld+Gather算子快速上手 |
+| getting_started/ | 编程模型/编程模型概述 | 概述与学习路径 |
+| environment_setup.md | 编译与运行 | 快速环境搭建，详细编译说明链接到编程指南 |
+| quick_start/heterogeneous_system_and_programming_model.md | 编程模型/异构系统 + 编程模型/编程模型概述 | 入门级概念+SIMD/SIMT选型，深入链接到编程指南 |
+| quick_start/simd_programming/ | 编程模型/AI-Core-SIMD编程 | HelloWorld+Add算子快速上手 |
+| quick_start/simt_programming/ | 编程模型/AI-Core-SIMT编程 | HelloWorld+Gather算子快速上手 |
 
 **链接方向**：
 - 首次提到编程概念深入 → 链接到编程指南对应章节
@@ -200,7 +200,7 @@ C = A × B + Bias
 
 **编写要求**：
 - 当不同产品的排布格式不同（如Zz vs Nz）时，**必须分表**
-- 物理位置写Buffer名称（L0A/L0B/L0C/UB等）
+- 物理位置写Buffer名称（L0A/L0B/L0C/Unified Buffer（UB）等）
 - 格式写分形排布格式（Zz/Zn/Nz/ND等）
 - 如有偏置矩阵，在C矩阵行的说明中标注"可支持使用偏置矩阵Bias进行初始化，维度为1 x N"
 
@@ -612,7 +612,7 @@ void mad(__cc__ float *c, __ca__ half *a, __cb__ half *b,
 ### 示例中的关键字注释
 
 ```cpp
-__aicore__ inline void ExampleKernel(__gm__ uint8_t* x) {  // __aicore__=核函数修饰符, __gm__=Global Memory地址空间
+__aicore__ inline void ExampleKernel(__gm__ uint8_t* x) {  // __aicore__=核函数（Kernel）修饰符, __gm__=Global Memory地址空间
     // ...
 }
 ```
@@ -621,7 +621,7 @@ __aicore__ inline void ExampleKernel(__gm__ uint8_t* x) {  // __aicore__=核函�
 
 ## 性能优化案例编写规范
 
-参考 `算子实践参考/优秀实践/` 目录下的已有案例（如FlashAttention、Matmul系列）。推荐结构：
+参考 `operator_practice/best_practices/` 目录下的已有案例（如FlashAttention、Matmul系列）。推荐结构：
 
 ```markdown
 # <算子名> 性能调优案例
@@ -657,7 +657,7 @@ __aicore__ inline void ExampleKernel(__gm__ uint8_t* x) {  // __aicore__=核函�
 提交资料PR前，请逐项检查：
 
 **内容正确性**：
-- [ ] 所有硬件参数值（容量、粒度、范围）与[硬件规格](./guide/编程指南/高级编程/硬件实现/架构规格/架构规格.md)保持一致
+- [ ] 所有硬件参数值（容量、粒度、范围）与[硬件规格](./guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/architecture_spec.md)保持一致
 - [ ] "固定值"等绝对性描述已经核实（很多"固定值"实际由配置参数决定）
 - [ ] 数据通路描述与实际路径一致（不与其他文档矛盾）
 

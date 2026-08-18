@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-reg计算数据搬运接口，适用于从矢量数据寄存器中**筛选出有效元素后**按照连续非32B对齐的起始地址连续搬出到UB的尾块场景。
+reg计算数据搬运接口，适用于从矢量数据寄存器中**筛选出有效元素后**按照连续非32B对齐的起始地址连续搬出到Unified Buffer（UB）的尾块场景。
 
 搬运原理如下：
 记目的操作数的起始地址为dst_start，结束地址为dst_end，尾块元素个数为unalign_count = (dst_end - dst_end / 32 * 32) / sizeof(T)。则搬运的数据会分为两部分，分别是：
@@ -53,7 +53,6 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ bfloa
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ int32_t* dst, vector_store_unalign src)
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ uint32_t* dst, vector_store_unalign src)
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ float* dst, vector_store_unalign src)
-__simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(__ubuf__ int64_t* dst, vector_store_unalign src)
 ```
 
 ## 参数说明
