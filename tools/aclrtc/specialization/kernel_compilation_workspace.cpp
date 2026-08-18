@@ -83,6 +83,18 @@ bool WritePatchedSourceFileAtomically(const fs::path& sourceFilePath, const std:
             fs::remove(temporaryFilePath, ignoredError);
             return false;
         }
+        outputStream.flush();
+        outputStream.close();
+        if (!outputStream) {
+            const int finalizeError = errno;
+            ACLRTC_LOG_ERROR(
+                "Failed to finalize temporary source patch file: path=%s errno=%d message=%s; original source "
+                "was not replaced",
+                temporaryFilePath.c_str(), finalizeError, std::strerror(finalizeError));
+            boost::system::error_code ignoredError;
+            fs::remove(temporaryFilePath, ignoredError);
+            return false;
+        }
     }
     boost::system::error_code renameError;
     fs::rename(temporaryFilePath, sourceFilePath, renameError);
