@@ -50,6 +50,8 @@ inline int __float2int_ru(const float x)
 | nan | 0 |
 | inf | 2147483647 |
 | -inf | -2147483648 |
+| 超出 int 范围的正数 | 2147483647 |
+| 超出 int 范围的负数 | -2147483648 |
 
 
 ## 约束说明
