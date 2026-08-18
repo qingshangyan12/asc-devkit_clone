@@ -75,7 +75,7 @@ inline half hsin(half x)
     __global__ __launch_bounds__(1024) void KernelSin(half* dst, half* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = hsin(x[idx]); // 对src源地址的第idx个元素取三角函数正弦值
+        dst[idx] = hsin(x[idx]); // 对x的第idx个元素取三角函数正弦值
     }
     ```
 
