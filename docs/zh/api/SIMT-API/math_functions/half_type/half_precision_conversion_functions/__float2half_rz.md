@@ -56,7 +56,7 @@ inline half __float2half_rz(const float x)
 
 ## 约束说明
 
-无
+返回值说明中的饱和模式返回值仅在全局饱和寄存器（CTRL[60]）置位时生效；SIMT编程场景由于无法设置CTRL寄存器，饱和模式不生效。
 
 ## 需要包含的头文件
 
