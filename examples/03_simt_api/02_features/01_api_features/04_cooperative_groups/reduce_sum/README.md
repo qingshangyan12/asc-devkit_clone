@@ -13,7 +13,7 @@ Ascend 950PR/Ascend 950DT。
 
 ## 支持的CANN软件版本
 
-CANN 9.2.0及以上。
+- \>= CANN 9.2.0
 
 
 ## 目录结构介绍
