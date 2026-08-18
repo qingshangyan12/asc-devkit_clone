@@ -123,6 +123,7 @@ add_executable(${CCU_UT_TARGET}
     # Source under test (minimal impl dependencies)
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
     ${HCCL_CC_SRC_DIR}/common/hccl_alloc_ctx_res.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/ccu_kernel_utils.cc
 )
 
 target_include_directories(${CCU_UT_TARGET} PRIVATE
