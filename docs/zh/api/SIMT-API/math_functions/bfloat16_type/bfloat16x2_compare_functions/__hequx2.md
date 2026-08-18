@@ -113,7 +113,7 @@ bfloat16x2_t __hequx2(bfloat16x2_t x, bfloat16x2_t y)
     __global__ __launch_bounds__(1024) void simt_hequx2(bfloat16_t* x, bfloat16_t* y, bfloat16_t* dst, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
+        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据；要求x/y/dst指针满足4字节对齐，且input_total_length为偶数，否则末尾1个元素不会被处理
         if (idx >= input_total_length / 2) {
             return;
         }
