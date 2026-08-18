@@ -2,71 +2,48 @@
 
 ## Overview
 
-This sample demonstrates register-based logical compute with Tensor API. Input data is loaded as masked `reg_tensor<int32_t>` values. C++ operators perform logical not, bitwise AND, OR, XOR, and left/right shifts, and eight result rows are written back to Global Memory.
-
-Both register and scalar operands are covered to show how a binary API inherits its active-lane mask from the `reg_tensor` operand.
+This sample uses Tensor API to run logical and shift operations on 64 `int32_t` elements and writes eight result rows to GM. Python scripts generate golden data and require exact element-wise results.
 
 ## Supported Products
 
-- Ascend 950PR/Ascend 950DT
+- Ascend 950PR
+- Ascend 950DT
 
 ## Directory Structure
 
 ```text
 logical_compute_tensor_api
+├── scripts
+│   ├── gen_data.py
+│   └── verify_result.py
 ├── CMakeLists.txt
-├── README.md
-├── README_En.md
 ├── logical_compute_tensor_api.asc
-└── scripts
-    ├── gen_data.py
-    └── verify_result.py
+├── README.md
+└── README_En.md
 ```
 
 ## Sample Description
 
-The input contains 64 `int32_t` elements. The output contains these eight rows:
+| Input/Output | Specification |
+| :--- | :--- |
+| `src_a`, `src_b`, `shifts` | `[64]`, `int32_t` |
+| `output` | `[8, 64]`, `int32_t` |
 
-| Operation | Operand Form |
-| --- | --- |
-| `!a` | Register logical not: zero becomes 1 and nonzero becomes 0 |
-| `a & b` | Register and register |
-| `a | 16` | Register and right scalar |
-| `7 ^ a` | Left scalar and register |
-| `a << shift` | Register shift count |
-| `a << 2` | `int16_t` scalar shift count |
-| `a >> shift` | Register shift count |
-| `a >> 2` | `int16_t` scalar shift count |
-
-The kernel copies data from GM to UB, loads Tensor values, executes register logical operations, and copies the output from UB to GM. The data generator performs the same operations with NumPy. Verification requires the output shape and every integer element to match exactly.
+The sample evaluates `!a`, `a & b`, `a | 16`, `7 ^ a`, `a << shift`, `a << 2`, `a >> shift`, and `a >> 2`. `!a` is logical not: zero becomes 1 and nonzero becomes 0. Generated register shift counts range from 0 to 3.
 
 ## Build and Run
 
-Run the following steps in the sample directory.
+Run the following in this directory:
 
-- Configure the environment for the installed CANN toolkit.
-
-  ```bash
-  # Default path for the root user
-  source /usr/local/Ascend/cann/set_env.sh
-
-  # Default path for a non-root user
-  source $HOME/Ascend/cann/set_env.sh
-
-  # Custom installation path
-  source ${install_path}/cann/set_env.sh
-  ```
-
-- Build and run the sample.
-
-  ```bash
-  cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-3510
-  cmake --build build -j
-  cd build
-  python3 ../scripts/gen_data.py
-  ./demo
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin
-  ```
+```bash
+source /usr/local/Ascend/cann/set_env.sh
+cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-3510
+cmake --build build -j
+cd build
+python3 ../scripts/gen_data.py
+./demo
+python3 ../scripts/verify_result.py output/output.bin output/golden.bin
+```
 
 A successful run prints:
 
