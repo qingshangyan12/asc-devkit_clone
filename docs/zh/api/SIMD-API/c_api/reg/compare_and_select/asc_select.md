@@ -44,7 +44,17 @@ __simd_callee__ inline void asc_select(vector_<dtype>& dst,
                                        vector_bool mask)
 ```
 
+<<<<<<< Updated upstream
 `dtype`支持的取值为`bool`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+=======
+### dtype支持数据类型
+
+<<<<<<< Updated upstream
+`dtype`支持的数据类型为`bool`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+=======
+dtype支持的数据类型为`bool`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 ### 典型示例
 
@@ -80,7 +90,11 @@ __simd_callee__ inline void asc_select(vector_half& dst,
 
 ## 调用示例
 
+<<<<<<< Updated upstream
 <!-- npu="950" id8 -->
+=======
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -97,7 +111,37 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 namespace {
 template <typename T>
+<<<<<<< Updated upstream
+=======
+void print_data(const char* label, const std::vector<T>& values)
+=======
+```cpp
+#include <cstdint>
+#include <iostream>
+#include <vector>
+
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void PrintData(const char* label, const std::vector<T>& values)
+>>>>>>> Stashed changes
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+=======
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+>>>>>>> Stashed changes
 {
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
@@ -108,9 +152,30 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
+<<<<<<< Updated upstream
 constexpr uint32_t ELEMENT_COUNT = 64;
 
 __simd_vf__ inline void select(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1)
+=======
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+
+
+constexpr uint32_t ELEMENT_COUNT = 64;
+
+__simd_vf__ inline void Select(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1)
+>>>>>>> Stashed changes
 {
     vector_float dst_reg;
     vector_float src0_reg;
@@ -125,7 +190,11 @@ __simd_vf__ inline void select(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf
     asc_storealign(dst, dst_reg, mask);
 }
 
+<<<<<<< Updated upstream
 __global__ __vector__ void asc_select_kernel(__gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
+=======
+__global__ __vector__ void AscSelectKernel(__gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
+>>>>>>> Stashed changes
 {
     asc_init();
     __ubuf__ float dst_local[ELEMENT_COUNT];
@@ -135,7 +204,11 @@ __global__ __vector__ void asc_select_kernel(__gm__ float* dst, __gm__ float* sr
     asc_copy_gm2ub_align(src1_local, src1, ELEMENT_COUNT * sizeof(float));
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+<<<<<<< Updated upstream
     select(dst_local, src0_local, src1_local);
+=======
+    Select(dst_local, src0_local, src1_local);
+>>>>>>> Stashed changes
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(float));
@@ -169,6 +242,7 @@ int main()
         ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(src1_device, src1.size() * sizeof(float), src1.data(), src1.size() * sizeof(float),
         ACL_MEMCPY_HOST_TO_DEVICE);
+<<<<<<< Updated upstream
     asc_select_kernel<<<1, 0>>>(dst_device, src0_device, src1_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
@@ -177,6 +251,18 @@ int main()
     std::cout << (passed ? "[Success] asc_select passed."
                          : "[Failed] asc_select failed.")
               << std::endl;
+=======
+    AscSelectKernel<<<1, 0>>>(dst_device, src0_device, src1_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Input src0", src0);
+    PrintData("Input src1", src1);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = CompareData(output, golden);
+    std::cout << (passed ? "[Success] asc_select passed." : "[Failed] asc_select failed.") << std::endl;
+>>>>>>> Stashed changes
     aclrtFree(dst_device);
     aclrtFree(src0_device);
     aclrtFree(src1_device);

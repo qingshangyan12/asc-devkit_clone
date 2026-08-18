@@ -96,8 +96,23 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 
 namespace {
 template <typename T>
+<<<<<<< Updated upstream
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
+=======
+void PrintData(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+>>>>>>> Stashed changes
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
         if (actual[i] == expected[i]) continue;
@@ -107,10 +122,33 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
+<<<<<<< Updated upstream
 constexpr uint32_t ELEMENT_COUNT = 64;
 constexpr float SCALAR_VALUE = 2.0f;
 
 __simd_vf__ inline void compute(__ubuf__ float* dst, __ubuf__ float* src)
+=======
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+
+
+
+constexpr uint32_t ELEMENT_COUNT = 64;
+constexpr float SCALAR_VALUE = 2.0f;
+
+__simd_vf__ inline void Compute(__ubuf__ float* dst, __ubuf__ float* src)
+>>>>>>> Stashed changes
 {
     vector_float dst_reg;
     vector_float src_reg;
@@ -121,7 +159,11 @@ __simd_vf__ inline void compute(__ubuf__ float* dst, __ubuf__ float* src)
     asc_storealign(dst, dst_reg, mask);
 }
 
+<<<<<<< Updated upstream
 __global__ __vector__ void asc_mul_scalar_kernel(__gm__ float* dst, __gm__ float* src)
+=======
+__global__ __vector__ void AscMulScalarKernel(__gm__ float* dst, __gm__ float* src)
+>>>>>>> Stashed changes
 {
     asc_init();
     __ubuf__ float dst_local[ELEMENT_COUNT];
@@ -129,7 +171,11 @@ __global__ __vector__ void asc_mul_scalar_kernel(__gm__ float* dst, __gm__ float
     asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(float));
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+<<<<<<< Updated upstream
     compute(dst_local, src_local);
+=======
+    Compute(dst_local, src_local);
+>>>>>>> Stashed changes
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(float));
@@ -159,12 +205,23 @@ int main()
     aclrtMemcpy(src_device, src.size() * sizeof(float), src.data(), src.size() * sizeof(float),
         ACL_MEMCPY_HOST_TO_DEVICE);
 
+<<<<<<< Updated upstream
     asc_mul_scalar_kernel<<<1, 0>>>(dst_device, src_device);
+=======
+    AscMulScalarKernel<<<1, 0>>>(dst_device, src_device);
+>>>>>>> Stashed changes
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
 
+<<<<<<< Updated upstream
     const bool passed = compare_data(output, golden, 1e-6);
+=======
+    PrintData("Input", src);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = CompareData(output, golden, 1e-6);
+>>>>>>> Stashed changes
     std::cout << (passed ? "[Success] asc_mul_scalar passed." : "[Failed] asc_mul_scalar failed.") << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src_device);

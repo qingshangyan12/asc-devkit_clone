@@ -82,7 +82,11 @@ __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
 
 ## 调用示例
 
+<<<<<<< Updated upstream
 <!-- npu="950" id8 -->
+=======
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -92,6 +96,9 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 
 ```c
+=======
+```cpp
+>>>>>>> Stashed changes
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -99,7 +106,28 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 namespace {
 template <typename T>
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+void print_data(const char* label, const std::vector<T>& values)
+=======
+void PrintData(const char* label, const std::vector<T>& values)
+>>>>>>> Stashed changes
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+=======
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+>>>>>>> Stashed changes
 {
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
@@ -110,8 +138,16 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
+<<<<<<< Updated upstream
 constexpr uint32_t BUFFER_BYTES = 256;
 __simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+=======
+
+
+
+constexpr uint32_t BUFFER_BYTES = 256;
+__simd_vf__ inline void Convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+>>>>>>> Stashed changes
 {
     vector_bool mask = asc_create_mask_b8(PAT_ALL);
     vector_float dst;
@@ -120,7 +156,11 @@ __simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* inpu
     asc_int322float_rn(dst, src, mask);
     asc_storealign(reinterpret_cast<__ubuf__ float*>(output), dst, mask);
 }
+<<<<<<< Updated upstream
 __global__ __vector__ void asc_int322float_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+=======
+__global__ __vector__ void AscInt322floatKernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+>>>>>>> Stashed changes
 {
     asc_init();
     __ubuf__ uint8_t output_local[BUFFER_BYTES];
@@ -129,7 +169,11 @@ __global__ __vector__ void asc_int322float_kernel(__gm__ uint8_t* output, __gm__
     asc_copy_gm2ub_align(output_local, input, BUFFER_BYTES);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+<<<<<<< Updated upstream
     convert(output_local, input_local);
+=======
+    Convert(output_local, input_local);
+>>>>>>> Stashed changes
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
@@ -157,14 +201,33 @@ int main()
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(input_device, input.size() * sizeof(uint8_t), input.data(), input.size() * sizeof(uint8_t),
         ACL_MEMCPY_HOST_TO_DEVICE);
+<<<<<<< Updated upstream
     asc_int322float_kernel<<<1, 0>>>(output_device, input_device);
+=======
+    AscInt322floatKernel<<<1, 0>>>(output_device, input_device);
+>>>>>>> Stashed changes
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(uint8_t), output_device, output.size() * sizeof(uint8_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
+<<<<<<< Updated upstream
+=======
+    std::cout << "Conversion: vector_int32_t -> vector_float" << std::endl;
+<<<<<<< Updated upstream
+    print_data("Input 1.0 (raw bytes)", input);
+    print_data("Output (raw bytes)", output);
+    print_data("Golden 1.0 (raw bytes)", golden);
+>>>>>>> Stashed changes
     const bool passed = compare_data(output, golden);
     std::cout << (passed ? "[Success] asc_int322float_rn passed."
                          : "[Failed] asc_int322float_rn failed.")
               << std::endl;
+=======
+    PrintData("Input 1.0 (raw bytes)", input);
+    PrintData("Output (raw bytes)", output);
+    PrintData("Golden 1.0 (raw bytes)", golden);
+    const bool passed = CompareData(output, golden);
+    std::cout << (passed ? "[Success] asc_int322float_rn/asc_int322float_rna/asc_int322float_rd/asc_int322float_ru/asc_int322float_rz passed." : "[Failed] asc_int322float_rn/asc_int322float_rna/asc_int322float_rd/asc_int322float_ru/asc_int322float_rz failed.") << std::endl;
+>>>>>>> Stashed changes
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);

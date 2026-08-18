@@ -34,22 +34,49 @@ $$
 
 ## 函数原型
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+  ```cpp
+  __simd_callee__ inline void asc_abs(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
+  __simd_callee__ inline void asc_abs(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
+  __simd_callee__ inline void asc_abs(vector_half& dst, vector_half src, vector_bool mask)
+  __simd_callee__ inline void asc_abs(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
+  __simd_callee__ inline void asc_abs(vector_float& dst, vector_float src, vector_bool mask)
+  ```
+=======
+### 模板原型（占位符形式）
+
+>>>>>>> Stashed changes
 ```c
 __simd_callee__ inline void asc_abs(vector_<dtype>& dst,
                                     vector_<dtype> src,
                                     vector_bool mask)
 ```
 
+<<<<<<< Updated upstream
 `dtype`支持的取值为`int8_t`、`int16_t`、`half`、`int32_t`、`float`。
+=======
+### dtype支持数据类型
+
+dtype支持的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`
+>>>>>>> Stashed changes
 
 ### 典型示例
 
 ```c
+<<<<<<< Updated upstream
 // 示例：对half类型的矢量数据寄存器按元素取绝对值。
+=======
+>>>>>>> Stashed changes
 __simd_callee__ inline void asc_abs(vector_half& dst,
                                     vector_half src,
                                     vector_bool mask)
 ```
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 ## 参数说明
 
@@ -96,8 +123,23 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 
 namespace {
 template <typename T>
+<<<<<<< Updated upstream
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
+=======
+void PrintData(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+>>>>>>> Stashed changes
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
         if (actual[i] == expected[i]) continue;
@@ -107,9 +149,31 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
+<<<<<<< Updated upstream
 constexpr uint32_t ELEMENT_COUNT = 64;
 
 __simd_vf__ inline void compute(__ubuf__ float* dst, __ubuf__ float* src)
+=======
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+
+
+
+constexpr uint32_t ELEMENT_COUNT = 64;
+
+__simd_vf__ inline void Compute(__ubuf__ float* dst, __ubuf__ float* src)
+>>>>>>> Stashed changes
 {
     vector_float dst_reg;
     vector_float src_reg;
@@ -120,7 +184,11 @@ __simd_vf__ inline void compute(__ubuf__ float* dst, __ubuf__ float* src)
     asc_storealign(dst, dst_reg, mask);
 }
 
+<<<<<<< Updated upstream
 __global__ __vector__ void asc_abs_kernel(__gm__ float* dst, __gm__ float* src)
+=======
+__global__ __vector__ void AscAbsKernel(__gm__ float* dst, __gm__ float* src)
+>>>>>>> Stashed changes
 {
     asc_init();
     __ubuf__ float dst_local[ELEMENT_COUNT];
@@ -128,7 +196,11 @@ __global__ __vector__ void asc_abs_kernel(__gm__ float* dst, __gm__ float* src)
     asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(float));
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+<<<<<<< Updated upstream
     compute(dst_local, src_local);
+=======
+    Compute(dst_local, src_local);
+>>>>>>> Stashed changes
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(float));
@@ -158,12 +230,23 @@ int main()
     aclrtMemcpy(src_device, src.size() * sizeof(float), src.data(), src.size() * sizeof(float),
         ACL_MEMCPY_HOST_TO_DEVICE);
 
+<<<<<<< Updated upstream
     asc_abs_kernel<<<1, 0>>>(dst_device, src_device);
+=======
+    AscAbsKernel<<<1, 0>>>(dst_device, src_device);
+>>>>>>> Stashed changes
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
 
+<<<<<<< Updated upstream
     const bool passed = compare_data(output, golden, 1e-6);
+=======
+    PrintData("Input", src);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = CompareData(output, golden, 1e-6);
+>>>>>>> Stashed changes
     std::cout << (passed ? "[Success] asc_abs passed." : "[Failed] asc_abs failed.") << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src_device);

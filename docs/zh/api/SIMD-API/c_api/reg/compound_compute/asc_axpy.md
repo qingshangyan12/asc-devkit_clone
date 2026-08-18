@@ -95,8 +95,23 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 
 namespace {
 template <typename T>
+<<<<<<< Updated upstream
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
+=======
+void PrintData(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+>>>>>>> Stashed changes
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
         if (actual[i] == expected[i]) continue;
@@ -106,6 +121,7 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
+<<<<<<< Updated upstream
 constexpr uint32_t ELEMENT_COUNT = 64;
 constexpr float SCALAR_VALUE = 0.5f;
 
@@ -131,6 +147,52 @@ __global__ __vector__ void asc_axpy_kernel(__gm__ float* dst, __gm__ float* src)
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     compute(dst_local, src_local);
+=======
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+
+
+constexpr uint32_t ELEMENT_COUNT = 64;
+constexpr float SCALAR_VALUE = 0.5f;
+
+__simd_vf__ inline void Compute(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1)
+{
+    vector_float dst_reg;
+    vector_float src0_reg;
+    vector_float src1_reg;
+    uint32_t count = ELEMENT_COUNT;
+    vector_bool mask = asc_update_mask_b32(count);
+    asc_loadalign(dst_reg, dst);
+    asc_loadalign(src0_reg, src0);
+    asc_loadalign(src1_reg, src1);
+    asc_axpy(dst_reg, src0_reg, SCALAR_VALUE, mask);
+    asc_storealign(dst, dst_reg, mask);
+}
+
+__global__ __vector__ void AscAxpyKernel(__gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
+{
+    asc_init();
+    __ubuf__ float dst_local[ELEMENT_COUNT];
+    __ubuf__ float src0_local[ELEMENT_COUNT];
+    __ubuf__ float src1_local[ELEMENT_COUNT];
+    asc_copy_gm2ub_align(dst_local, dst, ELEMENT_COUNT * sizeof(float));
+    asc_copy_gm2ub_align(src0_local, src0, ELEMENT_COUNT * sizeof(float));
+    asc_copy_gm2ub_align(src1_local, src1, ELEMENT_COUNT * sizeof(float));
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    Compute(dst_local, src0_local, src1_local);
+>>>>>>> Stashed changes
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(float));
@@ -141,20 +203,33 @@ __global__ __vector__ void asc_axpy_kernel(__gm__ float* dst, __gm__ float* src)
 int main()
 {
     std::vector<float> initial(ELEMENT_COUNT);
+<<<<<<< Updated upstream
     std::vector<float> src(ELEMENT_COUNT);
+=======
+    std::vector<float> src0(ELEMENT_COUNT);
+    std::vector<float> src1(ELEMENT_COUNT);
+>>>>>>> Stashed changes
     std::vector<float> output(ELEMENT_COUNT);
     std::vector<float> golden(ELEMENT_COUNT);
     for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
         initial[i] = 1.0f + static_cast<float>(i) * 0.125f;
+<<<<<<< Updated upstream
         src[i] = static_cast<float>(i % 8) * 0.25f;
         output[i] = initial[i];
         golden[i] = src[i] * SCALAR_VALUE + initial[i];
+=======
+        src0[i] = static_cast<float>(i % 8) * 0.25f;
+        src1[i] = static_cast<float>((i + 3) % 8) * 0.25f;
+        output[i] = initial[i];
+        golden[i] = src0[i] * SCALAR_VALUE + initial[i];
+>>>>>>> Stashed changes
     }
     aclInit(nullptr);
     aclrtSetDevice(0);
     float* dst_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&dst_device), (ELEMENT_COUNT) * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
+<<<<<<< Updated upstream
     float* src_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&src_device), (ELEMENT_COUNT) * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
@@ -170,6 +245,34 @@ int main()
     std::cout << (passed ? "[Success] asc_axpy passed." : "[Failed] asc_axpy failed.") << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src_device);
+=======
+    float* src0_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src0_device), (ELEMENT_COUNT) * sizeof(float),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    float* src1_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src1_device), (ELEMENT_COUNT) * sizeof(float),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(dst_device, initial.size() * sizeof(float), initial.data(), initial.size() * sizeof(float),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(src0_device, src0.size() * sizeof(float), src0.data(), src0.size() * sizeof(float),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(src1_device, src1.size() * sizeof(float), src1.data(), src1.size() * sizeof(float),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    AscAxpyKernel<<<1, 0>>>(dst_device, src0_device, src1_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Initial dst", initial);
+    PrintData("Input src0", src0);
+    PrintData("Input src1", src1);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = CompareData(output, golden, 1e-6);
+    std::cout << (passed ? "[Success] asc_axpy passed." : "[Failed] asc_axpy failed.") << std::endl;
+    aclrtFree(dst_device);
+    aclrtFree(src0_device);
+    aclrtFree(src1_device);
+>>>>>>> Stashed changes
     aclrtResetDevice(0);
     aclFinalize();
     return passed ? 0 : 1;

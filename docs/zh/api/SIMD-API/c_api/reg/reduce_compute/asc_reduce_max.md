@@ -35,21 +35,48 @@ $$
 
 ## 函数原型
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+```cpp
+__simd_callee__ inline void asc_reduce_max(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
+__simd_callee__ inline void asc_reduce_max(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void asc_reduce_max(vector_half& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_reduce_max(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
+__simd_callee__ inline void asc_reduce_max(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
+__simd_callee__ inline void asc_reduce_max(vector_float& dst, vector_float src, vector_bool mask)
+=======
+### 模板原型（占位符形式）
+
+>>>>>>> Stashed changes
 ```c
 __simd_callee__ inline void asc_reduce_max(vector_<dtype>& dst,
                                            vector_<dtype> src,
                                            vector_bool mask)
 ```
 
+<<<<<<< Updated upstream
 `dtype`支持的取值为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
+=======
+#### dtype支持数据类型
+
+dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`
+>>>>>>> Stashed changes
 
 ### 典型示例
 
 ```c
+<<<<<<< Updated upstream
 // 示例：对int16_t类型的矢量数据寄存器执行归约最大值操作。
 __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst,
                                            vector_int16_t src,
                                            vector_bool mask)
+=======
+__simd_callee__ inline void asc_reduce_max(vector_int16_t& dst,
+                                           vector_int16_t src,
+                                           vector_bool mask)
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 ```
 
 ## 参数说明
@@ -78,7 +105,11 @@ __simd_callee__ inline void asc_reduce_max(vector_int16_t& dst,
 
 **索引值需要强制类型转换**：
 
+<<<<<<< Updated upstream
 `dst`的索引按照`dst`的数据类型存储，比如`dst`为half类型时，索引按照half类型存储，因此读取索引需要使用  reinterpret\_cast方法转换到整数类型。若数据类型是half，需要使用reinterpret\_cast\<uint16_t\*\>；若数据类型是float，需要使用reinterpret\_cast\<uint32\_t\*\>。
+=======
+索引不是dst数据类型的数值，而是按dst元素位宽保存的无符号整数原始位模式。读取`int16_t`、`uint16_t`或`half`结果中的索引时，应按`uint16_t`位模式解释；读取`int32_t`、`uint32_t`或`float`结果中的索引时，应按`uint32_t`位模式解释。
+>>>>>>> Stashed changes
 
 ```cpp
 __global__ __vector__ void reduce_max_kernel(
@@ -119,8 +150,23 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 namespace {
 template <typename T>
+<<<<<<< Updated upstream
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
+=======
+void PrintData(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+>>>>>>> Stashed changes
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
         if (actual[i] == expected[i]) continue;
@@ -130,8 +176,28 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
+<<<<<<< Updated upstream
 constexpr uint32_t ELEMENT_COUNT = 64;
 __simd_vf__ inline void reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
+=======
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+
+
+constexpr uint32_t ELEMENT_COUNT = 64;
+__simd_vf__ inline void Reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
+>>>>>>> Stashed changes
 {
     vector_uint32_t dst_reg, src_reg;
     uint32_t count = ELEMENT_COUNT;
@@ -140,14 +206,22 @@ __simd_vf__ inline void reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
     asc_reduce_max(dst_reg, src_reg, mask);
     asc_storealign(dst, dst_reg, mask);
 }
+<<<<<<< Updated upstream
 __global__ __vector__ void asc_reduce_max_kernel(__gm__ uint32_t* dst, __gm__ uint32_t* src)
+=======
+__global__ __vector__ void AscReduceMaxKernel(__gm__ uint32_t* dst, __gm__ uint32_t* src)
+>>>>>>> Stashed changes
 {
     asc_init();
     __ubuf__ uint32_t dst_local[ELEMENT_COUNT], src_local[ELEMENT_COUNT];
     asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(uint32_t));
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+<<<<<<< Updated upstream
     reduce(dst_local, src_local);
+=======
+    Reduce(dst_local, src_local);
+>>>>>>> Stashed changes
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(uint32_t));
@@ -169,11 +243,22 @@ int main()
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(src_device, src.size() * sizeof(uint32_t), src.data(), src.size() * sizeof(uint32_t),
         ACL_MEMCPY_HOST_TO_DEVICE);
+<<<<<<< Updated upstream
     asc_reduce_max_kernel<<<1, 0>>>(dst_device, src_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(uint32_t), dst_device, output.size() * sizeof(uint32_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
     const bool passed = compare_data(output, golden);
+=======
+    AscReduceMaxKernel<<<1, 0>>>(dst_device, src_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(uint32_t), dst_device, output.size() * sizeof(uint32_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Input", src);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = CompareData(output, golden);
+>>>>>>> Stashed changes
     std::cout << (passed ? "[Success] asc_reduce_max passed." : "[Failed] asc_reduce_max failed.") << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src_device);

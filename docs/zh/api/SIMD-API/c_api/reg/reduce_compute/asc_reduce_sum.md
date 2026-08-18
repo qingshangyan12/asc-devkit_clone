@@ -49,6 +49,7 @@ __simd_callee__ inline void asc_reduce_sum(vector_<dst_dtype>& dst,
 
 ### src_dtype与dst_dtype支持组合
 
+<<<<<<< Updated upstream
 | `src_dtype` | `dst_dtype` |
 | ----------- | ----------- |
 | `int16_t`   | `int32_t`   |
@@ -57,6 +58,16 @@ __simd_callee__ inline void asc_reduce_sum(vector_<dst_dtype>& dst,
 | `int32_t`   | `int32_t`   |
 | `uint32_t`  | `uint32_t`  |
 | `float`     | `float`     |
+=======
+| src_dtype | dst_dtype |
+| --------- | --------- |
+| `int16_t` | `int32_t` |
+| `uint16_t` | `uint32_t` |
+| `half` | `half` |
+| `int32_t` | `int32_t` |
+| `uint32_t` | `uint32_t` |
+| `float` | `float` |
+>>>>>>> Stashed changes
 
 ### 典型示例
 
@@ -107,7 +118,11 @@ __simd_callee__ inline void asc_reduce_sum(vector_float& dst,
 
 ## 调用示例
 
+<<<<<<< Updated upstream
 <!-- npu="950" id8 -->
+=======
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -117,6 +132,9 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 
 ```c
+=======
+```cpp
+>>>>>>> Stashed changes
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -124,7 +142,28 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 namespace {
 template <typename T>
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+void print_data(const char* label, const std::vector<T>& values)
+=======
+void PrintData(const char* label, const std::vector<T>& values)
+>>>>>>> Stashed changes
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+=======
+bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+>>>>>>> Stashed changes
 {
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
@@ -135,8 +174,28 @@ bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, 
     return true;
 }
 
+<<<<<<< Updated upstream
 constexpr uint32_t ELEMENT_COUNT = 64;
 __simd_vf__ inline void reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
+=======
+template <typename T>
+bool CompareRangeData(const std::vector<T>& actual, const std::vector<T>& expected,
+    size_t begin, size_t count, double tolerance = 0.0)
+{
+    if (begin + count > actual.size() || begin + count > expected.size()) return false;
+    for (size_t i = begin; i < begin + count; ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
+    }
+    return true;
+}
+
+
+
+constexpr uint32_t ELEMENT_COUNT = 64;
+__simd_vf__ inline void Reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
+>>>>>>> Stashed changes
 {
     vector_uint32_t dst_reg, src_reg;
     uint32_t count = ELEMENT_COUNT;
@@ -145,14 +204,22 @@ __simd_vf__ inline void reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src)
     asc_reduce_sum(dst_reg, src_reg, mask);
     asc_storealign(dst, dst_reg, mask);
 }
+<<<<<<< Updated upstream
 __global__ __vector__ void asc_reduce_sum_kernel(__gm__ uint32_t* dst, __gm__ uint32_t* src)
+=======
+__global__ __vector__ void AscReduceSumKernel(__gm__ uint32_t* dst, __gm__ uint32_t* src)
+>>>>>>> Stashed changes
 {
     asc_init();
     __ubuf__ uint32_t dst_local[ELEMENT_COUNT], src_local[ELEMENT_COUNT];
     asc_copy_gm2ub_align(src_local, src, ELEMENT_COUNT * sizeof(uint32_t));
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+<<<<<<< Updated upstream
     reduce(dst_local, src_local);
+=======
+    Reduce(dst_local, src_local);
+>>>>>>> Stashed changes
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(dst, dst_local, ELEMENT_COUNT * sizeof(uint32_t));
@@ -174,6 +241,7 @@ int main()
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(src_device, src.size() * sizeof(uint32_t), src.data(), src.size() * sizeof(uint32_t),
         ACL_MEMCPY_HOST_TO_DEVICE);
+<<<<<<< Updated upstream
     asc_reduce_sum_kernel<<<1, 0>>>(dst_device, src_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(uint32_t), dst_device, output.size() * sizeof(uint32_t),
@@ -182,6 +250,17 @@ int main()
     std::cout << (passed ? "[Success] asc_reduce_sum passed."
                          : "[Failed] asc_reduce_sum failed.")
               << std::endl;
+=======
+    AscReduceSumKernel<<<1, 0>>>(dst_device, src_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(uint32_t), dst_device, output.size() * sizeof(uint32_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Input", src);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    const bool passed = CompareData(output, golden);
+    std::cout << (passed ? "[Success] asc_reduce_sum passed." : "[Failed] asc_reduce_sum failed.") << std::endl;
+>>>>>>> Stashed changes
     aclrtFree(dst_device);
     aclrtFree(src_device);
     aclrtResetDevice(0);
