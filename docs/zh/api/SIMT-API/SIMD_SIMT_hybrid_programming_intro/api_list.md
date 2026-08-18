@@ -486,7 +486,7 @@
 | [__lowhigh2highlow](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__lowhigh2highlow.md) | 将输入数据的高低16位进行交换并返回。 |
 | [__lows2bfloat162](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__lows2bfloat162.md) | 分别提取两个bfloat16x2输入的低16位，并填充到bfloat16x2中。返回填充后的数据。 |
 | [__bfloat1622float2](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat1622float2.md) | 将bfloat16x2的两个分量分别转换为float，并填充到float2返回。 |
-| [__ushort_as_bfloat16](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__ushort_as_bfloat16.md) | 将unsigned short int的按位重新解释为bfloat16，即将unsigned short int的数据存储的位按照bfloat16的格式进行读取。 |
+| [__ushort_as_bfloat16](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__ushort_as_bfloat16.md) | 将unsigned short int按位重新解释为bfloat16，即将unsigned short int的数据存储的位按照bfloat16的格式进行读取。 |
 
 **表20**  bfloat16x2类型算术函数
 
@@ -601,7 +601,7 @@
 | [asinhf](../math_functions/float_math_functions/asinhf.md) | 获取输入数据的双曲反正弦值。 |
 | [sincosf](../math_functions/float_math_functions/sincosf.md) | 获取输入数据的三角函数正弦值和余弦值。 |
 | [sincospif](../math_functions/float_math_functions/sincospif.md) | 获取输入数据与π相乘的三角函数正弦值和余弦值。 |
-| [frexpf](../math_functions/float_math_functions/frexpf.md) | 将x转换为归一化[1/2, 1)的有符号数乘以2的积分幂。 |
+| [frexpf](../math_functions/float_math_functions/frexpf.md) | 将x转换为归一化[1/2, 1)的有符号数乘以2的整数次幂。 |
 | [ldexpf](../math_functions/float_math_functions/ldexpf.md) | 获取输入x乘以2的exp次幂的结果。 |
 | [sqrtf](../math_functions/float_math_functions/sqrtf.md) | 获取输入数据x的平方根。 |
 | [rsqrtf](../math_functions/float_math_functions/rsqrtf.md) | 获取输入数据x的平方根的倒数。 |
