@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-计算两个half2类型数据各分量的相减结果，并遵循CAST\_RINT模式对结果进行舍入。
+计算两个`half2`类型数据各分量的相减结果，并遵循CAST\_RINT模式对结果进行舍入。
 
 ## 函数原型
 
@@ -119,7 +119,7 @@ half2 __hsubx2(const half2 x, const half2 y)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用该接口需要包含`simt_api/asc_fp16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_fp16.h"
