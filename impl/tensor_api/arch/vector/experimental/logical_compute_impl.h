@@ -31,11 +31,6 @@ enum class bitwise_op {
     bit_xor,
 };
 
-__simd_callee__ inline vector_bool full_predicate_mask()
-{
-    return asc_create_mask_b8(PAT_ALL);
-}
-
 template <bitwise_op op, typename T>
 __simd_callee__ inline void check_bitwise_type()
 {
@@ -59,7 +54,7 @@ __simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
         static_assert(is_reg_tensor_v<T> && is_reg_tensor_v<U>,
             "bool bitwise operators require two reg_tensor<bool> operands");
         reg_tensor<bool> dst;
-        vector_bool mask = full_predicate_mask();
+        vector_bool mask = binary_mask(a, b);
         if constexpr (op == bitwise_op::bit_and) {
             asc_and(dst.reg, a.reg, b.reg, mask);
         } else if constexpr (op == bitwise_op::bit_or) {
@@ -67,6 +62,7 @@ __simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
         } else {
             asc_xor(dst.reg, a.reg, b.reg, mask);
         }
+        dst.mask = mask;
         return dst;
     } else {
         vector_bool mask = binary_mask(a, b);
@@ -94,7 +90,8 @@ __simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src)
 
     if constexpr (Std::is_same_v<T, bool>) {
         reg_tensor<bool> dst;
-        asc_not(dst.reg, src.reg, detail::full_predicate_mask());
+        asc_not(dst.reg, src.reg, src.mask);
+        dst.mask = src.mask;
         return dst;
     } else {
         reg_tensor<T> dst;
