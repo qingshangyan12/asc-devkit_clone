@@ -10,6 +10,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+import importlib
 import json
 import os
 import sys
@@ -24,35 +25,35 @@ FRAMEWORK_PATH = os.path.join(TOP_PATH, "tools/build/")
 ASC_OPC_PATH = os.path.join(TOP_PATH, "tools/build/asc_opc/python/asc_opc_tool/")
 OPC_STUB_PATH = os.path.join(TOP_PATH, "tests/python/asc_opc/stub/")
 UTIL_PATH = os.path.join(TOP_PATH, "cmake/asc/fwk_modules/util/")
-sys.path.insert(0, FRAMEWORK_PATH)
-sys.path.insert(0, ASC_OPC_PATH)
-sys.path.insert(0, OPC_STUB_PATH)
-sys.path.insert(0, UTIL_PATH)
+@pytest.fixture
+def custom_binary_modules(monkeypatch):
+    for path in (FRAMEWORK_PATH, ASC_OPC_PATH, OPC_STUB_PATH, UTIL_PATH):
+        monkeypatch.syspath_prepend(path)
 
-log_stub = types.ModuleType("asc_op_compile_base.common.utils.log")
-for method_name in ("debug", "info", "warn", "warning", "error"):
-    setattr(log_stub, method_name, lambda *_args, **_kwargs: None)
-utils_stub = types.ModuleType("asc_op_compile_base.common.utils")
-utils_stub.log = log_stub
-common_stub = types.ModuleType("asc_op_compile_base.common")
-common_stub.utils = utils_stub
-package_stub = types.ModuleType("asc_op_compile_base")
-package_stub.common = common_stub
-sys.modules["asc_op_compile_base"] = package_stub
-sys.modules["asc_op_compile_base.common"] = common_stub
-sys.modules["asc_op_compile_base.common.utils"] = utils_stub
-sys.modules["asc_op_compile_base.common.utils.log"] = log_stub
+    log_stub = types.ModuleType("asc_op_compile_base.common.utils.log")
+    for method_name in ("debug", "info", "warn", "warning", "error"):
+        setattr(log_stub, method_name, lambda *_args, **_kwargs: None)
+    utils_stub = types.ModuleType("asc_op_compile_base.common.utils")
+    utils_stub.log = log_stub
+    common_stub = types.ModuleType("asc_op_compile_base.common")
+    common_stub.utils = utils_stub
+    package_stub = types.ModuleType("asc_op_compile_base")
+    package_stub.common = common_stub
+    monkeypatch.setitem(sys.modules, "asc_op_compile_base", package_stub)
+    monkeypatch.setitem(sys.modules, "asc_op_compile_base.common", common_stub)
+    monkeypatch.setitem(sys.modules, "asc_op_compile_base.common.utils", utils_stub)
+    monkeypatch.setitem(sys.modules, "asc_op_compile_base.common.utils.log", log_stub)
 
-op_manager_stub = types.ModuleType("op_manager")
-op_manager_stub.get_inout_info_from_opstore = lambda _op_type: (None, None)
-sys.modules["op_manager"] = op_manager_stub
+    op_manager_stub = types.ModuleType("op_manager")
+    op_manager_stub.get_inout_info_from_opstore = lambda _op_type: (None, None)
+    monkeypatch.setitem(sys.modules, "op_manager", op_manager_stub)
+    monkeypatch.delitem(sys.modules, "op_compile_info_check", raising=False)
+    monkeypatch.delitem(sys.modules, "split_opc_json_with_op_list", raising=False)
 
-from constant import OpcOptions
-import op_compile_info_check as CHECK_MODULE
-from split_opc_json_with_op_list import split_json_files
-
-
-check_op_compilation_json = CHECK_MODULE.check_op_compilation_json
+    check_module = importlib.import_module("op_compile_info_check")
+    split_module = importlib.import_module("split_opc_json_with_op_list")
+    constant_module = importlib.import_module("constant")
+    return check_module, split_module.split_json_files, constant_module.OpcOptions
 
 
 class RecordingLogger:
@@ -101,7 +102,8 @@ def _valid_config():
     }
 
 
-def _check(tmp_path, content, strict=True):
+def _check(tmp_path, content, modules, strict=True):
+    check_module, split_json_files, opc_options = modules
     path = tmp_path / "binary.json"
     path.write_text(json.dumps(content), encoding="utf-8")
     if strict:
@@ -117,20 +119,20 @@ def _check(tmp_path, content, strict=True):
         except ValueError:
             return False
         path = generated_files[0]
-    return check_op_compilation_json(
-        OpcOptions.INPUT_PARAM, {OpcOptions.INPUT_PARAM: str(path)}
+    return check_module.check_op_compilation_json(
+        opc_options.INPUT_PARAM, {opc_options.INPUT_PARAM: str(path)}
     )[0]
 
 
-def test_accepts_valid_custom_binary_dtype_and_format(tmp_path):
-    assert _check(tmp_path, _valid_config()) is True
+def test_accepts_valid_custom_binary_dtype_and_format(tmp_path, custom_binary_modules):
+    assert _check(tmp_path, _valid_config(), custom_binary_modules) is True
 
 
-def test_accepts_format_stored_as_tuple_constant(tmp_path):
+def test_accepts_format_stored_as_tuple_constant(tmp_path, custom_binary_modules):
     content = _valid_config()
     content["op_list"][0]["inputs"][0]["format"] = "DHWNC"
 
-    assert _check(tmp_path, content) is True
+    assert _check(tmp_path, content, custom_binary_modules) is True
 
 
 @pytest.mark.parametrize(
@@ -142,14 +144,16 @@ def test_accepts_format_stored_as_tuple_constant(tmp_path):
         ("format", {"name": "ND"}),
     ],
 )
-def test_rejects_invalid_custom_binary_dtype_or_format(tmp_path, field, value):
+def test_rejects_invalid_custom_binary_dtype_or_format(
+    tmp_path, custom_binary_modules, field, value
+):
     content = _valid_config()
     content["op_list"][0]["inputs"][0][field] = value
 
-    assert _check(tmp_path, content) is False
+    assert _check(tmp_path, content, custom_binary_modules) is False
 
 
-def test_rejects_invalid_dynamic_tensor_dtype(tmp_path):
+def test_rejects_invalid_dynamic_tensor_dtype(tmp_path, custom_binary_modules):
     content = _valid_config()
     content["op_list"][0]["inputs"] = [
         [
@@ -163,10 +167,13 @@ def test_rejects_invalid_dynamic_tensor_dtype(tmp_path):
         ]
     ]
 
-    assert _check(tmp_path, content) is False
+    assert _check(tmp_path, content, custom_binary_modules) is False
 
 
-def test_invalid_value_message_contains_file_and_field_path(tmp_path, monkeypatch):
+def test_invalid_value_message_contains_file_and_field_path(
+    tmp_path, monkeypatch, custom_binary_modules
+):
+    check_module, split_json_files, opc_options = custom_binary_modules
     content = _valid_config()
     content["op_list"][0]["outputs"][0]["format"] = "NOT_A_FORMAT"
     path = tmp_path / "input.json"
@@ -180,10 +187,10 @@ def test_invalid_value_message_contains_file_and_field_path(tmp_path, monkeypatc
         require_simplified_key=True,
     )
     logger = RecordingLogger()
-    monkeypatch.setattr(CHECK_MODULE, "logger", logger)
+    monkeypatch.setattr(check_module, "logger", logger)
 
-    result, _ = check_op_compilation_json(
-        OpcOptions.INPUT_PARAM, {OpcOptions.INPUT_PARAM: generated_files[0]}
+    result, _ = check_module.check_op_compilation_json(
+        opc_options.INPUT_PARAM, {opc_options.INPUT_PARAM: generated_files[0]}
     )
 
     assert result is False
@@ -193,7 +200,10 @@ def test_invalid_value_message_contains_file_and_field_path(tmp_path, monkeypatc
     assert "NOT_A_FORMAT" in error
 
 
-def test_invalid_value_message_keeps_original_op_index(tmp_path, monkeypatch):
+def test_invalid_value_message_keeps_original_op_index(
+    tmp_path, monkeypatch, custom_binary_modules
+):
+    check_module, split_json_files, opc_options = custom_binary_modules
     content = _valid_config()
     second_op = json.loads(json.dumps(content["op_list"][0]))
     second_op["bin_filename"] = "AddCustomTemplate_FP32"
@@ -210,10 +220,10 @@ def test_invalid_value_message_keeps_original_op_index(tmp_path, monkeypatch):
         require_simplified_key=True,
     )
     logger = RecordingLogger()
-    monkeypatch.setattr(CHECK_MODULE, "logger", logger)
+    monkeypatch.setattr(check_module, "logger", logger)
 
-    result, _ = check_op_compilation_json(
-        OpcOptions.INPUT_PARAM, {OpcOptions.INPUT_PARAM: generated_files[1]}
+    result, _ = check_module.check_op_compilation_json(
+        opc_options.INPUT_PARAM, {opc_options.INPUT_PARAM: generated_files[1]}
     )
 
     assert result is False
@@ -221,12 +231,12 @@ def test_invalid_value_message_keeps_original_op_index(tmp_path, monkeypatch):
     assert "op_list[1].inputs[0].dtype" in logger.errors[-1]
 
 
-def test_standard_mode_keeps_existing_validation_behavior(tmp_path):
+def test_standard_mode_keeps_existing_validation_behavior(tmp_path, custom_binary_modules):
     content = _valid_config()
     del content["op_list"][0]["simplified_key"]
     content["op_list"][0]["inputs"][0]["dtype"] = "legacy_custom_dtype"
 
-    assert _check(tmp_path, content, strict=False) is True
+    assert _check(tmp_path, content, custom_binary_modules, strict=False) is True
 
 
 @pytest.mark.parametrize(
@@ -237,7 +247,10 @@ def test_standard_mode_keeps_existing_validation_behavior(tmp_path):
         ({"op_type": "AddCustomTemplate", "op_list": [None]}, "op_list[0]: expected object"),
     ],
 )
-def test_rejects_invalid_binary_json_structure(tmp_path, content, expected_error):
+def test_rejects_invalid_binary_json_structure(
+    tmp_path, custom_binary_modules, content, expected_error
+):
+    _, split_json_files, _ = custom_binary_modules
     path = tmp_path / "binary.json"
     path.write_text(json.dumps(content), encoding="utf-8")
 
@@ -250,7 +263,8 @@ def test_rejects_invalid_binary_json_structure(tmp_path, content, expected_error
         )
 
 
-def test_rejects_duplicate_binary_filename(tmp_path):
+def test_rejects_duplicate_binary_filename(tmp_path, custom_binary_modules):
+    _, split_json_files, _ = custom_binary_modules
     content = _valid_config()
     content["op_list"].append(dict(content["op_list"][0]))
     path = tmp_path / "binary.json"
@@ -265,7 +279,10 @@ def test_rejects_duplicate_binary_filename(tmp_path):
         )
 
 
-def test_rejects_binary_filenames_with_same_output_name(tmp_path):
+def test_rejects_binary_filenames_with_same_output_name(
+    tmp_path, custom_binary_modules
+):
+    _, split_json_files, _ = custom_binary_modules
     content = _valid_config()
     second_op = json.loads(json.dumps(content["op_list"][0]))
     second_op["bin_filename"] = "AddCustomTemplate_FP16.json"
