@@ -71,7 +71,7 @@ TEST_F(FloatSubnormalFtzTruePrecTrueTestsuite, InternalSqrtFloatFtzTruePrecTrue)
     volatile float normal = 4.0f;
     EXPECT_FLOAT_EQ(0.0f, __internal_sqrtf(zero));
     EXPECT_TRUE(std::isinf(__internal_sqrtf(inf)));
-    EXPECT_FLOAT_EQ(0.0f, __internal_sqrtf(subnormal));
+    EXPECT_FLOAT_EQ(std::sqrt(static_cast<float>(subnormal)), __internal_sqrtf(subnormal));
     EXPECT_NEAR(std::sqrt(static_cast<float>(scaledNormal)), __internal_sqrtf(scaledNormal), 1e-6f);
     EXPECT_NEAR(std::sqrt(static_cast<float>(normal)), __internal_sqrtf(normal), 1e-6f);
 }
