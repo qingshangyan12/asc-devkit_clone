@@ -9,7 +9,6 @@
  */
 
 #include "specialization/kernel_compilation_plan_builder.h"
-#include "stub/kernel_specialization_log.h"
 
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
@@ -349,7 +348,7 @@ TEST(KernelCompilationPlanBuilderTest, RequiresOnlyEnvironmentUsedBySelectedObje
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 
-TEST(KernelCompilationPlanBuilderTest, ReportsMalformedEnvironmentPlaceholderDetails)
+TEST(KernelCompilationPlanBuilderTest, RejectsMalformedEnvironmentPlaceholders)
 {
     KernelPlanTestWorkspace workspace;
     ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
@@ -364,28 +363,20 @@ TEST(KernelCompilationPlanBuilderTest, ReportsMalformedEnvironmentPlaceholderDet
     Json manifestWithUnterminatedPlaceholder = CreateManifest();
     manifestWithUnterminatedPlaceholder["kernels"][1]["objects"][0]["commands"][0]["cmd"][2] =
         "${env:ACLRTC_TEST_TOOLCHAIN";
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithUnterminatedPlaceholder, workspace.ResourcePath(),
                                            workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "Unterminated environment variable placeholder at basic/compile[0].cmd[2] byte 0"));
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("regenerate the JIT resource"));
 
     Json manifestWithEmptyEnvironmentName = CreateManifest();
     manifestWithEmptyEnvironmentName["kernels"][1]["objects"][0]["commands"][0]["cmd"][2] = "${env:}";
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithEmptyEnvironmentName, workspace.ResourcePath(),
                                            workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "Environment variable placeholder at basic/compile[0].cmd[2] byte 0 has an empty name"));
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("regenerate the JIT resource"));
 }
 
-TEST(KernelCompilationPlanBuilderTest, ReportsUndefinedOptionReferenceLocation)
+TEST(KernelCompilationPlanBuilderTest, RejectsUndefinedOptionReference)
 {
     KernelPlanTestWorkspace workspace;
     ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
@@ -399,13 +390,9 @@ TEST(KernelCompilationPlanBuilderTest, ReportsUndefinedOptionReferenceLocation)
     manifest["kernels"][1]["objects"][0]["commands"][0]["cmd"][1] = "${options:missing}";
 
     KernelCompilationPlan plan;
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "basic/compile[0].cmd[1] references undefined options key 'missing'"));
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("regenerate the JIT resource"));
 }
 
 TEST(KernelCompilationPlanBuilderTest, DoesNotRecursivelyExpandEnvironmentOrUserOptions)
@@ -466,13 +453,10 @@ TEST(KernelCompilationPlanBuilderTest, RejectsKernelWithoutStaticConstants)
 
     Json manifestWithoutConstants = CreateManifest();
     manifestWithoutConstants["kernels"][1].erase("constant_infos");
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithoutConstants, workspace.ResourcePath(),
                                            workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "Selected kernel must contain at least one constant_info"));
 
     Json manifestWithEmptyConstants = CreateManifest();
     manifestWithEmptyConstants["kernels"][1]["constant_infos"] = Json::array();
@@ -490,13 +474,10 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMissingRuntimeConstantBuffer)
     NormalizedKernelSpecializationRequest request = CreateRequest(workspace, nullptr, nullptr);
 
     KernelCompilationPlan plan;
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
                                            workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "constant parameter_index 0 requires argsAddr and argsBytes"));
 }
 
 TEST(KernelCompilationPlanBuilderTest, RejectsMismatchedRuntimeConstantByteCount)
@@ -511,16 +492,13 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMismatchedRuntimeConstantByteCount
         CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
 
     KernelCompilationPlan plan;
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), workspace.ResourcePath(),
                                            workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "argsBytes[0]=3 does not match required byte_size 2; set argsBytes[0] to 2"));
 }
 
-TEST(KernelCompilationPlanBuilderTest, ReportsMissingRegistryPathsWithoutSuccessErrorText)
+TEST(KernelCompilationPlanBuilderTest, RejectsMissingRegistryPaths)
 {
     KernelPlanTestWorkspace workspace;
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
@@ -532,24 +510,16 @@ TEST(KernelCompilationPlanBuilderTest, ReportsMissingRegistryPathsWithoutSuccess
     KernelCompilationPlan plan;
 
     const fs::path missingWorktreePath = workspace.ResourcePath() / "missing";
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), missingWorktreePath,
                                            workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "Resource worktree must be an existing directory"));
-    EXPECT_FALSE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("message=Success"));
 
     Json manifestWithMissingSource = CreateManifest();
     manifestWithMissingSource["source_file"] = "missing.cpp";
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithMissingSource, workspace.ResourcePath(),
                                            workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "Manifest source file must be an existing regular file"));
-    EXPECT_FALSE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("message=Success"));
 }
 } // namespace

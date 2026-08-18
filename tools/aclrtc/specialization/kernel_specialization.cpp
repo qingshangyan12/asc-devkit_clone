@@ -14,7 +14,7 @@
 #include "kernel_compilation_plan_builder.h"
 #include "kernel_compilation_workspace.h"
 #include "kernel_specialization_diagnostics.h"
-#include "kernel_specialization_log.h"
+#include "ascendc_tool_log.h"
 #include "resource_registry.h"
 
 #include <atomic>
@@ -49,7 +49,7 @@ bool CopyFileDescriptorContents(int sourceFileDescriptor, const fs::path& source
                 continue;
             }
             const int readError = errno;
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Failed to read linked kernel ELF while publishing: path=%s errno=%d message=%s",
                 sourceFilePath.c_str(), readError, std::strerror(readError));
             return false;
@@ -63,7 +63,7 @@ bool CopyFileDescriptorContents(int sourceFileDescriptor, const fs::path& source
             }
             if (writeResult <= 0) {
                 const int writeError = errno;
-                ACLRTC_LOG_ERROR(
+                ASCENDLOGE(
                     "Failed to write linked kernel ELF while publishing: path=%s errno=%d message=%s",
                     destinationFilePath.c_str(), writeError, std::strerror(writeError));
                 return false;
@@ -89,7 +89,7 @@ bool CreateUniqueTemporaryOutputFile(const fs::path& outputElfPath, fs::path& te
         }
         if (errno != EEXIST) {
             const int createError = errno;
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Failed to create temporary output ELF: path=%s parent=%s errno=%d message=%s; create the "
                 "output parent directory and ensure it is writable",
                 temporaryOutputPath.c_str(), outputElfPath.parent_path().c_str(), createError,
@@ -97,7 +97,7 @@ bool CreateUniqueTemporaryOutputFile(const fs::path& outputElfPath, fs::path& te
             return false;
         }
     }
-    ACLRTC_LOG_ERROR("Failed to create a unique temporary output ELF after %zu attempts: output=%s",
+    ASCENDLOGE("Failed to create a unique temporary output ELF after %zu attempts: output=%s",
                      MAX_TEMPORARY_FILE_ATTEMPTS, outputElfPath.c_str());
     return false;
 }
@@ -107,7 +107,7 @@ void RemoveTemporaryOutputFileBestEffort(const fs::path& temporaryOutputPath)
     boost::system::error_code removeError;
     fs::remove(temporaryOutputPath, removeError);
     if (removeError) {
-        ACLRTC_LOG_WARNING(
+        ASCENDLOGW(
             "Failed to remove temporary output ELF: path=%s error=%d message=%s; remove the file manually if it "
             "remains",
             temporaryOutputPath.c_str(), removeError.value(), removeError.message().c_str());
@@ -121,7 +121,7 @@ aclError KernelSpecializationSession::PrepareCompilationResource(
     ResourceRegistry& resourceRegistry = ResourceRegistry::Instance();
     const ResourceStatus loadStatus = resourceRegistry.Load(nullptr);
     if (loadStatus != ResourceStatus::Success) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "Failed to load compilation resources before specializing resourceId '%s': status=%d; check the "
             "preceding ResourceRegistry logs and configured OPP paths",
             resourceId.c_str(), static_cast<int32_t>(loadStatus));
@@ -131,7 +131,7 @@ aclError KernelSpecializationSession::PrepareCompilationResource(
     ResourceData resourceData;
     const ResourceStatus lookupStatus = resourceRegistry.Lookup(resourceId.c_str(), resourceData);
     if (lookupStatus != ResourceStatus::Success) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "Failed to find or materialize compilation resource '%s': status=%d; verify resourceId and check the "
             "preceding ResourceRegistry logs",
             resourceId.c_str(), static_cast<int32_t>(lookupStatus));
@@ -153,7 +153,7 @@ aclError KernelSpecializationSession::FinalizeSpecializationResult(
         : OutputPublicationStatus::NotPublished;
     diagnostics.WriteSpecializationResult(specializationRequest.outputElfPath, publicationStatus);
     if (specializationResult == ACLRTC_SUCCESS) {
-        ACLRTC_LOG_INFO("Kernel %s specialization completed: output=%s",
+        ASCENDLOGI("Kernel %s specialization completed: output=%s",
                         specializationRequest.kernelName.c_str(), specializationRequest.outputElfPath.c_str());
     }
     return specializationResult;
@@ -163,11 +163,11 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
     const aclrtcKernelSpecRequest* apiRequest, const char* outputElfPath)
 {
     if (apiRequest == nullptr) {
-        ACLRTC_LOG_ERROR("aclrtcKernelSpecialization request must not be null");
+        ASCENDLOGE("aclrtcKernelSpecialization request must not be null");
         return ACLRTC_ERROR_INVALID_INPUT;
     }
     if (outputElfPath == nullptr) {
-        ACLRTC_LOG_ERROR("aclrtcKernelSpecialization outPath must not be null");
+        ASCENDLOGE("aclrtcKernelSpecialization outPath must not be null");
         return ACLRTC_ERROR_INVALID_INPUT;
     }
 
@@ -181,12 +181,7 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
     MaterializedKernelCompilationResource compilationResource;
     specializationResult = PrepareCompilationResource(specializationRequest.resourceId, compilationResource);
     if (specializationResult != ACLRTC_SUCCESS) {
-        const DiagnosticCollectionMode diagnosticCollectionMode = IsKernelMetaSavingEnabled()
-            ? DiagnosticCollectionMode::Enabled
-            : DiagnosticCollectionMode::Disabled;
-        KernelSpecializationDiagnostics diagnostics(
-            specializationRequest.specializationSessionId, diagnosticCollectionMode);
-        return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
+        return specializationResult;
     }
     return RunSpecializationWithMaterializedResource(specializationRequest, std::move(compilationResource));
 }
@@ -197,21 +192,12 @@ aclError KernelSpecializationSession::RunSpecializationWithMaterializedResource(
 {
     const bool saveKernelMetaEnabled = IsKernelMetaSavingEnabled();
     KernelCompilationWorkspace compilationWorkspace(
-        std::move(compilationResource.ownedResourceDirectoryPath), WorktreeRetentionPolicy::RemoveAfterCompilation);
-
-    const DiagnosticCollectionMode diagnosticCollectionMode = saveKernelMetaEnabled
-        ? DiagnosticCollectionMode::Enabled
-        : DiagnosticCollectionMode::Disabled;
+        std::move(compilationResource.ownedResourceDirectoryPath),
+        saveKernelMetaEnabled ? WorktreeRetentionPolicy::RetainAfterCompilation
+                              : WorktreeRetentionPolicy::RemoveAfterCompilation);
     KernelSpecializationDiagnostics diagnostics(
-        specializationRequest.specializationSessionId, diagnosticCollectionMode);
-
-    if (saveKernelMetaEnabled) {
-        fs::path resourceWorktreeRetentionPath;
-        if (diagnostics.GetResourceWorktreeRetentionPath(resourceWorktreeRetentionPath)) {
-            compilationWorkspace.TryMoveWorktreeToDiagnosticsDirectory(resourceWorktreeRetentionPath);
-        }
-    }
-    diagnostics.RecordWorktreePath(compilationWorkspace.GetWorktreePath());
+        saveKernelMetaEnabled ? compilationWorkspace.GetWorktreePath() : fs::path(),
+        specializationRequest.specializationSessionId);
     diagnostics.WriteManifestSnapshot(compilationResource.manifest);
 
     KernelCompilationPlan compilationPlan;
@@ -246,7 +232,7 @@ aclError KernelSpecializationSession::PublishKernelElf(
     const int linkedKernelFileDescriptor = open(linkedKernelElfPath.c_str(), O_RDONLY | O_CLOEXEC);
     if (linkedKernelFileDescriptor < 0) {
         const int openError = errno;
-        ACLRTC_LOG_ERROR("Failed to open linked kernel ELF: path=%s errno=%d message=%s",
+        ASCENDLOGE("Failed to open linked kernel ELF: path=%s errno=%d message=%s",
                          linkedKernelElfPath.c_str(), openError, std::strerror(openError));
         return ACLRTC_ERROR_FAILURE;
     }
@@ -256,7 +242,7 @@ aclError KernelSpecializationSession::PublishKernelElf(
     if (!CreateUniqueTemporaryOutputFile(outputElfPath, temporaryOutputPath, temporaryOutputFileDescriptor)) {
         if (close(linkedKernelFileDescriptor) != 0) {
             const int closeError = errno;
-            ACLRTC_LOG_WARNING(
+            ASCENDLOGW(
                 "Failed to close linked kernel ELF after publish setup failure: path=%s errno=%d message=%s",
                 linkedKernelElfPath.c_str(), closeError, std::strerror(closeError));
         }
@@ -271,11 +257,11 @@ aclError KernelSpecializationSession::PublishKernelElf(
     const int destinationCloseError = destinationCloseSucceeded ? 0 : errno;
     if (!copySucceeded || !sourceCloseSucceeded || !destinationCloseSucceeded) {
         if (!sourceCloseSucceeded) {
-            ACLRTC_LOG_ERROR("Failed to close linked kernel ELF: path=%s errno=%d message=%s",
+            ASCENDLOGE("Failed to close linked kernel ELF: path=%s errno=%d message=%s",
                              linkedKernelElfPath.c_str(), sourceCloseError, std::strerror(sourceCloseError));
         }
         if (!destinationCloseSucceeded) {
-            ACLRTC_LOG_ERROR("Failed to close temporary output ELF: path=%s errno=%d message=%s",
+            ASCENDLOGE("Failed to close temporary output ELF: path=%s errno=%d message=%s",
                              temporaryOutputPath.c_str(), destinationCloseError,
                              std::strerror(destinationCloseError));
         }
@@ -292,7 +278,7 @@ aclError KernelSpecializationSession::PublishKernelElf(
     boost::system::error_code renameError;
     fs::rename(temporaryOutputPath, outputElfPath, renameError);
     if (renameError) {
-        ACLRTC_LOG_ERROR("Failed to publish kernel ELF: source=%s target=%s error=%d message=%s",
+        ASCENDLOGE("Failed to publish kernel ELF: source=%s target=%s error=%d message=%s",
                          temporaryOutputPath.c_str(), outputElfPath.c_str(), renameError.value(),
                          renameError.message().c_str());
         RemoveTemporaryOutputFileBestEffort(temporaryOutputPath);
@@ -310,13 +296,13 @@ extern "C" aclError aclrtcKernelSpecialization(const aclrtcKernelSpecRequest* re
         ascendc::aclrtc::KernelSpecializationSession specializationSession;
         return specializationSession.RunKernelSpecialization(request, outPath);
     } catch (const std::bad_alloc&) {
-        ACLRTC_LOG_ERROR("Out of memory while specializing kernel");
+        ASCENDLOGE("Out of memory while specializing kernel");
         return ascendc::aclrtc::ACLRTC_ERROR_OUT_OF_MEMORY;
     } catch (const std::exception& exception) {
-        ACLRTC_LOG_ERROR("Kernel specialization failed with exception: %s", exception.what());
+        ASCENDLOGE("Kernel specialization failed with exception: %s", exception.what());
         return ascendc::aclrtc::ACLRTC_ERROR_FAILURE;
     } catch (...) {
-        ACLRTC_LOG_ERROR("Kernel specialization failed with an unknown exception");
+        ASCENDLOGE("Kernel specialization failed with an unknown exception");
         return ascendc::aclrtc::ACLRTC_ERROR_FAILURE;
     }
 }

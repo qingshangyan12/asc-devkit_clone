@@ -10,7 +10,6 @@
 
 #include "specialization/compilation_plan_executor.h"
 #include "specialization/kernel_specialization_diagnostics.h"
-#include "stub/kernel_specialization_log.h"
 
 #include <gtest/gtest.h>
 
@@ -35,7 +34,6 @@ using ascendc::aclrtc::CompilationCommandKind;
 using ascendc::aclrtc::CompilationProcessResult;
 using ascendc::aclrtc::CompilationProcessTermination;
 using ascendc::aclrtc::CompilationVariant;
-using ascendc::aclrtc::DiagnosticCollectionMode;
 using ascendc::aclrtc::KernelCompilationPlan;
 using ascendc::aclrtc::KernelSpecializationDiagnostics;
 
@@ -57,11 +55,28 @@ CompilationCommand CreateCommand(CompilationCommandKind commandKind, const char*
     return {commandKind, 0U, "test-command", executable, std::move(arguments)};
 }
 
-fs::path GetDiagnosticDirectoryPath(const std::string& specializationSessionId)
-{
-    return fs::current_path() / "kernel_meta" / std::to_string(getpid()) /
-           ("aclrtc_" + specializationSessionId);
-}
+class ScopedDiagnosticCurrentDirectory final {
+public:
+    ScopedDiagnosticCurrentDirectory()
+        : previousDirectoryPath_(fs::current_path()),
+          temporaryDirectoryPath_(fs::temp_directory_path() /
+                                  fs::unique_path("aclrtc_executor_diagnostics_%%%%-%%%%"))
+    {
+        fs::create_directories(temporaryDirectoryPath_);
+        fs::current_path(temporaryDirectoryPath_);
+    }
+
+    ~ScopedDiagnosticCurrentDirectory()
+    {
+        boost::system::error_code ignoredError;
+        fs::current_path(previousDirectoryPath_, ignoredError);
+        fs::remove_all(temporaryDirectoryPath_, ignoredError);
+    }
+
+private:
+    fs::path previousDirectoryPath_;
+    fs::path temporaryDirectoryPath_;
+};
 
 std::string ReadTextFile(const fs::path& filePath)
 {
@@ -82,7 +97,7 @@ TEST(CompilationPlanExecutorTest, ExecutesCommandsWithoutShellParsing)
 {
     boost::system::error_code ignoredError;
     fs::remove("/tmp/aclrtc_should_not_exist", ignoredError);
-    KernelSpecializationDiagnostics diagnostics("executor_success", DiagnosticCollectionMode::Disabled);
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_success");
     CompilationPlanExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(
@@ -94,7 +109,7 @@ TEST(CompilationPlanExecutorTest, ExecutesCommandsWithoutShellParsing)
 
 TEST(CompilationPlanExecutorTest, RejectsEmbeddedNullBeforeSpawningProcess)
 {
-    KernelSpecializationDiagnostics diagnostics("executor_embedded_null", DiagnosticCollectionMode::Disabled);
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_embedded_null");
     CompilationPlanExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
 
     std::string executableWithEmbeddedNull("/bin/true");
@@ -118,14 +133,11 @@ TEST(CompilationPlanExecutorTest, RejectsEmbeddedNullBeforeSpawningProcess)
 
 TEST(CompilationPlanExecutorTest, MapsCompileAndLinkFailuresToDifferentErrors)
 {
-    KernelSpecializationDiagnostics diagnostics("executor_failure", DiagnosticCollectionMode::Disabled);
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_failure");
     CompilationPlanExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/false", {}));
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "INFO: Set ASCEND_OP_COMPILE_SAVE_KERNEL_META=1 and retry"));
 
     plan.compilationCommands[0].commandKind = CompilationCommandKind::Link;
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_LINKING);
@@ -133,7 +145,7 @@ TEST(CompilationPlanExecutorTest, MapsCompileAndLinkFailuresToDifferentErrors)
 
 TEST(CompilationPlanExecutorTest, UsesInjectedShortTimeoutInUnitTests)
 {
-    KernelSpecializationDiagnostics diagnostics("executor_timeout", DiagnosticCollectionMode::Disabled);
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_timeout");
     CompilationCommandExecutionLimits limits;
     limits.compileCommandTimeout = 20ms;
     limits.objectCopyAndLinkCommandTimeout = 20ms;
@@ -143,17 +155,14 @@ TEST(CompilationPlanExecutorTest, UsesInjectedShortTimeoutInUnitTests)
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/sleep", {"10"}));
 
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     const auto startedAt = std::chrono::steady_clock::now();
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
     EXPECT_LT(std::chrono::steady_clock::now() - startedAt, 2s);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "Command test-command exceeded its 20 ms execution timeout"));
 }
 
 TEST(CompilationPlanExecutorTest, EnforcesTimeoutWhileCommandContinuouslyProducesOutput)
 {
-    KernelSpecializationDiagnostics diagnostics("executor_continuous_output", DiagnosticCollectionMode::Disabled);
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_continuous_output");
     CompilationCommandExecutionLimits limits {20ms, 20ms, 20ms, 1024U};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
@@ -168,7 +177,7 @@ TEST(CompilationPlanExecutorTest, EnforcesTimeoutWhileCommandContinuouslyProduce
 
 TEST(CompilationPlanExecutorTest, WaitsWithoutBusyPollingAfterCommandOutputCloses)
 {
-    KernelSpecializationDiagnostics diagnostics("executor_closed_output", DiagnosticCollectionMode::Disabled);
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_closed_output");
     CompilationCommandExecutionLimits limits {1s, 1s, 20ms, 1024U};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
@@ -188,7 +197,7 @@ TEST(CompilationPlanExecutorTest, WaitsWithoutBusyPollingAfterCommandOutputClose
 
 TEST(CompilationPlanExecutorTest, WaitsForOutputPipeClosureAfterCommandLeaderExits)
 {
-    KernelSpecializationDiagnostics diagnostics("executor_leader_exit", DiagnosticCollectionMode::Disabled);
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_leader_exit");
     CompilationCommandExecutionLimits limits {500ms, 500ms, 20ms, 1024U};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
@@ -206,7 +215,7 @@ TEST(CompilationPlanExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeader
     const fs::path descendantProcessIdPath =
         fs::temp_directory_path() /
         ("aclrtc_descendant_pid_" + std::to_string(getpid()) + "_" + std::to_string(sequence++));
-    KernelSpecializationDiagnostics diagnostics("executor_process_group", DiagnosticCollectionMode::Disabled);
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_process_group");
     CompilationCommandExecutionLimits limits {20ms, 20ms, 20ms, 1024U};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
@@ -236,53 +245,27 @@ TEST(CompilationPlanExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeader
     fs::remove(descendantProcessIdPath, ignoredError);
 }
 
-TEST(CompilationPlanExecutorTest, ReportsSpawnFailureAsInfrastructureFailure)
+TEST(CompilationPlanExecutorTest, RecordsSpawnFailureAsInfrastructureFailure)
 {
+    ScopedDiagnosticCurrentDirectory diagnosticCurrentDirectory;
     const std::string specializationSessionId = "executor_spawn_failure";
-    const fs::path diagnosticDirectoryPath = GetDiagnosticDirectoryPath(specializationSessionId);
-    boost::system::error_code ignoredError;
-    fs::remove_all(diagnosticDirectoryPath, ignoredError);
-    KernelSpecializationDiagnostics diagnostics(specializationSessionId, DiagnosticCollectionMode::Enabled);
+    KernelSpecializationDiagnostics diagnostics(fs::current_path(), specializationSessionId);
     CompilationPlanExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(
         CreateCommand(CompilationCommandKind::Compile, "/path/that/does/not/exist", {}));
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
-    const std::string compilationLog = ReadTextFile(diagnosticDirectoryPath / "compile.log");
+    const std::string compilationLog = ReadTextFile(fs::current_path() / "aclrtc_compile.log");
     EXPECT_NE(compilationLog.find("termination=infrastructure_failure"), std::string::npos);
     EXPECT_EQ(compilationLog.find("termination=exited code=0"), std::string::npos);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "INFO: Compilation diagnostics saved:"));
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        (diagnosticDirectoryPath / "replay.sh").string()));
-    fs::remove_all(diagnosticDirectoryPath, ignoredError);
-}
-
-TEST(CompilationPlanExecutorTest, DistinguishesCapturedAndLoggedOutputTruncation)
-{
-    KernelSpecializationDiagnostics diagnostics(
-        "executor_logged_output_limit", DiagnosticCollectionMode::Disabled);
-    CompilationCommandExecutionLimits limits = CompilationCommandExecutionLimits::ProductionDefaults();
-    limits.capturedOutputByteLimit = 8192U;
-    CompilationPlanExecutor executor(diagnostics, limits);
-    KernelCompilationPlan plan;
-    plan.compilationCommands.push_back(CreateCommand(
-        CompilationCommandKind::Compile, "/bin/sh", {"-c", "yes x | head -c 5000; exit 1"}));
-
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
-    EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "captured_output_truncated=false logged_output_truncated=true output_prefix_bytes=4096"));
 }
 
 TEST(CompilationPlanExecutorTest, BoundsCapturedProcessOutput)
 {
+    ScopedDiagnosticCurrentDirectory diagnosticCurrentDirectory;
     const std::string specializationSessionId = "executor_output_limit";
-    const fs::path diagnosticDirectoryPath = GetDiagnosticDirectoryPath(specializationSessionId);
-    boost::system::error_code ignoredError;
-    fs::remove_all(diagnosticDirectoryPath, ignoredError);
-    KernelSpecializationDiagnostics diagnostics(specializationSessionId, DiagnosticCollectionMode::Enabled);
+    KernelSpecializationDiagnostics diagnostics(fs::current_path(), specializationSessionId);
     CompilationCommandExecutionLimits limits = CompilationCommandExecutionLimits::ProductionDefaults();
     limits.capturedOutputByteLimit = 8U;
     CompilationPlanExecutor executor(diagnostics, limits);
@@ -291,10 +274,9 @@ TEST(CompilationPlanExecutorTest, BoundsCapturedProcessOutput)
         CreateCommand(CompilationCommandKind::Compile, "/usr/bin/printf", {"0123456789abcdef"}));
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_SUCCESS);
 
-    const std::string compilationLog = ReadTextFile(diagnosticDirectoryPath / "compile.log");
+    const std::string compilationLog = ReadTextFile(fs::current_path() / "aclrtc_compile.log");
     EXPECT_NE(compilationLog.find("output_truncated=true"), std::string::npos);
     EXPECT_NE(compilationLog.find("01234567"), std::string::npos);
     EXPECT_EQ(compilationLog.find("89abcdef"), std::string::npos);
-    fs::remove_all(diagnosticDirectoryPath, ignoredError);
 }
 } // namespace

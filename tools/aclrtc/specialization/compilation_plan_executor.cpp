@@ -11,7 +11,7 @@
 #include "compilation_plan_executor.h"
 
 #include "kernel_specialization_diagnostics.h"
-#include "kernel_specialization_log.h"
+#include "ascendc_tool_log.h"
 
 #include <algorithm>
 #include <cerrno>
@@ -75,7 +75,7 @@ public:
         fileDescriptor_ = -1;
         if (close(closingFileDescriptor) != 0) {
             const int closeError = errno;
-            ACLRTC_LOG_WARNING("Failed to close command pipe descriptor: fd=%d errno=%d message=%s",
+            ASCENDLOGW("Failed to close command pipe descriptor: fd=%d errno=%d message=%s",
                                closingFileDescriptor, closeError, std::strerror(closeError));
         }
     }
@@ -88,7 +88,7 @@ void CloseFileDescriptorBestEffort(int fileDescriptor) noexcept
 {
     if (fileDescriptor >= 0 && close(fileDescriptor) != 0) {
         const int closeError = errno;
-        ACLRTC_LOG_WARNING("Failed to close command pipe descriptor: fd=%d errno=%d message=%s",
+        ASCENDLOGW("Failed to close command pipe descriptor: fd=%d errno=%d message=%s",
                            fileDescriptor, closeError, std::strerror(closeError));
     }
 }
@@ -102,14 +102,14 @@ public:
         if (spawnAttributesInitialized_) {
             const int destroyResult = posix_spawnattr_destroy(&spawnAttributes_);
             if (destroyResult != 0) {
-                ACLRTC_LOG_WARNING("Failed to destroy spawn attributes: error=%d message=%s", destroyResult,
+                ASCENDLOGW("Failed to destroy spawn attributes: error=%d message=%s", destroyResult,
                                    std::strerror(destroyResult));
             }
         }
         if (fileActionsInitialized_) {
             const int destroyResult = posix_spawn_file_actions_destroy(&fileActions_);
             if (destroyResult != 0) {
-                ACLRTC_LOG_WARNING("Failed to destroy spawn file actions: error=%d message=%s", destroyResult,
+                ASCENDLOGW("Failed to destroy spawn file actions: error=%d message=%s", destroyResult,
                                    std::strerror(destroyResult));
             }
         }
@@ -123,7 +123,7 @@ public:
     {
         int setupResult = posix_spawn_file_actions_init(&fileActions_);
         if (setupResult != 0) {
-            ACLRTC_LOG_ERROR("Failed to initialize spawn file actions: error=%d message=%s", setupResult,
+            ASCENDLOGE("Failed to initialize spawn file actions: error=%d message=%s", setupResult,
                              std::strerror(setupResult));
             return false;
         }
@@ -140,14 +140,14 @@ public:
             setupResult = posix_spawn_file_actions_addclose(&fileActions_, outputWriteFileDescriptor);
         }
         if (setupResult != 0) {
-            ACLRTC_LOG_ERROR("Failed to configure spawn file actions: error=%d message=%s", setupResult,
+            ASCENDLOGE("Failed to configure spawn file actions: error=%d message=%s", setupResult,
                              std::strerror(setupResult));
             return false;
         }
 
         setupResult = posix_spawnattr_init(&spawnAttributes_);
         if (setupResult != 0) {
-            ACLRTC_LOG_ERROR("Failed to initialize spawn attributes: error=%d message=%s", setupResult,
+            ASCENDLOGE("Failed to initialize spawn attributes: error=%d message=%s", setupResult,
                              std::strerror(setupResult));
             return false;
         }
@@ -157,7 +157,7 @@ public:
             setupResult = posix_spawnattr_setpgroup(&spawnAttributes_, 0);
         }
         if (setupResult != 0) {
-            ACLRTC_LOG_ERROR("Failed to configure spawn process group: error=%d message=%s", setupResult,
+            ASCENDLOGE("Failed to configure spawn process group: error=%d message=%s", setupResult,
                              std::strerror(setupResult));
             return false;
         }
@@ -188,7 +188,7 @@ void SignalChildProcessGroup(pid_t childProcessId, int signalNumber) noexcept
     }
     const int processGroupError = errno;
     if (processGroupError != ESRCH) {
-        ACLRTC_LOG_WARNING("Failed to signal command process group: pid=%d signal=%d errno=%d message=%s",
+        ASCENDLOGW("Failed to signal command process group: pid=%d signal=%d errno=%d message=%s",
                            static_cast<int>(childProcessId), signalNumber, processGroupError,
                            std::strerror(processGroupError));
     }
@@ -196,7 +196,7 @@ void SignalChildProcessGroup(pid_t childProcessId, int signalNumber) noexcept
         return;
     }
     const int processLeaderError = errno;
-    ACLRTC_LOG_WARNING("Failed to signal command process leader: pid=%d signal=%d errno=%d message=%s",
+    ASCENDLOGW("Failed to signal command process leader: pid=%d signal=%d errno=%d message=%s",
                        static_cast<int>(childProcessId), signalNumber, processLeaderError,
                        std::strerror(processLeaderError));
 }
@@ -236,7 +236,7 @@ ProcessOutputDrainStatus DrainProcessOutputUpToReadBudget(
             return ProcessOutputDrainStatus::NoDataAvailable;
         }
         const int readError = errno;
-        ACLRTC_LOG_ERROR("Failed to read command output: fd=%d errno=%d message=%s", outputFileDescriptor,
+        ASCENDLOGE("Failed to read command output: fd=%d errno=%d message=%s", outputFileDescriptor,
                          readError, std::strerror(readError));
         return ProcessOutputDrainStatus::Failed;
     }
@@ -251,7 +251,7 @@ bool WaitForOutputOrNextProcessCheck(int outputFileDescriptor, bool outputPipeCl
     const int pollResult = poll(pollDescriptors, pollDescriptorCount, pollTimeout);
     if (pollResult < 0 && errno != EINTR) {
         const int pollError = errno;
-        ACLRTC_LOG_ERROR("Failed to poll command output: fd=%d errno=%d message=%s", outputFileDescriptor,
+        ASCENDLOGE("Failed to poll command output: fd=%d errno=%d message=%s", outputFileDescriptor,
                          pollError, std::strerror(pollError));
         return false;
     }
@@ -262,14 +262,14 @@ bool CreateNonblockingCloseOnExecPipe(int outputPipe[2])
 {
     if (pipe(outputPipe) != 0) {
         const int pipeError = errno;
-        ACLRTC_LOG_ERROR("Failed to create command output pipe: errno=%d message=%s", pipeError,
+        ASCENDLOGE("Failed to create command output pipe: errno=%d message=%s", pipeError,
                          std::strerror(pipeError));
         return false;
     }
     const int readFlags = fcntl(outputPipe[0], F_GETFL, 0);
     if (readFlags < 0) {
         const int flagError = errno;
-        ACLRTC_LOG_ERROR("Failed to read command pipe flags: fd=%d errno=%d message=%s", outputPipe[0],
+        ASCENDLOGE("Failed to read command pipe flags: fd=%d errno=%d message=%s", outputPipe[0],
                          flagError, std::strerror(flagError));
         CloseFileDescriptorBestEffort(outputPipe[0]);
         CloseFileDescriptorBestEffort(outputPipe[1]);
@@ -277,7 +277,7 @@ bool CreateNonblockingCloseOnExecPipe(int outputPipe[2])
     }
     if (fcntl(outputPipe[0], F_SETFL, readFlags | O_NONBLOCK) != 0) {
         const int nonblockingError = errno;
-        ACLRTC_LOG_ERROR("Failed to make command pipe nonblocking: fd=%d errno=%d message=%s", outputPipe[0],
+        ASCENDLOGE("Failed to make command pipe nonblocking: fd=%d errno=%d message=%s", outputPipe[0],
                          nonblockingError, std::strerror(nonblockingError));
         CloseFileDescriptorBestEffort(outputPipe[0]);
         CloseFileDescriptorBestEffort(outputPipe[1]);
@@ -286,7 +286,7 @@ bool CreateNonblockingCloseOnExecPipe(int outputPipe[2])
     if (fcntl(outputPipe[0], F_SETFD, FD_CLOEXEC) != 0 ||
         fcntl(outputPipe[1], F_SETFD, FD_CLOEXEC) != 0) {
         const int closeOnExecError = errno;
-        ACLRTC_LOG_ERROR("Failed to make command pipe close-on-exec: errno=%d message=%s", closeOnExecError,
+        ASCENDLOGE("Failed to make command pipe close-on-exec: errno=%d message=%s", closeOnExecError,
                          std::strerror(closeOnExecError));
         CloseFileDescriptorBestEffort(outputPipe[0]);
         CloseFileDescriptorBestEffort(outputPipe[1]);
@@ -321,14 +321,14 @@ bool BuildNullTerminatedSpawnArguments(const CompilationCommand& compilationComm
 {
     const std::string executablePath = compilationCommand.executablePath.string();
     if (HasEmbeddedNull(executablePath)) {
-        ACLRTC_LOG_ERROR("Command %s has an executable path containing an embedded NUL; regenerate the JIT resource",
+        ASCENDLOGE("Command %s has an executable path containing an embedded NUL; regenerate the JIT resource",
                          compilationCommand.diagnosticLabel.c_str());
         return false;
     }
     for (size_t argumentIndex = 0U; argumentIndex < compilationCommand.commandArguments.size(); ++argumentIndex) {
         const std::string& argument = compilationCommand.commandArguments[argumentIndex];
         if (HasEmbeddedNull(argument)) {
-            ACLRTC_LOG_ERROR("Command %s argv[%zu] contains an embedded NUL; regenerate the JIT resource",
+            ASCENDLOGE("Command %s argv[%zu] contains an embedded NUL; regenerate the JIT resource",
                              compilationCommand.diagnosticLabel.c_str(), argumentIndex);
             return false;
         }
@@ -391,7 +391,7 @@ public:
             spawnConfiguration.GetSpawnAttributes(), spawnArgv.data(), environ);
         outputWriteFileDescriptor.Close();
         if (spawnResult != 0) {
-            ACLRTC_LOG_ERROR("Failed to spawn command %s: error=%d message=%s executable=%s",
+            ASCENDLOGE("Failed to spawn command %s: error=%d message=%s executable=%s",
                              compilationCommand.diagnosticLabel.c_str(), spawnResult,
                              std::strerror(spawnResult), compilationCommand.executablePath.c_str());
             return ACLRTC_ERROR_FAILURE;
@@ -437,7 +437,7 @@ public:
             }
             if (SteadyClock::now() >= executionDeadline) {
                 processResult.termination = CompilationProcessTermination::TimedOut;
-                ACLRTC_LOG_ERROR(
+                ASCENDLOGE(
                     "Command %s exceeded its %lld ms execution timeout; inspect the compiler output or a stalled "
                     "tool process",
                     commandDiagnosticLabel.c_str(), static_cast<long long>(executionTimeout.count()));
@@ -493,7 +493,7 @@ public:
                 processResult.terminationCode = static_cast<int32_t>(WTERMSIG(childStatus));
             } else {
                 processResult.termination = CompilationProcessTermination::InfrastructureFailure;
-                ACLRTC_LOG_ERROR("Command process returned an unsupported wait status: pid=%d status=%d",
+                ASCENDLOGE("Command process returned an unsupported wait status: pid=%d status=%d",
                                  static_cast<int>(childProcessId_), childStatus);
                 return ACLRTC_ERROR_FAILURE;
             }
@@ -518,7 +518,7 @@ private:
         } while (waitResult != 0 && errno == EINTR);
         if (waitResult != 0) {
             const int waitError = errno;
-            ACLRTC_LOG_ERROR("Failed to inspect command process: pid=%d errno=%d message=%s",
+            ASCENDLOGE("Failed to inspect command process: pid=%d errno=%d message=%s",
                              static_cast<int>(childProcessId_), waitError, std::strerror(waitError));
             return CommandLeaderExitState::InspectionFailed;
         }
@@ -536,7 +536,7 @@ private:
         } while (waitResult < 0 && errno == EINTR);
         if (waitResult != childProcessId_) {
             const int waitError = errno;
-            ACLRTC_LOG_ERROR("Failed to reap command process: pid=%d errno=%d message=%s",
+            ASCENDLOGE("Failed to reap command process: pid=%d errno=%d message=%s",
                              static_cast<int>(childProcessId_), waitError, std::strerror(waitError));
             return false;
         }
@@ -589,7 +589,7 @@ aclError CompilationPlanExecutor::ExecuteCompilationPlan(const KernelCompilation
 {
     try {
         for (const CompilationCommand& compilationCommand : compilationPlan.compilationCommands) {
-            ACLRTC_LOG_INFO("Executing command %s with %s", compilationCommand.diagnosticLabel.c_str(),
+            ASCENDLOGI("Executing command %s with %s", compilationCommand.diagnosticLabel.c_str(),
                             compilationCommand.executablePath.c_str());
             specializationDiagnostics_.AppendCommandToReplayScript(compilationCommand);
             CompilationProcessResult processResult;
@@ -601,7 +601,7 @@ aclError CompilationPlanExecutor::ExecuteCompilationPlan(const KernelCompilation
                     std::min(processResult.capturedOutput.size(), MAX_LOGGED_PROCESS_OUTPUT_BYTES);
                 const bool loggedOutputTruncated =
                     processResult.capturedOutput.size() > loggedOutputByteCount;
-                ACLRTC_LOG_ERROR(
+                ASCENDLOGE(
                     "Command %s failed: termination=%s code=%d elapsed_ms=%lld captured_output_truncated=%s "
                     "logged_output_truncated=%s output_prefix_bytes=%zu output=%.*s",
                     compilationCommand.diagnosticLabel.c_str(),
@@ -618,13 +618,13 @@ aclError CompilationPlanExecutor::ExecuteCompilationPlan(const KernelCompilation
         }
         return ACLRTC_SUCCESS;
     } catch (const std::bad_alloc&) {
-        ACLRTC_LOG_ERROR("Out of memory while executing kernel compilation commands");
+        ASCENDLOGE("Out of memory while executing kernel compilation commands");
         return ACLRTC_ERROR_OUT_OF_MEMORY;
     } catch (const std::exception& exception) {
-        ACLRTC_LOG_ERROR("Kernel compilation command execution failed with exception: %s", exception.what());
+        ASCENDLOGE("Kernel compilation command execution failed with exception: %s", exception.what());
         return ACLRTC_ERROR_FAILURE;
     } catch (...) {
-        ACLRTC_LOG_ERROR("Kernel compilation command execution failed with an unknown exception");
+        ASCENDLOGE("Kernel compilation command execution failed with an unknown exception");
         return ACLRTC_ERROR_FAILURE;
     }
 }

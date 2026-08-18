@@ -21,11 +21,6 @@
 namespace ascendc {
 namespace aclrtc {
 
-enum class DiagnosticCollectionMode : uint32_t {
-    Disabled,
-    Enabled,
-};
-
 enum class OutputPublicationStatus : uint32_t {
     NotPublished,
     Published,
@@ -33,13 +28,10 @@ enum class OutputPublicationStatus : uint32_t {
 
 class KernelSpecializationDiagnostics final {
 public:
-    KernelSpecializationDiagnostics(std::string specializationSessionId,
-                                    DiagnosticCollectionMode collectionMode);
+    KernelSpecializationDiagnostics(boost::filesystem::path resourceWorktreePath,
+                                    std::string specializationSessionId);
 
-    bool GetResourceWorktreeRetentionPath(
-        boost::filesystem::path& resourceWorktreeRetentionPath) const noexcept;
     void WriteManifestSnapshot(const nlohmann::json& resourceManifest) noexcept;
-    void RecordWorktreePath(const boost::filesystem::path& resourceWorktreePath) noexcept;
     void AppendCommandToReplayScript(const CompilationCommand& compilationCommand) noexcept;
     void AppendCommandResultToCompilationLog(
         const CompilationCommand& compilationCommand,
@@ -52,9 +44,8 @@ private:
     void AppendTextToDiagnosticFile(const boost::filesystem::path& filePath, const std::string& text) noexcept;
 
     std::string specializationSessionId_;
-    bool diagnosticsRequested_ {false};
     bool diagnosticsEnabled_ {false};
-    boost::filesystem::path diagnosticDirectoryPath_;
+    boost::filesystem::path resourceWorktreePath_;
 };
 
 } // namespace aclrtc
