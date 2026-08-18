@@ -64,12 +64,12 @@ PIPE_S
 <!-- npu="950" id8 -->
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 
 以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
@@ -81,6 +81,7 @@ bisheng example.asc -o main --npu-arch=dav-3510; ./main
 #include "c_api/asc_simd.h"
 #include "acl/acl.h"
 
+namespace {
 constexpr uint32_t DIM = 16, ELEMENTS = DIM * DIM;
 constexpr uint16_t HALF_ONE = 0x3c00;
 
@@ -106,7 +107,6 @@ __global__ __cube__ void asc_set_l0c2gm_nz2nd_kernel(
     asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, 0, true, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
-    // Fixpipe produces NZ internally; LOOP3 parameters make the GM result row-major ND.
     asc_set_l0c2gm_nz2nd(1, 0, 0);
     asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
@@ -120,6 +120,7 @@ void print_row(const char* label, const std::vector<float>& data)
     for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
     std::cout << " ..." << std::endl;
 }
+} // namespace
 
 int main()
 {
