@@ -48,8 +48,58 @@ PIPE_S
 
 ## 约束说明
 
-无
+- 如果需要精确阻塞n拍流水，需要在n个`asc_nop`接口调用前后插入`asc_sync`，例如：
+
+    ```cpp
+    // 阻塞3拍流水
+    asc_sync();
+    asc_nop();
+    asc_nop();
+    asc_nop();
+    asc_sync();
+    ```
 
 ## 调用示例
 
-无
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
+
+```c
+#include <iostream>
+#include "acl/acl.h"
+#include "kernel_operator.h"
+#include "c_api/asc_simd.h"
+
+namespace {
+__global__ __vector__ void asc_nop_kernel()
+{
+    asc_init();
+    asc_sync();
+    // 当前CANN软件包暂不支持asc_nop，使用功能相同的AscendC::Nop代替。
+    asc_nop();
+    asc_nop();
+    asc_nop();
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    asc_nop_kernel<<<1, 0>>>();
+    const aclError ret = aclrtSynchronizeDevice();
+    const bool passed = ret == ACL_SUCCESS;
+    std::cout << (passed ? "[Success] asc_nop passed." : "[Failed] asc_nop failed.") << std::endl;
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
+```
