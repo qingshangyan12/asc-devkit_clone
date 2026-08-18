@@ -1290,35 +1290,30 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log10f(float x) { return logf(x) / l
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x)
 {
-    // 常量对应反汇编中的立即数：0xff800000、0x3f400000、0x40800000 以及特殊值边界。
-    constexpr uint32_t log1pReductionMask = 0xFF800000U;
-    constexpr uint32_t fp32OneHalfBits = 0x3F400000U;
-    constexpr uint32_t fp32FourBits = 0x40800000U;
-    constexpr uint32_t fp32PositiveInfBits = 0x7F800000U;
-    constexpr uint32_t fp32SignBit = 0x80000000U;
-    constexpr uint32_t log1pLowerBoundBits = 0xBF800001U;
-    constexpr float polyFirstCoeff = 0.04534861445426940918f; // 0x3d39bf78，对应反汇编中的 R5。
+    constexpr uint32_t log1p_reduction_mask = 0xFF800000U;      // Keeps sign/exponent bits and clears mantissa bits.
+    constexpr uint32_t fp32_three_quarters_bits = 0x3F400000U;  // Bit pattern of 0.75f for exponent reduction.
+    constexpr uint32_t fp32_four_bits = 0x40800000U;            // Bit pattern of 4.0f for building 2^(2-k).
+    constexpr uint32_t fp32_positive_inf_bits = 0x7F800000U;    // Bit pattern of +inf, also the start of NaN range.
+    constexpr uint32_t fp32_sign_bit = 0x80000000U;             // Sign bit; negative values compare after +inf as u32.
+    constexpr uint32_t log1p_lower_bound_bits = 0xBF800001U;    // First float below -1.0f, whose result must be NaN.
+    constexpr float poly_first_coeff = 0.04534861445426940918f; // 0x3d39bf78, highest-order polynomial coefficient.
 
-    // 对应 FADD.RZ R0, R4, 1；当前 SIMT C++ 未暴露专用的 RZ 浮点加法接口。
-    const float oneAddX = 1.0f + x;
-    // 对应 MOV/位解释：R4 保存 x 的原始位，R0 保存 1 + x 的原始位。
-    const uint32_t xBits = __builtin_bit_cast(uint32_t, x);
-    const uint32_t oneAddXBits = __builtin_bit_cast(uint32_t, oneAddX);
+    const float one_plus_x = 1.0f + x;
+    const uint32_t x_bits = __builtin_bit_cast(uint32_t, x);
+    const uint32_t one_plus_x_bits = __builtin_bit_cast(uint32_t, one_plus_x);
 
-    // 对应 IADD3 + LOP3：从 1 + x 中提取指数区间分量 reductionBits。
-    const uint32_t reductionBits = (oneAddXBits - fp32OneHalfBits) & log1pReductionMask;
-    // 对应 IADD3：构造归一化后的 x 位模式，以及用于区间缩放的位模式。
-    const uint32_t normalizedXBits = xBits - reductionBits;
-    const uint32_t rangeScaleBits = fp32FourBits - reductionBits;
-    const float normalizedX = __builtin_bit_cast(float, normalizedXBits);
-    const float rangeScale = __builtin_bit_cast(float, rangeScaleBits);
-    // 对应 FFMA R3, R3, 0.25, -1 与 FADD：得到多项式输入 reduced。
-    const float reduced = fmaf(0.25f, rangeScale, -1.0f) + normalizedX;
-    // 对应 I2F 后乘以 2^-23，得到指数补偿项。
-    const float exponent = static_cast<float>(static_cast<int32_t>(reductionBits)) * 1.1920928955078125e-07f;
+    // Choose k from the exponent bucket of 1 + x and rewrite log1p(x) as k * ln2 + log1p(r).
+    // Keeping r near zero reduces polynomial error and keeps small x from being lost in 1 + x.
+    const uint32_t reduction_bits = (one_plus_x_bits - fp32_three_quarters_bits) & log1p_reduction_mask;
+    const uint32_t normalized_x_bits = x_bits - reduction_bits;
+    const uint32_t range_scale_bits = fp32_four_bits - reduction_bits;
+    const float normalized_x = __builtin_bit_cast(float, normalized_x_bits);
+    const float range_scale = __builtin_bit_cast(float, range_scale_bits);
+    const float reduced = fmaf(0.25f, range_scale, -1.0f) + normalized_x;
+    const float exponent = static_cast<float>(static_cast<int32_t>(reduction_bits)) * 1.1920928955078125e-07f;
 
-    // 对应连续 FFMA：按反汇编顺序计算 log1p(reduced) 的多项式部分。
-    float poly = fmaf(-polyFirstCoeff, reduced, 0.10546888411045074463f);
+    // Approximate log1p(reduced) with a minimax-like polynomial.
+    float poly = fmaf(-poly_first_coeff, reduced, 0.10546888411045074463f);
     poly = fmaf(poly, reduced, -0.13229703903198242188f);
     poly = fmaf(poly, reduced, 0.14491446316242218018f);
     poly = fmaf(poly, reduced, -0.16641564667224884033f);
@@ -1327,20 +1322,18 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x)
     poly = fmaf(poly, reduced, 0.33333510160446166992f);
     poly = fmaf(poly, reduced, -0.5f);
 
-    const float reducedPoly = reduced * poly;
-    // 对应 FMUL + FFMA：reduced + reduced * reduced * poly。
-    float output = fmaf(reducedPoly, reduced, reduced);
-    // 对应最后一次 FFMA：加上 exponent * ln2。
+    // The polynomial contains only second-order and higher correction terms, so combine it as
+    // reduced + reduced^2 * poly. Then add exponent * ln2 from the range reduction.
+    const float reduced_poly = reduced * poly;
+    float output = fmaf(reduced_poly, reduced, reduced);
     output = fmaf(exponent, 0.69314718246459960938f, output);
 
-    // 对应 ISETP.GE.U32：正无穷/NaN 以及所有负数进入尾部修正逻辑。
-    if (xBits >= fp32PositiveInfBits) {
-        // 对应有符号 ISETP.GE：x 为 +inf/NaN 或 x < -1 时，用 x * +inf + +inf 生成结果。
-        // x == -1 保留前面规约和多项式路径得到的 -inf。
-        if (!(xBits >= fp32SignBit && xBits < log1pLowerBoundBits)) {
+    // Generate NaN, +inf, and x < -1 results through inf arithmetic to preserve IEEE special-value behavior.
+    if (x_bits >= fp32_positive_inf_bits) {
+        if (!(x_bits >= fp32_sign_bit && x_bits < log1p_lower_bound_bits)) {
             output = fmaf(x, ASCRT_INF_F, ASCRT_INF_F);
         }
-        // 对应 FSETP.NEU + FSEL：当输入按浮点比较等于 0 时选择 -0。
+        // Preserve log1p(-0) == -0. The float comparison matches +/-0, but only -0 reaches this branch.
         if (x == 0.0f) {
             output = ASCRT_NEG_ZERO_F;
         }
