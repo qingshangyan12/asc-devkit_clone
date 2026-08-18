@@ -53,6 +53,7 @@ inline float frexpf(float x, int *exp)
 -   当x为nan时，返回值为nan，exp为0。
 -   当x为0时，返回值为0，exp为0。
 -   当x为0时，返回值为0，exp为0。
+-   当x为0时，返回值为0，exp为0。
 
 ## 约束说明
 
