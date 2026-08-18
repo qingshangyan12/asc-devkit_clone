@@ -19,6 +19,7 @@
 #include "hccl_ccu_res.h"
 #include "adapter_acl.h"
 #include "kfc_server_protocol.h"
+#include "ccu_kernel_utils.h"
 
 using namespace mc2_ops_hccl;
 
@@ -197,10 +198,11 @@ HcclResult BuildTagsAndValidate(
     const void* ccTilingList[], uint32_t tilingNum, const char* commName, u32 rankSize, u32 userRank,
     std::string topoTag[], std::string& ctxTag)
 {
+    const std::string versionTag = "_ccuV" + std::to_string(static_cast<uint32_t>(GetCcuVersion()) + 1U);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         topoTag[i] = std::to_string(ccTiling->opType) + "_" + std::to_string(ccTiling->srcDataType) + "_" +
-                     std::string(commName);
+                     std::string(commName) + versionTag;
         CHK_RET(HcclCheckTag(topoTag[i].c_str()));
         bool isReduce;
         CHK_RET(CheckIsReduce(ccTiling, &isReduce));
@@ -214,6 +216,7 @@ HcclResult BuildTagsAndValidate(
                       std::to_string(ccTiling->commEngine);
         }
     }
+    ctxTag += versionTag;
     CHK_RET(HcomCheckUserRank(rankSize, userRank));
     return HCCL_SUCCESS;
 }
@@ -325,7 +328,7 @@ namespace {
 HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
     HCCL_RUN_INFO(
-        "[MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
+        "[MC2_CLIENT_A5A6] enter asc-devkit common HcclAllocComResourceByTiling, "
         "comm[%p], stream[%p], tiling[%p].",
         comm, stream, mc2Tiling);
     // 记录开始时间，用于性能统计
@@ -335,7 +338,7 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
     CHK_RET(hrtGetDeviceType(deviceType));
 
     // 检查设备类型是否支持新流程，950或910_95支持新流程，其他设备走老流程
-    if (deviceType != DevType::DEV_TYPE_950) {
+    if (deviceType != DevType::DEV_TYPE_950 && deviceType != DevType::DEV_TYPE_950) {
         HCCL_ERROR("[%s] invalid deviceType[%u]", __func__, deviceType);
         return HCCL_E_NOT_SUPPORT;
     }

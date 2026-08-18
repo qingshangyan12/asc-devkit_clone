@@ -17,6 +17,7 @@
 
 #include "log.h"
 #include "ccu_kernel.h"
+#include "ccu_kernel_utils.h"
 #include "ccu_primitives_dl.hpp"
 #include "ccu_log.h"
 
@@ -31,6 +32,7 @@ constexpr uint64_t NUM_TWO = 2;
 constexpr uint32_t LOCAL_COPY_MS_PER_LOOP = 8;
 constexpr uint32_t CCU_MS_LOCAL_COPY_LOOP_COUNT = 8;
 constexpr uint32_t CCU_M2M_LOCAL_COPY_LOOP_COUNT = 16;
+constexpr uint64_t CCU_LOOP_CKE_NUM_COPY_V2 = 2;
 
 struct LoopGroupConfig {
     uint32_t msInterleave; // loop使用的ms步长，即与前一个loop间的间距
@@ -85,6 +87,7 @@ struct CcuKernelCtxBase {
         std::unique_ptr<ccu::Func> body[2];
         std::unique_ptr<ccu::Loop> loops[2];
         ccu::Variable loopParam[2];
+        ccu::Variable addrOffset[2];
     };
 
     LoopGroupConfig moConfig;
@@ -94,6 +97,16 @@ struct CcuKernelCtxBase {
     std::map<std::string, CcuLoopEntity> loopMap;
     CcuLoopExecutors enginePool;
     GroupLocalReduceVar localReduceVar;
+
+    // GroupCopyVar 延迟分配：仅使用 GroupCopy 的 kernel 才会创建，避免资源浪费
+    std::unique_ptr<GroupCopyVar> gcVarPtr;
+    GroupCopyVar& GetGcVar()
+    {
+        if (!gcVarPtr) {
+            gcVarPtr.reset(new GroupCopyVar());
+        }
+        return *gcVarPtr;
+    }
 
     void CreateLoopEntity(std::string loopStr) { loopMap.emplace(loopStr, CcuLoopEntity()); }
 
@@ -112,10 +125,13 @@ inline void InitCcuKernelCtxBase(CcuKernelCtxBase& ctx)
 }
 
 std::vector<uint64_t> CalGoSize(uint64_t size);
-std::vector<uint64_t> CalGoSize(uint64_t size, const LoopGroupConfig& config);
+std::vector<uint64_t> CalGoSize(uint64_t size, CcuVersion ccuVersion);
+std::vector<uint64_t> CalGoSize(
+    uint64_t size, const LoopGroupConfig& config, CcuVersion ccuVersion = CcuVersion::CCU_V1);
 CcuResult AllocGoResource(
     LoopGroupConfig& config, LoopGroupResource& res, bool& allocated, uint32_t parallelDim = CCU_MS_DEFAULT_LOOP_COUNT,
-    uint32_t msPerLoop = 1);
+    uint32_t msPerLoop = 1,
+    uint32_t ckeNum = 1); // ckeNum: 每个loop克隆的event隔离数, V1默认1, V2传对应CCU_LOOP_CKE_NUM_*常量
 
 CcuResult GroupBroadcastWithoutMyRank(
     CcuKernelCtxBase& ctx, const size_t channels[], uint32_t channelCount, std::vector<ccu::RemoteAddr> dst,
@@ -126,8 +142,10 @@ CcuResult GroupReduceWithoutMyRank(
     std::vector<ccu::RemoteAddr> src, GroupOpSizeVars goSize, HcclDataType dataType, HcclDataType outputDataType,
     HcclReduceOp opType);
 
-CcuResult CreateMultiOpCopy(CcuKernelCtxBase& ctx, GroupCopyVar& var);
-CcuResult GroupCopy(CcuKernelCtxBase& ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize);
+CcuResult CreateMultiOpCopyV1(CcuKernelCtxBase& ctx, GroupCopyVar& var);
+CcuResult GroupCopy(
+    CcuKernelCtxBase& ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize,
+    CcuVersion ccuVersion = CcuVersion::CCU_V1);
 
 CcuResult CreateReduceLoop(
     CcuKernelCtxBase& ctx, GroupLocalReduceVar& var, uint32_t size, HcclDataType dataType, HcclDataType outputDataType,
@@ -158,6 +176,8 @@ CcuResult GroupBroadcast(
 CcuResult CreateMultiOpReduceWithoutMyRank(
     CcuKernelCtxBase& ctx, GroupReduceVar& var, const size_t channels[], uint32_t channelCount, HcclDataType dataType,
     HcclDataType outputDataType, HcclReduceOp opType);
+CcuResult GroupCopyV1(CcuKernelCtxBase& ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize);
+CcuResult GroupCopyV2(CcuKernelCtxBase& ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize);
 
 } // namespace mc2_ops_hccl
 

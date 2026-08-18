@@ -161,7 +161,9 @@ static CcuResult DoAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
     }
 
     CCU_CHK_RET(DoAllGatherWrite(ctx, src, dst));
-    CCU_IF(ctx.isInputOutputEqual == 0) { CCU_CHK_RET(GroupCopy(ctx, localDst, src, ctx.goSize)); }
+    CCU_IF(ctx.isInputOutputEqual == 0) {
+        CCU_CHK_RET(GroupCopy(ctx, localDst, src, ctx.goSize, GetCcuVersion()));
+    }
     CCU_CHK_RET(DoAllGatherWait(ctx));
     return CCU_SUCCESS;
 }
