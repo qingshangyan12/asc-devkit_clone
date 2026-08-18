@@ -8,16 +8,7 @@
 
 ## 概述
 
-Fixpipe L0C→L1接口将L0C中的矩阵计算结果搬运到L1 Buffer，在搬运过程中支持随路量化，将L0C中的float或int32\_t数据转换为目标数据类型输出。由于dav-3510架构中L1 Buffer数据无法直接搬运到GM，样例通过第二次Mmad（量化结果×单位矩阵D）将数据从L1经L0A→L0C搬运到GM，最终输出为int32\_t（int8输入场景）或float（其他场景）。
-
-### 支持的数据类型组合
-
-针对Ascend 950PR/Ascend 950DT，asc\_copy\_l0c2l1接口支持的数据类型组合如下：
-
-| 源矩阵（L0C Buffer） | 目的矩阵（L1 Buffer） |
-| --- | --- |
-| float | int8\_t、uint8\_t、hifloat8\_t、fp8\_e4m3fn\_t、half、bfloat16\_t、float |
-| int32\_t | int8\_t、uint8\_t、half、bfloat16\_t、int32\_t |
+Fixpipe L0C→L1接口将L0C中的矩阵计算结果搬运到L1 Buffer，在搬运过程中支持随路量化，将L0C中的float或int32\_t数据转换为目标数据类型输出。由于dav-3510架构中L1 Buffer数据无法直接搬运到GM，样例通过第二次Mmad（量化结果×单位矩阵D）将数据从L1经L0A→L0C搬运到GM，最终输出为int32\_t（int8/int4b输入场景）或float（其他场景）。
 
 随路量化的inf/nan处理与Fixpipe L0C→GM接口完全一致，通过CTRL寄存器的CTRL\[48\]比特位控制饱和模式：
 
@@ -75,9 +66,9 @@ L0C Buffer中存储的float类型数据来自Mmad矩阵乘计算结果，当输�
 | int8\_t | QF322B8\_PRE / VQF322B8\_PRE | +inf | 127（MAX） | 127（MAX） |
 | int8\_t | QF322B8\_PRE / VQF322B8\_PRE | -inf | -128（MIN） | -128（MIN） |
 | int8\_t | QF322B8\_PRE / VQF322B8\_PRE | nan | 0 | 0 |
-| int4b\_t<sup>†</sup> | VQF322S4\_PRE | +inf | 7（MAX） | 7（MAX） |
-| int4b\_t<sup>†</sup> | VQF322S4\_PRE | -inf | -8（MIN） | -8（MIN） |
-| int4b\_t<sup>†</sup> | VQF322S4\_PRE | nan | 0 | 0 |
+| int4b\_t | VQF322S4\_PRE | +inf | 7（MAX） | 7（MAX） |
+| int4b\_t | VQF322S4\_PRE | -inf | -8（MIN） | -8（MIN） |
+| int4b\_t | VQF322S4\_PRE | nan | 0 | 0 |
 
 注：
 
@@ -86,7 +77,6 @@ L0C Buffer中存储的float类型数据来自Mmad矩阵乘计算结果，当输�
 - hifloat8\_t类型中，111（0b01101111）为HiF8+inf编码，239（0b11101111）为HiF8-inf编码，128（0b10000000）为HiF8NAN编码。饱和模式下，inf保持为对应的inf编码，nan被饱和为0。
 - hifloat8\_t的溢出判断阈值为1.25×2^15=40960，当量化后的值绝对值大于等于40960时输出inf编码（111/239），而非饱和为240。
 - 整数类型只有饱和模式，饱和模式和非饱和模式下的输出结果一致。
-- <sup>†</sup>int4b\_t不在官方支持的数据类型组合中（见"支持的数据类型组合"章节），表中所列为基于整数类型饱和行为推导的理论参考值，非实测结果。
 - VQF322HIF8\_PRE使用Half to Away舍入模式，VQF322HIF8\_PRE\_HYBRID使用Hybrid舍入模式（|exp|<4时为Half to Away，|exp|≥4时为SSR随机舍入）。两种模式对inf/nan的处理一致。
 - 表中列出的量化模式为实测验证的模式。同一输出类型的scalar模式（如QF322F16\_PRE）与tensor模式（如VQF322F16\_PRE）使用相同的类型转换算法，inf/nan边界值处理行为完全一致，差异仅在于量化参数的传递方式（单个标量 vs 每列张量），因此表中仅列出tensor模式。
 - L0C→L1与L0C→GM/L0C→UB的随路量化inf/nan处理行为完全一致。边界值数据可参考[Fixpipe(L0C→GM)接口边界值汇总](fixpipe_l0c2gm_interface_boundary_value_summary.md)和[Fixpipe(L0C→UB)接口边界值汇总](fixpipe_l0c2ub_interface_boundary_value_summary.md)。
@@ -105,10 +95,10 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 | bfloat16\_t | VQS322BF16\_PRE | 量化后超出bfloat16表示范围 | 0x7F7F（MAX） / 0xFF7F（MIN） |
 | int8\_t | REQ8 / VREQ8 | 量化后大于127 | 127（MAX） |
 | int8\_t | REQ8 / VREQ8 | 量化后小于-128 | -128（MIN） |
-| int4b\_t<sup>†</sup> | VREQ4 | 量化后大于7 | 7（MAX） |
-| int4b\_t<sup>†</sup> | VREQ4 | 量化后小于-8 | -8（MIN） |
+| int4b\_t | VREQ4 | 量化后大于7 | 7（MAX） |
+| int4b\_t | VREQ4 | 量化后小于-8 | -8（MIN） |
 
-注：整数类型只有饱和模式，溢出时饱和为目标类型的最值。half和bfloat16\_t在饱和模式和非饱和模式下均对溢出值进行饱和处理。<sup>†</sup>int4b\_t不在官方支持的数据类型组合中，表中所列为理论参考值。
+注：整数类型只有饱和模式，溢出时饱和为目标类型的最值。half和bfloat16\_t在饱和模式和非饱和模式下均对溢出值进行饱和处理。
 
 ## 测试验证
 
@@ -139,19 +129,19 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 
 ### 未验证场景说明
 
-以下场景因CANN版本限制未纳入实测验证：
+以下场景因CANN版本限制未纳入实测验证，对应API重载在CANN 9.2.0中未实现或未提供：
 
 **表4** 未验证场景及原因
 
 <a name="table_fixpipe_l0c2l1_unverified"></a>
 
-| 场景 | 输出类型 | 量化模式 | 官方支持 | 未验证原因 |
-| --- | --- | --- | --- | --- |
-| 11 | int4b\_t | VREQ4 | 否 | int4b\_t不在官方支持的数据类型组合中，且asc\_mmad\_s4（int4b\_t×int4b\_t→int32\_t）在dav-3510上未实现，验证路径的第二次Mmad无法执行 |
-| 12 | bfloat16\_t | VQS322BF16\_PRE | 是 | CANN 9.2.0未提供asc\_copy\_l0c2l1的bfloat16\_t/int32\_t重载，待后续CANN版本补齐后可启用验证 |
-| 13 | int4b\_t | VQF322S4\_PRE | 否 | int4b\_t不在官方支持的数据类型组合中，同场景11 |
-| 14 | fp8\_e4m3fn\_t | VQF322FP8\_PRE | 是 | CANN 9.2.0未提供asc\_copy\_l0c2l1的fp8\_e4m3fn\_t/float重载，待后续CANN版本补齐后可启用验证 |
-| 15 | hifloat8\_t | VQF322HIF8\_PRE | 是 | CANN 9.2.0未提供asc\_copy\_l0c2l1的hifloat8\_t/float重载，待后续CANN版本补齐后可启用验证 |
-| 16 | hifloat8\_t | VQF322HIF8\_PRE\_HYBRID | 是 | 同场景15 |
+| 场景 | 输出类型 | 量化模式 | 未验证原因 |
+| --- | --- | --- | --- |
+| 11 | int4b\_t | VREQ4 | asc\_mmad\_s4（int4b\_t×int4b\_t→int32\_t）在dav-3510上未实现（声明存在但无链接实现），验证路径的第二次Mmad无法执行 |
+| 12 | bfloat16\_t | VQS322BF16\_PRE | asc\_copy\_l0c2l1的bfloat16\_t/int32\_t重载未提供（int8输入场景的L0C为int32\_t，需bf16/int32重载） |
+| 13 | int4b\_t | VQF322S4\_PRE | asc\_mmad\_s4未实现，同场景11 |
+| 14 | fp8\_e4m3fn\_t | VQF322FP8\_PRE | asc\_copy\_l0c2l1的fp8\_e4m3fn\_t/float重载未提供 |
+| 15 | hifloat8\_t | VQF322HIF8\_PRE | asc\_copy\_l0c2l1的hifloat8\_t/float重载未提供 |
+| 16 | hifloat8\_t | VQF322HIF8\_PRE\_HYBRID | asc\_copy\_l0c2l1的hifloat8\_t/float重载未提供，同场景15 |
 
-注：场景12、14、15、16的数据类型组合在官方支持矩阵中已列出，仅因当前CANN 9.2.0版本未提供对应重载而无法验证，待CANN后续版本补齐重载后可启用端到端验证。场景11、13的int4b\_t不在官方支持的数据类型组合中，表1和表2中列出的int4b\_t边界值为理论参考值（基于整数类型饱和行为推导），非实测结果。
+注：场景11-16的边界值行为可参考表1和表2中的理论值。其中int4b\_t场景（11、13）的asc\_copy\_l0c2l1重载已验证可编译，但验证路径的asc\_mmad\_s4未实现导致无法端到端验证。fp8\_e4m3fn\_t和hifloat8\_t场景（14-16）的asc\_copy\_l0c2l1重载本身未提供，待CANN后续版本支持后可启用验证。
