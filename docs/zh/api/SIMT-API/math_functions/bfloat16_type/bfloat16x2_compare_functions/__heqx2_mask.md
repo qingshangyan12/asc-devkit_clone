@@ -112,6 +112,7 @@ unsigned int __heqx2_mask(bfloat16x2_t x, bfloat16x2_t y)
             return;
         }
         // 输入缓冲区需按4字节对齐，且元素个数为偶数；bfloat16x2_t占用4字节
+        // 输入缓冲区需按4字节对齐，且元素个数为偶数；bfloat16x2_t占用4字节
         bfloat16x2_t* input1 = (bfloat16x2_t*)x;
         bfloat16x2_t* input2 = (bfloat16x2_t*)y;
         dst[idx] = __heqx2_mask(input1[idx], input2[idx]);
