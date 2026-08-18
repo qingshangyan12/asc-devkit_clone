@@ -49,11 +49,12 @@ coalesced_group binary_partition(const thread_block_tile<Size, ParentT>& g, bool
 
 ## 返回值说明
 
-返回划分出的子组`coalesced_group`对象。
+返回包含当前调用线程的子组（当前线程及所有与其具有相同`pred`标签的线程）。当父组中的线程标签全部相同时，返回整个父组。返回类型为`coalesced_group`。
 
 ## 约束说明
 
-- 当`g`为`thread_block_tile<Size, ParentT>`类型时，`g`必须满足`Size`小于等于32，否则编译报错。
+- 当`g`为`thread_block_tile<Size, ParentT>`类型时，`Size`必须为2的幂且小于等于32（即1、2、4、8、16、32），否则编译报错。
+- 组内所有线程必须共同调用该接口（`pred`可以取不同值），否则行为未定义。
 
 ## 调用示例
 
