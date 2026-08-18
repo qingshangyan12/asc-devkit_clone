@@ -50,8 +50,8 @@ inline int __half2int_rd(const half x)
 | nan | 0 |
 | inf | 2147483647（int32_t最大值） |
 | -inf | -2147483648（int32_t最小值） |
-| ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
-| -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
+| ASCRT\_MAX\_NORMAL\_FP16 | 65504 |
+| -ASCRT\_MAX\_NORMAL\_FP16 | -65504 |
 
 ## 约束说明
 
