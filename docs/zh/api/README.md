@@ -1344,6 +1344,11 @@
         -   [废弃接口](SIMD-API/c_api/deprecated_interface/deprecated_interface.md)
             -   [asc_set_atomic_add_int（废弃）](SIMD-API/c_api/deprecated_interface/asc_set_atomic_add_int_deprecated.md)
             -   [asc_abs_sync（废弃）](SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md)
+            -   [asc_float2bfloat16（废弃）](SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md)
+            -   [asc_int322int16（废弃）](SIMD-API/c_api/deprecated_interface/asc_int322int16_deprecated.md)
+            -   [asc_int322int64（废弃）](SIMD-API/c_api/deprecated_interface/asc_int322int64_deprecated.md)
+            -   [asc_int322uint16（废弃）](SIMD-API/c_api/deprecated_interface/asc_int322uint16_deprecated.md)
+            -   [asc_uint82uint16（废弃）](SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md)
 
     -   [高阶API](SIMD-API/adv_api/adv_api.md)
         -   [高阶API列表](SIMD-API/adv_api/adv_api_list.md)
