@@ -219,3 +219,128 @@ NHR适合rank数较多、希望降低通信轮数，或者集群规模不是2的
 ## 资料边界
 
 本文只采用当前HCCL文档可以直接证明的术语定义，并用HCCL源码补充工程判定。若后续正式产品资料给出UBX的标准英文展开或更严格的硬件定义，应以正式资料为准并更新本文。
+
+## CCU Kernel参数与资源描述
+
+CCU算法的资源申请和传统`hcomm::CcuKernel`对象模型使用了两组名称相近、但职责不同的数据结构。迁移和调试时必须区分：`CcuKernelInfo`描述MC2/KFC运行时需要注册和调度的kernel；`hcomm::CcuKernelArg`是传统CCU host kernel对象的抽象参数基类；两者不存在直接继承关系。
+
+### `AlgResourceRequest`与`CcuKernelInfo`
+
+executor和template的`CalcRes`接口中名为`resourceRequest`的出参类型是`AlgResourceRequest`。该结构体定义于asc-devkit的`impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h`，用于汇总一次算法执行所需的线程、notify、通信Channel和CCU kernel资源。`CcuKernelInfo`定义在同一文件，`AlgResourceRequest::ccuKernelInfos`是该类型的数组成员：
+
+```cpp
+struct CcuKernelInfo {
+    u32 resGroup = 0;
+    u32 dieId = 0;
+    char kernelFuncName[64];
+    void* kernelFunc;
+    void* kernelArg;
+    std::vector<HcclChannelDesc> channels;
+
+private:
+    std::shared_ptr<CcuKernelArgBase> kernelArgSmartPtr;
+
+public:
+    template <typename T>
+    void setKernelArg(std::shared_ptr<T> arg)
+    {
+        kernelArgSmartPtr = std::static_pointer_cast<CcuKernelArgBase>(arg);
+        kernelArg = static_cast<void*>(arg.get());
+    }
+};
+
+struct AlgResourceRequest {
+    double dieSplitRatio = 0.0;
+    u32 notifyNumOnMainThread = 0;
+    u32 slaveThreadNum = 0;
+    std::vector<u32> notifyNumPerThread;
+    std::vector<std::vector<HcclChannelDesc>> channels;
+    std::vector<CcuKernelInfo> ccuKernelInfos;
+    std::vector<u32> ccuKernelNum;
+};
+```
+
+`AlgResourceRequest`字段职责如下：
+
+| 字段 | 作用 |
+| --- | --- |
+| `dieSplitRatio` | die切分比例字段；默认值为`0.0`。当前CC算法目录中除声明外未见对该成员的赋值，具体语义需以实际使用它的算法实现为准。 |
+| `notifyNumOnMainThread` | 主线程需要申请的notify数量。 |
+| `slaveThreadNum` | 需要申请的从线程数量。 |
+| `notifyNumPerThread` | 各从线程需要申请的notify数量；下标与从线程顺序对应。 |
+| `channels` | 按算法层级或执行阶段组织的通信`HcclChannelDesc`集合。 |
+| `ccuKernelInfos` | 待注册、调度的CCU kernel描述集合。 |
+| `ccuKernelNum` | 按template或mission记录的CCU kernel数量；与`ccuKernelInfos`的顺序共同确定分组。 |
+
+`CcuKernelInfo`字段职责如下：
+
+| 字段 | 作用 |
+| --- | --- |
+| `resGroup` | CCU kernel资源组编号。相同资源组的kernel可按资源复用规则处理。 |
+| `dieId` | kernel所属die；单die场景通常为`0`。 |
+| `kernelFuncName` | 注册和诊断使用的CCU kernel函数名。 |
+| `kernelFunc` | CCU kernel函数指针。 |
+| `kernelArg` | 指向具体参数对象的非拥有型指针，供后续注册或运行路径传递。 |
+| `channels` | 此kernel申请并绑定的通信Channel描述。 |
+| `kernelArgSmartPtr` | 私有拥有型指针，维持`kernelArg`所指对象的生命周期。 |
+
+`setKernelArg`同时保存`shared_ptr`和其裸指针：前者解决生命周期，后者保持既有运行时接口使用`void*`参数的方式。传入的具体参数类型必须继承同文件定义的`CcuKernelArgBase`：
+
+```cpp
+struct CcuKernelArgBase {
+    ChannelHandle channels[CCU_MAX_RANK_SIZE];
+    uint32_t channelCount;
+};
+```
+
+对Concurrent Mesh + NHR MultiLink算法，executor将Mesh和NHR模板生成的`ccuKernelInfos`按顺序合并，并设置`ccuKernelNum = {1, 1}`。因此第`0`项对应Mesh原始kernel，第`1`项对应NHR原始kernel；KFC适配层据此将两个原始kernel分别转换为对应mission的KFC server kernel。
+
+### `hcomm::CcuKernelArg`
+
+`hcomm::CcuKernelArg`定义于`include/adv_api/hccl/internal/hcomm/pkg_inc/hcomm/ccu/ccu_kernel_arg.h`：
+
+```cpp
+namespace hcomm {
+
+class CcuKernelArg {
+public:
+    explicit CcuKernelArg() = default;
+    virtual ~CcuKernelArg() = default;
+    virtual CcuKernelSignature GetKernelSignature() const = 0;
+
+    std::vector<ChannelHandle> channels{};
+};
+
+}; // namespace hcomm
+```
+
+它是传统`hcomm::CcuKernel`对象构造时使用的C++抽象参数基类。派生类须实现`GetKernelSignature()`，以生成参数签名；`channels`保存该对象模型中实际绑定的`ChannelHandle`列表。虚析构函数确保通过基类引用或指针处理派生参数对象时可安全销毁。
+
+不要将它与C接口同名类型混淆。`include/adv_api/hccl/internal/hcomm/ccu/ccu_types.h`中的无命名空间`CcuKernelArg`是：
+
+```cpp
+typedef void* CcuKernelArg;
+```
+
+该C接口别名仅用于以通用指针形式传递CCU kernel参数；它既不是`hcomm::CcuKernelArg`类，也不是MC2/KFC适配层的`CcuKernelArgBase`。
+
+### 类型关系
+
+```text
+传统CCU对象路径
+hcomm::CcuKernelArg (抽象类，含vector<ChannelHandle>)
+        -> 具体传统CCU参数类
+        -> hcomm::CcuKernel
+
+MC2/KFC适配路径
+CcuKernelArgBase (适配层基类，含定长ChannelHandle数组)
+        -> 具体MC2 CCU kernel参数类
+        -> CcuKernelInfo::kernelArgSmartPtr / kernelArg
+        -> AlgResourceRequest::ccuKernelInfos
+        -> KFC server kernel与mission调度
+
+C接口调用边界
+CcuKernelArg == void*
+```
+
+上述两条C++路径可表达相似的“kernel参数”和“Channel集合”信息，但数据布局、所有权模型、执行入口均不同。MC2算法移植时，应以`CcuKernelInfo`及其`CcuKernelArgBase`派生参数为准，不能把传统`hcomm::CcuKernelArg`直接传入MC2/KFC注册路径。
