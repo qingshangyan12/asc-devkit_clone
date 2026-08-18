@@ -77,6 +77,25 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fabsf(float x) { return __fabsf(x); 
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmaf(float x, float y, float z) { return __fma(x, y, z); }
 
+/*
+ * Computes a refined sqrt approximation for float inputs.
+ *
+ * calculation to move subnormal or very small values into a more stable
+ * range. The result is scaled back by 2^-12 because sqrt(x * 2^24)
+ * equals sqrt(x) * 2^12.
+ *
+ * then applies one Newton-style correction to inv:
+ *   err0 = 1 - b * inv * inv
+ *   inv = inv + err0 * inv * 0.5
+ *
+ * The final sqrt value is reconstructed and corrected:
+ *   y = inv * b
+ *   err1 = b - y * y
+ *   y = y + 0.5 * inv * err1
+ *
+ * @param x The input value.
+ * @return The refined square root approximation.
+ */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf_precise_impl(float x)
 {
     constexpr float scale_up = 16777216.0f;       // 2^24
