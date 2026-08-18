@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-饱和模式下，将float2类型数据的两个分量遵循CAST\_ROUND模式转换为bfloat16精度，返回转换后的bfloat16x2\_t类型数据。
+饱和模式下，将`float2`类型数据的两个分量遵循`CAST_ROUND`模式转换为bfloat16精度，返回转换后的`bfloat16x2_t`类型数据。
 
 ## 函数原型
 
@@ -61,7 +61,7 @@ SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用该接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"
