@@ -19,6 +19,44 @@ for SAT_MODE in 1 0; do
     fi
 
     for SCENARIO_NUM in $(seq 1 17); do
+        # Scenarios 11, 13 require asc_mmad_s4 (ASC_HAS_MMAD_S4_3510).
+        # Scenarios 12 requires asc_copy_l0c2l1 bfloat16_t/int32_t overload
+        #   (ASC_HAS_L0C2L1_BF16_INT32).
+        # Scenarios 14 requires asc_copy_l0c2l1 fp8_e4m3fn_t/float overload
+        #   (ASC_HAS_L0C2L1_FP8).
+        # Scenarios 15, 16 require asc_copy_l0c2l1 hifloat8_t/float overload
+        #   (ASC_HAS_L0C2L1_HIF8).
+        # Toggle the feature macros in data_copy_l0c2l1.asc when upgrading CANN.
+        case "$SCENARIO_NUM" in
+            11|13)
+                echo "=============================="
+                echo "Scenario $SCENARIO_NUM ($MODE_NAME mode)"
+                echo "=============================="
+                echo "[SKIP] Scenario $SCENARIO_NUM ($MODE_NAME) — ASC_HAS_MMAD_S4_3510=0"
+                continue
+                ;;
+            12)
+                echo "=============================="
+                echo "Scenario $SCENARIO_NUM ($MODE_NAME mode)"
+                echo "=============================="
+                echo "[SKIP] Scenario $SCENARIO_NUM ($MODE_NAME) — ASC_HAS_L0C2L1_BF16_INT32=0"
+                continue
+                ;;
+            14)
+                echo "=============================="
+                echo "Scenario $SCENARIO_NUM ($MODE_NAME mode)"
+                echo "=============================="
+                echo "[SKIP] Scenario $SCENARIO_NUM ($MODE_NAME) — ASC_HAS_L0C2L1_FP8=0"
+                continue
+                ;;
+            15|16)
+                echo "=============================="
+                echo "Scenario $SCENARIO_NUM ($MODE_NAME mode)"
+                echo "=============================="
+                echo "[SKIP] Scenario $SCENARIO_NUM ($MODE_NAME) — ASC_HAS_L0C2L1_HIF8=0"
+                continue
+                ;;
+        esac
         TOTAL=$((TOTAL + 1))
         echo "=============================="
         echo "Scenario $SCENARIO_NUM ($MODE_NAME mode)"
