@@ -272,12 +272,36 @@ __global__ void reduce_block_tile(const int32_t* input, int32_t* total_tile, uin
   |------|--------|------|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
-  以整块规约场景为例，执行结果如下，说明精度对比成功。
+  三个用例的执行结果如下，均说明精度对比成功。
+
+  跨块规约场景：
+
+  ```text
+  Case 0: cross-block reduction (grid_group), reduce domain = 4096
+  num_elements = 4096, threads = 4096
+  grid = 4 blocks x 1024 threads, reduce domain = 4096, workspace in global memory
+  Output: 8390656
+  Golden: 8390656
+  [Success] Case accuracy verification passed.
+  ```
+
+  整块规约场景：
 
   ```text
   Case 1: whole-block reduction (thread_block), reduce domain = 1024
   num_elements = 4096, threads = 4096
   grid = 4 blocks x 1024 threads, reduce domain = 1024 per block, workspace in shared memory
+  Output: 8390656
+  Golden: 8390656
+  [Success] Case accuracy verification passed.
+  ```
+
+  子组规约场景：
+
+  ```text
+  Case 2: sub-group reduction (thread_block_tile<32>), reduce domain = 32
+  num_elements = 4096, threads = 4096
+  grid = 4 blocks x 1024 threads, 32 tiles per block, reduce domain = 32, workspace in shared memory
   Output: 8390656
   Golden: 8390656
   [Success] Case accuracy verification passed.
