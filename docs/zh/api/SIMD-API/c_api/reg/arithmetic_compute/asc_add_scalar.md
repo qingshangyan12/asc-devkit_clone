@@ -98,16 +98,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 
 namespace {
 template <typename T>
-void print_data(const char* label, const std::vector<T>& values)
-{
-    std::cout << label << ":";
-    const size_t count = values.size() < 8 ? values.size() : 8;
-    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
-    if (values.size() > count) std::cout << " ...";
-    std::cout << std::endl;
-}
-
-template <typename T>
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
     if (actual.size() != expected.size()) return false;
@@ -176,9 +166,6 @@ int main()
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
 
-    print_data("Input", src);
-    print_data("Output", output);
-    print_data("Golden", golden);
     const bool passed = compare_data(output, golden, 1e-6);
     std::cout << (passed ? "[Success] asc_add_scalar passed." : "[Failed] asc_add_scalar failed.") << std::endl;
     aclrtFree(dst_device);

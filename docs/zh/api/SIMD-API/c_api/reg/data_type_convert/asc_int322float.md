@@ -99,16 +99,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 namespace {
 template <typename T>
-void print_data(const char* label, const std::vector<T>& values)
-{
-    std::cout << label << ":";
-    const size_t count = values.size() < 8 ? values.size() : 8;
-    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
-    if (values.size() > count) std::cout << " ...";
-    std::cout << std::endl;
-}
-
-template <typename T>
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
     if (actual.size() != expected.size()) return false;
@@ -124,36 +114,11 @@ constexpr uint32_t BUFFER_BYTES = 256;
 __simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
     vector_bool mask = asc_create_mask_b8(PAT_ALL);
-    vector_float dst_0;
-    vector_int32_t src_0;
-    asc_loadalign(dst_0, reinterpret_cast<__ubuf__ float*>(output));
-    asc_loadalign(src_0, reinterpret_cast<__ubuf__ int32_t*>(input));
-    asc_int322float_rna(dst_0, src_0, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ float*>(output), dst_0, mask);
-    vector_float dst_1;
-    vector_int32_t src_1;
-    asc_loadalign(dst_1, reinterpret_cast<__ubuf__ float*>(output));
-    asc_loadalign(src_1, reinterpret_cast<__ubuf__ int32_t*>(input));
-    asc_int322float_rd(dst_1, src_1, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ float*>(output), dst_1, mask);
-    vector_float dst_2;
-    vector_int32_t src_2;
-    asc_loadalign(dst_2, reinterpret_cast<__ubuf__ float*>(output));
-    asc_loadalign(src_2, reinterpret_cast<__ubuf__ int32_t*>(input));
-    asc_int322float_ru(dst_2, src_2, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ float*>(output), dst_2, mask);
-    vector_float dst_3;
-    vector_int32_t src_3;
-    asc_loadalign(dst_3, reinterpret_cast<__ubuf__ float*>(output));
-    asc_loadalign(src_3, reinterpret_cast<__ubuf__ int32_t*>(input));
-    asc_int322float_rz(dst_3, src_3, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ float*>(output), dst_3, mask);
-    vector_float dst_4;
-    vector_int32_t src_4;
-    asc_loadalign(dst_4, reinterpret_cast<__ubuf__ float*>(output));
-    asc_loadalign(src_4, reinterpret_cast<__ubuf__ int32_t*>(input));
-    asc_int322float_rn(dst_4, src_4, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ float*>(output), dst_4, mask);
+    vector_float dst;
+    vector_int32_t src;
+    asc_loadalign(src, reinterpret_cast<__ubuf__ int32_t*>(input));
+    asc_int322float_rn(dst, src, mask);
+    asc_storealign(reinterpret_cast<__ubuf__ float*>(output), dst, mask);
 }
 __global__ __vector__ void asc_int322float_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
@@ -196,15 +161,9 @@ int main()
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(uint8_t), output_device, output.size() * sizeof(uint8_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    std::cout << "Conversion: vector_int32_t -> vector_float" << std::endl;
-    print_data("Input 1.0 (raw bytes)", input);
-    print_data("Output (raw bytes)", output);
-    print_data("Golden 1.0 (raw bytes)", golden);
     const bool passed = compare_data(output, golden);
-    std::cout << (passed ? "[Success] asc_int322float_rn/asc_int322float_rna/"
-                           "asc_int322float_rd/asc_int322float_ru/asc_int322float_rz passed."
-                         : "[Failed] asc_int322float_rn/asc_int322float_rna/"
-                           "asc_int322float_rd/asc_int322float_ru/asc_int322float_rz failed.")
+    std::cout << (passed ? "[Success] asc_int322float_rn passed."
+                         : "[Failed] asc_int322float_rn failed.")
               << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);

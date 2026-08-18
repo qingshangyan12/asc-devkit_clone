@@ -80,7 +80,7 @@ __simd_callee__ inline void asc_ln(vector_half& dst,
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+bisheng example.asc -o main --npu-arch=dav-3510 -lm && ./main
 ```
 
 ```cpp
@@ -94,16 +94,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
-template <typename T>
-void print_data(const char* label, const std::vector<T>& values)
-{
-    std::cout << label << ":";
-    const size_t count = values.size() < 8 ? values.size() : 8;
-    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
-    if (values.size() > count) std::cout << " ...";
-    std::cout << std::endl;
-}
-
 template <typename T>
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
@@ -172,9 +162,6 @@ int main()
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
 
-    print_data("Input", src);
-    print_data("Output", output);
-    print_data("Golden", golden);
     const bool passed = compare_data(output, golden, 1e-3);
     std::cout << (passed ? "[Success] asc_ln passed." : "[Failed] asc_ln failed.") << std::endl;
     aclrtFree(dst_device);

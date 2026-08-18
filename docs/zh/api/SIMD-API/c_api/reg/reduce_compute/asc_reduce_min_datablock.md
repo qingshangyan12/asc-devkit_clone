@@ -95,16 +95,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 namespace {
 template <typename T>
-void print_data(const char* label, const std::vector<T>& values)
-{
-    std::cout << label << ":";
-    const size_t count = values.size() < 8 ? values.size() : 8;
-    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
-    if (values.size() > count) std::cout << " ...";
-    std::cout << std::endl;
-}
-
-template <typename T>
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
     if (actual.size() != expected.size()) return false;
@@ -159,9 +149,6 @@ int main()
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(uint32_t), dst_device, output.size() * sizeof(uint32_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    print_data("Input", src);
-    print_data("Output", output);
-    print_data("Golden", golden);
     const bool passed = compare_data(output, golden);
     std::cout << (passed ? "[Success] asc_reduce_min_datablock passed." : "[Failed] asc_reduce_min_datablock failed.") << std::endl;
     aclrtFree(dst_device);

@@ -97,16 +97,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 
 namespace {
 template <typename T>
-void print_data(const char* label, const std::vector<T>& values)
-{
-    std::cout << label << ":";
-    const size_t count = values.size() < 8 ? values.size() : 8;
-    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
-    if (values.size() > count) std::cout << " ...";
-    std::cout << std::endl;
-}
-
-template <typename T>
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
     if (actual.size() != expected.size()) return false;
@@ -156,16 +146,13 @@ __global__ __vector__ void asc_abs_sub_kernel(__gm__ float* dst, __gm__ float* s
 
 int main()
 {
-    std::vector<float> initial(ELEMENT_COUNT);
     std::vector<float> src0(ELEMENT_COUNT);
     std::vector<float> src1(ELEMENT_COUNT);
     std::vector<float> output(ELEMENT_COUNT);
     std::vector<float> golden(ELEMENT_COUNT);
     for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
-        initial[i] = 1.0f + static_cast<float>(i) * 0.125f;
         src0[i] = static_cast<float>(i % 8) * 0.25f;
         src1[i] = static_cast<float>((i + 3) % 8) * 0.25f;
-        output[i] = initial[i];
         golden[i] = std::fabs(src0[i] - src1[i]);
     }
     aclInit(nullptr);
@@ -179,8 +166,6 @@ int main()
     float* src1_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&src1_device), (ELEMENT_COUNT) * sizeof(float),
         ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(dst_device, initial.size() * sizeof(float), initial.data(), initial.size() * sizeof(float),
-        ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(src0_device, src0.size() * sizeof(float), src0.data(), src0.size() * sizeof(float),
         ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(src1_device, src1.size() * sizeof(float), src1.data(), src1.size() * sizeof(float),
@@ -189,11 +174,6 @@ int main()
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    print_data("Initial dst", initial);
-    print_data("Input src0", src0);
-    print_data("Input src1", src1);
-    print_data("Output", output);
-    print_data("Golden", golden);
     const bool passed = compare_data(output, golden, 1e-6);
     std::cout << (passed ? "[Success] asc_abs_sub passed." : "[Failed] asc_abs_sub failed.") << std::endl;
     aclrtFree(dst_device);
