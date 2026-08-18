@@ -409,6 +409,7 @@ public:
         int childStatus = 0;
         bool infrastructureFailure = false;
         bool outputPipeClosed = false;
+        bool commandLeaderExited = false;
         while (true) {
             ProcessOutputDrainStatus outputDrainStatus = ProcessOutputDrainStatus::EndOfFile;
             if (!outputPipeClosed) {
@@ -423,19 +424,15 @@ public:
                     outputPipeClosed = true;
                 }
             }
-            const pid_t waitResult = waitpid(childProcessId_, &childStatus, WNOHANG);
-            if (waitResult == childProcessId_) {
-                childProcessNeedsReaping_ = false;
-                break;
-            }
-            if (waitResult < 0) {
-                if (errno == EINTR) {
-                    continue;
+            if (!commandLeaderExited) {
+                const CommandLeaderExitState leaderExitState = ObserveCommandLeaderExitWithoutReaping();
+                if (leaderExitState == CommandLeaderExitState::InspectionFailed) {
+                    infrastructureFailure = true;
+                    break;
                 }
-                const int waitError = errno;
-                ACLRTC_LOG_ERROR("Failed to inspect command process: pid=%d errno=%d message=%s",
-                                 static_cast<int>(childProcessId_), waitError, std::strerror(waitError));
-                infrastructureFailure = true;
+                commandLeaderExited = leaderExitState == CommandLeaderExitState::Exited;
+            }
+            if (commandLeaderExited && outputPipeClosed) {
                 break;
             }
             if (SteadyClock::now() >= executionDeadline) {
@@ -466,6 +463,10 @@ public:
         }
 
         if (infrastructureFailure) {
+            TerminateAndReapProcessGroup(childStatus);
+        } else if (processResult.termination != CompilationProcessTermination::TimedOut &&
+                   !ReapCommandLeader(childStatus)) {
+            infrastructureFailure = true;
             TerminateAndReapProcessGroup(childStatus);
         }
         if (!outputPipeClosed) {
@@ -501,6 +502,48 @@ public:
     }
 
 private:
+    enum class CommandLeaderExitState : uint32_t {
+        Running,
+        Exited,
+        InspectionFailed,
+    };
+
+    CommandLeaderExitState ObserveCommandLeaderExitWithoutReaping() const noexcept
+    {
+        siginfo_t childInformation {};
+        int waitResult = 0;
+        do {
+            waitResult = waitid(
+                P_PID, static_cast<id_t>(childProcessId_), &childInformation, WEXITED | WNOHANG | WNOWAIT);
+        } while (waitResult != 0 && errno == EINTR);
+        if (waitResult != 0) {
+            const int waitError = errno;
+            ACLRTC_LOG_ERROR("Failed to inspect command process: pid=%d errno=%d message=%s",
+                             static_cast<int>(childProcessId_), waitError, std::strerror(waitError));
+            return CommandLeaderExitState::InspectionFailed;
+        }
+        return childInformation.si_pid == 0 ? CommandLeaderExitState::Running : CommandLeaderExitState::Exited;
+    }
+
+    bool ReapCommandLeader(int& childStatus) noexcept
+    {
+        if (!childProcessNeedsReaping_) {
+            return true;
+        }
+        pid_t waitResult;
+        do {
+            waitResult = waitpid(childProcessId_, &childStatus, 0);
+        } while (waitResult < 0 && errno == EINTR);
+        if (waitResult != childProcessId_) {
+            const int waitError = errno;
+            ACLRTC_LOG_ERROR("Failed to reap command process: pid=%d errno=%d message=%s",
+                             static_cast<int>(childProcessId_), waitError, std::strerror(waitError));
+            return false;
+        }
+        childProcessNeedsReaping_ = false;
+        return true;
+    }
+
     void TerminateAndReapProcessGroup(int& childStatus) noexcept
     {
         if (!childProcessNeedsReaping_) {
@@ -510,17 +553,7 @@ private:
         // Keep the leader unreaped so its PID cannot be reused as another process group ID during the grace period.
         std::this_thread::sleep_for(terminationGracePeriod_);
         SignalChildProcessGroup(childProcessId_, SIGKILL);
-
-        pid_t waitResult;
-        do {
-            waitResult = waitpid(childProcessId_, &childStatus, 0);
-        } while (waitResult < 0 && errno == EINTR);
-        if (waitResult != childProcessId_) {
-            const int waitError = errno;
-            ACLRTC_LOG_ERROR("Failed to reap command process: pid=%d errno=%d message=%s",
-                             static_cast<int>(childProcessId_), waitError, std::strerror(waitError));
-        }
-        childProcessNeedsReaping_ = false;
+        (void)ReapCommandLeader(childStatus);
     }
 
     ScopedFileDescriptor outputReadFileDescriptor_ {-1};

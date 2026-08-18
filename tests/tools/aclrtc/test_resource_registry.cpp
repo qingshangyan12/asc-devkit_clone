@@ -18,6 +18,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -41,6 +42,11 @@ constexpr uint64_t TEST_MAX_MANIFEST_COUNT = 4096U;
 constexpr uint64_t TEST_MAX_EXTENSION_COUNT = 4096U;
 constexpr uint64_t TEST_MAX_FILE_COUNT = 65536U;
 constexpr uint64_t TEST_MAX_REGISTRY_FILE_COUNT = 131072U;
+
+static_assert(std::is_same<std::underlying_type_t<ResourceStatus>, uint32_t>::value,
+              "ResourceStatus must have a stable width");
+static_assert(std::is_same<std::underlying_type_t<ResourceSourceType>, uint32_t>::value,
+              "ResourceSourceType must have a stable width");
 
 const AcCompileResourceBundleHeader* gBundleHeader = nullptr;
 uint32_t gDlopenCalls = 0U;
