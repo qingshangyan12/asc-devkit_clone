@@ -134,13 +134,13 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
 {
     ccu::Variable opType;
     opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
-    HCCL_INFO("[KFCAG_DEBUG][Dispatch] rankId[%u] rankSize[%u] channelCount[%u] opType[%u] dataType[%u]",
+    HCCL_INFO("[KFC][Dispatch] rankId[%u] rankSize[%u] channelCount[%u] opType[%u] dataType[%u]",
         ctx.arg->rankId, ctx.arg->rankSize, ctx.arg->channelCount,
         static_cast<uint32_t>(ctx.arg->opParam.opType),
         static_cast<uint32_t>(ctx.arg->opParam.DataDes.dataType));
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
     {
-<<<<<<< HEAD
+
         if (ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
             CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
                 param[KFC_CONCURRENT_AG_NHR_INPUT], param[KFC_CONCURRENT_AG_NHR_OUTPUT], ctx.token,
@@ -162,14 +162,24 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 param[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL], ctx.arg->channels, ctx.arg->channelCount,
                 static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
         }
-=======
+
+        // The AICore producer CcuPrepareForAllGatherM2M writes the queue as
+        // [0]=op, [1]=input, [2]=output, [3]=outputOffset, [4]=sliceSize,
+        // [5..8]=goSize, [9]=inputOffset, [10]=repeat, [11..12]=strides,
+        // [13]=lastSliceSize, [14]=inplace.  The memory token is immutable
+        // for the KFC server lifetime and comes from ctx.token.
+        HCCL_INFO(
+            "[KFC][AllGather][Dispatch] route queue payload to CcuKfcAllGatherMesh1DMem2MemKernel, "
+            "token=serverContext");
+
         CcuKfcAllGatherMesh1DMem2MemKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
+            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
+            param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
             param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], param[HBM_PARAM_IDX_12],
             param[HBM_PARAM_IDX_13], param[HBM_PARAM_IDX_14], ctx.arg->channels, ctx.arg->channelCount,
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
->>>>>>> f5610b3dd (test)
+
     }
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER))
     {
@@ -283,12 +293,10 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     CCU_CHK_RET(CompArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
-<<<<<<< HEAD
     CCU_CHK_RET(KfcServerGenCircularQueue(ctx));
-=======
     CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(KfcServerGenCircularQueue(ctx)); }
-    // CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
->>>>>>> ad89768df (1)
+    //CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
+
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }
