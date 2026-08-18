@@ -23,43 +23,6 @@
 namespace asc {
 namespace te {
 
-namespace detail {
-
-template <typename T, typename U>
-__simd_callee__ inline reg_tensor<T> make_arithmetic_operand(const U& value, const vector_bool& mask)
-{
-    if constexpr (is_reg_tensor_v<U>) {
-        return value;
-    } else {
-        reg_tensor<T> dst;
-        asc_duplicate_scalar(dst.reg, static_cast<T>(value), mask);
-        dst.mask = mask;
-        return dst;
-    }
-}
-
-template <typename T, typename U>
-__simd_callee__ inline vector_bool binary_mask(const T& a, const U& b)
-{
-    static_assert(is_reg_tensor_v<T> || is_reg_tensor_v<U>, "at least one operand must be reg_tensor");
-    if constexpr (is_reg_tensor_v<T>) {
-        return a.mask;
-    } else {
-        return b.mask;
-    }
-}
-
-template <typename T, typename U>
-__simd_callee__ inline void check_binary_reg_types()
-{
-    if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
-        static_assert(::AscendC::Std::is_same_v<reg_elem_t<T>, reg_elem_t<U>>,
-            "the reg_tensor operands must have the same element type");
-    }
-}
-
-} // namespace detail
-
 template <typename T>
 __simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg)
 {
@@ -155,7 +118,7 @@ __simd_callee__ inline decltype(auto) leaky_relu(const reg_tensor<T>& src_reg, c
 {
     static_assert(detail::supports_float_math_v<T>, "leaky_relu supports half and float");
     static_assert(!detail::is_reg_tensor_v<scalar_type> &&
-            ::AscendC::Std::is_convertible_v<::AscendC::Std::remove_cvref_t<scalar_type>, T>,
+            Std::is_convertible_v<Std::remove_cvref_t<scalar_type>, T>,
         "leaky_relu requires a scalar convertible to the reg_tensor element type");
     reg_tensor<T> dst;
     asc_leakyrelu(dst.reg, src_reg.reg, static_cast<T>(slope), src_reg.mask);
@@ -224,8 +187,8 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b)
     static_assert(detail::supports_add_sub_v<elem_type>, "operator- does not support this element type");
 
     vector_bool mask = detail::binary_mask(a, b);
-    auto left = detail::make_arithmetic_operand<elem_type>(a, mask);
-    auto right = detail::make_arithmetic_operand<elem_type>(b, mask);
+    auto left = detail::make_reg_operand<elem_type>(a, mask);
+    auto right = detail::make_reg_operand<elem_type>(b, mask);
     reg_tensor<elem_type> dst;
     asc_sub(dst.reg, left.reg, right.reg, mask);
     dst.mask = mask;
@@ -300,8 +263,8 @@ __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
     static_assert(detail::supports_div_v<elem_type>, "operator/ does not support this element type");
 
     vector_bool mask = detail::binary_mask(a, b);
-    auto left = detail::make_arithmetic_operand<elem_type>(a, mask);
-    auto right = detail::make_arithmetic_operand<elem_type>(b, mask);
+    auto left = detail::make_reg_operand<elem_type>(a, mask);
+    auto right = detail::make_reg_operand<elem_type>(b, mask);
     reg_tensor<elem_type> dst;
     asc_div(dst.reg, left.reg, right.reg, mask);
     dst.mask = mask;
@@ -336,8 +299,8 @@ __simd_callee__ inline decltype(auto) min(const T& a, const U& b)
     static_assert(detail::supports_min_max_v<elem_type>, "min does not support this element type");
 
     vector_bool mask = detail::binary_mask(a, b);
-    auto left = detail::make_arithmetic_operand<elem_type>(a, mask);
-    auto right = detail::make_arithmetic_operand<elem_type>(b, mask);
+    auto left = detail::make_reg_operand<elem_type>(a, mask);
+    auto right = detail::make_reg_operand<elem_type>(b, mask);
     reg_tensor<elem_type> dst;
     asc_min(dst.reg, left.reg, right.reg, mask);
     dst.mask = mask;

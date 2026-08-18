@@ -60,6 +60,39 @@ struct binary_elem_type<T, U, true> {
 template <typename T, typename U>
 using binary_elem_t = typename binary_elem_type<T, U>::type;
 
+template <typename T, typename U>
+__simd_callee__ inline reg_tensor<T> make_reg_operand(const U& value, const vector_bool& mask)
+{
+    if constexpr (is_reg_tensor_v<U>) {
+        return value;
+    } else {
+        reg_tensor<T> dst;
+        asc_duplicate_scalar(dst.reg, static_cast<T>(value), mask);
+        dst.mask = mask;
+        return dst;
+    }
+}
+
+template <typename T, typename U>
+__simd_callee__ inline vector_bool binary_mask(const T& a, const U& b)
+{
+    static_assert(is_reg_tensor_v<T> || is_reg_tensor_v<U>, "at least one operand must be reg_tensor");
+    if constexpr (is_reg_tensor_v<T>) {
+        return a.mask;
+    } else {
+        return b.mask;
+    }
+}
+
+template <typename T, typename U>
+__simd_callee__ inline void check_binary_reg_types()
+{
+    if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
+        static_assert(Std::is_same_v<reg_elem_t<T>, reg_elem_t<U>>,
+            "the reg_tensor operands must have the same element type");
+    }
+}
+
 template <typename T>
 inline constexpr bool supports_abs_v =
     ::AscendC::Std::is_one_of_v<T, int8_t, int16_t, half, int32_t, float>;
