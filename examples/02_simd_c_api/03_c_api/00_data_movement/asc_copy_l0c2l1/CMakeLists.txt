@@ -12,6 +12,7 @@ cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
+set(SCENARIO_NUM 1 CACHE STRING "Example scenario: 1")
 
 find_package(ASC REQUIRED)
 
@@ -23,6 +24,10 @@ endif()
 
 if(NOT CMAKE_ASC_RUN_MODE MATCHES "^(npu|sim)$")
     message(FATAL_ERROR "CMAKE_ASC_RUN_MODE must be npu or sim, but got ${CMAKE_ASC_RUN_MODE}.")
+endif()
+
+if(NOT SCENARIO_NUM STREQUAL "1")
+    message(FATAL_ERROR "This example only supports SCENARIO_NUM=1.")
 endif()
 
 add_executable(demo asc_copy_l0c2l1_arch_3510.asc)
