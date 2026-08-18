@@ -53,11 +53,11 @@ x \* y+ z的值。本接口不受全局饱和模式影响，特殊值如下：
 | --- | --- | --- | --- |
 | ±inf | ±0 | — | nan |
 | ±0 | ±inf | — | nan |
-| x*y = inf | -inf | nan |  |
-| x*y = -inf | inf | nan |  |
-| x*y+z超出ASCRT_MAX_NORMAL_BF16 | inf |  |  |
-| x*y+z小于-ASCRT_MAX_NORMAL_BF16 | -inf |  |  |
-| x、y、z任意一个为nan | nan |  |  |
+| x*y = inf | — | -inf | nan |
+| x*y = -inf | — | inf | nan |
+| x*y+z超出ASCRT_MAX_NORMAL_BF16 | — | — | inf |
+| x*y+z小于-ASCRT_MAX_NORMAL_BF16 | — | — | -inf |
+| x、y、z任意一个为nan | — | — | nan |
 
 ## 约束说明
 
