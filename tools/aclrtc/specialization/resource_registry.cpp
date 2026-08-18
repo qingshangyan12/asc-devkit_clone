@@ -1287,7 +1287,7 @@ ResourceEntry* ResourceRegistry::FindResource(const std::string& resourceId) noe
     return builtIn == builtInResources_.end() ? nullptr : builtIn->second.get();
 }
 
-bool ResourceRegistry::HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed)
+bool ResourceRegistry::HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed) const
 {
     for (const auto& item : incoming) {
         const auto existing = committed.find(item.first);

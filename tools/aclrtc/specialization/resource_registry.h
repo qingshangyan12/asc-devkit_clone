@@ -153,7 +153,7 @@ private:
     ResourceEntry* FindResource(const std::string& resourceId) noexcept;
     ResourceStatus Materialize(const std::string& resourceId, const ResourceEntry& entry, ResourceData& resource);
     ResourceStatus Commit(StageState& stage);
-    bool HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed);
+    bool HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed) const;
 
     std::string temporaryRoot_;
     ResourceStore externalResources_;
