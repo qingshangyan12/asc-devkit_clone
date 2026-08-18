@@ -43,14 +43,16 @@ inline half __float2half_rn(const float x)
 
 ## 返回值说明
 
-输入遵循CAST\_RINT模式转换成的半精度浮点数。特殊值如下：
+输入遵循CAST\_RINT模式转换成的半精度浮点数。本接口受全局饱和寄存器的影响，特殊值如下：
 
-| x值 | 返回值 |
-| --- | --- |
-| ±0 | ±0 |
-| nan | 0 |
-| inf | ASCRT\_MAX\_NORMAL\_FP16 |
-| -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
+| x值 | 非饱和模式返回值 | 饱和模式返回值 |
+| --- | --- | --- |
+| ±0 | ±0 | ±0 |
+| nan | nan | 0 |
+| inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| -inf | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
+| x>ASCRT\_MAX\_NORMAL\_FP16 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| x<-ASCRT\_MAX\_NORMAL\_FP16 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 
