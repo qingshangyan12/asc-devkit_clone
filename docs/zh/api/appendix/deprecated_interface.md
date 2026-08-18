@@ -190,6 +190,26 @@
 <!-- npu="950" id8 -->
 ### Reg矢量计算
 
+- [asc_float2bfloat16](../SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md)接口（旧三参数及位置后缀原型）
+
+    旧原型已废弃，请使用[asc_float2bfloat16](../SIMD-API/c_api/reg/data_type_convert/asc_float2bfloat16.md)的显式位置参数重载。
+
+- [asc_int322int16](../SIMD-API/c_api/deprecated_interface/asc_int322int16_deprecated.md)接口（旧三参数及位置后缀原型）
+
+    旧原型已废弃，请使用[asc_int322int16](../SIMD-API/c_api/reg/data_type_convert/asc_int322int16.md)的显式位置参数重载。
+
+- [asc_int322int64](../SIMD-API/c_api/deprecated_interface/asc_int322int64_deprecated.md)接口（旧三参数及位置后缀原型）
+
+    旧原型已废弃，请使用[asc_int322int64](../SIMD-API/c_api/reg/data_type_convert/asc_int322int64.md)的显式位置参数重载。
+
+- [asc_int322uint16](../SIMD-API/c_api/deprecated_interface/asc_int322uint16_deprecated.md)接口（旧三参数及位置后缀原型）
+
+    旧原型已废弃，请使用[asc_int322uint16](../SIMD-API/c_api/reg/data_type_convert/asc_int322uint16.md)的显式位置参数重载。
+
+- [asc_uint82uint16](../SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md)接口（旧三参数及位置后缀原型）
+
+    旧原型已废弃，请使用[asc_uint82uint16](../SIMD-API/c_api/reg/data_type_convert/asc_uint82uint16.md)的显式位置参数重载。
+
 - [asc_squeeze_v2](../SIMD-API/c_api/reg/compare_and_select/asc_squeeze_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_squeeze_and_storeunalign](../SIMD-API/c_api/reg/reg_store/asc_squeeze_and_storeunalign.md)接口。
