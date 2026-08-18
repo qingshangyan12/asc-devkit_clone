@@ -50,7 +50,9 @@ inline long long int __bfloat162ll_rd(const bfloat16_t x)
 | ±0 | 0 |
 | nan | 0 |
 | inf | 9223372036854775807（INT64_MAX） |
+| ASCRT_MAX_NORMAL_BF16 | 9223372036854775807（INT64_MAX） |
 | -inf | -9223372036854775808（INT64_MIN） |
+| -ASCRT_MAX_NORMAL_BF16 | -9223372036854775808（INT64_MIN） |
 
 ## 约束说明
 
