@@ -70,10 +70,12 @@ inline bfloat16_t __ll2bfloat16_rna(const long long int x)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__ll2bfloat16_rna(bfloat16_t* dst, int64_t* x)
+    __global__ __launch_bounds__(1024) void kernel__ll2bfloat16_rna(bfloat16_t* dst, int64_t* x, int64_t n)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = __ll2bfloat16_rna(x[idx]);
+        if (idx < n) {
+            dst[idx] = __ll2bfloat16_rna(x[idx]);
+        }
     }
     ```
 
