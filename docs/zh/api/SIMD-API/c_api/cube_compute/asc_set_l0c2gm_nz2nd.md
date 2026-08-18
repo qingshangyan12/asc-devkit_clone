@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-本接口用于在L0C Buffer搬出接口启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。
+本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_data_move/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_data_move/asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。
 
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
 
@@ -45,8 +45,8 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num,
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | nd_num | 输入 | ND矩阵的数量，取值范围为[1, 65535]。 |
-| src_nd_stride | 输入 | 源相邻Nz矩阵之间的偏移（相邻Nz矩阵头与头的间隔）。当nd_num配置为1时，src_nd_stride不生效，配置为0即可。取值范围为[0, 65535]，单位为C0_Size（`16 * sizeof(dtype)`，`dtype`为L0C Buffer上数据的类型）。 |
-| dst_nd_stride | 输入 | 目的相邻ND矩阵之间的偏移（相邻ND矩阵头与头的间隔）。当nd_num配置为1时，dst_nd_stride不生效，配置为0即可。取值范围为[0, 65535]，单位为element。 |
+| src_nd_stride | 输入 | 源相邻Nz矩阵之间的偏移（相邻Nz矩阵头与头的间隔）。当nd_num配置为1时，src_nd_stride不生效，配置为0即可。取值范围为[0, 65535]，单位为64字节（`16 × sizeof(dtype)`，`dtype`为L0C Buffer上数据的类型，支持`float`和`int32_t`）。 |
+| dst_nd_stride | 输入 | 目的相邻ND矩阵之间的偏移（相邻ND矩阵头与头的间隔）。当nd_num配置为1时，dst_nd_stride不生效，配置为0即可。取值范围为[0, 2^32-1]，单位为element。 |
 
 ## 返回值说明
 
@@ -59,7 +59,7 @@ PIPE_S
 ## 约束说明
 
 - 本接口仅在AIC上生效，在AIV上调用将直接返回。
-- 调用L0C Buffer搬出接口并且需要进行随路Nz转ND格式之前，必须先调用本接口配置格式转换参数。
+- 调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_data_move/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_data_move/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND格式之前，必须先调用本接口配置格式转换参数。
 
 <!-- npu="950" id8 -->
 ## 调用示例

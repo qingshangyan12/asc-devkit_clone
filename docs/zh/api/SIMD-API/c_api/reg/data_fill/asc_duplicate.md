@@ -32,8 +32,6 @@
 
 ## 函数原型
 
-**占位符形式：**
-
 ```c
 __simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,
                                           vector_<dtype> src,
@@ -43,6 +41,14 @@ __simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,
 **dtype支持的数据类型：**
 
 dtype可取的数据类型为`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+**典型示例：**
+
+```c
+__simd_callee__ inline void asc_duplicate(vector_int8_t& dst,
+                                          vector_int8_t src,
+                                          vector_bool mask)
+```
 
 ## 参数说明
 
@@ -63,7 +69,6 @@ dtype可取的数据类型为`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t
 ## 约束说明
 
 - 本接口为Reg矢量计算接口，只能在使用`__simd_vf__`标记的VF函数内调用，不支持在`__aicore__`函数中直接调用，仅在AIV上生效，在AIC上调用将直接返回。
-- dst和src的数据类型需要保持一致，仅支持[函数原型](#函数原型)中列出的数据类型。其他数据类型组合无法匹配函数重载，编译不通过。
 - 同一寄存器的数据依赖由硬件保序，无需额外插入同步指令。本接口与前后Reg数据搬运接口之间，如果不同寄存器访问同一UB地址且存在写后读或写后写依赖，需要调用[asc_mem_bar](../sync_control/asc_mem_bar.md)进行同步。
 - 使用mask前，需要通过掩码设置或搬入接口完成初始化；未初始化的掩码寄存器内容不确定。
 - mask仅筛选dst中写入广播值的位置，不筛选src中的元素。无论mask的最低位是否有效，待广播的数据均为src的最低位元素。
@@ -85,7 +90,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <cstdint>
 #include <iostream>
 #include <vector>
-
 #include "c_api/asc_simd.h"
 #include "acl/acl.h"
 
@@ -186,8 +190,8 @@ int main()
     print_data("Golden highest + zero", golden, HIGHEST_ZERO_OFFSET);
     print_data("Golden highest + merge", golden, HIGHEST_MERGE_OFFSET);
     const bool passed = output == golden;
-    std::cout << (passed ? "[Success] asc_duplicate highest modes passed."
-                        : "[Failed] asc_duplicate highest modes failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_duplicate passed."
+                        : "[Failed] asc_duplicate failed.") << std::endl;
     aclrtFree(dst_device);
     aclrtFree(src_device);
     aclrtResetDevice(0);

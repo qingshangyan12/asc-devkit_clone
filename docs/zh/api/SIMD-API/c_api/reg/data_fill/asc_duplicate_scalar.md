@@ -35,8 +35,6 @@
 
 ## 函数原型
 
-**占位符形式：**
-
 - 带mask
 
     ```c
@@ -55,6 +53,23 @@
     ```
 
     dtype可取的数据类型为`int8_t`、`uint8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+**典型示例：**
+
+- 带mask
+
+    ```c
+    __simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst,
+                                                     int8_t value,
+                                                     vector_bool mask)
+    ```
+
+- 不带mask
+
+    ```c
+    __simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst,
+                                                     int8_t value)
+    ```
 
 ## 参数说明
 
@@ -75,7 +90,6 @@
 ## 约束说明
 
 - 本接口为Reg矢量计算接口，只能在使用`__simd_vf__`标记的VF函数内调用，不支持在`__aicore__`函数中直接调用，仅在AIV上生效，在AIC上调用将直接返回。
-- 函数重载由dst的元素数据类型确定，支持的数据类型请参见[函数原型](#函数原型)。value实参的数据类型不同时，需要能够隐式转换为该重载对应的标量类型；建议传入相同数据类型，避免隐式转换导致精度损失或溢出。无法隐式转换时，编译不通过。
 - 同一寄存器的数据依赖由硬件保序，无需额外插入同步指令。本接口与前后Reg数据搬运接口之间，如果不同寄存器访问同一UB地址且存在写后读或写后写依赖，需要调用[asc_mem_bar](../sync_control/asc_mem_bar.md)进行同步。
 - 使用mask前，需要通过掩码设置或搬入接口完成初始化；未初始化的掩码寄存器内容不确定。
 
@@ -96,7 +110,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <cstdint>
 #include <iostream>
 #include <vector>
-
 #include "c_api/asc_simd.h"
 #include "acl/acl.h"
 
@@ -115,28 +128,21 @@ void print_data(const char* label, const std::vector<T>& values, uint32_t offset
 constexpr uint32_t ELEMENT_COUNT = 64;
 constexpr float FILL_VALUE = 3.5f;
 
-__simd_vf__ inline void fill(__ubuf__ float* dst, __ubuf__ float* src)
+__simd_vf__ inline void duplicate_scalar_modes(__ubuf__ float* dst)
 {
     vector_float dst_reg;
-    vector_float src_reg;
     uint32_t count = ELEMENT_COUNT;
     vector_bool mask = asc_update_mask_b32(count);
     asc_loadalign(dst_reg, dst);
-    asc_loadalign(src_reg, src);
     asc_duplicate_scalar(dst_reg, FILL_VALUE, mask);
     asc_storealign(dst, dst_reg, mask);
 }
 
-__global__ __vector__ void asc_duplicate_scalar_kernel(__gm__ float* dst, __gm__ float* src)
+__global__ __vector__ void asc_duplicate_scalar_kernel(__gm__ float* dst)
 {
     asc_init();
     __ubuf__ float dst_local[ELEMENT_COUNT];
-    __ubuf__ float src_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(dst_local, dst, sizeof(dst_local));
-    asc_copy_gm2ub_align(src_local, src, sizeof(src_local));
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    fill(dst_local, src_local);
+    duplicate_scalar_modes(dst_local);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(dst, dst_local, sizeof(dst_local));
@@ -153,26 +159,21 @@ int main()
 
     aclInit(nullptr);
     aclrtSetDevice(0);
-    float *src_device = nullptr, *dst_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&src_device), src.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    float *dst_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&dst_device), output.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(src_device, src.size() * sizeof(float), src.data(), src.size() * sizeof(float),
-        ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(dst_device, output.size() * sizeof(float), output.data(), output.size() * sizeof(float),
         ACL_MEMCPY_HOST_TO_DEVICE);
-    asc_duplicate_scalar_kernel<<<1, 0>>>(dst_device, src_device);
+    asc_duplicate_scalar_kernel<<<1, 0>>>(dst_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
 
-    print_data("Input", src);
     print_data("Output", output);
     print_data("Golden", golden);
     const bool passed = output == golden;
     std::cout << (passed ? "[Success] asc_duplicate_scalar passed."
                         : "[Failed] asc_duplicate_scalar failed.") << std::endl;
     aclrtFree(dst_device);
-    aclrtFree(src_device);
     aclrtResetDevice(0);
     aclFinalize();
     return passed ? 0 : 1;
