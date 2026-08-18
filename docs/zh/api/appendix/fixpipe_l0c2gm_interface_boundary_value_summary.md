@@ -94,3 +94,67 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 | int4b\_t | VREQ4 | 量化后小于-8 | -8（MIN） |
 
 注：整数类型只有饱和模式，溢出时饱和为目标类型的最值。half和bfloat16\_t在饱和模式和非饱和模式下均对溢出值进行饱和处理。
+
+## 量化模式说明
+
+asc\_copy\_l0c2gm接口支持如下随路量化模式，scalar模式使用单个标量量化参数，tensor模式使用每列独立的量化参数：
+
+**表3** 量化模式说明
+
+<a name="table_fixpipe_l0c2gm_quant_mode"></a>
+
+| 源数据类型 | 量化模式 | 目标数据类型 | 量化方式 | 说明 |
+| --- | --- | --- | --- | --- |
+| - | NoQuant | - | 不量化 | 不开启量化功能 |
+| int32\_t | DEQF16 | half | scalar | int32\_t量化成half |
+| int32\_t | VDEQF16 | half | tensor | int32\_t量化成half |
+| int32\_t | REQ4 | int4b\_t | scalar | int32\_t量化成int4b\_t |
+| int32\_t | VREQ4 | int4b\_t | tensor | int32\_t量化成int4b\_t |
+| int32\_t | REQ8 | int8\_t、uint8\_t | scalar | int32\_t量化成int8\_t/uint8\_t |
+| int32\_t | VREQ8 | int8\_t、uint8\_t | tensor | int32\_t量化成int8\_t/uint8\_t |
+| int32\_t | QS322BF16\_PRE | bfloat16\_t | scalar | int32\_t量化成bfloat16\_t |
+| int32\_t | VQS322BF16\_PRE | bfloat16\_t | tensor | int32\_t量化成bfloat16\_t |
+| float | QF322F16\_PRE | half | scalar | float量化成half |
+| float | VQF322F16\_PRE | half | tensor | float量化成half |
+| float | QF322BF16\_PRE | bfloat16\_t | scalar | float量化成bfloat16\_t |
+| float | VQF322BF16\_PRE | bfloat16\_t | tensor | float量化成bfloat16\_t |
+| float | F322F16 | half | cast | float cast成half，cast mode为CAST\_RINT模式 |
+| float | F322BF16 | bfloat16\_t | cast | float cast成bfloat16\_t，cast mode为CAST\_RINT模式 |
+| float | QF322S4\_PRE | int4b\_t | scalar | float量化成int4b\_t |
+| float | VQF322S4\_PRE | int4b\_t | tensor | float量化成int4b\_t |
+| float | QF322B8\_PRE | int8\_t、uint8\_t | scalar | float量化成int8\_t/uint8\_t |
+| float | VQF322B8\_PRE | int8\_t、uint8\_t | tensor | float量化成int8\_t/uint8\_t |
+| float | QF322FP8\_PRE | fp8\_e4m3fn\_t | scalar | float量化成fp8\_e4m3fn\_t |
+| float | VQF322FP8\_PRE | fp8\_e4m3fn\_t | tensor | float量化成fp8\_e4m3fn\_t |
+| float | QF322HIF8\_PRE | hifloat8\_t | scalar | float量化成hifloat8\_t，Half to Away舍入 |
+| float | VQF322HIF8\_PRE | hifloat8\_t | tensor | float量化成hifloat8\_t，Half to Away舍入 |
+| float | QF322HIF8\_PRE\_HYBRID | hifloat8\_t | scalar | float量化成hifloat8\_t，Hybrid舍入 |
+| float | VQF322HIF8\_PRE\_HYBRID | hifloat8\_t | tensor | float量化成hifloat8\_t，Hybrid舍入 |
+| float | QF322F32\_PRE | float | scalar | float量化成float，精度可达双千分之一，无法达双万分之一，有双万分之一精度要求时建议使用AscendDeQuant高阶API |
+| float | VQF322F32\_PRE | float | tensor | 同上 |
+
+注：同一输出类型的scalar模式与tensor模式使用相同的类型转换算法，inf/nan边界值处理行为完全一致，差异仅在于量化参数的传递方式（单个标量 vs 每列张量）。NoQuant模式不做类型转换和量化，数据原样搬运，float类型的inf/nan保持原样输出。L0C→GM与L0C→UB/L0C→L1的随路量化模式及inf/nan处理行为完全一致。
+
+## 测试验证
+
+以上边界值汇总通过[data_copy_l0c2gm样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2gm)的边界测试脚本`scripts/test_boundary.sh`在NPU上实测验证，结果为**34/34项全部通过**。共覆盖17种量化场景×2种饱和模式（饱和/非饱和）= 34项测试。
+
+| 场景范围 | 场景数 | 测试模式 | 测试项 | 说明 |
+| --- | --- | --- | --- | --- |
+| 1-2（int32→half） | 2 | 饱和+非饱和 | 4 | DEQF16/VDEQF16，int8输入场景 |
+| 3-4（float→int8） | 2 | 饱和+非饱和 | 4 | QF322B8\_PRE/VQF322B8\_PRE，half输入场景 |
+| 5-6（int32→int8） | 2 | 饱和+非饱和 | 4 | REQ8/VREQ8，int8输入场景 |
+| 7（int32→int4b） | 1 | 饱和+非饱和 | 2 | VREQ4，int8输入场景 |
+| 8（int32→bf16） | 1 | 饱和+非饱和 | 2 | VQS322BF16\_PRE，int8输入场景 |
+| 9（float→half） | 1 | 饱和+非饱和 | 2 | VQF322F16\_PRE |
+| 10（float→bf16） | 1 | 饱和+非饱和 | 2 | VQF322BF16\_PRE |
+| 11（float→int4b） | 1 | 饱和+非饱和 | 2 | VQF322S4\_PRE |
+| 12（float→fp8） | 1 | 饱和+非饱和 | 2 | VQF322FP8\_PRE |
+| 13-14（float→hif8） | 2 | 饱和+非饱和 | 4 | VQF322HIF8\_PRE/VQF322HIF8\_PRE\_HYBRID |
+| 15（float→float） | 1 | 饱和+非饱和 | 2 | VQF322F32\_PRE |
+| 16-17（float→half/bf16 cast） | 2 | 饱和+非饱和 | 4 | F322F16/F322BF16 cast模式 |
+| **合计** | **17** | | **34** | |
+
+测试通过向输入矩阵A注入inf/-inf/nan（配合B矩阵对应行设为1.0），使L0C = A×B中产生inf/-inf/nan，验证各输出类型在饱和模式和非饱和模式下的inf/nan处理是否符合预期。对于int8\_t输入场景，使用极端值（A某行设为-128、其余设为127）验证整数溢出饱和行为。
+
+L0C→GM接口直接将L0C Buffer数据搬运到GM，无需中转路径，因此非饱和模式下inf/nan能完整传递到GM输出，无验证路径限制。L0C→GM与L0C→UB/L0C→L1的随路量化inf/nan处理行为完全一致，边界值数据可参考[Fixpipe(L0C→UB)接口边界值汇总](fixpipe_l0c2ub_interface_boundary_value_summary.md)和[Fixpipe(L0C→L1)接口边界值汇总](fixpipe_l0c2l1_interface_boundary_value_summary.md)。
