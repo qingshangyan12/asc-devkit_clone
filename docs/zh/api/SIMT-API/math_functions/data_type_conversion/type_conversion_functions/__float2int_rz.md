@@ -94,4 +94,9 @@ inline int __float2int_rz(const float x)
     {
         asc_vf_call<kernel__float2int_rz>(dim3(256), dst, x);
     }
+
+    __global__ __vector__ void run_kernel__float2int_rz(__gm__ int32_t* dst, __gm__ float* x)
+    {
+        asc_vf_call<kernel__float2int_rz>(dim3(256), dst, x);
+    }
     ```
