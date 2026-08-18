@@ -32,7 +32,16 @@ endif()
 
 add_executable(demo data_copy_l0c2gm.asc)
 
+get_filename_component(ASC_DEVKIT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../../.." ABSOLUTE)
+target_include_directories(demo BEFORE PRIVATE
+    "${ASC_DEVKIT_ROOT}"
+    "${ASC_DEVKIT_ROOT}/include"
+)
+
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+target_compile_definitions(demo PRIVATE ASCENDC_DUMP=0)
 target_compile_options(demo PRIVATE
+    $<$<COMPILE_LANGUAGE:ASC>:-iquote${ASC_DEVKIT_ROOT}>
+    $<$<COMPILE_LANGUAGE:ASC>:-iquote${ASC_DEVKIT_ROOT}/include>
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )

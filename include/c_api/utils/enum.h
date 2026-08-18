@@ -14,10 +14,10 @@
 #include <cstdint>
 #include <type_traits>
 
-#define RELU_POST_DEFAULT 0
-#define CLIP_RELU_POST_DEFAULT 0
-#define ELTWISE_OP_DEFAULT 0
-#define QUANT_POST_DEFAULT 0
+constexpr uint8_t RELU_POST_DEFAULT = 0;
+constexpr bool CLIP_RELU_POST_DEFAULT = false;
+constexpr uint8_t ELTWISE_OP_DEFAULT = 0;
+constexpr uint64_t QUANT_POST_DEFAULT = 0;
 
 enum class asc_load_l2_cache_mode : uint8_t {
     NORMAL_FIRST_VICTIM = 0,
@@ -69,29 +69,10 @@ enum class asc_relu_pre_mode : uint8_t {
     NONE = 0,
     NORMAL = 1,
     SCALAR = 2,
-<<<<<<< HEAD
-    VECTOR = 3
-=======
     VECTOR = 3,
-    PIECEWISE_LINEAR = 4
 };
 
 using asc_quant_mode = QuantMode_t;
-
-enum class asc_hf32_round_mode : uint8_t { NEAREST_ZERO, NEAREST_EVEN };
-
-enum class asc_position_mode { EVEN = 0, ODD };
-
-constexpr std::integral_constant<asc_position_mode, asc_position_mode::EVEN> ASC_POSITION_EVEN;
-constexpr std::integral_constant<asc_position_mode, asc_position_mode::ODD> ASC_POSITION_ODD;
-
-enum class asc_position_quarter_mode {
-    DISPERSE_FIRST_QUARTER = 0,
-    DISPERSE_SECOND_QUARTER,
-    DISPERSE_THIRD_QUARTER,
-    DISPERSE_FOURTH_QUARTER
->>>>>>> ccaaad7d3 (修改入参类型)
-};
 
 constexpr std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
     ASC_DISPERSE_FIRST_QUARTER;
