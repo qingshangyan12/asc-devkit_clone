@@ -14,7 +14,7 @@
 
 namespace mc2_ops_hccl {
 
-// 最多支持 8 * 16 = 128 个 rank 的 unroll 展开（与 hccl 独立仓保持一致）
+// 每轮最多展开 16 次 Write/GroupCopy/Wait 三阶段流水。
 constexpr uint32_t AG_M2M_UNROLL_NUM = 16;
 
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
