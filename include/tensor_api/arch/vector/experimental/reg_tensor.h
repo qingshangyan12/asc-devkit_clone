@@ -36,7 +36,7 @@ struct reg_tensor {
     template <typename ScalarType>
     __simd_callee__ inline reg_tensor& operator=(ScalarType src)
     {
-        if constexpr (IsSameType<ActualT, bool>::value) {
+        if constexpr (AscendC::Std::is_same_v<DataType, bool>) {
             asc_duplicate_scalar((reg_tensor<int8_t>&)dstReg, (int8_t)scalarValue, mask);
         } else {
             asc_duplicate_scalar(reg, static_cast<DataType>(src), mask);
