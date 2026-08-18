@@ -16,12 +16,56 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
+#include <atomic>
 #include <cerrno>
+#include <cstdlib>
 #include <fstream>
+#include <new>
 #include <string>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+namespace {
+std::atomic<bool> gRejectTestAllocations {false};
+
+void* AllocateTestMemory(std::size_t byteCount) noexcept
+{
+    if (gRejectTestAllocations.load(std::memory_order_relaxed)) {
+        return nullptr;
+    }
+    return std::malloc(byteCount == 0U ? 1U : byteCount);
+}
+}
+
+void* operator new(std::size_t byteCount)
+{
+    void* allocation = AllocateTestMemory(byteCount);
+    if (allocation == nullptr) {
+        throw std::bad_alloc();
+    }
+    return allocation;
+}
+
+void operator delete(void* allocation) noexcept
+{
+    std::free(allocation);
+}
+
+void operator delete(void* allocation, std::size_t) noexcept
+{
+    std::free(allocation);
+}
+
+void* operator new(std::size_t byteCount, const std::nothrow_t&) noexcept
+{
+    return AllocateTestMemory(byteCount);
+}
+
+void operator delete(void* allocation, const std::nothrow_t&) noexcept
+{
+    std::free(allocation);
+}
 
 namespace {
 namespace fs = boost::filesystem;
@@ -148,6 +192,30 @@ TEST(KernelSpecializationDiagnosticsTest, ReportsDiagnosticDirectoryCreationFail
         KernelSpecializationDiagnostics diagnostics("session_error", DiagnosticCollectionMode::Enabled);
         EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
             (testRoot / "kernel_meta" / std::to_string(getpid()) / "aclrtc_session_error").string()));
+    }
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationDiagnosticsTest, NoexceptFailureLoggingDoesNotAllocateASecondPath)
+{
+    static uint64_t sequence = 0U;
+    const fs::path testRoot = fs::temp_directory_path() /
+                              ("aclrtc_diagnostics_noexcept_test_" + std::to_string(getpid()) + "_" +
+                               std::to_string(sequence++));
+    fs::create_directories(testRoot);
+    {
+        ScopedCurrentDirectory currentDirectory(testRoot);
+        KernelSpecializationDiagnostics diagnostics("session_noexcept", DiagnosticCollectionMode::Enabled);
+        const nlohmann::json manifest {{"schema_version", "1.0"}};
+        EXPECT_EXIT(
+            {
+                gRejectTestAllocations.store(true, std::memory_order_relaxed);
+                diagnostics.WriteManifestSnapshot(manifest);
+                _exit(0);
+            },
+            ::testing::ExitedWithCode(0), "");
     }
 
     boost::system::error_code ignoredError;

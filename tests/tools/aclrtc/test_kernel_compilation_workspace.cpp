@@ -15,8 +15,10 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
+#include <csignal>
 #include <fstream>
 #include <string>
+#include <sys/resource.h>
 #include <unistd.h>
 
 namespace {
@@ -103,6 +105,42 @@ TEST(KernelCompilationWorkspaceTest, ReportsUnreadablePatchFileWithSystemReason)
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(missingSourcePath.string()));
     EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("message="));
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(worktreePath, ignoredError);
+}
+
+TEST(KernelCompilationWorkspaceTest, PreservesOriginalSourceWhenFinalPatchFlushFails)
+{
+    const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_patch_flush_failure");
+    const fs::path sourcePath = worktreePath / "resources/constants.h";
+    WriteFile(sourcePath, "VALUE=@@VALUE@@;\n");
+    KernelCompilationPlan plan;
+    plan.sourcePatches = {{sourcePath, "@@VALUE@@", "{0x01}"}};
+
+    struct rlimit originalFileSizeLimit {};
+    ASSERT_EQ(getrlimit(RLIMIT_FSIZE, &originalFileSizeLimit), 0);
+    struct sigaction ignoreFileSizeSignal {};
+    struct sigaction originalFileSizeSignal {};
+    ignoreFileSizeSignal.sa_handler = SIG_IGN;
+    ASSERT_EQ(sigemptyset(&ignoreFileSizeSignal.sa_mask), 0);
+    ASSERT_EQ(sigaction(SIGXFSZ, &ignoreFileSizeSignal, &originalFileSizeSignal), 0);
+    struct rlimit zeroFileSizeLimit = originalFileSizeLimit;
+    zeroFileSizeLimit.rlim_cur = 0;
+    ASSERT_EQ(setrlimit(RLIMIT_FSIZE, &zeroFileSizeLimit), 0);
+
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
+    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    const aclError patchResult = workspace.CreateOutputDirectoriesAndApplySourcePatches(plan);
+
+    const int restoreLimitResult = setrlimit(RLIMIT_FSIZE, &originalFileSizeLimit);
+    const int restoreSignalResult = sigaction(SIGXFSZ, &originalFileSizeSignal, nullptr);
+    ASSERT_EQ(restoreLimitResult, 0);
+    ASSERT_EQ(restoreSignalResult, 0);
+    EXPECT_EQ(patchResult, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(ReadFile(sourcePath), "VALUE=@@VALUE@@;\n");
+    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
+        "Failed to finalize temporary source patch file"));
 
     boost::system::error_code ignoredError;
     fs::remove_all(worktreePath, ignoredError);
