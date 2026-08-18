@@ -49,7 +49,8 @@ inline half hrcp(half x)
 
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
-| ±0 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| 0 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| -0 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 | nan | nan | 0 |
 | inf | 0 | 0 |
 | -inf | -0 | -0 |
