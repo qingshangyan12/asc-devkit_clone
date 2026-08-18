@@ -49,11 +49,11 @@ inline half __ull2half_rd(const unsigned long long int x)
 | 0 | 0 | 0 |
 | 2049 | 2048 | 2048 |
 | 4097 | 4096 | 4096 |
-| 8193 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
+| 8193 | 8192 | 8192 |
 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 | 65505 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 | x≥65535 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
-| 9223372036854775807（long long最大值） | inf | 9223372036854775807（long long最大值） |
+| 9223372036854775807（long long最大值） | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 
