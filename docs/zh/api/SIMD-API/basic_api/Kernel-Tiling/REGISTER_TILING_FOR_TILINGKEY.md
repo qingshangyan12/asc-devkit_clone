@@ -27,6 +27,8 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001526206862_section212607105720"></a>
 
+头文件路径为：`"basic_api/kernel_utils_macros.h"`。
+
 用于在kernel侧注册与TilingKey相匹配的TilingData自定义结构体；该接口需提供一个逻辑表达式，逻辑表达式以字符串“TILING\_KEY\_VAR”代指实际TilingKey，表达TilingKey所满足的范围。
 
 ## 函数原型<a name="zh-cn_topic_0000001526206862_section1630753514297"></a>

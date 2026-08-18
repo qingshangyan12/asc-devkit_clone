@@ -27,6 +27,8 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001610027821_section212607105720"></a>
 
+头文件路径为：`"basic_api/kernel_utils_macros.h"`。
+
 TILING\_KEY\_LIST函数用于在核函数（Kernel）中判断当前执行的TilingKey是否与Host侧配置的指定TilingKey匹配，从而标识满足TilingKey == key1或TilingKey == key2条件的分支逻辑。
 
 ## 函数原型<a name="zh-cn_topic_0000001610027821_section1630753514297"></a>
@@ -109,4 +111,3 @@ ge::graphStatus TilingFunc(gert::TilingContext* context)
     }
 }
 ```
-
