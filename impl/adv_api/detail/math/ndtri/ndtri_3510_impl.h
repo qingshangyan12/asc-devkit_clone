@@ -56,8 +56,37 @@ __simd_callee__ inline void MulAdds(
     Reg::Adds(dstReg, dstReg, scalar, mask);
 }
 
-__simd_callee__ inline void ComputeCenterSeries(
-    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& qReg, Reg::MaskReg mask)
+__simd_callee__ inline void ComputeCenterSeriesPart1(
+    Reg::RegTensor<float>& seriesReg, Reg::RegTensor<float>& xSquaredReg, Reg::MaskReg mask)
+{
+    constexpr float c12 = 0.020606780424714088f;
+    constexpr float c13 = 0.018918218091130257f;
+    constexpr float c14 = 0.017476370558142662f;
+    constexpr float c15 = 0.01623150147497654f;
+    constexpr float c16 = 0.015146315097808838f;
+    constexpr float c17 = 0.014192315749824047f;
+    constexpr float c18 = 0.013347364030778408f;
+    constexpr float c19 = 0.012594005092978477f;
+    constexpr float c20 = 0.011918296106159687f;
+    constexpr float c21 = 0.011308969929814339f;
+    constexpr float c22 = 0.010756825096905231f;
+    constexpr float c23 = 0.010254274122416973f;
+    Reg::Duplicate(seriesReg, c23, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c22, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c21, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c20, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c19, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c18, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c17, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c16, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c15, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c14, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c13, mask);
+    MulAdds(seriesReg, seriesReg, xSquaredReg, c12, mask);
+}
+
+__simd_callee__ inline void ComputeCenterSeriesPart2(
+    Reg::RegTensor<float>& seriesReg, Reg::RegTensor<float>& xSquaredReg, Reg::MaskReg mask)
 {
     constexpr float c0 = 0.88622695207595825f;
     constexpr float c1 = 0.23201367259025574f;
@@ -71,38 +100,7 @@ __simd_callee__ inline void ComputeCenterSeries(
     constexpr float c9 = 0.027980633080005646f;
     constexpr float c10 = 0.025022275745868683f;
     constexpr float c11 = 0.022609863430261612f;
-    constexpr float c12 = 0.020606780424714088f;
-    constexpr float c13 = 0.018918218091130257f;
-    constexpr float c14 = 0.017476370558142662f;
-    constexpr float c15 = 0.01623150147497654f;
-    constexpr float c16 = 0.015146315097808838f;
-    constexpr float c17 = 0.014192315749824047f;
-    constexpr float c18 = 0.013347364030778408f;
-    constexpr float c19 = 0.012594005092978477f;
-    constexpr float c20 = 0.011918296106159687f;
-    constexpr float c21 = 0.011308969929814339f;
-    constexpr float c22 = 0.010756825096905231f;
-    constexpr float c23 = 0.010254274122416973f;
-    constexpr float sqrtTwo = 1.4142135623730951f;
 
-    Reg::RegTensor<float> xReg;
-    Reg::RegTensor<float> xSquaredReg;
-    Reg::RegTensor<float> seriesReg;
-    Reg::Muls(xReg, qReg, 2.0f, mask);
-    Reg::Mul(xSquaredReg, xReg, xReg, mask);
-
-    Reg::Duplicate(seriesReg, c23, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, c22, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, c21, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, c20, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, c19, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, c18, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, c17, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, c16, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, c15, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, c14, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, c13, mask);
-    MulAdds(seriesReg, seriesReg, xSquaredReg, c12, mask);
     MulAdds(seriesReg, seriesReg, xSquaredReg, c11, mask);
     MulAdds(seriesReg, seriesReg, xSquaredReg, c10, mask);
     MulAdds(seriesReg, seriesReg, xSquaredReg, c9, mask);
@@ -115,6 +113,19 @@ __simd_callee__ inline void ComputeCenterSeries(
     MulAdds(seriesReg, seriesReg, xSquaredReg, c2, mask);
     MulAdds(seriesReg, seriesReg, xSquaredReg, c1, mask);
     MulAdds(seriesReg, seriesReg, xSquaredReg, c0, mask);
+}
+
+__simd_callee__ inline void ComputeCenterSeries(
+    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& qReg, Reg::MaskReg mask)
+{
+    constexpr float sqrtTwo = 1.4142135623730951f;
+    Reg::RegTensor<float> xReg;
+    Reg::RegTensor<float> xSquaredReg;
+    Reg::RegTensor<float> seriesReg;
+    Reg::Muls(xReg, qReg, 2.0f, mask);
+    Reg::Mul(xSquaredReg, xReg, xReg, mask);
+    ComputeCenterSeriesPart1(seriesReg, xSquaredReg, mask);
+    ComputeCenterSeriesPart2(seriesReg, xSquaredReg, mask);
 
     Reg::Mul(dstReg, xReg, seriesReg, mask);
     Reg::Muls(dstReg, dstReg, sqrtTwo, mask);
@@ -212,30 +223,17 @@ __simd_callee__ inline void ComputeFarTail(
     Reg::Div(dstReg, numeratorReg, denominatorReg, mask);
 }
 
-__simd_callee__ inline void Compute(Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& srcReg, Reg::MaskReg mask)
+__simd_callee__ inline void ComputeTail(
+    Reg::RegTensor<float>& tailReg, Reg::RegTensor<float>& srcReg, Reg::RegTensor<float>& qReg, Reg::MaskReg mask)
 {
-    Reg::RegTensor<float> qReg;
-    Reg::RegTensor<float> absQReg;
-    Reg::RegTensor<float> centralReg;
     Reg::RegTensor<float> tailProbabilityReg;
     Reg::RegTensor<float> logInputReg;
     Reg::RegTensor<float> tailRadiusReg;
     Reg::RegTensor<float> nearTailReg;
     Reg::RegTensor<float> farTailReg;
-    Reg::RegTensor<float> tailReg;
     Reg::RegTensor<float> tmpReg;
-    Reg::RegTensor<float> positiveInfReg;
-    Reg::RegTensor<float> negativeInfReg;
-    Reg::RegTensor<float> nanReg;
-    Reg::MaskReg centerMask;
     Reg::MaskReg nearTailMask;
     Reg::MaskReg negativeMask;
-    Reg::MaskReg specialMask;
-    Reg::MaskReg nanMask;
-
-    Reg::Adds(qReg, srcReg, -0.5f, mask);
-    Reg::Abs(absQReg, qReg, mask);
-    ComputeCenterSeries(centralReg, qReg, mask);
 
     Reg::Muls(tmpReg, srcReg, -1.0f, mask);
     Reg::Adds(tmpReg, tmpReg, 1.0f, mask);
@@ -254,9 +252,17 @@ __simd_callee__ inline void Compute(Reg::RegTensor<float>& dstReg, Reg::RegTenso
     Reg::CompareScalar<float, CMPMODE::LT>(negativeMask, qReg, 0.0f, mask);
     Reg::Neg(tmpReg, tailReg, mask);
     Reg::Select(tailReg, tmpReg, tailReg, negativeMask);
+}
 
-    Reg::CompareScalar<float, CMPMODE::LE>(centerMask, absQReg, centerRegionBoundary, mask);
-    Reg::Select(dstReg, centralReg, tailReg, centerMask);
+__simd_callee__ inline void ComputeSpecialValues(
+    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& srcReg, Reg::MaskReg mask)
+{
+    Reg::RegTensor<float> positiveInfReg;
+    Reg::RegTensor<float> negativeInfReg;
+    Reg::RegTensor<float> nanReg;
+    Reg::MaskReg nearTailMask;
+    Reg::MaskReg specialMask;
+    Reg::MaskReg nanMask;
 
     Reg::Duplicate(positiveInfReg, positiveInfinity.f32, mask);
     Reg::Duplicate(negativeInfReg, negativeInfinity.f32, mask);
@@ -273,6 +279,24 @@ __simd_callee__ inline void Compute(Reg::RegTensor<float>& dstReg, Reg::RegTenso
     Reg::Compare<float, CMPMODE::NE>(nanMask, srcReg, srcReg, mask);
     Reg::MaskOr(specialMask, specialMask, nanMask, mask);
     Reg::Select(dstReg, nanReg, dstReg, specialMask);
+}
+
+__simd_callee__ inline void Compute(Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& srcReg, Reg::MaskReg mask)
+{
+    Reg::RegTensor<float> qReg;
+    Reg::RegTensor<float> absQReg;
+    Reg::RegTensor<float> centralReg;
+    Reg::RegTensor<float> tailReg;
+    Reg::MaskReg centerMask;
+
+    Reg::Adds(qReg, srcReg, -0.5f, mask);
+    Reg::Abs(absQReg, qReg, mask);
+    ComputeCenterSeries(centralReg, qReg, mask);
+    ComputeTail(tailReg, srcReg, qReg, mask);
+
+    Reg::CompareScalar<float, CMPMODE::LE>(centerMask, absQReg, centerRegionBoundary, mask);
+    Reg::Select(dstReg, centralReg, tailReg, centerMask);
+    ComputeSpecialValues(dstReg, srcReg, mask);
 }
 
 template <bool isReuseSource = false>
