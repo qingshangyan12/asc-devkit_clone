@@ -51,6 +51,8 @@ inline half __float2half_rn_sat(const float x)
 | nan | 0 |
 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
+| x>ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
+| x<-ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 
