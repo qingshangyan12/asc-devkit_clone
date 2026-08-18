@@ -54,7 +54,7 @@ MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度�
 | 参数名 | 输入/输出 | 描述 |
 | :-- | :------------ | :------------ |
 | T | 输入 | 模板参数，支持的数据类型为b8/b16/b32/b64。 |
-| mode | 输入 | 创建MaskReg的模式，enum class类型。<br><pre>enum class MaskPattern {<br>    ALL,        // 所有元素设置为有效数据<br>    VL1,        // 最低1个元素设置为有效数据<br>    VL2,        // 最低2个元素设置为有效数据<br>    VL3,        // 最低3个元素设置为有效数据<br>    VL4,        // 最低4个元素设置为有效数据<br>    VL8,        // 最低8个元素设置为有效数据<br>    VL16,       // 最低16个元素设置为有效数据<br>    VL32,       // 最低32个元素设置为有效数据<br>    VL64,       // 最低64个元素设置为有效数据<br>    VL128,      // 最低128个元素设置为有效数据<br>    M3,         // 3的倍数设置为有效数据<br>    M4,         // 4的倍数设置为有效数据<br>    H,          // 最低一半元素设置为有效数据<br>    Q,          // 最低四分之一元素设置为有效数据<br>    ALLF = 15   // 所有元素设置为无效数据<br>};</pre> |
+| mode | 输入 | 创建MaskReg的模式，enum class类型。<br>enum class MaskPattern {<br>    ALL,        // 所有元素设置为有效数据<br>    VL1,        // 最低1个元素设置为有效数据<br>    VL2,        // 最低2个元素设置为有效数据<br>    VL3,        // 最低3个元素设置为有效数据<br>    VL4,        // 最低4个元素设置为有效数据<br>    VL8,        // 最低8个元素设置为有效数据<br>    VL16,       // 最低16个元素设置为有效数据<br>    VL32,       // 最低32个元素设置为有效数据<br>    VL64,       // 最低64个元素设置为有效数据<br>    VL128,      // 最低128个元素设置为有效数据<br>    M3,         // 3的倍数设置为有效数据<br>    M4,         // 4的倍数设置为有效数据<br>    H,          // 最低一半元素设置为有效数据<br>    Q,          // 最低四分之一元素设置为有效数据<br>    ALLF = 15   // 所有元素设置为无效数据<br>}; |
 | regTrait | 输入 | 该参数默认值为RegTraitNumOne。 |
 
 <a id="update-mask-params"></a>
@@ -267,7 +267,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 ### NPU架构版本2201与NPU架构版本3510之间Mask机制对比
 
-本节对比[NPU架构版本2201](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)在Normal模式的逐bit计算中Mask机制，与[NPU架构版本3510](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)基于Reg矢量计算中Mask机制的差异。
+本节对比[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)在Normal模式的逐bit计算中Mask机制，与[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)基于Reg矢量计算中Mask机制的差异。
 
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品
 

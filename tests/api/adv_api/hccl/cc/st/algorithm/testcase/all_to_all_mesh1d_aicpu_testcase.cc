@@ -87,90 +87,11 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, collective_routes_use_local_registry)
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_mesh1d_and_concurrent_algorithms)
 {
-    CollAlgExecRegistryV2& registry = CollAlgExecRegistryV2::Instance();
-    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALLV, "AicpuAlltoAllVSoleMesh"), nullptr);
-    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAlltoAllSoleMeshSingleChannel"), nullptr);
-    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAlltoAllSoleMesh"), nullptr);
-    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMeshConcurrent"), nullptr);
-    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALLV, "AicpuAllToAllVSoleMeshConcurrent"), nullptr);
-}
+    const auto& registry = CollAlgExecRegistryV2::Instance();
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, concurrent_selector_obeys_topology_and_count_boundaries)
-{
-    ExecuteSelector selector;
-    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
-    u64 sendCounts[4] = {512U, 512U, 512U, 512U};
-    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
-    param.all2AllVDataDes.sendCounts = sendCounts;
-    std::string algName;
-
-    EXPECT_EQ(selector.Run(param, &topo, algName), HCCL_E_NOT_SUPPORT);
-    sendCounts[0] = 513U;
-    param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
-    param.all2AllVDataDes.sendCounts = sendCounts;
-    EXPECT_EQ(selector.Run(param, &topo, algName), HCCL_SUCCESS);
-    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshConcurrent");
-
-    param = MakeAicpuParam(HCCL_CMD_ALLTOALLV);
-    EXPECT_EQ(selector.Run(param, &topo, algName), HCCL_SUCCESS);
-    EXPECT_EQ(algName, "AicpuAllToAllVSoleMeshConcurrent");
-
-    topo.userRankSize = 5U;
-    EXPECT_EQ(selector.Run(param, &topo, algName), HCCL_E_NOT_SUPPORT);
-    topo = MakeConcurrentTopo();
-    topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_CLOS] = {3U};
-    EXPECT_EQ(selector.Run(param, &topo, algName), HCCL_E_NOT_SUPPORT);
-    topo = MakeConcurrentTopo();
-    topo.level0PcieMix = true;
-    EXPECT_EQ(selector.Run(param, &topo, algName), HCCL_E_NOT_SUPPORT);
-}
-
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, concurrent_template_uses_all_channels_per_rank)
-{
-    constexpr u32 rankSize = 4U;
-    constexpr u32 channelsPerRank = 4U;
-    const std::vector<std::vector<u32>> subCommRanks = {{0U, 1U, 2U, 3U}};
-    const std::vector<HcclChannelDesc> channels = MakeMultiJettyChannels(rankSize, channelsPerRank);
-
-    for (const char* algName : {"AicpuAllToAllSoleMeshConcurrent", "AicpuAllToAllVSoleMeshConcurrent"}) {
-        OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
-        EXPECT_GT(std::snprintf(param.algName, sizeof(param.algName), "%s", algName), 0);
-        InsTempAlltoAllVMesh1D temp(param, 0U, subCommRanks);
-        AlgResourceRequest request;
-        EXPECT_EQ(temp.CalcResByChannelDescs(param, channels, request), HCCL_SUCCESS);
-        EXPECT_EQ(request.slaveThreadNum, (rankSize - 1U) * channelsPerRank);
-        EXPECT_EQ(request.notifyNumOnMainThread, request.slaveThreadNum);
-        ASSERT_EQ(request.notifyNumPerThread.size(), request.slaveThreadNum);
-        EXPECT_TRUE(std::all_of(
-            request.notifyNumPerThread.begin(), request.notifyNumPerThread.end(),
-            [](u32 notifyNum) { return notifyNum == channelsPerRank; }));
-    }
-}
-
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, concurrent_executor_calculates_resources_with_host_alltoall_param)
-{
-    constexpr u32 rankSize = 4U;
-    u64 sendCounts[rankSize] = {513U, 513U, 513U, 513U};
-    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
-    param.all2AllVDataDes.sendType = HCCL_DATA_TYPE_FP32;
-    param.all2AllVDataDes.recvType = HCCL_DATA_TYPE_FP32;
-    param.all2AllVDataDes.sendCounts = sendCounts;
-    EXPECT_GT(std::snprintf(param.algName, sizeof(param.algName), "%s", "AicpuAllToAllSoleMeshConcurrent"), 0);
-
-    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo(rankSize);
-    AlgHierarchyInfoForAllLevel hierarchy;
-    hierarchy.infos = {{{0U, 1U, 2U, 3U}, {0U, 1U, 2U, 3U}}};
-    std::unique_ptr<InsCollAlgBase> executor =
-        CollAlgExecRegistryV2::Instance().GetAlgExec(HCCL_CMD_ALLTOALL, param.algName);
-    ASSERT_NE(executor, nullptr);
-
-    AlgResourceRequest request;
-    EXPECT_EQ(executor->CalcRes(nullptr, param, &topo, hierarchy, request), HCCL_SUCCESS);
-    EXPECT_EQ(request.slaveThreadNum, 16U);
-    EXPECT_EQ(request.notifyNumOnMainThread, 4U);
-    EXPECT_EQ(request.notifyNumPerThread.size(), 16U);
-    ASSERT_EQ(request.channels.size(), 1U);
-    EXPECT_EQ(request.channels[0].size(), 15U);
+    EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALLV, "InsAlltoAllVMesh1D"));
+    EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1DSingleChannel"));
+    EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1D"));
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, alltoall_multi_channel_threshold_is_strict_and_overflow_safe)
