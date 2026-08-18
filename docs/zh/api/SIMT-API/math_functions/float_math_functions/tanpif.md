@@ -46,7 +46,7 @@ inline float tanpif(float x)
 
 输入数据与π相乘的正切值。
 
--   当x\*π超出float最大范围，返回值为nan。
+-   当`x*π`超出`float`最大范围，返回值为`nan`。
 -   当x\*π超出float最小范围，返回值为nan。
 -   当x为inf时，返回值为nan。
 -   当x为-inf时，返回值为nan。
@@ -58,7 +58,7 @@ inline float tanpif(float x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/math\_functions.h"头文件。
+使用该接口需要包含`simt_api/math_functions.h`头文件。
 
 ```cpp
 #include "simt_api/math_functions.h"
