@@ -94,6 +94,11 @@ HcclResult CcuTempKfcServer::CalcRes(
         HCCL_INFO(
             "[CcuTempKfcServer::CalcRes] inheriting kernelargs from[%s]",
             resourceRequest.ccuKernelInfos.back().kernelFuncName);
+        if (isAllGather) {
+            HCCL_INFO(
+                "[KFC][AllGather][Server] replace placeholder[%s] with CcuKernelKfcServer",
+                resourceRequest.ccuKernelInfos.back().kernelFuncName);
+        }
         InheritKfcServerKernelArg(
             resourceRequest.ccuKernelInfos.back(), kernelInfo, param, mySubCommRank_, subCommRanks_);
         resourceRequest.ccuKernelInfos.back() = kernelInfo;
