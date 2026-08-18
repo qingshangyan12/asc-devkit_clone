@@ -37,10 +37,6 @@ __simd_callee__ inline decltype(auto) relu(const reg_tensor<T>& src_reg);
 
 返回 `reg_tensor<T>`，mask 与 `src_reg.mask` 一致。
 
-## 约束说明
-
-不支持的元素类型会在编译期报错。
-
 ## 调用示例
 
 ```cpp
