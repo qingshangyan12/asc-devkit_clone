@@ -69,7 +69,7 @@ inline half2 h2floor(half2 x)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelIsFinite(half2* dst, half2* x)
+    __global__ __launch_bounds__(1024) void KernelFloor(half2* dst, half2* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = h2floor(x[idx]);
