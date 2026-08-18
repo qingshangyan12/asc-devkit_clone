@@ -70,15 +70,19 @@ unsigned long long __mul_i32toi64(unsigned int x, unsigned int y)
     __global__ __launch_bounds__(1024) void KernelMul_i32toi64(long long* dst, int* x, int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = __mul_i32toi64(x[idx], y[idx]);
+        if (idx < n) {
+            dst[idx] = __mul_i32toi64(x[idx], y[idx]);
+        }
     }
     ```
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelMul_i32toi64(unsigned long long* dst, unsigned int* x, unsigned int* y)
+    __global__ __launch_bounds__(1024) void KernelMul_i32toi64(unsigned long long* dst, unsigned int* x, unsigned int* y, int n)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = __mul_i32toi64(x[idx], y[idx]);
+        if (idx < n) {
+            dst[idx] = __mul_i32toi64(x[idx], y[idx]);
+        }
     }
     ```
 
