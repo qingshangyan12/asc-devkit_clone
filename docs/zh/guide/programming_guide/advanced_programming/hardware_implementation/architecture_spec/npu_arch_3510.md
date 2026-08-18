@@ -150,7 +150,7 @@
 
 **存储单元的访问冲突**
 
-本NPU架构版本UB结构如下图所示，当多个操作尝试同时访问Unified Buffer同一个bank或者bank group时，可能会发生bank冲突，包括读写冲突、写写冲突、读读冲突，这种冲突会导致访问排队，降低性能。在NPU架构版本2201中，同一个bank group只有一组读口和写口，最多一拍完成一读或者一写，在本NPU架构版本中每个bank group有两组读口和写口，最多同时允许2读0写或者1读1写。相关读写约束如下：
+本NPU架构版本UB结构如下图所示，当多个操作尝试同时访问Unified Buffer同一个bank或者bank group时，可能会发生bank冲突，包括读写冲突、写写冲突、读读冲突，这种冲突会导致访问排队，降低性能。相比NPU架构版本2201，本架构版本中同一个bank group单拍支持两次读操作，或者一次读操作和一次写操作；不支持同一个bank group单拍完成两次写操作。相关读写约束如下：
 
 -   **读写冲突**：读操作和写操作同时尝试访问同一个bank。
 -   **写写冲突**：多个写操作同时尝试访问同一个bank group。
@@ -260,7 +260,7 @@ Channel merge支持S8、U8、S4和U4数据类型，而Channel split支持FP32数
 
 ## AIC AIV核间通信<a name="section1965819584325"></a>
 
-该架构支持AIC: AIV为1:1和1:2的核间通信，核间通信通过SSBuf进行，这一点和NPU220架构有所不同，NPU220架构中核间通信通过GM来完成。
+该架构支持AIC: AIV为1:1和1:2的核间通信，核间通信通过SSBuf进行，这一点和NPU220架构有所不同，NPU220架构中核间通信通过GM来完成。SSBuffer的获取、访问约束和核间同步流程请参考[SSBuffer核间通信](../ssbuffer_communication.md)。
 
 ![](../../../../figures/fig_1b2.png)
 
