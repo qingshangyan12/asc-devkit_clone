@@ -202,7 +202,8 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 
 ### 非连续对齐搬入模式
 
-该模式不支持目的操作数为掩码寄存器。
+- 该模式不支持目的操作数为掩码寄存器。
+- `mask`需通过[掩码设置接口](../reg_data_types/data_type_definition.md#掩码寄存器)预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 
 ## 调用示例
 

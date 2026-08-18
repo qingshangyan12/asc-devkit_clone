@@ -34,8 +34,6 @@
 
 ## 函数原型
 
-### 模板原型（占位符形式）
-
 ```c
 __aicore__ inline void asc_set_ndim_pad_value(<dtype> pad_value)
 ```

@@ -30,8 +30,6 @@
 
 ## 函数原型
 
-### 模板原型（占位符形式）
-
 ```c
 __aicore__ inline <dtype> asc_atomic_exch(__gm__ <dtype>* address,
                                           <dtype> val)
