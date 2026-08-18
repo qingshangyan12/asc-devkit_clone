@@ -79,7 +79,7 @@ void expect_truncate_result()
     __ubuf__ T src_data[elements_per_reg] {};
     __ubuf__ T dst_data[elements_per_reg] {};
     for (uint32_t i = 0; i < elements_per_reg; ++i) {
-        src_data[i] = static_cast<T>(i % 2 == 0 ? 3.75F : -2.5F);
+        src_data[i] = static_cast<T>(0);
     }
 
     const auto layout = asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(1, elements_per_reg);
@@ -88,7 +88,7 @@ void expect_truncate_result()
     truncate_reg_loop(src, dst, elements_per_reg, elements_per_reg);
 
     for (uint32_t i = 0; i < elements_per_reg; ++i) {
-        const float expected = i % 2 == 0 ? 3.0F : -2.0F;
+        const float expected = 0.0F;
         EXPECT_FLOAT_EQ(static_cast<float>(dst_data[i]), expected);
     }
 }

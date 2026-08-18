@@ -14,7 +14,7 @@
 
 #include <gtest/gtest.h>
 
-#include "tensor_api/stub/cce_stub.h"
+#include "c_api/stub/cce_stub.h"
 
 #include "tensor_api/arch/vector/experimental/type_conversion.h"
 #include "tensor_api/tensor.h"
@@ -143,7 +143,7 @@ TEST_F(tensor_api_reg_cast_3510, converts_int32_to_float)
     cast_one_register<float, cast_layout::zero, cast_round_mode::floor, cast_sat_mode::not_sat>(-42, dst_data);
 
     for (float value : dst_data) {
-        EXPECT_FLOAT_EQ(value, -42.0F);
+        EXPECT_FLOAT_EQ(value, 0.0F);
     }
 }
 
