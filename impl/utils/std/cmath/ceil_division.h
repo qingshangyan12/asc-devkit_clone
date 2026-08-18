@@ -15,8 +15,8 @@
 #ifndef IMPL_STD_CEIL_DIVISION_H
 #define IMPL_STD_CEIL_DIVISION_H
 
-#include "../algorithm/min.h"
-#include "../type_traits/is_integral.h"
+// #include "../algorithm/min.h"
+// #include "../type_traits/is_integral.h"
 
 namespace AscendC {
 namespace Std {
@@ -27,47 +27,47 @@ __host__ __aicore__ inline constexpr auto ceil_division(const T& num1, const U& 
     return (num1 + num2 - 1) / num2;
 }
 
-template <typename T>
-struct integer_traits {
-    static constexpr bool is_signed = false;
-    using unsigned_type = T;
-};
+// template <typename T>
+// struct integer_traits {
+//     static constexpr bool is_signed = false;
+//     using unsigned_type = T;
+// };
 
-template <>
-struct integer_traits<signed char> {
-    static constexpr bool is_signed = true;
-    using unsigned_type = unsigned char;
-};
+// template <>
+// struct integer_traits<signed char> {
+//     static constexpr bool is_signed = true;
+//     using unsigned_type = unsigned char;
+// };
 
-template <>
-struct integer_traits<short> {
-    static constexpr bool is_signed = true;
-    using unsigned_type = unsigned short;
-};
+// template <>
+// struct integer_traits<short> {
+//     static constexpr bool is_signed = true;
+//     using unsigned_type = unsigned short;
+// };
 
-template <>
-struct integer_traits<int> {
-    static constexpr bool is_signed = true;
-    using unsigned_type = unsigned int;
-};
+// template <>
+// struct integer_traits<int> {
+//     static constexpr bool is_signed = true;
+//     using unsigned_type = unsigned int;
+// };
 
-template <>
-struct integer_traits<long> {
-    static constexpr bool is_signed = true;
-    using unsigned_type = unsigned long;
-};
+// template <>
+// struct integer_traits<long> {
+//     static constexpr bool is_signed = true;
+//     using unsigned_type = unsigned long;
+// };
 
-template <>
-struct integer_traits<long long> {
-    static constexpr bool is_signed = true;
-    using unsigned_type = unsigned long long;
-};
+// template <>
+// struct integer_traits<long long> {
+//     static constexpr bool is_signed = true;
+//     using unsigned_type = unsigned long long;
+// };
 
-template <typename T>
-static constexpr bool is_signed_impl_v = integer_traits<T>::is_signed;
+// template <typename T>
+// static constexpr bool is_signed_impl_v = integer_traits<T>::is_signed;
 
-template <typename T>
-using make_unsigned_t = typename integer_traits<T>::unsigned_type;
+// template <typename T>
+// using make_unsigned_t = typename integer_traits<T>::unsigned_type;
 
 /*!
  * \brief Divide a by b and round the result up.
