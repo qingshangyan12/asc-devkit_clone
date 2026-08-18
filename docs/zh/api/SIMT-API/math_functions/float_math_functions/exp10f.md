@@ -52,6 +52,7 @@ inline float exp10f(float x)
 -   当x为nan时，返回值为nan。
 -   当结果超出float的最大取值范围时，返回值为inf。
 -   当结果超出float的最大取值范围时，返回值为inf。
+-   当结果超出float的最大取值范围时，返回值为inf。
 
 ## 约束说明
 
