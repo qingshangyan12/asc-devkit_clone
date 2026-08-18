@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-将unsigned short int的数据按位重新解释为half，即将unsigned short int的数据存储的位按照half的格式进行读取。
+将`unsigned short int`的数据按位重新解释为`half`，即将`unsigned short int`的数据存储的位按照`half`的格式进行读取。
 
 ## 函数原型
 
