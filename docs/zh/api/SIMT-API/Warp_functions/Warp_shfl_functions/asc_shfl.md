@@ -32,7 +32,7 @@ Warp Shfl类接口主要实现Warp级数据交换，能够实现直接读取某�
 
 -   **数据交换**
 
-    本接口主要是获取分组内指定线程持有的var值，用户通过参数src\_lane指定线程。如果src\_lane大于等于width，指定线程的逻辑Lane ID是src\_lane%width。
+    本接口主要是获取分组内指定线程持有的var值，用户通过参数`src_lane`指定线程。如果src\_lane大于等于width，指定线程的逻辑Lane ID是src\_lane%width。
 
 **主要使用场景**
 
