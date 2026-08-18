@@ -11,10 +11,8 @@
 #ifndef CCU_LOOP_DL_HPP
 #define CCU_LOOP_DL_HPP
 
-#if CANN_VERSION_NUM >= 90100000
-#include "ccu_loop.hpp"
-#else
 #include <vector>
+#include <memory>
 #include "ccu_types_dl.h"
 #include "ccu_variable_dl.hpp"
 #include "ccu_func_dl.hpp"
@@ -31,7 +29,7 @@ public:
     Loop(Variable& loopCfg, const Func& func)
     {
         ComposeLoopBody(func);
-        isVarBased_ = true;
+        mode_ = Mode::VarBased;
         loopParamVar_ = &loopCfg;
     }
 
@@ -40,19 +38,44 @@ public:
     Loop(const CcuLoopConfig& loopCfg, const Func& func)
     {
         ComposeLoopBody(func);
-        isVarBased_ = false;
+        mode_ = Mode::ConfigBased;
         config_ = loopCfg;
     }
 
+    Loop(Variable& iterNum, Variable& addrOffset, const Func& func)
+    {
+        ComposeLoopBody(func);
+        mode_ = Mode::VarBasedV2;
+        iterNumVar_ = &iterNum;
+        addrOffsetVar_ = &addrOffset;
+        ctxIdVar_ = std::make_shared<Variable>();
+    }
+
+private:
+    friend class LoopGroup;
+
+    enum class Mode {
+        ConfigBased,
+        VarBased,
+        VarBasedV2,
+    };
+
     CcuLoop Handle() const { return handle_; }
 
-    bool IsVarBased() const { return isVarBased_; }
+    Mode GetMode() const { return mode_; }
+
+    bool IsVarBased() const { return mode_ == Mode::VarBased; }
 
     Variable* LoopParamVar() const { return loopParamVar_; }
 
+    Variable* IterNumVar() const { return iterNumVar_; }
+
+    Variable* AddrOffsetVar() const { return addrOffsetVar_; }
+
+    Variable* CtxIdVar() const { return ctxIdVar_.get(); }
+
     const CcuLoopConfig* Config() const { return &config_; }
 
-private:
     void ComposeLoopBody(const Func& func)
     {
         if (func.NumIn() != 0) {
@@ -71,8 +94,11 @@ private:
     }
 
     CcuLoop handle_{0};
-    bool isVarBased_{false};
+    Mode mode_{Mode::ConfigBased};
     Variable* loopParamVar_{nullptr};
+    Variable* iterNumVar_{nullptr};
+    Variable* addrOffsetVar_{nullptr};
+    std::shared_ptr<Variable> ctxIdVar_{nullptr};
     CcuLoopConfig config_{};
 };
 
@@ -87,6 +113,17 @@ public:
         CCU_THROW_IF_FAILED(
             ::CcuLoopGroupCreateFromVar(&handle_, maxLoopNum, parallelCfg.handle, offsetCfg.handle),
             "CcuLoopGroupCreateFromVar failed");
+        AddLoops(loops);
+    }
+
+    LoopGroup(
+        Variable& parallelCfgV2, Variable& offsetCfgV2, Variable& varOffsetCfg, uint32_t maxLoopNum,
+        const std::vector<Loop>& loops)
+    {
+        CCU_THROW_IF_FAILED(
+            ::CcuLoopGroupCreateFromVarV2(
+                &handle_, maxLoopNum, parallelCfgV2.handle, offsetCfgV2.handle, varOffsetCfg.handle),
+            "CcuLoopGroupCreateFromVarV2 failed");
         AddLoops(loops);
     }
 
@@ -105,7 +142,19 @@ private:
     void AddLoops(const std::vector<Loop>& loops) const
     {
         for (const auto& loop : loops) {
-            if (loop.IsVarBased()) {
+            if (loop.GetMode() == Loop::Mode::VarBasedV2) {
+                auto* iterNumVar = loop.IterNumVar();
+                auto* addrOffsetVar = loop.AddrOffsetVar();
+                auto* ctxIdVar = loop.CtxIdVar();
+                if (iterNumVar == nullptr || addrOffsetVar == nullptr || ctxIdVar == nullptr) {
+                    throw ::AscendC::ccu::detail::CcuException(
+                        CcuResult::CCU_E_PARA, "ccu::Loop V2 loop has null parameter");
+                }
+                CCU_THROW_IF_FAILED(
+                    ::CcuLoopGroupAddLoopFromVarV2(
+                        handle_, loop.Handle(), iterNumVar->handle, addrOffsetVar->handle, ctxIdVar->handle),
+                    "CcuLoopGroupAddLoopFromVarV2 failed");
+            } else if (loop.IsVarBased()) {
                 auto* loopParamVar = loop.LoopParamVar();
                 if (loopParamVar == nullptr) {
                     throw ::AscendC::ccu::detail::CcuException(
@@ -127,5 +176,4 @@ private:
 } // namespace ccu
 } // namespace AscendC
 
-#endif // CANN_VERSION_NUM >= 90100000
 #endif // CCU_LOOP_DL_HPP
