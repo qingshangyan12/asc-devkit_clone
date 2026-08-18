@@ -51,7 +51,7 @@ inline half __uint2half_rna(const unsigned int x)
 | 4098 | 4100 |
 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 | 65505 | ASCRT\_MAX\_NORMAL\_FP16 |
-| 65520（溢出中点） | inf |
+| x≥65520 | inf |
 | 4294967295（uint32_t最大值） | inf |
 
 ## 约束说明
