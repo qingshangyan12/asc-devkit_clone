@@ -46,10 +46,10 @@ inline float atanhf(float x)
 
 输入数据的反双曲正切值。
 
--   当x为nan时，返回值为nan。
--   当x为1时，返回值为inf。
--   当x为-1时，返回值为-inf。
--   当x大于1或小于-1时，返回值为nan。
+-   当`x`为`nan`时，返回值为`nan`。
+-   当`x`为`1`时，返回值为`inf`。
+-   当`x`为`-1`时，返回值为`-inf`。
+-   当`x`大于`1`或小于`-1`时，返回值为`nan`。
 
 ## 约束说明
 
@@ -57,7 +57,7 @@ inline float atanhf(float x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/math\_functions.h"头文件。
+使用该接口需要包含"simt_api/math_functions.h"头文件。
 
 ```cpp
 #include "simt_api/math_functions.h"
