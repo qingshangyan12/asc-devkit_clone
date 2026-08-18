@@ -48,7 +48,7 @@ inline half __uint2half_ru(const unsigned int x)
 | x值 | 返回值 |
 | --- | --- |
 | 0 | 0 |
-| x>ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
+| x>ASCRT\_MAX\_NORMAL\_FP16 | inf |
 
 ## 约束说明
 
