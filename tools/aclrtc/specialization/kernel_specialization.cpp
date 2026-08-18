@@ -21,7 +21,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
 #include <cerrno>
-#include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
 #include <memory>
@@ -32,14 +31,9 @@ namespace aclrtc {
 namespace {
 namespace fs = boost::filesystem;
 using specialization_compile::ResourceData;
+using specialization_compile::IsKernelMetaSavingEnabled;
 using specialization_compile::ResourceRegistry;
 using specialization_compile::ResourceStatus;
-
-bool IsKernelMetaSavingEnabled()
-{
-    const char* saveKernelMeta = std::getenv("ASCEND_OP_COMPILE_SAVE_KERNEL_META");
-    return saveKernelMeta != nullptr && std::strcmp(saveKernelMeta, "1") == 0;
-}
 
 bool CopyFileDescriptorContents(int sourceFileDescriptor, const fs::path& sourceFilePath,
                                 int destinationFileDescriptor, const fs::path& destinationFilePath)
