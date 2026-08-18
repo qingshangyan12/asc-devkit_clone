@@ -52,11 +52,13 @@ inline half2 __float22half2_rn(const float2 x)
 | inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | x>ASCRT\_MAX\_NORMAL\_FP16 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | -inf | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
-| x<-ASCRT\_MAX\_NORMAL\_FP16 | -inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| x<-ASCRT\_MAX\_NORMAL\_FP16 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 
-无
+使用此接口前需将CTRL[60]寄存器设置为0，否则饱和模式不生效。设置方式请参见[控制饱和行为的方式](../../data_type_conversion/overview.md#section1194916101549)。
+
+SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生效。
 
 ## 需要包含的头文件
 
