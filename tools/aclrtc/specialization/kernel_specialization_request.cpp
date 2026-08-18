@@ -10,7 +10,7 @@
 
 #include "kernel_specialization_types.h"
 
-#include "kernel_specialization_log.h"
+#include "ascendc_tool_log.h"
 
 #include <algorithm>
 #include <atomic>
@@ -32,21 +32,21 @@ bool CopyRequiredBoundedCString(const char* input, const char* inputLocation, st
                                 size_t& copiedRequestTextByteCount)
 {
     if (input == nullptr) {
-        ACLRTC_LOG_ERROR("%s must not be null", inputLocation);
+        ASCENDLOGE("%s must not be null", inputLocation);
         return false;
     }
     const size_t inputLength = strnlen(input, MAX_REQUEST_STRING_BYTES + 1U);
     if (inputLength == 0U) {
-        ACLRTC_LOG_ERROR("%s must not be empty", inputLocation);
+        ASCENDLOGE("%s must not be empty", inputLocation);
         return false;
     }
     if (inputLength > MAX_REQUEST_STRING_BYTES) {
-        ACLRTC_LOG_ERROR("%s must be NUL-terminated within %zu bytes", inputLocation,
+        ASCENDLOGE("%s must be NUL-terminated within %zu bytes", inputLocation,
                          MAX_REQUEST_STRING_BYTES);
         return false;
     }
     if (inputLength > MAX_REQUEST_TEXT_BYTES - copiedRequestTextByteCount) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "%s would exceed the %zu-byte combined request text limit: already_copied=%zu field_bytes=%zu; reduce "
             "the number or length of compiler options",
             inputLocation, MAX_REQUEST_TEXT_BYTES, copiedRequestTextByteCount, inputLength);
@@ -84,7 +84,7 @@ aclError ValidateCompilerOptionCharacters(
     size_t controlBytePosition = 0U;
     unsigned char controlByteValue = 0U;
     if (FindAsciiControlCharacter(compilerOption, controlBytePosition, controlByteValue)) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "%s[%llu] contains prohibited control byte 0x%02x at byte %zu; pass each compiler option as one "
             "plain argv string without control characters",
             optionFieldName, static_cast<unsigned long long>(optionIndex),
@@ -98,13 +98,13 @@ aclError ValidateForwardedCompilerOptionDoesNotRedirectFiles(
     const std::string& compilerOption, const char* optionFieldName, uint64_t optionIndex)
 {
     if (compilerOption.front() == '@') {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "%s[%llu] cannot use a compiler response file; pass its contents as separate %s entries",
             optionFieldName, static_cast<unsigned long long>(optionIndex), optionFieldName);
         return ACLRTC_ERROR_INVALID_OPTION;
     }
     if (OverridesCompilerOutputPath(compilerOption)) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "%s[%llu] cannot override compiler output; remove this option because aclrtc manages the output path",
             optionFieldName, static_cast<unsigned long long>(optionIndex));
         return ACLRTC_ERROR_INVALID_OPTION;
@@ -121,7 +121,7 @@ aclError CopyCompilerOptionsAndRejectControlCharacters(
         return ACLRTC_SUCCESS;
     }
     if (apiOptions == nullptr) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "%s must not be null when %s=%llu; provide %llu entries or set %s to 0",
             optionFieldName, optionCountFieldName, static_cast<unsigned long long>(apiOptionCount),
             static_cast<unsigned long long>(apiOptionCount), optionCountFieldName);
@@ -175,14 +175,14 @@ aclError NormalizeSuperKernelCompilerOptions(const aclrtcKernelSpecRequest& apiR
     const size_t superKernelEnableOptionCount = static_cast<size_t>(std::count(
         copiedSuperKernelOptions.begin(), copiedSuperKernelOptions.end(), SUPER_KERNEL_ENABLE_OPTION));
     if (superKernelEnableOptionCount > 1U) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "skOptions contains --enable-super-kernel %zu times; remove duplicates and provide it exactly once",
             superKernelEnableOptionCount);
         return ACLRTC_ERROR_INVALID_OPTION;
     }
     if (superKernelEnableOptionCount == 0U) {
         if (!copiedSuperKernelOptions.empty()) {
-            ACLRTC_LOG_WARNING(
+            ASCENDLOGW(
                 "skOptions were provided without --enable-super-kernel; ignoring skOptions and compiling basic only");
         }
         return ACLRTC_SUCCESS;
@@ -218,7 +218,7 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
     const auto firstNonZeroReservedByte = std::find_if(
         std::begin(apiRequest.reserved), std::end(apiRequest.reserved), [](uint8_t value) { return value != 0U; });
     if (firstNonZeroReservedByte != std::end(apiRequest.reserved)) {
-        ACLRTC_LOG_ERROR("aclrtcKernelSpecRequest.reserved[%zu] must be zero; zero-initialize the request before use",
+        ASCENDLOGE("aclrtcKernelSpecRequest.reserved[%zu] must be zero; zero-initialize the request before use",
                          static_cast<size_t>(firstNonZeroReservedByte - std::begin(apiRequest.reserved)));
         return ACLRTC_ERROR_INVALID_INPUT;
     }
@@ -243,7 +243,7 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
     const boost::filesystem::path normalizedOutputElfPath =
         boost::filesystem::absolute(copiedOutputElfPath, outputPathError).lexically_normal();
     if (outputPathError) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "Failed to resolve outPath '%s' against the current working directory: error=%d message=%s",
             copiedOutputElfPath.c_str(), outputPathError.value(), outputPathError.message().c_str());
         return ACLRTC_ERROR_INVALID_INPUT;
@@ -252,7 +252,7 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
 
     if (apiRequest.optionCount > MAX_USER_OPTION_COUNT ||
         apiRequest.skOptionCount > MAX_USER_OPTION_COUNT - apiRequest.optionCount) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "optionCount + skOptionCount must not exceed %zu: optionCount=%llu skOptionCount=%llu; remove excess "
             "compiler options",
             MAX_USER_OPTION_COUNT, static_cast<unsigned long long>(apiRequest.optionCount),

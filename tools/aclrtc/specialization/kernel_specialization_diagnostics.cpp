@@ -10,21 +10,24 @@
 
 #include "kernel_specialization_diagnostics.h"
 
-#include "kernel_specialization_log.h"
+#include "ascendc_tool_log.h"
 
 #include <boost/filesystem.hpp>
-#include <boost/system/error_code.hpp>
 #include <cerrno>
 #include <cstring>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
-#include <unistd.h>
 
 namespace ascendc {
 namespace aclrtc {
 namespace {
 namespace fs = boost::filesystem;
+
+constexpr char DIAGNOSTIC_MANIFEST_FILE_NAME[] = "aclrtc_manifest.json";
+constexpr char DIAGNOSTIC_COMPILE_LOG_FILE_NAME[] = "aclrtc_compile.log";
+constexpr char DIAGNOSTIC_REPLAY_SCRIPT_FILE_NAME[] = "aclrtc_replay.sh";
+constexpr char DIAGNOSTIC_RESULT_FILE_NAME[] = "aclrtc_result.json";
 
 std::string QuoteArgumentForReplayScript(const std::string& argument)
 {
@@ -61,7 +64,7 @@ bool WriteDiagnosticTextFile(const fs::path& filePath, const std::string& text, 
     std::ofstream outputStream(filePath, std::ios::out | writeMode);
     if (!outputStream) {
         const int openError = errno;
-        ACLRTC_LOG_WARNING("Failed to open diagnostic file for writing: path=%s errno=%d message=%s",
+        ASCENDLOGW("Failed to open diagnostic file for writing: path=%s errno=%d message=%s",
                            filePath.c_str(), openError, std::strerror(openError));
         return false;
     }
@@ -72,7 +75,7 @@ bool WriteDiagnosticTextFile(const fs::path& filePath, const std::string& text, 
         return true;
     }
     const int writeError = errno;
-    ACLRTC_LOG_WARNING("Failed to write diagnostic file: path=%s errno=%d message=%s",
+    ASCENDLOGW("Failed to write diagnostic file: path=%s errno=%d message=%s",
                        filePath.c_str(), writeError, std::strerror(writeError));
     return false;
 }
@@ -82,7 +85,7 @@ void RemoveIncompleteReplayScript(const fs::path& replayScriptPath) noexcept
     boost::system::error_code removalError;
     fs::remove(replayScriptPath, removalError);
     if (removalError) {
-        ACLRTC_LOG_WARNING("Failed to remove incomplete replay script: path=%s error=%d message=%s",
+        ASCENDLOGW("Failed to remove incomplete replay script: path=%s error=%d message=%s",
                            replayScriptPath.c_str(), removalError.value(), removalError.message().c_str());
     }
 }
@@ -103,59 +106,32 @@ bool CreateExecutableReplayScript(const fs::path& replayScriptPath,
     }
 
     const int permissionError = errno;
-    ACLRTC_LOG_WARNING("Failed to make replay script executable: path=%s errno=%d message=%s",
+    ASCENDLOGW("Failed to make replay script executable: path=%s errno=%d message=%s",
                        replayScriptPath.c_str(), permissionError, std::strerror(permissionError));
     RemoveIncompleteReplayScript(replayScriptPath);
     return false;
 }
+
 } // namespace
 
 KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
-    std::string specializationSessionId, DiagnosticCollectionMode collectionMode)
+    fs::path resourceWorktreePath, std::string specializationSessionId)
     : specializationSessionId_(std::move(specializationSessionId)),
-      diagnosticsRequested_(collectionMode == DiagnosticCollectionMode::Enabled),
-      diagnosticsEnabled_(collectionMode == DiagnosticCollectionMode::Enabled)
+      diagnosticsEnabled_(!resourceWorktreePath.empty()),
+      resourceWorktreePath_(std::move(resourceWorktreePath))
 {
     if (!diagnosticsEnabled_) {
         return;
     }
     try {
-        const fs::path compilationWorkingDirectoryPath = fs::current_path();
-        diagnosticDirectoryPath_ = compilationWorkingDirectoryPath / "kernel_meta" / std::to_string(getpid()) /
-                                   ("aclrtc_" + specializationSessionId_);
-        boost::system::error_code directoryError;
-        fs::create_directories(diagnosticDirectoryPath_, directoryError);
-        if (directoryError) {
-            diagnosticsEnabled_ = false;
-            ACLRTC_LOG_WARNING("Failed to create diagnostic directory: path=%s error=%d message=%s",
-                               diagnosticDirectoryPath_.c_str(), directoryError.value(),
-                               directoryError.message().c_str());
-            return;
-        }
-        const fs::path replayScriptPath = diagnosticDirectoryPath_ / "replay.sh";
-        if (!CreateExecutableReplayScript(replayScriptPath, compilationWorkingDirectoryPath)) {
+        const fs::path replayScriptPath = resourceWorktreePath_ / DIAGNOSTIC_REPLAY_SCRIPT_FILE_NAME;
+        if (!CreateExecutableReplayScript(replayScriptPath, fs::current_path())) {
             diagnosticsEnabled_ = false;
         }
     } catch (...) {
         diagnosticsEnabled_ = false;
-        ACLRTC_LOG_WARNING("Failed to initialize specialization diagnostics: session=%s path=%s",
-                           specializationSessionId_.c_str(), diagnosticDirectoryPath_.c_str());
-    }
-}
-
-bool KernelSpecializationDiagnostics::GetResourceWorktreeRetentionPath(
-    fs::path& resourceWorktreeRetentionPath) const noexcept
-{
-    if (!diagnosticsEnabled_) {
-        return false;
-    }
-    try {
-        resourceWorktreeRetentionPath = diagnosticDirectoryPath_ / "resource_worktree";
-        return true;
-    } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to construct retained resource worktree path: diagnostic_directory=%s",
-                           diagnosticDirectoryPath_.c_str());
-        return false;
+        ASCENDLOGW("Failed to initialize specialization diagnostics in resource worktree: session=%s path=%s",
+                   specializationSessionId_.c_str(), resourceWorktreePath_.c_str());
     }
 }
 
@@ -165,25 +141,11 @@ void KernelSpecializationDiagnostics::WriteManifestSnapshot(const nlohmann::json
         return;
     }
     try {
-        const fs::path manifestPath = diagnosticDirectoryPath_ / "manifest.json";
+        const fs::path manifestPath = resourceWorktreePath_ / DIAGNOSTIC_MANIFEST_FILE_NAME;
         WriteDiagnosticTextFile(manifestPath, resourceManifest.dump(2) + '\n', std::ios::trunc);
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record specialization manifest: directory=%s file=manifest.json",
-                           diagnosticDirectoryPath_.c_str());
-    }
-}
-
-void KernelSpecializationDiagnostics::RecordWorktreePath(const fs::path& resourceWorktreePath) noexcept
-{
-    if (!diagnosticsEnabled_) {
-        return;
-    }
-    try {
-        AppendTextToDiagnosticFile(diagnosticDirectoryPath_ / "compile.log",
-                                   "resource_worktree=" + resourceWorktreePath.string() + "\n");
-    } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record resource worktree path: directory=%s file=compile.log",
-                           diagnosticDirectoryPath_.c_str());
+        ASCENDLOGW("Failed to record specialization manifest: resource_worktree=%s file=%s",
+                   resourceWorktreePath_.c_str(), DIAGNOSTIC_MANIFEST_FILE_NAME);
     }
 }
 
@@ -199,10 +161,11 @@ void KernelSpecializationDiagnostics::AppendCommandToReplayScript(
             replayLine += " " + QuoteArgumentForReplayScript(argument);
         }
         replayLine += '\n';
-        AppendTextToDiagnosticFile(diagnosticDirectoryPath_ / "replay.sh", replayLine);
+        AppendTextToDiagnosticFile(resourceWorktreePath_ / DIAGNOSTIC_REPLAY_SCRIPT_FILE_NAME, replayLine);
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record command %s: directory=%s file=replay.sh",
-                           compilationCommand.diagnosticLabel.c_str(), diagnosticDirectoryPath_.c_str());
+        ASCENDLOGW("Failed to record command %s: resource_worktree=%s file=%s",
+                   compilationCommand.diagnosticLabel.c_str(), resourceWorktreePath_.c_str(),
+                   DIAGNOSTIC_REPLAY_SCRIPT_FILE_NAME);
     }
 }
 
@@ -223,37 +186,31 @@ void KernelSpecializationDiagnostics::AppendCommandResultToCompilationLog(
         if (!processResult.capturedOutput.empty() && processResult.capturedOutput.back() != '\n') {
             resultText << '\n';
         }
-        AppendTextToDiagnosticFile(diagnosticDirectoryPath_ / "compile.log", resultText.str());
+        AppendTextToDiagnosticFile(resourceWorktreePath_ / DIAGNOSTIC_COMPILE_LOG_FILE_NAME, resultText.str());
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record result for command %s: directory=%s file=compile.log",
-                           compilationCommand.diagnosticLabel.c_str(), diagnosticDirectoryPath_.c_str());
+        ASCENDLOGW("Failed to record result for command %s: resource_worktree=%s file=%s",
+                   compilationCommand.diagnosticLabel.c_str(), resourceWorktreePath_.c_str(),
+                   DIAGNOSTIC_COMPILE_LOG_FILE_NAME);
     }
 }
 
 void KernelSpecializationDiagnostics::LogCommandFailureRecoveryHint() const noexcept
 {
     if (!diagnosticsEnabled_) {
-        if (diagnosticsRequested_) {
-            ACLRTC_LOG_INFO(
-                "Compilation diagnostics were requested but could not be initialized; fix the preceding diagnostic "
-                "warning and retry");
-            return;
-        }
-        ACLRTC_LOG_INFO(
-            "Set ASCEND_OP_COMPILE_SAVE_KERNEL_META=1 and retry to save compile.log, replay.sh, and the resource "
-            "worktree");
+        ASCENDLOGI(
+            "Set ASCEND_OP_COMPILE_SAVE_KERNEL_META=1 and retry to retain the resource worktree and save "
+            "specialization diagnostics");
         return;
     }
     try {
-        const fs::path compilationLogPath = diagnosticDirectoryPath_ / "compile.log";
-        const fs::path replayScriptPath = diagnosticDirectoryPath_ / "replay.sh";
-        ACLRTC_LOG_INFO(
-            "Compilation diagnostics saved: compile_log=%s replay_script=%s; inspect compile.log or run replay.sh "
-            "to reproduce the failed command",
+        const fs::path compilationLogPath = resourceWorktreePath_ / DIAGNOSTIC_COMPILE_LOG_FILE_NAME;
+        const fs::path replayScriptPath = resourceWorktreePath_ / DIAGNOSTIC_REPLAY_SCRIPT_FILE_NAME;
+        ASCENDLOGI(
+            "Compilation diagnostics saved: compile_log=%s replay_script=%s; inspect the log or run the replay "
+            "script to reproduce the failed command",
             compilationLogPath.c_str(), replayScriptPath.c_str());
     } catch (...) {
-        ACLRTC_LOG_INFO(
-            "Compilation diagnostics were enabled; inspect kernel_meta for compile.log and replay.sh");
+        ASCENDLOGI("Compilation diagnostics were enabled; inspect the retained resource worktree");
     }
 }
 
@@ -269,11 +226,11 @@ void KernelSpecializationDiagnostics::WriteSpecializationResult(
             {"output_path", outputElfPath.string()},
             {"output_published", publicationStatus == OutputPublicationStatus::Published},
         };
-        const fs::path resultPath = diagnosticDirectoryPath_ / "result.json";
+        const fs::path resultPath = resourceWorktreePath_ / DIAGNOSTIC_RESULT_FILE_NAME;
         WriteDiagnosticTextFile(resultPath, resultJson.dump(2) + '\n', std::ios::trunc);
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record specialization result: directory=%s file=result.json",
-                           diagnosticDirectoryPath_.c_str());
+        ASCENDLOGW("Failed to record specialization result: resource_worktree=%s file=%s",
+                   resourceWorktreePath_.c_str(), DIAGNOSTIC_RESULT_FILE_NAME);
     }
 }
 
@@ -286,7 +243,7 @@ void KernelSpecializationDiagnostics::AppendTextToDiagnosticFile(
     try {
         WriteDiagnosticTextFile(filePath, text, std::ios::app);
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to append diagnostic file: path=%s", filePath.c_str());
+        ASCENDLOGW("Failed to append diagnostic file: path=%s", filePath.c_str());
     }
 }
 

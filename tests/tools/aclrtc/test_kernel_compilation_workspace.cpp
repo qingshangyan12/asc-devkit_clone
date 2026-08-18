@@ -9,7 +9,6 @@
  */
 
 #include "specialization/kernel_compilation_workspace.h"
-#include "stub/kernel_specialization_log.h"
 
 #include <gtest/gtest.h>
 
@@ -61,7 +60,7 @@ TEST(KernelCompilationWorkspaceTest, CreatesOutputDirectoriesAndAppliesAllPatche
         {sourcePath, "@@B@@", "{0x02}"},
     };
 
-    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
     EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), 0);
     EXPECT_TRUE(fs::is_directory(worktreePath / "outputs/nested"));
     EXPECT_EQ(ReadFile(sourcePath), "A={0x01}; B={0x02};\n");
@@ -70,7 +69,7 @@ TEST(KernelCompilationWorkspaceTest, CreatesOutputDirectoriesAndAppliesAllPatche
     fs::remove_all(worktreePath, ignoredError);
 }
 
-TEST(KernelCompilationWorkspaceTest, ReportsMissingPatchTemplateAsResourceFailure)
+TEST(KernelCompilationWorkspaceTest, FailsWhenPatchTemplateIsMissing)
 {
     const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_missing_template");
     const fs::path sourcePath = worktreePath / "resources/constants.h";
@@ -78,33 +77,25 @@ TEST(KernelCompilationWorkspaceTest, ReportsMissingPatchTemplateAsResourceFailur
     KernelCompilationPlan plan;
     plan.sourcePatches = {{sourcePath, "@@MISSING@@", "{0x01}"}};
 
-    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
     EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "patch template was not found"));
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "regenerate the JIT resource from matching source files"));
     EXPECT_EQ(ReadFile(sourcePath), "unchanged\n");
 
     boost::system::error_code ignoredError;
     fs::remove_all(worktreePath, ignoredError);
 }
 
-TEST(KernelCompilationWorkspaceTest, ReportsUnreadablePatchFileWithSystemReason)
+TEST(KernelCompilationWorkspaceTest, FailsWhenPatchFileIsMissing)
 {
     const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_missing_file");
     const fs::path missingSourcePath = worktreePath / "resources/missing_constants.h";
     KernelCompilationPlan plan;
     plan.sourcePatches = {{missingSourcePath, "@@MISSING@@", "{0x01}"}};
 
-    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
     EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(missingSourcePath.string()));
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain("message="));
 
     boost::system::error_code ignoredError;
     fs::remove_all(worktreePath, ignoredError);
@@ -129,8 +120,7 @@ TEST(KernelCompilationWorkspaceTest, PreservesOriginalSourceWhenFinalPatchFlushF
     zeroFileSizeLimit.rlim_cur = 0;
     ASSERT_EQ(setrlimit(RLIMIT_FSIZE, &zeroFileSizeLimit), 0);
 
-    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
     const aclError patchResult = workspace.CreateOutputDirectoriesAndApplySourcePatches(plan);
 
     const int restoreLimitResult = setrlimit(RLIMIT_FSIZE, &originalFileSizeLimit);
@@ -139,8 +129,6 @@ TEST(KernelCompilationWorkspaceTest, PreservesOriginalSourceWhenFinalPatchFlushF
     ASSERT_EQ(restoreSignalResult, 0);
     EXPECT_EQ(patchResult, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_EQ(ReadFile(sourcePath), "VALUE=@@VALUE@@;\n");
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "Failed to finalize temporary source patch file"));
 
     boost::system::error_code ignoredError;
     fs::remove_all(worktreePath, ignoredError);
@@ -156,30 +144,11 @@ TEST(KernelCompilationWorkspaceTest, DeletesWorktreeByDefaultAndRetainsItWhenReq
 
     const fs::path retainedWorktreePath = CreateWorkspacePath("aclrtc_workspace_retain");
     {
-        KernelCompilationWorkspace workspace(retainedWorktreePath, WorktreeRetentionPolicy::RetainForDiagnostics);
+        KernelCompilationWorkspace workspace(retainedWorktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
     }
     EXPECT_TRUE(fs::is_directory(retainedWorktreePath));
     boost::system::error_code ignoredError;
     fs::remove_all(retainedWorktreePath, ignoredError);
-}
-
-TEST(KernelCompilationWorkspaceTest, RetainsWorktreeAfterMovingItToDiagnosticsDirectory)
-{
-    const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_move_to_diagnostics");
-    WriteFile(worktreePath / "artifact.txt", "diagnostic artifact\n");
-    const fs::path diagnosticWorktreePath =
-        worktreePath.parent_path() / fs::unique_path("aclrtc_retained_workspace_%%%%-%%%%-%%%%");
-
-    {
-        KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RemoveAfterCompilation);
-        ASSERT_TRUE(workspace.TryMoveWorktreeToDiagnosticsDirectory(diagnosticWorktreePath));
-        EXPECT_EQ(workspace.GetWorktreePath(), diagnosticWorktreePath);
-    }
-
-    EXPECT_FALSE(fs::exists(worktreePath));
-    EXPECT_EQ(ReadFile(diagnosticWorktreePath / "artifact.txt"), "diagnostic artifact\n");
-    boost::system::error_code ignoredError;
-    fs::remove_all(diagnosticWorktreePath, ignoredError);
 }
 
 TEST(KernelCompilationWorkspaceTest, RemovesWorktreeBeforeOutputPublicationWhenNotRetained)

@@ -10,7 +10,6 @@
 
 #include "acl/acl_rt_compile.h"
 #include "specialization/kernel_specialization_types.h"
-#include "stub/kernel_specialization_log.h"
 
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
@@ -116,14 +115,11 @@ TEST(KernelSpecializationRequestTest, IgnoresSuperKernelOptionsWithoutEnable)
     request.skOptionCount = 2;
 
     ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
-    ascendc::aclrtc::ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               0);
     EXPECT_EQ(normalizedRequest.compilationVariant, ascendc::aclrtc::CompilationVariant::Basic);
     EXPECT_TRUE(normalizedRequest.compilerOptions.superKernelOptions.empty());
-    EXPECT_TRUE(ascendc::aclrtc::CapturedKernelSpecializationLogsContain(
-        "WARNING: skOptions were provided without --enable-super-kernel"));
 }
 
 TEST(KernelSpecializationRequestTest, RejectsInvalidAbiFields)
@@ -153,82 +149,62 @@ TEST(KernelSpecializationRequestTest, RejectsInvalidAbiFields)
               ACL_ERROR_RTC_INVALID_INPUT);
 }
 
-TEST(KernelSpecializationRequestTest, ReportsSpecificRequestValidationFailures)
+TEST(KernelSpecializationRequestTest, RejectsSpecificRequestValidationFailures)
 {
-    using ascendc::aclrtc::CapturedKernelSpecializationLogsContain;
-    using ascendc::aclrtc::ClearCapturedKernelSpecializationLogs;
     ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
 
     aclrtcKernelSpecRequest request = CreateValidRequest();
     request.reserved[7] = 1U;
-    ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               ACL_ERROR_RTC_INVALID_INPUT);
-    EXPECT_TRUE(CapturedKernelSpecializationLogsContain(
-        "ERROR: aclrtcKernelSpecRequest.reserved[7] must be zero"));
 
     request = CreateValidRequest();
     request.optionCount = 1U;
-    ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               ACL_ERROR_RTC_INVALID_INPUT);
-    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("options must not be null"));
 
     const char* options[] = {"-o"};
     request = CreateValidRequest();
     request.options = options;
     request.optionCount = 1U;
-    ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               ACL_ERROR_RTC_INVALID_OPTION);
-    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("options[0] cannot override compiler output"));
 }
 
-TEST(KernelSpecializationRequestTest, ReportsHowToCorrectInvalidRequestText)
+TEST(KernelSpecializationRequestTest, RejectsInvalidRequestInputs)
 {
-    using ascendc::aclrtc::CapturedKernelSpecializationLogsContain;
-    using ascendc::aclrtc::ClearCapturedKernelSpecializationLogs;
     ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
 
     aclrtcKernelSpecRequest request = CreateValidRequest();
     request.resourceId = nullptr;
-    ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               ACL_ERROR_RTC_INVALID_INPUT);
-    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("resourceId must not be null"));
 
     request = CreateValidRequest();
     request.kernelEntry = "";
-    ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               ACL_ERROR_RTC_INVALID_INPUT);
-    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("kernelEntry must not be empty"));
 
     const char* nullOption[] = {nullptr};
     request = CreateValidRequest();
     request.options = nullOption;
     request.optionCount = 1U;
-    ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               ACL_ERROR_RTC_INVALID_OPTION);
-    EXPECT_TRUE(CapturedKernelSpecializationLogsContain("options[0] must not be null"));
 
     const char* optionWithControlByte[] = {"-DVALUE=line\nbreak"};
     request = CreateValidRequest();
     request.options = optionWithControlByte;
     request.optionCount = 1U;
-    ClearCapturedKernelSpecializationLogs();
     EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
                   request, "/tmp/kernel.elf", normalizedRequest),
               ACL_ERROR_RTC_INVALID_OPTION);
-    EXPECT_TRUE(CapturedKernelSpecializationLogsContain(
-        "options[0] contains prohibited control byte 0x0a at byte 12"));
 }
 
 TEST(KernelSpecializationRequestTest, RejectsOptionsThatCanRedirectCompilerInputsOrOutputs)
