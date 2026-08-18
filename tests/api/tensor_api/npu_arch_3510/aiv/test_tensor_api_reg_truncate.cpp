@@ -14,7 +14,7 @@
 
 #include <gtest/gtest.h>
 
-#include "c_api/stub/cce_stub.h"
+#include "tensor_api/stub/cce_stub.h"
 
 #include "tensor_api/arch/vector/experimental/type_conversion.h"
 #include "tensor_api/tensor.h"
