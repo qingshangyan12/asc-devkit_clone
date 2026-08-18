@@ -44,8 +44,8 @@ inline bool __hisnan(bfloat16_t x)
 
 接口功能不受全局饱和模式影响。返回值为：
 
--   false：输入非nan。
--   true：输入为nan。
+-   `false`：输入非nan。
+-   `true`：输入为nan。
 
 ## 约束说明
 
@@ -53,7 +53,7 @@ inline bool __hisnan(bfloat16_t x)
 
 ## 需要包含的头文件
 
-使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用`bfloat16_t`类型接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"
