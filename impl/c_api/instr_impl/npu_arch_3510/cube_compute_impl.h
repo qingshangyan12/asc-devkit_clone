@@ -36,6 +36,12 @@ __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_p
     asc_set_l0c2gm_config_impl(relu_pre, quant_pre, enable_unit_flag);
 }
 
+__aicore__ inline void asc_set_l0c_copy_nz_para(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride)
+{
+    asc_set_l0c_copy_nz_para_impl(nd_num, src_nd_stride, dst_nd_stride);
+}
+
+[[deprecated("NOTICE: asc_set_l0c2gm_nz2nd is deprecated. Please use asc_set_l0c_copy_nz_para instead")]]
 __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride)
 {
     asc_set_l0c2gm_nz2nd_impl(nd_num, src_nd_stride, dst_nd_stride);
@@ -384,13 +390,29 @@ __aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mo
     asc_set_hf32_round_mode_impl(hf32_round_mode);
 }
 
-__aicore__ inline void asc_enable_hf32_trans(uint32_t mode) { asc_enable_hf32_trans_impl(mode); }
+[[deprecated("NOTICE: asc_enable_hf32_trans is deprecated.")]]
+__aicore__ inline void asc_enable_hf32_trans(uint32_t mode)
+{
+    asc_enable_hf32_trans_impl(mode);
+}
 
-__aicore__ inline void asc_set_fp32_mode() { asc_set_fp32_mode_impl(); }
+[[deprecated("NOTICE: asc_set_fp32_mode is deprecated. Please use asc_disable_hf32 instead")]]
+__aicore__ inline void asc_set_fp32_mode()
+{
+    asc_set_fp32_mode_impl();
+}
+
+__aicore__ inline void asc_disable_hf32() { asc_disable_hf32_impl(); }
 
 __aicore__ inline void asc_enable_hif8() { asc_enable_hif8_impl(); }
 
-__aicore__ inline void asc_enable_fp8() { asc_enable_fp8_impl(); }
+__aicore__ inline void asc_disable_hif8() { asc_disable_hif8_impl(); }
+
+[[deprecated("NOTICE: asc_enable_fp8 is deprecated. Please use asc_disable_hif8 instead")]]
+__aicore__ inline void asc_enable_fp8()
+{
+    asc_enable_fp8_impl();
+}
 
 __aicore__ inline void asc_set_mmad_direction_m() { asc_set_mmad_direction_m_impl(); }
 
