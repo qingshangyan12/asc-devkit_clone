@@ -71,9 +71,12 @@ inline bfloat16_t __habs(bfloat16_t x)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelAbs(bfloat16_t* dst, bfloat16_t* x)
+    __global__ __launch_bounds__(1024) void KernelAbs(bfloat16_t* dst, bfloat16_t* x, int n)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= n) {
+            return;
+        }
         dst[idx] = __habs(x[idx]);
     }
     ```
