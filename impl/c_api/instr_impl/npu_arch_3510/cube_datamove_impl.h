@@ -2439,8 +2439,9 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
 
@@ -2463,8 +2464,9 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
 
@@ -2487,8 +2489,9 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
 
@@ -2511,8 +2514,9 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
 
@@ -2535,8 +2539,9 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode),
+        static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+        QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
 
@@ -2559,8 +2564,9 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode),
+        static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+        QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
 
@@ -2583,8 +2589,9 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode),
+        static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+        QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
 
@@ -2607,8 +2614,9 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode),
+        static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+        QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
 
@@ -2631,8 +2639,9 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode),
+        static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd,
+        QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
         false, false);
 }
 
@@ -2656,9 +2665,10 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
-        false, false);
+        dst, src, n_size, m_size, dst_stride, src_stride, 0, static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
+        false, false, false, false);
 }
 
 __aicore__ inline void asc_copy_l0c2l1_sync(
@@ -2694,9 +2704,10 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
-        false, false);
+        dst, src, n_size, m_size, dst_stride, src_stride, 0, static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
+        false, false, false, false);
 }
 
 __aicore__ inline void asc_copy_l0c2l1_sync(
@@ -2725,17 +2736,6 @@ __aicore__ inline void asc_copy_l0c2l1(
         eltwise_op, eltwise_antq_en, c0_pad_en, broadcast_en, enable_nz2dn);
 }
 
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
-    asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode,
-    bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
-{
-    asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
-        false, false);
-}
-
 // bfloat16_t float
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
@@ -2748,17 +2748,6 @@ __aicore__ inline void asc_copy_l0c2l1(
         dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
         quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, quant_post, relu_post, clip_relu_post,
         eltwise_op, eltwise_antq_en, c0_pad_en, broadcast_en, enable_nz2dn);
-}
-
-__aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
-    asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode,
-    bool enable_channel_split, bool enable_nz2nd, bool enable_clip_relu_pre)
-{
-    asc_copy_l0c2l1_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, enable_clip_relu_pre, unit_flag_mode, quant_pre_mode,
-        relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, false, false,
-        false, false);
 }
 
 // ==========asc_copy_l0c2gm===========
@@ -2782,8 +2771,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -2819,8 +2809,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -2856,8 +2847,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -2894,8 +2886,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -2931,8 +2924,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -2967,8 +2961,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -3003,8 +2998,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -3040,8 +3036,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -3077,8 +3074,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -3113,8 +3111,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -3150,8 +3149,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -3188,8 +3188,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -3225,8 +3226,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -3262,8 +3264,9 @@ __aicore__ inline void asc_copy_l0c2gm(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2gm_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, l2_cache_mode, enable_clip_relu_pre, unit_flag_mode,
-        quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(l2_cache_mode), static_cast<uint8_t>(enable_clip_relu_pre),
+        static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode), static_cast<uint8_t>(relu_pre_mode),
+        enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT, CLIP_RELU_POST_DEFAULT,
         ELTWISE_OP_DEFAULT, false, false, false, enable_nz2dn);
 }
 
@@ -3301,8 +3304,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3339,8 +3343,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3377,8 +3382,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3415,8 +3421,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3453,8 +3460,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3491,8 +3499,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3529,8 +3538,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3567,8 +3577,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3605,8 +3616,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3643,8 +3655,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3681,8 +3694,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3719,8 +3733,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3757,8 +3772,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
@@ -3795,8 +3811,9 @@ __aicore__ inline void asc_copy_l0c2ub(
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre)
 {
     asc_copy_l0c2ub_impl(
-        dst, src, n_size, m_size, dst_stride, src_stride, dual_dst_ctrl, sub_blockid, enable_clip_relu_pre,
-        unit_flag_mode, quant_pre_mode, relu_pre_mode, enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
+        dst, src, n_size, m_size, dst_stride, src_stride, static_cast<uint8_t>(dual_dst_ctrl), static_cast<bool>(sub_blockid),
+        static_cast<uint8_t>(enable_clip_relu_pre), static_cast<uint8_t>(unit_flag_mode), static_cast<uint64_t>(quant_pre_mode),
+        static_cast<uint8_t>(relu_pre_mode), enable_channel_split, enable_nz2nd, QUANT_POST_DEFAULT, RELU_POST_DEFAULT,
         CLIP_RELU_POST_DEFAULT, false, false, false, false, enable_nz2dn);
 }
 
