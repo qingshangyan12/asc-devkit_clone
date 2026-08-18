@@ -30,6 +30,7 @@ adv_test_targets=(
 adv_test_two_targets=(
     ascendc_ut_adv_api_tiling_ascend610
     ascendc_ut_adv_api_hccl_cc_algorithm_ascend950pr_9599_AIC
+    ascendc_ut_adv_api_hccl_cc_aicpu_alloc_ctx
 )
 
 basic_test_one_targets=(
@@ -81,6 +82,7 @@ basic_test_three_targets=(
     ascendc_ut_asc_runtime
     ascendc_ut_elf_tool
     ascendc_ut_pack_kernel
+    ascendc_ut_asc_compile_exporter
     ascendc_ut_tpl_tiling_debug
     ascendc_ut_tpl_tiling_release
     ascendc_ut_aicpu_api

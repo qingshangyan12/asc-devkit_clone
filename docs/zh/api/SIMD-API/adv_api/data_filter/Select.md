@@ -33,7 +33,7 @@
 
 如下图样例，源操作数src0为Tensor，shape为\(2,16\)，数据类型为half，尾轴长度满足32字节对齐；源操作数src1为scalar，数据类型为half；maskTensor的数据类型为bool，为满足对齐要求shape为\(2,32\)，仅有图中蓝色部分的mask掩码生效，灰色部分不参与计算。输出目的操作数dstTensor如下图所示。
 
-![](../../../figures/nz-reduce-53.png)
+![](../../../figures/nz_reduce_53.png)
 
 ## 实现原理
 
@@ -112,7 +112,7 @@ struct SelectWithBytesMaskShapeInfo {
 ## 约束说明
 
 -   源操作数与目的操作数可以复用。
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../general_description_and_constraints.md#section796754519912)。
 -   maskTensor尾轴元素个数和源操作数尾轴元素个数不同的情况下， maskTensor的数据有可能被接口改写。
 
 ## 调用示例

@@ -122,18 +122,6 @@ bool IsCcuKfcSupportedOp(uint32_t opType)
     return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
            opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
 }
-
-HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
-{
-    uint64_t actualSize = ctxSize;
-    if (HcclEngineCtxGet(comm, tag.c_str(), COMM_ENGINE_AIV, ctx, &actualSize) == HCCL_SUCCESS) {
-        HCCL_INFO(
-            "[AllocCcuOpResCtx] HcclEngineCtxGet success, tag[%s], ctxAddr[%p], ctxSize[%llu]", tag.c_str(), *ctx,
-            static_cast<unsigned long long>(actualSize));
-        return HCCL_SUCCESS;
-    }
-    return HcclEngineCtxCreate(comm, tag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx);
-}
 } // namespace
 
 HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum)
@@ -229,24 +217,20 @@ HcclResult AllocOpParamMemory(
         std::string tagParam = ctxTag + "_" + std::to_string(i);
         void* opParamPtr = nullptr;
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
-        if (HcclEngineCtxGet(
-                comm, tagParam.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), &opParamPtr, &opParamSize) ==
-            HCCL_SUCCESS) {
+        CommEngine commEngine = OpExecuteConfigToCommEngine(ccTiling->commEngine);
+        if (HcclEngineCtxGet(comm, tagParam.c_str(), commEngine, &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
             HCCL_INFO(
                 "HcclEngineCtxGet success, tagParam[%s], opParamAddr[%p], opParamSize[%u]", tagParam.c_str(),
                 opParamPtr, opParamSize);
             opParamAddr[i] = reinterpret_cast<uint64_t>(opParamPtr);
         } else {
-            CHK_RET(HcclEngineCtxCreate(
-                comm, tagParam.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), opParamSize, &opParamPtr));
+            CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), commEngine, opParamSize, &opParamPtr));
             opParamAddr[i] = reinterpret_cast<uint64_t>(opParamPtr);
         }
         HCCL_INFO(
             "HcclAllocOpResCtx the %dth opParam: opParamAddr[%u], opParamSize[%u]", i, opParamAddr[i], opParamSize);
 
-        aclError aclRet = aclrtMemcpy(
-            reinterpret_cast<void*>(opParamAddr[i]), opParamSize, &opParamVec[i], opParamSize, aclrtMemcpyKind(1));
-        CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
+        CHK_RET(HcclEngineCtxCopy(comm, commEngine, tagParam.c_str(), &opParamVec[i], opParamSize, 0));
         resCtx.algInfo[i].opParam = opParamAddr[i];
         resCtx.algInfo[i].offset = initTiling->offset[i];
     }
@@ -293,21 +277,18 @@ HcclResult AllocAndCopyOpResCtx(
 {
     std::string tagOpResCtx = ctxTag + "_opResCtx";
     uint64_t opResCtxSize = sizeof(OpResCtx);
-    if (HcclEngineCtxGet(
-            comm, tagOpResCtx.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), opResCtxPtr, &opResCtxSize) ==
-        HCCL_SUCCESS) {
+    CommEngine commEngine = OpExecuteConfigToCommEngine(ccTiling->commEngine);
+    if (HcclEngineCtxGet(comm, tagOpResCtx.c_str(), commEngine, opResCtxPtr, &opResCtxSize) == HCCL_SUCCESS) {
         HCCL_INFO(
             "HcclEngineCtxGet success, tagOpResCtx[%s], opResCtxAddr[%p], opResCtxSize[%u]", tagOpResCtx.c_str(),
             opResCtxPtr, opResCtxSize);
     } else {
-        CHK_RET(HcclEngineCtxCreate(
-            comm, tagOpResCtx.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), opResCtxSize, opResCtxPtr));
+        CHK_RET(HcclEngineCtxCreate(comm, tagOpResCtx.c_str(), commEngine, opResCtxSize, opResCtxPtr));
     }
 
     HCCL_INFO("HcclAllocOpResCtx the opResCtx: opResCtxAddr[%u], opResCtxSize[%u]", opResCtxPtr, opResCtxSize);
 
-    aclError aclRet = aclrtMemcpy(*opResCtxPtr, opResCtxSize, &resCtx, opResCtxSize, aclrtMemcpyKind(1));
-    CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
+    CHK_RET(HcclEngineCtxCopy(comm, commEngine, tagOpResCtx.c_str(), &resCtx, opResCtxSize, 0));
     return HCCL_SUCCESS;
 }
 } // namespace
@@ -538,6 +519,13 @@ HcclResult InitOpParamByTiling(
     opParam.opType = static_cast<HcclCMDType>(ccTiling->opType);
     opParam.stream = reinterpret_cast<aclrtStream>(stream);
     opParam.engine = OpExecuteConfigToCommEngine(ccTiling->commEngine);
+
+    if (ccTiling->commEngine == static_cast<uint8_t>(OpExecuteConfig::AICPU_TS)) {
+        opParam.commOpExpansionMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU;
+    } else if (ccTiling->commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+        opParam.commOpExpansionMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_CCU_SCHED;
+    }
+
     CHK_RET(HcclGetCommName(comm, opParam.commName));
     CHK_RET(PrepareOpParams(comm, tag, ccTiling, opParam));
     if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
@@ -895,9 +883,15 @@ HcclResult SelectCcuAlgorithm(
     CHK_RET(InitOpParamByTiling(comm, stream, topoTag, ccTiling, opParam));
     HCCL_INFO("[CcuSelectAlg]InitOpParamByTiling[%u] successfully!", tilingIndex);
 
-    CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
-    HCCL_INFO(
-        "[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", tilingIndex, algName.c_str());
+    if (GetForcedAlgName(ccTiling, algName)) {
+        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+        CHK_RET(PrepareEngineForAlg(opParam, algName));
+        HCCL_INFO("[CcuSelectAlg] use configured algorithm[%s] for ccTiling[%u].", algName.c_str(), tilingIndex);
+    } else {
+        CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
+        HCCL_INFO(
+            "[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", tilingIndex, algName.c_str());
+    }
 
     auto it = algorithmMap.find(algName);
     if (it == algorithmMap.end()) {
@@ -953,13 +947,7 @@ HcclResult CopyCcuOpParamToDevice(
     std::string tagParam = std::to_string(tilingIndex) + "_" + std::string(opParam.algTag);
     void* opParamPtr = nullptr;
     uint64_t opParamSize = sizeof(OpParam);
-    if (HcclEngineCtxGet(comm, tagParam.c_str(), COMM_ENGINE_AIV, &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
-        HCCL_INFO(
-            "HcclEngineCtxGet success, tagParam[%s], opParamAddr[%p], opParamSize[%llu]", tagParam.c_str(), opParamPtr,
-            opParamSize);
-    } else {
-        CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), COMM_ENGINE_AIV, opParamSize, &opParamPtr));
-    }
+    CHK_RET(GetOrCreateCcuCtx(comm, tagParam, opParamSize, &opParamPtr));
     aclError aclRet = aclrtMemcpy(opParamPtr, opParamSize, &opParam, opParamSize, ACL_MEMCPY_HOST_TO_DEVICE);
     CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
     opResCtx.algInfo[tilingIndex].opParam = reinterpret_cast<uint64_t>(opParamPtr);
