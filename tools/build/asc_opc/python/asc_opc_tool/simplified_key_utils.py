@@ -191,9 +191,7 @@ def infer_simplified_key_mode(op, opc_compile_args):
             CUSTOM_SIMPLIFIED_KEY_MAX_LEN,
             "custom simplified_key",
         )
-        logger.warn(
-            "Custom simplified_key is configured; custom mode 2 will be used."
-        )
+        logger.warn("Custom simplified_key is configured; custom mode 2 will be used.")
         return (2, None, None, None, None)
     has_invalid_option, has_non_null_attr, attr_str = check_attr_for_simpilified_key(
         op.get(CompileParam.ATTRS)

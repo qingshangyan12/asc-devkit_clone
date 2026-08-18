@@ -25,12 +25,8 @@ def _valid_binary_json(op_type="AddCustomTemplate"):
             {
                 "bin_filename": "AddCustomTemplate_FP16",
                 "simplified_key": "custom_fp16",
-                "inputs": [
-                    {"dtype": "float16", "format": "ND", "shape": [-2]}
-                ],
-                "outputs": [
-                    {"dtype": "float16", "format": "ND", "shape": [-2]}
-                ],
+                "inputs": [{"dtype": "float16", "format": "ND", "shape": [-2]}],
+                "outputs": [{"dtype": "float16", "format": "ND", "shape": [-2]}],
             }
         ],
     }
@@ -52,7 +48,7 @@ set(CUSTOM_OPC_OPTIONS "custom_opc_options.ini")
 file(MAKE_DIRECTORY "${{CMAKE_BINARY_DIR}}/autogen")
 file(WRITE "${{CMAKE_BINARY_DIR}}/autogen/custom_opc_options.ini" "")
 set_property(GLOBAL PROPERTY ASCENDC_AUTO_GEN_PATH "${{CMAKE_BINARY_DIR}}/autogen")
-include("{(FWK_MODULES_DIR / 'func.cmake').as_posix()}")
+include("{(FWK_MODULES_DIR / "func.cmake").as_posix()}")
 npu_op_kernel_sources(ascendc_kernels {kernel_args})
 {options}
 ''',
@@ -85,9 +81,9 @@ def test_kernel_json_option_writes_opc_kernel_config(tmp_path):
 
 def test_kernel_sources_no_longer_handles_binary_json():
     source = (FWK_MODULES_DIR / "func.cmake").read_text(encoding="utf-8")
-    kernel_sources = source.split(
-        "function(npu_op_kernel_sources target_name)", 1
-    )[1].split("endfunction()", 1)[0]
+    kernel_sources = source.split("function(npu_op_kernel_sources target_name)", 1)[
+        1
+    ].split("endfunction()", 1)[0]
 
     assert "BINARY_JSON" not in kernel_sources
     assert "--simplified_key_mode=None" not in kernel_sources

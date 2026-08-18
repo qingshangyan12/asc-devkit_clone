@@ -25,6 +25,8 @@ FRAMEWORK_PATH = os.path.join(TOP_PATH, "tools/build/")
 ASC_OPC_PATH = os.path.join(TOP_PATH, "tools/build/asc_opc/python/asc_opc_tool/")
 OPC_STUB_PATH = os.path.join(TOP_PATH, "tests/python/asc_opc/stub/")
 UTIL_PATH = os.path.join(TOP_PATH, "cmake/asc/fwk_modules/util/")
+
+
 @pytest.fixture
 def custom_binary_modules(monkeypatch):
     for path in (FRAMEWORK_PATH, ASC_OPC_PATH, OPC_STUB_PATH, UTIL_PATH):
@@ -231,7 +233,9 @@ def test_invalid_value_message_keeps_original_op_index(
     assert "op_list[1].inputs[0].dtype" in logger.errors[-1]
 
 
-def test_standard_mode_keeps_existing_validation_behavior(tmp_path, custom_binary_modules):
+def test_standard_mode_keeps_existing_validation_behavior(
+    tmp_path, custom_binary_modules
+):
     content = _valid_config()
     del content["op_list"][0]["simplified_key"]
     content["op_list"][0]["inputs"][0]["dtype"] = "legacy_custom_dtype"
@@ -243,8 +247,14 @@ def test_standard_mode_keeps_existing_validation_behavior(tmp_path, custom_binar
     ("content", "expected_error"),
     [
         ([], "root: expected object"),
-        ({"op_type": "AddCustomTemplate", "op_list": []}, "op_list: expected non-empty array"),
-        ({"op_type": "AddCustomTemplate", "op_list": [None]}, "op_list[0]: expected object"),
+        (
+            {"op_type": "AddCustomTemplate", "op_list": []},
+            "op_list: expected non-empty array",
+        ),
+        (
+            {"op_type": "AddCustomTemplate", "op_list": [None]},
+            "op_list[0]: expected object",
+        ),
     ],
 )
 def test_rejects_invalid_binary_json_structure(
@@ -254,7 +264,9 @@ def test_rejects_invalid_binary_json_structure(
     path = tmp_path / "binary.json"
     path.write_text(json.dumps(content), encoding="utf-8")
 
-    with pytest.raises(ValueError, match=expected_error.replace("[", r"\[").replace("]", r"\]")):
+    with pytest.raises(
+        ValueError, match=expected_error.replace("[", r"\[").replace("]", r"\]")
+    ):
         split_json_files(
             str(path),
             str(tmp_path),

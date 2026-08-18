@@ -55,7 +55,9 @@ def _check_binary_json(binary_json, expected_op_type):
             raise ValueError(f"{op_path}.bin_filename: invalid value '{bin_filename}'")
         output_name = os.path.splitext(bin_filename)[0]
         if output_name in bin_filenames:
-            raise ValueError(f"{op_path}.bin_filename: duplicate output '{output_name}'")
+            raise ValueError(
+                f"{op_path}.bin_filename: duplicate output '{output_name}'"
+            )
         bin_filenames.add(output_name)
         simplified_key = op.get("simplified_key")
         if not isinstance(simplified_key, str) or not simplified_key:
