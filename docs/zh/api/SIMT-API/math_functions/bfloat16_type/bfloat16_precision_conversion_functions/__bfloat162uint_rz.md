@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-遵循CAST\_TRUNC模式，将bfloat16类型数据转换为无符号整数，返回转换后的值。
+遵循`CAST_TRUNC`模式，将bfloat16类型数据转换为无符号整数，返回转换后的值。
 
 ## 函数原型
 
@@ -59,7 +59,7 @@ inline unsigned int __bfloat162uint_rz(const bfloat16_t x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用该接口需要包含"`simt_api/asc_bf16.h`"头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"
