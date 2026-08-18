@@ -55,6 +55,9 @@ inline long long int __half2ll_rna(const half x)
 | 0.5 | 1 |
 | -0.5 | -1 |
 | 2.5 | 3 |
+| 0.5 | 1 |
+| -0.5 | -1 |
+| 2.5 | 3 |
 
 ## 约束说明
 
