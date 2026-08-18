@@ -11,9 +11,6 @@
 #ifndef CCU_CONTROL_FLOW_MACRO_DL_H
 #define CCU_CONTROL_FLOW_MACRO_DL_H
 
-#if CANN_VERSION_NUM >= 90100000
-#include "ccu_control_flow_macro.h"
-#else
 #include "ccu_variable_dl.hpp"
 #include "ccu_primitives_impl_dl.h"
 
@@ -28,30 +25,40 @@
 
 #define CCU_WHILE_EXPAND(expr, uid) CCU_WHILE_IMPL(expr, uid)
 
-#define CCU_WHILE_IMPL(expr, uid)                                                                                     \
-    for (::AscendC::ccu::CondExpr uid##_ce = (expr), *uid##_p = &uid##_ce; uid##_p != nullptr; uid##_p = nullptr)     \
-        for (const char *uid##_dwLbl = _CcuDoWhileStackPopForWhile(), *uid##_sen = (const char*)1;                    \
-             uid##_sen != nullptr; uid##_sen = nullptr)                                                               \
-            for (int uid##_rc =                                                                                       \
-                     (uid##_dwLbl != nullptr) ?                                                                       \
-                         (int)CCU_SUCCESS :                                                                           \
-                         (int)CcuWhileBegin(uid##_ce.var->handle, uid##_ce.imm, uid##_ce.cond, CCU_LABEL(uid)),       \
-                     uid##_done = 0;                                                                                  \
-                 uid##_rc == (int)CCU_SUCCESS && !uid##_done;                                                         \
-                 uid##_done = 1, uid##_rc = (uid##_dwLbl != nullptr) ?                                                \
-                                                (int)CcuDoWhileEnd(                                                   \
-                                                    uid##_ce.var->handle, uid##_ce.imm, uid##_ce.cond, uid##_dwLbl) : \
-                                                (int)CcuWhileEnd(CCU_LABEL(uid)))
+#define CCU_WHILE_IMPL(expr, uid)                                                                                   \
+    for (::AscendC::ccu::CondExpr uid##_ce = (expr), *uid##_p = &uid##_ce; uid##_p != nullptr; uid##_p = nullptr)   \
+        for (const char *uid##_dwLbl = _CcuDoWhileStackPopForWhile(), *uid##_sen = (const char*)1;                  \
+             uid##_sen != nullptr; uid##_sen = nullptr)                                                             \
+            for (int uid##_rc                                                                                       \
+                 = (uid##_dwLbl != nullptr) ?                                                                       \
+                       (int)CCU_SUCCESS :                                                                           \
+                       (uid##_ce.isVarCompare ?                                                                     \
+                            (int)CcuWhileBeginVar(                                                                  \
+                                uid##_ce.var->handle, uid##_ce.rhsVar->handle, uid##_ce.cond, CCU_LABEL(uid)) :     \
+                            (int)CcuWhileBegin(uid##_ce.var->handle, uid##_ce.imm, uid##_ce.cond, CCU_LABEL(uid))), \
+                 uid##_done = 0;                                                                                    \
+                 uid##_rc == (int)CCU_SUCCESS && !uid##_done;                                                       \
+                 uid##_done = 1,                                                                                    \
+                 uid##_rc                                                                                           \
+                 = (uid##_dwLbl != nullptr) ?                                                                       \
+                       (uid##_ce.isVarCompare ?                                                                     \
+                            (int)CcuDoWhileEndVar(                                                                  \
+                                uid##_ce.var->handle, uid##_ce.rhsVar->handle, uid##_ce.cond, uid##_dwLbl) :        \
+                            (int)CcuDoWhileEnd(uid##_ce.var->handle, uid##_ce.imm, uid##_ce.cond, uid##_dwLbl)) :   \
+                       (int)CcuWhileEnd(CCU_LABEL(uid)))
 
 #define CCU_IF(expr) CCU_IF_EXPAND(expr, CCU_CONCAT(__ccu_if_, __COUNTER__))
 
 #define CCU_IF_EXPAND(expr, uid) CCU_IF_IMPL(expr, uid)
 
-#define CCU_IF_IMPL(expr, uid)                                                                                    \
-    for (::AscendC::ccu::CondExpr uid##_ce = (expr), *uid##_p = &uid##_ce; uid##_p != nullptr; uid##_p = nullptr) \
-        for (int uid##_rc = (int)CcuIfBegin(uid##_ce.var->handle, uid##_ce.imm, uid##_ce.cond, CCU_LABEL(uid)),   \
-                 uid##_done = (_CcuIfStackPush(CCU_LABEL(uid)), 0);                                               \
-             uid##_rc == (int)CCU_SUCCESS && uid##_done == 0;                                                     \
+#define CCU_IF_IMPL(expr, uid)                                                                                         \
+    for (::AscendC::ccu::CondExpr uid##_ce = (expr), *uid##_p = &uid##_ce; uid##_p != nullptr; uid##_p = nullptr)      \
+        for (int uid##_rc                                                                                              \
+             = (uid##_ce.isVarCompare ?                                                                                \
+                    (int)CcuIfBeginVar(uid##_ce.var->handle, uid##_ce.rhsVar->handle, uid##_ce.cond, CCU_LABEL(uid)) : \
+                    (int)CcuIfBegin(uid##_ce.var->handle, uid##_ce.imm, uid##_ce.cond, CCU_LABEL(uid))),               \
+             uid##_done = (_CcuIfStackPush(CCU_LABEL(uid)), 0);                                                        \
+             uid##_rc == (int)CCU_SUCCESS && uid##_done == 0;                                                          \
              uid##_done = 1, ((void)CcuFlushPendingIfs(), _CcuIfStackMarkBodyDone(), (void)0))
 
 #define CCU_ELSE CCU_ELSE_EXPAND(CCU_CONCAT(__ccu_el_, __COUNTER__))
@@ -71,7 +78,5 @@
 #define CCU_DO_IMPL(uid)                                                      \
     for (int uid##_rc = (int)CcuDoWhileBegin(CCU_LABEL(uid)), uid##_done = 0; \
          uid##_rc == (int)CCU_SUCCESS && !uid##_done; uid##_done = 1, _CcuDoWhileStackPush(CCU_LABEL(uid)))
-
-#endif // CANN_VERSION_NUM >= 90100000
 
 #endif // CCU_CONTROL_FLOW_MACRO_DL_H
