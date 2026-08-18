@@ -95,9 +95,9 @@ public:
     static ResourceRegistry& Instance();
 
     /**
-     * @brief Loads compile resources from an explicit path or the configured OPP search paths.
-     * @param[in] directory Resource shared object or directory to load. Pass nullptr or an empty string to use
-     * automatic OPP discovery.
+     * @brief Loads compile resources from an explicit shared object or the configured OPP search paths.
+     * @param[in] directory Resource shared object file to load. Pass nullptr or an empty string to use automatic OPP
+     * discovery. Directory input is not supported for explicit loading.
      * @return ResourceStatus::Success on success; otherwise, a status describing the discovery, validation, loading,
      * I/O, or conflict failure.
      */
