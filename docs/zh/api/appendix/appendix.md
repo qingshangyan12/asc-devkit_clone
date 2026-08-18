@@ -10,6 +10,8 @@
 
 - **[Mmad接口边界值汇总](mmad_interface_boundary_value_summary.md)**
 
+- **[Fixpipe接口边界值汇总](fixpipe_interface_boundary_value_summary.md)**
+
 - **[Memory矢量计算接口边界值汇总](memory_vector_compute_interface_boundary_value_summary.md)**
 
 - **[Reg矢量计算接口边界值汇总](reg_vector_compute_interface_boundary_value_summary.md)**
