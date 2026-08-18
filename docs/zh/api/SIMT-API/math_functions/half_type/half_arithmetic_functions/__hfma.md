@@ -88,7 +88,7 @@ x \* y + z的值。本接口受全局饱和模式影响，特殊值如下：
     <td>ASCRT_MAX_NORMAL_FP16</td>
   </tr>
   <tr>
-    <td colspan="3">x*y+z小于ASCRT_MAX_NORMAL_FP16</td>
+    <td colspan="3">x*y+z小于-ASCRT_MAX_NORMAL_FP16</td>
     <td>-inf</td>
     <td>-ASCRT_MAX_NORMAL_FP16</td>
   </tr>

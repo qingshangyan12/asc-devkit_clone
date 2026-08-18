@@ -56,7 +56,7 @@ inline bfloat16x2_t h2sqrt(bfloat16x2_t x)
 
 ## 约束说明
 
-本接口支持的输入数据各元素范围为x大于等于0，否则返回值为nan。
+本接口支持的输入数据各元素范围为x大于等于0，否则在非饱和模式下返回值为nan，在饱和模式下返回值为0。
 
 <!-- npu="950" id7 -->
 针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。

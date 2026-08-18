@@ -58,7 +58,7 @@ inline bfloat16_t __float2bfloat16_rd(const float x)
 
 ## 约束说明
 
-无
+本接口的饱和行为受全局饱和模式影响，开启方式为设置CTRL[60]寄存器，具体参见[控制饱和行为的方式](../../data_type_conversion/overview.md#section1194916101549)。SIMT编程场景无法设置CTRL寄存器，该场景下饱和模式不生效。
 
 ## 需要包含的头文件
 

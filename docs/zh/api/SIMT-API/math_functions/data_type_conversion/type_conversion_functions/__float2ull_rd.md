@@ -68,10 +68,12 @@ inline unsigned long long int __float2ull_rd(const float x)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__float2ull_rd(uint64_t* dst, float* x)
+    __global__ __launch_bounds__(1024) void kernel__float2ull_rd(uint64_t* dst, float* x, uint32_t count)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = __float2ull_rd(x[idx]);
+        if (idx < count) {
+            dst[idx] = __float2ull_rd(x[idx]);
+        }
     }
     ```
 

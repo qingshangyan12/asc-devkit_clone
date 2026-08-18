@@ -48,7 +48,7 @@ inline bfloat16_t hrcp(bfloat16_t x)
 
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
-| 0 | inf | ASCRT_MAX_NORMAL_BF16 |
+| ±0 | inf | ASCRT_MAX_NORMAL_BF16 |
 | inf | 0 | 0 |
 | -inf | -0 | -0 |
 | nan | nan | 0 |
@@ -56,7 +56,7 @@ inline bfloat16_t hrcp(bfloat16_t x)
 ## 约束说明
 
 <!-- npu="950" id7 -->
-针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了除法运算符，由于除法运算符不支持Subnormal场景，当输入x为Subnormal数据时，会导致本接口最终结果为±inf。
+针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了除法运算符，由于除法运算符不支持Subnormal场景，当输入x为Subnormal数据时，会导致本接口最终结果为±inf；当计算结果处于Subnormal范围（例如x为较大正常数）时，输出会被刷新为保留符号的0。
 <!-- end id7 -->
 
 ## 需要包含的头文件

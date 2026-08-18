@@ -50,7 +50,8 @@ inline long long int __float2ll_rna(const float x)
 | nan | 0 |
 | inf | 9223372036854775807（INT64_MAX） |
 | -inf | -9223372036854775808（INT64_MIN） |
-| ASCRT_MAX_NORMAL_F | 9223372036854775807（INT64_MAX） |
+| 超出int64范围的正值（如ASCRT_MAX_NORMAL_F） | 9223372036854775807（INT64_MAX） |
+| 超出int64范围的负值（如-ASCRT_MAX_NORMAL_F） | -9223372036854775808（INT64_MIN） |
 
 ## 约束说明
 

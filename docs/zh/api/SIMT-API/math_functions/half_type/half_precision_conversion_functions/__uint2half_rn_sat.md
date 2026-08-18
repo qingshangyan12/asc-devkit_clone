@@ -47,7 +47,7 @@ inline half __uint2half_rn_sat(const unsigned int x)
 | x值 | 返回值 |
 | --- | --- |
 | 0 | 0 |
-| x>4294967295（uint32_t最大值） | ASCRT\_MAX\_NORMAL\_FP16 |
+| x>ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 

@@ -73,10 +73,12 @@ inline bfloat16_t __bfloat162bfloat16_rna(const bfloat16_t x)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__bfloat162bfloat16_rna(bfloat16_t* dst, bfloat16_t* x)
+    __global__ __launch_bounds__(1024) void kernel__bfloat162bfloat16_rna(bfloat16_t* dst, bfloat16_t* x, unsigned int count)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = __bfloat162bfloat16_rna(x[idx]);
+        unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx < count) {
+            dst[idx] = __bfloat162bfloat16_rna(x[idx]);
+        }
     }
     ```
 
@@ -87,5 +89,10 @@ inline bfloat16_t __bfloat162bfloat16_rna(const bfloat16_t x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __bfloat162bfloat16_rna(x[idx]);
+    }
+
+    __global__ __vector__ void run_bfloat162bfloat16_rna(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)
+    {
+        asc_vf_call<kernel__bfloat162bfloat16_rna>(dim3(1024), dst, x);
     }
     ```

@@ -29,7 +29,7 @@
 ## 函数原型
 
 ```cpp
-unsigned long long meta_group_size() const
+unsigned int meta_group_size() const
 ```
 
 ## 参数说明

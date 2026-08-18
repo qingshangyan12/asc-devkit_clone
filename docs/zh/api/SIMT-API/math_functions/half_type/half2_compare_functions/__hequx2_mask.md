@@ -74,7 +74,7 @@ unsigned int __hequx2_mask(half2 x, half2 y)
   <tr>
     <td>±inf</td>
     <td>异号inf</td>
-    <td>0xFFFF</td>
+    <td>0x0</td>
   </tr>
 </table>
 

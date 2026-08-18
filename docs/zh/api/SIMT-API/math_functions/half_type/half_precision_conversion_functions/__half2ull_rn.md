@@ -53,7 +53,7 @@ inline unsigned long long int __half2ull_rn(const half x)
 | inf | 18446744073709551615（uint64_t最大值） |
 | -inf | 0 |
 | x<0 | 0 |
-| ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
+| ASCRT\_MAX\_NORMAL\_FP16 | 65504 |
 
 ## 约束说明
 

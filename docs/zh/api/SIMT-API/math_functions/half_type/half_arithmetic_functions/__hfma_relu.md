@@ -86,7 +86,7 @@ x \* y + z的值，若结果为负数，置为0。本接口受全局饱和模式
     <td>ASCRT_MAX_NORMAL_FP16</td>
   </tr>
   <tr>
-    <td colspan="3">x*y+z小于ASCRT_MIN_NORMAL_FP16</td>
+    <td colspan="3">x*y+z小于FP16正数最小规格化值</td>
     <td>0</td>
     <td>0</td>
   </tr>
