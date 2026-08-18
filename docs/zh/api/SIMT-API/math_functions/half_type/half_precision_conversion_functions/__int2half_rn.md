@@ -51,8 +51,10 @@ inline half __int2half_rn(const int x)
 | ±2049 | ±2048 |
 | ±2051 | ±2052 |
 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
-| x>ASCRT\_MAX\_NORMAL\_FP16 | inf |
-| x<-ASCRT\_MAX\_NORMAL\_FP16 | -inf |
+| 65505 | ASCRT\_MAX\_NORMAL\_FP16 |
+| -65505 | -ASCRT\_MAX\_NORMAL\_FP16 |
+| x≥65520 | inf |
+| x≤-65520 | -inf |
 
 ## 约束说明
 
