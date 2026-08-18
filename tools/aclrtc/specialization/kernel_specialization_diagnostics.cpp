@@ -168,8 +168,8 @@ void KernelSpecializationDiagnostics::WriteManifestSnapshot(const nlohmann::json
         const fs::path manifestPath = diagnosticDirectoryPath_ / "manifest.json";
         WriteDiagnosticTextFile(manifestPath, resourceManifest.dump(2) + '\n', std::ios::trunc);
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record specialization manifest: path=%s",
-                           (diagnosticDirectoryPath_ / "manifest.json").c_str());
+        ACLRTC_LOG_WARNING("Failed to record specialization manifest: directory=%s file=manifest.json",
+                           diagnosticDirectoryPath_.c_str());
     }
 }
 
@@ -182,8 +182,8 @@ void KernelSpecializationDiagnostics::RecordWorktreePath(const fs::path& resourc
         AppendTextToDiagnosticFile(diagnosticDirectoryPath_ / "compile.log",
                                    "resource_worktree=" + resourceWorktreePath.string() + "\n");
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record resource worktree path: path=%s",
-                           (diagnosticDirectoryPath_ / "compile.log").c_str());
+        ACLRTC_LOG_WARNING("Failed to record resource worktree path: directory=%s file=compile.log",
+                           diagnosticDirectoryPath_.c_str());
     }
 }
 
@@ -201,9 +201,8 @@ void KernelSpecializationDiagnostics::AppendCommandToReplayScript(
         replayLine += '\n';
         AppendTextToDiagnosticFile(diagnosticDirectoryPath_ / "replay.sh", replayLine);
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record command %s: path=%s",
-                           compilationCommand.diagnosticLabel.c_str(),
-                           (diagnosticDirectoryPath_ / "replay.sh").c_str());
+        ACLRTC_LOG_WARNING("Failed to record command %s: directory=%s file=replay.sh",
+                           compilationCommand.diagnosticLabel.c_str(), diagnosticDirectoryPath_.c_str());
     }
 }
 
@@ -226,9 +225,8 @@ void KernelSpecializationDiagnostics::AppendCommandResultToCompilationLog(
         }
         AppendTextToDiagnosticFile(diagnosticDirectoryPath_ / "compile.log", resultText.str());
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record result for command %s: path=%s",
-                           compilationCommand.diagnosticLabel.c_str(),
-                           (diagnosticDirectoryPath_ / "compile.log").c_str());
+        ACLRTC_LOG_WARNING("Failed to record result for command %s: directory=%s file=compile.log",
+                           compilationCommand.diagnosticLabel.c_str(), diagnosticDirectoryPath_.c_str());
     }
 }
 
@@ -274,8 +272,8 @@ void KernelSpecializationDiagnostics::WriteSpecializationResult(
         const fs::path resultPath = diagnosticDirectoryPath_ / "result.json";
         WriteDiagnosticTextFile(resultPath, resultJson.dump(2) + '\n', std::ios::trunc);
     } catch (...) {
-        ACLRTC_LOG_WARNING("Failed to record specialization result: path=%s",
-                           (diagnosticDirectoryPath_ / "result.json").c_str());
+        ACLRTC_LOG_WARNING("Failed to record specialization result: directory=%s file=result.json",
+                           diagnosticDirectoryPath_.c_str());
     }
 }
 
