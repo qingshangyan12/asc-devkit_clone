@@ -53,6 +53,8 @@ inline unsigned int __float2uint_rd(const float x)
 | -inf | 0 |
 | 超出uint32_t范围的正值 | 4294967295 |
 | 负数 | 0 |
+| 超出uint32_t范围的正值 | 4294967295 |
+| 负数 | 0 |
 
 ## 约束说明
 
