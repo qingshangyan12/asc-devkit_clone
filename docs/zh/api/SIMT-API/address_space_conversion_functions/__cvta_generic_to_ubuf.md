@@ -72,9 +72,9 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_ubuf(uint32_t* s
 {
     __ubuf__ uint32_t ubuf_data[1024];
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    ubuf_data[threadIdx.x] = src[idx]; // 需保证 idx 不越界，或补充分界判断 // 需保证 idx 不越界，或补充分界判断 // 需保证 idx 不越界，或补充分界判断 // 需保证 idx 不越界，或补充分界判断 // 需保证 idx 不越界，或补充分界判断
+    ubuf_data[threadIdx.x] = src[idx]; // 需保证 idx 不越界，或补充分界判断 // 需保证 idx 不越界，或补充分界判断 // 需保证 idx 不越界，或补充分界判断 // 需保证 idx 不越界，或补充分界判断 // 需保证 idx 不越界，或补充分界判断 // 需保证 idx 不越界，或补充分界判断
     size_t addr_val = __cvta_generic_to_ubuf(ubuf_data + threadIdx.x);
-    if (addr_val > (256-32) * 1024) { // 256:UB总容量，32:Dcache容量，取值适用于Ascend 950，取值适用于Ascend 950，取值适用于Ascend 950，取值适用于Ascend 950，取值适用于Ascend 950
+    if (addr_val > (256-32) * 1024) { // 256:UB总容量，32:Dcache容量，取值适用于Ascend 950，取值适用于Ascend 950，取值适用于Ascend 950，取值适用于Ascend 950，取值适用于Ascend 950，取值适用于Ascend 950
         printf("UB(ubuf_data)溢出，偏移量为：%lu\n", addr_val);
     } else {
         printf("UB(ubuf_data)的偏移量为：%lu\n", addr_val);
