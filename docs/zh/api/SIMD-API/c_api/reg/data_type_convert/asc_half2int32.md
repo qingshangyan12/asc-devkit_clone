@@ -126,7 +126,7 @@ __simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* inpu
     vector_half src;
     asc_loadalign(dst, reinterpret_cast<__ubuf__ int32_t*>(output));
     asc_loadalign(src, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2int32_rd(dst, src, mask);
+    asc_half2int32_rd(dst, src, mask, ASC_POSITION_EVEN);
     asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst, mask);
 }
 
