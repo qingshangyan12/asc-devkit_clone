@@ -43,7 +43,7 @@ inline unsigned int __float_as_uint(const float x)
 
 ## 返回值说明
 
-与输入浮点数最接近的整数值。特殊值如下：
+输入的浮点数中的位重新解释成的无符号整数。特殊值如下：
 
 | x值 | 返回值 |
 |---|---|
