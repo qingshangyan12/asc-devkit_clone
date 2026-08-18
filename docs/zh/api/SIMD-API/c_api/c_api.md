@@ -1,6 +1,6 @@
 # C API
 
-C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
+C API文档目录。除试验接口外，整体使用时可以引入`asc_simd.h`，C API列表如下：
 
 ## 数据结构
 
@@ -201,6 +201,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_ffs](scalar_compute/asc_ffs.md) | FindFirstSet接口，输入数据的二进制表示中从最低位向最高位查找第一个值为1的位，并返回其位置，如果没找到则返回-1。 |
 | [asc_ffz](scalar_compute/asc_ffz.md) | 获取一个uint64_t类型数字的二进制表示中从最低有效位开始的第一个0出现的位置，如果没找到则返回-1。 |
 | [asc_float2int32](scalar_compute/asc_float2int32.md) | 将float类型转化为int32_t类型，并支持多种舍入模式。 |
+| [asc_load_dev](scalar_compute/asc_load_dev.md) | 不经过DCache直接从GM地址读取整型数据。 |
 | [asc_popc](scalar_compute/asc_popc.md) | 获取一个uint64_t类型数字的二进制中1的个数。 |
 | [asc_set_nthbit](scalar_compute/asc_set_nthbit.md) | 计算一个uint64_t类型数字的指定二进制位置为1，其余位保持不变。 |
 | [asc_sflbits](scalar_compute/asc_sflbits.md) | 计算一个int64_t类型数字的二进制中，从最高数值位开始与符号位相同的连续比特位的个数。 |
@@ -272,7 +273,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 ## 系统变量
 
-系统变量类API，单独使用时可以引入sys_var.h，此类API列表如下：
+系统变量类API列表如下。除试验接口外，单独使用时可以引入`sys_var.h`；试验接口需按对应接口文档引入头文件并开启试验特性。
 
 **表7** 系统变量API列表
 
@@ -303,6 +304,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_l0c2gm_relu_alpha](sys_var/asc_set_l0c2gm_relu_alpha.md) | 设置RELU_ALPHA寄存器的值。 |
 | [asc_set_l12l0_padding_val](sys_var/asc_set_l12l0_padding_val.md) | 设置PADDING_B寄存器的值。 |
 | [asc_set_l3d_rpt_b](sys_var/asc_set_l3d_rpt_b.md) | 用于设置接口asc_copy_l12l0a、asc_copy_l12l0b的2D格式搬运的repeat参数。 |
+| [指令发射队列空闲槽位查询](sys_var/asc_get_pipe_idle_slot_count.md) | 获取`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_FIX`发射队列的空闲槽位数量。本接口为试验接口。 |
 | [asc_get_ar_spr（废弃）](sys_var/asc_get_ar_spr_deprecated.md) | 读取指定特殊寄存器的值。 |
 
 ## 缓存控制
@@ -537,6 +539,8 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_unpack](reg/data_compress/asc_unpack.md) | 矢量解包操作。 |
 | [asc_unsqueeze](reg/data_compress/asc_unsqueeze.md) | 根据mask进行解压缩，将生成的数据输出到dst。 |
 | [asc_duplicate](reg/data_fill/asc_duplicate.md) | 根据mask将源操作数src的最低位元素填充到目的操作数dst。 |
+| [asc_duplicate_highest](reg/data_fill/asc_duplicate_highest.md) | 根据mask将源操作数src的最高位元素填充到目的操作数dst，dst中未被mask筛选的元素置为0。 |
+| [asc_duplicate_highest_merge](reg/data_fill/asc_duplicate_highest_merge.md) | 根据mask将源操作数src的最高位元素填充到目的操作数dst，dst中未被mask筛选的元素保留原值。 |
 | [asc_duplicate_merge](reg/data_fill/asc_duplicate_merge.md) | 根据mask将源操作数src的最低位元素填充到目的操作数dst，dst中未被mask筛选的元素保留原值。 |
 | [asc_duplicate_scalar](reg/data_fill/asc_duplicate_scalar.md) | 根据mask将value填充到目的操作数dst。 |
 | [asc_duplicate_scalar_merge](reg/data_fill/asc_duplicate_scalar_merge.md) | 根据mask将value填充到目的操作数dst，dst中未被mask筛选的元素保留原值。 |
