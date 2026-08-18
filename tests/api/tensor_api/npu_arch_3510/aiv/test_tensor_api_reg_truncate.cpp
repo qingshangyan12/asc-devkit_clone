@@ -27,7 +27,7 @@ static_assert(asc::te::detail::is_supported<half>::value);
 static_assert(asc::te::detail::is_supported<bfloat16_t>::value);
 static_assert(asc::te::detail::is_supported<float>::value);
 static_assert(!asc::te::detail::is_supported<int32_t>::value);
-static_assert(AscendC::AscendC::Std::is_same_v<truncate_result<half>, asc::te::reg_tensor<half>>);
+static_assert(AscendC::Std::is_same_v<truncate_result<half>, asc::te::reg_tensor<half>>);
 static_assert(AscendC::Std::is_same_v<truncate_result<bfloat16_t>, asc::te::reg_tensor<bfloat16_t>>);
 static_assert(AscendC::Std::is_same_v<truncate_result<float>, asc::te::reg_tensor<float>>);
 
