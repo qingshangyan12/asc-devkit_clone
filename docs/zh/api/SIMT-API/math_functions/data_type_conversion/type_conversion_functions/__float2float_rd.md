@@ -42,7 +42,7 @@ inline float __float2float_rd(const float x)
 
 ## 返回值说明
 
-输入遵循CAST\_FLOOR模式取整后的浮点数。特殊值如下：
+输入遵循`CAST\_FLOOR`模式取整后的浮点数。特殊值如下：
 
 | 输入 | 返回值 |
 |---|---|
