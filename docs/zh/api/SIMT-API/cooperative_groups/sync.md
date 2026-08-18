@@ -61,6 +61,8 @@ void sync(const GroupType& g)
 - `grid_group`的同步仅保证线程指令执行的同步，不保证各线程块的Data Cache和Global Memory间的缓存一致性。
 - 使用`grid_group`执行跨线程块同步时，需确保Grid中的线程块总数不超过设备的AIV物理核数，以避免程序卡死。
 - `grid_group`的同步仅保证线程指令执行的同步，不保证各线程块的Data Cache和Global Memory间的缓存一致性。
+- 使用`grid_group`执行跨线程块同步时，需确保Grid中的线程块总数不超过设备的AIV物理核数，以避免程序卡死。
+- `grid_group`的同步仅保证线程指令执行的同步，不保证各线程块的Data Cache和Global Memory间的缓存一致性。
 
 ## 调用示例
 
