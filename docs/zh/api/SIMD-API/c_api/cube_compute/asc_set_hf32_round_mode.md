@@ -50,6 +50,7 @@ PIPE_S
 
 ## 约束说明
 
+- 开启HF32模式后，若不调用本接口，则默认使用`NEAREST_EVEN`代表的舍入模式。
 - 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
 - 本接口配置的舍入模式仅在HF32模式开启期间生效，需先开启HF32模式再调用本接口，否则舍入模式配置不产生实际作用。
 - 舍入模式配置后会持续生效，HF32模式关闭后再次开启仍将沿用上次的舍入模式配置，如需切换舍入模式，请重新调用本接口。
@@ -62,7 +63,7 @@ PIPE_S
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 
 以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。

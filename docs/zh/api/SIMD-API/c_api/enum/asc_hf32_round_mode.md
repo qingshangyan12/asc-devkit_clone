@@ -18,4 +18,4 @@ enum class asc_hf32_round_mode : uint8_t {
 |------|-----------|
 | NEAREST_AWAY | FP32将以向最接近的值舍入，平局时远离零的方式舍入为HF32。 |
 | NEAREST_EVEN | FP32将以向最接近的值舍入，平局时向偶数舍入的方式舍入为HF32。 |
-| NEAREST_ZERO | 兼容旧名称，不推荐使用，实际行为等同于`NEAREST_AWAY`。 |
+| NEAREST_ZERO | 用于兼容旧版实现，不推荐使用，实际行为等同于`NEAREST_AWAY`。 |
