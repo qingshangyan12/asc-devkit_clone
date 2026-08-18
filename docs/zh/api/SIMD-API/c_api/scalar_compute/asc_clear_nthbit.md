@@ -67,7 +67,7 @@ PIPE_S
 在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
