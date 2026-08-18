@@ -103,6 +103,7 @@ bool __hbltux2(bfloat16x2_t x, bfloat16x2_t y)
             return;
         }
         // 要求x、y指向的起始地址4字节对齐，且元素数量为2的整数倍
+        // 要求x、y指向的起始地址4字节对齐，且元素数量为2的整数倍
         bfloat16x2_t* input1 = (bfloat16x2_t*)x;
         bfloat16x2_t* input2 = (bfloat16x2_t*)y;
         dst[idx] = __hbltux2(input1[idx], input2[idx]);
