@@ -220,17 +220,35 @@ if __name__ == "__main__":
     if len(sys.argv) < 4:
         raise RuntimeError("arguments must greater than 4")
     compute_soc = ""
+    has_explicit_soc_series = False
     comp_options = []
     for i in range(len(sys.argv) - 3):
-        if sys.argv[i + 3].upper().startswith("ASCEND"):
-            compute_soc += sys.argv[i + 3] + ";"
-        elif sys.argv[i + 3].upper().startswith("KIRIN"):
-            compute_soc += sys.argv[i + 3] + ";"
-        elif sys.argv[i + 3].upper().startswith("MC62"):
-            compute_soc += sys.argv[i + 3] + ";"
+        arg = sys.argv[i + 3]
+        if arg.startswith("--soc-series="):
+            if has_explicit_soc_series or compute_soc != "":
+                raise RuntimeError("SOC_SERIES and COMPUTE_UNIT cannot be set together")
+            soc_series = arg.split("=", 1)[1].split(",")
+            if any(not series or series != series.lower() for series in soc_series):
+                raise RuntimeError(
+                    "Invalid --soc-series value: expected non-empty lowercase comma-separated series"
+                )
+            compute_soc = ";".join(soc_series)
+            has_explicit_soc_series = True
+        elif arg.upper().startswith("ASCEND"):
+            if has_explicit_soc_series:
+                raise RuntimeError("SOC_SERIES and COMPUTE_UNIT cannot be set together")
+            compute_soc += arg + ";"
+        elif arg.upper().startswith("KIRIN"):
+            if has_explicit_soc_series:
+                raise RuntimeError("SOC_SERIES and COMPUTE_UNIT cannot be set together")
+            compute_soc += arg + ";"
+        elif arg.upper().startswith("MC62"):
+            if has_explicit_soc_series:
+                raise RuntimeError("SOC_SERIES and COMPUTE_UNIT cannot be set together")
+            compute_soc += arg + ";"
         else:
-            comp_options.append(sys.argv[i + 3])
-    if compute_soc != "":
+            comp_options.append(arg)
+    if compute_soc.endswith(";"):
         compute_soc = compute_soc[0:-1]
     final_options = []
     for opt in comp_options:

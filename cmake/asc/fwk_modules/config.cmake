@@ -53,11 +53,35 @@ endif()
 
 set(ASCEND_CHECK_OPTYPE_DUPLICATE FALSE CACHE BOOL "")
 
-if (NOT DEFINED ASCEND_COMPUTE_UNIT)
+set(ASC_VALID_SOC_LIST ascend310b ascend310p ascend610 ascend910 ascend910b ascend910_93 ascend950 bs9sx1a bs9sx2a ascend610lite mc61am21a mc62 ascend910_96 kirinx90 kirin9030 mc32dm11a ascend350)
+
+function(_asc_normalize_soc_series output_var)
+    set(_normalized_soc_series)
+    foreach(_soc_series IN LISTS ARGN)
+        string(TOLOWER "${_soc_series}" _soc_series_lower)
+        list(FIND ASC_VALID_SOC_LIST "${_soc_series_lower}" _soc_series_index)
+        if(_soc_series_index EQUAL -1)
+            message(FATAL_ERROR
+                "SOC_SERIES ${_soc_series} does not support, the support list is ${ASC_VALID_SOC_LIST}")
+        endif()
+        list(APPEND _normalized_soc_series "${_soc_series_lower}")
+    endforeach()
+    set(${output_var} "${_normalized_soc_series}" PARENT_SCOPE)
+endfunction()
+
+# Check the new selector before the legacy default is written to the cache.
+if(DEFINED ASCEND_SOC_SERIES)
+    if(DEFINED ASCEND_COMPUTE_UNIT)
+        message(FATAL_ERROR "ASCEND_SOC_SERIES and ASCEND_COMPUTE_UNIT cannot be set together")
+    endif()
+    if("${ASCEND_SOC_SERIES}" STREQUAL "")
+        message(FATAL_ERROR "ASCEND_SOC_SERIES cannot be empty")
+    endif()
+    _asc_normalize_soc_series(_ascend_soc_series_normalized ${ASCEND_SOC_SERIES})
+    set(ASCEND_COMPUTE_UNIT "${_ascend_soc_series_normalized}")
+elseif(NOT DEFINED ASCEND_COMPUTE_UNIT)
     set(ASCEND_COMPUTE_UNIT ascend910b CACHE STRING "")
 endif()
-
-set(ASC_VALID_SOC_LIST ascend310b ascend310p ascend610 ascend910 ascend910b ascend910_93 ascend950 bs9sx1a bs9sx2a ascend610lite mc61am21a mc62 ascend910_96 kirinx90 kirin9030 mc32dm11a ascend350)
 
 foreach(soc_version ${ASCEND_COMPUTE_UNIT})
     list(FIND ASC_VALID_SOC_LIST "${soc_version}" _SOC_INDEX)

@@ -15,6 +15,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 #include <cctype>
 #include <unordered_map>
 #include <limits.h>
@@ -24,7 +25,71 @@
 #include "op_dtype_name_utils.h"
 
 namespace ops {
+namespace {
+std::string NormalizeSocVersion(std::string socVersion)
+{
+    std::transform(socVersion.begin(), socVersion.end(), socVersion.begin(), [](unsigned char c) {
+        return static_cast<char>(std::tolower(c));
+    });
+    return socVersion;
+}
+
+std::string GetValidSocList()
+{
+    std::ostringstream list;
+    for (auto iter = VALID_SOC_SET.cbegin(); iter != VALID_SOC_SET.cend(); ++iter) {
+        if (iter != VALID_SOC_SET.cbegin()) {
+            list << ", ";
+        }
+        list << *iter;
+    }
+    return list.str();
+}
+
+bool BuildNormalizedAICoreConfigs(
+    const std::map<ge::AscendString, OpAICoreConfig>& source,
+    std::map<std::string, OpAICoreConfig>& normalizedConfigs)
+{
+    std::map<std::string, std::string> originalSocByCanonical;
+    for (const auto& item : source) {
+        const std::string originalSoc = item.first.GetString();
+        const std::string normalizedSoc = NormalizeSocVersion(originalSoc);
+        if (VALID_SOC_SET.find(normalizedSoc) == VALID_SOC_SET.end()) {
+            const std::string error = "Invalid AddConfig SOC '" + originalSoc + "' normalized to '" + normalizedSoc
+                + "'; supported series are " + GetValidSocList();
+            ASCENDLOGE("%s", error.c_str());
+            Generator::SetErrorMessage(error);
+            return false;
+        }
+        const auto originalIter = originalSocByCanonical.find(normalizedSoc);
+        if (originalIter != originalSocByCanonical.end()) {
+            const std::string error = "Duplicate AddConfig SOC keys '" + originalIter->second + "' and '" + originalSoc
+                + "' normalize to '" + normalizedSoc + "'";
+            ASCENDLOGE("%s", error.c_str());
+            Generator::SetErrorMessage(error);
+            return false;
+        }
+        originalSocByCanonical.emplace(normalizedSoc, originalSoc);
+        normalizedConfigs.emplace(normalizedSoc, item.second);
+    }
+    return true;
+}
+
+} // namespace
+
 std::string CfgGenerator::GetDataTypeName(const ge::DataType& type) const { return FindCfgDataTypeName(type); }
+
+bool CfgGenerator::ValidateAICoreConfigs(const std::vector<std::string>& ops) const
+{
+    for (const auto& op : ops) {
+        OpDef opsDef = OpDefFactory::OpDefCreate(op.c_str());
+        std::map<std::string, OpAICoreConfig> normalizedConfigs;
+        if (!BuildNormalizedAICoreConfigs(opsDef.AICore().GetAICoreConfigs(), normalizedConfigs)) {
+            return false;
+        }
+    }
+    return true;
+}
 
 std::string CfgGenerator::GetParamTypeName(uint32_t paramType) const
 {
@@ -409,8 +474,12 @@ void CfgGenerator::GenAllOpCfgWithoutComputeUint(
     for (auto op : ops) {
         OpDef opsDef = OpDefFactory::OpDefCreate(op.c_str());
         bool enableFallBack = opsDef.IsEnableFallBack();
-        for (auto& aicoreItem : opsDef.AICore().GetAICoreConfigs()) {
-            std::string socVer = aicoreItem.first.GetString();
+        std::map<std::string, OpAICoreConfig> normalizedConfigs;
+        if (!BuildNormalizedAICoreConfigs(opsDef.AICore().GetAICoreConfigs(), normalizedConfigs)) {
+            return;
+        }
+        for (auto& aicoreItem : normalizedConfigs) {
+            std::string socVer = aicoreItem.first;
             OpAICoreConfig aicoreConfig = aicoreItem.second;
             std::ofstream outfile;
             GetOutFilePtr(genPath, socVer, outfile, resolvedGenPath, cfgFileStreams);
@@ -434,6 +503,11 @@ opbuild::Status CfgGenerator::GenerateCode(void)
     std::vector<std::string> ops = this->GetAllOp();
     std::map<std::string, std::string> cfgFileStreams;
 
+    // Validate every AddConfig key before opening an ops-info output file.
+    if (!ValidateAICoreConfigs(ops)) {
+        return opbuild::OPBUILD_FAILED;
+    }
+
     auto computeUnitCfg = opbuild::Params::GetInstance().Optional("compute_unit");
     ASCENDLOGI("Compute unit cfg is %s ", computeUnitCfg.c_str());
     if (computeUnitCfg.size() == 0) {
@@ -448,15 +522,17 @@ opbuild::Status CfgGenerator::GenerateCode(void)
     for (auto op : ops) {
         OpDef opsDef = OpDefFactory::OpDefCreate(op.c_str());
         bool enableFallBack = opsDef.IsEnableFallBack();
-        auto allAICoreConfig = opsDef.AICore().GetAICoreConfigs();
+        std::map<std::string, OpAICoreConfig> allAICoreConfig;
+        if (!BuildNormalizedAICoreConfigs(opsDef.AICore().GetAICoreConfigs(), allAICoreConfig)) {
+            return opbuild::OPBUILD_FAILED;
+        }
         for (uint32_t i = 0; i < computeUnits.size(); ++i) {
             auto socVer = computeUnits[i];
             if (VALID_SOC_SET.find(socVer) == VALID_SOC_SET.end()) {
                 ASCENDLOGW("Invlid soc version %s\n of ASCEND_COMPUTE_UNIT", socVer.c_str());
                 continue;
             }
-            ge::AscendString curCompUnit(socVer.c_str());
-            auto cfgIter = allAICoreConfig.find(curCompUnit);
+            auto cfgIter = allAICoreConfig.find(socVer);
             OpAICoreConfig aicoreConfig;
             if (cfgIter == allAICoreConfig.end()) {
                 aicoreConfig = OpAICoreConfig(socVer.c_str());
