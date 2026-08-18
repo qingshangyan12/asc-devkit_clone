@@ -32,7 +32,8 @@ namespace {
 
 static const std::set<std::string> REGISTERED_CCU_ALGORITHMS = {
     "CcuAllGatherMesh1DMem2Mem", "CcuSchedAllGatherConcurMeshNHRMultiLink", "CcuKfcReduceScatterMesh1DMem2Mem",
-    "CcuAlltoAllMesh1D"};
+    "CcuAlltoAllMesh1D", "CcuAllGatherMesh1DMem2Mem", "CcuSchedAllGatherConcurMeshNHRMultiLink", "CcuKfcReduceScatterMesh1DMem2Mem",
+    "CcuAllGatherMesh1DMem2Mem", "CcuKfcAllGatherMesh1DMem2Mem", "CcuKfcReduceScatterMesh1DMem2Mem"};
 
 bool IsCcuAlgorithmRegistered(const std::string& algConfig, uint8_t commEngine)
 {
