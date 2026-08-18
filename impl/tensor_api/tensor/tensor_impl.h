@@ -244,40 +244,6 @@ private:
     Std::tuple<layout_type, engine_type> rep;
 };
 template <typename EngineType, typename LayoutType>
-template <load_sideband_mode sideband_mode, typename Coord>
-__simd_callee__ inline reg_tensor<typename base_tensor<EngineType, LayoutType>::data_type>
-base_tensor<EngineType, LayoutType>::load(const Coord& coord) const
-{
-    static_assert(Std::is_same_v<get_mem_location<EngineType>, location::ub>,
-                  "base_tensor::load only supports tensors located in UB");
-
-    TENSOR_API_DEBUG_CHECK(debug_check_coord, layout(), coord, "tensor::load");
-    reg_tensor<data_type> dst;
-    auto src_engine = engine() + layout()(coord);
-    auto src = src_engine.begin().get();
-    if constexpr (sideband_mode == load_sideband_mode::direct) {
-        asc_loadalign(dst.reg, src);
-    }
-    return dst;
-}
-
-template <typename EngineType, typename LayoutType>
-template <typename Coord, typename RegDataType>
-__simd_callee__ inline void base_tensor<EngineType, LayoutType>::store(
-    const Coord& coord, const reg_tensor<RegDataType>& src)
-{
-    static_assert(Std::is_same_v<get_mem_location<EngineType>, location::ub>,
-                  "base_tensor::store only supports tensors located in UB");
-    static_assert(Std::is_same_v<data_type, RegDataType>,
-                  "base_tensor::store requires the tensor and reg_tensor to have the same element type");
-
-    TENSOR_API_DEBUG_CHECK(debug_check_coord, layout(), coord, "tensor::store");
-    auto dst_engine = engine() + layout()(coord);
-    asc_storealign(dst_engine.begin().get(), src.reg, src.mask);
-}
-
-
-template <typename EngineType, typename LayoutType>
 struct global_tensor : public base_tensor<EngineType, LayoutType> {
     using tensor_api_base = base_tensor<EngineType, LayoutType>;
     using layoutType = typename tensor_api_base::layout_type;
