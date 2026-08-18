@@ -52,7 +52,9 @@ __simd_vf__ inline void compile_reg_local_tensor_load_store(
     static_assert(has_reg_load<decltype(src_tensor), coord_type>::value);
     static_assert(std::is_base_of_v<tensor_api_base, decltype(src_tensor)>);
 
-    reg_tensor<bool> mask_reg {mask};
+    reg_tensor<bool> mask_reg;
+    mask_reg.reg = mask;
+    mask_reg.mask = mask;
     auto value = src_tensor.template load<sideband_mode>(make_coord(0)).with_mask(mask_reg);
     static_assert(std::is_same_v<typename decltype(value)::type, T>);
     dst_tensor.store(make_coord(0), value);
@@ -130,8 +132,12 @@ __simd_vf__ inline void compile_reg_mask(uint32_t remain)
 template <typename T>
 __simd_vf__ inline void compile_reg_mask_data_reorder(vector_bool src0, vector_bool src1)
 {
-    reg_tensor<bool> mask0 {src0};
-    reg_tensor<bool> mask1 {src1};
+    reg_tensor<bool> mask0;
+    reg_tensor<bool> mask1;
+    mask0.reg = src0;
+    mask1.reg = src1;
+    mask0.mask = all_mask<T>().reg;
+    mask1.mask = all_mask<T>().reg;
     auto interleaved = interleave<T>(mask0, mask1);
     static_assert(std::is_same_v<decltype(interleaved), reg_pair<bool>>);
     static_assert(std::is_same_v<decltype(interleaved.first), reg_tensor<bool>>);
@@ -147,6 +153,10 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     reg_tensor<float> value {};
     (void)value.reg;
     (void)value.mask;
+
+    reg_tensor<bool> predicate {};
+    (void)predicate.reg;
+    (void)predicate.mask;
 
     auto compile_load_store = &compile_reg_local_tensor_load_store<float>;
     (void)compile_load_store;
