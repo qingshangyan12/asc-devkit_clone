@@ -24,7 +24,7 @@
 
 ## 功能说明
 
-遵循CAST\_ROUND模式，将浮点数转换为半精度浮点数，返回转换后的值。
+遵循`CAST_ROUND`模式，将浮点数转换为半精度浮点数，返回转换后的值。
 
 ## 函数原型
 
@@ -59,7 +59,7 @@ inline half __float2half_rna(const float x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用该接口需要包含`simt_api/asc_fp16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_fp16.h"
