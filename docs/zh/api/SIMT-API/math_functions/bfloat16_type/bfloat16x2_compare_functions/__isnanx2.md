@@ -81,6 +81,7 @@ bfloat16x2_t __isnanx2(bfloat16x2_t x)
         // 使用bfloat16x2_t访问要求数据长度为2的整数倍且起始地址4字节对齐
         // 使用bfloat16x2_t访问要求数据长度为2的整数倍且起始地址4字节对齐
         // 使用bfloat16x2_t访问要求数据长度为2的整数倍且起始地址4字节对齐
+        // 使用bfloat16x2_t访问要求数据长度为2的整数倍且起始地址4字节对齐
         bfloat16x2_t* input = (bfloat16x2_t*)x;
         bfloat16x2_t* out = (bfloat16x2_t*)dst;
         out[idx] = __isnanx2(input[idx]);
