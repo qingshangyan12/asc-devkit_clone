@@ -10,7 +10,7 @@
 
 #include "kernel_compilation_plan_builder.h"
 
-#include "kernel_specialization_log.h"
+#include "ascendc_tool_log.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
@@ -72,14 +72,14 @@ bool ExpandEnvironmentVariablePlaceholders(
         const size_t namePosition = referencePosition + sizeof(ENVIRONMENT_REFERENCE_PREFIX) - 1U;
         const size_t closingBracePosition = text.find('}', namePosition);
         if (closingBracePosition == std::string::npos) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Unterminated environment variable placeholder at %s byte %zu; regenerate the JIT resource "
                 "using the form ${env:NAME}",
                 manifestValueLocation.c_str(), referencePosition);
             return false;
         }
         if (closingBracePosition == namePosition) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Environment variable placeholder at %s byte %zu has an empty name; regenerate the JIT resource "
                 "using the form ${env:NAME}",
                 manifestValueLocation.c_str(), referencePosition);
@@ -88,7 +88,7 @@ bool ExpandEnvironmentVariablePlaceholders(
         const std::string environmentName = text.substr(namePosition, closingBracePosition - namePosition);
         const char* environmentValue = std::getenv(environmentName.c_str());
         if (environmentValue == nullptr) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Environment variable %s referenced at %s byte %zu is not set; "
                 "set it with: export %s=<value>",
                 environmentName.c_str(), manifestValueLocation.c_str(), referencePosition,
@@ -143,7 +143,7 @@ aclError ExpandManifestArgument(const std::string& manifestArgument, const std::
     const auto optionTable = expansionContext.resourceManifest.find("options");
     if (optionTable == expansionContext.resourceManifest.end() || !optionTable->is_object() ||
         optionTable->find(optionName) == optionTable->end()) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "Manifest value %s references undefined options key '%s'; define this key in the top-level options "
             "object and regenerate the JIT resource",
             argumentLocation.c_str(), optionName.c_str());
@@ -211,7 +211,7 @@ aclError BuildConstantSourcePatches(const Json& selectedKernel,
 {
     const auto constantInfos = selectedKernel.find("constant_infos");
     if (constantInfos == selectedKernel.end() || constantInfos->empty()) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "Selected kernel must contain at least one constant_info for static compilation; regenerate the JIT "
             "resource with its static constant metadata");
         return ACLRTC_ERROR_FAILURE;
@@ -222,14 +222,14 @@ aclError BuildConstantSourcePatches(const Json& selectedKernel,
         const uint64_t requiredConstantByteCount = constantInfo.at("byte_size").get<uint64_t>();
         if (specializationRequest.borrowedKernelArgumentDataPointers == nullptr ||
             specializationRequest.borrowedKernelArgumentByteCounts == nullptr) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "constant parameter_index %llu requires argsAddr and argsBytes; set both request arrays with at "
                 "least argsCount entries",
                 static_cast<unsigned long long>(constantArgumentIndex));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
         if (constantArgumentIndex >= specializationRequest.kernelArgumentCount) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "constant parameter_index %llu is outside argsCount %llu; set argsCount greater than %llu and "
                 "provide matching argsAddr and argsBytes entries",
                              static_cast<unsigned long long>(constantArgumentIndex),
@@ -238,7 +238,7 @@ aclError BuildConstantSourcePatches(const Json& selectedKernel,
             return ACLRTC_ERROR_INVALID_INPUT;
         }
         if (specializationRequest.borrowedKernelArgumentDataPointers[constantArgumentIndex] == nullptr) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "argsAddr[%llu] must not be null for a static constant; set it to the constant data buffer",
                              static_cast<unsigned long long>(constantArgumentIndex));
             return ACLRTC_ERROR_INVALID_INPUT;
@@ -246,7 +246,7 @@ aclError BuildConstantSourcePatches(const Json& selectedKernel,
         const uint64_t suppliedConstantByteCount =
             specializationRequest.borrowedKernelArgumentByteCounts[constantArgumentIndex];
         if (suppliedConstantByteCount != requiredConstantByteCount) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "argsBytes[%llu]=%llu does not match required byte_size %llu; set argsBytes[%llu] to %llu",
                              static_cast<unsigned long long>(constantArgumentIndex),
                              static_cast<unsigned long long>(suppliedConstantByteCount),
@@ -287,7 +287,7 @@ aclError BuildManifestCommand(const Json& manifestCommand, const SelectedManifes
     } else if (commandType == "objcopy") {
         compilationCommand.commandKind = CompilationCommandKind::ObjectCopy;
     } else {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "Manifest object %s command[%zu] has unsupported type '%s'; regenerate the JIT resource using a "
             "command type supported by ACLRTC",
             manifestObjectName.c_str(), commandIndex, commandType.c_str());
@@ -303,7 +303,7 @@ aclError BuildManifestCommand(const Json& manifestCommand, const SelectedManifes
     const std::vector<std::string> manifestArguments =
         manifestCommand.at("cmd").get<std::vector<std::string>>();
     if (manifestArguments.empty()) {
-        ACLRTC_LOG_ERROR("Manifest command %s has an empty cmd array; regenerate the JIT resource",
+        ASCENDLOGE("Manifest command %s has an empty cmd array; regenerate the JIT resource",
                          compilationCommand.diagnosticLabel.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
@@ -315,7 +315,7 @@ aclError BuildManifestCommand(const Json& manifestCommand, const SelectedManifes
         return result;
     }
     if (expandedExecutable.size() != 1U) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "Manifest command %s executable expanded to %zu argv items; regenerate the JIT resource so cmd[0] "
             "resolves to exactly one executable path",
             compilationCommand.diagnosticLabel.c_str(), expandedExecutable.size());
@@ -336,7 +336,7 @@ aclError BuildManifestCommand(const Json& manifestCommand, const SelectedManifes
     if (compilationCommand.commandKind == CompilationCommandKind::Compile) {
         size_t outputOptionPosition = 0U;
         if (!FindCompilerOutputOptionPosition(compilationCommand.commandArguments, outputOptionPosition)) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Manifest compile command %s must contain an output option; regenerate the JIT resource with "
                 "'-o' and its output path",
                 compilationCommand.diagnosticLabel.c_str());
@@ -350,7 +350,7 @@ aclError BuildManifestCommand(const Json& manifestCommand, const SelectedManifes
             userOptions.begin(), userOptions.end());
     }
     if (!IsAbsoluteExecutableRegularFile(compilationCommand.executablePath)) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "Manifest command %s requires an absolute path to an existing executable regular file: path=%s; "
             "check the referenced environment variable and tool installation",
             compilationCommand.diagnosticLabel.c_str(), compilationCommand.executablePath.c_str());
@@ -377,11 +377,11 @@ aclError SelectManifestObjectsForCompilation(const Json& selectedKernel, Compila
         }
     }
     if (!foundBasicObject) {
-        ACLRTC_LOG_ERROR("Selected kernel does not contain a basic object; regenerate the JIT resource");
+        ASCENDLOGE("Selected kernel does not contain a basic object; regenerate the JIT resource");
         return ACLRTC_ERROR_FAILURE;
     }
     if (compilationVariant == CompilationVariant::BasicWithSuperKernel && !foundSuperKernelObject) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "Super-kernel compilation was requested but the selected kernel has no sk object; remove "
             "--enable-super-kernel or use a JIT resource that contains an sk object");
         return ACLRTC_ERROR_FAILURE;
@@ -440,7 +440,7 @@ aclError BuildLinkCommand(const Json& selectedKernel, const std::vector<Selected
     linkCommand.commandArguments.emplace_back("-o");
     linkCommand.commandArguments.emplace_back(linkedKernelElfPath.string());
     if (!IsAbsoluteExecutableRegularFile(linkCommand.executablePath)) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "Linker requires an absolute path to an existing executable regular file: path=%s; verify "
             "ASCEND_HOME_PATH points to a complete CANN installation",
             linkCommand.executablePath.c_str());
@@ -462,7 +462,7 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
 {
     try {
         if (!resourceWorktreePath_.is_absolute()) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "ResourceRegistry returned a non-absolute worktree path: %s; fix the registry integration",
                 resourceWorktreePath_.c_str());
             return ACLRTC_ERROR_FAILURE;
@@ -470,20 +470,20 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
         boost::system::error_code worktreeError;
         const bool worktreeIsDirectory = fs::is_directory(resourceWorktreePath_, worktreeError);
         if (worktreeError && !IsMissingPathError(worktreeError)) {
-            ACLRTC_LOG_ERROR("Failed to inspect resource worktree: path=%s error=%d message=%s; fix the registry "
+            ASCENDLOGE("Failed to inspect resource worktree: path=%s error=%d message=%s; fix the registry "
                              "integration",
                              resourceWorktreePath_.c_str(), worktreeError.value(),
                              worktreeError.message().c_str());
             return ACLRTC_ERROR_FAILURE;
         }
         if (!worktreeIsDirectory) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Resource worktree must be an existing directory: path=%s; fix the registry integration",
                 resourceWorktreePath_.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
         if (!externalSourceDirectoryPath_.is_absolute()) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "ResourceRegistry returned a non-absolute sourceFilePath directory: %s; fix the registry integration",
                 externalSourceDirectoryPath_.c_str());
             return ACLRTC_ERROR_FAILURE;
@@ -491,7 +491,7 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
         boost::system::error_code sourceDirectoryError;
         const bool sourcePathIsDirectory = fs::is_directory(externalSourceDirectoryPath_, sourceDirectoryError);
         if (sourceDirectoryError && !IsMissingPathError(sourceDirectoryError)) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Failed to inspect sourceFilePath directory: path=%s error=%d message=%s; fix the registered "
                 "resource data",
                 externalSourceDirectoryPath_.c_str(), sourceDirectoryError.value(),
@@ -499,14 +499,14 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
             return ACLRTC_ERROR_FAILURE;
         }
         if (!sourcePathIsDirectory) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "sourceFilePath must be an existing directory: path=%s; fix the registered resource data",
                 externalSourceDirectoryPath_.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
         const std::string schemaVersion = resourceManifest_.at("schema_version").get<std::string>();
         if (schemaVersion != SUPPORTED_MANIFEST_SCHEMA_VERSION) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Unsupported Manifest schema_version '%s'; expected '%s'. Regenerate the JIT resource with a "
                 "compatible pack tool",
                 schemaVersion.c_str(), SUPPORTED_MANIFEST_SCHEMA_VERSION);
@@ -518,14 +518,14 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
         boost::system::error_code sourceFileError;
         const bool sourceFileIsRegular = fs::is_regular_file(manifestSourceFilePath, sourceFileError);
         if (sourceFileError && !IsMissingPathError(sourceFileError)) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Failed to inspect Manifest source file: path=%s error=%d message=%s; fix the registered resource "
                 "data",
                 manifestSourceFilePath.c_str(), sourceFileError.value(), sourceFileError.message().c_str());
             return ACLRTC_ERROR_FAILURE;
         }
         if (!sourceFileIsRegular) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Manifest source file must be an existing regular file: path=%s; regenerate the JIT resource from "
                 "the matching operator source",
                 manifestSourceFilePath.c_str());
@@ -540,7 +540,7 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
             }
         }
         if (selectedKernel == nullptr) {
-            ACLRTC_LOG_ERROR(
+            ASCENDLOGE(
                 "Kernel entry '%s' is not present in JIT resource '%s'; correct kernelEntry or resourceId",
                 specializationRequest_.kernelName.c_str(), specializationRequest_.resourceId.c_str());
             return ACLRTC_ERROR_FAILURE;
@@ -591,7 +591,7 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
         compilationPlan = std::move(builtPlan);
         return ACLRTC_SUCCESS;
     } catch (const nlohmann::json::exception& exception) {
-        ACLRTC_LOG_ERROR(
+        ASCENDLOGE(
             "Manifest data consumed for kernel entry '%s' is incompatible with schema %s: %s; regenerate the JIT "
             "resource with a compatible pack tool",
             specializationRequest_.kernelName.c_str(), SUPPORTED_MANIFEST_SCHEMA_VERSION, exception.what());
