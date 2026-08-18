@@ -41,7 +41,7 @@ inline void asc_half2uint8<round_mode><sat_mode>(vector_uint8_t& dst,
 inline void asc_half2uint8<round_mode><sat_mode>(vector_uint8_t& dst,
                                                  vector_half src,
                                                  vector_bool mask,
-                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
 **占位符说明如下：**
