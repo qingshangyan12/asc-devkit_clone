@@ -50,35 +50,22 @@ __simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
     check_binary_reg_types<T, U>();
     check_bitwise_type<op, elem_type>();
 
-    if constexpr (Std::is_same_v<elem_type, bool>) {
-        static_assert(is_reg_tensor_v<T> && is_reg_tensor_v<U>,
-            "bool bitwise operators require two reg_tensor<bool> operands");
-        reg_tensor<bool> dst;
-        vector_bool mask = binary_mask(a, b);
-        if constexpr (op == bitwise_op::bit_and) {
-            asc_and(dst.reg, a.reg, b.reg, mask);
-        } else if constexpr (op == bitwise_op::bit_or) {
-            asc_or(dst.reg, a.reg, b.reg, mask);
-        } else {
-            asc_xor(dst.reg, a.reg, b.reg, mask);
-        }
-        dst.mask = mask;
-        return dst;
+    static_assert(!Std::is_same_v<elem_type, bool> || (is_reg_tensor_v<T> && is_reg_tensor_v<U>),
+        "bool bitwise operators require two reg_tensor<bool> operands");
+
+    vector_bool mask = binary_mask(a, b);
+    auto left = make_reg_operand<elem_type>(a, mask);
+    auto right = make_reg_operand<elem_type>(b, mask);
+    reg_tensor<elem_type> dst;
+    if constexpr (op == bitwise_op::bit_and) {
+        asc_and(dst.reg, left.reg, right.reg, mask);
+    } else if constexpr (op == bitwise_op::bit_or) {
+        asc_or(dst.reg, left.reg, right.reg, mask);
     } else {
-        vector_bool mask = binary_mask(a, b);
-        auto left = make_reg_operand<elem_type>(a, mask);
-        auto right = make_reg_operand<elem_type>(b, mask);
-        reg_tensor<elem_type> dst;
-        if constexpr (op == bitwise_op::bit_and) {
-            asc_and(dst.reg, left.reg, right.reg, mask);
-        } else if constexpr (op == bitwise_op::bit_or) {
-            asc_or(dst.reg, left.reg, right.reg, mask);
-        } else {
-            asc_xor(dst.reg, left.reg, right.reg, mask);
-        }
-        dst.mask = mask;
-        return dst;
+        asc_xor(dst.reg, left.reg, right.reg, mask);
     }
+    dst.mask = mask;
+    return dst;
 }
 
 } // namespace detail
