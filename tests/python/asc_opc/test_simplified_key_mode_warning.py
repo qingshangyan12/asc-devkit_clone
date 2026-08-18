@@ -78,9 +78,7 @@ def test_custom_key_warns_when_mode_2_is_selected(
         else {simplified_key_module.OpcOptions.SIMPLE_KEY_MODE: requested_mode}
     )
 
-    result = simplified_key_module.infer_simplified_key_mode(
-        _custom_op(), compile_args
-    )
+    result = simplified_key_module.infer_simplified_key_mode(_custom_op(), compile_args)
 
     assert result[0] == 2
     assert logger.warnings == [

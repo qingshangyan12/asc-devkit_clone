@@ -512,8 +512,10 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
         compile_file = os.path.join(self.out_path, "-".join(name_com) + ".sh")
         compile_file = os.path.realpath(compile_file)
 
-        bin_cmd_str = "res=$(asc_opc $1 --main_func={fun} --input_param={param} --soc_version={soc} \
+        bin_cmd_str = (
+            "res=$(asc_opc $1 --main_func={fun} --input_param={param} --soc_version={soc} \
                 --output=$2 --impl_mode={impl} --op_mode=dynamic "
+        )
 
         build_cmd_var = "#!/bin/bash\n"
         build_cmd_var += f'echo "[{self.soc}] Generating {bin_file} ..."\n'
@@ -679,9 +681,7 @@ def _process_opc_options(
         _process_kernel_template_input_option(
             op_type, options, kernel_template_input_info
         )
-        _process_simplified_key_mode_option(
-            op_type, options, simplified_key_mode_info
-        )
+        _process_simplified_key_mode_option(op_type, options, simplified_key_mode_info)
 
 
 def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
