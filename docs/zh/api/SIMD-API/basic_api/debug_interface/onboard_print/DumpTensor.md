@@ -90,7 +90,7 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |
-| tensor | 输入 | 需要dump的Tensor。<br>•待dump的tensor位于Unified Buffer/L1 Buffer/L0C Buffer时使用LocalTensor类型的tensor参数输入。<br>•待dump的tensor位于Global Memory时使用GlobalTensor类型的tensor参数输入。|
+| tensor | 输入 | 需要dump的Tensor。<br>•待dump的tensor位于UB/L1 Buffer/L0C Buffer时使用LocalTensor类型的tensor参数输入。<br>•待dump的tensor位于Global Memory时使用GlobalTensor类型的tensor参数输入。|
 | desc | 输入 | 用户自定义附加信息（行号或其他自定义数字）。<br>在使用DumpTensor功能时，用户可通过desc参数附加自定义信息，以便在不同场景下区分Dump内容的来源。此功能有助于精准定位具体DumpTensor的输出，提升调试与分析效率。|
 | dumpSize | 输入 | 需要dump的元素个数。|
 | shapeInfo | 输入 | 传入Tensor的shape信息，可按照shape信息进行打印。<br>•当Shape尺寸大于dumpSize元素个数时，按照ShapeInfo打印元素，不足的Dump数据用"-"展示。<br>•当Shape尺寸小于等于dumpSize元素个数时，按照ShapeInfo打印元素，多出的Dump数据不展示。|
@@ -114,7 +114,7 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 
 ## 约束说明<a name="section794123819592"></a>
 
-- 当前支持打印存储位置为Unified Buffer/L1 Buffer/L0C Buffer/Global Memory的Tensor信息。
+- 当前支持打印存储位置为Unified Buffer（UB）/L1 Buffer/L0C Buffer/Global Memory的Tensor信息。
 <!-- npu="950" id111 -->
 - 在Ascend 950PR/Ascend 950DT下新增BiasTable Buffer和Fixpipe Buffer的Tensor数据打印。
 <!-- end id111 -->
@@ -125,7 +125,7 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 - 针对Ascend 950PR/Ascend 950DT，打印Fixpipe Buffer中的Tensor信息场景：
   - Fixpipe Buffer保存的是硬件参数位域，打印结果不一定与L1 Buffer中的原始数据按位相同。前级Quant参数每8字节保留bit[7:0]、bit[31:13]和bit[46:37]，期望值为`input & 0x00007fe0ffffe0ffULL`；前级ReLU参数每4字节保留bit[31:13]，期望值为`word & 0xffffe000U`。
 <!-- end id113 --> 
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 - SIMD场景下，单次调用本接口打印的数据总量不可超过打印大小限制，默认为30KB。使用时应注意，如果超出这个限制，则数据不会被打印。您可以通过[aclInit接口](https://hiascend.com/document/redirect/CannCommunityruntimeapiaclinit)中的"simd\_printf\_fifo\_size\_per\_core"字段进行配置，配置范围最小为1KB，最大为64MB。使用时应注意，如果超出这个限制，则数据不会被打印。
 
 ## 调用示例<a name="section82241477610"></a>

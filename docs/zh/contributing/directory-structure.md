@@ -111,7 +111,7 @@ exp_check_common.h
 | `dav_c220` | `2201` | Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品 |
 | `dav_3510` | `3510` | Ascend 950PR/Ascend 950DT |
 
-> 产品型号与 `__NPU_ARCH__` 的完整对应关系见 [**NPU_ARCH** 文档](../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+> 产品型号与 `__NPU_ARCH__` 的完整对应关系见 [**NPU_ARCH** 文档](../../zh/guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 ### 架构分发模式
 
@@ -267,9 +267,9 @@ examples/
 │   ├── 02_features/        # 高级特性
 │   ├── 03_basic_api/       # 基础API示例
 │   │   └── 00_data_movement/
-│   │       └── copy_ub2ub/ # UB到UB拷贝示例
+│   │       └── copy_ub2ub/ # Unified Buffer（UB）到UB拷贝示例
 │   │           ├── CMakeLists.txt
-│   │           ├── copy.asc         # Kernel源码（.asc后缀）
+│   │           ├── copy.asc         # 核函数（Kernel）源码（.asc后缀）
 │   │           ├── data_utils.h     # 测试数据工具
 │   │           └── README.md
 │   ├── 04_advanced_api/    # 高阶API示例
@@ -287,7 +287,7 @@ examples/
 
 - 典型目录组织：`<api_type>/<category>/<api_name>/`，部分类别有更深层级
 - 数字前缀确保排序：`00_introduction/`、`01_utilities/`
-- Kernel源码文件使用 `.asc` 扩展名
+- 核函数（Kernel）源码文件使用 `.asc` 扩展名
 - 每个示例必须有独立的 `CMakeLists.txt`
 - 每个示例推荐包含 `README.md`
 

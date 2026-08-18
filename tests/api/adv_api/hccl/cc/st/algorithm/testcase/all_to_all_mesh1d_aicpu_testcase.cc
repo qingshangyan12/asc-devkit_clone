@@ -13,10 +13,10 @@
 
 #include "alg_env_config.h"
 #include "cann_host_bridge.h"
+#include "coll_alg_v2_exec_registry.h"
 #include "executor_v2_base.h"
 #include "gtest/gtest.h"
 #include "ins_temp_all_to_all_v_mesh_1D.h"
-#include "coll_alg_v2_exec_registry.h"
 
 using namespace mc2_ops_hccl;
 
@@ -55,13 +55,12 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, route_uses_expected_bridge)
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, registry_contains_expected_algorithms)
 {
     EXPECT_NE(GetAlgExecViaCann(HCCL_CMD_ALLTOALLV, "InsAlltoAllVMesh1D"), nullptr);
-    EXPECT_NE(
-        CollAlgExecRegistryV2::Instance().GetAlgExec(
-            HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1DSingleChannel"),
-        nullptr);
-    EXPECT_NE(
-        CollAlgExecRegistryV2::Instance().GetAlgExec(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1D"), nullptr);
-    EXPECT_NE(CollAlgExecRegistryV2::Instance().GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMeshUBX"), nullptr);
+    const auto& registry = CollAlgExecRegistryV2::Instance();
+
+    EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALLV, "InsAlltoAllVMesh1D"));
+    EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1DSingleChannel"));
+    EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALL, "InsAlltoAllMesh1D"));
+    EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMeshUBX"));
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, alltoall_multi_channel_threshold_is_strict_and_overflow_safe)

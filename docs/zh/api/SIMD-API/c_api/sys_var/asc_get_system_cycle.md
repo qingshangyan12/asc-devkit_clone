@@ -62,11 +62,11 @@ PIPE_S
 
 - 该接口是PIPE_S流水，若需要测试其他流水的指令时间，需要在调用该接口前插入对应流水的同步。
 - 本接口为只读查询接口，读取的是只读系统计数器，不修改任何寄存器或存储状态，可在AIC与AIV上下文中调用。
-- 返回值由系统时钟计数器实时提供，随系统时钟持续递增，不反映Kernel启动配置或其他静态参数。
+- 返回值由系统时钟计数器实时提供，随系统时钟持续递增，不反映核函数（Kernel）启动配置或其他静态参数。
 
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id11 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：

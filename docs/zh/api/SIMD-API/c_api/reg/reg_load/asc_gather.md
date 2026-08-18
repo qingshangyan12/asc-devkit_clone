@@ -28,7 +28,7 @@
 
 根据索引位置index将源操作数src按元素收集到目的操作数dst中。
 
-**图 1**  收集UB中的元素
+**图 1**  收集Unified Buffer（UB）中的元素
 
 ![收集UB中的元素](../../figures/asc_gather_ub.png)
 
@@ -77,6 +77,7 @@
     __simd_callee__ inline void asc_gather(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_uint16_t index)
     __simd_callee__ inline void asc_gather(vector_int32_t& dst, vector_int32_t src, vector_uint32_t index)
     __simd_callee__ inline void asc_gather(vector_uint32_t& dst, vector_uint32_t src, vector_uint32_t index)
+    __simd_callee__ inline void asc_gather(vector_float& dst, vector_float src, vector_uint32_t index)
     ```
 
 ## 参数说明
