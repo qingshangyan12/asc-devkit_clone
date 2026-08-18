@@ -26,6 +26,12 @@ __aicore__ inline void asc_set_fp32_mode_impl()
     set_ctrl(sbitset0(get_ctrl(), HF32_MODE_BIT));
 }
 
+__aicore__ inline void asc_disable_hf32_impl()
+{
+    constexpr int32_t HF32_MODE_BIT = 46;
+    set_ctrl(sbitset0(get_ctrl(), HF32_MODE_BIT));
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
