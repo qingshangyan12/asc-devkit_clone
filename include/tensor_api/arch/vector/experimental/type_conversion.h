@@ -17,7 +17,7 @@
 #define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_H
 
 #include "../../../utils/utils.h"
-#include "impl/tensor_api/experimental/reg/reg_tensor_impl.h"
+#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 
 namespace asc {
 namespace te {
