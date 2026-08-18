@@ -18,7 +18,7 @@ import hashlib
 import re
 import copy
 from collections import defaultdict
-from typing import Dict, Set, NamedTuple
+from typing import Set, NamedTuple
 
 import const_var
 import opdesc_parser
@@ -32,6 +32,15 @@ class ParamInfo(NamedTuple):
     format_list: list
     dtype_for_bin_list: dict
     format_for_bin_list: dict
+
+
+class OpDebugConfig(NamedTuple):
+    tiling_key_info: dict
+    op_debug_config: dict
+    kernel_json_file: dict
+    input_param_file: dict
+    kernel_template_input_info: dict
+    simplified_key_mode_info: dict
 
 
 class BinParamBuilder(opdesc_parser.OpDesc):
@@ -684,7 +693,7 @@ def _process_opc_options(
         _process_simplified_key_mode_option(op_type, options, simplified_key_mode_info)
 
 
-def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
+def parse_op_debug_config(opc_config_file: str, soc: str) -> OpDebugConfig:
     tiling_key_info = defaultdict(set)
     op_debug_config = defaultdict(set)
     kernel_json_file = defaultdict(dict)
@@ -693,7 +702,7 @@ def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
     simplified_key_mode_info = defaultdict(dict)
 
     if not opc_config_file or not os.path.exists(opc_config_file):
-        return (
+        return OpDebugConfig(
             tiling_key_info,
             op_debug_config,
             kernel_json_file,
@@ -727,7 +736,7 @@ def parse_op_debug_config(opc_config_file: str, soc: str) -> Dict:
             simplified_key_mode_info,
         )
 
-    return (
+    return OpDebugConfig(
         tiling_key_info,
         op_debug_config,
         kernel_json_file,
