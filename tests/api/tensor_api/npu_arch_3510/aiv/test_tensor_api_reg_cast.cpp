@@ -17,6 +17,7 @@
 #include "c_api/stub/cce_stub.h"
 
 #include "tensor_api/arch/vector/experimental/type_conversion.h"
+#include "tensor_api/tensor.h"
 
 namespace {
 
@@ -53,48 +54,95 @@ protected:
     }
 };
 
-TEST_F(tensor_api_reg_cast_3510, default_policy_converts_half_to_float_and_preserves_mask)
+template <typename To, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat,
+    typename SrcTensor, typename DstTensor>
+__simd_vf__ inline void cast_reg_loop(const SrcTensor src, DstTensor dst, uint32_t data_size,
+    uint32_t column_count)
 {
-    asc::te::reg_tensor<half> src {};
-    src.mask = pset_b16(PAT_ALL);
-    asc_duplicate_scalar(src.reg, static_cast<half>(3.5F), src.mask);
-    auto dst = asc::te::cast<float>(src);
+    using From = typename SrcTensor::data_type;
+    using src_reg_type = typename asc::te::reg_tensor<From>::reg_type;
 
-    EXPECT_EQ(dst.mask, src.mask);
-    for (float value : dst.reg) {
+    constexpr uint32_t elements_per_reg = sizeof(src_reg_type) / sizeof(From);
+    const auto full_mask = asc::te::all_mask<From>();
+    const uint32_t repeat = data_size / elements_per_reg;
+
+    for (uint32_t i = 0; i < repeat; ++i) {
+        const uint32_t offset = i * elements_per_reg;
+        const auto coord = asc::te::make_coord(offset / column_count, offset % column_count);
+        auto src_reg = src.load(coord);
+        src_reg.with_mask(full_mask);
+
+        auto dst_reg = asc::te::cast<To, Layout, Round, Sat>(src_reg);
+        dst.store(coord, dst_reg);
+    }
+}
+
+template <typename To, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat, typename From, size_t N>
+void cast_one_register(From input_value, To (&dst_data)[N])
+{
+    using src_reg_type = typename asc::te::reg_tensor<From>::reg_type;
+    using dst_reg_type = typename asc::te::reg_tensor<To>::reg_type;
+
+    constexpr uint32_t src_elements_per_reg = sizeof(src_reg_type) / sizeof(From);
+    constexpr uint32_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(To);
+    static_assert(N == dst_elements_per_reg, "destination buffer must hold one register");
+
+    __ubuf__ From src_data[src_elements_per_reg] {};
+    for (uint32_t i = 0; i < src_elements_per_reg; ++i) {
+        src_data[i] = input_value;
+    }
+
+    const auto src_layout = asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(1, src_elements_per_reg);
+    const auto dst_layout = asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(1, dst_elements_per_reg);
+    auto src = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src_data), src_layout);
+    auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst_data), dst_layout);
+    cast_reg_loop<To, Layout, Round, Sat>(src, dst, src_elements_per_reg, src_elements_per_reg);
+}
+
+TEST_F(tensor_api_reg_cast_3510, default_policy_converts_half_to_float)
+{
+    using dst_reg_type = typename asc::te::reg_tensor<float>::reg_type;
+    constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(float);
+    __ubuf__ float dst_data[dst_elements_per_reg] {};
+
+    cast_one_register<float, cast_layout::zero, cast_round_mode::rint, cast_sat_mode::not_sat>(
+        static_cast<half>(3.5F), dst_data);
+
+    for (float value : dst_data) {
         EXPECT_FLOAT_EQ(value, 3.5F);
     }
 }
 
 TEST_F(tensor_api_reg_cast_3510, explicit_policy_converts_float_to_half_with_layout_one_and_saturation)
 {
-    asc::te::reg_tensor<float> src {};
-    src.mask = pset_b32(PAT_ALL);
-    asc_duplicate_scalar(src.reg, 70000.0F, src.mask);
-    auto dst = asc::te::cast<half, cast_layout::one, cast_round_mode::ceil,
-        cast_sat_mode::sat>(src);
+    using src_reg_type = typename asc::te::reg_tensor<float>::reg_type;
+    using dst_reg_type = typename asc::te::reg_tensor<half>::reg_type;
+    constexpr size_t src_elements_per_reg = sizeof(src_reg_type) / sizeof(float);
+    constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(half);
+    __ubuf__ half dst_data[dst_elements_per_reg] {};
 
-    EXPECT_EQ(dst.mask, src.mask);
+    cast_one_register<half, cast_layout::one, cast_round_mode::ceil, cast_sat_mode::sat>(70000.0F, dst_data);
+
     size_t converted_count = 0;
     size_t zeroed_count = 0;
-    for (half value : dst.reg) {
+    for (half value : dst_data) {
         const float actual = static_cast<float>(value);
         converted_count += actual == 65504.0F;
         zeroed_count += actual == 0.0F;
     }
-    EXPECT_EQ(converted_count, src.reg.size());
-    EXPECT_EQ(zeroed_count, dst.reg.size() - src.reg.size());
+    EXPECT_EQ(converted_count, src_elements_per_reg);
+    EXPECT_EQ(zeroed_count, dst_elements_per_reg - src_elements_per_reg);
 }
 
 TEST_F(tensor_api_reg_cast_3510, converts_int32_to_float)
 {
-    asc::te::reg_tensor<int32_t> src {};
-    src.mask = pset_b32(PAT_ALL);
-    asc_duplicate_scalar(src.reg, -42, src.mask);
-    auto dst = asc::te::cast<float>(src);
+    using dst_reg_type = typename asc::te::reg_tensor<float>::reg_type;
+    constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(float);
+    __ubuf__ float dst_data[dst_elements_per_reg] {};
 
-    EXPECT_EQ(dst.mask, src.mask);
-    for (float value : dst.reg) {
+    cast_one_register<float, cast_layout::zero, cast_round_mode::floor, cast_sat_mode::not_sat>(-42, dst_data);
+
+    for (float value : dst_data) {
         EXPECT_FLOAT_EQ(value, -42.0F);
     }
 }

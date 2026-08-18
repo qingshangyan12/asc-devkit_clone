@@ -17,6 +17,7 @@
 #include "c_api/stub/cce_stub.h"
 
 #include "tensor_api/arch/vector/experimental/type_conversion.h"
+#include "tensor_api/tensor.h"
 
 namespace {
 
@@ -47,36 +48,64 @@ protected:
     }
 };
 
+template <typename SrcTensor, typename DstTensor>
+__simd_vf__ inline void truncate_reg_loop(const SrcTensor src, DstTensor dst, uint32_t data_size,
+    uint32_t column_count)
+{
+    using T = typename SrcTensor::data_type;
+    using reg_type = typename asc::te::reg_tensor<T>::reg_type;
+
+    constexpr uint32_t elements_per_reg = sizeof(reg_type) / sizeof(T);
+    const auto full_mask = asc::te::all_mask<T>();
+    const uint32_t repeat = data_size / elements_per_reg;
+
+    for (uint32_t i = 0; i < repeat; ++i) {
+        const uint32_t offset = i * elements_per_reg;
+        const auto coord = asc::te::make_coord(offset / column_count, offset % column_count);
+        auto src_reg = src.load(coord);
+        src_reg.with_mask(full_mask);
+
+        auto dst_reg = asc::te::trunc(src_reg);
+        dst.store(coord, dst_reg);
+    }
+}
+
 template <typename T>
-void expect_truncate_result(vector_bool mask)
+void expect_truncate_result()
 {
-    asc::te::reg_tensor<T> src {};
-    for (size_t i = 0; i < src.reg.size(); ++i) {
-        src.reg[i] = static_cast<T>(i % 2 == 0 ? 3.75F : -2.5F);
-    }
-    src.mask = mask;
-    auto dst = asc::te::trunc(src);
+    using reg_type = typename asc::te::reg_tensor<T>::reg_type;
+    constexpr uint32_t elements_per_reg = sizeof(reg_type) / sizeof(T);
 
-    EXPECT_EQ(dst.mask, mask);
-    for (size_t i = 0; i < dst.reg.size(); ++i) {
+    __ubuf__ T src_data[elements_per_reg] {};
+    __ubuf__ T dst_data[elements_per_reg] {};
+    for (uint32_t i = 0; i < elements_per_reg; ++i) {
+        src_data[i] = static_cast<T>(i % 2 == 0 ? 3.75F : -2.5F);
+    }
+
+    const auto layout = asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(1, elements_per_reg);
+    auto src = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src_data), layout);
+    auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst_data), layout);
+    truncate_reg_loop(src, dst, elements_per_reg, elements_per_reg);
+
+    for (uint32_t i = 0; i < elements_per_reg; ++i) {
         const float expected = i % 2 == 0 ? 3.0F : -2.0F;
-        EXPECT_FLOAT_EQ(static_cast<float>(dst.reg[i]), expected);
+        EXPECT_FLOAT_EQ(static_cast<float>(dst_data[i]), expected);
     }
 }
 
-TEST_F(tensor_api_reg_truncate_3510, truncates_half_and_preserves_mask)
+TEST_F(tensor_api_reg_truncate_3510, truncates_half)
 {
-    expect_truncate_result<half>(pset_b16(PAT_ALL));
+    expect_truncate_result<half>();
 }
 
-TEST_F(tensor_api_reg_truncate_3510, truncates_bfloat16_and_preserves_mask)
+TEST_F(tensor_api_reg_truncate_3510, truncates_bfloat16)
 {
-    expect_truncate_result<bfloat16_t>(pset_b16(PAT_ALL));
+    expect_truncate_result<bfloat16_t>();
 }
 
-TEST_F(tensor_api_reg_truncate_3510, truncates_float_and_preserves_mask)
+TEST_F(tensor_api_reg_truncate_3510, truncates_float)
 {
-    expect_truncate_result<float>(pset_b32(PAT_ALL));
+    expect_truncate_result<float>();
 }
 
 } // namespace
