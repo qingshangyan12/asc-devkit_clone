@@ -119,8 +119,10 @@ HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint
 namespace {
 bool IsCcuKfcSupportedOp(uint32_t opType)
 {
-    return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
-           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
+    bool ret = opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE);
+    return ret;
 }
 } // namespace
 
@@ -400,7 +402,7 @@ HcclResult PrepareParamForAllReduce(
     param.reduceType = static_cast<HcclReduceOp>(ccTiling->reduceType);
     param.DataDes.dataType = static_cast<HcclDataType>(ccTiling->srcDataType);
     param.DataDes.outputType = param.DataDes.dataType;
-    param.DataDes.count = 0;
+    param.DataDes.count = 0; // 60195712
 
     HCCL_INFO("Print PrepareParamForAllReduce.");
     CHK_RET(PrintOpsCommParam(param));
