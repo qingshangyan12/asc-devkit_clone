@@ -21,7 +21,7 @@
 - 矩阵乘法、卷积等深度学习核心运算；
 - 逐元素数学函数（如向量加减、乘除、指数/对数运算）。
 
-**SIMD[核函数Kernel](./ai_core_simd_programming/kernel_function.md)编程四步法**：SIMD编程遵循SPMD模型（Single Program Multiple Data，单程序多数据），即每个AI Core运行同一份核函数，但负责处理不同的数据块，具体步骤如下：
+**SIMD[核函数（Kernel）](./ai_core_simd_programming/kernel_function.md)编程四步法**：SIMD编程遵循SPMD模型（Single Program Multiple Data，单程序多数据），即每个AI Core运行同一份核函数（Kernel），但负责处理不同的数据块，具体步骤如下：
 1. **Tiling（分块）设计**：对全局超大数据进行均匀切分，为各AI Core分配大小均衡的独立数据分片，精准适配SPMD多核并行架构，规避单核算力瓶颈，实现全域负载均衡。
 2. **数据搬入**：调用SIMD专用API，将计算所需的数据从Device Memory（通常为HBM）搬运到AI Core的本地缓存，减少全局内存访问延迟。
 3. **数据计算**：调用向量指令，一次处理多个同构数据；需注意，数据搬运与计算过程通常是异步执行的，需插入同步指令，确保计算时数据已就绪，保证结果准确。
@@ -41,13 +41,13 @@
 - 带有复杂if-else分支的逐元素运算；
 - 具有动态数据依赖的算法（如并行前缀和、排序网络）。
 
-**SIMT[核函数Kernel](./ai_core_simt_programming/kernel_function.md)编程四步法**：SIMT编程同样遵循SPMD模型，即同一份程序运行在每个线程上，每个线程处理不同的数据元素，具体步骤如下：
+**SIMT[核函数（Kernel）](./ai_core_simt_programming/kernel_function.md)编程四步法**：SIMT编程同样遵循SPMD模型，即同一份程序运行在每个线程上，每个线程处理不同的数据元素，具体步骤如下：
 1. **Tiling（分块）设计**：将整体任务拆分为多个独立线程，使线程索引与数据索引一一对应，确保每个线程处理唯一的数据元素，避免数据重复或遗漏。
 2. **数据搬入**：通过指针直接访问Device Memory，无需调用SIMD那样的专用API；硬件会自动将所需数据从Device Memory加载到线程的寄存器中，简化开发流程。
 3. **数据计算**：编程方式类似CPU标量代码，支持分支、循环等复杂控制逻辑；数据搬运与计算过程通常无需显式同步，若涉及多线程协作（如使用共享内存），需插入同步指令。
 4. **数据搬出**：通过指针直接将计算结果写回Device Memory，无需调用专用API，与CPU编程逻辑更接近，降低上手难度。
 
-> 📌 **提示**：Host端可通过`<<<>>>`语法糖来调用并运行核函数。
+> 📌 **提示**：Host端可通过`<<<>>>`语法糖来调用并运行核函数（Kernel）。
 
 ## AI Core硬件基础
 
@@ -76,19 +76,19 @@
 - **能力范围**：支持向量计算、矩阵计算，以及向量与矩阵的融合计算，覆盖深度学习大部分核心场景；
 - **适用场景**：规整的、高密度的数据并行任务，如卷积、矩阵乘、逐元素变换等，是昇腾NPU开发的主流选择；
 - **优势**：能效比高，指令执行开销低，可充分发挥硬件性能，接近AI Core的峰值计算能力；
-- **学习路径**：详见[AI Core SIMD编程](./ai_core_simd_programming/overview.md)；算子开发流程参见[SIMD算子实现](../../算子实践参考/SIMD算子实现/SIMD算子实现.md)。
+- **学习路径**：详见[AI Core SIMD编程](./ai_core_simd_programming/overview.md)；算子开发流程参见[SIMD算子实现](../../operator_practice/simd_operator_impl/simd_operator_impl.md)。
 
 <!-- npu="950" id2 -->
 ### SIMT编程（辅助补充，仅限Ascend 950PR/Ascend 950DT）
 - **能力范围**：仅支持向量计算，不支持矩阵运算或向量与矩阵的融合计算，功能范围相对有限；
 - **适用场景**：离散数据访问、复杂分支控制的向量算子，同时适合熟悉SIMT模型的开发者快速上手Ascend C；
 - **限制**：当前仅支持Ascend 950PR/Ascend 950DT芯片架构；
-- **学习路径**：详见[AI Core SIMT编程](./ai_core_simt_programming/overview.md)；算子开发参见[SIMT算子实现](../../算子实践参考/SIMT算子实现/SIMT算子实现.md)。
+- **学习路径**：详见[AI Core SIMT编程](./ai_core_simt_programming/overview.md)；算子开发参见[SIMT算子实现](../../operator_practice/simt_operator_impl/simt_operator_impl.md)。
 <!-- end id2 -->
 
 ### SIMD与SIMT混合编程
 
-SIMD与SIMT混合编程的Kernel，底层仍以SIMD编程模型为基础。开发者可在Kernel函数内部灵活组合两类编程逻辑：通过SIMT逻辑处理稀疏索引、复杂分支等不规则计算场景，输出规整化数据块；再通过SIMD高吞吐向量/矩阵运算处理规整数据，兼顾代码灵活性与硬件高性能，适配复杂混合计算场景。详细实现方法请参考[AI Core SIMD与SIMT混合编程](../advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/overview.md)。
+SIMD与SIMT混合编程的核函数（Kernel），底层仍以SIMD编程模型为基础。开发者可在核函数（Kernel）内部灵活组合两类编程逻辑：通过SIMT逻辑处理稀疏索引、复杂分支等不规则计算场景，输出规整化数据块；再通过SIMD高吞吐向量/矩阵运算处理规整数据，兼顾代码灵活性与硬件高性能，适配复杂混合计算场景。详细实现方法请参考[AI Core SIMD与SIMT混合编程](../advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/overview.md)。
 
 ## AI Core编程小结
 

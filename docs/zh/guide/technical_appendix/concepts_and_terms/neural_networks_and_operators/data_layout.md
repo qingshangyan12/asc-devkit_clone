@@ -326,12 +326,12 @@
 -   **ND\_ALIGN**：ND\_ALIGN是ND数据格式
 <a name="li075920427155"></a>的一种变换数据格式。输出矩阵乘的结果矩阵C时，用于配置C矩阵按照N方向32字节对齐的规则进行输出。
 
-    ND-\>ND\_ALIGN变换过程如下图所示，假设矩阵乘结果矩阵C的数据类型是int32\_t，输出到UB（VECOUT），原矩阵N方向没有32字节对齐，设置ND\_ALIGN后则在其后补0，将其对齐到32字节。
+    ND-\>ND\_ALIGN变换过程如下图所示，假设矩阵乘结果矩阵C的数据类型是int32\_t，输出到Unified Buffer（UB，VECOUT），原矩阵N方向没有32字节对齐，设置ND\_ALIGN后则在其后补0，将其对齐到32字节。
 
     ![](../../../figures/nd2nz.png)
 
 -   **VECTOR**：VECTOR是
-<a name="li51557161818"></a>[GEMV](../../../算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/矩阵向量乘.md)（矩阵向量乘，General Matrix-Vector Multiply）场景使用的一种数据格式，配置矩阵为VECTOR数据排布格式即代表输入数据是一个向量。
+<a name="li51557161818"></a>[GEMV](../../../operator_practice/simd_operator_impl/matrix_advanced_api/feature_scenarios/matrix_vector_multiply.md)（矩阵向量乘，General Matrix-Vector Multiply）场景使用的一种数据格式，配置矩阵为VECTOR数据排布格式即代表输入数据是一个向量。
 
     **图2**  GEMV场景输入Vector格式的A矩阵示意图<a name="fig172015331814"></a>  
     ![](../../../figures/gemv_vec_a.png "GEMV场景输入Vector格式的A矩阵示意图")
