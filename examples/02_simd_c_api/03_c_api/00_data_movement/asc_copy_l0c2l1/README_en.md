@@ -39,10 +39,11 @@ Run the following commands from this example directory.
 2. Build, generate data, run, and validate.
 
    ```bash
+   SCENARIO_NUM=1
    mkdir -p build && cd build
-   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
    make -j
-   python3 ../scripts/gen_data.py
+   python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM
    ./demo
    python3 ../scripts/verify_result.py output/output.bin output/golden.bin
    ```

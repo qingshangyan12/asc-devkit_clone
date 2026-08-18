@@ -10,7 +10,8 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-import os
+import argparse
+from pathlib import Path
 
 import numpy as np
 
@@ -27,15 +28,23 @@ def pack_signed_int4(values):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-scenarioNum", type=int, choices=(1,), default=1)
+    parser.parse_args()
+
     a = np.eye(M, K, dtype=np.float16)
     b = np.full((K, N), 3.0, dtype=np.float16)
     golden = pack_signed_int4(a.astype(np.float32) @ b.astype(np.float32))
 
-    os.makedirs("input", exist_ok=True)
-    os.makedirs("output", exist_ok=True)
-    a.tofile("input/x1_gm.bin")
-    b.tofile("input/x2_gm.bin")
-    golden.tofile("output/golden.bin")
+    output_dir = Path.cwd()
+    input_dir = output_dir / "input"
+    golden_dir = output_dir / "output"
+    input_dir.mkdir(exist_ok=True)
+    golden_dir.mkdir(exist_ok=True)
+    a.tofile(input_dir / "x1_gm.bin")
+    b.tofile(input_dir / "x2_gm.bin")
+    golden.tofile(golden_dir / "golden.bin")
+    print("Generated input and golden data in %s" % output_dir)
 
 
 if __name__ == "__main__":
