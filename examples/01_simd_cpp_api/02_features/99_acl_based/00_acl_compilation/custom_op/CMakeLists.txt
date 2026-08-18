@@ -11,6 +11,10 @@
 
 cmake_minimum_required(VERSION 3.16.0)
 project(custom_op_prj)
+
+# 推荐使用 ASCEND_SOC_SERIES 指定芯片系列，不使用 ASCEND_COMPUTE_UNIT；
+# 该缓存值也可以通过 cmake -DASCEND_SOC_SERIES=... 覆盖。
+set(ASCEND_SOC_SERIES ascend910b ascend910_93 ascend950 CACHE STRING "Target SOC series")
 find_package(ASC REQUIRED)
 
 # Enable ccache for compilation caching. OFF by default.
@@ -28,7 +32,6 @@ if(ENABLE_CCACHE)
     endif()
 endif()
 
-set(ASCEND_COMPUTE_UNIT ascend910b ascend910_93 ascend950)
 set(package_name customize)
 
 npu_op_package(${package_name}

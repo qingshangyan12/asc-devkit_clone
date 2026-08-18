@@ -8,29 +8,34 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-
+# 推荐使用 SOC_SERIES 指定 kernel 支持的芯片系列；不指定时，kernel 默认适用于
+# ASCEND_SOC_SERIES 中配置的所有芯片系列。
 npu_op_kernel_sources(ascendc_kernels
     OP_TYPE AddCustom
     KERNEL_DIR add_custom
     KERNEL_FILE add_custom_kernel.cpp
+    # SOC_SERIES ${ASCEND_SOC_SERIES}
 )
 
 npu_op_kernel_sources(ascendc_kernels
     OP_TYPE LeakyReluCustom
     KERNEL_DIR leaky_relu_custom
     KERNEL_FILE leaky_relu_custom_kernel.cpp
+    # SOC_SERIES ${ASCEND_SOC_SERIES}
 )
 
 npu_op_kernel_sources(ascendc_kernels
     OP_TYPE AddCustomTilingSink
     KERNEL_DIR add_custom_tiling_sink
     KERNEL_FILE add_custom_tiling_sink_kernel.cpp
+    # SOC_SERIES ${ASCEND_SOC_SERIES}
 )
 
 npu_op_kernel_sources(ascendc_kernels
     OP_TYPE AddCustomTemplate
     KERNEL_DIR add_custom_template
     KERNEL_FILE add_custom_template.cpp
+    # SOC_SERIES ${ASCEND_SOC_SERIES}
 )
 
 npu_op_kernel_library(ascendc_kernels

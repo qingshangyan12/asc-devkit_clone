@@ -55,6 +55,9 @@ public:
     explicit CfgGenerator(std::vector<std::string>& ops);
     opbuild::Status GenerateCode(void) override;
     ~CfgGenerator() override = default;
+
+private:
+    bool ValidateAICoreConfigs(const std::vector<std::string>& ops) const;
 };
 } // namespace ops
 
