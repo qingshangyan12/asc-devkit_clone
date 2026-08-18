@@ -94,7 +94,9 @@ inline void asc_syncthreads()
          if (idx == 0) {
              dst[0] = 0;
              for(int i = 1023; i > 0; i--) {
-                 dst[0] += dst[i];
+                 if (i < count) {
+                     dst[0] += dst[i];
+                 }
              }
          }
     }
