@@ -44,10 +44,10 @@ float __saturatef(float x)
 
 输入数据转换至\[0.0, 1.0\]区间的结果。
 
--   当x≤0时，返回值为0。
--   当x≥1时，返回值为1。
--   当0<x<1时，返回值为x。
--   当x为nan时，返回值为0。
+-   当`x`≤0时，返回值为0。
+-   当`x`≥1时，返回值为1。
+-   当0<`x`<1时，返回值为`x`。
+-   当`x`为`nan`时，返回值为0。
 
 ## 约束说明
 
@@ -55,7 +55,7 @@ float __saturatef(float x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/device\_functions.h"头文件。
+使用该接口需要包含`simt_api/device_functions.h`头文件。
 
 ```cpp
 #include "simt_api/device_functions.h"
