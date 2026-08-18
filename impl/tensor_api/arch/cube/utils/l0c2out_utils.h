@@ -271,7 +271,7 @@ private:
     template <typename T>
     __aicore__ inline static void SetLoop3Para(uint32_t num, uint32_t dstStride, uint32_t srcStride)
     {
-        asc_set_l0c2gm_nz2nd(static_cast<T>(num), static_cast<T>(srcStride), static_cast<T>(dstStride));
+        asc_set_l0c_copy_nz_para(static_cast<T>(num), static_cast<T>(srcStride), static_cast<T>(dstStride));
     }
 
     template <typename T>
@@ -283,7 +283,7 @@ private:
 
         T channelPara = 0;
         channelPara |= static_cast<T>(srcNZC0Stride) << SHIFT_CHANNEL_C0_STRIDE;
-        asc_set_l0c2gm_channel_para(channelPara);
+        asc_set_l0c_copy_channel_para(static_cast<uint16_t>(srcNZC0Stride));
     }
 };
 

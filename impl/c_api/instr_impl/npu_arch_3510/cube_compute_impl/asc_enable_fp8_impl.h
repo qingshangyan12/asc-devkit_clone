@@ -26,6 +26,12 @@ __aicore__ inline void asc_enable_fp8_impl()
     set_ctrl(sbitset0(get_ctrl(), HIF8_MODE_BIT));
 }
 
+__aicore__ inline void asc_disable_hif8_impl()
+{
+    constexpr int32_t HIF8_MODE_BIT = 45;
+    set_ctrl(sbitset0(get_ctrl(), HIF8_MODE_BIT));
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
