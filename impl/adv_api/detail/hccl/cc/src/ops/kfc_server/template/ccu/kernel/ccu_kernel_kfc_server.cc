@@ -138,7 +138,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
 {
     ccu::Variable opType;
     opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
-    HCCL_INFO("[KFCAG_DEBUG][Dispatch] rankId[%u] rankSize[%u] channelCount[%u] opType[%u] dataType[%u]",
+    HCCL_INFO("[KFC][Dispatch] rankId[%u] rankSize[%u] channelCount[%u] opType[%u] dataType[%u]",
         ctx.arg->rankId, ctx.arg->rankSize, ctx.arg->channelCount,
         static_cast<uint32_t>(ctx.arg->opParam.opType),
         static_cast<uint32_t>(ctx.arg->opParam.DataDes.dataType));
@@ -286,12 +286,10 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     CCU_CHK_RET(CompArgs(ctx));
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
-<<<<<<< HEAD
     CCU_CHK_RET(KfcServerGenCircularQueue(ctx));
-=======
     CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(KfcServerGenCircularQueue(ctx)); }
-    // CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
->>>>>>> ad89768df (1)
+    //CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
+
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }
