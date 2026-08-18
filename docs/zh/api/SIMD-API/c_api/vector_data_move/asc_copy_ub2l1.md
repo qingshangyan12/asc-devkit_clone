@@ -126,6 +126,7 @@ namespace {
 constexpr uint32_t DIM = 16;
 constexpr uint32_t ELEMENTS = DIM * DIM;
 constexpr uint32_t INPUT_BYTES = ELEMENTS * sizeof(half);
+constexpr uint64_t SYNC_ID = 8;
 
 __global__ __mix__(1, 2) void asc_copy_ub2l1_kernel(
     __gm__ float* output, __gm__ uint16_t* a, __gm__ uint16_t* b)
@@ -146,8 +147,10 @@ __global__ __mix__(1, 2) void asc_copy_ub2l1_kernel(
         asc_copy_ub2l1(a_l1, a_ub, INPUT_BYTES);
         asc_copy_ub2l1(b_l1, b_ub, INPUT_BYTES);
         asc_sync_block_arrive(PIPE_MTE3, l1_ready);
+        asc_sync_intra_arrive(PIPE_MTE3, SYNC_ID);
     }
     if ASC_IS_AIC {
+        asc_sync_intra_wait(PIPE_MTE1, SYNC_ID);
         // AIC starts reading L1 only after both AIV MTE3 pipelines arrive.
         asc_sync_block_wait(PIPE_MTE1, l1_ready);
         asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);
@@ -163,6 +166,7 @@ __global__ __mix__(1, 2) void asc_copy_ub2l1_kernel(
             static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
         asc_sync_pipe(PIPE_FIX);
     }
+    asc_sync_pipe(PIPE_ALL);
 }
 
 void print_row(const char* name, const std::vector<float>& data)

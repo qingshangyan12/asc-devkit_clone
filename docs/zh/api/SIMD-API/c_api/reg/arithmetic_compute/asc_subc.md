@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-该接口根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求差操作，减法运算在硬件底层通过补码加法实现，将结果写入目的操作数dst，同时将每个元素的进位结果写入carry（存放进位的掩码寄存器）。
+该接口根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求差操作，减法运算在硬件底层通过补码加法实现，将结果写入目的操作数dst，同时将每个元素的进位结果写入carry（存放进位标志的掩码寄存器）。
 
 Carry flag（进位/借位标志）用于表示加法进位或者减法无借位。补码加法实现中若`src0`、`~src1`、`carry_src`输入按位相加后最高位有进位，则`carry`中对应位置每4bit的最低位写1，否则写0。
 
@@ -37,10 +37,6 @@ $$
 $$
 
 ![](../../figures/asc_subc_1.png)
-
-以uint64_t类型数据计算0xFFFFFFFF FFFFFFFF - 0x00000000 00000008 = 0xFFFFFFFF FFFFFFF7为例，asc_sub/asc_subc接口的适用场景如下图：
-
-![](../../figures/asc_subc_2.png)
 
 本接口仅在AIV上生效。
 
@@ -61,11 +57,11 @@ __simd_callee__ inline void asc_subc(vector_bool& carry,
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| carry | 输出 | 目的操作数（掩码寄存器）。存储补码加法计算后的进位数据。 |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+| carry | 输出 | 目的操作数（掩码寄存器）。用于存储减法借位输出。减法不借位等价于补码加法进位。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器），用于存储计算结果的低32位。 |
 | src0 | 输入 | 源操作数（矢量数据寄存器）。 |
 | src1 | 输入 |源操作数（矢量数据寄存器）。 |
-| carry_src | 输入 | 源操作数（掩码寄存器），进位数据。 |
+| carry_src | 输入 | 源操作数（掩码寄存器），作为输入的借位标志。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
@@ -79,7 +75,13 @@ __simd_callee__ inline void asc_subc(vector_bool& carry,
 
 - 本接口在非AIV上调用直接返回。
 - `mask`需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
-- 运算输出完整计算结果（包含无借位标志），不受[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
+- 运算输出完整计算结果（包含借位标志），不受[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)影响，硬件不会对输出进行饱和或截断。
+
+## 关键特性
+
+以uint64_t类型数据计算0xFFFFFFFF FFFFFFFF - 0x00000000 00000008 = 0xFFFFFFFF FFFFFFF7为例，asc_sub/asc_subc接口的适用场景如下图：
+
+![](../../figures/asc_subc_2.png)
 
 ## 调用示例
 

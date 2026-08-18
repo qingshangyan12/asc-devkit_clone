@@ -26,9 +26,9 @@
 
 ## 功能说明
 
-`mask`将`src`中的每个`half`类型元素转换为`bfloat16_t`类型，结果写入`dst`。
+根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`bfloat16_t`类型，结果写入`dst`。
 
-## 函数原型
+## 函数原型（占位符形式）
 
 ```c
 inline void asc_half2bfloat16<round_mode>(vector_bfloat16_t& dst,
@@ -36,9 +36,9 @@ inline void asc_half2bfloat16<round_mode>(vector_bfloat16_t& dst,
                                           vector_bool mask)
 ```
 
-- `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
+**占位符说明如下：**`<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
 
-### 典型示例
+**典型示例**
 
 ```c
 inline void asc_half2bfloat16_rna(vector_bfloat16_t& dst,
@@ -67,7 +67,6 @@ inline void asc_half2bfloat16_rna(vector_bfloat16_t& dst,
 - 本接口在非AIV上调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - mask需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
-- 当数据写入目的操作数索引为奇数的位置，索引为偶数位置的数值置零。反之亦然。
 - `mask`掩码位为0时，`dst`对应元素置0。
 
 ## 调用示例
@@ -116,36 +115,12 @@ constexpr uint32_t BUFFER_BYTES = 256;
 __simd_vf__ inline void Convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
     vector_bool mask = asc_create_mask_b8(PAT_ALL);
-    vector_bfloat16_t dst_0;
-    vector_half src_0;
-    asc_loadalign(dst_0, reinterpret_cast<__ubuf__ bfloat16_t*>(output));
-    asc_loadalign(src_0, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2bfloat16_rn(dst_0, src_0, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ bfloat16_t*>(output), dst_0, mask);
-    vector_bfloat16_t dst_1;
-    vector_half src_1;
-    asc_loadalign(dst_1, reinterpret_cast<__ubuf__ bfloat16_t*>(output));
-    asc_loadalign(src_1, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2bfloat16_rna(dst_1, src_1, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ bfloat16_t*>(output), dst_1, mask);
-    vector_bfloat16_t dst_2;
-    vector_half src_2;
-    asc_loadalign(dst_2, reinterpret_cast<__ubuf__ bfloat16_t*>(output));
-    asc_loadalign(src_2, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2bfloat16_ru(dst_2, src_2, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ bfloat16_t*>(output), dst_2, mask);
-    vector_bfloat16_t dst_3;
-    vector_half src_3;
-    asc_loadalign(dst_3, reinterpret_cast<__ubuf__ bfloat16_t*>(output));
-    asc_loadalign(src_3, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2bfloat16_rz(dst_3, src_3, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ bfloat16_t*>(output), dst_3, mask);
-    vector_bfloat16_t dst_4;
-    vector_half src_4;
-    asc_loadalign(dst_4, reinterpret_cast<__ubuf__ bfloat16_t*>(output));
-    asc_loadalign(src_4, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2bfloat16_rd(dst_4, src_4, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ bfloat16_t*>(output), dst_4, mask);
+    vector_bfloat16_t dst;
+    vector_half src;
+    asc_loadalign(dst, reinterpret_cast<__ubuf__ bfloat16_t*>(output));
+    asc_loadalign(src, reinterpret_cast<__ubuf__ half*>(input));
+    asc_half2bfloat16_rd(dst, src, mask);
+    asc_storealign(reinterpret_cast<__ubuf__ bfloat16_t*>(output), dst, mask);
 }
 
 __global__ __vector__ void AscHalf2bfloat16Kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
@@ -195,7 +170,7 @@ int main()
     PrintData("Output (raw bytes)", output);
     PrintData("Golden 1.0 (raw bytes)", golden);
     const bool passed = CompareData(output, golden);
-    std::cout << (passed ? "[Success] asc_half2bfloat16_rd/asc_half2bfloat16_rn/asc_half2bfloat16_rna/asc_half2bfloat16_ru/asc_half2bfloat16_rz passed." : "[Failed] asc_half2bfloat16_rd/asc_half2bfloat16_rn/asc_half2bfloat16_rna/asc_half2bfloat16_ru/asc_half2bfloat16_rz failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_half2bfloat16_rd passed." : "[Failed] asc_half2bfloat16_rd failed.") << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);

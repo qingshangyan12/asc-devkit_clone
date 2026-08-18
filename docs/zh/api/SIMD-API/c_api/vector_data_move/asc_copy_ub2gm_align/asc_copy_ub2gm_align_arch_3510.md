@@ -53,7 +53,7 @@
 
 ## 函数原型
 
-### 连续数据搬运
+### 连续数据搬运（占位符形式）
 
 ```c
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,
@@ -61,9 +61,9 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,
                                             uint32_t size)
 ```
 
-dtype可取的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+**dtype取值如下：**`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
-#### 典型示例
+**典型示例**
 
 ```c
 // 示例：源与目的数据类型为bfloat16_t
@@ -72,26 +72,7 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ bfloat16_t* dst,
                                             uint32_t size)
 ```
 
-### 同步搬运
-
-```c
-__aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ <dtype>* dst,
-                                                 __ubuf__ <dtype>* src,
-                                                 uint32_t size)
-```
-
-dtype可取的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
-
-#### 典型示例
-
-```c
-// 示例：源与目的数据类型为bfloat16_t
-__aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ bfloat16_t* dst,
-                                                 __ubuf__ bfloat16_t* src,
-                                                 uint32_t size)
-```
-
-### 高维切分数据搬运
+### 高维切分数据搬运（占位符形式）
 
 ```c
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,
@@ -103,9 +84,9 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,
                                             uint32_t src_stride)
 ```
 
-dtype可取的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+**dtype取值如下：**`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
-#### 典型示例
+**典型示例**
 
 ```c
 // 示例：源与目的数据类型为bfloat16_t
@@ -114,18 +95,6 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ bfloat16_t* dst,
                                             uint16_t n_burst,
                                             uint32_t len_burst,
                                             asc_store_l2_cache_mode l2_cache_mode,
-                                            uint64_t dst_stride,
-                                            uint32_t src_stride)
-```
-
-以下高维切分数据搬运原型已废弃，请使用`asc_store_l2_cache_mode`类型的枚举值进行L2 Cache管理策略配置：
-
-```c
-__aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,
-                                            __ubuf__ <dtype>* src,
-                                            uint16_t n_burst,
-                                            uint32_t len_burst,
-                                            uint8_t l2_cache_mode,
                                             uint64_t dst_stride,
                                             uint32_t src_stride)
 ```
@@ -142,10 +111,6 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,
 | src | 输入 | 源UB的起始地址。需要32字节对齐。 |
 | size | 输入 | 搬运数据大小，单位为字节。取值范围：[1, $2^{21}−1$]。 |
 
-### 同步搬运
-
-同步搬运接口的参数说明与[连续数据搬运](#连续数据搬运)相同。
-
 ### 高维切分数据搬运
 
 **表2** 参数说明
@@ -154,7 +119,7 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,
 | :--- | :--- | :--- |
 | dst | 输出 | 目的GM的起始地址。需要1字节对齐。 |
 | src | 输入 | 源UB的起始地址。需要32字节对齐。 |
-| n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
+| n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, $2^{12}−1$]。 |
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[1, $2^{21}−1$]。 |
 | l2_cache_mode | 输入 | [asc_store_l2_cache_mode](../../enum/asc_store_l2_cache_mode.md)类型的枚举值，配置数据在L2 Cache中的管理策略。 |
 | dst_stride | 输入 | 目的操作数相邻连续数据块的距离（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。取值范围：[0, $2^{40}−1$]。<br>只搬运1个数据块，即`n_burst`设置为1时，可以将此参数设置为0。 |
@@ -175,10 +140,6 @@ PIPE_MTE3
 - 本接口在非AIV上调用直接返回。
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 如果本指令与其他指令的目的地址存在重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个指令的串行化，防止出现异常数据。
-
-### 连续数据搬运约束
-
-- 若`size`非32字节对齐，硬件在读取UB数据时自动补充dummy假数据至32字节对齐。写入GM时会丢弃补充的dummy假数据。
 
 ### 高维切分数据搬运约束
 
@@ -245,6 +206,7 @@ __global__ __vector__ void asc_copy_ub2gm_align_arch3510_kernel(__gm__ uint8_t* 
     // Copy INPUT_BYTES from UB to GM, then wait only for PIPE_MTE3.
     asc_copy_ub2gm_align(output, local, INPUT_BYTES);
     asc_sync_mte3(0);
+    asc_sync_pipe(PIPE_ALL);
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)

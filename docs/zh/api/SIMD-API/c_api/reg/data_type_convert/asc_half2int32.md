@@ -26,25 +26,31 @@
 
 ## 功能说明
 
-`mask`将`src`中的每个`half`类型元素转换为`int32_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据不同接口选择读取源数据索引为偶数的位置或奇数的位置。
+根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int32_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据参数`src_pos`选择读取`src`索引为偶数的位置或奇数的位置。
 
-## 函数原型
+## 函数原型（占位符形式）
 
 ```c
-inline void asc_half2int32<round_mode><position_mode>(vector_int32_t& dst,
-                                                      vector_half src,
-                                                      vector_bool mask)
+inline void asc_half2int32<round_mode>(vector_int32_t& dst,
+                                       vector_half src,
+                                       vector_bool mask,
+                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+
+inline void asc_half2int32<round_mode>(vector_int32_t& dst,
+                                       vector_half src,
+                                       vector_bool mask,
+                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 ```
 
-- `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
-- `<position_mode>`表示`src`读取的位置，为空时读取`src`的偶数索引位置；取值为`_v2`时读取`src`的奇数索引位置。
+**占位符说明如下：**`<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
 
-### 典型示例
+**典型示例**
 
 ```c
 inline void asc_half2int32_rd(vector_int32_t& dst,
                               vector_half src,
-                              vector_bool mask)
+                              vector_bool mask,
+                              std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 ```
 
 ## 参数说明
@@ -56,6 +62,7 @@ inline void asc_half2int32_rd(vector_int32_t& dst,
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| src_pos | 输入 | 位置选择标签（编译器标签类型），类型为std::integral_constant<asc_position_mode, asc_position_mode::EVEN>或std::integral_constant<asc_position_mode, asc_position_mode::ODD>。取`ASC_POSITION_EVEN`时选择读取源数据索引为偶数的位置；取`ASC_POSITION_ODD`时选择读取源数据索引为奇数的位置。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -115,66 +122,12 @@ constexpr uint32_t BUFFER_BYTES = 256;
 __simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
     vector_bool mask = asc_create_mask_b16(PAT_ALL);
-    vector_int32_t dst_0;
-    vector_half src_0;
-    asc_loadalign(dst_0, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_0, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2int32_rd_v2(dst_0, src_0, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_0, mask);
-    vector_int32_t dst_1;
-    vector_half src_1;
-    asc_loadalign(dst_1, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_1, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2int32_rn(dst_1, src_1, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_1, mask);
-    vector_int32_t dst_2;
-    vector_half src_2;
-    asc_loadalign(dst_2, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_2, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2int32_rn_v2(dst_2, src_2, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_2, mask);
-    vector_int32_t dst_3;
-    vector_half src_3;
-    asc_loadalign(dst_3, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_3, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2int32_rna(dst_3, src_3, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_3, mask);
-    vector_int32_t dst_4;
-    vector_half src_4;
-    asc_loadalign(dst_4, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_4, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2int32_rna_v2(dst_4, src_4, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_4, mask);
-    vector_int32_t dst_5;
-    vector_half src_5;
-    asc_loadalign(dst_5, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_5, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2int32_ru(dst_5, src_5, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_5, mask);
-    vector_int32_t dst_6;
-    vector_half src_6;
-    asc_loadalign(dst_6, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_6, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2int32_ru_v2(dst_6, src_6, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_6, mask);
-    vector_int32_t dst_7;
-    vector_half src_7;
-    asc_loadalign(dst_7, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_7, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2int32_rz(dst_7, src_7, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_7, mask);
-    vector_int32_t dst_8;
-    vector_half src_8;
-    asc_loadalign(dst_8, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_8, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2int32_rz_v2(dst_8, src_8, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_8, mask);
-    vector_int32_t dst_9;
-    vector_half src_9;
-    asc_loadalign(dst_9, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_9, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2int32_rd(dst_9, src_9, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_9, mask);
+    vector_int32_t dst;
+    vector_half src;
+    asc_loadalign(dst, reinterpret_cast<__ubuf__ int32_t*>(output));
+    asc_loadalign(src, reinterpret_cast<__ubuf__ half*>(input));
+    asc_half2int32_rd(dst, src, mask);
+    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst, mask);
 }
 
 __global__ __vector__ void asc_half2int32_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
@@ -224,7 +177,7 @@ int main()
     print_data("Output (raw bytes)", output);
     print_data("Golden 1.0 (raw bytes)", golden);
     const bool passed = compare_data(output, golden);
-    std::cout << (passed ? "[Success] asc_half2int32_rd/asc_half2int32_rd_v2/asc_half2int32_rn/asc_half2int32_rn_v2/asc_half2int32_rna/asc_half2int32_rna_v2/asc_half2int32_ru/asc_half2int32_ru_v2/asc_half2int32_rz/asc_half2int32_rz_v2 passed." : "[Failed] asc_half2int32_rd/asc_half2int32_rd_v2/asc_half2int32_rn/asc_half2int32_rn_v2/asc_half2int32_rna/asc_half2int32_rna_v2/asc_half2int32_ru/asc_half2int32_ru_v2/asc_half2int32_rz/asc_half2int32_rz_v2 failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_half2int32_rd passed." : "[Failed] asc_half2int32_rd failed.") << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);

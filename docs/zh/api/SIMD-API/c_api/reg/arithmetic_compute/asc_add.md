@@ -50,7 +50,7 @@ $$
 
 ## 函数原型
 
-### 无进位输出加法
+### 无进位输出加法（占位符形式）
 
 ```c
 __simd_callee__ inline void asc_add(vector_<dtype>& dst,
@@ -59,12 +59,12 @@ __simd_callee__ inline void asc_add(vector_<dtype>& dst,
                                     vector_bool mask)
 ```
 
-dtype可取的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+**dtype取值如下：**`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
-#### 典型示例
+**典型示例**
 
 ```c
-// 示例：float类型无进位输出加法
+// 示例：float类型的无进位输出加法
 __simd_callee__ inline void asc_add(vector_float& dst,
                                     vector_float src0,
                                     vector_float src1,

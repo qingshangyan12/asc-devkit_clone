@@ -26,23 +26,29 @@
 
 ## 功能说明
 
-`mask`将`src`中的每个`half`类型元素转换为`hifloat8_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据不同接口选择数据写入`dst`索引为偶数的位置或奇数的位置。
+根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`hifloat8_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据参数`dst_pos`选择写入`dst`索引为偶数的位置或奇数的位置。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
 
-## 函数原型
+## 函数原型（占位符形式）
 
 ```c
-inline void asc_half2hif8<round_mode><sat_mode><position_mode>(vector_hifloat8_t& dst,
-                                                               vector_half src,
-                                                               vector_bool mask)
+inline void asc_half2hif8<round_mode><sat_mode>(vector_hifloat8_t& dst,
+                                                vector_half src,
+                                                vector_bool mask,
+                                                std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+
+inline void asc_half2hif8<round_mode><sat_mode>(vector_hifloat8_t& dst,
+                                                vector_half src,
+                                                vector_bool mask,
+                                                std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
+**占位符说明如下：**
 - `<round_mode>`支持`rna`（ROUND）和`rh`（HYBRID）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
-- `<position_mode>`表示`dst`写入的位置，为空时结果写入`dst`的偶数索引位置；取值为`_v2`时结果写入`dst`的奇数索引位置。
 
-### 典型示例
+**典型示例**
 
 ```c
 inline void asc_half2hif8_rna(vector_hifloat8_t& dst,
@@ -59,6 +65,7 @@ inline void asc_half2hif8_rna(vector_hifloat8_t& dst,
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| dst_pos | 输入 | 位置选择标签（编译器标签类型），类型为std::integral_constant<asc_position_mode, asc_position_mode::EVEN>或std::integral_constant<asc_position_mode, asc_position_mode::ODD>。取`ASC_POSITION_EVEN`时选择写入`dst`索引为偶数的位置；取`ASC_POSITION_ODD`时选择写入`dst`索引为奇数的位置。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -120,54 +127,12 @@ constexpr uint32_t BUFFER_BYTES = 256;
 __simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
     vector_bool mask = asc_create_mask_b8(PAT_ALL);
-    vector_hifloat8_t dst_0;
-    vector_half src_0;
-    asc_loadalign(dst_0, reinterpret_cast<__ubuf__ hifloat8_t*>(output));
-    asc_loadalign(src_0, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2hif8_rna_sat(dst_0, src_0, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ hifloat8_t*>(output), dst_0, mask);
-    vector_hifloat8_t dst_1;
-    vector_half src_1;
-    asc_loadalign(dst_1, reinterpret_cast<__ubuf__ hifloat8_t*>(output));
-    asc_loadalign(src_1, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2hif8_rna_v2(dst_1, src_1, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ hifloat8_t*>(output), dst_1, mask);
-    vector_hifloat8_t dst_2;
-    vector_half src_2;
-    asc_loadalign(dst_2, reinterpret_cast<__ubuf__ hifloat8_t*>(output));
-    asc_loadalign(src_2, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2hif8_rna_sat_v2(dst_2, src_2, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ hifloat8_t*>(output), dst_2, mask);
-    vector_hifloat8_t dst_3;
-    vector_half src_3;
-    asc_loadalign(dst_3, reinterpret_cast<__ubuf__ hifloat8_t*>(output));
-    asc_loadalign(src_3, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2hif8_rh(dst_3, src_3, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ hifloat8_t*>(output), dst_3, mask);
-    vector_hifloat8_t dst_4;
-    vector_half src_4;
-    asc_loadalign(dst_4, reinterpret_cast<__ubuf__ hifloat8_t*>(output));
-    asc_loadalign(src_4, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2hif8_rh_sat(dst_4, src_4, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ hifloat8_t*>(output), dst_4, mask);
-    vector_hifloat8_t dst_5;
-    vector_half src_5;
-    asc_loadalign(dst_5, reinterpret_cast<__ubuf__ hifloat8_t*>(output));
-    asc_loadalign(src_5, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2hif8_rh_v2(dst_5, src_5, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ hifloat8_t*>(output), dst_5, mask);
-    vector_hifloat8_t dst_6;
-    vector_half src_6;
-    asc_loadalign(dst_6, reinterpret_cast<__ubuf__ hifloat8_t*>(output));
-    asc_loadalign(src_6, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2hif8_rh_sat_v2(dst_6, src_6, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ hifloat8_t*>(output), dst_6, mask);
-    vector_hifloat8_t dst_7;
-    vector_half src_7;
-    asc_loadalign(dst_7, reinterpret_cast<__ubuf__ hifloat8_t*>(output));
-    asc_loadalign(src_7, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2hif8_rna(dst_7, src_7, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ hifloat8_t*>(output), dst_7, mask);
+    vector_hifloat8_t dst;
+    vector_half src;
+    asc_loadalign(dst, reinterpret_cast<__ubuf__ hifloat8_t*>(output));
+    asc_loadalign(src, reinterpret_cast<__ubuf__ half*>(input));
+    asc_half2hif8_rna(dst, src, mask, ASC_POSITION_EVEN);
+    asc_storealign(reinterpret_cast<__ubuf__ hifloat8_t*>(output), dst, mask);
 }
 
 __global__ __vector__ void asc_half2hif8_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
@@ -217,7 +182,7 @@ int main()
     print_data("Output (raw bytes)", output);
     print_data("Golden 1.0 (raw bytes)", golden);
     const bool passed = compare_data(output, golden);
-    std::cout << (passed ? "[Success] asc_half2hif8_rna/asc_half2hif8_rna_sat/asc_half2hif8_rna_v2/asc_half2hif8_rna_sat_v2/asc_half2hif8_rh/asc_half2hif8_rh_sat/asc_half2hif8_rh_v2/asc_half2hif8_rh_sat_v2 passed." : "[Failed] asc_half2hif8_rna/asc_half2hif8_rna_sat/asc_half2hif8_rna_v2/asc_half2hif8_rna_sat_v2/asc_half2hif8_rh/asc_half2hif8_rh_sat/asc_half2hif8_rh_v2/asc_half2hif8_rh_sat_v2 failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_half2hif8_rna passed." : "[Failed] asc_half2hif8_rna failed.") << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);

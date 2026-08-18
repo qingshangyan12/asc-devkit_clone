@@ -26,11 +26,11 @@
 
 ## 功能说明
 
-`mask`将`src`中的每个`bfloat16_t`类型元素转换为`half`类型，结果写入`dst`。
+根据`mask`将`src`中的每个参与计算的`bfloat16_t`类型元素转换为`half`类型，结果写入`dst`。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
 
-## 函数原型
+## 函数原型（占位符形式）
 
 ```c
 inline void asc_bfloat162half<round_mode><sat_mode>(vector_half& dst,
@@ -38,10 +38,11 @@ inline void asc_bfloat162half<round_mode><sat_mode>(vector_half& dst,
                                                     vector_bool mask)
 ```
 
+**占位符说明如下：**
 - `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 
-### 典型示例
+**典型示例**
 
 ```c
 inline void asc_bfloat162half_rn(vector_half& dst,
@@ -119,66 +120,12 @@ constexpr uint32_t BUFFER_BYTES = 256;
 __simd_vf__ inline void convert_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
     vector_bool mask = asc_create_mask_b16(PAT_ALL);
-    vector_half dst_0;
-    vector_bfloat16_t src_0;
-    asc_loadalign(dst_0, reinterpret_cast<__ubuf__ half*>(output));
-    asc_loadalign(src_0, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162half_rn_sat(dst_0, src_0, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst_0, mask);
-    vector_half dst_1;
-    vector_bfloat16_t src_1;
-    asc_loadalign(dst_1, reinterpret_cast<__ubuf__ half*>(output));
-    asc_loadalign(src_1, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162half_rna(dst_1, src_1, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst_1, mask);
-    vector_half dst_2;
-    vector_bfloat16_t src_2;
-    asc_loadalign(dst_2, reinterpret_cast<__ubuf__ half*>(output));
-    asc_loadalign(src_2, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162half_rna_sat(dst_2, src_2, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst_2, mask);
-    vector_half dst_3;
-    vector_bfloat16_t src_3;
-    asc_loadalign(dst_3, reinterpret_cast<__ubuf__ half*>(output));
-    asc_loadalign(src_3, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162half_rd(dst_3, src_3, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst_3, mask);
-    vector_half dst_4;
-    vector_bfloat16_t src_4;
-    asc_loadalign(dst_4, reinterpret_cast<__ubuf__ half*>(output));
-    asc_loadalign(src_4, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162half_rd_sat(dst_4, src_4, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst_4, mask);
-    vector_half dst_5;
-    vector_bfloat16_t src_5;
-    asc_loadalign(dst_5, reinterpret_cast<__ubuf__ half*>(output));
-    asc_loadalign(src_5, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162half_ru(dst_5, src_5, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst_5, mask);
-    vector_half dst_6;
-    vector_bfloat16_t src_6;
-    asc_loadalign(dst_6, reinterpret_cast<__ubuf__ half*>(output));
-    asc_loadalign(src_6, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162half_ru_sat(dst_6, src_6, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst_6, mask);
-    vector_half dst_7;
-    vector_bfloat16_t src_7;
-    asc_loadalign(dst_7, reinterpret_cast<__ubuf__ half*>(output));
-    asc_loadalign(src_7, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162half_rz(dst_7, src_7, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst_7, mask);
-    vector_half dst_8;
-    vector_bfloat16_t src_8;
-    asc_loadalign(dst_8, reinterpret_cast<__ubuf__ half*>(output));
-    asc_loadalign(src_8, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162half_rz_sat(dst_8, src_8, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst_8, mask);
-    vector_half dst_9;
-    vector_bfloat16_t src_9;
-    asc_loadalign(dst_9, reinterpret_cast<__ubuf__ half*>(output));
-    asc_loadalign(src_9, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162half_rn(dst_9, src_9, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst_9, mask);
+    vector_half dst;
+    vector_bfloat16_t src;
+    asc_loadalign(dst, reinterpret_cast<__ubuf__ half*>(output));
+    asc_loadalign(src, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
+    asc_bfloat162half_rn(dst, src, mask);
+    asc_storealign(reinterpret_cast<__ubuf__ half*>(output), dst, mask);
 }
 __global__ __vector__ void asc_bfloat162half_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
@@ -227,7 +174,7 @@ int main()
     print_data("Output (raw bytes)", output);
     print_data("Golden 1.0 (raw bytes)", golden);
     const bool passed = compare_date(output, golden);
-    std::cout << (passed ? "[Success] asc_bfloat162half_rn/asc_bfloat162half_rn_sat/asc_bfloat162half_rna/asc_bfloat162half_rna_sat/asc_bfloat162half_rd/asc_bfloat162half_rd_sat/asc_bfloat162half_ru/asc_bfloat162half_ru_sat/asc_bfloat162half_rz/asc_bfloat162half_rz_sat passed." : "[Failed] asc_bfloat162half_rn/asc_bfloat162half_rn_sat/asc_bfloat162half_rna/asc_bfloat162half_rna_sat/asc_bfloat162half_rd/asc_bfloat162half_rd_sat/asc_bfloat162half_ru/asc_bfloat162half_ru_sat/asc_bfloat162half_rz/asc_bfloat162half_rz_sat failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_bfloat162half_rn passed." : "[Failed] asc_bfloat162half_rn failed.") << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);

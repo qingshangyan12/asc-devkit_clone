@@ -26,28 +26,35 @@
 
 ## 功能说明
 
-`mask`将`src`中的每个`bfloat16_t`类型元素转换为`int32_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据不同接口选择读取源数据索引为偶数的位置或奇数的位置。
+根据`mask`将`src`中的每个参与计算的`bfloat16_t`类型元素转换为`int32_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据参数`src_pos`选择读取`src`索引为偶数的位置或奇数的位置。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../data_type_convert/rounding_mode.md)。
 
-## 函数原型
+## 函数原型（占位符形式）
 
 ```c
-inline void asc_bfloat162int32<round_mode><sat_mode><position_mode>(vector_int32_t& dst,
-                                                                    vector_bfloat16_t src,
-                                                                    vector_bool mask)
+inline void asc_bfloat162int32<round_mode><sat_mode>(vector_int32_t& dst,
+                                                     vector_bfloat16_t src,
+                                                     vector_bool mask,
+                                                     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+
+inline void asc_bfloat162int32<round_mode><sat_mode>(vector_int32_t& dst,
+                                                     vector_bfloat16_t src,
+                                                     vector_bool mask,
+                                                     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 ```
 
+**占位符说明如下：**
 - `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
-- `<position_mode>`表示`src`读取的位置，为空时读取`src`的偶数索引位置；取值为`_v2`时读取`src`的奇数索引位置。
 
-### 典型示例
+**典型示例**
 
 ```c
 inline void asc_bfloat162int32_rn(vector_int32_t& dst,
                                   vector_bfloat16_t src,
-                                  vector_bool mask)
+                                  vector_bool mask,
+                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 ```
 
 ## 参数说明
@@ -59,6 +66,7 @@ inline void asc_bfloat162int32_rn(vector_int32_t& dst,
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| src_pos | 输入 | 位置选择标签（编译器标签类型），类型为std::integral_constant<asc_position_mode, asc_position_mode::EVEN>或std::integral_constant<asc_position_mode, asc_position_mode::ODD>。取`ASC_POSITION_EVEN`时选择读取源数据索引为偶数的位置；取`ASC_POSITION_ODD`时选择读取源数据索引为奇数的位置。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -119,126 +127,12 @@ constexpr uint32_t BUFFER_BYTES = 256;
 __simd_vf__ inline void convert_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
     vector_bool mask = asc_create_mask_b16(PAT_ALL);
-    vector_int32_t dst_0;
-    vector_bfloat16_t src_0;
-    asc_loadalign(dst_0, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_0, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rn_sat(dst_0, src_0, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_0, mask);
-    vector_int32_t dst_1;
-    vector_bfloat16_t src_1;
-    asc_loadalign(dst_1, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_1, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rn_v2(dst_1, src_1, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_1, mask);
-    vector_int32_t dst_2;
-    vector_bfloat16_t src_2;
-    asc_loadalign(dst_2, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_2, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rn_sat_v2(dst_2, src_2, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_2, mask);
-    vector_int32_t dst_3;
-    vector_bfloat16_t src_3;
-    asc_loadalign(dst_3, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_3, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rna(dst_3, src_3, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_3, mask);
-    vector_int32_t dst_4;
-    vector_bfloat16_t src_4;
-    asc_loadalign(dst_4, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_4, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rna_sat(dst_4, src_4, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_4, mask);
-    vector_int32_t dst_5;
-    vector_bfloat16_t src_5;
-    asc_loadalign(dst_5, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_5, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rna_v2(dst_5, src_5, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_5, mask);
-    vector_int32_t dst_6;
-    vector_bfloat16_t src_6;
-    asc_loadalign(dst_6, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_6, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rna_sat_v2(dst_6, src_6, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_6, mask);
-    vector_int32_t dst_7;
-    vector_bfloat16_t src_7;
-    asc_loadalign(dst_7, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_7, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rd(dst_7, src_7, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_7, mask);
-    vector_int32_t dst_8;
-    vector_bfloat16_t src_8;
-    asc_loadalign(dst_8, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_8, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rd_sat(dst_8, src_8, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_8, mask);
-    vector_int32_t dst_9;
-    vector_bfloat16_t src_9;
-    asc_loadalign(dst_9, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_9, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rd_v2(dst_9, src_9, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_9, mask);
-    vector_int32_t dst_10;
-    vector_bfloat16_t src_10;
-    asc_loadalign(dst_10, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_10, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rd_sat_v2(dst_10, src_10, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_10, mask);
-    vector_int32_t dst_11;
-    vector_bfloat16_t src_11;
-    asc_loadalign(dst_11, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_11, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_ru(dst_11, src_11, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_11, mask);
-    vector_int32_t dst_12;
-    vector_bfloat16_t src_12;
-    asc_loadalign(dst_12, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_12, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_ru_sat(dst_12, src_12, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_12, mask);
-    vector_int32_t dst_13;
-    vector_bfloat16_t src_13;
-    asc_loadalign(dst_13, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_13, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_ru_v2(dst_13, src_13, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_13, mask);
-    vector_int32_t dst_14;
-    vector_bfloat16_t src_14;
-    asc_loadalign(dst_14, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_14, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_ru_sat_v2(dst_14, src_14, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_14, mask);
-    vector_int32_t dst_15;
-    vector_bfloat16_t src_15;
-    asc_loadalign(dst_15, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_15, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rz(dst_15, src_15, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_15, mask);
-    vector_int32_t dst_16;
-    vector_bfloat16_t src_16;
-    asc_loadalign(dst_16, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_16, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rz_sat(dst_16, src_16, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_16, mask);
-    vector_int32_t dst_17;
-    vector_bfloat16_t src_17;
-    asc_loadalign(dst_17, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_17, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rz_v2(dst_17, src_17, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_17, mask);
-    vector_int32_t dst_18;
-    vector_bfloat16_t src_18;
-    asc_loadalign(dst_18, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_18, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rz_sat_v2(dst_18, src_18, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_18, mask);
-    vector_int32_t dst_19;
-    vector_bfloat16_t src_19;
-    asc_loadalign(dst_19, reinterpret_cast<__ubuf__ int32_t*>(output));
-    asc_loadalign(src_19, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162int32_rn(dst_19, src_19, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst_19, mask);
+    vector_int32_t dst;
+    vector_bfloat16_t src;
+    asc_loadalign(dst, reinterpret_cast<__ubuf__ int32_t*>(output));
+    asc_loadalign(src, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
+    asc_bfloat162int32_rn(dst, src, mask, ASC_POSITION_EVEN);
+    asc_storealign(reinterpret_cast<__ubuf__ int32_t*>(output), dst, mask);
 }
 
 __global__ __vector__ void asc_bfloat162int32_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
@@ -288,7 +182,7 @@ int main()
     print_data("Output (raw bytes)", output);
     print_data("Golden 1.0 (raw bytes)", golden);
     const bool passed = compare_data(output, golden);
-    std::cout << (passed ? "[Success] asc_bfloat162int32_rn/asc_bfloat162int32_rn_sat/asc_bfloat162int32_rn_v2/asc_bfloat162int32_rn_sat_v2/asc_bfloat162int32_rna/asc_bfloat162int32_rna_sat/asc_bfloat162int32_rna_v2/asc_bfloat162int32_rna_sat_v2/asc_bfloat162int32_rd/asc_bfloat162int32_rd_sat/asc_bfloat162int32_rd_v2/asc_bfloat162int32_rd_sat_v2/asc_bfloat162int32_ru/asc_bfloat162int32_ru_sat/asc_bfloat162int32_ru_v2/asc_bfloat162int32_ru_sat_v2/asc_bfloat162int32_rz/asc_bfloat162int32_rz_sat/asc_bfloat162int32_rz_v2/asc_bfloat162int32_rz_sat_v2 passed." : "[Failed] asc_bfloat162int32_rn/asc_bfloat162int32_rn_sat/asc_bfloat162int32_rn_v2/asc_bfloat162int32_rn_sat_v2/asc_bfloat162int32_rna/asc_bfloat162int32_rna_sat/asc_bfloat162int32_rna_v2/asc_bfloat162int32_rna_sat_v2/asc_bfloat162int32_rd/asc_bfloat162int32_rd_sat/asc_bfloat162int32_rd_v2/asc_bfloat162int32_rd_sat_v2/asc_bfloat162int32_ru/asc_bfloat162int32_ru_sat/asc_bfloat162int32_ru_v2/asc_bfloat162int32_ru_sat_v2/asc_bfloat162int32_rz/asc_bfloat162int32_rz_sat/asc_bfloat162int32_rz_v2/asc_bfloat162int32_rz_sat_v2 failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_bfloat162int32_rn passed." : "[Failed] asc_bfloat162int32_rn failed.") << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);

@@ -42,7 +42,7 @@
 
 ## 函数原型
 
-### UB源收集模式
+### UB源收集模式（占位符形式）
 
 ```c
 __simd_callee__ inline void asc_gather(vector_<dst_dtype>& dst,
@@ -50,8 +50,6 @@ __simd_callee__ inline void asc_gather(vector_<dst_dtype>& dst,
                                        vector_<index_dtype> index,
                                        vector_bool mask)
 ```
-
-#### 支持数据类型组合列表
 
 **表1**  UB源收集模式支持数据类型组合列表
 
@@ -77,8 +75,7 @@ __simd_callee__ inline void asc_gather(vector_<dst_dtype>& dst,
 | uint32_t | uint32_t | uint32_t |
 | float | float | uint32_t |
 
-#### 典型示例
-
+**典型示例**
 ```c
 // 示例：dst_dtype/src_dtype/index_dtype数据类型分别为: int16_t/int16_t/uint16_t
 __simd_callee__ inline void asc_gather(vector_int16_t& dst,
@@ -87,15 +84,13 @@ __simd_callee__ inline void asc_gather(vector_int16_t& dst,
                                        vector_bool mask)
 ```
 
-### 寄存器源收集模式
+### 寄存器源收集模式（占位符形式）
 
 ```c
 __simd_callee__ inline void asc_gather(vector_<dtype>& dst,
                                        vector_<dtype> src,
                                        vector_<index_dtype> index)
 ```
-
-#### 支持数据类型列表
 
 **表2**  寄存器源收集模式支持数据类型列表
 
@@ -114,7 +109,7 @@ __simd_callee__ inline void asc_gather(vector_<dtype>& dst,
 | int32_t | uint32_t |
 | uint32_t | uint32_t |
 
-#### 典型示例
+**典型示例**
 
 ```c
 // 示例：dtype/index_dtype数据类型分别为: int16_t/uint16_t

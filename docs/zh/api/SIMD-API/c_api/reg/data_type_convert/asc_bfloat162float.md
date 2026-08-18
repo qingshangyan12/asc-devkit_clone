@@ -26,24 +26,20 @@
 
 ## 功能说明
 
-`mask`将`src`中的每个`bfloat16_t`类型元素转换为`float`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据不同接口选择读取源数据索引为偶数的位置或奇数的位置。
+根据`mask`将`src`中的每个参与计算的`bfloat16_t`类型元素转换为`float`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据参数`src_pos`选择读取`src`索引为偶数的位置或奇数的位置。
 
 ## 函数原型
 
 ```c
-inline void asc_bfloat162float<position_mode>(vector_float& dst,
-                                              vector_bfloat16_t src,
-                                              vector_bool mask)
-```
-
-- `<position_mode>`表示`src`读取的位置，为空时读取`src`的偶数索引位置；取值为`_v2`时读取`src`的奇数索引位置。
-
-### 典型示例
-
-```c
 inline void asc_bfloat162float(vector_float& dst,
                                vector_bfloat16_t src,
-                               vector_bool mask)
+                               vector_bool mask,
+                               std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+
+inline void asc_bfloat162float(vector_float& dst,
+                               vector_bfloat16_t src,
+                               vector_bool mask,
+                               std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 ```
 
 ## 参数说明
@@ -55,6 +51,7 @@ inline void asc_bfloat162float(vector_float& dst,
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| src_pos | 输入 | 位置选择标签（编译器标签类型），类型为std::integral_constant<asc_position_mode, asc_position_mode::EVEN>或std::integral_constant<asc_position_mode, asc_position_mode::ODD>。取`ASC_POSITION_EVEN`时选择读取源数据索引为偶数的位置；取`ASC_POSITION_ODD`时选择读取源数据索引为奇数的位置。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -67,7 +64,6 @@ inline void asc_bfloat162float(vector_float& dst,
 - 本接口在非AIV上调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - mask需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
-- 当数据写入目的操作数索引为奇数的位置，索引为偶数位置的数值置零。反之亦然。
 - `mask`掩码位为0时，`dst`对应元素置0。
 
 ## 调用示例
@@ -116,18 +112,12 @@ constexpr uint32_t BUFFER_BYTES = 256;
 __simd_vf__ inline void convert_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
 {
     vector_bool mask = asc_create_mask_b16(PAT_ALL);
-    vector_float dst_0;
-    vector_bfloat16_t src_0;
-    asc_loadalign(dst_0, reinterpret_cast<__ubuf__ float*>(output));
-    asc_loadalign(src_0, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162float_v2(dst_0, src_0, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ float*>(output), dst_0, mask);
-    vector_float dst_1;
-    vector_bfloat16_t src_1;
-    asc_loadalign(dst_1, reinterpret_cast<__ubuf__ float*>(output));
-    asc_loadalign(src_1, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
-    asc_bfloat162float(dst_1, src_1, mask);
-    asc_storealign(reinterpret_cast<__ubuf__ float*>(output), dst_1, mask);
+    vector_float dst;
+    vector_bfloat16_t src;
+    asc_loadalign(dst, reinterpret_cast<__ubuf__ float*>(output));
+    asc_loadalign(src, reinterpret_cast<__ubuf__ bfloat16_t*>(input));
+    asc_bfloat162float(dst, src, mask, ASC_POSITION_EVEN);
+    asc_storealign(reinterpret_cast<__ubuf__ float*>(output), dst, mask);
 }
 
 __global__ __vector__ void asc_bfloat162float_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
@@ -177,7 +167,7 @@ int main()
     print_data("Output (raw bytes)", output);
     print_data("Golden 1.0 (raw bytes)", golden);
     const bool passed = compare_data(output, golden);
-    std::cout << (passed ? "[Success] asc_bfloat162float/asc_bfloat162float_v2 passed." : "[Failed] asc_bfloat162float/asc_bfloat162float_v2 failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_bfloat162float passed." : "[Failed] asc_bfloat162float failed.") << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);
