@@ -27,7 +27,7 @@ Fixpipe L0C→L1接口将L0C中的矩阵计算结果搬运到L1 Buffer，在搬�
 >
 >- 下表中的MAX/MIN对应目标数据类型下的最大值和最小值。
 >
->- 量化后的数据经过第二次Mmad（C×D，D为单位矩阵）输出到GM。由于乘以单位矩阵不改变值，inf/nan饱和处理在第一次搬运（asc_copy_l0c2l1）时完成，第二次Mmad仅做数据中转。
+>- 量化后的数据经过第二次Mmad（C×D，D为单位矩阵）输出到GM。由于dav-3510架构中L1 Buffer数据无法直接搬运到GM，第二次Mmad仅作为数据中转路径。需要注意，当量化结果中包含inf时，第二次Mmad中inf与单位矩阵的off-diagonal零元素相乘会产生nan（IEEE 754: inf×0=nan），累加后整行变为nan。此为验证路径的限制，不影响asc\_copy\_l0c2l1本身的inf/nan处理行为。
 
 ## float L0C → 各输出类型
 
@@ -102,6 +102,46 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 
 ## 测试验证
 
-以上边界值汇总通过[data_copy_l0c2l1样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2l1)的边界测试脚本`scripts/test_boundary.sh`在NPU上实测验证，共覆盖17种量化场景×2种饱和模式（饱和/非饱和）= 34项测试。
+以上边界值汇总通过[data_copy_l0c2l1样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2l1)的边界测试脚本`scripts/test_boundary.sh`在NPU上实测验证。
 
 测试通过向输入矩阵A注入inf/-inf/nan（配合B矩阵对应行设为1.0），使L0C = A×B中产生inf/-inf/nan，验证各输出类型在饱和模式和非饱和模式下的inf/nan处理是否符合预期。对于int8\_t输入场景，使用极端值（A某行设为-128、其余设为127）验证整数溢出饱和行为。
+
+### 测试覆盖范围
+
+共覆盖17种量化场景×2种饱和模式（饱和/非饱和）= 34项测试，其中：
+
+- **已验证且通过**：场景1-10的饱和模式（10项）、场景1-4和7-8的非饱和模式（6项），共16项。
+- **已验证但失败（已知限制）**：场景5、6、9、10的非饱和模式（4项）和场景17的两种模式（2项），共6项。失败原因详见下文"已知限制"。
+- **未验证（CANN版本限制）**：场景11-16的两种模式（12项）。这些场景依赖的API重载在当前CANN版本（9.2.0）中未实现或未提供，具体见下文"未验证场景说明"。
+
+### 已知限制
+
+以下场景在边界值测试中失败，属于验证路径或硬件限制，非asc\_copy\_l0c2l1接口本身的问题：
+
+**表3** 边界值测试已知限制
+
+<a name="table_fixpipe_l0c2l1_known_limitations"></a>
+
+| 失败场景 | 饱和模式 | 根因 | 说明 |
+| --- | --- | --- | --- |
+| 5、6、9、10 | 非饱和 | 验证路径中第二次Mmad（C×D，D为单位矩阵）的off-diagonal元素为0，IEEE 754下inf×0.0=nan，累加后整行变为nan | L1 Buffer上的量化结果实际保留了inf（符合表1预期），但经过第二次Mmad后被破坏为nan，导致GM输出与golden数据不匹配。此问题仅影响inf边界值在非饱和模式下的验证，不影响asc\_copy\_l0c2l1本身的inf处理行为 |
+| 17 | 饱和和非饱和模式均失败 | float×float→float的Mmad在L0C包含inf/-inf/nan时触发硬件运行时错误（aclrtSynchronizeStream返回507015） | 可能是dav-3510的CANN版本限制，float类型Mmad对inf/nan输入的硬件处理异常 |
+
+### 未验证场景说明
+
+以下场景因CANN版本限制未纳入实测验证，对应API重载在CANN 9.2.0中未实现或未提供：
+
+**表4** 未验证场景及原因
+
+<a name="table_fixpipe_l0c2l1_unverified"></a>
+
+| 场景 | 输出类型 | 量化模式 | 未验证原因 |
+| --- | --- | --- | --- |
+| 11 | int4b\_t | VREQ4 | asc\_mmad\_s4（int4b\_t×int4b\_t→int32\_t）在dav-3510上未实现（声明存在但无链接实现），验证路径的第二次Mmad无法执行 |
+| 12 | bfloat16\_t | VQS322BF16\_PRE | asc\_copy\_l0c2l1的bfloat16\_t/int32\_t重载未提供（int8输入场景的L0C为int32\_t，需bf16/int32重载） |
+| 13 | int4b\_t | VQF322S4\_PRE | asc\_mmad\_s4未实现，同场景11 |
+| 14 | fp8\_e4m3fn\_t | VQF322FP8\_PRE | asc\_copy\_l0c2l1的fp8\_e4m3fn\_t/float重载未提供 |
+| 15 | hifloat8\_t | VQF322HIF8\_PRE | asc\_copy\_l0c2l1的hifloat8\_t/float重载未提供 |
+| 16 | hifloat8\_t | VQF322HIF8\_PRE\_HYBRID | asc\_copy\_l0c2l1的hifloat8\_t/float重载未提供，同场景15 |
+
+注：场景11-16的边界值行为可参考表1和表2中的理论值。其中int4b\_t场景（11、13）的asc\_copy\_l0c2l1重载已验证可编译，但验证路径的asc\_mmad\_s4未实现导致无法端到端验证。fp8\_e4m3fn\_t和hifloat8\_t场景（14-16）的asc\_copy\_l0c2l1重载本身未提供，待CANN后续版本支持后可启用验证。
