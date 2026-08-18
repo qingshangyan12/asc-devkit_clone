@@ -134,16 +134,19 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
     const U* y2 = reinterpret_cast<const U*>(y);
     U* z2 = reinterpret_cast<U*>(z);
 
-    uint64_t vectorSize = size / 2;
+    // 此处用除法一次性算出for循环的边界值
+    uint64_t vector_size = size / 2;
     int32_t stride = gridDim.x * blockDim.x;
-    // 短向量循环处理偶数对（步长同样是总线程数）
-    for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < vectorSize; idx += stride) {
+
+    // 向量化循环处理偶数对（步长同样是总线程数）
+    for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < vector_size; idx += stride) {
         z2[idx] = x2[idx] + y2[idx];
     }
+
     // 最后一个奇数元素处理（如果size是奇数，由全局第0号线程在最后处理）
     if (blockIdx.x == 0 && threadIdx.x == 0 && (size % 2 != 0)) {
-        uint64_t lastIdx = size - 1;
-        z[lastIdx] = x[lastIdx] + y[lastIdx];
+        uint64_t last_idx = size - 1;
+        z[last_idx] = x[last_idx] + y[last_idx];
     }
 }
 ```
@@ -168,7 +171,7 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 - 读写带宽：**14.51(GB/s) | 7.25(GB/s)**
 
 **原理说明**：
-SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
+在Ascend 950PR系列产品上，SIMT编程模式下L2 Cache以Cache Line=128字节为单位进行访问。
 
 - Case 1（标量half）：无法填满整行导致RMW写放大
   使用标量half（2B）。单个Warp（32线程）同时发射指令时，在空间上连续拼出的总宽度为：
