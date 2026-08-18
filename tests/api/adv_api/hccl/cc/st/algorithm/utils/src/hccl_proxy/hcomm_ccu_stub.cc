@@ -9,9 +9,13 @@
  */
 
 #include "ccu_kernel.h"
-#include "ccu_condition_v1.h"
 #include "ccu_rep_loopcall_v1.h"
+#include "ccu_condition_v1.h"
+#include "ccu_datatype_v1.h"
+#include "ccu_rep_context_v1.h"
 #include "ccu_repeat_v1.h"
+#include "ccu_types.h"
+#include "hccl_ccu_res.h"
 #include <vector>
 #include <string>
 
@@ -334,7 +338,10 @@ LoopCall::LoopCall(CcuRepContext* context, const std::string& label)
 
 Executor::Executor(CcuRepContext* context) : CcuVirRes(context) {}
 
-uint64_t CcuRep::GetTokenInfo(uint64_t va, uint64_t size) { return 0; }
+uint64_t CcuRep::GetTokenInfo(uint64_t va, uint64_t size)
+{
+    return va == 0 ? 0 : va + 0x1234;
+}
 
 void LoopGroupCall::Run(
     const std::vector<LoopCall>& loopVec, const std::vector<Variable>& loopCfg, const std::vector<Executor>& executors,
@@ -351,6 +358,24 @@ uint16_t CcuBuf::Id() const { return 0; }
 extern "C" {
 #endif // __cplusplus
 
+static uint32_t g_ccuKernelRegisterCount = 0;
+
+void ResetCcuKernelRegisterCount()
+{
+    g_ccuKernelRegisterCount = 0;
+}
+
+uint32_t GetCcuKernelRegisterCount()
+{
+    return g_ccuKernelRegisterCount;
+}
+
+CcuKernelHandle RecordCcuKernelRegistrationForTest()
+{
+    ++g_ccuKernelRegisterCount;
+    return g_ccuKernelRegisterCount;
+}
+
 HcclResult HcclCcuKernelRegister(HcclComm comm, CcuKernelHandle* kernelHandle, void* kernelCreator, void* kernelArg)
 {
     return HCCL_SUCCESS;
@@ -364,7 +389,12 @@ HcclResult HcclCcuKernelLaunch(
     return HCCL_SUCCESS;
 }
 
-HcclResult HcclCommQueryCcuIns(HcclComm comm, CcuInsHandle* insHandles, uint32_t* insNum) { return HCCL_SUCCESS; }
+HcclResult HcclCommQueryCcuIns(HcclComm comm, CcuInsHandle* insHandles, uint32_t* insNum)
+{
+    *insHandles = 1;
+    *insNum = 1;
+    return HCCL_SUCCESS;
+}
 
 CcuResult HcommCcuKernelRegisterStart(CcuInsHandle insHandle) { return CCU_SUCCESS; }
 
@@ -372,6 +402,7 @@ CcuResult HcommCcuKernelRegister(
     CcuInsHandle insHandle, uint32_t dieId, const char* kernelFuncName, const void* kernelFunc, const void** kernelArgs,
     uint32_t argNum, CcuKernelHandle* kernelHandle)
 {
+    *kernelHandle = RecordCcuKernelRegistrationForTest();
     return CCU_SUCCESS;
 }
 
