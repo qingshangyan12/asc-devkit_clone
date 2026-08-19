@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-eq表示相等（equal to），该接口用于逐元素比较两个源操作数大小，将比较结果（$src0_i == src1_i$）写入目的操作数dst对应比特位，如果比较结果为真，则对应比特位为1，否则为0。
+eq表示相等（equal to），该接口用于逐元素比较两个源操作数大小，将比较结果（$src0_i == src1_i$）写入目的操作数`dst`对应比特位，如果比较结果为真，则对应比特位为1，否则为0。
 
 计算公式如下：
 
@@ -34,7 +34,7 @@ $$
 dst_i = (src0_i == src1_i)
 $$
 
-本接口仅在AIV上生效，非AIV调用直接返回。
+本接口仅在AIV上生效。
 
 ## 函数原型
 
@@ -47,7 +47,7 @@ __simd_callee__ inline void asc_eq(vector_bool& dst,
 
 dtype取值为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
-### 典型示例
+### 函数原型典型示例
 
 ```c
 // 典型示例：half类型逐元素相等比较
@@ -76,23 +76,23 @@ __simd_callee__ inline void asc_eq(vector_bool& dst,
 
 ## 约束说明
 
-- 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst为掩码寄存器，src0、src1为矢量数据寄存器。
-- mask为`vector_bool`类型掩码寄存器，需通过掩码设置接口预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
-- src0与src1的dtype需要保持一致。
-- mask比特位为0时，dst对应比特位写0。
-- 浮点比较时，+0与-0视为相等。
-- 浮点比较输入含nan时，dst对应比特位写0。
+- 本接口在非AIV上调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`dst`为掩码寄存器，`src0`、`src1`为矢量数据寄存器。
+- `mask`需通过[掩码设置接口](../reg_data_types/data_type_definition.md#掩码寄存器)预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- `src0`与`src1`的`dtype`需要保持一致。
+- `mask`比特位为0时，`dst`对应比特位写0。
+- 浮点比较时，+0.0与-0.0视为相等。
+- 浮点比较输入含nan时，`dst`对应比特位写0。
 
 ## 调用示例
 
-将代码保存为example.asc后，可通过bisheng命令编译运行，其中--npu-arch参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为dav-3510）为例，编译运行命令如下：
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 

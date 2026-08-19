@@ -38,7 +38,7 @@ __aicore__ inline void asc_store_dev(__gm__ <dtype>* addr,
 
 dtype取值为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
 
-### 典型示例
+### 函数原型典型示例
 
 ```c
 // 示例：写入32bit无符号整数
@@ -61,20 +61,20 @@ __aicore__ inline void asc_store_dev(__gm__ uint32_t* addr,
 
 ## 约束说明
 
-- `addr`起始地址须按写入dtype字节数对齐。
+- `addr`起始地址须按写入`dtype`字节数对齐。
 - `addr`须落在GM可访问地址空间内。
 - 本接口运行在标量流水上，与后续依赖该写入结果的指令之间存在标量数据依赖；如后续有读取同一GM地址的指令，须通过同步指令建立依赖顺序，标量流水本身的顺序执行不保证跨指令访存可见性。
 - 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../guide/编程指南/高级编程/内存模型/缓存一致性.md#scalar原子操作与dcache一致性)。
 
 ## 调用示例
 
-将代码保存为example.asc后，可通过bisheng命令编译运行，其中--npu-arch参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为dav-3510）为例，编译运行命令如下：
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
