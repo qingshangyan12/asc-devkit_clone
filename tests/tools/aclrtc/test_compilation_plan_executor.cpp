@@ -218,8 +218,10 @@ TEST(CompilationPlanExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeader
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     const std::string commandScript =
-        "(trap '' TERM; while :; do printf x >> '" + descendantMarkerPath.string() +
-        "'; sleep 0.01; done) & exec /bin/true";
+        "(trap '' TERM; count=0; while [ $count -lt 100 ]; do printf x >> '" +
+        descendantMarkerPath.string() +
+        "'; count=$((count + 1)); sleep 0.01; done; rm -f '" + descendantMarkerPath.string() +
+        "') & exec /bin/true";
     plan.compilationCommands.push_back(
         CreateCommand(CompilationCommandKind::Compile, "/bin/sh", {"-c", commandScript}));
 
