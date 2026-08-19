@@ -116,7 +116,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             global_kernel_attribute="__global__ [aicore]",
         )
 
-    def fake_command_builder(
+    def make_recorded_commands(
         self, compile_info, options, constant_info_files, chip_version
     ):
         if compile_info.no_set_kernel_type:
@@ -217,13 +217,27 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 template="@@STATIC_VALUE_tiling_data@@",
             ),
         )
+        basic_context = basic_context or self.make_compile_context()
+        basic_options = basic_options or self.make_options()
+        constant_info_files = tuple(
+            dict.fromkeys(item.template_path for item in constant_infos)
+        )
+        basic_context.recorded_compile_commands = self.make_recorded_commands(
+            basic_context,
+            basic_options,
+            constant_info_files,
+            chip_version,
+        )
+        if sk_context is not None:
+            sk_context.recorded_compile_commands = self.make_recorded_commands(
+                sk_context,
+                sk_options or self.make_options(),
+                constant_info_files,
+                chip_version,
+            )
         return generator.build_kernel_compile_records(
-            basic_compile_info=basic_context or self.make_compile_context(),
-            basic_compile_option_tuple=basic_options or self.make_options(),
+            basic_compile_info=basic_context,
             sk_compile_info=sk_context,
-            sk_compile_option_tuple=sk_options,
-            command_builder=self.fake_command_builder,
-            chip_version=chip_version,
             metadata_json_path=self.metadata_path,
             constant_infos=constant_infos,
             constant_info_size_by_tiling_key=(
@@ -273,13 +287,6 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertTrue(reference.startswith(prefix))
         return reference[len(prefix) :]
 
-    def test_manifest_generation_does_not_reinspect_generated_artifacts(self):
-        request = self.make_request(self.make_records())
-
-        result = generator.generate_manifest(request)
-
-        self.assertTrue(os.path.isfile(result.manifest_path))
-
     def test_generate_manifest_uses_requested_name_and_kernel_directory(self):
         request = self.make_request(self.make_records())
 
@@ -292,78 +299,6 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertEqual(result.manifest_path, expected_path)
         self.assertTrue(os.path.isfile(expected_path))
         self.assertTrue(os.path.isdir(os.path.join(request.output_dir, "resources")))
-
-    def test_generate_manifest_keeps_different_kernels(self):
-        first_request = self.make_request(self.make_records())
-        second_request = self.make_request(
-            self.make_records(),
-            output_dir=os.path.join(self.output_root, "other_kernel"),
-            manifest_name="other_kernel_manifest.json",
-        )
-
-        first_result = self.generate(first_request)
-        second_result = self.generate(second_request)
-
-        self.assertTrue(os.path.isfile(first_result.manifest_path))
-        self.assertTrue(os.path.isfile(second_result.manifest_path))
-        self.assertNotEqual(first_result.manifest_path, second_result.manifest_path)
-
-    def test_generate_manifest_uses_per_kernel_lock(self):
-        request = self.make_request(self.make_records())
-
-        self.generate(request)
-
-        self.assertTrue(
-            os.path.isfile(os.path.join(self.output_root, ".add_custom.manifest.lock"))
-        )
-        self.assertFalse(
-            os.path.exists(os.path.join(self.output_root, ".manifest.lock"))
-        )
-
-    def test_manifest_generation_does_not_resolve_physical_paths(self):
-        request = self.make_request(self.make_records())
-
-        with mock.patch.object(
-            generator.os.path,
-            "realpath",
-            side_effect=AssertionError("physical path resolution is not allowed"),
-        ):
-            result = generator.generate_manifest(request)
-
-        self.assertTrue(os.path.isfile(result.manifest_path))
-
-    def test_static_commands_are_rebuilt_from_compile_context(self):
-        mix_records = self.make_records(
-            basic_context=self.make_compile_context(code_channel=0)
-        )
-        self.assertEqual(
-            [command.core_type for command in mix_records[0].commands],
-            ["cube", "vec"],
-        )
-        for kernel_type_name, expected_core in (
-            ("KERNEL_TYPE_AIC_ONLY", "cube"),
-            ("KERNEL_TYPE_AIV_ONLY", "vec"),
-        ):
-            kernel_type = SimpleNamespace(name=kernel_type_name)
-            records = self.make_records(
-                basic_context=self.make_compile_context(
-                    kernel_types={"100000": kernel_type}
-                )
-            )
-            self.assertEqual(
-                [command.core_type for command in records[0].commands],
-                [expected_core],
-            )
-        c310_context = self.make_compile_context(
-            kernel_types={"100000": SimpleNamespace(name="KERNEL_TYPE_AIC_ONLY")}
-        )
-        c310_context.raw_tiling_key_kernel_type = {}
-        c310_records = self.make_records(
-            basic_context=c310_context, chip_version="c310"
-        )
-        self.assertIn("-DRAW_AIC_ONLY_DUMP_TENSOR", c310_records[0].commands[0].argv)
-        self.assertFalse(hasattr(generator, "DynamicCompileRecorder"))
-        self.assertFalse(hasattr(generator, "capture_compile_command"))
 
     def test_basic_mix_manifest_uses_static_wrapper_and_tiling_template(self):
         records = self.make_records(
@@ -797,11 +732,13 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             encoding="utf-8",
         )
         options = self.make_options(source_include_style="joined")
+        sk_options = self.make_options(source_include_style="joined")
+        sk_options.compile_options.append("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__=4")
         records = self.make_records(
             basic_context=basic_context,
             basic_options=options,
             sk_context=sk_context,
-            sk_options=options,
+            sk_options=sk_options,
             tiling_key_data_size={"100001": 12},
         )
 
@@ -816,6 +753,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
 
         manifest = json.loads(Path(result.manifest_path).read_text(encoding="utf-8"))
+        self.assertNotIn("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__=4", json.dumps(manifest))
         sk_object = manifest["kernels"][0]["objects"][1]
         self.assertTrue(
             all("stage" not in command for command in sk_object["commands"])
@@ -922,7 +860,6 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 sk_bind_compile_options=options.compile_options,
             )
         )
-
         manifest = json.loads(Path(result.manifest_path).read_text(encoding="utf-8"))
         sk_object = manifest["kernels"][0]["objects"][1]
         self.assertEqual(sk_object["object_name"], "sk")

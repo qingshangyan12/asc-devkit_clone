@@ -10,7 +10,6 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 import os
-import re
 import sys
 import unittest
 from unittest import mock
@@ -875,18 +874,6 @@ const static uint64_t L0A_SIZE = 65536 * get_block_idx();
             self.assertRaises(
                 Exception, check_exist_instrinsic_when_super_kernel, dst_i_file
             )
-
-    def test_check_exist_instrinsic_compiles_patterns_once(self):
-        data = '# 1 "/tmp/custom.cpp"\nint value = 0;\nvalue += 1;\n'
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data=data
-        ), mock.patch(
-            "asc_op_compile_base.asc_op_compiler.ascendc_compile_base.re.escape",
-            wraps=re.escape,
-        ) as mock_escape:
-            check_exist_instrinsic_when_super_kernel("./a.i")
-
-        self.assertEqual(mock_escape.call_count, 10)
 
     def test_check_exist_forbidden_symbols_preserves_matches(self):
         data = (

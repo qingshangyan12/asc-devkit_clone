@@ -95,6 +95,10 @@ class CompileInfo:
         self.tiling_and_dfx_utils_bin_path: str = ""
         self.global_kernel_symbols: list = []
         self.global_kernel_attribute: str = ""
+        self.record_compile_commands: bool = False
+        self.execute_compile_commands: bool = True
+        self.recorded_compile_commands: list = []
+        self.last_compiled_symbol: str = ""
 
     def __str__(self):
         return ",".join(

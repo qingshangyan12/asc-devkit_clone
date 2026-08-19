@@ -105,33 +105,26 @@ def _read_regular_file(path, description):
         raise ManifestResourceError(f"failed to read {description}: {path}") from error
 
 
-def _build_context_commands(
-    compile_info,
-    compile_option_tuple,
-    command_builder,
-    chip_version,
-    constant_info_files,
-    object_type,
-):
+def _build_recorded_context_commands(compile_info, constant_info_files, object_type):
+    recorded_commands = tuple(getattr(compile_info, "recorded_compile_commands", ()))
+    if not recorded_commands:
+        raise ManifestCommandError(
+            f"{object_type} Manifest generation requires recorded dynamic compile commands"
+        )
     return tuple(
         StaticCompileCommand(
-            tiling_key=spec.tiling_key,
-            compile_tiling_key=spec.tiling_key,
+            tiling_key=str(spec.tiling_key),
+            compile_tiling_key=str(spec.tiling_key),
             compiled_symbol=spec.compiled_symbol,
             compile_symbol=spec.compiled_symbol,
             object_type=object_type,
             core_type=spec.core_type,
             source_path=spec.source_path,
-            constant_info_files=tuple(spec.constant_info_files),
+            constant_info_files=tuple(constant_info_files),
             argv=tuple(spec.argv),
             output_path=spec.output_path,
         )
-        for spec in command_builder(
-            compile_info,
-            compile_option_tuple,
-            constant_info_files,
-            chip_version,
-        )
+        for spec in recorded_commands
     )
 
 
@@ -182,14 +175,10 @@ def _logical_symbol(compile_symbol, compile_tiling_key, logical_tiling_key):
 def build_kernel_compile_records(
     *,
     basic_compile_info,
-    basic_compile_option_tuple,
-    command_builder,
-    chip_version: str,
     metadata_json_path: str,
     constant_infos: Sequence[ConstantInfoRecord],
     constant_info_size_by_tiling_key: Optional[dict] = None,
     sk_compile_info=None,
-    sk_compile_option_tuple=None,
     link_options: Sequence[str] = _LINK_OPTION,
 ):
     constant_infos = tuple(constant_infos)
@@ -203,25 +192,13 @@ def build_kernel_compile_records(
     )
 
     all_commands = list(
-        _build_context_commands(
-            basic_compile_info,
-            basic_compile_option_tuple,
-            command_builder,
-            chip_version,
-            constant_info_files,
-            "basic",
+        _build_recorded_context_commands(
+            basic_compile_info, constant_info_files, "basic"
         )
     )
     if sk_compile_info is not None:
         all_commands.extend(
-            _build_context_commands(
-                sk_compile_info,
-                sk_compile_option_tuple,
-                command_builder,
-                chip_version,
-                constant_info_files,
-                "sk",
-            )
+            _build_recorded_context_commands(sk_compile_info, constant_info_files, "sk")
         )
     commands_by_key = {}
     for command in all_commands:
@@ -466,6 +443,11 @@ def _normalize_compile_command(
         "${source_file_path}",
         insertion_before=record.source_path,
     )
+    argv = [
+        value
+        for value in argv
+        if not value.startswith("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")
+    ]
     compiler_index = next(
         (
             index
