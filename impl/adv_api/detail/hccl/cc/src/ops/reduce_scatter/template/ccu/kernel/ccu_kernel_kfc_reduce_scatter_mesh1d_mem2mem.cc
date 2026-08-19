@@ -190,27 +190,16 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
         ctx.scratchMem[rankIdx].token = ctx.token[ctx.rankId];
     }
 
-    ccu::Variable repeatNumAdd;
-    repeatNumAdd = 1;
-    ctx.flag = 0;
-    // AIV encodes one round as UINT64_MAX - 1; keep the original sentinel protocol unchanged.
-    CCU_WHILE(ctx.repeatNum != UINT64_MAX)
-    {
-        ctx.repeatNum += repeatNumAdd;
-        CCU_IF(ctx.flag == 1)
-        {
-            for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
-                if (rankIdx == ctx.rankId) {
-                    ctx.myInput.addr += ctx.inputRepeatStride;
-                } else {
-                    ctx.remoteInput[rankIdx].addr += ctx.inputRepeatStride;
-                }
-            }
-            ctx.output += ctx.outputRepeatStride;
+    CCU_CHK_RET(DoReduceScatter(ctx));
+    for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
+        if (rankIdx == ctx.rankId) {
+            ctx.myInput.addr += ctx.inputRepeatStride;
+        } else {
+            ctx.remoteInput[rankIdx].addr += ctx.inputRepeatStride;
         }
-        CCU_CHK_RET(DoReduceScatter(ctx));
-        ctx.flag = 1;
     }
+    ctx.output += ctx.outputRepeatStride;
+    CCU_CHK_RET(DoReduceScatter(ctx));
     return CCU_SUCCESS;
 }
 
