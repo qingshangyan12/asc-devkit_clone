@@ -85,8 +85,8 @@ static CcuResult LoadArgs(
     ctx.scratch[ctx.rankId] = scratch;
     ctx.currentRankSliceInputOffset = currentRankSliceInputOffset;
     ctx.currentRankSliceOutputOffset = 0;
-    ctx.inputRepeatStride = 0;
-    ctx.outputRepeatStride = 0;
+    ctx.inputRepeatStride = sliceSize;
+    ctx.outputRepeatStride = sliceSize;
     ctx.normalSliceSize = sliceSize;
     ctx.lastSliceSize = sliceSize;
     ctx.repeatNum = repeatNum;
