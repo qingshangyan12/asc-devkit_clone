@@ -1,3 +1,0 @@
-/workspace/0811_2/asc-devkit_aug/examples/01_simd_cpp_api/05_best_practices/02_reg_compute/softmax_high_performance/build_sim_case5/CMakeFiles/rebuild_cache.dir
-/workspace/0811_2/asc-devkit_aug/examples/01_simd_cpp_api/05_best_practices/02_reg_compute/softmax_high_performance/build_sim_case5/CMakeFiles/edit_cache.dir
-/workspace/0811_2/asc-devkit_aug/examples/01_simd_cpp_api/05_best_practices/02_reg_compute/softmax_high_performance/build_sim_case5/CMakeFiles/demo.dir

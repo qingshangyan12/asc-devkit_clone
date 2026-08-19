@@ -1,1 +1,0 @@
- /home/developer/Ascend/cann-9.2.0/bin/bisheng  --npu-arch=dav-3510 CMakeFiles/demo.dir/softmax.asc.o -o demo  -Wl,-rpath,/home/developer/Ascend/cann-9.2.0/tools/simulator/dav_3510/lib -Wl,-L/home/developer/Ascend/cann-9.2.0/tools/simulator/dav_3510/lib -Wl,--disable-new-dtags -lruntime_camodel -lnpu_drv_camodel -ltiling_api -lregister -lplatform -lm -ldl 

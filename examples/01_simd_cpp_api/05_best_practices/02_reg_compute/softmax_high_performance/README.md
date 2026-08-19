@@ -410,8 +410,8 @@ cat ./OPPROF_*/PipeUtilization.csv
 
 | 场景 | 出队指令日志 | 同目录其他日志 |
 | --- | --- | --- |
-| Case 5 | `build_sim_case5/core0.veccore0.instr_popped_log.dump` | `core0.veccore0.instr_log.dump`、`core0.veccore0.ccu_log.dump`、`core0.veccore0.dcache_log.dump` |
-| Case 6 | `build_sim_case6/core0.veccore0.instr_popped_log.dump` | `core0.veccore0.instr_log.dump`、`core0.veccore0.ccu_log.dump`、`core0.veccore0.dcache_log.dump` |
+| Case 5 | `build_sim_case5/log/core0.veccore0.instr_popped_log.dump` | `core0.veccore0.instr_log.dump`、`core0.veccore0.ccu_log.dump`、`core0.veccore0.dcache_log.dump` |
+| Case 6 | `build_sim_case6/log/core0.veccore0.instr_popped_log.dump` | `core0.veccore0.instr_log.dump`、`core0.veccore0.ccu_log.dump`、`core0.veccore0.dcache_log.dump` |
 
 ### 对比结果
 
@@ -473,10 +473,10 @@ Case 5和Case 6的`VF`及`RV_VLOOPv2`日志如下：
 日志末尾直接记录了两种场景的kernel执行tick：
 
 ```text
-# build_sim_case5/core0.veccore0.instr_popped_log.dump
+# build_sim_case5/log/core0.veccore0.instr_popped_log.dump
 core: 0, subcore: 1, start: 208, tick: 17610, kernelId: 0, blkID: 0, blkDim: 1, done
 
-# build_sim_case6/core0.veccore0.instr_popped_log.dump
+# build_sim_case6/log/core0.veccore0.instr_popped_log.dump
 core: 0, subcore: 1, start: 208, tick: 19029, kernelId: 0, blkID: 0, blkDim: 1, done
 ```
 
