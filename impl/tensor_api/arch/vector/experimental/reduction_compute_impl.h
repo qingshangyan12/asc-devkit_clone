@@ -28,10 +28,10 @@
 namespace asc {
 namespace te {
 
-template <typename To, reduce_scope scope, typename From>
-__simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<From> src)
+template <typename DstType, reduce_scope scope, typename SrcType>
+__simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<SrcType> src)
 {
-    reg_tensor<To> dst;
+    reg_tensor<DstType> dst;
     if constexpr (scope == reduce_scope::vector) {
         asc_reduce_sum(dst.reg, src.reg, src.mask);
     } else if constexpr (scope == reduce_scope::datablock) {
@@ -43,10 +43,10 @@ __simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<From> src)
     return dst;
 }
 
-template <typename To, reduce_scope scope, typename From>
-__simd_callee__ inline decltype(auto) reduce_max(reg_tensor<From> src)
+template <typename DstType, reduce_scope scope, typename SrcType>
+__simd_callee__ inline decltype(auto) reduce_max(reg_tensor<SrcType> src)
 {
-    reg_tensor<To> dst;
+    reg_tensor<DstType> dst;
     if constexpr (scope == reduce_scope::vector) {
         asc_reduce_max(dst.reg, src.reg, src.mask);
     } else if constexpr (scope == reduce_scope::datablock) {
@@ -56,10 +56,10 @@ __simd_callee__ inline decltype(auto) reduce_max(reg_tensor<From> src)
     return dst;
 }
 
-template <typename To, reduce_scope scope, typename From>
-__simd_callee__ inline decltype(auto) reduce_min(reg_tensor<From> src)
+template <typename DstType, reduce_scope scope, typename SrcType>
+__simd_callee__ inline decltype(auto) reduce_min(reg_tensor<SrcType> src)
 {
-    reg_tensor<To> dst;
+    reg_tensor<DstType> dst;
     if constexpr (scope == reduce_scope::vector) {
         asc_reduce_min(dst.reg, src.reg, src.mask);
     } else if constexpr (scope == reduce_scope::datablock) {

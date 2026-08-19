@@ -26,14 +26,14 @@
 namespace asc {
 namespace te {
 
-template <typename To, reduce_scope scope = reduce_scope::vector, typename From>
-__simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<From> src);
+template <typename DstType, reduce_scope scope = reduce_scope::vector, typename SrcType>
+__simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<SrcType> src);
 
-template <typename To, reduce_scope scope = reduce_scope::vector, typename From>
-__simd_callee__ inline decltype(auto) reduce_max(reg_tensor<From> src);
+template <typename DstType, reduce_scope scope = reduce_scope::vector, typename SrcType>
+__simd_callee__ inline decltype(auto) reduce_max(reg_tensor<SrcType> src);
 
-template <typename To, reduce_scope scope = reduce_scope::vector, typename From>
-__simd_callee__ inline decltype(auto) reduce_min(reg_tensor<From> src);
+template <typename DstType, reduce_scope scope = reduce_scope::vector, typename SrcType>
+__simd_callee__ inline decltype(auto) reduce_min(reg_tensor<SrcType> src);
 
 } // namespace te
 } // namespace asc
