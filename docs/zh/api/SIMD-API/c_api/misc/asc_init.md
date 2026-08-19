@@ -92,7 +92,7 @@ __aicore__ inline void asc_init()
 
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id11 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -131,7 +131,7 @@ __global__ __vector__ void asc_init_kernel(__gm__ uint64_t* output, __gm__ uint6
     asc_set_atomic_add_int();
     // Reinitialize the core and clear persistent state such as the atomic mode.
     asc_init();
-    // asc_init resets the atomic mode, so this is an ordinary UB-to-GM copy.
+    // asc_init resets the atomic mode, so this is an ordinary Unified Buffer（UB）-to-GM copy.
     asc_copy_ub2gm(reinterpret_cast<__gm__ uint32_t*>(output), local, BYTES);
     asc_sync_mte3(0);
 }

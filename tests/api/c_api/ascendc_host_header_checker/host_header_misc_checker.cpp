@@ -10,4 +10,8 @@
 
 #include "c_api/misc/misc.h"
 
-static void test_host_c_api_misc_0() { using ::asc_init; }
+static void test_host_c_api_misc_0()
+{
+    using ::asc_init;
+    using __asc_aicore::asc_nop;
+}

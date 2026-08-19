@@ -1,6 +1,6 @@
 # TPosition<a name="ZH-CN_TOPIC_0000001712887453"></a>
 
-Ascend C管理不同层级的物理内存时，用一种抽象的逻辑位置（TPosition）来表达各级别的存储，代替了片上物理存储的概念，达到隐藏硬件架构的目的。主要的TPosition类型包括：VECIN、VECOUT、VECCALC、A1、A2、B1、B2、C1、C2、CO1、CO2，其中VECIN、VECCALC、VECOUT主要用于矢量编程，A1、A2、B1、B2、C1、C2、CO1、CO2用于矩阵编程。您可以通过[表1](../../通用说明和约束.md#table07372185712)了解TPosition和物理存储的映射关系。
+Ascend C管理不同层级的物理内存时，用一种抽象的逻辑位置（TPosition）来表达各级别的存储，代替了片上物理存储的概念，达到隐藏硬件架构的目的。主要的TPosition类型包括：VECIN、VECOUT、VECCALC、A1、A2、B1、B2、C1、C2、CO1、CO2，其中VECIN、VECCALC、VECOUT主要用于矢量编程，A1、A2、B1、B2、C1、C2、CO1、CO2用于矩阵编程。您可以通过[表1](../../general_description_and_constraints.md#table07372185712)了解TPosition和物理存储的映射关系。
 
 TPosition定义如下：
 
@@ -101,12 +101,12 @@ TPosition枚举值的具体定义如下：
 </tr>
 <tr id="row1682573410509"><td class="cellrowborder" valign="top" width="17.53%" headers="mcps1.2.3.1.1 "><p id="p1082533425015"><a name="p1082533425015"></a><a name="p1082533425015"></a>LCM</p>
 </td>
-<td class="cellrowborder" valign="top" width="82.47%" headers="mcps1.2.3.1.2 "><p id="p58251234135017"><a name="p58251234135017"></a><a name="p58251234135017"></a>Local Cache Memory，代表临时共享的Unified Buffer空间，VECCALC的别名，与VECCALC实现同样的功能。</p>
+<td class="cellrowborder" valign="top" width="82.47%" headers="mcps1.2.3.1.2 "><p id="p58251234135017"><a name="p58251234135017"></a><a name="p58251234135017"></a>Local Cache Memory，代表临时共享的Unified Buffer（UB）空间，VECCALC的别名，与VECCALC实现同样的功能。</p>
 </td>
 </tr>
 <tr id="row18899424276"><td class="cellrowborder" valign="top" width="17.53%" headers="mcps1.2.3.1.1 "><p id="p9889942112716"><a name="p9889942112716"></a><a name="p9889942112716"></a>SPM</p>
 </td>
-<td class="cellrowborder" valign="top" width="82.47%" headers="mcps1.2.3.1.2 "><p id="p18891442102718"><a name="p18891442102718"></a><a name="p18891442102718"></a>当Unified Buffer内存有溢出风险时，用于Unified Buffer的数据暂存。</p>
+<td class="cellrowborder" valign="top" width="82.47%" headers="mcps1.2.3.1.2 "><p id="p18891442102718"><a name="p18891442102718"></a><a name="p18891442102718"></a>当UB内存有溢出风险时，用于UB的数据暂存。</p>
 </td>
 </tr>
 <tr id="row121471975507"><td class="cellrowborder" valign="top" width="17.53%" headers="mcps1.2.3.1.1 "><p id="p181474775015"><a name="p181474775015"></a><a name="p181474775015"></a>SHM</p>

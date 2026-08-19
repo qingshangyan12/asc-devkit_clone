@@ -156,8 +156,8 @@ $$
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md#section668772811100)。
 <!-- npu="A3,910b,950" id13 -->
 - 当参数count或repeatTime取值为0时，该接口的行为如下：
   <!-- npu="A3,910b" id14 -->
@@ -175,9 +175,9 @@ $$
 <!-- end id13 -->
 - 本指令涉及精度转换，转换规则参考[精度转换规则](../../data_structures/precision_conversion.md)。
 <!-- npu="950" id18 -->
-- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
-  - tensor高维切分计算接口占用8KB Unified Buffer临时空间。
-  - tensor前n个数据连续计算接口不涉及8KB Unified Buffer临时空间的占用。
+- 对Unified Buffer（UB）空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+  - tensor高维切分计算接口占用8KB UB临时空间。
+  - tensor前n个数据连续计算接口不涉及8KB UB临时空间的占用。
 <!-- end id18 -->
 
 ## 调用示例<a name="section837496171220"></a>

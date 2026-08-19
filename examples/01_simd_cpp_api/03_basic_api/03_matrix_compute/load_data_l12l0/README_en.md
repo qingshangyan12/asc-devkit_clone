@@ -36,7 +36,7 @@ This example uses a fixed matrix multiplication specification of `[m, n, k] = [4
 A complete matrix multiplication includes four phases: GM -> L1, L1 -> L0A / L0B, matrix multiplication, and L0C -> GM, as shown below:
 
 ```text
-GM(ND) -> L1(Nz/Zz) -> L0A(Zz)/L0B(Zn) -> L0C(Zz) -> GM(ND)
+GM(ND) -> L1(Nz/Zz) -> L0A(Zz)/L0B(Zn) -> L0C(Nz) -> GM(ND)
        │            │                       │          │
     DataCopy     LoadData                 Mmad       Fixpipe
 ```
@@ -1301,7 +1301,7 @@ fixpipeParams.dstNdStride = 0;
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure environment variables
-  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
