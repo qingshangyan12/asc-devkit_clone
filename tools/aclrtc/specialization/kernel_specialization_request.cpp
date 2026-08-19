@@ -160,6 +160,20 @@ aclError ValidateForwardedCompilerOptionsDoNotRedirectFiles(
     return ACLRTC_SUCCESS;
 }
 
+aclError NormalizeBasicCompilerOptions(const aclrtcKernelSpecRequest& apiRequest,
+                                       NormalizedKernelSpecializationRequest& normalizedRequest,
+                                       size_t& copiedRequestTextByteCount)
+{
+    aclError result = CopyCompilerOptionsAndRejectControlCharacters(
+        apiRequest.options, apiRequest.optionCount, "options", "optionCount",
+        normalizedRequest.compilerOptions.basicOptions, copiedRequestTextByteCount);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
+    }
+    return ValidateForwardedCompilerOptionsDoNotRedirectFiles(
+        normalizedRequest.compilerOptions.basicOptions, "options");
+}
+
 aclError NormalizeSuperKernelCompilerOptions(const aclrtcKernelSpecRequest& apiRequest,
                                              NormalizedKernelSpecializationRequest& normalizedRequest,
                                              size_t& copiedRequestTextByteCount)
@@ -259,14 +273,7 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
             static_cast<unsigned long long>(apiRequest.skOptionCount));
         return ACLRTC_ERROR_INVALID_INPUT;
     }
-    aclError result = CopyCompilerOptionsAndRejectControlCharacters(
-        apiRequest.options, apiRequest.optionCount, "options", "optionCount",
-        request.compilerOptions.basicOptions, copiedRequestTextByteCount);
-    if (result != ACLRTC_SUCCESS) {
-        return result;
-    }
-    result = ValidateForwardedCompilerOptionsDoNotRedirectFiles(
-        request.compilerOptions.basicOptions, "options");
+    aclError result = NormalizeBasicCompilerOptions(apiRequest, request, copiedRequestTextByteCount);
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
