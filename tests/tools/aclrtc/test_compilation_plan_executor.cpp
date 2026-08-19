@@ -16,8 +16,6 @@
 #include <chrono>
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
-#include <cerrno>
-#include <csignal>
 #include <fstream>
 #include <thread>
 #include <time.h>
@@ -212,37 +210,31 @@ TEST(CompilationPlanExecutorTest, WaitsForOutputPipeClosureAfterCommandLeaderExi
 TEST(CompilationPlanExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeaderExits)
 {
     static uint64_t sequence = 0U;
-    const fs::path descendantProcessIdPath =
+    const fs::path descendantMarkerPath =
         fs::temp_directory_path() /
-        ("aclrtc_descendant_pid_" + std::to_string(getpid()) + "_" + std::to_string(sequence++));
+        ("aclrtc_descendant_marker_" + std::to_string(getpid()) + "_" + std::to_string(sequence++));
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_process_group");
     CompilationCommandExecutionLimits limits {20ms, 20ms, 20ms, 1024U};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     const std::string commandScript =
-        "(trap '' TERM; sleep 10) & echo $! > '" + descendantProcessIdPath.string() +
-        "'; exec /bin/true";
+        "(trap '' TERM; while :; do printf x >> '" + descendantMarkerPath.string() +
+        "'; sleep 0.01; done) & exec /bin/true";
     plan.compilationCommands.push_back(
         CreateCommand(CompilationCommandKind::Compile, "/bin/sh", {"-c", commandScript}));
 
     ASSERT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
-    std::ifstream descendantProcessIdStream(descendantProcessIdPath.string());
-    pid_t descendantProcessId = -1;
-    ASSERT_TRUE(descendantProcessIdStream >> descendantProcessId);
-    bool descendantProcessAlive = true;
-    for (size_t attempt = 0U; attempt < 40U; ++attempt) {
-        if (kill(descendantProcessId, 0) != 0 && errno == ESRCH) {
-            descendantProcessAlive = false;
-            break;
-        }
-        std::this_thread::sleep_for(5ms);
-    }
-    if (descendantProcessAlive) {
-        kill(descendantProcessId, SIGKILL);
-    }
-    EXPECT_FALSE(descendantProcessAlive);
+    // An orphaned descendant can remain as a zombie until the container init reaps it, so do not use kill(pid, 0)
+    // as the assertion. A heartbeat that stops growing after the timeout directly verifies that the descendant did
+    // not continue.
+    const uintmax_t markerSizeAfterTimeout =
+        fs::exists(descendantMarkerPath) ? fs::file_size(descendantMarkerPath) : 0U;
+    std::this_thread::sleep_for(100ms);
+    const uintmax_t markerSizeAfterWait =
+        fs::exists(descendantMarkerPath) ? fs::file_size(descendantMarkerPath) : 0U;
+    EXPECT_EQ(markerSizeAfterWait, markerSizeAfterTimeout);
     boost::system::error_code ignoredError;
-    fs::remove(descendantProcessIdPath, ignoredError);
+    fs::remove(descendantMarkerPath, ignoredError);
 }
 
 TEST(CompilationPlanExecutorTest, RecordsSpawnFailureAsInfrastructureFailure)
