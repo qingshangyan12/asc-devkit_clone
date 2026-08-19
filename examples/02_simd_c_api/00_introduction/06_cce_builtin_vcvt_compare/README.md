@@ -18,7 +18,16 @@ kernel包含GM/UB搬运、float缩放、残差相加、`f32->f16->f32`量化往�
 
 ## 编译运行
 
-在仓库根目录执行：
+在本样例目录下通过CMake构建并运行两个版本：
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_ASC_ARCHITECTURES=dav-3510
+cmake --build build -j
+timeout --signal=TERM --kill-after=5s 30s ./build/cce_vcvt_compare
+timeout --signal=TERM --kill-after=5s 30s ./build/builtin_vcvt_compare
+```
+
+也可以在仓库根目录使用单条编译命令：
 
 ```bash
 SRC=examples/02_simd_c_api/00_introduction/06_cce_builtin_vcvt_compare/cce_builtin_vcvt_compare.asc
@@ -30,11 +39,11 @@ timeout --signal=TERM --kill-after=5s 30s /tmp/cce_vcvt_compare
 timeout --signal=TERM --kill-after=5s 30s /tmp/builtin_vcvt_compare
 ```
 
-当前CANN的`bisheng --asc-aicore-lang`会同时生成宿主和设备产物，不能用单一的`-o`导出唯一的设备LLVM文本。可直接提取并比较两个可执行文件中优化后的设备二进制段：
+当前CANN的`bisheng --asc-aicore-lang`会同时生成宿主和设备产物，不能用单一的`-o`导出唯一的设备LLVM文本。CMake构建完成后，可直接提取并比较两个可执行文件中优化后的设备二进制段：
 
 ```bash
-objcopy --dump-section .aicore_binary=/tmp/cce_vcvt.aicore /tmp/cce_vcvt_compare
-objcopy --dump-section .aicore_binary=/tmp/builtin_vcvt.aicore /tmp/builtin_vcvt_compare
+objcopy --dump-section .aicore_binary=/tmp/cce_vcvt.aicore build/cce_vcvt_compare
+objcopy --dump-section .aicore_binary=/tmp/builtin_vcvt.aicore build/builtin_vcvt_compare
 sha256sum /tmp/cce_vcvt.aicore /tmp/builtin_vcvt.aicore
 cmp -s /tmp/cce_vcvt.aicore /tmp/builtin_vcvt.aicore && echo '[Success] identical device binary'
 ```

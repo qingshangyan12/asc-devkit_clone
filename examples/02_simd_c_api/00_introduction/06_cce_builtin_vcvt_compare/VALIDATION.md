@@ -1,6 +1,6 @@
 # CCE vcvt与builtin验证结果
 
-验证环境：DAV 3510，CANN 9.2.0，`bisheng`，`-O2`。
+验证环境：DAV 3510，CANN 9.2.0，`bisheng`，`-O2`。验证方式包括直接调用`bisheng`以及通过本目录`CMakeLists.txt`并行构建两个目标，两种方式的结果一致。
 
 | 检查项 | `vcvt`路径 | `__builtin_cce_vcvtff_f322f16_x`路径 | 结果 |
 | --- | --- | --- | --- |
