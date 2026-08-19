@@ -48,15 +48,17 @@ bool ReadSourceFileContents(const fs::path& sourceFilePath, std::string& sourceF
     return true;
 }
 
-bool ReplaceFirstSourceTemplateOccurrence(std::string& sourceFileContents, const std::string& sourceTemplateText,
-                                          const std::string& replacementText)
+bool ReplaceAllSourceTemplateOccurrences(std::string& sourceFileContents, const std::string& sourceTemplateText,
+                                         const std::string& replacementText)
 {
-    const size_t templatePosition = sourceFileContents.find(sourceTemplateText);
-    if (templatePosition == std::string::npos) {
-        return false;
+    bool replacedAtLeastOnce = false;
+    size_t searchPosition = 0U;
+    while ((searchPosition = sourceFileContents.find(sourceTemplateText, searchPosition)) != std::string::npos) {
+        sourceFileContents.replace(searchPosition, sourceTemplateText.size(), replacementText);
+        searchPosition += replacementText.size();
+        replacedAtLeastOnce = true;
     }
-    sourceFileContents.replace(templatePosition, sourceTemplateText.size(), replacementText);
-    return true;
+    return replacedAtLeastOnce;
 }
 
 bool WritePatchedSourceFileAtomically(const fs::path& sourceFilePath, const std::string& patchedSourceFileContents)
@@ -161,7 +163,7 @@ aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatche
         }
         for (size_t patchIndex = 0U; patchIndex < filePatches.second.size(); ++patchIndex) {
             const KernelSourcePatch* sourcePatch = filePatches.second[patchIndex];
-            if (!ReplaceFirstSourceTemplateOccurrence(
+            if (!ReplaceAllSourceTemplateOccurrences(
                     patchedSourceText, sourcePatch->templateText, sourcePatch->replacementText)) {
                 ASCENDLOGE(
                     "Source patch template was not found: path=%s patch_index=%zu; regenerate the JIT resource "
