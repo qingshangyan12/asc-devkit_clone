@@ -14,7 +14,7 @@
 
 namespace mc2_ops_hccl {
 
-// 每轮最多展开 16 次 Write/GroupCopy/Wait 三阶段流水。
+// 每轮最多展开 16 次 Write/LocalCopy/Wait 三阶段流水。
 constexpr uint32_t AG_M2M_UNROLL_NUM = 16;
 
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
