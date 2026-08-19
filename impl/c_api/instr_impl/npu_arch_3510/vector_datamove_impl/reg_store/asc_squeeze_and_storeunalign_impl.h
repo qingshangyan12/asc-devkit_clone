@@ -112,7 +112,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
 {
     if ASC_IS_AIV {
         vsqz(dst, src1, squeeze_mask, MODE_STORED);
-        vstur(src0, dst, dst, POST_UPDATE);
+        vstur(src0, dst, dst_addr, POST_UPDATE);
     }
 }
 
@@ -122,7 +122,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
 {
     if ASC_IS_AIV {
         vsqz(dst, src1, squeeze_mask, MODE_STORED);
-        vstur(src0, dst, dst, POST_UPDATE);
+        vstur(src0, dst, dst_addr, POST_UPDATE);
     }
 }
 
@@ -132,7 +132,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
 {
     if ASC_IS_AIV {
         vsqz(dst, src1, squeeze_mask, MODE_STORED);
-        vstur(src0, dst, dst, POST_UPDATE);
+        vstur(src0, dst, dst_addr, POST_UPDATE);
     }
 }
 
@@ -142,7 +142,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
 {
     if ASC_IS_AIV {
         vsqz((vector_int8_t&)dst, (vector_int8_t&)src1, squeeze_mask, MODE_STORED);
-        vstur(src0, dst, dst, POST_UPDATE);
+        vstur(src0, dst, dst_addr, POST_UPDATE);
     }
 }
 
@@ -152,7 +152,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
 {
     if ASC_IS_AIV {
         vsqz((vector_int8_t&)dst, (vector_int8_t&)src1, squeeze_mask, MODE_STORED);
-        vstur(src0, dst, dst, POST_UPDATE);
+        vstur(src0, dst, dst_addr, POST_UPDATE);
     }
 }
 
