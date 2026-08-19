@@ -28,6 +28,13 @@ set(ASCENDC_TEST_HEADER_FILES
     ${ASCENDC_DIR}/impl/simt_api
 )
 
+file(GLOB ASCENDC_TEST_SIMT_COMMON_SRC_FILES
+    common_simt/*.cpp
+)
+set(ASCENDC_TEST_ascend950pr_9599_SIMT_SUBNORMAL_CASE_SRC_FILE
+    ${CMAKE_CURRENT_SOURCE_DIR}/ascendc_case_ascend950pr_9599_simt/test_operator_simt_subnormal.cpp
+)
+
 # # ================ simt_api kernel ut ================
 # ascend950pr_9599 simt test cases
 file(GLOB ASCENDC_TEST_ascend950pr_9599_SIMT_CASE_SRC_FILES
@@ -108,8 +115,8 @@ foreach(product_type ${SIMT_PRODUCT_TYPE_LIST})
         foreach(target_name ${SIMT_SUBNORMAL_TARGETS})
             add_executable(${target_name}
                 ${ASCENDC_DIR}/tests/main.cpp
-                common_simt/*.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/ascendc_case_ascend950pr_9599_simt/test_operator_simt_subnormal.cpp
+                ${ASCENDC_TEST_SIMT_COMMON_SRC_FILES}
+                ${ASCENDC_TEST_ascend950pr_9599_SIMT_SUBNORMAL_CASE_SRC_FILE}
             )
 
             target_link_libraries(${target_name} PRIVATE simt_api_test_common)
