@@ -239,8 +239,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         KERNEL_INFO, "ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
         ccuParam_.scratchAddr, rankSliceOffset);
     xnData_[4] = rankSliceOffset;
-    xnData_[7] = sliceSize / 2;
-    xnData_[8] = UINT64_MAX - 1;
+    // Keep the fixed scratch contract local to the existing XN7/XN8 protocol:
+    // XN7 is the tail size and XN8 is the inverse number of full chunks.
+    constexpr uint64_t scratchSize = 16 * 1024 * 1024;
+    constexpr uint64_t minSliceAlign = 128;
+    uint64_t chunkSize = scratchSize / ccuParam_.rankNum / minSliceAlign * minSliceAlign;
+    uint64_t fullChunkCount = sliceSize / chunkSize;
+    xnData_[7] = sliceSize - fullChunkCount * chunkSize;
+    xnData_[8] = UINT64_MAX - fullChunkCount;
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
 }
 } // namespace AscendC
