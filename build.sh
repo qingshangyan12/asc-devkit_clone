@@ -681,8 +681,19 @@ function build_test() {
 function build_test_part() {
   source ${CURRENT_DIR}/tests/test_parts.sh
 
+  echo "BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}"
   if [ "$TEST_PART" == "adv_test" ]; then
-    TEST_TARGET_LIST=("${adv_test_targets[@]}")
+      if [ "$BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG" == "OFF" ]; then
+          tmp_targets=()
+          for target in "${adv_test_targets[@]}"; do
+              if [[ "$target" != "ascendc_ut_adv_api_kernel_KirinX90_AIV" && "$target" != "ascendc_ut_adv_api_kernel_Kirin9030_AIV" ]]; then
+                  tmp_targets+=("$target")
+              fi
+          done
+          TEST_TARGET_LIST=("${tmp_targets[@]}")
+      else
+          TEST_TARGET_LIST=("${adv_test_targets[@]}")
+      fi
   elif [ "$TEST_PART" == "adv_test_two" ]; then
     TEST_TARGET_LIST=("${adv_test_two_targets[@]}")
   elif [ "$TEST_PART" == "arm_test" ]; then
