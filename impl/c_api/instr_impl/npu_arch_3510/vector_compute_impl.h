@@ -9917,6 +9917,8 @@ __aicore__ inline void asc_transto5hd_b8(
     asc_transto5hd_b8_impl(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
 }
 
+[[deprecated("NOTICE: asc_transto5hd_b8_sync is deprecated. "
+             "Currently asc_transto5hd_b8_sync is an unsupported API on current device.")]]
 __aicore__ inline void asc_transto5hd_b8_sync(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half,
     bool src_high_half)
@@ -9930,6 +9932,8 @@ __aicore__ inline void asc_transto5hd_b16(
     asc_transto5hd_b16_impl(dst, src, repeat, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_transto5hd_b16_sync is deprecated. "
+             "Currently asc_transto5hd_b16_sync is an unsupported API on current device.")]]
 __aicore__ inline void asc_transto5hd_b16_sync(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
 {
@@ -9942,6 +9946,8 @@ __aicore__ inline void asc_transto5hd_b32(
     asc_transto5hd_b32_impl(dst, src, repeat, dst_stride, src_stride);
 }
 
+[[deprecated("NOTICE: asc_transto5hd_b32_sync is deprecated. "
+             "Currently asc_transto5hd_b32_sync is an unsupported API on current device.")]]
 __aicore__ inline void asc_transto5hd_b32_sync(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
 {
