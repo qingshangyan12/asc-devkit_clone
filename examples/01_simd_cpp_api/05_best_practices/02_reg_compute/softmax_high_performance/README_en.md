@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses single-core Softmax as a case study to demonstrate a complete performance tuning path from MemBase to RegBase, and from basic loops to optimizations such as loop fusion and loop unrolling. It includes six progressively optimized versions: Case 0 through Case 5.
+This example uses single-core Softmax as a case study to demonstrate a complete performance tuning path from MemBase to RegBase, and from basic loops to optimizations such as loop fusion and loop unrolling. Case 5 and Case 6 also compare the performance impact of address and loop variable types. It includes seven versions: Case 0 through Case 6.
 
 **Optimization Path**:
 - Case 0 → Case 1: MemBase → RegBase API (register-level computation)
@@ -10,6 +10,7 @@ This example uses single-core Softmax as a case study to demonstrate a complete 
 - Case 2 → Case 3: Outer loop unrolling (UpdateMask mode)
 - Case 2 → Case 4: Main-tail block mode
 - Case 4 → Case 5: Main-tail block mode + Outer loop unrolling + ExpSub fused instruction
+- Case 5 → Case 6: Change address and loop variables from `uint16_t` to `uint32_t`
 
 **Prerequisites**: Before reading, a basic understanding of the following background topics is recommended to provide theoretical support for the optimization strategies of each Case:
 - **[Reg Vector Computation Programming](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/reg_vector_computation.md)**
@@ -32,7 +33,7 @@ This example uses single-core Softmax as a case study to demonstrate a complete 
 │   │   └── verify_result.py    // Ground truth comparison script
 │   ├── CMakeLists.txt          // Build project file
 │   ├── data_utils.h            // Data read/write functions
-│   ├── softmax.asc             // Ascend C sample implementation (Case 0-5, six versions)
+│   ├── softmax.asc             // Ascend C sample implementation (Case 0-6, seven versions)
 │   └── README.md               // Sample documentation
 ```
 
@@ -72,6 +73,7 @@ $$
 | **Case 3** | RegBase | UpdateMask mode + Outer loop unrolling, improves dual-issue capability | 2197 cycles |
 | **Case 4** | RegBase | Main-tail block mode, replaces UpdateMask | 3424 cycles |
 | **Case 5** | RegBase | Main-tail block mode + Outer loop unrolling + ExpSub fused instruction (optimal) | 1785 cycles |
+| **Case 6** | RegBase | Case 5 computation with `uint32_t` address and loop variables | See the simulation instruction log analysis in README.md |
 
 **Table 2: AI Core Performance Metric Field Descriptions**
 
@@ -86,7 +88,7 @@ $$
 
 ## Optimization Strategy Analysis
 
-This section details the progressive optimization strategies from Case 0 to Case 5.
+This section details the progressive optimization strategies from Case 0 to Case 5. Case 6 retains the Case 5 computation and compares only the address and loop variable types.
 
 ## Phase 1: MemBase (Case 0)
 
@@ -328,8 +330,9 @@ Combination mechanism of the three optimizations:
 | ExpSub fused instruction | Single instruction replaces Sub+Exp, reduces latency | Case 1→Case 2 |
 | Loop fusion | Shared Load/Store, eliminates redundant movement and synchronization | Case 1→Case 2 |
 | UpdateMask | Automatic mask update, concise tail block handling | Case 2, Case 3 |
-| Main-tail block mode | Main block full Mask with no update overhead, tail block handled separately | Case 4, Case 5 |
-| Outer loop unrolling | Multiple register sets interleaved execution, improves dual-issue | Case 2→Case 3, Case 4→Case 5 |
+| Main-tail block mode | Main block full Mask with no update overhead, tail block handled separately | Case 4, Case 5, Case 6 |
+| Outer loop unrolling | Multiple register sets interleaved execution, improves dual-issue | Case 2→Case 3, Case 4→Case 5/6 |
+| Address and loop variable types | Compares addressing and loop-control instructions generated for `uint16_t` and `uint32_t` | Case 5→Case 6 |
 
 ## Build and Run
 
@@ -337,7 +340,7 @@ Execute the following steps in the sample's root directory to build and run the 
 
 - Select version
 
-  Use `-DSCENARIO_NUM=N` (N=0~5) to specify the version to compile:
+  Use `-DSCENARIO_NUM=N` (N=0~6) to specify the version to compile:
 
   | SCENARIO_NUM | Version | Description | CMAKE_VF_MODE |
   |:---:|:---:|:---|:---:|
@@ -346,7 +349,8 @@ Execute the following steps in the sample's root directory to build and run the 
   | 2 | Case 2 | RegBase, UpdateMask+ExpSub+Fusion | false |
   | 3 | Case 3 | RegBase, UpdateMask+Loop unrolling | false |
   | 4 | Case 4 | RegBase, Main-tail block mode | false |
-  | 5 | Case 5 | RegBase, Main-tail block+Loop unrolling+ExpSub | false |
+  | 5 | Case 5 | RegBase, Main-tail block+Loop unrolling+ExpSub, `uint16_t` address and loop variables | false |
+  | 6 | Case 6 | RegBase, Main-tail block+Loop unrolling+ExpSub, `uint32_t` address and loop variables | false |
 
 - Configure environment variables
   ```bash
@@ -376,7 +380,7 @@ Execute the following steps in the sample's root directory to build and run the 
   |:---|:---|:---|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture |
-  | `SCENARIO_NUM` | `0`~`5` | Version number Case 0-5 |
+  | `SCENARIO_NUM` | `0`~`6` | Version number Case 0-6 |
   | `CMAKE_VF_MODE` | `true`, `false` | VF fusion mode: Default is false |
 
 ### Performance Analysis
