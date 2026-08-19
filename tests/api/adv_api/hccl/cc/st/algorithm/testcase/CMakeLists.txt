@@ -59,6 +59,8 @@ run_llt_test(
     TASK_NUM 1
 )
 
+add_subdirectory(mc2_ccu)
+
 set(HCCL_AICPU_ALLOC_CTX_TARGET ascendc_ut_adv_api_hccl_cc_aicpu_alloc_ctx)
 
 add_executable(${HCCL_AICPU_ALLOC_CTX_TARGET}
