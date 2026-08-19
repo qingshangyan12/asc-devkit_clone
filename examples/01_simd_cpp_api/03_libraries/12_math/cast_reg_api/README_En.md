@@ -7,7 +7,7 @@ This sample demonstrates how to use the experimental register Tensor API `asc::t
 The sample covers six conversion scenarios among floating-point types, integer types, and `bfloat16_t`. It also demonstrates the `unpack`, `unpack4`, `pack`, and `pack_quarter` memory access modes used for conversions between types of different widths. The computation is as follows:
 
 ```text
-y[i] = cast<To, Layout, Round, Sat>(x[i])
+y[i] = cast<To, Options>(x[i])
 ```
 
 ## Supported Products
@@ -106,7 +106,9 @@ y[i] = cast<To, Layout, Round, Sat>(x[i])
     auto srcReg = src.load(coord);
     srcReg = srcReg.with_mask(asc::te::update_mask<WiderT>(remain));
 
-    auto dstReg = asc::te::cast<DstT, Layout, Round, Sat>(srcReg);
+    constexpr asc::te::cast_options options = {
+        Layout, Round, Sat};
+    auto dstReg = asc::te::cast<DstT, options>(srcReg);
     dst.store(coord, dstReg);
     ```
 

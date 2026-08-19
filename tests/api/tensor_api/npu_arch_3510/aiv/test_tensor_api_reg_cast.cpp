@@ -22,8 +22,14 @@
 namespace {
 
 using asc::te::cast_layout;
+using asc::te::cast_options;
 using asc::te::cast_round_mode;
 using asc::te::cast_sat_mode;
+
+constexpr cast_options float_to_half_options = {
+    cast_layout::one, cast_round_mode::ceil, cast_sat_mode::sat};
+constexpr cast_options int32_to_float_options = {
+    cast_layout::zero, cast_round_mode::floor, cast_sat_mode::not_sat};
 
 static_assert(asc::te::detail::reg_cast_op<float, half, cast_layout::zero,
     cast_round_mode::rint, cast_sat_mode::not_sat>::supported);
@@ -54,8 +60,7 @@ protected:
     }
 };
 
-template <typename To, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat,
-    typename SrcTensor, typename DstTensor>
+template <typename To, const cast_options& opt, typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void cast_reg_loop(const SrcTensor src, DstTensor dst, uint32_t data_size,
     uint32_t column_count)
 {
@@ -72,12 +77,12 @@ __simd_vf__ inline void cast_reg_loop(const SrcTensor src, DstTensor dst, uint32
         auto src_reg = src.load(coord);
         src_reg.with_mask(full_mask);
 
-        auto dst_reg = asc::te::cast<To, Layout, Round, Sat>(src_reg);
+        auto dst_reg = asc::te::cast<To, opt>(src_reg);
         dst.store(coord, dst_reg);
     }
 }
 
-template <typename To, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat, typename From, size_t N>
+template <typename To, const cast_options& opt = asc::te::default_cast_ops, typename From, size_t N>
 void cast_one_register(From input_value, To (&dst_data)[N])
 {
     using src_reg_type = typename asc::te::reg_tensor<From>::reg_type;
@@ -96,7 +101,7 @@ void cast_one_register(From input_value, To (&dst_data)[N])
     const auto dst_layout = asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(1, dst_elements_per_reg);
     auto src = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src_data), src_layout);
     auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst_data), dst_layout);
-    cast_reg_loop<To, Layout, Round, Sat>(src, dst, src_elements_per_reg, src_elements_per_reg);
+    cast_reg_loop<To, opt>(src, dst, src_elements_per_reg, src_elements_per_reg);
 }
 
 TEST_F(tensor_api_reg_cast_3510, default_policy_converts_half_to_float)
@@ -105,8 +110,7 @@ TEST_F(tensor_api_reg_cast_3510, default_policy_converts_half_to_float)
     constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(float);
     __ubuf__ float dst_data[dst_elements_per_reg] {};
 
-    cast_one_register<float, cast_layout::zero, cast_round_mode::rint, cast_sat_mode::not_sat>(
-        static_cast<half>(3.5F), dst_data);
+    cast_one_register<float>(static_cast<half>(3.5F), dst_data);
 
     for (float value : dst_data) {
         EXPECT_FLOAT_EQ(value, 3.5F);
@@ -121,7 +125,7 @@ TEST_F(tensor_api_reg_cast_3510, explicit_policy_converts_float_to_half_with_lay
     constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(half);
     __ubuf__ half dst_data[dst_elements_per_reg] {};
 
-    cast_one_register<half, cast_layout::one, cast_round_mode::ceil, cast_sat_mode::sat>(70000.0F, dst_data);
+    cast_one_register<half, float_to_half_options>(70000.0F, dst_data);
 
     size_t converted_count = 0;
     size_t zeroed_count = 0;
@@ -140,7 +144,7 @@ TEST_F(tensor_api_reg_cast_3510, converts_int32_to_float)
     constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(float);
     __ubuf__ float dst_data[dst_elements_per_reg] {};
 
-    cast_one_register<float, cast_layout::zero, cast_round_mode::floor, cast_sat_mode::not_sat>(-42, dst_data);
+    cast_one_register<float, int32_to_float_options>(-42, dst_data);
 
     for (float value : dst_data) {
         EXPECT_FLOAT_EQ(value, 0.0F);

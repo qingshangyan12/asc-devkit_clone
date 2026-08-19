@@ -22,8 +22,10 @@
 namespace asc {
 namespace te {
 
-template <typename To, cast_layout Layout = cast_layout::zero, cast_round_mode Round = cast_round_mode::rint,
-    cast_sat_mode Sat = cast_sat_mode::not_sat, typename From>
+constexpr cast_options default_cast_ops = {
+    cast_layout::zero, cast_round_mode::rint, cast_sat_mode::not_sat};
+
+template <typename To, const cast_options& opt = default_cast_ops, typename From>
 __simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src);
 
 template <typename T>

@@ -94,10 +94,10 @@ struct is_supported<float> {
 
 } // namespace detail
 
-template <typename To, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat, typename From>
+template <typename To, const cast_options& opt, typename From>
 __simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src)
 {
-    return detail::cast_impl<To, Layout, Round, Sat>(src);
+    return detail::cast_impl<To, opt.layout, opt.round, opt.sat>(src);
 }
 
 template <typename T>

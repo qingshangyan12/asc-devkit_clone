@@ -7,7 +7,7 @@
 样例覆盖浮点类型、整数类型和 `bfloat16_t` 之间的6种转换场景，并演示不同位宽转换时的 `unpack`、`unpack4`、`pack` 和 `pack_quarter` 访存模式。计算关系如下：
 
 ```text
-y[i] = cast<To, Layout, Round, Sat>(x[i])
+y[i] = cast<To, Options>(x[i])
 ```
 
 ## 支持的产品
@@ -106,7 +106,9 @@ y[i] = cast<To, Layout, Round, Sat>(x[i])
     auto srcReg = src.load(coord);
     srcReg = srcReg.with_mask(asc::te::update_mask<WiderT>(remain));
 
-    auto dstReg = asc::te::cast<DstT, Layout, Round, Sat>(srcReg);
+    constexpr asc::te::cast_options options = {
+        Layout, Round, Sat};
+    auto dstReg = asc::te::cast<DstT, options>(srcReg);
     dst.store(coord, dstReg);
     ```
 
