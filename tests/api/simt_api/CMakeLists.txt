@@ -80,7 +80,6 @@ target_link_libraries(simt_api_test_common INTERFACE
 foreach(product_type ${SIMT_PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_simt_api_${product_type}
         ${ASCENDC_DIR}/tests/main.cpp
-        ../common/k3_pvwrap.cpp
         ${ASCENDC_TEST_${product_type}_SIMT_CASE_SRC_FILES}
     )
 
