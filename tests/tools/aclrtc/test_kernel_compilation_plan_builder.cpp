@@ -212,6 +212,27 @@ TEST(KernelCompilationPlanBuilderTest, BuildsBasicPlanFromOnlySelectedManifestFi
               workspace.ResourcePath() / ".aclrtc_session_1/outputs/linked_kernel.elf");
 }
 
+TEST(KernelCompilationPlanBuilderTest, BuildsPlanWithoutOptionalExternalSourceFile)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t tilingBytes[] = {0x01, 0x02};
+    const void* argumentAddresses[] = {tilingBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(tilingBytes)};
+    NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, argumentAddresses, argumentByteCounts);
+    Json manifest = CreateManifest();
+    manifest.erase("source_file");
+    manifest["options"]["common_compile"] =
+        Json::array({"-I${env:ACLRTC_TEST_TOOLCHAIN}/include"});
+
+    KernelCompilationPlan plan;
+    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), fs::path())
+                  .BuildCompilationPlan(plan),
+              ascendc::aclrtc::ACLRTC_SUCCESS);
+}
+
 TEST(KernelCompilationPlanBuilderTest, RejectsCompileCommandWithoutOutputPath)
 {
     KernelPlanTestWorkspace workspace;
@@ -536,7 +557,7 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMismatchedRuntimeConstantByteCount
               ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
 }
 
-TEST(KernelCompilationPlanBuilderTest, RejectsMissingRegistryPaths)
+TEST(KernelCompilationPlanBuilderTest, RejectsMissingResourceWorktree)
 {
     KernelPlanTestWorkspace workspace;
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
@@ -549,13 +570,6 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMissingRegistryPaths)
 
     const fs::path missingWorktreePath = workspace.ResourcePath() / "missing";
     EXPECT_EQ(KernelCompilationPlanBuilder(request, CreateManifest(), missingWorktreePath,
-                                           workspace.SourceDirectoryPath())
-                  .BuildCompilationPlan(plan),
-              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
-
-    Json manifestWithMissingSource = CreateManifest();
-    manifestWithMissingSource["source_file"] = "missing.cpp";
-    EXPECT_EQ(KernelCompilationPlanBuilder(request, manifestWithMissingSource, workspace.ResourcePath(),
                                            workspace.SourceDirectoryPath())
                   .BuildCompilationPlan(plan),
               ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
