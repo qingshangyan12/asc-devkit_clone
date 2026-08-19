@@ -26,8 +26,6 @@
 #include <thread>
 #include <unistd.h>
 
-extern char** environ;
-
 namespace ascendc {
 namespace aclrtc {
 namespace {
@@ -388,7 +386,7 @@ public:
         startedAt_ = SteadyClock::now();
         const int spawnResult = posix_spawn(
             &childProcessId_, argumentStorage.front().c_str(), spawnConfiguration.GetFileActions(),
-            spawnConfiguration.GetSpawnAttributes(), spawnArgv.data(), environ);
+            spawnConfiguration.GetSpawnAttributes(), spawnArgv.data(), ::environ);
         outputWriteFileDescriptor.Close();
         if (spawnResult != 0) {
             ASCENDLOGE("Failed to spawn command %s: error=%d message=%s executable=%s",
