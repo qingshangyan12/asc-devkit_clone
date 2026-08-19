@@ -26,6 +26,56 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
+
+__simd_callee__ inline vector_half asc_muls(vector_float src, float value, vector_bool mask)
+{
+    return asc_muls_impl(src, value, mask);
+}
+
+__simd_callee__ inline vector_half asc_muls_v2(vector_float src, float value, vector_bool mask)
+{
+    return asc_muls_v2_impl(src, value, mask);
+}
+
+[[deprecated("NOTICE: asc_exp_sub with half inputs and without src_pos is deprecated. "
+             "Please use asc_exp_sub_half2float with src_pos instead.")]] __simd_callee__ inline vector_float
+asc_exp_sub(vector_half src0, vector_half src1, vector_bool mask)
+{
+    return asc_exp_sub_impl(src0, src1, mask);
+}
+
+__simd_callee__ inline vector_float asc_exp_sub(vector_float src0, vector_float src1, vector_bool mask)
+{
+    return asc_exp_sub_impl(src0, src1, mask);
+}
+
+__simd_callee__ inline vector_float asc_exp_sub_half2float(
+    vector_half src0, vector_half src1, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+{
+    return asc_exp_sub_half2float_impl(src0, src1, mask, src_pos);
+}
+
+__simd_callee__ inline vector_float asc_exp_sub_half2float(
+    vector_half src0, vector_half src1, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
+{
+    return asc_exp_sub_half2float_impl(src0, src1, mask, src_pos);
+}
+
+[[deprecated("NOTICE: asc_exp_sub_v2 with half inputs is deprecated. "
+             "Please use asc_exp_sub_half2float with src_pos instead.")]] __simd_callee__ inline vector_float
+asc_exp_sub_v2(vector_half src0, vector_half src1, vector_bool mask)
+{
+    return asc_exp_sub_v2_impl(src0, src1, mask);
+}
+
+[[deprecated("NOTICE: asc_exp_sub_v2 with float inputs is deprecated. "
+             "Please use asc_exp_sub instead.")]] __simd_callee__ inline vector_float
+asc_exp_sub_v2(vector_float src0, vector_float src1, vector_bool mask)
+{
+    return asc_exp_sub_v2_impl(src0, src1, mask);
+}
 #endif
 /*
  *   asc_create_mask_b8(pat_mode);
