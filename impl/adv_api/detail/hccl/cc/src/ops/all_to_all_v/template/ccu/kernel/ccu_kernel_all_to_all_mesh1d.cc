@@ -186,7 +186,31 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     } else {
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r != arg->rankId) {
-                ccu::Write(arg->channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
+                ccu::RemoteAddr curDst = dst[r];
+                ccu::LocalAddr curSrc = src[r];
+
+                ccu::Variable loopCount;
+                loopCount = ctx.writeLoopCount;
+                ccu::Variable remaining;
+                remaining = ctx.sliceSize;
+
+                CCU_WHILE(loopCount != UINT64_MAX)
+                {
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 0);
+                    curDst.addr += chunkSize;
+                    curSrc.addr += chunkSize;
+                    remaining += neg256MB;
+                    loopCount += constOne;
+                }
+
+                CCU_IF(remaining != 0)
+                {
+                    ccu::Write(arg->channels[channelId], curDst, curSrc, remaining, ctx.event, 1 << r);
+                }
+                CCU_ELSE
+                {
+                    ccu::EventRecord(ctx.event, 1 << r);
+                }
                 channelId++;
             }
         }
