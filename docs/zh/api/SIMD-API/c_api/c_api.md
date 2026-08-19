@@ -592,3 +592,9 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | 废弃接口 | 说明 |
 | [asc_abs_sync（废弃）](deprecated_interface/asc_abs_sync_deprecated.md) | 按元素取绝对值同步接口。 |
 | [asc_set_atomic_add_int（废弃）](deprecated_interface/asc_set_atomic_add_int_deprecated.md) | 设置对后续的从UB/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int32_t。 |
+| [asc_float2bfloat16（废弃）](deprecated_interface/asc_float2bfloat16_deprecated.md) | 旧三参数及位置后缀原型已废弃，请使用显式位置参数重载。 |
+| [asc_int322int16（废弃）](deprecated_interface/asc_int322int16_deprecated.md) | 旧三参数及位置后缀原型已废弃，请使用显式位置参数重载。 |
+| [asc_int322int64（废弃）](deprecated_interface/asc_int322int64_deprecated.md) | 旧三参数及位置后缀原型已废弃，请使用显式位置参数重载。 |
+| [asc_int322uint16（废弃）](deprecated_interface/asc_int322uint16_deprecated.md) | 旧三参数及位置后缀原型已废弃，请使用显式位置参数重载。 |
+| [asc_set_atomic_add_int（废弃）](deprecated_interface/asc_set_atomic_add_int_deprecated.md) | 设置对后续的从Unified Buffer/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int32_t。 |
+| [asc_uint82uint16（废弃）](deprecated_interface/asc_uint82uint16_deprecated.md) | 旧三参数及位置后缀原型已废弃，请使用显式位置参数重载。 |
