@@ -20,7 +20,8 @@
     "clangd.path": "/usr/bin/clangd",
     "clangd.arguments": [
         "--background-index=0",
-        "--clang-tidy=0"
+        "--clang-tidy=0",
+        "--compile-commands-dir=build"
     ],
-    "C_Cpp.intelliSenseEngine": "disabled"
+    "C_Cpp.intelliSenseEngine": "default"
 }
