@@ -80,6 +80,7 @@ SOC_TO_SHORT_SOC_MAP = {
     "ascend950": "ascend950",
     "ascend350_354f": "ascend350",
     "ascend350_355e": "ascend350",
+    "mc32dm11aa": "mc32dm11a",
 }
 CONFLICT_KEYWORDS = {
     "and",
@@ -368,6 +369,10 @@ def _set_options_to_opdesc(op_descs, op_type, soc_ver_compile_options, op_impl_m
 
 def _trans_soc_ver_to_short(soc_ver: str):
     low_soc_ver = soc_ver.lower()
+    if low_soc_ver.startswith("series:"):
+        return low_soc_ver.split(":", 1)[1]
+    if low_soc_ver.startswith("full:"):
+        low_soc_ver = low_soc_ver.split(":", 1)[1]
     if low_soc_ver not in SOC_TO_SHORT_SOC_MAP:
         raise ValueError(
             f"Unsupported SOC version: '{soc_ver}'. "

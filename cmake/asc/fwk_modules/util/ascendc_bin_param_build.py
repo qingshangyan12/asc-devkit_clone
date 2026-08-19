@@ -582,6 +582,8 @@ def get_tiling_keys(tiling_keys: str) -> Set:
 
 def trans_soc_version(soc_ver: str):
     low_soc_ver = soc_ver.lower()
+    if low_soc_ver.startswith(("series:", "full:")):
+        return opdesc_parser._trans_soc_ver_to_short(low_soc_ver)
     if low_soc_ver not in opdesc_parser.SOC_TO_SHORT_SOC_MAP:
         return low_soc_ver
     return opdesc_parser.SOC_TO_SHORT_SOC_MAP[low_soc_ver]
