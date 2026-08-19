@@ -25,6 +25,19 @@ HcclResult ExecuteSelector::Run(
         opParam.opType, opParam.opExecuteConfig, opParam.engine, opParam.isMc2, opParam.commName, opParam.tag);
 
     if (UseCannBridge(opParam)) {
+        if (opParam.opType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
+            const auto selectors = SelectorRegistry::Global()->GetSelectorsByOpType(opParam.opType);
+            for (auto iter : selectors) {
+                if (iter.second->Select(opParam, topoInfo, selectAlgName) == SelectorStatus::MATCH &&
+                    IsLocalAicpuAlg(opParam.opType, selectAlgName)) {
+                    HCCL_INFO(
+                        "[asc][AlgoSelect][ExecuteSelector::Run] local migrated algorithm matched, "
+                        "priority[%llu], algName[%s].",
+                        iter.first, selectAlgName.c_str());
+                    return HCCL_SUCCESS;
+                }
+            }
+        }
         HCCL_INFO(
             "[asc][AlgoSelect][ExecuteSelector::Run] before SelectViaCann, opType[%d], "
             "opExecuteConfig[%d], engine[%d].",

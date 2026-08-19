@@ -21,9 +21,14 @@ namespace mc2_ops_hccl {
 class InsCollAlgBase;
 struct AlgResourceCtxSerializable;
 
-// 判断该 op 是否需要走 CANN 桥接路径(选路/取执行器/资源准备)。
-// 条件: engine 为 AICPU/AICPU_TS 且 opType 为 ALLTOALL/ALLTOALLV/ALLREDUCE。
+// 判断默认选路是否需要走 CANN 桥接路径。
 bool UseCannBridge(const OpParam& param);
+
+// 已迁移到 asc-devkit、可在 Host/AICPU 两侧使用本地注册表的算法。
+inline bool IsLocalAicpuAlg(HcclCMDType opType, const std::string& algName)
+{
+    return opType == HcclCMDType::HCCL_CMD_ALLREDUCE && algName == "AicpuAllReduceSoleMeshChunkTwoShot";
+}
 
 HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName);
 

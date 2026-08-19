@@ -12,14 +12,44 @@
 
 namespace mc2_ops_hccl {
 
+namespace {
+constexpr u64 AR_AICPU_1D_MAX_DATA_SIZE = 32 * 1024 * 1024;
+constexpr u64 AR_AICPU_SEQUENCE_DATA_SIZE = 4ULL * 1024 * 1024 * 1024;
+constexpr u64 AR_2P_DETOUR_DATA_SIZE = 8 * 1024 * 1024;
+}
+
 SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
-    (void)topoInfo;
-    (void)opParam;
     (void)configAlgMap;
-    selectAlgName = "AicpuAllReduceSoleMeshOneShot";
+    const u64 dataTypeSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
+    const u64 dataSize = opParam.DataDes.count * dataTypeSize;
+    const bool specialDataOrReduce = Is64BitDataType(opParam.DataDes.dataType) ||
+                                     opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
+    if (specialDataOrReduce || topoInfo == nullptr) {
+        return SelectorStatus::NOT_MATCH;
+    }
+
+    const double rankRatio = topoInfo->userRankSize == 0
+                                 ? 1.0
+                                 : DEFAULT_RANK_SIZE / topoInfo->userRankSize / topoInfo->userRankSize;
+    const bool overMaxDataSize = dataSize * rankRatio > AR_AICPU_1D_MAX_DATA_SIZE;
+    const bool overSequenceDataSize = dataSize > AR_AICPU_SEQUENCE_DATA_SIZE;
+    bool match = false;
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
+        const bool twoLevel = IsTwoLevelNetLayer(topoInfo);
+        match = overMaxDataSize && !(twoLevel && overSequenceDataSize) &&
+                !(twoLevel && topoInfo->userRankSize == 2 && dataSize >= AR_2P_DETOUR_DATA_SIZE);
+    } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix) {
+        match = IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH) && overMaxDataSize;
+    }
+
+    if (!match) {
+        return SelectorStatus::NOT_MATCH;
+    }
+
+    selectAlgName = "AicpuAllReduceSoleMeshChunkTwoShot";
     return SelectorStatus::MATCH;
 }
 

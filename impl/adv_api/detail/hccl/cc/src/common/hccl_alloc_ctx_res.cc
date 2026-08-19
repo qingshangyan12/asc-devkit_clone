@@ -566,7 +566,7 @@ HcclResult PrepareEngineForAlg(OpParam& opParam, const std::string& algName)
 
 std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, const std::string& algName)
 {
-    if (UseCannBridge(opParam)) {
+    if (UseCannBridge(opParam) && !IsLocalAicpuAlg(opParam.opType, algName)) {
         return GetAlgExecViaCann(opParam.opType, algName);
     }
     return CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
@@ -752,7 +752,7 @@ HcclResult GetOpParamResCtx(
     HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
     void** resCtxOut)
 {
-    bool useCannResCtx = UseCannBridge(opParam);
+    bool useCannResCtx = UseCannBridge(opParam) && !IsLocalAicpuAlg(opParam.opType, algName);
     std::unique_ptr<InsCollAlgBase> executor = nullptr;
     if (useCannResCtx) {
         executor = GetAlgExecViaCann(opParam.opType, algName);

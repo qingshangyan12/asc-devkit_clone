@@ -409,7 +409,7 @@ HcclResult HcclExecOp(
         return HCCL_E_INTERNAL;
     }
 
-    bool useCannResCtx = UseCannBridge(param);
+    bool useCannResCtx = UseCannBridge(param) && !IsLocalAicpuAlg(param.opType, algName);
 
     std::unique_ptr<InsCollAlgBase> executor = nullptr;
     if (useCannResCtx) {
