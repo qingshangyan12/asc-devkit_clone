@@ -175,12 +175,15 @@ bool IsMissingPathError(const boost::system::error_code& pathError) noexcept
     return pathError.value() == ENOENT || pathError.value() == ENOTDIR;
 }
 
-bool FindCompilerOutputOptionPosition(const std::vector<std::string>& commandArguments,
-                                      size_t& outputOptionPosition)
+bool FindSeparatedCompilerOutputOptionPosition(const std::vector<std::string>& commandArguments,
+                                               size_t& outputOptionPosition)
 {
     for (size_t argumentIndex = 0; argumentIndex < commandArguments.size(); ++argumentIndex) {
         const std::string& argument = commandArguments[argumentIndex];
-        if (argument == "-o" || (argument.size() > 2U && argument.compare(0, 2, "-o") == 0)) {
+        if (argument != "-o") {
+            continue;
+        }
+        if (argumentIndex + 1U < commandArguments.size() && !commandArguments[argumentIndex + 1U].empty()) {
             outputOptionPosition = argumentIndex;
             return true;
         }
@@ -335,10 +338,10 @@ aclError BuildManifestCommand(const Json& manifestCommand, const SelectedManifes
 
     if (compilationCommand.commandKind == CompilationCommandKind::Compile) {
         size_t outputOptionPosition = 0U;
-        if (!FindCompilerOutputOptionPosition(compilationCommand.commandArguments, outputOptionPosition)) {
+        if (!FindSeparatedCompilerOutputOptionPosition(compilationCommand.commandArguments, outputOptionPosition)) {
             ASCENDLOGE(
-                "Manifest compile command %s must contain an output option; regenerate the JIT resource with "
-                "'-o' and its output path",
+                "Manifest compile command %s must contain a valid separated '-o' output option and a non-empty "
+                "output path; regenerate the JIT resource with '-o' followed by its output path",
                 compilationCommand.diagnosticLabel.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
