@@ -49,14 +49,35 @@ from .super_kernel_sub_op_compile import gen_sub_kernel_name
 
 
 @dataclass(frozen=True)
-class StaticCompileCommandSpec:
+class DynamicCompileCommandSpec:
     tiling_key: str
     compiled_symbol: str
     core_type: str
     source_path: str
-    constant_info_files: Tuple[str, ...]
     argv: Tuple[str, ...]
     output_path: str
+
+
+def _record_dynamic_compile_command(
+    compile_info: CompileInfo,
+    tiling_key: str,
+    compiled_symbol: str,
+    core_type: str,
+    argv,
+    output_path: str,
+):
+    if not compile_info.record_compile_commands:
+        return
+    compile_info.recorded_compile_commands.append(
+        DynamicCompileCommandSpec(
+            tiling_key=str(tiling_key),
+            compiled_symbol=compiled_symbol,
+            core_type=core_type,
+            source_path=compile_info.gen_kernel_func_file,
+            argv=tuple(argv),
+            output_path=output_path,
+        )
+    )
 
 
 def _gen_compile_cmd_c310(
@@ -412,79 +433,6 @@ def get_compile_target_options(
     return tuple(options)
 
 
-def build_static_compile_commands(
-    compile_info: CompileInfo,
-    compile_option_tuple,
-    constant_info_files,
-    chip_version: str,
-):
-    constant_info_files = tuple(dict.fromkeys(constant_info_files))
-    static_options = copy.deepcopy(compile_option_tuple)
-    static_options.compile_options = [
-        option
-        for option in static_options.compile_options
-        if option != "-DCONST_TILING"
-        and not option.startswith("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")
-    ]
-    static_options.compile_options.append("-DCONST_TILING")
-
-    targets = [
-        (str(tiling_key), core_type)
-        for tiling_key in compile_info.tiling_key_list
-        for core_type in get_compile_core_types(compile_info, str(tiling_key))
-    ]
-    symbols = list(getattr(compile_info, "global_kernel_symbols", []))
-
-    commands = []
-    for index, (tiling_key, core_type) in enumerate(targets):
-        compiled_symbol = (
-            symbols[index]
-            if symbols
-            else get_compile_target_name(compile_info, tiling_key, core_type)
-        )
-        output_path = os.path.join(
-            os.path.dirname(compile_info.dst_file),
-            f".static_{compile_info.kernel_name}_{tiling_key}_{core_type}.o",
-        )
-        argv = gen_compile_cmd_v220(
-            compile_info.gen_kernel_func_file,
-            output_path,
-            static_options,
-            f"dav-{chip_version}-{core_type}",
-            "",
-            with_tiling_file=False,
-        )
-        include_index = argv.index("-std=c++17")
-        for constant_info_file in constant_info_files:
-            argv[include_index:include_index] = ["-include", constant_info_file]
-            include_index += 2
-        argv.extend(
-            get_compile_target_options(
-                compile_info, tiling_key, "c310" in chip_version.lower()
-            )
-        )
-        argv.extend(
-            [
-                f"-Dauto_gen_{compile_info.origin_func_name}_kernel={compiled_symbol}",
-                f"-D{TILING_KEY_MACRO}={tiling_key}UL",
-                f"-D{compile_info.origin_func_name}="
-                f"{compile_info.origin_func_name}_{tiling_key}_tilingkey",
-            ]
-        )
-        commands.append(
-            StaticCompileCommandSpec(
-                tiling_key=tiling_key,
-                compiled_symbol=compiled_symbol,
-                core_type=core_type,
-                source_path=compile_info.gen_kernel_func_file,
-                constant_info_files=constant_info_files,
-                argv=tuple(argv),
-                output_path=output_path,
-            )
-        )
-    return tuple(commands)
-
-
 def gen_compile_cmd_for_meta_info(
     src_file: str, dst_file: str, compile_option_tuple, sub_arch: str
 ):
@@ -663,7 +611,10 @@ def compile_single_tiling_v220(param: SingleTilingKeyCompileParams):
             f"-D{param.compile_info.origin_func_name}="
             f"{param.compile_info.origin_func_name}_{param.tiling_key}_tilingkey"
         ]
-    core_type = "cube" if "cube" in param.sub_arch else "vec"
+    is_cube = (param.sub_arch is None and param.code_channel == CORE_TYPE_CUBE) or (
+        param.sub_arch is not None and "cube" in param.sub_arch
+    )
+    core_type = "cube" if is_cube else "vec"
     kernel_func_name = get_compile_target_name(
         param.compile_info, param.tiling_key, core_type
     )
@@ -824,6 +775,20 @@ def call_bisheng_v220(
                 compile_option_tuple,
             )
             compile_cmd, kernel_name = compile_single_tiling_v220(param)
+            core_type = (
+                "cube"
+                if (sub_arch is None and code_channel == CORE_TYPE_CUBE)
+                or (sub_arch is not None and "cube" in sub_arch)
+                else "vec"
+            )
+            _record_dynamic_compile_command(
+                compile_info,
+                tiling_key,
+                kernel_name,
+                core_type,
+                compile_cmd,
+                compile_info.dst_file[:-2] + "_%s.o" % tiling_key,
+            )
             new_sources += DFXSectionGenerator().generate_dfx_section(
                 tiling_key, tiling_info, kernel_name, compile_info, True
             )
@@ -838,6 +803,9 @@ def call_bisheng_v220(
         CommonUtility().ascendc_write_file(
             compile_info.gen_kernel_func_file, new_sources
         )
+
+        if not compile_info.execute_compile_commands:
+            return compile_info.tiling_key_list
 
         compile_multi_tilingkey(
             compile_info.tiling_key_list,
