@@ -11,6 +11,7 @@
 #include "ccu_kernel_alg_base.h"
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
 #include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
+#include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_half_alltoallv_mesh1d.h"
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
 #include "ccu_func_dl.hpp"
@@ -131,6 +132,17 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
             ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
+    }
+    CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_HALF_ALLTOALLV))
+    {
+        // 阶段二 xn 布局：
+        // [0]=missionId [1]=sendBuf [2]=sendSizes [3]=sendOffsets
+        // [4..7]=goSize [8]=remoteWinOffset [9]=tokenInfo
+        CcuKfcHalfAlltoAllVMesh1DKernel(
+            param[HBM_PARAM_IDX_0], param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
+            param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
+            param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9], ctx.arg->channels, ctx.arg->channelCount,
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->localWinAddr);
     }
 }
 
