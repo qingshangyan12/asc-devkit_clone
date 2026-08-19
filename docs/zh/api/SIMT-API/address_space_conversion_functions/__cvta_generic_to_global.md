@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/address_space_conversion_functions/__cvta_generic_to_global_res.md#id1 -->
 
 ## 功能说明
 
@@ -47,7 +48,7 @@ size_t __cvta_generic_to_global(const void* ptr)
 | 输入场景 | 返回值 |
 | --- | --- |
 | `ptr`为`nullptr` | 返回`0`。 |
-| `ptr`为Unified Buffer或栈空间指针 | 在编译阶段报错。|
+| `ptr`为UB或栈空间指针 | 在编译阶段报错。|
 
 ## 约束说明
 
