@@ -31,6 +31,8 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     bool loadFromMem;
     OpParam opParam;
     std::vector<std::vector<uint32_t>> subCommRanks;
+    // 仅HALF_ALLTOALLV使用，见CcuKernelInfo::localWinAddr
+    uint64_t localWinAddr = 0;
 };
 
 // 第一层同步：missionId=0 与missionId>0之间的
