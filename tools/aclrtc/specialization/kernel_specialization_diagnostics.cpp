@@ -61,7 +61,7 @@ const char* GetProcessTerminationName(CompilationProcessTermination termination)
 
 bool WriteDiagnosticTextFile(const fs::path& filePath, const std::string& text, std::ios::openmode writeMode)
 {
-    std::ofstream outputStream(filePath, std::ios::out | writeMode);
+    std::ofstream outputStream(filePath.string(), std::ios::out | writeMode);
     if (!outputStream) {
         const int openError = errno;
         ASCENDLOGW("Failed to open diagnostic file for writing: path=%s errno=%d message=%s",

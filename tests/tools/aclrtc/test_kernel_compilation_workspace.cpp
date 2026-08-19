@@ -38,13 +38,13 @@ fs::path CreateWorkspacePath(const std::string& name)
 void WriteFile(const fs::path& path, const std::string& text)
 {
     fs::create_directories(path.parent_path());
-    std::ofstream stream(path);
+    std::ofstream stream(path.string());
     stream << text;
 }
 
 std::string ReadFile(const fs::path& path)
 {
-    std::ifstream stream(path);
+    std::ifstream stream(path.string());
     return std::string(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
 }
 

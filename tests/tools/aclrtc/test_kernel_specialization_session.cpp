@@ -118,7 +118,7 @@ public:
 private:
     static void WriteFile(const fs::path& path, const std::string& contents)
     {
-        std::ofstream stream(path);
+        std::ofstream stream(path.string());
         stream << contents;
     }
 
@@ -252,7 +252,7 @@ NormalizedKernelSpecializationRequest NormalizeRequestForTest(
 
 std::string ReadFile(const fs::path& path)
 {
-    std::ifstream stream(path);
+    std::ifstream stream(path.string());
     return std::string(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
 }
 
@@ -280,7 +280,7 @@ TEST(KernelSpecializationSessionTest, DoesNotReplaceExistingOutputWhenCompilatio
     EndToEndTestResource testResource(FakeCompilerOutcome::Failure);
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
     ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
-    std::ofstream(testResource.OutputElfPath()) << "previous-elf";
+    std::ofstream(testResource.OutputElfPath().string()) << "previous-elf";
     const uint8_t constantBytes[] = {0x01, 0xfe};
     const void* constantAddresses[] = {constantBytes};
     const uint64_t constantByteCounts[] = {sizeof(constantBytes)};

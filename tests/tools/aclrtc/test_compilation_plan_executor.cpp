@@ -80,7 +80,7 @@ private:
 
 std::string ReadTextFile(const fs::path& filePath)
 {
-    std::ifstream inputStream(filePath);
+    std::ifstream inputStream(filePath.string());
     return {std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>()};
 }
 
@@ -226,7 +226,7 @@ TEST(CompilationPlanExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeader
         CreateCommand(CompilationCommandKind::Compile, "/bin/sh", {"-c", commandScript}));
 
     ASSERT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
-    std::ifstream descendantProcessIdStream(descendantProcessIdPath);
+    std::ifstream descendantProcessIdStream(descendantProcessIdPath.string());
     pid_t descendantProcessId = -1;
     ASSERT_TRUE(descendantProcessIdStream >> descendantProcessId);
     bool descendantProcessAlive = true;
