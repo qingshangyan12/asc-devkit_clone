@@ -1,7 +1,7 @@
 # Compare Tensor API 样例
 
 ## 概述
-本样例基于Reg编程接口实现operator>接口完成多场景下的数据比较功能。  
+本样例基于Tensor API实现operator>接口完成多场景下的数据比较功能。  
 本样例支持两种比较场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
   <table>
     <tr>
