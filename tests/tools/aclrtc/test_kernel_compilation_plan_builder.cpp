@@ -94,7 +94,7 @@ public:
 private:
     static void WriteFile(const fs::path& path, const std::string& contents)
     {
-        std::ofstream stream(path);
+        std::ofstream stream(path.string());
         stream << contents;
     }
 
