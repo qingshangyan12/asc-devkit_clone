@@ -69,6 +69,22 @@ TEST(KernelCompilationWorkspaceTest, CreatesOutputDirectoriesAndAppliesAllPatche
     fs::remove_all(worktreePath, ignoredError);
 }
 
+TEST(KernelCompilationWorkspaceTest, ReplacesEveryOccurrenceOfTheSameSourceTemplate)
+{
+    const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_repeated_template");
+    const fs::path sourcePath = worktreePath / "resources/constants.h";
+    WriteFile(sourcePath, "FIRST=@@VALUE@@; SECOND=@@VALUE@@;\n");
+    KernelCompilationPlan plan;
+    plan.sourcePatches = {{sourcePath, "@@VALUE@@", "{0x01}"}};
+
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
+    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_SUCCESS);
+    EXPECT_EQ(ReadFile(sourcePath), "FIRST={0x01}; SECOND={0x01};\n");
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(worktreePath, ignoredError);
+}
+
 TEST(KernelCompilationWorkspaceTest, FailsWhenPatchTemplateIsMissing)
 {
     const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_missing_template");
