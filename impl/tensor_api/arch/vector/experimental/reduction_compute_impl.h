@@ -31,8 +31,6 @@ namespace te {
 template <typename To, reduce_scope scope, typename From>
 __simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<From> src)
 {
-    static_assert(scope == reduce_scope::vector || scope == reduce_scope::datablock || scope == reduce_scope::pair,
-                  "reduce_sum received an invalid reduction scope");
     reg_tensor<To> dst;
     if constexpr (scope == reduce_scope::vector) {
         asc_reduce_sum(dst.reg, src.reg, src.mask);
@@ -48,8 +46,6 @@ __simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<From> src)
 template <typename To, reduce_scope scope, typename From>
 __simd_callee__ inline decltype(auto) reduce_max(reg_tensor<From> src)
 {
-    static_assert(scope == reduce_scope::vector || scope == reduce_scope::datablock,
-                  "reduce_max only supports vector and datablock reduction");
     reg_tensor<To> dst;
     if constexpr (scope == reduce_scope::vector) {
         asc_reduce_max(dst.reg, src.reg, src.mask);
@@ -63,8 +59,6 @@ __simd_callee__ inline decltype(auto) reduce_max(reg_tensor<From> src)
 template <typename To, reduce_scope scope, typename From>
 __simd_callee__ inline decltype(auto) reduce_min(reg_tensor<From> src)
 {
-    static_assert(scope == reduce_scope::vector || scope == reduce_scope::datablock,
-                  "reduce_min only supports vector and datablock reduction");
     reg_tensor<To> dst;
     if constexpr (scope == reduce_scope::vector) {
         asc_reduce_min(dst.reg, src.reg, src.mask);
