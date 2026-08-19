@@ -50,8 +50,13 @@ __simd_callee__ inline decltype(auto) exp_sub(const reg_tensor<T>& src0, const r
 {
     static_assert(detail::supports_exp_sub_v<T>, "exp_sub supports half and float");
     reg_tensor<float> dst;
-    // asc_exp_sub returns float for both half and float inputs.
-    asc_exp_sub(dst.reg, src0.reg, src1.reg, src0.mask);
+    if constexpr (Std::is_same_v<T, half>) {
+        // Preserve the deprecated half overload's PART_EVEN behavior.
+        asc_exp_sub_half2float(dst.reg, src0.reg, src1.reg, src0.mask,
+            std::integral_constant<asc_position_mode, asc_position_mode::EVEN> {});
+    } else {
+        asc_exp_sub(dst.reg, src0.reg, src1.reg, src0.mask);
+    }
     dst.mask = src0.mask;
     return dst;
 }
