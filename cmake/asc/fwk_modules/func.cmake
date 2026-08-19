@@ -35,7 +35,7 @@ function(add_ops_info_target)
 endfunction()
 
 function(npu_op_kernel_options target_name OP_TYPE)
-  cmake_parse_arguments(OP_COMPILE "" "" "COMPUTE_UNIT;OPTIONS" ${ARGN})
+  cmake_parse_arguments(OP_COMPILE "" "" "COMPUTE_UNIT;SOC_SERIES;OPTIONS" ${ARGN})
   get_property(auto_gen_path GLOBAL PROPERTY ASCENDC_AUTO_GEN_PATH)
   if("${auto_gen_path}" STREQUAL "")
     message(FATAL_ERROR "auto_gen_path has not be set which should set in npu_op_code_gen api.")
@@ -43,8 +43,24 @@ function(npu_op_kernel_options target_name OP_TYPE)
   if(NOT DEFINED OP_COMPILE_OPTIONS)
     message(FATAL_ERROR "Must provide options for npu_op_kernel_options")
   endif()
+
+  if(DEFINED OP_COMPILE_COMPUTE_UNIT AND DEFINED OP_COMPILE_SOC_SERIES)
+    message(FATAL_ERROR "COMPUTE_UNIT and SOC_SERIES cannot be set together in npu_op_kernel_options")
+  endif()
+
+  set(_op_compile_soc_series_arg)
+  if(DEFINED OP_COMPILE_SOC_SERIES)
+    if("${OP_COMPILE_SOC_SERIES}" STREQUAL "")
+      message(FATAL_ERROR "SOC_SERIES cannot be empty in npu_op_kernel_options")
+    endif()
+    string(TOLOWER "${OP_COMPILE_SOC_SERIES}" _op_compile_soc_series)
+    string(JOIN "," _op_compile_soc_series_value ${_op_compile_soc_series})
+    set(_op_compile_soc_series_arg "--soc-series=${_op_compile_soc_series_value}")
+  endif()
+
   execute_process(COMMAND ${ASCEND_PYTHON_EXECUTABLE} ${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_gen_options.py
                           ${auto_gen_path}/${CUSTOM_COMPILE_OPTIONS} ${OP_TYPE} ${OP_COMPILE_COMPUTE_UNIT}
+                          ${_op_compile_soc_series_arg}
                           "${OP_COMPILE_OPTIONS}"
                   RESULT_VARIABLE EXEC_RESULT
                   OUTPUT_VARIABLE EXEC_INFO
@@ -334,7 +350,16 @@ function(simple_kernel_compile)
 endfunction()
 
 function(npu_op_kernel_sources target_name)
-  cmake_parse_arguments(KERNEL_SRC "" "KERNEL_FILE;KERNEL_DIR;OP_TYPE" "COMPUTE_UNIT" ${ARGN})
+  cmake_parse_arguments(KERNEL_SRC "" "KERNEL_FILE;KERNEL_DIR;OP_TYPE" "COMPUTE_UNIT;SOC_SERIES" ${ARGN})
+  if(DEFINED KERNEL_SRC_COMPUTE_UNIT AND DEFINED KERNEL_SRC_SOC_SERIES)
+    message(FATAL_ERROR "COMPUTE_UNIT and SOC_SERIES cannot be set together in npu_op_kernel_sources")
+  endif()
+  if(DEFINED KERNEL_SRC_SOC_SERIES)
+    if("${KERNEL_SRC_SOC_SERIES}" STREQUAL "")
+      message(FATAL_ERROR "SOC_SERIES cannot be empty in npu_op_kernel_sources")
+    endif()
+    string(TOLOWER "${KERNEL_SRC_SOC_SERIES}" KERNEL_SRC_SOC_SERIES)
+  endif()
   if(((DEFINED KERNEL_SRC_KERNEL_FILE) AND (NOT DEFINED KERNEL_SRC_OP_TYPE)) OR ((NOT DEFINED KERNEL_SRC_KERNEL_FILE) AND (DEFINED KERNEL_SRC_OP_TYPE)))
     message(FATAL_ERROR "op_type and kernel_file must exist at the same time")
   endif()
@@ -356,6 +381,10 @@ function(npu_op_kernel_sources target_name)
   endif()
   if(DEFINED KERNEL_SRC_COMPUTE_UNIT)
     string(REPLACE ";" " " COMPUTE_UNITS "${KERNEL_SRC_COMPUTE_UNIT}")
+    list(APPEND process_source_files_command "--compute-unit=${COMPUTE_UNITS}")
+  endif()
+  if(DEFINED KERNEL_SRC_SOC_SERIES)
+    string(REPLACE ";" " " COMPUTE_UNITS "${KERNEL_SRC_SOC_SERIES}")
     list(APPEND process_source_files_command "--compute-unit=${COMPUTE_UNITS}")
   endif()
   execute_process(COMMAND ${ASCEND_PYTHON_EXECUTABLE} ${process_source_files_command}
