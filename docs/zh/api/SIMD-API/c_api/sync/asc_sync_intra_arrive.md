@@ -76,13 +76,13 @@ __aicore__ inline void asc_sync_intra_arrive(pipe_t pipe,
 
 本示例采用`__mix__(1, 2)`标识核函数，核函数启动1个AI Core，共包含1个AIC和2个AIV。AIV0在UB中构造矩阵A和矩阵B，将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行`asc_sync_intra_arrive`向调度模块发送通知。AIC中从L1 Buffer搬运数据到L0A Buffer、L0B Buffer（PIPE_MTE1）的操作被`asc_sync_intra_wait`阻塞，直到AIV0执行了`asc_sync_intra_arrive`后才能执行。通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)区分不同的AIV，仅AIV0参与该次同步，AIV1不参与该次同步。
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 
 <!-- end id8 -->

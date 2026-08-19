@@ -64,7 +64,7 @@ AI Core内部并行的指令流水类型和解释如下所示：
         - `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。
         - `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
     <!-- npu="950" id3 -->
-    - Ascend 950PR/Ascend 950DT新增通过[asc_lock](asc_lock.md)/[asc_unlock](asc_unlock.md)接口进行不同流水线间的同步控制。通过`Lock`锁定指定流水（阻塞后续指令），再通过`Unlock`释放流水，来完成流水间的同步依赖。
+    - 针对Ascend 950PR/Ascend 950DT，新增[asc_lock](asc_lock.md)/[asc_unlock](asc_unlock.md)接口进行不同流水线间的同步控制。通过`Lock`锁定指定流水（阻塞后续指令），再通过`Unlock`释放流水，来完成流水间的同步依赖。
         - `asc_lock`：根据`mutex_id`获取Mutex，若Mutex已被锁定，将阻塞后续指定流水指令队列，直到前序指令中对应`mutex_id`的Mutex被`asc_unlock`。
         - `asc_unlock`：当前流水的前置指令退出后，根据`mutex_id`释放对应Mutex。
     - 相较于`asc_sync_notify`/`asc_sync_wait`同步机制，使用`asc_lock`/`asc_unlock`接口有以下优势：
@@ -97,7 +97,7 @@ AI Core内部并行的指令流水类型和解释如下所示：
             ```
 
         - 可以使用更多的同步信号量：`asc_sync_notify`/`asc_sync_wait`的入参`EVENT_ID0`为同步ID，取值范围为[0, 7]；而`asc_lock`/`asc_unlock`的入参`mutex_id`取值范围为[0, 31]。
-       <!-- end id3 -->
+    <!-- end id3 -->
 - 单流水同步：同一核内具有数据依赖的相同类型流水指令之间的同步。通过[asc_sync_pipe](asc_sync_pipe.md)接口进行相同流水线间的同步控制。同一流水中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。`asc_sync_pipe`指令可以保证前序指令中所有数据读写全部完成，后序指令才开始执行。注意该接口不支持PIPE_S单流水的同步。
 - 通过[asc_sync_data_barrier](asc_sync_data_barrier.md)接口阻塞后续指令的执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。开发者通过`arg`参数指定屏障作用的内存范围，确保屏障前后的内存访问指令按预期顺序完成。
 

@@ -52,9 +52,4 @@ __aicore__ inline void asc_set_atomic_none()
 
 ## 调用示例
 
-```c
-asc_set_atomic_add_int8();
-asc_copy_ub2gm(dst, src, total_length * sizeof(int8_t));
-// 关闭原子操作。
-asc_set_atomic_none();
-```
+asc_set_atomic_none与[asc_set_atomic_add](asc_set_atomic_add.md)等原子操作接口配合使用，调用示例请参见[asc_set_atomic_add的调用示例](asc_set_atomic_add.md#调用示例)。
