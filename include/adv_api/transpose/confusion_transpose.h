@@ -25,7 +25,10 @@
 #ifndef LIB_TRANSPOSE_CONFUSION_TRANSPOSE_H
 #define LIB_TRANSPOSE_CONFUSION_TRANSPOSE_H
 #include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
+//#include "kernel_basic_intf.h"
+#include "basic_api/kernel_struct_transpose.h"
+#include "basic_api/kernel_operator_vec_transpose_intf.h"
+#include "basic_api/reg_compute/kernel_reg_compute_intf.h"
 #include "../../../impl/basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "../../../impl/adv_api/detail/transpose/confusion_transpose/confusion_transpose_common_impl.h"
