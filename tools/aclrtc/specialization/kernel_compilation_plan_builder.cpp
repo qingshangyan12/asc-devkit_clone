@@ -485,53 +485,12 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
                 resourceWorktreePath_.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
-        if (!externalSourceDirectoryPath_.is_absolute()) {
-            ASCENDLOGE(
-                "ResourceRegistry returned a non-absolute sourceFilePath directory: %s; fix the registry integration",
-                externalSourceDirectoryPath_.c_str());
-            return ACLRTC_ERROR_FAILURE;
-        }
-        boost::system::error_code sourceDirectoryError;
-        const bool sourcePathIsDirectory = fs::is_directory(externalSourceDirectoryPath_, sourceDirectoryError);
-        if (sourceDirectoryError && !IsMissingPathError(sourceDirectoryError)) {
-            ASCENDLOGE(
-                "Failed to inspect sourceFilePath directory: path=%s error=%d message=%s; fix the registered "
-                "resource data",
-                externalSourceDirectoryPath_.c_str(), sourceDirectoryError.value(),
-                sourceDirectoryError.message().c_str());
-            return ACLRTC_ERROR_FAILURE;
-        }
-        if (!sourcePathIsDirectory) {
-            ASCENDLOGE(
-                "sourceFilePath must be an existing directory: path=%s; fix the registered resource data",
-                externalSourceDirectoryPath_.c_str());
-            return ACLRTC_ERROR_FAILURE;
-        }
         const std::string schemaVersion = resourceManifest_.at("schema_version").get<std::string>();
         if (schemaVersion != SUPPORTED_MANIFEST_SCHEMA_VERSION) {
             ASCENDLOGE(
                 "Unsupported Manifest schema_version '%s'; expected '%s'. Regenerate the JIT resource with a "
                 "compatible pack tool",
                 schemaVersion.c_str(), SUPPORTED_MANIFEST_SCHEMA_VERSION);
-            return ACLRTC_ERROR_FAILURE;
-        }
-
-        const fs::path manifestSourceFilePath =
-            externalSourceDirectoryPath_ / resourceManifest_.at("source_file").get<std::string>();
-        boost::system::error_code sourceFileError;
-        const bool sourceFileIsRegular = fs::is_regular_file(manifestSourceFilePath, sourceFileError);
-        if (sourceFileError && !IsMissingPathError(sourceFileError)) {
-            ASCENDLOGE(
-                "Failed to inspect Manifest source file: path=%s error=%d message=%s; fix the registered resource "
-                "data",
-                manifestSourceFilePath.c_str(), sourceFileError.value(), sourceFileError.message().c_str());
-            return ACLRTC_ERROR_FAILURE;
-        }
-        if (!sourceFileIsRegular) {
-            ASCENDLOGE(
-                "Manifest source file must be an existing regular file: path=%s; regenerate the JIT resource from "
-                "the matching operator source",
-                manifestSourceFilePath.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
 
