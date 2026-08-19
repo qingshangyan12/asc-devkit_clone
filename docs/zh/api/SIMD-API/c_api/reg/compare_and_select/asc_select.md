@@ -37,8 +37,6 @@ $$
 
 ## 函数原型
 
-### 模板原型（占位符形式）
-
 ```c
 __simd_callee__ inline void asc_select(vector_<dtype>& dst,
                                        vector_<dtype> src0,
@@ -46,9 +44,7 @@ __simd_callee__ inline void asc_select(vector_<dtype>& dst,
                                        vector_bool mask)
 ```
 
-### dtype支持数据类型
-
-`dtype`支持的数据类型为`bool`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`支持的取值为`bool`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
@@ -66,10 +62,10 @@ __simd_callee__ inline void asc_select(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述                                                                                                                             |
 | :----- | :-------- | :------------------------------------------------------------------------------------------------------------------------------- |
-| `dst`  | 输出      | 目的操作数（掩码寄存器或矢量数据寄存器）。                                                                                       |
-| `src0` | 输入      | 源操作数0（掩码寄存器或矢量数据寄存器）。                                                                                        |
-| `src1` | 输入      | 源操作数1（掩码寄存器或矢量数据寄存器）。                                                                                        |
-| `mask` | 输入      | 源操作数掩码（掩码寄存器）。指定选择`src0`或`src1`为有效数据。`mask`的比特位为1时，选取`src0`；`mask`的比特位为0时，选取`src1`。 |
+| dst  | 输出      | 目的操作数（掩码寄存器或矢量数据寄存器）。                                                                                       |
+| src0 | 输入      | 源操作数0（掩码寄存器或矢量数据寄存器）。                                                                                        |
+| src1 | 输入      | 源操作数1（掩码寄存器或矢量数据寄存器）。                                                                                        |
+| mask | 输入      | 源操作数掩码（掩码寄存器）。指定选择`src0`或`src1`为有效数据。`mask`的比特位为1时，选取`src0`；`mask`的比特位为0时，选取`src1`。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -84,15 +80,15 @@ __simd_callee__ inline void asc_select(vector_half& dst,
 
 ## 调用示例
 
+<!-- npu="950" id8 -->
+
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-<!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
-<!-- end id8 -->
 
 ```c
 #include <cstdint>
@@ -101,16 +97,6 @@ bisheng example.asc -o main --npu-arch=dav-3510; ./main
 #include "c_api/asc_simd.h"
 #include "acl/acl.h"
 namespace {
-template <typename T>
-void print_data(const char* label, const std::vector<T>& values)
-{
-    std::cout << label << ":";
-    const size_t count = values.size() < 8 ? values.size() : 8;
-    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
-    if (values.size() > count) std::cout << " ...";
-    std::cout << std::endl;
-}
-
 template <typename T>
 bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
@@ -188,10 +174,6 @@ int main()
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(float), dst_device, output.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    print_data("Input src0", src0);
-    print_data("Input src1", src1);
-    print_data("Output", output);
-    print_data("Golden", golden);
     const bool passed = compare_data(output, golden);
     std::cout << (passed ? "[Success] asc_select passed."
                          : "[Failed] asc_select failed.")
@@ -204,3 +186,5 @@ int main()
     return passed ? 0 : 1;
 }
 ```
+
+<!-- end id8 -->
