@@ -258,7 +258,7 @@ bool WaitForOutputOrNextProcessCheck(int outputFileDescriptor, bool outputPipeCl
 
 bool CreateNonblockingCloseOnExecPipe(int outputPipe[2])
 {
-    if (pipe(outputPipe) != 0) {
+    if (pipe2(outputPipe, O_CLOEXEC) != 0) {
         const int pipeError = errno;
         ASCENDLOGE("Failed to create command output pipe: errno=%d message=%s", pipeError,
                          std::strerror(pipeError));
@@ -277,15 +277,6 @@ bool CreateNonblockingCloseOnExecPipe(int outputPipe[2])
         const int nonblockingError = errno;
         ASCENDLOGE("Failed to make command pipe nonblocking: fd=%d errno=%d message=%s", outputPipe[0],
                          nonblockingError, std::strerror(nonblockingError));
-        CloseFileDescriptorBestEffort(outputPipe[0]);
-        CloseFileDescriptorBestEffort(outputPipe[1]);
-        return false;
-    }
-    if (fcntl(outputPipe[0], F_SETFD, FD_CLOEXEC) != 0 ||
-        fcntl(outputPipe[1], F_SETFD, FD_CLOEXEC) != 0) {
-        const int closeOnExecError = errno;
-        ASCENDLOGE("Failed to make command pipe close-on-exec: errno=%d message=%s", closeOnExecError,
-                         std::strerror(closeOnExecError));
         CloseFileDescriptorBestEffort(outputPipe[0]);
         CloseFileDescriptorBestEffort(outputPipe[1]);
         return false;
