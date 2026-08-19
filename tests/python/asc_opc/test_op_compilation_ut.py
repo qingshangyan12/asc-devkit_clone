@@ -930,6 +930,7 @@ class TestOpCompilationUt(unittest.TestCase):
         cases = (
             ("Normal", False, False),
             ("SK", False, True),
+            ("Normal", True, False),
             ("None", True, True),
         )
         for mode, relocatable, expected_enable_sk in cases:
@@ -974,6 +975,38 @@ class TestOpCompilationUt(unittest.TestCase):
                     build_config.call_args.kwargs["enable_super_kernel"],
                     expected_enable_sk,
                 )
+
+    def test_kernel_spec_sk_adds_default_sub_super_kernel_info(self):
+        compiler = SingleOpCompile(
+            {},
+            {},
+            {
+                OpcOptions.KERNEL_SPEC: "SK",
+                OpcOptions.SPK_OPT: "early-start=1",
+            },
+        )
+        with op_context.OpContext() as context:
+            compiler.set_kernel_spec_for_context(context)
+            self.assertEqual(
+                context.get_addition("super_kernel_sub_info"),
+                {
+                    "enable_super_kernel": True,
+                    "super_kernel_options": "early-start=1",
+                    "super_kernel_sub_loc": "middle",
+                },
+            )
+
+    def test_kernel_spec_sk_keeps_input_sub_super_kernel_info(self):
+        compiler = SingleOpCompile({}, {}, {OpcOptions.KERNEL_SPEC: "SK"})
+        expected_info = {
+            "enable_super_kernel": True,
+            "super_kernel_options": "early-start=0",
+            "super_kernel_sub_loc": "start",
+        }
+        with op_context.OpContext() as context:
+            context.add_addition("super_kernel_sub_info", expected_info)
+            compiler.set_kernel_spec_for_context(context)
+            self.assertIs(context.get_addition("super_kernel_sub_info"), expected_info)
 
     def test_SingleOpCompile_will_jit_compile_option_to_kwargs(self):
         with unittest.mock.patch("single_op_compile.build_config") as build_config:

@@ -75,6 +75,13 @@ class KernelCompileRecord:
 
 
 @dataclass(frozen=True)
+class SkBindCommandSpec:
+    source_path: str
+    argv: Tuple[str, ...]
+    output_path: str
+
+
+@dataclass(frozen=True)
 class ManifestGenerationRequest:
     soc_version: str
     resource_id: str
@@ -83,11 +90,10 @@ class ManifestGenerationRequest:
     output_dir: str
     manifest_name: str
     kernels: Tuple[KernelCompileRecord, ...]
-    chip_version: str
     sk_cap_bitmap: Optional[int] = None
     sk_kernel_attribute: str = ""
     basic_kernel_attribute: str = ""
-    sk_bind_compile_options: Tuple[str, ...] = ()
+    sk_bind_command: Optional[SkBindCommandSpec] = None
 
 
 @dataclass(frozen=True)
@@ -105,33 +111,26 @@ def _read_regular_file(path, description):
         raise ManifestResourceError(f"failed to read {description}: {path}") from error
 
 
-def _build_context_commands(
-    compile_info,
-    compile_option_tuple,
-    command_builder,
-    chip_version,
-    constant_info_files,
-    object_type,
-):
+def _build_recorded_context_commands(compile_info, constant_info_files, object_type):
+    recorded_commands = tuple(getattr(compile_info, "recorded_compile_commands", ()))
+    if not recorded_commands:
+        raise ManifestCommandError(
+            f"{object_type} Manifest generation requires recorded dynamic compile commands"
+        )
     return tuple(
         StaticCompileCommand(
-            tiling_key=spec.tiling_key,
-            compile_tiling_key=spec.tiling_key,
+            tiling_key=str(spec.tiling_key),
+            compile_tiling_key=str(spec.tiling_key),
             compiled_symbol=spec.compiled_symbol,
             compile_symbol=spec.compiled_symbol,
             object_type=object_type,
             core_type=spec.core_type,
             source_path=spec.source_path,
-            constant_info_files=tuple(spec.constant_info_files),
+            constant_info_files=tuple(constant_info_files),
             argv=tuple(spec.argv),
             output_path=spec.output_path,
         )
-        for spec in command_builder(
-            compile_info,
-            compile_option_tuple,
-            constant_info_files,
-            chip_version,
-        )
+        for spec in recorded_commands
     )
 
 
@@ -182,14 +181,10 @@ def _logical_symbol(compile_symbol, compile_tiling_key, logical_tiling_key):
 def build_kernel_compile_records(
     *,
     basic_compile_info,
-    basic_compile_option_tuple,
-    command_builder,
-    chip_version: str,
     metadata_json_path: str,
     constant_infos: Sequence[ConstantInfoRecord],
     constant_info_size_by_tiling_key: Optional[dict] = None,
     sk_compile_info=None,
-    sk_compile_option_tuple=None,
     link_options: Sequence[str] = _LINK_OPTION,
 ):
     constant_infos = tuple(constant_infos)
@@ -203,25 +198,13 @@ def build_kernel_compile_records(
     )
 
     all_commands = list(
-        _build_context_commands(
-            basic_compile_info,
-            basic_compile_option_tuple,
-            command_builder,
-            chip_version,
-            constant_info_files,
-            "basic",
+        _build_recorded_context_commands(
+            basic_compile_info, constant_info_files, "basic"
         )
     )
     if sk_compile_info is not None:
         all_commands.extend(
-            _build_context_commands(
-                sk_compile_info,
-                sk_compile_option_tuple,
-                command_builder,
-                chip_version,
-                constant_info_files,
-                "sk",
-            )
+            _build_recorded_context_commands(sk_compile_info, constant_info_files, "sk")
         )
     commands_by_key = {}
     for command in all_commands:
@@ -322,6 +305,7 @@ def static_tiling_template_text(dynamic_header):
         "GET_TILING_DATA",
         "GET_TILING_DATA_WITH_STRUCT",
         "GET_TILING_DATA_MEMBER",
+        "GET_TILING_DATA_PTR_WITH_STRUCT",
     ):
         lines.extend([f"#ifdef {macro}", f"#undef {macro}", "#endif"])
     if class_name is None:
@@ -346,6 +330,11 @@ def static_tiling_template_text(dynamic_header):
             f"    static constexpr tiling_type __ascendc_static_full_##var = {slash}",
             f"        convert_from_bytes<tiling_type>(__ascendc_static_tiling_data); {slash}",
             "    auto& var = __ascendc_static_full_##var.member;",
+            f"#define GET_TILING_DATA_PTR_WITH_STRUCT(tiling_struct, dst_ptr, tiling_ptr) {slash}",
+            f"    REGISTER_TILINGDATA_SIZE(tiling_struct, __COUNTER__); {slash}",
+            f"    static constexpr tiling_struct __ascendc_static_full_##dst_ptr = {slash}",
+            f"        convert_from_bytes<tiling_struct>(__ascendc_static_tiling_data); {slash}",
+            "    const tiling_struct *dst_ptr = &__ascendc_static_full_##dst_ptr;",
             "#endif",
             "",
         ]
@@ -466,6 +455,11 @@ def _normalize_compile_command(
         "${source_file_path}",
         insertion_before=record.source_path,
     )
+    argv = [
+        value
+        for value in argv
+        if not value.startswith("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")
+    ]
     compiler_index = next(
         (
             index
@@ -518,31 +512,34 @@ def _normalize_compile_command(
 
 
 def _static_bind_command(request, resource_path, source_logical, output_name):
+    recorded = request.sk_bind_command
+    if recorded is None:
+        raise ManifestCommandError(
+            "SK Manifest generation requires a recorded sk-bind command"
+        )
     source_reference = _resource_placeholder(resource_path, source_logical)
     output_reference = _output_placeholder(output_name)
-    options = [
-        option
-        for option in request.sk_bind_compile_options
-        if option != "-DCONST_TILING"
-        and not option.startswith("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__")
-    ]
-    options = _normalize_source_include_options(options, request.source_file_path, None)
-    argv = ["${env:ASCEND_HOME_PATH}/bin/bisheng", "-c", "-O3", *options]
-    argv.extend(
-        [
-            "-xcce",
-            source_reference,
-            f"--cce-aicore-arch=dav-{request.chip_version}-cube",
-            "--cce-aicore-only",
-            "-std=c++17",
-            "-DTILING_KEY_VAR=0",
-            "-o",
-            output_reference,
-        ]
+    argv = list(recorded.argv)
+    compiler_index = next(
+        index
+        for index, value in enumerate(argv)
+        if os.path.basename(value) == "bisheng"
     )
+    argv = argv[compiler_index:]
+    argv[0] = "${env:ASCEND_HOME_PATH}/bin/bisheng"
+    argv = _normalize_source_include_options(argv, request.source_file_path, None)
     cann_root = os.environ.get("ASCEND_HOME_PATH", "")
     normalized = []
     for value in argv:
+        if value == recorded.source_path:
+            value = source_reference
+        else:
+            value = _replace_path_token(value, recorded.source_path, source_reference)
+        value = _replace_path_token(value, recorded.output_path, output_reference)
+        if value == "-DCONST_TILING" or value.startswith(
+            "-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__"
+        ):
+            continue
         if cann_root and cann_root in value:
             value = value.replace(cann_root, "${env:ASCEND_HOME_PATH}")
         normalized.append(value)
@@ -798,6 +795,7 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                                 (
                                     record.compiled_symbol,
                                     static_sk_symbol,
+                                    compile_static_sk_symbol,
                                     compile_output,
                                     final_sk_output,
                                 )
@@ -848,6 +846,7 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                     for (
                         dynamic_slave_symbol,
                         static_sk_symbol,
+                        compile_static_sk_symbol,
                         compile_output,
                         final_sk_output,
                     ) in logical_rename_specs:
@@ -858,6 +857,7 @@ def generate_manifest(request: ManifestGenerationRequest) -> ManifestGenerationR
                                     "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
                                     f"--redefine-sym={dynamic_slave_symbol}="
                                     f"{static_sk_symbol}",
+                                    f"--strip-symbol={compile_static_sk_symbol}",
                                     compile_output,
                                     final_sk_output,
                                 ],

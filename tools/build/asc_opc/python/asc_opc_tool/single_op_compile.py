@@ -100,6 +100,17 @@ class SingleOpCompile:
         context.add_addition("kernel_spec_dir", kernel_spec_dir)
         if kernel_spec_mode == "SK":
             context.add_addition("super_kernel_sub_combine", True)
+            if context.get_addition("super_kernel_sub_info") is None:
+                context.add_addition(
+                    "super_kernel_sub_info",
+                    {
+                        "enable_super_kernel": True,
+                        "super_kernel_options": self.__opc_compile_args.get(
+                            OpcOptions.SPK_OPT, ""
+                        ),
+                        "super_kernel_sub_loc": "middle",
+                    },
+                )
 
     def __get_single_check_impl_mode(self, op_info, impl_mode):
         op_func = op_info.get(OpcOptions.OP_FUNC_ATTR)
@@ -358,7 +369,10 @@ class SingleOpCompile:
             OpcOptions.RELOCATABLE_BIN, False
         )
         kernel_spec_mode = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC, "None")
-        enable_super_kernel = op_relocatable_bin or kernel_spec_mode == "SK"
+        if kernel_spec_mode == "None":
+            enable_super_kernel = op_relocatable_bin
+        else:
+            enable_super_kernel = kernel_spec_mode == "SK"
         logger.debug(
             "debug_config {}, enable_super_kernel {}.".format(
                 debug_config, enable_super_kernel
