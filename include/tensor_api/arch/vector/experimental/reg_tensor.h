@@ -24,18 +24,6 @@ namespace te {
 template <typename DataType>
 struct reg_tensor;
 
-template <>
-struct reg_tensor<bool> {
-    using type = bool;
-    using elem_type = bool;
-    using reg_type = typename detail::type_get<bool>::type;
-
-    __simd_callee__ reg_tensor() = default;
-    __simd_callee__ reg_tensor(reg_type regValue) : reg(regValue) {}
-
-    reg_type reg;
-};
-
 template <typename DataType>
 struct reg_tensor {
     using type = DataType;
