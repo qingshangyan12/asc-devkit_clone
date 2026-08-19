@@ -325,6 +325,13 @@ aclError BuildManifestCommand(const Json& manifestCommand, const SelectedManifes
         return ACLRTC_ERROR_FAILURE;
     }
     compilationCommand.executablePath = std::move(expandedExecutable.front());
+    if (!IsAbsoluteExecutableRegularFile(compilationCommand.executablePath)) {
+        ASCENDLOGE(
+            "Manifest command %s requires an absolute path to an existing executable regular file: path=%s; "
+            "check the referenced environment variable and tool installation",
+            compilationCommand.diagnosticLabel.c_str(), compilationCommand.executablePath.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
 
     for (size_t argumentIndex = 1U; argumentIndex < manifestArguments.size(); ++argumentIndex) {
         const std::string argumentLocation = compilationCommand.diagnosticLabel + ".cmd[" +
@@ -351,13 +358,6 @@ aclError BuildManifestCommand(const Json& manifestCommand, const SelectedManifes
         compilationCommand.commandArguments.insert(
             compilationCommand.commandArguments.begin() + static_cast<std::ptrdiff_t>(outputOptionPosition),
             userOptions.begin(), userOptions.end());
-    }
-    if (!IsAbsoluteExecutableRegularFile(compilationCommand.executablePath)) {
-        ASCENDLOGE(
-            "Manifest command %s requires an absolute path to an existing executable regular file: path=%s; "
-            "check the referenced environment variable and tool installation",
-            compilationCommand.diagnosticLabel.c_str(), compilationCommand.executablePath.c_str());
-        return ACLRTC_ERROR_FAILURE;
     }
     return ACLRTC_SUCCESS;
 }
