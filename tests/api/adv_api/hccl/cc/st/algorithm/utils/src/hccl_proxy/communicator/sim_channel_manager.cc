@@ -85,4 +85,33 @@ HcclResult SimChannelMgr::ChannelCommCreate(
     return HCCL_SUCCESS;
 }
 
+HcclResult SimChannelMgr::ChannelCommCreateForCcu(
+    const std::string& commId, const std::string& tag, CommEngine engine, const HcclChannelDesc* channelDescList,
+    uint32_t listNum, ChannelHandle* channelList)
+{
+    for (uint32_t i = 0; i < listNum; ++i) {
+        string channelKey = tag + ":" + to_string(engine) + ":" + to_string(channelDescList[i].remoteRank) + ":" +
+                            to_string(channelDescList[i].channelProtocol);
+        auto channelIdx = channelIdxMap_[channelKey]++;
+
+        shared_ptr<SimChannel> fwdChannel = make_shared<SimChannel>(
+            commId, tag, engine, channelDescList[i].channelProtocol, curRank_, channelDescList[i].remoteRank,
+            channelDescList[i].notifyNum, channelIdx);
+        CHK_RET(fwdChannel->Init());
+
+        shared_ptr<SimChannel> revChannel = make_shared<SimChannel>(
+            commId, tag, engine, channelDescList[i].channelProtocol, channelDescList[i].remoteRank, curRank_,
+            channelDescList[i].notifyNum, channelIdx);
+        CHK_RET(revChannel->Init());
+
+        CHK_RET(fwdChannel->ResExchange(revChannel));
+        CHK_RET(revChannel->ResExchange(fwdChannel));
+
+        channelList[i] = reinterpret_cast<ChannelHandle>(fwdChannel.get());
+        SimChannelExchangeHandler::GetInstance().PutChannel(fwdChannel);
+        SimChannelExchangeHandler::GetInstance().PutChannel(revChannel);
+    }
+    return HCCL_SUCCESS;
+}
+
 } // namespace HcclSim

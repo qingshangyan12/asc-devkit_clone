@@ -195,7 +195,11 @@ HcclResult HcclRankGraphGetEndpointInfo(
     void* info)
 {
     uint32_t* intInfo = static_cast<uint32_t*>(info);
-    *intInfo = 0;
+    if (endpointAttr == EndpointAttr::ENDPOINT_ATTR_DIE_ID) {
+        *intInfo = (endpointDesc->loc.device.devPhyId >= 4) ? 1 : 0;
+    } else {
+        *intInfo = 0;
+    }
     return HCCL_SUCCESS;
 }
 
@@ -385,6 +389,10 @@ HcclResult HcclChannelAcquire(
     auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
     CHK_PTR_NULL(simComm);
     std::string channelTag = "channelTag";
+    if (engine == COMM_ENGINE_CCU) {
+        return simComm->ChannelCommCreateForCcu(
+            simComm->GetIdentifier(), channelTag.c_str(), engine, channelDescList, listNum, channelList);
+    }
     return simComm->ChannelCommCreate(
         simComm->GetIdentifier(), channelTag.c_str(), engine, channelDescList, listNum, channelList);
 }
