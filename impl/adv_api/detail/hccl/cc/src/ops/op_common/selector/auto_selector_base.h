@@ -68,7 +68,9 @@ const std::unordered_map<std::string, std::string> RES_RESUSE_ALG = {
     {"InsRecv", "InsSendRecv"}};
 
 class AutoSelectorBase {
-public:
+public: 
+    virtual ~AutoSelectorBase() = default;
+
     SelectorStatus Select(OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName) const;
     bool IsDefaultAlg(const HcclAlgoType algoType) const;
     bool IsSmallData(const u64 dataSize) const;
