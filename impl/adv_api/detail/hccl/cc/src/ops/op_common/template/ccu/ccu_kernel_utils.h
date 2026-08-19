@@ -24,14 +24,21 @@ inline CcuVersion GetCcuVersion()
 {
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     if (hrtGetDeviceType(deviceType) != HCCL_SUCCESS) {
-        HCCL_WARNING("GetCcuVersion: failed to get device type, degrade to V1");
-        return CcuVersion::CCU_V1;
+        HCCL_ERROR("GetCcuVersion: failed to get device type");
+        return CcuVersion::INVALID;
     }
-    CcuVersion ccuVersion =
-        (deviceType == DevType::DEV_TYPE_950) ? CcuVersion::CCU_V1 : CcuVersion::CCU_V2;
-    if (ccuVersion == CcuVersion::CCU_V2 && !HcommIsSupportCcuV2()) {
-        HCCL_WARNING("GetCcuVersion: HCOMM does not support CCU V2 interfaces, degrade to V1");
+    CcuVersion ccuVersion = CcuVersion::INVALID;
+    if (deviceType == DevType::DEV_TYPE_950) {
         ccuVersion = CcuVersion::CCU_V1;
+    } else if (deviceType == DevType::DEV_TYPE_960) {
+        if (!HcommIsSupportCcuV2()) {
+            HCCL_ERROR("GetCcuVersion: HCOMM does not support complete CCU V2 interfaces");
+            return CcuVersion::INVALID;
+        }
+        ccuVersion = CcuVersion::CCU_V2;
+    } else {
+        HCCL_ERROR("GetCcuVersion: unsupported deviceType[%u]", static_cast<uint32_t>(deviceType));
+        return CcuVersion::INVALID;
     }
     HCCL_INFO(
         "GetCcuVersion: deviceType[%u], ccuVersion[%u]", static_cast<uint32_t>(deviceType),

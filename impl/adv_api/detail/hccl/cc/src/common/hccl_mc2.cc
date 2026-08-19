@@ -342,8 +342,8 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CHK_RET(hrtGetDeviceType(deviceType));
 
-    // 检查设备类型是否支持新流程，950或910_95支持新流程，其他设备走老流程
-    if (deviceType != DevType::DEV_TYPE_950 && deviceType != DevType::DEV_TYPE_950) {
+    // 检查设备类型是否支持新流程，950或960支持新流程，其他设备走老流程
+    if (deviceType != DevType::DEV_TYPE_950 && deviceType != DevType::DEV_TYPE_960) {
         HCCL_ERROR("[%s] invalid deviceType[%u]", __func__, deviceType);
         return HCCL_E_NOT_SUPPORT;
     }
@@ -383,6 +383,11 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
             comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
         HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == CCU_SCHED!");
+        if (GetCcuVersion() == CcuVersion::INVALID) {
+            HCCL_ERROR(
+                "[HcclAllocComResourceByTiling]Failed to resolve a supported CCU version; refusing V1 fallback.");
+            return HCCL_E_NOT_SUPPORT;
+        }
         if (!CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum)) {
             HCCL_INFO("[HcclAllocComResourceByTiling]Current ccu algorithm is not supported in mc2_client.");
             return HCCL_E_ALG_NOT_SUPPORTED;
