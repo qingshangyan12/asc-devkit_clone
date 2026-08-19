@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-将非对齐寄存器中暂存的尾块写入Unified Buffer（UB），用于搬出[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)的**立即数偏移搬出模式**产生的非对齐寄存器。启用Post Update模式在搬出后自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。搬出结束后，目的地址向后偏移立即数`offset`个元素。
+将非对齐寄存器中暂存的尾块写入Unified Buffer（UB），用于搬出[asc_storeunalign_postupdate立即数偏移搬出模式](asc_storeunalign_postupdate.md)产生的非对齐寄存器。启用Post Update模式在搬出后自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。搬出结束后，目的地址向后偏移立即数`offset`个元素。
 
 本接口在Vector Function（`__simd_vf__` 标记的函数）内使用。本接口仅在AIV上生效。
 
@@ -52,7 +52,7 @@ __simd_callee__ inline void asc_storeunalign_post_postupdate(__ubuf__ uint8_t*& 
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|

@@ -118,7 +118,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 
 ### 立即数偏移搬出模式
 
-**表 1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -129,7 +129,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 
 ### 地址寄存器偏移搬出模式
 
-**表 2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -140,7 +140,7 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst,
 
 ### 掩码寄存器搬出模式
 
-**表 3**  参数说明
+**表3** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|

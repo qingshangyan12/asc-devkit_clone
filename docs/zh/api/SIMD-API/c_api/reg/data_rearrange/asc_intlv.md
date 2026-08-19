@@ -82,7 +82,7 @@ __simd_callee__ inline void asc_intlv_b32(vector_bool& dst0,
 
 ### 矢量数据寄存器交织模式
 
-**表 1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -93,7 +93,7 @@ __simd_callee__ inline void asc_intlv_b32(vector_bool& dst0,
 
 ### 掩码寄存器交织模式
 
-**表 2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|

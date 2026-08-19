@@ -58,7 +58,7 @@ __simd_callee__ inline void asc_leakyrelu(vector_half& dst,
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
