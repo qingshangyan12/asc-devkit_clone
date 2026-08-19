@@ -104,7 +104,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_float& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器。dtype须与`src`一致，搬入VL长度数据。 |
+| dst | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。 |
 | src | 输入/输出 | 源UB地址，实际读取地址需32字节对齐。 |
 | block_stride | 输入 | 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。 |
 | repeat_stride | 输入 | Post Update步长，单位为32字节。接口完成本次搬入后，将`src`地址增加`repeat_stride × 32`字节。 |
@@ -128,17 +128,18 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_float& dst,
 
 ### 非连续对齐搬入模式
 
-该模式不支持目的操作数为掩码寄存器。
+- 该模式不支持目的操作数为掩码寄存器。
+- `mask`需通过[掩码设置接口](../reg_data_types/data_type_definition.md#掩码寄存器)预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 

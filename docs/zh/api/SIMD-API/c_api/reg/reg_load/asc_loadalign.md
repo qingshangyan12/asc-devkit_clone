@@ -28,7 +28,7 @@
 
 将Unified Buffer（UB）中起始地址32字节对齐的数据搬入矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。本接口提供四种功能模式：
 
-- **连续对齐搬入模式**：将UB源地址的数据搬入到矢量数据寄存器或掩码寄存器，由用户自行更新源地址。
+- **连续对齐搬入模式**：将Unified Buffer（UB）源地址的数据搬入到矢量数据寄存器或掩码寄存器，由用户自行更新源地址。
 - **立即数偏移搬入模式**：从相对源起始地址偏移指定距离的位置搬入数据。本接口不会自动更新源地址。
 - **地址寄存器偏移搬入模式**：通过地址寄存器指定相对源起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬入场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
 - **非连续对齐搬入模式**：单条指令非连续搬入8个`DataBlock`，每个`DataBlock`的数据量为32字节。支持配置数据块之间的地址步长和起始读取位置。
@@ -146,7 +146,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
-| src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
+| src | 输入 | 源Unified Buffer（UB）地址，实际读取地址需32字节对齐。 |
 
 ### 立即数偏移搬入模式
 
@@ -155,7 +155,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
-| src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
+| src | 输入 | 源Unified Buffer（UB）地址，实际读取地址需32字节对齐。 |
 | offset | 输入 | 相对`src`起始地址的偏移。<br>&bull; 当`dst`为矢量数据寄存器，单位为元素个数。<br>&bull; 当`dst`为掩码寄存器，单位为字节。 |
 
 ### 地址寄存器偏移搬入模式
@@ -165,7 +165,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
-| src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
+| src | 输入 | 源Unified Buffer（UB）地址，实际读取地址需32字节对齐。 |
 | offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。当`dst`为`vector_bool`时，应使用b32模式。 |
 
 ### 非连续对齐搬入模式
@@ -175,10 +175,10 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。 |
-| src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
+| src | 输入 | 源Unified Buffer（UB）地址，实际读取地址需32字节对齐。 |
 | block_stride | 输入 | 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。 |
 | repeat_stride | 输入 | 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。 |
-| mask | 输入 | 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。<br>&bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。<br>&bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。 |
+| mask | 输入 | 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。<br>&bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。<br>&bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使Unified Buffer（UB）越界也不会报错。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -192,9 +192,9 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- 实际读取的UB地址和偏移后的UB地址必须32字节对齐，并且在UB地址空间内且不越界，否则会报错。
-- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 实际读取的Unified Buffer（UB）地址和偏移后的Unified Buffer（UB）地址必须32字节对齐，并且在Unified Buffer（UB）地址空间内且不越界，否则会报错。
+- Unified Buffer（UB）容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。Unified Buffer（UB）地址偏移后不可超过实际可用容量，否则会报错。
+- 如果本指令与其他指令存在Unified Buffer（UB）地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 地址寄存器偏移搬入模式
 
@@ -202,17 +202,18 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 
 ### 非连续对齐搬入模式
 
-该模式不支持目的操作数为掩码寄存器。
+- 该模式不支持目的操作数为掩码寄存器。
+- `mask`需通过[掩码设置接口](../reg_data_types/data_type_definition.md#掩码寄存器)预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
