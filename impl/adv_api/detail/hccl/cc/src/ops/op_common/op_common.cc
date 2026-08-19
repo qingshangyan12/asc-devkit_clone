@@ -48,6 +48,7 @@
 #include "hccl_ccu_res_dl.h"
 #include "ccu_log.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
+#include "kfc_server_protocol.h"
 
 #ifndef MC2_CLIENT_ENABLE_CCU
 #define MC2_CLIENT_ENABLE_CCU 0
@@ -125,19 +126,24 @@ static HcclResult UpdateCcuCtxTokenOnReuse(
     tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
     tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
 
-    // 从 cclBuffer 获取 token 并更新第6个字段（而非 push_back，保证序列化大小一致）
+    // 从 cclBuffer 获取 token 并更新每个 mission 的 token 字段。
     void* cclBufferAddr = nullptr;
     uint64_t cclBufferSize = 0;
     if (HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize) == HCCL_SUCCESS) {
         uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
-        if (tempCtx.kfcServerArgs.size() >= 6U) {
-            tempCtx.kfcServerArgs[5] = token; // 更新占位符为真实 token
-            HCCL_INFO("[UpdateCcuCtxTokenOnReuse] token[%llu] updated at kfcServerArgs[5]", token);
+        for (size_t offset = 0; offset + KFC_SERVER_TOKEN_ARG_INDEX < tempCtx.kfcServerArgs.size();
+             offset += KFC_SERVER_ARG_NUM) {
+            tempCtx.kfcServerArgs[offset + KFC_SERVER_TOKEN_ARG_INDEX] = token;
         }
 
-        // 序列化大小不变（都是6个元素），可以安全更新
         std::vector<char> updatedSeq = tempCtx.Serialize();
-        memcpy_s(ctx, ctxSize, updatedSeq.data(), updatedSeq.size());
+        CHK_PRT_RET(
+            updatedSeq.size() != ctxSize,
+            HCCL_ERROR(
+                "[UpdateCcuCtxTokenOnReuse] serialized size changed, old[%llu], new[%zu]", ctxSize,
+                updatedSeq.size()),
+            HCCL_E_INTERNAL);
+        CHK_SAFETY_FUNC_RET(memcpy_s(ctx, ctxSize, updatedSeq.data(), updatedSeq.size()));
     } else {
         HCCL_WARNING("[UpdateCcuCtxTokenOnReuse] HcclGetHcclBuffer failed, token remains 0");
     }
@@ -1331,15 +1337,18 @@ HcclResult HcclAllocAlgResourceCcu(
     // CCL IN使用所有的CCL Buffer，这个其实就是scratch buffer
     resCtxHost->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
 
-    // 在确保 cclMem 可用的前提下，获取 token 并更新 kfcServerArgs 的第6个字段（占位符）
+    // 在确保 cclMem 可用的前提下，更新所有 mission 的 token 占位符。
     uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
-    if (resCtxHost->kfcServerArgs.size() >= 6U) {
-        resCtxHost->kfcServerArgs[5] = token; // 更新占位符为真实 token
-        HCCL_INFO("[HcclAllocAlgResourceCcu] token[%llu] updated at kfcServerArgs[5]", token);
-    } else {
+    if (resCtxHost->kfcServerArgs.size() < KFC_SERVER_ARG_NUM) {
         HCCL_WARNING(
             "[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < 6, cannot update token",
             resCtxHost->kfcServerArgs.size());
+    } else {
+        for (size_t offset = 0; offset + KFC_SERVER_TOKEN_ARG_INDEX < resCtxHost->kfcServerArgs.size();
+             offset += KFC_SERVER_ARG_NUM) {
+            resCtxHost->kfcServerArgs[offset + KFC_SERVER_TOKEN_ARG_INDEX] = token;
+        }
+        HCCL_INFO("[HcclAllocAlgResourceCcu] token[%llu] updated for all KFC missions", token);
     }
 
     resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;

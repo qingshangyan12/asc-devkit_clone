@@ -516,6 +516,15 @@ static bool IsEndPointEqual(EndpointDesc& endPoint0, EndpointDesc& endPoint1)
            (memcmp(endPoint0.commAddr.eid, endPoint1.commAddr.eid, sizeof(endPoint0.commAddr.eid)) == 0);
 }
 
+static bool IsNhrJettyPortMatched(const EndpointDesc& localEndpoint, const EndpointDesc& remoteEndpoint, bool isIsolation)
+{
+    constexpr u32 portIndex = 5U;
+    constexpr u32 sharedPort = 127U;
+    const u32 localPort = localEndpoint.commAddr.eid[portIndex];
+    const u32 remotePort = remoteEndpoint.commAddr.eid[portIndex];
+    return localPort == remotePort && (isIsolation ? localPort != sharedPort : localPort == sharedPort);
+}
+
 HcclResult GetTopoTypeByLink(HcclComm comm, uint32_t netLayer, CommLink& link, CommTopo& topoType)
 {
 #ifndef AICPU_COMPILE
@@ -529,17 +538,31 @@ HcclResult GetTopoTypeByLink(HcclComm comm, uint32_t netLayer, CommLink& link, C
         uint32_t endPointNum;
         CHK_RET(HcclRankGraphGetEndpointNum(comm, netLayer, topoInstId, &endPointNum));
         EndpointDesc* endPointDescs = (EndpointDesc*)malloc(endPointNum * sizeof(EndpointDesc));
-        CHK_RET(HcclRankGraphGetEndpointDesc(comm, netLayer, topoInstId, &endPointNum, endPointDescs));
-        CHK_RET(HcclRankGraphGetTopoType(comm, netLayer, topoInstId, &topoType));
+        if (endPointDescs == nullptr) {
+            HCCL_ERROR("[%s] malloc endPointDescs failed.", __func__);
+            return HCCL_E_MEMORY;
+        }
+        HcclResult ret = HcclRankGraphGetEndpointDesc(comm, netLayer, topoInstId, &endPointNum, endPointDescs);
+        if (ret != HCCL_SUCCESS) {
+            free(endPointDescs);
+            return ret;
+        }
+        ret = HcclRankGraphGetTopoType(comm, netLayer, topoInstId, &topoType);
+        if (ret != HCCL_SUCCESS) {
+            free(endPointDescs);
+            return ret;
+        }
         HCCL_DEBUG("[%s]topoInstId=%u, endPointNum=%u, topoType=%u", __func__, topoInstId, endPointNum, topoType);
         for (uint32_t endPointIdx = 0; endPointIdx < endPointNum; endPointIdx++) {
             EndpointDesc endPoint = endPointDescs[endPointIdx];
             if (IsEndPointEqual(link.srcEndpointDesc, endPoint) ==
                 true) { // 当前TopoInst和link的endPoint相同，说明link属于当前TopoInst
+                free(endPointDescs);
                 return HCCL_SUCCESS;
             }
         }
         HCCL_WARNING("[%s]No Endpoint matches on TopoInst[%u].", __func__, topoInstId);
+        free(endPointDescs);
     }
     HCCL_ERROR("[%s]Cannot get TopoType by Link.", __func__);
     return HCCL_E_INTERNAL;
@@ -610,6 +633,47 @@ HcclResult ProcessLinksForChannel(
     return HCCL_SUCCESS;
 }
 
+static HcclResult ProcessLinksForNhrMultiJetty(
+    HcclComm comm, CommProtocol expectedProtocol, std::vector<CommLink>& linkList, u32 remoteRank,
+    uint32_t netLayer, std::vector<HcclChannelDesc>& channels, bool isIsolation)
+{
+#ifndef AICPU_COMPILE
+    constexpr u32 minIsolatedLinkCount = 8U;
+    if (linkList.size() < minIsolatedLinkCount) {
+        isIsolation = false;
+    }
+    for (CommLink& link : linkList) {
+        if (link.linkAttr.linkProtocol != expectedProtocol) {
+            continue;
+        }
+        CommTopo topoType;
+        CHK_RET(GetTopoTypeByLink(comm, netLayer, link, topoType));
+        if (topoType != CommTopo::COMM_TOPO_CLOS ||
+            !IsNhrJettyPortMatched(link.srcEndpointDesc, link.dstEndpointDesc, isIsolation)) {
+            continue;
+        }
+
+        HcclChannelDesc channelDesc;
+        HcclChannelDescInit(&channelDesc, 1);
+        channelDesc.remoteRank = remoteRank;
+        channelDesc.localEndpoint = link.srcEndpointDesc;
+        channelDesc.remoteEndpoint = link.dstEndpointDesc;
+        channelDesc.channelProtocol = link.srcEndpointDesc.protocol;
+        channelDesc.notifyNum = NORMAL_NOTIFY_NUM;
+        channels.push_back(channelDesc);
+    }
+#else
+    (void)comm;
+    (void)expectedProtocol;
+    (void)linkList;
+    (void)remoteRank;
+    (void)netLayer;
+    (void)channels;
+    (void)isIsolation;
+#endif
+    return HCCL_SUCCESS;
+}
+
 HcclResult CalcChannelRequestMesh1DWithPriorityTopo(
     HcclComm comm, const OpParam& param, const TopoInfo* topoInfo, const std::vector<std::vector<u32>>& subcommInfo,
     std::vector<HcclChannelDesc>& channels, CommTopo priorityTopo)
@@ -659,6 +723,64 @@ HcclResult CalcChannelRequestNHRWithPriorityTopo(
         }
     }
     HCCL_INFO("[%s] success.", __func__);
+#endif
+    return HCCL_SUCCESS;
+}
+
+HcclResult CalcChannelRequestNhrMultiJetty(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation)
+{
+#ifndef AICPU_COMPILE
+    channels.clear();
+    CHK_PRT_RET(
+        subcommInfo.empty(), HCCL_ERROR("[CalcChannelRequestNhrMultiJetty] subcommInfo is empty."), HCCL_E_PARA);
+    const u32 myRank = topoInfo->userRank;
+    auto rankIt = std::find(subcommInfo[0].begin(), subcommInfo[0].end(), myRank);
+    CHK_PRT_RET(
+        rankIt == subcommInfo[0].end(),
+        HCCL_ERROR("[CalcChannelRequestNhrMultiJetty] rank[%u] is not in subcommInfo.", myRank), HCCL_E_PARA);
+
+    const u32 localRank = static_cast<u32>(std::distance(subcommInfo[0].begin(), rankIt));
+    std::set<u32> connectRanks;
+    CHK_RET(CalcNHRChannelConnect(localRank, subcommInfo[0].size(), INVALID_VALUE_RANKID, connectRanks));
+    const CommProtocol expectedProtocol = param.engine == CommEngine::COMM_ENGINE_AIV ?
+                                              CommProtocol::COMM_PROTOCOL_UB_MEM :
+                                              CommProtocol::COMM_PROTOCOL_UBC_CTP;
+    for (u32 rankIdx : connectRanks) {
+        const size_t channelCountBefore = channels.size();
+        uint32_t* netLayers = nullptr;
+        uint32_t netLayerNum = 0;
+        CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum));
+        for (uint32_t layerIdx = 0; layerIdx < netLayerNum; ++layerIdx) {
+            CommLink* linkList = nullptr;
+            u32 linkCount = 0;
+            const u32 remoteRank = subcommInfo[0][rankIdx];
+            CHK_RET(HcclRankGraphGetLinks(comm, netLayers[layerIdx], myRank, remoteRank, &linkList, &linkCount));
+            if (linkCount == 0U) {
+                continue;
+            }
+            std::vector<CommLink> links(linkList, linkList + linkCount);
+            CHK_RET(ProcessLinksForNhrMultiJetty(
+                comm, expectedProtocol, links, remoteRank, netLayers[layerIdx], channels, isIsolation));
+            if (channels.size() > channelCountBefore) {
+                break;
+            }
+        }
+        CHK_PRT_RET(
+            channels.size() == channelCountBefore,
+            HCCL_ERROR(
+                "[CalcChannelRequestNhrMultiJetty] no CLOS channel between rank[%u] and rank[%u].", myRank,
+                subcommInfo[0][rankIdx]),
+            HCCL_E_INTERNAL);
+    }
+#else
+    (void)comm;
+    (void)param;
+    (void)topoInfo;
+    (void)subcommInfo;
+    (void)channels;
+    (void)isIsolation;
 #endif
     return HCCL_SUCCESS;
 }
