@@ -49,7 +49,7 @@ if(NOT EXISTS ${ASC_COMM_INCLUDE_DIR})
     message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing include dir: ${ASC_COMM_INCLUDE_DIR}")
 endif()
 
-set(ASC_COMM_AICPU_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/pod_only/include/aicpu/hcomm)
+set(ASC_COMM_AICPU_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/include/aicpu/hcomm)
 if(NOT EXISTS ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR})
     message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public aicpu headers: ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR}")
 endif()
