@@ -335,7 +335,7 @@ TEST_F(CcuMc2TestSuite, CheckCcuKfcFlow_RejectsAllGatherReduceScatterMix)
     EXPECT_EQ(CheckCcuKfcFlow(&initTiling, ccTilingList, 2U), HCCL_E_NOT_SUPPORT);
 }
 
-TEST_F(CcuMc2TestSuite, GetCcuVersion_UsesRuntimeDeviceAndDegradesWhenV2IsUnavailable)
+TEST_F(CcuMc2TestSuite, GetCcuVersion_UsesRuntimeDeviceAndRejectsUnavailableV2)
 {
     auto& simNpu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(g_stubRankId);
     simNpu.SetDevType(DevType::DEV_TYPE_950);
@@ -345,7 +345,7 @@ TEST_F(CcuMc2TestSuite, GetCcuVersion_UsesRuntimeDeviceAndDegradesWhenV2IsUnavai
     EXPECT_EQ(GetCcuVersion(), CcuVersion::CCU_V2);
 
     mc2_ops_hccl::g_stubHcommCcuV2Supported = false;
-    EXPECT_EQ(GetCcuVersion(), CcuVersion::CCU_V1);
+    EXPECT_EQ(GetCcuVersion(), CcuVersion::INVALID);
 }
 
 TEST_F(CcuMc2TestSuite, GetParallelParam_V1V2GoldenValues)
@@ -444,6 +444,19 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
     EXPECT_NE(ctx->ckeAddr, 0U);
     EXPECT_EQ(ctx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuAllGatherMeshMem2Mem1D));
+}
+
+TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPathRejectsUnavailableV2)
+{
+    auto& simNpu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(g_stubRankId);
+    simNpu.SetDevType(DevType::DEV_TYPE_960);
+    mc2_ops_hccl::g_stubHcommCcuV2Supported = false;
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    void* opResCtx = nullptr;
+
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(opResCtx, nullptr);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuAlgorithmNotRegistered)
