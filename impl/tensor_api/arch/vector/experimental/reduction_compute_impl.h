@@ -22,7 +22,7 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REDUCTION_COMPUTE_IMPL_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REDUCTION_COMPUTE_IMPL_H
 
-#include "include/tensor_api/utils/utils.h"
+#include "tensor_api/utils/utils.h"
 #include "tensor_api/arch/vector/experimental/reg_tensor.h"
 
 namespace asc {
