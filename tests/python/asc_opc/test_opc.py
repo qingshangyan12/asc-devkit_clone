@@ -992,8 +992,7 @@ class TestOpc02(unittest.TestCase):
     def test_kernel_spec_accepts_normal_and_sk(self):
         for mode, relocatable in (
             ("Normal", "false"),
-            ("Normal", "true"),
-            ("SK", "true"),
+            ("SK", "false"),
         ):
             with self.subTest(mode=mode), tempfile.TemporaryDirectory() as output_dir:
                 with RequiredValidArgs() as required_args:
@@ -1011,19 +1010,47 @@ class TestOpc02(unittest.TestCase):
                     options[OpcOptions.KERNEL_SPEC_DIR], os.path.realpath(output_dir)
                 )
 
+    def test_kernel_spec_none_accepts_relocatable_binary(self):
+        with RequiredValidArgs() as required_args:
+            sys.argv = required_args + [
+                "--op_relocatable_kernel_binary=true",
+            ]
+            _, result_parser = opc.parse_args()
+
+        self.assertTrue(result_parser.check_input_params())
+        self.assertTrue(result_parser.get_option(OpcOptions.RELOCATABLE_BIN))
+
     def test_kernel_spec_rejects_invalid_combinations(self):
         cases = (
             ("invalid mode", ["--kernel-spec=All"]),
             ("normal without dir", ["--kernel-spec=Normal"]),
             ("sk without dir", ["--kernel-spec=SK"]),
+            (
+                "normal with relocatable binary",
+                [
+                    "--kernel-spec=Normal",
+                    "--kernel-spec-dir={}",
+                    "--op_relocatable_kernel_binary=true",
+                ],
+            ),
+            (
+                "sk with relocatable binary",
+                [
+                    "--kernel-spec=SK",
+                    "--kernel-spec-dir={}",
+                    "--op_relocatable_kernel_binary=true",
+                ],
+            ),
         )
         for name, args in cases:
             with self.subTest(name=name):
-                with RequiredValidArgs() as required_args:
-                    sys.argv = required_args + args
-                    _, result_parser = opc.parse_args()
+                with tempfile.TemporaryDirectory() as output_dir:
+                    args = [arg.format(output_dir) for arg in args]
+                    with RequiredValidArgs() as required_args:
+                        sys.argv = required_args + args
+                        _, result_parser = opc.parse_args()
 
-                self.assertFalse(result_parser.check_input_params())
+                    self.assertFalse(result_parser.check_input_params())
 
     def test_options_parse_24(self):
         """

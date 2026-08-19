@@ -645,6 +645,12 @@ class OpcOptionParser:
         if kernel_spec == "None":
             return True
 
+        if self.get_option(OpcOptions.RELOCATABLE_BIN):
+            logger.error(
+                "kernel-spec cannot be used with op_relocatable_kernel_binary."
+            )
+            return False
+
         kernel_spec_dir = self.get_option(OpcOptions.KERNEL_SPEC_DIR)
         if not kernel_spec_dir:
             logger.error("kernel-spec-dir is required when kernel-spec is enabled.")
