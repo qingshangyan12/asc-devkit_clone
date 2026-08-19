@@ -38,6 +38,25 @@ __simd_callee__ inline void asc_half2int16_rna_sat_impl(vector_int16_t& dst, vec
         vcvt(dst, src, mask, ROUND_A, RS_ENABLE, MODE_ZEROING);
     }
 }
+// ASC_RETURN_VALUE_VCONV_IMPL
+__simd_callee__ inline vector_int16_t asc_half2int16_rna_impl(
+    vector_half src,
+    vector_bool mask)
+{
+    vector_int16_t dst{};
+    asc_half2int16_rna_impl(dst, src, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_half2int16_rna_sat_impl(
+    vector_half src,
+    vector_bool mask)
+{
+    vector_int16_t dst{};
+    asc_half2int16_rna_sat_impl(dst, src, mask);
+    return dst;
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
