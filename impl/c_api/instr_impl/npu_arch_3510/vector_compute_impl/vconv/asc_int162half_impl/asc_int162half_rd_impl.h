@@ -31,6 +31,16 @@ __simd_callee__ inline void asc_int162half_rd_impl(vector_half& dst, vector_int1
     }
 }
 
+// ASC_RETURN_VALUE_VCONV_IMPL
+__simd_callee__ inline vector_half asc_int162half_rd_impl(
+    vector_int16_t src,
+    vector_bool mask)
+{
+    vector_half dst{};
+    asc_int162half_rd_impl(dst, src, mask);
+    return dst;
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
