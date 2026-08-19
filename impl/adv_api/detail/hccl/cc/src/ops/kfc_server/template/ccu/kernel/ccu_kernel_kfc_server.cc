@@ -135,13 +135,14 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
     }
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_HALF_ALLTOALLV))
     {
-        // xn 布局见 CcuPrepareForAllToAllVWrite：
-        // [1]=sendBuf [2]=sendSizes [3]=sendOffsets [4..7]=goSize [8]=remoteWinOffset
+        // 阶段二 xn 布局：
+        // [0]=missionId [1]=sendBuf [2]=sendSizes [3]=sendOffsets
+        // [4..7]=goSize [8]=remoteWinOffset [9]=tokenInfo
         CcuKfcHalfAlltoAllVMesh1DKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
-            ctx.token, ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
-            ctx.arg->rankId, ctx.arg->localWinAddr);
+            param[HBM_PARAM_IDX_0], param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
+            param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
+            param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9], ctx.arg->channels, ctx.arg->channelCount,
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->localWinAddr);
     }
 }
 

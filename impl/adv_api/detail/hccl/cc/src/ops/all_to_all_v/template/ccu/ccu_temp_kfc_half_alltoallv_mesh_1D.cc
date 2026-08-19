@@ -127,15 +127,39 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::KernelRun(
     config.memSlice = CCU_MS_SIZE * LOCAL_COPY_MS_PER_LOOP;
     const auto goSize = CalGoSize(localSliceSize, config);
 
-    CcuKernelSubmitInfo submitInfo{};
-    submitInfo.kernelHandle = templateResource.ccuKernels[0];
-    // 顺序须与设备侧 CcuPrepareForAllToAllVWrite 的 xnData_ 布局一致：
-    // xn[1]=sendBuf, xn[2]=sendSizes, xn[3]=sendOffsets, xn[4..7]=goSize, xn[8]=remoteWinOffset
+    // 阶段二：推 2 个 submitInfo，KFC Server 循环队列顺序处理 Mission 0 → Mission 1
+    // Mission 0 — 搬运前半数据（sendSizeA / sendOffsetA）
+    CcuKernelSubmitInfo submitInfo0{};
+    submitInfo0.kernelHandle = templateResource.ccuKernels[0];
+    // 阶段二参数顺序：
+    // xn[0]=missionId, xn[1]=sendBuf, xn[2]=sendSizes, xn[3]=sendOffsets,
+    // xn[4..7]=goSize, xn[8]=remoteWinOffset, xn[9]=tokenInfo
     (void)myBufferAddr;
     CHK_RET(FillCachedArgs(
-        submitInfo, userInAddr, sendSizeAddr, sendOffsetAddr, goSize[0], goSize[1], goSize[2], goSize[3], recvOffset,
+        submitInfo0,
+        0ULL,           // missionId = 0
+        userInAddr,     // xn[1]
+        sendSizeAddr,   // xn[2] - 同一地址，device 侧根据 missionId 偏移读取
+        sendOffsetAddr, // xn[3]
+        goSize[0], goSize[1], goSize[2], goSize[3],  // xn[4..7]
+        recvOffset,     // xn[8]
+        token));        // xn[9]
+    templateResource.submitInfos.push_back(submitInfo0);
+
+    // Mission 1 — 搬运后半数据（sendSizeB / sendOffsetB）
+    CcuKernelSubmitInfo submitInfo1{};
+    submitInfo1.kernelHandle = templateResource.ccuKernels[0];
+    CHK_RET(FillCachedArgs(
+        submitInfo1,
+        1ULL,           // missionId = 1（唯一差异）
+        userInAddr,
+        sendSizeAddr,   // 同一地址，kernel 内部根据 missionId 偏移
+        sendOffsetAddr,
+        goSize[0], goSize[1], goSize[2], goSize[3],
+        recvOffset,
         token));
-    templateResource.submitInfos.push_back(submitInfo);
+    templateResource.submitInfos.push_back(submitInfo1);
+
     return HcclResult::HCCL_SUCCESS;
 }
 

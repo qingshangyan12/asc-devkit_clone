@@ -17,22 +17,20 @@ namespace mc2_ops_hccl {
 // MC2 变长 AllToAll。sendSizes/sendOffsets 由 AIC 运行时写入设备内存，故此处只收地址，
 // 由 kernel 用 ccu::Load 批量读入，与 hcomm 源实现的 LoadArgsFromMem 语义一致。
 //
-// 参数顺序必须与设备侧 CcuPrepareForAllToAllVWrite 写入 xnData_ 的顺序严格一致
-// （hccl_ccu_v0_prepare.h:64）：
-//   xn[0]=opId(签名)  xn[1]=sendBuf  xn[2]=sendSizes  xn[3]=sendOffsets
-//   xn[4..7]=goSize[0..3]  xn[8]=remoteWinOffset
+// 阶段二参数顺序（必须与 CcuPrepareForAllToAllVWrite 写入 xnData_ 的顺序严格一致）：
+//   xn[0]=missionId  xn[1]=sendBuf  xn[2]=sendSizes  xn[3]=sendOffsets
+//   xn[4..7]=goSize[0..3]  xn[8]=remoteWinOffset  xn[9]=tokenInfo
 // 对应 AIC 侧 API：AlltoAllvWrite(usrIn, sendOffsets, sendSizes, remoteWinOffset, localDataSize)
-// 且 hccl_ccu_v0.h:269 的 ccuUsedXnNum_ = 9 与此处 9 个 xn 参数吻合。
+// 且 hccl_ccu_v0.h:269 的 ccuUsedXnNum_ 需更新为 10（新增 missionId + tokenInfo 显式化）。
 //
-// 阶段一：单 mission 承担全部数据（missionId 固化为 0），只读 A 片槽位，
-// 语义等同常规 1D Fullmesh AllToAllV。A/B 双片内存布局保持不变，阶段二恢复双 mission
-// 时无需改动 host 侧参数打包。
+// 阶段二：双 mission 顺序执行，missionId=0 搬 A 片，missionId=1 搬 B 片。
+// Mission 1 写入时需加 chunk 偏移（跳过 A 片），本地拷贝和 PostSync 仅 Mission 0 执行。
 // localWinAddr 为建图期常量（本端 window 基址），非运行时 xn 参数。
 CcuResult CcuKfcHalfAlltoAllVMesh1DKernel(
-    ccu::Variable userInAddr, ccu::Variable sendSizeAddr, ccu::Variable sendOffsetAddr, ccu::Variable goSize0,
-    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable recvOffset,
-    ccu::Variable tokenInfo, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    uint64_t localWinAddr);
+    ccu::Variable missionId, ccu::Variable userInAddr, ccu::Variable sendSizeAddr, ccu::Variable sendOffsetAddr,
+    ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
+    ccu::Variable recvOffset, ccu::Variable tokenInfo, const ChannelHandle channels[], uint32_t channelCount,
+    uint32_t rankSize, uint32_t rankId, uint64_t localWinAddr);
 
 } // namespace mc2_ops_hccl
 
