@@ -51,7 +51,7 @@ private:
 
 std::string ReadTextFile(const fs::path& filePath)
 {
-    std::ifstream inputStream(filePath);
+    std::ifstream inputStream(filePath.string());
     return std::string(std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>());
 }
 

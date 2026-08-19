@@ -29,7 +29,7 @@ namespace fs = boost::filesystem;
 
 bool ReadSourceFileContents(const fs::path& sourceFilePath, std::string& sourceFileContents)
 {
-    std::ifstream inputStream(sourceFilePath, std::ios::in | std::ios::binary);
+    std::ifstream inputStream(sourceFilePath.string(), std::ios::in | std::ios::binary);
     if (!inputStream) {
         const int openError = errno;
         ASCENDLOGE("Failed to open source patch file: path=%s errno=%d message=%s",
@@ -66,7 +66,8 @@ bool WritePatchedSourceFileAtomically(const fs::path& sourceFilePath, const std:
         sourceFilePath.string() + ".aclrtc_patch_" + std::to_string(getpid()) + "_" +
         std::to_string(temporaryPatchFileSequence.fetch_add(1U, std::memory_order_relaxed));
     {
-        std::ofstream outputStream(temporaryFilePath, std::ios::out | std::ios::binary | std::ios::trunc);
+        std::ofstream outputStream(
+            temporaryFilePath.string(), std::ios::out | std::ios::binary | std::ios::trunc);
         if (!outputStream) {
             const int createError = errno;
             ASCENDLOGE("Failed to create temporary source patch file: path=%s errno=%d message=%s",
