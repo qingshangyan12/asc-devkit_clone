@@ -35,15 +35,18 @@ struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::Variable normalSliceSize;
     ccu::Variable lastSliceSize;
     ccu::Variable isInputOutputEqual;
+    // Kept to consume queue payload slots [5..8].  The KFC path must not
+    // create a GroupCopy/LoopGroup from inside the server's persistent loop.
     GroupOpSizeVars goSize;
     ccu::LocalAddr srcLocCopy;
     ccu::LocalAddr localDst;
     std::vector<ccu::Event> events;
+    ccu::Event localCopyEvent;
 
     ccu::Variable constVar1;
     ccu::Variable repeatTimeFlag;
     ccu::Variable waitRepeatNum;
-    ccu::Variable groupCopyRepeatNum;
+    ccu::Variable localCopyRepeatNum;
     ccu::Variable sliceSize;
     ccu::LocalAddr src;
     std::vector<ccu::RemoteAddr> dst;
@@ -194,22 +197,30 @@ static CcuResult DoAllGatherWait(KfcAllGatherMesh1DMem2MemContext& ctx, uint32_t
     return CCU_SUCCESS;
 }
 
-static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
+static CcuResult DoAllGatherLocalCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
     CCU_IF(ctx.isInputOutputEqual == 0)
     {
-        CCU_IF(ctx.groupCopyRepeatNum != UINT64_MAX)
+        CCU_IF(ctx.localCopyRepeatNum != UINT64_MAX)
         {
             ctx.repeatTimeFlag = 0;
-            CCU_WHILE(ctx.groupCopyRepeatNum != UINT64_MAX)
+            CCU_WHILE(ctx.localCopyRepeatNum != UINT64_MAX)
             {
-                ctx.groupCopyRepeatNum += ctx.constVar1;
+                ctx.localCopyRepeatNum += ctx.constVar1;
                 CCU_IF(ctx.repeatTimeFlag != 0)
                 {
                     ctx.localDst.addr += ctx.outputRepeatStride;
                     ctx.srcLocCopy.addr += ctx.inputRepeatStride;
                 }
-                CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcLocCopy, ctx.goSize));
+                // The KFC subkernel is emitted inside the server's persistent
+                // CCU_WHILE. GroupCopy creates a two-loop LoopGroup there,
+                // which the KFC server runtime rejects when adding the second
+                // loop.
+                // Use the direct mem-to-mem primitive already used by other
+                // KFC kernels, and wait before reusing its event in the next
+                // repeat.
+                CCU_CHK_RET(ccu::LocalCopy(ctx.localDst, ctx.srcLocCopy, ctx.sliceSize, ctx.localCopyEvent, 1));
+                CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));
                 ctx.repeatTimeFlag = 1;
             }
         }
@@ -221,7 +232,7 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
     CCU_CHK_RET(InitAllGatherAddr(ctx));
     ctx.waitRepeatNum = ctx.tmpRepeatNum;
-    ctx.groupCopyRepeatNum = ctx.tmpRepeatNum;
+    ctx.localCopyRepeatNum = ctx.tmpRepeatNum;
 
     // Phase 1: issue all remote writes first, with one event group per unrolled repeat.
     CCU_IF(ctx.tmpRepeatNum != UINT64_MAX)
@@ -244,7 +255,7 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
     }
 
     // Phase 2: copy this rank's slice locally while remote writes are in flight.
-    CCU_CHK_RET(DoAllGatherGroupCopy(ctx));
+    CCU_CHK_RET(DoAllGatherLocalCopy(ctx));
 
     // Phase 3: wait for every unrolled write group before leaving this round.
     for (uint32_t unrollIdx = 0; unrollIdx < AG_M2M_UNROLL_NUM; ++unrollIdx) {
@@ -276,7 +287,8 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
         goSize3, currentRankSliceInputOffset, tmpRepeatNum, inputRepeatStride, outputRepeatStride, lastSliceSize,
         isInputOutputEqual));
     HCCL_INFO(
-        "[KFC][AllGather][Kernel] rankId[%u], rankSize[%u], channelCount[%u], unroll[%u]",
+        "[KFC][AllGather][Kernel] rankId[%u], rankSize[%u], channelCount[%u], unroll[%u], "
+        "localCopy[direct]",
         rankId, rankSize, channelCount, AG_M2M_UNROLL_NUM);
 
     CCU_CHK_RET(PreSync(ctx));
