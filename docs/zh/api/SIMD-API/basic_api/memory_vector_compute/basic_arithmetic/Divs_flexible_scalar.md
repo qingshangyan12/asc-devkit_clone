@@ -28,7 +28,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_vec_binary_scalar_intf.h"`。
 
-Divs属于双目标量类计算接口，矢量内每个元素和标量间取较小值，支持标量在前和标量在后两种场景。其中标量输入支持配置LocalTensor单点元素，计算公式如下：
+Divs属于双目标量类计算接口，用于将矢量中的每个元素与标量相除，支持标量作为被除数或除数两种场景。其中标量输入支持配置LocalTensor单点元素，计算公式如下：
 
 $dst_i = src_i \div scalar$
 
@@ -106,9 +106,9 @@ $dst_i = scalar \div src_i$
 
 <!-- npu="950" id9 -->
 - 针对Ascend 950PR/Ascend 950DT：该接口通过VF调用[Reg矢量计算API](../../reg_vector_compute/reg_vector_compute.md)实现兼容，当参数count或repeatTime取值为0时，软仿行为不保证该接口被视为NOP（空操作）。
-- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
-  - tensor高维切分计算占用8KB Unified Buffer。
-  - tensor前n个数据连续计算不涉及8KB Unified Buffer的占用。
+- 对Unified Buffer（UB）空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+  - tensor高维切分计算占用8KB UB。
+  - tensor前n个数据连续计算不涉及8KB UB的占用。
 - 针对Ascend 950PR/Ascend 950DT，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
 <!-- end id9 -->
 
