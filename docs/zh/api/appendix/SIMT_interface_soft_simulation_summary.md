@@ -125,14 +125,14 @@
 
 | API名 | 非软仿数据类型 | 软仿数据类型 |
 | --- | --- | --- |
-| [asc_atomic_add](../SIMT-API/atomic_operations/asc_atomic_add.md) | int32_t、uint32_t、float、half、bfloat16_t、half2、bfloat16x2_t | - |
+| [asc_atomic_add](../SIMT-API/atomic_operations/asc_atomic_add.md) | int32_t、uint32_t、int64_t、uint64_t、float、half、bfloat16_t、half2、bfloat16x2_t | - |
 | [asc_atomic_and](../SIMT-API/atomic_operations/asc_atomic_and.md) | - | int32_t、uint32_t、int64_t、uint64_t |
 | [asc_atomic_cas](../SIMT-API/atomic_operations/asc_atomic_cas.md) | uint32_t、uint64_t | int32_t、int64_t、float、half2、bfloat16x2_t |
 | [asc_atomic_dec](../SIMT-API/atomic_operations/asc_atomic_dec.md) | - | uint32_t、uint64_t |
 | [asc_atomic_exch](../SIMT-API/atomic_operations/asc_atomic_exch.md) | uint32_t、uint64_t | int32_t、int64_t、float、half2、bfloat16x2_t |
 | [asc_atomic_inc](../SIMT-API/atomic_operations/asc_atomic_inc.md) | - | uint32_t、uint64_t |
-| [asc_atomic_max](../SIMT-API/atomic_operations/asc_atomic_max.md) | int32_t、uint32_t、float、half、bfloat16_t、half2、bfloat16x2_t | - |
-| [asc_atomic_min](../SIMT-API/atomic_operations/asc_atomic_min.md) | int32_t、uint32_t、float、half、bfloat16_t、half2、bfloat16x2_t | - |
+| [asc_atomic_max](../SIMT-API/atomic_operations/asc_atomic_max.md) | int32_t、uint32_t、int64_t、uint64_t、float、half、bfloat16_t、half2、bfloat16x2_t | - |
+| [asc_atomic_min](../SIMT-API/atomic_operations/asc_atomic_min.md) | int32_t、uint32_t、int64_t、uint64_t、float、half、bfloat16_t、half2、bfloat16x2_t | - |
 | [asc_atomic_or](../SIMT-API/atomic_operations/asc_atomic_or.md) | - | int32_t、uint32_t、int64_t、uint64_t |
 | [asc_atomic_sub](../SIMT-API/atomic_operations/asc_atomic_sub.md) | half、bfloat16_t | int32_t、uint32_t、float、int64_t、uint64_t、half2、bfloat16x2_t |
 | [asc_atomic_xor](../SIMT-API/atomic_operations/asc_atomic_xor.md) | - | int32_t、uint32_t、int64_t、uint64_t |
