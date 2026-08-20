@@ -19,7 +19,8 @@
 #define IMPL_TENSOR_API_ARCH_UTILS_REG_COMPUTE_TRAITS_H
 
 #include "tensor_api/arch/vector/experimental/reg_tensor.h"
-#include "impl/tensor_api/utils/utils_impl.h"
+#include "tensor_api/utils/utils.h"
+#include "utils/std/type_traits.h"
 
 namespace asc {
 namespace te {
