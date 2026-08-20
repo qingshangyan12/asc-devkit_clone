@@ -26,7 +26,6 @@ Tensor API Reg 矢量计算接口以 `asc::te::reg_tensor<T>` 为输入和返回
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/basic_arithmetic.h"
 
 __simd_vf__ inline void reg_vector_compute_example(

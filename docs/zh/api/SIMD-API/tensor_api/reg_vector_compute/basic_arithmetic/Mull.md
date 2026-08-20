@@ -77,7 +77,6 @@ __simd_callee__ inline decltype(auto) mull(
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/basic_arithmetic.h"
 
 __simd_vf__ inline void mull_example(__ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1,

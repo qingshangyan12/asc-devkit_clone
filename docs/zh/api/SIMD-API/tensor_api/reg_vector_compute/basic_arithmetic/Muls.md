@@ -86,7 +86,6 @@ __simd_callee__ inline decltype(auto) operator*(const T& a, const U& b);
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/basic_arithmetic.h"
 
 __simd_vf__ inline void mul_scalar_example(__ubuf__ float* src, __ubuf__ float* dst)

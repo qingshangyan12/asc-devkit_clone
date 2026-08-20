@@ -86,7 +86,6 @@ __simd_callee__ inline decltype(auto) axpy(
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/composite_compute.h"
 
 __simd_vf__ inline void axpy_example(

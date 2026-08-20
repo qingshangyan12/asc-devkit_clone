@@ -91,7 +91,6 @@ __simd_callee__ inline decltype(auto) muls_cast(
 ```cpp
 #include "c_api/asc_simd.h"
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/composite_compute.h"
 
 __simd_vf__ inline void muls_cast_example(__ubuf__ float* src, __ubuf__ float* dst)

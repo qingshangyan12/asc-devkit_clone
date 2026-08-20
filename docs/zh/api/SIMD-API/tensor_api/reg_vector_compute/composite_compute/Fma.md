@@ -81,7 +81,6 @@ __simd_callee__ inline decltype(auto) fma(
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/composite_compute.h"
 
 __simd_vf__ inline void fma_example(__ubuf__ float* src0, __ubuf__ float* src1,

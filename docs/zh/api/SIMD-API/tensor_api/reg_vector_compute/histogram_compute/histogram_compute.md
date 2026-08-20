@@ -5,7 +5,6 @@
 ## 头文件
 
 ```cpp
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/histogram_compute.h"
 ```
 

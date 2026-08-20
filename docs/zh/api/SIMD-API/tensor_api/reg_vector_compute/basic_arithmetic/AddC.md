@@ -98,7 +98,6 @@ __simd_callee__ inline decltype(auto) add_c(
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/basic_arithmetic.h"
 
 __simd_vf__ inline void add_with_carry_example(

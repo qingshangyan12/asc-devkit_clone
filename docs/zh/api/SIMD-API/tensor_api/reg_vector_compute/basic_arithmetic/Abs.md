@@ -80,7 +80,6 @@ __simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg);
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/basic_arithmetic.h"
 
 __simd_vf__ inline void abs_example(__ubuf__ float* src, __ubuf__ float* dst)

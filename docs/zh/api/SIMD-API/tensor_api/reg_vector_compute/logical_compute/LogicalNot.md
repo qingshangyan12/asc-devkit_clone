@@ -84,7 +84,6 @@ __simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src);
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/logical_compute.h"
 
 __simd_vf__ inline void logical_not_example(__ubuf__ int32_t* src, __ubuf__ int32_t* dst)

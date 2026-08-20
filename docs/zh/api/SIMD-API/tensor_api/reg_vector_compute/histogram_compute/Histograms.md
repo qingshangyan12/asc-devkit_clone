@@ -88,7 +88,6 @@ __simd_callee__ inline decltype(auto) histograms(
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/histogram_compute.h"
 
 constexpr asc::te::histogram_options high_options {

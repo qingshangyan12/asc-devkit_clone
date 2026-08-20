@@ -81,7 +81,6 @@ __simd_callee__ inline decltype(auto) operator&(const T& a, const U& b);
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/logical_compute.h"
 
 __simd_vf__ inline void bit_and_example(
