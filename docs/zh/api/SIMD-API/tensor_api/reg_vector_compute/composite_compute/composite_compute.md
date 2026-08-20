@@ -5,13 +5,19 @@
 ## 头文件
 
 ```cpp
+#include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/experimental/reg/composite_compute.h"
 ```
 
 ## 产品支持情况
 
-- Ascend 950PR/Ascend 950DT：支持。
-- 其他产品：不支持。
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
 
 ## 接口列表
 
@@ -27,3 +33,6 @@
 
 - 接口返回新的 `reg_tensor`，不会要求调用方预先声明输出对象。
 - 各接口支持的数据类型和参数形式见对应接口文档。
+- 接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用。
+- 多输入接口使用文档指定的第一个输入寄存器 `mask` 作为执行 mask，其他输入的 `mask` 不参与
+  本次执行 mask 的选择。
