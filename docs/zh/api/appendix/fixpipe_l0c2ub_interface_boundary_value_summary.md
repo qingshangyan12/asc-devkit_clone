@@ -76,6 +76,7 @@ L0C Buffer中存储的float类型数据来自Mmad矩阵乘计算结果，当输�
 - VQF322HIF8\_PRE使用Half to Away舍入模式，VQF322HIF8\_PRE\_HYBRID使用Hybrid舍入模式（|exp|<4时为Half to Away，|exp|≥4时为SSR随机舍入）。两种模式对inf/nan的处理一致。
 - 表中列出的量化模式为实测验证的模式。同一输出类型的scalar模式（如QF322F16\_PRE）与tensor模式（如VQF322F16\_PRE）使用相同的类型转换算法，inf/nan边界值处理行为完全一致，差异仅在于量化参数的传递方式（单个标量 vs 每列张量），因此表中仅列出tensor模式。NoQuant模式不做类型转换和量化，数据原样搬运。
 - L0C→UB与L0C→GM/L0C→L1的随路量化inf/nan处理行为完全一致，差异仅在于搬运目标（UB vs GM vs L1 Buffer）及内核函数中是否需要AIC/AIV跨核同步。边界值数据可参考[Fixpipe(L0C→GM)接口边界值汇总](fixpipe_l0c2gm_interface_boundary_value_summary.md)和[Fixpipe(L0C→L1)接口边界值汇总](fixpipe_l0c2l1_interface_boundary_value_summary.md)。
+- L0C→L1接口的边界值验证存在限制：int4b\_t（场景11、13）因`asc_mmad_s4`未实现而跳过，bfloat16\_t/int32\_t（场景12）、fp8\_e4m3fn\_t/float（场景14）、hifloat8\_t/float（场景15、16）因`asc_copy_l0c2l1`重载未提供而跳过，float×float→float Mmad（场景17）在L0C包含inf/-inf/nan时触发硬件运行时错误而跳过。这些场景的inf/nan处理行为与L0C→UB一致，但受限于验证路径（L1 Buffer数据无法直接搬运到GM，需经第二次Mmad中转）无法实测验证。
 
 ## int32\_t L0C → 各输出类型
 
@@ -155,7 +156,15 @@ NoQuant模式不做类型转换和量化，L0C中的float数据原样搬运到UB
 
 ## 测试验证
 
-以上边界值汇总通过[data_copy_l0c2ub样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub)的边界测试脚本`scripts/test_boundary.sh`在NPU上实测验证，结果为**38/38项全部通过**。共覆盖21种场景：
+以上边界值汇总通过[data_copy_l0c2ub样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub)的边界测试脚本`scripts/test_boundary.sh`在NPU仿真模式下（sim）实测验证，结果为**38/38项全部通过**。测试环境如下：
+
+| 项目 | 值 |
+|------|-----|
+| 芯片架构 | dav-3510（Ascend 950PR/Ascend 950DT） |
+| CANN版本 | 9.2.0 |
+| 运行模式 | sim（NPU仿真） |
+
+共覆盖21种场景：
 
 | 场景范围 | 场景数 | 测试模式 | 测试项 | 说明 |
 | --- | --- | --- | --- | --- |
@@ -164,3 +173,5 @@ NoQuant模式不做类型转换和量化，L0C中的float数据原样搬运到UB
 | **合计** | **21** | | **38** | |
 
 测试通过向输入矩阵A注入inf/-inf/nan（配合B矩阵对应行设为1.0），使L0C = A×B中产生inf/-inf/nan，验证各输出类型在饱和模式和非饱和模式下的inf/nan处理是否符合预期。对于int8\_t输入场景，使用极端值（A某行设为-128、其余设为127）验证整数溢出饱和行为。对于NoQuant场景，验证inf/-inf/nan在NZ2NZ、NZ2ND及双目标拆分模式下的正确传递。
+
+L0C→UB接口通过L0C→UB→GM的中转路径搬运数据（AIC执行`asc_copy_l0c2ub`将数据从L0C搬运到UB，AIV执行`asc_copy_ub2gm`将数据从UB搬运到GM），无第二次Mmad的inf×0=nan问题，非饱和模式下inf/nan能完整传递到GM输出。完整测试报告参见[边界值测试报告](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/boundary_test_report.md)。

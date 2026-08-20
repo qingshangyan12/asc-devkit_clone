@@ -19,12 +19,11 @@ N = 128
 
 # scenario_num -> output_type (quantization target type, not second Mmad output type)
 SCENARIO_OUTPUT = {
-    1: 'int8',       2: 'int8',       3: 'int8',       4: 'int8',
-    5: 'half',       6: 'half',       7: 'half',       8: 'half',
-    9: 'bfloat16',   10: 'bfloat16',
-    11: 'int4b',     12: 'bfloat16',  13: 'int4b',
-    14: 'fp8_e4m3fn', 15: 'hifloat8', 16: 'hifloat8',
-    17: 'float',
+    1: 'half',       2: 'int8',       3: 'int8',       4: 'half',
+    5: 'int8',       6: 'int8',       7: 'half',       8: 'half',
+    9: 'half',       10: 'bfloat16',  11: 'bfloat16',  12: 'int4b',
+    13: 'bfloat16',  14: 'int4b',     15: 'fp8_e4m3fn', 16: 'hifloat8',
+    17: 'hifloat8',  18: 'float',
 }
 
 # Golden and output are both saved in the second Mmad output type:
@@ -80,7 +79,7 @@ def verify_result(scenario_num, output_path, golden_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 18))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 19))
     parser.add_argument("output", type=str)
     parser.add_argument("golden", type=str)
     args = parser.parse_args()

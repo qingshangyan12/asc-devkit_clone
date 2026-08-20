@@ -6,12 +6,6 @@
 - Ascend 950PR/Ascend 950DT
 <!-- end id1 -->
 
-涉及的接口如下：
-
-- **L0C→GM**：C API [asc\_copy\_l0c2gm](../SIMD-API/c_api/cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、高阶API [Fixpipe](../SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)
-- **L0C→L1**：C API [asc\_copy\_l0c2l1](../SIMD-API/c_api/cube_data_move/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)
-- **L0C→UB**：C API [asc\_copy\_l0c2ub](../SIMD-API/c_api/cube_data_move/asc_copy_l0c2ub.md)
-
 ## 概述
 
 三个接口均将L0C中的矩阵计算结果搬运到目标Buffer（GM/L1/UB），在搬运过程中支持随路量化，将L0C中的float或int32\_t数据转换为目标数据类型输出。随路量化的inf/nan处理行为在三个接口间完全一致，通过CTRL寄存器的CTRL\[48\]比特位控制饱和模式：
@@ -37,18 +31,13 @@
 
 - **L0C→GM**：直接将L0C Buffer数据搬运到GM，无需中转路径，非饱和模式下inf/nan能完整传递到GM输出，无验证路径限制。
 - **L0C→L1**：将L0C数据搬运到L1 Buffer。由于dav-3510架构中L1 Buffer数据无法直接搬运到GM，样例通过第二次Mmad（量化结果×单位矩阵D）将数据从L1经L0A→L0C搬运到GM，最终输出为int32\_t（int8/int4b输入场景）或float（其他场景）。需要注意，当量化结果中包含inf时，第二次Mmad中inf与单位矩阵的off-diagonal零元素相乘会产生nan（IEEE 754: inf×0=nan），累加后整行变为nan。此为验证路径的限制，不影响asc\_copy\_l0c2l1本身的inf/nan处理行为。golden数据已适配此行为：非饱和模式下inf/-inf/nan位置的golden值设为nan，使测试能端到端通过。
-- **L0C→UB**：将L0C数据搬运到UB（Unified Buffer），随后通过`asc_copy_ub2gm`将数据从UB搬运到GM。差异仅在于搬运目标及内核函数中是否需要AIC/AIV跨核同步。
+- **L0C→UB**：将L0C数据搬运到UB（Unified Buffer），随后通过`asc_copy_ub2gm`将数据从UB搬运到GM。AIC执行`asc_copy_l0c2ub`将数据从L0C搬运到UB，AIV执行`asc_copy_ub2gm`将数据从UB搬运到GM，通过跨核同步协调。此路径无第二次Mmad，不存在inf×0=nan问题，非饱和模式下inf/nan能完整传递到GM输出。
 
 ## float L0C → 各输出类型
 
 L0C Buffer中存储的float类型数据来自Mmad矩阵乘计算结果，当输入矩阵A中包含inf/-inf/nan时，L0C中对应行会出现inf/-inf/nan（详见[Mmad接口边界值汇总](mmad_interface_boundary_value_summary.md)）。
 
 **表1** float类型L0C中存在inf/-inf/nan时，各输出类型的计算结果说明
-
-<a name="table_fixpipe_l0c2gm_float_boundary"></a>
-<a name="table_fixpipe_l0c2l1_float_boundary"></a>
-<a name="table_fixpipe_l0c2ub_float_boundary"></a>
-
 | 输出数据类型 | 随路量化模式 | L0C中的元素取值 | 输出元素取值<br>（饱和模式，CTRL\[48\]=0） | 输出元素取值<br>（非饱和模式，CTRL\[48\]=1） |
 | --- | --- | --- | --- | --- |
 | half | QF322F16\_PRE / VQF322F16\_PRE | +inf | 65504.0（MAX） | +inf |
@@ -100,11 +89,6 @@ L0C Buffer中存储的float类型数据来自Mmad矩阵乘计算结果，当输�
 int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生inf/nan，但量化后可能产生溢出。
 
 **表2** int32\_t类型L0C量化溢出时的计算结果说明
-
-<a name="table_fixpipe_l0c2gm_int32_boundary"></a>
-<a name="table_fixpipe_l0c2l1_int32_boundary"></a>
-<a name="table_fixpipe_l0c2ub_int32_boundary"></a>
-
 | 输出数据类型 | 随路量化模式 | L0C中的元素取值 | 输出元素取值 |
 | --- | --- | --- | --- |
 | half | DEQF16 / VDEQF16 | 量化后超出half表示范围 | 65504.0（MAX） / -65504.0（MIN） |
@@ -123,11 +107,6 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 三个接口支持如下随路量化模式，scalar模式使用单个标量量化参数，tensor模式使用每列独立的量化参数：
 
 **表3** 量化模式说明
-
-<a name="table_fixpipe_l0c2gm_quant_mode"></a>
-<a name="table_fixpipe_l0c2l1_quant_mode"></a>
-<a name="table_fixpipe_l0c2ub_quant_mode"></a>
-
 | 源数据类型 | 量化模式 | 目标数据类型 | 量化方式 | 说明 |
 | --- | --- | --- | --- | --- |
 | - | NoQuant | - | 不量化 | 不开启量化功能 |
@@ -165,9 +144,6 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 NoQuant模式不做类型转换和量化，L0C中的float数据原样搬运到目标Buffer。由于CTRL\[48\]不支持float数据类型，饱和模式和非饱和模式下inf/nan均保持原样输出。NoQuant场景还覆盖了NZ2NZ、NZ2ND、双目标按M维度拆分、双目标按N维度拆分等输出格式，验证inf/-inf/nan在各种格式转换和双目标拆分场景下均能正确传递。
 
 **表4** NoQuant模式下float类型L0C中存在inf/-inf/nan时的输出结果
-
-<a name="table_fixpipe_l0c2ub_noquant_boundary"></a>
-
 | 场景 | 输出格式 | 双目标 | L0C中的元素取值 | 输出元素取值 | 说明 |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Nz | 否 | +inf/-inf/nan | +inf/-inf/nan | 原样保留 |
@@ -179,11 +155,20 @@ NoQuant模式不做类型转换和量化，L0C中的float数据原样搬运到�
 
 ## 测试验证
 
-以上边界值汇总通过各接口对应样例的边界测试脚本`scripts/test_boundary.sh`在NPU上实测验证。测试通过向输入矩阵A注入inf/-inf/nan（配合B矩阵对应行设为1.0），使L0C = A×B中产生inf/-inf/nan，验证各输出类型在饱和模式和非饱和模式下的inf/nan处理是否符合预期。对于int8\_t输入场景，使用极端值（A某行设为-128、其余设为127）验证整数溢出饱和行为。
+以上边界值汇总通过各接口对应样例的在NPU仿真模式下边界测试。测试环境如下：
+
+| 项目 | 值 |
+|------|-----|
+| 芯片架构 | dav-3510（Ascend 950PR/Ascend 950DT） |
+| CANN版本 | 9.2.0 |
+
+测试通过向输入矩阵A注入inf/-inf/nan（配合B矩阵对应行设为1.0），使L0C = A×B中产生inf/-inf/nan，验证各输出类型在饱和模式和非饱和模式下的inf/nan处理是否符合预期。对于int8\_t输入场景，使用极端值（A某行设为-128、其余设为127）验证整数溢出饱和行为。
+
+此外，三个接口还通过[Fixpipe边界值测试报告](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/mmad_spec_results)进行了全6×6 A×B边界值组合的深度验证。该测试将A矩阵6种边界值（+inf、-inf、nan、norm(>0)=2.0、norm(<0)=-2.0、0.0）与B矩阵6种边界值（+inf、-inf、nan、norm(>0)=3.0、norm(<0)=-3.0、0.0）全组合注入，生成36种L0C边界值，覆盖Mmad乘法阶段的全部inf/-inf/nan行为路径，在饱和模式和非饱和模式下逐点验证Fixpipe输出是否符合表1预期。
 
 ### L0C→GM
 
-通过[data_copy_l0c2gm样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2gm)验证，结果为**34/34项全部通过**。共覆盖17种量化场景×2种饱和模式（饱和/非饱和）= 34项测试。
+通过[data_copy_l0c2gm样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2gm)验证结果为**34/34项全部通过**。共覆盖17种量化场景×2种饱和模式（饱和/非饱和）= 34项测试。6×6 A×B边界值组合深度验证26/26项通过（场景15，VQF322F32\_PRE，float→float）。
 
 | 场景范围 | 场景数 | 测试模式 | 测试项 | 说明 |
 | --- | --- | --- | --- | --- |
@@ -205,7 +190,7 @@ L0C→GM接口直接将L0C Buffer数据搬运到GM，无需中转路径，因此
 
 ### L0C→UB
 
-通过[data_copy_l0c2ub样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub)验证，结果为**38/38项全部通过**。共覆盖21种场景：
+通过[data_copy_l0c2ub样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub)在NPU验证，结果为**38/38项全部通过**。共覆盖21种场景：
 
 | 场景范围 | 场景数 | 测试模式 | 测试项 | 说明 |
 | --- | --- | --- | --- | --- |
@@ -213,21 +198,37 @@ L0C→GM接口直接将L0C Buffer数据搬运到GM，无需中转路径，因此
 | 5-21（量化） | 17 | 饱和+非饱和 | 34 | 每种量化场景×2种CTRL[48]模式 |
 | **合计** | **21** | | **38** | |
 
-对于NoQuant场景，验证inf/-inf/nan在NZ2NZ、NZ2ND及双目标拆分模式下的正确传递。
+对于NoQuant场景，验证inf/-inf/nan在NZ2NZ、NZ2ND及双目标拆分模式下的正确传递。6×6 A×B边界值组合深度验证26/26项通过（场景1，NoQuant，float→float）。
 
 ### L0C→L1
 
-通过[data_copy_l0c2l1样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2l1)验证。共覆盖17种量化场景×2种饱和模式（饱和/非饱和）= 34项测试，其中：
+通过[data_copy_l0c2l1样例](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2l1)验证。共覆盖18种量化场景×2种饱和模式（饱和/非饱和）= 36项测试。6×6 A×B边界值组合深度验证26/26项通过（场景6，VQF322F16\_PRE，float→half）。场景编号已与C++高阶API样例[fixpipe_l0c2l1](../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1)对齐：场景1-4分别对应C++样例的4个场景。
 
-- **已验证且通过**：场景1-10的两种模式（20项）。
-- **跳过（硬件限制）**：场景17的两种模式（2项）。float×float→float的Mmad在L0C包含inf/-inf/nan时触发硬件运行时错误（aclrtSynchronizeStream返回507015），属于dav-3510的CANN版本限制。
-- **未验证（CANN版本限制）**：场景11-16的两种模式（12项）。这些场景依赖的API重载在当前CANN版本（9.2.0）中未实现或未提供，具体见下文"未验证场景说明"。
+| 场景范围 | 场景数 | 测试模式 | 测试项 | 说明 |
+| --- | --- | --- | --- | --- |
+| 1（float→half cast） | 1 | 饱和+非饱和 | 2 | F322F16，C++ ref场景1 |
+| 2（float→int8 scalar） | 1 | 饱和+非饱和 | 2 | QF322B8\_PRE，C++ ref场景2 |
+| 3（float→int8 vector） | 1 | 饱和+非饱和 | 2 | VQF322B8\_PRE，C++ ref场景3 |
+| 4（float→half cast+ReLU） | 1 | 饱和+非饱和 | 2 | F322F16+ReLU，C++ ref场景4 |
+| 5-6（int32→int8） | 2 | 饱和+非饱和 | 4 | REQ8/VREQ8，int8输入场景 |
+| 7（float→half vector） | 1 | 饱和+非饱和 | 2 | VQF322F16\_PRE |
+| 8-9（int32→half） | 2 | 饱和+非饱和 | 4 | DEQF16/VDEQF16，int8输入场景 |
+| 10-11（float→bf16） | 2 | 饱和+非饱和 | 4 | F322BF16/VQF322BF16\_PRE |
+| 12-17（int4b/bf16/fp8/hif8） | 6 | 未验证 | 0 | CANN版本限制，见下文 |
+| 18（float→float） | 1 | 跳过 | 0 | 硬件限制，见下文 |
+| **合计** | **18** | | **22已通过** | |
 
-注：场景5、6、9、10的非饱和模式存在验证路径中第二次Mmad的inf×0=nan问题（见上文"数据搬运路径差异"中的说明），golden数据已适配此行为，测试通过。L1 Buffer上的量化结果实际保留了inf（符合表1预期），仅经第二次Mmad后被破坏为nan。
+其中：
+
+- **已验证且通过**：场景1-11的两种模式（22项）。
+- **跳过（硬件限制）**：场景18的两种模式（2项）。float×float→float的Mmad在L0C包含inf/-inf/nan时触发硬件运行时错误（aclrtSynchronizeStream返回507015），属于dav-3510的CANN版本限制。
+- **未验证（CANN版本限制）**：场景12-17的两种模式（12项）。这些场景依赖的API重载在当前CANN版本（9.2.0）中未实现或未提供，具体见下文"未验证场景说明"。
+
+注：场景1、4、7、10、11的非饱和模式存在验证路径中第二次Mmad的inf×0=nan问题（见上文"数据搬运路径差异"中的说明），golden数据已适配此行为，测试通过。L1 Buffer上的量化结果实际保留了inf（符合表1预期），仅经第二次Mmad后被破坏为nan。场景4（F322F16+ReLU）中，ReLU会将负值和nan置零，但+inf经ReLU后仍为+inf，因此非饱和模式下+inf相关行仍会被第二次Mmad污染为nan。
 
 #### 已知限制
 
-场景17在边界值测试中跳过，属于硬件限制，非asc\_copy\_l0c2l1接口本身的问题：
+场景18在边界值测试中跳过，属于硬件限制，非asc\_copy\_l0c2l1接口本身的问题：
 
 **表5** 边界值测试已知限制
 
@@ -235,7 +236,7 @@ L0C→GM接口直接将L0C Buffer数据搬运到GM，无需中转路径，因此
 
 | 跳过场景 | 跳过模式 | 根因 | 说明 |
 | --- | --- | --- | --- |
-| 17 | 饱和非饱和均跳过 | float×float→float的Mmad在L0C包含inf/-inf/nan时触发硬件运行时错误（aclrtSynchronizeStream返回507015） | 可能是dav-3510的CANN版本限制，float类型Mmad对inf/nan输入的硬件处理异常。asc\_copy\_l0c2l1本身的float inf/nan处理行为符合表1预期（保持原样输出），但验证路径无法端到端验证 |
+| 18 | 饱和非饱和均跳过 | float×float→float的Mmad在L0C包含inf/-inf/nan时触发硬件运行时错误（aclrtSynchronizeStream返回507015） | 可能是dav-3510的CANN版本限制，float类型Mmad对inf/nan输入的硬件处理异常。asc\_copy\_l0c2l1本身的float inf/nan处理行为符合表1预期（保持原样输出），但验证路径无法端到端验证 |
 
 #### 未验证场景说明
 
@@ -247,11 +248,13 @@ L0C→GM接口直接将L0C Buffer数据搬运到GM，无需中转路径，因此
 
 | 场景 | 输出类型 | 量化模式 | 未验证原因 |
 | --- | --- | --- | --- |
-| 11 | int4b\_t | VREQ4 | asc\_mmad\_s4（int4b\_t×int4b\_t→int32\_t）在dav-3510上未实现（声明存在但无链接实现），验证路径的第二次Mmad无法执行 |
-| 12 | bfloat16\_t | VQS322BF16\_PRE | asc\_copy\_l0c2l1的bfloat16\_t/int32\_t重载未提供（int8输入场景的L0C为int32\_t，需bf16/int32重载） |
-| 13 | int4b\_t | VQF322S4\_PRE | asc\_mmad\_s4未实现，同场景11 |
-| 14 | fp8\_e4m3fn\_t | VQF322FP8\_PRE | asc\_copy\_l0c2l1的fp8\_e4m3fn\_t/float重载未提供 |
-| 15 | hifloat8\_t | VQF322HIF8\_PRE | asc\_copy\_l0c2l1的hifloat8\_t/float重载未提供 |
-| 16 | hifloat8\_t | VQF322HIF8\_PRE\_HYBRID | asc\_copy\_l0c2l1的hifloat8\_t/float重载未提供，同场景15 |
+| 12 | int4b\_t | VREQ4 | asc\_mmad\_s4（int4b\_t×int4b\_t→int32\_t）在dav-3510上未实现（声明存在但无链接实现），验证路径的第二次Mmad无法执行 |
+| 13 | bfloat16\_t | VQS322BF16\_PRE | asc\_copy\_l0c2l1的bfloat16\_t/int32\_t重载未提供（int8输入场景的L0C为int32\_t，需bf16/int32重载） |
+| 14 | int4b\_t | VQF322S4\_PRE | asc\_mmad\_s4未实现，同场景12 |
+| 15 | fp8\_e4m3fn\_t | VQF322FP8\_PRE | asc\_copy\_l0c2l1的fp8\_e4m3fn\_t/float重载未提供 |
+| 16 | hifloat8\_t | VQF322HIF8\_PRE | asc\_copy\_l0c2l1的hifloat8\_t/float重载未提供 |
+| 17 | hifloat8\_t | VQF322HIF8\_PRE\_HYBRID | asc\_copy\_l0c2l1的hifloat8\_t/float重载未提供，同场景16 |
 
-注：场景11-16的边界值行为可参考表1和表2中的理论值。其中int4b\_t场景（11、13）的asc\_copy\_l0c2l1重载已验证可编译，但验证路径的asc\_mmad\_s4未实现导致无法端到端验证。fp8\_e4m3fn\_t和hifloat8\_t场景（14-16）的asc\_copy\_l0c2l1重载本身未提供，待CANN后续版本支持后可启用验证。
+注：场景12-17的边界值行为可参考表1和表2中的理论值。其中int4b\_t场景（12、14）的asc\_copy\_l0c2l1重载已验证可编译，但验证路径的asc\_mmad\_s4未实现导致无法端到端验证。fp8\_e4m3fn\_t和hifloat8\_t场景（15-17）的asc\_copy\_l0c2l1重载本身未提供，待CANN后续版本支持后可启用验证。
+
+完整测试报告参见[边界值测试报告](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/boundary_test_report.md)和[Fixpipe边界值测试报告（6×6 A×B组合）](../../../../examples/02_simd_c_api/03_c_api/00_data_movement/mmad_spec_results/mmad_spec_report_all.md)。

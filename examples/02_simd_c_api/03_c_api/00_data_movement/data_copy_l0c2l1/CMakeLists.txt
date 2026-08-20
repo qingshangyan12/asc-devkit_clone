@@ -25,9 +25,9 @@ if(NOT CMAKE_ASC_RUN_MODE MATCHES "^(npu|sim)$")
     message(FATAL_ERROR "CMAKE_ASC_RUN_MODE must be npu or sim, but got ${CMAKE_ASC_RUN_MODE}.")
 endif()
 
-set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-17)")
-if(NOT SCENARIO_NUM MATCHES "^([1-9]|1[0-7])$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1-17, but got ${SCENARIO_NUM}")
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-18)")
+if(NOT SCENARIO_NUM MATCHES "^([1-9]|1[0-8])$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1-18, but got ${SCENARIO_NUM}")
 endif()
 
 set(SATURATION_MODE "1" CACHE STRING "Saturation mode: 1=saturation (CTRL[48]=0), 0=non-saturation (CTRL[48]=1)")

@@ -28,26 +28,32 @@ K_ROUND = 2
 #   output_type: 'int8', 'half', 'bfloat16', 'int4b', 'fp8_e4m3fn', 'hifloat8', 'float'
 #   quant_mode:  QuantMode_t enum name
 #   is_tensor:   whether tensor (vector) quantization is used
+# Aligned with C++ reference fixpipe_l0c2l1 scenarios 1-4:
+#   1: F322F16 cast      (C++ ref 1)
+#   2: QF322B8_PRE scalar (C++ ref 2)
+#   3: VQF322B8_PRE vector (C++ ref 3)
+#   4: F322F16 cast + ReLU (C++ ref 4)
 SCENARIOS = {
-    # --- existing (compile-verified on CANN 9.2.0) ---
-    1:  ('half', 'int8',        'QF322B8_PRE',          False),
-    2:  ('half', 'int8',        'VQF322B8_PRE',         True),
-    3:  ('int8', 'int8',        'REQ8',                 False),
-    4:  ('int8', 'int8',        'VREQ8',                True),
-    5:  ('half', 'half',        'F322F16',              False),
-    6:  ('half', 'half',        'VQF322F16_PRE',        True),
-    7:  ('int8', 'half',        'DEQF16',               False),
-    8:  ('int8', 'half',        'VDEQF16',              True),
-    # --- extended (require newer CANN / asc_copy_l0c2l1 overloads) ---
-    9:  ('half', 'bfloat16',   'F322BF16',              False),
-    10: ('half', 'bfloat16',   'VQF322BF16_PRE',        True),
-    11: ('int8', 'int4b',       'VREQ4',                True),
-    12: ('int8', 'bfloat16',   'VQS322BF16_PRE',        True),
-    13: ('half', 'int4b',       'VQF322S4_PRE',          True),
-    14: ('half', 'fp8_e4m3fn', 'VQF322FP8_PRE',         True),
-    15: ('half', 'hifloat8',   'VQF322HIF8_PRE',        True),
-    16: ('half', 'hifloat8',   'VQF322HIF8_PRE_HYBRID', True),
-    17: ('half', 'float',       'VQF322F32_PRE',        True),
+    # --- aligned with C++ reference (scenarios 1-4) ---
+    1:  ('half', 'half',        'F322F16',              False),
+    2:  ('half', 'int8',        'QF322B8_PRE',          False),
+    3:  ('half', 'int8',        'VQF322B8_PRE',         True),
+    4:  ('half', 'half',        'F322F16',              False),  # + ReLU
+    # --- extended (scenarios 5-18) ---
+    5:  ('int8', 'int8',        'REQ8',                 False),
+    6:  ('int8', 'int8',        'VREQ8',                True),
+    7:  ('half', 'half',        'VQF322F16_PRE',        True),
+    8:  ('int8', 'half',        'DEQF16',               False),
+    9:  ('int8', 'half',        'VDEQF16',              True),
+    10: ('half', 'bfloat16',   'F322BF16',              False),
+    11: ('half', 'bfloat16',   'VQF322BF16_PRE',        True),
+    12: ('int8', 'int4b',       'VREQ4',                True),
+    13: ('int8', 'bfloat16',   'VQS322BF16_PRE',        True),
+    14: ('half', 'int4b',       'VQF322S4_PRE',          True),
+    15: ('half', 'fp8_e4m3fn', 'VQF322FP8_PRE',         True),
+    16: ('half', 'hifloat8',   'VQF322HIF8_PRE',        True),
+    17: ('half', 'hifloat8',   'VQF322HIF8_PRE_HYBRID', True),
+    18: ('half', 'float',       'VQF322F32_PRE',        True),
 }
 
 CUBE_BLOCK = 16
@@ -789,7 +795,12 @@ def gen_golden_data(scenario_num, boundary=False, saturation=True):
             np.any(l0c == np.inf), np.any(l0c == -np.inf), np.any(np.isnan(l0c))))
 
     quant_params = make_quant_params(output_type)
-    golden = apply_prequant(l0c, quant_mode, quant_params, output_type, False)
+    is_relu = (scenario_num == 4)
+    golden = apply_prequant(l0c, quant_mode, quant_params, output_type, is_relu)
+
+    # Scenario 4: F322F16 cast + ReLU — apply max(0, val) after cast
+    if is_relu:
+        golden = np.where(golden > 0, golden, 0)
 
     if not saturation:
         golden = apply_non_saturation_override(golden, l0c, output_type)
@@ -837,7 +848,7 @@ def gen_golden_data(scenario_num, boundary=False, saturation=True):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 18))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 19))
     parser.add_argument("--boundary", action="store_true",
                         help="Generate boundary value inputs (inf/-inf/nan) to test saturation behavior")
     parser.add_argument("--saturation", type=int, default=1, choices=[0, 1],
