@@ -503,6 +503,16 @@ CcuResult GetLaunchMissionNum(const AlgResourceCtxSerializable& resourceCtx, uin
             "insufficient launch handles, missionNum[%u], threads[%zu], kernels[%zu]", missionNum,
             resourceCtx.threads.size(), resourceCtx.ccuKernels.size()),
         CCU_E_PARA);
+    for (uint32_t missionIndex = 0; missionIndex < missionNum; ++missionIndex) {
+        for (uint32_t previousIndex = 0; previousIndex < missionIndex; ++previousIndex) {
+            CHK_PRT_RET(
+                resourceCtx.threads[missionIndex] == resourceCtx.threads[previousIndex],
+                HCCL_ERROR(
+                    "missions[%u] and [%u] use duplicate threadHandle[0x%llx]", previousIndex, missionIndex,
+                    static_cast<unsigned long long>(resourceCtx.threads[missionIndex])),
+                CCU_E_PARA);
+        }
+    }
     return CCU_SUCCESS;
 }
 
