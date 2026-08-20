@@ -14,10 +14,10 @@
 #include <cstdint>
 #include <type_traits>
 
-#define RELU_POST_DEFAULT 0
-#define CLIP_RELU_POST_DEFAULT 0
-#define ELTWISE_OP_DEFAULT 0
-#define QUANT_POST_DEFAULT 0
+constexpr uint8_t RELU_POST_DEFAULT = 0;
+constexpr bool CLIP_RELU_POST_DEFAULT = false;
+constexpr uint8_t ELTWISE_OP_DEFAULT = 0;
+constexpr uint64_t QUANT_POST_DEFAULT = 0;
 
 enum class asc_load_l2_cache_mode : uint8_t {
     NORMAL_FIRST_VICTIM = 0,
