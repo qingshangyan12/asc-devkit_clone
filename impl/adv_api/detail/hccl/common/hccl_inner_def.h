@@ -25,7 +25,17 @@ constexpr int32_t HCCL_SUCCESS = 0;
 constexpr uint8_t HCCL_ONLY_COMPUTE = 1U;
 constexpr uint8_t HCCL_ASCEND910B = 1U;
 constexpr uint32_t MAX_DCCI_CNT = 64U;
-constexpr uint64_t DATA_TYPE_MAP[] = {1, 2, 4, 2, 4, 8, 8, 1, 8, 4, 8, 2, 0, 0, 1, 1, 1, 1, 0};
+constexpr uint32_t DATA_TYPE_MAP_SIZE = static_cast<uint32_t>(HCCL_DATA_TYPE_RESERVED) + 1U;
+constexpr uint64_t DATA_TYPE_MAP[DATA_TYPE_MAP_SIZE] = {1, 2, 4, 2, 4, 8, 8, 1, 8, 4, 8, 2, 0, 0, 1, 1, 1, 1, 0};
+
+__aicore__ inline uint64_t GetHcclDataTypeSize(HcclDataType dataType)
+{
+    const uint32_t dataTypeIndex = static_cast<uint32_t>(dataType);
+    if (dataTypeIndex >= DATA_TYPE_MAP_SIZE) {
+        return 0U;
+    }
+    return DATA_TYPE_MAP[dataTypeIndex];
+}
 
 // Used to calc xor checksum for HcclMsg
 constexpr uint32_t HCCL_MSG_DATA_CNT = 16U;

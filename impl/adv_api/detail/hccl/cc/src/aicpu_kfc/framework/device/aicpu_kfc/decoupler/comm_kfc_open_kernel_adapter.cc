@@ -194,6 +194,8 @@ HcclResult FormatOpenOpParamDataFromMsg(
     const std::vector<uint8_t>& baseOpParam, const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, uint32_t rankNum,
     uint32_t repeatIdx, void* stream, std::vector<uint8_t>& runOpParam)
 {
+    CHK_PRT_RET(
+        !HcclApi::IsValidHcclMsgRankSize(rankNum), HCCL_ERROR("Invalid rank size %u.", rankNum), HCCL_E_PARA);
     if (baseOpParam.empty()) {
         HCCL_ERROR("Base op param is empty.");
         return HCCL_E_PARA;

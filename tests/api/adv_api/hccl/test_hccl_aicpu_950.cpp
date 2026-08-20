@@ -44,6 +44,53 @@ static HcclMsgArea* GetHcclMsgArea(uint8_t* workspaceGM)
     return reinterpret_cast<HcclMsgArea*>(msgAddr);
 }
 
+TEST_F(HcclSuiteAICPU, CcuSetCcTilingRejectsInvalidOpType)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    hccl.impl_.curVersion_ = HcclTilingVersion::NEW_TILING_VERSION;
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL);
+
+    EXPECT_EQ(hccl.SetCcTiling(reinterpret_cast<__gm__ void*>(&tiling)), HCCL_FAILED);
+}
+
+TEST_F(HcclSuiteAICPU, CcuSetCcTilingV2RejectsInvalidOpType)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL);
+    hccl.impl_.curVersion_ = HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION;
+    hccl.impl_.tilingBaseAddr_ = reinterpret_cast<uint64_t>(&tiling);
+
+    EXPECT_EQ(hccl.SetCcTilingV2(0U), HCCL_FAILED);
+}
+
+TEST_F(HcclSuiteAICPU, CcuCommonPrepareRejectsInvalidIndexInputs)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    CommonPrepareParam param{};
+    param.commType.prepareType = HcclCMDType::HCCL_CMD_ALL;
+    param.dataType = HCCL_DATA_TYPE_INT8;
+    param.repeat = 1U;
+    EXPECT_EQ(hccl.impl_.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+
+    param.commType.prepareType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    param.dataType = static_cast<HcclDataType>(254);
+    EXPECT_EQ(hccl.impl_.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+}
+
+TEST_F(HcclSuiteAICPU, CcuCommonPrepareRequiresRegisteredTiling)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    hccl.impl_.curVersion_ = HcclTilingVersion::NEW_TILING_VERSION;
+    CommonPrepareParam param{};
+    param.commType.prepareType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    param.dataType = HCCL_DATA_TYPE_INT8;
+    param.repeat = 1U;
+
+    EXPECT_EQ(hccl.impl_.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+}
+
 class Mc2InitTilingAicpuTest {
     uint32_t version = 0U;
     uint32_t mc2HcommCnt = 0U;
