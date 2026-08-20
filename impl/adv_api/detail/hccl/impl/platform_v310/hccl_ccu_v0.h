@@ -224,9 +224,10 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         ccOpTilingData != nullptr, { return HCCL_FAILED; },
         "Call SetCcTiling failed, ensure ccOpTilingData is not nullptr");
     const uint32_t opType = (static_cast<__gm__ Mc2CcTilingInner*>(ccOpTilingData))->opType;
-    ASCENDC_HCCL_API_ASSERT(
-        opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return HCCL_FAILED; },
-        "Call SetCcTiling failed, ensure cmdType is valid");
+    if (opType >= static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL)) {
+        KERNEL_LOG(KERNEL_ERROR, "Call SetCcTiling failed, invalid cmdType %u.", opType);
+        return HCCL_FAILED;
+    }
     KERNEL_LOG(KERNEL_INFO, "CmdType = %d, ccOpTilingData = %lu ", opType, reinterpret_cast<uint64_t>(ccOpTilingData));
     ccOpTilingDataTable_[opType] = reinterpret_cast<uint64_t>(ccOpTilingData);
     return HCCL_SUCCESS;
@@ -239,9 +240,10 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         curVersion_ == HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION, { return HCCL_FAILED; },
         "Call SetCcTiling failed, ensure Hccl::InitV2 func has been called successfully!");
     const uint32_t opType = (reinterpret_cast<Mc2CcTilingInner*>(tilingBaseAddr_ + offset))->opType;
-    ASCENDC_HCCL_API_ASSERT(
-        opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return HCCL_FAILED; },
-        "Call SetCcTiling failed, ensure cmdType is valid");
+    if (opType >= static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL)) {
+        KERNEL_LOG(KERNEL_ERROR, "Call SetCcTiling failed, invalid cmdType %u.", opType);
+        return HCCL_FAILED;
+    }
     ccOpTilingDataTable_[opType] = offset;
     return HCCL_SUCCESS;
 }
@@ -342,6 +344,36 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         return INVALID_HANDLE_ID;
     }
 
+    const uint32_t prepareType = static_cast<uint32_t>(commonPrepareParam.commType.prepareType);
+    if (prepareType >= static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL)) {
+        KERNEL_LOG(KERNEL_ERROR, "Call Prepare failed, invalid prepare type %u.", prepareType);
+        return INVALID_HANDLE_ID;
+    }
+    const uint64_t dataSize = GetHcclDataTypeSize(commonPrepareParam.dataType);
+    if (dataSize == 0U) {
+        KERNEL_LOG(
+            KERNEL_ERROR, "Call Prepare[%u] failed, invalid data type %d.", prepareType,
+            static_cast<int32_t>(commonPrepareParam.dataType));
+        return INVALID_HANDLE_ID;
+    }
+    if (((curVersion_ == HcclTilingVersion::NEW_TILING_VERSION) ||
+         (curVersion_ == HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION)) &&
+        (ccOpTilingDataTable_[prepareType] == 0U)) {
+        KERNEL_LOG(KERNEL_ERROR, "Call Prepare[%u] failed, ensure SetCcTiling has been called.", prepareType);
+        return INVALID_HANDLE_ID;
+    }
+
+    uint32_t rankNum = 0U;
+    if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
+        if (!IsValidCcuRankNum(rankNum)) {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Call AlltoAllV Prepare failed, rank num %u is outside the supported range [1, %u].",
+                rankNum, HCCL_CCU_MAX_RANK_NUM);
+            return INVALID_HANDLE_ID;
+        }
+    }
+
     HcclHandle handleId = curHandleId_;
 
     ASCENDC_HCCL_API_ASSERT(
@@ -366,8 +398,6 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         handleParamGM_[handleId].strideCount = commonPrepareParam.strideCount;
         InitCcuParam(handleId);
         FlushDataCache(&handleParamGM_[handleId]);
-        uint64_t dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(commonPrepareParam.dataType)];
-        uint32_t rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
 
         if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
             for (uint32_t i = 0; i < rankNum; i++) {

@@ -44,6 +44,82 @@ static HcclMsgArea* GetHcclMsgArea(uint8_t* workspaceGM)
     return reinterpret_cast<HcclMsgArea*>(msgAddr);
 }
 
+TEST_F(HcclSuiteAICPU, CcuSetCcTilingRejectsInvalidOpType)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    hccl.impl_.curVersion_ = HcclTilingVersion::NEW_TILING_VERSION;
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL);
+
+    EXPECT_EQ(hccl.SetCcTiling(reinterpret_cast<__gm__ void*>(&tiling)), HCCL_FAILED);
+}
+
+TEST_F(HcclSuiteAICPU, CcuSetCcTilingV2RejectsInvalidOpType)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL);
+    hccl.impl_.curVersion_ = HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION;
+    hccl.impl_.tilingBaseAddr_ = reinterpret_cast<uint64_t>(&tiling);
+
+    EXPECT_EQ(hccl.SetCcTilingV2(0U), HCCL_FAILED);
+}
+
+TEST_F(HcclSuiteAICPU, CcuCommonPrepareRejectsInvalidIndexInputs)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    CommonPrepareParam param{};
+    param.commType.prepareType = HcclCMDType::HCCL_CMD_ALL;
+    param.dataType = HCCL_DATA_TYPE_INT8;
+    param.repeat = 1U;
+    EXPECT_EQ(hccl.impl_.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+
+    param.commType.prepareType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    param.dataType = static_cast<HcclDataType>(254);
+    EXPECT_EQ(hccl.impl_.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+}
+
+TEST_F(HcclSuiteAICPU, CcuCommonPrepareRequiresRegisteredTiling)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    hccl.impl_.curVersion_ = HcclTilingVersion::NEW_TILING_VERSION;
+    CommonPrepareParam param{};
+    param.commType.prepareType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    param.dataType = HCCL_DATA_TYPE_INT8;
+    param.repeat = 1U;
+
+    EXPECT_EQ(hccl.impl_.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+}
+
+TEST_F(HcclSuiteAICPU, CcuAlltoAllVRankCapacityCoversDav3510Limit)
+{
+    EXPECT_FALSE(IsValidCcuRankNum(0U));
+    EXPECT_TRUE(IsValidCcuRankNum(1U));
+    EXPECT_TRUE(IsValidCcuRankNum(32U));
+    EXPECT_TRUE(IsValidCcuRankNum(33U));
+    EXPECT_TRUE(IsValidCcuRankNum(HCCL_CCU_MAX_RANK_NUM));
+    EXPECT_FALSE(IsValidCcuRankNum(HCCL_CCU_MAX_RANK_NUM + 1U));
+    EXPECT_EQ(sizeof(AlltoAllVParamCcu), sizeof(uint64_t) * HCCL_CCU_MAX_RANK_NUM * 4U);
+}
+
+TEST_F(HcclSuiteAICPU, CcuAlltoAllVRejectsRankBeyondDav3510Limit)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    OpResCtx context{};
+    context.rankSize = HCCL_CCU_MAX_RANK_NUM + 1U;
+    hccl.impl_.newCcuFlag_ = true;
+    hccl.impl_.hcclNewContext_ = &context;
+
+    CommonPrepareParam param{};
+    param.commType.prepareType = HcclCMDType::HCCL_CMD_ALLTOALLV;
+    param.dataType = HCCL_DATA_TYPE_INT8;
+    param.repeat = 1U;
+    const HcclHandle initialHandleId = hccl.impl_.curHandleId_;
+
+    EXPECT_EQ(hccl.impl_.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+    EXPECT_EQ(hccl.impl_.curHandleId_, initialHandleId);
+}
+
 class Mc2InitTilingAicpuTest {
     uint32_t version = 0U;
     uint32_t mc2HcommCnt = 0U;
