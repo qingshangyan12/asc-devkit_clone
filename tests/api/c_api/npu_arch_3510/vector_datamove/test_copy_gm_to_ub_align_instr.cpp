@@ -32,15 +32,15 @@
     namespace {                                                                                                    \
                                                                                                                    \
     void cce_name##_##data_type##_Stub(                                                                            \
-        __ubuf__ data_type* dst, __gm__ data_type* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst,         \
+        __ubuf__ data_type* dst, __gm__ data_type* src, uint8_t sid, uint32_t burst_count, uint32_t burst_len,         \
         uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,      \
         uint64_t src_stride, uint32_t dst_stride)                                                                  \
     {                                                                                                              \
         EXPECT_EQ(dst, reinterpret_cast<__ubuf__ void*>(11));                                                      \
         EXPECT_EQ(src, reinterpret_cast<__gm__ void*>(22));                                                        \
         EXPECT_EQ(sid, static_cast<uint8_t>(0));                                                                   \
-        EXPECT_EQ(n_burst, static_cast<uint32_t>(1));                                                              \
-        EXPECT_EQ(len_burst, static_cast<uint32_t>(44));                                                           \
+        EXPECT_EQ(burst_count, static_cast<uint32_t>(1));                                                              \
+        EXPECT_EQ(burst_len, static_cast<uint32_t>(44));                                                           \
         EXPECT_EQ(left_padding_num, static_cast<uint8_t>(0));                                                      \
         EXPECT_EQ(right_padding_num, static_cast<uint8_t>(0));                                                     \
         EXPECT_EQ(enable_constant_pad, false);                                                                     \
