@@ -155,7 +155,7 @@ graph TD
   - [ATVC](https://gitcode.com/cann/atvc)：Ascend C矢量计算模板集合，为典型Vector算子提供标准化开发模板头文件
   - [ATVOSS](https://gitcode.com/cann/atvoss)：矢量算子子程序模板库，为昇腾硬件Vector类融合算子提供极简、高性能、高扩展的编程范式
 - Cube类算子模板库：
-  - [BLAZE](https://gitcode.com/cann/ops-tensor)：昇腾算子模板库，聚焦提供高性能矩阵乘类算子基础模板与工程化最佳实践，支持矩阵乘及相关融合算子的定制化开发
+  - [BLAZE](https://gitcode.com/cann/ops-tensor)：Ascend C算子模板库，聚焦提供高性能矩阵乘类算子基础模板与工程化最佳实践，支持矩阵乘及相关融合算子的定制化开发
 
 ## 总结
 
