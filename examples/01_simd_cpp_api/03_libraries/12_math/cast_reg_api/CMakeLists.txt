@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
+set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 
 get_filename_component(ASC_DEVKIT_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
@@ -34,7 +34,7 @@ add_executable(demo
 
 set(ASCEND_HOME "$ENV{ASCEND_HOME_PATH}")
 target_include_directories(demo PRIVATE
-    "${ASCEND_HOME}/include"
+    "${ASCEND_HOME}"
 )
 
 target_compile_definitions(demo PRIVATE
@@ -43,7 +43,6 @@ target_compile_definitions(demo PRIVATE
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-    $<$<COMPILE_LANGUAGE:ASC>:-std=c++17>
 )
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")

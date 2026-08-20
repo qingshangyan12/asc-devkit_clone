@@ -29,7 +29,7 @@ namespace te {
 
 namespace detail {
 
-template <typename To, typename From, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat>
+template <typename DstType, typename SrcType, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat>
 struct reg_cast_op {
     static constexpr bool supported = false;
 };
@@ -50,17 +50,17 @@ struct reg_cast_op {
 
 #undef ASC_REG_CAST_OP
 
-template <typename To, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat, typename From>
-__simd_callee__ inline reg_tensor<To> cast_impl(reg_tensor<From> src)
+template <typename DstType, typename SrcType, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat>
+__simd_callee__ inline reg_tensor<DstType> cast_impl(reg_tensor<SrcType> src)
 {
-    static_assert(!AscendC::Std::is_same_v<To, From>,
+    static_assert(!AscendC::Std::is_same_v<DstType, SrcType>,
         "reg_tensor cast requires different source and destination element types");
 
-    using op = reg_cast_op<To, From, Layout, Round, Sat>;
+    using op = reg_cast_op<DstType, SrcType, Layout, Round, Sat>;
     static_assert(op::supported,
         "register cast type or option combination is unsupported on the current architecture");
 
-    reg_tensor<To> dst;
+    reg_tensor<DstType> dst;
     if constexpr (op::supported) {
         op::run(dst.reg, src.reg, src.mask);
     }
@@ -94,10 +94,10 @@ struct is_supported<float> {
 
 } // namespace detail
 
-template <typename To, const cast_options& opt, typename From>
-__simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src)
+template <typename DstType, const cast_options& opt, typename SrcType>
+__simd_callee__ inline reg_tensor<DstType> cast(reg_tensor<SrcType> src)
 {
-    return detail::cast_impl<To, opt.layout, opt.round, opt.sat>(src);
+    return detail::cast_impl<DstType, SrcType, opt.layout, opt.round, opt.sat>(src);
 }
 
 template <typename T>

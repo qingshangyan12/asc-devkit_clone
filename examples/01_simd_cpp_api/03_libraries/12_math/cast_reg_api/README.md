@@ -4,7 +4,7 @@
 
 本样例介绍如何使用 Tensor API `asc::te::cast` 完成逐元素数据类型转换。样例输入和输出均为 `[16, 16]` 的二维 ND Tensor，共包含256个元素。
 
-样例覆盖浮点类型、整数类型和 `bfloat16_t` 之间的6种转换场景，并演示不同位宽转换时的 `unpack`、`unpack4`、`pack` 和 `pack_quarter` 访存模式。计算关系如下：
+样例覆盖浮点类型和浮点类型、整数类型和浮点类型之间的6种转换场景，并演示不同位宽转换时的 `unpack`、`unpack4`、`pack` 和 `pack_quarter` 访存模式。计算关系如下：
 
 ```text
 y[i] = cast<To, Options>(x[i])
@@ -78,8 +78,6 @@ y[i] = cast<To, Options>(x[i])
     </tr>
   </table>
 
-  输入和输出文件均为无文件头的连续二进制数据，元素采用主机端小端字节序存储。
-
   | SCENARIO_NUM | `input/input_x.bin` | 输入大小 | `output/output.bin` / `output/golden.bin` | 输出大小 |
   | --- | --- | --- | --- | --- |
   | 1 | 256个 `half` | 512 B | 256个 `int32_t` | 1024 B |
@@ -114,10 +112,6 @@ y[i] = cast<To, Options>(x[i])
 
     当源类型和目标类型位宽不同时，样例会为 `load` 或 `store` 指定对应的 sideband mode，保证寄存器数据排布与转换指令匹配。
 
-  - 调用实现
-
-    Host侧读取 `input/input_x.bin`，申请Host和Device内存，并通过 `<<<1, 0, stream>>>` 启动一个Vector Block。Kernel执行完成后，Host侧将结果写入 `output/output.bin`，并与 `output/golden.bin` 比较；BF16输出按位比较，其余类型使用绝对误差和相对误差校验。
-
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
@@ -139,19 +133,18 @@ y[i] = cast<To, Options>(x[i])
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
-  python3 ../scripts/gen_data.py -scenarioNum=${SCENARIO_NUM}
+  python3 ../scripts/gen_data.py -scenarioNum=1
   ./demo
   ```
 
   生成数据时传入的 `scenarioNum` 必须与编译时的 `SCENARIO_NUM` 一致。运行其他场景时，将其修改为1至6之间的对应值。
 
-  使用CPU仿真或NPU仿真时，可分别增加以下编译选项：
+  使用NPU仿真时，可分别增加以下编译选项：
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DSCENARIO_NUM=${SCENARIO_NUM} ..
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} ..
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=1 ..
   ```
 
   切换运行模式、芯片型号或场景时，建议清除 `build` 目录中的CMake缓存后重新配置。
@@ -160,7 +153,7 @@ y[i] = cast<To, Options>(x[i])
 
   | 选项 | 说明 |
   | --- | --- |
-  | `CMAKE_ASC_RUN_MODE` | 算子执行模式，可选 `npu`、`cpu`、`sim`，默认值为 `npu`。 |
+  | `CMAKE_ASC_RUN_MODE` | 算子执行模式，可选 `npu`、`sim`，默认值为 `npu`。 |
   | `CMAKE_ASC_ARCHITECTURES` | NPU芯片型号，默认值为 `dav-3510`。 |
   | `SCENARIO_NUM` | 类型转换场景编号，必选，取值范围为1至6。 |
 

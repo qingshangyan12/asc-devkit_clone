@@ -16,7 +16,7 @@
 #ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_H
 #define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_H
 
-#include "../../../utils/utils.h"
+#include "tensor_api/utils/utils.h"
 #include "tensor_api/arch/vector/experimental/reg_tensor.h"
 
 namespace asc {
@@ -25,8 +25,8 @@ namespace te {
 constexpr cast_options default_cast_ops = {
     cast_layout::zero, cast_round_mode::rint, cast_sat_mode::not_sat};
 
-template <typename To, const cast_options& opt = default_cast_ops, typename From>
-__simd_callee__ inline reg_tensor<To> cast(reg_tensor<From> src);
+template <typename DstType, const cast_options& opt = default_cast_ops, typename SrcType>
+__simd_callee__ inline reg_tensor<DstType> cast(reg_tensor<SrcType> src);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src);

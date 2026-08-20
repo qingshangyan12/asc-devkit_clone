@@ -2,9 +2,9 @@
 
 ## Overview
 
-This sample demonstrates how to use the experimental register Tensor API `asc::te::cast` to perform element-wise data type conversion. Both the input and output are two-dimensional ND tensors with shape `[16, 16]`, containing 256 elements.
+This sample demonstrates how to use the Tensor API `asc::te::cast` to perform element-wise data type conversion. Both the input and output are two-dimensional ND tensors with shape `[16, 16]`, containing 256 elements.
 
-The sample covers six conversion scenarios among floating-point types, integer types, and `bfloat16_t`. It also demonstrates the `unpack`, `unpack4`, `pack`, and `pack_quarter` memory access modes used for conversions between types of different widths. The computation is as follows:
+The sample covers six conversion scenarios between floating-point types and between integer and floating-point types. It also demonstrates the `unpack`, `unpack4`, `pack`, and `pack_quarter` memory access modes used for conversions between types of different widths. The computation is as follows:
 
 ```text
 y[i] = cast<To, Options>(x[i])
@@ -78,8 +78,6 @@ y[i] = cast<To, Options>(x[i])
     </tr>
   </table>
 
-  The input and output files contain contiguous binary data without file headers. Elements are stored in the host's little-endian byte order.
-
   | SCENARIO_NUM | `input/input_x.bin` | Input Size | `output/output.bin` / `output/golden.bin` | Output Size |
   | --- | --- | --- | --- | --- |
   | 1 | 256 `half` elements | 512 B | 256 `int32_t` elements | 1024 B |
@@ -114,10 +112,6 @@ y[i] = cast<To, Options>(x[i])
 
     When the source and destination types have different widths, the sample specifies the corresponding sideband mode for `load` or `store` so that the register data layout matches the conversion instruction.
 
-  - Invocation
-
-    The host reads `input/input_x.bin`, allocates host and device memory, and launches one Vector Block using `<<<1, 0, stream>>>`. After the kernel finishes, the host writes the result to `output/output.bin` and compares it with `output/golden.bin`. BF16 output is compared bit by bit, while the other types are checked using absolute and relative errors.
-
 ## Build and Run
 
 Run the following steps in the sample root directory to build and execute the operator.
@@ -139,19 +133,18 @@ Run the following steps in the sample root directory to build and execute the op
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
   make -j
-  python3 ../scripts/gen_data.py -scenarioNum=${SCENARIO_NUM}
+  python3 ../scripts/gen_data.py -scenarioNum=1
   ./demo
   ```
 
   The `scenarioNum` passed to the data generation script must match the `SCENARIO_NUM` used during compilation. To run another scenario, set both values to the corresponding number from 1 to 6.
 
-  To use CPU emulation or NPU simulation, add the corresponding build option:
+  To use NPU simulation, add the following build option:
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DSCENARIO_NUM=${SCENARIO_NUM} ..
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} ..
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=1 ..
   ```
 
   When switching the run mode, chip model, or scenario, clear the CMake cache in the `build` directory before reconfiguring the project.
@@ -160,7 +153,7 @@ Run the following steps in the sample root directory to build and execute the op
 
   | Option | Description |
   | --- | --- |
-  | `CMAKE_ASC_RUN_MODE` | Operator execution mode. Available values are `npu`, `cpu`, and `sim`. The default is `npu`. |
+  | `CMAKE_ASC_RUN_MODE` | Operator execution mode. Available values are `npu` and `sim`. The default is `npu`. |
   | `CMAKE_ASC_ARCHITECTURES` | NPU chip model. The default is `dav-3510`. |
   | `SCENARIO_NUM` | Required data type conversion scenario number. The valid range is 1 to 6. |
 
