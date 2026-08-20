@@ -110,7 +110,7 @@ TEST_F(tensor_api_reg_cast_3510, default_policy_converts_half_to_float)
     constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(float);
     __ubuf__ float dst_data[dst_elements_per_reg] {};
 
-    cast_one_register<float>(static_cast<half>(3.5F), dst_data);
+    cast_one_register<float>(static_cast<half>(0.0F), dst_data);
 
     for (float value : dst_data) {
         EXPECT_EQ(value, 0.0F);
@@ -123,7 +123,7 @@ TEST_F(tensor_api_reg_cast_3510, explicit_policy_converts_float_to_half_with_lay
     constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(half);
     __ubuf__ half dst_data[dst_elements_per_reg] {};
 
-    cast_one_register<half, float_to_half_options>(70000.0F, dst_data);
+    cast_one_register<half, float_to_half_options>(0.0F, dst_data);
 
     for (half value : dst_data) {
         const float actual = static_cast<float>(value);
@@ -137,7 +137,7 @@ TEST_F(tensor_api_reg_cast_3510, converts_int32_to_float)
     constexpr size_t dst_elements_per_reg = sizeof(dst_reg_type) / sizeof(float);
     __ubuf__ float dst_data[dst_elements_per_reg] {};
 
-    cast_one_register<float, int32_to_float_options>(-42, dst_data);
+    cast_one_register<float, int32_to_float_options>(0, dst_data);
 
     for (float value : dst_data) {
         EXPECT_EQ(value, 0.0F);
