@@ -444,6 +444,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const uint8_t missionNum = GetKfcMissionNum(handleId);
     for (uint8_t mission = 0; mission < missionNum; ++mission) {
         ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId, mission);
+        AscendC::PRINTF(
+            "[KFC_DEBUG][Commit] handleId=%u resourceId=%u mission=%u missionNum=%u commitCKEAddr=%p\n",
+            static_cast<uint32_t>(handleId), static_cast<uint32_t>(resourceId), static_cast<uint32_t>(mission),
+            static_cast<uint32_t>(missionNum), ccuMsg_.commitCKEAddr);
         WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
     }
 }
@@ -452,12 +456,20 @@ template <const auto& config>
 __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetKfcMissionNum(
     HcclHandle handleId) const
 {
-    if (newCcuFlag_ && handleId < MAX_CC_TILING_NUM &&
-        hcclNewContext_->algorithmType[handleId] ==
-            static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink)) {
-        return KFC_MAX_MISSION_NUM;
+    uint32_t algorithmType = UINT32_MAX;
+    if (newCcuFlag_ && handleId < MAX_CC_TILING_NUM) {
+        algorithmType = hcclNewContext_->algorithmType[handleId];
     }
-    return 1U;
+    uint8_t missionNum = 1U;
+    if (newCcuFlag_ && handleId < MAX_CC_TILING_NUM &&
+        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink)) {
+        missionNum = KFC_MAX_MISSION_NUM;
+    }
+    AscendC::PRINTF(
+        "[KFC_DEBUG][MissionNum] handleId=%u newCcuFlag=%u algorithmType=%u missionNum=%u\n",
+        static_cast<uint32_t>(handleId), static_cast<uint32_t>(newCcuFlag_), algorithmType,
+        static_cast<uint32_t>(missionNum));
+    return missionNum;
 }
 
 template <const auto& config>
@@ -553,9 +565,17 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         const uint8_t missionNum = GetKfcMissionNum(handleId);
         for (uint8_t mission = 0; mission < missionNum; ++mission) {
             GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId, mission);
+            AscendC::PRINTF(
+                "[KFC_DEBUG][Wait] handleId=%u reqId=%u mission=%u missionNum=%u waitCKEAddr=%p\n",
+                static_cast<uint32_t>(handleId), static_cast<uint32_t>(reqId), static_cast<uint32_t>(mission),
+                static_cast<uint32_t>(missionNum), waitCKEAddr);
             while (true) {
                 uint64_t waitCke = ReadHBMData(waitCKEAddr);
                 if (waitCke != 0) {
+                    AscendC::PRINTF(
+                        "[KFC_DEBUG][WaitDone] handleId=%u reqId=%u mission=%u waitCke=%lu\n",
+                        static_cast<uint32_t>(handleId), static_cast<uint32_t>(reqId),
+                        static_cast<uint32_t>(mission), waitCke);
                     WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(waitCKEAddr), CCU_MSG_CKE_INIT_VALUE);
                     break;
                 }
