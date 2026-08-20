@@ -438,21 +438,52 @@ __ubuf__ int * __gm__ ptr;
 
 ## 内置变量<a name="section199434523343"></a>
 
-| 变量名 | 相关API | 功能 |
-|-------|---------|------|
-| block_num | GetBlockNum | 当前任务配置的核数，用于代码内部的多核逻辑控制等。内置变量block_num的值与通过相关API GetBlockNum获取的值保持一致。 |
-| block_idx | GetBlockIdx | 当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。注意，内置变量block_idx的值与通过相关API GetBlockIdx获取的值在部分场景下并不一致，具体说明及场景示例请参考下文描述。 |
-通常，建议用户使用内置变量对应的API获取所需值，不建议用户直接使用内置变量。因为内置变量反映的是单个硬件资源的配置信息，对于软件栈整合硬件资源、扩展硬件的功能，内置变量的值与实际语义可能不符。
+内置变量由框架自动设置，可在Device侧代码中直接引用，用于多核逻辑控制和数据分片。在Mix场景下，还需组合使用sub_block相关变量，各变量的说明及获取方式如下：
 
-在Mix场景（使用`__mix__`函数执行空间限定符）下，Vector核（AIV）的逻辑位置需要通过block_idx和sub_block_idx共同确定：`logic_idx = block_idx * sub_block_num + sub_block_idx`。其中block_idx标识当前组合在整个grid中的位置，sub_block_idx标识当前AIV在组合内的位置。开发者应使用GetBlockIdx和GetSubBlockIdx API组合获取完整的逻辑位置信息，而非直接使用内置变量。
+| 变量 | 说明 | 获取方式 |
+|------|------|---------|
+| block_num | 当前任务配置的核数。 | 内置变量，直接引用（GetBlockNum返回值一致） |
+| block_idx | 当前核的索引。 | 内置变量，直接引用（GetBlockIdx返回值在部分场景不一致，见下表） |
+| sub_block_num | 单个组合中AIV的数量。 | 非内置变量，通过[GetSubBlockNum](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSubBlockNum_ISASI.md)或[asc_get_sub_block_num](../../../api/SIMD-API/c_api/sys_var/asc_get_sub_block_num.md)获取 |
+| sub_block_idx | 当前AIV在组合内的位置，取值范围为[0, sub_block_num - 1]。 | 非内置变量，通过[GetSubBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSubBlockIdx_ISASI.md)或[asc_get_sub_block_id](../../../api/SIMD-API/c_api/sys_var/asc_get_sub_block_id.md)获取 |
 
-**示例：**
+**各场景下的变量取值**
 
-例如，在任务配置的核数为3（block_num = 3）的场景下，当使用`__mix__(1, 2)`作为函数执行空间限定符时，任务会启动3个Cube Core和6个Vector Core，内置变量block_idx在6个Vector Core上的取值分别为：0、0、1、1、2、2，即位于同一核上的两个Vector Core取值相同，而GetBlockIdx API获取的值分别为：0、1、2、3、4、5，两者并不相同。在3个Cube Core上两者的取值相同，均为：0、1、2。
+不同执行场景下，上述变量的取值不同。下表以block_num = 4为例：
+
+| 场景 | 执行核 | block_idx（内置变量） | GetBlockIdx | sub_block_num | sub_block_idx | logic_idx |
+|------|--------|----------------------|-------------|---------------|---------------|-----------|
+| 纯Cube（`__cube__`） | AIC | 0、1、2、3 | 与block_idx一致 | 1 | 0 | 等于block_idx |
+| 纯Vector（`__vector__`） | AIV | 0、1、2、3 | 与block_idx一致 | 1 | 0 | 等于block_idx |
+| Mix（`__mix__(1, 1)`） | AIC、AIV | 0、1、2、3 | 与block_idx一致 | 1 | 0 | 等于block_idx |
+| Mix（`__mix__(1, 2)`） | AIC | 0、1、2、3 | 与block_idx一致 | 2 | 0 | 等于block_idx |
+| Mix（`__mix__(1, 2)`） | AIV | 组合内取值相同：0、0、1、1、2、2、3、3 | 0、1、2、3、4、5、6、7 | 2 | 0或1 | 见公式 |
+
+说明：
+- block_num与GetBlockNum的返回值始终一致；asc_get_block_idx与内置变量block_idx的返回值始终一致。
+- 除Mix（1,2）的AIV外，GetBlockIdx与内置变量block_idx的取值均一致。当sub_block_num大于1（如Mix（1,2））时，AIV的GetBlockIdx直接返回逻辑位置0~7，与公式计算结果一致。
+- Mix（1,2）场景下，AIC侧asc_get_sub_block_num的返回值为2（950实机验证），与[asc_get_sub_block_num](../../../api/SIMD-API/c_api/sys_var/asc_get_sub_block_num.md)接口文档标注的"AIC返回1"不一致。
+
+**Mix场景下AIV逻辑位置的确定**
+
+Mix场景下，一个组合由1个Cube Core（AIC）和若干个Vector Core（AIV）组成，组合内AIV的block_idx相同，因此AIV不能仅通过block_idx定位，还需结合sub_block_idx，计算公式如下：
+
+```
+logic_idx = block_idx * sub_block_num + sub_block_idx
+```
+
+以Mix（1,2）场景中组合2的第二个AIV为例：block_idx = 2、sub_block_idx = 1，代入公式得logic_idx = 2 × 2 + 1 = 5，与上表GetBlockIdx列一致。
+
+**使用建议**
+
+-   使用**基础API**时，应使用[GetBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)和[GetSubBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSubBlockIdx_ISASI.md)组合获取逻辑位置，而非直接使用内置变量。原因在于：Mix（1,2）的AIV上，block_idx在组合内取值相同（0、0、1、1、2、2、3、3），无法区分同一组合内的AIV；而GetBlockIdx直接返回0、1、2、3、4、5、6、7，与该场景的logic_idx一致。其余场景两者取值一致。
+-   使用**C API**时，应使用内置变量block_idx和[asc_get_sub_block_id](../../../api/SIMD-API/c_api/sys_var/asc_get_sub_block_id.md)按公式计算logic_idx。
 
 <!-- npu="310p" id7 -->
-例如，在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
+在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
 <!-- end id7 -->
+
+
 
 ## 核函数配置<a name="section97005415463"></a>
 
