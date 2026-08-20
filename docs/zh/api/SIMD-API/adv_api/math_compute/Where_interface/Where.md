@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/math_compute/Where_interface/Where_res.md#id1 -->
 
 ## 功能说明
 
@@ -62,7 +63,7 @@ __aicore__ inline void Where(const LocalTensor<T>& dst, const U& src0, const S& 
 ## 约束说明
 
 -   **不支持源操作数与目的操作数地址重叠。**
--   操作数地址偏移对齐要求请参见[通用说明和约束](../../../通用说明和约束.md)。
+-   操作数地址偏移对齐要求请参见[通用说明和约束](../../../general_description_and_constraints.md)。
 
 ## 调用示例
 

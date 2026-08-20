@@ -123,8 +123,8 @@
 
 ## 约束说明
 
-- 源操作数及`sharedTmpBuffer`的地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[ReduceRepeat-表3](./ReduceRepeat.md#tab3)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
+- 源操作数及`sharedTmpBuffer`的地址对齐约束请参考[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[ReduceRepeat-表3](./ReduceRepeat.md#tab3)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md#通用地址重叠约束)。
 - 需要使用`sharedTmpBuffer`的情况下，支持`dst`与`sharedTmpBuffer`地址重叠（通常情况下`dst`比`sharedTmpBuffer`所需的空间要小），此时`sharedTmpBuffer`必须满足所需空间要求，详情请参考[关键特性说明](#关键特性说明)。
 
 <!-- npu="950,A3,910b" id18 -->
@@ -144,7 +144,7 @@
   <!-- end id22 -->
 <!-- end id18 -->
 
-- `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
+- `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合Unified Buffer（UB）的实际大小避免出现越界。
 - 如果存在多个最大值，该指令会将最小索引写入目的操作数。
 - `dst`结果存储顺序为最大值，最大值索引，若不需要索引，只会存储最大值。
 - 索引按操作数的数据类型存储，读取索引需要将类型转换到整型。请参考[ReduceRepeat关键特性说明](./ReduceRepeat.md#关键特性说明)。

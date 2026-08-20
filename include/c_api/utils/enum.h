@@ -35,6 +35,12 @@ enum class asc_store_l2_cache_mode : uint8_t {
     NOTALLOC_CLEAN = 4
 };
 
+enum class asc_hf32_round_mode : uint8_t {
+    NEAREST_AWAY = 0,
+    NEAREST_EVEN = 1,
+    NEAREST_ZERO = NEAREST_AWAY // Compatible with the old name; the actual behavior is equivalent to NEAREST_AWAY.
+};
+
 enum class asc_dual_dst_mode : uint8_t {
     DUAL_DST_DISABLE = 0,
     DUAL_DST_SPLIT_M = 1,
@@ -56,8 +62,6 @@ enum class asc_relu_pre_mode : uint8_t {
 };
 
 using asc_quant_mode = QuantMode_t;
-
-enum class asc_hf32_round_mode : uint8_t { NEAREST_ZERO, NEAREST_EVEN };
 
 enum class asc_position_mode { EVEN = 0, ODD };
 

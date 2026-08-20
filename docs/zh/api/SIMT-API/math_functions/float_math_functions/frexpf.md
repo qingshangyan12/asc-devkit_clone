@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/float_math_functions/frexpf_res.md#id1 -->
 
 ## 功能说明
 
@@ -41,7 +42,7 @@ inline float frexpf(float x, int *exp)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | x | 输入 | 源操作数。 |
-| exp | 输出 | Unified Buffer、Global Memory或栈空间的地址，用于存储以2为底的指数。 |
+| exp | 输出 | UB、Global Memory或栈空间的地址，用于存储以2为底的指数。 |
 
 ## 返回值说明
 
