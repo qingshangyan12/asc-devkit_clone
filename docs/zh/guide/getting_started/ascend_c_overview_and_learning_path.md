@@ -95,7 +95,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 </div>
 <div style=" margin: 5px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;"><a href="../programming_guide/debug_and_tuning/overview.md" style="color: #3b82f6; text-decoration: none;">🔧 调试与调优</a></strong><br/>
-<a href="../programming_guide/debug_and_tuning/functional_debug/cpu_twin_debug.md" style="color: #3b82f6; font-size: 14px;">功能调试</a> <span style="color: #999; font-size: 13px;">（<a href="../programming_guide/debug_and_tuning/functional_debug/cpu_twin_debug.md" style="color: #3b82f6; font-size: 13px;">CPU域孪生调试</a> | <a href="../programming_guide/debug_and_tuning/functional_debug/npu_board_debug.md" style="color: #3b82f6; font-size: 13px;">NPU域孪生调试</a>）</span> | <a href="../programming_guide/debug_and_tuning/performance_tuning.md" style="color: #3b82f6; font-size: 14px;">性能调试</a>
+<a href="../programming_guide/debug_and_tuning/functional_debug/cpu_twin_debug.md" style="color: #3b82f6; font-size: 14px;">功能调试</a> <span style="color: #999; font-size: 13px;">（<a href="../programming_guide/debug_and_tuning/functional_debug/cpu_twin_debug.md" style="color: #3b82f6; font-size: 13px;">CPU域孪生调试</a> | <a href="../programming_guide/debug_and_tuning/functional_debug/npu_board_debug.md" style="color: #3b82f6; font-size: 13px;">NPU域上板调试</a>）</span> | <a href="../programming_guide/debug_and_tuning/performance_tuning.md" style="color: #3b82f6; font-size: 14px;">性能调试</a>
 </div>
 <div style=" margin: 5px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;">📦 算子部署</strong><br/>
@@ -103,9 +103,9 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 </div>
 <div style=" margin: 5px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;"><span style="color: #3b82f6;">💻</span> 实践巩固</strong><br/>
-<span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMD算子实现/矢量编程/概述.md" style="color: #3b82f6; font-size: 14px;">典型SIMD矢量算子开发</a></span><br/>
-<span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMD算子实现/矩阵编程（基础API）/分离模式.md" style="color: #3b82f6; font-size: 14px;">典型SIMD矩阵类算子开发</a></span><br/>
-<span style="color: #666; font-size: 14px;">• <a href="../算子实践参考/SIMT算子实现/算子实现.md" style="color: #3b82f6; font-size: 14px;">典型SIMT算子开发</a></span>
+<span style="color: #666; font-size: 14px;">• <a href="../operator_practice/simd_operator_impl/vector_programming/overview.md" style="color: #3b82f6; font-size: 14px;">典型SIMD矢量算子开发</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../operator_practice/simd_operator_impl/matrix_basic_api/decoupled_mode.md" style="color: #3b82f6; font-size: 14px;">典型SIMD矩阵类算子开发</a></span><br/>
+<span style="color: #666; font-size: 14px;">• <a href="../operator_practice/simt_operator_impl/operator_impl.md" style="color: #3b82f6; font-size: 14px;">典型SIMT算子开发</a></span>
 </div>
 
 </div>
@@ -124,7 +124,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 </div>
 <div style=" margin: 5px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">
 <strong style="color: #1a1a1a;"><span style="color: #3b82f6;">💻</span> 实践巩固</strong><br/><span style="color: #666; font-size: 14px;">• 
-<a href="../算子实践参考/SIMD与SIMT混合算子实现/算子实现.md" style="color: #3b82f6; font-size: 14px;">典型SIMD & SIMT混合算子开发</a><br/><span style="color: #666; font-size: 14px;">• 
+<a href="../operator_practice/simd_simt_hybrid_operator_impl/operator_impl.md" style="color: #3b82f6; font-size: 14px;">典型SIMD & SIMT混合算子开发</a><br/><span style="color: #666; font-size: 14px;">• 
 <a href="https://gitcode.com/cann/cann-samples" style="color: #3b82f6; font-size: 14px;">Ascend C算子高性能实践样例仓</a>
 </div>
 <div style=" margin: 5px 0; padding: 8px; background: #fff; border-left: 3px solid #3b82f6; border-radius: 4px;">

@@ -2,13 +2,13 @@
 
 C++ Tensor编程是Ascend C SIMD编程路径的基础编程接口，基于Tensor对象抽象封装内存地址，提供类型安全、编译期检查的高层次编程能力。开发者通过LocalTensor、GlobalTensor、RegTensor等Tensor对象管理内存，无需直接操作指针地址，搬运计算接口直接操作Tensor对象即可完成数据流转。该路径适用于追求开发效率、类型安全、代码可维护性的算子开发场景，是习惯C++面向对象编程的开发者快速上手NPU算子开发的关键技术路径。本章旨在帮助开发者建立对C++ Tensor编程的系统化认知，理解其Tensor抽象编程范式、核心编程模型与开发方法论。
 
-## Kernel函数
+## 核函数（Kernel）
 
-[核函数](../kernel_function.md)在前序章节已作介绍，C++ Tensor编程在核函数定义与调用上沿用SIMD编程通用规范，无额外语法约束。
+[核函数（Kernel）](../kernel_function.md)在前序章节已作介绍，C++ Tensor编程在核函数（Kernel）定义与调用上沿用SIMD编程通用规范，无额外语法约束。
 
 ## 内存层级
 
-AI Core采用分级存储架构，Cube矩阵计算采用「Global Memory（以下简称为GM） → L1/L0系列Buffer」两级层级服务于矩阵计算，Vector矢量计算传统架构为「Global Memory → Unified Buffer（以下简称为UB）」两级层级，而[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)引入寄存器后构建「GM → UB → Register」三级层级，其中GM存放输入输出数据、UB作为矢量计算中间缓存、Register位于Vector计算单元最内层直接与执行单元交互。
+AI Core采用分级存储架构，Cube矩阵计算采用「Global Memory（以下简称为GM） → L1/L0系列Buffer」两级层级服务于矩阵计算，Vector矢量计算传统架构为「Global Memory → UB」两级层级，而[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)引入寄存器后构建「GM → UB → Register」三级层级，其中GM存放输入输出数据、Unified Buffer（UB）作为矢量计算中间缓存、Register位于Vector计算单元最内层直接与执行单元交互。
 
 ![AI Core存储层次结构](../../../../figures/aicore_mem_2.png)
 
@@ -63,9 +63,9 @@ Tensor本质是基于数组的编程抽象，而非简单的内存地址封装�
 
 前文的Tensor抽象示例中已展示了GlobalTensor和LocalTensor的基本用法。下面从硬件存储层级的角度，进一步介绍外部存储和内部存储的特性及Tensor管理方式。
 GM是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟较长。用于存储算子的输入数据、输出结果和中间计算数据。GM具有持久性：其中存储的数据持续保留，直到内存空间被释放或应用程序终止。
-用户通过Runtime API管理Device侧全局内存。Host侧使用`aclrtMalloc`分配Device内存，通过`aclrtMemcpy`完成Host与Device间的数据拷贝，通过`<<<>>>`拉起核函数执行，最后使用`aclrtFree`释放内存。有关Runtime API的详细信息，可参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+用户通过Runtime API管理Device侧全局内存。Host侧使用`aclrtMalloc`分配Device内存，通过`aclrtMemcpy`完成Host与Device间的数据拷贝，通过`<<<>>>`拉起核函数（Kernel）执行，最后使用`aclrtFree`释放内存。有关Runtime API的详细信息，可参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
-如下示例展示了在Host侧通过Runtime API管理分配Device内存、在Host与Device之间数据拷贝以及核函数的调用过程：
+如下示例展示了在Host侧通过Runtime API管理分配Device内存、在Host与Device之间数据拷贝以及核函数（Kernel）的调用过程：
 ```cpp
 // Kernel function definition (using __global__ prefix to indicate Host call, Device execution)
 __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
@@ -201,7 +201,7 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 
 #### Bank冲突
 
-为了提高数据访问的效率和吞吐量，内部存储采用了bank（大小相等的内存模块）结构设计。以UB为例，[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)产品上，UB总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。[NPU架构版本2201](../../../language_extension/simd_builtin_keywords.md)的UB容量规格请参考[UB bank结构](../../../../算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/avoid_bank_conflict_npu_arch_2201.md)。
+为了提高数据访问的效率和吞吐量，内部存储采用了bank（大小相等的内存模块）结构设计。以UB为例，[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)产品上，UB总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。[NPU架构版本2201](../../../language_extension/simd_builtin_keywords.md)的UB容量规格请参考[UB bank结构](../../../../operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/avoid_bank_conflict_npu_arch_2201.md)。
 
 ![UB Bank冲突示意图](../../../../figures/ub_conflict.png)
 
@@ -216,7 +216,7 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 
 以读写冲突为例，当进行一组`dst = src0 + src1`的矢量加法计算时，如果`src0`的起始地址在0x0000，`dst`的起始地址为0x4000，结合Bank的排布，可以看到当前`src0`和`dst`的地址分别属于同一个bank和同一个bank group，则存在读写冲突。
 
-当遇到Bank冲突时，会引起算子性能的下降，通常可以通过优化计算逻辑和优化分配地址方式来避免冲突的产生，详情请参考[避免Bank冲突](../../../../算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/avoid_bank_conflict_npu_arch_3510.md)。
+当遇到Bank冲突时，会引起算子性能的下降，通常可以通过优化计算逻辑和优化分配地址方式来避免冲突的产生，详情请参考[避免Bank冲突](../../../../operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/avoid_bank_conflict_npu_arch_3510.md)。
 
 合理规划内存地址可规避Bank冲突、提升访存吞吐，但AI Core内DMA、Vector、Cube多流水异步执行，数据读写存在强依赖。需要配套同步机制管控多流水线执行时序，避免脏读、计算错乱。
 
@@ -253,7 +253,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 | **PIPE_M** | 矩阵计算流水 |
 | **PIPE_MTE1** | L1 Buffer→L0A Buffer、L1 Buffer→L0B Buffer数据搬运流水 |
 | **PIPE_MTE2** | GM→L1 Buffer、GM→UB等数据搬运流水 |
-| **PIPE_MTE3** | UB→GM等数据搬运流水 |
+| **PIPE_MTE3** | UB→GM、L1 Buffer→GM数据搬运流水 |
 | **PIPE_FIX** | L0C Buffer→GM、L0C Buffer→L1等数据搬运流水 |
 
 为确保流水线间正确执行，AI Core针对不同应用场景提供了多种同步机制，开发者可根据实际需求灵活选择合适的同步方式来实现算子功能。
@@ -388,8 +388,8 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 ## 编程约束和限制
 
 - 同步事件由开发者使用`SetFlag/WaitFlag(ISASI)`和`PipeBarrier(ISASI)`手动插入，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。
-- Kernel入口处需要开发者手动调用[InitSocState](../../../../../api/SIMD-API/basic_api/tool_interface/system_init/InitSocState.md)接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
-- Kernel结束前需要开发者手动调用[PipeBarrier<PIPE_ALL>()](../../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/PipeBarrier_ISASI.md)。
+- 核函数（Kernel）入口处需要开发者手动调用[InitSocState](../../../../../api/SIMD-API/basic_api/tool_interface/system_init/InitSocState.md)接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
+- 核函数（Kernel）结束前需要开发者手动调用[PipeBarrier<PIPE_ALL>()](../../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/PipeBarrier_ISASI.md)。
 - 部分API内部通过软仿真实现，需占用Ascend C预留的UB空间，开发者使用时需关注目标API是否依赖该预留空间（针对[NPU架构版本2201](../../../language_extension/simd_builtin_keywords.md)，Select等API内部使用了8KB的预留UB空间，用于存储中间数据；针对[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)，Exp等API内部使用了2KB的预留UB空间，用于指令兼容或存储中间数据）。若开启--cce-disable-asc-reserved-ubuf编译选项，在对应产品版本下调用相关API会触发编译期报错。具体API范围见[使用预留UB空间的API列表](#section_reserved_ubuf_api)。
 - 同时另外一些软仿实现接口内部会占用系统分配的事件ID，如果开发者手动调用`SetFlag/WaitFlag(ISASI)`插入自定义事件ID时会跟接口内部的事件ID产生冲突，所以用户自定义事件ID时，只能支持部分API。具体支持的API列表见[支持的API范围](#section2633193623711)。
 

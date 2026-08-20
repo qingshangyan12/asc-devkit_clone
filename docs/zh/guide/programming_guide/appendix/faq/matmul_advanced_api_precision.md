@@ -15,11 +15,11 @@
 
 1.  **CPU域调试，观察报错信息**
 
-    在完成算子代码的开发后，优先通过[Kernel直调中的CPU调测工程](../kernel_direct_call_from_sample.md#section883611324486)，调试算子的功能。在CPU域调试时，若编译或执行报错，日志中一般会有明显的报错信息。根据报错信息的提示内容，通常可以快速定位到问题所对应的代码位置。这种方法尤其对DataCopy参数设置错误导致的地址越界、算子Tiling参数设置不正确、其他内存越界访问等基础参数的使用问题，可以快速定位到具体原因。
+    在完成算子代码的开发后，优先通过[核函数（Kernel）直调中的CPU调测工程](../kernel_direct_call_from_sample.md#section883611324486)，调试算子的功能。在CPU域调试时，若编译或执行报错，日志中一般会有明显的报错信息。根据报错信息的提示内容，通常可以快速定位到问题所对应的代码位置。这种方法尤其对DataCopy参数设置错误导致的地址越界、算子Tiling参数设置不正确、其他内存越界访问等基础参数的使用问题，可以快速定位到具体原因。
 
     1.  案例：
 
-        以下为matmul算子核函数的代码片段。该段代码实现了根据Global Memory上的A、B矩阵和Tiling信息，计算每个核要使用数据的地址偏移、创建Matmul对象，计算得到Matmul结果。
+        以下为matmul算子核函数（Kernel）的代码片段。该段代码实现了根据Global Memory上的A、B矩阵和Tiling信息，计算每个核要使用数据的地址偏移、创建Matmul对象，计算得到Matmul结果。
 
         ```
         extern "C" __global__ __aicore__ void matmul_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR workspace, GM_ADDR tilingGm)
@@ -145,7 +145,7 @@
 
         修改算子代码，注释屏蔽LeakyRelu API计算，同时，需要适配修改相应的内存分配和涉及的同步等代码；然后，注释golden脚本中LeakyRelu计算，具体修改示例如下。
 
-        以下代码为算子核函数的代码片段。
+        以下代码为算子核函数（Kernel）的代码片段。
 
         ```
         template <typename aType, typename bType, typename cType, typename biasType>
@@ -232,7 +232,7 @@
 
     验证单核场景下算子的功能是否正确，可以帮助快速定界是Matmul API的计算结果不符合预期，还是算子代码中错误调用Matmul API导致。由于Matmul API内部实现的是单核的计算逻辑，所以单核的计算结果正确，而多核的计算结果错误的情况，说明单核上的Matmul API的使用及计算正确，这时需要排查与多核切分相关的代码逻辑是否正确，比如每个核的输入和输出地址偏移是否正确，每个核上的尾块地址设置是否正确。如果验证单核场景下，算子精度不正确，需要排查Matmul API的使用是否正确，具体可参考[步骤5](#li1950561483219)。
 
-    提示，包含Matmul的算子的Tiling实现中，Matmul的多核Tiling需要使用MultiCoreMatmulTiling构造多核Tiling对象，通过SetDim接口设置Matmul计算所用的核数。注意：这里设置的核数为Matmul计算所用的核数，仅在多核场景下设置，用于计算tiling参数。如下两个案例为MIX模式的算子，SetDim的设置规则请参考[MIX场景核数设置规则](../../../算子实践参考/SIMD算子实现/融合算子编程/CV融合/算子实现.md#zh-cn_topic_0000001644252364_li4790115115920)。
+    提示，包含Matmul的算子的Tiling实现中，Matmul的多核Tiling需要使用MultiCoreMatmulTiling构造多核Tiling对象，通过SetDim接口设置Matmul计算所用的核数。注意：这里设置的核数为Matmul计算所用的核数，仅在多核场景下设置，用于计算tiling参数。如下两个案例为MIX模式的算子，SetDim的设置规则请参考[MIX场景核数设置规则](../../../operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/operator_impl.md#zh-cn_topic_0000001644252364_li4790115115920)。
 
     -   案例1：多核切分场景，输出地址偏移不正确
 
@@ -290,7 +290,7 @@
         }
         ```
 
-        以下为算子核函数的代码片段。
+        以下为算子核函数（Kernel）的代码片段。
 
         ```
         __aicore__ inline void CalcGMOffset(int blockIdx, const TCubeTiling &tiling, int &offsetA, int &offsetB, int &offsetC,
@@ -407,9 +407,9 @@
 
         提示，在上述单核场景的修改验证中，AIC核数为1，AIV核数为2；若想进一步验证，不引入任何多核切分，AIC核数和AIV核数均修改为1，代码修改示例如下：
 
-        -   在核函数中REGIST\_MATMUL\_OBJ接口后，利用判断代码，BlockIdx不为0的AIV核退出。
+        -   在核函数（Kernel）中REGIST\_MATMUL\_OBJ接口后，利用判断代码，BlockIdx不为0的AIV核退出。
 
-            以下为算子核函数的代码片段。
+            以下为算子核函数（Kernel）的代码片段。
 
             ```
             extern "C" __global__ __aicore__ void matmul_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR workspace,
@@ -489,7 +489,7 @@
         [ERROR] result error
         ```
 
-        以下为算子核函数的代码片段。
+        以下为算子核函数（Kernel）的代码片段。
 
         ```
         __aicore__ inline void CalcGMOffset(int blockIdx, const TCubeTiling &tiling, int &offsetA, int &offsetB, int &offsetC,

@@ -8,7 +8,7 @@
 
 ### Memory矢量计算的瓶颈
 
-在以往的SIMD矢量编程中，矢量计算单元的源操作数和目的操作数都直接落在LocalMemory（Unified Buffer，以下简称UB）上。每一条矢量计算的执行过程都包含"从UB读 → 在执行单元算 → 写回UB"。当一个算子由多个矢量计算串联组成时（例如`dst = (a + b) * c + d`），每一步的中间结果都必须先写回UB，再被下一条指令重新读出。
+在以往的SIMD矢量编程中，矢量计算单元的源操作数和目的操作数都直接存放在Unified Buffer（UB）上。每一条矢量计算的执行过程都包含"从UB读 → 在执行单元算 → 写回UB"。当一个算子由多个矢量计算串联组成时（例如`dst = (a + b) * c + d`），每一步的中间结果都必须先写回UB，再被下一条指令重新读出。
 
 这种模式下存在三个典型瓶颈：
 
@@ -97,7 +97,7 @@ Reg矢量计算编程模型中`Load` -> `Compute`  ->`Store`的执行过程，�
 
 | 标签 | 角色 | 调用方 | 可调用对象 |
 | --- | --- | --- | --- |
-| `__aicore__` | Device侧普通函数 | 核函数或其他`__aicore__`函数 | `__aicore__`函数，或通过`asc_vf_call`调用VF函数 |
+| `__aicore__` | Device侧普通函数 | 核函数（Kernel）或其他`__aicore__`函数 | `__aicore__`函数，或通过`asc_vf_call`调用VF函数 |
 | `__simd_vf__` | VF函数 | `__aicore__`函数通过`asc_vf_call`调用 | `__simd_callee__`修饰的Reg矢量API或者VF内部子函数 |
 | `__simd_callee__` | VF内部子函数 | `__simd_vf__`或其他`__simd_callee__` | `__simd_callee__` |
 
@@ -666,7 +666,7 @@ VF融合可以分成两个层级：
 - 多个VF保持相同或等价的循环结构增加VF深度融合的机会，循环满足Hardware Loop规范。
 - 控制寄存器使用量，避免融合后超过寄存器资源限制。
 
-> 📌 **提示**：VF融合并非范围越大越好。融合粒度过大可能导致寄存器溢出，反而使性能下降。更多优化手段可以参考[VF融合优化](../../../../算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF融合优化.md)和[VF循环优化](../../../../算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF循环优化.md)。
+> 📌 **提示**：VF融合并非范围越大越好。融合粒度过大可能导致寄存器溢出，反而使性能下降。更多优化手段可以参考[VF融合优化](../../../../operator_practice/simd_operator_optimization/vector_compute/vf_optimization/vf_fusion_optimization.md)和[VF循环优化](../../../../operator_practice/simd_operator_optimization/vector_compute/vf_optimization/vf_loop_optimization.md)。
 
 #### 指令双发
 
@@ -674,7 +674,7 @@ VF融合可以分成两个层级：
 
 如果计算链路过长，也可以适度拆分VF循环、必要时将阶段性结果写回UB，以换取更好的指令调度空间。同时需要控制VF内寄存器数量：一个VF中可同时使用的`vector_*`、`vector_bool`、`vector_load_unalign`、`vector_store_unalign`数量都受硬件规格限制，超出后编译器会插入换入换出和同步指令，反而降低性能。
 
->📌 **提示**：优化手段可以参考[指令双发优化](../../../../算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/指令双发优化.md)。
+>📌 **提示**：优化手段可以参考[指令双发优化](../../../../operator_practice/simd_operator_optimization/vector_compute/vf_optimization/dual_issue_optimization.md)。
 
 
 

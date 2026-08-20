@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/float_math_functions/remquof_res.md#id1 -->
 
 ## 功能说明
 
@@ -40,7 +41,7 @@ inline float remquof(float x, float y, int *quo)
 | --- | --- | --- |
 | x | 输入 | 源操作数。 |
 | y | 输入 | 源操作数。 |
-| quo | 输出 | Unified Buffer、Global Memory或栈空间的地址，用于存储除法运算的商。 |
+| quo | 输出 | UB、Global Memory或栈空间的地址，用于存储除法运算的商。 |
 
 ## 返回值说明
 
