@@ -190,7 +190,7 @@ static CcuResult DoChunkedReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ct
     // 满块循环：每轮搬运 chunkSize 字节，输入/输出地址同步推进，scratch 跨 chunk 复用
     CCU_WHILE(chunkLeft != 0)
     {
-        chunkLeft -= chunkAdd;
+        chunkLeft = chunkLeft - chunkAdd;
         ctx.currentSliceSize = ctx.chunkSize;
         CCU_CHK_RET(DoReduceScatter(ctx, ctx.event));
         for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
