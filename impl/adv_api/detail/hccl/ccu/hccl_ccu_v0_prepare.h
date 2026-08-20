@@ -257,12 +257,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         tailChunkSize = sliceSize - (chunkCount - 1) * chunkSize;
     }
     xnData_[5] = chunkSize;
-    xnData_[6] = chunkCount;
+    xnData_[6] = UINT64_MAX - chunkCount;
     xnData_[7] = sliceSize;
     xnData_[8] = tailChunkSize;
-    for (uint32_t i = 9; i < 13; ++i) {
-        xnData_[i] = 0; // 清零保留槽位，避免环形队列槽复用残留旧值
-    }
     AscendC::PRINTF(
         "RS chunk prepare: total=0x%llx, chunk=0x%llx, count=0x%llx, tail=0x%llx, scratch=0x%llx\n", sliceSize,
         chunkSize, chunkCount, tailChunkSize, scratchSize);
