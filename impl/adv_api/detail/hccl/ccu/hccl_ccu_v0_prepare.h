@@ -243,14 +243,18 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     // XN7 is the tail size and XN8 is the inverse number of full chunks.
     constexpr uint64_t scratchSize = 16 * 1024 * 1024;
     constexpr uint64_t minSliceAlign = 128;
-    uint64_t chunkSize = scratchSize / ccuParam_.rankNum / minSliceAlign * minSliceAlign;
-    uint64_t fullChunkCount = sliceSize / chunkSize;
-    xnData_[7] = sliceSize - fullChunkCount * chunkSize;
-    xnData_[8] = UINT64_MAX - fullChunkCount;
+    uint64_t fullChunkCount = sliceSize == 0 ? 0 : (sliceSize - 1) / chunkSize;
+    xnData_[5] = chunkSize;
+    xnData_[6] = sliceSize - fullChunkCount * chunkSize;
+    xnData_[7] = UINT64_MAX - fullChunkCount;
+    xnData_[8] = 0;
     AscendC::PRINTF(
-        "RS chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, id8=0x%llx\n",
-        sliceSize, chunkSize, fullChunkCount, xnData_[7], xnData_[8]);
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+        "RS chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n",
+        sliceSize, chunkSize, fullChunkCount, xnData_[6], xnData_[7]);
+    xnData_[9] = 0;
+    xnData_[10] = 0;
+    xnData_[11] = 0;
+    xnData_[12] = 0;
 }
 } // namespace AscendC
 
