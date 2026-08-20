@@ -26,6 +26,18 @@
 #include "../../../../common/common.h"
 
 namespace AscendC {
+__simd_callee__ inline void SoftmaxExpSub(
+    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& srcReg0, Reg::RegTensor<float>& srcReg1,
+    Reg::MaskReg& mask)
+{
+#if !defined(__ASC_FTZ__)
+    Reg::Sub(srcReg1, srcReg0, srcReg1, mask);
+    Reg::Exp(dstReg, srcReg1, mask);
+#else
+    Reg::FusedExpSub(dstReg, srcReg0, srcReg1, mask);
+#endif
+}
+
 template <typename T>
 __simd_callee__ inline void LoadIfNeedCast(Reg::RegTensor<float>& dstReg, __ubuf__ T* srcUb, Reg::MaskReg& preg)
 {
