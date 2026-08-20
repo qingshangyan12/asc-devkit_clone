@@ -186,11 +186,15 @@ __aicore__ inline HcclContextDef::HcclRankRelationResV2* GetRemoteRankAddrs(
 
 __aicore__ inline void UpdateControlMsgCount(__gm__ HcclMsgArea* hcclMsgArea, ControlMsgType msg)
 {
-    ASCENDC_HCCL_API_ASSERT(
-        msg < ControlMsgType::HCCL_CMD_MAX, { return; }, "Invalid msg type %u.", static_cast<uint32_t>(msg));
+    const uint32_t msgValue = static_cast<uint32_t>(msg);
+    const uint32_t firstMsgValue = static_cast<uint32_t>(ControlMsgType::HCCL_CMD_FINALIZE);
+    const uint32_t maxMsgValue = static_cast<uint32_t>(ControlMsgType::HCCL_CMD_MAX);
+    if ((msgValue < firstMsgValue) || (msgValue >= maxMsgValue)) {
+        KERNEL_LOG(KERNEL_ERROR, "Invalid msg type %u.", msgValue);
+        return;
+    }
     __gm__ TurnCnt* apiInfo =
-        &(hcclMsgArea->apiStats
-              .msgStats[static_cast<uint32_t>(msg) - static_cast<uint32_t>(ControlMsgType::HCCL_CMD_FINALIZE)]);
+        &(hcclMsgArea->apiStats.msgStats[msgValue - firstMsgValue]);
     FlushDataCache(apiInfo);
     ++(apiInfo->cnt);
     FlushDataCache(apiInfo);

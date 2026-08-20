@@ -130,6 +130,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitInner(
     GM_ADDR context, HcclTilingVersion version)
 {
+    isInited_ = false;
     ASCENDC_HCCL_API_ASSERT(context != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
     // 只有 alltoall 且 ccu的会走到这里，并设为true
     if (newCcuFlag_) {
@@ -138,14 +139,33 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         hcclContext_ = (__gm__ HcclCombineOpParam*)context;
     }
 
-    // ensure hcclMsgArea 512B aligned
-    uint64_t msgAddr = newCcuFlag_ ? hcclNewContext_->workspace : hcclContext_->workSpace;
-    if (msgAddr & 0x1ff) {
-        msgAddr = (msgAddr & (~((uint64_t)0x1ff))) + 0x200;
+    constexpr uint64_t workspaceAlign = 512U;
+    constexpr uint64_t workspaceAlignMask = workspaceAlign - 1U;
+    constexpr uint64_t layoutSize = MAX_DCCI_CNT +
+                                    sizeof(CommonPrepareParamCcu) * static_cast<uint64_t>(HCCL_MAX_HANDLE_ID) +
+                                    sizeof(AlltoAllVParamCcu) * static_cast<uint64_t>(HCCL_MAX_HANDLE_ID) +
+                                    CCU_MSG_EXT_MAX_OFFSET;
+    static_assert(sizeof(CommonPrepareParamCcu) % ALIGN_64_BYTE == 0U, "CommonPrepareParamCcu layout is unaligned");
+    static_assert(sizeof(AlltoAllVParamCcu) % ALIGN_64_BYTE == 0U, "AlltoAllVParamCcu layout is unaligned");
+    static_assert(CCU_MSG_EXT_MAX_OFFSET % ALIGN_64_BYTE == 0U, "CCUMsgExt layout is unaligned");
+
+    const uint64_t workspaceAddr = newCcuFlag_ ? hcclNewContext_->workspace : hcclContext_->workSpace;
+    const uint64_t workspaceSize = newCcuFlag_ ? hcclNewContext_->workspaceSize : hcclContext_->workSpaceSize;
+    const uint64_t alignPadding = (workspaceAlign - (workspaceAddr & workspaceAlignMask)) & workspaceAlignMask;
+    if (workspaceAddr > UINT64_MAX - alignPadding || workspaceSize < alignPadding ||
+        workspaceSize - alignPadding < layoutSize) {
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "Init Hccl failed, workspace addr 0x%llx size 0x%llx is smaller than required size 0x%llx.",
+            static_cast<unsigned long long>(workspaceAddr), static_cast<unsigned long long>(workspaceSize),
+            static_cast<unsigned long long>(alignPadding + layoutSize));
+        return;
     }
+    const uint64_t msgAddr = workspaceAddr + alignPadding;
     KERNEL_LOG(
-        KERNEL_INFO, "ApiClient InitInner msgAddr:0x%llx, workSpaceSize:0x%llx", msgAddr,
-        newCcuFlag_ ? hcclNewContext_->workspace : hcclContext_->workSpace);
+        KERNEL_INFO, "ApiClient InitInner msgAddr:0x%llx, workSpaceSize:0x%llx",
+        static_cast<unsigned long long>(msgAddr),
+        static_cast<unsigned long long>(workspaceSize));
 
     uint64_t xnAddr = newCcuFlag_ ? hcclNewContext_->xnAddr : reinterpret_cast<uint64_t>(hcclContext_->xnOffset);
     uint64_t ckeAddr = newCcuFlag_ ? hcclNewContext_->ckeAddr : reinterpret_cast<uint64_t>(hcclContext_->ckeOffset);
@@ -342,6 +362,22 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         return INVALID_HANDLE_ID;
     }
 
+    const uint32_t prepareType = static_cast<uint32_t>(commonPrepareParam.commType.prepareType);
+    if (prepareType >= static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL)) {
+        KERNEL_LOG(KERNEL_ERROR, "Call Prepare failed, invalid prepare type %u.", prepareType);
+        return INVALID_HANDLE_ID;
+    }
+    uint32_t rankNum = 0U;
+    if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
+        if (!IsValidCcuRankNum(rankNum)) {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Call AlltoAllV Prepare failed, rank num %u is outside the supported range [1, %u].",
+                rankNum, HCCL_CCU_MAX_RANK_NUM);
+            return INVALID_HANDLE_ID;
+        }
+    }
+
     HcclHandle handleId = curHandleId_;
 
     ASCENDC_HCCL_API_ASSERT(
@@ -366,8 +402,6 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         handleParamGM_[handleId].strideCount = commonPrepareParam.strideCount;
         InitCcuParam(handleId);
         FlushDataCache(&handleParamGM_[handleId]);
-        uint64_t dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(commonPrepareParam.dataType)];
-        uint32_t rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
 
         if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
             for (uint32_t i = 0; i < rankNum; i++) {
