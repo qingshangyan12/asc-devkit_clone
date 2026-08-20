@@ -157,7 +157,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
 
-    uint64_t loopCount = CCU_LOOP_COUNT_M2M_RE;
     uint64_t tmpCount = (commParam->count + ccuParam_.rankNum - 1) / ccuParam_.rankNum;
     uint64_t sliceCount = (ccuParam_.rankId == ccuParam_.rankNum - 1) ?
                               (commParam->count - (ccuParam_.rankNum - 1) * tmpCount) :
@@ -183,20 +182,30 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     } else {
         lastSliceSize = (commParam->count * dataSize) - (normalRankCount * normalSliceSize);
     }
+    uint64_t mySliceSize = ccuParam_.rankId < normalRankCount ? normalSliceSize : lastSliceSize;
     KERNEL_LOG(
-        KERNEL_INFO, "ApiClient CcuPrepareForAllReduceM2M normalSliceSize:%d, lastSliceSize:%d", normalSliceSize,
-        lastSliceSize);
+        KERNEL_INFO, "ApiClient CcuPrepareForAllReduceM2M normalSliceSize:%d, lastSliceSize:%d, mySliceSize:%d",
+        normalSliceSize, lastSliceSize, mySliceSize);
 
-    xnData_[6] = normalSliceSize;
-    xnData_[7] = lastSliceSize;
-    xnData_[8] = ccuParam_.rankId < normalRankCount ? normalSliceSize : lastSliceSize;
+    // Partition mySliceSize into fixed chunkSize iterations followed by a tail, so that
+    // rankSize * chunkSize never exceeds the fixed 16 MiB scratch buffer.
+    constexpr uint64_t arScratchSize = 16 * 1024 * 1024;
+    constexpr uint64_t minSliceAlign = 128;
+    uint64_t chunkSize = arScratchSize / ccuParam_.rankNum / minSliceAlign * minSliceAlign;
+    uint64_t fullChunkCount = mySliceSize == 0 ? 0 : (mySliceSize - 1) / chunkSize;
+    uint64_t tailSize = mySliceSize - fullChunkCount * chunkSize;
+    xnData_[6] = chunkSize;
+    xnData_[7] = tailSize;
+    xnData_[8] = UINT64_MAX - fullChunkCount;
     xnData_[9] = ccuParam_.rankId * normalSliceSize;
     xnData_[10] = 0; // input output not equals
-    if (ccuParam_.rankId == ccuParam_.rankNum - 1) {
-        CalcGoSize(lastSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11]);
-    } else {
-        CalcGoSize(normalSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11]);
-    }
+    KERNEL_LOG(
+        KERNEL_INFO, "AR chunk debug: mySlice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n",
+        mySliceSize, chunkSize, fullChunkCount, tailSize, xnData_[8]);
+    xnData_[11] = 0;
+    xnData_[12] = 0;
+    xnData_[13] = 0;
+    xnData_[14] = 0;
 }
 
 template <const auto& config>
