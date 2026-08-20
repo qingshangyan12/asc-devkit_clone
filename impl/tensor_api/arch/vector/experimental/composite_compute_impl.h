@@ -74,8 +74,10 @@ __simd_callee__ inline decltype(auto) fma(
 
 __simd_callee__ inline decltype(auto) muls_cast(const reg_tensor<float>& src, const float& scalar)
 {
+    reg_tensor<float> product;
+    asc_mul_scalar(product.reg, src.reg, scalar, src.mask);
     reg_tensor<half> dst;
-    asc_muls(dst.reg, src.reg, scalar, src.mask);
+    asc_float2half_rna(dst.reg, product.reg, src.mask, ASC_POSITION_EVEN);
     dst.mask = src.mask;
     return dst;
 }

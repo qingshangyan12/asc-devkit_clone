@@ -33,10 +33,13 @@ __simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tens
     reg_pair<bool> result;
     if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
         asc_intlv_b32(result.first.reg, result.second.reg, src0.reg, src1.reg);
+        asc_intlv_b32(result.first.mask, result.second.mask, src0.mask, src1.mask);
     } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
         asc_intlv_b16(result.first.reg, result.second.reg, src0.reg, src1.reg);
+        asc_intlv_b16(result.first.mask, result.second.mask, src0.mask, src1.mask);
     } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
         asc_intlv_b8(result.first.reg, result.second.reg, src0.reg, src1.reg);
+        asc_intlv_b8(result.first.mask, result.second.mask, src0.mask, src1.mask);
     }
     return result;
 }
@@ -51,10 +54,13 @@ __simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_te
     reg_pair<bool> result;
     if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
         asc_deintlv_b32(result.first.reg, result.second.reg, src0.reg, src1.reg);
+        asc_deintlv_b32(result.first.mask, result.second.mask, src0.mask, src1.mask);
     } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
         asc_deintlv_b16(result.first.reg, result.second.reg, src0.reg, src1.reg);
+        asc_deintlv_b16(result.first.mask, result.second.mask, src0.mask, src1.mask);
     } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
         asc_deintlv_b8(result.first.reg, result.second.reg, src0.reg, src1.reg);
+        asc_deintlv_b8(result.first.mask, result.second.mask, src0.mask, src1.mask);
     }
     return result;
 }
