@@ -798,14 +798,21 @@ def gen_golden_data(scenario_num, boundary=False, saturation=True):
     is_relu = (scenario_num == 4)
     golden = apply_prequant(l0c, quant_mode, quant_params, output_type, is_relu)
 
-    # Scenario 4: F322F16 cast + ReLU — apply max(0, val) after cast
+    # Scenario 4: F322F16 cast + ReLU — apply max(0, val) after cast.
+    # Hardware ReLU: zeros negative values (including -inf), but +inf and
+    # nan are preserved (IEEE 754: max(0, nan) = nan).
+    # The saturation/non-saturation overrides must use the post-ReLU
+    # "effective L0C" (only +inf and nan survive ReLU).
     if is_relu:
-        golden = np.where(golden > 0, golden, 0)
+        golden = np.where(np.isnan(golden) | (golden > 0), golden, 0)
+        effective_l0c = np.where(np.isnan(l0c) | (l0c > 0), l0c, np.float32(0.0))
+    else:
+        effective_l0c = l0c
 
     if not saturation:
-        golden = apply_non_saturation_override(golden, l0c, output_type)
+        golden = apply_non_saturation_override(golden, effective_l0c, output_type)
     else:
-        golden = apply_saturation_override(golden, l0c, output_type)
+        golden = apply_saturation_override(golden, effective_l0c, output_type)
 
     if boundary:
         has_inf_out = np.any(np.isinf(golden.astype(np.float64)))
