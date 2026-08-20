@@ -70,10 +70,18 @@ public:
     // 对string的读取函数
     BinaryStream& operator>>(std::string& s)
     {
-        size_t size;
+        size_t size = 0U;
         stream.read(reinterpret_cast<char*>(&size), sizeof(size)); // 先从流中读取字符串长度
-        s.resize(size);                                            // 为string分配足够空间
-        stream.read(&s[0], size); // 直接读取数据到string的缓冲区中，无需再分配内存
+        const std::streamsize remaining = stream.rdbuf()->in_avail();
+        if (!stream.good() || remaining < 0 || size > MAX_CONTAINER_BYTES ||
+            size > static_cast<size_t>(remaining)) {
+            stream.setstate(std::ios_base::failbit);
+            return *this;
+        }
+        s.resize(size); // 为string分配足够空间
+        if (size > 0U) {
+            stream.read(&s[0], size);
+        }
         return *this;
     }
 
@@ -81,11 +89,20 @@ public:
     template <typename T>
     BinaryStream& operator>>(std::vector<T>& vec)
     {
-        size_t size;
+        size_t size = 0U;
         *this >> size;
+        const std::streamsize remaining = stream.rdbuf()->in_avail();
+        if (!stream.good() || remaining < 0 || size > MAX_CONTAINER_ELEMENTS ||
+            size > MAX_CONTAINER_BYTES / sizeof(T) || size > static_cast<size_t>(remaining)) {
+            stream.setstate(std::ios_base::failbit);
+            return *this;
+        }
         vec.resize(size);
         for (auto& elem : vec) {
             *this >> elem;
+            if (!stream.good()) {
+                return *this;
+            }
         }
         return *this;
     }
@@ -128,6 +145,8 @@ public:
     void Clear() { stream.clear(); }
 
 private:
+    static constexpr size_t MAX_CONTAINER_ELEMENTS = 1024U * 1024U;
+    static constexpr size_t MAX_CONTAINER_BYTES = 64U * 1024U * 1024U;
     std::stringstream stream;
 };
 
