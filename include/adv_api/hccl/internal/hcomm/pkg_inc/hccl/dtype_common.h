@@ -32,7 +32,13 @@ constexpr u32 SIZE_TABLE[HCCL_DATA_TYPE_RESERVED] = {
     1,
     1,
     1,
+    1,
     1};
+
+static_assert(
+    sizeof(SIZE_TABLE) / sizeof(SIZE_TABLE[0]) == static_cast<u32>(HCCL_DATA_TYPE_RESERVED),
+    "SIZE_TABLE must cover the HcclDataType index range");
+static_assert(SIZE_TABLE[HCCL_DATA_TYPE_MXFP8] == 1U, "MXFP8 elements occupy one byte");
 
 // 对内芯片类型
 #define MACRO_DEV_TYPE_NEW // 兼容性处理，后续删除
