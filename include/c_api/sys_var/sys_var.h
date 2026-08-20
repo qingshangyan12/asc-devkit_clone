@@ -80,7 +80,6 @@ __aicore__ inline int64_t asc_get_ar_spr();
 __aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
 __aicore__ inline constexpr int64_t asc_get_vf_len();
 __aicore__ inline void asc_set_l0c_copy_channel_para(uint16_t src_nz_matrix_stride);
-[[deprecated("NOTICE: asc_set_l0c2gm_channel_para is deprecated. Please use asc_set_l0c_copy_channel_para instead")]]
 __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config);
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
 __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config);

@@ -65,8 +65,7 @@ public:
         }
 
         asc_copy_gm2l1_align(
-            dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, true,
-            static_cast<asc_load_l2_cache_mode>(cacheMode), srcStride, dstStride);
+            dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, true, cacheMode, srcStride, dstStride);
     }
 };
 
@@ -100,9 +99,7 @@ public:
         mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
         mte2NzPara |= static_cast<uint64_t>(ndNum);                        // MTE2_NZ_PARA[15:0]
         SetMTE2NzPara(mte2NzPara); // CCE: store parameters for ND2NZ DMA instructions
-        asc_copy_gm2l1_nd2nz(
-            dst, src, loop1SrcStride, static_cast<asc_load_l2_cache_mode>(cacheMode), nValue, dValue, loop4SrcStride,
-            enableSmallC0);
+        asc_copy_gm2l1_nd2nz(dst, src, loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, enableSmallC0);
     }
 };
 
@@ -137,9 +134,7 @@ public:
         mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
         mte2NzPara |= static_cast<uint64_t>(dnNum);                        // MTE2_NZ_PARA[15:0]
         SetMTE2NzPara(mte2NzPara); // CCE: store parameters for DN2NZ DMA instructions
-        asc_copy_gm2l1_dn2nz(
-            dst, src, loop1SrcStride, static_cast<asc_load_l2_cache_mode>(cacheMode), nValue, dValue, loop4SrcStride,
-            enableSmallC0);
+        asc_copy_gm2l1_dn2nz(dst, src, loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, enableSmallC0);
     }
 };
 
