@@ -249,8 +249,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[6] = sliceSize - fullChunkCount * chunkSize;
     xnData_[7] = UINT64_MAX - fullChunkCount;
     xnData_[8] = 0;
-    AscendC::PRINTF(
-        "RS chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n",
+    KERNEL_LOG(
+        KERNEL_INFO, "RS chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n",
         sliceSize, chunkSize, fullChunkCount, xnData_[6], xnData_[7]);
     xnData_[9] = 0;
     xnData_[10] = 0;
