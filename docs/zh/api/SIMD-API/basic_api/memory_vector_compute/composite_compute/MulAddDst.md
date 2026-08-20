@@ -186,8 +186,8 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md#section668772811100)。
 - 源操作数的数据类型为half、目的操作数的数据类型为float的情况下，不支持地址重叠。
 <!-- npu="A3,910b,950" id17 -->
 - 当参数count或repeatTime取值为0时，该接口的行为如下：
@@ -204,13 +204,13 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
   - 针对Ascend 950PR/Ascend 950DT，该接口通过VF调用[Reg矢量计算API](../../reg_vector_compute/reg_vector_compute.md)实现兼容，当参数count或repeatTime取值为0时，不保证该接口将被视为NOP（空操作）。
   <!-- end id21 -->
 <!-- end id17 -->
-- MulAddDst指令实际使用会受到[bank冲突](../../../../../guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/概述.md)影响。  
+- MulAddDst指令实际使用会受到[bank冲突](../../../../../guide/operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/overview.md)影响。  
   地址不重叠场景下，无法在一拍读取dst、src0、src1三块不同地址下的数据，因此只能达到一半的理论并行度，理论并行度将在原有基础上减半；在地址重叠场景下，则保持原有理论并行度。
 - 使用tensor高维切分计算接口时，src和scalar的数据类型为half、dst的数据类型为float的情况下，一个迭代处理内最多处理64个输入数据。
 <!-- npu="950" id22 -->
-- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
-  - tensor高维切分计算接口占用8KB Unified Buffer临时空间。
-  - tensor前n个数据连续计算接口不涉及8KB Unified Buffer临时空间的占用。
+- 对Unified Buffer（UB）空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+  - tensor高维切分计算接口占用8KB UB临时空间。
+  - tensor前n个数据连续计算接口不涉及8KB UB临时空间的占用。
 <!-- end id22 -->
 
 ## 调用示例<a name="section837496171220"></a>

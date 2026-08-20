@@ -15,7 +15,7 @@ AI Core内外包含多级存储单元，各存储单元的主要用途如下：
 <!-- npu="950" id1 -->
 **针对Ascend 950PR/Ascend 950DT：**
 
-各存储单元的空间大小和对齐要求请参见[存储单元规格](../../../guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本3510.md#section6500173264510)。如果具体C API中已明确操作数起始地址的对齐要求，则以具体C API中的说明为准。
+各存储单元的空间大小和对齐要求请参见[存储单元规格](../../../guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_3510.md#section6500173264510)。如果具体C API中已明确操作数起始地址的对齐要求，则以具体C API中的说明为准。
 
 > [!NOTE]说明
 >
@@ -30,7 +30,7 @@ AI Core内外包含多级存储单元，各存储单元的主要用途如下：
 <!-- npu="910b" id4 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id4 -->
-各存储单元的空间大小和对齐要求请参见[存储单元规格](../../../guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本2201.md#section6500173264510)。如果具体C API中已明确操作数起始地址的对齐要求，则以具体C API中的说明为准。
+各存储单元的空间大小和对齐要求请参见[存储单元规格](../../../guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_2201.md#section6500173264510)。如果具体C API中已明确操作数起始地址的对齐要求，则以具体C API中的说明为准。
 
 > [!NOTE]说明
 >
@@ -61,7 +61,7 @@ AI Core内外包含多级存储单元，各存储单元的主要用途如下：
 
 使用高维切分计算API可充分发挥硬件优势，支持开发者控制指令的迭代执行和操作数的地址间隔，功能更加灵活。
 
-矢量计算通过Vector计算单元完成，矢量计算的源操作数和目的操作数均通过Unified Buffer（UB）来进行存储。Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock数据块内部地址连续，长度32Byte），进行计算，并写入对应的8个DataBlock中。下图为单次迭代内的8个DataBlock进行Exp计算的示意图。
+矢量计算通过Vector计算单元完成，矢量计算的源操作数和目的操作数均通过UB来进行存储。Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock数据块内部地址连续，长度32Byte），进行计算，并写入对应的8个DataBlock中。下图为单次迭代内的8个DataBlock进行Exp计算的示意图。
 
 **图2** 单次迭代内的8个DataBlock进行Exp计算示意图
 

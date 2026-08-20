@@ -21,10 +21,11 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/WaitGetTensorC_res.md#id1 -->
 
 ## 功能说明
 
-当使用GetTensorC异步接口将结果矩阵从GM拷贝到UB，且UB后续需要进行Vector计算时，需要调用WaitGetTensorC进行同步。
+当使用GetTensorC异步接口将结果矩阵从GM拷贝到Unified Buffer（UB），且UB后续需要进行Vector计算时，需要调用WaitGetTensorC进行同步。
 
 ## 函数原型
 

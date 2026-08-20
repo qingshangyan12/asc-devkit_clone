@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/tensor_transform/Transpose_res.md#id1 -->
 
 ## 功能说明
 
@@ -82,7 +83,7 @@
 
 【场景7：二维转置】
 
-支持在UB上对二维Tensor进行转置，其中srcShape中的H、W均是16的整倍。
+支持在Unified Buffer（UB）上对二维Tensor进行转置，其中srcShape中的H、W均是16的整倍。
 
 **图7**  场景7数据排布变换  
 ![](../../../figures/scenario7_layout_transform.png "场景7数据排布变换")
@@ -276,7 +277,7 @@ enum class TransposeType : uint8_t {
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../general_description_and_constraints.md#section796754519912)。
 <!-- npu="950" id7 -->
 -   场景13到场景16仅在Ascend 950PR/Ascend 950DT上支持。
 -   Ascend 950PR/Ascend 950DT，场景13到场景16不支持dst和src空间复用。
