@@ -239,9 +239,9 @@ typedef void* HcclRequest;
 typedef void* ServiceHandle;
 
 typedef struct {
-    int srcRank; // 接收/探测到的msg/信封的发送端rank_id，MPI标准定义，调用者可以访问
-    int tag;     // 接收/探测到的msg/信封的tag，MPI标准定义，调用者可以访问
-    int error; // 接收/探测的错误码0：no error，others：传输过程出错，MPI标准定义，调用者可以访问
+    int srcRank;   // 接收/探测到的msg/信封的发送端rank_id，MPI标准定义，调用者可以访问
+    int tag;       // 接收/探测到的msg/信封的tag，MPI标准定义，调用者可以访问
+    int error;     // 接收/探测的错误码0：no error，others：传输过程出错，MPI标准定义，调用者可以访问
     int cancelled; // 指定实现，不建议调用者访问
     int count;     // 接收/探测到的payload大小，指定实现，不建议调用者访问
 } HcclStatus;
@@ -296,7 +296,7 @@ enum HcomOperationType {
 #define HCOM_GROUP_NAME_MAX_LEN 127
 
 typedef struct {
-    char group[HCOM_GROUP_NAME_MAX_LEN];
+    char group[HCOM_GROUP_NAME_MAX_LEN + 1];
     uint32_t tag;          // 点到点通信的tag
     uint32_t peerRank;     // 点到点通信的对端rank
     void* addr;            // send/recv的发送或接收buffer
@@ -308,7 +308,7 @@ typedef struct {
 } HcomP2pOpInfo;
 
 typedef struct {
-    char group[HCOM_GROUP_NAME_MAX_LEN];
+    char group[HCOM_GROUP_NAME_MAX_LEN + 1];
     void* inputAddr;
     void* outputAddr;
     uint64_t count;
@@ -320,11 +320,11 @@ typedef struct {
 
 typedef struct {
     HcomOperationType opType; // op类型用于结合拓扑和rank_table一起决定需要创建哪些通信连接
-    HcomSchedType schedType; // 由于prepare接口需要NPU与CPU共用，创建的QP是不同的，引出需要调度器类型
-    int32_t cxtId; // 集合通信的执行上下文标识，由调用者自定义，（暂时保留不使用）
-                   // 相同cxtId被认为是相同的执行上下文，比如stream/thread
-                   // 相同上下文的集合通信只能串行执行
-    uint64_t flag; // bit0：接收数据量和地址是否动态, 1==动态, 此时info里的addr, count无效（预留不使用）
+    HcomSchedType schedType;  // 由于prepare接口需要NPU与CPU共用，创建的QP是不同的，引出需要调度器类型
+    int32_t cxtId;            // 集合通信的执行上下文标识，由调用者自定义，（暂时保留不使用）
+                              // 相同cxtId被认为是相同的执行上下文，比如stream/thread
+                              // 相同上下文的集合通信只能串行执行
+    uint64_t flag;            // bit0：接收数据量和地址是否动态, 1==动态, 此时info里的addr, count无效（预留不使用）
     union {
         HcomP2pOpInfo p2p;
         HcomCollOpInfo coll;

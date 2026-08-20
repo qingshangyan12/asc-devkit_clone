@@ -372,8 +372,9 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         HCCL_DEBUG(
             "[%s]Notify record on srcThread[%llu], dstThread[%llu], notifyIdx[%u]", __func__, thread,
             exportedAicpuTsThread, DEFAULT_NOTIFY_IDX);
-        CHK_RET(static_cast<HcclResult>(
-            HcommThreadNotifyRecordOnThread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
+        CHK_RET(
+            static_cast<HcclResult>(
+                HcommThreadNotifyRecordOnThread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
 
         // 上报主流和最后一个task 在notify之后
         if (HcommProfilingReportKernelEndTask(thread, param->commName) != HCCL_SUCCESS) {
@@ -440,8 +441,14 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             // 上报device侧的op 附加信息
             HcomProInfoTmp profInfo;
             std::string algTypeStr(param->algTypeStr);
-            strcpy_s(profInfo.algType, sizeof(profInfo.algType), algTypeStr.c_str());
-            strcpy_s(profInfo.commName, sizeof(profInfo.commName), param->commName);
+            if (strcpy_s(profInfo.algType, sizeof(profInfo.algType), algTypeStr.c_str()) != EOK) {
+                HCCL_ERROR("failed to copy algType for profiling");
+                return 1;
+            }
+            if (strcpy_s(profInfo.commName, sizeof(profInfo.commName), param->commName) != EOK) {
+                HCCL_ERROR("failed to copy commName for profiling");
+                return 1;
+            }
             profInfo.commNameLen = strlen(param->commName);
             profInfo.dataCount = param->DataDes.count;
             profInfo.dataType = static_cast<uint8_t>(param->DataDes.dataType);
@@ -453,8 +460,9 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             HCCL_DEBUG(
                 "[%s]Notify record on srcThread[%llu], dstThread[%llu], notifyIdx[%u]", __func__, thread,
                 exportedAicpuTsThread, DEFAULT_NOTIFY_IDX);
-            CHK_RET(static_cast<HcclResult>(
-                HcommThreadNotifyRecordOnThread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
+            CHK_RET(
+                static_cast<HcclResult>(
+                    HcommThreadNotifyRecordOnThread(thread, exportedAicpuTsThread, DEFAULT_NOTIFY_IDX)));
 
             // 上报主流和最后一个task 在notify之后
             if (HcommProfilingReportMainStreamAndLastTask(thread) != HCCL_SUCCESS) {

@@ -31,10 +31,10 @@ constexpr int32_t INVALID_RANKID = INT32_MAX;
 enum class CcuProfilinType { CCU_TASK_PROFILING, CCU_WAITCKE_PROFILING, CCU_LOOPGROUP_PROFILING, CCU_MAP_PROFILING };
 
 struct CcuProfilingInfo {
-    std::string name;  // CCU任务名或微码名
-    uint8_t type;      // 枚举，0为Task粒度，1为WaitCKE，2为LoopGroup，3为channelId->RemoteRankId的映射
-    uint8_t dieId;     // CCU任务执行的DieId
-    uint8_t missionId; // CCU任务执行的MissionId
+    std::string name;       // CCU任务名或微码名
+    uint8_t type;           // 枚举，0为Task粒度，1为WaitCKE，2为LoopGroup，3为channelId->RemoteRankId的映射
+    uint8_t dieId;          // CCU任务执行的DieId
+    uint8_t missionId;      // CCU任务执行的MissionId
     uint8_t reduceOpType;   // 与HcclReduceOp类型保持一致
     uint8_t inputDataType;  // 与HcclDataType类型保持一致
     uint8_t outputDataType; // 与HcclDataType类型保持一致
@@ -59,10 +59,11 @@ struct CcuProfilingInfo {
           mask(0),
           dataSize(0)
     {
-        (void)memset_s(channelId, sizeof(channelId), INVALID_VALUE_CHANNELID, sizeof(channelId));
-        (void)memset_s(remoteRankId, sizeof(remoteRankId), INVALID_RANKID, sizeof(remoteRankId));
-        (void)memset_s(
-            channelHandle, sizeof(channelHandle), static_cast<int>(INVALID_VALUE_NOTIFYID), sizeof(channelHandle));
+        for (uint16_t i = 0; i < CCU_MAX_CHANNEL_NUM; ++i) {
+            channelId[i] = INVALID_VALUE_CHANNELID;
+            remoteRankId[i] = UINT32_MAX;
+            channelHandle[i] = INVALID_VALUE_NOTIFYID;
+        }
     }
 };
 namespace CcuRep {

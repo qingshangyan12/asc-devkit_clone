@@ -304,7 +304,7 @@ HcclResult SetOpParamFastLaunchTag(OpParam& param)
     CHK_PRT_RET(
         (tagBuilder.length() >= sizeof(param.fastLaunchTag)), "failed to fill fastLaunchTag, tag too long",
         HcclResult::HCCL_E_INTERNAL);
-    snprintf_s(param.fastLaunchTag, sizeof(param.fastLaunchTag), sizeof(param.fastLaunchTag), "%s", tagBuilder.c_str());
+    CHK_SAFETY_FUNC_RET(strcpy_s(param.fastLaunchTag, sizeof(param.fastLaunchTag), tagBuilder.c_str()));
 
     HCCL_INFO("[SetOpParamFastLaunchTag] fastLaunchTag: [%s]", param.fastLaunchTag);
     return HcclResult::HCCL_SUCCESS;
@@ -592,8 +592,9 @@ HcclResult HcclAicpuKernelEntranceLaunch(
     }
 
     // Host stream通知Device主thread，使用主流上idx最大的notify
-    CHK_RET(static_cast<HcclResult>(
-        HcommThreadNotifyRecordOnThread(cpuTsThread, exportedCpuTsThread, notifyNumOnMainThread - 1)));
+    CHK_RET(
+        static_cast<HcclResult>(
+            HcommThreadNotifyRecordOnThread(cpuTsThread, exportedCpuTsThread, notifyNumOnMainThread - 1)));
     // AicpuKernel report
     uint64_t beginTime = HcommGetProfilingSysCycleTime();
     HcclResult launchRet = AicpuKernelLaunch(comm, param, unfoldThread);
@@ -613,8 +614,9 @@ HcclResult HcclAicpuKernelEntranceLaunch(
     }
     // Host stream等待Device的通知
     u16 NOTIFY_WAIT_TIME = 27 * 68;
-    CHK_RET(static_cast<HcclResult>(
-        HcommThreadNotifyWaitOnThread(cpuTsThread, HOST_WAIT_AICPU_NOTIFYIDX, NOTIFY_WAIT_TIME)));
+    CHK_RET(
+        static_cast<HcclResult>(
+            HcommThreadNotifyWaitOnThread(cpuTsThread, HOST_WAIT_AICPU_NOTIFYIDX, NOTIFY_WAIT_TIME)));
 
     HCCL_INFO(
         "[asc][AlgoExecute][HcclAicpuKernelEntranceLaunch] end, opType[%d], algName[%s], algTag[%s].", param.opType,
@@ -1409,6 +1411,12 @@ HcclResult HcclAllocAlgResourceCcu(
 
 HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest)
 {
+    for (const CcuKernelInfo& kernelInfo : resRequest.ccuKernelInfos) {
+        CHK_PRT_RET(
+            kernelInfo.channels.size() > CCU_MAX_RANK_SIZE,
+            HCCL_ERROR("[HcclGetChannelForCcu] too many channels[%zu].", kernelInfo.channels.size()), HCCL_E_PARA);
+    }
+
     // OpParam.userRank 并非所有算子路径都会赋值（仅 Reduce 赋值），这里直接从 comm 查询本端全局 rank
     u32 userRank = INVALID_VALUE_RANKID;
     CHK_RET(HcclGetRankId(comm, &userRank));
@@ -2590,8 +2598,15 @@ HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetai
             }
             uint32_t endPointNums = 0;
             CHK_RET(HcclRankGraphGetEndpointNum(comm, netLayer, topoInstId, &endPointNums));
-            EndpointDesc endPointDescs[endPointNums];
-            CHK_RET(HcclRankGraphGetEndpointDesc(comm, netLayer, topoInstId, &endPointNums, endPointDescs));
+            std::vector<EndpointDesc> endPointDescs;
+            EXECEPTION_CATCH(endPointDescs.resize(endPointNums), return HCCL_E_MEMORY);
+            if (endPointDescs.empty()) {
+                continue;
+            }
+            CHK_RET(HcclRankGraphGetEndpointDesc(comm, netLayer, topoInstId, &endPointNums, endPointDescs.data()));
+            CHK_PRT_RET(
+                endPointNums > endPointDescs.size(), HCCL_ERROR("Invalid endpoint num[%u].", endPointNums),
+                HCCL_E_INTERNAL);
             for (uint32_t endPointIdx = 0; endPointIdx < endPointNums; endPointIdx++) {
                 EndpointDesc endPointDesc = endPointDescs[endPointIdx];
                 if (endPointDesc.loc.locType == ENDPOINT_LOC_TYPE_DEVICE) {
