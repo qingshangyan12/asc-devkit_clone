@@ -38,6 +38,21 @@ struct reg_tensor {
     vector_bool mask;
 };
 
+template <typename T>
+struct is_reg_tensor : AscendC::Std::false_type {};
+
+template <typename DataType>
+struct is_reg_tensor<reg_tensor<DataType>> : AscendC::Std::true_type {};
+
+template <typename T>
+inline constexpr bool is_reg_tensor_v = is_reg_tensor<AscendC::Std::remove_cvref_t<T>>::value;
+
+template <typename DataType>
+struct reg_pair {
+    reg_tensor<DataType> first;
+    reg_tensor<DataType> second;
+};
+
 } // namespace te
 } // namespace asc
 
