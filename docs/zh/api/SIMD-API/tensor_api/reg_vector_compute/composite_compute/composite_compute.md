@@ -27,7 +27,7 @@
 | [absdiff](Absdiff.md) | 减法与绝对值融合。 |
 | [exp_sub](ExpSub.md) | 减法与自然指数融合。 |
 | [fma](Fma.md) | `src0 * src1 + src2` 融合。 |
-| [muls_cast](MulsCast.md) | 标量乘与 `float` 到 `half` 转换融合。 |
+| [muls_cast](MulsCast.md) | 标量乘与 `float` 到 `half` 转换融合，结果位于偶数 `half` 位置。 |
 
 ## 通用说明
 

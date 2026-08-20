@@ -1,6 +1,7 @@
 # Reg 矢量计算
 
-Tensor API Reg 矢量计算接口以 `asc::te::reg_tensor<T>` 为输入和返回值，mask 随寄存器对象传递，支持返回值风格和 C++ 运算符表达式。
+Tensor API Reg 矢量计算接口以 `asc::te::reg_tensor<T>` 为输入和返回值，mask 随寄存器对象传递，
+支持返回值风格和 C++ 运算符表达式。
 
 ## 产品支持情况
 

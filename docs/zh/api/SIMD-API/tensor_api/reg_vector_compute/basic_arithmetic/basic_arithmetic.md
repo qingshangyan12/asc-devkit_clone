@@ -38,7 +38,7 @@
 | [operator-（二元）](Sub.md) | 逐元素执行普通减法。 |
 | [sub / sub_c](SubC.md) | 执行带进位输出的补码减法，并支持传递进位。 |
 | [operator*（mul）](Mul.md) | 逐元素执行寄存器与寄存器乘法。 |
-| [operator*（muls）](Muls.md) | 逐元素执行寄存器与标量乘法。 |
+| [operator*（寄存器与标量）](Muls.md) | 逐元素执行寄存器与标量乘法。 |
 | [mull](Mull.md) | 计算 32 位整数宽乘的高、低部分。 |
 | [operator/](Div.md) | 逐元素除法。 |
 | [max](Max.md) | 逐元素取最大值。 |

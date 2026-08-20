@@ -72,9 +72,11 @@ __simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg);
 
 ## 7. 调用示例
 
-以下示例展示接口在 AIV 计算函数中的典型调用方式。示例先为加载结果绑定 mask，再执行计算并将结果写回 UB。
+以下示例展示接口在 AIV 计算函数中的典型调用方式。示例先为加载结果绑定 mask，
+再执行计算并将结果写回 UB。
 
-完整的 Kernel、Host 调用和数据验证代码请参见[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/basic_arithmetic_tensor_api.asc)。
+完整的 Kernel、Host 调用和数据验证代码请参见
+[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/)。
 
 ```cpp
 #include "tensor_api/tensor.h"

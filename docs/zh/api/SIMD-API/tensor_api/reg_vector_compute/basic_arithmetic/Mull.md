@@ -58,20 +58,22 @@ __simd_callee__ inline decltype(auto) mull(
 - 本接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用；
   底层调用 `asc_mull`。
 - 作为执行 mask 的第一个寄存器操作数 `.mask` 必须在调用前初始化，通常使用
-  `load(...).with_mask(m)`。`m` 可由 `update_mask<T>`、`make_mask` 或 `all_mask<T>` 生成；
+  `load(...).with_mask(m)`。`m` 可由 `update_mask<T>(remain)`、`make_mask<pattern, T>()` 或 `all_mask<T>()` 生成；
   未初始化的 mask 内容不确定。
 - 单个矢量寄存器宽度为 `asc_get_vf_len()` 字节；`T` 类型对应的最大 lane 数为
   `asc_get_vf_len() / sizeof(T)`。
-- 该底层 C API 未提供统一的 ZEROING 模式参数；不要依赖执行 mask 无效位置的数据，
-  后续计算和存储应以返回对象的 `mask` 为准。
+- 底层 C API 将执行 mask 无效位置的乘积低 32 位和高 32 位结果均置零。两个返回对象仍携带
+  `src0.mask`，后续计算和存储应继续遵循该 mask。
 - `T` 不是 `int32_t` 或 `uint32_t` 时，编译失败，并提示 `mull supports int32_t and uint32_t`。
 - `src0`、`src1` 和 `high` 的元素类型不一致时，找不到匹配的 `mull` 重载，编译失败。
 
 ## 7. 调用示例
 
-以下示例展示接口在 AIV 计算函数中的典型调用方式。示例先为加载结果绑定 mask，再执行计算并将结果写回 UB。
+以下示例展示接口在 AIV 计算函数中的典型调用方式。示例先为加载结果绑定 mask，
+再执行计算并将结果写回 UB。
 
-完整的 Kernel、Host 调用和数据验证代码请参见[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/basic_arithmetic_tensor_api.asc)。
+完整的 Kernel、Host 调用和数据验证代码请参见
+[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/)。
 
 ```cpp
 #include "tensor_api/tensor.h"

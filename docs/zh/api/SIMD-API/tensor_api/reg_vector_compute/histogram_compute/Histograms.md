@@ -57,29 +57,34 @@ __simd_callee__ inline decltype(auto) histograms(
 
 返回更新后的 `reg_tensor<uint16_t>`：
 
-- `reg`：`frequency` 模式在 `dst.reg` 上累加各输入值的出现次数；`cumulative` 模式累加不大于当前 bin 对应值的输入数量。
-- `mask`：等于 `dst.mask`。该 mask 用于约束后续计算和存储，不参与本次直方图统计；参与统计的输入由 `src.mask` 决定。
+- `reg`：`frequency` 模式在 `dst.reg` 上累加各输入值的出现次数；`cumulative` 模式累加
+  不大于当前 bin 对应值的输入数量。
+- `mask`：等于 `dst.mask`。该 mask 用于约束后续计算和存储，不参与本次直方图统计；
+  参与统计的输入由 `src.mask` 决定。
 
 ## 6. 约束说明
 
 - 本接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用；
   底层调用 `asc_frequency_histogram_bin0/bin1` 或
   `asc_cumulative_histogram_bin0/bin1`。
-- `src.mask` 必须在调用前初始化，它决定参与统计的 `uint8_t` 输入 lane；`dst.mask` 不参与底层直方图计算，但会原样传播到返回对象，必须保证其适用于后续存储。
-- 该底层 C API 未提供统一的 ZEROING 模式参数；不要依赖执行 mask 无效位置的数据，
-  后续计算和存储应以返回对象的 `mask` 为准。
+- `src.mask` 必须在调用前初始化，它用于过滤参与统计的 `uint8_t` 输入 lane；mask 无效的
+  输入 lane 不参与统计。
+- 本接口根据筛选后的输入更新 `dst.reg` 中的全部直方图 bin，不存在普通逐 lane 计算意义上的
+  “无效目的 lane”。`dst.mask` 不传入底层 C API，仅原样传播到返回对象，必须保证其适用于
+  后续计算和存储。
 - 完整统计 `[0, 255]` 需要分别选择 `low` 和 `high`，并使用两个目标寄存器保存结果。
 - 非默认配置必须先定义具名的 `constexpr histogram_options`，再作为模板实参传入；直接使用临时对象时，
   C++17 编译失败。
-- `src.mask` 无效的输入元素不会参与统计。
 - `src` 和 `dst` 分别不是 `reg_tensor<uint8_t>` 和 `reg_tensor<uint16_t>` 时，找不到匹配的重载，编译失败。
 - 单个计数超过 `uint16_t` 上限 `65535` 时发生非饱和截断，结果按低 16 位保存。
 
 ## 7. 调用示例
 
-以下示例展示接口在 AIV 计算函数中的典型调用方式。示例先为加载结果绑定 mask，再执行计算并将结果写回 UB。
+以下示例展示接口在 AIV 计算函数中的典型调用方式。示例先为加载结果绑定 mask，
+再执行计算并将结果写回 UB。
 
-完整的 Kernel、Host 调用和数据验证代码请参见[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/histogram_compute_tensor_api/histogram_compute_tensor_api.asc)。
+完整的 Kernel、Host 调用和数据验证代码请参见
+[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/histogram_compute_tensor_api/)。
 
 ```cpp
 #include "tensor_api/tensor.h"

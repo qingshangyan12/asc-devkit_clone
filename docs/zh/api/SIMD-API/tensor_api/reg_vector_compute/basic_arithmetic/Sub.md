@@ -46,7 +46,8 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b);
 
 返回元素类型与寄存器操作数相同的 `reg_tensor`：
 
-- `reg`：有效 lane 保存左操作数减右操作数的结果。整型结果超出 `T` 的位宽时，仅保留目标类型位宽内的结果。
+- `reg`：有效 lane 保存左操作数减右操作数的结果。整型结果超出 `T` 的位宽时，
+  仅保留目标类型位宽内的结果。
 - `mask`：等于第一个 `reg_tensor` 操作数的 `mask`。
 
 ## 6. 约束说明
@@ -54,7 +55,7 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b);
 - 本接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用；
   底层调用 `asc_sub`。
 - 作为执行 mask 的第一个寄存器操作数 `.mask` 必须在调用前初始化，通常使用
-  `load(...).with_mask(m)`。`m` 可由 `update_mask<T>`、`make_mask` 或 `all_mask<T>` 生成；
+  `load(...).with_mask(m)`。`m` 可由 `update_mask<T>(remain)`、`make_mask<pattern, T>()` 或 `all_mask<T>()` 生成；
   未初始化的 mask 内容不确定。
 - 单个矢量寄存器宽度为 `asc_get_vf_len()` 字节；`T` 类型对应的最大 lane 数为
   `asc_get_vf_len() / sizeof(T)`。
@@ -65,9 +66,11 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b);
 
 ## 7. 调用示例
 
-以下示例展示接口在 AIV 计算函数中的典型调用方式。示例先为加载结果绑定 mask，再执行计算并将结果写回 UB。
+以下示例展示接口在 AIV 计算函数中的典型调用方式。示例先为加载结果绑定 mask，
+再执行计算并将结果写回 UB。
 
-完整的 Kernel、Host 调用和数据验证代码请参见[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/basic_arithmetic_tensor_api.asc)。
+完整的 Kernel、Host 调用和数据验证代码请参见
+[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/)。
 
 ```cpp
 #include "tensor_api/tensor.h"
