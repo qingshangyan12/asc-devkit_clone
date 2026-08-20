@@ -51,7 +51,7 @@ PIPE_S
 ## 约束说明
 
 - 本接口仅反映标量store侧策略，与标量load侧以及向量搬运接口参数中的`l2_cache_mode`无关。
-- 若编码不属于已定义枚举值，接口回退返回`asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM`。
+- 若CTRL对应4bit编码不属于已定义枚举值，接口仍按该编码原样强转为枚举返回。开发者应优先通过[asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md)写入合法枚举值。
 
 ## 调用示例
 

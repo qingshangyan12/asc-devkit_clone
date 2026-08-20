@@ -53,8 +53,7 @@ PIPE_S
 
 ## 约束说明
 
-- 本接口仅反映策略选择（CTRL[60]），不返回FLOAT/FLOAT8/INT/CAST各自的饱和开关状态；开关状态请使用[asc_get_saturation_flag](asc_get_saturation_flag.md)查询。
-- 若返回值为`USE_API`，则即使CAST饱和开关已打开，全局CAST饱和也不会生效。
+无
 
 ## 调用示例
 

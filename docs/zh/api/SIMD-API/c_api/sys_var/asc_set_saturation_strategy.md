@@ -28,10 +28,10 @@
 
 设置饱和控制策略，对应CTRL[60]：
 
-- `asc_override_strategy::USE_API`：写入CTRL[60]=0，表示按单指令/API路径配置饱和。
-- `asc_override_strategy::USE_GLOBAL`：写入CTRL[60]=1，表示使用全局CTRL饱和配置。
+- `asc_override_strategy::USE_API`：表示按单指令/API路径配置饱和。
+- `asc_override_strategy::USE_GLOBAL`：表示使用全局CTRL饱和配置。
 
-该策略尤其影响CAST类饱和：只有在`USE_GLOBAL`时，通过[asc_set_saturation_flag](asc_set_saturation_flag.md)配置的`asc_saturation_mode::CAST`（CTRL[59]）才会生效。枚举含义详见[asc_override_strategy](../enum/asc_override_strategy.md)。
+该策略尤其影响CAST类饱和：只有在`USE_GLOBAL`时，通过[asc_set_saturation_flag](asc_set_saturation_flag.md)配置的`asc_saturation_mode::CAST`才会生效。枚举含义详见[asc_override_strategy](../enum/asc_override_strategy.md)。
 
 ## 函数原型
 
@@ -57,8 +57,8 @@ PIPE_S
 
 ## 约束说明
 
-- 当策略为`USE_API`时，全局CAST饱和位（CTRL[59]）不生效；若需要CAST全局饱和，必须先或同时将策略设置为`USE_GLOBAL`。
-- 切换策略不会自动修改FLOAT/FLOAT8/INT/CAST各自的饱和开关位，仅改变CTRL[60]所代表的策略选择。
+- 当策略为`USE_API`时，全局CAST饱和位不生效；若需要CAST全局饱和，必须先或同时将策略设置为`USE_GLOBAL`。
+- 切换策略不会自动修改FLOAT/FLOAT8/INT/CAST各自的饱和开关位。
 
 ## 调用示例
 
@@ -68,7 +68,7 @@ PIPE_S
 float src = 3.0e9f;  // 可能超出int32正数范围的浮点值
 int32_t dst;
 
-// 切到全局饱和策略，使CAST对应的CTRL[59]生效
+// 切到全局饱和策略
 asc_set_saturation_strategy(asc_override_strategy::USE_GLOBAL);
 // 开启CAST饱和
 asc_set_saturation_flag(asc_saturation_mode::CAST, true);

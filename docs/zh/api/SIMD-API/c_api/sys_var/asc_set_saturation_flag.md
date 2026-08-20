@@ -67,7 +67,7 @@ PIPE_S
 ## 约束说明
 
 - `enable_sat`是API语义参数，不是CTRL原始比特值。FLOAT/FLOAT8/CAST开启饱和时写入0，INT开启饱和时写入1，二者极性相反，请勿按同一bit语义理解。
-- 当`saturation_mode`为`CAST`时，还需将饱和策略设置为`asc_override_strategy::USE_GLOBAL`（CTRL[60]=1），CAST对应的CTRL[59]才会生效。可通过[asc_set_saturation_strategy](asc_set_saturation_strategy.md)配置。
+- 当`saturation_mode`为`CAST`时，还需将饱和策略设置为`asc_override_strategy::USE_GLOBAL`，CAST才会生效。可通过[asc_set_saturation_strategy](asc_set_saturation_strategy.md)配置。
 - 本接口仅修改对应饱和控制位，不会破坏CTRL上其他无关比特位。
 
 ## 调用示例
@@ -78,7 +78,7 @@ PIPE_S
 float src = 3.0e9f;  // 可能超出int32正数范围的浮点值
 int32_t dst;
 
-// 使用全局CAST饱和策略，使CTRL[59]生效
+// 使用全局CAST饱和策略
 asc_set_saturation_strategy(asc_override_strategy::USE_GLOBAL);
 // 开启CAST饱和
 asc_set_saturation_flag(asc_saturation_mode::CAST, true);
