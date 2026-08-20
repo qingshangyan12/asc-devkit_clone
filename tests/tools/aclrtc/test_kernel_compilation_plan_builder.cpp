@@ -578,4 +578,243 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMissingResourceWorktree)
             .BuildCompilationPlan(plan),
         ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
+
+TEST(KernelCompilationPlanBuilderTest, RejectsInvalidRuntimeConstantLocations)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t constantBytes[] = {0x01, 0x02};
+    const void* validArgumentDataPointers[] = {constantBytes};
+    const void* nullArgumentDataPointers[] = {nullptr};
+    const uint64_t argumentByteCounts[] = {sizeof(constantBytes)};
+    KernelCompilationPlan plan;
+
+    Json outOfRangeManifest = CreateManifest();
+    outOfRangeManifest["kernels"][1]["constant_infos"][0]["parameter_index"] = 1U;
+    NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, validArgumentDataPointers, argumentByteCounts);
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, outOfRangeManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
+
+    request = CreateRequest(workspace, nullArgumentDataPointers, argumentByteCounts);
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
+}
+
+TEST(KernelCompilationPlanBuilderTest, RejectsMalformedManifestCommands)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t constantBytes[] = {0x01, 0x02};
+    const void* argumentDataPointers[] = {constantBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(constantBytes)};
+    const NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+    KernelCompilationPlan plan;
+
+    Json unsupportedCommandManifest = CreateManifest();
+    unsupportedCommandManifest["kernels"][1]["objects"][0]["commands"][0]["type"] = "future-command";
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, unsupportedCommandManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    Json emptyCommandManifest = CreateManifest();
+    emptyCommandManifest["kernels"][1]["objects"][0]["commands"][0]["cmd"] = Json::array();
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, emptyCommandManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    Json expandedExecutableManifest = CreateManifest();
+    expandedExecutableManifest["kernels"][1]["objects"][0]["commands"][0]["cmd"][0] = "${options:common_compile}";
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, expandedExecutableManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    Json relativeExecutableManifest = CreateManifest();
+    relativeExecutableManifest["kernels"][1]["objects"][0]["commands"][0]["cmd"][0] = "bisheng";
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, relativeExecutableManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+}
+
+TEST(KernelCompilationPlanBuilderTest, RequiresBasicAndRequestedSuperKernelObjects)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable skToolchainEnvironment("ACLRTC_TEST_SK_TOOLCHAIN", workspace.ToolchainPath().string());
+    const uint8_t constantBytes[] = {0x01, 0x02};
+    const void* argumentDataPointers[] = {constantBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(constantBytes)};
+    NormalizedKernelSpecializationRequest request = CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+    KernelCompilationPlan plan;
+
+    Json manifestWithoutBasic = CreateManifest();
+    manifestWithoutBasic["kernels"][1]["objects"].erase(0);
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, manifestWithoutBasic, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    request.compilationVariant = CompilationVariant::BasicWithSuperKernel;
+    Json manifestWithoutSuperKernel = CreateManifest();
+    manifestWithoutSuperKernel["kernels"][1]["objects"].erase(1);
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, manifestWithoutSuperKernel, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+}
+
+TEST(KernelCompilationPlanBuilderTest, RejectsUnresolvableLinkInputs)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t constantBytes[] = {0x01, 0x02};
+    const void* argumentDataPointers[] = {constantBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(constantBytes)};
+    const NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+    KernelCompilationPlan plan;
+    unsetenv("ACLRTC_TEST_MISSING_LINK_INPUT");
+
+    Json unresolvedLinkOptionManifest = CreateManifest();
+    unresolvedLinkOptionManifest["kernels"][1]["link_options"] = Json::array({"${env:ACLRTC_TEST_MISSING_LINK_INPUT}"});
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, unresolvedLinkOptionManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    Json unresolvedObjectOutputManifest = CreateManifest();
+    unresolvedObjectOutputManifest["kernels"][1]["objects"][0]["outputs"][0] = "${env:ACLRTC_TEST_MISSING_LINK_INPUT}";
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, unresolvedObjectOutputManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    ScopedEnvironmentVariable missingLinkerEnvironment(
+        "ASCEND_HOME_PATH", (workspace.ResourcePath() / "missing-toolchain").string());
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+}
+
+TEST(KernelCompilationPlanBuilderTest, RejectsInvalidManifestSelectionInputs)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t constantBytes[] = {0x01, 0x02};
+    const void* argumentDataPointers[] = {constantBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(constantBytes)};
+    NormalizedKernelSpecializationRequest request = CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+    KernelCompilationPlan plan;
+
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(request, CreateManifest(), "relative-worktree", workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    Json unsupportedSchemaManifest = CreateManifest();
+    unsupportedSchemaManifest["schema_version"] = "2.0";
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, unsupportedSchemaManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    request.kernelName = "missing_kernel";
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    request.kernelName = "add_custom_100000";
+    Json malformedSchemaManifest = CreateManifest();
+    malformedSchemaManifest["schema_version"] = Json::array();
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(
+            request, malformedSchemaManifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+}
+
+TEST(KernelCompilationPlanBuilderTest, RejectsMissingEnvironmentVariablesAtEachExpansionLayer)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable missingEnvironment("ACLRTC_TEST_MISSING_ENV", "temporarily-set");
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    ASSERT_EQ(unsetenv("ACLRTC_TEST_MISSING_ENV"), 0);
+    const uint8_t tilingBytes[] = {0x01, 0x02};
+    const void* argumentAddresses[] = {tilingBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(tilingBytes)};
+    const NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, argumentAddresses, argumentByteCounts);
+
+    Json manifest = CreateManifest();
+    manifest["options"]["common_compile"] = Json::array({"${env:ACLRTC_TEST_MISSING_ENV}/include"});
+    KernelCompilationPlan plan;
+    EXPECT_NE(
+        KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+
+    manifest = CreateManifest();
+    manifest["kernels"][1]["constant_infos"][0]["file"] = "${env:ACLRTC_TEST_MISSING_ENV}/constants.h";
+    EXPECT_NE(
+        KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+
+    ASSERT_EQ(unsetenv("ASCEND_HOME_PATH"), 0);
+    manifest = CreateManifest();
+    EXPECT_NE(
+        KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+}
+
+TEST(KernelCompilationPlanBuilderTest, ReportsResourceWorktreeInspectionErrors)
+{
+    KernelPlanTestWorkspace workspace;
+    const fs::path selfReferentialLink = workspace.ResourcePath().parent_path() / "worktree-link-loop";
+    boost::system::error_code symlinkError;
+    fs::create_symlink(selfReferentialLink.filename(), selfReferentialLink, symlinkError);
+    ASSERT_FALSE(symlinkError);
+    const uint8_t tilingBytes[] = {0x01, 0x02};
+    const void* argumentAddresses[] = {tilingBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(tilingBytes)};
+    const NormalizedKernelSpecializationRequest request =
+        CreateRequest(workspace, argumentAddresses, argumentByteCounts);
+
+    KernelCompilationPlan plan;
+    EXPECT_NE(
+        KernelCompilationPlanBuilder(request, CreateManifest(), selfReferentialLink, workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+}
 } // namespace

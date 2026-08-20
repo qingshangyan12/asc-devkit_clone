@@ -16,9 +16,11 @@
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
 #include <cerrno>
+#include <csignal>
 #include <cstdint>
 #include <fstream>
 #include <string>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -130,6 +132,113 @@ TEST(KernelSpecializationDiagnosticsTest, SavesOnlyReviewedDiagnosticFiles)
 
     boost::system::error_code ignoredError;
     fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationDiagnosticsTest, DisablesDiagnosticsWhenReplayScriptCannotBeCreated)
+{
+    const fs::path missingWorktreePath =
+        fs::temp_directory_path() / fs::unique_path("aclrtc_missing_diagnostics_%%%%-%%%%") / "worktree";
+    KernelSpecializationDiagnostics diagnostics(missingWorktreePath, "disabled_session");
+    diagnostics.WriteManifestSnapshot(nlohmann::json{{"schema_version", "1.0"}});
+
+    const CompilationCommand command{CompilationCommandKind::Compile, std::nullopt, "compile", "/bin/true", {}};
+    diagnostics.AppendCommandToReplayScript(command);
+    diagnostics.AppendCommandResultToCompilationLog(command, CompilationProcessResult{});
+    diagnostics.LogCommandFailureRecoveryHint();
+    diagnostics.WriteSpecializationResult("/tmp/kernel.elf", OutputPublicationStatus::NotPublished);
+
+    EXPECT_FALSE(fs::exists(missingWorktreePath));
+}
+
+TEST(KernelSpecializationDiagnosticsTest, RemovesReplayScriptWhenInitialWriteCannotBeFinalized)
+{
+    const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_diagnostics_write_failure_%%%%-%%%%");
+    fs::create_directories(testRoot);
+    struct rlimit originalFileSizeLimit {};
+    ASSERT_EQ(getrlimit(RLIMIT_FSIZE, &originalFileSizeLimit), 0);
+    struct sigaction ignoreFileSizeSignal {};
+    struct sigaction originalFileSizeSignal {};
+    ignoreFileSizeSignal.sa_handler = SIG_IGN;
+    ASSERT_EQ(sigemptyset(&ignoreFileSizeSignal.sa_mask), 0);
+    ASSERT_EQ(sigaction(SIGXFSZ, &ignoreFileSizeSignal, &originalFileSizeSignal), 0);
+    struct rlimit zeroFileSizeLimit = originalFileSizeLimit;
+    zeroFileSizeLimit.rlim_cur = 0U;
+    ASSERT_EQ(setrlimit(RLIMIT_FSIZE, &zeroFileSizeLimit), 0);
+
+    KernelSpecializationDiagnostics diagnostics(testRoot, "write_failure_session");
+
+    const int restoreLimitResult = setrlimit(RLIMIT_FSIZE, &originalFileSizeLimit);
+    const int restoreSignalResult = sigaction(SIGXFSZ, &originalFileSizeSignal, nullptr);
+    ASSERT_EQ(restoreLimitResult, 0);
+    ASSERT_EQ(restoreSignalResult, 0);
+    EXPECT_FALSE(fs::exists(testRoot / "aclrtc_replay.sh"));
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationDiagnosticsTest, KeepsNonEmptyReplayPathWhenInitialOpenFails)
+{
+    const fs::path testRoot =
+        fs::temp_directory_path() / fs::unique_path("aclrtc_diagnostics_replay_directory_%%%%-%%%%");
+    const fs::path replayScriptDirectory = testRoot / "aclrtc_replay.sh";
+    fs::create_directories(replayScriptDirectory);
+    std::ofstream(replayScriptDirectory / "existing.log") << "keep this diagnostic evidence\n";
+
+    KernelSpecializationDiagnostics diagnostics(testRoot, "replay_directory_session");
+    EXPECT_TRUE(fs::is_directory(replayScriptDirectory));
+    EXPECT_TRUE(fs::is_regular_file(replayScriptDirectory / "existing.log"));
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationDiagnosticsTest, RecordsTerminationKindsAndUnpublishedResult)
+{
+    const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_diagnostics_states_%%%%-%%%%");
+    fs::create_directories(testRoot);
+    KernelSpecializationDiagnostics diagnostics(testRoot, "session_states");
+    const CompilationCommand command{CompilationCommandKind::Compile, std::nullopt, "compile", "/bin/true", {}};
+
+    CompilationProcessResult processResult;
+    processResult.termination = ascendc::aclrtc::CompilationProcessTermination::Signaled;
+    processResult.terminationCode = SIGTERM;
+    diagnostics.AppendCommandResultToCompilationLog(command, processResult);
+    processResult.termination = ascendc::aclrtc::CompilationProcessTermination::TimedOut;
+    diagnostics.AppendCommandResultToCompilationLog(command, processResult);
+    processResult.termination = static_cast<ascendc::aclrtc::CompilationProcessTermination>(UINT32_MAX);
+    diagnostics.AppendCommandResultToCompilationLog(command, processResult);
+    diagnostics.LogCommandFailureRecoveryHint();
+    diagnostics.WriteSpecializationResult("/tmp/not_published.elf", OutputPublicationStatus::NotPublished);
+
+    const std::string compilationLog = ReadTextFile(testRoot / "aclrtc_compile.log");
+    EXPECT_NE(compilationLog.find("termination=signaled"), std::string::npos);
+    EXPECT_NE(compilationLog.find("termination=timed_out"), std::string::npos);
+    EXPECT_NE(compilationLog.find("termination=unknown"), std::string::npos);
+    const nlohmann::json result = nlohmann::json::parse(ReadTextFile(testRoot / "aclrtc_result.json"));
+    EXPECT_FALSE(result.at("output_published"));
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationDiagnosticsTest, IgnoresDiagnosticWriteFailuresAfterWorktreeRemoval)
+{
+    const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_diagnostics_removed_%%%%-%%%%");
+    fs::create_directories(testRoot);
+    KernelSpecializationDiagnostics diagnostics(testRoot, "removed_session");
+    boost::system::error_code removeError;
+    fs::remove_all(testRoot, removeError);
+    ASSERT_FALSE(removeError);
+
+    const CompilationCommand command{
+        CompilationCommandKind::Compile, std::nullopt, "compile", "/bin/true", {"argument"}};
+    diagnostics.WriteManifestSnapshot(nlohmann::json{{"schema_version", "1.0"}});
+    diagnostics.AppendCommandToReplayScript(command);
+    diagnostics.AppendCommandResultToCompilationLog(command, CompilationProcessResult{});
+    diagnostics.WriteSpecializationResult("/tmp/kernel.elf", OutputPublicationStatus::NotPublished);
+
+    EXPECT_FALSE(fs::exists(testRoot));
 }
 
 } // namespace

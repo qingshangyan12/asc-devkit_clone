@@ -18,6 +18,7 @@
 #include <boost/system/error_code.hpp>
 #include <fstream>
 #include <thread>
+#include <sys/resource.h>
 #include <time.h>
 #include <type_traits>
 #include <unistd.h>
@@ -269,5 +270,35 @@ TEST(CompilationPlanExecutorTest, BoundsCapturedProcessOutput)
     EXPECT_NE(compilationLog.find("output_truncated=true"), std::string::npos);
     EXPECT_NE(compilationLog.find("01234567"), std::string::npos);
     EXPECT_EQ(compilationLog.find("89abcdef"), std::string::npos);
+}
+
+TEST(CompilationPlanExecutorTest, ReportsToolProcessTerminatedBySignal)
+{
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_signaled");
+    CompilationPlanExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
+    KernelCompilationPlan plan;
+    plan.compilationCommands.push_back(
+        CreateCommand(CompilationCommandKind::Compile, "/bin/sh", {"-c", "kill -TERM $$"}));
+
+    EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
+}
+
+TEST(CompilationPlanExecutorTest, ReportsPipeCreationFailureWhenFileDescriptorsAreExhausted)
+{
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_pipe_failure");
+    CompilationPlanExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
+    KernelCompilationPlan plan;
+    plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/true", {}));
+
+    struct rlimit originalFileDescriptorLimit {};
+    ASSERT_EQ(getrlimit(RLIMIT_NOFILE, &originalFileDescriptorLimit), 0);
+    struct rlimit exhaustedFileDescriptorLimit = originalFileDescriptorLimit;
+    exhaustedFileDescriptorLimit.rlim_cur = 0U;
+    ASSERT_EQ(setrlimit(RLIMIT_NOFILE, &exhaustedFileDescriptorLimit), 0);
+    const aclError executionResult = executor.ExecuteCompilationPlan(plan);
+    const int restoreLimitResult = setrlimit(RLIMIT_NOFILE, &originalFileDescriptorLimit);
+
+    ASSERT_EQ(restoreLimitResult, 0);
+    EXPECT_EQ(executionResult, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 } // namespace

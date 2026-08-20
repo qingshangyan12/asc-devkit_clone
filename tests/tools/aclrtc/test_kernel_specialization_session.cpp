@@ -9,6 +9,7 @@
  */
 
 #include "specialization/kernel_specialization.h"
+#include "specialization/kernel_compilation_workspace.h"
 #include "specialization/resource_registry.h"
 
 #include <gtest/gtest.h>
@@ -23,14 +24,18 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <utility>
+#include <vector>
 
 namespace {
 namespace fs = boost::filesystem;
 using Json = nlohmann::json;
+using ascendc::aclrtc::KernelCompilationWorkspace;
 using ascendc::aclrtc::KernelSpecializationSession;
 using ascendc::aclrtc::MaterializedKernelCompilationResource;
 using ascendc::aclrtc::NormalizedKernelSpecializationRequest;
+using ascendc::aclrtc::WorktreeRetentionPolicy;
 using ascendc::specialization_compile::ResourceEntry;
+using ascendc::specialization_compile::ResourceFileData;
 using ascendc::specialization_compile::ResourceRegistry;
 using ascendc::specialization_compile::ResourceSourceType;
 using ascendc::specialization_compile::ResourceStatus;
@@ -112,7 +117,9 @@ public:
 
     const fs::path& ToolchainPath() const { return toolchainPath_; }
     const fs::path& WorktreePath() const { return worktreePath_; }
+    const fs::path& SourceDirectoryPath() const { return sourceDirectoryPath_; }
     const fs::path& OutputElfPath() const { return outputElfPath_; }
+    const Json& Manifest() const { return manifest_; }
 
 private:
     static void WriteFile(const fs::path& path, const std::string& contents)
@@ -180,7 +187,8 @@ private:
 class ScopedRegisteredCompilationResource final {
 public:
     ScopedRegisteredCompilationResource(
-        std::string resourceId, const Json& manifest, const fs::path& sourceDirectoryPath)
+        std::string resourceId, const Json& manifest, const fs::path& sourceDirectoryPath,
+        std::vector<ResourceFileData> resourceFiles = {{"payload.bin", "payload.bin", {0x01U, 0x02U}}})
         : registry_(ResourceRegistry::Instance()),
           resourceId_(std::move(resourceId)),
           previousTemporaryRoot_(registry_.temporaryRoot_),
@@ -196,7 +204,7 @@ public:
         std::unique_ptr<ResourceEntry> resourceEntry(new ResourceEntry());
         resourceEntry->data.json = manifest;
         resourceEntry->data.sourceFilePath = sourceDirectoryPath.string();
-        resourceEntry->files.push_back({"payload.bin", "payload.bin", {0x01U, 0x02U}});
+        resourceEntry->files = std::move(resourceFiles);
         resourceEntry->sourceType = ResourceSourceType::External;
         inserted_ = registry_.externalResources_.emplace(resourceId_, std::move(resourceEntry)).second;
     }
@@ -383,5 +391,68 @@ TEST(KernelSpecializationApiTest, RejectsNullPointersBeforeResourceLookup)
     EXPECT_EQ(aclrtcKernelSpecialization(nullptr, "/tmp/kernel.elf"), ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
 
     EXPECT_EQ(aclrtcKernelSpecialization(&request, nullptr), ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
+
+    EXPECT_EQ(aclrtcKernelSpecialization(&request, "/tmp/kernel.elf"), ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
+}
+
+TEST(KernelSpecializationApiTest, CompilesRegisteredResourceThroughPublicApi)
+{
+    EndToEndTestResource testResource(FakeCompilerOutcome::Success);
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
+    ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
+    const std::vector<ResourceFileData> resourceFiles = {
+        {"constants.h", "resources/include/constants.h", {'T', 'I', 'L', 'I', 'N', 'G', '=', '@', '@',
+                                                          'S', 'T', 'A', 'T', 'I', 'C', '_', 'T', 'I',
+                                                          'L', 'I', 'N', 'G', '@', '@', ';', '\n'}},
+        {"basic.cpp", "resources/src/basic.cpp", {'/', '/', ' ', 'b', 'a', 's', 'i', 'c', '\n'}},
+    };
+    ScopedRegisteredCompilationResource registeredResource(
+        RESOURCE_ID, testResource.Manifest(), testResource.SourceDirectoryPath(), resourceFiles);
+    ASSERT_TRUE(registeredResource.WasInserted());
+    const uint8_t constantBytes[] = {0x01, 0xfe};
+    const void* constantAddresses[] = {constantBytes};
+    const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
+    aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
+
+    EXPECT_EQ(
+        aclrtcKernelSpecialization(&request, testResource.OutputElfPath().c_str()), ascendc::aclrtc::ACLRTC_SUCCESS);
+    EXPECT_EQ(ReadFile(testResource.OutputElfPath()), "linked-elf");
+}
+
+TEST(KernelSpecializationSessionTest, RejectsMissingLinkedElfDuringPublication)
+{
+    const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_publish_missing_%%%%-%%%%");
+    const fs::path worktreePath = testRoot / "worktree";
+    fs::create_directories(worktreePath);
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
+    KernelSpecializationSession session;
+
+    EXPECT_EQ(
+        session.PublishKernelElf(testRoot / "missing.elf", testRoot / "output.elf", workspace),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationSessionTest, RemovesTemporaryElfWhenPublicationTargetIsDirectory)
+{
+    const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_publish_directory_%%%%-%%%%");
+    const fs::path worktreePath = testRoot / "worktree";
+    const fs::path linkedElfPath = testRoot / "linked.elf";
+    const fs::path outputDirectoryPath = testRoot / "output.elf";
+    fs::create_directories(worktreePath);
+    fs::create_directories(outputDirectoryPath);
+    std::ofstream(linkedElfPath.string()) << "linked-elf";
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
+    KernelSpecializationSession session;
+
+    EXPECT_EQ(
+        session.PublishKernelElf(linkedElfPath, outputDirectoryPath, workspace), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(fs::is_directory(outputDirectoryPath));
+    EXPECT_EQ(std::distance(fs::directory_iterator(testRoot), fs::directory_iterator()), 3);
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
 }
 } // namespace

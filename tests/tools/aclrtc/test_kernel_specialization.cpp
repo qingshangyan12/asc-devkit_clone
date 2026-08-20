@@ -197,6 +197,56 @@ TEST(KernelSpecializationRequestTest, RejectsInvalidRequestInputs)
     EXPECT_EQ(
         ascendc::aclrtc::NormalizeKernelSpecializationRequest(request, "/tmp/kernel.elf", normalizedRequest),
         ACL_ERROR_RTC_INVALID_OPTION);
+
+    request = CreateValidRequest();
+    request.skOptions = nullOption;
+    request.skOptionCount = 1U;
+    EXPECT_EQ(
+        ascendc::aclrtc::NormalizeKernelSpecializationRequest(request, "/tmp/kernel.elf", normalizedRequest),
+        ACL_ERROR_RTC_INVALID_OPTION);
+}
+
+TEST(KernelSpecializationRequestTest, RejectsCompilerOptionThatExceedsIndividualTextLimit)
+{
+    const std::string oversizedOption(1024U * 1024U + 1U, 'x');
+    const char* options[] = {oversizedOption.c_str()};
+    aclrtcKernelSpecRequest request = CreateValidRequest();
+    request.options = options;
+    request.optionCount = 1U;
+
+    ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
+    EXPECT_EQ(
+        ascendc::aclrtc::NormalizeKernelSpecializationRequest(request, "/tmp/kernel.elf", normalizedRequest),
+        ACL_ERROR_RTC_INVALID_OPTION);
+}
+
+TEST(KernelSpecializationRequestTest, RejectsCompilerOptionsThatExceedCombinedTextLimit)
+{
+    const std::string maximumLengthOption(1024U * 1024U, 'x');
+    const char* options[] = {
+        maximumLengthOption.c_str(), maximumLengthOption.c_str(), maximumLengthOption.c_str(),
+        maximumLengthOption.c_str(), maximumLengthOption.c_str()};
+    aclrtcKernelSpecRequest request = CreateValidRequest();
+    request.options = options;
+    request.optionCount = 5U;
+
+    ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
+    EXPECT_EQ(
+        ascendc::aclrtc::NormalizeKernelSpecializationRequest(request, "/tmp/kernel.elf", normalizedRequest),
+        ACL_ERROR_RTC_INVALID_OPTION);
+}
+
+TEST(KernelSpecializationRequestTest, RejectsTooManyCompilerOptions)
+{
+    const std::vector<const char*> options(4097U, "-g");
+    aclrtcKernelSpecRequest request = CreateValidRequest();
+    request.options = options.data();
+    request.optionCount = options.size();
+
+    ascendc::aclrtc::NormalizedKernelSpecializationRequest normalizedRequest;
+    EXPECT_EQ(
+        ascendc::aclrtc::NormalizeKernelSpecializationRequest(request, "/tmp/kernel.elf", normalizedRequest),
+        ACL_ERROR_RTC_INVALID_INPUT);
 }
 
 TEST(KernelSpecializationRequestTest, RejectsOptionsThatCanRedirectCompilerInputsOrOutputs)

@@ -115,6 +115,22 @@ TEST(KernelCompilationWorkspaceTest, FailsWhenPatchFileIsMissing)
     fs::remove_all(worktreePath, ignoredError);
 }
 
+TEST(KernelCompilationWorkspaceTest, FailsWhenPatchSourceCannotBeRead)
+{
+    const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_unreadable_source");
+    const fs::path directoryUsedAsSource = worktreePath / "resources/constants.h";
+    fs::create_directories(directoryUsedAsSource);
+    KernelCompilationPlan plan;
+    plan.sourcePatches = {{directoryUsedAsSource, "@@VALUE@@", "{0x01}"}};
+
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
+    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(fs::is_directory(directoryUsedAsSource));
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(worktreePath, ignoredError);
+}
+
 TEST(KernelCompilationWorkspaceTest, PreservesOriginalSourceWhenFinalPatchFlushFails)
 {
     const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_patch_flush_failure");
@@ -171,5 +187,51 @@ TEST(KernelCompilationWorkspaceTest, RemovesWorktreeBeforeOutputPublicationWhenN
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RemoveAfterCompilation);
     EXPECT_EQ(workspace.RemoveWorktreeBeforePublishingElfIfNeeded(), 0);
     EXPECT_FALSE(fs::exists(worktreePath));
+}
+
+TEST(KernelCompilationWorkspaceTest, FailsWhenOutputDirectoryConflictsWithExistingFile)
+{
+    const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_output_conflict");
+    const fs::path conflictingOutputPath = worktreePath / "outputs";
+    WriteFile(conflictingOutputPath, "not a directory");
+    KernelCompilationPlan plan;
+    plan.requiredOutputDirectoryPaths = {conflictingOutputPath / "nested"};
+
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
+    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(fs::is_regular_file(conflictingOutputPath));
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(worktreePath, ignoredError);
+}
+
+TEST(KernelCompilationWorkspaceTest, PreservesSourceWhenTemporaryPatchFilenameIsTooLong)
+{
+    const fs::path worktreePath = CreateWorkspacePath("aclrtc_workspace_long_patch_name");
+    const fs::path sourcePath = worktreePath / std::string(245U, 'a');
+    WriteFile(sourcePath, "VALUE=@@VALUE@@;\n");
+    KernelCompilationPlan plan;
+    plan.sourcePatches = {{sourcePath, "@@VALUE@@", "{0x01}"}};
+
+    KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
+    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(ReadFile(sourcePath), "VALUE=@@VALUE@@;\n");
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(worktreePath, ignoredError);
+}
+
+TEST(KernelCompilationWorkspaceTest, PrepublicationCleanupNoOpsForEmptyAndRetainedWorktrees)
+{
+    KernelCompilationWorkspace emptyWorkspace({}, WorktreeRetentionPolicy::RemoveAfterCompilation);
+    EXPECT_EQ(emptyWorkspace.RemoveWorktreeBeforePublishingElfIfNeeded(), ascendc::aclrtc::ACLRTC_SUCCESS);
+
+    const fs::path retainedWorktreePath = CreateWorkspacePath("aclrtc_workspace_retained_prepublish");
+    KernelCompilationWorkspace retainedWorkspace(retainedWorktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
+    EXPECT_EQ(retainedWorkspace.RemoveWorktreeBeforePublishingElfIfNeeded(), ascendc::aclrtc::ACLRTC_SUCCESS);
+    EXPECT_TRUE(fs::is_directory(retainedWorktreePath));
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(retainedWorktreePath, ignoredError);
 }
 } // namespace
