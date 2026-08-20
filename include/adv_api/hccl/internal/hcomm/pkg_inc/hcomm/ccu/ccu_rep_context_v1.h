@@ -11,6 +11,7 @@
 #define CCU_REP_CTX_H
 
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 
@@ -59,10 +60,17 @@ struct CcuProfilingInfo {
           mask(0),
           dataSize(0)
     {
-        (void)memset_s(channelId, sizeof(channelId), INVALID_VALUE_CHANNELID, sizeof(channelId));
-        (void)memset_s(remoteRankId, sizeof(remoteRankId), INVALID_RANKID, sizeof(remoteRankId));
-        (void)memset_s(
-            channelHandle, sizeof(channelHandle), static_cast<int>(INVALID_VALUE_NOTIFYID), sizeof(channelHandle));
+        if (memset_s(channelId, sizeof(channelId), INVALID_VALUE_CHANNELID, sizeof(channelId)) != EOK) {
+            throw std::runtime_error("failed to initialize CCU profiling channel IDs");
+        }
+        if (memset_s(remoteRankId, sizeof(remoteRankId), INVALID_RANKID, sizeof(remoteRankId)) != EOK) {
+            throw std::runtime_error("failed to initialize CCU profiling rank IDs");
+        }
+        if (memset_s(
+                channelHandle, sizeof(channelHandle), static_cast<int>(INVALID_VALUE_NOTIFYID),
+                sizeof(channelHandle)) != EOK) {
+            throw std::runtime_error("failed to initialize CCU profiling channel handles");
+        }
     }
 };
 namespace CcuRep {
