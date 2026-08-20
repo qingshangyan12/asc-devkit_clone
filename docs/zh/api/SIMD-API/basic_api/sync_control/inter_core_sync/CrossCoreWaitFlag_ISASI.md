@@ -137,9 +137,9 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
     - SyncAll硬件同步接口占用的flagId情况请参考[flagId占用情况](SyncAll.md#syncall_flagId冲突说明)。
 
 - flagId相关的约束：
-    - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会截取最低位4bit为准。
+    - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则截取低4bit（例如，flagId=17时，截取后为1）。
     <!-- npu="950" id18 -->
-    - 针对Ascend 950PR/Ascend 950DT，核间同步的模式为模式4时，AIC有32个flagId，支持的取值范围为0-31，如果flagId的值超出该范围，则会截取最低位5bit为准；AIV有16个flagId，支持的取值范围为0-15，如果flagId的值超出该范围，则会截取最低位4bit为准。
+    - 针对Ascend 950PR/Ascend 950DT，核间同步的模式为模式4时，AIC有32个flagId，支持的取值范围为0-31，如果flagId的值超出该范围，则截取低5bit（例如，flagId=35时，截取后为3）；AIV有16个flagId，支持的取值范围为0-15，如果flagId的值超出该范围，则截取低4bit（例如，flagId=17时，截取后为1）。
     <!-- end id18 -->
     - 每个flagId都对应一个计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag_ISASI.md)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到核间同步（CrossCoreSetFlag）全部完成后，会将对应CrossCoreWaitFlag的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](key_features.md#ZH-CN_TOPIC_0000002586300741)。flagId对应的计数器计数范围为0-15。如果计数器的值超出该范围，则会异常报错，中断流程。
 - 模式0、1、2下，同一个flagId用于不同核间同步模式的约束：

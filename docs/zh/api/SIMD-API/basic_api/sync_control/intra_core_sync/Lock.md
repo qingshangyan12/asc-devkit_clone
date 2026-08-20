@@ -28,7 +28,7 @@
 
 头文件路径为：`"basic_api/kernel_common.h"`。
 
-根据MutexID获取Mutex，若Mutex已被锁定，将阻塞后续指定流水指令队列，直到当前流水的前序指令中对应MutexID的Mutex被[Unlock](Unlock.md)。
+根据MutexID获取Mutex，若Mutex已被锁定，将阻塞指定流水上后续指令的执行，直到所有流水中具有相同MutexID的Mutex都已经被[Unlock](Unlock.md)释放。
 
 > [!NOTE]说明
 > Lock接口需与[Unlock](Unlock.md)接口配合使用，对同一个MutexID，Lock和Unlock必须严格成对出现，否则属于未定义行为。具体约束请参见[约束说明](#约束说明)。
@@ -81,46 +81,45 @@ static __aicore__ inline void Lock(MutexID id)
     AscendC::Mutex::Unlock<PIPE_MTE2>(0);
     ```
 
-- Lock与Unlock不能实现单流水内不同指令之间的同步，单流水内多个指令之间的同步请使用[PipeBarrier](PipeBarrier_ISASI.md)接口。
+- 当具有相同id与pipe的两对Lock与Unlock连续调用时，第一次调用的Lock将由参数pipe指定的流水阻塞后，第二次调用的Lock不能再次阻塞该流水。换言之，连续调用的、具有相同id与pipe的两对Lock与Unlock不能实现单流水（参数pipe指定）内不同指令之间的同步，单流水内多个指令之间的同步请使用[PipeBarrier](PipeBarrier_ISASI.md)接口。
 
-如[图1](#fig_mte2_overlap)所示，两次搬运的目的地址在Unified Buffer（UB）存在重叠时，开发者需要控制PIPE_MTE2上两条指令执行的先后顺序。在此场景中如下写法只能保证两条PIPE_MTE2上指令执行后，PIPE_V上指令才能执行，但并不能控制PIPE_MTE2上两条指令执行的先后顺序（），正确写法是在`CopyInY`与`CopyInX`之间插入`PipeBarrier<PIPE_MTE2>()`。
+    如[图1](#fig_mte2_overlap)所示，两次搬运的目的地址在Unified Buffer（UB）存在重叠时，开发者需要控制PIPE_MTE2上两条指令执行的先后顺序。在此场景中如下写法（具有相同id与pipe的两对Lock与Unlock连续调用）只能保证两条PIPE_MTE2上指令执行后，PIPE_V上指令才能执行，但并不能控制PIPE_MTE2上两条指令执行的先后顺序，正确写法是在`CopyInY`与`CopyInX`之间插入`PipeBarrier<PIPE_MTE2>()`。
 
-**图1**  PIPE_MTE2上两次搬运目的地址UB存在重叠，Lock/Unlock无法控制两条指令的先后顺序<a name="fig_mte2_overlap"></a>  
-![](../../../../figures/mte2_overlap.png)
+    **图1**  PIPE_MTE2上两次搬运目的地址（UB）存在重叠 <a name="fig_mte2_overlap"></a>    
+    ![](../../../../figures/mte2_overlap.png)
 
-```cpp
-// x和y在UB上的地址存在重叠（重叠部分x覆盖y），预期先搬入y后搬入x，需要保证搬入顺序。
-void CopyInX(LocalTensor<float>& x, const GlobalTensor<float>& xGm, uint32_t len, uint8_t mutexId)
-{
-    AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);
-    AscendC::DataCopy(x, xGm, len);
-    AscendC::Mutex::Unlock<PIPE_MTE2>(mutexId);
-}
+    ```cpp
+    // x和y在UB上的地址存在重叠（重叠部分x覆盖y），预期先搬入y后搬入x，需要保证搬入顺序。
+    void CopyInX(LocalTensor<float>& x, const GlobalTensor<float>& xGm, uint32_t len, uint8_t mutexId)
+    {
+        AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);
+        AscendC::DataCopy(x, xGm, len);
+        AscendC::Mutex::Unlock<PIPE_MTE2>(mutexId);
+    }
 
-void CopyInY(LocalTensor<float>& y, const GlobalTensor<float>& yGm, uint32_t len, uint8_t mutexId)
-{
-    AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);
-    AscendC::DataCopy(y, yGm, len);
-    AscendC::Mutex::Unlock<PIPE_MTE2>(mutexId);
-}
+    void CopyInY(LocalTensor<float>& y, const GlobalTensor<float>& yGm, uint32_t len, uint8_t mutexId)
+    {
+        AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);
+        AscendC::DataCopy(y, yGm, len);
+        AscendC::Mutex::Unlock<PIPE_MTE2>(mutexId);
+    }
 
-void Process(LocalTensor<float>& z, LocalTensor<float>& x, LocalTensor<float>& y, uint32_t len, uint8_t mutexId)
-{
-    // 先搬入y，再搬入x（重叠部分x覆盖y），顺序错误会导致精度异常。
-    CopyInY(y, yGm, len, mutexId);
+    void Process(LocalTensor<float>& z, LocalTensor<float>& x, LocalTensor<float>& y, uint32_t len, uint8_t mutexId)
+    {
+        // 先搬入y，再搬入x（重叠部分x覆盖y），顺序错误会导致精度异常。
+        CopyInY(y, yGm, len, mutexId);
 
-    /*
-     * 必须在CopyInY与CopyInX之间插入PipeBarrier，保证前一次搬入完成后才执行下一次搬入。
-     * AscendC::PipeBarrier<PIPE_MTE2>();
-     */
+        /*
+        * // 必须在CopyInY与CopyInX之间插入PipeBarrier，保证前一次搬入完成后才执行下一次搬入。
+        * AscendC::PipeBarrier<PIPE_MTE2>();
+        */
 
-
-    CopyInX(x, xGm, len, mutexId);
-    AscendC::Mutex::Lock<PIPE_V>(mutexId);
-    AscendC::Add(z, x, y, len);
-    AscendC::Mutex::Unlock<PIPE_V>(mutexId);
-}
-```
+        CopyInX(x, xGm, len, mutexId);
+        AscendC::Mutex::Lock<PIPE_V>(mutexId);
+        AscendC::Add(z, x, y, len);
+        AscendC::Mutex::Unlock<PIPE_V>(mutexId);
+    }
+    ```
 
 ## 调用示例<a name="section123275308128"></a>
 
