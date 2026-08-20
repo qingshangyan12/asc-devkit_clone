@@ -239,6 +239,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         KERNEL_INFO, "ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
         ccuParam_.scratchAddr, rankSliceOffset);
     xnData_[4] = rankSliceOffset;
+    // xn5/xn6 对应 outputOffset 与 repeatStride，CCU 侧固定按 0 处理，此处显式置 0 避免刷入残留值
+    xnData_[5] = 0;
+    xnData_[6] = 0;
     xnData_[7] = sliceSize;
     xnData_[8] = UINT64_MAX - 1;
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
