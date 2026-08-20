@@ -534,7 +534,6 @@ __simd_callee__ inline void LogXImpl(
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     punpack(MaskLow, mask, LOWER);
     punpack(MaskHigh, mask, HIGHER);
-
     vintlv(f16RegLow, f16RegHigh, srcReg, srcReg);
 
     vcvt(f32RegLow, f16RegLow, maskAll, partModeEvenVal, modeValue);
