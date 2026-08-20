@@ -39,9 +39,3 @@ target_include_directories(demo BEFORE PRIVATE
 )
 
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
-target_compile_definitions(demo PRIVATE ASCENDC_DUMP=0)
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:-iquote${ASC_DEVKIT_ROOT}>
-    $<$<COMPILE_LANGUAGE:ASC>:-iquote${ASC_DEVKIT_ROOT}/include>
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-)
