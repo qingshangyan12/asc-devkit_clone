@@ -64,8 +64,9 @@ bool WriteDiagnosticTextFile(const fs::path& filePath, const std::string& text, 
     std::ofstream outputStream(filePath.string(), std::ios::out | writeMode);
     if (!outputStream) {
         const int openError = errno;
-        ASCENDLOGW("Failed to open diagnostic file for writing: path=%s errno=%d message=%s",
-                           filePath.c_str(), openError, std::strerror(openError));
+        ASCENDLOGW(
+            "Failed to open diagnostic file for writing: path=%s errno=%d message=%s", filePath.c_str(), openError,
+            std::strerror(openError));
         return false;
     }
 
@@ -75,8 +76,9 @@ bool WriteDiagnosticTextFile(const fs::path& filePath, const std::string& text, 
         return true;
     }
     const int writeError = errno;
-    ASCENDLOGW("Failed to write diagnostic file: path=%s errno=%d message=%s",
-                       filePath.c_str(), writeError, std::strerror(writeError));
+    ASCENDLOGW(
+        "Failed to write diagnostic file: path=%s errno=%d message=%s", filePath.c_str(), writeError,
+        std::strerror(writeError));
     return false;
 }
 
@@ -85,13 +87,13 @@ void RemoveIncompleteReplayScript(const fs::path& replayScriptPath) noexcept
     boost::system::error_code removalError;
     fs::remove(replayScriptPath, removalError);
     if (removalError) {
-        ASCENDLOGW("Failed to remove incomplete replay script: path=%s error=%d message=%s",
-                           replayScriptPath.c_str(), removalError.value(), removalError.message().c_str());
+        ASCENDLOGW(
+            "Failed to remove incomplete replay script: path=%s error=%d message=%s", replayScriptPath.c_str(),
+            removalError.value(), removalError.message().c_str());
     }
 }
 
-bool CreateExecutableReplayScript(const fs::path& replayScriptPath,
-                                  const fs::path& compilationWorkingDirectoryPath)
+bool CreateExecutableReplayScript(const fs::path& replayScriptPath, const fs::path& compilationWorkingDirectoryPath)
 {
     const std::string replayScriptHeader =
         "#!/bin/sh\nset -eu\ncd " + QuoteArgumentForReplayScript(compilationWorkingDirectoryPath.string()) + "\n";
@@ -106,8 +108,9 @@ bool CreateExecutableReplayScript(const fs::path& replayScriptPath,
     }
 
     const int permissionError = errno;
-    ASCENDLOGW("Failed to make replay script executable: path=%s errno=%d message=%s",
-                       replayScriptPath.c_str(), permissionError, std::strerror(permissionError));
+    ASCENDLOGW(
+        "Failed to make replay script executable: path=%s errno=%d message=%s", replayScriptPath.c_str(),
+        permissionError, std::strerror(permissionError));
     RemoveIncompleteReplayScript(replayScriptPath);
     return false;
 }
@@ -130,8 +133,9 @@ KernelSpecializationDiagnostics::KernelSpecializationDiagnostics(
         }
     } catch (...) {
         diagnosticsEnabled_ = false;
-        ASCENDLOGW("Failed to initialize specialization diagnostics in resource worktree: session=%s path=%s",
-                   specializationSessionId_.c_str(), resourceWorktreePath_.c_str());
+        ASCENDLOGW(
+            "Failed to initialize specialization diagnostics in resource worktree: session=%s path=%s",
+            specializationSessionId_.c_str(), resourceWorktreePath_.c_str());
     }
 }
 
@@ -144,13 +148,13 @@ void KernelSpecializationDiagnostics::WriteManifestSnapshot(const nlohmann::json
         const fs::path manifestPath = resourceWorktreePath_ / DIAGNOSTIC_MANIFEST_FILE_NAME;
         WriteDiagnosticTextFile(manifestPath, resourceManifest.dump(2) + '\n', std::ios::trunc);
     } catch (...) {
-        ASCENDLOGW("Failed to record specialization manifest: resource_worktree=%s file=%s",
-                   resourceWorktreePath_.c_str(), DIAGNOSTIC_MANIFEST_FILE_NAME);
+        ASCENDLOGW(
+            "Failed to record specialization manifest: resource_worktree=%s file=%s", resourceWorktreePath_.c_str(),
+            DIAGNOSTIC_MANIFEST_FILE_NAME);
     }
 }
 
-void KernelSpecializationDiagnostics::AppendCommandToReplayScript(
-    const CompilationCommand& compilationCommand) noexcept
+void KernelSpecializationDiagnostics::AppendCommandToReplayScript(const CompilationCommand& compilationCommand) noexcept
 {
     if (!diagnosticsEnabled_) {
         return;
@@ -163,9 +167,9 @@ void KernelSpecializationDiagnostics::AppendCommandToReplayScript(
         replayLine += '\n';
         AppendTextToDiagnosticFile(resourceWorktreePath_ / DIAGNOSTIC_REPLAY_SCRIPT_FILE_NAME, replayLine);
     } catch (...) {
-        ASCENDLOGW("Failed to record command %s: resource_worktree=%s file=%s",
-                   compilationCommand.diagnosticLabel.c_str(), resourceWorktreePath_.c_str(),
-                   DIAGNOSTIC_REPLAY_SCRIPT_FILE_NAME);
+        ASCENDLOGW(
+            "Failed to record command %s: resource_worktree=%s file=%s", compilationCommand.diagnosticLabel.c_str(),
+            resourceWorktreePath_.c_str(), DIAGNOSTIC_REPLAY_SCRIPT_FILE_NAME);
     }
 }
 
@@ -177,10 +181,9 @@ void KernelSpecializationDiagnostics::AppendCommandResultToCompilationLog(
     }
     try {
         std::ostringstream resultText;
-        resultText << '[' << compilationCommand.diagnosticLabel << "] termination="
-                   << GetProcessTerminationName(processResult.termination) << " code="
-                   << processResult.terminationCode
-                   << " elapsed_ms=" << processResult.elapsedTime.count()
+        resultText << '[' << compilationCommand.diagnosticLabel
+                   << "] termination=" << GetProcessTerminationName(processResult.termination)
+                   << " code=" << processResult.terminationCode << " elapsed_ms=" << processResult.elapsedTime.count()
                    << " output_truncated=" << (processResult.capturedOutputTruncated ? "true" : "false") << '\n'
                    << processResult.capturedOutput;
         if (!processResult.capturedOutput.empty() && processResult.capturedOutput.back() != '\n') {
@@ -188,18 +191,18 @@ void KernelSpecializationDiagnostics::AppendCommandResultToCompilationLog(
         }
         AppendTextToDiagnosticFile(resourceWorktreePath_ / DIAGNOSTIC_COMPILE_LOG_FILE_NAME, resultText.str());
     } catch (...) {
-        ASCENDLOGW("Failed to record result for command %s: resource_worktree=%s file=%s",
-                   compilationCommand.diagnosticLabel.c_str(), resourceWorktreePath_.c_str(),
-                   DIAGNOSTIC_COMPILE_LOG_FILE_NAME);
+        ASCENDLOGW(
+            "Failed to record result for command %s: resource_worktree=%s file=%s",
+            compilationCommand.diagnosticLabel.c_str(), resourceWorktreePath_.c_str(),
+            DIAGNOSTIC_COMPILE_LOG_FILE_NAME);
     }
 }
 
 void KernelSpecializationDiagnostics::LogCommandFailureRecoveryHint() const noexcept
 {
     if (!diagnosticsEnabled_) {
-        ASCENDLOGI(
-            "Set ASCEND_OP_COMPILE_SAVE_KERNEL_META=1 and retry to retain the resource worktree and save "
-            "specialization diagnostics");
+        ASCENDLOGI("Set ASCEND_OP_COMPILE_SAVE_KERNEL_META=1 and retry to retain the resource worktree and save "
+                   "specialization diagnostics");
         return;
     }
     try {
@@ -221,7 +224,7 @@ void KernelSpecializationDiagnostics::WriteSpecializationResult(
         return;
     }
     try {
-        nlohmann::json resultJson {
+        nlohmann::json resultJson{
             {"specialization_session_id", specializationSessionId_},
             {"output_path", outputElfPath.string()},
             {"output_published", publicationStatus == OutputPublicationStatus::Published},
@@ -229,8 +232,9 @@ void KernelSpecializationDiagnostics::WriteSpecializationResult(
         const fs::path resultPath = resourceWorktreePath_ / DIAGNOSTIC_RESULT_FILE_NAME;
         WriteDiagnosticTextFile(resultPath, resultJson.dump(2) + '\n', std::ios::trunc);
     } catch (...) {
-        ASCENDLOGW("Failed to record specialization result: resource_worktree=%s file=%s",
-                   resourceWorktreePath_.c_str(), DIAGNOSTIC_RESULT_FILE_NAME);
+        ASCENDLOGW(
+            "Failed to record specialization result: resource_worktree=%s file=%s", resourceWorktreePath_.c_str(),
+            DIAGNOSTIC_RESULT_FILE_NAME);
     }
 }
 

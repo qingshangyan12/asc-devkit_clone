@@ -21,10 +21,9 @@ namespace aclrtc {
 
 class KernelCompilationPlanBuilder final {
 public:
-    KernelCompilationPlanBuilder(const NormalizedKernelSpecializationRequest& specializationRequest,
-                                 const nlohmann::json& resourceManifest,
-                                 boost::filesystem::path resourceWorktreePath,
-                                 boost::filesystem::path externalSourceDirectoryPath);
+    KernelCompilationPlanBuilder(
+        const NormalizedKernelSpecializationRequest& specializationRequest, const nlohmann::json& resourceManifest,
+        boost::filesystem::path resourceWorktreePath, boost::filesystem::path externalSourceDirectoryPath);
 
     aclError BuildCompilationPlan(KernelCompilationPlan& compilationPlan) const;
 

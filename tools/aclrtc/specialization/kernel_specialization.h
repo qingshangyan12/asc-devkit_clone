@@ -43,9 +43,9 @@ private:
         const NormalizedKernelSpecializationRequest& specializationRequest,
         KernelSpecializationDiagnostics& diagnostics, aclError specializationResult) noexcept;
 
-    aclError PublishKernelElf(const boost::filesystem::path& linkedKernelElfPath,
-                              const boost::filesystem::path& outputElfPath,
-                              KernelCompilationWorkspace& compilationWorkspace) const;
+    aclError PublishKernelElf(
+        const boost::filesystem::path& linkedKernelElfPath, const boost::filesystem::path& outputElfPath,
+        KernelCompilationWorkspace& compilationWorkspace) const;
 };
 
 } // namespace aclrtc

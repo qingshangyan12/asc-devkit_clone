@@ -28,23 +28,21 @@ enum class OutputPublicationStatus : uint32_t {
 
 class KernelSpecializationDiagnostics final {
 public:
-    KernelSpecializationDiagnostics(boost::filesystem::path resourceWorktreePath,
-                                    std::string specializationSessionId);
+    KernelSpecializationDiagnostics(boost::filesystem::path resourceWorktreePath, std::string specializationSessionId);
 
     void WriteManifestSnapshot(const nlohmann::json& resourceManifest) noexcept;
     void AppendCommandToReplayScript(const CompilationCommand& compilationCommand) noexcept;
     void AppendCommandResultToCompilationLog(
-        const CompilationCommand& compilationCommand,
-        const CompilationProcessResult& processResult) noexcept;
+        const CompilationCommand& compilationCommand, const CompilationProcessResult& processResult) noexcept;
     void LogCommandFailureRecoveryHint() const noexcept;
-    void WriteSpecializationResult(const boost::filesystem::path& outputElfPath,
-                                   OutputPublicationStatus publicationStatus) noexcept;
+    void WriteSpecializationResult(
+        const boost::filesystem::path& outputElfPath, OutputPublicationStatus publicationStatus) noexcept;
 
 private:
     void AppendTextToDiagnosticFile(const boost::filesystem::path& filePath, const std::string& text) noexcept;
 
     std::string specializationSessionId_;
-    bool diagnosticsEnabled_ {false};
+    bool diagnosticsEnabled_{false};
     boost::filesystem::path resourceWorktreePath_;
 };
 

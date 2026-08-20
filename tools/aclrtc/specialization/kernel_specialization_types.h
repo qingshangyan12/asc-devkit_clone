@@ -59,11 +59,11 @@ struct NormalizedKernelSpecializationRequest {
     std::string resourceId;
     std::string kernelName;
     boost::filesystem::path outputElfPath;
-    CompilationVariant compilationVariant {CompilationVariant::Basic};
+    CompilationVariant compilationVariant{CompilationVariant::Basic};
     KernelCompilerOptions compilerOptions;
-    uint64_t kernelArgumentCount {0};
-    const void* const* borrowedKernelArgumentDataPointers {nullptr};
-    const uint64_t* borrowedKernelArgumentByteCounts {nullptr};
+    uint64_t kernelArgumentCount{0};
+    const void* const* borrowedKernelArgumentDataPointers{nullptr};
+    const uint64_t* borrowedKernelArgumentByteCounts{nullptr};
 };
 
 struct KernelSourcePatch {
@@ -88,10 +88,10 @@ struct KernelCompilationPlan {
 };
 
 struct CompilationProcessResult {
-    CompilationProcessTermination termination {CompilationProcessTermination::InfrastructureFailure};
-    int32_t terminationCode {0};
-    bool capturedOutputTruncated {false};
-    std::chrono::milliseconds elapsedTime {0};
+    CompilationProcessTermination termination{CompilationProcessTermination::InfrastructureFailure};
+    int32_t terminationCode{0};
+    bool capturedOutputTruncated{false};
+    std::chrono::milliseconds elapsedTime{0};
     std::string capturedOutput;
 };
 

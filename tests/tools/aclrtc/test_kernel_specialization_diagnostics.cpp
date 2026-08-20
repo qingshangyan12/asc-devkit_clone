@@ -33,8 +33,7 @@ using ascendc::aclrtc::OutputPublicationStatus;
 
 class ScopedCurrentDirectory final {
 public:
-    explicit ScopedCurrentDirectory(const fs::path& currentDirectory)
-        : previousDirectory_(fs::current_path())
+    explicit ScopedCurrentDirectory(const fs::path& currentDirectory) : previousDirectory_(fs::current_path())
     {
         fs::current_path(currentDirectory);
     }
@@ -80,19 +79,22 @@ int ExecuteReplayScriptAndWait(const fs::path& replayScriptPath)
 TEST(KernelSpecializationDiagnosticsTest, SavesOnlyReviewedDiagnosticFiles)
 {
     static uint64_t sequence = 0U;
-    const fs::path testRoot = fs::temp_directory_path() /
-                              ("aclrtc_diagnostics_test_" + std::to_string(getpid()) + "_" +
-                               std::to_string(sequence++));
+    const fs::path testRoot = fs::temp_directory_path() / ("aclrtc_diagnostics_test_" + std::to_string(getpid()) + "_" +
+                                                           std::to_string(sequence++));
     fs::create_directories(testRoot);
     {
         ScopedCurrentDirectory currentDirectory(testRoot);
         KernelSpecializationDiagnostics diagnostics(testRoot, "session_1");
-        diagnostics.WriteManifestSnapshot(nlohmann::json {{"schema_version", "1.0"}});
+        diagnostics.WriteManifestSnapshot(nlohmann::json{{"schema_version", "1.0"}});
 
-        const CompilationCommand command {CompilationCommandKind::Compile, 0U, "basic/compile[0]",
-                                          "/bin/echo", {"argument with space", "quote'value"}};
+        const CompilationCommand command{
+            CompilationCommandKind::Compile,
+            0U,
+            "basic/compile[0]",
+            "/bin/echo",
+            {"argument with space", "quote'value"}};
         diagnostics.AppendCommandToReplayScript(command);
-        const CompilationCommand workingDirectoryCheck {
+        const CompilationCommand workingDirectoryCheck{
             CompilationCommandKind::Compile,
             std::nullopt,
             "basic/compile[1]",

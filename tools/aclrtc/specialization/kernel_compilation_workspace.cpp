@@ -32,24 +32,26 @@ bool ReadSourceFileContents(const fs::path& sourceFilePath, std::string& sourceF
     std::ifstream inputStream(sourceFilePath.string(), std::ios::in | std::ios::binary);
     if (!inputStream) {
         const int openError = errno;
-        ASCENDLOGE("Failed to open source patch file: path=%s errno=%d message=%s",
-                         sourceFilePath.c_str(), openError, std::strerror(openError));
+        ASCENDLOGE(
+            "Failed to open source patch file: path=%s errno=%d message=%s", sourceFilePath.c_str(), openError,
+            std::strerror(openError));
         return false;
     }
     std::ostringstream sourceFileContentsStream;
     sourceFileContentsStream << inputStream.rdbuf();
     if (inputStream.bad()) {
         const int readError = errno;
-        ASCENDLOGE("Failed to read source patch file: path=%s errno=%d message=%s",
-                         sourceFilePath.c_str(), readError, std::strerror(readError));
+        ASCENDLOGE(
+            "Failed to read source patch file: path=%s errno=%d message=%s", sourceFilePath.c_str(), readError,
+            std::strerror(readError));
         return false;
     }
     sourceFileContents = sourceFileContentsStream.str();
     return true;
 }
 
-bool ReplaceAllSourceTemplateOccurrences(std::string& sourceFileContents, const std::string& sourceTemplateText,
-                                         const std::string& replacementText)
+bool ReplaceAllSourceTemplateOccurrences(
+    std::string& sourceFileContents, const std::string& sourceTemplateText, const std::string& replacementText)
 {
     bool replacedAtLeastOnce = false;
     size_t searchPosition = 0U;
@@ -63,25 +65,26 @@ bool ReplaceAllSourceTemplateOccurrences(std::string& sourceFileContents, const 
 
 bool WritePatchedSourceFileAtomically(const fs::path& sourceFilePath, const std::string& patchedSourceFileContents)
 {
-    static std::atomic<uint64_t> temporaryPatchFileSequence {0};
+    static std::atomic<uint64_t> temporaryPatchFileSequence{0};
     const fs::path temporaryFilePath =
         sourceFilePath.string() + ".aclrtc_patch_" + std::to_string(getpid()) + "_" +
         std::to_string(temporaryPatchFileSequence.fetch_add(1U, std::memory_order_relaxed));
     {
-        std::ofstream outputStream(
-            temporaryFilePath.string(), std::ios::out | std::ios::binary | std::ios::trunc);
+        std::ofstream outputStream(temporaryFilePath.string(), std::ios::out | std::ios::binary | std::ios::trunc);
         if (!outputStream) {
             const int createError = errno;
-            ASCENDLOGE("Failed to create temporary source patch file: path=%s errno=%d message=%s",
-                             temporaryFilePath.c_str(), createError, std::strerror(createError));
+            ASCENDLOGE(
+                "Failed to create temporary source patch file: path=%s errno=%d message=%s", temporaryFilePath.c_str(),
+                createError, std::strerror(createError));
             return false;
         }
-        outputStream.write(patchedSourceFileContents.data(),
-                           static_cast<std::streamsize>(patchedSourceFileContents.size()));
+        outputStream.write(
+            patchedSourceFileContents.data(), static_cast<std::streamsize>(patchedSourceFileContents.size()));
         if (!outputStream) {
             const int writeError = errno;
-            ASCENDLOGE("Failed to write temporary source patch file: path=%s errno=%d message=%s",
-                             temporaryFilePath.c_str(), writeError, std::strerror(writeError));
+            ASCENDLOGE(
+                "Failed to write temporary source patch file: path=%s errno=%d message=%s", temporaryFilePath.c_str(),
+                writeError, std::strerror(writeError));
             boost::system::error_code ignoredError;
             fs::remove(temporaryFilePath, ignoredError);
             return false;
@@ -102,9 +105,9 @@ bool WritePatchedSourceFileAtomically(const fs::path& sourceFilePath, const std:
     boost::system::error_code renameError;
     fs::rename(temporaryFilePath, sourceFilePath, renameError);
     if (renameError) {
-        ASCENDLOGE("Failed to replace patched source file: source=%s target=%s error=%d message=%s",
-                         temporaryFilePath.c_str(), sourceFilePath.c_str(), renameError.value(),
-                         renameError.message().c_str());
+        ASCENDLOGE(
+            "Failed to replace patched source file: source=%s target=%s error=%d message=%s", temporaryFilePath.c_str(),
+            sourceFilePath.c_str(), renameError.value(), renameError.message().c_str());
         boost::system::error_code ignoredError;
         fs::remove(temporaryFilePath, ignoredError);
         return false;
@@ -113,8 +116,7 @@ bool WritePatchedSourceFileAtomically(const fs::path& sourceFilePath, const std:
 }
 } // namespace
 
-KernelCompilationWorkspace::KernelCompilationWorkspace(
-    fs::path worktreePath, WorktreeRetentionPolicy retentionPolicy)
+KernelCompilationWorkspace::KernelCompilationWorkspace(fs::path worktreePath, WorktreeRetentionPolicy retentionPolicy)
     : worktreePath_(std::move(worktreePath)), retentionPolicy_(retentionPolicy)
 {}
 
@@ -133,10 +135,7 @@ KernelCompilationWorkspace::~KernelCompilationWorkspace()
     }
 }
 
-const fs::path& KernelCompilationWorkspace::GetWorktreePath() const noexcept
-{
-    return worktreePath_;
-}
+const fs::path& KernelCompilationWorkspace::GetWorktreePath() const noexcept { return worktreePath_; }
 
 aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatches(
     const KernelCompilationPlan& compilationPlan)
@@ -145,9 +144,9 @@ aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatche
         boost::system::error_code directoryError;
         fs::create_directories(outputDirectoryPath, directoryError);
         if (directoryError) {
-            ASCENDLOGE("Failed to create compilation output directory: path=%s error=%d message=%s",
-                             outputDirectoryPath.c_str(), directoryError.value(),
-                             directoryError.message().c_str());
+            ASCENDLOGE(
+                "Failed to create compilation output directory: path=%s error=%d message=%s",
+                outputDirectoryPath.c_str(), directoryError.value(), directoryError.message().c_str());
             return ACLRTC_ERROR_FAILURE;
         }
     }

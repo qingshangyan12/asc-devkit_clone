@@ -29,8 +29,8 @@ using ascendc::aclrtc::WorktreeRetentionPolicy;
 fs::path CreateWorkspacePath(const std::string& name)
 {
     static uint64_t sequence = 0;
-    const fs::path path = fs::temp_directory_path() /
-                          (name + "_" + std::to_string(getpid()) + "_" + std::to_string(sequence++));
+    const fs::path path =
+        fs::temp_directory_path() / (name + "_" + std::to_string(getpid()) + "_" + std::to_string(sequence++));
     fs::create_directories(path);
     return path;
 }
@@ -94,8 +94,7 @@ TEST(KernelCompilationWorkspaceTest, FailsWhenPatchTemplateIsMissing)
     plan.sourcePatches = {{sourcePath, "@@MISSING@@", "{0x01}"}};
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
-    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan),
-              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_EQ(ReadFile(sourcePath), "unchanged\n");
 
     boost::system::error_code ignoredError;
@@ -110,8 +109,7 @@ TEST(KernelCompilationWorkspaceTest, FailsWhenPatchFileIsMissing)
     plan.sourcePatches = {{missingSourcePath, "@@MISSING@@", "{0x01}"}};
 
     KernelCompilationWorkspace workspace(worktreePath, WorktreeRetentionPolicy::RetainAfterCompilation);
-    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan),
-              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(workspace.CreateOutputDirectoriesAndApplySourcePatches(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
     boost::system::error_code ignoredError;
     fs::remove_all(worktreePath, ignoredError);

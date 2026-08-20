@@ -27,28 +27,32 @@ namespace fs = boost::filesystem;
 using namespace std::chrono_literals;
 using ascendc::aclrtc::CompilationCommand;
 using ascendc::aclrtc::CompilationCommandExecutionLimits;
-using ascendc::aclrtc::CompilationPlanExecutor;
 using ascendc::aclrtc::CompilationCommandKind;
+using ascendc::aclrtc::CompilationPlanExecutor;
 using ascendc::aclrtc::CompilationProcessResult;
 using ascendc::aclrtc::CompilationProcessTermination;
 using ascendc::aclrtc::CompilationVariant;
 using ascendc::aclrtc::KernelCompilationPlan;
 using ascendc::aclrtc::KernelSpecializationDiagnostics;
 
-static_assert(std::is_same<std::underlying_type_t<CompilationVariant>, uint32_t>::value,
-              "CompilationVariant must have a stable width");
-static_assert(std::is_same<std::underlying_type_t<CompilationCommandKind>, uint32_t>::value,
-              "CompilationCommandKind must have a stable width");
-static_assert(std::is_same<std::underlying_type_t<CompilationProcessTermination>, uint32_t>::value,
-              "CompilationProcessTermination must have a stable width");
-static_assert(std::is_same<decltype(CompilationProcessResult::terminationCode), int32_t>::value,
-              "terminationCode must have a stable width");
+static_assert(
+    std::is_same<std::underlying_type_t<CompilationVariant>, uint32_t>::value,
+    "CompilationVariant must have a stable width");
+static_assert(
+    std::is_same<std::underlying_type_t<CompilationCommandKind>, uint32_t>::value,
+    "CompilationCommandKind must have a stable width");
+static_assert(
+    std::is_same<std::underlying_type_t<CompilationProcessTermination>, uint32_t>::value,
+    "CompilationProcessTermination must have a stable width");
+static_assert(
+    std::is_same<decltype(CompilationProcessResult::terminationCode), int32_t>::value,
+    "terminationCode must have a stable width");
 static_assert(
     std::is_same<decltype(CompilationCommandExecutionLimits::capturedOutputByteLimit), uint64_t>::value,
     "capturedOutputByteLimit must have a stable width");
 
-CompilationCommand CreateCommand(CompilationCommandKind commandKind, const char* executable,
-                                 std::vector<std::string> arguments)
+CompilationCommand CreateCommand(
+    CompilationCommandKind commandKind, const char* executable, std::vector<std::string> arguments)
 {
     return {commandKind, 0U, "test-command", executable, std::move(arguments)};
 }
@@ -57,8 +61,7 @@ class ScopedDiagnosticCurrentDirectory final {
 public:
     ScopedDiagnosticCurrentDirectory()
         : previousDirectoryPath_(fs::current_path()),
-          temporaryDirectoryPath_(fs::temp_directory_path() /
-                                  fs::unique_path("aclrtc_executor_diagnostics_%%%%-%%%%"))
+          temporaryDirectoryPath_(fs::temp_directory_path() / fs::unique_path("aclrtc_executor_diagnostics_%%%%-%%%%"))
     {
         fs::create_directories(temporaryDirectoryPath_);
         fs::current_path(temporaryDirectoryPath_);
@@ -98,8 +101,8 @@ TEST(CompilationPlanExecutorTest, ExecutesCommandsWithoutShellParsing)
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_success");
     CompilationPlanExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     KernelCompilationPlan plan;
-    plan.compilationCommands.push_back(CreateCommand(
-        CompilationCommandKind::Compile, "/bin/echo", {"$(touch /tmp/aclrtc_should_not_exist);literal"}));
+    plan.compilationCommands.push_back(
+        CreateCommand(CompilationCommandKind::Compile, "/bin/echo", {"$(touch /tmp/aclrtc_should_not_exist);literal"}));
 
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), 0);
     EXPECT_FALSE(fs::exists("/tmp/aclrtc_should_not_exist"));
@@ -114,8 +117,7 @@ TEST(CompilationPlanExecutorTest, RejectsEmbeddedNullBeforeSpawningProcess)
     executableWithEmbeddedNull.push_back('\0');
     executableWithEmbeddedNull += "/bin/false";
     KernelCompilationPlan executablePlan;
-    CompilationCommand executableCommand =
-        CreateCommand(CompilationCommandKind::Compile, "/bin/true", {});
+    CompilationCommand executableCommand = CreateCommand(CompilationCommandKind::Compile, "/bin/true", {});
     executableCommand.executablePath = fs::path(executableWithEmbeddedNull);
     executablePlan.compilationCommands.push_back(std::move(executableCommand));
     EXPECT_EQ(executor.ExecuteCompilationPlan(executablePlan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
@@ -161,12 +163,11 @@ TEST(CompilationPlanExecutorTest, UsesInjectedShortTimeoutInUnitTests)
 TEST(CompilationPlanExecutorTest, EnforcesTimeoutWhileCommandContinuouslyProducesOutput)
 {
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_continuous_output");
-    CompilationCommandExecutionLimits limits {20ms, 20ms, 20ms, 1024U};
+    CompilationCommandExecutionLimits limits{20ms, 20ms, 20ms, 1024U};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(
-        CompilationCommandKind::Compile, "/bin/sh",
-        {"-c", "yes & yes & yes & yes & yes & yes & yes & yes & wait"}));
+        CompilationCommandKind::Compile, "/bin/sh", {"-c", "yes & yes & yes & yes & yes & yes & yes & yes & wait"}));
 
     const auto startedAt = std::chrono::steady_clock::now();
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
@@ -176,14 +177,14 @@ TEST(CompilationPlanExecutorTest, EnforcesTimeoutWhileCommandContinuouslyProduce
 TEST(CompilationPlanExecutorTest, WaitsWithoutBusyPollingAfterCommandOutputCloses)
 {
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_closed_output");
-    CompilationCommandExecutionLimits limits {1s, 1s, 20ms, 1024U};
+    CompilationCommandExecutionLimits limits{1s, 1s, 20ms, 1024U};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
-    plan.compilationCommands.push_back(CreateCommand(
-        CompilationCommandKind::Compile, "/bin/sh", {"-c", "exec >/dev/null 2>&1; sleep 0.25"}));
+    plan.compilationCommands.push_back(
+        CreateCommand(CompilationCommandKind::Compile, "/bin/sh", {"-c", "exec >/dev/null 2>&1; sleep 0.25"}));
 
-    timespec cpuStartedAt {};
-    timespec cpuFinishedAt {};
+    timespec cpuStartedAt{};
+    timespec cpuFinishedAt{};
     ASSERT_EQ(clock_gettime(CLOCK_THREAD_CPUTIME_ID, &cpuStartedAt), 0);
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_SUCCESS);
     ASSERT_EQ(clock_gettime(CLOCK_THREAD_CPUTIME_ID, &cpuFinishedAt), 0);
@@ -196,11 +197,11 @@ TEST(CompilationPlanExecutorTest, WaitsWithoutBusyPollingAfterCommandOutputClose
 TEST(CompilationPlanExecutorTest, WaitsForOutputPipeClosureAfterCommandLeaderExits)
 {
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_leader_exit");
-    CompilationCommandExecutionLimits limits {500ms, 500ms, 20ms, 1024U};
+    CompilationCommandExecutionLimits limits{500ms, 500ms, 20ms, 1024U};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
-    plan.compilationCommands.push_back(CreateCommand(
-        CompilationCommandKind::Compile, "/bin/sh", {"-c", "sleep 0.3 & exec /bin/true"}));
+    plan.compilationCommands.push_back(
+        CreateCommand(CompilationCommandKind::Compile, "/bin/sh", {"-c", "sleep 0.3 & exec /bin/true"}));
 
     const auto startedAt = std::chrono::steady_clock::now();
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_SUCCESS);
@@ -214,14 +215,12 @@ TEST(CompilationPlanExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeader
         fs::temp_directory_path() /
         ("aclrtc_descendant_marker_" + std::to_string(getpid()) + "_" + std::to_string(sequence++));
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_process_group");
-    CompilationCommandExecutionLimits limits {20ms, 20ms, 20ms, 1024U};
+    CompilationCommandExecutionLimits limits{20ms, 20ms, 20ms, 1024U};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     const std::string commandScript =
-        "(trap '' TERM; count=0; while [ $count -lt 100 ]; do printf x >> '" +
-        descendantMarkerPath.string() +
-        "'; count=$((count + 1)); sleep 0.01; done; rm -f '" + descendantMarkerPath.string() +
-        "') & exec /bin/true";
+        "(trap '' TERM; count=0; while [ $count -lt 100 ]; do printf x >> '" + descendantMarkerPath.string() +
+        "'; count=$((count + 1)); sleep 0.01; done; rm -f '" + descendantMarkerPath.string() + "') & exec /bin/true";
     plan.compilationCommands.push_back(
         CreateCommand(CompilationCommandKind::Compile, "/bin/sh", {"-c", commandScript}));
 
@@ -232,8 +231,7 @@ TEST(CompilationPlanExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeader
     const uintmax_t markerSizeAfterTimeout =
         fs::exists(descendantMarkerPath) ? fs::file_size(descendantMarkerPath) : 0U;
     std::this_thread::sleep_for(100ms);
-    const uintmax_t markerSizeAfterWait =
-        fs::exists(descendantMarkerPath) ? fs::file_size(descendantMarkerPath) : 0U;
+    const uintmax_t markerSizeAfterWait = fs::exists(descendantMarkerPath) ? fs::file_size(descendantMarkerPath) : 0U;
     EXPECT_EQ(markerSizeAfterWait, markerSizeAfterTimeout);
     boost::system::error_code ignoredError;
     fs::remove(descendantMarkerPath, ignoredError);
@@ -246,8 +244,7 @@ TEST(CompilationPlanExecutorTest, RecordsSpawnFailureAsInfrastructureFailure)
     KernelSpecializationDiagnostics diagnostics(fs::current_path(), specializationSessionId);
     CompilationPlanExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     KernelCompilationPlan plan;
-    plan.compilationCommands.push_back(
-        CreateCommand(CompilationCommandKind::Compile, "/path/that/does/not/exist", {}));
+    plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/path/that/does/not/exist", {}));
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
     const std::string compilationLog = ReadTextFile(fs::current_path() / "aclrtc_compile.log");

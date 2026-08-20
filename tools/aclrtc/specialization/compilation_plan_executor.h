@@ -32,14 +32,14 @@ struct CompilationCommandExecutionLimits {
 
 class CompilationPlanExecutor final {
 public:
-    CompilationPlanExecutor(KernelSpecializationDiagnostics& specializationDiagnostics,
-                            CompilationCommandExecutionLimits executionLimits);
+    CompilationPlanExecutor(
+        KernelSpecializationDiagnostics& specializationDiagnostics, CompilationCommandExecutionLimits executionLimits);
 
     aclError ExecuteCompilationPlan(const KernelCompilationPlan& compilationPlan) const;
 
 private:
-    aclError ExecuteCompilationCommand(const CompilationCommand& compilationCommand,
-                                       CompilationProcessResult& processResult) const;
+    aclError ExecuteCompilationCommand(
+        const CompilationCommand& compilationCommand, CompilationProcessResult& processResult) const;
     std::chrono::milliseconds GetCommandExecutionTimeout(CompilationCommandKind commandKind) const noexcept;
 
     KernelSpecializationDiagnostics& specializationDiagnostics_;

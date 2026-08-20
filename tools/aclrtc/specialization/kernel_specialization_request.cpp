@@ -28,8 +28,8 @@ constexpr size_t MAX_USER_OPTION_COUNT = 4096U;
 constexpr size_t MAX_REQUEST_TEXT_BYTES = 4U * 1024U * 1024U;
 constexpr char SUPER_KERNEL_ENABLE_OPTION[] = "--enable-super-kernel";
 
-bool CopyRequiredBoundedCString(const char* input, const char* inputLocation, std::string& output,
-                                size_t& copiedRequestTextByteCount)
+bool CopyRequiredBoundedCString(
+    const char* input, const char* inputLocation, std::string& output, size_t& copiedRequestTextByteCount)
 {
     if (input == nullptr) {
         ASCENDLOGE("%s must not be null", inputLocation);
@@ -41,8 +41,7 @@ bool CopyRequiredBoundedCString(const char* input, const char* inputLocation, st
         return false;
     }
     if (inputLength > MAX_REQUEST_STRING_BYTES) {
-        ASCENDLOGE("%s must be NUL-terminated within %zu bytes", inputLocation,
-                         MAX_REQUEST_STRING_BYTES);
+        ASCENDLOGE("%s must be NUL-terminated within %zu bytes", inputLocation, MAX_REQUEST_STRING_BYTES);
         return false;
     }
     if (inputLength > MAX_REQUEST_TEXT_BYTES - copiedRequestTextByteCount) {
@@ -57,8 +56,8 @@ bool CopyRequiredBoundedCString(const char* input, const char* inputLocation, st
     return true;
 }
 
-bool FindAsciiControlCharacter(const std::string& compilerOption, size_t& controlBytePosition,
-                               unsigned char& controlByteValue)
+bool FindAsciiControlCharacter(
+    const std::string& compilerOption, size_t& controlBytePosition, unsigned char& controlByteValue)
 {
     for (size_t bytePosition = 0U; bytePosition < compilerOption.size(); ++bytePosition) {
         const unsigned char byteValue = static_cast<unsigned char>(compilerOption[bytePosition]);
@@ -87,8 +86,8 @@ aclError ValidateCompilerOptionCharacters(
         ASCENDLOGE(
             "%s[%llu] contains prohibited control byte 0x%02x at byte %zu; pass each compiler option as one "
             "plain argv string without control characters",
-            optionFieldName, static_cast<unsigned long long>(optionIndex),
-            static_cast<unsigned int>(controlByteValue), controlBytePosition);
+            optionFieldName, static_cast<unsigned long long>(optionIndex), static_cast<unsigned int>(controlByteValue),
+            controlBytePosition);
         return ACLRTC_ERROR_INVALID_OPTION;
     }
     return ACLRTC_SUCCESS;
@@ -99,8 +98,8 @@ aclError ValidateForwardedCompilerOptionDoesNotRedirectFiles(
 {
     if (compilerOption.front() == '@') {
         ASCENDLOGE(
-            "%s[%llu] cannot use a compiler response file; pass its contents as separate %s entries",
-            optionFieldName, static_cast<unsigned long long>(optionIndex), optionFieldName);
+            "%s[%llu] cannot use a compiler response file; pass its contents as separate %s entries", optionFieldName,
+            static_cast<unsigned long long>(optionIndex), optionFieldName);
         return ACLRTC_ERROR_INVALID_OPTION;
     }
     if (OverridesCompilerOutputPath(compilerOption)) {
@@ -113,17 +112,16 @@ aclError ValidateForwardedCompilerOptionDoesNotRedirectFiles(
 }
 
 aclError CopyCompilerOptionsAndRejectControlCharacters(
-    const char* const* apiOptions, uint64_t apiOptionCount,
-    const char* optionFieldName, const char* optionCountFieldName,
-    std::vector<std::string>& copiedOptions, size_t& copiedRequestTextByteCount)
+    const char* const* apiOptions, uint64_t apiOptionCount, const char* optionFieldName,
+    const char* optionCountFieldName, std::vector<std::string>& copiedOptions, size_t& copiedRequestTextByteCount)
 {
     if (apiOptionCount == 0U) {
         return ACLRTC_SUCCESS;
     }
     if (apiOptions == nullptr) {
         ASCENDLOGE(
-            "%s must not be null when %s=%llu; provide %llu entries or set %s to 0",
-            optionFieldName, optionCountFieldName, static_cast<unsigned long long>(apiOptionCount),
+            "%s must not be null when %s=%llu; provide %llu entries or set %s to 0", optionFieldName,
+            optionCountFieldName, static_cast<unsigned long long>(apiOptionCount),
             static_cast<unsigned long long>(apiOptionCount), optionCountFieldName);
         return ACLRTC_ERROR_INVALID_INPUT;
     }
@@ -131,14 +129,12 @@ aclError CopyCompilerOptionsAndRejectControlCharacters(
     copiedOptions.reserve(static_cast<size_t>(apiOptionCount));
     for (uint64_t optionIndex = 0; optionIndex < apiOptionCount; ++optionIndex) {
         std::string copiedOption;
-        const std::string optionLocation = std::string(optionFieldName) + "[" +
-                                           std::to_string(optionIndex) + "]";
+        const std::string optionLocation = std::string(optionFieldName) + "[" + std::to_string(optionIndex) + "]";
         if (!CopyRequiredBoundedCString(
                 apiOptions[optionIndex], optionLocation.c_str(), copiedOption, copiedRequestTextByteCount)) {
             return ACLRTC_ERROR_INVALID_OPTION;
         }
-        const aclError validationResult =
-            ValidateCompilerOptionCharacters(copiedOption, optionFieldName, optionIndex);
+        const aclError validationResult = ValidateCompilerOptionCharacters(copiedOption, optionFieldName, optionIndex);
         if (validationResult != ACLRTC_SUCCESS) {
             return validationResult;
         }
@@ -160,9 +156,9 @@ aclError ValidateForwardedCompilerOptionsDoNotRedirectFiles(
     return ACLRTC_SUCCESS;
 }
 
-aclError NormalizeBasicCompilerOptions(const aclrtcKernelSpecRequest& apiRequest,
-                                       NormalizedKernelSpecializationRequest& normalizedRequest,
-                                       size_t& copiedRequestTextByteCount)
+aclError NormalizeBasicCompilerOptions(
+    const aclrtcKernelSpecRequest& apiRequest, NormalizedKernelSpecializationRequest& normalizedRequest,
+    size_t& copiedRequestTextByteCount)
 {
     aclError result = CopyCompilerOptionsAndRejectControlCharacters(
         apiRequest.options, apiRequest.optionCount, "options", "optionCount",
@@ -174,20 +170,20 @@ aclError NormalizeBasicCompilerOptions(const aclrtcKernelSpecRequest& apiRequest
         normalizedRequest.compilerOptions.basicOptions, "options");
 }
 
-aclError NormalizeSuperKernelCompilerOptions(const aclrtcKernelSpecRequest& apiRequest,
-                                             NormalizedKernelSpecializationRequest& normalizedRequest,
-                                             size_t& copiedRequestTextByteCount)
+aclError NormalizeSuperKernelCompilerOptions(
+    const aclrtcKernelSpecRequest& apiRequest, NormalizedKernelSpecializationRequest& normalizedRequest,
+    size_t& copiedRequestTextByteCount)
 {
     std::vector<std::string> copiedSuperKernelOptions;
     aclError result = CopyCompilerOptionsAndRejectControlCharacters(
-        apiRequest.skOptions, apiRequest.skOptionCount, "skOptions", "skOptionCount",
-        copiedSuperKernelOptions, copiedRequestTextByteCount);
+        apiRequest.skOptions, apiRequest.skOptionCount, "skOptions", "skOptionCount", copiedSuperKernelOptions,
+        copiedRequestTextByteCount);
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
 
-    const size_t superKernelEnableOptionCount = static_cast<size_t>(std::count(
-        copiedSuperKernelOptions.begin(), copiedSuperKernelOptions.end(), SUPER_KERNEL_ENABLE_OPTION));
+    const size_t superKernelEnableOptionCount = static_cast<size_t>(
+        std::count(copiedSuperKernelOptions.begin(), copiedSuperKernelOptions.end(), SUPER_KERNEL_ENABLE_OPTION));
     if (superKernelEnableOptionCount > 1U) {
         ASCENDLOGE(
             "skOptions contains --enable-super-kernel %zu times; remove duplicates and provide it exactly once",
@@ -208,8 +204,7 @@ aclError NormalizeSuperKernelCompilerOptions(const aclrtcKernelSpecRequest& apiR
         if (superKernelOption == SUPER_KERNEL_ENABLE_OPTION) {
             continue;
         }
-        result = ValidateForwardedCompilerOptionDoesNotRedirectFiles(
-            superKernelOption, "skOptions", optionIndex);
+        result = ValidateForwardedCompilerOptionDoesNotRedirectFiles(superKernelOption, "skOptions", optionIndex);
         if (result != ACLRTC_SUCCESS) {
             return result;
         }
@@ -220,20 +215,22 @@ aclError NormalizeSuperKernelCompilerOptions(const aclrtcKernelSpecRequest& apiR
 
 std::string CreateSpecializationSessionId()
 {
-    static std::atomic<uint64_t> specializationSessionSequence {0};
+    static std::atomic<uint64_t> specializationSessionSequence{0};
     return std::to_string(getpid()) + "_" +
            std::to_string(specializationSessionSequence.fetch_add(1U, std::memory_order_relaxed));
 }
 } // namespace
 
-aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& apiRequest, const char* outputElfPath,
-                                              NormalizedKernelSpecializationRequest& normalizedRequest)
+aclError NormalizeKernelSpecializationRequest(
+    const aclrtcKernelSpecRequest& apiRequest, const char* outputElfPath,
+    NormalizedKernelSpecializationRequest& normalizedRequest)
 {
     const auto firstNonZeroReservedByte = std::find_if(
         std::begin(apiRequest.reserved), std::end(apiRequest.reserved), [](uint8_t value) { return value != 0U; });
     if (firstNonZeroReservedByte != std::end(apiRequest.reserved)) {
-        ASCENDLOGE("aclrtcKernelSpecRequest.reserved[%zu] must be zero; zero-initialize the request before use",
-                         static_cast<size_t>(firstNonZeroReservedByte - std::begin(apiRequest.reserved)));
+        ASCENDLOGE(
+            "aclrtcKernelSpecRequest.reserved[%zu] must be zero; zero-initialize the request before use",
+            static_cast<size_t>(firstNonZeroReservedByte - std::begin(apiRequest.reserved)));
         return ACLRTC_ERROR_INVALID_INPUT;
     }
 
@@ -249,8 +246,7 @@ aclError NormalizeKernelSpecializationRequest(const aclrtcKernelSpecRequest& api
     }
 
     std::string copiedOutputElfPath;
-    if (!CopyRequiredBoundedCString(
-            outputElfPath, "outPath", copiedOutputElfPath, copiedRequestTextByteCount)) {
+    if (!CopyRequiredBoundedCString(outputElfPath, "outPath", copiedOutputElfPath, copiedRequestTextByteCount)) {
         return ACLRTC_ERROR_INVALID_INPUT;
     }
     boost::system::error_code outputPathError;

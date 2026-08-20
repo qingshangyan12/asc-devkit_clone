@@ -38,7 +38,7 @@ public:
 
 private:
     boost::filesystem::path worktreePath_;
-    WorktreeRetentionPolicy retentionPolicy_ {WorktreeRetentionPolicy::RemoveAfterCompilation};
+    WorktreeRetentionPolicy retentionPolicy_{WorktreeRetentionPolicy::RemoveAfterCompilation};
 };
 
 } // namespace aclrtc

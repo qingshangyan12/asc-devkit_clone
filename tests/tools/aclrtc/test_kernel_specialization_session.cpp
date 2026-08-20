@@ -70,7 +70,7 @@ public:
 private:
     std::string name_;
     std::string previousValue_;
-    bool wasSet_ {false};
+    bool wasSet_{false};
 };
 
 class EndToEndTestResource final {
@@ -92,9 +92,9 @@ public:
         WriteFile(sourceDirectoryPath_ / "add_custom.cpp", "// user source\n");
         WriteFile(worktreePath_ / "resources/include/constants.h", "TILING=@@STATIC_TILING@@;\n");
         WriteFile(worktreePath_ / "resources/src/basic.cpp", "// basic source\n");
-        WriteExecutable(toolchainPath_ / "bin/bisheng",
-                        compilerOutcome == FakeCompilerOutcome::Success ? CreateOutputScript("object")
-                                                                        : "#!/bin/sh\nexit 2\n");
+        WriteExecutable(
+            toolchainPath_ / "bin/bisheng",
+            compilerOutcome == FakeCompilerOutcome::Success ? CreateOutputScript("object") : "#!/bin/sh\nexit 2\n");
         WriteExecutable(toolchainPath_ / "bin/ld.lld", CreateOutputScript("linked-elf"));
         manifest_ = CreateManifest();
     }
@@ -107,8 +107,7 @@ public:
 
     MaterializedKernelCompilationResource CreateMaterializedCompilationResource() const
     {
-        return MaterializedKernelCompilationResource {
-            manifest_, worktreePath_, sourceDirectoryPath_};
+        return MaterializedKernelCompilationResource{manifest_, worktreePath_, sourceDirectoryPath_};
     }
 
     const fs::path& ToolchainPath() const { return toolchainPath_; }
@@ -134,7 +133,9 @@ private:
                "while [ \"$#\" -gt 0 ]; do\n"
                "  if [ \"$1\" = \"-o\" ]; then\n"
                "    shift\n"
-               "    printf '" + contents + "' > \"$1\"\n"
+               "    printf '" +
+               contents +
+               "' > \"$1\"\n"
                "    exit 0\n"
                "  fi\n"
                "  shift\n"
@@ -144,28 +145,28 @@ private:
 
     static Json CreateManifest()
     {
-        return Json {
+        return Json{
             {"schema_version", "1.0"},
             {"source_file", "add_custom.cpp"},
-            {"kernels",
-             Json::array({{{"kernel_name", "add_custom_100000"},
-                           {"constant_infos",
-                            Json::array({{{"parameter_index", 0},
-                                          {"byte_size", 2},
-                                          {"file", "${resource}/resources/include/constants.h"},
-                                          {"template", "@@STATIC_TILING@@"}}})},
-                           {"link_options", Json::array({"-m", "aicorelinux", "-Ttext=0"})},
-                           {"objects",
-                            Json::array({{{"object_name", "basic"},
-                                          {"object_type", "basic"},
-                                          {"commands",
-                                           Json::array({{{"type", "compile"},
-                                                         {"stage", 0},
-                                                         {"cmd",
-                                                          Json::array({"${env:ASCEND_HOME_PATH}/bin/bisheng",
-                                                                       "${resource}/resources/src/basic.cpp", "-o",
-                                                                       "${output}/basic.o"})}}})},
-                                          {"outputs", Json::array({"${output}/basic.o"})}}})}}})}};
+            {"kernels", Json::array(
+                            {{{"kernel_name", "add_custom_100000"},
+                              {"constant_infos", Json::array(
+                                                     {{{"parameter_index", 0},
+                                                       {"byte_size", 2},
+                                                       {"file", "${resource}/resources/include/constants.h"},
+                                                       {"template", "@@STATIC_TILING@@"}}})},
+                              {"link_options", Json::array({"-m", "aicorelinux", "-Ttext=0"})},
+                              {"objects", Json::array(
+                                              {{{"object_name", "basic"},
+                                                {"object_type", "basic"},
+                                                {"commands", Json::array(
+                                                                 {{{"type", "compile"},
+                                                                   {"stage", 0},
+                                                                   {"cmd", Json::array(
+                                                                               {"${env:ASCEND_HOME_PATH}/bin/bisheng",
+                                                                                "${resource}/resources/src/basic.cpp",
+                                                                                "-o", "${output}/basic.o"})}}})},
+                                                {"outputs", Json::array({"${output}/basic.o"})}}})}}})}};
     }
 
     fs::path rootPath_;
@@ -180,7 +181,8 @@ class ScopedRegisteredCompilationResource final {
 public:
     ScopedRegisteredCompilationResource(
         std::string resourceId, const Json& manifest, const fs::path& sourceDirectoryPath)
-        : registry_(ResourceRegistry::Instance()), resourceId_(std::move(resourceId)),
+        : registry_(ResourceRegistry::Instance()),
+          resourceId_(std::move(resourceId)),
           previousTemporaryRoot_(registry_.temporaryRoot_),
           previousAutomaticLoadAttempted_(registry_.automaticLoadAttempted_),
           previousKeepTemporaryRoot_(registry_.keepTemporaryRoot_),
@@ -214,24 +216,21 @@ public:
 
     bool WasInserted() const noexcept { return inserted_; }
 
-    void SetAutomaticLoadStatus(ResourceStatus loadStatus) noexcept
-    {
-        registry_.automaticLoadStatus_ = loadStatus;
-    }
+    void SetAutomaticLoadStatus(ResourceStatus loadStatus) noexcept { registry_.automaticLoadStatus_ = loadStatus; }
 
 private:
     ResourceRegistry& registry_;
     std::string resourceId_;
     std::string previousTemporaryRoot_;
-    bool previousAutomaticLoadAttempted_ {false};
-    bool previousKeepTemporaryRoot_ {false};
-    ResourceStatus previousAutomaticLoadStatus_ {ResourceStatus::Success};
-    bool inserted_ {false};
+    bool previousAutomaticLoadAttempted_{false};
+    bool previousKeepTemporaryRoot_{false};
+    ResourceStatus previousAutomaticLoadStatus_{ResourceStatus::Success};
+    bool inserted_{false};
 };
 
 aclrtcKernelSpecRequest CreateRequest(const uint64_t* constantByteCounts, const void* const* constantAddresses)
 {
-    aclrtcKernelSpecRequest request {};
+    aclrtcKernelSpecRequest request{};
     request.resourceId = RESOURCE_ID;
     request.kernelEntry = "add_custom_100000";
     request.argsCount = 1;
@@ -244,9 +243,9 @@ NormalizedKernelSpecializationRequest NormalizeRequestForTest(
     const aclrtcKernelSpecRequest& request, const fs::path& outputElfPath)
 {
     NormalizedKernelSpecializationRequest normalizedRequest;
-    EXPECT_EQ(ascendc::aclrtc::NormalizeKernelSpecializationRequest(
-                  request, outputElfPath.c_str(), normalizedRequest),
-              ascendc::aclrtc::ACLRTC_SUCCESS);
+    EXPECT_EQ(
+        ascendc::aclrtc::NormalizeKernelSpecializationRequest(request, outputElfPath.c_str(), normalizedRequest),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
     return normalizedRequest;
 }
 
@@ -267,10 +266,11 @@ TEST(KernelSpecializationSessionTest, RunsPatchCompileLinkPublishAndCleanupWithM
     aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
 
     KernelSpecializationSession session;
-    EXPECT_EQ(session.RunSpecializationWithMaterializedResource(
-                  NormalizeRequestForTest(request, testResource.OutputElfPath()),
-                  testResource.CreateMaterializedCompilationResource()),
-              0);
+    EXPECT_EQ(
+        session.RunSpecializationWithMaterializedResource(
+            NormalizeRequestForTest(request, testResource.OutputElfPath()),
+            testResource.CreateMaterializedCompilationResource()),
+        0);
     EXPECT_EQ(ReadFile(testResource.OutputElfPath()), "linked-elf");
     EXPECT_FALSE(fs::exists(testResource.WorktreePath()));
 }
@@ -287,10 +287,11 @@ TEST(KernelSpecializationSessionTest, DoesNotReplaceExistingOutputWhenCompilatio
     aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
 
     KernelSpecializationSession session;
-    EXPECT_EQ(session.RunSpecializationWithMaterializedResource(
-                  NormalizeRequestForTest(request, testResource.OutputElfPath()),
-                  testResource.CreateMaterializedCompilationResource()),
-              ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
+    EXPECT_EQ(
+        session.RunSpecializationWithMaterializedResource(
+            NormalizeRequestForTest(request, testResource.OutputElfPath()),
+            testResource.CreateMaterializedCompilationResource()),
+        ascendc::aclrtc::ACLRTC_ERROR_COMPILATION);
     EXPECT_EQ(ReadFile(testResource.OutputElfPath()), "previous-elf");
     EXPECT_FALSE(fs::exists(testResource.WorktreePath()));
 }
@@ -309,10 +310,11 @@ TEST(KernelSpecializationSessionTest, FailsWhenOutputDirectoryIsMissing)
     aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
 
     KernelSpecializationSession session;
-    EXPECT_EQ(session.RunSpecializationWithMaterializedResource(
-                  NormalizeRequestForTest(request, testResource.OutputElfPath()),
-                  testResource.CreateMaterializedCompilationResource()),
-              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(
+        session.RunSpecializationWithMaterializedResource(
+            NormalizeRequestForTest(request, testResource.OutputElfPath()),
+            testResource.CreateMaterializedCompilationResource()),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 
 TEST(KernelSpecializationSessionTest, RetainsWorktreeWhenKernelMetaSavingValueHasWhitespace)
@@ -326,23 +328,24 @@ TEST(KernelSpecializationSessionTest, RetainsWorktreeWhenKernelMetaSavingValueHa
     aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
 
     KernelSpecializationSession session;
-    EXPECT_EQ(session.RunSpecializationWithMaterializedResource(
-                  NormalizeRequestForTest(request, testResource.OutputElfPath()),
-                  testResource.CreateMaterializedCompilationResource()),
-              0);
+    EXPECT_EQ(
+        session.RunSpecializationWithMaterializedResource(
+            NormalizeRequestForTest(request, testResource.OutputElfPath()),
+            testResource.CreateMaterializedCompilationResource()),
+        0);
     EXPECT_TRUE(fs::is_directory(testResource.WorktreePath()));
     EXPECT_TRUE(fs::is_regular_file(testResource.WorktreePath() / "aclrtc_manifest.json"));
     EXPECT_TRUE(fs::is_regular_file(testResource.WorktreePath() / "aclrtc_compile.log"));
     EXPECT_TRUE(fs::is_regular_file(testResource.WorktreePath() / "aclrtc_replay.sh"));
     EXPECT_TRUE(fs::is_regular_file(testResource.WorktreePath() / "aclrtc_result.json"));
-    EXPECT_NE(ReadFile(testResource.WorktreePath() / "aclrtc_replay.sh").find(testResource.WorktreePath().string()),
-              std::string::npos);
+    EXPECT_NE(
+        ReadFile(testResource.WorktreePath() / "aclrtc_replay.sh").find(testResource.WorktreePath().string()),
+        std::string::npos);
 }
 
 TEST(KernelSpecializationSessionTest, LoadsAndCopiesFreshMaterializedPathsFromRegistry)
 {
-    const fs::path testRoot = fs::temp_directory_path() /
-                              fs::unique_path("aclrtc_session_registry_%%%%-%%%%-%%%%");
+    const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_session_registry_%%%%-%%%%-%%%%");
     const fs::path sourceDirectoryPath = testRoot / "source";
     fs::create_directories(sourceDirectoryPath);
     ScopedEnvironmentVariable temporaryDirectoryEnvironment("TMPDIR", testRoot.c_str());
@@ -353,29 +356,31 @@ TEST(KernelSpecializationSessionTest, LoadsAndCopiesFreshMaterializedPathsFromRe
 
     registeredResource.SetAutomaticLoadStatus(ResourceStatus::NotFound);
     MaterializedKernelCompilationResource rejectedResource;
-    EXPECT_EQ(KernelSpecializationSession::PrepareCompilationResource(resourceId, rejectedResource),
-              ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(
+        KernelSpecializationSession::PrepareCompilationResource(resourceId, rejectedResource),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
     registeredResource.SetAutomaticLoadStatus(ResourceStatus::Success);
     MaterializedKernelCompilationResource firstResource;
-    ASSERT_EQ(KernelSpecializationSession::PrepareCompilationResource(resourceId, firstResource),
-              ascendc::aclrtc::ACLRTC_SUCCESS);
+    ASSERT_EQ(
+        KernelSpecializationSession::PrepareCompilationResource(resourceId, firstResource),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
     EXPECT_EQ(firstResource.manifest, manifest);
     EXPECT_EQ(firstResource.externalSourceDirectoryPath, sourceDirectoryPath);
     EXPECT_TRUE(fs::is_regular_file(firstResource.ownedResourceDirectoryPath / "payload.bin"));
 
     MaterializedKernelCompilationResource secondResource;
-    ASSERT_EQ(KernelSpecializationSession::PrepareCompilationResource(resourceId, secondResource),
-              ascendc::aclrtc::ACLRTC_SUCCESS);
+    ASSERT_EQ(
+        KernelSpecializationSession::PrepareCompilationResource(resourceId, secondResource),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
     EXPECT_NE(firstResource.ownedResourceDirectoryPath, secondResource.ownedResourceDirectoryPath);
     EXPECT_TRUE(fs::is_regular_file(secondResource.ownedResourceDirectoryPath / "payload.bin"));
 }
 
 TEST(KernelSpecializationApiTest, RejectsNullPointersBeforeResourceLookup)
 {
-    aclrtcKernelSpecRequest request {};
-    EXPECT_EQ(aclrtcKernelSpecialization(nullptr, "/tmp/kernel.elf"),
-              ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
+    aclrtcKernelSpecRequest request{};
+    EXPECT_EQ(aclrtcKernelSpecialization(nullptr, "/tmp/kernel.elf"), ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
 
     EXPECT_EQ(aclrtcKernelSpecialization(&request, nullptr), ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
 }
