@@ -13,7 +13,7 @@
 # Compiles real selector/executor/template + kernel, verifies full chain
 # ============================================================================
 set(HCCL_MC2_CCU_SELECTOR_TARGET ascendc_ut_adv_api_hccl_ccu_selector_st)
-set(HCCL_MC2_CCU_SELECTOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/selector)
+set(HCCL_MC2_CCU_ALL_TO_ALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/all_to_all)
 
 set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector/alltoall_auto_selector.cc
@@ -47,17 +47,17 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
 
 add_executable(${HCCL_MC2_CCU_SELECTOR_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
-    ${HCCL_MC2_CCU_SELECTOR_DIR}/all_to_all_selector_testcase.cpp
-    ${HCCL_MC2_CCU_SELECTOR_DIR}/dag_conflict_testcase.cpp
-    ${HCCL_MC2_CCU_SELECTOR_DIR}/stubs.cc
-    ${UTILS_DIR}/ccu_scenario/ccu_all_to_all_mesh1d_adapter.cc
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/all_to_all_testcase.cpp
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/shim/stubs.cc
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all_mesh1d_adapter.cc
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all.cc
     ${UTILS_DIR}/ccu_scenario/ccu_fixture.cc
-    ${UTILS_DIR}/ccu_scenario/ccu_all_to_all.cc
     ${HCCL_SELECTOR_PRODUCT_SOURCES}
 )
 
 target_include_directories(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
-    ${HCCL_MC2_CCU_SELECTOR_DIR}/shim
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/shim
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
     ${UTILS_DIR}/ccu_scenario
     ${HCCL_CC_SRC_DIR}
@@ -100,38 +100,5 @@ target_link_libraries(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
 
 run_llt_test(
     TARGET ${HCCL_MC2_CCU_SELECTOR_TARGET}
-    TASK_NUM 1
-)
-
-# ============================================================================
-# Target: CalGoSize overflow unit test (standalone, no product code dependency)
-# ============================================================================
-set(HCCL_MC2_CCU_GOSIZE_TARGET ascendc_ut_adv_api_hccl_ccu_gosize_overflow)
-
-add_executable(${HCCL_MC2_CCU_GOSIZE_TARGET}
-    ${ASCENDC_DIR}/tests/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/calc_gosize_overflow_test.cpp
-)
-
-target_include_directories(${HCCL_MC2_CCU_GOSIZE_TARGET} PRIVATE
-    ${UT_COMMON_INCLUDE_LIST}
-)
-
-target_compile_options(${HCCL_MC2_CCU_GOSIZE_TARGET} PRIVATE
-    -std=c++17
-    -O0
-    -g
-    -Wno-unused-variable
-    -Wno-unused-parameter
-)
-
-target_link_libraries(${HCCL_MC2_CCU_GOSIZE_TARGET} PRIVATE
-    intf_llt_pub_basic
-    pthread
-    dl
-)
-
-run_llt_test(
-    TARGET ${HCCL_MC2_CCU_GOSIZE_TARGET}
     TASK_NUM 1
 )

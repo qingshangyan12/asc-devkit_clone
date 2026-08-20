@@ -66,6 +66,7 @@ enum class OpCode {
     LOCAL_COPY,
     GROUP_COPY,
     IF_BEGIN,
+    ELSE_BEGIN,
     IF_END,
     WHILE_BEGIN,
     WHILE_END

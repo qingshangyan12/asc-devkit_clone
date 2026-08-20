@@ -156,6 +156,11 @@ CheckResult CcuLogicalResourceChecker::Check(const Program &program) const
                     return Failure("control-flow condition or peer operation is invalid");
                 }
                 break;
+            case OpCode::ELSE_BEGIN:
+                if (operation.peerIndex >= program.operations.size()) {
+                    return Failure("else peer operation is invalid");
+                }
+                break;
             case OpCode::IF_END:
             case OpCode::WHILE_END:
                 if (operation.peerIndex >= program.operations.size()) {

@@ -16,21 +16,16 @@
 #include <vector>
 #include "hccl_types.h"
 #include "hccl_common.h"
+#include "sim_common.h"
 
 namespace HcclSim {
 namespace CcuSt {
 
-enum class StTopoType {
-    SINGLE_DIE_MESH1D = 0,    // 1 server, single die (default)
-    TWO_DIE_REGULAR,          // 1 server, 2D phyId layout, 2 die
-    MESH_1D_CLOS,             // 2 servers, cross-server CLOS
-};
-
 struct CcuStScenario {
-    uint32_t rankSize = 2;
+    TopoMeta topoMeta;                                // rankSize 从 topoMeta 自动推导
+    DevType devType = DevType::DEV_TYPE_950;
     HcclDataType dataType = HCCL_DATA_TYPE_FP16;
     HcclCMDType opType = HcclCMDType::HCCL_CMD_ALLTOALLV;
-    StTopoType topoType = StTopoType::SINGLE_DIE_MESH1D;
 
     // Expected algorithm name selected by selector (verified in VerifyScenario)
     // Empty string means skip algName assertion
@@ -55,10 +50,14 @@ struct CcuStScenario {
     // HCCL_DATA_TYPE_RESERVED means same as dataType
     HcclDataType outputType = HCCL_DATA_TYPE_RESERVED;
 
+    // Root rank for Broadcast/Reduce/Scatter
+    uint32_t root = 0;
+
+    // In-place operation (e.g. AllReduce input==output)
+    bool inPlace = false;
+
     // negative test controls
     bool corruptOutput = false;
-    bool swapTaskArgs = false;
-    bool missingTaskArg = false;
     bool outOfRangeParam = false;
 };
 

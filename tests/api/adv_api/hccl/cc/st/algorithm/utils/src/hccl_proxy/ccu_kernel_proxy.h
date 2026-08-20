@@ -14,6 +14,7 @@
 #include "ccu_st_types.h"
 
 #include <functional>
+#include <mutex>
 #include <string>
 
 namespace HcclSim {
@@ -35,6 +36,9 @@ public:
     const std::vector<KernelHandle> &GetLastCompiledGroup() const;
     bool IsRegistering(InstanceHandle instance) const;
 
+    static void RegisterChannelMap(ChannelHandle handle, uint32_t localRank, uint32_t remoteRank);
+    static bool GetChannelRanks(ChannelHandle handle, uint32_t &localRank, uint32_t &remoteRank);
+
 private:
     struct KernelRecord {
         std::string name;
@@ -50,6 +54,10 @@ private:
     std::map<KernelHandle, KernelRecord> kernels_;
     std::map<InstanceHandle, InstanceState> instances_;
     std::vector<KernelHandle> lastCompiledGroup_;
+    mutable std::mutex mutex_;
+    static std::map<ChannelHandle, std::pair<uint32_t, uint32_t>> channelMap_;
+    static std::mutex channelMapMutex_;
+    static thread_local std::vector<KernelHandle> threadLocalCompiledGroup_;
 };
 
 ChannelHandle MakeChannel(uint32_t localRank, uint32_t remoteRank);

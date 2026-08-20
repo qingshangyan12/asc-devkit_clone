@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <thread>
 #include <vector>
 
 extern "C" {
@@ -45,37 +46,15 @@ Mc2CcTilingInner CcuStFixture::BuildTiling(HcclCMDType opType, HcclDataType data
     return tiling;
 }
 
-TopoMeta CcuStFixture::BuildTopoMeta(uint32_t rankSize, StTopoType topoType)
+uint32_t CcuStFixture::CountRanks(const TopoMeta &topoMeta)
 {
-    switch (topoType) {
-    case StTopoType::TWO_DIE_REGULAR: {
-        const uint32_t half = rankSize / 2;
-        ServerMeta server;
-        for (uint32_t i = 0; i < half; ++i) {
-            server.push_back(i);           // die 0: phyId 0..half-1
+    uint32_t total = 0;
+    for (const auto &pod : topoMeta) {
+        for (const auto &server : pod) {
+            total += static_cast<uint32_t>(server.size());
         }
-        for (uint32_t i = 0; i < rankSize - half; ++i) {
-            server.push_back(i + GRID_SIZE);  // die 1: phyId 8..8+remaining-1
-        }
-        return {{{server}}};
     }
-    case StTopoType::MESH_1D_CLOS: {
-        uint32_t half = rankSize / 2;
-        ServerMeta server0;
-        ServerMeta server1;
-        for (uint32_t i = 0; i < half; ++i) server0.push_back(i);
-        for (uint32_t i = half; i < rankSize; ++i) server1.push_back(i);
-        return {{{server0, server1}}};
-    }
-    case StTopoType::SINGLE_DIE_MESH1D:
-    default: {
-        ServerMeta server;
-        for (uint32_t rank = 0; rank < rankSize; ++rank) {
-            server.push_back(rank);
-        }
-        return {{{server}}};
-    }
-    }
+    return total;
 }
 
 void CcuStFixture::CleanupHostEnv(HcclComm &comm)
@@ -84,9 +63,6 @@ void CcuStFixture::CleanupHostEnv(HcclComm &comm)
         delete static_cast<HcclSim::SimCommunicator *>(comm);
         comm = nullptr;
     }
-    HcclSim::SimWorld::Global()->Deinit();
-    unsetenv("HCCL_OP_EXPANSION_MODE");
-    unsetenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
 }
 
 KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSize,
@@ -96,8 +72,6 @@ KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSiz
 {
     setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
     setenv("ASCEND_ENABLE_CCU_KFC_BRANCH", "1", 1);
-    fprintf(stderr, "DEBUG step1: SimWorld::Init\n");
-    HcclSim::SimWorld::Global()->Init(topoMeta, DevType::DEV_TYPE_950);
     fprintf(stderr, "DEBUG step2: aclrtSetDevice\n");
     if (aclrtSetDevice(rank) != ACL_SUCCESS) return 0;
 
@@ -123,8 +97,7 @@ KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSiz
         return 0;
     }
 
-    std::vector<uint64_t> sendCounts(rankSize, 1024U);
-    opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void *>(sendCounts.data());
+    PrepareOpParam(opParam, rankSize, scenario);
 
     opParam.opExecuteConfig = mc2_ops_hccl::OpExecuteConfig::CCU_SCHED;
 
@@ -177,17 +150,29 @@ KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSiz
 
 void CcuStFixture::VerifyScenario(const CcuStScenario &scenario)
 {
-    const uint32_t rankSize = scenario.rankSize;
+    const uint32_t rankSize = CountRanks(scenario.topoMeta);
 
     RegisterManager::Global().Reset();
     ResetCcuKernelRegisterCount();
 
-    const TopoMeta topoMeta = BuildTopoMeta(rankSize, scenario.topoType);
+    setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
+    setenv("ASCEND_ENABLE_CCU_KFC_BRANCH", "1", 1);
+    HcclSim::SimWorld::Global()->Init(scenario.topoMeta, scenario.devType);
+
+    const TopoMeta &topoMeta = scenario.topoMeta;
     const Mc2CcTilingInner tiling = BuildTiling(scenario.opType, scenario.dataType, scenario.algConfig);
 
-    std::vector<KernelHandle> handles(rankSize);
+    std::vector<KernelHandle> handles(rankSize, 0);
+    std::vector<std::thread> threads;
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
-        handles[rank] = RegisterKernelForRank(rank, rankSize, scenario, topoMeta, tiling);
+        threads.emplace_back([this, rank, rankSize, &scenario, &topoMeta, &tiling, &handles]() {
+            handles[rank] = RegisterKernelForRank(rank, rankSize, scenario, topoMeta, tiling);
+        });
+    }
+    for (auto &thread : threads) {
+        thread.join();
+    }
+    for (uint32_t rank = 0; rank < rankSize; ++rank) {
         ASSERT_NE(handles[rank], 0U) << "failed to register kernel for rank " << rank;
     }
 
@@ -196,43 +181,35 @@ void CcuStFixture::VerifyScenario(const CcuStScenario &scenario)
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
         const Program *program = RegisterManager::Global().GetProgram(handles[rank]);
         ASSERT_NE(program, nullptr);
-        CheckResult registration = DoCheckRegistration(*program, rank, rankSize);
-        ASSERT_TRUE(registration.Ok()) << registration.message;
-        CheckResult taskArgs = DoCheckTaskArgs(*program, rank, data);
-        ASSERT_TRUE(taskArgs.Ok()) << taskArgs.message;
+        CheckResult staticCheck = CcuProgramChecker().Check(*program);
+        ASSERT_TRUE(staticCheck.Ok()) << staticCheck.message;
     }
 
-    if (scenario.swapTaskArgs) {
-        auto [i, j] = SwapTaskArgIndices();
-        std::swap(data.launches[0].taskArgs[i], data.launches[0].taskArgs[j]);
-        EXPECT_FALSE(DoCheckTaskArgs(
-            *RegisterManager::Global().GetProgram(handles[0]), 0, data).Ok());
-        return;
+    RuntimeExpectation expectation;
+    {
+        CheckResult capture = CaptureRuntimeExpectation(data, scenario, expectation);
+        ASSERT_TRUE(capture.Ok()) << capture.message;
     }
 
-    CheckResult capture = DoCaptureRuntimeExpectation(data);
-    ASSERT_TRUE(capture.Ok()) << capture.message;
-
-    if (scenario.missingTaskArg) {
-        data.launches[1].taskArgs.pop_back();
+    {
         RuntimeWorld world;
-        EXPECT_EQ(world.Launch(data.launches), Result::CONTRACT_ERROR);
-        return;
-    }
+        ASSERT_EQ(world.Launch(data.launches), Result::SUCCESS) << world.LastError();
+        CheckResult dagResult = CcuDagChecker().Check(world.ExecutionLogData());
+        ASSERT_TRUE(dagResult.Ok()) << dagResult.message;
+        CheckResult runtime = CheckRuntimeOutput(data.memories, expectation, world);
+        ASSERT_TRUE(runtime.Ok()) << runtime.message;
 
-    RuntimeWorld world;
-    ASSERT_EQ(world.Launch(data.launches), Result::SUCCESS) << world.LastError();
-    CheckResult dagResult = CcuDagChecker().Check(world.ExecutionLogData());
-    ASSERT_TRUE(dagResult.Ok()) << dagResult.message;
-    CheckResult runtime = DoCheckRuntime(data, world);
-    ASSERT_TRUE(runtime.Ok()) << runtime.message;
-
-    if (scenario.corruptOutput) {
-        if (!data.memories.empty() && !data.memories[0].output.empty()) {
-            data.memories[0].output[0] ^= 1U;
+        if (scenario.corruptOutput) {
+            if (!data.memories.empty() && !data.memories[0].output.empty()) {
+                data.memories[0].output[0] ^= 1U;
+            }
+            EXPECT_FALSE(CheckRuntimeOutput(data.memories, expectation, world).Ok());
         }
-        EXPECT_FALSE(DoCheckRuntime(data, world).Ok());
     }
+
+    HcclSim::SimWorld::Global()->Deinit();
+    unsetenv("HCCL_OP_EXPANSION_MODE");
+    unsetenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
 }
 
 } // namespace CcuSt

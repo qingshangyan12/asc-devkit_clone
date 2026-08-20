@@ -164,7 +164,8 @@ Result CompilerContext::Finalize()
     std::vector<size_t> stack;
     for (size_t index = 0; index < program_.operations.size(); ++index) {
         Operation &operation = program_.operations[index];
-        if (operation.code == OpCode::IF_BEGIN || operation.code == OpCode::WHILE_BEGIN) {
+        if (operation.code == OpCode::IF_BEGIN || operation.code == OpCode::WHILE_BEGIN ||
+            operation.code == OpCode::ELSE_BEGIN) {
             stack.push_back(index);
             continue;
         }
@@ -176,15 +177,38 @@ Result CompilerContext::Finalize()
         }
         const size_t beginIndex = stack.back();
         stack.pop_back();
-        const OpCode expected = operation.code == OpCode::IF_END ? OpCode::IF_BEGIN : OpCode::WHILE_BEGIN;
-        if (program_.operations[beginIndex].code != expected) {
-            return Result::STATE_ERROR;
+        if (operation.code == OpCode::IF_END) {
+            if (program_.operations[beginIndex].code != OpCode::IF_BEGIN &&
+                program_.operations[beginIndex].code != OpCode::ELSE_BEGIN) {
+                return Result::STATE_ERROR;
+            }
+        } else {
+            if (program_.operations[beginIndex].code != OpCode::WHILE_BEGIN) {
+                return Result::STATE_ERROR;
+            }
         }
         program_.operations[beginIndex].peerIndex = index;
         operation.peerIndex = beginIndex;
     }
     if (!stack.empty()) {
         return Result::STATE_ERROR;
+    }
+
+    for (size_t index = 0; index < program_.operations.size(); ++index) {
+        if (program_.operations[index].code != OpCode::ELSE_BEGIN) {
+            continue;
+        }
+        size_t ifEndIndex = index - 1;
+        if (ifEndIndex >= program_.operations.size() ||
+            program_.operations[ifEndIndex].code != OpCode::IF_END) {
+            return Result::STATE_ERROR;
+        }
+        size_t ifBeginIndex = program_.operations[ifEndIndex].peerIndex;
+        if (ifBeginIndex >= program_.operations.size() ||
+            program_.operations[ifBeginIndex].code != OpCode::IF_BEGIN) {
+            return Result::STATE_ERROR;
+        }
+        program_.operations[ifBeginIndex].peerIndex = index;
     }
 
     std::sort(program_.arguments.begin(), program_.arguments.end(),
@@ -213,10 +237,16 @@ void CompilerContext::SetCurrent(CompilerContext *context)
     gCompilerContext = context;
 }
 
-ControlScope::ControlScope(const Condition &condition, bool isWhile) : isWhile_(isWhile)
+ControlScope::ControlScope(const Condition &condition, bool isWhile, bool isElse) : isWhile_(isWhile), isElse_(isElse)
 {
-    CompilerContext::Current().Append(MakeConditionOperation(
-        isWhile ? OpCode::WHILE_BEGIN : OpCode::IF_BEGIN, condition));
+    if (isElse_) {
+        Operation operation;
+        operation.code = OpCode::ELSE_BEGIN;
+        CompilerContext::Current().Append(operation);
+    } else {
+        CompilerContext::Current().Append(MakeConditionOperation(
+            isWhile ? OpCode::WHILE_BEGIN : OpCode::IF_BEGIN, condition));
+    }
 }
 
 bool ControlScope::Once()

@@ -17,6 +17,7 @@
 #include "ccu_types.h"
 #include "hccl_ccu_res.h"
 #include "ccu_kernel_proxy.h"
+#include "sim_communicator.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -415,7 +416,9 @@ HcclResult HcclCcuKernelLaunch(
 }
 
 HcclResult HcclCommQueryCcuIns(HcclComm comm, CcuInsHandle *insHandles, uint32_t *insNum) {
-    *insHandles = 1;
+    auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
+    CHK_PTR_NULL(simComm);
+    *insHandles = static_cast<CcuInsHandle>(simComm->GetRankId()) + 1;
     *insNum = 1;
     return HCCL_SUCCESS;
 }

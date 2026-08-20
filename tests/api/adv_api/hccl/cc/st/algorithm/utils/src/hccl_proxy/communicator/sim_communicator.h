@@ -40,9 +40,6 @@ public:
     HcclResult ChannelCommCreate(
         const std::string& commId, const std::string& tag, CommEngine engine, const HcclChannelDesc* channelDescList,
         uint32_t listNum, ChannelHandle* channelList);
-    HcclResult ChannelCommCreateForCcu(
-        const std::string& commId, const std::string& tag, CommEngine engine, const HcclChannelDesc* channelDescList,
-        uint32_t listNum, ChannelHandle* channelList);
 
 private:
     HcclResult GetFileRealPath(const char* rankTable, std::string& realFilePath);

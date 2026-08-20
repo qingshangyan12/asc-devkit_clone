@@ -12,6 +12,7 @@
 #define HCCL_CCU_ALL_TO_ALL_MESH1D_ADAPTER_H
 
 #include "ccu_kernel_proxy.h"
+#include "ccu_fixture.h"
 
 #include <array>
 
@@ -42,6 +43,8 @@ struct AllToAllLaunchConfig {
 
 Result CaptureAllToAllMesh1DKernel(void *kernelArg);
 std::vector<uint64_t> PrepareAllToAllTaskArgs(const AllToAllLaunchConfig &config);
+ScenarioData BuildMesh1DScenario(const CcuStScenario &scenario,
+    const std::vector<KernelHandle> &handles);
 
 } // namespace CcuSt
 } // namespace HcclSim

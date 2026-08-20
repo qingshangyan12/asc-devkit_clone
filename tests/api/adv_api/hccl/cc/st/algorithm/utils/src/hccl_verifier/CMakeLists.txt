@@ -13,6 +13,7 @@ target_sources(hccl-verifier PRIVATE
     checker.cc
     ccu_checker.cc
     ccu_dag_checker.cc
+    ccu_runtime_checker.cc
     hccl_verifier.cc
 )
 

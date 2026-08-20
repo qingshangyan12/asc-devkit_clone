@@ -30,8 +30,10 @@ CcuTempAlltoAllMesh1D::~CcuTempAlltoAllMesh1D()
 {
 }
 
-HcclResult CcuTempAlltoAllMesh1D::CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-                                                       AlgResourceRequest& resourceRequest)
+HcclResult CcuTempAlltoAllMesh1D::CalcRes(HcclComm comm,
+                                          const OpParam& param,
+                                          const TopoInfoWithNetLayerDetails* topoInfo,
+                                          AlgResourceRequest& resourceRequest)
 {
     // 不需要从流
     resourceRequest.notifyNumOnMainThread = 0;

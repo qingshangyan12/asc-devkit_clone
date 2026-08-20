@@ -52,7 +52,7 @@ struct Condition {
 
 class ControlScope {
 public:
-    ControlScope(const Condition &condition, bool isWhile);
+    ControlScope(const Condition &condition, bool isWhile, bool isElse = false);
     bool Once();
     void Close();
 
@@ -60,6 +60,7 @@ private:
     bool entered_{false};
     bool closed_{false};
     bool isWhile_{false};
+    bool isElse_{false};
 };
 
 } // namespace CcuSt
@@ -201,9 +202,9 @@ Result LocalCopy(LocalAddr destination, LocalAddr source, Variable length,
     for (::HcclSim::CcuSt::ControlScope _ccuWhileScope((expr), true); _ccuWhileScope.Once();                       \
          _ccuWhileScope.Close())
 
-// Product kernels use CCU_ELSE for device-side branches. Registration captures
-// the primary branch; runtime branch behavior is modeled by the dedicated world.
-#define CCU_ELSE if (false)
+#define CCU_ELSE                                                                                               \
+    for (::HcclSim::CcuSt::ControlScope _ccuElseScope(::HcclSim::CcuSt::Condition{0, 0, true}, false, true);   \
+         _ccuElseScope.Once(); _ccuElseScope.Close())
 
 // Merged from shim/ccu_primitives_dl.hpp — empty shell types for compilation
 namespace AscendC {

@@ -10,6 +10,7 @@
 
 #include "ccu_sim_world.h"
 
+#include <algorithm>
 #include <cstring>
 #include <limits>
 #include <sstream>
@@ -296,6 +297,9 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
                 return true;
             }
             break;
+        case OpCode::ELSE_BEGIN:
+            state.pc = operation.peerIndex + 1;
+            return true;
         case OpCode::IF_END:
             break;
         case OpCode::WHILE_BEGIN:
@@ -359,7 +363,40 @@ Result RuntimeWorld::Launch(const std::vector<RankLaunch> &launches)
             return Result::SUCCESS;
         }
         if (!progressed) {
-            SetError("all ranks are blocked on CCU events or notifies");
+            std::ostringstream detail;
+            detail << "deadlock detected:\n";
+            for (size_t rank = 0; rank < states.size(); ++rank) {
+                const auto &state = states[rank];
+                if (state.completed) {
+                    continue;
+                }
+                if (state.pc >= state.program->operations.size()) {
+                    detail << "  rank " << rank << ": pc out of range\n";
+                    continue;
+                }
+                const Operation &op = state.program->operations[state.pc];
+                detail << "  rank " << rank << " blocked at operation[" << state.pc << "]: "
+                       << "code=" << static_cast<int>(op.code);
+                if (op.code == OpCode::NOTIFY_WAIT) {
+                    uint32_t peer = ChannelRemoteRank(op.channel);
+                    auto it = state.notifies.find({peer, op.index});
+                    uint16_t current = (it != state.notifies.end()) ? it->second : 0;
+                    detail << " channel=0x" << std::hex << op.channel << std::dec
+                           << " index=" << op.index << " mask=0x" << std::hex << op.mask << std::dec
+                           << " current=0x" << std::hex << current << std::dec;
+                } else if (op.code == OpCode::EVENT_WAIT) {
+                    auto it = state.events.find(op.src0);
+                    uint16_t current = (it != state.events.end()) ? it->second : 0;
+                    detail << " event=0x" << std::hex << op.src0 << std::dec
+                           << " mask=0x" << std::hex << op.mask << std::dec
+                           << " current=0x" << std::hex << current << std::dec;
+                } else if (op.code == OpCode::WHILE_BEGIN || op.code == OpCode::IF_BEGIN) {
+                    detail << " condition variable=0x" << std::hex << op.src0 << std::dec
+                           << " immediate=" << op.immediate << " equal=" << op.equal;
+                }
+                detail << "\n";
+            }
+            SetError(detail.str());
             return Result::DEADLOCK;
         }
     }
