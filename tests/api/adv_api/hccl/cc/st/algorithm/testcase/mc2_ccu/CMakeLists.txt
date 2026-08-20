@@ -12,7 +12,7 @@
 # Target: selector/CalcRes/channel full-chain ST
 # Compiles real selector/executor/template + kernel, verifies full chain
 # ============================================================================
-set(HCCL_MC2_CCU_SELECTOR_TARGET ascendc_ut_adv_api_hccl_ccu_selector_st)
+set(HCCL_CCU_ST_TARGET ascendc_ut_adv_api_ccu_st)
 set(HCCL_MC2_CCU_ALL_TO_ALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/all_to_all)
 
 set(HCCL_SELECTOR_PRODUCT_SOURCES
@@ -45,7 +45,7 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
 )
 
-add_executable(${HCCL_MC2_CCU_SELECTOR_TARGET}
+add_executable(${HCCL_CCU_ST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/all_to_all_testcase.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/shim/stubs.cc
@@ -55,7 +55,7 @@ add_executable(${HCCL_MC2_CCU_SELECTOR_TARGET}
     ${HCCL_SELECTOR_PRODUCT_SOURCES}
 )
 
-target_include_directories(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
+target_include_directories(${HCCL_CCU_ST_TARGET} PRIVATE
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/shim
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
@@ -73,7 +73,7 @@ target_include_directories(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/toolchain
 )
 
-target_compile_options(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
+target_compile_options(${HCCL_CCU_ST_TARGET} PRIVATE
     -std=c++17
     -O0
     -g
@@ -84,12 +84,12 @@ target_compile_options(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
     -D_GLIBCXX_USE_CXX11_ABI=0
 )
 
-target_compile_definitions(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
+target_compile_definitions(${HCCL_CCU_ST_TARGET} PRIVATE
     -DUT_TEST
     -DMC2_CLIENT_ENABLE_CCU=1
 )
 
-target_link_libraries(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
+target_link_libraries(${HCCL_CCU_ST_TARGET} PRIVATE
     hccl-model-proxy
     hccl-verifier
     intf_llt_pub_basic
@@ -99,6 +99,6 @@ target_link_libraries(${HCCL_MC2_CCU_SELECTOR_TARGET} PRIVATE
 )
 
 run_llt_test(
-    TARGET ${HCCL_MC2_CCU_SELECTOR_TARGET}
+    TARGET ${HCCL_CCU_ST_TARGET}
     TASK_NUM 1
 )
