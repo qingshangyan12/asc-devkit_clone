@@ -341,8 +341,7 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
     const CommonPrepareParam& commonPrepareParam)
 {
     if (unlikely(commonPrepareParam.repeat == 0U)) {
-        KERNEL_LOG(
-            KERNEL_ERROR,
+        AscendC::PRINTF(
             "Call Prepare[%d] failed, repeat is 0, repeat means the number of complete op instances and must be >= 1.",
             static_cast<int32_t>(commonPrepareParam.commType.prepareType));
         return INVALID_HANDLE_ID;
