@@ -51,7 +51,7 @@ class ArchRuntimeConfig(RuntimeConfig):
         enable_kernel_type_mix = False
         enable_simt = True
         dump_size_multiples = 75
-        chip_version = "v516"
+        chip_version = "516r2"
         decode_mode_v310 = False
 
         # Tiling Info Generator Config
@@ -107,7 +107,7 @@ class ArchRuntimeConfig(RuntimeConfig):
         dfx_set_kernel_type_mix = False
         dfx_set_kernel_type_aic = False
         support_raw_aic_only_dump_tensor = False
-        chip_version = "v516"
+        chip_version = "516r2"
         compile_type = CompileType.COMPILE_TYPE_1
 
         # Genrate Config

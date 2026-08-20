@@ -489,7 +489,7 @@ def _gen_kernel_func_declare_head(
     func_params = []
     super_kernel_params = []
     needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (
-        CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_v516()
+        CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2()
     )
     workspace_idx = 0
     if needs_ffts:
@@ -900,7 +900,7 @@ def gen_kernel_fun(
         source += "    AscendC::WriteBackOverflow(overflowStatus);\n"
 
     if not global_var_storage.get_variable("ascendc_enable_super_kernel") and (
-        CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_v516()
+        CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2()
     ):
         check_custom_dcci_end_false(compile_option_tuple)
 
@@ -1457,10 +1457,10 @@ def compile_kernel_and_meta(
         compile_info.code_channel = CORE_TYPE_CUBE
         compile_info.hard_sync = False
         _compile_ascendc_cce_m510(compile_info, compile_option_tuple, tiling_info)
-    elif CommonUtility.is_v516():
+    elif CommonUtility.is_516r2():
         compile_info.code_channel = CORE_TYPE_CUBE
         compile_info.hard_sync = False
-        _compile_ascendc_cce_v516(compile_info, compile_option_tuple, tiling_info)
+        _compile_ascendc_cce_516r2(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_regbase():
         _compile_ascendc_cce_regbase(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_v200() and compile_info.no_set_kernel_type is False:
@@ -1983,7 +1983,7 @@ def compile_op(
         [] if compile_options is None else compile_options, []
     )
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_v516())
+        (CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2())
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
@@ -2091,7 +2091,7 @@ def compile_op_with_customized_config(
         [] if compile_options is None else compile_options, []
     )
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_v516())
+        (CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2())
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
@@ -3097,7 +3097,7 @@ def _compile_ascendc_cce_m510(
         )
 
 
-def _compile_ascendc_cce_v516(
+def _compile_ascendc_cce_516r2(
     compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo
 ):
     """call cce-c to compile a AscendC.cce file, generate a binary file and a json file

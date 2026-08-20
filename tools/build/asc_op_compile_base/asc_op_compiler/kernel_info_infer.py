@@ -461,7 +461,7 @@ REGISTER_TILING_DEFAULT"
             not CommonUtility.is_m510()
             and not CommonUtility.is_l300()
             and not CommonUtility.is_l311()
-            and not CommonUtility.is_v516()
+            and not CommonUtility.is_516r2()
         )
         tiling_no_register_flag = False
         try:
@@ -821,7 +821,7 @@ REGISTER_TILING_DEFAULT"
             # chmod sub core .i file permission
             os.chmod(dis_i_file_cube, stat.S_IRUSR + stat.S_IWUSR)
             os.chmod(dis_i_file_vec, stat.S_IRUSR + stat.S_IWUSR)
-        elif CommonUtility.is_m510() or CommonUtility.is_v516():
+        elif CommonUtility.is_m510() or CommonUtility.is_516r2():
             pre_compile_cmd = gen_compile_cmd_v220(
                 cce_file, dst_i_file, compile_option_tuple_pre, None, "", False
             )

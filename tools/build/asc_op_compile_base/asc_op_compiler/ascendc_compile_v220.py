@@ -264,7 +264,7 @@ def _gen_compile_cmd_m510(
     return compile_cmd
 
 
-def _gen_compile_cmd_v516(
+def _gen_compile_cmd_516r2(
     src_file: str,
     dst_file: str,
     compile_option_tuple,
@@ -272,7 +272,7 @@ def _gen_compile_cmd_v516(
     with_tiling_file: bool = True,
 ):
     """
-    Generate the compile command for the v516 compiler.
+    Generate the compile command for the 516r2 compiler.
     :param src_file: the source file
     :param dst_file: the destination file
     :param extra_options: the extra options
@@ -280,7 +280,7 @@ def _gen_compile_cmd_v516(
     :return: the compile command
     """
     """
-    Generate the compile command for the v516 compiler.
+    Generate the compile command for the 516r2 compiler.
     :param src_file: the source file
     :param dst_file: the destination file
     :param extra_options: the extra options
@@ -380,8 +380,8 @@ def gen_compile_cmd_v220(
         return _gen_compile_cmd_m510(
             src_file, dst_file, compile_option_tuple, tiling_file, with_tiling_file
         )
-    elif CommonUtility.is_v516():
-        return _gen_compile_cmd_v516(
+    elif CommonUtility.is_516r2():
+        return _gen_compile_cmd_516r2(
             src_file, dst_file, compile_option_tuple, tiling_file, with_tiling_file
         )
     else:
@@ -573,7 +573,7 @@ def compile_single_tiling_v220(param: SingleTilingKeyCompileParams):
         kernel_func_name = param.compile_info.kernel_name + "_%s" % param.tiling_key
     if param.code_channel == CORE_TYPE_MIX:
         compile_cmd += [f"-D{MIX_CORE_MACRO}={1}"]
-    if CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_v516():
+    if CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2():
         if param.code_channel == CORE_TYPE_MIX:
             compile_cmd += ["-D__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__"]
         raw_kernel_type = param.compile_info.raw_tiling_key_kernel_type.get(
@@ -636,7 +636,7 @@ def get_compile_cmd_for_kernel_name(
     ]
     if code_channel == CORE_TYPE_MIX:
         compile_cmd += [f"-D{MIX_CORE_MACRO}={1}"]
-    if CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_v516():
+    if CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2():
         if code_channel == CORE_TYPE_MIX:
             compile_cmd += ["-D__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__"]
         raw_kernel_type = compile_info.raw_tiling_key_kernel_type.get(

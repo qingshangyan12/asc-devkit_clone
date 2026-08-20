@@ -550,11 +550,11 @@ class CommonUtility:
         return False
 
     @staticmethod
-    def is_v516():
-        """return if current soc version is v516
+    def is_516r2():
+        """return if current soc version is 516r2
 
         Returns:
-            res: True means v516
+            res: True means 516r2
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
         if short_soc_version in ["Ascend5162A"]:
@@ -597,7 +597,7 @@ class CommonUtility:
             chip_version = "c310"
         elif CommonUtility.is_m510():
             chip_version = "510r2"
-        elif CommonUtility.is_v516():
+        elif CommonUtility.is_516r2():
             chip_version = "516r2"
         return chip_version
 
