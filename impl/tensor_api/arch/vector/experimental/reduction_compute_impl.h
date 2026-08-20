@@ -46,6 +46,8 @@ __simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<SrcType> src)
 template <typename DstType, reduce_scope scope, typename SrcType>
 __simd_callee__ inline decltype(auto) reduce_max(reg_tensor<SrcType> src)
 {
+    static_assert(scope == reduce_scope::vector || scope == reduce_scope::datablock,
+                  "reduce_max only supports reduce_scope::vector and reduce_scope::datablock");
     reg_tensor<DstType> dst;
     if constexpr (scope == reduce_scope::vector) {
         asc_reduce_max(dst.reg, src.reg, src.mask);
@@ -59,6 +61,8 @@ __simd_callee__ inline decltype(auto) reduce_max(reg_tensor<SrcType> src)
 template <typename DstType, reduce_scope scope, typename SrcType>
 __simd_callee__ inline decltype(auto) reduce_min(reg_tensor<SrcType> src)
 {
+    static_assert(scope == reduce_scope::vector || scope == reduce_scope::datablock,
+                  "reduce_min only supports reduce_scope::vector and reduce_scope::datablock");
     reg_tensor<DstType> dst;
     if constexpr (scope == reduce_scope::vector) {
         asc_reduce_min(dst.reg, src.reg, src.mask);
