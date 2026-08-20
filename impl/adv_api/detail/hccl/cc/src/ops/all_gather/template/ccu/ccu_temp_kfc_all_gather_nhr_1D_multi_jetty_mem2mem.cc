@@ -118,6 +118,20 @@ HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::KernelRun(
     return HCCL_SUCCESS;
 }
 
+HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::GetRes(
+    AlgResourceRequest& resourceRequest) const
+{
+    resourceRequest.slaveThreadNum = 0;
+    resourceRequest.notifyNumOnMainThread = 0;
+    resourceRequest.notifyNumPerThread.assign(resourceRequest.slaveThreadNum, 1);
+    return HCCL_SUCCESS;
+}
+
+u64 CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::GetThreadNum() const
+{
+    return 1;
+}
+
 u64 CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcScratchMultiple(
     BufferType inBuffType, BufferType outBuffType)
 {
