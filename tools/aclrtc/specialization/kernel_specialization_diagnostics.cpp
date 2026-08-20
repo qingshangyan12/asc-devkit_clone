@@ -102,8 +102,8 @@ bool CreateExecutableReplayScript(const fs::path& replayScriptPath, const fs::pa
         return false;
     }
 
-    constexpr mode_t REPLAY_SCRIPT_PERMISSION = S_IRUSR | S_IWUSR | S_IXUSR;
-    if (chmod(replayScriptPath.c_str(), REPLAY_SCRIPT_PERMISSION) == 0) {
+    constexpr mode_t replayScriptPermission = S_IRUSR | S_IWUSR | S_IXUSR;
+    if (chmod(replayScriptPath.c_str(), replayScriptPermission) == 0) {
         return true;
     }
 
@@ -144,11 +144,11 @@ void KernelSpecializationDiagnostics::WriteManifestSnapshot(const nlohmann::json
     if (!diagnosticsEnabled_) {
         return;
     }
-    constexpr int DIAGNOSTIC_JSON_INDENTATION_WIDTH = 2;
+    constexpr int diagnosticJsonIndentationWidth = 2;
     try {
         const fs::path manifestPath = resourceWorktreePath_ / DIAGNOSTIC_MANIFEST_FILE_NAME;
         WriteDiagnosticTextFile(
-            manifestPath, resourceManifest.dump(DIAGNOSTIC_JSON_INDENTATION_WIDTH) + '\n', std::ios::trunc);
+            manifestPath, resourceManifest.dump(diagnosticJsonIndentationWidth) + '\n', std::ios::trunc);
     } catch (...) {
         ASCENDLOGW(
             "Failed to record specialization manifest: resource_worktree=%s file=%s", resourceWorktreePath_.c_str(),
@@ -225,7 +225,7 @@ void KernelSpecializationDiagnostics::WriteSpecializationResult(
     if (!diagnosticsEnabled_) {
         return;
     }
-    constexpr int DIAGNOSTIC_JSON_INDENTATION_WIDTH = 2;
+    constexpr int diagnosticJsonIndentationWidth = 2;
     try {
         nlohmann::json resultJson{
             {"specialization_session_id", specializationSessionId_},
@@ -233,7 +233,7 @@ void KernelSpecializationDiagnostics::WriteSpecializationResult(
             {"output_published", publicationStatus == OutputPublicationStatus::Published},
         };
         const fs::path resultPath = resourceWorktreePath_ / DIAGNOSTIC_RESULT_FILE_NAME;
-        WriteDiagnosticTextFile(resultPath, resultJson.dump(DIAGNOSTIC_JSON_INDENTATION_WIDTH) + '\n', std::ios::trunc);
+        WriteDiagnosticTextFile(resultPath, resultJson.dump(diagnosticJsonIndentationWidth) + '\n', std::ios::trunc);
     } catch (...) {
         ASCENDLOGW(
             "Failed to record specialization result: resource_worktree=%s file=%s", resourceWorktreePath_.c_str(),

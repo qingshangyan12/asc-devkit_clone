@@ -583,9 +583,9 @@ aclError CompilationPlanExecutor::ExecuteCompilationPlan(const KernelCompilation
             const aclError executionResult = ExecuteCompilationCommand(compilationCommand, processResult);
             specializationDiagnostics_.AppendCommandResultToCompilationLog(compilationCommand, processResult);
             if (executionResult != ACLRTC_SUCCESS) {
-                constexpr size_t MAX_LOGGED_PROCESS_OUTPUT_BYTES = 4096U;
+                constexpr size_t maxLoggedProcessOutputBytes = 4096U;
                 const size_t loggedOutputByteCount =
-                    std::min(processResult.capturedOutput.size(), MAX_LOGGED_PROCESS_OUTPUT_BYTES);
+                    std::min(processResult.capturedOutput.size(), maxLoggedProcessOutputBytes);
                 const bool loggedOutputTruncated = processResult.capturedOutput.size() > loggedOutputByteCount;
                 ASCENDLOGE(
                     "Command %s failed: termination=%s code=%d elapsed_ms=%lld captured_output_truncated=%s "
