@@ -4,8 +4,13 @@ Tensor API Reg 矢量计算接口以 `asc::te::reg_tensor<T>` 为输入和返回
 
 ## 产品支持情况
 
-- Ascend 950PR/Ascend 950DT：支持。
-- 其他产品：不支持。
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
 
 ## 接口分类
 
@@ -19,11 +24,27 @@ Tensor API Reg 矢量计算接口以 `asc::te::reg_tensor<T>` 为输入和返回
 ## 编程模型
 
 ```cpp
-auto mask = asc::te::ones<float>();
-auto src0 = input0.load(MakeCoord(0, 0)).with_mask(mask);
-auto src1 = input1.load(MakeCoord(0, 0)).with_mask(mask);
-auto result = asc::te::abs(src0) + src1;
-output.store(MakeCoord(0, 0), result);
+#include "tensor_api/tensor.h"
+#include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/experimental/reg/basic_arithmetic.h"
+
+__simd_vf__ inline void reg_vector_compute_example(
+    __ubuf__ float* src0, __ubuf__ float* src1, __ubuf__ float* dst)
+{
+    auto layout =
+        asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(asc::te::_1 {}, asc::te::_64 {});
+    auto input0 = asc::te::make_tensor(asc::te::make_mem_ptr(src0), layout);
+    auto input1 = asc::te::make_tensor(asc::te::make_mem_ptr(src1), layout);
+    auto output = asc::te::make_tensor(asc::te::make_mem_ptr(dst), layout);
+    auto mask = asc::te::all_mask<float>();
+    auto src0_reg = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto src1_reg = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
+
+    auto result = asc::te::abs(src0_reg) + src1_reg;
+    output.store(asc::te::make_coord(0, 0), result);
+}
 ```
 
-接口只能在支持 `__simd_callee__` 调用的设备侧函数中使用。当前实现面向 `__NPU_ARCH__ == 3510`。
+接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用。`reg_tensor<T>`
+中的 `reg` 保存矢量数据，`mask` 表示参与计算的有效 lane；调用计算接口前必须先初始化输入寄存器的
+`mask`，通常使用 `load(...).with_mask(m)` 完成绑定。
