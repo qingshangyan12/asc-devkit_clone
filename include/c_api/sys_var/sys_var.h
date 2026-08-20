@@ -41,6 +41,9 @@ __aicore__ inline int64_t asc_get_sys_virtual_base();
 
 __aicore__ inline int64_t asc_get_ctrl();
 
+[[deprecated(
+    "NOTICE: asc_get_block_num is deprecated. "
+    "Please use block_num instead.")]]
 __aicore__ inline int64_t asc_get_block_num();
 
 /*
@@ -48,6 +51,10 @@ __aicore__ inline int64_t asc_get_block_num();
  * @brief：Get the index of the current running block
  * @return：The index of the current running block
  */
+[[deprecated(
+    "NOTICE: asc_get_block_idx is deprecated. "
+    "Please use block_idx * asc_get_sub_block_num() "
+    "+ asc_get_sub_block_id() instead.")]]
 __aicore__ inline int64_t asc_get_block_idx();
 
 /*
@@ -74,8 +81,9 @@ __aicore__ inline uint64_t asc_get_overflow_status();
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
 __aicore__ inline int64_t asc_get_program_counter();
 __aicore__ inline void asc_get_arch_ver(uint32_t& core_version);
-[[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
-             "Please use asc_get_squeeze_status instead.")]]
+[[deprecated(
+    "NOTICE: asc_get_ar_spr is deprecated. "
+    "Please use asc_get_squeeze_status instead.")]]
 __aicore__ inline int64_t asc_get_ar_spr();
 __aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
 __aicore__ inline constexpr int64_t asc_get_vf_len();
