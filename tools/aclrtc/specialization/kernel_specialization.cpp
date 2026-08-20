@@ -78,12 +78,13 @@ bool CreateUniqueTemporaryOutputFile(
     const fs::path& outputElfPath, fs::path& temporaryOutputPath, int& temporaryOutputFileDescriptor)
 {
     constexpr size_t MAX_TEMPORARY_FILE_ATTEMPTS = 32U;
+    constexpr mode_t TEMPORARY_OUTPUT_FILE_MODE = 0644;
     static std::atomic<uint64_t> temporaryOutputFileSequence{0};
     for (size_t attempt = 0U; attempt < MAX_TEMPORARY_FILE_ATTEMPTS; ++attempt) {
         temporaryOutputPath = outputElfPath.string() + ".aclrtc_tmp_" + std::to_string(getpid()) + "_" +
                               std::to_string(temporaryOutputFileSequence.fetch_add(1U, std::memory_order_relaxed));
         temporaryOutputFileDescriptor =
-            open(temporaryOutputPath.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0644);
+            open(temporaryOutputPath.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, TEMPORARY_OUTPUT_FILE_MODE);
         if (temporaryOutputFileDescriptor >= 0) {
             return true;
         }
