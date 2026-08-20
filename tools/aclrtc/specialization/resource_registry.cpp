@@ -62,29 +62,6 @@ void LibraryDeleter::operator()(void* handle) const noexcept
     }
 }
 
-bool IsKernelMetaSavingEnabled() noexcept
-{
-    const char* environment = std::getenv("ASCEND_OP_COMPILE_SAVE_KERNEL_META");
-    if (environment == nullptr) {
-        return false;
-    }
-    const auto isWhitespace = [](char value) {
-        return value == ' ' || value == '\t' || value == '\n' || value == '\r' || value == '\f' || value == '\v';
-    };
-    const char* begin = environment;
-    while (*begin != '\0' && isWhitespace(*begin)) {
-        ++begin;
-    }
-    const char* end = begin;
-    while (*end != '\0') {
-        ++end;
-    }
-    while (end != begin && isWhitespace(*(end - 1))) {
-        --end;
-    }
-    return end == begin + 1 && *begin == '1';
-}
-
 namespace {
 
 namespace fs = boost::filesystem;

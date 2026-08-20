@@ -54,12 +54,6 @@ enum class ResourceSourceType : uint32_t {
  */
 bool IsKernelMetaSavingEnabled() noexcept;
 
-/**
- * @brief Returns whether kernel metadata and diagnostic artifacts are retained.
- * @return true only when ASCEND_OP_COMPILE_SAVE_KERNEL_META, after surrounding whitespace is ignored, is exactly "1".
- */
-bool IsKernelMetaSavingEnabled() noexcept;
-
 struct ResourceData {
     nlohmann::json json;
     std::string resourceDir;
