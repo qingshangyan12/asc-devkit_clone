@@ -28,9 +28,7 @@
 namespace AscendC {
 __aicore__ inline int64_t GetGatherMaskRemainCountImpl()
 {
-    ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported GetGatherMaskRemainCount on current device");
-    });
+    ASCENDC_ASSERT((false), { KERNEL_LOG(KERNEL_ERROR, "unsupported GetGatherMaskRemainCount on current device"); });
     return 0;
 }
 

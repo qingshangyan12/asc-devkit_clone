@@ -225,9 +225,8 @@ __aicore__ inline void VecUnaryLevel0Template(
 {
     BasicAPIMaskStruct maskArrayStruct;
     if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(maskCount == 0, {
-            KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true.");
-        });
+        ASCENDC_ASSERT(
+            maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
         maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(maskArray));
     } else {
         ASCENDC_ASSERT(maskArray == nullptr, {
@@ -249,9 +248,7 @@ __aicore__ inline void VecUnaryLevel0Template(
     } else {
         if constexpr (isMaskBitMode) {
             if constexpr (SupportBytes<T, 1>()) {
-                ASCENDC_ASSERT(isSetMask, {
-                    KERNEL_LOG(KERNEL_ERROR, "mask must be set when sizeof(T) is 1.");
-                });
+                ASCENDC_ASSERT(isSetMask, { KERNEL_LOG(KERNEL_ERROR, "mask must be set when sizeof(T) is 1."); });
                 auto eventIDV2S = GetTPipePtr()->FetchEventID(HardEvent::V_S);
                 SetFlag<HardEvent::V_S>(eventIDV2S);
                 WaitFlag<HardEvent::V_S>(eventIDV2S);
