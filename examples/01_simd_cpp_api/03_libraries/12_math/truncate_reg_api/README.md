@@ -77,8 +77,6 @@ y[i] = trunc(x[i])
     </tr>
   </table>
 
-  输入和输出文件均为无文件头的连续二进制数据，元素采用主机端小端字节序存储。BF16数据在文件中以 `uint16_t` 位模式保存。
-
   | SCENARIO_NUM | `input/input_x.bin` | 输入大小 | `output/output.bin` / `output/golden.bin` | 输出大小 |
   | --- | --- | --- | --- | --- |
   | 1 | 256个 `half` | 512 B | 256个 `half` | 512 B |
@@ -139,10 +137,9 @@ y[i] = trunc(x[i])
 
   生成数据时传入的 `scenarioNum` 必须与编译时的 `SCENARIO_NUM` 一致。运行其他场景时，将其修改为1至3之间的对应值。
 
-  使用CPU仿真或NPU仿真时，可分别增加以下编译选项：
+  使用NPU仿真时，可分别增加以下编译选项：
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DSCENARIO_NUM=${SCENARIO_NUM} ..
   cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} ..
   ```
 
@@ -152,7 +149,7 @@ y[i] = trunc(x[i])
 
   | 选项 | 说明 |
   | --- | --- |
-  | `CMAKE_ASC_RUN_MODE` | 算子执行模式，可选 `npu`、`cpu`、`sim`，默认值为 `npu`。 |
+  | `CMAKE_ASC_RUN_MODE` | 算子执行模式，可选 `npu`、`sim`，默认值为 `npu`。 |
   | `CMAKE_ASC_ARCHITECTURES` | NPU芯片型号，默认值为 `dav-3510`。 |
   | `SCENARIO_NUM` | 数据类型场景编号，必选，取值范围为1至3。 |
 

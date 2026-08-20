@@ -77,8 +77,6 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
     </tr>
   </table>
 
-  The input and output files contain contiguous binary data without file headers. Elements are stored in the host's little-endian byte order. BF16 data is stored in the files as `uint16_t` bit patterns.
-
   | SCENARIO_NUM | `input/input_x.bin` | Input Size | `output/output.bin` / `output/golden.bin` | Output Size |
   | --- | --- | --- | --- | --- |
   | 1 | 256 `half` elements | 512 B | 256 `half` elements | 512 B |
@@ -139,10 +137,9 @@ Run the following steps in the sample root directory to build and execute the op
 
   The `scenarioNum` passed to the data generation script must match the `SCENARIO_NUM` used during compilation. To run another scenario, set both values to the corresponding number from 1 to 3.
 
-  To use CPU emulation or NPU simulation, add the corresponding build option:
+  To use NPU simulation, add the corresponding build option:
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DSCENARIO_NUM=${SCENARIO_NUM} ..
   cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=${SCENARIO_NUM} ..
   ```
 
@@ -152,7 +149,7 @@ Run the following steps in the sample root directory to build and execute the op
 
   | Option | Description |
   | --- | --- |
-  | `CMAKE_ASC_RUN_MODE` | Operator execution mode. Available values are `npu`, `cpu`, and `sim`. The default is `npu`. |
+  | `CMAKE_ASC_RUN_MODE` | Operator execution mode. Available values are `npu` and `sim`. The default is `npu`. |
   | `CMAKE_ASC_ARCHITECTURES` | NPU chip model. The default is `dav-3510`. |
   | `SCENARIO_NUM` | Required data type scenario number. The valid range is 1 to 3. |
 
