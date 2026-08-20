@@ -157,46 +157,37 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
 
-    uint64_t loopCount = CCU_LOOP_COUNT_M2M_RE;
     uint64_t tmpCount = (commParam->count + ccuParam_.rankNum - 1) / ccuParam_.rankNum;
     uint64_t sliceCount = (ccuParam_.rankId == ccuParam_.rankNum - 1) ?
                               (commParam->count - (ccuParam_.rankNum - 1) * tmpCount) :
                               tmpCount;
-    uint64_t sliceSize = sliceCount * DATA_TYPE_MAP[commParam->dataType];
+    uint64_t mySliceSize = sliceCount * DATA_TYPE_MAP[commParam->dataType];
 
     xnData_[3] = ccuParam_.scratchAddr;
     uint64_t rankSliceOffset =
-        ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
+        ccuParam_.rankId * ((commParam->strideCount == 0) ? mySliceSize : (commParam->strideCount * dataSize));
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient CcuPrepareForAllReduceM2M scratchAddr:0x%llx, rankSliceOffset:%d",
         ccuParam_.scratchAddr, rankSliceOffset);
     xnData_[4] = rankSliceOffset;
     xnData_[5] = rankSliceOffset;
 
-    uint64_t normalSliceCount =
-        (commParam->count + ccuParam_.rankNum - 1) / ccuParam_.rankNum; // count/rankNum 向上取整
-    uint64_t normalSliceSize = normalSliceCount * dataSize;
-    uint64_t normalRankCount = commParam->count / normalSliceCount;
-    uint64_t lastSliceSize = 0;
-    if (normalRankCount == ccuParam_.rankNum) {
-        lastSliceSize = (commParam->count * dataSize) - ((normalRankCount - 1) * normalSliceSize);
-    } else {
-        lastSliceSize = (commParam->count * dataSize) - (normalRankCount * normalSliceSize);
-    }
+    constexpr uint64_t scratchSize = 16 * 1024 * 1024;
+    constexpr uint64_t minSliceAlign = 128;
+    uint64_t chunkSize = scratchSize / ccuParam_.rankNum / minSliceAlign * minSliceAlign;
+    uint64_t fullChunkCount = mySliceSize == 0 ? 0 : (mySliceSize - 1) / chunkSize;
+    xnData_[6] = chunkSize;
+    xnData_[7] = mySliceSize - fullChunkCount * chunkSize;
+    xnData_[8] = UINT64_MAX - fullChunkCount;
     KERNEL_LOG(
-        KERNEL_INFO, "ApiClient CcuPrepareForAllReduceM2M normalSliceSize:%d, lastSliceSize:%d", normalSliceSize,
-        lastSliceSize);
-
-    xnData_[6] = normalSliceSize;
-    xnData_[7] = lastSliceSize;
-    xnData_[8] = ccuParam_.rankId < normalRankCount ? normalSliceSize : lastSliceSize;
-    xnData_[9] = ccuParam_.rankId * normalSliceSize;
+        KERNEL_INFO, "AR chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n",
+        mySliceSize, chunkSize, fullChunkCount, xnData_[7], xnData_[8]);
+    xnData_[9] = ccuParam_.rankId * tmpCount * dataSize;
     xnData_[10] = 0; // input output not equals
-    if (ccuParam_.rankId == ccuParam_.rankNum - 1) {
-        CalcGoSize(lastSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11]);
-    } else {
-        CalcGoSize(normalSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11]);
-    }
+    xnData_[11] = 0;
+    xnData_[12] = 0;
+    xnData_[13] = 0;
+    xnData_[14] = 0;
 }
 
 template <const auto& config>
