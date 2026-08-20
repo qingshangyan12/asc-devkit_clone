@@ -110,14 +110,14 @@ __simd_vf__ inline void DequantPerchannelVFImpl(
             Reg::LoadAlign<int32_t, Reg::LoadDist::DIST_NORM>(s32vreg, srcUb + i * N + j * sregLower);
 
             Reg::Cast<float, int32_t, MrgZRndA>(f32vreg, s32vreg, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             if constexpr (SupportType<scaleT, bfloat16_t>()) {
                 Reg::LoadAlign<bfloat16_t, Reg::LoadDist::DIST_UNPACK_B16>(scaleVreg, scaleUb + j * sregLower);
                 Reg::Cast<float, bfloat16_t, layoutZMrgZ>(scaleB32Vreg, scaleVreg, preg); // bf16->fp32
             } else {
 #endif
                 Reg::LoadAlign<float, Reg::LoadDist::DIST_NORM>(scaleB32Vreg, scaleUb + j * sregLower);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             }
 #endif
 
@@ -166,7 +166,7 @@ __simd_vf__ inline void DequantPertensorVFImpl(
     Reg::MaskReg preg;
     Reg::RegTensor<int32_t> s32vreg;
     Reg::RegTensor<float> f32vreg;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
     Reg::RegTensor<bfloat16_t> b16vreg;
 #endif
 
@@ -179,17 +179,17 @@ __simd_vf__ inline void DequantPertensorVFImpl(
             preg = Reg::UpdateMask<uint32_t>(sreg);
             Reg::LoadAlign<int32_t, Reg::LoadDist::DIST_NORM>(s32vreg, srcUb + i * N + j * sregLower);
             Reg::Cast<float, int32_t, MrgZRndA>(f32vreg, s32vreg, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             if constexpr (SupportType<scaleT, bfloat16_t>()) {
                 Reg::Muls(f32vreg, f32vreg, ToFloat(deqScale), preg);
             } else {
 #endif
                 Reg::Muls(f32vreg, f32vreg, deqScale, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             if constexpr (SupportType<dstT, bfloat16_t>()) {
                 Reg::Cast<bfloat16_t, float, LayoutZMrgZRndRSatS>(b16vreg, f32vreg, preg);
                 Reg::StoreAlign<bfloat16_t, Reg::StoreDist::DIST_PACK_B32>(
@@ -198,7 +198,7 @@ __simd_vf__ inline void DequantPertensorVFImpl(
 #endif
                 Reg::StoreAlign<float, Reg::StoreDist::DIST_NORM_B32>(
                     dstUb + i * dstInner + j * sregLower, f32vreg, preg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             }
 #endif
         }

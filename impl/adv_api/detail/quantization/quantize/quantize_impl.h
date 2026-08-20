@@ -36,14 +36,14 @@ __aicore__ inline void CheckApiDtypeValid()
     static_assert(
         SupportType<
             Tuple<SrcT, ScaleT, DstT>, Tuple<half, half, fp8_e4m3fn_t>, Tuple<half, half, fp8_e5m2_t>
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             ,
             Tuple<bfloat16_t, bfloat16_t, fp8_e4m3fn_t>, Tuple<bfloat16_t, bfloat16_t, fp8_e5m2_t>
 #endif
             ,
             Tuple<float, float, fp8_e4m3fn_t>, Tuple<float, float, fp8_e5m2_t>, Tuple<half, float, fp8_e4m3fn_t>,
             Tuple<half, float, fp8_e5m2_t>
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             ,
             Tuple<bfloat16_t, float, fp8_e4m3fn_t>, Tuple<bfloat16_t, float, fp8_e5m2_t>, Tuple<half, half, hifloat8_t>,
             Tuple<bfloat16_t, bfloat16_t, hifloat8_t>, Tuple<bfloat16_t, bfloat16_t, int8_t>,
@@ -53,14 +53,14 @@ __aicore__ inline void CheckApiDtypeValid()
             ,
             Tuple<half, half, int8_t>, Tuple<float, float, int8_t>, Tuple<half, float, int8_t>,
             Tuple<half, half, fp4x2_e1m2_t>, Tuple<half, half, fp4x2_e2m1_t>
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             ,
             Tuple<bfloat16_t, bfloat16_t, fp4x2_e1m2_t>, Tuple<bfloat16_t, bfloat16_t, fp4x2_e2m1_t>
 #endif
             ,
             Tuple<float, float, fp4x2_e1m2_t>, Tuple<float, float, fp4x2_e2m1_t>, Tuple<half, float, fp4x2_e1m2_t>,
             Tuple<half, float, fp4x2_e2m1_t>
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             ,
             Tuple<bfloat16_t, float, fp4x2_e1m2_t>, Tuple<bfloat16_t, float, fp4x2_e2m1_t>
 #endif
@@ -96,7 +96,7 @@ __simd_callee__ inline void TransRegForFp8(
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 template <typename DstT, typename ScaleT, const Reg::CastTrait& castTrait>
 __simd_callee__ inline void TransRegForHif8(
     Reg::RegTensor<ScaleT>& srcVreg, Reg::RegTensor<DstT>& dstVreg, Reg::MaskReg& mask)
@@ -137,7 +137,7 @@ template <typename DstT, typename ScaleT, const Reg::CastTrait& castTrait>
 __simd_callee__ inline void TransRegForS8(
     Reg::RegTensor<ScaleT>& srcVreg, Reg::RegTensor<DstT>& dstVreg, Reg::MaskReg& mask)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
     if constexpr (SupportType<ScaleT, bfloat16_t>()) {
         // bf16->fp32->s16->fp16->s8
         Reg::MaskReg mask1;
@@ -196,7 +196,7 @@ __simd_callee__ inline void TransRegForS8(
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 template <typename DstT, typename ScaleT, const Reg::CastTrait& castTrait>
 __simd_callee__ inline void TransRegForFp4(
     Reg::RegTensor<ScaleT>& vreg, Reg::RegTensor<DstT>& dstVreg, Reg::MaskReg& mask)
@@ -242,7 +242,7 @@ template <typename T>
 __simd_callee__ inline void GetPerGroupScale(
     __ubuf__ T* scaleUb, const int32_t start, const uint32_t groupSize, Reg::RegTensor<T>& scaleVreg)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
     if constexpr (SupportType<T, half, bfloat16_t>()) {
 #else
     if constexpr (SupportType<T, half>()) {
@@ -272,7 +272,7 @@ __simd_callee__ inline void GetPerGroupScaleToFloat(
     __ubuf__ T* scaleAddr, const int32_t start, const uint32_t groupSize, Reg::RegTensor<float>& floatVreg,
     Reg::RegTensor<T>& tempVreg, Reg::MaskReg& mask)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
     if constexpr (SupportType<T, half, bfloat16_t>()) {
 #else
     if constexpr (SupportType<T, half>()) {
@@ -289,7 +289,7 @@ template <typename T>
 __simd_callee__ inline void DuplicateScalarToFloatVector(
     Reg::RegTensor<float>& floatVreg, const T& scalar, Reg::RegTensor<T>& tempVreg, Reg::MaskReg& mask)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
     if constexpr (SupportType<T, half, bfloat16_t>()) {
 #else
     if constexpr (SupportType<T, half>()) {
@@ -307,7 +307,7 @@ __simd_callee__ inline void CastFp32DstToExpect(
 {
     if constexpr (SupportType<DstT, fp8_e4m3fn_t, fp8_e5m2_t>()) {
         QuantizeUtils::TransRegForFp8<DstT, float, castTrait>(srcVreg, dstVreg, mask);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
     } else if constexpr (IsSameType<DstT, hifloat8_t>::value) {
         QuantizeUtils::TransRegForHif8<DstT, float, castTrait>(srcVreg, dstVreg, mask);
 #endif
@@ -354,7 +354,7 @@ __simd_vf__ inline void QuantizePerGroupForKColCommonVF(
                 QuantizeUtils::GetPerGroupScaleToFloat(
                     offsetUb + i * scaleK, j * vecLen, params.groupSize, offsetVreg, tempOffsetVreg, fullMask);
             }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             if constexpr (SupportType<SrcT, half, bfloat16_t>()) {
 #else
             if constexpr (SupportType<SrcT, half>()) {
@@ -417,7 +417,7 @@ __simd_vf__ inline void QuantizePerGroupForKColFp4VF(
             mask = Reg::UpdateMask<float>(sreg);
             QuantizeUtils::GetPerGroupScaleToFloat(
                 scaleUb + i * scaleK, j * vecLen, params.groupSize, scaleVreg, tempScaleVreg, fullMask);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             if constexpr (SupportType<SrcT, half, bfloat16_t>()) {
 #else
             if constexpr (SupportType<SrcT, half>()) {
@@ -428,7 +428,7 @@ __simd_vf__ inline void QuantizePerGroupForKColFp4VF(
                 Reg::LoadAlign<SrcT, Reg::LoadDist::DIST_NORM>(srcVreg, srcUb + i * params.n + j * vecLen);
             }
             Reg::Mul(srcVreg, srcVreg, scaleVreg, mask);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             QuantizeUtils::TransRegForFp4<DstT, float, castTrait>(srcVreg, dstVreg, mask);
 #endif
             Reg::StoreAlign<uint8_t, Reg::StoreDist::DIST_PACK4_B32>(
@@ -465,13 +465,13 @@ __aicore__ inline void QuantizePerGroupForKCol(
     }
     QuantizeUtils::CheckApiDtypeValid<DstT, SrcT, ActualScaleT>();
     // fp16, fp32, bf16 -> fp8 should always cast to fp32
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
     if constexpr (SupportType<DstT, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t, int8_t>()) {
 #else
     if constexpr (SupportType<DstT, fp8_e4m3fn_t, fp8_e5m2_t, int8_t>()) {
 #endif
         QuantizePerGroupForKColCommon<config, DstT, SrcT, ScaleT, OffsetT>(dstTensor, srcTensor, scale, offset, params);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
     } else if constexpr (SupportType<DstT, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         QuantizePerGroupForKColFp4<config, DstT, SrcT, ScaleT>(dstTensor, srcTensor, scale, params);
 #endif
@@ -621,7 +621,7 @@ __simd_callee__ inline void QuantizePerGroupForKRowFp4OneRow(
             Reg::LoadAlign<SrcT, Reg::LoadDist::DIST_NORM>(srcVreg, srcAddr + j * vecLen);
         }
         Reg::Mul<float, Reg::MaskMergeMode::ZEROING>(srcVreg, srcVreg, scaleVreg, mask);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
         QuantizeUtils::TransRegForFp4<DstT, float, castTrait>(srcVreg, dstVreg, mask);
 #endif
         Reg::StoreAlign<uint8_t, Reg::StoreDist::DIST_PACK4_B32>(
@@ -689,13 +689,13 @@ __aicore__ inline void QuantizePerGroupForKRow(
     }
     QuantizeUtils::CheckApiDtypeValid<DstT, SrcT, ActualScaleT>();
     // fp16, fp32, bf16 -> fp8 should always cast to fp32
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
     if constexpr (SupportType<DstT, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t, int8_t>()) {
 #else
     if constexpr (SupportType<DstT, fp8_e4m3fn_t, fp8_e5m2_t, int8_t>()) {
 #endif
         QuantizePerGroupForKRowCommon<config, DstT, SrcT, ScaleT, OffsetT>(dstTensor, srcTensor, scale, offset, params);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
     } else if constexpr (SupportType<DstT, fp4x2_e2m1_t, fp4x2_e1m2_t>()) {
         QuantizePerGroupForKRowFp4<config, DstT, SrcT, ScaleT>(dstTensor, srcTensor, scale, params);
 #endif
@@ -731,7 +731,7 @@ __simd_vf__ inline void QuantizePerTokenCommonVF(
         QuantizeUtils::DuplicateScalarToFloatVector<ActualScaleT>(offsetVreg, offset, tempOffsetVreg, fullMask);
     }
     for (uint16_t i = 0; i < rowNum; ++i) {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
         if constexpr (SupportType<ActualScaleT, half, bfloat16_t>()) {
 #else
         if constexpr (SupportType<ActualScaleT, half>()) {
@@ -751,7 +751,7 @@ __simd_vf__ inline void QuantizePerTokenCommonVF(
         uint32_t sreg = params.n;
         for (uint16_t j = 0; j < repeat; ++j) {
             mask = Reg::UpdateMask<float>(sreg);
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             if constexpr (SupportType<SrcT, half, bfloat16_t>()) {
 #else
             if constexpr (SupportType<SrcT, half>()) {
@@ -984,14 +984,14 @@ __aicore__ inline void CheckQuantizeParams(
         CheckTensorPosition(offset, "offset", "VECIN/VECOUT/VECCALC");
     }
     static_assert(
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
         SupportType<SrcT, half, float, bfloat16_t>(), "Quantize only support half/float/bfloat16_t input dtype");
 #else
         SupportType<SrcT, half, float>(), "Quantize only support half/float input dtype");
 #endif
     if constexpr (TypeUtils::IsInnerDefaultType<ScaleT>()) {
         static_assert(
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             SupportType<ScaleT, half, float, bfloat16_t>(), "Quantize only support half/float/bfloat16_t scale dtype");
 #else
             SupportType<ScaleT, half, float>(), "Quantize only support half/float scale dtype");
@@ -999,7 +999,7 @@ __aicore__ inline void CheckQuantizeParams(
     } else {
         using ActualScaleT = typename ScaleT::PrimType;
         static_assert(
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             SupportType<ActualScaleT, half, float, bfloat16_t>(),
             "Quantize only support half/float/bfloat16_t scale dtype");
 #else
@@ -1026,7 +1026,7 @@ __aicore__ inline void QuantizeImpl(
     ASCENDC_ASSERT((params.n % GetDataBlockSizeInBytes() == 0), { KERNEL_LOG(KERNEL_ERROR, "n must be 32B aligned"); });
     if constexpr (config.policy == QuantizePolicy::PER_TENSOR) {
         static_assert(
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             SupportType<DstT, int8_t, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t>(),
             "Quantize PerTensor only support int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t output dtype");
 #else
@@ -1036,7 +1036,7 @@ __aicore__ inline void QuantizeImpl(
         QuantizePerTensor<config, DstT, SrcT, ScaleT, OffsetT>(dstTensor, srcTensor, scale, offset, params);
     } else if constexpr (config.policy == QuantizePolicy::PER_CHANNEL) {
         static_assert(
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             SupportType<DstT, int8_t, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t>(),
             "Quantize PerChannel only support int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t output dtype");
 #else
@@ -1046,7 +1046,7 @@ __aicore__ inline void QuantizeImpl(
         QuantizePerChannel<config, DstT, SrcT, ScaleT, OffsetT>(dstTensor, srcTensor, scale, offset, params);
     } else if constexpr (config.policy == QuantizePolicy::PER_TOKEN) {
         static_assert(
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             SupportType<DstT, int8_t, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t>(),
             "Quantize PerToken only support int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t output dtype");
 #else
@@ -1056,7 +1056,7 @@ __aicore__ inline void QuantizeImpl(
         QuantizePerToken<config, DstT, SrcT, ScaleT, OffsetT>(dstTensor, srcTensor, scale, offset, params);
     } else if constexpr (config.policy == QuantizePolicy::PER_GROUP) {
         static_assert(
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3003) && (__NPU_ARCH__ != 3113)
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             SupportType<DstT, int8_t, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t, fp4x2_e2m1_t, fp4x2_e1m2_t>(),
             "Quantize PerGroup only support "
             "int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t/fp4x2_e2m1_t/fp4x2_e1m2_t output dtype");
