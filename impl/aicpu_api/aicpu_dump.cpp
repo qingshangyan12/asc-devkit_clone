@@ -68,6 +68,7 @@ constexpr uint32_t FIFO_MAX_WAIT_ITERS = 15U;
 
 /* ── FIFO protocol structures ───────────────────────────────────────── */
 
+#pragma pack(push, 1)
 struct AicpuPrintfMemInfo {
     uint64_t printfMemAddr = 0U;
     uint32_t printfMemSize = 0U;
@@ -88,6 +89,7 @@ struct AicpuDfxInfo {
     uint64_t attrs = 0U;
     uint64_t numAttrs = 0U;
 };
+#pragma pack(pop)
 
 struct BlockRingBufInfo {
     uint32_t length = 0U;       // total size per block (include head and r/w info)
@@ -218,13 +220,7 @@ inline uint32_t CalcTlvLen(uint32_t strLen)
 
 inline uint64_t GetFreeRingBufLen(uint64_t rOff, uint64_t wOff, uint32_t ringBufLen)
 {
-    if (wOff == rOff) {
-        return ringBufLen;
-    } else if (wOff > rOff) {
-        return (ringBufLen - wOff) + rOff;
-    } else {
-        return rOff - wOff;
-    }
+    return (wOff - rOff < ringBufLen) ? (ringBufLen - (wOff - rOff)) : 0;
 }
 
 inline bool AicpuRingbufWait(RingBufReadInfo* readInfo, RingBufWriteInfo* writeInfo,
@@ -362,15 +358,11 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     }
     // 2. atomically reserve space.
     RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockInfo);
-    uint64_t wOff = writeInfo->bufOffset;
-    uint32_t tailSpace = ringBufLen - static_cast<uint32_t>(wOff);
+    uint64_t oriBufOff = writeInfo->bufOffset;
+    uint64_t newBufOff = oriBufOff + tlvLen;
+    uint32_t wOffLimited = static_cast<uint32_t>(oriBufOff) % ringBufLen;
+    uint32_t tailSpace = ringBufLen - wOffLimited;
     bool needSplit = (tlvLen > tailSpace);
-    uint64_t newBufOff;
-    if (needSplit) {
-        newBufOff = static_cast<uint64_t>(tlvLen) - tailSpace;
-    } else {
-        newBufOff = wOff + tlvLen;
-    }
     // 3. prepare PrintInfo header
     PrintfInfo infoHead;
     infoHead.printfType   = PRINT_TYPE_WRITING;
@@ -382,12 +374,12 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     //    This ensures rts sees WRITING (not stale READY) when it notices
     //    bufOffset has advanced, causing it to stop reading this round.
     if (!needSplit) {
-        (void)memcpy(ringBase + wOff, &infoHead, sizeof(PrintfInfo));
+        (void)memcpy(ringBase + wOffLimited, &infoHead, sizeof(PrintfInfo));
     } else {
         // Split: header may span tail/head boundary, write byte-by-byte.
         const uint8_t* headBytes = reinterpret_cast<const uint8_t*>(&infoHead);
         for (uint32_t i = 0U; i < sizeof(PrintfInfo); ++i) {
-            ringBase[(static_cast<uint32_t>(wOff) + i) % ringBufLen] = headBytes[i];
+            ringBase[(wOffLimited + i) % ringBufLen] = headBytes[i];
         }
     }
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
@@ -397,8 +389,8 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     // 6. Write the formatted string into the ringbuf.
     if (!needSplit) {
         // header already written, write formatted string directly
-        char* strDest = reinterpret_cast<char*>(ringBase + wOff + sizeof(PrintfInfo));
-        size_t destMax = ringBufLen - static_cast<size_t>(wOff) - sizeof(PrintfInfo);
+        char* strDest = reinterpret_cast<char*>(ringBase + wOffLimited + sizeof(PrintfInfo));
+        size_t destMax = ringBufLen - wOffLimited - sizeof(PrintfInfo);
         size_t count = (strLen < destMax) ? strLen : (destMax - 1U);
         (void)vsnprintf_s(strDest, destMax, count, fmt, otherArgs);
     } else {
@@ -408,7 +400,7 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
         // 3. Copy the temp buffer to ringbuf in two parts: tail then head.
         uint8_t* tempBuf = g_fifoTempBuf.Get(ringBufLen);
         if (tempBuf == nullptr) {
-            RollbackWriteInfo(writeInfo, wOff);
+            RollbackWriteInfo(writeInfo, oriBufOff);
             return;
         }
         // Write header to temp buffer.
@@ -422,7 +414,7 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
         // (Overwrites the byte-by-byte header written above with identical content.)
         uint32_t part1 = tailSpace;
         uint32_t part2 = tlvLen - part1;
-        (void)memcpy(ringBase + static_cast<uint32_t>(wOff), tempBuf, part1);
+        (void)memcpy(ringBase + wOffLimited, tempBuf, part1);
         (void)memcpy(ringBase, tempBuf + part1, part2);
     }
 /* ── Step 7: Release the entry to the rts reader ─────────────────── */
@@ -431,7 +423,7 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     uint32_t readyType = PRINT_TYPE_READY;
     if (!needSplit) {
         /* Non-split: entry is contiguous, typeField is aligned. */
-        uint32_t* typeField = reinterpret_cast<uint32_t*>(ringBase + wOff);
+        uint32_t* typeField = reinterpret_cast<uint32_t*>(ringBase + wOffLimited);
         __atomic_store_n(typeField, readyType, __ATOMIC_SEQ_CST);
     } else {
         /* Split: wOff may be unaligned or the type field may span
@@ -439,7 +431,7 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
          * wrap-around to handle both cases. */
         const uint8_t* src = reinterpret_cast<const uint8_t*>(&readyType);
         for (uint32_t i = 0U; i < sizeof(uint32_t); ++i) {
-            ringBase[(static_cast<uint32_t>(wOff) + i) % ringBufLen] = src[i];
+            ringBase[(wOffLimited + i) % ringBufLen] = src[i];
         }
         __atomic_thread_fence(__ATOMIC_SEQ_CST);
     }
