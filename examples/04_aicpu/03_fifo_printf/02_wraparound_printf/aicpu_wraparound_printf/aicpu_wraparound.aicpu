@@ -1,0 +1,47 @@
+/**
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/* !
+ * \file aicpu_wraparound.aicpu
+ * \brief AICPU 大量 printf 回绕样例
+ *
+ * 默认 ringbuf 大小为 32KB。本样例持续输出大量 printf，
+ * 当写入数据累计超过 32KB 时会触发 ringbuf 回绕（split-write）。
+ * rts 读端需要持续消费数据，否则 WaitForRts 会在超时后丢弃。
+ */
+
+#include "aicpu_api.h"
+#include "kernel_args.h"
+
+__global__ __aicpu__ uint32_t WraparoundPrintfKernel(KernelInfo::WrapArgs args)
+{
+    AscendC::printf("WraparoundPrintfKernel start, totalPrints=%u strLen=%u\n",
+                    args.totalPrints, args.strLen);
+
+    // 构造一个固定长度的填充字符串，用于控制每条 printf 的总长度
+    // 每条 entry = PrintfInfo(24字节) + 字符串 + NUL，对齐到8字节
+    // 当 strLen=200 时，每条约 232 字节
+    // 32KB ringbuf 纄可容 140 条，第 141 条开始回绕
+    char pad[256];
+    for (uint32_t i = 0; i < args.strLen && i < sizeof(pad) - 1; ++i) {
+        pad[i] = 'A' + (i % 26);
+    }
+    pad[args.strLen < sizeof(pad) ? args.strLen : sizeof(pad) - 1] = '\0';
+
+    for (uint32_t i = 0; i < args.totalPrints; ++i) {
+        AscendC::printf("[%u] %s\n", i, pad);
+        if (i % args.batchSize == args.batchSize - 1) {
+            AscendC::printf("=== batch %u done ===\n", i / args.batchSize);
+        }
+    }
+
+    AscendC::printf("WraparoundPrintfKernel done, totalPrints=%u\n", args.totalPrints);
+    return 0;
+}

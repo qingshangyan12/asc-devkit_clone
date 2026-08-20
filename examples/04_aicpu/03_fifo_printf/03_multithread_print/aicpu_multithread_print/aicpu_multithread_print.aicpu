@@ -1,0 +1,33 @@
+/**
+* Copyright (c) 2025 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/* !
+ * \file aicpu_multithread_print.aicpu
+ * \brief AICPU 多线程执行同一打印算子样例的内核
+ *        多个 host 线程同时下发本内核到不同 stream，内核内执行 printf
+ */
+
+#include "aicpu_api.h"
+#include "kernel_args.h"
+
+__global__ __aicpu__ uint32_t MultiThreadPrintKernel(KernelInfo::KernelArgs args)
+{
+    AscendC::printf("MultiThreadPrintKernel start, threadNum=%u\n", args.threadNum);
+
+    for (uint32_t i = 0; i < args.threadNum; ++i) {
+        uint32_t count = args.args[i].printCount;
+        for (uint32_t j = 0; j < count; ++j) {
+            AscendC::printf("[thread %u] print %u: hello from aicpu\n", i, j);
+        }
+    }
+
+    AscendC::printf("MultiThreadPrintKernel done\n");
+    return 0;
+}
