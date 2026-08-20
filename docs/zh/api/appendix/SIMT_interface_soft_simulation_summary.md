@@ -137,7 +137,6 @@
 | [asc_atomic_sub](../SIMT-API/atomic_operations/asc_atomic_sub.md) | half、bfloat16_t | int32_t、uint32_t、float、int64_t、uint64_t、half2、bfloat16x2_t |
 | [asc_atomic_xor](../SIMT-API/atomic_operations/asc_atomic_xor.md) | - | int32_t、uint32_t、int64_t、uint64_t |
 
-
 ## 同步与内存栅栏
 
 ### 内存栅栏接口
