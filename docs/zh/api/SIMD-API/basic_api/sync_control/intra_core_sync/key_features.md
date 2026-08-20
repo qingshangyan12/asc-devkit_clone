@@ -215,7 +215,10 @@ TPipe-TQue框架编程范式插入的同步并没有单独的日志功能，但�
 
 基于TPipe-TQue框架编程范式的Add向量加法的样例中，开启NPU仿真模式后，在build目录下查看vector核0的指令日志（`core0.veccore0.instr_log.dump`）片段如下：
 
-<!-- npu="910b" id10 -->
+<!-- npu="A3,910b" id10 -->
+> [!NOTE]说明
+> 以下日志片段及对应分析仅针对[NPU架构2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)成立。
+
 ```text
 [info] [00002009] (PC: 0x10d0d378) MTE2     : (Binary: 0x40a210bc) SET_FLAG  PIPE:MTE2, TRIGGER PIPE:VEC, FLAG ID:0, 
 [info] [00002009] (PC: 0x10d0d380) MTE2     : (Binary: 0x40a210b4) SET_FLAG  PIPE:MTE2, TRIGGER PIPE:VEC, FLAG ID:1, 
@@ -233,6 +236,7 @@ TPipe-TQue框架编程范式插入的同步并没有单独的日志功能，但�
 ```
 
 以上日志片段大致与Add向量加法样例的如下代码片段对应，日志中`MOV_OUT_TO_UB`对应`DataCopy`（源地址GM、目的地址UB）、`SET_FLAG`对应`SetFlag`、`WAIT_FLAG`对应`WaitFlag`、`VADD`对应`Add`，从日志中序号为00002009、00002010和00002011的条目可以看到，TPipe-TQue框架编程范式在PIPE_MTE2和PIPE_V之间自动插入了`SetFlag`和`WaitFlag`指令。
+<!-- end id10 -->
 
 ```cpp
 AscendC::LocalTensor<float> xLocal = inQueueX.AllocTensor<float>();
@@ -248,7 +252,6 @@ yLocal = inQueueY.DeQue<float>();
 AscendC::LocalTensor<float> zLocal = outQueueZ.AllocTensor<float>();
 AscendC::Add(zLocal, xLocal, yLocal, blockLength);
 ```
-<!-- end id10 -->
 
 ### 毕昇编译器自动同步日志
 
