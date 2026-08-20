@@ -8,19 +8,20 @@ import numpy as np
 
 def gen_golden_data_simple():
     total_length = 256
-    register_length = 64
     data_type = np.float32
     src0 = np.arange(total_length, dtype=data_type)
     src1 = np.arange(1000, 1000 + total_length, dtype=data_type)
     dst0 = np.zeros(total_length, dtype=data_type)
     dst1 = np.zeros(total_length, dtype=data_type)
+    combined=[]
     for i in range(4):
         offset = i * 64
         tmp_src0 = src0[offset:64]
         tmp_src1 = src1[offset:64]
-        combined = np.concatenate((tmp_src0, tmp_src1))
-        dst0[offset] = combined[0::2]
-        dst1[offset] = combined[1::2]
+        combined = np.concatenate((combined, tmp_src0, tmp_src1))
+    
+    dst0 = combined[0::2]
+    dst1 = combined[1::2]
     
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
