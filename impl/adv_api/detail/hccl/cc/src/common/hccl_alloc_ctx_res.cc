@@ -312,6 +312,13 @@ HcclResult HcclAllocOpResCtx(
 HcclResult ConvertAlltoAllParam(
     const u64 recvCount, const u32 rankSize, std::vector<u64>& sdispls, std::vector<u64>& rdispls)
 {
+    CHK_PRT_RET(
+        (sdispls.size() < rankSize) || (rdispls.size() < rankSize),
+        HCCL_ERROR(
+            "[ConvertAlltoAllParam] displacement vector size is smaller than rank size, sdispls[%zu], "
+            "rdispls[%zu], rankSize[%u]",
+            sdispls.size(), rdispls.size(), rankSize),
+        HCCL_E_PARA);
     u64 dataCountOffset = 0;
     for (u64 i = 0; i < rankSize; i++) {
         sdispls[i] = dataCountOffset;
