@@ -399,7 +399,7 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
     Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
     void* opResCtx = nullptr;
-    HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
+    HcclResult ret = HcclAllocComResourceByTilingV2(comm_, stream_, &tiling, sizeof(tiling), &opResCtx);
     EXPECT_EQ(ret, HCCL_SUCCESS);
     ASSERT_NE(opResCtx, nullptr);
     OpResCtx* ctx = static_cast<OpResCtx*>(opResCtx);
@@ -411,6 +411,61 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
     EXPECT_NE(ctx->ckeAddr, 0U);
     EXPECT_EQ(ctx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuAllGatherMeshMem2Mem1D));
+}
+
+TEST(CcuMc2TilingBoundaryTest, AcceptsValidSizeDelimitedTiling)
+{
+    const uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1U, COMM_ENGINE_AICPU, opTypes, nullptr);
+    const void* tilingList[Hccl::MC2_MAX_OP_NUM] = {};
+    uint32_t tilingNum = 0U;
+
+    ASSERT_EQ(HcclGetTilingList(&tiling, sizeof(tiling), tilingList, tilingNum), HCCL_SUCCESS);
+    EXPECT_EQ(tilingNum, 1U);
+    EXPECT_EQ(tilingList[0], &tiling.ccTiling[0]);
+}
+
+TEST(CcuMc2TilingBoundaryTest, RejectsTruncatedBaseHeader)
+{
+    uint32_t version = INIT_TILING_VERSION;
+    const void* tilingList[Hccl::MC2_MAX_OP_NUM] = {};
+    uint32_t tilingNum = 0U;
+
+    EXPECT_EQ(HcclGetTilingList(&version, sizeof(version), tilingList, tilingNum), HCCL_E_PARA);
+}
+
+TEST(CcuMc2TilingBoundaryTest, RejectsTruncatedOffsetTable)
+{
+    const uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1U, COMM_ENGINE_AICPU, opTypes, nullptr);
+    const void* tilingList[Hccl::MC2_MAX_OP_NUM] = {};
+    uint32_t tilingNum = 0U;
+
+    EXPECT_EQ(
+        HcclGetTilingList(&tiling, offsetof(Mc2TilingTestData, ccTiling) - 1U, tilingList, tilingNum),
+        HCCL_E_PARA);
+}
+
+TEST(CcuMc2TilingBoundaryTest, RejectsUnalignedTilingOffset)
+{
+    const uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1U, COMM_ENGINE_AICPU, opTypes, nullptr);
+    ++tiling.offset[0];
+    const void* tilingList[Hccl::MC2_MAX_OP_NUM] = {};
+    uint32_t tilingNum = 0U;
+
+    EXPECT_EQ(HcclGetTilingList(&tiling, sizeof(tiling), tilingList, tilingNum), HCCL_E_PARA);
+}
+
+TEST(CcuMc2TilingBoundaryTest, RejectsTilingObjectPastBufferEnd)
+{
+    const uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1U, COMM_ENGINE_AICPU, opTypes, nullptr);
+    tiling.offset[0] = sizeof(tiling) - sizeof(Mc2CcTilingInner) + alignof(Mc2CcTilingInner);
+    const void* tilingList[Hccl::MC2_MAX_OP_NUM] = {};
+    uint32_t tilingNum = 0U;
+
+    EXPECT_EQ(HcclGetTilingList(&tiling, sizeof(tiling), tilingList, tilingNum), HCCL_E_PARA);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuAlgorithmNotRegistered)

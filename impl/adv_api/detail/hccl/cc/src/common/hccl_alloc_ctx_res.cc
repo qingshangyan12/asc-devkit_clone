@@ -9,6 +9,8 @@
  */
 #include "hccl_alloc_ctx_res.h"
 
+#include <limits>
+
 using namespace mc2_ops_hccl;
 using namespace hcomm::CcuRep;
 
@@ -53,18 +55,42 @@ HcclResult CheckInputParam(const HcclComm comm, const void* mc2Tiling, const acl
     return HCCL_SUCCESS;
 }
 
-HcclResult HcclGetTilingList(const void* mc2Tiling, const void* p[], uint32_t& cnt)
+HcclResult HcclGetTilingList(const void* mc2Tiling, uint64_t mc2TilingSize, const void* p[], uint32_t& cnt)
 {
+    constexpr uint64_t baseHeaderSize = sizeof(u32) * 2U;
+    constexpr uint64_t offsetTableEnd = baseHeaderSize + sizeof(u32) * MAX_CC_TILING_NUM;
+    constexpr uint64_t tilingHeaderSize = offsetTableEnd + sizeof(Mc2ServerCfg);
+    CHK_PRT_RET(
+        mc2Tiling == nullptr || mc2TilingSize < baseHeaderSize,
+        HCCL_ERROR("Invalid tiling buffer, addr[%p], size[%llu].", mc2Tiling, mc2TilingSize), HCCL_E_PARA);
+
     const u32* versionPtr = static_cast<const u32*>(mc2Tiling);
     const u32 version = *(versionPtr++);
     CHK_PRT_RET(version < MC2_TILING_VERSION, HCCL_ERROR("Invalid tiling version %u.", version), HCCL_E_PARA);
 
     cnt = *(versionPtr++);
     CHK_PRT_RET(cnt > MAX_HCOM_NUM, HCCL_ERROR("Invalid hcom tiling number %u.", cnt), HCCL_E_PARA);
+    CHK_PRT_RET(
+        mc2TilingSize < tilingHeaderSize,
+        HCCL_ERROR("Invalid tiling size %llu, header requires at least %llu bytes.", mc2TilingSize, tilingHeaderSize),
+        HCCL_E_PARA);
 
-    u64 serverCfgAddr = reinterpret_cast<u64>(versionPtr) + sizeof(Mc2ServerCfg);
     for (uint32_t i = 0U; i < MAX_CC_TILING_NUM; ++i) {
-        p[i] = reinterpret_cast<const void*>(reinterpret_cast<const u8*>(mc2Tiling) + versionPtr[i]);
+        p[i] = nullptr;
+    }
+    for (uint32_t i = 0U; i < cnt; ++i) {
+        const uint64_t offset = versionPtr[i];
+        CHK_PRT_RET(
+            offset < tilingHeaderSize || offset % alignof(Mc2CcTilingInner) != 0U,
+            HCCL_ERROR("Invalid hcom tiling offset[%u]=%llu, header size[%llu].", i, offset, tilingHeaderSize),
+            HCCL_E_PARA);
+        CHK_PRT_RET(
+            offset > mc2TilingSize || sizeof(Mc2CcTilingInner) > mc2TilingSize - offset,
+            HCCL_ERROR(
+                "Hcom tiling offset[%u]=%llu with object size[%zu] exceeds buffer size[%llu].", i, offset,
+                sizeof(Mc2CcTilingInner), mc2TilingSize),
+            HCCL_E_PARA);
+        p[i] = reinterpret_cast<const void*>(reinterpret_cast<const u8*>(mc2Tiling) + offset);
     }
     HCCL_INFO("HcclGetTilingList version[%u] cnt[%u]", version, cnt);
     return HCCL_SUCCESS;
@@ -212,26 +238,47 @@ HcclResult AllocOpParamMemory(
     const Mc2InitTilingInner* initTiling, const void* ccTilingList[], OpResCtx& resCtx)
 {
     std::vector<uint64_t> opParamAddr(opParamVec.size());
-    uint64_t opParamSize = sizeof(OpParam);
     for (uint32_t i = 0U; i < opParamVec.size(); ++i) {
+        CHK_PRT_RET(
+            opParamVec[i].varMemSize > std::numeric_limits<size_t>::max() - sizeof(OpParam),
+            HCCL_ERROR("OpParam[%u] variable memory size[%llu] overflows serialized size.", i,
+                       static_cast<unsigned long long>(opParamVec[i].varMemSize)),
+            HCCL_E_PARA);
+        const size_t opParamSize = sizeof(OpParam) + static_cast<size_t>(opParamVec[i].varMemSize);
+        std::vector<uint8_t> serializedOpParam(opParamSize, 0U);
+        CHK_PRT_RET(
+            memcpy_s(serializedOpParam.data(), serializedOpParam.size(), &opParamVec[i], sizeof(OpParam)) != EOK,
+            HCCL_ERROR("Serialize OpParam[%u] fixed header failed.", i), HCCL_E_MEMORY);
+
         std::string tagParam = ctxTag + "_" + std::to_string(i);
         void* opParamPtr = nullptr;
+        uint64_t allocatedOpParamSize = opParamSize;
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         CommEngine commEngine = OpExecuteConfigToCommEngine(ccTiling->commEngine);
-        if (HcclEngineCtxGet(comm, tagParam.c_str(), commEngine, &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
+        if (HcclEngineCtxGet(comm, tagParam.c_str(), commEngine, &opParamPtr, &allocatedOpParamSize) == HCCL_SUCCESS) {
+            CHK_PRT_RET(
+                allocatedOpParamSize < opParamSize,
+                HCCL_ERROR(
+                    "Existing OpParam[%u] allocation size[%llu] is smaller than required size[%llu].", i,
+                    static_cast<unsigned long long>(allocatedOpParamSize),
+                    static_cast<unsigned long long>(opParamSize)),
+                HCCL_E_MEMORY);
             HCCL_INFO(
-                "HcclEngineCtxGet success, tagParam[%s], opParamAddr[%p], opParamSize[%u]", tagParam.c_str(),
-                opParamPtr, opParamSize);
+                "HcclEngineCtxGet success, tagParam[%s], opParamAddr[%p], opParamSize[%llu]", tagParam.c_str(),
+                opParamPtr, static_cast<unsigned long long>(allocatedOpParamSize));
             opParamAddr[i] = reinterpret_cast<uint64_t>(opParamPtr);
         } else {
             CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), commEngine, opParamSize, &opParamPtr));
             opParamAddr[i] = reinterpret_cast<uint64_t>(opParamPtr);
         }
         HCCL_INFO(
-            "HcclAllocOpResCtx the %dth opParam: opParamAddr[%u], opParamSize[%u]", i, opParamAddr[i], opParamSize);
+            "HcclAllocOpResCtx the %uth opParam: opParamAddr[%llu], opParamSize[%llu]", i,
+            static_cast<unsigned long long>(opParamAddr[i]), static_cast<unsigned long long>(opParamSize));
 
-        CHK_RET(HcclEngineCtxCopy(comm, commEngine, tagParam.c_str(), &opParamVec[i], opParamSize, 0));
+        CHK_RET(HcclEngineCtxCopy(
+            comm, commEngine, tagParam.c_str(), serializedOpParam.data(), serializedOpParam.size(), 0));
         resCtx.algInfo[i].opParam = opParamAddr[i];
+        resCtx.algInfo[i].opParamSize = static_cast<uint64_t>(opParamSize);
         resCtx.algInfo[i].offset = initTiling->offset[i];
     }
     return HCCL_SUCCESS;
@@ -312,6 +359,13 @@ HcclResult HcclAllocOpResCtx(
 HcclResult ConvertAlltoAllParam(
     const u64 recvCount, const u32 rankSize, std::vector<u64>& sdispls, std::vector<u64>& rdispls)
 {
+    CHK_PRT_RET(
+        (sdispls.size() < rankSize) || (rdispls.size() < rankSize),
+        HCCL_ERROR(
+            "[ConvertAlltoAllParam] displacement vector size is smaller than rank size, sdispls[%zu], "
+            "rdispls[%zu], rankSize[%u]",
+            sdispls.size(), rdispls.size(), rankSize),
+        HCCL_E_PARA);
     u64 dataCountOffset = 0;
     for (u64 i = 0; i < rankSize; i++) {
         sdispls[i] = dataCountOffset;
@@ -951,6 +1005,7 @@ HcclResult CopyCcuOpParamToDevice(
     aclError aclRet = aclrtMemcpy(opParamPtr, opParamSize, &opParam, opParamSize, ACL_MEMCPY_HOST_TO_DEVICE);
     CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
     opResCtx.algInfo[tilingIndex].opParam = reinterpret_cast<uint64_t>(opParamPtr);
+    opResCtx.algInfo[tilingIndex].opParamSize = opParamSize;
     opResCtx.algInfo[tilingIndex].offset = initTiling->offset[tilingIndex];
     HCCL_INFO(
         "[CcuSelectAlg] ccTiling[%u]: opParamAddr[%llu], offset[%u]", tilingIndex,

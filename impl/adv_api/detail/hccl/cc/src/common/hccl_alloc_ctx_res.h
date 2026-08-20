@@ -87,6 +87,7 @@ struct Mc2CcTilingInner {
 struct AlgInfo {
     uint64_t offset;
     uint64_t opParam;
+    uint64_t opParamSize;
 };
 
 struct OpResCtx {
@@ -132,7 +133,7 @@ CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine);
 
 HcclResult CheckInputParam(const HcclComm comm, const void* mc2Tiling, const aclrtStream stream);
 
-HcclResult HcclGetTilingList(const void* mc2Tiling, const void* p[], uint32_t& cnt);
+HcclResult HcclGetTilingList(const void* mc2Tiling, uint64_t mc2TilingSize, const void* p[], uint32_t& cnt);
 
 HcclResult CheckIsReduce(const Mc2CcTilingInner* ccTiling, bool* isReduce);
 

@@ -95,6 +95,17 @@ extern HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void* opArgs
 extern HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx);
 
+/**
+ * @brief Allocate communication resource by size-delimited MC2 Tiling data.
+ * @param comm A pointer identifying the communication resource based on.
+ * @param stream A pointer identifying the stream information.
+ * @param mc2Tiling MC2 tiling data structure containing algorithm configuration.
+ * @param mc2TilingSize Total size in bytes of mc2Tiling.
+ * @param opResCtx Output pointer to store the created communication context.
+ */
+extern HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTilingV2(
+    HcclComm comm, void* stream, void* mc2Tiling, uint64_t mc2TilingSize, void** opResCtx);
+
 extern CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx);
 
 #ifdef __cplusplus

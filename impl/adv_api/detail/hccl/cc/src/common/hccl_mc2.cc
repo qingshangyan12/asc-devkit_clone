@@ -19,6 +19,8 @@
 #include "hccl_ccu_res.h"
 #include "adapter_acl.h"
 
+#include <limits>
+
 using namespace mc2_ops_hccl;
 
 namespace {
@@ -321,7 +323,8 @@ HcclResult AllocComResourceByTilingCcu(
 }
 
 namespace {
-HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
+HcclResult HcclAllocComResourceByTilingImpl(
+    HcclComm comm, void* stream, void* mc2Tiling, uint64_t mc2TilingSize, void** opResCtx)
 {
     HCCL_RUN_INFO(
         "[MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
@@ -360,7 +363,7 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
 
     const void* ccTilingList[Hccl::MC2_MAX_OP_NUM];
     uint32_t tilingNum;
-    CHK_RET(HcclGetTilingList(mc2Tiling, ccTilingList, tilingNum));
+    CHK_RET(HcclGetTilingList(mc2Tiling, mc2TilingSize, ccTilingList, tilingNum));
 
     // 校验commengine
     uint8_t commEngine;
@@ -395,7 +398,15 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
 HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
-    return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+    HCCL_WARNING("HcclAllocComResourceByTiling cannot verify the tiling allocation size; use V2 for untrusted data.");
+    return HcclAllocComResourceByTilingImpl(
+        comm, stream, mc2Tiling, std::numeric_limits<uint64_t>::max(), opResCtx);
+}
+
+HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTilingV2(
+    HcclComm comm, void* stream, void* mc2Tiling, uint64_t mc2TilingSize, void** opResCtx)
+{
+    return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, mc2TilingSize, opResCtx);
 }
 
 extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTilingA5Mc2(
@@ -405,7 +416,8 @@ extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourc
         "[MC2_CLIENT_A5_AICPU] enter asc-devkit explicit A5 MC2 resource allocator, "
         "comm[%p], stream[%p], tiling[%p].",
         comm, stream, mc2Tiling);
-    return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+    return HcclAllocComResourceByTilingImpl(
+        comm, stream, mc2Tiling, std::numeric_limits<uint64_t>::max(), opResCtx);
 }
 
 namespace {
