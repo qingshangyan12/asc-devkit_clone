@@ -22,6 +22,34 @@ extern HcclResult LaunchOpenOpParamDataImpl(
     std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
 
 namespace {
+HcclResult ValidateSerializedOpParam(
+    const uint8_t* data, uint64_t availableSize, const char* bufferName,
+    const mc2_ops_hccl::OpParam*& param, size_t& serializedSize)
+{
+    if (data == nullptr || availableSize < sizeof(mc2_ops_hccl::OpParam)) {
+        HCCL_ERROR(
+            "%s size %llu is smaller than OpParam size %zu.", bufferName,
+            static_cast<unsigned long long>(availableSize), sizeof(mc2_ops_hccl::OpParam));
+        return HCCL_E_PARA;
+    }
+
+    param = reinterpret_cast<const mc2_ops_hccl::OpParam*>(data);
+    if (param->varMemSize > std::numeric_limits<size_t>::max() - sizeof(mc2_ops_hccl::OpParam)) {
+        HCCL_ERROR(
+            "%s variable memory size %llu overflows serialized size.", bufferName,
+            static_cast<unsigned long long>(param->varMemSize));
+        return HCCL_E_PARA;
+    }
+    serializedSize = sizeof(mc2_ops_hccl::OpParam) + static_cast<size_t>(param->varMemSize);
+    if (serializedSize > availableSize) {
+        HCCL_ERROR(
+            "%s serialized size %zu exceeds available size %llu.", bufferName, serializedSize,
+            static_cast<unsigned long long>(availableSize));
+        return HCCL_E_PARA;
+    }
+    return HCCL_SUCCESS;
+}
+
 u64 GetDataTypeSize(HcclDataType dataType)
 {
     switch (dataType) {
@@ -31,6 +59,7 @@ u64 GetDataTypeSize(HcclDataType dataType)
         case HCCL_DATA_TYPE_FP8E5M2:
         case HCCL_DATA_TYPE_FP8E4M3:
         case HCCL_DATA_TYPE_FP8E8M0:
+        case HCCL_DATA_TYPE_MXFP8:
             return 1U;
         case HCCL_DATA_TYPE_INT16:
         case HCCL_DATA_TYPE_UINT16:
@@ -53,23 +82,24 @@ u64 GetDataTypeSize(HcclDataType dataType)
 }
 } // namespace
 
-HcclResult LoadOpenOpParamData(uint64_t opParamKey, std::string& commName, std::vector<uint8_t>& opParam)
+HcclResult LoadOpenOpParamData(
+    uint64_t opParamKey, uint64_t opParamAllocationSize, std::string& commName, std::vector<uint8_t>& opParam)
 {
     if (opParamKey == 0U) {
         HCCL_ERROR("Invalid opParamKey %#llx.", opParamKey);
         return HCCL_E_PARA;
     }
 
-    const auto* param = reinterpret_cast<const mc2_ops_hccl::OpParam*>(opParamKey);
-    if (param == nullptr) {
-        HCCL_ERROR("Invalid opParamKey %#llx.", opParamKey);
-        return HCCL_E_PARA;
-    }
-
-    const size_t opParamSize = sizeof(mc2_ops_hccl::OpParam) + param->varMemSize;
-    const auto* begin = reinterpret_cast<const uint8_t*>(param);
+    const auto* begin = reinterpret_cast<const uint8_t*>(opParamKey);
+    const mc2_ops_hccl::OpParam* param = nullptr;
+    size_t opParamSize = 0U;
+    CHK_RET(ValidateSerializedOpParam(begin, opParamAllocationSize, "OpParam allocation", param, opParamSize));
     opParam.assign(begin, begin + opParamSize);
-    commName.assign(param->commName);
+    const char* commNameEnd = param->commName;
+    while (commNameEnd < param->commName + sizeof(param->commName) && *commNameEnd != '\0') {
+        ++commNameEnd;
+    }
+    commName.assign(param->commName, commNameEnd);
     HCCL_INFO(
         "[MC2_OPEN_DIAG][LoadOpenOpParamData] file[%s:%d], key %#llx, sizeof(OpParam) %zu, "
         "varMemSizeOffset %zu, varMemSize %llu, opParamSize %zu.",
@@ -98,7 +128,7 @@ HcclResult LoadOpenOpParamData(uint64_t opParamKey, std::string& commName, std::
     return HCCL_SUCCESS;
 }
 
-void CreateOpParamByBaseOpParam(
+HcclResult CreateOpParamByBaseOpParam(
     const std::vector<uint8_t>& baseOpParam, const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, uint32_t rankNum,
     void* stream, std::vector<uint8_t>& runOpParam)
 {
@@ -107,10 +137,11 @@ void CreateOpParamByBaseOpParam(
     const size_t opParamSize = sizeof(mc2_ops_hccl::OpParam) + baseParam->varMemSize;
     runOpParam.resize(opParamSize);
     auto* param = reinterpret_cast<mc2_ops_hccl::OpParam*>(runOpParam.data());
-    memcpy_s(param, sizeof(mc2_ops_hccl::OpParam), baseParam, sizeof(mc2_ops_hccl::OpParam));
+    CHK_SAFETY_FUNC_RET(memcpy_s(param, sizeof(mc2_ops_hccl::OpParam), baseParam, sizeof(mc2_ops_hccl::OpParam)));
 
     if (baseParam->varMemSize > 0) {
-        memcpy_s(param->varData, baseParam->varMemSize, baseParam->varData, baseParam->varMemSize);
+        CHK_SAFETY_FUNC_RET(
+            memcpy_s(param->varData, baseParam->varMemSize, baseParam->varData, baseParam->varMemSize));
     }
 
     param->inputPtr = reinterpret_cast<void*>(msg.sendBuffer);
@@ -155,6 +186,7 @@ void CreateOpParamByBaseOpParam(
     param->opType = static_cast<HcclCMDType>(msg.commType.prepareType);
     param->reduceType = static_cast<HcclReduceOp>(msg.opType);
     param->stream = stream;
+    return HCCL_SUCCESS;
 }
 
 inline void LocalPrintElseOpParam(uint32_t rankNum, uint32_t repeatIdx, std::vector<uint8_t>& runOpParam)
@@ -194,20 +226,24 @@ HcclResult FormatOpenOpParamDataFromMsg(
     const std::vector<uint8_t>& baseOpParam, const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, uint32_t rankNum,
     uint32_t repeatIdx, void* stream, std::vector<uint8_t>& runOpParam)
 {
-    if (baseOpParam.empty()) {
-        HCCL_ERROR("Base op param is empty.");
-        return HCCL_E_PARA;
-    }
-    auto* param = reinterpret_cast<mc2_ops_hccl::OpParam*>(runOpParam.data());
-    const auto* baseParam = reinterpret_cast<const mc2_ops_hccl::OpParam*>(baseOpParam.data());
+    CHK_PRT_RET(
+        !HcclApi::IsValidHcclMsgRankSize(rankNum), HCCL_ERROR("Invalid rank size %u.", rankNum), HCCL_E_PARA);
+    const mc2_ops_hccl::OpParam* baseParam = nullptr;
+    size_t baseOpParamSize = 0U;
+    CHK_RET(ValidateSerializedOpParam(
+        baseOpParam.data(), baseOpParam.size(), "Base OpParam", baseParam, baseOpParamSize));
+    (void)baseOpParamSize;
+    mc2_ops_hccl::OpParam* param = nullptr;
     if (repeatIdx == 0U) {
-        CreateOpParamByBaseOpParam(baseOpParam, msg, extMsg, rankNum, stream, runOpParam);
+        CHK_RET(CreateOpParamByBaseOpParam(baseOpParam, msg, extMsg, rankNum, stream, runOpParam));
         param = reinterpret_cast<mc2_ops_hccl::OpParam*>(runOpParam.data());
     } else {
-        if (runOpParam.empty()) {
-            HCCL_ERROR("Run op param is empty at repeat %u.", repeatIdx);
-            return HCCL_E_PARA;
-        }
+        const mc2_ops_hccl::OpParam* runParam = nullptr;
+        size_t runOpParamSize = 0U;
+        CHK_RET(ValidateSerializedOpParam(
+            runOpParam.data(), runOpParam.size(), "Run OpParam", runParam, runOpParamSize));
+        (void)runOpParamSize;
+        param = const_cast<mc2_ops_hccl::OpParam*>(runParam);
         if (param->opType == HCCL_CMD_ALLTOALLV || param->opType == HCCL_CMD_ALLTOALL) {
             for (u32 i = 0U; i < rankNum; ++i) {
                 extMsg.sendOffset[i] += extMsg.sendCounts[i];
