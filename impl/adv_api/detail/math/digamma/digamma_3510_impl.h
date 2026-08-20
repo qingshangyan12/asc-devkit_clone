@@ -74,6 +74,13 @@ __simd_callee__ inline void DigammaSelect(
     Reg::Add(dstReg, tmpReg, dstReg, fullMask);
 }
 
+__simd_callee__ inline void DigammaPositiveDiv(
+    Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& srcReg0, Reg::RegTensor<float>& srcReg1,
+    Reg::MaskReg& mask)
+{
+    Reg::Div(dstReg, srcReg0, srcReg1, mask);
+}
+
 __simd_callee__ inline void DigammaPositive(
     Reg::RegTensor<float>& dstReg, Reg::RegTensor<float>& srcReg, Reg::MaskReg& mask)
 {
@@ -86,7 +93,7 @@ __simd_callee__ inline void DigammaPositive(
     Reg::Adds(tmpReg1, srcReg, 10.0f, fullMask);
     Reg::Ln(dstReg, tmpReg1, fullMask);
     Reg::Duplicate(tmpScalarReg, 1.0f, fullMask);
-    Reg::Div(tmpReg1, tmpScalarReg, tmpReg1, fullMask);
+    DigammaPositiveDiv(tmpReg1, tmpScalarReg, tmpReg1, fullMask);
     Reg::Muls(tmpReg2, tmpReg1, 0.5f, fullMask);
     Reg::Sub(dstReg, dstReg, tmpReg2, fullMask);
     Reg::Mul(tmpReg1, tmpReg1, tmpReg1, fullMask);
@@ -114,33 +121,33 @@ __simd_callee__ inline void DigammaPositive(
 
     // Inline DigammaPositiveTmp1: accumulate the recurrence correction from srcReg to srcReg + 10.
     Reg::Duplicate(tmpScalarReg, 1.0f, fullMask);
-    Reg::Div(tmpReg1, tmpScalarReg, srcReg, fullMask);
+    DigammaPositiveDiv(tmpReg1, tmpScalarReg, srcReg, fullMask);
     Reg::Adds(tmpReg2, srcReg, tmp1CalcConst[0U], fullMask);
-    Reg::Div(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
+    DigammaPositiveDiv(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
     Reg::Add(tmpReg1, tmpReg1, tmpReg2, fullMask);
     Reg::Adds(tmpReg2, srcReg, tmp1CalcConst[1U], fullMask);
-    Reg::Div(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
+    DigammaPositiveDiv(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
     Reg::Add(tmpReg1, tmpReg1, tmpReg2, fullMask);
     Reg::Adds(tmpReg2, srcReg, tmp1CalcConst[2U], fullMask);
-    Reg::Div(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
+    DigammaPositiveDiv(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
     Reg::Add(tmpReg1, tmpReg1, tmpReg2, fullMask);
     Reg::Adds(tmpReg2, srcReg, tmp1CalcConst[3U], fullMask);
-    Reg::Div(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
+    DigammaPositiveDiv(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
     Reg::Add(tmpReg1, tmpReg1, tmpReg2, fullMask);
     Reg::Adds(tmpReg2, srcReg, tmp1CalcConst[4U], fullMask);
-    Reg::Div(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
+    DigammaPositiveDiv(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
     Reg::Add(tmpReg1, tmpReg1, tmpReg2, fullMask);
     Reg::Adds(tmpReg2, srcReg, tmp1CalcConst[5U], fullMask);
-    Reg::Div(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
+    DigammaPositiveDiv(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
     Reg::Add(tmpReg1, tmpReg1, tmpReg2, fullMask);
     Reg::Adds(tmpReg2, srcReg, tmp1CalcConst[6U], fullMask);
-    Reg::Div(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
+    DigammaPositiveDiv(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
     Reg::Add(tmpReg1, tmpReg1, tmpReg2, fullMask);
     Reg::Adds(tmpReg2, srcReg, tmp1CalcConst[7U], fullMask);
-    Reg::Div(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
+    DigammaPositiveDiv(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
     Reg::Add(tmpReg1, tmpReg1, tmpReg2, fullMask);
     Reg::Adds(tmpReg2, srcReg, tmp1CalcConst[8U], fullMask);
-    Reg::Div(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
+    DigammaPositiveDiv(tmpReg2, tmpScalarReg, tmpReg2, fullMask);
     Reg::Add(tmpReg1, tmpReg1, tmpReg2, fullMask);
     Reg::Sub(dstReg, dstReg, tmpReg1, mask);
 }
