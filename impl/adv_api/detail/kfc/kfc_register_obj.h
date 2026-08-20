@@ -179,7 +179,7 @@ __aicore__ inline void CountMatmulObj(AscendC::TPipe* tpipe, T& a, Args&&... b)
 
     if constexpr (sizeof...(b) == 0) {
         g_matmulCount++;
-    } else if constexpr (IsTilingObj<Args...>()) {
+    } else if constexpr (IsTilingObj<Args...>) {
         g_matmulCount++;
         CountMatmulObj(tpipe, b...);
     } else {
