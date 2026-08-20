@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
+set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 
 if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
@@ -21,10 +21,15 @@ find_package(ASC REQUIRED)
 project(basic_arithmetic_tensor_api LANGUAGES ASC CXX)
 
 add_executable(demo basic_arithmetic_tensor_api.asc)
-target_include_directories(demo PRIVATE
-    "$ENV{ASCEND_HOME_PATH}/asc"
+
+set(ASCEND_HOME $ENV{ASCEND_HOME_PATH})
+set(ASC_INCLUDE_DIR "${ASCEND_HOME}/asc/")
+
+include_directories(
+    "${ASC_INCLUDE_DIR}"
     "${CMAKE_CURRENT_LIST_DIR}/.."
 )
+
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
