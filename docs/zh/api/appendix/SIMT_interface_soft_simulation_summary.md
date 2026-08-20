@@ -134,7 +134,7 @@
 | [asc_atomic_max](../SIMT-API/atomic_operations/asc_atomic_max.md) | int32_t、uint32_t、float、half、bfloat16_t、half2、bfloat16x2_t | - |
 | [asc_atomic_min](../SIMT-API/atomic_operations/asc_atomic_min.md) | int32_t、uint32_t、float、half、bfloat16_t、half2、bfloat16x2_t | - |
 | [asc_atomic_or](../SIMT-API/atomic_operations/asc_atomic_or.md) | - | int32_t、uint32_t、int64_t、uint64_t |
-| [asc_atomic_sub](../SIMT-API/atomic_operations/asc_atomic_sub.md) | - | int32_t、uint32_t、float、int64_t、uint64_t、half2、bfloat16x2_t |
+| [asc_atomic_sub](../SIMT-API/atomic_operations/asc_atomic_sub.md) | half、bfloat16_t | int32_t、uint32_t、float、int64_t、uint64_t、half2、bfloat16x2_t |
 | [asc_atomic_xor](../SIMT-API/atomic_operations/asc_atomic_xor.md) | - | int32_t、uint32_t、int64_t、uint64_t |
 
 
