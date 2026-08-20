@@ -64,10 +64,12 @@ set(HCCL_AICPU_ALLOC_CTX_TARGET ascendc_ut_adv_api_hccl_cc_aicpu_alloc_ctx)
 add_executable(${HCCL_AICPU_ALLOC_CTX_TARGET}
     main.cc
     aicpu_alloc_ctx_res_testcase.cc
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_open_kernel_adapter.cc
 )
 
 target_include_directories(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/framework/device/aicpu_kfc/decoupler
 )
 
 target_compile_options(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE

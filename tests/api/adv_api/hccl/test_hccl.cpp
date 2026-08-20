@@ -935,6 +935,47 @@ TEST_F(HcclAbnormalTestSuite, PrepareFailed_InvalidDtype)
         static_cast<HcclDataType>(-1), HcclReduceOp::HCCL_REDUCE_SUM, 1);
     EXPECT_EQ(handleId, INVALID_HANDLE_ID);
     EXPECT_NE(hcclMsgArea->commMsg.singleMsg.sendMsgs[0].addMsg.v0Msg.valid, HCCL_MSG_VALID_MASK);
+
+    handleId = hccl.AllReduce(
+        reinterpret_cast<__gm__ uint8_t*>(0x11), reinterpret_cast<__gm__ uint8_t*>(0x11), 100,
+        static_cast<HcclDataType>(254), HcclReduceOp::HCCL_REDUCE_SUM, 1);
+    EXPECT_EQ(handleId, INVALID_HANDLE_ID);
+    EXPECT_NE(hcclMsgArea->commMsg.singleMsg.sendMsgs[0].addMsg.v0Msg.valid, HCCL_MSG_VALID_MASK);
+}
+
+TEST_F(HcclAbnormalTestSuite, DataTypeSizeRejectsUnmappedValues)
+{
+    EXPECT_EQ(GetHcclDataTypeSize(HCCL_DATA_TYPE_INT8), 1U);
+    EXPECT_EQ(GetHcclDataTypeSize(HCCL_DATA_TYPE_INT128), 0U);
+    EXPECT_EQ(GetHcclDataTypeSize(static_cast<HcclDataType>(254)), 0U);
+    EXPECT_EQ(GetHcclDataTypeSize(static_cast<HcclDataType>(-1)), 0U);
+}
+
+TEST_F(HcclAbnormalTestSuite, UpdateControlMsgCountRejectsOutOfRangeValues)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024);
+    HcclMsgArea* hcclMsgArea = GetHcclMsgArea(workSpace.data());
+    ASSERT_NE(hcclMsgArea, nullptr);
+
+    UpdateControlMsgCount(hcclMsgArea, static_cast<ControlMsgType>(0U));
+    UpdateControlMsgCount(hcclMsgArea, ControlMsgType::HCCL_CMD_MAX);
+
+    for (uint32_t i = 0U; i < HCCL_MSG_TYPE_CNT; ++i) {
+        EXPECT_EQ(hcclMsgArea->apiStats.msgStats[i].cnt, 0U);
+    }
+}
+
+TEST_F(HcclAbnormalTestSuite, QueueBarrierRejectsInvalidQueueId)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024);
+    HcclMsgArea* hcclMsgArea = GetHcclMsgArea(workSpace.data());
+    HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
+
+    Hccl hccl;
+    hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
+    hccl.QueueBarrier(static_cast<uint16_t>(MAX_QUE_NUM));
+
+    EXPECT_NE(hcclMsgArea->commMsg.singleMsg.sendMsgs[0].addMsg.v0Msg.valid, HCCL_MSG_VALID_MASK);
 }
 
 // sendBuf/recvBuf nullptr, HCCL_REDUCE_RESERVED for AllReduce.

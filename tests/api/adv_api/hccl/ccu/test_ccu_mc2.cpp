@@ -15,6 +15,7 @@
 
 #include "dtype_common.h"
 #include "base.h"
+#include "hccl_comm.h"
 #include "hccl_mc2.h"
 #include "hccl_alloc_ctx_res.h"
 #include "sim_communicator.h"
@@ -154,6 +155,24 @@ protected:
     HcclComm comm_ = nullptr;
     aclrtStream stream_ = nullptr;
 };
+
+TEST_F(CcuMc2TestSuite, Mxfp8AndCanonicalTilingLayoutsAreExplicit)
+{
+    EXPECT_EQ(SIZE_TABLE[HCCL_DATA_TYPE_MXFP8], 1U);
+    EXPECT_EQ(sizeof(Mc2CcTilingInner), sizeof(HcclApi::Mc2CcTilingInner));
+}
+
+TEST_F(CcuMc2TestSuite, HcclCommConfigInitStoresMetadataInReservedBytes)
+{
+    HcclCommConfig config{};
+    HcclCommConfigInit(&config);
+
+    size_t storedSize = 0U;
+    memcpy(&storedSize, config.reserved, sizeof(storedSize));
+    EXPECT_EQ(storedSize, sizeof(HcclCommConfig));
+    EXPECT_EQ(config.hcclBufferSize, HCCL_COMM_BUFFSIZE_CONFIG_NOT_SET);
+    EXPECT_EQ(config.hcclDeterministic, HCCL_COMM_DETERMINISTIC_CONFIG_NOT_SET);
+}
 
 TEST_F(CcuMc2TestSuite, AllocCcuOpResCtx_BasicFields)
 {

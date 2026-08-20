@@ -14,6 +14,10 @@
 #include <cstdint>
 #include <sstream>
 #include <algorithm>
+#include <limits>
+#include <map>
+#include <type_traits>
+#include <utility>
 
 #include "log.h"
 
@@ -22,11 +26,13 @@ namespace mc2_ops_hccl {
 class BinaryStream {
 public:
     static constexpr std::ios_base::openmode DEFAULT_IOS_MODE = std::ios_base::in | std::ios_base::out;
+    static constexpr size_t MAX_CONTAINER_ELEMENTS = 1024U * 1024U;
+    static constexpr size_t MAX_CONTAINER_BYTES = 64U * 1024U * 1024U;
 
     explicit BinaryStream(std::ios_base::openmode mode = DEFAULT_IOS_MODE) : stream(mode | std::ios_base::binary){};
 
     explicit BinaryStream(std::vector<char>& buf, std::ios_base::openmode mode = DEFAULT_IOS_MODE)
-        : stream(mode | std::ios_base::binary)
+        : stream(mode | std::ios_base::binary), inputSize(buf.size()), hasInputLimit(true)
     {
         stream.rdbuf()->pubsetbuf(buf.data(), buf.size());
     }
@@ -62,30 +68,50 @@ public:
     template <typename T>
     BinaryStream& operator>>(T& t)
     {
-        stream.read(reinterpret_cast<char*>(&t), sizeof(T));
+        ReadExact(reinterpret_cast<char*>(&t), sizeof(T));
         return *this;
     }
 
     // 对string的读取函数
     BinaryStream& operator>>(std::string& s)
     {
-        size_t size;
-        stream.read(reinterpret_cast<char*>(&size), sizeof(size)); // 先从流中读取字符串长度
-        s.resize(size);                                            // 为string分配足够空间
-        stream.read(&s[0], size); // 直接读取数据到string的缓冲区中，无需再分配内存
+        size_t size = 0U;
+        *this >> size;
+        const size_t remaining = RemainingBytes();
+        if (!Good() || size > MAX_CONTAINER_BYTES || size > remaining) {
+            MarkFailed();
+            return *this;
+        }
+
+        std::string value;
+        value.resize(size);
+        if ((size > 0U) && !ReadExact(&value[0], size)) {
+            return *this;
+        }
+        s.swap(value);
         return *this;
     }
 
-    // 多级vector递归反序列化
+    // 多级vector递归反序列化，失败时不提交部分结果
     template <typename T>
     BinaryStream& operator>>(std::vector<T>& vec)
     {
-        size_t size;
+        size_t size = 0U;
         *this >> size;
-        vec.resize(size);
-        for (auto& elem : vec) {
-            *this >> elem;
+        constexpr size_t minSerializedSize =
+            (std::is_arithmetic<T>::value || std::is_enum<T>::value) ? sizeof(T) : 1U;
+        if (!Good() || !ValidateContainerSize(size, sizeof(T), minSerializedSize)) {
+            return *this;
         }
+
+        std::vector<T> value(size);
+        for (auto& elem : value) {
+            *this >> elem;
+            if (!Good()) {
+                return *this;
+            }
+        }
+        vec.swap(value);
         return *this;
     }
 
@@ -106,17 +132,33 @@ public:
     template <typename T1, typename T2>
     BinaryStream& operator>>(std::map<T1, T2>& m)
     {
-        size_t size;
+        size_t size = 0U;
         *this >> size;
-        for (size_t i = 0; i < size; i++) {
-            T1 key;
-            *this >> key;
-            T2 value;
-            *this >> value;
-            m[key] = value;
+        if (!Good() || !ValidateContainerSize(size, sizeof(std::pair<const T1, T2>), 2U)) {
+            return *this;
         }
+
+        std::map<T1, T2> value;
+        for (size_t i = 0; i < size; i++) {
+            T1 key{};
+            *this >> key;
+            if (!Good()) {
+                return *this;
+            }
+            T2 mappedValue{};
+            *this >> mappedValue;
+            if (!Good()) {
+                return *this;
+            }
+            value[key] = std::move(mappedValue);
+        }
+        m.swap(value);
         return *this;
     }
+
+    bool Good() const { return stream.good(); }
+
+    explicit operator bool() const { return Good(); }
 
     void Dump(std::vector<char>& vec)
     {
@@ -156,7 +198,60 @@ public:
     void Clear() { stream.clear(); }
 
 private:
+    size_t RemainingBytes()
+    {
+        if (!stream.good()) {
+            return 0U;
+        }
+        const std::streampos position = stream.tellg();
+        if (position == std::streampos(-1)) {
+            MarkFailed();
+            return 0U;
+        }
+        const std::streamoff offset = static_cast<std::streamoff>(position);
+        const size_t limit = hasInputLimit ? inputSize : stream.str().size();
+        if ((offset < 0) || (static_cast<uintmax_t>(offset) > static_cast<uintmax_t>(limit))) {
+            MarkFailed();
+            return 0U;
+        }
+        return limit - static_cast<size_t>(offset);
+    }
+
+    bool ReadExact(char* dst, size_t size)
+    {
+        const size_t remaining = RemainingBytes();
+        if (!stream.good() || size > remaining ||
+            size > static_cast<size_t>((std::numeric_limits<std::streamsize>::max)())) {
+            MarkFailed();
+            return false;
+        }
+        if (size == 0U) {
+            return true;
+        }
+        stream.read(dst, static_cast<std::streamsize>(size));
+        if (!stream.good()) {
+            MarkFailed();
+            return false;
+        }
+        return true;
+    }
+
+    bool ValidateContainerSize(size_t count, size_t elementSize, size_t minSerializedSize)
+    {
+        if (count > MAX_CONTAINER_ELEMENTS ||
+            (elementSize > 0U && count > MAX_CONTAINER_BYTES / elementSize) ||
+            (minSerializedSize > 0U && count > RemainingBytes() / minSerializedSize)) {
+            MarkFailed();
+            return false;
+        }
+        return stream.good();
+    }
+
+    void MarkFailed() { stream.setstate(std::ios_base::failbit); }
+
     std::stringstream stream;
+    size_t inputSize = 0U;
+    bool hasInputLimit = false;
 };
 
 } // namespace mc2_ops_hccl

@@ -44,6 +44,143 @@ static HcclMsgArea* GetHcclMsgArea(uint8_t* workspaceGM)
     return reinterpret_cast<HcclMsgArea*>(msgAddr);
 }
 
+constexpr uint64_t GetCcuWorkspaceLayoutSize()
+{
+    return MAX_DCCI_CNT + sizeof(CommonPrepareParamCcu) * static_cast<uint64_t>(HCCL_MAX_HANDLE_ID) +
+           sizeof(AlltoAllVParamCcu) * static_cast<uint64_t>(HCCL_MAX_HANDLE_ID) + CCU_MSG_EXT_MAX_OFFSET;
+}
+
+uint64_t GetCcuWorkspaceRequiredSize(uint64_t workspaceAddr)
+{
+    constexpr uint64_t workspaceAlign = 512U;
+    const uint64_t alignedAddr = (workspaceAddr + workspaceAlign - 1U) & ~(workspaceAlign - 1U);
+    return alignedAddr - workspaceAddr + GetCcuWorkspaceLayoutSize();
+}
+
+void InitCcuV2(Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU>& hccl, OpResCtx& context)
+{
+    Mc2InitTilingInner initTiling{};
+    initTiling.version = INIT_TILING_CCU_NEW_VERSION;
+    hccl.InitV2(reinterpret_cast<GM_ADDR>(&context), &initTiling);
+}
+
+TEST_F(HcclSuiteAICPU, InitCcuWorkspaceAcceptsExactCapacityWithAlignmentPadding)
+{
+    std::vector<uint8_t> workSpace(GetCcuWorkspaceLayoutSize() + 512U);
+    OpResCtx context = GetOpResCtx(workSpace);
+    context.workspace = reinterpret_cast<uint64_t>(workSpace.data() + 1U);
+    context.workspaceSize = GetCcuWorkspaceRequiredSize(context.workspace);
+
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    InitCcuV2(hccl, context);
+
+    EXPECT_TRUE(hccl.impl_.isInited_);
+    EXPECT_EQ(reinterpret_cast<uint64_t>(hccl.impl_.ccuParam_.ccuMsgExt) + CCU_MSG_EXT_MAX_OFFSET,
+              context.workspace + context.workspaceSize);
+}
+
+TEST_F(HcclSuiteAICPU, InitCcuWorkspaceRejectsCapacityOneByteShort)
+{
+    std::vector<uint8_t> workSpace(GetCcuWorkspaceLayoutSize() + 512U);
+    OpResCtx context = GetOpResCtx(workSpace);
+    context.workspace = reinterpret_cast<uint64_t>(workSpace.data() + 1U);
+    context.workspaceSize = GetCcuWorkspaceRequiredSize(context.workspace) - 1U;
+
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    InitCcuV2(hccl, context);
+
+    EXPECT_FALSE(hccl.impl_.isInited_);
+}
+
+TEST_F(HcclSuiteAICPU, InitCcuWorkspaceRejectsAddressAlignmentOverflow)
+{
+    std::vector<uint8_t> workSpace(1U);
+    OpResCtx context = GetOpResCtx(workSpace);
+    context.workspace = UINT64_MAX - 100U;
+    context.workspaceSize = UINT64_MAX;
+
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    InitCcuV2(hccl, context);
+
+    EXPECT_FALSE(hccl.impl_.isInited_);
+}
+
+TEST_F(HcclSuiteAICPU, CcuSetCcTilingRejectsInvalidOpType)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    hccl.impl_.curVersion_ = HcclTilingVersion::NEW_TILING_VERSION;
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL);
+
+    EXPECT_EQ(hccl.SetCcTiling(reinterpret_cast<__gm__ void*>(&tiling)), HCCL_FAILED);
+}
+
+TEST_F(HcclSuiteAICPU, CcuSetCcTilingV2RejectsInvalidOpType)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL);
+    hccl.impl_.curVersion_ = HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION;
+    hccl.impl_.tilingBaseAddr_ = reinterpret_cast<uint64_t>(&tiling);
+
+    EXPECT_EQ(hccl.SetCcTilingV2(0U), HCCL_FAILED);
+}
+
+TEST_F(HcclSuiteAICPU, CcuCommonPrepareRejectsInvalidIndexInputs)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    CommonPrepareParam param{};
+    param.commType.prepareType = HcclCMDType::HCCL_CMD_ALL;
+    param.dataType = HCCL_DATA_TYPE_INT8;
+    param.repeat = 1U;
+    EXPECT_EQ(hccl.impl_.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+
+    param.commType.prepareType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    param.dataType = static_cast<HcclDataType>(254);
+    EXPECT_EQ(hccl.impl_.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+}
+
+TEST_F(HcclSuiteAICPU, CcuCommonPrepareRequiresRegisteredTiling)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    hccl.impl_.curVersion_ = HcclTilingVersion::NEW_TILING_VERSION;
+    CommonPrepareParam param{};
+    param.commType.prepareType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    param.dataType = HCCL_DATA_TYPE_INT8;
+    param.repeat = 1U;
+
+    EXPECT_EQ(hccl.impl_.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+}
+
+TEST_F(HcclSuiteAICPU, CcuAlltoAllVRankCapacityCoversDav3510Limit)
+{
+    EXPECT_FALSE(IsValidCcuRankNum(0U));
+    EXPECT_TRUE(IsValidCcuRankNum(1U));
+    EXPECT_TRUE(IsValidCcuRankNum(32U));
+    EXPECT_TRUE(IsValidCcuRankNum(33U));
+    EXPECT_TRUE(IsValidCcuRankNum(HCCL_CCU_MAX_RANK_NUM));
+    EXPECT_FALSE(IsValidCcuRankNum(HCCL_CCU_MAX_RANK_NUM + 1U));
+    EXPECT_EQ(sizeof(AlltoAllVParamCcu), sizeof(uint64_t) * HCCL_CCU_MAX_RANK_NUM * 4U);
+}
+
+TEST_F(HcclSuiteAICPU, CcuAlltoAllVRejectsRankBeyondDav3510Limit)
+{
+    Hccl<HcclServerType::HCCL_SERVER_TYPE_CCU> hccl;
+    OpResCtx context{};
+    context.rankSize = HCCL_CCU_MAX_RANK_NUM + 1U;
+    hccl.impl_.newCcuFlag_ = true;
+    hccl.impl_.hcclNewContext_ = &context;
+
+    CommonPrepareParam param{};
+    param.commType.prepareType = HcclCMDType::HCCL_CMD_ALLTOALLV;
+    param.dataType = HCCL_DATA_TYPE_INT8;
+    param.repeat = 1U;
+    const HcclHandle initialHandleId = hccl.impl_.curHandleId_;
+
+    EXPECT_EQ(hccl.impl_.CommonPrepareImpl<false>(param), INVALID_HANDLE_ID);
+    EXPECT_EQ(hccl.impl_.curHandleId_, initialHandleId);
+}
+
 class Mc2InitTilingAicpuTest {
     uint32_t version = 0U;
     uint32_t mc2HcommCnt = 0U;
