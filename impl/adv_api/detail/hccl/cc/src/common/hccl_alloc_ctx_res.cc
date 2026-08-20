@@ -18,6 +18,7 @@ std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
     {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, PrepareParamForReduceScatter},
     {HcclCMDType::HCCL_CMD_ALLTOALL, PrepareParamForAlltoAll},
     {HcclCMDType::HCCL_CMD_ALLTOALLV, PrepareParamForAlltoAllV},
+    {HcclCMDType::HCCL_CMD_HALF_ALLTOALLV, PrepareParamForHalfAlltoAllV},
 };
 
 CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine)
@@ -120,7 +121,8 @@ namespace {
 bool IsCcuKfcSupportedOp(uint32_t opType)
 {
     return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
-           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_HALF_ALLTOALLV);
 }
 } // namespace
 
@@ -500,6 +502,42 @@ HcclResult PrepareParamForAlltoAllV(
     HCCL_INFO("opType %u", static_cast<uint32_t>(param.opType));
     HCCL_INFO("all2AllVDataDes.sendType %u", static_cast<uint32_t>(param.all2AllVDataDes.sendType));
     HCCL_INFO("all2AllVDataDes.recvType %u", static_cast<uint32_t>(param.all2AllVDataDes.recvType));
+    return HCCL_SUCCESS;
+}
+
+// MC2 变长 AllToAll。与 AlltoAllV 共用 all2AllVDataDes 联合体成员，但分片大小/偏移由 AIC
+// 运行时写入 varData 变长区，故此处指针置空，由 CCU kernel 按地址从设备内存读取。
+HcclResult PrepareParamForHalfAlltoAllV(
+    HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param)
+{
+    HCCL_INFO("PrepareParamForHalfAlltoAllV, ccTiling[%p]", ccTiling);
+    u32 userRankSize;
+    CHK_RET(HcclGetRankSize(comm, &userRankSize));
+
+    HcclResult ret = PrepareOpsCommParam(tag, param);
+    if (ret != HCCL_SUCCESS) {
+        HCCL_ERROR("failed to fill OpsCommParam");
+    }
+
+    param.varMemSize = ALL_TO_ALL_V_VECTOR_NUM * userRankSize * sizeof(u64);
+    param.opType = HcclCMDType::HCCL_CMD_HALF_ALLTOALLV;
+    // KFC Server 的 DispatchKfcSubKernel 用 CCU_IF 分支包含所有 opType 的子 kernel。
+    // CCU_IF 在 host 侧 DSL 翻译时会执行所有分支体以记录 rep，ReduceScatter 分支的
+    // LocalReduce 需要有效 reduceOp 才能通过 GetUBReduceType 检查。HalfAlltoAllv 本身
+    // 不做 reduce，此处填 SUM 仅满足翻译期约束，运行时 dispatch 不会走 ReduceScatter 分支。
+    param.reduceType = HcclReduceOp::HCCL_REDUCE_SUM;
+    param.all2AllVDataDes.sendType = static_cast<HcclDataType>(ccTiling->srcDataType);
+    param.all2AllVDataDes.recvType = static_cast<HcclDataType>(ccTiling->dstDataType);
+    param.all2AllVDataDes.sendCounts = nullptr;
+    param.all2AllVDataDes.recvCounts = nullptr;
+    param.all2AllVDataDes.sdispls = nullptr;
+    param.all2AllVDataDes.rdispls = nullptr;
+
+    HCCL_INFO("Print PrepareParamForHalfAlltoAllV.");
+    CHK_RET(PrintOpsCommParam(param));
+    HCCL_INFO("varMemSize %lu", param.varMemSize);
+    HCCL_INFO("opType %u", static_cast<uint32_t>(param.opType));
+    HCCL_INFO("Execute PrepareParamForHalfAlltoAllV success.");
     return HCCL_SUCCESS;
 }
 

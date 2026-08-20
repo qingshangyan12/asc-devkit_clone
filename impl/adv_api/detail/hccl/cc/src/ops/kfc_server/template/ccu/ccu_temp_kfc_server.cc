@@ -28,12 +28,15 @@ void InheritKfcServerKernelArg(
         srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isReduceScatter =
         srcName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
-    if (isAllGather || isReduceScatter) {
+    const bool isHalfAlltoAllV =
+        srcName == "CcuKernelHalfAlltoAllVMesh1D" && param.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV;
+    if (isAllGather || isReduceScatter || isHalfAlltoAllV) {
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
         kfcArg->loadFromMem = false;
         kfcArg->opParam = param;
         kfcArg->subCommRanks = subCommRanks;
+        kfcArg->localWinAddr = srcKernel.localWinAddr;
     } else {
         HCCL_WARNING(
             "[InheritKfcServerKernelArg] unknown src kernel type[%s], no attributes inherited", srcName.c_str());
@@ -62,7 +65,8 @@ HcclResult CcuTempKfcServer::CalcRes(
     AlgResourceRequest& resourceRequest)
 {
     HCCL_INFO("[CcuTempKfcServer::CalcRes start]");
-    if (param.opType != HcclCMDType::HCCL_CMD_ALLGATHER && param.opType != HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+    if (param.opType != HcclCMDType::HCCL_CMD_ALLGATHER && param.opType != HcclCMDType::HCCL_CMD_REDUCE_SCATTER &&
+        param.opType != HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
         HCCL_ERROR("[CcuTempKfcServer::CalcRes] unsupported opType[%u]", static_cast<uint32_t>(param.opType));
         return HCCL_E_NOT_SUPPORT;
     }
@@ -85,7 +89,9 @@ HcclResult CcuTempKfcServer::CalcRes(
             sourceName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
         const bool isReduceScatter = sourceName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" &&
                                      param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
-        if (!isAllGather && !isReduceScatter) {
+        const bool isHalfAlltoAllV =
+            sourceName == "CcuKernelHalfAlltoAllVMesh1D" && param.opType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV;
+        if (!isAllGather && !isReduceScatter && !isHalfAlltoAllV) {
             HCCL_ERROR(
                 "[CcuTempKfcServer::CalcRes] unsupported source kernel[%s]",
                 resourceRequest.ccuKernelInfos.back().kernelFuncName);

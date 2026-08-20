@@ -143,8 +143,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     if (msgAddr & 0x1ff) {
         msgAddr = (msgAddr & (~((uint64_t)0x1ff))) + 0x200;
     }
-    KERNEL_LOG(
-        KERNEL_INFO, "ApiClient InitInner msgAddr:0x%llx, workSpaceSize:0x%llx", msgAddr,
+
+    AscendC::PRINTF(
+        "ApiClient InitInner msgAddr:0x%llx, workSpaceSize:0x%llx", msgAddr,
         newCcuFlag_ ? hcclNewContext_->workspace : hcclContext_->workSpace);
 
     uint64_t xnAddr = newCcuFlag_ ? hcclNewContext_->xnAddr : reinterpret_cast<uint64_t>(hcclContext_->xnOffset);
