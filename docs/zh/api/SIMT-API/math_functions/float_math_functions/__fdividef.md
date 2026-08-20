@@ -56,7 +56,7 @@ float __fdividef(float x, float y)
 <!-- npu="950" id7 -->
 -   针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
 <!-- end id7 -->
--   本接口不受编译选项[--cce-use-fast-math](../../../../guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md#常用的编译选项)的影响。
+-   本接口不受编译选项[--cce-use-fast-math](../../../../guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#常用的编译选项)的影响。
 
 ## 需要包含的头文件
 
