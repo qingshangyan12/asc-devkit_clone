@@ -74,8 +74,9 @@ __aicore__ inline uint64_t asc_get_overflow_status();
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
 __aicore__ inline int64_t asc_get_program_counter();
 __aicore__ inline void asc_get_arch_ver(uint32_t& core_version);
-[[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
-             "Please use asc_get_squeeze_status instead.")]]
+[[deprecated(
+    "NOTICE: asc_get_ar_spr is deprecated. "
+    "Please use asc_get_squeeze_status instead.")]]
 __aicore__ inline int64_t asc_get_ar_spr();
 __aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
 __aicore__ inline constexpr int64_t asc_get_vf_len();
@@ -91,12 +92,10 @@ __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
 __aicore__ inline int64_t asc_get_squeeze_status();
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat);
 __aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode);
 __aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy);
 __aicore__ inline asc_override_strategy asc_get_saturation_strategy();
-#endif
 
 #endif
 
