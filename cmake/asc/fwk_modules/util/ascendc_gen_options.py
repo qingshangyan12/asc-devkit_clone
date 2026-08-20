@@ -237,7 +237,9 @@ if __name__ == "__main__":
         else:
             comp_options.append(arg)
     if soc_series and compute_soc:
-        raise RuntimeError("SOC_SERIES and COMPUTE_UNIT cannot be used at the same time")
+        raise RuntimeError(
+            "SOC_SERIES and COMPUTE_UNIT cannot be used at the same time"
+        )
     if soc_series:
         compute_soc = soc_series
     elif compute_soc != "":
