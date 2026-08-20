@@ -17,6 +17,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #include "kernel_operator_common_impl.h"
+#include "../../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 // #include "kernel_operator_scm_data_copy_impl.h"
 // #include "kernel_operator_vec_duplicate_impl.h"
 // #include "kernel_operator_sync_impl.h"
