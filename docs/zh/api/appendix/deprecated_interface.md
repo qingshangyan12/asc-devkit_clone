@@ -56,6 +56,14 @@
 <!-- npu="950" id6 -->
 ### 系统变量
 
+- [asc_get_block_idx](../SIMD-API/c_api/deprecated_interface/asc_get_block_idx_deprecated.md)接口
+
+    此接口后续版本会废弃，请使用内置变量[block_idx](../../guide/programming_guide/language_extension/simd_builtin_keywords.md#内置变量)结合[asc_get_sub_block_num](../SIMD-API/c_api/sys_var/asc_get_sub_block_num.md)和[asc_get_sub_block_id](../SIMD-API/c_api/sys_var/asc_get_sub_block_id.md)接口计算逻辑核索引。
+
+- [asc_get_block_num](../SIMD-API/c_api/deprecated_interface/asc_get_block_num_deprecated.md)接口
+
+    此接口后续版本会废弃，请使用[内置变量block_num](../../guide/programming_guide/language_extension/simd_builtin_keywords.md#内置变量)。
+
 - [asc_get_ar_spr](../SIMD-API/c_api/sys_var/asc_get_ar_spr_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_get_squeeze_status](../SIMD-API/c_api/sys_var/asc_get_squeeze_status.md)接口。

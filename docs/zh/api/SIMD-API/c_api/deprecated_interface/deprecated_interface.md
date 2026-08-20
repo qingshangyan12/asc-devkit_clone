@@ -5,3 +5,7 @@
 
 ## 原子操作
 - **[asc_set_atomic_add_int（废弃）](asc_set_atomic_add_int_deprecated.md)**
+
+## 系统变量
+- **[asc_get_block_idx（废弃）](asc_get_block_idx_deprecated.md)**
+- **[asc_get_block_num（废弃）](asc_get_block_num_deprecated.md)**

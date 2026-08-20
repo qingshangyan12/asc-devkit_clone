@@ -1297,8 +1297,6 @@
         -   [系统变量](SIMD-API/c_api/sys_var/system_variables.md)
             -   [asc_get_arch_ver](SIMD-API/c_api/sys_var/asc_get_arch_ver.md)
             -   [asc_get_squeeze_status](SIMD-API/c_api/sys_var/asc_get_squeeze_status.md)
-            -   [asc_get_block_idx](SIMD-API/c_api/sys_var/asc_get_block_idx.md)
-            -   [asc_get_block_num](SIMD-API/c_api/sys_var/asc_get_block_num.md)
             -   [asc_get_core_id](SIMD-API/c_api/sys_var/asc_get_core_id.md)
             -   [asc_get_ctrl](SIMD-API/c_api/sys_var/asc_get_ctrl.md)
             -   [asc_get_ffts_base_addr](SIMD-API/c_api/sys_var/asc_get_ffts_base_addr.md)
@@ -1345,6 +1343,8 @@
             -   [asc_load_l2_cache_mode](SIMD-API/c_api/enum/asc_load_l2_cache_mode.md)
             -   [asc_store_l2_cache_mode](SIMD-API/c_api/enum/asc_store_l2_cache_mode.md)
         -   [废弃接口](SIMD-API/c_api/deprecated_interface/deprecated_interface.md)
+            -   [asc_get_block_idx（废弃）](SIMD-API/c_api/deprecated_interface/asc_get_block_idx_deprecated.md)
+            -   [asc_get_block_num（废弃）](SIMD-API/c_api/deprecated_interface/asc_get_block_num_deprecated.md)
             -   [asc_set_atomic_add_int（废弃）](SIMD-API/c_api/deprecated_interface/asc_set_atomic_add_int_deprecated.md)
             -   [asc_abs_sync（废弃）](SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md)
 
