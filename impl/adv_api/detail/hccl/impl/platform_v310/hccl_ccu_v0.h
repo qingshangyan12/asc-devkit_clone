@@ -339,6 +339,7 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
     const CommonPrepareParam& commonPrepareParam)
 {
     if (unlikely(commonPrepareParam.repeat == 0U)) {
+        AscendC::PRINTF("unlikely commonPrepareParam.repeat");
         return INVALID_HANDLE_ID;
     }
 
