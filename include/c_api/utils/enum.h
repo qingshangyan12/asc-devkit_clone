@@ -33,15 +33,15 @@ enum class asc_store_l2_cache_mode : uint8_t {
 enum class asc_hf32_round_mode : uint8_t { NEAREST_ZERO, NEAREST_EVEN };
 
 enum class asc_saturation_mode : uint8_t {
-    FLOAT,   // CTRL[48]
-    FLOAT8,  // CTRL[50]
-    INT,     // CTRL[53]
-    CAST     // CTRL[59]
+    FLOAT = 48,  // CTRL[48]
+    FLOAT8 = 50, // CTRL[50]
+    INT = 53,    // CTRL[53]
+    CAST = 59    // CTRL[59]
 };
 
 enum class asc_override_strategy : uint8_t {
-    USE_API = 0,    // CTRL[60]=0：单指令设置饱和
-    USE_GLOBAL = 1  // CTRL[60]=1：全局设置饱和
+    USE_API = 0,   // CTRL[60]=0：单指令设置饱和
+    USE_GLOBAL = 1 // CTRL[60]=1：全局设置饱和
 };
 
 enum class asc_position_mode { EVEN = 0, ODD };

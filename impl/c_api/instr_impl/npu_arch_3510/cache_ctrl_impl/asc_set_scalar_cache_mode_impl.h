@@ -25,24 +25,32 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
+// Bitfields are packed from LSB, matching hardware CTRL layout.
+union asc_ctrl_scalar_cache_bits {
+    uint64_t value;
+    struct {
+        uint64_t reserved0 : 16;              // CTRL[15:0]
+        uint64_t scalar_load_cache_mode : 4;  // CTRL[19:16]
+        uint64_t scalar_store_cache_mode : 4; // CTRL[23:20]
+        uint64_t reserved1 : 40;              // CTRL[63:24]
+    };
+};
+
+// Enum underlying values match HW encodings; write via CTRL bitfield overlay.
 __aicore__ inline void asc_set_scalar_cache_mode_impl(asc_load_l2_cache_mode l2_cache_mode)
 {
-    constexpr uint8_t startBit = 16; // READ mode: CTRL[19:16]
-    uint8_t cacheBits = static_cast<uint8_t>(l2_cache_mode);
-    uint64_t mask = ~(uint64_t(0xF) << startBit);
-    int64_t ctrlValue = get_ctrl() & mask;
-    ctrlValue |= (static_cast<uint64_t>(cacheBits) << startBit);
-    set_ctrl(ctrlValue);
+    asc_ctrl_scalar_cache_bits ctrl;
+    ctrl.value = static_cast<uint64_t>(get_ctrl());
+    ctrl.scalar_load_cache_mode = static_cast<uint8_t>(l2_cache_mode);
+    set_ctrl(static_cast<int64_t>(ctrl.value));
 }
 
 __aicore__ inline void asc_set_scalar_cache_mode_impl(asc_store_l2_cache_mode l2_cache_mode)
 {
-    constexpr uint8_t startBit = 20; // WRITE mode: CTRL[23:20]
-    uint8_t cacheBits = static_cast<uint8_t>(l2_cache_mode);
-    uint64_t mask = ~(uint64_t(0xF) << startBit);
-    int64_t ctrlValue = get_ctrl() & mask;
-    ctrlValue |= (static_cast<uint64_t>(cacheBits) << startBit);
-    set_ctrl(ctrlValue);
+    asc_ctrl_scalar_cache_bits ctrl;
+    ctrl.value = static_cast<uint64_t>(get_ctrl());
+    ctrl.scalar_store_cache_mode = static_cast<uint8_t>(l2_cache_mode);
+    set_ctrl(static_cast<int64_t>(ctrl.value));
 }
 
 #endif

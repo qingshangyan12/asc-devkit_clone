@@ -25,46 +25,19 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
+// Enum underlying values match HW encodings; cast is used as-is (illegal codes are not normalized).
 __aicore__ inline asc_load_l2_cache_mode asc_get_scalar_load_cache_mode_impl()
 {
-    constexpr uint8_t startBit = 16; // READ mode: CTRL[19:16]
-    int64_t ctrlValue = get_ctrl();
-    uint8_t cacheBits = static_cast<uint8_t>((ctrlValue >> startBit) & 0xF);
-    switch (cacheBits) {
-        case 0:
-            return asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM;
-        case 1:
-            return asc_load_l2_cache_mode::NORMAL_LAST_VICTIM;
-        case 2:
-            return asc_load_l2_cache_mode::NORMAL_PERSISTENT;
-        case 4:
-            return asc_load_l2_cache_mode::NOTALLOC_KEEP;
-        case 5:
-            return asc_load_l2_cache_mode::NOTALLOC_CLEAN;
-        case 6:
-            return asc_load_l2_cache_mode::NOTALLOC_DROP;
-        default:
-            return asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM;
-    }
+    constexpr uint8_t start_bit = 16; // READ mode: CTRL[19:16]
+    uint8_t cache_bits = static_cast<uint8_t>((get_ctrl() >> start_bit) & 0xF);
+    return static_cast<asc_load_l2_cache_mode>(cache_bits);
 }
 
 __aicore__ inline asc_store_l2_cache_mode asc_get_scalar_store_cache_mode_impl()
 {
-    constexpr uint8_t startBit = 20; // WRITE mode: CTRL[23:20]
-    int64_t ctrlValue = get_ctrl();
-    uint8_t cacheBits = static_cast<uint8_t>((ctrlValue >> startBit) & 0xF);
-    switch (cacheBits) {
-        case 0:
-            return asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM;
-        case 1:
-            return asc_store_l2_cache_mode::NORMAL_LAST_VICTIM;
-        case 2:
-            return asc_store_l2_cache_mode::NORMAL_PERSISTENT;
-        case 4:
-            return asc_store_l2_cache_mode::NOTALLOC_CLEAN;
-        default:
-            return asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM;
-    }
+    constexpr uint8_t start_bit = 20; // WRITE mode: CTRL[23:20]
+    uint8_t cache_bits = static_cast<uint8_t>((get_ctrl() >> start_bit) & 0xF);
+    return static_cast<asc_store_l2_cache_mode>(cache_bits);
 }
 
 #endif

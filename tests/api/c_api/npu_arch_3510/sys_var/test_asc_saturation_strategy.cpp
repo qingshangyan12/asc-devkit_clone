@@ -22,25 +22,13 @@ protected:
 namespace {
 int64_t g_ctrlValue = 0;
 
-int64_t get_ctrl_stub()
-{
-    return g_ctrlValue;
-}
+int64_t get_ctrl_stub() { return g_ctrlValue; }
 
-void set_ctrl_stub(uint64_t config)
-{
-    g_ctrlValue = static_cast<int64_t>(config);
-}
+void set_ctrl_stub(uint64_t config) { g_ctrlValue = static_cast<int64_t>(config); }
 
-uint64_t sbitset0_stub(uint64_t bits, int64_t idx)
-{
-    return bits & ~(static_cast<uint64_t>(1) << idx);
-}
+uint64_t sbitset0_stub(uint64_t bits, int64_t idx) { return bits & ~(static_cast<uint64_t>(1) << idx); }
 
-uint64_t sbitset1_stub(uint64_t bits, int64_t idx)
-{
-    return bits | (static_cast<uint64_t>(1) << idx);
-}
+uint64_t sbitset1_stub(uint64_t bits, int64_t idx) { return bits | (static_cast<uint64_t>(1) << idx); }
 
 void MockCtrlRw()
 {
@@ -50,10 +38,7 @@ void MockCtrlRw()
     MOCKER_CPP(sbitset1, uint64_t(uint64_t, int64_t)).stubs().will(invoke(sbitset1_stub));
 }
 
-int64_t GetCtrlBit(int8_t bit)
-{
-    return (g_ctrlValue >> bit) & 1;
-}
+int64_t GetCtrlBit(int8_t bit) { return (g_ctrlValue >> bit) & 1; }
 } // namespace
 
 TEST_F(TestSaturationStrategyCAPI, UseApi)

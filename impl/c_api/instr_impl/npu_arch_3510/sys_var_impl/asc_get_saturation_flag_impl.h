@@ -27,31 +27,10 @@
 
 __aicore__ inline bool asc_get_saturation_flag_impl(asc_saturation_mode saturation_mode)
 {
-    // Bit mapping aligns with AscendC::Internal::GetSaturationModeBit (basic_api).
-    int8_t sprBit;
-    switch (saturation_mode) {
-        case asc_saturation_mode::FLOAT:
-            sprBit = 48;
-            break;
-        case asc_saturation_mode::FLOAT8:
-            sprBit = 50;
-            break;
-        case asc_saturation_mode::INT:
-            sprBit = 53;
-            break;
-        case asc_saturation_mode::CAST:
-            sprBit = 59;
-            break;
-        default:
-            sprBit = 48;
-            break;
-    }
-    int64_t value = (get_ctrl() >> sprBit) & 1;
-    // INT: bit1=sat; FLOAT/FLOAT8/CAST: bit0=sat.
-    if (saturation_mode == asc_saturation_mode::INT) {
-        return value != 0;
-    }
-    return value == 0;
+    // Enum underlying values are CTRL bit indices. INT: 1=sat; FLOAT/FLOAT8/CAST: 0=sat.
+    const uint8_t bit = static_cast<uint8_t>(saturation_mode);
+    const bool hw_bit = ((get_ctrl() >> bit) & 1) != 0;
+    return (saturation_mode == asc_saturation_mode::INT) ? hw_bit : !hw_bit;
 }
 
 #endif
