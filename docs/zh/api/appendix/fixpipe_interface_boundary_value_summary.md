@@ -38,11 +38,6 @@
 L0C Buffer中存储的float类型数据来自Mmad矩阵乘计算结果，当输入矩阵A中包含inf/-inf/nan时，L0C中对应行会出现inf/-inf/nan（详见[Mmad接口边界值汇总](mmad_interface_boundary_value_summary.md)）。
 
 **表1** float类型L0C中存在inf/-inf/nan时，各输出类型的计算结果说明
-
-<a name="table_fixpipe_l0c2gm_float_boundary"></a>
-<a name="table_fixpipe_l0c2l1_float_boundary"></a>
-<a name="table_fixpipe_l0c2ub_float_boundary"></a>
-
 | 输出数据类型 | 随路量化模式 | L0C中的元素取值 | 输出元素取值<br>（饱和模式，CTRL\[48\]=0） | 输出元素取值<br>（非饱和模式，CTRL\[48\]=1） |
 | --- | --- | --- | --- | --- |
 | half | QF322F16\_PRE / VQF322F16\_PRE | +inf | 65504.0（MAX） | +inf |
@@ -94,11 +89,6 @@ L0C Buffer中存储的float类型数据来自Mmad矩阵乘计算结果，当输�
 int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生inf/nan，但量化后可能产生溢出。
 
 **表2** int32\_t类型L0C量化溢出时的计算结果说明
-
-<a name="table_fixpipe_l0c2gm_int32_boundary"></a>
-<a name="table_fixpipe_l0c2l1_int32_boundary"></a>
-<a name="table_fixpipe_l0c2ub_int32_boundary"></a>
-
 | 输出数据类型 | 随路量化模式 | L0C中的元素取值 | 输出元素取值 |
 | --- | --- | --- | --- |
 | half | DEQF16 / VDEQF16 | 量化后超出half表示范围 | 65504.0（MAX） / -65504.0（MIN） |
@@ -117,11 +107,6 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 三个接口支持如下随路量化模式，scalar模式使用单个标量量化参数，tensor模式使用每列独立的量化参数：
 
 **表3** 量化模式说明
-
-<a name="table_fixpipe_l0c2gm_quant_mode"></a>
-<a name="table_fixpipe_l0c2l1_quant_mode"></a>
-<a name="table_fixpipe_l0c2ub_quant_mode"></a>
-
 | 源数据类型 | 量化模式 | 目标数据类型 | 量化方式 | 说明 |
 | --- | --- | --- | --- | --- |
 | - | NoQuant | - | 不量化 | 不开启量化功能 |
@@ -159,9 +144,6 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 NoQuant模式不做类型转换和量化，L0C中的float数据原样搬运到目标Buffer。由于CTRL\[48\]不支持float数据类型，饱和模式和非饱和模式下inf/nan均保持原样输出。NoQuant场景还覆盖了NZ2NZ、NZ2ND、双目标按M维度拆分、双目标按N维度拆分等输出格式，验证inf/-inf/nan在各种格式转换和双目标拆分场景下均能正确传递。
 
 **表4** NoQuant模式下float类型L0C中存在inf/-inf/nan时的输出结果
-
-<a name="table_fixpipe_l0c2ub_noquant_boundary"></a>
-
 | 场景 | 输出格式 | 双目标 | L0C中的元素取值 | 输出元素取值 | 说明 |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Nz | 否 | +inf/-inf/nan | +inf/-inf/nan | 原样保留 |
@@ -224,9 +206,6 @@ L0C→GM接口直接将L0C Buffer数据搬运到GM，无需中转路径，因此
 场景17在边界值测试中跳过，属于硬件限制，非asc\_copy\_l0c2l1接口本身的问题：
 
 **表5** 边界值测试已知限制
-
-<a name="table_fixpipe_l0c2l1_known_limitations"></a>
-
 | 跳过场景 | 跳过模式 | 根因 | 说明 |
 | --- | --- | --- | --- |
 | 17 | 饱和非饱和均跳过 | float×float→float的Mmad在L0C包含inf/-inf/nan时触发硬件运行时错误（aclrtSynchronizeStream返回507015） | 可能是dav-3510的CANN版本限制，float类型Mmad对inf/nan输入的硬件处理异常。asc\_copy\_l0c2l1本身的float inf/nan处理行为符合表1预期（保持原样输出），但验证路径无法端到端验证 |
@@ -236,9 +215,6 @@ L0C→GM接口直接将L0C Buffer数据搬运到GM，无需中转路径，因此
 以下场景因CANN版本限制未纳入实测验证，对应API重载在CANN 9.2.0中未实现或未提供：
 
 **表6** 未验证场景及原因
-
-<a name="table_fixpipe_l0c2l1_unverified"></a>
-
 | 场景 | 输出类型 | 量化模式 | 未验证原因 |
 | --- | --- | --- | --- |
 | 11 | int4b\_t | VREQ4 | asc\_mmad\_s4（int4b\_t×int4b\_t→int32\_t）在dav-3510上未实现（声明存在但无链接实现），验证路径的第二次Mmad无法执行 |
