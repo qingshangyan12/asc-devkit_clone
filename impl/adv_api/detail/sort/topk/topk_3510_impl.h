@@ -69,30 +69,94 @@ void TopkInputCheck(const int32_t k, const TopKInfo& topKInfo)
 #endif
 
 template <typename T>
+__simd_vf__ inline void ExtractTopKValueAndIndex(
+    __ubuf__ T* dstValue, __ubuf__ int32_t* dstIndex, __ubuf__ T* sorted, uint32_t count)
+{
+    constexpr uint32_t proposalsPerRepeat = GetVecLen() / sizeof(uint32_t) / 2;
+    constexpr uint32_t valuesPerRegister = GetVecLen() / sizeof(float);
+    uint32_t valueCount = count;
+    uint32_t indexCount = count;
+
+    if (count > proposalsPerRepeat) {
+        Reg::RegTensor<float> valueReg;
+        Reg::RegTensor<float> indexReg;
+        Reg::LoadAlign<float, Reg::LoadDist::DIST_DINTLV_B32>(
+            valueReg, indexReg, reinterpret_cast<__ubuf__ float*>(sorted));
+
+        Reg::MaskReg indexMask = Reg::UpdateMask<int32_t>(indexCount);
+        Reg::StoreAlign(dstIndex, reinterpret_cast<Reg::RegTensor<int32_t>&>(indexReg), indexMask);
+
+        if constexpr (IsSameType<T, float>::value) {
+            Reg::MaskReg valueMask = Reg::UpdateMask<float>(valueCount);
+            Reg::StoreAlign(dstValue, valueReg, valueMask);
+        } else {
+            Reg::RegTensor<half> halfValueReg;
+            Reg::MaskReg squeezeMask = Reg::CreateMask<uint32_t>();
+            Reg::Squeeze<half, Reg::GatherMaskMode::NO_STORE_REG>(
+                halfValueReg, reinterpret_cast<Reg::RegTensor<half>&>(valueReg), squeezeMask);
+            Reg::MaskReg valueMask = Reg::UpdateMask<half>(valueCount);
+            Reg::StoreAlign(dstValue, halfValueReg, valueMask);
+        }
+    } else {
+        Reg::RegTensor<float> valueReg;
+        Reg::RegTensor<float> indexReg;
+        Reg::LoadAlign(valueReg, reinterpret_cast<__ubuf__ float*>(sorted));
+        Reg::LoadAlign(indexReg, reinterpret_cast<__ubuf__ float*>(sorted));
+        Reg::DeInterleave(valueReg, indexReg, valueReg, indexReg);
+
+        Reg::MaskReg indexMask = Reg::UpdateMask<int32_t>(indexCount);
+        Reg::StoreAlign(dstIndex, reinterpret_cast<Reg::RegTensor<int32_t>&>(indexReg), indexMask);
+
+        if constexpr (IsSameType<T, float>::value) {
+            Reg::MaskReg valueMask = Reg::UpdateMask<float>(valueCount);
+            Reg::StoreAlign(dstValue, valueReg, valueMask);
+        } else {
+            Reg::RegTensor<half> halfValueReg;
+            Reg::MaskReg squeezeMask = Reg::CreateMask<uint32_t>();
+            Reg::Squeeze<half, Reg::GatherMaskMode::NO_STORE_REG>(
+                halfValueReg, reinterpret_cast<Reg::RegTensor<half>&>(valueReg), squeezeMask);
+            Reg::MaskReg valueMask = Reg::UpdateMask<half>(valueCount);
+            Reg::StoreAlign(dstValue, halfValueReg, valueMask);
+        }
+    }
+}
+
+template <typename T>
 __ASC_USE_RESERVED_UBUF__(3510, "TopK is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void GatherDstValAndDstIdx(
     const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal, const LocalTensor<T>& tmpLocal,
-    const TopkTiling& tiling, const int32_t dstOffsetFourBytes, const int outterIdx)
+    const int32_t k, const TopkTiling& tiling, const int32_t dstOffsetFourBytes, const int outterIdx)
 {
-    uint64_t rsvdCnt = 0;
-    struct GatherMaskParams reducev2Params(DEFAULT_BLK_STRIDE, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_BLK_STRIDE);
-    if constexpr (sizeof(T) == sizeof(float)) {
-        // Get Value, The index of the odd position is obtained for each repeat.
-        GatherMask<T>(
-            dstValueLocal[dstOffsetFourBytes], tmpLocal[tiling.innerDataSize], REDUCEV2_MODE_ONE, true,
+    // The paired load covers 64 proposals. Keep the existing reduction path for larger K values.
+    if (k > static_cast<int32_t>(GetVecLen() / sizeof(float))) {
+        uint64_t rsvdCnt = 0;
+        struct GatherMaskParams reducev2Params(DEFAULT_BLK_STRIDE, 1, DEFAULT_REPEAT_STRIDE, DEFAULT_BLK_STRIDE);
+        if constexpr (sizeof(T) == sizeof(float)) {
+            GatherMask<T>(
+                dstValueLocal[dstOffsetFourBytes], tmpLocal[tiling.innerDataSize], REDUCEV2_MODE_ONE, true,
+                tiling.maskVreducev2FourBytes, reducev2Params, rsvdCnt);
+        } else {
+            int32_t dstOffsetTwoBytes = outterIdx * tiling.kAlignTwoBytes;
+            GatherMask<T>(
+                dstValueLocal[dstOffsetTwoBytes], tmpLocal[tiling.innerDataSize], REDUCEV2_MODE_THREE, true,
+                tiling.maskVreducev2TwoBytes, reducev2Params, rsvdCnt);
+        }
+        LocalTensor<int32_t> tempBufferLocal = tmpLocal[tiling.innerDataSize].template ReinterpretCast<int32_t>();
+        GatherMask<int32_t>(
+            dstIndexLocal[dstOffsetFourBytes], tempBufferLocal, REDUCEV2_MODE_TWO, true,
             tiling.maskVreducev2FourBytes, reducev2Params, rsvdCnt);
-    } else {
-        int32_t dstOffsetTwoBytes = outterIdx * tiling.kAlignTwoBytes;
-        // Get Value. The first element is used for every four elements in each repeat.
-        GatherMask<T>(
-            dstValueLocal[dstOffsetTwoBytes], tmpLocal[tiling.innerDataSize], REDUCEV2_MODE_THREE, true,
-            tiling.maskVreducev2TwoBytes, reducev2Params, rsvdCnt);
+        return;
     }
-    // Get Index, The index of the even position is obtained for each repeat.
-    LocalTensor<int32_t> tempBufferLocal = tmpLocal[tiling.innerDataSize].template ReinterpretCast<int32_t>();
-    GatherMask<int32_t>(
-        dstIndexLocal[dstOffsetFourBytes], tempBufferLocal, REDUCEV2_MODE_TWO, true, tiling.maskVreducev2FourBytes,
-        reducev2Params, rsvdCnt);
+
+    int32_t dstValueOffset = dstOffsetFourBytes;
+    if constexpr (sizeof(T) != sizeof(float)) {
+        dstValueOffset = outterIdx * tiling.kAlignTwoBytes;
+    }
+
+    ExtractTopKValueAndIndex<T>(
+        reinterpret_cast<__ubuf__ T*>(dstValueLocal[dstValueOffset].GetPhyAddr()),
+        reinterpret_cast<__ubuf__ int32_t*>(dstIndexLocal[dstOffsetFourBytes].GetPhyAddr()),
+        reinterpret_cast<__ubuf__ T*>(tmpLocal[tiling.innerDataSize].GetPhyAddr()), static_cast<uint32_t>(k));
 }
 
 template <typename T, bool isInitIndex>
@@ -124,7 +188,7 @@ __aicore__ inline void TopKCompute(
         int32_t dstOffsetFourBytes = j * tiling.kAlignFourBytes;
         TmpLocalSort32<T, isInitIndex>(srcLocal, srcIndexLocal, tmpLocal, tiling, topKInfo, isLargest, j);
 
-        GatherDstValAndDstIdx(dstValueLocal, dstIndexLocal, tmpLocal, tiling, dstOffsetFourBytes, j);
+        GatherDstValAndDstIdx(dstValueLocal, dstIndexLocal, tmpLocal, k, tiling, dstOffsetFourBytes, j);
 
         if constexpr (isHasfinish) {
             bool finishValue = finishLocal.GetValue(j);
