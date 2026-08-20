@@ -1923,8 +1923,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         src_stride, dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1935,8 +1933,6 @@ __aicore__ inline void asc_copy_gm2l1_align(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align_sync the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1947,8 +1943,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ half* dst, __gm__ half* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1959,8 +1953,6 @@ __aicore__ inline void asc_copy_gm2l1_align(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align_sync the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ half* dst, __gm__ half* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1971,8 +1963,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ float* dst, __gm__ float* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1983,8 +1973,6 @@ __aicore__ inline void asc_copy_gm2l1_align(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align_sync the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ float* dst, __gm__ float* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1995,8 +1983,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2007,8 +1993,6 @@ __aicore__ inline void asc_copy_gm2l1_align(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align_sync the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2019,8 +2003,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2031,8 +2013,6 @@ __aicore__ inline void asc_copy_gm2l1_align(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align_sync the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2043,8 +2023,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2055,8 +2033,6 @@ __aicore__ inline void asc_copy_gm2l1_align(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align_sync the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2067,8 +2043,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2079,8 +2053,6 @@ __aicore__ inline void asc_copy_gm2l1_align(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align_sync the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2091,8 +2063,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2103,8 +2073,6 @@ __aicore__ inline void asc_copy_gm2l1_align(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align_sync the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2115,8 +2083,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2127,8 +2093,6 @@ __aicore__ inline void asc_copy_gm2l1_align(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align_sync the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2139,8 +2103,6 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2151,8 +2113,6 @@ __aicore__ inline void asc_copy_gm2l1_align(
         burst_src_stride, burst_dst_stride);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_align_sync the uint8_t l2_cache_ctl parameter is deprecated. "
-             "Please use enum class asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_align_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -2356,8 +2316,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
         enable_small_c0);
 }
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2365,9 +2323,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2376,8 +2331,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2385,9 +2338,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2396,8 +2346,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2405,9 +2353,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2416,8 +2361,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ half* dst, __gm__ half* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2425,9 +2368,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ half* dst, __gm__ half* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2436,8 +2376,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ float* dst, __gm__ float* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2445,9 +2383,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ float* dst, __gm__ float* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2456,8 +2391,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2465,9 +2398,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2476,8 +2406,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2485,9 +2413,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2496,8 +2421,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2505,9 +2428,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2516,8 +2436,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2525,9 +2443,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2536,8 +2451,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2545,9 +2458,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2556,8 +2466,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2565,9 +2473,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2576,8 +2481,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_dn2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2585,9 +2488,6 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     asc_copy_gm2l1_dn2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_dn2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2789,8 +2689,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
         enable_small_c0);
 }
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2798,9 +2696,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2809,8 +2704,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2818,9 +2711,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2829,8 +2719,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2838,9 +2726,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2849,8 +2734,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ half* dst, __gm__ half* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2858,9 +2741,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ half* dst, __gm__ half* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2869,8 +2749,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ float* dst, __gm__ float* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2878,9 +2756,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ float* dst, __gm__ float* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2889,8 +2764,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2898,9 +2771,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2909,8 +2779,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2918,9 +2786,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2929,8 +2794,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2938,9 +2801,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2949,8 +2809,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2958,9 +2816,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2969,8 +2824,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2978,9 +2831,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2989,8 +2839,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -2998,9 +2846,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -3009,8 +2854,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
         dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated("NOTICE: asc_copy_gm2l1_nd2nz the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-             "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)
@@ -3018,9 +2861,6 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     asc_copy_gm2l1_nd2nz_impl(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
 }
 
-[[deprecated(
-    "NOTICE: asc_copy_gm2l1_nd2nz_sync the uint8_t l2_cache_ctl parameter is deprecated. Please use enum class "
-    "asc_load_l2_cache_mode instead")]]
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en)

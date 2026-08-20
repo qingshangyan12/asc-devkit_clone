@@ -81,11 +81,7 @@ __aicore__ inline void asc_set_l0c_copy_channel_para(uint16_t src_nz_matrix_stri
     asc_set_l0c_copy_channel_para_impl(src_nz_matrix_stride);
 }
 
-[[deprecated("NOTICE: asc_set_l0c2gm_channel_para is deprecated. Please use asc_set_l0c_copy_channel_para instead")]]
-__aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config)
-{
-    asc_set_l0c2gm_channel_para_impl(config);
-}
+__aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config) { asc_set_l0c2gm_channel_para_impl(config); }
 
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config) { asc_set_l3d_rpt_b_impl(config); }
 
