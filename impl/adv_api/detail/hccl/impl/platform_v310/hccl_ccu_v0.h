@@ -283,7 +283,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         if (msgQueueIsAvailable_[globalCurResId_] == false) {
             break;
         }
-        KERNEL_LOG(KERNEL_INFO, "ApiClient do ccu prepare repeatIdx = %d, globalCurResId_ = %d.", i, globalCurResId_);
+        AscendC::PRINTF("ApiClient do ccu prepare repeatIdx = %d, globalCurResId_ = %d.", i, globalCurResId_);
 
         ccuParam_.repeatIndex = i;
         ccuParam_.alltoallvCnt = globalCurResId_;
@@ -486,8 +486,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
     handleNeedCommitCnt_[handleId]++;
     if (msgQueueIsAvailable_[globalCurResId_] == false) {
-        KERNEL_LOG(
-            KERNEL_ERROR, "Call Commit failed, the th msg is not avaliable! handleId = %d", globalCurResId_, handleId);
+        AscendC::PRINTF("Call Commit failed, the th msg is not avaliable! handleId = %d", globalCurResId_, handleId);
         return;
     }
 
