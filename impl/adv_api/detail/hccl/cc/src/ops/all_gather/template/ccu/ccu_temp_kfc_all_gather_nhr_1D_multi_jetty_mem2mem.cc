@@ -115,7 +115,12 @@ HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::KernelRun(
     return HCCL_SUCCESS;
 }
 
+<<<<<<< HEAD
 HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::GetRes(AlgResourceRequest& resourceRequest) const
+=======
+HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::GetRes(
+    AlgResourceRequest& resourceRequest) const
+>>>>>>> bd0dc8c83 (fix nhr alloc bug)
 {
     resourceRequest.slaveThreadNum = 0;
     resourceRequest.notifyNumOnMainThread = 0;
