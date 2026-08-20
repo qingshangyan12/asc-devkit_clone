@@ -26,7 +26,8 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/vector_datamove_impl/asc_set_copy_pad_val_impl.h"
 
 __aicore__ inline void asc_copy_ub2ub(
-    __ubuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    __ubuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap,
+    uint16_t dst_gap)
 {
     asc_copy_ub2ub_impl(dst, src, burst_count, burst_len, src_gap, dst_gap);
 }
@@ -160,8 +161,8 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ half* dst, __gm__ half
 }
 
 __aicore__ inline void asc_copy_gm2ub_align(
-    __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
-    uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len,
+    uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
 {
     asc_copy_gm2ub_align_impl(dst, src, burst_count, burst_len, left_padding_num, right_padding_num, src_gap, dst_gap);
 }
@@ -314,8 +315,8 @@ __aicore__ inline void asc_copy_ub2gm_align_sync(__gm__ int16_t* dst, __ubuf__ i
 }
 
 __aicore__ inline void asc_copy_ub2gm_align(
-    __gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
-    uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    __gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len,
+    uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
 {
     asc_copy_ub2gm_align_impl(dst, src, burst_count, burst_len, left_padding_num, right_padding_num, src_gap, dst_gap);
 }

@@ -29,13 +29,13 @@
     namespace {                                                                                                \
                                                                                                                \
     void cce_name##_##data_type##_Stub(                                                                        \
-        __gm__ void* dst, __ubuf__ void* src, uint8_t sid, uint32_t burst_count, uint32_t burst_len,               \
+        __gm__ void* dst, __ubuf__ void* src, uint8_t sid, uint32_t burst_count, uint32_t burst_len,           \
         uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)                                       \
     {                                                                                                          \
         EXPECT_EQ(dst, reinterpret_cast<__gm__ void*>(11));                                                    \
         EXPECT_EQ(src, reinterpret_cast<__ubuf__ void*>(22));                                                  \
         EXPECT_EQ(sid, static_cast<uint8_t>(0));                                                               \
-        EXPECT_EQ(burst_count, static_cast<uint32_t>(1));                                                          \
+        EXPECT_EQ(burst_count, static_cast<uint32_t>(1));                                                      \
         EXPECT_EQ(burst_len, static_cast<uint32_t>(1));                                                        \
         EXPECT_EQ(l2_cache_mode, static_cast<uint8_t>(0));                                                     \
         EXPECT_EQ(dst_stride, static_cast<uint64_t>(0));                                                       \

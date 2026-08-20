@@ -39,8 +39,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b8(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -63,8 +63,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b8(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -87,8 +87,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b8(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -111,8 +111,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b16(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -135,8 +135,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b16(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -154,13 +154,13 @@ __aicore__ inline void asc_copy_ub2gm_align_sync_impl(__gm__ int16_t* dst, __ubu
 }
 
 __aicore__ inline void asc_copy_ub2gm_align_impl(
-    __gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
-    uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    __gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len,
+    uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b16(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -183,8 +183,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b32(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -207,8 +207,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b32(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -231,8 +231,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b32(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -255,8 +255,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b32(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -279,8 +279,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b32(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -303,8 +303,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_b32(
-            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__gm__ void*)dst, (__ubuf__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 

@@ -238,8 +238,8 @@ __aicore__ inline void asc_copy_ub2gm_align_sync_impl(__gm__ int32_t* dst, __ubu
 }
 
 __aicore__ inline void asc_copy_ub2gm_align_impl(
-    __gm__ half* dst, __ubuf__ half* src, uint32_t burst_count, uint32_t burst_len, asc_store_l2_cache_mode l2_cache_mode,
-    uint64_t dst_stride, uint32_t src_stride)
+    __gm__ half* dst, __ubuf__ half* src, uint32_t burst_count, uint32_t burst_len,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
@@ -272,8 +272,8 @@ __aicore__ inline void asc_copy_ub2gm_align_sync_impl(__gm__ half* dst, __ubuf__
 }
 
 __aicore__ inline void asc_copy_ub2gm_align_impl(
-    __gm__ float* dst, __ubuf__ float* src, uint32_t burst_count, uint32_t burst_len, asc_store_l2_cache_mode l2_cache_mode,
-    uint64_t dst_stride, uint32_t src_stride)
+    __gm__ float* dst, __ubuf__ float* src, uint32_t burst_count, uint32_t burst_len,
+    asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(
@@ -385,8 +385,8 @@ __aicore__ inline void asc_copy_ub2gm_align_impl(
 }
 
 __aicore__ inline void asc_copy_ub2gm_align_impl(
-    __gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t l2_cache_mode,
-    uint64_t dst_stride, uint32_t src_stride)
+    __gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint32_t burst_count, uint32_t burst_len,
+    uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride)
 {
     if ASC_IS_AIV {
         copy_ubuf_to_gm_align_v2(

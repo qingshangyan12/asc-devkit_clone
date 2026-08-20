@@ -40,8 +40,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(
 {
     if ASC_IS_AIV {
         copy_gm_to_ubuf_align_b8(
-            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -65,8 +65,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(
 {
     if ASC_IS_AIV {
         copy_gm_to_ubuf_align_b8(
-            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -90,8 +90,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(
 {
     if ASC_IS_AIV {
         copy_gm_to_ubuf_align_b16(
-            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -110,13 +110,13 @@ __aicore__ inline void asc_copy_gm2ub_align_sync_impl(__ubuf__ half* dst, __gm__
 
 // bfloat16_t
 __aicore__ inline void asc_copy_gm2ub_align_impl(
-    __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
-    uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
+    __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len,
+    uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap)
 {
     if ASC_IS_AIV {
         copy_gm_to_ubuf_align_b16(
-            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -140,8 +140,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(
 {
     if ASC_IS_AIV {
         copy_gm_to_ubuf_align_b16(
-            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -165,8 +165,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(
 {
     if ASC_IS_AIV {
         copy_gm_to_ubuf_align_b16(
-            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -190,8 +190,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(
 {
     if ASC_IS_AIV {
         copy_gm_to_ubuf_align_b32(
-            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -215,8 +215,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(
 {
     if ASC_IS_AIV {
         copy_gm_to_ubuf_align_b32(
-            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
@@ -240,8 +240,8 @@ __aicore__ inline void asc_copy_gm2ub_align_impl(
 {
     if ASC_IS_AIV {
         copy_gm_to_ubuf_align_b32(
-            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num, src_gap,
-            dst_gap);
+            (__ubuf__ void*)dst, (__gm__ void*)src, 0, burst_count, burst_len, left_padding_num, right_padding_num,
+            src_gap, dst_gap);
     }
 }
 
