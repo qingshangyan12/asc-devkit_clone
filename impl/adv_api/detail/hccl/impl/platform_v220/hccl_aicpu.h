@@ -207,6 +207,15 @@ template <const auto& config>
 template <ScopeType type>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>::QueueBarrier(uint16_t queueID)
 {
+    const uint32_t availableQueueNum = (queueNum_ == 0U) ? 1U : static_cast<uint32_t>(queueNum_);
+    const uint64_t queueIndex =
+        static_cast<uint64_t>(queueID) + static_cast<uint64_t>(GetBlockIdx()) * static_cast<uint64_t>(queueNum_);
+    if ((static_cast<uint32_t>(queueID) >= availableQueueNum) || (queueIndex >= MAX_QUE_NUM)) {
+        KERNEL_LOG(
+            KERNEL_ERROR, "Invalid queue ID %u, available queue num %u, queue index %llu.",
+            static_cast<uint32_t>(queueID), availableQueueNum, static_cast<unsigned long long>(queueIndex));
+        return;
+    }
     CommonPrepareParam param;
     param.commType.msgType = ControlMsgType::HCCL_CMD_BARRIER;
     SendMsgToServer(queueID, param);

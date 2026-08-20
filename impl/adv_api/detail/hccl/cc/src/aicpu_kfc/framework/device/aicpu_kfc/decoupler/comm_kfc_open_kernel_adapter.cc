@@ -65,8 +65,13 @@ HcclResult LoadOpenOpParamData(uint64_t opParamKey, std::string& commName, std::
         HCCL_ERROR("Invalid opParamKey %#llx.", opParamKey);
         return HCCL_E_PARA;
     }
-
-    const size_t opParamSize = sizeof(mc2_ops_hccl::OpParam) + param->varMemSize;
+    const u64 maxVarMemSize = mc2_ops_hccl::ALL_TO_ALL_V_VECTOR_NUM * HcclApi::HCCL_MAX_RANK_NUM_V2 * sizeof(u64);
+    if (param->varMemSize > maxVarMemSize) {
+        HCCL_ERROR(
+            "Invalid OpParam variable memory size %llu.", static_cast<unsigned long long>(param->varMemSize));
+        return HCCL_E_PARA;
+    }
+    const size_t opParamSize = sizeof(mc2_ops_hccl::OpParam) + static_cast<size_t>(param->varMemSize);
     const auto* begin = reinterpret_cast<const uint8_t*>(param);
     opParam.assign(begin, begin + opParamSize);
     commName.assign(param->commName);
@@ -98,7 +103,7 @@ HcclResult LoadOpenOpParamData(uint64_t opParamKey, std::string& commName, std::
     return HCCL_SUCCESS;
 }
 
-void CreateOpParamByBaseOpParam(
+HcclResult CreateOpParamByBaseOpParam(
     const std::vector<uint8_t>& baseOpParam, const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, uint32_t rankNum,
     void* stream, std::vector<uint8_t>& runOpParam)
 {
@@ -107,10 +112,11 @@ void CreateOpParamByBaseOpParam(
     const size_t opParamSize = sizeof(mc2_ops_hccl::OpParam) + baseParam->varMemSize;
     runOpParam.resize(opParamSize);
     auto* param = reinterpret_cast<mc2_ops_hccl::OpParam*>(runOpParam.data());
-    memcpy_s(param, sizeof(mc2_ops_hccl::OpParam), baseParam, sizeof(mc2_ops_hccl::OpParam));
+    CHK_SAFETY_FUNC_RET(memcpy_s(param, sizeof(mc2_ops_hccl::OpParam), baseParam, sizeof(mc2_ops_hccl::OpParam)));
 
     if (baseParam->varMemSize > 0) {
-        memcpy_s(param->varData, baseParam->varMemSize, baseParam->varData, baseParam->varMemSize);
+        CHK_SAFETY_FUNC_RET(
+            memcpy_s(param->varData, baseParam->varMemSize, baseParam->varData, baseParam->varMemSize));
     }
 
     param->inputPtr = reinterpret_cast<void*>(msg.sendBuffer);
@@ -155,6 +161,7 @@ void CreateOpParamByBaseOpParam(
     param->opType = static_cast<HcclCMDType>(msg.commType.prepareType);
     param->reduceType = static_cast<HcclReduceOp>(msg.opType);
     param->stream = stream;
+    return HCCL_SUCCESS;
 }
 
 inline void LocalPrintElseOpParam(uint32_t rankNum, uint32_t repeatIdx, std::vector<uint8_t>& runOpParam)
@@ -194,14 +201,24 @@ HcclResult FormatOpenOpParamDataFromMsg(
     const std::vector<uint8_t>& baseOpParam, const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, uint32_t rankNum,
     uint32_t repeatIdx, void* stream, std::vector<uint8_t>& runOpParam)
 {
-    if (baseOpParam.empty()) {
-        HCCL_ERROR("Base op param is empty.");
-        return HCCL_E_PARA;
-    }
-    auto* param = reinterpret_cast<mc2_ops_hccl::OpParam*>(runOpParam.data());
+    CHK_PRT_RET(
+        !HcclApi::IsValidHcclMsgRankSize(rankNum), HCCL_ERROR("Invalid rank size %u.", rankNum), HCCL_E_PARA);
+    CHK_PRT_RET(
+        baseOpParam.size() < sizeof(mc2_ops_hccl::OpParam),
+        HCCL_ERROR(
+            "Base op param size %zu is smaller than OpParam size %zu.", baseOpParam.size(),
+            sizeof(mc2_ops_hccl::OpParam)),
+        HCCL_E_PARA);
     const auto* baseParam = reinterpret_cast<const mc2_ops_hccl::OpParam*>(baseOpParam.data());
+    CHK_PRT_RET(
+        baseParam->varMemSize > baseOpParam.size() - sizeof(mc2_ops_hccl::OpParam),
+        HCCL_ERROR(
+            "Base OpParam variable memory size %llu exceeds buffer size %zu.",
+            static_cast<unsigned long long>(baseParam->varMemSize), baseOpParam.size()),
+        HCCL_E_PARA);
+    auto* param = reinterpret_cast<mc2_ops_hccl::OpParam*>(runOpParam.data());
     if (repeatIdx == 0U) {
-        CreateOpParamByBaseOpParam(baseOpParam, msg, extMsg, rankNum, stream, runOpParam);
+        CHK_RET(CreateOpParamByBaseOpParam(baseOpParam, msg, extMsg, rankNum, stream, runOpParam));
         param = reinterpret_cast<mc2_ops_hccl::OpParam*>(runOpParam.data());
     } else {
         if (runOpParam.empty()) {
