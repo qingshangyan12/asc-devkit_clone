@@ -2,14 +2,22 @@
 
 ## 概述
 
-本样例展示 `data_reorder.h` 中寄存器数据重排接口的用法，使用 `SCENARIO_NUM` 选择场景：
-
-| SCENARIO_NUM | 接口 | 功能 |
-| --- | --- | --- |
-| 1 | `interleave` | 将两个寄存器按元素交织，返回两个结果寄存器 |
-| 2 | `deinterleave` | 将两个连续寄存器按奇偶位置拆分，返回两个结果寄存器 |
-
-输入 `x`、`y` 均为 64 个 `float`，对应 dav-3510 的一个 256 字节向量寄存器。输出为两个结果寄存器连续存放，共 128 个 `float`。
+## 概述
+本样例基于Reg编程接口实现数据重排功能，支持多种场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
+    <table>
+ 	  	 	<tr>
+        <td>SCENARIO_NUM</td>
+ 	  	 		<td>重排场景</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>1</td>
+ 	  	 		<td>Interleave（将两个uint16_t向量交织）</td>
+ 	  	 	</tr>
+ 	  	 	<tr>
+ 	  	 		<td>2</td>
+ 	  	 		<td>Pack（从uint32_t向量中提取低16位到uint16_t向量）</td>
+ 	  	 	</tr>
+ 	  	 </table>
 
 ## 目录结构
 
