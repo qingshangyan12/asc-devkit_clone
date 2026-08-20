@@ -13,8 +13,6 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 
-get_filename_component(ASC_DEVKIT_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
-list(APPEND CMAKE_MODULE_PATH "${ASC_DEVKIT_ROOT}/cmake/asc/asc_modules")
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
@@ -32,9 +30,10 @@ add_executable(demo
     cast_reg_api.asc
 )
 
-set(ASCEND_HOME "$ENV{ASCEND_HOME_PATH}")
-target_include_directories(demo PRIVATE
-    "${ASCEND_HOME}"
+set(ASCEND_HOME $ENV{ASCEND_HOME_PATH})
+set(ASC_INCLUDE_DIR "${ASCEND_HOME}/asc/")
+include_directories(
+    "${ASC_INCLUDE_DIR}"
 )
 
 target_compile_definitions(demo PRIVATE
