@@ -10,6 +10,8 @@
 #ifndef AICPU_LAUNCH_MANAGER_H
 #define AICPU_LAUNCH_MANAGER_H
 
+#include <stdexcept>
+
 #include "hccl_common.h"
 #include "stream_pub.h"
 #include "aicpu_operator_pub.h"
@@ -52,9 +54,15 @@ struct ApiParamDef {
 
     ApiParamDef(const char* kName, const char* sName, const char* oName)
     {
-        strncpy_s(kernelName, NAME_SIZE, kName, NAME_SIZE - 1);
-        strncpy_s(soName, NAME_SIZE, sName, NAME_SIZE - 1);
-        strncpy_s(opName, NAME_SIZE, oName, NAME_SIZE - 1);
+        if (strncpy_s(kernelName, NAME_SIZE, kName, NAME_SIZE - 1) != EOK) {
+            throw std::invalid_argument("failed to copy kernel name");
+        }
+        if (strncpy_s(soName, NAME_SIZE, sName, NAME_SIZE - 1) != EOK) {
+            throw std::invalid_argument("failed to copy shared object name");
+        }
+        if (strncpy_s(opName, NAME_SIZE, oName, NAME_SIZE - 1) != EOK) {
+            throw std::invalid_argument("failed to copy operator name");
+        }
     }
 };
 
