@@ -228,28 +228,44 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
 
-    uint64_t loopCount = CCU_LOOP_COUNT_M2M_RE;
     uint64_t sliceCount = commParam->count;
     uint64_t sliceSize = sliceCount * dataSize;
 
     xnData_[3] = ccuParam_.scratchAddr;
     uint64_t rankSliceOffset =
         ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
-    AscendC::PRINTF("ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
-        ccuParam_.scratchAddr, rankSliceOffset);
     xnData_[4] = rankSliceOffset;
-    // Keep the fixed scratch contract local to the existing XN7/XN8 protocol:
-    // XN7 is the tail size and XN8 is the inverse number of full chunks.
-    constexpr uint64_t scratchSize = 16 * 1024 * 1024;
+
+    // XN5~8 为 chunk 协议，须与 KFC server DispatchKfcSubKernel 的 ReduceScatter 分支同步修改：
+    // 5=chunkSize 6=chunkCount 7=totalSliceSize 8=tailChunkSize，9~12 清零保留
+    uint64_t scratchSize = ccuParam_.scratchSize;
+    if (unlikely(scratchSize == 0)) {
+        KERNEL_LOG(KERNEL_WARNING, "CcuPrepareForReduceScatterM2M scratchSize from res[1] is 0, fallback to default.");
+        scratchSize = CCU_KFC_SCRATCH_DEFAULT_SIZE;
+    }
     constexpr uint64_t minSliceAlign = 128;
     uint64_t chunkSize = scratchSize / ccuParam_.rankNum / minSliceAlign * minSliceAlign;
-    uint64_t fullChunkCount = sliceSize / chunkSize;
-    xnData_[7] = sliceSize - fullChunkCount * chunkSize;
-    xnData_[8] = UINT64_MAX - fullChunkCount;
+    uint64_t chunkCount = 0;
+    uint64_t tailChunkSize = 0;
+    if (sliceSize != 0 && chunkSize == 0) {
+        // scratch 容量不足以按 rank 切出合法 chunk，只能拒绝搬运，不能发出可能越界的消息
+        KERNEL_LOG(
+            KERNEL_ERROR, "CcuPrepareForReduceScatterM2M chunkSize is 0, scratchSize[%llu] rankNum[%u] invalid.",
+            scratchSize, ccuParam_.rankNum);
+    } else if (sliceSize != 0) {
+        chunkCount = (sliceSize + chunkSize - 1) / chunkSize;
+        tailChunkSize = sliceSize - (chunkCount - 1) * chunkSize;
+    }
+    xnData_[5] = chunkSize;
+    xnData_[6] = chunkCount;
+    xnData_[7] = sliceSize;
+    xnData_[8] = tailChunkSize;
+    for (uint32_t i = 9; i < 13; ++i) {
+        xnData_[i] = 0; // 清零保留槽位，避免环形队列槽复用残留旧值
+    }
     AscendC::PRINTF(
-        "RS chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, id8=0x%llx\n",
-        sliceSize, chunkSize, fullChunkCount, xnData_[7], xnData_[8]);
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+        "RS chunk prepare: total=0x%llx, chunk=0x%llx, count=0x%llx, tail=0x%llx, scratch=0x%llx\n", sliceSize,
+        chunkSize, chunkCount, tailChunkSize, scratchSize);
 }
 } // namespace AscendC
 

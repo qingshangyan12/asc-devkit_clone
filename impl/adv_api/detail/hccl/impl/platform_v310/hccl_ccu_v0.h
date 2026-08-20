@@ -321,6 +321,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     ccuParam_.rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
     ccuParam_.rankId = newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId;
     ccuParam_.scratchAddr = newCcuFlag_ ? hcclNewContext_->res[0] : hcclContext_->windowsOut[0];
+    // res[1] 由 Host 写入 scratch 实际容量；旧 context 无该字段，保持 0 由使用方回退
+    ccuParam_.scratchSize = newCcuFlag_ ? hcclNewContext_->res[1] : 0;
 }
 
 template <const auto& config>
@@ -339,7 +341,10 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
     const CommonPrepareParam& commonPrepareParam)
 {
     if (unlikely(commonPrepareParam.repeat == 0U)) {
-        AscendC::PRINTF("unlikely commonPrepareParam.repeat");
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "Call Prepare[%d] failed, repeat is 0, repeat means the number of complete op instances and must be >= 1.",
+            static_cast<int32_t>(commonPrepareParam.commType.prepareType));
         return INVALID_HANDLE_ID;
     }
 

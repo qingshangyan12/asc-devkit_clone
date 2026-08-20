@@ -193,8 +193,9 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     opResCtx.rankSize = rankSize;
     opResCtx.xnAddr = reinterpret_cast<uint64_t>(comParamPtr);
     opResCtx.ckeAddr = reinterpret_cast<uint64_t>(comSyncPtr);
-    // ReduceScatter KFC follows pr_4523 and partitions this fixed 16 MiB buffer as rankSize * sliceSize.
+    // res[0] 为 scratch 地址，res[1] 为 scratch 实际容量；KFC ReduceScatter 按 chunkSize=容量/rankSize 分块复用
     opResCtx.res[0] = reinterpret_cast<uint64_t>(scratchPtr);
+    opResCtx.res[1] = scratchSize;
 
     HCCL_INFO(
         "[AllocCcuOpResCtx] workspace[%p], workspaceSize[%llu], scratch[%p], scratchSize[%llu], "

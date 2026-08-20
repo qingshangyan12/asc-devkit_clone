@@ -153,6 +153,8 @@ constexpr uint64_t CCU_MEMSLICE_SIZE = 4096; // CCU MS size, MC2 is not aware of
 constexpr uint64_t CCU_MSG_CKE_INIT_VALUE = 0;
 constexpr uint64_t CCU_MSG_CKE_SET_VALUE = 1;
 constexpr uint64_t CCU_MAX_COMM_DATA = 268435456; // 256 * 1024 * 1024
+// 旧 ByTiling context 未通过 res[1] 下发 scratch 容量时的回退值，须与 Hccl::MC2_WORKSPACE_SIZE 保持一致
+constexpr uint64_t CCU_KFC_SCRATCH_DEFAULT_SIZE = 16 * 1024 * 1024;
 
 struct CCUMsg {
     GM_ADDR xnData; // Msg is converted to CCU register value
@@ -175,6 +177,7 @@ struct CcuPrepareParam {
     uint8_t alltoallvCnt = 0;
     __gm__ CCUMsgExt* ccuMsgExt;
     uint64_t scratchAddr;
+    uint64_t scratchSize = 0;
 };
 
 struct AlltoAllVParamCcu {
