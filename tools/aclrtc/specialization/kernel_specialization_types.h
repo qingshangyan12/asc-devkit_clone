@@ -62,7 +62,7 @@ struct NormalizedKernelSpecializationRequest {
     CompilationVariant compilationVariant{CompilationVariant::Basic};
     KernelCompilerOptions compilerOptions;
     uint64_t kernelArgumentCount{0};
-    const void* const *borrowedKernelArgumentDataPointers{nullptr};
+    const void* const* borrowedKernelArgumentDataPointers{nullptr};
     const uint64_t* borrowedKernelArgumentByteCounts{nullptr};
 };
 

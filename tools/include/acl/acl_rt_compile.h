@@ -36,13 +36,13 @@ typedef struct aclrtcKernelSpecRequest {
     const char* kernelEntry;
 
     uint64_t argsCount;
-    const void* const *argsAddr;
+    const void* const* argsAddr;
     const uint64_t* argsBytes;
 
-    const char* const *options;
+    const char* const* options;
     uint64_t optionCount;
 
-    const char* const *skOptions;
+    const char* const* skOptions;
     uint64_t skOptionCount;
 
     uint8_t reserved[256];
