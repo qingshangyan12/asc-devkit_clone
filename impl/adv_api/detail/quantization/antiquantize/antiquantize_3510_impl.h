@@ -297,7 +297,7 @@ __aicore__ inline void AntiQuantizePerTensor(
     static_assert(
         SupportType<
             SrcT, fp8_e4m3fn_t, fp8_e5m2_t, int8_t
-#if !(defined(NPU_ARCH) && (NPU_ARCH == 3003 || NPU_ARCH == 3113))
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
             ,
             hifloat8_t
 #endif
