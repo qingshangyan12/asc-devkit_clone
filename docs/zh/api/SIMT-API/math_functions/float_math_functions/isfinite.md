@@ -42,7 +42,7 @@ inline bool isfinite(float x)
 
 ## 返回值说明
 
--   `false`：输入为`nan`、`inf`、`-inf`。
+-   `false`：输入为nan、inf、-inf。
 -   `true`：输入为有限数。
 
 ## 约束说明

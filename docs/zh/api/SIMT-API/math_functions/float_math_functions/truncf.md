@@ -44,9 +44,9 @@ inline float truncf(float x)
 
 输入数据浮点数截断后的整数。特别场景说明如下：
 
--   当`x`为`nan`时，返回值为`nan`。
--   当`x`为`inf`时，返回值为`inf`。
--   当`x`为`-inf`时，返回值为`-inf`。
+-   当`x`为nan时，返回值为nan。
+-   当`x`为inf时，返回值为inf。
+-   当`x`为-inf时，返回值为-inf。
 
 ## 约束说明
 

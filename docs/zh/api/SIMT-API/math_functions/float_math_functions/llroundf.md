@@ -44,7 +44,7 @@ inline long long int llroundf(float x)
 
 对输入四舍五入后的整数。特别场景说明如下：
 
--   当 `x` 为 `nan` 时，返回值为0
+-   当 `x` 为 nan 时，返回值为0
 
 ## 约束说明
 
