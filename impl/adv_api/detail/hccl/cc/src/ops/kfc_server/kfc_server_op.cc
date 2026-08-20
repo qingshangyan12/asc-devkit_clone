@@ -34,7 +34,7 @@ HcclResult HcclKfcServer(
     u32 rankSize = INVALID_VALUE_RANKSIZE;
     CHK_RET(HcclGetRankSize(comm, &rankSize));
     char commName[COMM_INDENTIFIER_MAX_LENGTH];
-    CHK_RET(HcclGetCommName(comm, commName));
+    CHK_RET(HcclGetCommNameV2(comm, commName, sizeof(commName)));
     u32 userRank = INVALID_VALUE_RANKID;
     CHK_RET(HcclGetRankId(comm, &userRank));
     const string tag = "KFC_SERVER_" + string(commName);
@@ -75,7 +75,7 @@ HcclResult KfcServerConstructOpParam(
     uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, uint64_t workSpaceSize, HcclComm comm, aclrtStream stream,
     const std::string& tag, HcclCMDType opType, u32 rankSize, OpMode opMode, OpParam& param)
 {
-    CHK_RET(HcclGetCommName(comm, param.commName));
+    CHK_RET(HcclGetCommNameV2(comm, param.commName, sizeof(param.commName)));
     param.stream = stream;
     param.opMode = opMode;
     DevType deviceType = DevType::DEV_TYPE_COUNT;

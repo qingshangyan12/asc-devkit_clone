@@ -10,8 +10,10 @@
 #ifndef HCCL_COMM_H_
 #define HCCL_COMM_H_
 
+#include <stddef.h>
 #include <hccl/hccl_types.h>
 #include <acl/acl.h>
+#include "securec.h"
 
 #ifndef HCOMM_WEAK_SYMBOL
 #define HCOMM_WEAK_SYMBOL __attribute__((weak))
@@ -120,6 +122,21 @@ extern HcclResult HcclGetConfig(HcclConfig config, HcclConfigValue* configValue)
 extern HcclResult HcclGetCommName(HcclComm comm, char* commName) HCOMM_WEAK_SYMBOL;
 
 /**
+ * @brief ABI-compatible checked wrapper for HcclGetCommName.
+ * @param commNameCapacity Capacity of commName in bytes, including the null terminator.
+ */
+static inline HcclResult HcclGetCommNameV2(HcclComm comm, char* commName, size_t commNameCapacity)
+{
+    if (commName == nullptr) {
+        return HCCL_E_PTR;
+    }
+    if (commNameCapacity < COMM_NAME_MAX_LENGTH) {
+        return HCCL_E_PARA;
+    }
+    return HcclGetCommName(comm, commName);
+}
+
+/**
  * @brief get commhandle with commName.
  *
  * @param commName The name of commhandle.
@@ -209,12 +226,14 @@ static inline void HcclCommConfigInit(HcclCommConfig* config)
         uint64_t reserved;
     } configInfo_t;
 
-    configInfo_t* info = (configInfo_t*)config;
-
-    info->size = sizeof(HcclCommConfig);
-    info->magicWord = HCCL_COMM_CONFIG_MAGIC_WORD;
-    info->version = HCCL_COMM_CONFIG_VERSION;
-    info->reserved = 0;
+    static_assert(sizeof(configInfo_t) <= HCCL_COMM_CONFIG_INFO_BYTES, "HcclCommConfig metadata exceeds reserved bytes");
+    static_assert(
+        offsetof(HcclCommConfig, hcclBufferSize) == HCCL_COMM_CONFIG_INFO_BYTES,
+        "HcclCommConfig metadata layout changed");
+    const configInfo_t info = {sizeof(HcclCommConfig), HCCL_COMM_CONFIG_MAGIC_WORD, HCCL_COMM_CONFIG_VERSION, 0U};
+    if (memcpy_s(config->reserved, sizeof(config->reserved), &info, sizeof(info)) != EOK) {
+        return;
+    }
 
     config->hcclBufferSize = HCCL_COMM_BUFFSIZE_CONFIG_NOT_SET;
     config->hcclDeterministic = HCCL_COMM_DETERMINISTIC_CONFIG_NOT_SET;

@@ -11,21 +11,21 @@
 <!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910" id4 -->
+- Atlas 训练系列产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas 推理系列产品 AI Core：不支持
+- Atlas 推理系列产品 Vector Core：不支持
 <!-- end id5 -->
-<!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310b" id6 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/AlltoAllV_res.md#id1 -->
 
 ## 功能说明
 
-集合通信AlltoAllV的任务下发接口，返回该任务的标识handleId给用户。AlltoAll是AlltoAllV的一个子集，AlltoAll要求所有卡的收发数据量相同，AlltoAllV则不需要数据量相同，使用上更加灵活。
+集合通信AlltoAllV的任务下发接口，返回该任务的标识handleId给用户。AlltoAll是AlltoAllV的一个子集，AlltoAll要求所有卡的收发数据量相同，AlltoAllV则不需要数据量相同，使用上更加灵活。推荐使用AlltoAllVV2接口，该接口显式接收四个数组的元素个数，并在下发任务前根据通信域rank数检查数组长度。AlltoAllV接口保留用于兼容已有代码。
 
 AlltoAllV的功能为：通信域内的卡互相发送和接收数据，并且定制每张卡给其它卡发送的数据量和从其它卡接收的数据量，以及定制发送和接收的数据在内存中的偏移。结合原型中的参数，描述接口功能，具体为：第i张卡发送sendBuf内存中第j块数据到第j张卡，该块数据在sendBuf中偏移为sdispls\[j\]的位置，且数据量为sendCounts\[j\]，第j张卡将该数据存放到本卡recvBuf中偏移为rdispls\[i\]的位置，接收数据量为recvCounts\[i\]，这里的sendCounts\[j\]与recvCounts\[i\]需要相等。注意：这里的偏移和数据量均为数据的个数，单位为sizeof\(sendType\)。
 
@@ -33,9 +33,20 @@ AlltoAllV的功能为：通信域内的卡互相发送和接收数据，并且�
 
 ## 函数原型
 
-```
+```cpp
 template <bool commit = false>
-__aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts, void* rdispls, HcclDataType recvType, uint8_t repeat = 1)
+__aicore__ inline HcclHandle AlltoAllV(
+    GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType,
+    GM_ADDR recvBuf, void* recvCounts, void* rdispls, HcclDataType recvType,
+    uint8_t repeat = 1);
+
+template <bool commit = false>
+__aicore__ inline HcclHandle AlltoAllVV2(
+    GM_ADDR sendBuf, void* sendCounts, uint32_t sendCountsLen,
+    void* sdispls, uint32_t sdisplsLen, HcclDataType sendType,
+    GM_ADDR recvBuf, void* recvCounts, uint32_t recvCountsLen,
+    void* rdispls, uint32_t rdisplsLen, HcclDataType recvType,
+    uint8_t repeat = 1);
 ```
 
 ## 参数说明
@@ -52,17 +63,21 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
 | --- | --- | --- |
 | sendBuf | 输入 | 源数据buffer地址。 |
 | sendCounts | 输入 | 本卡向通信域内其它每张卡发送的数据量，sendCounts[i]表示本卡发送到第i张卡rank_i的数据量，单位是sizeof(sendType)。<br><br>sendCounts是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。<br><br>例如：sendBuf内数据的数据类型为fp16，sendCounts[0]=1，sendCounts[1]=2，表示本rank给rank0发送1个fp16数据，给rank1发送2个fp16数据。 |
+| sendCountsLen | 输入 | 仅AlltoAllVV2接口支持。sendCounts数组的元素个数，取值必须大于等于通信域内总rank数。 |
 | sdispls | 输入 | 本卡向其它卡发送的数据在sendBuf中的偏移，sdispls[i]=n表示本卡发送给rank_i的数据块在sendBuf中的偏移数据量为n。<br><br>sdispls是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。 |
+| sdisplsLen | 输入 | 仅AlltoAllVV2接口支持。sdispls数组的元素个数，取值必须大于等于通信域内总rank数。 |
 | sendType | 输入 | sendBuf内数据的数据类型，目前支持HcclDataType包含的全部数据类型，HcclDataType详细可参考[表1](HCCL_usage.md#table116710585514)。 |
 | recvBuf | 输出 | 目的数据buffer地址，集合通信结果输出到此buffer中。 |
 | recvCounts | 输入 | 本卡从其它卡接收的数据量，recvCounts[i]表示本rank接收到的来自rank_i的数据个数，单位是sizeof(recvType)。<br><br>recvCounts是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。<br><br>例如：recvBuf内数据的数据类型为fp16，recvCounts[0]=1，recvCounts[1]=2，表示本rank接收到rank0的1个fp16数据，接收到rank1的2个fp16数据。 |
+| recvCountsLen | 输入 | 仅AlltoAllVV2接口支持。recvCounts数组的元素个数，取值必须大于等于通信域内总rank数。 |
 | rdispls | 输入 | 本卡接收的数据存放在recvBuf中的偏移，rdispls[i]=n表示本卡接收到的rank_i的数据块在recvBuf中的偏移数据量为n。<br><br>rdispls是一个uint64_t类型的数组，数组长度必须为通信域内总rank数。 |
+| rdisplsLen | 输入 | 仅AlltoAllVV2接口支持。rdispls数组的元素个数，取值必须大于等于通信域内总rank数。 |
 | recvType | 输入 | recvBuf内数据的数据类型，目前支持HcclDataType包含的全部数据类型，HcclDataType详细可参考[表1](HCCL_usage.md#table116710585514)。<br><br>注意：recvType和sendType必须一致。 |
 | repeat | 输入 | 一次下发的AlltoAllV通信任务个数。repeat取值≥1，默认值为1。当repeat>1时，每个AlltoAllV任务的sendBuf\sendCounts\recvBuf\recvCounts参数不变，sdispls和rdispls由服务端更新，每一轮任务i的更新公式如下：<br><br>sdispls[i] = sdispls[i] + sendCounts[i], i∈[0, sdispls.size())<br><br>rdispls[i] = rdispls[i] + recvCounts[i], i∈[0, rdispls.size())<br><br>注意：当设置repeat>1时，须根据此计算公式，规划通信内存。 |
 
 ## 返回值说明
 
-返回该任务的标识handleId，handleId大于等于0。调用失败时，返回 -1。
+返回该任务的标识handleId，handleId大于等于0。调用失败时，返回-1。AlltoAllVV2接口还会在通信域rank数为0、任一数组指针为空或任一数组元素个数小于通信域rank数时返回-1。
 
 ## 约束说明
 
@@ -70,24 +85,25 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
 -   若HCCL对象的[config模板参数](HCCL_template_params.md#hccl-template-params)未指定下发通信任务的核，该接口只能在AIC核或者AIV核两者之一上调用。若HCCL对象的[config模板参数](HCCL_template_params.md#hccl-template-params)中指定了下发通信任务的核，则该接口可以在AIC核和AIV核上同时调用，接口内部会根据指定的核的类型，只在AIC核、AIV核二者之一下发该通信任务。
 -   一个通信域内，所有Prepare接口和InterHcclGroupSync接口的总调用次数不能超过63。
 -   每张卡发送给卡rank\_j的数据量sendCounts\[j\]，与rank\_j接收对应卡rank\_i的数据量recvCounts\[i\]，必须相等。
-<!-- npu="A3" id7 -->
--   对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，一个通信域内，最大支持128卡通信。
-<!-- end id7 -->
-<!-- npu="950" id8 -->
+-   调用AlltoAllVV2接口时，sendCountsLen、sdisplsLen、recvCountsLen和rdisplsLen表示对应数组的元素个数，不是字节数。
+<!-- npu="950" id7 -->
 -   对于Ascend 950PR/Ascend 950DT，一个通信域内，所有Prepare接口的总调用次数不能超过63。
 -   对于Ascend 950PR/Ascend 950DT，通信服务端为CCU时，默认仅支持FullMesh算法，并且单次最大通信数据量不能超过256M。
+<!-- end id7 -->
+<!-- npu="A3" id8 -->
+-   对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，一个通信域内，最大支持128卡通信。
 <!-- end id8 -->
 
 ## 调用示例
 
--   使用AlltoAllV接口等效实现4卡间的AlltoAll通信
+-   使用AlltoAllVV2接口等效实现4卡间的AlltoAll通信
 
-    4张卡调用AlltoAllV接口。非多轮切分场景下，每张卡上的数据块和数据量一致，如下图中每张卡的A\\B\\C\\D数据块，数据量均为dataCount。
+    4张卡调用AlltoAllVV2接口。非多轮切分场景下，每张卡上的数据块和数据量一致，如下图中每张卡的A\\B\\C\\D数据块，数据量均为dataCount。
 
     **图1**  非切分场景下4卡AlltoAllV图示  
     ![](../../../../figures/alltoallv_4rank_no_split.png "非切分场景下4卡AlltoAllV图示")
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void alltoallv_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         constexpr uint32_t rankNum = 4U;
@@ -117,8 +133,9 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
             if (ret != HCCL_SUCCESS) {
                 return;
             }
-            auto handleId1 = hccl.AlltoAllV<true>(
-                sendBuf, sendCounts, sDisplacements, dtype, recvBuf, recvCounts, rDisplacements, dtype);
+            auto handleId1 = hccl.AlltoAllVV2<true>(
+                sendBuf, sendCounts, rankNum, sDisplacements, rankNum, dtype,
+                recvBuf, recvCounts, rankNum, rDisplacements, rankNum, dtype);
 
             hccl.Wait(handleId1);
             AscendC::SyncAll<true>(); // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死
@@ -127,14 +144,14 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
     }
     ```
 
--   使用AlltoAllV接口实现4卡间不同数据量的数据收发
+-   使用AlltoAllVV2接口实现4卡间不同数据量的数据收发
 
     如下图所示，每个rank下的方格中数字表示发送或接收的数据个数，以rank1为例进行说明：rank1分别向rank0、rank1、rank2、rank3发送2、2、3、2个数据，并分别从rank0、rank1、rank2、rank3接收3、2、4、3个数据，对应的代码示例如下。
 
     **图2**  非切分场景下4卡不均匀收发  
     ![](../../../../figures/4rank_unequal_no_split.png "非切分场景下4卡不均匀收发")
 
-    ```
+    ```cpp
     extern "C" __global__ __aicore__ void alltoallv_custom(GM_ADDR xGM, GM_ADDR yGM, GM_ADDR workspaceGM, GM_ADDR tilingGM)
     {
         constexpr uint32_t rankNum = 4U;
@@ -218,8 +235,9 @@ __aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* 
                 rDisplacements[2] = 5;
                 rDisplacements[3] = 9;
             }
-            auto handleId = hccl.AlltoAllV<true>(
-                sendBuf, sendCounts, sDisplacements, dtype, recvBuf, recvCounts, rDisplacements, dtype);
+            auto handleId = hccl.AlltoAllVV2<true>(
+                sendBuf, sendCounts, rankNum, sDisplacements, rankNum, dtype,
+                recvBuf, recvCounts, rankNum, rDisplacements, rankNum, dtype);
 
             hccl.Wait(handleId);
             AscendC::SyncAll<true>(); // 全AIV核同步，防止0核执行过快，提前调用hccl.Finalize()接口，导致其他核Wait卡死

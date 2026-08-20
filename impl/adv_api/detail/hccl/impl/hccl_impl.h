@@ -71,6 +71,22 @@ __aicore__ inline HcclHandle Hccl<serverType, config>::AlltoAllV(
 
 template <HcclServerType serverType, const auto& config>
 template <bool commit>
+__aicore__ inline HcclHandle Hccl<serverType, config>::AlltoAllVV2(
+    GM_ADDR sendBuf, void* sendCounts, uint32_t sendCountsLen, void* sdispls, uint32_t sdisplsLen,
+    HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts, uint32_t recvCountsLen, void* rdispls,
+    uint32_t rdisplsLen, HcclDataType recvType, uint8_t repeat)
+{
+    const uint32_t rankDim = GetRankDim();
+    if (rankDim == 0U || sendCounts == nullptr || sdispls == nullptr || recvCounts == nullptr || rdispls == nullptr ||
+        sendCountsLen < rankDim || sdisplsLen < rankDim || recvCountsLen < rankDim || rdisplsLen < rankDim) {
+        return INVALID_HANDLE_ID;
+    }
+    return AlltoAllV<commit>(
+        sendBuf, sendCounts, sdispls, sendType, recvBuf, recvCounts, rdispls, recvType, repeat);
+}
+
+template <HcclServerType serverType, const auto& config>
+template <bool commit>
 __aicore__ inline HcclHandle Hccl<serverType, config>::ReduceScatter(
     GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t recvCount, HcclDataType dataType, HcclReduceOp op, uint64_t strideCount,
     uint8_t repeat)

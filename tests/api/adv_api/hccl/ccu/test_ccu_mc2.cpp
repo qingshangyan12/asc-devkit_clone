@@ -15,6 +15,8 @@
 
 #include "dtype_common.h"
 #include "base.h"
+#include "ccu_microcode_v1.h"
+#include "hccl_comm.h"
 #include "hccl_mc2.h"
 #include "hccl_alloc_ctx_res.h"
 #include "sim_communicator.h"
@@ -154,6 +156,49 @@ protected:
     HcclComm comm_ = nullptr;
     aclrtStream stream_ = nullptr;
 };
+
+TEST_F(CcuMc2TestSuite, Mxfp8AndVersionedLayoutsAreExplicit)
+{
+    EXPECT_EQ(SIZE_TABLE[HCCL_DATA_TYPE_MXFP8], 1U);
+    EXPECT_EQ(sizeof(Mc2CcTilingInner), sizeof(HcclApi::Mc2CcTilingInner));
+    EXPECT_EQ(sizeof(HcomP2pOpInfoV2{}.group), HCOM_GROUP_NAME_CAPACITY);
+    EXPECT_EQ(sizeof(HcomCollOpInfoV2{}.group), HCOM_GROUP_NAME_CAPACITY);
+}
+
+TEST_F(CcuMc2TestSuite, HcclGetCommNameV2RejectsSmallBuffer)
+{
+    char smallName[COMM_NAME_MAX_LENGTH - 1U] = {};
+    EXPECT_EQ(HcclGetCommNameV2(comm_, smallName, sizeof(smallName)), HCCL_E_PARA);
+
+    char commName[COMM_NAME_MAX_LENGTH] = {};
+    EXPECT_EQ(HcclGetCommNameV2(comm_, commName, sizeof(commName)), HCCL_SUCCESS);
+    EXPECT_NE(commName[0], '\0');
+}
+
+TEST_F(CcuMc2TestSuite, HcclCommConfigInitStoresMetadataInReservedBytes)
+{
+    HcclCommConfig config{};
+    HcclCommConfigInit(&config);
+
+    size_t storedSize = 0U;
+    memcpy(&storedSize, config.reserved, sizeof(storedSize));
+    EXPECT_EQ(storedSize, sizeof(HcclCommConfig));
+    EXPECT_EQ(config.hcclBufferSize, HCCL_COMM_BUFFSIZE_CONFIG_NOT_SET);
+    EXPECT_EQ(config.hcclDeterministic, HCCL_COMM_DETERMINISTIC_CONFIG_NOT_SET);
+}
+
+TEST(CcuReduceCheckedWrapperTest, ValidatesCountAndSourceCapacity)
+{
+    hcomm::CcuRep::CcuInstr instr{};
+    uint16_t msIds[hcomm::CcuRep::CCU_REDUCE_MAX_MS] = {};
+
+    EXPECT_TRUE(hcomm::CcuRep::IsValidReduceMsArgs(
+        &instr, msIds, hcomm::CcuRep::CCU_REDUCE_MAX_MS, hcomm::CcuRep::CCU_REDUCE_MAX_MS));
+    EXPECT_FALSE(hcomm::CcuRep::IsValidReduceMsArgs(&instr, msIds, 7U, 8U));
+    EXPECT_FALSE(hcomm::CcuRep::IsValidReduceMsArgs(&instr, msIds, 8U, 1U));
+    EXPECT_FALSE(hcomm::CcuRep::IsValidReduceMsArgs(&instr, msIds, 8U, 9U));
+    EXPECT_FALSE(hcomm::CcuRep::IsValidReduceMsArgs(nullptr, msIds, 8U, 8U));
+}
 
 TEST_F(CcuMc2TestSuite, AllocCcuOpResCtx_BasicFields)
 {
@@ -399,7 +444,7 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
     uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
     Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
     void* opResCtx = nullptr;
-    HcclResult ret = HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx);
+    HcclResult ret = HcclAllocComResourceByTilingV2(comm_, stream_, &tiling, sizeof(tiling), &opResCtx);
     EXPECT_EQ(ret, HCCL_SUCCESS);
     ASSERT_NE(opResCtx, nullptr);
     OpResCtx* ctx = static_cast<OpResCtx*>(opResCtx);
@@ -411,6 +456,61 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
     EXPECT_NE(ctx->ckeAddr, 0U);
     EXPECT_EQ(ctx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuAllGatherMeshMem2Mem1D));
+}
+
+TEST(CcuMc2TilingBoundaryTest, AcceptsValidSizeDelimitedTiling)
+{
+    const uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1U, COMM_ENGINE_AICPU, opTypes, nullptr);
+    const void* tilingList[Hccl::MC2_MAX_OP_NUM] = {};
+    uint32_t tilingNum = 0U;
+
+    ASSERT_EQ(HcclGetTilingList(&tiling, sizeof(tiling), tilingList, tilingNum), HCCL_SUCCESS);
+    EXPECT_EQ(tilingNum, 1U);
+    EXPECT_EQ(tilingList[0], &tiling.ccTiling[0]);
+}
+
+TEST(CcuMc2TilingBoundaryTest, RejectsTruncatedBaseHeader)
+{
+    uint32_t version = INIT_TILING_VERSION;
+    const void* tilingList[Hccl::MC2_MAX_OP_NUM] = {};
+    uint32_t tilingNum = 0U;
+
+    EXPECT_EQ(HcclGetTilingList(&version, sizeof(version), tilingList, tilingNum), HCCL_E_PARA);
+}
+
+TEST(CcuMc2TilingBoundaryTest, RejectsTruncatedOffsetTable)
+{
+    const uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1U, COMM_ENGINE_AICPU, opTypes, nullptr);
+    const void* tilingList[Hccl::MC2_MAX_OP_NUM] = {};
+    uint32_t tilingNum = 0U;
+
+    EXPECT_EQ(
+        HcclGetTilingList(&tiling, offsetof(Mc2TilingTestData, ccTiling) - 1U, tilingList, tilingNum),
+        HCCL_E_PARA);
+}
+
+TEST(CcuMc2TilingBoundaryTest, RejectsUnalignedTilingOffset)
+{
+    const uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1U, COMM_ENGINE_AICPU, opTypes, nullptr);
+    ++tiling.offset[0];
+    const void* tilingList[Hccl::MC2_MAX_OP_NUM] = {};
+    uint32_t tilingNum = 0U;
+
+    EXPECT_EQ(HcclGetTilingList(&tiling, sizeof(tiling), tilingList, tilingNum), HCCL_E_PARA);
+}
+
+TEST(CcuMc2TilingBoundaryTest, RejectsTilingObjectPastBufferEnd)
+{
+    const uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1U, COMM_ENGINE_AICPU, opTypes, nullptr);
+    tiling.offset[0] = sizeof(tiling) - sizeof(Mc2CcTilingInner) + alignof(Mc2CcTilingInner);
+    const void* tilingList[Hccl::MC2_MAX_OP_NUM] = {};
+    uint32_t tilingNum = 0U;
+
+    EXPECT_EQ(HcclGetTilingList(&tiling, sizeof(tiling), tilingList, tilingNum), HCCL_E_PARA);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuAlgorithmNotRegistered)

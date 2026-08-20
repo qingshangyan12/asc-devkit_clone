@@ -907,6 +907,48 @@ void MinInstr(
     CcuInstr* instr, uint16_t* msId, uint16_t count, uint16_t dataType, uint16_t setCKEId, uint16_t setCKEMask,
     uint16_t waitCKEId, uint16_t waitCKEMask, uint16_t clearType, uint16_t XnIdLength);
 
+inline bool IsValidReduceMsArgs(
+    const CcuInstr* instr, const uint16_t* msId, uint16_t msIdCapacity, uint16_t count)
+{
+    return instr != nullptr && msId != nullptr && msIdCapacity >= CCU_REDUCE_MAX_MS && count >= 2U &&
+           count <= CCU_REDUCE_MAX_MS;
+}
+
+inline bool AddInstrChecked(
+    CcuInstr* instr, uint16_t* msId, uint16_t msIdCapacity, uint16_t count, uint16_t castEn, uint16_t dataType,
+    uint16_t setCKEId, uint16_t setCKEMask, uint16_t waitCKEId, uint16_t waitCKEMask, uint16_t clearType,
+    uint16_t XnIdLength)
+{
+    if (!IsValidReduceMsArgs(instr, msId, msIdCapacity, count)) {
+        return false;
+    }
+    AddInstr(
+        instr, msId, count, castEn, dataType, setCKEId, setCKEMask, waitCKEId, waitCKEMask, clearType, XnIdLength);
+    return true;
+}
+
+inline bool MaxInstrChecked(
+    CcuInstr* instr, uint16_t* msId, uint16_t msIdCapacity, uint16_t count, uint16_t dataType, uint16_t setCKEId,
+    uint16_t setCKEMask, uint16_t waitCKEId, uint16_t waitCKEMask, uint16_t clearType, uint16_t XnIdLength)
+{
+    if (!IsValidReduceMsArgs(instr, msId, msIdCapacity, count)) {
+        return false;
+    }
+    MaxInstr(instr, msId, count, dataType, setCKEId, setCKEMask, waitCKEId, waitCKEMask, clearType, XnIdLength);
+    return true;
+}
+
+inline bool MinInstrChecked(
+    CcuInstr* instr, uint16_t* msId, uint16_t msIdCapacity, uint16_t count, uint16_t dataType, uint16_t setCKEId,
+    uint16_t setCKEMask, uint16_t waitCKEId, uint16_t waitCKEMask, uint16_t clearType, uint16_t XnIdLength)
+{
+    if (!IsValidReduceMsArgs(instr, msId, msIdCapacity, count)) {
+        return false;
+    }
+    MinInstr(instr, msId, count, dataType, setCKEId, setCKEMask, waitCKEId, waitCKEMask, clearType, XnIdLength);
+    return true;
+}
+
 namespace CcuV2 {
 void Nop(CcuInstr* instr);
 
@@ -977,6 +1019,39 @@ void ReduceMax(
     CcuInstr* instr, uint16_t* ms, uint16_t count, uint16_t dataType, uint16_t setCKEId, uint16_t setCKEMask);
 void ReduceMin(
     CcuInstr* instr, uint16_t* ms, uint16_t count, uint16_t dataType, uint16_t setCKEId, uint16_t setCKEMask);
+
+inline bool ReduceAddChecked(
+    CcuInstr* instr, uint16_t* ms, uint16_t msCapacity, uint16_t count, uint16_t castEn, uint16_t dataType,
+    uint16_t setCKEId, uint16_t setCKEMask)
+{
+    if (!IsValidReduceMsArgs(instr, ms, msCapacity, count)) {
+        return false;
+    }
+    ReduceAdd(instr, ms, count, castEn, dataType, setCKEId, setCKEMask);
+    return true;
+}
+
+inline bool ReduceMaxChecked(
+    CcuInstr* instr, uint16_t* ms, uint16_t msCapacity, uint16_t count, uint16_t dataType, uint16_t setCKEId,
+    uint16_t setCKEMask)
+{
+    if (!IsValidReduceMsArgs(instr, ms, msCapacity, count)) {
+        return false;
+    }
+    ReduceMax(instr, ms, count, dataType, setCKEId, setCKEMask);
+    return true;
+}
+
+inline bool ReduceMinChecked(
+    CcuInstr* instr, uint16_t* ms, uint16_t msCapacity, uint16_t count, uint16_t dataType, uint16_t setCKEId,
+    uint16_t setCKEMask)
+{
+    if (!IsValidReduceMsArgs(instr, ms, msCapacity, count)) {
+        return false;
+    }
+    ReduceMin(instr, ms, count, dataType, setCKEId, setCKEMask);
+    return true;
+}
 }; // namespace CcuV2
 
 }; // namespace CcuRep

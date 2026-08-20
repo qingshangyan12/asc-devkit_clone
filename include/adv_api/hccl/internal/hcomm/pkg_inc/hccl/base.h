@@ -294,6 +294,7 @@ enum HcomOperationType {
 };
 
 #define HCOM_GROUP_NAME_MAX_LEN 127
+#define HCOM_GROUP_NAME_CAPACITY (HCOM_GROUP_NAME_MAX_LEN + 1)
 
 typedef struct {
     char group[HCOM_GROUP_NAME_MAX_LEN];
@@ -317,6 +318,42 @@ typedef struct {
     HcclReduceOp reduceOp;
     uint64_t strideCount;
 } HcomCollOpInfo;
+
+const uint32_t HCOM_OP_INFO_VERSION_2 = 2;
+
+typedef struct {
+    uint32_t version;
+    uint32_t size;
+    char group[HCOM_GROUP_NAME_CAPACITY];
+    uint32_t tag;
+    uint32_t peerRank;
+    void* addr;
+    uint64_t count;
+    HcclDataType dataType;
+    int32_t rsv0;
+    int32_t rsv1;
+    int32_t rsv2;
+} HcomP2pOpInfoV2;
+
+typedef struct {
+    uint32_t version;
+    uint32_t size;
+    char group[HCOM_GROUP_NAME_CAPACITY];
+    void* inputAddr;
+    void* outputAddr;
+    uint64_t count;
+    HcclDataType dataType;
+    uint32_t root;
+    HcclReduceOp reduceOp;
+    uint64_t strideCount;
+} HcomCollOpInfoV2;
+
+static_assert(
+    sizeof(((HcomP2pOpInfoV2*)nullptr)->group) == HCOM_GROUP_NAME_CAPACITY,
+    "HcomP2pOpInfoV2 group must include null terminator space");
+static_assert(
+    sizeof(((HcomCollOpInfoV2*)nullptr)->group) == HCOM_GROUP_NAME_CAPACITY,
+    "HcomCollOpInfoV2 group must include null terminator space");
 
 typedef struct {
     HcomOperationType opType; // op类型用于结合拓扑和rank_table一起决定需要创建哪些通信连接

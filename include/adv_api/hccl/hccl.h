@@ -204,6 +204,13 @@ public:
         GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts,
         void* rdispls, HcclDataType recvType, uint8_t repeat = 1);
 
+    /*! @brief Size-delimited AlltoAllV. Array lengths are element counts and must cover GetRankDim(). */
+    template <bool commit = false>
+    __aicore__ inline HcclHandle AlltoAllVV2(
+        GM_ADDR sendBuf, void* sendCounts, uint32_t sendCountsLen, void* sdispls, uint32_t sdisplsLen,
+        HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts, uint32_t recvCountsLen, void* rdispls,
+        uint32_t rdisplsLen, HcclDataType recvType, uint8_t repeat = 1);
+
     /*!
      * @class Hccl
      * @brief The task launching interface of the BatchWrite collective communication operator, returns the identifier

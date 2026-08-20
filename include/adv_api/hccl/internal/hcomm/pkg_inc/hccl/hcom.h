@@ -408,6 +408,69 @@ HcclResult HcomGenerateCclOpTag(const char* opType, s64 hcomComm, const char* gr
 HcclResult HcomGetCommCCLBufferSize(const char* group, uint64_t& size);
 HcclResult HcomGetL0TopoTypeEx(const char* group, CommTopo* topoType, uint32_t flag);
 HcclResult HcomGetRankSizeEx(const char* group, uint32_t* rankSize, uint32_t flag);
+
+static inline HcclResult HcomValidateCountsLength(const char* group, const void* counts, size_t countsLen)
+{
+    if (counts == nullptr) {
+        return countsLen == 0U ? HCCL_SUCCESS : HCCL_E_PTR;
+    }
+    if (group == nullptr) {
+        return HCCL_E_PTR;
+    }
+
+    uint32_t rankSize = 0U;
+    HcclResult ret = HcomGetRankSizeEx(group, &rankSize, 0U);
+    if (ret != HCCL_SUCCESS) {
+        return ret;
+    }
+    return countsLen >= rankSize ? HCCL_SUCCESS : HCCL_E_PARA;
+}
+
+static inline HcclResult HcomSelectAlgV2(
+    s64 comm, const char* group, u64 count, void* counts, size_t countsLen, HcclDataType dataType, HcclReduceOp op,
+    HcclCMDType opType, int32_t aivCoreLimit, bool& ifAiv, char* algName, size_t algNameCapacity)
+{
+    if (algName == nullptr) {
+        return HCCL_E_PTR;
+    }
+    if (algNameCapacity < ALG_NAME_MAX_LEN) {
+        return HCCL_E_PARA;
+    }
+    HcclResult ret = HcomValidateCountsLength(group, counts, countsLen);
+    if (ret != HCCL_SUCCESS) {
+        return ret;
+    }
+    return HcomSelectAlg(comm, group, count, counts, dataType, op, opType, aivCoreLimit, ifAiv, algName);
+}
+
+static inline HcclResult HcomCalcAivCoreNumV2(
+    const char* group, HcclCMDType opType, u64 count, void* counts, size_t countsLen, HcclDataType dataType,
+    int32_t aivCoreLimit, char* algName, size_t algNameCapacity, u32* numBlocks)
+{
+    if (algName == nullptr || numBlocks == nullptr) {
+        return HCCL_E_PTR;
+    }
+    if (algNameCapacity < ALG_NAME_MAX_LEN) {
+        return HCCL_E_PARA;
+    }
+    HcclResult ret = HcomValidateCountsLength(group, counts, countsLen);
+    if (ret != HCCL_SUCCESS) {
+        return ret;
+    }
+    return HcomCalcAivCoreNum(group, opType, count, counts, dataType, aivCoreLimit, algName, numBlocks);
+}
+
+static inline HcclResult HcomGenerateCclOpTagV2(
+    const char* opType, s64 hcomComm, const char* group, char* sTag, size_t sTagCapacity)
+{
+    if (sTag == nullptr) {
+        return HCCL_E_PTR;
+    }
+    if (sTagCapacity < CCL_OP_TAG_MAX_LEN) {
+        return HCCL_E_PARA;
+    }
+    return HcomGenerateCclOpTag(opType, hcomComm, group, sTag);
+}
 #ifdef __cplusplus
 }
 #endif // __cplusplus
