@@ -93,7 +93,11 @@ __simd_callee__ inline void asc_copy(vector_bool& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
+<<<<<<< HEAD
 | dst | 输出 | 目的矢量数据寄存器，dtype须与src完全一致。mask比特位为1的位置写入src对应元素（或对应比特），mask比特位为0的位置采用Merging模式写入dst原值。dst需初始化，否则当mask为0时将出现未知值。 |
+=======
+| dst | 输出 | 目的矢量数据寄存器，dtype须与src完全一致。mask比特位为1的位置写入src对应元素（或对应比特），mask比特位为0的位置采用Merging模式写入dst原值。 |
+>>>>>>> a2f0becb2342a411187be00f9d96c603f03b0023
 | src | 输入 | 源矢量数据寄存器，dtype须与dst完全一致。 |
 | mask | 输入 | 源掩码寄存器，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中保持原值。 |
 
