@@ -11,6 +11,7 @@
 #include "specialization/kernel_specialization_diagnostics.h"
 
 #include <gtest/gtest.h>
+#include <mockcpp/mockcpp.hpp>
 #include <nlohmann/json.hpp>
 
 #include <boost/filesystem.hpp>
@@ -18,6 +19,7 @@
 #include <cerrno>
 #include <csignal>
 #include <cstdint>
+#include <fcntl.h>
 #include <fstream>
 #include <string>
 #include <sys/resource.h>
@@ -32,6 +34,13 @@ using ascendc::aclrtc::CompilationCommandKind;
 using ascendc::aclrtc::CompilationProcessResult;
 using ascendc::aclrtc::KernelSpecializationDiagnostics;
 using ascendc::aclrtc::OutputPublicationStatus;
+using namespace mockcpp;
+
+int RejectReplayScriptPermissionChange(const char*, mode_t)
+{
+    errno = EPERM;
+    return -1;
+}
 
 class ScopedCurrentDirectory final {
 public:
@@ -189,6 +198,54 @@ TEST(KernelSpecializationDiagnosticsTest, KeepsNonEmptyReplayPathWhenInitialOpen
     EXPECT_TRUE(fs::is_directory(replayScriptDirectory));
     EXPECT_TRUE(fs::is_regular_file(replayScriptDirectory / "existing.log"));
 
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationDiagnosticsTest, DisablesDiagnosticsWhenReplayScriptCannotBeMadeExecutable)
+{
+    const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_diagnostics_chmod_failure_%%%%-%%%%");
+    fs::create_directories(testRoot);
+    MOCKER(chmod, int (*)(const char*, mode_t)).expects(once()).will(invoke(RejectReplayScriptPermissionChange));
+
+    KernelSpecializationDiagnostics diagnostics(testRoot, "chmod_failure_session");
+
+    GlobalMockObject::verify();
+    EXPECT_FALSE(fs::exists(testRoot / "aclrtc_replay.sh"));
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationDiagnosticsTest, HandlesMissingCurrentDirectoryDuringInitialization)
+{
+    const int originalDirectoryFileDescriptor = open(".", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+    ASSERT_GE(originalDirectoryFileDescriptor, 0);
+    const fs::path removedCurrentDirectory =
+        fs::temp_directory_path() / fs::unique_path("aclrtc_diagnostics_removed_cwd_%%%%-%%%%");
+    fs::create_directories(removedCurrentDirectory);
+    ASSERT_EQ(chdir(removedCurrentDirectory.c_str()), 0);
+    ASSERT_EQ(rmdir(removedCurrentDirectory.c_str()), 0);
+
+    KernelSpecializationDiagnostics diagnostics(removedCurrentDirectory, "removed_cwd_session");
+
+    const int restoreDirectoryResult = fchdir(originalDirectoryFileDescriptor);
+    const int closeDirectoryResult = close(originalDirectoryFileDescriptor);
+    ASSERT_EQ(restoreDirectoryResult, 0);
+    ASSERT_EQ(closeDirectoryResult, 0);
+    EXPECT_FALSE(fs::exists(removedCurrentDirectory));
+}
+
+TEST(KernelSpecializationDiagnosticsTest, IgnoresManifestSerializationFailure)
+{
+    const fs::path testRoot =
+        fs::temp_directory_path() / fs::unique_path("aclrtc_diagnostics_invalid_manifest_%%%%-%%%%");
+    fs::create_directories(testRoot);
+    KernelSpecializationDiagnostics diagnostics(testRoot, "invalid_manifest_session");
+    const nlohmann::json invalidUtf8Manifest = {{"invalid_utf8", std::string(1U, static_cast<char>(0xff))}};
+
+    diagnostics.WriteManifestSnapshot(invalidUtf8Manifest);
+
+    EXPECT_FALSE(fs::exists(testRoot / "aclrtc_manifest.json"));
     boost::system::error_code ignoredError;
     fs::remove_all(testRoot, ignoredError);
 }

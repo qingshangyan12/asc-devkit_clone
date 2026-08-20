@@ -12,13 +12,16 @@
 #include "specialization/kernel_specialization_diagnostics.h"
 
 #include <gtest/gtest.h>
+#include <mockcpp/mockcpp.hpp>
 
 #include <chrono>
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
 #include <fstream>
+#include <poll.h>
 #include <thread>
 #include <sys/resource.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <type_traits>
 #include <unistd.h>
@@ -35,6 +38,19 @@ using ascendc::aclrtc::CompilationProcessTermination;
 using ascendc::aclrtc::CompilationVariant;
 using ascendc::aclrtc::KernelCompilationPlan;
 using ascendc::aclrtc::KernelSpecializationDiagnostics;
+using namespace mockcpp;
+
+int FailCommandOutputPoll(pollfd*, nfds_t, int)
+{
+    errno = EIO;
+    return -1;
+}
+
+int FailCommandLeaderInspection(idtype_t, id_t, siginfo_t*, int)
+{
+    errno = ECHILD;
+    return -1;
+}
 
 static_assert(
     std::is_same<std::underlying_type_t<CompilationVariant>, uint32_t>::value,
@@ -299,6 +315,36 @@ TEST(CompilationPlanExecutorTest, ReportsPipeCreationFailureWhenFileDescriptorsA
     const int restoreLimitResult = setrlimit(RLIMIT_NOFILE, &originalFileDescriptorLimit);
 
     ASSERT_EQ(restoreLimitResult, 0);
+    EXPECT_EQ(executionResult, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+}
+
+TEST(CompilationPlanExecutorTest, ReportsCommandOutputPollFailure)
+{
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_poll_failure");
+    CompilationCommandExecutionLimits limits{1s, 1s, 20ms, 1024U};
+    CompilationPlanExecutor executor(diagnostics, limits);
+    KernelCompilationPlan plan;
+    plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/sleep", {"1"}));
+    MOCKER(poll, int (*)(pollfd*, nfds_t, int)).expects(once()).will(invoke(FailCommandOutputPoll));
+
+    const aclError executionResult = executor.ExecuteCompilationPlan(plan);
+
+    GlobalMockObject::verify();
+    EXPECT_EQ(executionResult, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+}
+
+TEST(CompilationPlanExecutorTest, ReportsCommandLeaderInspectionFailure)
+{
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_waitid_failure");
+    CompilationCommandExecutionLimits limits{1s, 1s, 20ms, 1024U};
+    CompilationPlanExecutor executor(diagnostics, limits);
+    KernelCompilationPlan plan;
+    plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/sleep", {"1"}));
+    MOCKER(waitid, int (*)(idtype_t, id_t, siginfo_t*, int)).expects(once()).will(invoke(FailCommandLeaderInspection));
+
+    const aclError executionResult = executor.ExecuteCompilationPlan(plan);
+
+    GlobalMockObject::verify();
     EXPECT_EQ(executionResult, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 } // namespace

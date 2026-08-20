@@ -17,10 +17,12 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
+#include <csignal>
 #include <cstdlib>
 #include <fstream>
 #include <memory>
 #include <string>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <utility>
@@ -385,6 +387,26 @@ TEST(KernelSpecializationSessionTest, LoadsAndCopiesFreshMaterializedPathsFromRe
     EXPECT_TRUE(fs::is_regular_file(secondResource.ownedResourceDirectoryPath / "payload.bin"));
 }
 
+TEST(KernelSpecializationApiTest, ReportsMissingRegisteredResource)
+{
+    const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_session_missing_resource_%%%%-%%%%");
+    fs::create_directories(testRoot);
+    ScopedRegisteredCompilationResource registeredResource(
+        "unrelated-resource", Json{{"schema_version", "1.0"}}, testRoot);
+    ASSERT_TRUE(registeredResource.WasInserted());
+    const uint8_t constantBytes[] = {0x01, 0xfe};
+    const void* constantAddresses[] = {constantBytes};
+    const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
+    aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
+    request.resourceId = "missing-resource";
+
+    EXPECT_EQ(
+        aclrtcKernelSpecialization(&request, (testRoot / "kernel.elf").c_str()), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
 TEST(KernelSpecializationApiTest, RejectsNullPointersBeforeResourceLookup)
 {
     aclrtcKernelSpecRequest request{};
@@ -419,6 +441,46 @@ TEST(KernelSpecializationApiTest, CompilesRegisteredResourceThroughPublicApi)
     EXPECT_EQ(ReadFile(testResource.OutputElfPath()), "linked-elf");
 }
 
+TEST(KernelSpecializationSessionTest, ReportsManifestPlanFailure)
+{
+    EndToEndTestResource testResource(FakeCompilerOutcome::Success);
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
+    ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
+    const uint8_t constantBytes[] = {0x01, 0xfe};
+    const void* constantAddresses[] = {constantBytes};
+    const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
+    const aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
+    MaterializedKernelCompilationResource resource = testResource.CreateMaterializedCompilationResource();
+    resource.manifest["schema_version"] = "unsupported";
+
+    KernelSpecializationSession session;
+    EXPECT_EQ(
+        session.RunSpecializationWithMaterializedResource(
+            NormalizeRequestForTest(request, testResource.OutputElfPath()), std::move(resource)),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_FALSE(fs::exists(testResource.OutputElfPath()));
+}
+
+TEST(KernelSpecializationSessionTest, ReportsSourcePatchFailure)
+{
+    EndToEndTestResource testResource(FakeCompilerOutcome::Success);
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
+    ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
+    const uint8_t constantBytes[] = {0x01, 0xfe};
+    const void* constantAddresses[] = {constantBytes};
+    const uint64_t constantByteCounts[] = {sizeof(constantBytes)};
+    const aclrtcKernelSpecRequest request = CreateRequest(constantByteCounts, constantAddresses);
+    MaterializedKernelCompilationResource resource = testResource.CreateMaterializedCompilationResource();
+    resource.manifest["kernels"][0]["constant_infos"][0]["template"] = "@@MISSING_TEMPLATE@@";
+
+    KernelSpecializationSession session;
+    EXPECT_EQ(
+        session.RunSpecializationWithMaterializedResource(
+            NormalizeRequestForTest(request, testResource.OutputElfPath()), std::move(resource)),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_FALSE(fs::exists(testResource.OutputElfPath()));
+}
+
 TEST(KernelSpecializationSessionTest, RejectsMissingLinkedElfDuringPublication)
 {
     const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_publish_missing_%%%%-%%%%");
@@ -451,6 +513,75 @@ TEST(KernelSpecializationSessionTest, RemovesTemporaryElfWhenPublicationTargetIs
         session.PublishKernelElf(linkedElfPath, outputDirectoryPath, workspace), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     EXPECT_TRUE(fs::is_directory(outputDirectoryPath));
     EXPECT_EQ(std::distance(fs::directory_iterator(testRoot), fs::directory_iterator()), 3);
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationSessionTest, RemovesTemporaryElfWhenLinkedElfCannotBeRead)
+{
+    const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_publish_read_failure_%%%%-%%%%");
+    const fs::path linkedElfDirectory = testRoot / "linked.elf";
+    fs::create_directories(linkedElfDirectory);
+    KernelCompilationWorkspace workspace(testRoot / "worktree", WorktreeRetentionPolicy::RetainAfterCompilation);
+    KernelSpecializationSession session;
+
+    EXPECT_EQ(
+        session.PublishKernelElf(linkedElfDirectory, testRoot / "output.elf", workspace),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(std::distance(fs::directory_iterator(testRoot), fs::directory_iterator()), 1);
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationSessionTest, RemovesTemporaryElfWhenOutputWriteFails)
+{
+    const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_publish_write_failure_%%%%-%%%%");
+    fs::create_directories(testRoot);
+    const fs::path linkedElfPath = testRoot / "linked.elf";
+    std::ofstream(linkedElfPath.string()) << "linked-elf";
+    KernelCompilationWorkspace workspace(testRoot / "worktree", WorktreeRetentionPolicy::RetainAfterCompilation);
+    KernelSpecializationSession session;
+    struct rlimit originalFileSizeLimit {};
+    ASSERT_EQ(getrlimit(RLIMIT_FSIZE, &originalFileSizeLimit), 0);
+    struct sigaction ignoreFileSizeSignal {};
+    struct sigaction originalFileSizeSignal {};
+    ignoreFileSizeSignal.sa_handler = SIG_IGN;
+    ASSERT_EQ(sigemptyset(&ignoreFileSizeSignal.sa_mask), 0);
+    ASSERT_EQ(sigaction(SIGXFSZ, &ignoreFileSizeSignal, &originalFileSizeSignal), 0);
+    struct rlimit zeroFileSizeLimit = originalFileSizeLimit;
+    zeroFileSizeLimit.rlim_cur = 0U;
+    ASSERT_EQ(setrlimit(RLIMIT_FSIZE, &zeroFileSizeLimit), 0);
+
+    const aclError publishResult = session.PublishKernelElf(linkedElfPath, testRoot / "output.elf", workspace);
+
+    const int restoreLimitResult = setrlimit(RLIMIT_FSIZE, &originalFileSizeLimit);
+    const int restoreSignalResult = sigaction(SIGXFSZ, &originalFileSizeSignal, nullptr);
+    ASSERT_EQ(restoreLimitResult, 0);
+    ASSERT_EQ(restoreSignalResult, 0);
+    EXPECT_EQ(publishResult, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_FALSE(fs::exists(testRoot / "output.elf"));
+    EXPECT_EQ(std::distance(fs::directory_iterator(testRoot), fs::directory_iterator()), 1);
+
+    boost::system::error_code ignoredError;
+    fs::remove_all(testRoot, ignoredError);
+}
+
+TEST(KernelSpecializationSessionTest, StopsPublicationWhenWorktreeCannotBeRemoved)
+{
+    const fs::path testRoot = fs::temp_directory_path() / fs::unique_path("aclrtc_publish_cleanup_failure_%%%%-%%%%");
+    fs::create_directories(testRoot);
+    const fs::path linkedElfPath = testRoot / "linked.elf";
+    std::ofstream(linkedElfPath.string()) << "linked-elf";
+    KernelCompilationWorkspace workspace("/proc/self/status", WorktreeRetentionPolicy::RemoveAfterCompilation);
+    KernelSpecializationSession session;
+
+    EXPECT_EQ(
+        session.PublishKernelElf(linkedElfPath, testRoot / "output.elf", workspace),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_FALSE(fs::exists(testRoot / "output.elf"));
+    EXPECT_EQ(std::distance(fs::directory_iterator(testRoot), fs::directory_iterator()), 1);
 
     boost::system::error_code ignoredError;
     fs::remove_all(testRoot, ignoredError);
