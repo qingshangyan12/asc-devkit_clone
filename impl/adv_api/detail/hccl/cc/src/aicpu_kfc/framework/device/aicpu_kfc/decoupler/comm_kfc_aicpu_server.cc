@@ -181,6 +181,11 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
 {
     CHK_PTR_NULL(ctx);
     CHK_PRT_RET(
+        !IsValidHcclMsgRankSize(ctx->rankSize),
+        HCCL_ERROR(
+            "Group %u: invalid rank size %llu.", groupIdx_, static_cast<unsigned long long>(ctx->rankSize)),
+        HCCL_E_PARA);
+    CHK_PRT_RET(
         msgArea_ != nullptr && reinterpret_cast<u64>(msgArea_) != ctx->workspace,
         HCCL_ERROR("Group %u: message area addr should be %#llx, not %#llx.", groupIdx_, msgArea_, ctx->workspace),
         HCCL_E_PARA);

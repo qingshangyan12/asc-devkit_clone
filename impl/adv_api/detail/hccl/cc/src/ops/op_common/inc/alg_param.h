@@ -526,6 +526,14 @@ struct AlgResourceCtxSerializable {
         binaryStream >> kfcServerArgs;
         binaryStream >> kfcServerArgSize;
         binaryStream >> topoInfoSeqSize;
+        if ((topoInfoSeqSize == 0) || (topoInfoSeqSize > data.size())) {
+            HCCL_ERROR(
+                "[AlgResourceCtxSerializable::DeSerialize] invalid topo info size[%u], data size[%zu]",
+                topoInfoSeqSize, data.size());
+            topoInfoSeqSize = 0;
+            topoInfo = TopoInfoWithNetLayerDetails{};
+            return;
+        }
         size_t startPos = data.size() - topoInfoSeqSize;
         std::vector<char> tailData(data.begin() + startPos, data.end());
         TopoInfoWithNetLayerDetails topoTemp;
