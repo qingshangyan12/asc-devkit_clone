@@ -54,13 +54,24 @@ __aicore__ inline int64_t asc_get_squeeze_status() { return asc_get_squeeze_stat
 
 __aicore__ inline int64_t asc_get_program_counter() { return asc_get_program_counter_impl(); }
 
-__aicore__ inline int64_t asc_get_block_idx() { return asc_get_block_idx_impl(); }
+[[deprecated("NOTICE: asc_get_block_idx is deprecated. "
+             "Please use block_idx * asc_get_sub_block_num() "
+             "+ asc_get_sub_block_id() instead.")]] __aicore__ inline int64_t
+asc_get_block_idx()
+{
+    return asc_get_block_idx_impl();
+}
 
 __aicore__ inline int64_t asc_get_sub_block_num() { return asc_get_sub_block_num_impl(); }
 
 __aicore__ inline int64_t asc_get_sub_block_id() { return asc_get_sub_block_id_impl(); }
 
-__aicore__ inline int64_t asc_get_block_num() { return asc_get_block_num_impl(); }
+[[deprecated("NOTICE: asc_get_block_num is deprecated. "
+             "Please use block_num instead.")]] __aicore__ inline int64_t
+asc_get_block_num()
+{
+    return asc_get_block_num_impl();
+}
 
 __aicore__ inline int64_t asc_get_system_cycle() { return asc_get_system_cycle_impl(); }
 
