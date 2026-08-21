@@ -199,9 +199,8 @@ ST RegisterKernelForRank:
 | 注册的 kernel | `CcuKernelKfcServer` | `CcuAlltoAllMesh1DKernel` |
 | `InheritKfcServerKernelArg` | ✅ 验证 | ❌ 不验证 |
 | `DispatchKfcSubKernel` | ✅ 验证（Phase 3） | ❌ 不验证 |
-```
 
-### 2.3 op 交互边界分类
+### 2.4 op 交互边界分类
 
 **ops ↔ hcomm 库交界（通用）**：
 
@@ -218,7 +217,7 @@ ST RegisterKernelForRank:
 | `ccu_temp_all_to_all_mesh_1D.cc` CalcRes | kernelFunc 函数指针 + kernelArg 构建 |
 | `ccu_kernel_all_to_all_mesh1d.cc` | collective kernel 函数（CCU API 调用） |
 
-### 2.4 selector/executor/template/kernel 关联机制
+### 2.5 selector/executor/template/kernel 关联机制
 
 | 关联 | 机制 | 时机 |
 |------|------|------|
@@ -231,7 +230,7 @@ ST RegisterKernelForRank:
 
 selector 和 executor 之间没有直接调用，只通过 algName 字符串间接耦合。
 
-### 2.5 参与的 ops 代码
+### 2.6 参与的 ops 代码
 
 | 代码 | 作用 | MC2 调用位置 |
 |------|------|-------------|
@@ -650,11 +649,11 @@ TEST_F(CcuStAllToAll, Mesh1D_2Rank_SingleDie_Fp16_100B)
 
 ---
 
-## 13. 新增算法变体接入指南
+## 14. 新增算法变体接入指南
 
 以 `CcuAlltoAllMesh2Die` 为例，加新变体只改 testcase，不改 utils：
 
-### 13.1 新建 adapter
+### 14.1 新建 adapter
 
 ```
 testcase/mc2_ccu/all_to_all/
@@ -672,7 +671,7 @@ testcase/mc2_ccu/all_to_all/
    CcuStAllToAll::RegisterVariant("CcuAlltoAllMesh2Die", builder);
    ```
 
-### 13.2 用例
+### 14.2 用例
 
 ```cpp
 TEST_F(CcuStAllToAll, Mesh2Die_4Rank_Fp16_64B)
@@ -684,17 +683,11 @@ TEST_F(CcuStAllToAll, Mesh2Die_4Rank_Fp16_64B)
 }
 ```
 
-### 13.3 不需要改的
+### 14.3 不需要改的
 
 - `ccu_all_to_all.h/.cc` — 原语级，不变
 - `ccu_fixture.h/.cc` — 框架，不变
 - utils 所有文件 — 不变
-
----
-
-## 14. 新增算法变体接入指南
-
-（同上，§13）
 
 ---
 
@@ -756,7 +749,7 @@ all_gather/
 
 ## 17. 边界声明
 
-### 16.1 覆盖
+### 17.1 覆盖
 
 - 真实 selector 算法选择逻辑
 - 真实 template.CalcRes 构建 CcuKernelInfo
@@ -767,7 +760,7 @@ all_gather/
 - DAG 内存冲突检测
 - 独立期望字节结果对比
 
-### 16.2 不覆盖
+### 17.2 不覆盖
 
 - KFC server kernel（queue/CKE/wrap/finalize）
 - InheritKfcServerKernelArg（KFC server 替换逻辑）
