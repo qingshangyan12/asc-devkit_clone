@@ -162,8 +162,12 @@ HcclResult PrepareEngineForAlg(OpParam& opParam, const std::string& algName);
 
 std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, const std::string& algName);
 
-HcclResult CheckForcedAlgResource(
-    HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName);
+// 校验指定算法的executor注册与资源计算能力（executor获取 + CalcAlgHierarchyInfo + CalcRes），
+// 失败统一返回HCCL_E_NOT_SUPPORT（强制算法校验失败触发回退；校验路径视为算法不支持）。
+// resRequest为可选输出：调用方需要资源请求（如校验路径的余量查询）时传入，避免重复计算；
+// 强制算法校验场景可不传
+HcclResult CheckForcedAlgResource(HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
+    const std::string& algName, AlgResourceRequest* resRequest = nullptr);
 
 bool GetForcedAlgName(const Mc2CcTilingInner* ccTiling, std::string& algName);
 
@@ -192,8 +196,9 @@ HcclResult GetOpParam(
 HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex);
 
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
+// checkOnly为true时逐算子仅执行校验并查询资源余量，不申请任何通信资源
 HcclResult CcuSelectAlg(
     HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
-    void* mc2Tiling, OpResCtx& opResCtx);
+    void* mc2Tiling, OpResCtx& opResCtx, bool checkOnly = false);
 
 #endif

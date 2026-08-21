@@ -1615,11 +1615,34 @@ static void DestroyAllDescs(ResDescByDie& descs)
     descs.clear();
 }
 
+// 从 kernel 首条 channel 的 localEndpoint 查询所属 dieId（同一 kernel 的所有 channel 在同一 die 上）。
+// 查询基于 channel 描述符而非已建链的 channel 句柄，属纯拓扑查询，不依赖 HcclChannelAcquire。
+// 无 channel 的纯计算 kernel 保持 CcuKernelInfo 默认的 dieId 0。
+static HcclResult ResolveKernelDieId(HcclComm comm, u32 userRank, CcuKernelInfo& kernelInfo)
+{
+    if (kernelInfo.channels.empty()) {
+        return HCCL_SUCCESS;
+    }
+
+    using DieIdType = uint32_t;
+    const uint32_t dieIdTypeSize = sizeof(DieIdType);
+    DieIdType dieId = 0;
+    EndpointDesc localEndpoint = kernelInfo.channels[0].localEndpoint;
+    CHK_RET(HcclRankGraphGetEndpointInfo(
+        comm, userRank, &localEndpoint, ENDPOINT_ATTR_DIE_ID, dieIdTypeSize, static_cast<void*>(&dieId)));
+    kernelInfo.dieId = dieId;
+    HCCL_DEBUG("[ResolveKernelDieId] kernel[%s] dieId[%u].", kernelInfo.kernelFuncName, kernelInfo.dieId);
+    return HCCL_SUCCESS;
+}
+
 // 查询单个 kernel 的资源需求，按 (dieId, resGroup, resType) 累加到 groupedResMap。
 static HcclResult AccumulateKernelRes(
-    const CcuKernelInfo& kernelInfo,
+    HcclComm comm, u32 userRank, CcuKernelInfo& kernelInfo,
     std::map<uint32_t, std::map<u32, std::map<HcommCcuResType, uint32_t>>>& groupedResMap)
 {
+    // 校验路径不经过 HcclGetChannelForCcu，dieId 尚未填充，此处补齐后再按 die 聚合
+    CHK_RET(ResolveKernelDieId(comm, userRank, kernelInfo));
+
     HcommCcuResDescHandle kernelDesc = 0;
     CcuResult createRet = HcommCcuInsResDescCreate(kernelInfo.dieId, &kernelDesc);
     CHK_PRT_RET(
@@ -1810,15 +1833,19 @@ static HcclResult IsDieEnabledForPadding(uint32_t dieId, bool& enabled)
 // 聚合所有 kernel 的资源需求到 reqDescs（按 dieId 分组）。
 // 聚合规则：同 (dieId, resGroup) 内逐 kernel 相加、同 dieId 不同 resGroup 之间取最大。
 // 为硬件上所有使能的 die 创建 reqDesc（未使能 die 跳过），防止后续算子容量不足触发回退。
-static HcclResult BuildAggregatedResReq(AlgResourceRequest& resRequest, ResDescByDie& reqDescs)
+static HcclResult BuildAggregatedResReq(HcclComm comm, AlgResourceRequest& resRequest, ResDescByDie& reqDescs)
 {
     u32 totalKernelNum = resRequest.ccuKernelInfos.size();
     HCCL_INFO("[BuildAggregatedResReq] start, kernelNum[%u].", totalKernelNum);
 
+    // OpParam.userRank 并非所有算子路径都会赋值，这里直接从 comm 查询本端全局 rank
+    u32 userRank = INVALID_VALUE_RANKID;
+    CHK_RET(HcclGetRankId(comm, &userRank));
+
     // 按 (dieId, resGroup, resType) 聚合所有 kernel 的资源需求
     std::map<uint32_t, std::map<u32, std::map<HcommCcuResType, uint32_t>>> groupedResMap;
     for (u32 i = 0; i < totalKernelNum; i++) {
-        CHK_RET(AccumulateKernelRes(resRequest.ccuKernelInfos[i], groupedResMap));
+        CHK_RET(AccumulateKernelRes(comm, userRank, resRequest.ccuKernelInfos[i], groupedResMap));
     }
 
     // 补齐缺失的 die。区分两类 die：
@@ -1846,6 +1873,9 @@ static HcclResult BuildAggregatedResReq(AlgResourceRequest& resRequest, ResDescB
         if (createRet != CCU_SUCCESS) {
             HCCL_ERROR(
                 "[BuildAggregatedResReq] HcommCcuInsResDescCreate dieId[%u] failed: ccuRet -> %d", dieId, createRet);
+            if (reqDesc != 0) {
+                HcommCcuInsResDescDestroy(reqDesc);
+            }
             DestroyAllDescs(reqDescs);
             return ConvertCcuToHccl(createRet);
         }
@@ -1891,6 +1921,9 @@ static HcclResult ReuseExistingCcuIns(
             HCCL_ERROR(
                 "[ReuseExistingCcuIns] HcommCcuInsResDescCreate capDesc dieId[%u] failed: ccuRet -> %d", dieId,
                 capCreateRet);
+            if (capDesc != 0) {
+                HcommCcuInsResDescDestroy(capDesc);
+            }
             DestroyAllDescs(reqDescs);
             return ConvertCcuToHccl(capCreateRet);
         }
@@ -1977,6 +2010,9 @@ static void CollectInsufficientResFromRemain(
             HCCL_WARNING(
                 "[CollectInsufficientResFromRemain] create remainDesc dieId[%u] failed: ccuRet -> %d, skip.", dieId,
                 rCreateRet);
+            if (remainDesc != 0) {
+                HcommCcuInsResDescDestroy(remainDesc);
+            }
             continue;
         }
         CcuResult rQueryRet = HcommCcuQueryRemainResDesc(remainDesc);
@@ -2077,7 +2113,7 @@ static HcclResult HcclGetCcuKernelDynamic(
 
     // 步骤1：聚合资源需求，按 dieId 分组
     ResDescByDie reqDescs;
-    HcclResult buildRet = BuildAggregatedResReq(resRequest, reqDescs);
+    HcclResult buildRet = BuildAggregatedResReq(comm, resRequest, reqDescs);
     if (buildRet != HCCL_SUCCESS) {
         // 防御性清理：BuildAggregatedResReq 失败时契约上已清理，这里再清理一次防止内部契约被破坏
         DestroyAllDescs(reqDescs);
@@ -2119,6 +2155,68 @@ static HcclResult HcclGetCcuKernelDynamic(
     return finalRet;
 }
 } // namespace
+
+// 查询CCU通信资源余量是否满足请求（仅校验，不申请资源）：
+// 1. 将算子请求的kernel资源按die聚合为资源需求描述；
+// 2. 对每个die创建"剩余资源"描述并查询剩余量；
+// 3. 逐资源类型比较剩余量是否满足需求量，任一die任一类型不足则sufficient置false；
+// 4. 所有描述句柄在返回前统一销毁，错误路径统一转换为HcclResult。
+HcclResult HcclQueryCcuResSuffient(HcclComm comm, AlgResourceRequest& resRequest, bool& sufficient)
+{
+    HCCL_INFO("[HcclQueryCcuResSuffient] start, kernelNum[%zu].", resRequest.ccuKernelInfos.size());
+    // 默认资源充足，任一die任一资源类型不足时置为false
+    sufficient = true;
+    ResDescByDie reqDescs;
+    // 将请求的kernel资源需求按die聚合为资源需求描述集合
+    CHK_RET(BuildAggregatedResReq(comm, resRequest, reqDescs));
+
+    // 逐die查询剩余资源并与请求比较
+    std::string allDieInsuffSummary;
+    for (auto& dieEntry : reqDescs) {
+        uint32_t dieId = dieEntry.first;
+        HcommCcuResDescHandle reqDesc = dieEntry.second;
+        HcommCcuResDescHandle remainDesc = 0;
+        // 创建该die的剩余资源描述句柄，失败则转换错误码返回
+        CcuResult rCreateRet = HcommCcuInsResDescCreate(dieId, &remainDesc);
+        if (rCreateRet != CCU_SUCCESS) {
+            if (remainDesc != 0) {
+                HcommCcuInsResDescDestroy(remainDesc);
+            }
+            DestroyAllDescs(reqDescs);
+            return ConvertCcuToHccl(rCreateRet);
+        }
+        // 查询该die的剩余资源（结果写入remainDesc），失败则转换错误码返回
+        CcuResult rQueryRet = HcommCcuQueryRemainResDesc(remainDesc);
+        if (rQueryRet != CCU_SUCCESS) {
+            HcommCcuInsResDescDestroy(remainDesc);
+            DestroyAllDescs(reqDescs);
+            return ConvertCcuToHccl(rQueryRet);
+        }
+        // 逐资源类型比较剩余量与请求量，比较结果写入dieSufficient，不足详情写入dieInsuffSummary
+        bool dieSufficient = false;
+        std::string dieInsuffSummary;
+        HcclResult cmpRet = IsResCapSufficient(dieId, remainDesc, reqDesc, dieSufficient, dieInsuffSummary);
+        HcommCcuInsResDescDestroy(remainDesc);
+        if (cmpRet != HCCL_SUCCESS) {
+            DestroyAllDescs(reqDescs);
+            return cmpRet;
+        }
+        // 当前die资源不足时置全局不充足标记，并汇总各die的不足详情
+        if (!dieSufficient) {
+            sufficient = false;
+            if (!allDieInsuffSummary.empty()) {
+                allDieInsuffSummary += "; ";
+            }
+            allDieInsuffSummary += "dieId[" + std::to_string(dieId) + "]: " + dieInsuffSummary;
+        }
+    }
+    DestroyAllDescs(reqDescs);
+    if (!sufficient) {
+        HCCL_RUN_INFO("[HcclQueryCcuResSuffient] resource insufficient detail: %s", allDieInsuffSummary.c_str());
+    }
+    HCCL_INFO("[HcclQueryCcuResSuffient] finish, sufficient[%d].", sufficient);
+    return HCCL_SUCCESS;
+}
 #endif
 
 HcclResult HcclGetCcuKernel(

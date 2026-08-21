@@ -74,6 +74,9 @@ HcclResult HcclGetCcuKernel(
 
 HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest);
 
+// 查询CCU通信资源余量是否满足resRequest请求（仅校验，不申请资源），结果写入sufficient
+HcclResult HcclQueryCcuResSuffient(HcclComm comm, AlgResourceRequest& resRequest, bool& sufficient);
+
 HcclResult HcclAllocAlgResourceCcu(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);
