@@ -445,9 +445,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     for (uint8_t mission = 0; mission < missionNum; ++mission) {
         ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId, mission);
         AscendC::PRINTF(
-            "[KFC_DEBUG][Commit] handleId=%u resourceId=%u mission=%u missionNum=%u commitCKEAddr=%p\n",
+            "[KFC_DEBUG][Commit] handleId=%u resourceId=%u mission=%u missionNum=%u commitCKEAddr=0x%llx\n",
             static_cast<uint32_t>(handleId), static_cast<uint32_t>(resourceId), static_cast<uint32_t>(mission),
-            static_cast<uint32_t>(missionNum), ccuMsg_.commitCKEAddr);
+            static_cast<uint32_t>(missionNum),
+            static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(ccuMsg_.commitCKEAddr)));
         WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
     }
 }
@@ -566,9 +567,10 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         for (uint8_t mission = 0; mission < missionNum; ++mission) {
             GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId, mission);
             AscendC::PRINTF(
-                "[KFC_DEBUG][Wait] handleId=%u reqId=%u mission=%u missionNum=%u waitCKEAddr=%p\n",
+                "[KFC_DEBUG][Wait] handleId=%u reqId=%u mission=%u missionNum=%u waitCKEAddr=0x%llx\n",
                 static_cast<uint32_t>(handleId), static_cast<uint32_t>(reqId), static_cast<uint32_t>(mission),
-                static_cast<uint32_t>(missionNum), waitCKEAddr);
+                static_cast<uint32_t>(missionNum),
+                static_cast<unsigned long long>(reinterpret_cast<uintptr_t>(waitCKEAddr)));
             while (true) {
                 uint64_t waitCke = ReadHBMData(waitCKEAddr);
                 if (waitCke != 0) {
