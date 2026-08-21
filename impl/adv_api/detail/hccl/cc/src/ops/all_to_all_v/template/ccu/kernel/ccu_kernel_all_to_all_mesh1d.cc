@@ -112,7 +112,7 @@ static void PostSync(AlltoAllMesh1DContext &ctx)
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D PostSync end.");
 }
 
-static void WriteChunked(AlltoAllMesh1DContext &ctx, ccu::ChannelHandle channelId,
+static void WriteChunked(AlltoAllMesh1DContext &ctx, ChannelHandle channelId,
     ccu::RemoteAddr &curDst, ccu::LocalAddr &curSrc, uint64_t rankIdx)
 {
     ccu::Variable chunkSize;
