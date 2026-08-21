@@ -131,9 +131,10 @@ from .static_compile_resource_id import generate_and_write_resource_id
 from .static_compile_resource_generator import (
     ManifestGenerationRequest,
     ConstantInfoRecord,
+    KernelCompileRecordBuildRequest,
+    KernelCompileRecordBuilder,
     SkBindCommandSpec,
-    build_kernel_compile_records,
-    generate_manifest,
+    StaticCompileResourceGenerator,
 )
 from .super_kernel_constants import SuperKernelStreamFusionMode
 from .super_kernel_option_parse import parse_super_kernel_options
@@ -1803,24 +1804,26 @@ def generate_static_compile_manifest(
         manifest_tiling_size = compile_info.static_compile_tiling_size
     manifest_tiling_sizes = dict(tiling_info.tiling_key_data_size)
     manifest_tiling_sizes.update(compile_info.static_compile_tiling_key_data_size)
-    kernel_records = build_kernel_compile_records(
-        basic_compile_info=basic_compile_info,
-        sk_compile_info=sk_compile_info,
-        metadata_json_path=metadata_json_path,
-        constant_infos=(
-            ConstantInfoRecord(
-                name="tiling_data",
-                parameter_index=workspace_idx + 1,
-                byte_size=manifest_tiling_size,
-                template_path=tiling_info.tiling_data_file_path,
-                template="@@STATIC_VALUE_tiling_data@@",
+    kernel_records = KernelCompileRecordBuilder(
+        KernelCompileRecordBuildRequest(
+            basic_compile_info=basic_compile_info,
+            sk_compile_info=sk_compile_info,
+            metadata_json_path=metadata_json_path,
+            constant_infos=(
+                ConstantInfoRecord(
+                    name="tiling_data",
+                    parameter_index=workspace_idx + 1,
+                    byte_size=manifest_tiling_size,
+                    template_path=tiling_info.tiling_data_file_path,
+                    template="@@STATIC_VALUE_tiling_data@@",
+                ),
             ),
-        ),
-        constant_info_size_by_tiling_key={"tiling_data": manifest_tiling_sizes},
-    )
+            constant_info_size_by_tiling_key={"tiling_data": manifest_tiling_sizes},
+        )
+    ).build()
     kernel_output_dir = os.path.join(kernel_spec_dir, compile_info.kernel_name)
     manifest_name = f"{compile_info.kernel_name}_manifest.json"
-    return generate_manifest(
+    return StaticCompileResourceGenerator(
         ManifestGenerationRequest(
             soc_version=global_var_storage.get_variable("ascendc_short_soc_version"),
             resource_id=resource_id,
@@ -1847,7 +1850,7 @@ def generate_static_compile_manifest(
                 else None
             ),
         )
-    )
+    ).generate()
 
 
 def compile_op_common_part(
