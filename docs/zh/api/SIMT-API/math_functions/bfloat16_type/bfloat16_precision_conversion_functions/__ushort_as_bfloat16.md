@@ -46,15 +46,15 @@ unsigned short int的数据按位重新解释为bfloat16的值。特殊值如下
 
 | x值 | 返回值 |
 |---|---|
-| 0x0000（+0 位模式） | 0 |
-| 0x8000（-0 位模式） | -0 |
-| 0x7F80（inf 位模式） | inf |
-| 0xFF80（-inf 位模式） | -inf |
-| 0x7FFF（nan 位模式） | nan |
-| 0x7F7F（bfloat16 最大有限正数位模式） | ASCRT_MAX_NORMAL_BF16 |
-| 0xFF7F（bfloat16 最大有限负数位模式） | -ASCRT_MAX_NORMAL_BF16 |
-| 0x0001（bfloat16 最小非正规正数位模式） | ASCRT_MIN_DENORM_BF16 |
-| 0x3F80（1.0 位模式） | 1.0 |
+| 0x0000 | 0 |
+| 0x8000 | -0 |
+| 0x7F80 | inf |
+| 0xFF80 | -inf |
+| 0x7FFF | nan |
+| 0x7F7F | ASCRT_MAX_NORMAL_BF16 |
+| 0xFF7F | -ASCRT_MAX_NORMAL_BF16 |
+| 0x0001 | ASCRT_MIN_DENORM_BF16 |
+| 0x3F80 | 1.0 |
 
 ## 约束说明
 

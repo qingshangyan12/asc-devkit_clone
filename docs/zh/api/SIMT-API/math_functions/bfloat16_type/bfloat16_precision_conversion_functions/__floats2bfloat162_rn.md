@@ -81,9 +81,9 @@ inline bfloat16x2_t __floats2bfloat162_rn(const float x, const float y)
         }
         output[idx] = __floats2bfloat162_rn(input1[idx], input2[idx]);
     }
-    __global__ __launch_bounds__(1024) void cast_kernel(float* input1, float* input2, bfloat16x2_t* output, uint32_t input_total_length)
+    __global__ __launch_bounds__(1024) void cast_kernel(float* input1, float* input2, bfloat16_t* output, uint32_t input_total_length)
     {
-        simt_floats2bfloat162_rn(input1, input2, output, input_total_length);
+        simt_floats2bfloat162_rn(input1, input2, (bfloat16x2_t*)output, input_total_length);
     }
     ```
 

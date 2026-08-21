@@ -100,8 +100,6 @@ bool __hbgtx2(bfloat16x2_t x, bfloat16x2_t y)
 
 ## 调用示例
 
-> 说明：示例中将输入按 `bfloat16x2_t` 类型成对读取，要求 input_total_length 为2的倍数且输入缓冲区按4字节对齐；若元素个数为奇数，最后一个元素不会参与比较。
-
 -   SIMT编程场景：
 
     ```cpp

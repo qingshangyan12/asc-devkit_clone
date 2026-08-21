@@ -96,8 +96,6 @@ bfloat16x2_t __hmulx2(const bfloat16x2_t x, const bfloat16x2_t y)
 
 无
 
-> 调用示例中将缓冲区按bfloat16x2_t类型向量化访问时，需保证缓冲区起始地址按bfloat16x2_t类型对齐（4字节），且bfloat16_t元素个数为偶数（即input_total_length能被2整除），否则最后一个元素不会被处理。
-
 ## 需要包含的头文件
 
 使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。

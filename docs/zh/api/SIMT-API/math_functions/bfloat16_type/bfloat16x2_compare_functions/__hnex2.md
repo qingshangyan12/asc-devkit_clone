@@ -76,7 +76,7 @@ bfloat16x2_t __hnex2(bfloat16x2_t x, bfloat16x2_t y)
 
 ## 约束说明
 
-- 调用该接口前需保证输入数据长度 `input_total_length` 为偶数，且 x、y、dst 基地址满足 4 字节对齐，以确保 bfloat16x2_t 向量化访问有效。
+无
 
 ## 需要包含的头文件
 

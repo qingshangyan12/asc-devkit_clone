@@ -76,7 +76,7 @@ unsigned int __hltux2_mask(bfloat16x2_t x, bfloat16x2_t y)
 
 ## 约束说明
 
-使用该接口时，要求x、y指向的输入缓冲区地址满足4字节对齐，且input_total_length为2的整数倍，以保证按bfloat16x2_t类型访问数据时不遗漏、不越界。
+无
 
 ## 需要包含的头文件
 
