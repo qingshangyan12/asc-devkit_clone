@@ -25,27 +25,20 @@ namespace te {
 namespace detail {
 
 template <typename DataType, typename PatternType>
-__simd_callee__ inline vector_bool create_reg_mask(PatternType pattern)
+__simd_callee__ inline reg_tensor<bool> make_reg_mask(PatternType pattern)
 {
     static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t)
                       || sizeof(DataType) == sizeof(uint32_t),
                   "mask helpers only support 8-bit, 16-bit, and 32-bit element types");
 
-    if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
-        return asc_create_mask_b32(pattern);
-    } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
-        return asc_create_mask_b16(pattern);
-    } else {
-        return asc_create_mask_b8(pattern);
-    }
-}
-
-template <typename DataType, typename PatternType>
-__simd_callee__ inline reg_tensor<bool> make_reg_mask(PatternType pattern)
-{
     reg_tensor<bool> result;
-    result.reg = create_reg_mask<DataType>(pattern);
-    result.mask = create_reg_mask<DataType>(PAT_ALL);
+    if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
+        result.reg = asc_create_mask_b32(pattern);
+    } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
+        result.reg = asc_create_mask_b16(pattern);
+    } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
+        result.reg = asc_create_mask_b8(pattern);
+    }
     return result;
 }
 
@@ -64,7 +57,6 @@ __simd_callee__ inline reg_tensor<bool> make_updated_reg_mask(uint32_t& remain)
     } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
         result.reg = asc_update_mask_b8(remain);
     }
-    result.mask = create_reg_mask<DataType>(PAT_ALL);
     return result;
 }
 

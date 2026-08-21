@@ -53,7 +53,6 @@ __simd_vf__ inline void compile_reg_local_tensor_load_store(
     static_assert(std::is_base_of_v<tensor_api_base, decltype(src_tensor)>);
 
     reg_tensor<bool> mask_reg {mask};
-    mask_reg.reg = mask;
     auto value = src_tensor.template load<sideband_mode>(make_coord(0)).with_mask(mask_reg);
     static_assert(std::is_same_v<typename decltype(value)::elem_type, T>);
     dst_tensor.store(make_coord(0), value);
@@ -122,24 +121,17 @@ __simd_vf__ inline void compile_reg_mask(uint32_t remain)
     auto tail_mask = update_mask<T>(remain);
     static_assert(std::is_same_v<decltype(vl8_mask), reg_tensor<bool>>);
     static_assert(std::is_same_v<decltype(every3_mask), reg_tensor<bool>>);
-    auto inverted = !empty_mask;
-    auto intersected = vl8_mask & every3_mask;
     (void)vl8_mask;
     (void)every3_mask;
     (void)empty_mask;
     (void)tail_mask;
-    (void)inverted;
-    (void)intersected;
 }
 
 template <typename T>
 __simd_vf__ inline void compile_reg_mask_data_reorder(vector_bool src0, vector_bool src1)
 {
-    auto execution_mask = all_mask<T>();
-    reg_tensor<bool> mask0 {execution_mask.reg};
-    reg_tensor<bool> mask1 {execution_mask.reg};
-    mask0.reg = src0;
-    mask1.reg = src1;
+    reg_tensor<bool> mask0 {src0};
+    reg_tensor<bool> mask1 {src1};
     auto interleaved = interleave<T>(mask0, mask1);
     static_assert(std::is_same_v<decltype(interleaved), reg_pair<bool>>);
     static_assert(std::is_same_v<decltype(interleaved.first), reg_tensor<bool>>);
@@ -147,9 +139,7 @@ __simd_vf__ inline void compile_reg_mask_data_reorder(vector_bool src0, vector_b
 
     auto restored = deinterleave<T>(interleaved.first, interleaved.second);
     static_assert(std::is_same_v<decltype(restored), reg_pair<bool>>);
-    auto combined = restored.first | restored.second;
     (void)restored;
-    (void)combined;
 }
 
 TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
@@ -157,11 +147,6 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     reg_tensor<float> value {};
     (void)value.reg;
     (void)value.mask;
-
-    static_assert(has_mask_member<reg_tensor<bool>>::value);
-    reg_tensor<bool> predicate {};
-    (void)predicate.reg;
-    (void)predicate.mask;
 
     auto compile_load_store = &compile_reg_local_tensor_load_store<float>;
     (void)compile_load_store;
