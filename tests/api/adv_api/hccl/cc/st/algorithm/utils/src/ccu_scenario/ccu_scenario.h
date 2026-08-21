@@ -22,7 +22,7 @@ namespace HcclSim {
 namespace CcuSt {
 
 struct CcuStScenario {
-    TopoMeta topoMeta;                                // rankSize 从 topoMeta 自动推导
+    TopoMeta topoMeta; // rankSize 从 topoMeta 自动推导
     DevType devType = DevType::DEV_TYPE_950;
     HcclDataType dataType = HCCL_DATA_TYPE_FP16;
     HcclCMDType opType = HcclCMDType::HCCL_CMD_ALLTOALLV;

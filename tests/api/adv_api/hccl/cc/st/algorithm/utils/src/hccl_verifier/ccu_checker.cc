@@ -16,20 +16,21 @@
 namespace HcclSim {
 namespace CcuSt {
 namespace {
-CheckResult Failure(const std::string &message, Result result = Result::CONTRACT_ERROR)
+CheckResult Failure(const std::string& message, Result result = Result::CONTRACT_ERROR)
 {
     return CheckResult{result, message};
 }
 } // namespace
 
-CheckResult CcuLogicalResourceChecker::Check(const Program &program) const
+CheckResult CcuLogicalResourceChecker::Check(const Program& program) const
 {
     std::set<ResourceHandle> allResources;
-    const std::pair<const std::set<ResourceHandle> *, const char *> typedResources[] = {
-        {&program.variables, "Variable"}, {&program.addresses, "Address"},
-        {&program.events, "Event"}, {&program.buffers, "CcuBuffer"}
-    };
-    for (const auto &typed : typedResources) {
+    const std::pair<const std::set<ResourceHandle>*, const char*> typedResources[] = {
+        {&program.variables, "Variable"},
+        {&program.addresses, "Address"},
+        {&program.events, "Event"},
+        {&program.buffers, "CcuBuffer"}};
+    for (const auto& typed : typedResources) {
         for (ResourceHandle handle : *typed.first) {
             if (handle == 0 || !allResources.insert(handle).second) {
                 return Failure(std::string(typed.second) + " handle is zero or collides with another resource type");
@@ -37,12 +38,11 @@ CheckResult CcuLogicalResourceChecker::Check(const Program &program) const
         }
     }
 
-    auto checkAddressMap = [&](const std::map<ResourceHandle,
-        std::pair<ResourceHandle, ResourceHandle>> &resources, const char *name) -> CheckResult {
-        for (const auto &entry : resources) {
+    auto checkAddressMap = [&](const std::map<ResourceHandle, std::pair<ResourceHandle, ResourceHandle>>& resources,
+                               const char* name) -> CheckResult {
+        for (const auto& entry : resources) {
             if (entry.first == 0 || !allResources.insert(entry.first).second ||
-                program.addresses.count(entry.second.first) != 1 ||
-                program.variables.count(entry.second.second) != 1) {
+                program.addresses.count(entry.second.first) != 1 || program.variables.count(entry.second.second) != 1) {
                 return Failure(std::string(name) + " does not own a valid unique Address/Token pair");
             }
         }
@@ -57,18 +57,18 @@ CheckResult CcuLogicalResourceChecker::Check(const Program &program) const
         return addressResult;
     }
 
-    for (const auto &channelVariable : program.channelVariables) {
+    for (const auto& channelVariable : program.channelVariables) {
         if (program.variables.count(channelVariable.second) != 1) {
             return Failure("Channel variable does not reference an allocated Variable");
         }
     }
-    for (const ArgDescriptor &argument : program.arguments) {
+    for (const ArgDescriptor& argument : program.arguments) {
         if (program.variables.count(argument.variable) != 1) {
             return Failure("LoadArg descriptor does not reference an allocated Variable");
         }
     }
 
-    for (const Operation &operation : program.operations) {
+    for (const Operation& operation : program.operations) {
         const auto isVariable = [&](ResourceHandle handle) { return program.variables.count(handle) == 1; };
         const auto isAddress = [&](ResourceHandle handle) { return program.addresses.count(handle) == 1; };
         const auto isEvent = [&](ResourceHandle handle) { return program.events.count(handle) == 1; };
@@ -131,22 +131,22 @@ CheckResult CcuLogicalResourceChecker::Check(const Program &program) const
                 break;
             case OpCode::WRITE:
                 if (program.remoteAddresses.count(operation.dst) != 1 ||
-                    program.localAddresses.count(operation.src0) != 1 ||
-                    !isVariable(operation.src1) || !isEvent(operation.immediate)) {
+                    program.localAddresses.count(operation.src0) != 1 || !isVariable(operation.src1) ||
+                    !isEvent(operation.immediate)) {
                     return Failure("remote Write references an invalid address, length, or Event");
                 }
                 break;
             case OpCode::LOCAL_COPY:
                 if (program.localAddresses.count(operation.dst) != 1 ||
-                    program.localAddresses.count(operation.src0) != 1 ||
-                    !isVariable(operation.src1) || !isEvent(operation.immediate)) {
+                    program.localAddresses.count(operation.src0) != 1 || !isVariable(operation.src1) ||
+                    !isEvent(operation.immediate)) {
                     return Failure("LocalCopy references an invalid address, length, or Event");
                 }
                 break;
             case OpCode::GROUP_COPY:
                 if (program.localAddresses.count(operation.dst) != 1 ||
-                    program.localAddresses.count(operation.src0) != 1 ||
-                    !isVariable(operation.src1) || operation.index >= program.groupCopies.size()) {
+                    program.localAddresses.count(operation.src0) != 1 || !isVariable(operation.src1) ||
+                    operation.index >= program.groupCopies.size()) {
                     return Failure("GroupCopy references an invalid address, length, or descriptor");
                 }
                 break;
@@ -175,7 +175,7 @@ CheckResult CcuLogicalResourceChecker::Check(const Program &program) const
     return {};
 }
 
-CheckResult CcuProgramChecker::Check(const Program &program) const
+CheckResult CcuProgramChecker::Check(const Program& program) const
 {
     CheckResult resourceResult = CcuLogicalResourceChecker().Check(program);
     if (!resourceResult.Ok()) {
@@ -188,7 +188,7 @@ CheckResult CcuProgramChecker::Check(const Program &program) const
             return Failure("LoadArg IDs are not contiguous");
         }
     }
-    for (const Operation &operation : program.operations) {
+    for (const Operation& operation : program.operations) {
         if (operation.code != OpCode::LOAD_ARG) {
             continue;
         }
@@ -204,28 +204,25 @@ CheckResult CcuProgramChecker::Check(const Program &program) const
     return {};
 }
 
-CheckResult CcuTaskArgChecker::Check(const Program &program, const std::vector<uint64_t> &taskArgs) const
+CheckResult CcuTaskArgChecker::Check(const Program& program, const std::vector<uint64_t>& taskArgs) const
 {
     if (program.arguments.size() != taskArgs.size()) {
         return Failure("taskArgs count does not match the compiled LoadArg operations");
     }
     const std::vector<TaskParam> params = PackTaskArgs(taskArgs);
-    const size_t expectedMissionCount =
-        (taskArgs.size() + TASK_PARAM_SLOT_COUNT - 1) / TASK_PARAM_SLOT_COUNT;
+    const size_t expectedMissionCount = (taskArgs.size() + TASK_PARAM_SLOT_COUNT - 1) / TASK_PARAM_SLOT_COUNT;
     if (params.size() != expectedMissionCount) {
         return Failure("taskArgs mission count is invalid");
     }
     for (size_t mission = 0; mission < params.size(); ++mission) {
         const size_t firstArg = mission * TASK_PARAM_SLOT_COUNT;
         const size_t expectedCopied = std::min<size_t>(TASK_PARAM_SLOT_COUNT, taskArgs.size() - firstArg);
-        if (params[mission].argSize != TASK_PARAM_SLOT_COUNT ||
-            params[mission].copiedArgCount != expectedCopied) {
+        if (params[mission].argSize != TASK_PARAM_SLOT_COUNT || params[mission].copiedArgCount != expectedCopied) {
             return Failure("taskArgs mission metadata is invalid");
         }
         for (size_t slot = 0; slot < expectedCopied; ++slot) {
             const size_t argId = firstArg + slot;
-            if (params[mission].args[slot] != taskArgs[argId] ||
-                program.arguments[argId].id != argId) {
+            if (params[mission].args[slot] != taskArgs[argId] || program.arguments[argId].id != argId) {
                 return Failure("LoadArg mission/slot binding does not match taskArgs");
             }
         }
@@ -233,13 +230,13 @@ CheckResult CcuTaskArgChecker::Check(const Program &program, const std::vector<u
     return {};
 }
 
-CheckResult CcuRuntimeChecker::CheckCompleted(const RuntimeWorld &world, size_t rankCount) const
+CheckResult CcuRuntimeChecker::CheckCompleted(const RuntimeWorld& world, size_t rankCount) const
 {
-    const std::vector<RankExecutionStats> &stats = world.LastExecutionStats();
+    const std::vector<RankExecutionStats>& stats = world.LastExecutionStats();
     if (stats.size() != rankCount) {
         return Failure("runtime execution rank count is invalid");
     }
-    for (const RankExecutionStats &rankStats : stats) {
+    for (const RankExecutionStats& rankStats : stats) {
         if (!rankStats.completed) {
             return Failure("one or more ranks did not finish the CCU program");
         }

@@ -41,10 +41,9 @@ struct AllToAllLaunchConfig {
     uint64_t srcOffset{0};
 };
 
-Result CaptureAllToAllMesh1DKernel(void *kernelArg);
-std::vector<uint64_t> PrepareAllToAllTaskArgs(const AllToAllLaunchConfig &config);
-ScenarioData BuildMesh1DScenario(const CcuStScenario &scenario,
-    const std::vector<KernelHandle> &handles);
+Result CaptureAllToAllMesh1DKernel(void* kernelArg);
+std::vector<uint64_t> PrepareAllToAllTaskArgs(const AllToAllLaunchConfig& config);
+ScenarioData BuildMesh1DScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles);
 
 } // namespace CcuSt
 } // namespace HcclSim

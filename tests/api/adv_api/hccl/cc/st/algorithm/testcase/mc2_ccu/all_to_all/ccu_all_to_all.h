@@ -22,22 +22,19 @@ namespace CcuSt {
 
 class CcuStAllToAll : public CcuStFixture {
 public:
-    using ScenarioBuilder = std::function<ScenarioData(
-        const CcuStScenario &, const std::vector<KernelHandle> &)>;
+    using ScenarioBuilder = std::function<ScenarioData(const CcuStScenario&, const std::vector<KernelHandle>&)>;
 
-    static void RegisterVariant(const std::string &algName, ScenarioBuilder builder);
+    static void RegisterVariant(const std::string& algName, ScenarioBuilder builder);
 
 protected:
-    ScenarioData BuildScenarioData(const CcuStScenario &scenario,
-                                   const std::vector<KernelHandle> &handles) override;
-    void PrepareOpParam(OpParam &opParam, uint32_t rankSize,
-                        const CcuStScenario &scenario) override;
+    ScenarioData BuildScenarioData(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles) override;
+    void PrepareOpParam(OpParam& opParam, uint32_t rankSize, const CcuStScenario& scenario) override;
 
 private:
     std::vector<uint64_t> sendCounts_;
     std::string algName_;
 
-    static std::map<std::string, ScenarioBuilder> &GetVariantRegistry();
+    static std::map<std::string, ScenarioBuilder>& GetVariantRegistry();
 };
 
 } // namespace CcuSt

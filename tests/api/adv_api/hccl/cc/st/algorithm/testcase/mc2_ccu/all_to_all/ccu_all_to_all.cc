@@ -18,33 +18,31 @@
 namespace HcclSim {
 namespace CcuSt {
 
-std::map<std::string, CcuStAllToAll::ScenarioBuilder> &CcuStAllToAll::GetVariantRegistry()
+std::map<std::string, CcuStAllToAll::ScenarioBuilder>& CcuStAllToAll::GetVariantRegistry()
 {
     static std::map<std::string, ScenarioBuilder> registry;
     return registry;
 }
 
-void CcuStAllToAll::RegisterVariant(const std::string &algName, ScenarioBuilder builder)
+void CcuStAllToAll::RegisterVariant(const std::string& algName, ScenarioBuilder builder)
 {
     GetVariantRegistry()[algName] = std::move(builder);
 }
 
-void CcuStAllToAll::PrepareOpParam(OpParam &opParam, uint32_t rankSize,
-                                   const CcuStScenario &scenario)
+void CcuStAllToAll::PrepareOpParam(OpParam& opParam, uint32_t rankSize, const CcuStScenario& scenario)
 {
     const uint32_t typeSize = DATATYPE_SIZE_TABLE[scenario.dataType];
     sendCounts_.assign(rankSize, 0);
     for (uint32_t i = 0; i < rankSize; ++i) {
         sendCounts_[i] = (typeSize > 0) ? scenario.sizes[0][i] / typeSize : scenario.sizes[0][i];
     }
-    opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void *>(sendCounts_.data());
+    opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void*>(sendCounts_.data());
 }
 
-ScenarioData CcuStAllToAll::BuildScenarioData(const CcuStScenario &scenario,
-                                               const std::vector<KernelHandle> &handles)
+ScenarioData CcuStAllToAll::BuildScenarioData(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)
 {
     algName_ = scenario.expectedAlgName;
-    auto &registry = GetVariantRegistry();
+    auto& registry = GetVariantRegistry();
     auto it = registry.find(algName_);
     if (it != registry.end()) {
         return it->second(scenario, handles);

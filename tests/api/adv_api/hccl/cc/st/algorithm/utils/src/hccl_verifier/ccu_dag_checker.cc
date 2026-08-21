@@ -21,7 +21,7 @@ namespace {
 
 const size_t INVALID_INDEX = std::numeric_limits<size_t>::max();
 
-size_t FindLastDataEntryBefore(const std::vector<ExecutionLogEntry> &entries, size_t opIndex)
+size_t FindLastDataEntryBefore(const std::vector<ExecutionLogEntry>& entries, size_t opIndex)
 {
     size_t result = INVALID_INDEX;
     for (size_t i = 0; i < entries.size(); ++i) {
@@ -32,7 +32,7 @@ size_t FindLastDataEntryBefore(const std::vector<ExecutionLogEntry> &entries, si
     return result;
 }
 
-size_t FindFirstDataEntryAfter(const std::vector<ExecutionLogEntry> &entries, size_t opIndex)
+size_t FindFirstDataEntryAfter(const std::vector<ExecutionLogEntry>& entries, size_t opIndex)
 {
     for (size_t i = 0; i < entries.size(); ++i) {
         if (entries[i].operationIndex > opIndex) {
@@ -44,13 +44,13 @@ size_t FindFirstDataEntryAfter(const std::vector<ExecutionLogEntry> &entries, si
 
 } // namespace
 
-void CcuDagChecker::AddEdge(std::vector<DagNode> &nodes, size_t from, size_t to) const
+void CcuDagChecker::AddEdge(std::vector<DagNode>& nodes, size_t from, size_t to) const
 {
     nodes[from].successors.push_back(to);
     nodes[to].predecessors.push_back(from);
 }
 
-std::vector<DagNode> CcuDagChecker::BuildDag(const ExecutionLog &log) const
+std::vector<DagNode> CcuDagChecker::BuildDag(const ExecutionLog& log) const
 {
     std::vector<DagNode> nodes;
     std::vector<std::vector<size_t>> entryToNode(log.rankEntries.size());
@@ -70,12 +70,12 @@ std::vector<DagNode> CcuDagChecker::BuildDag(const ExecutionLog &log) const
     }
 
     for (size_t rankA = 0; rankA < log.programs.size() && rankA < log.rankEntries.size(); ++rankA) {
-        const Program *programA = log.programs[rankA];
+        const Program* programA = log.programs[rankA];
         if (programA == nullptr) {
             continue;
         }
         for (size_t opIndex = 0; opIndex < programA->operations.size(); ++opIndex) {
-            const Operation &op = programA->operations[opIndex];
+            const Operation& op = programA->operations[opIndex];
             uint32_t remoteRank = 0;
             uint32_t notifyIndex = 0;
             if (op.code == OpCode::NOTIFY_RECORD) {
@@ -97,12 +97,12 @@ std::vector<DagNode> CcuDagChecker::BuildDag(const ExecutionLog &log) const
             }
             size_t sourceNode = entryToNode[rankA][sourceLocal];
 
-            const Program *programB = log.programs[remoteRank];
+            const Program* programB = log.programs[remoteRank];
             if (programB == nullptr) {
                 continue;
             }
             for (size_t waitOpIndex = 0; waitOpIndex < programB->operations.size(); ++waitOpIndex) {
-                const Operation &waitOp = programB->operations[waitOpIndex];
+                const Operation& waitOp = programB->operations[waitOpIndex];
                 if (waitOp.code != OpCode::NOTIFY_WAIT) {
                     continue;
                 }
@@ -127,7 +127,7 @@ std::vector<DagNode> CcuDagChecker::BuildDag(const ExecutionLog &log) const
     return nodes;
 }
 
-std::vector<bool> CcuDagChecker::ReachableFrom(const std::vector<DagNode> &nodes, size_t from) const
+std::vector<bool> CcuDagChecker::ReachableFrom(const std::vector<DagNode>& nodes, size_t from) const
 {
     std::vector<bool> visited(nodes.size(), false);
     std::queue<size_t> queue;
@@ -146,10 +146,10 @@ std::vector<bool> CcuDagChecker::ReachableFrom(const std::vector<DagNode> &nodes
     return visited;
 }
 
-bool CcuDagChecker::HasConflict(const DagNode &a, const DagNode &b) const
+bool CcuDagChecker::HasConflict(const DagNode& a, const DagNode& b) const
 {
-    const ExecutionLogEntry &ea = *a.entry;
-    const ExecutionLogEntry &eb = *b.entry;
+    const ExecutionLogEntry& ea = *a.entry;
+    const ExecutionLogEntry& eb = *b.entry;
 
     if (IntervalsOverlap(ea.destination, eb.destination)) {
         return true;
@@ -163,7 +163,7 @@ bool CcuDagChecker::HasConflict(const DagNode &a, const DagNode &b) const
     return false;
 }
 
-CheckResult CcuDagChecker::Check(const ExecutionLog &log) const
+CheckResult CcuDagChecker::Check(const ExecutionLog& log) const
 {
     std::vector<DagNode> nodes = BuildDag(log);
     if (nodes.empty()) {
@@ -189,10 +189,8 @@ CheckResult CcuDagChecker::Check(const ExecutionLog &log) const
                 conflict.nodeA = i;
                 conflict.nodeB = j;
                 std::ostringstream oss;
-                oss << "rank " << nodes[i].entry->rank
-                    << " op@" << nodes[i].entry->operationIndex
-                    << " vs rank " << nodes[j].entry->rank
-                    << " op@" << nodes[j].entry->operationIndex;
+                oss << "rank " << nodes[i].entry->rank << " op@" << nodes[i].entry->operationIndex << " vs rank "
+                    << nodes[j].entry->rank << " op@" << nodes[j].entry->operationIndex;
                 conflict.description = oss.str();
                 conflicts.push_back(conflict);
             }

@@ -17,7 +17,7 @@
 namespace HcclSim {
 namespace CcuSt {
 
-RegisterManager &RegisterManager::Global()
+RegisterManager& RegisterManager::Global()
 {
     static RegisterManager manager;
     return manager;
@@ -39,7 +39,7 @@ void RegisterManager::Reset()
 Result RegisterManager::RegisterStart(InstanceHandle instance)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    InstanceState &state = instances_[instance];
+    InstanceState& state = instances_[instance];
     if (state.registering) {
         return Result::STATE_ERROR;
     }
@@ -48,8 +48,9 @@ Result RegisterManager::RegisterStart(InstanceHandle instance)
     return Result::SUCCESS;
 }
 
-Result RegisterManager::Register(InstanceHandle instance, const std::string &name,
-    const KernelFunction &function, void *kernelArg, KernelHandle &handle)
+Result RegisterManager::Register(
+    InstanceHandle instance, const std::string& name, const KernelFunction& function, void* kernelArg,
+    KernelHandle& handle)
 {
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -66,7 +67,7 @@ Result RegisterManager::Register(InstanceHandle instance, const std::string &nam
     Result result = Result::SUCCESS;
     try {
         result = function(kernelArg);
-    } catch (const std::exception &) {
+    } catch (const std::exception&) {
         result = Result::STATE_ERROR;
     } catch (...) {
         result = Result::STATE_ERROR;
@@ -127,7 +128,7 @@ Result RegisterManager::RegisterEnd(InstanceHandle instance)
     return Result::SUCCESS;
 }
 
-const Program *RegisterManager::GetProgram(KernelHandle handle) const
+const Program* RegisterManager::GetProgram(KernelHandle handle) const
 {
     std::lock_guard<std::mutex> lock(mutex_);
     auto iterator = kernels_.find(handle);
@@ -137,10 +138,7 @@ const Program *RegisterManager::GetProgram(KernelHandle handle) const
     return &iterator->second.program;
 }
 
-const std::vector<KernelHandle> &RegisterManager::GetLastCompiledGroup() const
-{
-    return threadLocalCompiledGroup_;
-}
+const std::vector<KernelHandle>& RegisterManager::GetLastCompiledGroup() const { return threadLocalCompiledGroup_; }
 
 bool RegisterManager::IsRegistering(InstanceHandle instance) const
 {
@@ -159,7 +157,7 @@ void RegisterManager::RegisterChannelMap(ChannelHandle handle, uint32_t localRan
     channelMap_.emplace(handle, std::make_pair(localRank, remoteRank));
 }
 
-bool RegisterManager::GetChannelRanks(ChannelHandle handle, uint32_t &localRank, uint32_t &remoteRank)
+bool RegisterManager::GetChannelRanks(ChannelHandle handle, uint32_t& localRank, uint32_t& remoteRank)
 {
     std::lock_guard<std::mutex> lock(channelMapMutex_);
     auto it = channelMap_.find(handle);
@@ -171,13 +169,13 @@ bool RegisterManager::GetChannelRanks(ChannelHandle handle, uint32_t &localRank,
     return false;
 }
 
-std::vector<TaskParam> PackTaskArgs(const std::vector<uint64_t> &taskArgs)
+std::vector<TaskParam> PackTaskArgs(const std::vector<uint64_t>& taskArgs)
 {
     std::vector<TaskParam> taskParams;
     for (size_t offset = 0; offset < taskArgs.size(); offset += TASK_PARAM_SLOT_COUNT) {
         TaskParam taskParam;
-        taskParam.copiedArgCount = static_cast<uint32_t>(
-            std::min<size_t>(TASK_PARAM_SLOT_COUNT, taskArgs.size() - offset));
+        taskParam.copiedArgCount =
+            static_cast<uint32_t>(std::min<size_t>(TASK_PARAM_SLOT_COUNT, taskArgs.size() - offset));
         for (uint32_t index = 0; index < taskParam.copiedArgCount; ++index) {
             taskParam.args[index] = taskArgs[offset + index];
         }

@@ -19,14 +19,14 @@ namespace mc2_ops_hccl {
 class CcuTempAlltoAllMesh1D : public CcuAlgTemplateBase {
 public:
     CcuTempAlltoAllMesh1D() = default;
-    explicit CcuTempAlltoAllMesh1D(const OpParam& param,
-                                        const u32 rankId,
-                                        const std::vector<std::vector<u32>> &subCommRanks);
+    explicit CcuTempAlltoAllMesh1D(
+        const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks);
     ~CcuTempAlltoAllMesh1D() override;
 
     std::string Describe() const override;
-    HcclResult CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-                       AlgResourceRequest& resourceRequest) override;
+    HcclResult CalcRes(
+        HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+        AlgResourceRequest& resourceRequest) override;
 
 private:
     uint32_t typeSize_ = 0;

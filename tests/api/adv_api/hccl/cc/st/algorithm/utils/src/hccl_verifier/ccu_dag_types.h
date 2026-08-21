@@ -37,12 +37,12 @@ struct ExecutionLogEntry {
 };
 
 struct ExecutionLog {
-    std::vector<const Program *> programs;
+    std::vector<const Program*> programs;
     std::vector<std::vector<ExecutionLogEntry>> rankEntries;
 };
 
 struct DagNode {
-    const ExecutionLogEntry *entry{nullptr};
+    const ExecutionLogEntry* entry{nullptr};
     std::vector<size_t> successors;
     std::vector<size_t> predecessors;
 };
@@ -53,7 +53,7 @@ struct DagConflict {
     std::string description;
 };
 
-inline bool IntervalsOverlap(const MemoryInterval &a, const MemoryInterval &b)
+inline bool IntervalsOverlap(const MemoryInterval& a, const MemoryInterval& b)
 {
     if (a.ownerRank != b.ownerRank) {
         return false;

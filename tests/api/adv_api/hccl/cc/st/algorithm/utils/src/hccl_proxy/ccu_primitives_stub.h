@@ -20,27 +20,28 @@ namespace CcuSt {
 
 class CompilerContext {
 public:
-    explicit CompilerContext(Program &program);
+    explicit CompilerContext(Program& program);
 
     ResourceHandle AllocateVariable();
     ResourceHandle AllocateAddress();
     ResourceHandle AllocateEvent();
     ResourceHandle AllocateBuffer();
-    ResourceHandle AllocateLocalAddress(ResourceHandle &address, ResourceHandle &token);
-    ResourceHandle AllocateRemoteAddress(ResourceHandle &address, ResourceHandle &token);
+    ResourceHandle AllocateLocalAddress(ResourceHandle& address, ResourceHandle& token);
+    ResourceHandle AllocateRemoteAddress(ResourceHandle& address, ResourceHandle& token);
     ResourceHandle GetChannelVariable(ChannelHandle channel, uint32_t index);
-    void ConfigureProgram(uint32_t rankId, uint32_t rankSize, const std::vector<ChannelHandle> &channels);
+    void ConfigureProgram(uint32_t rankId, uint32_t rankSize, const std::vector<ChannelHandle>& channels);
     void RegisterArgument(ResourceHandle variable, uint32_t argId);
-    void Append(const Operation &operation);
-    void AppendGroupCopy(ResourceHandle destination, ResourceHandle source, ResourceHandle length,
-        const std::array<ResourceHandle, 4> &groupSize);
+    void Append(const Operation& operation);
+    void AppendGroupCopy(
+        ResourceHandle destination, ResourceHandle source, ResourceHandle length,
+        const std::array<ResourceHandle, 4>& groupSize);
     Result Finalize();
 
-    static CompilerContext &Current();
-    static void SetCurrent(CompilerContext *context);
+    static CompilerContext& Current();
+    static void SetCurrent(CompilerContext* context);
 
 private:
-    Program &program_;
+    Program& program_;
     ResourceHandle nextHandle_{1};
 };
 
@@ -52,7 +53,7 @@ struct Condition {
 
 class ControlScope {
 public:
-    ControlScope(const Condition &condition, bool isWhile, bool isElse = false);
+    ControlScope(const Condition& condition, bool isWhile, bool isElse = false);
     bool Once();
     void Close();
 
@@ -78,14 +79,14 @@ class Variable {
 public:
     Variable();
     explicit Variable(ResourceHandle existingHandle);
-    Variable(const Variable &other) = default;
-    Variable(Variable &&other) noexcept = default;
-    Variable &operator=(Variable &&other) noexcept = default;
+    Variable(const Variable& other) = default;
+    Variable(Variable&& other) noexcept = default;
+    Variable& operator=(Variable&& other) noexcept = default;
 
-    void operator=(const Variable &other) const;
+    void operator=(const Variable& other) const;
     void operator=(uint64_t immediate) const;
-    void operator+=(const Variable &other) const;
-    Variable operator+(const Variable &other) const;
+    void operator+=(const Variable& other) const;
+    Variable operator+(const Variable& other) const;
     Condition operator==(uint64_t immediate) const;
     Condition operator!=(uint64_t immediate) const;
 
@@ -100,13 +101,13 @@ class Address {
 public:
     Address();
     explicit Address(ResourceHandle existingHandle);
-    Address(const Address &other) = default;
-    Address(Address &&other) noexcept = default;
-    Address &operator=(Address &&other) noexcept = default;
+    Address(const Address& other) = default;
+    Address(Address&& other) noexcept = default;
+    Address& operator=(Address&& other) noexcept = default;
 
-    void operator=(const Variable &variable) const;
-    void operator=(const Address &address) const;
-    void operator+=(const Variable &variable) const;
+    void operator=(const Variable& variable) const;
+    void operator=(const Address& address) const;
+    void operator+=(const Variable& variable) const;
 
     ResourceHandle handle{0};
 
@@ -118,9 +119,9 @@ private:
 class LocalAddr {
 public:
     LocalAddr();
-    LocalAddr(const LocalAddr &other) = default;
-    LocalAddr(LocalAddr &&other) noexcept = default;
-    LocalAddr &operator=(LocalAddr &&other) noexcept = default;
+    LocalAddr(const LocalAddr& other) = default;
+    LocalAddr(LocalAddr&& other) noexcept = default;
+    LocalAddr& operator=(LocalAddr&& other) noexcept = default;
 
     Address addr;
     Variable token;
@@ -133,9 +134,9 @@ private:
 class RemoteAddr {
 public:
     RemoteAddr();
-    RemoteAddr(const RemoteAddr &other) = default;
-    RemoteAddr(RemoteAddr &&other) noexcept = default;
-    RemoteAddr &operator=(RemoteAddr &&other) noexcept = default;
+    RemoteAddr(const RemoteAddr& other) = default;
+    RemoteAddr(RemoteAddr&& other) noexcept = default;
+    RemoteAddr& operator=(RemoteAddr&& other) noexcept = default;
 
     Address addr;
     Variable token;
@@ -154,9 +155,8 @@ public:
 class Func {
 public:
     template <typename Callable>
-    explicit Func(Callable &&)
-    {
-    }
+    explicit Func(Callable&&)
+    {}
 };
 
 template <typename T>
@@ -164,8 +164,8 @@ class Array {
 public:
     explicit Array(uint32_t count) : values_(count) {}
 
-    T &operator[](uint32_t index) { return values_[index]; }
-    const T &operator[](uint32_t index) const { return values_[index]; }
+    T& operator[](uint32_t index) { return values_[index]; }
+    const T& operator[](uint32_t index) const { return values_[index]; }
     uint32_t size() const { return static_cast<uint32_t>(values_.size()); }
 
 private:
@@ -179,31 +179,29 @@ template <>
 Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t index);
 Result LoadArg(Variable variable, uint32_t argId);
 Result Load(Variable address, Variable destination);
-Result Load(Variable address, Array<Variable> &destinations, uint32_t count);
+Result Load(Variable address, Array<Variable>& destinations, uint32_t count);
 Result Store(Variable address, Variable source);
-Result WriteVariableWithNotify(ChannelHandle channel, Variable variable, uint32_t remoteVarIndex,
-    uint32_t remoteNotifyIndex, uint16_t mask = 1);
+Result WriteVariableWithNotify(
+    ChannelHandle channel, Variable variable, uint32_t remoteVarIndex, uint32_t remoteNotifyIndex, uint16_t mask = 1);
 Result NotifyWait(ChannelHandle channel, uint32_t localNotifyIndex, uint16_t mask = 1);
 Result NotifyRecord(ChannelHandle channel, uint32_t remoteNotifyIndex, uint16_t mask = 1);
 Result EventRecord(Event event, uint16_t mask = 1);
 Result EventWait(Event event, uint16_t mask = 1);
-Result Write(ChannelHandle channel, RemoteAddr remote, LocalAddr local, Variable length,
-    Event event, uint16_t mask = 1);
-Result LocalCopy(LocalAddr destination, LocalAddr source, Variable length,
-    Event event, uint16_t mask = 1);
+Result Write(
+    ChannelHandle channel, RemoteAddr remote, LocalAddr local, Variable length, Event event, uint16_t mask = 1);
+Result LocalCopy(LocalAddr destination, LocalAddr source, Variable length, Event event, uint16_t mask = 1);
 
 } // namespace ccu
 } // namespace AscendC
 
-#define CCU_IF(expr)                                                                                               \
+#define CCU_IF(expr) \
     for (::HcclSim::CcuSt::ControlScope _ccuIfScope((expr), false); _ccuIfScope.Once(); _ccuIfScope.Close())
 
-#define CCU_WHILE(expr)                                                                                            \
-    for (::HcclSim::CcuSt::ControlScope _ccuWhileScope((expr), true); _ccuWhileScope.Once();                       \
-         _ccuWhileScope.Close())
+#define CCU_WHILE(expr) \
+    for (::HcclSim::CcuSt::ControlScope _ccuWhileScope((expr), true); _ccuWhileScope.Once(); _ccuWhileScope.Close())
 
-#define CCU_ELSE                                                                                               \
-    for (::HcclSim::CcuSt::ControlScope _ccuElseScope(::HcclSim::CcuSt::Condition{0, 0, true}, false, true);   \
+#define CCU_ELSE                                                                                             \
+    for (::HcclSim::CcuSt::ControlScope _ccuElseScope(::HcclSim::CcuSt::Condition{0, 0, true}, false, true); \
          _ccuElseScope.Once(); _ccuElseScope.Close())
 
 // Merged from shim/ccu_primitives_dl.hpp — empty shell types for compilation

@@ -22,32 +22,29 @@ struct CheckResult {
     Result result{Result::SUCCESS};
     std::string message;
 
-    bool Ok() const
-    {
-        return result == Result::SUCCESS;
-    }
+    bool Ok() const { return result == Result::SUCCESS; }
 };
 
 // These checkers validate contracts shared by every CCU collective. Collective
 // topology, operation sequences and result semantics belong in semantics_check.
 class CcuLogicalResourceChecker {
 public:
-    CheckResult Check(const Program &program) const;
+    CheckResult Check(const Program& program) const;
 };
 
 class CcuProgramChecker {
 public:
-    CheckResult Check(const Program &program) const;
+    CheckResult Check(const Program& program) const;
 };
 
 class CcuTaskArgChecker {
 public:
-    CheckResult Check(const Program &program, const std::vector<uint64_t> &taskArgs) const;
+    CheckResult Check(const Program& program, const std::vector<uint64_t>& taskArgs) const;
 };
 
 class CcuRuntimeChecker {
 public:
-    CheckResult CheckCompleted(const RuntimeWorld &world, size_t rankCount) const;
+    CheckResult CheckCompleted(const RuntimeWorld& world, size_t rankCount) const;
 };
 
 } // namespace CcuSt

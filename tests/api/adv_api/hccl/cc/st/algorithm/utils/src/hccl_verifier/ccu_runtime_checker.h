@@ -35,11 +35,11 @@ struct RuntimeExpectation {
     std::vector<std::vector<uint8_t>> outputs;
 };
 
-CheckResult CaptureRuntimeExpectation(const ScenarioData &data,
-    const CcuStScenario &scenario, RuntimeExpectation &expectation);
+CheckResult CaptureRuntimeExpectation(
+    const ScenarioData& data, const CcuStScenario& scenario, RuntimeExpectation& expectation);
 
-CheckResult CheckRuntimeOutput(const std::vector<RankMemory> &memories,
-    const RuntimeExpectation &expectation, const RuntimeWorld &world);
+CheckResult CheckRuntimeOutput(
+    const std::vector<RankMemory>& memories, const RuntimeExpectation& expectation, const RuntimeWorld& world);
 
 } // namespace CcuSt
 } // namespace HcclSim

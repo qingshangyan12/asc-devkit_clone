@@ -18,39 +18,27 @@
 namespace HcclSim {
 namespace CcuSt {
 
-uint64_t RankMemory::InputAddress()
-{
-    return static_cast<const RankMemory &>(*this).InputAddress();
-}
+uint64_t RankMemory::InputAddress() { return static_cast<const RankMemory&>(*this).InputAddress(); }
 
-uint64_t RankMemory::OutputAddress()
-{
-    return static_cast<const RankMemory &>(*this).OutputAddress();
-}
+uint64_t RankMemory::OutputAddress() { return static_cast<const RankMemory&>(*this).OutputAddress(); }
 
-uint64_t RankMemory::ParameterAddress()
-{
-    return static_cast<const RankMemory &>(*this).ParameterAddress();
-}
+uint64_t RankMemory::ParameterAddress() { return static_cast<const RankMemory&>(*this).ParameterAddress(); }
 
 uint64_t RankMemory::InputAddress() const
 {
-    return inPlace ? OutputAddress() : reinterpret_cast<uint64_t>(const_cast<uint8_t *>(input.data()));
+    return inPlace ? OutputAddress() : reinterpret_cast<uint64_t>(const_cast<uint8_t*>(input.data()));
 }
 
-uint64_t RankMemory::OutputAddress() const
-{
-    return reinterpret_cast<uint64_t>(const_cast<uint8_t *>(output.data()));
-}
+uint64_t RankMemory::OutputAddress() const { return reinterpret_cast<uint64_t>(const_cast<uint8_t*>(output.data())); }
 
 uint64_t RankMemory::ParameterAddress() const
 {
-    return reinterpret_cast<uint64_t>(const_cast<uint64_t *>(parameter.data()));
+    return reinterpret_cast<uint64_t>(const_cast<uint64_t*>(parameter.data()));
 }
 
 struct RuntimeWorld::RankState {
-    const Program *program{nullptr};
-    const RankLaunch *launch{nullptr};
+    const Program* program{nullptr};
+    const RankLaunch* launch{nullptr};
     size_t pc{0};
     bool completed{false};
     std::vector<TaskParam> taskParams;
@@ -60,22 +48,22 @@ struct RuntimeWorld::RankState {
     std::map<std::pair<uint32_t, uint32_t>, uint16_t> notifies;
 };
 
-bool RuntimeWorld::Evaluate(const RankState &state, const Operation &operation) const
+bool RuntimeWorld::Evaluate(const RankState& state, const Operation& operation) const
 {
     auto iterator = state.variables.find(operation.src0);
     const uint64_t value = iterator == state.variables.end() ? 0 : iterator->second;
     return operation.equal ? value == operation.immediate : value != operation.immediate;
 }
 
-bool RuntimeWorld::ResolveMemory(std::vector<RankState> &states, uint64_t address, uint64_t size,
-    uint8_t *&pointer, uint32_t &ownerRank)
+bool RuntimeWorld::ResolveMemory(
+    std::vector<RankState>& states, uint64_t address, uint64_t size, uint8_t*& pointer, uint32_t& ownerRank)
 {
     if (size > std::numeric_limits<uint64_t>::max() - address) {
         return false;
     }
     const uint64_t end = address + size;
     for (size_t index = 0; index < states.size(); ++index) {
-        RankMemory *memory = states[index].launch->memory;
+        RankMemory* memory = states[index].launch->memory;
         const uint64_t outputBase = memory->OutputAddress();
         if (address >= outputBase && end <= outputBase + memory->output.size()) {
             pointer = memory->output.data() + (address - outputBase);
@@ -93,7 +81,7 @@ bool RuntimeWorld::ResolveMemory(std::vector<RankState> &states, uint64_t addres
         const uint64_t parameterBase = memory->ParameterAddress();
         const uint64_t parameterSize = memory->parameter.size() * sizeof(uint64_t);
         if (address >= parameterBase && end <= parameterBase + parameterSize) {
-            pointer = reinterpret_cast<uint8_t *>(memory->parameter.data()) + (address - parameterBase);
+            pointer = reinterpret_cast<uint8_t*>(memory->parameter.data()) + (address - parameterBase);
             ownerRank = static_cast<uint32_t>(index);
             return true;
         }
@@ -101,9 +89,9 @@ bool RuntimeWorld::ResolveMemory(std::vector<RankState> &states, uint64_t addres
     return false;
 }
 
-bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, Result &result)
+bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, Result& result)
 {
-    RankState &state = states[rankIndex];
+    RankState& state = states[rankIndex];
     if (state.completed) {
         return false;
     }
@@ -113,14 +101,12 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
         return true;
     }
 
-    const Operation &operation = state.program->operations[state.pc];
+    const Operation& operation = state.program->operations[state.pc];
     switch (operation.code) {
-        case OpCode::LOAD_ARG:
-        {
+        case OpCode::LOAD_ARG: {
             const uint32_t missionIndex = operation.index / TASK_PARAM_SLOT_COUNT;
             const uint32_t slotIndex = operation.index % TASK_PARAM_SLOT_COUNT;
-            if (missionIndex >= state.taskParams.size() ||
-                slotIndex >= state.taskParams[missionIndex].copiedArgCount) {
+            if (missionIndex >= state.taskParams.size() || slotIndex >= state.taskParams[missionIndex].copiedArgCount) {
                 result = Result::CONTRACT_ERROR;
                 SetError("LoadArg index exceeds taskArgs");
                 return false;
@@ -129,7 +115,7 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
             break;
         }
         case OpCode::LOAD_MEMORY: {
-            uint8_t *source = nullptr;
+            uint8_t* source = nullptr;
             uint32_t ownerRank = 0;
             const uint64_t baseAddress = state.variables[operation.src0];
             if (operation.byteOffset > std::numeric_limits<uint64_t>::max() - baseAddress ||
@@ -149,7 +135,7 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
             break;
         }
         case OpCode::STORE_MEMORY: {
-            uint8_t *destination = nullptr;
+            uint8_t* destination = nullptr;
             uint32_t ownerRank = 0;
             if (!ResolveMemory(states, state.variables[operation.dst], sizeof(uint64_t), destination, ownerRank)) {
                 result = Result::OUT_OF_RANGE;
@@ -190,9 +176,9 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
                 SetError("channel remote rank is invalid");
                 return false;
             }
-            RankState &remote = states[remoteRank];
-            auto variableIterator = remote.program->channelVariables.find(
-                {static_cast<uint32_t>(rankIndex), operation.index});
+            RankState& remote = states[remoteRank];
+            auto variableIterator =
+                remote.program->channelVariables.find({static_cast<uint32_t>(rankIndex), operation.index});
             if (variableIterator == remote.program->channelVariables.end()) {
                 result = Result::CONTRACT_ERROR;
                 SetError("remote channel variable was not registered");
@@ -205,7 +191,7 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
         }
         case OpCode::NOTIFY_WAIT: {
             const uint32_t peer = ChannelRemoteRank(operation.channel);
-            uint16_t &value = state.notifies[{peer, operation.index}];
+            uint16_t& value = state.notifies[{peer, operation.index}];
             if ((value & operation.mask) != operation.mask) {
                 return false;
             }
@@ -221,7 +207,7 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
             state.events[operation.dst] |= operation.mask;
             break;
         case OpCode::EVENT_WAIT: {
-            uint16_t &value = state.events[operation.src0];
+            uint16_t& value = state.events[operation.src0];
             if ((value & operation.mask) != operation.mask) {
                 return false;
             }
@@ -259,14 +245,14 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
             }
 
             const uint64_t length = state.variables[operation.src1];
-            uint8_t *sourcePointer = nullptr;
-            uint8_t *destinationPointer = nullptr;
+            uint8_t* sourcePointer = nullptr;
+            uint8_t* destinationPointer = nullptr;
             uint32_t sourceRank = 0;
             uint32_t destinationRank = 0;
-            if (!ResolveMemory(states, state.addresses[localIterator->second.first], length,
-                    sourcePointer, sourceRank) ||
-                !ResolveMemory(states, state.addresses[destinationAddress], length,
-                    destinationPointer, destinationRank)) {
+            if (!ResolveMemory(
+                    states, state.addresses[localIterator->second.first], length, sourcePointer, sourceRank) ||
+                !ResolveMemory(
+                    states, state.addresses[destinationAddress], length, destinationPointer, destinationRank)) {
                 result = Result::OUT_OF_RANGE;
                 SetError("CCU memory operation is out of range");
                 return false;
@@ -281,10 +267,8 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
             logEntry.rank = static_cast<uint32_t>(rankIndex);
             logEntry.operationIndex = state.pc;
             logEntry.code = operation.code;
-            logEntry.source = MemoryInterval{sourceRank,
-                state.addresses[localIterator->second.first], length, false};
-            logEntry.destination = MemoryInterval{destinationRank,
-                state.addresses[destinationAddress], length, true};
+            logEntry.source = MemoryInterval{sourceRank, state.addresses[localIterator->second.first], length, false};
+            logEntry.destination = MemoryInterval{destinationRank, state.addresses[destinationAddress], length, true};
             executionLog_.rankEntries[rankIndex].push_back(logEntry);
             if (operation.code != OpCode::GROUP_COPY) {
                 state.events[operation.immediate] |= operation.mask;
@@ -317,7 +301,7 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState> &states, size_t rankIndex, 
     return true;
 }
 
-Result RuntimeWorld::Launch(const std::vector<RankLaunch> &launches)
+Result RuntimeWorld::Launch(const std::vector<RankLaunch>& launches)
 {
     lastError_.clear();
     lastExecutionStats_.assign(launches.size(), RankExecutionStats{});
@@ -330,7 +314,7 @@ Result RuntimeWorld::Launch(const std::vector<RankLaunch> &launches)
 
     std::vector<RankState> states(launches.size());
     for (size_t rank = 0; rank < launches.size(); ++rank) {
-        const Program *program = RegisterManager::Global().GetProgram(launches[rank].kernel);
+        const Program* program = RegisterManager::Global().GetProgram(launches[rank].kernel);
         if (program == nullptr || launches[rank].memory == nullptr || program->rankId != rank ||
             program->rankSize != launches.size()) {
             SetError("rank launch does not match compiled program");
@@ -366,7 +350,7 @@ Result RuntimeWorld::Launch(const std::vector<RankLaunch> &launches)
             std::ostringstream detail;
             detail << "deadlock detected:\n";
             for (size_t rank = 0; rank < states.size(); ++rank) {
-                const auto &state = states[rank];
+                const auto& state = states[rank];
                 if (state.completed) {
                     continue;
                 }
@@ -374,22 +358,20 @@ Result RuntimeWorld::Launch(const std::vector<RankLaunch> &launches)
                     detail << "  rank " << rank << ": pc out of range\n";
                     continue;
                 }
-                const Operation &op = state.program->operations[state.pc];
+                const Operation& op = state.program->operations[state.pc];
                 detail << "  rank " << rank << " blocked at operation[" << state.pc << "]: "
                        << "code=" << static_cast<int>(op.code);
                 if (op.code == OpCode::NOTIFY_WAIT) {
                     uint32_t peer = ChannelRemoteRank(op.channel);
                     auto it = state.notifies.find({peer, op.index});
                     uint16_t current = (it != state.notifies.end()) ? it->second : 0;
-                    detail << " channel=0x" << std::hex << op.channel << std::dec
-                           << " index=" << op.index << " mask=0x" << std::hex << op.mask << std::dec
-                           << " current=0x" << std::hex << current << std::dec;
+                    detail << " channel=0x" << std::hex << op.channel << std::dec << " index=" << op.index << " mask=0x"
+                           << std::hex << op.mask << std::dec << " current=0x" << std::hex << current << std::dec;
                 } else if (op.code == OpCode::EVENT_WAIT) {
                     auto it = state.events.find(op.src0);
                     uint16_t current = (it != state.events.end()) ? it->second : 0;
-                    detail << " event=0x" << std::hex << op.src0 << std::dec
-                           << " mask=0x" << std::hex << op.mask << std::dec
-                           << " current=0x" << std::hex << current << std::dec;
+                    detail << " event=0x" << std::hex << op.src0 << std::dec << " mask=0x" << std::hex << op.mask
+                           << std::dec << " current=0x" << std::hex << current << std::dec;
                 } else if (op.code == OpCode::WHILE_BEGIN || op.code == OpCode::IF_BEGIN) {
                     detail << " condition variable=0x" << std::hex << op.src0 << std::dec
                            << " immediate=" << op.immediate << " equal=" << op.equal;
@@ -402,25 +384,13 @@ Result RuntimeWorld::Launch(const std::vector<RankLaunch> &launches)
     }
 }
 
-const std::string &RuntimeWorld::LastError() const
-{
-    return lastError_;
-}
+const std::string& RuntimeWorld::LastError() const { return lastError_; }
 
-const std::vector<RankExecutionStats> &RuntimeWorld::LastExecutionStats() const
-{
-    return lastExecutionStats_;
-}
+const std::vector<RankExecutionStats>& RuntimeWorld::LastExecutionStats() const { return lastExecutionStats_; }
 
-const ExecutionLog &RuntimeWorld::ExecutionLogData() const
-{
-    return executionLog_;
-}
+const ExecutionLog& RuntimeWorld::ExecutionLogData() const { return executionLog_; }
 
-void RuntimeWorld::SetError(const std::string &message)
-{
-    lastError_ = message;
-}
+void RuntimeWorld::SetError(const std::string& message) { lastError_ = message; }
 
 } // namespace CcuSt
 } // namespace HcclSim

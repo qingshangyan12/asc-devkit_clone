@@ -21,13 +21,13 @@ namespace CcuSt {
 
 class CcuDagChecker {
 public:
-    CheckResult Check(const ExecutionLog &log) const;
+    CheckResult Check(const ExecutionLog& log) const;
 
 private:
-    std::vector<DagNode> BuildDag(const ExecutionLog &log) const;
-    std::vector<bool> ReachableFrom(const std::vector<DagNode> &nodes, size_t from) const;
-    bool HasConflict(const DagNode &a, const DagNode &b) const;
-    void AddEdge(std::vector<DagNode> &nodes, size_t from, size_t to) const;
+    std::vector<DagNode> BuildDag(const ExecutionLog& log) const;
+    std::vector<bool> ReachableFrom(const std::vector<DagNode>& nodes, size_t from) const;
+    bool HasConflict(const DagNode& a, const DagNode& b) const;
+    void AddEdge(std::vector<DagNode>& nodes, size_t from, size_t to) const;
 };
 
 } // namespace CcuSt

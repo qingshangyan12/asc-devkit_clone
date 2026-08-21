@@ -26,35 +26,27 @@ namespace CcuSt {
 
 class CcuStFixture : public ::testing::Test {
 protected:
-    void SetUp() override {
-        RegisterManager::Global().Reset();
-    }
+    void SetUp() override { RegisterManager::Global().Reset(); }
 
-    void TearDown() override {
-        RegisterManager::Global().Reset();
-    }
+    void TearDown() override { RegisterManager::Global().Reset(); }
 
-    void VerifyScenario(const CcuStScenario &scenario);
+    void VerifyScenario(const CcuStScenario& scenario);
 
     // ===== 子类必须实现的虚函数 =====
 
-    virtual ScenarioData BuildScenarioData(const CcuStScenario &scenario,
-                                           const std::vector<KernelHandle> &handles) = 0;
+    virtual ScenarioData BuildScenarioData(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles) = 0;
 
-    virtual void PrepareOpParam(OpParam &opParam, uint32_t rankSize,
-                                const CcuStScenario &scenario) = 0;
+    virtual void PrepareOpParam(OpParam& opParam, uint32_t rankSize, const CcuStScenario& scenario) = 0;
 
 public:
-    static Mc2CcTilingInner BuildTiling(HcclCMDType opType, HcclDataType dataType,
-                                         const std::string &algConfig);
-    static uint32_t CountRanks(const TopoMeta &topoMeta);
+    static Mc2CcTilingInner BuildTiling(HcclCMDType opType, HcclDataType dataType, const std::string& algConfig);
+    static uint32_t CountRanks(const TopoMeta& topoMeta);
 
 protected:
-    static void CleanupHostEnv(HcclComm &comm);
-    KernelHandle RegisterKernelForRank(uint32_t rank, uint32_t rankSize,
-                                       const CcuStScenario &scenario,
-                                       const TopoMeta &topoMeta,
-                                       const Mc2CcTilingInner &tiling);
+    static void CleanupHostEnv(HcclComm& comm);
+    KernelHandle RegisterKernelForRank(
+        uint32_t rank, uint32_t rankSize, const CcuStScenario& scenario, const TopoMeta& topoMeta,
+        const Mc2CcTilingInner& tiling);
 };
 
 } // namespace CcuSt

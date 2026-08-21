@@ -254,8 +254,7 @@ REGISTER_EXEC_V2(
 
 #ifndef AICPU_COMPILE
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
-    CcuTempAlltoAllMesh1D);
+    HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D, CcuTempAlltoAllMesh1D);
 #endif
 
 } // namespace mc2_ops_hccl

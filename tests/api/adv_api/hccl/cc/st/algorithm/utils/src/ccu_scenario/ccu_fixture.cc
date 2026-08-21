@@ -33,8 +33,7 @@ namespace CcuSt {
 
 constexpr uint32_t GRID_SIZE = 8;
 
-Mc2CcTilingInner CcuStFixture::BuildTiling(HcclCMDType opType, HcclDataType dataType,
-                                             const std::string &algConfig)
+Mc2CcTilingInner CcuStFixture::BuildTiling(HcclCMDType opType, HcclDataType dataType, const std::string& algConfig)
 {
     Mc2CcTilingInner tiling{};
     tiling.opType = static_cast<uint32_t>(opType);
@@ -46,42 +45,44 @@ Mc2CcTilingInner CcuStFixture::BuildTiling(HcclCMDType opType, HcclDataType data
     return tiling;
 }
 
-uint32_t CcuStFixture::CountRanks(const TopoMeta &topoMeta)
+uint32_t CcuStFixture::CountRanks(const TopoMeta& topoMeta)
 {
     uint32_t total = 0;
-    for (const auto &pod : topoMeta) {
-        for (const auto &server : pod) {
+    for (const auto& pod : topoMeta) {
+        for (const auto& server : pod) {
             total += static_cast<uint32_t>(server.size());
         }
     }
     return total;
 }
 
-void CcuStFixture::CleanupHostEnv(HcclComm &comm)
+void CcuStFixture::CleanupHostEnv(HcclComm& comm)
 {
     if (comm != nullptr) {
-        delete static_cast<HcclSim::SimCommunicator *>(comm);
+        delete static_cast<HcclSim::SimCommunicator*>(comm);
         comm = nullptr;
     }
 }
 
-KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSize,
-                                                   const CcuStScenario &scenario,
-                                                   const TopoMeta &topoMeta,
-                                                   const Mc2CcTilingInner &tiling)
+KernelHandle CcuStFixture::RegisterKernelForRank(
+    uint32_t rank, uint32_t rankSize, const CcuStScenario& scenario, const TopoMeta& topoMeta,
+    const Mc2CcTilingInner& tiling)
 {
     setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
     setenv("ASCEND_ENABLE_CCU_KFC_BRANCH", "1", 1);
     fprintf(stderr, "DEBUG step2: aclrtSetDevice\n");
-    if (aclrtSetDevice(rank) != ACL_SUCCESS) return 0;
+    if (aclrtSetDevice(rank) != ACL_SUCCESS)
+        return 0;
 
     aclrtStream stream = nullptr;
     fprintf(stderr, "DEBUG step3: aclrtCreateStream\n");
-    if (aclrtCreateStream(&stream) != ACL_SUCCESS) return 0;
+    if (aclrtCreateStream(&stream) != ACL_SUCCESS)
+        return 0;
 
     HcclComm comm = nullptr;
     fprintf(stderr, "DEBUG step4: Sim_HcclCommInitClusterInfo\n");
-    if (HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, rank, &comm) != HCCL_SUCCESS) return 0;
+    if (HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, rank, &comm) != HCCL_SUCCESS)
+        return 0;
 
     OpResCtx resCtx{};
     fprintf(stderr, "DEBUG step5: AllocCcuOpResCtx\n");
@@ -132,7 +133,7 @@ KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSiz
         return 0;
     }
 
-    void *resCtxOut = nullptr;
+    void* resCtxOut = nullptr;
     fprintf(stderr, "DEBUG step11: GetCcuOpParamResCtx\n");
     if (GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), resCtx, &resCtxOut) != HCCL_SUCCESS) {
         fprintf(stderr, "DEBUG step11 FAILED\n");
@@ -141,14 +142,14 @@ KernelHandle CcuStFixture::RegisterKernelForRank(uint32_t rank, uint32_t rankSiz
     }
     fprintf(stderr, "DEBUG step12: GetLastCompiledGroup\n");
 
-    const auto &lastGroup = RegisterManager::Global().GetLastCompiledGroup();
+    const auto& lastGroup = RegisterManager::Global().GetLastCompiledGroup();
     KernelHandle handle = lastGroup.empty() ? 0 : lastGroup.back();
 
     CleanupHostEnv(comm);
     return handle;
 }
 
-void CcuStFixture::VerifyScenario(const CcuStScenario &scenario)
+void CcuStFixture::VerifyScenario(const CcuStScenario& scenario)
 {
     const uint32_t rankSize = CountRanks(scenario.topoMeta);
 
@@ -159,7 +160,7 @@ void CcuStFixture::VerifyScenario(const CcuStScenario &scenario)
     setenv("ASCEND_ENABLE_CCU_KFC_BRANCH", "1", 1);
     HcclSim::SimWorld::Global()->Init(scenario.topoMeta, scenario.devType);
 
-    const TopoMeta &topoMeta = scenario.topoMeta;
+    const TopoMeta& topoMeta = scenario.topoMeta;
     const Mc2CcTilingInner tiling = BuildTiling(scenario.opType, scenario.dataType, scenario.algConfig);
 
     std::vector<KernelHandle> handles(rankSize, 0);
@@ -169,7 +170,7 @@ void CcuStFixture::VerifyScenario(const CcuStScenario &scenario)
             handles[rank] = RegisterKernelForRank(rank, rankSize, scenario, topoMeta, tiling);
         });
     }
-    for (auto &thread : threads) {
+    for (auto& thread : threads) {
         thread.join();
     }
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
@@ -179,7 +180,7 @@ void CcuStFixture::VerifyScenario(const CcuStScenario &scenario)
     ScenarioData data = BuildScenarioData(scenario, handles);
 
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
-        const Program *program = RegisterManager::Global().GetProgram(handles[rank]);
+        const Program* program = RegisterManager::Global().GetProgram(handles[rank]);
         ASSERT_NE(program, nullptr);
         CheckResult staticCheck = CcuProgramChecker().Check(*program);
         ASSERT_TRUE(staticCheck.Ok()) << staticCheck.message;

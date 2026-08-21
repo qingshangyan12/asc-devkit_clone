@@ -31,61 +31,32 @@
 
 extern "C" CcuKernelHandle RecordCcuKernelRegistrationForTest();
 
-bool HcclCheckLogLevel(int logType, int moduleId)
-{
-    return false;
-}
+bool HcclCheckLogLevel(int logType, int moduleId) { return false; }
 
-bool IsErrorToWarn()
-{
-    return false;
-}
+bool IsErrorToWarn() { return false; }
 
-extern "C" unsigned int HcclLaunchAicpuKernel(mc2_ops_hccl::OpParam* param)
-{
-    return 0;
-}
+extern "C" unsigned int HcclLaunchAicpuKernel(mc2_ops_hccl::OpParam* param) { return 0; }
 
-HcclResult ConvertCcuToHccl(CcuResult ccuResult)
-{
-    return HCCL_SUCCESS;
-}
+HcclResult ConvertCcuToHccl(CcuResult ccuResult) { return HCCL_SUCCESS; }
 
-extern "C" HcclResult HcclDfxRegOpInfoByCommId(char* commId, void* dfxOpInfo)
-{
-    return HCCL_SUCCESS;
-}
+extern "C" HcclResult HcclDfxRegOpInfoByCommId(char* commId, void* dfxOpInfo) { return HCCL_SUCCESS; }
 
 namespace mc2_ops_hccl {
 
-HcclResult HcomCheckDataType(HcclDataType dataType)
-{
-    return HcclResult::HCCL_SUCCESS;
-}
+HcclResult HcomCheckDataType(HcclDataType dataType) { return HcclResult::HCCL_SUCCESS; }
 
-HcclResult HcomCheckReductionOp(HcclReduceOp op)
-{
-    return HcclResult::HCCL_SUCCESS;
-}
+HcclResult HcomCheckReductionOp(HcclReduceOp op) { return HcclResult::HCCL_SUCCESS; }
 
-HcclResult HcomCheckUserRank(const u32 totalRanks, const u32 userRank)
-{
-    return HcclResult::HCCL_SUCCESS;
-}
+HcclResult HcomCheckUserRank(const u32 totalRanks, const u32 userRank) { return HcclResult::HCCL_SUCCESS; }
 
-void GetScatterOpInfo(const void* opInfo, char* output, size_t size)
-{
-}
+void GetScatterOpInfo(const void* opInfo, char* output, size_t size) {}
 
 HcclResult CheckAsymmetricTopoSupport(HcclCMDType cmdType, const TopoInfoWithNetLayerDetails* topoInfo)
 {
     return HCCL_SUCCESS;
 }
 
-HcclResult InitEnvConfig()
-{
-    return HcclResult::HCCL_SUCCESS;
-}
+HcclResult InitEnvConfig() { return HcclResult::HCCL_SUCCESS; }
 
 static bool ReadEnvVarCcuMSMode()
 {
@@ -150,47 +121,26 @@ const bool& GetExternalInputInterHccsDisable()
     return value;
 }
 
-const std::map<HcclCMDType, std::vector<HcclAlgoType>> GetExternalInputHcclAlgoConfigAllType()
-{
-    return {};
-}
+const std::map<HcclCMDType, std::vector<HcclAlgoType>> GetExternalInputHcclAlgoConfigAllType() { return {}; }
 
-u64 GetDebugConfig()
-{
-    return 0;
-}
+u64 GetDebugConfig() { return 0; }
 
-bool UseCannBridge(const OpParam& param)
-{
-    return false;
-}
+bool UseCannBridge(const OpParam& param) { return false; }
 
 HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName)
 {
     return HcclResult::HCCL_E_NOT_SUPPORT;
 }
 
-std::unique_ptr<InsCollAlgBase> GetAlgExecViaCann(HcclCMDType opType, const std::string& algName)
-{
-    return nullptr;
-}
+std::unique_ptr<InsCollAlgBase> GetAlgExecViaCann(HcclCMDType opType, const std::string& algName) { return nullptr; }
 
-uint64_t DataTypeSizeGet(HcclDataType type)
-{
-    return DATATYPE_SIZE_TABLE[type];
-}
+uint64_t DataTypeSizeGet(HcclDataType type) { return DATATYPE_SIZE_TABLE[type]; }
 
-std::vector<uint64_t> CalGoSize(uint64_t size)
-{
-    return {size};
-}
+std::vector<uint64_t> CalGoSize(uint64_t size) { return {size}; }
 
-std::vector<uint64_t> CalGoSize(uint64_t size, const LoopGroupConfig &config)
-{
-    return {size};
-}
+std::vector<uint64_t> CalGoSize(uint64_t size, const LoopGroupConfig& config) { return {size}; }
 
-CcuResult GroupCopy(CcuKernelCtxBase &ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize)
+CcuResult GroupCopy(CcuKernelCtxBase& ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize)
 {
     return CCU_SUCCESS;
 }
@@ -201,14 +151,8 @@ DlHcommFunction& DlHcommFunction::GetInstance()
     static DlHcommFunction instance;
     return instance;
 }
-HcclResult DlHcommFunction::DlHcommFunctionInit()
-{
-    return HCCL_SUCCESS;
-}
-HcclResult DlHcommFunction::DlHcommFunctionInterInit()
-{
-    return HCCL_SUCCESS;
-}
+HcclResult DlHcommFunction::DlHcommFunctionInit() { return HCCL_SUCCESS; }
+HcclResult DlHcommFunction::DlHcommFunctionInterInit() { return HCCL_SUCCESS; }
 
 } // namespace mc2_ops_hccl
 

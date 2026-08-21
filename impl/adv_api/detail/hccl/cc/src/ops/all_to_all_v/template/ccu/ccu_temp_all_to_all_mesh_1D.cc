@@ -15,9 +15,9 @@
 
 namespace mc2_ops_hccl {
 
-CcuTempAlltoAllMesh1D::CcuTempAlltoAllMesh1D(const OpParam& param, const u32 rankId,
-                                        const std::vector<std::vector<u32>> &subCommRanks)
-: CcuAlgTemplateBase(param, rankId, subCommRanks)
+CcuTempAlltoAllMesh1D::CcuTempAlltoAllMesh1D(
+    const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
+    : CcuAlgTemplateBase(param, rankId, subCommRanks)
 {
     tempRankSize_ = subCommRanks[0].size();
     auto it = std::find(subCommRanks[0].begin(), subCommRanks[0].end(), rankId);
@@ -26,28 +26,27 @@ CcuTempAlltoAllMesh1D::CcuTempAlltoAllMesh1D(const OpParam& param, const u32 ran
     }
 }
 
-CcuTempAlltoAllMesh1D::~CcuTempAlltoAllMesh1D()
-{
-}
+CcuTempAlltoAllMesh1D::~CcuTempAlltoAllMesh1D() {}
 
-HcclResult CcuTempAlltoAllMesh1D::CalcRes(HcclComm comm,
-                                          const OpParam& param,
-                                          const TopoInfoWithNetLayerDetails* topoInfo,
-                                          AlgResourceRequest& resourceRequest)
+HcclResult CcuTempAlltoAllMesh1D::CalcRes(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    AlgResourceRequest& resourceRequest)
 {
     // 不需要从流
     resourceRequest.notifyNumOnMainThread = 0;
     resourceRequest.slaveThreadNum = 0;
     // kernel数量
     resourceRequest.ccuKernelNum.push_back(1);
-    HCCL_DEBUG("[CcuTempAlltoAllMesh1D::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
-               resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
+    HCCL_DEBUG(
+        "[CcuTempAlltoAllMesh1D::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
+        resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
 
     typeSize_ = DataTypeSizeGet(param.all2AllDataDes.sendType);
     CcuKernelInfo kernelInfo;
 
-    CHK_SAFETY_FUNC_RET(strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAlltoAllMesh1D"));
-    kernelInfo.kernelFunc = reinterpret_cast<void *>(CcuAlltoAllMesh1DKernel);
+    CHK_SAFETY_FUNC_RET(
+        strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAlltoAllMesh1D"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuAlltoAllMesh1DKernel);
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
     auto kernelArg = std::make_shared<CcuKernelArgAlltoAllMesh1D>();
@@ -60,15 +59,13 @@ HcclResult CcuTempAlltoAllMesh1D::CalcRes(HcclComm comm,
     kernelInfo.channels = channelDescs;
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
 
-    HCCL_DEBUG("[CcuTempAlltoAllMesh1D::CalcRes] channelDescs.size()=%llu, dimsize=%llu, "
-               "ccuKernelInfos.size()=%llu",
-               channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
+    HCCL_DEBUG(
+        "[CcuTempAlltoAllMesh1D::CalcRes] channelDescs.size()=%llu, dimsize=%llu, "
+        "ccuKernelInfos.size()=%llu",
+        channelDescs.size(), subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
 
     return HcclResult::HCCL_SUCCESS;
 }
 
-std::string CcuTempAlltoAllMesh1D::Describe() const
-{
-    return "CcuTempAlltoAllMesh1D";
-}
+std::string CcuTempAlltoAllMesh1D::Describe() const { return "CcuTempAlltoAllMesh1D"; }
 } // namespace mc2_ops_hccl

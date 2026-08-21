@@ -342,10 +342,7 @@ LoopCall::LoopCall(CcuRepContext* context, const std::string& label)
 
 Executor::Executor(CcuRepContext* context) : CcuVirRes(context) {}
 
-uint64_t CcuRep::GetTokenInfo(uint64_t va, uint64_t size)
-{
-    return va == 0 ? 0 : va + 0x1234;
-}
+uint64_t CcuRep::GetTokenInfo(uint64_t va, uint64_t size) { return va == 0 ? 0 : va + 0x1234; }
 
 void LoopGroupCall::Run(
     const std::vector<LoopCall>& loopVec, const std::vector<Variable>& loopCfg, const std::vector<Executor>& executors,
@@ -364,14 +361,15 @@ struct CaptureEntry {
     HcclSim::CcuSt::ArgDeleter deleter;
 };
 
-static std::map<std::string, CaptureEntry> &GetCaptureRegistry()
+static std::map<std::string, CaptureEntry>& GetCaptureRegistry()
 {
     static std::map<std::string, CaptureEntry> registry;
     return registry;
 }
 
-void HcclSim::CcuSt::RegisterCaptureFunction(const std::string &name,
-    const RegisterManager::KernelFunction &capture, const ArgConverter &convert, const ArgDeleter &deleter)
+void HcclSim::CcuSt::RegisterCaptureFunction(
+    const std::string& name, const RegisterManager::KernelFunction& capture, const ArgConverter& convert,
+    const ArgDeleter& deleter)
 {
     CaptureEntry entry;
     entry.capture = capture;
@@ -386,15 +384,9 @@ extern "C" {
 
 static uint32_t g_ccuKernelRegisterCount = 0;
 
-void ResetCcuKernelRegisterCount()
-{
-    g_ccuKernelRegisterCount = 0;
-}
+void ResetCcuKernelRegisterCount() { g_ccuKernelRegisterCount = 0; }
 
-uint32_t GetCcuKernelRegisterCount()
-{
-    return g_ccuKernelRegisterCount;
-}
+uint32_t GetCcuKernelRegisterCount() { return g_ccuKernelRegisterCount; }
 
 CcuKernelHandle RecordCcuKernelRegistrationForTest()
 {
@@ -415,7 +407,8 @@ HcclResult HcclCcuKernelLaunch(
     return HCCL_SUCCESS;
 }
 
-HcclResult HcclCommQueryCcuIns(HcclComm comm, CcuInsHandle *insHandles, uint32_t *insNum) {
+HcclResult HcclCommQueryCcuIns(HcclComm comm, CcuInsHandle* insHandles, uint32_t* insNum)
+{
     auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
     CHK_PTR_NULL(simComm);
     *insHandles = static_cast<CcuInsHandle>(simComm->GetRankId()) + 1;
@@ -423,27 +416,29 @@ HcclResult HcclCommQueryCcuIns(HcclComm comm, CcuInsHandle *insHandles, uint32_t
     return HCCL_SUCCESS;
 }
 
-CcuResult HcommCcuKernelRegisterStart(CcuInsHandle insHandle) {
-    HcclSim::CcuSt::Result r = HcclSim::CcuSt::RegisterManager::Global().RegisterStart(
-        static_cast<HcclSim::CcuSt::InstanceHandle>(insHandle));
+CcuResult HcommCcuKernelRegisterStart(CcuInsHandle insHandle)
+{
+    HcclSim::CcuSt::Result r =
+        HcclSim::CcuSt::RegisterManager::Global().RegisterStart(static_cast<HcclSim::CcuSt::InstanceHandle>(insHandle));
     return r == HcclSim::CcuSt::Result::SUCCESS ? CCU_SUCCESS : CCU_E_INTERNAL;
 }
 
-CcuResult HcommCcuKernelRegister(CcuInsHandle insHandle, uint32_t dieId, const char *kernelFuncName,
-    const void *kernelFunc, const void **kernelArgs, uint32_t argNum, CcuKernelHandle *kernelHandle) {
-    auto &registry = GetCaptureRegistry();
+CcuResult HcommCcuKernelRegister(
+    CcuInsHandle insHandle, uint32_t dieId, const char* kernelFuncName, const void* kernelFunc, const void** kernelArgs,
+    uint32_t argNum, CcuKernelHandle* kernelHandle)
+{
+    auto& registry = GetCaptureRegistry();
     auto it = registry.find(kernelFuncName);
     if (it == registry.end()) {
         *kernelHandle = RecordCcuKernelRegistrationForTest();
         return CCU_SUCCESS;
     }
 
-    void *stArg = it->second.convert(kernelArgs[0], argNum);
+    void* stArg = it->second.convert(kernelArgs[0], argNum);
 
     HcclSim::CcuSt::KernelHandle handle = 0;
     HcclSim::CcuSt::Result result = HcclSim::CcuSt::RegisterManager::Global().Register(
-        static_cast<HcclSim::CcuSt::InstanceHandle>(insHandle),
-        kernelFuncName, it->second.capture, stArg, handle);
+        static_cast<HcclSim::CcuSt::InstanceHandle>(insHandle), kernelFuncName, it->second.capture, stArg, handle);
 
     if (it->second.deleter) {
         it->second.deleter(stArg);
@@ -456,13 +451,16 @@ CcuResult HcommCcuKernelRegister(CcuInsHandle insHandle, uint32_t dieId, const c
     return CCU_SUCCESS;
 }
 
-CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle) {
-    HcclSim::CcuSt::Result r = HcclSim::CcuSt::RegisterManager::Global().RegisterEnd(
-        static_cast<HcclSim::CcuSt::InstanceHandle>(insHandle));
+CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle)
+{
+    HcclSim::CcuSt::Result r =
+        HcclSim::CcuSt::RegisterManager::Global().RegisterEnd(static_cast<HcclSim::CcuSt::InstanceHandle>(insHandle));
     return r == HcclSim::CcuSt::Result::SUCCESS ? CCU_SUCCESS : CCU_E_INTERNAL;
 }
 
-CcuResult HcommCcuKernelLaunch(ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void *taskArgs, uint32_t argSize) {
+CcuResult HcommCcuKernelLaunch(
+    ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs, uint32_t argSize)
+{
     return CCU_SUCCESS;
 }
 

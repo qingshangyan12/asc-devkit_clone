@@ -22,13 +22,13 @@ namespace CcuSt {
 
 namespace {
 
-void *ConvertAllToAllArg(const void *productArg, uint32_t argNum)
+void* ConvertAllToAllArg(const void* productArg, uint32_t argNum)
 {
     if (productArg == nullptr) {
         return nullptr;
     }
-    const auto *src = static_cast<const mc2_ops_hccl::CcuKernelArgAlltoAllMesh1D *>(productArg);
-    auto *config = new AllToAllKernelConfig();
+    const auto* src = static_cast<const mc2_ops_hccl::CcuKernelArgAlltoAllMesh1D*>(productArg);
+    auto* config = new AllToAllKernelConfig();
     config->rankId = src->rankId;
     config->rankSize = static_cast<uint32_t>(src->rankSize);
     config->loadFromMem = src->loadFromMem;
@@ -41,25 +41,26 @@ void *ConvertAllToAllArg(const void *productArg, uint32_t argNum)
 std::vector<AllToAllLaunchConfig> g_mesh1dConfigs;
 
 bool g_registered = []() {
-    RegisterCaptureFunction("CcuKernelAlltoAllMesh1D", CaptureAllToAllMesh1DKernel, ConvertAllToAllArg,
-        [](void *p) { delete static_cast<AllToAllKernelConfig *>(p); });
+    RegisterCaptureFunction("CcuKernelAlltoAllMesh1D", CaptureAllToAllMesh1DKernel, ConvertAllToAllArg, [](void* p) {
+        delete static_cast<AllToAllKernelConfig*>(p);
+    });
 
-    CcuStAllToAll::RegisterVariant("CcuAlltoAllMesh1D",
-        [](const CcuStScenario &scenario, const std::vector<KernelHandle> &handles) -> ScenarioData {
+    CcuStAllToAll::RegisterVariant(
+        "CcuAlltoAllMesh1D",
+        [](const CcuStScenario& scenario, const std::vector<KernelHandle>& handles) -> ScenarioData {
             return BuildMesh1DScenario(scenario, handles);
         });
     return true;
 }();
 } // namespace
 
-Result CaptureAllToAllMesh1DKernel(void *kernelArg)
+Result CaptureAllToAllMesh1DKernel(void* kernelArg)
 {
     if (kernelArg == nullptr) {
         return Result::PARAM_ERROR;
     }
-    const auto &config = *static_cast<AllToAllKernelConfig *>(kernelArg);
-    if (config.rankSize < 2 || config.rankId >= config.rankSize ||
-        config.channels.size() != config.rankSize - 1) {
+    const auto& config = *static_cast<AllToAllKernelConfig*>(kernelArg);
+    if (config.rankSize < 2 || config.rankId >= config.rankSize || config.channels.size() != config.rankSize - 1) {
         return Result::PARAM_ERROR;
     }
 
@@ -82,20 +83,19 @@ Result CaptureAllToAllMesh1DKernel(void *kernelArg)
 
     CcuKernelArg argPtr = static_cast<CcuKernelArg>(&kernelArgData);
     const CcuResult result = mc2_ops_hccl::CcuAlltoAllMesh1DKernel(
-        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6],
-        arguments[7], arguments[8], arguments[9], arguments[10], argPtr);
+        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
+        arguments[8], arguments[9], arguments[10], argPtr);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
 
-std::vector<uint64_t> PrepareAllToAllTaskArgs(const AllToAllLaunchConfig &config)
+std::vector<uint64_t> PrepareAllToAllTaskArgs(const AllToAllLaunchConfig& config)
 {
-    return {config.inputAddress, config.outputAddress, config.token, config.sliceSize,
-        config.srcStride, config.writeLoopCount, config.dstOffset,
-        config.goSize[0], config.goSize[1], config.goSize[2], config.goSize[3]};
+    return {config.inputAddress, config.outputAddress,  config.token,     config.sliceSize,
+            config.srcStride,    config.writeLoopCount, config.dstOffset, config.goSize[0],
+            config.goSize[1],    config.goSize[2],      config.goSize[3]};
 }
 
-ScenarioData BuildMesh1DScenario(const CcuStScenario &scenario,
-    const std::vector<KernelHandle> &handles)
+ScenarioData BuildMesh1DScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)
 {
     const uint32_t rankSize = CcuStFixture::CountRanks(scenario.topoMeta);
     const uint64_t sliceSize = scenario.sizes[0][0];
@@ -114,10 +114,10 @@ ScenarioData BuildMesh1DScenario(const CcuStScenario &scenario,
     const uint64_t outputSize = destinationBaseOffset + rankSize * sliceSize + guard;
 
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
-        RankMemory &memory = data.memories[rank];
+        RankMemory& memory = data.memories[rank];
         memory.input.assign(inputSize, 0x5a);
         memory.output.assign(outputSize, 0xa5);
-        AllToAllLaunchConfig &config = g_mesh1dConfigs[rank];
+        AllToAllLaunchConfig& config = g_mesh1dConfigs[rank];
         config.inputAddress = memory.InputAddress() + sourceBaseOffset;
         config.outputAddress = memory.OutputAddress();
         config.token = 0x1000U + rank;
@@ -131,14 +131,12 @@ ScenarioData BuildMesh1DScenario(const CcuStScenario &scenario,
         for (uint32_t dest = 0; dest < rankSize; ++dest) {
             const uint64_t offset = sourceBaseOffset + static_cast<uint64_t>(dest) * sliceSize;
             for (uint64_t byte = 0; byte < sliceSize; ++byte) {
-                memory.input[offset + byte] =
-                    static_cast<uint8_t>(17U + rank * 41U + dest * 13U + byte);
+                memory.input[offset + byte] = static_cast<uint8_t>(17U + rank * 41U + dest * 13U + byte);
             }
             data.srcOffsets[rank][dest] = sourceBaseOffset + static_cast<uint64_t>(dest) * sliceSize;
             data.dstOffsets[rank][dest] = destinationBaseOffset + static_cast<uint64_t>(rank) * sliceSize;
         }
-        data.launches[rank] = RankLaunch{handles[rank],
-            PrepareAllToAllTaskArgs(config), &memory};
+        data.launches[rank] = RankLaunch{handles[rank], PrepareAllToAllTaskArgs(config), &memory};
     }
     return data;
 }

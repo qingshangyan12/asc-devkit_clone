@@ -22,22 +22,23 @@ namespace CcuSt {
 
 class RegisterManager {
 public:
-    using KernelFunction = std::function<Result(void *)>;
+    using KernelFunction = std::function<Result(void*)>;
 
-    static RegisterManager &Global();
+    static RegisterManager& Global();
     void Reset();
 
     Result RegisterStart(InstanceHandle instance);
-    Result Register(InstanceHandle instance, const std::string &name, const KernelFunction &function,
-        void *kernelArg, KernelHandle &handle);
+    Result Register(
+        InstanceHandle instance, const std::string& name, const KernelFunction& function, void* kernelArg,
+        KernelHandle& handle);
     Result RegisterEnd(InstanceHandle instance);
 
-    const Program *GetProgram(KernelHandle handle) const;
-    const std::vector<KernelHandle> &GetLastCompiledGroup() const;
+    const Program* GetProgram(KernelHandle handle) const;
+    const std::vector<KernelHandle>& GetLastCompiledGroup() const;
     bool IsRegistering(InstanceHandle instance) const;
 
     static void RegisterChannelMap(ChannelHandle handle, uint32_t localRank, uint32_t remoteRank);
-    static bool GetChannelRanks(ChannelHandle handle, uint32_t &localRank, uint32_t &remoteRank);
+    static bool GetChannelRanks(ChannelHandle handle, uint32_t& localRank, uint32_t& remoteRank);
 
 private:
     struct KernelRecord {
@@ -64,11 +65,12 @@ ChannelHandle MakeChannel(uint32_t localRank, uint32_t remoteRank);
 uint32_t ChannelLocalRank(ChannelHandle channel);
 uint32_t ChannelRemoteRank(ChannelHandle channel);
 
-using ArgConverter = std::function<void *(const void *, uint32_t)>;
-using ArgDeleter = std::function<void(void *)>;
+using ArgConverter = std::function<void*(const void*, uint32_t)>;
+using ArgDeleter = std::function<void(void*)>;
 
-void RegisterCaptureFunction(const std::string &name, const RegisterManager::KernelFunction &capture,
-    const ArgConverter &convert, const ArgDeleter &deleter);
+void RegisterCaptureFunction(
+    const std::string& name, const RegisterManager::KernelFunction& capture, const ArgConverter& convert,
+    const ArgDeleter& deleter);
 
 } // namespace CcuSt
 } // namespace HcclSim

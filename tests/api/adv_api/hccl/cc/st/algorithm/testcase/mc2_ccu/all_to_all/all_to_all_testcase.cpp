@@ -16,7 +16,7 @@ using namespace HcclSim::CcuSt;
 
 namespace {
 
-CcuStScenario MakeScenario(const TopoMeta &topoMeta, HcclDataType dataType, uint64_t sliceSize)
+CcuStScenario MakeScenario(const TopoMeta& topoMeta, HcclDataType dataType, uint64_t sliceSize)
 {
     const uint32_t rankSize = CcuStFixture::CountRanks(topoMeta);
     CcuStScenario scenario;

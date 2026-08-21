@@ -36,7 +36,7 @@ struct RankMemory {
 struct RankLaunch {
     KernelHandle kernel{0};
     std::vector<uint64_t> taskArgs;
-    RankMemory *memory{nullptr};
+    RankMemory* memory{nullptr};
 };
 
 struct RankExecutionStats {
@@ -46,19 +46,19 @@ struct RankExecutionStats {
 
 class RuntimeWorld {
 public:
-    Result Launch(const std::vector<RankLaunch> &launches);
-    const std::string &LastError() const;
-    const std::vector<RankExecutionStats> &LastExecutionStats() const;
-    const ExecutionLog &ExecutionLogData() const;
+    Result Launch(const std::vector<RankLaunch>& launches);
+    const std::string& LastError() const;
+    const std::vector<RankExecutionStats>& LastExecutionStats() const;
+    const ExecutionLog& ExecutionLogData() const;
 
 private:
     struct RankState;
 
-    bool ExecuteOne(std::vector<RankState> &states, size_t rankIndex, Result &result);
-    bool Evaluate(const RankState &state, const Operation &operation) const;
-    bool ResolveMemory(std::vector<RankState> &states, uint64_t address, uint64_t size,
-        uint8_t *&pointer, uint32_t &ownerRank);
-    void SetError(const std::string &message);
+    bool ExecuteOne(std::vector<RankState>& states, size_t rankIndex, Result& result);
+    bool Evaluate(const RankState& state, const Operation& operation) const;
+    bool ResolveMemory(
+        std::vector<RankState>& states, uint64_t address, uint64_t size, uint8_t*& pointer, uint32_t& ownerRank);
+    void SetError(const std::string& message);
 
     std::string lastError_;
     std::vector<RankExecutionStats> lastExecutionStats_;

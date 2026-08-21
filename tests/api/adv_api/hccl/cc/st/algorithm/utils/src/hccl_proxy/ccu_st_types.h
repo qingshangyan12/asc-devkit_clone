@@ -22,15 +22,7 @@
 namespace HcclSim {
 namespace CcuSt {
 
-enum class Result {
-    SUCCESS = 0,
-    PARAM_ERROR,
-    STATE_ERROR,
-    NOT_FOUND,
-    CONTRACT_ERROR,
-    DEADLOCK,
-    OUT_OF_RANGE
-};
+enum class Result { SUCCESS = 0, PARAM_ERROR, STATE_ERROR, NOT_FOUND, CONTRACT_ERROR, DEADLOCK, OUT_OF_RANGE };
 
 using KernelHandle = uint64_t;
 using InstanceHandle = uint64_t;
@@ -45,7 +37,7 @@ struct TaskParam {
     uint32_t copiedArgCount{0};
 };
 
-std::vector<TaskParam> PackTaskArgs(const std::vector<uint64_t> &taskArgs);
+std::vector<TaskParam> PackTaskArgs(const std::vector<uint64_t>& taskArgs);
 
 enum class OpCode {
     LOAD_ARG,
@@ -91,12 +83,7 @@ struct ArgDescriptor {
     ResourceHandle variable{0};
 };
 
-enum class GroupCopyBodyOp {
-    LOCAL_TO_BUFFER,
-    EVENT_WAIT,
-    BUFFER_TO_LOCAL,
-    EVENT_WAIT_FINAL
-};
+enum class GroupCopyBodyOp { LOCAL_TO_BUFFER, EVENT_WAIT, BUFFER_TO_LOCAL, EVENT_WAIT_FINAL };
 
 struct GroupCopyFunctionDescriptor {
     uint32_t index{0};

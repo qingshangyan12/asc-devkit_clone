@@ -19,15 +19,16 @@ namespace CcuSt {
 
 namespace {
 
-void ApplyCopy(std::vector<uint8_t> &dst, uint64_t dstOffset,
-    const std::vector<uint8_t> &src, uint64_t srcOffset, uint64_t size)
+void ApplyCopy(
+    std::vector<uint8_t>& dst, uint64_t dstOffset, const std::vector<uint8_t>& src, uint64_t srcOffset, uint64_t size)
 {
-    std::copy_n(src.begin() + static_cast<size_t>(srcOffset), static_cast<size_t>(size),
+    std::copy_n(
+        src.begin() + static_cast<size_t>(srcOffset), static_cast<size_t>(size),
         dst.begin() + static_cast<size_t>(dstOffset));
 }
 
-void ApplyReduce(std::vector<uint8_t> &dst, uint64_t dstOffset,
-    const std::vector<uint8_t> &src, uint64_t srcOffset, uint64_t size,
+void ApplyReduce(
+    std::vector<uint8_t>& dst, uint64_t dstOffset, const std::vector<uint8_t>& src, uint64_t srcOffset, uint64_t size,
     HcclDataType dataType, HcclReduceOp reduceOp)
 {
     // TODO: 实现 reduce 逻辑（SUM/MAX/MIN/PROD），当前只支持纯拷贝
@@ -36,8 +37,8 @@ void ApplyReduce(std::vector<uint8_t> &dst, uint64_t dstOffset,
 
 } // namespace
 
-CheckResult CaptureRuntimeExpectation(const ScenarioData &data,
-    const CcuStScenario &scenario, RuntimeExpectation &expectation)
+CheckResult CaptureRuntimeExpectation(
+    const ScenarioData& data, const CcuStScenario& scenario, RuntimeExpectation& expectation)
 {
     const size_t rankSize = data.memories.size();
     if (rankSize == 0) {
@@ -55,8 +56,8 @@ CheckResult CaptureRuntimeExpectation(const ScenarioData &data,
             const uint64_t srcOffset = data.srcOffsets[srcRank][dstRank];
             const uint64_t dstOffset = data.dstOffsets[srcRank][dstRank];
             const uint64_t size = scenario.sizes[srcRank][dstRank];
-            const auto &src = data.memories[srcRank].input;
-            auto &dst = expectation.outputs[dstRank];
+            const auto& src = data.memories[srcRank].input;
+            auto& dst = expectation.outputs[dstRank];
             if (srcOffset + size > src.size() || dstOffset + size > dst.size()) {
                 return {Result::OUT_OF_RANGE, "expected transfer is out of range"};
             }
@@ -70,16 +71,16 @@ CheckResult CaptureRuntimeExpectation(const ScenarioData &data,
     return {};
 }
 
-CheckResult CheckRuntimeOutput(const std::vector<RankMemory> &memories,
-    const RuntimeExpectation &expectation, const RuntimeWorld &world)
+CheckResult CheckRuntimeOutput(
+    const std::vector<RankMemory>& memories, const RuntimeExpectation& expectation, const RuntimeWorld& world)
 {
     if (expectation.outputs.size() != memories.size()) {
         return {Result::CONTRACT_ERROR, "expected output rank count does not match memories"};
     }
     for (size_t rank = 0; rank < memories.size(); ++rank) {
         if (memories[rank].output != expectation.outputs[rank]) {
-            const auto mismatch = std::mismatch(memories[rank].output.begin(), memories[rank].output.end(),
-                expectation.outputs[rank].begin());
+            const auto mismatch = std::mismatch(
+                memories[rank].output.begin(), memories[rank].output.end(), expectation.outputs[rank].begin());
             std::ostringstream message;
             message << "output mismatch at rank " << rank;
             if (mismatch.first != memories[rank].output.end()) {

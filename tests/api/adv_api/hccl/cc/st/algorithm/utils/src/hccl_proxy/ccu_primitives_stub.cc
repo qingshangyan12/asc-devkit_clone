@@ -20,9 +20,9 @@
 namespace HcclSim {
 namespace CcuSt {
 namespace {
-thread_local CompilerContext *gCompilerContext = nullptr;
+thread_local CompilerContext* gCompilerContext = nullptr;
 
-Operation MakeConditionOperation(OpCode code, const Condition &condition)
+Operation MakeConditionOperation(OpCode code, const Condition& condition)
 {
     Operation operation;
     operation.code = code;
@@ -33,7 +33,7 @@ Operation MakeConditionOperation(OpCode code, const Condition &condition)
 }
 } // namespace
 
-CompilerContext::CompilerContext(Program &program) : program_(program) {}
+CompilerContext::CompilerContext(Program& program) : program_(program) {}
 
 ResourceHandle CompilerContext::AllocateVariable()
 {
@@ -63,7 +63,7 @@ ResourceHandle CompilerContext::AllocateBuffer()
     return handle;
 }
 
-ResourceHandle CompilerContext::AllocateLocalAddress(ResourceHandle &address, ResourceHandle &token)
+ResourceHandle CompilerContext::AllocateLocalAddress(ResourceHandle& address, ResourceHandle& token)
 {
     ResourceHandle handle = nextHandle_++;
     address = AllocateAddress();
@@ -72,7 +72,7 @@ ResourceHandle CompilerContext::AllocateLocalAddress(ResourceHandle &address, Re
     return handle;
 }
 
-ResourceHandle CompilerContext::AllocateRemoteAddress(ResourceHandle &address, ResourceHandle &token)
+ResourceHandle CompilerContext::AllocateRemoteAddress(ResourceHandle& address, ResourceHandle& token)
 {
     ResourceHandle handle = nextHandle_++;
     address = AllocateAddress();
@@ -94,8 +94,7 @@ ResourceHandle CompilerContext::GetChannelVariable(ChannelHandle channel, uint32
     return handle;
 }
 
-void CompilerContext::ConfigureProgram(
-    uint32_t rankId, uint32_t rankSize, const std::vector<ChannelHandle> &channels)
+void CompilerContext::ConfigureProgram(uint32_t rankId, uint32_t rankSize, const std::vector<ChannelHandle>& channels)
 {
     program_.rankId = rankId;
     program_.rankSize = rankSize;
@@ -107,13 +106,11 @@ void CompilerContext::RegisterArgument(ResourceHandle variable, uint32_t argId)
     program_.arguments.push_back(ArgDescriptor{argId, variable});
 }
 
-void CompilerContext::Append(const Operation &operation)
-{
-    program_.operations.push_back(operation);
-}
+void CompilerContext::Append(const Operation& operation) { program_.operations.push_back(operation); }
 
-void CompilerContext::AppendGroupCopy(ResourceHandle destination, ResourceHandle source,
-    ResourceHandle length, const std::array<ResourceHandle, 4> &groupSize)
+void CompilerContext::AppendGroupCopy(
+    ResourceHandle destination, ResourceHandle source, ResourceHandle length,
+    const std::array<ResourceHandle, 4>& groupSize)
 {
     constexpr uint32_t msInterleave = 8;
     constexpr uint32_t loopCount = 8;
@@ -139,15 +136,16 @@ void CompilerContext::AppendGroupCopy(ResourceHandle destination, ResourceHandle
         function.index = index;
         function.bufferBase = index * msInterleave;
         function.event = descriptor.events[index];
-        function.body = {GroupCopyBodyOp::LOCAL_TO_BUFFER, GroupCopyBodyOp::EVENT_WAIT,
-            GroupCopyBodyOp::BUFFER_TO_LOCAL, GroupCopyBodyOp::EVENT_WAIT_FINAL};
+        function.body = {
+            GroupCopyBodyOp::LOCAL_TO_BUFFER, GroupCopyBodyOp::EVENT_WAIT, GroupCopyBodyOp::BUFFER_TO_LOCAL,
+            GroupCopyBodyOp::EVENT_WAIT_FINAL};
         descriptor.functions.push_back(function);
         descriptor.loops.push_back(GroupCopyLoopDescriptor{index, index});
     }
-    descriptor.loopGroups.push_back(GroupCopyLoopGroupDescriptor{
-        groupSize[0], groupSize[1], 0, groupSize[0], 0, loopCount, {0}});
-    descriptor.loopGroups.push_back(GroupCopyLoopGroupDescriptor{
-        groupSize[2], 0, groupSize[2], groupSize[0], groupSize[3], loopCount, {0, 1}});
+    descriptor.loopGroups.push_back(
+        GroupCopyLoopGroupDescriptor{groupSize[0], groupSize[1], 0, groupSize[0], 0, loopCount, {0}});
+    descriptor.loopGroups.push_back(
+        GroupCopyLoopGroupDescriptor{groupSize[2], 0, groupSize[2], groupSize[0], groupSize[3], loopCount, {0, 1}});
     program_.groupCopies.push_back(descriptor);
 
     Operation operation;
@@ -163,7 +161,7 @@ Result CompilerContext::Finalize()
 {
     std::vector<size_t> stack;
     for (size_t index = 0; index < program_.operations.size(); ++index) {
-        Operation &operation = program_.operations[index];
+        Operation& operation = program_.operations[index];
         if (operation.code == OpCode::IF_BEGIN || operation.code == OpCode::WHILE_BEGIN ||
             operation.code == OpCode::ELSE_BEGIN) {
             stack.push_back(index);
@@ -199,20 +197,19 @@ Result CompilerContext::Finalize()
             continue;
         }
         size_t ifEndIndex = index - 1;
-        if (ifEndIndex >= program_.operations.size() ||
-            program_.operations[ifEndIndex].code != OpCode::IF_END) {
+        if (ifEndIndex >= program_.operations.size() || program_.operations[ifEndIndex].code != OpCode::IF_END) {
             return Result::STATE_ERROR;
         }
         size_t ifBeginIndex = program_.operations[ifEndIndex].peerIndex;
-        if (ifBeginIndex >= program_.operations.size() ||
-            program_.operations[ifBeginIndex].code != OpCode::IF_BEGIN) {
+        if (ifBeginIndex >= program_.operations.size() || program_.operations[ifBeginIndex].code != OpCode::IF_BEGIN) {
             return Result::STATE_ERROR;
         }
         program_.operations[ifBeginIndex].peerIndex = index;
     }
 
-    std::sort(program_.arguments.begin(), program_.arguments.end(),
-        [](const ArgDescriptor &lhs, const ArgDescriptor &rhs) { return lhs.id < rhs.id; });
+    std::sort(
+        program_.arguments.begin(), program_.arguments.end(),
+        [](const ArgDescriptor& lhs, const ArgDescriptor& rhs) { return lhs.id < rhs.id; });
     for (size_t index = 0; index < program_.arguments.size(); ++index) {
         if (program_.arguments[index].id != index) {
             return Result::CONTRACT_ERROR;
@@ -224,7 +221,7 @@ Result CompilerContext::Finalize()
     return Result::SUCCESS;
 }
 
-CompilerContext &CompilerContext::Current()
+CompilerContext& CompilerContext::Current()
 {
     if (gCompilerContext == nullptr) {
         throw std::logic_error("CCU primitive called outside kernel registration");
@@ -232,20 +229,17 @@ CompilerContext &CompilerContext::Current()
     return *gCompilerContext;
 }
 
-void CompilerContext::SetCurrent(CompilerContext *context)
-{
-    gCompilerContext = context;
-}
+void CompilerContext::SetCurrent(CompilerContext* context) { gCompilerContext = context; }
 
-ControlScope::ControlScope(const Condition &condition, bool isWhile, bool isElse) : isWhile_(isWhile), isElse_(isElse)
+ControlScope::ControlScope(const Condition& condition, bool isWhile, bool isElse) : isWhile_(isWhile), isElse_(isElse)
 {
     if (isElse_) {
         Operation operation;
         operation.code = OpCode::ELSE_BEGIN;
         CompilerContext::Current().Append(operation);
     } else {
-        CompilerContext::Current().Append(MakeConditionOperation(
-            isWhile ? OpCode::WHILE_BEGIN : OpCode::IF_BEGIN, condition));
+        CompilerContext::Current().Append(
+            MakeConditionOperation(isWhile ? OpCode::WHILE_BEGIN : OpCode::IF_BEGIN, condition));
     }
 }
 
@@ -292,10 +286,7 @@ void AppendSimple(OpCode code, ResourceHandle destination, ResourceHandle source
 Variable::Variable() : handle(CompilerContext::Current().AllocateVariable()) {}
 Variable::Variable(ResourceHandle existingHandle) : handle(existingHandle) {}
 
-void Variable::operator=(const Variable &other) const
-{
-    AppendSimple(OpCode::ASSIGN_VAR, handle, other.handle);
-}
+void Variable::operator=(const Variable& other) const { AppendSimple(OpCode::ASSIGN_VAR, handle, other.handle); }
 
 void Variable::operator=(uint64_t immediate) const
 {
@@ -306,7 +297,7 @@ void Variable::operator=(uint64_t immediate) const
     CompilerContext::Current().Append(operation);
 }
 
-void Variable::operator+=(const Variable &other) const
+void Variable::operator+=(const Variable& other) const
 {
     Operation operation;
     operation.code = OpCode::ADD_VAR;
@@ -316,7 +307,7 @@ void Variable::operator+=(const Variable &other) const
     CompilerContext::Current().Append(operation);
 }
 
-Variable Variable::operator+(const Variable &other) const
+Variable Variable::operator+(const Variable& other) const
 {
     Variable result;
     Operation operation;
@@ -328,30 +319,24 @@ Variable Variable::operator+(const Variable &other) const
     return result;
 }
 
-Condition Variable::operator==(uint64_t immediate) const
-{
-    return Condition{handle, immediate, true};
-}
+Condition Variable::operator==(uint64_t immediate) const { return Condition{handle, immediate, true}; }
 
-Condition Variable::operator!=(uint64_t immediate) const
-{
-    return Condition{handle, immediate, false};
-}
+Condition Variable::operator!=(uint64_t immediate) const { return Condition{handle, immediate, false}; }
 
 Address::Address() : handle(CompilerContext::Current().AllocateAddress()) {}
 Address::Address(ResourceHandle existingHandle) : handle(existingHandle) {}
 
-void Address::operator=(const Variable &variable) const
+void Address::operator=(const Variable& variable) const
 {
     AppendSimple(OpCode::ADDRESS_ASSIGN_VAR, handle, variable.handle);
 }
 
-void Address::operator=(const Address &address) const
+void Address::operator=(const Address& address) const
 {
     AppendSimple(OpCode::ADDRESS_ASSIGN_ADDRESS, handle, address.handle);
 }
 
-void Address::operator+=(const Variable &variable) const
+void Address::operator+=(const Variable& variable) const
 {
     AppendSimple(OpCode::ADDRESS_ADD_VAR, handle, variable.handle);
 }
@@ -411,7 +396,7 @@ Result Load(Variable address, Variable destination)
     return Result::SUCCESS;
 }
 
-Result Load(Variable address, Array<Variable> &destinations, uint32_t count)
+Result Load(Variable address, Array<Variable>& destinations, uint32_t count)
 {
     if (count > destinations.size()) {
         return Result::PARAM_ERROR;
@@ -437,8 +422,8 @@ Result Store(Variable address, Variable source)
     return Result::SUCCESS;
 }
 
-Result WriteVariableWithNotify(ChannelHandle channel, Variable variable, uint32_t remoteVarIndex,
-    uint32_t remoteNotifyIndex, uint16_t mask)
+Result WriteVariableWithNotify(
+    ChannelHandle channel, Variable variable, uint32_t remoteVarIndex, uint32_t remoteNotifyIndex, uint16_t mask)
 {
     Operation operation;
     operation.code = OpCode::WRITE_VARIABLE_NOTIFY;
@@ -493,8 +478,7 @@ Result EventWait(Event event, uint16_t mask)
     return Result::SUCCESS;
 }
 
-Result Write(ChannelHandle channel, RemoteAddr remote, LocalAddr local, Variable length,
-    Event event, uint16_t mask)
+Result Write(ChannelHandle channel, RemoteAddr remote, LocalAddr local, Variable length, Event event, uint16_t mask)
 {
     Operation operation;
     operation.code = OpCode::WRITE;
