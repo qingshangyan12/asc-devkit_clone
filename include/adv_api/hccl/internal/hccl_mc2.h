@@ -95,6 +95,22 @@ extern HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void* opArgs
 extern HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx);
 
+/**
+ * @brief Check whether communication resource can be allocated for the given MC2 tiling
+ * @param comm A pointer identifying the communication resource based on.
+ * @param stream A pointer identifying the stream information.
+ * @param mc2Tiling MC2 tiling data structure containing algorithm configuration.
+ * @return HcclResult - HCCL_SUCCESS on success, error code otherwise.
+ *
+ * @note Only the validation logic of HcclAllocComResourceByTiling is executed,
+ *       no communication resource is allocated.
+ */
+extern HcclResult __attribute__((visibility("default"))) CheckOpResSuffient(
+    HcclComm comm, void* stream, void* mc2Tiling);
+
+extern HcclResult __attribute__((visibility("default"))) CheckOpResSuffient(
+    HcclComm comm, void* stream, void* mc2Tiling);
+
 extern CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx);
 
 #ifdef __cplusplus
