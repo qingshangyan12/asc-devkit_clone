@@ -505,16 +505,9 @@ class TestCompileOp(unittest.TestCase):
                             wraps=compile_op_module.record_sk_manifest_commands,
                         )
                     )
-                    mock_build_records = stack.enter_context(
-                        mock.patch.object(
-                            compile_op_module,
-                            "KernelCompileRecordBuilder",
-                        )
-                    )
-                    mock_build_records.return_value.build.return_value = ()
                     mock_generate_manifest = stack.enter_context(
                         mock.patch.object(
-                            compile_op_module, "StaticCompileResourceGenerator"
+                            compile_op_module, "generate_static_compile_manifest"
                         )
                     )
                     compile_op_common_part(
@@ -538,7 +531,6 @@ class TestCompileOp(unittest.TestCase):
             "link_sk_norm": mock_link_sk_norm,
             "write_resource_id": mock_write_resource_id,
             "record_sk": mock_record_sk,
-            "build_records": mock_build_records,
             "generate_manifest": mock_generate_manifest,
             "compile_states": compile_states,
         }
@@ -549,7 +541,6 @@ class TestCompileOp(unittest.TestCase):
         calls["compile_kernel"].assert_called_once()
         calls["link_kernel"].assert_called_once()
         calls["write_resource_id"].assert_not_called()
-        calls["build_records"].assert_not_called()
         calls["generate_manifest"].assert_not_called()
 
     def test_kernel_spec_normal_builds_basic_manifest_only(self):
@@ -563,82 +554,13 @@ class TestCompileOp(unittest.TestCase):
         calls["record_sk"].assert_not_called()
         calls["compile_sk_bind"].assert_not_called()
         calls["link_sk_norm"].assert_not_called()
-        build_request = calls["build_records"].call_args.args[0]
-        self.assertIsNone(build_request.sk_compile_info)
         calls["generate_manifest"].assert_called_once()
-        request = calls["generate_manifest"].call_args.args[0]
-        self.assertEqual(
-            getattr(request, "output_dir", None),
-            "/tmp/kernel_spec/TestKernel",
-        )
-        self.assertEqual(
-            getattr(request, "manifest_name", None),
-            "TestKernel_manifest.json",
-        )
-
-    def test_generate_static_compile_manifest_builds_request(self):
-        compile_info = CompileInfo()
-        compile_info.kernel_name = "TestKernel"
-        compile_info.dst_file = "/tmp/kernel_meta/TestKernel.o"
-        compile_info.static_compile_tiling_size = 32
-        compile_info.static_compile_tiling_key_data_size = {2: 24}
-
-        basic_compile_info = CompileInfo()
-        basic_compile_info.global_kernel_attribute = "__global__ [aicore]"
-        sk_compile_info = CompileInfo()
-        sk_compile_info.global_kernel_attribute = "__global__ __sk__"
-        sk_bind_command = mock.Mock()
-        sk_compile_info.recorded_sk_bind_commands = [sk_bind_command]
-
-        tiling_info = TilingInfo()
-        tiling_info.default_tiling_size = 0
-        tiling_info.tiling_key_data_size = {1: 16}
-        tiling_info.tiling_data_file_path = "/tmp/kernel_meta/TestKernel_tiling_data.h"
-
-        with (
-            mock.patch.object(
-                compile_op_module,
-                "KernelCompileRecordBuilder",
-            ) as build_records,
-            mock.patch.object(
-                compile_op_module, "StaticCompileResourceGenerator"
-            ) as generate,
-        ):
-            build_records.return_value.build.return_value = ("kernel-record",)
-            compile_op_module.generate_static_compile_manifest(
-                cce_file="/tmp/op.cpp",
-                origin_func_name="test_op",
-                kernel_spec_dir="/tmp/kernel_spec",
-                resource_id="resource-id",
-                compile_info=compile_info,
-                basic_compile_info=basic_compile_info,
-                sk_compile_info=sk_compile_info,
-                sk_cap_bitmap=7,
-                tiling_info=tiling_info,
-                workspace_idx=3,
-            )
-
-        build_request = build_records.call_args.args[0]
-        self.assertEqual(
-            build_request.metadata_json_path, "/tmp/kernel_meta/TestKernel.json"
-        )
-        constant_info = build_request.constant_infos[0]
-        self.assertEqual(constant_info.name, "tiling_data")
-        self.assertEqual(constant_info.parameter_index, 4)
-        self.assertEqual(constant_info.byte_size, 32)
-        self.assertEqual(
-            build_request.constant_info_size_by_tiling_key,
-            {"tiling_data": {1: 16, 2: 24}},
-        )
-
-        request = generate.call_args.args[0]
-        self.assertEqual(request.output_dir, "/tmp/kernel_spec/TestKernel")
-        self.assertEqual(request.manifest_name, "TestKernel_manifest.json")
-        self.assertEqual(request.kernels, ("kernel-record",))
-        self.assertEqual(request.sk_cap_bitmap, 7)
-        self.assertEqual(request.basic_kernel_attribute, "__global__ [aicore]")
-        self.assertEqual(request.sk_kernel_attribute, "__global__ __sk__")
-        self.assertIs(request.sk_bind_command, sk_bind_command)
+        context = calls["generate_manifest"].call_args.args[0]
+        self.assertEqual(context.kernel_spec_dir, "/tmp/kernel_spec")
+        self.assertEqual(context.resource_id, "resource-id")
+        self.assertEqual(context.compile_info.kernel_name, "TestKernel")
+        self.assertIs(context.basic_compile_info, context.compile_info)
+        self.assertIsNone(context.sk_compile_info)
 
     def test_kernel_spec_sk_records_commands_without_sk_compile(self):
         calls = self._run_kernel_spec_common_part("SK", enable_sk=True)
@@ -654,10 +576,6 @@ class TestCompileOp(unittest.TestCase):
             calls["compile_states"],
             [(False, False, True), (True, True, False)],
         )
-        self.assertIs(
-            calls["build_records"].call_args.args[0].basic_compile_info,
-            basic_compile_info,
-        )
         calls["link_kernel"].assert_called_once()
         calls["compile_sk_bind"].assert_called_once()
         self.assertIs(calls["compile_sk_bind"].call_args.args[0], sk_compile_info)
@@ -667,11 +585,18 @@ class TestCompileOp(unittest.TestCase):
         calls["write_resource_id"].assert_called_once_with(
             "/tmp/kernel_meta/TestKernel.o"
         )
-        self.assertIs(
-            calls["build_records"].call_args.args[0].sk_compile_info,
-            sk_compile_info,
+        record_context = calls["record_sk"].call_args.args[0]
+        self.assertIsInstance(
+            record_context, compile_op_module.SkManifestCommandContext
         )
+        self.assertEqual(len(calls["record_sk"].call_args.args), 1)
+        self.assertIs(record_context.compile_info, sk_compile_info)
+        self.assertIs(record_context.basic_compile_info, basic_compile_info)
         calls["generate_manifest"].assert_called_once()
+        context = calls["generate_manifest"].call_args.args[0]
+        self.assertEqual(context.resource_id, "resource-id")
+        self.assertIs(context.basic_compile_info, basic_compile_info)
+        self.assertIs(context.sk_compile_info, sk_compile_info)
 
     def test_compile_sk_bind_records_command_without_execution(self):
         sk_compile_info = CompileInfo()
@@ -716,7 +641,6 @@ class TestCompileOp(unittest.TestCase):
         calls["link_kernel"].assert_called_once()
         calls["write_resource_id"].assert_not_called()
         calls["record_sk"].assert_not_called()
-        calls["build_records"].assert_not_called()
         calls["generate_manifest"].assert_not_called()
 
     def test_kernel_spec_static_shape_keeps_original_sk_workflow(self):
@@ -729,7 +653,6 @@ class TestCompileOp(unittest.TestCase):
         calls["link_sk_norm"].assert_called_once()
         calls["record_sk"].assert_not_called()
         calls["write_resource_id"].assert_not_called()
-        calls["build_records"].assert_not_called()
         calls["generate_manifest"].assert_not_called()
 
     def test_kernel_spec_sk_falls_back_to_basic_manifest(self):
@@ -741,8 +664,9 @@ class TestCompileOp(unittest.TestCase):
             "/tmp/kernel_meta/TestKernel.o"
         )
         calls["record_sk"].assert_not_called()
-        self.assertIsNone(calls["build_records"].call_args.kwargs["sk_compile_info"])
         calls["generate_manifest"].assert_called_once()
+        context = calls["generate_manifest"].call_args.args[0]
+        self.assertIsNone(context.sk_compile_info)
 
     def test_kernel_spec_normal_keeps_dynamic_sk_and_builds_basic_manifest(self):
         calls = self._run_kernel_spec_common_part("Normal", enable_sk=True)
@@ -752,16 +676,14 @@ class TestCompileOp(unittest.TestCase):
         basic_compile_info = calls["compile_kernel"].call_args_list[1].args[0]
         self.assertFalse(sk_compile_info.record_compile_commands)
         self.assertTrue(basic_compile_info.record_compile_commands)
-        self.assertIs(
-            calls["build_records"].call_args.kwargs["basic_compile_info"],
-            basic_compile_info,
-        )
         calls["link_kernel"].assert_called_once()
         calls["compile_sk_bind"].assert_called_once()
         calls["link_sk_norm"].assert_called_once()
         calls["record_sk"].assert_not_called()
-        self.assertIsNone(calls["build_records"].call_args.kwargs["sk_compile_info"])
         calls["generate_manifest"].assert_called_once()
+        context = calls["generate_manifest"].call_args.args[0]
+        self.assertIs(context.basic_compile_info, basic_compile_info)
+        self.assertIsNone(context.sk_compile_info)
 
     def test_kernel_spec_rejects_unsupported_compile_context(self):
         cases = (
@@ -4523,6 +4445,24 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
                 compile_info, compile_option_tuple, tiling_info, arch, code_channel
             )
             self.assertEqual(ret, ["1"])
+
+    def test_record_dynamic_compile_command_accepts_spec(self):
+        from asc_op_compile_base.asc_op_compiler import ascendc_compile_v220
+
+        compile_info = CompileInfo()
+        compile_info.record_compile_commands = True
+        spec = ascendc_compile_v220.DynamicCompileCommandSpec(
+            tiling_key="7",
+            compiled_symbol="record_kernel_7",
+            core_type="cube",
+            source_path="/tmp/record_kernel.cpp",
+            argv=("bisheng", "-c", "record_kernel.cpp"),
+            output_path="/tmp/record_kernel_7.o",
+        )
+
+        ascendc_compile_v220._record_dynamic_compile_command(compile_info, spec)
+
+        self.assertEqual(compile_info.recorded_compile_commands, [spec])
 
     def test_call_bisheng_v220_records_commands_and_controls_execution(self):
         compile_info = CompileInfo()
