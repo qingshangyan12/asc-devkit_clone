@@ -53,17 +53,9 @@ enum class asc_position_quarter_mode {
     DISPERSE_FOURTH_QUARTER
 };
 
-enum class asc_dual_dst_mode : uint8_t {
-    DUAL_DST_DISABLE = 0,
-    DUAL_DST_SPLIT_M = 1,
-    DUAL_DST_SPLIT_N = 2
-};
+enum class asc_dual_dst_mode : uint8_t { DUAL_DST_DISABLE = 0, DUAL_DST_SPLIT_M = 1, DUAL_DST_SPLIT_N = 2 };
 
-enum class asc_unit_flag_mode : uint8_t {
-    DISABLE = 0,
-    ENABLE_KEEP = 2,
-    ENABLE_UPDATE = 3
-};
+enum class asc_unit_flag_mode : uint8_t { DISABLE = 0, ENABLE_KEEP = 2, ENABLE_UPDATE = 3 };
 
 enum class asc_relu_pre_mode : uint8_t {
     NONE = 0,
