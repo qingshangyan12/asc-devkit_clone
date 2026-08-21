@@ -312,6 +312,72 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertTrue(reference.startswith(prefix))
         return reference[len(prefix) :]
 
+    def test_generate_static_compile_manifest_builds_request_from_context(self):
+        compile_info = self.make_compile_context(kernel_name="TestKernel")
+        compile_info.dst_file = "/tmp/kernel_meta/TestKernel.o"
+        compile_info.src_file = "/tmp/op.cpp"
+        compile_info.origin_func_name = "test_op"
+        compile_info.static_compile_tiling_size = 32
+        compile_info.static_compile_tiling_key_data_size = {2: 24}
+        basic_compile_info = SimpleNamespace(
+            global_kernel_attribute="__global__ [aicore]"
+        )
+        sk_bind_command = mock.Mock()
+        sk_compile_info = SimpleNamespace(
+            global_kernel_attribute="__global__ __sk__",
+            recorded_sk_bind_commands=[sk_bind_command],
+        )
+        tiling_info = SimpleNamespace(
+            default_tiling_size=0,
+            tiling_key_data_size={1: 16},
+            tiling_data_file_path="/tmp/kernel_meta/TestKernel_tiling_data.h",
+        )
+        context = generator.StaticCompileManifestContext(
+            soc_version="Ascend910B",
+            kernel_spec_dir="/tmp/kernel_spec",
+            resource_id="resource-id",
+            compile_info=compile_info,
+            basic_compile_info=basic_compile_info,
+            tiling_info=tiling_info,
+            workspace_idx=3,
+            sk_compile_info=sk_compile_info,
+            sk_cap_bitmap=7,
+        )
+
+        with mock.patch.object(
+            generator, "KernelCompileRecordBuilder"
+        ) as build_records:
+            with mock.patch.object(
+                generator, "StaticCompileResourceGenerator"
+            ) as generate:
+                build_records.return_value.build.return_value = ("kernel-record",)
+                generator.generate_static_compile_manifest(context)
+
+        build_request = build_records.call_args.args[0]
+        self.assertEqual(
+            build_request.metadata_json_path, "/tmp/kernel_meta/TestKernel.json"
+        )
+        constant_info = build_request.constant_infos[0]
+        self.assertEqual(constant_info.name, "tiling_data")
+        self.assertEqual(constant_info.parameter_index, 4)
+        self.assertEqual(constant_info.byte_size, 32)
+        self.assertEqual(
+            build_request.constant_info_size_by_tiling_key,
+            {"tiling_data": {1: 16, 2: 24}},
+        )
+
+        request = generate.call_args.args[0]
+        self.assertEqual(request.soc_version, "Ascend910B")
+        self.assertEqual(request.source_file_path, "/tmp/op.cpp")
+        self.assertEqual(request.origin_func_name, "test_op")
+        self.assertEqual(request.output_dir, "/tmp/kernel_spec/TestKernel")
+        self.assertEqual(request.manifest_name, "TestKernel_manifest.json")
+        self.assertEqual(request.kernels, ("kernel-record",))
+        self.assertEqual(request.sk_cap_bitmap, 7)
+        self.assertEqual(request.basic_kernel_attribute, "__global__ [aicore]")
+        self.assertEqual(request.sk_kernel_attribute, "__global__ __sk__")
+        self.assertIs(request.sk_bind_command, sk_bind_command)
+
     def test_generate_manifest_uses_requested_name_and_kernel_directory(self):
         request = self.make_request(self.make_records())
 
@@ -479,6 +545,16 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertIn("__ascendc_static_tiling_data", static_definition)
         self.assertIn("__ascendc_static_full_##dst_ptr", static_definition)
         self.assertNotIn("(tiling_struct *)tiling_ptr", static_definition)
+
+    def test_static_tiling_template_ignores_generic_class_name(self):
+        dynamic_header = (
+            "InitTilingData<T>();\nInitTilingData<ValidTiling>();\n#endif\n"
+        )
+
+        template_text = generator.static_tiling_template_text(dynamic_header)
+
+        self.assertIn("REGISTER_TILINGDATA_SIZE(ValidTiling", template_text)
+        self.assertNotIn("REGISTER_TILINGDATA_SIZE(T,", template_text)
 
     def test_multiple_constant_infos_share_one_template(self):
         block_dim_template = "@@STATIC_VALUE_block_dim@@"
