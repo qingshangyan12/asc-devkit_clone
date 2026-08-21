@@ -100,10 +100,6 @@ __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst,
 
 无
 
-## 流水类型
-
-PIPE_V
-
 ## 约束说明
 
 ### 通用约束
