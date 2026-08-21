@@ -176,7 +176,8 @@ HcclResult SelectAlgAndPrepareEngine(
 
 HcclResult FillOpParamAlgName(OpParam& opParam, const std::string& algName);
 
-HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam& opParam, bool& skipGetRes);
+// onlyCheck为true时仅判定单rank场景，不执行SingleRankProc的实际数据搬运
+HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam& opParam, bool& skipGetRes, bool onlyCheck = false);
 
 HcclResult GetOpParamResCtx(
     HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
@@ -186,14 +187,19 @@ HcclResult GetCcuOpParamResCtx(
     HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
     OpResCtx& opResCtx, void** resCtxOut);
 
+// 构造单个算子的OpParam并完成算法选择/资源计算。
+// onlyCheck为true时仅执行参数构造、算法选择与资源计算（CalcAlgHierarchyInfo/CalcRes），
+// 不执行GetOpParamResCtx的真实资源申请（AICPU路径资源充足性校验用）
 HcclResult GetOpParam(
-    HcclComm comm, void* stream, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& opParam);
+    HcclComm comm, void* stream, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& opParam,
+    bool onlyCheck = false);
 
 HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex);
 
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
+// checkOnly为true时逐算子仅执行校验并查询资源余量，不申请任何通信资源
 HcclResult CcuSelectAlg(
     HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
-    void* mc2Tiling, OpResCtx& opResCtx);
+    void* mc2Tiling, OpResCtx& opResCtx, bool checkOnly = false);
 
 #endif
