@@ -15,6 +15,7 @@
 #include <unistd.h>
 
 #include <cerrno>
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -28,13 +29,14 @@
 
 #include "ascendc_manifest_abi.h"
 #include "manifest_bundle_compiler.h"
-#include "process_runner.h"
+#include "process_executor.h"
 #include "test_support.h"
 
 namespace {
 
 using asc_compile_exporter_test::ScopedEnvironment;
-using ascendc::ProcessRunner;
+using ascendc::ProcessExecutionRequest;
+using ascendc::ProcessExecutor;
 using ascendc::manifest_generator::BuildCollectedBundleRequest;
 using ascendc::manifest_generator::BundleOutputKind;
 using ascendc::manifest_generator::ManifestBundleCompiler;
@@ -450,7 +452,11 @@ TEST_F(AscCompileExporterTest, BuildsRelocatableObjectThatCanBeLinkedIntoSharedL
     EXPECT_EQ(elfType, ET_REL);
 
     const std::string linkedBundle = JoinTestPath(root_, "output/linked-bundle.so");
-    ASSERT_TRUE(ProcessRunner::Run({request.cxxCompiler, "-shared", request.outputPath, "-o", linkedBundle}, {}));
+    ProcessExecutionRequest linkRequest;
+    linkRequest.arguments = {request.cxxCompiler, "-shared", request.outputPath, "-o", linkedBundle};
+    linkRequest.executionTimeout = std::chrono::minutes(5);
+    linkRequest.terminationGracePeriod = std::chrono::seconds(1);
+    ASSERT_TRUE(ProcessExecutor::Execute(linkRequest).HasSuccessfulExit());
 
     void* handle = dlopen(linkedBundle.c_str(), RTLD_NOW | RTLD_LOCAL);
     const char* loadError = handle == nullptr ? dlerror() : nullptr;

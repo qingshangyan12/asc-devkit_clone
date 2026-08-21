@@ -260,7 +260,7 @@ bool IsEnvironmentVariableRemoved(
            removedEnvironmentVariables.end();
 }
 
-bool BuildSpawnEnvironment(
+void BuildSpawnEnvironment(
     const ProcessExecutionRequest& request, std::vector<std::string>& environmentStorage,
     std::vector<char*>& spawnEnvironment)
 {
@@ -290,7 +290,6 @@ bool BuildSpawnEnvironment(
         spawnEnvironment.push_back(const_cast<char*>(environmentEntry.c_str()));
     }
     spawnEnvironment.push_back(nullptr);
-    return true;
 }
 
 void BuildSpawnArguments(
@@ -402,9 +401,7 @@ public:
         BuildSpawnArguments(request.arguments, argumentStorage, spawnArgv);
         std::vector<std::string> environmentStorage;
         std::vector<char*> spawnEnvironment;
-        if (!BuildSpawnEnvironment(request, environmentStorage, spawnEnvironment)) {
-            return false;
-        }
+        BuildSpawnEnvironment(request, environmentStorage, spawnEnvironment);
 
         ScopedFileDescriptor outputWriteFileDescriptor;
         if (request.outputMode == ProcessOutputMode::CaptureCombined) {

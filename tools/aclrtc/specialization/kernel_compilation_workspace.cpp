@@ -117,25 +117,17 @@ bool WritePatchedSourceFileAtomically(const fs::path& sourceFilePath, const std:
 } // namespace
 
 KernelCompilationWorkspace::KernelCompilationWorkspace(fs::path worktreePath, WorktreeRetentionPolicy retentionPolicy)
-    : worktreePath_(std::move(worktreePath)), retentionPolicy_(retentionPolicy)
-{}
-
-KernelCompilationWorkspace::~KernelCompilationWorkspace()
+    : retentionPolicy_(retentionPolicy)
 {
-    if (retentionPolicy_ == WorktreeRetentionPolicy::RetainAfterCompilation || worktreePath_.empty()) {
-        return;
+    if (!worktreePath.empty()) {
+        (void)ownedWorktree_.AdoptExistingForCleanup(worktreePath.string());
     }
-    boost::system::error_code cleanupError;
-    fs::remove_all(worktreePath_, cleanupError);
-    if (cleanupError) {
-        ASCENDLOGW(
-            "Failed to clean resource worktree: path=%s error=%d message=%s; remove the worktree manually if it "
-            "is no longer needed",
-            worktreePath_.c_str(), cleanupError.value(), cleanupError.message().c_str());
+    if (retentionPolicy_ == WorktreeRetentionPolicy::RetainAfterCompilation) {
+        ownedWorktree_.RetainAfterDestruction();
     }
 }
 
-const fs::path& KernelCompilationWorkspace::GetWorktreePath() const noexcept { return worktreePath_; }
+fs::path KernelCompilationWorkspace::GetWorktreePath() const { return fs::path(ownedWorktree_.GetPath()); }
 
 aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatches(
     const KernelCompilationPlan& compilationPlan)
@@ -180,22 +172,19 @@ aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatche
 
 aclError KernelCompilationWorkspace::RemoveWorktreeBeforePublishingElfIfNeeded()
 {
-    if (worktreePath_.empty()) {
+    if (ownedWorktree_.GetPath().empty()) {
         return ACLRTC_SUCCESS;
     }
     if (retentionPolicy_ == WorktreeRetentionPolicy::RetainAfterCompilation) {
         return ACLRTC_SUCCESS;
     }
-    boost::system::error_code cleanupError;
-    fs::remove_all(worktreePath_, cleanupError);
-    if (cleanupError) {
+    const std::string worktreePath = ownedWorktree_.GetPath();
+    if (!ownedWorktree_.RemoveNow()) {
         ASCENDLOGE(
-            "Failed to clean resource worktree before publishing ELF: path=%s error=%d message=%s; ensure the "
-            "path is removable and retry",
-            worktreePath_.c_str(), cleanupError.value(), cleanupError.message().c_str());
+            "Failed to clean resource worktree before publishing ELF: path=%s; ensure the path is removable and retry",
+            worktreePath.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
-    worktreePath_.clear();
     return ACLRTC_SUCCESS;
 }
 
