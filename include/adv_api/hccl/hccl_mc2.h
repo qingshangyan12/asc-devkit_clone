@@ -95,6 +95,21 @@ extern HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void* opArgs
 extern HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx);
 
+/**
+ * @brief Check whether communication resource can be allocated for the given MC2 tiling
+ * @param comm A pointer identifying the communication resource based on.
+ * @param stream A pointer identifying the stream information.
+ * @param mc2Tiling MC2 tiling data structure containing algorithm configuration.
+ * @return HcclResult - HCCL_SUCCESS on success, error code otherwise.
+ *
+ * @note CheckOnly pre-check: reuses the same argument parsing / algorithm selection / resource
+ *       calculation / resource acquisition logic as the real allocation path to probe whether
+ *       resources are sufficient; HCCL_E_UNAVAIL is translated to HCCL_E_RES_NOT_SUFFICIENT,
+ *       and the final OpResCtx is not persisted to device.
+ */
+extern HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(
+    HcclComm comm, void* stream, void* mc2Tiling);
+
 extern CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx);
 
 #ifdef __cplusplus
