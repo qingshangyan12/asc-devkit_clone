@@ -25,27 +25,20 @@ namespace te {
 namespace detail {
 
 template <typename DataType, typename PatternType>
-__simd_callee__ inline vector_bool create_reg_mask(PatternType pattern)
+__simd_callee__ inline reg_tensor<bool> make_reg_mask(PatternType pattern)
 {
     static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t)
                       || sizeof(DataType) == sizeof(uint32_t),
                   "mask helpers only support 8-bit, 16-bit, and 32-bit element types");
 
-    if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
-        return asc_create_mask_b32(pattern);
-    } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
-        return asc_create_mask_b16(pattern);
-    } else {
-        return asc_create_mask_b8(pattern);
-    }
-}
-
-template <typename DataType, typename PatternType>
-__simd_callee__ inline reg_tensor<bool> make_reg_mask(PatternType pattern)
-{
     reg_tensor<bool> result;
-    result.reg = create_reg_mask<DataType>(pattern);
-    result.mask = create_reg_mask<DataType>(PAT_ALL);
+    if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
+        result.reg = asc_create_mask_b32(pattern);
+    } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
+        result.reg = asc_create_mask_b16(pattern);
+    } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
+        result.reg = asc_create_mask_b8(pattern);
+    }
     return result;
 }
 
@@ -64,7 +57,6 @@ __simd_callee__ inline reg_tensor<bool> make_updated_reg_mask(uint32_t& remain)
     } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
         result.reg = asc_update_mask_b8(remain);
     }
-    result.mask = create_reg_mask<DataType>(PAT_ALL);
     return result;
 }
 
@@ -124,6 +116,42 @@ template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain)
 {
     return detail::make_updated_reg_mask<DataType>(remain);
+}
+
+template <typename DataType>
+__simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tensor<bool> src1)
+{
+    static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t)
+                      || sizeof(DataType) == sizeof(uint32_t),
+                  "interleave only supports 8-bit, 16-bit, and 32-bit element types");
+
+    reg_pair<bool> result;
+    if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
+        asc_intlv_b32(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
+        asc_intlv_b16(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
+        asc_intlv_b8(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    }
+    return result;
+}
+
+template <typename DataType>
+__simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_tensor<bool> src1)
+{
+    static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t)
+                      || sizeof(DataType) == sizeof(uint32_t),
+                  "deinterleave only supports 8-bit, 16-bit, and 32-bit element types");
+
+    reg_pair<bool> result;
+    if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
+        asc_deintlv_b32(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
+        asc_deintlv_b16(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
+        asc_deintlv_b8(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    }
+    return result;
 }
 
 } // namespace te
