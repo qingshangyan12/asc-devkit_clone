@@ -236,7 +236,6 @@ inline bool AicpuRingbufWait(RingBufReadInfo* readInfo, RingBufWriteInfo* writeI
         }
         /* Sleep 300ms to let rts reader make progress. */
         (void)nanosleep(&ts, nullptr);
-        __atomic_thread_fence(__ATOMIC_SEQ_CST); // TODO 刷新缓存，实际写法应该是什么
     }
     return false;
 }
@@ -250,7 +249,6 @@ inline bool CheckAicpuRingBuf(BlockRingBufInfo* blockInfo, uint32_t tlvLen)
     if (tlvLen > ringBufLen) {
         return false;
     }
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (!AicpuRingbufWait(readInfo, writeInfo, tlvLen, ringBufLen)) {
         return false;
     }
@@ -382,7 +380,6 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
             ringBase[(wOffLimited + i) % ringBufLen] = headBytes[i];
         }
     }
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     // 5. Advance bufOffset and packIdx together — rts sees WRITING and stops,
     //    and packIdx is consistent with bufOffset.
     AdvanceWriteInfo(writeInfo, newBufOff);
@@ -419,7 +416,6 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     }
 /* ── Step 7: Release the entry to the rts reader ─────────────────── */
     /* Ensure all data writes are visible before flipping the type. */
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     uint32_t readyType = PRINT_TYPE_READY;
     if (!needSplit) {
         /* Non-split: entry is contiguous, typeField is aligned. */
@@ -433,7 +429,6 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
         for (uint32_t i = 0U; i < sizeof(uint32_t); ++i) {
             ringBase[(wOffLimited + i) % ringBufLen] = src[i];
         }
-        __atomic_thread_fence(__ATOMIC_SEQ_CST);
     }
 }
 
