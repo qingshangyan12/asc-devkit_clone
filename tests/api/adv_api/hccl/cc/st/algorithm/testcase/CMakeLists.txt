@@ -88,8 +88,11 @@ target_compile_definitions(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
 
 # The test must exercise the mc2_client built from the current source tree even
 # when an older CANN installation is present in LD_LIBRARY_PATH.
+# libmc2_client.so depends on libmc2_compat.so (common/hcomm_dlsym) and
+# libhcomm.so (mc2_client_link_stub) built in the same tree, so their
+# directories must also be in the RPATH to avoid runtime symbol lookup errors.
 set_target_properties(${HCCL_AICPU_ALLOC_CTX_TARGET} PROPERTIES
-    BUILD_RPATH "$<TARGET_FILE_DIR:mc2_client>"
+    BUILD_RPATH "$<TARGET_FILE_DIR:mc2_client>:$<TARGET_FILE_DIR:mc2_client>/common/hcomm_dlsym:$<TARGET_FILE_DIR:mc2_client>/mc2_client_link_stub"
 )
 target_link_options(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
     -Wl,--disable-new-dtags
