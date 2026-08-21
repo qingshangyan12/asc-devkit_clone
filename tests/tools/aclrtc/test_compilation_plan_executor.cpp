@@ -29,12 +29,12 @@
 namespace {
 namespace fs = boost::filesystem;
 using namespace std::chrono_literals;
+using ascendc::ProcessExecutionResult;
+using ascendc::ProcessTermination;
 using ascendc::aclrtc::CompilationCommand;
 using ascendc::aclrtc::CompilationCommandExecutionLimits;
 using ascendc::aclrtc::CompilationCommandKind;
 using ascendc::aclrtc::CompilationPlanExecutor;
-using ascendc::aclrtc::CompilationProcessResult;
-using ascendc::aclrtc::CompilationProcessTermination;
 using ascendc::aclrtc::CompilationVariant;
 using ascendc::aclrtc::KernelCompilationPlan;
 using ascendc::aclrtc::KernelSpecializationDiagnostics;
@@ -59,10 +59,10 @@ static_assert(
     std::is_same<std::underlying_type_t<CompilationCommandKind>, uint32_t>::value,
     "CompilationCommandKind must have a stable width");
 static_assert(
-    std::is_same<std::underlying_type_t<CompilationProcessTermination>, uint32_t>::value,
-    "CompilationProcessTermination must have a stable width");
+    std::is_same<std::underlying_type_t<ProcessTermination>, uint32_t>::value,
+    "ProcessTermination must have a stable width");
 static_assert(
-    std::is_same<decltype(CompilationProcessResult::terminationCode), int32_t>::value,
+    std::is_same<decltype(ProcessExecutionResult::terminationCode), int32_t>::value,
     "terminationCode must have a stable width");
 static_assert(
     std::is_same<decltype(CompilationCommandExecutionLimits::capturedOutputByteLimit), uint64_t>::value,

@@ -43,22 +43,6 @@ std::string QuoteArgumentForReplayScript(const std::string& argument)
     return quotedArgument;
 }
 
-const char* GetProcessTerminationName(CompilationProcessTermination termination)
-{
-    switch (termination) {
-        case CompilationProcessTermination::InfrastructureFailure:
-            return "infrastructure_failure";
-        case CompilationProcessTermination::Exited:
-            return "exited";
-        case CompilationProcessTermination::Signaled:
-            return "signaled";
-        case CompilationProcessTermination::TimedOut:
-            return "timed_out";
-        default:
-            return "unknown";
-    }
-}
-
 bool WriteDiagnosticTextFile(const fs::path& filePath, const std::string& text, std::ios::openmode writeMode)
 {
     std::ofstream outputStream(filePath.string(), std::ios::out | writeMode);
@@ -176,7 +160,7 @@ void KernelSpecializationDiagnostics::AppendCommandToReplayScript(const Compilat
 }
 
 void KernelSpecializationDiagnostics::AppendCommandResultToCompilationLog(
-    const CompilationCommand& compilationCommand, const CompilationProcessResult& processResult) noexcept
+    const CompilationCommand& compilationCommand, const ProcessExecutionResult& processResult) noexcept
 {
     if (!diagnosticsEnabled_) {
         return;
@@ -184,7 +168,7 @@ void KernelSpecializationDiagnostics::AppendCommandResultToCompilationLog(
     try {
         std::ostringstream resultText;
         resultText << '[' << compilationCommand.diagnosticLabel
-                   << "] termination=" << GetProcessTerminationName(processResult.termination)
+                   << "] termination=" << processResult.GetTerminationName()
                    << " code=" << processResult.terminationCode << " elapsed_ms=" << processResult.elapsedTime.count()
                    << " output_truncated=" << (processResult.capturedOutputTruncated ? "true" : "false") << '\n'
                    << processResult.capturedOutput;
