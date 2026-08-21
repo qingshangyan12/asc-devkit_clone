@@ -27,10 +27,10 @@ adv_test_targets=(
     ascendc_ut_adv_api_tiling_ascend950pr_9599_AIV
 )
 
+# hccl 目录 UT：仅构建运行 tests/api/adv_api/hccl/ccu 下的 ccu_mc2 用例，
+# 不包含其他 hccl/cc 目标与全量 kernel/tiling UT，用于 CheckOpResSuffient 等
+# MC2 CCU 路径的本地快速验证。
 adv_test_two_targets=(
-    ascendc_ut_adv_api_tiling_ascend610
-    ascendc_ut_adv_api_hccl_cc_algorithm_ascend950pr_9599_AIC
-    ascendc_ut_adv_api_hccl_cc_aicpu_alloc_ctx
     ascendc_ut_adv_api_hccl_ccu_mc2
 )
 
