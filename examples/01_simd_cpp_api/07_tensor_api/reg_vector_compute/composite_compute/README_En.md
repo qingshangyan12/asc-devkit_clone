@@ -16,6 +16,7 @@ This sample demonstrates the register composite compute API `asc::te::fma` with 
 │   │   ├── gen_data.py          // Generates input and golden data.
 │   │   └── verify_result.py     // Verifies output data.
 │   ├── CMakeLists.txt           // Build project file.
+│   ├── data_utils.h             // Data input and output utilities.
 │   ├── README.md
 │   ├── README_En.md
 │   └── composite_compute_tensor_api.asc  // Ascend C operator implementation and invocation sample.
