@@ -508,12 +508,14 @@ class TestCompileOp(unittest.TestCase):
                     mock_build_records = stack.enter_context(
                         mock.patch.object(
                             compile_op_module,
-                            "build_kernel_compile_records",
-                            return_value=(),
+                            "KernelCompileRecordBuilder",
                         )
                     )
+                    mock_build_records.return_value.build.return_value = ()
                     mock_generate_manifest = stack.enter_context(
-                        mock.patch.object(compile_op_module, "generate_manifest")
+                        mock.patch.object(
+                            compile_op_module, "StaticCompileResourceGenerator"
+                        )
                     )
                     compile_op_common_part(
                         "test.cpp",
@@ -561,7 +563,8 @@ class TestCompileOp(unittest.TestCase):
         calls["record_sk"].assert_not_called()
         calls["compile_sk_bind"].assert_not_called()
         calls["link_sk_norm"].assert_not_called()
-        self.assertIsNone(calls["build_records"].call_args.kwargs["sk_compile_info"])
+        build_request = calls["build_records"].call_args.args[0]
+        self.assertIsNone(build_request.sk_compile_info)
         calls["generate_manifest"].assert_called_once()
         request = calls["generate_manifest"].call_args.args[0]
         self.assertEqual(
@@ -595,11 +598,13 @@ class TestCompileOp(unittest.TestCase):
         with (
             mock.patch.object(
                 compile_op_module,
-                "build_kernel_compile_records",
-                return_value=("kernel-record",),
+                "KernelCompileRecordBuilder",
             ) as build_records,
-            mock.patch.object(compile_op_module, "generate_manifest") as generate,
+            mock.patch.object(
+                compile_op_module, "StaticCompileResourceGenerator"
+            ) as generate,
         ):
+            build_records.return_value.build.return_value = ("kernel-record",)
             compile_op_module.generate_static_compile_manifest(
                 cce_file="/tmp/op.cpp",
                 origin_func_name="test_op",
@@ -613,16 +618,16 @@ class TestCompileOp(unittest.TestCase):
                 workspace_idx=3,
             )
 
-        build_arguments = build_records.call_args.kwargs
+        build_request = build_records.call_args.args[0]
         self.assertEqual(
-            build_arguments["metadata_json_path"], "/tmp/kernel_meta/TestKernel.json"
+            build_request.metadata_json_path, "/tmp/kernel_meta/TestKernel.json"
         )
-        constant_info = build_arguments["constant_infos"][0]
+        constant_info = build_request.constant_infos[0]
         self.assertEqual(constant_info.name, "tiling_data")
         self.assertEqual(constant_info.parameter_index, 4)
         self.assertEqual(constant_info.byte_size, 32)
         self.assertEqual(
-            build_arguments["constant_info_size_by_tiling_key"],
+            build_request.constant_info_size_by_tiling_key,
             {"tiling_data": {1: 16, 2: 24}},
         )
 
@@ -650,7 +655,7 @@ class TestCompileOp(unittest.TestCase):
             [(False, False, True), (True, True, False)],
         )
         self.assertIs(
-            calls["build_records"].call_args.kwargs["basic_compile_info"],
+            calls["build_records"].call_args.args[0].basic_compile_info,
             basic_compile_info,
         )
         calls["link_kernel"].assert_called_once()
@@ -663,7 +668,7 @@ class TestCompileOp(unittest.TestCase):
             "/tmp/kernel_meta/TestKernel.o"
         )
         self.assertIs(
-            calls["build_records"].call_args.kwargs["sk_compile_info"],
+            calls["build_records"].call_args.args[0].sk_compile_info,
             sk_compile_info,
         )
         calls["generate_manifest"].assert_called_once()
