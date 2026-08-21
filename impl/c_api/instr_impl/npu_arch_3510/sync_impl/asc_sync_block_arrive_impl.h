@@ -30,7 +30,7 @@ __aicore__ inline void asc_sync_block_arrive_impl(pipe_t pipe, int64_t flag_id)
     constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
     constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;
     uint16_t mode = 0x02;
-    int64_t config = (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE));
+    uint64_t config = (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE));
 
     if ASC_IS_AIC {
         if (pipe == pipe_t::PIPE_M) {

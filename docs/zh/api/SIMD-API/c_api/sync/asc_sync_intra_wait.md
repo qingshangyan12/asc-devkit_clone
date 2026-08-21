@@ -33,7 +33,6 @@ block内同步指令，与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配�
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint8_t sync_id)
 __aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id)
 ```
 

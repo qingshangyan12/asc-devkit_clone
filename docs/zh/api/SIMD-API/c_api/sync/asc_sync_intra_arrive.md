@@ -49,7 +49,6 @@ AIC 1中在执行asc_sync_intra_wait后，此时AIC 1 sync_id=0的计数器为0�
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint8_t sync_id)
 __aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id)
 ```
 
