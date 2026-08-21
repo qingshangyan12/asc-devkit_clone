@@ -29,8 +29,6 @@
 namespace {
 namespace fs = boost::filesystem;
 using namespace std::chrono_literals;
-using ascendc::ProcessExecutionResult;
-using ascendc::ProcessTermination;
 using ascendc::aclrtc::CompilationCommand;
 using ascendc::aclrtc::CompilationCommandExecutionLimits;
 using ascendc::aclrtc::CompilationCommandKind;
@@ -58,12 +56,6 @@ static_assert(
 static_assert(
     std::is_same<std::underlying_type_t<CompilationCommandKind>, uint32_t>::value,
     "CompilationCommandKind must have a stable width");
-static_assert(
-    std::is_same<std::underlying_type_t<ProcessTermination>, uint32_t>::value,
-    "ProcessTermination must have a stable width");
-static_assert(
-    std::is_same<decltype(ProcessExecutionResult::terminationCode), int32_t>::value,
-    "terminationCode must have a stable width");
 static_assert(
     std::is_same<decltype(CompilationCommandExecutionLimits::capturedOutputByteLimit), uint64_t>::value,
     "capturedOutputByteLimit must have a stable width");

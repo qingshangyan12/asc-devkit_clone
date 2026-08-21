@@ -19,6 +19,9 @@
 #include <string>
 
 namespace ascendc {
+
+struct ProcessExecutionResult;
+
 namespace aclrtc {
 
 enum class OutputPublicationStatus : uint32_t {

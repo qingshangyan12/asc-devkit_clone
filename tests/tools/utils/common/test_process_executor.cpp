@@ -15,11 +15,14 @@
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
 #include <chrono>
+#include <csignal>
 #include <cstdlib>
 #include <string>
 #include <thread>
 #include <type_traits>
+#include <utility>
 #include <unistd.h>
+#include <vector>
 
 namespace ascendc {
 namespace {
@@ -69,6 +72,22 @@ TEST(ProcessExecutorTest, RejectsInvalidRequestsBeforeSpawning)
 
     ProcessExecutionRequest embeddedNullRequest = CreateCapturedRequest({std::string("/bin/true\0invalid", 17U)});
     EXPECT_EQ(ProcessExecutor::Execute(embeddedNullRequest).termination, ProcessTermination::InfrastructureFailure);
+
+    ProcessExecutionRequest invalidOverrideNameRequest = CreateCapturedRequest({"/bin/true"});
+    invalidOverrideNameRequest.environmentOverrides.emplace_back("INVALID=NAME", "value");
+    EXPECT_EQ(
+        ProcessExecutor::Execute(invalidOverrideNameRequest).termination, ProcessTermination::InfrastructureFailure);
+
+    ProcessExecutionRequest embeddedNullOverrideValueRequest = CreateCapturedRequest({"/bin/true"});
+    embeddedNullOverrideValueRequest.environmentOverrides.emplace_back("VALID_NAME", std::string("value\0suffix", 12U));
+    EXPECT_EQ(
+        ProcessExecutor::Execute(embeddedNullOverrideValueRequest).termination,
+        ProcessTermination::InfrastructureFailure);
+
+    ProcessExecutionRequest invalidRemovalNameRequest = CreateCapturedRequest({"/bin/true"});
+    invalidRemovalNameRequest.removedEnvironmentVariables.emplace_back("INVALID=NAME");
+    EXPECT_EQ(
+        ProcessExecutor::Execute(invalidRemovalNameRequest).termination, ProcessTermination::InfrastructureFailure);
 }
 
 TEST(ProcessExecutorTest, ExecutesArgumentsWithoutShellParsing)

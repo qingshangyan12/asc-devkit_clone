@@ -15,8 +15,12 @@
 
 #include <chrono>
 #include <cstddef>
+#include <cstdint>
 
 namespace ascendc {
+
+struct ProcessExecutionResult;
+
 namespace aclrtc {
 
 class KernelSpecializationDiagnostics;

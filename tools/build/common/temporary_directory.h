@@ -26,7 +26,7 @@ public:
     TemporaryDirectory(const TemporaryDirectory&) = delete;
     TemporaryDirectory& operator=(const TemporaryDirectory&) = delete;
 
-    bool CreateUniqueUnder(const std::string& parentDirectoryPath, const std::string& namePattern);
+    bool CreateUniqueUnder(const std::string& parentDirectoryPath, const std::string& directoryNamePrefix);
     bool AdoptExistingForCleanup(std::string directoryPath);
     bool RemoveNow() noexcept;
     void RetainAfterDestruction() noexcept;

@@ -11,6 +11,7 @@
 #include "kernel_specialization_diagnostics.h"
 
 #include "ascendc_tool_log.h"
+#include "process_executor.h"
 
 #include <boost/filesystem.hpp>
 #include <cerrno>

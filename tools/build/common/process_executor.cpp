@@ -217,16 +217,27 @@ bool IsExecutionRequestWellFormed(const ProcessExecutionRequest& request) noexce
             return false;
         }
     }
-    for (const std::pair<std::string, std::string>& environmentOverride : request.environmentOverrides) {
-        if (!IsEnvironmentVariableNameValid(environmentOverride.first) ||
-            ContainsEmbeddedNull(environmentOverride.second)) {
-            ASCENDLOGE("Process environment override has an invalid name or an embedded NUL value");
+    for (size_t overrideIndex = 0U; overrideIndex < request.environmentOverrides.size(); ++overrideIndex) {
+        const std::pair<std::string, std::string>& environmentOverride = request.environmentOverrides[overrideIndex];
+        if (!IsEnvironmentVariableNameValid(environmentOverride.first)) {
+            ASCENDLOGE(
+                "Process environment override[%zu] has an invalid variable name: name=%s", overrideIndex,
+                environmentOverride.first.c_str());
+            return false;
+        }
+        if (ContainsEmbeddedNull(environmentOverride.second)) {
+            ASCENDLOGE(
+                "Process environment override[%zu] contains an embedded NUL value: name=%s", overrideIndex,
+                environmentOverride.first.c_str());
             return false;
         }
     }
-    for (const std::string& environmentVariableName : request.removedEnvironmentVariables) {
+    for (size_t removalIndex = 0U; removalIndex < request.removedEnvironmentVariables.size(); ++removalIndex) {
+        const std::string& environmentVariableName = request.removedEnvironmentVariables[removalIndex];
         if (!IsEnvironmentVariableNameValid(environmentVariableName)) {
-            ASCENDLOGE("Process environment removal contains an invalid variable name");
+            ASCENDLOGE(
+                "Process environment removal[%zu] has an invalid variable name: name=%s", removalIndex,
+                environmentVariableName.c_str());
             return false;
         }
     }
@@ -468,6 +479,9 @@ public:
             }
             if (SteadyClock::now() >= executionDeadline) {
                 processResult.termination = ProcessTermination::TimedOut;
+                ASCENDLOGE(
+                    "Process exceeded its execution timeout: executable=%s timeout_ms=%lld",
+                    request.arguments.front().c_str(), static_cast<long long>(request.executionTimeout.count()));
                 TerminateAndReapProcessGroup(processStatus);
                 break;
             }
@@ -620,8 +634,7 @@ ProcessExecutionResult ProcessExecutor::Execute(const ProcessExecutionRequest& r
         }
         (void)spawnedProcess.WaitForExit(request, processResult);
     } catch (const std::bad_alloc&) {
-        ASCENDLOGE(
-            "Out of memory while preparing or executing process: executable=%s", request.arguments.front().c_str());
+        throw;
     } catch (const std::exception& exception) {
         ASCENDLOGE(
             "Process execution failed with exception: executable=%s message=%s", request.arguments.front().c_str(),

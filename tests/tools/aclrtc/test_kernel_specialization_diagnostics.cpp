@@ -9,6 +9,7 @@
  */
 
 #include "specialization/kernel_specialization_diagnostics.h"
+#include "process_executor.h"
 
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>

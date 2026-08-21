@@ -24,14 +24,14 @@ namespace ascendc {
 namespace {
 namespace fs = boost::filesystem;
 
-bool IsSinglePathComponent(const std::string& namePattern)
+bool IsValidDirectoryNamePrefix(const std::string& directoryNamePrefix)
 {
-    if (namePattern.empty() || namePattern.find('%') == std::string::npos ||
-        namePattern.find('\0') != std::string::npos || namePattern.find('\\') != std::string::npos) {
+    if (directoryNamePrefix.empty() || directoryNamePrefix.find('%') != std::string::npos ||
+        directoryNamePrefix.find('\0') != std::string::npos || directoryNamePrefix.find('\\') != std::string::npos) {
         return false;
     }
-    const fs::path patternPath(namePattern);
-    return patternPath.is_relative() && !patternPath.has_parent_path();
+    const fs::path prefixPath(directoryNamePrefix);
+    return prefixPath.is_relative() && !prefixPath.has_parent_path();
 }
 
 } // namespace
@@ -50,27 +50,22 @@ TemporaryDirectory& TemporaryDirectory::operator=(TemporaryDirectory&& other) no
     if (this == &other) {
         return *this;
     }
-    if (removeAfterDestruction_ && !RemoveNow()) {
-        ASCENDLOGW(
-            "Temporary directory cleanup ownership was not transferred because the previously owned path could not "
-            "be removed: path=%s",
-            ownedDirectoryPath_.c_str());
-        return *this;
-    }
+    TemporaryDirectory previouslyOwnedDirectory(std::move(*this));
     TakeCleanupOwnershipFrom(other);
     return *this;
 }
 
-bool TemporaryDirectory::CreateUniqueUnder(const std::string& parentDirectoryPath, const std::string& namePattern)
+bool TemporaryDirectory::CreateUniqueUnder(
+    const std::string& parentDirectoryPath, const std::string& directoryNamePrefix)
 {
     if (!ownedDirectoryPath_.empty()) {
         ASCENDLOGE("Temporary directory already owns a path: path=%s", ownedDirectoryPath_.c_str());
         return false;
     }
-    if (!IsSinglePathComponent(namePattern)) {
+    if (!IsValidDirectoryNamePrefix(directoryNamePrefix)) {
         ASCENDLOGE(
-            "Temporary directory name pattern must be one path component containing %% placeholders: pattern=%s",
-            namePattern.c_str());
+            "Temporary directory name prefix must be one path component without %% characters: prefix=%s",
+            directoryNamePrefix.c_str());
         return false;
     }
 
@@ -80,11 +75,11 @@ bool TemporaryDirectory::CreateUniqueUnder(const std::string& parentDirectoryPat
         return false;
     }
     boost::system::error_code filesystemError;
-    const fs::path uniqueName = fs::unique_path(namePattern, filesystemError);
+    const fs::path uniqueName = fs::unique_path(directoryNamePrefix + "-%%%%%%%%%%%%%%%%", filesystemError);
     if (filesystemError || uniqueName.empty() || uniqueName.has_parent_path()) {
         ASCENDLOGE(
-            "Failed to generate temporary directory name: parent=%s pattern=%s error=%s",
-            resolvedParentDirectoryPath.c_str(), namePattern.c_str(),
+            "Failed to generate temporary directory name: parent=%s prefix=%s error=%s",
+            resolvedParentDirectoryPath.c_str(), directoryNamePrefix.c_str(),
             filesystemError ? filesystemError.message().c_str() : "invalid generated name");
         return false;
     }

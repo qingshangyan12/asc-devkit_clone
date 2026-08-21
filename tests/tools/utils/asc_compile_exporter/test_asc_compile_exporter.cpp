@@ -373,6 +373,7 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
 {
     ScopedEnvironment temporary("TMPDIR", root_.c_str());
     ScopedEnvironment cannHome("ASCEND_HOME_PATH", nullptr);
+    ScopedEnvironment inheritedMakeFlags("MAKEFLAGS", "--definitely-invalid-option");
     const std::string first = JoinTestPath(root_, "collection/nested/First");
     const std::string second = JoinTestPath(root_, "collection/Second");
     WriteFile(JoinTestPath(first, "resources/kernel.cpp"), "first source");

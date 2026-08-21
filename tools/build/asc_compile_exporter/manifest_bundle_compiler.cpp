@@ -49,7 +49,7 @@ bool CreatePrivateBundleDirectory(const std::string& requestedParentDirectoryPat
         ASCENDLOGE("Failed to prepare bundle work directory parent: path=%s", parentDirectoryPath.c_str());
         return false;
     }
-    return directory.CreateUniqueUnder(absoluteParentDirectoryPath, ".manifest-generator-%%%%%%%%");
+    return directory.CreateUniqueUnder(absoluteParentDirectoryPath, ".manifest-generator");
 }
 
 } // namespace

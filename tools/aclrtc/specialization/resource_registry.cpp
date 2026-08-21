@@ -117,7 +117,7 @@ ResourceStatus CreateRegistryTemporaryRoot(TemporaryDirectory& temporaryRoot)
 {
     const char* environment = std::getenv("TMPDIR");
     const std::string parentDirectoryPath = environment == nullptr || *environment == '\0' ? "/tmp" : environment;
-    if (!temporaryRoot.CreateUniqueUnder(parentDirectoryPath, "aclrtc-resource-%%%%%%%%")) {
+    if (!temporaryRoot.CreateUniqueUnder(parentDirectoryPath, "aclrtc-resource")) {
         ASCENDLOGE("Failed to create compile resource temporary root: parent=%s", parentDirectoryPath.c_str());
         return ResourceStatus::IoError;
     }
@@ -389,7 +389,7 @@ ResourceStatus CreateMaterializedResourceDirectory(
 {
     const std::string categoryParent = FileUtils::JoinPath(temporaryRoot, SourceTypeName(sourceType));
     if (!FileUtils::CreateDirectories(categoryParent) ||
-        !materializedResourceDirectory.CreateUniqueUnder(categoryParent, "materialize-%%%%%%%%%%%%%%%%")) {
+        !materializedResourceDirectory.CreateUniqueUnder(categoryParent, "materialize")) {
         ASCENDLOGE(
             "Failed to create compile resource materialization directory: resource_id=%s source_type=%s parent=%s",
             resourceId.c_str(), SourceTypeName(sourceType), categoryParent.c_str());

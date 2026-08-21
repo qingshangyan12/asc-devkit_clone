@@ -12,9 +12,7 @@
 #define ASCENDC_ACLRTC_KERNEL_SPECIALIZATION_TYPES_H
 
 #include "acl/acl_rt_compile.h"
-#include "process_executor.h"
 
-#include <chrono>
 #include <boost/filesystem/path.hpp>
 #include <cstdint>
 #include <optional>
