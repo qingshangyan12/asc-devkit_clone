@@ -109,6 +109,7 @@ protected:
     {
         SetGCoreType(2);
         KernelRaise::GetInstance().SetRaiseMode(false);
+        OOMInit();
     }
 
     void TearDown() override
@@ -130,8 +131,12 @@ protected:
 
     void ExpectDstStrideRaiseCount(int64_t dstStride, uint64_t expectedRaiseCount)
     {
-        MOCKER(
-            copy_ubuf_to_gm_align_v2, void (*)(void*, void*, uint8_t, uint32_t, uint32_t, uint8_t, uint64_t, uint32_t))
+        MOCKER_CPP(GetSysWorkSpacePtr)
+            .expects(once())
+            .will(returnValue(static_cast<__gm__ uint8_t*>(nullptr)));
+        MOCKER_CPP(
+            copy_ubuf_to_gm_align_v2,
+            void(__gm__ void*, __ubuf__ void*, uint8_t, uint32_t, uint32_t, uint8_t, uint64_t, uint32_t))
             .expects(once());
         uint8_t src = 0;
         uint8_t dst = 0;
