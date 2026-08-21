@@ -74,9 +74,11 @@ target_include_directories(${HCCL_CCU_ST_TARGET} PRIVATE
 )
 
 target_compile_options(${HCCL_CCU_ST_TARGET} PRIVATE
-    -std=c++17
+    -std=c++14
     -O0
     -g
+    -fno-inline
+    -fprofile-update=atomic
     -Wno-unused-variable
     -Wno-unused-parameter
     -Wno-attributes
