@@ -7,18 +7,18 @@
 ## 目录
 
 - [1. 概述](#1-概述)
-- [2. 目录结构](#2-目录结构)
-- [3. 框架分层](#3-框架分层)
-- [4. CcuStScenario — 用例配置](#4-ccustscenario--用例配置)
-- [5. VerifyScenario — 通用流程](#5-verifyscenario--通用流程)
-- [6. 检查机制](#6-检查机制)
-- [7. Program IR 与原语桩](#7-program-ir-与原语桩)
-- [8. Channel 映射机制](#8-channel-映射机制)
-- [9. 多线程执行模型](#9-多线程执行模型)
-- [10. CCU_ELSE 双分支支持](#10-ccu_else-双分支支持)
-- [11. 注册机制](#11-注册机制)
-- [12. AllToAll 用例](#12-alltoall-用例)
-- [13. 新增原语接入指南](#13-新增原语接入指南)
+- [2. MC2 端到端调用栈与交互边界](#2-mc2-端到端调用栈与交互边界)
+- [3. 目录结构](#3-目录结构)
+- [4. 框架分层](#4-框架分层)
+- [5. CcuStScenario — 用例配置](#5-ccustscenario--用例配置)
+- [6. VerifyScenario — 通用流程](#6-verifyscenario--通用流程)
+- [7. 检查机制](#7-检查机制)
+- [8. Program IR 与原语桩](#8-program-ir-与原语桩)
+- [9. Channel 映射机制](#9-channel-映射机制)
+- [10. 多线程执行模型](#10-多线程执行模型)
+- [11. CCU_ELSE 双分支支持](#11-ccu_else-双分支支持)
+- [12. 注册机制](#12-注册机制)
+- [13. AllToAll 用例](#13-alltoall-用例)
 - [14. 新增算法变体接入指南](#14-新增算法变体接入指南)
 - [15. 新增 CCU 硬件原语接入指南](#15-新增-ccu-硬件原语接入指南)
 - [16. 新增通信原语接入指南](#16-新增通信原语接入指南)
@@ -46,7 +46,100 @@ CCU ST 是无硬件仿真测试框架，在 x86 上验证 CCU 算法的正确性
 
 ---
 
-## 2. 目录结构
+## 2. MC2 端到端调用栈与交互边界
+
+### 2.1 MC2 路径概述
+
+MC2 路径不走普通 Host API（`HcclAlltoAllV()`），有独立的 Host 阶段 + Device 阶段：
+
+```
+Phase 1: HcclAllocComResourceByTiling (资源准备 + kernel 注册)
+Phase 2: CcuKernelLaunch (启动 KFC server)
+Phase 3: Device 侧 KFC server 执行微码 → DispatchKfcSubKernel → collective kernel
+```
+
+ST 验证的是 Phase 1（selector → CalcRes → channel → kernel 注册），通过 `HcommCcuKernelRegister` 桥接到 `RegisterManager` 捕获 Program IR。不验证 Phase 2/3（KFC server / 微码 / 硬件）。
+
+### 2.2 端到端调用链（以 AllToAll 为例）
+
+★ = AllToAll 算法交互边界
+
+```
+Phase 1: HcclAllocComResourceByTiling [hccl_mc2.cc]
+│
+├─ AllocCcuOpResCtx                          [hccl_alloc_ctx_res.cc]
+│   分配 workspace/XN/CKE device 内存
+│
+├─ CcuSelectAlg
+│   ├─ SelectAlgAndPrepareEngine
+│   │   → AlltoAllAutoSelector::SelectCcuScheduleAlgo
+│   │     → algName = "CcuAlltoAllMesh1D"
+│   │
+│   └─ GetCcuOpParamResCtx
+│       └─ HcclGetAlgRes                     [op_common.cc]
+│           │
+│           ├─ ★ executor->CalcRes
+│           │   → CcuTempAlltoAllMesh1D::CalcRes
+│           │     ★ kernelFunc = CcuAlltoAllMesh1DKernel
+│           │     ★ kernelArg = CcuKernelArgAlltoAllMesh1D{...}
+│           │
+│           └─ GetAlgResCcu                  [op_common.cc]
+│               ├─ HcclGetChannelForCcu (通用)
+│               │   channel 写入 kernelArg
+│               └─ HcclGetCcuKernel
+│                   ├─ HcommCcuKernelRegisterStart
+│                   ├─ HcommCcuKernelRegister(kernelFunc)
+│                   │   → 桥接到 RegisterManager（查 capture 注册表 → adapter）
+│                   │     → adapter 调真实 CcuAlltoAllMesh1DKernel
+│                   │       → CCU API 被 ccu_primitives_stub 拦截 → Program IR
+│                   └─ HcommCcuKernelRegisterEnd
+│                       → Finalize（IF/ELSE/WHILE 匹配 + LoadArg 排序）
+│
+└─ 返回 kernelHandle
+```
+
+### 2.3 op 交互边界分类
+
+**ops ↔ hcomm 库交界（通用）**：
+
+| 位置 | 代码 | 交界内容 |
+|------|------|---------|
+| `op_common.cc` | `HcommCcuKernelRegister` | ops 把 kernelFunc + kernelArg 交给 hcomm 库 |
+| `op_common.cc` | `HcommCcuKernelRegisterEnd` | hcomm 库完成注册 |
+| `hccl_mc2.cc` | `HcommCcuKernelLaunch` | ops 把 kernelHandle + taskArgs 交给 hcomm 库启动 |
+
+**AllToAll 算法专属交界**：
+
+| 位置 | 交界内容 |
+|------|---------|
+| `ccu_temp_all_to_all_mesh_1D.cc` CalcRes | kernelFunc 函数指针 + kernelArg 构建 |
+| `ccu_kernel_all_to_all_mesh1d.cc` | collective kernel 函数（CCU API 调用） |
+
+### 2.4 selector/executor/template/kernel 关联机制
+
+| 关联 | 机制 | 时机 |
+|------|------|------|
+| opType → selector | `SelectorRegistry` 查表 | 运行时 |
+| 引擎 → SelectXxxAlgo | `AutoSelectorBase::Select` if 分支 | 运行时 |
+| topo+opType → algName | `SelectCcuScheduleAlgo` 条件逻辑 | 运行时 |
+| opType+algName → executor | `CollAlgExecRegistryV2` 查表 | 运行时 |
+| executor → template | `REGISTER_EXEC_V2` 模板参数 | 编译期 |
+| template → kernel | `#include` + 取函数指针 | 编译期 |
+
+selector 和 executor 之间没有直接调用，只通过 algName 字符串间接耦合。
+
+### 2.5 参与的 ops 代码
+
+| 代码 | 作用 | MC2 调用位置 |
+|------|------|-------------|
+| `selector/alltoall_auto_selector.cc` | 选算法 | CcuSelectAlg → SelectAlgAndPrepareEngine |
+| `executor/ins_v2_all_to_all_v_sole_executor.cc` | CalcRes 构建模板 | HcclGetAlgRes → executor->CalcRes |
+| `template/ccu/ccu_temp_all_to_all_mesh_1D.cc` | CalcRes 设置 kernelFunc+kernelArg | executor->CalcRes → template->CalcRes |
+| `template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.cc` | collective kernel 函数 | Register 时执行 |
+
+---
+
+## 3. 目录结构
 
 ```
 tests/api/adv_api/hccl/cc/st/algorithm/
@@ -102,7 +195,7 @@ tests/api/adv_api/hccl/cc/st/algorithm/
 
 ---
 
-## 3. 框架分层
+## 4. 框架分层
 
 ```
 用例层（testcase）
@@ -131,7 +224,7 @@ tests/api/adv_api/hccl/cc/st/algorithm/
 
 ---
 
-## 4. CcuStScenario — 用例配置
+## 5. CcuStScenario — 用例配置
 
 ```cpp
 struct CcuStScenario {
@@ -159,7 +252,7 @@ struct CcuStScenario {
 
 ---
 
-## 5. VerifyScenario — 通用流程
+## 6. VerifyScenario — 通用流程
 
 ```
 VerifyScenario(scenario)
@@ -207,9 +300,9 @@ VerifyScenario(scenario)
 
 ---
 
-## 6. 检查机制
+## 7. 检查机制
 
-### 6.1 保留的检查
+### 7.1 保留的检查
 
 | 编号 | 检查 | 层次 | 实现位置 | 说明 |
 |------|------|------|---------|------|
@@ -222,7 +315,7 @@ VerifyScenario(scenario)
 | D2 | 逐字节比对 | 通用 | `CheckRuntimeOutput`（utils） | 实际 output vs 期望 output |
 | DAG | 内存冲突检测 | 通用 | `CcuDagChecker`（utils） | WAW/WAR/RAR 无同步冲突 |
 
-### 6.2 去掉的检查
+### 7.2 去掉的检查
 
 以下检查已去掉，由 R2（运行时执行）和 D2（逐字节比对）间接覆盖：
 
@@ -231,7 +324,7 @@ VerifyScenario(scenario)
 - taskArgs 数量/mission 绑定（R2 越界覆盖）
 - CheckCompleted（和 R2 重复）
 
-### 6.3 死锁精确定位
+### 7.3 死锁精确定位
 
 R2 死锁时输出每个 rank 卡在哪个 operation：
 
@@ -245,9 +338,9 @@ deadlock detected:
 
 ---
 
-## 7. Program IR 与原语桩
+## 8. Program IR 与原语桩
 
-### 7.1 OpCode
+### 8.1 OpCode
 
 ```cpp
 enum class OpCode {
@@ -262,7 +355,7 @@ enum class OpCode {
 };
 ```
 
-### 7.2 录制
+### 8.2 录制
 
 产品 kernel 代码的 CCU API 调用被 `ccu_primitives_stub` 拦截，转成 `Operation` 追加到 `Program::operations[]`：
 
@@ -275,7 +368,7 @@ CCU_ELSE                           → Operation{ELSE_BEGIN} + body + Operation{
 CCU_WHILE(cond)                    → Operation{WHILE_BEGIN} + body + Operation{WHILE_END}
 ```
 
-### 7.3 RuntimeWorld 执行
+### 8.3 RuntimeWorld 执行
 
 轮询调度，每轮每个 rank 执行一条 operation：
 
@@ -290,13 +383,13 @@ CCU_WHILE(cond)                    → Operation{WHILE_BEGIN} + body + Operation
 
 ---
 
-## 8. Channel 映射机制
+## 9. Channel 映射机制
 
-### 8.1 问题
+### 9.1 问题
 
 ST 的 channel handle 是 `SimChannel*` 裸指针。RuntimeWorld/checker 需要从 handle 反查 localRank/remoteRank。
 
-### 8.2 方案
+### 9.2 方案
 
 框架提供统一的 `RegisterChannelMap`：
 
@@ -328,9 +421,9 @@ for (uint32_t i = 0; i < src->channelCount; ++i) {
 
 ---
 
-## 9. 多线程执行模型
+## 10. 多线程执行模型
 
-### 9.1 设计
+### 10.1 设计
 
 `VerifyScenario` 里每个 rank 一个 `std::thread`，并发执行 `RegisterKernelForRank`：
 
@@ -344,11 +437,11 @@ for (uint32_t rank = 0; rank < rankSize; ++rank) {
 for (auto &thread : threads) { thread.join(); }
 ```
 
-### 9.2 与非 CCU 路径统一
+### 10.2 与非 CCU 路径统一
 
 CCU 和非 CCU 都用 `ChannelCommCreate`（轮询配对方式），不用 `ChannelCommCreateForCcu`（已删除）。
 
-### 9.3 线程安全
+### 10.3 线程安全
 
 - `RegisterManager`：`mutex_` 保护 `kernels_`/`instances_`，`channelMapMutex_` 保护 `channelMap_`
 - `GetLastCompiledGroup`：用 `thread_local` 避免多 rank 覆盖
@@ -356,7 +449,7 @@ CCU 和非 CCU 都用 `ChannelCommCreate`（轮询配对方式），不用 `Chan
 - `SimChannelExchangeHandler`：已有 `mutex_`
 - `SimWorld`：Init 一次后不修改，并发读安全
 
-### 9.4 生命周期
+### 10.4 生命周期
 
 - `SimWorld::Init` 在 `VerifyScenario` 开头调一次
 - `CleanupHostEnv` 只删 `comm`（不 Deinit SimWorld）
@@ -364,13 +457,13 @@ CCU 和非 CCU 都用 `ChannelCommCreate`（轮询配对方式），不用 `Chan
 
 ---
 
-## 10. CCU_ELSE 双分支支持
+## 11. CCU_ELSE 双分支支持
 
-### 10.1 问题
+### 11.1 问题
 
 原 `CCU_ELSE` 是 `if(false)`，ELSE body 不录制。当 `remaining==0`（如 sliceSize=0 或 256MB 整数倍）时，ELSE body 的 `EventRecord` 丢失，`EventWait` 死等。
 
-### 10.2 修复
+### 11.2 修复
 
 `CCU_ELSE` 改为用 `ControlScope(isElse=true)` 录制 `ELSE_BEGIN` + body + `IF_END`。
 
@@ -386,9 +479,9 @@ RuntimeWorld 执行：
 
 ---
 
-## 11. 注册机制
+## 12. 注册机制
 
-### 11.1 Capture 注册
+### 12.1 Capture 注册
 
 adapter 静态初始化时注册 kernel 名 → capture 函数 + arg 转换器：
 
@@ -404,7 +497,7 @@ bool g_registered = []() {
 
 `HcommCcuKernelRegister` 按 `kernelFuncName` 查注册表，自动调 capture。
 
-### 11.2 Variant 注册
+### 12.2 Variant 注册
 
 原语级类提供 `RegisterVariant`，算法级 builder 注册：
 
@@ -419,9 +512,9 @@ CcuStAllToAll::RegisterVariant("CcuAlltoAllMesh1D",
 
 ---
 
-## 12. AllToAll 用例
+## 13. AllToAll 用例
 
-### 12.1 用例清单
+### 13.1 用例清单
 
 | 分组 | 用例名 | Topo | DataType | DataSize |
 |------|--------|------|----------|----------|
@@ -440,7 +533,7 @@ CcuStAllToAll::RegisterVariant("CcuAlltoAllMesh1D",
 | 负向 | Negative_OutputCorruption_2Rank_SingleDie_Fp16_80B | {{{0,1}}} | FP16 | 80B |
 | 强制算法 | ForcedAlg_2Rank_SingleDie_Fp16_100B | {{{0,1}}} | FP16 | 100B |
 
-### 12.2 用例写法
+### 13.2 用例写法
 
 ```cpp
 TEST_F(CcuStAllToAll, Mesh1D_2Rank_SingleDie_Fp16_100B)
