@@ -20,8 +20,9 @@
 - [12. AllToAll 用例](#12-alltoall-用例)
 - [13. 新增原语接入指南](#13-新增原语接入指南)
 - [14. 新增算法变体接入指南](#14-新增算法变体接入指南)
-- [15. 新增原语接入指南](#15-新增原语接入指南)
-- [16. 边界声明](#16-边界声明)
+- [15. 新增 CCU 硬件原语接入指南](#15-新增-ccu-硬件原语接入指南)
+- [16. 新增通信原语接入指南](#16-新增通信原语接入指南)
+- [17. 边界声明](#17-边界声明)
 
 ---
 
@@ -501,23 +502,31 @@ TEST_F(CcuStAllToAll, Mesh2Die_4Rank_Fp16_64B)
 
 ---
 
-## 15. 新增原语接入指南
+## 15. 新增 CCU 硬件原语接入指南
 
-以 AllGather 为例，加新原语需要改 utils（框架）+ testcase（原语+算法）：
+CCU 硬件原语是 `ccu::Write`、`ccu::Notify`、`ccu::LocalCopy` 等底层操作。如果产品代码新增了 CCU 硬件原语（如 `ccu::Scatter`），需要扩展框架（utils）：
 
-### 15.1 框架层（utils）— 加新原语
-
-如果产品代码新增了 `ccu::Scatter` 等原语：
+### 15.1 框架层改动
 
 | 文件 | 改动 |
 |------|------|
-| `ccu_st_types.h` | `OpCode` 加 `SCATTER` |
+| `ccu_st_types.h` | `OpCode` 加新值（如 `SCATTER`） |
 | `ccu_primitives_stub.h` | 加 `Result Scatter(...)` 声明 |
-| `ccu_primitives_stub.cc` | 实现 stub：拦截 → 追加 `Operation{SCATTER}` |
-| `ccu_sim_world.cc` | `ExecuteOne` 加 `case OpCode::SCATTER` |
-| `ccu_checker.cc` | `CcuLogicalResourceChecker` 加 `case OpCode::SCATTER` |
+| `ccu_primitives_stub.cc` | 实现 stub：拦截调用 → 追加 `Operation{SCATTER}` 到 Program IR |
+| `ccu_sim_world.cc` | `ExecuteOne` 加 `case OpCode::SCATTER` 执行逻辑 |
+| `ccu_checker.cc` | `CcuLogicalResourceChecker` 加 `case OpCode::SCATTER` 资源校验 |
 
-### 15.2 原语层（testcase）— 加新原语
+所有通信原语和算法变体自动获得新 CCU 硬件原语支持。
+
+---
+
+## 16. 新增通信原语接入指南
+
+通信原语是 AllToAll、AllGather、AllReduce、ReduceScatter、Broadcast 等。新增通信原语需要改 testcase（原语层 + 算法层），不改 utils 框架。
+
+以 AllGather 为例：
+
+### 16.1 原语层（testcase）
 
 新建 `testcase/mc2_ccu/all_gather/`：
 
@@ -535,18 +544,21 @@ all_gather/
 - `PrepareOpParam` — 填 `opParam.DataDes.count` / `opParam.DataDes.dataType`
 - `RegisterVariant` — 注册算法变体
 
+### 16.2 算法层（testcase）
+
 算法级实现：
 - `BuildMesh1DScenario` — 填 `ScenarioData` 的 `srcOffsets`/`dstOffsets` 矩阵
 - `CaptureAllGatherMesh1DKernel` — 录制 IR
 - `ConvertAllGatherArg` — 产品 arg → ST config
+- 静态注册 `RegisterCaptureFunction` + `RegisterVariant`
 
-### 15.3 期望输出计算
+### 16.3 期望输出计算
 
-`CaptureRuntimeExpectation`（utils 通用）按 `ScenarioData` 的矩阵搬运数据，不需要各原语实现。如果原语有 reduce 语义，设置 `ScenarioData::reduceOp`（当前预留，未实现 reduce 逻辑）。
+`CaptureRuntimeExpectation`（utils 通用）按 `ScenarioData` 的矩阵搬运数据，不需要各通信原语实现。如果通信原语有 reduce 语义（如 ReduceScatter），设置 `ScenarioData::reduceOp`（当前预留，未实现 reduce 逻辑）。
 
 ---
 
-## 16. 边界声明
+## 17. 边界声明
 
 ### 16.1 覆盖
 
