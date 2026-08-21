@@ -75,13 +75,6 @@ enum class asc_relu_pre_mode : uint8_t {
 
 using asc_quant_mode = QuantMode_t;
 
-enum class asc_position_quarter_mode {
-    DISPERSE_FIRST_QUARTER = 0,
-    DISPERSE_SECOND_QUARTER,
-    DISPERSE_THIRD_QUARTER,
-    DISPERSE_FOURTH_QUARTER
-};
-
 constexpr std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
     ASC_DISPERSE_FIRST_QUARTER;
 constexpr std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER>
