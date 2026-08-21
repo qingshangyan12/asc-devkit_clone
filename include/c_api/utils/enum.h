@@ -69,10 +69,8 @@ enum class asc_relu_pre_mode : uint8_t {
     NONE = 0,
     NORMAL = 1,
     SCALAR = 2,
-<<<<<<< HEAD
-    VECTOR = 3
-=======
     VECTOR = 3,
+    PIECEWISE_LINEAR = 4
 };
 
 using asc_quant_mode = QuantMode_t;
@@ -89,7 +87,6 @@ enum class asc_position_quarter_mode {
     DISPERSE_SECOND_QUARTER,
     DISPERSE_THIRD_QUARTER,
     DISPERSE_FOURTH_QUARTER
->>>>>>> ccaaad7d3 (修改入参类型)
 };
 
 constexpr std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
