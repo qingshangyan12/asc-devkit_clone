@@ -8,15 +8,17 @@
 # See LICENSE in the root of the software repository for the full text of the license.
 
 import sys
+from pathlib import Path
 
 import numpy as np
 
 
 def main() -> None:
-    if len(sys.argv) != 3:
-        raise ValueError("Usage: verify_result.py <output> <golden>")
-    actual = np.fromfile(sys.argv[1], dtype=np.uint16)
-    golden = np.fromfile(sys.argv[2], dtype=np.uint16)
+    if len(sys.argv) > 2:
+        raise ValueError("Usage: verify_result.py [output_dir]")
+    output_dir = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("output")
+    actual = np.fromfile(output_dir / "output.bin", dtype=np.uint16)
+    golden = np.fromfile(output_dir / "golden.bin", dtype=np.uint16)
     if actual.shape != golden.shape or not np.array_equal(actual, golden):
         index = int(np.flatnonzero(actual != golden)[0])
         raise ValueError(f"mismatch at index {index}: actual={actual[index]}, golden={golden[index]}")

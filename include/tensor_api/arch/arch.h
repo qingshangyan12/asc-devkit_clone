@@ -24,6 +24,10 @@
 #include "tensor_api/arch/cube/copy_op.h"
 #include "tensor_api/arch/vector/copy_op.h"
 #include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/arch/vector/experimental/basic_arithmetic.h"
+#include "tensor_api/arch/vector/experimental/logical_compute.h"
+#include "tensor_api/arch/vector/experimental/composite_compute.h"
+#include "tensor_api/arch/vector/experimental/histogram_compute.h"
 #include "tensor_api/arch/vector/experimental/MaskReg_compute.h"
 #include "tensor_api/arch/vector/experimental/data_reorder.h"
 

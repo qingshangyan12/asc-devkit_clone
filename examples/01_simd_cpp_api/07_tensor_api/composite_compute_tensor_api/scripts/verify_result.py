@@ -8,27 +8,33 @@
 # See LICENSE in the root of the software repository for the full text of the license.
 
 import sys
+from pathlib import Path
 
 import numpy as np
 
 
-ROWS = 5
-VECTOR_LENGTH = 64
+cases = (
+    ("half", np.float16, 1e-3, 1e-3),
+    ("float", np.float32, 1e-4, 1e-4),
+)
 
 
 def main() -> None:
-    if len(sys.argv) != 3:
-        raise ValueError("Usage: verify_result.py <output> <golden>")
-    actual = np.fromfile(sys.argv[1], dtype=np.float32).reshape(ROWS, VECTOR_LENGTH)
-    golden = np.fromfile(sys.argv[2], dtype=np.float32).reshape(ROWS, VECTOR_LENGTH)
-    matches = np.isclose(actual, golden, rtol=1e-4, atol=1e-4)
-    matches[2] = np.isclose(actual[2], golden[2], rtol=5e-3, atol=5e-3)
-    if not np.all(matches):
-        row, lane = np.argwhere(~matches)[0]
-        raise ValueError(
-            f"mismatch at row {row}, lane {lane}: actual={actual[row, lane]}, golden={golden[row, lane]}"
-        )
-    print(f"test pass! max absolute error: {np.max(np.abs(actual - golden)):.9g}")
+    if len(sys.argv) > 2:
+        raise ValueError("Usage: verify_result.py [output_dir]")
+    output_dir = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("output")
+    golden_dir = output_dir
+    for name, dtype, rtol, atol in cases:
+        actual = np.fromfile(output_dir / f"{name}_output.bin", dtype=dtype)
+        golden = np.fromfile(golden_dir / f"{name}_golden.bin", dtype=dtype)
+        if actual.shape != golden.shape:
+            raise ValueError(f"{name}: expected shape {golden.shape}, got {actual.shape}")
+        matches = np.isclose(actual, golden, rtol=rtol, atol=atol)
+        if np.all(matches):
+            continue
+        index = int(np.flatnonzero(~matches)[0])
+        raise ValueError(f"{name}: mismatch at index {index}, actual={actual[index]}, golden={golden[index]}")
+    print("test pass! verified fma for half and float.")
 
 
 if __name__ == "__main__":

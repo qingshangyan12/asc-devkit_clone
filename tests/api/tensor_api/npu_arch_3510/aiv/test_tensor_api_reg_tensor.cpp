@@ -14,7 +14,6 @@
 #include <gtest/gtest.h>
 
 #include "tensor_api/stub/cce_stub.h"
-#include "tensor_api/experimental/reg/logical_compute.h"
 #include "tensor_api/tensor.h"
 
 namespace {

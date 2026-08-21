@@ -12,36 +12,27 @@ from pathlib import Path
 import numpy as np
 
 
-VECTOR_LENGTH = 64
+vector_length = 64
+shift_bits = 1
+
+
+def write_case(name: str, data: np.ndarray) -> None:
+    data.tofile(Path("input") / f"{name}_input.bin")
+    np.left_shift(data, shift_bits).astype(data.dtype).tofile(Path("output") / f"{name}_golden.bin")
 
 
 def main() -> None:
-    input_dir = Path("input")
-    output_dir = Path("output")
-    input_dir.mkdir(exist_ok=True)
-    output_dir.mkdir(exist_ok=True)
+    Path("input").mkdir(exist_ok=True)
+    Path("output").mkdir(exist_ok=True)
 
-    src_a = np.arange(VECTOR_LENGTH, dtype=np.int32) - np.int32(24)
-    src_b = (3 * np.arange(VECTOR_LENGTH, dtype=np.int32) + np.int32(1))
-    shifts = (np.arange(VECTOR_LENGTH, dtype=np.int32) % np.int32(4))
-    golden = np.stack(
-        [
-            (src_a == 0).astype(np.int32),
-            src_a & src_b,
-            src_a | np.int32(16),
-            np.int32(7) ^ src_a,
-            src_a << shifts,
-            src_a << np.int32(2),
-            src_a >> shifts,
-            src_a >> np.int32(2),
-        ]
-    ).astype(np.int32)
-
-    src_a.tofile(input_dir / "src_a.bin")
-    src_b.tofile(input_dir / "src_b.bin")
-    shifts.tofile(input_dir / "shifts.bin")
-    golden.tofile(output_dir / "golden.bin")
-    print(f"Generated {golden.shape[0]} logical compute result rows.")
+    indexes = np.arange(vector_length)
+    write_case("int8", indexes.astype(np.int8))
+    write_case("uint8", indexes.astype(np.uint8))
+    write_case("int16", (indexes * 3).astype(np.int16))
+    write_case("uint16", (indexes * 3).astype(np.uint16))
+    write_case("int32", (indexes * 17).astype(np.int32))
+    write_case("uint32", (indexes * 17).astype(np.uint32))
+    print("Generated shift-left input and golden data for six integer types.")
 
 
 if __name__ == "__main__":

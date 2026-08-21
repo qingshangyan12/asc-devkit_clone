@@ -12,31 +12,22 @@ from pathlib import Path
 import numpy as np
 
 
-INPUT_LENGTH = 256
-INITIAL_VALUE = np.uint16(3)
+input_length = 256
+initial_value = np.uint16(3)
 
 
 def main() -> None:
-    input_dir = Path("input")
-    output_dir = Path("output")
-    input_dir.mkdir(exist_ok=True)
-    output_dir.mkdir(exist_ok=True)
+    Path("input").mkdir(exist_ok=True)
+    Path("output").mkdir(exist_ok=True)
 
-    indexes = np.arange(INPUT_LENGTH, dtype=np.uint16)
+    indexes = np.arange(input_length, dtype=np.uint16)
     data = (indexes * np.uint16(37) + indexes % np.uint16(11)).astype(np.uint8)
     frequency = np.bincount(data, minlength=256).astype(np.uint16)
-    golden = np.stack(
-        [
-            frequency[:128] + INITIAL_VALUE,
-            frequency[128:] + INITIAL_VALUE,
-            np.cumsum(frequency[:128], dtype=np.uint16) + INITIAL_VALUE,
-            np.cumsum(frequency, dtype=np.uint16)[128:] + INITIAL_VALUE,
-        ]
-    ).astype(np.uint16)
+    golden = (frequency[:128] + initial_value).astype(np.uint16)
 
-    data.tofile(input_dir / "input.bin")
-    golden.tofile(output_dir / "golden.bin")
-    print("Generated frequency and cumulative histogram results for bin0 and bin1.")
+    data.tofile(Path("input") / "input.bin")
+    golden.tofile(Path("output") / "golden.bin")
+    print("Generated frequency histogram data for low half bins.")
 
 
 if __name__ == "__main__":
