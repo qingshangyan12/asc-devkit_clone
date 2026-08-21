@@ -119,7 +119,7 @@ graph TD
 - 生产级高性能算子开发场景，在追求极致硬件性能的同时，需保障代码的规范性、可维护性与可扩展性。
 
 **参考示例**
-- [基于Tensor API的Matmul示例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_tensor_api/mmad_tensor_api.asc)
+- [基于Tensor API的Matmul示例](../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_tensor_api/mmad_tensor_api.asc)
 
 ### 基础API(Basic API)：轻量化Tensor编程接口（TPipe/TQue自动化资源管理）
 
@@ -182,4 +182,4 @@ graph TD
 
 Ascend C多层级接口设计的核心理念是：让您**始终使用最合适的编程范式，而非被动适应单一抽象**。无论您是追求极致性能的底层专家，还是希望快速验证算法的原型开发者，都能在Ascend C的层级化API生态中找到得心应手的工具。
 
-立即开始您的算子编程之旅！如有疑问，欢迎参考[Ascend C详细文档](https://asc.gitcode.com)或[社区示例](https://gitcode.com/cann/asc-devkit/tree/master/examples)，我们将持续致力于让NPU的强大算力对您触手可及、高效易用。
+立即开始您的算子编程之旅！如有疑问，欢迎参考[Ascend C详细文档](https://asc.gitcode.com)或[社区示例](../../examples)，我们将持续致力于让NPU的强大算力对您触手可及、高效易用。

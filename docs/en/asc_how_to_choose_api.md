@@ -121,7 +121,7 @@ C++-level low-level programming interface for in-depth development of high-perfo
 - Production-grade high-performance operator development scenarios that require guaranteed code standardization, maintainability and scalability while pursuing ultimate hardware performance.
 
 **Reference Examples**
-- [Matmul Example Based on Tensor API](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_tensor_api/mmad_tensor_api.asc)
+- [Matmul Example Based on Tensor API](../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_tensor_api/mmad_tensor_api.asc)
 
 ---
 
@@ -192,4 +192,4 @@ An operator development component library for in-depth customization and ultimat
 
 The core philosophy of Ascend C's multi-layer interface design is to allow you to **always use the most suitable programming paradigm, rather than passively adapting to a single abstraction**. Whether you are a low-level expert pursuing ultimate performance or a prototype developer looking to quickly verify algorithms, you can find the right tools in Ascend C's layered API ecosystem.
 
-Start your operator programming journey now! For questions, please refer to the [Ascend C Detailed Documentation](https://asc.gitcode.com) or [Community Examples](https://gitcode.com/cann/asc-devkit/tree/master/examples). We are continuously committed to making the powerful computing power of NPU accessible and easy to use for you.
+Start your operator programming journey now! For questions, please refer to the [Ascend C Detailed Documentation](https://asc.gitcode.com) or [Community Examples](../../examples). We are continuously committed to making the powerful computing power of NPU accessible and easy to use for you.
