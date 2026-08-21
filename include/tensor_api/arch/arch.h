@@ -23,6 +23,7 @@
 #include "tensor_api/arch/cube/mmad_op.h"
 #include "tensor_api/arch/cube/copy_op.h"
 #include "tensor_api/arch/vector/copy_op.h"
+#include "tensor_api/arch/vector/experimental/reduction_compute.h"
 #include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/arch/vector/experimental/basic_arithmetic.h"
 #include "tensor_api/arch/vector/experimental/logical_compute.h"
@@ -30,6 +31,8 @@
 #include "tensor_api/arch/vector/experimental/histogram_compute.h"
 #include "tensor_api/arch/vector/experimental/MaskReg_compute.h"
 #include "tensor_api/arch/vector/experimental/data_reorder.h"
+#include "tensor_api/arch/vector/experimental/data_padding.h"
+#include "tensor_api/arch/vector/experimental/compare_and_select.h"
 
 #endif // INCLUDE_TENSOR_API_ARCH_ARCH_H
 

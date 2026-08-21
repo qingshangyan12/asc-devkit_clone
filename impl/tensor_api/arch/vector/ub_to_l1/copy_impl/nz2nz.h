@@ -29,27 +29,45 @@ namespace te {
 
 class copy_ub_to_l1_nz : private copy_ub_to_l1_common {
 public:
-    template <const copy_ub_to_l1_trait& trait, typename T, typename U>
-    __aicore__ inline static void run(const T& dst, const U& src)
+    template <const ub_to_l1_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src)
     {
-        data_copy_impl<trait, T, U>(dst, src);
+        data_copy_impl<trait, DstTensor, SrcTensor>(dst, src);
+    }
+
+    template <const ub_to_l1_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord,
+        typename ShapeType>
+    __aicore__ inline static void run(const T& dst, const U& src, const DstCoord& dst_coord,
+        const SrcCoord& src_coord, const ShapeType& copy_shape)
+    {
+        check_template<trait, T, U>();
+        using src_type = typename U::element_type;
+        using dst_type = typename T::element_type;
+        auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
+        auto block_count = get_shape_batch_size(src_shape) *
+            Std::ceil_division(get_shape_columns(src_shape), c0_element<src_type>);
+        auto block_len = get_shape_rows(src_shape);
+        auto src_stride = get_column_stride(src.layout()) / c0_element<src_type> - block_len;
+        auto dst_stride = get_column_stride(dst.layout()) / c0_element<dst_type> - block_len;
+        emit_copy(dst, src, dst.layout()(dst_coord), src.layout()(src_coord), block_count, block_len,
+            src_stride, dst_stride);
     }
 
 private:
-    template <const copy_ub_to_l1_trait& trait, typename T, typename U>
+    template <const ub_to_l1_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static constexpr void check_template()
     {
-        check_layout_pattern<U, T>();
-        check_data_type::check_ub_to_l1_data_type<T, U>();
+        check_layout_pattern<SrcTensor, DstTensor>();
+        check_data_type::check_ub_to_l1_data_type<DstTensor, SrcTensor>();
     }
 
-    template <const copy_ub_to_l1_trait& trait, typename T, typename U>
-    __aicore__ inline static void data_copy_impl(const T& dst, const U& src)
+    template <const ub_to_l1_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src)
     {
-        using src_type = typename U::element_type;
-        using dst_type = typename T::element_type;
+        using src_type = typename SrcTensor::element_type;
+        using dst_type = typename DstTensor::element_type;
 
-        check_template<trait, T, U>();
+        check_template<trait, DstTensor, SrcTensor>();
 
         auto dst_layout = dst.layout();
         auto src_layout = src.layout();
@@ -58,9 +76,9 @@ private:
         TENSOR_API_DEBUG_CHECK(debug_check_block_count, block_count, "src column shape size", "copy_ub_to_l1 NZ path");
         uint32_t block_len = get_total_row_shape(src_layout);
         int64_t src_stride =
-            get_element<attr_info::stride, attr_info::column, 1>(src_layout) / C0_ELEMENT<src_type> - block_len;
+            get_element<attr_info::stride, attr_info::column, 1>(src_layout) / c0_element<src_type> - block_len;
         int64_t dst_stride =
-            get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / C0_ELEMENT<dst_type> - block_len;
+            get_element<attr_info::stride, attr_info::column, 1>(dst_layout) / c0_element<dst_type> - block_len;
 
         emit_copy(dst, src, block_count, block_len, src_stride, dst_stride);
     }

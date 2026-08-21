@@ -29,27 +29,44 @@ namespace te {
 
 class copy_ub_to_gm_nd : private copy_ub_to_gm_common {
 public:
-    template <const copy_ub_to_gm_trait& trait, typename T, typename U>
-    __aicore__ inline static void run(const T& dst, const U& src)
+    template <const ub_to_gm_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src)
     {
-        data_copy_impl<trait, T, U>(dst, src);
+        data_copy_impl<trait, DstTensor, SrcTensor>(dst, src);
+    }
+
+    template <const ub_to_gm_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord,
+        typename ShapeType>
+    __aicore__ inline static void run(const T& dst, const U& src, const DstCoord& dst_coord,
+        const SrcCoord& src_coord, const ShapeType& copy_shape)
+    {
+        check_template<trait, T, U>();
+        using src_type = typename U::element_type;
+        using dst_type = typename T::element_type;
+        auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
+        auto block_count = get_shape_rows(src_shape);
+        auto block_len = get_shape_columns(src_shape) * sizeof(src_type);
+        auto src_stride = get_row_stride(src.layout()) * sizeof(src_type);
+        auto dst_stride = get_row_stride(dst.layout()) * sizeof(dst_type);
+        emit_copy(dst, src, dst.layout()(dst_coord), src.layout()(src_coord), block_count, block_len,
+            src_stride, dst_stride);
     }
 
 private:
-    template <const copy_ub_to_gm_trait& trait, typename T, typename U>
+    template <const ub_to_gm_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static constexpr void check_template()
     {
-        check_layout_pattern<U, T>();
-        check_data_type::check_ub_to_gm_data_type<T, U>();
+        check_layout_pattern<SrcTensor, DstTensor>();
+        check_data_type::check_ub_to_gm_data_type<DstTensor, SrcTensor>();
     }
 
-    template <const copy_ub_to_gm_trait& trait, typename T, typename U>
-    __aicore__ inline static void data_copy_impl(const T& dst, const U& src)
+    template <const ub_to_gm_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src)
     {
-        using src_type = typename U::element_type;
-        using dst_type = typename T::element_type;
+        using src_type = typename SrcTensor::element_type;
+        using dst_type = typename DstTensor::element_type;
 
-        check_template<trait, T, U>();
+        check_template<trait, DstTensor, SrcTensor>();
 
         auto dst_layout = dst.layout();
         auto src_layout = src.layout();
