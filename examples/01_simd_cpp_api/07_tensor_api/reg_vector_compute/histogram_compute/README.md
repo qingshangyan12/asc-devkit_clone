@@ -11,7 +11,7 @@
 ## 目录结构介绍
 
 ```plain
-├── histogram_compute_tensor_api
+├── histogram_compute
 │   ├── scripts
 │   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py     // 输出结果校验脚本

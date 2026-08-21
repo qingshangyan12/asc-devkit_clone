@@ -1,8 +1,8 @@
-# Basic Compute Sample Implemented with Tensor API
+# Histogram Compute Sample Implemented with Tensor API
 
 ## Overview
 
-This sample demonstrates the register basic compute API `asc::te::abs` with Tensor API. It covers `int8_t`, `int16_t`, `half`, `int32_t`, and `float`. Each typed input contains 64 elements, and the output stores the absolute value of each input element.
+This sample demonstrates the default mode of the register histogram compute API `asc::te::histograms` with Tensor API, which is low-half frequency counting. It reads 256 `uint8_t` input values and writes 128 `uint16_t` histogram bins.
 
 ## Supported Products
 
@@ -11,33 +11,33 @@ This sample demonstrates the register basic compute API `asc::te::abs` with Tens
 ## Directory Structure
 
 ```plain
-├── basic_arithmetic_tensor_api
+├── histogram_compute
 │   ├── scripts
 │   │   ├── gen_data.py          // Generates input and golden data.
 │   │   └── verify_result.py     // Verifies output data.
 │   ├── CMakeLists.txt           // Build project file.
 │   ├── README.md
 │   ├── README_En.md
-│   └── basic_arithmetic_tensor_api.asc  // Ascend C operator implementation and invocation sample.
+│   └── histogram_compute_tensor_api.asc  // Ascend C operator implementation and invocation sample.
 ```
 
 ## Sample Description
 
 - Sample function:
-  The sample computes the absolute value of each input Tensor element:
+  The sample counts the frequency of input values in the low-half range `[0, 127]`. The output initial value is 3:
 
   ```text
-  output_i = abs(input_i)
+  output_i = 3 + count(input_j == i), 0 <= i < 128
   ```
 
 - Sample specification:
   <table>
   <caption>Table 1: Sample input and output specification</caption>
-  <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">basic_arithmetic_tensor_api</td></tr>
+  <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">histogram_compute_tensor_api</td></tr>
   <tr><td rowspan="2" align="center">Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input</td><td align="center">[1, 64]</td><td align="center">int8_t/int16_t/half/int32_t/float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Output</td><td align="center">output</td><td align="center">[1, 64]</td><td align="center">int8_t/int16_t/half/int32_t/float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">basic_arithmetic_tensor_api</td></tr>
+  <tr><td align="center">input</td><td align="center">[1, 256]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Output</td><td align="center">output</td><td align="center">[1, 128]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">histogram_compute_tensor_api</td></tr>
   </table>
 
 - Sample implementation:
@@ -46,9 +46,9 @@ This sample demonstrates the register basic compute API `asc::te::abs` with Tens
 
     1. Create Tensor objects on GM and UB by using `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout`.
     2. Move input data from GM to UB by using `asc::te::make_copy` and `asc::te::copy`.
-    3. Load UB Tensor data as `reg_tensor` by using Tensor `load`, and use `make_mask<mask_pattern::vl64, T>()` to select 64 elements.
-    4. Call `asc::te::abs` and store the result back to UB by using Tensor `store`.
-    5. Move the result from UB back to GM by using `asc::te::copy`.
+    3. Load input data as `reg_tensor<uint8_t>` by using Tensor `load`.
+    4. Initialize the destination `reg_tensor<uint16_t>` to 3 and call `asc::te::histograms` to count low-half frequencies.
+    5. Store the result back to UB by using Tensor `store`, and move it from UB back to GM by using `asc::te::copy`.
 
   - Invocation implementation
 
@@ -56,14 +56,14 @@ This sample demonstrates the register basic compute API `asc::te::abs` with Tens
 
 ## Core Interface
 
-### asc::te::abs
+### asc::te::histograms
 
 ```cpp
-template <typename T>
-__simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg);
+__simd_callee__ inline decltype(auto) histograms(
+    const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src);
 ```
 
-This API computes the absolute value of an input `reg_tensor` and returns a `reg_tensor` with the same element type.
+This API counts low-half frequencies for an input `uint8_t` register and returns a `reg_tensor<uint16_t>` result.
 
 ## Build and Run
 
@@ -100,6 +100,6 @@ Run the following steps in the sample root directory to build and execute the sa
   A successful run prints:
 
   ```text
-  basic_arithmetic_tensor_api executed successfully.
-  test pass! verified abs for int8, int16, half, int32, and float.
+  histogram_compute_tensor_api executed successfully.
+  test pass!
   ```
