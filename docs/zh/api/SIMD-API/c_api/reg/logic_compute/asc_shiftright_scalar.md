@@ -42,6 +42,12 @@ $$
 ## 函数原型
 
 ```c
+// 带返回值
+__simd_callee__ inline vector_<dtype> asc_shiftright_scalar(vector_<dtype> src,
+                                                            int16_t value,
+                                                            vector_bool mask)
+
+// 不带返回值
 __simd_callee__ inline void asc_shiftright_scalar(vector_<dtype>& dst,
                                                   vector_<dtype> src,
                                                   int16_t value,
@@ -76,7 +82,7 @@ __simd_callee__ inline void asc_shiftright_scalar(vector_int8_t& dst,
 
 ## 返回值说明
 
-无
+带返回值的函数原型中返回值为`vector_<dtype>`。
 
 ## 约束说明
 

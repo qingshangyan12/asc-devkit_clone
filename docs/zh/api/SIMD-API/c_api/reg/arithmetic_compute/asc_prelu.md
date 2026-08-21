@@ -40,6 +40,12 @@ $$
 ## 函数原型
 
 ```c
+// 带返回值
+__simd_callee__ inline vector_<dtype> asc_prelu(vector_<dtype> src0,
+                                                vector_<dtype> src1,
+                                                vector_bool mask)
+
+// 不带返回值
 __simd_callee__ inline void asc_prelu(vector_<dtype>& dst,
                                       vector_<dtype> src0,
                                       vector_<dtype> src1,
@@ -74,7 +80,7 @@ __simd_callee__ inline void asc_prelu(vector_half& dst,
 
 ## 返回值说明
 
-无
+带返回值的函数原型中返回值为`vector_<dtype>`。
 
 ## 约束说明
 

@@ -42,6 +42,12 @@ $$
 ## 函数原型
 
 ```c
+// 带返回值
+__simd_callee__ inline vector_<dtype0> asc_shiftright(vector_<dtype0> src0,
+                                                      vector_<dtype1> src1,
+                                                      vector_bool mask)
+
+// 不带返回值
 __simd_callee__ inline void asc_shiftright(vector_<dtype0>& dst,
                                            vector_<dtype0> src0,
                                            vector_<dtype1> src1,
@@ -83,7 +89,7 @@ __simd_callee__ inline void asc_shiftright(vector_uint16_t& dst,
 
 ## 返回值说明
 
-无
+带返回值的函数原型中返回值为`vector_<dtype0>`。
 
 ## 约束说明
 
