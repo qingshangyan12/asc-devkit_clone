@@ -54,13 +54,8 @@ __simd_vf__ inline void IsInfImplVF(__ubuf__ T* dst, __ubuf__ U* src, uint32_t c
         Reg::Duplicate((Reg::RegTensor<uint8_t>&)vReg0, 0u);
         Reg::Duplicate((Reg::RegTensor<uint8_t>&)vReg1, 1u);
     } else {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
         Reg::Duplicate(vReg0, 0.0f);
         Reg::Duplicate(vReg1, 1.0f);
-#else
-        Reg::Duplicate(vReg0, 0.0);
-        Reg::Duplicate(vReg1, 1.0);
-#endif
     }
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = Reg::UpdateMask<U>(count);
