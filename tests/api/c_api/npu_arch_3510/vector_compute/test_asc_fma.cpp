@@ -13,3 +13,7 @@
 TEST_VECTOR_COMPUTE_BINARY_INSTR(AscFma, asc_fma, vmula, vector_bfloat16_t);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(AscFma, asc_fma, vmula, vector_half);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(AscFma, asc_fma, vmula, vector_float);
+TEST_VECTOR_COMPUTE_BINARY_INSTR(AscFma, asc_fma, vmula, vector_int16_t);
+TEST_VECTOR_COMPUTE_BINARY_INSTR(AscFma, asc_fma, vmula, vector_uint16_t);
+TEST_VECTOR_COMPUTE_BINARY_INSTR(AscFma, asc_fma, vmula, vector_int32_t);
+TEST_VECTOR_COMPUTE_BINARY_INSTR(AscFma, asc_fma, vmula, vector_uint32_t);
