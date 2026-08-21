@@ -16,6 +16,7 @@
 │   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py     // 输出结果校验脚本
 │   ├── CMakeLists.txt           // 编译工程文件
+│   ├── data_utils.h             // 数据读写工具
 │   ├── README.md
 │   ├── README_En.md
 │   └── basic_arithmetic_tensor_api.asc  // Ascend C算子实现与调用样例
