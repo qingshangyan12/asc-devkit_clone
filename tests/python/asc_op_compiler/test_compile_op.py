@@ -6016,6 +6016,14 @@ Contents of section
             compile_info,
         )
         self.assertNotEqual(result, "")
+        self.assertIn(
+            "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
+            "    GM_ADDR usrWorkspace = workspace;\n"
+            "#else\n"
+            "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n"
+            "#endif\n",
+            result,
+        )
         with buildcfg.build_config() as cfg:
             cfg.current()["tir.op_debug_config"] = ["oom"]
             result = _gen_set_workspace_codes(
