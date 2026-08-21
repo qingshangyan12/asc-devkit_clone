@@ -1034,3 +1034,83 @@ HcclResult CcuSelectAlg(
 
     return HCCL_SUCCESS;
 }
+
+// CCU路径逐算子资源充足性校验（供CheckOpResSuffient逐tiling调用）：
+// 复用算子选择/层级计算/资源计算全流程得到资源请求，仅查询资源余量是否充足，不申请任何通信资源。
+HcclResult CheckCcuResSuffient(
+    HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex)
+{
+    HCCL_INFO("[CheckCcuResSuffient] start, tilingIndex[%u], opType[%u].", tilingIndex, ccTiling->opType);
+    // 复用现有算子选择的前置校验（算子类型/展开模式等合法性校验）
+    RunCcuSelectAlgCheck(ccTiling, tilingIndex);
+
+    OpParam opParam{};
+    std::string algName;
+    auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    AlgorithmType algorithmType;
+    // 选择CCU算法并填充算子参数（含引擎、数据类型、是否KFC等）
+    CHK_RET(
+        SelectCcuAlgorithm(comm, stream, topoTag, ccTiling, tilingIndex, opParam, algName, topoInfo, algorithmType));
+    opParam.isKfc = true;
+    // 单rank或特殊comm mode场景无需申请资源，直接判定资源充足
+    bool skipGetRes = false;
+    CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
+    if (skipGetRes) {
+        HCCL_INFO("[CheckCcuResSuffient] single rank, resource sufficient, tilingIndex[%u].", tilingIndex);
+        return HCCL_SUCCESS;
+    }
+
+    // 获取算法执行器，用于后续计算层级信息与资源请求
+    std::unique_ptr<InsCollAlgBase> executor = GetAlgExecutorForOp(opParam, algName);
+    CHK_PRT_RET(
+        executor.get() == nullptr,
+        HCCL_ERROR("[CheckCcuResSuffient] fail to find executor for algName[%s].", algName.c_str()), HCCL_E_ALG_NOT_SUPPORTED);
+    // 计算算法拓扑层级信息
+    AlgHierarchyInfoForAllLevel algHierarchyInfo;
+    HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfo(comm, topoInfo.get(), algHierarchyInfo);
+    CHK_PRT_RET(
+        calcHierarchyRet != HCCL_SUCCESS,
+        HCCL_ERROR(
+            "[CheckCcuResSuffient] CalcAlgHierarchyInfo failed, algName[%s], ret[%d].", algName.c_str(),
+            static_cast<int>(calcHierarchyRet)),
+        calcHierarchyRet);
+    // 计算该算子的通信资源请求
+    AlgResourceRequest resRequest;
+    HcclResult calcResRet = executor->CalcRes(comm, opParam, topoInfo.get(), algHierarchyInfo, resRequest);
+    CHK_PRT_RET(
+        calcResRet != HCCL_SUCCESS,
+        HCCL_ERROR(
+            "[CheckCcuResSuffient] CalcRes failed, algName[%s], ret[%d].", algName.c_str(),
+            static_cast<int>(calcResRet)),
+        calcResRet);
+
+    // KFC（Kernel Fusion Communication）场景：补充计算CcuKfcServer的通道资源请求
+    if (opParam.isKfc && opParam.engine == COMM_ENGINE_CCU) {
+        std::unique_ptr<InsCollAlgBase> ccuKfcExecutor =
+            CollAlgExecRegistryV2::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_KFC_SERVER, "CcuKfcServer");
+        CHK_PRT_RET(
+            ccuKfcExecutor.get() == nullptr, HCCL_ERROR("[CheckCcuResSuffient] fail to find CcuKfcServer executor."),
+            HCCL_E_ALG_NOT_SUPPORTED);
+        HcclResult kfcResRet = ccuKfcExecutor->CalcRes(comm, opParam, topoInfo.get(), algHierarchyInfo, resRequest);
+        CHK_PRT_RET(
+            kfcResRet != HCCL_SUCCESS,
+            HCCL_ERROR(
+                "[CheckCcuResSuffient] CcuKfcServer CalcRes failed, algName[%s], ret[%d].", algName.c_str(),
+                static_cast<int>(kfcResRet)),
+            kfcResRet);
+    }
+
+    // 查询CCU通信资源余量是否满足请求，不满足时返回HCCL_E_RES_NOT_SUFFICIENT
+    bool sufficient = true;
+    CHK_RET(HcclQueryCcuResSuffient(resRequest, sufficient));
+    if (!sufficient) {
+        HCCL_WARNING(
+            "[CheckCcuResSuffient] resource insufficient, tilingIndex[%u], opType[%u].", tilingIndex, ccTiling->opType);
+        return HCCL_E_RES_NOT_SUFFICIENT;
+    }
+
+    HCCL_INFO(
+        "[CheckCcuResSuffient] finish, tilingIndex[%u], algName[%s], resource sufficient.", tilingIndex,
+        algName.c_str());
+    return HCCL_SUCCESS;
+}
