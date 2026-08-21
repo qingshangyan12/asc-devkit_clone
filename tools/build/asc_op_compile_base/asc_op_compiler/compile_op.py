@@ -23,6 +23,8 @@ import re
 import shutil
 import sys
 import struct
+from dataclasses import dataclass
+from typing import Optional
 from asc_op_compile_base.common.ccec import CCECInfo
 from asc_op_compile_base.asc_op_compiler.cce_runtime import tvm_callback_cce_postproc
 from asc_op_compile_base.common.buildcfg import get_current_build_config
@@ -129,12 +131,9 @@ from .super_kernel_sub_op_compile import (
 )
 from .static_compile_resource_id import generate_and_write_resource_id
 from .static_compile_resource_generator import (
-    ManifestGenerationRequest,
-    ConstantInfoRecord,
-    KernelCompileRecordBuildRequest,
-    KernelCompileRecordBuilder,
     SkBindCommandSpec,
-    StaticCompileResourceGenerator,
+    StaticCompileManifestContext,
+    generate_static_compile_manifest,
 )
 from .super_kernel_constants import SuperKernelStreamFusionMode
 from .super_kernel_option_parse import parse_super_kernel_options
@@ -1765,119 +1764,163 @@ def compile_sk_bind(
     return sk_bind_dst_file
 
 
-def record_sk_manifest_commands(
-    compile_info,
-    compile_option_tuple,
-    basic_compile_info,
-    op_info,
-    infered_info_from_ifile,
-    tiling_info,
-    distinct_tag,
-    kernel_meta_dir,
-):
+@dataclass(frozen=True)
+class SkManifestCommandContext:
+    compile_info: CompileInfo
+    compile_option_tuple: object
+    basic_compile_info: CompileInfo
+    op_info: OpInfo
+    infered_info_from_ifile: InferChannelParamsFromIFile
+    tiling_info: TilingInfo
+    distinct_tag: str
+    kernel_meta_dir: str
+
+
+@dataclass
+class StaticManifestCompileState:
+    enabled: bool
+    record_sk_commands: bool
+    kernel_spec_dir: Optional[str]
+    compile_info: CompileInfo
+    basic_compile_info: CompileInfo
+    sk_compile_info: Optional[CompileInfo] = None
+    sk_compile_option_tuple: Optional[CompileOptionTuple] = None
+    resource_id: Optional[str] = None
+    sk_cap_bitmap: Optional[int] = None
+
+
+def record_sk_manifest_commands(context: SkManifestCommandContext):
+    compile_info = context.compile_info
+    basic_compile_info = context.basic_compile_info
     basic_compile_info.global_kernel_symbols = [
         spec.compiled_symbol for spec in basic_compile_info.recorded_compile_commands
     ]
     global_var_storage.set_variable("ascendc_enable_super_kernel", True)
     global_var_storage.set_variable("ascendc_sk_double_compile", True)
     global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", False)
-    DFXSectionGenerator().dfx_info_reset(op_info)
-    DFXSectionGenerator().update_is_support(op_info)
+    DFXSectionGenerator().dfx_info_reset(context.op_info)
+    DFXSectionGenerator().update_is_support(context.op_info)
     compile_info.raw_tiling_key_kernel_type = copy.deepcopy(
         compile_info.tiling_key_kernel_type
     )
-    handle_sk_codegen_options(compile_info, infered_info_from_ifile)
+    handle_sk_codegen_options(compile_info, context.infered_info_from_ifile)
     workspace_idx = gen_op_stub_kernel_func(
         compile_info,
-        op_info,
-        compile_option_tuple,
-        tiling_info,
-        distinct_tag,
-        kernel_meta_dir,
+        context.op_info,
+        context.compile_option_tuple,
+        context.tiling_info,
+        context.distinct_tag,
+        context.kernel_meta_dir,
     )
     handle_compile_options(
-        compile_info, compile_option_tuple, tiling_info, workspace_idx
+        compile_info,
+        context.compile_option_tuple,
+        context.tiling_info,
+        workspace_idx,
     )
-    compile_kernel_and_meta(compile_info, op_info, compile_option_tuple, tiling_info)
+    compile_kernel_and_meta(
+        compile_info,
+        context.op_info,
+        context.compile_option_tuple,
+        context.tiling_info,
+    )
     compile_info.global_kernel_symbols = [
         spec.compiled_symbol for spec in compile_info.recorded_compile_commands
     ]
     compile_sk_bind(
         compile_info,
         basic_compile_info,
-        compile_option_tuple,
-        kernel_meta_dir,
+        context.compile_option_tuple,
+        context.kernel_meta_dir,
     )
     return _get_sk_cap_bitmap(compile_info, basic_compile_info.global_kernel_symbols)
 
 
-def generate_static_compile_manifest(
-    cce_file,
-    origin_func_name,
-    kernel_spec_dir,
-    resource_id,
-    compile_info,
-    basic_compile_info,
-    sk_compile_info,
-    sk_cap_bitmap,
-    tiling_info,
-    workspace_idx,
+def _prepare_static_manifest_compile_state(
+    compile_info, compile_option_tuple, tiling_info
 ):
-    metadata_json_path = os.path.join(
-        os.path.dirname(compile_info.dst_file), compile_info.kernel_name + ".json"
+    is_sk_double_compile = (
+        get_context().get_addition("super_kernel_sub_combine") is True
+        and global_var_storage.get_variable("ascendc_enable_super_kernel") is True
     )
-    manifest_tiling_size = tiling_info.default_tiling_size
-    if manifest_tiling_size <= 0:
-        manifest_tiling_size = compile_info.static_compile_tiling_size
-    manifest_tiling_sizes = dict(tiling_info.tiling_key_data_size)
-    manifest_tiling_sizes.update(compile_info.static_compile_tiling_key_data_size)
-    kernel_records = KernelCompileRecordBuilder(
-        KernelCompileRecordBuildRequest(
-            basic_compile_info=basic_compile_info,
-            sk_compile_info=sk_compile_info,
-            metadata_json_path=metadata_json_path,
-            constant_infos=(
-                ConstantInfoRecord(
-                    name="tiling_data",
-                    parameter_index=workspace_idx + 1,
-                    byte_size=manifest_tiling_size,
-                    template_path=tiling_info.tiling_data_file_path,
-                    template="@@STATIC_VALUE_tiling_data@@",
-                ),
-            ),
-            constant_info_size_by_tiling_key={"tiling_data": manifest_tiling_sizes},
-        )
-    ).build()
-    kernel_output_dir = os.path.join(kernel_spec_dir, compile_info.kernel_name)
-    manifest_name = f"{compile_info.kernel_name}_manifest.json"
-    return StaticCompileResourceGenerator(
-        ManifestGenerationRequest(
+    kernel_spec_mode = get_context().get_addition("kernel_spec_mode") or "None"
+    kernel_spec_dir = get_context().get_addition("kernel_spec_dir")
+    manifest_requested = kernel_spec_mode in {"Normal", "SK"}
+    enabled = manifest_requested and not tiling_info.static_shape_flag
+    if enabled:
+        if not (CommonUtility.is_v220() or CommonUtility.is_c310()):
+            raise_tbe_python_err(
+                TBE_DEFAULT_PYTHON_ERROR_CODE,
+                "Kernel Spec only supports v220 and c310 architectures.",
+            )
+        if not kernel_spec_dir:
+            raise_tbe_python_err(
+                TBE_DEFAULT_PYTHON_ERROR_CODE,
+                "kernel_spec_dir is required when kernel_spec_mode is Normal or SK.",
+            )
+
+    record_sk_commands = enabled and kernel_spec_mode == "SK" and is_sk_double_compile
+    state = StaticManifestCompileState(
+        enabled=enabled,
+        record_sk_commands=record_sk_commands,
+        kernel_spec_dir=kernel_spec_dir,
+        compile_info=compile_info,
+        basic_compile_info=compile_info,
+    )
+    if not record_sk_commands:
+        return state
+
+    state.sk_compile_info = copy.deepcopy(compile_info)
+    state.sk_compile_option_tuple = copy.deepcopy(compile_option_tuple)
+    state.sk_compile_info.record_compile_commands = True
+    state.sk_compile_info.execute_compile_commands = False
+    # Run the normal workflow first. The original SK workflow is replayed
+    # after the normal object is complete to record commands only.
+    global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+    global_var_storage.set_variable("ascendc_sk_double_compile", False)
+    global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
+    return state
+
+
+def _select_static_manifest_basic_compile_info(
+    state, compile_info_origin, compile_option_tuple_origin
+):
+    if compile_option_tuple_origin is not None:
+        state.basic_compile_info = compile_info_origin
+    if state.enabled:
+        state.basic_compile_info.record_compile_commands = True
+
+
+def _write_static_manifest_resource_id(state):
+    if state.enabled:
+        state.resource_id = generate_and_write_resource_id(state.compile_info.dst_file)
+
+
+def _finalize_static_compile_manifest(
+    state, command_context, tiling_info, workspace_idx
+):
+    if not state.enabled:
+        return
+    if state.record_sk_commands:
+        state.sk_cap_bitmap = record_sk_manifest_commands(command_context)
+    generate_static_compile_manifest(
+        StaticCompileManifestContext(
             soc_version=global_var_storage.get_variable("ascendc_short_soc_version"),
-            resource_id=resource_id,
-            source_file_path=cce_file,
-            origin_func_name=origin_func_name,
-            output_dir=kernel_output_dir,
-            manifest_name=manifest_name,
-            kernels=kernel_records,
-            sk_cap_bitmap=sk_cap_bitmap,
-            sk_kernel_attribute=(
-                sk_compile_info.global_kernel_attribute
-                if sk_compile_info is not None
-                else ""
-            ),
-            basic_kernel_attribute=(
-                basic_compile_info.global_kernel_attribute
-                if sk_compile_info is not None
-                else ""
-            ),
-            sk_bind_command=(
-                sk_compile_info.recorded_sk_bind_commands[0]
-                if sk_compile_info is not None
-                and sk_compile_info.recorded_sk_bind_commands
-                else None
-            ),
+            kernel_spec_dir=state.kernel_spec_dir,
+            resource_id=state.resource_id,
+            compile_info=state.compile_info,
+            basic_compile_info=state.basic_compile_info,
+            tiling_info=tiling_info,
+            workspace_idx=workspace_idx,
+            sk_compile_info=state.sk_compile_info,
+            sk_cap_bitmap=state.sk_cap_bitmap,
         )
-    ).generate()
+    )
+
+
+def _remove_static_manifest_temp_file(state):
+    if state.record_sk_commands:
+        CommonUtility.remove_temp_file(state.sk_compile_info.gen_kernel_func_file)
 
 
 def compile_op_common_part(
@@ -2012,34 +2055,9 @@ def compile_op_common_part(
     compile_info.default_kernel_type = infered_info_from_ifile.default_kernel_type
     compile_info.dump_info = {"dump_type": "", "dump_size": 1024}
 
-    is_sk_double_compile = (
-        get_context().get_addition("super_kernel_sub_combine") is True
-        and global_var_storage.get_variable("ascendc_enable_super_kernel") is True
+    static_manifest_state = _prepare_static_manifest_compile_state(
+        compile_info, compile_option_tuple, tiling_info
     )
-    kernel_spec_mode = get_context().get_addition("kernel_spec_mode") or "None"
-    kernel_spec_dir = get_context().get_addition("kernel_spec_dir")
-    generate_normal_manifest = kernel_spec_mode == "Normal"
-    generate_sk_manifest = kernel_spec_mode == "SK"
-    manifest_requested = generate_normal_manifest or generate_sk_manifest
-    enable_static_manifest = manifest_requested and not tiling_info.static_shape_flag
-    if enable_static_manifest:
-        if not (CommonUtility.is_v220() or CommonUtility.is_c310()):
-            raise_tbe_python_err(
-                TBE_DEFAULT_PYTHON_ERROR_CODE,
-                "Kernel Spec only supports v220 and c310 architectures.",
-            )
-        if not kernel_spec_dir:
-            raise_tbe_python_err(
-                TBE_DEFAULT_PYTHON_ERROR_CODE,
-                "kernel_spec_dir is required when kernel_spec_mode is Normal or SK.",
-            )
-    record_sk_commands = (
-        enable_static_manifest and generate_sk_manifest and is_sk_double_compile
-    )
-    basic_compile_info = compile_info
-    sk_compile_info = None
-    sk_compile_option_tuple = None
-    sk_cap_bitmap = None
 
     # generate tiling struct size, dfx section
     if global_var_storage.get_variable("ascendc_tiling_no_register"):
@@ -2058,16 +2076,6 @@ def compile_op_common_part(
 
     compile_info_origin = CompileInfo()
     compile_option_tuple_origin = None
-    if record_sk_commands:
-        sk_compile_info = copy.deepcopy(compile_info)
-        sk_compile_option_tuple = copy.deepcopy(compile_option_tuple)
-        sk_compile_info.record_compile_commands = True
-        sk_compile_info.execute_compile_commands = False
-        # Run the normal workflow first. The original SK workflow is replayed
-        # by record_sk_manifest_commands after the normal object is complete.
-        global_var_storage.set_variable("ascendc_enable_super_kernel", False)
-        global_var_storage.set_variable("ascendc_sk_double_compile", False)
-        global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
     if (
         get_context().get_addition("super_kernel_sub_combine") is True
         and global_var_storage.get_variable("ascendc_enable_super_kernel") is True
@@ -2075,10 +2083,9 @@ def compile_op_common_part(
         global_var_storage.set_variable("ascendc_sk_double_compile", True)
         compile_info_origin = copy.deepcopy(compile_info)
         compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
-    if compile_option_tuple_origin is not None:
-        basic_compile_info = compile_info_origin
-    if enable_static_manifest:
-        basic_compile_info.record_compile_commands = True
+    _select_static_manifest_basic_compile_info(
+        static_manifest_state, compile_info_origin, compile_option_tuple_origin
+    )
 
     # dump ktype handle
     compile_info.raw_tiling_key_kernel_type = copy.deepcopy(
@@ -2160,9 +2167,7 @@ def compile_op_common_part(
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", False)
         DFXSectionGenerator().update_is_support(op_info)
 
-    resource_id = None
-    if enable_static_manifest:
-        resource_id = generate_and_write_resource_id(compile_info.dst_file)
+    _write_static_manifest_resource_id(static_manifest_state)
 
     # generate opinfo json
     _json_post_process(
@@ -2173,36 +2178,28 @@ def compile_op_common_part(
         output_gen_placehoder,
         compile_log_path,
     )
-    if record_sk_commands:
-        # Replay the original SK path to record Kernel and sk-bind commands only.
-        sk_cap_bitmap = record_sk_manifest_commands(
-            sk_compile_info,
-            sk_compile_option_tuple,
-            basic_compile_info,
-            op_info,
-            infered_info_from_ifile,
-            tiling_info,
-            distinct_tag,
-            kernel_meta_dir,
+    sk_manifest_command_context = None
+    if static_manifest_state.record_sk_commands:
+        sk_manifest_command_context = SkManifestCommandContext(
+            compile_info=static_manifest_state.sk_compile_info,
+            compile_option_tuple=static_manifest_state.sk_compile_option_tuple,
+            basic_compile_info=static_manifest_state.basic_compile_info,
+            op_info=op_info,
+            infered_info_from_ifile=infered_info_from_ifile,
+            tiling_info=tiling_info,
+            distinct_tag=distinct_tag,
+            kernel_meta_dir=kernel_meta_dir,
         )
-    if enable_static_manifest:
-        generate_static_compile_manifest(
-            cce_file,
-            origin_func_name,
-            kernel_spec_dir,
-            resource_id,
-            compile_info,
-            basic_compile_info,
-            sk_compile_info,
-            sk_cap_bitmap,
-            tiling_info,
-            workspace_idx,
-        )
+    _finalize_static_compile_manifest(
+        static_manifest_state,
+        sk_manifest_command_context,
+        tiling_info,
+        workspace_idx,
+    )
     if not global_var_storage.get_variable("ascendc_compile_debug_config"):
         tiling_info.remove_file()
         CommonUtility.remove_temp_file(compile_info.gen_kernel_func_file)
-        if record_sk_commands:
-            CommonUtility.remove_temp_file(sk_compile_info.gen_kernel_func_file)
+        _remove_static_manifest_temp_file(static_manifest_state)
         CommonUtility.remove_temp_file(compile_info.tiling_and_dfx_utils_file)
     CommonUtility.print_compile_log(
         "",

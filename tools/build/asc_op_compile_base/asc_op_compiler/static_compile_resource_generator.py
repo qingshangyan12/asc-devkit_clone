@@ -114,6 +114,19 @@ class ManifestGenerationResult:
     resource_count: int
 
 
+@dataclass(frozen=True)
+class StaticCompileManifestContext:
+    soc_version: str
+    kernel_spec_dir: str
+    resource_id: str
+    compile_info: object
+    basic_compile_info: object
+    tiling_info: object
+    workspace_idx: int
+    sk_compile_info: Optional[object] = None
+    sk_cap_bitmap: Optional[int] = None
+
+
 def _read_regular_file(path, description):
     try:
         return Path(path).read_bytes()
@@ -304,13 +317,12 @@ def static_tiling_template_text(dynamic_header):
         )
     final_endif = dynamic_header.rfind("#endif")
 
-    class_names = [
-        name
-        for name in re.findall(
-            r"InitTilingData<([A-Za-z_][A-Za-z0-9_:]*)>", dynamic_header
-        )
-        if name not in {"T", "tiling_struct", "tiling_type", "type", "Type"}
-    ]
+    class_names = []
+    class_name_pattern = r"InitTilingData<([A-Za-z_][A-Za-z0-9_:]*)>"
+    ignored_class_names = {"T", "tiling_struct", "tiling_type", "type", "Type"}
+    for name in re.findall(class_name_pattern, dynamic_header):
+        if name not in ignored_class_names:
+            class_names.append(name)
     class_name = class_names[0] if class_names else None
     slash = "\\"
     lines = [
@@ -593,26 +605,28 @@ class StaticCompileResourceGenerator:
 
     def _collect_resources(self):
         request = self._request
-        all_records = [
-            command for kernel in request.kernels for command in kernel.commands
-        ]
+        all_records = []
+        for kernel in request.kernels:
+            all_records.extend(kernel.commands)
         for command in all_records:
             source_path = command.source_path
             if source_path in self._wrapper_paths:
                 continue
             logical = "src/" + os.path.basename(source_path)
             source_content = _read_regular_file(source_path, "generated wrapper")
-            sk_slave_symbols = tuple(
-                record.compiled_symbol
-                for record in all_records
-                if record.source_path == source_path
-                and record.object_type == "sk"
-                and record.tiling_key != record.compile_tiling_key
-            )
+            sk_slave_symbols = []
+            for record in all_records:
+                if record.source_path != source_path:
+                    continue
+                if record.object_type != "sk":
+                    continue
+                if record.tiling_key == record.compile_tiling_key:
+                    continue
+                sk_slave_symbols.append(record.compiled_symbol)
             wrapper = _portable_wrapper_text(
                 source_content,
                 request.source_file_path,
-                sk_slave_symbols,
+                tuple(sk_slave_symbols),
             ).encode("utf-8")
             self._wrapper_paths[source_path] = _add_resource(
                 self._resources, logical, content=wrapper
@@ -933,3 +947,65 @@ class StaticCompileResourceGenerator:
                 value = value.replace(cann_root, "${env:ASCEND_HOME_PATH}")
             normalized.append(value)
         return normalized
+
+
+def generate_static_compile_manifest(
+    context: StaticCompileManifestContext,
+) -> ManifestGenerationResult:
+    compile_info = context.compile_info
+    tiling_info = context.tiling_info
+    metadata_json_path = os.path.join(
+        os.path.dirname(compile_info.dst_file), compile_info.kernel_name + ".json"
+    )
+    manifest_tiling_size = tiling_info.default_tiling_size
+    if manifest_tiling_size <= 0:
+        manifest_tiling_size = compile_info.static_compile_tiling_size
+    manifest_tiling_sizes = dict(tiling_info.tiling_key_data_size)
+    manifest_tiling_sizes.update(compile_info.static_compile_tiling_key_data_size)
+    kernel_records = KernelCompileRecordBuilder(
+        KernelCompileRecordBuildRequest(
+            basic_compile_info=context.basic_compile_info,
+            sk_compile_info=context.sk_compile_info,
+            metadata_json_path=metadata_json_path,
+            constant_infos=(
+                ConstantInfoRecord(
+                    name="tiling_data",
+                    parameter_index=context.workspace_idx + 1,
+                    byte_size=manifest_tiling_size,
+                    template_path=tiling_info.tiling_data_file_path,
+                    template=_TILING_DATA_TEMPLATE,
+                ),
+            ),
+            constant_info_size_by_tiling_key={"tiling_data": manifest_tiling_sizes},
+        )
+    ).build()
+    kernel_output_dir = os.path.join(context.kernel_spec_dir, compile_info.kernel_name)
+    sk_compile_info = context.sk_compile_info
+    return StaticCompileResourceGenerator(
+        ManifestGenerationRequest(
+            soc_version=context.soc_version,
+            resource_id=context.resource_id,
+            source_file_path=compile_info.src_file,
+            origin_func_name=compile_info.origin_func_name,
+            output_dir=kernel_output_dir,
+            manifest_name=f"{compile_info.kernel_name}_manifest.json",
+            kernels=kernel_records,
+            sk_cap_bitmap=context.sk_cap_bitmap,
+            sk_kernel_attribute=(
+                sk_compile_info.global_kernel_attribute
+                if sk_compile_info is not None
+                else ""
+            ),
+            basic_kernel_attribute=(
+                context.basic_compile_info.global_kernel_attribute
+                if sk_compile_info is not None
+                else ""
+            ),
+            sk_bind_command=(
+                sk_compile_info.recorded_sk_bind_commands[0]
+                if sk_compile_info is not None
+                and sk_compile_info.recorded_sk_bind_commands
+                else None
+            ),
+        )
+    ).generate()

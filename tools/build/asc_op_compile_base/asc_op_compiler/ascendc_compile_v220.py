@@ -60,24 +60,10 @@ class DynamicCompileCommandSpec:
 
 def _record_dynamic_compile_command(
     compile_info: CompileInfo,
-    tiling_key: str,
-    compiled_symbol: str,
-    core_type: str,
-    argv,
-    output_path: str,
+    command: DynamicCompileCommandSpec,
 ):
-    if not compile_info.record_compile_commands:
-        return
-    compile_info.recorded_compile_commands.append(
-        DynamicCompileCommandSpec(
-            tiling_key=str(tiling_key),
-            compiled_symbol=compiled_symbol,
-            core_type=core_type,
-            source_path=compile_info.gen_kernel_func_file,
-            argv=tuple(argv),
-            output_path=output_path,
-        )
-    )
+    if compile_info.record_compile_commands:
+        compile_info.recorded_compile_commands.append(command)
 
 
 def _gen_compile_cmd_c310(
@@ -783,11 +769,14 @@ def call_bisheng_v220(
             )
             _record_dynamic_compile_command(
                 compile_info,
-                tiling_key,
-                kernel_name,
-                core_type,
-                compile_cmd,
-                compile_info.dst_file[:-2] + "_%s.o" % tiling_key,
+                DynamicCompileCommandSpec(
+                    tiling_key=str(tiling_key),
+                    compiled_symbol=kernel_name,
+                    core_type=core_type,
+                    source_path=compile_info.gen_kernel_func_file,
+                    argv=tuple(compile_cmd),
+                    output_path=compile_info.dst_file[:-2] + "_%s.o" % tiling_key,
+                ),
             )
             new_sources += DFXSectionGenerator().generate_dfx_section(
                 tiling_key, tiling_info, kernel_name, compile_info, True

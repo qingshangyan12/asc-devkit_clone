@@ -73,7 +73,7 @@ def _run_tool(command):
 
 
 def _resource_id_section_info(dynamic_object_path):
-    readelf = _find_tool("llvm-readelf", "readelf")
+    readelf = _find_tool("readelf")
     output = _run_tool([readelf, "-W", "-S", dynamic_object_path])
     matches = []
     for line in output.splitlines():
@@ -132,9 +132,8 @@ def calculate_resource_id(dynamic_object_path: str) -> str:
 
 
 def read_resource_id_section(dynamic_object_path: str) -> str:
-    _validate_elf(dynamic_object_path)
     _validate_section_metadata(dynamic_object_path)
-    objcopy = _find_tool("llvm-objcopy", "objcopy")
+    objcopy = _find_tool("llvm-objcopy")
     directory = os.path.dirname(os.path.realpath(dynamic_object_path))
     dump_fd, dump_path = tempfile.mkstemp(prefix=".resource_id.dump.", dir=directory)
     os.close(dump_fd)
@@ -166,7 +165,6 @@ def read_resource_id_section(dynamic_object_path: str) -> str:
 
 
 def write_resource_id_section(dynamic_object_path: str, resource_id: str) -> None:
-    _validate_elf(dynamic_object_path)
     if not isinstance(resource_id, str) or not _RESOURCE_ID_PATTERN.fullmatch(
         resource_id
     ):
@@ -174,7 +172,7 @@ def write_resource_id_section(dynamic_object_path: str, resource_id: str) -> Non
     if _resource_id_section_info(dynamic_object_path):
         raise ResourceIdError(".ascend.resource_id section already exists")
 
-    objcopy = _find_tool("llvm-objcopy", "objcopy")
+    objcopy = _find_tool("llvm-objcopy")
     directory = os.path.dirname(os.path.realpath(dynamic_object_path))
     object_fd = None
     payload_fd = None
