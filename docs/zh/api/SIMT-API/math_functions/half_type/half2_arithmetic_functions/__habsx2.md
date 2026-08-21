@@ -53,7 +53,7 @@ half2 __habsx2(const half2 x)
 
 ## 约束说明
 
-调用示例中，输入/输出地址需满足4字节对齐，且input_total_length需为偶数，以保证数据以half2为单位完整处理。
+无
 
 ## 需要包含的头文件
 

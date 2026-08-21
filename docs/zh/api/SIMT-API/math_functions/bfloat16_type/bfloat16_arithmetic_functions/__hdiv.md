@@ -60,7 +60,7 @@ bfloat16_t __hdiv(const bfloat16_t x, const bfloat16_t y)
 | >0 | -0 | -inf | -ASCRT_MAX_NORMAL_BF16 |
 | <0 | -0 | inf | ASCRT_MAX_NORMAL_BF16 |
 | ±0 | 非0 | 符号由x和y的符号异或决定，值为0 | 符号由x和y的符号异或决定，值为0 |
-| x，y任意一个为nan | | nan | 0 |  |
+| x，y任意一个为nan | — | nan | 0 |
 
 ## 约束说明
 
