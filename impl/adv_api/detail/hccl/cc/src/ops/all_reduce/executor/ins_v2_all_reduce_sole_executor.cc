@@ -14,6 +14,7 @@
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_all_reduce_mesh_1D_mem2mem.h"
 #endif
+#include "ins_temp_all_reduce_aicpu_reduce_nhr.h"
 
 namespace mc2_ops_hccl {
 
@@ -260,4 +261,7 @@ REGISTER_EXEC_V2(
     CcuTempKfcAllReduceMesh1DMem2Mem);
 #endif
 
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleNHRAicpuReduce, InsV2AllReduceSoleExecutor, TopoMatch1D,
+    InsTempAllReduceAicpuReduceNHR);
 } // namespace mc2_ops_hccl
