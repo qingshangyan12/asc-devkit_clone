@@ -73,7 +73,6 @@ enum class asc_relu_pre_mode : uint8_t {
     VECTOR = 3
 =======
     VECTOR = 3,
-    PIECEWISE_LINEAR = 4
 };
 
 using asc_quant_mode = QuantMode_t;
