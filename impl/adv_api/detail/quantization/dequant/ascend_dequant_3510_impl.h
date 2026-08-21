@@ -26,7 +26,9 @@
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "ascend_dequant_common.h"
+#if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 #include "../../quantization/quant/ascend_quant_3510_impl.h"
+#endif
 #include "../../common/check.h"
 
 namespace AscendC {
