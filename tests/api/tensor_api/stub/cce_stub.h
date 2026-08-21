@@ -13,6 +13,9 @@
 #include <cstdint>
 #include "stub_fun.h"
 
+// The compiler supports this overload, but it is missing from the CPU debug stub header.
+int64_t ld_dev(__gm__ int64_t* src, int16_t offset);
+
 // tikicpulib's host stub does not expose the complete predicate-pattern set
 // used by the Tensor API. These are host-test Literal values only.
 inline constexpr Literal PAT_VL1 = static_cast<Literal>(100);
@@ -525,6 +528,8 @@ inline void vgather2_bc(vector_bf16& dst, __ubuf__ bfloat16_t* src, vector_u32 i
 inline void vbr(vector_f8e4m3& dst, fp8_e4m3fn_t value) {}
 inline void vbr(vector_f8e5m2& dst, fp8_e5m2_t value) {}
 inline void vbr(vector_f8e8m0& dst, fp8_e8m0_t value) {}
+inline void vdup(vector_f8e8m0& dst, fp8_e8m0_t value, vector_bool mask, Literal mode) {}
+inline void vdup(vector_f8e8m0& dst, vector_f8e8m0 src, vector_bool mask, int32_t type, Literal mode) {}
 
 inline void copy_gm_to_cbuf_v2(__cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode, uint8_t l2_cache_ctl, uint64_t src_stride, uint32_t dst_stride) {}
 inline void img2colv2_cbuf_to_ca(__ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m, uint8_t stride_w, uint8_t stride_h, uint8_t w_k,
@@ -541,6 +546,10 @@ inline void set_intra_block(pipe_t pipe, uint8_t sync_id) {}
 inline void rls_buf(pipe_t pipe, uint64_t buf_id, bool mode) {}
 
 inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {}
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+inline int64_t get_iqent(pipe_t pipe) { return 0; }
+#endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 // asc_copy_gm2ub_impl uses void*; stub_fun.h void* overload lacks l2_cache_ctl.
