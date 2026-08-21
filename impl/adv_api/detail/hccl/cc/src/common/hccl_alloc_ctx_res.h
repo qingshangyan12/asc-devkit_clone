@@ -218,4 +218,8 @@ HcclResult CcuSelectAlg(
     HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
     void* mc2Tiling, OpResCtx& opResCtx);
 
+// CCU路径逐算子：仅执行校验并查询资源是否充足，不申请任何通信资源
+HcclResult CheckCcuResSuffient(
+    HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex);
+
 #endif
