@@ -386,9 +386,9 @@ public:
 };
 ```
 
-`CreateUniqueUnder` 使用 `FileUtils::CreateDirectories`、`FileUtils::ResolveDirectory`、
-`boost::filesystem::unique_path` 和单次 `create_directory`。不得把 TMPDIR、资源类型或 Manifest 语义放入
-公共类。
+`CreateUniqueUnder` 要求父目录已由调用方创建，使用 `FileUtils::ResolveDirectory`、
+`boost::filesystem::unique_path` 和单次 `create_directory`。不得把 TMPDIR、父目录创建策略、资源类型或
+Manifest 语义放入公共类。
 
 - [ ] **步骤 4：运行目录测试并确认 GREEN**
 
@@ -486,7 +486,7 @@ git add tools/build/asc_compile_exporter tools/aclrtc tools/build/common tests/t
 git commit -m "refactor(build): share temporary directory ownership"
 ```
 
-### 任务 7：复用 FileUtils 并删除剩余重复代码
+### 任务 7：审查 FileUtils 复用边界并删除剩余重复代码
 
 **文件：**
 - 修改：`tools/aclrtc/specialization/kernel_compilation_workspace.cpp`
@@ -496,22 +496,20 @@ git commit -m "refactor(build): share temporary directory ownership"
 - 测试：`tests/tools/aclrtc/test_kernel_specialization_diagnostics.cpp`
 - 测试：`tests/tools/aclrtc/test_resource_registry.cpp`
 
-- [ ] **步骤 1：增加现有 FileUtils 复用后的行为断言**
+- [ ] **步骤 1：确认现有文件操作的行为合同**
 
 保留以下测试：源码文件打开/读取失败、patch 写入/flush/close 失败时不替换原文件、诊断文件写入失败、
 物化文件 finalize 失败。测试只断言模块行为，不依赖公共函数内部实现。
 
-- [ ] **步骤 2：迁移已有完全相同的文件操作**
+- [ ] **步骤 2：仅迁移已有完全相同的文件操作**
 
-- `ReadSourceFileContents` 改用 `FileUtils::ReadRegularFile`，再将字节数组转换为字符串；
-- 输出目录创建改用 `FileUtils::CreateDirectories`；
-- patch 和诊断流的 flush/close 检查改用 `FileUtils::FinalizeOutput`；
 - 有明确生命周期所有权的目录统一使用 `TemporaryDirectory`；一次性无所有权路径的尽力清理使用
   `FileUtils::RemoveAll`；
 - `ResourceRegistry` 已使用的 `FinalizeOutput` 保持不变。
 
-原子 patch、ELF 发布时序和跨文件系统资源包发布仍保留在领域模块，不新增只被一个调用方使用的
-`FileUtils` 高层接口。
+`ReadSourceFileContents` 需要保留源码读取错误上下文，patch 写入需要“原文件不被覆盖”的原子语义，诊断
+写入允许降级，ELF 发布使用排他文件和特定权限。因此这些实现仍保留在领域模块，不新增只被一个调用方
+使用或需要大量策略参数的 `FileUtils` 高层接口。
 
 - [ ] **步骤 3：运行两个模块测试并确认 GREEN**
 

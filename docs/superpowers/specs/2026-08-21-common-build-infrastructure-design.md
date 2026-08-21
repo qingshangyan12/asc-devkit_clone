@@ -31,6 +31,56 @@
 7. 每迁移一个调用方前，先通过测试固化现有行为。
 8. 公共源码必须支持 C++11，因为 `asc_compile_exporter` 当前固定使用该语言标准。
 
+### 3.1 组件关系
+
+```mermaid
+flowchart TB
+    Pack[资源打包<br/>ManifestBundleCompiler]
+    Registry[资源注册与物化<br/>ResourceRegistry]
+    Specialization[常量化编译<br/>KernelSpecializationSession]
+
+    Process[ProcessExecutor<br/>argv / env / timeout / output]
+    Temp[TemporaryDirectory<br/>唯一目录 / 所有权 / 清理]
+    Files[FileUtils<br/>路径 / 基础文件操作]
+
+    Pack --> Process
+    Pack --> Temp
+    Pack --> Files
+    Registry --> Temp
+    Registry --> Files
+    Specialization --> Process
+    Specialization --> Temp
+    Specialization --> Files
+```
+
+依赖只能从领域模块指向公共层。公共层不知道 Manifest、resource ID、basic/SK、诊断目录或 ACL 错误码，
+因此 pack、register、specialization 可以共享实现而不互相依赖。
+
+### 3.2 目录所有权数据流
+
+```mermaid
+sequenceDiagram
+    participant Registry as ResourceRegistry
+    participant Directory as TemporaryDirectory
+    participant Session as KernelSpecializationSession
+    participant Workspace as KernelCompilationWorkspace
+
+    Registry->>Directory: 创建唯一物化目录
+    Registry->>Registry: 写入资源文件
+    Registry->>Session: Lookup 返回唯一 resourceDir
+    Registry->>Directory: 放弃单次目录的清理责任
+    Session->>Workspace: 传入 resourceDir
+    Workspace->>Directory: 接管清理责任
+    alt 保存 kernel meta
+        Workspace->>Directory: RetainAfterDestruction
+    else 默认流程
+        Workspace->>Directory: 发布 ELF 前 RemoveNow
+    end
+```
+
+`ResourceRegistry` 持有临时根目录；每次 Lookup 的物化子目录在成功返回后由调用方负责。所有权只转移一次，
+路径字符串本身不代表清理责任。
+
 ## 4. 公共组件
 
 ### 4.1 ProcessExecutor
@@ -70,23 +120,21 @@
 - 接管资源物化接口返回的已有目录。
 
 除非显式释放目录所有权用于保留诊断信息，否则对象析构时删除其持有的目录。创建或接管失败时对象保持
-为空；移动操作保证清理责任只转移一次。
+为空；移动操作保证清理责任只转移一次。新建目录统一设置为仅当前用户可读、写、执行的 `0700` 权限，
+不依赖调用进程的 umask。
 
 打包模块使用新对象替代 `BuildWorkspace`。资源注册模块在物化过程中临时持有该对象，全部文件物化成功后
-释放路径；物化失败时默认清理目录，但开启保存 kernel meta 后释放路径并保留失败现场。常量化编译模块
-接管 Lookup 返回的路径，仅当
+显式放弃单次目录的清理责任并将路径交给调用方；物化失败时默认清理目录，但开启保存 kernel meta 后保留
+失败现场。常量化编译模块接管 Lookup 返回的路径，仅当
 `ASCEND_OP_COMPILE_SAVE_KERNEL_META=1` 时保留该目录。
 
 资源注册模块仍负责定义资源查找和物化语义，`TemporaryDirectory` 只表达目录所有权。
 
 ### 4.3 FileUtils
 
-保留 `FileUtils` 现有的路径检查和基础文件操作。首先让各调用方复用已有的路径处理、有界文件读取、文件
-复制和目录清理能力。只有至少两个调用方需要完全相同的行为约束时，才新增公共原语。当前候选能力包括：
-
-- 完整写入新文件，并检查 flush 或 close 失败；
-- 完整复制普通文件，并准确报告源文件或目标文件错误；
-- 使用已准备好的同文件系统文件原子替换目标文件。
+保留 `FileUtils` 现有的路径检查和基础文件操作。各调用方复用已有的路径处理、有界文件读取、文件复制、
+输出流关闭检查和目录清理能力。审查后不新增文件 API：当前看似重复的源码 patch、诊断文件追加和 ELF
+发布具有不同的原子性、权限、失败清理和日志要求，合并后只能形成带大量策略参数的公共函数。
 
 以下包含业务流程语义的操作不放入 `FileUtils`：
 
@@ -146,7 +194,7 @@
 3. 迁移常量化编译的子进程实现，保持结果映射和诊断测试不变。
 4. 迁移打包模块并删除 `ProcessRunner`。
 5. 增加 `TemporaryDirectory` 测试，依次迁移打包、注册和常量化编译的目录所有权处理。
-6. 增加具备实际复用价值的 `FileUtils` 原语并迁移重复文件操作。
+6. 审查文件操作，仅复用行为合同完全相同的现有 `FileUtils` 原语。
 7. 删除被替代的代码，运行三个模块的完整测试。
 
 每迁移一个调用方，都必须先确保其原有测试全部通过，再修改下一个调用方。
@@ -158,7 +206,7 @@
 - 公共进程测试：空 argv、环境变量覆盖和移除、非 0 退出、信号退出、超时、忽略 SIGTERM 的后代进程、
   输出截断、exec 失败以及 wait/poll 失败；
 - 公共目录测试：唯一目录创建、移动所有权、接管、释放、正常清理和清理失败；
-- 公共文件测试：短读写、排他临时文件创建、原子替换和失败清理；
+- 现有公共文件测试：有界读取、输出流关闭检查、复制和失败清理；
 - 现有打包测试，包括保留临时目录、环境隔离、超时和跨文件系统发布；
 - 现有注册测试，包括物化失败清理和 Lookup 唯一路径；
 - 现有常量化编译测试，包括不真实等待的 5 分钟/1 分钟超时选择、输出诊断、worktree 保留与删除、
