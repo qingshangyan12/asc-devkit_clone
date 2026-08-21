@@ -23,9 +23,11 @@ using namespace hcomm;
 CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
     ccu::Variable currentRankSliceInputOffset, ccu::Variable currentRankSliceOutputOffset,
-    ccu::Variable chunkSize, ccu::Variable tailSize, ccu::Variable chunkLoopNum, ccu::Variable sliceOffset,
-    ccu::Variable isInputOutputEqual, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
-    uint32_t rankId, const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType);
+    ccu::Variable normalSliceSize, ccu::Variable lastSliceSize, ccu::Variable mySliceSize, ccu::Variable sliceOffset,
+    ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
+    ccu::Variable goSize3, ccu::Variable chunkSize, ccu::Variable tailSize, ccu::Variable chunkLoopNum,
+    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
+    const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType);
 
 } // namespace mc2_ops_hccl
 #endif // HCCL_CCU_KERNEL_KFC_ALL_REDUCE_MESH_1D_MEM2MEM_H
