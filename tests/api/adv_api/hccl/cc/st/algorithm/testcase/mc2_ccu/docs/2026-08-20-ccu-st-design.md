@@ -35,7 +35,7 @@ CCU ST 是无硬件仿真测试框架，在 x86 上验证 CCU 算法的正确性
 3. **RuntimeWorld** 解释执行 Program IR，模拟多 rank 并发
 4. 通用校验：静态结构检查 + 运行时死锁检测 + 数据逐字节比对
 
-与非 CCU（AICPU）ST 的对比：
+与 hccl 仓非 CCU（AICPU）ST 的对比：
 
 | 维度 | AICPU ST | CCU ST |
 |------|---------|--------|
