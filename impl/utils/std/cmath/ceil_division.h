@@ -70,10 +70,10 @@ template <typename T>
 using make_unsigned_t = typename integer_traits<T>::unsigned_type;
 
 /*!
-* \brief Divide a by b and round the result up.
-*
-* \note For signed inputs, callers must ensure a >= 0 and b > 0.
-*/
+ * \brief Divide a by b and round the result up.
+ *
+ * \note For signed inputs, callers must ensure a >= 0 and b > 0.
+ */
 template <typename T, typename U>
 __host__ __aicore__ inline constexpr auto ceil_div_generic(const T& a, const U& b)
 {
