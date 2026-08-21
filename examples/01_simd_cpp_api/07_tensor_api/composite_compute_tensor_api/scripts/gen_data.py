@@ -12,31 +12,29 @@ from pathlib import Path
 import numpy as np
 
 
-VECTOR_LENGTH = 64
+vector_length = 64
+
+
+def write_case(name: str, dtype: type) -> None:
+    input_dir = Path("input")
+    output_dir = Path("output")
+    input_a = np.linspace(-1.0, 1.0, vector_length, dtype=dtype)
+    input_b = np.linspace(0.25, 1.25, vector_length, dtype=dtype)
+    input_c = np.linspace(-0.5, 0.5, vector_length, dtype=dtype)
+    golden = (input_a * input_b + input_c).astype(dtype)
+    input_a.tofile(input_dir / f"{name}_input_a.bin")
+    input_b.tofile(input_dir / f"{name}_input_b.bin")
+    input_c.tofile(input_dir / f"{name}_input_c.bin")
+    golden.tofile(output_dir / f"{name}_golden.bin")
 
 
 def main() -> None:
-    input_dir = Path("input")
-    output_dir = Path("output")
-    input_dir.mkdir(exist_ok=True)
-    output_dir.mkdir(exist_ok=True)
+    Path("input").mkdir(exist_ok=True)
+    Path("output").mkdir(exist_ok=True)
 
-    src_a = np.linspace(-1.5, 1.5, VECTOR_LENGTH, dtype=np.float32)
-    src_b = (0.5 + (np.arange(VECTOR_LENGTH) % 8) * 0.125).astype(np.float32)
-    golden = np.stack(
-        [
-            src_b + np.float32(0.25) * src_a,
-            np.abs(src_a - src_b),
-            np.exp(src_a - src_b),
-            src_a * src_b + src_b,
-            (src_a * np.float32(1.5)).astype(np.float16).astype(np.float32),
-        ]
-    ).astype(np.float32)
-
-    src_a.tofile(input_dir / "src_a.bin")
-    src_b.tofile(input_dir / "src_b.bin")
-    golden.tofile(output_dir / "golden.bin")
-    print(f"Generated {golden.shape[0]} composite compute result rows.")
+    write_case("half", np.float16)
+    write_case("float", np.float32)
+    print("Generated fma input and golden data for half and float.")
 
 
 if __name__ == "__main__":
