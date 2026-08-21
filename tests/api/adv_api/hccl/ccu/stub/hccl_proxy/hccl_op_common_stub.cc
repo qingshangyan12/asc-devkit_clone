@@ -42,6 +42,19 @@ namespace mc2_ops_hccl {
 
 bool g_stubCcuAlgorithmRegistered = true;
 
+// CCU资源余量查询打桩：op_common.cc中的真实实现位于MC2_CLIENT_ENABLE_CCU编译开关内，
+// 且该文件未参与本UT目标编译，故在此打桩并暴露开关供用例控制充足/不足两条分支。
+bool g_stubCcuResSufficient = true;
+HcclResult g_stubCcuResQueryRet = HCCL_SUCCESS;
+uint32_t g_stubCcuResQueryCalledCnt = 0;
+
+HcclResult HcclQueryCcuResSuffient(AlgResourceRequest& resRequest, bool& sufficient)
+{
+    ++g_stubCcuResQueryCalledCnt;
+    sufficient = g_stubCcuResSufficient;
+    return g_stubCcuResQueryRet;
+}
+
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
 {
     uint64_t actualSize = ctxSize;
