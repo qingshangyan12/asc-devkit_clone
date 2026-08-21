@@ -17,13 +17,10 @@ constexpr u32 TOPO_LEVEL_NUM_3 = 3;
 constexpr uint64_t SMALL_COUNT_16M = 16 * 1024 * 1024;
 
 namespace {
-bool IsDevType960()
-{
-    return false;
-}
-}
+bool IsDevType960() { return false; }
+} // namespace
 
-uint64_t AlltoAllAutoSelector::CalcDataSize(const OpParam &opParam, const TopoInfoWithNetLayerDetails* topoInfo) const
+uint64_t AlltoAllAutoSelector::CalcDataSize(const OpParam& opParam, const TopoInfoWithNetLayerDetails* topoInfo) const
 {
     uint32_t dataTypeSize = DATATYPE_SIZE_TABLE[opParam.all2AllDataDes.sendType];
     uint64_t* sendCountPtr = (uint64_t*)opParam.all2AllVDataDes.sendCounts;
@@ -33,8 +30,8 @@ uint64_t AlltoAllAutoSelector::CalcDataSize(const OpParam &opParam, const TopoIn
     return *sendCountPtr * dataTypeSize * topoInfo->userRankSize;
 }
 
-SelectorStatus AlltoAllAutoSelector::SelectMultiLevelAlgo(const TopoInfoWithNetLayerDetails* topoInfo,
-    std::string &selectAlgName) const
+SelectorStatus AlltoAllAutoSelector::SelectMultiLevelAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName) const
 {
     if (topoInfo->level0Topo == Level0Shape::MESH_1D && topoInfo->userRankSize <= 64U) {
         selectAlgName = "CcuAllToAllMesh1D2Die";
@@ -48,8 +45,8 @@ SelectorStatus AlltoAllAutoSelector::SelectMultiLevelAlgo(const TopoInfoWithNetL
     return SelectorStatus::NOT_MATCH;
 }
 
-SelectorStatus AlltoAllAutoSelector::SelectMesh1DClosAlgo(const TopoInfoWithNetLayerDetails* topoInfo,
-    const OpParam &opParam, std::string &selectAlgName) const
+SelectorStatus AlltoAllAutoSelector::SelectMesh1DClosAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
 {
     if (topoInfo->level0PcieMix) {
         if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
@@ -61,15 +58,16 @@ SelectorStatus AlltoAllAutoSelector::SelectMesh1DClosAlgo(const TopoInfoWithNetL
     }
     uint32_t dataTypeSize = DATATYPE_SIZE_TABLE[opParam.all2AllVDataDes.sendType];
     u64* sendCounts = reinterpret_cast<u64*>(opParam.all2AllVDataDes.sendCounts);
-    CHK_PRT_RET(sendCounts == nullptr,
-        HCCL_WARNING("[AlltoAllAutoSelector][%s] sendCounts is nullptr.", __func__),
+    CHK_PRT_RET(
+        sendCounts == nullptr, HCCL_WARNING("[AlltoAllAutoSelector][%s] sendCounts is nullptr.", __func__),
         SelectorStatus::NOT_MATCH);
     uint64_t dataSize = sendCounts[0] * dataTypeSize;
     bool isMeshNumEqualToClosNum = false;
-    CHK_PRT_RET(CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
+    CHK_PRT_RET(
+        CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
         HCCL_DEBUG("[AlltoAllAutoSelector] CheckMeshNumEqualToClosNum failed."), SelectorStatus::NOT_MATCH);
-    if ((isMeshNumEqualToClosNum == true) && (topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT)
-        && (dataSize > BIG_DATA_SIZE_LIMIT)) {
+    if ((isMeshNumEqualToClosNum == true) && (topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT) &&
+        (dataSize > BIG_DATA_SIZE_LIMIT)) {
         selectAlgName = "CcuAllToAllMesh1DConcurrent";
     } else {
         selectAlgName = "CcuAlltoAllMesh1DMultiJetty";
@@ -77,8 +75,8 @@ SelectorStatus AlltoAllAutoSelector::SelectMesh1DClosAlgo(const TopoInfoWithNetL
     return SelectorStatus::MATCH;
 }
 
-SelectorStatus AlltoAllAutoSelector::SelectSingleLevelAlgo(const TopoInfoWithNetLayerDetails* topoInfo,
-    const OpParam &opParam, std::string &selectAlgName) const
+SelectorStatus AlltoAllAutoSelector::SelectSingleLevelAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
 {
     if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
         if (topoInfo->level0MeshType == Level0MeshType::TWO_DIE_REGULAR) {
@@ -126,28 +124,31 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
     return SelectorStatus::MATCH;
 }
 
-SelectorStatus AlltoAllAutoSelector::SelectCcuScheduleAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
-                                                    const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
-                                                    std::string &selectAlgName) const
+SelectorStatus AlltoAllAutoSelector::SelectCcuScheduleAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
     (void)configAlgMap;
     HCCL_DEBUG("[AlltoAllAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
     if (topoInfo->level2Ubg) {
-        HCCL_INFO("[AlltoAllAutoSelector][%s] ccu schedule is not supported with level2Ubg, reset to default.", __func__);
+        HCCL_INFO(
+            "[AlltoAllAutoSelector][%s] ccu schedule is not supported with level2Ubg, reset to default.", __func__);
         return SelectorStatus::NOT_MATCH;
     }
     if (topoInfo->topoLevelNums >= TOPO_LEVEL_NUM_3) {
-        HCCL_INFO("[AlltoAllAutoSelector][%s] ccu schedule is not supported when topoLevelNums >= 3(levelNum[%u]), reset to default.",
+        HCCL_INFO(
+            "[AlltoAllAutoSelector][%s] ccu schedule is not supported when topoLevelNums >= 3(levelNum[%u]), reset to "
+            "default.",
             __func__, topoInfo->topoLevelNums);
         return SelectorStatus::NOT_MATCH;
     }
-    CHK_PRT_RET(IsInputOutputOverlap(opParam) == true,
+    CHK_PRT_RET(
+        IsInputOutputOverlap(opParam) == true,
         HCCL_WARNING("[Algo][AlltoAllAutoSelector] ccu schedule does not support inplace alltoall."),
         SelectorStatus::NOT_MATCH);
 
-    SelectorStatus status = (topoInfo->topoLevelNums > 1) ?
-        SelectMultiLevelAlgo(topoInfo, selectAlgName) :
-        SelectSingleLevelAlgo(topoInfo, opParam, selectAlgName);
+    SelectorStatus status = (topoInfo->topoLevelNums > 1) ? SelectMultiLevelAlgo(topoInfo, selectAlgName) :
+                                                            SelectSingleLevelAlgo(topoInfo, opParam, selectAlgName);
     if (status == SelectorStatus::MATCH) {
         HCCL_INFO("[AlltoAllAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
     }
