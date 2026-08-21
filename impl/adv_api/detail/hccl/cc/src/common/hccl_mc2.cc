@@ -258,14 +258,17 @@ HcclResult AllocComResourceByTilingAicpu(
     std::string topoTag[Hccl::MC2_MAX_OP_NUM];
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
 
+    // 逐算子构造OpParam并选择算法
     std::vector<OpParam> opParamVec(tilingNum);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
-        CHK_RET(
-            GetOpParam(comm, stream, topoTag[i], static_cast<const Mc2CcTilingInner*>(ccTilingList[i]), opParamVec[i]));
+        CHK_RET(GetOpParam(comm, stream, topoTag[i], static_cast<const Mc2CcTilingInner*>(ccTilingList[i]),
+            opParamVec[i]));
     }
 
+    // 申请OpResCtx（HcclAllocOpResCtx内部经HcclGetAlgRes申请线程/channel/buffer等资源）
     CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));
 
+    // 打印逐算子算法/数据类型/引擎信息（只读日志，校验与分配路径共用）
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         const OpParam& opParam = opParamVec[i];
@@ -285,26 +288,33 @@ HcclResult AllocComResourceByTilingAicpu(
 }
 
 // CCU引擎资源分配流程
+// checkOnly为true时仅执行校验（构建拓扑标签 + 逐算子算法选择），不申请任何通信资源
 HcclResult AllocComResourceByTilingCcu(
     HcclComm comm, void* stream, void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum, const char* commName,
-    u32 rankSize, u32 userRank, void** opResCtx, std::string& ctxTag)
+    u32 rankSize, u32 userRank, void** opResCtx, std::string& ctxTag, bool checkOnly = false)
 {
     HCCL_INFO("[AllocComResourceByTilingCcu]start AllocComResourceByTilingCcu!");
     std::string topoTag[Hccl::MC2_MAX_OP_NUM];
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
     HCCL_INFO("[AllocComResourceByTilingCcu]BuildTagsAndValidate successfully!");
 
-    // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
+    // 仅校验场景：不申请workspace/scratch/comParam/comSync等资源
     OpResCtx resCtx{};
-    CHK_RET(AllocCcuOpResCtx(comm, ctxTag, rankSize, userRank, resCtx));
-    HCCL_INFO("[AllocComResourceByTilingCcu]AllocCcuOpResCtx successfully!");
-    HCCL_INFO(
-        "[AllocComResourceByTilingCcu]allocated: workspace[%p], size[%llu]", (void*)resCtx.workSpace,
-        resCtx.workSpaceSize);
+    if (!checkOnly) {
+        CHK_RET(AllocCcuOpResCtx(comm, ctxTag, rankSize, userRank, resCtx));
+        HCCL_INFO("[AllocComResourceByTilingCcu]AllocCcuOpResCtx successfully!");
+        HCCL_INFO(
+            "[AllocComResourceByTilingCcu]allocated: workspace[%p], size[%llu]", (void*)resCtx.workSpace,
+            resCtx.workSpaceSize);
+    }
 
     // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
-    CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, mc2Tiling, resCtx));
+    CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, mc2Tiling, resCtx, checkOnly));
     HCCL_INFO("[AllocComResourceByTilingCcu]CcuSelectAlg successfully!");
+    if (checkOnly) {
+        HCCL_INFO("[AllocComResourceByTilingCcu]checkOnly, end AllocComResourceByTilingCcu!");
+        return HCCL_SUCCESS;
+    }
 
     // 申请OpResCtx硬件内存并写入
     std::string tagOpResCtx = ctxTag + "_opResCtx";
@@ -322,7 +332,9 @@ HcclResult AllocComResourceByTilingCcu(
 }
 
 namespace {
-HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
+// checkOnly为true时只执行校验逻辑，不申请任何通信资源（供CheckOpResSuffient复用）
+HcclResult HcclAllocComResourceByTilingImpl(
+    HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx, bool checkOnly = false)
 {
     HCCL_RUN_INFO(
         "[MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
@@ -333,17 +345,14 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
     // 获取设备类型
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CHK_RET(hrtGetDeviceType(deviceType));
-
     // 检查设备类型是否支持新流程，950或910_95支持新流程，其他设备走老流程
     if (deviceType != DevType::DEV_TYPE_950) {
         HCCL_ERROR("[%s] invalid deviceType[%u]", __func__, deviceType);
         return HCCL_E_NOT_SUPPORT;
     }
-
     // 初始化环境变量配置，解析HCCL相关的环境变量
     // 包括算子展开模式、确定性计算、通信方式、日志开关等配置
     CHK_RET(InitEnvConfig());
-
     // 检查输入参数的合法性（comm、sendBuf、recvBuf、stream不能为空）
     CHK_RET(CheckInputParam(comm, mc2Tiling, stream));
 
@@ -367,7 +376,15 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
     uint8_t commEngine;
     CHK_RET(ObtainCommEngine(ccTilingList, tilingNum, commEngine));
 
-    // 根据commEngine类型分发到对应的资源分配流程
+    // onlyCheck场景：仅CCU_SCHED引擎执行资源充足性校验，其他引擎（AICPU_TS等）暂不支持，直接返回SUCCESS
+    if (checkOnly && commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+        HCCL_INFO(
+            "[HcclAllocComResourceByTiling]checkOnly, commEngine[%u] not supported, return SUCCESS.", commEngine);
+        return HCCL_SUCCESS;
+    }
+
+    // 根据commEngine类型分发到对应的资源分配流程（需求步骤4：AICPU_TS走AICPU路径、
+    // CCU_SCHED走CCU路径，其他引擎在ObtainCommEngine已返回不支持）
     std::string ctxTag;
     if (commEngine == static_cast<uint8_t>(OpExecuteConfig::AICPU_TS)) {
         HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == AICPU_TS!");
@@ -380,8 +397,10 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
             return HCCL_E_ALG_NOT_SUPPORTED;
         }
         CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum));
+        // checkOnly透传：逐算子仅执行校验并查询资源余量，不进入资源分配
         CHK_RET(AllocComResourceByTilingCcu(
-            comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
+            comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag,
+            checkOnly));
     } else {
         HCCL_ERROR("[%s] unsupported commEngine[%u]", __func__, commEngine);
         return HCCL_E_NOT_SUPPORT;
@@ -397,6 +416,26 @@ HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
     return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+}
+
+// 对外暴露的通信资源充足性校验接口（checkOnly=true），对应需求步骤：
+//   1 输入参数校验（CheckInputParam）       2 解析tiling（HcclGetTilingList）
+//   3 引擎一致/支持范围（ObtainCommEngine） 4 按引擎分流（AICPU_TS走AICPU校验、CCU_SCHED走CCU校验）
+//   5 构造opParam（InitOpParamByTiling）    6 强制算法+回退（TryForcedAlgAndPrepareEngine/SelectAlgAndPrepareEngine）
+//   7 topo/引擎绑定                         8 资源计算+余量判断（CalcAlgHierarchyInfo/CalcRes/HcclQueryCcuResSuffient）
+//   9 返回结果（充足SUCCESS/不足RES_NOT_SUFFICIENT）
+// 仅执行校验、不申请任何通信资源（边界：AllocCcuOpResCtx/HcclGetAlgRes/HcclEngineCtxCreate-Copy/aclrtMemcpy之前停止）
+HcclResult __attribute__((visibility("default"))) CheckOpResSuffient(
+    HcclComm comm, void* stream, void* mc2Tiling)
+{
+    void* opResCtx = nullptr;
+    HcclResult ret = HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, &opResCtx, true);
+    // 内部路径返回HCCL_E_UNAVAIL表示资源不可用/不足（如channel/CCU资源查询失败触发回退），
+    // 在资源校验接口处统一映射为HCCL_E_RES_NOT_SUFFICIENT，避免将HCCL_E_UNAVAIL向上暴露
+    if (ret == HCCL_E_UNAVAIL) {
+        return HCCL_E_RES_NOT_SUFFICIENT;
+    }
+    return ret;
 }
 
 extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTilingA5Mc2(
