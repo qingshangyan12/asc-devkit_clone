@@ -573,7 +573,7 @@ inline void vstur(vector_align& alignData, vector_f4e2m1x2 src, __ubuf__ fp4x2_e
 inline void vstur(vector_align& alignData, vector_f4e1m2x2 src, __ubuf__ fp4x2_e1m2_t* base, Literal post) {}
 
 inline void vdup(vector_f8e8m0 src0, vector_f8e8m0 src1, vector_bool mask, int32_t pos, Literal mode) {}
-inline void vdup(vector_f8e8m0 src0, fp8_e8m0_t src1, vector_bool mask, int32_t pos, Literal mode) {}
+inline void vdup(vector_f8e8m0 src0, fp8_e8m0_t src1, vector_bool mask, Literal mode) {}
 
 inline void nd_dma_dci() {}
 
