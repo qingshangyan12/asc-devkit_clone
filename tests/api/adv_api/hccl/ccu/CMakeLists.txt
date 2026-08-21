@@ -27,6 +27,7 @@ set(CCU_INCLUDE_LIST
     ${CANN_3RD_LIB_PATH}/gtest/include
     ${ASCENDC_DIR}
     ${HCCL_CC_INCLUDE_DIR}
+    ${ASCENDC_DIR}/include/adv_api/hccl
     ${HCCL_CC_INCLUDE_DIR}/hcomm
     ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
     ${HCCL_LOCAL_PKG_INC}
