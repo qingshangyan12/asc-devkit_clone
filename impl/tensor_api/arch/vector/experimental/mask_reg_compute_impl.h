@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/vector/experimental/MaskReg_compute_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use tensor_api/arch/vector/experimental/MaskReg_compute.h instead."
+    "impl/tensor_api/arch/vector/experimental/mask_reg_compute_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use tensor_api/arch/vector/experimental/mask_reg_compute.h instead."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define __UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_MASK_REG_COMPUTE_IMPL_H__
 #endif
@@ -18,7 +18,7 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_REG_COMPUTE_IMPL_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_REG_COMPUTE_IMPL_H
 
-#include "tensor_api/arch/vector/experimental/MaskReg_compute.h"
+#include "tensor_api/arch/vector/experimental/mask_reg_compute.h"
 
 namespace asc {
 namespace te {
@@ -116,6 +116,42 @@ template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain)
 {
     return detail::make_updated_reg_mask<DataType>(remain);
+}
+
+template <typename DataType>
+__simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tensor<bool> src1)
+{
+    static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t)
+                      || sizeof(DataType) == sizeof(uint32_t),
+                  "interleave only supports 8-bit, 16-bit, and 32-bit element types");
+
+    reg_pair<bool> result;
+    if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
+        asc_intlv_b32(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
+        asc_intlv_b16(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
+        asc_intlv_b8(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    }
+    return result;
+}
+
+template <typename DataType>
+__simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_tensor<bool> src1)
+{
+    static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t)
+                      || sizeof(DataType) == sizeof(uint32_t),
+                  "deinterleave only supports 8-bit, 16-bit, and 32-bit element types");
+
+    reg_pair<bool> result;
+    if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
+        asc_deintlv_b32(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    } else if constexpr (sizeof(DataType) == sizeof(uint16_t)) {
+        asc_deintlv_b16(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    } else if constexpr (sizeof(DataType) == sizeof(uint8_t)) {
+        asc_deintlv_b8(result.first.reg, result.second.reg, src0.reg, src1.reg);
+    }
+    return result;
 }
 
 } // namespace te

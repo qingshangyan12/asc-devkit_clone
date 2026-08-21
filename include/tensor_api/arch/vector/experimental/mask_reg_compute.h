@@ -34,11 +34,16 @@ __simd_callee__ inline reg_tensor<bool> none_mask();
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 
+template <typename DataType>
+__simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
+
+template <typename DataType>
+__simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
 } // namespace te
 } // namespace asc
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/arch/vector/experimental/MaskReg_compute_impl.h"
+#include "impl/tensor_api/arch/vector/experimental/mask_reg_compute_impl.h"
 #endif
 
 #endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_REG_COMPUTE_H
