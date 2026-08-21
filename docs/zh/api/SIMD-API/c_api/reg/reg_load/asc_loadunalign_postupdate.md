@@ -26,17 +26,15 @@
 
 ## 功能说明
 
-将Unified Buffer（UB）中起始地址无需32字节对齐的VL长度连续数据搬入矢量数据寄存器。接口将非对齐寄存器中缓存的前置数据与从UB读取的后续数据拼接，得到从本次有效起始地址开始的VL长度数据。搬入完成后，接口同步更新地址和非对齐寄存器状态。
+从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度连续数据，并搬入矢量数据寄存器。本接口将[asc_loadunalign_pre](asc_loadunalign_pre.md)中的非对齐寄存器（32字节）中缓存的前置数据与从UB读取的后续数据拼接，得到VL长度数据并搬入矢量数据寄存器。搬入完成后，接口同步更新地址和非对齐寄存器。
 
-具体而言，设本次有效起始地址为`src_start`，结束地址为`src_end`，其中`src_end = src_start + VL`；将`src_start`向低地址方向对齐到32字节边界得到`aligned_src_start`。[asc_loadunalign_pre](asc_loadunalign_pre.md)将地址范围为`[aligned_src_start, aligned_src_start + 32)`的数据缓存到非对齐寄存器，本接口将该缓存与从UB读取的后续数据拼接，得到地址范围为`[src_start, src_end)`的数据。
+设本次实际读取的起始字节地址为`src_start_addr`，结束字节地址为`src_end_addr`，其中`src_end_addr = src_start_addr + VL`；将`src_start_addr`向低地址方向对齐到32字节边界，得到`aligned_src_start_addr`。[asc_loadunalign_pre](asc_loadunalign_pre.md)将字节地址范围`[aligned_src_start_addr, aligned_src_start_addr + 32)`的数据缓存到非对齐寄存器，本接口将该缓存与从UB读取的后续数据拼接，得到字节地址范围`[src_start_addr, src_end_addr)`的数据。
 
-本接口使用`asc_loadunalign_pre`生成的非对齐寄存器状态完成首次搬入。搬入完成后，接口同步更新地址和非对齐寄存器状态；更新后的地址与非对齐寄存器相互匹配，共同构成下一次搬入的输入状态。本接口提供两种功能模式：
+本接口提供两种功能模式：
 
-- **连续非对齐搬入模式**：以当前源地址作为本次有效起始地址`src_start`。搬入完成后，下一次有效起始地址为`next_src_start = src_start + count × sizeof(dtype)`，接口将源地址更新为`next_src_start`，并同步更新非对齐寄存器。
+- **连续非对齐搬入模式**：设当前UB地址指针为`src_ptr`。搬入完成后，源地址指针更新为`src_ptr = src_ptr + count`，并同步更新非对齐寄存器。该指针运算以元素为单位，即源地址增加`count × sizeof(dtype)`字节。
 
-- **地址寄存器偏移搬入模式**：以UB源基地址与地址寄存器记录的偏移之和作为本次有效起始地址`src_start`。搬入完成后，下一次有效起始地址为`next_src_start = src_start + inc × sizeof(dtype)`，接口根据`inc`更新地址寄存器和非对齐寄存器，源基地址保持不变。
-
-`asc_update_addr_reg`根据当前循环迭代的索引生成该次迭代的起始偏移；`inc`只更新当前循环迭代内的地址偏移，不影响下一次循环迭代的起始偏移。
+- **地址寄存器偏移搬入模式**：设当前UB地址指针为`src_ptr`，循环迭代索引为`i`，步长`stride`的单位为元素个数。[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)生成当前迭代的起始偏移`offset = i * stride`，本次实际读取地址为`src_ptr + offset`。搬入完成后，接口将`offset`更新为`offset + inc`，因此当前循环迭代内下一次实际读取地址为`src_ptr + i * stride + inc`。以上指针和偏移运算均以元素为单位。`src_ptr`保持不变；`inc`只更新当前循环迭代内的地址偏移，不影响下一次循环迭代的起始偏移。
 
 ## 函数原型
 
@@ -53,7 +51,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
 
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。当dtype为`int4b_t`时，`dst`的实际类型为`vector_int4x2_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
@@ -76,7 +74,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
 
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。当dtype为`int4b_t`时，`dst`的实际类型为`vector_int4x2_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
@@ -95,9 +93,9 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器。dtype必须与`src1`一致，搬入VL长度数据。 |
-| src0 | 输入/输出 | 非对齐寄存器，大小为32字节。本接口调用后，`src0`更新为包含下一次有效起始地址所需前置数据的缓存。 |
-| src1 | 输入/输出 | 源UB地址，实际读取地址无需32字节对齐。 |
-| count | 输入 | Post Update步长，单位为元素个数。接口使用当前`src1`地址完成搬入后，将`src1`指针增加`count × sizeof(dtype)`字节。 |
+| src0 | 输入/输出 | 非对齐寄存器，大小为32字节。本接口调用后，`src0`中缓存的数据更新为更新后的`src1`所确定的实际读取地址所需的前置数据，可供下一次搬入使用。 |
+| src1 | 输入/输出 | 源UB地址，实际读取地址必须按dtype对齐。 |
+| count | 输入 | Post Update步长，单位为元素个数。接口使用当前`src1`地址完成搬入后，将`src1`增加`count × sizeof(dtype)`字节。 |
 
 ### 地址寄存器偏移搬入模式
 
@@ -106,10 +104,10 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器。dtype必须与`src1`一致，搬入VL长度数据。 |
-| src0 | 输入/输出 | 非对齐寄存器，大小为32字节。本接口调用后，`src0`更新为包含当前循环迭代内下一次有效起始地址所需前置数据的缓存。 |
-| src1 | 输入 | 源UB基地址。该地址与`offset`共同确定实际读取地址，实际读取地址无需32字节对齐。 |
-| offset | 输入/输出 | 地址寄存器，类型为`addr_reg`。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：`b8`、`b16`、`b32`模式分别以1字节、2字节、4字节为偏移单位。本接口完成搬入后会根据`inc`更新`offset`。 |
-| inc | 输入 | Post Update步长，单位为元素个数。接口使用当前`offset`完成搬入后，将`offset`记录的地址偏移量增加`inc × sizeof(dtype)`字节。 |
+| src0 | 输入/输出 | 非对齐寄存器，大小为32字节。本接口调用后，`src0`中缓存的数据更新为`src1`与更新后的`offset`所确定的实际读取地址所需的前置数据，可供当前循环迭代内的下一次搬入使用。 |
+| src1 | 输入 | 源UB基地址。该地址与`offset`共同确定实际读取地址，实际读取地址必须按dtype对齐。 |
+| offset | 输入/输出 | 地址寄存器，类型为`addr_reg`。该寄存器记录相对`src1`起始地址的偏移，单位为元素个数。`b8`、`b16`、`b32`模式分别表示每个元素占1字节、2字节、4字节。本接口完成搬入后会根据`inc`更新`offset`。 |
+| inc | 输入 | Post Update步长，单位为元素个数。接口使用当前`offset`完成搬入后，将`offset`记录的元素偏移量增加`inc`，即更新为`offset = offset + inc`。 |
 
 ## 返回值说明
 
@@ -121,21 +119,20 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- `src1`起始地址或`src1`与`offset`确定的实际访问地址无需32字节对齐，但实际访问范围必须在UB地址空间内，否则会报错。
+- `src1`起始地址或`src1`与`offset`确定的实际访问地址必须按dtype对齐，且实际访问范围必须在UB地址空间内，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 连续非对齐搬入模式
 
-- 首次搬入前必须调用[asc_loadunalign_pre](asc_loadunalign_pre.md)，且初始化和紧随其后的首次搬入必须使用相同的`src1`地址。
-- 后续调用继续使用上一次调用更新后的`src1`时，可以复用更新后的`src0`；如果用户另外修改了`src1`，必须根据新地址重新初始化`src0`。
+- 首次搬入前必须调用[asc_loadunalign_pre](asc_loadunalign_pre.md)进行初始化，该初始化接口与紧随其后的首次搬入必须使用相同的`src1`。
+- 后续调用继续使用上一次调用更新后的`src1`时，可以复用更新后的`src0`；如果`src1`被修改，必须根据修改后的`src1`重新初始化`src0`。
 
 ### 地址寄存器偏移搬入模式
 
-- 必须先调用`asc_update_addr_reg`接口。
-- `asc_update_addr_reg`生成当前循环迭代的起始偏移后，必须在该次迭代首次搬入前使用相同的`src1`和`offset`调用[asc_loadunalign_pre](asc_loadunalign_pre.md)重新初始化`src0`。
-- 同一次循环迭代内的后续调用继续使用接口按`inc`更新后的`offset`时，可以复用更新后的`src0`。
-- 当前循环迭代中最后一次使用`offset`时，可将`inc`设置为0。
+- 每次循环迭代中，必须先调用`asc_update_addr_reg`生成该次迭代的起始偏移，再调用[asc_loadunalign_pre](asc_loadunalign_pre.md)初始化`src0`。该初始化调用与紧随其后的首次搬入必须使用相同的`src1`和`offset`。
+- 当dtype为`int64_t`（b64）时，由于地址寄存器更新接口不支持b64模式，需要使用[asc_update_addr_reg_b32](../reg_data_types/asc_update_addr_reg.md)生成地址寄存器。一个b64元素占用两个b32寻址单元，因此传入`asc_update_addr_reg_b32`的各维偏移量以及本接口的`inc`都必须设置为期望的b64元素偏移量的2倍。
+- 同一循环迭代内，后续搬入继续使用上一次本接口调用按`inc`更新后的`offset`时，可复用同步更新后的`src0`。如果`src1`或`offset`被另行修改，必须根据修改后的实际读取地址重新初始化`src0`。
 
 ## 调用示例
 
@@ -158,30 +155,38 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t INPUT_BYTES = 544;
-constexpr uint32_t OUTPUT_BYTES = 1024;
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
 
-__simd_vf__ inline void asc_loadunalign_postupdate_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+constexpr uint32_t one_repeat_size = 256;
+constexpr uint32_t repeat_time = 2;
+constexpr uint32_t total_length = repeat_time * one_repeat_size;
+constexpr uint32_t INPUT_BYTES = repeat_time * one_repeat_size + 32;
+constexpr uint32_t OUTPUT_BYTES = 2 * repeat_time * one_repeat_size;
+
+__simd_vf__ inline void asc_loadunalign_postupdate_vf(__ubuf__ uint8_t* output,
+                                                      __ubuf__ uint8_t* input,
+                                                      uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_bool mask = asc_create_mask_b8(PAT_ALL);
     vector_load_unalign unalign;
     __ubuf__ uint8_t* src = input + 1;
-    asc_loadunalign_pre(unalign, src);
     vector_uint8_t value;
-    asc_loadunalign_postupdate(value, unalign, src, 256);
-    asc_storealign(output, value, mask);
-    asc_loadunalign_postupdate(value, unalign, src, 256);
-    asc_storealign(output + 256, value, mask);
+    asc_loadunalign_pre(unalign, src);
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        asc_loadunalign_postupdate(value, unalign, src, one_repeat_size);
+        asc_storealign(output + i * one_repeat_size, value, mask);
+    }
 
     __ubuf__ uint8_t* base = input + 1;
-    for (uint16_t i = 0; i < 1; ++i) {
-        addr_reg offset = asc_update_addr_reg_b8(256);
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        addr_reg offset = asc_update_addr_reg_b8(one_repeat_size);
         vector_load_unalign offset_unalign;
         asc_loadunalign_pre(offset_unalign, base, offset);
-        asc_loadunalign_postupdate(value, offset_unalign, base, offset, 256);
-        asc_storealign(output + 512, value, mask);
-        asc_loadunalign_postupdate(value, offset_unalign, base, offset, 0);
-        asc_storealign(output + 768, value, mask);
+        asc_loadunalign_postupdate(value, offset_unalign, base, offset, one_repeat_size);
+        asc_storealign(output + (repeat_time + i) * one_repeat_size, value, mask);
     }
 }
 
@@ -193,7 +198,9 @@ __global__ __vector__ void asc_loadunalign_postupdate_kernel(__gm__ uint8_t* out
     asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_vf_call<asc_loadunalign_postupdate_vf>(output_local, input_local);
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint8_t);
+    uint16_t repeat_time = ceil_division(total_length, one_repeat_size);
+    asc_vf_call<asc_loadunalign_postupdate_vf>(output_local, input_local, one_repeat_size, repeat_time);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
@@ -206,10 +213,10 @@ int main()
     std::vector<uint8_t> input(INPUT_BYTES);
     std::vector<uint8_t> output(OUTPUT_BYTES, 0xff);
     std::vector<uint8_t> golden(OUTPUT_BYTES, 0);
-    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
-    for (uint32_t i = 0; i < 512; ++i) {
+    for (uint16_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
+    for (uint16_t i = 0; i < repeat_time * one_repeat_size; ++i) {
         golden[i] = input[i + 1];
-        golden[i + 512] = input[i + 1];
+        golden[repeat_time * one_repeat_size + i] = input[i + 1];
     }
 
     aclInit(nullptr);

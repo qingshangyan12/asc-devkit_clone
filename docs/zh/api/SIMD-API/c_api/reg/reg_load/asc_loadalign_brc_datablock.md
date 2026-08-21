@@ -26,9 +26,9 @@
 
 ## 功能说明
 
-从Unified Buffer（UB）中起始地址32字节对齐的位置读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。搬运过程中数据格式和内容保持不变。本接口提供三种功能模式：
+从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。搬运过程中数据格式和内容保持不变。本接口提供三种功能模式：
 
-- **连续对齐搬入模式**：将Unified Buffer（UB）源地址的数据搬入到矢量数据寄存器，由用户自行更新源地址。
+- **连续对齐搬入模式**：将UB源地址的数据搬入到矢量数据寄存器，由用户自行更新源地址。
 - **立即数偏移搬入模式**：从相对源起始地址偏移指定距离的位置搬入数据。本接口不会自动更新源地址。
 - **地址寄存器偏移搬入模式**：通过地址寄存器指定相对源起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬入场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
 
@@ -47,7 +47,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_<dtype>& dst,
 
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。当dtype为`int4b_t`时，dst的实际类型为`vector_int4x2_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 // 示例：half类型。
@@ -67,10 +67,10 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_<dtype>& dst,
 
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。当dtype为`int4b_t`时，dst的实际类型为`vector_int4x2_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
-// 示例：带偏移从Unified Buffer（UB）读取half类型DataBlock并广播。
+// 示例：带偏移从UB读取half类型DataBlock并广播。
 __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst,
                                                         __ubuf__ half* src,
                                                         int32_t offset)
@@ -88,7 +88,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_<dtype>& dst,
 
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。当dtype为`int4b_t`时，dst的实际类型为`vector_int4x2_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 // 示例：half类型。
@@ -106,7 +106,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。 |
-| src | 输入 | 源Unified Buffer（UB）地址，实际读取地址需32字节对齐。 |
+| src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
 
 ### 立即数偏移搬入模式
 
@@ -115,7 +115,7 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。 |
-| src | 输入 | 源Unified Buffer（UB）地址，实际读取地址需32字节对齐。 |
+| src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
 | offset | 输入 | 相对`src`起始地址的偏移，单位为元素个数。 |
 
 ### 地址寄存器偏移搬入模式
@@ -125,8 +125,8 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。 |
-| src | 输入 | 源Unified Buffer（UB）地址，实际读取地址需32字节对齐。 |
-| offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。 |
+| src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
+| offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录相对`src`起始地址的偏移，单位为元素个数。b8、b16、b32模式分别表示每个元素占1字节、2字节、4字节。 |
 
 矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -140,9 +140,9 @@ __simd_callee__ inline void asc_loadalign_brc_datablock(vector_half& dst,
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- 实际读取的Unified Buffer（UB）地址和偏移后的Unified Buffer（UB）地址必须32字节对齐，并且在Unified Buffer（UB）地址空间内且不越界，否则会报错。
-- 一次读取数据量为32字节（1个DataBlock）。Unified Buffer（UB）容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。实际读取地址加32字节不可超过实际可用容量，否则会报错。
-- 如果本指令与其他指令存在Unified Buffer（UB）地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 各功能模式下的实际读取地址必须按32字节对齐，且实际读取范围必须在UB地址空间内且不越界，否则会报错。
+- 一次读取数据量为32字节（1个DataBlock）。UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。实际读取地址加32字节不可超过实际可用容量，否则会报错。
+- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 地址寄存器偏移搬入模式
 
@@ -169,15 +169,27 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t INPUT_BYTES = 256;
-constexpr uint32_t OUTPUT_BYTES = 256;
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
 
-__simd_vf__ inline void asc_loadalign_brc_datablock_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+constexpr uint32_t one_repeat_size = 256;
+constexpr uint32_t repeat_time = 2;
+constexpr uint32_t total_length = repeat_time * one_repeat_size;
+constexpr uint32_t INPUT_BYTES = repeat_time * 32;
+constexpr uint32_t OUTPUT_BYTES = repeat_time * one_repeat_size;
+
+__simd_vf__ inline void asc_loadalign_brc_datablock_vf(__ubuf__ uint8_t* output,
+                                                       __ubuf__ uint8_t* input,
+                                                       uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_bool mask = asc_create_mask_b8(PAT_ALL);
     vector_uint8_t value;
-    asc_loadalign_brc_datablock(value, input);
-    asc_storealign(output, value, mask);
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        asc_loadalign_brc_datablock(value, input + i * 32);
+        asc_storealign(output + i * one_repeat_size, value, mask);
+    }
 }
 
 __global__ __vector__ void asc_loadalign_brc_datablock_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
@@ -188,7 +200,9 @@ __global__ __vector__ void asc_loadalign_brc_datablock_kernel(__gm__ uint8_t* ou
     asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_vf_call<asc_loadalign_brc_datablock_vf>(output_local, input_local);
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint8_t);
+    uint16_t repeat_time = ceil_division(total_length, one_repeat_size);
+    asc_vf_call<asc_loadalign_brc_datablock_vf>(output_local, input_local, one_repeat_size, repeat_time);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
@@ -201,8 +215,12 @@ int main()
     std::vector<uint8_t> input(INPUT_BYTES);
     std::vector<uint8_t> output(OUTPUT_BYTES, 0xff);
     std::vector<uint8_t> golden(OUTPUT_BYTES, 0);
-    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
-    for (uint32_t i = 0; i < OUTPUT_BYTES; ++i) golden[i] = input[i % 32];
+    for (uint16_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
+    for (uint16_t repeat = 0; repeat < repeat_time; ++repeat) {
+        for (uint16_t i = 0; i < one_repeat_size; ++i) {
+            golden[repeat * one_repeat_size + i] = input[repeat * 32 + i % 32];
+        }
+    }
 
     aclInit(nullptr);
     aclrtSetDevice(0);

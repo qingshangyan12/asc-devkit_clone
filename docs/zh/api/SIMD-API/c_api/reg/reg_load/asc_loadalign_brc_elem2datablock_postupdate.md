@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-从Unified Buffer（UB）连续读取8个元素，并将每个元素广播到目的矢量数据寄存器对应的一个`DataBlock`（32字节）中。`b16`类型的实际读取地址需16字节对齐，`b32`类型的实际读取地址需32字节对齐。搬运过程中数据格式和内容保持不变。搬运完成后启用Post Update模式，自动更新源地址指针。
+从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到目的矢量数据寄存器对应的一个`DataBlock`（32字节）中。搬运过程中数据格式和内容保持不变。接口采用Post Update模式，搬运完成后自动更新源地址指针。
 
 本接口仅在AIV上生效，非AIV调用直接返回。
 
@@ -44,7 +44,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(vector_<
 
 dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
-### 典型示例
+### 函数原型典型示例
 
 ```c
 // 示例：half类型。
@@ -62,7 +62,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(vector_h
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。 |
-| src | 输入/输出 | 源UB地址，实际读取地址需满足对齐要求：b16类型需16字节对齐，b32类型需32字节对齐。 |
+| src | 输入/输出 | 源UB地址，实际读取地址必须满足对齐要求：b16类型必须按16字节对齐，b32类型必须按32字节对齐。 |
 | offset | 输入 | Post Update步长，单位为元素个数。接口从当前`src`地址完成搬入后更新`src`，`src`增加`offset × sizeof(dtype)`字节。 |
 
 矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
@@ -77,7 +77,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(vector_h
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- b16类型的实际读取地址和偏移后的UB地址必须16字节对齐，b32类型的实际读取地址和偏移后的UB地址必须32字节对齐，并且在UB地址空间内且不越界，否则会报错。
+- 当前实际读取地址及Post Update更新后的下一次实际读取地址必须满足对应对齐要求：b16类型按16字节对齐，b32类型按32字节对齐；且实际读取范围必须在UB地址空间内且不越界，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
@@ -102,21 +102,29 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t INPUT_ELEMENTS = 16;
-constexpr uint32_t OUTPUT_ELEMENTS = 256;
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
+
+constexpr uint32_t one_repeat_size = 256;
+constexpr uint32_t repeat_time = 2;
+constexpr uint32_t INPUT_ELEMENTS = repeat_time * 8;
+constexpr uint32_t OUTPUT_ELEMENTS = repeat_time * one_repeat_size / sizeof(uint16_t);
+constexpr uint32_t total_length = OUTPUT_ELEMENTS;
 constexpr uint32_t INPUT_BYTES = INPUT_ELEMENTS * sizeof(uint16_t);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_ELEMENTS * sizeof(uint16_t);
 
 __simd_vf__ inline void asc_loadalign_brc_elem2datablock_postupdate_vf(
-    __ubuf__ uint16_t* output, __ubuf__ uint16_t* input)
+    __ubuf__ uint16_t* output, __ubuf__ uint16_t* input, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_bool mask = asc_create_mask_b16(PAT_ALL);
     vector_uint16_t value;
     __ubuf__ uint16_t* src = input;
-    asc_loadalign_brc_elem2datablock_postupdate(value, src, 8);
-    asc_storealign(output, value, mask);
-    asc_loadalign_brc_elem2datablock_postupdate(value, src, 8);
-    asc_storealign(output + 128, value, mask);
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        asc_loadalign_brc_elem2datablock_postupdate(value, src, 8);
+        asc_storealign(output + i * one_repeat_size, value, mask);
+    }
 }
 
 __global__ __vector__ void asc_loadalign_brc_elem2datablock_postupdate_kernel(
@@ -128,7 +136,9 @@ __global__ __vector__ void asc_loadalign_brc_elem2datablock_postupdate_kernel(
     asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_vf_call<asc_loadalign_brc_elem2datablock_postupdate_vf>(output_local, input_local);
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint16_t);
+    uint16_t repeat_time = ceil_division(total_length, one_repeat_size);
+    asc_vf_call<asc_loadalign_brc_elem2datablock_postupdate_vf>(output_local, input_local, one_repeat_size, repeat_time);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
@@ -141,12 +151,12 @@ int main()
     std::vector<uint16_t> input(INPUT_ELEMENTS);
     std::vector<uint16_t> output(OUTPUT_ELEMENTS, 0xffff);
     std::vector<uint16_t> golden(OUTPUT_ELEMENTS, 0);
-    for (uint32_t i = 0; i < INPUT_ELEMENTS; ++i) input[i] = static_cast<uint16_t>(i + 1);
-    for (uint32_t call = 0; call < 2; ++call) {
-        for (uint32_t block = 0; block < 8; ++block) {
-            for (uint32_t i = 0; i < 16; ++i) {
-                const uint32_t out = call * 128 + block * 16 + i;
-                const uint32_t in = call * 8 + block;
+    for (uint16_t i = 0; i < INPUT_ELEMENTS; ++i) input[i] = static_cast<uint16_t>(i + 1);
+    for (uint16_t repeat = 0; repeat < repeat_time; ++repeat) {
+        for (uint16_t block = 0; block < 8; ++block) {
+            for (uint16_t i = 0; i < 16; ++i) {
+                const uint32_t out = repeat * 128 + block * 16 + i;
+                const uint32_t in = repeat * 8 + block;
                 golden[out] = input[in];
             }
         }

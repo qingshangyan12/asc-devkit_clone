@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-从Unified Buffer（UB）中起始地址32字节对齐的位置读取连续数据并进行2倍下采样。
+从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样。
 
 - 当`dst`为矢量数据寄存器时，读取2×VL（512字节）长度数据，保留偶数下标元素后写入VL长度数据。
 - 当`dst`为掩码寄存器时，读取VL/4（64字节）长度数据，保留偶数下标bit后写入VL/8长度数据。
@@ -56,7 +56,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst,
 
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`。当dtype为`int4b_t`时，dst的实际类型为`vector_int4x2_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 // 示例：half类型。
@@ -81,7 +81,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst,
 
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`。当dtype为`int4b_t`时，dst的实际类型为`vector_int4x2_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 // 示例：half。
@@ -107,7 +107,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst,
 
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`。当dtype为`int4b_t`时，dst的实际类型为`vector_int4x2_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 // 示例：half。
@@ -125,7 +125,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
-| src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
+| src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
 
 ### 立即数偏移搬入模式
 
@@ -134,7 +134,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
-| src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
+| src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
 | offset | 输入 | 相对`src`起始地址的偏移。<br>&bull; 当`dst`为矢量数据寄存器，单位为元素个数。<br>&bull; 当`dst`为掩码寄存器，单位为字节。 |
 
 ### 地址寄存器偏移搬入模式
@@ -144,8 +144,8 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst,
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
-| src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
-| offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。当`dst`为`vector_bool`时，应使用b32模式。 |
+| src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
+| offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录相对`src`起始地址的偏移，单位为元素个数。b8、b16、b32模式分别表示每个元素占1字节、2字节、4字节。当`dst`为`vector_bool`时，应使用b32模式。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
@@ -159,7 +159,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst,
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- 实际读取的UB地址和偏移后的UB地址必须32字节对齐，并且在UB地址空间内且不越界，否则会报错。
+- 各功能模式下的实际读取地址必须按32字节对齐，且实际读取范围必须在UB地址空间内且不越界，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
@@ -188,15 +188,26 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t INPUT_BYTES = 512;
-constexpr uint32_t OUTPUT_BYTES = 256;
+__aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denominator)
+{
+    return (numerator + denominator - 1) / denominator;
+}
 
-__simd_vf__ inline void asc_loadalign_downsample_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+constexpr uint32_t one_repeat_size = 256;
+constexpr uint32_t repeat_time = 2;
+constexpr uint32_t total_length = repeat_time * one_repeat_size;
+constexpr uint32_t INPUT_BYTES = repeat_time * 512;
+constexpr uint32_t OUTPUT_BYTES = repeat_time * one_repeat_size;
+
+__simd_vf__ inline void asc_loadalign_downsample_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input,
+                                                   uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_bool mask = asc_create_mask_b8(PAT_ALL);
     vector_uint8_t value;
-    asc_loadalign_downsample(value, input);
-    asc_storealign(output, value, mask);
+    for (uint16_t i = 0; i < repeat_time; ++i) {
+        asc_loadalign_downsample(value, input + i * 512);
+        asc_storealign(output + i * one_repeat_size, value, mask);
+    }
 }
 
 __global__ __vector__ void asc_loadalign_downsample_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
@@ -207,7 +218,9 @@ __global__ __vector__ void asc_loadalign_downsample_kernel(__gm__ uint8_t* outpu
     asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_vf_call<asc_loadalign_downsample_vf>(output_local, input_local);
+    uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint8_t);
+    uint16_t repeat_time = ceil_division(total_length, one_repeat_size);
+    asc_vf_call<asc_loadalign_downsample_vf>(output_local, input_local, one_repeat_size, repeat_time);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
@@ -220,8 +233,12 @@ int main()
     std::vector<uint8_t> input(INPUT_BYTES);
     std::vector<uint8_t> output(OUTPUT_BYTES, 0xff);
     std::vector<uint8_t> golden(OUTPUT_BYTES, 0);
-    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
-    for (uint32_t i = 0; i < OUTPUT_BYTES; ++i) golden[i] = input[2 * i];
+    for (uint16_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
+    for (uint16_t repeat = 0; repeat < repeat_time; ++repeat) {
+        for (uint16_t i = 0; i < one_repeat_size; ++i) {
+            golden[repeat * one_repeat_size + i] = input[repeat * 512 + 2 * i];
+        }
+    }
 
     aclInit(nullptr);
     aclrtSetDevice(0);
