@@ -321,7 +321,9 @@ HcclResult AllocComResourceByTilingCcu(
 }
 
 namespace {
-HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
+// checkOnly为true时只执行校验逻辑，不申请任何通信资源（供CheckOpResSuffient复用）
+HcclResult HcclAllocComResourceByTilingImpl(
+    HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx, bool checkOnly = false)
 {
     HCCL_RUN_INFO(
         "[MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
@@ -368,6 +370,35 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
 
     // 根据commEngine类型分发到对应的资源分配流程
     std::string ctxTag;
+    // 仅校验场景：复用上述所有校验并补齐引擎相关校验，在进入资源申请前返回
+    if (checkOnly) {
+        std::string topoTag[Hccl::MC2_MAX_OP_NUM];
+        CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
+        if (commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+            HCCL_INFO("[CheckOpResSuffient] commEngine[%u] not CCU_SCHED, bypass resource check.", commEngine);
+            return HCCL_SUCCESS;
+        }
+        if (!CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum)) {
+            HCCL_INFO("[CheckOpResSuffient] current ccu algorithm is not supported in mc2_client.");
+            return HCCL_E_ALG_NOT_SUPPORT;
+        }
+        CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum));
+
+        for (uint32_t i = 0U; i < tilingNum; ++i) {
+            const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
+            HcclResult ret = CheckCcuResSuffient(comm, stream, topoTag[i], ccTiling, i);
+            if (ret != HCCL_SUCCESS) {
+                HCCL_ERROR(
+                    "[CheckOpResSuffient] tilingIndex[%u] opType[%u] check failed,
+                    ret[%d].", i, ccTiling->opType, static_cast<int>(ret)
+                );
+                return ret;
+            }
+        }
+        return HCCL_SUCCESS;
+    }
+
+
     if (commEngine == static_cast<uint8_t>(OpExecuteConfig::AICPU_TS)) {
         HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == AICPU_TS!");
         CHK_RET(AllocComResourceByTilingAicpu(
@@ -392,10 +423,25 @@ HcclResult HcclAllocComResourceByTilingImpl(HcclComm comm, void* stream, void* m
 }
 } // namespace
 
+HcclResult __attribute__((visibility("default"))) CheckOpResSuffient(
+    HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex
+)
+{
+    void* opResCtx = nullptr;
+    return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, &opResCtx, true);
+}
+
 HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
     return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+}
+
+HcclResult __attribute__((visibility("default"))) CheckOpResSuffient(
+    HcclComm comm, void* stream, void* mc2Tiling)
+{
+    void* opResCtx = nullptr;
+    return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, &opResCtx, true);
 }
 
 extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTilingA5Mc2(
