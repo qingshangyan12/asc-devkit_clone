@@ -1,0 +1,4 @@
+interface:
+  display_name: "Defensive Task Clarifier"
+  short_description: "在安全相关编码任务开始前整理授权、范围和防御性目标"
+  default_prompt: "请使用 defensive-task-clarifier，在开始实现前把任务整理成有明确用户授权、范围和验收标准的防御性 prompt。"
