@@ -28,7 +28,7 @@ struct CcuKernelArgAlltoAllMesh1D: CcuKernelArgBase{
 
 struct AlltoAllMesh1DContext: CcuKernelCtxBase {
     const CcuKernelArgAlltoAllMesh1D *arg;
-    
+
     std::vector<ccu::Variable> input;
     std::vector<ccu::Variable> output;
     std::vector<ccu::Variable> token;
