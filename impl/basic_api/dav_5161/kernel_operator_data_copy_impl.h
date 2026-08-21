@@ -1162,9 +1162,10 @@ __aicore__ inline void DataCopyPadGm2UBImpl(
         intriParams.srcStride, intriParams.dstStride, true, padParams.isPad);
 }
 
-template <typename T>
-__aicore__ inline void DataCopyPadGM2L1Impl(
-    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyPadParams& padParams)
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline void DataCopyPadGm2L1Impl(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyPadParams& padParams,
+    const uint8_t cacheMode = 0)
 {
     // if ASCEND_IS_AIV {
     //     return;
@@ -1186,9 +1187,10 @@ __aicore__ inline void DataCopyPadGM2L1Impl(
     //     intriParams.srcStride, intriParams.dstStride, true, cacheMode);
 }
 
-template <typename T>
-__aicore__ inline void DataCopyPadGM2L1Impl(
-    __cbuf__ T* dst, __gm__ T* src, const DataCopyExtParams& intriParams, const DataCopyPadExtParams<T>& padParams)
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline void DataCopyPadGm2L1Impl(
+    __cbuf__ T* dst, __gm__ T* src, const DataCopyExtParams& intriParams, const DataCopyPadExtParams<T>& padParams,
+    const uint8_t cacheMode = 0)
 {
     // if ASCEND_IS_AIV {
     //     return;

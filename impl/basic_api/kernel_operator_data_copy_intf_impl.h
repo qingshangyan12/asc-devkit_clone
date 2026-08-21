@@ -1563,7 +1563,9 @@ __aicore__ inline void DataCopyPad(
 }
 
 // override DataCopyPad, use new param DataCopyExtParams
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165))
 template <typename T, PaddingMode mode>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
@@ -1585,8 +1587,14 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const Hardware dstHWPos = GetPhyType((TPosition)dst.GetPosition());
     const uint8_t cacheMode = ExtractCacheMode(src);
     if (dstHWPos == Hardware::UB) {
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165))
+        DataCopyPadGm2UBImpl<T, mode>(
+            (__ubuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams);
+#else
         DataCopyPadGm2UBImpl<T, mode>(
             (__ubuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams, cacheMode);
+#endif
     } else if (dstHWPos == Hardware::L1) {
         DataCopyPadGm2L1Impl<T, mode>(
             (__cbuf__ T*)dst.GetPhyAddr(), (__gm__ T*)src.GetPhyAddr(), dataCopyParams, padParams, cacheMode);
