@@ -24,6 +24,9 @@
 
 namespace mc2_ops_hccl {
 extern bool g_stubCcuAlgorithmRegistered;
+extern bool g_stubCcuResSufficient;
+extern HcclResult g_stubCcuResQueryRet;
+extern uint32_t g_stubCcuResQueryCalledCnt;
 }
 
 namespace {
@@ -48,6 +51,9 @@ static void StubCleanup()
     g_stubRankId = 0;
     g_stubDeviceType = DevType::DEV_TYPE_950;
     mc2_ops_hccl::g_stubCcuAlgorithmRegistered = true;
+    mc2_ops_hccl::g_stubCcuResSufficient = true;
+    mc2_ops_hccl::g_stubCcuResQueryRet = HCCL_SUCCESS;
+    mc2_ops_hccl::g_stubCcuResQueryCalledCnt = 0;
     unsetenv("HCCL_OP_EXPANSION_MODE");
 }
 
@@ -681,6 +687,119 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
     resourceCtx2.DeSerialize(seq2);
     EXPECT_EQ(resourceCtx2.kfcServerArgs.size(), 6U);
     EXPECT_EQ(resourceCtx2.kfcServerArgs[5], expectedToken);
+}
+
+// ---------- CheckOpResSuffient ----------
+// 入口函数只做校验，不申请任何通信资源；资源充足/不足由打桩的HcclQueryCcuResSuffient决定
+
+TEST_F(CcuMc2TestSuite, CheckOpResSuffient_CcuSufficient)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+
+    HcclResult ret = CheckOpResSuffient(comm_, stream_, &tiling);
+
+    EXPECT_EQ(ret, HCCL_SUCCESS);
+    // 校验路径应确实触发了资源余量查询，且不申请任何通信资源
+    EXPECT_EQ(mc2_ops_hccl::g_stubCcuResQueryCalledCnt, 1U);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSuffient_ReduceScatterCcu)
+{
+    // ReduceScatter 走 CCU KFC 分支（isKfc=true 且 engine==CCU）
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+
+    HcclResult ret = CheckOpResSuffient(comm_, stream_, &tiling);
+
+    EXPECT_EQ(ret, HCCL_SUCCESS);
+    EXPECT_EQ(mc2_ops_hccl::g_stubCcuResQueryCalledCnt, 1U);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSuffient_ResInsufficient)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    mc2_ops_hccl::g_stubCcuResSufficient = false;
+
+    HcclResult ret = CheckOpResSuffient(comm_, stream_, &tiling);
+
+    EXPECT_EQ(ret, HCCL_E_RES_NOT_SUFFICIENT);
+    EXPECT_EQ(mc2_ops_hccl::g_stubCcuResQueryCalledCnt, 1U);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSuffient_QueryRetError)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    mc2_ops_hccl::g_stubCcuResQueryRet = HCCL_E_INTERNAL;
+
+    HcclResult ret = CheckOpResSuffient(comm_, stream_, &tiling);
+
+    // 查询接口自身的错误码应被透传
+    EXPECT_EQ(ret, HCCL_E_INTERNAL);
+    EXPECT_EQ(mc2_ops_hccl::g_stubCcuResQueryCalledCnt, 1U);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSuffient_AicpuBypass)
+{
+    // 非CCU_SCHED引擎不查询资源，直接通过
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, COMM_ENGINE_AICPU, opTypes, nullptr);
+
+    HcclResult ret = CheckOpResSuffient(comm_, stream_, &tiling);
+
+    EXPECT_EQ(ret, HCCL_SUCCESS);
+    EXPECT_EQ(mc2_ops_hccl::g_stubCcuResQueryCalledCnt, 0U);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSuffient_AlgNotRegistered)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    mc2_ops_hccl::g_stubCcuAlgorithmRegistered = false;
+
+    HcclResult ret = CheckOpResSuffient(comm_, stream_, &tiling);
+
+    EXPECT_EQ(ret, HCCL_E_ALG_NOT_SUPPORTED);
+    EXPECT_EQ(mc2_ops_hccl::g_stubCcuResQueryCalledCnt, 0U);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSuffient_MixedOpsRejected)
+{
+    uint32_t opTypes[] = {
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(2, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+
+    // 多算子场景先被CheckCcuAlgorithmsRegistered拒绝（tilingNum>1），不进入逐算子校验
+    EXPECT_EQ(CheckOpResSuffient(comm_, stream_, &tiling), HCCL_E_ALG_NOT_SUPPORTED);
+    EXPECT_EQ(mc2_ops_hccl::g_stubCcuResQueryCalledCnt, 0U);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSuffient_NullComm)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    EXPECT_EQ(CheckOpResSuffient(nullptr, stream_, &tiling), HCCL_E_PTR);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSuffient_NullStream)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    EXPECT_EQ(CheckOpResSuffient(comm_, nullptr, &tiling), HCCL_E_PTR);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSuffient_NullTiling)
+{
+    EXPECT_EQ(CheckOpResSuffient(comm_, stream_, nullptr), HCCL_E_PTR);
+}
+
+TEST_F(CcuMc2TestSuite, CheckOpResSuffient_UnsupportedEngine)
+{
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, COMM_ENGINE_AIV, opTypes, nullptr);
+    EXPECT_EQ(CheckOpResSuffient(comm_, stream_, &tiling), HCCL_E_NOT_SUPPORT);
 }
 
 } // namespace

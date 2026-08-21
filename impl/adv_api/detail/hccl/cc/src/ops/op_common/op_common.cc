@@ -2106,6 +2106,66 @@ static HcclResult HcclGetCcuKernelDynamic(
     return finalRet;
 }
 } // namespace
+
+// 查询CCU通信资源余量是否满足请求（仅校验，不申请资源）：
+// 1. 将算子请求的kernel资源按die聚合为资源需求描述；
+// 2. 对每个die创建"剩余资源"描述并查询剩余量；
+// 3. 逐资源类型比较剩余量是否满足需求量，任一die任一类型不足则sufficient置false；
+// 4. 所有描述句柄在返回前统一销毁，错误路径统一转换为HcclResult。
+HcclResult HcclQueryCcuResSuffient(AlgResourceRequest& resRequest, bool& sufficient)
+{
+    HCCL_INFO("[HcclQueryCcuResSuffient] start, kernelNum[%zu].", resRequest.ccuKernelInfos.size());
+    // 默认资源充足，任一die任一资源类型不足时置为false
+    sufficient = true;
+    ResDescByDie reqDescs;
+    // 将请求的kernel资源需求按die聚合为资源需求描述集合
+    CHK_RET(BuildAggregatedResReq(resRequest, reqDescs));
+
+    // 逐die查询剩余资源并与请求比较
+    std::string allDieInsuffSummary;
+    for (auto& dieEntry : reqDescs) {
+        uint32_t dieId = dieEntry.first;
+        HcommCcuResDescHandle reqDesc = dieEntry.second;
+        HcommCcuResDescHandle remainDesc = 0;
+        // 创建该die的剩余资源描述句柄，失败则转换错误码返回
+        CcuResult rCreateRet = HcommCcuInsResDescCreate(dieId, &remainDesc);
+        if (rCreateRet != CCU_SUCCESS) {
+            HcommCcuInsResDescDestroy(remainDesc);
+            DestroyAllDescs(reqDescs);
+            return ConvertCcuToHccl(rCreateRet);
+        }
+        // 查询该die的剩余资源（结果写入remainDesc），失败则转换错误码返回
+        CcuResult rQueryRet = HcommCcuQueryRemainResDesc(remainDesc);
+        if (rQueryRet != CCU_SUCCESS) {
+            HcommCcuInsResDescDestroy(remainDesc);
+            DestroyAllDescs(reqDescs);
+            return ConvertCcuToHccl(rQueryRet);
+        }
+        // 逐资源类型比较剩余量与请求量，比较结果写入dieSufficient，不足详情写入dieInsuffSummary
+        bool dieSufficient = false;
+        std::string dieInsuffSummary;
+        HcclResult cmpRet = IsResCapSufficient(dieId, remainDesc, reqDesc, dieSufficient, dieInsuffSummary);
+        HcommCcuInsResDescDestroy(remainDesc);
+        if (cmpRet != HCCL_SUCCESS) {
+            DestroyAllDescs(reqDescs);
+            return cmpRet;
+        }
+        // 当前die资源不足时置全局不充足标记，并汇总各die的不足详情
+        if (!dieSufficient) {
+            sufficient = false;
+            if (!allDieInsuffSummary.empty()) {
+                allDieInsuffSummary += "; ";
+            }
+            allDieInsuffSummary += "dieId[" + std::to_string(dieId) + "]: " + dieInsuffSummary;
+        }
+    }
+    DestroyAllDescs(reqDescs);
+    if (!sufficient) {
+        HCCL_RUN_INFO("[HcclQueryCcuResSuffient] resource insufficient detail: %s", allDieInsuffSummary.c_str());
+    }
+    HCCL_INFO("[HcclQueryCcuResSuffient] finish, sufficient[%d].", sufficient);
+    return HCCL_SUCCESS;
+}
 #endif
 
 HcclResult HcclGetCcuKernel(
