@@ -32,7 +32,7 @@ Ascend C以「兼容标准C/C++语法、最小化语法扩展」为核心设计�
 | **算子模板库（ATVC/ATVOSS/BLAZE等）** | 算法开发人员 | 提供覆盖Vector、Cube等计算范式的典型算子高性能模板实现，支持基于模板的定制化扩展，快速适配业务场景的高性能算力需求，同时沉淀端到端性能优化最佳实践 |
 | **高阶API** | 算法开发人员 | 封装Softmax、Matmul等通用单核计算算法原语，屏蔽底层硬件实现细节，支撑开发者快速搭建算法逻辑，高效完成功能验证与方案原型落地，缩短从想法到可运行算子的周期 |
 
-此外，联合生态正持续建设Kernel编程C++标准库[asc-stl](https://gitcode.com/cann/asc-stl)、设备侧线性代数库[asc-mathdx](https://gitcode.com/cann/asc-mathdx)等基础组件，不断丰富Ascend C算子编程生态。
+此外，联合生态正持续建设Kernel编程C++标准库**asc-stl**、设备侧线性代数库**asc-mathdx**等基础组件，不断丰富Ascend C算子编程生态。
 
 ---
 

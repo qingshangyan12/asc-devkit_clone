@@ -30,7 +30,7 @@ On top of the underlying programming interface system, Ascend C further provides
 | **Operator Template Libraries (ATVC/ATVOSS/BLAZE, etc.)** | Algorithm developers | Provide high-performance template implementations of typical operators covering Vector, Cube and other computing paradigms, support template-based customized expansion, quickly adapt to high-performance computing requirements of business scenarios, and precipitate end-to-end performance optimization best practices |
 | **High-Level API** | Algorithm developers | Encapsulate general single-core computing algorithm primitives such as Softmax and Matmul, shield underlying hardware implementation details, enable developers to quickly build algorithm logic, efficiently complete function verification and scheme prototyping, and shorten the cycle from idea to runnable operator |
 
-In addition, the joint ecosystem is continuously building foundational components such as [asc-stl](https://gitcode.com/cann/asc-stl) (C++ standard library for kernel programming) and [asc-mathdx](https://gitcode.com/cann/asc-mathdx) (on-device linear algebra library) to continuously enrich the Ascend C operator programming ecosystem.
+In addition, the joint ecosystem is continuously building foundational components such as **asc-stl** (C++ standard library for kernel programming) and **asc-mathdx**(on-device linear algebra library) to continuously enrich the Ascend C operator programming ecosystem.
 
 ---
 

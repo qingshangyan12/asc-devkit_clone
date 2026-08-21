@@ -74,7 +74,7 @@ Ascend C遵循「标准C/C++语法、最小化扩展」的核心原则，构建�
 | **算子模板库（BLAZE/ATVOSS等）** | 算法开发人员 | 提供典型算子的高性能模板实现，支持基于模板定制化扩展，快速适配业务场景的高性能算力需求 |
 | **高阶API** | 算法开发人员 | 封装通用单核计算算法原语，屏蔽底层硬件实现细节，支撑开发者快速搭建算法逻辑，高效完成功能验证与方案原型落地 |
 
-此外，联合生态正持续建设Kernel编程C++标准库[asc-stl](https://gitcode.com/cann/asc-stl)、设备侧线性代数库[asc-mathdx](https://gitcode.com/cann/asc-mathdx)等基础组件，不断丰富Ascend C算子编程生态。
+此外，联合生态正持续建设Kernel编程C++标准库**asc-stl**、设备侧线性代数库**asc-mathdx**等基础组件，不断丰富Ascend C算子编程生态。
 
 ### 整体架构
 
@@ -200,7 +200,7 @@ Ascend C采用分层架构设计，自下而上构建完整的算子开发技术
 
 - 重启clangd（VS Code: Command Palette -> "Clangd: Restart language server"）
 
-- 推荐安装VS Code扩展[Ascend C Toolkit](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit)，用于在VS Code中完成Ascend C算子工程的编辑、编译、运行、调试、异常检测与性能调优等流程。打开本仓工作区时，VS Code会根据`.vscode/extensions.json`提示安装推荐扩展。
+- 推荐安装VS Code扩展Ascend C Toolkit，用于在VS Code中完成Ascend C算子工程的编辑、编译、运行、调试、异常检测与性能调优等流程。打开本仓工作区时，VS Code会根据`.vscode/extensions.json`提示安装推荐扩展。
 
 - Ascend C Toolkit近期更新重点增强Atlas A2系列产品和Atlas A3系列产品的环境解析、标准自定义算子创建、SoC设置、仿真分析、NPU调试、设置迁移与稳定性；完整使用说明和问题反馈请参考[CANN讨论区使用指导](https://gitcode.com/org/cann/discussions/54)。
 

@@ -77,7 +77,7 @@ On top of the underlying programming interfaces, Ascend C also provides operator
 | **Operator Template Library (BLAZE/ATVOSS, etc.)** | Algorithm developers | Provides high-performance template implementations of typical operators, supports customized expansion based on templates, and quickly adapts to high-performance computing requirements of business scenarios. |
 | **High-level API** | Algorithm developers | Encapsulates general single-core computing algorithm primitives, shields underlying hardware implementation details, enables developers to quickly build algorithm logic, and efficiently completes function verification and scheme prototyping. |
 
-In addition, the joint ecosystem is continuously building basic components such as [asc-stl](https://gitcode.com/cann/asc-stl) (C++ standard library for kernel programming) and [asc-mathdx](https://gitcode.com/cann/asc-mathdx) (on-device linear algebra library), to continuously enrich the Ascend C operator programming ecosystem.
+In addition, the joint ecosystem is continuously building basic components such as **asc-stl** (C++ standard library for kernel programming) and **asc-mathdx**(on-device linear algebra library), to continuously enrich the Ascend C operator programming ecosystem.
 
 ### Overall Architecture
 
@@ -204,7 +204,7 @@ If you want to quickly experience project building and operator sample execution
 
 - Restart clangd (VS Code: Command Palette -> "Clangd: Restart language server")
 
-- It is recommended to install the VS Code extension [Ascend C Toolkit](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit), which supports editing, compilation, execution, debugging, exception detection and performance tuning of Ascend C operator projects within VS Code. When opening the workspace of this repository, VS Code will prompt to install recommended extensions according to `.vscode/extensions.json`.
+- It is recommended to install the VS Code extension Ascend C Toolkit, which supports editing, compilation, execution, debugging, exception detection and performance tuning of Ascend C operator projects within VS Code. When opening the workspace of this repository, VS Code will prompt to install recommended extensions according to `.vscode/extensions.json`.
 
 - Recent updates of Ascend C Toolkit focus on enhancing environment resolution, standard custom operator creation, SoC settings, simulation analysis, NPU debugging, setting migration and stability for Atlas A2 series and Atlas A3 series products. For complete usage instructions and feedback, please refer to [CANN Discussion Area Usage Guide](https://gitcode.com/org/cann/discussions/54).
 
