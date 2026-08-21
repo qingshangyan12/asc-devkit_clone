@@ -259,7 +259,6 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst,
 ### 掩码寄存器搬出场景
 
 - `dst`起始地址需16字节对齐。
-- `PK`模式每间隔1 bit丢弃1 bit，保留bit按原顺序连续写入目的地址；`uint8_t`、`uint16_t`和`uint32_t`三种目标类型使用相同的bit压缩规则。
 - `int32_t offset`的单位为字节，通过`offset`参数偏移后的实际访问地址需落在UB地址范围内，且仍需16字节对齐，否则会报错。
 - `addr_reg offset`必须由配套的地址寄存器构造接口预先构造。偏移后的实际访问地址需落在UB地址范围内，且仍需16字节对齐，否则会报错。
 

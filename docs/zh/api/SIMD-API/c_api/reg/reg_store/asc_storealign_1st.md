@@ -26,11 +26,11 @@
 
 ## 功能说明
 
-将矢量数据寄存器中的首个元素搬出到Unified Buffer（UB），单次搬出量为一个元素。本接口不支持设置掩码，固定搬出矢量数据寄存器中第一个元素到目的地址处，搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。
+将矢量数据寄存器中的首个元素搬出到Unified Buffer（UB），单次搬出量为一个元素。本接口不支持设置掩码，固定搬出矢量数据寄存器中第一个元素到目的地址处，目的地址需按`sizeof(dtype)`对齐，搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。
 
 本接口提供三种参数列表不同的功能模式：
 
-- **对齐搬出模式**：从矢量数据寄存器首个元素搬出到UB起始地址，由用户自行更新目的地址。
+- **对齐搬出模式**：从矢量数据寄存器首个元素搬出到UB起始地址，多次调用时由用户自行更新目的地址。
 - **立即数偏移搬出模式**：通过`int32_t offset`指定相对目的起始地址的元素偏移，用户可选择更新偏移或更新目的地址。
 - **地址寄存器偏移搬出模式**：通过地址寄存器`addr_reg offset`指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
 
@@ -104,7 +104,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst_align32b | 输出 | 目的操作数的起始地址，类型为`__ubuf__ <dtype>*`，需32字节对齐。 |
+| dst_align32b | 输出 | 目的操作数的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需dtype对齐。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。仅首个元素参与搬出，其余元素被忽略。 |
 
 ### 立即数偏移搬出模式
@@ -113,9 +113,9 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst_align32b | 输出 | 目的操作数的起始地址，类型为`__ubuf__ <dtype>*`，需32字节对齐。 |
+| dst_align32b | 输出 | 目的操作数的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需dtype对齐。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。仅首个元素参与搬出，其余元素被忽略。 |
-| offset | 输入 | 相对`dst_align32b`起始地址的偏移量，类型为`int32_t`，单位为元素。实际访问地址为`dst_align32b + offset`。 |
+| offset | 输入 | 相对`dst_align32b`起始地址的偏移量，类型为`int32_t`，单位为元素。 |
 
 ### 地址寄存器偏移搬出模式
 
@@ -123,7 +123,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst_align32b | 输出 | 目的操作数的起始地址，类型为`__ubuf__ <dtype>*`，需32字节对齐。 |
+| dst_align32b | 输出 | 目的操作数的起始地址，类型为`__ubuf__ <dtype>*`，起始地址需dtype对齐。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。仅首个元素参与搬出，其余元素被忽略。 |
 | offset | 输入 | 地址寄存器偏移，类型为`addr_reg`，由配套的地址寄存器构造接口预先构造，单位为元素。 |
 
@@ -144,7 +144,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b,
 
 ### 指令约束
 
-- `dst_align32b`起始地址需32字节对齐，`offset`偏移后的实际访问地址需32字节对齐且需落在UB地址范围内。
+- `dst_align32b`起始地址需dtype对齐。，`offset`偏移后的实际访问地址需dtype对齐且需落在UB地址范围内。
 
 ## 调用示例
 
