@@ -239,7 +239,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 constant_info_files,
                 chip_version,
             )
-        return generator.build_kernel_compile_records(
+        request = generator.KernelCompileRecordBuildRequest(
             basic_compile_info=basic_context,
             sk_compile_info=sk_context,
             metadata_json_path=self.metadata_path,
@@ -256,6 +256,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 else constant_info_size_by_tiling_key
             ),
         )
+        return generator.KernelCompileRecordBuilder(request).build()
 
     def make_request(
         self,
@@ -304,7 +305,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
 
     def generate(self, request):
-        return generator.generate_manifest(request)
+        return generator.StaticCompileResourceGenerator(request).generate()
 
     def resource_logical_path(self, manifest, reference):
         prefix = "${resource}/" + manifest["resource_path"] + "/"
@@ -695,6 +696,42 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             )
         )
 
+    def test_logical_symbol_rewrites_only_trailing_tiling_key(self):
+        cases = (
+            (
+                "op100000_add_100000",
+                "op100000_add_100001",
+            ),
+            (
+                "op100000_add_100000_mix_aic",
+                "op100000_add_100001_mix_aic",
+            ),
+            (
+                "op100000_add_100000_mix_aiv",
+                "op100000_add_100001_mix_aiv",
+            ),
+        )
+        for compile_symbol, expected in cases:
+            with self.subTest(compile_symbol=compile_symbol):
+                self.assertEqual(
+                    generator._logical_symbol(
+                        compile_symbol,
+                        "100000",
+                        "100001",
+                    ),
+                    expected,
+                )
+
+        with self.assertRaisesRegex(
+            generator.ManifestCommandError,
+            "does not end with master tiling key 100000",
+        ):
+            generator._logical_symbol(
+                "op100000_add_200000_mix_aic",
+                "100000",
+                "100001",
+            )
+
     def test_grouped_tiling_key_rejects_ambiguous_or_missing_master(self):
         first_context = self.make_compile_context()
         first_context.tiling_key_group_map = {"100000": ["100001"]}
@@ -984,7 +1021,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             with self.assertRaisesRegex(
                 generator.ManifestPublishError, "failed to publish"
             ):
-                generator.generate_manifest(request)
+                self.generate(request)
 
         self.assertEqual(Path(marker).read_text(encoding="utf-8"), "previous\n")
         self.assertFalse(
@@ -1002,7 +1039,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             with self.assertRaisesRegex(
                 generator.ManifestPublishError, "failed to publish"
             ):
-                generator.generate_manifest(request)
+                self.generate(request)
 
         self.assertEqual(Path(marker).read_text(encoding="utf-8"), "previous\n")
 
