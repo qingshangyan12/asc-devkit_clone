@@ -11,7 +11,7 @@ This sample demonstrates the register composite compute API `asc::te::fma` with 
 ## Directory Structure
 
 ```plain
-├── composite_compute_tensor_api
+├── composite_compute
 │   ├── scripts
 │   │   ├── gen_data.py          // Generates input and golden data.
 │   │   └── verify_result.py     // Verifies output data.

@@ -1,8 +1,8 @@
-# Logical Compute Sample Implemented with Tensor API
+# Basic Compute Sample Implemented with Tensor API
 
 ## Overview
 
-This sample demonstrates scalar left-shift on register tensors with Tensor API. It covers `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, and `uint32_t`. Each typed input contains 64 elements, and the output stores the result of shifting each element left by one bit.
+This sample demonstrates the register basic compute API `asc::te::abs` with Tensor API. It covers `int8_t`, `int16_t`, `half`, `int32_t`, and `float`. Each typed input contains 64 elements, and the output stores the absolute value of each input element.
 
 ## Supported Products
 
@@ -11,33 +11,33 @@ This sample demonstrates scalar left-shift on register tensors with Tensor API. 
 ## Directory Structure
 
 ```plain
-├── logical_compute_tensor_api
+├── basic_arithmetic
 │   ├── scripts
 │   │   ├── gen_data.py          // Generates input and golden data.
 │   │   └── verify_result.py     // Verifies output data.
 │   ├── CMakeLists.txt           // Build project file.
 │   ├── README.md
 │   ├── README_En.md
-│   └── logical_compute_tensor_api.asc  // Ascend C operator implementation and invocation sample.
+│   └── basic_arithmetic_tensor_api.asc  // Ascend C operator implementation and invocation sample.
 ```
 
 ## Sample Description
 
 - Sample function:
-  The sample shifts each input Tensor element left by one bit:
+  The sample computes the absolute value of each input Tensor element:
 
   ```text
-  output_i = input_i << 1
+  output_i = abs(input_i)
   ```
 
 - Sample specification:
   <table>
   <caption>Table 1: Sample input and output specification</caption>
-  <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">logical_compute_tensor_api</td></tr>
+  <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">basic_arithmetic_tensor_api</td></tr>
   <tr><td rowspan="2" align="center">Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input</td><td align="center">[1, 64]</td><td align="center">int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Output</td><td align="center">output</td><td align="center">[1, 64]</td><td align="center">int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">logical_compute_tensor_api</td></tr>
+  <tr><td align="center">input</td><td align="center">[1, 64]</td><td align="center">int8_t/int16_t/half/int32_t/float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Output</td><td align="center">output</td><td align="center">[1, 64]</td><td align="center">int8_t/int16_t/half/int32_t/float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">basic_arithmetic_tensor_api</td></tr>
   </table>
 
 - Sample implementation:
@@ -47,7 +47,7 @@ This sample demonstrates scalar left-shift on register tensors with Tensor API. 
     1. Create Tensor objects on GM and UB by using `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout`.
     2. Move input data from GM to UB by using `asc::te::make_copy` and `asc::te::copy`.
     3. Load UB Tensor data as `reg_tensor` by using Tensor `load`, and use `make_mask<mask_pattern::vl64, T>()` to select 64 elements.
-    4. Execute `value << 1` and store the result back to UB by using Tensor `store`.
+    4. Call `asc::te::abs` and store the result back to UB by using Tensor `store`.
     5. Move the result from UB back to GM by using `asc::te::copy`.
 
   - Invocation implementation
@@ -56,14 +56,14 @@ This sample demonstrates scalar left-shift on register tensors with Tensor API. 
 
 ## Core Interface
 
-### operator<<
+### asc::te::abs
 
 ```cpp
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator<<(const reg_tensor<T>& src, const U& shift);
+template <typename T>
+__simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg);
 ```
 
-This API performs scalar left-shift on an input `reg_tensor` and returns a `reg_tensor` with the same element type.
+This API computes the absolute value of an input `reg_tensor` and returns a `reg_tensor` with the same element type.
 
 ## Build and Run
 
@@ -100,6 +100,6 @@ Run the following steps in the sample root directory to build and execute the sa
   A successful run prints:
 
   ```text
-  logical_compute_tensor_api executed successfully.
-  test pass! verified scalar shift-left for six integer types.
+  basic_arithmetic_tensor_api executed successfully.
+  test pass! verified abs for int8, int16, half, int32, and float.
   ```
