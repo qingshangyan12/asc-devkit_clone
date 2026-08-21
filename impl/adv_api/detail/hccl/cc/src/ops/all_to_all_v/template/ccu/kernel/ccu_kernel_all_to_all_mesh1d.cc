@@ -112,6 +112,40 @@ static void PostSync(AlltoAllMesh1DContext &ctx)
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D PostSync end.");
 }
 
+static void WriteChunked(AlltoAllMesh1DContext &ctx, ccu::ChannelHandle channelId,
+    ccu::RemoteAddr &curDst, ccu::LocalAddr &curSrc, uint64_t rankIdx)
+{
+    ccu::Variable chunkSize;
+    chunkSize = MAX_DMA_TRANS_SIZE;
+    ccu::Variable neg256MB;
+    neg256MB = NEG_256MB;
+    ccu::Variable constOne;
+    constOne = 1;
+
+    ccu::Variable loopCount;
+    loopCount = ctx.writeLoopCount;
+    ccu::Variable remaining;
+    remaining = ctx.sliceSize;
+
+    CCU_WHILE(loopCount != UINT64_MAX)
+    {
+        ccu::Write(channelId, curDst, curSrc, chunkSize, ctx.event, 0);
+        curDst.addr += chunkSize;
+        curSrc.addr += chunkSize;
+        remaining += neg256MB;
+        loopCount += constOne;
+    }
+
+    CCU_IF(remaining != 0)
+    {
+        ccu::Write(channelId, curDst, curSrc, remaining, ctx.event, 1 << rankIdx);
+    }
+    CCU_ELSE
+    {
+        ccu::EventRecord(ctx.event, 1 << rankIdx);
+    }
+}
+
 static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
 {
     HCCL_INFO("DoAlltoAll Start.");
@@ -141,45 +175,13 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
     uint32_t channelId = 0;
     uint16_t allBit = ((1 << arg->rankSize) - 1) & (~(1 << arg->rankId));
 
-    ccu::Variable chunkSize;
-    chunkSize = MAX_DMA_TRANS_SIZE;
-    ccu::Variable neg256MB;
-    neg256MB = NEG_256MB;
-    ccu::Variable constOne;
-    constOne = 1;
-
     if (arg->loadFromMem) {
         HCCL_INFO("[DoAlltoAll] loadFromMem=true, rankSize[%u] rankId[%u] chunkSize=256MB", arg->rankSize, arg->rankId);
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r == arg->rankId) {
                 ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1 << r);
-            }
-            else {
-                ccu::RemoteAddr curDst = dst[r];
-                ccu::LocalAddr curSrc = src[r];
-
-                ccu::Variable loopCount;
-                loopCount = ctx.writeLoopCount;
-                ccu::Variable remaining;
-                remaining = ctx.sliceSize;
-
-                CCU_WHILE(loopCount != UINT64_MAX)
-                {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 0);
-                    curDst.addr += chunkSize;
-                    curSrc.addr += chunkSize;
-                    remaining += neg256MB;
-                    loopCount += constOne;
-                }
-
-                CCU_IF(remaining != 0)
-                {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, remaining, ctx.event, 1 << r);
-                }
-                CCU_ELSE
-                {
-                    ccu::EventRecord(ctx.event, 1 << r);
-                }
+            } else {
+                WriteChunked(ctx, arg->channels[channelId], dst[r], src[r], r);
                 channelId++;
             }
         }
@@ -189,31 +191,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
             arg->rankSize, arg->rankId, allBit);
         for(uint64_t r = 0; r < arg->rankSize; r++) {
             if (r != arg->rankId) {
-                ccu::RemoteAddr curDst = dst[r];
-                ccu::LocalAddr curSrc = src[r];
-
-                ccu::Variable loopCount;
-                loopCount = ctx.writeLoopCount;
-                ccu::Variable remaining;
-                remaining = ctx.sliceSize;
-
-                CCU_WHILE(loopCount != UINT64_MAX)
-                {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, chunkSize, ctx.event, 0);
-                    curDst.addr += chunkSize;
-                    curSrc.addr += chunkSize;
-                    remaining += neg256MB;
-                    loopCount += constOne;
-                }
-
-                CCU_IF(remaining != 0)
-                {
-                    ccu::Write(arg->channels[channelId], curDst, curSrc, remaining, ctx.event, 1 << r);
-                }
-                CCU_ELSE
-                {
-                    ccu::EventRecord(ctx.event, 1 << r);
-                }
+                WriteChunked(ctx, arg->channels[channelId], dst[r], src[r], r);
                 channelId++;
             }
         }
