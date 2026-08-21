@@ -811,7 +811,14 @@ HcclResult HcclGetAlgRes(
             // ccu申请aiv内存用于存放resctx
             ctxEngine = COMM_ENGINE_AIV;
         }
+        HCCL_INFO(
+            "[asc][AlgoResource][HcclGetAlgRes] before HcclEngineCtxGet, algTag[%s], engine[%d], ctxEngine[%d].",
+            param.algTag, param.engine, ctxEngine);
         if (HcclEngineCtxGet(comm, param.algTag, ctxEngine, &ctx, &size) == HCCL_SUCCESS) {
+            HCCL_INFO(
+                "[asc][AlgoResource][HcclGetAlgRes] HcclEngineCtxGet HIT cache, algTag[%s], engine[%d], ctxEngine[%d], "
+                "ctxSize[%llu].",
+                param.algTag, param.engine, ctxEngine, static_cast<unsigned long long>(size));
             HCCL_DEBUG("Already have context, skip create, ctxSize is %u", param.ctxSize);
             isResourceReused = true;
             *resCtxSequence = ctx;
@@ -823,6 +830,10 @@ HcclResult HcclGetAlgRes(
 
             return HCCL_SUCCESS;
         }
+        HCCL_INFO(
+            "[asc][AlgoResource][HcclGetAlgRes] HcclEngineCtxGet MISS cache, algTag[%s], engine[%d], ctxEngine[%d], "
+            "will alloc new resource.",
+            param.algTag, param.engine, ctxEngine);
     }
 
     // 计算AlgHierarchyInfo
