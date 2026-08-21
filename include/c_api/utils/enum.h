@@ -41,17 +41,9 @@ enum class asc_hf32_round_mode : uint8_t {
     NEAREST_ZERO = NEAREST_AWAY // Compatible with the old name; the actual behavior is equivalent to NEAREST_AWAY.
 };
 
-enum class asc_dual_dst_mode : uint8_t {
-    DUAL_DST_DISABLE = 0,
-    DUAL_DST_SPLIT_M = 1,
-    DUAL_DST_SPLIT_N = 2
-};
+enum class asc_dual_dst_mode : uint8_t { DUAL_DST_DISABLE = 0, DUAL_DST_SPLIT_M = 1, DUAL_DST_SPLIT_N = 2 };
 
-enum class asc_unit_flag_mode : uint8_t {
-    DISABLE = 0,
-    ENABLE_KEEP = 2,
-    ENABLE_UPDATE = 3
-};
+enum class asc_unit_flag_mode : uint8_t { DISABLE = 0, ENABLE_KEEP = 2, ENABLE_UPDATE = 3 };
 
 enum class asc_relu_pre_mode : uint8_t {
     NONE = 0,
