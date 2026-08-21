@@ -344,10 +344,17 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
 
     HcclHandle handleId = curHandleId_;
 
-    ASCENDC_HCCL_API_ASSERT(
-        handleId < HCCL_MAX_HANDLE_ID, { return INVALID_HANDLE_ID; },
-        "Call Prepare[%d] failed, Prepare interface call num is[%d], expected less than[%d].",
-        static_cast<int32_t>(commonPrepareParam.commType.prepareType), handleId + 1, HCCL_MAX_HANDLE_ID);
+    uint64_t commDataSize =
+        commonPrepareParam.count * DATA_TYPE_MAP[static_cast<uint64_t>(commonPrepareParam.dataType)];
+    ascendc_assert(commDataSize > 0 && commDataSize <= CCU_MAX_COMM_DATA,
+        "Call Prepare failed, data size is %u, expected in range of (0, %u].\n", commDataSize, CCU_MAX_COMM_DATA);
+
+    ascendc_assert(handleId < HCCL_MAX_HANDLE_ID, "Call Prepare failed, Prepare     interface call num is expected less than HCCL_MAX_HANDLE_ID.\n");
+
+    KERNEL_LOG(KERNEL_INFO,
+        "ApiClient CommonPrepareImpl prepareType:%d, count:%llu, dataType:%d, commDataSize:%llu, handleId:%d",
+        static_cast<int32_t>(commonPrepareParam.commType.prepareType), commonPrepareParam.count,
+        static_cast<int32_t>(commonPrepareParam.dataType), commDataSize, static_cast<int32_t>(handleId));
 
     InitHandleInfo(handleId);
     uint64_t reqId = handleId == 0 ? 0 : handleReqId_[handleId - 1] + handleRepeatCnt_[handleId - 1];
