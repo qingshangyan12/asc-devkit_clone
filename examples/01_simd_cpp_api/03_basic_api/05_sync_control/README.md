@@ -20,6 +20,7 @@
 | [cross_core_set_wait_flag](./cross_core_set_wait_flag) |  基于CrossCoreSetFlag和CrossCoreWaitFlag实现核间同步，支持全核同步、单AI Core内AIV同步、AIC与AIV同步三种模式 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [group_barrier](./group_barrier) |  基于GroupBarrier实现两组存在依赖关系的AIV之间的同步，A组AIV计算完成后，B组AIV依赖该结果进行后续计算 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [ib_set_wait](./ib_set_wait) |  基于IBSet和IBWait实现核间同步，适用于不同核操作同一块全局内存且存在数据依赖问题的场景 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [ssbuffer](./ssbuffer) |  基于SSBuffer实现AIC与AIV核间小数据通信（配合CrossCoreSetFlag/CrossCoreWaitFlag核间同步），并验证GetSsbufBaseAddr基址获取 | Ascend 950PR/Ascend 950DT |
 | [sequential_block_sync](./sequential_block_sync) |  基于InitDetermineComputeWorkspace、WaitPreBlock、NotifyNextBlock三个接口组合实现核间顺序同步，确保多核按blockIdx升序执行 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [sync_all](./sync_all) |  基于SyncAll实现核间同步，适用于不同核操作同一块全局内存且存在读后写、写后读、写后写等数据依赖问题的场景 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 
