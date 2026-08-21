@@ -61,9 +61,7 @@ __simd_callee__ inline reg_tensor<DstType> cast_impl(reg_tensor<SrcType> src)
         "register cast type or option combination is unsupported on the current architecture");
 
     reg_tensor<DstType> dst;
-    if constexpr (op::supported) {
-        op::run(dst.reg, src.reg, src.mask);
-    }
+    op::run(dst.reg, src.reg, src.mask);
     dst.mask = src.mask;
     return dst;
 }
