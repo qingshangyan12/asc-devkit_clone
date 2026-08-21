@@ -25,14 +25,20 @@ if(NOT CMAKE_ASC_RUN_MODE MATCHES "^(npu|sim)$")
     message(FATAL_ERROR "CMAKE_ASC_RUN_MODE must be npu or sim, but got ${CMAKE_ASC_RUN_MODE}.")
 endif()
 
-set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-6)")
-if(NOT SCENARIO_NUM MATCHES "^[1-6]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3, 4, 5, or 6, but got ${SCENARIO_NUM}")
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-17)")
+if(NOT SCENARIO_NUM MATCHES "^([1-9]|1[0-7])$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1-17, but got ${SCENARIO_NUM}")
+endif()
+
+set(SATURATION_MODE "1" CACHE STRING "Saturation mode: 1=saturation (CTRL[48]=0), 0=non-saturation (CTRL[48]=1)")
+if(NOT SATURATION_MODE MATCHES "^[01]$")
+    message(FATAL_ERROR "SATURATION_MODE must be 0 or 1, but got ${SATURATION_MODE}")
 endif()
 
 add_executable(demo data_copy_l0c2gm.asc)
 
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+add_definitions(-DSATURATION_MODE=${SATURATION_MODE})
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
