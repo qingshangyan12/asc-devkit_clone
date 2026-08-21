@@ -245,6 +245,6 @@ If you want to quickly experience project building and operator sample execution
 
 ## 📝 Related Information
 
-- [Contribution Guide](CONTRIBUTING.md)
-- [Security Statement](SECURITY.md)
+- [Contribution Guide](CONTRIBUTING_en.md)
+- [Security Statement](SECURITY_en.md)
 - [License](LICENSE)
