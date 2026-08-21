@@ -26,6 +26,7 @@
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "ascend_dequant_common.h"
+#include "../../quantization/quant/ascend_quant_3510_impl.h"
 #include "../../common/check.h"
 
 namespace AscendC {

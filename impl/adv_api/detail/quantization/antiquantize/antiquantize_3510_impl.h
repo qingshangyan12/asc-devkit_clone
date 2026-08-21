@@ -143,7 +143,11 @@ __simd_vf__ inline void AntiQuantizePerGroupForRowCommonVF(
     const AscendAntiQuantParam para, uint16_t rowNum, uint16_t tailRow)
 {
     uint16_t mainRowGroup = rowNum / para.groupSize;
+if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     uint32_t vecLen = ANTIQUANT_B32_VF_LEN;
+#else
+    uint32_t vecLen = ASCENDC_QUANT_B32_VF_LEN;
+#endif
     uint16_t repeat = CeilDivision(para.n, vecLen);
 
     Reg::MaskReg preg;
@@ -202,7 +206,11 @@ __simd_vf__ inline void AntiQuantizePerTokenCommonVF(
     const AscendAntiQuantParam para)
 {
     uint16_t rowNum = para.calCount / para.n;
+if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     uint32_t vecLen = ANTIQUANT_B32_VF_LEN;
+#else
+    uint32_t vecLen = ASCENDC_QUANT_B32_VF_LEN;
+#endif
     uint16_t repeat = CeilDivision(para.n, vecLen);
     uint32_t sreg = para.n;
 
