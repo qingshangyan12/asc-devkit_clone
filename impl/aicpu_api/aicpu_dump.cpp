@@ -206,7 +206,7 @@ inline uint32_t CalcFormattedLen(const char* fmt, va_list args)
 {
     va_list argsCopy;
     va_copy(argsCopy, args);
-    int32_t len = vsnprintf(nullptr, 0, fmt, argsCopy);
+    int32_t len = vsnprintf_s(nullptr, 0, 0, fmt, argsCopy);
     va_end(argsCopy);
     return (len > 0) ? static_cast<uint32_t>(len) : 0U;
 }
@@ -270,7 +270,7 @@ public:
 
     uint8_t* Get(uint32_t size)
     {
-        if (buf_ == nullptr) {
+        if (buf_ == nullptr && size > 0) {
             buf_ = static_cast<uint8_t*>(malloc(size));
         }
         return buf_;
@@ -372,7 +372,7 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     //    This ensures rts sees WRITING (not stale READY) when it notices
     //    bufOffset has advanced, causing it to stop reading this round.
     if (!needSplit) {
-        (void)memcpy(ringBase + wOffLimited, &infoHead, sizeof(PrintfInfo));
+        (void)memcpy_s(ringBase + wOffLimited, ringBufLen - wOffLimited, &infoHead, sizeof(PrintfInfo));
     } else {
         // Split: header may span tail/head boundary, write byte-by-byte.
         const uint8_t* headBytes = reinterpret_cast<const uint8_t*>(&infoHead);
@@ -401,7 +401,7 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
             return;
         }
         // Write header to temp buffer.
-        (void)memcpy(tempBuf, &infoHead, sizeof(PrintfInfo));
+        (void)memcpy_s(tempBuf, ringBufLen, &infoHead, sizeof(PrintfInfo));
         // Write formatted string to temp buffer after header.
         char* strDest = reinterpret_cast<char*>(tempBuf + sizeof(PrintfInfo));
         size_t destMax = static_cast<size_t>(ringBufLen) - sizeof(PrintfInfo);
@@ -411,8 +411,8 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
         // (Overwrites the byte-by-byte header written above with identical content.)
         uint32_t part1 = tailSpace;
         uint32_t part2 = tlvLen - part1;
-        (void)memcpy(ringBase + wOffLimited, tempBuf, part1);
-        (void)memcpy(ringBase, tempBuf + part1, part2);
+        (void)memcpy_s(ringBase + wOffLimited, ringBufLen - wOffLimited, tempBuf, part1);
+        (void)memcpy_s(ringBase, ringBufLen, tempBuf + part1, part2);
     }
 /* ── Step 7: Release the entry to the rts reader ─────────────────── */
     /* Ensure all data writes are visible before flipping the type. */
