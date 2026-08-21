@@ -74,6 +74,8 @@ HcclResult HcclGetCcuKernel(
 
 HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest);
 
+HcclResult HcclQueryCcuResSuffient(AlgResourceRequest& resRequest, bool& sufficient);
+
 HcclResult HcclAllocAlgResourceCcu(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);

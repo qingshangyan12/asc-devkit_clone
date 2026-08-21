@@ -1034,3 +1034,60 @@ HcclResult CcuSelectAlg(
 
     return HCCL_SUCCESS;
 }
+
+HcclResult CheckCcuResSuffient(
+    HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex)
+{
+    HCCL_INFO("[CheckCcuResSuffient] start, tilingIndex[%u], opType[%u].", tilingIndex, ccTiling->opType);
+    RunCcuSelectAlgCheck(ccTiling, tilingIndex);
+
+    OpParam opParam{};
+    std::string algName;
+    auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    AlgorithmType algorithmType;
+    CHK_RET(SelectCcuAlgorithm(comm, stream, topoTag, ccTiling, tilingIndex, opParam, algName, topoInfo, algorithmType));
+    opParam.isKfc = true;
+    bool skipGetRes = false;
+    CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
+    if (skipGetRes) {
+        HCCL_INFO("[CheckCcuResSuffient] single rank, resource sufficient, tilingIndex[%u].", tilingIndex);
+        return HCCL_SUCCESS;
+    }
+
+    std::unique_ptr<InsCollAlgBase> executor = GetAlgExecutor(opParam, algName);
+    CHK_PRT_RET(executor.get() != nullptr,
+        HCCL_ERROR("[CheckCcuResSuffient] fail to find executor, algName[%s].", algName.c_str()), HCCL_E_ALG_NOT_SUPPORTED);
+    AlgHierarchyInfoForAllLevel algHierarchyInfo;
+    HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfo(comm, topoInfo.get(), algHierarchyInfo);
+    CHK_PRT_RET(calcHierarchyRet != HCCL_SUCCESS, 
+        HCCL_ERROR("[CheckCcuResSuffient] CalcAlgHierachyInfo failed, algName[%s],
+            ret[%d].", algName.c_str(), static_cast<int>(calcHierarchyRet)), calcHierarchyRet);
+    AlgResourceRequest resRequest;
+    HcclResult calcResRet = executor->CalRes(comm, opParam, topoInfo.get(), algHierarchyInfo, resRequest);
+    CHK_PRT_RET(calcResRet != HCCL_SUCCESS,
+        HCCL_ERROR("[CheckCcuResSuffient] CalcRes failed, algName[%s], ret[%d].", 
+        algName.c_str(), static_cast<int>(calcResRet)), calcResRet);
+    
+    if (opParam.isKfc && opParam.engine == COMM_ENGINE_CCU) {
+        std::unique_ptr<InsCollAlgBase> ccuKfcExecutor = 
+            CollAlgExecutor::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_KFC_SERVER, "CcuKfcServer");
+        CHK_PRT_RET(ccuKfcExecutor.get() != nullptr,
+            HCCL_ERROR("[CheckCcuResSuffient] fail to find ccuKfcExecutor, algName[%s].", algName.c_str()), HCCL_E_ALG_NOT_SUPPORTED);
+        HcclResult kfcResRet = ccuKfcExecutor->CalcRes(comm, opParam, topoInfo.get(), algHierarchyInfo, resRequest);
+        CHK_PRT_RET(kfcResRet != HCCL_SUCCESS,
+            HCCL_ERROR("[CheckCcuResSuffient] CalcRes failed, algName[%s], ret[%d].", 
+            algName.c_str(), static_cast<int>(kfcResRet)), kfcResRet);
+        
+    }
+
+    bool sufficient = true;
+    CHK_RET(CheckCcuResourceSufficient(resRequest, sufficient));
+    if (!sufficient) {
+        HCCL_WARN("[CheckCcuResSuffient] resource insufficient, tilingIndex[%u], opType[%u].", tilingIndex, ccTiling->opType);
+        return HCCL_E_RESOURCE_INSUFFICIENT;
+    }
+
+    HCCL_INFO("[CheckCcuResSuffient] finish, tilingIndex[%u], algName[%s].", tilingIndex, algName.c_str());
+    return HCCL_SUCCESS;
+
+}
