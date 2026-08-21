@@ -21,8 +21,9 @@ bool IsDevType960()
 {
     return false;
 }
+}
 
-uint64_t SelectCcuScheduleAlgoDataSize(const OpParam &opParam, const TopoInfoWithNetLayerDetails* topoInfo)
+uint64_t AlltoAllAutoSelector::CalcDataSize(const OpParam &opParam, const TopoInfoWithNetLayerDetails* topoInfo) const
 {
     uint32_t dataTypeSize = DATATYPE_SIZE_TABLE[opParam.all2AllDataDes.sendType];
     uint64_t* sendCountPtr = (uint64_t*)opParam.all2AllVDataDes.sendCounts;
@@ -32,7 +33,8 @@ uint64_t SelectCcuScheduleAlgoDataSize(const OpParam &opParam, const TopoInfoWit
     return *sendCountPtr * dataTypeSize * topoInfo->userRankSize;
 }
 
-SelectorStatus SelectMultiLevelAlgo(const TopoInfoWithNetLayerDetails* topoInfo, std::string &selectAlgName)
+SelectorStatus AlltoAllAutoSelector::SelectMultiLevelAlgo(const TopoInfoWithNetLayerDetails* topoInfo,
+    std::string &selectAlgName) const
 {
     if (topoInfo->level0Topo == Level0Shape::MESH_1D && topoInfo->userRankSize <= 64U) {
         selectAlgName = "CcuAllToAllMesh1D2Die";
@@ -46,8 +48,8 @@ SelectorStatus SelectMultiLevelAlgo(const TopoInfoWithNetLayerDetails* topoInfo,
     return SelectorStatus::NOT_MATCH;
 }
 
-SelectorStatus SelectMesh1DClosAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
-    std::string &selectAlgName)
+SelectorStatus AlltoAllAutoSelector::SelectMesh1DClosAlgo(const TopoInfoWithNetLayerDetails* topoInfo,
+    const OpParam &opParam, std::string &selectAlgName) const
 {
     if (topoInfo->level0PcieMix) {
         if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
@@ -75,8 +77,8 @@ SelectorStatus SelectMesh1DClosAlgo(const TopoInfoWithNetLayerDetails* topoInfo,
     return SelectorStatus::MATCH;
 }
 
-SelectorStatus SelectSingleLevelAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
-    std::string &selectAlgName)
+SelectorStatus AlltoAllAutoSelector::SelectSingleLevelAlgo(const TopoInfoWithNetLayerDetails* topoInfo,
+    const OpParam &opParam, std::string &selectAlgName) const
 {
     if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
         if (topoInfo->level0MeshType == Level0MeshType::TWO_DIE_REGULAR) {
@@ -87,7 +89,7 @@ SelectorStatus SelectSingleLevelAlgo(const TopoInfoWithNetLayerDetails* topoInfo
             HCCL_DEBUG("[AlltoAllAutoSelector][%s] TWO_DIE_NOT_REGULAR not match", __func__);
             return SelectorStatus::NOT_MATCH;
         }
-        uint64_t dataSize = SelectCcuScheduleAlgoDataSize(opParam, topoInfo);
+        uint64_t dataSize = CalcDataSize(opParam, topoInfo);
         if (IsDevType960() && dataSize > SMALL_COUNT_16M && IsTwoLevelNetLayer(topoInfo)) {
             selectAlgName = "CcuAllToAllSoleMeshScheConcur";
         } else {
@@ -100,7 +102,6 @@ SelectorStatus SelectSingleLevelAlgo(const TopoInfoWithNetLayerDetails* topoInfo
     }
     HCCL_DEBUG("[Algo][AlltoAllAutoSelector] algo is not supported yet for ccu_schedule mode, reset to default.");
     return SelectorStatus::NOT_MATCH;
-}
 }
 
 SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
