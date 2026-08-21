@@ -1616,6 +1616,7 @@ static void DestroyAllDescs(ResDescByDie& descs)
 }
 
 // 查询单个 kernel 的资源需求，按 (dieId, resGroup, resType) 累加到 groupedResMap。
+// 依赖 kernelInfo.dieId 与 kernelArg 中的 channel 句柄，两者均由 HcclGetChannelForCcu 填充。
 static HcclResult AccumulateKernelRes(
     const CcuKernelInfo& kernelInfo,
     std::map<uint32_t, std::map<u32, std::map<HcommCcuResType, uint32_t>>>& groupedResMap)
@@ -1846,6 +1847,9 @@ static HcclResult BuildAggregatedResReq(AlgResourceRequest& resRequest, ResDescB
         if (createRet != CCU_SUCCESS) {
             HCCL_ERROR(
                 "[BuildAggregatedResReq] HcommCcuInsResDescCreate dieId[%u] failed: ccuRet -> %d", dieId, createRet);
+            if (reqDesc != 0) {
+                HcommCcuInsResDescDestroy(reqDesc);
+            }
             DestroyAllDescs(reqDescs);
             return ConvertCcuToHccl(createRet);
         }
@@ -1891,6 +1895,9 @@ static HcclResult ReuseExistingCcuIns(
             HCCL_ERROR(
                 "[ReuseExistingCcuIns] HcommCcuInsResDescCreate capDesc dieId[%u] failed: ccuRet -> %d", dieId,
                 capCreateRet);
+            if (capDesc != 0) {
+                HcommCcuInsResDescDestroy(capDesc);
+            }
             DestroyAllDescs(reqDescs);
             return ConvertCcuToHccl(capCreateRet);
         }
@@ -1977,6 +1984,9 @@ static void CollectInsufficientResFromRemain(
             HCCL_WARNING(
                 "[CollectInsufficientResFromRemain] create remainDesc dieId[%u] failed: ccuRet -> %d, skip.", dieId,
                 rCreateRet);
+            if (remainDesc != 0) {
+                HcommCcuInsResDescDestroy(remainDesc);
+            }
             continue;
         }
         CcuResult rQueryRet = HcommCcuQueryRemainResDesc(remainDesc);
