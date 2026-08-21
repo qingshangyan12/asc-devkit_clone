@@ -29,9 +29,10 @@
 
 namespace {
 namespace fs = boost::filesystem;
+using ascendc::ProcessExecutionResult;
+using ascendc::ProcessTermination;
 using ascendc::aclrtc::CompilationCommand;
 using ascendc::aclrtc::CompilationCommandKind;
-using ascendc::aclrtc::CompilationProcessResult;
 using ascendc::aclrtc::KernelSpecializationDiagnostics;
 using ascendc::aclrtc::OutputPublicationStatus;
 using namespace mockcpp;
@@ -112,7 +113,7 @@ TEST(KernelSpecializationDiagnosticsTest, SavesOnlyReviewedDiagnosticFiles)
             "/bin/sh",
             {"-c", "test \"$PWD\" = \"$1\"", "replay-working-directory-check", testRoot.string()}};
         diagnostics.AppendCommandToReplayScript(workingDirectoryCheck);
-        CompilationProcessResult processResult;
+        ProcessExecutionResult processResult;
         processResult.capturedOutput = "compiler output\n";
         diagnostics.AppendCommandResultToCompilationLog(command, processResult);
         diagnostics.WriteSpecializationResult("/tmp/kernel.elf", OutputPublicationStatus::Published);
@@ -152,7 +153,7 @@ TEST(KernelSpecializationDiagnosticsTest, DisablesDiagnosticsWhenReplayScriptCan
 
     const CompilationCommand command{CompilationCommandKind::Compile, std::nullopt, "compile", "/bin/true", {}};
     diagnostics.AppendCommandToReplayScript(command);
-    diagnostics.AppendCommandResultToCompilationLog(command, CompilationProcessResult{});
+    diagnostics.AppendCommandResultToCompilationLog(command, ProcessExecutionResult{});
     diagnostics.LogCommandFailureRecoveryHint();
     diagnostics.WriteSpecializationResult("/tmp/kernel.elf", OutputPublicationStatus::NotPublished);
 
@@ -257,13 +258,13 @@ TEST(KernelSpecializationDiagnosticsTest, RecordsTerminationKindsAndUnpublishedR
     KernelSpecializationDiagnostics diagnostics(testRoot, "session_states");
     const CompilationCommand command{CompilationCommandKind::Compile, std::nullopt, "compile", "/bin/true", {}};
 
-    CompilationProcessResult processResult;
-    processResult.termination = ascendc::aclrtc::CompilationProcessTermination::Signaled;
+    ProcessExecutionResult processResult;
+    processResult.termination = ProcessTermination::Signaled;
     processResult.terminationCode = SIGTERM;
     diagnostics.AppendCommandResultToCompilationLog(command, processResult);
-    processResult.termination = ascendc::aclrtc::CompilationProcessTermination::TimedOut;
+    processResult.termination = ProcessTermination::TimedOut;
     diagnostics.AppendCommandResultToCompilationLog(command, processResult);
-    processResult.termination = static_cast<ascendc::aclrtc::CompilationProcessTermination>(UINT32_MAX);
+    processResult.termination = static_cast<ProcessTermination>(UINT32_MAX);
     diagnostics.AppendCommandResultToCompilationLog(command, processResult);
     diagnostics.LogCommandFailureRecoveryHint();
     diagnostics.WriteSpecializationResult("/tmp/not_published.elf", OutputPublicationStatus::NotPublished);
@@ -292,7 +293,7 @@ TEST(KernelSpecializationDiagnosticsTest, IgnoresDiagnosticWriteFailuresAfterWor
         CompilationCommandKind::Compile, std::nullopt, "compile", "/bin/true", {"argument"}};
     diagnostics.WriteManifestSnapshot(nlohmann::json{{"schema_version", "1.0"}});
     diagnostics.AppendCommandToReplayScript(command);
-    diagnostics.AppendCommandResultToCompilationLog(command, CompilationProcessResult{});
+    diagnostics.AppendCommandResultToCompilationLog(command, ProcessExecutionResult{});
     diagnostics.WriteSpecializationResult("/tmp/kernel.elf", OutputPublicationStatus::NotPublished);
 
     EXPECT_FALSE(fs::exists(testRoot));

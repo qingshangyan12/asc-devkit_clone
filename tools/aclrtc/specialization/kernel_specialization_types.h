@@ -12,6 +12,7 @@
 #define ASCENDC_ACLRTC_KERNEL_SPECIALIZATION_TYPES_H
 
 #include "acl/acl_rt_compile.h"
+#include "process_executor.h"
 
 #include <chrono>
 #include <boost/filesystem/path.hpp>
@@ -40,13 +41,6 @@ enum class CompilationCommandKind : uint32_t {
     Compile,
     ObjectCopy,
     Link,
-};
-
-enum class CompilationProcessTermination : uint32_t {
-    InfrastructureFailure,
-    Exited,
-    Signaled,
-    TimedOut,
 };
 
 struct KernelCompilerOptions {
@@ -85,14 +79,6 @@ struct KernelCompilationPlan {
     std::vector<CompilationCommand> compilationCommands;
     std::vector<boost::filesystem::path> requiredOutputDirectoryPaths;
     boost::filesystem::path linkedKernelElfPath;
-};
-
-struct CompilationProcessResult {
-    CompilationProcessTermination termination{CompilationProcessTermination::InfrastructureFailure};
-    int32_t terminationCode{0};
-    bool capturedOutputTruncated{false};
-    std::chrono::milliseconds elapsedTime{0};
-    std::string capturedOutput;
 };
 
 aclError NormalizeKernelSpecializationRequest(

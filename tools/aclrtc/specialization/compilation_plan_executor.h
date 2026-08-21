@@ -39,7 +39,7 @@ public:
 
 private:
     aclError ExecuteCompilationCommand(
-        const CompilationCommand& compilationCommand, CompilationProcessResult& processResult) const;
+        const CompilationCommand& compilationCommand, ProcessExecutionResult& processResult) const;
     std::chrono::milliseconds GetCommandExecutionTimeout(CompilationCommandKind commandKind) const noexcept;
 
     KernelSpecializationDiagnostics& specializationDiagnostics_;
