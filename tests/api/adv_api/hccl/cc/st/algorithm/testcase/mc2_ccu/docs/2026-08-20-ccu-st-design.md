@@ -16,22 +16,21 @@
   - [2.6 参与的 ops 代码](#26-参与的-ops-代码)
 - [3. 目录结构](#3-目录结构)
 - [4. 框架分层](#4-框架分层)
-- [5. CcuStScenario — 用例配置](#5-ccustscenario--用例配置)
-- [6. VerifyScenario — 通用流程](#6-verifyscenario--通用流程)
-- [7. 检查机制](#7-检查机制)
-  - [7.1 保留的检查](#71-保留的检查)
-  - [7.2 去掉的检查](#72-去掉的检查)
-  - [7.3 死锁精确定位](#73-死锁精确定位)
-- [8. Program IR 与原语桩](#8-program-ir-与原语桩)
-- [9. Channel 映射机制](#9-channel-映射机制)
-- [10. 多线程执行模型](#10-多线程执行模型)
-- [11. CCU_ELSE 双分支支持](#11-ccu_else-双分支支持)
+- [5. AllToAll 用例](#5-alltoall-用例)
+- [6. CcuStScenario — 用例配置](#6-ccustscenario--用例配置)
+- [7. VerifyScenario — 通用流程](#7-verifyscenario--通用流程)
+- [8. 检查机制](#8-检查机制)
+  - [8.1 保留的检查](#81-保留的检查)
+  - [8.2 去掉的检查](#82-去掉的检查)
+  - [8.3 死锁精确定位](#83-死锁精确定位)
+- [9. Program IR 与原语桩](#9-program-ir-与原语桩)
+- [10. Channel 映射机制](#10-channel-映射机制)
+- [11. 多线程执行模型](#11-多线程执行模型)
 - [12. 注册机制](#12-注册机制)
-- [13. AllToAll 用例](#13-alltoall-用例)
-- [14. 新增算法变体接入指南](#14-新增算法变体接入指南)
-- [15. 新增 CCU 硬件原语接入指南](#15-新增-ccu-硬件原语接入指南)
-- [16. 新增通信原语接入指南](#16-新增通信原语接入指南)
-- [17. 边界声明](#17-边界声明)
+- [13. 新增算法变体接入指南](#13-新增算法变体接入指南)
+- [14. 新增 CCU 硬件原语接入指南](#14-新增-ccu-硬件原语接入指南)
+- [15. 新增通信原语接入指南](#15-新增通信原语接入指南)
+- [16. 边界声明](#16-边界声明)
 
 ---
 
@@ -62,21 +61,22 @@ CCU ST 是无硬件仿真测试框架，在 x86 上验证 CCU 算法的正确性
 MC2 路径不走普通 Host API（`HcclAlltoAllV()`），有独立的 Host 阶段 + Device 阶段：
 
 ```
-Phase 1: CcuSelectAlg (算法选择 + 资源准备 + kernel 注册)
-  ├─ SelectCcuAlgorithm → SelectAlgAndPrepareEngine (selector 选算法)
-  ├─ FillCcuAlgorithmInfo (设 isKfc=true)
-  ├─ PrepareCcuAlgorithmResource → GetCcuOpParamResCtx
-  │   └─ HcclGetAlgRes
-  │       ├─ executor->CalcRes (collective kernel 的 CalcRes)
-  │       ├─ ccuKfcExecutor->CalcRes (KFC server 的 CalcRes，替换 collective kernel 为 KFC server)
-  ｜       │   └─ InheritKfcServerKernelArg (继承 channel/kernelArg，替换 kernelFunc)
-  │       └─ GetAlgResCcu
-  │           ├─ HcclGetChannelForCcu (channel 分配)
-  │           └─ HcclGetCcuKernel → RegisterCcuKernels
-  │               └─ HcommCcuKernelRegister(kernelFuncName="CcuKernelKfcServer")
-  └─ CopyCcuOpParamToDevice
-Phase 2: CcuKernelLaunch (启动 KFC server)
-Phase 3: Device 侧 KFC server 执行微码 → DispatchKfcSubKernel → collective kernel
+HcclAllocComResourceByTiling [hccl_mc2.cc:324]         ← tiling 入口
+│
+├─ Phase 1: Host 侧准备
+│   ├─ AllocCcuOpResCtx         (device 内存分配)
+│   ├─ CcuSelectAlg             (算法选择 + 资源准备 + kernel 注册)
+│   │   ├─ SelectCcuAlgorithm   (selector 选算法)
+│   │   ├─ FillCcuAlgorithmInfo (设 isKfc=true)
+│   │   └─ PrepareCcuAlgorithmResource → GetCcuOpParamResCtx
+│   │       ├─ executor->CalcRes        (collective kernel CalcRes)
+│   │       ├─ ccuKfcExecutor->CalcRes  (KFC server CalcRes，替换 collective → KFC server)
+│   │       └─ GetAlgResCcu             (channel 分配 + kernel 注册)
+│   └─ CopyCcuOpParamToDevice   (opParam H2D)
+│
+├─ Phase 2: CcuKernelLaunch    (启动 KFC server)
+│
+└─ Phase 3: Device 侧          (KFC server 微码 → DispatchKfcSubKernel → collective kernel)
 ```
 
 **ST 验证范围**：ST 直接调 `SelectAlgAndPrepareEngine` + `GetCcuOpParamResCtx`，跳过 `CcuSelectAlg` → `FillCcuAlgorithmInfo`，因此 `isKfc=false`，不走 `ccuKfcExecutor->CalcRes`。注册的是原始 collective kernel（如 `CcuAlltoAllMesh1DKernel`），不是 KFC server kernel。
@@ -87,112 +87,116 @@ Phase 3: Device 侧 KFC server 执行微码 → DispatchKfcSubKernel → collect
 
 ★ = AllToAll 算法交互边界，🔶 = KFC server 交互边界，🔹 = ST 使用的产品函数
 
-    HcclAllocComResourceByTiling [hccl_mc2.cc:324]
-    │
-    ├─ AllocComResourceByTilingCcu [hccl_mc2.cc:289]
-    │   │
-    │   ├─ 🔹 AllocCcuOpResCtx [hccl_alloc_ctx_res.cc:161]
-    │   │   分配 workspace/XN/CKE device 内存
-    │   │
-    │   ├─ CcuSelectAlg [hccl_alloc_ctx_res.cc:987]
-    │   │   │  遍历 tilingList，逐算子处理：
-    │   │   │
-    │   │   └─ ProcessCcuTiling [hccl_alloc_ctx_res.cc:963]
-    │   │       │
-    │   │       ├─ RunCcuSelectAlgCheck (参数校验)
-    │   │       │
-    │   │       ├─ SelectCcuAlgorithm [hccl_alloc_ctx_res.cc:880]
-    │   │       │   ├─ 🔹 InitOpParamByTiling (从 tiling 填 opParam: opType/engine/dataType)
-    │   │       │   ├─ 🔹 TryForcedAlgAndPrepareEngine / 🔹 SelectAlgAndPrepareEngine
-    │   │       │   │   → AlltoAllAutoSelector::SelectCcuScheduleAlgo
-    │   │       │   │     → algName = "CcuAlltoAllMesh1D"
-    │   │       │   └─ algorithmMap 查表 → algorithmType
-    │   │       │
-    │   │       ├─ FillCcuAlgorithmInfo [hccl_alloc_ctx_res.cc:915]
-    │   │       │   → opParam.isKfc = true           ← ST 跳过此步（isKfc 保持 false）
-    │   │       │   → opResCtx.isKfc[tilingIndex] = true
-    │   │       │
-    │   │       ├─ PrepareCcuAlgorithmResource [hccl_alloc_ctx_res.cc:929]
-    │   │       │   ├─ 🔹 HandleSingleRankAndCommMode
-    │   │       │   └─ 🔹 GetCcuOpParamResCtx
-    │   │       │       └─ HcclGetAlgRes [op_common.cc:777]
-    │   │       │           │
-    │   │       │           ├─ ★ 🔹 executor->CalcRes
-    │   │       │           │   → CcuTempAlltoAllMesh1D::CalcRes
-    │   │       │           │     ★ kernelFunc = CcuAlltoAllMesh1DKernel
-    │   │       │           │     ★ kernelArg = CcuKernelArgAlltoAllMesh1D{channels, rankId, rankSize, ...}
-    │   │       │           │     ★ channelDescs = CalcChannelRequestMesh1D 产出
-    │   │       │           │
-    │   │       │           ├─ 🔶 ccuKfcExecutor->CalcRes (isKfc=true 时执行)
-    │   │       │           │   → CcuTempKfcServer::CalcRes            ← ST 不走（isKfc=false）
-    │   │       │           │     🔶 InheritKfcServerKernelArg:
-    │   │       │           │       - 新建 CcuKernelArgKfcServer（继承 rankId/rankSize/loadFromMem/opParam/subCommRanks）
-    │   │       │           │       - 继承源 kernelInfo 的 channels
-    │   │       │           │       - 替换 kernelFuncName = "CcuKernelKfcServer"
-    │   │       │           │       - 替换 kernelFunc = CcuKfcServerKernel
-    │   │       │           │       - 覆盖 ccuKernelInfos.back()（替换 collective kernel 为 KFC server）
-    │   │       │           │
-    │   │       │           └─ GetAlgResCcu [op_common.cc:1305]
-    │   │       │               ├─ HcclAllocAlgResourceCcu (CCU 资源分配)
-    │   │       │               ├─ 🔹 HcclGetThread (线程/notify 分配)
-    │   │       │               ├─ 🔹 HcclGetChannelForCcu [op_common.cc:1394]
-    │   │       │               │   → HcclChannelAcquire → channel handle 写入 kernelArg
-    │   │       │               └─ 🔹 HcclGetCcuKernel [op_common.cc:2095]
-    │   │       │                   → RegisterCcuKernels [op_common.cc:1698]
-    │   │       │                     ├─ 🔹 HcclCommQueryCcuIns
-    │   │       │                     ├─ 🔹 HcommCcuKernelRegisterStart
-    │   │       │                     ├─ 🔹 HcommCcuKernelRegister(kernelFuncName="CcuKernelAlltoAllMesh1D")
-    │   │       │                     │   → 真实：录制 Rep → CcuInstr 微码 → LoadInstruction
-    │   │       │                     │   → ST：查 capture 注册表 → adapter → RegisterManager → Program IR
-    │   │       │                     └─ 🔹 HcommCcuKernelRegisterEnd
-    │   │       │                         → ST：Finalize（IF/ELSE/WHILE 匹配 + LoadArg 排序）
-    │   │       │
-    │   │       └─ CopyCcuOpParamToDevice (opParam H2D 拷贝)    ← ST 不走
-    │   │
-    │   └─ GetOrCreateCcuCtx + aclrtMemcpy (opResCtx H2D 拷贝)  ← ST 不走
-    
-    Phase 2: CcuKernelLaunch [hccl_mc2.cc]
-      → HcommCcuKernelLaunch(KFC server kernel, startup args)
-    
-    Phase 3: Device 侧 (CCU 硬件执行微码)
-      → KFC server 微码循环
-        → CCU_IF(param[0] == opId)
-          → DispatchKfcSubKernel
-            → ★ CcuAlltoAllMesh1DKernel(...)
-              → CCU API 执行（Write/Notify/LocalCopy...）
+```
+HcclAllocComResourceByTiling [hccl_mc2.cc:324]
+│
+├─ AllocComResourceByTilingCcu [hccl_mc2.cc:289]
+│   │
+│   ├─ 🔹 AllocCcuOpResCtx [hccl_alloc_ctx_res.cc:161]
+│   │   分配 workspace/XN/CKE device 内存
+│   │
+│   ├─ CcuSelectAlg [hccl_alloc_ctx_res.cc:987]
+│   │   │  遍历 tilingList，逐算子处理：
+│   │   │
+│   │   └─ ProcessCcuTiling [hccl_alloc_ctx_res.cc:963]
+│   │       │
+│   │       ├─ RunCcuSelectAlgCheck (参数校验)
+│   │       │
+│   │       ├─ SelectCcuAlgorithm [hccl_alloc_ctx_res.cc:880]
+│   │       │   ├─ 🔹 InitOpParamByTiling (从 tiling 填 opParam: opType/engine/dataType)
+│   │       │   ├─ 🔹 TryForcedAlgAndPrepareEngine / 🔹 SelectAlgAndPrepareEngine
+│   │       │   │   → AlltoAllAutoSelector::SelectCcuScheduleAlgo
+│   │       │   │     → algName = "CcuAlltoAllMesh1D"
+│   │       │   └─ algorithmMap 查表 → algorithmType
+│   │       │
+│   │       ├─ FillCcuAlgorithmInfo [hccl_alloc_ctx_res.cc:915]
+│   │       │   → opParam.isKfc = true           ← ST 跳过此步（isKfc 保持 false）
+│   │       │   → opResCtx.isKfc[tilingIndex] = true
+│   │       │
+│   │       ├─ PrepareCcuAlgorithmResource [hccl_alloc_ctx_res.cc:929]
+│   │       │   ├─ 🔹 HandleSingleRankAndCommMode
+│   │       │   └─ 🔹 GetCcuOpParamResCtx
+│   │       │       └─ HcclGetAlgRes [op_common.cc:777]
+│   │       │           │
+│   │       │           ├─ ★ 🔹 executor->CalcRes
+│   │       │           │   → CcuTempAlltoAllMesh1D::CalcRes
+│   │       │           │     ★ kernelFunc = CcuAlltoAllMesh1DKernel
+│   │       │           │     ★ kernelArg = CcuKernelArgAlltoAllMesh1D{channels, rankId, rankSize, ...}
+│   │       │           │     ★ channelDescs = CalcChannelRequestMesh1D 产出
+│   │       │           │
+│   │       │           ├─ 🔶 ccuKfcExecutor->CalcRes (isKfc=true 时执行)
+│   │       │           │   → CcuTempKfcServer::CalcRes            ← ST 不走（isKfc=false）
+│   │       │           │     🔶 InheritKfcServerKernelArg:
+│   │       │           │       - 新建 CcuKernelArgKfcServer（继承 rankId/rankSize/loadFromMem/opParam/subCommRanks）
+│   │       │           │       - 继承源 kernelInfo 的 channels
+│   │       │           │       - 替换 kernelFuncName = "CcuKernelKfcServer"
+│   │       │           │       - 替换 kernelFunc = CcuKfcServerKernel
+│   │       │           │       - 覆盖 ccuKernelInfos.back()（替换 collective kernel 为 KFC server）
+│   │       │           │
+│   │       │           └─ GetAlgResCcu [op_common.cc:1305]
+│   │       │               ├─ HcclAllocAlgResourceCcu (CCU 资源分配)
+│   │       │               ├─ 🔹 HcclGetThread (线程/notify 分配)
+│   │       │               ├─ 🔹 HcclGetChannelForCcu [op_common.cc:1394]
+│   │       │               │   → HcclChannelAcquire → channel handle 写入 kernelArg
+│   │       │               └─ 🔹 HcclGetCcuKernel [op_common.cc:2095]
+│   │       │                   → RegisterCcuKernels [op_common.cc:1698]
+│   │       │                     ├─ 🔹 HcclCommQueryCcuIns
+│   │       │                     ├─ 🔹 HcommCcuKernelRegisterStart
+│   │       │                     ├─ 🔹 HcommCcuKernelRegister(kernelFuncName="CcuKernelAlltoAllMesh1D")
+│   │       │                     │   → 真实：录制 Rep → CcuInstr 微码 → LoadInstruction
+│   │       │                     │   → ST：查 capture 注册表 → adapter → RegisterManager → Program IR
+│   │       │                     └─ 🔹 HcommCcuKernelRegisterEnd
+│   │       │                         → ST：Finalize（IF/ELSE/WHILE 匹配 + LoadArg 排序）
+│   │       │
+│   │       └─ CopyCcuOpParamToDevice (opParam H2D 拷贝)    ← ST 不走
+│   │
+│   └─ GetOrCreateCcuCtx + aclrtMemcpy (opResCtx H2D 拷贝)  ← ST 不走
+│
+├─ Phase 2: CcuKernelLaunch [hccl_mc2.cc]
+│   → HcommCcuKernelLaunch(KFC server kernel, startup args)
+│
+└─ Phase 3: Device 侧 (CCU 硬件执行微码)
+    → KFC server 微码循环
+      → CCU_IF(param[0] == opId)
+        → DispatchKfcSubKernel
+          → ★ CcuAllToAllMesh1DKernel(...)
+            → CCU API 执行（Write/Notify/LocalCopy...）
+```
 
 ### 2.3 ST 调用链（与功能代码的差异）
 
 ST 的 `RegisterKernelForRank` 从 `AllocCcuOpResCtx` 之后直接调 `SelectAlgAndPrepareEngine`，跳过 `CcuSelectAlg` → `FillCcuAlgorithmInfo`：
 
-    ST RegisterKernelForRank:
-    │
-    ├─ AllocCcuOpResCtx [hccl_alloc_ctx_res.cc:161]     ← 同功能代码
-    │
-    ├─ InitOpParamByTiling [hccl_alloc_ctx_res.cc:518]   ← 同功能代码
-    │
-    ├─ PrepareOpParam（虚函数）                            ← ST 专属：填 union 字段
-    │
-    ├─ TryForcedAlgAndPrepareEngine / SelectAlgAndPrepareEngine  ← 同功能代码
-    │   → algName = "CcuAlltoAllMesh1D"
-    │
-    ├─ HandleSingleRankAndCommMode                         ← 同功能代码
-    │
-    ├─ GetCcuOpParamResCtx                                 ← 同功能代码
-    │   └─ HcclGetAlgRes [op_common.cc:777]
-    │       ├─ ★ executor->CalcRes                         ← 同功能代码
-    │       ├─ (isKfc=false → 跳过 ccuKfcExecutor->CalcRes) ← 差异：不走 KFC server
-    │       └─ GetAlgResCcu [op_common.cc:1305]
-    │           ├─ HcclGetChannelForCcu
-    │           │   → ChannelCommCreate → RegisterChannelMap ← ST 专属：channel 映射
-    │           └─ HcclGetCcuKernel → RegisterCcuKernels
-    │               └─ HcommCcuKernelRegister(kernelFuncName="CcuKernelAlltoAllMesh1D")
-    │                   → 查 capture 注册表 → adapter        ← ST 专属：桥接到 RegisterManager
-    │                     → ConvertAllToAllArg → RegisterManager::Register
-    │                       → capture function → CcuAlltoAllMesh1DKernel
-    │                         → CCU API 拦截 → Program IR
-    │
-    └─ 返回 kernelHandle
+```
+ST RegisterKernelForRank:
+│
+├─ AllocCcuOpResCtx [hccl_alloc_ctx_res.cc:161]     ← 同功能代码
+│
+├─ InitOpParamByTiling [hccl_alloc_ctx_res.cc:518]   ← 同功能代码
+│
+├─ PrepareOpParam（虚函数）                            ← ST 专属：填 union 字段
+│
+├─ TryForcedAlgAndPrepareEngine / SelectAlgAndPrepareEngine  ← 同功能代码
+│   → algName = "CcuAlltoAllMesh1D"
+│
+├─ HandleSingleRankAndCommMode                         ← 同功能代码
+│
+├─ GetCcuOpParamResCtx                                 ← 同功能代码
+│   └─ HcclGetAlgRes [op_common.cc:777]
+│       ├─ ★ executor->CalcRes                         ← 同功能代码
+│       ├─ (isKfc=false → 跳过 ccuKfcExecutor->CalcRes) ← 差异：不走 KFC server
+│       └─ GetAlgResCcu [op_common.cc:1305]
+│           ├─ HcclGetChannelForCcu
+│           │   → ChannelCommCreate → RegisterChannelMap ← ST 专属：channel 映射
+│           └─ HcclGetCcuKernel → RegisterCcuKernels
+│               └─ HcommCcuKernelRegister(kernelFuncName="CcuKernelAlltoAllMesh1D")
+│                   → 查 capture 注册表 → adapter        ← ST 专属：桥接到 RegisterManager
+│                     → ConvertAllToAllArg → RegisterManager::Register
+│                       → capture function → CcuAlltoAllMesh1DKernel
+│                         → CCU API 拦截 → Program IR
+│
+└─ 返回 kernelHandle
+```
 
 **关键差异**：
 
@@ -331,7 +335,42 @@ tests/api/adv_api/hccl/cc/st/algorithm/
 
 ---
 
-## 5. CcuStScenario — 用例配置
+## 5. AllToAll 用例
+
+### 5.1 用例清单
+
+| 分组 | 用例名 | Topo | DataType | DataSize |
+|------|--------|------|----------|----------|
+| 拓扑泛化 | Mesh1D_2Rank_SingleDie_Fp16_100B | {{{0,1}}} | FP16 | 100B |
+| 拓扑泛化 | Mesh1D_4Rank_SingleDie_Fp16_64B | {{{0,1,2,3}}} | FP16 | 64B |
+| 拓扑泛化 | Mesh1D_8Rank_SingleDie_Fp16_64B | {{{0..7}}} | FP16 | 64B |
+| 数据类型 | Mesh1D_2Rank_SingleDie_Fp32_100B | {{{0,1}}} | FP32 | 100B |
+| 数据类型 | Mesh1D_2Rank_SingleDie_Int8_100B | {{{0,1}}} | INT8 | 100B |
+| 数据类型 | Mesh1D_2Rank_SingleDie_Int32_100B | {{{0,1}}} | INT32 | 100B |
+| 数据类型 | Mesh1D_2Rank_SingleDie_Bfp16_100B | {{{0,1}}} | BFP16 | 100B |
+| 数据量 | Mesh1D_2Rank_SingleDie_Fp16_1KB | {{{0,1}}} | FP16 | 1KB |
+| 数据量 | Mesh1D_2Rank_SingleDie_Fp16_1MB | {{{0,1}}} | FP16 | 1MB |
+| 数据量 | Mesh1D_2Rank_SingleDie_Fp16_10MB | {{{0,1}}} | FP16 | 10MB |
+| 边界 | Mesh1D_2Rank_SingleDie_Fp16_0B | {{{0,1}}} | FP16 | 0B |
+| 边界 | Mesh1D_2Rank_SingleDie_Fp16_256MB | {{{0,1}}} | FP16 | 256MB |
+| 负向 | Negative_OutputCorruption_2Rank_SingleDie_Fp16_80B | {{{0,1}}} | FP16 | 80B |
+| 强制算法 | ForcedAlg_2Rank_SingleDie_Fp16_100B | {{{0,1}}} | FP16 | 100B |
+
+### 5.2 用例写法
+
+```cpp
+TEST_F(CcuStAllToAll, Mesh1D_2Rank_SingleDie_Fp16_100B)
+{
+    TopoMeta topo{{{{0, 1}}}};
+    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_FP16, 100));
+}
+```
+
+用例只传 `TopoMeta` + `dataType` + `sliceSize`，框架自动完成全链路。
+
+---
+
+## 6. CcuStScenario — 用例配置
 
 ```cpp
 struct CcuStScenario {
@@ -359,7 +398,7 @@ struct CcuStScenario {
 
 ---
 
-## 6. VerifyScenario — 通用流程
+## 7. VerifyScenario — 通用流程
 
 ```
 VerifyScenario(scenario)
@@ -407,9 +446,9 @@ VerifyScenario(scenario)
 
 ---
 
-## 7. 检查机制
+## 8. 检查机制
 
-### 7.1 保留的检查
+### 8.1 保留的检查
 
 | 编号 | 检查 | 层次 | 实现位置 | 说明 |
 |------|------|------|---------|------|
@@ -422,7 +461,7 @@ VerifyScenario(scenario)
 | D2 | 逐字节比对 | 通用 | `CheckRuntimeOutput`（utils） | 实际 output vs 期望 output |
 | DAG | 内存冲突检测 | 通用 | `CcuDagChecker`（utils） | WAW/WAR/RAR 无同步冲突 |
 
-### 7.2 去掉的检查
+### 8.2 去掉的检查
 
 以下检查已去掉，由 R2（运行时执行）和 D2（逐字节比对）间接覆盖：
 
@@ -431,7 +470,7 @@ VerifyScenario(scenario)
 - taskArgs 数量/mission 绑定（R2 越界覆盖）
 - CheckCompleted（和 R2 重复）
 
-### 7.3 死锁精确定位
+### 8.3 死锁精确定位
 
 R2 死锁时输出每个 rank 卡在哪个 operation：
 
@@ -445,9 +484,9 @@ deadlock detected:
 
 ---
 
-## 8. Program IR 与原语桩
+## 9. Program IR 与原语桩
 
-### 8.1 OpCode
+### 9.1 OpCode
 
 ```cpp
 enum class OpCode {
@@ -462,7 +501,7 @@ enum class OpCode {
 };
 ```
 
-### 8.2 录制
+### 9.2 录制
 
 产品 kernel 代码的 CCU API 调用被 `ccu_primitives_stub` 拦截，转成 `Operation` 追加到 `Program::operations[]`：
 
@@ -475,7 +514,7 @@ CCU_ELSE                           → Operation{ELSE_BEGIN} + body + Operation{
 CCU_WHILE(cond)                    → Operation{WHILE_BEGIN} + body + Operation{WHILE_END}
 ```
 
-### 8.3 RuntimeWorld 执行
+### 9.3 RuntimeWorld 执行
 
 轮询调度，每轮每个 rank 执行一条 operation：
 
@@ -490,13 +529,13 @@ CCU_WHILE(cond)                    → Operation{WHILE_BEGIN} + body + Operation
 
 ---
 
-## 9. Channel 映射机制
+## 10. Channel 映射机制
 
-### 9.1 问题
+### 10.1 问题
 
 ST 的 channel handle 是 `SimChannel*` 裸指针。RuntimeWorld/checker 需要从 handle 反查 localRank/remoteRank。
 
-### 9.2 方案
+### 10.2 方案
 
 框架提供统一的 `RegisterChannelMap`：
 
@@ -528,9 +567,9 @@ for (uint32_t i = 0; i < src->channelCount; ++i) {
 
 ---
 
-## 10. 多线程执行模型
+## 11. 多线程执行模型
 
-### 10.1 设计
+### 11.1 设计
 
 `VerifyScenario` 里每个 rank 一个 `std::thread`，并发执行 `RegisterKernelForRank`：
 
@@ -544,11 +583,11 @@ for (uint32_t rank = 0; rank < rankSize; ++rank) {
 for (auto &thread : threads) { thread.join(); }
 ```
 
-### 10.2 与非 CCU 路径统一
+### 11.2 与非 CCU 路径统一
 
 CCU 和非 CCU 都用 `ChannelCommCreate`（轮询配对方式），不用 `ChannelCommCreateForCcu`（已删除）。
 
-### 10.3 线程安全
+### 11.3 线程安全
 
 - `RegisterManager`：`mutex_` 保护 `kernels_`/`instances_`，`channelMapMutex_` 保护 `channelMap_`
 - `GetLastCompiledGroup`：用 `thread_local` 避免多 rank 覆盖
@@ -556,33 +595,11 @@ CCU 和非 CCU 都用 `ChannelCommCreate`（轮询配对方式），不用 `Chan
 - `SimChannelExchangeHandler`：已有 `mutex_`
 - `SimWorld`：Init 一次后不修改，并发读安全
 
-### 10.4 生命周期
+### 11.4 生命周期
 
 - `SimWorld::Init` 在 `VerifyScenario` 开头调一次
 - `CleanupHostEnv` 只删 `comm`（不 Deinit SimWorld）
 - `SimWorld::Deinit` 在 `VerifyScenario` 结尾调一次
-
----
-
-## 11. CCU_ELSE 双分支支持
-
-### 11.1 问题
-
-原 `CCU_ELSE` 是 `if(false)`，ELSE body 不录制。当 `remaining==0`（如 sliceSize=0 或 256MB 整数倍）时，ELSE body 的 `EventRecord` 丢失，`EventWait` 死等。
-
-### 11.2 修复
-
-`CCU_ELSE` 改为用 `ControlScope(isElse=true)` 录制 `ELSE_BEGIN` + body + `IF_END`。
-
-IR 结构：
-```
-无 ELSE:  IF_BEGIN(peerIndex=IF_END) ... IF_END(peerIndex=IF_BEGIN)
-有 ELSE:  IF_BEGIN(peerIndex=ELSE_BEGIN) ... IF_END ELSE_BEGIN(peerIndex=IF_END2) ... IF_END2
-```
-
-RuntimeWorld 执行：
-- 条件 true → 执行 IF body → IF_END → ELSE_BEGIN → 跳到 IF_END2 后
-- 条件 false → 跳到 ELSE_BEGIN+1 → 执行 ELSE body → IF_END2 → 继续
 
 ---
 
@@ -619,46 +636,11 @@ CcuStAllToAll::RegisterVariant("CcuAlltoAllMesh1D",
 
 ---
 
-## 13. AllToAll 用例
-
-### 13.1 用例清单
-
-| 分组 | 用例名 | Topo | DataType | DataSize |
-|------|--------|------|----------|----------|
-| 拓扑泛化 | Mesh1D_2Rank_SingleDie_Fp16_100B | {{{0,1}}} | FP16 | 100B |
-| 拓扑泛化 | Mesh1D_4Rank_SingleDie_Fp16_64B | {{{0,1,2,3}}} | FP16 | 64B |
-| 拓扑泛化 | Mesh1D_8Rank_SingleDie_Fp16_64B | {{{0..7}}} | FP16 | 64B |
-| 数据类型 | Mesh1D_2Rank_SingleDie_Fp32_100B | {{{0,1}}} | FP32 | 100B |
-| 数据类型 | Mesh1D_2Rank_SingleDie_Int8_100B | {{{0,1}}} | INT8 | 100B |
-| 数据类型 | Mesh1D_2Rank_SingleDie_Int32_100B | {{{0,1}}} | INT32 | 100B |
-| 数据类型 | Mesh1D_2Rank_SingleDie_Bfp16_100B | {{{0,1}}} | BFP16 | 100B |
-| 数据量 | Mesh1D_2Rank_SingleDie_Fp16_1KB | {{{0,1}}} | FP16 | 1KB |
-| 数据量 | Mesh1D_2Rank_SingleDie_Fp16_1MB | {{{0,1}}} | FP16 | 1MB |
-| 数据量 | Mesh1D_2Rank_SingleDie_Fp16_10MB | {{{0,1}}} | FP16 | 10MB |
-| 边界 | Mesh1D_2Rank_SingleDie_Fp16_0B | {{{0,1}}} | FP16 | 0B |
-| 边界 | Mesh1D_2Rank_SingleDie_Fp16_256MB | {{{0,1}}} | FP16 | 256MB |
-| 负向 | Negative_OutputCorruption_2Rank_SingleDie_Fp16_80B | {{{0,1}}} | FP16 | 80B |
-| 强制算法 | ForcedAlg_2Rank_SingleDie_Fp16_100B | {{{0,1}}} | FP16 | 100B |
-
-### 13.2 用例写法
-
-```cpp
-TEST_F(CcuStAllToAll, Mesh1D_2Rank_SingleDie_Fp16_100B)
-{
-    TopoMeta topo{{{{0, 1}}}};
-    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_FP16, 100));
-}
-```
-
-用例只传 `TopoMeta` + `dataType` + `sliceSize`，框架自动完成全链路。
-
----
-
-## 14. 新增算法变体接入指南
+## 13. 新增算法变体接入指南
 
 以 `CcuAlltoAllMesh2Die` 为例，加新变体只改 testcase，不改 utils：
 
-### 14.1 新建 adapter
+### 13.1 新建 adapter
 
 ```
 testcase/mc2_ccu/all_to_all/
@@ -676,7 +658,7 @@ testcase/mc2_ccu/all_to_all/
    CcuStAllToAll::RegisterVariant("CcuAlltoAllMesh2Die", builder);
    ```
 
-### 14.2 用例
+### 13.2 用例
 
 ```cpp
 TEST_F(CcuStAllToAll, Mesh2Die_4Rank_Fp16_64B)
@@ -688,7 +670,7 @@ TEST_F(CcuStAllToAll, Mesh2Die_4Rank_Fp16_64B)
 }
 ```
 
-### 14.3 不需要改的
+### 13.3 不需要改的
 
 - `ccu_all_to_all.h/.cc` — 原语级，不变
 - `ccu_fixture.h/.cc` — 框架，不变
@@ -696,11 +678,11 @@ TEST_F(CcuStAllToAll, Mesh2Die_4Rank_Fp16_64B)
 
 ---
 
-## 15. 新增 CCU 硬件原语接入指南
+## 14. 新增 CCU 硬件原语接入指南
 
 CCU 硬件原语是 `ccu::Write`、`ccu::Notify`、`ccu::LocalCopy` 等底层操作。如果产品代码新增了 CCU 硬件原语（如 `ccu::Scatter`），需要扩展框架（utils）：
 
-### 15.1 框架层改动
+### 14.1 框架层改动
 
 | 文件 | 改动 |
 |------|------|
@@ -714,13 +696,13 @@ CCU 硬件原语是 `ccu::Write`、`ccu::Notify`、`ccu::LocalCopy` 等底层操
 
 ---
 
-## 16. 新增通信原语接入指南
+## 15. 新增通信原语接入指南
 
 通信原语是 AllToAll、AllGather、AllReduce、ReduceScatter、Broadcast 等。新增通信原语需要改 testcase（原语层 + 算法层），不改 utils 框架。
 
 以 AllGather 为例：
 
-### 16.1 原语层（testcase）
+### 15.1 原语层（testcase）
 
 新建 `testcase/mc2_ccu/all_gather/`：
 
@@ -738,7 +720,7 @@ all_gather/
 - `PrepareOpParam` — 填 `opParam.DataDes.count` / `opParam.DataDes.dataType`
 - `RegisterVariant` — 注册算法变体
 
-### 16.2 算法层（testcase）
+### 15.2 算法层（testcase）
 
 算法级实现：
 - `BuildMesh1DScenario` — 填 `ScenarioData` 的 `srcOffsets`/`dstOffsets` 矩阵
@@ -746,15 +728,27 @@ all_gather/
 - `ConvertAllGatherArg` — 产品 arg → ST config
 - 静态注册 `RegisterCaptureFunction` + `RegisterVariant`
 
-### 16.3 期望输出计算
+### 15.3 框架层（utils）
+
+新增通信原语时 utils 需要改动：
+
+| 文件 | 改动 |
+|------|------|
+| `testcase/mc2_ccu/CMakeLists.txt` | 加 AllGather product sources + include 路径 + testcase 源文件 |
+| `utils/src/ccu_scenario/ccu_scenario.h` | `CcuStScenario` 的 `opType` 支持新原语枚举值（如 `HCCL_OP_ALLGATHER`） |
+| `utils/src/hccl_proxy/stubs.cc` | 如新原语有额外的产品函数需要桩，补充 stub |
+
+utils 的框架逻辑（`VerifyScenario`、`CcuProgramChecker`、`RuntimeWorld`、`CaptureRuntimeExpectation`、`CheckRuntimeOutput`）不需要改——它们是原语无关的通用流程。
+
+### 15.4 期望输出计算
 
 `CaptureRuntimeExpectation`（utils 通用）按 `ScenarioData` 的矩阵搬运数据，不需要各通信原语实现。如果通信原语有 reduce 语义（如 ReduceScatter），设置 `ScenarioData::reduceOp`（当前预留，未实现 reduce 逻辑）。
 
 ---
 
-## 17. 边界声明
+## 16. 边界声明
 
-### 17.1 覆盖
+### 16.1 覆盖
 
 - 真实 selector 算法选择逻辑
 - 真实 template.CalcRes 构建 CcuKernelInfo
@@ -765,7 +759,7 @@ all_gather/
 - DAG 内存冲突检测
 - 独立期望字节结果对比
 
-### 17.2 不覆盖
+### 16.2 不覆盖
 
 - KFC server kernel（queue/CKE/wrap/finalize）
 - InheritKfcServerKernelArg（KFC server 替换逻辑）
