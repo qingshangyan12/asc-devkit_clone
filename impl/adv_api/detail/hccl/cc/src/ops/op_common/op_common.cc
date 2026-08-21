@@ -2106,6 +2106,54 @@ static HcclResult HcclGetCcuKernelDynamic(
     return finalRet;
 }
 } // namespace
+
+HcclResult HcclQueryCcuResSuffient(AlgResourceRequest& resRequest, bool& sufficient)
+{
+    HCCL_INFO("[HcclQueryCcuResSuffient] start, kernelNum[%zu].", resRequest.ccuKernelInfos.size());
+    sufficient = true;
+    ResDescByDie reqDescs;
+    CHK_RET(BuildAggregatedResReq(resRequest, reqDescs));
+
+    std::string allDieInsuffSummary;
+    for (auto& dieEntry : reqDescs) {
+        uint32_t dieId = dieEntry.first;
+        HcommCcuResDescHandle reqDesc = dieEntry.second;
+        HcommCcuResDescHandle remainDesc = 0;
+        CcuResult rCreateRet = HcommCcuInsResDescCreate(reqDesc, &remainDesc);
+        if (rCreateRet != HCCL_SUCCESS) {
+            HcommCcuInsResDescDestroy(reqDesc);
+            DestroyAllDescs(reqDescs);
+            return ConvertCcuToHccl(rCreateRet);
+        }
+        CcuResult rQueryRet = HcommCcuQueryRemainResDesc(remainDesc);
+        if (rQueryRet != CCU_SUCCESS) {
+            HcommCcuInsResDescDestroy(remainDesc);
+            DestroyAllDescs(reqDescs);
+            return ConvertCcuToHccl(rQueryRet);
+        }
+        bool dieSufficient = false;
+        std::string dieInsuffSummary;
+        HcclResult cmpRet = IsRetCapSufficient(dieId, remainDesc, reqDesc, dieSufficient, dieInsuffSummary);
+        HcommCcuInsResDescDestroy(remainDesc);
+        if (cmpRet != HCCL_SUCCESS) {
+            DestroyAllDescs(reqDescs);
+            return cmpRet;
+        }
+        if (!dieSufficient) {
+            sufficient = false;
+            if (!allDieInsuffSummary.empty()) {
+                allDieInsuffSummary += "; ";
+            }
+            allDieInsuffSummary += "dieId " + std::to_string(dieId) + " " + dieInsuffSummary;
+        }
+    }
+    DestroyAllDescs(reqDescs);
+    if (!sufficient) {
+        HCCL_RUN_INFO("[HcclQueryCcuResSuffient] insufficient resource, summary: %s", allDieInsuffSummary.c_str());
+    }
+    HCCL_INFO("[HcclQueryCcuResSuffient] finish, sufficient[%d].", sufficient);
+    return HCCL_SUCCESS;
+}
 #endif
 
 HcclResult HcclGetCcuKernel(
