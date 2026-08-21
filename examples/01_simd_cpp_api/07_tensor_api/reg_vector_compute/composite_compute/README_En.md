@@ -95,7 +95,7 @@ Run the following steps in the sample root directory to build and execute the sa
 
   | Option | Value | Description |
   |--------|-------|-------------|
-  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, or NPU simulation. |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation. |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture. |
 
 - Execution result.

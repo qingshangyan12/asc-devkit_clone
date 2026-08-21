@@ -27,7 +27,6 @@ set(ASC_INCLUDE_DIR "${ASCEND_HOME}/asc/")
 
 include_directories(
     "${ASC_INCLUDE_DIR}"
-    "${CMAKE_CURRENT_LIST_DIR}/.."
 )
 
 target_compile_options(demo PRIVATE
