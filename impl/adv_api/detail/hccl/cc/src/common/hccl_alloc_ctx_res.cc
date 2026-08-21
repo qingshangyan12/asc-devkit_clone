@@ -625,8 +625,11 @@ std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, cons
     return CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
 }
 
+// 校验指定算法的executor注册与资源计算能力（executor获取 + CalcAlgHierarchyInfo + CalcRes），
+// 失败统一返回HCCL_E_NOT_SUPPORT（强制算法校验失败触发回退；校验路径视为算法不支持）
 HcclResult CheckForcedAlgResource(
-    HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName)
+    HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName,
+    AlgResourceRequest* resRequest)
 {
     CHK_PTR_NULL(topoInfo);
     std::unique_ptr<InsCollAlgBase> executor = GetAlgExecutorForOp(opParam, algName);
@@ -646,13 +649,18 @@ HcclResult CheckForcedAlgResource(
             static_cast<int>(ret)),
         HCCL_E_NOT_SUPPORT);
 
-    AlgResourceRequest resRequest;
-    ret = executor->CalcRes(comm, opParam, topoInfo, algHierarchyInfo, resRequest);
+    AlgResourceRequest resRequestTmp;
+    ret = executor->CalcRes(comm, opParam, topoInfo, algHierarchyInfo, resRequestTmp);
     CHK_PRT_RET(
         ret != HCCL_SUCCESS,
         HCCL_WARNING(
             "[MC2_FORCE_ALG] fallback, CalcRes failed, algName[%s], ret[%d].", algName.c_str(), static_cast<int>(ret)),
         HCCL_E_NOT_SUPPORT);
+
+    // 调用方需要资源请求（如校验路径的余量查询）时回传，避免重复计算
+    if (resRequest != nullptr) {
+        *resRequest = resRequestTmp;
+    }
     return HCCL_SUCCESS;
 }
 
@@ -947,24 +955,11 @@ void RunCcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex
     HCCL_INFO("[CcuSelectAlg]CcuSelectAlgCheck[%u] successfully!", tilingIndex);
 }
 
-HcclResult SelectCcuAlgorithm(
-    HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex,
-    OpParam& opParam, std::string& algName, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo,
+// 校验algName为CCU算法（algorithmMap命中），回填algorithmType并写入opParam.algName
+HcclResult FillCcuAlgTypeAndName(
+    uint32_t tilingIndex, const Mc2CcTilingInner* ccTiling, const std::string& algName, OpParam& opParam,
     AlgorithmType& algorithmType)
 {
-    CHK_RET(InitOpParamByTiling(comm, stream, topoTag, ccTiling, opParam));
-    HCCL_INFO("[CcuSelectAlg]InitOpParamByTiling[%u] successfully!", tilingIndex);
-
-    if (GetForcedAlgName(ccTiling, algName)) {
-        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
-        CHK_RET(PrepareEngineForAlg(opParam, algName));
-        HCCL_INFO("[CcuSelectAlg] use configured algorithm[%s] for ccTiling[%u].", algName.c_str(), tilingIndex);
-    } else {
-        CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
-        HCCL_INFO(
-            "[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", tilingIndex, algName.c_str());
-    }
-
     auto it = algorithmMap.find(algName);
     if (it == algorithmMap.end()) {
         HCCL_ERROR(
@@ -982,6 +977,45 @@ HcclResult SelectCcuAlgorithm(
     return HCCL_SUCCESS;
 }
 
+// 选择CCU算法并回填algorithmType与opParam.algName。
+// onlyCheck为true时（校验路径）：algConfig为合法强制算法名时先尝试强制算法（注册/层级/资源计算均校验通过才接受），
+// 强制算法不可用或校验失败时回退默认selector；分配路径保持GetForcedAlgName直取语义。
+HcclResult SelectCcuAlgorithm(
+    HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex,
+    OpParam& opParam, std::string& algName, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo,
+    AlgorithmType& algorithmType, bool onlyCheck = false)
+{
+    CHK_RET(InitOpParamByTiling(comm, stream, topoTag, ccTiling, opParam));
+    HCCL_INFO("[CcuSelectAlg]InitOpParamByTiling[%u] successfully!", tilingIndex);
+
+    if (onlyCheck) {
+        // 校验路径：强制算法 + 计算校验回退默认selector
+        bool forcedAlgAccepted = false;
+        CHK_RET(TryForcedAlgAndPrepareEngine(comm, ccTiling, opParam, algName, topoInfo, forcedAlgAccepted));
+        if (!forcedAlgAccepted) {
+            CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
+            HCCL_INFO(
+                "[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", tilingIndex,
+                algName.c_str());
+        } else {
+            HCCL_INFO("[CcuSelectAlg] use configured algorithm[%s] for ccTiling[%u].", algName.c_str(), tilingIndex);
+        }
+        return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
+    }
+
+    if (GetForcedAlgName(ccTiling, algName)) {
+        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+        CHK_RET(PrepareEngineForAlg(opParam, algName));
+        HCCL_INFO("[CcuSelectAlg] use configured algorithm[%s] for ccTiling[%u].", algName.c_str(), tilingIndex);
+    } else {
+        CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
+        HCCL_INFO(
+            "[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", tilingIndex, algName.c_str());
+    }
+
+    return FillCcuAlgTypeAndName(tilingIndex, ccTiling, algName, opParam, algorithmType);
+}
+
 void FillCcuAlgorithmInfo(
     uint32_t tilingIndex, const Mc2CcTilingInner* ccTiling, const std::string& algName, AlgorithmType algorithmType,
     OpParam& opParam, OpResCtx& opResCtx)
@@ -995,6 +1029,7 @@ void FillCcuAlgorithmInfo(
         "[CcuSelectAlg] ccTiling[%u]: opType[%u], algName[%s], algorithmType[%u]", tilingIndex,
         opResCtx.opType[tilingIndex], algName.c_str(), opResCtx.algorithmType[tilingIndex]);
 }
+
 
 HcclResult PrepareCcuAlgorithmResource(
     HcclComm comm, uint32_t tilingIndex, const std::string& algName, OpParam& opParam,
@@ -1031,18 +1066,41 @@ HcclResult CopyCcuOpParamToDevice(
     return HCCL_SUCCESS;
 }
 
+// 逐tiling处理：checkOnly为true时仅执行算法选择/层级计算/资源计算并查询余量，不申请任何通信资源
 HcclResult ProcessCcuTiling(
     HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex,
-    const Mc2InitTilingInner* initTiling, OpResCtx& opResCtx)
+    const Mc2InitTilingInner* initTiling, OpResCtx& opResCtx, bool checkOnly = false)
 {
+    // 算子选择的前置校验（算子类型/展开模式等合法性校验）
     RunCcuSelectAlgCheck(ccTiling, tilingIndex);
 
     OpParam opParam{};
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     AlgorithmType algorithmType;
-    CHK_RET(
-        SelectCcuAlgorithm(comm, stream, topoTag, ccTiling, tilingIndex, opParam, algName, topoInfo, algorithmType));
+    CHK_RET(SelectCcuAlgorithm(
+        comm, stream, topoTag, ccTiling, tilingIndex, opParam, algName, topoInfo, algorithmType, checkOnly));
+
+    if (checkOnly) {
+        // 校验路径：复用CheckForcedAlgResource的"executor获取+CalcAlgHierarchyInfo+CalcRes"得到资源请求，
+        // 失败统一视为算法不支持（需求：资源计算失败直接判断不足返回失败），不做任何资源申请
+        AlgResourceRequest resRequest;
+        CHK_RET(CheckForcedAlgResource(comm, opParam, topoInfo.get(), algName, &resRequest));
+        // 查询CCU资源余量是否满足请求，不足则返回资源不足错误码
+        bool sufficient = true;
+        CHK_RET(HcclQueryCcuResSuffient(resRequest, sufficient));
+        if (!sufficient) {
+            HCCL_WARNING(
+                "[ProcessCcuTiling] resource insufficient, tilingIndex[%u], opType[%u].", tilingIndex,
+                ccTiling->opType);
+            return HCCL_E_RES_NOT_SUFFICIENT;
+        }
+        HCCL_INFO(
+            "[ProcessCcuTiling] check finish, tilingIndex[%u], algName[%s], resource sufficient.", tilingIndex,
+            algName.c_str());
+        return HCCL_SUCCESS;
+    }
+
     FillCcuAlgorithmInfo(tilingIndex, ccTiling, algName, algorithmType, opParam, opResCtx);
 
     bool skipGetRes = false;
@@ -1057,14 +1115,14 @@ HcclResult ProcessCcuTiling(
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
 HcclResult CcuSelectAlg(
     HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
-    void* mc2Tiling, OpResCtx& opResCtx)
+    void* mc2Tiling, OpResCtx& opResCtx, bool checkOnly)
 {
     HCCL_INFO("[CcuSelectAlg]start CcuSelectAlg!");
     HCCL_INFO("[CcuSelectAlg]received: workspace[%p], size[%llu]", (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
     Mc2InitTilingInner* initTiling = static_cast<Mc2InitTilingInner*>(mc2Tiling);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
-        CHK_RET(ProcessCcuTiling(comm, stream, topoTag[i], ccTiling, i, initTiling, opResCtx));
+        CHK_RET(ProcessCcuTiling(comm, stream, topoTag[i], ccTiling, i, initTiling, opResCtx, checkOnly));
         if (i > 0U && opResCtx.algorithmType[i] != opResCtx.algorithmType[0]) {
             HCCL_ERROR(
                 "[CcuSelectAlg] all tilings in one KFC context must use the same static server algorithm, "
