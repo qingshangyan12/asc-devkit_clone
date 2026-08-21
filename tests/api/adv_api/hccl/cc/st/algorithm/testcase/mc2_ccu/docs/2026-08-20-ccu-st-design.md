@@ -53,47 +53,63 @@ CCU ST 是无硬件仿真测试框架，在 x86 上验证 CCU 算法的正确性
 MC2 路径不走普通 Host API（`HcclAlltoAllV()`），有独立的 Host 阶段 + Device 阶段：
 
 ```
-Phase 1: HcclAllocComResourceByTiling (资源准备 + kernel 注册)
+Phase 1: CcuSelectAlg (算法选择 + 资源准备 + kernel 注册)
 Phase 2: CcuKernelLaunch (启动 KFC server)
 Phase 3: Device 侧 KFC server 执行微码 → DispatchKfcSubKernel → collective kernel
 ```
 
-ST 验证的是 Phase 1（selector → CalcRes → channel → kernel 注册），通过 `HcommCcuKernelRegister` 桥接到 `RegisterManager` 捕获 Program IR。不验证 Phase 2/3（KFC server / 微码 / 硬件）。
+ST 验证的是 Phase 1 的核心链路（selector → CalcRes → channel → kernel 注册），通过 `HcommCcuKernelRegister` 桥接到 `RegisterManager` 捕获 Program IR。
+
+**注意**：ST 直接调 `SelectAlgAndPrepareEngine` + `GetCcuOpParamResCtx`，不经过 `CcuSelectAlg` → `FillCcuAlgorithmInfo`，因此 `isKfc=false`，不走 KFC server CalcRes（`InheritKfcServerKernelArg`）。注册的是原始 collective kernel（如 `CcuAlltoAllMesh1DKernel`），不是 KFC server kernel。不验证 Phase 2/3（KFC server / 微码 / 硬件）。
 
 ### 2.2 端到端调用链（以 AllToAll 为例）
 
 ★ = AllToAll 算法交互边界
 
 ```
-Phase 1: HcclAllocComResourceByTiling [hccl_mc2.cc]
+ST RegisterKernelForRank:
 │
 ├─ AllocCcuOpResCtx                          [hccl_alloc_ctx_res.cc]
 │   分配 workspace/XN/CKE device 内存
 │
-├─ CcuSelectAlg
-│   ├─ SelectAlgAndPrepareEngine
-│   │   → AlltoAllAutoSelector::SelectCcuScheduleAlgo
-│   │     → algName = "CcuAlltoAllMesh1D"
-│   │
-│   └─ GetCcuOpParamResCtx
-│       └─ HcclGetAlgRes                     [op_common.cc]
-│           │
-│           ├─ ★ executor->CalcRes
-│           │   → CcuTempAlltoAllMesh1D::CalcRes
-│           │     ★ kernelFunc = CcuAlltoAllMesh1DKernel
-│           │     ★ kernelArg = CcuKernelArgAlltoAllMesh1D{...}
-│           │
-│           └─ GetAlgResCcu                  [op_common.cc]
-│               ├─ HcclGetChannelForCcu (通用)
-│               │   channel 写入 kernelArg
-│               └─ HcclGetCcuKernel
-│                   ├─ HcommCcuKernelRegisterStart
-│                   ├─ HcommCcuKernelRegister(kernelFunc)
-│                   │   → 桥接到 RegisterManager（查 capture 注册表 → adapter）
-│                   │     → adapter 调真实 CcuAlltoAllMesh1DKernel
-│                   │       → CCU API 被 ccu_primitives_stub 拦截 → Program IR
-│                   └─ HcommCcuKernelRegisterEnd
-│                       → Finalize（IF/ELSE/WHILE 匹配 + LoadArg 排序）
+├─ InitOpParamByTiling
+│   → 从 tiling 填 opParam（opType/engine/dataType）
+│
+├─ PrepareOpParam（虚函数）
+│   → 子类填 union 专属字段（如 AllToAll 的 sendCounts）
+│
+├─ SelectAlgAndPrepareEngine（真实 selector）
+│   → AlltoAllAutoSelector::SelectCcuScheduleAlgo
+│     → algName = "CcuAlltoAllMesh1D"
+│
+├─ HandleSingleRankAndCommMode
+│
+├─ GetCcuOpParamResCtx
+│   └─ HcclGetAlgRes                         [op_common.cc]
+│       │
+│       ├─ ★ executor->CalcRes
+│       │   → CcuTempAlltoAllMesh1D::CalcRes
+│       │     ★ kernelFunc = CcuAlltoAllMesh1DKernel
+│       │     ★ kernelArg = CcuKernelArgAlltoAllMesh1D{...}
+│       │
+│       ├─ (isKfc=false → 不走 ccuKfcExecutor->CalcRes)
+│       │
+│       └─ GetAlgResCcu                      [op_common.cc]
+│           ├─ HcclGetChannelForCcu (通用)
+│           │   → HcclChannelAcquire → ChannelCommCreate
+│           │   → channel 写入 kernelArg
+│           │   → RegisterChannelMap(handle, loc, rmt)
+│           └─ HcclGetCcuKernel
+│               ├─ HcclCommQueryCcuIns (per-rank instance handle)
+│               ├─ HcommCcuKernelRegisterStart
+│               ├─ HcommCcuKernelRegister(kernelFuncName="CcuKernelAlltoAllMesh1D")
+│               │   → 查 capture 注册表 → adapter
+│               │     → ConvertAllToAllArg: 产品 kernelArg → ST config
+│               │     → RegisterManager::Register → capture function
+│               │       → LoadArg + ConfigureProgram + 调真实 CcuAlltoAllMesh1DKernel
+│               │         → CCU API 被 ccu_primitives_stub 拦截 → Program IR
+│               └─ HcommCcuKernelRegisterEnd
+│                   → Finalize（IF/ELSE/WHILE 匹配 + LoadArg 排序）
 │
 └─ 返回 kernelHandle
 ```
