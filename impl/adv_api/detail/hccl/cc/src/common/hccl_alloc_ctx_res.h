@@ -189,7 +189,7 @@ HcclResult GetOpParamResCtx(
 
 HcclResult GetCcuOpParamResCtx(
     HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
-    OpResCtx& opResCtx, void** resCtxOut);
+    OpResCtx& opResCtx, void** resCtxOut, bool onlyCheck = false);
 
 HcclResult GetOpParam(
     HcclComm comm, void* stream, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& opParam);
@@ -197,8 +197,9 @@ HcclResult GetOpParam(
 HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex);
 
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
+// checkOnly为true时逐算子走真实资源链探测资源是否充足（UNAVAIL统一映射为HCCL_E_RES_NOT_SUFFICIENT）
 HcclResult CcuSelectAlg(
     HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
-    void* mc2Tiling, OpResCtx& opResCtx);
+    void* mc2Tiling, OpResCtx& opResCtx, bool checkOnly = false);
 
 #endif
