@@ -14,11 +14,6 @@
 #include <cstdint>
 #include <type_traits>
 
-constexpr uint8_t RELU_POST_DEFAULT = 0;
-constexpr bool CLIP_RELU_POST_DEFAULT = false;
-constexpr uint8_t ELTWISE_OP_DEFAULT = 0;
-constexpr uint64_t QUANT_POST_DEFAULT = 0;
-
 enum class asc_load_l2_cache_mode : uint8_t {
     NORMAL_FIRST_VICTIM = 0,
     NORMAL_LAST_VICTIM = 1,
@@ -53,17 +48,9 @@ enum class asc_position_quarter_mode {
     DISPERSE_FOURTH_QUARTER
 };
 
-enum class asc_dual_dst_mode : uint8_t {
-    DUAL_DST_DISABLE = 0,
-    DUAL_DST_SPLIT_M = 1,
-    DUAL_DST_SPLIT_N = 2
-};
+enum class asc_dual_dst_mode : uint8_t { DUAL_DST_DISABLE = 0, DUAL_DST_SPLIT_M = 1, DUAL_DST_SPLIT_N = 2 };
 
-enum class asc_unit_flag_mode : uint8_t {
-    DISABLE = 0,
-    ENABLE_KEEP = 2,
-    ENABLE_UPDATE = 3
-};
+enum class asc_unit_flag_mode : uint8_t { DISABLE = 0, ENABLE_KEEP = 2, ENABLE_UPDATE = 3 };
 
 enum class asc_relu_pre_mode : uint8_t {
     NONE = 0,
