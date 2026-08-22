@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径：`"basic_api/reg_compute/kernel_reg_compute_vec_interleave_intf.h"`。
+头文件路径：`"basic_api/reg_compute/kernel_reg_compute_vec_duplicate_intf.h`。
 
 给定源操作数寄存器srcReg0和srcReg1，将srcReg0和srcReg1中的元素交织存入结果操作数dstReg0和dstReg1中。交织排列方式如下图所示，其中每个方格代表一个元素：
 
