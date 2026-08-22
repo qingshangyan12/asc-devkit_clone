@@ -36,7 +36,7 @@ The CCU algorithm module in asc-devkit is located under `impl/adv_api/detail/hcc
 Overall call chain:
 
 ```
-aclnn API → MC2 Executor → Selector (algorithm selection) → Template (CalcRes) → Kernel dispatch
+aclnn API → Selector (algorithm selection) → Executor (Orchestrate) → Template (CalcRes) → Kernel dispatch
 ```
 
 CCU algorithms coexist with existing AICPU algorithms, with execution path selected by `opExecuteConfig`:

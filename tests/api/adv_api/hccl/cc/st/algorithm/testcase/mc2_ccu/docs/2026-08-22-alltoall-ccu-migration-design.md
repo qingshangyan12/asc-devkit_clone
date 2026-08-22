@@ -36,7 +36,7 @@ asc-devkit 仓的 CCU 算法模块位于 `impl/adv_api/detail/hccl/cc/` 目录�
 整体调用链：
 
 ```
-aclnn API → MC2 Executor → Selector（算法选择）→ Template（CalcRes 资源计算）→ Kernel 下发
+aclnn API → Selector（算法选择）→ Executor（Orchestrate 编排）→ Template（CalcRes 资源计算）→ Kernel 下发
 ```
 
 CCU 算法与现有 AICPU 算法共存，通过 `opExecuteConfig` 配置选择执行路径：
