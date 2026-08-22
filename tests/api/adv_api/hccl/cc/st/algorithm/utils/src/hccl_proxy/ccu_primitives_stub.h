@@ -13,7 +13,9 @@
 
 #include "ccu_st_types.h"
 
+#include <functional>
 #include <vector>
+#include "hccl_types.h"
 
 namespace HcclSim {
 namespace CcuSt {
@@ -37,12 +39,23 @@ public:
         const std::array<ResourceHandle, 4>& groupSize);
     Result Finalize();
 
+    ResourceHandle CreateLoop();
+    void LoopBodyEnter(ResourceHandle loopHandle);
+    void LoopBodyExit();
+    std::vector<Operation>& GetLoopBody(ResourceHandle loopHandle);
+
+    ResourceHandle CreateLoopGroup(ResourceHandle parallelCfg, ResourceHandle offsetCfg,
+        uint32_t maxLoopNum, const std::vector<ResourceHandle>& loopHandles,
+        const std::vector<ResourceHandle>& loopParamHandles);
+
     static CompilerContext& Current();
     static void SetCurrent(CompilerContext* context);
 
 private:
     Program& program_;
     ResourceHandle nextHandle_{1};
+    std::vector<Operation>* loopBodyTarget_{nullptr};
+    std::map<ResourceHandle, std::vector<Operation>> loopBodies_;
 };
 
 struct Condition {
@@ -152,11 +165,21 @@ public:
     ResourceHandle handle{0};
 };
 
+class CcuBuffer;
+
 class Func {
 public:
     template <typename Callable>
-    explicit Func(Callable&&)
+    explicit Func(Callable &&fn) : body_(std::forward<Callable>(fn))
     {}
+
+    void RunBody() const
+    {
+        if (body_) body_();
+    }
+
+private:
+    std::function<void()> body_;
 };
 
 template <typename T>
@@ -190,6 +213,19 @@ Result EventWait(Event event, uint16_t mask = 1);
 Result Write(
     ChannelHandle channel, RemoteAddr remote, LocalAddr local, Variable length, Event event, uint16_t mask = 1);
 Result LocalCopy(LocalAddr destination, LocalAddr source, Variable length, Event event, uint16_t mask = 1);
+Result LocalCopy(CcuBuffer destination, LocalAddr source, Variable length, Event event, uint16_t mask = 1);
+Result LocalCopy(LocalAddr destination, CcuBuffer source, Variable length, Event event, uint16_t mask = 1);
+Result Read(ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length, Event event, uint16_t mask = 1);
+Result Read(ChannelHandle channel, CcuBuffer local, RemoteAddr remote, Variable length, Event event, uint16_t mask = 1);
+Result ReadReduce(ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length,
+    HcclDataType dataType, HcclReduceOp opType, Event event, uint16_t mask = 1);
+Result LocalReduce(LocalAddr dst, LocalAddr src, Variable len, HcclDataType dataType, HcclReduceOp opType,
+    Event event, uint16_t mask = 1);
+Result LocalReduce(CcuBuffer* buffers, uint32_t count, HcclDataType dataType, HcclDataType outputDataType,
+    HcclReduceOp opType, Variable len, Event event, uint16_t mask = 1);
+Result Write(ChannelHandle channel, RemoteAddr remote, CcuBuffer local, Variable length, Event event, uint16_t mask = 1);
+Result WriteReduce(ChannelHandle channel, RemoteAddr remote, LocalAddr local, Variable length,
+    HcclDataType dataType, HcclReduceOp opType, Event event, uint16_t mask = 1);
 
 } // namespace ccu
 } // namespace AscendC
@@ -204,19 +240,29 @@ Result LocalCopy(LocalAddr destination, LocalAddr source, Variable length, Event
     for (::HcclSim::CcuSt::ControlScope _ccuElseScope(::HcclSim::CcuSt::Condition{0, 0, true}, false, true); \
          _ccuElseScope.Once(); _ccuElseScope.Close())
 
-// Merged from shim/ccu_primitives_dl.hpp — empty shell types for compilation
+// Merged from shim/ccu_primitives_dl.hpp — types with IR capture support
 namespace AscendC {
 namespace ccu {
 class CcuBuffer {
 public:
+    CcuBuffer();
+    explicit CcuBuffer(ResourceHandle h) : handle(h) {}
     ResourceHandle handle{0};
 };
+
 class Loop {
 public:
+    Loop();
+    Loop(Variable &loopParam, const Func &func);
+    Loop(const Loop &) = default;
     ResourceHandle handle{0};
+    ResourceHandle loopParamHandle{0};
 };
+
 class LoopGroup {
 public:
+    LoopGroup();
+    LoopGroup(Variable &parallelCfg, Variable &offsetCfg, uint32_t maxLoopNum, const std::vector<Loop> &loops);
     ResourceHandle handle{0};
 };
 } // namespace ccu

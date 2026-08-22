@@ -81,6 +81,78 @@ TEST_F(CcuStAllToAll, Mesh1D_2Rank_SingleDie_Fp16_1KB)
     VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_FP16, 1024));
 }
 
+// ===== GroupCopy CalGoSize 分块边界 =====
+// CalGoSize config: loopCount=8, memSlice=32768, loopSize=262144
+// 以下用例覆盖 CalGoSize 的 m/n/p 分块边界和 GroupCopy 两个 LoopGroup 的执行路径
+
+TEST_F(CcuStAllToAll, GroupCopy_Boundary_1B)
+{
+    TopoMeta topo{{{{0, 1}}}};
+    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_FP16, 1));
+}
+
+TEST_F(CcuStAllToAll, GroupCopy_Boundary_MemSliceMinus1)
+{
+    TopoMeta topo{{{{0, 1}}}};
+    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_INT8, 32767));
+}
+
+TEST_F(CcuStAllToAll, GroupCopy_Boundary_MemSlice)
+{
+    // memSlice=32768: n=1, p=0, 第二个 LoopGroup 走 n!=0 && p==0 分支
+    TopoMeta topo{{{{0, 1}}}};
+    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_INT8, 32768));
+}
+
+TEST_F(CcuStAllToAll, GroupCopy_Boundary_MemSlicePlus1)
+{
+    // memSlice+1=32769: n=1, p=1, 第二个 LoopGroup 走 n!=0 && p!=0 分支
+    TopoMeta topo{{{{0, 1}}}};
+    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_INT8, 32769));
+}
+
+TEST_F(CcuStAllToAll, GroupCopy_Boundary_LoopSizeMinus1)
+{
+    // loopSize-1=262143: n=7, p=32767, 第二个 LoopGroup 两个 loop 都执行
+    TopoMeta topo{{{{0, 1}}}};
+    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_INT8, 262143));
+}
+
+TEST_F(CcuStAllToAll, GroupCopy_Boundary_LoopSize)
+{
+    // loopSize=262144: m=1, n=0, p=0, 只有第一个 LoopGroup 执行
+    TopoMeta topo{{{{0, 1}}}};
+    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_INT8, 262144));
+}
+
+TEST_F(CcuStAllToAll, GroupCopy_Boundary_LoopSizePlus1)
+{
+    // loopSize+1=262145: m=1, n=0, p=1, 两个 LoopGroup 都执行
+    TopoMeta topo{{{{0, 1}}}};
+    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_INT8, 262145));
+}
+
+TEST_F(CcuStAllToAll, GroupCopy_Boundary_2xLoopSize)
+{
+    // 2*loopSize=524288: m=2, n=0, p=0, 第一个 LoopGroup 内层迭代 3 次
+    TopoMeta topo{{{{0, 1}}}};
+    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_INT8, 524288));
+}
+
+TEST_F(CcuStAllToAll, GroupCopy_Boundary_2xLoopSizePlus1)
+{
+    // 2*loopSize+1=524289: m=2, n=0, p=1, 两个 LoopGroup 都执行
+    TopoMeta topo{{{{0, 1}}}};
+    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_INT8, 524289));
+}
+
+TEST_F(CcuStAllToAll, GroupCopy_Boundary_LoopSizePlusMemSlice)
+{
+    // loopSize+memSlice=294912: m=1, n=1, p=0, 第一个+第二个 LoopGroup 都执行
+    TopoMeta topo{{{{0, 1}}}};
+    VerifyScenario(MakeScenario(topo, HCCL_DATA_TYPE_INT8, 294912));
+}
+
 TEST_F(CcuStAllToAll, Mesh1D_2Rank_SingleDie_Fp16_1MB)
 {
     TopoMeta topo{{{{0, 1}}}};

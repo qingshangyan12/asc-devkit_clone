@@ -31,7 +31,6 @@ protected:
     void PrepareOpParam(OpParam& opParam, uint32_t rankSize, const CcuStScenario& scenario) override;
 
 private:
-    std::vector<uint64_t> sendCounts_;
     std::string algName_;
 
     static std::map<std::string, ScenarioBuilder>& GetVariantRegistry();

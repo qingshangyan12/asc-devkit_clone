@@ -37,8 +37,8 @@ uint64_t RankMemory::ParameterAddress() const
 }
 
 struct RuntimeWorld::RankState {
-    const Program* program{nullptr};
-    const RankLaunch* launch{nullptr};
+    const Program *program{nullptr};
+    const RankLaunch *launch{nullptr};
     size_t pc{0};
     bool completed{false};
     std::vector<TaskParam> taskParams;
@@ -46,6 +46,7 @@ struct RuntimeWorld::RankState {
     std::map<ResourceHandle, uint64_t> addresses;
     std::map<ResourceHandle, uint16_t> events;
     std::map<std::pair<uint32_t, uint32_t>, uint16_t> notifies;
+    std::map<ResourceHandle, std::vector<uint8_t>> buffers;
 };
 
 bool RuntimeWorld::Evaluate(const RankState& state, const Operation& operation) const
@@ -214,65 +215,227 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
             value &= static_cast<uint16_t>(~operation.mask);
             break;
         }
-        case OpCode::WRITE:
-        case OpCode::LOCAL_COPY:
         case OpCode::GROUP_COPY: {
-            auto localIterator = state.program->localAddresses.find(operation.src0);
-            if (localIterator == state.program->localAddresses.end()) {
+            if (operation.index >= state.program->groupCopies.size()) {
                 result = Result::CONTRACT_ERROR;
-                SetError("local address handle is invalid");
+                SetError("GroupCopy descriptor index out of range");
                 return false;
             }
-            ResourceHandle destinationAddress = 0;
+            const auto& descriptor = state.program->groupCopies[operation.index];
+            for (const auto& loopGroup : descriptor.loopGroups) {
+                const uint64_t parallelParam = state.variables.count(loopGroup.parallelParamVariable) ?
+                    state.variables[loopGroup.parallelParamVariable] : 0;
+                const uint64_t offsetParam = state.variables.count(loopGroup.addressOffsetVariable) ?
+                    state.variables[loopGroup.addressOffsetVariable] : 0;
+                if (parallelParam == 0) {
+                    continue;
+                }
+                const uint64_t repeatNum = (parallelParam >> 55) & 0x7F;
+                const uint64_t repeatLoopIndex = (parallelParam >> 48) & 0x7F;
+                const uint64_t totalLoopNum = (parallelParam >> 41) & 0x7F;
+                const uint64_t gsaOffsetGroup = (offsetParam >> 21) & 0xFFFFFFFF;
+                const uint64_t msOffset = (offsetParam >> 10) & 0x7FF;
+
+                for (uint64_t idx = 0; idx <= repeatNum; ++idx) {
+                    uint64_t loopStart = (idx == 0) ? 0 : repeatLoopIndex;
+                    for (uint64_t li = loopStart; li < totalLoopNum && li < loopGroup.loopHandles.size(); ++li) {
+                        const auto& loopHandle = loopGroup.loopHandles[li];
+                        auto bodyIt = state.program->loopBodies.find(loopHandle);
+                        if (bodyIt == state.program->loopBodies.end()) {
+                            continue;
+                        }
+
+                        ResourceHandle loopParamHandle = (li < loopGroup.loopParamHandles.size()) ?
+                            loopGroup.loopParamHandles[li] : 0;
+                        const uint64_t loopParam = (loopParamHandle != 0 && state.variables.count(loopParamHandle)) ?
+                            state.variables[loopParamHandle] : 0;
+                        const uint64_t iterNum = loopParam & 0x1FFF;
+                        const uint64_t gsaOffsetLoop = (loopParam >> 13) & 0xFFFFFFFF;
+                        if (iterNum == 0) {
+                            continue;
+                        }
+
+                        for (uint64_t round = 0; round < iterNum; ++round) {
+                            const uint64_t addrOffset = gsaOffsetGroup * idx + gsaOffsetLoop * round;
+                            const uint64_t msIdx = msOffset * idx;
+
+                            for (const auto& bodyOp : bodyIt->second) {
+                                if (bodyOp.code == OpCode::LOCAL_COPY) {
+                                    auto srcLocal = state.program->localAddresses.find(bodyOp.src0);
+                                    auto dstLocal = state.program->localAddresses.find(bodyOp.dst);
+                                    bool srcIsBuffer = (srcLocal == state.program->localAddresses.end());
+                                    bool dstIsBuffer = (dstLocal == state.program->localAddresses.end());
+
+                                    const uint64_t copyLen = state.variables.count(bodyOp.src1) ?
+                                        state.variables[bodyOp.src1] : 0;
+                                    if (copyLen == 0) {
+                                        state.events[bodyOp.immediate] |= bodyOp.mask;
+                                        continue;
+                                    }
+
+                                    uint8_t* srcPtr = nullptr;
+                                    uint8_t* dstPtr = nullptr;
+                                    uint32_t srcRank = 0;
+                                    uint32_t dstRank = 0;
+
+                                    if (srcIsBuffer) {
+                                        ResourceHandle bufHandle = bodyOp.src0 + msIdx;
+                                        state.buffers[bufHandle].resize(copyLen);
+                                        srcPtr = state.buffers[bufHandle].data();
+                                    } else {
+                                        const uint64_t srcAddr = state.addresses[srcLocal->second.first] + addrOffset;
+                                        if (!ResolveMemory(states, srcAddr, copyLen, srcPtr, srcRank)) {
+                                            result = Result::OUT_OF_RANGE;
+                                            SetError("GroupCopy src memory out of range");
+                                            return false;
+                                        }
+                                    }
+                                    if (dstIsBuffer) {
+                                        ResourceHandle bufHandle = bodyOp.dst + msIdx;
+                                        state.buffers[bufHandle].resize(copyLen);
+                                        dstPtr = state.buffers[bufHandle].data();
+                                    } else {
+                                        const uint64_t dstAddr = state.addresses[dstLocal->second.first] + addrOffset;
+                                        if (!ResolveMemory(states, dstAddr, copyLen, dstPtr, dstRank)) {
+                                            result = Result::OUT_OF_RANGE;
+                                            SetError("GroupCopy dst memory out of range");
+                                            return false;
+                                        }
+                                    }
+                                    std::memmove(dstPtr, srcPtr, static_cast<size_t>(copyLen));
+                                    state.events[bodyOp.immediate] |= bodyOp.mask;
+                                } else if (bodyOp.code == OpCode::EVENT_WAIT) {
+                                    uint16_t& value = state.events[bodyOp.src0];
+                                    if ((value & bodyOp.mask) != bodyOp.mask) {
+                                        return false;
+                                    }
+                                    value &= static_cast<uint16_t>(~bodyOp.mask);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            ExecutionLogEntry logEntry;
+            logEntry.rank = static_cast<uint32_t>(rankIndex);
+            logEntry.operationIndex = state.pc;
+            logEntry.code = operation.code;
+            executionLog_.rankEntries[rankIndex].push_back(logEntry);
+            break;
+        }
+        case OpCode::WRITE:
+        case OpCode::LOCAL_COPY: {
+            auto resolveAddr = [&](ResourceHandle handle, bool isRemote, ResourceHandle& outAddrHandle,
+                bool& outIsBuffer) -> bool {
+                outIsBuffer = false;
+                if (isRemote) {
+                    auto it = state.program->remoteAddresses.find(handle);
+                    if (it != state.program->remoteAddresses.end()) {
+                        outAddrHandle = it->second.first;
+                        return true;
+                    }
+                } else {
+                    auto it = state.program->localAddresses.find(handle);
+                    if (it != state.program->localAddresses.end()) {
+                        outAddrHandle = it->second.first;
+                        return true;
+                    }
+                }
+                auto bufIt = state.program->buffers.find(handle);
+                if (bufIt != state.program->buffers.end()) {
+                    outIsBuffer = true;
+                    outAddrHandle = handle;
+                    return true;
+                }
+                return false;
+            };
+
+            ResourceHandle srcAddrHandle = 0;
+            bool srcIsBuffer = false;
+            if (!resolveAddr(operation.src0, false, srcAddrHandle, srcIsBuffer)) {
+                result = Result::CONTRACT_ERROR;
+                SetError("source handle is invalid");
+                return false;
+            }
+
+            ResourceHandle dstAddrHandle = 0;
+            bool dstIsBuffer = false;
             uint32_t expectedDestinationRank = static_cast<uint32_t>(rankIndex);
             if (operation.code == OpCode::WRITE) {
-                auto remoteIterator = state.program->remoteAddresses.find(operation.dst);
-                if (remoteIterator == state.program->remoteAddresses.end()) {
+                if (!resolveAddr(operation.dst, true, dstAddrHandle, dstIsBuffer)) {
                     result = Result::CONTRACT_ERROR;
                     SetError("remote address handle is invalid");
                     return false;
                 }
-                destinationAddress = remoteIterator->second.first;
                 expectedDestinationRank = ChannelRemoteRank(operation.channel);
             } else {
-                auto destinationIterator = state.program->localAddresses.find(operation.dst);
-                if (destinationIterator == state.program->localAddresses.end()) {
+                if (!resolveAddr(operation.dst, false, dstAddrHandle, dstIsBuffer)) {
                     result = Result::CONTRACT_ERROR;
                     SetError("local destination handle is invalid");
                     return false;
                 }
-                destinationAddress = destinationIterator->second.first;
             }
 
-            const uint64_t length = state.variables[operation.src1];
+            const uint64_t length = state.variables.count(operation.src1) ?
+                state.variables[operation.src1] : 0;
+            if (length == 0) {
+                state.events[operation.immediate] |= operation.mask;
+                break;
+            }
+
             uint8_t* sourcePointer = nullptr;
             uint8_t* destinationPointer = nullptr;
             uint32_t sourceRank = 0;
             uint32_t destinationRank = 0;
-            if (!ResolveMemory(
-                    states, state.addresses[localIterator->second.first], length, sourcePointer, sourceRank) ||
-                !ResolveMemory(
-                    states, state.addresses[destinationAddress], length, destinationPointer, destinationRank)) {
-                result = Result::OUT_OF_RANGE;
-                SetError("CCU memory operation is out of range");
+
+            if (srcIsBuffer) {
+                state.buffers[srcAddrHandle].resize(length);
+                sourcePointer = state.buffers[srcAddrHandle].data();
+                sourceRank = static_cast<uint32_t>(rankIndex);
+            } else {
+                if (!ResolveMemory(states, state.addresses[srcAddrHandle], length, sourcePointer, sourceRank)) {
+                    result = Result::OUT_OF_RANGE;
+                    SetError("CCU source memory is out of range");
+                    return false;
+                }
+            }
+
+            if (dstIsBuffer) {
+                state.buffers[dstAddrHandle].resize(length);
+                destinationPointer = state.buffers[dstAddrHandle].data();
+                destinationRank = static_cast<uint32_t>(rankIndex);
+            } else {
+                if (!ResolveMemory(states, state.addresses[dstAddrHandle], length, destinationPointer, destinationRank)) {
+                    result = Result::OUT_OF_RANGE;
+                    SetError("CCU destination memory is out of range");
+                    return false;
+                }
+            }
+
+            if (!srcIsBuffer && sourceRank != rankIndex) {
+                result = Result::CONTRACT_ERROR;
+                SetError("CCU source address resolves to the wrong rank");
                 return false;
             }
-            if (sourceRank != rankIndex || destinationRank != expectedDestinationRank) {
+            if (!dstIsBuffer && destinationRank != expectedDestinationRank) {
                 result = Result::CONTRACT_ERROR;
                 SetError("CCU address resolves to the wrong rank");
                 return false;
             }
+
             std::memmove(destinationPointer, sourcePointer, static_cast<size_t>(length));
             ExecutionLogEntry logEntry;
             logEntry.rank = static_cast<uint32_t>(rankIndex);
             logEntry.operationIndex = state.pc;
             logEntry.code = operation.code;
-            logEntry.source = MemoryInterval{sourceRank, state.addresses[localIterator->second.first], length, false};
-            logEntry.destination = MemoryInterval{destinationRank, state.addresses[destinationAddress], length, true};
-            executionLog_.rankEntries[rankIndex].push_back(logEntry);
-            if (operation.code != OpCode::GROUP_COPY) {
-                state.events[operation.immediate] |= operation.mask;
+            if (!srcIsBuffer) {
+                logEntry.source = MemoryInterval{sourceRank, state.addresses[srcAddrHandle], length, false};
             }
+            if (!dstIsBuffer) {
+                logEntry.destination = MemoryInterval{destinationRank, state.addresses[dstAddrHandle], length, true};
+            }
+            executionLog_.rankEntries[rankIndex].push_back(logEntry);
+            state.events[operation.immediate] |= operation.mask;
             break;
         }
         case OpCode::IF_BEGIN:
@@ -314,7 +477,7 @@ Result RuntimeWorld::Launch(const std::vector<RankLaunch>& launches)
 
     std::vector<RankState> states(launches.size());
     for (size_t rank = 0; rank < launches.size(); ++rank) {
-        const Program* program = RegisterManager::Global().GetProgram(launches[rank].kernel);
+        const Program *program = RegisterManager::Global().GetProgram(launches[rank].kernel);
         if (program == nullptr || launches[rank].memory == nullptr || program->rankId != rank ||
             program->rankSize != launches.size()) {
             SetError("rank launch does not match compiled program");

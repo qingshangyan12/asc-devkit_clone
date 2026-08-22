@@ -30,7 +30,8 @@
 - [13. 新增算法变体接入指南](#13-新增算法变体接入指南)
 - [14. 新增 CCU 硬件原语接入指南](#14-新增-ccu-硬件原语接入指南)
 - [15. 新增通信原语接入指南](#15-新增通信原语接入指南)
-- [16. 边界声明](#16-边界声明)
+- [16. Loop Engine 仿真](#16-loop-engine-仿真)
+- [17. 边界声明](#17-边界声明)
 
 ---
 
@@ -746,7 +747,239 @@ utils 的框架逻辑（`VerifyScenario`、`CcuProgramChecker`、`RuntimeWorld`�
 
 ---
 
-## 16. 边界声明
+## 16. Loop Engine 仿真
+
+### 16.1 背景
+
+CCU 硬件的 `GroupCopy` 不是简单的单次 `memmove`，而是通过 **Loop Engine** 两层嵌套循环分块搬运数据。ST 框架的 `RuntimeWorld` 在遇到 `GROUP_COPY` IR 时，需要按硬件 Loop Engine 的语义展开执行，否则无法正确验证 `goSize` 分块参数和地址偏移。
+
+### 16.2 硬件 Loop Engine 模型
+
+参考 hcomm 仓 `CcuSimulator`（`test/hccl_vm/src/plugin/runner/ccu_executor/ccu_simulator.cc`），Loop Engine 由两层嵌套组成：
+
+```
+LoopGroup（外层展开）
+ ├─ parallelParam（Xn 寄存器）: repeatNum, repeatLoopIndex, totalLoopNum
+ ├─ offsetParam（Xm 寄存器）: gsaOffset, msOffset, ckeOffset
+ └─ Loop[]（内层迭代）
+     └─ loopParam（Xn 寄存器）: iterNum, gsaOffsetLoop
+         └─ LoopBody（IR 序列）: LocalCopy(src→buf) + EventWait + LocalCopy(buf→dst) + EventWait
+```
+
+#### 参数解析
+
+**parallelParam**（来自 `GetParallelParam`）：
+
+| 字段 | 位段 | 含义 |
+|------|------|------|
+| repeatNum | [61:55] | 外层展开次数（实际执行 repeatNum+1 次） |
+| repeatLoopIndex | [54:48] | 展开时从哪个 Loop 开始 |
+| totalLoopNum | [47:41] | Loop 总数 |
+
+**offsetParam**（来自 `GetOffsetParam`）：
+
+| 字段 | 位段 | 含义 |
+|------|------|------|
+| gsaOffset | [52:21] | 外层每次展开的 GSA 地址步进 |
+| msOffset | [20:10] | 外层每次展开的 MS（buffer）索引步进 |
+| ckeOffset | [9:0] | 外层每次展开的 CKE 索引步进 |
+
+**loopParam**（来自 `GetLoopParam`）：
+
+| 字段 | 位段 | 含义 |
+|------|------|------|
+| loopCtxId | [52:45] | LoopEngine ID |
+| gsaOffsetLoop | [44:13] | 内层每次迭代的 GSA 地址步进 |
+| iterNum | [12:0] | 内层迭代次数 |
+
+#### 地址偏移公式
+
+每次 LoopBody 执行时，源/目标地址的偏移量（参考 `CcuSimulator::GetLoopGsaAddrOffset`）：
+
+```
+addrOffset = gsaOffset × loopExtendIndex + gsaOffsetLoop × curLoopRound
+```
+
+- `loopExtendIndex`：外层展开序号（0 ~ repeatNum）
+- `curLoopRound`：内层迭代序号（0 ~ iterNum-1）
+
+#### 执行流程
+
+参考 `CcuSimulator::ExecuteLoopGroup`（ccu_simulator.cc:235）：
+
+```
+for (idx = 0; idx <= repeatNum; idx++) {
+    loopStartIdx = (idx == 0) ? 0 : repeatLoopIndex
+    for (li = loopStartIdx; li < totalLoopNum; li++) {
+        loopExtendIndex = idx
+        // 执行 Loop 指令 → LoopExecutor::RunV1()
+        //   解析 loopParam: iterNum, gsaOffsetLoop
+        //   for (round = 0; round < iterNum; round++) {
+        //       curLoopRound = round
+        //       执行 LoopBody IR:
+        //         LocalCopy(buf, src, len): src += addrOffset, msId += msOffset × idx
+        //         EventWait: 阻塞等待 event mask
+        //         LocalCopy(dst, buf, len): dst += addrOffset, msId += msOffset × idx
+        //         EventWait: 阻塞等待 event mask
+        //   }
+    }
+}
+```
+
+关键规则：
+- `idx=0` 时从 Loop 0 开始执行所有 `totalLoopNum` 个 Loop
+- `idx>0` 时从 `repeatLoopIndex` 开始执行
+- 每个 Loop 内层迭代 `iterNum` 次
+- 每次 LoopBody 中 `src→buf→dst` 两次搬运（buffer 中转）
+- `EventWait` 是阻塞等待，不跳过
+
+### 16.3 ST RuntimeWorld 实现
+
+`ccu_sim_world.cc` 中 `GROUP_COPY` case 按上述硬件模型实现：
+
+```cpp
+for (idx = 0; idx <= repeatNum; idx++) {
+    loopStart = (idx == 0) ? 0 : repeatLoopIndex;
+    for (li = loopStart; li < totalLoopNum; li++) {
+        // 解析 loopParam → iterNum, gsaOffsetLoop
+        for (round = 0; round < iterNum; round++) {
+            addrOffset = gsaOffsetGroup * idx + gsaOffsetLoop * round;
+            msIdx = msOffset * idx;
+            // 遍历 LoopBody IR:
+            //   LOCAL_COPY: src→buffer 或 buffer→dst（按 handle 区分）
+            //     src/dst 地址 += addrOffset
+            //     buffer 用 handle + msIdx 索引（模拟 MS 偏移）
+            //   EVENT_WAIT: 阻塞等待（if ((value & mask) != mask) return false）
+        }
+    }
+}
+```
+
+与硬件的对应关系：
+
+| 硬件 | ST 实现 |
+|------|---------|
+| `ExecuteLoopGroup` 外层展开 | `for (idx = 0; idx <= repeatNum; idx++)` |
+| `loopStartIdx = (idx == 0) ? 0 : repeatLoopIndex` | `loopStart = (idx == 0) ? 0 : repeatLoopIndex` |
+| `ExecuteLoop` 内层迭代 | `for (round = 0; round < iterNum; round++)` |
+| `GetLoopGsaAddrOffset()` | `addrOffset = gsaOffsetGroup * idx + gsaOffsetLoop * round` |
+| `GetLoopMsOffset()` | `msIdx = msOffset * idx` |
+| `TransMemToMS` / `TransMSToMem` | `state.buffers[handle + msIdx]` + `memmove` |
+| `WaitCkeProcess` 阻塞等待 | `if ((value & mask) != mask) return false` |
+
+### 16.4 GroupCopy 编译阶段
+
+产品代码 `GroupCopy`（`ccu_kernel_alg_base.cc:716`）在 kernel 注册时被调用，通过 CCU 原语桩生成 IR：
+
+1. `CreateMultiOpCopy` → `AllocGoResource(loopCount=8, msPerLoop=8)` → `memSlice=32768`
+   - 分配 `loopCount` 个 Event + `loopCount * msInterleave` 个 CcuBuffer
+2. `CreateMultiOpCopy` → 创建 2 个 `Func`（lambda）+ 2 个 `Loop`
+   - 每个 `Loop` 构造时调 `func.RunBody()`，lambda 中的 `LocalCopy/EventWait` 生成 IR
+   - IR 存入 `program.loopBodies[loopHandle]`（通过 `CompilerContext::LoopBodyEnter/Exit`）
+3. `GroupCopy` 中 `CCU_IF(goSize.addrOffset != 0)` → `LoopGroup` 构造
+   - `LoopGroup` 调 `CreateLoopGroup`，存入 `GroupCopyDescriptor`
+   - 主操作流追加一条 `GROUP_COPY` op（`op.index` 指向 descriptor）
+
+### 16.5 goSize 计算
+
+`CalGoSize(size, config)` 根据 `size` 和 `LoopGroupConfig` 计算分块参数：
+
+```
+loopSize = config.loopCount × config.memSlice
+m = size / loopSize       // 完整外层迭代次数
+n = (size % loopSize) / config.memSlice  // 剩余的 memSlice 数
+p = size % config.memSlice  // 尾块
+```
+
+返回 `{offset, loopIterNum, loopExtendNum, tailSize}`：
+
+| 字段 | 含义 | GroupCopy 用途 |
+|------|------|---------------|
+| offset (=addrOffset) | m × loopSize | 第一个 LoopGroup 总搬运量 |
+| loopIterNum (=loopParam) | m | 第一个 LoopGroup 的内层迭代数 |
+| loopExtendNum (=parallelParam) | GetParallelParam(n-1, ...) | 第二个 LoopGroup 的外层展开参数 |
+| tailSize (=residual) | p 或 memSlice | 第二个 LoopGroup 的尾块大小 |
+
+**重要**：`CalGoSize` 的 `config.memSlice` 必须与 `AllocGoResource` 的 `memSlice` 一致（均为 `LOCAL_COPY_MS_PER_LOOP × CCU_MS_SIZE = 32768`），否则 goSize 分块参数与 loop 参数不匹配。
+
+参考 hccl 仓 AllToAll template（`ccu_temp_all_to_all_v_mesh_1D.cc:193`）：
+```cpp
+config.loopCount = CCU_MS_INTERLEAVE;              // 8
+config.memSlice = CCU_MS_INTERLEAVE * CCU_MS_SIZE; // 32768
+auto goSize = CalGoSize(sliceSize, config, GetCcuVersion());
+```
+
+ST 用例构造时必须使用相同的 config：
+```cpp
+LoopGroupConfig goConfig{};
+goConfig.msInterleave = CCU_MS_INTERLEAVE;
+goConfig.loopCount = CCU_MS_LOCAL_COPY_LOOP_COUNT;
+goConfig.memSlice = LOCAL_COPY_MS_PER_LOOP * CCU_MS_SIZE;
+auto goSize = CalGoSize(sliceSize, goConfig);
+```
+
+### 16.6 1MB 数据搬运示例
+
+以 `sliceSize=1MB=1048576` 为例：
+
+**CalGoSize 计算**（`memSlice=32768, loopCount=8`）：
+```
+loopSize = 8 × 32768 = 262144
+m = 1048576 / 262144 = 4
+n = 0, p = 0
+goSize = {addrOffset=1048576, loopParam=4, parallelParam=0, residual=0}
+```
+
+**第一个 LoopGroup 执行**（`goSize.addrOffset != 0`）：
+- `loopParam = GetLoopParam(0, 32768×8, 0) + 4` → `gsaOffsetLoop=262144, iterNum=4`
+- `paraCfg = GetParallelParam(7, 0, 1)` → `repeatNum=7, repeatLoopIndex=0, totalLoopNum=1`
+- `offsetCfg = GetOffsetParam(32768, 8, 1)` → `gsaOffsetGroup=32768, msOffset=8`
+
+**执行展开**：
+```
+idx=0: loop 0, round 0~3 → addrOffset = 0, 262144, 524288, 786432
+idx=1: loop 0, round 0~3 → addrOffset = 32768, 294912, 557056, 819200
+idx=2: loop 0, round 0~3 → addrOffset = 65536, 327680, 589824, 851456
+idx=3: loop 0, round 0~3 → addrOffset = 98304, 360448, 622592, 883712
+idx=4: loop 0, round 0~3 → addrOffset = 131072, 393216, 655360, 915968
+idx=5: loop 0, round 0~3 → addrOffset = 163840, 425984, 688128, 948224
+idx=6: loop 0, round 0~3 → addrOffset = 196608, 458752, 720896, 980480
+idx=7: loop 0, round 0~3 → addrOffset = 229376, 491520, 753664, 1012736
+```
+
+总搬运量 = 8 × 4 × 32768 = 1048576 = 1MB ✓
+
+每次搬运：`src → buffer[msId] → dst`，buffer 索引 = `msOffset × idx = 8 × idx`。
+
+### 16.7 100B 数据搬运示例
+
+以 `sliceSize=100` 为例：
+
+**CalGoSize 计算**：
+```
+loopSize = 8 × 32768 = 262144
+m = 100 / 262144 = 0
+n = 100 / 32768 = 0
+p = 100
+goSize = {addrOffset=0, loopParam=0, parallelParam=GetParallelParam(0,0,1), residual=100}
+```
+
+**第二个 LoopGroup 执行**（`goSize.parallelParam != 0`）：
+- `paraCfg = GetParallelParam(0, 0, 1)` → `repeatNum=0, repeatLoopIndex=0, totalLoopNum=1`
+- `loopParam = GetLoopParam(0, 0, 1)` → `gsaOffsetLoop=0, iterNum=1`
+- `offsetCfg = GetOffsetParam(32768, 8, 1)` → `gsaOffsetGroup=32768, msOffset=8`
+- `loopLen[0] = goSize.residual = 100`
+
+**执行展开**：
+```
+idx=0: loop 0, round 0 → addrOffset=0, 搬运 100 字节
+```
+
+总搬运量 = 1 × 1 × 100 = 100B ✓
+
+---
+
+## 17. 边界声明
 
 ### 16.1 覆盖
 
@@ -767,7 +1000,8 @@ utils 的框架逻辑（`VerifyScenario`、`CcuProgramChecker`、`RuntimeWorld`�
 - 真实 Translator、微码、CcuInstr
 - 真实 XN/GSA/CKE/MS 物理资源分配
 - 多 Mission/多 LoopEngine 真实并发
-- GroupCopy 内部 MS/LoopEngine pipeline 逐节点执行
+- GroupCopy Loop Engine 两层嵌套展开（参见 [§16](#16-loop-engine-仿真)）
+- GroupCopy loop body buffer 中转（src→MS→dst）
 - 驱动、硬件时序、性能
 - 浮点逐元素数值精度
 - reduce 语义（reduceOp 字段预留，ApplyReduce 未实现）

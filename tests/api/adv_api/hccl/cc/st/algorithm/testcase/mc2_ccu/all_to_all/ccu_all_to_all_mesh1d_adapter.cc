@@ -13,6 +13,7 @@
 
 #include "ccu_kernel_all_to_all_mesh1d.h"
 #include "ccu_primitives_stub.h"
+#include "ccu_kernel_alg_base.h"
 #include "alg_param.h"
 
 #include <algorithm>
@@ -113,6 +114,12 @@ ScenarioData BuildMesh1DScenario(const CcuStScenario& scenario, const std::vecto
     const uint64_t inputSize = sourceBaseOffset + rankSize * sliceSize + guard;
     const uint64_t outputSize = destinationBaseOffset + rankSize * sliceSize + guard;
 
+    mc2_ops_hccl::LoopGroupConfig goConfig{};
+    goConfig.msInterleave = mc2_ops_hccl::CCU_MS_INTERLEAVE;
+    goConfig.loopCount = mc2_ops_hccl::CCU_MS_LOCAL_COPY_LOOP_COUNT;
+    goConfig.memSlice = mc2_ops_hccl::LOCAL_COPY_MS_PER_LOOP * mc2_ops_hccl::CCU_MS_SIZE;
+    const auto goSize = mc2_ops_hccl::CalGoSize(sliceSize, goConfig);
+
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
         RankMemory& memory = data.memories[rank];
         memory.input.assign(inputSize, 0x5a);
@@ -128,6 +135,7 @@ ScenarioData BuildMesh1DScenario(const CcuStScenario& scenario, const std::vecto
         config.writeLoopCount = UINT64_MAX - (sliceSize / MAX_DMA_TRANS_SIZE);
         config.dstOffset = destinationBaseOffset + static_cast<uint64_t>(rank) * sliceSize;
         config.rankId = rank;
+        config.goSize = {goSize[0], goSize[1], goSize[2], goSize[3]};
         for (uint32_t dest = 0; dest < rankSize; ++dest) {
             const uint64_t offset = sourceBaseOffset + static_cast<uint64_t>(dest) * sliceSize;
             for (uint64_t byte = 0; byte < sliceSize; ++byte) {

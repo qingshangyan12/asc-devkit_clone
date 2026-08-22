@@ -105,6 +105,8 @@ struct GroupCopyLoopGroupDescriptor {
     ResourceHandle residualVariable{0};
     uint32_t maxLoopNum{0};
     std::vector<uint32_t> loopIndices;
+    std::vector<ResourceHandle> loopHandles;
+    std::vector<ResourceHandle> loopParamHandles;
 };
 
 struct GroupCopyDescriptor {
@@ -136,6 +138,7 @@ struct Program {
     std::map<ResourceHandle, std::pair<ResourceHandle, ResourceHandle>> localAddresses;
     std::map<ResourceHandle, std::pair<ResourceHandle, ResourceHandle>> remoteAddresses;
     std::vector<GroupCopyDescriptor> groupCopies;
+    std::map<ResourceHandle, std::vector<Operation>> loopBodies;
 };
 
 } // namespace CcuSt

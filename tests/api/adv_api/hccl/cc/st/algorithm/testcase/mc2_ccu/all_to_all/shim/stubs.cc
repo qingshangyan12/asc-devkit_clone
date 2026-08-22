@@ -134,17 +134,6 @@ HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo
 
 std::unique_ptr<InsCollAlgBase> GetAlgExecViaCann(HcclCMDType opType, const std::string& algName) { return nullptr; }
 
-uint64_t DataTypeSizeGet(HcclDataType type) { return DATATYPE_SIZE_TABLE[type]; }
-
-std::vector<uint64_t> CalGoSize(uint64_t size) { return {size}; }
-
-std::vector<uint64_t> CalGoSize(uint64_t size, const LoopGroupConfig& config) { return {size}; }
-
-CcuResult GroupCopy(CcuKernelCtxBase& ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize)
-{
-    return CCU_SUCCESS;
-}
-
 DlHcommFunction::~DlHcommFunction() = default;
 DlHcommFunction& DlHcommFunction::GetInstance()
 {

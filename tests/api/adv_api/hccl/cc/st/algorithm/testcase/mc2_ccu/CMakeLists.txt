@@ -31,6 +31,8 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/alg_v2_template_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/alg_template_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/template_utils.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/ccu_kernel_alg_base.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/ccu_kernel_utils.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/channel/channel.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/channel/channel_request.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo.cc
@@ -48,9 +50,11 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
 add_executable(${HCCL_CCU_ST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/all_to_all_testcase.cpp
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_buffer_primitive_testcase.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/shim/stubs.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all_mesh1d_adapter.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all.cc
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_buffer_primitive_test.cc
     ${UTILS_DIR}/ccu_scenario/ccu_fixture.cc
     ${HCCL_SELECTOR_PRODUCT_SOURCES}
 )

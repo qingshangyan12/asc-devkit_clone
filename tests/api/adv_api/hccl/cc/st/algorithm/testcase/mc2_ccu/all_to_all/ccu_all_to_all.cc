@@ -32,11 +32,12 @@ void CcuStAllToAll::RegisterVariant(const std::string& algName, ScenarioBuilder 
 void CcuStAllToAll::PrepareOpParam(OpParam& opParam, uint32_t rankSize, const CcuStScenario& scenario)
 {
     const uint32_t typeSize = DATATYPE_SIZE_TABLE[scenario.dataType];
-    sendCounts_.assign(rankSize, 0);
+    static thread_local std::vector<uint64_t> sendCounts;
+    sendCounts.assign(rankSize, 0);
     for (uint32_t i = 0; i < rankSize; ++i) {
-        sendCounts_[i] = (typeSize > 0) ? scenario.sizes[0][i] / typeSize : scenario.sizes[0][i];
+        sendCounts[i] = (typeSize > 0) ? scenario.sizes[0][i] / typeSize : scenario.sizes[0][i];
     }
-    opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void*>(sendCounts_.data());
+    opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void*>(sendCounts.data());
 }
 
 ScenarioData CcuStAllToAll::BuildScenarioData(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)

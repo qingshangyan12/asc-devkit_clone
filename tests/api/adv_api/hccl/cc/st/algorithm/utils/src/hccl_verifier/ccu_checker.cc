@@ -129,25 +129,30 @@ CheckResult CcuLogicalResourceChecker::Check(const Program& program) const
                     return Failure("EventWait source is not an Event");
                 }
                 break;
-            case OpCode::WRITE:
-                if (program.remoteAddresses.count(operation.dst) != 1 ||
-                    program.localAddresses.count(operation.src0) != 1 || !isVariable(operation.src1) ||
+            case OpCode::WRITE: {
+                bool srcValid = program.localAddresses.count(operation.src0) == 1 ||
+                    program.buffers.count(operation.src0) == 1;
+                bool dstValid = program.remoteAddresses.count(operation.dst) == 1;
+                if (!dstValid || !srcValid || !isVariable(operation.src1) ||
                     !isEvent(operation.immediate)) {
                     return Failure("remote Write references an invalid address, length, or Event");
                 }
                 break;
-            case OpCode::LOCAL_COPY:
-                if (program.localAddresses.count(operation.dst) != 1 ||
-                    program.localAddresses.count(operation.src0) != 1 || !isVariable(operation.src1) ||
+            }
+            case OpCode::LOCAL_COPY: {
+                bool srcValid = program.localAddresses.count(operation.src0) == 1 ||
+                    program.buffers.count(operation.src0) == 1;
+                bool dstValid = program.localAddresses.count(operation.dst) == 1 ||
+                    program.buffers.count(operation.dst) == 1;
+                if (!srcValid || !dstValid || !isVariable(operation.src1) ||
                     !isEvent(operation.immediate)) {
                     return Failure("LocalCopy references an invalid address, length, or Event");
                 }
                 break;
+            }
             case OpCode::GROUP_COPY:
-                if (program.localAddresses.count(operation.dst) != 1 ||
-                    program.localAddresses.count(operation.src0) != 1 || !isVariable(operation.src1) ||
-                    operation.index >= program.groupCopies.size()) {
-                    return Failure("GroupCopy references an invalid address, length, or descriptor");
+                if (operation.index >= program.groupCopies.size()) {
+                    return Failure("GroupCopy descriptor index is out of range");
                 }
                 break;
             case OpCode::IF_BEGIN:

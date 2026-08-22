@@ -40,7 +40,8 @@
 - [13. Guide to Adding New Algorithm Variants](#13-guide-to-adding-new-algorithm-variants)
 - [14. Guide to Adding New CCU Hardware Primitives](#14-guide-to-adding-new-ccu-hardware-primitives)
 - [15. Guide to Adding New Communication Primitives](#15-guide-to-adding-new-communication-primitives)
-- [16. Boundary Declaration](#16-boundary-declaration)
+- [16. Loop Engine Simulation](#16-loop-engine-simulation)
+- [17. Boundary Declaration](#17-boundary-declaration)
 
 ---
 
@@ -756,7 +757,239 @@ The framework logic of utils (`VerifyScenario`, `CcuProgramChecker`, `RuntimeWor
 
 ---
 
-## 16. Boundary Declaration
+## 16. Loop Engine Simulation
+
+### 16.1 Background
+
+CCU hardware's `GroupCopy` is not a simple single `memmove`, but a two-level nested loop engine that moves data in chunks. ST framework's `RuntimeWorld` must expand and execute according to the hardware Loop Engine semantics when encountering `GROUP_COPY` IR, otherwise it cannot correctly verify `goSize` chunking parameters and address offsets.
+
+### 16.2 Hardware Loop Engine Model
+
+Referenced from hcomm repo `CcuSimulator` (`test/hccl_vm/src/plugin/runner/ccu_executor/ccu_simulator.cc`). The Loop Engine consists of two nested levels:
+
+```
+LoopGroup (outer expansion)
+ ├─ parallelParam (Xn register): repeatNum, repeatLoopIndex, totalLoopNum
+ ├─ offsetParam (Xm register): gsaOffset, msOffset, ckeOffset
+ └─ Loop[] (inner iteration)
+     └─ loopParam (Xn register): iterNum, gsaOffsetLoop
+         └─ LoopBody (IR sequence): LocalCopy(src→buf) + EventWait + LocalCopy(buf→dst) + EventWait
+```
+
+#### Parameter Parsing
+
+**parallelParam** (from `GetParallelParam`):
+
+| Field | Bits | Description |
+|-------|------|-------------|
+| repeatNum | [61:55] | Outer expansion count (executed repeatNum+1 times) |
+| repeatLoopIndex | [54:48] | Which Loop to start from during expansion |
+| totalLoopNum | [47:41] | Total number of Loops |
+
+**offsetParam** (from `GetOffsetParam`):
+
+| Field | Bits | Description |
+|-------|------|-------------|
+| gsaOffset | [52:21] | GSA address step per outer expansion |
+| msOffset | [20:10] | MS (buffer) index step per outer expansion |
+| ckeOffset | [9:0] | CKE index step per outer expansion |
+
+**loopParam** (from `GetLoopParam`):
+
+| Field | Bits | Description |
+|-------|------|-------------|
+| loopCtxId | [52:45] | LoopEngine ID |
+| gsaOffsetLoop | [44:13] | GSA address step per inner iteration |
+| iterNum | [12:0] | Inner iteration count |
+
+#### Address Offset Formula
+
+Address offset for each LoopBody execution (from `CcuSimulator::GetLoopGsaAddrOffset`):
+
+```
+addrOffset = gsaOffset × loopExtendIndex + gsaOffsetLoop × curLoopRound
+```
+
+- `loopExtendIndex`: outer expansion index (0 ~ repeatNum)
+- `curLoopRound`: inner iteration index (0 ~ iterNum-1)
+
+#### Execution Flow
+
+Referenced from `CcuSimulator::ExecuteLoopGroup` (ccu_simulator.cc:235):
+
+```
+for (idx = 0; idx <= repeatNum; idx++) {
+    loopStartIdx = (idx == 0) ? 0 : repeatLoopIndex
+    for (li = loopStartIdx; li < totalLoopNum; li++) {
+        loopExtendIndex = idx
+        // Execute Loop instruction → LoopExecutor::RunV1()
+        //   Parse loopParam: iterNum, gsaOffsetLoop
+        //   for (round = 0; round < iterNum; round++) {
+        //       curLoopRound = round
+        //       Execute LoopBody IR:
+        //         LocalCopy(buf, src, len): src += addrOffset, msId += msOffset × idx
+        //         EventWait: blocking wait for event mask
+        //         LocalCopy(dst, buf, len): dst += addrOffset, msId += msOffset × idx
+        //         EventWait: blocking wait for event mask
+        //   }
+    }
+}
+```
+
+Key rules:
+- When `idx=0`, execute all `totalLoopNum` Loops starting from Loop 0
+- When `idx>0`, start from `repeatLoopIndex`
+- Each Loop iterates `iterNum` times internally
+- Each LoopBody does `src→buf→dst` two transfers (buffer relay)
+- `EventWait` is blocking, not skipped
+
+### 16.3 ST RuntimeWorld Implementation
+
+The `GROUP_COPY` case in `ccu_sim_world.cc` implements the above hardware model:
+
+```cpp
+for (idx = 0; idx <= repeatNum; idx++) {
+    loopStart = (idx == 0) ? 0 : repeatLoopIndex;
+    for (li = loopStart; li < totalLoopNum; li++) {
+        // Parse loopParam → iterNum, gsaOffsetLoop
+        for (round = 0; round < iterNum; round++) {
+            addrOffset = gsaOffsetGroup * idx + gsaOffsetLoop * round;
+            msIdx = msOffset * idx;
+            // Iterate LoopBody IR:
+            //   LOCAL_COPY: src→buffer or buffer→dst (distinguished by handle)
+            //     src/dst address += addrOffset
+            //     buffer indexed by handle + msIdx (simulating MS offset)
+            //   EVENT_WAIT: blocking wait (if ((value & mask) != mask) return false)
+        }
+    }
+}
+```
+
+Hardware-to-ST mapping:
+
+| Hardware | ST Implementation |
+|----------|-------------------|
+| `ExecuteLoopGroup` outer expansion | `for (idx = 0; idx <= repeatNum; idx++)` |
+| `loopStartIdx = (idx == 0) ? 0 : repeatLoopIndex` | `loopStart = (idx == 0) ? 0 : repeatLoopIndex` |
+| `ExecuteLoop` inner iteration | `for (round = 0; round < iterNum; round++)` |
+| `GetLoopGsaAddrOffset()` | `addrOffset = gsaOffsetGroup * idx + gsaOffsetLoop * round` |
+| `GetLoopMsOffset()` | `msIdx = msOffset * idx` |
+| `TransMemToMS` / `TransMSToMem` | `state.buffers[handle + msIdx]` + `memmove` |
+| `WaitCkeProcess` blocking wait | `if ((value & mask) != mask) return false` |
+
+### 16.4 GroupCopy Compilation Phase
+
+Product code `GroupCopy` (`ccu_kernel_alg_base.cc:716`) is called during kernel registration, generating IR through CCU primitive stubs:
+
+1. `CreateMultiOpCopy` → `AllocGoResource(loopCount=8, msPerLoop=8)` → `memSlice=32768`
+   - Allocates `loopCount` Events + `loopCount * msInterleave` CcuBuffers
+2. `CreateMultiOpCopy` → Creates 2 `Func` (lambda) + 2 `Loop`
+   - Each `Loop` constructor calls `func.RunBody()`, lambda's `LocalCopy/EventWait` generates IR
+   - IR stored in `program.loopBodies[loopHandle]` (via `CompilerContext::LoopBodyEnter/Exit`)
+3. `GroupCopy` → `CCU_IF(goSize.addrOffset != 0)` → `LoopGroup` construction
+   - `LoopGroup` calls `CreateLoopGroup`, stores in `GroupCopyDescriptor`
+   - Appends one `GROUP_COPY` op to main operation stream (`op.index` points to descriptor)
+
+### 16.5 goSize Computation
+
+`CalGoSize(size, config)` computes chunking parameters based on `size` and `LoopGroupConfig`:
+
+```
+loopSize = config.loopCount × config.memSlice
+m = size / loopSize       // full outer iterations
+n = (size % loopSize) / config.memSlice  // remaining memSlice count
+p = size % config.memSlice  // tail block
+```
+
+Returns `{offset, loopIterNum, loopExtendNum, tailSize}`:
+
+| Field | Description | GroupCopy Usage |
+|-------|-------------|-----------------|
+| offset (=addrOffset) | m × loopSize | First LoopGroup total transfer size |
+| loopIterNum (=loopParam) | m | First LoopGroup inner iteration count |
+| loopExtendNum (=parallelParam) | GetParallelParam(n-1, ...) | Second LoopGroup outer expansion param |
+| tailSize (=residual) | p or memSlice | Second LoopGroup tail block size |
+
+**Important**: `CalGoSize`'s `config.memSlice` must match `AllocGoResource`'s `memSlice` (both `LOCAL_COPY_MS_PER_LOOP × CCU_MS_SIZE = 32768`), otherwise goSize parameters won't match loop parameters.
+
+Referenced from hccl repo AllToAll template (`ccu_temp_all_to_all_v_mesh_1D.cc:193`):
+```cpp
+config.loopCount = CCU_MS_INTERLEAVE;              // 8
+config.memSlice = CCU_MS_INTERLEAVE * CCU_MS_SIZE; // 32768
+auto goSize = CalGoSize(sliceSize, config, GetCcuVersion());
+```
+
+ST test case must use the same config:
+```cpp
+LoopGroupConfig goConfig{};
+goConfig.msInterleave = CCU_MS_INTERLEAVE;
+goConfig.loopCount = CCU_MS_LOCAL_COPY_LOOP_COUNT;
+goConfig.memSlice = LOCAL_COPY_MS_PER_LOOP * CCU_MS_SIZE;
+auto goSize = CalGoSize(sliceSize, goConfig);
+```
+
+### 16.6 1MB Data Transfer Example
+
+With `sliceSize=1MB=1048576`:
+
+**CalGoSize computation** (`memSlice=32768, loopCount=8`):
+```
+loopSize = 8 × 32768 = 262144
+m = 1048576 / 262144 = 4
+n = 0, p = 0
+goSize = {addrOffset=1048576, loopParam=4, parallelParam=0, residual=0}
+```
+
+**First LoopGroup execution** (`goSize.addrOffset != 0`):
+- `loopParam = GetLoopParam(0, 32768×8, 0) + 4` → `gsaOffsetLoop=262144, iterNum=4`
+- `paraCfg = GetParallelParam(7, 0, 1)` → `repeatNum=7, repeatLoopIndex=0, totalLoopNum=1`
+- `offsetCfg = GetOffsetParam(32768, 8, 1)` → `gsaOffsetGroup=32768, msOffset=8`
+
+**Expansion**:
+```
+idx=0: loop 0, round 0~3 → addrOffset = 0, 262144, 524288, 786432
+idx=1: loop 0, round 0~3 → addrOffset = 32768, 294912, 557056, 819200
+idx=2: loop 0, round 0~3 → addrOffset = 65536, 327680, 589824, 851456
+idx=3: loop 0, round 0~3 → addrOffset = 98304, 360448, 622592, 883712
+idx=4: loop 0, round 0~3 → addrOffset = 131072, 393216, 655360, 915968
+idx=5: loop 0, round 0~3 → addrOffset = 163840, 425984, 688128, 948224
+idx=6: loop 0, round 0~3 → addrOffset = 196608, 458752, 720896, 980480
+idx=7: loop 0, round 0~3 → addrOffset = 229376, 491520, 753664, 1012736
+```
+
+Total transfer = 8 × 4 × 32768 = 1048576 = 1MB ✓
+
+Each transfer: `src → buffer[msId] → dst`, buffer index = `msOffset × idx = 8 × idx`.
+
+### 16.7 100B Data Transfer Example
+
+With `sliceSize=100`:
+
+**CalGoSize computation**:
+```
+loopSize = 8 × 32768 = 262144
+m = 100 / 262144 = 0
+n = 100 / 32768 = 0
+p = 100
+goSize = {addrOffset=0, loopParam=0, parallelParam=GetParallelParam(0,0,1), residual=100}
+```
+
+**Second LoopGroup execution** (`goSize.parallelParam != 0`):
+- `paraCfg = GetParallelParam(0, 0, 1)` → `repeatNum=0, repeatLoopIndex=0, totalLoopNum=1`
+- `loopParam = GetLoopParam(0, 0, 1)` → `gsaOffsetLoop=0, iterNum=1`
+- `offsetCfg = GetOffsetParam(32768, 8, 1)` → `gsaOffsetGroup=32768, msOffset=8`
+- `loopLen[0] = goSize.residual = 100`
+
+**Expansion**:
+```
+idx=0: loop 0, round 0 → addrOffset=0, transfer 100 bytes
+```
+
+Total transfer = 1 × 1 × 100 = 100B ✓
+
+---
+
+## 17. Boundary Declaration
 
 ### 16.1 Coverage
 
@@ -777,7 +1010,8 @@ The framework logic of utils (`VerifyScenario`, `CcuProgramChecker`, `RuntimeWor
 - Real Translator, microcode, CcuInstr
 - Real XN/GSA/CKE/MS physical resource allocation
 - Real multi-Mission/multi-LoopEngine concurrency
-- GroupCopy internal MS/LoopEngine pipeline per-node execution
+- GroupCopy Loop Engine two-level nested expansion (see [§16](#16-loop-engine-simulation))
+- GroupCopy loop body buffer relay (src→MS→dst)
 - Driver, hardware timing, performance
 - Floating-point per-element numerical precision
 - reduce semantics (reduceOp field reserved, ApplyReduce not implemented)
