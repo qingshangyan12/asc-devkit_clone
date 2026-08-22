@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Tensor API演示寄存器基础计算接口`asc::te::abs`的使用方法。样例覆盖`int8_t`、`int16_t`、`half`、`int32_t`和`float`五种类型，每种类型输入64个元素，计算绝对值后输出。
+本样例基于Tensor API演示寄存器基础计算接口`asc::te::experimental::abs`的使用方法。样例覆盖`int8_t`、`int16_t`、`half`、`int32_t`和`float`五种类型，每种类型输入64个元素，计算绝对值后输出。
 
 ## 支持的产品
 
@@ -48,7 +48,7 @@
     1. 使用`asc::te::make_tensor`、`asc::te::make_mem_ptr`和`asc::te::make_frame_layout`创建GM和UB上的Tensor对象。
     2. 使用`asc::te::make_copy`和`asc::te::copy`完成GM到UB的数据搬运。
     3. 使用Tensor `load`接口加载为`reg_tensor`，通过`make_mask<mask_pattern::vl64, T>()`指定64个元素参与计算。
-    4. 调用`asc::te::abs`计算绝对值，并使用Tensor `store`接口写回UB。
+    4. 调用`asc::te::experimental::abs`计算绝对值，并使用Tensor `store`接口写回UB。
     5. 使用`asc::te::copy`将结果从UB搬运回GM。
 
   - 调用实现
@@ -57,7 +57,7 @@
 
 ## 核心接口说明
 
-### asc::te::abs
+### asc::te::experimental::abs
 
 ```cpp
 template <typename T>

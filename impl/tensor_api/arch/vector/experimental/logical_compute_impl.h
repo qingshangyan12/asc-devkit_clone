@@ -70,6 +70,8 @@ __simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
 
 } // namespace detail
 
+namespace experimental {
+
 template <typename T>
 __simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src)
 {
@@ -115,7 +117,7 @@ __simd_callee__ inline decltype(auto) operator<<(const reg_tensor<T>& src, const
     static_assert(detail::supports_shift_v<T>, "operator<< does not support this element type");
 
     reg_tensor<T> dst;
-    if constexpr (detail::is_reg_tensor_v<U>) {
+    if constexpr (is_reg_tensor_v<U>) {
         using shift_type = detail::reg_elem_t<U>;
         static_assert(detail::supports_shift_pair_v<T, shift_type>,
             "register operator<< requires a signed shift register of the same width");
@@ -135,7 +137,7 @@ __simd_callee__ inline decltype(auto) operator>>(const reg_tensor<T>& src, const
     static_assert(detail::supports_shift_v<T>, "operator>> does not support this element type");
 
     reg_tensor<T> dst;
-    if constexpr (detail::is_reg_tensor_v<U>) {
+    if constexpr (is_reg_tensor_v<U>) {
         using shift_type = detail::reg_elem_t<U>;
         static_assert(detail::supports_shift_pair_v<T, shift_type>,
             "register operator>> requires a signed shift register of the same width");
@@ -149,6 +151,7 @@ __simd_callee__ inline decltype(auto) operator>>(const reg_tensor<T>& src, const
     return dst;
 }
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

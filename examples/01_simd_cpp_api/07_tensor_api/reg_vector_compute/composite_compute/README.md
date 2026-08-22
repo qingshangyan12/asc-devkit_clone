@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Tensor API演示寄存器复合计算接口`asc::te::fma`的使用方法。样例覆盖`half`和`float`两种类型，每种类型包含三组64元素输入，计算`a * b + c`后输出。
+本样例基于Tensor API演示寄存器复合计算接口`asc::te::experimental::fma`的使用方法。样例覆盖`half`和`float`两种类型，每种类型包含三组64元素输入，计算`a * b + c`后输出。
 
 ## 支持的产品
 
@@ -50,7 +50,7 @@
     1. 使用`asc::te::make_tensor`、`asc::te::make_mem_ptr`和`asc::te::make_frame_layout`创建GM和UB上的Tensor对象。
     2. 使用`asc::te::make_copy`和`asc::te::copy`完成GM到UB的数据搬运。
     3. 使用Tensor `load`接口加载三组输入为`reg_tensor`，通过`make_mask<mask_pattern::vl64, T>()`指定64个元素参与计算。
-    4. 调用`asc::te::fma(input_a, input_b, input_c)`执行融合乘加计算，并使用Tensor `store`接口写回UB。
+    4. 调用`asc::te::experimental::fma(input_a, input_b, input_c)`执行融合乘加计算，并使用Tensor `store`接口写回UB。
     5. 使用`asc::te::copy`将结果从UB搬运回GM。
 
   - 调用实现
@@ -59,7 +59,7 @@
 
 ## 核心接口说明
 
-### asc::te::fma
+### asc::te::experimental::fma
 
 ```cpp
 template <typename T>
