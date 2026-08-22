@@ -207,8 +207,20 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2AllGatherConcurrentExecutor][Orchestrate] Orchestrate Start");
+    HCCL_INFO(
+        "[InsV2AllGatherConcurrentExecutor][Orchestrate] resCtx before copy: infos.size[%zu], "
+        "threads.size[%zu], channels.size[%zu], cclMem.size[%llu]",
+        resCtx.algHierarchyInfo.infos.size(), resCtx.threads.size(), resCtx.channels.size(),
+        static_cast<unsigned long long>(resCtx.cclMem.size));
+    HCCL_INFO("[InsV2AllGatherConcurrentExecutor][Orchestrate] before algHierarchyInfo copy");
     algHierarchyInfo_ = resCtx.algHierarchyInfo;
+    HCCL_INFO(
+        "[InsV2AllGatherConcurrentExecutor][Orchestrate] after algHierarchyInfo copy, infos.size[%zu]",
+        algHierarchyInfo_.infos.size());
+    HCCL_INFO("[InsV2AllGatherConcurrentExecutor][Orchestrate] before threads copy");
     threads_ = resCtx.threads;
+    HCCL_INFO(
+        "[InsV2AllGatherConcurrentExecutor][Orchestrate] after threads copy, threads.size[%zu]", threads_.size());
 
     maxTmpMemSize_ = resCtx.cclMem.size;
     myRank_ = resCtx.topoInfo.userRank;
@@ -218,7 +230,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     dataTypeSize_ = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
     dataSize_ = dataCount_ * dataTypeSize_;
     strideCount_ = param.DataDes.strideCount;
-    HCCL_DEBUG("[InsV2AllGatherConcurrentExecutor][Orchestrate] strideCount[%lu]", strideCount_);
+    HCCL_INFO("[InsV2AllGatherConcurrentExecutor][Orchestrate] strideCount[%lu]", strideCount_);
 
     // 拆分algHierarchyInfo
     if (algHierarchyInfo_.infos.empty() || algHierarchyInfo_.infos[0].size() < 2) {
