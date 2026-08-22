@@ -43,79 +43,70 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_str
 
 // ==========mmad_mx(e1m2/e1m2, e4m3/e5m2)==========
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t m,
-    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
         c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t m,
-    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
         c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t m,
-    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
         c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t m,
-    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
         c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m,
-    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
         c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t m,
-    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
         c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m,
-    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
         c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
-    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t m,
-    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
         c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad_mx with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad_mx with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad_mx(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -135,8 +126,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad_mx with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad_mx with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad_mx(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -156,8 +146,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad_mx with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad_mx with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad_mx(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -177,8 +166,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad_mx with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad_mx with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad_mx(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -198,8 +186,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad_mx with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad_mx with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad_mx(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -219,8 +206,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad_mx with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad_mx with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad_mx(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -240,8 +226,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad_mx with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad_mx with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad_mx(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -261,8 +246,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad_mx with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad_mx with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad_mx(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -292,9 +276,8 @@ __aicore__ inline void asc_mmad(
 }
 
 __aicore__ inline void asc_mmad(
-    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m,
-    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source,
-    bool c_matrix_init_val)
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_impl(
         c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
@@ -341,8 +324,8 @@ __aicore__ inline void asc_mmad(
 }
 
 __aicore__ inline void asc_mmad(
-    __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t m, uint16_t k,
-    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+    __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t m, uint16_t k, uint16_t n,
+    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_impl(
         c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
@@ -356,8 +339,7 @@ __aicore__ inline void asc_mmad(
         c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -377,8 +359,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -398,8 +379,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -419,8 +399,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -440,8 +419,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -461,8 +439,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ half* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
@@ -480,8 +457,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
@@ -499,8 +475,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad(
     __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
@@ -518,8 +493,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
-[[deprecated("NOTICE: asc_mmad with uint8_t unit_flag is deprecated. "
-             "Please use asc_mmad with asc_unit_flag_mode unit_flag_mode instead.")]] __aicore__ inline void asc_mmad(
+[[deprecated("NOTICE: uint8_t unit_flag is deprecated; use asc_unit_flag_mode.")]] __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)

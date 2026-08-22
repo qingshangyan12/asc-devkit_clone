@@ -25,7 +25,7 @@
     };                                                                                                               \
                                                                                                                      \
     namespace {                                                                                                      \
-    uint8_t expected_unit_flag_##src0_type##_##src1_type = 0;                                                       \
+    uint8_t expected_unit_flag_##src0_type##_##src1_type = 0;                                                        \
     void cce_name##_##src0_type##_##src1_type##_Stub(                                                                \
         dst_type* dst, src0_type* src0, src1_type* src1, uint16_t left_height, uint16_t n_dim, uint16_t right_width, \
         uint8_t unitFlag, bool disableGemv, bool cMatrixSource, bool cMatrixInitVal)                                 \
@@ -49,7 +49,7 @@
         bool cMatrixSource = false;                                                                                  \
         bool cMatrixInitVal = false;                                                                                 \
                                                                                                                      \
-        expected_unit_flag_##src0_type##_##src1_type = 0;                                                           \
+        expected_unit_flag_##src0_type##_##src1_type = 0;                                                            \
         MOCKER_CPP(                                                                                                  \
             cce_name,                                                                                                \
             void(dst_type*, src0_type*, src1_type*, uint16_t, uint16_t, uint16_t, uint8_t, bool, bool, bool))        \
@@ -63,7 +63,7 @@
                                                                                                                      \
     TEST_F(                                                                                                          \
         TestVectorCompute##class_name##_##src0_type##_##src1_type##_CApi,                                            \
-        c_api_name##_enum_##src0_type##_##src1_type##_Succ)                                                         \
+        c_api_name##_enum_##src0_type##_##src1_type##_Succ)                                                          \
     {                                                                                                                \
         dst_type* dst;                                                                                               \
         src0_type* src0;                                                                                             \
@@ -76,7 +76,7 @@
         bool cMatrixSource = false;                                                                                  \
         bool cMatrixInitVal = false;                                                                                 \
                                                                                                                      \
-        expected_unit_flag_##src0_type##_##src1_type = 2;                                                           \
+        expected_unit_flag_##src0_type##_##src1_type = 2;                                                            \
         MOCKER_CPP(                                                                                                  \
             cce_name,                                                                                                \
             void(dst_type*, src0_type*, src1_type*, uint16_t, uint16_t, uint16_t, uint8_t, bool, bool, bool))        \
