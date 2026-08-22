@@ -12,12 +12,61 @@
 
 import json
 import os
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest import mock
+
+
+class _RecordingMode(Enum):
+    EXECUTE_AND_RECORD = "execute_and_record"
+    RECORD_ONLY = "record_only"
+
+
+@dataclass(frozen=True)
+class _KernelCompileCommand:
+    tiling_key: str
+    compiled_symbol: str
+    core_type: str
+    source_path: str
+    argv: tuple
+    output_path: str
+    compile_tiling_key: str = None
+    compile_symbol: str = None
+    object_type: str = None
+    constant_info_files: tuple = ()
+
+
+@dataclass(frozen=True)
+class _SkBindCommand:
+    source_path: str
+    argv: tuple
+    output_path: str
+
+
+class _CommandSession:
+    def __init__(self, mode):
+        self._mode = mode
+        self._records = []
+        self._sk_bind_records = []
+
+    @property
+    def records(self):
+        return tuple(self._records)
+
+    @property
+    def sk_bind_records(self):
+        return tuple(self._sk_bind_records)
+
+    def submit(self, command):
+        self._records.append(command)
+
+    def submit_sk_bind(self, command):
+        self._sk_bind_records.append(command)
 
 
 MODULE_DIR = os.path.realpath(
@@ -87,7 +136,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
         self.dynamic_object = os.path.join(self.input_root, "AddCustom.o")
         Path(self.dynamic_object).write_bytes(b"\x7fELFtest-object")
-        self.metadata_path = os.path.join(self.input_root, "AddCustom.json")
+        self.metadata_path = os.path.join(self.input_root, "add_custom.json")
         Path(self.metadata_path).write_text(
             json.dumps({"kernelList": [{"kernelName": "add_custom_100000"}]}),
             encoding="utf-8",
@@ -118,6 +167,9 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             dst_file=self.dynamic_object,
             global_kernel_symbols=list(symbols or []),
             global_kernel_attribute="__global__ [aicore]",
+            max_tiling_size=0,
+            compiled_tiling_key_data_size_map={},
+            compile_command_session=_CommandSession(_RecordingMode.EXECUTE_AND_RECORD),
         )
 
     def make_recorded_commands(
@@ -170,12 +222,11 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             ):
                 argv.append("-DRAW_AIC_ONLY_DUMP_TENSOR")
             commands.append(
-                SimpleNamespace(
+                _KernelCompileCommand(
                     tiling_key="100000",
                     compiled_symbol=compiled_symbol,
                     core_type=core_type,
                     source_path=compile_info.gen_kernel_func_file,
-                    constant_info_files=tuple(constant_info_files),
                     argv=tuple(argv),
                     output_path=output_path,
                 )
@@ -226,37 +277,59 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         constant_info_files = tuple(
             dict.fromkeys(item.template_path for item in constant_infos)
         )
-        basic_context.recorded_compile_commands = self.make_recorded_commands(
-            basic_context,
-            basic_options,
-            constant_info_files,
-            chip_version,
+        basic_context.compile_command_session = _CommandSession(
+            _RecordingMode.EXECUTE_AND_RECORD
         )
+        for command in self.make_recorded_commands(
+            basic_context, basic_options, constant_info_files, chip_version
+        ):
+            basic_context.compile_command_session.submit(command)
         if sk_context is not None:
-            sk_context.recorded_compile_commands = self.make_recorded_commands(
+            sk_context.compile_command_session = _CommandSession(
+                _RecordingMode.RECORD_ONLY
+            )
+            for command in self.make_recorded_commands(
                 sk_context,
                 sk_options or self.make_options(),
                 constant_info_files,
                 chip_version,
-            )
-        request = generator.KernelCompileRecordBuildRequest(
+            ):
+                sk_context.compile_command_session.submit(command)
+        size_by_tiling_key = (
+            {
+                "tiling_data": (
+                    {"100000": 8}
+                    if tiling_key_data_size is None
+                    else tiling_key_data_size
+                )
+            }
+            if constant_info_size_by_tiling_key is None
+            else constant_info_size_by_tiling_key
+        )
+        tiling_info = SimpleNamespace(
+            default_tiling_size=default_tiling_size,
+            tiling_key_data_size=(
+                {"100000": 8} if tiling_key_data_size is None else tiling_key_data_size
+            ),
+            tiling_data_file_path=self.tiling_path,
+        )
+        self._last_snapshot = generator.ManifestInputSnapshot(
+            soc_version="Ascend910B",
+            kernel_spec_dir=self.output_root,
+            resource_id=self.resource_id,
+            compile_info=basic_context,
             basic_compile_info=basic_context,
             sk_compile_info=sk_context,
-            metadata_json_path=self.metadata_path,
+            tiling_info=tiling_info,
+            workspace_idx=3,
             constant_infos=constant_infos,
-            constant_info_size_by_tiling_key=(
-                {
-                    "tiling_data": (
-                        {"100000": 8}
-                        if tiling_key_data_size is None
-                        else tiling_key_data_size
-                    )
-                }
-                if constant_info_size_by_tiling_key is None
-                else constant_info_size_by_tiling_key
-            ),
+            constant_info_size_by_tiling_key=size_by_tiling_key,
         )
-        return generator.KernelCompileRecordBuilder(request).build()
+        return generator._KernelCompileRecordBuilder(
+            self._last_snapshot,
+            constant_infos,
+            size_by_tiling_key,
+        ).build()
 
     def make_request(
         self,
@@ -267,12 +340,10 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         basic_kernel_attribute="",
         sk_bind_compile_options=(),
         sk_bind_command=None,
-        output_dir=None,
-        manifest_name=None,
     ):
         if sk_bind_command is None and sk_cap_bitmap is not None:
             sk_bind_output = os.path.join(self.input_root, "sk_bind.o")
-            sk_bind_command = SimpleNamespace(
+            sk_bind_command = _SkBindCommand(
                 source_path=self.sk_bind_path,
                 argv=(
                     self.bisheng,
@@ -290,106 +361,81 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 ),
                 output_path=sk_bind_output,
             )
-        return generator.ManifestGenerationRequest(
-            soc_version="Ascend910B",
-            resource_id=self.resource_id,
-            source_file_path=self.source_path,
-            origin_func_name="add_custom",
-            output_dir=output_dir or self.output_dir,
-            manifest_name=manifest_name or self.manifest_name,
-            kernels=tuple(records),
+        snapshot = self._last_snapshot
+        if snapshot.sk_compile_info is not None:
+            snapshot.sk_compile_info.global_kernel_attribute = sk_kernel_attribute
+            snapshot.basic_compile_info.global_kernel_attribute = basic_kernel_attribute
+            if sk_bind_command is not None:
+                snapshot.sk_compile_info.compile_command_session.submit_sk_bind(
+                    sk_bind_command
+                )
+        return generator.ManifestInputSnapshot(
+            soc_version=snapshot.soc_version,
+            kernel_spec_dir=snapshot.kernel_spec_dir,
+            resource_id=snapshot.resource_id,
+            compile_info=snapshot.compile_info,
+            basic_compile_info=snapshot.basic_compile_info,
+            tiling_info=snapshot.tiling_info,
+            workspace_idx=snapshot.workspace_idx,
+            sk_compile_info=snapshot.sk_compile_info,
             sk_cap_bitmap=sk_cap_bitmap,
-            sk_kernel_attribute=sk_kernel_attribute,
-            basic_kernel_attribute=basic_kernel_attribute,
-            sk_bind_command=sk_bind_command,
+            constant_infos=snapshot.constant_infos,
+            constant_info_size_by_tiling_key=(
+                snapshot.constant_info_size_by_tiling_key
+            ),
         )
 
-    def generate(self, request):
-        return generator.StaticCompileResourceGenerator(request).generate()
+    def generate(self, snapshot):
+        return generator.ManifestPackageWriter(snapshot).write()
 
     def resource_logical_path(self, manifest, reference):
         prefix = "${resource}/" + manifest["resource_path"] + "/"
         self.assertTrue(reference.startswith(prefix))
         return reference[len(prefix) :]
 
-    def test_generate_static_compile_manifest_builds_request_from_context(self):
-        compile_info = self.make_compile_context(kernel_name="TestKernel")
-        compile_info.dst_file = "/tmp/kernel_meta/TestKernel.o"
-        compile_info.src_file = "/tmp/op.cpp"
-        compile_info.origin_func_name = "test_op"
-        compile_info.static_compile_tiling_size = 32
-        compile_info.static_compile_tiling_key_data_size = {2: 24}
-        basic_compile_info = SimpleNamespace(
-            global_kernel_attribute="__global__ [aicore]"
+    def test_manifest_package_writer_writes_snapshot(self):
+        compile_info = self.make_compile_context()
+        compile_info.dst_file = os.path.join(self.input_root, "add_custom.o")
+        compile_info.src_file = self.source_path
+        compile_info.max_tiling_size = 32
+        compile_info.compiled_tiling_key_data_size_map = {"100000": 24}
+        Path(compile_info.dst_file).write_bytes(b"\x7fELFtest-object")
+        metadata_path = os.path.join(self.input_root, "add_custom.json")
+        Path(metadata_path).write_text(
+            json.dumps({"kernelList": [{"kernelName": "add_custom_100000"}]}),
+            encoding="utf-8",
         )
-        sk_bind_command = mock.Mock()
-        sk_compile_info = SimpleNamespace(
-            global_kernel_attribute="__global__ __sk__",
-            recorded_sk_bind_commands=[sk_bind_command],
-        )
+        options = self.make_options()
+        for command in self.make_recorded_commands(
+            compile_info, options, (self.tiling_path,), "c220"
+        ):
+            compile_info.compile_command_session.submit(command)
         tiling_info = SimpleNamespace(
             default_tiling_size=0,
-            tiling_key_data_size={1: 16},
-            tiling_data_file_path="/tmp/kernel_meta/TestKernel_tiling_data.h",
+            tiling_key_data_size={"100000": 16},
+            tiling_data_file_path=self.tiling_path,
         )
-        context = generator.StaticCompileManifestContext(
+        snapshot = generator.ManifestInputSnapshot(
             soc_version="Ascend910B",
-            kernel_spec_dir="/tmp/kernel_spec",
-            resource_id="resource-id",
+            kernel_spec_dir=self.output_root,
+            resource_id=self.resource_id,
             compile_info=compile_info,
-            basic_compile_info=basic_compile_info,
+            basic_compile_info=compile_info,
             tiling_info=tiling_info,
             workspace_idx=3,
-            sk_compile_info=sk_compile_info,
-            sk_cap_bitmap=7,
         )
 
-        with mock.patch.object(
-            generator, "KernelCompileRecordBuilder"
-        ) as build_records:
-            with mock.patch.object(
-                generator, "StaticCompileResourceGenerator"
-            ) as generate:
-                build_records.return_value.build.return_value = ("kernel-record",)
-                generator.generate_static_compile_manifest(context)
+        manifest_path = generator.ManifestPackageWriter(snapshot).write()
 
-        build_request = build_records.call_args.args[0]
         self.assertEqual(
-            build_request.metadata_json_path, "/tmp/kernel_meta/TestKernel.json"
+            manifest_path,
+            os.path.join(self.output_root, "add_custom", self.manifest_name),
         )
-        constant_info = build_request.constant_infos[0]
-        self.assertEqual(constant_info.name, "tiling_data")
-        self.assertEqual(constant_info.parameter_index, 4)
-        self.assertEqual(constant_info.byte_size, 32)
-        self.assertEqual(
-            build_request.constant_info_size_by_tiling_key,
-            {"tiling_data": {1: 16, 2: 24}},
-        )
-
-        request = generate.call_args.args[0]
-        self.assertEqual(request.soc_version, "Ascend910B")
-        self.assertEqual(request.source_file_path, "/tmp/op.cpp")
-        self.assertEqual(request.origin_func_name, "test_op")
-        self.assertEqual(request.output_dir, "/tmp/kernel_spec/TestKernel")
-        self.assertEqual(request.manifest_name, "TestKernel_manifest.json")
-        self.assertEqual(request.kernels, ("kernel-record",))
-        self.assertEqual(request.sk_cap_bitmap, 7)
-        self.assertEqual(request.basic_kernel_attribute, "__global__ [aicore]")
-        self.assertEqual(request.sk_kernel_attribute, "__global__ __sk__")
-        self.assertIs(request.sk_bind_command, sk_bind_command)
-
-    def test_generate_manifest_uses_requested_name_and_kernel_directory(self):
-        request = self.make_request(self.make_records())
-
-        result = self.generate(request)
-
-        expected_path = os.path.join(
-            request.output_dir,
-            request.manifest_name,
-        )
-        self.assertEqual(result.manifest_path, expected_path)
-        self.assertTrue(os.path.isfile(expected_path))
-        self.assertTrue(os.path.isdir(os.path.join(request.output_dir, "resources")))
+        manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
+        self.assertEqual(manifest["resource_id"], self.resource_id)
+        self.assertEqual(manifest["kernels"][0]["kernel_name"], "add_custom_100000")
+        self.assertEqual(manifest["kernels"][0]["constant_infos"][0]["byte_size"], 24)
+        self.assertTrue(os.path.isdir(os.path.join(self.output_dir, "resources")))
 
     def test_basic_mix_manifest_uses_static_wrapper_and_tiling_template(self):
         records = self.make_records(
@@ -402,7 +448,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
         result = self.generate(self.make_request(records))
 
-        manifest = json.loads(Path(result.manifest_path).read_text(encoding="utf-8"))
+        manifest = json.loads(Path(result).read_text(encoding="utf-8"))
         self.assertEqual(
             set(manifest),
             {
@@ -596,7 +642,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
 
         result = self.generate(self.make_request(records))
 
-        manifest = json.loads(Path(result.manifest_path).read_text(encoding="utf-8"))
+        manifest = json.loads(Path(result).read_text(encoding="utf-8"))
         kernel = manifest["kernels"][0]
         self.assertEqual(
             kernel["constant_infos"],
@@ -716,7 +762,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             )
 
         result = self.generate(self.make_request(records))
-        manifest = json.loads(Path(result.manifest_path).read_text(encoding="utf-8"))
+        manifest = json.loads(Path(result).read_text(encoding="utf-8"))
         self.assertEqual(
             [kernel["kernel_name"] for kernel in manifest["kernels"]],
             ["add_custom_100000", "add_custom_100001"],
@@ -908,7 +954,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             )
         )
 
-        manifest = json.loads(Path(result.manifest_path).read_text(encoding="utf-8"))
+        manifest = json.loads(Path(result).read_text(encoding="utf-8"))
         self.assertNotIn("-D__SUPER_KERNEL_DYNAMIC_BLOCK_NUM__=4", json.dumps(manifest))
         sk_object = manifest["kernels"][0]["objects"][1]
         self.assertIn("-DREAL_BIND_ARGV", sk_object["commands"][2]["cmd"])
@@ -1021,7 +1067,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 sk_bind_compile_options=options.compile_options,
             )
         )
-        manifest = json.loads(Path(result.manifest_path).read_text(encoding="utf-8"))
+        manifest = json.loads(Path(result).read_text(encoding="utf-8"))
         sk_object = manifest["kernels"][0]["objects"][1]
         self.assertEqual(sk_object["object_name"], "sk")
         self.assertEqual(sk_object["object_type"], "sk")
@@ -1081,15 +1127,15 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
 
     def test_publish_failure_restores_previous_kernel(self):
         request = self.make_request(self.make_records())
-        os.makedirs(request.output_dir)
-        marker = os.path.join(request.output_dir, "previous.txt")
+        os.makedirs(self.output_dir)
+        marker = os.path.join(self.output_dir, "previous.txt")
         Path(marker).write_text("previous\n", encoding="utf-8")
         real_replace = os.replace
 
         def fail_stage_publish(source, destination):
-            if destination == request.output_dir and os.path.basename(
-                source
-            ).startswith(".add_custom.stage."):
+            if destination == self.output_dir and os.path.basename(source).startswith(
+                ".add_custom.stage."
+            ):
                 raise OSError("publish failed")
             return real_replace(source, destination)
 
