@@ -38,7 +38,9 @@ __simd_callee__ inline decltype(auto) reduce_min(reg_tensor<SrcType> src);
 } // namespace te
 } // namespace asc
 
+#if defined(__NPU_ARCH__)
 #include "impl/tensor_api/arch/vector/experimental/reduction_compute_impl.h"
+#endif
 
 #endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REDUCTION_COMPUTE_H
 

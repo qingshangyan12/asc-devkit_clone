@@ -14,6 +14,7 @@
 
 #include "tensor_api/stub/cce_stub.h"
 #include "tensor_api/tensor.h"
+#include "tensor_api/arch/vector/experimental/reg_compute.h"
 
 namespace asc {
 namespace te {

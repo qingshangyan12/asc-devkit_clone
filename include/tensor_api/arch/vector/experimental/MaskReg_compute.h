@@ -42,7 +42,7 @@ __simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_te
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__)
 #include "impl/tensor_api/arch/vector/experimental/MaskReg_compute_impl.h"
 #endif
 
