@@ -20,6 +20,10 @@
 #ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_COMPUTEH
 #define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_COMPUTEH
 
+#ifndef CANN_ASC_USE_EXPERIMENTAL
+#error "this is experimental feature, please set CANN_ASC_USE_EXPERIMENTAL = ON to use it."
+#endif
+
 #include "tensor_api/arch/vector/experimental/reg_tensor.h"
 #include "tensor_api/arch/vector/experimental/MaskReg_compute.h"
 #include "tensor_api/arch/vector/experimental/data_reorder.h"
