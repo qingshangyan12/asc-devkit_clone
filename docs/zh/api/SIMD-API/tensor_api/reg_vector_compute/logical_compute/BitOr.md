@@ -21,16 +21,8 @@
 ## 3. 函数原型
 
 ```cpp
-namespace asc {
-namespace te {
-namespace experimental {
-
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator|(const T& a, const U& b);
-
-} // namespace experimental
-} // namespace te
-} // namespace asc
 ```
 
 ## 4. 参数说明

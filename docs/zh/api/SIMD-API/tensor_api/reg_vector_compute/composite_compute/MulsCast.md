@@ -28,17 +28,9 @@ $$
 ## 3. 函数原型
 
 ```cpp
-namespace asc {
-namespace te {
-namespace experimental {
-
 __simd_callee__ inline decltype(auto) muls_cast(
     const reg_tensor<float>& src,
     const float& scalar);
-
-} // namespace experimental
-} // namespace te
-} // namespace asc
 ```
 
 ## 4. 参数说明

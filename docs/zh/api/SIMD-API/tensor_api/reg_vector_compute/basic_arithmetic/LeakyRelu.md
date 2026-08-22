@@ -28,17 +28,9 @@ $$
 ## 3. 函数原型
 
 ```cpp
-namespace asc {
-namespace te {
-namespace experimental {
-
 template <typename T, typename scalar_type>
 __simd_callee__ inline decltype(auto) leaky_relu(
     const reg_tensor<T>& src_reg, const scalar_type& slope);
-
-} // namespace experimental
-} // namespace te
-} // namespace asc
 ```
 
 ## 4. 参数说明

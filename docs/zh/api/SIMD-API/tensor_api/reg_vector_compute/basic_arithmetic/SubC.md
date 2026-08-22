@@ -30,10 +30,6 @@ $$
 ## 3. 函数原型
 
 ```cpp
-namespace asc {
-namespace te {
-namespace experimental {
-
 template <typename T>
 __simd_callee__ inline decltype(auto) sub(
     reg_tensor<bool>& carry,
@@ -46,10 +42,6 @@ __simd_callee__ inline decltype(auto) sub_c(
     const reg_tensor<T>& src0,
     const reg_tensor<T>& src1,
     const reg_tensor<bool>& carry_src);
-
-} // namespace experimental
-} // namespace te
-} // namespace asc
 ```
 
 ## 4. 参数说明
