@@ -49,7 +49,7 @@ __simd_callee__ inline void asc_reduce_sum(vector_<dst_dtype>& dst,
                                            vector_bool mask)
 ```
 
-### src_dtype与dst_dtype支持组合
+### src_dtype与dst_dtype数据类型支持情况
 
 | `src_dtype` | `dst_dtype` |
 | ----------- | ----------- |

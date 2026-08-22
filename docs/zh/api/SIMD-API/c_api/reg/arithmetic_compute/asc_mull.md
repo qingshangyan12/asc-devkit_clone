@@ -56,7 +56,7 @@ __simd_callee__ inline void asc_mull(vector_<dtype>& dst0,
 
 ### dtype支持数据类型
 
-`dtype`支持的数据类型为`int32_t`、`uint32_t`。
+`dtype`取值为：`int32_t`、`uint32_t`。
 
 ### 典型示例
 
