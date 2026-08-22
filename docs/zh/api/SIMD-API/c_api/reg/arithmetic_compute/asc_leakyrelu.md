@@ -43,11 +43,11 @@ __simd_callee__ inline void asc_leakyrelu(vector_<dtype>& dst,
                                           vector_bool mask)
 ```
 
-### dtype支持数据类型
+#### dtype支持数据类型
 
-`dtype`支持的数据类型为`half`、`float`。
+`dtype`取值为：`half`、`float`。
 
-### 典型示例
+### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_leakyrelu(vector_half& dst,

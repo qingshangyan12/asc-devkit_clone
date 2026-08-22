@@ -53,11 +53,11 @@ __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst_align32b,
                                            vector_bool mask)
 ```
 
-#### dtype支持数据类型
+##### dtype支持数据类型
 
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst_align32b,
@@ -74,11 +74,11 @@ __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst_align32b,
                                            vector_bool mask)
 ```
 
-#### dtype支持数据类型
+##### dtype支持数据类型
 
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst_align32b,
@@ -96,11 +96,11 @@ __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst_align32b,
                                            vector_bool mask)
 ```
 
-#### dtype支持数据类型
+##### dtype支持数据类型
 
 dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型`vector_<dtype>`，`int4b_t`对应`vector_int4x2_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst_align32b,
@@ -119,11 +119,11 @@ __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst_align32b,
                                            vector_bool mask)
 ```
 
-#### dtype支持数据类型
+##### dtype支持数据类型
 
 dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ int8_t* dst_align32b,
@@ -140,11 +140,11 @@ __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst,
                                            vector_bool src)
 ```
 
-#### dtype支持数据类型
+##### dtype支持数据类型
 
 dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
@@ -159,11 +159,11 @@ __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst,
                                            int32_t offset)
 ```
 
-#### dtype支持数据类型
+##### dtype支持数据类型
 
 dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
@@ -179,11 +179,11 @@ __simd_callee__ inline void asc_storealign(__ubuf__ <dtype>* dst,
                                            addr_reg offset)
 ```
 
-#### dtype支持数据类型
+##### dtype支持数据类型
 
 dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst,
