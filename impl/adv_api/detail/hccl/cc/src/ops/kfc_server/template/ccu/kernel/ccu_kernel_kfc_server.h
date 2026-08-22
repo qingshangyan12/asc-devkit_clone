@@ -31,6 +31,8 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     bool loadFromMem;
     OpParam opParam;
     std::vector<std::vector<uint32_t>> subCommRanks;
+    // 仅HALF_ALLTOALLV使用，见CcuKernelInfo::localWinAddr
+    uint64_t localWinAddr = 0;
 };
 
 // 第一层同步：missionId=0 与missionId>0之间的
@@ -60,6 +62,14 @@ struct KfcServerContext : CcuKernelCtxBase {
     // 用于Mission间同步变量
     std::vector<ccu::Variable> exportMissionVar;
     std::vector<ccu::Variable> importMissionVar;
+
+    // 双 mission 参数切片支持（阶段 3-1）
+    // 单 mission 时不分配，避免对现有路径的影响
+    // missionIndex==0 使用 A 切片，missionIndex==1 使用 B 切片
+    std::unique_ptr<std::vector<ccu::Variable>> sendSizeA;
+    std::unique_ptr<std::vector<ccu::Variable>> sendSizeB;
+    std::unique_ptr<std::vector<ccu::Variable>> sendOffsetA;
+    std::unique_ptr<std::vector<ccu::Variable>> sendOffsetB;
 };
 
 class CcuTaskArgKfcServer : public hcomm::CcuTaskArg {

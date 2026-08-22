@@ -35,6 +35,8 @@ const char* GetMc2OpTypeName(HcclCMDType opType)
             return "AllToAll";
         case HcclCMDType::HCCL_CMD_ALLTOALLV:
             return "AllToAllV";
+        case HcclCMDType::HCCL_CMD_HALF_ALLTOALLV:
+            return "AllToAllvWrite";
         default:
             return "Unknown";
     }
@@ -469,46 +471,57 @@ CcuResult LoadResourceCtx(const OpParam& opParamHost, AlgResourceCtxSerializable
     return CCU_SUCCESS;
 }
 
-CcuResult GetLaunchHandles(
-    const AlgResourceCtxSerializable& resourceCtx, ThreadHandle& threadHandle, CcuKernelHandle& kernelHandle)
+CcuResult GetLaunchHandles(const AlgResourceCtxSerializable& resourceCtx, uint32_t kernelIndex,
+                           ThreadHandle& threadHandle, CcuKernelHandle& kernelHandle, const void*& kfcArgsPtr)
 {
     CHK_PRT_RET(resourceCtx.threads.empty(), HCCL_ERROR("empty ccu threads"), CCU_E_PARA);
     CHK_PRT_RET(resourceCtx.ccuKernels.empty(), HCCL_ERROR("empty ccu kernels"), CCU_E_PARA);
+    CHK_PRT_RET(
+        kernelIndex >= resourceCtx.ccuKernels.size(),
+        HCCL_ERROR("kernelIndex[%u] exceeds ccuKernels.size[%zu]", kernelIndex, resourceCtx.ccuKernels.size()),
+        CCU_E_PARA);
 
-    threadHandle = resourceCtx.threads[0];
-    CHK_PRT_RET(threadHandle == 0, HCCL_ERROR("invalid threadHandle"), CCU_E_PARA);
+    // 阶段 3-2：双 mission 时 threads.size() = 2（主 + 从），单 mission 时 = 1
+    // 简化处理：threads[min(kernelIndex, threads.size()-1)]，单 mission 时总是 threads[0]
+    uint32_t threadIdx = (kernelIndex < resourceCtx.threads.size()) ? kernelIndex : (resourceCtx.threads.size() - 1);
+    threadHandle = resourceCtx.threads[threadIdx];
+    CHK_PRT_RET(threadHandle == 0, HCCL_ERROR("invalid threadHandle at index %u", threadIdx), CCU_E_PARA);
 
-    // HcclGetCcuKernel 已根据 isKfc 过滤，isKfc=true 时 ccuKernels[0] 即为 CcuKfcServerKernel
-    kernelHandle = resourceCtx.ccuKernels[0];
-    CHK_PRT_RET(kernelHandle == 0, HCCL_ERROR("invalid kernelHandle"), CCU_E_PARA);
+    kernelHandle = resourceCtx.ccuKernels[kernelIndex];
+    CHK_PRT_RET(kernelHandle == 0, HCCL_ERROR("invalid kernelHandle at index %u", kernelIndex), CCU_E_PARA);
     CHK_PRT_RET(
         resourceCtx.kfcServerArgSize != 0U && resourceCtx.kfcServerArgs.empty(),
         HCCL_ERROR("invalid kfcServerArgs, kfcServerArgSize[%u].", resourceCtx.kfcServerArgSize), CCU_E_PTR);
+
+    // 阶段 3-2：flat kfcServerArgs 按 6*kernelIndex 偏移取出对应 mission 的参数集
+    kfcArgsPtr = resourceCtx.kfcServerArgs.empty()
+                     ? nullptr
+                     : static_cast<const void*>(resourceCtx.kfcServerArgs.data() + kernelIndex * 6);
     return CCU_SUCCESS;
 }
 
-void LogKernelLaunchArgs(
-    const AlgResourceCtxSerializable& resourceCtx, ThreadHandle threadHandle, CcuKernelHandle kernelHandle)
+void LogKernelLaunchArgs(const AlgResourceCtxSerializable& resourceCtx, uint32_t kernelIndex, ThreadHandle threadHandle,
+                         CcuKernelHandle kernelHandle, const void* kfcArgsPtr)
 {
-    if (resourceCtx.kfcServerArgs.size() >= 6U) {
+    const uint64_t* argsArray = static_cast<const uint64_t*>(kfcArgsPtr);
+    if (argsArray != nullptr && resourceCtx.kfcServerArgs.size() >= (kernelIndex + 1) * 6) {
         HCCL_INFO(
-            "[CcuKernelLaunch] HcommCcuKernelLaunch args: "
+            "[CcuKernelLaunch][kernel %u] HcommCcuKernelLaunch args: "
             "threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], "
             "xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], missionNum[%llu], "
             "missionIndex[%llu], token[%llu]",
-            static_cast<unsigned long long>(threadHandle), static_cast<unsigned long long>(kernelHandle),
-            resourceCtx.kfcServerArgSize, static_cast<unsigned long long>(resourceCtx.kfcServerArgs[0]),
-            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[1]),
-            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[2]),
-            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[3]),
-            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[4]),
-            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[5]));
+            kernelIndex, static_cast<unsigned long long>(threadHandle),
+            static_cast<unsigned long long>(kernelHandle), resourceCtx.kfcServerArgSize,
+            static_cast<unsigned long long>(argsArray[0]), static_cast<unsigned long long>(argsArray[1]),
+            static_cast<unsigned long long>(argsArray[2]), static_cast<unsigned long long>(argsArray[3]),
+            static_cast<unsigned long long>(argsArray[4]), static_cast<unsigned long long>(argsArray[5]));
     } else {
         HCCL_INFO(
-            "[CcuKernelLaunch] HcommCcuKernelLaunch args: "
+            "[CcuKernelLaunch][kernel %u] HcommCcuKernelLaunch args: "
             "threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], kfcServerArgsSize[%zu]",
-            static_cast<unsigned long long>(threadHandle), static_cast<unsigned long long>(kernelHandle),
-            resourceCtx.kfcServerArgSize, resourceCtx.kfcServerArgs.size());
+            kernelIndex, static_cast<unsigned long long>(threadHandle),
+            static_cast<unsigned long long>(kernelHandle), resourceCtx.kfcServerArgSize,
+            resourceCtx.kfcServerArgs.size());
     }
 }
 } // namespace
@@ -534,15 +547,26 @@ CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx)
     if (ret != CCU_SUCCESS) {
         return ret;
     }
-    ThreadHandle threadHandle = 0;
-    CcuKernelHandle kernelHandle = 0;
-    ret = GetLaunchHandles(resourceCtx, threadHandle, kernelHandle);
-    if (ret != CCU_SUCCESS) {
-        return ret;
+
+    // 阶段 3-2：循环 launch 所有 ccuKernels（单 mission: 1 个；双 mission: 2 个）
+    const uint32_t numKernels = static_cast<uint32_t>(resourceCtx.ccuKernels.size());
+    HCCL_INFO("[CcuKernelLaunch] numKernels=%u, starting launches.", numKernels);
+    for (uint32_t i = 0; i < numKernels; ++i) {
+        ThreadHandle threadHandle = 0;
+        CcuKernelHandle kernelHandle = 0;
+        const void* kfcArgsPtr = nullptr;
+        ret = GetLaunchHandles(resourceCtx, i, threadHandle, kernelHandle, kfcArgsPtr);
+        if (ret != CCU_SUCCESS) {
+            return ret;
+        }
+        LogKernelLaunchArgs(resourceCtx, i, threadHandle, kernelHandle, kfcArgsPtr);
+        HCCL_INFO("[CcuKernelLaunch][kernel %u] calling HcommCcuKernelLaunch.", i);
+        ret = HcommCcuKernelLaunch(threadHandle, kernelHandle, kfcArgsPtr, resourceCtx.kfcServerArgSize);
+        if (ret != CCU_SUCCESS) {
+            HCCL_ERROR("[CcuKernelLaunch][kernel %u] HcommCcuKernelLaunch failed, ret=%d.", i, ret);
+            return ret;
+        }
     }
-    LogKernelLaunchArgs(resourceCtx, threadHandle, kernelHandle);
-    HCCL_INFO("[CcuKernelLaunch]Start HcommCcuKernelLaunch.");
-    const void* kfcArgs =
-        resourceCtx.kfcServerArgs.empty() ? nullptr : static_cast<const void*>(resourceCtx.kfcServerArgs.data());
-    return HcommCcuKernelLaunch(threadHandle, kernelHandle, kfcArgs, resourceCtx.kfcServerArgSize);
+    HCCL_INFO("[CcuKernelLaunch] all %u kernels launched successfully.", numKernels);
+    return CCU_SUCCESS;
 }

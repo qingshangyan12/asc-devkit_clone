@@ -7,6 +7,16 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
-target_sources(mc2_client PRIVATE
+set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_v2_all_to_all_v_sole_executor.cc
+)
+
+if(MC2_CLIENT_ENABLE_CCU)
+    list(APPEND src_list
+        ${CMAKE_CURRENT_SOURCE_DIR}/ins_v2_half_all_to_all_v_sole_executor.cc
+    )
+endif()
+
+target_sources(mc2_client PRIVATE
+    ${src_list}
 )
