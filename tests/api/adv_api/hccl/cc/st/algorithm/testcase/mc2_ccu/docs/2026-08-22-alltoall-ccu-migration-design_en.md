@@ -33,25 +33,12 @@ The asc-devkit repository, as part of the CANN development toolkit, contains the
 
 The CCU algorithm module in asc-devkit is located under `impl/adv_api/detail/hccl/cc/`, as a sub-module of the MC2 communication framework. CCU (Communication Compute Unit) is a dedicated on-chip communication hardware unit, implementing inter-rank communication through CCU primitives (Variable, Address, Write, LocalCopy, GroupCopy, Notify, Event, etc.).
 
-Overall call chain:
-
-```
-MC2 Operator Tiling (algConfig="CcuAlltoAllMesh1D")
-    │
-    ▼
-GetOpParam → SelectAlgAndPrepareEngine (Selector algorithm selection)
-    │
-    ▼
-GetOpParamResCtx → Executor (Orchestrate) → Template::CalcRes (resource computation)
-    │
-    ▼
-CcuKernelLaunch → CcuAlltoAllMesh1DKernel (Kernel dispatch)
-```
-
 CCU algorithms coexist with existing AICPU algorithms, with execution path selected by `opExecuteConfig`:
 - `CCU_MS`: Tries CCU_MS mode first, falls back to CCU_SCHED if not matched
 - `CCU_SCHED`: Uses CCU schedule mode, falls back to AICPU if not matched
 - `AICPU_TS`: Uses AICPU algorithm
+
+Overall call chain:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -59,17 +46,27 @@ CCU algorithms coexist with existing AICPU algorithms, with execution path selec
 └──────────────────────┬──────────────────────────────────┘
                        ▼
 ┌──────────────────────────────────────────────────────────┐
-│  GetOpParam → SelectAlgAndPrepareEngine                   │
-│  ┌─────────────┐  ┌──────────────────┐                  │
-│  │ SelectAicpu │  │ SelectCcuSchedule │                  │
-│  │   Algo      │  │     Algo          │                  │
-│  └─────────────┘  └────────┬─────────┘                  │
-│                            ▼                              │
-│  GetOpParamResCtx → Executor → Template::CalcRes          │
-└───────────────────────────┼──────────────────────────────┘
-                            ▼
-┌──────────────────────────────────────────────────────────┐
-│           CcuKernelLaunch → CcuAlltoAllMesh1DKernel       │
+│  HcclAllocComResourceByTiling [hccl_mc2.cc:324]          │
+│                                                          │
+│  Phase 1: Host-side preparation                          │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │ AllocCcuOpResCtx (device memory allocation)         │  │
+│  ├────────────────────────────────────────────────────┤  │
+│  │ CcuSelectAlg (algo selection + resource prep + kernel recording)  │  │
+│  │  ├─ SelectCcuAlgorithm (selector chooses algo)      │  │
+│  │  ├─ FillCcuAlgorithmInfo (set isKfc=true)           │  │
+│  │  └─ GetCcuOpParamResCtx                              │  │
+│  │      ├─ executor->CalcRes (collective kernel)       │  │
+│  │      ├─ ccuKfcExecutor->CalcRes (KFC server replace)│  │
+│  │      └─ GetAlgResCcu (channel alloc + kernel reg)   │  │
+│  ├────────────────────────────────────────────────────┤  │
+│  │ CopyCcuOpParamToDevice (opParam H2D)                │  │
+│  └────────────────────────────────────────────────────┘  │
+│                                                          │
+│  Phase 2: CcuKernelLaunch (launch KFC server)            │
+│                                                          │
+│  Phase 3: Device-side                                    │
+│  KFC server microcode → DispatchKfcSubKernel → CcuAlltoAll│
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐               │
 │  │ PreSync  │→ │ DoAlltoAll│→ │ PostSync │               │
 │  └──────────┘  └──────────┘  └──────────┘               │
@@ -82,7 +79,7 @@ CCU algorithms coexist with existing AICPU algorithms, with execution path selec
 
 1. **Algorithm Selection**: Automatically selects CCU AllToAll algorithm variant based on topology (Mesh1D / MESH_1D_CLOS), rank count, and data size
 2. **Resource Computation**: Computes channel requests, kernel parameters, and kernel count
-3. **Kernel Execution**: Implements AllToAll data transfer via CCU primitives, supporting both `loadFromMem` and `!loadFromMem` (GroupCopy) paths
+3. **Kernel Recording**: `CcuAlltoAllMesh1DKernel` records the AllToAll data transfer IR sequence via CCU primitives, supporting both `loadFromMem` and `!loadFromMem` (GroupCopy) paths
 4. **Chunked Transfer**: Data larger than 256MB is automatically chunked (WriteChunked + CCU_WHILE loop)
 5. **KFC Server Compatibility**: Supports AllToAll Kernel inheritance and dispatch in KFC Server mode
 
@@ -207,7 +204,7 @@ CalcRes
 
 - `resourceRequest`: Resource request (ccuKernelNum, ccuKernelInfos)
 
-### Functional Requirement 3: Kernel Execution
+### Functional Requirement 3: Kernel Recording
 
 1. Introduction
 
@@ -233,7 +230,7 @@ CalcRes
 
 3. Processing
 
-Kernel execution has 5 stages:
+Kernel recording has 5 stages:
 
 ```
 CcuAlltoAllMesh1DKernel
@@ -292,7 +289,7 @@ WriteChunked
 4. Output
 
 - Returns `CcuResult::CCU_SUCCESS` or error code
-- Side effect: Remote rank memory written with data, local event set
+- Recording result: Generates CCU primitive IR sequence (PreSync + DoAlltoAll + PostSync), dispatched to hardware by `CcuKernelLaunch`
 
 ### Functional Requirement 4: AICore v0 Parameter Preparation
 
@@ -444,6 +441,9 @@ New `CcuAlltoAllMesh1DKernel` function and `CcuTempAlltoAllMesh1D` class add app
 
 ```cpp
 struct CcuKernelArgAlltoAllMesh1D : CcuKernelArgBase {
+    // Inherited from CcuKernelArgBase:
+    //   ChannelHandle channels[CCU_MAX_RANK_SIZE];  // channel handle array
+    //   uint32_t channelCount;                      // channel count
     uint64_t rankSize;                      // Total rank count
     uint32_t rankId;                        // Local rank ID
     bool loadFromMem;                       // Data load path flag
@@ -517,45 +517,52 @@ Hierarchical selection by topology type:
 #### AllToAll CCU Overall Call Flow
 
 ```
-aclnn AllToAll
+MC2 Operator Tiling (algConfig="CcuAlltoAllMesh1D")
     │
     ▼
-Tiling: IsCcuAlgorithmRegistered("CcuAlltoAllMesh1D") ✓
+HcclAllocComResourceByTiling [hccl_mc2.cc:324]
     │
-    ▼
-Executor: SelectCcuScheduleAlgo
-    │ ├── level2Ubg? → NOT_MATCH
-    │ ├── topoLevelNums >= 3? → NOT_MATCH
-    │ ├── inplace? → NOT_MATCH
-    │ └── Topology match → "CcuAlltoAllMesh1D"
+    ├── Phase 1: Host-side preparation
+    │   ├── AllocCcuOpResCtx (device memory allocation)
+    │   ├── CcuSelectAlg
+    │   │   ├── SelectCcuAlgorithm → SelectCcuScheduleAlgo
+    │   │   │   ├── level2Ubg? → NOT_MATCH
+    │   │   │   ├── topoLevelNums >= 3? → NOT_MATCH
+    │   │   │   ├── inplace? → NOT_MATCH
+    │   │   │   └── Topology match → "CcuAlltoAllMesh1D"
+    │   │   ├── FillCcuAlgorithmInfo (set isKfc=true)
+    │   │   └─ GetCcuOpParamResCtx
+    │   │       ├── executor->CalcRes → CcuTempAlltoAllMesh1D::CalcRes
+    │   │       │   ├── CalcChannelRequestMesh1D → channels
+    │   │       │   ├── Construct CcuKernelArgAlltoAllMesh1D
+    │   │       │   └── Fill resourceRequest.ccuKernelInfos
+    │   │       ├── ccuKfcExecutor->CalcRes (KFC server replaces collective)
+    │   │       └─ GetAlgResCcu (channel allocation + kernel recording)
+    │   └── CopyCcuOpParamToDevice (opParam H2D)
     │
-    ▼
-Template: CcuTempAlltoAllMesh1D::CalcRes
-    │ ├── CalcChannelRequestMesh1D → channels
-    │ ├── Construct CcuKernelArgAlltoAllMesh1D
-    │ └── Fill resourceRequest.ccuKernelInfos
+    ├── Phase 2: CcuKernelLaunch (launch KFC server)
     │
-    ▼
-AICore: CcuPrepareForAllToAll
-    │ ├── xnData_[0] = token
-    │ ├── xnData_[1] = sendBuf + offset
-    │ ├── xnData_[2] = recvBuf + offset
-    │ ├── xnData_[3] = sliceSize
-    │ ├── xnData_[4] = strideSize
-    │ ├── xnData_[5] = UINT64_MAX - (sliceSize / 256MB)  ← This fix
-    │ ├── xnData_[6] = strideSize * rankId
-    │ └── xnData_[7~10] = CalcGoSize(sliceSize, 8, CCU_MEMSLICE_SIZE*8)
-    │
-    ▼
-Kernel: CcuAlltoAllMesh1DKernel(param[0~10], arg)
-    │
-    ├── InitResource: GetResByChannel for remote variables
-    ├── LoadArgs: Fill local rank parameters
-    ├── PreSync: WriteVariableWithNotify + NotifyWait
-    ├── DoAlltoAll:
-    │   ├── loadFromMem=true: LocalCopy + WriteChunked + EventWait
-    │   └── loadFromMem=false: WriteChunked + GroupCopy + EventWait
-    └── PostSync: NotifyRecord + NotifyWait
+    └── Phase 3: Device-side
+        AICore: CcuPrepareForAllToAll
+        │ ├── xnData_[0] = token
+        │ ├── xnData_[1] = sendBuf + offset
+        │ ├── xnData_[2] = recvBuf + offset
+        │ ├── xnData_[3] = sliceSize
+        │ ├── xnData_[4] = strideSize
+        │ ├── xnData_[5] = UINT64_MAX - (sliceSize / 256MB)  ← This fix
+        │ ├── xnData_[6] = strideSize * rankId
+        │ └── xnData_[7~10] = CalcGoSize(sliceSize, 8, CCU_MEMSLICE_SIZE*8)
+        │
+        ▼
+        KFC server microcode → DispatchKfcSubKernel → CcuAlltoAllMesh1DKernel(param[0~10], arg)
+        │
+        ├── InitResource: GetResByChannel for remote variables
+        ├── LoadArgs: Fill local rank parameters
+        ├── PreSync: WriteVariableWithNotify + NotifyWait
+        ├── DoAlltoAll:
+        │   ├── loadFromMem=true: LocalCopy + WriteChunked + EventWait
+        │   └── loadFromMem=false: WriteChunked + GroupCopy + EventWait
+        └── PostSync: NotifyRecord + NotifyWait
 ```
 
 #### loadFromMem Path Selection
@@ -611,7 +618,7 @@ Refer to coding guidelines.
 
 | **Check Item** | **Description** | **Involved** |
 | -------------------------------------------------- | ------------------------------------------------------------ | ------------ |
-| **Resource lifecycle management** | Kernel execution has no persistent resources; CcuKernelArgAlltoAllMesh1D managed via shared_ptr | No |
+| **Resource lifecycle management** | Kernel recording has no persistent resources; CcuKernelArgAlltoAllMesh1D managed via shared_ptr | No |
 | **New thread creation** | No new threads created | No |
 
 ## Compatibility Check

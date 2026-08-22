@@ -33,25 +33,12 @@ asc-devkit 仓作为 CANN 开发工具套件，包含 MC2 通信算子的 host �
 
 asc-devkit 仓的 CCU 算法模块位于 `impl/adv_api/detail/hccl/cc/` 目录，是 MC2 通信框架的子模块。CCU（Communication Compute Unit）是芯片内专用的通信硬件单元，通过 CCU 原语（Variable、Address、Write、LocalCopy、GroupCopy、Notify、Event 等）实现 rank 间通信。
 
-整体调用链：
-
-```
-MC2 算子 Tiling（含 algConfig="CcuAlltoAllMesh1D"）
-    │
-    ▼
-GetOpParam → SelectAlgAndPrepareEngine（Selector 算法选择）
-    │
-    ▼
-GetOpParamResCtx → Executor（Orchestrate 编排）→ Template::CalcRes（资源计算）
-    │
-    ▼
-CcuKernelLaunch → CcuAlltoAllMesh1DKernel（Kernel 下发）
-```
-
 CCU 算法与现有 AICPU 算法共存，通过 `opExecuteConfig` 配置选择执行路径：
 - `CCU_MS`：优先走 CCU_MS 模式，不匹配则降级到 CCU_SCHED
 - `CCU_SCHED`：走 CCU schedule 模式，不匹配则降级到 AICPU
 - `AICPU_TS`：走 AICPU 算法
+
+整体调用链：
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -59,17 +46,27 @@ CCU 算法与现有 AICPU 算法共存，通过 `opExecuteConfig` 配置选择�
 └──────────────────────┬──────────────────────────────────┘
                        ▼
 ┌──────────────────────────────────────────────────────────┐
-│  GetOpParam → SelectAlgAndPrepareEngine                   │
-│  ┌─────────────┐  ┌──────────────────┐                  │
-│  │ SelectAicpu │  │ SelectCcuSchedule │                  │
-│  │   Algo      │  │     Algo          │                  │
-│  └─────────────┘  └────────┬─────────┘                  │
-│                            ▼                              │
-│  GetOpParamResCtx → Executor → Template::CalcRes          │
-└───────────────────────────┼──────────────────────────────┘
-                            ▼
-┌──────────────────────────────────────────────────────────┐
-│           CcuKernelLaunch → CcuAlltoAllMesh1DKernel       │
+│  HcclAllocComResourceByTiling [hccl_mc2.cc:324]          │
+│                                                          │
+│  Phase 1: Host 侧准备                                    │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │ AllocCcuOpResCtx (device 内存分配)                  │  │
+│  ├────────────────────────────────────────────────────┤  │
+│  │ CcuSelectAlg (算法选择 + 资源准备 + kernel 录制)    │  │
+│  │  ├─ SelectCcuAlgorithm (selector 选算法)            │  │
+│  │  ├─ FillCcuAlgorithmInfo (设 isKfc=true)            │  │
+│  │  └─ GetCcuOpParamResCtx                             │  │
+│  │      ├─ executor->CalcRes (collective kernel)       │  │
+│  │      ├─ ccuKfcExecutor->CalcRes (KFC server 替换)   │  │
+│  │      └─ GetAlgResCcu (channel 分配 + kernel 录制)   │  │
+│  ├────────────────────────────────────────────────────┤  │
+│  │ CopyCcuOpParamToDevice (opParam H2D)                │  │
+│  └────────────────────────────────────────────────────┘  │
+│                                                          │
+│  Phase 2: CcuKernelLaunch (启动 KFC server)              │
+│                                                          │
+│  Phase 3: Device 侧                                      │
+│  KFC server 微码 → DispatchKfcSubKernel → CcuAlltoAll    │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐               │
 │  │ PreSync  │→ │ DoAlltoAll│→ │ PostSync │               │
 │  └──────────┘  └──────────┘  └──────────┘               │
@@ -82,7 +79,7 @@ CCU 算法与现有 AICPU 算法共存，通过 `opExecuteConfig` 配置选择�
 
 1. **算法选择**：根据拓扑类型（Mesh1D / MESH_1D_CLOS）、rank 数、数据量大小，自动选择 CCU AllToAll 算法变体
 2. **资源计算**：计算 channel 请求、kernel 参数、kernel 数量
-3. **Kernel 执行**：通过 CCU 原语实现 AllToAll 数据搬运，支持 `loadFromMem` 和 `!loadFromMem`（GroupCopy）两种路径
+3. **Kernel 录制**：`CcuAlltoAllMesh1DKernel` 通过 CCU 原语录制 AllToAll 数据搬运的 IR 序列，支持 `loadFromMem` 和 `!loadFromMem`（GroupCopy）两种路径
 4. **分块传输**：大于 256MB 的数据自动分块传输（WriteChunked + CCU_WHILE 循环）
 5. **KFC Server 兼容**：支持 KFC Server 模式下 AllToAll Kernel 的继承和分发
 
@@ -207,7 +204,7 @@ CalcRes
 
 - `resourceRequest`：资源请求（ccuKernelNum、ccuKernelInfos）
 
-### 功能需求3：Kernel 执行
+### 功能需求3：Kernel 录制
 
 1. 介绍
 
@@ -233,7 +230,7 @@ CalcRes
 
 3. 处理
 
-Kernel 执行分 5 个阶段：
+Kernel 录制分 5 个阶段：
 
 ```
 CcuAlltoAllMesh1DKernel
@@ -292,7 +289,7 @@ WriteChunked
 4. 输出
 
 - 返回 `CcuResult::CCU_SUCCESS` 或错误码
-- 副作用：远端 rank 内存被写入数据，本地 event 被设置
+- 录制结果：生成 CCU 原语 IR 序列（PreSync + DoAlltoAll + PostSync），由 `CcuKernelLaunch` 下发到硬件执行
 
 ### 功能需求4：AICore v0 参数准备
 
@@ -444,6 +441,9 @@ AllToAll CCU 与 AICPU AllToAll 共存于同一 Selector，通过 `opExecuteConf
 
 ```cpp
 struct CcuKernelArgAlltoAllMesh1D : CcuKernelArgBase {
+    // 继承自 CcuKernelArgBase:
+    //   ChannelHandle channels[CCU_MAX_RANK_SIZE];  // channel 句柄数组
+    //   uint32_t channelCount;                      // channel 数量
     uint64_t rankSize;                      // rank 总数
     uint32_t rankId;                        // 本 rank ID
     bool loadFromMem;                       // 数据加载路径标志
@@ -517,45 +517,52 @@ Mesh1D 拓扑下，每个 rank 向其他所有 rank 发送数据，同时接收�
 #### AllToAll CCU 整体调用流程
 
 ```
-aclnn AllToAll
+MC2 算子 Tiling (algConfig="CcuAlltoAllMesh1D")
     │
     ▼
-Tiling: IsCcuAlgorithmRegistered("CcuAlltoAllMesh1D") ✓
+HcclAllocComResourceByTiling [hccl_mc2.cc:324]
     │
-    ▼
-Executor: SelectCcuScheduleAlgo
-    │ ├── level2Ubg? → NOT_MATCH
-    │ ├── topoLevelNums >= 3? → NOT_MATCH
-    │ ├── inplace? → NOT_MATCH
-    │ └── 拓扑匹配 → "CcuAlltoAllMesh1D"
+    ├── Phase 1: Host 侧准备
+    │   ├── AllocCcuOpResCtx (device 内存分配)
+    │   ├── CcuSelectAlg
+    │   │   ├── SelectCcuAlgorithm → SelectCcuScheduleAlgo
+    │   │   │   ├── level2Ubg? → NOT_MATCH
+    │   │   │   ├── topoLevelNums >= 3? → NOT_MATCH
+    │   │   │   ├── inplace? → NOT_MATCH
+    │   │   │   └── 拓扑匹配 → "CcuAlltoAllMesh1D"
+    │   │   ├── FillCcuAlgorithmInfo (设 isKfc=true)
+    │   │   └─ GetCcuOpParamResCtx
+    │   │       ├── executor->CalcRes → CcuTempAlltoAllMesh1D::CalcRes
+    │   │       │   ├── CalcChannelRequestMesh1D → channels
+    │   │       │   ├── 构造 CcuKernelArgAlltoAllMesh1D
+    │   │       │   └── 填充 resourceRequest.ccuKernelInfos
+    │   │       ├── ccuKfcExecutor->CalcRes (KFC server 替换 collective)
+    │   │       └─ GetAlgResCcu (channel 分配 + kernel 录制)
+    │   └── CopyCcuOpParamToDevice (opParam H2D)
     │
-    ▼
-Template: CcuTempAlltoAllMesh1D::CalcRes
-    │ ├── CalcChannelRequestMesh1D → channels
-    │ ├── 构造 CcuKernelArgAlltoAllMesh1D
-    │ └── 填充 resourceRequest.ccuKernelInfos
+    ├── Phase 2: CcuKernelLaunch (启动 KFC server)
     │
-    ▼
-AICore: CcuPrepareForAllToAll
-    │ ├── xnData_[0] = token
-    │ ├── xnData_[1] = sendBuf + offset
-    │ ├── xnData_[2] = recvBuf + offset
-    │ ├── xnData_[3] = sliceSize
-    │ ├── xnData_[4] = strideSize
-    │ ├── xnData_[5] = UINT64_MAX - (sliceSize / 256MB)  ← 本次修复
-    │ ├── xnData_[6] = strideSize * rankId
-    │ └── xnData_[7~10] = CalcGoSize(sliceSize, 8, CCU_MEMSLICE_SIZE*8)
-    │
-    ▼
-Kernel: CcuAlltoAllMesh1DKernel(param[0~10], arg)
-    │
-    ├── InitResource: GetResByChannel 获取远端变量
-    ├── LoadArgs: 填充本 rank 参数
-    ├── PreSync: WriteVariableWithNotify + NotifyWait
-    ├── DoAlltoAll:
-    │   ├── loadFromMem=true: LocalCopy + WriteChunked + EventWait
-    │   └── loadFromMem=false: WriteChunked + GroupCopy + EventWait
-    └── PostSync: NotifyRecord + NotifyWait
+    └── Phase 3: Device 侧
+        AICore: CcuPrepareForAllToAll
+        │ ├── xnData_[0] = token
+        │ ├── xnData_[1] = sendBuf + offset
+        │ ├── xnData_[2] = recvBuf + offset
+        │ ├── xnData_[3] = sliceSize
+        │ ├── xnData_[4] = strideSize
+        │ ├── xnData_[5] = UINT64_MAX - (sliceSize / 256MB)  ← 本次修复
+        │ ├── xnData_[6] = strideSize * rankId
+        │ └── xnData_[7~10] = CalcGoSize(sliceSize, 8, CCU_MEMSLICE_SIZE*8)
+        │
+        ▼
+        KFC server 微码 → DispatchKfcSubKernel → CcuAlltoAllMesh1DKernel(param[0~10], arg)
+        │
+        ├── InitResource: GetResByChannel 获取远端变量
+        ├── LoadArgs: 填充本 rank 参数
+        ├── PreSync: WriteVariableWithNotify + NotifyWait
+        ├── DoAlltoAll:
+        │   ├── loadFromMem=true: LocalCopy + WriteChunked + EventWait
+        │   └── loadFromMem=false: WriteChunked + GroupCopy + EventWait
+        └── PostSync: NotifyRecord + NotifyWait
 ```
 
 #### loadFromMem 路径选择
@@ -611,7 +618,7 @@ param.isMc2?
 
 | **检查项** | **检查项说明** | **是否涉及** |
 | -------------------------------------------------- | ------------------------------------------------------------ | ------------ |
-| **是否涉及资源生命周期管理** | Kernel 执行无持久资源，CcuKernelArgAlltoAllMesh1D 通过 shared_ptr 管理 | 否 |
+| **是否涉及资源生命周期管理** | Kernel 录制无持久资源，CcuKernelArgAlltoAllMesh1D 通过 shared_ptr 管理 | 否 |
 | **是否创建新线程** | 无新线程创建 | 否 |
 
 ## 兼容性检查
