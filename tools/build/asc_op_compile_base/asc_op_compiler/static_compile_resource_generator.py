@@ -10,6 +10,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+import copy
 import fcntl
 import json
 import os
@@ -20,6 +21,16 @@ import shutil
 import tempfile
 from typing import Optional, Tuple
 
+if __package__:
+    from .static_compile_resource_id import (
+        ResourceIdError,
+        generate_and_write_resource_id,
+    )
+else:
+    from static_compile_resource_id import (
+        ResourceIdError,
+        generate_and_write_resource_id,
+    )
 
 _TILING_DATA_TEMPLATE = "@@STATIC_VALUE_tiling_data@@"
 _LINK_OPTION = ("-m", "aicorelinux", "-r", "-Ttext=0", "-q", "-x")
@@ -41,18 +52,14 @@ class ManifestPublishError(ManifestGenerationError):
     pass
 
 
-@dataclass(frozen=True)
-class StaticCompileCommand:
-    tiling_key: str
-    compile_tiling_key: str
-    compiled_symbol: str
-    compile_symbol: str
-    object_type: str
-    core_type: str
-    source_path: str
-    constant_info_files: Tuple[str, ...]
-    argv: Tuple[str, ...]
-    output_path: str
+def _kernel_spec_runtime():
+    # Keep the Manifest writer importable without loading the compiler runtime.
+    from asc_op_compile_base.common import context as context_module
+    from asc_op_compile_base.common import error_mgr
+    from asc_op_compile_base.asc_op_compiler import ascendc_common_utility
+    from asc_op_compile_base.asc_op_compiler import global_storage
+
+    return context_module, error_mgr, ascendc_common_utility, global_storage
 
 
 @dataclass(frozen=True)
@@ -70,52 +77,12 @@ class KernelCompileRecord:
     tiling_key: str
     compile_tiling_key: str
     constant_infos: Tuple[ConstantInfoRecord, ...]
-    commands: Tuple[StaticCompileCommand, ...]
+    commands: Tuple[object, ...]
     link_options: Tuple[str, ...] = _LINK_OPTION
 
 
 @dataclass(frozen=True)
-class KernelCompileRecordBuildRequest:
-    basic_compile_info: object
-    metadata_json_path: str
-    constant_infos: Tuple[ConstantInfoRecord, ...]
-    constant_info_size_by_tiling_key: Optional[dict] = None
-    sk_compile_info: Optional[object] = None
-    link_options: Tuple[str, ...] = _LINK_OPTION
-
-
-@dataclass(frozen=True)
-class SkBindCommandSpec:
-    source_path: str
-    argv: Tuple[str, ...]
-    output_path: str
-
-
-@dataclass(frozen=True)
-class ManifestGenerationRequest:
-    soc_version: str
-    resource_id: str
-    source_file_path: str
-    origin_func_name: str
-    output_dir: str
-    manifest_name: str
-    kernels: Tuple[KernelCompileRecord, ...]
-    sk_cap_bitmap: Optional[int] = None
-    sk_kernel_attribute: str = ""
-    basic_kernel_attribute: str = ""
-    sk_bind_command: Optional[SkBindCommandSpec] = None
-
-
-@dataclass(frozen=True)
-class ManifestGenerationResult:
-    manifest_path: str
-    resource_id: str
-    kernel_count: int
-    resource_count: int
-
-
-@dataclass(frozen=True)
-class StaticCompileManifestContext:
+class ManifestInputSnapshot:
     soc_version: str
     kernel_spec_dir: str
     resource_id: str
@@ -125,6 +92,8 @@ class StaticCompileManifestContext:
     workspace_idx: int
     sk_compile_info: Optional[object] = None
     sk_cap_bitmap: Optional[int] = None
+    constant_infos: Optional[Tuple[ConstantInfoRecord, ...]] = None
+    constant_info_size_by_tiling_key: Optional[dict] = None
 
 
 def _read_regular_file(path, description):
@@ -183,138 +152,138 @@ def _logical_symbol(compile_symbol, compile_tiling_key, logical_tiling_key):
     )
 
 
-class KernelCompileRecordBuilder:
-    def __init__(self, request: KernelCompileRecordBuildRequest):
-        self._request = request
-        self._constant_infos = tuple(request.constant_infos)
+class _KernelCompileRecordBuilder:
+    def __init__(self, snapshot, constant_infos, constant_info_size_by_tiling_key):
+        self._snapshot = snapshot
+        self._constant_infos = tuple(constant_infos)
+        self._constant_info_size_by_tiling_key = constant_info_size_by_tiling_key
         self._constant_info_files = tuple(
             dict.fromkeys(item.template_path for item in self._constant_infos)
         )
 
+    @staticmethod
+    def _resolve_tiling_key(item, logical_keys):
+        tiling_key_value = item.get("tilingKey")
+        if tiling_key_value is not None:
+            return str(tiling_key_value)
+        try:
+            return next(
+                key
+                for key in sorted(logical_keys, key=len, reverse=True)
+                if item["kernelName"].endswith("_" + key)
+            )
+        except StopIteration as error:
+            raise ManifestCommandError(
+                f"cannot determine tiling key for kernel {item['kernelName']}"
+            ) from error
+
     def build(self) -> Tuple[KernelCompileRecord, ...]:
-        request = self._request
-        metadata = json.loads(
-            Path(request.metadata_json_path).read_text(encoding="utf-8")
+        compile_info = self._snapshot.compile_info
+        metadata_json_path = os.path.join(
+            os.path.dirname(compile_info.dst_file), compile_info.kernel_name + ".json"
         )
-        kernel_list = metadata["kernelList"]
+        metadata = json.loads(Path(metadata_json_path).read_text(encoding="utf-8"))
         _, slave_to_master = build_tiling_key_group_index(
-            request.basic_compile_info, request.sk_compile_info
+            self._snapshot.basic_compile_info,
+            self._snapshot.sk_compile_info,
+        )
+        commands_by_key = self._group_commands_by_tiling_key()
+        exact_sizes = {
+            name: {str(key): value for key, value in sizes.items()}
+            for name, sizes in (self._constant_info_size_by_tiling_key or {}).items()
+        }
+        return tuple(
+            self._build_record(
+                item,
+                commands_by_key,
+                slave_to_master,
+                exact_sizes,
+            )
+            for item in metadata["kernelList"]
         )
 
+    def _group_commands_by_tiling_key(self):
+        snapshot = self._snapshot
         all_commands = list(
-            self._build_context_commands(request.basic_compile_info, "basic")
+            self._build_context_commands(snapshot.basic_compile_info, "basic")
         )
-        if request.sk_compile_info is not None:
+        if snapshot.sk_compile_info is not None:
             all_commands.extend(
-                self._build_context_commands(request.sk_compile_info, "sk")
+                self._build_context_commands(snapshot.sk_compile_info, "sk")
             )
         commands_by_key = {}
         for command in all_commands:
             commands_by_key.setdefault(command.tiling_key, []).append(command)
-        known_keys = set(commands_by_key)
-        logical_keys = known_keys | set(slave_to_master)
-        exact_sizes = {
-            name: {str(key): value for key, value in sizes.items()}
-            for name, sizes in (request.constant_info_size_by_tiling_key or {}).items()
-        }
-        records = []
-        for item in kernel_list:
-            tiling_key_value = item.get("tilingKey")
-            if tiling_key_value is None:
-                try:
-                    tiling_key = next(
-                        key
-                        for key in sorted(logical_keys, key=len, reverse=True)
-                        if item["kernelName"].endswith("_" + key)
-                    )
-                except StopIteration as error:
-                    raise ManifestCommandError(
-                        f"cannot determine tiling key for kernel {item['kernelName']}"
-                    ) from error
-            else:
-                tiling_key = str(tiling_key_value)
-            compile_tiling_key = slave_to_master.get(tiling_key, tiling_key)
-            try:
-                physical_commands = commands_by_key[compile_tiling_key]
-            except KeyError as error:
-                raise ManifestCommandError(
-                    f"master tiling key {compile_tiling_key} has no physical "
-                    "compile command"
-                ) from error
-            commands = tuple(
-                replace(
-                    command,
-                    tiling_key=tiling_key,
-                    compile_tiling_key=compile_tiling_key,
-                    compiled_symbol=_logical_symbol(
-                        command.compile_symbol,
-                        compile_tiling_key,
-                        tiling_key,
-                    ),
-                )
-                for command in physical_commands
+        return commands_by_key
+
+    def _build_record(self, item, commands_by_key, slave_to_master, exact_sizes):
+        tiling_key = self._resolve_tiling_key(
+            item,
+            set(commands_by_key) | set(slave_to_master),
+        )
+        compile_tiling_key = slave_to_master.get(tiling_key, tiling_key)
+        try:
+            physical_commands = commands_by_key[compile_tiling_key]
+        except KeyError as error:
+            raise ManifestCommandError(
+                f"master tiling key {compile_tiling_key} has no physical "
+                "compile command"
+            ) from error
+        commands = tuple(
+            replace(
+                command,
+                tiling_key=tiling_key,
+                compile_tiling_key=compile_tiling_key,
+                compiled_symbol=_logical_symbol(
+                    command.compile_symbol,
+                    compile_tiling_key,
+                    tiling_key,
+                ),
             )
-            resolved_constant_infos = []
-            for constant_info in self._constant_infos:
-                sizes = exact_sizes.get(constant_info.name, {})
-                if tiling_key in sizes:
-                    byte_size = sizes[tiling_key]
-                elif compile_tiling_key in sizes:
-                    byte_size = sizes[compile_tiling_key]
-                else:
-                    byte_size = constant_info.byte_size
-                resolved_constant_infos.append(
-                    replace(constant_info, byte_size=byte_size)
-                )
-            records.append(
-                KernelCompileRecord(
-                    kernel_name=item["kernelName"],
-                    tiling_key=tiling_key,
-                    compile_tiling_key=compile_tiling_key,
-                    constant_infos=tuple(resolved_constant_infos),
-                    commands=commands,
-                    link_options=tuple(request.link_options),
-                )
+            for command in physical_commands
+        )
+        return KernelCompileRecord(
+            kernel_name=item["kernelName"],
+            tiling_key=tiling_key,
+            compile_tiling_key=compile_tiling_key,
+            constant_infos=self._resolve_constant_infos(
+                tiling_key, compile_tiling_key, exact_sizes
+            ),
+            commands=commands,
+            link_options=_LINK_OPTION,
+        )
+
+    def _resolve_constant_infos(self, tiling_key, compile_tiling_key, exact_sizes):
+        resolved = []
+        for constant_info in self._constant_infos:
+            sizes = exact_sizes.get(constant_info.name, {})
+            byte_size = sizes.get(
+                tiling_key,
+                sizes.get(compile_tiling_key, constant_info.byte_size),
             )
-        return tuple(records)
+            resolved.append(replace(constant_info, byte_size=byte_size))
+        return tuple(resolved)
 
     def _build_context_commands(self, compile_info, object_type):
-        recorded_commands = tuple(
-            getattr(compile_info, "recorded_compile_commands", ())
-        )
+        recorded_commands = compile_info.compile_command_session.records
         if not recorded_commands:
             raise ManifestCommandError(
                 f"{object_type} Manifest generation requires recorded "
                 "dynamic compile commands"
             )
         return tuple(
-            StaticCompileCommand(
-                tiling_key=str(spec.tiling_key),
+            replace(
+                spec,
                 compile_tiling_key=str(spec.tiling_key),
-                compiled_symbol=spec.compiled_symbol,
                 compile_symbol=spec.compiled_symbol,
                 object_type=object_type,
-                core_type=spec.core_type,
-                source_path=spec.source_path,
                 constant_info_files=self._constant_info_files,
-                argv=tuple(spec.argv),
-                output_path=spec.output_path,
             )
             for spec in recorded_commands
         )
 
 
 def static_tiling_template_text(dynamic_header):
-    if not dynamic_header:
-        return (
-            "#ifndef __ASCENDC_STATIC_TILING_DATA_H__\n"
-            "#define __ASCENDC_STATIC_TILING_DATA_H__\n"
-            "#ifdef CONST_TILING\n"
-            "static constexpr unsigned char __ascendc_static_tiling_data[] = "
-            f"{_TILING_DATA_TEMPLATE};\n"
-            "#endif\n"
-            "#endif\n"
-        )
     final_endif = dynamic_header.rfind("#endif")
 
     class_names = []
@@ -417,6 +386,15 @@ def _replace_path_token(value, source, replacement):
     return value
 
 
+def _parse_include_option(argv, index):
+    value = argv[index]
+    if value == "-I" and index + 1 < len(argv):
+        return argv[index + 1], 2
+    if value.startswith("-I") and value != "-I":
+        return value[2:], 1
+    return None, 1
+
+
 def _normalize_source_include_options(
     argv, source_file_path, replacement, insertion_before=None
 ):
@@ -426,33 +404,22 @@ def _normalize_source_include_options(
     index = 0
     while index < len(argv):
         value = argv[index]
-        if value == "-I" and index + 1 < len(argv):
-            include_path = argv[index + 1]
-            if include_path == source_dir:
-                if replacement is not None and not source_include_added:
-                    normalized.extend(["-I", replacement])
-                    source_include_added = True
-                index += 2
-                continue
-            if os.path.isabs(include_path) and not os.path.exists(include_path):
-                index += 2
-                continue
-            normalized.extend([value, include_path])
-            index += 2
+        include_path, option_size = _parse_include_option(argv, index)
+        if include_path is None:
+            normalized.append(value)
+            index += option_size
             continue
-        if value.startswith("-I") and value != "-I":
-            include_path = value[2:]
-            if include_path == source_dir:
-                if replacement is not None and not source_include_added:
-                    normalized.extend(["-I", replacement])
-                    source_include_added = True
-                index += 1
-                continue
-            if os.path.isabs(include_path) and not os.path.exists(include_path):
-                index += 1
-                continue
-        normalized.append(value)
-        index += 1
+        if include_path == source_dir:
+            if replacement is not None and not source_include_added:
+                normalized.extend(["-I", replacement])
+                source_include_added = True
+            index += option_size
+            continue
+        if os.path.isabs(include_path) and not os.path.exists(include_path):
+            index += option_size
+            continue
+        normalized.extend(argv[index : index + option_size])
+        index += option_size
     if replacement is not None and not source_include_added:
         insertion_index = next(
             (
@@ -557,10 +524,36 @@ def _publish_directory(stage_dir, target_dir):
         shutil.rmtree(backup_dir)
 
 
-class StaticCompileResourceGenerator:
-    def __init__(self, request: ManifestGenerationRequest):
-        self._request = request
-        self._target_dir = os.path.abspath(request.output_dir)
+class ManifestPackageWriter:
+    def __init__(self, snapshot: ManifestInputSnapshot):
+        self._snapshot = snapshot
+        compile_info = snapshot.compile_info
+        tiling_info = snapshot.tiling_info
+        manifest_tiling_size = tiling_info.default_tiling_size
+        if manifest_tiling_size <= 0:
+            manifest_tiling_size = compile_info.max_tiling_size
+        manifest_tiling_sizes = dict(tiling_info.tiling_key_data_size)
+        manifest_tiling_sizes.update(compile_info.compiled_tiling_key_data_size_map)
+        constant_infos = snapshot.constant_infos or (
+            ConstantInfoRecord(
+                name="tiling_data",
+                parameter_index=snapshot.workspace_idx + 1,
+                byte_size=manifest_tiling_size,
+                template_path=tiling_info.tiling_data_file_path,
+                template=_TILING_DATA_TEMPLATE,
+            ),
+        )
+        constant_info_sizes = snapshot.constant_info_size_by_tiling_key or {
+            "tiling_data": manifest_tiling_sizes
+        }
+        self._kernels = _KernelCompileRecordBuilder(
+            snapshot, constant_infos, constant_info_sizes
+        ).build()
+        self._source_file_path = compile_info.src_file
+        self._origin_func_name = compile_info.origin_func_name
+        self._manifest_name = f"{compile_info.kernel_name}_manifest.json"
+        output_dir = os.path.join(snapshot.kernel_spec_dir, compile_info.kernel_name)
+        self._target_dir = os.path.abspath(output_dir)
         self._parent_dir = os.path.dirname(self._target_dir)
         self._kernel_name = os.path.basename(self._target_dir)
         self._resource_path = "resources"
@@ -570,8 +563,56 @@ class StaticCompileResourceGenerator:
         self._constant_info_logicals = {}
         self._wrapper_commands = []
 
-    def generate(self) -> ManifestGenerationResult:
-        request = self._request
+    @staticmethod
+    def _append_sk_objcopy_commands(commands, rename_specs, split_specs):
+        for (
+            dynamic_symbol,
+            static_symbol,
+            compile_symbol,
+            source,
+            output,
+        ) in rename_specs:
+            commands.append(
+                {
+                    "type": "objcopy",
+                    "cmd": [
+                        "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                        f"--redefine-sym={dynamic_symbol}={static_symbol}",
+                        f"--strip-symbol={compile_symbol}",
+                        source,
+                        output,
+                    ],
+                }
+            )
+        for static_symbol, sk_output, split_index, split_name in split_specs:
+            commands.append(
+                {
+                    "type": "objcopy",
+                    "cmd": [
+                        "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
+                        f"--redefine-sym={static_symbol}="
+                        f"{static_symbol}_split{split_index}",
+                        sk_output,
+                        _output_placeholder(split_name),
+                    ],
+                }
+            )
+
+    @staticmethod
+    def _build_sk_split_specs(
+        kernel, core_suffix, static_symbol, final_output, multiple_cores
+    ):
+        specs = []
+        for split_index in range(1, 4):
+            split_name = f"{kernel.kernel_name}.sk_split{split_index}.o"
+            if multiple_cores:
+                split_name = (
+                    f"{kernel.kernel_name}.{core_suffix}.sk_split{split_index}.o"
+                )
+            specs.append((static_symbol, final_output, split_index, split_name))
+        return tuple(specs)
+
+    def write(self) -> str:
         os.makedirs(self._parent_dir, exist_ok=True)
         lock_path = os.path.join(
             self._parent_dir, f".{self._kernel_name}.manifest.lock"
@@ -585,18 +626,16 @@ class StaticCompileResourceGenerator:
                 self._collect_resources()
                 manifest = self._build_manifest()
                 _write_resources(self._stage_dir, self._resource_path, self._resources)
-                manifest_path = os.path.join(self._stage_dir, request.manifest_name)
+                manifest_path = os.path.join(self._stage_dir, self._manifest_name)
                 with open(manifest_path, "w", encoding="utf-8") as file_obj:
                     json.dump(manifest, file_obj, indent=2, ensure_ascii=False)
                     file_obj.write("\n")
                 _fsync_tree(self._stage_dir)
                 _publish_directory(self._stage_dir, self._target_dir)
                 self._stage_dir = ""
-                return ManifestGenerationResult(
-                    manifest_path=os.path.join(self._target_dir, request.manifest_name),
-                    resource_id=request.resource_id,
-                    kernel_count=len(request.kernels),
-                    resource_count=len(self._resources),
+                return os.path.join(
+                    self._target_dir,
+                    self._manifest_name,
                 )
             finally:
                 if self._stage_dir and os.path.isdir(self._stage_dir):
@@ -604,9 +643,8 @@ class StaticCompileResourceGenerator:
                 fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
 
     def _collect_resources(self):
-        request = self._request
         all_records = []
-        for kernel in request.kernels:
+        for kernel in self._kernels:
             all_records.extend(kernel.commands)
         for command in all_records:
             source_path = command.source_path
@@ -625,7 +663,7 @@ class StaticCompileResourceGenerator:
                 sk_slave_symbols.append(record.compiled_symbol)
             wrapper = _portable_wrapper_text(
                 source_content,
-                request.source_file_path,
+                self._source_file_path,
                 tuple(sk_slave_symbols),
             ).encode("utf-8")
             self._wrapper_paths[source_path] = _add_resource(
@@ -633,7 +671,7 @@ class StaticCompileResourceGenerator:
             )
 
         templates_by_path = {}
-        for kernel in request.kernels:
+        for kernel in self._kernels:
             for constant_info in kernel.constant_infos:
                 templates_by_path.setdefault(constant_info.template_path, set()).add(
                     constant_info.template
@@ -650,9 +688,8 @@ class StaticCompileResourceGenerator:
             )
 
     def _build_manifest(self):
-        request = self._request
         manifest_kernels = []
-        for kernel in request.kernels:
+        for kernel in self._kernels:
             basic_records = sorted(
                 (record for record in kernel.commands if record.object_type == "basic"),
                 key=lambda record: (0 if record.core_type == "cube" else 1),
@@ -691,9 +728,9 @@ class StaticCompileResourceGenerator:
             self._wrapper_commands, self._resource_path
         )
         return {
-            "soc_version": request.soc_version,
-            "resource_id": request.resource_id,
-            "source_file": os.path.basename(request.source_file_path),
+            "soc_version": self._snapshot.soc_version,
+            "resource_id": self._snapshot.resource_id,
+            "source_file": os.path.basename(self._source_file_path),
             "resource_path": self._resource_path,
             "options": {"common_compile": common_compile},
             "kernels": manifest_kernels,
@@ -719,7 +756,6 @@ class StaticCompileResourceGenerator:
         }
 
     def _build_sk_object(self, kernel, basic_records, sk_records):
-        request = self._request
         basic_by_core = {record.core_type: record for record in basic_records}
         commands = []
         outputs = []
@@ -729,105 +765,32 @@ class StaticCompileResourceGenerator:
         multiple_cores = len(sk_records) > 1
         for record in sk_records:
             basic_record = basic_by_core[record.core_type]
-            static_sk_symbol = basic_record.compiled_symbol + "_static_sk"
-            compile_static_sk_symbol = basic_record.compile_symbol + "_static_sk"
-            core_suffix = _core_suffix(record.core_type)
-            final_output_name = (
-                f"{kernel.kernel_name}.{core_suffix}.sk.o"
-                if multiple_cores
-                else f"{kernel.kernel_name}.sk.o"
-            )
-            is_slave = kernel.tiling_key != kernel.compile_tiling_key
-            compile_output_name = (
-                final_output_name.replace(".sk.o", ".sk_source.o")
-                if is_slave
-                else final_output_name
-            )
-            command = {
-                "type": "compile",
-                "cmd": self._normalize_compile_command(
+            command, final_output, rename_spec, record_splits, bind_pair = (
+                self._plan_sk_compile(
+                    kernel,
+                    basic_record,
                     record,
-                    compile_output_name,
-                    target_symbol=compile_static_sk_symbol,
-                    tiling_key=kernel.compile_tiling_key,
-                ),
-            }
+                    multiple_cores,
+                )
+            )
             commands.append(command)
             self._wrapper_commands.append(command)
-            compile_output = _output_placeholder(compile_output_name)
-            final_output = _output_placeholder(final_output_name)
-            if is_slave:
-                logical_rename_specs.append(
-                    (
-                        record.compiled_symbol,
-                        static_sk_symbol,
-                        compile_static_sk_symbol,
-                        compile_output,
-                        final_output,
-                    )
-                )
             outputs.append(final_output)
-            bind_pairs.append((basic_record.compiled_symbol, static_sk_symbol))
-            for split_index in range(1, 4):
-                split_name = (
-                    f"{kernel.kernel_name}.{core_suffix}.sk_split{split_index}.o"
-                    if multiple_cores
-                    else f"{kernel.kernel_name}.sk_split{split_index}.o"
-                )
-                split_specs.append(
-                    (static_sk_symbol, final_output, split_index, split_name)
-                )
+            if rename_spec is not None:
+                logical_rename_specs.append(rename_spec)
+            split_specs.extend(record_splits)
+            bind_pairs.append(bind_pair)
 
-        bind_name = f"sk_bind_{kernel.kernel_name}.cpp"
-        bind_logical = _add_resource(
-            self._resources,
-            "src/" + bind_name,
-            content=_static_bind_source(
-                bind_pairs,
-                request.basic_kernel_attribute or request.sk_kernel_attribute,
-                request.sk_kernel_attribute,
-                request.sk_cap_bitmap,
-            ),
+        bind_output_name = self._append_sk_bind_command(
+            kernel,
+            bind_pairs,
+            commands,
         )
-        bind_output_name = f"{kernel.kernel_name}.sk_bind.o"
-        commands.append(
-            {
-                "type": "compile",
-                "cmd": self._build_bind_command(bind_logical, bind_output_name),
-            }
+        self._append_sk_objcopy_commands(
+            commands,
+            logical_rename_specs,
+            split_specs,
         )
-        for (
-            dynamic_slave_symbol,
-            static_sk_symbol,
-            compile_static_sk_symbol,
-            compile_output,
-            final_output,
-        ) in logical_rename_specs:
-            commands.append(
-                {
-                    "type": "objcopy",
-                    "cmd": [
-                        "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
-                        f"--redefine-sym={dynamic_slave_symbol}={static_sk_symbol}",
-                        f"--strip-symbol={compile_static_sk_symbol}",
-                        compile_output,
-                        final_output,
-                    ],
-                }
-            )
-        for static_sk_symbol, sk_output, split_index, split_name in split_specs:
-            commands.append(
-                {
-                    "type": "objcopy",
-                    "cmd": [
-                        "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy",
-                        f"--redefine-sym={static_sk_symbol}="
-                        f"{static_sk_symbol}_split{split_index}",
-                        sk_output,
-                        _output_placeholder(split_name),
-                    ],
-                }
-            )
         outputs.extend(
             _output_placeholder(split_name) for _, _, _, split_name in split_specs
         )
@@ -839,6 +802,74 @@ class StaticCompileResourceGenerator:
             "outputs": outputs,
         }
 
+    def _plan_sk_compile(self, kernel, basic_record, record, multiple_cores):
+        static_sk_symbol = basic_record.compiled_symbol + "_static_sk"
+        compile_static_sk_symbol = basic_record.compile_symbol + "_static_sk"
+        core_suffix = _core_suffix(record.core_type)
+        final_output_name = (
+            f"{kernel.kernel_name}.{core_suffix}.sk.o"
+            if multiple_cores
+            else f"{kernel.kernel_name}.sk.o"
+        )
+        is_slave = kernel.tiling_key != kernel.compile_tiling_key
+        compile_output_name = (
+            final_output_name.replace(".sk.o", ".sk_source.o")
+            if is_slave
+            else final_output_name
+        )
+        command = {
+            "type": "compile",
+            "cmd": self._normalize_compile_command(
+                record,
+                compile_output_name,
+                target_symbol=compile_static_sk_symbol,
+                tiling_key=kernel.compile_tiling_key,
+            ),
+        }
+        compile_output = _output_placeholder(compile_output_name)
+        final_output = _output_placeholder(final_output_name)
+        rename_spec = None
+        if is_slave:
+            rename_spec = (
+                record.compiled_symbol,
+                static_sk_symbol,
+                compile_static_sk_symbol,
+                compile_output,
+                final_output,
+            )
+        split_specs = self._build_sk_split_specs(
+            kernel,
+            core_suffix,
+            static_sk_symbol,
+            final_output,
+            multiple_cores,
+        )
+        bind_pair = (basic_record.compiled_symbol, static_sk_symbol)
+        return command, final_output, rename_spec, split_specs, bind_pair
+
+    def _append_sk_bind_command(self, kernel, bind_pairs, commands):
+        sk_attribute = self._snapshot.sk_compile_info.global_kernel_attribute
+        basic_attribute = self._snapshot.basic_compile_info.global_kernel_attribute
+        bind_name = f"sk_bind_{kernel.kernel_name}.cpp"
+        bind_logical = _add_resource(
+            self._resources,
+            "src/" + bind_name,
+            content=_static_bind_source(
+                bind_pairs,
+                basic_attribute or sk_attribute,
+                sk_attribute,
+                self._snapshot.sk_cap_bitmap,
+            ),
+        )
+        output_name = f"{kernel.kernel_name}.sk_bind.o"
+        commands.append(
+            {
+                "type": "compile",
+                "cmd": self._build_bind_command(bind_logical, output_name),
+            }
+        )
+        return output_name
+
     def _normalize_compile_command(
         self,
         record,
@@ -846,10 +877,26 @@ class StaticCompileResourceGenerator:
         target_symbol=None,
         tiling_key=None,
     ):
-        request = self._request
+        argv = self._prepare_compile_argv(record)
+        source_reference = _resource_placeholder(
+            self._resource_path, self._wrapper_paths[record.source_path]
+        )
+        normalized = self._replace_compile_paths(
+            argv,
+            record,
+            output_name,
+            source_reference,
+        )
+        self._rewrite_static_sk_symbols(normalized, target_symbol, tiling_key)
+        source_index = normalized.index(source_reference)
+        if "-DCONST_TILING" not in normalized:
+            normalized.insert(source_index, "-DCONST_TILING")
+        return normalized
+
+    def _prepare_compile_argv(self, record):
         argv = _normalize_source_include_options(
             list(record.argv),
-            request.source_file_path,
+            self._source_file_path,
             "${source_file_path}",
             insertion_before=record.source_path,
         )
@@ -865,10 +912,9 @@ class StaticCompileResourceGenerator:
         )
         argv = argv[compiler_index:]
         argv[0] = "${env:ASCEND_HOME_PATH}/bin/bisheng"
-        cann_root = os.environ.get("ASCEND_HOME_PATH", "")
-        source_reference = _resource_placeholder(
-            self._resource_path, self._wrapper_paths[record.source_path]
-        )
+        return argv
+
+    def _replace_compile_paths(self, argv, record, output_name, source_reference):
         constant_info_references = {
             path: _resource_placeholder(
                 self._resource_path, self._constant_info_logicals[path]
@@ -876,6 +922,7 @@ class StaticCompileResourceGenerator:
             for path in record.constant_info_files
         }
         output_reference = _output_placeholder(output_name)
+        cann_root = os.environ.get("ASCEND_HOME_PATH", "")
         normalized = []
         for value in argv:
             if value == record.source_path:
@@ -894,26 +941,26 @@ class StaticCompileResourceGenerator:
                 normalized[index] = source_reference
             if value.startswith("-include") and record.source_path in value:
                 normalized[index] = value.replace(record.source_path, source_reference)
-
-        if target_symbol is not None:
-            origin_func_name = request.origin_func_name
-            auto_gen_prefix = f"-Dauto_gen_{origin_func_name}_kernel="
-            origin_prefix = f"-D{origin_func_name}="
-            for index, value in enumerate(normalized):
-                if value.startswith(auto_gen_prefix):
-                    normalized[index] = auto_gen_prefix + target_symbol
-                elif value.startswith(origin_prefix):
-                    normalized[index] = (
-                        origin_prefix + f"{origin_func_name}_{tiling_key}_tilingkey"
-                    )
-        source_index = normalized.index(source_reference)
-        if "-DCONST_TILING" not in normalized:
-            normalized.insert(source_index, "-DCONST_TILING")
         return normalized
 
+    def _rewrite_static_sk_symbols(self, argv, target_symbol, tiling_key):
+        if target_symbol is None:
+            return
+        origin_func_name = self._origin_func_name
+        auto_gen_prefix = f"-Dauto_gen_{origin_func_name}_kernel="
+        origin_prefix = f"-D{origin_func_name}="
+        for index, value in enumerate(argv):
+            if value.startswith(auto_gen_prefix):
+                argv[index] = auto_gen_prefix + target_symbol
+            elif value.startswith(origin_prefix):
+                argv[index] = (
+                    origin_prefix + f"{origin_func_name}_{tiling_key}_tilingkey"
+                )
+
     def _build_bind_command(self, source_logical, output_name):
-        request = self._request
-        recorded = request.sk_bind_command
+        sk_compile_info = self._snapshot.sk_compile_info
+        recorded_commands = sk_compile_info.compile_command_session.sk_bind_records
+        recorded = recorded_commands[0] if recorded_commands else None
         if recorded is None:
             raise ManifestCommandError(
                 "SK Manifest generation requires a recorded sk-bind command"
@@ -928,7 +975,7 @@ class StaticCompileResourceGenerator:
         )
         argv = argv[compiler_index:]
         argv[0] = "${env:ASCEND_HOME_PATH}/bin/bisheng"
-        argv = _normalize_source_include_options(argv, request.source_file_path, None)
+        argv = _normalize_source_include_options(argv, self._source_file_path, None)
         cann_root = os.environ.get("ASCEND_HOME_PATH", "")
         normalized = []
         for value in argv:
@@ -949,63 +996,182 @@ class StaticCompileResourceGenerator:
         return normalized
 
 
-def generate_static_compile_manifest(
-    context: StaticCompileManifestContext,
-) -> ManifestGenerationResult:
-    compile_info = context.compile_info
-    tiling_info = context.tiling_info
-    metadata_json_path = os.path.join(
-        os.path.dirname(compile_info.dst_file), compile_info.kernel_name + ".json"
+class KernelSpecCompilation:
+    _GLOBAL_STATE_NAMES = (
+        "ascendc_enable_super_kernel",
+        "ascendc_sk_double_compile",
+        "ascendc_sk_sub_combine_norm_workflow",
     )
-    manifest_tiling_size = tiling_info.default_tiling_size
-    if manifest_tiling_size <= 0:
-        manifest_tiling_size = compile_info.static_compile_tiling_size
-    manifest_tiling_sizes = dict(tiling_info.tiling_key_data_size)
-    manifest_tiling_sizes.update(compile_info.static_compile_tiling_key_data_size)
-    kernel_records = KernelCompileRecordBuilder(
-        KernelCompileRecordBuildRequest(
-            basic_compile_info=context.basic_compile_info,
-            sk_compile_info=context.sk_compile_info,
-            metadata_json_path=metadata_json_path,
-            constant_infos=(
-                ConstantInfoRecord(
-                    name="tiling_data",
-                    parameter_index=context.workspace_idx + 1,
-                    byte_size=manifest_tiling_size,
-                    template_path=tiling_info.tiling_data_file_path,
-                    template=_TILING_DATA_TEMPLATE,
-                ),
-            ),
-            constant_info_size_by_tiling_key={"tiling_data": manifest_tiling_sizes},
+
+    def __init__(self, compile_info, compile_option_tuple, tiling_info):
+        context_module, _, _, storage_module = _kernel_spec_runtime()
+        context = context_module.get_context()
+        global_var_storage = storage_module.global_var_storage
+        self.compile_info = compile_info
+        self.basic_compile_info = compile_info
+        self.kernel_spec_dir = context.get_addition("kernel_spec_dir")
+        self.resource_id = None
+        self.sk_cap_bitmap = None
+        self._cleaned = False
+        # Save process-global SK state before the record-only replay changes it.
+        self._global_state = {
+            name: global_var_storage.get_variable(name)
+            for name in self._GLOBAL_STATE_NAMES
+        }
+        is_sk_double_compile = (
+            context.get_addition("super_kernel_sub_combine") is True
+            and self._global_state["ascendc_enable_super_kernel"] is True
         )
-    ).build()
-    kernel_output_dir = os.path.join(context.kernel_spec_dir, compile_info.kernel_name)
-    sk_compile_info = context.sk_compile_info
-    return StaticCompileResourceGenerator(
-        ManifestGenerationRequest(
-            soc_version=context.soc_version,
-            resource_id=context.resource_id,
-            source_file_path=compile_info.src_file,
-            origin_func_name=compile_info.origin_func_name,
-            output_dir=kernel_output_dir,
-            manifest_name=f"{compile_info.kernel_name}_manifest.json",
-            kernels=kernel_records,
-            sk_cap_bitmap=context.sk_cap_bitmap,
-            sk_kernel_attribute=(
-                sk_compile_info.global_kernel_attribute
-                if sk_compile_info is not None
-                else ""
-            ),
-            basic_kernel_attribute=(
-                context.basic_compile_info.global_kernel_attribute
-                if sk_compile_info is not None
-                else ""
-            ),
-            sk_bind_command=(
-                sk_compile_info.recorded_sk_bind_commands[0]
-                if sk_compile_info is not None
-                and sk_compile_info.recorded_sk_bind_commands
-                else None
-            ),
+        self._kernel_spec_mode = context.get_addition("kernel_spec_mode") or "None"
+        self.enabled = (
+            self._kernel_spec_mode in {"Normal", "SK"}
+            and not tiling_info.static_shape_flag
         )
-    ).generate()
+        self._validate_configuration()
+        self.record_sk_commands = (
+            self.enabled and self._kernel_spec_mode == "SK" and is_sk_double_compile
+        )
+        self.sk_compile_info = None
+        self.sk_compile_option_tuple = None
+        self._initialize_sk_recording(compile_option_tuple)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if not self.record_sk_commands:
+            return False
+        _, _, _, storage_module = _kernel_spec_runtime()
+        global_var_storage = storage_module.global_var_storage
+        try:
+            self.cleanup()
+        finally:
+            # Restore the entry state even when replay or cleanup fails.
+            for name, value in self._global_state.items():
+                global_var_storage.set_variable(name, value)
+        return False
+
+    @classmethod
+    def create(cls, compile_info, compile_option_tuple, tiling_info):
+        return cls(compile_info, compile_option_tuple, tiling_info)
+
+    def select_basic_compile(self, compile_info_origin, compile_option_tuple_origin):
+        if compile_option_tuple_origin is not None:
+            self.basic_compile_info = compile_info_origin
+        if self.enabled:
+            # Execute the Normal compile and retain its commands for the Manifest.
+            _, _, utility_module, _ = _kernel_spec_runtime()
+            self.basic_compile_info.compile_command_session = (
+                utility_module.CompileCommandSession(
+                    utility_module.CompileCommandMode.EXECUTE_AND_RECORD
+                )
+            )
+
+    def attach_resource_id(self):
+        if not self.enabled:
+            return
+        _, error_mgr, utility_module, _ = _kernel_spec_runtime()
+        try:
+            self.resource_id = generate_and_write_resource_id(
+                self.compile_info.dst_file
+            )
+        except ResourceIdError as error:
+            utility_module.CommonUtility.ascendc_raise_python_err(
+                error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE,
+                f"generate Resource ID failed, reason is: {error}",
+            )
+
+    def begin_sk_recording(self):
+        if not self.record_sk_commands:
+            return False
+        # Restore SK state only for the record-only replay.
+        _, _, _, storage_module = _kernel_spec_runtime()
+        self.basic_compile_info.global_kernel_symbols = [
+            command.compiled_symbol
+            for command in self.basic_compile_info.compile_command_session.records
+        ]
+        global_var_storage = storage_module.global_var_storage
+        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
+        global_var_storage.set_variable("ascendc_sk_double_compile", True)
+        global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", False)
+        return True
+
+    def finish_sk_recording(self, sk_cap_bitmap):
+        self.sk_cap_bitmap = sk_cap_bitmap
+
+    def publish_manifest(self, tiling_info, workspace_idx):
+        if not self.enabled:
+            return
+        # Publish after the Resource ID and all requested commands are available.
+        _, error_mgr, utility_module, storage_module = _kernel_spec_runtime()
+        try:
+            ManifestPackageWriter(
+                ManifestInputSnapshot(
+                    soc_version=storage_module.global_var_storage.get_variable(
+                        "ascendc_short_soc_version"
+                    ),
+                    kernel_spec_dir=self.kernel_spec_dir,
+                    resource_id=self.resource_id,
+                    compile_info=self.compile_info,
+                    basic_compile_info=self.basic_compile_info,
+                    tiling_info=tiling_info,
+                    workspace_idx=workspace_idx,
+                    sk_compile_info=self.sk_compile_info,
+                    sk_cap_bitmap=self.sk_cap_bitmap,
+                )
+            ).write()
+        except ManifestGenerationError as error:
+            utility_module.CommonUtility.ascendc_raise_python_err(
+                error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE,
+                f"generate Manifest failed, reason is: {error}",
+            )
+
+    def cleanup(self):
+        if self._cleaned:
+            return
+        self._cleaned = True
+        _, _, utility_module, storage_module = _kernel_spec_runtime()
+        if (
+            self.record_sk_commands
+            and self.sk_compile_info.gen_kernel_func_file
+            and not storage_module.global_var_storage.get_variable(
+                "ascendc_compile_debug_config"
+            )
+        ):
+            utility_module.CommonUtility.remove_temp_file(
+                self.sk_compile_info.gen_kernel_func_file
+            )
+
+    def _validate_configuration(self):
+        if not self.enabled:
+            return
+        _, error_mgr, utility_module, _ = _kernel_spec_runtime()
+        common_utility = utility_module.CommonUtility
+        if not (common_utility.is_v220() or common_utility.is_c310()):
+            error_mgr.raise_tbe_python_err(
+                error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE,
+                "Kernel Spec only supports v220 and c310 architectures.",
+            )
+        if not self.kernel_spec_dir:
+            error_mgr.raise_tbe_python_err(
+                error_mgr.TBE_DEFAULT_PYTHON_ERROR_CODE,
+                "kernel_spec_dir is required when kernel_spec_mode is Normal or SK.",
+            )
+
+    def _initialize_sk_recording(self, compile_option_tuple):
+        if not self.record_sk_commands:
+            return
+        _, _, utility_module, storage_module = _kernel_spec_runtime()
+        self.sk_compile_info = copy.deepcopy(self.compile_info)
+        self.sk_compile_option_tuple = copy.deepcopy(compile_option_tuple)
+        self.sk_compile_info.compile_command_session = (
+            utility_module.CompileCommandSession(
+                utility_module.CompileCommandMode.RECORD_ONLY
+            )
+        )
+        # Compile the normal object first, then replay the SK workflow to
+        # record commands without producing a second set of objects.
+        global_var_storage = storage_module.global_var_storage
+        global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+        global_var_storage.set_variable("ascendc_sk_double_compile", False)
+        global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
