@@ -22,6 +22,7 @@
 #include "sal.h"
 #include "hcomm/hccl/hccl_res.h"
 #include "hcomm/pkg_inc/hcomm/ccu/ccu_assist_pub.h"
+#include "acl/acl_rt.h"
 #include <memory>
 #include <string>
 #include <chrono>
@@ -50,6 +51,17 @@ extern "C" unsigned int HcclLaunchAicpuKernel(mc2_ops_hccl::OpParam* param)
 }
 
 namespace mc2_ops_hccl {
+
+HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
+{
+    uint64_t actualSize = ctxSize;
+    if (HcclEngineCtxGet(comm, tag.c_str(), COMM_ENGINE_AIV, ctx, &actualSize) == HCCL_SUCCESS) {
+        return actualSize >= ctxSize ? HCCL_SUCCESS : HCCL_E_INTERNAL;
+    }
+
+    CHK_RET(HcclEngineCtxCreate(comm, tag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx));
+    return aclrtMemset(*ctx, ctxSize, 0, ctxSize) == ACL_SUCCESS ? HCCL_SUCCESS : HCCL_E_RUNTIME;
+}
 
 InsCollAlgBase::InsCollAlgBase() {}
 InsCollAlgBase::~InsCollAlgBase() {}
