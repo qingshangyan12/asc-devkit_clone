@@ -59,6 +59,7 @@ def check_exist_forbidden_symbols(dst_i_file, forbidden_symbols, allow_path):
     with open(dst_i_file, "r") as f:
         for line in f:
             if line.startswith("#"):
+                # Track the current preprocessed source context for subsequent lines.
                 need_check = True
                 if allow_path_pattern.search(line):
                     need_check = False
