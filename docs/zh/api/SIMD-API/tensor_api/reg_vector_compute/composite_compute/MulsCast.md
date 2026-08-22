@@ -85,7 +85,7 @@ __simd_callee__ inline decltype(auto) muls_cast(
 
 以下示例先调用 `muls_cast`，再按 EVEN 布局将 `half` 结果转换回连续 `float`，最后写回 UB。
 
-完整的 Kernel、Host 调用和数据验证代码请参见
+同类 Tensor API 样例的 Kernel、Host 调用和数据验证流程请参见
 [可运行样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/reg_vector_compute/composite_compute/)。
 
 ```cpp

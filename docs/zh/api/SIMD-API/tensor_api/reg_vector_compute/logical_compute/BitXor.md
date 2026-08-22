@@ -74,7 +74,7 @@ __simd_callee__ inline decltype(auto) operator^(const T& a, const U& b);
 以下示例展示接口在 AIV 计算函数中的典型调用方式。示例先为加载结果绑定 mask，
 再执行计算并将结果写回 UB。
 
-完整的 Kernel、Host 调用和数据验证代码请参见
+同类 Tensor API 样例的 Kernel、Host 调用和数据验证流程请参见
 [可运行样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/reg_vector_compute/logical_compute/)。
 
 ```cpp
