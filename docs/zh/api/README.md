@@ -1347,6 +1347,7 @@
         -   [废弃接口](SIMD-API/c_api/deprecated_interface/deprecated_interface.md)
             -   [asc_set_atomic_add_int（废弃）](SIMD-API/c_api/deprecated_interface/asc_set_atomic_add_int_deprecated.md)
             -   [asc_abs_sync（废弃）](SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md)
+            -   [asc_transto5hd_sync（废弃）](SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md)
 
     -   [高阶API](SIMD-API/adv_api/adv_api.md)
         -   [高阶API列表](SIMD-API/adv_api/adv_api_list.md)

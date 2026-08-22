@@ -52,16 +52,6 @@ __aicore__ inline void asc_transto5hd_b8(ub_addr8_t dst, ub_addr8_t src, uint8_t
     uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
 ```
 
-- 同步计算
-```cpp
-__aicore__ inline void asc_transto5hd_b32_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
-    uint16_t dst_stride, uint16_t src_stride)
-__aicore__ inline void asc_transto5hd_b16_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
-    uint16_t dst_stride, uint16_t src_stride)
-__aicore__ inline void asc_transto5hd_b8_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
-    uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
-```
-
 ## 参数说明
 
 **表1** 参数说明
