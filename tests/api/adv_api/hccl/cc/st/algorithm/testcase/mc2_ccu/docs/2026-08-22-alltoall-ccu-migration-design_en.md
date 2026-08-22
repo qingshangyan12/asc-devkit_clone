@@ -31,7 +31,7 @@ The asc-devkit repository, as part of the CANN development toolkit, contains the
 
 ### Product Environment
 
-The CCU algorithm module in asc-devkit is located under `impl/adv_api/detail/hccl/cc/`, as a sub-module of the MC2 communication framework. CCU (Communication Compute Unit) algorithms run on AICore, implementing inter-rank communication through CCU primitives (Variable, Address, Write, LocalCopy, GroupCopy, Notify, Event, etc.).
+The CCU algorithm module in asc-devkit is located under `impl/adv_api/detail/hccl/cc/`, as a sub-module of the MC2 communication framework. CCU (Communication Compute Unit) is a dedicated on-chip communication hardware unit, implementing inter-rank communication through CCU primitives (Variable, Address, Write, LocalCopy, GroupCopy, Notify, Event, etc.).
 
 Overall call chain:
 

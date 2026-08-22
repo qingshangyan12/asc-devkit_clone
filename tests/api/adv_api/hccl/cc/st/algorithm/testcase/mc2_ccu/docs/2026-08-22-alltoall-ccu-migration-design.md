@@ -31,7 +31,7 @@ asc-devkit 仓作为 CANN 开发工具套件，包含 MC2 通信算子的 host �
 
 ### 产品环境介绍
 
-asc-devkit 仓的 CCU 算法模块位于 `impl/adv_api/detail/hccl/cc/` 目录，是 MC2 通信框架的子模块。CCU（Communication Compute Unit）算法运行在 AICore 上，通过 CCU 原语（Variable、Address、Write、LocalCopy、GroupCopy、Notify、Event 等）实现 rank 间通信。
+asc-devkit 仓的 CCU 算法模块位于 `impl/adv_api/detail/hccl/cc/` 目录，是 MC2 通信框架的子模块。CCU（Communication Compute Unit）是芯片内专用的通信硬件单元，通过 CCU 原语（Variable、Address、Write、LocalCopy、GroupCopy、Notify、Event 等）实现 rank 间通信。
 
 整体调用链：
 
