@@ -318,6 +318,87 @@ static void PrintfLegacy(const char* fmt, va_list otherArgs)
     *reinterpret_cast<size_t*>(g_aicpuDumpConfig.dumpBufAddr) = aicpuDumpOffSet;
 }
 
+/* ── FIFO write helpers ─────────────────────────────────────────────── */
+
+struct RingBufWriteCtx {
+    uint8_t* ringBase;
+    uint32_t ringBufLen;
+    uint32_t writingOff;
+    uint32_t tlvLen;
+    uint32_t strLen;
+};
+
+static void WritePrintInfoHeader(uint8_t* ringBase, uint32_t ringBufLen, uint64_t writeBufOffset, uint32_t tlvLen)
+{
+    uint32_t wOff = static_cast<uint32_t>(writeBufOffset % ringBufLen);
+    PrintfInfo infoHead;
+    infoHead.printfType = PRINT_TYPE_WRITING;
+    infoHead.printfLength = tlvLen - sizeof(uint32_t[2]);
+    infoHead.blockIdx = 0U;
+    infoHead.resv = 0U;
+    infoHead.fmtOffset = 8U;
+    // Write printfType=WRITING to ringbuf BEFORE updating bufOffset.
+    // This ensures rts sees WRITING (not stale READY) when it notices
+    // bufOffset has advanced, causing it to stop reading this round.
+    if (wOff + sizeof(PrintfFifo) <= ringBufLen) {
+        (void)memcpy_s(ringBase + wOff, ringBufLen - wOff, &infoHead, sizeof(PrintfInfo));
+    } else {
+        // Split: header may span tail/head boundary, write byte-by-byte.
+        const uint8_t* headBytes = reinterpret_cast<const uint8_t*>(&infoHead);
+        for (uint32_t i = 0U; i < sizeof(PrintfInfo); ++i) {
+            ringBase[(wOff + i) % ringBufLen] = headBytes[i];
+        }
+    }
+}
+
+static bool WriteFormattedString(const RingBufWriteCtx& ctx, const char* fmt, va_list otherArgs)
+{
+    uint32_t tailSpace = ctx.ringBufLen - ctx.writingOff;
+    bool needSplit = (ctx.tlvLen - sizeof(PrintfInfo) > tailSpace);
+    if (!needSplit) {
+        // header already written, write formatted string directly
+        char* strDest = reinterpret_cast<char*>(ctx.ringBase + ctx.writingOff);
+        size_t destMax = ctx.ringBufLen - ctx.writingOff;
+        size_t count = (ctx.strLen < destMax) ? ctx.strLen : (destMax - 1U);
+        (void)vsnprintf_s(strDest, destMax, count, fmt, otherArgs);
+        return true;
+    }
+    // Write formatted string to temp buffer after header.
+    // vsnprintf_s to tempBuf first, then copy to ringBuf (string may span boundary)
+    uint8_t* tempBuf = g_fifoTempBuf.Get(ctx.ringBufLen);
+    if (tempBuf == nullptr) {
+        return false;
+    }
+    char* strDest = reinterpret_cast<char*>(tempBuf);
+    size_t destMax = static_cast<size_t>(ctx.ringBufLen);
+    size_t count = (ctx.strLen < destMax) ? ctx.strLen : (destMax - 1U);
+    (void)vsnprintf_s(strDest, destMax, count, fmt, otherArgs);
+    // Copy string to ringbuf at the position after header (may span boundary)
+    uint32_t strCopyLen = ctx.tlvLen - sizeof(PrintfInfo);
+    uint32_t part1 = tailSpace;
+    uint32_t part2 = strCopyLen - part1;
+    (void)memcpy_s(ctx.ringBase + ctx.writingOff, tailSpace, tempBuf, part1);
+    (void)memcpy_s(ctx.ringBase, ctx.ringBufLen, tempBuf + part1, part2);
+
+    return true;
+}
+
+static void ReleaseEntry(uint8_t* ringBase, uint32_t ringBufLen, uint64_t oriBufOff)
+{
+    /* Ensure all data writes are visible before flipping the type */
+    uint32_t readyType = PRINT_TYPE_READY;
+    uint32_t wOff = static_cast<uint32_t>(oriBufOff % ringBufLen);
+    if (wOff + sizeof(uint32_t) <= ringBufLen) {
+        uint32_t* typeField = reinterpret_cast<uint32_t*>(ringBase + wOff);
+        __atomic_store_n(typeField, readyType, __ATOMIC_SEQ_CST);
+    } else {
+        const uint8_t* src = reinterpret_cast<const uint8_t*>(&readyType);
+        for (uint32_t i = 0U; i < sizeof(uint32_t); ++i) {
+            ringBase[(wOff + i) % ringBufLen] = src[i];
+        }
+    }
+}
+
 /* ── FIFO printf ────────────────────────────────────────────────────── */
 
 static void PrintfFifo(const char* fmt, va_list otherArgs)
@@ -349,82 +430,23 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     if (!CheckAicpuRingBuf(blockInfo, tlvLen)) {
         return; /* drop on overflow / timeout */
     }
-    // 2. atomically reserve space.
+    // 2. prepare PrintInfo header and write WRITING to ringbuf before advancing buffOffset
     RingBufWriteInfo* writeInfo = GetRingBufWriteInfo(blockInfo);
     uint64_t oriBufOff = writeInfo->bufOffset;
     uint64_t newBufOff = oriBufOff + tlvLen;
-    uint32_t wOffLimited = static_cast<uint32_t>(oriBufOff) % ringBufLen;
-    uint32_t tailSpace = ringBufLen - wOffLimited;
-    bool needSplit = (tlvLen > tailSpace);
-    // 3. prepare PrintInfo header
-    PrintfInfo infoHead;
-    infoHead.printfType = PRINT_TYPE_WRITING;
-    infoHead.printfLength = tlvLen - sizeof(uint32_t[2]);
-    infoHead.blockIdx = 0U;
-    infoHead.resv = 0U;
-    infoHead.fmtOffset = 8U;
-    // 4. Write printfType=WRITING to ringbuf BEFORE updating bufOffset.
-    //    This ensures rts sees WRITING (not stale READY) when it notices
-    //    bufOffset has advanced, causing it to stop reading this round.
-    if (!needSplit) {
-        (void)memcpy_s(ringBase + wOffLimited, ringBufLen - wOffLimited, &infoHead, sizeof(PrintfInfo));
-    } else {
-        // Split: header may span tail/head boundary, write byte-by-byte.
-        const uint8_t* headBytes = reinterpret_cast<const uint8_t*>(&infoHead);
-        for (uint32_t i = 0U; i < sizeof(PrintfInfo); ++i) {
-            ringBase[(wOffLimited + i) % ringBufLen] = headBytes[i];
-        }
-    }
-    // 5. Advance bufOffset and packIdx together — rts sees WRITING and stops,
+    WritePrintInfoHeader(ringBase, ringBufLen, oriBufOff, tlvLen);
+    // 3. Advance bufOffset and packIdx together — rts sees WRITING and stops,
     //    and packIdx is consistent with bufOffset.
     AdvanceWriteInfo(writeInfo, newBufOff);
-    // 6. Write the formatted string into the ringbuf.
-    if (!needSplit) {
-        // header already written, write formatted string directly
-        char* strDest = reinterpret_cast<char*>(ringBase + wOffLimited + sizeof(PrintfInfo));
-        size_t destMax = ringBufLen - wOffLimited - sizeof(PrintfInfo);
-        size_t count = (strLen < destMax) ? strLen : (destMax - 1U);
-        (void)vsnprintf_s(strDest, destMax, count, fmt, otherArgs);
-    } else {
-        // Split-write: entry spans the tail and the head.
-        // 1. malloc a temp buffer (ringBufLen size) if not yet allocated.
-        // 2. vsnprintf_s the formatted string into the temp buffer after the header.
-        // 3. Copy the temp buffer to ringbuf in two parts: tail then head.
-        uint8_t* tempBuf = g_fifoTempBuf.Get(ringBufLen);
-        if (tempBuf == nullptr) {
-            RollbackWriteInfo(writeInfo, oriBufOff);
-            return;
-        }
-        // Write header to temp buffer.
-        (void)memcpy_s(tempBuf, ringBufLen, &infoHead, sizeof(PrintfInfo));
-        // Write formatted string to temp buffer after header.
-        char* strDest = reinterpret_cast<char*>(tempBuf + sizeof(PrintfInfo));
-        size_t destMax = static_cast<size_t>(ringBufLen) - sizeof(PrintfInfo);
-        size_t count = (strLen < destMax) ? strLen : (destMax - 1U);
-        (void)vsnprintf_s(strDest, destMax, count, fmt, otherArgs);
-        // Copy tlvLen bytes from temp buffer to ringbuf with split.
-        // (Overwrites the byte-by-byte header written above with identical content.)
-        uint32_t part1 = tailSpace;
-        uint32_t part2 = tlvLen - part1;
-        (void)memcpy_s(ringBase + wOffLimited, ringBufLen - wOffLimited, tempBuf, part1);
-        (void)memcpy_s(ringBase, ringBufLen, tempBuf + part1, part2);
+    // 4. Write the formatted string into the ringbuf.
+    uint32_t writingOff = static_cast<uint32_t>(oriBufOff + sizeof(PrintfInfo)) % ringBufLen;
+    RingBufWriteCtx ctx = {ringBase, ringBufLen, writingOff, tlvLen, strLen};
+    if (!WriteFormattedString(ctx, fmt, otherArgs)) {
+        RollbackWriteInfo(writeInfo, oriBufOff);
+        return;
     }
-    /* ── Step 7: Release the entry to the rts reader ─────────────────── */
-    /* Ensure all data writes are visible before flipping the type. */
-    uint32_t readyType = PRINT_TYPE_READY;
-    if (!needSplit) {
-        /* Non-split: entry is contiguous, typeField is aligned. */
-        uint32_t* typeField = reinterpret_cast<uint32_t*>(ringBase + wOffLimited);
-        __atomic_store_n(typeField, readyType, __ATOMIC_SEQ_CST);
-    } else {
-        /* Split: wOff may be unaligned or the type field may span
-         * the tail/head boundary.  Use byte-by-byte copy with
-         * wrap-around to handle both cases. */
-        const uint8_t* src = reinterpret_cast<const uint8_t*>(&readyType);
-        for (uint32_t i = 0U; i < sizeof(uint32_t); ++i) {
-            ringBase[(wOffLimited + i) % ringBufLen] = src[i];
-        }
-    }
+    // 5. Release the entry to the rts reader
+    ReleaseEntry(ringBase, ringBufLen, oriBufOff);
 }
 
 /* ── Public API: unified printf entry point ─────────────────────────── */
