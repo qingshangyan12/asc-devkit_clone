@@ -37,7 +37,7 @@ DumpConfig g_aicpuDumpConfig = {reinterpret_cast<void*>(0x8), 0x100000, 0x0};
 /* ── rts interface (weak symbol provided by rts) ────────────────────── */
 
 extern "C" {
-int32_t __attribute__((weak)) AicpuGetDfxInfo(uint64_t *infoAddr);
+int32_t __attribute__((weak)) AicpuGetDfxInfo(uint64_t* infoAddr);
 }
 
 namespace AscendC {
@@ -53,8 +53,8 @@ enum DumpType : uint32_t {
     DUMP_META,
     DUMP_TIME_STAMP,
     DUMP_SIMT,
-    DUMP_BUFI,    /* 8: write info marker */
-    DUMP_BUFO,    /* 9: read  info marker */
+    DUMP_BUFI, /* 8: write info marker */
+    DUMP_BUFO, /* 9: read  info marker */
     DUMP_SKIP,
     DUMP_AICPU = 11U
 };
@@ -92,15 +92,15 @@ struct AicpuDfxInfo {
 #pragma pack(pop)
 
 struct BlockRingBufInfo {
-    uint32_t length = 0U;       // total size per block (include head and r/w info)
-    uint32_t resv0 = 0U;        // resv
-    uint32_t resv1 = 0U;        // resv
-    uint32_t ringBufLen = 0U;   // fifo buff size (print tlv storage)
-    uint16_t magic = 0U;        // magic number for info verify, expected to be 0xAE86
-    uint16_t flag = 0U;         // 0: simd, 1: simt, 3: aicpu
-    uint32_t resv2 = 0U;          // reserve
-    uint64_t ringBufAddr = 0U;  // start addr of fifo buff
-    uint32_t resvMem[6];        // reserved
+    uint32_t length = 0U;      // total size per block (include head and r/w info)
+    uint32_t resv0 = 0U;       // resv
+    uint32_t resv1 = 0U;       // resv
+    uint32_t ringBufLen = 0U;  // fifo buff size (print tlv storage)
+    uint16_t magic = 0U;       // magic number for info verify, expected to be 0xAE86
+    uint16_t flag = 0U;        // 0: simd, 1: simt, 3: aicpu
+    uint32_t resv2 = 0U;       // reserve
+    uint64_t ringBufAddr = 0U; // start addr of fifo buff
+    uint32_t resvMem[6];       // reserved
 };
 
 struct RingBufWriteInfo {
@@ -118,11 +118,11 @@ struct RingBufReadInfo {
 };
 
 struct PrintfInfo {
-    uint32_t printfType;             // DumpType = DUMP_AICPU
-    uint32_t printfLength;           // length of print info
-    uint32_t blockIdx = 0U;           // threadIdx
-    uint32_t resv = 0U;               // reserved
-    uint64_t fmtOffset = 0U;          // offset of fmt string from the start of fmtOffset addr 
+    uint32_t printfType;     // DumpType = DUMP_AICPU
+    uint32_t printfLength;   // length of print info
+    uint32_t blockIdx = 0U;  // threadIdx
+    uint32_t resv = 0U;      // reserved
+    uint64_t fmtOffset = 0U; // offset of fmt string from the start of fmtOffset addr
 };
 
 /* ── Mutex for multi-thread safety ──────────────────────────────────── */
@@ -223,11 +223,11 @@ inline uint64_t GetFreeRingBufLen(uint64_t rOff, uint64_t wOff, uint32_t ringBuf
     return (wOff - rOff < ringBufLen) ? (ringBufLen - (wOff - rOff)) : 0;
 }
 
-inline bool AicpuRingbufWait(RingBufReadInfo* readInfo, RingBufWriteInfo* writeInfo,
-                             uint32_t tlvLen, uint32_t ringBufLen)
+inline bool AicpuRingbufWait(
+    RingBufReadInfo* readInfo, RingBufWriteInfo* writeInfo, uint32_t tlvLen, uint32_t ringBufLen)
 {
     struct timespec ts;
-    ts.tv_sec  = static_cast<time_t>(FIFO_WAIT_INTERVAL_NS / 1000000000ULL);
+    ts.tv_sec = static_cast<time_t>(FIFO_WAIT_INTERVAL_NS / 1000000000ULL);
     ts.tv_nsec = static_cast<long>(FIFO_WAIT_INTERVAL_NS % 1000000000ULL);
 
     for (uint32_t i = 0U; i < FIFO_MAX_WAIT_ITERS; ++i) {
@@ -286,18 +286,14 @@ static FifoTempBuf g_fifoTempBuf;
 
 inline void AdvanceWriteInfo(RingBufWriteInfo* writeInfo, uint64_t newBufOff)
 {
-    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->packIdx),
-                     writeInfo->packIdx + 1U, __ATOMIC_SEQ_CST);
-    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->bufOffset),
-                     newBufOff, __ATOMIC_SEQ_CST);
+    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->packIdx), writeInfo->packIdx + 1U, __ATOMIC_SEQ_CST);
+    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->bufOffset), newBufOff, __ATOMIC_SEQ_CST);
 }
 
 inline void RollbackWriteInfo(RingBufWriteInfo* writeInfo, uint64_t oldBufOff)
 {
-    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->packIdx),
-                     writeInfo->packIdx - 1U, __ATOMIC_SEQ_CST);
-    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->bufOffset),
-                     oldBufOff, __ATOMIC_SEQ_CST);
+    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->packIdx), writeInfo->packIdx - 1U, __ATOMIC_SEQ_CST);
+    __atomic_store_n(reinterpret_cast<uint64_t*>(&writeInfo->bufOffset), oldBufOff, __ATOMIC_SEQ_CST);
 }
 
 /* ── Legacy printf (linear buffer) ──────────────────────────────────── */
@@ -317,8 +313,7 @@ static void PrintfLegacy(const char* fmt, va_list otherArgs)
         return;
     }
     aicpuDumpOffSet += static_cast<size_t>(vsnprintf_s(
-        reinterpret_cast<char*>(aicpuDumpBuffer) + aicpuDumpOffSet,
-        aicpuDumpBufSize - aicpuDumpOffSet,
+        reinterpret_cast<char*>(aicpuDumpBuffer) + aicpuDumpOffSet, aicpuDumpBufSize - aicpuDumpOffSet,
         aicpuDumpBufSize - aicpuDumpOffSet, fmt, otherArgs));
     *reinterpret_cast<size_t*>(g_aicpuDumpConfig.dumpBufAddr) = aicpuDumpOffSet;
 }
@@ -363,11 +358,11 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     bool needSplit = (tlvLen > tailSpace);
     // 3. prepare PrintInfo header
     PrintfInfo infoHead;
-    infoHead.printfType   = PRINT_TYPE_WRITING;
+    infoHead.printfType = PRINT_TYPE_WRITING;
     infoHead.printfLength = tlvLen - sizeof(uint32_t[2]);
-    infoHead.blockIdx     = 0U;
-    infoHead.resv         = 0U;
-    infoHead.fmtOffset    = 8U;
+    infoHead.blockIdx = 0U;
+    infoHead.resv = 0U;
+    infoHead.fmtOffset = 8U;
     // 4. Write printfType=WRITING to ringbuf BEFORE updating bufOffset.
     //    This ensures rts sees WRITING (not stale READY) when it notices
     //    bufOffset has advanced, causing it to stop reading this round.
@@ -414,7 +409,7 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
         (void)memcpy_s(ringBase + wOffLimited, ringBufLen - wOffLimited, tempBuf, part1);
         (void)memcpy_s(ringBase, ringBufLen, tempBuf + part1, part2);
     }
-/* ── Step 7: Release the entry to the rts reader ─────────────────── */
+    /* ── Step 7: Release the entry to the rts reader ─────────────────── */
     /* Ensure all data writes are visible before flipping the type. */
     uint32_t readyType = PRINT_TYPE_READY;
     if (!needSplit) {
