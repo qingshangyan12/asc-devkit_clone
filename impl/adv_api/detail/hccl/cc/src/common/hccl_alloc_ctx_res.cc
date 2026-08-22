@@ -774,14 +774,19 @@ static HcclResult AcquireAlgResources(
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     if (opParam.engine == COMM_ENGINE_CCU) {
-        // 填充 kfcServerArgs 的所有6个字段（最后一个为 token 占位符，后续更新）
-        resCtxHost->kfcServerArgs = {
-            opResCtx.xnAddr,          opResCtx.ckeAddr,
-            static_cast<uint64_t>(1), // dieNum
-            static_cast<uint64_t>(1), // missionNum
-            static_cast<uint64_t>(0), // missionIndex
-            static_cast<uint64_t>(0), // token 占位符，后续在 GetAlgResCcu 中更新
-        };
+        // 阶段 3-2：填充 kfcServerArgs 为 flat 数组，6*KFC_SERVER_MISSION_NUM 元素
+        // 单 mission: [xn, cke, dieNum=1, missionNum=1, missionIndex=0, token=0]（共6个）
+        // 双 mission: [xn, cke, 1, 2, 0, 0] + [xn, cke, 1, 2, 1, 0]（共12个）
+        // 后续 GetLaunchHandles 按 kfcServerArgs.data() + i*6 索引出各 mission 的参数集
+        resCtxHost->kfcServerArgs.clear();
+        for (uint32_t mId = 0; mId < KFC_SERVER_MISSION_NUM; ++mId) {
+            resCtxHost->kfcServerArgs.push_back(opResCtx.xnAddr);
+            resCtxHost->kfcServerArgs.push_back(opResCtx.ckeAddr);
+            resCtxHost->kfcServerArgs.push_back(static_cast<uint64_t>(1)); // dieNum
+            resCtxHost->kfcServerArgs.push_back(static_cast<uint64_t>(KFC_SERVER_MISSION_NUM));
+            resCtxHost->kfcServerArgs.push_back(static_cast<uint64_t>(mId)); // missionIndex
+            resCtxHost->kfcServerArgs.push_back(static_cast<uint64_t>(0));   // token 占位符
+        }
         resCtxHost->kfcServerArgSize = 6;
         HCCL_INFO(
             "[AcquireAlgResources] kfcServerArgs generated: "

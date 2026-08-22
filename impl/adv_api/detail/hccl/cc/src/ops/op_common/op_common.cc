@@ -157,15 +157,18 @@ static HcclResult UpdateCcuCtxTokenOnReuse(
     tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
     tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
 
-    // 从 cclBuffer 获取 token 并更新第6个字段（而非 push_back，保证序列化大小一致）
+    // 从 cclBuffer 获取 token 并更新所有 mission 的 token 字段（indices 5, 11, ...）
     void* cclBufferAddr = nullptr;
     uint64_t cclBufferSize = 0;
     if (HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize) == HCCL_SUCCESS) {
         uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
-        if (tempCtx.kfcServerArgs.size() >= 6U) {
-            tempCtx.kfcServerArgs[5] = token; // 更新占位符为真实 token
-            HCCL_INFO("[UpdateCcuCtxTokenOnReuse] token[%llu] updated at kfcServerArgs[5]", token);
+        const uint32_t numMissions = tempCtx.kfcServerArgs.size() / 6;
+        for (uint32_t mId = 0; mId < numMissions; ++mId) {
+            if (tempCtx.kfcServerArgs.size() >= (mId + 1) * 6) {
+                tempCtx.kfcServerArgs[mId * 6 + 5] = token;
+            }
         }
+        HCCL_INFO("[UpdateCcuCtxTokenOnReuse] token[%llu] updated for %u missions", token, numMissions);
 
         // 复用的 device ctx 大小不能变化
         std::vector<char> updatedSeq = tempCtx.Serialize();
@@ -1370,12 +1373,16 @@ HcclResult HcclAllocAlgResourceCcu(
     // CCL IN使用所有的CCL Buffer，这个其实就是scratch buffer
     resCtxHost->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
 
-    // 在确保 cclMem 可用的前提下，获取 token 并更新 kfcServerArgs 的第6个字段（占位符）
+    // 在确保 cclMem 可用的前提下，获取 token 并更新所有 mission 的 token 字段
     uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
-    if (resCtxHost->kfcServerArgs.size() >= 6U) {
-        resCtxHost->kfcServerArgs[5] = token; // 更新占位符为真实 token
-        HCCL_INFO("[HcclAllocAlgResourceCcu] token[%llu] updated at kfcServerArgs[5]", token);
-    } else {
+    const uint32_t numMissions = resCtxHost->kfcServerArgs.size() / 6;
+    for (uint32_t mId = 0; mId < numMissions; ++mId) {
+        if (resCtxHost->kfcServerArgs.size() >= (mId + 1) * 6) {
+            resCtxHost->kfcServerArgs[mId * 6 + 5] = token;
+        }
+    }
+    HCCL_INFO("[HcclAllocAlgResourceCcu] token[%llu] updated for %u missions", token, numMissions);
+    if (numMissions == 0) {
         HCCL_WARNING(
             "[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < 6, cannot update token",
             resCtxHost->kfcServerArgs.size());
