@@ -155,8 +155,8 @@ __simd_callee__ inline void AdjustMask_b32_b8(MaskReg& dstMask, MaskReg& srcMask
         "AdjustMask_b32_b8 only supports RegLayout ZERO, ONE, TWO and THREE");
     MaskReg zeroMask = CreateMask<uint8_t, MaskPattern::ALLF>();
     MaskReg tmpMask;
-    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
-    ppack(dstMask, dstMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
+    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
+    ppack(dstMask, dstMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
     if constexpr (layoutMode == RegLayout::ZERO) {
         pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
         pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
@@ -180,8 +180,8 @@ __simd_callee__ inline void AdjustMask_b32_b16(MaskReg& dstMask, MaskReg& srcMas
         "AdjustMask_b32_b16 only supports RegLayout ZERO and ONE");
     MaskReg zeroMask = CreateMask<uint8_t, MaskPattern::ALLF>();
     MaskReg tmpMask;
-    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
-    ppack(dstMask, dstMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
+    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
+    ppack(dstMask, dstMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
     if constexpr (layoutMode == RegLayout::ZERO) {
         pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
         pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
@@ -199,7 +199,7 @@ __simd_callee__ inline void AdjustMask_b16_b8(MaskReg& dstMask, MaskReg& srcMask
         "AdjustMask_b16_b8 only supports RegLayout ZERO and ONE");
     MaskReg zeroMask = CreateMask<uint8_t, MaskPattern::ALLF>();
     MaskReg tmpMask;
-    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
+    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
     if constexpr (layoutMode == RegLayout::ZERO) {
         pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
     } else {
@@ -215,8 +215,8 @@ __simd_callee__ inline void AdjustMask_b16_b4(MaskReg& dstMask, MaskReg& srcMask
         "AdjustMask_b16_b4 only supports RegLayout ZERO, ONE, TWO and THREE");
     MaskReg zeroMask = CreateMask<uint8_t, MaskPattern::ALLF>();
     MaskReg tmpMask;
-    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
-    ppack(dstMask, dstMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
+    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
+    ppack(dstMask, dstMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
     if constexpr (layoutMode == RegLayout::ZERO) {
         pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
         pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
@@ -306,7 +306,7 @@ __simd_callee__ inline void AdjustMask_b16_b32(MaskReg& dstMask, MaskReg& srcMas
         "AdjustMask_b16_b32 only supports RegLayout ZERO and ONE");
     MaskReg zeroMask = CreateMask<uint8_t, MaskPattern::ALLF>();
     MaskReg tmpMask;
-    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
+    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
     if constexpr (layoutMode == RegLayout::ZERO) {
         pdintlv_b8(dstMask, tmpMask, dstMask, dstMask);
     } else {
