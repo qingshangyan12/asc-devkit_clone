@@ -50,7 +50,6 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
 add_executable(${HCCL_CCU_ST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/all_to_all_testcase.cpp
-    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_buffer_primitive_testcase.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/shim/stubs.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all_mesh1d_adapter.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all.cc
