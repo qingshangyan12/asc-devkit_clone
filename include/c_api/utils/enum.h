@@ -36,6 +36,8 @@ enum class asc_hf32_round_mode : uint8_t {
     NEAREST_ZERO = NEAREST_AWAY // Compatible with the old name; the actual behavior is equivalent to NEAREST_AWAY.
 };
 
+enum class asc_unit_flag_mode : uint8_t { DISABLE = 0, ENABLE_KEEP = 2, ENABLE_UPDATE = 3 };
+
 enum class asc_position_mode { EVEN = 0, ODD };
 
 constexpr std::integral_constant<asc_position_mode, asc_position_mode::EVEN> ASC_POSITION_EVEN;
