@@ -2029,96 +2029,84 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ half* dst, __gm__ half* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode, uint16_t n_value,
     uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ float* dst, __gm__ float* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_dn2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
@@ -2306,96 +2294,84 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ half* dst, __gm__ half* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode, uint16_t n_value,
     uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ float* dst, __gm__ float* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0)
 {
     asc_copy_gm2l1_nd2nz_impl(
-        dst, src, src_d_value, static_cast<uint8_t>(l2_cache_mode), n_value, d_value, src_nd_matrix_stride,
-        enable_small_c0);
+        dst, src, src_d_value, l2_cache_mode, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
 }
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
