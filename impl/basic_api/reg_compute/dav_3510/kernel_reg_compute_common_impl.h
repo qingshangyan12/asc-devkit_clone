@@ -147,19 +147,159 @@ __simd_callee__ inline void TraitTwoToTraitOneTmpl(T& dstReg, U& srcReg)
         (RegTensor<ShortType>&)srcReg.reg[1]);
 }
 
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::MERGING, typename RegT>
-__simd_callee__ inline void CopyMerging(RegT& dstReg, RegT& srcReg, MaskReg& mask)
+
+template <RegLayout layoutMode>
+__simd_callee__ inline void AdjustMask_b32_b8(MaskReg& dstMask, MaskReg& srcMask)
+{
+    MaskReg zeroMask = CreateMask<uint8_t, MaskPattern::ALLF>();
+    MaskReg tmpMask;
+    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
+    ppack(dstMask, dstMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
+    if constexpr (layoutMode == RegLayout::ZERO) {
+        pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+        pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+    } else if constexpr (layoutMode == RegLayout::ONE) {
+        pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+        pintlv_b8(dstMask, tmpMask, zeroMask, dstMask);
+    } else if constexpr (layoutMode == RegLayout::TWO) {
+        pintlv_b8(dstMask, tmpMask, zeroMask, dstMask);
+        pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+    } else {
+        pintlv_b8(dstMask, tmpMask, zeroMask, dstMask);
+        pintlv_b8(dstMask, tmpMask, zeroMask, dstMask);
+    }
+}
+
+template <RegLayout layoutMode>
+__simd_callee__ inline void AdjustMask_b32_b16(MaskReg& dstMask, MaskReg& srcMask)
+{
+    MaskReg zeroMask = CreateMask<uint8_t, MaskPattern::ALLF>();
+    MaskReg tmpMask;
+    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
+    ppack(dstMask, dstMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
+    if constexpr (layoutMode == RegLayout::ZERO) {
+        pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+        pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+    } else  {
+        pintlv_b8(dstMask, tmpMask, zeroMask, dstMask);
+        pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+    }
+}
+
+template <RegLayout layoutMode>
+__simd_callee__ inline void AdjustMask_b16_b8(MaskReg& dstMask, MaskReg& srcMask)
+{
+    MaskReg zeroMask = CreateMask<uint8_t, MaskPattern::ALLF>();
+    MaskReg tmpMask;
+    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
+    if constexpr (layoutMode == RegLayout::ZERO) {
+        pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+    } else {
+        pintlv_b8(dstMask, tmpMask, zeroMask, dstMask);
+    }
+}
+
+template <RegLayout layoutMode>
+__simd_callee__ inline void AdjustMask_b8_b32(MaskReg& dstMask, MaskReg& srcMask)
+{
+    MaskReg zeroMask = CreateMask<uint8_t, MaskPattern::ALLF>();
+    MaskReg tmpMask;
+    if constexpr (layoutMode == RegLayout::ZERO) {
+        pdintlv_b8(dstMask, tmpMask, srcMask, srcMask);
+        pdintlv_b8(dstMask, tmpMask, dstMask, dstMask);
+    } else if constexpr (layoutMode == RegLayout::ONE) {
+        pdintlv_b8(tmpMask, dstMask, srcMask, srcMask);
+        pdintlv_b8(dstMask, tmpMask, dstMask, dstMask);
+    } else if constexpr (layoutMode == RegLayout::TWO) {
+        pdintlv_b8(dstMask, tmpMask, srcMask, srcMask);
+        pdintlv_b8(tmpMask, dstMask, dstMask, dstMask);
+    } else {
+        pdintlv_b8(tmpMask, dstMask, srcMask, srcMask);
+        pdintlv_b8(tmpMask, dstMask, dstMask, dstMask);
+    }
+    pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+    pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+}
+
+template <RegLayout layoutMode>
+__simd_callee__ inline void AdjustMask_b8_b16(MaskReg& dstMask, MaskReg& srcMask)
+{
+    MaskReg zeroMask = CreateMask<uint8_t, MaskPattern::ALLF>();
+    MaskReg tmpMask;
+    if constexpr (layoutMode == RegLayout::ZERO) {
+        pdintlv_b8(dstMask, tmpMask, srcMask, srcMask);
+    } else {
+        pdintlv_b8(tmpMask, dstMask, srcMask, srcMask);
+    }
+    pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+}
+
+template <RegLayout layoutMode>
+__simd_callee__ inline void AdjustMask_b16_b32(MaskReg& dstMask, MaskReg& srcMask)
+{
+    MaskReg zeroMask = CreateMask<uint8_t, MaskPattern::ALLF>();
+    MaskReg tmpMask;
+    ppack(dstMask, srcMask, std::integral_constant<::HiloPart, static_cast<::HiloPart>(LOWEST)>());
+    if constexpr (layoutMode == RegLayout::ZERO) {
+        pdintlv_b8(dstMask, tmpMask, dstMask, dstMask);
+    } else {
+        pdintlv_b8(tmpMask, dstMask, dstMask, dstMask);
+    }
+    pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+    pintlv_b8(dstMask, tmpMask, dstMask, zeroMask);
+}
+
+template <typename T, typename U = DefaultType, RegLayout srcLayout = RegLayout::ZERO>
+__simd_callee__ inline void AdjustMask(MaskReg& dstMask, MaskReg& srcMask)
+{
+    if constexpr (std::is_same_v<U, DefaultType>) {
+        dstMask = srcMask;
+        return;
+    }
+    constexpr size_t srcSize = sizeof(U);
+    constexpr size_t dstSize = sizeof(T);
+    if constexpr (srcSize > dstSize) {
+        if constexpr (srcSize == 4 && dstSize == 1) {
+            AdjustMask_b32_b8<srcLayout>(dstMask, srcMask);
+        } else if constexpr (srcSize == 4 && dstSize == 2) {
+            AdjustMask_b32_b16<srcLayout>(dstMask, srcMask);
+        } else if constexpr (srcSize == 2 && dstSize == 1) {
+            AdjustMask_b16_b8<srcLayout>(dstMask, srcMask);
+        } else {
+            dstMask = srcMask;
+        }
+    } else if constexpr (srcSize < dstSize) {
+        if constexpr (srcSize == 1 && dstSize == 4) {
+            AdjustMask_b8_b32<srcLayout>(dstMask, srcMask);
+        } else if constexpr (srcSize == 1 && dstSize == 2) {
+            AdjustMask_b8_b16<srcLayout>(dstMask, srcMask);
+        } else if constexpr (srcSize == 2 && dstSize == 4) {
+            AdjustMask_b16_b32<srcLayout>(dstMask, srcMask);
+        } else {
+            dstMask = srcMask;
+        }
+    } else {
+        dstMask = srcMask;
+    }
+}
+
+
+template <typename T = DefaultType, typename U = DefaultType, RegLayout srcLayout = RegLayout::ZERO,
+        MaskMergeMode mode = MaskMergeMode::MERGING, typename RegT>
+__simd_callee__ inline void CopyMergingImpl(RegT& dstReg, RegT& srcReg, MaskReg& mask)
 {
     using ActualT = typename RegT::ActualT;
     constexpr auto modeValue = GetMaskMergeMode<mode>();
+    MaskReg adjustedMask;
+    AdjustMask<ActualT, U, srcLayout>(adjustedMask, mask);
     if constexpr (IsSameType<ActualT, bool>::value) {
-        vmov((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, modeValue);
+        vmov((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, adjustedMask, modeValue);
     } else if constexpr (sizeof(ActualT) == 1) {
-        vmov((RegTensor<uint8_t>&)dstReg, (RegTensor<uint8_t>&)srcReg, mask, modeValue);
+        vmov((RegTensor<uint8_t>&)dstReg, (RegTensor<uint8_t>&)srcReg, adjustedMask, modeValue);
     } else if constexpr (sizeof(ActualT) == 2) {
-        vmov((RegTensor<uint16_t>&)dstReg, (RegTensor<uint16_t>&)srcReg, mask, modeValue);
+        vmov((RegTensor<uint16_t>&)dstReg, (RegTensor<uint16_t>&)srcReg, adjustedMask, modeValue);
     } else if constexpr (sizeof(ActualT) == 4) {
-        vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, mask, modeValue);
+        vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, adjustedMask, modeValue);
     } else if constexpr (sizeof(ActualT) == 8) {
         if constexpr (CheckRegTrait<RegT, RegTraitNumOne>()) {
             constexpr auto lowerDist =
@@ -167,12 +307,12 @@ __simd_callee__ inline void CopyMerging(RegT& dstReg, RegT& srcReg, MaskReg& mas
             MaskReg dstMask;
             MaskReg tmpMask;
             MaskReg dumpMask;
-            ppack(tmpMask, mask, lowerDist);
+            ppack(tmpMask, adjustedMask, lowerDist);
             pintlv_b32(dstMask, dumpMask, tmpMask, tmpMask);
             vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, dstMask, modeValue);
         } else if constexpr (CheckRegTrait<RegT, RegTraitNumTwo>()) {
-            vmov((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], mask, modeValue);
-            vmov((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, modeValue);
+            vmov((RegTensor<uint32_t> &)dstReg.reg[0], (RegTensor<uint32_t> &)srcReg.reg[0], adjustedMask, modeValue);
+            vmov((RegTensor<uint32_t> &)dstReg.reg[1], (RegTensor<uint32_t> &)srcReg.reg[1], adjustedMask, modeValue);
         }
     }
 }
