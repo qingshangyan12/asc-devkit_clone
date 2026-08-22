@@ -423,10 +423,6 @@ bool ResourceManifestValidator::ValidateCommand(const Json& command, std::set<st
     if (!CheckAndLog(command.is_object(), __LINE__, "invalid command: expected an object") ||
         !CheckAndLog(command.contains("type"), __LINE__, "missing required command field: type") ||
         !CheckAndLog(command.at("type").is_string(), __LINE__, "invalid command type: expected a string") ||
-        !CheckAndLog(command.contains("stage"), __LINE__, "missing required command field: stage") ||
-        !CheckAndLog(
-            command.at("stage").is_number_unsigned(), __LINE__,
-            "invalid command stage: expected an unsigned integer") ||
         !CheckAndLog(command.contains("cmd"), __LINE__, "missing required command field: cmd") ||
         !CheckAndLog(command.at("cmd").is_array(), __LINE__, "invalid command field cmd: expected an array")) {
         return false;
