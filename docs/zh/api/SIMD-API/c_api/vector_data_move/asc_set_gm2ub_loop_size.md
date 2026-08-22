@@ -26,26 +26,29 @@
 
 ## 功能说明
 
-将数据从Global Memory (GM)搬运到Unified Buffer（UB）时，通过调用该接口设置数据搬运流程中的循环次数。
+将数据从Global Memory（GM）搬运到Unified Buffer（UB）时，通过调用该接口设置数据搬运流程中的内层和外层循环次数。
 
 以源操作数搬运场景为例，如下图所示。
 
 ![源操作数搬运场景示例](../figures/source_operand_move_example.png)
 
+本接口仅在AIV上生效。
+
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_set_gm2ub_loop_size(uint64_t loop1_size, uint64_t loop2_size)
+```c
+__aicore__ inline void asc_set_gm2ub_loop_size(uint64_t loop1_size,
+                                               uint64_t loop2_size)
 ```
 
 ## 参数说明
 
 **表1** 参数说明
 
-|参数名|输入/输出|描述|
-|------------|------------|-----------|
-| loop1_size     | 输入     | 内层循环的循环次数，取值范围为[0, 2^21)。|
-| loop2_size     | 输入     | 外层循环的循环次数，取值范围为[0, 2^21)。|
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| loop1_size | 输入 | 内层循环的循环次数，取值范围为[0, 2^21)。 |
+| loop2_size | 输入 | 外层循环的循环次数，取值范围为[0, 2^21)。 |
 
 ## 返回值说明
 

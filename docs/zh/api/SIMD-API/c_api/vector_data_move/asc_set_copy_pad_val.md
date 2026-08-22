@@ -26,26 +26,30 @@
 
 ## 功能说明
 
-和asc_copy_gm2ub_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。
+该接口与`asc_copy_gm2ub_align`配合使用，用于设置连续搬运数据块左右两侧的填充值。
 
 <!-- npu="950" id10 -->
 
 对于Ascend 950PR/Ascend 950DT产品：
-- 该接口仅对asc_copy_gm2ub_align接口有效。
-- fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t类型的数据需转换成int8_t类型后再调用本接口。
+
+- 该接口仅对`asc_copy_gm2ub_align`接口有效。
+- `fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`类型的数据需转换成`int8_t`类型后再调用本接口。
 <!-- end id10 -->
+
+本接口仅在AIV上生效。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_set_copy_pad_val(int8_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(uint8_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(int16_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(uint16_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(half pad_value)
-__aicore__ inline void asc_set_copy_pad_val(bfloat16_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(int32_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value)
+```c
+__aicore__ inline void asc_set_copy_pad_val(<dtype> pad_value)
+```
+
+**dtype取值如下：**`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+**典型示例**
+
+```c
+// 示例：设置float类型的填充值
 __aicore__ inline void asc_set_copy_pad_val(float pad_value)
 ```
 
@@ -53,9 +57,9 @@ __aicore__ inline void asc_set_copy_pad_val(float pad_value)
 
 **表1** 参数说明
 
-|参数名|输入/输出|描述|
-|------------|------------|-----------|
-| pad_value     | 输入     | 需要填补的数据值。|
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| pad_value | 输入 | 需要填补的数据值。 |
 
 ## 返回值说明
 

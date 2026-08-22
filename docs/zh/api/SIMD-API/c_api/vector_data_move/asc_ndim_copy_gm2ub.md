@@ -26,23 +26,26 @@
 
 ## 功能说明
 
-多维数据搬运接口，将数据从Global Memory (GM)搬运到Unified Buffer（UB）。相比于基础数据搬移接口，可以更加自由配置搬入的维度信息。
-本功能最多能处理5个维度，每个维度都可以单独配置Stride，且支持随路Padding功能。相关配置参数有很多，需要通过不同的接口传入。
+该接口用于将多维数据从Global Memory（GM）搬运到Unified Buffer（UB）。相比基础数据搬运接口，本接口可以灵活配置搬入数据的维度信息。
 
-**表1** Stride配置涉及的所有参数及其传入接口，其中i表示第i维，可取值[0,4]
-| 参数 | 传入接口 | 描述 |
-| :--- | :------- | :--- |
-| loopi_size | 本接口 | 表示每个维度内，处理的元素个数（不包含Padding元素）。<br> 单位为元素个数，取值范围为[1, 2^20-1]。 |
-| loopi_src_stride | [asc_set_ndim_loopi_stride](./asc_set_ndim_loop_stride.md) | 表示每个维度内，该源操作数元素与下一个元素间的间隔。<br> 单位为元素个数，取值范围为[0, 2^40-1]。 |
-| loopi_dst_stride | [asc_set_ndim_loopi_stride](./asc_set_ndim_loop_stride.md) | 表示每个维度内，该目的操作数元素与下一个元素间的间隔。<br> 单位为元素个数，取值范围为[0, 2^20-1]。 |
+本接口最多支持5个维度，每个维度均可单独配置Stride，并支持随路Padding功能。相关配置参数需通过本接口及配套配置接口传入。
 
-**表2** Padding配置涉及的所有参数及其传入接口，其中i表示第i维，可取值[0,4]
+**表1** Stride配置参数及其传入接口，其中`i`表示第`i`维，取值范围为[0, 4]
+
 | 参数 | 传入接口 | 描述 |
-| :--- | :------- | :--- |
-| padding_mode | 本接口 | 表示Padding值填取方式，类型为bool。<br>&bull; true：使用常数填充方式，即所有Padding值为固定值pad_value。<br>&bull; false：使用最近值填充方式，即左右Padding值会选取当前维度最左或最右的值进行填充。 |
-| pad_value | [asc_set_ndim_pad_value](./asc_set_ndim_pad_value.md) | 当padding_mode为true时，该值将作为Padding的填充固定值。当padding_mode为false时，该值不生效。 |
-| loopi_lp_count | <br>&bull; 0维：本接口 <br>&bull; 1至4维：[asc_set_ndim_pad_count](./asc_set_ndim_pad_count.md) | 表示每个维度内，左侧需要补齐的元素个数。<br> 单位为元素个数，取值范围为[0, 255]。 |
-| loopi_rp_count | <br>&bull; 0维：本接口 <br>&bull; 1至4维：[asc_set_ndim_pad_count](./asc_set_ndim_pad_count.md) | 表示每个维度内，右侧需要补齐的元素个数。<br> 单位为元素个数，取值范围为[0, 255]。 |
+|---|---|---|
+| loopi_size | 本接口 | 每个维度内处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, 2^20-1]。 |
+| loopi_src_stride | [asc_set_ndim_loopi_stride](./asc_set_ndim_loop_stride.md) | 每个维度内，当前源操作数元素与下一个元素间的间隔。<br>单位为元素个数，取值范围为[0, 2^40-1]。 |
+| loopi_dst_stride | [asc_set_ndim_loopi_stride](./asc_set_ndim_loop_stride.md) | 每个维度内，当前目的操作数元素与下一个元素间的间隔。<br>单位为元素个数，取值范围为[0, 2^20-1]。 |
+
+**表2** Padding配置参数及其传入接口，其中`i`表示第`i`维，取值范围为[0, 4]
+
+| 参数 | 传入接口 | 描述 |
+|---|---|---|
+| padding_mode | 本接口 | Padding值的填充方式，类型为`bool`。<br>&bull; `true`：使用常数填充，所有Padding值均为固定值`pad_value`。<br>&bull; `false`：使用最近值填充，左右Padding值选取当前维度最左侧或最右侧的值。 |
+| pad_value | [asc_set_ndim_pad_value](./asc_set_ndim_pad_value.md) | 当`padding_mode`为`true`时，该值作为Padding的固定填充值；当`padding_mode`为`false`时，该值不生效。 |
+| loopi_lp_count | <br>&bull; 0维：本接口<br>&bull; 1至4维：[asc_set_ndim_pad_count](./asc_set_ndim_pad_count.md) | 每个维度左侧需要补齐的元素个数。<br>单位为元素个数，取值范围为[0, 255]。 |
+| loopi_rp_count | <br>&bull; 0维：本接口<br>&bull; 1至4维：[asc_set_ndim_pad_count](./asc_set_ndim_pad_count.md) | 每个维度右侧需要补齐的元素个数。<br>单位为元素个数，取值范围为[0, 255]。 |
 
 以下以2维的例子，介绍几个典型使用场景。
 
@@ -58,64 +61,86 @@
 - 2D Slice场景
 ![ ](../figures/asc_ndim_copy_gm2ub_2d_slice.png)
 
-- 2D BroadCast场景
+- 2D Broadcast场景
 ![ ](../figures/asc_ndim_copy_gm2ub_2d_broadcast.png)
+
+本接口仅在AIV上生效。
 
 ## 函数原型
 
-```cpp
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t* dst, __gm__ fp8_e8m0_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ half* dst, __gm__ half* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ float* dst, __gm__ float* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
+### L2 Cache枚举配置（占位符形式）
+
+```c
+__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ <dtype>* dst,
+                                           __gm__ <dtype>* src,
+                                           uint32_t loop0_size,
+                                           uint32_t loop1_size,
+                                           uint32_t loop2_size,
+                                           uint32_t loop3_size,
+                                           uint32_t loop4_size,
+                                           uint8_t loop0_lp_count,
+                                           uint8_t loop0_rp_count,
+                                           bool padding_mode,
+                                           asc_load_l2_cache_mode l2_cache_mode)
 ```
 
-**以下函数原型已废弃，请使用asc_load_l2_cache_mode类型枚举值进行L2 Cache管理策略配置。**
+**dtype取值如下：**`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
-```cpp
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t* dst, __gm__ fp8_e8m0_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ half* dst, __gm__ half* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ float* dst, __gm__ float* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+**典型示例**
+
+```c
+// 示例：源与目的数据类型为half
+__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ half* dst,
+                                           __gm__ half* src,
+                                           uint32_t loop0_size,
+                                           uint32_t loop1_size,
+                                           uint32_t loop2_size,
+                                           uint32_t loop3_size,
+                                           uint32_t loop4_size,
+                                           uint8_t loop0_lp_count,
+                                           uint8_t loop0_rp_count,
+                                           bool padding_mode,
+                                           asc_load_l2_cache_mode l2_cache_mode)
 ```
+
+### 已废弃原型（占位符形式）
+
+**以下函数原型已废弃，请使用`asc_load_l2_cache_mode`类型的枚举值配置L2 Cache管理策略。**
+
+```c
+__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ <dtype>* dst,
+                                           __gm__ <dtype>* src,
+                                           uint32_t loop0_size,
+                                           uint32_t loop1_size,
+                                           uint32_t loop2_size,
+                                           uint32_t loop3_size,
+                                           uint32_t loop4_size,
+                                           uint8_t loop0_lp_count,
+                                           uint8_t loop0_rp_count,
+                                           bool padding_mode,
+                                           uint8_t cache_mode)
+```
+
+**dtype取值如下：**`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ## 参数说明
 
 **表3** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-| :--- | :--- | :--- |
-| dst | 输出 | 目的UB地址。 |
-| src | 输入 | 源GM地址。 |
-| loop0_size | 输入 | 表示0维处理的元素个数（不包含Padding元素）。<br> 单位为元素个数，取值范围为[1, 2^20-1]。 |
-| loop1_size | 输入 | 表示1维处理的元素个数（不包含Padding元素）。<br> 单位为元素个数，取值范围为[1, 2^20-1]。 |
-| loop2_size | 输入 | 表示2维处理的元素个数（不包含Padding元素）。<br> 单位为元素个数，取值范围为[1, 2^20-1]。 |
-| loop3_size | 输入 | 表示3维处理的元素个数（不包含Padding元素）。<br> 单位为元素个数，取值范围为[1, 2^20-1]。 |
-| loop4_size | 输入 | 表示4维处理的元素个数（不包含Padding元素）。<br> 单位为元素个数，取值范围为[1, 2^20-1]。 |
-| loop0_lp_count | 输入 | 表示0维左侧需要补齐的元素个数。<br> 单位为元素个数，取值范围为[0, 255]。 |
-| loop0_rp_count | 输入 | 表示0维右侧需要补齐的元素个数。<br> 单位为元素个数，取值范围为[0, 255]。 |
-| padding_mode | 输入 | 表示Padding值填取方式。<br>&bull; true：使用常数填充方式，即所有Padding值为固定值pad_value。<br>&bull; false：使用最近值填充方式，即左右Padding值会选取当前维度最左或最右的值进行填充。 |
-| l2_cache_mode | 输入 | [asc_load_l2_cache_mode](../enum/asc_load_l2_cache_mode.md)类型的枚举值，配置数据在L2 Cache中的管理策略。 |
+|---|---|---|
+| dst | 输出 | 目的地址（UB）。 |
+| src | 输入 | 源地址（GM）。 |
+| loop0_size | 输入 | 0维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, 2^20-1]。 |
+| loop1_size | 输入 | 1维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, 2^20-1]。 |
+| loop2_size | 输入 | 2维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, 2^20-1]。 |
+| loop3_size | 输入 | 3维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, 2^20-1]。 |
+| loop4_size | 输入 | 4维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, 2^20-1]。 |
+| loop0_lp_count | 输入 | 0维左侧需要补齐的元素个数。<br>单位为元素个数，取值范围为[0, 255]。 |
+| loop0_rp_count | 输入 | 0维右侧需要补齐的元素个数。<br>单位为元素个数，取值范围为[0, 255]。 |
+| padding_mode | 输入 | Padding值的填充方式。<br>&bull; `true`：使用常数填充，所有Padding值均为固定值`pad_value`。<br>&bull; `false`：使用最近值填充，左右Padding值选取当前维度最左侧或最右侧的值。 |
+| l2_cache_mode | 输入 | [asc_load_l2_cache_mode](../enum/asc_load_l2_cache_mode.md)类型的枚举值，用于配置数据在L2 Cache中的管理策略。 |
+| cache_mode | 输入 | 已废弃的L2 Cache管理策略配置参数，请改用`l2_cache_mode`。 |
 
 ## 返回值说明
 

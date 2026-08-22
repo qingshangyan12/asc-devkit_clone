@@ -26,26 +26,37 @@
 
 ## 功能说明
 
-将数据从Global Memory (GM) 搬运到 Unified Buffer（UB）。
+将数据从Global Memory（GM）搬运到Unified Buffer（UB）。
+
+本接口仅在AIV上生效。
 
 ## 函数原型
 
-- 前n个数据搬运
+### 连续数据搬运
 
-```cpp
-__aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+```c
+__aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
+                                      __gm__ void* src,
+                                      uint32_t size)
 ```
 
-- 高维切分搬运
+### 高维切分数据搬运
 
-```cpp
-__aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_stride, uint16_t dst_stride)
+```c
+__aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
+                                      __gm__ void* src,
+                                      uint16_t n_burst,
+                                      uint16_t len_burst,
+                                      uint16_t src_stride,
+                                      uint16_t dst_stride)
 ```
 
-- 同步计算
+### 同步数据搬运
 
-```cpp
-__aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+```c
+__aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst,
+                                           __gm__ void* src,
+                                           uint32_t size)
 ```
 
 ## 参数说明
@@ -53,12 +64,12 @@ __aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst, __gm__ void* src,
 **表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-| :--- | :--- | :--- |
-| dst | 输出 | 目的UB地址。 |
-| src | 输入 | 源GM地址。 |
-| size | 输入 | 搬运数据大小（字节）。 |
-| n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
-| len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[1, 2097151]。 |
+|---|---|---|
+| dst | 输出 | 目的地址（UB）。 |
+| src | 输入 | 源地址（GM）。 |
+| size | 输入 | 搬运数据大小，单位为字节。 |
+| n_burst | 输入 | 待搬运的连续传输数据块个数，取值范围为[1, 4095]。 |
+| len_burst | 输入 | 每个连续传输数据块的长度，单位为字节，取值范围为[1, 2097151]。 |
 | src_stride | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为字节。 |
 | dst_stride | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为字节。 |
 
