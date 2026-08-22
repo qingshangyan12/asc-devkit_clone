@@ -369,10 +369,7 @@ class SingleOpCompile:
             OpcOptions.RELOCATABLE_BIN, False
         )
         kernel_spec_mode = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC, "None")
-        if kernel_spec_mode == "None":
-            enable_super_kernel = op_relocatable_bin
-        else:
-            enable_super_kernel = kernel_spec_mode == "SK"
+        enable_super_kernel = op_relocatable_bin or (kernel_spec_mode == "SK")
         logger.debug(
             "debug_config {}, enable_super_kernel {}.".format(
                 debug_config, enable_super_kernel
