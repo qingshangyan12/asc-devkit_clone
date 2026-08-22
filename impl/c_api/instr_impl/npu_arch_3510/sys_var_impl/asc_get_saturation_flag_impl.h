@@ -29,8 +29,8 @@ __aicore__ inline bool asc_get_saturation_flag_impl(asc_saturation_mode saturati
 {
     // Enum underlying values are CTRL bit indices. INT: 1=sat; FLOAT/FLOAT8/CAST: 0=sat.
     const uint8_t bit = static_cast<uint8_t>(saturation_mode);
-    const bool hw_bit = ((get_ctrl() >> bit) & 1) != 0;
-    return (saturation_mode == asc_saturation_mode::INT) ? hw_bit : !hw_bit;
+    const bool is_bit_set = ((get_ctrl() >> bit) & 1) != 0;
+    return (saturation_mode == asc_saturation_mode::INT) ? is_bit_set : !is_bit_set;
 }
 
 #endif

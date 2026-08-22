@@ -29,11 +29,7 @@ __aicore__ inline void asc_set_saturation_strategy_impl(asc_override_strategy st
 {
     // CTRL[60]: 0 => USE_API, 1 => USE_GLOBAL. Aligns with AscendC::SetSaturationStrategy.
     int64_t ctrl_value = get_ctrl();
-    if (strategy == asc_override_strategy::USE_API) {
-        set_ctrl(sbitset0(ctrl_value, 60));
-    } else {
-        set_ctrl(sbitset1(ctrl_value, 60));
-    }
+    set_ctrl(strategy == asc_override_strategy::USE_API ? sbitset0(ctrl_value, 60) : sbitset1(ctrl_value, 60));
 }
 
 #endif
