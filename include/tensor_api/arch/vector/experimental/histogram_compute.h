@@ -20,6 +20,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 enum class histogram_half {
     low,
@@ -42,6 +43,7 @@ template <const histogram_options& options = default_histogram_options>
 __simd_callee__ inline decltype(auto) histograms(
     const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src);
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

@@ -48,7 +48,7 @@ This sample demonstrates scalar left-shift on register tensors with Tensor API. 
     1. Create Tensor objects on GM and UB by using `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout`.
     2. Move input data from GM to UB by using `asc::te::make_copy` and `asc::te::copy`.
     3. Load UB Tensor data as `reg_tensor` by using Tensor `load`, and use `make_mask<mask_pattern::vl64, T>()` to select 64 elements.
-    4. Execute `value << 1` and store the result back to UB by using Tensor `store`.
+    4. Import `asc::te::experimental::operator<<`, execute `value << 1`, and store the result back to UB by using Tensor `store`.
     5. Move the result from UB back to GM by using `asc::te::copy`.
 
   - Invocation implementation
@@ -57,7 +57,7 @@ This sample demonstrates scalar left-shift on register tensors with Tensor API. 
 
 ## Core Interface
 
-### operator<<
+### asc::te::experimental::operator<<
 
 ```cpp
 template <typename T, typename U>

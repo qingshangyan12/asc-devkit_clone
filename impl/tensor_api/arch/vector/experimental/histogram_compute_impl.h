@@ -22,6 +22,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <const histogram_options& options>
 __simd_callee__ inline decltype(auto) histograms(
@@ -49,6 +50,7 @@ __simd_callee__ inline decltype(auto) histograms(
     return result;
 }
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

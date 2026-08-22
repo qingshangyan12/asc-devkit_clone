@@ -22,9 +22,6 @@ namespace asc {
 namespace te {
 
 template <typename DataType>
-struct reg_tensor;
-
-template <typename DataType>
 struct reg_tensor {
     using elem_type = DataType;
     using reg_type = typename detail::type_get<elem_type>::type;

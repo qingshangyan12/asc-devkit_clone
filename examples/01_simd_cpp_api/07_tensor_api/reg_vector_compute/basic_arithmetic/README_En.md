@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates the register basic compute API `asc::te::abs` with Tensor API. It covers `int8_t`, `int16_t`, `half`, `int32_t`, and `float`. Each typed input contains 64 elements, and the output stores the absolute value of each input element.
+This sample demonstrates the register basic compute API `asc::te::experimental::abs` with Tensor API. It covers `int8_t`, `int16_t`, `half`, `int32_t`, and `float`. Each typed input contains 64 elements, and the output stores the absolute value of each input element.
 
 ## Supported Products
 
@@ -48,7 +48,7 @@ This sample demonstrates the register basic compute API `asc::te::abs` with Tens
     1. Create Tensor objects on GM and UB by using `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout`.
     2. Move input data from GM to UB by using `asc::te::make_copy` and `asc::te::copy`.
     3. Load UB Tensor data as `reg_tensor` by using Tensor `load`, and use `make_mask<mask_pattern::vl64, T>()` to select 64 elements.
-    4. Call `asc::te::abs` and store the result back to UB by using Tensor `store`.
+    4. Call `asc::te::experimental::abs` and store the result back to UB by using Tensor `store`.
     5. Move the result from UB back to GM by using `asc::te::copy`.
 
   - Invocation implementation
@@ -57,7 +57,7 @@ This sample demonstrates the register basic compute API `asc::te::abs` with Tens
 
 ## Core Interface
 
-### asc::te::abs
+### asc::te::experimental::abs
 
 ```cpp
 template <typename T>
