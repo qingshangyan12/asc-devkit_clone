@@ -92,11 +92,11 @@ y[i] = cast<To, Options>(x[i])
   - Key Kernel Steps
 
     1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct two-dimensional tensors in GM and UB.
-    2. Use `asc::te::copy` to move the input from GM to UB, and use `asc_sync_notify/asc_sync_wait` to synchronize the MTE2 and Vector pipelines.
+    2. Wrap the MTE2 pipeline with `asc_lock/asc_unlock`, and use `asc::te::copy` to move the input from GM to UB.
     3. Calculate the number of elements processed by each register operation based on the larger width of the source and destination types, and use `asc::te::update_mask` to set the valid-element mask.
     4. Use a normal `load` for equal-width conversions, `unpack` or `unpack4` load modes for widening conversions, and `pack` or `pack_quarter` store modes for narrowing conversions.
     5. Call `asc::te::cast` with C++17 template parameters to perform register data type conversion.
-    6. Use `asc_sync_notify/asc_sync_wait` to synchronize the Vector and MTE3 pipelines, and then move the result from UB to GM.
+    6. Lock the Vector and MTE3 pipelines in sequence with the same mutex, and then move the result from UB to GM.
 
     The core conversion code is as follows:
 

@@ -92,11 +92,11 @@ y[i] = cast<To, Options>(x[i])
   - Kernel关键步骤
 
     1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_frame_layout` 构造GM、UB上的二维Tensor。
-    2. 使用 `asc::te::copy` 将输入从GM搬运到UB，并通过 `asc_sync_notify/asc_sync_wait` 完成MTE2到Vector流水同步。
+    2. 使用 `asc_lock/asc_unlock` 包围MTE2流水，通过 `asc::te::copy` 将输入从GM搬运到UB。
     3. 根据源类型和目标类型的较大位宽计算单次寄存器处理元素数，使用 `asc::te::update_mask` 设置有效元素掩码。
     4. 相同位宽使用普通 `load`；扩宽转换使用 `unpack` 或 `unpack4` 模式加载；窄化转换使用 `pack` 或 `pack_quarter` 模式存储。
     5. 调用C++17模板参数形式的 `asc::te::cast` 完成寄存器类型转换。
-    6. 通过 `asc_sync_notify/asc_sync_wait` 完成Vector到MTE3流水同步，再将结果从UB搬运回GM。
+    6. 使用同一个mutex依次锁定Vector和MTE3流水，再将结果从UB搬运回GM。
 
     核心转换代码如下：
 
