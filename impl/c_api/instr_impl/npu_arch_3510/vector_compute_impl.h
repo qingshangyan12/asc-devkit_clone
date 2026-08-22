@@ -10523,6 +10523,55 @@ __simd_callee__ inline void asc_fma(
     asc_fma_impl(dst, src0, src1, mask);
 }
 
+__simd_callee__ inline vector_bfloat16_t asc_fma(
+    vector_bfloat16_t dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+{
+    asc_fma_impl(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_half asc_fma(
+    vector_half dst, vector_half src0, vector_half src1, vector_bool mask)
+{
+    asc_fma_impl(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_float asc_fma(
+    vector_float dst, vector_float src0, vector_float src1, vector_bool mask)
+{
+    asc_fma_impl(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_fma(
+    vector_int16_t dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
+{
+    asc_fma_impl(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint16_t asc_fma(
+    vector_uint16_t dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
+{
+    asc_fma_impl(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_fma(
+    vector_int32_t dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+{
+    asc_fma_impl(dst, src0, src1, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint32_t asc_fma(
+    vector_uint32_t dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+{
+    asc_fma_impl(dst, src0, src1, mask);
+    return dst;
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

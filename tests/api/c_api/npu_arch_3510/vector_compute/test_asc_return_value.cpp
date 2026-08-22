@@ -107,6 +107,38 @@
         GlobalMockObject::verify();                                                                       \
     }
 
+// ==========fma: mock(dst&, src0, src1, mask, Literal)==========
+#define TEST_VECTOR_COMPUTE_FMA_RET_INSTR(class_name, c_api_name, cce_name, data_type)                    \
+                                                                                                          \
+    class TestVectorCompute##class_name##_##data_type##_CApi : public testing::Test {                     \
+    protected:                                                                                            \
+        void SetUp() {}                                                                                   \
+        void TearDown() {}                                                                                \
+    };                                                                                                    \
+                                                                                                          \
+    namespace {                                                                                           \
+    void cce_name##ReturnValue##_##data_type##_Stub(                                                      \
+        data_type& dst, data_type src0, data_type src1, vector_bool mask, Literal mode)                   \
+    {}                                                                                                    \
+    }                                                                                                     \
+                                                                                                          \
+    TEST_F(TestVectorCompute##class_name##_##data_type##_CApi, c_api_name##ReturnValue##_##data_type##_Succ) \
+    {                                                                                                     \
+        data_type dstSrc;                                                                                 \
+        data_type src0;                                                                                   \
+        data_type src1;                                                                                   \
+        vector_bool mask;                                                                                 \
+                                                                                                          \
+        MOCKER_CPP(cce_name, void(data_type&, data_type, data_type, vector_bool, Literal))                \
+            .times(1)                                                                                     \
+            .will(invoke(cce_name##ReturnValue##_##data_type##_Stub));                                    \
+                                                                                                          \
+        data_type (*func)(data_type, data_type, data_type, vector_bool) = c_api_name;                     \
+        data_type dst = func(dstSrc, src0, src1, mask);                                                   \
+        (void)dst;                                                                                        \
+        GlobalMockObject::verify();                                                                       \
+    }
+
 // ==========exp_sub: mock(dst&, src0, src1, mask, int)==========
 #define TEST_VECTOR_COMPUTE_EXP_SUB_RET_INSTR(class_name, c_api_name, cce_name, ret_type, data_type) \
                                                                                                      \
@@ -458,6 +490,15 @@ TEST_VECTOR_COMPUTE_RET_REDUCE_SUM_INSTR(Vcgadd, asc_reduce_sum_datablock, vcgad
 // ==========asc_abs_sub==========
 TEST_VECTOR_COMPUTE_BINARY_RET_INSTR(Vabsdif, asc_abs_sub, vabsdif, vector_half, vector_half);
 TEST_VECTOR_COMPUTE_BINARY_RET_INSTR(Vabsdif, asc_abs_sub, vabsdif, vector_float, vector_float);
+
+// ==========asc_fma==========
+TEST_VECTOR_COMPUTE_FMA_RET_INSTR(Vmula, asc_fma, vmula, vector_bfloat16_t);
+TEST_VECTOR_COMPUTE_FMA_RET_INSTR(Vmula, asc_fma, vmula, vector_half);
+TEST_VECTOR_COMPUTE_FMA_RET_INSTR(Vmula, asc_fma, vmula, vector_float);
+TEST_VECTOR_COMPUTE_FMA_RET_INSTR(Vmula, asc_fma, vmula, vector_int16_t);
+TEST_VECTOR_COMPUTE_FMA_RET_INSTR(Vmula, asc_fma, vmula, vector_uint16_t);
+TEST_VECTOR_COMPUTE_FMA_RET_INSTR(Vmula, asc_fma, vmula, vector_int32_t);
+TEST_VECTOR_COMPUTE_FMA_RET_INSTR(Vmula, asc_fma, vmula, vector_uint32_t);
 
 // ==========asc_exp_sub==========
 TEST_VECTOR_COMPUTE_EXP_SUB_RET_INSTR(Vexpdif, asc_exp_sub, vexpdif, vector_float, vector_float);
