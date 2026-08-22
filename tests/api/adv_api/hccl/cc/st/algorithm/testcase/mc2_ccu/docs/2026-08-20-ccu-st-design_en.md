@@ -41,7 +41,8 @@
 - [14. Guide to Adding New CCU Hardware Primitives](#14-guide-to-adding-new-ccu-hardware-primitives)
 - [15. Guide to Adding New Communication Primitives](#15-guide-to-adding-new-communication-primitives)
 - [16. Loop Engine Simulation](#16-loop-engine-simulation)
-- [17. Boundary Declaration](#17-boundary-declaration)
+- [17. CCU Primitive Simulation vs hcomm](#17-ccu-primitive-simulation-vs-hcomm)
+- [18. Boundary Declaration](#18-boundary-declaration)
 
 ---
 
@@ -989,7 +990,50 @@ Total transfer = 1 × 1 × 100 = 100B ✓
 
 ---
 
-## 17. Boundary Declaration
+## 17. CCU Primitive Simulation vs hcomm
+
+This section compares each CCU primitive's simulation logic between the ST framework (asc-devkit) and hcomm's `CcuSimulator`, confirming semantic consistency.
+
+Reference code:
+- asc-devkit: `ccu_primitives_stub.h/.cc` (IR generation), `ccu_sim_world.cc` (execution)
+- hcomm: `ccu_primitives.hpp` (primitives), `ccu_kernel.cc` (Rep generation), `ccu_simulator.cc` + `XxxExecutor` (execution)
+
+### 17.1 Comparison Summary
+
+| # | Primitive | Consistency | Test Case | Key Difference |
+|---|-----------|-------------|-----------|----------------|
+| 1 | Variable ops | ✅ Consistent | Variable_AssignImm, Variable_AssignVar_And_Add | Flat OpCode vs polymorphic Rep + deferred objects |
+| 2 | Address ops | ✅ Consistent | Address_AssignAndAdd | hcomm has 4 extra overloads (addr=imm, addr+addr, etc.) |
+| 3 | LoadArg | ✅ Consistent | LoadArg_MultipleArgs | Same argId split logic (13 slot/SQE_ARGS_LEN) |
+| 4 | Load/Store | ✅ Consistent | LoadStore_RoundTrip | hcomm supports immediate address; asc-devkit only Variable |
+| 5 | WriteVariableWithNotify | ✅ Consistent | WriteVariableWithNotify_2Rank | Direct map write vs SyncXn microcode |
+| 6 | NotifyWait/Record | ✅ Consistent | NotifyRecordWait_2Rank | notifies map vs CKE signal |
+| 7 | EventRecord/Wait | ✅ Consistent | EventRecordWait_SingleRank | events map vs CKE signal |
+| 8 | Write (cross-rank) | ✅ Consistent | Write_CrossRank_256B | hcomm supports reduce; asc-devkit pure copy |
+| 9 | LocalCopy (Mem→Mem) | ✅ Consistent | LocalCopy_MemToMem_256B | Direct memmove + set event |
+| 10 | LocalCopy (Buffer↔Mem) | ✅ Consistent | LocalCopy_BufferRelay_256B | state.buffers vs MS array |
+| 11 | Write with CcuBuffer | ✅ Consistent | Write_FromBuffer_2Rank_256B | Generic path supports buffer indexing |
+| 12 | CCU_IF/ELSE | ✅ Consistent | IfElse_BranchSelect, IfElse_ElseBranch | peerIndex jump vs Label+Jump microcode |
+| 13 | CCU_WHILE | ✅ Consistent | While_Loop_Sum | Same as IF, peerIndex back-jump |
+| 14 | GetResByChannel | ✅ Consistent | GetResByChannel_2Rank | Logical map vs Xn register binding |
+| 15 | GroupCopy + Loop Engine | ✅ Consistent | 24 AllToAll cases | See [§16](#16-loop-engine-simulation) |
+
+### 17.2 Engineering Differences Summary
+
+| Dimension | asc-devkit | hcomm |
+|-----------|-----------|-------|
+| IR type | Flat `Operation` array + `OpCode` enum | Polymorphic `CcuRepBase` tree → `CcuInstr` microcode |
+| Execution | switch-case interpreter + round-robin | Factory pattern Executor + state machine |
+| Resource model | `RankState` map (variables/addresses/events/buffers) | `CcuResourceManager` (XN/GSA/CKE/MS arrays) |
+| Multi-rank | Built-in round-robin + deadlock detection | Single rank, multi-rank by upper layer |
+| Reduce | Simplified to Copy | Actual FP16/FP32/BF16 computation |
+| Validation | Four layers (compile→resource→runtime→DAG+semantics) | Basic execution check + profiling |
+
+**Conclusion**: All 15 CCU primitive simulation semantics are consistent with hcomm `CcuSimulator`. Differences are only in engineering implementation (flat IR vs tree Rep, switch-case vs factory dispatch, map vs array), not affecting verification correctness.
+
+---
+
+## 18. Boundary Declaration
 
 ### 16.1 Coverage
 

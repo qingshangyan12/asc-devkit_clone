@@ -31,7 +31,8 @@
 - [14. 新增 CCU 硬件原语接入指南](#14-新增-ccu-硬件原语接入指南)
 - [15. 新增通信原语接入指南](#15-新增通信原语接入指南)
 - [16. Loop Engine 仿真](#16-loop-engine-仿真)
-- [17. 边界声明](#17-边界声明)
+- [17. CCU 原语模拟与 hcomm 对比](#17-ccu-原语模拟与-hcomm-对比)
+- [18. 边界声明](#18-边界声明)
 
 ---
 
@@ -979,7 +980,194 @@ idx=0: loop 0, round 0 → addrOffset=0, 搬运 100 字节
 
 ---
 
-## 17. 边界声明
+## 17. CCU 原语模拟与 hcomm 对比
+
+本章节逐个对比 ST 框架（asc-devkit）与 hcomm 仓 `CcuSimulator` 中每个 CCU 原语的模拟逻辑，确认语义一致性。
+
+参考代码：
+- asc-devkit: `ccu_primitives_stub.h/.cc`（IR 生成）、`ccu_sim_world.cc`（执行）
+- hcomm: `ccu_primitives.hpp`（原语定义）、`ccu_kernel.cc`（Rep 生成）、`ccu_simulator.cc` + 各 `XxxExecutor`（执行）
+
+### 17.1 对比总表
+
+| # | 原语 | 一致性 | 验证用例 | 关键差异 |
+|---|------|--------|---------|---------|
+| 1 | Variable 运算 | ✅ 一致 | Variable_AssignImm, Variable_AssignVar_And_Add | asc-devkit 扁平 OpCode；hcomm 多态 Rep + 延迟对象 |
+| 2 | Address 运算 | ✅ 一致 | Address_AssignAndAdd | hcomm 额外支持 addr=imm, addr+addr 等 4 种重载 |
+| 3 | LoadArg | ✅ 一致 | LoadArg_MultipleArgs | argId 切分逻辑一致（13 slot/SQE_ARGS_LEN） |
+| 4 | Load/Store | ✅ 一致 | LoadStore_RoundTrip | hcomm 支持立即数地址；asc-devkit 仅变量地址 |
+| 5 | WriteVariableWithNotify | ✅ 一致 | WriteVariableWithNotify_2Rank | asc-devkit 直接写远端 map；hcomm 经 SyncXn 微码 |
+| 6 | NotifyWait/Record | ✅ 一致 | NotifyRecordWait_2Rank | asc-devkit 用 notifies map；hcomm 用 CKE 信号 |
+| 7 | EventRecord/Wait | ✅ 一致 | EventRecordWait_SingleRank | asc-devkit 用 events map；hcomm 用 CKE 信号 |
+| 8 | Write（跨 rank） | ✅ 一致 | Write_CrossRank_256B | hcomm 支持 reduce；asc-devkit 纯拷贝 |
+| 9 | LocalCopy（Mem→Mem） | ✅ 一致 | LocalCopy_MemToMem_256B | 直接 memmove + 设置完成事件 |
+| 10 | LocalCopy（Buffer↔Mem） | ✅ 一致 | LocalCopy_BufferRelay_256B | asc-devkit 用 state.buffers；hcomm 用 MS 数组 |
+| 11 | Write with CcuBuffer | ✅ 一致 | Write_FromBuffer_2Rank_256B | asc-devkit 通用路径支持 buffer 索引 |
+| 12 | CCU_IF/ELSE | ✅ 一致 | IfElse_BranchSelect, IfElse_ElseBranch | asc-devkit 用 peerIndex 跳转；hcomm 用 Label+Jump 微码 |
+| 13 | CCU_WHILE | ✅ 一致 | While_Loop_Sum | 同 IF，asc-devkit 用 peerIndex 回跳 |
+| 14 | GetResByChannel | ✅ 一致 | GetResByChannel_2Rank | asc-devkit 用逻辑 map；hcomm 绑定到 Xn 寄存器 |
+| 15 | GroupCopy + Loop Engine | ✅ 一致 | 24 个 AllToAll 用例 | 参见 [§16](#16-loop-engine-仿真) |
+
+### 17.2 逐原语详细对比
+
+#### 1. Variable 运算
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `ASSIGN_IMM`/`ASSIGN_VAR`/`ADD_VAR` Operation | `CcuRepAssign`/`CcuRepAdd` Rep 节点 |
+| 执行 | `state.variables[dst] = immediate/variables[src0]` | `LoadImdToXn`/`LoadXnXn` 微码 → Xn 寄存器 |
+| `operator+` | 立即生成 `ADD_VAR` IR | 延迟对象，赋值时才生成 `CcuRepAdd` 三参数形式 |
+| `operator==/!=` | 返回 `Condition` 结构体，延迟到 CCU_IF | 返回 `CcuRelationalOperator`，延迟到 IfBegin/WhileBegin |
+
+**语义一致**：变量赋值、加法、比较的最终计算结果相同。
+
+#### 2. Address 运算
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `ADDRESS_ASSIGN_VAR`/`ADDRESS_ASSIGN_ADDRESS`/`ADDRESS_ADD_VAR` | `CcuRepAssign(Address,Variable)` → `LoadXnToGsa`/`LoadGsaToGsa`/`LoadGsaXn` 微码 |
+| 执行 | `state.addresses[dst] = variables/src0` | GSA 寄存器操作 |
+| 支持的重载 | 3 种（=Variable, =Address, +=Variable） | 7 种（额外支持 =imm, +Address, +Variable 等） |
+
+**语义一致**：asc-devkit 支持的 3 种操作与 hcomm 对应操作语义相同。hcomm 更完整但不影响现有 kernel。
+
+#### 3. LoadArg
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `LOAD_ARG` Operation + `RegisterArgument` | `CcuRepLoadArg` Rep → `LoadSqeArgsToXn` 微码 |
+| 执行 | `taskParams[mission].args[slot]` | `GetSqeArgValue(sqeArgId)` |
+| 切分逻辑 | `argId / 13` = mission, `argId % 13` = slot | `argId % CCU_SQE_ARGS_LEN` = slot |
+| 校验 | `Finalize` 检查 argId 连续性 | `ValidateTaskArgs` 检查 `loadArgUsedSet_.size() == argsNum` |
+
+**语义一致**：两者都从任务参数加载到变量寄存器，切分和校验逻辑等价。
+
+#### 4. Load/Store
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `LOAD_MEMORY`/`STORE_MEMORY` Operation | `CcuRepLoad`/`CcuRepStore` Rep |
+| 执行 | `ResolveMemory` + 8 字节 `memcpy` | GSA 地址空间直接读写 |
+| 地址源 | 仅 `Variable address` | 支持 `uint64_t addr` 和 `Variable addrVar` |
+| owner 校验 | 强制地址属于当前 rank | 无此校验 |
+
+**语义一致**：核心语义相同（内存↔变量 8 字节搬运）。差异在地址源类型和 owner 校验。
+
+#### 5. WriteVariableWithNotify
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `WRITE_VARIABLE_NOTIFY` Operation | `CcuRepRemPostVar` Rep → `SyncXn` 微码 |
+| 执行 | 直接写远端 `variables[handle]` + 设置远端 `notifies` | `SyncXnExecutor`：同步 Xn 寄存器值 + 设置远端 CKE |
+| 同步方式 | 同步立即生效（共享 RankState） | 通过 channel 同步（更接近硬件） |
+
+**语义一致**：都将本端变量值写到远端并触发远端 notify 信号。
+
+#### 6. NotifyWait/NotifyRecord
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `NOTIFY_WAIT`/`NOTIFY_RECORD` Operation | `CcuRepRemWaitSem`/`CcuRepRemPostSem` Rep |
+| 执行 | `notifies[{peer,index}]` mask 检查/设置 | CKE 信号 `WaitCkeProcess`/`SetRmtCKE` |
+| Wait 语义 | 阻塞 + 自动清除 mask | 阻塞 + `clearType` 控制清除 |
+| Record 语义 | 设置远端 notify mask | 设置远端 CKE 信号 |
+
+**语义一致**：Record 设置远端信号，Wait 等待并消费本端信号。`clearType=1`（产品代码中默认）时清除行为一致。
+
+#### 7. EventRecord/EventWait
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `EVENT_RECORD`/`EVENT_WAIT` Operation | `CcuRepLocRecordEvent`/`CcuRepLocWaitEvent` Rep |
+| 执行 | `events[handle]` mask 设置/检查 | CKE 信号 `SetCKE`/`WaitCKE` |
+| Wait 语义 | 阻塞 + 自动清除 mask | 阻塞 + `clearType=1` 清除 |
+
+**语义一致**：Record 设置本地事件信号，Wait 等待并消费本地事件信号。
+
+#### 8. Write（跨 rank 数据搬运）
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `WRITE` Operation | `CcuRepBufWrite` Rep → `TransLocMemToRmtMem` 微码 |
+| 执行 | `ResolveMemory` + `memmove` 跨 rank | `TransMemToMem(locAddr, rmtAddr, length)` |
+| rank 校验 | 校验 src 属本端、dst 属远端 | 无此校验 |
+| reduce | 不支持（纯拷贝） | 支持 `reduceEn/reduceOpCode/reduceDataType` |
+
+**语义一致**：跨 rank 数据搬运 + 设置完成事件。hcomm 额外支持 reduce。
+
+#### 9. LocalCopy（Mem→Mem）
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `LOCAL_COPY` Operation | `CcuRepLocCpy` Rep → `TransLocMemToLocMem` 微码 |
+| 执行 | `ResolveMemory` + `memmove` | `TransMemToMem(srcAddr, dstAddr, length)` |
+| rank 校验 | 校验 src/dst 都属本端 | 无此校验 |
+| Loop 偏移 | GROUP_COPY 路径中加 `addrOffset` | `GetLoopGsaAddrOffset()` 通用 |
+
+**语义一致**：本地内存拷贝 + 设置完成事件。
+
+#### 10. LocalCopy（Buffer↔Mem）
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `LOCAL_COPY` Operation（统一 OpCode） | `CcuRepBufLocRead`/`CcuRepBufLocWrite` Rep → `TransLocMemToLocMS`/`TransLocMSToLocMem` 微码 |
+| 执行 | `state.buffers[handle]` + `memmove` | `TransMemToMS(msId)`/`TransMSToMem(msId)` |
+| buffer 索引 | `handle + msOffset * idx` | `msId + msOffset * idx` |
+| MS 容量 | `state.buffers` 动态 resize | 每个 MS 固定 4096 字节 |
+
+**语义一致**：src→buffer→dst 两次搬运，buffer 用 `msOffset * idx` 索引偏移。asc-devkit 的 buffer 动态 resize 不限制 4096 字节，但不影响数据正确性。
+
+#### 11. CCU_IF/CCU_ELSE
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `IF_BEGIN`/`ELSE_BEGIN`/`IF_END` Operation + `peerIndex` | `CcuRepJumpEQ`/`CcuRepJumpNE`/`CcuRepJump` + Label |
+| 执行 | 条件 false → `pc = peerIndex + 1` 跳过 | `JumpExecutor`：条件不满足 → 跳转到目标指令 ID |
+| ELSE 语义 | `ELSE_BEGIN` 跳到 `IF_END` 之后 | 无条件 Jump 跳到 endLabel |
+| 额外特性 | 无 | DoWhile、Label 栈、FlushPendingIfs |
+
+**语义一致**：条件跳转实现 if/else 控制流。hcomm 额外支持 DoWhile 等高级控制流。
+
+#### 12. CCU_WHILE
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `WHILE_BEGIN`/`WHILE_END` Operation + `peerIndex` | `CcuRepJumpEQ/NE`（beginLabel）+ `CcuRepJump`（回跳）+ Label |
+| 执行 | 条件 false → `pc = peerIndex + 1` 跳出；`WHILE_END` → `pc = peerIndex` 回跳 | `JumpExecutor` 跳转 |
+| 回跳 | `WHILE_END` 的 `peerIndex` 指向 `WHILE_BEGIN` | 无条件 Jump 跳回 beginLabel |
+
+**语义一致**：条件循环控制流。
+
+#### 13. GetResByChannel
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 生成 | `GetChannelVariable` → `channelVariables[{peer,index}]` map | `CcuVariableCreateByChannel` → channel 的 `GetLocXnByIndex` |
+| 执行 | `WriteVariableWithNotify` 中查远端 `channelVariables` | `SyncXn` 微码通过 Xn ID 同步 |
+| 映射 | `(peerRank, index) → handle` 逻辑 map | channel → Xn 寄存器 ID 直接绑定 |
+
+**语义一致**：创建与 channel 关联的变量，用于跨 rank 变量同步。
+
+#### 14. GroupCopy + Loop Engine
+
+参见 [§16 Loop Engine 仿真](#16-loop-engine-仿真)。两层嵌套展开、地址偏移公式、buffer 中转、event 同步全部对齐 hcomm `CcuSimulator`。
+
+### 17.3 工程实现差异总结
+
+| 维度 | asc-devkit | hcomm |
+|------|-----------|-------|
+| IR 类型 | 扁平 `Operation` 数组 + `OpCode` 枚举 | 多态 `CcuRepBase` 树 → `CcuInstr` 微码 |
+| 执行模型 | switch-case 解释器 + 轮转调度 | 工厂模式 Executor + 状态机 |
+| 资源模型 | `RankState` map（variables/addresses/events/buffers） | `CcuResourceManager`（XN/GSA/CKE/MS 数组） |
+| 多 rank | 内置轮转调度 + 死锁检测 | 单 rank 执行，多 rank 由上层管理 |
+| Reduce | 简化为 Copy | 实际 FP16/FP32/BF16 计算 |
+| 校验 | 四层（编译→资源→运行→DAG+语义） | 基础执行检查 + profiling |
+
+**结论**：15 类 CCU 原语的模拟语义全部与 hcomm `CcuSimulator` 一致。差异仅在工程实现层面（扁平 IR vs 树形 Rep、switch-case vs 工厂分发、map vs 数组），不影响验证结果的正确性。
+
+---
+
+## 18. 边界声明
 
 ### 16.1 覆盖
 
