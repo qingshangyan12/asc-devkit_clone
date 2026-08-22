@@ -83,7 +83,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(vector_h
 
 <!-- npu="950" id8 -->
 
-在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -103,11 +103,8 @@ __aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denomin
     return (numerator + denominator - 1) / denominator;
 }
 
-constexpr uint32_t one_repeat_size = 256;
-constexpr uint32_t repeat_time = 2;
-constexpr uint32_t INPUT_ELEMENTS = repeat_time * 8;
-constexpr uint32_t OUTPUT_ELEMENTS = repeat_time * one_repeat_size / sizeof(uint16_t);
-constexpr uint32_t total_length = OUTPUT_ELEMENTS;
+constexpr uint32_t INPUT_ELEMENTS = 16;
+constexpr uint32_t OUTPUT_ELEMENTS = 256;
 constexpr uint32_t INPUT_BYTES = INPUT_ELEMENTS * sizeof(uint16_t);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_ELEMENTS * sizeof(uint16_t);
 
@@ -115,11 +112,11 @@ __simd_vf__ inline void asc_loadalign_brc_elem2datablock_postupdate_vf(
     __ubuf__ uint16_t* output, __ubuf__ uint16_t* input, uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_bool mask = asc_create_mask_b16(PAT_ALL);
-    vector_uint16_t value;
+    vector_uint16_t dst_reg;
     __ubuf__ uint16_t* src = input;
     for (uint16_t i = 0; i < repeat_time; ++i) {
-        asc_loadalign_brc_elem2datablock_postupdate(value, src, 8);
-        asc_storealign(output + i * one_repeat_size, value, mask);
+        asc_loadalign_brc_elem2datablock_postupdate(dst_reg, src, 8);
+        asc_storealign(output + i * one_repeat_size, dst_reg, mask);
     }
 }
 
@@ -133,7 +130,7 @@ __global__ __vector__ void asc_loadalign_brc_elem2datablock_postupdate_kernel(
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint16_t);
-    uint16_t repeat_time = ceil_division(total_length, one_repeat_size);
+    uint16_t repeat_time = ceil_division(OUTPUT_ELEMENTS, one_repeat_size);
     asc_vf_call<asc_loadalign_brc_elem2datablock_postupdate_vf>(output_local, input_local, one_repeat_size, repeat_time);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
@@ -148,15 +145,7 @@ int main()
     std::vector<uint16_t> output(OUTPUT_ELEMENTS, 0xffff);
     std::vector<uint16_t> golden(OUTPUT_ELEMENTS, 0);
     for (uint16_t i = 0; i < INPUT_ELEMENTS; ++i) input[i] = static_cast<uint16_t>(i + 1);
-    for (uint16_t repeat = 0; repeat < repeat_time; ++repeat) {
-        for (uint16_t block = 0; block < 8; ++block) {
-            for (uint16_t i = 0; i < 16; ++i) {
-                const uint32_t out = repeat * 128 + block * 16 + i;
-                const uint32_t in = repeat * 8 + block;
-                golden[out] = input[in];
-            }
-        }
-    }
+    for (uint16_t i = 0; i < OUTPUT_ELEMENTS; ++i) golden[i] = input[i / 16];
 
     aclInit(nullptr);
     aclrtSetDevice(0);

@@ -123,9 +123,24 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
 ### 地址寄存器偏移预处理模式
 
 - 每次循环迭代中，必须先调用`asc_update_addr_reg`生成该次迭代的起始偏移，再调用本接口初始化非对齐寄存器。
-- 当dtype为`int64_t`时，由于地址寄存器更新接口不支持b64模式，需要使用[asc_update_addr_reg_b32](../reg_data_types/asc_update_addr_reg.md)生成地址寄存器。一个b64元素占用两个b32寻址单元，因此传入`asc_update_addr_reg_b32`的各维偏移量必须设置为期望的b64元素偏移量的2倍。
 - 本接口和紧随其后的首次搬入必须使用相同的`src`和`offset`。
 - 同一循环迭代内，后续搬入继续使用[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)按`inc`更新后的`offset`时，可以复用更新后的`src0`；如果`src`或`offset`被另行修改，必须根据修改后的实际读取地址重新初始化`src0`。
+- 当dtype为`int64_t`时，由于地址寄存器更新接口不支持b64模式，需要使用[asc_update_addr_reg_b32](../reg_data_types/asc_update_addr_reg.md)生成地址寄存器。一个b64元素占用两个b32寻址单元，因此传入`asc_update_addr_reg_b32`的各维偏移量必须设置为期望的b64元素偏移量的2倍。
+    ```c
+    vector_int64_t src_reg;
+    vector_bool mask_b32 = asc_create_mask_b32(PAT_ALL);
+    vector_bool mask_b64;
+    asc_unpack_lower(mask_b64, mask_b32);
+    addr_reg load_offset;
+    addr_reg store_offset;
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        load_offset = asc_update_addr_reg_b32(elements_vl * 2);
+        // 搬出到UB后数据类型为B32，偏移不需要*2
+        store_offset = asc_update_addr_reg_b32(elements_vl);
+        asc_loadalign(src_reg, input, load_offset);
+        asc_storealign_pack(output, src_reg, store_offset, mask_b64);
+    }
+    ```
 
 ## 调用示例
 
@@ -133,7 +148,7 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
 
 <!-- npu="950" id8 -->
 
-在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -153,78 +168,62 @@ __aicore__ constexpr uint32_t ceil_division(uint32_t numerator, uint32_t denomin
     return (numerator + denominator - 1) / denominator;
 }
 
-constexpr uint32_t one_repeat_size = 256;
-constexpr uint32_t repeat_time = 2;
-constexpr uint32_t total_length = repeat_time * one_repeat_size;
-constexpr uint32_t INPUT_BYTES = repeat_time * one_repeat_size + 32;
-constexpr uint32_t OUTPUT_BYTES = 2 * repeat_time * one_repeat_size;
+constexpr uint32_t DATA_ELEMENTS = 512;
+constexpr uint32_t BUFFER_ELEMENTS = DATA_ELEMENTS + 32;
+constexpr uint32_t BUFFER_BYTES = BUFFER_ELEMENTS * sizeof(uint8_t);
 
-__simd_vf__ inline void asc_loadunalign_pre_vf(__ubuf__ uint8_t* output,
-                                               __ubuf__ uint8_t* input,
+__simd_vf__ inline void asc_loadunalign_pre_vf(__ubuf__ uint8_t* dst,
+                                               __ubuf__ uint8_t* src,
                                                uint16_t one_repeat_size, uint16_t repeat_time)
 {
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
-    vector_load_unalign unalign;
-    __ubuf__ uint8_t* src = input + 1;
-    vector_uint8_t value;
+    vector_load_unalign load_unalign_reg;
+    vector_store_unalign store_unalign_reg;
+    vector_uint8_t dst_reg;
+    asc_loadunalign_pre(load_unalign_reg, src);
     for (uint16_t i = 0; i < repeat_time; ++i) {
-        asc_loadunalign_pre(unalign, src);
-        asc_loadunalign(value, unalign, src);
-        asc_storealign(output + i * one_repeat_size, value, mask);
-        src += one_repeat_size;
+        asc_loadunalign_postupdate(dst_reg, load_unalign_reg, src, one_repeat_size);
+        asc_storeunalign_postupdate(dst, store_unalign_reg, dst_reg, one_repeat_size);
     }
-
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        addr_reg offset = asc_update_addr_reg_b8(one_repeat_size);
-        vector_load_unalign offset_unalign;
-        __ubuf__ uint8_t* base = input + 1;
-        asc_loadunalign_pre(offset_unalign, base, offset);
-        asc_loadunalign_postupdate(value, offset_unalign, base, offset, 0);
-        asc_storealign(output + (repeat_time + i) * one_repeat_size, value, mask);
-    }
+    asc_storeunalign_post_postupdate(dst, store_unalign_reg, 0);
 }
 
 __global__ __vector__ void asc_loadunalign_pre_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint8_t input_local[INPUT_BYTES];
-    __ubuf__ uint8_t output_local[OUTPUT_BYTES];
-    asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
+    __ubuf__ uint8_t input_local[BUFFER_ELEMENTS];
+    __ubuf__ uint8_t output_local[BUFFER_ELEMENTS];
+    asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint8_t);
-    uint16_t repeat_time = ceil_division(total_length, one_repeat_size);
-    asc_vf_call<asc_loadunalign_pre_vf>(output_local, input_local, one_repeat_size, repeat_time);
+    uint16_t repeat_time = ceil_division(DATA_ELEMENTS, one_repeat_size);
+    asc_vf_call<asc_loadunalign_pre_vf>(output_local + 1, input_local + 1, one_repeat_size, repeat_time);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
+    asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
     asc_sync();
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint8_t> input(INPUT_BYTES);
-    std::vector<uint8_t> output(OUTPUT_BYTES, 0xff);
-    std::vector<uint8_t> golden(OUTPUT_BYTES, 0);
-    for (uint16_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
-    for (uint16_t i = 0; i < repeat_time * one_repeat_size; ++i) {
-        golden[i] = input[i + 1];
-        golden[repeat_time * one_repeat_size + i] = input[i + 1];
-    }
+    std::vector<uint8_t> input(BUFFER_ELEMENTS);
+    std::vector<uint8_t> output(BUFFER_ELEMENTS, 0xff);
+    for (uint16_t i = 0; i < BUFFER_ELEMENTS; ++i) input[i] = static_cast<uint8_t>(i % 251 + 1);
 
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint8_t* input_device = nullptr;
     uint8_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, BUFFER_BYTES, input.data(), BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
     asc_loadunalign_pre_kernel<<<1, 0>>>(output_device, input_device);
     aclrtSynchronizeDevice();
-    aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    aclrtMemcpy(output.data(), BUFFER_BYTES, output_device, BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
 
-    const bool passed = output == golden;
+    bool passed = true;
+    for (uint16_t i = 0; i < DATA_ELEMENTS; ++i) passed = passed && output[i + 1] == input[i + 1];
     std::cout << (passed ? "[Success]" : "[Failed]") << " asc_loadunalign_pre example." << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);

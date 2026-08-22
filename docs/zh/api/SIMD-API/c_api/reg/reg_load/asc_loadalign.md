@@ -206,6 +206,21 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 - 该模式不支持目的操作数为掩码寄存器。
 - `mask`需通过[掩码设置接口](../reg_data_types/data_type_definition.md#掩码寄存器)预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 - 当dtype为`int64_t`时，由于掩码创建接口不支持b64模式，需要先通过[asc_create_mask_b32](../reg_data_types/asc_create_mask.md)生成b32掩码，再通过[asc_unpack_lower](../data_compress/asc_unpack.md)将其展开为适用于b64数据的掩码后传入本接口。展开后的掩码以连续8个bit为一组，仅每组最低位的bit有效，用于控制对应的一个b64元素。
+    ```c
+    vector_int64_t src_reg;
+    vector_bool mask_b32 = asc_create_mask_b32(PAT_ALL);
+    vector_bool mask_b64;
+    asc_unpack_lower(mask_b64, mask_b32);
+    addr_reg load_offset;
+    addr_reg store_offset;
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        load_offset = asc_update_addr_reg_b32(elements_vl * 2);
+        // 搬出到UB后数据类型为B32，偏移不需要*2
+        store_offset = asc_update_addr_reg_b32(elements_vl);
+        asc_loadalign(src_reg, input, load_offset);
+        asc_storealign_pack(output, src_reg, store_offset, mask_b64);
+    }
+    ```
 
 ## 调用示例
 
@@ -241,32 +256,30 @@ void print_data(const char* label, const std::vector<T>& values)
     std::cout << std::endl;
 }
 
-constexpr uint32_t one_repeat_size = 256;
-constexpr uint32_t repeat_time = 2;
-constexpr uint32_t total_length = repeat_time * one_repeat_size;
-constexpr uint32_t BUFFER_BYTES = repeat_time * one_repeat_size;
+constexpr uint32_t BUFFER_ELEMENTS = 512;
+constexpr uint32_t BUFFER_BYTES = BUFFER_ELEMENTS * sizeof(uint8_t);
 __simd_vf__ inline void asc_loadalign_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input,
                                          uint16_t one_repeat_size, uint16_t repeat_time)
 {
     vector_bool mask = asc_create_mask_b8(PAT_ALL);
     for (uint16_t i = 0; i < repeat_time; ++i) {
-        vector_uint8_t src_reg;
-        asc_loadalign(src_reg, input + i * one_repeat_size);
-        asc_storealign(output + i * one_repeat_size, src_reg, mask);
+        vector_uint8_t dst_reg;
+        asc_loadalign(dst_reg, input + i * one_repeat_size);
+        asc_storealign(output + i * one_repeat_size, dst_reg, mask);
     }
 }
 
 __global__ __vector__ void asc_loadalign_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
     asc_init();
-    __ubuf__ uint8_t output_local[BUFFER_BYTES], input_local[BUFFER_BYTES];
+    __ubuf__ uint8_t output_local[BUFFER_ELEMENTS], input_local[BUFFER_ELEMENTS];
     asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
 
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
     uint16_t one_repeat_size = asc_get_vf_len() / sizeof(uint8_t);
-    uint16_t repeat_time = ceil_division(total_length, one_repeat_size);
+    uint16_t repeat_time = ceil_division(BUFFER_ELEMENTS, one_repeat_size);
     asc_vf_call<asc_loadalign_vf>(output_local, input_local, one_repeat_size, repeat_time);
 
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
@@ -279,15 +292,15 @@ __global__ __vector__ void asc_loadalign_kernel(__gm__ uint8_t* output, __gm__ u
 
 int main()
 {
-    std::vector<uint8_t> input(BUFFER_BYTES), output(BUFFER_BYTES, 0xff);
-    for (uint16_t i = 0; i < BUFFER_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251);
+    std::vector<uint8_t> input(BUFFER_ELEMENTS), output(BUFFER_ELEMENTS, 0xff);
+    for (uint16_t i = 0; i < BUFFER_ELEMENTS; ++i) input[i] = static_cast<uint8_t>(i % 251);
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint8_t* input_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), (BUFFER_BYTES) * sizeof(uint8_t),
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), BUFFER_BYTES,
         ACL_MEM_MALLOC_HUGE_FIRST);
     uint8_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), (BUFFER_BYTES) * sizeof(uint8_t),
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BUFFER_BYTES,
         ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(input_device, input.size() * sizeof(uint8_t), input.data(), input.size() * sizeof(uint8_t),
         ACL_MEMCPY_HOST_TO_DEVICE);
