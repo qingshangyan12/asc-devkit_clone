@@ -193,7 +193,7 @@ bool IsEnvironmentVariableNameValid(const std::string& environmentVariableName) 
            !ContainsEmbeddedNull(environmentVariableName);
 }
 
-bool IsExecutionRequestWellFormed(const ProcessExecutionRequest& request) noexcept
+bool CheckProcessExecutionRequestAndLogErrors(const ProcessExecutionRequest& request) noexcept
 {
     if (request.arguments.empty()) {
         ASCENDLOGE("Process arguments must not be empty");
@@ -624,7 +624,7 @@ const char* ProcessExecutionResult::GetTerminationName() const noexcept
 ProcessExecutionResult ProcessExecutor::Execute(const ProcessExecutionRequest& request)
 {
     ProcessExecutionResult processResult;
-    if (!IsExecutionRequestWellFormed(request)) {
+    if (!CheckProcessExecutionRequestAndLogErrors(request)) {
         return processResult;
     }
     try {

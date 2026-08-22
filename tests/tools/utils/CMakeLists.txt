@@ -208,7 +208,7 @@ add_executable(ascendc_ut_asc_compile_exporter
     asc_compile_exporter/test_manifest_bundle_types.cpp
     common/test_process_executor.cpp
     asc_compile_exporter/test_resource_manifest_validator.cpp
-    common/test_temporary_directory.cpp
+    common/test_scoped_temporary_directory.cpp
     asc_compile_exporter/test_ascendc_tool_log.cpp
     ${ASCENDC_DIR}/tools/build/asc_compile_exporter/bundle_source_generator.cpp
     ${ASCENDC_DIR}/tools/build/asc_compile_exporter/collected_manifest_repository.cpp
@@ -216,7 +216,7 @@ add_executable(ascendc_ut_asc_compile_exporter
     ${ASCENDC_DIR}/tools/build/asc_compile_exporter/resource_manifest_validator.cpp
     ${ASCENDC_DIR}/tools/build/common/file_utils.cpp
     ${ASCENDC_DIR}/tools/build/common/process_executor.cpp
-    ${ASCENDC_DIR}/tools/build/common/temporary_directory.cpp
+    ${ASCENDC_DIR}/tools/build/common/scoped_temporary_directory.cpp
 )
 
 function(configure_asc_compile_exporter_test target_name)

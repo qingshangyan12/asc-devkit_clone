@@ -31,7 +31,7 @@
 namespace {
 namespace fs = boost::filesystem;
 using Json = nlohmann::json;
-using ascendc::TemporaryDirectory;
+using ascendc::ScopedTemporaryDirectory;
 using ascendc::aclrtc::KernelCompilationWorkspace;
 using ascendc::aclrtc::KernelSpecializationSession;
 using ascendc::aclrtc::MaterializedKernelCompilationResource;
@@ -194,7 +194,7 @@ public:
         std::vector<ResourceFileData> resourceFiles = {{"payload.bin", "payload.bin", {0x01U, 0x02U}}})
         : registry_(ResourceRegistry::Instance()),
           resourceId_(std::move(resourceId)),
-          previousOwnedTemporaryRoot_(std::move(registry_.ownedTemporaryRoot_)),
+          previousOwnedMaterializationRoot_(std::move(registry_.ownedMaterializationRoot_)),
           previousAutomaticLoadAttempted_(registry_.automaticLoadAttempted_),
           previousRetainMaterializedDirectories_(registry_.retainMaterializedDirectories_),
           previousAutomaticLoadStatus_(registry_.automaticLoadStatus_)
@@ -216,7 +216,7 @@ public:
         if (inserted_) {
             registry_.externalResources_.erase(resourceId_);
         }
-        registry_.ownedTemporaryRoot_ = std::move(previousOwnedTemporaryRoot_);
+        registry_.ownedMaterializationRoot_ = std::move(previousOwnedMaterializationRoot_);
         registry_.automaticLoadAttempted_ = previousAutomaticLoadAttempted_;
         registry_.retainMaterializedDirectories_ = previousRetainMaterializedDirectories_;
         registry_.automaticLoadStatus_ = previousAutomaticLoadStatus_;
@@ -229,7 +229,7 @@ public:
 private:
     ResourceRegistry& registry_;
     std::string resourceId_;
-    TemporaryDirectory previousOwnedTemporaryRoot_;
+    ScopedTemporaryDirectory previousOwnedMaterializationRoot_;
     bool previousAutomaticLoadAttempted_{false};
     bool previousRetainMaterializedDirectories_{false};
     ResourceStatus previousAutomaticLoadStatus_{ResourceStatus::Success};

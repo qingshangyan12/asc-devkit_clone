@@ -22,7 +22,7 @@ file(GLOB ACLRTC_SRC_FILES
 set(ACLRTC_COMMON_DEPENDENCY_SRC_FILES
     ${ASCENDC_DIR}/tools/build/common/file_utils.cpp
     ${ASCENDC_DIR}/tools/build/common/process_executor.cpp
-    ${ASCENDC_DIR}/tools/build/common/temporary_directory.cpp
+    ${ASCENDC_DIR}/tools/build/common/scoped_temporary_directory.cpp
 )
 
 file(GLOB TEST_ACLRTC_SRC_FILES

@@ -25,7 +25,7 @@
 #include "file_utils.h"
 #include "manifest_bundle_types.h"
 #include "process_executor.h"
-#include "temporary_directory.h"
+#include "scoped_temporary_directory.h"
 
 namespace ascendc {
 namespace manifest_generator {
@@ -34,7 +34,8 @@ namespace {
 constexpr uint32_t BUNDLE_BUILD_TIMEOUT_MINUTES = 30U;
 constexpr uint32_t BUNDLE_BUILD_TERMINATION_GRACE_SECONDS = 5U;
 
-bool CreatePrivateBundleDirectory(const std::string& requestedParentDirectoryPath, TemporaryDirectory& directory)
+bool CreatePrivateBundleWorkspaceDirectory(
+    const std::string& requestedParentDirectoryPath, ScopedTemporaryDirectory& bundleWorkspace)
 {
     const char* configuredTemporaryDirectory = std::getenv("TMPDIR");
     const std::string parentDirectoryPath =
@@ -49,7 +50,7 @@ bool CreatePrivateBundleDirectory(const std::string& requestedParentDirectoryPat
         ASCENDLOGE("Failed to prepare bundle work directory parent: path=%s", parentDirectoryPath.c_str());
         return false;
     }
-    return directory.CreateUniqueUnder(absoluteParentDirectoryPath, ".manifest-generator");
+    return bundleWorkspace.CreateUniqueSubdirectory(absoluteParentDirectoryPath, ".manifest-generator");
 }
 
 } // namespace
@@ -110,11 +111,11 @@ bool ManifestBundleCompiler::PublishBundleAcrossFileSystems(const std::string& s
 {
     ASCENDLOGD("Copying staged bundle across filesystems: %s -> %s", staged.c_str(), request_.outputPath.c_str());
     // A private workspace under the output parent places the copied file on the output filesystem.
-    TemporaryDirectory publishWorkspace;
-    if (!CreatePrivateBundleDirectory(FileUtils::ParentPath(request_.outputPath), publishWorkspace)) {
+    ScopedTemporaryDirectory publishWorkspace;
+    if (!CreatePrivateBundleWorkspaceDirectory(FileUtils::ParentPath(request_.outputPath), publishWorkspace)) {
         return false;
     }
-    const std::string copied = FileUtils::JoinPath(publishWorkspace.GetPath(), FileUtils::FileName(staged));
+    const std::string copied = FileUtils::JoinPath(publishWorkspace.GetDirectoryPath(), FileUtils::FileName(staged));
     if (!FileUtils::CopyFile(staged, copied)) {
         ASCENDLOGE("Failed to copy staged bundle across filesystems: %s", staged.c_str());
         return false;
@@ -142,24 +143,24 @@ bool ManifestBundleCompiler::Compile() const
     if (!CollectedManifestRepository(request_.manifestSearchRoot).Load(units)) {
         return false;
     }
-    TemporaryDirectory workspace;
-    if (!CreatePrivateBundleDirectory(std::string(), workspace)) {
+    ScopedTemporaryDirectory buildWorkspace;
+    if (!CreatePrivateBundleWorkspaceDirectory(std::string(), buildWorkspace)) {
         return false;
     }
     if (request_.keepTemp) {
-        workspace.RetainAfterDestruction();
-        ASCENDLOGI("Keeping temporary bundle directory %s", workspace.GetPath().c_str());
+        buildWorkspace.ReleaseCleanupOwnership();
+        ASCENDLOGI("Keeping temporary bundle directory %s", buildWorkspace.GetDirectoryPath().c_str());
     }
 
     // Generate isolated translation units and compile them into a staged output.
-    if (!BundleSourceGenerator(workspace.GetPath(), units, request_.outputKind).Generate()) {
+    if (!BundleSourceGenerator(buildWorkspace.GetDirectoryPath(), units, request_.outputKind).Generate()) {
         return false;
     }
     const std::string stagedName = request_.outputKind == BundleOutputKind::kSharedObject ?
                                        "compile_resource_bundle.so" :
                                        "compile_resource_bundle_relocatable.o";
-    const std::string stagedOutput = FileUtils::JoinPath(workspace.GetPath(), stagedName);
-    if (!BuildBundle(workspace.GetPath(), stagedOutput)) {
+    const std::string stagedOutput = FileUtils::JoinPath(buildWorkspace.GetDirectoryPath(), stagedName);
+    if (!BuildBundle(buildWorkspace.GetDirectoryPath(), stagedOutput)) {
         return false;
     }
 

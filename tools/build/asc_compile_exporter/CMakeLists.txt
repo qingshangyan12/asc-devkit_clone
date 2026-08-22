@@ -40,7 +40,7 @@ add_executable(asc_compile_exporter
   resource_manifest_validator.cpp
   ../common/file_utils.cpp
   ../common/process_executor.cpp
-  ../common/temporary_directory.cpp
+  ../common/scoped_temporary_directory.cpp
 )
 
 set_target_properties(asc_compile_exporter PROPERTIES

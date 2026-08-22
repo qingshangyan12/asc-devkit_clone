@@ -21,7 +21,7 @@
 
 #include "ascendc_manifest_abi.h"
 #include "nlohmann/json.hpp"
-#include "temporary_directory.h"
+#include "scoped_temporary_directory.h"
 
 namespace boost {
 namespace filesystem {
@@ -176,7 +176,7 @@ private:
     ResourceStatus Commit(StageState& stage);
     bool HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed) const;
 
-    TemporaryDirectory ownedTemporaryRoot_;
+    ScopedTemporaryDirectory ownedMaterializationRoot_;
     ResourceStore externalResources_;
     ResourceStore customResources_;
     ResourceStore builtInResources_;

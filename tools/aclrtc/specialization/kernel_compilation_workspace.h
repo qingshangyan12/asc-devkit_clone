@@ -12,7 +12,7 @@
 #define ASCENDC_ACLRTC_KERNEL_COMPILATION_WORKSPACE_H
 
 #include "kernel_specialization_types.h"
-#include "temporary_directory.h"
+#include "scoped_temporary_directory.h"
 
 #include <boost/filesystem/path.hpp>
 #include <cstdint>
@@ -38,7 +38,7 @@ public:
     aclError RemoveWorktreeBeforePublishingElfIfNeeded();
 
 private:
-    TemporaryDirectory ownedWorktree_;
+    ScopedTemporaryDirectory ownedWorktree_;
     WorktreeRetentionPolicy retentionPolicy_{WorktreeRetentionPolicy::RemoveAfterCompilation};
 };
 

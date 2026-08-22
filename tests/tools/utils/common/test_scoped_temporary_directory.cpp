@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 
 #include "file_utils.h"
-#include "temporary_directory.h"
+#include "scoped_temporary_directory.h"
 
 #include <cstdlib>
 #include <string>
@@ -28,7 +28,7 @@ bool PathExistsWithoutFollowingSymlinks(const std::string& path)
     return lstat(path.c_str(), &pathStatus) == 0;
 }
 
-class TemporaryDirectoryTest : public testing::Test {
+class ScopedTemporaryDirectoryTest : public testing::Test {
 protected:
     void SetUp() override
     {
@@ -37,7 +37,8 @@ protected:
             configuredTemporaryDirectory == nullptr || configuredTemporaryDirectory[0] == '\0' ?
                 "/tmp" :
                 configuredTemporaryDirectory;
-        std::string rootDirectoryPattern = FileUtils::JoinPath(parentDirectoryPath, "temporary_directory_ut_XXXXXX");
+        std::string rootDirectoryPattern =
+            FileUtils::JoinPath(parentDirectoryPath, "scoped_temporary_directory_ut_XXXXXX");
         std::vector<char> writablePattern(rootDirectoryPattern.begin(), rootDirectoryPattern.end());
         writablePattern.push_back('\0');
         char* createdDirectoryPath = mkdtemp(writablePattern.data());
@@ -50,84 +51,84 @@ protected:
     std::string rootDirectoryPath_;
 };
 
-TEST_F(TemporaryDirectoryTest, CreatesUniqueDirectoryAndRemovesItOnDestruction)
+TEST_F(ScopedTemporaryDirectoryTest, CreatesUniqueDirectoryAndRemovesItOnDestruction)
 {
     const std::string parentPath = FileUtils::JoinPath(rootDirectoryPath_, "temporary-directories");
     ASSERT_TRUE(FileUtils::CreateDirectories(parentPath));
     std::string removedDirectoryPath;
     {
-        TemporaryDirectory directory;
-        ASSERT_TRUE(directory.CreateUniqueUnder(parentPath, "test"));
-        removedDirectoryPath = directory.GetPath();
+        ScopedTemporaryDirectory directory;
+        ASSERT_TRUE(directory.CreateUniqueSubdirectory(parentPath, "test"));
+        removedDirectoryPath = directory.GetDirectoryPath();
         EXPECT_TRUE(FileUtils::IsDirectory(removedDirectoryPath));
         EXPECT_TRUE(FileUtils::IsPathWithin(removedDirectoryPath, parentPath));
         struct stat directoryStatus {};
         ASSERT_EQ(stat(removedDirectoryPath.c_str(), &directoryStatus), 0);
         constexpr mode_t permissionBits = S_IRWXU | S_IRWXG | S_IRWXO;
         EXPECT_EQ(directoryStatus.st_mode & permissionBits, S_IRWXU);
-        EXPECT_FALSE(directory.CreateUniqueUnder(parentPath, "second"));
+        EXPECT_FALSE(directory.CreateUniqueSubdirectory(parentPath, "second"));
     }
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(removedDirectoryPath));
 }
 
-TEST_F(TemporaryDirectoryTest, CanRetainCreatedOrAdoptedDirectory)
+TEST_F(ScopedTemporaryDirectoryTest, CanReleaseCleanupOwnershipForCreatedOrExistingDirectory)
 {
     const std::string createdParentPath = FileUtils::JoinPath(rootDirectoryPath_, "retained-created");
     ASSERT_TRUE(FileUtils::CreateDirectories(createdParentPath));
     std::string retainedCreatedPath;
     {
-        TemporaryDirectory directory;
-        ASSERT_TRUE(directory.CreateUniqueUnder(createdParentPath, "created"));
-        retainedCreatedPath = directory.GetPath();
-        directory.RetainAfterDestruction();
+        ScopedTemporaryDirectory directory;
+        ASSERT_TRUE(directory.CreateUniqueSubdirectory(createdParentPath, "created"));
+        retainedCreatedPath = directory.GetDirectoryPath();
+        directory.ReleaseCleanupOwnership();
     }
     EXPECT_TRUE(FileUtils::IsDirectory(retainedCreatedPath));
 
     const std::string retainedAdoptedPath = FileUtils::JoinPath(rootDirectoryPath_, "retained-adopted");
     ASSERT_TRUE(FileUtils::CreateDirectories(retainedAdoptedPath));
     {
-        TemporaryDirectory directory;
-        ASSERT_TRUE(directory.AdoptExistingForCleanup(retainedAdoptedPath));
-        directory.RetainAfterDestruction();
+        ScopedTemporaryDirectory directory;
+        ASSERT_TRUE(directory.TakeCleanupOwnershipOfDirectory(retainedAdoptedPath));
+        directory.ReleaseCleanupOwnership();
     }
     EXPECT_TRUE(FileUtils::IsDirectory(retainedAdoptedPath));
 }
 
-TEST_F(TemporaryDirectoryTest, MovesCleanupOwnershipExactlyOnce)
+TEST_F(ScopedTemporaryDirectoryTest, MovesCleanupOwnershipExactlyOnce)
 {
     const std::string parentPath = FileUtils::JoinPath(rootDirectoryPath_, "moved");
     ASSERT_TRUE(FileUtils::CreateDirectories(parentPath));
     std::string movedDirectoryPath;
     {
-        TemporaryDirectory original;
-        ASSERT_TRUE(original.CreateUniqueUnder(parentPath, "original"));
-        movedDirectoryPath = original.GetPath();
+        ScopedTemporaryDirectory original;
+        ASSERT_TRUE(original.CreateUniqueSubdirectory(parentPath, "original"));
+        movedDirectoryPath = original.GetDirectoryPath();
 
-        TemporaryDirectory moved(std::move(original));
-        EXPECT_TRUE(original.GetPath().empty());
-        EXPECT_EQ(moved.GetPath(), movedDirectoryPath);
+        ScopedTemporaryDirectory moved(std::move(original));
+        EXPECT_TRUE(original.GetDirectoryPath().empty());
+        EXPECT_EQ(moved.GetDirectoryPath(), movedDirectoryPath);
 
-        TemporaryDirectory assigned;
+        ScopedTemporaryDirectory assigned;
         assigned = std::move(moved);
-        EXPECT_TRUE(moved.GetPath().empty());
-        EXPECT_EQ(assigned.GetPath(), movedDirectoryPath);
+        EXPECT_TRUE(moved.GetDirectoryPath().empty());
+        EXPECT_EQ(assigned.GetDirectoryPath(), movedDirectoryPath);
     }
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(movedDirectoryPath));
 }
 
-TEST_F(TemporaryDirectoryTest, RemovesAdoptedDirectoryOnRequest)
+TEST_F(ScopedTemporaryDirectoryTest, RemovesOwnedDirectoryOnRequest)
 {
     const std::string adoptedPath = FileUtils::JoinPath(rootDirectoryPath_, "adopted");
     ASSERT_TRUE(FileUtils::CreateDirectories(adoptedPath));
-    TemporaryDirectory directory;
-    ASSERT_TRUE(directory.AdoptExistingForCleanup(adoptedPath));
-    EXPECT_TRUE(directory.RemoveNow());
-    EXPECT_TRUE(directory.GetPath().empty());
+    ScopedTemporaryDirectory directory;
+    ASSERT_TRUE(directory.TakeCleanupOwnershipOfDirectory(adoptedPath));
+    EXPECT_TRUE(directory.RemoveOwnedDirectoryImmediately());
+    EXPECT_TRUE(directory.GetDirectoryPath().empty());
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(adoptedPath));
-    EXPECT_TRUE(directory.RemoveNow());
+    EXPECT_TRUE(directory.RemoveOwnedDirectoryImmediately());
 }
 
-TEST_F(TemporaryDirectoryTest, MoveAssignmentRemovesPreviouslyOwnedDirectoryAndEmptiesSource)
+TEST_F(ScopedTemporaryDirectoryTest, MoveAssignmentRemovesPreviouslyOwnedDirectoryAndEmptiesSource)
 {
     const std::string sourceParentPath = FileUtils::JoinPath(rootDirectoryPath_, "move-source");
     const std::string destinationParentPath = FileUtils::JoinPath(rootDirectoryPath_, "move-destination");
@@ -136,35 +137,35 @@ TEST_F(TemporaryDirectoryTest, MoveAssignmentRemovesPreviouslyOwnedDirectoryAndE
     std::string sourceDirectoryPath;
     std::string destinationDirectoryPath;
     {
-        TemporaryDirectory source;
-        ASSERT_TRUE(source.CreateUniqueUnder(sourceParentPath, "source"));
-        sourceDirectoryPath = source.GetPath();
+        ScopedTemporaryDirectory source;
+        ASSERT_TRUE(source.CreateUniqueSubdirectory(sourceParentPath, "source"));
+        sourceDirectoryPath = source.GetDirectoryPath();
 
-        TemporaryDirectory destination;
-        ASSERT_TRUE(destination.CreateUniqueUnder(destinationParentPath, "destination"));
-        destinationDirectoryPath = destination.GetPath();
+        ScopedTemporaryDirectory destination;
+        ASSERT_TRUE(destination.CreateUniqueSubdirectory(destinationParentPath, "destination"));
+        destinationDirectoryPath = destination.GetDirectoryPath();
         destination = std::move(source);
 
-        EXPECT_EQ(destination.GetPath(), sourceDirectoryPath);
-        EXPECT_TRUE(source.GetPath().empty());
+        EXPECT_EQ(destination.GetDirectoryPath(), sourceDirectoryPath);
+        EXPECT_TRUE(source.GetDirectoryPath().empty());
         EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(destinationDirectoryPath));
     }
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(sourceDirectoryPath));
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(destinationDirectoryPath));
 }
 
-TEST_F(TemporaryDirectoryTest, RejectsInvalidCreationInputsAndReportsRemovalFailure)
+TEST_F(ScopedTemporaryDirectoryTest, RejectsInvalidCreationInputsAndReportsRemovalFailure)
 {
-    TemporaryDirectory directory;
-    EXPECT_FALSE(directory.CreateUniqueUnder(FileUtils::JoinPath(rootDirectoryPath_, "missing"), "test"));
-    EXPECT_FALSE(directory.CreateUniqueUnder(rootDirectoryPath_, "nested/test"));
-    EXPECT_FALSE(directory.CreateUniqueUnder(rootDirectoryPath_, "invalid%prefix"));
-    EXPECT_FALSE(directory.AdoptExistingForCleanup(std::string()));
+    ScopedTemporaryDirectory directory;
+    EXPECT_FALSE(directory.CreateUniqueSubdirectory(FileUtils::JoinPath(rootDirectoryPath_, "missing"), "test"));
+    EXPECT_FALSE(directory.CreateUniqueSubdirectory(rootDirectoryPath_, "nested/test"));
+    EXPECT_FALSE(directory.CreateUniqueSubdirectory(rootDirectoryPath_, "invalid%prefix"));
+    EXPECT_FALSE(directory.TakeCleanupOwnershipOfDirectory(std::string()));
 
-    ASSERT_TRUE(directory.AdoptExistingForCleanup("/proc/self/status"));
-    EXPECT_FALSE(directory.RemoveNow());
-    EXPECT_EQ(directory.GetPath(), "/proc/self/status");
-    directory.RetainAfterDestruction();
+    ASSERT_TRUE(directory.TakeCleanupOwnershipOfDirectory("/proc/self/status"));
+    EXPECT_FALSE(directory.RemoveOwnedDirectoryImmediately());
+    EXPECT_EQ(directory.GetDirectoryPath(), "/proc/self/status");
+    directory.ReleaseCleanupOwnership();
 }
 
 } // namespace
