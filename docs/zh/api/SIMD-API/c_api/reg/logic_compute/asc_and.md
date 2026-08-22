@@ -51,7 +51,9 @@ __simd_callee__ inline void asc_and(vector_<dtype>& dst,
                                     vector_bool mask)
 ```
 
-dtype取值为`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+### dtype支持数据类型
+
+`dtype`取值为：`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 #### 典型示例
 

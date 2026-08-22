@@ -48,8 +48,9 @@
 __simd_callee__ inline void asc_arange(vector_<dtype>& dst,
                                        <dtype> value)
 ```
+### dtype支持数据类型
 
-dtype可取的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`。
+`dtype`取值为：`int8_t`、`int16_t`、`half`、`int32_t`、`float`。
 
 #### 典型示例
 
