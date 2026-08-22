@@ -61,7 +61,7 @@
 
 | 接口     | 硬件支持的模板参数枚举值 | 软件支持的模板参数枚举值 |
 | :------- | :----------------------- | :----------------------- |
-| Cast     | MaskMergeMode::ZEROING   | 无                       |
+| Cast     | MaskMergeMode::ZEROING   | MaskMergeMode::MERGING（fp4x2_e2m1_t、fp4x2_e1m2_t、int4x2_t类型除外） |
 | Truncate | MaskMergeMode::ZEROING   | 无                       |
 
 **表6**  归约计算接口MergeMode支持情况
