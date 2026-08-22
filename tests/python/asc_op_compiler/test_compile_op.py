@@ -6017,6 +6017,21 @@ Contents of section
         )
         self.assertNotEqual(result, "")
         self.assertIn(
+            "    GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);\n",
+            result,
+        )
+        with mock.patch.object(
+            CommonUtility, "is_support_workspace_offset", return_value=True
+        ):
+            result = _gen_set_workspace_codes(
+                is_mix,
+                is_single_and_using_hard_sync,
+                op_info,
+                tiling_info,
+                compile_options,
+                compile_info,
+            )
+        self.assertIn(
             "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
             "    GM_ADDR usrWorkspace = workspace;\n"
             "#else\n"
