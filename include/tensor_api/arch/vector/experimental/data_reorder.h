@@ -20,15 +20,17 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 template <typename T>
 __simd_callee__ inline reg_pair<T> interleave(reg_tensor<T> src0, reg_tensor<T> src1);
 
 template <typename T>
 __simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T> src1);
+} // namespace experimental
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__)
 #include "impl/tensor_api/arch/vector/experimental/data_reorder_impl.h"
 #endif
 

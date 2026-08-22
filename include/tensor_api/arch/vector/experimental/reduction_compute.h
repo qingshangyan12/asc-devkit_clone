@@ -25,6 +25,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <typename DstType, reduce_scope scope = reduce_scope::vector, typename SrcType>
 __simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<SrcType> src);
@@ -35,10 +36,13 @@ __simd_callee__ inline decltype(auto) reduce_max(reg_tensor<SrcType> src);
 template <typename DstType, reduce_scope scope = reduce_scope::vector, typename SrcType>
 __simd_callee__ inline decltype(auto) reduce_min(reg_tensor<SrcType> src);
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 
+#if defined(__NPU_ARCH__)
 #include "impl/tensor_api/arch/vector/experimental/reduction_compute_impl.h"
+#endif
 
 #endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REDUCTION_COMPUTE_H
 

@@ -7,6 +7,7 @@ cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
+option(CANN_ASC_USE_EXPERIMENTAL "Enable experimental CANN ASC APIs" OFF)
 
 find_package(ASC REQUIRED)
 
@@ -23,6 +24,10 @@ include_directories(
 )
 
 target_link_libraries(demo PRIVATE
+)
+
+target_compile_definitions(demo PRIVATE
+    $<$<BOOL:${CANN_ASC_USE_EXPERIMENTAL}>:CANN_ASC_USE_EXPERIMENTAL>
 )
 
 target_compile_options(demo PRIVATE

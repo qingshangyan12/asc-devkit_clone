@@ -22,6 +22,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 namespace detail {
 template <typename T>
 inline constexpr bool is_fill_support_type = Std::is_one_of_v<T, uint8_t, int8_t, fp8_e4m3fn_t,
@@ -51,6 +52,7 @@ __simd_callee__ inline decltype(auto) fill(reg_tensor<T> val, reg_tensor<bool> m
     dst.mask = mask.reg;
     return dst;
 }
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

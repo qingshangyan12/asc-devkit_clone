@@ -15,10 +15,12 @@
 
 #include "tensor_api/stub/cce_stub.h"
 #include "tensor_api/tensor.h"
+#include "tensor_api/arch/vector/experimental/reg_compute.h"
 
 namespace {
 
 using namespace asc::te;
+using namespace asc::te::experimental;
 
 template <typename T, typename = void>
 struct has_mask_member : std::false_type {};

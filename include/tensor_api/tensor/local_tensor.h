@@ -37,18 +37,18 @@ struct local_tensor : public base_tensor<EngineT, LayoutT> {
     __simd_callee__ inline decltype(auto) load(const Coord& coord) const;
 
     template <load_sideband_mode sideband_mode = load_sideband_mode::deintlv, typename Coord, typename RegDataType>
-    __simd_callee__ inline void load(const Coord& coord, reg_tensor<RegDataType>& dst0,
-                                     reg_tensor<RegDataType>& dst1) const;
+    __simd_callee__ inline void load(const Coord& coord, experimental::reg_tensor<RegDataType>& dst0,
+                                     experimental::reg_tensor<RegDataType>& dst1) const;
 
     template <broadcast_mode brc_mode = broadcast_mode::elem, typename Coord>
     __simd_callee__ inline decltype(auto) load_broadcast(const Coord& coord) const;
 
     template <store_sideband_mode sideband_mode = store_sideband_mode::direct, typename Coord, typename RegDataType>
-    __simd_callee__ inline void store(const Coord& coord, const reg_tensor<RegDataType>& src);
+    __simd_callee__ inline void store(const Coord& coord, const experimental::reg_tensor<RegDataType>& src);
 
     template <store_sideband_mode sideband_mode = store_sideband_mode::intlv, typename Coord, typename RegDataType>
-    __simd_callee__ inline void store(const Coord& coord, const reg_tensor<RegDataType>& src0,
-                                      const reg_tensor<RegDataType>& src1);
+    __simd_callee__ inline void store(const Coord& coord, const experimental::reg_tensor<RegDataType>& src0,
+                                      const experimental::reg_tensor<RegDataType>& src1);
 };
 
 } // namespace te

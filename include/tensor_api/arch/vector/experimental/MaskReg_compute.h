@@ -21,6 +21,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <mask_pattern Pattern = mask_pattern::all, typename DataType>
 __simd_callee__ inline reg_tensor<bool> make_mask();
@@ -39,10 +40,11 @@ __simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tens
 
 template <typename DataType>
 __simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
+} // namespace experimental
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__)
 #include "impl/tensor_api/arch/vector/experimental/MaskReg_compute_impl.h"
 #endif
 
