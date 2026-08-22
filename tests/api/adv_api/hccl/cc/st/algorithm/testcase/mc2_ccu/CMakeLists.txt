@@ -54,7 +54,6 @@ add_executable(${HCCL_CCU_ST_TARGET}
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/shim/stubs.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all_mesh1d_adapter.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all.cc
-    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_buffer_primitive_test.cc
     ${UTILS_DIR}/ccu_scenario/ccu_fixture.cc
     ${HCCL_SELECTOR_PRODUCT_SOURCES}
 )
