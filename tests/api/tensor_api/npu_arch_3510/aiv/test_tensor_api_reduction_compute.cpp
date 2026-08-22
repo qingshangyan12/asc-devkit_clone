@@ -18,6 +18,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 static_assert(std::is_same_v<decltype(reduce_sum<float>(reg_tensor<float>{})), reg_tensor<float>>);
 static_assert(std::is_same_v<decltype(reduce_max<int16_t>(reg_tensor<int16_t>{})), reg_tensor<int16_t>>);
@@ -52,5 +53,6 @@ TEST(test_tensor_api_reduction_compute, compiles_supported_scopes)
     (void)compile_reduction;
 }
 
+} // namespace experimental
 } // namespace te
 } // namespace asc

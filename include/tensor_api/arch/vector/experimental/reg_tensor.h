@@ -20,6 +20,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <typename DataType>
 struct reg_tensor {
@@ -53,6 +54,7 @@ struct reg_pair {
     reg_tensor<DataType> second;
 };
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

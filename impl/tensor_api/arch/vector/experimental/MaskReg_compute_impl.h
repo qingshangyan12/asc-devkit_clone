@@ -22,6 +22,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 namespace detail {
 
 template <typename DataType, typename PatternType>
@@ -154,6 +155,7 @@ __simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_te
     return result;
 }
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

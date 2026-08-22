@@ -25,6 +25,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <typename DstType, reduce_scope scope = reduce_scope::vector, typename SrcType>
 __simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<SrcType> src);
@@ -35,6 +36,7 @@ __simd_callee__ inline decltype(auto) reduce_max(reg_tensor<SrcType> src);
 template <typename DstType, reduce_scope scope = reduce_scope::vector, typename SrcType>
 __simd_callee__ inline decltype(auto) reduce_min(reg_tensor<SrcType> src);
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

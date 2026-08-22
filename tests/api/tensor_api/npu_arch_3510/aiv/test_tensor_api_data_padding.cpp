@@ -19,28 +19,28 @@ class TensorApiVectorDataPadding3510 : public testing::Test {};
 template <typename T>
 __aicore__ inline void TestFillScalar()
 {
-    auto mask  = asc::te::make_mask<asc::te::mask_pattern::every3, T>();
-    auto dst = asc::te::fill(T {}, mask);
+    auto mask = asc::te::experimental::make_mask<asc::te::mask_pattern::every3, T>();
+    auto dst = asc::te::experimental::fill(T {}, mask);
     EXPECT_EQ(dst.mask, mask.reg);
 }
 
 template <typename T>
 __aicore__ inline void TestFillRegTensor()
 {
-    asc::te::reg_tensor<T> src {};
-    auto mask  = asc::te::make_mask<asc::te::mask_pattern::every3, T>();
-    auto dst = asc::te::fill(src, mask);
+    asc::te::experimental::reg_tensor<T> src {};
+    auto mask = asc::te::experimental::make_mask<asc::te::mask_pattern::every3, T>();
+    auto dst = asc::te::experimental::fill(src, mask);
     EXPECT_EQ(dst.mask, mask.reg);
 }
 
 template <typename T>
 __aicore__ inline void TestFillDefaultMask()
 {
-    asc::te::reg_tensor<T> src {};
+    asc::te::experimental::reg_tensor<T> src {};
 
-    auto scalar_dst = asc::te::fill(T {});
-    auto reg_tensor_dst = asc::te::fill(src);
-    auto mask = asc::te::all_mask<T>();
+    auto scalar_dst = asc::te::experimental::fill(T {});
+    auto reg_tensor_dst = asc::te::experimental::fill(src);
+    auto mask = asc::te::experimental::all_mask<T>();
     EXPECT_EQ(scalar_dst.mask, mask.reg);
     EXPECT_EQ(reg_tensor_dst.mask, mask.reg);
 }

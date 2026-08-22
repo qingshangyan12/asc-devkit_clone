@@ -22,6 +22,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 namespace detail {
 
 // Keep the primary template incomplete so unsupported element types fail at
@@ -125,6 +126,7 @@ struct type_get<fp4x2_e1m2_t> {
 };
 
 } // namespace detail
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

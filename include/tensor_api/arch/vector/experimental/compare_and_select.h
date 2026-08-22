@@ -20,6 +20,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 template <typename T>
 __simd_callee__ inline decltype(auto) select(reg_tensor<bool> condition, reg_tensor<T> src0,
     reg_tensor<T> src1);
@@ -59,6 +60,7 @@ __simd_callee__ inline decltype(auto) operator>(reg_tensor<T> src0, T src1);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) operator>=(reg_tensor<T> src0, T src1);
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

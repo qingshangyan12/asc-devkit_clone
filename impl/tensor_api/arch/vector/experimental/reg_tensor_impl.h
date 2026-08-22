@@ -23,6 +23,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <typename DataType>
 template <typename ScalarType>
@@ -47,6 +48,7 @@ __simd_callee__ inline reg_tensor<DataType>& reg_tensor<DataType>::with_mask(con
     return *this;
 }
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

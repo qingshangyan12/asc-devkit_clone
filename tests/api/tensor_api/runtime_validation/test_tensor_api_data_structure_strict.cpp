@@ -263,8 +263,8 @@ TEST_F(TensorApiDataStructureStrictValidation, TensorRegisterLoadStoreAndBroadca
 
     alignas(512) __ubuf__ int32_t data[4 * 8] = {};
     auto tensor = make_tensor_at<location::ub>(data, make_frame_layout<nd_layout_ptn, int32_t>(4, 8));
-    reg_tensor<int32_t> value0{};
-    reg_tensor<int32_t> value1{};
+    experimental::reg_tensor<int32_t> value0{};
+    experimental::reg_tensor<int32_t> value1{};
 
     EXPECT_THROW((void)tensor.load(make_coord(-1, 0)), TrapException);
     EXPECT_THROW((void)tensor.load(make_coord(0, 8)), TrapException);
