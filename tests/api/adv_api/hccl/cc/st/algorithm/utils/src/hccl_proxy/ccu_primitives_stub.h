@@ -44,9 +44,9 @@ public:
     void LoopBodyExit();
     std::vector<Operation>& GetLoopBody(ResourceHandle loopHandle);
 
-    ResourceHandle CreateLoopGroup(ResourceHandle parallelCfg, ResourceHandle offsetCfg,
-        uint32_t maxLoopNum, const std::vector<ResourceHandle>& loopHandles,
-        const std::vector<ResourceHandle>& loopParamHandles);
+    ResourceHandle CreateLoopGroup(
+        ResourceHandle parallelCfg, ResourceHandle offsetCfg, uint32_t maxLoopNum,
+        const std::vector<ResourceHandle>& loopHandles, const std::vector<ResourceHandle>& loopParamHandles);
 
     static CompilerContext& Current();
     static void SetCurrent(CompilerContext* context);
@@ -170,12 +170,13 @@ class CcuBuffer;
 class Func {
 public:
     template <typename Callable>
-    explicit Func(Callable &&fn) : body_(std::forward<Callable>(fn))
+    explicit Func(Callable&& fn) : body_(std::forward<Callable>(fn))
     {}
 
     void RunBody() const
     {
-        if (body_) body_();
+        if (body_)
+            body_();
     }
 
 private:
@@ -217,15 +218,20 @@ Result LocalCopy(CcuBuffer destination, LocalAddr source, Variable length, Event
 Result LocalCopy(LocalAddr destination, CcuBuffer source, Variable length, Event event, uint16_t mask = 1);
 Result Read(ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length, Event event, uint16_t mask = 1);
 Result Read(ChannelHandle channel, CcuBuffer local, RemoteAddr remote, Variable length, Event event, uint16_t mask = 1);
-Result ReadReduce(ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length,
-    HcclDataType dataType, HcclReduceOp opType, Event event, uint16_t mask = 1);
-Result LocalReduce(LocalAddr dst, LocalAddr src, Variable len, HcclDataType dataType, HcclReduceOp opType,
-    Event event, uint16_t mask = 1);
-Result LocalReduce(CcuBuffer* buffers, uint32_t count, HcclDataType dataType, HcclDataType outputDataType,
-    HcclReduceOp opType, Variable len, Event event, uint16_t mask = 1);
-Result Write(ChannelHandle channel, RemoteAddr remote, CcuBuffer local, Variable length, Event event, uint16_t mask = 1);
-Result WriteReduce(ChannelHandle channel, RemoteAddr remote, LocalAddr local, Variable length,
-    HcclDataType dataType, HcclReduceOp opType, Event event, uint16_t mask = 1);
+Result ReadReduce(
+    ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length, HcclDataType dataType,
+    HcclReduceOp opType, Event event, uint16_t mask = 1);
+Result LocalReduce(
+    LocalAddr dst, LocalAddr src, Variable len, HcclDataType dataType, HcclReduceOp opType, Event event,
+    uint16_t mask = 1);
+Result LocalReduce(
+    CcuBuffer* buffers, uint32_t count, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType,
+    Variable len, Event event, uint16_t mask = 1);
+Result Write(
+    ChannelHandle channel, RemoteAddr remote, CcuBuffer local, Variable length, Event event, uint16_t mask = 1);
+Result WriteReduce(
+    ChannelHandle channel, RemoteAddr remote, LocalAddr local, Variable length, HcclDataType dataType,
+    HcclReduceOp opType, Event event, uint16_t mask = 1);
 
 } // namespace ccu
 } // namespace AscendC
@@ -253,8 +259,8 @@ public:
 class Loop {
 public:
     Loop();
-    Loop(Variable &loopParam, const Func &func);
-    Loop(const Loop &) = default;
+    Loop(Variable& loopParam, const Func& func);
+    Loop(const Loop&) = default;
     ResourceHandle handle{0};
     ResourceHandle loopParamHandle{0};
 };
@@ -262,7 +268,7 @@ public:
 class LoopGroup {
 public:
     LoopGroup();
-    LoopGroup(Variable &parallelCfg, Variable &offsetCfg, uint32_t maxLoopNum, const std::vector<Loop> &loops);
+    LoopGroup(Variable& parallelCfg, Variable& offsetCfg, uint32_t maxLoopNum, const std::vector<Loop>& loops);
     ResourceHandle handle{0};
 };
 } // namespace ccu

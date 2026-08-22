@@ -130,22 +130,20 @@ CheckResult CcuLogicalResourceChecker::Check(const Program& program) const
                 }
                 break;
             case OpCode::WRITE: {
-                bool srcValid = program.localAddresses.count(operation.src0) == 1 ||
-                    program.buffers.count(operation.src0) == 1;
+                bool srcValid =
+                    program.localAddresses.count(operation.src0) == 1 || program.buffers.count(operation.src0) == 1;
                 bool dstValid = program.remoteAddresses.count(operation.dst) == 1;
-                if (!dstValid || !srcValid || !isVariable(operation.src1) ||
-                    !isEvent(operation.immediate)) {
+                if (!dstValid || !srcValid || !isVariable(operation.src1) || !isEvent(operation.immediate)) {
                     return Failure("remote Write references an invalid address, length, or Event");
                 }
                 break;
             }
             case OpCode::LOCAL_COPY: {
-                bool srcValid = program.localAddresses.count(operation.src0) == 1 ||
-                    program.buffers.count(operation.src0) == 1;
-                bool dstValid = program.localAddresses.count(operation.dst) == 1 ||
-                    program.buffers.count(operation.dst) == 1;
-                if (!srcValid || !dstValid || !isVariable(operation.src1) ||
-                    !isEvent(operation.immediate)) {
+                bool srcValid =
+                    program.localAddresses.count(operation.src0) == 1 || program.buffers.count(operation.src0) == 1;
+                bool dstValid =
+                    program.localAddresses.count(operation.dst) == 1 || program.buffers.count(operation.dst) == 1;
+                if (!srcValid || !dstValid || !isVariable(operation.src1) || !isEvent(operation.immediate)) {
                     return Failure("LocalCopy references an invalid address, length, or Event");
                 }
                 break;

@@ -115,10 +115,7 @@ void CompilerContext::Append(const Operation& operation)
     }
 }
 
-ResourceHandle CompilerContext::CreateLoop()
-{
-    return nextHandle_++;
-}
+ResourceHandle CompilerContext::CreateLoop() { return nextHandle_++; }
 
 void CompilerContext::LoopBodyEnter(ResourceHandle loopHandle)
 {
@@ -126,18 +123,13 @@ void CompilerContext::LoopBodyEnter(ResourceHandle loopHandle)
     loopBodyTarget_ = &loopBodies_[loopHandle];
 }
 
-void CompilerContext::LoopBodyExit()
-{
-    loopBodyTarget_ = nullptr;
-}
+void CompilerContext::LoopBodyExit() { loopBodyTarget_ = nullptr; }
 
-std::vector<Operation>& CompilerContext::GetLoopBody(ResourceHandle loopHandle)
-{
-    return loopBodies_[loopHandle];
-}
+std::vector<Operation>& CompilerContext::GetLoopBody(ResourceHandle loopHandle) { return loopBodies_[loopHandle]; }
 
-ResourceHandle CompilerContext::CreateLoopGroup(ResourceHandle parallelCfg, ResourceHandle offsetCfg,
-    uint32_t maxLoopNum, const std::vector<ResourceHandle>& loopHandles, const std::vector<ResourceHandle>& loopParamHandles)
+ResourceHandle CompilerContext::CreateLoopGroup(
+    ResourceHandle parallelCfg, ResourceHandle offsetCfg, uint32_t maxLoopNum,
+    const std::vector<ResourceHandle>& loopHandles, const std::vector<ResourceHandle>& loopParamHandles)
 {
     ResourceHandle groupHandle = nextHandle_++;
 
@@ -596,8 +588,9 @@ Result LocalCopy(LocalAddr destination, CcuBuffer source, Variable length, Event
 CcuBuffer::CcuBuffer() : handle(CompilerContext::Current().AllocateBuffer()) {}
 
 namespace {
-void AppendRead(OpCode code, ChannelHandle channel, ResourceHandle local, ResourceHandle remote,
-    ResourceHandle length, ResourceHandle event, uint16_t mask)
+void AppendRead(
+    OpCode code, ChannelHandle channel, ResourceHandle local, ResourceHandle remote, ResourceHandle length,
+    ResourceHandle event, uint16_t mask)
 {
     Operation operation;
     operation.code = code;
@@ -609,7 +602,7 @@ void AppendRead(OpCode code, ChannelHandle channel, ResourceHandle local, Resour
     operation.mask = mask;
     CompilerContext::Current().Append(operation);
 }
-}
+} // namespace
 
 Result Read(ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length, Event event, uint16_t mask)
 {
@@ -623,15 +616,16 @@ Result Read(ChannelHandle channel, CcuBuffer local, RemoteAddr remote, Variable 
     return Result::SUCCESS;
 }
 
-Result ReadReduce(ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length,
-    HcclDataType dataType, HcclReduceOp opType, Event event, uint16_t mask)
+Result ReadReduce(
+    ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length, HcclDataType dataType,
+    HcclReduceOp opType, Event event, uint16_t mask)
 {
     AppendRead(OpCode::WRITE, channel, local.handle, remote.handle, length.handle, event.handle, mask);
     return Result::SUCCESS;
 }
 
-Result LocalReduce(LocalAddr dst, LocalAddr src, Variable len, HcclDataType dataType, HcclReduceOp opType,
-    Event event, uint16_t mask)
+Result LocalReduce(
+    LocalAddr dst, LocalAddr src, Variable len, HcclDataType dataType, HcclReduceOp opType, Event event, uint16_t mask)
 {
     Operation operation;
     operation.code = OpCode::LOCAL_COPY;
@@ -644,8 +638,9 @@ Result LocalReduce(LocalAddr dst, LocalAddr src, Variable len, HcclDataType data
     return Result::SUCCESS;
 }
 
-Result LocalReduce(CcuBuffer* buffers, uint32_t count, HcclDataType dataType, HcclDataType outputDataType,
-    HcclReduceOp opType, Variable len, Event event, uint16_t mask)
+Result LocalReduce(
+    CcuBuffer* buffers, uint32_t count, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType,
+    Variable len, Event event, uint16_t mask)
 {
     return Result::SUCCESS;
 }
@@ -664,8 +659,9 @@ Result Write(ChannelHandle channel, RemoteAddr remote, CcuBuffer local, Variable
     return Result::SUCCESS;
 }
 
-Result WriteReduce(ChannelHandle channel, RemoteAddr remote, LocalAddr local, Variable length,
-    HcclDataType dataType, HcclReduceOp opType, Event event, uint16_t mask)
+Result WriteReduce(
+    ChannelHandle channel, RemoteAddr remote, LocalAddr local, Variable length, HcclDataType dataType,
+    HcclReduceOp opType, Event event, uint16_t mask)
 {
     Operation operation;
     operation.code = OpCode::WRITE;
@@ -681,7 +677,7 @@ Result WriteReduce(ChannelHandle channel, RemoteAddr remote, LocalAddr local, Va
 
 Loop::Loop() : handle(0) {}
 
-Loop::Loop(Variable &loopParam, const Func &func)
+Loop::Loop(Variable& loopParam, const Func& func)
 {
     handle = CompilerContext::Current().CreateLoop();
     loopParamHandle = loopParam.handle;
@@ -692,15 +688,16 @@ Loop::Loop(Variable &loopParam, const Func &func)
 
 LoopGroup::LoopGroup() : handle(0) {}
 
-LoopGroup::LoopGroup(Variable &parallelCfg, Variable &offsetCfg, uint32_t maxLoopNum, const std::vector<Loop> &loops)
+LoopGroup::LoopGroup(Variable& parallelCfg, Variable& offsetCfg, uint32_t maxLoopNum, const std::vector<Loop>& loops)
 {
     std::vector<ResourceHandle> loopHandles;
     std::vector<ResourceHandle> loopParamHandles;
-    for (const auto &loop : loops) {
+    for (const auto& loop : loops) {
         loopHandles.push_back(loop.handle);
         loopParamHandles.push_back(loop.loopParamHandle);
     }
-    handle = CompilerContext::Current().CreateLoopGroup(parallelCfg.handle, offsetCfg.handle, maxLoopNum, loopHandles, loopParamHandles);
+    handle = CompilerContext::Current().CreateLoopGroup(
+        parallelCfg.handle, offsetCfg.handle, maxLoopNum, loopHandles, loopParamHandles);
 }
 
 } // namespace ccu

@@ -71,7 +71,7 @@ CCU algorithms coexist with existing AICPU algorithms, with execution path selec
 
 ## Software Functions
 
-1. **Algorithm Selection**: Automatically selects CCU AllToAll algorithm variant based on topology (Mesh1D / Mesh1D_CLOS / CLOS), rank count, and data size
+1. **Algorithm Selection**: Automatically selects CCU AllToAll algorithm variant based on topology (Mesh1D / MESH_1D_CLOS), rank count, and data size
 2. **Resource Computation**: Computes channel requests, kernel parameters, and kernel count
 3. **Kernel Execution**: Implements AllToAll data transfer via CCU primitives, supporting both `loadFromMem` and `!loadFromMem` (GroupCopy) paths
 4. **Chunked Transfer**: Data larger than 256MB is automatically chunked (WriteChunked + CCU_WHILE loop)

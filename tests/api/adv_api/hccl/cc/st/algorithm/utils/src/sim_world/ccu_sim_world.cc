@@ -37,8 +37,8 @@ uint64_t RankMemory::ParameterAddress() const
 }
 
 struct RuntimeWorld::RankState {
-    const Program *program{nullptr};
-    const RankLaunch *launch{nullptr};
+    const Program* program{nullptr};
+    const RankLaunch* launch{nullptr};
     size_t pc{0};
     bool completed{false};
     std::vector<TaskParam> taskParams;
@@ -224,9 +224,11 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
             const auto& descriptor = state.program->groupCopies[operation.index];
             for (const auto& loopGroup : descriptor.loopGroups) {
                 const uint64_t parallelParam = state.variables.count(loopGroup.parallelParamVariable) ?
-                    state.variables[loopGroup.parallelParamVariable] : 0;
+                                                   state.variables[loopGroup.parallelParamVariable] :
+                                                   0;
                 const uint64_t offsetParam = state.variables.count(loopGroup.addressOffsetVariable) ?
-                    state.variables[loopGroup.addressOffsetVariable] : 0;
+                                                 state.variables[loopGroup.addressOffsetVariable] :
+                                                 0;
                 if (parallelParam == 0) {
                     continue;
                 }
@@ -245,10 +247,11 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
                             continue;
                         }
 
-                        ResourceHandle loopParamHandle = (li < loopGroup.loopParamHandles.size()) ?
-                            loopGroup.loopParamHandles[li] : 0;
+                        ResourceHandle loopParamHandle =
+                            (li < loopGroup.loopParamHandles.size()) ? loopGroup.loopParamHandles[li] : 0;
                         const uint64_t loopParam = (loopParamHandle != 0 && state.variables.count(loopParamHandle)) ?
-                            state.variables[loopParamHandle] : 0;
+                                                       state.variables[loopParamHandle] :
+                                                       0;
                         const uint64_t iterNum = loopParam & 0x1FFF;
                         const uint64_t gsaOffsetLoop = (loopParam >> 13) & 0xFFFFFFFF;
                         if (iterNum == 0) {
@@ -266,8 +269,8 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
                                     bool srcIsBuffer = (srcLocal == state.program->localAddresses.end());
                                     bool dstIsBuffer = (dstLocal == state.program->localAddresses.end());
 
-                                    const uint64_t copyLen = state.variables.count(bodyOp.src1) ?
-                                        state.variables[bodyOp.src1] : 0;
+                                    const uint64_t copyLen =
+                                        state.variables.count(bodyOp.src1) ? state.variables[bodyOp.src1] : 0;
                                     if (copyLen == 0) {
                                         state.events[bodyOp.immediate] |= bodyOp.mask;
                                         continue;
@@ -326,7 +329,7 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
         case OpCode::WRITE:
         case OpCode::LOCAL_COPY: {
             auto resolveAddr = [&](ResourceHandle handle, bool isRemote, ResourceHandle& outAddrHandle,
-                bool& outIsBuffer) -> bool {
+                                   bool& outIsBuffer) -> bool {
                 outIsBuffer = false;
                 if (isRemote) {
                     auto it = state.program->remoteAddresses.find(handle);
@@ -376,8 +379,7 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
                 }
             }
 
-            const uint64_t length = state.variables.count(operation.src1) ?
-                state.variables[operation.src1] : 0;
+            const uint64_t length = state.variables.count(operation.src1) ? state.variables[operation.src1] : 0;
             if (length == 0) {
                 state.events[operation.immediate] |= operation.mask;
                 break;
@@ -405,7 +407,8 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
                 destinationPointer = state.buffers[dstAddrHandle].data();
                 destinationRank = static_cast<uint32_t>(rankIndex);
             } else {
-                if (!ResolveMemory(states, state.addresses[dstAddrHandle], length, destinationPointer, destinationRank)) {
+                if (!ResolveMemory(
+                        states, state.addresses[dstAddrHandle], length, destinationPointer, destinationRank)) {
                     result = Result::OUT_OF_RANGE;
                     SetError("CCU destination memory is out of range");
                     return false;
@@ -477,7 +480,7 @@ Result RuntimeWorld::Launch(const std::vector<RankLaunch>& launches)
 
     std::vector<RankState> states(launches.size());
     for (size_t rank = 0; rank < launches.size(); ++rank) {
-        const Program *program = RegisterManager::Global().GetProgram(launches[rank].kernel);
+        const Program* program = RegisterManager::Global().GetProgram(launches[rank].kernel);
         if (program == nullptr || launches[rank].memory == nullptr || program->rankId != rank ||
             program->rankSize != launches.size()) {
             SetError("rank launch does not match compiled program");

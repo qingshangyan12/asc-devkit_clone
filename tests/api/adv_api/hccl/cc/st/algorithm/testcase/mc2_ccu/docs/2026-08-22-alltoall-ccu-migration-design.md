@@ -71,7 +71,7 @@ CCU 算法与现有 AICPU 算法共存，通过 `opExpansionMode` 配置选择�
 
 ## 软件功能
 
-1. **算法选择**：根据拓扑类型（Mesh1D / Mesh1D_CLOS / CLOS）、rank 数、数据量大小，自动选择 CCU AllToAll 算法变体
+1. **算法选择**：根据拓扑类型（Mesh1D / MESH_1D_CLOS）、rank 数、数据量大小，自动选择 CCU AllToAll 算法变体
 2. **资源计算**：计算 channel 请求、kernel 参数、kernel 数量
 3. **Kernel 执行**：通过 CCU 原语实现 AllToAll 数据搬运，支持 `loadFromMem` 和 `!loadFromMem`（GroupCopy）两种路径
 4. **分块传输**：大于 256MB 的数据自动分块传输（WriteChunked + CCU_WHILE 循环）
