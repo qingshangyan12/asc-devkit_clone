@@ -45,8 +45,14 @@
 ### UB源收集模式（占位符形式）
 
 ```c
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_gather(vector_<dst_dtype>& dst,
                                        __ubuf__ <src_dtype>* src,
+                                       vector_<index_dtype> index,
+                                       vector_bool mask)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline vector_<dst_dtype> asc_gather(__ubuf__ <src_dtype>* src,
                                        vector_<index_dtype> index,
                                        vector_bool mask)
 ```
@@ -75,11 +81,17 @@ __simd_callee__ inline void asc_gather(vector_<dst_dtype>& dst,
 | uint32_t | uint32_t | uint32_t |
 | float | float | uint32_t |
 
-**典型示例**
+**函数原型典型示例**
 ```c
 // 示例：dst_dtype/src_dtype/index_dtype数据类型分别为: int16_t/int16_t/uint16_t
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_gather(vector_int16_t& dst,
                                        __ubuf__ int16_t* src,
+                                       vector_uint16_t index,
+                                       vector_bool mask)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline vector_int16_t asc_gather(__ubuf__ int16_t* src,
                                        vector_uint16_t index,
                                        vector_bool mask)
 ```
@@ -87,8 +99,13 @@ __simd_callee__ inline void asc_gather(vector_int16_t& dst,
 ### 寄存器源收集模式（占位符形式）
 
 ```c
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_gather(vector_<dtype>& dst,
                                        vector_<dtype> src,
+                                       vector_<index_dtype> index)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline vector_<dtype> asc_gather(vector_<dtype> src,
                                        vector_<index_dtype> index)
 ```
 
@@ -110,12 +127,17 @@ __simd_callee__ inline void asc_gather(vector_<dtype>& dst,
 | uint32_t | uint32_t |
 | float | uint32_t |
 
-**典型示例**
+**函数原型典型示例**
 
 ```c
 // 示例：dtype/index_dtype数据类型分别为: int16_t/uint16_t
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_gather(vector_int16_t& dst,
                                        vector_int16_t src,
+                                       vector_uint16_t index)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline vector_int16_t asc_gather(vector_int16_t src,
                                        vector_uint16_t index)
 ```
 
@@ -146,13 +168,54 @@ __simd_callee__ inline void asc_gather(vector_int16_t& dst,
 
 ## 返回值说明
 
-无
+- 通过引用参数输出结果的函数原型无返回值。
+- 通过函数返回值输出结果的函数原型返回收集结果，具体返回值类型如下。
 
+### UB源收集模式返回值类型
+
+| src类型 | index类型 | 返回值类型 |
+|---|---|---|
+| `int8_t` | `vector_uint16_t` | `vector_int8_t` |
+| `uint8_t` | `vector_uint16_t` | `vector_uint8_t` |
+| `int16_t` | `vector_uint16_t` | `vector_int16_t` |
+| `uint16_t` | `vector_uint16_t` | `vector_uint16_t` |
+| `int32_t` | `vector_uint32_t` | `vector_int32_t` |
+| `uint32_t` | `vector_uint32_t` | `vector_uint32_t` |
+| `half` | `vector_uint16_t` | `vector_half` |
+| `float` | `vector_uint32_t` | `vector_float` |
+| `bfloat16_t` | `vector_uint16_t` | `vector_bfloat16_t` |
+| `fp8_e4m3fn_t` | `vector_uint16_t` | `vector_fp8_e4m3fn_t` |
+| `hifloat8_t` | `vector_uint16_t` | `vector_hifloat8_t` |
+| `fp8_e5m2_t` | `vector_uint16_t` | `vector_fp8_e5m2_t` |
+| `fp8_e8m0_t` | `vector_uint16_t` | `vector_fp8_e8m0_t` |
+| `int16_t` | `vector_uint32_t` | `vector_int16_t` |
+| `uint16_t` | `vector_uint32_t` | `vector_uint16_t` |
+| `half` | `vector_uint32_t` | `vector_half` |
+| `bfloat16_t` | `vector_uint32_t` | `vector_bfloat16_t` |
+
+### 寄存器源收集模式返回值类型
+
+| src类型 | index类型 | 返回值类型 |
+|---|---|---|
+| `vector_int8_t` | `vector_uint8_t` | `vector_int8_t` |
+| `vector_uint8_t` | `vector_uint8_t` | `vector_uint8_t` |
+| `vector_int16_t` | `vector_uint16_t` | `vector_int16_t` |
+| `vector_uint16_t` | `vector_uint16_t` | `vector_uint16_t` |
+| `vector_int32_t` | `vector_uint32_t` | `vector_int32_t` |
+| `vector_uint32_t` | `vector_uint32_t` | `vector_uint32_t` |
+| `vector_float` | `vector_uint32_t` | `vector_float` |
+| `vector_half` | `vector_uint16_t` | `vector_half` |
+| `vector_bfloat16_t` | `vector_uint16_t` | `vector_bfloat16_t` |
+| `vector_fp8_e4m3fn_t` | `vector_uint8_t` | `vector_fp8_e4m3fn_t` |
+| `vector_hifloat8_t` | `vector_uint8_t` | `vector_hifloat8_t` |
+| `vector_fp8_e5m2_t` | `vector_uint8_t` | `vector_fp8_e5m2_t` |
+| `vector_fp8_e8m0_t` | `vector_uint8_t` | `vector_fp8_e8m0_t` |
 ## 约束说明
 
 ### 通用约束
 
-- 本接口在非AIV上调用直接返回。
+- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
+- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
 - 本接口在Vector Function（`__simd_vf__` 标记的函数）内调用，UB源收集模式时源操作数为UB地址、目的操作数为矢量数据寄存器，寄存器源收集模式时源/目的均为矢量数据寄存器。
 
 ### UB源收集模式约束
