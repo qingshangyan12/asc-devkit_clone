@@ -94,6 +94,8 @@ class SingleOpCompile:
                 )
 
     def set_kernel_spec_for_context(self, context):
+        """Forward Kernel Spec settings to the AscendC compile context."""
+
         kernel_spec_mode = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC, "None")
         kernel_spec_dir = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC_DIR)
         context.add_addition("kernel_spec_mode", kernel_spec_mode)
@@ -369,10 +371,8 @@ class SingleOpCompile:
             OpcOptions.RELOCATABLE_BIN, False
         )
         kernel_spec_mode = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC, "None")
-        if kernel_spec_mode == "None":
-            enable_super_kernel = op_relocatable_bin
-        else:
-            enable_super_kernel = kernel_spec_mode == "SK"
+        # Explicit SK enables the existing dynamic SK preparation path.
+        enable_super_kernel = op_relocatable_bin or (kernel_spec_mode == "SK")
         logger.debug(
             "debug_config {}, enable_super_kernel {}.".format(
                 debug_config, enable_super_kernel

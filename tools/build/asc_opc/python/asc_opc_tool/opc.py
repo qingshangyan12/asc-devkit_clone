@@ -634,6 +634,8 @@ class OpcOptionParser:
         logger.info("Save op_super_kernel_options {}.".format(sub_kernel_option))
 
     def check_kernel_spec_cfg(self):
+        """Validate Kernel Spec mode and normalize its publication directory."""
+
         kernel_spec = self.get_option(OpcOptions.KERNEL_SPEC)
         if kernel_spec not in {"None", "Normal", "SK"}:
             logger.error(

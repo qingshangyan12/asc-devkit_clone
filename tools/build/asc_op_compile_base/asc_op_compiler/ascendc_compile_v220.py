@@ -18,13 +18,12 @@ import hashlib
 import os
 import stat
 import subprocess
-from dataclasses import dataclass
-from typing import Tuple
 from asc_op_compile_base.common.buildcfg import get_current_build_config
 from .global_storage import global_var_storage
 from .ascendc_common_utility import (
     CommonUtility,
     CompileInfo,
+    KernelCompileCommand,
     get_kernel_fun_name_with_tiling_key_and_kernel_type,
 )
 from .get_op_tiling import TilingInfo
@@ -46,24 +45,6 @@ from .ascendc_compile_base import (
 )
 from .ascendc_compile_dfx import DFXSectionGenerator
 from .super_kernel_sub_op_compile import gen_sub_kernel_name
-
-
-@dataclass(frozen=True)
-class DynamicCompileCommandSpec:
-    tiling_key: str
-    compiled_symbol: str
-    core_type: str
-    source_path: str
-    argv: Tuple[str, ...]
-    output_path: str
-
-
-def _record_dynamic_compile_command(
-    compile_info: CompileInfo,
-    command: DynamicCompileCommandSpec,
-):
-    if compile_info.record_compile_commands:
-        compile_info.recorded_compile_commands.append(command)
 
 
 def _gen_compile_cmd_c310(
@@ -327,6 +308,8 @@ def gen_compile_cmd_v220(
 
 
 def _kernel_type_for_key(compile_info: CompileInfo, tiling_key: str):
+    """Return the explicit Kernel type registered for one Tiling Key."""
+
     kernel_type = compile_info.tiling_key_kernel_type.get(str(tiling_key))
     if kernel_type is None:
         raise ValueError(f"kernel type is unavailable for tiling key {tiling_key}")
@@ -334,6 +317,8 @@ def _kernel_type_for_key(compile_info: CompileInfo, tiling_key: str):
 
 
 def get_compile_core_types(compile_info: CompileInfo, tiling_key: str):
+    """Resolve the physical cube/vector compile targets for one Tiling Key."""
+
     if compile_info.no_set_kernel_type:
         core_types = {
             CORE_TYPE_MIX: ("cube", "vec"),
@@ -369,6 +354,8 @@ def get_compile_core_types(compile_info: CompileInfo, tiling_key: str):
 
 
 def get_compile_target_name(compile_info: CompileInfo, tiling_key: str, core_type: str):
+    """Build the symbol name shared by dynamic compilation and Manifest replay."""
+
     kernel_name = compile_info.kernel_name
     for suffix in ("_mix_aic", "_mix_aiv"):
         if kernel_name.endswith(suffix):
@@ -390,6 +377,8 @@ def get_compile_target_name(compile_info: CompileInfo, tiling_key: str, core_typ
 def get_compile_target_options(
     compile_info: CompileInfo, tiling_key: str, enable_c310_rules: bool
 ):
+    """Build Kernel-type macros shared by executed and recorded commands."""
+
     options = []
     is_no_set_mix = (
         compile_info.no_set_kernel_type and compile_info.code_channel == CORE_TYPE_MIX
@@ -767,9 +756,9 @@ def call_bisheng_v220(
                 or (sub_arch is not None and "cube" in sub_arch)
                 else "vec"
             )
-            _record_dynamic_compile_command(
-                compile_info,
-                DynamicCompileCommandSpec(
+            # Record each per-key argv before batch execution.
+            compile_info.compile_command_session.submit(
+                KernelCompileCommand(
                     tiling_key=str(tiling_key),
                     compiled_symbol=kernel_name,
                     core_type=core_type,
@@ -793,7 +782,8 @@ def call_bisheng_v220(
             compile_info.gen_kernel_func_file, new_sources
         )
 
-        if not compile_info.execute_compile_commands:
+        # Record-only replay retains the wrapper but skips compilation and fatbin generation.
+        if not compile_info.compile_command_session.should_execute:
             return compile_info.tiling_key_list
 
         compile_multi_tilingkey(
