@@ -26,14 +26,18 @@
 ## 3. 函数原型
 
 ```cpp
-namespace asc::te::experimental {
+namespace asc {
+namespace te {
+namespace experimental {
 
 template <const histogram_options& options = default_histogram_options>
 __simd_callee__ inline decltype(auto) histograms(
     const reg_tensor<uint16_t>& dst,
     const reg_tensor<uint8_t>& src);
 
-} // namespace asc::te::experimental
+} // namespace experimental
+} // namespace te
+} // namespace asc
 ```
 
 ## 4. 参数说明

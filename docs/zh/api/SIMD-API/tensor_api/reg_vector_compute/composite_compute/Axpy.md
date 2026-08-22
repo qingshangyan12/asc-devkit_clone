@@ -25,7 +25,9 @@ $$
 ## 3. 函数原型
 
 ```cpp
-namespace asc::te::experimental {
+namespace asc {
+namespace te {
+namespace experimental {
 
 template <typename T, typename scalar_type>
 __simd_callee__ inline decltype(auto) axpy(
@@ -33,7 +35,9 @@ __simd_callee__ inline decltype(auto) axpy(
     const reg_tensor<T>& src,
     const scalar_type& scalar);
 
-} // namespace asc::te::experimental
+} // namespace experimental
+} // namespace te
+} // namespace asc
 ```
 
 ## 4. 参数说明

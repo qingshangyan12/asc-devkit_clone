@@ -31,14 +31,18 @@ $$
 ## 3. 函数原型
 
 ```cpp
-namespace asc::te::experimental {
+namespace asc {
+namespace te {
+namespace experimental {
 
 template <typename T>
 __simd_callee__ inline decltype(auto) exp_sub(
     const reg_tensor<T>& src0,
     const reg_tensor<T>& src1);
 
-} // namespace asc::te::experimental
+} // namespace experimental
+} // namespace te
+} // namespace asc
 ```
 
 ## 4. 参数说明
