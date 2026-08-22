@@ -206,7 +206,7 @@ inline uint32_t CalcFormattedLen(const char* fmt, va_list args)
 {
     va_list argsCopy;
     va_copy(argsCopy, args);
-    int32_t len = vsnprintf_s(nullptr, 0, 0, fmt, argsCopy);
+    int32_t len = vsnprintf(nullptr, 0, fmt, argsCopy);
     va_end(argsCopy);
     return (len > 0) ? static_cast<uint32_t>(len) : 0U;
 }
@@ -340,7 +340,7 @@ static void WritePrintInfoHeader(uint8_t* ringBase, uint32_t ringBufLen, uint64_
     // Write printfType=WRITING to ringbuf BEFORE updating bufOffset.
     // This ensures rts sees WRITING (not stale READY) when it notices
     // bufOffset has advanced, causing it to stop reading this round.
-    if (wOff + sizeof(PrintfFifo) <= ringBufLen) {
+    if (wOff + sizeof(PrintfInfo) <= ringBufLen) {
         (void)memcpy_s(ringBase + wOff, ringBufLen - wOff, &infoHead, sizeof(PrintfInfo));
     } else {
         // Split: header may span tail/head boundary, write byte-by-byte.
