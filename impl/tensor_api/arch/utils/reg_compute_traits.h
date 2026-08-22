@@ -28,15 +28,6 @@ namespace te {
 namespace detail {
 
 template <typename T>
-struct is_reg_tensor : ::AscendC::Std::false_type {};
-
-template <typename T>
-struct is_reg_tensor<reg_tensor<T>> : ::AscendC::Std::true_type {};
-
-template <typename T>
-inline constexpr bool is_reg_tensor_v = is_reg_tensor<::AscendC::Std::remove_cvref_t<T>>::value;
-
-template <typename T>
 struct reg_tensor_traits;
 
 template <typename T>

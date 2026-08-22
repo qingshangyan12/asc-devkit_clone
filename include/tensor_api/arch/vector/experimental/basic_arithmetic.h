@@ -20,6 +20,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <typename T>
 __simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg);
@@ -97,6 +98,7 @@ __simd_callee__ inline decltype(auto) max(const T& a, const U& b);
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) min(const T& a, const U& b);
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

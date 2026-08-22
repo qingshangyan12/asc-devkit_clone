@@ -18,6 +18,8 @@
 
 namespace {
 
+using namespace asc::te::experimental;
+
 template <typename T>
 using reg_type = asc::te::reg_tensor<T>;
 

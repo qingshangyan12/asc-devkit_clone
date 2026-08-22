@@ -20,6 +20,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <typename T, typename scalar_type>
 __simd_callee__ inline decltype(auto) axpy(
@@ -37,6 +38,7 @@ __simd_callee__ inline decltype(auto) fma(
 
 __simd_callee__ inline decltype(auto) muls_cast(const reg_tensor<float>& src, const float& scalar);
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

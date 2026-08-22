@@ -24,13 +24,13 @@ using reg_type = asc::te::reg_tensor<T>;
 template <typename T>
 void check_composite_compute()
 {
-    static_assert(std::is_same_v<decltype(asc::te::axpy(std::declval<const reg_type<T>&>(),
+    static_assert(std::is_same_v<decltype(asc::te::experimental::axpy(std::declval<const reg_type<T>&>(),
         std::declval<const reg_type<T>&>(), std::declval<const T&>())), reg_type<T>>);
-    static_assert(std::is_same_v<decltype(asc::te::absdiff(
+    static_assert(std::is_same_v<decltype(asc::te::experimental::absdiff(
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(std::is_same_v<decltype(asc::te::exp_sub(
+    static_assert(std::is_same_v<decltype(asc::te::experimental::exp_sub(
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<float>>);
-    static_assert(std::is_same_v<decltype(asc::te::fma(std::declval<const reg_type<T>&>(),
+    static_assert(std::is_same_v<decltype(asc::te::experimental::fma(std::declval<const reg_type<T>&>(),
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<T>>);
 }
 
@@ -38,7 +38,7 @@ TEST(test_tensor_api_composite_compute, compile_public_apis_and_supported_types)
 {
     check_composite_compute<half>();
     check_composite_compute<float>();
-    static_assert(std::is_same_v<decltype(asc::te::muls_cast(
+    static_assert(std::is_same_v<decltype(asc::te::experimental::muls_cast(
         std::declval<const reg_type<float>&>(), std::declval<const float&>())), reg_type<half>>);
 }
 

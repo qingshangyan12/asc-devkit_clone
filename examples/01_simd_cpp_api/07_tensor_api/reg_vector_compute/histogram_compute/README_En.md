@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates the default mode of the register histogram compute API `asc::te::histograms` with Tensor API, which is low-half frequency counting. It reads 256 `uint8_t` input values and writes 128 `uint16_t` histogram bins.
+This sample demonstrates the default mode of the register histogram compute API `asc::te::experimental::histograms` with Tensor API, which is low-half frequency counting. It reads 256 `uint8_t` input values and writes 128 `uint16_t` histogram bins.
 
 ## Supported Products
 
@@ -48,7 +48,7 @@ This sample demonstrates the default mode of the register histogram compute API 
     1. Create Tensor objects on GM and UB by using `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout`.
     2. Move input data from GM to UB by using `asc::te::make_copy` and `asc::te::copy`.
     3. Load input data as `reg_tensor<uint8_t>` by using Tensor `load`.
-    4. Initialize the destination `reg_tensor<uint16_t>` to 3 and call `asc::te::histograms` to count low-half frequencies.
+    4. Initialize the destination `reg_tensor<uint16_t>` to 3 and call `asc::te::experimental::histograms` to count low-half frequencies.
     5. Store the result back to UB by using Tensor `store`, and move it from UB back to GM by using `asc::te::copy`.
 
   - Invocation implementation
@@ -57,7 +57,7 @@ This sample demonstrates the default mode of the register histogram compute API 
 
 ## Core Interface
 
-### asc::te::histograms
+### asc::te::experimental::histograms
 
 ```cpp
 __simd_callee__ inline decltype(auto) histograms(

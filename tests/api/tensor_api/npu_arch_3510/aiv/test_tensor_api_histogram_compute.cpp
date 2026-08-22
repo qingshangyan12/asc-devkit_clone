@@ -18,24 +18,24 @@
 
 namespace {
 
-constexpr asc::te::histogram_options frequency_high_options {
-    asc::te::histogram_half::high, asc::te::histogram_mode::frequency};
-constexpr asc::te::histogram_options cumulative_low_options {
-    asc::te::histogram_half::low, asc::te::histogram_mode::cumulative};
-constexpr asc::te::histogram_options cumulative_high_options {
-    asc::te::histogram_half::high, asc::te::histogram_mode::cumulative};
+constexpr asc::te::experimental::histogram_options frequency_high_options {
+    asc::te::experimental::histogram_half::high, asc::te::experimental::histogram_mode::frequency};
+constexpr asc::te::experimental::histogram_options cumulative_low_options {
+    asc::te::experimental::histogram_half::low, asc::te::experimental::histogram_mode::cumulative};
+constexpr asc::te::experimental::histogram_options cumulative_high_options {
+    asc::te::experimental::histogram_half::high, asc::te::experimental::histogram_mode::cumulative};
 
 TEST(test_tensor_api_histogram_compute, compile_public_api_and_four_modes)
 {
     using dst_type = asc::te::reg_tensor<uint16_t>;
     using src_type = asc::te::reg_tensor<uint8_t>;
-    static_assert(std::is_same_v<decltype(asc::te::histograms(
+    static_assert(std::is_same_v<decltype(asc::te::experimental::histograms(
         std::declval<const dst_type&>(), std::declval<const src_type&>())), dst_type>);
-    static_assert(std::is_same_v<decltype(asc::te::histograms<frequency_high_options>(
+    static_assert(std::is_same_v<decltype(asc::te::experimental::histograms<frequency_high_options>(
         std::declval<const dst_type&>(), std::declval<const src_type&>())), dst_type>);
-    static_assert(std::is_same_v<decltype(asc::te::histograms<cumulative_low_options>(
+    static_assert(std::is_same_v<decltype(asc::te::experimental::histograms<cumulative_low_options>(
         std::declval<const dst_type&>(), std::declval<const src_type&>())), dst_type>);
-    static_assert(std::is_same_v<decltype(asc::te::histograms<cumulative_high_options>(
+    static_assert(std::is_same_v<decltype(asc::te::experimental::histograms<cumulative_high_options>(
         std::declval<const dst_type&>(), std::declval<const src_type&>())), dst_type>);
 }
 
