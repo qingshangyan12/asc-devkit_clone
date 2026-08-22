@@ -1,6 +1,6 @@
 # histograms
 
-> **命名空间** `asc::te` · **头文件** `tensor_api/experimental/reg/histogram_compute.h`
+> **命名空间** `asc::te::experimental` · **头文件** `tensor_api/tensor.h`
 
 ## 1. 产品支持情况
 
@@ -14,7 +14,7 @@
 
 ## 2. 功能说明
 
-头文件路径：`"tensor_api/experimental/reg/histogram_compute.h"`。
+头文件路径：`"tensor_api/tensor.h"`。
 
 统计 `uint8_t` 输入值的频率分布或累计分布，并在传入的 `dst` 初始值上累加结果。
 
@@ -26,14 +26,14 @@
 ## 3. 函数原型
 
 ```cpp
-namespace asc::te {
+namespace asc::te::experimental {
 
 template <const histogram_options& options = default_histogram_options>
 __simd_callee__ inline decltype(auto) histograms(
     const reg_tensor<uint16_t>& dst,
     const reg_tensor<uint8_t>& src);
 
-} // namespace asc::te
+} // namespace asc::te::experimental
 ```
 
 ## 4. 参数说明
@@ -64,7 +64,8 @@ __simd_callee__ inline decltype(auto) histograms(
 
 ## 6. 约束说明
 
-- 本接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用；
+- 本接口仅支持 `__NPU_ARCH__ == 3510`，须在 AIV 的 SIMD 调用链中使用，通常由
+  `__simd_vf__` 函数直接或间接调用；
   底层调用 `asc_frequency_histogram_bin0/bin1` 或
   `asc_cumulative_histogram_bin0/bin1`。
 - `src.mask` 必须在调用前初始化，它用于过滤参与统计的 `uint8_t` 输入 lane；mask 无效的
@@ -84,32 +85,25 @@ __simd_callee__ inline decltype(auto) histograms(
 再执行计算并将结果写回 UB。
 
 完整的 Kernel、Host 调用和数据验证代码请参见
-[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/histogram_compute_tensor_api/)。
+[可运行样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/reg_vector_compute/histogram_compute/)。
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/experimental/reg/histogram_compute.h"
 
-constexpr asc::te::histogram_options high_options {
-    asc::te::histogram_half::high, asc::te::histogram_mode::frequency};
+constexpr asc::te::experimental::histogram_options high_options {
+    asc::te::experimental::histogram_half::high, asc::te::experimental::histogram_mode::frequency};
 
-__simd_vf__ inline void histograms_example(__ubuf__ uint8_t* src,
-    __ubuf__ uint16_t* low_dst, __ubuf__ uint16_t* high_dst)
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void histograms_example(
+    InputTensor input, OutputTensor low_output, OutputTensor high_output)
 {
-    auto src_layout =
-        asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(asc::te::_1 {}, asc::te::_256 {});
-    auto dst_layout =
-        asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(asc::te::_1 {}, asc::te::_128 {});
-    auto input = asc::te::make_tensor(asc::te::make_mem_ptr(src), src_layout);
-    auto low_output = asc::te::make_tensor(asc::te::make_mem_ptr(low_dst), dst_layout);
-    auto high_output = asc::te::make_tensor(asc::te::make_mem_ptr(high_dst), dst_layout);
     auto src_reg = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<uint8_t>());
 
     asc::te::reg_tensor<uint16_t> initial;
     initial.mask = asc::te::all_mask<uint16_t>().reg;
     asc_duplicate_scalar(initial.reg, static_cast<uint16_t>(0), initial.mask);
-    auto low = asc::te::histograms(initial, src_reg);
-    auto high = asc::te::histograms<high_options>(initial, src_reg);
+    auto low = asc::te::experimental::histograms(initial, src_reg);
+    auto high = asc::te::experimental::histograms<high_options>(initial, src_reg);
     low_output.store(asc::te::make_coord(0, 0), low);
     high_output.store(asc::te::make_coord(0, 0), high);
 }

@@ -1,11 +1,11 @@
 # 基础算术
 
-本目录介绍 `asc::te` 命名空间下基于 `reg_tensor<T>` 的基础算术、数学函数和激活函数接口。
+本目录介绍 `asc::te::experimental` 命名空间下基于 `reg_tensor<T>` 的基础算术、数学函数和激活函数接口。
 
 ## 头文件
 
 ```cpp
-#include "tensor_api/experimental/reg/basic_arithmetic.h"
+#include "tensor_api/tensor.h"
 ```
 
 ## 产品支持情况
@@ -45,7 +45,8 @@
 
 ## 通用说明
 
-- 接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用。
+- 接口仅支持 `__NPU_ARCH__ == 3510`，须在 AIV 的 SIMD 调用链中使用，通常由
+`__simd_vf__` 函数直接或间接调用。
 - 返回对象的 `reg` 保存计算结果，`mask` 跟随接口选定的执行 mask。二元接口通常使用第一个
   `reg_tensor` 操作数的 `mask`，具体规则见对应接口页。
 - 输入寄存器的执行 mask 必须在调用前初始化，通常使用 `load(...).with_mask(m)` 完成绑定。

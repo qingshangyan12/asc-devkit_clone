@@ -1,6 +1,6 @@
 # operator!
 
-> **命名空间** `asc::te` · **头文件** `tensor_api/experimental/reg/logical_compute.h`
+> **命名空间** `asc::te::experimental` · **头文件** `tensor_api/tensor.h`
 
 ## 1. 产品支持情况
 
@@ -14,7 +14,7 @@
 
 ## 2. 功能说明
 
-头文件路径：`"tensor_api/experimental/reg/logical_compute.h"`。
+头文件路径：`"tensor_api/tensor.h"`。
 
 对普通元素执行逻辑非：输入为 0 时结果为 1，输入非 0 时结果为 0。
 
@@ -27,12 +27,12 @@ $$
 ## 3. 函数原型
 
 ```cpp
-namespace asc::te {
+namespace asc::te::experimental {
 
 template <typename T>
 __simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src);
 
-} // namespace asc::te
+} // namespace asc::te::experimental
 ```
 
 ## 4. 参数说明
@@ -58,7 +58,8 @@ __simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src);
 
 ## 6. 约束说明
 
-- 本接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用；
+- 本接口仅支持 `__NPU_ARCH__ == 3510`，须在 AIV 的 SIMD 调用链中使用，通常由
+  `__simd_vf__` 函数直接或间接调用；
   底层调用 `asc_not`、`asc_eq_scalar` 和
   `asc_duplicate_scalar`。
 - 作为执行 mask 的第一个寄存器操作数 `.mask` 必须在调用前初始化，通常使用
@@ -80,18 +81,16 @@ __simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src);
 再执行计算并将结果写回 UB。
 
 完整的 Kernel、Host 调用和数据验证代码请参见
-[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/logical_compute_tensor_api/)。
+[可运行样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/reg_vector_compute/logical_compute/)。
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/experimental/reg/logical_compute.h"
 
-__simd_vf__ inline void logical_not_example(__ubuf__ int32_t* src, __ubuf__ int32_t* dst)
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void logical_not_example(InputTensor input, OutputTensor output)
 {
-    auto layout =
-        asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(asc::te::_1 {}, asc::te::_64 {});
-    auto input = asc::te::make_tensor(asc::te::make_mem_ptr(src), layout);
-    auto output = asc::te::make_tensor(asc::te::make_mem_ptr(dst), layout);
+    using asc::te::experimental::operator!;
+
     auto src_reg = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<int32_t>());
 
     auto is_zero = !src_reg;

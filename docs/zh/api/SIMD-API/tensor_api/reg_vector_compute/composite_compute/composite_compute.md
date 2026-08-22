@@ -1,11 +1,11 @@
 # 复合计算
 
-本目录介绍 `asc::te` 命名空间下将多个基本步骤融合为一次调用的寄存器计算接口。
+本目录介绍 `asc::te::experimental` 命名空间下将多个基本步骤融合为一次调用的寄存器计算接口。
 
 ## 头文件
 
 ```cpp
-#include "tensor_api/experimental/reg/composite_compute.h"
+#include "tensor_api/tensor.h"
 ```
 
 ## 产品支持情况
@@ -32,6 +32,7 @@
 
 - 接口返回新的 `reg_tensor`，不会要求调用方预先声明输出对象。
 - 各接口支持的数据类型和参数形式见对应接口文档。
-- 接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用。
+- 接口仅支持 `__NPU_ARCH__ == 3510`，须在 AIV 的 SIMD 调用链中使用，通常由
+`__simd_vf__` 函数直接或间接调用。
 - 多输入接口使用文档指定的第一个输入寄存器 `mask` 作为执行 mask，其他输入的 `mask` 不参与
   本次执行 mask 的选择。

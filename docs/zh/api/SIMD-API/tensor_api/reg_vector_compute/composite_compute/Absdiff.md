@@ -1,6 +1,6 @@
 # absdiff
 
-> **命名空间** `asc::te` · **头文件** `tensor_api/experimental/reg/composite_compute.h`
+> **命名空间** `asc::te::experimental` · **头文件** `tensor_api/tensor.h`
 
 ## 1. 产品支持情况
 
@@ -14,7 +14,7 @@
 
 ## 2. 功能说明
 
-头文件路径：`"tensor_api/experimental/reg/composite_compute.h"`。
+头文件路径：`"tensor_api/tensor.h"`。
 
 逐元素计算两个输入之差的绝对值：
 
@@ -25,14 +25,14 @@ $$
 ## 3. 函数原型
 
 ```cpp
-namespace asc::te {
+namespace asc::te::experimental {
 
 template <typename T>
 __simd_callee__ inline decltype(auto) absdiff(
     const reg_tensor<T>& src0,
     const reg_tensor<T>& src1);
 
-} // namespace asc::te
+} // namespace asc::te::experimental
 ```
 
 ## 4. 参数说明
@@ -57,7 +57,8 @@ __simd_callee__ inline decltype(auto) absdiff(
 
 ## 6. 约束说明
 
-- 本接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用；
+- 本接口仅支持 `__NPU_ARCH__ == 3510`，须在 AIV 的 SIMD 调用链中使用，通常由
+  `__simd_vf__` 函数直接或间接调用；
   底层调用 `asc_abs_sub`。
 - 作为执行 mask 的第一个寄存器操作数 `.mask` 必须在调用前初始化，通常使用
   `load(...).with_mask(m)`。`m` 可由 `update_mask<T>(remain)`、`make_mask<pattern, T>()` 或 `all_mask<T>()` 生成；
@@ -75,25 +76,20 @@ __simd_callee__ inline decltype(auto) absdiff(
 再执行计算并将结果写回 UB。
 
 完整的 Kernel、Host 调用和数据验证代码请参见
-[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/composite_compute_tensor_api/)。
+[可运行样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/reg_vector_compute/composite_compute/)。
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/experimental/reg/composite_compute.h"
 
+template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void absdiff_example(
-    __ubuf__ float* src0, __ubuf__ float* src1, __ubuf__ float* dst)
+    InputTensor input0, InputTensor input1, OutputTensor output)
 {
-    auto layout =
-        asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(asc::te::_1 {}, asc::te::_64 {});
-    auto input0 = asc::te::make_tensor(asc::te::make_mem_ptr(src0), layout);
-    auto input1 = asc::te::make_tensor(asc::te::make_mem_ptr(src1), layout);
-    auto output = asc::te::make_tensor(asc::te::make_mem_ptr(dst), layout);
     auto mask = asc::te::all_mask<float>();
     auto src0_reg = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
     auto src1_reg = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
 
-    auto result = asc::te::absdiff(src0_reg, src1_reg);
+    auto result = asc::te::experimental::absdiff(src0_reg, src1_reg);
     output.store(asc::te::make_coord(0, 0), result);
 }
 ```

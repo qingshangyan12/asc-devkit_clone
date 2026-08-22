@@ -1,6 +1,6 @@
 # operator*（寄存器与标量）
 
-> **命名空间** `asc::te` · **头文件** `tensor_api/experimental/reg/basic_arithmetic.h`
+> **命名空间** `asc::te::experimental` · **头文件** `tensor_api/tensor.h`
 
 ## 1. 产品支持情况
 
@@ -14,7 +14,7 @@
 
 ## 2. 功能说明
 
-头文件路径：`"tensor_api/experimental/reg/basic_arithmetic.h"`。
+头文件路径：`"tensor_api/tensor.h"`。
 
 逐元素计算寄存器与标量的乘积，支持寄存器与标量、标量与寄存器两种操作数顺序：
 
@@ -28,12 +28,12 @@ Tensor API 的公开接口为 `operator*`，该标量重载底层调用 `asc_mul
 ## 3. 函数原型
 
 ```cpp
-namespace asc::te {
+namespace asc::te::experimental {
 
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator*(const T& a, const U& b);
 
-} // namespace asc::te
+} // namespace asc::te::experimental
 ```
 
 ## 4. 参数说明
@@ -82,18 +82,16 @@ __simd_callee__ inline decltype(auto) operator*(const T& a, const U& b);
 再执行计算并将结果写回 UB。
 
 完整的 Kernel、Host 调用和数据验证代码请参见
-[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/)。
+[可运行样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/reg_vector_compute/basic_arithmetic/)。
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/experimental/reg/basic_arithmetic.h"
 
-__simd_vf__ inline void mul_scalar_example(__ubuf__ float* src, __ubuf__ float* dst)
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void mul_scalar_example(InputTensor input, OutputTensor output)
 {
-    auto layout =
-        asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(asc::te::_1 {}, asc::te::_64 {});
-    auto input = asc::te::make_tensor(asc::te::make_mem_ptr(src), layout);
-    auto output = asc::te::make_tensor(asc::te::make_mem_ptr(dst), layout);
+    using asc::te::experimental::operator*;
+
     auto src_reg = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<float>());
 
     auto product = src_reg * 2.0f;

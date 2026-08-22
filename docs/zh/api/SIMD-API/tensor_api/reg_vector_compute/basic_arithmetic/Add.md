@@ -1,6 +1,6 @@
 # operator+
 
-> **命名空间** `asc::te` · **头文件** `tensor_api/experimental/reg/basic_arithmetic.h`
+> **命名空间** `asc::te::experimental` · **头文件** `tensor_api/tensor.h`
 
 ## 1. 产品支持情况
 
@@ -14,7 +14,7 @@
 
 ## 2. 功能说明
 
-头文件路径：`"tensor_api/experimental/reg/basic_arithmetic.h"`。
+头文件路径：`"tensor_api/tensor.h"`。
 
 `operator+` 对两个操作数执行逐元素加法。操作数支持寄存器与寄存器、寄存器与标量、
 标量与寄存器三种组合。
@@ -22,7 +22,7 @@
 ## 3. 函数原型
 
 ```cpp
-namespace asc::te {
+namespace asc::te::experimental {
 
 template <typename T>
 __simd_callee__ inline decltype(auto) operator+(
@@ -36,7 +36,7 @@ template <typename T>
 __simd_callee__ inline decltype(auto) operator+(
     const T& scalar, const reg_tensor<T>& src);
 
-} // namespace asc::te
+} // namespace asc::te::experimental
 ```
 
 ## 4. 参数说明
@@ -62,7 +62,8 @@ __simd_callee__ inline decltype(auto) operator+(
 
 ## 6. 约束说明
 
-- 本接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用；
+- 本接口仅支持 `__NPU_ARCH__ == 3510`，须在 AIV 的 SIMD 调用链中使用，通常由
+  `__simd_vf__` 函数直接或间接调用；
   底层调用 `asc_add` 或 `asc_add_scalar`。
 - 作为执行 mask 的第一个寄存器操作数 `.mask` 必须在调用前初始化，通常使用
   `load(...).with_mask(m)`。`m` 可由 `update_mask<T>(remain)`、`make_mask<pattern, T>()` 或 `all_mask<T>()` 生成；
@@ -80,20 +81,17 @@ __simd_callee__ inline decltype(auto) operator+(
 再执行计算并将结果写回 UB。
 
 完整的 Kernel、Host 调用和数据验证代码请参见
-[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/)。
+[可运行样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/reg_vector_compute/basic_arithmetic/)。
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/experimental/reg/basic_arithmetic.h"
 
+template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void add_example(
-    __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, __ubuf__ uint32_t* dst)
+    InputTensor input0, InputTensor input1, OutputTensor output)
 {
-    auto layout =
-        asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(asc::te::_1 {}, asc::te::_64 {});
-    auto input0 = asc::te::make_tensor(asc::te::make_mem_ptr(src0), layout);
-    auto input1 = asc::te::make_tensor(asc::te::make_mem_ptr(src1), layout);
-    auto output = asc::te::make_tensor(asc::te::make_mem_ptr(dst), layout);
+    using asc::te::experimental::operator+;
+
     auto mask = asc::te::all_mask<uint32_t>();
     auto src0_reg = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
     auto src1_reg = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);

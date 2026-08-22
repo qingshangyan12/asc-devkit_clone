@@ -1,6 +1,6 @@
 # muls_cast
 
-> **命名空间** `asc::te` · **头文件** `tensor_api/experimental/reg/composite_compute.h`
+> **命名空间** `asc::te::experimental` · **头文件** `tensor_api/tensor.h`
 
 ## 1. 产品支持情况
 
@@ -14,7 +14,7 @@
 
 ## 2. 功能说明
 
-头文件路径：`"tensor_api/experimental/reg/composite_compute.h"`。
+头文件路径：`"tensor_api/tensor.h"`。
 
 将 `float` 输入与标量逐元素相乘，再将结果转换为 `half`。对第 `i` 个有效的
 `float` 输入，计算结果写入返回寄存器的第 `2 * i` 个 `half` 位置：
@@ -28,13 +28,13 @@ $$
 ## 3. 函数原型
 
 ```cpp
-namespace asc::te {
+namespace asc::te::experimental {
 
 __simd_callee__ inline decltype(auto) muls_cast(
     const reg_tensor<float>& src,
     const float& scalar);
 
-} // namespace asc::te
+} // namespace asc::te::experimental
 ```
 
 ## 4. 参数说明
@@ -86,22 +86,18 @@ __simd_callee__ inline decltype(auto) muls_cast(
 以下示例先调用 `muls_cast`，再按 EVEN 布局将 `half` 结果转换回连续 `float`，最后写回 UB。
 
 完整的 Kernel、Host 调用和数据验证代码请参见
-[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/composite_compute_tensor_api/)。
+[可运行样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/reg_vector_compute/composite_compute/)。
 
 ```cpp
 #include "c_api/asc_simd.h"
 #include "tensor_api/tensor.h"
-#include "tensor_api/experimental/reg/composite_compute.h"
 
-__simd_vf__ inline void muls_cast_example(__ubuf__ float* src, __ubuf__ float* dst)
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void muls_cast_example(InputTensor input, OutputTensor output)
 {
-    auto layout =
-        asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(asc::te::_1 {}, asc::te::_64 {});
-    auto input = asc::te::make_tensor(asc::te::make_mem_ptr(src), layout);
-    auto output = asc::te::make_tensor(asc::te::make_mem_ptr(dst), layout);
     auto src_reg = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<float>());
 
-    auto half_result = asc::te::muls_cast(src_reg, 1.5f);
+    auto half_result = asc::te::experimental::muls_cast(src_reg, 1.5f);
     asc::te::reg_tensor<float> converted;
     asc_half2float(converted.reg, half_result.reg, half_result.mask, ASC_POSITION_EVEN);
     converted.mask = half_result.mask;

@@ -1,6 +1,6 @@
 # sqrt
 
-> **命名空间** `asc::te` · **头文件** `tensor_api/experimental/reg/basic_arithmetic.h`
+> **命名空间** `asc::te::experimental` · **头文件** `tensor_api/tensor.h`
 
 ## 1. 产品支持情况
 
@@ -14,7 +14,7 @@
 
 ## 2. 功能说明
 
-头文件路径：`"tensor_api/experimental/reg/basic_arithmetic.h"`。
+头文件路径：`"tensor_api/tensor.h"`。
 
 逐元素计算平方根：
 
@@ -25,12 +25,12 @@ $$
 ## 3. 函数原型
 
 ```cpp
-namespace asc::te {
+namespace asc::te::experimental {
 
 template <typename T>
 __simd_callee__ inline decltype(auto) sqrt(const reg_tensor<T>& src_reg);
 
-} // namespace asc::te
+} // namespace asc::te::experimental
 ```
 
 ## 4. 参数说明
@@ -55,7 +55,8 @@ __simd_callee__ inline decltype(auto) sqrt(const reg_tensor<T>& src_reg);
 
 ## 6. 约束说明
 
-- 本接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用；
+- 本接口仅支持 `__NPU_ARCH__ == 3510`，须在 AIV 的 SIMD 调用链中使用，通常由
+  `__simd_vf__` 函数直接或间接调用；
   底层调用 `asc_sqrt`。
 - 作为执行 mask 的第一个寄存器操作数 `.mask` 必须在调用前初始化，通常使用
   `load(...).with_mask(m)`。`m` 可由 `update_mask<T>(remain)`、`make_mask<pattern, T>()` 或 `all_mask<T>()` 生成；
@@ -73,21 +74,17 @@ __simd_callee__ inline decltype(auto) sqrt(const reg_tensor<T>& src_reg);
 再执行计算并将结果写回 UB。
 
 完整的 Kernel、Host 调用和数据验证代码请参见
-[可运行样例](../../../../../../../examples/01_simd_cpp_api/02_features/03_basic_api/02_vector_compute/basic_arithmetic_tensor_api/)。
+[可运行样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/reg_vector_compute/basic_arithmetic/)。
 
 ```cpp
 #include "tensor_api/tensor.h"
-#include "tensor_api/experimental/reg/basic_arithmetic.h"
 
-__simd_vf__ inline void sqrt_example(__ubuf__ float* src, __ubuf__ float* dst)
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void sqrt_example(InputTensor input, OutputTensor output)
 {
-    auto layout =
-        asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn>(asc::te::_1 {}, asc::te::_64 {});
-    auto input = asc::te::make_tensor(asc::te::make_mem_ptr(src), layout);
-    auto output = asc::te::make_tensor(asc::te::make_mem_ptr(dst), layout);
     auto src_reg = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<float>());
 
-    auto dst_reg = asc::te::sqrt(src_reg);
+    auto dst_reg = asc::te::experimental::sqrt(src_reg);
     output.store(asc::te::make_coord(0, 0), dst_reg);
 }
 ```

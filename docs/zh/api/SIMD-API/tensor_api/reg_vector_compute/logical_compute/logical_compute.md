@@ -1,11 +1,11 @@
 # 逻辑与位运算
 
-本目录介绍 `asc::te` 命名空间下基于 `reg_tensor<T>` 的逻辑、位运算和移位接口。
+本目录介绍 `asc::te::experimental` 命名空间下基于 `reg_tensor<T>` 的逻辑、位运算和移位接口。
 
 ## 头文件
 
 ```cpp
-#include "tensor_api/experimental/reg/logical_compute.h"
+#include "tensor_api/tensor.h"
 ```
 
 ## 产品支持情况
@@ -31,7 +31,8 @@
 
 ## 通用说明
 
-- 接口仅支持 `__NPU_ARCH__ == 3510`，并且只能在 AIV 的 `__simd_vf__` 函数中调用。
+- 接口仅支持 `__NPU_ARCH__ == 3510`，须在 AIV 的 SIMD 调用链中使用，通常由
+`__simd_vf__` 函数直接或间接调用。
 - `reg_tensor<bool>` 与其他 `reg_tensor<T>` 使用同一结构：`reg` 保存 predicate 数据，`mask` 表示
   predicate 数据的有效 lane。
 - 二元接口的执行 mask 和结果 mask 跟随第一个 `reg_tensor` 操作数；另一个寄存器操作数的
