@@ -10,5 +10,34 @@
 
 #include "tests/api/c_api/npu_arch_3510/utils/test_binary_instr_utils.h"
 
+#define TEST_VECTOR_COMPUTE_MADD_BF16_INSTR(class_name, c_api_name, cce_name, data_type)                               \
+                                                                                                                       \
+    class TestVectorCompute##class_name##_##data_type##_CApi : public testing::Test {                                  \
+    protected:                                                                                                         \
+        void SetUp() {}                                                                                                \
+        void TearDown() {}                                                                                             \
+    };                                                                                                                 \
+                                                                                                                       \
+    namespace {                                                                                                        \
+    void cce_name##_##data_type##_Stub(data_type& dst, data_type src0, data_type src1, vector_bool mask, int32_t mode) \
+    {}                                                                                                                 \
+    }                                                                                                                  \
+                                                                                                                       \
+    TEST_F(TestVectorCompute##class_name##_##data_type##_CApi, c_api_name##_##data_type##_Succ)                        \
+    {                                                                                                                  \
+        data_type dst;                                                                                                 \
+        data_type src0;                                                                                                \
+        data_type src1;                                                                                                \
+        vector_bool mask;                                                                                              \
+                                                                                                                       \
+        MOCKER_CPP(cce_name, void(data_type&, data_type, data_type, vector_bool, int32_t))                             \
+            .times(1)                                                                                                  \
+            .will(invoke(cce_name##_##data_type##_Stub));                                                              \
+                                                                                                                       \
+        c_api_name(dst, src0, src1, mask);                                                                             \
+        GlobalMockObject::verify();                                                                                    \
+    }
+
 TEST_VECTOR_COMPUTE_BINARY_INSTR(VMadd, asc_madd, vmadd, vector_half);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(VMadd, asc_madd, vmadd, vector_float);
+TEST_VECTOR_COMPUTE_MADD_BF16_INSTR(VMadd, asc_madd, vmadd, vector_bfloat16_t);
