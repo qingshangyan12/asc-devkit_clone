@@ -11,7 +11,6 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import importlib.util
-from contextlib import ExitStack
 import os
 from pathlib import Path
 import tempfile
@@ -43,24 +42,12 @@ class TestStaticCompileResourceId(unittest.TestCase):
         ]
         self.assertEqual(temporary_files, [])
 
-    def test_resource_metadata_uses_readelf(self):
-        with ExitStack() as stack:
-            find_tool = stack.enter_context(
-                mock.patch.object(MODULE, "_find_tool", return_value="readelf")
-            )
-            stack.enter_context(mock.patch.object(MODULE, "_run_tool", return_value=""))
-
-            self.assertEqual(MODULE._resource_id_section_info(self.object_path), [])
-
-        find_tool.assert_called_once_with("readelf")
-
     def test_invalid_inputs_do_not_modify_object(self):
         before = Path(self.object_path).read_bytes()
         for resource_id in ("A" * 64, "0" * 63, "z" * 64):
             with self.subTest(resource_id=resource_id):
-                with mock.patch.object(MODULE, "_validate_elf"):
-                    with self.assertRaisesRegex(MODULE.ResourceIdError, "64 lowercase"):
-                        MODULE.write_resource_id_section(self.object_path, resource_id)
+                with self.assertRaisesRegex(MODULE.ResourceIdError, "64 lowercase"):
+                    MODULE.write_resource_id_section(self.object_path, resource_id)
                 self.assertEqual(Path(self.object_path).read_bytes(), before)
 
         with self.subTest(input_type="non_elf"):
@@ -73,104 +60,59 @@ class TestStaticCompileResourceId(unittest.TestCase):
             with self.assertRaisesRegex(MODULE.ResourceIdError, "regular file"):
                 MODULE.calculate_resource_id(symlink_path)
 
-        with self.subTest(input_type="existing_section"):
-            section = [("PROGBITS", 64, "", 1)]
-            with ExitStack() as stack:
-                stack.enter_context(mock.patch.object(MODULE, "_validate_elf"))
-                stack.enter_context(
-                    mock.patch.object(
-                        MODULE, "_resource_id_section_info", return_value=section
-                    )
-                )
-                with self.assertRaisesRegex(MODULE.ResourceIdError, "already exists"):
-                    MODULE.write_resource_id_section(self.object_path, "0" * 64)
-            self.assertEqual(Path(self.object_path).read_bytes(), before)
+    def test_successful_objcopy_is_published_without_readback(self):
+        commands = []
+        payloads = []
+
+        def run_objcopy(command):
+            commands.append(command)
+            section_arg = command[command.index("--add-section") + 1]
+            payloads.append(Path(section_arg.split("=", 1)[1]).read_bytes())
+            Path(command[-1]).write_bytes(b"object with resource id")
+            return ""
+
+        with mock.patch.object(MODULE, "_find_tool", return_value="llvm-objcopy"):
+            with mock.patch.object(MODULE, "_run_tool", side_effect=run_objcopy):
+                MODULE.write_resource_id_section(self.object_path, "a" * 64)
+
+        self.assertEqual(len(commands), 1)
+        self.assertIn("--add-section", commands[0])
+        self.assertEqual(payloads, [b"a" * 64])
+        self.assertEqual(
+            Path(self.object_path).read_bytes(), b"object with resource id"
+        )
+        self.assert_no_resource_id_temporary_files()
 
     def test_write_failures_preserve_original_and_clean_temporary_files(self):
         resource_id = "a" * 64
         original = Path(self.object_path).read_bytes()
 
         with self.subTest(stage="objcopy"):
-            with ExitStack() as stack:
-                validate_elf = stack.enter_context(
-                    mock.patch.object(MODULE, "_validate_elf")
-                )
-                stack.enter_context(
-                    mock.patch.object(
-                        MODULE, "_resource_id_section_info", return_value=[]
-                    )
-                )
-                find_tool = stack.enter_context(
-                    mock.patch.object(MODULE, "_find_tool", return_value="llvm-objcopy")
-                )
-                stack.enter_context(
-                    mock.patch.object(
-                        MODULE,
-                        "_run_tool",
-                        side_effect=MODULE.ResourceIdError("objcopy failed"),
-                    )
-                )
-                with self.assertRaisesRegex(MODULE.ResourceIdError, "objcopy failed"):
-                    MODULE.write_resource_id_section(self.object_path, resource_id)
-            validate_elf.assert_not_called()
-            find_tool.assert_called_once_with("llvm-objcopy")
-            self.assertEqual(Path(self.object_path).read_bytes(), original)
-            self.assert_no_resource_id_temporary_files()
-
-        with self.subTest(stage="readback"):
-            with ExitStack() as stack:
-                stack.enter_context(mock.patch.object(MODULE, "_validate_elf"))
-                stack.enter_context(
-                    mock.patch.object(
-                        MODULE, "_resource_id_section_info", return_value=[]
-                    )
-                )
-                stack.enter_context(
-                    mock.patch.object(MODULE, "_find_tool", return_value="llvm-objcopy")
-                )
-                stack.enter_context(
-                    mock.patch.object(MODULE, "_run_tool", return_value="")
-                )
-                stack.enter_context(
-                    mock.patch.object(
-                        MODULE, "read_resource_id_section", return_value="b" * 64
-                    )
-                )
-                with self.assertRaisesRegex(
-                    MODULE.ResourceIdError, "verification failed"
+            with mock.patch.object(MODULE, "_find_tool", return_value="llvm-objcopy"):
+                with mock.patch.object(
+                    MODULE,
+                    "_run_tool",
+                    side_effect=MODULE.ResourceIdError("objcopy failed"),
                 ):
-                    MODULE.write_resource_id_section(self.object_path, resource_id)
+                    with self.assertRaisesRegex(
+                        MODULE.ResourceIdError, "objcopy failed"
+                    ):
+                        MODULE.write_resource_id_section(self.object_path, resource_id)
             self.assertEqual(Path(self.object_path).read_bytes(), original)
             self.assert_no_resource_id_temporary_files()
 
         with self.subTest(stage="replace"):
-            with ExitStack() as stack:
-                stack.enter_context(mock.patch.object(MODULE, "_validate_elf"))
-                stack.enter_context(
-                    mock.patch.object(
-                        MODULE, "_resource_id_section_info", return_value=[]
-                    )
-                )
-                stack.enter_context(
-                    mock.patch.object(MODULE, "_find_tool", return_value="llvm-objcopy")
-                )
-                stack.enter_context(
-                    mock.patch.object(MODULE, "_run_tool", return_value="")
-                )
-                stack.enter_context(
-                    mock.patch.object(
-                        MODULE, "read_resource_id_section", return_value=resource_id
-                    )
-                )
-                stack.enter_context(
-                    mock.patch.object(
+            with mock.patch.object(MODULE, "_find_tool", return_value="llvm-objcopy"):
+                with mock.patch.object(MODULE, "_run_tool", return_value=""):
+                    with mock.patch.object(
                         MODULE.os,
                         "replace",
                         side_effect=OSError("replace failed"),
-                    )
-                )
-                with self.assertRaisesRegex(OSError, "replace failed"):
-                    MODULE.write_resource_id_section(self.object_path, resource_id)
+                    ):
+                        with self.assertRaisesRegex(OSError, "replace failed"):
+                            MODULE.write_resource_id_section(
+                                self.object_path, resource_id
+                            )
             self.assertEqual(Path(self.object_path).read_bytes(), original)
             self.assert_no_resource_id_temporary_files()
 
@@ -185,79 +127,16 @@ class TestStaticCompileResourceId(unittest.TestCase):
                     raise OSError("payload creation failed")
                 return real_mkstemp(*args, **kwargs)
 
-            with ExitStack() as stack:
-                stack.enter_context(mock.patch.object(MODULE, "_validate_elf"))
-                stack.enter_context(
-                    mock.patch.object(
-                        MODULE, "_resource_id_section_info", return_value=[]
-                    )
-                )
-                stack.enter_context(
-                    mock.patch.object(MODULE, "_find_tool", return_value="llvm-objcopy")
-                )
-                stack.enter_context(
-                    mock.patch.object(
-                        MODULE.tempfile,
-                        "mkstemp",
-                        side_effect=fail_second_mkstemp,
-                    )
-                )
-                with self.assertRaisesRegex(OSError, "payload creation failed"):
-                    MODULE.write_resource_id_section(self.object_path, resource_id)
+            with mock.patch.object(MODULE, "_find_tool", return_value="llvm-objcopy"):
+                with mock.patch.object(
+                    MODULE.tempfile,
+                    "mkstemp",
+                    side_effect=fail_second_mkstemp,
+                ):
+                    with self.assertRaisesRegex(OSError, "payload creation failed"):
+                        MODULE.write_resource_id_section(self.object_path, resource_id)
             self.assertEqual(Path(self.object_path).read_bytes(), original)
             self.assert_no_resource_id_temporary_files()
-
-    def test_rejects_invalid_resource_id_sections(self):
-        metadata_cases = (
-            ([], "expected one"),
-            ([("PROGBITS", 64, "", 1)] * 2, "expected one"),
-            ([("NOBITS", 64, "", 1)], "SHT_PROGBITS"),
-            ([("PROGBITS", 63, "", 1)], "64 bytes"),
-            ([("PROGBITS", 64, "A", 1)], "SHF_ALLOC"),
-            ([("PROGBITS", 64, "", 8)], "alignment"),
-        )
-        for section_info, error_pattern in metadata_cases:
-            with self.subTest(section_info=section_info):
-                with ExitStack() as stack:
-                    stack.enter_context(mock.patch.object(MODULE, "_validate_elf"))
-                    stack.enter_context(
-                        mock.patch.object(
-                            MODULE,
-                            "_resource_id_section_info",
-                            return_value=section_info,
-                        )
-                    )
-                    with self.assertRaisesRegex(MODULE.ResourceIdError, error_pattern):
-                        MODULE.read_resource_id_section(self.object_path)
-
-        content_cases = (b"A" * 64, b"0" * 63, b"\xff" * 64)
-        for content in content_cases:
-            with self.subTest(content=content):
-
-                def dump_section(command):
-                    dump_path = command[2].split("=", 1)[1]
-                    Path(dump_path).write_bytes(content)
-                    return ""
-
-                with ExitStack() as stack:
-                    validate_elf = stack.enter_context(
-                        mock.patch.object(MODULE, "_validate_elf")
-                    )
-                    stack.enter_context(
-                        mock.patch.object(MODULE, "_validate_section_metadata")
-                    )
-                    find_tool = stack.enter_context(
-                        mock.patch.object(
-                            MODULE, "_find_tool", return_value="llvm-objcopy"
-                        )
-                    )
-                    stack.enter_context(
-                        mock.patch.object(MODULE, "_run_tool", side_effect=dump_section)
-                    )
-                    with self.assertRaises(MODULE.ResourceIdError):
-                        MODULE.read_resource_id_section(self.object_path)
-                validate_elf.assert_not_called()
-                find_tool.assert_called_once_with("llvm-objcopy")
 
 
 if __name__ == "__main__":

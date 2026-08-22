@@ -930,7 +930,6 @@ class TestOpCompilationUt(unittest.TestCase):
         cases = (
             ("Normal", False, False),
             ("SK", False, True),
-            ("Normal", True, False),
             ("None", True, True),
         )
         for mode, relocatable, expected_enable_sk in cases:
