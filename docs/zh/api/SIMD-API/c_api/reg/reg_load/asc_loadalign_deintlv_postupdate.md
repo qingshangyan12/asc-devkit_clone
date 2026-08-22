@@ -32,8 +32,6 @@
 
 ## 函数原型
 
-### 立即数偏移搬入模式
-
 ```c
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_<dtype>& dst0,
                                                              vector_<dtype>& dst1,
@@ -48,7 +46,7 @@ dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`�
 ### 函数原型典型示例
 
 ```c
-// 示例：int16_t类型去交织搬入并更新src。
+// 示例：int16_t类型。
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_int16_t& dst0,
                                                              vector_int16_t& dst1,
                                                              __ubuf__ int16_t*& src,
@@ -56,8 +54,6 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_int16_t& dst
 ```
 
 ## 参数说明
-
-### 立即数偏移搬入模式
 
 **表1** 参数说明
 
@@ -81,9 +77,12 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_int16_t& dst
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - 当前实际读取地址及Post Update更新后的下一次实际读取地址必须按32字节对齐，且实际读取范围必须在UB地址空间内且不越界，否则会报错。
-- `dst0`与`dst1`必须为不同的矢量数据寄存器。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+
+### 指令约束
+
+`dst0`与`dst1`必须为不同的矢量数据寄存器。
 
 ## 调用示例
 

@@ -53,6 +53,7 @@ dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`�
 #### 函数原型典型示例
 
 ```c
+// 示例：float类型。
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
                                                 __ubuf__ float* src)
 ```
@@ -72,6 +73,7 @@ dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`�
 #### 函数原型典型示例
 
 ```c
+// 示例：float类型。
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
                                                 __ubuf__ float* src,
                                                 addr_reg offset)
@@ -121,7 +123,7 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
 ### 地址寄存器偏移预处理模式
 
 - 每次循环迭代中，必须先调用`asc_update_addr_reg`生成该次迭代的起始偏移，再调用本接口初始化非对齐寄存器。
-- 当dtype为`int64_t`（b64）时，由于地址寄存器更新接口不支持b64模式，需要使用[asc_update_addr_reg_b32](../reg_data_types/asc_update_addr_reg.md)生成地址寄存器。一个b64元素占用两个b32寻址单元，因此传入`asc_update_addr_reg_b32`的各维偏移量必须设置为期望的b64元素偏移量的2倍。
+- 当dtype为`int64_t`时，由于地址寄存器更新接口不支持b64模式，需要使用[asc_update_addr_reg_b32](../reg_data_types/asc_update_addr_reg.md)生成地址寄存器。一个b64元素占用两个b32寻址单元，因此传入`asc_update_addr_reg_b32`的各维偏移量必须设置为期望的b64元素偏移量的2倍。
 - 本接口和紧随其后的首次搬入必须使用相同的`src`和`offset`。
 - 同一循环迭代内，后续搬入继续使用[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)按`inc`更新后的`offset`时，可以复用更新后的`src0`；如果`src`或`offset`被另行修改，必须根据修改后的实际读取地址重新初始化`src0`。
 

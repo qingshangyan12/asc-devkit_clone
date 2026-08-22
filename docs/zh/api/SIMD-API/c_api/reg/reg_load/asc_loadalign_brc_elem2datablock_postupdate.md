@@ -32,8 +32,6 @@
 
 ## 函数原型
 
-### 立即数偏移搬入模式
-
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(vector_<dtype>& dst,
                                                                         __ubuf__ <dtype>*& src,
@@ -54,8 +52,6 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(vector_h
 ```
 
 ## 参数说明
-
-### 立即数偏移搬入模式
 
 **表1** 参数说明
 

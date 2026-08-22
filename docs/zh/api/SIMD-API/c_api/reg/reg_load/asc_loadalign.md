@@ -198,15 +198,14 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 
 ### 地址寄存器偏移搬入模式
 
-必须先调用`asc_update_addr_reg`接口。
-
-- 当dtype为`int64_t`或`uint64_t`（b64）时，由于地址寄存器更新接口不支持b64模式，需要使用[asc_update_addr_reg_b32](../reg_data_types/asc_update_addr_reg.md)生成地址寄存器。一个b64元素占用两个b32寻址单元，因此传入`asc_update_addr_reg_b32`的各维偏移量必须设置为期望的b64元素偏移量的2倍。
+- 必须先调用`asc_update_addr_reg`接口。
+- 当dtype为`int64_t`或`uint64_t`时，由于地址寄存器更新接口不支持b64模式，需要使用[asc_update_addr_reg_b32](../reg_data_types/asc_update_addr_reg.md)生成地址寄存器。一个b64元素占用两个b32寻址单元，因此传入`asc_update_addr_reg_b32`的各维偏移量必须设置为期望的b64元素偏移量的2倍。
 
 ### 非连续对齐搬入模式
 
 - 该模式不支持目的操作数为掩码寄存器。
 - `mask`需通过[掩码设置接口](../reg_data_types/data_type_definition.md#掩码寄存器)预先赋值后再传入；未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
-- 当dtype为`int64_t`（b64）时，由于掩码创建接口不支持b64模式，需要先通过[asc_create_mask_b32](../reg_data_types/asc_create_mask.md)生成b32掩码，再通过[asc_unpack_lower](../data_compress/asc_unpack.md)将其展开为适用于b64数据的掩码后传入本接口。展开后的掩码以连续8个bit为一组，仅每组最低位的bit有效，用于控制对应的一个b64元素。
+- 当dtype为`int64_t`时，由于掩码创建接口不支持b64模式，需要先通过[asc_create_mask_b32](../reg_data_types/asc_create_mask.md)生成b32掩码，再通过[asc_unpack_lower](../data_compress/asc_unpack.md)将其展开为适用于b64数据的掩码后传入本接口。展开后的掩码以连续8个bit为一组，仅每组最低位的bit有效，用于控制对应的一个b64元素。
 
 ## 调用示例
 

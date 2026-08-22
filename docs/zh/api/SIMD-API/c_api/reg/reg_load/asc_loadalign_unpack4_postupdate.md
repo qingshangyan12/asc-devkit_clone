@@ -32,8 +32,6 @@
 
 ## 函数原型
 
-### 立即数偏移搬入模式
-
 ```c
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(vector_<dtype>& dst,
                                                              __ubuf__ <dtype>*& src,
@@ -47,15 +45,13 @@ dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`�
 ### 函数原型典型示例
 
 ```c
-// 示例：int8_t类型unpack4搬入并更新src。
+// 示例：int8_t类型。
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(vector_int8_t& dst,
                                                              __ubuf__ int8_t*& src,
                                                              int32_t offset)
 ```
 
 ## 参数说明
-
-### 立即数偏移搬入模式
 
 **表1** 参数说明
 

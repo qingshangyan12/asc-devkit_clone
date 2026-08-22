@@ -28,7 +28,7 @@
 
 从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到目的矢量数据寄存器对应的一个`DataBlock`（32字节）中。搬运过程中数据格式和内容保持不变。本接口提供三种功能模式：
 
-- **连续对齐搬入模式**：将UB源地址的数据搬入到矢量数据寄存器，由用户自行更新源地址。
+- **对齐搬入模式**：将UB源地址的数据搬入到矢量数据寄存器，由用户自行更新源地址。
 - **立即数偏移搬入模式**：从相对源起始地址偏移指定距离的位置搬入数据。本接口不会自动更新源地址。
 - **地址寄存器偏移搬入模式**：通过地址寄存器指定相对源起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬入场景。需要与[asc_update_addr_reg](../reg_data_types/asc_update_addr_reg.md)配合使用。
 
@@ -36,7 +36,7 @@
 
 ## 函数原型
 
-### 连续对齐搬入模式
+### 对齐搬入模式
 
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_<dtype>& dst,
@@ -99,7 +99,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
 
 ## 参数说明
 
-### 连续对齐搬入模式
+### 对齐搬入模式
 
 **表1** 参数说明
 

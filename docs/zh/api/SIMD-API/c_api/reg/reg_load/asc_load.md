@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度数据，并搬入矢量数据寄存器，搬运过程中数据格式和内容保持不变。连续搬入时，需要在每次调用前手动更新源地址。
+从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度数据，并搬入矢量数据寄存器，搬运过程中数据格式和内容保持不变。连续搬入时，需要在每次调用前手动更新源地址。该接口为易用性接口，对性能有要求时可使用[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)。
 
 本接口仅在AIV上生效，非AIV调用直接返回。
 
@@ -65,6 +65,8 @@ __simd_callee__ inline void asc_load(vector_float& dst,
 无
 
 ## 约束说明
+
+### 通用约束
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
