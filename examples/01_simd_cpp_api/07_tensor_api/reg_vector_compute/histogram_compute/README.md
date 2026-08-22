@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Tensor API演示寄存器直方图计算接口`asc::te::histograms`的默认模式，即低半区间`frequency`统计。样例读取256个`uint8_t`输入元素，输出128个`uint16_t`统计结果。
+本样例基于Tensor API演示寄存器直方图计算接口`asc::te::experimental::histograms`的默认模式，即低半区间`frequency`统计。样例读取256个`uint8_t`输入元素，输出128个`uint16_t`统计结果。
 
 ## 支持的产品
 
@@ -48,7 +48,7 @@
     1. 使用`asc::te::make_tensor`、`asc::te::make_mem_ptr`和`asc::te::make_frame_layout`创建GM和UB上的Tensor对象。
     2. 使用`asc::te::make_copy`和`asc::te::copy`完成GM到UB的数据搬运。
     3. 使用Tensor `load`接口加载输入为`reg_tensor<uint8_t>`。
-    4. 初始化`reg_tensor<uint16_t>`目的寄存器为3，调用`asc::te::histograms`统计低半区间频次。
+    4. 初始化`reg_tensor<uint16_t>`目的寄存器为3，调用`asc::te::experimental::histograms`统计低半区间频次。
     5. 使用Tensor `store`接口写回UB，并使用`asc::te::copy`将结果从UB搬运回GM。
 
   - 调用实现
@@ -57,7 +57,7 @@
 
 ## 核心接口说明
 
-### asc::te::histograms
+### asc::te::experimental::histograms
 
 ```cpp
 __simd_callee__ inline decltype(auto) histograms(

@@ -22,6 +22,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <typename T>
 __simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg)
@@ -117,7 +118,7 @@ template <typename T, typename scalar_type>
 __simd_callee__ inline decltype(auto) leaky_relu(const reg_tensor<T>& src_reg, const scalar_type& slope)
 {
     static_assert(detail::supports_float_math_v<T>, "leaky_relu supports half and float");
-    static_assert(!detail::is_reg_tensor_v<scalar_type> &&
+    static_assert(!is_reg_tensor_v<scalar_type> &&
             Std::is_convertible_v<Std::remove_cvref_t<scalar_type>, T>,
         "leaky_relu requires a scalar convertible to the reg_tensor element type");
     reg_tensor<T> dst;
@@ -227,7 +228,7 @@ __simd_callee__ inline decltype(auto) operator*(const T& a, const U& b)
 {
     using elem_type = detail::binary_elem_t<T, U>;
     detail::check_binary_reg_types<T, U>();
-    if constexpr (detail::is_reg_tensor_v<T> && detail::is_reg_tensor_v<U>) {
+    if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
         static_assert(detail::supports_mul_v<elem_type>, "operator* does not support this element type");
     } else {
         static_assert(
@@ -236,9 +237,9 @@ __simd_callee__ inline decltype(auto) operator*(const T& a, const U& b)
 
     reg_tensor<elem_type> dst;
     vector_bool mask = detail::binary_mask(a, b);
-    if constexpr (detail::is_reg_tensor_v<T> && detail::is_reg_tensor_v<U>) {
+    if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
         asc_mul(dst.reg, a.reg, b.reg, mask);
-    } else if constexpr (detail::is_reg_tensor_v<T>) {
+    } else if constexpr (is_reg_tensor_v<T>) {
         asc_mul_scalar(dst.reg, a.reg, static_cast<elem_type>(b), mask);
     } else {
         asc_mul_scalar(dst.reg, b.reg, static_cast<elem_type>(a), mask);
@@ -284,9 +285,9 @@ __simd_callee__ inline decltype(auto) max(const T& a, const U& b)
 
     reg_tensor<elem_type> dst;
     vector_bool mask = detail::binary_mask(a, b);
-    if constexpr (detail::is_reg_tensor_v<T> && detail::is_reg_tensor_v<U>) {
+    if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
         asc_max(dst.reg, a.reg, b.reg, mask);
-    } else if constexpr (detail::is_reg_tensor_v<T>) {
+    } else if constexpr (is_reg_tensor_v<T>) {
         asc_max_scalar(dst.reg, a.reg, static_cast<elem_type>(b), mask);
     } else {
         asc_max_scalar(dst.reg, b.reg, static_cast<elem_type>(a), mask);
@@ -311,6 +312,7 @@ __simd_callee__ inline decltype(auto) min(const T& a, const U& b)
     return dst;
 }
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

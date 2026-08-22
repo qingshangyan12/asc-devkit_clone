@@ -48,7 +48,7 @@
     1. 使用`asc::te::make_tensor`、`asc::te::make_mem_ptr`和`asc::te::make_frame_layout`创建GM和UB上的Tensor对象。
     2. 使用`asc::te::make_copy`和`asc::te::copy`完成GM到UB的数据搬运。
     3. 使用Tensor `load`接口加载为`reg_tensor`，通过`make_mask<mask_pattern::vl64, T>()`指定64个元素参与计算。
-    4. 执行`value << 1`，并使用Tensor `store`接口写回UB。
+    4. 导入`asc::te::experimental::operator<<`，执行`value << 1`，并使用Tensor `store`接口写回UB。
     5. 使用`asc::te::copy`将结果从UB搬运回GM。
 
   - 调用实现
@@ -57,7 +57,7 @@
 
 ## 核心接口说明
 
-### operator<<
+### asc::te::experimental::operator<<
 
 ```cpp
 template <typename T, typename U>
