@@ -73,13 +73,62 @@ static CcuResult CompArgs(KfcServerContext& ctx)
     return CCU_SUCCESS;
 }
 
-void MissionPreSync(ccu::Variable& func, KfcServerContext& ctx)
+CcuResult MissionPreSync(ccu::Variable& func, KfcServerContext& ctx)
 {
     (void)func;
-    (void)ctx;
+
+    // 单 mission 时短路，零影响现有路径
+    // Variable 支持 == 和 != 与 uint64_t 比较
+    // 使用 CCU_IF...CCU_ELSE 结构，避免在 CCU_IF 内提前 return
+    CCU_IF(ctx.missionNum == 1)
+    {
+        // 单 mission 模式：无需同步，直接返回
+    }
+    CCU_ELSE
+    {
+        // 双 mission 栅障同步：用 tag-based local notify 实现 mission 间互斥等待
+        // 替代 hcomm 的 ExportMaskSignal + LocalCtxPost/LocalWait 机制
+        // missionIndex==0 发出 bit 0，等待 bit 1
+        // missionIndex==1 发出 bit 1，等待 bit 0
+        CCU_IF(ctx.missionIndex == 0)
+        {
+            // mission 0: post bit 0, wait bit 1
+            CCU_CHK_RET(ccu::EventRecord("MiSync0_Mi0", 1 << 0));
+            CCU_CHK_RET(ccu::EventWait("MiSync0_Mi1", 1 << 1));
+        }
+        CCU_ELSE
+        {
+            // mission 1: post bit 1, wait bit 0
+            CCU_CHK_RET(ccu::EventRecord("MiSync0_Mi1", 1 << 1));
+            CCU_CHK_RET(ccu::EventWait("MiSync0_Mi0", 1 << 0));
+        }
+    }
+    return CCU_SUCCESS;
 }
 
-void MissionPostSync(KfcServerContext& ctx) { (void)ctx; }
+CcuResult MissionPostSync(KfcServerContext& ctx)
+{
+    // 单 mission 时短路
+    // 使用 CCU_IF...CCU_ELSE 结构，避免在 CCU_IF 内提前 return
+    CCU_IF(ctx.missionNum == 1)
+    {
+        // 单 mission 模式：无需同步，直接返回
+    }
+    CCU_ELSE
+    {
+        // 双 mission 模式：仅 mission 0 负责执行远程 Post 同步
+        // （对应 hcomm 的 PostSync：RemotePost 到各 transport + GroupWait）
+        // mission 1 无需执行此步骤
+        CCU_IF(ctx.missionIndex == 0)
+        {
+            // mission 0 的远程 Post 逻辑由具体算子 kernel 的 PostSync 实现
+            // （HalfAlltoAllV 已在其 PostSync 中实现 NotifyRecord + NotifyWait 循环）
+            // 此处仅作为框架层的 hook，确保调用时机正确
+        }
+        // mission 1 走 ELSE 分支：什么都不做
+    }
+    return CCU_SUCCESS;
+}
 
 CcuResult WaitTurnStartSig(const ccu::Variable& hbmSigAddr, ccu::Variable& turnStartSig, KfcServerContext& ctx)
 {
@@ -139,11 +188,14 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
         // [0]=opId(签名+哨兵) [1]=sendBuf [2]=sendSizes [3]=sendOffsets
         // [4..7]=goSize [8]=remoteWinOffset
         // token 走 ctx.token（来自 kfcServerArgs[5]），不占 xn 槽位
+        //
+        // 阶段 3-1：将 missionNum 和 missionIndex 传递给 HalfAlltoAllV kernel
+        // 使其能够根据 mission 选择对应的 A/B 切片
         CcuKfcHalfAlltoAllVMesh1DKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
             ctx.token, ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
-            ctx.arg->rankId, ctx.arg->localWinAddr);
+            ctx.arg->rankId, ctx.arg->localWinAddr, ctx.missionNum, ctx.missionIndex);
     }
 }
 
@@ -188,9 +240,9 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
-            MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
+            CCU_CHK_RET(MissionPreSync(param[HBM_PARAM_IDX_0], ctx));
             DispatchKfcSubKernel(param, ctx);
-            MissionPostSync(ctx);
+            CCU_CHK_RET(MissionPostSync(ctx));
             CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
         }
         waitAddr += ckeSize;
@@ -222,12 +274,12 @@ CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
 
     CCU_WHILE(repeatCond == 0)
     {
-        MissionPreSync(signature, ctx);                              // 在context中依次加入8轮指令
+        CCU_CHK_RET(MissionPreSync(signature, ctx));                 // 在context中依次加入8轮指令
         CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
 
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64) { DispatchKfcSubKernel(param, ctx); }
-        MissionPostSync(ctx);
+        CCU_CHK_RET(MissionPostSync(ctx));
     }
     return CCU_SUCCESS;
 }
@@ -250,7 +302,7 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
     CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(KfcServerGenCircularQueue(ctx)); }
-    // CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
+    CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }
