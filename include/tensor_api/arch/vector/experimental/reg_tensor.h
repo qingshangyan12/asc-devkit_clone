@@ -30,7 +30,15 @@ struct reg_tensor {
     __simd_callee__ reg_tensor(vector_bool maskValue) : mask(maskValue) {}
 
     template <typename ScalarType>
-    __simd_callee__ inline reg_tensor& operator=(ScalarType src);
+    __simd_callee__ inline reg_tensor& operator=(ScalarType src)
+    {
+        if constexpr (AscendC::Std::is_same_v<DataType, bool>) {
+            asc_duplicate_scalar(reinterpret_cast<vector_int8_t&>(reg), static_cast<int8_t>(src), mask);
+        } else {
+            asc_duplicate_scalar(reg, static_cast<DataType>(src), mask);
+        }
+        return *this;
+    }
 
     __simd_callee__ inline reg_tensor& with_mask(const reg_tensor<bool>& maskReg);
 
