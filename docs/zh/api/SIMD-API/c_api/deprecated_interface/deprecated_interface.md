@@ -2,6 +2,7 @@
 
 ## 矢量计算
 - **[asc_abs_sync（废弃）](asc_abs_sync_deprecated.md)**
+- **[asc_transto5hd_sync（废弃）](asc_transto5hd_sync_deprecated.md)**
 
 ### 类型转换
 

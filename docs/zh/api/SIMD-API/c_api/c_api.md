@@ -597,3 +597,4 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_int322int64（废弃）](deprecated_interface/asc_int322int64_deprecated.md) | 通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。 |
 | [asc_int322uint16（废弃）](deprecated_interface/asc_int322uint16_deprecated.md) | 通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。 |
 | [asc_uint82uint16（废弃）](deprecated_interface/asc_uint82uint16_deprecated.md) | 通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。 |
+| [asc_transto5hd_sync（废弃）](deprecated_interface/asc_transto5hd_sync_deprecated.md) | 数据格式转换同步接口。 |
