@@ -30,7 +30,6 @@
 #include "tensor_api/arch/vector/experimental/logical_compute.h"
 #include "tensor_api/arch/vector/experimental/composite_compute.h"
 #include "tensor_api/arch/vector/experimental/histogram_compute.h"
-#include "tensor_api/arch/vector/experimental/MaskReg_compute.h"
 #include "tensor_api/arch/vector/experimental/mask_reg_compute.h"
 #include "tensor_api/arch/vector/experimental/data_reorder.h"
 #include "tensor_api/arch/vector/experimental/data_padding.h"
