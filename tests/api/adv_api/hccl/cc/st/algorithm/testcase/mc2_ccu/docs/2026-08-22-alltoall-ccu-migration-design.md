@@ -196,9 +196,10 @@ CalcRes
 └── 填充 resourceRequest.ccuKernelInfos
 ```
 
-**关键参数 `loadFromMem`**：
-- `param.isMc2 = true`：MC2 模式，走 `loadFromMem=true` 路径（LocalCopy 本 rank 数据）
-- `param.isMc2 = false`：非 MC2 模式，走 `loadFromMem=false` 路径（GroupCopy 本 rank 数据）
+**关键参数 `loadFromMem`**（`loadFromMem = param.isMc2`）：
+- `isMc2=false`（默认值）：`loadFromMem=false`，本 rank 数据走 GroupCopy 路径
+- `isMc2=true`：`loadFromMem=true`，本 rank 数据走 LocalCopy 路径
+- KFC Server 模式：`InheritKfcServerKernelArg` 固定设置 `loadFromMem=false`，走 GroupCopy 路径
 
 4. 输出
 
@@ -257,12 +258,12 @@ DoAlltoAll
 ├── 计算每个 rank 的 src/dst 地址
 │   ├── dst[peer].addr = output[peer] + dstOffset
 │   └── src[rankIdx].addr = srcOffset + rankIdx * srcStride
-├── loadFromMem=true 路径（MC2 模式）
+├── loadFromMem=true 路径（isMc2=true）
 │   ├── 遍历所有 rank
 │   │   ├── 本 rank: LocalCopy(localDst, src[rankId], sliceSize)
 │   │   └── 远端 rank: WriteChunked(channel, dst[r], src[r])
 │   └── EventWait(event, (1<<rankSize)-1) — 等待所有 rank 完成
-└── loadFromMem=false 路径（非 MC2 / KFC Server 模式）
+└── loadFromMem=false 路径（MC2 模式 / KFC Server 模式，isMc2=false）
     ├── 遍历远端 rank: WriteChunked(channel, dst[r], src[r])
     ├── GroupCopy(ctx, localDst, src[rankId], goSize) — 本 rank 数据搬运
     └── EventWait(event, allBit) — 等待所有远端 rank 完成
@@ -576,7 +577,7 @@ param.isMc2?
 │           └── 远端 rank: WriteChunked(channel, dst, src)
 │           然后 EventWait 等待所有 rank（含本 rank）
 │
-└── false (非 MC2 / KFC Server 模式)
+└── false (MC2 模式 / KFC Server 模式)
     └── loadFromMem = false
         └── DoAlltoAll:
             ├── 先遍历远端 rank: WriteChunked(channel, dst, src)

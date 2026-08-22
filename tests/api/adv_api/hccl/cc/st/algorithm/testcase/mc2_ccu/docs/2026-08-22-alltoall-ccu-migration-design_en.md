@@ -196,9 +196,10 @@ CalcRes
 └── Fill resourceRequest.ccuKernelInfos
 ```
 
-**Key parameter `loadFromMem`**:
-- `param.isMc2 = true`: MC2 mode, uses `loadFromMem=true` path (LocalCopy for local rank data)
-- `param.isMc2 = false`: Non-MC2 mode, uses `loadFromMem=false` path (GroupCopy for local rank data)
+**Key parameter `loadFromMem`** (`loadFromMem = param.isMc2`):
+- `isMc2=false` (default): `loadFromMem=false`, local rank data via GroupCopy path
+- `isMc2=true`: `loadFromMem=true`, local rank data via LocalCopy path
+- KFC Server mode: `InheritKfcServerKernelArg` sets `loadFromMem=false`, uses GroupCopy path
 
 4. Output
 
@@ -257,12 +258,12 @@ DoAlltoAll
 ├── Compute src/dst addresses for each rank
 │   ├── dst[peer].addr = output[peer] + dstOffset
 │   └── src[rankIdx].addr = srcOffset + rankIdx * srcStride
-├── loadFromMem=true path (MC2 mode)
+├── loadFromMem=true path (isMc2=true)
 │   ├── Iterate all ranks
 │   │   ├── Local rank: LocalCopy(localDst, src[rankId], sliceSize)
 │   │   └── Remote rank: WriteChunked(channel, dst[r], src[r])
 │   └── EventWait(event, (1<<rankSize)-1) — wait for all ranks
-└── loadFromMem=false path (non-MC2 / KFC Server mode)
+└── loadFromMem=false path (MC2 mode / KFC Server mode, isMc2=false)
     ├── Iterate remote ranks: WriteChunked(channel, dst[r], src[r])
     ├── GroupCopy(ctx, localDst, src[rankId], goSize) — local rank data transfer
     └── EventWait(event, allBit) — wait for all remote ranks
@@ -576,7 +577,7 @@ param.isMc2?
 │           └── Remote rank: WriteChunked(channel, dst, src)
 │           Then EventWait for all ranks (including local)
 │
-└── false (non-MC2 / KFC Server mode)
+└── false (MC2 mode / KFC Server mode)
     └── loadFromMem = false
         └── DoAlltoAll:
             ├── First iterate remote ranks: WriteChunked(channel, dst, src)
