@@ -18,13 +18,12 @@ import hashlib
 import os
 import stat
 import subprocess
-from dataclasses import dataclass
-from typing import Tuple
 from asc_op_compile_base.common.buildcfg import get_current_build_config
 from .global_storage import global_var_storage
 from .ascendc_common_utility import (
     CommonUtility,
     CompileInfo,
+    KernelCompileCommand,
     get_kernel_fun_name_with_tiling_key_and_kernel_type,
 )
 from .get_op_tiling import TilingInfo
@@ -48,22 +47,11 @@ from .ascendc_compile_dfx import DFXSectionGenerator
 from .super_kernel_sub_op_compile import gen_sub_kernel_name
 
 
-@dataclass(frozen=True)
-class DynamicCompileCommandSpec:
-    tiling_key: str
-    compiled_symbol: str
-    core_type: str
-    source_path: str
-    argv: Tuple[str, ...]
-    output_path: str
-
-
 def _record_dynamic_compile_command(
     compile_info: CompileInfo,
-    command: DynamicCompileCommandSpec,
+    command: KernelCompileCommand,
 ):
-    if compile_info.record_compile_commands:
-        compile_info.recorded_compile_commands.append(command)
+    compile_info.compile_command_session.submit(command)
 
 
 def _gen_compile_cmd_c310(
@@ -769,7 +757,7 @@ def call_bisheng_v220(
             )
             _record_dynamic_compile_command(
                 compile_info,
-                DynamicCompileCommandSpec(
+                KernelCompileCommand(
                     tiling_key=str(tiling_key),
                     compiled_symbol=kernel_name,
                     core_type=core_type,
@@ -793,7 +781,7 @@ def call_bisheng_v220(
             compile_info.gen_kernel_func_file, new_sources
         )
 
-        if not compile_info.execute_compile_commands:
+        if not compile_info.compile_command_session.should_execute:
             return compile_info.tiling_key_list
 
         compile_multi_tilingkey(

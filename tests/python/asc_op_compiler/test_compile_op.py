@@ -39,6 +39,11 @@ from asc_op_compile_base.common.platform import (
 from asc_op_compile_base.common import register
 from asc_op_compile_base.common import buildcfg
 from asc_op_compile_base.asc_op_compiler.global_storage import global_var_storage
+from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import (
+    CompileCommandMode,
+    CompileCommandSession,
+    KernelCompileCommand,
+)
 from asc_op_compile_base.common.context import get_context
 
 
@@ -80,9 +85,6 @@ from asc_op_compile_base.asc_op_compiler.ascendc_compile_v220 import (
     v310_mode,
 )
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_dfx import DFXSectionGenerator
-from asc_op_compile_base.asc_op_compiler.static_compile_resource_id import (
-    read_resource_id_section,
-)
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_v200 import (
     call_bisheng_v200_static,
 )
@@ -181,6 +183,27 @@ def manifest_compile_include_options():
             "aarch64-linux/ascendc/include/highlevel_api",
         ),
     ]
+
+
+def read_resource_id_section_for_test(binary_file):
+    objcopy = os.path.join(os.environ["ASCEND_HOME_PATH"], "bin", "llvm-objcopy")
+    with TemporaryDirectory() as temp_dir:
+        dump_file = os.path.join(temp_dir, "resource_id")
+        result = subprocess.run(
+            [
+                objcopy,
+                "--dump-section",
+                f".ascend.resource_id={dump_file}",
+                binary_file,
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            check=False,
+            text=True,
+        )
+        if result.returncode != 0:
+            raise AssertionError(f"Failed to read Resource ID: {result.stdout}")
+        return Path(dump_file).read_text(encoding="ascii")
 
 
 def compile_manifest_resources(manifest, manifest_dir, source_file_path):
@@ -323,7 +346,7 @@ class TestCompileOp(unittest.TestCase):
             manifest_dir, op_info.kernel_name + "_manifest.json"
         )
         self.assertTrue(os.path.isfile(binary_file))
-        resource_id = read_resource_id_section(binary_file)
+        resource_id = read_resource_id_section_for_test(binary_file)
         with open(json_file, "r", encoding="utf-8") as file_obj:
             kernel_json = json.load(file_obj)
         with open(binary_file, "rb") as file_obj:
@@ -457,9 +480,12 @@ class TestCompileOp(unittest.TestCase):
                             ),
                         )
                         compile_states.append(state)
-                        if compile_info.record_compile_commands:
+                        if (
+                            compile_info.compile_command_session.mode
+                            is not CompileCommandMode.EXECUTE
+                        ):
                             symbol_type = "sk" if state[0] else "basic"
-                            compile_info.recorded_compile_commands.append(
+                            compile_info.compile_command_session.submit(
                                 mock.Mock(compiled_symbol=f"{symbol_type}_symbol")
                             )
                         if state[1]:
@@ -498,17 +524,17 @@ class TestCompileOp(unittest.TestCase):
                             return_value="resource-id",
                         )
                     )
+                    record_sk_method = compile_op_module.KernelSpecCompilation.record_sk
                     mock_record_sk = stack.enter_context(
                         mock.patch.object(
-                            compile_op_module,
-                            "record_sk_manifest_commands",
-                            wraps=compile_op_module.record_sk_manifest_commands,
+                            compile_op_module.KernelSpecCompilation,
+                            "record_sk",
+                            autospec=True,
+                            side_effect=record_sk_method,
                         )
                     )
                     mock_generate_manifest = stack.enter_context(
-                        mock.patch.object(
-                            compile_op_module, "generate_static_compile_manifest"
-                        )
+                        mock.patch.object(compile_op_module, "ManifestPackageWriter")
                     )
                     compile_op_common_part(
                         "test.cpp",
@@ -543,6 +569,21 @@ class TestCompileOp(unittest.TestCase):
         calls["write_resource_id"].assert_not_called()
         calls["generate_manifest"].assert_not_called()
 
+    def test_kernel_spec_none_preserves_original_sk_post_state(self):
+        global_var_storage.set_variable("ascendc_sk_double_compile", False)
+        self.addCleanup(
+            global_var_storage.set_variable, "ascendc_sk_double_compile", False
+        )
+
+        calls = self._run_kernel_spec_common_part("None", enable_sk=True)
+
+        self.assertEqual(calls["compile_kernel"].call_count, 2)
+        calls["compile_sk_bind"].assert_called_once()
+        calls["link_sk_norm"].assert_called_once()
+        calls["write_resource_id"].assert_not_called()
+        calls["generate_manifest"].assert_not_called()
+        self.assertTrue(global_var_storage.get_variable("ascendc_sk_double_compile"))
+
     def test_kernel_spec_normal_builds_basic_manifest_only(self):
         calls = self._run_kernel_spec_common_part("Normal")
 
@@ -568,10 +609,14 @@ class TestCompileOp(unittest.TestCase):
         self.assertEqual(calls["compile_kernel"].call_count, 2)
         basic_compile_info = calls["compile_kernel"].call_args_list[0].args[0]
         sk_compile_info = calls["compile_kernel"].call_args_list[1].args[0]
-        self.assertTrue(basic_compile_info.record_compile_commands)
-        self.assertTrue(basic_compile_info.execute_compile_commands)
-        self.assertTrue(sk_compile_info.record_compile_commands)
-        self.assertFalse(sk_compile_info.execute_compile_commands)
+        self.assertEqual(
+            basic_compile_info.compile_command_session.mode,
+            CompileCommandMode.EXECUTE_AND_RECORD,
+        )
+        self.assertEqual(
+            sk_compile_info.compile_command_session.mode,
+            CompileCommandMode.RECORD_ONLY,
+        )
         self.assertEqual(
             calls["compile_states"],
             [(False, False, True), (True, True, False)],
@@ -586,11 +631,9 @@ class TestCompileOp(unittest.TestCase):
             "/tmp/kernel_meta/TestKernel.o"
         )
         record_context = calls["record_sk"].call_args.args[0]
-        self.assertIsInstance(
-            record_context, compile_op_module.SkManifestCommandContext
-        )
-        self.assertEqual(len(calls["record_sk"].call_args.args), 1)
-        self.assertIs(record_context.compile_info, sk_compile_info)
+        self.assertIsInstance(record_context, compile_op_module.KernelSpecCompilation)
+        self.assertEqual(len(calls["record_sk"].call_args.args), 6)
+        self.assertIs(record_context.sk_compile_info, sk_compile_info)
         self.assertIs(record_context.basic_compile_info, basic_compile_info)
         calls["generate_manifest"].assert_called_once()
         context = calls["generate_manifest"].call_args.args[0]
@@ -603,8 +646,9 @@ class TestCompileOp(unittest.TestCase):
         sk_compile_info.compile_log_path = "/tmp/compile.log"
         sk_compile_info.global_kernel_symbols = ["test_sk"]
         sk_compile_info.global_kernel_attribute = "__global__ __sk__"
-        sk_compile_info.record_compile_commands = True
-        sk_compile_info.execute_compile_commands = False
+        sk_compile_info.compile_command_session = CompileCommandSession(
+            CompileCommandMode.RECORD_ONLY
+        )
         basic_compile_info = CompileInfo()
         basic_compile_info.global_kernel_symbols = ["test_basic"]
         basic_compile_info.global_kernel_attribute = "__global__ [aicore]"
@@ -626,8 +670,10 @@ class TestCompileOp(unittest.TestCase):
             source_path = os.path.join(kernel_meta_dir, "sk_bind.cpp")
             self.assertEqual(output_path, os.path.join(kernel_meta_dir, "sk_bind.o"))
             self.assertTrue(os.path.isfile(source_path))
-            self.assertEqual(len(sk_compile_info.recorded_sk_bind_commands), 1)
-            recorded = sk_compile_info.recorded_sk_bind_commands[0]
+            self.assertEqual(
+                len(sk_compile_info.compile_command_session.sk_bind_records), 1
+            )
+            recorded = sk_compile_info.compile_command_session.sk_bind_records[0]
             self.assertEqual(recorded.source_path, source_path)
             self.assertEqual(recorded.output_path, output_path)
             self.assertIn("-DTEST_OPTION", recorded.argv)
@@ -674,8 +720,14 @@ class TestCompileOp(unittest.TestCase):
         self.assertEqual(calls["compile_kernel"].call_count, 2)
         sk_compile_info = calls["compile_kernel"].call_args_list[0].args[0]
         basic_compile_info = calls["compile_kernel"].call_args_list[1].args[0]
-        self.assertFalse(sk_compile_info.record_compile_commands)
-        self.assertTrue(basic_compile_info.record_compile_commands)
+        self.assertEqual(
+            sk_compile_info.compile_command_session.mode,
+            CompileCommandMode.EXECUTE,
+        )
+        self.assertEqual(
+            basic_compile_info.compile_command_session.mode,
+            CompileCommandMode.EXECUTE_AND_RECORD,
+        )
         calls["link_kernel"].assert_called_once()
         calls["compile_sk_bind"].assert_called_once()
         calls["link_sk_norm"].assert_called_once()
@@ -694,6 +746,155 @@ class TestCompileOp(unittest.TestCase):
             with self.subTest(mode=mode, options=options):
                 with self.assertRaisesRegex(RuntimeError, message):
                     self._run_kernel_spec_common_part(mode, **options)
+
+    def test_kernel_spec_reports_producer_errors_as_ascendc_errors(self):
+        compile_info = CompileInfo()
+        compile_info.dst_file = "/tmp/kernel.o"
+        kernel_spec = object.__new__(compile_op_module.KernelSpecCompilation)
+        kernel_spec.enabled = True
+        kernel_spec.compile_info = compile_info
+        kernel_spec.kernel_spec_dir = "/tmp/kernel_spec"
+        kernel_spec.resource_id = "resource-id"
+        kernel_spec.basic_compile_info = compile_info
+        kernel_spec.sk_compile_info = None
+        kernel_spec.sk_cap_bitmap = None
+
+        cases = (
+            (
+                "resource_id",
+                mock.patch.object(
+                    compile_op_module,
+                    "generate_and_write_resource_id",
+                    side_effect=compile_op_module.ResourceIdError("resource failed"),
+                ),
+                lambda: kernel_spec.attach_resource_id(),
+                "generate Resource ID failed, reason is: resource failed",
+            ),
+            (
+                "manifest",
+                mock.patch.object(
+                    compile_op_module,
+                    "ManifestPackageWriter",
+                    side_effect=compile_op_module.ManifestGenerationError(
+                        "manifest failed"
+                    ),
+                ),
+                lambda: kernel_spec.publish_manifest(TilingInfo(), 0),
+                "generate Manifest failed, reason is: manifest failed",
+            ),
+        )
+        for stage, producer_patch, action, expected_message in cases:
+            with self.subTest(stage=stage):
+                with producer_patch:
+                    with mock.patch.object(
+                        CommonUtility,
+                        "ascendc_raise_python_err",
+                        side_effect=RuntimeError("converted error"),
+                    ) as raise_error:
+                        with self.assertRaisesRegex(RuntimeError, "converted error"):
+                            action()
+                raise_error.assert_called_once_with(
+                    TBE_DEFAULT_PYTHON_ERROR_CODE,
+                    expected_message,
+                )
+
+    def test_kernel_spec_compilation_restores_global_state_on_exception(self):
+        variable_names = (
+            "ascendc_enable_super_kernel",
+            "ascendc_sk_double_compile",
+            "ascendc_sk_sub_combine_norm_workflow",
+        )
+        entry_values = (True, True, False)
+        for name, value in zip(variable_names, entry_values):
+            global_var_storage.set_variable(name, value)
+        self.addCleanup(
+            global_var_storage.set_variable, "ascendc_enable_super_kernel", False
+        )
+        self.addCleanup(
+            global_var_storage.set_variable, "ascendc_sk_double_compile", False
+        )
+        self.addCleanup(
+            global_var_storage.set_variable,
+            "ascendc_sk_sub_combine_norm_workflow",
+            False,
+        )
+
+        compile_info = CompileInfo()
+        tiling_info = TilingInfo()
+        tiling_info.static_shape_flag = False
+        options = CompileOptionTuple([], [])
+
+        with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
+            ctx.add_addition("kernel_spec_mode", "SK")
+            ctx.add_addition("kernel_spec_dir", "/tmp/kernel_spec")
+            ctx.add_addition("super_kernel_sub_combine", True)
+            with (
+                mock.patch.object(CommonUtility, "is_v220", return_value=True),
+                mock.patch.object(CommonUtility, "is_c310", return_value=False),
+                self.assertRaisesRegex(RuntimeError, "recording failed"),
+            ):
+                with compile_op_module.KernelSpecCompilation.create(
+                    compile_info, options, tiling_info
+                ):
+                    current_values = tuple(
+                        global_var_storage.get_variable(name) for name in variable_names
+                    )
+                    self.assertEqual(current_values, (False, False, True))
+                    raise RuntimeError("recording failed")
+
+        restored_values = tuple(
+            global_var_storage.get_variable(name) for name in variable_names
+        )
+        self.assertEqual(restored_values, entry_values)
+
+    def test_kernel_spec_compilation_restores_state_when_cleanup_fails(self):
+        variable_names = (
+            "ascendc_enable_super_kernel",
+            "ascendc_sk_double_compile",
+            "ascendc_sk_sub_combine_norm_workflow",
+        )
+        entry_values = (True, True, False)
+        for name, value in zip(variable_names, entry_values):
+            global_var_storage.set_variable(name, value)
+        self.addCleanup(
+            global_var_storage.set_variable, "ascendc_enable_super_kernel", False
+        )
+        self.addCleanup(
+            global_var_storage.set_variable, "ascendc_sk_double_compile", False
+        )
+        self.addCleanup(
+            global_var_storage.set_variable,
+            "ascendc_sk_sub_combine_norm_workflow",
+            False,
+        )
+
+        compile_info = CompileInfo()
+        tiling_info = TilingInfo()
+        tiling_info.static_shape_flag = False
+
+        with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
+            ctx.add_addition("kernel_spec_mode", "SK")
+            ctx.add_addition("kernel_spec_dir", "/tmp/kernel_spec")
+            ctx.add_addition("super_kernel_sub_combine", True)
+            with (
+                mock.patch.object(CommonUtility, "is_v220", return_value=True),
+                mock.patch.object(CommonUtility, "is_c310", return_value=False),
+                mock.patch.object(
+                    CommonUtility,
+                    "remove_temp_file",
+                    side_effect=OSError("cleanup failed"),
+                ),
+                self.assertRaisesRegex(OSError, "cleanup failed"),
+            ):
+                with compile_op_module.KernelSpecCompilation.create(
+                    compile_info, CompileOptionTuple([], []), tiling_info
+                ) as kernel_spec:
+                    kernel_spec.sk_compile_info.gen_kernel_func_file = "/tmp/sk.cpp"
+
+        restored_values = tuple(
+            global_var_storage.get_variable(name) for name in variable_names
+        )
+        self.assertEqual(restored_values, entry_values)
 
     def test_decode_mode(self):
         mode1 = decode_mode(10)
@@ -899,9 +1100,9 @@ class TestCompileOp(unittest.TestCase):
             os.path.realpath(basic_compile_info.dst_file),
             os.path.realpath(binary_file),
         )
-        self.assertTrue(basic_compile_info.execute_compile_commands)
-        self.assertFalse(sk_compile_info.execute_compile_commands)
-        self.assertTrue(sk_compile_info.recorded_compile_commands)
+        self.assertTrue(basic_compile_info.compile_command_session.should_execute)
+        self.assertFalse(sk_compile_info.compile_command_session.should_execute)
+        self.assertTrue(sk_compile_info.compile_command_session.records)
         mock_compile_sk_bind.assert_called_once()
         json_file = os.path.join(TOP_PATH, "kernel_meta", op_info.kernel_name + ".json")
         manifest_dir = os.path.join(KERNEL_SPEC_ROOT, op_info.kernel_name)
@@ -909,7 +1110,7 @@ class TestCompileOp(unittest.TestCase):
             manifest_dir, op_info.kernel_name + "_manifest.json"
         )
         self.assertTrue(os.path.exists(binary_file))
-        resource_id = read_resource_id_section(binary_file)
+        resource_id = read_resource_id_section_for_test(binary_file)
         with open(binary_file, "rb") as file_obj:
             final_hash = hashlib.sha256(file_obj.read()).hexdigest()
         with open(json_file, "r", encoding="utf-8") as file_obj:
@@ -2009,9 +2210,9 @@ class TestCompileOp(unittest.TestCase):
             os.path.realpath(basic_compile_info.dst_file),
             os.path.realpath(binary_file),
         )
-        self.assertTrue(basic_compile_info.execute_compile_commands)
-        self.assertFalse(sk_compile_info.execute_compile_commands)
-        self.assertTrue(sk_compile_info.recorded_compile_commands)
+        self.assertTrue(basic_compile_info.compile_command_session.should_execute)
+        self.assertFalse(sk_compile_info.compile_command_session.should_execute)
+        self.assertTrue(sk_compile_info.compile_command_session.records)
         mock_compile_sk_bind.assert_called_once()
         self._assert_manifest_identity(op_info)
 
@@ -3509,7 +3710,7 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
         self.assertEqual(tiling_key_struct_size_map, {"1234": ("struct1", 80)})
         self.assertEqual(compile_info_old.max_tiling_size, 80)
         self.assertEqual(
-            compile_info_old.static_compile_tiling_key_data_size, {"1234": 80}
+            compile_info_old.compiled_tiling_key_data_size_map, {"1234": 80}
         )
 
     def test_get_code_channel_v220_by_first_tiling_key(self):
@@ -4455,8 +4656,10 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
         from asc_op_compile_base.asc_op_compiler import ascendc_compile_v220
 
         compile_info = CompileInfo()
-        compile_info.record_compile_commands = True
-        spec = ascendc_compile_v220.DynamicCompileCommandSpec(
+        compile_info.compile_command_session = CompileCommandSession(
+            CompileCommandMode.EXECUTE_AND_RECORD
+        )
+        spec = KernelCompileCommand(
             tiling_key="7",
             compiled_symbol="record_kernel_7",
             core_type="cube",
@@ -4467,7 +4670,38 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
 
         ascendc_compile_v220._record_dynamic_compile_command(compile_info, spec)
 
-        self.assertEqual(compile_info.recorded_compile_commands, [spec])
+        self.assertEqual(compile_info.compile_command_session.records, (spec,))
+
+    def test_compile_command_session_is_owned_by_common_utility(self):
+        self.assertEqual(
+            CompileCommandSession.__module__,
+            "asc_op_compile_base.asc_op_compiler.ascendc_common_utility",
+        )
+
+    def test_compile_command_session_modes_control_recording_and_execution(self):
+        cases = (
+            (CompileCommandMode.EXECUTE, True, ()),
+            (CompileCommandMode.EXECUTE_AND_RECORD, True, ("command",)),
+            (CompileCommandMode.RECORD_ONLY, False, ("command",)),
+        )
+        for mode, should_execute, expected_records in cases:
+            with self.subTest(mode=mode):
+                session = CompileCommandSession(mode)
+
+                session.submit("command")
+
+                self.assertEqual(session.should_execute, should_execute)
+                self.assertEqual(session.records, expected_records)
+
+    def test_compile_command_session_fork_keeps_mode_and_clears_records(self):
+        session = CompileCommandSession(CompileCommandMode.EXECUTE_AND_RECORD)
+        session.submit("command")
+
+        forked = session.fork()
+
+        self.assertEqual(forked.mode, CompileCommandMode.EXECUTE_AND_RECORD)
+        self.assertEqual(forked.records, ())
+        self.assertEqual(session.records, ("command",))
 
     def test_call_bisheng_v220_records_commands_and_controls_execution(self):
         compile_info = CompileInfo()
@@ -4478,8 +4712,9 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
         compile_info.tiling_key_list = ["7"]
         compile_info.code_channel = CORE_TYPE_CUBE
         compile_info.no_set_kernel_type = True
-        compile_info.record_compile_commands = True
-        compile_info.execute_compile_commands = False
+        compile_info.compile_command_session = CompileCommandSession(
+            CompileCommandMode.RECORD_ONLY
+        )
 
         tiling_info = TilingInfo()
         tiling_info.static_shape_flag = False
@@ -4524,8 +4759,8 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
                 CORE_TYPE_CUBE,
             )
             self.assertEqual(ret, ["7"])
-            self.assertEqual(len(compile_info.recorded_compile_commands), 1)
-            recorded = compile_info.recorded_compile_commands[0]
+            self.assertEqual(len(compile_info.compile_command_session.records), 1)
+            recorded = compile_info.compile_command_session.records[0]
             self.assertEqual(recorded.tiling_key, "7")
             self.assertEqual(recorded.compiled_symbol, "record_kernel_7")
             self.assertEqual(recorded.argv, compile_command)
@@ -4533,8 +4768,9 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             compile_multi.assert_not_called()
             fatbin.assert_not_called()
 
-            compile_info.recorded_compile_commands.clear()
-            compile_info.execute_compile_commands = True
+            compile_info.compile_command_session = CompileCommandSession(
+                CompileCommandMode.EXECUTE_AND_RECORD
+            )
             ret = call_bisheng_v220(
                 compile_info,
                 compile_option_tuple,
@@ -4544,7 +4780,7 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             )
 
         self.assertEqual(ret, ["7"])
-        self.assertEqual(len(compile_info.recorded_compile_commands), 1)
+        self.assertEqual(len(compile_info.compile_command_session.records), 1)
         compile_multi.assert_called_once()
         fatbin.assert_called_once()
 
@@ -4561,8 +4797,9 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             compile_info.tiling_key_kernel_type
         )
         compile_info.no_set_kernel_type = False
-        compile_info.record_compile_commands = True
-        compile_info.execute_compile_commands = False
+        compile_info.compile_command_session = CompileCommandSession(
+            CompileCommandMode.RECORD_ONLY
+        )
 
         tiling_info = TilingInfo()
         tiling_info.static_shape_flag = False
@@ -4605,8 +4842,8 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
                 compile_info, compile_option_tuple, tiling_info
             )
 
-        self.assertEqual(len(compile_info.recorded_compile_commands), 1)
-        recorded = compile_info.recorded_compile_commands[0]
+        self.assertEqual(len(compile_info.compile_command_session.records), 1)
+        recorded = compile_info.compile_command_session.records[0]
         self.assertEqual(recorded.tiling_key, "7")
         self.assertEqual(recorded.core_type, "cube")
         self.assertEqual(recorded.compiled_symbol, "typed_record_kernel_7")
@@ -4619,7 +4856,9 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
         compile_info.kernel_name = "record_kernel"
         compile_info.dst_file = "/tmp/record_kernel.o"
         compile_info.code_channel = CORE_TYPE_MIX
-        compile_info.execute_compile_commands = False
+        compile_info.compile_command_session = CompileCommandSession(
+            CompileCommandMode.RECORD_ONLY
+        )
 
         tiling_info = TilingInfo()
         tiling_info.static_shape_flag = False
@@ -4869,11 +5108,18 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
         compile_info = CompileInfo()
         compile_info.kernel_name = "test"
         compile_info.dst_file = "test.o"
-        compile_info.recorded_compile_commands = ["cube command"]
+        compile_info.compile_command_session = CompileCommandSession(
+            CompileCommandMode.EXECUTE_AND_RECORD
+        )
+        compile_info.compile_command_session.submit("cube command")
         kernel_type = 0
         sub_compile_info = _get_sub_compile_info(compile_info, kernel_type)
         self.assertEqual(sub_compile_info.dst_file, "test_mix_aiv.o")
-        self.assertEqual(sub_compile_info.recorded_compile_commands, [])
+        self.assertEqual(sub_compile_info.compile_command_session.records, ())
+        self.assertIsNot(
+            sub_compile_info.compile_command_session,
+            compile_info.compile_command_session,
+        )
 
     def test_compile_ascendc_cce_regbase(self):
         SetCurrentSocInfo("Ascend310B1")
@@ -8246,7 +8492,7 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
                 need_gen_placehoder,
                 dump_info,
             )
-        self.assertEqual(compile_info.static_compile_tiling_size, 96)
+        self.assertEqual(compile_info.max_tiling_size, 96)
 
     def test_json_except_info(self):
         compile_info = CompileInfo()
@@ -9968,9 +10214,8 @@ void add_custom()
 
                 max_tiling_size = _get_tiling_struct_size(compile_info)
                 self.assertEqual(max_tiling_size, 40)
-                self.assertEqual(compile_info.static_compile_tiling_size, 40)
                 self.assertEqual(
-                    compile_info.static_compile_tiling_key_data_size,
+                    compile_info.compiled_tiling_key_data_size_map,
                     {"1": 40, "3": 40, "6": 40},
                 )
 
