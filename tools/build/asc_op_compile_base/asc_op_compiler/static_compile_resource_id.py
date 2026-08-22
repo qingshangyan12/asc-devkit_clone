@@ -72,51 +72,6 @@ def _run_tool(command):
     return result.stdout
 
 
-def _resource_id_section_info(dynamic_object_path):
-    readelf = _find_tool("readelf")
-    output = _run_tool([readelf, "-W", "-S", dynamic_object_path])
-    matches = []
-    for line in output.splitlines():
-        fields = line.split()
-        try:
-            name_index = fields.index(_RESOURCE_ID_SECTION)
-        except ValueError:
-            continue
-        if len(fields) < name_index + 9:
-            raise ResourceIdError("malformed .ascend.resource_id section metadata")
-        section_type = fields[name_index + 1]
-        size_text = fields[name_index + 4]
-        tail = fields[name_index + 6 :]
-        flags = tail[0] if len(tail) == 4 else ""
-        align_text = tail[-1]
-        try:
-            size = int(size_text, 16)
-            alignment = int(align_text, 10)
-        except ValueError as error:
-            raise ResourceIdError(
-                "malformed .ascend.resource_id section metadata"
-            ) from error
-        matches.append((section_type, size, flags, alignment))
-    return matches
-
-
-def _validate_section_metadata(dynamic_object_path):
-    matches = _resource_id_section_info(dynamic_object_path)
-    if len(matches) != 1:
-        raise ResourceIdError(
-            f"expected one {_RESOURCE_ID_SECTION} section, found {len(matches)}"
-        )
-    section_type, size, flags, alignment = matches[0]
-    if section_type != "PROGBITS":
-        raise ResourceIdError(".ascend.resource_id section must be SHT_PROGBITS")
-    if size != 64:
-        raise ResourceIdError(".ascend.resource_id section must contain 64 bytes")
-    if "A" in flags:
-        raise ResourceIdError(".ascend.resource_id section must not have SHF_ALLOC")
-    if alignment != 1:
-        raise ResourceIdError(".ascend.resource_id section alignment must be 1")
-
-
 def calculate_resource_id(dynamic_object_path: str) -> str:
     _validate_elf(dynamic_object_path)
     digest = hashlib.sha256()
@@ -131,47 +86,11 @@ def calculate_resource_id(dynamic_object_path: str) -> str:
     return digest.hexdigest()
 
 
-def read_resource_id_section(dynamic_object_path: str) -> str:
-    _validate_section_metadata(dynamic_object_path)
-    objcopy = _find_tool("llvm-objcopy")
-    directory = os.path.dirname(os.path.realpath(dynamic_object_path))
-    dump_fd, dump_path = tempfile.mkstemp(prefix=".resource_id.dump.", dir=directory)
-    os.close(dump_fd)
-    try:
-        _run_tool(
-            [
-                objcopy,
-                "--dump-section",
-                f"{_RESOURCE_ID_SECTION}={dump_path}",
-                dynamic_object_path,
-            ]
-        )
-        with open(dump_path, "rb") as file_obj:
-            content = file_obj.read()
-    except OSError as error:
-        raise ResourceIdError("failed to read .ascend.resource_id section") from error
-    finally:
-        try:
-            os.unlink(dump_path)
-        except FileNotFoundError:
-            pass
-    try:
-        resource_id = content.decode("ascii")
-    except UnicodeDecodeError as error:
-        raise ResourceIdError(".ascend.resource_id is not ASCII") from error
-    if not _RESOURCE_ID_PATTERN.fullmatch(resource_id):
-        raise ResourceIdError(".ascend.resource_id must be 64 lowercase hex characters")
-    return resource_id
-
-
 def write_resource_id_section(dynamic_object_path: str, resource_id: str) -> None:
     if not isinstance(resource_id, str) or not _RESOURCE_ID_PATTERN.fullmatch(
         resource_id
     ):
         raise ResourceIdError("resource_id must be 64 lowercase hex characters")
-    if _resource_id_section_info(dynamic_object_path):
-        raise ResourceIdError(".ascend.resource_id section already exists")
-
     objcopy = _find_tool("llvm-objcopy")
     directory = os.path.dirname(os.path.realpath(dynamic_object_path))
     object_fd = None
@@ -204,9 +123,6 @@ def write_resource_id_section(dynamic_object_path: str, resource_id: str) -> Non
                 temporary_object,
             ]
         )
-        actual_resource_id = read_resource_id_section(temporary_object)
-        if actual_resource_id != resource_id:
-            raise ResourceIdError("resource_id verification failed")
         with open(temporary_object, "rb") as temporary_file:
             os.fsync(temporary_file.fileno())
         os.replace(temporary_object, dynamic_object_path)

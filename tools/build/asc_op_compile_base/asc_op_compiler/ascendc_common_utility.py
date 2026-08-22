@@ -21,6 +21,9 @@ import copy
 import json
 import shutil
 import struct
+from dataclasses import dataclass
+from enum import Enum
+from typing import Optional, Tuple
 from asc_op_compile_base.common.ccec import (
     _build_aicore_compile_cmd,
     switching_compilation_mode,
@@ -46,6 +49,75 @@ from .ascendc_constants import (
 )
 
 BIN_FILENAME_HASHED_FLAG_ENV = "BIN_FILENAME_HASHED"
+
+
+class CompileCommandMode(Enum):
+    EXECUTE = "execute"
+    EXECUTE_AND_RECORD = "execute_and_record"
+    RECORD_ONLY = "record_only"
+
+
+@dataclass(frozen=True)
+class KernelCompileCommand:
+    tiling_key: str
+    compiled_symbol: str
+    core_type: str
+    source_path: str
+    argv: Tuple[str, ...]
+    output_path: str
+    compile_tiling_key: Optional[str] = None
+    compile_symbol: Optional[str] = None
+    object_type: Optional[str] = None
+    constant_info_files: Tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class SkBindCommand:
+    source_path: str
+    argv: Tuple[str, ...]
+    output_path: str
+
+
+class CompileCommandSession:
+    def __init__(self, mode=CompileCommandMode.EXECUTE):
+        if not isinstance(mode, CompileCommandMode):
+            raise TypeError("mode must be a CompileCommandMode")
+        self._mode = mode
+        self._records = []
+        self._sk_bind_records = []
+
+    @property
+    def mode(self):
+        return self._mode
+
+    @property
+    def should_execute(self):
+        return self._mode is not CompileCommandMode.RECORD_ONLY
+
+    @property
+    def records(self):
+        return tuple(self._records)
+
+    @property
+    def sk_bind_records(self):
+        return tuple(self._sk_bind_records)
+
+    def submit(self, command):
+        if self._mode is not CompileCommandMode.EXECUTE:
+            self._records.append(command)
+        return self.should_execute
+
+    def submit_sk_bind(self, command):
+        if self._mode is not CompileCommandMode.EXECUTE:
+            self._sk_bind_records.append(command)
+        return self.should_execute
+
+    def extend(self, commands):
+        if self._mode is not CompileCommandMode.EXECUTE:
+            self._records.extend(commands)
+
+    def fork(self):
+        return CompileCommandSession(self._mode)
 
 
 class CompileInfo:
@@ -87,18 +159,14 @@ class CompileInfo:
             False  # used to judge super kernel compile or sub super kernel compile
         )
         self.max_tiling_size: int = 0
-        self.static_compile_tiling_size: int = 0
-        self.static_compile_tiling_key_data_size: dict = {}
+        self.compiled_tiling_key_data_size_map: dict = {}
         self.tiling_and_dfx_utils_file: str = (
             ""  # used when tling struct is not register
         )
         self.tiling_and_dfx_utils_bin_path: str = ""
         self.global_kernel_symbols: list = []
         self.global_kernel_attribute: str = ""
-        self.record_compile_commands: bool = False
-        self.execute_compile_commands: bool = True
-        self.recorded_compile_commands: list = []
-        self.recorded_sk_bind_commands: list = []
+        self.compile_command_session = CompileCommandSession()
         self.last_compiled_symbol: str = ""
 
     def __str__(self):
