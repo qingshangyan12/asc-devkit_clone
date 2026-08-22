@@ -50,7 +50,7 @@ __simd_callee__ inline void asc_shiftleft_scalar(vector_<dtype>& dst,
 
 ### dtype支持数据类型
 
-`dtype`支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`。
+`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`。
 
 ### 典型示例
 

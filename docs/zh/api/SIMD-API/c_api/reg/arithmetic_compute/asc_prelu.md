@@ -48,7 +48,7 @@ __simd_callee__ inline void asc_prelu(vector_<dtype>& dst,
 
 ### dtype支持数据类型
 
-`dtype`支持的数据类型为`half`、`float`。
+`dtype`取值如下：`half`、`float`。
 
 ### 典型示例
 

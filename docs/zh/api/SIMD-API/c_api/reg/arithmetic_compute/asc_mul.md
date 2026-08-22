@@ -44,8 +44,9 @@ __simd_callee__ inline void asc_mul(vector_<dtype>& dst,
                                     vector_<dtype> src1,
                                     vector_bool mask)
 ```
+### dtype支持数据类型
 
-`dtype`可取的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 

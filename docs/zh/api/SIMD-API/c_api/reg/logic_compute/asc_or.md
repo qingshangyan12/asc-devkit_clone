@@ -50,8 +50,9 @@ __simd_callee__ inline void asc_or(vector_<dtype>& dst,
                                    vector_<dtype> src1,
                                    vector_bool mask)
 ```
+### dtype支持数据类型
 
-dtype取值为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
 
 #### 典型示例
 
