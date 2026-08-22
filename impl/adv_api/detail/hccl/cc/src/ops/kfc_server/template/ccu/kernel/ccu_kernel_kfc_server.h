@@ -62,6 +62,14 @@ struct KfcServerContext : CcuKernelCtxBase {
     // 用于Mission间同步变量
     std::vector<ccu::Variable> exportMissionVar;
     std::vector<ccu::Variable> importMissionVar;
+
+    // 双 mission 参数切片支持（阶段 3-1）
+    // 单 mission 时不分配，避免对现有路径的影响
+    // missionIndex==0 使用 A 切片，missionIndex==1 使用 B 切片
+    std::unique_ptr<std::vector<ccu::Variable>> sendSizeA;
+    std::unique_ptr<std::vector<ccu::Variable>> sendSizeB;
+    std::unique_ptr<std::vector<ccu::Variable>> sendOffsetA;
+    std::unique_ptr<std::vector<ccu::Variable>> sendOffsetB;
 };
 
 class CcuTaskArgKfcServer : public hcomm::CcuTaskArg {

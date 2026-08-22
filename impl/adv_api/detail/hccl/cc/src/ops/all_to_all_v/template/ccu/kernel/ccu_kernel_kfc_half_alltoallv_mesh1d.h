@@ -33,11 +33,17 @@ namespace mc2_ops_hccl {
 //   - xn[0] 被 GetOpId 占用，且在 KFC 循环队列中作为哨兵（== INVALID_U64 退出循环）
 //   - token 通过 kfcServerArgs[5] 传递，不占用 xn 槽位
 //   - 轮次由 AIC 侧调用 AlltoAllvWrite 的次数决定，host 推 submitInfo 不影响轮次
+//
+// 阶段 3-1 修改：增加 missionNum 和 missionIndex 参数以支持双 mission 并发
+//   - missionNum==1 时为单 mission 模式（兼容现有行为）
+//   - missionNum==2 时为双 mission 模式：
+//      * missionIndex==0 使用 sendSize/sendOffset 的前 rankSize 个元素（A 切片）
+//      * missionIndex==1 使用后 rankSize 个元素（B 切片），且接收地址需加 sizeA 偏移
 CcuResult CcuKfcHalfAlltoAllVMesh1DKernel(
     ccu::Variable userInAddr, ccu::Variable sendSizeAddr, ccu::Variable sendOffsetAddr, ccu::Variable goSize0,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable recvOffset,
     ccu::Variable tokenInfo, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    uint64_t localWinAddr);
+    uint64_t localWinAddr, ccu::Variable missionNum, ccu::Variable missionIndex);
 
 } // namespace mc2_ops_hccl
 

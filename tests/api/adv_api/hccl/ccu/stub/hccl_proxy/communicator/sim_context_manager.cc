@@ -42,8 +42,10 @@ HcclResult SimContextMgr::CreateCommEngineCtx(const std::string& tag, CommEngine
 
     void* ctxMem = nullptr;
     HcclMemType type;
+    // COMM_ENGINE_AIV: GetOrCreateCcuCtx(op_common.cc) 统一按 AIV 申请 workspace/scratch/XN/CKE,
+    // 不加进来 AllocCcuOpResCtx 全路径都会拿到 HCCL_E_PARA。仿真侧同样按 HOST 内存承载。
     if (engine == COMM_ENGINE_CPU || engine == COMM_ENGINE_CPU_TS || engine == COMM_ENGINE_AICPU_TS ||
-        engine == COMM_ENGINE_AICPU || engine == COMM_ENGINE_CCU) {
+        engine == COMM_ENGINE_AICPU || engine == COMM_ENGINE_CCU || engine == COMM_ENGINE_AIV) {
         type = HCCL_MEM_TYPE_HOST;
         ctxMem = malloc(size);
         CHK_PTR_NULL(ctxMem);

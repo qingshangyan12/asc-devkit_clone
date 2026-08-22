@@ -193,6 +193,47 @@ TEST_F(CcuMc2TestSuite, AllocCcuOpResCtx_ReuseExistingMemory)
     EXPECT_EQ(secondResCtx.ckeAddr, firstResCtx.ckeAddr);
 }
 
+// res[1] 是 AIC 侧读取本端 window 落点的唯一通道（AlltoAllvWrite 契约不传 recvBuf，
+// CCU 侧走 kernelArg.localWinAddr，AIC 侧访问不到 kernelArg）。样例按 OpResCtx::res[1]
+// 回读并做数据搬出，因此这里锁定两件事：
+//   1) res[1] 必须等于 HcclGetHcclBuffer 的返回值——token 由 GetTokenFromBuffInfo(cclBuffer)
+//      算出，addr 与 token 不同源会导致远端访问校验失败；
+//   2) res[1] 与 res[0](_ccu_scratch) 必须是不同的内存——两者语义完全不同，混用会让
+//      全域 Write 落到错误地址。
+// 模板 CcuTempKfcHalfAlltoAllVMesh1D::CalcRes 里的 kernelInfo.localWinAddr 是第三处独立
+// 推导，同样源自 HcclGetHcclBuffer；该文件不在本 UT 目标的编译单元内，无法在此直接比较，
+// 改动任一处时必须同步核对。
+TEST_F(CcuMc2TestSuite, AllocCcuOpResCtx_Res1IsCclBuffer)
+{
+    void* cclBufferPtr = nullptr;
+    uint64_t cclBufferSize = 0;
+    ASSERT_EQ(HcclGetHcclBuffer(comm_, &cclBufferPtr, &cclBufferSize), HCCL_SUCCESS);
+    ASSERT_NE(cclBufferPtr, nullptr);
+
+    OpResCtx resCtx{};
+    ASSERT_EQ(AllocCcuOpResCtx(comm_, "res1_tag", g_stubRankSize, g_stubRankId, resCtx), HCCL_SUCCESS);
+
+    EXPECT_EQ(resCtx.res[1], reinterpret_cast<uint64_t>(cclBufferPtr));
+    EXPECT_NE(resCtx.res[1], 0U);
+    EXPECT_NE(resCtx.res[1], resCtx.res[0]);
+    EXPECT_NE(resCtx.res[1], resCtx.workSpace);
+    EXPECT_NE(resCtx.res[1], resCtx.xnAddr);
+    EXPECT_NE(resCtx.res[1], resCtx.ckeAddr);
+}
+
+// 样例侧手写了一份 OpResCtxCus 结构体副本，按硬编码偏移取 res[1]，与仓内 OpResCtx
+// 没有编译期绑定。此处锁定布局，仓内一旦改字段顺序或增删字段，UT 先失败，
+// 而不是让样例静默从错误偏移读地址。
+TEST_F(CcuMc2TestSuite, OpResCtxLayoutIsStableForDeviceSideCopy)
+{
+    EXPECT_EQ(sizeof(OpResCtx), 336U);
+    EXPECT_EQ(offsetof(OpResCtx, res), 192U);
+    EXPECT_EQ(offsetof(OpResCtx, res) + sizeof(uint64_t), 200U);
+    EXPECT_EQ(offsetof(OpResCtx, xnAddr), 168U);
+    EXPECT_EQ(offsetof(OpResCtx, ckeAddr), 176U);
+    EXPECT_EQ(offsetof(OpResCtx, resCtx), 256U);
+}
+
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather)
 {
     SetCommEngineEnv(COMM_ENGINE_CCU);
@@ -376,7 +417,10 @@ TEST_F(CcuMc2TestSuite, algorithmMap_AllEntries)
     EXPECT_EQ(algorithmMap.at("CcuAllGatherMesh1DMem2Mem"), CcuAllGatherMeshMem2Mem1D);
     EXPECT_EQ(algorithmMap.at("CcuAllGatherMeshMem2Mem1D"), CcuAllGatherMeshMem2Mem1D);
     EXPECT_EQ(algorithmMap.at("CcuKfcReduceScatterMesh1DMem2Mem"), CcuReduceScatterMeshMem2Mem1D);
-    EXPECT_EQ(algorithmMap.size(), 3U);
+    // HalfAlltoAllV 迁移新增；名字必须与 ccTiling.algConfig 下发的字符串逐字一致，
+    // 否则 CcuSelectAlg 走不到注册表，会静默回落成非 CCU 路径。
+    EXPECT_EQ(algorithmMap.at("CcuHalfAll2AllVMesh1D"), CcuHalfAlltoAllVMesh1D);
+    EXPECT_EQ(algorithmMap.size(), 4U);
 }
 
 TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
