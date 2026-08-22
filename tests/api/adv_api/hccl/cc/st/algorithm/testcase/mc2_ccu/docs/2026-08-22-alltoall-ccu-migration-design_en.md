@@ -39,9 +39,10 @@ Overall call chain:
 aclnn API → MC2 Executor → Selector (algorithm selection) → Template (CalcRes) → Kernel dispatch
 ```
 
-CCU algorithms coexist with existing AICPU algorithms, with execution path selected by `opExpansionMode`:
-- `AI_CPU`: AICPU algorithm path
-- `CCU_MS` / `CCU_SCHED`: CCU algorithm path
+CCU algorithms coexist with existing AICPU algorithms, with execution path selected by `opExecuteConfig`:
+- `CCU_MS`: Tries CCU_MS mode first, falls back to CCU_SCHED if not matched
+- `CCU_SCHED`: Uses CCU schedule mode, falls back to AICPU if not matched
+- `AICPU_TS`: Uses AICPU algorithm
 
 ```
 ┌─────────────────────────────────────────────────────────┐
