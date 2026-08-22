@@ -36,7 +36,16 @@ asc-devkit 仓的 CCU 算法模块位于 `impl/adv_api/detail/hccl/cc/` 目录�
 整体调用链：
 
 ```
-aclnn API → Selector（算法选择）→ Executor（Orchestrate 编排）→ Template（CalcRes 资源计算）→ Kernel 下发
+MC2 算子 Tiling（含 algConfig="CcuAlltoAllMesh1D"）
+    │
+    ▼
+GetOpParam → SelectAlgAndPrepareEngine（Selector 算法选择）
+    │
+    ▼
+GetOpParamResCtx → Executor（Orchestrate 编排）→ Template::CalcRes（资源计算）
+    │
+    ▼
+CcuKernelLaunch → CcuAlltoAllMesh1DKernel（Kernel 下发）
 ```
 
 CCU 算法与现有 AICPU 算法共存，通过 `opExecuteConfig` 配置选择执行路径：
@@ -46,27 +55,26 @@ CCU 算法与现有 AICPU 算法共存，通过 `opExecuteConfig` 配置选择�
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    aclnn AllToAll API                    │
+│          MC2 算子 Tiling (algConfig="CcuAlltoAllMesh1D") │
 └──────────────────────┬──────────────────────────────────┘
                        ▼
 ┌──────────────────────────────────────────────────────────┐
-│              AlltoAllAutoSelector                         │
+│  GetOpParam → SelectAlgAndPrepareEngine                   │
 │  ┌─────────────┐  ┌──────────────────┐                  │
 │  │ SelectAicpu │  │ SelectCcuSchedule │                  │
 │  │   Algo      │  │     Algo          │                  │
 │  └─────────────┘  └────────┬─────────┘                  │
 │                            ▼                              │
-│              ┌─────────────────────────┐                 │
-│              │  CcuTempAlltoAllMesh1D  │                 │
-│              │    (CalcRes)            │                 │
-│              └────────────┬────────────┘                 │
+│  GetOpParamResCtx → Executor → Template::CalcRes          │
 └───────────────────────────┼──────────────────────────────┘
                             ▼
 ┌──────────────────────────────────────────────────────────┐
-│           CcuAlltoAllMesh1DKernel                         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐ │
-│  │ PreSync  │→ │ DoAlltoAll│→ │ PostSync │  │ GroupCopy │ │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘ │
+│           CcuKernelLaunch → CcuAlltoAllMesh1DKernel       │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐               │
+│  │ PreSync  │→ │ DoAlltoAll│→ │ PostSync │               │
+│  └──────────┘  └──────────┘  └──────────┘               │
+│                  ├── loadFromMem=true: LocalCopy+Write    │
+│                  └── loadFromMem=false: GroupCopy+Write   │
 └──────────────────────────────────────────────────────────┘
 ```
 
