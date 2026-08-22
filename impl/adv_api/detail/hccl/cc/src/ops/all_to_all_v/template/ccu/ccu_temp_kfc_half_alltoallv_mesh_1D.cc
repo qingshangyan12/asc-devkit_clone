@@ -32,8 +32,8 @@ HcclResult CcuTempKfcHalfAlltoAllVMesh1D::CalcRes(
     AlgResourceRequest& resourceRequest)
 {
     CHK_RET(GetRes(resourceRequest));
-    // 阶段一单 mission，只申请 1 个 kernel；阶段二恢复双 mission 时改为 2
-    resourceRequest.ccuKernelNum.push_back(1);
+    // 阶段 3-2：双 mission 时 KfcServer CalcRes 会追加 1 个 kernel，故 ccuKernelNum 改为 2
+    resourceRequest.ccuKernelNum.push_back(KFC_SERVER_MISSION_NUM);
 
     CcuKernelInfo kernelInfo;
     strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelHalfAlltoAllVMesh1D");

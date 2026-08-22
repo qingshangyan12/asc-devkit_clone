@@ -263,23 +263,42 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
 {
     ccu::Variable signature; // 算子签名
-
     ccu::Variable repeatCond; // 存放《控制repeat循环执行的条件》的寄存器
     repeatCond = 0;
 
     ccu::Variable paramAddr;
     paramAddr = ctx.xnAddr;
 
+    // 阶段 3-2：添加wraparound所需的游标和常量（与master对齐）
+    ccu::Variable paramSize;
+    paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
+    ccu::Variable queueIdx;
+    ccu::Variable one;
+    queueIdx = 0;
+    one = 1;
+
     ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE); // 存放<每轮算子参数>的寄存器
 
     CCU_WHILE(repeatCond == 0)
     {
-        CCU_CHK_RET(MissionPreSync(signature, ctx));                 // 在context中依次加入8轮指令
-        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
-
+        // 阶段 3-2：先加载参数，检查哨兵，仅在非哨兵轮次才进入 barrier
+        // 保持 slave 与 master 的 barrier 对称，避免在 sentinel 轮次卡死在 MissionPreSync
+        CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx));
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
-        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64) { DispatchKfcSubKernel(param, ctx); }
-        CCU_CHK_RET(MissionPostSync(ctx));
+        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
+        {
+            CCU_CHK_RET(MissionPreSync(param[HBM_PARAM_IDX_0], ctx));
+            DispatchKfcSubKernel(param, ctx);
+            CCU_CHK_RET(MissionPostSync(ctx));
+        }
+        // 阶段 3-2：推进参数地址游标，wraparound at CCU_TASK_NUM_MAX
+        paramAddr += paramSize;
+        queueIdx += one;
+        CCU_IF(queueIdx == static_cast<u64>(CCU_TASK_NUM_MAX))
+        {
+            paramAddr = ctx.xnAddr;
+            queueIdx = 0;
+        }
     }
     return CCU_SUCCESS;
 }
