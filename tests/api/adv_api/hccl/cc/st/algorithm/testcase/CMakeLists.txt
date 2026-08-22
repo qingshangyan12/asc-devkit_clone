@@ -106,7 +106,8 @@ target_link_libraries(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
     dl
 )
 
-run_llt_test(
-    TARGET ${HCCL_AICPU_ALLOC_CTX_TARGET}
     TASK_NUM 1
 )
+
+add_subdirectory(mc2_ccu)
+
