@@ -82,7 +82,7 @@ CCU 算法与现有 AICPU 算法共存，通过 `opExecuteConfig` 配置选择�
 
 - **C++ 标准**：C++14，对齐产品代码要求
 - **编译宏**：`MC2_CLIENT_ENABLE_CCU` 控制是否编译 CCU 代码；`AICPU_COMPILE` 区分 AICPU 和 CCU 编译路径
-- **CCU 原语约束**：`1 << rankSize` 要求 rankSize ≤ 16（int 位宽限制）
+- **CCU 原语约束**：`1 << rankSize` 用于 event mask，`allBit` 为 `uint16_t`，要求 rankSize ≤ 16
 - **inplace 限制**：CCU schedule 模式不支持 inplace alltoall（输入输出地址重叠）
 - **拓扑限制**：不支持 `level2Ubg` 和 `topoLevelNums >= 3` 的多级拓扑
 - **平台限制**：`IsDevType960()` 当前固定返回 false，960 芯片特殊路径未启用
@@ -120,7 +120,7 @@ CCU 算法与现有 AICPU 算法共存，通过 `opExecuteConfig` 配置选择�
 
 1. 介绍
 
-`AlltoAllAutoSelector` 新增 `SelectCcuScheduleAlgo` 方法，当 `opExpansionMode` 为 `CCU_MS` 或 `CCU_SCHED` 时被调用，根据拓扑和数据量选择合适的 CCU AllToAll 算法变体。
+`AlltoAllAutoSelector` 新增 `SelectCcuScheduleAlgo` 方法，当 `opExecuteConfig` 为 `CCU_SCHED` 时被调用（`CCU_MS` 模式下 AllToAll 未覆写 `SelectCcuMsAlgo`，自动降级到 `CCU_SCHED`），根据拓扑和数据量选择合适的 CCU AllToAll 算法变体。
 
 2. 输入
 
@@ -341,7 +341,11 @@ KFC Server 模式下，AllToAll Kernel 需要被 KFC Server Kernel 继承和分�
   ```
   CCU_IF(opType == HCCL_CMD_ALLTOALL)
   {
-      CcuAlltoAllMesh1DKernel(param[1]~param[10], alltoAllArg);
+      // param[1]=inputAddr, param[2]=outputAddr, ctx.token=tokenInfo,
+      // param[3]=sliceSize, param[4]=srcStride, param[5]=writeLoopCount,
+      // param[6]=dstOffset, param[7~10]=goSize1~4
+      CcuAlltoAllMesh1DKernel(param[1], param[2], ctx.token, param[3], ...,
+                              param[10], alltoAllArg);
   }
   ```
 
@@ -373,7 +377,7 @@ KFC Server 模式下，AllToAll Kernel 需要被 KFC Server Kernel 继承和分�
 
 ### 特性交叉分析
 
-AllToAll CCU 与 AICPU AllToAll 共存于同一 Selector，通过 `opExpansionMode` 切换。两者不互相影响。
+AllToAll CCU 与 AICPU AllToAll 共存于同一 Selector，通过 `opExecuteConfig` 切换。两者不互相影响。
 
 ## 性能
 
@@ -580,7 +584,7 @@ param.isMc2?
 #### 系统错误
 
 - `InitResource`：channel 为空时返回 `CCU_E_INTERNAL`
-- `LoadArgs`：参数错误时返回 `CONTRACT_ERROR`
+- `LoadArgs`：始终返回 `CCU_SUCCESS`（当前无参数校验）
 - 分块传输无内存分配失败路径（CCU 原语不分配内存）
 
 #### 接口错误

@@ -82,7 +82,7 @@ CCU algorithms coexist with existing AICPU algorithms, with execution path selec
 
 - **C++ Standard**: C++14, aligned with product code requirements
 - **Compilation Macros**: `MC2_CLIENT_ENABLE_CCU` controls whether CCU code is compiled; `AICPU_COMPILE` distinguishes AICPU and CCU compilation paths
-- **CCU Primitive Constraint**: `1 << rankSize` requires rankSize ≤ 16 (int bit-width limitation)
+- **CCU Primitive Constraint**: `1 << rankSize` used for event mask, `allBit` is `uint16_t`, requires rankSize ≤ 16
 - **Inplace Limitation**: CCU schedule mode does not support inplace alltoall (overlapping input/output addresses)
 - **Topology Limitation**: Does not support `level2Ubg` and `topoLevelNums >= 3` multi-level topologies
 - **Platform Limitation**: `IsDevType960()` currently returns false; 960 chip special path not enabled
@@ -120,7 +120,7 @@ This migration adds a complete AllToAll CCU algorithm implementation to asc-devk
 
 1. Introduction
 
-`AlltoAllAutoSelector` adds a `SelectCcuScheduleAlgo` method, invoked when `opExpansionMode` is `CCU_MS` or `CCU_SCHED`, selecting the appropriate CCU AllToAll algorithm variant based on topology and data size.
+`AlltoAllAutoSelector` adds a `SelectCcuScheduleAlgo` method, invoked when `opExecuteConfig` is `CCU_SCHED` (under `CCU_MS` mode, AllToAll does not override `SelectCcuMsAlgo`, automatically falling back to `CCU_SCHED`), selecting the appropriate CCU AllToAll algorithm variant based on topology and data size.
 
 2. Input
 
@@ -341,7 +341,11 @@ In KFC Server mode, the AllToAll Kernel needs to be inherited and dispatched by 
   ```
   CCU_IF(opType == HCCL_CMD_ALLTOALL)
   {
-      CcuAlltoAllMesh1DKernel(param[1]~param[10], alltoAllArg);
+      // param[1]=inputAddr, param[2]=outputAddr, ctx.token=tokenInfo,
+      // param[3]=sliceSize, param[4]=srcStride, param[5]=writeLoopCount,
+      // param[6]=dstOffset, param[7~10]=goSize1~4
+      CcuAlltoAllMesh1DKernel(param[1], param[2], ctx.token, param[3], ...,
+                              param[10], alltoAllArg);
   }
   ```
 
@@ -373,7 +377,7 @@ In KFC Server mode, the AllToAll Kernel needs to be inherited and dispatched by 
 
 ### Cross-Feature Analysis
 
-AllToAll CCU coexists with AICPU AllToAll in the same Selector, switched by `opExpansionMode`. They do not affect each other.
+AllToAll CCU coexists with AICPU AllToAll in the same Selector, switched by `opExecuteConfig`. They do not affect each other.
 
 ## Performance
 
@@ -580,7 +584,7 @@ param.isMc2?
 #### System Errors
 
 - `InitResource`: Returns `CCU_E_INTERNAL` when channels are empty
-- `LoadArgs`: Returns `CONTRACT_ERROR` on parameter errors
+- `LoadArgs`: Always returns `CCU_SUCCESS` (no parameter validation currently)
 - Chunked transfer has no memory allocation failure path (CCU primitives do not allocate memory)
 
 #### Interface Errors
