@@ -48,10 +48,11 @@
 __simd_callee__ inline void asc_arange(vector_<dtype>& dst,
                                        <dtype> value)
 ```
+#### dtype支持数据类型
 
-dtype可取的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`。
+`dtype`取值为：`int8_t`、`int16_t`、`half`、`int32_t`、`float`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 // 示例：以half标量为基值生成递增序列
@@ -68,7 +69,7 @@ __simd_callee__ inline void asc_arange_descend(vector_<dtype>& dst,
 
 dtype可取的数据类型为`int8_t`、`int16_t`、`half`、`int32_t`、`float`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 // 示例：以half标量为基值生成递减序列

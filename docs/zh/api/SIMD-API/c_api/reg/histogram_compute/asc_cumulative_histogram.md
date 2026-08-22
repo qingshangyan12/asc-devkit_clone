@@ -56,8 +56,9 @@ __simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst,
                                                           vector_uint8_t src,
                                                           vector_bool mask)
 ```
+#### dtype支持数据类型
 
-`src`支持的数据类型为`uint8_t`，`dst`支持的数据类型为`uint16_t`。
+`dtype`取值为：`uint8_t`，`dst`支持的数据类型为`uint16_t`。
 
 ## 参数说明
 
