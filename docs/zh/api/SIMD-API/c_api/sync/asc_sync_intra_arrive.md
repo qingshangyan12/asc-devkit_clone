@@ -104,12 +104,13 @@ constexpr uint64_t SYNC_ID = 8;
 
 /*
  * 本示例说明：
- * - 采用 __mix__(1, 2) 标识核函数，核函数启动1个AI Core，共包含1个AIC和2个AIV。
- * - AIV0在UB中构造矩阵A和矩阵B，将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行 asc_sync_intra_arrive 向调度模块发送通知。
- * - AIC中从L1 Buffer搬运数据到L0A Buffer、L0B Buffer（PIPE_MTE1）的操作被 asc_sync_intra_wait 阻塞，直到AIV0执行了 asc_sync_intra_arrive 后才能执行。
- * - 通过 asc_get_sub_block_id 区分不同的AIV，仅AIV0参与该次同步，AIV1不参与该次同步。
+ * - 采用__mix__(1, 2)标识核函数，核函数启动1个AI Core，共包含1个AIC和2个AIV。
+ * - AIV0将矩阵从GM搬入UB。
+ * - AIV0将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行asc_sync_intra_arrive向调度模块发送通知。
+ * - AIC中从L1 Buffer搬运数据到L0A Buffer、L0B Buffer（PIPE_MTE1）的操作被asc_sync_intra_wait阻塞，直到AIV0执行了asc_sync_intra_arrive后才能执行。
+ * - 通过asc_get_sub_block_id区分不同的AIV，仅AIV0参与该次同步，AIV1不参与该次同步。
  */
-__global__ __mix__(1, 2) void asc_sync_intra_kernel(__gm__ float* output)
+__global__ __mix__(1, 2) void asc_sync_intra_kernel(__gm__ half* input, __gm__ float* output)
 {
     asc_init();
     __cbuf__ half matrix_a_l1[MATRIX_ELEMENTS], matrix_b_l1[MATRIX_ELEMENTS];
@@ -120,11 +121,9 @@ __global__ __mix__(1, 2) void asc_sync_intra_kernel(__gm__ float* output)
 
     if ASC_IS_AIV {
         if (asc_get_sub_block_id() == 0) {
-            for (uint32_t i = 0; i < MATRIX_ELEMENTS; ++i) {
-                input_ub[i] = static_cast<half>(1.0f);
-            }
-            asc_sync_notify(PIPE_S, PIPE_MTE3, EVENT_ID0);
-            asc_sync_wait(PIPE_S, PIPE_MTE3, EVENT_ID0);
+            asc_copy_gm2ub_align(input_ub, input, MATRIX_BYTES);
+            asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+            asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
             asc_copy_ub2l1(matrix_a_l1, input_ub, MATRIX_BYTES);
             asc_copy_ub2l1(matrix_b_l1, input_ub, MATRIX_BYTES);
             asc_sync_intra_arrive(PIPE_MTE3, SYNC_ID);
@@ -153,13 +152,17 @@ __global__ __mix__(1, 2) void asc_sync_intra_kernel(__gm__ float* output)
 int main()
 {
     uint32_t numBlocks = 1;
+    std::vector<half> input(MATRIX_ELEMENTS, static_cast<half>(1.0f));
     std::vector<float> output(MATRIX_ELEMENTS, 0.0f);
+    half* input_device = nullptr;
     float* output_device = nullptr;
 
     aclInit(nullptr);
     aclrtSetDevice(0);
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), MATRIX_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    asc_sync_intra_kernel<<<numBlocks, 0>>>(output_device);
+    aclrtMemcpy(input_device, MATRIX_BYTES, input.data(), MATRIX_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_sync_intra_kernel<<<numBlocks, 0>>>(input_device, output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;
@@ -168,6 +171,7 @@ int main()
     }
     std::cout << (passed ? "[Success] asc_sync_intra_arrive passed."
                           : "[Failed] asc_sync_intra_arrive failed.") << std::endl;
+    aclrtFree(input_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);
     aclFinalize();

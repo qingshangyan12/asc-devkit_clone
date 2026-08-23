@@ -101,32 +101,31 @@ constexpr int64_t FLAG_ID = 8;
 
 /*
  * 本示例说明：
- * - 采用 __mix__(1, 2) 标识核函数，核函数启动2个AI Core，共包含4个AIV。
- * - 每个AIV将一组数据从UB搬运至GM（PIPE_MTE3）操作执行完后，才能执行 asc_sync_inter_arrive 向调度模块发送通知。
- * - 各AIV中从GM读取数据（PIPE_MTE2）的操作被 asc_sync_inter_wait 阻塞，直到所有AIV均执行了 asc_sync_inter_arrive 后才能执行。
+ * - 采用__mix__(1, 2)标识核函数，核函数启动2个AI Core，共包含4个AIV。
+ * - 每个AIV将各自的数据从GM搬入UB。
+ * - 每个AIV将一组数据从UB搬运至GM（PIPE_MTE3）操作执行完后，才能执行asc_sync_inter_arrive向调度模块发送通知。
+ * - 各AIV中从GM读取数据（PIPE_MTE2）的操作被asc_sync_inter_wait阻塞，直到所有AIV均执行了asc_sync_inter_arrive后才能执行。
  * - 同步完成后，由AIV0读取并输出全部AIV生成的数据。
  */
 __global__ __mix__(1, 2) void asc_sync_inter_kernel(
-    __gm__ float* contributions, __gm__ float* output)
+    __gm__ float* input, __gm__ float* contributions, __gm__ float* output)
 {
     asc_init();
     if ASC_IS_AIV {
         __ubuf__ float local[ELEMENTS_PER_AIV];
         __ubuf__ float snapshot[TOTAL_ELEMENTS];
-        const uint32_t block_num = asc_get_block_num();
         const uint32_t sub_block_num = asc_get_sub_block_num();
-        const uint32_t block_idx = asc_get_block_idx() * sub_block_num + asc_get_sub_block_id();
+        // block_num和block_idx是内置变量。
+        const uint32_t aiv_block_index = block_idx * sub_block_num + asc_get_sub_block_id();
         const uint32_t total_elements = block_num * sub_block_num * ELEMENTS_PER_AIV;
         const uint32_t total_bytes = total_elements * sizeof(float);
-        for (uint32_t i = 0; i < ELEMENTS_PER_AIV; ++i) {
-            local[i] = static_cast<float>(block_idx + 1);
-        }
-        asc_sync_notify(PIPE_S, PIPE_MTE3, EVENT_ID0);
-        asc_sync_wait(PIPE_S, PIPE_MTE3, EVENT_ID0);
-        asc_copy_ub2gm_align(contributions + block_idx * ELEMENTS_PER_AIV, local, AIV_BYTES);
+        asc_copy_gm2ub_align(local, input + aiv_block_index * ELEMENTS_PER_AIV, AIV_BYTES);
+        asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+        asc_copy_ub2gm_align(contributions + aiv_block_index * ELEMENTS_PER_AIV, local, AIV_BYTES);
         asc_sync_inter_arrive(PIPE_MTE3, FLAG_ID);
         asc_sync_inter_wait(PIPE_MTE2, FLAG_ID);
-        if (block_idx == 0) {
+        if (aiv_block_index == 0) {
             asc_copy_gm2ub_align(snapshot, contributions, total_bytes);
             asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
             asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
@@ -141,14 +140,20 @@ __global__ __mix__(1, 2) void asc_sync_inter_kernel(
 int main()
 {
     uint32_t numBlocks = 2;
+    std::vector<float> input(TOTAL_ELEMENTS);
     std::vector<float> output(TOTAL_ELEMENTS, 0.0f);
-    float *contributions_device = nullptr, *output_device = nullptr;
+    for (uint32_t i = 0; i < TOTAL_ELEMENTS; ++i) {
+        input[i] = static_cast<float>(i / ELEMENTS_PER_AIV + 1);
+    }
+    float *input_device = nullptr, *contributions_device = nullptr, *output_device = nullptr;
 
     aclInit(nullptr);
     aclrtSetDevice(0);
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&contributions_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&output_device), TOTAL_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    asc_sync_inter_kernel<<<numBlocks, 0>>>(contributions_device, output_device);
+    aclrtMemcpy(input_device, TOTAL_BYTES, input.data(), TOTAL_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_sync_inter_kernel<<<numBlocks, 0>>>(input_device, contributions_device, output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), TOTAL_BYTES, output_device, TOTAL_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;
@@ -158,6 +163,7 @@ int main()
     }
     std::cout << (passed ? "[Success] asc_sync_inter_arrive passed."
                           : "[Failed] asc_sync_inter_arrive failed.") << std::endl;
+    aclrtFree(input_device);
     aclrtFree(contributions_device);
     aclrtFree(output_device);
     aclrtResetDevice(0);
