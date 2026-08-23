@@ -17,9 +17,9 @@ project(kernel_samples LANGUAGES ASC CXX)
 
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
 
-set(SCENARIO_NUM "3" CACHE STRING "Scenario number (0-11)")
-if(NOT SCENARIO_NUM MATCHES "^([0-9]|1[01])$")
-    message(FATAL_ERROR "SCENARIO_NUM must be one of 0-11.")
+set(SCENARIO_NUM "3" CACHE STRING "Scenario number (0-14)")
+if(NOT SCENARIO_NUM MATCHES "^([0-9]|1[0-4])$")
+    message(FATAL_ERROR "SCENARIO_NUM must be one of 0-14.")
 endif()
 
 set(CASE_SOURCE "")
@@ -29,7 +29,7 @@ elseif(SCENARIO_NUM MATCHES "^[2-5]$")
     set(CASE_SOURCE case1_ub_limit.asc)
 elseif(SCENARIO_NUM STREQUAL "6")
     set(CASE_SOURCE case2_ub_layout.asc)
-elseif(SCENARIO_NUM MATCHES "^([7-9]|1[01])$")
+elseif(SCENARIO_NUM MATCHES "^([7-9]|1[0-4])$")
     set(CASE_SOURCE case3_out_of_bounds_result.asc)
 endif()
 
