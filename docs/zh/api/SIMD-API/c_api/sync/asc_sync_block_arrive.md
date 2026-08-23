@@ -64,14 +64,14 @@ __aicore__ inline void asc_sync_block_arrive(pipe_t pipe,
 ## 约束说明
 
 - 用户需要确保配套使用（`flag_id`必须完全一致）`asc_sync_block_arrive`和`asc_sync_block_wait`，否则会出现未定义行为。
-- 每个计数器取值范围为[0, 15]，必须保证计数器的值不会溢出，否则触发异常。
+- 每个计数器最多连续累加15次（此时计数器的值为15），必须保证计数器的值不超过15，否则触发异常。
 - `pipe`不支持的取值：`PIPE_ALL`和`PIPE_S`。
 - 本接口不阻塞`pipe`流水中的后续指令。
-- `flag_id`取值范围为[0, 15]，超出范围值会被按位宽截断处理为低4位（如16->0、17->1）。
+- `flag_id`取值范围为[0, 15]，超出范围值会被按位宽截断处理为低4位（例如，flagId=16时，截取后为0；flagId=17时，截取后为1）。
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`标识核函数，同一AI Core内包含1个AIC和2个AIV。AIV0和AIV1分别在UB中构造矩阵A和矩阵B，通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)区分不同的AIV。两个AIV中将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行`asc_sync_block_arrive`向调度模块发送通知。AIC中从L1 Buffer搬运数据到L0A Buffer、L0B Buffer（PIPE_MTE1）的操作被`asc_sync_block_wait`阻塞，直到两个AIV均执行了`asc_sync_block_arrive`后才能执行。
+本示例演示两个AIV均执行完数据搬运后，AIC才能开始执行。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
@@ -99,6 +99,13 @@ constexpr uint32_t MATRIX_BYTES = MATRIX_ELEMENTS * sizeof(half);
 constexpr uint32_t OUTPUT_BYTES = MATRIX_ELEMENTS * sizeof(float);
 constexpr int64_t FLAG_ID = 8;
 
+/*
+ * 本示例说明：
+ * - 采用 __mix__(1, 2) 标识核函数，同一AI Core内包含1个AIC和2个AIV。
+ * - AIV0和AIV1分别在UB中构造矩阵A和矩阵B，通过 asc_get_sub_block_id 区分不同的AIV。
+ * - 两个AIV中将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行 asc_sync_block_arrive 向调度模块发送通知。
+ * - AIC中从L1 Buffer搬运数据到L0A Buffer、L0B Buffer（PIPE_MTE1）的操作被 asc_sync_block_wait 阻塞，直到两个AIV均执行了 asc_sync_block_arrive 后才能执行。
+ */
 __global__ __mix__(1, 2) void asc_sync_block_kernel(__gm__ float* output)
 {
     asc_init();

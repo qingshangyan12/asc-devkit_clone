@@ -66,15 +66,15 @@ __aicore__ inline void asc_sync_intra_arrive(pipe_t pipe,
 ## 约束说明
 
 - 用户需要确保配套使用`asc_sync_intra_arrive`和`asc_sync_intra_wait`，配对的`sync_id`必须符合跨核ID映射关系，否则会出现未定义行为。
-- 每个计数器取值范围为[0, 15]，必须保证计数器的值不会溢出，否则触发异常。
+- 每个计数器最多连续累加15次（此时计数器的值为15），必须保证计数器的值不超过15，否则触发异常。
 - 本接口不阻塞`pipe`流水中的后续指令。
-- AIC的`sync_id`取值范围为[0, 31]，超出范围值会被按位宽截断处理为低5位（如32->0、33->1）。
-- AIV的`sync_id`取值范围为[0, 15]，超出范围值会被按位宽截断处理为低4位（如16->0、17->1）。
+- AIC的`sync_id`取值范围为[0, 31]，超出范围值会被按位宽截断处理为低5位（例如，syncId=32时，截取后为0；syncId=33时，截取后为1）。
+- AIV的`sync_id`取值范围为[0, 15]，超出范围值会被按位宽截断处理为低4位（例如，syncId=16时，截取后为0；syncId=17时，截取后为1）。
 - 调用本接口的核函数必须使用`__mix__(1, 2)`修饰。
 
 ## 调用示例
 
-本示例采用`__mix__(1, 2)`标识核函数，核函数启动1个AI Core，共包含1个AIC和2个AIV。AIV0在UB中构造矩阵A和矩阵B，将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行`asc_sync_intra_arrive`向调度模块发送通知。AIC中从L1 Buffer搬运数据到L0A Buffer、L0B Buffer（PIPE_MTE1）的操作被`asc_sync_intra_wait`阻塞，直到AIV0执行了`asc_sync_intra_arrive`后才能执行。通过[asc_get_sub_block_id](../sys_var/asc_get_sub_block_id.md)区分不同的AIV，仅AIV0参与该次同步，AIV1不参与该次同步。
+本示例演示AIV0执行完数据搬运后，AIC才能开始执行。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
@@ -102,6 +102,13 @@ constexpr uint32_t MATRIX_BYTES = MATRIX_ELEMENTS * sizeof(half);
 constexpr uint32_t OUTPUT_BYTES = MATRIX_ELEMENTS * sizeof(float);
 constexpr uint64_t SYNC_ID = 8;
 
+/*
+ * 本示例说明：
+ * - 采用 __mix__(1, 2) 标识核函数，核函数启动1个AI Core，共包含1个AIC和2个AIV。
+ * - AIV0在UB中构造矩阵A和矩阵B，将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行 asc_sync_intra_arrive 向调度模块发送通知。
+ * - AIC中从L1 Buffer搬运数据到L0A Buffer、L0B Buffer（PIPE_MTE1）的操作被 asc_sync_intra_wait 阻塞，直到AIV0执行了 asc_sync_intra_arrive 后才能执行。
+ * - 通过 asc_get_sub_block_id 区分不同的AIV，仅AIV0参与该次同步，AIV1不参与该次同步。
+ */
 __global__ __mix__(1, 2) void asc_sync_intra_kernel(__gm__ float* output)
 {
     asc_init();
