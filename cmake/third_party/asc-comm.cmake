@@ -9,7 +9,7 @@
 # -----------------------------------------------------------------------------------------------------------
 
 # 后续如果更新asc-comm代码需要同步更新至devkit run包需要更新change id
-set(ASC_COMM_TAG_ID 1354774f46042a6a17d3ea80f44a637b1c2440b9)
+set(ASC_COMM_TAG_ID 563e0449e5172ad0dfb862f99d7d7ccb5ac83f98)
 
 # asc-comm 与 asc-devkit 按同级目录放置。路径以本文件所在目录(<devkit>/cmake/third_party)为锚，
 # 对于CI环境已经存在asc-comm代码, 不去拉取代码否则使用submodule方式拉取asc-comm仓代码
