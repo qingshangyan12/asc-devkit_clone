@@ -30,7 +30,7 @@
 
 分散搬出过程如下图所示。
 
-**图 1**  分散搬出数据
+**图1** 分散搬出数据
 
 ![](../../../../figures/reg_scatter.png)
 
@@ -38,7 +38,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 __simd_callee__ inline void asc_scatter(__ubuf__ <dtype>* dst,
                                         vector_<dtype> src,
                                         vector_<index_dtype> index,
@@ -63,7 +63,7 @@ __simd_callee__ inline void asc_scatter(__ubuf__ <dtype>* dst,
 
 ### 函数原型典型示例
 
-```cpp
+```c
 __simd_callee__ inline void asc_scatter(__ubuf__ int8_t* dst,
                                         vector_int8_t src,
                                         vector_uint16_t index,
@@ -117,7 +117,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -126,8 +126,11 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 
 namespace {
 constexpr uint32_t ELEMENT_COUNT = 128;
+constexpr uint32_t REPEAT_TIMES = 3;
+constexpr uint32_t OUTPUT_COUNT = REPEAT_TIMES * ELEMENT_COUNT;
 constexpr uint16_t SENTINEL = 0xffff;
-constexpr uint32_t BUFFER_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
+constexpr uint32_t INPUT_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
+constexpr uint32_t OUTPUT_BYTES = OUTPUT_COUNT * sizeof(uint16_t);
 
 __simd_vf__ inline void scatter_vf(__ubuf__ uint16_t* output,
                                     __ubuf__ uint16_t* input,
@@ -138,7 +141,9 @@ __simd_vf__ inline void scatter_vf(__ubuf__ uint16_t* output,
     asc_loadalign(src, input);
     asc_loadalign(index, indices);
     vector_bool mask = asc_create_mask_b16(PAT_M4);
-    asc_scatter(output, src, index, mask);
+    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        asc_scatter(output + repeat * ELEMENT_COUNT, src, index, mask);
+    }
 }
 
 __global__ __vector__ void asc_scatter_kernel(__gm__ uint16_t* output,
@@ -146,18 +151,18 @@ __global__ __vector__ void asc_scatter_kernel(__gm__ uint16_t* output,
                                                __gm__ uint16_t* indices)
 {
     asc_init();
-    __ubuf__ uint16_t output_local[ELEMENT_COUNT];
+    __ubuf__ uint16_t output_local[OUTPUT_COUNT];
     __ubuf__ uint16_t input_local[ELEMENT_COUNT];
     __ubuf__ uint16_t index_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(output_local, output, BUFFER_BYTES);
-    asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
-    asc_copy_gm2ub_align(index_local, indices, BUFFER_BYTES);
+    asc_copy_gm2ub_align(output_local, output, OUTPUT_BYTES);
+    asc_copy_gm2ub_align(input_local, input, INPUT_BYTES);
+    asc_copy_gm2ub_align(index_local, indices, INPUT_BYTES);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     scatter_vf(output_local, input_local, index_local);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_copy_ub2gm_align(output, output_local, OUTPUT_BYTES);
     asc_sync();
 }
 } // namespace
@@ -166,7 +171,7 @@ int main()
 {
     std::vector<uint16_t> input(ELEMENT_COUNT);
     std::vector<uint16_t> indices(ELEMENT_COUNT);
-    std::vector<uint16_t> output(ELEMENT_COUNT, SENTINEL);
+    std::vector<uint16_t> output(OUTPUT_COUNT, SENTINEL);
     for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
         input[i] = static_cast<uint16_t>(i + 1);
         indices[i] = static_cast<uint16_t>((i * 3) % ELEMENT_COUNT);
@@ -176,32 +181,34 @@ int main()
     uint16_t* input_device = nullptr;
     uint16_t* index_device = nullptr;
     uint16_t* output_device = nullptr;
-    if (aclrtMalloc(reinterpret_cast<void**>(&input_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST) != ACL_SUCCESS ||
-        aclrtMalloc(reinterpret_cast<void**>(&index_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST) != ACL_SUCCESS ||
-        aclrtMalloc(reinterpret_cast<void**>(&output_device), BUFFER_BYTES, ACL_MEM_MALLOC_HUGE_FIRST) != ACL_SUCCESS) {
+    if (aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST) != ACL_SUCCESS ||
+        aclrtMalloc(reinterpret_cast<void**>(&index_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST) != ACL_SUCCESS ||
+        aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST) != ACL_SUCCESS) {
         return 1;
     }
-    if (aclrtMemcpy(input_device, BUFFER_BYTES, input.data(), BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE) != ACL_SUCCESS ||
-        aclrtMemcpy(index_device, BUFFER_BYTES, indices.data(), BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE) != ACL_SUCCESS ||
-        aclrtMemcpy(output_device, BUFFER_BYTES, output.data(), BUFFER_BYTES, ACL_MEMCPY_HOST_TO_DEVICE) != ACL_SUCCESS) {
+    if (aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE) != ACL_SUCCESS ||
+        aclrtMemcpy(index_device, INPUT_BYTES, indices.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE) != ACL_SUCCESS ||
+        aclrtMemcpy(output_device, OUTPUT_BYTES, output.data(), OUTPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE) != ACL_SUCCESS) {
         return 1;
     }
 
     asc_scatter_kernel<<<1, 0>>>(output_device, input_device, index_device);
     if (aclrtSynchronizeDevice() != ACL_SUCCESS ||
-        aclrtMemcpy(output.data(), BUFFER_BYTES, output_device, BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST) != ACL_SUCCESS) {
+        aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST) != ACL_SUCCESS) {
         return 1;
     }
 
     bool passed = true;
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
-        const uint16_t expected = (i % 4 == 0) ? input[i] : SENTINEL;
-        const uint32_t position = indices[i];
-        if (output[position] != expected) {
-            std::cerr << "Mismatch at output[" << position << "]: expected " << expected
-                      << ", actual " << output[position] << std::endl;
-            passed = false;
-            break;
+    for (uint32_t repeat = 0; repeat < REPEAT_TIMES && passed; ++repeat) {
+        for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+            const uint16_t expected = (i % 4 == 0) ? input[i] : SENTINEL;
+            const uint32_t position = repeat * ELEMENT_COUNT + indices[i];
+            if (output[position] != expected) {
+                std::cerr << "Mismatch at output[" << position << "]: expected " << expected
+                          << ", actual " << output[position] << std::endl;
+                passed = false;
+                break;
+            }
         }
     }
 

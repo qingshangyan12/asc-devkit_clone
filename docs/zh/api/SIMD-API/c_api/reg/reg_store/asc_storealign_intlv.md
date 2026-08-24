@@ -107,7 +107,7 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
 
 ### 对齐搬出模式
 
-**表 1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -117,7 +117,7 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
 
 ### 立即数偏移搬出模式
 
-**表 2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -128,7 +128,7 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
 
 ### 地址寄存器偏移搬出模式
 
-**表 3**  参数说明
+**表3** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -166,7 +166,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -176,11 +176,13 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 constexpr uint32_t INPUT_COUNT = 128;
 constexpr uint32_t STORE_COUNT = INPUT_COUNT * 2;
+constexpr uint32_t REPEAT_TIMES = 2;
+constexpr uint32_t DIRECT_STRIDE = 272;
+constexpr uint32_t IMMEDIATE_BASE = 544;
 constexpr uint32_t IMMEDIATE_OFFSET = 272;
-constexpr uint32_t ADDR_BASE = 544;
+constexpr uint32_t ADDR_BASE = 1360;
 constexpr uint32_t ADDR_STRIDE = 272;
-constexpr uint32_t ADDR_REPEATS = 2;
-constexpr uint32_t OUTPUT_COUNT = 1088;
+constexpr uint32_t OUTPUT_COUNT = 1904;
 constexpr uint16_t SENTINEL = 0xffff;
 constexpr uint32_t INPUT_BYTES = INPUT_COUNT * sizeof(uint16_t);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_COUNT * sizeof(uint16_t);
@@ -193,10 +195,11 @@ __simd_vf__ inline void store_intlv_vf(__ubuf__ uint16_t* output,
     vector_uint16_t src1;
     asc_loadalign(src0, input0);
     asc_loadalign(src1, input1);
-    asc_storealign_intlv(output, src0, src1);
-    asc_storealign_intlv(output, src0, src1, static_cast<int32_t>(IMMEDIATE_OFFSET));
     addr_reg offset;
-    for (uint32_t i = 0; i < ADDR_REPEATS; ++i) {
+    for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
+        asc_storealign_intlv(output + i * DIRECT_STRIDE, src0, src1);
+        asc_storealign_intlv(output + IMMEDIATE_BASE + i * DIRECT_STRIDE,
+                             src0, src1, static_cast<int32_t>(IMMEDIATE_OFFSET));
         offset = asc_update_addr_reg_b16(ADDR_STRIDE);
         asc_storealign_intlv(output + ADDR_BASE, src0, src1, offset);
     }
@@ -249,7 +252,12 @@ int main()
     for (uint32_t i = 0; i < OUTPUT_COUNT; ++i) {
         uint32_t relative = 0;
         bool written = false;
-        const uint32_t starts[] = {0, IMMEDIATE_OFFSET, ADDR_BASE, ADDR_BASE + ADDR_STRIDE};
+        const uint32_t starts[] = {
+            0, DIRECT_STRIDE,
+            IMMEDIATE_BASE + IMMEDIATE_OFFSET,
+            IMMEDIATE_BASE + DIRECT_STRIDE + IMMEDIATE_OFFSET,
+            ADDR_BASE, ADDR_BASE + ADDR_STRIDE
+        };
         for (uint32_t start : starts) {
             if (i >= start && i < start + STORE_COUNT) {
                 relative = i - start;

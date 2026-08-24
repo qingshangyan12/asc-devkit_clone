@@ -274,7 +274,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -284,16 +284,23 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 constexpr uint32_t MASK_BYTES = 32;
 constexpr uint32_t PACKED_BYTES = 16;
-constexpr uint32_t OUTPUT_BYTES = 3 * 32;
+constexpr uint32_t REPEAT_TIMES = 2;
+constexpr uint32_t STEP_BYTES = 32;
+constexpr uint32_t SECTION_BYTES = REPEAT_TIMES * STEP_BYTES;
+constexpr uint32_t OUTPUT_BYTES = 3 * SECTION_BYTES;
 constexpr uint8_t SENTINEL = 0xa5;
 
 __simd_vf__ inline void pack_vf(__ubuf__ uint8_t* output, __ubuf__ uint32_t* mask_input)
 {
     vector_bool src;
     asc_loadalign(src, mask_input);
-    asc_storealign_pack(output, src);
-    asc_storealign_pack(reinterpret_cast<__ubuf__ uint16_t*>(output + 32), src);
-    asc_storealign_pack(reinterpret_cast<__ubuf__ uint32_t*>(output + 64), src);
+    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        asc_storealign_pack(output + repeat * STEP_BYTES, src);
+        asc_storealign_pack(reinterpret_cast<__ubuf__ uint16_t*>(
+            output + SECTION_BYTES + repeat * STEP_BYTES), src);
+        asc_storealign_pack(reinterpret_cast<__ubuf__ uint32_t*>(
+            output + 2 * SECTION_BYTES + repeat * STEP_BYTES), src);
+    }
 }
 
 __global__ __vector__ void asc_storealign_pack_kernel(__gm__ uint8_t* output, __gm__ uint32_t* mask_input)
@@ -318,9 +325,11 @@ int main()
     std::vector<uint32_t> mask_input(MASK_BYTES / sizeof(uint32_t), 0x55555555u);
     std::vector<uint8_t> output(OUTPUT_BYTES, SENTINEL);
     std::vector<uint8_t> expected(OUTPUT_BYTES, SENTINEL);
-    for (uint32_t base = 0; base < OUTPUT_BYTES; base += 32) {
-        for (uint32_t i = 0; i < PACKED_BYTES; ++i) {
-            expected[base + i] = 0xff;
+    for (uint32_t section = 0; section < 3; ++section) {
+        for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+            for (uint32_t i = 0; i < PACKED_BYTES; ++i) {
+                expected[section * SECTION_BYTES + repeat * STEP_BYTES + i] = 0xff;
+            }
         }
     }
 

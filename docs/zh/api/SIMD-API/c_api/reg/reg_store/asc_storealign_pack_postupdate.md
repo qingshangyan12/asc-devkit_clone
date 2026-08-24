@@ -142,7 +142,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -152,8 +152,10 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 constexpr uint32_t MASK_BYTES = 32;
 constexpr uint32_t PACKED_BYTES = 16;
+constexpr uint32_t REPEAT_TIMES = 2;
 constexpr uint32_t STEP_BYTES = 32;
-constexpr uint32_t OUTPUT_BYTES = 3 * 64;
+constexpr uint32_t SECTION_BYTES = REPEAT_TIMES * STEP_BYTES;
+constexpr uint32_t OUTPUT_BYTES = 3 * SECTION_BYTES;
 constexpr uint8_t SENTINEL = 0xa5;
 
 __simd_vf__ inline void pack_postupdate_vf(__ubuf__ uint8_t* output,
@@ -163,16 +165,13 @@ __simd_vf__ inline void pack_postupdate_vf(__ubuf__ uint8_t* output,
     asc_loadalign(src, mask_input);
 
     __ubuf__ uint8_t* dst8 = output;
-    asc_storealign_pack_postupdate(dst8, src, STEP_BYTES);
-    asc_storealign_pack_postupdate(dst8, src, STEP_BYTES);
-
-    __ubuf__ uint16_t* dst16 = reinterpret_cast<__ubuf__ uint16_t*>(output + 64);
-    asc_storealign_pack_postupdate(dst16, src, STEP_BYTES);
-    asc_storealign_pack_postupdate(dst16, src, STEP_BYTES);
-
-    __ubuf__ uint32_t* dst32 = reinterpret_cast<__ubuf__ uint32_t*>(output + 128);
-    asc_storealign_pack_postupdate(dst32, src, STEP_BYTES);
-    asc_storealign_pack_postupdate(dst32, src, STEP_BYTES);
+    __ubuf__ uint16_t* dst16 = reinterpret_cast<__ubuf__ uint16_t*>(output + SECTION_BYTES);
+    __ubuf__ uint32_t* dst32 = reinterpret_cast<__ubuf__ uint32_t*>(output + 2 * SECTION_BYTES);
+    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        asc_storealign_pack_postupdate(dst8, src, STEP_BYTES);
+        asc_storealign_pack_postupdate(dst16, src, STEP_BYTES);
+        asc_storealign_pack_postupdate(dst32, src, STEP_BYTES);
+    }
 }
 
 __global__ __vector__ void asc_storealign_pack_postupdate_kernel(
@@ -198,8 +197,8 @@ int main()
     std::vector<uint32_t> mask_input(MASK_BYTES / sizeof(uint32_t), 0x55555555u);
     std::vector<uint8_t> output(OUTPUT_BYTES, SENTINEL);
     std::vector<uint8_t> expected(OUTPUT_BYTES, SENTINEL);
-    for (uint32_t base = 0; base < OUTPUT_BYTES; base += 64) {
-        for (uint32_t repeat = 0; repeat < 2; ++repeat) {
+    for (uint32_t base = 0; base < OUTPUT_BYTES; base += SECTION_BYTES) {
+        for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
             for (uint32_t i = 0; i < PACKED_BYTES; ++i) {
                 expected[base + repeat * STEP_BYTES + i] = 0xff;
             }

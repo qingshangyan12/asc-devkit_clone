@@ -158,7 +158,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -167,10 +167,12 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 
 namespace {
 constexpr uint32_t ELEMENT_COUNT = 128;
+constexpr uint32_t REPEAT_TIMES = 3;
+constexpr uint32_t DIRECT_BASE = 0;
+constexpr uint32_t IMMEDIATE_BASE = 16;
 constexpr uint32_t IMMEDIATE_OFFSET = 17;
 constexpr uint32_t ADDR_BASE = 64;
 constexpr uint32_t ADDR_STRIDE = 7;
-constexpr uint32_t ADDR_REPEATS = 3;
 constexpr uint16_t SENTINEL = 0xffff;
 constexpr uint32_t BUFFER_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
 
@@ -178,10 +180,11 @@ __simd_vf__ inline void store_first_vf(__ubuf__ uint16_t* output, __ubuf__ uint1
 {
     vector_uint16_t src;
     asc_loadalign(src, input);
-    asc_storealign_1st(output, src);
-    asc_storealign_1st(output, src, static_cast<int32_t>(IMMEDIATE_OFFSET));
     addr_reg offset;
-    for (uint16_t i = 0; i < ADDR_REPEATS; ++i) {
+    for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
+        asc_storealign_1st(output + DIRECT_BASE + i, src);
+        asc_storealign_1st(output + IMMEDIATE_BASE + i, src,
+                           static_cast<int32_t>(IMMEDIATE_OFFSET));
         offset = asc_update_addr_reg_b16(ADDR_STRIDE);
         asc_storealign_1st(output + ADDR_BASE, src, offset);
     }
@@ -222,8 +225,10 @@ int main()
     aclrtMemcpy(output.data(), BUFFER_BYTES, output_device, BUFFER_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
     bool passed = true;
     for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
-        const bool written = i == 0 || i == IMMEDIATE_OFFSET ||
-            (i >= ADDR_BASE && i < ADDR_BASE + ADDR_REPEATS * ADDR_STRIDE &&
+        const bool written = (i >= DIRECT_BASE && i < DIRECT_BASE + REPEAT_TIMES) ||
+            (i >= IMMEDIATE_BASE + IMMEDIATE_OFFSET &&
+             i < IMMEDIATE_BASE + IMMEDIATE_OFFSET + REPEAT_TIMES) ||
+            (i >= ADDR_BASE && i < ADDR_BASE + REPEAT_TIMES * ADDR_STRIDE &&
              (i - ADDR_BASE) % ADDR_STRIDE == 0);
         passed = passed && output[i] == (written ? input[0] : SENTINEL);
     }

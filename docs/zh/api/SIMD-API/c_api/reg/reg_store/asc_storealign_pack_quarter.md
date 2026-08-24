@@ -177,7 +177,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -187,8 +187,10 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 constexpr uint32_t ELEMENT_COUNT = 64;
 constexpr uint32_t INPUT_BYTES = 256;
-constexpr uint32_t SECTION_BYTES = 256;
 constexpr uint32_t PACKED_BYTES = 64;
+constexpr uint32_t REPEAT_TIMES = 2;
+constexpr uint32_t STEP_BYTES = 128;
+constexpr uint32_t SECTION_BYTES = REPEAT_TIMES * STEP_BYTES;
 constexpr uint32_t OUTPUT_BYTES = 3 * SECTION_BYTES;
 constexpr uint8_t SENTINEL = 0xa5;
 
@@ -202,9 +204,14 @@ __simd_vf__ inline void pack_quarter_vf(__ubuf__ uint8_t* output,
     asc_loadalign(src_i32, reinterpret_cast<__ubuf__ int32_t*>(input));
     asc_loadalign(src_u32, input);
     asc_loadalign(src_f32, reinterpret_cast<__ubuf__ float*>(input));
-    asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ int32_t*>(output), src_i32, mask);
-    asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ uint32_t*>(output + SECTION_BYTES), src_u32, mask);
-    asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ float*>(output + 2 * SECTION_BYTES), src_f32, mask);
+    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ int32_t*>(
+            output + repeat * STEP_BYTES), src_i32, mask);
+        asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ uint32_t*>(
+            output + SECTION_BYTES + repeat * STEP_BYTES), src_u32, mask);
+        asc_storealign_pack_quarter(reinterpret_cast<__ubuf__ float*>(
+            output + 2 * SECTION_BYTES + repeat * STEP_BYTES), src_f32, mask);
+    }
 }
 
 __global__ __vector__ void asc_storealign_pack_quarter_kernel(
@@ -232,9 +239,12 @@ int main()
     std::vector<uint8_t> expected(OUTPUT_BYTES, SENTINEL);
     for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
         input[i] = 0x5a000000u | i;
-        expected[i] = static_cast<uint8_t>(input[i]);
-        expected[SECTION_BYTES + i] = static_cast<uint8_t>(input[i]);
-        expected[2 * SECTION_BYTES + i] = static_cast<uint8_t>(input[i]);
+        const uint8_t value = static_cast<uint8_t>(input[i]);
+        for (uint32_t section = 0; section < 3; ++section) {
+            for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+                expected[section * SECTION_BYTES + repeat * STEP_BYTES + i] = value;
+            }
+        }
     }
 
     aclInit(nullptr);

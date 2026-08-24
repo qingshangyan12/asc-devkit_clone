@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-将矢量数据寄存器中的数据搬出到Unified Buffer（UB），目的地址无需32字节对齐。底层经非对齐搬出指令完成单次连续写入，搬运过程中数据格式和内容保持不变。在追求极致性能时，对齐场景推荐使用[asc_storealign](asc_storealign.md)接口。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。本接口提供两种参数列表不同的功能模式：
+将矢量数据寄存器中的数据搬出到Unified Buffer（UB），目的地址需按照`dtype`对齐。底层经非对齐搬出指令完成单次连续写入，搬运过程中数据格式和内容保持不变。在追求极致性能时，对齐场景推荐使用[asc_storealign](asc_storealign.md)接口。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。本接口提供两种参数列表不同的功能模式：
 
 - **连续搬出模式**：将整个矢量数据寄存器内容写入`dst`起始地址，搬出量为一个矢量长度（`VL`，默认256字节）。
 - **带搬出数量模式**：仅将矢量数据寄存器前`count`个元素写入`dst`起始地址，用于部分搬出场景。
@@ -81,7 +81,7 @@ __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的操作数（矢量）的起始地址，类型为`__ubuf__ <dtype>*`。地址可非32字节对齐。 |
+| dst | 输出 | 目的操作数（矢量）的起始地址，类型为`__ubuf__ <dtype>*`。地址需按照`dtype`对齐。 |
 | src | 输入 | 源矢量数据寄存器。 |
 
 ### 带搬出数量模式
@@ -90,7 +90,7 @@ __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的操作数（矢量）的起始地址，类型为`__ubuf__ <dtype>*`。地址可非32字节对齐。 |
+| dst | 输出 | 目的操作数（矢量）的起始地址，类型为`__ubuf__ <dtype>*`。地址需按照`dtype`对齐。 |
 | src | 输入 | 源矢量数据寄存器，`dtype`须与`dst`一致。仅前`count`个元素参与搬出，其余元素被忽略。 |
 | count | 输入 | 实际搬出的元素个数。不可大于矢量数据寄存器容纳的最大元素个数。 |
 
@@ -106,7 +106,7 @@ __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst,
 
 - 本接口非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为矢量数据寄存器，目的操作数为UB地址，UB地址空间外的指针不可作为`dst`传入。
-- `dst`起始地址可非32字节对齐；本接口按非对齐方式将矢量数据寄存器内容写入UB，不要求对齐，不会报错。
+- `dst`起始地址需按照`dtype`对齐。本接口按非对齐方式将矢量数据寄存器内容写入UB，不要求对齐，不会报错。
 - UB容量上限：UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的地址不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../sync_control/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
@@ -126,7 +126,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -136,10 +136,13 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 constexpr uint32_t ELEMENT_COUNT = 128;
 constexpr uint32_t PARTIAL_COUNT = 16;
-constexpr uint32_t FULL_OFFSET = 1;
-constexpr uint32_t PARTIAL_BASE = 144;
+constexpr uint32_t REPEAT_TIMES = 2;
+constexpr uint32_t FULL_BASE = 1;
+constexpr uint32_t FULL_STRIDE = 144;
+constexpr uint32_t PARTIAL_BASE = 288;
 constexpr uint32_t PARTIAL_OFFSET = 7;
-constexpr uint32_t OUTPUT_COUNT = 288;
+constexpr uint32_t PARTIAL_STRIDE = 32;
+constexpr uint32_t OUTPUT_COUNT = 384;
 constexpr uint16_t SENTINEL = 0xffff;
 constexpr uint32_t INPUT_BYTES = ELEMENT_COUNT * sizeof(uint16_t);
 constexpr uint32_t OUTPUT_BYTES = OUTPUT_COUNT * sizeof(uint16_t);
@@ -148,8 +151,11 @@ __simd_vf__ inline void store_vf(__ubuf__ uint16_t* output, __ubuf__ uint16_t* i
 {
     vector_uint16_t src;
     asc_loadalign(src, input);
-    asc_store(output + FULL_OFFSET, src);
-    asc_store(output + PARTIAL_BASE + PARTIAL_OFFSET, src, PARTIAL_COUNT);
+    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        asc_store(output + FULL_BASE + repeat * FULL_STRIDE, src);
+        asc_store(output + PARTIAL_BASE + PARTIAL_OFFSET + repeat * PARTIAL_STRIDE,
+                  src, PARTIAL_COUNT);
+    }
 }
 
 __global__ __vector__ void store_kernel(__gm__ uint16_t* output, __gm__ uint16_t* input)
@@ -200,11 +206,13 @@ int main()
     CHECK_ACL(aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST));
 
     std::vector<uint16_t> expected(OUTPUT_COUNT, SENTINEL);
-    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
-        expected[FULL_OFFSET + i] = input[i];
-    }
-    for (uint32_t i = 0; i < PARTIAL_COUNT; ++i) {
-        expected[PARTIAL_BASE + PARTIAL_OFFSET + i] = input[i];
+    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+            expected[FULL_BASE + repeat * FULL_STRIDE + i] = input[i];
+        }
+        for (uint32_t i = 0; i < PARTIAL_COUNT; ++i) {
+            expected[PARTIAL_BASE + PARTIAL_OFFSET + repeat * PARTIAL_STRIDE + i] = input[i];
+        }
     }
 
     bool passed = true;

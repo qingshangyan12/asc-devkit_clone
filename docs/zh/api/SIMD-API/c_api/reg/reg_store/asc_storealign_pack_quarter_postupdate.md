@@ -99,7 +99,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -110,8 +110,9 @@ namespace {
 constexpr uint32_t ELEMENT_COUNT = 64;
 constexpr uint32_t INPUT_BYTES = 256;
 constexpr uint32_t PACKED_BYTES = 64;
+constexpr uint32_t REPEAT_TIMES = 2;
 constexpr uint32_t STEP_BYTES = 256;
-constexpr uint32_t SECTION_BYTES = 2 * STEP_BYTES;
+constexpr uint32_t SECTION_BYTES = REPEAT_TIMES * STEP_BYTES;
 constexpr uint32_t OUTPUT_BYTES = 3 * SECTION_BYTES;
 constexpr int32_t OFFSET_ELEMENTS = 64;
 constexpr uint8_t SENTINEL = 0xa5;
@@ -128,16 +129,13 @@ __simd_vf__ inline void pack_quarter_postupdate_vf(__ubuf__ uint8_t* output,
     asc_loadalign(src_f32, reinterpret_cast<__ubuf__ float*>(input));
 
     __ubuf__ int32_t* dst_i32 = reinterpret_cast<__ubuf__ int32_t*>(output);
-    asc_storealign_pack_quarter_postupdate(dst_i32, src_i32, OFFSET_ELEMENTS, mask);
-    asc_storealign_pack_quarter_postupdate(dst_i32, src_i32, OFFSET_ELEMENTS, mask);
-
     __ubuf__ uint32_t* dst_u32 = reinterpret_cast<__ubuf__ uint32_t*>(output + SECTION_BYTES);
-    asc_storealign_pack_quarter_postupdate(dst_u32, src_u32, OFFSET_ELEMENTS, mask);
-    asc_storealign_pack_quarter_postupdate(dst_u32, src_u32, OFFSET_ELEMENTS, mask);
-
     __ubuf__ float* dst_f32 = reinterpret_cast<__ubuf__ float*>(output + 2 * SECTION_BYTES);
-    asc_storealign_pack_quarter_postupdate(dst_f32, src_f32, OFFSET_ELEMENTS, mask);
-    asc_storealign_pack_quarter_postupdate(dst_f32, src_f32, OFFSET_ELEMENTS, mask);
+    for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+        asc_storealign_pack_quarter_postupdate(dst_i32, src_i32, OFFSET_ELEMENTS, mask);
+        asc_storealign_pack_quarter_postupdate(dst_u32, src_u32, OFFSET_ELEMENTS, mask);
+        asc_storealign_pack_quarter_postupdate(dst_f32, src_f32, OFFSET_ELEMENTS, mask);
+    }
 }
 
 __global__ __vector__ void asc_storealign_pack_quarter_postupdate_kernel(
@@ -168,8 +166,9 @@ int main()
         const uint8_t value = static_cast<uint8_t>(input[i]);
         for (uint32_t section = 0; section < 3; ++section) {
             const uint32_t base = section * SECTION_BYTES;
-            expected[base + i] = value;
-            expected[base + STEP_BYTES + i] = value;
+            for (uint32_t repeat = 0; repeat < REPEAT_TIMES; ++repeat) {
+                expected[base + repeat * STEP_BYTES + i] = value;
+            }
         }
     }
 
