@@ -669,6 +669,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
         const uint8_t missionNum = GetKfcMissionNum(handleId);
         for (uint8_t mission = 0; mission < missionNum; ++mission) {
             ccuMsg_.commitCKEAddr = GetCommitCkeAddr(globalCurWaitId_, mission);
+            AscendC::PRINTF(
+                "[KFC_DEBUG][Finalize] handleId=%u resourceId=%u mission=%u missionNum=%u commitCKEAddr=%p\n",
+                static_cast<uint32_t>(handleId), static_cast<uint32_t>(globalCurWaitId_),
+                static_cast<uint32_t>(mission), static_cast<uint32_t>(missionNum), ccuMsg_.commitCKEAddr);
             WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
         }
         KERNEL_LOG(
