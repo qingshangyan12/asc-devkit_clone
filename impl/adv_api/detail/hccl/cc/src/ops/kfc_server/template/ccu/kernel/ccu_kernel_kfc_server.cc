@@ -115,8 +115,7 @@ CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Vari
 
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
-    ccu::Variable opType;
-    opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
+    uint64_t opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
     if (opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
     {
         CcuKfcAllGatherMesh1DMem2MemKernel(
