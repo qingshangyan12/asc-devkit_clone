@@ -814,7 +814,7 @@
             -   [REGISTER\_TILING\_DEFAULT](SIMD-API/basic_api/Kernel-Tiling/REGISTER_TILING_DEFAULT.md)
             -   [REGISTER\_TILING\_FOR\_TILINGKEY](SIMD-API/basic_api/Kernel-Tiling/REGISTER_TILING_FOR_TILINGKEY.md)
             -   [REGISTER\_NONE\_TILING](SIMD-API/basic_api/Kernel-Tiling/REGISTER_NONE_TILING.md)
-            -   [设置Kernel类型](SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)
+            -   [设置核函数（Kernel）类型](SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)
 
         -   [特殊寄存器访问](SIMD-API/basic_api/special_register_access/special_register_access.md)
             -   [GetSpr](SIMD-API/basic_api/special_register_access/GetSpr.md)
