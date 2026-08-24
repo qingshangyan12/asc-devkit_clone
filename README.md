@@ -11,8 +11,6 @@
 [![license](https://img.shields.io/badge/license-CANN_Open_2.0-lightgrey.svg)](LICENSE)
 [![contributing](https://img.shields.io/badge/CONTRIBUTING-teal)](CONTRIBUTING.md)
 [![SIG](https://img.shields.io/badge/SIG-ascendc-yellow)](https://gitcode.com/cann/community/tree/master/CANN/sigs/ascendc)
-[![VS Marketplace](https://vsmarketplacebadges.dev/version/HICANN.ascend-c-toolkit.svg)](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit)
-[![Installs](https://vsmarketplacebadges.dev/installs-short/HICANN.ascend-c-toolkit.svg)](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit)
 
 </div>
 
@@ -188,7 +186,7 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 
 - 重启clangd（VS Code: Command Palette -> "Clangd: Restart language server"）
 
-- 推荐安装VS Code扩展[Ascend C Toolkit](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit)，用于在VS Code中完成Ascend C算子工程的编辑、编译、运行、调试、异常检测与性能调优等流程。打开本仓工作区时，VS Code会根据`.vscode/extensions.json`提示安装推荐扩展。
+- 推荐从[发布页面](https://gitcode.com/opdevtools/plugin_release/releases)下载并安装VS Code扩展Ascend C Toolkit，用于在VS Code中完成Ascend C算子工程的编辑、编译、运行、调试、异常检测与性能调优等流程。
 
 - Ascend C Toolkit近期更新重点增强Atlas A2系列产品和Atlas A3系列产品的环境解析、标准自定义算子创建、SoC设置、仿真分析、NPU调试、设置迁移与稳定性；完整使用说明和问题反馈请参考[CANN讨论区使用指导](https://gitcode.com/org/cann/discussions/54)。
 

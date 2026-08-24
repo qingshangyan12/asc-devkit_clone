@@ -11,8 +11,6 @@
 [![license](https://img.shields.io/badge/license-CANN_Open_2.0-lightgrey.svg)](LICENSE)
 [![contributing](https://img.shields.io/badge/CONTRIBUTING-teal)](CONTRIBUTING_en.md)
 [![SIG](https://img.shields.io/badge/SIG-ascendc-yellow)](https://gitcode.com/cann/community/tree/master/CANN/sigs/ascendc)
-[![VS Marketplace](https://vsmarketplacebadges.dev/version/HICANN.ascend-c-toolkit.svg)](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit)
-[![Installs](https://vsmarketplacebadges.dev/installs-short/HICANN.ascend-c-toolkit.svg)](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit)
 
 </div>
 
@@ -188,7 +186,7 @@ If you want to quickly experience project build and operator sample execution, a
 
 - Restart clangd (VS Code: Command Palette -> "Clangd: Restart language server")
 
-- We recommend installing the VS Code extension [Ascend C Toolkit](https://marketplace.visualstudio.com/items?itemName=HICANN.ascend-c-toolkit), which supports editing, building, running, debugging, exception detection, and performance tuning for Ascend C operator projects in VS Code. When this workspace is opened, VS Code prompts users to install the recommended extensions from `.vscode/extensions.json`.
+- We recommend downloading and installing the Ascend C Toolkit VS Code extension from the [releases page](https://gitcode.com/opdevtools/plugin_release/releases). It supports editing, building, running, debugging, exception detection, and performance tuning for Ascend C operator projects in VS Code.
 
 - Recent Ascend C Toolkit updates focus on environment parsing for Atlas A2 and Atlas A3 series products, standard custom operator creation, SoC settings, simulation analysis, NPU debugging, settings migration, and stability. For full usage instructions and feedback channels, see the [CANN discussion guide](https://gitcode.com/org/cann/discussions/54).
 
