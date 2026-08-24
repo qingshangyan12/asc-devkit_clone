@@ -19,13 +19,13 @@ constexpr u32 TOPO_LEVEL_NUM_3 = 3;
 constexpr uint64_t SMALL_COUNT_16M = 16 * 1024 * 1024;
 
 namespace {
-bool IsDevType960() { return false; }
+bool IsDevType960() { return false; } // TODO: 实现真实的960设备类型检测
 } // namespace
 
 uint64_t AlltoAllAutoSelector::CalcDataSize(const OpParam& opParam, const TopoInfoWithNetLayerDetails* topoInfo) const
 {
     uint32_t dataTypeSize = DATATYPE_SIZE_TABLE[opParam.all2AllDataDes.sendType];
-    uint64_t* sendCountPtr = (uint64_t*)opParam.all2AllVDataDes.sendCounts;
+    uint64_t* sendCountPtr = reinterpret_cast<uint64_t*>(opParam.all2AllVDataDes.sendCounts);
     if (sendCountPtr == nullptr) {
         return 0;
     }
@@ -63,6 +63,7 @@ SelectorStatus AlltoAllAutoSelector::SelectMesh1DClosAlgo(
     CHK_PRT_RET(
         sendCounts == nullptr, HCCL_WARNING("[AlltoAllAutoSelector][%s] sendCounts is nullptr.", __func__),
         SelectorStatus::NOT_MATCH);
+    // AllToAll（非 AllToAllV）场景下各 rank 的 sendCount 相同，取 sendCounts[0] 作为代表
     uint64_t dataSize = sendCounts[0] * dataTypeSize;
     bool isMeshNumEqualToClosNum = false;
     CHK_PRT_RET(

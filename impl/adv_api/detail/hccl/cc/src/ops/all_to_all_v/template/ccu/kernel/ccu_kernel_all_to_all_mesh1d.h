@@ -27,7 +27,11 @@ struct CcuKernelArgAlltoAllMesh1D : CcuKernelArgBase {
 };
 
 struct AlltoAllMesh1DContext : CcuKernelCtxBase {
-    const CcuKernelArgAlltoAllMesh1D* arg;
+    const ChannelHandle* channels;
+    uint32_t channelCount;
+    uint32_t rankSize;
+    uint32_t rankId;
+    bool loadFromMem;
 
     std::vector<ccu::Variable> input;
     std::vector<ccu::Variable> output;
@@ -45,7 +49,8 @@ struct AlltoAllMesh1DContext : CcuKernelCtxBase {
 CcuResult CcuAlltoAllMesh1DKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
     ccu::Variable srcStride, ccu::Variable writeLoopCount, ccu::Variable dstOffset, ccu::Variable goSize1,
-    ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4, CcuKernelArg& arg);
+    ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4, const ChannelHandle channels[],
+    uint32_t channelCount, uint32_t rankSize, uint32_t rankId, bool loadFromMem);
 
 } // namespace mc2_ops_hccl
 #endif // HCCL_CCU_KERNEL_ALL_TO_ALL_MESH_1D_H
