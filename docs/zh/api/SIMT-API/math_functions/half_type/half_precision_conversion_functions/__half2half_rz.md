@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-将`half`类型数据遵循CAST_TRUNC模式取整。
+将half类型数据遵循CAST\_TRUNC模式取整。
 
 ## 函数原型
 

@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-将`bfloat16_t`数据遵循CAST_RINT模式取整。
+将bfloat16\_t数据遵循CAST\_RINT模式取整。
 
 ## 函数原型
 
