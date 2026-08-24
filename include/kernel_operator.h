@@ -23,7 +23,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_H
 #define ASCENDC_MODULE_OPERATOR_H
 
-#include "kernel_utils_macros.h"
+#include "utils/base/sys_macros.h"
 #include "kernel_tpipe.h"
 #include "kernel_tensor.h"
 #include "kernel_type.h"

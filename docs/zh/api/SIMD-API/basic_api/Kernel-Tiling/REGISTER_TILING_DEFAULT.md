@@ -27,7 +27,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001526206862_section212607105720"></a>
 
-头文件路径为：`"basic_api/kernel_utils_macros.h"`。
+头文件路径为：`"utils/base/sys_macros.h"`。
 
 用于在kernel侧注册用户使用标准C++语法自定义的默认TilingData结构体。
 

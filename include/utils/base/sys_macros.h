@@ -25,4 +25,19 @@
 #define unlikely(x) __builtin_expect(!!(x), 0)
 #endif
 
+#define PRELOAD(len) ASCENDC_PRELOAD_IMPL(len)
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#define KERNEL_TASK_TYPE_DEFAULT(value)
+#else
+#ifndef __PLUGIN__KERNEL_TASK_TYPE_DEFAULT_DEFINED__
+#define __PLUGIN__KERNEL_TASK_TYPE_DEFAULT_DEFINED__
+#define KERNEL_TASK_TYPE_DEFAULT(value) ENABLE_FEATURE_FOR_COMPILE(default, value)
+#endif
+#endif
+
+#define REGISTER_TILING_DEFAULT(tiling_struct) ENABLE_FEATURE_FOR_TILING(default, tiling_struct)
+
+#define TILING_KEY_IS(k) (TILING_KEY_VAR == (k))
+
 #endif

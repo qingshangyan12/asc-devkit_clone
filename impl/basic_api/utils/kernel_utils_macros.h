@@ -26,7 +26,7 @@
 #define UB_ADDR __ubuf__ uint8_t*
 #define SSBUF_ADDR __ssbuf__ uint32_t*
 
-#include "basic_api/kernel_utils_macros.h"
+#include "utils/base/sys_macros.h"
 #include "../kernel_macros.h"
 #include "../kernel_log.h"
 #include "../kernel_event.h"
@@ -329,7 +329,21 @@ struct SknlKernelMap {
         g_sknl_map_, __COUNTER__) = {                                                                    \
         {B_TYPE_SK_INFO, sizeof(uint32_t) + sizeof(SknlMapInfo)}, 0, SknlKernelMap<__VA_ARGS__>::value}
 
+#ifdef __CHECK_FEATURE_AT_PRECOMPILE
+#define REGISTER_NONE_TILING auto __enable_no_register_custom_tiling ascendc_trigger_tiling_struct = default
+#else
+#define REGISTER_NONE_TILING
+#endif
+
 #define ENABLE_DETERMINISTIC() ENABLE_FEATURE_FOR_COMPILE(deterministic, 1)
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#define KERNEL_TASK_TYPE(key, value)
+#else
+#define KERNEL_TASK_TYPE(key, value) ENABLE_FEATURE_FOR_COMPILE(key, value)
+#endif
+
+#define REGISTER_TILING_FOR_TILINGKEY(expression, tiling_struct) ENABLE_FEATURE_FOR_TILING(expression, tiling_struct)
 
 #ifndef ONE_CORE_DUMP_SIZE
 #define ONE_CORE_DUMP_SIZE (1024 * 1024)
@@ -346,6 +360,31 @@ struct SknlKernelMap {
 namespace AscendC {
 constexpr size_t DUMP_UINTSIZE = ONE_CORE_DUMP_SIZE;
 } // namespace AscendC
+
+#define TILING_KEY_LIST_INOUT(...) TILING_KEY_LIST_INOUT_IMPL(__VA_ARGS__)
+#define TILING_KEY_LIST_INOUT_IMPL(...) \
+    TILING_KEY_ARGS_CONCAT(TILING_KEY_INDEX_INOUT_, TILING_KEY_ARG_COUNT(__VA_ARGS__)(__VA_ARGS__))
+
+#define TILING_KEY_INDEX_INOUT_1(a) TILING_KEY_VAR == (a)
+#define TILING_KEY_INDEX_INOUT_2(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_1(__VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_3(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_2(__VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_4(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_3(__VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_5(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_4(__VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_6(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_5(__VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_7(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_6(__VA_ARGS__)
+#define TILING_KEY_INDEX_INOUT_8(a, ...) TILING_KEY_INDEX_INOUT_1(a) || TILING_KEY_INDEX_INOUT_7(__VA_ARGS__)
+
+#define TILING_KEY_ARG_COUNT(...) TILING_KEY_ARG_COUNT_IMPL(__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+#define TILING_KEY_ARG_COUNT_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, N, ...) N
+
+#define TILING_KEY_ARGS_CONCAT(a, b) TILING_KEY_ARGS_CONCAT_IMPL(a, b)
+#define TILING_KEY_ARGS_CONCAT_IMPL(a, b) a##b
+
+#ifdef __CHECK_FEATURE_AT_PRECOMPILE
+#define TILING_KEY_LIST(...) (TILING_KEY_LIST_INOUT(__VA_ARGS__)) "TILING_KEY_LIST"
+#else
+#define TILING_KEY_LIST(...) (TILING_KEY_LIST_INOUT(__VA_ARGS__))
+#endif
 
 namespace impl_mode {
 #ifdef SUPPORT_OUT_OF_BOUND_INDEX_

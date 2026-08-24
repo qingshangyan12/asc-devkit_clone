@@ -11,23 +11,19 @@
 #ifndef VERIFY_SINGLE_HEADER
 #include "kernel_operator.h"
 #else
-#include "kernel_utils_macros.h"
+#include "utils/base/sys_macros.h"
 #endif
 
-#if !defined(likely) || !defined(unlikely)
-#error "likely and unlikely must be available from the public macro headers"
+#if !defined(likely) || !defined(unlikely) || !defined(PRELOAD) || !defined(KERNEL_TASK_TYPE_DEFAULT) || \
+    !defined(REGISTER_TILING_DEFAULT) || !defined(TILING_KEY_IS)
+#error "the public sys_macros header must provide the reviewed macro set"
 #endif
 
-#if !defined(REGISTER_TILING_DEFAULT) || !defined(REGISTER_TILING_FOR_TILINGKEY) || !defined(REGISTER_NONE_TILING)
-#error "tiling registration macros must be available from the Basic API public macro header"
+#ifdef VERIFY_SINGLE_HEADER
+#if defined(KERNEL_TASK_TYPE) || defined(REGISTER_TILING_FOR_TILINGKEY) || defined(REGISTER_NONE_TILING) || \
+    defined(TILING_KEY_LIST)
+#error "the public sys_macros header must not expose unreviewed companion macros"
 #endif
-
-#if !defined(KERNEL_TASK_TYPE) || !defined(KERNEL_TASK_TYPE_DEFAULT)
-#error "kernel task type macros must be available from the Basic API public macro header"
-#endif
-
-#if !defined(TILING_KEY_IS) || !defined(TILING_KEY_LIST) || !defined(PRELOAD)
-#error "tiling key and preload macros must be available from the Basic API public macro header"
 #endif
 
 struct HeaderCheckTilingData {
@@ -35,20 +31,29 @@ struct HeaderCheckTilingData {
 };
 
 REGISTER_TILING_DEFAULT(HeaderCheckTilingData);
-REGISTER_TILING_FOR_TILINGKEY("TILING_KEY_VAR == 1", HeaderCheckTilingData);
 
 extern "C" __global__ __aicore__ void KernelTestPublicMacros()
 {
     KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);
-    KERNEL_TASK_TYPE(1, KERNEL_TYPE_AIC_ONLY);
-    REGISTER_NONE_TILING;
     PRELOAD(1);
 
-    if (TILING_KEY_IS(0) || TILING_KEY_LIST(1, 2)) {
+    if (TILING_KEY_IS(0)) {
         return;
     }
 
     if (likely(true) && unlikely(false)) {
         return;
     }
+
+#ifndef VERIFY_SINGLE_HEADER
+    KERNEL_TASK_TYPE(1, KERNEL_TYPE_AIC_ONLY);
+    REGISTER_NONE_TILING;
+    if (TILING_KEY_LIST(1, 2)) {
+        return;
+    }
+#endif
 }
+
+#ifndef VERIFY_SINGLE_HEADER
+REGISTER_TILING_FOR_TILINGKEY("TILING_KEY_VAR == 1", HeaderCheckTilingData);
+#endif

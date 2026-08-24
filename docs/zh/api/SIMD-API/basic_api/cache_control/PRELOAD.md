@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径为：`"basic_api/kernel_utils_macros.h"`。
+头文件路径为：`"utils/base/sys_macros.h"`。
 
 从当前指令所在的GM地址开始，将后续指令预加载到ICache中。
 
