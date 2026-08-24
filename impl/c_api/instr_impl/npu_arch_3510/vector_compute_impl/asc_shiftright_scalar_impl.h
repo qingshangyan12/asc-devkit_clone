@@ -80,8 +80,7 @@ __simd_callee__ inline vector_int8_t asc_shiftright_scalar_impl(vector_int8_t sr
     return dst;
 }
 
-__simd_callee__ inline vector_uint16_t asc_shiftright_scalar_impl(
-    vector_uint16_t src, int16_t value, vector_bool mask)
+__simd_callee__ inline vector_uint16_t asc_shiftright_scalar_impl(vector_uint16_t src, int16_t value, vector_bool mask)
 {
     vector_uint16_t dst;
     asc_shiftright_scalar_impl(dst, src, value, mask);
@@ -95,8 +94,7 @@ __simd_callee__ inline vector_int16_t asc_shiftright_scalar_impl(vector_int16_t 
     return dst;
 }
 
-__simd_callee__ inline vector_uint32_t asc_shiftright_scalar_impl(
-    vector_uint32_t src, int16_t value, vector_bool mask)
+__simd_callee__ inline vector_uint32_t asc_shiftright_scalar_impl(vector_uint32_t src, int16_t value, vector_bool mask)
 {
     vector_uint32_t dst;
     asc_shiftright_scalar_impl(dst, src, value, mask);
