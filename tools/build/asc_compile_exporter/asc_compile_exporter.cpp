@@ -137,7 +137,7 @@ bool PrepareOutputPath(
 }
 
 struct ArgumentState {
-    ascendc::manifest_generator::BuildCollectedBundleRequest request;
+    ascendc::manifest_generator::ManifestBundleBuildRequest request;
     bool inputDirSpecified{false};
     bool outputSpecified{false};
     bool makeSpecified{false};
@@ -152,7 +152,7 @@ bool ParseInputDirectory(int argc, char** argv, int& index, const std::string& a
     if (!ReadOptionValue(argc, argv, index, argument, state.inputDirSpecified, value)) {
         return false;
     }
-    if (!ascendc::FileUtils::ResolveDirectory(value, state.request.manifestSearchRoot)) {
+    if (!ascendc::FileUtils::ResolveDirectory(value, state.request.manifestSearchRootPath)) {
         return ReportArgumentError("Invalid value for argument --input-dir", value);
     }
     return true;
@@ -175,7 +175,7 @@ bool ParseJobCount(int argc, char** argv, int& index, const std::string& argumen
     if (!ParseJobs(value, jobs)) {
         return ReportArgumentError("Invalid value for argument --jobs", value);
     }
-    state.request.jobs = ResolveJobCount(jobs);
+    state.request.parallelJobCount = ResolveJobCount(jobs);
     return true;
 }
 
@@ -199,7 +199,7 @@ bool ParseArgument(int argc, char** argv, int& index, ArgumentState& state)
             return ReportArgumentError("Duplicate argument", argument);
         }
         state.saveTempFilesSpecified = true;
-        state.request.keepTemp = true;
+        state.request.retainTemporaryWorkspace = true;
         return true;
     }
     if (argument == "--jobs") {
@@ -226,10 +226,10 @@ bool ValidateRequiredArguments(const ArgumentState& state)
     return complete;
 }
 
-bool ParseArguments(int argc, char** argv, ascendc::manifest_generator::BuildCollectedBundleRequest& request)
+bool ParseArguments(int argc, char** argv, ascendc::manifest_generator::ManifestBundleBuildRequest& request)
 {
     ArgumentState state;
-    state.request.jobs = ResolveJobCount(0U);
+    state.request.parallelJobCount = ResolveJobCount(0U);
     for (int index = 1; index < argc; ++index) {
         if (!ParseArgument(argc, argv, index, state)) {
             return false;
@@ -249,7 +249,7 @@ int RunWithExceptionHandling(int argc, char** argv)
             PrintUsage(std::cout, argv[0]);
             return 0;
         }
-        ascendc::manifest_generator::BuildCollectedBundleRequest request;
+        ascendc::manifest_generator::ManifestBundleBuildRequest request;
         if (!ParseArguments(argc, argv, request)) {
             PrintUsage(std::cerr, argv[0]);
             return 1;

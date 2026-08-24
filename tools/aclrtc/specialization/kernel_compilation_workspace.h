@@ -35,10 +35,10 @@ public:
 
     boost::filesystem::path GetWorktreePath() const;
     aclError CreateOutputDirectoriesAndApplySourcePatches(const KernelCompilationPlan& compilationPlan);
-    aclError RemoveWorktreeBeforePublishingElfIfNeeded();
+    aclError EnforceWorktreeRetentionBeforeElfPublication();
 
 private:
-    ScopedTemporaryDirectory ownedWorktree_;
+    ScopedTemporaryDirectory worktreeDirectory_;
     WorktreeRetentionPolicy retentionPolicy_{WorktreeRetentionPolicy::RemoveAfterCompilation};
 };
 

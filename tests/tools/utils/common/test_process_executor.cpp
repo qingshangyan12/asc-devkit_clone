@@ -33,8 +33,7 @@ static_assert(
     std::is_same<std::underlying_type_t<ProcessOutputMode>, uint32_t>::value,
     "ProcessOutputMode must have a stable width");
 static_assert(
-    std::is_same<std::underlying_type_t<ProcessTermination>, uint32_t>::value,
-    "ProcessTermination must have a stable width");
+    std::is_same<std::underlying_type_t<ProcessOutcome>, uint32_t>::value, "ProcessOutcome must have a stable width");
 static_assert(
     std::is_same<decltype(ProcessExecutionResult::terminationCode), int32_t>::value,
     "terminationCode must have a stable width");
@@ -54,40 +53,34 @@ TEST(ProcessExecutorTest, RejectsInvalidRequestsBeforeSpawning)
 {
     ProcessExecutionRequest emptyArgumentsRequest;
     emptyArgumentsRequest.executionTimeout = 1s;
-    EXPECT_EQ(ProcessExecutor::Execute(emptyArgumentsRequest).termination, ProcessTermination::InfrastructureFailure);
+    EXPECT_EQ(ProcessExecutor::Execute(emptyArgumentsRequest).outcome, ProcessOutcome::ExecutorFailure);
 
     ProcessExecutionRequest zeroTimeoutRequest = CreateCapturedRequest({"/bin/true"});
     zeroTimeoutRequest.executionTimeout = 0ms;
-    EXPECT_EQ(ProcessExecutor::Execute(zeroTimeoutRequest).termination, ProcessTermination::InfrastructureFailure);
+    EXPECT_EQ(ProcessExecutor::Execute(zeroTimeoutRequest).outcome, ProcessOutcome::ExecutorFailure);
 
     ProcessExecutionRequest negativeGracePeriodRequest = CreateCapturedRequest({"/bin/true"});
     negativeGracePeriodRequest.terminationGracePeriod = -1ms;
-    EXPECT_EQ(
-        ProcessExecutor::Execute(negativeGracePeriodRequest).termination, ProcessTermination::InfrastructureFailure);
+    EXPECT_EQ(ProcessExecutor::Execute(negativeGracePeriodRequest).outcome, ProcessOutcome::ExecutorFailure);
 
     ProcessExecutionRequest invalidOutputModeRequest = CreateCapturedRequest({"/bin/true"});
     invalidOutputModeRequest.outputMode = static_cast<ProcessOutputMode>(UINT32_MAX);
-    EXPECT_EQ(
-        ProcessExecutor::Execute(invalidOutputModeRequest).termination, ProcessTermination::InfrastructureFailure);
+    EXPECT_EQ(ProcessExecutor::Execute(invalidOutputModeRequest).outcome, ProcessOutcome::ExecutorFailure);
 
     ProcessExecutionRequest embeddedNullRequest = CreateCapturedRequest({std::string("/bin/true\0invalid", 17U)});
-    EXPECT_EQ(ProcessExecutor::Execute(embeddedNullRequest).termination, ProcessTermination::InfrastructureFailure);
+    EXPECT_EQ(ProcessExecutor::Execute(embeddedNullRequest).outcome, ProcessOutcome::ExecutorFailure);
 
     ProcessExecutionRequest invalidOverrideNameRequest = CreateCapturedRequest({"/bin/true"});
     invalidOverrideNameRequest.environmentOverrides.emplace_back("INVALID=NAME", "value");
-    EXPECT_EQ(
-        ProcessExecutor::Execute(invalidOverrideNameRequest).termination, ProcessTermination::InfrastructureFailure);
+    EXPECT_EQ(ProcessExecutor::Execute(invalidOverrideNameRequest).outcome, ProcessOutcome::ExecutorFailure);
 
     ProcessExecutionRequest embeddedNullOverrideValueRequest = CreateCapturedRequest({"/bin/true"});
     embeddedNullOverrideValueRequest.environmentOverrides.emplace_back("VALID_NAME", std::string("value\0suffix", 12U));
-    EXPECT_EQ(
-        ProcessExecutor::Execute(embeddedNullOverrideValueRequest).termination,
-        ProcessTermination::InfrastructureFailure);
+    EXPECT_EQ(ProcessExecutor::Execute(embeddedNullOverrideValueRequest).outcome, ProcessOutcome::ExecutorFailure);
 
     ProcessExecutionRequest invalidRemovalNameRequest = CreateCapturedRequest({"/bin/true"});
     invalidRemovalNameRequest.removedEnvironmentVariables.emplace_back("INVALID=NAME");
-    EXPECT_EQ(
-        ProcessExecutor::Execute(invalidRemovalNameRequest).termination, ProcessTermination::InfrastructureFailure);
+    EXPECT_EQ(ProcessExecutor::Execute(invalidRemovalNameRequest).outcome, ProcessOutcome::ExecutorFailure);
 }
 
 TEST(ProcessExecutorTest, ExecutesArgumentsWithoutShellParsing)
@@ -136,17 +129,17 @@ TEST(ProcessExecutorTest, ReportsExitSignalAndSpawnFailureSeparately)
 {
     const ProcessExecutionResult nonzeroExit =
         ProcessExecutor::Execute(CreateCapturedRequest({"/bin/sh", "-c", "exit 7"}));
-    EXPECT_EQ(nonzeroExit.termination, ProcessTermination::Exited);
+    EXPECT_EQ(nonzeroExit.outcome, ProcessOutcome::Exited);
     EXPECT_EQ(nonzeroExit.terminationCode, 7);
 
     const ProcessExecutionResult signalExit =
         ProcessExecutor::Execute(CreateCapturedRequest({"/bin/sh", "-c", "kill -TERM $$"}));
-    EXPECT_EQ(signalExit.termination, ProcessTermination::Signaled);
+    EXPECT_EQ(signalExit.outcome, ProcessOutcome::Signaled);
     EXPECT_EQ(signalExit.terminationCode, SIGTERM);
 
     const ProcessExecutionResult spawnFailure =
         ProcessExecutor::Execute(CreateCapturedRequest({"/path/that/does/not/exist"}));
-    EXPECT_EQ(spawnFailure.termination, ProcessTermination::InfrastructureFailure);
+    EXPECT_EQ(spawnFailure.outcome, ProcessOutcome::ExecutorFailure);
 }
 
 TEST(ProcessExecutorTest, BoundsCapturedCombinedOutput)
@@ -186,7 +179,7 @@ TEST(ProcessExecutorTest, TimeoutTerminatesDescendantsAfterLeaderExits)
     request.executionTimeout = 20ms;
 
     const ProcessExecutionResult result = ProcessExecutor::Execute(request);
-    EXPECT_EQ(result.termination, ProcessTermination::TimedOut);
+    EXPECT_EQ(result.outcome, ProcessOutcome::TimedOut);
 
     const uintmax_t markerSizeAfterTimeout =
         fs::exists(descendantMarkerPath) ? fs::file_size(descendantMarkerPath) : 0U;

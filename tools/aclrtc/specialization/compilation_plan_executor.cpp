@@ -48,9 +48,9 @@ aclError CompilationPlanExecutor::ExecuteCompilationPlan(const KernelCompilation
                     std::min(processResult.capturedOutput.size(), maxLoggedProcessOutputBytes);
                 const bool loggedOutputTruncated = processResult.capturedOutput.size() > loggedOutputByteCount;
                 ASCENDLOGE(
-                    "Command %s failed: termination=%s code=%d elapsed_ms=%lld captured_output_truncated=%s "
+                    "Command %s failed: outcome=%s code=%d elapsed_ms=%lld captured_output_truncated=%s "
                     "logged_output_truncated=%s output_prefix_bytes=%zu output=%.*s",
-                    compilationCommand.diagnosticLabel.c_str(), processResult.GetTerminationName(),
+                    compilationCommand.diagnosticLabel.c_str(), processResult.GetOutcomeName(),
                     static_cast<int>(processResult.terminationCode),
                     static_cast<long long>(processResult.elapsedTime.count()),
                     processResult.capturedOutputTruncated ? "true" : "false", loggedOutputTruncated ? "true" : "false",
@@ -93,7 +93,7 @@ aclError CompilationPlanExecutor::ExecuteCompilationCommand(
     if (processResult.HasSuccessfulExit()) {
         return ACLRTC_SUCCESS;
     }
-    if (processResult.termination == ProcessTermination::InfrastructureFailure) {
+    if (processResult.outcome == ProcessOutcome::ExecutorFailure) {
         return ACLRTC_ERROR_FAILURE;
     }
     return compilationCommand.commandKind == CompilationCommandKind::Link ? ACLRTC_ERROR_LINKING :

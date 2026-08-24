@@ -24,8 +24,8 @@ enum class ProcessOutputMode : uint32_t {
     CaptureCombined,
 };
 
-enum class ProcessTermination : uint32_t {
-    InfrastructureFailure,
+enum class ProcessOutcome : uint32_t {
+    ExecutorFailure,
     Exited,
     Signaled,
     TimedOut,
@@ -42,14 +42,14 @@ struct ProcessExecutionRequest {
 };
 
 struct ProcessExecutionResult {
-    ProcessTermination termination{ProcessTermination::InfrastructureFailure};
+    ProcessOutcome outcome{ProcessOutcome::ExecutorFailure};
     int32_t terminationCode{0};
     bool capturedOutputTruncated{false};
     std::chrono::milliseconds elapsedTime{0};
     std::string capturedOutput;
 
     bool HasSuccessfulExit() const noexcept;
-    const char* GetTerminationName() const noexcept;
+    const char* GetOutcomeName() const noexcept;
 };
 
 class ProcessExecutor final {

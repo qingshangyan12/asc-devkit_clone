@@ -31,7 +31,7 @@
 namespace {
 namespace fs = boost::filesystem;
 using ascendc::ProcessExecutionResult;
-using ascendc::ProcessTermination;
+using ascendc::ProcessOutcome;
 using ascendc::aclrtc::CompilationCommand;
 using ascendc::aclrtc::CompilationCommandKind;
 using ascendc::aclrtc::KernelSpecializationDiagnostics;
@@ -260,20 +260,20 @@ TEST(KernelSpecializationDiagnosticsTest, RecordsTerminationKindsAndUnpublishedR
     const CompilationCommand command{CompilationCommandKind::Compile, std::nullopt, "compile", "/bin/true", {}};
 
     ProcessExecutionResult processResult;
-    processResult.termination = ProcessTermination::Signaled;
+    processResult.outcome = ProcessOutcome::Signaled;
     processResult.terminationCode = SIGTERM;
     diagnostics.AppendCommandResultToCompilationLog(command, processResult);
-    processResult.termination = ProcessTermination::TimedOut;
+    processResult.outcome = ProcessOutcome::TimedOut;
     diagnostics.AppendCommandResultToCompilationLog(command, processResult);
-    processResult.termination = static_cast<ProcessTermination>(UINT32_MAX);
+    processResult.outcome = static_cast<ProcessOutcome>(UINT32_MAX);
     diagnostics.AppendCommandResultToCompilationLog(command, processResult);
     diagnostics.LogCommandFailureRecoveryHint();
     diagnostics.WriteSpecializationResult("/tmp/not_published.elf", OutputPublicationStatus::NotPublished);
 
     const std::string compilationLog = ReadTextFile(testRoot / "aclrtc_compile.log");
-    EXPECT_NE(compilationLog.find("termination=signaled"), std::string::npos);
-    EXPECT_NE(compilationLog.find("termination=timed_out"), std::string::npos);
-    EXPECT_NE(compilationLog.find("termination=unknown"), std::string::npos);
+    EXPECT_NE(compilationLog.find("outcome=signaled"), std::string::npos);
+    EXPECT_NE(compilationLog.find("outcome=timed_out"), std::string::npos);
+    EXPECT_NE(compilationLog.find("outcome=unknown"), std::string::npos);
     const nlohmann::json result = nlohmann::json::parse(ReadTextFile(testRoot / "aclrtc_result.json"));
     EXPECT_FALSE(result.at("output_published"));
 

@@ -71,7 +71,7 @@ TEST_F(ScopedTemporaryDirectoryTest, CreatesUniqueDirectoryAndRemovesItOnDestruc
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(removedDirectoryPath));
 }
 
-TEST_F(ScopedTemporaryDirectoryTest, CanReleaseCleanupOwnershipForCreatedOrExistingDirectory)
+TEST_F(ScopedTemporaryDirectoryTest, CanDisableAutomaticCleanupForCreatedOrTrackedDirectory)
 {
     const std::string createdParentPath = FileUtils::JoinPath(rootDirectoryPath_, "retained-created");
     ASSERT_TRUE(FileUtils::CreateDirectories(createdParentPath));
@@ -80,7 +80,7 @@ TEST_F(ScopedTemporaryDirectoryTest, CanReleaseCleanupOwnershipForCreatedOrExist
         ScopedTemporaryDirectory directory;
         ASSERT_TRUE(directory.CreateUniqueSubdirectory(createdParentPath, "created"));
         retainedCreatedPath = directory.GetDirectoryPath();
-        directory.ReleaseCleanupOwnership();
+        directory.DisableAutomaticCleanup();
     }
     EXPECT_TRUE(FileUtils::IsDirectory(retainedCreatedPath));
 
@@ -88,13 +88,13 @@ TEST_F(ScopedTemporaryDirectoryTest, CanReleaseCleanupOwnershipForCreatedOrExist
     ASSERT_TRUE(FileUtils::CreateDirectories(retainedAdoptedPath));
     {
         ScopedTemporaryDirectory directory;
-        ASSERT_TRUE(directory.TakeCleanupOwnershipOfDirectory(retainedAdoptedPath));
-        directory.ReleaseCleanupOwnership();
+        ASSERT_TRUE(directory.TrackDirectoryForAutomaticCleanup(retainedAdoptedPath));
+        directory.DisableAutomaticCleanup();
     }
     EXPECT_TRUE(FileUtils::IsDirectory(retainedAdoptedPath));
 }
 
-TEST_F(ScopedTemporaryDirectoryTest, MovesCleanupOwnershipExactlyOnce)
+TEST_F(ScopedTemporaryDirectoryTest, MovesAutomaticCleanupResponsibilityExactlyOnce)
 {
     const std::string parentPath = FileUtils::JoinPath(rootDirectoryPath_, "moved");
     ASSERT_TRUE(FileUtils::CreateDirectories(parentPath));
@@ -116,19 +116,19 @@ TEST_F(ScopedTemporaryDirectoryTest, MovesCleanupOwnershipExactlyOnce)
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(movedDirectoryPath));
 }
 
-TEST_F(ScopedTemporaryDirectoryTest, RemovesOwnedDirectoryOnRequest)
+TEST_F(ScopedTemporaryDirectoryTest, RemovesTrackedDirectoryOnRequest)
 {
     const std::string adoptedPath = FileUtils::JoinPath(rootDirectoryPath_, "adopted");
     ASSERT_TRUE(FileUtils::CreateDirectories(adoptedPath));
     ScopedTemporaryDirectory directory;
-    ASSERT_TRUE(directory.TakeCleanupOwnershipOfDirectory(adoptedPath));
-    EXPECT_TRUE(directory.RemoveOwnedDirectoryImmediately());
+    ASSERT_TRUE(directory.TrackDirectoryForAutomaticCleanup(adoptedPath));
+    EXPECT_TRUE(directory.RemoveTrackedDirectory());
     EXPECT_TRUE(directory.GetDirectoryPath().empty());
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(adoptedPath));
-    EXPECT_TRUE(directory.RemoveOwnedDirectoryImmediately());
+    EXPECT_TRUE(directory.RemoveTrackedDirectory());
 }
 
-TEST_F(ScopedTemporaryDirectoryTest, MoveAssignmentRemovesPreviouslyOwnedDirectoryAndEmptiesSource)
+TEST_F(ScopedTemporaryDirectoryTest, MoveAssignmentRemovesPreviouslyTrackedDirectoryAndEmptiesSource)
 {
     const std::string sourceParentPath = FileUtils::JoinPath(rootDirectoryPath_, "move-source");
     const std::string destinationParentPath = FileUtils::JoinPath(rootDirectoryPath_, "move-destination");
@@ -160,12 +160,12 @@ TEST_F(ScopedTemporaryDirectoryTest, RejectsInvalidCreationInputsAndReportsRemov
     EXPECT_FALSE(directory.CreateUniqueSubdirectory(FileUtils::JoinPath(rootDirectoryPath_, "missing"), "test"));
     EXPECT_FALSE(directory.CreateUniqueSubdirectory(rootDirectoryPath_, "nested/test"));
     EXPECT_FALSE(directory.CreateUniqueSubdirectory(rootDirectoryPath_, "invalid%prefix"));
-    EXPECT_FALSE(directory.TakeCleanupOwnershipOfDirectory(std::string()));
+    EXPECT_FALSE(directory.TrackDirectoryForAutomaticCleanup(std::string()));
 
-    ASSERT_TRUE(directory.TakeCleanupOwnershipOfDirectory("/proc/self/status"));
-    EXPECT_FALSE(directory.RemoveOwnedDirectoryImmediately());
+    ASSERT_TRUE(directory.TrackDirectoryForAutomaticCleanup("/proc/self/status"));
+    EXPECT_FALSE(directory.RemoveTrackedDirectory());
     EXPECT_EQ(directory.GetDirectoryPath(), "/proc/self/status");
-    directory.ReleaseCleanupOwnership();
+    directory.DisableAutomaticCleanup();
 }
 
 } // namespace

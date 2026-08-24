@@ -27,17 +27,17 @@ public:
     ScopedTemporaryDirectory& operator=(const ScopedTemporaryDirectory&) = delete;
 
     bool CreateUniqueSubdirectory(const std::string& parentDirectoryPath, const std::string& directoryNamePrefix);
-    bool TakeCleanupOwnershipOfDirectory(std::string directoryPath);
-    bool RemoveOwnedDirectoryImmediately() noexcept;
-    void ReleaseCleanupOwnership() noexcept;
+    bool TrackDirectoryForAutomaticCleanup(std::string directoryPath);
+    bool RemoveTrackedDirectory() noexcept;
+    void DisableAutomaticCleanup() noexcept;
 
     const std::string& GetDirectoryPath() const noexcept;
 
 private:
-    void MoveDirectoryPathAndCleanupPolicyFrom(ScopedTemporaryDirectory& other) noexcept;
+    void MoveStateFrom(ScopedTemporaryDirectory& other) noexcept;
 
-    std::string ownedDirectoryPath_;
-    bool removeOwnedDirectoryOnDestruction_{true};
+    std::string trackedDirectoryPath_;
+    bool automaticCleanupEnabled_{true};
 };
 
 } // namespace ascendc

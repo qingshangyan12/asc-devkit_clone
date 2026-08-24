@@ -117,7 +117,7 @@ void RemoveTemporaryOutputFileBestEffort(const fs::path& temporaryOutputPath)
 }
 } // namespace
 
-aclError KernelSpecializationSession::PrepareCompilationResource(
+aclError KernelSpecializationSession::LoadAndMaterializeCompilationResource(
     const std::string& resourceId, MaterializedKernelCompilationResource& compilationResource)
 {
     ResourceRegistry& resourceRegistry = ResourceRegistry::Instance();
@@ -146,7 +146,7 @@ aclError KernelSpecializationSession::PrepareCompilationResource(
     return ACLRTC_SUCCESS;
 }
 
-aclError KernelSpecializationSession::FinalizeSpecializationResult(
+aclError KernelSpecializationSession::RecordSpecializationResult(
     const NormalizedKernelSpecializationRequest& specializationRequest, KernelSpecializationDiagnostics& diagnostics,
     aclError specializationResult) noexcept
 {
@@ -182,7 +182,7 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
     }
 
     MaterializedKernelCompilationResource compilationResource;
-    specializationResult = PrepareCompilationResource(specializationRequest.resourceId, compilationResource);
+    specializationResult = LoadAndMaterializeCompilationResource(specializationRequest.resourceId, compilationResource);
     if (specializationResult != ACLRTC_SUCCESS) {
         return specializationResult;
     }
@@ -210,22 +210,22 @@ aclError KernelSpecializationSession::RunSpecializationWithMaterializedResource(
             compilationResource.externalSourceDirectoryPath)
             .BuildCompilationPlan(compilationPlan);
     if (specializationResult != ACLRTC_SUCCESS) {
-        return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
+        return RecordSpecializationResult(specializationRequest, diagnostics, specializationResult);
     }
     specializationResult = compilationWorkspace.CreateOutputDirectoriesAndApplySourcePatches(compilationPlan);
     if (specializationResult != ACLRTC_SUCCESS) {
-        return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
+        return RecordSpecializationResult(specializationRequest, diagnostics, specializationResult);
     }
 
     CompilationPlanExecutor planExecutor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     specializationResult = planExecutor.ExecuteCompilationPlan(compilationPlan);
     if (specializationResult != ACLRTC_SUCCESS) {
-        return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
+        return RecordSpecializationResult(specializationRequest, diagnostics, specializationResult);
     }
 
     specializationResult = PublishKernelElf(
         compilationPlan.linkedKernelElfPath, specializationRequest.outputElfPath, compilationWorkspace);
-    return FinalizeSpecializationResult(specializationRequest, diagnostics, specializationResult);
+    return RecordSpecializationResult(specializationRequest, diagnostics, specializationResult);
 }
 
 aclError KernelSpecializationSession::PublishKernelElf(
@@ -274,7 +274,7 @@ aclError KernelSpecializationSession::PublishKernelElf(
         return ACLRTC_ERROR_FAILURE;
     }
 
-    const aclError worktreeRemovalResult = compilationWorkspace.RemoveWorktreeBeforePublishingElfIfNeeded();
+    const aclError worktreeRemovalResult = compilationWorkspace.EnforceWorktreeRetentionBeforeElfPublication();
     if (worktreeRemovalResult != ACLRTC_SUCCESS) {
         RemoveTemporaryOutputFileBestEffort(temporaryOutputPath);
         return worktreeRemovalResult;

@@ -49,8 +49,8 @@ namespace {
 using asc_compile_exporter_test::ModuleTest;
 using asc_compile_exporter_test::WriteTestFile;
 using ascendc::FileUtils;
-using ascendc::manifest_generator::BuildCollectedBundleRequest;
 using ascendc::manifest_generator::BundleOutputKind;
+using ascendc::manifest_generator::ManifestBundleBuildRequest;
 
 class CerrCapture final {
 public:
@@ -84,7 +84,7 @@ private:
     std::streambuf* previous_;
 };
 
-bool ParseCommand(std::vector<std::string> arguments, BuildCollectedBundleRequest& request)
+bool ParseCommand(std::vector<std::string> arguments, ManifestBundleBuildRequest& request)
 {
     std::vector<char*> argv;
     argv.reserve(arguments.size());
@@ -156,7 +156,7 @@ TEST_F(ModuleTest, CliParsesKeywordArgumentsInAnyOrder)
     const std::string output = FileUtils::JoinPath(root_, "output/bundle.so");
     ASSERT_TRUE(FileUtils::CreateDirectories(manifestRoot));
 
-    BuildCollectedBundleRequest request;
+    ManifestBundleBuildRequest request;
     ASSERT_TRUE(ParseCommand(
         {"asc_compile_exporter", "--cxx", "/usr/bin/c++", "--save-temp-files", "--output", output, "--jobs", "3",
          "--input-dir", manifestRoot, "--make", "/usr/bin/make"},
@@ -166,13 +166,13 @@ TEST_F(ModuleTest, CliParsesKeywordArgumentsInAnyOrder)
     ASSERT_TRUE(FileUtils::ResolveDirectory(manifestRoot, resolvedManifestRoot));
     std::string resolvedOutputParent;
     ASSERT_TRUE(FileUtils::ResolveDirectory(FileUtils::ParentPath(output), resolvedOutputParent));
-    EXPECT_EQ(request.manifestSearchRoot, resolvedManifestRoot);
+    EXPECT_EQ(request.manifestSearchRootPath, resolvedManifestRoot);
     EXPECT_EQ(request.outputPath, FileUtils::JoinPath(resolvedOutputParent, "bundle.so"));
     EXPECT_EQ(request.outputKind, BundleOutputKind::kSharedObject);
     EXPECT_EQ(request.makeExecutable, "/usr/bin/make");
     EXPECT_EQ(request.cxxCompiler, "/usr/bin/c++");
-    EXPECT_TRUE(request.keepTemp);
-    EXPECT_EQ(request.jobs, ResolveJobCount(3U));
+    EXPECT_TRUE(request.retainTemporaryWorkspace);
+    EXPECT_EQ(request.parallelJobCount, ResolveJobCount(3U));
 }
 
 TEST_F(ModuleTest, CliUsesDefaultValues)
@@ -180,7 +180,7 @@ TEST_F(ModuleTest, CliUsesDefaultValues)
     const std::string manifestRoot = FileUtils::JoinPath(root_, "collection");
     const std::string output = FileUtils::JoinPath(root_, "output/bundle.o");
     ASSERT_TRUE(FileUtils::CreateDirectories(manifestRoot));
-    BuildCollectedBundleRequest request;
+    ManifestBundleBuildRequest request;
     ASSERT_TRUE(ParseCommand(
         {"asc_compile_exporter", "--input-dir", manifestRoot, "--output", output, "--make", "/usr/bin/make", "--cxx",
          "/usr/bin/c++"},
@@ -189,14 +189,14 @@ TEST_F(ModuleTest, CliUsesDefaultValues)
     ASSERT_TRUE(FileUtils::ResolveDirectory(FileUtils::ParentPath(output), resolvedOutputParent));
     EXPECT_EQ(request.outputPath, FileUtils::JoinPath(resolvedOutputParent, "bundle.o"));
     EXPECT_EQ(request.outputKind, BundleOutputKind::kRelocatableObject);
-    EXPECT_FALSE(request.keepTemp);
-    EXPECT_EQ(request.jobs, ResolveJobCount(0U));
+    EXPECT_FALSE(request.retainTemporaryWorkspace);
+    EXPECT_EQ(request.parallelJobCount, ResolveJobCount(0U));
 }
 
 TEST_F(ModuleTest, CliRejectsUnknownPositionalAndMissingArguments)
 {
     CerrCapture capture;
-    BuildCollectedBundleRequest request;
+    ManifestBundleBuildRequest request;
     EXPECT_FALSE(ParseCommand({"asc_compile_exporter"}, request));
     EXPECT_FALSE(ParseCommand({"asc_compile_exporter", "collection"}, request));
     EXPECT_FALSE(ParseCommand({"asc_compile_exporter", "--unknown"}, request));
@@ -216,7 +216,7 @@ TEST_F(ModuleTest, CliRejectsDuplicateArguments)
     CerrCapture capture;
     const std::string manifestRoot = FileUtils::JoinPath(root_, "collection");
     ASSERT_TRUE(FileUtils::CreateDirectories(manifestRoot));
-    BuildCollectedBundleRequest request;
+    ManifestBundleBuildRequest request;
     EXPECT_FALSE(
         ParseCommand({"asc_compile_exporter", "--input-dir", manifestRoot, "--input-dir", manifestRoot}, request));
     EXPECT_FALSE(ParseCommand({"asc_compile_exporter", "--save-temp-files", "--save-temp-files"}, request));
@@ -231,7 +231,7 @@ TEST_F(ModuleTest, CliRejectsDuplicateArguments)
 TEST_F(ModuleTest, CliValidatesArgumentsWhenRead)
 {
     CerrCapture capture;
-    BuildCollectedBundleRequest request;
+    ManifestBundleBuildRequest request;
     const std::string missingManifestRoot = FileUtils::JoinPath(root_, "missing");
     EXPECT_FALSE(ParseCommand({"asc_compile_exporter", "--input-dir", missingManifestRoot}, request));
     EXPECT_FALSE(ParseCommand({"asc_compile_exporter", "--output", "bundle.so"}, request));

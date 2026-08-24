@@ -25,7 +25,7 @@ namespace manifest_generator {
 class BundleSourceGenerator final {
 public:
     BundleSourceGenerator(
-        std::string workDir, const std::vector<ManifestUnit>& units, BundleOutputKind outputKind) noexcept;
+        std::string buildWorkspacePath, const std::vector<ManifestUnit>& units, BundleOutputKind outputKind) noexcept;
 
     bool Generate() const;
 
@@ -38,7 +38,7 @@ private:
     bool EmitBundleSource(const std::string& path) const;
     bool EmitMakefile(const std::string& path) const;
 
-    std::string workDir_;
+    std::string buildWorkspacePath_;
     const std::vector<ManifestUnit>& units_;
     BundleOutputKind outputKind_;
 };

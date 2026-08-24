@@ -37,8 +37,8 @@ namespace {
 using asc_compile_exporter_test::ScopedEnvironment;
 using ascendc::ProcessExecutionRequest;
 using ascendc::ProcessExecutor;
-using ascendc::manifest_generator::BuildCollectedBundleRequest;
 using ascendc::manifest_generator::BundleOutputKind;
+using ascendc::manifest_generator::ManifestBundleBuildRequest;
 using ascendc::manifest_generator::ManifestBundleCompiler;
 
 std::vector<int> g_renameErrors;
@@ -195,17 +195,17 @@ protected:
         RemoveTestTree(root_);
     }
 
-    BuildCollectedBundleRequest Request() const
+    ManifestBundleBuildRequest Request() const
     {
         CreateTestDirectories(JoinTestPath(root_, "output"));
-        BuildCollectedBundleRequest request;
-        request.manifestSearchRoot = JoinTestPath(root_, "collection");
+        ManifestBundleBuildRequest request;
+        request.manifestSearchRootPath = JoinTestPath(root_, "collection");
         request.outputPath = JoinTestPath(root_, "output/bundle.so");
         request.makeExecutable = "/usr/bin/make";
         request.cxxCompiler = "/usr/bin/c++";
         request.outputKind = BundleOutputKind::kSharedObject;
-        request.keepTemp = false;
-        request.jobs = 1U;
+        request.retainTemporaryWorkspace = false;
+        request.parallelJobCount = 1U;
         return request;
     }
 
@@ -220,7 +220,7 @@ protected:
                 "\"compile\",\"stage\":0,\"cmd\":[\"${output}/kernel.o\"]}],\"outputs\":[\"${output}/kernel.o\"]}]}]}");
     }
 
-    static void ExpectCompileFailure(const BuildCollectedBundleRequest& request)
+    static void ExpectCompileFailure(const ManifestBundleBuildRequest& request)
     {
         EXPECT_FALSE(ManifestBundleCompiler(request).Compile());
     }
@@ -239,7 +239,7 @@ TEST_F(AscCompileExporterTest, ReportsWorkspaceAndBuildFailures)
         ExpectCompileFailure(Request());
     }
 
-    BuildCollectedBundleRequest buildFailure = Request();
+    ManifestBundleBuildRequest buildFailure = Request();
     buildFailure.makeExecutable = "/path/that/does/not/exist";
     ExpectCompileFailure(buildFailure);
 }
@@ -250,7 +250,7 @@ TEST_F(AscCompileExporterTest, ReplacesTrustedOutputSymlinkWithoutFollowingIt)
     WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
     CreateManifest(unit, "SymlinkOutput");
 
-    const BuildCollectedBundleRequest request = Request();
+    const ManifestBundleBuildRequest request = Request();
     const std::string victim = JoinTestPath(root_, "victim.so");
     WriteFile(victim, "victim");
     ASSERT_EQ(symlink(victim.c_str(), request.outputPath.c_str()), 0);
@@ -265,7 +265,7 @@ TEST_F(AscCompileExporterTest, ReportsDirectPublishRenameFailureWithoutReplacing
     const std::string unit = JoinTestPath(root_, "collection/PublishFailure");
     WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
     CreateManifest(unit, "PublishFailure");
-    const BuildCollectedBundleRequest request = Request();
+    const ManifestBundleBuildRequest request = Request();
     WriteFile(request.outputPath, "previous bundle");
 
     g_renameErrors = {EACCES};
@@ -278,7 +278,7 @@ TEST_F(AscCompileExporterTest, PublishesBundleAfterCrossFileSystemRenameFailure)
     const std::string unit = JoinTestPath(root_, "collection/CrossFileSystem");
     WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
     CreateManifest(unit, "CrossFileSystem");
-    const BuildCollectedBundleRequest request = Request();
+    const ManifestBundleBuildRequest request = Request();
     WriteFile(request.outputPath, "previous bundle");
 
     g_renameErrors = {EXDEV};
@@ -292,7 +292,7 @@ TEST_F(AscCompileExporterTest, ReportsCrossFileSystemWorkspaceFailure)
     const std::string unit = JoinTestPath(root_, "collection/CrossFileSystemWorkspaceFailure");
     WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
     CreateManifest(unit, "CrossFileSystemWorkspaceFailure");
-    BuildCollectedBundleRequest request = Request();
+    ManifestBundleBuildRequest request = Request();
     request.outputPath = "/proc/asc_compile_exporter_bundle.so";
 
     g_renameErrors = {EXDEV};
@@ -304,7 +304,7 @@ TEST_F(AscCompileExporterTest, ReportsCrossFileSystemFinalRenameFailureWithoutRe
     const std::string unit = JoinTestPath(root_, "collection/CrossFileSystemRenameFailure");
     WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
     CreateManifest(unit, "CrossFileSystemRenameFailure");
-    const BuildCollectedBundleRequest request = Request();
+    const ManifestBundleBuildRequest request = Request();
     WriteFile(request.outputPath, "previous bundle");
 
     g_renameErrors = {EXDEV, EACCES};
@@ -315,7 +315,7 @@ TEST_F(AscCompileExporterTest, ReportsCrossFileSystemFinalRenameFailureWithoutRe
 TEST_F(AscCompileExporterTest, RejectsMissingManifestWithoutReplacingOutput)
 {
     CreateTestDirectories(JoinTestPath(root_, "collection"));
-    const BuildCollectedBundleRequest request = Request();
+    const ManifestBundleBuildRequest request = Request();
     WriteFile(request.outputPath, "previous bundle");
 
     ExpectCompileFailure(request);
@@ -327,7 +327,7 @@ TEST_F(AscCompileExporterTest, RejectsMalformedJsonWithoutReplacingOutput)
     const std::string unit = JoinTestPath(root_, "collection/Malformed");
     WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
     WriteFile(JoinTestPath(unit, "Malformed_manifest.json"), "{\"base_dir\":\"resources\"");
-    const BuildCollectedBundleRequest request = Request();
+    const ManifestBundleBuildRequest request = Request();
     WriteFile(request.outputPath, "previous bundle");
 
     ExpectCompileFailure(request);
@@ -362,7 +362,7 @@ TEST_F(AscCompileExporterTest, RejectsOversizedResourceWithoutReplacingOutput)
     WriteFile(resource, "");
     ASSERT_EQ(truncate(resource.c_str(), 1U * 1024U * 1024U + 1U), 0);
     CreateManifest(unit, "Large");
-    const BuildCollectedBundleRequest request = Request();
+    const ManifestBundleBuildRequest request = Request();
     WriteFile(request.outputPath, "previous bundle");
 
     ExpectCompileFailure(request);
@@ -383,7 +383,7 @@ TEST_F(AscCompileExporterTest, BuildsLoadableBundleAndCleansTemporaryWorkspace)
     CreateManifest(first, "First");
     CreateManifest(second, "Second");
 
-    const BuildCollectedBundleRequest request = Request();
+    const ManifestBundleBuildRequest request = Request();
     WriteFile(request.outputPath, "previous bundle");
     ASSERT_TRUE(ManifestBundleCompiler(request).Compile());
 
@@ -441,7 +441,7 @@ TEST_F(AscCompileExporterTest, BuildsRelocatableObjectThatCanBeLinkedIntoSharedL
     WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "relocatable source");
     CreateManifest(unit, "Relocatable");
 
-    BuildCollectedBundleRequest request = Request();
+    ManifestBundleBuildRequest request = Request();
     request.outputPath = JoinTestPath(root_, "output/bundle.o");
     request.outputKind = BundleOutputKind::kRelocatableObject;
     g_renameErrors = {EXDEV};
@@ -483,8 +483,8 @@ TEST_F(AscCompileExporterTest, KeepsTemporaryWorkspaceWhenRequested)
     WriteFile(JoinTestPath(unit, "resources/kernel.cpp"), "source");
     CreateManifest(unit, "Keep");
 
-    BuildCollectedBundleRequest request = Request();
-    request.keepTemp = true;
+    ManifestBundleBuildRequest request = Request();
+    request.retainTemporaryWorkspace = true;
     ASSERT_TRUE(ManifestBundleCompiler(request).Compile());
 
     const std::vector<std::string> workEntries = ListTestDirectory(root_);

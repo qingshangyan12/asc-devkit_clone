@@ -32,14 +32,14 @@ public:
     aclError RunKernelSpecialization(const aclrtcKernelSpecRequest* apiRequest, const char* outputElfPath);
 
 private:
-    static aclError PrepareCompilationResource(
+    static aclError LoadAndMaterializeCompilationResource(
         const std::string& resourceId, MaterializedKernelCompilationResource& compilationResource);
 
     aclError RunSpecializationWithMaterializedResource(
         const NormalizedKernelSpecializationRequest& specializationRequest,
         MaterializedKernelCompilationResource compilationResource);
 
-    static aclError FinalizeSpecializationResult(
+    static aclError RecordSpecializationResult(
         const NormalizedKernelSpecializationRequest& specializationRequest,
         KernelSpecializationDiagnostics& diagnostics, aclError specializationResult) noexcept;
 

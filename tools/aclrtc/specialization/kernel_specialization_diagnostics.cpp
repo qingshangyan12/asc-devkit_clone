@@ -168,8 +168,7 @@ void KernelSpecializationDiagnostics::AppendCommandResultToCompilationLog(
     }
     try {
         std::ostringstream resultText;
-        resultText << '[' << compilationCommand.diagnosticLabel
-                   << "] termination=" << processResult.GetTerminationName()
+        resultText << '[' << compilationCommand.diagnosticLabel << "] outcome=" << processResult.GetOutcomeName()
                    << " code=" << processResult.terminationCode << " elapsed_ms=" << processResult.elapsedTime.count()
                    << " output_truncated=" << (processResult.capturedOutputTruncated ? "true" : "false") << '\n'
                    << processResult.capturedOutput;

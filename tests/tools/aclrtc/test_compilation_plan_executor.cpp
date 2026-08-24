@@ -246,7 +246,7 @@ TEST(CompilationPlanExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeader
     fs::remove(descendantMarkerPath, ignoredError);
 }
 
-TEST(CompilationPlanExecutorTest, RecordsSpawnFailureAsInfrastructureFailure)
+TEST(CompilationPlanExecutorTest, RecordsSpawnFailureAsExecutorFailure)
 {
     ScopedDiagnosticCurrentDirectory diagnosticCurrentDirectory;
     const std::string specializationSessionId = "executor_spawn_failure";
@@ -257,7 +257,7 @@ TEST(CompilationPlanExecutorTest, RecordsSpawnFailureAsInfrastructureFailure)
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 
     const std::string compilationLog = ReadTextFile(fs::current_path() / "aclrtc_compile.log");
-    EXPECT_NE(compilationLog.find("termination=infrastructure_failure"), std::string::npos);
+    EXPECT_NE(compilationLog.find("outcome=executor_failure"), std::string::npos);
     EXPECT_EQ(compilationLog.find("termination=exited code=0"), std::string::npos);
 }
 

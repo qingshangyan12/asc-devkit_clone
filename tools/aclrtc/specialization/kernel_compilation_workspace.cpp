@@ -120,14 +120,14 @@ KernelCompilationWorkspace::KernelCompilationWorkspace(fs::path worktreePath, Wo
     : retentionPolicy_(retentionPolicy)
 {
     if (!worktreePath.empty()) {
-        (void)ownedWorktree_.TakeCleanupOwnershipOfDirectory(worktreePath.string());
+        (void)worktreeDirectory_.TrackDirectoryForAutomaticCleanup(worktreePath.string());
     }
     if (retentionPolicy_ == WorktreeRetentionPolicy::RetainAfterCompilation) {
-        ownedWorktree_.ReleaseCleanupOwnership();
+        worktreeDirectory_.DisableAutomaticCleanup();
     }
 }
 
-fs::path KernelCompilationWorkspace::GetWorktreePath() const { return fs::path(ownedWorktree_.GetDirectoryPath()); }
+fs::path KernelCompilationWorkspace::GetWorktreePath() const { return fs::path(worktreeDirectory_.GetDirectoryPath()); }
 
 aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatches(
     const KernelCompilationPlan& compilationPlan)
@@ -170,16 +170,16 @@ aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatche
     return ACLRTC_SUCCESS;
 }
 
-aclError KernelCompilationWorkspace::RemoveWorktreeBeforePublishingElfIfNeeded()
+aclError KernelCompilationWorkspace::EnforceWorktreeRetentionBeforeElfPublication()
 {
-    if (ownedWorktree_.GetDirectoryPath().empty()) {
+    if (worktreeDirectory_.GetDirectoryPath().empty()) {
         return ACLRTC_SUCCESS;
     }
     if (retentionPolicy_ == WorktreeRetentionPolicy::RetainAfterCompilation) {
         return ACLRTC_SUCCESS;
     }
-    const std::string worktreePath = ownedWorktree_.GetDirectoryPath();
-    if (!ownedWorktree_.RemoveOwnedDirectoryImmediately()) {
+    const std::string worktreePath = worktreeDirectory_.GetDirectoryPath();
+    if (!worktreeDirectory_.RemoveTrackedDirectory()) {
         ASCENDLOGE(
             "Failed to clean resource worktree before publishing ELF: path=%s; ensure the path is removable and retry",
             worktreePath.c_str());
