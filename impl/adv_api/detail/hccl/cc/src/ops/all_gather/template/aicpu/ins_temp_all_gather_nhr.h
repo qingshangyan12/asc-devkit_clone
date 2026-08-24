@@ -38,18 +38,89 @@ public:
 
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
     u64 GetThreadNum() const override;
-    void GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainnToSub) override{};
-    void GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain) override{};
+    void GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub) override;
+    void GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain) override;
 
 private:
     HcclResult GetStepInfo(u32 step, u32 nSteps, AicpuNHRStepInfo& stepInfo);
-
-    HcclResult LocalDataCopy(const std::vector<ThreadHandle>& threads);
-    HcclResult PostLocalCopy(const std::vector<ThreadHandle>& threads);
-    HcclResult RunAllGatherNHR(
-        const std::vector<ThreadHandle>& threads, const std::map<u32, std::vector<ChannelInfo>>& channels);
     u32 GetRankFromMap(const u32 algRankIdx) const;
+
+    // 末步直读output的使能条件；不满足时回退到全量scratch中转
+    bool CanReadLastStepToOutput() const;
+    // input/output同址同布局时，本rank自己那份slice无需回拷
+    bool CanSkipOwnSliceCopy() const;
+    bool IsLastStepReadSlice(u32 algRank) const;
+
+    // 按port group权重为普通块和尾块生成每个channel的size/offset
+    HcclResult PrepareDataSplitForMultiChannel(const TemplateResource& templateResource);
+
+    HcclResult LocalDataCopy(const std::vector<ThreadHandle>& threads, const u32& channelIdx);
+    HcclResult PostLocalCopy(const ThreadHandle& thread, const u32& channelIdx);
+
+    struct SliceCalcInfo {
+        u32 txIdx;
+        u32 rxIdx;
+        u64 txPartialOffset;
+        u64 rxPartialOffset;
+        u64 txScratchOff;
+        u64 rxScratchOff;
+        u64 txSliceSize;
+        u64 rxSliceSize;
+        u64 scratchBase;
+    };
+    SliceCalcInfo CalcSliceInfo(const AicpuNHRStepInfo& stepInfo, u32 rpt, u32 i, u32 channelIdx) const;
+
+    enum class StepBuildMode { NORMAL, LAST_STEP_READ_TO_OUTPUT };
+    HcclResult BuildStepSlices(
+        const ChannelInfo& channelSend, const ChannelInfo& channelRecv, const AicpuNHRStepInfo& stepInfo,
+        const u32& channelIdx, StepBuildMode mode, std::vector<DataSlice>& txSrcSlices,
+        std::vector<DataSlice>& txDstSlices, std::vector<DataSlice>& rxSrcSlices, std::vector<DataSlice>& rxDstSlices);
+    HcclResult BuildLastStepReadToOutputSlices(
+        const ChannelInfo& channelSend, const ChannelInfo& channelRecv, const AicpuNHRStepInfo& stepInfo,
+        const u32& channelIdx, std::vector<DataSlice>& txSrcSlices, std::vector<DataSlice>& txDstSlices,
+        std::vector<DataSlice>& rxSrcSlices, std::vector<DataSlice>& rxDstSlices)
+    {
+        return BuildStepSlices(
+            channelSend, channelRecv, stepInfo, channelIdx, StepBuildMode::LAST_STEP_READ_TO_OUTPUT, txSrcSlices,
+            txDstSlices, rxSrcSlices, rxDstSlices);
+    }
+    HcclResult BuildNormalStepSlices(
+        const ChannelInfo& channelSend, const ChannelInfo& channelRecv, const AicpuNHRStepInfo& stepInfo,
+        const u32& channelIdx, std::vector<DataSlice>& txSrcSlices, std::vector<DataSlice>& txDstSlices,
+        std::vector<DataSlice>& rxSrcSlices, std::vector<DataSlice>& rxDstSlices)
+    {
+        return BuildStepSlices(
+            channelSend, channelRecv, stepInfo, channelIdx, StepBuildMode::NORMAL, txSrcSlices, txDstSlices,
+            rxSrcSlices, rxDstSlices);
+    }
+
+    HcclResult RunStepNHR(
+        const std::vector<ThreadHandle>& threads, const std::map<u32, std::vector<ChannelInfo>>& channels,
+        const u32& channelIdx, u32 step, u32 nSteps, bool& postLocalCopyLaunched);
+    HcclResult RunLastStepReadToOutput(
+        const std::vector<ThreadHandle>& threads, const ChannelInfo& channelSend, const ChannelInfo& channelRecv,
+        const AicpuNHRStepInfo& stepInfo, const u32& channelIdx, u32 step, bool& postLocalCopyLaunched);
+    HcclResult RunAllGatherNHR(
+        const std::vector<ThreadHandle>& threads, const std::map<u32, std::vector<ChannelInfo>>& channels,
+        const u32& channelIdx, bool& postLocalCopyLaunched);
+
     TemplateDataParams tempAlgParams_;
+
+    // PCIe链路上使用DMA Read，其余场景使用Batch Write
+    bool isDmaRead_{false};
+    bool readLastStepToOutput_{false};
+    bool skipOwnSliceCopy_{false};
+    // 记录已由末步直接读入output的slice，PostLocalCopy需要跳过
+    std::vector<u32> lastStepReadSliceIdxs_;
+
+    // 执行按min循环保证每个peer都有对应channel，资源按max申请保证够用
+    u32 channelsPerRank_{1};
+    u32 maxChannelsPerRank_{1};
+
+    std::vector<u64> dataSplit_;
+    std::vector<u64> dataOffset_;
+    std::vector<u64> dataSplitTail_;
+    std::vector<u64> dataOffsetTail_;
 };
 
 } // namespace mc2_ops_hccl

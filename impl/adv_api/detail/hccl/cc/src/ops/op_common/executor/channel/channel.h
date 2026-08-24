@@ -54,6 +54,13 @@ HcclResult CalcChannelRequestNHRWithPriorityTopo(
 HcclResult GetTopoTypeByLink(HcclComm comm, uint32_t netLayer, CommLink& link, CommTopo& topoType);
 HcclResult ProcessLinksForChannel(
     HcclComm comm, u32 myRank, u32 rank, std::vector<HcclChannelDesc>& channels, CommTopo priorityTopo);
+// 沿用HCCL上游拼写，其中Muti为历史名称，首版保持同名便于逐提交对照
+HcclResult ProcessLinksForChannelMutiJetty(
+    HcclComm comm, CommProtocol& expectedProtocol, std::vector<CommLink>& linkList, u32 myRank, u32 remoteRank,
+    uint32_t netLayer, std::vector<HcclChannelDesc>& channels, bool execptMesh, bool isIsolation);
+HcclResult CalcChannelRequestNhrMultiJetty(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation);
 HcclResult GetProtocolByEngine(const OpParam& param, std::vector<CommProtocol>& protocols);
 } // namespace mc2_ops_hccl
 
