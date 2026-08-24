@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-遵循CAST\_CEIL模式，将浮点数转换为64位有符号整数，返回转换后的值。
+遵循`CAST_CEIL`模式，将浮点数转换为64位有符号整数，返回转换后的值。
 
 ## 函数原型
 
@@ -58,7 +58,7 @@ inline long long int __float2ll_ru(const float x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/device\_functions.h"头文件。
+使用该接口需要包含`simt_api/device_functions.h`头文件。
 
 ```cpp
 #include "simt_api/device_functions.h"

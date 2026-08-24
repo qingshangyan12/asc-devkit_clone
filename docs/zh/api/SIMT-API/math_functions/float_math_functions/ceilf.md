@@ -45,9 +45,9 @@ inline float ceilf(float x)
 
 大于或等于输入数据的最小整数值。特别场景说明如下：
 
--   当x为nan时，返回值为nan。
--   当x为inf时，返回值为inf。
--   当x为-inf时，返回值为-inf。
+-   当`x`为nan时，返回值为nan。
+-   当`x`为inf时，返回值为inf。
+-   当`x`为-inf时，返回值为-inf。
 
 ## 约束说明
 

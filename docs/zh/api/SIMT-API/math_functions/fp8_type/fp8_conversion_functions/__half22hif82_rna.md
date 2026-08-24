@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-将half2类型数据的两个分量遵循CAST\_ROUND模式转换为hifloat8\_t精度，返回转换后的hifloat8x2\_t类型数据。
+将`half2`类型数据的两个分量遵循`CAST_ROUND`模式转换为`hifloat8_t`精度，返回转换后的`hifloat8x2_t`类型数据。
 
 ## 函数原型
 
@@ -43,7 +43,7 @@ inline hifloat8x2_t __half22hif82_rna(const half2 x)
 
 ## 返回值说明
 
-将输入的两个分量遵循CAST\_ROUND模式转换成的hifloat8x2\_t类型数据。本接口受全局饱和模式影响，特殊值如下：
+将输入的两个分量遵循`CAST_ROUND`模式转换成的`hifloat8x2_t`类型数据。本接口受全局饱和模式影响，特殊值如下：
 
 | x分量值 | 非饱和模式返回值 | 饱和模式返回值 |
 |---|---|---|
@@ -61,7 +61,7 @@ SIMT编程场景当前不支持使用该接口。
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_fp8.h"头文件。
+使用该接口需要包含`simt_api/asc_fp8.h`头文件。
 
 ```cpp
 #include "simt_api/asc_fp8.h"

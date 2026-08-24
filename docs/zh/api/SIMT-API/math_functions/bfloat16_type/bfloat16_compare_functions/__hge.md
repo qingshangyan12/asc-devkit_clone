@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-比较两个bfloat16类型数据，仅当第一个数据大于或等于第二个数据时，返回true。
+比较两个bfloat16类型数据，仅当第一个数据大于或等于第二个数据时，返回`true`。
 
 ## 函数原型
 
@@ -55,7 +55,7 @@ bool __hge(bfloat16_t x, bfloat16_t y)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用该接口需要包含"`simt_api/asc_bf16.h`"头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"

@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-遵循CAST\_TRUNC模式，将half类型数据转换为long long类型数据，返回转换后的值。
+遵循`CAST_TRUNC`模式，将half类型数据转换为long long类型数据，返回转换后的值。
 
 ## 函数原型
 
@@ -62,7 +62,7 @@ inline long long int __half2ll_rz(const half x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用该接口需要包含`simt_api/asc_fp16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_fp16.h"
