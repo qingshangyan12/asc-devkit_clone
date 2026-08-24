@@ -120,6 +120,18 @@ TEST(ProcessExecutorTest, AppliesEnvironmentOverridesAndRemovals)
     EXPECT_EQ(unsetenv("PROCESS_EXECUTOR_REMOVE_ME"), 0);
 }
 
+TEST(ProcessExecutorTest, EnvironmentOverrideTakesPrecedenceOverRemoval)
+{
+    ProcessExecutionRequest request =
+        CreateCapturedRequest({"/bin/sh", "-c", "printf '%s' \"$PROCESS_EXECUTOR_PRECEDENCE\""});
+    request.removedEnvironmentVariables.emplace_back("PROCESS_EXECUTOR_PRECEDENCE");
+    request.environmentOverrides.emplace_back("PROCESS_EXECUTOR_PRECEDENCE", "overridden");
+
+    const ProcessExecutionResult result = ProcessExecutor::Execute(request);
+    EXPECT_TRUE(result.HasSuccessfulExit());
+    EXPECT_EQ(result.capturedOutput, "overridden");
+}
+
 TEST(ProcessExecutorTest, ReportsExitSignalAndSpawnFailureSeparately)
 {
     const ProcessExecutionResult nonzeroExit =

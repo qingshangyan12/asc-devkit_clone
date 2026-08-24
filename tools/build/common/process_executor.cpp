@@ -25,6 +25,7 @@
 #include <sys/wait.h>
 #include <thread>
 #include <unistd.h>
+#include <utility>
 
 namespace ascendc {
 namespace {
@@ -83,15 +84,28 @@ private:
     int fileDescriptor_;
 };
 
-void CloseFileDescriptorBestEffort(int fileDescriptor) noexcept
-{
-    if (fileDescriptor >= 0 && close(fileDescriptor) != 0) {
-        const int closeError = errno;
-        ASCENDLOGW(
-            "Failed to close process output descriptor: fd=%d errno=%d message=%s", fileDescriptor, closeError,
-            std::strerror(closeError));
+class OwnedNullTerminatedCStringArray final {
+public:
+    explicit OwnedNullTerminatedCStringArray(std::vector<std::string> strings) : strings_(std::move(strings))
+    {
+        nullTerminatedPointers_.reserve(strings_.size() + 1U);
+        for (std::string& string : strings_) {
+            nullTerminatedPointers_.push_back(const_cast<char*>(string.c_str()));
+        }
+        nullTerminatedPointers_.push_back(nullptr);
     }
-}
+
+    OwnedNullTerminatedCStringArray(const OwnedNullTerminatedCStringArray&) = delete;
+    OwnedNullTerminatedCStringArray& operator=(const OwnedNullTerminatedCStringArray&) = delete;
+    OwnedNullTerminatedCStringArray(OwnedNullTerminatedCStringArray&&) = delete;
+    OwnedNullTerminatedCStringArray& operator=(OwnedNullTerminatedCStringArray&&) = delete;
+
+    char* const* GetNullTerminatedPointers() noexcept { return nullTerminatedPointers_.data(); }
+
+private:
+    std::vector<std::string> strings_;
+    std::vector<char*> nullTerminatedPointers_;
+};
 
 class SpawnConfiguration final {
 public:
@@ -244,36 +258,29 @@ bool CheckProcessExecutionRequestAndLogErrors(const ProcessExecutionRequest& req
     return true;
 }
 
-bool CreateNonblockingCloseOnExecPipe(int outputPipe[2])
+bool OpenCapturedOutputPipe(
+    ScopedFileDescriptor& outputReadFileDescriptor, ScopedFileDescriptor& outputWriteFileDescriptor)
 {
+    int outputPipe[2]{-1, -1};
     if (pipe2(outputPipe, O_CLOEXEC) != 0) {
         const int pipeError = errno;
         ASCENDLOGE("Failed to create process output pipe: errno=%d message=%s", pipeError, std::strerror(pipeError));
         return false;
     }
-    const int readFlags = fcntl(outputPipe[0], F_GETFL, 0);
-    if (readFlags < 0 || fcntl(outputPipe[0], F_SETFL, readFlags | O_NONBLOCK) != 0) {
+    outputReadFileDescriptor.TakeOwnership(outputPipe[0]);
+    outputWriteFileDescriptor.TakeOwnership(outputPipe[1]);
+    const int readFlags = fcntl(outputReadFileDescriptor.Get(), F_GETFL, 0);
+    if (readFlags < 0 || fcntl(outputReadFileDescriptor.Get(), F_SETFL, readFlags | O_NONBLOCK) != 0) {
         const int flagError = errno;
         ASCENDLOGE(
-            "Failed to make process output pipe nonblocking: fd=%d errno=%d message=%s", outputPipe[0], flagError,
-            std::strerror(flagError));
-        CloseFileDescriptorBestEffort(outputPipe[0]);
-        CloseFileDescriptorBestEffort(outputPipe[1]);
+            "Failed to make process output pipe nonblocking: fd=%d errno=%d message=%s", outputReadFileDescriptor.Get(),
+            flagError, std::strerror(flagError));
         return false;
     }
     return true;
 }
 
-bool IsEnvironmentVariableRemoved(
-    const std::string& environmentVariableName, const std::vector<std::string>& removedEnvironmentVariables)
-{
-    return std::find(removedEnvironmentVariables.begin(), removedEnvironmentVariables.end(), environmentVariableName) !=
-           removedEnvironmentVariables.end();
-}
-
-void BuildSpawnEnvironment(
-    const ProcessExecutionRequest& request, std::vector<std::string>& environmentStorage,
-    std::vector<char*>& spawnEnvironment)
+std::vector<std::string> CollectSpawnEnvironmentEntries(const ProcessExecutionRequest& request)
 {
     std::map<std::string, std::string> environmentByName;
     for (char** inheritedEnvironment = ::environ; inheritedEnvironment != nullptr && *inheritedEnvironment != nullptr;
@@ -284,34 +291,21 @@ void BuildSpawnEnvironment(
             continue;
         }
         const std::string environmentVariableName = environmentEntry.substr(0U, separatorPosition);
-        if (!IsEnvironmentVariableRemoved(environmentVariableName, request.removedEnvironmentVariables)) {
-            environmentByName[environmentVariableName] = environmentEntry.substr(separatorPosition + 1U);
-        }
+        environmentByName[environmentVariableName] = environmentEntry.substr(separatorPosition + 1U);
+    }
+    for (const std::string& removedEnvironmentVariable : request.removedEnvironmentVariables) {
+        environmentByName.erase(removedEnvironmentVariable);
     }
     for (const std::pair<std::string, std::string>& environmentOverride : request.environmentOverrides) {
         environmentByName[environmentOverride.first] = environmentOverride.second;
     }
 
-    environmentStorage.reserve(environmentByName.size());
+    std::vector<std::string> environmentEntries;
+    environmentEntries.reserve(environmentByName.size());
     for (const std::pair<const std::string, std::string>& environmentVariable : environmentByName) {
-        environmentStorage.emplace_back(environmentVariable.first + "=" + environmentVariable.second);
+        environmentEntries.emplace_back(environmentVariable.first + "=" + environmentVariable.second);
     }
-    spawnEnvironment.reserve(environmentStorage.size() + 1U);
-    for (std::string& environmentEntry : environmentStorage) {
-        spawnEnvironment.push_back(const_cast<char*>(environmentEntry.c_str()));
-    }
-    spawnEnvironment.push_back(nullptr);
-}
-
-void BuildSpawnArguments(
-    const std::vector<std::string>& arguments, std::vector<std::string>& argumentStorage, std::vector<char*>& spawnArgv)
-{
-    argumentStorage = arguments;
-    spawnArgv.reserve(argumentStorage.size() + 1U);
-    for (std::string& argument : argumentStorage) {
-        spawnArgv.push_back(const_cast<char*>(argument.c_str()));
-    }
-    spawnArgv.push_back(nullptr);
+    return environmentEntries;
 }
 
 void SignalProcessGroup(pid_t processLeaderId, int signalNumber) noexcept
@@ -407,21 +401,14 @@ public:
 
     bool Start(const ProcessExecutionRequest& request)
     {
-        std::vector<std::string> argumentStorage;
-        std::vector<char*> spawnArgv;
-        BuildSpawnArguments(request.arguments, argumentStorage, spawnArgv);
-        std::vector<std::string> environmentStorage;
-        std::vector<char*> spawnEnvironment;
-        BuildSpawnEnvironment(request, environmentStorage, spawnEnvironment);
+        OwnedNullTerminatedCStringArray spawnArguments(request.arguments);
+        OwnedNullTerminatedCStringArray spawnEnvironment(CollectSpawnEnvironmentEntries(request));
 
         ScopedFileDescriptor outputWriteFileDescriptor;
         if (request.outputMode == ProcessOutputMode::CaptureCombined) {
-            int outputPipe[2]{-1, -1};
-            if (!CreateNonblockingCloseOnExecPipe(outputPipe)) {
+            if (!OpenCapturedOutputPipe(outputReadFileDescriptor_, outputWriteFileDescriptor)) {
                 return false;
             }
-            outputReadFileDescriptor_.TakeOwnership(outputPipe[0]);
-            outputWriteFileDescriptor.TakeOwnership(outputPipe[1]);
         }
 
         SpawnConfiguration spawnConfiguration;
@@ -432,12 +419,13 @@ public:
 
         startedAt_ = SteadyClock::now();
         const int spawnResult = posix_spawn(
-            &processLeaderId_, argumentStorage.front().c_str(), spawnConfiguration.GetFileActions(),
-            spawnConfiguration.GetSpawnAttributes(), spawnArgv.data(), spawnEnvironment.data());
+            &processLeaderId_, request.arguments.front().c_str(), spawnConfiguration.GetFileActions(),
+            spawnConfiguration.GetSpawnAttributes(), spawnArguments.GetNullTerminatedPointers(),
+            spawnEnvironment.GetNullTerminatedPointers());
         outputWriteFileDescriptor.Close();
         if (spawnResult != 0) {
             ASCENDLOGE(
-                "Failed to spawn process: executable=%s error=%d message=%s", argumentStorage.front().c_str(),
+                "Failed to spawn process: executable=%s error=%d message=%s", request.arguments.front().c_str(),
                 spawnResult, std::strerror(spawnResult));
             return false;
         }
@@ -445,7 +433,7 @@ public:
         return true;
     }
 
-    bool WaitForExit(const ProcessExecutionRequest& request, ProcessExecutionResult& processResult)
+    void WaitForExit(const ProcessExecutionRequest& request, ProcessExecutionResult& processResult)
     {
         const SteadyClock::time_point executionDeadline = startedAt_ + request.executionTimeout;
         int processStatus = 0;
@@ -518,26 +506,25 @@ public:
             std::chrono::duration_cast<std::chrono::milliseconds>(SteadyClock::now() - startedAt_);
         if (infrastructureFailure) {
             processResult.termination = ProcessTermination::InfrastructureFailure;
-            return false;
+            return;
         }
         if (processResult.termination == ProcessTermination::TimedOut) {
-            return true;
+            return;
         }
         if (WIFEXITED(processStatus)) {
             processResult.termination = ProcessTermination::Exited;
             processResult.terminationCode = static_cast<int32_t>(WEXITSTATUS(processStatus));
-            return true;
+            return;
         }
         if (WIFSIGNALED(processStatus)) {
             processResult.termination = ProcessTermination::Signaled;
             processResult.terminationCode = static_cast<int32_t>(WTERMSIG(processStatus));
-            return true;
+            return;
         }
         processResult.termination = ProcessTermination::InfrastructureFailure;
         ASCENDLOGE(
             "Process returned an unsupported wait status: pid=%d status=%d", static_cast<int>(processLeaderId_),
             processStatus);
-        return false;
     }
 
 private:
@@ -632,7 +619,7 @@ ProcessExecutionResult ProcessExecutor::Execute(const ProcessExecutionRequest& r
         if (!spawnedProcess.Start(request)) {
             return processResult;
         }
-        (void)spawnedProcess.WaitForExit(request, processResult);
+        spawnedProcess.WaitForExit(request, processResult);
     } catch (const std::bad_alloc&) {
         throw;
     } catch (const std::exception& exception) {
