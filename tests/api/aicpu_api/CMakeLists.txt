@@ -39,7 +39,41 @@ target_link_libraries(ascendc_ut_aicpu_api PRIVATE
     -Wl,--as-needed
 )
 
+add_executable(ascendc_ut_aicpu_api_fifo
+    ${ASCENDC_DIR}/tests/main.cpp
+    ${ASCENDC_DIR}/impl/aicpu_api/aicpu_dump.cpp
+    test_aicpu_dump_fifo.cpp
+)
+
+target_compile_definitions(ascendc_ut_aicpu_api_fifo PRIVATE
+    UT_TEST
+    ASCENDC_DEBUG=1
+    ASCENDC_CPU_DEBUG=1
+)
+
+target_include_directories(ascendc_ut_aicpu_api_fifo PRIVATE
+    ${ASCENDC_DIR}/include
+)
+
+target_compile_options(ascendc_ut_aicpu_api_fifo PRIVATE
+    -Werror
+)
+
+target_link_libraries(ascendc_ut_aicpu_api_fifo PRIVATE
+    $<BUILD_INTERFACE:intf_llt_pub_basic>
+    -Wl,--no-as-needed
+    error_manager
+    mmpa
+    c_sec
+    -Wl,--as-needed
+)
+
+# Route malloc() through __wrap_malloc() (defined in test_aicpu_dump_fifo.cpp)
+# so the temp-buffer allocation-failure path can be injected without hooking
+# the symbol at runtime (mockcpp malloc mocking is unsafe due to re-entry).
+target_link_options(ascendc_ut_aicpu_api_fifo PRIVATE "-Wl,--wrap=malloc")
+
 run_llt_test(
-    TARGET ascendc_ut_aicpu_api
+    TARGET ascendc_ut_aicpu_api_fifo
     TASK_NUM 1
 )
