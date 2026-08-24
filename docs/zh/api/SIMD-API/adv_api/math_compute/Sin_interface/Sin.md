@@ -117,15 +117,15 @@ enum class SinAlgo { POLYNOMIAL_APPROXIMATION = 0, RADIAN_REDUCTION };
 -   对于Ascend 950PR/Ascend 950DT，模板参数config中使用多项式拟合算法POLYNOMIAL\_APPROXIMATION时，必须保证输入源数据的值域在\[-65504.0, 65504.0\]范围内。
 <!-- end id11 -->
 -   对于以下产品，输入源数据必须保持值域在\[-65504.0, 65504.0\]范围内。
-        <!-- npu="A3" id12 -->
+    <!-- npu="A3" id12 -->
     -   Atlas A3 训练系列产品/Atlas A3 推理系列产品
-        <!-- end id12 -->
-        <!-- npu="910b" id13 -->
+    <!-- end id12 -->
+    <!-- npu="910b" id13 -->
     -   Atlas A2 训练系列产品/Atlas A2 推理系列产品
-        <!-- end id13 -->
-        <!-- npu="310p" id14 -->
+    <!-- end id13 -->
+    <!-- npu="310p" id14 -->
     -   Atlas 推理系列产品AI Core
-        <!-- end id14 -->
+    <!-- end id14 -->
 
 -   **不支持源操作数与目的操作数地址重叠。**
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
