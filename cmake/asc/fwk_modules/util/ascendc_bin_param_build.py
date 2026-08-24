@@ -317,7 +317,6 @@ class BinParamBuilder(opdesc_parser.OpDesc):
             ori_json,
             output_dir,
             expected_op_type=self.op_type,
-            require_simplified_key=True,
         )
         index_value = -1
         if generated_files:

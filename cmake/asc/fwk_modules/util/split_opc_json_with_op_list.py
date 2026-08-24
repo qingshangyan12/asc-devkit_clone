@@ -30,22 +30,28 @@ def wr_json(json_obj, json_file):
         json.dump(json_obj, f, indent=2)
 
 
-def _check_binary_json(binary_json, expected_op_type):
+def _get_binary_json_op_list(binary_json):
     if not isinstance(binary_json, dict):
         raise ValueError("root: expected object")
+    op_list = binary_json.get("op_list")
+    if not isinstance(op_list, list) or not op_list:
+        raise ValueError("op_list: expected non-empty array")
+    for index, op in enumerate(op_list):
+        if not isinstance(op, dict):
+            raise ValueError(f"op_list[{index}]: expected object")
+    return op_list
+
+
+def _check_binary_json(binary_json, expected_op_type):
+    op_list = _get_binary_json_op_list(binary_json)
     if binary_json.get("op_type") != expected_op_type:
         raise ValueError(
             f"op_type: expected '{expected_op_type}', got '{binary_json.get('op_type')}'"
         )
-    op_list = binary_json.get("op_list")
-    if not isinstance(op_list, list) or not op_list:
-        raise ValueError("op_list: expected non-empty array")
 
     bin_filenames = set()
     for index, op in enumerate(op_list):
         op_path = f"op_list[{index}]"
-        if not isinstance(op, dict):
-            raise ValueError(f"{op_path}: expected object")
         bin_filename = op.get("bin_filename")
         if (
             not isinstance(bin_filename, str)
@@ -64,9 +70,7 @@ def _check_binary_json(binary_json, expected_op_type):
             raise ValueError(f"{op_path}.simplified_key: expected non-empty string")
 
 
-def split_json_files(
-    ori_json, output_dir, expected_op_type=None, require_simplified_key=False
-):
+def split_json_files(ori_json, output_dir, expected_op_type=None):
     """
     gen output json by binary_file and opc json file
     """
@@ -80,13 +84,17 @@ def split_json_files(
         with open(ori_json, "r") as file_wr:
             binary_json = json.load(file_wr)
     except (OSError, json.JSONDecodeError) as error:
-        if require_simplified_key:
+        if expected_op_type is not None:
             raise ValueError(f"Invalid BINARY_JSON '{ori_json}': {error}") from error
         raise
 
-    if require_simplified_key:
+    is_custom_binary_json = False
+    if expected_op_type is not None:
         try:
-            _check_binary_json(binary_json, expected_op_type)
+            op_list = _get_binary_json_op_list(binary_json)
+            is_custom_binary_json = any("simplified_key" in op for op in op_list)
+            if is_custom_binary_json:
+                _check_binary_json(binary_json, expected_op_type)
         except ValueError as error:
             raise ValueError(f"Invalid BINARY_JSON '{ori_json}': {error}") from error
 
@@ -99,7 +107,7 @@ def split_json_files(
     for idx, op in enumerate(op_list):
         new_binary_json = {"op_type": op_type}
         new_binary_json["op_list"] = [op]
-        if require_simplified_key:
+        if is_custom_binary_json:
             new_binary_json[CUSTOM_BINARY_JSON_META] = [ori_json, idx]
 
         bin_filename = op.get("bin_filename")
