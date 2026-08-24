@@ -28,9 +28,9 @@
 
 头文件路径为：`"c_api/asc_simd.h"`。
 
-本接口通过CCE指令`set_mte2_nz_para`设置`MTE2_NZ_PARA`寄存器，用于配置从Global Memory搬运至L1 Buffer时，ND2NZ或DN2NZ格式转换所需的目的地址步长和矩阵数量。配置写入后，由后续的[asc_copy_gm2l1_nd2nz](../cube_data_move/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](../cube_data_move/asc_copy_gm2l1_dn2nz.md)接口使用。
+本接口用于配置从Global Memory搬运至L1 Buffer过程中，ND2NZ或DN2NZ格式转换所需的目的地址布局，包括矩阵数量、目的NZ矩阵中相邻行的步长、相邻Z矩阵的步长以及相邻NZ矩阵的步长。配置完成后，由后续调用的[asc_copy_gm2l1_nd2nz](../cube_data_move/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](../cube_data_move/asc_copy_gm2l1_dn2nz.md)接口使用。
 
-对应的基础API为[DataCopy（GMToL1随路转换-ND2NZ搬运）](../../basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ.md)和[DataCopy（GMToL1随路转换-DN2NZ搬运）](../../basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_DN2NZ.md)。本接口仅配置目的地址相关参数，源地址步长、矩阵行列数等参数由后续搬运接口配置。
+本接口只完成参数配置，不执行数据搬运。源地址步长、矩阵行数和矩阵列数等搬运参数由后续搬运接口配置。
 
 本接口为矩阵搬入相关配置接口，仅在AIC上生效。
 
@@ -50,19 +50,21 @@ __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config)
 
 **表 2**  config参数字段说明<a id="table2"></a>
 
-| 比特位范围 | 对应基础API参数 | 描述 |
+| 比特位范围 | 字段名称 | 描述 |
 | ---------- | ---------- | ---------- |
-| 15:0 | `ndNum`/`dnNum` | 源操作数中ND矩阵或DN矩阵的数量，取值范围为[0, 4095]。取值为0时，后续搬运接口将被视为NOP（空操作）。 |
-| 31:16 | `dstNzNStride` | 目的NZ矩阵中相邻行起始地址间的偏移，取值范围为[1, 16384]，单位为32B。 |
-| 47:32 | `dstNzC0Stride` | 目的NZ矩阵中相邻Z矩阵起始地址间的偏移，取值范围为[1, 16384]，单位为32B。 |
-| 63:48 | `dstNzMatrixStride`的换算值 | 目的操作数中相邻NZ矩阵起始地址间的偏移，取值范围为[0, 65535]，单位为32B。矩阵数量为1时，本字段无意义，设置为0即可。矩阵数量大于1且本字段为0时，后写入的NZ矩阵会覆盖第一个NZ矩阵。 |
+| 15:0 | `matrix_num` | 源操作数中ND矩阵或DN矩阵的数量，取值范围为[0, 4095]。取值为0时，后续搬运接口将被视为NOP（空操作）。 |
+| 31:16 | `dst_nz_n_stride` | 目的NZ矩阵中相邻行起始地址间的偏移。未开启SmallC0模式时，取值范围为[1, 16384]，单位为32B。 |
+| 47:32 | `dst_nz_c0_stride` | 目的NZ矩阵中相邻Z矩阵起始地址间的偏移。未开启SmallC0模式时，取值范围为[1, 16384]，单位为32B。 |
+| 63:48 | `dst_nz_matrix_stride` | 目的操作数中相邻NZ矩阵起始地址间的偏移，取值范围为[0, 65535]，单位为32B。矩阵数量为1时，本字段无意义，设置为0即可。矩阵数量大于1且本字段为0时，后写入的NZ矩阵会覆盖第一个NZ矩阵。 |
 
-基础API的`dstNzMatrixStride`参数以元素个数为单位，其实现会按照`dstNzMatrixStride * sizeof(T) / 32`换算为`config[63:48]`。调用本接口时，需要直接配置换算后的32B块数，本接口不会进行单位换算。`config`可按如下方式拼装：
+三个步长字段均以32B为单位，字段值表示相应地址偏移包含的32B块数。例如，字段值为2时，表示地址偏移为64B。待配置的字节偏移必须为32B的整数倍，字段值可按`字节偏移/32`计算。
+
+`config`可按如下方式拼装：
 
 ```cpp
-uint64_t config = (static_cast<uint64_t>(loop4_dst_stride) << 48) |
-                  (static_cast<uint64_t>(loop3_dst_stride) << 32) |
-                  (static_cast<uint64_t>(loop2_dst_stride) << 16) |
+uint64_t config = (static_cast<uint64_t>(dst_nz_matrix_stride) << 48) |
+                  (static_cast<uint64_t>(dst_nz_c0_stride) << 32) |
+                  (static_cast<uint64_t>(dst_nz_n_stride) << 16) |
                   static_cast<uint64_t>(matrix_num);
 ```
 
@@ -79,7 +81,7 @@ PIPE_S
 - 本接口仅在AIC上生效，在AIV上调用将直接返回。
 - 本接口需在对应的ND2NZ或DN2NZ搬运接口执行前调用，调用后配置会持续生效，直至再次调用本接口覆盖。
 - `config`由4个16位字段组成，接口会将`config`整体写入，不会检查字段范围。拼装前需确保各字段满足[表 2](#table2)中的取值要求，不得将超出16位的值直接左移，否则高位会写入相邻字段。
-- 后续搬运接口开启SmallC0模式时，`config[31:16]`和`config[47:32]`无需配置。
+- 后续搬运接口开启SmallC0模式时，`config[31:16]`和`config[47:32]`不生效，设置为0即可。
 - 搬运至L1 Buffer的数据不能重叠。如果步长配置导致重叠写入，硬件不会产生告警或错误，并且不保证重叠数据的写入顺序。
 
 <!-- npu="950" id8 -->
@@ -119,13 +121,13 @@ __global__ __cube__ void asc_set_gm2l1_nz_para_kernel(
     __cb__ half b_l0[ELEMENTS];
     __cc__ float c_l0[ELEMENTS];
 
-    // 三个stride字段的单位均为32B。
+    // 三个目的地址步长字段的单位均为32B。
     constexpr uint64_t matrix_num = 1;
-    constexpr uint64_t loop2_dst_stride = 1;
-    constexpr uint64_t loop3_dst_stride = 16;
-    constexpr uint64_t loop4_dst_stride = 0;
-    constexpr uint64_t nz_config = (loop4_dst_stride << 48) | (loop3_dst_stride << 32) |
-                                   (loop2_dst_stride << 16) | matrix_num;
+    constexpr uint64_t dst_nz_n_stride = 1;
+    constexpr uint64_t dst_nz_c0_stride = 16;
+    constexpr uint64_t dst_nz_matrix_stride = 0;
+    constexpr uint64_t nz_config = (dst_nz_matrix_stride << 48) | (dst_nz_c0_stride << 32) |
+                                   (dst_nz_n_stride << 16) | matrix_num;
     asc_set_gm2l1_nz_para(nz_config);
     asc_copy_gm2l1_nd2nz(a_l1, reinterpret_cast<__gm__ half*>(a), DIM * sizeof(half), 0, DIM, DIM, 0, false);
     asc_set_gm2l1_nz_para(nz_config);
