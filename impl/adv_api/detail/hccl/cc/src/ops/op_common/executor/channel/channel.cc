@@ -606,8 +606,6 @@ HcclResult CalcChannelRequestNhrMultiJetty(
     CHK_RET(CalcNHRChannelConnect(localRank, localRankSize, INVALID_VALUE_RANKID, connectRanks));
 
     // MultiJetty仅用于UB直连拓扑：AIV走UB_MEM，AICPU_TS/CCU走UBC_CTP。
-    // 与HCCL保持一致，直接按引擎写死预期协议，不经GetProtocolByEngine的协议列表，
-    // 避免依赖该函数内部的push顺序。
     CommProtocol expectedProtocol = param.engine == CommEngine::COMM_ENGINE_AIV ?
                                         CommProtocol::COMM_PROTOCOL_UB_MEM :
                                         CommProtocol::COMM_PROTOCOL_UBC_CTP;

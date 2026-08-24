@@ -22,9 +22,7 @@
 namespace {
 using namespace mc2_ops_hccl;
 
-// ---------------------------------------------------------------------------
-// 构造辅助
-// ---------------------------------------------------------------------------
+// Helpers
 
 std::vector<HcclChannelDesc> MakeChannelDescs(const std::vector<std::pair<u32, u32>>& rankAndCount)
 {
@@ -72,7 +70,7 @@ InsTempAllGatherNHR MakeNhrTemplate(u32 rankSize = 8U)
     return InsTempAllGatherNHR(param, 0U, {ranks});
 }
 
-// NHR 步数与每步 peer / slice 的参考实现，用于与模板内部推进规则对照。
+
 u32 RefStepNum(u32 rankSize)
 {
     u32 nSteps = 0;
@@ -108,7 +106,7 @@ RefStep RefGetStep(u32 myAlgRank, u32 rankSize, u32 step, u32 nSteps)
     return info;
 }
 
-// 末步直读 output 时，各 rx slice 落在 output 上的字节偏移。
+
 std::vector<u64> RefLastStepOutputOffsets(
     u32 myAlgRank, u32 rankSize, u64 outBuffBaseOff, u64 outputSliceStride, u64 partialOffset)
 {
@@ -121,7 +119,7 @@ std::vector<u64> RefLastStepOutputOffsets(
     return offsets;
 }
 
-// PostLocalCopy 实际会搬运的 algRank 集合。
+
 std::vector<u32> RefPostCopyRanks(
     u32 myAlgRank, u32 rankSize, bool readLastStepToOutput, bool skipOwnSliceCopy,
     const std::vector<u32>& lastStepReadSliceIdxs)
@@ -143,9 +141,7 @@ std::vector<u32> RefPostCopyRanks(
 
 const std::vector<u32> g_rankSizes = {2U, 3U, 4U, 5U, 8U, 16U};
 
-// ---------------------------------------------------------------------------
-// NHR 步骤推进
-// ---------------------------------------------------------------------------
+// NHR step scheduling
 
 class AllGatherNhrStepTest : public ::testing::Test {};
 
@@ -161,7 +157,6 @@ TEST_F(AllGatherNhrStepTest, StepNumMatchesCeilLog2)
 
 TEST_F(AllGatherNhrStepTest, PeerIsSymmetricAcrossRanks)
 {
-    // 本 rank 的 sendTo 必须把本 rank 视为 recvFrom，否则通信配不上对。
     for (u32 rankSize : g_rankSizes) {
         const u32 nSteps = RefStepNum(rankSize);
         for (u32 step = 0; step < nSteps; step++) {
@@ -177,12 +172,10 @@ TEST_F(AllGatherNhrStepTest, PeerIsSymmetricAcrossRanks)
 
 TEST_F(AllGatherNhrStepTest, EveryRankCollectsAllSlicesExactlyOnce)
 {
-    // 含 3/5 等非 2 次幂 rank 数：所有 slice 恰好收齐一次，不遗漏也不重复。
     for (u32 rankSize : g_rankSizes) {
         const u32 nSteps = RefStepNum(rankSize);
         for (u32 rank = 0; rank < rankSize; rank++) {
             std::set<u32> collected;
-            collected.insert(rank); // 本 rank 自己那份来自 LocalDataCopy
             u32 receivedTotal = 0;
             for (u32 step = 0; step < nSteps; step++) {
                 const RefStep info = RefGetStep(rank, rankSize, step, nSteps);
@@ -196,7 +189,6 @@ TEST_F(AllGatherNhrStepTest, EveryRankCollectsAllSlicesExactlyOnce)
                 }
             }
             EXPECT_EQ(collected.size(), rankSize) << "rankSize=" << rankSize << " rank=" << rank;
-            // 非 2 次幂时允许重复收取，2 次幂时收取数应恰好等于 rankSize-1
             if ((rankSize & (rankSize - 1U)) == 0U) {
                 EXPECT_EQ(receivedTotal, rankSize - 1U) << "rankSize=" << rankSize << " rank=" << rank;
             }
@@ -206,7 +198,6 @@ TEST_F(AllGatherNhrStepTest, EveryRankCollectsAllSlicesExactlyOnce)
 
 TEST_F(AllGatherNhrStepTest, EightRankZeroMatchesDocumentedSchedule)
 {
-    // 迁移方案 4.2 给出的 8 卡 rank0 期望调度。
     const u32 rankSize = 8U;
     const u32 nSteps = RefStepNum(rankSize);
     ASSERT_EQ(nSteps, 3U);
@@ -230,9 +221,7 @@ TEST_F(AllGatherNhrStepTest, EightRankZeroMatchesDocumentedSchedule)
     EXPECT_EQ(step2.rxSliceIdxs, std::vector<u32>({7U, 5U, 3U, 1U}));
 }
 
-// ---------------------------------------------------------------------------
-// channel 数量统计
-// ---------------------------------------------------------------------------
+// Channel count
 
 class AllGatherNhrChannelCountTest : public ::testing::Test {};
 
@@ -245,7 +234,6 @@ TEST_F(AllGatherNhrChannelCountTest, UniformChannelsGiveSameMinAndMax)
 
 TEST_F(AllGatherNhrChannelCountTest, RaggedChannelsGiveMinBelowMax)
 {
-    // 执行按 min 循环才不会越界访问 channel 少的 peer。
     const auto channels = MakeChannelDescs({{1U, 4U}, {2U, 2U}, {3U, 4U}});
     EXPECT_EQ(CalcChannelsPerRankMin(channels), 2U);
     EXPECT_EQ(CalcChannelsPerRank(channels), 4U);
@@ -269,9 +257,7 @@ TEST_F(AllGatherNhrChannelCountTest, ChannelMapMinAndMax)
     EXPECT_EQ(CalcChannelsPerRank(channels), 4U);
 }
 
-// ---------------------------------------------------------------------------
-// 资源数量
-// ---------------------------------------------------------------------------
+// Resource count
 
 class AllGatherNhrResourceTest : public ::testing::Test {};
 
@@ -342,10 +328,8 @@ TEST_F(AllGatherNhrResourceTest, ProductionCalcResRejectsNullTopoInfo)
 
 TEST_F(AllGatherNhrResourceTest, PostCopyThreadIndexStaysInRange)
 {
-    // 运行时 exact InsAllGatherNHR 保持 channelsPerRank_=1，
-    // PostCopy thread 下标为 channelsPerRank_ + channelIdx。
     const u32 channelsPerRank = 1U;
-    const u32 runtimeThreadNum = 2U; // maxChannelsPerRank_ 运行时为 1
+    const u32 runtimeThreadNum = 2U;
     for (u32 channelIdx = 0; channelIdx < channelsPerRank; channelIdx++) {
         const u32 postCopyThreadIdx = channelsPerRank + channelIdx;
         EXPECT_LT(postCopyThreadIdx, runtimeThreadNum);
@@ -354,16 +338,12 @@ TEST_F(AllGatherNhrResourceTest, PostCopyThreadIndexStaysInRange)
 
 TEST_F(AllGatherNhrResourceTest, HostMayAllocateMoreThreadsThanRuntimeUses)
 {
-    // Host CalcRes 按 MultiJetty 结果申请，运行时只用 channel 0，
-    // 申请多于使用是允许的，反之则越界。
-    const u32 hostThreadNum = 4U * 2U;    // Host 期 maxChannelsPerRank_=4
-    const u32 runtimeThreadNum = 1U * 2U; // 运行时 maxChannelsPerRank_=1
+    const u32 hostThreadNum = 4U * 2U;   
+    const u32 runtimeThreadNum = 1U * 2U;
     EXPECT_LE(runtimeThreadNum, hostThreadNum);
 }
 
-// ---------------------------------------------------------------------------
-// 拓扑判断与 port isolation 策略
-// ---------------------------------------------------------------------------
+// Topology and port isolation
 
 class AllGatherNhrTopoTest : public ::testing::Test {};
 
@@ -409,7 +389,6 @@ TEST_F(AllGatherNhrTopoTest, TopoDetailsShorterThanLayerSizesDoesNotOverflow)
 
 TEST_F(AllGatherNhrTopoTest, IsolationPolicyFollowsTopoAndDataSize)
 {
-    // CalcRes 中的判定：完整 1D Mesh 或 <=512KiB 时关闭 isolation。
     const auto fullMesh = MakeTopoInfo(8U, CommTopo::COMM_TOPO_1DMESH, 8U);
     const auto clos = MakeTopoInfo(8U, CommTopo::COMM_TOPO_CLOS, 8U);
 
@@ -424,9 +403,7 @@ TEST_F(AllGatherNhrTopoTest, IsolationPolicyFollowsTopoAndDataSize)
     EXPECT_TRUE(isIsolation(clos, 32UL * 1024UL * 1024UL));
 }
 
-// ---------------------------------------------------------------------------
-// port group 数据切分
-// ---------------------------------------------------------------------------
+// Port group data split
 
 class AllGatherNhrDataSplitTest : public ::testing::Test {};
 
@@ -479,7 +456,6 @@ TEST_F(AllGatherNhrDataSplitTest, IndivisibleTotalIsAbsorbedByLastChunk)
 
 TEST_F(AllGatherNhrDataSplitTest, HonorsChannelsPerRankSmallerThanChannelCount)
 {
-    // 运行时按 min 循环，只使用前 channelsPerRank 个 channel，切分总量仍需守恒。
     const auto channels = MakeChannelMap({{1U, 4U}});
     std::vector<u64> elemCount;
     std::vector<u64> sizeOut;
@@ -496,7 +472,6 @@ TEST_F(AllGatherNhrDataSplitTest, HonorsChannelsPerRankSmallerThanChannelCount)
 
 TEST_F(AllGatherNhrDataSplitTest, TailSliceSplitsIndependently)
 {
-    // 普通块与尾块分别切分，两者 offset 均从 0 起算。
     const auto channels = MakeChannelMap({{1U, 2U}});
     std::vector<u64> elemCount;
     std::vector<u64> normalSize;
@@ -523,21 +498,17 @@ TEST_F(AllGatherNhrDataSplitTest, TailSliceSplitsIndependently)
     EXPECT_NE(normalTotal, tailTotal);
 }
 
-// ---------------------------------------------------------------------------
-// 末步直读 output 与 PostLocalCopy 跳过
-// ---------------------------------------------------------------------------
+// Last step read and PostLocalCopy skip
 
 class AllGatherNhrLastStepTest : public ::testing::Test {};
 
 TEST_F(AllGatherNhrLastStepTest, LastStepQualifiesOnlyWhenMultipleSlices)
 {
-    // 2 卡末步只有 1 个 slice，没有可重叠的余量，必须回退普通路径。
     const u32 nSteps2 = RefStepNum(2U);
     const RefStep last2 = RefGetStep(0U, 2U, nSteps2 - 1U, nSteps2);
     EXPECT_EQ(last2.nSlices, 1U);
     EXPECT_FALSE(last2.nSlices > 1U);
 
-    // 8 卡末步 4 个 slice，可启用。
     const u32 nSteps8 = RefStepNum(8U);
     const RefStep last8 = RefGetStep(0U, 8U, nSteps8 - 1U, nSteps8);
     EXPECT_EQ(last8.nSlices, 4U);
@@ -561,7 +532,6 @@ TEST_F(AllGatherNhrLastStepTest, ReadSliceIdxsAreUniqueAndInRange)
 
 TEST_F(AllGatherNhrLastStepTest, ReadAndPostCopySetsPartitionAllRanks)
 {
-    // 直读集合与回拷集合必须互斥，且并集恰好覆盖全部 rank 一次。
     for (u32 rankSize : g_rankSizes) {
         const u32 nSteps = RefStepNum(rankSize);
         for (u32 rank = 0; rank < rankSize; rank++) {
@@ -581,8 +551,6 @@ TEST_F(AllGatherNhrLastStepTest, ReadAndPostCopySetsPartitionAllRanks)
 
 TEST_F(AllGatherNhrLastStepTest, SolePathStillCopiesOwnSlice)
 {
-    // sole executor 设置 inBuffType=INPUT，CanSkipOwnSliceCopy 为 false，
-    // 因此本 rank 自己那份仍需从 scratch 回拷。
     const u32 rankSize = 8U;
     const u32 nSteps = RefStepNum(rankSize);
     const RefStep last = RefGetStep(0U, rankSize, nSteps - 1U, nSteps);
@@ -604,7 +572,6 @@ TEST_F(AllGatherNhrLastStepTest, SkipOwnSliceDropsOneMoreCopy)
 
 TEST_F(AllGatherNhrLastStepTest, FallbackCopiesEveryRank)
 {
-    // 末步优化关闭时（例如 PCIe Read 分支），全部 slice 都走 scratch 回拷。
     const u32 rankSize = 8U;
     const u32 nSteps = RefStepNum(rankSize);
     const RefStep last = RefGetStep(0U, rankSize, nSteps - 1U, nSteps);
@@ -612,15 +579,12 @@ TEST_F(AllGatherNhrLastStepTest, FallbackCopiesEveryRank)
     EXPECT_EQ(copied.size(), rankSize);
 }
 
-// ---------------------------------------------------------------------------
-// strideCount 与末步直读的组合（HCCL 侧无此组合，必须单独覆盖）
-// ---------------------------------------------------------------------------
+// strideCount with last-step read
 
 class AllGatherNhrStrideTest : public ::testing::Test {};
 
 TEST_F(AllGatherNhrStrideTest, StrideZeroKeepsContiguousLayout)
 {
-    // strideCount=0 时 executor 取 outputSliceStride=dataSize，输出为连续拼接。
     const u32 rankSize = 8U;
     const u64 dataSize = 4096U;
     const auto offsets = RefLastStepOutputOffsets(0U, rankSize, 0U, dataSize, 0U);
@@ -646,7 +610,6 @@ TEST_F(AllGatherNhrStrideTest, StrideScalesOutputOffsets)
 
 TEST_F(AllGatherNhrStrideTest, StridedSlicesDoNotOverlap)
 {
-    // strideCount 大于 count 时各 rank 数据之间留空隙，落点不得重叠。
     const u32 rankSize = 8U;
     const u64 dataSize = 4096U;
     for (u64 strideMultiplier : {1U, 2U, 3U}) {
@@ -674,7 +637,6 @@ TEST_F(AllGatherNhrStrideTest, BaseOffsetShiftsAllSlices)
 
 TEST_F(AllGatherNhrStrideTest, PartialOffsetShiftsWithinSlice)
 {
-    // 多 channel 切分时，每个 channel 只搬自己那一段，偏移需叠加 partialOffset。
     const u32 rankSize = 8U;
     const u64 dataSize = 4096U;
     const u64 partialOffset = 512U;
@@ -688,7 +650,6 @@ TEST_F(AllGatherNhrStrideTest, PartialOffsetShiftsWithinSlice)
 
 TEST_F(AllGatherNhrStrideTest, StrideCoversEveryRankSlotAcrossAllRanks)
 {
-    // 每个 rank 在 strideCount>0 布局下，直读+回拷仍然覆盖所有 slot 一次。
     const u32 rankSize = 8U;
     const u64 dataSize = 4096U;
     const u64 stride = dataSize * 2U;
@@ -707,15 +668,12 @@ TEST_F(AllGatherNhrStrideTest, StrideCoversEveryRankSlotAcrossAllRanks)
     }
 }
 
-// ---------------------------------------------------------------------------
-// jetty 上限语义
-// ---------------------------------------------------------------------------
+// Jetty limit
 
 class AllGatherNhrJettyLimitTest : public ::testing::Test {};
 
 TEST_F(AllGatherNhrJettyLimitTest, OverLimitIsWarnOnlyNotFailure)
 {
-    // 与 HCCL 一致：channelsPerRank_ 超过 MAX_JETTY_NUM 只记录错误日志，不阻断。
     const auto channels = MakeChannelDescs({{1U, 8U}, {2U, 8U}});
     const u32 perRank = CalcChannelsPerRankMin(channels);
     EXPECT_EQ(perRank, 8U);
