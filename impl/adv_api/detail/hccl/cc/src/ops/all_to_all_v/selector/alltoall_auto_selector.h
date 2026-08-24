@@ -11,11 +11,16 @@
 #define HCCLV2_ALLTOALL_AUTO_SELECTOR_H
 
 #include "auto_selector_base.h"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 
 class AlltoAllAutoSelector : public AutoSelectorBase {
 private:
+    SelectorStatus SelectCcuScheduleAlgo(
+        const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+        const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,
+        std::string& selectAlgName) const override;
     SelectorStatus SelectAicpuAlgo(
         const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
         const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap,

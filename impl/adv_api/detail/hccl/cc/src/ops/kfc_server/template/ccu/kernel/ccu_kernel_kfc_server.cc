@@ -10,7 +10,9 @@
 
 #include "ccu_kernel_alg_base.h"
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
+#include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
 #include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
+#include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty_mem2mem.h"
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
 #include "ccu_func_dl.hpp"
@@ -25,6 +27,9 @@ using namespace std;
 static_assert(
     KFC_CONCURRENT_AG_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
     "Concurrent AllGather parameters exceed the KFC server load width");
+static_assert(
+    KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
+    "Concurrent AllToAll parameters exceed the KFC server load width");
 static_assert(KFC_MAX_MISSION_NUM == 2U, "KFC server CKE partitioning expects two missions");
 static_assert(KFC_SIGNAL_REGIONS_PER_MISSION == 2U, "Each KFC mission requires commit and done regions");
 
@@ -160,6 +165,28 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
             ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
+    }
+    CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLTOALL))
+    {
+        if (ctx.arg->role == KfcServerRole::ALL_TO_ALL_CLOS) {
+            CcuKfcAllToAllMesh1DMultiJettyMem2MemKernel(
+                param[KFC_CONCURRENT_A2A_CLOS_INPUT], param[KFC_CONCURRENT_A2A_CLOS_OUTPUT], ctx.token,
+                param[KFC_CONCURRENT_A2A_CLOS_SLICE_SIZE], param[KFC_CONCURRENT_A2A_CLOS_SRC_STRIDE],
+                param[KFC_CONCURRENT_A2A_CLOS_SRC_OFFSET], param[KFC_CONCURRENT_A2A_CLOS_DST_OFFSET],
+                param[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_0], param[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_1],
+                param[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_2], param[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_3],
+                ctx.arg->channels, ctx.arg->channelCount,
+                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+        } else {
+            CcuKfcAllToAllMesh1DMultiJettyMem2MemKernel(
+                param[KFC_CONCURRENT_A2A_MESH_INPUT], param[KFC_CONCURRENT_A2A_MESH_OUTPUT], ctx.token,
+                param[KFC_CONCURRENT_A2A_MESH_SLICE_SIZE], param[KFC_CONCURRENT_A2A_MESH_SRC_STRIDE],
+                param[KFC_CONCURRENT_A2A_MESH_SRC_OFFSET], param[KFC_CONCURRENT_A2A_MESH_DST_OFFSET],
+                param[KFC_CONCURRENT_A2A_MESH_GO_SIZE_0], param[KFC_CONCURRENT_A2A_MESH_GO_SIZE_1],
+                param[KFC_CONCURRENT_A2A_MESH_GO_SIZE_2], param[KFC_CONCURRENT_A2A_MESH_GO_SIZE_3],
+                ctx.arg->channels, ctx.arg->channelCount,
+                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+        }
     }
 }
 

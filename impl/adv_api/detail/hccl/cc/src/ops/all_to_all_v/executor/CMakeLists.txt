@@ -9,4 +9,5 @@
 # ----------------------------------------------------------------------------------------------------------
 target_sources(mc2_client PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_v2_all_to_all_v_sole_executor.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ins_v2_all_to_all_concurrent_executor.cc
 )
