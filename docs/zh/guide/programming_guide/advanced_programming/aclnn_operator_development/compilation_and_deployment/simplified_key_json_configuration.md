@@ -9,7 +9,7 @@
 将JSON放在算子工程现有的Host侧配置目录中，并按AI处理器型号划分。例如`AddCustomTemplate`样例使用：
 
 ```text
-op_host/config/ascend910b/add_custom_template_binary.json
+op_host/config/ascendxxx/add_custom_template_binary.json
 ```
 
 在`op_kernel/CMakeLists.txt`中通过`npu_op_kernel_options()`传递`--kernel-json-file`。该参数属于编译选项，不写入`npu_op_kernel_sources()`：
@@ -23,14 +23,14 @@ npu_op_kernel_sources(ascendc_kernels
 
 npu_op_kernel_options(ascendc_kernels AddCustomTemplate
     OPTIONS
-        --kernel-json-file=${CMAKE_CURRENT_SOURCE_DIR}/../op_host/config/ascend910b/add_custom_template_binary.json
+        --kernel-json-file=${CMAKE_CURRENT_SOURCE_DIR}/../op_host/config/ascendxxx/add_custom_template_binary.json
 )
 ```
 
 构建配置阶段会将该选项记录到自动生成的`custom_opc_options.ini`，后续二进制编译从该文件读取。例如：
 
 ```text
-AddCustomTemplate@@--kernel-json-file=<工程路径>/op_host/config/ascend910b/add_custom_template_binary.json
+AddCustomTemplate@@--kernel-json-file=<工程路径>/op_host/config/ascendxxx/add_custom_template_binary.json
 ```
 
 ## JSON格式
@@ -130,10 +130,10 @@ JSON文件最外层包含`op_type`和`op_list`两个字段：`op_type`指定算�
 以FP16项为例，主要产物如下：
 
 ```text
-binary/ascend910b/add_custom_template/AddCustomTemplate_FP16.o
-binary/ascend910b/add_custom_template/AddCustomTemplate_FP16.json
-binary/config/ascend910b/add_custom_template.json
-binary/config/ascend910b/binary_info_config.json
+binary/ascendxxx/add_custom_template/AddCustomTemplate_FP16.o
+binary/ascendxxx/add_custom_template/AddCustomTemplate_FP16.json
+binary/config/ascendxxx/add_custom_template.json
+binary/config/ascendxxx/binary_info_config.json
 ```
 
 其中`AddCustomTemplate_FP16.json`记录单份`.o`的核函数（Kernel）元信息；`add_custom_template.json`汇总每个组合的支持信息；`binary_info_config.json`为运行时提供完整simplified key到binary路径的查找表。示例如下：
@@ -145,13 +145,13 @@ binary/config/ascend910b/binary_info_config.json
     "binaryList": [
       {
         "simplifiedKey": ["AddCustomTemplate/d=0,p=1/custom_fp16"],
-        "binPath": "ascend910b/add_custom_template/AddCustomTemplate_FP16.o",
-        "jsonPath": "ascend910b/add_custom_template/AddCustomTemplate_FP16.json"
+        "binPath": "ascendxxx/add_custom_template/AddCustomTemplate_FP16.o",
+        "jsonPath": "ascendxxx/add_custom_template/AddCustomTemplate_FP16.json"
       },
       {
         "simplifiedKey": ["AddCustomTemplate/d=0,p=1/custom_fp32"],
-        "binPath": "ascend910b/add_custom_template/AddCustomTemplate_FP32.o",
-        "jsonPath": "ascend910b/add_custom_template/AddCustomTemplate_FP32.json"
+        "binPath": "ascendxxx/add_custom_template/AddCustomTemplate_FP32.o",
+        "jsonPath": "ascendxxx/add_custom_template/AddCustomTemplate_FP32.json"
       }
     ]
   }

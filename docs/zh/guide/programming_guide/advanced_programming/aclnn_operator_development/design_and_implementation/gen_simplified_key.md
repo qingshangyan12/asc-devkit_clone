@@ -95,7 +95,7 @@ static ge::graphStatus GenSimplifiedKeyFunc(
 this->AICore()
     .SetTiling(optiling::TilingFunc)
     .SetGenSimplifiedKey(optiling::GenSimplifiedKeyFunc)
-    .AddConfig("ascend910b");
+    .AddConfig("ascendxxx");
 ```
 
 `OP_ADD`注册算子原型时，会将该函数写入算子实现注册信息。运行时加载Host侧算子实现后，才能在调用过程中取得并调用此回调。
