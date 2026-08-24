@@ -26,6 +26,14 @@ __aicore__ inline void asc_set_l0c2gm_channel_para_impl(uint64_t config)
         set_channel_para(config);
     }
 }
+
+__aicore__ inline void asc_set_l0c_copy_channel_para_impl(uint16_t src_nz_matrix_stride)
+{
+    if ASC_IS_AIC {
+        uint64_t config = static_cast<uint64_t>(src_nz_matrix_stride) << 48;
+        set_channel_para(config);
+    }
+}
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
