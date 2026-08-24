@@ -12,7 +12,7 @@
 #define ASCENDC_ACLRTC_KERNEL_COMPILATION_WORKSPACE_H
 
 #include "kernel_specialization_types.h"
-#include "scoped_temporary_directory.h"
+#include "directory_cleanup_guard.h"
 
 #include <boost/filesystem/path.hpp>
 #include <cstdint>
@@ -35,10 +35,10 @@ public:
 
     boost::filesystem::path GetWorktreePath() const;
     aclError CreateOutputDirectoriesAndApplySourcePatches(const KernelCompilationPlan& compilationPlan);
-    aclError EnforceWorktreeRetentionBeforeElfPublication();
+    aclError CleanupWorktreeBeforeElfPublication();
 
 private:
-    ScopedTemporaryDirectory worktreeDirectory_;
+    DirectoryCleanupGuard worktreeDirectory_;
     WorktreeRetentionPolicy retentionPolicy_{WorktreeRetentionPolicy::RemoveAfterCompilation};
 };
 

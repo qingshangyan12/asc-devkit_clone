@@ -120,10 +120,10 @@ KernelCompilationWorkspace::KernelCompilationWorkspace(fs::path worktreePath, Wo
     : retentionPolicy_(retentionPolicy)
 {
     if (!worktreePath.empty()) {
-        (void)worktreeDirectory_.TrackDirectoryForAutomaticCleanup(worktreePath.string());
+        (void)worktreeDirectory_.ManageDirectory(worktreePath.string());
     }
     if (retentionPolicy_ == WorktreeRetentionPolicy::RetainAfterCompilation) {
-        worktreeDirectory_.DisableAutomaticCleanup();
+        worktreeDirectory_.PreserveDirectory();
     }
 }
 
@@ -170,7 +170,7 @@ aclError KernelCompilationWorkspace::CreateOutputDirectoriesAndApplySourcePatche
     return ACLRTC_SUCCESS;
 }
 
-aclError KernelCompilationWorkspace::EnforceWorktreeRetentionBeforeElfPublication()
+aclError KernelCompilationWorkspace::CleanupWorktreeBeforeElfPublication()
 {
     if (worktreeDirectory_.GetDirectoryPath().empty()) {
         return ACLRTC_SUCCESS;
@@ -179,7 +179,7 @@ aclError KernelCompilationWorkspace::EnforceWorktreeRetentionBeforeElfPublicatio
         return ACLRTC_SUCCESS;
     }
     const std::string worktreePath = worktreeDirectory_.GetDirectoryPath();
-    if (!worktreeDirectory_.RemoveTrackedDirectory()) {
+    if (!worktreeDirectory_.RemoveManagedDirectory()) {
         ASCENDLOGE(
             "Failed to clean resource worktree before publishing ELF: path=%s; ensure the path is removable and retry",
             worktreePath.c_str());

@@ -274,10 +274,10 @@ aclError KernelSpecializationSession::PublishKernelElf(
         return ACLRTC_ERROR_FAILURE;
     }
 
-    const aclError worktreeRemovalResult = compilationWorkspace.EnforceWorktreeRetentionBeforeElfPublication();
-    if (worktreeRemovalResult != ACLRTC_SUCCESS) {
+    const aclError worktreeCleanupStatus = compilationWorkspace.CleanupWorktreeBeforeElfPublication();
+    if (worktreeCleanupStatus != ACLRTC_SUCCESS) {
         RemoveTemporaryOutputFileBestEffort(temporaryOutputPath);
-        return worktreeRemovalResult;
+        return worktreeCleanupStatus;
     }
 
     boost::system::error_code renameError;
