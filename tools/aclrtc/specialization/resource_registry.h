@@ -21,7 +21,7 @@
 
 #include "ascendc_manifest_abi.h"
 #include "nlohmann/json.hpp"
-#include "directory_cleanup_guard.h"
+#include "scoped_temporary_directory.h"
 
 namespace boost {
 namespace filesystem {
@@ -185,7 +185,7 @@ private:
     ResourceStatus CommitStagedResources(ResourceLoadTransaction& loadTransaction);
     bool HasCommitConflict(const ResourceStore& incomingResources, const ResourceStore& committedResources) const;
 
-    DirectoryCleanupGuard materializationRootDirectory_;
+    ScopedTemporaryDirectory materializationRootDirectory_;
     ResourceStore externalResources_;
     ResourceStore customResources_;
     ResourceStore builtInResources_;

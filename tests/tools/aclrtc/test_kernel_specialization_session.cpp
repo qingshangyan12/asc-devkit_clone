@@ -31,7 +31,7 @@
 namespace {
 namespace fs = boost::filesystem;
 using Json = nlohmann::json;
-using ascendc::DirectoryCleanupGuard;
+using ascendc::ScopedTemporaryDirectory;
 using ascendc::aclrtc::KernelCompilationWorkspace;
 using ascendc::aclrtc::KernelSpecializationSession;
 using ascendc::aclrtc::MaterializedKernelCompilationResource;
@@ -229,7 +229,7 @@ public:
 private:
     ResourceRegistry& registry_;
     std::string resourceId_;
-    DirectoryCleanupGuard previousMaterializationRootDirectory_;
+    ScopedTemporaryDirectory previousMaterializationRootDirectory_;
     bool previousAutomaticLoadAttempted_{false};
     bool previousRetainMaterializedDirectories_{false};
     ResourceStatus previousAutomaticLoadStatus_{ResourceStatus::Success};

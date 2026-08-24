@@ -1247,7 +1247,8 @@ TEST_F(ResourceRegistryTest, LookupReportsTemporaryRootAndMaterializationFailure
     EXPECT_EQ(registry_->Lookup("bad-temp", output), ResourceStatus::IoError);
     EXPECT_TRUE(output.resourceDir.empty());
 
-    ASSERT_TRUE(registry_->materializationRootDirectory_.ManageDirectory(Path("forced-materialize").string()));
+    ASSERT_TRUE(registry_->materializationRootDirectory_.TrackDirectoryForAutomaticCleanup(
+        Path("forced-materialize").string()));
     WriteFile(fs::path(registry_->materializationRootDirectory_.GetDirectoryPath()) / "external", "blocking file");
     output.resourceDir = "stale";
     EXPECT_EQ(registry_->Lookup("bad-temp", output), ResourceStatus::IoError);

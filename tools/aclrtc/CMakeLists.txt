@@ -15,7 +15,7 @@ add_library(acl_rtc SHARED
     ${SPECIALIZATION_SRC}
     ${CMAKE_CURRENT_SOURCE_DIR}/../build/common/file_utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../build/common/process_executor.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../build/common/directory_cleanup_guard.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/common/scoped_temporary_directory.cpp
 )
 
 if(BUILD_OPEN_PROJECT)

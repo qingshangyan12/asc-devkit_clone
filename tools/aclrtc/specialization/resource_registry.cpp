@@ -113,7 +113,7 @@ const char* ResourceStatusName(ResourceStatus status) noexcept
     return "unknown";
 }
 
-ResourceStatus CreateCompileResourceMaterializationRoot(DirectoryCleanupGuard& materializationRootDirectory)
+ResourceStatus CreateCompileResourceMaterializationRoot(ScopedTemporaryDirectory& materializationRootDirectory)
 {
     const char* environment = std::getenv("TMPDIR");
     const std::string parentDirectoryPath = environment == nullptr || *environment == '\0' ? "/tmp" : environment;
@@ -401,7 +401,7 @@ ResourceStatus ParseManifestMetadata(
 
 ResourceStatus CreateUniqueResourceMaterializationDirectory(
     const std::string& materializationRootPath, const std::string& resourceId, ResourceSourceType sourceType,
-    DirectoryCleanupGuard& materializedResourceDirectory)
+    ScopedTemporaryDirectory& materializedResourceDirectory)
 {
     const std::string categoryParent = FileUtils::JoinPath(materializationRootPath, SourceTypeName(sourceType));
     if (!FileUtils::CreateDirectories(categoryParent) ||
@@ -1392,7 +1392,7 @@ ResourceStatus ResourceRegistry::MaterializeResource(
                 return status;
             }
             if (retainMaterializedDirectories_) {
-                materializationRootDirectory_.PreserveDirectory();
+                materializationRootDirectory_.DisableAutomaticCleanup();
             }
         }
         materializationRootPath = materializationRootDirectory_.GetDirectoryPath();
@@ -1400,7 +1400,7 @@ ResourceStatus ResourceRegistry::MaterializeResource(
     ASCENDLOGD(
         "Compile resource temporary root is ready: resource_id=%s path=%s", resourceId.c_str(),
         materializationRootPath.c_str());
-    DirectoryCleanupGuard materializedResourceDirectory;
+    ScopedTemporaryDirectory materializedResourceDirectory;
     ResourceStatus status = CreateUniqueResourceMaterializationDirectory(
         materializationRootPath, resourceId, entry.sourceType, materializedResourceDirectory);
     if (status == ResourceStatus::Success) {
@@ -1411,13 +1411,13 @@ ResourceStatus ResourceRegistry::MaterializeResource(
     }
     if (status != ResourceStatus::Success) {
         if (retainMaterializedDirectories_) {
-            materializedResourceDirectory.PreserveDirectory();
+            materializedResourceDirectory.DisableAutomaticCleanup();
         }
         resource.resourceDir.clear();
         return status;
     }
     resource.resourceDir = materializedResourceDirectory.GetDirectoryPath();
-    materializedResourceDirectory.PreserveDirectory();
+    materializedResourceDirectory.DisableAutomaticCleanup();
     ASCENDLOGI(
         "Compile resource materialized: resource_id=%s source_type=%s so=%s files=%zu directory=%s", resourceId.c_str(),
         SourceTypeName(entry.sourceType), entry.sourceLibraryPath.c_str(), entry.bundledFiles.size(),

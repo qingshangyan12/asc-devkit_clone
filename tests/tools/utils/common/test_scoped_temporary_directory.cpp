@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 
 #include "file_utils.h"
-#include "directory_cleanup_guard.h"
+#include "scoped_temporary_directory.h"
 
 #include <cstdlib>
 #include <string>
@@ -28,7 +28,7 @@ bool PathExistsWithoutFollowingSymlinks(const std::string& path)
     return lstat(path.c_str(), &pathStatus) == 0;
 }
 
-class DirectoryCleanupGuardTest : public testing::Test {
+class ScopedTemporaryDirectoryTest : public testing::Test {
 protected:
     void SetUp() override
     {
@@ -38,7 +38,7 @@ protected:
                 "/tmp" :
                 configuredTemporaryDirectory;
         std::string rootDirectoryPattern =
-            FileUtils::JoinPath(parentDirectoryPath, "directory_cleanup_guard_ut_XXXXXX");
+            FileUtils::JoinPath(parentDirectoryPath, "scoped_temporary_directory_ut_XXXXXX");
         std::vector<char> writablePattern(rootDirectoryPattern.begin(), rootDirectoryPattern.end());
         writablePattern.push_back('\0');
         char* createdDirectoryPath = mkdtemp(writablePattern.data());
@@ -51,13 +51,13 @@ protected:
     std::string rootDirectoryPath_;
 };
 
-TEST_F(DirectoryCleanupGuardTest, CreatesUniqueDirectoryAndRemovesItOnDestruction)
+TEST_F(ScopedTemporaryDirectoryTest, CreatesUniqueDirectoryAndRemovesItOnDestruction)
 {
     const std::string parentPath = FileUtils::JoinPath(rootDirectoryPath_, "temporary-directories");
     ASSERT_TRUE(FileUtils::CreateDirectories(parentPath));
     std::string removedDirectoryPath;
     {
-        DirectoryCleanupGuard directory;
+        ScopedTemporaryDirectory directory;
         ASSERT_TRUE(directory.CreateUniqueSubdirectory(parentPath, "test"));
         removedDirectoryPath = directory.GetDirectoryPath();
         EXPECT_TRUE(FileUtils::IsDirectory(removedDirectoryPath));
@@ -71,44 +71,44 @@ TEST_F(DirectoryCleanupGuardTest, CreatesUniqueDirectoryAndRemovesItOnDestructio
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(removedDirectoryPath));
 }
 
-TEST_F(DirectoryCleanupGuardTest, PreservesCreatedOrManagedDirectory)
+TEST_F(ScopedTemporaryDirectoryTest, CanDisableAutomaticCleanupForCreatedOrTrackedDirectory)
 {
     const std::string createdParentPath = FileUtils::JoinPath(rootDirectoryPath_, "retained-created");
     ASSERT_TRUE(FileUtils::CreateDirectories(createdParentPath));
     std::string retainedCreatedPath;
     {
-        DirectoryCleanupGuard directory;
+        ScopedTemporaryDirectory directory;
         ASSERT_TRUE(directory.CreateUniqueSubdirectory(createdParentPath, "created"));
         retainedCreatedPath = directory.GetDirectoryPath();
-        directory.PreserveDirectory();
+        directory.DisableAutomaticCleanup();
     }
     EXPECT_TRUE(FileUtils::IsDirectory(retainedCreatedPath));
 
     const std::string retainedAdoptedPath = FileUtils::JoinPath(rootDirectoryPath_, "retained-adopted");
     ASSERT_TRUE(FileUtils::CreateDirectories(retainedAdoptedPath));
     {
-        DirectoryCleanupGuard directory;
-        ASSERT_TRUE(directory.ManageDirectory(retainedAdoptedPath));
-        directory.PreserveDirectory();
+        ScopedTemporaryDirectory directory;
+        ASSERT_TRUE(directory.TrackDirectoryForAutomaticCleanup(retainedAdoptedPath));
+        directory.DisableAutomaticCleanup();
     }
     EXPECT_TRUE(FileUtils::IsDirectory(retainedAdoptedPath));
 }
 
-TEST_F(DirectoryCleanupGuardTest, MovesDirectoryCleanupResponsibilityExactlyOnce)
+TEST_F(ScopedTemporaryDirectoryTest, MovesAutomaticCleanupResponsibilityExactlyOnce)
 {
     const std::string parentPath = FileUtils::JoinPath(rootDirectoryPath_, "moved");
     ASSERT_TRUE(FileUtils::CreateDirectories(parentPath));
     std::string movedDirectoryPath;
     {
-        DirectoryCleanupGuard original;
+        ScopedTemporaryDirectory original;
         ASSERT_TRUE(original.CreateUniqueSubdirectory(parentPath, "original"));
         movedDirectoryPath = original.GetDirectoryPath();
 
-        DirectoryCleanupGuard moved(std::move(original));
+        ScopedTemporaryDirectory moved(std::move(original));
         EXPECT_TRUE(original.GetDirectoryPath().empty());
         EXPECT_EQ(moved.GetDirectoryPath(), movedDirectoryPath);
 
-        DirectoryCleanupGuard assigned;
+        ScopedTemporaryDirectory assigned;
         assigned = std::move(moved);
         EXPECT_TRUE(moved.GetDirectoryPath().empty());
         EXPECT_EQ(assigned.GetDirectoryPath(), movedDirectoryPath);
@@ -116,19 +116,19 @@ TEST_F(DirectoryCleanupGuardTest, MovesDirectoryCleanupResponsibilityExactlyOnce
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(movedDirectoryPath));
 }
 
-TEST_F(DirectoryCleanupGuardTest, RemovesManagedDirectoryOnRequest)
+TEST_F(ScopedTemporaryDirectoryTest, RemovesTrackedDirectoryOnRequest)
 {
     const std::string adoptedPath = FileUtils::JoinPath(rootDirectoryPath_, "adopted");
     ASSERT_TRUE(FileUtils::CreateDirectories(adoptedPath));
-    DirectoryCleanupGuard directory;
-    ASSERT_TRUE(directory.ManageDirectory(adoptedPath));
-    EXPECT_TRUE(directory.RemoveManagedDirectory());
+    ScopedTemporaryDirectory directory;
+    ASSERT_TRUE(directory.TrackDirectoryForAutomaticCleanup(adoptedPath));
+    EXPECT_TRUE(directory.RemoveTrackedDirectory());
     EXPECT_TRUE(directory.GetDirectoryPath().empty());
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(adoptedPath));
-    EXPECT_TRUE(directory.RemoveManagedDirectory());
+    EXPECT_TRUE(directory.RemoveTrackedDirectory());
 }
 
-TEST_F(DirectoryCleanupGuardTest, MoveAssignmentRemovesPreviouslyManagedDirectoryAndEmptiesSource)
+TEST_F(ScopedTemporaryDirectoryTest, MoveAssignmentRemovesPreviouslyTrackedDirectoryAndEmptiesSource)
 {
     const std::string sourceParentPath = FileUtils::JoinPath(rootDirectoryPath_, "move-source");
     const std::string destinationParentPath = FileUtils::JoinPath(rootDirectoryPath_, "move-destination");
@@ -137,11 +137,11 @@ TEST_F(DirectoryCleanupGuardTest, MoveAssignmentRemovesPreviouslyManagedDirector
     std::string sourceDirectoryPath;
     std::string destinationDirectoryPath;
     {
-        DirectoryCleanupGuard source;
+        ScopedTemporaryDirectory source;
         ASSERT_TRUE(source.CreateUniqueSubdirectory(sourceParentPath, "source"));
         sourceDirectoryPath = source.GetDirectoryPath();
 
-        DirectoryCleanupGuard destination;
+        ScopedTemporaryDirectory destination;
         ASSERT_TRUE(destination.CreateUniqueSubdirectory(destinationParentPath, "destination"));
         destinationDirectoryPath = destination.GetDirectoryPath();
         destination = std::move(source);
@@ -154,18 +154,18 @@ TEST_F(DirectoryCleanupGuardTest, MoveAssignmentRemovesPreviouslyManagedDirector
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(destinationDirectoryPath));
 }
 
-TEST_F(DirectoryCleanupGuardTest, RejectsInvalidCreationInputsAndReportsRemovalFailure)
+TEST_F(ScopedTemporaryDirectoryTest, RejectsInvalidCreationInputsAndReportsRemovalFailure)
 {
-    DirectoryCleanupGuard directory;
+    ScopedTemporaryDirectory directory;
     EXPECT_FALSE(directory.CreateUniqueSubdirectory(FileUtils::JoinPath(rootDirectoryPath_, "missing"), "test"));
     EXPECT_FALSE(directory.CreateUniqueSubdirectory(rootDirectoryPath_, "nested/test"));
     EXPECT_FALSE(directory.CreateUniqueSubdirectory(rootDirectoryPath_, "invalid%prefix"));
-    EXPECT_FALSE(directory.ManageDirectory(std::string()));
+    EXPECT_FALSE(directory.TrackDirectoryForAutomaticCleanup(std::string()));
 
-    ASSERT_TRUE(directory.ManageDirectory("/proc/self/status"));
-    EXPECT_FALSE(directory.RemoveManagedDirectory());
+    ASSERT_TRUE(directory.TrackDirectoryForAutomaticCleanup("/proc/self/status"));
+    EXPECT_FALSE(directory.RemoveTrackedDirectory());
     EXPECT_EQ(directory.GetDirectoryPath(), "/proc/self/status");
-    directory.PreserveDirectory();
+    directory.DisableAutomaticCleanup();
 }
 
 } // namespace

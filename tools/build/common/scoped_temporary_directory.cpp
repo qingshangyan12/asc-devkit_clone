@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "directory_cleanup_guard.h"
+#include "scoped_temporary_directory.h"
 
 #include "ascendc_tool_log.h"
 #include "file_utils.h"
@@ -36,30 +36,30 @@ bool IsValidDirectoryNamePrefix(const std::string& directoryNamePrefix)
 
 } // namespace
 
-DirectoryCleanupGuard::~DirectoryCleanupGuard() noexcept
+ScopedTemporaryDirectory::~ScopedTemporaryDirectory() noexcept
 {
-    if (removeDirectoryOnDestruction_) {
-        (void)RemoveManagedDirectory();
+    if (automaticCleanupEnabled_) {
+        (void)RemoveTrackedDirectory();
     }
 }
 
-DirectoryCleanupGuard::DirectoryCleanupGuard(DirectoryCleanupGuard&& other) noexcept { MoveStateFrom(other); }
+ScopedTemporaryDirectory::ScopedTemporaryDirectory(ScopedTemporaryDirectory&& other) noexcept { MoveStateFrom(other); }
 
-DirectoryCleanupGuard& DirectoryCleanupGuard::operator=(DirectoryCleanupGuard&& other) noexcept
+ScopedTemporaryDirectory& ScopedTemporaryDirectory::operator=(ScopedTemporaryDirectory&& other) noexcept
 {
     if (this == &other) {
         return *this;
     }
-    DirectoryCleanupGuard previousDirectory(std::move(*this));
+    ScopedTemporaryDirectory previousDirectory(std::move(*this));
     MoveStateFrom(other);
     return *this;
 }
 
-bool DirectoryCleanupGuard::CreateUniqueSubdirectory(
+bool ScopedTemporaryDirectory::CreateUniqueSubdirectory(
     const std::string& parentDirectoryPath, const std::string& directoryNamePrefix)
 {
-    if (!directoryPath_.empty()) {
-        ASCENDLOGE("Directory cleanup guard already manages a path: path=%s", directoryPath_.c_str());
+    if (!trackedDirectoryPath_.empty()) {
+        ASCENDLOGE("Temporary directory already tracks a path: path=%s", trackedDirectoryPath_.c_str());
         return false;
     }
     if (!IsValidDirectoryNamePrefix(directoryNamePrefix)) {
@@ -109,50 +109,50 @@ bool DirectoryCleanupGuard::CreateUniqueSubdirectory(
         (void)FileUtils::RemoveAll(createdDirectoryPath.string());
         return false;
     }
-    directoryPath_ = std::move(resolvedCreatedDirectoryPath);
-    removeDirectoryOnDestruction_ = true;
-    ASCENDLOGD("Created temporary directory: path=%s", directoryPath_.c_str());
+    trackedDirectoryPath_ = std::move(resolvedCreatedDirectoryPath);
+    automaticCleanupEnabled_ = true;
+    ASCENDLOGD("Created temporary directory: path=%s", trackedDirectoryPath_.c_str());
     return true;
 }
 
-bool DirectoryCleanupGuard::ManageDirectory(std::string directoryPath)
+bool ScopedTemporaryDirectory::TrackDirectoryForAutomaticCleanup(std::string directoryPath)
 {
     if (directoryPath.empty()) {
-        ASCENDLOGE("Cannot manage an empty directory path");
+        ASCENDLOGE("Cannot track an empty temporary directory path for automatic cleanup");
         return false;
     }
-    if (!directoryPath_.empty()) {
-        ASCENDLOGE("Directory cleanup guard already manages a path: path=%s", directoryPath_.c_str());
+    if (!trackedDirectoryPath_.empty()) {
+        ASCENDLOGE("Temporary directory already tracks a path: path=%s", trackedDirectoryPath_.c_str());
         return false;
     }
-    directoryPath_ = std::move(directoryPath);
-    removeDirectoryOnDestruction_ = true;
+    trackedDirectoryPath_ = std::move(directoryPath);
+    automaticCleanupEnabled_ = true;
     return true;
 }
 
-bool DirectoryCleanupGuard::RemoveManagedDirectory() noexcept
+bool ScopedTemporaryDirectory::RemoveTrackedDirectory() noexcept
 {
-    if (directoryPath_.empty()) {
+    if (trackedDirectoryPath_.empty()) {
         return true;
     }
-    if (!FileUtils::RemoveAll(directoryPath_)) {
-        ASCENDLOGW("Failed to remove managed directory: path=%s", directoryPath_.c_str());
+    if (!FileUtils::RemoveAll(trackedDirectoryPath_)) {
+        ASCENDLOGW("Failed to remove tracked temporary directory: path=%s", trackedDirectoryPath_.c_str());
         return false;
     }
-    directoryPath_.clear();
+    trackedDirectoryPath_.clear();
     return true;
 }
 
-void DirectoryCleanupGuard::PreserveDirectory() noexcept { removeDirectoryOnDestruction_ = false; }
+void ScopedTemporaryDirectory::DisableAutomaticCleanup() noexcept { automaticCleanupEnabled_ = false; }
 
-const std::string& DirectoryCleanupGuard::GetDirectoryPath() const noexcept { return directoryPath_; }
+const std::string& ScopedTemporaryDirectory::GetDirectoryPath() const noexcept { return trackedDirectoryPath_; }
 
-void DirectoryCleanupGuard::MoveStateFrom(DirectoryCleanupGuard& other) noexcept
+void ScopedTemporaryDirectory::MoveStateFrom(ScopedTemporaryDirectory& other) noexcept
 {
-    directoryPath_ = std::move(other.directoryPath_);
-    removeDirectoryOnDestruction_ = other.removeDirectoryOnDestruction_;
-    other.directoryPath_.clear();
-    other.removeDirectoryOnDestruction_ = false;
+    trackedDirectoryPath_ = std::move(other.trackedDirectoryPath_);
+    automaticCleanupEnabled_ = other.automaticCleanupEnabled_;
+    other.trackedDirectoryPath_.clear();
+    other.automaticCleanupEnabled_ = false;
 }
 
 } // namespace ascendc

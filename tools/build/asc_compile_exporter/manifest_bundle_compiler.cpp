@@ -25,7 +25,7 @@
 #include "file_utils.h"
 #include "manifest_bundle_types.h"
 #include "process_executor.h"
-#include "directory_cleanup_guard.h"
+#include "scoped_temporary_directory.h"
 
 namespace ascendc {
 namespace manifest_generator {
@@ -35,7 +35,7 @@ constexpr uint32_t BUNDLE_BUILD_TIMEOUT_MINUTES = 30U;
 constexpr uint32_t BUNDLE_BUILD_TERMINATION_GRACE_SECONDS = 5U;
 
 bool CreatePrivateBundleWorkspace(
-    const std::string& requestedParentDirectoryPath, DirectoryCleanupGuard& bundleWorkspace)
+    const std::string& requestedParentDirectoryPath, ScopedTemporaryDirectory& bundleWorkspace)
 {
     const char* configuredTemporaryDirectory = std::getenv("TMPDIR");
     const std::string parentDirectoryPath =
@@ -120,7 +120,7 @@ bool ManifestBundleCompiler::PublishBundleAcrossFileSystems(const std::string& s
     ASCENDLOGD(
         "Copying staged bundle across filesystems: %s -> %s", stagedBundlePath.c_str(), request_.outputPath.c_str());
     // A private workspace under the output parent places the copied file on the output filesystem.
-    DirectoryCleanupGuard publishWorkspace;
+    ScopedTemporaryDirectory publishWorkspace;
     if (!CreatePrivateBundleWorkspace(FileUtils::ParentPath(request_.outputPath), publishWorkspace)) {
         return false;
     }
@@ -154,12 +154,12 @@ bool ManifestBundleCompiler::Compile() const
     if (!CollectedManifestRepository(request_.manifestSearchRootPath).Load(units)) {
         return false;
     }
-    DirectoryCleanupGuard buildWorkspace;
+    ScopedTemporaryDirectory buildWorkspace;
     if (!CreatePrivateBundleWorkspace(std::string(), buildWorkspace)) {
         return false;
     }
     if (request_.retainTemporaryWorkspace) {
-        buildWorkspace.PreserveDirectory();
+        buildWorkspace.DisableAutomaticCleanup();
         ASCENDLOGI("Keeping temporary bundle directory %s", buildWorkspace.GetDirectoryPath().c_str());
     }
 
