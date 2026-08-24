@@ -245,7 +245,7 @@ Use the `msOpProf` tool to collect detailed performance data:
 msopprof ./data_cache_hint   # Analyze case performance
 ```
 
-After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure example is as follows:
+After the command completes, a folder named `OPPROF_{timestamp}_XXX` is generated in the default directory. The performance data folder structure example is as follows:
 
 ```text
 ├──dump                       # Raw performance data, no user attention needed

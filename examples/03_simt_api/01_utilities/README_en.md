@@ -1,6 +1,6 @@
 # Utilities Example Introduction
 ## Overview
-Simple examples based on Ascend C SIMT programming, introducing on-board debugging methods such as printing and clock timing through APIs like printf and clock. These examples are suitable for the debugging phase.
+Simple examples based on Ascend C SIMT programming, introducing on-board debugging methods such as printing and clock timing through APIs like `printf` and `clock`. These examples are suitable for the debugging phase.
 
 ## Example List
 |  Directory Name                                                   |  Function Description                                              |
