@@ -228,6 +228,18 @@ __simd_callee__ inline void asc_unsqueeze(vector_uint32_t& dst, vector_bool mask
 
 __simd_callee__ inline void asc_unsqueeze(vector_int32_t& dst, vector_bool mask);
 
+__simd_callee__ inline vector_uint8_t asc_unsqueeze(vector_bool mask);
+
+__simd_callee__ inline vector_int8_t asc_unsqueeze(vector_bool mask);
+
+__simd_callee__ inline vector_uint16_t asc_unsqueeze(vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_unsqueeze(vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_unsqueeze(vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_unsqueeze(vector_bool mask);
+
 __simd_callee__ inline void asc_pack_to_low(vector_uint8_t& dst, vector_uint16_t src);
 
 __simd_callee__ inline void asc_pack_to_low(vector_uint16_t& dst, vector_uint32_t src);
@@ -302,6 +314,26 @@ __simd_callee__ inline void asc_unpack_lower(vector_int32_t& dst, vector_int16_t
 __simd_callee__ inline void asc_unpack_upper(vector_bool& dst, vector_bool src);
 
 __simd_callee__ inline void asc_unpack_lower(vector_bool& dst, vector_bool src);
+
+__simd_callee__ inline vector_uint16_t asc_unpack_upper(vector_uint8_t src);
+
+__simd_callee__ inline vector_uint16_t asc_unpack_lower(vector_uint8_t src);
+
+__simd_callee__ inline vector_int16_t asc_unpack_upper(vector_int8_t src);
+
+__simd_callee__ inline vector_int16_t asc_unpack_lower(vector_int8_t src);
+
+__simd_callee__ inline vector_uint32_t asc_unpack_upper(vector_uint16_t src);
+
+__simd_callee__ inline vector_uint32_t asc_unpack_lower(vector_uint16_t src);
+
+__simd_callee__ inline vector_int32_t asc_unpack_upper(vector_int16_t src);
+
+__simd_callee__ inline vector_int32_t asc_unpack_lower(vector_int16_t src);
+
+__simd_callee__ inline vector_bool asc_unpack_upper(vector_bool src);
+
+__simd_callee__ inline vector_bool asc_unpack_lower(vector_bool src);
 
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array);
 
