@@ -24,7 +24,7 @@ CUSTOM_BINARY_JSON_META = "_ascendc_custom_binary_json"
 
 
 def wr_json(json_obj, json_file):
-    flags = os.O_WRONLY | os.O_CREAT
+    flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC
     modes = stat.S_IWUSR | stat.S_IRUSR
     with os.fdopen(os.open(json_file, flags, modes), "w") as f:
         json.dump(json_obj, f, indent=2)
@@ -50,6 +50,7 @@ def _check_binary_json(binary_json, expected_op_type):
         )
 
     bin_filenames = set()
+    simplified_keys = set()
     for index, op in enumerate(op_list):
         op_path = f"op_list[{index}]"
         bin_filename = op.get("bin_filename")
@@ -68,6 +69,11 @@ def _check_binary_json(binary_json, expected_op_type):
         simplified_key = op.get("simplified_key")
         if not isinstance(simplified_key, str) or not simplified_key:
             raise ValueError(f"{op_path}.simplified_key: expected non-empty string")
+        if simplified_key in simplified_keys:
+            raise ValueError(
+                f"{op_path}.simplified_key: duplicate value '{simplified_key}'"
+            )
+        simplified_keys.add(simplified_key)
 
 
 def split_json_files(ori_json, output_dir, expected_op_type=None):
