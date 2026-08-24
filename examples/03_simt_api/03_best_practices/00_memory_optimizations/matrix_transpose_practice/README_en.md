@@ -95,7 +95,7 @@ Therefore, the input element coordinates processed by this thread in GM are `inp
 | --- | --- |
 | Task Duration(μs) | Total task duration, including scheduling time to the accelerator, execution time on the accelerator, and response completion time |
 | aiv_time(μs) | Theoretical execution time of the task on the AI Vector Core, in microseconds |
-| aiv_total_cycles | Total execution cycles on each AI Vector Core compute unit after the task is assigned |
+| aiv_total_cycles | Total execution cycles on each AI Vector Core compute unit |
 | aiv_vec_time(μs) | Duration of vec-type instructions (vector computation instructions), in microseconds |
 | aiv_vec_ratio | Ratio of vec-type instruction cycles to total cycles |
 | aiv_scalar_time(μs) | Duration of scalar-type instructions (scalar computation instructions), in microseconds |
