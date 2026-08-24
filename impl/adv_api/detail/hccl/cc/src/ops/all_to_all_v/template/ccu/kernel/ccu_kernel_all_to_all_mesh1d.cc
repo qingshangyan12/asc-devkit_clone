@@ -105,13 +105,13 @@ static void WriteChunked(
     AlltoAllMesh1DContext& ctx, ChannelHandle channelId, ccu::RemoteAddr& curDst, ccu::LocalAddr& curSrc,
     uint64_t rankIdx)
 {
+    // Variable 类型必须先默认构造（分配 handle）再赋值，不支持声明时初始化
     ccu::Variable chunkSize;
     chunkSize = MAX_DMA_TRANS_SIZE;
     ccu::Variable neg256MB;
     neg256MB = NEG_256MB;
     ccu::Variable constOne;
     constOne = 1;
-
     ccu::Variable loopCount;
     loopCount = ctx.writeLoopCount;
     ccu::Variable remaining;
