@@ -346,6 +346,11 @@ __aicore__ constexpr bool IsSupportedPipe(pipe_t pipe)
     return false;
 }
 
+__aicore__ bool IsSupportedPipeWapper(pipe_t pipe)
+{
+    return IsSupportedPipe(pipe);
+}
+
 __aicore__ constexpr TPosition GetDefaultPosition(Hardware hard)
 {
     if (hard == Hardware::UB) {
@@ -364,6 +369,11 @@ __aicore__ constexpr TPosition GetDefaultPosition(Hardware hard)
         return TPosition::C2PIPE2GM;
     }
     return TPosition::MAX;
+}
+
+__aicore__ TPosition GetDefaultPositionWapper(Hardware hard)
+{
+    return GetDefaultPosition(hard);
 }
 
 __aicore__ constexpr Hardware GetPhyType(TPosition pos)
@@ -437,6 +447,11 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
     return hard;
 }
 
+__aicore__ Hardware GetPhyTypeWapper(TPosition pos)
+{
+    return GetPhyType(pos);
+}
+
 __aicore__ constexpr TPosition GetPosition(TPosition srcPos, TPosition dstPos)
 {
     // unsupported data stream
@@ -456,6 +471,11 @@ __aicore__ constexpr TPosition GetPosition(TPosition srcPos, TPosition dstPos)
     return dstPos;
 }
 
+__aicore__ TPosition GetPositionWapper(TPosition srcPos, TPosition dstPos)
+{
+    return GetPosition(srcPos, dstPos);
+}
+
 __aicore__ constexpr Hardware GetBufferPos(TPosition srcPos, TPosition dstPos)
 {
     // unsupported data stream
@@ -473,6 +493,11 @@ __aicore__ constexpr Hardware GetBufferPos(TPosition srcPos, TPosition dstPos)
     }
 #endif
     return GetPhyType(dstPos);
+}
+
+__aicore__ Hardware GetBufferPosWapper(TPosition srcPos, TPosition dstPos)
+{
+    return GetBufferPos(srcPos, dstPos);
 }
 
 __aicore__ constexpr TPosition GetBufferLogicPos(TPosition pos, bool isSrc)
@@ -508,14 +533,29 @@ __aicore__ constexpr TPosition GetBufferLogicPos(TPosition pos, bool isSrc)
     return TPosition::MAX;
 }
 
+__aicore__ TPosition GetBufferLogicPosWapper(TPosition pos, bool isSrc)
+{
+    return GetBufferLogicPos(pos, isSrc);
+}
+
 __aicore__ constexpr bool IsVecPos(TPosition pos)
 {
     return pos == TPosition::VECIN || pos == TPosition::VECOUT || pos == TPosition::VECCALC;
 }
 
+__aicore__ bool IsVecPosWapper(TPosition pos)
+{
+    return IsVecPos(pos);
+}
+
 __aicore__ constexpr bool IsTQuePositionForVec(TPosition src, TPosition dst)
 {
     return (IsVecPos(src) || IsVecPos(dst)) && src != TPosition::TSCM && dst != TPosition::TSCM;
+}
+
+__aicore__ bool IsTQuePositionForVecWapper(TPosition src, TPosition dst)
+{
+    return IsTQuePositionForVec(src, dst);
 }
 
 template <typename T>
@@ -528,6 +568,12 @@ __aicore__ constexpr bool UseBufIdSync()
 #endif
 }
 
+template <typename T>
+__aicore__ bool UseBufIdSyncWapper()
+{
+    return UseBufIdSync<T>();
+}
+
 __aicore__ constexpr bool UseBufIdSync(TPosition src, TPosition dst, bool enableStaticEvtId)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
@@ -535,6 +581,11 @@ __aicore__ constexpr bool UseBufIdSync(TPosition src, TPosition dst, bool enable
 #else
     return false;
 #endif
+}
+
+__aicore__ bool UseBufIdSyncWapper(TPosition src, TPosition dst, bool enableStaticEvtId)
+{
+    return UseBufIdSync(src, dst, enableStaticEvtId);
 }
 
 __aicore__ constexpr HardEvent GetQueEvt(
@@ -643,6 +694,12 @@ __aicore__ constexpr HardEvent GetQueEvt(
     return HardEvent::MAX;
 }
 
+__aicore__ HardEvent GetQueEvtWapper(
+    Hardware src, Hardware dst, bool fwdDirect, bool nd2nz = false, bool nz2nd = false)
+{
+    return GetQueEvt(src, dst, fwdDirect, nd2nz, nz2nd);
+}
+
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 __aicore__ constexpr HardEvent GetQueEvt(TPosition src, TPosition dst, bool fwdDirect)
 {
@@ -668,6 +725,11 @@ __aicore__ constexpr HardEvent GetQueEvt(TPosition src, TPosition dst, bool fwdD
         }
     }
     return GetQueEvt(GetPhyType(src), GetPhyType(dst), fwdDirect, false, false);
+}
+
+__aicore__ HardEvent GetQueEvtWapper(TPosition src, TPosition dst, bool fwdDirect)
+{
+    return GetQueEvt(src, dst, fwdDirect);
 }
 #endif
 
