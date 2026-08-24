@@ -45,8 +45,8 @@ inline bool __hisnan(bfloat16_t x)
 
 接口功能不受全局饱和模式影响。返回值为：
 
--   `false`：输入非nan。
--   `true`：输入为nan。
+-   false：输入非nan。
+-   true：输入为nan。
 
 ## 约束说明
 
