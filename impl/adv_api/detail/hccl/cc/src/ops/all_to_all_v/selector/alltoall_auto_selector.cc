@@ -19,7 +19,7 @@ constexpr u32 TOPO_LEVEL_NUM_3 = 3;
 constexpr uint64_t SMALL_COUNT_16M = 16 * 1024 * 1024;
 
 namespace {
-bool IsDevType960() { return false; } // TODO: 实现真实的960设备类型检测
+bool IsDevType960() { return false; } // 960设备类型检测待实现
 } // namespace
 
 uint64_t AlltoAllAutoSelector::CalcDataSize(const OpParam& opParam, const TopoInfoWithNetLayerDetails* topoInfo) const
