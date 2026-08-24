@@ -573,7 +573,7 @@ When SIMT VF writes the valid static UB range, no accuracy error is observed, an
 test pass!
 ```
 
-When SIMT VF writes unoccupied ordinary UB space, reserved space, or Data Cache, kernel synchronization fails and prints the following key error information:
+When SIMT VF writes unoccupied ordinary UB space, reserved space, or Data Cache, kernel execution fails and prints the following key error information:
 
 ```text
 [Case3] mode=simt_vf, region=unallocated_ub
@@ -719,7 +719,7 @@ The following examples show execution results for each Case.
     [Failed] Case accuracy verification failed!
     ```
 
-    When SIMT VF writes an out-of-bounds target region, kernel synchronization fails and prints the following key error information:
+    When SIMT VF writes an out-of-bounds target region, kernel execution fails and prints the following key error information:
 
     ```text
     [Case3] mode=simt_vf, region=unallocated_ub

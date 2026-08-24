@@ -575,7 +575,7 @@ SIMT VF写静态UB合法范围时，运行未观察到精度异常，日志中�
 test pass!
 ```
 
-SIMT VF写未被占用的普通UB空间、预留空间和Data Cache时，Kernel同步失败，关键错误信息如下：
+SIMT VF写未被占用的普通UB空间、预留空间和Data Cache时，Kernel运行失败，关键错误信息如下：
 
 ```text
 [Case3] mode=simt_vf, region=unallocated_ub
@@ -721,7 +721,7 @@ make -j
     [Failed] Case accuracy verification failed!
     ```
 
-    SIMT VF写越界目标区域时，Kernel同步失败，关键错误信息如下：
+    SIMT VF写越界目标区域时，Kernel运行失败，关键错误信息如下：
 
     ```text
     [Case3] mode=simt_vf, region=unallocated_ub
