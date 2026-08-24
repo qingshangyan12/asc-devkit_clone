@@ -73,19 +73,10 @@ Result CaptureAllToAllMesh1DKernel(void* kernelArg)
     }
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
 
-    mc2_ops_hccl::CcuKernelArgAlltoAllMesh1D kernelArgData;
-    kernelArgData.rankSize = config.rankSize;
-    kernelArgData.rankId = config.rankId;
-    kernelArgData.loadFromMem = config.loadFromMem;
-    kernelArgData.channelCount = static_cast<uint32_t>(config.channels.size());
-    for (size_t i = 0; i < config.channels.size(); ++i) {
-        kernelArgData.channels[i] = config.channels[i];
-    }
-
-    CcuKernelArg argPtr = static_cast<CcuKernelArg>(&kernelArgData);
     const CcuResult result = mc2_ops_hccl::CcuAlltoAllMesh1DKernel(
         arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
-        arguments[8], arguments[9], arguments[10], argPtr);
+        arguments[8], arguments[9], arguments[10], config.channels.data(),
+        static_cast<uint32_t>(config.channels.size()), config.rankSize, config.rankId, config.loadFromMem);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
 

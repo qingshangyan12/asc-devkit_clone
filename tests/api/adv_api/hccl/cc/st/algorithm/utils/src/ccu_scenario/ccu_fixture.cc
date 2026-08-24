@@ -40,8 +40,8 @@ Mc2CcTilingInner CcuStFixture::BuildTiling(HcclCMDType opType, HcclDataType data
     tiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
     tiling.srcDataType = static_cast<uint8_t>(dataType);
     tiling.dstDataType = static_cast<uint8_t>(dataType);
-    strcpy(tiling.groupName, "test_group");
-    strcpy(tiling.algConfig, algConfig.empty() ? "default" : algConfig.c_str());
+    strcpy_s(tiling.groupName, sizeof(tiling.groupName), "test_group");
+    strcpy_s(tiling.algConfig, sizeof(tiling.algConfig), algConfig.empty() ? "default" : algConfig.c_str());
     return tiling;
 }
 
@@ -68,8 +68,6 @@ KernelHandle CcuStFixture::RegisterKernelForRank(
     uint32_t rank, uint32_t rankSize, const CcuStScenario& scenario, const TopoMeta& topoMeta,
     const Mc2CcTilingInner& tiling)
 {
-    setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
-    setenv("ASCEND_ENABLE_CCU_KFC_BRANCH", "1", 1);
     if (aclrtSetDevice(rank) != ACL_SUCCESS)
         return 0;
 
