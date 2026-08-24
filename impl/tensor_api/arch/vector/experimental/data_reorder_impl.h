@@ -22,12 +22,13 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 namespace detail {
 template <typename T>
 inline constexpr bool is_data_reorder_support_type = Std::is_one_of_v<T, uint8_t, int8_t,
     fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t,
     int32_t, float>;
-}
+} // namespace detail
 
 template <typename T>
 __simd_callee__ inline reg_pair<T> interleave(reg_tensor<T> src0, reg_tensor<T> src1) {
@@ -52,6 +53,7 @@ __simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T
     dst.second.mask = dst.first.mask;
     return dst;
 }
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

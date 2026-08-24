@@ -66,10 +66,6 @@ __simd_callee__ inline reg_tensor<DstType> cast_impl(reg_tensor<SrcType> src)
     return dst;
 }
 
-} // namespace detail
-
-namespace detail {
-
 template <typename T>
 struct is_supported {
     static constexpr bool value = false;

@@ -23,7 +23,6 @@
 namespace asc {
 namespace te {
 namespace experimental {
-
 namespace detail {
 
 enum class bitwise_op {
