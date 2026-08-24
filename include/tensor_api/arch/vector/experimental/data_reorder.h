@@ -32,7 +32,7 @@ __simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__)
 #include "impl/tensor_api/arch/vector/experimental/data_reorder_impl.h"
 #endif
 
