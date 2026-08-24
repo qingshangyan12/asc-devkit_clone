@@ -47,10 +47,10 @@ inline float coshf(float x)
 
 输入数据的双曲余弦值。
 
--   当x为inf时，返回值为inf。
--   当x为-inf时，返回值为inf。
--   当x为nan时，返回值为nan。
--   当x为0时，返回值为1。
+-   当`x`为inf时，返回值为inf。
+-   当`x`为-inf时，返回值为inf。
+-   当`x`为nan时，返回值为nan。
+-   当`x`为0时，返回值为1。
 
 ## 约束说明
 
