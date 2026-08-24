@@ -8,38 +8,38 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef ASCENDC_COMMON_SCOPED_TEMPORARY_DIRECTORY_H
-#define ASCENDC_COMMON_SCOPED_TEMPORARY_DIRECTORY_H
+#ifndef ASCENDC_COMMON_DIRECTORY_CLEANUP_GUARD_H
+#define ASCENDC_COMMON_DIRECTORY_CLEANUP_GUARD_H
 
 #include <string>
 
 namespace ascendc {
 
-class ScopedTemporaryDirectory final {
+class DirectoryCleanupGuard final {
 public:
-    ScopedTemporaryDirectory() = default;
-    ~ScopedTemporaryDirectory() noexcept;
+    DirectoryCleanupGuard() = default;
+    ~DirectoryCleanupGuard() noexcept;
 
-    ScopedTemporaryDirectory(ScopedTemporaryDirectory&& other) noexcept;
-    ScopedTemporaryDirectory& operator=(ScopedTemporaryDirectory&& other) noexcept;
+    DirectoryCleanupGuard(DirectoryCleanupGuard&& other) noexcept;
+    DirectoryCleanupGuard& operator=(DirectoryCleanupGuard&& other) noexcept;
 
-    ScopedTemporaryDirectory(const ScopedTemporaryDirectory&) = delete;
-    ScopedTemporaryDirectory& operator=(const ScopedTemporaryDirectory&) = delete;
+    DirectoryCleanupGuard(const DirectoryCleanupGuard&) = delete;
+    DirectoryCleanupGuard& operator=(const DirectoryCleanupGuard&) = delete;
 
     bool CreateUniqueSubdirectory(const std::string& parentDirectoryPath, const std::string& directoryNamePrefix);
-    bool TrackDirectoryForAutomaticCleanup(std::string directoryPath);
-    bool RemoveTrackedDirectory() noexcept;
-    void DisableAutomaticCleanup() noexcept;
+    bool ManageDirectory(std::string directoryPath);
+    bool RemoveManagedDirectory() noexcept;
+    void PreserveDirectory() noexcept;
 
     const std::string& GetDirectoryPath() const noexcept;
 
 private:
-    void MoveStateFrom(ScopedTemporaryDirectory& other) noexcept;
+    void MoveStateFrom(DirectoryCleanupGuard& other) noexcept;
 
-    std::string trackedDirectoryPath_;
-    bool automaticCleanupEnabled_{true};
+    std::string directoryPath_;
+    bool removeDirectoryOnDestruction_{true};
 };
 
 } // namespace ascendc
 
-#endif // ASCENDC_COMMON_SCOPED_TEMPORARY_DIRECTORY_H
+#endif // ASCENDC_COMMON_DIRECTORY_CLEANUP_GUARD_H
