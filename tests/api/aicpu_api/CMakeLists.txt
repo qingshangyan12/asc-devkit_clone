@@ -10,10 +10,18 @@
 project(ascendc_aicpu_api_tests)
 cmake_minimum_required(VERSION 3.16.0)
 
+# Single target covering both printf paths in one binary:
+#  - test_aicpu_dump.cpp      : legacy linear-buffer flow. AicpuGetDfxInfo is a
+#                               strong symbol (defined in test_aicpu_dump_fifo.cpp),
+#                               so printf() enters PrintfFifo and immediately falls
+#                               back to PrintfLegacy (hook cleared in SetUp).
+#  - test_aicpu_dump_fifo.cpp : FIFO ring-buffer flow. Provides the strong
+#                               AicpuGetDfxInfo + rts hook for full FIFO coverage.
 add_executable(ascendc_ut_aicpu_api
     ${ASCENDC_DIR}/tests/main.cpp
     ${ASCENDC_DIR}/impl/aicpu_api/aicpu_dump.cpp
     test_aicpu_dump.cpp
+    test_aicpu_dump_fifo.cpp
 )
 
 target_compile_definitions(ascendc_ut_aicpu_api PRIVATE
@@ -38,6 +46,11 @@ target_link_libraries(ascendc_ut_aicpu_api PRIVATE
     c_sec
     -Wl,--as-needed
 )
+
+# Route malloc() through __wrap_malloc() (defined in test_aicpu_dump_fifo.cpp)
+# so the temp-buffer allocation-failure path can be injected without hooking
+# the symbol at runtime (mockcpp malloc mocking is unsafe due to re-entry).
+target_link_options(ascendc_ut_aicpu_api PRIVATE "-Wl,--wrap=malloc")
 
 run_llt_test(
     TARGET ascendc_ut_aicpu_api

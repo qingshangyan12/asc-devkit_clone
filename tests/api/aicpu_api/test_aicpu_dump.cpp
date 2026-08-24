@@ -9,15 +9,29 @@
  */
 #include <gtest/gtest.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <mutex>
 #include <stdio.h>
 #include "securec.h"
 #include "aicpu_api/aicpu_api.h"
 #include <mockcpp/mockcpp.hpp>
 
+extern "C" {
+/* FIFO dispatch hook (defined in test_aicpu_dump_fifo.cpp). This binary
+ * provides a strong AicpuGetDfxInfo, so AscendC::printf() always enters
+ * PrintfFifo; with the hook cleared, AicpuGetDfxInfo returns -1 and the
+ * legacy linear-buffer flow runs as the fallback inside PrintfFifo. */
+extern int32_t (*g_utAicpuGetDfxInfoHook)(uint64_t* infoAddr);
+}
+
 class TEST_AICPU_DUMP : public testing::Test {
 protected:
-    void SetUp() {}
+    void SetUp()
+    {
+        /* Clear the FIFO hook so printf() dispatches to the legacy
+         * fallback inside PrintfFifo (see declaration above). */
+        g_utAicpuGetDfxInfoHook = nullptr;
+    }
     void TearDown() { GlobalMockObject::verify(); }
 };
 
