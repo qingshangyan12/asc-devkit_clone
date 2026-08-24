@@ -64,7 +64,7 @@
 - [交叉编译](./compilation_and_deployment/cross_compilation.md) — 适用于开发环境与运行环境架构不同的场景。
 - [编译过程调试](./compilation_and_deployment/compilation_debug.md) — 适用于遇到编译问题的场景。
 - [编译加速](./compilation_and_deployment/compilation_acceleration.md) — 适用于需要加速构建的场景。
-- [简化Key二进制配置JSON](./compilation_and_deployment/simplified_key_json_configuration.md) — 适用于按自定义Key编译多份binary的场景。
+- [simplified key二进制配置JSON](./compilation_and_deployment/simplified_key_json_configuration.md) — 适用于按自定义Key编译多份binary的场景。
 
 ### 调用验证
 
@@ -73,7 +73,7 @@
 
 `[扩展]`：
 - [运行时加载机制](./invocation/runtime_loading_mechanism.md) — 适用于需要了解二段式调用模型和代码写法如何影响运行表现的场景。
-- [基于简化Key的运行时选择流程](./invocation/simplified_key_runtime_flow.md) — 适用于需要了解运行时如何选择预编译binary的场景。
+- [基于simplified key的运行时选择流程](./invocation/simplified_key_runtime_flow.md) — 适用于需要了解运行时如何选择预编译binary的场景。
 
 ### 参考文档
 

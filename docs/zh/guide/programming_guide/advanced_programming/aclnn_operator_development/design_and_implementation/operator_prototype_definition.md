@@ -181,7 +181,7 @@ TilingData字段设计、Tiling函数写法、workspace设置和`numBlocks`配�
 
 ## 注册GenSimplifiedKey回调
 
-当算子需要依据运行时输入、输出或属性，从多份预编译核函数（Kernel）binary中快速选择一份时，可以注册`GenSimplifiedKey`回调。回调由算子开发者编写，只负责生成自定义简化Key片段；运行时框架负责在该片段前补齐算子类型和运行时公共维度，使用完整Key查找并选择对应的binary。
+当算子需要依据运行时输入、输出或属性，从多份预编译核函数（Kernel）binary中快速选择一份时，可以注册`GenSimplifiedKey`回调。回调由算子开发者编写，只负责生成自定义simplified key片段；运行时框架负责在该片段前补齐算子类型和运行时公共维度，使用完整Key查找并选择对应的binary。
 
 在已有Tiling注册的`AICore()`链式调用中增加`SetGenSimplifiedKey`即可：
 
@@ -289,6 +289,6 @@ OP_ADD(AddCustom);
 
 - [算子功能设计](./operator_function_design.md)：了解如何确定算子的输入输出、属性和Host侧Tiling设计。
 - [Host侧Tiling实现](./host_tiling_implementation.md)：了解TilingData定义、Tiling函数编写和`SetTiling`关联关系。
-- [GenSimplifiedKey回调实现](./gen_simplified_key.md)：了解如何为预编译核函数（Kernel）binary生成自定义简化Key片段。
+- [GenSimplifiedKey回调实现](./gen_simplified_key.md)：了解如何为预编译核函数（Kernel）binary生成自定义simplified key片段。
 - [核函数（Kernel）侧算子实现](./kernel_operator_implementation.md)：了解核函数（Kernel）入口格式、参数顺序和TilingData读取方式。
 - [命名转换规则对照表](../appendix/naming_conversion_table.md)：了解OpType、核函数（Kernel）入口和aclnn接口之间的命名转换关系。
