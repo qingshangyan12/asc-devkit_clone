@@ -46,10 +46,6 @@ target_compile_definitions(ub_usage_limit PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
 )
 
-target_link_libraries(ub_usage_limit PRIVATE
-    m
-)
-
 string(FIND "${CMAKE_ASC_FLAGS}" "--cce-disable-vf-stack-reserved-ubuf" CASE1_DISABLE_VF_RESERVED_POS)
 string(FIND "${CMAKE_ASC_FLAGS}" "--cce-disable-asc-reserved-ubuf" CASE1_DISABLE_ASC_RESERVED_POS)
 if(NOT CASE1_DISABLE_VF_RESERVED_POS EQUAL -1)

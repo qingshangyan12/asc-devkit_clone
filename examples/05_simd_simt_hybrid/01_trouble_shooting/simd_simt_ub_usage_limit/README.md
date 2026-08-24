@@ -17,7 +17,6 @@
 ```text
 ├── simd_simt_ub_usage_limit
 │   ├── CMakeLists.txt                   // cmake编译文件
-│   ├── ub_usage_limit_common.h          // 公共声明和工具函数
 │   ├── case0_ub_out_of_bounds.asc       // Case 0样例实现
 │   ├── case1_ub_limit.asc               // Case 1样例实现
 │   ├── case2_ub_layout.asc              // Case 2样例实现
@@ -38,7 +37,7 @@
 | Case 0 | 输出精度异常定位 | 展现输出精度异常，并通过执行状态、计算逻辑和访问范围排查定位原因、验证修复方法 |
 | Case 1 | 不同VF场景下的UB可用上限 | 确定不同VF调用、预留空间和Data Cache配置下的UB可用上限 |
 | Case 2 | 不同执行位置的静态UB和动态UB布局 | 说明MainScalar、SIMD VF和SIMT VF中的静态UB和动态UB布局关系 |
-| Case 3 | 不同执行位置的UB越界访问结果 | 说明MainScalar写目标UB区域和SIMT VF读目标UB区域时的运行及精度结果 |
+| Case 3 | 不同执行位置的UB越界访问结果 | 说明MainScalar和SIMT VF越界访问UB区域时的结果 |
 
 **样例规格**：
 
@@ -66,7 +65,7 @@ Case 0可使用`[8192]`或`[10240]`输入输出；Case 3使用`[512]`输入输�
 | Case 0 | 0-1 | 展示UB访问范围计算错误引发的精度问题及修复结果 |
 | Case 1 | 2-5 | 对比不调用VF、仅调用SIMD VF、仅调用SIMT VF、同时调用SIMD VF和SIMT VF时的UB最大可用上限 |
 | Case 2 | 6 | 展示MainScalar、SIMD VF和SIMT VF中的静态UB和动态UB布局关系 |
-| Case 3 | 7-14 | 对比MainScalar写目标UB区域和SIMT VF读目标UB区域后的运行及精度结果 |
+| Case 3 | 7-14 | 对比MainScalar写目标UB区域和SIMT VF写目标UB区域后的运行及精度结果 |
 
 ### Case 0：输出精度异常定位
 
@@ -288,7 +287,7 @@ test pass!
 
 **结论**：
 
-出现UB越界访问时，不一定触发Kernel运行错误，日志中也不一定有明确的异常信息。本Case中，`bias`越界写入Data Cache，可能破坏SIMT访问GM时缓存的数据，并最终表现为精度异常。因此，定位UB越界导致的精度问题时，除了观察日志结果，还需要结合计算逻辑和运行时参数计算出的实际访问范围一起排查。
+出现UB越界访问时，不一定触发Kernel运行错误，日志中也不一定有明确的异常信息。本Case中，`bias`越界写入Data Cache，破坏了SIMT访问GM时缓存的数据，并最终表现为精度异常。因此，定位UB越界导致的精度问题时，除了观察日志结果，还需要结合计算逻辑和运行时参数计算出的实际访问范围一起排查。
 
 Case 0说明了UB访问越界可能表现为精度异常。混合编程场景涉及MainScalar、SIMD VF、SIMT VF等不同执行位置，UB既是各执行位置申请静态或动态内存的空间，也用于VF与MainScalar之间的数据通信。为避免开发者越界使用UB，下面通过Case 1～3说明不同VF配置下的UB可用上限、静态UB与动态UB的布局关系，以及越界访问不同区域时的结果。
 
@@ -377,10 +376,10 @@ __global__ __vector__ void ub_limit_simd_simt_vf_kernel(__gm__ uint32_t* output)
 [Case1] result=PASSED
 ```
 
-将`static_ub`的申请大小从当前场景的理论UB可用上限增加到“理论UB可用上限+4B”后，Kernel启动失败，并输出如下错误信息：
+将`static_ub`的申请大小从当前场景的理论UB可用上限增加到“理论UB可用上限+4B”后，Kernel启动失败，关键错误信息如下：
 
 ```text
-[Host] kernel error: ... the sum of dynamic shared memory and kernel shared memory exceeds the maximum limit.
+[Host] kernel error: ... Reason: the sum of dynamic shared memory and kernel shared memory exceeds the maximum limit.
 [ERROR] [Bisheng] Launch kernel failure! ret 107000
 ```
 
@@ -445,13 +444,13 @@ MainScalar、SIMD VF和SIMT VF中声明的静态UB共同占用当前Kernel的静
 
 **样例目标**：
 
-申请一块静态UB空间，构造MainScalar和SIMT VF访问目标UB区域的场景，观察不同执行位置越界访问UB区域时的结果。
+申请一块静态UB空间，构造MainScalar和SIMT VF越界访问UB区域的场景，观察不同执行位置越界访问UB区域的结果。
 
 **核心实现**：
 
-本Case申请4KB静态UB数组`static_ub`，前2KB存放输入数据`input`，后2KB存放用于计算输出的`bias`。`output`写回GM，计算关系为`output = input + bias`。Kernel先在合法UB范围内准备`input`和`bias`，再根据场景选择不同执行位置访问目标UB区域。
+申请4KB静态UB数组`static_ub`，前2KB存放输入数据`input`，后2KB存放用于计算输出的校准值`bias`。`output`写回GM，计算关系为`output = input + bias`。Kernel先在申请静态UB内准备`input`和`bias`，再选择不同执行位置访问目标UB区域。
 
-访问目标UB区域的方式分为两类。MainScalar访问场景中，MainScalar将合法`bias`额外写入目标UB区域，随后SIMT VF仍从合法`bias`区域读取数据并计算输出。SIMT VF访问场景中，SIMT VF在计算输出时直接从目标UB区域读取`bias`。
+对于越界访问目标UB区域，本Case构造MainScalar写和SIMT VF写两个场景。MainScalar写场景中，MainScalar将`bias`额外写入目标UB区域，随后SIMT VF仍从`static_ub`中读取`bias`计算输出；SIMT VF写场景中，SIMT VF将`bias`额外写入目标UB区域，再从`static_ub`中读取`bias`并计算输出。
 
 Case 3未添加关闭预留空间的编译选项，不配置动态UB。在该配置下，Data Cache达到128KB上限。根据[3510架构规格](../../../../docs/zh/guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_3510.md#compile-options-description)和[SIMT内存层级](../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/memory_hierarchy.md)，Data Cache之前还包含8KB预留空间。Case 3的UB布局计算如下：
 
@@ -470,7 +469,7 @@ Data Cache起点 = 256KB - 128KB = 128KB
 
 | 目标区域 | 目标起始偏移 | `access_index` | 2KB目标范围 |
 | --- | ---: | ---: | --- |
-| 静态UB合法范围 | 2048B | 512 | [2KB, 4KB) |
+| 静态UB | 2048B | 512 | [2KB, 4KB) |
 | 未被占用的普通UB空间 | 63488B | 15872 | [62KB, 64KB) |
 | 预留空间 | 122880B | 30720 | [120KB, 122KB) |
 | Data Cache | 131072B | 32768 | [128KB, 130KB) |
@@ -479,12 +478,12 @@ Case 3通过`SCENARIO_NUM`选择访问方式和目标区域：
 
 | SCENARIO_NUM | 访问方式 | 目标区域 |
 | --- | --- | --- |
-| 7 / 11 | MainScalar写 / SIMT VF读 | 静态UB合法范围 |
-| 8 / 12 | MainScalar写 / SIMT VF读 | 未被占用的普通UB空间 |
-| 9 / 13 | MainScalar写 / SIMT VF读 | 预留空间 |
-| 10 / 14 | MainScalar写 / SIMT VF读 | Data Cache |
+| 7 / 11 | MainScalar写 / SIMT VF写 | 静态UB |
+| 8 / 12 | MainScalar写 / SIMT VF写 | 未被占用的普通UB空间 |
+| 9 / 13 | MainScalar写 / SIMT VF写 | 预留空间 |
+| 10 / 14 | MainScalar写 / SIMT VF写 | Data Cache |
 
-Kernel根据运行时下标`access_index`访问选定目标区域。公共准备阶段先由SIMT VF将`input`和合法`bias`写入`static_ub`：
+Kernel根据运行时下标`access_index`访问选定目标区域，关键代码如下。公共准备阶段先由SIMT VF将`input`和`bias`写入`static_ub`：
 
 ```cpp
 constexpr uint32_t UB_BYTES = 4 * 1024;
@@ -503,7 +502,7 @@ __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void simt_prepare_input_ub(
 }
 ```
 
-MainScalar访问场景中，`access_index`作为目标写入起始下标。MainScalar将合法`bias`额外写入目标UB区域，随后SIMT VF仍从合法`bias`区域读取数据并计算输出：
+MainScalar访问场景中，MainScalar将`bias`额外写入目标UB区域：
 
 ```cpp
 __aicore__ inline void copy_bias_to_target_by_scalar(__ubuf__ uint32_t* static_ub, uint32_t bias_index)
@@ -514,8 +513,25 @@ __aicore__ inline void copy_bias_to_target_by_scalar(__ubuf__ uint32_t* static_u
         static_ub_ptr[bias_index + index] = bias;
     }
 }
+```
 
-__simt_vf__ __launch_bounds__(THREAD_COUNT) inline void simt_store_output_with_legal_bias(
+SIMT VF访问场景中，SIMT VF将`bias`额外写入目标UB区域：
+
+```cpp
+__simt_vf__ __launch_bounds__(THREAD_COUNT) inline void simt_copy_bias_to_target(
+    __ubuf__ uint32_t* static_ub, uint32_t bias_index)
+{
+    for (uint32_t index = threadIdx.x; index < DATA_WORDS; index += blockDim.x) {
+        const uint32_t bias = static_ub[BIAS_OFFSET + index];
+        static_ub[bias_index + index] = bias;
+    }
+}
+```
+
+写入目标UB区域后，SIMT VF从`static_ub`中的`bias`区域读取数据并计算输出：
+
+```cpp
+__simt_vf__ __launch_bounds__(THREAD_COUNT) inline void simt_store_output_with_prepared_bias(
     __gm__ const uint32_t* input, __ubuf__ uint32_t* static_ub, __gm__ uint32_t* output)
 {
     for (uint32_t index = threadIdx.x; index < DATA_WORDS; index += blockDim.x) {
@@ -526,58 +542,20 @@ __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void simt_store_output_with_l
 }
 ```
 
-SIMT VF访问场景中，`access_index`作为`bias`读取起始下标。SIMT VF在计算输出时直接从目标UB区域读取`bias`：
-
-```cpp
-__simt_vf__ __launch_bounds__(THREAD_COUNT) inline void simt_store_output_with_target_bias(
-    __gm__ const uint32_t* input, __ubuf__ uint32_t* static_ub, __gm__ uint32_t* output, uint32_t bias_index)
-{
-    for (uint32_t index = threadIdx.x; index < DATA_WORDS; index += blockDim.x) {
-        const uint32_t input_data = input[index];
-        const uint32_t bias = static_ub[bias_index + index];
-        output[index] = input_data + bias;
-    }
-}
-```
-
-两个Kernel的调用流程如下：
-
-```cpp
-__global__ __vector__ void scalar_ub_access_result_kernel(
-    __gm__ const uint32_t* input, __gm__ uint32_t* output, uint32_t access_index)
-{
-    __ubuf__ uint32_t static_ub[UB_WORDS];
-    ...
-    asc_vf_call<simt_prepare_input_ub>(dim3(THREAD_COUNT), input, static_ub);
-    copy_bias_to_target_by_scalar(static_ub, access_index);
-
-    asc_vf_call<simt_store_output_with_legal_bias>(dim3(THREAD_COUNT), input, static_ub, output);
-}
-
-__global__ __vector__ void simt_vf_ub_access_result_kernel(
-    __gm__ const uint32_t* input, __gm__ uint32_t* output, uint32_t access_index)
-{
-    __ubuf__ uint32_t static_ub[UB_WORDS];
-    ...
-    asc_vf_call<simt_prepare_input_ub>(dim3(THREAD_COUNT), input, static_ub);
-    asc_vf_call<simt_store_output_with_target_bias>(dim3(THREAD_COUNT), input, static_ub, output, access_index);
-}
-```
-
 **执行结果**：
 
 不同访问配置的执行结果如下：
 
-| 访问方式 | 目标区域 | 启动/同步结果 | 精度结果 | 结果说明 |
-| --- | --- | --- | --- | --- |
-| MainScalar写 | 静态UB合法范围 | 成功 | 通过 | 合法访问 |
-| MainScalar写 | 未被占用的普通UB空间 | 成功 | 通过 | 已越界，本次运行未出现可见异常 |
-| MainScalar写 | 预留空间 | 成功 | 通过 | 已越界，本次运行未出现可见异常 |
-| MainScalar写 | Data Cache | 成功 | 失败 | 缓存数据被破坏，但未报告运行错误 |
-| SIMT VF读 | 静态UB合法范围 | 成功 | 通过 | 合法访问 |
-| SIMT VF读 | 未被占用的普通UB空间 | 失败 | - | VEC访问UB越界 |
-| SIMT VF读 | 预留空间 | 失败 | - | VEC访问UB越界 |
-| SIMT VF读 | Data Cache | 失败 | - | VEC访问UB越界 |
+| SCENARIO_NUM | 访问方式 | 目标区域 | Kernel运行结果 | 精度结果 | 结果说明 |
+| --- | --- | --- | --- | --- | --- |
+| 7 | MainScalar写 | 静态UB合法范围 | 成功 | 通过 | 合法访问 |
+| 8 | MainScalar写 | 未被占用的普通UB空间 | 成功 | 通过 | 已越界，本次运行未出现可见异常 |
+| 9 | MainScalar写 | 预留空间 | 成功 | 通过 | 已越界，本次运行未出现可见异常 |
+| 10 | MainScalar写 | Data Cache | 成功 | 失败 | 未报告运行错误，但出现精度异常 |
+| 11 | SIMT VF写 | 静态UB合法范围 | 成功 | 通过 | 合法访问 |
+| 12 | SIMT VF写 | 未被占用的普通UB空间 | 失败 | - | VEC访问UB越界 |
+| 13 | SIMT VF写 | 预留空间 | 失败 | - | VEC访问UB越界 |
+| 14 | SIMT VF写 | Data Cache | 失败 | - | VEC访问UB越界 |
 
 MainScalar写静态UB合法范围、未被占用的普通UB空间和预留空间时，运行未观察到精度异常，日志中输出如下信息：
 
@@ -591,25 +569,27 @@ MainScalar写Data Cache时，运行出现精度异常，日志中输出如下信
 [Failed] Case accuracy verification failed!
 ```
 
-SIMT VF读静态UB合法范围时，运行未观察到精度异常，日志中输出如下信息：
+SIMT VF写静态UB合法范围时，运行未观察到精度异常，日志中输出如下信息：
 
 ```text
 test pass!
 ```
 
-SIMT VF读未被占用的普通UB空间、预留空间和Data Cache时，Kernel同步失败，日志中输出如下信息：
+SIMT VF写未被占用的普通UB空间、预留空间和Data Cache时，Kernel同步失败，关键错误信息如下：
 
 ```text
-[Host] kernel error: ... The address for VEC to access UB is out of bounds.
+[Case3] mode=simt_vf, region=unallocated_ub
+[Host] kernel error: EZ9999: Inner Error!
+The extend info: errcode:(341) errorStr: The address for VEC to access UB is out of bounds. subErrType: 0x4.
 ```
 
 **分析**：
 
-精度校验通过只能说明本次运行没有观察到精度异常，不能说明申请的静态UB后面的区域可以越界访问。[SIMT内存层级](../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/memory_hierarchy.md#共享内存大小的限制)指出，访问超出已申请的静态UB或动态UB范围后，不一定立即表现为内存分配失败，但可能破坏Data Cache并导致计算结果不稳定或精度异常。表中结果只用于展示不同执行位置访问不同UB区域时观察到的现象，不能作为越界访问合法或越界区域未被使用的依据。
+精度校验通过只能说明输出数据未观察到精度异常，不能说明申请的静态UB后面的区域可以越界访问。[SIMT内存层级](../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/memory_hierarchy.md#共享内存大小的限制)指出，访问超出已申请的静态UB或动态UB范围后，不一定立即表现为内存分配失败，但可能破坏Data Cache并导致计算结果不稳定或精度异常。当前结果中，MainScalar写Data Cache未报告运行错误但出现精度异常；SIMT VF写越界目标区域则触发VEC访问UB越界错误。
 
 **结论**：
 
-UB越界访问未被占用的普通UB空间或预留空间属于未定义行为，运行可能没有可见异常；访问Data Cache时，可能表现为精度异常。不同执行位置的越界访问现象也可能不同：MainScalar写Data Cache未报告运行错误但出现精度异常，SIMT VF读取越界目标区域则触发VEC访问UB越界错误。
+访问UB时，应确保访问范围不超过已申请的UB范围。越界访问未被占用的普通UB空间、预留空间和Data Cache，都属于错误访问；其中写入Data Cache可能破坏SIMT访问GM使用的数据缓存，导致结果不稳定或精度异常。不同执行位置对UB越界访问的表现不同：MainScalar越界写不报告运行错误但可能出现精度异常，SIMT VF越界访问则会触发VEC访问UB越界错误。
 
 ## 编译运行
 
@@ -705,10 +685,10 @@ make -j
     [Case1] result=PASSED
     ```
 
-    在理论UB上限基础上多申请一个`uint32_t`元素后，Kernel启动失败，日志中输出如下信息：
+    在理论UB上限基础上多申请一个`uint32_t`元素后，Kernel启动失败，关键错误信息如下：
 
     ```text
-    [Host] kernel error: ... the sum of dynamic shared memory and kernel shared memory exceeds the maximum limit.
+    [Host] kernel error: ... Reason: the sum of dynamic shared memory and kernel shared memory exceeds the maximum limit.
     [ERROR] [Bisheng] Launch kernel failure! ret 107000
     ```
 
@@ -741,9 +721,10 @@ make -j
     [Failed] Case accuracy verification failed!
     ```
 
-    SIMT VF读越界目标区域时，Kernel同步失败，日志中输出如下信息：
+    SIMT VF写越界目标区域时，Kernel同步失败，关键错误信息如下：
 
     ```text
     [Case3] mode=simt_vf, region=unallocated_ub
-    [Host] kernel error: ... The address for VEC to access UB is out of bounds.
+    [Host] kernel error: EZ9999: Inner Error!
+    The extend info: errcode:(341) errorStr: The address for VEC to access UB is out of bounds. subErrType: 0x4.
     ```
