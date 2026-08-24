@@ -45,13 +45,10 @@ private:
     HcclResult GetStepInfo(u32 step, u32 nSteps, AicpuNHRStepInfo& stepInfo);
     u32 GetRankFromMap(const u32 algRankIdx) const;
 
-    // 末步直读output的使能条件；不满足时回退到全量scratch中转
     bool CanReadLastStepToOutput() const;
-    // input/output同址同布局时，本rank自己那份slice无需回拷
     bool CanSkipOwnSliceCopy() const;
     bool IsLastStepReadSlice(u32 algRank) const;
 
-    // 按port group权重为普通块和尾块生成每个channel的size/offset
     HcclResult PrepareDataSplitForMultiChannel(const TemplateResource& templateResource);
 
     HcclResult LocalDataCopy(const std::vector<ThreadHandle>& threads, const u32& channelIdx);
@@ -106,14 +103,11 @@ private:
 
     TemplateDataParams tempAlgParams_;
 
-    // PCIe链路上使用DMA Read，其余场景使用Batch Write
     bool isDmaRead_{false};
     bool readLastStepToOutput_{false};
     bool skipOwnSliceCopy_{false};
-    // 记录已由末步直接读入output的slice，PostLocalCopy需要跳过
     std::vector<u32> lastStepReadSliceIdxs_;
 
-    // 执行按min循环保证每个peer都有对应channel，资源按max申请保证够用
     u32 channelsPerRank_{1};
     u32 maxChannelsPerRank_{1};
 

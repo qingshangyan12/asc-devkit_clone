@@ -14,7 +14,6 @@
 
 namespace mc2_ops_hccl {
 namespace {
-// 末步与PostLocalCopy并行时，主通信thread向PostCopy thread前同步使用的notify下标
 constexpr u32 POST_COPY_NOTIFY_IDX = 1;
 } // namespace
 
@@ -30,13 +29,11 @@ HcclResult InsTempAllGatherNHR::CalcRes(
     AlgResourceRequest& resourceRequest)
 {
     CHK_PTR_NULL(topoInfo);
-    // 必须先算出channel，再由channel数决定线程与notify数量，最后调用GetRes
     std::vector<HcclChannelDesc> level1Channels;
     std::vector<HcclChannelDesc> myChannelDescs;
     const u64 perDataSize = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
     const u64 dataSize = param.DataDes.count * perDataSize;
     if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
-        // 完整1D Mesh或小数据走共享口时延更低，仅CLOS大数据才按独立端口切分以叠加带宽
         const bool isIsolation =
             !(IsAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH) || dataSize <= SMALL_SIZE_512KB);
         CHK_RET(CalcChannelRequestNhrMultiJetty(comm, param, topoInfo, subCommRanks_, myChannelDescs, isIsolation));
@@ -55,7 +52,6 @@ HcclResult InsTempAllGatherNHR::CalcRes(
     resourceRequest.channels.push_back(level1Channels);
     channelsPerRank_ = CalcChannelsPerRankMin(level1Channels);
     maxChannelsPerRank_ = CalcChannelsPerRank(level1Channels);
-    // 与HCCL一致：超限只记录错误日志后继续，不阻断有效输入
     if (channelsPerRank_ > MAX_JETTY_NUM) {
         HCCL_ERROR(
             "[InsTempAllGatherNHR][CalcRes] channelsPerRank_ %u is greater than MAX_JETTY_NUM %u", channelsPerRank_,
@@ -74,7 +70,6 @@ HcclResult InsTempAllGatherNHR::GetRes(AlgResourceRequest& resourceRequest) cons
     u32 threadNum = GetThreadNum();
     HCCL_INFO("[InsTempAllGatherNHR][GetRes] threadNum[%u]", threadNum);
     resourceRequest.slaveThreadNum = threadNum - 1;
-    // 一个notify用于主从流之间的同步，另一个用于PostLocalCopy和NHR最后一个step并行执行时的前同步
     resourceRequest.notifyNumPerThread.assign(resourceRequest.slaveThreadNum, 2);
     resourceRequest.notifyNumOnMainThread = threadNum - 1;
     return HCCL_SUCCESS;
@@ -82,7 +77,6 @@ HcclResult InsTempAllGatherNHR::GetRes(AlgResourceRequest& resourceRequest) cons
 
 u64 InsTempAllGatherNHR::GetThreadNum() const
 {
-    // 多申请一倍的流用来做PostLocalCopy和NHR最后一个step并行执行
     return maxChannelsPerRank_ * 2;
 }
 
@@ -99,7 +93,6 @@ HcclResult InsTempAllGatherNHR::PrepareDataSplitForMultiChannel(const TemplateRe
     const u32 dataTypeSize = DATATYPE_SIZE_TABLE[dataType_];
     const u64 totalDataCount = tempAlgParams_.sliceSize / dataTypeSize;
     if (templateResource.channels.empty() || templateResource.channels.begin()->second.empty()) {
-        // 没有channel信息时退化为单块，保证单channel场景行为不变
         dataSplit_.assign(1, tempAlgParams_.sliceSize);
         dataOffset_.assign(1, 0);
         if (tempAlgParams_.tailSize > 0) {
@@ -145,9 +138,6 @@ HcclResult InsTempAllGatherNHR::KernelRun(
             myRank_, tempAlgParams_.sliceSize, tempAlgParams_.tailSize, checkDataTypeSize),
         HcclResult::HCCL_E_PARA);
 
-    // 精确算法名InsAllGatherNHR运行时不调用SetchannelsPerRank，channelsPerRank_保持默认值1，
-    // 即只使用channel 0、一条主通信thread和一条PostCopy thread。Host侧CalcRes仍可能按
-    // MultiJetty结果申请更多资源，此处不得据此扩大运行时使用的channel数。
     threadNum_ = GetThreadNum();
     CHK_PRT_RET(
         threadNum_ > templateResource.threads.size(),
@@ -162,7 +152,7 @@ HcclResult InsTempAllGatherNHR::KernelRun(
             channelsPerRank_, maxChannelsPerRank_),
         HcclResult::HCCL_E_INTERNAL);
 
-    isDmaRead_ = IsPcieProtocol(templateResource.channels); // PCIe链路上Read优于Write
+    isDmaRead_ = IsPcieProtocol(templateResource.channels);
     HCCL_DEBUG("[InsTempAllGatherNHR] Use Dma Read[%d]", isDmaRead_);
     CHK_RET(PrepareDataSplitForMultiChannel(templateResource));
     readLastStepToOutput_ = CanReadLastStepToOutput();
@@ -180,13 +170,12 @@ HcclResult InsTempAllGatherNHR::KernelRun(
 
     for (u32 channelIdx = 0; channelIdx < channelsPerRank_; channelIdx++) {
         bool postLocalCopyLaunched = false;
-        CHK_RET(LocalDataCopy(templateResource.threads, channelIdx)); // input buffer拷贝到scratch buffer上
+        CHK_RET(LocalDataCopy(templateResource.threads, channelIdx));
         if (templateRankSize_ > 1) {
             CHK_RET(RunAllGatherNHR(
                 templateResource.threads, templateResource.channels, channelIdx, postLocalCopyLaunched));
         }
         if (!postLocalCopyLaunched) {
-            // 末步未启用直读output时，仍在本channel对应的通信thread上串行回拷
             CHK_RET(PostLocalCopy(templateResource.threads[channelIdx], channelIdx));
         }
     }
@@ -261,8 +250,6 @@ HcclResult InsTempAllGatherNHR::BuildStepSlices(
             SliceCalcInfo info = CalcSliceInfo(stepInfo, rpt, i, channelIdx);
 
             if (mode == StepBuildMode::LAST_STEP_READ_TO_OUTPUT) {
-                // 末步时对端CCL buffer已持有全部rx slice：rx[0]是它自己那份，rx[1..]是前序step收到的。
-                // 直接读入output，本地scratch不再落这批数据。
                 const u64 rxOutputOff = tempAlgParams_.buffInfo.outBuffBaseOff +
                                         rpt * tempAlgParams_.outputRepeatStride +
                                         tempAlgParams_.outputSliceStride * info.rxIdx + info.rxPartialOffset;
@@ -303,7 +290,6 @@ HcclResult InsTempAllGatherNHR::RunLastStepReadToOutput(
         channelSend, channelRecv, stepInfo, channelIdx, txSrcSlices, txDstSlices, rxSrcSlices, rxDstSlices));
 
     if (rxSrcSlices.empty()) {
-        // 没有可直读的slice时不启动额外PostCopy thread，交由普通PostLocalCopy处理
         return HcclResult::HCCL_SUCCESS;
     }
 
@@ -315,8 +301,6 @@ HcclResult InsTempAllGatherNHR::RunLastStepReadToOutput(
             threads.size()),
         HcclResult::HCCL_E_INTERNAL);
 
-    // 末步不再往本地scratch写数据，因此前序step一结束，PostLocalCopy就可以搬运已在scratch中的slice，
-    // 与主通信thread读取剩余slice并行。
     CHK_RET(PreSyncInterThreads(threads[channelIdx], {threads[postCopyThreadIdx]}, {POST_COPY_NOTIFY_IDX}));
     CHK_RET(PostLocalCopy(threads[postCopyThreadIdx], channelIdx));
     postLocalCopyLaunched = true;
@@ -337,9 +321,8 @@ HcclResult InsTempAllGatherNHR::RunStepNHR(
     const u32& channelIdx, u32 step, u32 nSteps, bool& postLocalCopyLaunched)
 {
     AicpuNHRStepInfo stepInfo;
-    CHK_RET(GetStepInfo(step, nSteps, stepInfo)); // 计算当前step要通信的卡，数据
+    CHK_RET(GetStepInfo(step, nSteps, stepInfo));
 
-    // 所有校验必须在提交本step第一个通信任务之前完成
     const u32 fromRankKey = GetRankFromMap(stepInfo.fromRank);
     const u32 toRankKey = GetRankFromMap(stepInfo.toRank);
     CHK_PRT_RET(
@@ -358,7 +341,6 @@ HcclResult InsTempAllGatherNHR::RunStepNHR(
         "[InsTempAllGatherNHR] rank[%u] rankSize[%u] recvFrom[%u] sendTo[%u] step[%u] nSteps[%u] nSlices[%u]", myRank_,
         templateRankSize_, stepInfo.fromRank, stepInfo.toRank, step, nSteps, stepInfo.nSlices);
 
-    // nSlices<=1时没有可与本地拷贝重叠的余量，走普通路径
     const bool readLastStepToOutput = readLastStepToOutput_ && step == nSteps - 1 && stepInfo.nSlices > 1;
     if (readLastStepToOutput) {
         CHK_RET(RunLastStepReadToOutput(
@@ -373,8 +355,6 @@ HcclResult InsTempAllGatherNHR::RunStepNHR(
     CHK_RET(BuildNormalStepSlices(
         channelSend, channelRecv, stepInfo, channelIdx, txSrcSlices, txDstSlices, rxSrcSlices, rxDstSlices));
 
-    // write模式使用tx, rx地址不生效，仅使用对端link做Post/Wait
-    // read 模式使用rx, tx地址不生效，仅使用对端link做Post/Wait
     TxRxSlicesList sendRecvSlicesList({txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices});
     TxRxChannels sendRecvChannels(channelSend, channelRecv);
     SendRecvInfo sendRecvInfo(sendRecvChannels, sendRecvSlicesList, dataType_);
@@ -396,7 +376,7 @@ HcclResult InsTempAllGatherNHR::RunAllGatherNHR(
     const std::vector<ThreadHandle>& threads, const std::map<u32, std::vector<ChannelInfo>>& channels,
     const u32& channelIdx, bool& postLocalCopyLaunched)
 {
-    const u32 nSteps = GetNHRStepNum(templateRankSize_); // NHR 通信步数， ceil(log2(rankSize))
+    const u32 nSteps = GetNHRStepNum(templateRankSize_);
     lastStepReadSliceIdxs_.clear();
 
     for (u32 step = 0; step < nSteps; ++step) {
@@ -420,7 +400,6 @@ HcclResult InsTempAllGatherNHR::GetStepInfo(u32 step, u32 nSteps, AicpuNHRStepIn
     u32 recvFrom = (myAlgRank + templateRankSize_ - deltaRank) % templateRankSize_;
     u32 sendTo = (myAlgRank + deltaRank) % templateRankSize_;
 
-    // 数据份数和数据编号增量， NHR是一个传输数据变化的
     u32 nSlices = (templateRankSize_ - 1 + (1 << (nSteps - 1 - step))) / (1 << (nSteps - step));
     u32 deltaSliceIndex = 1 << (nSteps - step);
     u32 txSliceIdx = myAlgRank;
@@ -450,7 +429,6 @@ HcclResult InsTempAllGatherNHR::LocalDataCopy(const std::vector<ThreadHandle>& t
     const u32 dataTypeSize = DATATYPE_SIZE_TABLE[dataType_];
     u64 partialSliceSize = dataSplit_[channelIdx];
     u64 partialOffset = dataOffset_[channelIdx];
-    // 尾块模式
     if (tempAlgParams_.tailSize != 0 && myAlgRank == templateRankSize_ - 1) {
         partialSliceSize = dataSplitTail_[channelIdx];
         partialOffset = dataOffsetTail_[channelIdx];
@@ -496,7 +474,6 @@ HcclResult InsTempAllGatherNHR::PostLocalCopy(const ThreadHandle& thread, const 
             if (readLastStepToOutput_ && IsLastStepReadSlice(algRank)) {
                 continue;
             }
-            // 尾块模式；每个rank重新取值，避免尾块长度污染后续rank
             u64 partialSliceSize = dataSplit_[channelIdx];
             u64 partialOffset = dataOffset_[channelIdx];
             if (tempAlgParams_.tailSize != 0 && algRank == templateRankSize_ - 1) {
