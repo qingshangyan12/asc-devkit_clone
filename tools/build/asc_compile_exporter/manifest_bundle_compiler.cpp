@@ -34,7 +34,7 @@ namespace {
 constexpr uint32_t BUNDLE_BUILD_TIMEOUT_MINUTES = 30U;
 constexpr uint32_t BUNDLE_BUILD_TERMINATION_GRACE_SECONDS = 5U;
 
-bool CreatePrivateBundleWorkspace(
+bool CreatePrivateBundleWorkspaceDirectory(
     const std::string& requestedParentDirectoryPath, DirectoryCleanupGuard& bundleWorkspace)
 {
     const char* configuredTemporaryDirectory = std::getenv("TMPDIR");
@@ -55,27 +55,20 @@ bool CreatePrivateBundleWorkspace(
 
 } // namespace
 
-ManifestBundleCompiler::ManifestBundleCompiler(ManifestBundleBuildRequest request) noexcept
+ManifestBundleCompiler::ManifestBundleCompiler(BuildCollectedBundleRequest request) noexcept
     : request_(std::move(request))
 {}
 
-bool ManifestBundleCompiler::BuildBundle(
-    const std::string& buildWorkspacePath, const std::string& stagedBundlePath) const
+bool ManifestBundleCompiler::BuildBundle(const std::string& workDir, const std::string& output) const
 {
     ASCENDLOGD(
         "Building bundle with make=%s compiler=%s jobs=%u", request_.makeExecutable.c_str(),
-        request_.cxxCompiler.c_str(), request_.parallelJobCount);
+        request_.cxxCompiler.c_str(), request_.jobs);
     ProcessExecutorRequest executionRequest;
     executionRequest.arguments = {
-        request_.makeExecutable,
-        "-C",
-        buildWorkspacePath,
-        "-f",
-        "Makefile",
-        "-B",
-        "-j" + std::to_string(request_.parallelJobCount)};
+        request_.makeExecutable, "-C", workDir, "-f", "Makefile", "-B", "-j" + std::to_string(request_.jobs)};
     executionRequest.environmentOverrides = {
-        {"ASCENDC_BUNDLE_CXX", request_.cxxCompiler}, {"ASCENDC_BUNDLE_OUTPUT", stagedBundlePath}};
+        {"ASCENDC_BUNDLE_CXX", request_.cxxCompiler}, {"ASCENDC_BUNDLE_OUTPUT", output}};
     executionRequest.removedEnvironmentVariables = {"MAKEFLAGS", "MFLAGS", "MAKEFILES", "GNUMAKEFLAGS"};
     executionRequest.outputMode = ProcessOutputMode::Inherit;
     executionRequest.executionTimeout = std::chrono::minutes(BUNDLE_BUILD_TIMEOUT_MINUTES);
@@ -83,21 +76,20 @@ bool ManifestBundleCompiler::BuildBundle(
     const ProcessExecutorResult executionResult = ProcessExecutor::Execute(executionRequest);
     if (!executionResult.HasSuccessfulExit()) {
         ASCENDLOGE(
-            "Failed to build compile resource bundle: outcome=%s code=%d elapsed_ms=%lld",
+            "Failed to build compile resource bundle: termination=%s code=%d elapsed_ms=%lld",
             executionResult.GetOutcomeName(), static_cast<int>(executionResult.terminationCode),
             static_cast<long long>(executionResult.elapsedTime.count()));
         return false;
     }
-    ASCENDLOGI("Built staged compile resource bundle %s", stagedBundlePath.c_str());
+    ASCENDLOGI("Built staged compile resource bundle %s", output.c_str());
     return true;
 }
 
-bool ManifestBundleCompiler::PublishBundle(const std::string& stagedBundlePath) const
+bool ManifestBundleCompiler::PublishBundle(const std::string& staged) const
 {
     // Prefer rename because replacing the output is atomic when both paths are on the same filesystem.
     boost::system::error_code error;
-    boost::filesystem::rename(
-        boost::filesystem::path(stagedBundlePath), boost::filesystem::path(request_.outputPath), error);
+    boost::filesystem::rename(boost::filesystem::path(staged), boost::filesystem::path(request_.outputPath), error);
     if (!error) {
         ASCENDLOGI("Published compile resource bundle %s", request_.outputPath.c_str());
         return true;
@@ -108,32 +100,29 @@ bool ManifestBundleCompiler::PublishBundle(const std::string& stagedBundlePath) 
     }
 
     // rename cannot cross filesystems. Copy into the output filesystem before renaming again.
-    if (!PublishBundleAcrossFileSystems(stagedBundlePath)) {
+    if (!PublishBundleAcrossFileSystems(staged)) {
         return false;
     }
     ASCENDLOGI("Published compile resource bundle %s", request_.outputPath.c_str());
     return true;
 }
 
-bool ManifestBundleCompiler::PublishBundleAcrossFileSystems(const std::string& stagedBundlePath) const
+bool ManifestBundleCompiler::PublishBundleAcrossFileSystems(const std::string& staged) const
 {
-    ASCENDLOGD(
-        "Copying staged bundle across filesystems: %s -> %s", stagedBundlePath.c_str(), request_.outputPath.c_str());
+    ASCENDLOGD("Copying staged bundle across filesystems: %s -> %s", staged.c_str(), request_.outputPath.c_str());
     // A private workspace under the output parent places the copied file on the output filesystem.
     DirectoryCleanupGuard publishWorkspace;
-    if (!CreatePrivateBundleWorkspace(FileUtils::ParentPath(request_.outputPath), publishWorkspace)) {
+    if (!CreatePrivateBundleWorkspaceDirectory(FileUtils::ParentPath(request_.outputPath), publishWorkspace)) {
         return false;
     }
-    const std::string copiedBundlePath =
-        FileUtils::JoinPath(publishWorkspace.GetDirectoryPath(), FileUtils::FileName(stagedBundlePath));
-    if (!FileUtils::CopyFile(stagedBundlePath, copiedBundlePath)) {
-        ASCENDLOGE("Failed to copy staged bundle across filesystems: %s", stagedBundlePath.c_str());
+    const std::string copied = FileUtils::JoinPath(publishWorkspace.GetDirectoryPath(), FileUtils::FileName(staged));
+    if (!FileUtils::CopyFile(staged, copied)) {
+        ASCENDLOGE("Failed to copy staged bundle across filesystems: %s", staged.c_str());
         return false;
     }
 
     boost::system::error_code error;
-    boost::filesystem::rename(
-        boost::filesystem::path(copiedBundlePath), boost::filesystem::path(request_.outputPath), error);
+    boost::filesystem::rename(boost::filesystem::path(copied), boost::filesystem::path(request_.outputPath), error);
     if (error) {
         ASCENDLOGE("Failed to publish copied bundle output: %s", error.message().c_str());
         return false;
@@ -144,21 +133,21 @@ bool ManifestBundleCompiler::PublishBundleAcrossFileSystems(const std::string& s
 bool ManifestBundleCompiler::Compile() const
 {
     ASCENDLOGI(
-        "Starting bundle generation: manifest_root=%s output=%s keep_temp=%s", request_.manifestSearchRootPath.c_str(),
-        request_.outputPath.c_str(), request_.retainTemporaryWorkspace ? "true" : "false");
+        "Starting bundle generation: manifest_root=%s output=%s keep_temp=%s", request_.manifestSearchRoot.c_str(),
+        request_.outputPath.c_str(), request_.keepTemp ? "true" : "false");
 
-    ASCENDLOGI("Using %u parallel bundle build job(s)", request_.parallelJobCount);
+    ASCENDLOGI("Using %u parallel bundle build job(s)", request_.jobs);
 
     // Load and validate the complete collection before allocating a private build workspace.
     std::vector<ManifestUnit> units;
-    if (!CollectedManifestRepository(request_.manifestSearchRootPath).Load(units)) {
+    if (!CollectedManifestRepository(request_.manifestSearchRoot).Load(units)) {
         return false;
     }
     DirectoryCleanupGuard buildWorkspace;
-    if (!CreatePrivateBundleWorkspace(std::string(), buildWorkspace)) {
+    if (!CreatePrivateBundleWorkspaceDirectory(std::string(), buildWorkspace)) {
         return false;
     }
-    if (request_.retainTemporaryWorkspace) {
+    if (request_.keepTemp) {
         buildWorkspace.PreserveDirectory();
         ASCENDLOGI("Keeping temporary bundle directory %s", buildWorkspace.GetDirectoryPath().c_str());
     }

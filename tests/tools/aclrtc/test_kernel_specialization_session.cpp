@@ -37,8 +37,8 @@ using ascendc::aclrtc::KernelSpecializationSession;
 using ascendc::aclrtc::MaterializedKernelCompilationResource;
 using ascendc::aclrtc::NormalizedKernelSpecializationRequest;
 using ascendc::aclrtc::WorktreeRetentionPolicy;
-using ascendc::specialization_compile::BundledResourceFile;
 using ascendc::specialization_compile::ResourceEntry;
+using ascendc::specialization_compile::ResourceFileData;
 using ascendc::specialization_compile::ResourceRegistry;
 using ascendc::specialization_compile::ResourceSourceType;
 using ascendc::specialization_compile::ResourceStatus;
@@ -191,10 +191,10 @@ class ScopedRegisteredCompilationResource final {
 public:
     ScopedRegisteredCompilationResource(
         std::string resourceId, const Json& manifest, const fs::path& sourceDirectoryPath,
-        std::vector<BundledResourceFile> resourceFiles = {{"payload.bin", "payload.bin", {0x01U, 0x02U}}})
+        std::vector<ResourceFileData> resourceFiles = {{"payload.bin", "payload.bin", {0x01U, 0x02U}}})
         : registry_(ResourceRegistry::Instance()),
           resourceId_(std::move(resourceId)),
-          previousMaterializationRootDirectory_(std::move(registry_.materializationRootDirectory_)),
+          previousOwnedMaterializationRoot_(std::move(registry_.ownedMaterializationRoot_)),
           previousAutomaticLoadAttempted_(registry_.automaticLoadAttempted_),
           previousRetainMaterializedDirectories_(registry_.retainMaterializedDirectories_),
           previousAutomaticLoadStatus_(registry_.automaticLoadStatus_)
@@ -204,9 +204,9 @@ public:
         registry_.automaticLoadStatus_ = ResourceStatus::Success;
 
         std::unique_ptr<ResourceEntry> resourceEntry(new ResourceEntry());
-        resourceEntry->resourceData.json = manifest;
-        resourceEntry->resourceData.sourceFilePath = sourceDirectoryPath.string();
-        resourceEntry->bundledFiles = std::move(resourceFiles);
+        resourceEntry->data.json = manifest;
+        resourceEntry->data.sourceFilePath = sourceDirectoryPath.string();
+        resourceEntry->files = std::move(resourceFiles);
         resourceEntry->sourceType = ResourceSourceType::External;
         inserted_ = registry_.externalResources_.emplace(resourceId_, std::move(resourceEntry)).second;
     }
@@ -216,7 +216,7 @@ public:
         if (inserted_) {
             registry_.externalResources_.erase(resourceId_);
         }
-        registry_.materializationRootDirectory_ = std::move(previousMaterializationRootDirectory_);
+        registry_.ownedMaterializationRoot_ = std::move(previousOwnedMaterializationRoot_);
         registry_.automaticLoadAttempted_ = previousAutomaticLoadAttempted_;
         registry_.retainMaterializedDirectories_ = previousRetainMaterializedDirectories_;
         registry_.automaticLoadStatus_ = previousAutomaticLoadStatus_;
@@ -229,7 +229,7 @@ public:
 private:
     ResourceRegistry& registry_;
     std::string resourceId_;
-    DirectoryCleanupGuard previousMaterializationRootDirectory_;
+    DirectoryCleanupGuard previousOwnedMaterializationRoot_;
     bool previousAutomaticLoadAttempted_{false};
     bool previousRetainMaterializedDirectories_{false};
     ResourceStatus previousAutomaticLoadStatus_{ResourceStatus::Success};
@@ -420,7 +420,7 @@ TEST(KernelSpecializationApiTest, CompilesRegisteredResourceThroughPublicApi)
     EndToEndTestResource testResource(FakeCompilerOutcome::Success);
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", testResource.ToolchainPath().c_str());
     ScopedEnvironmentVariable saveMetaEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", nullptr);
-    const std::vector<BundledResourceFile> resourceFiles = {
+    const std::vector<ResourceFileData> resourceFiles = {
         {"constants.h", "resources/include/constants.h", {'T', 'I', 'L', 'I', 'N', 'G', '=', '@', '@',
                                                           'S', 'T', 'A', 'T', 'I', 'C', '_', 'T', 'I',
                                                           'L', 'I', 'N', 'G', '@', '@', ';', '\n'}},

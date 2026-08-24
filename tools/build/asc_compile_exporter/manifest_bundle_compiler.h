@@ -19,29 +19,29 @@
 namespace ascendc {
 namespace manifest_generator {
 
-struct ManifestBundleBuildRequest {
-    std::string manifestSearchRootPath;
+struct BuildCollectedBundleRequest {
+    std::string manifestSearchRoot;
     std::string outputPath;
     std::string makeExecutable;
     std::string cxxCompiler;
     BundleOutputKind outputKind = BundleOutputKind::kSharedObject;
-    bool retainTemporaryWorkspace = false;
-    uint32_t parallelJobCount = 0U;
+    bool keepTemp = false;
+    uint32_t jobs = 0U;
 };
 
 class ManifestBundleCompiler final {
 public:
     // The request must contain paths, an output kind, and a job count already validated by the caller.
-    explicit ManifestBundleCompiler(ManifestBundleBuildRequest request) noexcept;
+    explicit ManifestBundleCompiler(BuildCollectedBundleRequest request) noexcept;
 
     bool Compile() const;
 
 private:
-    bool BuildBundle(const std::string& buildWorkspacePath, const std::string& stagedBundlePath) const;
-    bool PublishBundle(const std::string& stagedBundlePath) const;
-    bool PublishBundleAcrossFileSystems(const std::string& stagedBundlePath) const;
+    bool BuildBundle(const std::string& workDir, const std::string& output) const;
+    bool PublishBundle(const std::string& staged) const;
+    bool PublishBundleAcrossFileSystems(const std::string& staged) const;
 
-    ManifestBundleBuildRequest request_;
+    BuildCollectedBundleRequest request_;
 };
 
 } // namespace manifest_generator

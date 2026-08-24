@@ -21,12 +21,12 @@ namespace manifest_generator {
 
 class CollectedManifestRepository final {
 public:
-    explicit CollectedManifestRepository(std::string manifestSearchRootPath) noexcept;
+    explicit CollectedManifestRepository(std::string manifestSearchRoot) noexcept;
 
     bool Load(std::vector<ManifestUnit>& units) const;
 
 private:
-    std::string manifestSearchRootPath_;
+    std::string manifestSearchRoot_;
 };
 
 } // namespace manifest_generator

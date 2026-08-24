@@ -115,13 +115,13 @@ bool AdvanceIterator(fs::recursive_directory_iterator& iterator, const std::stri
     return false;
 }
 
-bool DiscoverManifestFiles(const std::string& manifestSearchRootPath, std::vector<std::string>& manifests)
+bool DiscoverManifestFiles(const std::string& manifestSearchRoot, std::vector<std::string>& manifests)
 {
     boost::system::error_code error;
-    fs::recursive_directory_iterator iterator(fs::path(manifestSearchRootPath), fs::directory_options::none, error);
+    fs::recursive_directory_iterator iterator(fs::path(manifestSearchRoot), fs::directory_options::none, error);
     const fs::recursive_directory_iterator end;
     if (error) {
-        ASCENDLOGE("Failed to enumerate %s: %s", manifestSearchRootPath.c_str(), error.message().c_str());
+        ASCENDLOGE("Failed to enumerate %s: %s", manifestSearchRoot.c_str(), error.message().c_str());
         return false;
     }
     while (iterator != end) {
@@ -145,7 +145,7 @@ bool DiscoverManifestFiles(const std::string& manifestSearchRootPath, std::vecto
             }
             manifests.push_back(path.string());
         }
-        if (!AdvanceIterator(iterator, manifestSearchRootPath)) {
+        if (!AdvanceIterator(iterator, manifestSearchRoot)) {
             return false;
         }
     }
@@ -278,16 +278,16 @@ bool LoadUnit(const std::string& manifestPath, ResourceBudget& budget, ManifestU
 
 } // namespace
 
-CollectedManifestRepository::CollectedManifestRepository(std::string manifestSearchRootPath) noexcept
-    : manifestSearchRootPath_(std::move(manifestSearchRootPath))
+CollectedManifestRepository::CollectedManifestRepository(std::string manifestSearchRoot) noexcept
+    : manifestSearchRoot_(std::move(manifestSearchRoot))
 {}
 
 bool CollectedManifestRepository::Load(std::vector<ManifestUnit>& units) const
 {
-    ASCENDLOGD("Discovering manifests under %s", manifestSearchRootPath_.c_str());
+    ASCENDLOGD("Discovering manifests under %s", manifestSearchRoot_.c_str());
     ResourceBudget budget;
     std::vector<std::string> manifests;
-    if (!DiscoverManifestFiles(manifestSearchRootPath_, manifests)) {
+    if (!DiscoverManifestFiles(manifestSearchRoot_, manifests)) {
         return false;
     }
     ASCENDLOGI("Discovered %zu manifest(s)", manifests.size());

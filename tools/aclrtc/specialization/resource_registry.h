@@ -61,51 +61,51 @@ struct ResourceData {
     std::string sourceFilePath;
 };
 
-struct BundledResourceFile {
+struct ResourceFileData {
     std::string fileName;
     std::string relativePath;
-    std::vector<uint8_t> contents;
+    std::vector<uint8_t> bytes;
 };
 
 struct ResourceEntry {
-    ResourceData resourceData;
-    std::vector<BundledResourceFile> bundledFiles;
-    std::string sourceLibraryPath;
+    ResourceData data;
+    std::vector<ResourceFileData> files;
+    std::string sourceSoPath;
     ResourceSourceType sourceType = ResourceSourceType::External;
-    std::mutex materializationMutex;
+    std::mutex materializeMutex;
 };
 
 using ResourceStore = std::unordered_map<std::string, std::unique_ptr<ResourceEntry>>;
 
-struct StagedResourceSet {
+struct StagedResources {
     ResourceStore resources;
-    uint64_t payloadByteCount = 0U;
-    uint64_t fileCount = 0U;
-    bool libraryDiscovered = false;
-    bool conflictDetected = false;
+    uint64_t bytes = 0U;
+    uint64_t files = 0U;
+    bool discovered = false;
+    bool conflict = false;
 };
 
-struct ResourceLoadTransaction {
-    StagedResourceSet external;
-    StagedResourceSet custom;
-    StagedResourceSet builtIn;
+struct StageState {
+    StagedResources external;
+    StagedResources custom;
+    StagedResources builtIn;
 };
 
-struct ResourceLibraryDescriptor {
-    std::string libraryPath;
+struct LibrarySpec {
+    std::string path;
     ResourceSourceType sourceType;
 };
 
-struct ResourceSearchRoots {
-    std::vector<std::string> customSearchRoots;
-    std::vector<std::string> builtInSearchRoots;
+struct AutomaticRoots {
+    std::vector<std::string> custom;
+    std::vector<std::string> builtIn;
 };
 
-struct SharedLibraryDeleter {
+struct LibraryDeleter {
     void operator()(void* handle) const noexcept;
 };
 
-using SharedLibraryHandle = std::unique_ptr<void, SharedLibraryDeleter>;
+using LibraryHandle = std::unique_ptr<void, LibraryDeleter>;
 
 class ResourceRegistry {
 public:
@@ -117,12 +117,12 @@ public:
 
     /**
      * @brief Loads compile resources from an explicit shared object or the configured OPP search paths.
-     * @param[in] resourceLibraryPath Resource shared object file to load. Pass nullptr or an empty string to use
-     * automatic OPP discovery. Directory input is not supported for explicit loading.
+     * @param[in] directory Resource shared object file to load. Pass nullptr or an empty string to use automatic OPP
+     * discovery. Directory input is not supported for explicit loading.
      * @return ResourceStatus::Success on success; otherwise, a status describing the discovery, validation, loading,
      * I/O, or conflict failure.
      */
-    ResourceStatus Load(const char* resourceLibraryPath);
+    ResourceStatus Load(const char* directory);
 
     /**
      * @brief Looks up a registered compile resource and materializes its bundled files.
@@ -140,52 +140,43 @@ private:
     ResourceRegistry();
     ~ResourceRegistry();
 
-    static ResourceSearchRoots AutomaticSearchRoots();
+    static AutomaticRoots AutomaticSearchRoots();
     static bool IsLibraryName(const std::string& path);
     static void AddLibrary(const std::string& path, std::set<std::string>& found);
     static bool CollectLibraries(
         const std::string& root, ResourceSourceType sourceType, bool recursive, std::set<std::string>& found);
     static bool CollectAutomaticLibraries(
         const std::vector<std::string>& roots, ResourceSourceType sourceType, std::set<std::string>& found);
-    static ResourceStatus DiscoverLibraries(
-        const char* resourceLibraryPath, std::vector<ResourceLibraryDescriptor>& libraries);
-    static ResourceStatus ResolveAndValidateBundle(
-        const SharedLibraryHandle& library, const ResourceLibraryDescriptor& libraryDescriptor,
-        const AcCompileResourceBundle*& bundle);
+    static ResourceStatus DiscoverLibraries(const char* directory, std::vector<LibrarySpec>& libraries);
+    static ResourceStatus GetBundle(
+        const LibraryHandle& library, const LibrarySpec& spec, const AcCompileResourceBundle*& bundle);
     static ResourceStatus ResolveSourceRoot(
         const boost::filesystem::path& searchRoot, const std::string& resourceId, std::string& canonicalRoot);
     static ResourceStatus AddSourceMatch(
         const boost::filesystem::path& candidate, const std::string& sourceFile, const std::string& canonicalRoot,
         const std::string& resourceId, std::set<std::string>& matches);
-    static ResourceStatus LocateExternalSourceDirectory(
-        const ResourceLibraryDescriptor& libraryDescriptor, const std::string& resourceId,
-        const std::string& sourceFile, std::string& sourceDirectoryPath);
+    static ResourceStatus LocateSourceFile(
+        const LibrarySpec& spec, const std::string& resourceId, const std::string& sourceFile, std::string& located);
     static bool FindPathConflict(const std::set<std::string>& paths);
     static ResourceStatus AppendFile(
         const AcCompileResourceFile& file, const std::string& resourceId, ResourceEntry& entry,
-        std::set<std::string>& paths, uint64_t& manifestBytes, StagedResourceSet& stagedResources);
+        std::set<std::string>& paths, uint64_t& manifestBytes, StagedResources& staged);
     static ResourceStatus CopyManifestFiles(
         const AcCompileResourceManifest& unit, const std::string& resourceId, ResourceEntry& entry,
-        StagedResourceSet& stagedResources);
-    static StagedResourceSet& SelectStagedResources(
-        ResourceLoadTransaction& loadTransaction, ResourceSourceType sourceType);
+        StagedResources& staged);
+    static StagedResources& SelectStagedResources(StageState& stage, ResourceSourceType sourceType);
     static ResourceStatus LoadManifest(
-        const AcCompileResourceManifest& unit, const ResourceLibraryDescriptor& libraryDescriptor,
-        uint64_t manifestIndex, ResourceLoadTransaction& loadTransaction);
-    static ResourceStatus LoadLibrary(
-        const ResourceLibraryDescriptor& libraryDescriptor, ResourceLoadTransaction& loadTransaction);
-    static ResourceStatus LoadLibraries(
-        const std::vector<ResourceLibraryDescriptor>& libraries, ResourceLoadTransaction& loadTransaction);
-    static ResourceStatus WriteMaterializedFiles(
-        const std::vector<BundledResourceFile>& bundledFiles, const std::string& materializationRootPath);
+        const AcCompileResourceManifest& unit, const LibrarySpec& spec, uint64_t manifestIndex, StageState& stage);
+    static ResourceStatus LoadLibrary(const LibrarySpec& spec, StageState& stage);
+    static ResourceStatus LoadLibraries(const std::vector<LibrarySpec>& libraries, StageState& stage);
+    static ResourceStatus WriteMaterializedFiles(const std::vector<ResourceFileData>& files, const std::string& root);
 
     ResourceEntry* FindResource(const std::string& resourceId) noexcept;
-    ResourceStatus MaterializeResource(
-        const std::string& resourceId, const ResourceEntry& entry, ResourceData& resource);
-    ResourceStatus CommitStagedResources(ResourceLoadTransaction& loadTransaction);
-    bool HasCommitConflict(const ResourceStore& incomingResources, const ResourceStore& committedResources) const;
+    ResourceStatus Materialize(const std::string& resourceId, const ResourceEntry& entry, ResourceData& resource);
+    ResourceStatus Commit(StageState& stage);
+    bool HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed) const;
 
-    DirectoryCleanupGuard materializationRootDirectory_;
+    DirectoryCleanupGuard ownedMaterializationRoot_;
     ResourceStore externalResources_;
     ResourceStore customResources_;
     ResourceStore builtInResources_;
