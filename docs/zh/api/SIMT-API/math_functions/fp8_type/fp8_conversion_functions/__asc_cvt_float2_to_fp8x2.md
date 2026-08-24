@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-将`float2`类型数据的两个分量，按照`CAST_RINT`模式转换为指定类型（`float8_e4m3x2_t`和`float8_e5m2x2_t`）的8位浮点数，并根据指定的饱和模式（饱和或非饱和）进行溢出处理。转换结果以位级打包形式存储为`__asc_fp8x2_storage_t`类型，该类型为16位无符号整数`unsigned short int`，用于存储`float8_e4m3x2_t`或`float8_e5m2x2_t`类型的数据。
+将`float2`类型数据的两个分量，按照CAST_RINT模式转换为指定类型（`float8_e4m3x2_t`和`float8_e5m2x2_t`）的8位浮点数，并根据指定的饱和模式（饱和或非饱和）进行溢出处理。转换结果以位级打包形式存储为`__asc_fp8x2_storage_t`类型，该类型为16位无符号整数`unsigned short int`，用于存储`float8_e4m3x2_t`或`float8_e5m2x2_t`类型的数据。
 
 ## 函数原型
 

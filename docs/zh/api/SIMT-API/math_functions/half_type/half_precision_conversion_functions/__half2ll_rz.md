@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-遵循`CAST_TRUNC`模式，将half类型数据转换为long long类型数据，返回转换后的值。
+遵循CAST_TRUNC模式，将half类型数据转换为long long类型数据，返回转换后的值。
 
 ## 函数原型
 
