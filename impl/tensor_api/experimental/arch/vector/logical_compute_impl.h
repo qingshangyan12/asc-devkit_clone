@@ -10,13 +10,13 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/vector/experimental/logical_compute_impl.h is internal and must not be used directly."
+    "impl/tensor_api/experimental/arch/vector/logical_compute_impl.h is internal and must not be used directly."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOGICAL_COMPUTE_IMPL
 #endif
 
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_IMPL_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_IMPL_H
+#ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_IMPL_H
+#define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_IMPL_H
 
 #include "impl/tensor_api/arch/utils/reg_compute_traits.h"
 
@@ -50,7 +50,7 @@ __simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
     check_binary_reg_types<T, U>();
     check_bitwise_type<op, elem_type>();
 
-    static_assert(!Std::is_same_v<elem_type, bool> || (is_reg_tensor_v<T> && is_reg_tensor_v<U>),
+    static_assert(!::AscendC::Std::is_same_v<elem_type, bool> || (is_reg_tensor_v<T> && is_reg_tensor_v<U>),
         "bool bitwise operators require two reg_tensor<bool> operands");
 
     vector_bool mask = binary_mask(a, b);
@@ -73,24 +73,13 @@ __simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
 namespace experimental {
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src)
+__simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
 {
     static_assert(detail::supports_not_v<T>, "operator! does not support this element type");
-
-    if constexpr (Std::is_same_v<T, bool>) {
-        reg_tensor<bool> dst;
-        asc_not(dst.reg, src.reg, src.mask);
-        dst.mask = src.mask;
-        return dst;
-    } else {
-        reg_tensor<T> dst;
-        vector_bool is_zero;
-        asc_eq_scalar(is_zero, src.reg, static_cast<T>(0), src.mask);
-        asc_duplicate_scalar(dst.reg, static_cast<T>(0), src.mask);
-        asc_duplicate_scalar(dst.reg, static_cast<T>(1), is_zero);
-        dst.mask = src.mask;
-        return dst;
-    }
+    reg_tensor<T> dst;
+    asc_not(dst.reg, src.reg, src.mask);
+    dst.mask = src.mask;
+    return dst;
 }
 
 template <typename T, typename U>
@@ -112,7 +101,7 @@ __simd_callee__ inline decltype(auto) operator^(const T& a, const U& b)
 }
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator<<(const reg_tensor<T>& src, const U& shift)
+__simd_callee__ inline reg_tensor<T> operator<<(const reg_tensor<T>& src, const U& shift)
 {
     static_assert(detail::supports_shift_v<T>, "operator<< does not support this element type");
 
@@ -123,7 +112,7 @@ __simd_callee__ inline decltype(auto) operator<<(const reg_tensor<T>& src, const
             "register operator<< requires a signed shift register of the same width");
         asc_shiftleft(dst.reg, src.reg, shift.reg, src.mask);
     } else {
-        static_assert(Std::is_same_v<Std::remove_cvref_t<U>, int16_t>,
+        static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<U>, int16_t>,
             "scalar operator<< requires an int16_t shift value");
         asc_shiftleft_scalar(dst.reg, src.reg, shift, src.mask);
     }
@@ -132,7 +121,7 @@ __simd_callee__ inline decltype(auto) operator<<(const reg_tensor<T>& src, const
 }
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator>>(const reg_tensor<T>& src, const U& shift)
+__simd_callee__ inline reg_tensor<T> operator>>(const reg_tensor<T>& src, const U& shift)
 {
     static_assert(detail::supports_shift_v<T>, "operator>> does not support this element type");
 
@@ -143,7 +132,7 @@ __simd_callee__ inline decltype(auto) operator>>(const reg_tensor<T>& src, const
             "register operator>> requires a signed shift register of the same width");
         asc_shiftright(dst.reg, src.reg, shift.reg, src.mask);
     } else {
-        static_assert(Std::is_same_v<Std::remove_cvref_t<U>, int16_t>,
+        static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<U>, int16_t>,
             "scalar operator>> requires an int16_t shift value");
         asc_shiftright_scalar(dst.reg, src.reg, shift, src.mask);
     }
@@ -155,7 +144,7 @@ __simd_callee__ inline decltype(auto) operator>>(const reg_tensor<T>& src, const
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_IMPL_H
+#endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_IMPL_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOGICAL_COMPUTE_IMPL)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

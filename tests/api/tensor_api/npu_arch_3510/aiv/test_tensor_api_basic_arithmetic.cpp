@@ -131,8 +131,8 @@ void check_carry()
 template <typename T>
 void check_mull()
 {
-    static_assert(std::is_same_v<decltype(asc::te::experimental::mull(std::declval<reg_type<T>&>(),
-        std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<T>>);
+    static_assert(std::is_same_v<decltype(asc::te::experimental::mull(
+        std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), asc::te::reg_pair<T>>);
 }
 
 TEST(test_tensor_api_basic_arithmetic, compile_public_apis_and_supported_types)

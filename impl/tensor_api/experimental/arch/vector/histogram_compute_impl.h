@@ -10,13 +10,13 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/vector/experimental/histogram_compute_impl.h is internal and must not be used directly."
+    "impl/tensor_api/experimental/arch/vector/histogram_compute_impl.h is internal and must not be used directly."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE_IMPL
 #endif
 
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_HISTOGRAM_COMPUTE_IMPL_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_HISTOGRAM_COMPUTE_IMPL_H
+#ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_HISTOGRAM_COMPUTE_IMPL_H
+#define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_HISTOGRAM_COMPUTE_IMPL_H
 
 #include "impl/tensor_api/arch/utils/reg_compute_traits.h"
 
@@ -54,7 +54,7 @@ __simd_callee__ inline decltype(auto) histograms(
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_HISTOGRAM_COMPUTE_IMPL_H
+#endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_HISTOGRAM_COMPUTE_IMPL_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE_IMPL)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

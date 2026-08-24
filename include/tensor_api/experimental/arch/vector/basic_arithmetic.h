@@ -13,8 +13,8 @@
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_BASIC_ARITHMETIC
 #endif
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_BASIC_ARITHMETIC_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_BASIC_ARITHMETIC_H
+#ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_H
+#define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_H
 
 #include "tensor_api/arch/vector/experimental/reg_tensor.h"
 
@@ -23,50 +23,44 @@ namespace te {
 namespace experimental {
 
 template <typename T>
-__simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) exp(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> exp(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) sqrt(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> sqrt(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) log(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) log2(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) log10(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> log10(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator-(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) relu(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> relu(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) prelu(const reg_tensor<T>& src_reg, const reg_tensor<T>& slope);
+__simd_callee__ inline reg_tensor<T> prelu(const reg_tensor<T>& src_reg, const reg_tensor<T>& slope);
 
 template <typename T, typename scalar_type>
-__simd_callee__ inline decltype(auto) leaky_relu(const reg_tensor<T>& src_reg, const scalar_type& slope);
+__simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src_reg, const scalar_type& slope);
+
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator+(const T& a, const U& b);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
-
-template <typename T>
-__simd_callee__ inline decltype(auto) operator+(const reg_tensor<T>& src, const T& scalar);
-
-template <typename T>
-__simd_callee__ inline decltype(auto) operator+(const T& scalar, const reg_tensor<T>& src);
-
-template <typename T>
-__simd_callee__ inline decltype(auto) add(
+__simd_callee__ inline reg_tensor<T> add(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) add_c(
+__simd_callee__ inline reg_tensor<T> add_c(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
     const reg_tensor<bool>& carry_src);
 
@@ -74,11 +68,11 @@ template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) sub(
+__simd_callee__ inline reg_tensor<T> sub(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) sub_c(
+__simd_callee__ inline reg_tensor<T> sub_c(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
     const reg_tensor<bool>& carry_src);
 
@@ -86,8 +80,7 @@ template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator*(const T& a, const U& b);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) mull(
-    reg_tensor<T>& high, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_pair<T> mull(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b);
@@ -103,10 +96,10 @@ __simd_callee__ inline decltype(auto) min(const T& a, const U& b);
 } // namespace asc
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/arch/vector/experimental/basic_arithmetic_impl.h"
+#include "impl/tensor_api/experimental/arch/vector/basic_arithmetic_impl.h"
 #endif
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_BASIC_ARITHMETIC_H
+#endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_BASIC_ARITHMETIC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

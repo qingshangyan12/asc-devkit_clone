@@ -19,10 +19,12 @@ def main() -> None:
     output_dir = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("output")
     actual = np.fromfile(output_dir / "output.bin", dtype=np.uint16)
     golden = np.fromfile(output_dir / "golden.bin", dtype=np.uint16)
-    if actual.shape != golden.shape or not np.array_equal(actual, golden):
+    if actual.shape != golden.shape:
+        raise ValueError(f"expected shape {golden.shape}, got {actual.shape}")
+    if not np.array_equal(actual, golden):
         index = int(np.flatnonzero(actual != golden)[0])
         raise ValueError(f"mismatch at index {index}: actual={actual[index]}, golden={golden[index]}")
-    print("test pass!")
+    print("test pass! verified cumulative histogram for high half bins.")
 
 
 if __name__ == "__main__":

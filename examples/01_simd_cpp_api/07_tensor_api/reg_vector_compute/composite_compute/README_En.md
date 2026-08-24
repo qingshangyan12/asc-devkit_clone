@@ -2,7 +2,8 @@
 
 ## Overview
 
-This sample demonstrates the register composite compute API `asc::te::experimental::fma` with Tensor API. It covers `half` and `float`. Each type has three 64-element input vectors, and the output stores `a * b + c`.
+This sample demonstrates the register composite compute API `fma` with Tensor API. It uses
+three 64-element `float` input vectors, and the output stores `a * b + c`.
 
 ## Supported Products
 
@@ -36,10 +37,10 @@ This sample demonstrates the register composite compute API `asc::te::experiment
   <caption>Table 1: Sample input and output specification</caption>
   <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">composite_compute_tensor_api</td></tr>
   <tr><td rowspan="4" align="center">Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input_a</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td align="center">input_b</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td align="center">input_c</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Output</td><td align="center">output</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input_a</td><td align="center">[1, 64]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input_b</td><td align="center">[1, 64]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input_c</td><td align="center">[1, 64]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Output</td><td align="center">output</td><td align="center">[1, 64]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">composite_compute_tensor_api</td></tr>
   </table>
 
@@ -49,8 +50,8 @@ This sample demonstrates the register composite compute API `asc::te::experiment
 
     1. Create Tensor objects on GM and UB by using `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout`.
     2. Move input data from GM to UB by using `asc::te::make_copy` and `asc::te::copy`.
-    3. Load the three input Tensors as `reg_tensor` by using Tensor `load`, and use `make_mask<mask_pattern::vl64, T>()` to select 64 elements.
-    4. Call `asc::te::experimental::fma(input_a, input_b, input_c)` and store the result back to UB by using Tensor `store`.
+    3. Load the three input Tensors as `reg_tensor<float>` and select 64 elements.
+    4. Call `fma(input_a, input_b, input_c)` and store the result back to UB by using Tensor `store`.
     5. Move the result from UB back to GM by using `asc::te::copy`.
 
   - Invocation implementation
@@ -59,7 +60,7 @@ This sample demonstrates the register composite compute API `asc::te::experiment
 
 ## Core Interface
 
-### asc::te::experimental::fma
+### fma
 
 ```cpp
 template <typename T>
@@ -105,5 +106,5 @@ Run the following steps in the sample root directory to build and execute the sa
 
   ```text
   composite_compute_tensor_api executed successfully.
-  test pass! verified fma for half and float.
+  test pass! verified float fma.
   ```

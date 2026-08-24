@@ -13,24 +13,23 @@ import numpy as np
 
 
 vector_length = 64
-
-
-def write_case(name: str, data: np.ndarray) -> None:
-    data.tofile(Path("input") / f"{name}_input.bin")
-    np.abs(data).astype(data.dtype).tofile(Path("output") / f"{name}_golden.bin")
+uint32_mask = np.uint64(0xFFFFFFFF)
 
 
 def main() -> None:
     Path("input").mkdir(exist_ok=True)
     Path("output").mkdir(exist_ok=True)
 
-    indexes = np.arange(vector_length)
-    write_case("int8", (indexes.astype(np.int16) - 32).astype(np.int8))
-    write_case("int16", (indexes.astype(np.int32) * 3 - 96).astype(np.int16))
-    write_case("half", np.linspace(-2.0, 2.0, vector_length, dtype=np.float16))
-    write_case("int32", (indexes.astype(np.int64) * 11 - 320).astype(np.int32))
-    write_case("float", np.linspace(-3.0, 3.0, vector_length, dtype=np.float32))
-    print("Generated abs input and golden data for int8, int16, half, int32, and float.")
+    indexes = np.arange(vector_length, dtype=np.uint64)
+    src0 = ((np.uint64(0xF0000000) + indexes * np.uint64(0x01020304)) & uint32_mask).astype(np.uint32)
+    src1 = ((np.uint64(0x00010001) + indexes * np.uint64(0x00100011)) & uint32_mask).astype(np.uint32)
+    product = src0.astype(np.uint64) * src1.astype(np.uint64)
+
+    src0.tofile(Path("input") / "src0_input.bin")
+    src1.tofile(Path("input") / "src1_input.bin")
+    (product & uint32_mask).astype(np.uint32).tofile(Path("output") / "low_golden.bin")
+    (product >> np.uint64(32)).astype(np.uint32).tofile(Path("output") / "high_golden.bin")
+    print("Generated uint32 mull input and golden data.")
 
 
 if __name__ == "__main__":

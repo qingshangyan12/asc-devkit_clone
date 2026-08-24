@@ -2,7 +2,8 @@
 
 ## 概述
 
-本样例基于Tensor API演示寄存器复合计算接口`asc::te::experimental::fma`的使用方法。样例覆盖`half`和`float`两种类型，每种类型包含三组64元素输入，计算`a * b + c`后输出。
+本样例基于Tensor API演示寄存器复合计算接口`fma`的使用方法。样例使用三组
+64元素`float`输入，计算`a * b + c`后输出。
 
 ## 支持的产品
 
@@ -36,10 +37,10 @@
   <caption>表1：样例输入输出规格</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">composite_compute_tensor_api</td></tr>
   <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input_a</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td align="center">input_b</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td align="center">input_c</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input_a</td><td align="center">[1, 64]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input_b</td><td align="center">[1, 64]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input_c</td><td align="center">[1, 64]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[1, 64]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">composite_compute_tensor_api</td></tr>
   </table>
 
@@ -49,8 +50,8 @@
 
     1. 使用`asc::te::make_tensor`、`asc::te::make_mem_ptr`和`asc::te::make_frame_layout`创建GM和UB上的Tensor对象。
     2. 使用`asc::te::make_copy`和`asc::te::copy`完成GM到UB的数据搬运。
-    3. 使用Tensor `load`接口加载三组输入为`reg_tensor`，通过`make_mask<mask_pattern::vl64, T>()`指定64个元素参与计算。
-    4. 调用`asc::te::experimental::fma(input_a, input_b, input_c)`执行融合乘加计算，并使用Tensor `store`接口写回UB。
+    3. 使用Tensor `load`接口将三组输入加载为`reg_tensor<float>`，并指定64个元素参与计算。
+    4. 调用`fma(input_a, input_b, input_c)`执行融合乘加计算，并使用Tensor `store`接口写回UB。
     5. 使用`asc::te::copy`将结果从UB搬运回GM。
 
   - 调用实现
@@ -59,7 +60,7 @@
 
 ## 核心接口说明
 
-### asc::te::experimental::fma
+### fma
 
 ```cpp
 template <typename T>
@@ -105,5 +106,5 @@ __simd_callee__ inline decltype(auto) fma(
 
   ```text
   composite_compute_tensor_api executed successfully.
-  test pass! verified fma for half and float.
+  test pass! verified float fma.
   ```

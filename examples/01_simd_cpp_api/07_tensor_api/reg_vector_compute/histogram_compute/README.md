@@ -2,7 +2,8 @@
 
 ## 概述
 
-本样例基于Tensor API演示寄存器直方图计算接口`asc::te::experimental::histograms`的默认模式，即低半区间`frequency`统计。样例读取256个`uint8_t`输入元素，输出128个`uint16_t`统计结果。
+本样例基于Tensor API演示寄存器直方图计算接口`histograms`。样例显式选择
+高半区间`cumulative`模式，读取256个`uint8_t`输入元素，输出128个`uint16_t`累计统计结果。
 
 ## 支持的产品
 
@@ -25,10 +26,10 @@
 ## 样例描述
 
 - 样例功能：
-  统计输入元素在低半区间`[0, 127]`内的频次。输出初始值为3，计算公式如下：
+  对高半区间`[128, 255]`执行累计统计。输出初始值为3，计算公式如下：
 
   ```text
-  output_i = 3 + count(input_j == i), 0 <= i < 128
+  output_i = 3 + count(input_j <= 128 + i), 0 <= i < 128
   ```
 
 - 样例规格：
@@ -48,8 +49,10 @@
     1. 使用`asc::te::make_tensor`、`asc::te::make_mem_ptr`和`asc::te::make_frame_layout`创建GM和UB上的Tensor对象。
     2. 使用`asc::te::make_copy`和`asc::te::copy`完成GM到UB的数据搬运。
     3. 使用Tensor `load`接口加载输入为`reg_tensor<uint8_t>`。
-    4. 初始化`reg_tensor<uint16_t>`目的寄存器为3，调用`asc::te::experimental::histograms`统计低半区间频次。
-    5. 使用Tensor `store`接口写回UB，并使用`asc::te::copy`将结果从UB搬运回GM。
+    4. 初始化`reg_tensor<uint16_t>`目的寄存器为3，并配置`histogram_half::high`和
+       `histogram_mode::cumulative`。
+    5. 调用`histograms<histogram_config>`执行累计统计并写回UB。
+    6. 使用`asc::te::copy`将结果从UB搬运回GM。
 
   - 调用实现
 
@@ -57,14 +60,16 @@
 
 ## 核心接口说明
 
-### asc::te::experimental::histograms
+### histograms
 
 ```cpp
+template <const histogram_options& options = default_histogram_options>
 __simd_callee__ inline decltype(auto) histograms(
     const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src);
 ```
 
-该接口统计`uint8_t`输入寄存器中低半区间元素的频次，并返回`reg_tensor<uint16_t>`结果。
+该接口根据`options.half`和`options.mode`统计`uint8_t`输入寄存器。本样例使用具名`constexpr`
+配置选择高半区累计模式，并返回`reg_tensor<uint16_t>`结果。
 
 ## 编译运行
 
@@ -102,5 +107,5 @@ __simd_callee__ inline decltype(auto) histograms(
 
   ```text
   histogram_compute_tensor_api executed successfully.
-  test pass!
+  test pass! verified cumulative histogram for high half bins.
   ```

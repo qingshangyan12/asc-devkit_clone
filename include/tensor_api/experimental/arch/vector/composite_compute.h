@@ -13,8 +13,8 @@
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_COMPUTE
 #endif
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_H
+#ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPOSITE_COMPUTE_H
+#define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPOSITE_COMPUTE_H
 
 #include "tensor_api/arch/vector/experimental/reg_tensor.h"
 
@@ -27,10 +27,16 @@ __simd_callee__ inline decltype(auto) axpy(
     const reg_tensor<T>& dst, const reg_tensor<T>& src, const scalar_type& scalar);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) absdiff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) exp_sub(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<float> exp_sub(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+__simd_callee__ inline reg_tensor<float> exp_sub(
+    const reg_tensor<half>& src0, const reg_tensor<half>& src1, decltype(ASC_POSITION_EVEN) src_pos);
+
+__simd_callee__ inline reg_tensor<float> exp_sub(
+    const reg_tensor<half>& src0, const reg_tensor<half>& src1, decltype(ASC_POSITION_ODD) src_pos);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) fma(
@@ -43,10 +49,10 @@ __simd_callee__ inline decltype(auto) muls_cast(const reg_tensor<float>& src, co
 } // namespace asc
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/arch/vector/experimental/composite_compute_impl.h"
+#include "impl/tensor_api/experimental/arch/vector/composite_compute_impl.h"
 #endif
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_H
+#endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPOSITE_COMPUTE_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_COMPUTE)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

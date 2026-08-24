@@ -13,28 +13,39 @@ import numpy as np
 
 
 vector_length = 64
-
-
-def write_case(name: str, dtype: type) -> None:
-    input_dir = Path("input")
-    output_dir = Path("output")
-    input_a = np.linspace(-1.0, 1.0, vector_length, dtype=dtype)
-    input_b = np.linspace(0.25, 1.25, vector_length, dtype=dtype)
-    input_c = np.linspace(-0.5, 0.5, vector_length, dtype=dtype)
-    golden = (input_a * input_b + input_c).astype(dtype)
-    input_a.tofile(input_dir / f"{name}_input_a.bin")
-    input_b.tofile(input_dir / f"{name}_input_b.bin")
-    input_c.tofile(input_dir / f"{name}_input_c.bin")
-    golden.tofile(output_dir / f"{name}_golden.bin")
+half_vector_length = 128
 
 
 def main() -> None:
-    Path("input").mkdir(exist_ok=True)
-    Path("output").mkdir(exist_ok=True)
+    input_dir = Path("input")
+    output_dir = Path("output")
+    input_dir.mkdir(exist_ok=True)
+    output_dir.mkdir(exist_ok=True)
 
-    write_case("half", np.float16)
-    write_case("float", np.float32)
-    print("Generated fma input and golden data for half and float.")
+    input_a = np.linspace(-1.0, 1.0, vector_length, dtype=np.float32)
+    input_b = np.linspace(0.25, 1.25, vector_length, dtype=np.float32)
+    input_c = np.linspace(-0.5, 0.5, vector_length, dtype=np.float32)
+    golden = (
+        input_a.astype(np.float64) * input_b.astype(np.float64) + input_c.astype(np.float64)
+    ).astype(np.float32)
+    exp_input_a = np.linspace(-0.75, 0.75, half_vector_length, dtype=np.float16)
+    exp_input_b = np.linspace(0.5, -0.5, half_vector_length, dtype=np.float16)
+    exp_golden_even = np.exp(
+        exp_input_a[0::2].astype(np.float32) - exp_input_b[0::2].astype(np.float32)
+    ).astype(np.float32)
+    exp_golden_odd = np.exp(
+        exp_input_a[1::2].astype(np.float32) - exp_input_b[1::2].astype(np.float32)
+    ).astype(np.float32)
+
+    input_a.tofile(input_dir / "input_a.bin")
+    input_b.tofile(input_dir / "input_b.bin")
+    input_c.tofile(input_dir / "input_c.bin")
+    exp_input_a.tofile(input_dir / "exp_input_a.bin")
+    exp_input_b.tofile(input_dir / "exp_input_b.bin")
+    golden.tofile(output_dir / "golden.bin")
+    exp_golden_even.tofile(output_dir / "exp_golden_even.bin")
+    exp_golden_odd.tofile(output_dir / "exp_golden_odd.bin")
+    print("Generated float fma and half exp_sub input and golden data.")
 
 
 if __name__ == "__main__":

@@ -13,8 +13,8 @@
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOGICAL_COMPUTE
 #endif
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_H
+#ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_H
+#define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_H
 
 #include "tensor_api/arch/vector/experimental/reg_tensor.h"
 
@@ -23,7 +23,7 @@ namespace te {
 namespace experimental {
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src);
+__simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src);
 
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator&(const T& a, const U& b);
@@ -35,20 +35,20 @@ template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator^(const T& a, const U& b);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator<<(const reg_tensor<T>& src, const U& shift);
+__simd_callee__ inline reg_tensor<T> operator<<(const reg_tensor<T>& src, const U& shift);
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator>>(const reg_tensor<T>& src, const U& shift);
+__simd_callee__ inline reg_tensor<T> operator>>(const reg_tensor<T>& src, const U& shift);
 
 } // namespace experimental
 } // namespace te
 } // namespace asc
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/arch/vector/experimental/logical_compute_impl.h"
+#include "impl/tensor_api/experimental/arch/vector/logical_compute_impl.h"
 #endif
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_H
+#endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOGICAL_COMPUTE)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

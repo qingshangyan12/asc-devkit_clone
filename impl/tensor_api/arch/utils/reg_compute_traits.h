@@ -80,7 +80,7 @@ template <typename T, typename U>
 __simd_callee__ inline void check_binary_reg_types()
 {
     if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
-        static_assert(Std::is_same_v<reg_elem_t<T>, reg_elem_t<U>>,
+        static_assert(::AscendC::Std::is_same_v<reg_elem_t<T>, reg_elem_t<U>>,
             "the reg_tensor operands must have the same element type");
     }
 }
@@ -127,8 +127,7 @@ inline constexpr bool supports_min_max_v =
 
 template <typename T>
 inline constexpr bool supports_not_v =
-    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t,
-        uint32_t, float>;
+    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_and_v =
@@ -157,7 +156,7 @@ template <typename T>
 inline constexpr bool supports_axpy_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 template <typename T>
-inline constexpr bool supports_absdiff_v = ::AscendC::Std::is_one_of_v<T, half, float>;
+inline constexpr bool supports_abs_diff_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 template <typename T>
 inline constexpr bool supports_exp_sub_v = ::AscendC::Std::is_one_of_v<T, half, float>;

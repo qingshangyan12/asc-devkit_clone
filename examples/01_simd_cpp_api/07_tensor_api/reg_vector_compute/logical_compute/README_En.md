@@ -2,7 +2,8 @@
 
 ## Overview
 
-This sample demonstrates scalar left-shift on register tensors with Tensor API. It covers `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, and `uint32_t`. Each typed input contains 64 elements, and the output stores the result of shifting each element left by one bit.
+This sample demonstrates the register logical compute API `operator<<` with Tensor API. It uses one 64-element
+`uint32_t` data vector and one `int32_t` shift vector to perform element-wise register shift-left.
 
 ## Supported Products
 
@@ -25,19 +26,20 @@ This sample demonstrates scalar left-shift on register tensors with Tensor API. 
 ## Sample Description
 
 - Sample function:
-  The sample shifts each input Tensor element left by one bit:
+  The sample shifts each input Tensor element by the corresponding register value:
 
   ```text
-  output_i = input_i << 1
+  output_i = input_i << shifts_i
   ```
 
 - Sample specification:
   <table>
   <caption>Table 1: Sample input and output specification</caption>
   <tr><td rowspan="1" align="center">Sample Type (OpType)</td><td colspan="4" align="center">logical_compute_tensor_api</td></tr>
-  <tr><td rowspan="2" align="center">Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input</td><td align="center">[1, 64]</td><td align="center">int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Output</td><td align="center">output</td><td align="center">[1, 64]</td><td align="center">int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="3" align="center">Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">input</td><td align="center">[1, 64]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">shifts</td><td align="center">[1, 64]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Output</td><td align="center">output</td><td align="center">[1, 64]</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">logical_compute_tensor_api</td></tr>
   </table>
 
@@ -47,8 +49,8 @@ This sample demonstrates scalar left-shift on register tensors with Tensor API. 
 
     1. Create Tensor objects on GM and UB by using `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout`.
     2. Move input data from GM to UB by using `asc::te::make_copy` and `asc::te::copy`.
-    3. Load UB Tensor data as `reg_tensor` by using Tensor `load`, and use `make_mask<mask_pattern::vl64, T>()` to select 64 elements.
-    4. Import `asc::te::experimental::operator<<`, execute `value << 1`, and store the result back to UB by using Tensor `store`.
+    3. Load data and shifts as `reg_tensor<uint32_t>` and `reg_tensor<int32_t>` by using Tensor `load`.
+    4. Import `operator<<`, execute `src << shift`, and store the result back to UB.
     5. Move the result from UB back to GM by using `asc::te::copy`.
 
   - Invocation implementation
@@ -57,14 +59,15 @@ This sample demonstrates scalar left-shift on register tensors with Tensor API. 
 
 ## Core Interface
 
-### asc::te::experimental::operator<<
+### operator<<
 
 ```cpp
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator<<(const reg_tensor<T>& src, const U& shift);
 ```
 
-This API performs scalar left-shift on an input `reg_tensor` and returns a `reg_tensor` with the same element type.
+This API supports register shift operands. In this sample, the data register uses `uint32_t` and the signed,
+same-width shift register uses `int32_t`; the return type is `reg_tensor<uint32_t>`.
 
 ## Build and Run
 
@@ -102,5 +105,5 @@ Run the following steps in the sample root directory to build and execute the sa
 
   ```text
   logical_compute_tensor_api executed successfully.
-  test pass! verified scalar shift-left for six integer types.
+  test pass! verified uint32 register shift-left.
   ```

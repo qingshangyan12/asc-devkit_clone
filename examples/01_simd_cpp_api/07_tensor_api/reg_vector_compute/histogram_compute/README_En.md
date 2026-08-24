@@ -2,7 +2,8 @@
 
 ## Overview
 
-This sample demonstrates the default mode of the register histogram compute API `asc::te::experimental::histograms` with Tensor API, which is low-half frequency counting. It reads 256 `uint8_t` input values and writes 128 `uint16_t` histogram bins.
+This sample demonstrates the register histogram compute API `histograms` with Tensor API.
+It explicitly selects high-half cumulative mode, reads 256 `uint8_t` values, and writes 128 `uint16_t` results.
 
 ## Supported Products
 
@@ -25,10 +26,10 @@ This sample demonstrates the default mode of the register histogram compute API 
 ## Sample Description
 
 - Sample function:
-  The sample counts the frequency of input values in the low-half range `[0, 127]`. The output initial value is 3:
+  The sample computes the cumulative histogram for the high-half range `[128, 255]`. The output initial value is 3:
 
   ```text
-  output_i = 3 + count(input_j == i), 0 <= i < 128
+  output_i = 3 + count(input_j <= 128 + i), 0 <= i < 128
   ```
 
 - Sample specification:
@@ -48,8 +49,10 @@ This sample demonstrates the default mode of the register histogram compute API 
     1. Create Tensor objects on GM and UB by using `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout`.
     2. Move input data from GM to UB by using `asc::te::make_copy` and `asc::te::copy`.
     3. Load input data as `reg_tensor<uint8_t>` by using Tensor `load`.
-    4. Initialize the destination `reg_tensor<uint16_t>` to 3 and call `asc::te::experimental::histograms` to count low-half frequencies.
-    5. Store the result back to UB by using Tensor `store`, and move it from UB back to GM by using `asc::te::copy`.
+    4. Initialize the destination `reg_tensor<uint16_t>` to 3 and configure `histogram_half::high` and
+       `histogram_mode::cumulative`.
+    5. Call `histograms<histogram_config>` and store the result back to UB.
+    6. Move the result from UB back to GM by using `asc::te::copy`.
 
   - Invocation implementation
 
@@ -57,14 +60,16 @@ This sample demonstrates the default mode of the register histogram compute API 
 
 ## Core Interface
 
-### asc::te::experimental::histograms
+### histograms
 
 ```cpp
+template <const histogram_options& options = default_histogram_options>
 __simd_callee__ inline decltype(auto) histograms(
     const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src);
 ```
 
-This API counts low-half frequencies for an input `uint8_t` register and returns a `reg_tensor<uint16_t>` result.
+This API selects the histogram range and mode through `options.half` and `options.mode`. This sample passes a named
+`constexpr` configuration for high-half cumulative mode and returns a `reg_tensor<uint16_t>` result.
 
 ## Build and Run
 
@@ -102,5 +107,5 @@ Run the following steps in the sample root directory to build and execute the sa
 
   ```text
   histogram_compute_tensor_api executed successfully.
-  test pass!
+  test pass! verified cumulative histogram for high half bins.
   ```

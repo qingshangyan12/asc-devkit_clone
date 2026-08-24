@@ -82,7 +82,6 @@ TEST(test_tensor_api_logical_compute, compile_public_apis_and_supported_types)
     check_logical_not<int16_t>();
     check_logical_not<uint16_t>();
     check_logical_not<half>();
-    check_logical_not<bfloat16_t>();
     check_logical_not<int32_t>();
     check_logical_not<uint32_t>();
     check_logical_not<float>();
