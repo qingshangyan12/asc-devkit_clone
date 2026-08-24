@@ -10,6 +10,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+import json
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -95,3 +96,31 @@ def test_build_command_passes_default_numeric_mode(tmp_path):
     )
     assert "--simplified_key_mode=0" in command
     assert "--simplified_key_mode=None" not in command
+
+
+def test_kernel_json_without_simplified_key_keeps_legacy_behavior(
+    tmp_path, monkeypatch
+):
+    json_file = tmp_path / "legacy.json"
+    json_file.write_text(
+        json.dumps(
+            {
+                "op_type": "AddCustomTemplate",
+                "op_list": [{"bin_filename": "AddCustomTemplate_FP16"}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    builder = ascendc_bin_param_build.BinParamBuilder("AddCustomTemplate")
+    build_commands = []
+    monkeypatch.setattr(
+        builder,
+        "_write_build_cmd",
+        lambda *args: build_commands.append(args),
+    )
+
+    builder.gen_input_json_based_on_specified_json(str(json_file), str(tmp_path))
+
+    assert len(build_commands) == 1
+    split_json = json.loads(Path(build_commands[0][0]).read_text(encoding="utf-8"))
+    assert "_ascendc_custom_binary_json" not in split_json

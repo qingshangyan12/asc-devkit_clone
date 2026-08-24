@@ -104,23 +104,19 @@ def _valid_config():
     }
 
 
-def _check(tmp_path, content, modules, strict=True):
+def _check(tmp_path, content, modules):
     check_module, split_json_files, opc_options = modules
     path = tmp_path / "binary.json"
     path.write_text(json.dumps(content), encoding="utf-8")
-    if strict:
-        output_dir = tmp_path / "split"
-        output_dir.mkdir()
-        try:
-            generated_files = split_json_files(
-                str(path),
-                str(output_dir),
-                expected_op_type="AddCustomTemplate",
-                require_simplified_key=True,
-            )
-        except ValueError:
-            return False
-        path = generated_files[0]
+    output_dir = tmp_path / "split"
+    output_dir.mkdir()
+    try:
+        generated_files = split_json_files(
+            str(path), str(output_dir), expected_op_type="AddCustomTemplate"
+        )
+    except ValueError:
+        return False
+    path = generated_files[0]
     return check_module.check_op_compilation_json(
         opc_options.INPUT_PARAM, {opc_options.INPUT_PARAM: str(path)}
     )[0]
@@ -186,7 +182,6 @@ def test_invalid_value_message_contains_file_and_field_path(
         str(path),
         str(output_dir),
         expected_op_type="AddCustomTemplate",
-        require_simplified_key=True,
     )
     logger = RecordingLogger()
     monkeypatch.setattr(check_module, "logger", logger)
@@ -219,7 +214,6 @@ def test_invalid_value_message_keeps_original_op_index(
         str(path),
         str(output_dir),
         expected_op_type="AddCustomTemplate",
-        require_simplified_key=True,
     )
     logger = RecordingLogger()
     monkeypatch.setattr(check_module, "logger", logger)
@@ -240,7 +234,42 @@ def test_standard_mode_keeps_existing_validation_behavior(
     del content["op_list"][0]["simplified_key"]
     content["op_list"][0]["inputs"][0]["dtype"] = "legacy_custom_dtype"
 
-    assert _check(tmp_path, content, custom_binary_modules, strict=False) is True
+    assert _check(tmp_path, content, custom_binary_modules) is True
+
+
+def test_simplified_key_presence_enables_custom_validation(
+    tmp_path, custom_binary_modules
+):
+    _, split_json_files, _ = custom_binary_modules
+    content = _valid_config()
+    path = tmp_path / "binary.json"
+    path.write_text(json.dumps(content), encoding="utf-8")
+
+    generated_files = split_json_files(
+        str(path), str(tmp_path), expected_op_type="AddCustomTemplate"
+    )
+
+    with open(generated_files[0], "r", encoding="utf-8") as split_file:
+        split_json = json.load(split_file)
+    assert split_json["_ascendc_custom_binary_json"] == [str(path), 0]
+
+
+def test_simplified_key_presence_requires_key_for_every_binary(
+    tmp_path, custom_binary_modules
+):
+    _, split_json_files, _ = custom_binary_modules
+    content = _valid_config()
+    second_op = json.loads(json.dumps(content["op_list"][0]))
+    second_op["bin_filename"] = "AddCustomTemplate_FP32"
+    del second_op["simplified_key"]
+    content["op_list"].append(second_op)
+    path = tmp_path / "binary.json"
+    path.write_text(json.dumps(content), encoding="utf-8")
+
+    with pytest.raises(ValueError, match=r"op_list\[1\]\.simplified_key"):
+        split_json_files(
+            str(path), str(tmp_path), expected_op_type="AddCustomTemplate"
+        )
 
 
 @pytest.mark.parametrize(
@@ -271,7 +300,6 @@ def test_rejects_invalid_binary_json_structure(
             str(path),
             str(tmp_path),
             expected_op_type="AddCustomTemplate",
-            require_simplified_key=True,
         )
 
 
@@ -287,7 +315,6 @@ def test_rejects_duplicate_binary_filename(tmp_path, custom_binary_modules):
             str(path),
             str(tmp_path),
             expected_op_type="AddCustomTemplate",
-            require_simplified_key=True,
         )
 
 
@@ -307,5 +334,4 @@ def test_rejects_binary_filenames_with_same_output_name(
             str(path),
             str(tmp_path),
             expected_op_type="AddCustomTemplate",
-            require_simplified_key=True,
         )
