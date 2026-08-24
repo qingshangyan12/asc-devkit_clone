@@ -51,6 +51,9 @@ public:
 protected:
     virtual HcclResult RunAllGatherMesh(
         const std::vector<ThreadHandle>& threads, const std::map<u32, std::vector<ChannelInfo>>& channels);
+    virtual HcclResult RunAllGatherMeshOnChannel(
+        const ThreadHandle& thread, const ChannelInfo& linkRemote, const u32 connectedRank, const u32 connectedAlgRank,
+        const u32 channelIdx, void* remoteOut);
     virtual HcclResult LocalDataCopy(const std::vector<ThreadHandle>& threads);
     HcclResult PostLocalCopy(const std::vector<ThreadHandle>& threads);
     TemplateDataParams tempAlgParams_;
@@ -59,6 +62,9 @@ protected:
     void* inputSymWindow_{nullptr};
     void* outputSymWindow_{nullptr};
     u32 channelsPerRank_{1};
+    std::vector<u64> elemCountOut_;
+    std::vector<u64> sizeOut_;
+    std::vector<u64> elemOffset_;
 };
 
 } // namespace mc2_ops_hccl
