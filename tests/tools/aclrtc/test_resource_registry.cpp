@@ -744,6 +744,8 @@ TEST_F(ResourceRegistryTest, LoadManifestValidatesJsonOwnershipSourceAndDuplicat
     EXPECT_EQ(loadText("[]"), ResourceStatus::InvalidResource);
     EXPECT_EQ(loadText(R"({"source_file":"source.cpp"})"), ResourceStatus::InvalidResource);
     EXPECT_EQ(loadText(R"({"resource_id":1,"source_file":"source.cpp"})"), ResourceStatus::InvalidResource);
+    EXPECT_EQ(loadText(R"({"resource_id":""})"), ResourceStatus::InvalidResource);
+    EXPECT_EQ(stage.external.resources.find(""), stage.external.resources.end());
     EXPECT_EQ(loadText(R"({"resource_id":"metadata-only"})"), ResourceStatus::Success);
     EXPECT_TRUE(stage.external.resources.at("metadata-only")->data.sourceFilePath.empty());
     EXPECT_EQ(loadText(R"({"resource_id":"resource","source_file":1})"), ResourceStatus::InvalidResource);
