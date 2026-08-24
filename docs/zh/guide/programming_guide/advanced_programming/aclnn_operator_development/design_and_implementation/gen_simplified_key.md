@@ -1,8 +1,8 @@
 # GenSimplifiedKey回调实现
 
-本文介绍如何编写并注册`GenSimplifiedKey`回调。该回调用于预编译多份核函数（Kernel）binary的场景：算子开发者根据本次调用的输入、输出和属性生成一个自定义简化Key片段，运行时框架使用该片段查找对应的binary。
+本文介绍如何编写并注册`GenSimplifiedKey`回调。该回调用于预编译多份核函数（Kernel）binary的场景：算子开发者根据本次调用的输入、输出和属性生成一个自定义simplified key片段，运行时框架使用该片段查找对应的binary。
 
-本文只说明回调如何生成Key。如何在编译时提供每个Key对应的binary，请参见[简化Key二进制配置JSON](../compilation_and_deployment/simplified_key_json_configuration.md)；运行时如何调用回调并选择binary，请参见[基于简化Key的运行时选择流程](../invocation/simplified_key_runtime_flow.md)。
+本文只说明回调如何生成Key。如何在编译时提供每个Key对应的binary，请参见[simplified key二进制配置JSON](../compilation_and_deployment/simplified_key_json_configuration.md)；运行时如何调用回调并选择binary，请参见[基于simplified key的运行时选择流程](../invocation/simplified_key_runtime_flow.md)。
 
 ## 使用场景和职责边界
 
@@ -10,13 +10,13 @@
 
 `GenSimplifiedKey`的职责边界如下：
 
-**表1**  简化Key各参与方职责
+**表1**  simplified key各参与方职责
 
 | 参与方 | 职责 |
 |---|---|
 | 算子开发者 | 枚举需要编译的组合，在JSON中为每份binary声明`simplified_key`；编写回调，从本次调用信息生成相同的Key片段。 |
-| 编译工具链 | 按JSON拆分并编译每个组合，将完整简化Key和binary路径写入产物配置。 |
-| 运行时框架 | 调用回调生成片段，组装完整简化Key，查找并加载匹配的binary。 |
+| 编译工具链 | 按JSON拆分并编译每个组合，将完整simplified key和binary路径写入产物配置。 |
+| 运行时框架 | 调用回调生成片段，组装完整simplified key，查找并加载匹配的binary。 |
 
 回调不加载binary，也不决定TilingKey或核函数（Kernel）入口；这些工作仍由运行时框架和已注册的`TilingFunc`完成。
 
@@ -45,7 +45,7 @@ static ge::graphStatus GenSimplifiedKeyFunc(
 | `simplifiedKey` | 由运行时提供的输出缓冲区。回调将自定义Key片段写入该缓冲区。 |
 | 返回值 | 成功返回`ge::GRAPH_SUCCESS`，无法生成有效片段时返回失败码。 |
 
-自定义Key片段以UTF-8字节数计算必须小于256字节，不能包含算子类型、`d=`或`p=`等完整Key前缀。完整简化Key以UTF-8字节数计算必须小于1024字节。
+自定义Key片段经UTF-8编码后的长度必须小于256字节，不能包含算子类型、`d=`或`p=`等完整Key前缀。完整simplified key经UTF-8编码后的长度必须小于1024字节。
 
 ## 编写回调
 
@@ -111,5 +111,5 @@ this->AICore()
 ## 相关文档
 
 - [算子原型定义](./operator_prototype_definition.md)：了解`SetGenSimplifiedKey`所在的原型注册位置。
-- [简化Key二进制配置JSON](../compilation_and_deployment/simplified_key_json_configuration.md)：了解JSON与编译产物的对应关系。
-- [基于简化Key的运行时选择流程](../invocation/simplified_key_runtime_flow.md)：了解运行时如何使用回调结果选择binary。
+- [simplified key二进制配置JSON](../compilation_and_deployment/simplified_key_json_configuration.md)：了解JSON与编译产物的对应关系。
+- [基于simplified key的运行时选择流程](../invocation/simplified_key_runtime_flow.md)：了解运行时如何使用回调结果选择binary。

@@ -1,8 +1,8 @@
-# 基于简化Key的运行时选择流程
+# 基于simplified key的运行时选择流程
 
-本文介绍配置`GenSimplifiedKey`后的运行时流程。该机制用于从同一算子的多份预编译核函数（Kernel）binary中选择与本次调用条件匹配的一份。算子开发者负责提供回调和编译配置JSON；运行时框架负责调用回调、组装完整简化Key、查找并选择binary。
+本文介绍配置`GenSimplifiedKey`后的运行时流程。该机制用于从同一算子的多份预编译核函数（Kernel）binary中选择与本次调用条件匹配的一份。算子开发者负责提供回调和编译配置JSON；运行时框架负责调用回调、组装完整simplified key、查找并选择binary。
 
-回调的实现见[GenSimplifiedKey回调实现](../design_and_implementation/gen_simplified_key.md)，JSON的提供和编译产物见[简化Key二进制配置JSON](../compilation_and_deployment/simplified_key_json_configuration.md)。
+回调的实现见[GenSimplifiedKey回调实现](../design_and_implementation/gen_simplified_key.md)，JSON的提供和编译产物见[simplified key二进制配置JSON](../compilation_and_deployment/simplified_key_json_configuration.md)。
 
 ## 运行时流程
 
@@ -10,13 +10,13 @@
 
 1. 加载算子包中的Host侧算子实现和`binary_info_config.json`，取得该OpType的`binaryList`及`GenSimplifiedKey`回调。
 2. 根据本次调用的输入、输出、属性和目标AI处理器创建或复用`TilingContext`。
-3. 调用算子注册的`GenSimplifiedKey`回调。回调读取`TilingContext`并写出自定义简化Key片段，例如`custom_fp16`。
-4. 运行时框架补齐算子类型、确定性和实现模式等公共维度，生成完整简化Key，例如`AddCustomTemplate/d=0,p=1/custom_fp16`。
+3. 调用算子注册的`GenSimplifiedKey`回调。回调读取`TilingContext`并写出自定义simplified key片段，例如`custom_fp16`。
+4. 运行时框架补齐算子类型、确定性和实现模式等公共维度，生成完整simplified key，例如`AddCustomTemplate/d=0,p=1/custom_fp16`。
 5. 运行时使用完整Key在`binary_info_config.json`的`binaryList`中查找，得到匹配的`.o`和配套`.json`路径，并加载对应binary。
 6. 运行时调用已注册的`TilingFunc`，计算TilingData、workspace、BlockDim和TilingKey；随后创建executor并返回给调用方。
 7. 在`aclnnXxx`执行阶段，运行时使用已选择的binary和前一阶段准备的Tiling结果下发核函数（Kernel）。
 
-简化Key选择发生在Tiling之前的binary匹配阶段。`GenSimplifiedKey`不替代`TilingFunc`：前者用于选择哪份预编译binary，后者用于计算该binary本次执行需要的运行参数。
+simplified key选择发生在Tiling之前的binary匹配阶段。`GenSimplifiedKey`不替代`TilingFunc`：前者用于选择哪份预编译binary，后者用于计算该binary本次执行需要的运行参数。
 
 ## AddCustomTemplate示例
 
@@ -47,7 +47,7 @@
 
 ## 失败处理
 
-以下情况会导致本次调用无法通过自定义简化Key匹配到预编译binary：
+以下情况会导致本次调用无法通过自定义simplified key匹配到预编译binary：
 
 - 未注册`GenSimplifiedKey`回调，或回调为空。
 - 回调返回失败，例如输入描述为空或遇到未支持的dtype。
@@ -58,10 +58,10 @@
 
 ## 与两段式调用的关系
 
-简化Key选择属于`aclnnXxxGetWorkspaceSize`阶段的准备工作。参数缓存命中时，运行时可以复用已保存的binary和Tiling信息；缓存未命中时，才执行上述回调、查找和Tiling流程。`aclnnXxx`执行阶段不重新生成Key，而是使用executor中已准备好的binary和Tiling结果。
+simplified key选择属于`aclnnXxxGetWorkspaceSize`阶段的准备工作。参数缓存命中时，运行时可以复用已保存的binary和Tiling信息；缓存未命中时，才执行上述回调、查找和Tiling流程。`aclnnXxx`执行阶段不重新生成Key，而是使用executor中已准备好的binary和Tiling结果。
 
 ## 相关文档
 
 - [运行时加载机制](./runtime_loading_mechanism.md)：了解单算子两段式调用、缓存和通用binary匹配行为。
 - [GenSimplifiedKey回调实现](../design_and_implementation/gen_simplified_key.md)：了解回调签名、注册方法和编写要求。
-- [简化Key二进制配置JSON](../compilation_and_deployment/simplified_key_json_configuration.md)：了解完整Key和binary路径如何写入编译产物。
+- [simplified key二进制配置JSON](../compilation_and_deployment/simplified_key_json_configuration.md)：了解完整Key和binary路径如何写入编译产物。
