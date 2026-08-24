@@ -20,21 +20,6 @@
 
 namespace ascendc {
 namespace aclrtc {
-namespace {
-
-aclError MapProcessResultToCompilationError(
-    CompilationCommandKind commandKind, const ProcessExecutionResult& processResult) noexcept
-{
-    if (processResult.HasSuccessfulExit()) {
-        return ACLRTC_SUCCESS;
-    }
-    if (processResult.termination == ProcessTermination::InfrastructureFailure) {
-        return ACLRTC_ERROR_FAILURE;
-    }
-    return commandKind == CompilationCommandKind::Link ? ACLRTC_ERROR_LINKING : ACLRTC_ERROR_COMPILATION;
-}
-
-} // namespace
 
 CompilationCommandExecutionLimits CompilationCommandExecutionLimits::ProductionDefaults() noexcept
 {
@@ -103,7 +88,14 @@ aclError CompilationPlanExecutor::ExecuteCompilationCommand(
     executionRequest.capturedOutputByteLimit = executionLimits_.capturedOutputByteLimit;
 
     processResult = ProcessExecutor::Execute(executionRequest);
-    return MapProcessResultToCompilationError(compilationCommand.commandKind, processResult);
+    if (processResult.HasSuccessfulExit()) {
+        return ACLRTC_SUCCESS;
+    }
+    if (processResult.termination == ProcessTermination::InfrastructureFailure) {
+        return ACLRTC_ERROR_FAILURE;
+    }
+    return compilationCommand.commandKind == CompilationCommandKind::Link ? ACLRTC_ERROR_LINKING :
+                                                                            ACLRTC_ERROR_COMPILATION;
 }
 
 std::chrono::milliseconds CompilationPlanExecutor::GetCommandExecutionTimeout(
