@@ -267,9 +267,7 @@ def test_simplified_key_presence_requires_key_for_every_binary(
     path.write_text(json.dumps(content), encoding="utf-8")
 
     with pytest.raises(ValueError, match=r"op_list\[1\]\.simplified_key"):
-        split_json_files(
-            str(path), str(tmp_path), expected_op_type="AddCustomTemplate"
-        )
+        split_json_files(str(path), str(tmp_path), expected_op_type="AddCustomTemplate")
 
 
 @pytest.mark.parametrize(
