@@ -83,7 +83,9 @@ aclError CompilationPlanExecutor::ExecuteCompilationCommand(
         executionRequest.arguments.end(), compilationCommand.commandArguments.begin(),
         compilationCommand.commandArguments.end());
     executionRequest.outputMode = ProcessOutputMode::CaptureCombined;
-    executionRequest.executionTimeout = GetCommandExecutionTimeout(compilationCommand.commandKind);
+    executionRequest.executionTimeout = compilationCommand.commandKind == CompilationCommandKind::Compile ?
+                                            executionLimits_.compileCommandTimeout :
+                                            executionLimits_.objectCopyAndLinkCommandTimeout;
     executionRequest.terminationGracePeriod = executionLimits_.terminationGracePeriod;
     executionRequest.capturedOutputByteLimit = executionLimits_.capturedOutputByteLimit;
 
@@ -96,13 +98,6 @@ aclError CompilationPlanExecutor::ExecuteCompilationCommand(
     }
     return compilationCommand.commandKind == CompilationCommandKind::Link ? ACLRTC_ERROR_LINKING :
                                                                             ACLRTC_ERROR_COMPILATION;
-}
-
-std::chrono::milliseconds CompilationPlanExecutor::GetCommandExecutionTimeout(
-    CompilationCommandKind commandKind) const noexcept
-{
-    return commandKind == CompilationCommandKind::Compile ? executionLimits_.compileCommandTimeout :
-                                                            executionLimits_.objectCopyAndLinkCommandTimeout;
 }
 
 } // namespace aclrtc
