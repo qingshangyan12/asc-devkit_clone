@@ -116,7 +116,7 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
     u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
     u64 dataSize = opParam.DataDes.count * perDataSize;
     HCCL_INFO(
-        "[AllGatherAutoSelector][SelectAicpuAlgo] topoLevelNums=[%d], deviceNumPerModule=[%d], level0Topo=[%d]",
+        "[AllGatherAutoSelector][SelectAicpuAlgo111] topoLevelNums=[%d], deviceNumPerModule=[%d], level0Topo=[%d]",
         topoInfo->topoLevelNums, topoInfo->deviceNumPerModule, topoInfo->level0Topo);
     if (topoInfo->topoLevelNums > 1) {
         // Level1Nhr 已在 CalcTopoShape 中设置（GCD==1 时为 true）
@@ -138,6 +138,7 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
             selectAlgName = "InsAllGatherMesh1D";
         } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
             // UBX机型
+            HCCL_INFO("[hld][test111] level0Topo=[%d]", topoInfo->level0Topo);
             bool isMeshNumEqualToClosNum = false;
             bool isClosNumMultipleOfMeshNum = false;
             CHK_PRT_RET(
@@ -147,9 +148,12 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
                 CheckClosNumMultipleOfMeshNum(topoInfo, isClosNumMultipleOfMeshNum) != HCCL_SUCCESS,
                 HCCL_ERROR("[AllGatherAutoSelector] CheckClosNumMultipleOfMeshNum failed."), SelectorStatus::NOT_MATCH);
             if (isMeshNumEqualToClosNum && (topoInfo->userRankSize <= MAX_RANK_NUM_FOR_CONCURRENT_ALGO)) {
+                HCCL_INFO("[hld][test222] level0Topo=[%d]", topoInfo->level0Topo);
                 if (dataSize > SMALL_COUNT_512KB) {
+                    HCCL_INFO("[hld][test3333] level0Topo=[%d]", topoInfo->level0Topo);
                     selectAlgName = "InsAllGatherConcurrentMesh1DNHR";
                 } else {
+                    HCCL_INFO("[hld][test4444] level0Topo=[%d]", topoInfo->level0Topo);
                     selectAlgName = "InsAllGatherMesh1D";
                 }
             } else if (isClosNumMultipleOfMeshNum && dataSize > SMALL_COUNT_512KB) {
