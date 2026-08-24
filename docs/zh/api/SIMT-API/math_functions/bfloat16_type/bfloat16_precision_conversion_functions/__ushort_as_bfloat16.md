@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-将unsigned short int的数据按位重新解释为bfloat16，即将unsigned short int的数据存储的位按照bfloat16的格式进行读取。
+将`unsigned short int`的数据按位重新解释为bfloat16，即将`unsigned short int`的数据存储的位按照bfloat16的格式进行读取。
 
 ## 函数原型
 

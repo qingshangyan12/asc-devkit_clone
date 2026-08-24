@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-将float2类型数据的两个分量遵循CAST\_ROUND模式转换为hifloat8\_t精度，返回转换后的hifloat8x2\_t类型数据。
+将`float2`类型数据的两个分量遵循`CAST_ROUND`模式转换为`hifloat8_t`精度，返回转换后的`hifloat8x2_t`类型数据。
 
 ## 函数原型
 

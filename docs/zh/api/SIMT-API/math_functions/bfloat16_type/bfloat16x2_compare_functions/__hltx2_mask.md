@@ -80,12 +80,12 @@ unsigned int __hltx2_mask(bfloat16x2_t x, bfloat16x2_t y)
     </tr>
     <tr>
       <td>正常值</td>
-      <td>inf)</td>
+      <td>inf</td>
       <td>0xFFFF</td>
     </tr>
     <tr>
       <td>正常值</td>
-      <td>-inf)</td>
+      <td>-inf</td>
       <td>0x0000</td>
     </tr>
     <tr>

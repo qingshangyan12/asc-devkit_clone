@@ -47,9 +47,9 @@ inline float tanf(float x)
 
 输入数据的正切值。
 
--   当x为inf时，返回值为nan。
--   当x为-inf时，返回值为nan。
--   当x为nan时，返回值为nan。
+-   当`x`为inf时，返回值为nan。
+-   当`x`为-inf时，返回值为nan。
+-   当`x`为nan时，返回值为nan。
 
 ## 约束说明
 
