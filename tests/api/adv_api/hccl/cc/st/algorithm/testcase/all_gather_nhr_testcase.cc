@@ -23,7 +23,7 @@ namespace {
 using namespace mc2_ops_hccl;
 
 // ---------------------------------------------------------------------------
-// 构造辅助
+// Helpers
 // ---------------------------------------------------------------------------
 
 std::vector<HcclChannelDesc> MakeChannelDescs(const std::vector<std::pair<u32, u32>>& rankAndCount)
@@ -72,7 +72,7 @@ InsTempAllGatherNHR MakeNhrTemplate(u32 rankSize = 8U)
     return InsTempAllGatherNHR(param, 0U, {ranks});
 }
 
-// NHR 步数与每步 peer / slice 的参考实现，用于与模板内部推进规则对照。
+
 u32 RefStepNum(u32 rankSize)
 {
     u32 nSteps = 0;
@@ -108,7 +108,7 @@ RefStep RefGetStep(u32 myAlgRank, u32 rankSize, u32 step, u32 nSteps)
     return info;
 }
 
-// 末步直读 output 时，各 rx slice 落在 output 上的字节偏移。
+
 std::vector<u64> RefLastStepOutputOffsets(
     u32 myAlgRank, u32 rankSize, u64 outBuffBaseOff, u64 outputSliceStride, u64 partialOffset)
 {
@@ -121,7 +121,7 @@ std::vector<u64> RefLastStepOutputOffsets(
     return offsets;
 }
 
-// PostLocalCopy 实际会搬运的 algRank 集合。
+
 std::vector<u32> RefPostCopyRanks(
     u32 myAlgRank, u32 rankSize, bool readLastStepToOutput, bool skipOwnSliceCopy,
     const std::vector<u32>& lastStepReadSliceIdxs)
@@ -144,7 +144,7 @@ std::vector<u32> RefPostCopyRanks(
 const std::vector<u32> g_rankSizes = {2U, 3U, 4U, 5U, 8U, 16U};
 
 // ---------------------------------------------------------------------------
-// NHR 步骤推进
+// NHR step scheduling
 // ---------------------------------------------------------------------------
 
 class AllGatherNhrStepTest : public ::testing::Test {};
@@ -161,7 +161,6 @@ TEST_F(AllGatherNhrStepTest, StepNumMatchesCeilLog2)
 
 TEST_F(AllGatherNhrStepTest, PeerIsSymmetricAcrossRanks)
 {
-    // 本 rank 的 sendTo 必须把本 rank 视为 recvFrom，否则通信配不上对。
     for (u32 rankSize : g_rankSizes) {
         const u32 nSteps = RefStepNum(rankSize);
         for (u32 step = 0; step < nSteps; step++) {
@@ -177,12 +176,10 @@ TEST_F(AllGatherNhrStepTest, PeerIsSymmetricAcrossRanks)
 
 TEST_F(AllGatherNhrStepTest, EveryRankCollectsAllSlicesExactlyOnce)
 {
-    // 含 3/5 等非 2 次幂 rank 数：所有 slice 恰好收齐一次，不遗漏也不重复。
     for (u32 rankSize : g_rankSizes) {
         const u32 nSteps = RefStepNum(rankSize);
         for (u32 rank = 0; rank < rankSize; rank++) {
             std::set<u32> collected;
-            collected.insert(rank); // 本 rank 自己那份来自 LocalDataCopy
             u32 receivedTotal = 0;
             for (u32 step = 0; step < nSteps; step++) {
                 const RefStep info = RefGetStep(rank, rankSize, step, nSteps);
@@ -196,7 +193,6 @@ TEST_F(AllGatherNhrStepTest, EveryRankCollectsAllSlicesExactlyOnce)
                 }
             }
             EXPECT_EQ(collected.size(), rankSize) << "rankSize=" << rankSize << " rank=" << rank;
-            // 非 2 次幂时允许重复收取，2 次幂时收取数应恰好等于 rankSize-1
             if ((rankSize & (rankSize - 1U)) == 0U) {
                 EXPECT_EQ(receivedTotal, rankSize - 1U) << "rankSize=" << rankSize << " rank=" << rank;
             }
@@ -206,7 +202,6 @@ TEST_F(AllGatherNhrStepTest, EveryRankCollectsAllSlicesExactlyOnce)
 
 TEST_F(AllGatherNhrStepTest, EightRankZeroMatchesDocumentedSchedule)
 {
-    // 迁移方案 4.2 给出的 8 卡 rank0 期望调度。
     const u32 rankSize = 8U;
     const u32 nSteps = RefStepNum(rankSize);
     ASSERT_EQ(nSteps, 3U);
@@ -231,7 +226,7 @@ TEST_F(AllGatherNhrStepTest, EightRankZeroMatchesDocumentedSchedule)
 }
 
 // ---------------------------------------------------------------------------
-// channel 数量统计
+// Channel count
 // ---------------------------------------------------------------------------
 
 class AllGatherNhrChannelCountTest : public ::testing::Test {};
@@ -245,7 +240,6 @@ TEST_F(AllGatherNhrChannelCountTest, UniformChannelsGiveSameMinAndMax)
 
 TEST_F(AllGatherNhrChannelCountTest, RaggedChannelsGiveMinBelowMax)
 {
-    // 执行按 min 循环才不会越界访问 channel 少的 peer。
     const auto channels = MakeChannelDescs({{1U, 4U}, {2U, 2U}, {3U, 4U}});
     EXPECT_EQ(CalcChannelsPerRankMin(channels), 2U);
     EXPECT_EQ(CalcChannelsPerRank(channels), 4U);
@@ -270,7 +264,7 @@ TEST_F(AllGatherNhrChannelCountTest, ChannelMapMinAndMax)
 }
 
 // ---------------------------------------------------------------------------
-// 资源数量
+// Resource count
 // ---------------------------------------------------------------------------
 
 class AllGatherNhrResourceTest : public ::testing::Test {};
@@ -342,7 +336,6 @@ TEST_F(AllGatherNhrResourceTest, ProductionCalcResRejectsNullTopoInfo)
 
 TEST_F(AllGatherNhrResourceTest, PostCopyThreadIndexStaysInRange)
 {
-    // 运行时 exact InsAllGatherNHR 保持 channelsPerRank_=1，
     // PostCopy thread 下标为 channelsPerRank_ + channelIdx。
     const u32 channelsPerRank = 1U;
     const u32 runtimeThreadNum = 2U; // maxChannelsPerRank_ 运行时为 1
