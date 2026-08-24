@@ -57,7 +57,7 @@ inline half hsqrt(half x)
 
 ## 约束说明
 
-本接口支持的输入数据范围为x大于等于0，否则返回值为nan。
+本接口支持的输入数据范围为x大于等于0，否则非饱和模式下返回值为nan，饱和模式下返回值为0。
 
 ## 需要包含的头文件
 
@@ -72,9 +72,12 @@ inline half hsqrt(half x)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelSqrt(half* dst, half* x)
+    __global__ __launch_bounds__(1024) void KernelSqrt(half* dst, half* x, uint32_t count)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= count) {
+            return;
+        }
         dst[idx] = hsqrt(x[idx]);
     }
     ```
@@ -82,9 +85,17 @@ inline half hsqrt(half x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelSqrt(__gm__ half* dst, __gm__ half* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelSqrt(__gm__ half* dst, __gm__ half* x, uint32_t count)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= count) {
+            return;
+        }
         dst[idx] = hsqrt(x[idx]);
+    }
+
+    __global__ __vector__ void runSqrt(__gm__ half* dst, __gm__ half* x, uint32_t count)
+    {
+        asc_vf_call<KernelSqrt>(dim3(1024), dst, x, count);
     }
     ```

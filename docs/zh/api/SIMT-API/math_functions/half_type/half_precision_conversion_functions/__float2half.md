@@ -43,7 +43,7 @@ inline half __float2half(const float x)
 
 ## 返回值说明
 
-将float类型数据按照CAST\_RINT模式转换为half类型数据。特殊值如下：
+将float类型数据按照CAST\_RINT模式转换为half类型数据。本接口受全局饱和寄存器的影响，特殊值如下：
 
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
