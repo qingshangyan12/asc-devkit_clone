@@ -536,20 +536,34 @@ HcclResult GetTopoTypeByLink(HcclComm comm, uint32_t netLayer, const CommLink& l
         uint32_t topoInstId = topoInstList[topoInstIdx];
         uint32_t endPointNum;
         CHK_RET(HcclRankGraphGetEndpointNum(comm, netLayer, topoInstId, &endPointNum));
-        CHK_PRT_RET(
-            endPointNum == 0U, HCCL_ERROR("[%s] TopoInst[%u] has no endpoint.", __func__, topoInstId), HCCL_E_INTERNAL);
-        std::vector<EndpointDesc> endPointDescs(endPointNum);
-        CHK_RET(HcclRankGraphGetEndpointDesc(comm, netLayer, topoInstId, &endPointNum, endPointDescs.data()));
-        CHK_RET(HcclRankGraphGetTopoType(comm, netLayer, topoInstId, &topoType));
+        EndpointDesc* endPointDescs = (EndpointDesc*)malloc(endPointNum * sizeof(EndpointDesc));
+        if (endPointDescs == nullptr) {
+            HCCL_ERROR("Malloc endPointDescs failed!");
+            return HCCL_E_PARA;
+        }
+        HcclResult ret = HCCL_SUCCESS;
+        ret = HcclRankGraphGetEndpointDesc(comm, netLayer, topoInstId, &endPointNum, endPointDescs);
+        if (ret != HCCL_SUCCESS) {
+            free(endPointDescs);
+            return ret;
+        }
+
+        ret = HcclRankGraphGetTopoType(comm, netLayer, topoInstId, &topoType);
+        if (ret != HCCL_SUCCESS) {
+            free(endPointDescs);
+            return ret;
+        }
         HCCL_DEBUG("[%s]topoInstId=%u, endPointNum=%u, topoType=%u", __func__, topoInstId, endPointNum, topoType);
         for (uint32_t endPointIdx = 0; endPointIdx < endPointNum; endPointIdx++) {
             const EndpointDesc& endPoint = endPointDescs[endPointIdx];
             if (IsEndPointEqual(link.srcEndpointDesc, endPoint) ==
                 true) { // 当前TopoInst和link的endPoint相同，说明link属于当前TopoInst
+                free(endPointDescs);
                 return HCCL_SUCCESS;
             }
         }
         HCCL_WARNING("[%s]No Endpoint matches on TopoInst[%u].", __func__, topoInstId);
+        free(endPointDescs);
     }
     HCCL_ERROR("[%s]Cannot get TopoType by Link.", __func__);
     return HCCL_E_INTERNAL;

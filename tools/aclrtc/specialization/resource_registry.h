@@ -31,8 +31,28 @@ class path;
 namespace ascendc {
 namespace specialization_compile {
 
-enum class ResourceStatus { Success, NotFound, Conflict, InvalidResource, IoError, LoadError, InternalError };
-enum class ResourceSourceType { External, Custom, BuiltIn };
+enum class ResourceStatus : uint32_t {
+    Success,
+    NotFound,
+    Conflict,
+    InvalidResource,
+    IoError,
+    LoadError,
+    InternalError,
+};
+
+enum class ResourceSourceType : uint32_t {
+    External,
+    Custom,
+    BuiltIn,
+};
+
+/**
+ * @brief Returns whether kernel metadata and diagnostic artifacts are retained.
+ * @return true only when ASCEND_OP_COMPILE_SAVE_KERNEL_META, after surrounding
+ * whitespace is ignored, is exactly "1".
+ */
+bool IsKernelMetaSavingEnabled() noexcept;
 
 struct ResourceData {
     nlohmann::json json;
@@ -95,9 +115,9 @@ public:
     static ResourceRegistry& Instance();
 
     /**
-     * @brief Loads compile resources from an explicit path or the configured OPP search paths.
-     * @param[in] directory Resource shared object or directory to load. Pass nullptr or an empty string to use
-     * automatic OPP discovery.
+     * @brief Loads compile resources from an explicit shared object or the configured OPP search paths.
+     * @param[in] directory Resource shared object file to load. Pass nullptr or an empty string to use automatic OPP
+     * discovery. Directory input is not supported for explicit loading.
      * @return ResourceStatus::Success on success; otherwise, a status describing the discovery, validation, loading,
      * I/O, or conflict failure.
      */
@@ -153,7 +173,7 @@ private:
     ResourceEntry* FindResource(const std::string& resourceId) noexcept;
     ResourceStatus Materialize(const std::string& resourceId, const ResourceEntry& entry, ResourceData& resource);
     ResourceStatus Commit(StageState& stage);
-    bool HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed);
+    bool HasCommitConflict(const ResourceStore& incoming, const ResourceStore& committed) const;
 
     std::string temporaryRoot_;
     ResourceStore externalResources_;
