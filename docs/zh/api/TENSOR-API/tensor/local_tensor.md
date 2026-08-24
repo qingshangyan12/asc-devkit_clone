@@ -262,23 +262,21 @@ Tensor 元素类型与 `reg_tensor` 元素类型必须一致。当前寄存器�
 ```cpp
 #include "tensor_api/tensor.h"
 
-using namespace asc::te;
-
 template <typename T>
 __simd_vf__ inline void LocalTensorCopy(__ubuf__ T* dst_addr,
                                         __ubuf__ T* src_addr,
                                         uint32_t count)
 {
-    auto layout = make_layout(make_shape(256));
-    auto dst = make_tensor(make_mem_ptr<location::ub>(dst_addr), layout);
-    auto src = make_tensor(make_mem_ptr<location::ub>(src_addr), layout);
+    auto layout = asc::te::make_layout(asc::te::make_shape(256));
+    auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst_addr), layout);
+    auto src = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src_addr), layout);
 
     constexpr uint32_t vl = 256 / sizeof(T);
     uint32_t remain = count;
     for (uint32_t offset = 0; offset < count; offset += vl) {
-        auto mask = update_mask<T>(remain);
-        auto value = src.load(make_coord(offset)).with_mask(mask);
-        dst.store(make_coord(offset), value);
+        auto mask = asc::te::update_mask<T>(remain);
+        auto value = src.load(asc::te::make_coord(offset)).with_mask(mask);
+        dst.store(asc::te::make_coord(offset), value);
     }
 }
 ```
@@ -289,17 +287,17 @@ __simd_vf__ inline void LocalTensorCopy(__ubuf__ T* dst_addr,
 __simd_vf__ inline void LocalTensorSideband(__ubuf__ uint8_t* dst_addr,
                                             __ubuf__ uint8_t* src_addr)
 {
-    auto layout = make_layout(make_shape(256));
-    auto dst = make_tensor(make_mem_ptr<location::ub>(dst_addr), layout);
-    auto src = make_tensor(make_mem_ptr<location::ub>(src_addr), layout);
+    auto layout = asc::te::make_layout(asc::te::make_shape(256));
+    auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst_addr), layout);
+    auto src = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src_addr), layout);
 
-    auto bias = src.load_broadcast<broadcast_mode::elem>(make_coord(0));
+    auto bias = src.load_broadcast<asc::te::broadcast_mode::elem>(asc::te::make_coord(0));
 
-    reg_tensor<uint8_t> even;
-    reg_tensor<uint8_t> odd;
-    src.load<load_sideband_mode::deintlv>(make_coord(0), even, odd);
+    asc::te::reg_tensor<uint8_t> even;
+    asc::te::reg_tensor<uint8_t> odd;
+    src.load<asc::te::load_sideband_mode::deintlv>(asc::te::make_coord(0), even, odd);
     // intlv 写回不接收独立 mask；调用方需确保目标空间和输入范围满足硬件要求。
-    dst.store<store_sideband_mode::intlv>(make_coord(0), even, odd);
+    dst.store<asc::te::store_sideband_mode::intlv>(asc::te::make_coord(0), even, odd);
     (void)bias;
 }
 ```
