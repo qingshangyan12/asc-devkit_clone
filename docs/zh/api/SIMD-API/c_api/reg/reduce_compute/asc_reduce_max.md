@@ -29,8 +29,10 @@
 根据`mask`对源操作数`src`进行归约最大值操作，将最大值写入目的操作数`dst`的第0个元素，将最大值在`src`中的索引原始位模式写入`dst`的第1个元素，并将`dst`中的其他元素置0。如果存在多个最大值，则写入最小的索引。计算公式如下：
 
 $$
-dst_0 = \max\{src_i \mid mask_i = 1\} \\
-dst_1 = \argmax\{src_i \mid mask_i = 1\}
+\begin{aligned}
+dst_0 &= \max\{src_i \mid mask_i = 1\} \\
+dst_1 &= \argmax\{src_i \mid mask_i = 1\}
+\end{aligned}
 $$
 
 ## 函数原型
