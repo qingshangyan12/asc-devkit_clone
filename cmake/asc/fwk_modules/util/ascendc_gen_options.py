@@ -14,6 +14,8 @@ import sys
 import stat
 import os
 
+from opdesc_parser import _trans_short_soc_to_soc_version
+
 
 def write_options_to_file(
     file_name: str, options_str: str, op_type: str, compute_unit: str, split_char: str
@@ -241,7 +243,10 @@ if __name__ == "__main__":
             "SOC_SERIES and COMPUTE_UNIT cannot be used at the same time"
         )
     if soc_series:
-        compute_soc = soc_series
+        compute_soc = ";".join(
+            _trans_short_soc_to_soc_version(soc_ver)
+            for soc_ver in soc_series.split(";")
+        )
     elif compute_soc != "":
         compute_soc = compute_soc[0:-1]
     final_options = []

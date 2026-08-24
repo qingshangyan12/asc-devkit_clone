@@ -394,7 +394,7 @@ function(npu_op_kernel_sources target_name)
   elseif(DEFINED KERNEL_SRC_SOC_SERIES)
     _ascendc_encode_soc_series(encoded_soc_series ${KERNEL_SRC_SOC_SERIES})
     string(REPLACE ";" " " COMPUTE_UNITS "${encoded_soc_series}")
-    list(APPEND process_source_files_command "--compute-unit=${COMPUTE_UNITS}")
+    list(APPEND process_source_files_command "--soc-series=${COMPUTE_UNITS}")
   endif()
   execute_process(COMMAND ${ASCEND_PYTHON_EXECUTABLE} ${process_source_files_command}
     RESULT_VARIABLE EXEC_RESULT
