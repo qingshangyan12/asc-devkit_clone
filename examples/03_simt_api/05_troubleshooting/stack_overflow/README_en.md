@@ -15,7 +15,7 @@ This example contains two cases:
 
 ## Supported CANN Software Version
 
-- \>=CANN 9.1.0
+- \>= CANN 9.1.0
 
 ## Directory Structure
 

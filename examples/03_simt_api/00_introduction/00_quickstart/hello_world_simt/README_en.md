@@ -58,4 +58,4 @@ Execute the following steps in the root directory of this example to compile and
   [blockIdx (1/2)][threadIdx (0/32)]: Hello World!
   ```
 
-  The output consists of 6 lines, each corresponding to the print result of one thread. `[blockIdx (X/2)]` indicates the X-th thread block (out of 2 thread blocks in total), and `[threadIdx (Y/32)]` indicates the Y-th thread within the thread block. This shows that the kernel function has successfully executed on the AIV Core.
+  The output consists of 6 lines, each corresponding to the print result of one thread. `[blockIdx (X/2)]` indicates the X-th thread block (out of 2 thread blocks in total), and `[threadIdx (Y/32)]` indicates the Y-th thread within the thread block. This shows that the kernel function has executed successfully on the AIV Core.
