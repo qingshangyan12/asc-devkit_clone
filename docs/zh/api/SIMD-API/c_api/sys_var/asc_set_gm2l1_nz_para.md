@@ -11,8 +11,8 @@
 <!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910" id4 -->
+- Atlas 训练系列产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
@@ -20,13 +20,17 @@
 <!-- npu="310p" id6 -->
 - Atlas 推理系列产品Vector Core：不支持
 <!-- end id6 -->
-<!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310b" id7 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-本接口用于配置Global Memory到L1 Buffer的ND2Nz和DN2Nz搬运参数。配置写入后，由后续的[asc_copy_gm2l1_nd2nz](../cube_data_move/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](../cube_data_move/asc_copy_gm2l1_dn2nz.md)接口使用。
+头文件路径为：`"c_api/asc_simd.h"`。
+
+本接口通过CCE指令`set_mte2_nz_para`设置`MTE2_NZ_PARA`寄存器，用于配置从Global Memory搬运至L1 Buffer时，ND2NZ或DN2NZ格式转换所需的目的地址步长和矩阵数量。配置写入后，由后续的[asc_copy_gm2l1_nd2nz](../cube_data_move/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](../cube_data_move/asc_copy_gm2l1_dn2nz.md)接口使用。
+
+对应的基础API为[DataCopy（GMToL1随路转换-ND2NZ搬运）](../../basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ.md)和[DataCopy（GMToL1随路转换-DN2NZ搬运）](../../basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_DN2NZ.md)。本接口仅配置目的地址相关参数，源地址步长、矩阵行列数等参数由后续搬运接口配置。
 
 本接口为矩阵搬入相关配置接口，仅在AIC上生效。
 
@@ -38,20 +42,29 @@ __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config)
 
 ## 参数说明
 
-**表1** 参数说明
+**表 1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-|---|---|---|
-| config | 输入 | ND2Nz或DN2Nz搬运的64bit配置参数。接口不检查或转换字段值，需按照[表2](#table2)完成拼装。 |
+| ---------- | ---------- | ---------- |
+| config | 输入 | ND2NZ或DN2NZ搬运的64位配置参数。接口不检查或转换字段值，需按照[表 2](#table2)完成拼装。 |
 
-**表2** config参数字段说明 <a id="table2"></a>
+**表 2**  config参数字段说明<a id="table2"></a>
 
-| bit范围 | 描述 |
-|---|---|
-| 15:0 | 源矩阵中ND矩阵或DN矩阵的数量，取值范围为[0, 4095]。取值为0时，后续搬运接口将被视为NOP（空操作）。 |
-| 31:16 | 目的Nz矩阵中相邻行起始地址的偏移，取值范围为[1, 16384]，单位为32字节。 |
-| 47:32 | 目的Nz矩阵中相邻z矩阵起始地址的偏移，取值范围为[1, 16384]，单位为32字节。 |
-| 63:48 | 目的矩阵中相邻Nz矩阵起始地址的偏移，字段取值范围为[0, 65535]，单位为32字节。矩阵数量为1时，本字段无意义，设置为0即可。矩阵数量大于1且本字段为0时，后写入的Nz矩阵会覆盖第一个Nz矩阵。 |
+| 比特位范围 | 对应基础API参数 | 描述 |
+| ---------- | ---------- | ---------- |
+| 15:0 | `ndNum`/`dnNum` | 源操作数中ND矩阵或DN矩阵的数量，取值范围为[0, 4095]。取值为0时，后续搬运接口将被视为NOP（空操作）。 |
+| 31:16 | `dstNzNStride` | 目的NZ矩阵中相邻行起始地址间的偏移，取值范围为[1, 16384]，单位为32B。 |
+| 47:32 | `dstNzC0Stride` | 目的NZ矩阵中相邻Z矩阵起始地址间的偏移，取值范围为[1, 16384]，单位为32B。 |
+| 63:48 | `dstNzMatrixStride`的换算值 | 目的操作数中相邻NZ矩阵起始地址间的偏移，取值范围为[0, 65535]，单位为32B。矩阵数量为1时，本字段无意义，设置为0即可。矩阵数量大于1且本字段为0时，后写入的NZ矩阵会覆盖第一个NZ矩阵。 |
+
+基础API的`dstNzMatrixStride`参数以元素个数为单位，其实现会按照`dstNzMatrixStride * sizeof(T) / 32`换算为`config[63:48]`。调用本接口时，需要直接配置换算后的32B块数，本接口不会进行单位换算。`config`可按如下方式拼装：
+
+```cpp
+uint64_t config = (static_cast<uint64_t>(loop4_dst_stride) << 48) |
+                  (static_cast<uint64_t>(loop3_dst_stride) << 32) |
+                  (static_cast<uint64_t>(loop2_dst_stride) << 16) |
+                  static_cast<uint64_t>(matrix_num);
+```
 
 ## 返回值说明
 
@@ -64,9 +77,10 @@ PIPE_S
 ## 约束说明
 
 - 本接口仅在AIC上生效，在AIV上调用将直接返回。
-- 本接口需在对应的ND2Nz或DN2Nz搬运接口执行前调用，调用后配置会持续生效，直至再次调用本接口覆盖。
-- `config`的四个字段均为16bit，接口会将`config`整体写入，不会单独检查字段范围。拼装前需确保各字段满足[表2](#table2)中的取值要求，不得将超出16bit的值直接左移，否则高位会写入相邻字段。
-- 矩阵数量大于1时，需根据单个Nz矩阵占用的空间正确设置[63:48]字段，否则L1 Buffer上的数据会产生重叠。
+- 本接口需在对应的ND2NZ或DN2NZ搬运接口执行前调用，调用后配置会持续生效，直至再次调用本接口覆盖。
+- `config`由4个16位字段组成，接口会将`config`整体写入，不会检查字段范围。拼装前需确保各字段满足[表 2](#table2)中的取值要求，不得将超出16位的值直接左移，否则高位会写入相邻字段。
+- 后续搬运接口开启SmallC0模式时，`config[31:16]`和`config[47:32]`无需配置。
+- 搬运至L1 Buffer的数据不能重叠。如果步长配置导致重叠写入，硬件不会产生告警或错误，并且不保证重叠数据的写入顺序。
 
 <!-- npu="950" id8 -->
 ## 调用示例
@@ -80,6 +94,8 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 
 以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
+
+示例中每次搬运一个16×16的`half`类型ND矩阵。目的NZ矩阵的相邻行起始地址偏移为1个32B块，相邻Z矩阵起始地址偏移为16个32B块；由于每次只搬运一个矩阵，相邻NZ矩阵起始地址偏移配置为0。
 
 ```cpp
 #include <cstdint>
@@ -103,8 +119,13 @@ __global__ __cube__ void asc_set_gm2l1_nz_para_kernel(
     __cb__ half b_l0[ELEMENTS];
     __cc__ float c_l0[ELEMENTS];
 
-    // One ND matrix, adjacent N blocks, and a 16-element C0-column stride.
-    constexpr uint64_t nz_config = (16ULL << 32) | (1ULL << 16) | 1ULL;
+    // 三个stride字段的单位均为32B。
+    constexpr uint64_t matrix_num = 1;
+    constexpr uint64_t loop2_dst_stride = 1;
+    constexpr uint64_t loop3_dst_stride = 16;
+    constexpr uint64_t loop4_dst_stride = 0;
+    constexpr uint64_t nz_config = (loop4_dst_stride << 48) | (loop3_dst_stride << 32) |
+                                   (loop2_dst_stride << 16) | matrix_num;
     asc_set_gm2l1_nz_para(nz_config);
     asc_copy_gm2l1_nd2nz(a_l1, reinterpret_cast<__gm__ half*>(a), DIM * sizeof(half), 0, DIM, DIM, 0, false);
     asc_set_gm2l1_nz_para(nz_config);
