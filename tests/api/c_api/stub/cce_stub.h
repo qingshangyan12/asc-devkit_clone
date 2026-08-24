@@ -15,6 +15,11 @@
 // The compiler supports this overload, but it is missing from the CPU debug stub header.
 int64_t ld_dev(__gm__ int64_t* src, int16_t offset);
 
+// The compiler supports this overload, but it is missing from the CPU debug stub header.
+inline void vmadd(
+    vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, vector_bool mask, Literal mode)
+{}
+
 #ifndef ULL
 #define ULL unsigned long long
 #endif
