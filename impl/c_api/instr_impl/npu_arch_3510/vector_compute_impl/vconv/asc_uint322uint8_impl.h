@@ -166,7 +166,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_impl(
     vector_uint32_t src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_impl(dst, src, mask);
     return dst;
 }
@@ -175,7 +175,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_sat_impl(
     vector_uint32_t src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_sat_impl(dst, src, mask);
     return dst;
 }
@@ -184,7 +184,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_v2_impl(
     vector_uint32_t src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_v2_impl(dst, src, mask);
     return dst;
 }
@@ -193,7 +193,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_sat_v2_impl(
     vector_uint32_t src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_sat_v2_impl(dst, src, mask);
     return dst;
 }
@@ -202,7 +202,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_v3_impl(
     vector_uint32_t src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_v3_impl(dst, src, mask);
     return dst;
 }
@@ -211,7 +211,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_sat_v3_impl(
     vector_uint32_t src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_sat_v3_impl(dst, src, mask);
     return dst;
 }
@@ -220,7 +220,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_v4_impl(
     vector_uint32_t src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_v4_impl(dst, src, mask);
     return dst;
 }
@@ -229,7 +229,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_sat_v4_impl(
     vector_uint32_t src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_sat_v4_impl(dst, src, mask);
     return dst;
 }
@@ -239,7 +239,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -249,7 +249,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_quarter_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -259,7 +259,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_quarter_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -269,7 +269,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_quarter_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -279,7 +279,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_sat_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -289,7 +289,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_quarter_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_sat_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -299,7 +299,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_quarter_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_sat_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -309,7 +309,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_quarter_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_uint322uint8_sat_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }

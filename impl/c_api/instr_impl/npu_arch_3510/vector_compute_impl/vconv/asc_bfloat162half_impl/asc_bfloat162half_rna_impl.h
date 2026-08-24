@@ -37,7 +37,7 @@ __simd_callee__ inline vector_half asc_bfloat162half_rna_impl(
     vector_bfloat16_t src,
     vector_bool mask)
 {
-    vector_half dst{};
+    vector_half dst;
     asc_bfloat162half_rna_impl(dst, src, mask);
     return dst;
 }
@@ -46,7 +46,7 @@ __simd_callee__ inline vector_half asc_bfloat162half_rna_sat_impl(
     vector_bfloat16_t src,
     vector_bool mask)
 {
-    vector_half dst{};
+    vector_half dst;
     asc_bfloat162half_rna_sat_impl(dst, src, mask);
     return dst;
 }

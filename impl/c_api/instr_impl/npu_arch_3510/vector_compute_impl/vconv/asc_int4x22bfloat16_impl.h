@@ -51,7 +51,7 @@ __simd_callee__ inline vector_bfloat16_t asc_int4x22bfloat16_impl(
     vector_int4x2_t src,
     vector_bool mask)
 {
-    vector_bfloat16_t dst{};
+    vector_bfloat16_t dst;
     asc_int4x22bfloat16_impl(dst, src, mask);
     return dst;
 }
@@ -60,7 +60,7 @@ __simd_callee__ inline vector_bfloat16_t asc_int4x22bfloat16_v2_impl(
     vector_int4x2_t src,
     vector_bool mask)
 {
-    vector_bfloat16_t dst{};
+    vector_bfloat16_t dst;
     asc_int4x22bfloat16_v2_impl(dst, src, mask);
     return dst;
 }
@@ -69,7 +69,7 @@ __simd_callee__ inline vector_bfloat16_t asc_int4x22bfloat16_v3_impl(
     vector_int4x2_t src,
     vector_bool mask)
 {
-    vector_bfloat16_t dst{};
+    vector_bfloat16_t dst;
     asc_int4x22bfloat16_v3_impl(dst, src, mask);
     return dst;
 }
@@ -78,7 +78,7 @@ __simd_callee__ inline vector_bfloat16_t asc_int4x22bfloat16_v4_impl(
     vector_int4x2_t src,
     vector_bool mask)
 {
-    vector_bfloat16_t dst{};
+    vector_bfloat16_t dst;
     asc_int4x22bfloat16_v4_impl(dst, src, mask);
     return dst;
 }

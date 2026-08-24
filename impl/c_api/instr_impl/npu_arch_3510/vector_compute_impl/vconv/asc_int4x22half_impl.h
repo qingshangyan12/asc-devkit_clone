@@ -58,7 +58,7 @@ __simd_callee__ inline vector_half asc_int4x22half_impl(
     vector_int4x2_t src,
     vector_bool mask)
 {
-    vector_half dst{};
+    vector_half dst;
     asc_int4x22half_impl(dst, src, mask);
     return dst;
 }
@@ -67,7 +67,7 @@ __simd_callee__ inline vector_half asc_int4x22half_v2_impl(
     vector_int4x2_t src,
     vector_bool mask)
 {
-    vector_half dst{};
+    vector_half dst;
     asc_int4x22half_v2_impl(dst, src, mask);
     return dst;
 }
@@ -76,7 +76,7 @@ __simd_callee__ inline vector_half asc_int4x22half_v3_impl(
     vector_int4x2_t src,
     vector_bool mask)
 {
-    vector_half dst{};
+    vector_half dst;
     asc_int4x22half_v3_impl(dst, src, mask);
     return dst;
 }
@@ -85,7 +85,7 @@ __simd_callee__ inline vector_half asc_int4x22half_v4_impl(
     vector_int4x2_t src,
     vector_bool mask)
 {
-    vector_half dst{};
+    vector_half dst;
     asc_int4x22half_v4_impl(dst, src, mask);
     return dst;
 }
