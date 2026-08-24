@@ -53,31 +53,54 @@ $$
 ### 无进位输出加法（占位符形式）
 
 ```c
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_add(vector_<dtype>& dst,
+                                    vector_<dtype> src0,
+                                    vector_<dtype> src1,
+                                    vector_bool mask)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline vector_<dtype> asc_add(vector_<dtype> src0,
+                                              vector_<dtype> src1,
+                                              vector_bool mask)
+```
+
+**dtype取值如下：**`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+**函数原型典型示例**
+
+```c
+// 通过引用参数输出结果示例：float类型的无进位输出加法
+__simd_callee__ inline void asc_add(vector_float& dst,
+                                    vector_float src0,
+                                    vector_float src1,
+                                    vector_bool mask)
+
+// 通过函数返回值返回结果示例：float类型的无进位输出加法
+__simd_callee__ inline vector_float asc_add(vector_float src0,
+                                            vector_float src1,
+                                            vector_bool mask)
+```
+
+### 带进位输出加法（占位符形式）
+
+```c
+__simd_callee__ inline void asc_add(vector_bool& carry,
+                                    vector_<dtype>& dst,
                                     vector_<dtype> src0,
                                     vector_<dtype> src1,
                                     vector_bool mask)
 ```
 
-**dtype取值如下：**`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+**dtype取值如下：**`int32_t`、`uint32_t`。
 
-**典型示例**
-
-```c
-// 示例：float类型的无进位输出加法
-__simd_callee__ inline void asc_add(vector_float& dst,
-                                    vector_float src0,
-                                    vector_float src1,
-                                    vector_bool mask)
-```
-
-### 带进位输出加法
+**函数原型典型示例**
 
 ```c
 __simd_callee__ inline void asc_add(vector_bool& carry,
-                                    vector_uint32_t& dst,
-                                    vector_uint32_t src0,
-                                    vector_uint32_t src1,
+                                    vector_int32_t& dst,
+                                    vector_int32_t src0,
+                                    vector_int32_t src1,
                                     vector_bool mask)
 ```
 
@@ -110,13 +133,16 @@ __simd_callee__ inline void asc_add(vector_bool& carry,
 
 ## 返回值说明
 
-无
+- 通过引用参数输出结果的函数原型无返回值。
+- 通过函数返回值输出结果的函数原型返回无进位加法结果，返回值类型与源操作数类型一致。
+- 带进位输出加法仅支持通过引用参数输出结果，无返回值。
 
 ## 约束说明
 
 ### 通用约束
 
-- 本接口在非AIV上调用直接返回。
+- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
+- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
 - `mask`需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 
 ### 无进位输出加法约束

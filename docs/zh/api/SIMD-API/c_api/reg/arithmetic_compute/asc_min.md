@@ -35,16 +35,36 @@ $$
 
 ## 函数原型
 
-```cpp
-__simd_callee__ inline void asc_min(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_min(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_min(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_min(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_min(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_min(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_min(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_min(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_min(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
+### 占位符形式
+
+```c
+// 通过引用参数输出结果
+__simd_callee__ inline void asc_min(vector_<dtype>& dst,
+                                    vector_<dtype> src0,
+                                    vector_<dtype> src1,
+                                    vector_bool mask)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline vector_<dtype> asc_min(vector_<dtype> src0,
+                                              vector_<dtype> src1,
+                                              vector_bool mask)
+```
+
+**dtype取值如下：**`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+**函数原型典型示例**
+
+```c
+// 通过引用参数输出结果示例：float类型
+__simd_callee__ inline void asc_min(vector_float& dst,
+                                    vector_float src0,
+                                    vector_float src1,
+                                    vector_bool mask)
+
+// 通过函数返回值返回结果示例：float类型
+__simd_callee__ inline vector_float asc_min(vector_float src0,
+                                              vector_float src1,
+                                              vector_bool mask)
 ```
 
 ## 参数说明
@@ -52,19 +72,23 @@ __simd_callee__ inline void asc_min(vector_float& dst, vector_float src0, vector
 **表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-| :--- | :--- | :--- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+|---|---|---|
+| dst | 输出 | 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。 |
 | src0 | 输入 | 源操作数（矢量数据寄存器）。 |
-| src1 | 输入 |源操作数（矢量数据寄存器）。 |
-| mask | 输入 | 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| src1 | 输入 | 源操作数（矢量数据寄存器）。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
-无
+- 通过引用参数输出结果的函数原型无返回值。
+- 通过函数返回值返回结果的函数原型返回逐元素最小值计算结果，返回值类型与源操作数类型一致。
 
 ## 约束说明
+
+- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
+- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
 
 - mask控制源操作数是否参与计算，源操作数不参与计算的元素在输出对应位置置零。
 
