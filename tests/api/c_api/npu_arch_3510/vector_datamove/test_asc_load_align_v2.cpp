@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
@@ -39,6 +40,24 @@
         GlobalMockObject::verify();                                                                                    \
     }
 
+#define TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(dst_type, src_type, cce_dst_type, cce_src_type)                           \
+    TEST_F(TestVectorDataMoveLoadAlignV2##dst_type##CApi,                                                          \
+        c_api_asc_loadalign_datablock_stride_##dst_type##_ReturnSucc)                                              \
+    {                                                                                                                  \
+        __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                             \
+        vector_bool mask;                                                                                              \
+                                                                                                                       \
+        MOCKER_CPP(vsldb, void(cce_dst_type&, __ubuf__ cce_src_type*, int32_t, vector_bool))                           \
+            .times(1)                                                                                                  \
+            .will(invoke(vsldb##_##dst_type##_Stub));                                                                  \
+                                                                                                                       \
+        static_assert(std::is_same_v<                                                                                   \
+                      decltype(asc_loadalign_datablock_stride(src, 0, 0, mask)), dst_type>);                           \
+        dst_type dst = asc_loadalign_datablock_stride(src, 0, 0, mask);                                                \
+        (void)dst;                                                                                                     \
+        GlobalMockObject::verify();                                                                                    \
+    }
+
 TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_int8_t, int8_t, vector_int8_t, int8_t);
 TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_uint8_t, uint8_t, vector_uint8_t, uint8_t);
 TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_int16_t, int16_t, vector_int16_t, int16_t);
@@ -56,6 +75,23 @@ TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_
 TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_half, half, vector_half, half);
 TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_float, float, vector_float, float);
 TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t, float4_e1m2x2_t);
+
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_int8_t, int8_t, vector_int8_t, int8_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_uint8_t, uint8_t, vector_uint8_t, uint8_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_int16_t, int16_t, vector_int16_t, int16_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_uint16_t, uint16_t, vector_uint16_t, uint16_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_int32_t, int32_t, vector_int32_t, int32_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_uint32_t, uint32_t, vector_uint32_t, uint32_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_bfloat16_t, bfloat16_t, vector_bfloat16_t, bfloat16_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_hifloat8_t, hifloat8_t, vector_uint8_t, uint8_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t, fp8_e5m2_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_fp8_e8m0_t, fp8_e8m0_t, vector_fp8_e8m0_t, fp8_e8m0_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t, fp4x2_e1m2_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t, fp4x2_e2m1_t);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_half, half, vector_half, half);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_float, float, vector_float, float);
+TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t, float4_e1m2x2_t);
 
 #define TEST_VECTOR_COMPUTE_LOADALIGN_POSTUPDATEV2(dst_type, src_type, cce_dst_type, cce_src_type)            \
                                                                                                               \
