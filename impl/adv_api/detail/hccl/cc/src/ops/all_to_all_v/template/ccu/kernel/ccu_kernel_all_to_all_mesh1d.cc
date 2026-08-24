@@ -77,8 +77,7 @@ static void PreSync(AlltoAllMesh1DContext& ctx)
     for (uint32_t i = 0; i < ctx.channelCount; i++) {
         ccu::WriteVariableWithNotify(
             ctx.channels[i], ctx.output[ctx.rankId], OUTPUT_XN_ID, CKE_IDX_0, 1 << OUTPUT_XN_ID);
-        ccu::WriteVariableWithNotify(
-            ctx.channels[i], ctx.token[ctx.rankId], TOKEN_XN_ID, CKE_IDX_0, 1 << TOKEN_XN_ID);
+        ccu::WriteVariableWithNotify(ctx.channels[i], ctx.token[ctx.rankId], TOKEN_XN_ID, CKE_IDX_0, 1 << TOKEN_XN_ID);
     }
 
     uint32_t allBit = (1 << OUTPUT_XN_ID) | (1 << TOKEN_XN_ID);
