@@ -204,6 +204,7 @@ def test_invalid_value_message_keeps_original_op_index(
     content = _valid_config()
     second_op = json.loads(json.dumps(content["op_list"][0]))
     second_op["bin_filename"] = "AddCustomTemplate_FP32"
+    second_op["simplified_key"] = "custom_fp32"
     second_op["inputs"][0]["dtype"] = "fp17"
     content["op_list"].append(second_op)
     path = tmp_path / "binary.json"
@@ -316,6 +317,23 @@ def test_rejects_duplicate_binary_filename(tmp_path, custom_binary_modules):
         )
 
 
+def test_rejects_duplicate_simplified_key(tmp_path, custom_binary_modules):
+    _, split_json_files, _ = custom_binary_modules
+    content = _valid_config()
+    second_op = json.loads(json.dumps(content["op_list"][0]))
+    second_op["bin_filename"] = "AddCustomTemplate_FP32"
+    content["op_list"].append(second_op)
+    path = tmp_path / "binary.json"
+    path.write_text(json.dumps(content), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="duplicate value 'custom_fp16'"):
+        split_json_files(
+            str(path),
+            str(tmp_path),
+            expected_op_type="AddCustomTemplate",
+        )
+
+
 def test_rejects_binary_filenames_with_same_output_name(
     tmp_path, custom_binary_modules
 ):
@@ -333,3 +351,30 @@ def test_rejects_binary_filenames_with_same_output_name(
             str(tmp_path),
             expected_op_type="AddCustomTemplate",
         )
+
+
+def test_incremental_split_truncates_existing_json(tmp_path, custom_binary_modules):
+    _, split_json_files, _ = custom_binary_modules
+    path = tmp_path / "binary.json"
+    output_dir = tmp_path / "split"
+    output_dir.mkdir()
+    path.write_text(json.dumps(_valid_config()), encoding="utf-8")
+    generated_files = split_json_files(
+        str(path), str(output_dir), expected_op_type="AddCustomTemplate"
+    )
+
+    shorter_config = {
+        "op_type": "AddCustomTemplate",
+        "op_list": [
+            {
+                "bin_filename": "AddCustomTemplate_FP16",
+                "simplified_key": "custom_fp16",
+            }
+        ],
+    }
+    path.write_text(json.dumps(shorter_config), encoding="utf-8")
+    split_json_files(str(path), str(output_dir), expected_op_type="AddCustomTemplate")
+
+    with open(generated_files[0], "r", encoding="utf-8") as split_file:
+        split_json = json.load(split_file)
+    assert split_json["op_list"] == shorter_config["op_list"]
