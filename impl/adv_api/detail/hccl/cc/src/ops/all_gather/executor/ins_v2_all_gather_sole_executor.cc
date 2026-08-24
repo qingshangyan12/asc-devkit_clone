@@ -142,8 +142,10 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     } else {
         maxDataSizePerLoop = transportBoundDataSize;
     }
-    if (param.supportSymmetricMemory) {
+    // 对称内存只由InsAllGatherMesh1D显式使能，避免其他共享Executor的模板误进入该路径
+    if (param.supportSymmetricMemory && std::string(param.algName) == "InsAllGatherMesh1D") {
         maxDataSizePerLoop = dataSize_;
+        tempAlgParams.supportSymmetricMemory = true;
     }
     u64 maxCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
     // 计算loopTimes
