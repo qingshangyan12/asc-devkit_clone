@@ -34,7 +34,7 @@ This sample provides three implementations of reduction sum operations, demonstr
 
 ### Specifications
 
-All three cases use the same execution configuration: a grid of 4 thread blocks, 1024 threads per block (32 warps), 4096 threads in total, with dynamic ubuf set to 0. The launch form is `<<<dim3(4), dim3(1024), DYN_UBUF_SIZE, stream>>>`. `THREADS_PER_BLOCK` is 1024, the number of threads per block under the default thread configuration.
+All three cases use the same execution configuration: a grid of 4 thread blocks, 1024 threads per block (the default thread configuration), 4096 threads in total, with dynamic ubuf set to 0. The launch form is `<<<dim3(4), dim3(1024), DYN_UBUF_SIZE, stream>>>`.
 
 
 <table>
