@@ -171,7 +171,7 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 - 读写带宽：**14.51(GB/s) | 7.25(GB/s)**
 
 **原理说明**：
-在Ascend 950PR系列产品上，SIMT编程模式下L2 Cache以Cache Line=128字节为单位进行访问。
+SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 
 - Case 1（标量half）：无法填满整行导致RMW写放大
   使用标量half（2B）。单个Warp（32线程）同时发射指令时，在空间上连续拼出的总宽度为：
