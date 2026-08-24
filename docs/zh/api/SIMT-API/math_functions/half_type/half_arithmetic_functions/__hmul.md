@@ -46,8 +46,8 @@ half __hmul(const half x, const half y)
 
 输入数据相乘的结果。
 
--   当输入和结果都不为nan时，x\*y的符号为x和y符号的异或。
--   \_\_hmul\(x, y\)等价于\_\_hmul\(y, x\)。
+-   当输入和结果都不为nan时，`x*y`的符号为x和y符号的异或。
+-   `__hmul(x, y)`等价于`__hmul(y, x)`。
 -   本接口受全局饱和模式影响，特殊值如下：
 
     <table>

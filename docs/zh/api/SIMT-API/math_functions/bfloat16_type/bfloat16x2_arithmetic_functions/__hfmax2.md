@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-计算输入bfloat16x2\_t类型数据各分量的乘加的结果（前两个输入相乘后与第三个输入相加），并遵循CAST\_RINT模式对结果进行舍入。
+计算输入`bfloat16x2_t`类型数据各分量的乘加的结果（前两个输入相乘后与第三个输入相加），并遵循`CAST_RINT`模式对结果进行舍入。
 
 ## 函数原型
 
@@ -110,7 +110,7 @@ bfloat16x2_t __hfmax2(const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用该接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"

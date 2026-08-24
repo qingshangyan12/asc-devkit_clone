@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-遵循CAST\_CEIL模式，将浮点数转换为bfloat16精度，返回转换后的值。
+遵循`CAST_CEIL`模式，将浮点数转换为bfloat16精度，返回转换后的值。
 
 ## 函数原型
 
@@ -61,7 +61,7 @@ inline bfloat16_t __float2bfloat16_ru(const float x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用该接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"

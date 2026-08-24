@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-饱和模式下，将float2类型数据的两个分量遵循CAST\_FLOOR模式转换为bfloat16精度，返回转换后的bfloat16x2\_t类型数据。
+饱和模式下，将`float2`类型数据的两个分量遵循`CAST_FLOOR`模式转换为bfloat16精度，返回转换后的`bfloat16x2_t`类型数据。
 
 ## 函数原型
 

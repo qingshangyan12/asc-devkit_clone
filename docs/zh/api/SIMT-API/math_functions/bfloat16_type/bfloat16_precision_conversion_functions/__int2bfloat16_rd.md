@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-遵循CAST\_FLOOR模式，将int32类型数据转换为bfloat16类型数据，返回转换后的值。
+遵循`CAST_FLOOR`模式，将int32类型数据转换为bfloat16类型数据，返回转换后的值。
 
 ## 函数原型
 
@@ -57,7 +57,7 @@ inline bfloat16_t __int2bfloat16_rd(const int x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用该接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"

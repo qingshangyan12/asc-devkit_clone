@@ -29,7 +29,7 @@
 
 在多个分组场景（width小于32）下，每个分组交换操作是独立的，每个线程获取本组内当前线程向后偏移delta的线程的var值。如果当前线程向后偏移delta的线程编号，即Lane ID + delta，大于所在分组的最大Lane ID，则返回当前线程的var值。
 
-例如，Warp内32个活跃线程调用asc\_shfl\_down\(LaneId, 2, 16\)接口，每个线程的返回值为当前线程Lane ID + 2对应线程的var值，或者当前线程的var值。
+例如，Warp内32个活跃线程调用`asc_shfl_down(LaneId, 2, 16)`接口，每个线程的返回值为当前线程Lane ID + 2对应线程的var值，或者当前线程的var值。
 
 **图1**  asc\_shfl\_down结果示意图
 

@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-将指定数据存储到Global Memory的地址address中，并缓存至Data Cache和L2 Cache。
+将指定数据存储到Global Memory的地址`address`中，并缓存至Data Cache和L2 Cache。
 
 ## 函数原型
 

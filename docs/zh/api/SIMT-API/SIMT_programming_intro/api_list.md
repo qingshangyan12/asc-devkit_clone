@@ -583,7 +583,7 @@
 | [asinhf](../math_functions/float_math_functions/asinhf.md) | 获取输入数据的双曲反正弦值。 |
 | [sincosf](../math_functions/float_math_functions/sincosf.md) | 获取输入数据的三角函数正弦值和余弦值。 |
 | [sincospif](../math_functions/float_math_functions/sincospif.md) | 获取输入数据与π相乘的三角函数正弦值和余弦值。 |
-| [frexpf](../math_functions/float_math_functions/frexpf.md) | 将x转换为归一化[1/2, 1)的有符号数乘以2的积分幂。 |
+| [frexpf](../math_functions/float_math_functions/frexpf.md) | 将x转换为归一化[1/2, 1)的有符号数乘以2的整数次幂。 |
 | [ldexpf](../math_functions/float_math_functions/ldexpf.md) | 获取输入x乘以2的exp次幂的结果。 |
 | [sqrtf](../math_functions/float_math_functions/sqrtf.md) | 获取输入数据x的平方根。 |
 | [rsqrtf](../math_functions/float_math_functions/rsqrtf.md) | 获取输入数据x的平方根的倒数。 |
