@@ -65,7 +65,7 @@ bool ManifestBundleCompiler::BuildBundle(
     ASCENDLOGD(
         "Building bundle with make=%s compiler=%s jobs=%u", request_.makeExecutable.c_str(),
         request_.cxxCompiler.c_str(), request_.parallelJobCount);
-    ProcessExecutionRequest executionRequest;
+    ProcessExecutorRequest executionRequest;
     executionRequest.arguments = {
         request_.makeExecutable,
         "-C",

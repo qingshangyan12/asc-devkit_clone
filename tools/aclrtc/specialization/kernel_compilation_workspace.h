@@ -38,7 +38,7 @@ public:
     aclError CleanupWorktreeBeforeElfPublication();
 
 private:
-    DirectoryCleanupGuard worktreeDirectory_;
+    DirectoryCleanupGuard worktreeCleanupGuard_;
     WorktreeRetentionPolicy retentionPolicy_{WorktreeRetentionPolicy::RemoveAfterCompilation};
 };
 

@@ -33,8 +33,8 @@ using ascendc::aclrtc::CompilationCommand;
 using ascendc::aclrtc::CompilationCommandExecutionLimits;
 using ascendc::aclrtc::CompilationCommandKind;
 using ascendc::aclrtc::CompilationPlanExecutor;
-using ascendc::aclrtc::CompilationVariant;
 using ascendc::aclrtc::KernelCompilationPlan;
+using ascendc::aclrtc::KernelCompilationVariant;
 using ascendc::aclrtc::KernelSpecializationDiagnostics;
 using namespace mockcpp;
 
@@ -51,8 +51,8 @@ int FailCommandLeaderInspection(idtype_t, id_t, siginfo_t*, int)
 }
 
 static_assert(
-    std::is_same<std::underlying_type_t<CompilationVariant>, uint32_t>::value,
-    "CompilationVariant must have a stable width");
+    std::is_same<std::underlying_type_t<KernelCompilationVariant>, uint32_t>::value,
+    "KernelCompilationVariant must have a stable width");
 static_assert(
     std::is_same<std::underlying_type_t<CompilationCommandKind>, uint32_t>::value,
     "CompilationCommandKind must have a stable width");
@@ -303,11 +303,11 @@ TEST(CompilationPlanExecutorTest, ReportsPipeCreationFailureWhenFileDescriptorsA
     struct rlimit exhaustedFileDescriptorLimit = originalFileDescriptorLimit;
     exhaustedFileDescriptorLimit.rlim_cur = 0U;
     ASSERT_EQ(setrlimit(RLIMIT_NOFILE, &exhaustedFileDescriptorLimit), 0);
-    const aclError executionResult = executor.ExecuteCompilationPlan(plan);
+    const aclError planExecutionStatus = executor.ExecuteCompilationPlan(plan);
     const int restoreLimitResult = setrlimit(RLIMIT_NOFILE, &originalFileDescriptorLimit);
 
     ASSERT_EQ(restoreLimitResult, 0);
-    EXPECT_EQ(executionResult, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(planExecutionStatus, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 
 TEST(CompilationPlanExecutorTest, ReportsCommandOutputPollFailure)
@@ -319,10 +319,10 @@ TEST(CompilationPlanExecutorTest, ReportsCommandOutputPollFailure)
     plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/sleep", {"1"}));
     MOCKER(poll, int (*)(pollfd*, nfds_t, int)).expects(once()).will(invoke(FailCommandOutputPoll));
 
-    const aclError executionResult = executor.ExecuteCompilationPlan(plan);
+    const aclError planExecutionStatus = executor.ExecuteCompilationPlan(plan);
 
     GlobalMockObject::verify();
-    EXPECT_EQ(executionResult, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(planExecutionStatus, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 
 TEST(CompilationPlanExecutorTest, ReportsCommandLeaderInspectionFailure)
@@ -334,9 +334,9 @@ TEST(CompilationPlanExecutorTest, ReportsCommandLeaderInspectionFailure)
     plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/sleep", {"1"}));
     MOCKER(waitid, int (*)(idtype_t, id_t, siginfo_t*, int)).expects(once()).will(invoke(FailCommandLeaderInspection));
 
-    const aclError executionResult = executor.ExecuteCompilationPlan(plan);
+    const aclError planExecutionStatus = executor.ExecuteCompilationPlan(plan);
 
     GlobalMockObject::verify();
-    EXPECT_EQ(executionResult, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_EQ(planExecutionStatus, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 } // namespace

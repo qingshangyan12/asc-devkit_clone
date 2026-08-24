@@ -28,7 +28,7 @@ CompilationCommandExecutionLimits CompilationCommandExecutionLimits::ProductionD
 
 CompilationPlanExecutor::CompilationPlanExecutor(
     KernelSpecializationDiagnostics& specializationDiagnostics, CompilationCommandExecutionLimits executionLimits)
-    : specializationDiagnostics_(specializationDiagnostics), executionLimits_(executionLimits)
+    : specializationDiagnostics_(specializationDiagnostics), commandExecutionLimits_(executionLimits)
 {}
 
 aclError CompilationPlanExecutor::ExecuteCompilationPlan(const KernelCompilationPlan& compilationPlan) const
@@ -39,25 +39,25 @@ aclError CompilationPlanExecutor::ExecuteCompilationPlan(const KernelCompilation
                 "Executing command %s with %s", compilationCommand.diagnosticLabel.c_str(),
                 compilationCommand.executablePath.c_str());
             specializationDiagnostics_.AppendCommandToReplayScript(compilationCommand);
-            ProcessExecutorResult processResult;
-            const aclError executionResult = ExecuteCompilationCommand(compilationCommand, processResult);
-            specializationDiagnostics_.AppendCommandResultToCompilationLog(compilationCommand, processResult);
-            if (executionResult != ACLRTC_SUCCESS) {
+            ProcessExecutorResult executorResult;
+            const aclError commandExecutionStatus = ExecuteCompilationCommand(compilationCommand, executorResult);
+            specializationDiagnostics_.AppendCommandExecutionResultToLog(compilationCommand, executorResult);
+            if (commandExecutionStatus != ACLRTC_SUCCESS) {
                 constexpr size_t maxLoggedProcessOutputBytes = 4096U;
                 const size_t loggedOutputByteCount =
-                    std::min(processResult.capturedOutput.size(), maxLoggedProcessOutputBytes);
-                const bool loggedOutputTruncated = processResult.capturedOutput.size() > loggedOutputByteCount;
+                    std::min(executorResult.capturedOutput.size(), maxLoggedProcessOutputBytes);
+                const bool loggedOutputTruncated = executorResult.capturedOutput.size() > loggedOutputByteCount;
                 ASCENDLOGE(
                     "Command %s failed: outcome=%s code=%d elapsed_ms=%lld captured_output_truncated=%s "
                     "logged_output_truncated=%s output_prefix_bytes=%zu output=%.*s",
-                    compilationCommand.diagnosticLabel.c_str(), processResult.GetOutcomeName(),
-                    static_cast<int>(processResult.terminationCode),
-                    static_cast<long long>(processResult.elapsedTime.count()),
-                    processResult.capturedOutputTruncated ? "true" : "false", loggedOutputTruncated ? "true" : "false",
+                    compilationCommand.diagnosticLabel.c_str(), executorResult.GetOutcomeName(),
+                    static_cast<int>(executorResult.terminationCode),
+                    static_cast<long long>(executorResult.elapsedTime.count()),
+                    executorResult.capturedOutputTruncated ? "true" : "false", loggedOutputTruncated ? "true" : "false",
                     loggedOutputByteCount, static_cast<int>(loggedOutputByteCount),
-                    processResult.capturedOutput.c_str());
+                    executorResult.capturedOutput.c_str());
                 specializationDiagnostics_.LogCommandFailureRecoveryHint();
-                return executionResult;
+                return commandExecutionStatus;
             }
         }
         return ACLRTC_SUCCESS;
@@ -74,26 +74,26 @@ aclError CompilationPlanExecutor::ExecuteCompilationPlan(const KernelCompilation
 }
 
 aclError CompilationPlanExecutor::ExecuteCompilationCommand(
-    const CompilationCommand& compilationCommand, ProcessExecutorResult& processResult) const
+    const CompilationCommand& compilationCommand, ProcessExecutorResult& executorResult) const
 {
-    ProcessExecutionRequest executionRequest;
-    executionRequest.arguments.reserve(compilationCommand.commandArguments.size() + 1U);
-    executionRequest.arguments.emplace_back(compilationCommand.executablePath.string());
-    executionRequest.arguments.insert(
-        executionRequest.arguments.end(), compilationCommand.commandArguments.begin(),
+    ProcessExecutorRequest executorRequest;
+    executorRequest.arguments.reserve(compilationCommand.commandArguments.size() + 1U);
+    executorRequest.arguments.emplace_back(compilationCommand.executablePath.string());
+    executorRequest.arguments.insert(
+        executorRequest.arguments.end(), compilationCommand.commandArguments.begin(),
         compilationCommand.commandArguments.end());
-    executionRequest.outputMode = ProcessOutputMode::CaptureCombined;
-    executionRequest.executionTimeout = compilationCommand.commandKind == CompilationCommandKind::Compile ?
-                                            executionLimits_.compileCommandTimeout :
-                                            executionLimits_.objectCopyAndLinkCommandTimeout;
-    executionRequest.terminationGracePeriod = executionLimits_.terminationGracePeriod;
-    executionRequest.capturedOutputByteLimit = executionLimits_.capturedOutputByteLimit;
+    executorRequest.outputMode = ProcessOutputMode::CaptureCombined;
+    executorRequest.executionTimeout = compilationCommand.commandKind == CompilationCommandKind::Compile ?
+                                           commandExecutionLimits_.compileCommandTimeout :
+                                           commandExecutionLimits_.objectCopyAndLinkCommandTimeout;
+    executorRequest.terminationGracePeriod = commandExecutionLimits_.terminationGracePeriod;
+    executorRequest.capturedOutputByteLimit = commandExecutionLimits_.capturedOutputByteLimit;
 
-    processResult = ProcessExecutor::Execute(executionRequest);
-    if (processResult.HasSuccessfulExit()) {
+    executorResult = ProcessExecutor::Execute(executorRequest);
+    if (executorResult.HasSuccessfulExit()) {
         return ACLRTC_SUCCESS;
     }
-    if (processResult.outcome == ProcessOutcome::ExecutorFailure) {
+    if (executorResult.outcome == ProcessOutcome::ExecutorFailure) {
         return ACLRTC_ERROR_FAILURE;
     }
     return compilationCommand.commandKind == CompilationCommandKind::Link ? ACLRTC_ERROR_LINKING :

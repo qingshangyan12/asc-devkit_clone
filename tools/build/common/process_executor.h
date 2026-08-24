@@ -31,7 +31,7 @@ enum class ProcessOutcome : uint32_t {
     TimedOut,
 };
 
-struct ProcessExecutionRequest {
+struct ProcessExecutorRequest {
     std::vector<std::string> arguments;
     std::vector<std::pair<std::string, std::string>> environmentOverrides;
     std::vector<std::string> removedEnvironmentVariables;
@@ -56,7 +56,7 @@ class ProcessExecutor final {
 public:
     ProcessExecutor() = delete;
 
-    static ProcessExecutorResult Execute(const ProcessExecutionRequest& request);
+    static ProcessExecutorResult Execute(const ProcessExecutorRequest& request);
 };
 
 } // namespace ascendc

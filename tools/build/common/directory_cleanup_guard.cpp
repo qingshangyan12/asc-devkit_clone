@@ -39,7 +39,7 @@ bool IsValidDirectoryNamePrefix(const std::string& directoryNamePrefix)
 DirectoryCleanupGuard::~DirectoryCleanupGuard() noexcept
 {
     if (removeDirectoryOnDestruction_) {
-        (void)RemoveManagedDirectory();
+        (void)RemoveDirectory();
     }
 }
 
@@ -115,10 +115,10 @@ bool DirectoryCleanupGuard::CreateUniqueSubdirectory(
     return true;
 }
 
-bool DirectoryCleanupGuard::ManageDirectory(std::string directoryPath)
+bool DirectoryCleanupGuard::RegisterDirectoryForCleanup(std::string directoryPath)
 {
     if (directoryPath.empty()) {
-        ASCENDLOGE("Cannot manage an empty directory path");
+        ASCENDLOGE("Cannot register an empty directory path for cleanup");
         return false;
     }
     if (!directoryPath_.empty()) {
@@ -130,13 +130,13 @@ bool DirectoryCleanupGuard::ManageDirectory(std::string directoryPath)
     return true;
 }
 
-bool DirectoryCleanupGuard::RemoveManagedDirectory() noexcept
+bool DirectoryCleanupGuard::RemoveDirectory() noexcept
 {
     if (directoryPath_.empty()) {
         return true;
     }
     if (!FileUtils::RemoveAll(directoryPath_)) {
-        ASCENDLOGW("Failed to remove managed directory: path=%s", directoryPath_.c_str());
+        ASCENDLOGW("Failed to remove directory registered for cleanup: path=%s", directoryPath_.c_str());
         return false;
     }
     directoryPath_.clear();

@@ -43,10 +43,10 @@ public:
 
 private:
     aclError ExecuteCompilationCommand(
-        const CompilationCommand& compilationCommand, ProcessExecutorResult& processResult) const;
+        const CompilationCommand& compilationCommand, ProcessExecutorResult& executorResult) const;
 
     KernelSpecializationDiagnostics& specializationDiagnostics_;
-    CompilationCommandExecutionLimits executionLimits_;
+    CompilationCommandExecutionLimits commandExecutionLimits_;
 };
 
 } // namespace aclrtc

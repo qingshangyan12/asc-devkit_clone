@@ -30,7 +30,7 @@ constexpr aclError ACLRTC_ERROR_LINKING = 176004;
 constexpr aclError ACLRTC_ERROR_OUT_OF_MEMORY = 276001;
 constexpr aclError ACLRTC_ERROR_FAILURE = 576000;
 
-enum class CompilationVariant : uint32_t {
+enum class KernelCompilationVariant : uint32_t {
     Basic,
     BasicWithSuperKernel,
 };
@@ -51,7 +51,7 @@ struct NormalizedKernelSpecializationRequest {
     std::string resourceId;
     std::string kernelName;
     boost::filesystem::path outputElfPath;
-    CompilationVariant compilationVariant{CompilationVariant::Basic};
+    KernelCompilationVariant compilationVariant{KernelCompilationVariant::Basic};
     KernelCompilerOptions compilerOptions;
     uint64_t kernelArgumentCount{0};
     const void* const* borrowedKernelArgumentDataPointers{nullptr};

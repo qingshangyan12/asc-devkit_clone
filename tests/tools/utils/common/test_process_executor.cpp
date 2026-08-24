@@ -38,9 +38,9 @@ static_assert(
     std::is_same<decltype(ProcessExecutorResult::terminationCode), int32_t>::value,
     "terminationCode must have a stable width");
 
-ProcessExecutionRequest CreateCapturedRequest(std::vector<std::string> arguments)
+ProcessExecutorRequest CreateCapturedRequest(std::vector<std::string> arguments)
 {
-    ProcessExecutionRequest request;
+    ProcessExecutorRequest request;
     request.arguments = std::move(arguments);
     request.outputMode = ProcessOutputMode::CaptureCombined;
     request.executionTimeout = 1s;
@@ -51,34 +51,34 @@ ProcessExecutionRequest CreateCapturedRequest(std::vector<std::string> arguments
 
 TEST(ProcessExecutorTest, RejectsInvalidRequestsBeforeSpawning)
 {
-    ProcessExecutionRequest emptyArgumentsRequest;
+    ProcessExecutorRequest emptyArgumentsRequest;
     emptyArgumentsRequest.executionTimeout = 1s;
     EXPECT_EQ(ProcessExecutor::Execute(emptyArgumentsRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutionRequest zeroTimeoutRequest = CreateCapturedRequest({"/bin/true"});
+    ProcessExecutorRequest zeroTimeoutRequest = CreateCapturedRequest({"/bin/true"});
     zeroTimeoutRequest.executionTimeout = 0ms;
     EXPECT_EQ(ProcessExecutor::Execute(zeroTimeoutRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutionRequest negativeGracePeriodRequest = CreateCapturedRequest({"/bin/true"});
+    ProcessExecutorRequest negativeGracePeriodRequest = CreateCapturedRequest({"/bin/true"});
     negativeGracePeriodRequest.terminationGracePeriod = -1ms;
     EXPECT_EQ(ProcessExecutor::Execute(negativeGracePeriodRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutionRequest invalidOutputModeRequest = CreateCapturedRequest({"/bin/true"});
+    ProcessExecutorRequest invalidOutputModeRequest = CreateCapturedRequest({"/bin/true"});
     invalidOutputModeRequest.outputMode = static_cast<ProcessOutputMode>(UINT32_MAX);
     EXPECT_EQ(ProcessExecutor::Execute(invalidOutputModeRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutionRequest embeddedNullRequest = CreateCapturedRequest({std::string("/bin/true\0invalid", 17U)});
+    ProcessExecutorRequest embeddedNullRequest = CreateCapturedRequest({std::string("/bin/true\0invalid", 17U)});
     EXPECT_EQ(ProcessExecutor::Execute(embeddedNullRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutionRequest invalidOverrideNameRequest = CreateCapturedRequest({"/bin/true"});
+    ProcessExecutorRequest invalidOverrideNameRequest = CreateCapturedRequest({"/bin/true"});
     invalidOverrideNameRequest.environmentOverrides.emplace_back("INVALID=NAME", "value");
     EXPECT_EQ(ProcessExecutor::Execute(invalidOverrideNameRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutionRequest embeddedNullOverrideValueRequest = CreateCapturedRequest({"/bin/true"});
+    ProcessExecutorRequest embeddedNullOverrideValueRequest = CreateCapturedRequest({"/bin/true"});
     embeddedNullOverrideValueRequest.environmentOverrides.emplace_back("VALID_NAME", std::string("value\0suffix", 12U));
     EXPECT_EQ(ProcessExecutor::Execute(embeddedNullOverrideValueRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutionRequest invalidRemovalNameRequest = CreateCapturedRequest({"/bin/true"});
+    ProcessExecutorRequest invalidRemovalNameRequest = CreateCapturedRequest({"/bin/true"});
     invalidRemovalNameRequest.removedEnvironmentVariables.emplace_back("INVALID=NAME");
     EXPECT_EQ(ProcessExecutor::Execute(invalidRemovalNameRequest).outcome, ProcessOutcome::ExecutorFailure);
 }
@@ -90,7 +90,7 @@ TEST(ProcessExecutorTest, ExecutesArgumentsWithoutShellParsing)
     boost::system::error_code ignoredError;
     fs::remove(unexpectedFilePath, ignoredError);
 
-    ProcessExecutionRequest request =
+    ProcessExecutorRequest request =
         CreateCapturedRequest({"/usr/bin/printf", "$(touch " + unexpectedFilePath.string() + ")"});
     const ProcessExecutorResult result = ProcessExecutor::Execute(request);
 
@@ -102,7 +102,7 @@ TEST(ProcessExecutorTest, ExecutesArgumentsWithoutShellParsing)
 TEST(ProcessExecutorTest, AppliesEnvironmentOverridesAndRemovals)
 {
     ASSERT_EQ(setenv("PROCESS_EXECUTOR_REMOVE_ME", "inherited", 1), 0);
-    ProcessExecutionRequest request = CreateCapturedRequest(
+    ProcessExecutorRequest request = CreateCapturedRequest(
         {"/bin/sh", "-c", "printf '%s|%s' \"$PROCESS_EXECUTOR_VALUE\" \"${PROCESS_EXECUTOR_REMOVE_ME-unset}\""});
     request.environmentOverrides.emplace_back("PROCESS_EXECUTOR_VALUE", "visible");
     request.removedEnvironmentVariables.emplace_back("PROCESS_EXECUTOR_REMOVE_ME");
@@ -115,7 +115,7 @@ TEST(ProcessExecutorTest, AppliesEnvironmentOverridesAndRemovals)
 
 TEST(ProcessExecutorTest, EnvironmentOverrideTakesPrecedenceOverRemoval)
 {
-    ProcessExecutionRequest request =
+    ProcessExecutorRequest request =
         CreateCapturedRequest({"/bin/sh", "-c", "printf '%s' \"$PROCESS_EXECUTOR_PRECEDENCE\""});
     request.removedEnvironmentVariables.emplace_back("PROCESS_EXECUTOR_PRECEDENCE");
     request.environmentOverrides.emplace_back("PROCESS_EXECUTOR_PRECEDENCE", "overridden");
@@ -144,7 +144,7 @@ TEST(ProcessExecutorTest, ReportsExitSignalAndSpawnFailureSeparately)
 
 TEST(ProcessExecutorTest, BoundsCapturedCombinedOutput)
 {
-    ProcessExecutionRequest request = CreateCapturedRequest({"/bin/sh", "-c", "printf stdout; printf stderr >&2"});
+    ProcessExecutorRequest request = CreateCapturedRequest({"/bin/sh", "-c", "printf stdout; printf stderr >&2"});
     request.capturedOutputByteLimit = 8U;
 
     const ProcessExecutorResult result = ProcessExecutor::Execute(request);
@@ -155,7 +155,7 @@ TEST(ProcessExecutorTest, BoundsCapturedCombinedOutput)
 
 TEST(ProcessExecutorTest, InheritModeDoesNotCaptureOutput)
 {
-    ProcessExecutionRequest request;
+    ProcessExecutorRequest request;
     request.arguments = {"/bin/true"};
     request.outputMode = ProcessOutputMode::Inherit;
     request.executionTimeout = 1s;
@@ -175,7 +175,7 @@ TEST(ProcessExecutorTest, TimeoutTerminatesDescendantsAfterLeaderExits)
     const std::string commandScript =
         "(trap '' TERM; count=0; while [ $count -lt 100 ]; do printf x >> '" + descendantMarkerPath.string() +
         "'; count=$((count + 1)); sleep 0.01; done; rm -f '" + descendantMarkerPath.string() + "') & exec /bin/true";
-    ProcessExecutionRequest request = CreateCapturedRequest({"/bin/sh", "-c", commandScript});
+    ProcessExecutorRequest request = CreateCapturedRequest({"/bin/sh", "-c", commandScript});
     request.executionTimeout = 20ms;
 
     const ProcessExecutorResult result = ProcessExecutor::Execute(request);

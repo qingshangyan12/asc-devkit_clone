@@ -27,8 +27,8 @@ public:
     DirectoryCleanupGuard& operator=(const DirectoryCleanupGuard&) = delete;
 
     bool CreateUniqueSubdirectory(const std::string& parentDirectoryPath, const std::string& directoryNamePrefix);
-    bool ManageDirectory(std::string directoryPath);
-    bool RemoveManagedDirectory() noexcept;
+    bool RegisterDirectoryForCleanup(std::string directoryPath);
+    bool RemoveDirectory() noexcept;
     void PreserveDirectory() noexcept;
 
     const std::string& GetDirectoryPath() const noexcept;

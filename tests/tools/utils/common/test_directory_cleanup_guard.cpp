@@ -71,7 +71,7 @@ TEST_F(DirectoryCleanupGuardTest, CreatesUniqueDirectoryAndRemovesItOnDestructio
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(removedDirectoryPath));
 }
 
-TEST_F(DirectoryCleanupGuardTest, PreservesCreatedOrManagedDirectory)
+TEST_F(DirectoryCleanupGuardTest, PreservesCreatedOrRegisteredDirectory)
 {
     const std::string createdParentPath = FileUtils::JoinPath(rootDirectoryPath_, "retained-created");
     ASSERT_TRUE(FileUtils::CreateDirectories(createdParentPath));
@@ -84,14 +84,14 @@ TEST_F(DirectoryCleanupGuardTest, PreservesCreatedOrManagedDirectory)
     }
     EXPECT_TRUE(FileUtils::IsDirectory(retainedCreatedPath));
 
-    const std::string retainedAdoptedPath = FileUtils::JoinPath(rootDirectoryPath_, "retained-adopted");
-    ASSERT_TRUE(FileUtils::CreateDirectories(retainedAdoptedPath));
+    const std::string retainedRegisteredPath = FileUtils::JoinPath(rootDirectoryPath_, "retained-registered");
+    ASSERT_TRUE(FileUtils::CreateDirectories(retainedRegisteredPath));
     {
         DirectoryCleanupGuard directory;
-        ASSERT_TRUE(directory.ManageDirectory(retainedAdoptedPath));
+        ASSERT_TRUE(directory.RegisterDirectoryForCleanup(retainedRegisteredPath));
         directory.PreserveDirectory();
     }
-    EXPECT_TRUE(FileUtils::IsDirectory(retainedAdoptedPath));
+    EXPECT_TRUE(FileUtils::IsDirectory(retainedRegisteredPath));
 }
 
 TEST_F(DirectoryCleanupGuardTest, MovesDirectoryCleanupResponsibilityExactlyOnce)
@@ -116,19 +116,19 @@ TEST_F(DirectoryCleanupGuardTest, MovesDirectoryCleanupResponsibilityExactlyOnce
     EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(movedDirectoryPath));
 }
 
-TEST_F(DirectoryCleanupGuardTest, RemovesManagedDirectoryOnRequest)
+TEST_F(DirectoryCleanupGuardTest, RemovesRegisteredDirectoryOnRequest)
 {
-    const std::string adoptedPath = FileUtils::JoinPath(rootDirectoryPath_, "adopted");
-    ASSERT_TRUE(FileUtils::CreateDirectories(adoptedPath));
+    const std::string registeredPath = FileUtils::JoinPath(rootDirectoryPath_, "registered");
+    ASSERT_TRUE(FileUtils::CreateDirectories(registeredPath));
     DirectoryCleanupGuard directory;
-    ASSERT_TRUE(directory.ManageDirectory(adoptedPath));
-    EXPECT_TRUE(directory.RemoveManagedDirectory());
+    ASSERT_TRUE(directory.RegisterDirectoryForCleanup(registeredPath));
+    EXPECT_TRUE(directory.RemoveDirectory());
     EXPECT_TRUE(directory.GetDirectoryPath().empty());
-    EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(adoptedPath));
-    EXPECT_TRUE(directory.RemoveManagedDirectory());
+    EXPECT_FALSE(PathExistsWithoutFollowingSymlinks(registeredPath));
+    EXPECT_TRUE(directory.RemoveDirectory());
 }
 
-TEST_F(DirectoryCleanupGuardTest, MoveAssignmentRemovesPreviouslyManagedDirectoryAndEmptiesSource)
+TEST_F(DirectoryCleanupGuardTest, MoveAssignmentRemovesPreviouslyRegisteredDirectoryAndEmptiesSource)
 {
     const std::string sourceParentPath = FileUtils::JoinPath(rootDirectoryPath_, "move-source");
     const std::string destinationParentPath = FileUtils::JoinPath(rootDirectoryPath_, "move-destination");
@@ -160,10 +160,10 @@ TEST_F(DirectoryCleanupGuardTest, RejectsInvalidCreationInputsAndReportsRemovalF
     EXPECT_FALSE(directory.CreateUniqueSubdirectory(FileUtils::JoinPath(rootDirectoryPath_, "missing"), "test"));
     EXPECT_FALSE(directory.CreateUniqueSubdirectory(rootDirectoryPath_, "nested/test"));
     EXPECT_FALSE(directory.CreateUniqueSubdirectory(rootDirectoryPath_, "invalid%prefix"));
-    EXPECT_FALSE(directory.ManageDirectory(std::string()));
+    EXPECT_FALSE(directory.RegisterDirectoryForCleanup(std::string()));
 
-    ASSERT_TRUE(directory.ManageDirectory("/proc/self/status"));
-    EXPECT_FALSE(directory.RemoveManagedDirectory());
+    ASSERT_TRUE(directory.RegisterDirectoryForCleanup("/proc/self/status"));
+    EXPECT_FALSE(directory.RemoveDirectory());
     EXPECT_EQ(directory.GetDirectoryPath(), "/proc/self/status");
     directory.PreserveDirectory();
 }

@@ -39,9 +39,9 @@ private:
         const NormalizedKernelSpecializationRequest& specializationRequest,
         MaterializedKernelCompilationResource compilationResource);
 
-    static aclError RecordSpecializationResult(
+    static aclError ReportSpecializationStatus(
         const NormalizedKernelSpecializationRequest& specializationRequest,
-        KernelSpecializationDiagnostics& diagnostics, aclError specializationResult) noexcept;
+        KernelSpecializationDiagnostics& diagnostics, aclError specializationStatus) noexcept;
 
     aclError PublishKernelElf(
         const boost::filesystem::path& linkedKernelElfPath, const boost::filesystem::path& outputElfPath,

@@ -24,7 +24,7 @@ struct ProcessExecutorResult;
 
 namespace aclrtc {
 
-enum class OutputPublicationStatus : uint32_t {
+enum class KernelElfPublicationStatus : uint32_t {
     NotPublished,
     Published,
 };
@@ -35,11 +35,11 @@ public:
 
     void WriteManifestSnapshot(const nlohmann::json& resourceManifest) noexcept;
     void AppendCommandToReplayScript(const CompilationCommand& compilationCommand) noexcept;
-    void AppendCommandResultToCompilationLog(
-        const CompilationCommand& compilationCommand, const ProcessExecutorResult& processResult) noexcept;
+    void AppendCommandExecutionResultToLog(
+        const CompilationCommand& compilationCommand, const ProcessExecutorResult& executorResult) noexcept;
     void LogCommandFailureRecoveryHint() const noexcept;
     void WriteSpecializationResult(
-        const boost::filesystem::path& outputElfPath, OutputPublicationStatus publicationStatus) noexcept;
+        const boost::filesystem::path& outputElfPath, KernelElfPublicationStatus publicationStatus) noexcept;
 
 private:
     void AppendTextToDiagnosticFile(const boost::filesystem::path& filePath, const std::string& text) noexcept;

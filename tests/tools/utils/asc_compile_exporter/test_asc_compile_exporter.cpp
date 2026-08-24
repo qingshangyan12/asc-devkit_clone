@@ -35,8 +35,8 @@
 namespace {
 
 using asc_compile_exporter_test::ScopedEnvironment;
-using ascendc::ProcessExecutionRequest;
 using ascendc::ProcessExecutor;
+using ascendc::ProcessExecutorRequest;
 using ascendc::manifest_generator::BundleOutputKind;
 using ascendc::manifest_generator::ManifestBundleBuildRequest;
 using ascendc::manifest_generator::ManifestBundleCompiler;
@@ -453,7 +453,7 @@ TEST_F(AscCompileExporterTest, BuildsRelocatableObjectThatCanBeLinkedIntoSharedL
     EXPECT_EQ(elfType, ET_REL);
 
     const std::string linkedBundle = JoinTestPath(root_, "output/linked-bundle.so");
-    ProcessExecutionRequest linkRequest;
+    ProcessExecutorRequest linkRequest;
     linkRequest.arguments = {request.cxxCompiler, "-shared", request.outputPath, "-o", linkedBundle};
     linkRequest.executionTimeout = std::chrono::minutes(5);
     linkRequest.terminationGracePeriod = std::chrono::seconds(1);

@@ -146,20 +146,20 @@ aclError KernelSpecializationSession::LoadAndMaterializeCompilationResource(
     return ACLRTC_SUCCESS;
 }
 
-aclError KernelSpecializationSession::RecordSpecializationResult(
+aclError KernelSpecializationSession::ReportSpecializationStatus(
     const NormalizedKernelSpecializationRequest& specializationRequest, KernelSpecializationDiagnostics& diagnostics,
-    aclError specializationResult) noexcept
+    aclError specializationStatus) noexcept
 {
-    const OutputPublicationStatus publicationStatus = specializationResult == ACLRTC_SUCCESS ?
-                                                          OutputPublicationStatus::Published :
-                                                          OutputPublicationStatus::NotPublished;
+    const KernelElfPublicationStatus publicationStatus = specializationStatus == ACLRTC_SUCCESS ?
+                                                             KernelElfPublicationStatus::Published :
+                                                             KernelElfPublicationStatus::NotPublished;
     diagnostics.WriteSpecializationResult(specializationRequest.outputElfPath, publicationStatus);
-    if (specializationResult == ACLRTC_SUCCESS) {
+    if (specializationStatus == ACLRTC_SUCCESS) {
         ASCENDLOGI(
             "Kernel %s specialization completed: output=%s", specializationRequest.kernelName.c_str(),
             specializationRequest.outputElfPath.c_str());
     }
-    return specializationResult;
+    return specializationStatus;
 }
 
 aclError KernelSpecializationSession::RunKernelSpecialization(
@@ -175,16 +175,16 @@ aclError KernelSpecializationSession::RunKernelSpecialization(
     }
 
     NormalizedKernelSpecializationRequest specializationRequest;
-    aclError specializationResult =
+    aclError specializationStatus =
         NormalizeKernelSpecializationRequest(*apiRequest, outputElfPath, specializationRequest);
-    if (specializationResult != ACLRTC_SUCCESS) {
-        return specializationResult;
+    if (specializationStatus != ACLRTC_SUCCESS) {
+        return specializationStatus;
     }
 
     MaterializedKernelCompilationResource compilationResource;
-    specializationResult = LoadAndMaterializeCompilationResource(specializationRequest.resourceId, compilationResource);
-    if (specializationResult != ACLRTC_SUCCESS) {
-        return specializationResult;
+    specializationStatus = LoadAndMaterializeCompilationResource(specializationRequest.resourceId, compilationResource);
+    if (specializationStatus != ACLRTC_SUCCESS) {
+        return specializationStatus;
     }
     return RunSpecializationWithMaterializedResource(specializationRequest, std::move(compilationResource));
 }
@@ -204,28 +204,28 @@ aclError KernelSpecializationSession::RunSpecializationWithMaterializedResource(
     diagnostics.WriteManifestSnapshot(compilationResource.manifest);
 
     KernelCompilationPlan compilationPlan;
-    aclError specializationResult =
+    aclError specializationStatus =
         KernelCompilationPlanBuilder(
             specializationRequest, compilationResource.manifest, compilationWorkspace.GetWorktreePath(),
             compilationResource.externalSourceDirectoryPath)
             .BuildCompilationPlan(compilationPlan);
-    if (specializationResult != ACLRTC_SUCCESS) {
-        return RecordSpecializationResult(specializationRequest, diagnostics, specializationResult);
+    if (specializationStatus != ACLRTC_SUCCESS) {
+        return ReportSpecializationStatus(specializationRequest, diagnostics, specializationStatus);
     }
-    specializationResult = compilationWorkspace.CreateOutputDirectoriesAndApplySourcePatches(compilationPlan);
-    if (specializationResult != ACLRTC_SUCCESS) {
-        return RecordSpecializationResult(specializationRequest, diagnostics, specializationResult);
+    specializationStatus = compilationWorkspace.CreateOutputDirectoriesAndApplySourcePatches(compilationPlan);
+    if (specializationStatus != ACLRTC_SUCCESS) {
+        return ReportSpecializationStatus(specializationRequest, diagnostics, specializationStatus);
     }
 
     CompilationPlanExecutor planExecutor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
-    specializationResult = planExecutor.ExecuteCompilationPlan(compilationPlan);
-    if (specializationResult != ACLRTC_SUCCESS) {
-        return RecordSpecializationResult(specializationRequest, diagnostics, specializationResult);
+    specializationStatus = planExecutor.ExecuteCompilationPlan(compilationPlan);
+    if (specializationStatus != ACLRTC_SUCCESS) {
+        return ReportSpecializationStatus(specializationRequest, diagnostics, specializationStatus);
     }
 
-    specializationResult = PublishKernelElf(
+    specializationStatus = PublishKernelElf(
         compilationPlan.linkedKernelElfPath, specializationRequest.outputElfPath, compilationWorkspace);
-    return RecordSpecializationResult(specializationRequest, diagnostics, specializationResult);
+    return ReportSpecializationStatus(specializationRequest, diagnostics, specializationStatus);
 }
 
 aclError KernelSpecializationSession::PublishKernelElf(
