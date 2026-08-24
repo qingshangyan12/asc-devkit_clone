@@ -178,7 +178,7 @@ __global__ void reduce_block_tile(const int32_t* input, int32_t* total_tile, int
 }
 ```
 
-`TILE_SIZE` is 32, the width of one warp, so that each sub-group produced by `tiled_partition<TILE_SIZE>(block)` falls exactly within one warp. A `sync()` within such a group then only has to wait for 32 threads, which costs less than a block-level barrier that waits for 1024 threads. A value greater than 32 makes a sub-group span warps, its `sync()` degrades to a block-level barrier, and this advantage no longer holds.
+`TILE_SIZE` is 32, the width of one warp, so that each sub-group produced by `tiled_partition<TILE_SIZE>(block)` falls exactly within one warp. Since the 32 threads within a warp are inherently synchronized under the hardware SIMT execution model, `sync()` calls in the code require no actual waiting, costing far less than a block-level barrier that waits for 1024 threads. A value greater than 32 makes a sub-group span warps, its `sync()` degrades to a block-level barrier, and this advantage no longer holds.
 
 **Performance data**:
 
@@ -194,11 +194,11 @@ The performance data of the three cases is listed below:
 | :--: | :----: | :--: | :--: | :-----------------: |
 | Cross-block reduction | 4096 | 12 | 24 grid-level | 16.101 |
 | Whole-block reduction | 1024 | 10 | 20 block-level | 3.514 |
-| Warp-internal reduction | 32 | 5 + 5 | 20 warp-internal + 1 block-level | 2.397 |
+| Warp-internal reduction | 32 | 5 + 5 | 20 warp-internal (no overhead) + 1 block-level | 2.397 |
 
 The three cases have the same input size and the same memory traffic, so the performance difference comes mainly from the scope of synchronization: the more threads a single synchronization has to wait for, the longer the threads that arrive early sit idle at the barrier.
 
-- Warp-internal reduction is roughly 31.8% faster than whole-block reduction. The two have the same number of halving rounds and both keep the workspace in UB; they differ only in the scope of synchronization. Each of the 20 synchronizations in warp-internal reduction waits for only 32 threads, with a single block-level barrier used between the two levels, whereas each of the 20 synchronizations in whole-block reduction waits for all 1024 threads of the block.
+- Warp-internal reduction is roughly 31.8% faster than whole-block reduction. The two have the same number of halving rounds and both keep the workspace in UB; they differ only in the scope of synchronization. The 20 `sync()` calls in warp-internal reduction incur no actual overhead due to inherent thread synchronization, with only one block-level barrier between the two levels that generates actual waiting, whereas each of the 20 synchronizations in whole-block reduction waits for all 1024 threads of the block.
 - Cross-block reduction takes roughly 4.6 times as long as whole-block reduction, for two reasons. First, every synchronization has to wait for all 4096 threads of the grid, the widest scope of the three. Second, the workspace can only be placed in GM and the pointer additionally needs `volatile`, so every read and write of each round accesses GM directly, and the access latency of GM is far higher than that of UB.
 
 ## Build and Run
