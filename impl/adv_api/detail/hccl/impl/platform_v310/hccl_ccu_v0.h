@@ -483,18 +483,27 @@ template <const auto& config>
 __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetKfcMissionNum(
     HcclHandle handleId) const
 {
+    uint32_t prepareType = UINT32_MAX;
+    uint32_t tilingIndex = UINT32_MAX;
     uint32_t algorithmType = UINT32_MAX;
-    if (newCcuFlag_ && handleId < MAX_CC_TILING_NUM) {
-        algorithmType = hcclNewContext_->algorithmType[handleId];
+    if (newCcuFlag_ && handleId >= 0 && handleId < HCCL_MAX_HANDLE_ID) {
+        prepareType = static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType);
+        for (uint32_t index = 0U; index < Hccl::MC2_MAX_OP_NUM; ++index) {
+            if (hcclNewContext_->isKfc[index] && hcclNewContext_->opType[index] == prepareType) {
+                tilingIndex = index;
+                algorithmType = hcclNewContext_->algorithmType[index];
+                break;
+            }
+        }
     }
     uint8_t missionNum = 1U;
-    if (newCcuFlag_ && handleId < MAX_CC_TILING_NUM &&
-        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink)) {
+    if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink)) {
         missionNum = KFC_MAX_MISSION_NUM;
     }
     AscendC::PRINTF(
-        "[KFC_DEBUG][MissionNum] handleId=%u newCcuFlag=%u algorithmType=%u missionNum=%u\n",
-        static_cast<uint32_t>(handleId), static_cast<uint32_t>(newCcuFlag_), algorithmType,
+        "[KFC_DEBUG][MissionNum] handleId=%u newCcuFlag=%u prepareType=%u tilingIndex=%u algorithmType=%u "
+        "missionNum=%u\n",
+        static_cast<uint32_t>(handleId), static_cast<uint32_t>(newCcuFlag_), prepareType, tilingIndex, algorithmType,
         static_cast<uint32_t>(missionNum));
     return missionNum;
 }
@@ -666,6 +675,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
         const uint8_t missionNum = GetKfcMissionNum(handleId);
         for (uint8_t mission = 0; mission < missionNum; ++mission) {
             ccuMsg_.commitCKEAddr = GetCommitCkeAddr(globalCurWaitId_, mission);
+            AscendC::PRINTF(
+                "[KFC_DEBUG][Finalize] handleId=%u resourceId=%u mission=%u missionNum=%u commitCKEAddr=%p\n",
+                static_cast<uint32_t>(handleId), static_cast<uint32_t>(globalCurWaitId_),
+                static_cast<uint32_t>(mission), static_cast<uint32_t>(missionNum), ccuMsg_.commitCKEAddr);
             WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
         }
         KERNEL_LOG(
