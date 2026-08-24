@@ -23,8 +23,11 @@
                                                                                                                \
     namespace {                                                                                                \
     void cce_name0##_##data_type##_Stub0(                                                                      \
-        vector_store_unalign& src0, uint32_t offset, vector_##data_type src1, __ubuf__ data_type* dst)         \
-    {}                                                                                                         \
+        vector_store_unalign& src0, uint32_t offset, vector_##data_type src1, __ubuf__ data_type*& dst,        \
+        Literal post)                                                                                          \
+    {                                                                                                          \
+        EXPECT_EQ(post, static_cast<Literal>(Literal::POST_UPDATE));                                           \
+    }                                                                                                          \
     void cce_name1##_##data_type##_Stub1(vector_store_unalign src, __ubuf__ data_type* dst, int32_t offset) {} \
     }                                                                                                          \
                                                                                                                \
@@ -33,7 +36,8 @@
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                                    \
         vector_##data_type src;                                                                                \
                                                                                                                \
-        MOCKER_CPP(cce_name0, void(vector_store_unalign&, uint32_t, vector_##data_type, __ubuf__ data_type*))  \
+        MOCKER_CPP(                                                                                            \
+            cce_name0, void(vector_store_unalign&, uint32_t, vector_##data_type, __ubuf__ data_type*&, Literal)) \
             .times(1)                                                                                          \
             .will(invoke(cce_name0##_##data_type##_Stub0));                                                    \
                                                                                                                \
@@ -55,8 +59,10 @@
                                                                                                              \
     namespace {                                                                                              \
     void cce_name0##_##data_type##_Stub0(                                                                    \
-        vector_store_unalign& src0, uint32_t offset, vector_uint8_t src1, __ubuf__ uint8_t* dst)             \
-    {}                                                                                                       \
+        vector_store_unalign& src0, uint32_t offset, vector_uint8_t src1, __ubuf__ uint8_t*& dst, Literal post) \
+    {                                                                                                        \
+        EXPECT_EQ(post, static_cast<Literal>(Literal::POST_UPDATE));                                         \
+    }                                                                                                        \
     void cce_name1##_##data_type##_Stub1(vector_store_unalign src, __ubuf__ uint8_t* dst, int32_t offset) {} \
     }                                                                                                        \
                                                                                                              \
@@ -65,7 +71,8 @@
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                                  \
         vector_##data_type src;                                                                              \
                                                                                                              \
-        MOCKER_CPP(cce_name0, void(vector_store_unalign&, uint32_t, vector_uint8_t, __ubuf__ uint8_t*))      \
+        MOCKER_CPP(                                                                                          \
+            cce_name0, void(vector_store_unalign&, uint32_t, vector_uint8_t, __ubuf__ uint8_t*&, Literal))  \
             .times(1)                                                                                        \
             .will(invoke(cce_name0##_##data_type##_Stub0));                                                  \
                                                                                                              \
@@ -87,8 +94,11 @@
                                                                                                                      \
     namespace {                                                                                                      \
     void cce_name0##_##data_type##_Stub0(                                                                            \
-        vector_store_unalign& src0, uint32_t offset, vector_fp4x2_e1m2_t src1, __ubuf__ float4_e1m2x2_t* dst)        \
-    {}                                                                                                               \
+        vector_store_unalign& src0, uint32_t offset, vector_fp4x2_e1m2_t src1, __ubuf__ float4_e1m2x2_t*& dst,       \
+        Literal post)                                                                                                 \
+    {                                                                                                                \
+        EXPECT_EQ(post, static_cast<Literal>(Literal::POST_UPDATE));                                                 \
+    }                                                                                                                \
     void cce_name1##_##data_type##_Stub1(vector_store_unalign src, __ubuf__ float4_e1m2x2_t* dst, int32_t offset) {} \
     }                                                                                                                \
                                                                                                                      \
@@ -97,7 +107,8 @@
         __ubuf__ data_type* dst = reinterpret_cast<__ubuf__ data_type*>(0);                                          \
         vector_int4x2_t src;                                                                                         \
                                                                                                                      \
-        MOCKER_CPP(cce_name0, void(vector_store_unalign&, uint32_t, vector_fp4x2_e1m2_t, __ubuf__ float4_e1m2x2_t*)) \
+        MOCKER_CPP(cce_name0,                                                                                         \
+            void(vector_store_unalign&, uint32_t, vector_fp4x2_e1m2_t, __ubuf__ float4_e1m2x2_t*&, Literal))        \
             .times(1)                                                                                                \
             .will(invoke(cce_name0##_##data_type##_Stub0));                                                          \
                                                                                                                      \
@@ -119,8 +130,11 @@
                                                                                                                \
     namespace {                                                                                                \
     void cce_name2##_##data_type##_Stub2(                                                                      \
-        vector_store_unalign& src0, uint32_t offset, vector_##data_type src1, __ubuf__ data_type* dst)         \
-    {}                                                                                                         \
+        vector_store_unalign& src0, uint32_t offset, vector_##data_type src1, __ubuf__ data_type*& dst,        \
+        Literal post)                                                                                          \
+    {                                                                                                          \
+        EXPECT_EQ(post, static_cast<Literal>(Literal::POST_UPDATE));                                           \
+    }                                                                                                          \
     void cce_name3##_##data_type##_Stub3(vector_store_unalign src, __ubuf__ data_type* dst, int32_t offset) {} \
     }                                                                                                          \
                                                                                                                \
@@ -130,7 +144,8 @@
         vector_##data_type src;                                                                                \
         uint32_t count = 32;                                                                                   \
                                                                                                                \
-        MOCKER_CPP(cce_name2, void(vector_store_unalign&, uint32_t, vector_##data_type, __ubuf__ data_type*))  \
+        MOCKER_CPP(                                                                                            \
+            cce_name2, void(vector_store_unalign&, uint32_t, vector_##data_type, __ubuf__ data_type*&, Literal)) \
             .times(1)                                                                                          \
             .will(invoke(cce_name2##_##data_type##_Stub2));                                                    \
                                                                                                                \
@@ -152,8 +167,10 @@
                                                                                                              \
     namespace {                                                                                              \
     void cce_name2##_##data_type##_Stub2(                                                                    \
-        vector_store_unalign& src0, uint32_t offset, vector_uint8_t src1, __ubuf__ uint8_t* dst)             \
-    {}                                                                                                       \
+        vector_store_unalign& src0, uint32_t offset, vector_uint8_t src1, __ubuf__ uint8_t*& dst, Literal post) \
+    {                                                                                                        \
+        EXPECT_EQ(post, static_cast<Literal>(Literal::POST_UPDATE));                                         \
+    }                                                                                                        \
     void cce_name3##_##data_type##_Stub3(vector_store_unalign src, __ubuf__ uint8_t* dst, int32_t offset) {} \
     }                                                                                                        \
                                                                                                              \
@@ -163,7 +180,8 @@
         vector_##data_type src;                                                                              \
         uint32_t count = 32;                                                                                 \
                                                                                                              \
-        MOCKER_CPP(cce_name2, void(vector_store_unalign&, uint32_t, vector_uint8_t, __ubuf__ uint8_t*))      \
+        MOCKER_CPP(                                                                                          \
+            cce_name2, void(vector_store_unalign&, uint32_t, vector_uint8_t, __ubuf__ uint8_t*&, Literal))  \
             .times(1)                                                                                        \
             .will(invoke(cce_name2##_##data_type##_Stub2));                                                  \
                                                                                                              \
@@ -185,8 +203,11 @@
                                                                                                                      \
     namespace {                                                                                                      \
     void cce_name2##_##data_type##_Stub2(                                                                            \
-        vector_store_unalign& src0, uint32_t offset, vector_fp4x2_e1m2_t src1, __ubuf__ float4_e1m2x2_t* dst)        \
-    {}                                                                                                               \
+        vector_store_unalign& src0, uint32_t offset, vector_fp4x2_e1m2_t src1, __ubuf__ float4_e1m2x2_t*& dst,       \
+        Literal post)                                                                                                 \
+    {                                                                                                                \
+        EXPECT_EQ(post, static_cast<Literal>(Literal::POST_UPDATE));                                                 \
+    }                                                                                                                \
     void cce_name3##_##data_type##_Stub3(vector_store_unalign src, __ubuf__ float4_e1m2x2_t* dst, int32_t offset) {} \
     }                                                                                                                \
                                                                                                                      \
@@ -196,7 +217,8 @@
         vector_int4x2_t src;                                                                                         \
         uint32_t count = 32;                                                                                         \
                                                                                                                      \
-        MOCKER_CPP(cce_name2, void(vector_store_unalign&, uint32_t, vector_fp4x2_e1m2_t, __ubuf__ float4_e1m2x2_t*)) \
+        MOCKER_CPP(cce_name2,                                                                                         \
+            void(vector_store_unalign&, uint32_t, vector_fp4x2_e1m2_t, __ubuf__ float4_e1m2x2_t*&, Literal))        \
             .times(1)                                                                                                \
             .will(invoke(cce_name2##_##data_type##_Stub2));                                                          \
                                                                                                                      \
