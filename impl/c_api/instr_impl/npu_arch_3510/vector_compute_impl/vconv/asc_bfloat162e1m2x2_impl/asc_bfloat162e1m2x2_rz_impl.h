@@ -90,7 +90,7 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rz_impl(
     vector_bfloat16_t src,
     vector_bool mask)
 {
-    vector_fp4x2_e1m2_t dst{};
+    vector_fp4x2_e1m2_t dst;
     asc_bfloat162e1m2x2_rz_impl(dst, src, mask);
     return dst;
 }
@@ -99,7 +99,7 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rz_v2_impl(
     vector_bfloat16_t src,
     vector_bool mask)
 {
-    vector_fp4x2_e1m2_t dst{};
+    vector_fp4x2_e1m2_t dst;
     asc_bfloat162e1m2x2_rz_v2_impl(dst, src, mask);
     return dst;
 }
@@ -108,7 +108,7 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rz_v3_impl(
     vector_bfloat16_t src,
     vector_bool mask)
 {
-    vector_fp4x2_e1m2_t dst{};
+    vector_fp4x2_e1m2_t dst;
     asc_bfloat162e1m2x2_rz_v3_impl(dst, src, mask);
     return dst;
 }
@@ -117,7 +117,7 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rz_v4_impl(
     vector_bfloat16_t src,
     vector_bool mask)
 {
-    vector_fp4x2_e1m2_t dst{};
+    vector_fp4x2_e1m2_t dst;
     asc_bfloat162e1m2x2_rz_v4_impl(dst, src, mask);
     return dst;
 }
@@ -127,7 +127,7 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rz_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 {
-    vector_fp4x2_e1m2_t dst{};
+    vector_fp4x2_e1m2_t dst;
     asc_bfloat162e1m2x2_rz_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -137,7 +137,7 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rz_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_quarter_pos)
 {
-    vector_fp4x2_e1m2_t dst{};
+    vector_fp4x2_e1m2_t dst;
     asc_bfloat162e1m2x2_rz_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -147,7 +147,7 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rz_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_quarter_pos)
 {
-    vector_fp4x2_e1m2_t dst{};
+    vector_fp4x2_e1m2_t dst;
     asc_bfloat162e1m2x2_rz_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -157,7 +157,7 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_rz_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_quarter_pos)
 {
-    vector_fp4x2_e1m2_t dst{};
+    vector_fp4x2_e1m2_t dst;
     asc_bfloat162e1m2x2_rz_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }

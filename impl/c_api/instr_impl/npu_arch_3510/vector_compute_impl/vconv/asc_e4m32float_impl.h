@@ -91,7 +91,7 @@ __simd_callee__ inline vector_float asc_e4m32float_impl(
     vector_fp8_e4m3fn_t src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_e4m32float_impl(dst, src, mask);
     return dst;
 }
@@ -100,7 +100,7 @@ __simd_callee__ inline vector_float asc_e4m32float_v2_impl(
     vector_fp8_e4m3fn_t src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_e4m32float_v2_impl(dst, src, mask);
     return dst;
 }
@@ -109,7 +109,7 @@ __simd_callee__ inline vector_float asc_e4m32float_v3_impl(
     vector_fp8_e4m3fn_t src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_e4m32float_v3_impl(dst, src, mask);
     return dst;
 }
@@ -118,7 +118,7 @@ __simd_callee__ inline vector_float asc_e4m32float_v4_impl(
     vector_fp8_e4m3fn_t src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_e4m32float_v4_impl(dst, src, mask);
     return dst;
 }
@@ -128,7 +128,7 @@ __simd_callee__ inline vector_float asc_e4m32float_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_e4m32float_impl(dst, src, mask, src_quarter_pos);
     return dst;
 }
@@ -138,7 +138,7 @@ __simd_callee__ inline vector_float asc_e4m32float_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> src_quarter_pos)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_e4m32float_impl(dst, src, mask, src_quarter_pos);
     return dst;
 }
@@ -148,7 +148,7 @@ __simd_callee__ inline vector_float asc_e4m32float_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> src_quarter_pos)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_e4m32float_impl(dst, src, mask, src_quarter_pos);
     return dst;
 }
@@ -158,7 +158,7 @@ __simd_callee__ inline vector_float asc_e4m32float_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> src_quarter_pos)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_e4m32float_impl(dst, src, mask, src_quarter_pos);
     return dst;
 }

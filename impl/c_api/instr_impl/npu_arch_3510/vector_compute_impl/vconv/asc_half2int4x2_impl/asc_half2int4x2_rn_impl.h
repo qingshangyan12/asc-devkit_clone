@@ -75,7 +75,7 @@ __simd_callee__ inline vector_int4x2_t asc_half2int4x2_rn_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_int4x2_t dst{};
+    vector_int4x2_t dst;
     asc_half2int4x2_rn_impl(dst, src, mask);
     return dst;
 }
@@ -84,7 +84,7 @@ __simd_callee__ inline vector_int4x2_t asc_half2int4x2_rn_sat_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_int4x2_t dst{};
+    vector_int4x2_t dst;
     asc_half2int4x2_rn_sat_impl(dst, src, mask);
     return dst;
 }
@@ -93,7 +93,7 @@ __simd_callee__ inline vector_int4x2_t asc_half2int4x2_rn_v2_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_int4x2_t dst{};
+    vector_int4x2_t dst;
     asc_half2int4x2_rn_v2_impl(dst, src, mask);
     return dst;
 }
@@ -102,7 +102,7 @@ __simd_callee__ inline vector_int4x2_t asc_half2int4x2_rn_sat_v2_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_int4x2_t dst{};
+    vector_int4x2_t dst;
     asc_half2int4x2_rn_sat_v2_impl(dst, src, mask);
     return dst;
 }
@@ -111,7 +111,7 @@ __simd_callee__ inline vector_int4x2_t asc_half2int4x2_rn_v3_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_int4x2_t dst{};
+    vector_int4x2_t dst;
     asc_half2int4x2_rn_v3_impl(dst, src, mask);
     return dst;
 }
@@ -120,7 +120,7 @@ __simd_callee__ inline vector_int4x2_t asc_half2int4x2_rn_sat_v3_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_int4x2_t dst{};
+    vector_int4x2_t dst;
     asc_half2int4x2_rn_sat_v3_impl(dst, src, mask);
     return dst;
 }
@@ -129,7 +129,7 @@ __simd_callee__ inline vector_int4x2_t asc_half2int4x2_rn_v4_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_int4x2_t dst{};
+    vector_int4x2_t dst;
     asc_half2int4x2_rn_v4_impl(dst, src, mask);
     return dst;
 }
@@ -138,7 +138,7 @@ __simd_callee__ inline vector_int4x2_t asc_half2int4x2_rn_sat_v4_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_int4x2_t dst{};
+    vector_int4x2_t dst;
     asc_half2int4x2_rn_sat_v4_impl(dst, src, mask);
     return dst;
 }

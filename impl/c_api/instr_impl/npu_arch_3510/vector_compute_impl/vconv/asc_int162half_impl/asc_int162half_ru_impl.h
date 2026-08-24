@@ -36,7 +36,7 @@ __simd_callee__ inline vector_half asc_int162half_ru_impl(
     vector_int16_t src,
     vector_bool mask)
 {
-    vector_half dst{};
+    vector_half dst;
     asc_int162half_ru_impl(dst, src, mask);
     return dst;
 }

@@ -44,7 +44,7 @@ __simd_callee__ inline vector_half asc_trunc_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_half dst{};
+    vector_half dst;
     asc_trunc_impl(dst, src, mask);
     return dst;
 }
@@ -53,7 +53,7 @@ __simd_callee__ inline vector_bfloat16_t asc_trunc_impl(
     vector_bfloat16_t src,
     vector_bool mask)
 {
-    vector_bfloat16_t dst{};
+    vector_bfloat16_t dst;
     asc_trunc_impl(dst, src, mask);
     return dst;
 }
@@ -62,7 +62,7 @@ __simd_callee__ inline vector_float asc_trunc_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_trunc_impl(dst, src, mask);
     return dst;
 }

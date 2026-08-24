@@ -160,7 +160,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_sat_impl(dst, src, mask);
     return dst;
 }
@@ -169,7 +169,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_impl(dst, src, mask);
     return dst;
 }
@@ -178,7 +178,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat_v2_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_sat_v2_impl(dst, src, mask);
     return dst;
 }
@@ -187,7 +187,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_v2_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_v2_impl(dst, src, mask);
     return dst;
 }
@@ -196,7 +196,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat_v3_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_sat_v3_impl(dst, src, mask);
     return dst;
 }
@@ -205,7 +205,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_v3_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_v3_impl(dst, src, mask);
     return dst;
 }
@@ -214,7 +214,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat_v4_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_sat_v4_impl(dst, src, mask);
     return dst;
 }
@@ -223,7 +223,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_v4_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_v4_impl(dst, src, mask);
     return dst;
 }
@@ -233,7 +233,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -243,7 +243,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_quarter_pos)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -253,7 +253,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_quarter_pos)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -263,7 +263,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_quarter_pos)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -273,7 +273,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_sat_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -283,7 +283,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER> dst_quarter_pos)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_sat_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -293,7 +293,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER> dst_quarter_pos)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_sat_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }
@@ -303,7 +303,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_quarter_pos)
 {
-    vector_hifloat8_t dst{};
+    vector_hifloat8_t dst;
     asc_float2hif8_rna_sat_impl(dst, src, mask, dst_quarter_pos);
     return dst;
 }

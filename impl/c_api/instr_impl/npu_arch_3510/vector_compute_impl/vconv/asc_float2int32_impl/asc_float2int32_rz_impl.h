@@ -37,7 +37,7 @@ __simd_callee__ inline vector_int32_t asc_float2int32_rz_sat_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_int32_t dst{};
+    vector_int32_t dst;
     asc_float2int32_rz_sat_impl(dst, src, mask);
     return dst;
 }
@@ -46,7 +46,7 @@ __simd_callee__ inline vector_int32_t asc_float2int32_rz_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_int32_t dst{};
+    vector_int32_t dst;
     asc_float2int32_rz_impl(dst, src, mask);
     return dst;
 }

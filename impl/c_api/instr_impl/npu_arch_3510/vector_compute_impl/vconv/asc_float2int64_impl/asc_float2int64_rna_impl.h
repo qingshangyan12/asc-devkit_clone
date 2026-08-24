@@ -93,7 +93,7 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rna_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_int64_t dst{};
+    vector_int64_t dst;
     asc_float2int64_rna_impl(dst, src, mask);
     return dst;
 }
@@ -102,7 +102,7 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rna_sat_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_int64_t dst{};
+    vector_int64_t dst;
     asc_float2int64_rna_sat_impl(dst, src, mask);
     return dst;
 }
@@ -111,7 +111,7 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rna_v2_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_int64_t dst{};
+    vector_int64_t dst;
     asc_float2int64_rna_v2_impl(dst, src, mask);
     return dst;
 }
@@ -120,7 +120,7 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rna_sat_v2_impl(
     vector_float src,
     vector_bool mask)
 {
-    vector_int64_t dst{};
+    vector_int64_t dst;
     asc_float2int64_rna_sat_v2_impl(dst, src, mask);
     return dst;
 }
@@ -130,7 +130,7 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rna_impl(
     vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {
-    vector_int64_t dst{};
+    vector_int64_t dst;
     asc_float2int64_rna_impl(dst, src, mask, src_pos);
     return dst;
 }
@@ -140,7 +140,7 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rna_impl(
     vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 {
-    vector_int64_t dst{};
+    vector_int64_t dst;
     asc_float2int64_rna_impl(dst, src, mask, src_pos);
     return dst;
 }
@@ -150,7 +150,7 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rna_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {
-    vector_int64_t dst{};
+    vector_int64_t dst;
     asc_float2int64_rna_sat_impl(dst, src, mask, src_pos);
     return dst;
 }
@@ -160,7 +160,7 @@ __simd_callee__ inline vector_int64_t asc_float2int64_rna_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 {
-    vector_int64_t dst{};
+    vector_int64_t dst;
     asc_float2int64_rna_sat_impl(dst, src, mask, src_pos);
     return dst;
 }
