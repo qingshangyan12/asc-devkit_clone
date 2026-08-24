@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例通过归约求和算子展现[协作组API](../../../../../../docs/zh/api/SIMT-API/cooperative_groups/cooperative_groups.md)的基本用法，重点呈现了协作组提供的代码抽象能力
+本样例通过归约求和算子展现[协作组API](../../../../../../docs/zh/api/SIMT-API/cooperative_groups/cooperative_groups.md)的基本用法，重点呈现了协作组提供的代码抽象能力。
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
@@ -31,7 +31,7 @@
 本样例给出了3种归约求和算子的写法，分别展现协作组从`grid`、`thread block`、`Warp`粒度控制线程协作的方式。并且将规约求和操作提炼为一个通用函数`reduce_sum`，通过传入不同的协作组对象实现不同粒度的规约操作，展现协作组的代码抽象能力。
 ### 样例规格
 
-三个用例采用同一执行配置：grid为4个线程块，每块1024线程即32个warp，共4096线程，动态ubuf为0，核函数调用形式为`<<<dim3(4), dim3(1024), DYN_UBUF_SIZE, stream>>>`。`THREADS_PER_BLOCK`取1024，为默认线程配置下每个block的线程数。
+三个用例采用同一执行配置：grid为4个线程块，每个block为1024个线程（默认线程配置），共4096个线程，动态ubuf为0，核函数调用形式为`<<<dim3(4), dim3(1024), DYN_UBUF_SIZE, stream>>>`。
 
 
 <table>
