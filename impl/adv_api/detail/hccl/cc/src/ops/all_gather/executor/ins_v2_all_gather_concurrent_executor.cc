@@ -207,11 +207,11 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
     HCCL_INFO("[InsV2AllGatherConcurrentExecutor][Orchestrate] Orchestrate Start");
-    HCCL_INFO(
-        "[InsV2AllGatherConcurrentExecutor][Orchestrate] resCtx before copy: infos.size[%zu], "
-        "threads.size[%zu], channels.size[%zu], cclMem.size[%llu]",
-        resCtx.algHierarchyInfo.infos.size(), resCtx.threads.size(), resCtx.channels.size(),
-        static_cast<unsigned long long>(resCtx.cclMem.size));
+//     HCCL_INFO(
+//         "[InsV2AllGatherConcurrentExecutor][Orchestrate] resCtx before copy: infos.size[%zu], "
+//         "threads.size[%zu], channels.size[%zu], cclMem.size[%llu]",
+//         resCtx.algHierarchyInfo.infos.size(), resCtx.threads.size(), resCtx.channels.size(),
+//         static_cast<unsigned long long>(resCtx.cclMem.size));
     HCCL_INFO("[InsV2AllGatherConcurrentExecutor][Orchestrate] before algHierarchyInfo copy");
     algHierarchyInfo_ = resCtx.algHierarchyInfo;
     HCCL_INFO(
