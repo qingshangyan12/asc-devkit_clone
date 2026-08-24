@@ -25,6 +25,8 @@ DECL_WEAK_FUNC(
     const void* kernelFunc, const void** kernelArgs, uint32_t argNum, CcuKernelHandle* kernelHandle);
 DECL_WEAK_FUNC(CcuResult, HcommCcuKernelRegisterEnd, CcuInsHandle insHandle);
 DECL_WEAK_FUNC(
+    CcuResult, HcommCcuFunctionGet, CcuKernelHandle kernelHandle, const char* funcName, uint64_t* pc);
+DECL_WEAK_FUNC(
     CcuResult, HcommCcuKernelLaunch, ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs,
     uint32_t argSize);
 
