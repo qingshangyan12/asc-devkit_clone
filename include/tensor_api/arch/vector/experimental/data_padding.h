@@ -13,10 +13,13 @@
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_DATA_PADDING_H
 #endif
 
-#ifndef IMPL_TENSOR_API_EXPERIMENTAL_REG_DATA_PADDING_H
-#define IMPL_TENSOR_API_EXPERIMENTAL_REG_DATA_PADDING_H
+#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_DATA_PADDING_H
+#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_DATA_PADDING_H
 
-#include <cstdint>
+#include <cstddef>
+
+#include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/arch/vector/experimental/mask_reg_compute.h"
 
 namespace asc {
 namespace te {
@@ -36,7 +39,7 @@ __simd_callee__ inline decltype(auto) fill(reg_tensor<T> val, reg_tensor<bool> m
 #include "impl/tensor_api/arch/vector/experimental/data_padding_impl.h"
 #endif
 
-#endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_DATA_PADDING_H
+#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_DATA_PADDING_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_DATA_PADDING_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

@@ -37,7 +37,7 @@ __simd_callee__ inline reg_pair<T> interleave(reg_tensor<T> src0, reg_tensor<T> 
         "int32_t and float.");
     reg_pair<T> dst;   
     asc_intlv(dst.first.reg, dst.second.reg, src0.reg, src1.reg);
-    dst.first.with_mask(all_mask<uint8_t>());;
+    dst.first.with_mask(all_mask<T>());
     dst.second.mask = dst.first.mask;
     return dst;
 }
@@ -49,7 +49,7 @@ __simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T
         "int32_t and float.");
     reg_pair<T> dst;   
     asc_deintlv(dst.first.reg, dst.second.reg, src0.reg, src1.reg);
-    dst.first.with_mask(all_mask<uint8_t>());;
+    dst.first.with_mask(all_mask<T>());
     dst.second.mask = dst.first.mask;
     return dst;
 }
