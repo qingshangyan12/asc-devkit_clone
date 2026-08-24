@@ -116,8 +116,8 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
     u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
     u64 dataSize = opParam.DataDes.count * perDataSize;
     HCCL_INFO(
-        "[AllGatherAutoSelector][SelectAicpuAlgo111] topoLevelNums=[%d], deviceNumPerModule=[%d], level0Topo=[%d]",
-        topoInfo->topoLevelNums, topoInfo->deviceNumPerModule, topoInfo->level0Topo);
+        "[AllGatherAutoSelector][SelectAicpuAlgo111] topoLevelNums=[%d], deviceNumPerModule=[%d], level0Topo=[%d], datacount=[%d], perDataSize=[%d]",
+        topoInfo->topoLevelNums, topoInfo->deviceNumPerModule, topoInfo->level0Topo, opParam.DataDes.count, perDataSize);
     if (topoInfo->topoLevelNums > 1) {
         // Level1Nhr 已在 CalcTopoShape 中设置（GCD==1 时为 true）
         if (topoInfo->Level1Nhr) {
@@ -148,7 +148,7 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
                 CheckClosNumMultipleOfMeshNum(topoInfo, isClosNumMultipleOfMeshNum) != HCCL_SUCCESS,
                 HCCL_ERROR("[AllGatherAutoSelector] CheckClosNumMultipleOfMeshNum failed."), SelectorStatus::NOT_MATCH);
             if (isMeshNumEqualToClosNum && (topoInfo->userRankSize <= MAX_RANK_NUM_FOR_CONCURRENT_ALGO)) {
-                HCCL_INFO("[hld][test222] level0Topo=[%d]", topoInfo->level0Topo);
+                HCCL_INFO("[hld][test222] level0Topo=[%d] dataSize=[%d]", topoInfo->level0Topo, dataSize);
                 if (dataSize > SMALL_COUNT_512KB) {
                     HCCL_INFO("[hld][test3333] level0Topo=[%d]", topoInfo->level0Topo);
                     selectAlgName = "InsAllGatherConcurrentMesh1DNHR";
