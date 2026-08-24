@@ -35,7 +35,7 @@ static_assert(
 static_assert(
     std::is_same<std::underlying_type_t<ProcessOutcome>, uint32_t>::value, "ProcessOutcome must have a stable width");
 static_assert(
-    std::is_same<decltype(ProcessExecutionResult::terminationCode), int32_t>::value,
+    std::is_same<decltype(ProcessExecutorResult::terminationCode), int32_t>::value,
     "terminationCode must have a stable width");
 
 ProcessExecutionRequest CreateCapturedRequest(std::vector<std::string> arguments)
@@ -92,7 +92,7 @@ TEST(ProcessExecutorTest, ExecutesArgumentsWithoutShellParsing)
 
     ProcessExecutionRequest request =
         CreateCapturedRequest({"/usr/bin/printf", "$(touch " + unexpectedFilePath.string() + ")"});
-    const ProcessExecutionResult result = ProcessExecutor::Execute(request);
+    const ProcessExecutorResult result = ProcessExecutor::Execute(request);
 
     EXPECT_TRUE(result.HasSuccessfulExit());
     EXPECT_EQ(result.capturedOutput, "$(touch " + unexpectedFilePath.string() + ")");
@@ -107,7 +107,7 @@ TEST(ProcessExecutorTest, AppliesEnvironmentOverridesAndRemovals)
     request.environmentOverrides.emplace_back("PROCESS_EXECUTOR_VALUE", "visible");
     request.removedEnvironmentVariables.emplace_back("PROCESS_EXECUTOR_REMOVE_ME");
 
-    const ProcessExecutionResult result = ProcessExecutor::Execute(request);
+    const ProcessExecutorResult result = ProcessExecutor::Execute(request);
     EXPECT_TRUE(result.HasSuccessfulExit());
     EXPECT_EQ(result.capturedOutput, "visible|unset");
     EXPECT_EQ(unsetenv("PROCESS_EXECUTOR_REMOVE_ME"), 0);
@@ -120,24 +120,24 @@ TEST(ProcessExecutorTest, EnvironmentOverrideTakesPrecedenceOverRemoval)
     request.removedEnvironmentVariables.emplace_back("PROCESS_EXECUTOR_PRECEDENCE");
     request.environmentOverrides.emplace_back("PROCESS_EXECUTOR_PRECEDENCE", "overridden");
 
-    const ProcessExecutionResult result = ProcessExecutor::Execute(request);
+    const ProcessExecutorResult result = ProcessExecutor::Execute(request);
     EXPECT_TRUE(result.HasSuccessfulExit());
     EXPECT_EQ(result.capturedOutput, "overridden");
 }
 
 TEST(ProcessExecutorTest, ReportsExitSignalAndSpawnFailureSeparately)
 {
-    const ProcessExecutionResult nonzeroExit =
+    const ProcessExecutorResult nonzeroExit =
         ProcessExecutor::Execute(CreateCapturedRequest({"/bin/sh", "-c", "exit 7"}));
     EXPECT_EQ(nonzeroExit.outcome, ProcessOutcome::Exited);
     EXPECT_EQ(nonzeroExit.terminationCode, 7);
 
-    const ProcessExecutionResult signalExit =
+    const ProcessExecutorResult signalExit =
         ProcessExecutor::Execute(CreateCapturedRequest({"/bin/sh", "-c", "kill -TERM $$"}));
     EXPECT_EQ(signalExit.outcome, ProcessOutcome::Signaled);
     EXPECT_EQ(signalExit.terminationCode, SIGTERM);
 
-    const ProcessExecutionResult spawnFailure =
+    const ProcessExecutorResult spawnFailure =
         ProcessExecutor::Execute(CreateCapturedRequest({"/path/that/does/not/exist"}));
     EXPECT_EQ(spawnFailure.outcome, ProcessOutcome::ExecutorFailure);
 }
@@ -147,7 +147,7 @@ TEST(ProcessExecutorTest, BoundsCapturedCombinedOutput)
     ProcessExecutionRequest request = CreateCapturedRequest({"/bin/sh", "-c", "printf stdout; printf stderr >&2"});
     request.capturedOutputByteLimit = 8U;
 
-    const ProcessExecutionResult result = ProcessExecutor::Execute(request);
+    const ProcessExecutorResult result = ProcessExecutor::Execute(request);
     EXPECT_TRUE(result.HasSuccessfulExit());
     EXPECT_EQ(result.capturedOutput.size(), 8U);
     EXPECT_TRUE(result.capturedOutputTruncated);
@@ -161,7 +161,7 @@ TEST(ProcessExecutorTest, InheritModeDoesNotCaptureOutput)
     request.executionTimeout = 1s;
     request.terminationGracePeriod = 20ms;
 
-    const ProcessExecutionResult result = ProcessExecutor::Execute(request);
+    const ProcessExecutorResult result = ProcessExecutor::Execute(request);
     EXPECT_TRUE(result.HasSuccessfulExit());
     EXPECT_TRUE(result.capturedOutput.empty());
 }
@@ -178,7 +178,7 @@ TEST(ProcessExecutorTest, TimeoutTerminatesDescendantsAfterLeaderExits)
     ProcessExecutionRequest request = CreateCapturedRequest({"/bin/sh", "-c", commandScript});
     request.executionTimeout = 20ms;
 
-    const ProcessExecutionResult result = ProcessExecutor::Execute(request);
+    const ProcessExecutorResult result = ProcessExecutor::Execute(request);
     EXPECT_EQ(result.outcome, ProcessOutcome::TimedOut);
 
     const uintmax_t markerSizeAfterTimeout =

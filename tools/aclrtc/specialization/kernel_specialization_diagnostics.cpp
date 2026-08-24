@@ -161,7 +161,7 @@ void KernelSpecializationDiagnostics::AppendCommandToReplayScript(const Compilat
 }
 
 void KernelSpecializationDiagnostics::AppendCommandResultToCompilationLog(
-    const CompilationCommand& compilationCommand, const ProcessExecutionResult& processResult) noexcept
+    const CompilationCommand& compilationCommand, const ProcessExecutorResult& processResult) noexcept
 {
     if (!diagnosticsEnabled_) {
         return;

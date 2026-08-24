@@ -326,7 +326,7 @@ void SignalProcessGroup(pid_t processLeaderId, int signalNumber) noexcept
 }
 
 OutputDrainStatus DrainCapturedOutput(
-    int outputFileDescriptor, uint64_t capturedOutputByteLimit, ProcessExecutionResult& processResult)
+    int outputFileDescriptor, uint64_t capturedOutputByteLimit, ProcessExecutorResult& processResult)
 {
     char outputBuffer[4096];
     uint64_t readByteCountThisIteration = 0U;
@@ -432,7 +432,7 @@ public:
         return true;
     }
 
-    void WaitForCompletion(const ProcessExecutionRequest& request, ProcessExecutionResult& processResult)
+    void WaitForCompletion(const ProcessExecutionRequest& request, ProcessExecutorResult& processResult)
     {
         const SteadyClock::time_point executionDeadline = startedAt_ + request.executionTimeout;
         int processStatus = 0;
@@ -587,12 +587,12 @@ private:
 
 } // namespace
 
-bool ProcessExecutionResult::HasSuccessfulExit() const noexcept
+bool ProcessExecutorResult::HasSuccessfulExit() const noexcept
 {
     return outcome == ProcessOutcome::Exited && terminationCode == 0;
 }
 
-const char* ProcessExecutionResult::GetOutcomeName() const noexcept
+const char* ProcessExecutorResult::GetOutcomeName() const noexcept
 {
     switch (outcome) {
         case ProcessOutcome::Exited:
@@ -608,9 +608,9 @@ const char* ProcessExecutionResult::GetOutcomeName() const noexcept
     }
 }
 
-ProcessExecutionResult ProcessExecutor::Execute(const ProcessExecutionRequest& request)
+ProcessExecutorResult ProcessExecutor::Execute(const ProcessExecutionRequest& request)
 {
-    ProcessExecutionResult processResult;
+    ProcessExecutorResult processResult;
     if (!ValidateExecutionRequest(request)) {
         return processResult;
     }

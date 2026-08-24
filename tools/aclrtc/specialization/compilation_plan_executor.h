@@ -19,7 +19,7 @@
 
 namespace ascendc {
 
-struct ProcessExecutionResult;
+struct ProcessExecutorResult;
 
 namespace aclrtc {
 
@@ -43,7 +43,7 @@ public:
 
 private:
     aclError ExecuteCompilationCommand(
-        const CompilationCommand& compilationCommand, ProcessExecutionResult& processResult) const;
+        const CompilationCommand& compilationCommand, ProcessExecutorResult& processResult) const;
 
     KernelSpecializationDiagnostics& specializationDiagnostics_;
     CompilationCommandExecutionLimits executionLimits_;

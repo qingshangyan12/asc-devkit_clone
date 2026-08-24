@@ -41,7 +41,7 @@ struct ProcessExecutionRequest {
     uint64_t capturedOutputByteLimit{0U};
 };
 
-struct ProcessExecutionResult {
+struct ProcessExecutorResult {
     ProcessOutcome outcome{ProcessOutcome::ExecutorFailure};
     int32_t terminationCode{0};
     bool capturedOutputTruncated{false};
@@ -56,7 +56,7 @@ class ProcessExecutor final {
 public:
     ProcessExecutor() = delete;
 
-    static ProcessExecutionResult Execute(const ProcessExecutionRequest& request);
+    static ProcessExecutorResult Execute(const ProcessExecutionRequest& request);
 };
 
 } // namespace ascendc

@@ -39,7 +39,7 @@ aclError CompilationPlanExecutor::ExecuteCompilationPlan(const KernelCompilation
                 "Executing command %s with %s", compilationCommand.diagnosticLabel.c_str(),
                 compilationCommand.executablePath.c_str());
             specializationDiagnostics_.AppendCommandToReplayScript(compilationCommand);
-            ProcessExecutionResult processResult;
+            ProcessExecutorResult processResult;
             const aclError executionResult = ExecuteCompilationCommand(compilationCommand, processResult);
             specializationDiagnostics_.AppendCommandResultToCompilationLog(compilationCommand, processResult);
             if (executionResult != ACLRTC_SUCCESS) {
@@ -74,7 +74,7 @@ aclError CompilationPlanExecutor::ExecuteCompilationPlan(const KernelCompilation
 }
 
 aclError CompilationPlanExecutor::ExecuteCompilationCommand(
-    const CompilationCommand& compilationCommand, ProcessExecutionResult& processResult) const
+    const CompilationCommand& compilationCommand, ProcessExecutorResult& processResult) const
 {
     ProcessExecutionRequest executionRequest;
     executionRequest.arguments.reserve(compilationCommand.commandArguments.size() + 1U);

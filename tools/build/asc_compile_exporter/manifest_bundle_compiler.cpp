@@ -80,7 +80,7 @@ bool ManifestBundleCompiler::BuildBundle(
     executionRequest.outputMode = ProcessOutputMode::Inherit;
     executionRequest.executionTimeout = std::chrono::minutes(BUNDLE_BUILD_TIMEOUT_MINUTES);
     executionRequest.terminationGracePeriod = std::chrono::seconds(BUNDLE_BUILD_TERMINATION_GRACE_SECONDS);
-    const ProcessExecutionResult executionResult = ProcessExecutor::Execute(executionRequest);
+    const ProcessExecutorResult executionResult = ProcessExecutor::Execute(executionRequest);
     if (!executionResult.HasSuccessfulExit()) {
         ASCENDLOGE(
             "Failed to build compile resource bundle: outcome=%s code=%d elapsed_ms=%lld",

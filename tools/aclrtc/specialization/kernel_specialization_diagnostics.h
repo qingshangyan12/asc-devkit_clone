@@ -20,7 +20,7 @@
 
 namespace ascendc {
 
-struct ProcessExecutionResult;
+struct ProcessExecutorResult;
 
 namespace aclrtc {
 
@@ -36,7 +36,7 @@ public:
     void WriteManifestSnapshot(const nlohmann::json& resourceManifest) noexcept;
     void AppendCommandToReplayScript(const CompilationCommand& compilationCommand) noexcept;
     void AppendCommandResultToCompilationLog(
-        const CompilationCommand& compilationCommand, const ProcessExecutionResult& processResult) noexcept;
+        const CompilationCommand& compilationCommand, const ProcessExecutorResult& processResult) noexcept;
     void LogCommandFailureRecoveryHint() const noexcept;
     void WriteSpecializationResult(
         const boost::filesystem::path& outputElfPath, OutputPublicationStatus publicationStatus) noexcept;
