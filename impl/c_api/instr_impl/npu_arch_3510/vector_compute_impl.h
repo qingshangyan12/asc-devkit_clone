@@ -1585,6 +1585,66 @@ __simd_callee__ inline void asc_duplicate(vector_float& dst, vector_float src, v
     asc_duplicate_impl(dst, src, mask);
 }
 
+__simd_callee__ inline vector_uint8_t asc_duplicate(vector_uint8_t src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
+__simd_callee__ inline vector_int8_t asc_duplicate(vector_int8_t src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_duplicate(vector_fp8_e4m3fn_t src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
+__simd_callee__ inline vector_fp8_e5m2_t asc_duplicate(vector_fp8_e5m2_t src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
+__simd_callee__ inline vector_fp8_e8m0_t asc_duplicate(vector_fp8_e8m0_t src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
+__simd_callee__ inline vector_uint16_t asc_duplicate(vector_uint16_t src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
+__simd_callee__ inline vector_int16_t asc_duplicate(vector_int16_t src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
+__simd_callee__ inline vector_half asc_duplicate(vector_half src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
+__simd_callee__ inline vector_bfloat16_t asc_duplicate(vector_bfloat16_t src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
+__simd_callee__ inline vector_uint32_t asc_duplicate(vector_uint32_t src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
+__simd_callee__ inline vector_int32_t asc_duplicate(vector_int32_t src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
+__simd_callee__ inline vector_float asc_duplicate(vector_float src, vector_bool mask)
+{
+    return asc_duplicate_impl(src, mask);
+}
+
 // ==========asc_duplicate_highest(uint8_t/int8_t/fp8_e4m3fn_t/fp8_e5m2_t/fp8_e8m0_t/uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float)==========
 __simd_callee__ inline void asc_duplicate_highest(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
 {

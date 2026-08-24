@@ -43,8 +43,6 @@
                                                      vector_bool mask)
     ```
 
-    dtype可取的数据类型为`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
-
 - 不带mask
 
     ```c
@@ -52,7 +50,9 @@
                                                      <dtype> value)
     ```
 
-    dtype可取的数据类型为`int8_t`、`uint8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+**dtype支持的数据类型：**
+
+dtype可取的数据类型为`int8_t`、`uint8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 **典型示例：**
 
@@ -128,7 +128,7 @@ void print_data(const char* label, const std::vector<T>& values, uint32_t offset
 constexpr uint32_t ELEMENT_COUNT = 64;
 constexpr float FILL_VALUE = 3.5f;
 
-__simd_vf__ inline void duplicate_scalar_modes(__ubuf__ float* dst)
+__simd_vf__ inline void duplicate_scalar(__ubuf__ float* dst)
 {
     vector_float dst_reg;
     uint32_t count = ELEMENT_COUNT;
@@ -142,7 +142,7 @@ __global__ __vector__ void asc_duplicate_scalar_kernel(__gm__ float* dst)
 {
     asc_init();
     __ubuf__ float dst_local[ELEMENT_COUNT];
-    duplicate_scalar_modes(dst_local);
+    duplicate_scalar(dst_local);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(dst, dst_local, sizeof(dst_local));
