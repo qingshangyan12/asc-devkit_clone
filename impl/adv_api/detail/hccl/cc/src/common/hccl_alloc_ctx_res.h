@@ -113,6 +113,7 @@ enum AlgorithmType {
     CcuAllGatherMeshMem2Mem1D,
     CcuAllGatherMesh2D,
     CcuSchedAllGatherConcurMeshNHRMultiLink = 3,
+    CcuSchedAllToAllSoleMeshConcurrent = 4,
     CcuReduceScatterMesh1D = 50,
     CcuReduceScatterMeshMem2Mem1D,
     CcuReduceScatterMesh2D,
@@ -125,6 +126,7 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
     {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
     {"CcuSchedAllGatherConcurMeshNHRMultiLink", CcuSchedAllGatherConcurMeshNHRMultiLink},
+    {"CcuSchedAllToAllSoleMeshConcurrent", CcuSchedAllToAllSoleMeshConcurrent},
     {"CcuKfcReduceScatterMesh1DMem2Mem", CcuReduceScatterMeshMem2Mem1D}};
 
 typedef HcclResult (*OpParamPrepareFunc)(
