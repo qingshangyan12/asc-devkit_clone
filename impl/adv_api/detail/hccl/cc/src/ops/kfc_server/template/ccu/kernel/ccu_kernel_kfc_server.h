@@ -25,6 +25,9 @@ constexpr uint32_t CCU_PARAM_NUM_PER_DIE = 32;
 constexpr uint32_t CCU_PARAM_NUM_MAX = CCU_PARAM_NUM_PER_DIE * 2;
 constexpr uint32_t CCU_ONE_PARAM_SIZE = 8;
 constexpr uint32_t CCU_TASK_NUM_MAX = 64;
+constexpr uint32_t KFC_SERVER_SUB_KERNEL_PC_ARG_IDX = 6;
+constexpr const char* KFC_ALL_GATHER_FUNC_NAME = "KfcAllGatherMesh1DMem2MemFunc";
+constexpr const char* KFC_REDUCE_SCATTER_FUNC_NAME = "KfcReduceScatterMesh1DMem2MemFunc";
 
 // new---20260603
 struct CcuKernelArgKfcServer : CcuKernelArgBase {
@@ -53,6 +56,7 @@ struct KfcServerContext : CcuKernelCtxBase {
 
     ccu::Variable missionNum;
     ccu::Variable missionIndex;
+    ccu::Variable subKernelPc;
 
     // 用于Die间同步信号[missionId=0]
     const char* exportDieSig;
