@@ -40,7 +40,7 @@ struct KfcReduceScatterMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::Variable chunkSize;
     ccu::Variable currentSliceSize;
     ccu::Variable tailSize;
-    ccu::Variable chunkLoopNum;
+    ccu::Variable repeatNum;
     ccu::LocalAddr myInput;
     std::vector<ccu::RemoteAddr> remoteInput;
     std::vector<ccu::LocalAddr> scratchMem;
@@ -77,7 +77,7 @@ static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext& ctx)
 static CcuResult LoadArgs(
     KfcReduceScatterMesh1DMem2MemContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr,
     ccu::Variable tokenInfo, ccu::Variable scratch, ccu::Variable currentRankSliceInputOffset,
-    ccu::Variable tailSize, ccu::Variable chunkLoopNum)
+    ccu::Variable tailSize, ccu::Variable repeatNum)
 {
     ctx.input[ctx.rankId] = inputAddr;
     ctx.output = outputAddr;
@@ -89,7 +89,7 @@ static CcuResult LoadArgs(
     chunkSize = chunkSize / MIN_SLICE_ALIGN * MIN_SLICE_ALIGN;
     ctx.chunkSize = chunkSize;
     ctx.tailSize = tailSize;
-    ctx.chunkLoopNum = chunkLoopNum;
+    ctx.repeatNum = repeatNum;
     return CCU_SUCCESS;
 }
 
@@ -188,9 +188,9 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
 
     ccu::Variable repeatNumAdd;
     repeatNumAdd = 1;
-    CCU_WHILE(ctx.chunkLoopNum != UINT64_MAX)
+    CCU_WHILE(ctx.repeatNum != UINT64_MAX)
     {
-        ctx.chunkLoopNum += repeatNumAdd;
+        ctx.repeatNum += repeatNumAdd;
         ctx.currentSliceSize = ctx.chunkSize;
         CCU_CHK_RET(DoReduceScatter(ctx, ctx.event));
         for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
@@ -210,7 +210,7 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
 
 CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
-    ccu::Variable currentRankSliceInputOffset, ccu::Variable tailSize, ccu::Variable chunkLoopNum,
+    ccu::Variable currentRankSliceInputOffset, ccu::Variable tailSize, ccu::Variable repeatNum,
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
     const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType)
 {
@@ -240,7 +240,7 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem run");
     CCU_CHK_RET(InitResource(ctx));
     CCU_CHK_RET(
-        LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, tailSize, chunkLoopNum));
+        LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, tailSize, repeatNum));
     CCU_CHK_RET(PreSync(ctx));
     CCU_CHK_RET(DoRepeatReduceScatter(ctx));
     CCU_CHK_RET(PostSync(ctx));

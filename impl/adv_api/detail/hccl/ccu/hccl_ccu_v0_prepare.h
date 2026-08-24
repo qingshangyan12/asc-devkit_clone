@@ -238,6 +238,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         KERNEL_INFO, "ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
         ccuParam_.scratchAddr, rankSliceOffset);
     xnData_[4] = rankSliceOffset;
+    xnData_[5] = 0;
+    xnData_[6] = 0;
     // Keep the existing XN7/XN8 layout: tail size and inverse full-chunk count.
     constexpr uint64_t scratchSize = 16 * 1024 * 1024;
     constexpr uint64_t minSliceAlign = 128;

@@ -194,7 +194,6 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     void* comSyncPtr = nullptr;
 
     CHK_RET(GetOrCreateCcuCtx(comm, tagWorkspace, Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
-    HCCL_INFO("Used scratchSize: %zu.", scratchSize);
     CHK_RET(GetOrCreateCcuCtx(comm, tagScratch, scratchSize, &scratchPtr));
     CHK_RET(GetOrCreateCcuCtx(comm, tagComParam, comParamBufSize, &comParamPtr));
     CHK_RET(GetOrCreateCcuCtx(comm, tagComSync, comSyncBufSize, &comSyncPtr));
