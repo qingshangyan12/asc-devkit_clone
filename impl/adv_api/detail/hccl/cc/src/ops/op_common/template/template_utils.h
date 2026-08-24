@@ -313,7 +313,6 @@ inline u32 CalcChannelsPerRank(const std::vector<HcclChannelDesc>& channels)
     u32 channelsPerRank = 1;
     u32 currentRank = INVALID_VALUE_RANKID;
     u32 currentCount = 0;
-    // channels的排列遵循相同远端的channel放在相邻位置
     for (const auto& channel : channels) {
         if (channel.remoteRank == currentRank) {
             currentCount++;
@@ -357,19 +356,15 @@ inline u32 CalcChannelsPerRankMin(const std::vector<HcclChannelDesc>& channels)
         }
     };
 
-    // channels的排列遵循相同远端的channel放在相邻位置
     for (const auto& channel : channels) {
         if (channel.remoteRank == currentRank) {
-            // 如果remoteRank不变，则计数一直累加
             currentCount++;
         } else {
-            // 如果remoteRank变化了，则更新channelsPerRank并重新开始给下一个remoteRank计数
             updateChannelsPerRank(currentRank, currentCount);
             currentRank = channel.remoteRank;
             currentCount = 1;
         }
     }
-    // 处理最后一个rank
     updateChannelsPerRank(currentRank, currentCount);
     if (channelsPerRank == UINT32_MAX) {
         channelsPerRank = 1;
@@ -431,7 +426,6 @@ HcclResult FillCachedArgs(CcuKernelSubmitInfo& info, Args... args)
     return HcclResult::HCCL_SUCCESS;
 }
 
-// 只读判断：指定网络层上是否存在某个拓扑实例覆盖了该层全部本地Rank
 bool IsAllConnetedWithTopo(const TopoInfoWithNetLayerDetails* topoInfo, const u32 netLayer, const CommTopo topoType);
 
 HcclResult CalcDataSplitByPortGroupCommon(

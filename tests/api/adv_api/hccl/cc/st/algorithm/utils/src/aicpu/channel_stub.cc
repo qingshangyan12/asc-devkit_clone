@@ -117,7 +117,6 @@ HcclResult ProcessLinksForChannelMutiJetty(
     return HCCL_SUCCESS;
 }
 
-// ST环境没有真实RankGraph链路，退化为与普通NHR一致的单channel请求
 HcclResult CalcChannelRequestNhrMultiJetty(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation)
