@@ -879,9 +879,11 @@ __simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst, 
 
 __simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
-__simd_callee__ inline void asc_frequency_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
+__simd_callee__ inline vector_uint16_t asc_frequency_histogram_bin0(
+    vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
-__simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
+__simd_callee__ inline vector_uint16_t asc_frequency_histogram_bin1(
+    vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
 // ==========asc_update_mask==========
 __simd_callee__ inline vector_bool asc_update_mask_b8(uint32_t& value);

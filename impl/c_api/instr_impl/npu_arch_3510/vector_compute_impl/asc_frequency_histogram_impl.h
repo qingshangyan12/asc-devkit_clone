@@ -25,20 +25,22 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
-__simd_callee__ inline void asc_frequency_histogram_bin0_impl(
+__simd_callee__ inline vector_uint16_t asc_frequency_histogram_bin0_impl(
     vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         dhistv2(dst, src, mask, Bin_N0);
     }
+    return dst;
 }
 
-__simd_callee__ inline void asc_frequency_histogram_bin1_impl(
+__simd_callee__ inline vector_uint16_t asc_frequency_histogram_bin1_impl(
     vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 {
     if ASC_IS_AIV {
         dhistv2(dst, src, mask, Bin_N1);
     }
+    return dst;
 }
 
 #endif

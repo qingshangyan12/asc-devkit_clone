@@ -31,4 +31,19 @@ TEST_F(TestVectorComputeFrequencyHistogram, c_api_frequency_histogram_Succ)
     MOCKER_CPP(dhistv2, void(vector_u16&, vector_u8, vector_bool, uint32_t)).times(2).will(invoke(dhistv2_Stub));
     asc_frequency_histogram_bin0(dst, src, mask);
     asc_frequency_histogram_bin1(dst, src, mask);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestVectorComputeFrequencyHistogram, c_api_frequency_histogram_return_Succ)
+{
+    vector_u16 dst0;
+    vector_u16 dst1;
+    vector_u8 src;
+    vector_bool mask;
+    MOCKER_CPP(dhistv2, void(vector_u16&, vector_u8, vector_bool, uint32_t)).times(2).will(invoke(dhistv2_Stub));
+    vector_u16 result0 = asc_frequency_histogram_bin0(dst0, src, mask);
+    vector_u16 result1 = asc_frequency_histogram_bin1(dst1, src, mask);
+    (void)result0;
+    (void)result1;
+    GlobalMockObject::verify();
 }

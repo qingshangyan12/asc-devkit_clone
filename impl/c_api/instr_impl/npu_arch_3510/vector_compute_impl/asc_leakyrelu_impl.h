@@ -45,9 +45,7 @@ __simd_callee__ inline void asc_leakyrelu_impl(vector_half& dst, vector_half src
 __simd_callee__ inline vector_float asc_leakyrelu_impl(vector_float src, float value, vector_bool mask)
 {
     vector_float dst;
-    if ASC_IS_AIV {
-        vlrelu(dst, src, value, mask, MODE_ZEROING);
-    }
+    asc_leakyrelu_impl(dst, src, value, mask);
     return dst;
 }
 
@@ -55,9 +53,7 @@ __simd_callee__ inline vector_float asc_leakyrelu_impl(vector_float src, float v
 __simd_callee__ inline vector_half asc_leakyrelu_impl(vector_half src, half value, vector_bool mask)
 {
     vector_half dst;
-    if ASC_IS_AIV {
-        vlrelu(dst, src, value, mask, MODE_ZEROING);
-    }
+    asc_leakyrelu_impl(dst, src, value, mask);
     return dst;
 }
 

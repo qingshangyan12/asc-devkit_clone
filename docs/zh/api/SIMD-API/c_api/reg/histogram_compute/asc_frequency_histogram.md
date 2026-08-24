@@ -44,13 +44,17 @@
 ### 低位模式
 
 ```cpp
-__simd_callee__ inline void asc_frequency_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
+__simd_callee__ inline vector_uint16_t asc_frequency_histogram_bin0(vector_uint16_t& dst,
+                                                                    vector_uint8_t src,
+                                                                    vector_bool mask)
 ```
 
 ### 高位模式
 
 ```cpp
-__simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
+__simd_callee__ inline vector_uint16_t asc_frequency_histogram_bin1(vector_uint16_t& dst,
+                                                                    vector_uint8_t src,
+                                                                    vector_bool mask)
 ```
 
 ## 参数说明
@@ -67,7 +71,7 @@ __simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, v
 
 ## 返回值说明
 
-无
+返回更新后的目的操作数，数据类型为`vector_uint16_t`。
 
 ## 约束说明
 
@@ -119,8 +123,8 @@ __simd_vf__ inline void histogram_vf(__ubuf__ uint16_t* output, __ubuf__ uint8_t
     asc_duplicate_scalar(dst0, static_cast<uint16_t>(0));
     asc_duplicate_scalar(dst1, static_cast<uint16_t>(0));
     asc_loadalign(src, input);
-    asc_frequency_histogram_bin0(dst0, src, src_mask);
-    asc_frequency_histogram_bin1(dst1, src, src_mask);
+    dst0 = asc_frequency_histogram_bin0(dst0, src, src_mask);
+    dst1 = asc_frequency_histogram_bin1(dst1, src, src_mask);
     asc_storealign(output, dst0, dst_mask);
     asc_storealign(output + 128, dst1, dst_mask);
 }

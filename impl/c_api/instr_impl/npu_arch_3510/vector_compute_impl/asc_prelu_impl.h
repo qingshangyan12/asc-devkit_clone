@@ -42,18 +42,14 @@ __simd_callee__ inline void asc_prelu_impl(vector_half& dst, vector_half src0, v
 __simd_callee__ inline vector_float asc_prelu_impl(vector_float src0, vector_float src1, vector_bool mask)
 {
     vector_float dst;
-    if ASC_IS_AIV {
-        vprelu(dst, src0, src1, mask, MODE_UNKNOWN);
-    }
+    asc_prelu_impl(dst, src0, src1, mask);
     return dst;
 }
 
 __simd_callee__ inline vector_half asc_prelu_impl(vector_half src0, vector_half src1, vector_bool mask)
 {
     vector_half dst;
-    if ASC_IS_AIV {
-        vprelu(dst, src0, src1, mask, MODE_UNKNOWN);
-    }
+    asc_prelu_impl(dst, src0, src1, mask);
     return dst;
 }
 
