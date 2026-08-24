@@ -94,7 +94,7 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rn_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_half2uint8_rn_impl(dst, src, mask);
     return dst;
 }
@@ -103,7 +103,7 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rn_sat_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_half2uint8_rn_sat_impl(dst, src, mask);
     return dst;
 }
@@ -112,7 +112,7 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rn_v2_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_half2uint8_rn_v2_impl(dst, src, mask);
     return dst;
 }
@@ -121,7 +121,7 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rn_sat_v2_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_half2uint8_rn_sat_v2_impl(dst, src, mask);
     return dst;
 }
@@ -131,7 +131,7 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rn_impl(
     vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_half2uint8_rn_impl(dst, src, mask, dst_pos);
     return dst;
 }
@@ -141,7 +141,7 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rn_impl(
     vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_half2uint8_rn_impl(dst, src, mask, dst_pos);
     return dst;
 }
@@ -151,7 +151,7 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rn_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_half2uint8_rn_sat_impl(dst, src, mask, dst_pos);
     return dst;
 }
@@ -161,7 +161,7 @@ __simd_callee__ inline vector_uint8_t asc_half2uint8_rn_sat_impl(
     vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
-    vector_uint8_t dst{};
+    vector_uint8_t dst;
     asc_half2uint8_rn_sat_impl(dst, src, mask, dst_pos);
     return dst;
 }

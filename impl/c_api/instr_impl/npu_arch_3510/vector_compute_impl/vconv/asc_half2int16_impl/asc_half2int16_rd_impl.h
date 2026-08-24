@@ -43,7 +43,7 @@ __simd_callee__ inline vector_int16_t asc_half2int16_rd_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_int16_t dst{};
+    vector_int16_t dst;
     asc_half2int16_rd_impl(dst, src, mask);
     return dst;
 }
@@ -52,7 +52,7 @@ __simd_callee__ inline vector_int16_t asc_half2int16_rd_sat_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_int16_t dst{};
+    vector_int16_t dst;
     asc_half2int16_rd_sat_impl(dst, src, mask);
     return dst;
 }

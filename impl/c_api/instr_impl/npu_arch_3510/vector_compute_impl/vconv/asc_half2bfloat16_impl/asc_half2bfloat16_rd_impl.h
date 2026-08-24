@@ -24,7 +24,7 @@ __simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rd_impl(
     vector_half src,
     vector_bool mask)
 {
-    vector_bfloat16_t dst{};
+    vector_bfloat16_t dst;
     asc_half2bfloat16_rd_impl(dst, src, mask);
     return dst;
 }

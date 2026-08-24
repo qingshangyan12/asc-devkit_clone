@@ -62,7 +62,7 @@ __simd_callee__ inline vector_float asc_int642float_rn_impl(
     vector_int64_t src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_int642float_rn_impl(dst, src, mask);
     return dst;
 }
@@ -71,7 +71,7 @@ __simd_callee__ inline vector_float asc_int642float_rn_v2_impl(
     vector_int64_t src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_int642float_rn_v2_impl(dst, src, mask);
     return dst;
 }
@@ -81,7 +81,7 @@ __simd_callee__ inline vector_float asc_int642float_rn_impl(
     vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_int642float_rn_impl(dst, src, mask, dst_pos);
     return dst;
 }
@@ -91,7 +91,7 @@ __simd_callee__ inline vector_float asc_int642float_rn_impl(
     vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_int642float_rn_impl(dst, src, mask, dst_pos);
     return dst;
 }

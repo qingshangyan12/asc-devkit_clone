@@ -58,7 +58,7 @@ __simd_callee__ inline vector_float asc_int322float_rd_impl(
     vector_int32_t src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_int322float_rd_impl(dst, src, mask);
     return dst;
 }
@@ -67,7 +67,7 @@ __simd_callee__ inline vector_float asc_int322float_ru_impl(
     vector_int32_t src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_int322float_ru_impl(dst, src, mask);
     return dst;
 }
@@ -76,7 +76,7 @@ __simd_callee__ inline vector_float asc_int322float_rz_impl(
     vector_int32_t src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_int322float_rz_impl(dst, src, mask);
     return dst;
 }
@@ -85,7 +85,7 @@ __simd_callee__ inline vector_float asc_int322float_rn_impl(
     vector_int32_t src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_int322float_rn_impl(dst, src, mask);
     return dst;
 }
@@ -94,7 +94,7 @@ __simd_callee__ inline vector_float asc_int322float_rna_impl(
     vector_int32_t src,
     vector_bool mask)
 {
-    vector_float dst{};
+    vector_float dst;
     asc_int322float_rna_impl(dst, src, mask);
     return dst;
 }
