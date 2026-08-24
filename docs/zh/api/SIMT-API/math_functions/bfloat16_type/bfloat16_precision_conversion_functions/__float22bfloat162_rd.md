@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-将float2类型数据的两个分量遵循CAST_FLOOR模式转换为bfloat16精度，返回转换后的bfloat16x2\_t类型数据。
+将float2类型数据的两个分量遵循CAST\_FLOOR模式转换为bfloat16精度，返回转换后的bfloat16x2\_t类型数据。
 
 ## 函数原型
 

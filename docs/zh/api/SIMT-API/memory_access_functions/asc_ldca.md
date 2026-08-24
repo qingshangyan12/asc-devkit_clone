@@ -207,7 +207,7 @@ inline half2 asc_ldca(half2* address)
 
 ## 需要包含的头文件
 
-使用除`half`、`half2`、`bfloat16_t`、`bfloat16x2_t`类型之外的接口需要包含`simt_api/device_functions.h`头文件，使用`half`和`half2`类型接口需要包含`simt_api/asc_fp16.h`头文件，使用`bfloat16_t`和`bfloat16x2_t`类型接口需要包含`simt_api/asc_bf16.h`头文件。
+使用除half、half2、bfloat16_t、bfloat16x2_t类型之外的接口需要包含`simt_api/device_functions.h`头文件，使用half和half2类型接口需要包含`simt_api/asc_fp16.h`头文件，使用bfloat16_t和bfloat16x2_t类型接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/device_functions.h"

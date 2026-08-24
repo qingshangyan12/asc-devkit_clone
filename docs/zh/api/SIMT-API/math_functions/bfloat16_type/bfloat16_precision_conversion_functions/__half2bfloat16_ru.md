@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-遵循CAST_CEIL模式，将half类型数据转换为bfloat16类型，返回转换后的值。
+遵循CAST\_CEIL模式，将half类型数据转换为bfloat16类型，返回转换后的值。
 
 ## 函数原型
 
@@ -58,7 +58,7 @@ inline bfloat16_t __half2bfloat16_ru(const half x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含 `simt_api/asc_bf16.h` 头文件。
+使用该接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"
