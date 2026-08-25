@@ -86,11 +86,19 @@ template <typename T>
 __aicore__ constexpr inline float Cast(const T& bVal);
 #endif
 
+[[deprecated("NOTICE: WriteGmByPassDCache has been deprecated and will be removed in the 2028 release.")]]
 template <typename T>
 __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value);
 
+[[deprecated("NOTICE: ReadGmByPassDCache has been deprecated and will be removed in the 2028 release.")]]
 template <typename T>
 __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr);
+
+template <typename T>
+__aicore__ inline void WriteGmBypassDCache(__gm__ T* addr, T value);
+
+template <typename T>
+__aicore__ inline T ReadGmBypassDCache(__gm__ T* addr);
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

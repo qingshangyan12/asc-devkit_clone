@@ -81,15 +81,28 @@ __aicore__ inline U ScalarCast(T valueIn)
 
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T>
+[[deprecated("NOTICE: WriteGmByPassDCache has been deprecated and will be removed in the 2028 release.")]]
 __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value)
 {
-    return WriteGmByPassDCacheImpl(addr, value);
+    return WriteGmBypassDCacheImpl(addr, value);
 }
 
+[[deprecated("NOTICE: ReadGmByPassDCache has been deprecated and will be removed in the 2028 release.")]]
 template <typename T>
 __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr)
 {
-    return ReadGmByPassDCacheImpl(addr);
+    return ReadGmBypassDCacheImpl(addr);
+}
+
+__aicore__ inline void WriteGmBypassDCache(__gm__ T* addr, T value)
+{
+    return WriteGmBypassDCacheImpl(addr, value);
+}
+
+template <typename T>
+__aicore__ inline T ReadGmBypassDCache(__gm__ T* addr)
+{
+    return ReadGmBypassDCacheImpl(addr);
 }
 #endif
 } // namespace AscendC
