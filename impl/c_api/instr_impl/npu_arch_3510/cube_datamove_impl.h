@@ -117,6 +117,13 @@ __aicore__ inline void asc_set_gm2l1_pad(uint32_t pad_val) { asc_set_gm2l1_pad_i
 // ==========asc_set_l13d_rpt==========
 __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config) { asc_set_l13d_rpt_impl(config); }
 
+__aicore__ inline void asc_set_l13d_rpt(
+    uint16_t repeat_stride, uint8_t repeat_times, asc_l13d_repeat_direction repeat_direction, uint16_t dst_stride_k,
+    uint16_t dst_start_pos_m)
+{
+    asc_set_l13d_rpt_impl(repeat_stride, repeat_times, repeat_direction, dst_stride_k, dst_start_pos_m);
+}
+
 // ==========asc_set_l13d_fmatrix==========
 __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config) { asc_set_l13d_fmatrix_impl(config); }
 

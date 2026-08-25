@@ -35,6 +35,9 @@
 #include "c_api/composite/cube_datamove_composite.h"
 
 __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config);
+__aicore__ inline void asc_set_l13d_rpt(
+    uint16_t repeat_stride, uint8_t repeat_times, asc_l13d_repeat_direction repeat_direction, uint16_t dst_stride_k,
+    uint16_t dst_start_pos_m);
 
 __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config);
 
