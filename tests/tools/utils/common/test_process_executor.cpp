@@ -51,6 +51,43 @@ std::string ReadTextFile(const fs::path& filePath)
     return {std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>()};
 }
 
+class TemporarilyClosedStandardOutputStreams final {
+public:
+    ~TemporarilyClosedStandardOutputStreams() { (void)Restore(); }
+
+    bool Close()
+    {
+        savedStandardOutput_ = dup(STDOUT_FILENO);
+        savedStandardError_ = dup(STDERR_FILENO);
+        if (savedStandardOutput_ < 0 || savedStandardError_ < 0) {
+            return false;
+        }
+        const bool standardOutputClosed = close(STDOUT_FILENO) == 0;
+        const bool standardErrorClosed = close(STDERR_FILENO) == 0;
+        return standardOutputClosed && standardErrorClosed;
+    }
+
+    bool Restore()
+    {
+        bool restored = true;
+        if (savedStandardOutput_ >= 0) {
+            restored = dup2(savedStandardOutput_, STDOUT_FILENO) == STDOUT_FILENO && restored;
+            restored = close(savedStandardOutput_) == 0 && restored;
+            savedStandardOutput_ = -1;
+        }
+        if (savedStandardError_ >= 0) {
+            restored = dup2(savedStandardError_, STDERR_FILENO) == STDERR_FILENO && restored;
+            restored = close(savedStandardError_) == 0 && restored;
+            savedStandardError_ = -1;
+        }
+        return restored;
+    }
+
+private:
+    int savedStandardOutput_{-1};
+    int savedStandardError_{-1};
+};
+
 TEST(ProcessExecutorTest, RejectsInvalidRequestsBeforeSpawning)
 {
     ProcessExecutorRequest emptyArgumentsRequest;
@@ -149,6 +186,30 @@ TEST(ProcessExecutorTest, ReportsExitSignalAndSpawnFailureSeparately)
     const ProcessExecutorResult spawnFailure =
         ProcessExecutor::Execute(CreateProcessRequest({"/path/that/does/not/exist"}));
     EXPECT_EQ(spawnFailure.outcome, ProcessOutcome::ExecutorFailure);
+}
+
+TEST(ProcessExecutorTest, RedirectsChildOutputWhenParentStandardOutputStreamsAreClosed)
+{
+    const fs::path outputLogPath =
+        fs::temp_directory_path() / fs::unique_path("process_executor_closed_stdio_%%%%-%%%%");
+    ProcessExecutorRequest request = CreateProcessRequest({"/bin/sh", "-c", "printf stdout; printf stderr >&2"});
+    request.mirroredOutputLogFilePath = outputLogPath.string();
+    TemporarilyClosedStandardOutputStreams standardOutputStreams;
+    const bool streamsClosed = standardOutputStreams.Close();
+    ProcessExecutorResult result;
+    if (streamsClosed) {
+        result = ProcessExecutor::Execute(request);
+    }
+    const bool streamsRestored = standardOutputStreams.Restore();
+
+    ASSERT_TRUE(streamsClosed);
+    ASSERT_TRUE(streamsRestored);
+    EXPECT_TRUE(result.HasSuccessfulExit());
+    const std::string mirroredOutput = ReadTextFile(outputLogPath);
+    EXPECT_NE(mirroredOutput.find("stdout"), std::string::npos);
+    EXPECT_NE(mirroredOutput.find("stderr"), std::string::npos);
+    boost::system::error_code ignoredError;
+    fs::remove(outputLogPath, ignoredError);
 }
 
 TEST(ProcessExecutorTest, MirrorsStandardOutputAndStandardErrorToOneLogFile)

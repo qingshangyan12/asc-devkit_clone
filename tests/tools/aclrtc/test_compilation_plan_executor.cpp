@@ -50,6 +50,24 @@ pid_t FailCommandWait(pid_t, int*, int)
     return -1;
 }
 
+uint32_t COMMAND_OUTPUT_READ_CALL_COUNT = 0U;
+
+ssize_t FailFinalCommandOutputRead(int, void*, size_t)
+{
+    ++COMMAND_OUTPUT_READ_CALL_COUNT;
+    errno = COMMAND_OUTPUT_READ_CALL_COUNT == 3U ? EIO : EAGAIN;
+    return -1;
+}
+
+pid_t ReapCommandProcess(pid_t processId, int* waitStatus, int)
+{
+    pid_t waitResult;
+    do {
+        waitResult = wait4(processId, waitStatus, 0, nullptr);
+    } while (waitResult < 0 && errno == EINTR);
+    return waitResult;
+}
+
 static_assert(
     std::is_same<std::underlying_type_t<KernelCompilationVariant>, uint32_t>::value,
     "KernelCompilationVariant must have a stable width");
@@ -330,4 +348,21 @@ TEST(CompilationPlanExecutorTest, ReportsCommandWaitFailure)
     GlobalMockObject::verify();
     EXPECT_EQ(planExecutionStatus, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
+
+TEST(CompilationPlanExecutorTest, ReportsFinalCommandOutputReadFailure)
+{
+    KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_final_output_read_failure");
+    CompilationPlanExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
+    KernelCompilationPlan plan;
+    plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/true", {}));
+    COMMAND_OUTPUT_READ_CALL_COUNT = 0U;
+    MOCKER(read, ssize_t(*)(int, void*, size_t)).expects(exactly(4)).will(invoke(FailFinalCommandOutputRead));
+    MOCKER(waitpid, pid_t(*)(pid_t, int*, int)).expects(once()).will(invoke(ReapCommandProcess));
+
+    const aclError planExecutionStatus = executor.ExecuteCompilationPlan(plan);
+
+    GlobalMockObject::verify();
+    EXPECT_EQ(planExecutionStatus, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+}
+
 } // namespace

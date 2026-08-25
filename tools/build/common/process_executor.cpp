@@ -71,6 +71,23 @@ private:
     int value_;
 };
 
+bool RelocateFileDescriptorAboveStandardStreams(FileDescriptor& fileDescriptor) noexcept
+{
+    if (fileDescriptor.Get() > STDERR_FILENO) {
+        return true;
+    }
+    const int relocatedFileDescriptor = fcntl(fileDescriptor.Get(), F_DUPFD_CLOEXEC, STDERR_FILENO + 1);
+    if (relocatedFileDescriptor < 0) {
+        const int duplicateError = errno;
+        ASCENDLOGE(
+            "Failed to relocate process pipe file descriptor: fd=%d errno=%d message=%s", fileDescriptor.Get(),
+            duplicateError, std::strerror(duplicateError));
+        return false;
+    }
+    fileDescriptor.Reset(relocatedFileDescriptor);
+    return true;
+}
+
 struct PosixSpawnResources {
     ~PosixSpawnResources() noexcept
     {
@@ -125,6 +142,10 @@ public:
         }
         readFileDescriptor_.Reset(pipeFileDescriptors[0]);
         writeFileDescriptor_.Reset(pipeFileDescriptors[1]);
+        if (!RelocateFileDescriptorAboveStandardStreams(readFileDescriptor_) ||
+            !RelocateFileDescriptorAboveStandardStreams(writeFileDescriptor_)) {
+            return false;
+        }
         const int readFlags = fcntl(readFileDescriptor_.Get(), F_GETFL, 0);
         if (readFlags < 0 || fcntl(readFileDescriptor_.Get(), F_SETFL, readFlags | O_NONBLOCK) != 0) {
             const int flagError = errno;
@@ -430,7 +451,11 @@ public:
             const pid_t waitResult = WaitWithoutBlocking(waitStatus);
             if (waitResult == processLeaderId_) {
                 needsReaping_ = false;
-                (void)ForwardAvailableOutput();
+                if (!ForwardAvailableOutput()) {
+                    CloseOutputStreams();
+                    SetElapsedTime(result);
+                    return;
+                }
                 CloseOutputStreams();
                 SetResultFromWaitStatus(waitStatus, result);
                 SetElapsedTime(result);
@@ -482,8 +507,9 @@ private:
 
     bool ForwardAvailableOutput() noexcept
     {
-        return (!stdoutForwarder_.IsOpen() || stdoutForwarder_.ForwardAvailableOutput()) &&
-               (!stderrForwarder_.IsOpen() || stderrForwarder_.ForwardAvailableOutput());
+        const bool stdoutForwarded = !stdoutForwarder_.IsOpen() || stdoutForwarder_.ForwardAvailableOutput();
+        const bool stderrForwarded = !stderrForwarder_.IsOpen() || stderrForwarder_.ForwardAvailableOutput();
+        return stdoutForwarded && stderrForwarded;
     }
 
     bool WaitForOutput(const SteadyClock::time_point& executionDeadline) noexcept
@@ -518,6 +544,12 @@ private:
         do {
             waitResult = waitpid(processLeaderId_, &ignoredWaitStatus, 0);
         } while (waitResult < 0 && errno == EINTR);
+        if (waitResult < 0 && errno != ECHILD) {
+            const int waitError = errno;
+            ASCENDLOGW(
+                "Failed to reap terminated process: pid=%d errno=%d message=%s", static_cast<int>(processLeaderId_),
+                waitError, std::strerror(waitError));
+        }
         needsReaping_ = false;
     }
 
