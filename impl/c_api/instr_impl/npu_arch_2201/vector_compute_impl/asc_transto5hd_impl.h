@@ -25,7 +25,135 @@ __aicore__ inline void asc_transto5hd_b8_impl(
     bool src_high_half)
 {
     if ASC_IS_AIV {
-        scatter_vnchwconv_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+        if (dst == ub_addr8_t::VA0) {
+            if (src == ub_addr8_t::VA1) {
+                scatter_vnchwconv_b8(VA0, VA1, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA2) {
+                scatter_vnchwconv_b8(VA0, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA3) {
+                scatter_vnchwconv_b8(VA0, VA3, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA4) {
+                scatter_vnchwconv_b8(VA0, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA5) {
+                scatter_vnchwconv_b8(VA0, VA5, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA6) {
+                scatter_vnchwconv_b8(VA0, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA7) {
+                scatter_vnchwconv_b8(VA0, VA7, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            }
+        } else if (dst == ub_addr8_t::VA1) {
+            if (src == ub_addr8_t::VA0) {
+                scatter_vnchwconv_b8(VA1, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA2) {
+                scatter_vnchwconv_b8(VA1, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA3) {
+                scatter_vnchwconv_b8(VA1, VA3, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA4) {
+                scatter_vnchwconv_b8(VA1, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA5) {
+                scatter_vnchwconv_b8(VA1, VA5, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA6) {
+                scatter_vnchwconv_b8(VA1, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA7) {
+                scatter_vnchwconv_b8(VA1, VA7, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            }
+        } else if (dst == ub_addr8_t::VA2) {
+            if (src == ub_addr8_t::VA0) {
+                scatter_vnchwconv_b8(VA2, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA1) {
+                scatter_vnchwconv_b8(VA2, VA1, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA3) {
+                scatter_vnchwconv_b8(VA2, VA3, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA4) {
+                scatter_vnchwconv_b8(VA2, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA5) {
+                scatter_vnchwconv_b8(VA2, VA5, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA6) {
+                scatter_vnchwconv_b8(VA2, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA7) {
+                scatter_vnchwconv_b8(VA2, VA7, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            }
+        } else if (dst == ub_addr8_t::VA3) {
+            if (src == ub_addr8_t::VA0) {
+                scatter_vnchwconv_b8(VA3, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA1) {
+                scatter_vnchwconv_b8(VA3, VA1, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA2) {
+                scatter_vnchwconv_b8(VA3, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA4) {
+                scatter_vnchwconv_b8(VA3, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA5) {
+                scatter_vnchwconv_b8(VA3, VA5, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA6) {
+                scatter_vnchwconv_b8(VA3, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA7) {
+                scatter_vnchwconv_b8(VA3, VA7, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            }
+        } else if (dst == ub_addr8_t::VA4) {
+            if (src == ub_addr8_t::VA0) {
+                scatter_vnchwconv_b8(VA4, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA1) {
+                scatter_vnchwconv_b8(VA4, VA1, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA2) {
+                scatter_vnchwconv_b8(VA4, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA3) {
+                scatter_vnchwconv_b8(VA4, VA3, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA5) {
+                scatter_vnchwconv_b8(VA4, VA5, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA6) {
+                scatter_vnchwconv_b8(VA4, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA7) {
+                scatter_vnchwconv_b8(VA4, VA7, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            }
+        } else if (dst == ub_addr8_t::VA5) {
+            if (src == ub_addr8_t::VA0) {
+                scatter_vnchwconv_b8(VA5, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA1) {
+                scatter_vnchwconv_b8(VA5, VA1, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA2) {
+                scatter_vnchwconv_b8(VA5, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA3) {
+                scatter_vnchwconv_b8(VA5, VA3, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA4) {
+                scatter_vnchwconv_b8(VA5, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA6) {
+                scatter_vnchwconv_b8(VA5, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA7) {
+                scatter_vnchwconv_b8(VA5, VA7, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            }
+        } else if (dst == ub_addr8_t::VA6) {
+            if (src == ub_addr8_t::VA0) {
+                scatter_vnchwconv_b8(VA6, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA1) {
+                scatter_vnchwconv_b8(VA6, VA1, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA2) {
+                scatter_vnchwconv_b8(VA6, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA3) {
+                scatter_vnchwconv_b8(VA6, VA3, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA4) {
+                scatter_vnchwconv_b8(VA6, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA5) {
+                scatter_vnchwconv_b8(VA6, VA5, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA7) {
+                scatter_vnchwconv_b8(VA6, VA7, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            }
+        } else if (dst == ub_addr8_t::VA7) {
+            if (src == ub_addr8_t::VA0) {
+                scatter_vnchwconv_b8(VA7, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA1) {
+                scatter_vnchwconv_b8(VA7, VA1, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA2) {
+                scatter_vnchwconv_b8(VA7, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA3) {
+                scatter_vnchwconv_b8(VA7, VA3, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA4) {
+                scatter_vnchwconv_b8(VA7, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA5) {
+                scatter_vnchwconv_b8(VA7, VA5, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            } else if (src == ub_addr8_t::VA6) {
+                scatter_vnchwconv_b8(VA7, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+            }
+        }
     }
 }
 
