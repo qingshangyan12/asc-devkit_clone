@@ -76,9 +76,9 @@ public:
         tuple_static_assert<0, Tp, Tps...>();
     }
 
-    ASCENDC_HOST_AICORE inline Tp& GetValue() noexcept { return value; }
+    ASCENDC_HOST_AICORE inline constexpr Tp& GetValue() noexcept { return value; }
 
-    ASCENDC_HOST_AICORE inline const Tp& GetValue() const noexcept { return value; }
+    ASCENDC_HOST_AICORE inline constexpr const Tp& GetValue() const noexcept { return value; }
 
     template <typename Head, typename... Args>
     ASCENDC_HOST_AICORE inline tuple<Tp, Tps...>& operator=(const tuple<Head, Args...>& t)
