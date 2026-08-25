@@ -41,16 +41,16 @@ __simd_callee__ inline reg_pair<T> mull(
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `T` | 模板参数 | 输入和返回值的元素类型，支持`int32_t`、`uint32_t`。 |
-| `src0` | 输入 | 第一个乘数，同时提供执行mask。 |
-| `src1` | 输入 | 第二个乘数。 |
+| `src0` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `src1` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
 
 ## 返回值说明
 
-返回`reg_pair<T>`。`first`保存乘积低32位，`second`保存乘积高32位，二者的mask均等于`src0.mask`。
+返回`reg_pair<T>`。`first.reg`保存乘积的低32位，`second.reg`保存乘积的高32位。`src0.mask`对应位置为`0`时，两个结果的对应位置均置零。`first.mask`和`second.mask`均与`src0.mask`相同。
 
 ## 约束说明
 
-- 两个输入寄存器的元素类型必须一致。
+无。
 
 ## 调用示例
 

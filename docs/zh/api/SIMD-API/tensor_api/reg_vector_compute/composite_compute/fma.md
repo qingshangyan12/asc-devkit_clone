@@ -37,16 +37,13 @@ __simd_callee__ inline decltype(auto) fma(
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `T` | 模板参数 | 输入和返回值的元素类型，支持`half`、`float`。 |
-| `src0` | 输入 | 第一个乘数，同时提供结果mask。 |
-| `src1` | 输入 | 第二个乘数。 |
-| `src2` | 输入 | 加数。 |
+| `src0` | 输入 | 第一个乘数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `src1` | 输入 | 第二个乘数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
+| `src2` | 输入 | 加数，类型为`reg_tensor<T>`。`src2.mask`不用于本次计算。 |
 
 ## 返回值说明
 
-返回`reg_tensor<T>`：
-
-- `reg`：有效元素保存`src0.reg * src1.reg + src2.reg`，无效元素置零。
-- `mask`：等于`src0.mask`；`src1.mask`和`src2.mask`不参与执行mask的选择。
+返回`reg_tensor<T>`。`reg`保存`src0 * src1 + src2`的逐元素融合乘加结果，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。
 
 ## 调用示例
 

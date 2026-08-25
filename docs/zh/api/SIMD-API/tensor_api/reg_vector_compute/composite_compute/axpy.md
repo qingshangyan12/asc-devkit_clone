@@ -38,16 +38,13 @@ __simd_callee__ inline decltype(auto) axpy(
 | --- | --- | --- |
 | `T` | 模板参数 | 输入和返回值的元素类型，支持`half`、`float`。 |
 | `scalar_type` | 模板参数 | 标量类型，必须与`T`相同。 |
-| `dst` | 输入 | 累加初值，同时提供结果mask。 |
-| `src` | 输入 | 与标量相乘的输入寄存器。 |
+| `dst` | 输入 | 加法操作数，类型为`reg_tensor<T>`。`dst.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `src` | 输入 | 与标量相乘的源操作数，类型为`reg_tensor<T>`。`src.mask`不用于本次计算。 |
 | `scalar` | 输入 | 标量乘数，类型必须与`T`完全一致。 |
 
 ## 返回值说明
 
-返回`reg_tensor<T>`：
-
-- `reg`：有效元素保存`dst.reg + scalar * src.reg`，无效元素置零。
-- `mask`：等于`dst.mask`；`src.mask`不参与执行mask的选择。
+返回`reg_tensor<T>`。`reg`保存`dst + scalar * src`的逐元素计算结果，`dst.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`dst.mask`相同。
 
 ## 调用示例
 

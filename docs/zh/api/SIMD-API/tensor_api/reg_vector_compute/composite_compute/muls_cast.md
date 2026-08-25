@@ -33,16 +33,16 @@ __simd_callee__ inline decltype(auto) muls_cast(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `src` | 输入 | `reg_tensor<float>`输入，同时提供执行mask。 |
+| `src` | 输入 | 源操作数，类型为`reg_tensor<float>`。`src.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
 | `scalar` | 输入 | `float`标量乘数。 |
 
 ## 返回值说明
 
-返回`reg_tensor<half>`。每个有效`float`输入对应一个位于偶数位置的`half`结果，结果mask等于`src.mask`。
+返回`reg_tensor<half>`。`reg`保存乘法及类型转换结果，每个参与计算的`float`元素对应一个位于偶数位置的`half`结果。`src.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src.mask`相同。
 
 ## 约束说明
 
-- 返回值采用偶数位置布局，不能按连续`half`数据解释。
+返回值采用偶数位置布局，不能按连续`half`数据解释。
 
 ## 调用示例
 

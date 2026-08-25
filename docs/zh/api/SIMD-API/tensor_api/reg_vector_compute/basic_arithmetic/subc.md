@@ -1,4 +1,4 @@
-# sub_c
+# subc
 
 ## 产品支持情况
 
@@ -16,37 +16,41 @@
 
 命名空间：`asc::te::experimental`。
 
-`sub_c`包含以下两种逐元素补码减法重载：
+`subc`提供带借位输出减法，以及带借位输入和输出减法。减法在硬件中通过补码加法实现，输出的进位标志表示减法是否借位，`1`表示未借位，`0`表示发生借位。
 
-- 三参数形式返回两个32位整数寄存器之差的低32位，并通过`carry`输出补码减法的进位。
-- 四参数形式使用`carry_src`提供的进位继续计算，并通过`carry`输出新的进位。
+### 带借位输出减法
 
-计算公式如下：
+对`src0`和`src1`按元素求差，返回计算结果的低32位，并通过`carry`输出每个元素的进位标志。
 
 $$
-\begin{aligned}
-\{carry_i, dst_i\} &= \{1'b0, src0_i\} + \{1'b0, \mathord{\sim}src1_i\} + 33'b1 \\
-\{carry_i, dst_i\} &= \{1'b0, src0_i\} + \{1'b0, \mathord{\sim}src1_i\} + carry\_src_i
-\end{aligned}
+\{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, \mathord{\sim}src1_i\} + 33'b1
+$$
+
+### 带借位输入和输出减法
+
+使用`carry_src`中的输入进位继续进行按元素减法，返回计算结果的低32位，并通过`carry`输出每个元素的新进位标志。
+
+$$
+\{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, \mathord{\sim}src1_i\} + \{32'b0, carry\_src_i\}
 $$
 
 ## 函数原型
 
-### 仅输出进位
+### 带借位输出减法
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sub_c(
+__simd_callee__ inline reg_tensor<T> subc(
     reg_tensor<bool>& carry,
     const reg_tensor<T>& src0,
     const reg_tensor<T>& src1)
 ```
 
-### 输入并输出进位
+### 带借位输入和输出减法
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sub_c(
+__simd_callee__ inline reg_tensor<T> subc(
     reg_tensor<bool>& carry,
     const reg_tensor<T>& src0,
     const reg_tensor<T>& src1,
@@ -55,27 +59,38 @@ __simd_callee__ inline reg_tensor<T> sub_c(
 
 ## 参数说明
 
+### 带借位输出减法
+
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `T` | 模板参数 | 输入和返回值的元素类型，支持`int32_t`、`uint32_t`。 |
-| `carry` | 输出 | 逐元素进位输出，类型为`reg_tensor<bool>`。`reg`保存进位，`mask`由接口写为`src0.mask`。 |
-| `src0` | 输入 | 被减数，类型为`reg_tensor<T>`，同时提供执行mask。 |
-| `src1` | 输入 | 减数，类型为`reg_tensor<T>`；`src1.mask`不参与执行mask的选择。 |
-| `carry_src` | 输入 | 仅四参数形式使用。前一段减法产生的逐元素进位，类型为`reg_tensor<bool>`；接口读取其`reg`，其`mask`不参与执行mask的选择。 |
+| `carry` | 输出 | 借位输出，类型为`reg_tensor<bool>`。`carry.reg`保存每个元素的进位标志，`1`表示未借位，`0`表示发生借位。返回时`carry.mask`与`src0.mask`相同，用于标记哪些进位标志有效。 |
+| `src0` | 输入 | 被减数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `src1` | 输入 | 减数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
+
+### 带借位输入和输出减法
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`int32_t`、`uint32_t`。 |
+| `carry` | 输出 | 借位输出，类型为`reg_tensor<bool>`。`carry.reg`保存每个元素的新进位标志，`1`表示未借位，`0`表示发生借位。返回时`carry.mask`与`src0.mask`相同，用于标记哪些进位标志有效。 |
+| `src0` | 输入 | 被减数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `src1` | 输入 | 减数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
+| `carry_src` | 输入 | 输入进位标志，类型为`reg_tensor<bool>`。`carry_src.reg`保存上一部分减法产生的进位标志，`carry_src.mask`不用于本次计算。 |
 
 ## 返回值说明
 
-返回`reg_tensor<T>`：
+### 带借位输出减法
 
-- 三参数形式的`reg`保存`src0.reg - src1.reg`的低32位。
-- 四参数形式的`reg`保存`src0.reg + ~src1.reg + carry_src.reg`的低32位。
-- 返回值的`mask`等于`src0.mask`。
+返回`reg_tensor<T>`。`reg`保存`src0`与`src1`逐元素相减后的低32位，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。
 
-`carry.reg`保存补码减法的逐元素进位，`1`表示未借位，`0`表示发生借位；`carry.mask`等于`src0.mask`。
+### 带借位输入和输出减法
+
+返回`reg_tensor<T>`。`reg`保存加入输入进位后逐元素计算得到的低32位，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。
 
 ## 约束说明
 
-- 用于多字整数分段减法时，低位使用三参数形式，高位按照从低到高的顺序使用四参数形式传递进位。
+用于多字整数分段减法时，最低32位使用带借位输出减法，其余部分按照从低位到高位的顺序使用带借位输入和输出减法传递进位标志。
 
 ## 调用示例
 
@@ -85,7 +100,7 @@ __simd_callee__ inline reg_tensor<T> sub_c(
 #include "tensor_api/tensor.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void sub_c_example(
+__simd_vf__ inline void subc_example(
     InputTensor input0, InputTensor input1, OutputTensor output)
 {
     auto mask = asc::te::all_mask<uint32_t>();
@@ -95,9 +110,9 @@ __simd_vf__ inline void sub_c_example(
     auto src1_high = input1.load(asc::te::make_coord(1, 0)).with_mask(mask);
 
     asc::te::reg_tensor<bool> carry_low;
-    auto low = asc::te::experimental::sub_c(carry_low, src0_low, src1_low);
+    auto low = asc::te::experimental::subc(carry_low, src0_low, src1_low);
     asc::te::reg_tensor<bool> carry_high;
-    auto high = asc::te::experimental::sub_c(carry_high, src0_high, src1_high, carry_low);
+    auto high = asc::te::experimental::subc(carry_high, src0_high, src1_high, carry_low);
 
     output.store(asc::te::make_coord(0, 0), low);
     output.store(asc::te::make_coord(1, 0), high);

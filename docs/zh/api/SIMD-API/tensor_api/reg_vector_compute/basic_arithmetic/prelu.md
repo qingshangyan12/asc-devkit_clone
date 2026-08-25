@@ -38,19 +38,16 @@ __simd_callee__ inline reg_tensor<T> prelu(
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `T` | 模板参数 | 输入、斜率和返回值的元素类型，支持`half`、`float`。 |
-| `src_reg` | 输入 | 待计算的输入寄存器，同时提供执行mask。 |
-| `slope` | 输入 | 负数区间使用的逐元素斜率寄存器；`slope.mask`不参与执行mask的选择。 |
+| `src_reg` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src_reg.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `slope` | 输入 | 负数区间使用的逐元素斜率，类型为`reg_tensor<T>`。`slope.mask`不用于本次计算。 |
 
 ## 返回值说明
 
-返回`reg_tensor<T>`：
-
-- `reg`：有效元素在`src_reg.reg >= 0`时取原值，否则取`src_reg.reg * slope.reg`。
-- `mask`：等于`src_reg.mask`；`slope.mask`不参与本次执行mask的选择。
+返回`reg_tensor<T>`。`src_reg`中的元素大于等于`0`时，`reg`保存原值，否则保存该元素与`slope`对应元素的乘积。`src_reg.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src_reg.mask`相同。
 
 ## 约束说明
 
-- 仅`src_reg.mask`中的有效元素参与计算；`slope.mask`不改变结果mask。
+计算只使用`src_reg.mask`，不使用`slope.mask`。
 
 ## 调用示例
 
