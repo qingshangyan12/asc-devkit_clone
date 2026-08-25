@@ -43,19 +43,19 @@ inline bfloat16_t __ushort_as_bfloat16(const unsigned short int x)
 
 ## 返回值说明
 
-unsigned short int的数据按位重新解释为bfloat16的值。特殊值如下：
+unsigned short int的数据按位重新解释为bfloat16的值。以下列出典型输入位模式对应的返回值：
 
-| x值（16位无符号整数位模式） | 返回值 |
+| x值 | 返回值 |
 |---|---|
-| 0x0000 | 0 |
-| 0x8000 | -0 |
-| 0x7F80 | inf |
-| 0xFF80 | -inf |
-| 0x7FFF | nan |
-| 0x7F7F | ASCRT_MAX_NORMAL_BF16 |
-| 0xFF7F | -ASCRT_MAX_NORMAL_BF16 |
-| 0x0001 | ASCRT_MIN_DENORM_BF16 |
-| 0x3F80 | 1.0 |
+| 0（0x0000） | 0 |
+| 32768（0x8000） | -0 |
+| 32640（0x7F80） | inf |
+| 65408（0xFF80） | -inf |
+| 32767（0x7FFF） | nan |
+| 32639（0x7F7F） | ASCRT_MAX_NORMAL_BF16 |
+| 65407（0xFF7F） | -ASCRT_MAX_NORMAL_BF16 |
+| 1（0x0001） | ASCRT_MIN_DENORM_BF16 |
+| 16256（0x3F80） | 1.0 |
 
 ## 约束说明
 
