@@ -664,8 +664,6 @@
                 -   [PrintTimeStamp](SIMD-API/basic_api/debug_interface/onboard_print/PrintTimeStamp.md)
 
             -   [异常检测](SIMD-API/basic_api/debug_interface/exception_detection/exception_detection.md)
-                -   [ascendc\_assert](SIMD-API/basic_api/debug_interface/exception_detection/ascendc_assert.md)
-                -   [assert](SIMD-API/basic_api/debug_interface/exception_detection/assert.md)
                 -   [Trap](SIMD-API/basic_api/debug_interface/exception_detection/Trap.md)
                 -   [CheckLocalMemoryIA\(ISASI\)](SIMD-API/basic_api/debug_interface/exception_detection/CheckLocalMemoryIA_ISASI.md)
 
@@ -3163,7 +3161,7 @@
 
     -   [调测接口](Utils-API/tuning_interface/tuning_interface.md)
         -   [printf](Utils-API/tuning_interface/printf.md)
-        -   [assert](Utils-API/tuning_interface/assert.md)
+        -   [assert/ascendc\_assert](Utils-API/tuning_interface/assert.md)
         -   [\_\_trap](Utils-API/tuning_interface/__trap.md)
         -   [asc\_dump](Utils-API/tuning_interface/asc_dump.md)
         -   [clock](Utils-API/tuning_interface/clock.md)
