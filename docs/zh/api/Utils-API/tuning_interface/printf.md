@@ -77,7 +77,6 @@ static __attribute__((noinline)) void printf(const char* fmt, Args&&... args);
 
 ## 约束说明
 
--   本接口不支持打印除换行符之外的其他转义字符。
 <!-- npu="950,A3,910b" id14 -->
 -   SIMT场景的支持情况如下：
       <!-- npu="950" id11 -->
