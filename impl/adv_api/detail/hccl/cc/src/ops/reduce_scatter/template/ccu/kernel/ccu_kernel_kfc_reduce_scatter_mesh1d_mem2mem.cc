@@ -190,9 +190,9 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
     repeatNumAdd = 1;
     CCU_WHILE(ctx.repeatNum != UINT64_MAX)
     {
-        ctx.repeatNum += repeatNumAdd;
         ctx.currentSliceSize = ctx.chunkSize;
-        CCU_IF(ctx.repeatNum == UINT64_MAX) { ctx.currentSliceSize = ctx.tailSize; }
+        CCU_IF(ctx.repeatNum == UINT64_MAX - 1) { ctx.currentSliceSize = ctx.tailSize; }
+        ctx.repeatNum += repeatNumAdd;
         CCU_CHK_RET(DoReduceScatter(ctx));
         for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
             if (rankIdx == ctx.rankId) {
