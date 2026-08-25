@@ -50,8 +50,8 @@ inline long long int __half2ll_ru(const half x)
 | nan | 0 |
 | inf | 9223372036854775807（long long最大值） |
 | -inf | -9223372036854775808（long long最小值） |
-| ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
-| -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
+| ASCRT\_MAX\_NORMAL\_FP16 | 65504 |
+| -ASCRT\_MAX\_NORMAL\_FP16 | -65504 |
 
 ## 约束说明
 
