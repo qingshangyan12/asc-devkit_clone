@@ -51,7 +51,8 @@ inline half __int2half_ru(const int x)
 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 | x>ASCRT\_MAX\_NORMAL\_FP16 | inf |
 | -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
-| x<-ASCRT\_MAX\_NORMAL\_FP16 | -inf |
+| -65535 | -ASCRT\_MAX\_NORMAL\_FP16 |
+| x≤-65536 | -inf |
 | 2049 | 2050 |
 | -2049 | -2048 |
 

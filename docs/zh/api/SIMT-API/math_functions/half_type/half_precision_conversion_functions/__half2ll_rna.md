@@ -53,12 +53,6 @@ inline long long int __half2ll_rna(const half x)
 | -inf | -9223372036854775808（long long最小值） |
 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 | -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
-| 0.5 | 1 |
-| -0.5 | -1 |
-| 2.5 | 3 |
-| 0.5 | 1 |
-| -0.5 | -1 |
-| 2.5 | 3 |
 
 ## 约束说明
 
