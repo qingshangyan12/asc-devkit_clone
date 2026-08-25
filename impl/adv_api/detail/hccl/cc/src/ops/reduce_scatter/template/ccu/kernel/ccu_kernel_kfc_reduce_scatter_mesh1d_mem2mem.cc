@@ -121,7 +121,7 @@ static CcuResult PostSync(KfcReduceScatterMesh1DMem2MemContext& ctx)
     return CCU_SUCCESS;
 }
 
-static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx, ccu::Event event)
+static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
     uint32_t channelId = 0;
 
@@ -134,16 +134,16 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx, ccu:
     {
         for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
             if (rankIdx == ctx.rankId) {
-                ccu::LocalCopy(ctx.scratchMem[rankIdx], ctx.myInput, ctx.currentSliceSize, event, 1 << rankIdx);
+                ccu::LocalCopy(ctx.scratchMem[rankIdx], ctx.myInput, ctx.currentSliceSize, ctx.event, 1 << rankIdx);
             } else {
                 ccu::Read(
                     ctx.channels[channelId], ctx.scratchMem[rankIdx], ctx.remoteInput[rankIdx], ctx.currentSliceSize,
-                    event, 1 << rankIdx);
+                    ctx.event, 1 << rankIdx);
                 channelId++;
             }
         }
 
-        ccu::EventWait(event, (1 << ctx.rankSize) - 1);
+        ccu::EventWait(ctx.event, (1 << ctx.rankSize) - 1);
 
         // Keep pr_4523's hand-written reduction to avoid loop-group block resource expansion in KFC server.
         uint32_t expansionNum = GetReduceExpansionNum(ctx.reduceOp, ctx.dataType, ctx.outputDataType);
@@ -153,11 +153,12 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx, ccu:
             tmp = GetExpansionParam(expansionNum);
             reduceDst.token = reduceDst.token + tmp;
         }
-        ccu::LocalCopy(reduceDst, ctx.scratchMem[0], ctx.currentSliceSize, event, 1);
-        ccu::EventWait(event, 1);
+        ccu::LocalCopy(reduceDst, ctx.scratchMem[0], ctx.currentSliceSize, ctx.event, 1);
+        ccu::EventWait(ctx.event, 1);
         for (uint32_t i = 1; i < ctx.rankSize; i++) {
-            ccu::LocalReduce(reduceDst, ctx.scratchMem[i], ctx.currentSliceSize, ctx.dataType, ctx.reduceOp, event, 1);
-            ccu::EventWait(event, 1);
+            ccu::LocalReduce(
+                reduceDst, ctx.scratchMem[i], ctx.currentSliceSize, ctx.dataType, ctx.reduceOp, ctx.event, 1);
+            ccu::EventWait(ctx.event, 1);
         }
     }
     return CCU_SUCCESS;
@@ -168,8 +169,7 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
     ccu::Variable scratchOffset;
     scratchOffset = 0;
 
-    // The fixed 16 MiB context scratch is divided into rankSize contiguous sliceSize regions.
-    // This intentionally preserves pr_4523 behavior; there is no chunking when rankSize * sliceSize exceeds it.
+    // Divide the fixed 16 MiB scratch into rankSize regions and reuse them for every chunk.
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
         if (rankIdx == ctx.rankId) {
             ctx.myInput.addr = ctx.input[rankIdx];
@@ -193,7 +193,8 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
     {
         ctx.repeatNum += repeatNumAdd;
         ctx.currentSliceSize = ctx.chunkSize;
-        CCU_CHK_RET(DoReduceScatter(ctx, ctx.event));
+        CCU_IF(ctx.repeatNum == UINT64_MAX) { ctx.currentSliceSize = ctx.tailSize; }
+        CCU_CHK_RET(DoReduceScatter(ctx));
         for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
             if (rankIdx == ctx.rankId) {
                 ctx.myInput.addr += ctx.currentSliceSize;
@@ -203,9 +204,6 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
         }
         ctx.output += ctx.currentSliceSize;
     }
-
-    ctx.currentSliceSize = ctx.tailSize;
-    CCU_CHK_RET(DoReduceScatter(ctx, ctx.event));
     return CCU_SUCCESS;
 }
 
