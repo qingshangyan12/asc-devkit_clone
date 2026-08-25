@@ -97,9 +97,4 @@ inline unsigned int __half2uint_rn(const half x)
     {
         asc_vf_call<kernel__half2uint_rn>(dim3(1024), dst, x);
     }
-
-    __global__ __vector__ void wrapper__half2uint_rn(__gm__ uint32_t* dst, __gm__ half* x)
-    {
-        asc_vf_call<kernel__half2uint_rn>(dim3(1024), dst, x);
-    }
     ```
