@@ -13,11 +13,12 @@
 
 ### Reg数据搬出
 
+- **[asc_storealign_v1（废弃）](asc_storealign_v1_deprecated.md)**
+- **[asc_storealign_v2（废弃）](asc_storealign_v2_deprecated.md)**
+- **[asc_storealign_v3（废弃）](asc_storealign_v3_deprecated.md)**
+- **[asc_storealign_v4（废弃）](asc_storealign_v4_deprecated.md)**
+- **[asc_storealign_v5（废弃）](asc_storealign_v5_deprecated.md)**
 - **[asc_scatter（废弃）](asc_scatter_deprecated.md)**
-- **[asc_storealign_pack_v2（无偏移量原型，废弃）](asc_storealign_v1_deprecated.md)**
-- **[asc_storealign_pack_v2（addr_reg偏移原型，废弃）](asc_storealign_v2_deprecated.md)**
-- **[asc_storealign_pack_v2（int32_t偏移原型，废弃）](asc_storealign_v3_deprecated.md)**
-- **[asc_storealign_pack_postupdate_v2（废弃）](asc_storealign_v4_deprecated.md)**
 - **[asc_storeunalign_post（废弃）](asc_storeunalign_post_deprecated.md)**
 - **[asc_storeunalign_postupdate（废弃）](asc_storeunalign_postupdate_deprecated.md)**
 
