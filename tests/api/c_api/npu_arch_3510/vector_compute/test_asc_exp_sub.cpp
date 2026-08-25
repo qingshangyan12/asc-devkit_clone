@@ -43,10 +43,18 @@
         GlobalMockObject::verify();                                                        \
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 TEST_VECTOR_COMPUTE_EXP_SUB(ExpSub, asc_exp_sub, vexpdif, vector_float, vector_half);
+#pragma clang diagnostic pop
+
 TEST_VECTOR_COMPUTE_EXP_SUB(ExpSub, asc_exp_sub, vexpdif, vector_float, vector_float);
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 TEST_VECTOR_COMPUTE_EXP_SUB(ExpSubV2, asc_exp_sub_v2, vexpdif, vector_float, vector_half);
 TEST_VECTOR_COMPUTE_EXP_SUB(ExpSubV2, asc_exp_sub_v2, vexpdif, vector_float, vector_float);
+#pragma clang diagnostic pop
 
 TEST(RegExpSubHalf2FloatPositionOverloads, AcceptAllLegalSourcePositionArguments)
 {
