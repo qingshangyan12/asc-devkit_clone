@@ -1,5 +1,7 @@
 # SIMD and SIMT Hybrid Programming Troubleshooting Samples
 
+<!-- UTF-8 encoding marker: 文档 -->
+
 ## Overview
 
 This directory provides troubleshooting samples for Ascend C SIMD and SIMT hybrid programming, including resource configuration, memory boundary checks, and issue analysis methods.

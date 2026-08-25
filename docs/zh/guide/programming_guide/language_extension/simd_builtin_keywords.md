@@ -4,7 +4,7 @@
 
 如其他语言一样，会提供一些内置的宏方便用户编写程序。预定义宏一节着重介绍一些用户在做异构编程时会经常用到的宏，以及宏的解释。
 
--   <a id="npu-arch"></a>**\_\_NPU\_ARCH\_\_**
+- <a id="npu-arch"></a>**\_\_NPU\_ARCH\_\_**
 
     \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。该宏由四位数字组成，其中前三位数字用于标识AI Core的IP核\(Intellectual Property Core\)类型，第四位数字标识该AI Core同一个IP核的配置版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。产品型号和NPU架构版本的对应关系如下：
 
@@ -29,7 +29,7 @@
 
     以下为通过\_\_NPU\_ARCH\_\_控制在不同AI处理器上算子输出值舍入模式的示例。
 
-    ```
+    ```cpp
     __aicore__ static inline void CopyOut(uint64_t mulLen)
     {
     #if __NPU_ARCH__ == 2002
@@ -44,7 +44,7 @@
     }
     ```
 
--   <a name="li19530175294118"></a>**ASCEND\_IS\_AIV、ASCEND\_IS\_AIC**
+- <a name="li19530175294118"></a>**ASCEND\_IS\_AIV、ASCEND\_IS\_AIC**
 
     ASCEND\_IS\_AIV和ASCEND\_IS\_AIC是通过C++宏实现的条件判断语句，用于在\_\_aicore\_\_修饰的函数中实现代码的条件编译。基于分离模式（AIC核和AIV核分离）开发融合算子时，算子逻辑中同时涉及AIV核和AIC核的处理逻辑，并需要进行核间同步，此时需要通过ASCEND\_IS\_AIV/ ASCEND\_IS\_AIC进行AIV和AIC核代码的隔离。
 
@@ -55,7 +55,7 @@
 
     示例伪码如下：
 
-    ```
+    ```cpp
     template <typename AType, typename BType, typename CType, typename BiasType>
     __aicore__ inline void MatmulKernel<AType, BType, CType, BiasType>::Process(AscendC::TPipe *pipe)
     {
@@ -92,7 +92,7 @@
     }
     ```
 
--   **ASCENDC\_CUBE\_ONLY**
+- **ASCENDC\_CUBE\_ONLY**
 
     ASCENDC\_CUBE\_ONLY是通过C++宏实现的条件判断语句，用于在\_\_aicore\_\_修饰的函数中实现代码的条件编译。
 
@@ -105,7 +105,7 @@
 
     示例伪码如下：
 
-    ```
+    ```cpp
     #define ASCENDC_CUBE_ONLY
     #include "lib/matmul_intf.h"
 
@@ -120,22 +120,22 @@
 
 函数执行空间限定符（Function Execution Space Qualifier）指示函数是在Host侧执行还是在Device侧执行，以及它是否可从Host侧或Device侧调用。
 
--   **\_\_global\_\_**
+- **\_\_global\_\_**
 
     \_\_global\_\_执行空间限定符声明一个核函数（Kernel）。核函数（Kernel）有如下性质：在Device上执行；只能被Host侧函数调用；\_\_global\_\_只是表示这是Device侧函数的入口，并不表示具体的设备类型，具体的设备类型由\_\_aicore\_\_标记。具有如下使用约束：
 
-    -   一个\_\_global\_\_函数必须返回void类型，并且不能是class的成员函数。
-    -   主机侧调用\_\_global\_\_函数必须使用<<<\>\>\>异构调用语法。
-    -   \_\_global\_\_的调用是异步的，意味着函数返回，并不表示kernel函数在device侧已经执行完成，如果需要同步，需要使用Runtime同步接口显式同步，如**aclrtSynchronizeStream**接口。
+    - 一个\_\_global\_\_函数必须返回void类型，并且不能是class的成员函数。
+    - 主机侧调用\_\_global\_\_函数必须使用<<<\>\>\>异构调用语法。
+    - \_\_global\_\_的调用是异步的，意味着函数返回，并不表示kernel函数在device侧已经执行完成，如果需要同步，需要使用Runtime同步接口显式同步，如**aclrtSynchronizeStream**接口。
 
--   **\_\_aicore\_\_**
+- **\_\_aicore\_\_**
 
     \_\_aicore\_\_执行空间限定符声明一个函数，它具有如下属性：
 
-    -   在Device侧执行
-    -   只能被\_\_global\_\_函数，或者其他\_\_aicore\_\_函数调用
+    - 在Device侧执行
+    - 只能被\_\_global\_\_函数，或者其他\_\_aicore\_\_函数调用
 
-    ```
+    ```cpp
     // Only callable from device functions with same kind
     // of execution space
     __aicore__ void bar() {}
@@ -146,17 +146,17 @@
     }
     ```
 
--   **\_\_host\_\_**
+- **\_\_host\_\_**
 
     \_\_host\_\_执行空间限定符声明一个函数，它具有如下属性：
 
-    -   只能在Host侧执行
-    -   只能被Host侧函数调用
-    -   \_\_global\_\_ 和\_\_host\_\_不能一起使用
+    - 只能在Host侧执行
+    - 只能被Host侧函数调用
+    - \_\_global\_\_ 和\_\_host\_\_不能一起使用
 
     \_\_host\_\_限定符是可选项，无函数执行空间限定符定义的函数，默认是host函数。
 
-    ```
+    ```cpp
     __aicore__ int f() {}
 
     // defines a host side function
@@ -172,17 +172,17 @@
     __global__ __host__ void kfunc() {}
     ```
 
--   **\_\_aicpu\_\_**
+- **\_\_aicpu\_\_**
 
     AI CPU函数执行空间限定符\_\_aicpu\_\_用于指示函数是否为AI CPU核函数（Kernel），它具有如下属性：
 
-    -   在Device侧执行且只能被Host侧函数调用，因此必须与\_\_global\_\_同时声明。
-    -   一个\_\_global\_\_ \_\_aicpu\_\_函数不能是void返回类型，并且入参只能是一个指针。
-    -   一个\_\_global\_\_ \_\_aicpu\_\_函数不能在.asc文件中进行定义，只能声明，且需要使用extern。
-    -   Host侧调用\_\_global\_\_ \_\_aicpu\_\_函数时必须使用<<<\>\>\>异构调用语法，输入的函数入参在入参指针的基础上需要输入从指针中读取的数据大小。
-    -   \_\_global\_\_的调用是异步的，意味着函数返回，并不表示kernel函数在Device侧已经执行完成，如果需要同步，需要使用Runtime同步接口显式同步，如**aclrtSynchronizeStream**接口
+    - 在Device侧执行且只能被Host侧函数调用，因此必须与\_\_global\_\_同时声明。
+    - 一个\_\_global\_\_ \_\_aicpu\_\_函数不能是void返回类型，并且入参只能是一个指针。
+    - 一个\_\_global\_\_ \_\_aicpu\_\_函数不能在.asc文件中进行定义，只能声明，且需要使用extern。
+    - Host侧调用\_\_global\_\_ \_\_aicpu\_\_函数时必须使用<<<\>\>\>异构调用语法，输入的函数入参在入参指针的基础上需要输入从指针中读取的数据大小。
+    - \_\_global\_\_的调用是异步的，意味着函数返回，并不表示kernel函数在Device侧已经执行完成，如果需要同步，需要使用Runtime同步接口显式同步，如**aclrtSynchronizeStream**接口
 
-    ```
+    ```cpp
     // Define a AI CPU kernel function in AI CPU device file
     __aicpu__ void foo() {} // Error, single __aicpu__ identifier without _global__
     __global__ void foo() {} // Error, single __global__ identifier without __aicpu__
@@ -192,24 +192,24 @@
     __global__ __aicpu__  int foo(void *a, void *b) {} // Error, input param num is not one
     ```
 
-    ```
+    ```cpp
     // Declare a AI CPU kernel function in .asc file
     extern __global__ __aicpu__ uint32_t hello_world(void *args);// OK
     ```
 
--   **\_\_inline\_\_**
+- **\_\_inline\_\_**
 
     \_\_inline\_\_限定符声明一个函数，它具有如下属性：
 
-    -   标识Device侧函数强制内联，可以减少函数频繁调用产生的指令压栈、出栈的开销，但可能会导致算子二进制增加。
-    -   和C++函数修饰符inline的主要区别是Device侧\_\_inline\_\_是强制内联，C++的inline则是根据编译器优化选择性内联。
-    -   AI Core对函数嵌套深度有限制，一般推荐嵌套深度不超过4层。使用强制内联可以减少调用层次。
+    - 标识Device侧函数强制内联，可以减少函数频繁调用产生的指令压栈、出栈的开销，但可能会导致算子二进制增加。
+    - 和C++函数修饰符inline的主要区别是Device侧\_\_inline\_\_是强制内联，C++的inline则是根据编译器优化选择性内联。
+    - AI Core对函数嵌套深度有限制，一般推荐嵌套深度不超过4层。使用强制内联可以减少调用层次。
 
--   **\_\_cube\_\_**
+- **\_\_cube\_\_**
 
     标识该核函数（Kernel）仅在Cube核执行。针对耦合模式的硬件架构，该修饰符不生效。
 
-    ```
+    ```cpp
     extern "C" __global__ __cube__ void mmad_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c)
     {
         KernelMmad op;
@@ -218,31 +218,31 @@
     }
     ```
 
--   **\_\_vector\_\_**
+- **\_\_vector\_\_**
 
     标识该核函数（Kernel）仅在Vector核执行。针对耦合模式的硬件架构，该修饰符不生效。
 
-    ```
+    ```cpp
      __vector__ __global__ __aicore__ void add_custom(){}
     ```
 
--   **\_\_mix\_\_\(cube, vec\)**
+- **\_\_mix\_\_\(cube, vec\)**
 
     标识该核函数（Kernel）同时在Cube核和Vector核上执行。\(cube, vec\)分别表示核函数（Kernel）启动的Cube核和Vector核的配比，支持的配比为\(1, 0\)、\(0, 1\)、\(1, 1\)和\(1, 2\)。在该修饰符生效的非耦合架构上，`__mix__(1, 0)`等价于`__cube__`，`__mix__(0, 1)`等价于`__vector__`，可分别使用__cube__和__vector__替代。针对耦合模式的硬件架构，该修饰符不生效。
 
--   **\_\_schedmode\_\_\(mode\)**
+- **\_\_schedmode\_\_\(mode\)**
 
     标识该核函数（Kernel）的执行调度模式。如下图所示：
 
-    -   mode = 0 : normal mode，尽可能选择空闲物理核下发执行核函数（Kernel），若空闲物理核数无法满足当前核函数（Kernel）的需要，没有下发的部分等待核心空闲后执行。此时OP1和OP2算子会存在交叠执行（overlap）的情况。
+    - mode = 0 : normal mode，尽可能选择空闲物理核下发执行核函数（Kernel），若空闲物理核数无法满足当前核函数（Kernel）的需要，没有下发的部分等待核心空闲后执行。此时OP1和OP2算子会存在交叠执行（overlap）的情况。
 
-    -   mode = 1 : batch mode，在下发核函数（Kernel）时先进行判断，若空闲物理核数无法满足当前核函数（Kernel）的需要，则等待至空闲物理核数满足该核函数（Kernel）所需要的所有物理核时，同时下发执行，OP1和OP2的执行被切分（split）开，不会出现交叠执行的情况。
+    - mode = 1 : batch mode，在下发核函数（Kernel）时先进行判断，若空闲物理核数无法满足当前核函数（Kernel）的需要，则等待至空闲物理核数满足该核函数（Kernel）所需要的所有物理核时，同时下发执行，OP1和OP2的执行被切分（split）开，不会出现交叠执行的情况。
 
     ![](../../figures/batchmode.png)
 
     在多流并发场景，多算子并行执行时，若执行总核数超过最大物理核数，且多个算子逻辑使用SyncALL等核间同步接口时，建议设置mode为1，防止多个算子之间互相等待空闲核调度，导致死锁。默认值mode为0。
 
-    ```
+    ```cpp
      __schedmode__(1) __global__ __mix__(1, 2) void OP1() // OP1使用了SyncAll接口，且存在多流并发的可能，需要设置batch mode（mode 1）
     {
         AscendC::SyncAll();
@@ -260,23 +260,23 @@
 
 ## 函数标记宏<a name="section192521344610"></a>
 
--   \_\_simd\_vf\_\_
+- \_\_simd\_vf\_\_
 
     函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](../../../api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md)调用SIMD VF入口函数，启动VF子任务。
 
-    ```
+    ```cpp
     __simd_vf__ inline void KernelAdd(__ubuf__ float* x, __ubuf__ float* y, __ubuf__ float* z)
     ```
 
     \_\_simd\_vf\_\_标记的SIMD VF有以下入参约束：
 
-    -   支持指针传参（Pass-by-Pointer），指针变量必须用\_\_ubuf\_\_地址空间限定符修饰。
-    -   不支持引用传参（Pass-by-Reference）。
-    -   不支持函数指针传参。
+    - 支持指针传参（Pass-by-Pointer），指针变量必须用\_\_ubuf\_\_地址空间限定符修饰。
+    - 不支持引用传参（Pass-by-Reference）。
+    - 不支持函数指针传参。
 
         \_\_simd\_vf\_\_使用的示例如下：
 
-        ```
+        ```cpp
         __simd_vf__ inline void simd_adds(__ubuf__ float *output, __ubuf__ float *input,
             uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
         {
@@ -296,11 +296,11 @@
         }
         ```
 
--   \_\_simd\_callee\_\_
+- \_\_simd\_callee\_\_
 
     函数标记宏，函数可以有返回值，允许被SIMD VF入口函数或其他非入口函数调用。
 
-    ```
+    ```cpp
     __simd_callee__ inline float add(float x, float y)
     ```
 
@@ -323,7 +323,7 @@ AI Core具备多级独立片上存储，各个地址空间独立编址，具备�
 
 地址空间限定符可以在变量声明中使用，用于指定对象分配的区域。如果对象的类型被地址空间名称限定，那么该对象将被分配在指定的地址空间中。同样地，对于指针，指向的类型可以通过地址空间进行限定，以指示所指向的对象所在的地址空间。
 
-```
+```cpp
 // declares a pointer p in the __gm__ address space that
 // points to an object(has int type) in the __gm__ address space
 __gm__ int *p;
@@ -337,7 +337,7 @@ __global__ __aicore__ void foo(...)
 
 地址空间限定符不能用于非指针返回类型，非指针函数参数，函数类型，同一个类型上不允许使用多个地址空间限定符。
 
-```
+```cpp
 // OK.
 __aicore__ int f() {...}
 
@@ -358,11 +358,11 @@ __ubuf__ int * __gm__ ptr;
 >[!NOTE]说明
 >**重要**：不同地址空间指针的大小可能不同。例如，不能认为sizeof\(\_\_gm\_\_ int \*\)总是等于sizeof\(\_\_ubuf\_\_ int \*\)，譬如编译器或许可能在某些系统上以32bit存储\_\_ubuf\_\_指针。
 
--   **private地址空间**
+- **private地址空间**
 
     private地址空间是大多数变量的默认地址空间，特别是局部变量。
 
-    ```
+    ```cpp
     // m is in a specific kernel parameter address space,
     // it's physical location is implementation determined.
     __global__ __vector__ void foo(int m) {
@@ -376,11 +376,11 @@ __ubuf__ int * __gm__ ptr;
     }
     ```
 
--   **\_\_gm\_\_地址空间**
+- **\_\_gm\_\_地址空间**
 
     \_\_gm\_\_地址空间限定符用来表示分配于设备侧全局内存的对象，全局内存对象可以声明为标量、用户自定义结构体的指针。
 
-    ```
+    ```cpp
     __gm__ int *var; // var point to an array of int elements
 
     typedef struct {
@@ -391,22 +391,22 @@ __ubuf__ int * __gm__ ptr;
     __gm__ foo_t *info; // info point to an array of foo_t elements
     ```
 
--   **\_\_ubuf\_\_地址空间**
+- **\_\_ubuf\_\_地址空间**
 
     \_\_ubuf\_\_地址空间用来描述存储于AI Core核内UB存储空间的变量。
 
-    ```
+    ```cpp
     __global__ __aicore__ void foo() {
       // ptr is in private address space, point to __ubuf__
       __ubuf__ int *ptr;
     }
     ```
 
--   **\_\_ca\_\_, \_\_cb\_\_, \_\_cc\_\_, \_\_cbuf\_\_地址空间**
+- **\_\_ca\_\_, \_\_cb\_\_, \_\_cc\_\_, \_\_cbuf\_\_地址空间**
 
     上述几个地址空间主要用于特定的DMA指令访问，不具备标量直接访问能力。
 
-    ```
+    ```cpp
     class ObjTy{
       ObjTy(){...}
       void print(){...}
@@ -447,14 +447,11 @@ __ubuf__ int * __gm__ ptr;
 | sub_block_num | 组合中当前类型的核的数量。 | 非内置变量，通过[GetSubBlockNum](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSubBlockNum_ISASI.md)或[asc_get_sub_block_num](../../../api/SIMD-API/c_api/sys_var/asc_get_sub_block_num.md)获取。 |
 | sub_block_idx | 当前核在组合内的位置。 | 非内置变量，通过[GetSubBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSubBlockIdx_ISASI.md)或[asc_get_sub_block_id](../../../api/SIMD-API/c_api/sys_var/asc_get_sub_block_id.md)获取。 |
 
-
-
 在多核切分场景中，需要得到每个核的真实逻辑位置（logic_idx），不同执行场景下，上述变量的取值不同，对应logic_idx的计算方式不同。Mix场景下，一个组合由1个Cube Core（AIC）和若干个Vector Core（AIV）组成，组合内每个AIV的block_idx相同，因此组合内有多个AIV核时，不能仅通过block_idx定位，还需结合sub_block_idx，计算公式如下：
 
 $$
 \text{logic\_idx} = \text{block\_idx} \times \text{sub\_block\_num} + \text{sub\_block\_idx}
 $$
-
 
 下表以$\text{block\_num} = 4$为例，介绍不同场景下各个变量的取值以及logic_idx的计算方式（使用基础API [GetBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)可以直接获取logic_idx）：
 
@@ -468,24 +465,25 @@ $$
 
 **使用建议**
 
--   使用**基础API**时，应使用GetBlockIdx获取核的逻辑位置，而非直接使用内置变量。
+- 使用**基础API**时，应使用GetBlockIdx获取核的逻辑位置，而非直接使用内置变量。
 
     <!-- npu="310p" id7 -->
     在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
     <!-- end id7 -->
 
--   使用**C API**时，对于纯Cube/纯Vector/Mix（1,1）场景，应使用内置变量block_idx获取当前核的逻辑位置；对于Mix（1,2）场景，应使用内置变量block_idx、asc_get_sub_block_num和asc_get_sub_block_id按公式计算logic_idx。
+- 使用**C API**时，对于纯Cube/纯Vector/Mix（1,1）场景，应使用内置变量block_idx获取当前核的逻辑位置；对于Mix（1,2）场景，应使用内置变量block_idx、asc_get_sub_block_num和asc_get_sub_block_id按公式计算logic_idx。
 
 ## 核函数（Kernel）配置<a name="核函数配置"></a><a name="section97005415463"></a>
 
 在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
 
-```
+```cpp
 <<<numBlocks, dynUBufSize, stream>>>
 ```
 
 其中：
--   numBlocks：规定了核函数（Kernel）将会在几个核上执行。每个执行该核函数（Kernel）的核会被分配一个逻辑ID，即block\_idx，可以在核函数（Kernel）的实现中使用内置变量[block_idx](../language_extension/simd_builtin_keywords.md#内置变量)获取；
+
+- numBlocks：规定了核函数（Kernel）将会在几个核上执行。每个执行该核函数（Kernel）的核会被分配一个逻辑ID，即block\_idx，可以在核函数（Kernel）的实现中使用内置变量[block_idx](../language_extension/simd_builtin_keywords.md#内置变量)获取；
 
     >[!NOTE]说明 
     >numBlocks是逻辑核的概念，取值范围为\[1,65535\]。为了充分利用硬件资源，一般设置为物理核的核数或其倍数。
@@ -498,12 +496,12 @@ $$
     >        - AIC/AIV的核数分别通过[GetCoreNumAic](../../../api/Utils-API/platform_info/PlatformAscendC/GetCoreNumAic.md)和[GetCoreNumAiv](../../../api/Utils-API/platform_info/PlatformAscendC/GetCoreNumAiv.md)接口获取。
     >- 如果开发者使用了Device资源限制特性，那么算子设置的numBlocks不应超过[PlatformAscendC](../../../api/Utils-API/platform_info/PlatformAscendC/PlatformAscendC.md)提供核数的API（GetCoreNum/GetCoreNumAic/GetCoreNumAiv等）返回的核数。例如，使用aclrtSetStreamResLimit设置Stream级别的Vector核数为8，那么GetCoreNumAiv接口返回值为8，针对Vector算子设置的numBlocks不应超过8，否则会抢占其他Stream的资源，导致资源限制失效。
 
--   dynUBufSize：Dynamic UB Size，是配置UB动态内存分配的空间的大小（仅限UB，不包括L1等），单位为Byte，默认设置为0；
--   stream：类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在device上执行，默认设置为nullptr。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+- dynUBufSize：Dynamic UB Size，是配置UB动态内存分配的空间的大小（仅限UB，不包括L1等），单位为Byte，默认设置为0；
+- stream：类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在device上执行，默认设置为nullptr。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
 以下示例展示了核函数（Kernel）的声明与调用方式。
 
-```
+```cpp
 // 声明
 __global__ __vector__ void add_custom(float* x, float* y, float* z);
 // 调用
