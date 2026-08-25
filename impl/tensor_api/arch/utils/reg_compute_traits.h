@@ -24,6 +24,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 namespace detail {
 
@@ -165,6 +166,7 @@ template <typename T>
 inline constexpr bool supports_fma_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 } // namespace detail
+} // namespace experimental
 } // namespace te
 } // namespace asc
 

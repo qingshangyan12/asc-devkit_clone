@@ -22,6 +22,7 @@
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 namespace detail {
 
@@ -69,8 +70,6 @@ __simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
 }
 
 } // namespace detail
-
-namespace experimental {
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
