@@ -66,7 +66,7 @@ inline half hfloor(half x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel_hfloor(half* dst, half* x, uint32_t input_total_length)
@@ -79,7 +79,7 @@ inline half hfloor(half x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel_hfloor(__gm__ half* dst, __gm__ half* x, uint32_t input_total_length)

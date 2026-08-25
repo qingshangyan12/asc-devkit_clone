@@ -68,7 +68,7 @@ inline long long int __float2ll_rna(const float x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__float2ll_rna(int64_t* dst, float* x)
@@ -78,7 +78,7 @@ inline long long int __float2ll_rna(const float x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel__float2ll_rna(__gm__ int64_t* dst, __gm__ float* x)

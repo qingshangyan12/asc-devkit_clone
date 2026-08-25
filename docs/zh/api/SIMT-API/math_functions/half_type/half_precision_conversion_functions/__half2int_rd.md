@@ -68,7 +68,7 @@ inline int __half2int_rd(const half x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__half2int_rd(int32_t* dst, half* x)
@@ -78,7 +78,7 @@ inline int __half2int_rd(const half x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel__half2int_rd(__gm__ int32_t* dst, __gm__ half* x)

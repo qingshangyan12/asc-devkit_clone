@@ -70,7 +70,7 @@ unsigned int __hneux2_mask(bfloat16x2_t x, bfloat16x2_t y)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
@@ -87,7 +87,7 @@ unsigned int __hneux2_mask(bfloat16x2_t x, bfloat16x2_t y)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率

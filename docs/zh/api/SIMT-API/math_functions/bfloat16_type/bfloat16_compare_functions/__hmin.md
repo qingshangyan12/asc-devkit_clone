@@ -73,7 +73,7 @@ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void KernelMin(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y)
@@ -83,7 +83,7 @@ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelMin(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y)

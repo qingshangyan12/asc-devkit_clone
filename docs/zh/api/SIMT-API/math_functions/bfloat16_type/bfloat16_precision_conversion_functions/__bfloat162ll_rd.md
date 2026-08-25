@@ -68,7 +68,7 @@ inline long long int __bfloat162ll_rd(const bfloat16_t x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__bfloat162ll_rd(int64_t* dst, bfloat16_t* x)
@@ -78,7 +78,7 @@ inline long long int __bfloat162ll_rd(const bfloat16_t x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel__bfloat162ll_rd(__gm__ int64_t* dst, __gm__ bfloat16_t* x)

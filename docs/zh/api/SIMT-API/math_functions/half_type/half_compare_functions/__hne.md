@@ -71,7 +71,7 @@ bool __hne(half x, half y)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void KernelHne(bool* dst, half* x, half* y)
@@ -81,7 +81,7 @@ bool __hne(half x, half y)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelHne(__gm__ bool* dst, __gm__ half* x, __gm__ half* y)

@@ -67,7 +67,7 @@ inline bfloat16x2_t h2cos(bfloat16x2_t x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void KernelCos(bfloat16x2_t* dst, bfloat16x2_t* x)
@@ -77,7 +77,7 @@ inline bfloat16x2_t h2cos(bfloat16x2_t x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelCos(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x)

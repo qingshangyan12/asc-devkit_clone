@@ -70,7 +70,7 @@ inline unsigned long long int __half2ull_rn(const half x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__half2ull_rn(uint64_t* dst, half* x)
@@ -80,7 +80,7 @@ inline unsigned long long int __half2ull_rn(const half x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel__half2ull_rn(__gm__ uint64_t* dst, __gm__ half* x)

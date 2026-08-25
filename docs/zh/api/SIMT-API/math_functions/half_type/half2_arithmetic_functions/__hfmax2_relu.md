@@ -99,7 +99,7 @@ half2 __hfmax2_relu(const half2 x, const half2 y, const half2 z)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
@@ -118,7 +118,7 @@ half2 __hfmax2_relu(const half2 x, const half2 y, const half2 z)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率

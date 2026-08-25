@@ -68,7 +68,7 @@ inline half __float2half_rn(const float x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__float2half_rn(half* dst, float* x)
@@ -78,7 +78,7 @@ inline half __float2half_rn(const float x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel__float2half_rn(__gm__ half* dst, __gm__ float* x)

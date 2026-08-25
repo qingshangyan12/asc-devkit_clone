@@ -67,7 +67,7 @@ inline bfloat16_t __ll2bfloat16_rna(const long long int x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__ll2bfloat16_rna(bfloat16_t* dst, int64_t* x, uint32_t input_total_length)
@@ -80,7 +80,7 @@ inline bfloat16_t __ll2bfloat16_rna(const long long int x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel__ll2bfloat16_rna(__gm__ bfloat16_t* dst, __gm__ int64_t* x, uint32_t input_total_length)

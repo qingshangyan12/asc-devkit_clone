@@ -71,7 +71,7 @@ inline bfloat16_t __bfloat162bfloat16_rna(const bfloat16_t x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __aicore__ void simt_bfloat162bfloat16_rna(bfloat16_t* input, bfloat16_t* output, uint32_t input_total_length)
@@ -89,7 +89,7 @@ inline bfloat16_t __bfloat162bfloat16_rna(const bfloat16_t x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void simt_bfloat162bfloat16_rna(__gm__ bfloat16_t* input, __gm__ bfloat16_t* output, uint32_t input_total_length)

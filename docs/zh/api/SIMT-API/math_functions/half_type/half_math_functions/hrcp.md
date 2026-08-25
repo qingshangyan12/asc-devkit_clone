@@ -69,7 +69,7 @@ inline half hrcp(half x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void KernelRcp(half* dst, half* x)
@@ -79,7 +79,7 @@ inline half hrcp(half x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelRcp(__gm__ half* dst, __gm__ half* x)
