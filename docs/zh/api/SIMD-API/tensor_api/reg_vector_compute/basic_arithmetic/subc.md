@@ -79,15 +79,27 @@ __simd_callee__ inline reg_tensor<T> sub_c(
 
 ## 调用示例
 
-```cpp
-auto mask = asc::te::all_mask<uint32_t>();
-auto src0_low = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto src1_low = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto src0_high = input0.load(asc::te::make_coord(1, 0)).with_mask(mask);
-auto src1_high = input1.load(asc::te::make_coord(1, 0)).with_mask(mask);
+以下示例展示接口在AIV计算函数中的典型调用方式。第0行保存低32位，第1行保存高32位。
 
-asc::te::reg_tensor<bool> carry_low;
-auto low = asc::te::experimental::sub_c(carry_low, src0_low, src1_low);
-asc::te::reg_tensor<bool> carry_high;
-auto high = asc::te::experimental::sub_c(carry_high, src0_high, src1_high, carry_low);
+```cpp
+#include "tensor_api/tensor.h"
+
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void sub_c_example(
+    InputTensor input0, InputTensor input1, OutputTensor output)
+{
+    auto mask = asc::te::all_mask<uint32_t>();
+    auto src0_low = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto src1_low = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto src0_high = input0.load(asc::te::make_coord(1, 0)).with_mask(mask);
+    auto src1_high = input1.load(asc::te::make_coord(1, 0)).with_mask(mask);
+
+    asc::te::reg_tensor<bool> carry_low;
+    auto low = asc::te::experimental::sub_c(carry_low, src0_low, src1_low);
+    asc::te::reg_tensor<bool> carry_high;
+    auto high = asc::te::experimental::sub_c(carry_high, src0_high, src1_high, carry_low);
+
+    output.store(asc::te::make_coord(0, 0), low);
+    output.store(asc::te::make_coord(1, 0), high);
+}
 ```
