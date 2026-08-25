@@ -28,6 +28,8 @@
 
 - **[原子操作类接口边界值汇总](atomic_operations_interface_boundary_value_summary.md)**
 
+- **[C API指令组合](c_api_instruction_combinations.md)**
+
 - **[SIMT接口软仿情况汇总](SIMT_interface_soft_simulation_summary.md)**
 
 - **[SIMT接口精度标准汇总](SIMT_interface_precision_standard_summary.md)**
