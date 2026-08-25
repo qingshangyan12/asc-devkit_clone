@@ -2493,6 +2493,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(
     vector_float& dst, __ubuf__ float*& src, int32_t offset);
 
 // ==========return-value load APIs==========
+// ========== return vector data register APIs ==========
 // ========== asc_load ==========
 __simd_callee__ inline vector_int4x2_t asc_load(__ubuf__ int4b_t* src);
 __simd_callee__ inline vector_int8_t asc_load(__ubuf__ int8_t* src);
@@ -2512,7 +2513,6 @@ __simd_callee__ inline vector_uint32_t asc_load(__ubuf__ uint32_t* src);
 __simd_callee__ inline vector_float asc_load(__ubuf__ float* src);
 
 // ========== asc_loadalign ==========
-__simd_callee__ inline vector_bool asc_loadalign(__ubuf__ bool* src);
 __simd_callee__ inline vector_int4x2_t asc_loadalign(__ubuf__ int4b_t* src);
 __simd_callee__ inline vector_int8_t asc_loadalign(__ubuf__ int8_t* src);
 __simd_callee__ inline vector_uint8_t asc_loadalign(__ubuf__ uint8_t* src);
@@ -2576,7 +2576,6 @@ __simd_callee__ inline vector_uint32_t asc_loadalign_brc_elem2datablock(__ubuf__
 __simd_callee__ inline vector_float asc_loadalign_brc_elem2datablock(__ubuf__ float* src);
 
 // ========== asc_loadalign_downsample ==========
-__simd_callee__ inline vector_bool asc_loadalign_downsample(__ubuf__ uint32_t* src);
 __simd_callee__ inline vector_int4x2_t asc_loadalign_downsample(__ubuf__ int4b_t* src);
 __simd_callee__ inline vector_int8_t asc_loadalign_downsample(__ubuf__ int8_t* src);
 __simd_callee__ inline vector_uint8_t asc_loadalign_downsample(__ubuf__ uint8_t* src);
@@ -2621,7 +2620,6 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign_unpack4(__ubuf__ fp8_e5m2
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_unpack4(__ubuf__ fp8_e4m3fn_t* src);
 
 // ========== asc_loadalign_upsample ==========
-__simd_callee__ inline vector_bool asc_loadalign_upsample(__ubuf__ uint32_t* src);
 __simd_callee__ inline vector_int4x2_t asc_loadalign_upsample(__ubuf__ int4b_t* src);
 __simd_callee__ inline vector_int8_t asc_loadalign_upsample(__ubuf__ int8_t* src);
 __simd_callee__ inline vector_uint8_t asc_loadalign_upsample(__ubuf__ uint8_t* src);
@@ -2636,39 +2634,44 @@ __simd_callee__ inline vector_uint16_t asc_loadalign_upsample(__ubuf__ uint16_t*
 __simd_callee__ inline vector_half asc_loadalign_upsample(__ubuf__ half* src);
 __simd_callee__ inline vector_bfloat16_t asc_loadalign_upsample(__ubuf__ bfloat16_t* src);
 
-// ========== asc_loadalign_datablock_stride ==========
-__simd_callee__ inline vector_int4x2_t asc_loadalign_datablock_stride(
+// ========== asc_loadalign_datablock_strided ==========
+__simd_callee__ inline vector_int4x2_t asc_loadalign_datablock_strided(
     __ubuf__ int4b_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_int8_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_int8_t asc_loadalign_datablock_strided(
     __ubuf__ int8_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_uint8_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_uint8_t asc_loadalign_datablock_strided(
     __ubuf__ uint8_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign_datablock_strided(
     __ubuf__ fp4x2_e2m1_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign_datablock_strided(
     __ubuf__ fp4x2_e1m2_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_hifloat8_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_hifloat8_t asc_loadalign_datablock_strided(
     __ubuf__ hifloat8_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_fp8_e8m0_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_fp8_e8m0_t asc_loadalign_datablock_strided(
     __ubuf__ fp8_e8m0_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_fp8_e5m2_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_fp8_e5m2_t asc_loadalign_datablock_strided(
     __ubuf__ fp8_e5m2_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign_datablock_strided(
     __ubuf__ fp8_e4m3fn_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_int16_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_int16_t asc_loadalign_datablock_strided(
     __ubuf__ int16_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_uint16_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_uint16_t asc_loadalign_datablock_strided(
     __ubuf__ uint16_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_half asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_half asc_loadalign_datablock_strided(
     __ubuf__ half* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_bfloat16_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_bfloat16_t asc_loadalign_datablock_strided(
     __ubuf__ bfloat16_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_int32_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_int32_t asc_loadalign_datablock_strided(
     __ubuf__ int32_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_uint32_t asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_uint32_t asc_loadalign_datablock_strided(
     __ubuf__ uint32_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
-__simd_callee__ inline vector_float asc_loadalign_datablock_stride(
+__simd_callee__ inline vector_float asc_loadalign_datablock_strided(
     __ubuf__ float* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
+
+// ========== return mask register APIs ==========
+__simd_callee__ inline vector_bool asc_loadalign_mask(__ubuf__ uint32_t* src);
+__simd_callee__ inline vector_bool asc_loadalign_mask_downsample(__ubuf__ uint32_t* src);
+__simd_callee__ inline vector_bool asc_loadalign_mask_upsample(__ubuf__ uint32_t* src);
 
 #endif
 

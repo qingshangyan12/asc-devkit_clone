@@ -185,7 +185,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_bfloat16_t, bfloat16_t, vector_bfloat16_t, bfloat16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignDownsampleReturn, asc_loadalign_downsample, plds, vector_bool, uint32_t, vector_bool, uint32_t);
+    LoadAlignMaskDownsampleReturn, asc_loadalign_mask_downsample, plds, vector_bool, uint32_t, vector_bool, uint32_t);
 
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUnpackReturn, asc_loadalign_unpack, vlds, vector_int8_t, int8_t, vector_int8_t, int8_t);
@@ -266,4 +266,4 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_bfloat16_t, bfloat16_t, vector_bfloat16_t, bfloat16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUpsampleReturn, asc_loadalign_upsample, plds, vector_bool, uint32_t, vector_bool, uint32_t);
+    LoadAlignMaskUpsampleReturn, asc_loadalign_mask_upsample, plds, vector_bool, uint32_t, vector_bool, uint32_t);
