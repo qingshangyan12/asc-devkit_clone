@@ -43,6 +43,8 @@ __aicore__ inline void asc_set_l13d_rpt_b(
     uint16_t dst_start_pos_m);
 
 __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config);
+__aicore__ inline void asc_set_l13d_fmatrix(
+    uint16_t fmatrix_w, uint16_t fmatrix_h, uint8_t pad_left, uint8_t pad_right, uint8_t pad_top, uint8_t pad_bottom);
 
 __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config);
 

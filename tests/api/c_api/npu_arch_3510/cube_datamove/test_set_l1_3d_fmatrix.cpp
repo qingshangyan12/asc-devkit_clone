@@ -40,6 +40,13 @@ TEST_F(TestCubeDmamoveSetL13DFmatrix, set_l1_3d_fmatrix_uint32_t_Succ)
     GlobalMockObject::verify();
 }
 
+TEST_F(TestCubeDmamoveSetL13DFmatrix, set_l1_3d_fmatrix_params_Succ)
+{
+    MOCKER(set_fmatrix, void(uint64_t)).times(1).will(invoke(set_fmatrix_stub));
+    asc_set_l13d_fmatrix(2, 1, 3, 4, 5, 6);
+    GlobalMockObject::verify();
+}
+
 class TestCubeDmamoveSetL13DFmatrixB : public testing::Test {
 protected:
     void SetUp() { g_coreType = C_API_AIC_TYPE; }
