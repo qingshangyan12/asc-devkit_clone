@@ -94,7 +94,7 @@ enum class mask_pattern : uint8_t {
     none,
 };
 
-enum class reduce_scope : uint8_t { vector, datablock, pair };
+enum class reduce_scope : uint8_t { element, datablock, pair };
 
 enum class histogram_half {
     low,

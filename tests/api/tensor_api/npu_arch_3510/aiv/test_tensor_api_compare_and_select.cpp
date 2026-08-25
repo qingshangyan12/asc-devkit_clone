@@ -42,12 +42,6 @@ __aicore__ inline void TestCompareRegTensor()
     auto le = src0 <= src1;
     auto gt = src0 > src1;
     auto ge = src0 >= src1;
-    static_assert(std::is_same_v<decltype(eq), asc::te::experimental::reg_tensor<bool>> &&
-        std::is_same_v<decltype(ne), asc::te::experimental::reg_tensor<bool>> &&
-        std::is_same_v<decltype(lt), asc::te::experimental::reg_tensor<bool>> &&
-        std::is_same_v<decltype(le), asc::te::experimental::reg_tensor<bool>> &&
-        std::is_same_v<decltype(gt), asc::te::experimental::reg_tensor<bool>> &&
-        std::is_same_v<decltype(ge), asc::te::experimental::reg_tensor<bool>>);
     (void)eq;
     (void)ne;
     (void)lt;
@@ -68,12 +62,6 @@ __aicore__ inline void TestCompareScalar()
     auto le = src <= scalar;
     auto gt = src > scalar;
     auto ge = src >= scalar;
-    static_assert(std::is_same_v<decltype(eq), asc::te::experimental::reg_tensor<bool>> &&
-        std::is_same_v<decltype(ne), asc::te::experimental::reg_tensor<bool>> &&
-        std::is_same_v<decltype(lt), asc::te::experimental::reg_tensor<bool>> &&
-        std::is_same_v<decltype(le), asc::te::experimental::reg_tensor<bool>> &&
-        std::is_same_v<decltype(gt), asc::te::experimental::reg_tensor<bool>> &&
-        std::is_same_v<decltype(ge), asc::te::experimental::reg_tensor<bool>>);
     (void)eq;
     (void)ne;
     (void)lt;

@@ -19,9 +19,9 @@ namespace asc {
 namespace te {
 namespace experimental {
 
-static_assert(std::is_same_v<decltype(reduce_sum<float>(reg_tensor<float>{})), reg_tensor<float>>);
-static_assert(std::is_same_v<decltype(reduce_max<int16_t>(reg_tensor<int16_t>{})), reg_tensor<int16_t>>);
-static_assert(std::is_same_v<decltype(reduce_min<uint32_t>(reg_tensor<uint32_t>{})), reg_tensor<uint32_t>>);
+static_assert(AscendC::Std::is_same_v<decltype(reduce_sum<float>(reg_tensor<float>{})), reg_tensor<float>>);
+static_assert(AscendC::Std::is_same_v<decltype(reduce_max<int16_t>(reg_tensor<int16_t>{})), reg_tensor<int16_t>>);
+static_assert(AscendC::Std::is_same_v<decltype(reduce_min<uint32_t>(reg_tensor<uint32_t>{})), reg_tensor<uint32_t>>);
 
 __aicore__ inline void compile_reg_reduction(reg_tensor<float> float_src, reg_tensor<int16_t> int16_src)
 {

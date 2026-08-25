@@ -27,13 +27,13 @@ namespace asc {
 namespace te {
 namespace experimental {
 
-template <typename DstType, reduce_scope scope = reduce_scope::vector, typename SrcType>
+template <typename DstType, reduce_scope scope = reduce_scope::element, typename SrcType>
 __simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>& src);
 
-template <typename DstType, reduce_scope scope = reduce_scope::vector, typename SrcType>
+template <typename DstType, reduce_scope scope = reduce_scope::element, typename SrcType>
 __simd_callee__ inline reg_tensor<DstType> reduce_max(const reg_tensor<SrcType>& src);
 
-template <typename DstType, reduce_scope scope = reduce_scope::vector, typename SrcType>
+template <typename DstType, reduce_scope scope = reduce_scope::element, typename SrcType>
 __simd_callee__ inline reg_tensor<DstType> reduce_min(const reg_tensor<SrcType>& src);
 
 } // namespace experimental

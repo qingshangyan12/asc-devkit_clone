@@ -27,6 +27,31 @@ namespace te {
 namespace experimental {
 namespace detail {
 
+template <typename T>
+struct reg_tensor_traits;
+
+template <typename T>
+struct reg_tensor_traits<reg_tensor<T>> {
+    using elem_type = T;
+};
+
+template <typename T>
+using reg_elem_t = typename reg_tensor_traits<AscendC::Std::remove_cvref_t<T>>::elem_type;
+
+template <typename T, typename U, bool = is_reg_tensor_v<T>>
+struct binary_elem_type {
+    static_assert(is_reg_tensor_v<U>, "at least one operand must be reg_tensor");
+    using type = reg_elem_t<U>;
+};
+
+template <typename T, typename U>
+struct binary_elem_type<T, U, true> {
+    using type = reg_elem_t<T>;
+};
+
+template <typename T, typename U>
+using binary_elem_t = typename binary_elem_type<T, U>::type;
+
 template <typename T, typename U>
 __simd_callee__ inline reg_tensor<T> make_reg_operand(const U& value, const vector_bool& mask)
 {

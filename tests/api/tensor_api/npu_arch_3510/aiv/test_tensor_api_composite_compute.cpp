@@ -24,22 +24,22 @@ using reg_type = asc::te::experimental::reg_tensor<T>;
 template <typename T>
 void check_composite_compute()
 {
-    static_assert(std::is_same_v<decltype(asc::te::experimental::axpy(std::declval<const reg_type<T>&>(),
-        std::declval<const reg_type<T>&>(), std::declval<const T&>())), reg_type<T>>);
-    static_assert(std::is_same_v<decltype(asc::te::experimental::absdiff(
-        std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(std::is_same_v<decltype(asc::te::experimental::exp_sub(
-        std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<float>>);
-    static_assert(std::is_same_v<decltype(asc::te::experimental::fma(std::declval<const reg_type<T>&>(),
-        std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::axpy(AscendC::Std::declval<const reg_type<T>&>(),
+        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const T&>())), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::absdiff(
+        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::exp_sub(
+        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<float>>);
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::fma(AscendC::Std::declval<const reg_type<T>&>(),
+        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
 }
 
 TEST(test_tensor_api_composite_compute, compile_public_apis_and_supported_types)
 {
     check_composite_compute<half>();
     check_composite_compute<float>();
-    static_assert(std::is_same_v<decltype(asc::te::experimental::muls_cast(
-        std::declval<const reg_type<float>&>(), std::declval<const float&>())), reg_type<half>>);
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::muls_cast(
+        AscendC::Std::declval<const reg_type<float>&>(), AscendC::Std::declval<const float&>())), reg_type<half>>);
 }
 
 } // namespace
