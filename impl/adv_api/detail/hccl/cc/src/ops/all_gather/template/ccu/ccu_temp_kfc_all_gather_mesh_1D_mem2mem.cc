@@ -30,12 +30,7 @@ HcclResult CcuTempKfcAllGatherMesh1DMem2Mem::CalcRes(
     resourceRequest.ccuKernelNum.push_back(1);
 
     CcuKernelInfo kernelInfo;
-<<<<<<< HEAD
-    CHK_SAFETY_FUNC_RET(
-        strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAllGatherMesh1DMem2Mem"));
-=======
     strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcAllGatherMesh1DMem2Mem");
->>>>>>> 8ae6d9c02 (1)
 
     std::vector<HcclChannelDesc> channelDescs;
     if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
