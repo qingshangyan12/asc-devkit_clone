@@ -24,6 +24,9 @@ TEST_F(tensor_api_pointer, test_make_mem_ptr)
 {
     using namespace asc::te;
 
+    using legacy_element_type = AscendC::Te::GetAttributeElementType<__gm__ float*>;
+    static_assert(AscendC::Std::is_same_v<legacy_element_type, float>);
+
     __gm__ float gm_data[4] = {0};
     __ubuf__ float ub_data[4] = {0};
     __cbuf__ float l1_data[4] = {0};
