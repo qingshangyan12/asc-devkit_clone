@@ -409,18 +409,18 @@ struct CcuStScenario {
     HcclDataType dataType = FP16;         // data type
     HcclCMDType opType;                   // operator type
 
-    std::string expectedAlgName;          // expected algorithm name selected by selector
+    std::string expectedAlgName;          // expected algorithm name (empty = skip assertion)
     std::string algConfig;                // forced algorithm (empty = auto-select)
 
     std::vector<std::vector<uint64_t>> sizes;  // sizes[src][dst] = data size (bytes)
-    uint64_t count = 0;                        // for AllGather/ReduceScatter
-    HcclReduceOp reduceType = HCCL_REDUCE_SUM;
-    HcclDataType outputType = HCCL_DATA_TYPE_RESERVED;
-    uint32_t root = 0;                    // for Broadcast/Reduce/Scatter
-    bool inPlace = false;                 // for AllReduce/AllGather
+    uint64_t count = 0;                        // per-rank element count for AllGather/ReduceScatter
+    HcclReduceOp reduceType = HCCL_REDUCE_SUM; // reduce operation type (ReduceScatter/AllReduce)
+    HcclDataType outputType = HCCL_DATA_TYPE_RESERVED;  // low-precision reduce output type (RESERVED = same as dataType)
+    uint32_t root = 0;                    // root rank for Broadcast/Reduce/Scatter
+    bool inPlace = false;                 // in-place operation (input==output, for AllReduce)
 
     bool corruptOutput = false;           // negative: corrupt output
-    bool outOfRangeParam = false;         // negative: parameter out of range
+    bool outOfRangeParam = false;         // negative: parameter out of range (reserved, currently unused)
 };
 ```
 
@@ -772,7 +772,7 @@ The framework logic of utils (`VerifyScenario`, `CcuProgramChecker`, `RuntimeWor
 
 ### 15.4 Expected Output Computation
 
-`CaptureRuntimeExpectation` (utils generic) moves data according to the matrix in `ScenarioData`, and does not need to be implemented by each communication primitive. If the communication primitive has reduce semantics (e.g., ReduceScatter), set `ScenarioData::reduceOp` (currently reserved, reduce logic not implemented).
+`CaptureRuntimeExpectation` (utils generic) moves data according to the matrix in `ScenarioData`, and does not need to be implemented by each communication primitive. If the communication primitive has reduce semantics (e.g., ReduceScatter), set `ScenarioData::reduceOp`, and `ApplyReduce` performs per-element reduction by dataType (supports INT8/FP16/BF16/INT32/FP32 × SUM/PROD/MAX/MIN).
 
 ---
 
@@ -1075,5 +1075,4 @@ Reference code:
 - GroupCopy Loop Engine two-level nested expansion (see [§16](#16-loop-engine-simulation))
 - GroupCopy loop body buffer relay (src→MS→dst)
 - Driver, hardware timing, performance
-- Floating-point per-element numerical precision
-- reduce semantics (reduceOp field reserved, ApplyReduce not implemented)
+- Floating-point per-element numerical precision (FP16/BF16 conversion precision, not strict IEEE)

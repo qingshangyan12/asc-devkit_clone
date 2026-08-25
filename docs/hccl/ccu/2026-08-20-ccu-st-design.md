@@ -399,18 +399,18 @@ struct CcuStScenario {
     HcclDataType dataType = FP16;         // 数据类型
     HcclCMDType opType;                   // 算子类型
 
-    std::string expectedAlgName;          // 期望 selector 选出的算法名
+    std::string expectedAlgName;          // 期望 selector 选出的算法名（空=不校验）
     std::string algConfig;                // 强制指定算法（空=自动选择）
 
     std::vector<std::vector<uint64_t>> sizes;  // sizes[src][dst] = 数据大小（bytes）
-    uint64_t count = 0;                        // AllGather/ReduceScatter 用
-    HcclReduceOp reduceType = HCCL_REDUCE_SUM;
-    HcclDataType outputType = HCCL_DATA_TYPE_RESERVED;
-    uint32_t root = 0;                    // Broadcast/Reduce/Scatter 用
-    bool inPlace = false;                 // AllReduce/AllGather 用
+    uint64_t count = 0;                        // AllGather/ReduceScatter 的 per-rank 元素数
+    HcclReduceOp reduceType = HCCL_REDUCE_SUM; // 归约操作类型（ReduceScatter/AllReduce）
+    HcclDataType outputType = HCCL_DATA_TYPE_RESERVED;  // 低精度归约输出类型（RESERVED=同 dataType）
+    uint32_t root = 0;                    // Broadcast/Reduce/Scatter 的 root rank
+    bool inPlace = false;                 //原地操作（input==output，AllReduce 用）
 
     bool corruptOutput = false;           // 负向：篡改 output
-    bool outOfRangeParam = false;         // 负向：参数越界
+    bool outOfRangeParam = false;         // 负向：参数越界（预留，当前未使用）
 };
 ```
 
@@ -762,7 +762,7 @@ utils 的框架逻辑（`VerifyScenario`、`CcuProgramChecker`、`RuntimeWorld`�
 
 ### 15.4 期望输出计算
 
-`CaptureRuntimeExpectation`（utils 通用）按 `ScenarioData` 的矩阵搬运数据，不需要各通信原语实现。如果通信原语有 reduce 语义（如 ReduceScatter），设置 `ScenarioData::reduceOp`（当前预留，未实现 reduce 逻辑）。
+`CaptureRuntimeExpectation`（utils 通用）按 `ScenarioData` 的矩阵搬运数据，不需要各通信原语实现。如果通信原语有 reduce 语义（如 ReduceScatter），设置 `ScenarioData::reduceOp`，`ApplyReduce` 按 dataType 逐元素归约（支持 INT8/FP16/BF16/INT32/FP32 × SUM/PROD/MAX/MIN）。
 
 ---
 
@@ -1209,5 +1209,4 @@ idx=0: loop 0, round 0 → addrOffset=0, 搬运 100 字节
 - GroupCopy Loop Engine 两层嵌套展开（参见 [§16](#16-loop-engine-仿真)）
 - GroupCopy loop body buffer 中转（src→MS→dst）
 - 驱动、硬件时序、性能
-- 浮点逐元素数值精度
-- reduce 语义（reduceOp 字段预留，ApplyReduce 未实现）
+- 浮点逐元素数值精度（FP16/BF16 转换精度，非严格 IEEE）
