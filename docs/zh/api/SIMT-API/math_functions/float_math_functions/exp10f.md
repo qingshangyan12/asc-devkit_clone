@@ -32,7 +32,7 @@
 
 ```cpp
 inline float exp10f(float x)
-```
+```text
 
 ## 参数说明
 
@@ -46,10 +46,10 @@ inline float exp10f(float x)
 
 10的x次方。
 
--   当x为inf时，返回值为inf。
--   当x为-inf时，返回值为0。
--   当x为nan时，返回值为nan。
--   当结果超出float的最大取值范围时，返回值为inf。
+- 当x为inf时，返回值为inf。
+- 当x为-inf时，返回值为0。
+- 当x为nan时，返回值为nan。
+- 当结果超出float的最大取值范围时，返回值为inf。
 
 ## 约束说明
 
@@ -100,7 +100,7 @@ inline float exp10f(float x)
 
 输入输出示例如下：
 
-```
+```text
 x：0.25, 0.75, 1.25, 1.75
 result: 1.778279 5.623414 17.7828 56.23413
 ```

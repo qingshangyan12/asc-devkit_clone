@@ -9,51 +9,52 @@
 
 host侧自动获取Tiling参数的关键步骤介绍如下：
 <a name="zh-cn_topic_0000001622514006_li19113114819525"></a>
-1.  **创建Tiling对象**。
 
-    ```
+1. **创建Tiling对象**。
+
+    ```cpp
     auto ascendcPlatform = platform_ascendc::PlatformAscendCManager::GetInstance();
     matmul_tiling::MultiCoreMatmulTiling tilingApi(*ascendcPlatform);
     ```
 
     传入硬件平台信息创建PlatformAscendC对象，然后创建Tiling对象，硬件平台信息可以通过GetPlatformInfo获取。
 
-2.  **设置参与Matmul运算的核数，A、B的内存逻辑位置、格式和数据类型。**
+2. **设置参与Matmul运算的核数，A、B的内存逻辑位置、格式和数据类型。**
 
-    ```
+    ```cpp
     tilingApi.SetDim(ascendcPlatform->GetCoreNumAic());  
     tilingApi.SetAType(AscendC::TPosition::GM, CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16, false);
     tilingApi.SetBType(AscendC::TPosition::GM, CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16, false);
     tilingApi.SetCType(AscendC::TPosition::GM, CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT);
     ```
 
-3.  **设置矩阵shape信息。**
+3. **设置矩阵shape信息。**
 
-    ```
+    ```cpp
     tilingApi.SetOrgShape(M, N, K); // 设置原始完整的形状M、N、K
     tilingApi.SetShape(M, N, K);
     ```
 
-4.  **设置可用空间大小信息。**
+4. **设置可用空间大小信息。**
 
     设置Matmul计算时可用的L1 Buffer/L0C Buffer/Unified Buffer（UB）空间大小，-1表示AI处理器对应Buffer的大小。
 
-    ```
+    ```cpp
     tilingApi.SetBufferSpace(-1, -1, -1);
     ```
 
-5.  **获取Tiling参数。**
+5. **获取Tiling参数。**
 
-    ```
+    ```cpp
     int64_t res = tilingApi.GetTiling(tilingData);
     if (res == -1) {
         std::cout << "gen tiling failed" << std::endl;
     }
     ```
 
-6.  Tiling参数的序列化保存等其他操作。
+6. Tiling参数的序列化保存等其他操作。
 
-    ```
+    ```cpp
     uint32_t tcubeTilingSize = tilingData.GetDataSize();
     tilingData.SaveToBuffer(tilingBuf, tcubeTilingSize);
     ```
@@ -61,14 +62,14 @@ host侧自动获取Tiling参数的关键步骤介绍如下：
 <a name="zh-cn_topic_0000001622514006_li1032116474330"></a>
 kernel侧使用Matmul API矩阵乘运算的具体步骤如下：
 
-1.  **创建Matmul对象**
+1. **创建Matmul对象**
 
     创建Matmul对象的示例如下：
 
-    -   纯Cube模式（只有矩阵计算）场景下，建议在代码中定义ASCENDC\_CUBE\_ONLY宏，避免额外的性能开销。本节内容以纯Cube模式举例。
-    -   默认为MIX模式（包含矩阵计算和矢量计算），该场景下通常不定义ASCENDC\_CUBE\_ONLY宏，如果在程序中使用了ASCENDC\_CUBE\_ONLY宏，则必须使用ASCEND\_IS\_AIC宏和ASCEND\_IS\_AIV宏将Cube计算和Vector计算隔离开，更多内容请参考[融合算子编程](../fusion_operator_programming/fusion_operator_programming.md)。
+    - 纯Cube模式（只有矩阵计算）场景下，建议在代码中定义ASCENDC\_CUBE\_ONLY宏，避免额外的性能开销。本节内容以纯Cube模式举例。
+    - 默认为MIX模式（包含矩阵计算和矢量计算），该场景下通常不定义ASCENDC\_CUBE\_ONLY宏，如果在程序中使用了ASCENDC\_CUBE\_ONLY宏，则必须使用ASCEND\_IS\_AIC宏和ASCEND\_IS\_AIV宏将Cube计算和Vector计算隔离开，更多内容请参考[融合算子编程](../fusion_operator_programming/fusion_operator_programming.md)。
 
-    ```
+    ```cpp
     typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType; 
     typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType; 
     typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType; 
@@ -77,46 +78,48 @@ kernel侧使用Matmul API矩阵乘运算的具体步骤如下：
 
     创建对象时需要传入A、B、C的参数类型信息，类型信息通过MatmulType来定义，包括：内存逻辑位置、数据格式、数据类型。
 
-2.  **初始化操作。**
+2. **初始化操作。**
 
-    ```
+    ```cpp
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling); // 初始化
     ```
 
-    >[!NOTE]说明 
+    >[!NOTE]说明
     >Matmul高阶API内部实现时需要使用系统workspace（即对应本步骤中的GetSysWorkSpacePtr接口），开发者需要自行申请系统workspace的空间：
-    >-   在host侧Tiling实现时，设置总的workspace的数值大小（包含用户workspace和系统workspace），workspace空间由框架来申请并管理。系统workspace的空间大小通过[GetLibApiWorkSpaceSize](../../../../api/Utils-API/platform_info/PlatformAscendC/GetLibApiWorkSpaceSize.md)获取。
-    >    ```
+    >
+    >- 在host侧Tiling实现时，设置总的workspace的数值大小（包含用户workspace和系统workspace），workspace空间由框架来申请并管理。系统workspace的空间大小通过[GetLibApiWorkSpaceSize](../../../../api/Utils-API/platform_info/PlatformAscendC/GetLibApiWorkSpaceSize.md)获取。
+    >
+    >    ```cpp
     >    size_t userWorkspaceSize = 0;
     >    size_t systemWorkspaceSize = static_cast<size_t>(ascendcPlatform.GetLibApiWorkSpaceSize());
     >    size_t workspaceSize = userWorkspaceSize + systemWorkspaceSize;
     >    ```
 
-3.  **设置左矩阵A、右矩阵B。**
+3. **设置左矩阵A、右矩阵B。**
 
-    ```
+    ```cpp
     mm.SetTensorA(gmA);    // 设置左矩阵A
     mm.SetTensorB(gmB);    // 设置右矩阵B
     ```
 
-4.  **完成矩阵乘操作。**
-    -   调用Iterate完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
+4. **完成矩阵乘操作。**
+    - 调用Iterate完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
 
-        ```
+        ```cpp
         while (mm.Iterate()) {   
             mm.GetTensorC(gmC); 
         }
         ```
 
-    -   调用IterateAll完成单核上所有数据的计算。IterateAll方式，无需循环迭代，使用比较简单。
+    - 调用IterateAll完成单核上所有数据的计算。IterateAll方式，无需循环迭代，使用比较简单。
 
-        ```
+        ```cpp
         mm.IterateAll(gmC);
         ```
 
-5.  **结束矩阵乘操作。**
+5. **结束矩阵乘操作。**
 
-    ```
+    ```cpp
     mm.End();
     ```
 
@@ -124,10 +127,10 @@ kernel侧使用Matmul API矩阵乘运算的具体步骤如下：
 
 在实现Host Tiling时可以设置Shape信息，用于Tiling计算；kernel侧运行时也可以修改部分Shape信息，用于尾块设置、Matmul复用（多个Matmul计算复用一个Matmul对象）等场景。本节对涉及到的Shape概念进行介绍，并给出host侧和kernel侧设置Tiling信息的指导。
 
--   orgShape：M、N、K
--   singleCoreShape：singleCoreM、singleCoreN、singleCoreK
--   singleShape：singleM、singleN、singleK
--   baseShape：baseM、baseN、baseK
+- orgShape：M、N、K
+- singleCoreShape：singleCoreM、singleCoreN、singleCoreK
+- singleShape：singleM、singleN、singleK
+- baseShape：baseM、baseN、baseK
 
 通过[数据分块（Tiling）](basics.md#zh-cn_topic_0000001622194138_section68451031218)的介绍我们已经了解了orgShape\(M、N、K\)，singleCoreShape\(singleCoreM、singleCoreN、singleCoreK\)，baseShape\(baseM、baseN、baseK\)的概念，如下图所示：
 
@@ -137,28 +140,28 @@ kernel侧使用Matmul API矩阵乘运算的具体步骤如下：
 
 ![](../../../figures/zh-cn_image_0000002533171617.png)
 
--   核函数（Kernel）运行时设置
-    -   [SetTail](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTail.md)、[SetSingleShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetSingleShape.md)都是运行时修改singleCoreM、singleCoreN、singleCoreK，处理尾块时使用[SetTail](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTail.md)，Matmul复用（多个Matmul计算复用一个Matmul对象）的场景可以使用SetSingleShape重新设置。
-    -   [SetOrgShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetOrgShape.md)是运行时修改M、N、K，Matmul复用的场景可以使用SetOrgShape重新设置。
+- 核函数（Kernel）运行时设置
+    - [SetTail](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTail.md)、[SetSingleShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetSingleShape.md)都是运行时修改singleCoreM、singleCoreN、singleCoreK，处理尾块时使用[SetTail](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetTail.md)，Matmul复用（多个Matmul计算复用一个Matmul对象）的场景可以使用SetSingleShape重新设置。
+    - [SetOrgShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetOrgShape.md)是运行时修改M、N、K，Matmul复用的场景可以使用SetOrgShape重新设置。
 
--   单核Tiling时设置
-    -   [SetOrgShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetOrgShape.md)（必选）：设置M、N、K
-    -   [SetShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetShape.md)（非必选）：设置singleM、singleN、singleK，等同于设置singleCoreM、singleCoreN、singleCoreK
-    -   [SetFixSplit](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetFixSplit.md)（非必选）：设置baseM、baseN、baseK
+- 单核Tiling时设置
+    - [SetOrgShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetOrgShape.md)（必选）：设置M、N、K
+    - [SetShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetShape.md)（非必选）：设置singleM、singleN、singleK，等同于设置singleCoreM、singleCoreN、singleCoreK
+    - [SetFixSplit](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetFixSplit.md)（非必选）：设置baseM、baseN、baseK
 
--   多核Tiling时设置
-    -   [SetOrgShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetOrgShape.md)（必选）：设置M、N、K
-    -   [SetShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetShape.md)（非必选）：设置singleM、singleN、singleK
-    -   [SetFixSplit](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetFixSplit.md)（非必选）：设置baseM、baseN、baseK
+- 多核Tiling时设置
+    - [SetOrgShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetOrgShape.md)（必选）：设置M、N、K
+    - [SetShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetShape.md)（非必选）：设置singleM、singleN、singleK
+    - [SetFixSplit](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetFixSplit.md)（非必选）：设置baseM、baseN、baseK
 
-    -   [SetSingleShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetSingleShape.md)\(非必选\)：设置singleCoreM、singleCoreN、singleCoreK
-    -   [SetSingleRange](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetSingleRange.md)\(非必选\)：设置singleCoreM、singleCoreN、singleCoreK的范围
+    - [SetSingleShape](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetSingleShape.md)\(非必选\)：设置singleCoreM、singleCoreN、singleCoreK
+    - [SetSingleRange](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetSingleRange.md)\(非必选\)：设置singleCoreM、singleCoreN、singleCoreK的范围
 
 ## 设置format格式<a name="zh-cn_topic_0000001622514006_section1558462120502"></a>
 
 创建Matmul对象时需要传入A、B、C的参数类型信息，类型信息通过MatmulType来定义，包括：内存逻辑位置、数据格式、数据类型。示例如下：
 
-```
+```cpp
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType; 
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType; 
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType; 

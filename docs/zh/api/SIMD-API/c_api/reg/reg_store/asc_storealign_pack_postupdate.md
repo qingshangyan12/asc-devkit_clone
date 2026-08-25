@@ -31,6 +31,7 @@
 ## 函数原型
 
 - 从矢量数据寄存器连续对齐搬出到UB的场景
+
   ```cpp
   __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ int16_t*& dst_align32b, vector_int16_t src, int32_t offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint16_t*& dst_align32b, vector_uint16_t src, int32_t offset, vector_bool mask)
@@ -42,7 +43,9 @@
   __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ bfloat16_t*& dst_align32b, vector_bfloat16_t src, int32_t offset, vector_bool mask)
   ```
+
 - 从掩码寄存器连续对齐搬出到UB的场景
+
   ```cpp
   __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint32_t*& dst, vector_bool src, int32_t offset)
   __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint16_t*& dst, vector_bool src, int32_t offset)

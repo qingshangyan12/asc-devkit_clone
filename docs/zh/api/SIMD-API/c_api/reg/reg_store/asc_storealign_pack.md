@@ -31,6 +31,7 @@
 ## 函数原型
 
 - 偏移固定传入0，由用户自行更新目的操作数的地址
+
   ```cpp
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ int16_t* dst_align32b, vector_int16_t src, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t* dst_align32b, vector_uint16_t src, vector_bool mask)
@@ -42,7 +43,9 @@
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ float* dst_align32b, vector_float src, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src, vector_bool mask)
   ```
+
 - 通过int32_t传入偏移，用户可以选择更新偏移或者更新目的操作数的地址
+
   ```cpp
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ int16_t* dst_align32b, vector_int16_t src, int32_t offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t* dst_align32b, vector_uint16_t src, int32_t offset, vector_bool mask)
@@ -54,7 +57,9 @@
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ float* dst_align32b, vector_float src, int32_t offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ bfloat16_t* dst_align32b, vector_bfloat16_t src, int32_t offset, vector_bool mask)
   ```
+
 - 通过addr_reg地址寄存器传入偏移
+
   ```cpp
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ int16_t* dst_align32b, vector_int16_t src, addr_reg offset, vector_bool mask)
   __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t* dst_align32b, vector_uint16_t src, addr_reg offset, vector_bool mask)

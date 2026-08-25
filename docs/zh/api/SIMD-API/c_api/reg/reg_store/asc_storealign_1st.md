@@ -31,6 +31,7 @@
 ## 函数原型
 
 - 偏移固定传入0，由用户自行更新目的操作数的地址
+
   ```cpp
   __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b, vector_int8_t src)
   __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint8_t* dst_align32b, vector_uint8_t src)
@@ -49,7 +50,9 @@
   __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src)
   __simd_callee__ inline void asc_storealign_1st(__ubuf__ int4b_t* dst_align32b, vector_int4x2_t src)
   ```
+
 - 通过int32_t传入偏移，用户可以选择更新偏移或者更新目的操作数的地址
+
   ```cpp
   __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b, vector_int8_t src, int32_t offset)
   __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint8_t* dst_align32b, vector_uint8_t src, int32_t offset)
@@ -68,7 +71,9 @@
   __simd_callee__ inline void asc_storealign_1st(__ubuf__ fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src, int32_t offset)
   __simd_callee__ inline void asc_storealign_1st(__ubuf__ int4b_t* dst_align32b, vector_int4x2_t src, int32_t offset)
   ```
+
 - 通过addr_reg地址寄存器传入偏移
+
   ```cpp
   __simd_callee__ inline void asc_storealign_1st(__ubuf__ int8_t* dst_align32b, vector_int8_t src, addr_reg offset)
   __simd_callee__ inline void asc_storealign_1st(__ubuf__ uint8_t* dst_align32b, vector_uint8_t src, addr_reg offset)

@@ -37,6 +37,7 @@ __aicore__ inline void asc_set_atomic_none()
 ## 参数说明
 
 无
+
 ## 返回值说明
 
 无
@@ -64,7 +65,7 @@ asc_set_atomic_none();
 
 结果示例：
 
-```
+```text
 输入数据src0：[1, 1, 1, ..., 1]  // int16_t类型
 输入数据src1：[2, 2, 2, ..., 2]  // int16_t类型
 输出数据dst：[3, 3, 3, ..., 3]   // int16_t类型

@@ -31,6 +31,7 @@
 ## 函数原型
 
 - 偏移固定传入0，由用户自行更新源操作数的地址
+
   ```cpp
   __simd_callee__ inline void asc_loadalign_unpack(vector_int8_t& dst, __ubuf__ int8_t* src)
   __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ uint8_t* src)
@@ -49,7 +50,9 @@
   __simd_callee__ inline void asc_loadalign_unpack(vector_float& dst, __ubuf__ float* src)
   __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
   ```
+
 - 通过int32_t传入偏移
+
   ```cpp
   __simd_callee__ inline void asc_loadalign_unpack(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
   __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
@@ -68,7 +71,9 @@
   __simd_callee__ inline void asc_loadalign_unpack(vector_float& dst, __ubuf__ float* src, int32_t offset)
   __simd_callee__ inline void asc_loadalign_unpack(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
   ```
+
 - 通过addr_reg地址寄存器传入偏移
+
   ```cpp
   __simd_callee__ inline void asc_loadalign_unpack(vector_int8_t& dst, __ubuf__ int8_t* src, addr_reg offset)
   __simd_callee__ inline void asc_loadalign_unpack(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset)

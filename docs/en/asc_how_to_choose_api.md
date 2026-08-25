@@ -9,6 +9,7 @@ Welcome to use [Ascend C](https://www.hiascend.com/cann/ascend-c) for Ascend AI 
 The design goals of Ascend C can be summarized as **"high performance, completeness, ease of programming, debuggability, and compatibility"**. Through minimal extensions to C/C++ language standards, it supports both pointer-based C language development habits and Tensor-based C++ programming paradigms. Ascend C achieves seamless integration with existing ecosystems while supporting efficient Ascend operator development, ensuring consistent development experience.
 
 We adhere to the following core principles:
+
 - **No silver bullet**: Different scenarios have varying requirements for performance and development efficiency. A single interface cannot achieve optimal adaptation in all scenarios.
 - **Progressive learning**: Beginners can start with easy-to-use interfaces for rapid algorithm verification. Experts can drill down for fine-tuning and leverage complex interfaces to fully unleash hardware potential.
 
@@ -69,6 +70,7 @@ You can also refer to the following key dimensions for quick decision-making:
 ### Language Extension Layer C API (SIMD & SIMT)
 
 **Features**
+
 - Matches traditional C language operator development habits in the industry. Supports array memory allocation, pointer computation interfaces, and uses `asc_xxx` prefix snake_case naming style.
 - SIMT API programming model follows industry-common development practices, reducing learning curve.
 - SIMD API provides easy-to-use continuous computation interfaces. It supports most operator development needs, for example, `asc_add(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)`.
@@ -76,12 +78,14 @@ You can also refer to the following key dimensions for quick decision-making:
 - For extreme performance scenarios, SIMD API provides advanced computation interfaces with `repeat` / `stride` parameters. These support flexible control of data layout and computation mode.
 
 **Applicable Scenarios**
+
 - Operator developers familiar with traditional C language development habits.
 - Developers with SIMT programming experience who want to quickly migrate to NPU environments.
 - Production environment operator development that requires extracting extreme hardware performance.
 - Developers who want to quickly verify algorithms using computation interfaces with `sync` suffix.
 
 **Examples**
+
 - [SIMD Add Operator Example (with Synchronous Computation Interface)](../../examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add/c_api_add.asc)
 - [SIMT Gather Operator Example (Matching Industry Habits)](../../examples/03_simt_api/00_introduction/01_gather/basic_gather/gather_1d/gather_1d.asc)
 - For more examples, refer to [examples directory](../../examples)
@@ -91,16 +95,19 @@ You can also refer to the following key dimensions for quick decision-making:
 ### Basic API: Tensor-based Single Instruction Abstraction
 
 **Features**
+
 - Abstracts NPU instructions based on Tensor and data types, provides Tensor programming model.
 - Provides memory allocation and synchronization interfaces independent of `Tque` / `Tpipe`. Developers can manage resources based on Tensor independently.
 - Extends Tensor to support `Layout` concept. Simplifies computation interfaces through unified data layout representation, maintaining consistency with industry Tensor programming experience.
 - Framework Programming API: Introduces `Tque` / `Tpipe` framework, borrowing C++ `Queue` design concept to simplify NPU synchronization and memory management.
 
 **Applicable Scenarios**
+
 - Operator developers familiar with industry C++ Tensor development habits.
 - Scenarios that require developing extreme performance operators in production environments while maintaining code maintainability and extensibility.
 
 **Examples**
+
 - [SIMD Add Operator Example with Tque / Tpipe Automatic Memory and Synchronization Management](../../examples/01_simd_cpp_api/00_introduction/01_add/add_tpipe_tque/add_tpipe_tque.asc)
 - [SIMD Add Operator Example with LocalMemoryAllocator Independent Memory and Synchronization Management](../../examples/01_simd_cpp_api/00_introduction/01_add/add/add.asc)
 - Tensor API Example Based on Layout (to be added)
@@ -110,14 +117,17 @@ You can also refer to the following key dimensions for quick decision-making:
 ### High-level API: Single-core Common Algorithm Implementation
 
 **Features**
+
 - Encapsulates common single-core algorithm implementations, provides good generalization performance.
 - Can also achieve near-extreme performance in typical network scenarios.
 
 **Applicable Scenarios**
+
 - Quickly verify algorithm feasibility without extreme performance requirements for specific scenarios.
 - Scenarios that want to reuse mature algorithm implementations and shorten development cycles.
 
 **Examples**
+
 - [Softmax API Example](../../examples/01_simd_cpp_api/04_advanced_api/01_activation/softmax/softmax.asc)
 - [Matmul API Example](../../examples/01_simd_cpp_api/04_advanced_api/00_matmul)
 
@@ -126,13 +136,16 @@ You can also refer to the following key dimensions for quick decision-making:
 ### Operator Template Library: Operator Implementation Samples
 
 **Features**
+
 - Provides end-to-end complete implementations of typical operators in specific scenarios as best practice references.
 - Typically optimized for specific scenarios. Generalization performance is not the primary goal.
 
 **Applicable Scenarios**
+
 - Need to customize and extend typical operators to quickly adapt to specific business scenarios.
 
 **Examples**
+
 - Vector operator template library: [ATVC](https://gitcode.com/cann/atvc), [ATVOSS](https://gitcode.com/cann/atvoss)
 - Cube operator template library: [CATLASS](https://gitcode.com/cann/catlass)
 

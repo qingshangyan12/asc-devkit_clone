@@ -17,15 +17,20 @@
 </div>
 
 ## 🔥Latest News
+
 [2026/05] Key features of v9.1.0-beta.2
+
 ### 🚀 Key Features
+
 - The Ascend C framework basic API supports NPU Check ([PR#1557](https://gitcode.com/cann/asc-devkit/pull/1557) [PR#1467](https://gitcode.com/cann/asc-devkit/pull/1467)), enhancing operator runtime verification capability.
 - SIMD VF supports printf and reg dump printing ([PR#1605](https://gitcode.com/cann/asc-devkit/pull/1605)), providing debug printing and register data dump capability.
 - A5 supports DumpTensor for L1 Tensor data ([PR#2175](https://gitcode.com/cann/asc-devkit/pull/2175)), extending L1 layer data debugging support.
-- The compilation project CMakeModule supports CMAKE<LANG> compilation options ([PR#2055](https://gitcode.com/cann/asc-devkit/pull/2055)); adds the optype_collector tool, supporting optype duplicate name checking ([PR#285](https://gitcode.com/cann/asc-tools/pull/285)).
+- The compilation project CMakeModule supports CMAKE&lt;LANG&gt; compilation options ([PR#2055](https://gitcode.com/cann/asc-devkit/pull/2055)); adds the optype_collector tool, supporting optype duplicate name checking ([PR#285](https://gitcode.com/cann/asc-tools/pull/285)).
 - The basic API supports functional behavior in ctrl (saturation overflow management) ([PR#2077](https://gitcode.com/cann/asc-devkit/pull/2077)).
 - SIMT programming adds ld/st interfaces ([PR#2058](https://gitcode.com/cann/asc-devkit/pull/2058)) and AddrSpace class interfaces ([PR#1597](https://gitcode.com/cann/asc-devkit/pull/1597)), enriching SIMT memory access programming capability.
+
 ### 🎯 Sample Updates
+
 - Best practice sample development: matmul+gelu fusion, datacopy optimization, bank conflict optimization, group_matmul quantized group matrix multiplication, and simt&simd high-performance programming ([PR#1814](https://gitcode.com/cann/asc-devkit/pull/1814) [PR#2137](https://gitcode.com/cann/asc-devkit/pull/2137) [PR#2141](https://gitcode.com/cann/asc-devkit/pull/2141) [PR#2166](https://gitcode.com/cann/asc-devkit/pull/2166) [PR#2363](https://gitcode.com/cann/asc-devkit/pull/2363)).
 - Ascend 950 new feature supplements and compatibility sample rectification: loopmode data movement, interleave vector computation, datacopy_gm2l1, loadmx (Load2DMX), mmad_mx, data_copy_pad, and so on ([PR#2336](https://gitcode.com/cann/asc-devkit/pull/2336) [PR#1899](https://gitcode.com/cann/asc-devkit/pull/1899) [PR#2124](https://gitcode.com/cann/asc-devkit/pull/2124)).
 - RegBase adds basic samples: basic arithmetic, data type conversion, reduction, comparison, indexing, and other samples ([PR#1459](https://gitcode.com/cann/asc-devkit/pull/1459) [PR#1575](https://gitcode.com/cann/asc-devkit/pull/1575) [PR#2024](https://gitcode.com/cann/asc-devkit/pull/2024)).
@@ -34,7 +39,9 @@
 - SIMT adds functional feature samples: PyTorch custom operator registration ([PR#2769](https://gitcode.com/cann/asc-devkit/pull/2769)), compilation-related samples (dynamic, static, separate compilation, and so on) ([PR#2356](https://gitcode.com/cann/asc-devkit/pull/2356)), profiling samples ([PR#1989](https://gitcode.com/cann/asc-devkit/pull/1989)), memory barrier feature samples ([PR#1923](https://gitcode.com/cann/asc-devkit/pull/1923)), Warp class feature samples ([PR#2876](https://gitcode.com/cann/asc-devkit/pull/2876)), simulator samples ([PR#2692](https://gitcode.com/cann/asc-devkit/pull/2692)), and kernel log samples ([PR#2131](https://gitcode.com/cann/asc-devkit/pull/2131)).
 - The SIMT getting-started sample is modified to gather ([PR#2405](https://gitcode.com/cann/asc-devkit/pull/2405)).
 - Adds Tensor API getting-started and best practice samples: Matmul getting started, data movement in/out, data movement out with on-path quantization, and MX FP4 best practices ([PR#2553](https://gitcode.com/cann/asc-devkit/pull/2553)).
+
 ### 📖 Documentation
+
 - Adds matrix computation overview and computation fractal introduction documentation ([PR#2533](https://gitcode.com/cann/asc-devkit/pull/2533)).
 - Optimizes vector computation API documentation, supplementing instruction constraints, and so on ([PR#2676](https://gitcode.com/cann/asc-devkit/pull/2676)).
 - Sets up a VitePress documentation site, providing AscendC documentation preview functionality ([PR#2547](https://gitcode.com/cann/asc-devkit/pull/2547)).
@@ -51,10 +58,12 @@ For detailed information about all historical versions and updates, see [CHANGEL
 The design goals of Ascend C can be summarized as **"high performance, completeness, ease of programming, debuggability, and compatibility"**. Through minimal extension to C/C++ language standards, it supports both pointer-based C language development habits and Tensor-based C++ programming paradigms, achieving seamless integration with existing ecosystems while supporting efficient Ascend operator development and ensuring consistency in development experience.
 
 We uphold the following core philosophies:
+
 - **No silver bullet**: Different scenarios have different requirements for performance and development efficiency. A single interface cannot optimally adapt to all scenarios.
 - **Progressive learning**: Beginners can start with ease-of-use interfaces to quickly verify algorithms, while experts can drill down and fine-tune, leveraging complex interface features to fully exploit hardware potential.
 
 ### API Levels
+
 Ascend C provides three types of interfaces, all capable of achieving complete low-level programming capabilities:
 
 | API Level | Language | Features | Target Users | Primary Use |
@@ -63,14 +72,12 @@ Ascend C provides three types of interfaces, all capable of achieving complete l
 | **Basic API** | **C++** |Based on **Tensor** programming, providing **C++ basic complete programming capabilities**<br>Allocate Tensor through MakeTensor/LocalMemoryAllocator, manage synchronization independently| Operator library developers|Manage synchronization and memory independently<br>Match C++ Tensor development habits, support achieving ultimate performance|
 | **Language Extension Layer<br>SIMD&SIMT API** |**C**|Based on **pointer** programming, providing **C basic complete programming capabilities**<br>Allocate memory through array[], manage synchronization independently|Operator library developers |Manage synchronization and memory independently<br>Match C language development habits, support achieving ultimate performance|
 
-
 Additionally, Ascend C provides high-level APIs and operator template libraries to improve operator development efficiency.
 
 | API Level |  Target Users | Primary Use |
 |----------|----------|----------|
 | **Operator Template Library (CATLASS/ATVOSS and others)** |  Algorithm developers | Perform custom extensions based on typical operator implementations to meet high-performance requirements in specific scenarios |
 | **High-level API** |Algorithm developers | Reuse general single-core algorithms to quickly complete algorithm verification |
-
 
 The overall logical architecture diagram is shown below:
 
@@ -83,15 +90,16 @@ The overall logical architecture diagram is shown below:
 - **Python Frontend PyAsc**: PyAsc provides complete low-level chip programming capabilities based on Python frontend, and will gradually improve Tensor programming capabilities based on Layout, adding SIMT programming and other capabilities to achieve high-performance operator development based on Python interfaces.
 
 ### How to Choose Multi-level APIs for Operator Development
+
 - **Based on C/C++ language development**: For details, see [Ascend C Multi-level API Selection Guide](./docs/en/asc_how_to_choose_api.md)
 - **Based on Python language development, supporting complete programming capabilities to achieve ultimate performance**: Recommend Ascend C Python frontend [PyAsc](https://gitcode.com/cann/pyasc)
 - **Based on Python language development, quick development verification, ease of use priority**: Recommend [PyPTO](https://gitcode.com/cann/pypto)
 
-
 ## 🔍 Directory Structure
+
 This repository mainly contains Ascend C programming APIs and necessary cmake build scripts, which are the core modules required for operator development. The directory structure is as follows:
 
-```
+```text
 ├── cmake                               # Ascend C build source code
 ├── docs                                # Project documentation
 ├── examples                            # Ascend C API sample projects
@@ -197,6 +205,7 @@ If you want to quickly experience project build and operator sample execution, a
 ## 📖 Related Resources
 
 - **Programming Guide**
+
   | Document  |  Description   |
   |---------|--------|
   |[Ascend C Programming Guide](https://hiascend.com/document/redirect/CannCommunityOpdevAscendC)|Write operator programs using Ascend C based on Ascend AI hardware and develop custom operators.|
@@ -206,12 +215,14 @@ If you want to quickly experience project build and operator sample execution, a
   |[Ascend C Programming Guide (Harmony)](https://gitcode.com/cann/cann-recipes-harmony-infer/blob/master/docs/ascendc_develop_guide.md)|Write operator programs using Ascend C based on Kylin AI hardware and develop custom operators.|
 
 - **Contribution Guide**
+
   | Document  |  Description   |
   |---------|--------|
   |[CANN Community Contribution Guide](https://gitcode.com/cann/community)| CANN community Issue, PR, and other general processing procedures|
   |[ASC-DevKit Contribution Guide](./CONTRIBUTING_en.md) | Ascend C API, documentation, and sample contribution guide|
 
 - **Others**
+
   | Document  |  Description   |
   |---------|--------|
   |[Ascend C Meetup Materials](https://gitcode.com/cann/community/tree/master/events/meetup/slides/sig-ascendc)|Ascend C external presentation PPT materials, including 950 new features and others|
