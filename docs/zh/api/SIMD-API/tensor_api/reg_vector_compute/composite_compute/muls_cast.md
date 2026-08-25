@@ -12,6 +12,8 @@
 
 ## 功能说明
 
+头文件路径：`"tensor_api/tensor.h"`。
+
 命名空间：`asc::te::experimental`。
 
 将`float`输入与标量逐元素相乘，并将结果转换为`half`。转换结果写入返回寄存器的偶数`half`位置。

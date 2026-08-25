@@ -12,6 +12,8 @@
 
 ## 功能说明
 
+头文件路径：`"tensor_api/tensor.h"`。
+
 命名空间：`asc::te::experimental`。
 
 逐元素计算两个输入之差的自然指数：
