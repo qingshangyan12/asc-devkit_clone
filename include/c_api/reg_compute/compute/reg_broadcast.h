@@ -50,27 +50,27 @@ __simd_callee__ inline void asc_duplicate_scalar(vector_int32_t& dst, int32_t va
 __simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float value, vector_bool mask);
 
 __simd_callee__ inline vector_uint8_t asc_duplicate_scalar(uint8_t value, vector_bool mask);
- 
+
 __simd_callee__ inline vector_int8_t asc_duplicate_scalar(int8_t value, vector_bool mask);
- 
+
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_duplicate_scalar(fp8_e4m3fn_t value, vector_bool mask);
- 
+
 __simd_callee__ inline vector_fp8_e5m2_t asc_duplicate_scalar(fp8_e5m2_t value, vector_bool mask);
- 
+
 __simd_callee__ inline vector_fp8_e8m0_t asc_duplicate_scalar(fp8_e8m0_t value, vector_bool mask);
- 
+
 __simd_callee__ inline vector_uint16_t asc_duplicate_scalar(uint16_t value, vector_bool mask);
- 
+
 __simd_callee__ inline vector_int16_t asc_duplicate_scalar(int16_t value, vector_bool mask);
- 
+
 __simd_callee__ inline vector_half asc_duplicate_scalar(half value, vector_bool mask);
- 
+
 __simd_callee__ inline vector_bfloat16_t asc_duplicate_scalar(bfloat16_t value, vector_bool mask);
- 
+
 __simd_callee__ inline vector_uint32_t asc_duplicate_scalar(uint32_t value, vector_bool mask);
- 
+
 __simd_callee__ inline vector_int32_t asc_duplicate_scalar(int32_t value, vector_bool mask);
- 
+
 __simd_callee__ inline vector_float asc_duplicate_scalar(float value, vector_bool mask);
 
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint8_t& dst, uint8_t value, vector_bool mask);

@@ -56,20 +56,20 @@ TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, ui
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, int32_t);
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_INSTR(Vdups, asc_duplicate_scalar, vdup, float);
 
-#define TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_RETURN_INSTR(c_api_name, cce_name, data_type)              \
-    TEST(TestVectorComputeVdupsReturn, data_type)                                                       \
-    {                                                                                                  \
-        data_type value;                                                                               \
-        vector_bool mask;                                                                              \
-                                                                                                       \
-        static_assert(std::is_same_v<decltype(c_api_name(value, mask)), vector_##data_type>);          \
-        MOCKER_CPP(cce_name, void(vector_##data_type&, data_type, vector_bool, Literal))               \
-            .times(1)                                                                                  \
-            .will(invoke(cce_name##_##data_type##_Stub));                                              \
-                                                                                                       \
-        vector_##data_type dst = c_api_name(value, mask);                                              \
-        (void)dst;                                                                                     \
-        GlobalMockObject::verify();                                                                    \
+#define TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_RETURN_INSTR(c_api_name, cce_name, data_type)    \
+    TEST(TestVectorComputeVdupsReturn, data_type)                                             \
+    {                                                                                         \
+        data_type value;                                                                      \
+        vector_bool mask;                                                                     \
+                                                                                              \
+        static_assert(std::is_same_v<decltype(c_api_name(value, mask)), vector_##data_type>); \
+        MOCKER_CPP(cce_name, void(vector_##data_type&, data_type, vector_bool, Literal))      \
+            .times(1)                                                                         \
+            .will(invoke(cce_name##_##data_type##_Stub));                                     \
+                                                                                              \
+        vector_##data_type dst = c_api_name(value, mask);                                     \
+        (void)dst;                                                                            \
+        GlobalMockObject::verify();                                                           \
     }
 
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_RETURN_INSTR(asc_duplicate_scalar, vdup, uint8_t);
@@ -169,7 +169,7 @@ TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, f
 TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_INSTR(Vbr, asc_duplicate_scalar, vbr, fp8_e8m0_t);
 
 #define TEST_VECTOR_COMPUTE_DUPLICATE_SCALAR_VBR_RETURN_INSTR(c_api_name, cce_name, data_type) \
-    TEST(TestVectorComputeVbrReturn, data_type)                                                 \
+    TEST(TestVectorComputeVbrReturn, data_type)                                                \
     {                                                                                          \
         data_type value;                                                                       \
                                                                                                \

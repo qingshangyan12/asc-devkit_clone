@@ -1585,45 +1585,21 @@ __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e8m0_t& dst, fp8_e8m
     asc_duplicate_scalar_impl(dst, value);
 }
 
-__simd_callee__ inline vector_uint8_t asc_duplicate_scalar(uint8_t value)
-{
-    return asc_duplicate_scalar_impl(value);
-}
+__simd_callee__ inline vector_uint8_t asc_duplicate_scalar(uint8_t value) { return asc_duplicate_scalar_impl(value); }
 
-__simd_callee__ inline vector_int8_t asc_duplicate_scalar(int8_t value)
-{
-    return asc_duplicate_scalar_impl(value);
-}
+__simd_callee__ inline vector_int8_t asc_duplicate_scalar(int8_t value) { return asc_duplicate_scalar_impl(value); }
 
-__simd_callee__ inline vector_uint16_t asc_duplicate_scalar(uint16_t value)
-{
-    return asc_duplicate_scalar_impl(value);
-}
+__simd_callee__ inline vector_uint16_t asc_duplicate_scalar(uint16_t value) { return asc_duplicate_scalar_impl(value); }
 
-__simd_callee__ inline vector_int16_t asc_duplicate_scalar(int16_t value)
-{
-    return asc_duplicate_scalar_impl(value);
-}
+__simd_callee__ inline vector_int16_t asc_duplicate_scalar(int16_t value) { return asc_duplicate_scalar_impl(value); }
 
-__simd_callee__ inline vector_uint32_t asc_duplicate_scalar(uint32_t value)
-{
-    return asc_duplicate_scalar_impl(value);
-}
+__simd_callee__ inline vector_uint32_t asc_duplicate_scalar(uint32_t value) { return asc_duplicate_scalar_impl(value); }
 
-__simd_callee__ inline vector_int32_t asc_duplicate_scalar(int32_t value)
-{
-    return asc_duplicate_scalar_impl(value);
-}
+__simd_callee__ inline vector_int32_t asc_duplicate_scalar(int32_t value) { return asc_duplicate_scalar_impl(value); }
 
-__simd_callee__ inline vector_half asc_duplicate_scalar(half value)
-{
-    return asc_duplicate_scalar_impl(value);
-}
+__simd_callee__ inline vector_half asc_duplicate_scalar(half value) { return asc_duplicate_scalar_impl(value); }
 
-__simd_callee__ inline vector_float asc_duplicate_scalar(float value)
-{
-    return asc_duplicate_scalar_impl(value);
-}
+__simd_callee__ inline vector_float asc_duplicate_scalar(float value) { return asc_duplicate_scalar_impl(value); }
 
 __simd_callee__ inline vector_bfloat16_t asc_duplicate_scalar(bfloat16_t value)
 {
