@@ -10,22 +10,22 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/vector/experimental/composite_compute_impl.h is internal and must not be used directly."
+    "impl/tensor_api/experimental/arch/vector/composite_compute_impl.h is internal and must not be used directly."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_COMPUTE_IMPL
 #endif
 
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_IMPL_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_IMPL_H
+#ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPOSITE_COMPUTE_IMPL_H
+#define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPOSITE_COMPUTE_IMPL_H
 
-#include "impl/tensor_api/arch/utils/reg_compute_traits.h"
+#include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
 
 namespace asc {
 namespace te {
 namespace experimental {
 
 template <typename T, typename scalar_type>
-__simd_callee__ inline decltype(auto) axpy(
+__simd_callee__ inline reg_tensor<T> axpy(
     const reg_tensor<T>& dst, const reg_tensor<T>& src, const scalar_type& scalar)
 {
     static_assert(detail::supports_axpy_v<T>, "axpy supports half and float");
@@ -37,7 +37,7 @@ __simd_callee__ inline decltype(auto) axpy(
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) absdiff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<T> absdiff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_absdiff_v<T>, "absdiff supports half and float");
     reg_tensor<T> dst;
@@ -47,7 +47,7 @@ __simd_callee__ inline decltype(auto) absdiff(const reg_tensor<T>& src0, const r
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) exp_sub(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<float> exp_sub(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_exp_sub_v<T>, "exp_sub supports half and float");
     reg_tensor<float> dst;
@@ -63,7 +63,7 @@ __simd_callee__ inline decltype(auto) exp_sub(const reg_tensor<T>& src0, const r
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) fma(
+__simd_callee__ inline reg_tensor<T> fma(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2)
 {
     static_assert(detail::supports_fma_v<T>, "fma supports half and float");
@@ -73,7 +73,7 @@ __simd_callee__ inline decltype(auto) fma(
     return dst;
 }
 
-__simd_callee__ inline decltype(auto) muls_cast(const reg_tensor<float>& src, const float& scalar)
+__simd_callee__ inline reg_tensor<half> muls_cast(const reg_tensor<float>& src, const float& scalar)
 {
     reg_tensor<float> product;
     asc_mul_scalar(product.reg, src.reg, scalar, src.mask);
@@ -87,7 +87,7 @@ __simd_callee__ inline decltype(auto) muls_cast(const reg_tensor<float>& src, co
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_IMPL_H
+#endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPOSITE_COMPUTE_IMPL_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_COMPUTE_IMPL)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

@@ -16,7 +16,7 @@
 #ifndef INCLUDE_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 #define INCLUDE_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/experimental/arch/vector/reg_tensor.h"
 #include "tensor_api/tensor/tensor.h"
 #include "tensor_api/utils/utils.h"
 
@@ -33,22 +33,26 @@ struct local_tensor : public base_tensor<EngineT, LayoutT> {
     __aicore__ inline local_tensor();
     __aicore__ inline local_tensor(const EngineT& engine, const LayoutT& layout);
 
-    template <load_sideband_mode sideband_mode = load_sideband_mode::direct, typename Coord>
+    template <experimental::load_sideband_mode sideband_mode = experimental::load_sideband_mode::direct,
+              typename Coord>
     __simd_callee__ inline decltype(auto) load(const Coord& coord) const;
 
-    template <load_sideband_mode sideband_mode = load_sideband_mode::deintlv, typename Coord, typename RegDataType>
-    __simd_callee__ inline void load(const Coord& coord, reg_tensor<RegDataType>& dst0,
-                                     reg_tensor<RegDataType>& dst1) const;
+    template <experimental::load_sideband_mode sideband_mode = experimental::load_sideband_mode::deintlv,
+              typename Coord, typename RegDataType>
+    __simd_callee__ inline void load(const Coord& coord, experimental::reg_tensor<RegDataType>& dst0,
+                                     experimental::reg_tensor<RegDataType>& dst1) const;
 
-    template <broadcast_mode brc_mode = broadcast_mode::elem, typename Coord>
+    template <experimental::broadcast_mode brc_mode = experimental::broadcast_mode::elem, typename Coord>
     __simd_callee__ inline decltype(auto) load_broadcast(const Coord& coord) const;
 
-    template <store_sideband_mode sideband_mode = store_sideband_mode::direct, typename Coord, typename RegDataType>
-    __simd_callee__ inline void store(const Coord& coord, const reg_tensor<RegDataType>& src);
+    template <experimental::store_sideband_mode sideband_mode = experimental::store_sideband_mode::direct,
+              typename Coord, typename RegDataType>
+    __simd_callee__ inline void store(const Coord& coord, const experimental::reg_tensor<RegDataType>& src);
 
-    template <store_sideband_mode sideband_mode = store_sideband_mode::intlv, typename Coord, typename RegDataType>
-    __simd_callee__ inline void store(const Coord& coord, const reg_tensor<RegDataType>& src0,
-                                      const reg_tensor<RegDataType>& src1);
+    template <experimental::store_sideband_mode sideband_mode = experimental::store_sideband_mode::intlv,
+              typename Coord, typename RegDataType>
+    __simd_callee__ inline void store(const Coord& coord, const experimental::reg_tensor<RegDataType>& src0,
+                                      const experimental::reg_tensor<RegDataType>& src1);
 };
 
 } // namespace te

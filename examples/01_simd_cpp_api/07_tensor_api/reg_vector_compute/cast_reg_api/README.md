@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍如何使用 Tensor API `asc::te::cast` 完成逐元素数据类型转换。样例输入和输出均为 `[16, 16]` 的二维 ND Tensor，共包含256个元素。
+本样例介绍如何使用 Tensor API `asc::te::experimental::cast` 完成逐元素数据类型转换。样例输入和输出均为 `[16, 16]` 的二维 ND Tensor，共包含256个元素。
 
 样例覆盖浮点类型和浮点类型、整数类型和浮点类型之间的6种转换场景，并演示不同位宽转换时的 `unpack`、`unpack4`、`pack` 和 `pack_quarter` 访存模式。计算关系如下：
 
@@ -93,20 +93,20 @@ y[i] = cast<To, Options>(x[i])
 
     1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_frame_layout` 构造GM、UB上的二维Tensor。
     2. 使用 `asc_lock/asc_unlock` 包围MTE2流水，通过 `asc::te::copy` 将输入从GM搬运到UB。
-    3. 根据源类型和目标类型的较大位宽计算单次寄存器处理元素数，使用 `asc::te::update_mask` 设置有效元素掩码。
+    3. 根据源类型和目标类型的较大位宽计算单次寄存器处理元素数，使用 `asc::te::experimental::update_mask` 设置有效元素掩码。
     4. 相同位宽使用普通 `load`；扩宽转换使用 `unpack` 或 `unpack4` 模式加载；窄化转换使用 `pack` 或 `pack_quarter` 模式存储。
-    5. 调用C++17模板参数形式的 `asc::te::cast` 完成寄存器类型转换。
+    5. 调用C++17模板参数形式的 `asc::te::experimental::cast` 完成寄存器类型转换。
     6. 使用同一个mutex依次锁定Vector和MTE3流水，再将结果从UB搬运回GM。
 
     核心转换代码如下：
 
     ```cpp
     auto srcReg = src.load(coord);
-    srcReg = srcReg.with_mask(asc::te::update_mask<WiderT>(remain));
+    srcReg = srcReg.with_mask(asc::te::experimental::update_mask<WiderT>(remain));
 
-    constexpr asc::te::cast_options options = {
+    constexpr asc::te::experimental::cast_options options = {
         Layout, Round, Sat};
-    auto dstReg = asc::te::cast<DstT, options>(srcReg);
+    auto dstReg = asc::te::experimental::cast<DstT, options>(srcReg);
     dst.store(coord, dstReg);
     ```
 

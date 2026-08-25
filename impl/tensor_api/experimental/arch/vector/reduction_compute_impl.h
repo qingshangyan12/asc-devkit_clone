@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/vector/experimental/reduction_compute_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future."
+    "impl/tensor_api/experimental/arch/vector/reduction_compute_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REDUCTION_COMPUTE_IMPL
 #endif
@@ -19,17 +19,18 @@
  * \file reduction_compute_impl.h
  * \brief Register reduction compute implementations.
  */
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REDUCTION_COMPUTE_IMPL_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REDUCTION_COMPUTE_IMPL_H
+#ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REDUCTION_COMPUTE_IMPL_H
+#define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REDUCTION_COMPUTE_IMPL_H
 
-#include "tensor_api/utils/utils.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/experimental/utils/reg_enum.h"
+#include "tensor_api/experimental/arch/vector/reg_tensor.h"
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <typename DstType, reduce_scope scope, typename SrcType>
-__simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<SrcType> src)
+__simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>& src)
 {
     reg_tensor<DstType> dst;
     if constexpr (scope == reduce_scope::vector) {
@@ -44,7 +45,7 @@ __simd_callee__ inline decltype(auto) reduce_sum(reg_tensor<SrcType> src)
 }
 
 template <typename DstType, reduce_scope scope, typename SrcType>
-__simd_callee__ inline decltype(auto) reduce_max(reg_tensor<SrcType> src)
+__simd_callee__ inline reg_tensor<DstType> reduce_max(const reg_tensor<SrcType>& src)
 {
     static_assert(scope == reduce_scope::vector || scope == reduce_scope::datablock,
                   "reduce_max only supports reduce_scope::vector and reduce_scope::datablock");
@@ -59,7 +60,7 @@ __simd_callee__ inline decltype(auto) reduce_max(reg_tensor<SrcType> src)
 }
 
 template <typename DstType, reduce_scope scope, typename SrcType>
-__simd_callee__ inline decltype(auto) reduce_min(reg_tensor<SrcType> src)
+__simd_callee__ inline reg_tensor<DstType> reduce_min(const reg_tensor<SrcType>& src)
 {
     static_assert(scope == reduce_scope::vector || scope == reduce_scope::datablock,
                   "reduce_min only supports reduce_scope::vector and reduce_scope::datablock");
@@ -73,10 +74,11 @@ __simd_callee__ inline decltype(auto) reduce_min(reg_tensor<SrcType> src)
     return dst;
 }
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REDUCTION_COMPUTE_IMPL_H
+#endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REDUCTION_COMPUTE_IMPL_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REDUCTION_COMPUTE_IMPL)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

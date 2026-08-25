@@ -13,14 +13,15 @@
 #define __UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_MASK_REG_COMPUTE_H__
 #endif
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_REG_COMPUTE_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_REG_COMPUTE_H
+#ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_MASK_REG_COMPUTE_H
+#define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_MASK_REG_COMPUTE_H
 
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
-#include "tensor_api/utils/utils.h"
+#include "tensor_api/experimental/arch/vector/reg_tensor.h"
+#include "tensor_api/experimental/utils/reg_enum.h"
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <mask_pattern Pattern = mask_pattern::all, typename DataType>
 __simd_callee__ inline reg_tensor<bool> make_mask();
@@ -34,19 +35,15 @@ __simd_callee__ inline reg_tensor<bool> none_mask();
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 
-template <typename DataType>
-__simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
-
-template <typename DataType>
-__simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
+} // namespace experimental
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/arch/vector/experimental/mask_reg_compute_impl.h"
+#if defined(__NPU_ARCH__)
+#include "impl/tensor_api/experimental/arch/vector/mask_reg_compute_impl.h"
 #endif
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_MASK_REG_COMPUTE_H
+#endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_MASK_REG_COMPUTE_H
 
 #if defined(__UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_MASK_REG_COMPUTE_H__)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

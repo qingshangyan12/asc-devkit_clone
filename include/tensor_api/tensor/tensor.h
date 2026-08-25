@@ -126,8 +126,8 @@ struct global_tensor : public base_tensor<EngineT, LayoutT> {
     using tensor_api_base::tensor_api_base;
 
     __aicore__ inline global_tensor();
-    __aicore__ inline constexpr cache_mode get_cache_mode() const;
-    __aicore__ inline constexpr void set_l2_cache_hint(cache_mode mode);
+    __aicore__ inline constexpr experimental::cache_mode get_cache_mode() const;
+    __aicore__ inline constexpr void set_l2_cache_hint(experimental::cache_mode mode);
     [[deprecated("SetL2CacheHint() is deprecated. Please use set_l2_cache_hint() instead.")]]
     __aicore__ inline constexpr void SetL2CacheHint(AscendC::Te::CacheMode mode);
 };

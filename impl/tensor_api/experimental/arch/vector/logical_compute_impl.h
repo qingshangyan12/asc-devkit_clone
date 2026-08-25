@@ -10,19 +10,19 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/vector/experimental/logical_compute_impl.h is internal and must not be used directly."
+    "impl/tensor_api/experimental/arch/vector/logical_compute_impl.h is internal and must not be used directly."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOGICAL_COMPUTE_IMPL
 #endif
 
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_IMPL_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_IMPL_H
+#ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_IMPL_H
+#define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_IMPL_H
 
-#include "impl/tensor_api/arch/utils/reg_compute_traits.h"
+#include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
 
 namespace asc {
 namespace te {
-
+namespace experimental {
 namespace detail {
 
 enum class bitwise_op {
@@ -70,10 +70,8 @@ __simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
 
 } // namespace detail
 
-namespace experimental {
-
 template <typename T>
-__simd_callee__ inline decltype(auto) operator!(const reg_tensor<T>& src)
+__simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
 {
     static_assert(detail::supports_not_v<T>, "operator! does not support this element type");
 
@@ -112,7 +110,7 @@ __simd_callee__ inline decltype(auto) operator^(const T& a, const U& b)
 }
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator<<(const reg_tensor<T>& src, const U& shift)
+__simd_callee__ inline reg_tensor<T> operator<<(const reg_tensor<T>& src, const U& shift)
 {
     static_assert(detail::supports_shift_v<T>, "operator<< does not support this element type");
 
@@ -132,7 +130,7 @@ __simd_callee__ inline decltype(auto) operator<<(const reg_tensor<T>& src, const
 }
 
 template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator>>(const reg_tensor<T>& src, const U& shift)
+__simd_callee__ inline reg_tensor<T> operator>>(const reg_tensor<T>& src, const U& shift)
 {
     static_assert(detail::supports_shift_v<T>, "operator>> does not support this element type");
 
@@ -155,7 +153,7 @@ __simd_callee__ inline decltype(auto) operator>>(const reg_tensor<T>& src, const
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_LOGICAL_COMPUTE_IMPL_H
+#endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_IMPL_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_LOGICAL_COMPUTE_IMPL)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

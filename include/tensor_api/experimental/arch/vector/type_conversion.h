@@ -13,32 +13,34 @@
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_TYPE_CONVERSION_H__
 #endif
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_H
+#ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_TYPE_CONVERSION_H
+#define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_TYPE_CONVERSION_H
 
-#include "tensor_api/utils/utils.h"
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/experimental/utils/reg_enum.h"
+#include "tensor_api/experimental/arch/vector/reg_tensor.h"
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 constexpr cast_options default_cast_ops = {
     cast_layout::zero, cast_round_mode::rint, cast_sat_mode::not_sat};
 
 template <typename DstType, const cast_options& opt = default_cast_ops, typename SrcType>
-__simd_callee__ inline reg_tensor<DstType> cast(reg_tensor<SrcType> src);
+__simd_callee__ inline reg_tensor<DstType> cast(const reg_tensor<SrcType>& src);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src);
+__simd_callee__ inline reg_tensor<T> trunc(const reg_tensor<T>& src);
 
+} // namespace experimental
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/arch/vector/experimental/type_conversion_impl.h"
+#if defined(__NPU_ARCH__)
+#include "impl/tensor_api/experimental/arch/vector/type_conversion_impl.h"
 #endif
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_TYPE_CONVERSION_H
+#endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_TYPE_CONVERSION_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_TYPE_CONVERSION_H__)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

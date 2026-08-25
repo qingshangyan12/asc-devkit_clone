@@ -13,24 +13,15 @@
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE
 #endif
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_HISTOGRAM_COMPUTE_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_HISTOGRAM_COMPUTE_H
+#ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_HISTOGRAM_COMPUTE_H
+#define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_HISTOGRAM_COMPUTE_H
 
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/experimental/utils/reg_enum.h"
+#include "tensor_api/experimental/arch/vector/reg_tensor.h"
 
 namespace asc {
 namespace te {
 namespace experimental {
-
-enum class histogram_half {
-    low,
-    high,
-};
-
-enum class histogram_mode {
-    frequency,
-    cumulative,
-};
 
 struct histogram_options {
     histogram_half half = histogram_half::low;
@@ -40,18 +31,18 @@ struct histogram_options {
 inline constexpr histogram_options default_histogram_options {};
 
 template <const histogram_options& options = default_histogram_options>
-__simd_callee__ inline decltype(auto) histograms(
+__simd_callee__ inline reg_tensor<uint16_t> histograms(
     const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src);
 
 } // namespace experimental
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/arch/vector/experimental/histogram_compute_impl.h"
+#if defined(__NPU_ARCH__)
+#include "impl/tensor_api/experimental/arch/vector/histogram_compute_impl.h"
 #endif
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_HISTOGRAM_COMPUTE_H
+#endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_HISTOGRAM_COMPUTE_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_HISTOGRAM_COMPUTE)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

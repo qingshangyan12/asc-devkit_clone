@@ -27,8 +27,8 @@ constexpr asc::te::experimental::histogram_options cumulative_high_options {
 
 TEST(test_tensor_api_histogram_compute, compile_public_api_and_four_modes)
 {
-    using dst_type = asc::te::reg_tensor<uint16_t>;
-    using src_type = asc::te::reg_tensor<uint8_t>;
+    using dst_type = asc::te::experimental::reg_tensor<uint16_t>;
+    using src_type = asc::te::experimental::reg_tensor<uint8_t>;
     static_assert(std::is_same_v<decltype(asc::te::experimental::histograms(
         std::declval<const dst_type&>(), std::declval<const src_type&>())), dst_type>);
     static_assert(std::is_same_v<decltype(asc::te::experimental::histograms<frequency_high_options>(

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates how to use the Tensor API `asc::te::cast` to perform element-wise data type conversion. Both the input and output are two-dimensional ND tensors with shape `[16, 16]`, containing 256 elements.
+This sample demonstrates how to use the Tensor API `asc::te::experimental::cast` to perform element-wise data type conversion. Both the input and output are two-dimensional ND tensors with shape `[16, 16]`, containing 256 elements.
 
 The sample covers six conversion scenarios between floating-point types and between integer and floating-point types. It also demonstrates the `unpack`, `unpack4`, `pack`, and `pack_quarter` memory access modes used for conversions between types of different widths. The computation is as follows:
 
@@ -93,20 +93,20 @@ y[i] = cast<To, Options>(x[i])
 
     1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct two-dimensional tensors in GM and UB.
     2. Wrap the MTE2 pipeline with `asc_lock/asc_unlock`, and use `asc::te::copy` to move the input from GM to UB.
-    3. Calculate the number of elements processed by each register operation based on the larger width of the source and destination types, and use `asc::te::update_mask` to set the valid-element mask.
+    3. Calculate the number of elements processed by each register operation based on the larger width of the source and destination types, and use `asc::te::experimental::update_mask` to set the valid-element mask.
     4. Use a normal `load` for equal-width conversions, `unpack` or `unpack4` load modes for widening conversions, and `pack` or `pack_quarter` store modes for narrowing conversions.
-    5. Call `asc::te::cast` with C++17 template parameters to perform register data type conversion.
+    5. Call `asc::te::experimental::cast` with C++17 template parameters to perform register data type conversion.
     6. Lock the Vector and MTE3 pipelines in sequence with the same mutex, and then move the result from UB to GM.
 
     The core conversion code is as follows:
 
     ```cpp
     auto srcReg = src.load(coord);
-    srcReg = srcReg.with_mask(asc::te::update_mask<WiderT>(remain));
+    srcReg = srcReg.with_mask(asc::te::experimental::update_mask<WiderT>(remain));
 
-    constexpr asc::te::cast_options options = {
+    constexpr asc::te::experimental::cast_options options = {
         Layout, Round, Sat};
-    auto dstReg = asc::te::cast<DstT, options>(srcReg);
+    auto dstReg = asc::te::experimental::cast<DstT, options>(srcReg);
     dst.store(coord, dstReg);
     ```
 

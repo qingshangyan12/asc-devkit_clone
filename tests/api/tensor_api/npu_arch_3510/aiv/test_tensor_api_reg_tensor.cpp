@@ -19,6 +19,7 @@
 namespace {
 
 using namespace asc::te;
+using namespace asc::te::experimental;
 
 template <typename T, typename = void>
 struct has_mask_member : std::false_type {};

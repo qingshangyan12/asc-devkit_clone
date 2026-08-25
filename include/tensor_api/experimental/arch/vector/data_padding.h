@@ -13,26 +13,30 @@
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_DATA_PADDING_H
 #endif
 
-#ifndef IMPL_TENSOR_API_EXPERIMENTAL_REG_DATA_PADDING_H
-#define IMPL_TENSOR_API_EXPERIMENTAL_REG_DATA_PADDING_H
+#ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_DATA_PADDING_H
+#define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_DATA_PADDING_H
 
 #include <cstdint>
 
 namespace asc {
 namespace te {
+namespace experimental {
 template <size_t N = 1, typename T>
-__simd_callee__ inline decltype(auto) fill(T value, reg_tensor<bool> mask = all_mask<T>());
+__simd_callee__ inline reg_tensor<T> fill(
+    const T& value, const reg_tensor<bool>& mask = all_mask<T>());
 
 template <size_t N = 1, typename T>
-__simd_callee__ inline decltype(auto) fill(reg_tensor<T> val, reg_tensor<bool> mask = all_mask<T>());
+__simd_callee__ inline reg_tensor<T> fill(
+    const reg_tensor<T>& val, const reg_tensor<bool>& mask = all_mask<T>());
+} // namespace experimental
 } // namespace te
 } // namespace asc
 
 #if defined(__NPU_ARCH__)
-#include "impl/tensor_api/arch/vector/experimental/data_padding_impl.h"
+#include "impl/tensor_api/experimental/arch/vector/data_padding_impl.h"
 #endif
 
-#endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_DATA_PADDING_H
+#endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_DATA_PADDING_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_DATA_PADDING_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

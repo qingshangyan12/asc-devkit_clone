@@ -24,7 +24,7 @@ namespace asc {
 namespace te {
 namespace detail {
 
-template <load_sideband_mode sideband_mode, typename Tensor, typename Coord>
+template <experimental::load_sideband_mode sideband_mode, typename Tensor, typename Coord>
 __simd_callee__ inline decltype(auto) load_local_tensor(const Tensor& tensor, const Coord& coord)
 {
     using engine_type = typename Tensor::engine_type;
@@ -35,29 +35,31 @@ __simd_callee__ inline decltype(auto) load_local_tensor(const Tensor& tensor, co
     auto src_engine = tensor.engine() + tensor.layout()(coord);
     auto src = src_engine.begin().get();
 
-    reg_tensor<data_type> dst;
-    if constexpr (sideband_mode == load_sideband_mode::direct) {
+    experimental::reg_tensor<data_type> dst;
+    if constexpr (sideband_mode == experimental::load_sideband_mode::direct) {
         asc_loadalign(dst.reg, src);
-    } else if constexpr (sideband_mode == load_sideband_mode::downsample) {
+    } else if constexpr (sideband_mode == experimental::load_sideband_mode::downsample) {
         asc_loadalign_downsample(dst.reg, src);
-    } else if constexpr (sideband_mode == load_sideband_mode::unpack) {
+    } else if constexpr (sideband_mode == experimental::load_sideband_mode::unpack) {
         asc_loadalign_unpack(dst.reg, src);
-    } else if constexpr (sideband_mode == load_sideband_mode::unpack4) {
+    } else if constexpr (sideband_mode == experimental::load_sideband_mode::unpack4) {
         asc_loadalign_unpack4(dst.reg, src);
-    } else if constexpr (sideband_mode == load_sideband_mode::upsample) {
+    } else if constexpr (sideband_mode == experimental::load_sideband_mode::upsample) {
         asc_loadalign_upsample(dst.reg, src);
-    } else if constexpr (sideband_mode == load_sideband_mode::deintlv) {
-        static_assert(sideband_mode != load_sideband_mode::deintlv,
+    } else if constexpr (sideband_mode == experimental::load_sideband_mode::deintlv) {
+        static_assert(sideband_mode != experimental::load_sideband_mode::deintlv,
                       "deintlv requires the local_tensor::load(coord, dst0, dst1) overload");
     } else {
-        static_assert(sideband_mode == load_sideband_mode::direct, "unsupported load sideband mode");
+        static_assert(sideband_mode == experimental::load_sideband_mode::direct,
+                      "unsupported load sideband mode");
     }
     return dst;
 }
 
-template <load_sideband_mode sideband_mode, typename Tensor, typename Coord, typename RegDataType>
-__simd_callee__ inline void load_local_tensor(const Tensor& tensor, const Coord& coord, reg_tensor<RegDataType>& dst0,
-                                              reg_tensor<RegDataType>& dst1)
+template <experimental::load_sideband_mode sideband_mode, typename Tensor, typename Coord, typename RegDataType>
+__simd_callee__ inline void load_local_tensor(
+    const Tensor& tensor, const Coord& coord, experimental::reg_tensor<RegDataType>& dst0,
+    experimental::reg_tensor<RegDataType>& dst1)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
@@ -66,16 +68,16 @@ __simd_callee__ inline void load_local_tensor(const Tensor& tensor, const Coord&
     static_assert(Std::is_same_v<data_type, RegDataType>,
                   "local_tensor::load requires matching tensor and register element types");
 
-    if constexpr (sideband_mode == load_sideband_mode::deintlv) {
+    if constexpr (sideband_mode == experimental::load_sideband_mode::deintlv) {
         auto src_engine = tensor.engine() + tensor.layout()(coord);
         asc_loadalign_deintlv(dst0.reg, dst1.reg, src_engine.begin().get());
     } else {
-        static_assert(sideband_mode == load_sideband_mode::deintlv,
+        static_assert(sideband_mode == experimental::load_sideband_mode::deintlv,
                       "the two-destination local_tensor::load overload only supports deintlv");
     }
 }
 
-template <broadcast_mode brc_mode, typename Tensor, typename Coord>
+template <experimental::broadcast_mode brc_mode, typename Tensor, typename Coord>
 __simd_callee__ inline decltype(auto) load_broadcast_local_tensor(const Tensor& tensor, const Coord& coord)
 {
     using engine_type = typename Tensor::engine_type;
@@ -86,21 +88,22 @@ __simd_callee__ inline decltype(auto) load_broadcast_local_tensor(const Tensor& 
     auto src_engine = tensor.engine() + tensor.layout()(coord);
     auto src = src_engine.begin().get();
 
-    reg_tensor<data_type> dst;
-    if constexpr (brc_mode == broadcast_mode::elem) {
+    experimental::reg_tensor<data_type> dst;
+    if constexpr (brc_mode == experimental::broadcast_mode::elem) {
         asc_loadalign_brc_elem(dst.reg, src);
-    } else if constexpr (brc_mode == broadcast_mode::datablock) {
+    } else if constexpr (brc_mode == experimental::broadcast_mode::datablock) {
         asc_loadalign_brc_datablock(dst.reg, src);
-    } else if constexpr (brc_mode == broadcast_mode::elem2datablock) {
+    } else if constexpr (brc_mode == experimental::broadcast_mode::elem2datablock) {
         asc_loadalign_brc_elem2datablock(dst.reg, src);
     } else {
-        static_assert(brc_mode == broadcast_mode::elem, "unsupported broadcast mode");
+        static_assert(brc_mode == experimental::broadcast_mode::elem, "unsupported broadcast mode");
     }
     return dst;
 }
 
-template <store_sideband_mode sideband_mode, typename Tensor, typename Coord, typename RegDataType>
-__simd_callee__ inline void store_local_tensor(Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src)
+template <experimental::store_sideband_mode sideband_mode, typename Tensor, typename Coord, typename RegDataType>
+__simd_callee__ inline void store_local_tensor(
+    Tensor& tensor, const Coord& coord, const experimental::reg_tensor<RegDataType>& src)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
@@ -111,25 +114,27 @@ __simd_callee__ inline void store_local_tensor(Tensor& tensor, const Coord& coor
 
     auto dst_engine = tensor.engine() + tensor.layout()(coord);
     auto dst = dst_engine.begin().get();
-    if constexpr (sideband_mode == store_sideband_mode::direct) {
+    if constexpr (sideband_mode == experimental::store_sideband_mode::direct) {
         asc_storealign(dst, src.reg, src.mask);
-    } else if constexpr (sideband_mode == store_sideband_mode::store_1st) {
+    } else if constexpr (sideband_mode == experimental::store_sideband_mode::store_1st) {
         asc_storealign_1st(dst, src.reg);
-    } else if constexpr (sideband_mode == store_sideband_mode::pack) {
+    } else if constexpr (sideband_mode == experimental::store_sideband_mode::pack) {
         asc_storealign_pack(dst, src.reg, src.mask);
-    } else if constexpr (sideband_mode == store_sideband_mode::pack_quarter) {
+    } else if constexpr (sideband_mode == experimental::store_sideband_mode::pack_quarter) {
         asc_storealign_pack_quarter(dst, src.reg, src.mask);
-    } else if constexpr (sideband_mode == store_sideband_mode::intlv) {
-        static_assert(sideband_mode != store_sideband_mode::intlv,
+    } else if constexpr (sideband_mode == experimental::store_sideband_mode::intlv) {
+        static_assert(sideband_mode != experimental::store_sideband_mode::intlv,
                       "intlv requires the local_tensor::store(coord, src0, src1) overload");
     } else {
-        static_assert(sideband_mode == store_sideband_mode::direct, "unsupported store sideband mode");
+        static_assert(sideband_mode == experimental::store_sideband_mode::direct,
+                      "unsupported store sideband mode");
     }
 }
 
-template <store_sideband_mode sideband_mode, typename Tensor, typename Coord, typename RegDataType>
-__simd_callee__ inline void store_local_tensor(Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src0,
-                                               const reg_tensor<RegDataType>& src1)
+template <experimental::store_sideband_mode sideband_mode, typename Tensor, typename Coord, typename RegDataType>
+__simd_callee__ inline void store_local_tensor(
+    Tensor& tensor, const Coord& coord, const experimental::reg_tensor<RegDataType>& src0,
+    const experimental::reg_tensor<RegDataType>& src1)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
@@ -138,11 +143,11 @@ __simd_callee__ inline void store_local_tensor(Tensor& tensor, const Coord& coor
     static_assert(Std::is_same_v<data_type, RegDataType>,
                   "local_tensor::store requires matching tensor and register element types");
 
-    if constexpr (sideband_mode == store_sideband_mode::intlv) {
+    if constexpr (sideband_mode == experimental::store_sideband_mode::intlv) {
         auto dst_engine = tensor.engine() + tensor.layout()(coord);
         asc_storealign_intlv(dst_engine.begin().get(), src0.reg, src1.reg);
     } else {
-        static_assert(sideband_mode == store_sideband_mode::intlv,
+        static_assert(sideband_mode == experimental::store_sideband_mode::intlv,
                       "the two-source local_tensor::store overload only supports intlv");
     }
 }
@@ -158,7 +163,7 @@ __aicore__ inline local_tensor<EngineT, LayoutT>::local_tensor(const EngineT& en
 {}
 
 template <typename EngineT, typename LayoutT>
-template <load_sideband_mode sideband_mode, typename Coord>
+template <experimental::load_sideband_mode sideband_mode, typename Coord>
 __simd_callee__ inline decltype(auto) local_tensor<EngineT, LayoutT>::load(const Coord& coord) const
 {
     TENSOR_API_DEBUG_CHECK(debug_check_coord, this->layout(), coord, "tensor::load");
@@ -166,16 +171,17 @@ __simd_callee__ inline decltype(auto) local_tensor<EngineT, LayoutT>::load(const
 }
 
 template <typename EngineT, typename LayoutT>
-template <load_sideband_mode sideband_mode, typename Coord, typename RegDataType>
-__simd_callee__ inline void local_tensor<EngineT, LayoutT>::load(const Coord& coord, reg_tensor<RegDataType>& dst0,
-                                                                 reg_tensor<RegDataType>& dst1) const
+template <experimental::load_sideband_mode sideband_mode, typename Coord, typename RegDataType>
+__simd_callee__ inline void local_tensor<EngineT, LayoutT>::load(
+    const Coord& coord, experimental::reg_tensor<RegDataType>& dst0,
+    experimental::reg_tensor<RegDataType>& dst1) const
 {
     TENSOR_API_DEBUG_CHECK(debug_check_coord, this->layout(), coord, "tensor::load");
     detail::load_local_tensor<sideband_mode>(*this, coord, dst0, dst1);
 }
 
 template <typename EngineT, typename LayoutT>
-template <broadcast_mode brc_mode, typename Coord>
+template <experimental::broadcast_mode brc_mode, typename Coord>
 __simd_callee__ inline decltype(auto) local_tensor<EngineT, LayoutT>::load_broadcast(const Coord& coord) const
 {
     TENSOR_API_DEBUG_CHECK(debug_check_coord, this->layout(), coord, "tensor::load_broadcast");
@@ -183,19 +189,19 @@ __simd_callee__ inline decltype(auto) local_tensor<EngineT, LayoutT>::load_broad
 }
 
 template <typename EngineT, typename LayoutT>
-template <store_sideband_mode sideband_mode, typename Coord, typename RegDataType>
+template <experimental::store_sideband_mode sideband_mode, typename Coord, typename RegDataType>
 __simd_callee__ inline void local_tensor<EngineT, LayoutT>::store(const Coord& coord,
-                                                                  const reg_tensor<RegDataType>& src)
+                                                                  const experimental::reg_tensor<RegDataType>& src)
 {
     TENSOR_API_DEBUG_CHECK(debug_check_coord, this->layout(), coord, "tensor::store");
     detail::store_local_tensor<sideband_mode>(*this, coord, src);
 }
 
 template <typename EngineT, typename LayoutT>
-template <store_sideband_mode sideband_mode, typename Coord, typename RegDataType>
+template <experimental::store_sideband_mode sideband_mode, typename Coord, typename RegDataType>
 __simd_callee__ inline void local_tensor<EngineT, LayoutT>::store(const Coord& coord,
-                                                                  const reg_tensor<RegDataType>& src0,
-                                                                  const reg_tensor<RegDataType>& src1)
+                                                                  const experimental::reg_tensor<RegDataType>& src0,
+                                                                  const experimental::reg_tensor<RegDataType>& src1)
 {
     TENSOR_API_DEBUG_CHECK(debug_check_coord, this->layout(), coord, "tensor::store");
     detail::store_local_tensor<sideband_mode>(*this, coord, src0, src1);

@@ -13,13 +13,14 @@
 #define __UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_TENSOR_H__
 #endif
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_TENSOR_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_TENSOR_H
+#ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_TENSOR_H
+#define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_TENSOR_H
 
-#include "impl/tensor_api/arch/vector/experimental/type_get.h"
+#include "impl/tensor_api/experimental/arch/vector/type_get.h"
 
 namespace asc {
 namespace te {
+namespace experimental {
 
 template <typename DataType>
 struct reg_tensor {
@@ -27,10 +28,7 @@ struct reg_tensor {
     using reg_type = typename detail::type_get<elem_type>::type;
 
     __simd_callee__ reg_tensor() = default;
-    __simd_callee__ reg_tensor(vector_bool maskValue) : mask(maskValue) {}
-
-    template <typename ScalarType>
-    __simd_callee__ inline reg_tensor& operator=(ScalarType src);
+    __simd_callee__ reg_tensor(const vector_bool& maskValue) : mask(maskValue) {}
 
     __simd_callee__ inline reg_tensor& with_mask(const reg_tensor<bool>& maskReg);
 
@@ -53,14 +51,44 @@ struct reg_pair {
     reg_tensor<DataType> second;
 };
 
+namespace detail {
+
+template <typename T>
+struct reg_tensor_traits;
+
+template <typename T>
+struct reg_tensor_traits<reg_tensor<T>> {
+    using elem_type = T;
+};
+
+template <typename T>
+using reg_elem_t = typename reg_tensor_traits<AscendC::Std::remove_cvref_t<T>>::elem_type;
+
+template <typename T, typename U, bool = is_reg_tensor_v<T>>
+struct binary_elem_type {
+    static_assert(is_reg_tensor_v<U>, "at least one operand must be reg_tensor");
+    using type = reg_elem_t<U>;
+};
+
+template <typename T, typename U>
+struct binary_elem_type<T, U, true> {
+    using type = reg_elem_t<T>;
+};
+
+template <typename T, typename U>
+using binary_elem_t = typename binary_elem_type<T, U>::type;
+
+} // namespace detail
+
+} // namespace experimental
 } // namespace te
 } // namespace asc
 
 #if defined(__NPU_ARCH__)
-#include "impl/tensor_api/arch/vector/experimental/reg_tensor_impl.h"
+#include "impl/tensor_api/experimental/arch/vector/reg_tensor_impl.h"
 #endif
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_REG_TENSOR_H
+#endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_TENSOR_H
 
 #if defined(__UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_TENSOR_H__)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

@@ -13,40 +13,40 @@
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_COMPUTE
 #endif
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_H
+#ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPOSITE_COMPUTE_H
+#define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPOSITE_COMPUTE_H
 
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/experimental/arch/vector/reg_tensor.h"
 
 namespace asc {
 namespace te {
 namespace experimental {
 
 template <typename T, typename scalar_type>
-__simd_callee__ inline decltype(auto) axpy(
+__simd_callee__ inline reg_tensor<T> axpy(
     const reg_tensor<T>& dst, const reg_tensor<T>& src, const scalar_type& scalar);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) absdiff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<T> absdiff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) exp_sub(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<float> exp_sub(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) fma(
+__simd_callee__ inline reg_tensor<T> fma(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2);
 
-__simd_callee__ inline decltype(auto) muls_cast(const reg_tensor<float>& src, const float& scalar);
+__simd_callee__ inline reg_tensor<half> muls_cast(const reg_tensor<float>& src, const float& scalar);
 
 } // namespace experimental
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/arch/vector/experimental/composite_compute_impl.h"
+#if defined(__NPU_ARCH__)
+#include "impl/tensor_api/experimental/arch/vector/composite_compute_impl.h"
 #endif
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_COMPOSITE_COMPUTE_H
+#endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPOSITE_COMPUTE_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPOSITE_COMPUTE)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates how to use the experimental register Tensor API `asc::te::trunc` to round floating-point input elements toward zero. Both the input and output are two-dimensional ND tensors with shape `[16, 16]`, containing 256 elements. The input and output data types are the same.
+This sample demonstrates how to use the experimental register Tensor API `asc::te::experimental::trunc` to round floating-point input elements toward zero. Both the input and output are two-dimensional ND tensors with shape `[16, 16]`, containing 256 elements. The input and output data types are the same.
 
 The computation is as follows:
 
@@ -89,8 +89,8 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
 
     1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct two-dimensional tensors in GM and UB.
     2. Wrap the MTE2 pipeline with `asc_lock/asc_unlock`, and use `asc::te::copy` to move the input from GM to UB.
-    3. Calculate the number of elements processed by each register operation from the register size and element type size, and use `asc::te::all_mask<T>()` to generate an all-valid mask.
-    4. Use the tensor `load` interface to load UB data into `asc::te::reg_tensor<T>`, call `asc::te::trunc` to round the data toward zero, and use the tensor `store` interface to write the result back to UB.
+    3. Calculate the number of elements processed by each register operation from the register size and element type size, and use `asc::te::experimental::all_mask<T>()` to generate an all-valid mask.
+    4. Use the tensor `load` interface to load UB data into `asc::te::experimental::reg_tensor<T>`, call `asc::te::experimental::trunc` to round the data toward zero, and use the tensor `store` interface to write the result back to UB.
     5. Lock the Vector and MTE3 pipelines in sequence with the same mutex, and then move the result from UB to GM.
 
     The core computation code is as follows:
@@ -98,9 +98,9 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
     ```cpp
     const auto coord = asc::te::make_coord(offset / columnCount, offset % columnCount);
     auto srcReg = src.load(coord);
-    srcReg.with_mask(asc::te::all_mask<T>());
+    srcReg.with_mask(asc::te::experimental::all_mask<T>());
 
-    auto dstReg = asc::te::trunc(srcReg);
+    auto dstReg = asc::te::experimental::trunc(srcReg);
     dst.store(coord, dstReg);
     ```
 

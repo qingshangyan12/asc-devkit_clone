@@ -266,13 +266,13 @@ template <typename EngineT, typename LayoutT>
 __aicore__ inline global_tensor<EngineT, LayoutT>::global_tensor() = default;
 
 template <typename EngineT, typename LayoutT>
-__aicore__ inline constexpr cache_mode global_tensor<EngineT, LayoutT>::get_cache_mode() const
+__aicore__ inline constexpr experimental::cache_mode global_tensor<EngineT, LayoutT>::get_cache_mode() const
 {
-    return static_cast<cache_mode>(this->engine().get_cache_mode());
+    return static_cast<experimental::cache_mode>(this->engine().get_cache_mode());
 }
 
 template <typename EngineT, typename LayoutT>
-__aicore__ inline constexpr void global_tensor<EngineT, LayoutT>::set_l2_cache_hint(cache_mode mode)
+__aicore__ inline constexpr void global_tensor<EngineT, LayoutT>::set_l2_cache_hint(experimental::cache_mode mode)
 {
     this->engine().set_cache_mode(mode);
 }

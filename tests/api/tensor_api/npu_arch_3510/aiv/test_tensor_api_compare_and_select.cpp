@@ -8,6 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <type_traits>
+
 #include <gtest/gtest.h>
 
 #include "tensor_api/stub/cce_stub.h"
@@ -18,20 +20,21 @@ class TensorApiVectorCompareAndSelect3510 : public testing::Test {};
 template <typename T>
 __aicore__ inline void TestSelect()
 {
-    asc::te::reg_tensor<bool> condition {};
-    asc::te::reg_tensor<T> src0 {};
-    asc::te::reg_tensor<T> src1 {};
-    src0.mask = asc::te::all_mask<T>().reg;
+    asc::te::experimental::reg_tensor<bool> condition {};
+    asc::te::experimental::reg_tensor<T> src0 {};
+    asc::te::experimental::reg_tensor<T> src1 {};
+    src0.mask = asc::te::experimental::all_mask<T>().reg;
 
-    auto dst = asc::te::select(condition, src0, src1);
+    auto dst = asc::te::experimental::select(condition, src0, src1);
+    static_assert(std::is_same_v<decltype(dst), asc::te::experimental::reg_tensor<T>>);
     EXPECT_EQ(dst.mask, src0.mask);
 }
 
 template <typename T>
 __aicore__ inline void TestCompareRegTensor()
 {
-    asc::te::reg_tensor<T> src0 {};
-    asc::te::reg_tensor<T> src1 {};
+    asc::te::experimental::reg_tensor<T> src0 {};
+    asc::te::experimental::reg_tensor<T> src1 {};
 
     auto eq = src0 == src1;
     auto ne = src0 != src1;
@@ -39,6 +42,12 @@ __aicore__ inline void TestCompareRegTensor()
     auto le = src0 <= src1;
     auto gt = src0 > src1;
     auto ge = src0 >= src1;
+    static_assert(std::is_same_v<decltype(eq), asc::te::experimental::reg_tensor<bool>> &&
+        std::is_same_v<decltype(ne), asc::te::experimental::reg_tensor<bool>> &&
+        std::is_same_v<decltype(lt), asc::te::experimental::reg_tensor<bool>> &&
+        std::is_same_v<decltype(le), asc::te::experimental::reg_tensor<bool>> &&
+        std::is_same_v<decltype(gt), asc::te::experimental::reg_tensor<bool>> &&
+        std::is_same_v<decltype(ge), asc::te::experimental::reg_tensor<bool>>);
     (void)eq;
     (void)ne;
     (void)lt;
@@ -50,7 +59,7 @@ __aicore__ inline void TestCompareRegTensor()
 template <typename T>
 __aicore__ inline void TestCompareScalar()
 {
-    asc::te::reg_tensor<T> src {};
+    asc::te::experimental::reg_tensor<T> src {};
     T scalar {};
 
     auto eq = src == scalar;
@@ -59,6 +68,12 @@ __aicore__ inline void TestCompareScalar()
     auto le = src <= scalar;
     auto gt = src > scalar;
     auto ge = src >= scalar;
+    static_assert(std::is_same_v<decltype(eq), asc::te::experimental::reg_tensor<bool>> &&
+        std::is_same_v<decltype(ne), asc::te::experimental::reg_tensor<bool>> &&
+        std::is_same_v<decltype(lt), asc::te::experimental::reg_tensor<bool>> &&
+        std::is_same_v<decltype(le), asc::te::experimental::reg_tensor<bool>> &&
+        std::is_same_v<decltype(gt), asc::te::experimental::reg_tensor<bool>> &&
+        std::is_same_v<decltype(ge), asc::te::experimental::reg_tensor<bool>>);
     (void)eq;
     (void)ne;
     (void)lt;

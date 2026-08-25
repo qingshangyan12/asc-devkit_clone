@@ -13,26 +13,30 @@
 #define __UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_DATA_REORDER_H__
 #endif
 
-#ifndef INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_DATA_REORDER_H
-#define INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_DATA_REORDER_H
+#ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_DATA_REORDER_H
+#define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_DATA_REORDER_H
 
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/experimental/arch/vector/reg_tensor.h"
 
 namespace asc {
 namespace te {
-template <typename T>
-__simd_callee__ inline reg_pair<T> interleave(reg_tensor<T> src0, reg_tensor<T> src1);
+namespace experimental {
+template <typename DataType = void, typename RegDataType = DataType>
+__simd_callee__ inline reg_pair<RegDataType> interleave(
+    const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
 
-template <typename T>
-__simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T> src1);
+template <typename DataType = void, typename RegDataType = DataType>
+__simd_callee__ inline reg_pair<RegDataType> deinterleave(
+    const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
+} // namespace experimental
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "impl/tensor_api/arch/vector/experimental/data_reorder_impl.h"
+#if defined(__NPU_ARCH__)
+#include "impl/tensor_api/experimental/arch/vector/data_reorder_impl.h"
 #endif
 
-#endif // INCLUDE_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_DATA_REORDER_H
+#endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_DATA_REORDER_H
 
 #if defined(__UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_DATA_REORDER_H__)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

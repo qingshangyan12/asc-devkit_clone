@@ -10,22 +10,22 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/vector/experimental/basic_arithmetic_impl.h is internal and must not be used directly."
+    "impl/tensor_api/experimental/arch/vector/basic_arithmetic_impl.h is internal and must not be used directly."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_BASIC_ARITHMETIC_IMPL
 #endif
 
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_BASIC_ARITHMETIC_IMPL_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_BASIC_ARITHMETIC_IMPL_H
+#ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_IMPL_H
+#define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_IMPL_H
 
-#include "impl/tensor_api/arch/utils/reg_compute_traits.h"
+#include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
 
 namespace asc {
 namespace te {
 namespace experimental {
 
 template <typename T>
-__simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg)
+__simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src_reg)
 {
     static_assert(detail::supports_abs_v<T>, "abs does not support this element type");
     reg_tensor<T> dst;
@@ -35,7 +35,7 @@ __simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg)
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) exp(const reg_tensor<T>& src_reg)
+__simd_callee__ inline reg_tensor<T> exp(const reg_tensor<T>& src_reg)
 {
     static_assert(detail::supports_float_math_v<T>, "exp supports half and float");
     reg_tensor<T> dst;
@@ -45,7 +45,7 @@ __simd_callee__ inline decltype(auto) exp(const reg_tensor<T>& src_reg)
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) sqrt(const reg_tensor<T>& src_reg)
+__simd_callee__ inline reg_tensor<T> sqrt(const reg_tensor<T>& src_reg)
 {
     static_assert(detail::supports_float_math_v<T>, "sqrt supports half and float");
     reg_tensor<T> dst;
@@ -55,7 +55,7 @@ __simd_callee__ inline decltype(auto) sqrt(const reg_tensor<T>& src_reg)
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) log(const reg_tensor<T>& src_reg)
+__simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src_reg)
 {
     static_assert(detail::supports_float_math_v<T>, "log supports half and float");
     reg_tensor<T> dst;
@@ -65,7 +65,7 @@ __simd_callee__ inline decltype(auto) log(const reg_tensor<T>& src_reg)
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) log2(const reg_tensor<T>& src_reg)
+__simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src_reg)
 {
     auto natural_log = log(src_reg);
     reg_tensor<T> dst;
@@ -75,7 +75,7 @@ __simd_callee__ inline decltype(auto) log2(const reg_tensor<T>& src_reg)
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) log10(const reg_tensor<T>& src_reg)
+__simd_callee__ inline reg_tensor<T> log10(const reg_tensor<T>& src_reg)
 {
     auto natural_log = log(src_reg);
     reg_tensor<T> dst;
@@ -85,7 +85,7 @@ __simd_callee__ inline decltype(auto) log10(const reg_tensor<T>& src_reg)
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator-(const reg_tensor<T>& src_reg)
+__simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src_reg)
 {
     static_assert(detail::supports_neg_v<T>, "unary operator- does not support this element type");
     reg_tensor<T> dst;
@@ -95,7 +95,7 @@ __simd_callee__ inline decltype(auto) operator-(const reg_tensor<T>& src_reg)
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) relu(const reg_tensor<T>& src_reg)
+__simd_callee__ inline reg_tensor<T> relu(const reg_tensor<T>& src_reg)
 {
     static_assert(detail::supports_relu_v<T>, "relu supports half, int32_t, and float");
     reg_tensor<T> dst;
@@ -105,7 +105,7 @@ __simd_callee__ inline decltype(auto) relu(const reg_tensor<T>& src_reg)
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) prelu(const reg_tensor<T>& src_reg, const reg_tensor<T>& slope)
+__simd_callee__ inline reg_tensor<T> prelu(const reg_tensor<T>& src_reg, const reg_tensor<T>& slope)
 {
     static_assert(detail::supports_float_math_v<T>, "prelu supports half and float");
     reg_tensor<T> dst;
@@ -115,7 +115,7 @@ __simd_callee__ inline decltype(auto) prelu(const reg_tensor<T>& src_reg, const 
 }
 
 template <typename T, typename scalar_type>
-__simd_callee__ inline decltype(auto) leaky_relu(const reg_tensor<T>& src_reg, const scalar_type& slope)
+__simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src_reg, const scalar_type& slope)
 {
     static_assert(detail::supports_float_math_v<T>, "leaky_relu supports half and float");
     static_assert(!is_reg_tensor_v<scalar_type> &&
@@ -128,7 +128,7 @@ __simd_callee__ inline decltype(auto) leaky_relu(const reg_tensor<T>& src_reg, c
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_add_sub_v<T>, "operator+ does not support this element type");
     reg_tensor<T> dst;
@@ -138,7 +138,7 @@ __simd_callee__ inline decltype(auto) operator+(const reg_tensor<T>& src0, const
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator+(const reg_tensor<T>& src, const T& scalar)
+__simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src, const T& scalar)
 {
     static_assert(detail::supports_add_sub_v<T>, "scalar operator+ does not support this element type");
     reg_tensor<T> dst;
@@ -148,7 +148,7 @@ __simd_callee__ inline decltype(auto) operator+(const reg_tensor<T>& src, const 
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator+(const T& scalar, const reg_tensor<T>& src)
+__simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor<T>& src)
 {
     static_assert(detail::supports_add_sub_v<T>, "scalar operator+ does not support this element type");
     reg_tensor<T> dst;
@@ -158,7 +158,7 @@ __simd_callee__ inline decltype(auto) operator+(const T& scalar, const reg_tenso
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) add(
+__simd_callee__ inline reg_tensor<T> add(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_carry_v<T>, "add with carry supports int32_t and uint32_t");
@@ -170,7 +170,7 @@ __simd_callee__ inline decltype(auto) add(
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) add_c(
+__simd_callee__ inline reg_tensor<T> add_c(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
     const reg_tensor<bool>& carry_src)
 {
@@ -199,7 +199,7 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b)
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) sub(
+__simd_callee__ inline reg_tensor<T> sub(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_carry_v<T>, "sub with carry supports int32_t and uint32_t");
@@ -211,7 +211,7 @@ __simd_callee__ inline decltype(auto) sub(
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) sub_c(
+__simd_callee__ inline reg_tensor<T> sub_c(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
     const reg_tensor<bool>& carry_src)
 {
@@ -249,7 +249,7 @@ __simd_callee__ inline decltype(auto) operator*(const T& a, const U& b)
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) mull(
+__simd_callee__ inline reg_tensor<T> mull(
     reg_tensor<T>& high, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_mull_v<T>, "mull supports int32_t and uint32_t");
@@ -316,7 +316,7 @@ __simd_callee__ inline decltype(auto) min(const T& a, const U& b)
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_EXPERIMENTAL_BASIC_ARITHMETIC_IMPL_H
+#endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_IMPL_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_BASIC_ARITHMETIC_IMPL)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

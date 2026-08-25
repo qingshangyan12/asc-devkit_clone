@@ -21,15 +21,15 @@
 namespace {
 
 template <typename T>
-using truncate_result = decltype(asc::te::trunc(AscendC::Std::declval<asc::te::reg_tensor<T>>()));
+using truncate_result = decltype(asc::te::experimental::trunc(AscendC::Std::declval<asc::te::experimental::reg_tensor<T>>()));
 
-static_assert(asc::te::detail::is_supported<half>::value);
-static_assert(asc::te::detail::is_supported<bfloat16_t>::value);
-static_assert(asc::te::detail::is_supported<float>::value);
-static_assert(!asc::te::detail::is_supported<int32_t>::value);
-static_assert(AscendC::Std::is_same_v<truncate_result<half>, asc::te::reg_tensor<half>>);
-static_assert(AscendC::Std::is_same_v<truncate_result<bfloat16_t>, asc::te::reg_tensor<bfloat16_t>>);
-static_assert(AscendC::Std::is_same_v<truncate_result<float>, asc::te::reg_tensor<float>>);
+static_assert(asc::te::experimental::detail::is_supported<half>::value);
+static_assert(asc::te::experimental::detail::is_supported<bfloat16_t>::value);
+static_assert(asc::te::experimental::detail::is_supported<float>::value);
+static_assert(!asc::te::experimental::detail::is_supported<int32_t>::value);
+static_assert(AscendC::Std::is_same_v<truncate_result<half>, asc::te::experimental::reg_tensor<half>>);
+static_assert(AscendC::Std::is_same_v<truncate_result<bfloat16_t>, asc::te::experimental::reg_tensor<bfloat16_t>>);
+static_assert(AscendC::Std::is_same_v<truncate_result<float>, asc::te::experimental::reg_tensor<float>>);
 
 class tensor_api_reg_truncate_3510 : public testing::Test {
 protected:
@@ -52,10 +52,10 @@ __simd_vf__ inline void truncate_reg_loop(const SrcTensor src, DstTensor dst, ui
     uint32_t column_count)
 {
     using T = typename SrcTensor::data_type;
-    using reg_type = typename asc::te::reg_tensor<T>::reg_type;
+    using reg_type = typename asc::te::experimental::reg_tensor<T>::reg_type;
 
     constexpr uint32_t elements_per_reg = sizeof(reg_type) / sizeof(T);
-    const auto full_mask = asc::te::all_mask<T>();
+    const auto full_mask = asc::te::experimental::all_mask<T>();
     const uint32_t repeat = data_size / elements_per_reg;
 
     for (uint32_t i = 0; i < repeat; ++i) {
@@ -64,7 +64,7 @@ __simd_vf__ inline void truncate_reg_loop(const SrcTensor src, DstTensor dst, ui
         auto src_reg = src.load(coord);
         src_reg.with_mask(full_mask);
 
-        auto dst_reg = asc::te::trunc(src_reg);
+        auto dst_reg = asc::te::experimental::trunc(src_reg);
         dst.store(coord, dst_reg);
     }
 }
@@ -72,7 +72,7 @@ __simd_vf__ inline void truncate_reg_loop(const SrcTensor src, DstTensor dst, ui
 template <typename T>
 void expect_truncate_result()
 {
-    using reg_type = typename asc::te::reg_tensor<T>::reg_type;
+    using reg_type = typename asc::te::experimental::reg_tensor<T>::reg_type;
     constexpr uint32_t elements_per_reg = sizeof(reg_type) / sizeof(T);
 
     __ubuf__ T src_data[elements_per_reg] {};

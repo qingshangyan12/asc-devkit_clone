@@ -14,14 +14,14 @@
 #include <gtest/gtest.h>
 
 #include "tensor_api/stub/cce_stub.h"
-#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
 
 namespace {
 
 using namespace asc::te::experimental;
 
 template <typename T>
-using reg_type = asc::te::reg_tensor<T>;
+using reg_type = asc::te::experimental::reg_tensor<T>;
 
 template <typename T>
 void check_unary_arithmetic()

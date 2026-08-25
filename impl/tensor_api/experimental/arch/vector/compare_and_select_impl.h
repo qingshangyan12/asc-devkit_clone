@@ -15,13 +15,14 @@
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPARE_AND_SELECT_IMPL_H
 #endif
 
-#ifndef IMPL_TENSOR_API_EXPERIMENTAL_REG_COMPARE_AND_SELECT_IMPL_H
-#define IMPL_TENSOR_API_EXPERIMENTAL_REG_COMPARE_AND_SELECT_IMPL_H
+#ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPARE_AND_SELECT_IMPL_H
+#define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPARE_AND_SELECT_IMPL_H
 
 #include <cstdint>
 
 namespace asc {
 namespace te {
+namespace experimental {
 namespace detail {
 template <typename T>
 inline constexpr bool is_select_support_type = Std::is_one_of_v<T, bool, uint8_t, int8_t, fp8_e4m3fn_t,
@@ -33,8 +34,8 @@ inline constexpr bool is_cmp_support_type = Std::is_one_of_v<T, uint8_t, int8_t,
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) select(reg_tensor<bool> condition, reg_tensor<T> src0,
-    reg_tensor<T> src1) {
+__simd_callee__ inline reg_tensor<T> select(const reg_tensor<bool>& condition, const reg_tensor<T>& src0,
+    const reg_tensor<T>& src1) {
     static_assert(detail::is_select_support_type<T>, "select only supports bool, uint8_t, int8_t, "
         "fp8_e4m3fn_t, hifloat8_t, fp8_e5m2_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t "
         "and float.");
@@ -45,7 +46,7 @@ __simd_callee__ inline decltype(auto) select(reg_tensor<bool> condition, reg_ten
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator==(reg_tensor<T> src0, reg_tensor<T> src1) {
+__simd_callee__ inline reg_tensor<bool> operator==(const reg_tensor<T>& src0, const reg_tensor<T>& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator== only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
@@ -54,7 +55,7 @@ __simd_callee__ inline decltype(auto) operator==(reg_tensor<T> src0, reg_tensor<
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator!=(reg_tensor<T> src0, reg_tensor<T> src1) {
+__simd_callee__ inline reg_tensor<bool> operator!=(const reg_tensor<T>& src0, const reg_tensor<T>& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator!= only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
@@ -63,7 +64,7 @@ __simd_callee__ inline decltype(auto) operator!=(reg_tensor<T> src0, reg_tensor<
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator<(reg_tensor<T> src0, reg_tensor<T> src1) {
+__simd_callee__ inline reg_tensor<bool> operator<(const reg_tensor<T>& src0, const reg_tensor<T>& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator< only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
@@ -72,7 +73,7 @@ __simd_callee__ inline decltype(auto) operator<(reg_tensor<T> src0, reg_tensor<T
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator<=(reg_tensor<T> src0, reg_tensor<T> src1) {
+__simd_callee__ inline reg_tensor<bool> operator<=(const reg_tensor<T>& src0, const reg_tensor<T>& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator<= only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
@@ -81,7 +82,7 @@ __simd_callee__ inline decltype(auto) operator<=(reg_tensor<T> src0, reg_tensor<
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator>(reg_tensor<T> src0, reg_tensor<T> src1) {
+__simd_callee__ inline reg_tensor<bool> operator>(const reg_tensor<T>& src0, const reg_tensor<T>& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator> only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
@@ -90,7 +91,7 @@ __simd_callee__ inline decltype(auto) operator>(reg_tensor<T> src0, reg_tensor<T
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator>=(reg_tensor<T> src0, reg_tensor<T> src1) {
+__simd_callee__ inline reg_tensor<bool> operator>=(const reg_tensor<T>& src0, const reg_tensor<T>& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator>= only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
@@ -99,7 +100,7 @@ __simd_callee__ inline decltype(auto) operator>=(reg_tensor<T> src0, reg_tensor<
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator==(reg_tensor<T> src0, T src1) {
+__simd_callee__ inline reg_tensor<bool> operator==(const reg_tensor<T>& src0, const T& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator== only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
@@ -108,7 +109,7 @@ __simd_callee__ inline decltype(auto) operator==(reg_tensor<T> src0, T src1) {
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator!=(reg_tensor<T> src0, T src1) {
+__simd_callee__ inline reg_tensor<bool> operator!=(const reg_tensor<T>& src0, const T& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator!= only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
@@ -117,7 +118,7 @@ __simd_callee__ inline decltype(auto) operator!=(reg_tensor<T> src0, T src1) {
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator<(reg_tensor<T> src0, T src1) {
+__simd_callee__ inline reg_tensor<bool> operator<(const reg_tensor<T>& src0, const T& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator< only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
@@ -126,7 +127,7 @@ __simd_callee__ inline decltype(auto) operator<(reg_tensor<T> src0, T src1) {
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator<=(reg_tensor<T> src0, T src1) {
+__simd_callee__ inline reg_tensor<bool> operator<=(const reg_tensor<T>& src0, const T& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator<= only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
@@ -135,7 +136,7 @@ __simd_callee__ inline decltype(auto) operator<=(reg_tensor<T> src0, T src1) {
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator>(reg_tensor<T> src0, T src1) {
+__simd_callee__ inline reg_tensor<bool> operator>(const reg_tensor<T>& src0, const T& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator> only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
@@ -144,17 +145,18 @@ __simd_callee__ inline decltype(auto) operator>(reg_tensor<T> src0, T src1) {
 }
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator>=(reg_tensor<T> src0, T src1) {
+__simd_callee__ inline reg_tensor<bool> operator>=(const reg_tensor<T>& src0, const T& src1) {
     static_assert(detail::is_cmp_support_type<T>, "operator>= only supports uint8_t, int8_t, "
         "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     reg_tensor<bool> mask;
     asc_ge_scalar(mask.reg, src0.reg, src1, src0.mask);
     return mask;
 }
+} // namespace experimental
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_EXPERIMENTAL_REG_COMPARE_AND_SELECT_IMPL_H
+#endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPARE_AND_SELECT_IMPL_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPARE_AND_SELECT_IMPL_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

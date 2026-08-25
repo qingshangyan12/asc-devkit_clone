@@ -10,47 +10,22 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/tensor_api/arch/utils/reg_compute_traits.h is an internal header file and must not be used directly."
+    "impl/tensor_api/experimental/arch/utils/reg_utils.h is an internal header file and must not be used directly."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_TRAITS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_UTILS
 #endif
 
-#ifndef IMPL_TENSOR_API_ARCH_UTILS_REG_COMPUTE_TRAITS_H
-#define IMPL_TENSOR_API_ARCH_UTILS_REG_COMPUTE_TRAITS_H
+#ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_UTILS_REG_UTILS_H
+#define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_UTILS_REG_UTILS_H
 
-#include "tensor_api/arch/vector/experimental/reg_tensor.h"
+#include "tensor_api/experimental/arch/vector/reg_tensor.h"
 #include "tensor_api/utils/utils.h"
 #include "utils/std/type_traits.h"
 
 namespace asc {
 namespace te {
-
+namespace experimental {
 namespace detail {
-
-template <typename T>
-struct reg_tensor_traits;
-
-template <typename T>
-struct reg_tensor_traits<reg_tensor<T>> {
-    using elem_type = T;
-};
-
-template <typename T>
-using reg_elem_t = typename reg_tensor_traits<::AscendC::Std::remove_cvref_t<T>>::elem_type;
-
-template <typename T, typename U, bool = is_reg_tensor_v<T>>
-struct binary_elem_type {
-    static_assert(is_reg_tensor_v<U>, "at least one operand must be reg_tensor");
-    using type = reg_elem_t<U>;
-};
-
-template <typename T, typename U>
-struct binary_elem_type<T, U, true> {
-    using type = reg_elem_t<T>;
-};
-
-template <typename T, typename U>
-using binary_elem_t = typename binary_elem_type<T, U>::type;
 
 template <typename T, typename U>
 __simd_callee__ inline reg_tensor<T> make_reg_operand(const U& value, const vector_bool& mask)
@@ -166,12 +141,13 @@ template <typename T>
 inline constexpr bool supports_fma_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 } // namespace detail
+} // namespace experimental
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_UTILS_REG_COMPUTE_TRAITS_H
+#endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_UTILS_REG_UTILS_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_TRAITS)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_UTILS)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_TRAITS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_UTILS
 #endif
