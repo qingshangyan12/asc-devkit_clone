@@ -21,6 +21,8 @@ workspace是设备侧Global Memory上的一块内存。workspace内存分为两�
     在tiling函数中先通过GetWorkspaceSizes接口获取workspace大小的存放位置，再设置workspace的大小，框架侧会为其申请对应大小的设备侧Global Memory，在对应的算子kernel侧实现时可以使用这块workspace内存。在使用[Matmul核函数（Kernel）侧接口](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_Kernel.md)等需要系统workspace的高阶API时，设置的workspace空间大小为系统workspace和用户workspace之和。
 
     ```
+    #include <limits>
+
     // 用户自定义的tiling函数
     static ge::graphStatus TilingFunc(gert::TilingContext* context)
     {
@@ -30,6 +32,9 @@ workspace是设备侧Global Memory上的一块内存。workspace内存分为两�
         // 如需要使用系统workspace需要调用GetLibApiWorkSpaceSize获取系统workspace的大小。
         auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
         uint32_t sysWorkspaceSize = ascendcPlatform.GetLibApiWorkSpaceSize();
+        if (sysWorkspaceSize == std::numeric_limits<uint32_t>::max()) {
+            return ge::GRAPH_FAILED;
+        }
         size_t *currentWorkspace = context->GetWorkspaceSizes(1); // 通过框架获取workspace的指针，GetWorkspaceSizes入参为所需workspace的块数。当前限制使用一块。
         currentWorkspace[0] = usrSize + sysWorkspaceSize; // 设置总的workspace的数值大小，总的workspace空间由框架来申请并管理。
         ...
@@ -50,4 +55,3 @@ workspace是设备侧Global Memory上的一块内存。workspace内存分为两�
 -   核函数（Kernel）直调算子开发场景
 
     需要使用workspace空间时，建议开启编译选项[HAVE\_WORKSPACE](../kernel_direct_call_from_sample.md#li1103101565014)。host侧开发者仍需要自行申请workspace的空间，并传入。在使用Matmul核函数（Kernel）侧接口等需要系统workspace的高阶API时，设置的workspace空间大小为系统workspace和用户workspace之和。系统workspace大小可以通过PlatformAscendCManager的GetLibApiWorkSpaceSize接口获取。开启[HAVE\_WORKSPACE](../kernel_direct_call_from_sample.md#li1103101565014)后，开发者在kernel侧入参处获取的workspace为偏移了系统workspace后的用户workspace。
-
