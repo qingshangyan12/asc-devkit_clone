@@ -42,8 +42,8 @@ union asc_scalar_bitcode {
     uint64_t output;
 };
 
-union asc_l12l0a_3d_padding_bitcode {
-    __aicore__ asc_l12l0a_3d_padding_bitcode() {}
+union asc_3d_padding_bitcode {
+    __aicore__ asc_3d_padding_bitcode() {}
     half input_half;
     bfloat16_t input_bfloat16;
     int16_t input_int16;
