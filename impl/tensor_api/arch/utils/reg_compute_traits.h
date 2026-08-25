@@ -159,7 +159,7 @@ template <typename T>
 inline constexpr bool supports_abs_diff_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 template <typename T>
-inline constexpr bool supports_exp_sub_v = ::AscendC::Std::is_one_of_v<T, half, float>;
+inline constexpr bool supports_exp_diff_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 template <typename T>
 inline constexpr bool supports_fma_v = ::AscendC::Std::is_one_of_v<T, half, float>;

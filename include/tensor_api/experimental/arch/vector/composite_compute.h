@@ -30,13 +30,11 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<float> exp_sub(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
-__simd_callee__ inline reg_tensor<float> exp_sub(
-    const reg_tensor<half>& src0, const reg_tensor<half>& src1, decltype(ASC_POSITION_EVEN) src_pos);
-
-__simd_callee__ inline reg_tensor<float> exp_sub(
-    const reg_tensor<half>& src0, const reg_tensor<half>& src1, decltype(ASC_POSITION_ODD) src_pos);
+template <typename position_type>
+__simd_callee__ inline reg_tensor<float> exp_diff(
+    const reg_tensor<half>& src0, const reg_tensor<half>& src1, position_type src_pos);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) fma(

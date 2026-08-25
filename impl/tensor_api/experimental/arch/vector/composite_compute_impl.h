@@ -47,11 +47,11 @@ __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const r
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<float> exp_sub(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_exp_sub_v<T>, "exp_sub supports half and float");
+    static_assert(detail::supports_exp_diff_v<T>, "exp_diff supports half and float");
     if constexpr (::AscendC::Std::is_same_v<T, half>) {
-        return exp_sub(src0, src1, ASC_POSITION_EVEN);
+        return exp_diff(src0, src1, ASC_POSITION_EVEN);
     } else {
         reg_tensor<float> dst;
         asc_exp_sub(dst.reg, src0.reg, src1.reg, src0.mask);
@@ -60,18 +60,16 @@ __simd_callee__ inline reg_tensor<float> exp_sub(const reg_tensor<T>& src0, cons
     }
 }
 
-__simd_callee__ inline reg_tensor<float> exp_sub(
-    const reg_tensor<half>& src0, const reg_tensor<half>& src1, decltype(ASC_POSITION_EVEN) src_pos)
+template <typename position_type>
+__simd_callee__ inline reg_tensor<float> exp_diff(
+    const reg_tensor<half>& src0, const reg_tensor<half>& src1, position_type src_pos)
 {
-    reg_tensor<float> dst;
-    asc_exp_sub_half2float(dst.reg, src0.reg, src1.reg, src0.mask, src_pos);
-    dst.mask = src0.mask;
-    return dst;
-}
-
-__simd_callee__ inline reg_tensor<float> exp_sub(
-    const reg_tensor<half>& src0, const reg_tensor<half>& src1, decltype(ASC_POSITION_ODD) src_pos)
-{
+    using pos_type = ::AscendC::Std::remove_cvref_t<position_type>;
+    using even_pos_type = ::AscendC::Std::remove_cvref_t<decltype(ASC_POSITION_EVEN)>;
+    using odd_pos_type = ::AscendC::Std::remove_cvref_t<decltype(ASC_POSITION_ODD)>;
+    static_assert(::AscendC::Std::is_same_v<pos_type, even_pos_type> ||
+            ::AscendC::Std::is_same_v<pos_type, odd_pos_type>,
+        "exp_diff position supports ASC_POSITION_EVEN and ASC_POSITION_ODD");
     reg_tensor<float> dst;
     asc_exp_sub_half2float(dst.reg, src0.reg, src1.reg, src0.mask, src_pos);
     dst.mask = src0.mask;

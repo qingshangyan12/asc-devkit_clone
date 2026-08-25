@@ -37,7 +37,7 @@ def main() -> None:
     verify_output(
         output_dir, "exp_output_odd.bin", "exp_golden_odd.bin", rtol=1e-3, atol=1e-3
     )
-    print("test pass! verified float fma and half exp_sub EVEN/ODD.")
+    print("test pass! verified float fma and half exp_diff EVEN/ODD.")
 
 
 if __name__ == "__main__":

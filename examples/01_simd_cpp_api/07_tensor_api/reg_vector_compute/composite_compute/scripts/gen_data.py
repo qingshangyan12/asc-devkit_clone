@@ -45,7 +45,7 @@ def main() -> None:
     golden.tofile(output_dir / "golden.bin")
     exp_golden_even.tofile(output_dir / "exp_golden_even.bin")
     exp_golden_odd.tofile(output_dir / "exp_golden_odd.bin")
-    print("Generated float fma and half exp_sub input and golden data.")
+    print("Generated float fma and half exp_diff input and golden data.")
 
 
 if __name__ == "__main__":
