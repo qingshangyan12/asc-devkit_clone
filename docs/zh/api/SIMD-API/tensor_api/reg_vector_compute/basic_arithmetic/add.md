@@ -1,4 +1,4 @@
-# operator+
+# add
 
 ## 产品支持情况
 
@@ -12,50 +12,59 @@
 
 ## 功能说明
 
+头文件路径：`"tensor_api/tensor.h"`。
+
 命名空间：`asc::te::experimental`。
 
-逐元素执行加法。支持寄存器与寄存器、寄存器与标量、标量与寄存器三种操作数组合。
+对两个32位整数寄存器执行逐元素加法，返回加法结果的低32位，并通过引用参数`carry`输出进位：
+
+$$
+\{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, src1_i\}
+$$
 
 ## 函数原型
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1)
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(
-    const reg_tensor<T>& src, const T& scalar)
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(
-    const T& scalar, const reg_tensor<T>& src)
+__simd_callee__ inline reg_tensor<T> add(
+    reg_tensor<bool>& carry,
+    const reg_tensor<T>& src0,
+    const reg_tensor<T>& src1)
 ```
 
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 模板参数 | 输入和返回值的元素类型，支持`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。 |
-| `src0`、`src1` | 输入 | 寄存器/寄存器形式的两个加数，类型均为`reg_tensor<T>`。 |
-| `src` | 输入 | 标量形式中的寄存器加数，类型为`reg_tensor<T>`。 |
-| `scalar` | 输入 | 标量加数，类型为`T`。 |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`int32_t`、`uint32_t`。 |
+| `carry` | 输出 | 逐元素进位输出，类型为`reg_tensor<bool>`。`reg`保存进位，`mask`由接口写为`src0.mask`。 |
+| `src0` | 输入 | 第一个加数，类型为`reg_tensor<T>`，同时提供执行mask。 |
+| `src1` | 输入 | 第二个加数，类型为`reg_tensor<T>`；`src1.mask`不参与执行mask的选择。 |
 
 ## 返回值说明
 
-返回与寄存器操作数元素类型相同的`reg_tensor`。结果mask等于第一个寄存器操作数的mask。
+返回`reg_tensor<T>`：
 
-## 约束说明
+- `reg`：保存`src0.reg + src1.reg`的低32位。
+- `mask`：等于`src0.mask`。
 
-- 标量类型必须与寄存器元素类型一致。
-- 整型结果超出元素类型表示范围时采用非饱和截断。
+`carry.reg`保存本次加法的逐元素进位，产生进位时为`1`，否则为`0`。
 
 ## 调用示例
 
 ```cpp
-using asc::te::experimental::operator+;
+#include "tensor_api/tensor.h"
 
-auto mask = asc::te::all_mask<float>();
-auto src = input.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto result = src + 1.0f;
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void add_example(
+    InputTensor input0, InputTensor input1, OutputTensor output)
+{
+    auto mask = asc::te::all_mask<uint32_t>();
+    auto src0 = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto src1 = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
+
+    asc::te::reg_tensor<bool> carry;
+    auto result = asc::te::experimental::add(carry, src0, src1);
+    output.store(asc::te::make_coord(0, 0), result);
+}
 ```
