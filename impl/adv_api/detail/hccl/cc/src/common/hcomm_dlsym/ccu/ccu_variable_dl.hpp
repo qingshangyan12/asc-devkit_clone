@@ -85,6 +85,8 @@ public:
 
     CondExpr operator!=(uint64_t immediate) { return CondExpr{this, immediate, CCU_CONDITION_NE}; }
 
+    CondExpr operator<(uint64_t immediate) { return CondExpr{this, immediate, CCU_CONDITION_LT}; }
+
     CcuVariableHandle handle{0};
 
 private:
