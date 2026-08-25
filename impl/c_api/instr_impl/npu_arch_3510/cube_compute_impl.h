@@ -18,6 +18,9 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CUBE_COMPUTE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CUBE_COMPUTE_IMPL_H
 
+#include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_l0c2gm_config_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_l0c_copy_config_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_l0c2gm_nz2nd_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_l0c_copy_nz_para_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_mmad_mx_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_mmad_impl.h"
@@ -31,6 +34,16 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_disable_hif8_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_mmad_direction_m_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_mmad_direction_n_impl.h"
+
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
+{
+    asc_set_l0c2gm_config_impl(relu_pre, quant_pre, enable_unit_flag);
+}
+
+__aicore__ inline void asc_set_l0c_copy_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool is_clean_unit_flag)
+{
+    asc_set_l0c_copy_config_impl(relu_pre_addr, quant_pre_addr, is_clean_unit_flag);
+}
 
 __aicore__ inline void asc_set_l0c_copy_nz_para(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride)
 {
