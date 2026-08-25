@@ -9,7 +9,7 @@
 
 ## npu-arch Build Option Description
 
-Developers need to modify the `--npu-arch` build option in the `CMakeLists.txt` file in the specific example directory according to the actual execution environment. Refer to the corresponding relationship in the table below to modify to the npu-arch parameter value corresponding to the environment.
+Developers need to modify the `--npu-arch` build option in the CMakeLists.txt file in the specific example directory according to the actual execution environment. Refer to the corresponding relationship in the table below to modify to the npu-arch parameter value corresponding to the environment.
 | Product Model |  npu-arch Parameter |
 | ---- | ---- |
 | Ascend 950PR/Ascend 950DT | `--npu-arch=dav-3510` |
