@@ -12,6 +12,8 @@
 
 ## 功能说明
 
+头文件路径：`"tensor_api/tensor.h"`。
+
 命名空间：`asc::te::experimental`。
 
 对输入寄存器中的有效元素逐位取反。`reg_tensor<bool>`对predicate位取反；其他类型对元素的二进制编码取反。

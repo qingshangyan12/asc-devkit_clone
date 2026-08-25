@@ -12,6 +12,8 @@
 
 ## 功能说明
 
+头文件路径：`"tensor_api/tensor.h"`。
+
 命名空间：`asc::te::experimental`。
 
 统计`uint8_t`输入值的频率分布或累计分布，并在`dst`初始值上累加结果。
