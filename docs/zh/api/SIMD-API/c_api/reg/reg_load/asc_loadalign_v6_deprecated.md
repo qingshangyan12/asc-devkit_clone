@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+**该接口已废弃。`普通搬运`请使用[asc_loadalign](asc_loadalign.md)接口，`上采样搬运`请使用[asc_loadalign_upsample](asc_loadalign_upsample.md)接口，`下采样搬运`请使用[asc_loadalign_downsample](asc_loadalign_downsample.md)接口。**
+
 reg数据搬运接口，适用于从Unified Buffer（UB）搬入MaskReg。
 
 ## 函数原型
