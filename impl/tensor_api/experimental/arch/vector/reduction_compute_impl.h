@@ -50,7 +50,7 @@ __simd_callee__ inline reg_tensor<DstType> reduce_max(const reg_tensor<SrcType>&
     static_assert(scope == reduce_scope::element || scope == reduce_scope::datablock,
                   "reduce_max only supports reduce_scope::element and reduce_scope::datablock");
     reg_tensor<DstType> dst;
-    if constexpr (scope == reduce_scope::vector) {
+    if constexpr (scope == reduce_scope::element) {
         asc_reduce_max(dst.reg, src.reg, src.mask);
     } else if constexpr (scope == reduce_scope::datablock) {
         asc_reduce_max_datablock(dst.reg, src.reg, src.mask);

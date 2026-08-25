@@ -58,7 +58,7 @@ __simd_callee__ inline reg_pair<RegDataType> interleave(
             "interleave only supports uint8_t, int8_t, fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, "
             "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float");
         asc_intlv(dst.first.reg, dst.second.reg, src0.reg, src1.reg);
-        dst.first.with_mask(all_mask<T>());
+        dst.first.with_mask(all_mask<RegDataType>());
         dst.second.mask = dst.first.mask;
     }
     return dst;
@@ -91,7 +91,7 @@ __simd_callee__ inline reg_pair<RegDataType> deinterleave(
             "deinterleave only supports uint8_t, int8_t, fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, "
             "uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t and float");
         asc_deintlv(dst.first.reg, dst.second.reg, src0.reg, src1.reg);
-        dst.first.with_mask(all_mask<T>());
+        dst.first.with_mask(all_mask<RegDataType>());
         dst.second.mask = dst.first.mask;
     }
     return dst;

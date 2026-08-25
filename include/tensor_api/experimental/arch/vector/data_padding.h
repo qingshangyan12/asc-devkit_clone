@@ -16,7 +16,10 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_DATA_PADDING_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_DATA_PADDING_H
 
-#include <cstdint>
+#include <cstddef>
+
+#include "tensor_api/experimental/arch/vector/reg_tensor.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
 
 namespace asc {
 namespace te {

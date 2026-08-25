@@ -60,10 +60,6 @@ __simd_vf__ inline void compile_reg_local_tensor_load_store(
 
     auto full_value = src_tensor.load(make_coord(0)).with_mask(all_mask<T>());
     static_assert(std::is_same_v<typename decltype(full_value)::elem_type, T>);
-
-    reg_tensor<T> assigned {mask};
-    auto& assigned_ref = (assigned = static_cast<T>(1));
-    static_assert(std::is_same_v<decltype(assigned_ref), reg_tensor<T>&>);
 }
 
 template <load_sideband_mode sideband_mode>

@@ -42,7 +42,7 @@ enum class cast_round_mode {
 
 /** @brief Saturation behavior for register cast. */
 enum class cast_sat_mode {
-    unknow = -1,
+    unknown = -1,
     not_sat,
     sat,
 };

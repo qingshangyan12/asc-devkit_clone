@@ -8,8 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include <type_traits>
-
 #include <gtest/gtest.h>
 
 #include "tensor_api/stub/cce_stub.h"
@@ -26,7 +24,7 @@ __aicore__ inline void TestSelect()
     src0.mask = asc::te::experimental::all_mask<T>().reg;
 
     auto dst = asc::te::experimental::select(condition, src0, src1);
-    static_assert(std::is_same_v<decltype(dst), asc::te::experimental::reg_tensor<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), asc::te::experimental::reg_tensor<T>>);
     EXPECT_EQ(dst.mask, src0.mask);
 }
 

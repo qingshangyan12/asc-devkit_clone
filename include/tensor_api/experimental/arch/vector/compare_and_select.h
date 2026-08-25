@@ -16,7 +16,7 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPARE_AND_SELECT_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPARE_AND_SELECT_H
 
-#include <cstdint>
+#include "tensor_api/experimental/arch/vector/reg_tensor.h"
 
 namespace asc {
 namespace te {

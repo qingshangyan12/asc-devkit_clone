@@ -8,8 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include <type_traits>
-
 #include <gtest/gtest.h>
 
 #include "tensor_api/stub/cce_stub.h"

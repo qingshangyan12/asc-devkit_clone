@@ -8,9 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the license.
  */
 
-#include <type_traits>
-#include <utility>
-
 #include <gtest/gtest.h>
 
 #include "tensor_api/stub/cce_stub.h"
@@ -26,9 +23,9 @@ void check_composite_compute()
 {
     static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::axpy(AscendC::Std::declval<const reg_type<T>&>(),
         AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const T&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::absdiff(
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::abs_diff(
         AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::exp_sub(
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::exp_diff(
         AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<float>>);
     static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::fma(AscendC::Std::declval<const reg_type<T>&>(),
         AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
