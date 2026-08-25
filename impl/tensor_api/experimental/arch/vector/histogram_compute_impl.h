@@ -25,7 +25,7 @@ namespace te {
 namespace experimental {
 
 template <const histogram_options& options>
-__simd_callee__ inline decltype(auto) histograms(
+__simd_callee__ inline reg_tensor<uint16_t> histograms(
     const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src)
 {
     static_assert(options.half == histogram_half::low || options.half == histogram_half::high,
