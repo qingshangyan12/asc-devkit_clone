@@ -25,7 +25,7 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_unlock_impl(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode)
+__aicore__ inline void asc_unlock_impl(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode)
 {
     if (mode == ASC_LOCK_BLOCK) {
         if ASC_IS_AIC {

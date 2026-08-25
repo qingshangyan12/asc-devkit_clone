@@ -13,9 +13,4 @@
 
 #include "c_api/defs/enum.h"
 
-enum ascMutexExecuteMode {
-    ASC_LOCK_BLOCK = 0,    // Block the execution of the pipeline indicated by pipe (Default).
-    ASC_LOCK_NON_BLOCK = 1 // Won't block execution of the pipeline.
-};
-
 #endif

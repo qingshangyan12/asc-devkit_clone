@@ -89,14 +89,14 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id) { asc_s
 
 __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id) { asc_lock_impl(pipe, mutex_id); }
 
-__aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode)
+__aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode)
 {
     asc_lock_impl(pipe, mutex_id, mode);
 }
 
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id) { asc_unlock_impl(pipe, mutex_id); }
 
-__aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode)
+__aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode)
 {
     asc_unlock_impl(pipe, mutex_id, mode);
 }

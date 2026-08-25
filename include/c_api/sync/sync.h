@@ -61,11 +61,11 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id);
 
 __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id);
 
-__aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode);
+__aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode);
 
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id);
 
-__aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode);
+__aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode);
 
 [[deprecated("NOTICE: asc_sync_vec() is deprecated. "
              "Please use asc_sync() instead")]]
