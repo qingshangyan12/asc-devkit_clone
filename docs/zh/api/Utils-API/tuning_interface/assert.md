@@ -42,8 +42,6 @@
 | Atlas 推理系列产品AI Core | 支持 | 不支持 | 不支持 |
 | Atlas 推理系列产品Vector Core | 支持 | 不支持 | 不支持 |
 
-SIMD和SIMD VF支持输出自定义错误信息；SIMT VF不输出自定义错误信息。
-
 ## 功能说明
 
 头文件路径为：`"utils/debug/asc_assert.h"`。
@@ -102,7 +100,7 @@ extern "C" __global__ __vector__ void AssertSimdKernel()
 {
     int32_t value = 7;
     AscendC::printf("before assert, value is %d.\n", value);
-    ascendc_assert(value == 6, "value is %d.\n", value);
+    assert(value == 6, "value is %d.\n", value);
 }
 ```
 
@@ -158,7 +156,7 @@ __simd_vf__ inline void AssertSimdVf()
 {
     int32_t value = 7;
     __ubuf__ const char* fmt = "value is %d.\n";
-    ascendc_assert(value == 6, fmt, value);
+    assert(value == 6, fmt, value);
 }
 ```
 
