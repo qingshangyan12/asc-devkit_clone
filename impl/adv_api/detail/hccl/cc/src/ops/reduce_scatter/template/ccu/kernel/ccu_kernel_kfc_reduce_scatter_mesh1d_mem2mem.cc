@@ -44,8 +44,7 @@ struct KfcReduceScatterMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::LocalAddr myInput;
     std::vector<ccu::RemoteAddr> remoteInput;
     std::vector<ccu::LocalAddr> scratchMem;
-    ccu::Event gatherEvent;
-    ccu::Event reduceEvent;
+    ccu::Event event;
 };
 
 static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext& ctx)
@@ -135,17 +134,15 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
     {
         for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
             if (rankIdx == ctx.rankId) {
-                ccu::LocalCopy(
-                    ctx.scratchMem[rankIdx], ctx.myInput, ctx.currentSliceSize, ctx.gatherEvent, 1 << rankIdx);
+                ccu::LocalCopy(ctx.scratchMem[rankIdx], ctx.myInput, ctx.currentSliceSize, ctx.event, 1);
             } else {
                 ccu::Read(
                     ctx.channels[channelId], ctx.scratchMem[rankIdx], ctx.remoteInput[rankIdx], ctx.currentSliceSize,
-                    ctx.gatherEvent, 1 << rankIdx);
+                    ctx.event, 1);
                 channelId++;
             }
+            ccu::EventWait(ctx.event, 1);
         }
-
-        ccu::EventWait(ctx.gatherEvent, (1 << ctx.rankSize) - 1);
 
         // Keep pr_4523's hand-written reduction to avoid loop-group block resource expansion in KFC server.
         uint32_t expansionNum = GetReduceExpansionNum(ctx.reduceOp, ctx.dataType, ctx.outputDataType);
@@ -155,12 +152,12 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
             tmp = GetExpansionParam(expansionNum);
             reduceDst.token = reduceDst.token + tmp;
         }
-        ccu::LocalCopy(reduceDst, ctx.scratchMem[0], ctx.currentSliceSize, ctx.reduceEvent, 1);
-        ccu::EventWait(ctx.reduceEvent, 1);
+        ccu::LocalCopy(reduceDst, ctx.scratchMem[0], ctx.currentSliceSize, ctx.event, 1);
+        ccu::EventWait(ctx.event, 1);
         for (uint32_t i = 1; i < ctx.rankSize; i++) {
             ccu::LocalReduce(
-                reduceDst, ctx.scratchMem[i], ctx.currentSliceSize, ctx.dataType, ctx.reduceOp, ctx.reduceEvent, 1);
-            ccu::EventWait(ctx.reduceEvent, 1);
+                reduceDst, ctx.scratchMem[i], ctx.currentSliceSize, ctx.dataType, ctx.reduceOp, ctx.event, 1);
+            ccu::EventWait(ctx.event, 1);
         }
     }
     return CCU_SUCCESS;
