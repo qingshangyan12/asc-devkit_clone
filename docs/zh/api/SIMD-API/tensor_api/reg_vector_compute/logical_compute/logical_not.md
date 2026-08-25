@@ -18,6 +18,10 @@
 
 对输入寄存器中的有效元素逐位取反。`reg_tensor<bool>`对predicate位取反；其他类型对元素的二进制编码取反。
 
+$$
+dst_i = \mathord{\sim}src_i
+$$
+
 ## 函数原型
 
 ```cpp
