@@ -404,10 +404,10 @@ The test case only passes `TopoMeta` + `dataType` + `sliceSize`; the framework a
 
 ```cpp
 struct CcuStScenario {
-    TopoMeta topoMeta;                    // topology, rankSize derived from this
-    DevType devType = DEV_TYPE_950;       // device type
-    HcclDataType dataType = FP16;         // data type
-    HcclCMDType opType;                   // operator type
+    TopoMeta topoMeta;                                    // rankSize derived from topoMeta
+    DevType devType = DevType::DEV_TYPE_950;
+    HcclDataType dataType = HCCL_DATA_TYPE_FP16;
+    HcclCMDType opType = HcclCMDType::HCCL_CMD_ALLTOALLV;
 
     std::string expectedAlgName;          // expected algorithm name (empty = skip assertion)
     std::string algConfig;                // forced algorithm (empty = auto-select)

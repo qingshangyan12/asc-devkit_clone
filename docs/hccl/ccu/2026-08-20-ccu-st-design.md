@@ -394,10 +394,10 @@ TEST_F(CcuStAllToAll, Mesh1D_2Rank_SingleDie_Fp16_100B)
 
 ```cpp
 struct CcuStScenario {
-    TopoMeta topoMeta;                    // 拓扑，rankSize 从此推导
-    DevType devType = DEV_TYPE_950;       // 设备类型
-    HcclDataType dataType = FP16;         // 数据类型
-    HcclCMDType opType;                   // 算子类型
+    TopoMeta topoMeta;                                    // rankSize 从 topoMeta 自动推导
+    DevType devType = DevType::DEV_TYPE_950;
+    HcclDataType dataType = HCCL_DATA_TYPE_FP16;
+    HcclCMDType opType = HcclCMDType::HCCL_CMD_ALLTOALLV;
 
     std::string expectedAlgName;          // 期望 selector 选出的算法名（空=不校验）
     std::string algConfig;                // 强制指定算法（空=自动选择）
@@ -407,7 +407,7 @@ struct CcuStScenario {
     HcclReduceOp reduceType = HCCL_REDUCE_SUM; // 归约操作类型（ReduceScatter/AllReduce）
     HcclDataType outputType = HCCL_DATA_TYPE_RESERVED;  // 低精度归约输出类型（RESERVED=同 dataType）
     uint32_t root = 0;                    // Broadcast/Reduce/Scatter 的 root rank
-    bool inPlace = false;                 //原地操作（input==output，AllReduce 用）
+    bool inPlace = false;                 // 原地操作（input==output，AllReduce 用）
 
     bool corruptOutput = false;           // 负向：篡改 output
     bool outOfRangeParam = false;         // 负向：参数越界（预留，当前未使用）
