@@ -160,6 +160,28 @@ void KernelSpecializationDiagnostics::AppendCommandToReplayScript(const Compilat
     }
 }
 
+std::string KernelSpecializationDiagnostics::GetCompilationLogFilePath() const
+{
+    return diagnosticsEnabled_ ? (resourceWorktreePath_ / DIAGNOSTIC_COMPILE_LOG_FILE_NAME).string() : std::string();
+}
+
+void KernelSpecializationDiagnostics::AppendCommandExecutionHeaderToLog(
+    const CompilationCommand& compilationCommand) noexcept
+{
+    if (!diagnosticsEnabled_) {
+        return;
+    }
+    try {
+        AppendTextToDiagnosticFile(
+            resourceWorktreePath_ / DIAGNOSTIC_COMPILE_LOG_FILE_NAME,
+            "[" + compilationCommand.diagnosticLabel + "] output:\n");
+    } catch (...) {
+        ASCENDLOGW(
+            "Failed to record command output header: command=%s resource_worktree=%s",
+            compilationCommand.diagnosticLabel.c_str(), resourceWorktreePath_.c_str());
+    }
+}
+
 void KernelSpecializationDiagnostics::AppendCommandExecutionResultToLog(
     const CompilationCommand& compilationCommand, const ProcessExecutorResult& executorResult) noexcept
 {
@@ -168,13 +190,10 @@ void KernelSpecializationDiagnostics::AppendCommandExecutionResultToLog(
     }
     try {
         std::ostringstream resultText;
-        resultText << '[' << compilationCommand.diagnosticLabel << "] outcome=" << executorResult.GetOutcomeName()
+        resultText << '\n'
+                   << '[' << compilationCommand.diagnosticLabel << "] outcome=" << executorResult.GetOutcomeName()
                    << " code=" << executorResult.terminationCode << " elapsed_ms=" << executorResult.elapsedTime.count()
-                   << " output_truncated=" << (executorResult.capturedOutputTruncated ? "true" : "false") << '\n'
-                   << executorResult.capturedOutput;
-        if (!executorResult.capturedOutput.empty() && executorResult.capturedOutput.back() != '\n') {
-            resultText << '\n';
-        }
+                   << '\n';
         AppendTextToDiagnosticFile(resourceWorktreePath_ / DIAGNOSTIC_COMPILE_LOG_FILE_NAME, resultText.str());
     } catch (...) {
         ASCENDLOGW(

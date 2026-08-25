@@ -44,7 +44,7 @@ int FailCommandOutputPoll(pollfd*, nfds_t, int)
     return -1;
 }
 
-int FailCommandLeaderInspection(idtype_t, id_t, siginfo_t*, int)
+pid_t FailCommandWait(pid_t, int*, int)
 {
     errno = ECHILD;
     return -1;
@@ -56,10 +56,6 @@ static_assert(
 static_assert(
     std::is_same<std::underlying_type_t<CompilationCommandKind>, uint32_t>::value,
     "CompilationCommandKind must have a stable width");
-static_assert(
-    std::is_same<decltype(CompilationCommandExecutionLimits::capturedOutputByteLimit), uint64_t>::value,
-    "capturedOutputByteLimit must have a stable width");
-
 CompilationCommand CreateCommand(
     CompilationCommandKind commandKind, const char* executable, std::vector<std::string> arguments)
 {
@@ -100,7 +96,6 @@ TEST(CompilationPlanExecutorTest, ProductionLimitsMatchReviewedPerCommandTimeout
     EXPECT_EQ(limits.compileCommandTimeout, 5min);
     EXPECT_EQ(limits.objectCopyAndLinkCommandTimeout, 1min);
     EXPECT_EQ(limits.terminationGracePeriod, 5s);
-    EXPECT_EQ(limits.capturedOutputByteLimit, 4U * 1024U * 1024U);
 }
 
 TEST(CompilationPlanExecutorTest, ExecutesCommandsWithoutShellParsing)
@@ -159,7 +154,6 @@ TEST(CompilationPlanExecutorTest, UsesInjectedShortTimeoutInUnitTests)
     limits.compileCommandTimeout = 20ms;
     limits.objectCopyAndLinkCommandTimeout = 20ms;
     limits.terminationGracePeriod = 20ms;
-    limits.capturedOutputByteLimit = 1024U;
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/sleep", {"10"}));
@@ -172,7 +166,7 @@ TEST(CompilationPlanExecutorTest, UsesInjectedShortTimeoutInUnitTests)
 TEST(CompilationPlanExecutorTest, EnforcesTimeoutWhileCommandContinuouslyProducesOutput)
 {
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_continuous_output");
-    CompilationCommandExecutionLimits limits{20ms, 20ms, 20ms, 1024U};
+    CompilationCommandExecutionLimits limits{20ms, 20ms, 20ms};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(
@@ -186,7 +180,7 @@ TEST(CompilationPlanExecutorTest, EnforcesTimeoutWhileCommandContinuouslyProduce
 TEST(CompilationPlanExecutorTest, WaitsWithoutBusyPollingAfterCommandOutputCloses)
 {
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_closed_output");
-    CompilationCommandExecutionLimits limits{1s, 1s, 20ms, 1024U};
+    CompilationCommandExecutionLimits limits{1s, 1s, 20ms};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(
@@ -203,10 +197,10 @@ TEST(CompilationPlanExecutorTest, WaitsWithoutBusyPollingAfterCommandOutputClose
     EXPECT_LT(consumedCpuNanoseconds, 100000000LL);
 }
 
-TEST(CompilationPlanExecutorTest, WaitsForOutputPipeClosureAfterCommandLeaderExits)
+TEST(CompilationPlanExecutorTest, CompletesWhenSynchronousCommandLeaderExits)
 {
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_leader_exit");
-    CompilationCommandExecutionLimits limits{500ms, 500ms, 20ms, 1024U};
+    CompilationCommandExecutionLimits limits{500ms, 500ms, 20ms};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(
@@ -214,22 +208,21 @@ TEST(CompilationPlanExecutorTest, WaitsForOutputPipeClosureAfterCommandLeaderExi
 
     const auto startedAt = std::chrono::steady_clock::now();
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_SUCCESS);
-    EXPECT_GE(std::chrono::steady_clock::now() - startedAt, 200ms);
+    EXPECT_LT(std::chrono::steady_clock::now() - startedAt, 200ms);
 }
 
-TEST(CompilationPlanExecutorTest, TimeoutTerminatesDescendantsAfterCommandLeaderExits)
+TEST(CompilationPlanExecutorTest, TimeoutTerminatesActiveProcessGroup)
 {
     static uint64_t sequence = 0U;
     const fs::path descendantMarkerPath =
         fs::temp_directory_path() /
         ("aclrtc_descendant_marker_" + std::to_string(getpid()) + "_" + std::to_string(sequence++));
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_process_group");
-    CompilationCommandExecutionLimits limits{20ms, 20ms, 20ms, 1024U};
+    CompilationCommandExecutionLimits limits{20ms, 20ms, 20ms};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     const std::string commandScript =
-        "(trap '' TERM; count=0; while [ $count -lt 100 ]; do printf x >> '" + descendantMarkerPath.string() +
-        "'; count=$((count + 1)); sleep 0.01; done; rm -f '" + descendantMarkerPath.string() + "') & exec /bin/true";
+        "(trap '' TERM; while true; do printf x >> '" + descendantMarkerPath.string() + "'; sleep 0.01; done) & wait";
     plan.compilationCommands.push_back(
         CreateCommand(CompilationCommandKind::Compile, "/bin/sh", {"-c", commandScript}));
 
@@ -261,23 +254,21 @@ TEST(CompilationPlanExecutorTest, RecordsSpawnFailureAsExecutorFailure)
     EXPECT_EQ(compilationLog.find("termination=exited code=0"), std::string::npos);
 }
 
-TEST(CompilationPlanExecutorTest, BoundsCapturedProcessOutput)
+TEST(CompilationPlanExecutorTest, MirrorsCompleteProcessOutputWhenDiagnosticsAreEnabled)
 {
     ScopedDiagnosticCurrentDirectory diagnosticCurrentDirectory;
     const std::string specializationSessionId = "executor_output_limit";
     KernelSpecializationDiagnostics diagnostics(fs::current_path(), specializationSessionId);
-    CompilationCommandExecutionLimits limits = CompilationCommandExecutionLimits::ProductionDefaults();
-    limits.capturedOutputByteLimit = 8U;
-    CompilationPlanExecutor executor(diagnostics, limits);
+    CompilationPlanExecutor executor(diagnostics, CompilationCommandExecutionLimits::ProductionDefaults());
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(
         CreateCommand(CompilationCommandKind::Compile, "/usr/bin/printf", {"0123456789abcdef"}));
     EXPECT_EQ(executor.ExecuteCompilationPlan(plan), ascendc::aclrtc::ACLRTC_SUCCESS);
 
     const std::string compilationLog = ReadTextFile(fs::current_path() / "aclrtc_compile.log");
-    EXPECT_NE(compilationLog.find("output_truncated=true"), std::string::npos);
-    EXPECT_NE(compilationLog.find("01234567"), std::string::npos);
-    EXPECT_EQ(compilationLog.find("89abcdef"), std::string::npos);
+    EXPECT_NE(compilationLog.find("[test-command] output:\n"), std::string::npos);
+    EXPECT_NE(compilationLog.find("0123456789abcdef"), std::string::npos);
+    EXPECT_NE(compilationLog.find("\n[test-command] outcome=exited code=0"), std::string::npos);
 }
 
 TEST(CompilationPlanExecutorTest, ReportsToolProcessTerminatedBySignal)
@@ -313,7 +304,7 @@ TEST(CompilationPlanExecutorTest, ReportsPipeCreationFailureWhenFileDescriptorsA
 TEST(CompilationPlanExecutorTest, ReportsCommandOutputPollFailure)
 {
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_poll_failure");
-    CompilationCommandExecutionLimits limits{1s, 1s, 20ms, 1024U};
+    CompilationCommandExecutionLimits limits{1s, 1s, 20ms};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/sleep", {"1"}));
@@ -325,14 +316,14 @@ TEST(CompilationPlanExecutorTest, ReportsCommandOutputPollFailure)
     EXPECT_EQ(planExecutionStatus, ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
 }
 
-TEST(CompilationPlanExecutorTest, ReportsCommandLeaderInspectionFailure)
+TEST(CompilationPlanExecutorTest, ReportsCommandWaitFailure)
 {
     KernelSpecializationDiagnostics diagnostics(fs::path(), "executor_waitid_failure");
-    CompilationCommandExecutionLimits limits{1s, 1s, 20ms, 1024U};
+    CompilationCommandExecutionLimits limits{1s, 1s, 20ms};
     CompilationPlanExecutor executor(diagnostics, limits);
     KernelCompilationPlan plan;
     plan.compilationCommands.push_back(CreateCommand(CompilationCommandKind::Compile, "/bin/sleep", {"1"}));
-    MOCKER(waitid, int (*)(idtype_t, id_t, siginfo_t*, int)).expects(once()).will(invoke(FailCommandLeaderInspection));
+    MOCKER(waitpid, pid_t(*)(pid_t, int*, int)).expects(once()).will(invoke(FailCommandWait));
 
     const aclError planExecutionStatus = executor.ExecuteCompilationPlan(plan);
 

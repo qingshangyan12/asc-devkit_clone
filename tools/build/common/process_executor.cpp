@@ -13,11 +13,13 @@
 #include "ascendc_tool_log.h"
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
 #include <csignal>
 #include <cstring>
 #include <exception>
 #include <fcntl.h>
+#include <fstream>
 #include <map>
 #include <new>
 #include <poll.h>
@@ -31,184 +33,212 @@ namespace ascendc {
 namespace {
 using SteadyClock = std::chrono::steady_clock;
 
-constexpr uint64_t MAX_OUTPUT_READ_BYTES_PER_WAIT_ITERATION = 64U * 1024U;
-constexpr int64_t MAX_OUTPUT_WAIT_INTERVAL_MILLISECONDS = 50;
-constexpr int64_t MAX_PROCESS_CHECK_INTERVAL_MILLISECONDS = 5;
+constexpr uint64_t MAX_OUTPUT_READ_BYTES_PER_ITERATION = 64U * 1024U;
+constexpr int64_t MAX_PROCESS_WAIT_MILLISECONDS = 5;
 
-enum class CapturedOutputDrainStatus : uint32_t {
-    NoDataAvailable,
-    EndOfFile,
-    ReadBudgetExhausted,
-    Failed,
-};
-
-enum class ProcessLeaderCheckResult : uint32_t {
-    Running,
-    Terminated,
-    InspectionFailed,
-};
-
-class FileDescriptorGuard final {
+class FileDescriptor final {
 public:
-    explicit FileDescriptorGuard(int fileDescriptor = -1) noexcept : fileDescriptor_(fileDescriptor) {}
+    explicit FileDescriptor(int value = -1) noexcept : value_(value) {}
+    ~FileDescriptor() noexcept { Close(); }
 
-    ~FileDescriptorGuard() noexcept { Close(); }
+    FileDescriptor(const FileDescriptor&) = delete;
+    FileDescriptor& operator=(const FileDescriptor&) = delete;
 
-    FileDescriptorGuard(const FileDescriptorGuard&) = delete;
-    FileDescriptorGuard& operator=(const FileDescriptorGuard&) = delete;
+    int Get() const noexcept { return value_; }
 
-    int Get() const noexcept { return fileDescriptor_; }
-
-    void TakeOwnership(int fileDescriptor) noexcept
+    void Reset(int value = -1) noexcept
     {
         Close();
-        fileDescriptor_ = fileDescriptor;
+        value_ = value;
     }
 
     void Close() noexcept
     {
-        if (fileDescriptor_ < 0) {
+        if (value_ < 0) {
             return;
         }
-        const int closingFileDescriptor = fileDescriptor_;
-        fileDescriptor_ = -1;
-        if (close(closingFileDescriptor) != 0) {
+        const int valueToClose = value_;
+        value_ = -1;
+        if (close(valueToClose) != 0) {
             const int closeError = errno;
             ASCENDLOGW(
-                "Failed to close process output descriptor: fd=%d errno=%d message=%s", closingFileDescriptor,
-                closeError, std::strerror(closeError));
+                "Failed to close process file descriptor: fd=%d errno=%d message=%s", valueToClose, closeError,
+                std::strerror(closeError));
         }
     }
 
 private:
-    int fileDescriptor_;
+    int value_;
 };
 
-class PosixSpawnStringStorage final {
-public:
-    explicit PosixSpawnStringStorage(std::vector<std::string> strings) : stringStorage_(std::move(strings))
+struct PosixSpawnResources {
+    ~PosixSpawnResources() noexcept
     {
-        cStringPointers_.reserve(stringStorage_.size() + 1U);
-        for (std::string& string : stringStorage_) {
-            cStringPointers_.push_back(const_cast<char*>(string.c_str()));
-        }
-        cStringPointers_.push_back(nullptr);
-    }
-
-    PosixSpawnStringStorage(const PosixSpawnStringStorage&) = delete;
-    PosixSpawnStringStorage& operator=(const PosixSpawnStringStorage&) = delete;
-    PosixSpawnStringStorage(PosixSpawnStringStorage&&) = delete;
-    PosixSpawnStringStorage& operator=(PosixSpawnStringStorage&&) = delete;
-
-    char* const* Data() noexcept { return cStringPointers_.data(); }
-
-private:
-    std::vector<std::string> stringStorage_;
-    std::vector<char*> cStringPointers_;
-};
-
-class PosixSpawnConfiguration final {
-public:
-    PosixSpawnConfiguration() = default;
-
-    ~PosixSpawnConfiguration() noexcept
-    {
-        if (spawnAttributesInitialized_) {
-            const int destroyResult = posix_spawnattr_destroy(&spawnAttributes_);
-            if (destroyResult != 0) {
-                ASCENDLOGW(
-                    "Failed to destroy process spawn attributes: error=%d message=%s", destroyResult,
-                    std::strerror(destroyResult));
-            }
+        if (attributesInitialized_) {
+            (void)posix_spawnattr_destroy(&attributes_);
         }
         if (fileActionsInitialized_) {
-            const int destroyResult = posix_spawn_file_actions_destroy(&fileActions_);
-            if (destroyResult != 0) {
-                ASCENDLOGW(
-                    "Failed to destroy process spawn file actions: error=%d message=%s", destroyResult,
-                    std::strerror(destroyResult));
-            }
+            (void)posix_spawn_file_actions_destroy(&fileActions_);
         }
     }
 
-    PosixSpawnConfiguration(const PosixSpawnConfiguration&) = delete;
-    PosixSpawnConfiguration& operator=(const PosixSpawnConfiguration&) = delete;
+    posix_spawn_file_actions_t fileActions_{};
+    posix_spawnattr_t attributes_{};
+    bool fileActionsInitialized_{false};
+    bool attributesInitialized_{false};
+};
 
-    bool Initialize(ProcessOutputMode outputMode, int outputReadFileDescriptor, int outputWriteFileDescriptor) noexcept
+std::vector<char*> BuildCStringPointers(const std::vector<std::string>& strings)
+{
+    std::vector<char*> pointers;
+    pointers.reserve(strings.size() + 1U);
+    for (const std::string& string : strings) {
+        pointers.push_back(const_cast<char*>(string.c_str()));
+    }
+    pointers.push_back(nullptr);
+    return pointers;
+}
+
+enum class ProcessOutputKind : uint32_t {
+    StandardOutput,
+    StandardError,
+};
+
+class ProcessOutputForwarder final {
+public:
+    ProcessOutputForwarder(ProcessOutputKind outputKind, std::string executablePath, std::ofstream& outputLog)
+        : outputKind_(outputKind), executablePath_(std::move(executablePath)), outputLog_(outputLog)
+    {}
+
+    int GetReadFileDescriptor() const noexcept { return readFileDescriptor_.Get(); }
+    int GetWriteFileDescriptor() const noexcept { return writeFileDescriptor_.Get(); }
+    bool IsOpen() const noexcept { return readFileDescriptor_.Get() >= 0; }
+
+    bool CreatePipe() noexcept
     {
-        int setupResult = posix_spawnattr_init(&spawnAttributes_);
-        if (setupResult != 0) {
+        int pipeFileDescriptors[2]{-1, -1};
+        if (pipe2(pipeFileDescriptors, O_CLOEXEC) != 0) {
+            const int pipeError = errno;
             ASCENDLOGE(
-                "Failed to initialize process spawn attributes: error=%d message=%s", setupResult,
-                std::strerror(setupResult));
+                "Failed to create process output pipe: errno=%d message=%s", pipeError, std::strerror(pipeError));
             return false;
         }
-        spawnAttributesInitialized_ = true;
-        setupResult = posix_spawnattr_setflags(&spawnAttributes_, POSIX_SPAWN_SETPGROUP);
-        if (setupResult == 0) {
-            setupResult = posix_spawnattr_setpgroup(&spawnAttributes_, 0);
-        }
-        if (setupResult != 0) {
+        readFileDescriptor_.Reset(pipeFileDescriptors[0]);
+        writeFileDescriptor_.Reset(pipeFileDescriptors[1]);
+        const int readFlags = fcntl(readFileDescriptor_.Get(), F_GETFL, 0);
+        if (readFlags < 0 || fcntl(readFileDescriptor_.Get(), F_SETFL, readFlags | O_NONBLOCK) != 0) {
+            const int flagError = errno;
             ASCENDLOGE(
-                "Failed to configure process spawn group: error=%d message=%s", setupResult,
-                std::strerror(setupResult));
-            return false;
-        }
-        if (outputMode == ProcessOutputMode::Inherit) {
-            return true;
-        }
-
-        setupResult = posix_spawn_file_actions_init(&fileActions_);
-        if (setupResult != 0) {
-            ASCENDLOGE(
-                "Failed to initialize process spawn file actions: error=%d message=%s", setupResult,
-                std::strerror(setupResult));
-            return false;
-        }
-        fileActionsInitialized_ = true;
-        setupResult = posix_spawn_file_actions_addclose(&fileActions_, outputReadFileDescriptor);
-        if (setupResult == 0) {
-            setupResult = posix_spawn_file_actions_adddup2(&fileActions_, outputWriteFileDescriptor, STDOUT_FILENO);
-        }
-        if (setupResult == 0) {
-            setupResult = posix_spawn_file_actions_adddup2(&fileActions_, outputWriteFileDescriptor, STDERR_FILENO);
-        }
-        if (setupResult == 0) {
-            setupResult = posix_spawn_file_actions_addclose(&fileActions_, outputWriteFileDescriptor);
-        }
-        if (setupResult != 0) {
-            ASCENDLOGE(
-                "Failed to configure captured process output: error=%d message=%s", setupResult,
-                std::strerror(setupResult));
+                "Failed to make process output pipe nonblocking: fd=%d errno=%d message=%s", readFileDescriptor_.Get(),
+                flagError, std::strerror(flagError));
             return false;
         }
         return true;
     }
 
-    const posix_spawn_file_actions_t* GetFileActions() const noexcept
+    void CloseWriteEnd() noexcept { writeFileDescriptor_.Close(); }
+
+    bool ForwardAvailableOutput() noexcept
     {
-        return fileActionsInitialized_ ? &fileActions_ : nullptr;
+        char readBuffer[4096];
+        uint64_t totalReadBytes = 0U;
+        while (totalReadBytes < MAX_OUTPUT_READ_BYTES_PER_ITERATION) {
+            const ssize_t readBytes = read(readFileDescriptor_.Get(), readBuffer, sizeof(readBuffer));
+            if (readBytes > 0) {
+                const size_t outputBytes = static_cast<size_t>(readBytes);
+                totalReadBytes += static_cast<uint64_t>(outputBytes);
+                MirrorOutputToFile(readBuffer, outputBytes);
+                ForwardOutputToPlog(readBuffer, outputBytes);
+                continue;
+            }
+            if (readBytes == 0) {
+                Close();
+                return true;
+            }
+            if (errno == EINTR) {
+                continue;
+            }
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                return true;
+            }
+            const int readError = errno;
+            ASCENDLOGE(
+                "Failed to read process output: executable=%s stream=%s errno=%d message=%s", executablePath_.c_str(),
+                GetOutputKindName(), readError, std::strerror(readError));
+            Close();
+            return false;
+        }
+        return true;
     }
 
-    const posix_spawnattr_t* GetSpawnAttributes() const noexcept { return &spawnAttributes_; }
+    void Close() noexcept { readFileDescriptor_.Close(); }
 
 private:
-    posix_spawn_file_actions_t fileActions_{};
-    posix_spawnattr_t spawnAttributes_{};
-    bool fileActionsInitialized_{false};
-    bool spawnAttributesInitialized_{false};
+    void MirrorOutputToFile(const char* output, size_t outputBytes) noexcept
+    {
+        if (!outputLog_.is_open()) {
+            return;
+        }
+        outputLog_.write(output, static_cast<std::streamsize>(outputBytes));
+        outputLog_.flush();
+        if (!outputLog_) {
+            ASCENDLOGW("Failed to save process output; compilation will continue");
+            outputLog_.close();
+        }
+    }
+
+    void ForwardOutputToPlog(const char* output, size_t outputBytes) noexcept
+    {
+        const int plogOutputBytes = static_cast<int>(outputBytes);
+        if (outputKind_ == ProcessOutputKind::StandardOutput) {
+            ASCENDLOGI("Process stdout: executable=%s output=%.*s", executablePath_.c_str(), plogOutputBytes, output);
+        } else {
+            ASCENDLOGE("Process stderr: executable=%s output=%.*s", executablePath_.c_str(), plogOutputBytes, output);
+        }
+    }
+
+    const char* GetOutputKindName() const noexcept
+    {
+        return outputKind_ == ProcessOutputKind::StandardOutput ? "stdout" : "stderr";
+    }
+
+    ProcessOutputKind outputKind_;
+    std::string executablePath_;
+    std::ofstream& outputLog_;
+    FileDescriptor readFileDescriptor_;
+    FileDescriptor writeFileDescriptor_;
 };
 
 bool ContainsEmbeddedNull(const std::string& text) noexcept { return text.find('\0') != std::string::npos; }
 
-bool IsEnvironmentVariableNameValid(const std::string& environmentVariableName) noexcept
+bool IsEnvironmentVariableNameValid(const std::string& name) noexcept
 {
-    return !environmentVariableName.empty() && environmentVariableName.find('=') == std::string::npos &&
-           !ContainsEmbeddedNull(environmentVariableName);
+    return !name.empty() && name.find('=') == std::string::npos && !ContainsEmbeddedNull(name);
+}
+
+bool CanWaitForChildProcesses() noexcept
+{
+    struct sigaction sigchldDisposition {};
+    if (sigaction(SIGCHLD, nullptr, &sigchldDisposition) != 0) {
+        const int sigactionError = errno;
+        ASCENDLOGE(
+            "Failed to inspect SIGCHLD disposition: errno=%d message=%s", sigactionError,
+            std::strerror(sigactionError));
+        return false;
+    }
+    if (sigchldDisposition.sa_handler == SIG_IGN || (sigchldDisposition.sa_flags & SA_NOCLDWAIT) != 0) {
+        ASCENDLOGE("Process execution requires waitable children; restore the default SIGCHLD disposition and remove "
+                   "SA_NOCLDWAIT before invoking ProcessExecutor");
+        return false;
+    }
+    return true;
 }
 
 bool ValidateProcessExecutorRequest(const ProcessExecutorRequest& request) noexcept
 {
+    if (!CanWaitForChildProcesses()) {
+        return false;
+    }
     if (request.arguments.empty()) {
         ASCENDLOGE("Process arguments must not be empty");
         return false;
@@ -221,80 +251,51 @@ bool ValidateProcessExecutorRequest(const ProcessExecutorRequest& request) noexc
         ASCENDLOGE("Process termination grace period must not be negative");
         return false;
     }
-    if (request.outputMode != ProcessOutputMode::Inherit && request.outputMode != ProcessOutputMode::CaptureCombined) {
-        ASCENDLOGE("Process output mode is invalid: value=%u", static_cast<uint32_t>(request.outputMode));
-        return false;
-    }
     for (size_t argumentIndex = 0U; argumentIndex < request.arguments.size(); ++argumentIndex) {
         if (ContainsEmbeddedNull(request.arguments[argumentIndex])) {
             ASCENDLOGE("Process argv[%zu] contains an embedded NUL", argumentIndex);
             return false;
         }
     }
+    if (ContainsEmbeddedNull(request.mirroredOutputLogFilePath)) {
+        ASCENDLOGE("Process output log path contains an embedded NUL");
+        return false;
+    }
     for (size_t overrideIndex = 0U; overrideIndex < request.environmentOverrides.size(); ++overrideIndex) {
         const std::pair<std::string, std::string>& environmentOverride = request.environmentOverrides[overrideIndex];
-        if (!IsEnvironmentVariableNameValid(environmentOverride.first)) {
+        if (!IsEnvironmentVariableNameValid(environmentOverride.first) ||
+            ContainsEmbeddedNull(environmentOverride.second)) {
             ASCENDLOGE(
-                "Process environment override[%zu] has an invalid variable name: name=%s", overrideIndex,
-                environmentOverride.first.c_str());
-            return false;
-        }
-        if (ContainsEmbeddedNull(environmentOverride.second)) {
-            ASCENDLOGE(
-                "Process environment override[%zu] contains an embedded NUL value: name=%s", overrideIndex,
+                "Process environment override[%zu] is invalid: name=%s", overrideIndex,
                 environmentOverride.first.c_str());
             return false;
         }
     }
     for (size_t removalIndex = 0U; removalIndex < request.removedEnvironmentVariables.size(); ++removalIndex) {
-        const std::string& environmentVariableName = request.removedEnvironmentVariables[removalIndex];
-        if (!IsEnvironmentVariableNameValid(environmentVariableName)) {
+        if (!IsEnvironmentVariableNameValid(request.removedEnvironmentVariables[removalIndex])) {
             ASCENDLOGE(
                 "Process environment removal[%zu] has an invalid variable name: name=%s", removalIndex,
-                environmentVariableName.c_str());
+                request.removedEnvironmentVariables[removalIndex].c_str());
             return false;
         }
     }
     return true;
 }
 
-bool CreateNonblockingOutputCapturePipe(
-    FileDescriptorGuard& outputReadFileDescriptor, FileDescriptorGuard& outputWriteFileDescriptor)
-{
-    int outputPipe[2]{-1, -1};
-    if (pipe2(outputPipe, O_CLOEXEC) != 0) {
-        const int pipeError = errno;
-        ASCENDLOGE("Failed to create process output pipe: errno=%d message=%s", pipeError, std::strerror(pipeError));
-        return false;
-    }
-    outputReadFileDescriptor.TakeOwnership(outputPipe[0]);
-    outputWriteFileDescriptor.TakeOwnership(outputPipe[1]);
-    const int readFlags = fcntl(outputReadFileDescriptor.Get(), F_GETFL, 0);
-    if (readFlags < 0 || fcntl(outputReadFileDescriptor.Get(), F_SETFL, readFlags | O_NONBLOCK) != 0) {
-        const int flagError = errno;
-        ASCENDLOGE(
-            "Failed to make process output pipe nonblocking: fd=%d errno=%d message=%s", outputReadFileDescriptor.Get(),
-            flagError, std::strerror(flagError));
-        return false;
-    }
-    return true;
-}
-
-std::vector<std::string> BuildEffectiveSpawnEnvironment(const ProcessExecutorRequest& request)
+std::vector<std::string> BuildSpawnEnvironment(const ProcessExecutorRequest& request)
 {
     std::map<std::string, std::string> environmentByName;
     for (char** inheritedEnvironment = ::environ; inheritedEnvironment != nullptr && *inheritedEnvironment != nullptr;
          ++inheritedEnvironment) {
         const std::string environmentEntry(*inheritedEnvironment);
         const size_t separatorPosition = environmentEntry.find('=');
-        if (separatorPosition == std::string::npos) {
-            continue;
+        if (separatorPosition != std::string::npos) {
+            environmentByName[environmentEntry.substr(0U, separatorPosition)] =
+                environmentEntry.substr(separatorPosition + 1U);
         }
-        const std::string environmentVariableName = environmentEntry.substr(0U, separatorPosition);
-        environmentByName[environmentVariableName] = environmentEntry.substr(separatorPosition + 1U);
     }
-    for (const std::string& removedEnvironmentVariable : request.removedEnvironmentVariables) {
-        environmentByName.erase(removedEnvironmentVariable);
+    for (const std::string& removedVariable : request.removedEnvironmentVariables) {
+        environmentByName.erase(removedVariable);
     }
     for (const std::pair<std::string, std::string>& environmentOverride : request.environmentOverrides) {
         environmentByName[environmentOverride.first] = environmentOverride.second;
@@ -308,6 +309,18 @@ std::vector<std::string> BuildEffectiveSpawnEnvironment(const ProcessExecutorReq
     return environmentEntries;
 }
 
+void OpenMirroredOutputLog(const std::string& outputLogFilePath, std::ofstream& outputLog) noexcept
+{
+    if (outputLogFilePath.empty()) {
+        return;
+    }
+    outputLog.open(outputLogFilePath, std::ios::out | std::ios::binary | std::ios::app);
+    if (outputLog.is_open()) {
+        return;
+    }
+    ASCENDLOGW("Failed to open process output log; compilation will continue: path=%s", outputLogFilePath.c_str());
+}
+
 void SignalProcessGroup(pid_t processLeaderId, int signalNumber) noexcept
 {
     if (kill(-processLeaderId, signalNumber) == 0 || errno == ESRCH) {
@@ -317,272 +330,226 @@ void SignalProcessGroup(pid_t processLeaderId, int signalNumber) noexcept
     ASCENDLOGW(
         "Failed to signal process group: pid=%d signal=%d errno=%d message=%s", static_cast<int>(processLeaderId),
         signalNumber, processGroupError, std::strerror(processGroupError));
-    if (kill(processLeaderId, signalNumber) != 0 && errno != ESRCH) {
-        const int processLeaderError = errno;
-        ASCENDLOGW(
-            "Failed to signal process leader: pid=%d signal=%d errno=%d message=%s", static_cast<int>(processLeaderId),
-            signalNumber, processLeaderError, std::strerror(processLeaderError));
-    }
 }
 
-CapturedOutputDrainStatus DrainCapturedOutput(
-    int outputFileDescriptor, uint64_t capturedOutputByteLimit, ProcessExecutorResult& executorResult)
-{
-    char outputBuffer[4096];
-    uint64_t readByteCountThisIteration = 0U;
-    while (readByteCountThisIteration < MAX_OUTPUT_READ_BYTES_PER_WAIT_ITERATION) {
-        const uint64_t remainingReadBudget = MAX_OUTPUT_READ_BYTES_PER_WAIT_ITERATION - readByteCountThisIteration;
-        const size_t requestedReadByteCount =
-            static_cast<size_t>(std::min<uint64_t>(sizeof(outputBuffer), remainingReadBudget));
-        const ssize_t readByteCount = read(outputFileDescriptor, outputBuffer, requestedReadByteCount);
-        if (readByteCount > 0) {
-            readByteCountThisIteration += static_cast<uint64_t>(readByteCount);
-            const uint64_t capturedOutputByteCount = static_cast<uint64_t>(executorResult.capturedOutput.size());
-            const uint64_t availableCapacity = capturedOutputByteLimit > capturedOutputByteCount ?
-                                                   capturedOutputByteLimit - capturedOutputByteCount :
-                                                   0U;
-            const size_t appendByteCount =
-                static_cast<size_t>(std::min<uint64_t>(static_cast<uint64_t>(readByteCount), availableCapacity));
-            executorResult.capturedOutput.append(outputBuffer, appendByteCount);
-            executorResult.capturedOutputTruncated =
-                executorResult.capturedOutputTruncated || appendByteCount < static_cast<size_t>(readByteCount);
-            continue;
-        }
-        if (readByteCount == 0) {
-            return CapturedOutputDrainStatus::EndOfFile;
-        }
-        if (errno == EINTR) {
-            continue;
-        }
-        if (errno == EAGAIN || errno == EWOULDBLOCK) {
-            return CapturedOutputDrainStatus::NoDataAvailable;
-        }
-        const int readError = errno;
-        ASCENDLOGE(
-            "Failed to read process output: fd=%d errno=%d message=%s", outputFileDescriptor, readError,
-            std::strerror(readError));
-        return CapturedOutputDrainStatus::Failed;
-    }
-    return CapturedOutputDrainStatus::ReadBudgetExhausted;
-}
-
-bool WaitForOutputOrNextStatusCheck(int outputFileDescriptor, bool outputPipeClosed, int pollTimeoutMilliseconds)
-{
-    pollfd outputPollDescriptor{outputFileDescriptor, POLLIN, 0};
-    pollfd* pollDescriptors = outputPipeClosed ? nullptr : &outputPollDescriptor;
-    const nfds_t pollDescriptorCount = outputPipeClosed ? 0U : 1U;
-    const int pollResult = poll(pollDescriptors, pollDescriptorCount, pollTimeoutMilliseconds);
-    if (pollResult < 0 && errno != EINTR) {
-        const int pollError = errno;
-        ASCENDLOGE(
-            "Failed to poll process output: fd=%d errno=%d message=%s", outputFileDescriptor, pollError,
-            std::strerror(pollError));
-        return false;
-    }
-    return true;
-}
-
-class ChildProcessGroup final {
+class ChildProcess final {
 public:
-    explicit ChildProcessGroup(std::chrono::milliseconds terminationGracePeriod) noexcept
-        : terminationGracePeriod_(terminationGracePeriod)
+    explicit ChildProcess(const ProcessExecutorRequest& request)
+        : request_(request),
+          stdoutForwarder_(ProcessOutputKind::StandardOutput, request.arguments.front(), outputLog_),
+          stderrForwarder_(ProcessOutputKind::StandardError, request.arguments.front(), outputLog_)
     {}
 
-    ~ChildProcessGroup() noexcept
+    ~ChildProcess() noexcept
     {
-        if (processLeaderNeedsReaping_) {
-            int ignoredWaitStatus = 0;
-            TerminateProcessGroupAndReapLeader(ignoredWaitStatus);
+        if (needsReaping_) {
+            TerminateAndReap();
         }
     }
 
-    ChildProcessGroup(const ChildProcessGroup&) = delete;
-    ChildProcessGroup& operator=(const ChildProcessGroup&) = delete;
+    ChildProcess(const ChildProcess&) = delete;
+    ChildProcess& operator=(const ChildProcess&) = delete;
 
-    bool Start(const ProcessExecutorRequest& request)
+    bool Start()
     {
-        PosixSpawnStringStorage spawnArguments(request.arguments);
-        PosixSpawnStringStorage spawnEnvironment(BuildEffectiveSpawnEnvironment(request));
-
-        FileDescriptorGuard outputWriteFileDescriptor;
-        if (request.outputMode == ProcessOutputMode::CaptureCombined) {
-            if (!CreateNonblockingOutputCapturePipe(outputReadFileDescriptor_, outputWriteFileDescriptor)) {
-                return false;
-            }
-        }
-
-        PosixSpawnConfiguration spawnConfiguration;
-        if (!spawnConfiguration.Initialize(
-                request.outputMode, outputReadFileDescriptor_.Get(), outputWriteFileDescriptor.Get())) {
+        OpenMirroredOutputLog(request_.mirroredOutputLogFilePath, outputLog_);
+        if (!stdoutForwarder_.CreatePipe() || !stderrForwarder_.CreatePipe()) {
             return false;
         }
 
+        PosixSpawnResources spawnResources;
+        int setupResult = posix_spawnattr_init(&spawnResources.attributes_);
+        if (setupResult == 0) {
+            spawnResources.attributesInitialized_ = true;
+            setupResult = posix_spawnattr_setflags(&spawnResources.attributes_, POSIX_SPAWN_SETPGROUP);
+        }
+        if (setupResult == 0) {
+            setupResult = posix_spawnattr_setpgroup(&spawnResources.attributes_, 0);
+        }
+        if (setupResult == 0) {
+            setupResult = posix_spawn_file_actions_init(&spawnResources.fileActions_);
+            spawnResources.fileActionsInitialized_ = setupResult == 0;
+        }
+        const std::array<int, 2U> readFileDescriptors{
+            stdoutForwarder_.GetReadFileDescriptor(), stderrForwarder_.GetReadFileDescriptor()};
+        for (const int readFileDescriptor : readFileDescriptors) {
+            if (setupResult == 0) {
+                setupResult = posix_spawn_file_actions_addclose(&spawnResources.fileActions_, readFileDescriptor);
+            }
+        }
+        if (setupResult == 0) {
+            setupResult = posix_spawn_file_actions_adddup2(
+                &spawnResources.fileActions_, stdoutForwarder_.GetWriteFileDescriptor(), STDOUT_FILENO);
+        }
+        if (setupResult == 0) {
+            setupResult = posix_spawn_file_actions_adddup2(
+                &spawnResources.fileActions_, stderrForwarder_.GetWriteFileDescriptor(), STDERR_FILENO);
+        }
+        const std::array<int, 2U> writeFileDescriptors{
+            stdoutForwarder_.GetWriteFileDescriptor(), stderrForwarder_.GetWriteFileDescriptor()};
+        for (const int writeFileDescriptor : writeFileDescriptors) {
+            if (setupResult == 0) {
+                setupResult = posix_spawn_file_actions_addclose(&spawnResources.fileActions_, writeFileDescriptor);
+            }
+        }
+        if (setupResult != 0) {
+            ASCENDLOGE(
+                "Failed to configure process spawn: error=%d message=%s", setupResult, std::strerror(setupResult));
+            return false;
+        }
+
+        std::vector<std::string> environment = BuildSpawnEnvironment(request_);
+        std::vector<char*> argumentPointers = BuildCStringPointers(request_.arguments);
+        std::vector<char*> environmentPointers = BuildCStringPointers(environment);
         startedAt_ = SteadyClock::now();
         const int spawnResult = posix_spawn(
-            &processLeaderId_, request.arguments.front().c_str(), spawnConfiguration.GetFileActions(),
-            spawnConfiguration.GetSpawnAttributes(), spawnArguments.Data(), spawnEnvironment.Data());
-        outputWriteFileDescriptor.Close();
+            &processLeaderId_, request_.arguments.front().c_str(), &spawnResources.fileActions_,
+            &spawnResources.attributes_, argumentPointers.data(), environmentPointers.data());
+        stdoutForwarder_.CloseWriteEnd();
+        stderrForwarder_.CloseWriteEnd();
         if (spawnResult != 0) {
             ASCENDLOGE(
-                "Failed to spawn process: executable=%s error=%d message=%s", request.arguments.front().c_str(),
+                "Failed to spawn process: executable=%s error=%d message=%s", request_.arguments.front().c_str(),
                 spawnResult, std::strerror(spawnResult));
             return false;
         }
-        processLeaderNeedsReaping_ = true;
+        needsReaping_ = true;
         return true;
     }
 
-    void WaitForCompletion(const ProcessExecutorRequest& request, ProcessExecutorResult& executorResult)
+    void Wait(ProcessExecutorResult& result) noexcept
     {
-        const SteadyClock::time_point executionDeadline = startedAt_ + request.executionTimeout;
+        const SteadyClock::time_point executionDeadline = startedAt_ + request_.executionTimeout;
         int waitStatus = 0;
-        bool infrastructureFailure = false;
-        bool outputPipeClosed = request.outputMode == ProcessOutputMode::Inherit;
-        bool processLeaderTerminated = false;
         while (true) {
-            CapturedOutputDrainStatus outputDrainStatus = CapturedOutputDrainStatus::EndOfFile;
-            if (!outputPipeClosed) {
-                outputDrainStatus = DrainCapturedOutput(
-                    outputReadFileDescriptor_.Get(), request.capturedOutputByteLimit, executorResult);
-                if (outputDrainStatus == CapturedOutputDrainStatus::Failed) {
-                    infrastructureFailure = true;
-                    break;
-                }
-                if (outputDrainStatus == CapturedOutputDrainStatus::EndOfFile) {
-                    outputReadFileDescriptor_.Close();
-                    outputPipeClosed = true;
-                }
+            if (!ForwardAvailableOutput()) {
+                TerminateAndReap();
+                SetElapsedTime(result);
+                return;
             }
-            if (!processLeaderTerminated) {
-                const ProcessLeaderCheckResult checkResult = CheckProcessLeaderWithoutReaping();
-                if (checkResult == ProcessLeaderCheckResult::InspectionFailed) {
-                    infrastructureFailure = true;
-                    break;
-                }
-                processLeaderTerminated = checkResult == ProcessLeaderCheckResult::Terminated;
+            const pid_t waitResult = WaitWithoutBlocking(waitStatus);
+            if (waitResult == processLeaderId_) {
+                needsReaping_ = false;
+                (void)ForwardAvailableOutput();
+                CloseOutputStreams();
+                SetResultFromWaitStatus(waitStatus, result);
+                SetElapsedTime(result);
+                return;
             }
-            if (processLeaderTerminated && outputPipeClosed) {
-                break;
+            if (waitResult < 0) {
+                const int waitError = errno;
+                if (waitError == ECHILD) {
+                    needsReaping_ = false;
+                } else {
+                    TerminateAndReap();
+                }
+                ASCENDLOGE(
+                    "Failed to wait for process: pid=%d errno=%d message=%s", static_cast<int>(processLeaderId_),
+                    waitError, std::strerror(waitError));
+                CloseOutputStreams();
+                SetElapsedTime(result);
+                return;
             }
             if (SteadyClock::now() >= executionDeadline) {
-                executorResult.outcome = ProcessOutcome::TimedOut;
+                result.outcome = ProcessOutcome::TimedOut;
                 ASCENDLOGE(
                     "Process exceeded its execution timeout: executable=%s timeout_ms=%lld",
-                    request.arguments.front().c_str(), static_cast<long long>(request.executionTimeout.count()));
-                TerminateProcessGroupAndReapLeader(waitStatus);
-                break;
+                    request_.arguments.front().c_str(), static_cast<long long>(request_.executionTimeout.count()));
+                TerminateAndReap();
+                (void)ForwardAvailableOutput();
+                CloseOutputStreams();
+                SetElapsedTime(result);
+                return;
             }
-            if (outputDrainStatus == CapturedOutputDrainStatus::ReadBudgetExhausted) {
-                continue;
-            }
-
-            const std::chrono::milliseconds remainingTime =
-                std::chrono::duration_cast<std::chrono::milliseconds>(executionDeadline - SteadyClock::now());
-            const int64_t maximumPollInterval =
-                outputPipeClosed ? MAX_PROCESS_CHECK_INTERVAL_MILLISECONDS : MAX_OUTPUT_WAIT_INTERVAL_MILLISECONDS;
-            const int pollTimeoutMilliseconds =
-                static_cast<int>(std::max<int64_t>(1, std::min<int64_t>(remainingTime.count(), maximumPollInterval)));
-            if (!WaitForOutputOrNextStatusCheck(
-                    outputReadFileDescriptor_.Get(), outputPipeClosed, pollTimeoutMilliseconds)) {
-                infrastructureFailure = true;
-                break;
+            if (!WaitForOutput(executionDeadline)) {
+                TerminateAndReap();
+                CloseOutputStreams();
+                SetElapsedTime(result);
+                return;
             }
         }
-
-        if (infrastructureFailure) {
-            TerminateProcessGroupAndReapLeader(waitStatus);
-        } else if (executorResult.outcome != ProcessOutcome::TimedOut && !ReapProcessLeader(waitStatus)) {
-            infrastructureFailure = true;
-            TerminateProcessGroupAndReapLeader(waitStatus);
-        }
-        if (!outputPipeClosed) {
-            const CapturedOutputDrainStatus finalDrainStatus =
-                DrainCapturedOutput(outputReadFileDescriptor_.Get(), request.capturedOutputByteLimit, executorResult);
-            infrastructureFailure = infrastructureFailure || finalDrainStatus == CapturedOutputDrainStatus::Failed;
-        }
-        outputReadFileDescriptor_.Close();
-        executorResult.elapsedTime =
-            std::chrono::duration_cast<std::chrono::milliseconds>(SteadyClock::now() - startedAt_);
-        if (infrastructureFailure) {
-            executorResult.outcome = ProcessOutcome::ExecutorFailure;
-            return;
-        }
-        if (executorResult.outcome == ProcessOutcome::TimedOut) {
-            return;
-        }
-        if (WIFEXITED(waitStatus)) {
-            executorResult.outcome = ProcessOutcome::Exited;
-            executorResult.terminationCode = static_cast<int32_t>(WEXITSTATUS(waitStatus));
-            return;
-        }
-        if (WIFSIGNALED(waitStatus)) {
-            executorResult.outcome = ProcessOutcome::Signaled;
-            executorResult.terminationCode = static_cast<int32_t>(WTERMSIG(waitStatus));
-            return;
-        }
-        executorResult.outcome = ProcessOutcome::ExecutorFailure;
-        ASCENDLOGE(
-            "Process returned an unsupported wait status: pid=%d status=%d", static_cast<int>(processLeaderId_),
-            waitStatus);
     }
 
 private:
-    ProcessLeaderCheckResult CheckProcessLeaderWithoutReaping() const noexcept
+    pid_t WaitWithoutBlocking(int& waitStatus) noexcept
     {
-        siginfo_t processInformation{};
-        int waitResult = 0;
+        pid_t waitResult;
         do {
-            waitResult =
-                waitid(P_PID, static_cast<id_t>(processLeaderId_), &processInformation, WEXITED | WNOHANG | WNOWAIT);
-        } while (waitResult != 0 && errno == EINTR);
-        if (waitResult != 0) {
-            const int waitError = errno;
-            ASCENDLOGE(
-                "Failed to inspect process: pid=%d errno=%d message=%s", static_cast<int>(processLeaderId_), waitError,
-                std::strerror(waitError));
-            return ProcessLeaderCheckResult::InspectionFailed;
-        }
-        return processInformation.si_pid == 0 ? ProcessLeaderCheckResult::Running :
-                                                ProcessLeaderCheckResult::Terminated;
+            waitResult = waitpid(processLeaderId_, &waitStatus, WNOHANG);
+        } while (waitResult < 0 && errno == EINTR);
+        return waitResult;
     }
 
-    bool ReapProcessLeader(int& waitStatus) noexcept
+    bool ForwardAvailableOutput() noexcept
     {
-        if (!processLeaderNeedsReaping_) {
+        return (!stdoutForwarder_.IsOpen() || stdoutForwarder_.ForwardAvailableOutput()) &&
+               (!stderrForwarder_.IsOpen() || stderrForwarder_.ForwardAvailableOutput());
+    }
+
+    bool WaitForOutput(const SteadyClock::time_point& executionDeadline) noexcept
+    {
+        const std::chrono::milliseconds remainingTime =
+            std::chrono::duration_cast<std::chrono::milliseconds>(executionDeadline - SteadyClock::now());
+        const int timeoutMilliseconds = static_cast<int>(
+            std::max<int64_t>(1, std::min<int64_t>(remainingTime.count(), MAX_PROCESS_WAIT_MILLISECONDS)));
+        std::array<pollfd, 2U> outputDescriptors{{
+            {stdoutForwarder_.GetReadFileDescriptor(), POLLIN, 0},
+            {stderrForwarder_.GetReadFileDescriptor(), POLLIN, 0},
+        }};
+        const int pollResult = poll(outputDescriptors.data(), outputDescriptors.size(), timeoutMilliseconds);
+        if (pollResult >= 0 || errno == EINTR) {
             return true;
         }
-        pid_t waitResult = -1;
-        do {
-            waitResult = waitpid(processLeaderId_, &waitStatus, 0);
-        } while (waitResult < 0 && errno == EINTR);
-        if (waitResult != processLeaderId_) {
-            const int waitError = errno;
-            ASCENDLOGE(
-                "Failed to reap process: pid=%d errno=%d message=%s", static_cast<int>(processLeaderId_), waitError,
-                std::strerror(waitError));
-            return false;
-        }
-        processLeaderNeedsReaping_ = false;
-        return true;
+        const int pollError = errno;
+        ASCENDLOGE("Failed to poll process output: errno=%d message=%s", pollError, std::strerror(pollError));
+        return false;
     }
 
-    void TerminateProcessGroupAndReapLeader(int& waitStatus) noexcept
+    void TerminateAndReap() noexcept
     {
-        if (!processLeaderNeedsReaping_) {
+        if (!needsReaping_) {
             return;
         }
         SignalProcessGroup(processLeaderId_, SIGTERM);
-        // Keep the process leader unreaped so its PID cannot be reused as another process group ID during cleanup.
-        std::this_thread::sleep_for(terminationGracePeriod_);
+        std::this_thread::sleep_for(request_.terminationGracePeriod);
         SignalProcessGroup(processLeaderId_, SIGKILL);
-        (void)ReapProcessLeader(waitStatus);
+        int ignoredWaitStatus = 0;
+        pid_t waitResult;
+        do {
+            waitResult = waitpid(processLeaderId_, &ignoredWaitStatus, 0);
+        } while (waitResult < 0 && errno == EINTR);
+        needsReaping_ = false;
     }
 
-    FileDescriptorGuard outputReadFileDescriptor_;
+    void CloseOutputStreams() noexcept
+    {
+        stdoutForwarder_.Close();
+        stderrForwarder_.Close();
+    }
+
+    void SetElapsedTime(ProcessExecutorResult& result) const noexcept
+    {
+        result.elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(SteadyClock::now() - startedAt_);
+    }
+
+    static void SetResultFromWaitStatus(int waitStatus, ProcessExecutorResult& result) noexcept
+    {
+        if (WIFEXITED(waitStatus)) {
+            result.outcome = ProcessOutcome::Exited;
+            result.terminationCode = static_cast<int32_t>(WEXITSTATUS(waitStatus));
+        } else if (WIFSIGNALED(waitStatus)) {
+            result.outcome = ProcessOutcome::Signaled;
+            result.terminationCode = static_cast<int32_t>(WTERMSIG(waitStatus));
+        }
+    }
+
+    const ProcessExecutorRequest& request_;
+    std::ofstream outputLog_;
+    ProcessOutputForwarder stdoutForwarder_;
+    ProcessOutputForwarder stderrForwarder_;
     pid_t processLeaderId_{-1};
     SteadyClock::time_point startedAt_{};
-    std::chrono::milliseconds terminationGracePeriod_;
-    bool processLeaderNeedsReaping_{false};
+    bool needsReaping_{false};
 };
 
 } // namespace
@@ -610,16 +577,15 @@ const char* ProcessExecutorResult::GetOutcomeName() const noexcept
 
 ProcessExecutorResult ProcessExecutor::Execute(const ProcessExecutorRequest& request)
 {
-    ProcessExecutorResult executorResult;
+    ProcessExecutorResult result;
     if (!ValidateProcessExecutorRequest(request)) {
-        return executorResult;
+        return result;
     }
     try {
-        ChildProcessGroup childProcessGroup(request.terminationGracePeriod);
-        if (!childProcessGroup.Start(request)) {
-            return executorResult;
+        ChildProcess childProcess(request);
+        if (childProcess.Start()) {
+            childProcess.Wait(result);
         }
-        childProcessGroup.WaitForCompletion(request, executorResult);
     } catch (const std::bad_alloc&) {
         throw;
     } catch (const std::exception& exception) {
@@ -630,7 +596,7 @@ ProcessExecutorResult ProcessExecutor::Execute(const ProcessExecutorRequest& req
         ASCENDLOGE(
             "Process execution failed with an unknown exception: executable=%s", request.arguments.front().c_str());
     }
-    return executorResult;
+    return result;
 }
 
 } // namespace ascendc

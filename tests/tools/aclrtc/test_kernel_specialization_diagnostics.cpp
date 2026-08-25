@@ -115,7 +115,6 @@ TEST(KernelSpecializationDiagnosticsTest, SavesOnlyReviewedDiagnosticFiles)
             {"-c", "test \"$PWD\" = \"$1\"", "replay-working-directory-check", testRoot.string()}};
         diagnostics.AppendCommandToReplayScript(workingDirectoryCheck);
         ProcessExecutorResult executorResult;
-        executorResult.capturedOutput = "compiler output\n";
         diagnostics.AppendCommandExecutionResultToLog(command, executorResult);
         diagnostics.WriteSpecializationResult("/tmp/kernel.elf", KernelElfPublicationStatus::Published);
     }

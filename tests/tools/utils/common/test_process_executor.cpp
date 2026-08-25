@@ -17,6 +17,7 @@
 #include <chrono>
 #include <csignal>
 #include <cstdlib>
+#include <fstream>
 #include <string>
 #include <thread>
 #include <type_traits>
@@ -30,23 +31,24 @@ namespace fs = boost::filesystem;
 using namespace std::chrono_literals;
 
 static_assert(
-    std::is_same<std::underlying_type_t<ProcessOutputMode>, uint32_t>::value,
-    "ProcessOutputMode must have a stable width");
-static_assert(
     std::is_same<std::underlying_type_t<ProcessOutcome>, uint32_t>::value, "ProcessOutcome must have a stable width");
 static_assert(
     std::is_same<decltype(ProcessExecutorResult::terminationCode), int32_t>::value,
     "terminationCode must have a stable width");
 
-ProcessExecutorRequest CreateCapturedRequest(std::vector<std::string> arguments)
+ProcessExecutorRequest CreateProcessRequest(std::vector<std::string> arguments)
 {
     ProcessExecutorRequest request;
     request.arguments = std::move(arguments);
-    request.outputMode = ProcessOutputMode::CaptureCombined;
     request.executionTimeout = 1s;
     request.terminationGracePeriod = 20ms;
-    request.capturedOutputByteLimit = 1024U;
     return request;
+}
+
+std::string ReadTextFile(const fs::path& filePath)
+{
+    std::ifstream inputStream(filePath.string());
+    return {std::istreambuf_iterator<char>(inputStream), std::istreambuf_iterator<char>()};
 }
 
 TEST(ProcessExecutorTest, RejectsInvalidRequestsBeforeSpawning)
@@ -55,30 +57,26 @@ TEST(ProcessExecutorTest, RejectsInvalidRequestsBeforeSpawning)
     emptyArgumentsRequest.executionTimeout = 1s;
     EXPECT_EQ(ProcessExecutor::Execute(emptyArgumentsRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutorRequest zeroTimeoutRequest = CreateCapturedRequest({"/bin/true"});
+    ProcessExecutorRequest zeroTimeoutRequest = CreateProcessRequest({"/bin/true"});
     zeroTimeoutRequest.executionTimeout = 0ms;
     EXPECT_EQ(ProcessExecutor::Execute(zeroTimeoutRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutorRequest negativeGracePeriodRequest = CreateCapturedRequest({"/bin/true"});
+    ProcessExecutorRequest negativeGracePeriodRequest = CreateProcessRequest({"/bin/true"});
     negativeGracePeriodRequest.terminationGracePeriod = -1ms;
     EXPECT_EQ(ProcessExecutor::Execute(negativeGracePeriodRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutorRequest invalidOutputModeRequest = CreateCapturedRequest({"/bin/true"});
-    invalidOutputModeRequest.outputMode = static_cast<ProcessOutputMode>(UINT32_MAX);
-    EXPECT_EQ(ProcessExecutor::Execute(invalidOutputModeRequest).outcome, ProcessOutcome::ExecutorFailure);
-
-    ProcessExecutorRequest embeddedNullRequest = CreateCapturedRequest({std::string("/bin/true\0invalid", 17U)});
+    ProcessExecutorRequest embeddedNullRequest = CreateProcessRequest({std::string("/bin/true\0invalid", 17U)});
     EXPECT_EQ(ProcessExecutor::Execute(embeddedNullRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutorRequest invalidOverrideNameRequest = CreateCapturedRequest({"/bin/true"});
+    ProcessExecutorRequest invalidOverrideNameRequest = CreateProcessRequest({"/bin/true"});
     invalidOverrideNameRequest.environmentOverrides.emplace_back("INVALID=NAME", "value");
     EXPECT_EQ(ProcessExecutor::Execute(invalidOverrideNameRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutorRequest embeddedNullOverrideValueRequest = CreateCapturedRequest({"/bin/true"});
+    ProcessExecutorRequest embeddedNullOverrideValueRequest = CreateProcessRequest({"/bin/true"});
     embeddedNullOverrideValueRequest.environmentOverrides.emplace_back("VALID_NAME", std::string("value\0suffix", 12U));
     EXPECT_EQ(ProcessExecutor::Execute(embeddedNullOverrideValueRequest).outcome, ProcessOutcome::ExecutorFailure);
 
-    ProcessExecutorRequest invalidRemovalNameRequest = CreateCapturedRequest({"/bin/true"});
+    ProcessExecutorRequest invalidRemovalNameRequest = CreateProcessRequest({"/bin/true"});
     invalidRemovalNameRequest.removedEnvironmentVariables.emplace_back("INVALID=NAME");
     EXPECT_EQ(ProcessExecutor::Execute(invalidRemovalNameRequest).outcome, ProcessOutcome::ExecutorFailure);
 }
@@ -90,92 +88,144 @@ TEST(ProcessExecutorTest, ExecutesArgumentsWithoutShellParsing)
     boost::system::error_code ignoredError;
     fs::remove(unexpectedFilePath, ignoredError);
 
+    const fs::path outputLogPath = fs::temp_directory_path() / fs::unique_path("process_executor_output_%%%%-%%%%");
     ProcessExecutorRequest request =
-        CreateCapturedRequest({"/usr/bin/printf", "$(touch " + unexpectedFilePath.string() + ")"});
+        CreateProcessRequest({"/usr/bin/printf", "$(touch " + unexpectedFilePath.string() + ")"});
+    request.mirroredOutputLogFilePath = outputLogPath.string();
     const ProcessExecutorResult result = ProcessExecutor::Execute(request);
 
     EXPECT_TRUE(result.HasSuccessfulExit());
-    EXPECT_EQ(result.capturedOutput, "$(touch " + unexpectedFilePath.string() + ")");
+    EXPECT_EQ(ReadTextFile(outputLogPath), "$(touch " + unexpectedFilePath.string() + ")");
     EXPECT_FALSE(fs::exists(unexpectedFilePath));
+    fs::remove(outputLogPath, ignoredError);
 }
 
 TEST(ProcessExecutorTest, AppliesEnvironmentOverridesAndRemovals)
 {
     ASSERT_EQ(setenv("PROCESS_EXECUTOR_REMOVE_ME", "inherited", 1), 0);
-    ProcessExecutorRequest request = CreateCapturedRequest(
+    const fs::path outputLogPath = fs::temp_directory_path() / fs::unique_path("process_executor_env_%%%%-%%%%");
+    ProcessExecutorRequest request = CreateProcessRequest(
         {"/bin/sh", "-c", "printf '%s|%s' \"$PROCESS_EXECUTOR_VALUE\" \"${PROCESS_EXECUTOR_REMOVE_ME-unset}\""});
     request.environmentOverrides.emplace_back("PROCESS_EXECUTOR_VALUE", "visible");
     request.removedEnvironmentVariables.emplace_back("PROCESS_EXECUTOR_REMOVE_ME");
+    request.mirroredOutputLogFilePath = outputLogPath.string();
 
     const ProcessExecutorResult result = ProcessExecutor::Execute(request);
     EXPECT_TRUE(result.HasSuccessfulExit());
-    EXPECT_EQ(result.capturedOutput, "visible|unset");
+    EXPECT_EQ(ReadTextFile(outputLogPath), "visible|unset");
     EXPECT_EQ(unsetenv("PROCESS_EXECUTOR_REMOVE_ME"), 0);
+    boost::system::error_code ignoredError;
+    fs::remove(outputLogPath, ignoredError);
 }
 
 TEST(ProcessExecutorTest, EnvironmentOverrideTakesPrecedenceOverRemoval)
 {
+    const fs::path outputLogPath = fs::temp_directory_path() / fs::unique_path("process_executor_precedence_%%%%-%%%%");
     ProcessExecutorRequest request =
-        CreateCapturedRequest({"/bin/sh", "-c", "printf '%s' \"$PROCESS_EXECUTOR_PRECEDENCE\""});
+        CreateProcessRequest({"/bin/sh", "-c", "printf '%s' \"$PROCESS_EXECUTOR_PRECEDENCE\""});
     request.removedEnvironmentVariables.emplace_back("PROCESS_EXECUTOR_PRECEDENCE");
     request.environmentOverrides.emplace_back("PROCESS_EXECUTOR_PRECEDENCE", "overridden");
+    request.mirroredOutputLogFilePath = outputLogPath.string();
 
     const ProcessExecutorResult result = ProcessExecutor::Execute(request);
     EXPECT_TRUE(result.HasSuccessfulExit());
-    EXPECT_EQ(result.capturedOutput, "overridden");
+    EXPECT_EQ(ReadTextFile(outputLogPath), "overridden");
+    boost::system::error_code ignoredError;
+    fs::remove(outputLogPath, ignoredError);
 }
 
 TEST(ProcessExecutorTest, ReportsExitSignalAndSpawnFailureSeparately)
 {
     const ProcessExecutorResult nonzeroExit =
-        ProcessExecutor::Execute(CreateCapturedRequest({"/bin/sh", "-c", "exit 7"}));
+        ProcessExecutor::Execute(CreateProcessRequest({"/bin/sh", "-c", "exit 7"}));
     EXPECT_EQ(nonzeroExit.outcome, ProcessOutcome::Exited);
     EXPECT_EQ(nonzeroExit.terminationCode, 7);
 
     const ProcessExecutorResult signalExit =
-        ProcessExecutor::Execute(CreateCapturedRequest({"/bin/sh", "-c", "kill -TERM $$"}));
+        ProcessExecutor::Execute(CreateProcessRequest({"/bin/sh", "-c", "kill -TERM $$"}));
     EXPECT_EQ(signalExit.outcome, ProcessOutcome::Signaled);
     EXPECT_EQ(signalExit.terminationCode, SIGTERM);
 
     const ProcessExecutorResult spawnFailure =
-        ProcessExecutor::Execute(CreateCapturedRequest({"/path/that/does/not/exist"}));
+        ProcessExecutor::Execute(CreateProcessRequest({"/path/that/does/not/exist"}));
     EXPECT_EQ(spawnFailure.outcome, ProcessOutcome::ExecutorFailure);
 }
 
-TEST(ProcessExecutorTest, BoundsCapturedCombinedOutput)
+TEST(ProcessExecutorTest, MirrorsStandardOutputAndStandardErrorToOneLogFile)
 {
-    ProcessExecutorRequest request = CreateCapturedRequest({"/bin/sh", "-c", "printf stdout; printf stderr >&2"});
-    request.capturedOutputByteLimit = 8U;
+    const fs::path outputLogPath = fs::temp_directory_path() / fs::unique_path("process_executor_streams_%%%%-%%%%");
+    ProcessExecutorRequest request =
+        CreateProcessRequest({"/bin/sh", "-c", "printf 'stdout-line\\n'; printf 'stderr-line\\n' >&2"});
+    request.mirroredOutputLogFilePath = outputLogPath.string();
 
     const ProcessExecutorResult result = ProcessExecutor::Execute(request);
     EXPECT_TRUE(result.HasSuccessfulExit());
-    EXPECT_EQ(result.capturedOutput.size(), 8U);
-    EXPECT_TRUE(result.capturedOutputTruncated);
+    const std::string mirroredOutput = ReadTextFile(outputLogPath);
+    EXPECT_NE(mirroredOutput.find("stdout-line\n"), std::string::npos);
+    EXPECT_NE(mirroredOutput.find("stderr-line\n"), std::string::npos);
+    boost::system::error_code ignoredError;
+    fs::remove(outputLogPath, ignoredError);
 }
 
-TEST(ProcessExecutorTest, InheritModeDoesNotCaptureOutput)
+TEST(ProcessExecutorTest, DrainsProcessOutputLargerThanPipeCapacity)
 {
-    ProcessExecutorRequest request;
-    request.arguments = {"/bin/true"};
-    request.outputMode = ProcessOutputMode::Inherit;
-    request.executionTimeout = 1s;
-    request.terminationGracePeriod = 20ms;
+    constexpr uintmax_t outputByteCount = 200000U;
+    const fs::path outputLogPath = fs::temp_directory_path() / fs::unique_path("process_executor_large_%%%%-%%%%");
+    ProcessExecutorRequest request = CreateProcessRequest({"/bin/sh", "-c", "head -c 200000 /dev/zero | tr '\\0' x"});
+    request.mirroredOutputLogFilePath = outputLogPath.string();
 
+    EXPECT_TRUE(ProcessExecutor::Execute(request).HasSuccessfulExit());
+    EXPECT_EQ(fs::file_size(outputLogPath), outputByteCount);
+    boost::system::error_code ignoredError;
+    fs::remove(outputLogPath, ignoredError);
+}
+
+TEST(ProcessExecutorTest, DiagnosticLogFailureDoesNotFailCommand)
+{
+    ProcessExecutorRequest request = CreateProcessRequest({"/usr/bin/printf", "still-runs"});
+    request.mirroredOutputLogFilePath = fs::temp_directory_path().string();
+
+    EXPECT_TRUE(ProcessExecutor::Execute(request).HasSuccessfulExit());
+}
+
+TEST(ProcessExecutorTest, RejectsIncompatibleSigchldDispositionBeforeSpawning)
+{
+    const fs::path spawnMarkerPath = fs::temp_directory_path() / fs::unique_path("process_executor_sigchld_%%%%-%%%%");
+    struct sigaction ignoredSigchld {};
+    struct sigaction originalSigchld {};
+    ignoredSigchld.sa_handler = SIG_IGN;
+    ASSERT_EQ(sigemptyset(&ignoredSigchld.sa_mask), 0);
+    ASSERT_EQ(sigaction(SIGCHLD, &ignoredSigchld, &originalSigchld), 0);
+
+    const ProcessExecutorResult result =
+        ProcessExecutor::Execute(CreateProcessRequest({"/usr/bin/touch", spawnMarkerPath.string()}));
+
+    ASSERT_EQ(sigaction(SIGCHLD, &originalSigchld, nullptr), 0);
+    EXPECT_EQ(result.outcome, ProcessOutcome::ExecutorFailure);
+    EXPECT_FALSE(fs::exists(spawnMarkerPath));
+    boost::system::error_code ignoredError;
+    fs::remove(spawnMarkerPath, ignoredError);
+}
+
+TEST(ProcessExecutorTest, CompletesWhenSynchronousCommandLeaderExits)
+{
+    ProcessExecutorRequest request = CreateProcessRequest({"/bin/sh", "-c", "sleep 0.3 & exec /bin/true"});
+
+    const auto startedAt = std::chrono::steady_clock::now();
     const ProcessExecutorResult result = ProcessExecutor::Execute(request);
     EXPECT_TRUE(result.HasSuccessfulExit());
-    EXPECT_TRUE(result.capturedOutput.empty());
+    EXPECT_LT(std::chrono::steady_clock::now() - startedAt, 200ms);
 }
 
-TEST(ProcessExecutorTest, TimeoutTerminatesDescendantsAfterLeaderExits)
+TEST(ProcessExecutorTest, TimeoutTerminatesActiveProcessGroup)
 {
     static uint64_t sequence = 0U;
     const fs::path descendantMarkerPath =
         fs::temp_directory_path() /
         ("process_executor_descendant_" + std::to_string(getpid()) + "_" + std::to_string(sequence++));
     const std::string commandScript =
-        "(trap '' TERM; count=0; while [ $count -lt 100 ]; do printf x >> '" + descendantMarkerPath.string() +
-        "'; count=$((count + 1)); sleep 0.01; done; rm -f '" + descendantMarkerPath.string() + "') & exec /bin/true";
-    ProcessExecutorRequest request = CreateCapturedRequest({"/bin/sh", "-c", commandScript});
+        "(trap '' TERM; while true; do printf x >> '" + descendantMarkerPath.string() + "'; sleep 0.01; done) & wait";
+    ProcessExecutorRequest request = CreateProcessRequest({"/bin/sh", "-c", commandScript});
     request.executionTimeout = 20ms;
 
     const ProcessExecutorResult result = ProcessExecutor::Execute(request);

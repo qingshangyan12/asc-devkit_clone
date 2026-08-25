@@ -70,7 +70,6 @@ bool ManifestBundleCompiler::BuildBundle(const std::string& workDir, const std::
     executionRequest.environmentOverrides = {
         {"ASCENDC_BUNDLE_CXX", request_.cxxCompiler}, {"ASCENDC_BUNDLE_OUTPUT", output}};
     executionRequest.removedEnvironmentVariables = {"MAKEFLAGS", "MFLAGS", "MAKEFILES", "GNUMAKEFLAGS"};
-    executionRequest.outputMode = ProcessOutputMode::Inherit;
     executionRequest.executionTimeout = std::chrono::minutes(BUNDLE_BUILD_TIMEOUT_MINUTES);
     executionRequest.terminationGracePeriod = std::chrono::seconds(BUNDLE_BUILD_TERMINATION_GRACE_SECONDS);
     const ProcessExecutorResult executionResult = ProcessExecutor::Execute(executionRequest);

@@ -29,7 +29,6 @@ struct CompilationCommandExecutionLimits {
     std::chrono::milliseconds compileCommandTimeout;
     std::chrono::milliseconds objectCopyAndLinkCommandTimeout;
     std::chrono::milliseconds terminationGracePeriod;
-    uint64_t capturedOutputByteLimit;
 
     static CompilationCommandExecutionLimits ProductionDefaults() noexcept;
 };

@@ -35,6 +35,8 @@ public:
 
     void WriteManifestSnapshot(const nlohmann::json& resourceManifest) noexcept;
     void AppendCommandToReplayScript(const CompilationCommand& compilationCommand) noexcept;
+    void AppendCommandExecutionHeaderToLog(const CompilationCommand& compilationCommand) noexcept;
+    std::string GetCompilationLogFilePath() const;
     void AppendCommandExecutionResultToLog(
         const CompilationCommand& compilationCommand, const ProcessExecutorResult& executorResult) noexcept;
     void LogCommandFailureRecoveryHint() const noexcept;

@@ -14,7 +14,6 @@
 #include "kernel_specialization_diagnostics.h"
 #include "process_executor.h"
 
-#include <algorithm>
 #include <exception>
 #include <new>
 
@@ -23,7 +22,7 @@ namespace aclrtc {
 
 CompilationCommandExecutionLimits CompilationCommandExecutionLimits::ProductionDefaults() noexcept
 {
-    return {std::chrono::minutes(5), std::chrono::minutes(1), std::chrono::seconds(5), 4U * 1024U * 1024U};
+    return {std::chrono::minutes(5), std::chrono::minutes(1), std::chrono::seconds(5)};
 }
 
 CompilationPlanExecutor::CompilationPlanExecutor(
@@ -39,23 +38,15 @@ aclError CompilationPlanExecutor::ExecuteCompilationPlan(const KernelCompilation
                 "Executing command %s with %s", compilationCommand.diagnosticLabel.c_str(),
                 compilationCommand.executablePath.c_str());
             specializationDiagnostics_.AppendCommandToReplayScript(compilationCommand);
+            specializationDiagnostics_.AppendCommandExecutionHeaderToLog(compilationCommand);
             ProcessExecutorResult executorResult;
             const aclError commandExecutionStatus = ExecuteCompilationCommand(compilationCommand, executorResult);
             specializationDiagnostics_.AppendCommandExecutionResultToLog(compilationCommand, executorResult);
             if (commandExecutionStatus != ACLRTC_SUCCESS) {
-                constexpr size_t maxLoggedProcessOutputBytes = 4096U;
-                const size_t loggedOutputByteCount =
-                    std::min(executorResult.capturedOutput.size(), maxLoggedProcessOutputBytes);
-                const bool loggedOutputTruncated = executorResult.capturedOutput.size() > loggedOutputByteCount;
                 ASCENDLOGE(
-                    "Command %s failed: outcome=%s code=%d elapsed_ms=%lld captured_output_truncated=%s "
-                    "logged_output_truncated=%s output_prefix_bytes=%zu output=%.*s",
-                    compilationCommand.diagnosticLabel.c_str(), executorResult.GetOutcomeName(),
-                    static_cast<int>(executorResult.terminationCode),
-                    static_cast<long long>(executorResult.elapsedTime.count()),
-                    executorResult.capturedOutputTruncated ? "true" : "false", loggedOutputTruncated ? "true" : "false",
-                    loggedOutputByteCount, static_cast<int>(loggedOutputByteCount),
-                    executorResult.capturedOutput.c_str());
+                    "Command %s failed: outcome=%s code=%d elapsed_ms=%lld", compilationCommand.diagnosticLabel.c_str(),
+                    executorResult.GetOutcomeName(), static_cast<int>(executorResult.terminationCode),
+                    static_cast<long long>(executorResult.elapsedTime.count()));
                 specializationDiagnostics_.LogCommandFailureRecoveryHint();
                 return commandExecutionStatus;
             }
@@ -82,13 +73,11 @@ aclError CompilationPlanExecutor::ExecuteCompilationCommand(
     executorRequest.arguments.insert(
         executorRequest.arguments.end(), compilationCommand.commandArguments.begin(),
         compilationCommand.commandArguments.end());
-    executorRequest.outputMode = ProcessOutputMode::CaptureCombined;
+    executorRequest.mirroredOutputLogFilePath = specializationDiagnostics_.GetCompilationLogFilePath();
     executorRequest.executionTimeout = compilationCommand.commandKind == CompilationCommandKind::Compile ?
                                            commandExecutionLimits_.compileCommandTimeout :
                                            commandExecutionLimits_.objectCopyAndLinkCommandTimeout;
     executorRequest.terminationGracePeriod = commandExecutionLimits_.terminationGracePeriod;
-    executorRequest.capturedOutputByteLimit = commandExecutionLimits_.capturedOutputByteLimit;
-
     executorResult = ProcessExecutor::Execute(executorRequest);
     if (executorResult.HasSuccessfulExit()) {
         return ACLRTC_SUCCESS;

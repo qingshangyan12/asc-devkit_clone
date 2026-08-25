@@ -19,11 +19,6 @@
 
 namespace ascendc {
 
-enum class ProcessOutputMode : uint32_t {
-    Inherit,
-    CaptureCombined,
-};
-
 enum class ProcessOutcome : uint32_t {
     ExecutorFailure,
     Exited,
@@ -35,18 +30,15 @@ struct ProcessExecutorRequest {
     std::vector<std::string> arguments;
     std::vector<std::pair<std::string, std::string>> environmentOverrides;
     std::vector<std::string> removedEnvironmentVariables;
-    ProcessOutputMode outputMode{ProcessOutputMode::Inherit};
+    std::string mirroredOutputLogFilePath;
     std::chrono::milliseconds executionTimeout{0};
     std::chrono::milliseconds terminationGracePeriod{0};
-    uint64_t capturedOutputByteLimit{0U};
 };
 
 struct ProcessExecutorResult {
     ProcessOutcome outcome{ProcessOutcome::ExecutorFailure};
     int32_t terminationCode{0};
-    bool capturedOutputTruncated{false};
     std::chrono::milliseconds elapsedTime{0};
-    std::string capturedOutput;
 
     bool HasSuccessfulExit() const noexcept;
     const char* GetOutcomeName() const noexcept;
