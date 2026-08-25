@@ -138,6 +138,8 @@ __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, half value, const a
 __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
 __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config);
+__aicore__ inline void asc_set_l13d_fmatrix_b(
+    uint16_t fmatrix_w, uint16_t fmatrix_h, uint8_t pad_left, uint8_t pad_right, uint8_t pad_top, uint8_t pad_bottom);
 
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 
