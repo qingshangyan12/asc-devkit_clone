@@ -49,9 +49,8 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_saturation_strategy_impl.h"
 #endif
 
-[[deprecated(
-    "NOTICE: asc_get_ar_spr is deprecated. "
-    "Please use asc_get_squeeze_status instead.")]] __aicore__ inline int64_t
+[[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
+             "Please use asc_get_squeeze_status instead.")]] __aicore__ inline int64_t
 asc_get_ar_spr()
 {
     return asc_get_ar_spr_impl();
