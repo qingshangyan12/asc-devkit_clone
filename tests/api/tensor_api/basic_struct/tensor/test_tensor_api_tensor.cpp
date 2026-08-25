@@ -12,8 +12,6 @@
 #include "tensor_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
 
-using asc::te::experimental::cache_mode;
-
 class tensor_api_tensor_struct : public testing::Test {
 protected:
     static void SetUpTestCase() {}

@@ -44,9 +44,7 @@ struct view_engine {
     }
 
     __aicore__ inline constexpr view_engine(iterator storage = {}) : storage(storage) {}
-    __aicore__ inline constexpr view_engine(iterator storage, experimental::cache_mode mode) :
-        storage(storage), mode(mode)
-    {}
+    __aicore__ inline constexpr view_engine(iterator storage, cache_mode mode) : storage(storage), mode(mode) {}
     __aicore__ inline constexpr view_engine(iterator storage, AscendC::Te::CacheMode mode) :
         storage(storage), mode(normalize_cache_mode(mode))
     {}
@@ -56,7 +54,7 @@ struct view_engine {
         return static_cast<uint8_t>(mode);
     }
 
-    __aicore__ inline constexpr void set_cache_mode(experimental::cache_mode mode)
+    __aicore__ inline constexpr void set_cache_mode(cache_mode mode)
     {
         this->mode = mode;
     }
@@ -90,7 +88,7 @@ struct view_engine {
 
 private:
     iterator storage;
-    experimental::cache_mode mode = experimental::cache_mode::normal;
+    cache_mode mode = cache_mode::normal;
 };
 
 template <typename Iterator>

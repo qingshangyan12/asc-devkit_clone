@@ -53,8 +53,6 @@ struct cast_options {
     cast_sat_mode sat = cast_sat_mode::not_sat;
 };
 
-enum class cache_mode : uint8_t { normal = 0, disable = 4, last = 5, persistent = 6 };
-
 enum class load_sideband_mode : uint8_t {
     direct,
     deintlv,

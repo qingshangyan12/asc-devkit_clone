@@ -159,23 +159,23 @@ struct Img2ColParams {
 };
 
 // normalize 函数: PascalCase → snake_case 类型转换
-__aicore__ inline constexpr experimental::cache_mode normalize_cache_mode(experimental::cache_mode mode)
+__aicore__ inline constexpr cache_mode normalize_cache_mode(cache_mode mode)
 {
     return mode;
 }
 
-__aicore__ inline constexpr experimental::cache_mode normalize_cache_mode(CacheMode mode)
+__aicore__ inline constexpr cache_mode normalize_cache_mode(CacheMode mode)
 {
     switch (mode) {
     case CacheMode::CACHE_MODE_DISABLE:
-        return experimental::cache_mode::disable;
+        return cache_mode::disable;
     case CacheMode::CACHE_MODE_LAST:
-        return experimental::cache_mode::last;
+        return cache_mode::last;
     case CacheMode::CACHE_MODE_PERSISTENT:
-        return experimental::cache_mode::persistent;
+        return cache_mode::persistent;
     case CacheMode::CACHE_MODE_NORMAL:
     default:
-        return experimental::cache_mode::normal;
+        return cache_mode::normal;
     }
 }
 

@@ -32,6 +32,8 @@ namespace Std = AscendC::Std;
 
 enum class unit_flag_mode : uint8_t { disable = 0, enable_keep = 2, enable_update = 3 };
 
+enum class cache_mode : uint8_t { normal = 0, disable = 4, last = 5, persistent = 6 };
+
 using _0 = Std::Int<0>;
 using _1 = Std::Int<1>;
 using _2 = Std::Int<2>;
