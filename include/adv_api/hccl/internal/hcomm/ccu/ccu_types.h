@@ -50,7 +50,6 @@ typedef enum {
 typedef enum {
     CCU_CONDITION_EQ = 0,
     CCU_CONDITION_NE = 1,
-    CCU_CONDITION_LT = 2,
 } CcuConditionType;
 
 typedef uint64_t CcuLoop;
