@@ -1,5 +1,7 @@
 # SIMD and SIMT Hybrid Programming Sample Introduction
 
+<!-- UTF-8 encoding marker: 文档 -->
+
 ## Overview
 
 SIMD and SIMT hybrid programming applies to scenarios where the same kernel needs both vectorized compute capability and thread-level flexible control. In typical cases, SIMD is used for regular vector computation, while SIMT is used for irregular memory access, branch handling, thread mapping, and fine-grained data movement. This keeps the flexibility of thread-level expression while improving regular computation efficiency.

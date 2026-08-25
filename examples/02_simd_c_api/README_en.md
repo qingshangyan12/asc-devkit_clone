@@ -1,4 +1,7 @@
 # Sample List
+
+<!-- UTF-8 encoding marker: 文档 -->
+
 |  Directory Name                                                   |  Description                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
 | [00_introduction](./00_introduction) | Simple examples based on Ascend C, demonstrating custom function implementations through Ascend C programming language with corresponding C_API implementations |

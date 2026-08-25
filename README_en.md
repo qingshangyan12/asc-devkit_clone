@@ -15,9 +15,11 @@
 </div>
 
 ## 🔥 Latest News
+
 [2026/05] Key Features of v9.1.0-beta.2
 
 ### 🚀 Key Features
+
 - NPU Check support added to Ascend C framework basic APIs ([PR#1557](https://gitcode.com/cann/asc-devkit/pull/1557), [PR#1467](https://gitcode.com/cann/asc-devkit/pull/1467)), enhancing runtime verification capability for operators.
 - printf and register dump support added within SIMD VF ([PR#1605](https://gitcode.com/cann/asc-devkit/pull/1605)), enabling debug printing and register data dumping.
 - DumpTensor for L1 Tensor data supported on A5 ([PR#2175](https://gitcode.com/cann/asc-devkit/pull/2175)), extending debug support for L1-level data.
@@ -26,6 +28,7 @@
 - ld/st interfaces ([PR#2058](https://gitcode.com/cann/asc-devkit/pull/2058)) and AddrSpace class interfaces ([PR#1597](https://gitcode.com/cann/asc-devkit/pull/1597)) added to SIMT programming, enriching SIMT memory access capabilities.
 
 ### 🎯 Sample Updates
+
 - Best practice sample development: matmul+gelu fusion, datacopy optimization, bank conflict optimization, grouped quantized matmul, and high-performance SIMD & SIMT programming ([PR#1814](https://gitcode.com/cann/asc-devkit/pull/1814), [PR#2137](https://gitcode.com/cann/asc-devkit/pull/2137), [PR#2141](https://gitcode.com/cann/asc-devkit/pull/2141), [PR#2166](https://gitcode.com/cann/asc-devkit/pull/2166), [PR#2363](https://gitcode.com/cann/asc-devkit/pull/2363)).
 - New feature supplements and compatibility sample rectification for Ascend 950: loopmode data transfer, interleave vector computation, datacopy_gm2l1, loadmx (Load2DMX), mmad_mx, data_copy_pad, etc. ([PR#2336](https://gitcode.com/cann/asc-devkit/pull/2336), [PR#1899](https://gitcode.com/cann/asc-devkit/pull/1899), [PR#2124](https://gitcode.com/cann/asc-devkit/pull/2124)).
 - Basic samples added to RegBase: basic arithmetic, data type conversion, reduction, comparison, indexing, etc. ([PR#1459](https://gitcode.com/cann/asc-devkit/pull/1459), [PR#1575](https://gitcode.com/cann/asc-devkit/pull/1575), [PR#2024](https://gitcode.com/cann/asc-devkit/pull/2024)).
@@ -36,6 +39,7 @@
 - Tensor API introductory and best practice samples added: Matmul introduction, data load/store, output-side quantization, MX FP4 best practices ([PR#2553](https://gitcode.com/cann/asc-devkit/pull/2553)).
 
 ### 📖 Documentation
+
 - Documentation on matrix computation overview and computation fractal introduction added ([PR#2533](https://gitcode.com/cann/asc-devkit/pull/2533)).
 - Vector computation API documentation optimized, with instruction constraints supplemented ([PR#2676](https://gitcode.com/cann/asc-devkit/pull/2676)).
 - VitePress documentation site built to provide AscendC document preview capability ([PR#2547](https://gitcode.com/cann/asc-devkit/pull/2547)).
@@ -54,6 +58,7 @@ As a programming language covering full-scenario operator development needs, Asc
 Ascend C takes **"Compatible with C/C++ standards · Unleash ultimate computing power"** as its core design philosophy: on the basis of strictly complying with C/C++ language specifications, it makes minimal syntax extensions, enabling developers with C/C++ foundation to migrate smoothly to the Ascend platform with low threshold, and independently unleash the full computing potential of the chip. The language is simultaneously compatible with pointer-based native C development paradigm and Tensor+Layout modern C++ programming mode, deeply supporting operator customization and optimization while realizing seamless integration with existing C/C++ development ecosystems and ensuring consistent cross-platform development experience.
 
 We adhere to two core design principles:
+
 - **No silver bullet**: Different business scenarios have different demands for performance and development efficiency. There is no single optimal interface suitable for all scenarios. Layered design is the core path to balance efficiency and performance.
 - **Progressive growth**: Entry-level developers can quickly get started with high-level easy-to-use interfaces to complete algorithm verification and prototype implementation; senior developers can dive into low-level interfaces to fully unleash hardware potential through fine-grained tuning.
 
@@ -84,6 +89,7 @@ Ascend C adopts a layered architecture design, building a complete operator deve
 <img src="docs/zh/guide/figures/architecture_ascendc.png" alt="Ascend C Overall Architecture Diagram" width="1000px">
 
 The capability definition and description of each layer are as follows:
+
 - **Language Extension Layer (SIMT API)**: Native C programming interface for multi-threaded parallel scenarios, supports industry-standard SIMT programming model, ensures consistent cross-technology development experience, and enables high-performance operator development in discrete and irregular computing scenarios.
 - **Language Extension Layer (SIMD C API)**: C-level underlying programming interface based on SIMD vectorized programming model for ultimate performance tuning, natively supports array-style memory allocation and pointer-based computing primitives, with instruction-level zero-encapsulation-overhead hardware access capability. Ascend 950PR/Ascend 950DT architecture adds support for SIMD/SIMT hybrid programming mode, covering multi-form parallel computing scenarios.
 - **Tensor API**: Core C++ Tensor-level programming interface for high-performance operator development. Takes memory layout (Layout) as a first-class citizen of Tensor abstraction, natively supports Tensor objects carrying Layout semantics; built-in Layout algebra can automatically complete memory layout index derivation and layout transformation management, significantly reducing development complexity in complex memory layout scenarios, and improving code maintainability and cross-architecture portability.
@@ -97,6 +103,7 @@ The capability definition and description of each layer are as follows:
 - **Python Frontend (PyAsc)**: Encapsulates the full underlying programmability of the chip based on Python language, continuously improves Tensor programming capability under the Layout system, adds support for SIMT programming model, and enables development of high-performance operators through Python interfaces.
 
 ### How to Select Multi-layer APIs for Operator Development
+
 - **Development in C/C++**: Please refer to [Ascend C Multi-level API Selection Guide](./docs/zh/asc_how_to_choose_api.md) for details
 - **Python-based development for full programmability and ultimate performance**: Ascend C Python frontend [PyAsc](https://gitcode.com/cann/pyasc) is recommended
 - **Python-based development for rapid verification and ease of use**: [PyPTO](https://gitcode.com/cann/pypto) is recommended
@@ -105,7 +112,7 @@ The capability definition and description of each layer are as follows:
 
 This repository mainly contains Ascend C programming APIs and necessary cmake build scripts, which are the core modules required for operator development. Its directory structure is as follows:
 
-```
+```text
 ├── cmake                               # Ascend C build source code
 ├── docs                                # Project documentation
 ├── examples                            # Ascend C API sample projects
