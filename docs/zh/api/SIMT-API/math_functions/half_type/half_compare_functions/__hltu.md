@@ -63,7 +63,7 @@ bool __hltu(half x, half y)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelHltu(bool* dst, half* x, half* y, int n)
+    __global__ __launch_bounds__(1024) void kernel_hltu(bool* dst, half* x, half* y, int n)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         if (idx < n) {
@@ -75,7 +75,7 @@ bool __hltu(half x, half y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelHltu(__gm__ bool* dst, __gm__ half* x, __gm__ half* y)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_hltu(__gm__ bool* dst, __gm__ half* x, __gm__ half* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __hltu(x[idx], y[idx]);

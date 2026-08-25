@@ -45,7 +45,7 @@ inline bfloat16_t __ushort_as_bfloat16(const unsigned short int x)
 
 unsigned short int的数据按位重新解释为bfloat16的值。特殊值如下：
 
-| x值 | 返回值 |
+| x值（16位无符号整数位模式） | 返回值 |
 |---|---|
 | 0x0000 | 0 |
 | 0x8000 | -0 |

@@ -53,7 +53,8 @@ bool __hbnex2(bfloat16x2_t x, bfloat16x2_t y)
 
 | x分量值 | y分量值 | 返回值 |
 |---|---|---|
-| 任一分量为nan | 任意值 | false |
+| nan | 任意值 | false |
+| 任意值 | nan | false |
 | ±0 | ±0  | false |
 | ±inf | ±inf | 相同符号inf返回false，不同符号inf返回true |
 
