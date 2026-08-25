@@ -243,7 +243,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_log2f_positive_finite(floa
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x)
 {
     if (isnan(x)) {
-        return x + x;
+        return x;
     }
     if (x == ASCRT_INF_F) {
         return ASCRT_INF_F;
@@ -1336,7 +1336,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y)
     const float odd_remainder = y - (half_y_trunc + half_y_trunc);
     const bool exponent_is_odd_integer = fabsf(odd_remainder) == 1.0f;
     if (x == 0.0f || abs_x == ASCRT_INF_F) {
-        float special_output = x + x;
+        float special_output = x;
         if (y < 0.0f) {
             special_output = abs_x == ASCRT_INF_F ? 0.0f : ASCRT_INF_F;
             // Preserve the sign of x for odd powers such as pow(-0, -3) and pow(-inf, -3).
@@ -1387,7 +1387,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x)
 {
     if (isnan(x)) {
-        return x + x;
+        return x;
     }
     if (x == ASCRT_INF_F) {
         return ASCRT_INF_F;
