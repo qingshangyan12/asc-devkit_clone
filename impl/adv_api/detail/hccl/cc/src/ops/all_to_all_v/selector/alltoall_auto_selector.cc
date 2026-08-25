@@ -15,7 +15,7 @@ namespace mc2_ops_hccl {
 namespace {
 constexpr u32 CONCURRENT_RANK_LIMIT = 4;
 constexpr u64 BIG_DATA_SIZE_LIMIT = 512;
-}
+} // namespace
 
 SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
@@ -45,14 +45,12 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
             CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
             HCCL_ERROR("[AlltoAllAutoSelector] CheckMeshNumEqualToClosNum failed."), SelectorStatus::NOT_MATCH);
 
-        const bool concurrentCondition = isMeshNumEqualToClosNum &&
-                                         topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT &&
+        const bool concurrentCondition = isMeshNumEqualToClosNum && topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT &&
                                          sendCounts[0] > BIG_DATA_SIZE_LIMIT;
         if (concurrentCondition) {
             // Concurrent is outside this migration scope. UBX is the confirmed local fallback.
-            HCCL_WARNING(
-                "[AlltoAllAutoSelector] HCCL concurrent condition matched, but Concurrent is not migrated; "
-                "fallback to AicpuAllToAllSoleMeshUBX.");
+            HCCL_WARNING("[AlltoAllAutoSelector] HCCL concurrent condition matched, but Concurrent is not migrated; "
+                         "fallback to AicpuAllToAllSoleMeshUBX.");
         }
         selectAlgName = "AicpuAllToAllSoleMeshUBX";
     } else {
