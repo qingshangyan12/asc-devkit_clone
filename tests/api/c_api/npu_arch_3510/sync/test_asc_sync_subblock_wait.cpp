@@ -19,23 +19,23 @@ protected:
     void TearDown() { g_coreType = C_API_AIV_TYPE; }
 };
 
-#define TEST_ASC_SYNC_SUBBLOCK_WAIT_BY_PIPE(coreType, pipeVal)                                    \
-    void wait_flag_dev_subblock_mode_stub_##coreType##_##pipeVal(pipe_t pipe, int64_t flag_id)    \
-    {                                                                                             \
-        EXPECT_EQ(pipe, pipeVal);                                                                 \
-        EXPECT_EQ(flag_id, static_cast<int64_t>(11));                                             \
-    }                                                                                             \
-                                                                                                  \
-    TEST_F(TEST_ASC_SYNC_SUBBLOCK_WAIT, TEST_ASC_SYNC_SUBBLOCK_WAIT_##coreType##_##pipeVal)       \
-    {                                                                                             \
-        g_coreType = coreType;                                                                    \
-        MOCKER_CPP(wait_flag_dev, void(pipe_t, int64_t))                                          \
-            .times(1)                                                                             \
-            .will(invoke(wait_flag_dev_subblock_mode_stub_##coreType##_##pipeVal));               \
-        pipe_t pipe = pipeVal;                                                                    \
-        int64_t flag_id = static_cast<int64_t>(11);                                               \
-        asc_sync_subblock_wait(pipe, flag_id);                                                    \
-        GlobalMockObject::verify();                                                               \
+#define TEST_ASC_SYNC_SUBBLOCK_WAIT_BY_PIPE(coreType, pipeVal)                                 \
+    void wait_flag_dev_subblock_mode_stub_##coreType##_##pipeVal(pipe_t pipe, int64_t flag_id) \
+    {                                                                                          \
+        EXPECT_EQ(pipe, pipeVal);                                                              \
+        EXPECT_EQ(flag_id, static_cast<int64_t>(11));                                          \
+    }                                                                                          \
+                                                                                               \
+    TEST_F(TEST_ASC_SYNC_SUBBLOCK_WAIT, TEST_ASC_SYNC_SUBBLOCK_WAIT_##coreType##_##pipeVal)    \
+    {                                                                                          \
+        g_coreType = coreType;                                                                 \
+        MOCKER_CPP(wait_flag_dev, void(pipe_t, int64_t))                                       \
+            .times(1)                                                                          \
+            .will(invoke(wait_flag_dev_subblock_mode_stub_##coreType##_##pipeVal));            \
+        pipe_t pipe = pipeVal;                                                                 \
+        int64_t flag_id = static_cast<int64_t>(11);                                            \
+        asc_sync_subblock_wait(pipe, flag_id);                                                 \
+        GlobalMockObject::verify();                                                            \
     }
 
 TEST_ASC_SYNC_SUBBLOCK_WAIT_BY_PIPE(C_API_AIC_TYPE, PIPE_S);
