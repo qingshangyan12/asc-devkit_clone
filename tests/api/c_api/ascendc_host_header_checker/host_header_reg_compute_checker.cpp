@@ -535,6 +535,9 @@ static void test_host_c_api_reg_compute_15()
     using ::asc_ln;
     using ::asc_load;
     using ::asc_loadalign;
+    using ::asc_loadalign_mask;
+    using ::asc_loadalign_mask_downsample;
+    using ::asc_loadalign_mask_upsample;
     using ::asc_loadalign_brc;
     using ::asc_loadalign_brc_datablock;
     using ::asc_loadalign_brc_datablock_postupdate;
@@ -552,7 +555,7 @@ static void test_host_c_api_reg_compute_15()
     using ::asc_loadalign_downsample;
     using ::asc_loadalign_downsample_postupdate;
     using ::asc_loadalign_postupdate;
-    using ::asc_loadalign_datablock_stride;
+    using ::asc_loadalign_datablock_strided;
     using ::asc_loadalign_unpack;
     using ::asc_loadalign_unpack4;
     using ::asc_loadalign_unpack4_postupdate;

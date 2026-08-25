@@ -42,7 +42,7 @@
 
 #define TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(dst_type, src_type, cce_dst_type, cce_src_type)                           \
     TEST_F(TestVectorDataMoveLoadAlignV2##dst_type##CApi,                                                          \
-        c_api_asc_loadalign_datablock_stride_##dst_type##_ReturnSucc)                                              \
+        c_api_asc_loadalign_datablock_strided_##dst_type##_ReturnSucc)                                             \
     {                                                                                                                  \
         __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                             \
         vector_bool mask;                                                                                              \
@@ -52,8 +52,8 @@
             .will(invoke(vsldb##_##dst_type##_Stub));                                                                  \
                                                                                                                        \
         static_assert(std::is_same_v<                                                                                   \
-                      decltype(asc_loadalign_datablock_stride(src, 0, 0, mask)), dst_type>);                           \
-        dst_type dst = asc_loadalign_datablock_stride(src, 0, 0, mask);                                                \
+                      decltype(asc_loadalign_datablock_strided(src, 0, 0, mask)), dst_type>);                          \
+        dst_type dst = asc_loadalign_datablock_strided(src, 0, 0, mask);                                               \
         (void)dst;                                                                                                     \
         GlobalMockObject::verify();                                                                                    \
     }

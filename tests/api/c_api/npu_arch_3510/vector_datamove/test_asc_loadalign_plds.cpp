@@ -101,14 +101,14 @@ TEST_F(TestVectorDatamoveLoadAlignPlds, LoadAlignPlds_Succ)
     GlobalMockObject::verify();
 }
 
-TEST_F(TestVectorDatamoveLoadAlignPlds, LoadAlignPldsBool_ReturnSucc)
+TEST_F(TestVectorDatamoveLoadAlignPlds, LoadAlignMaskPlds_ReturnSucc)
 {
-    __ubuf__ bool* src = reinterpret_cast<__ubuf__ bool*>(22);
+    __ubuf__ uint32_t* src = reinterpret_cast<__ubuf__ uint32_t*>(22);
 
     MOCKER_CPP(plds, void(vector_bool&, __ubuf__ uint32_t*, int32_t, Literal)).times(1).will(invoke(plds_stub));
 
-    static_assert(std::is_same_v<decltype(asc_loadalign(src)), vector_bool>);
-    vector_bool dst = asc_loadalign(src);
+    static_assert(std::is_same_v<decltype(asc_loadalign_mask(src)), vector_bool>);
+    vector_bool dst = asc_loadalign_mask(src);
     (void)dst;
     GlobalMockObject::verify();
 }
