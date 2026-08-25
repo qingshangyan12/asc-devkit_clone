@@ -56,7 +56,7 @@ inline half __float2half_ru(const float x)
 
 ## 约束说明
 
-本接口的饱和行为受CTRL\[60\]、CTRL\[48\]寄存器共同控制：当CTRL\[60\]=1且CTRL\[48\]=0时，接口按饱和模式工作，转换结果为上表“饱和模式返回值”列；其余情况按非饱和模式工作。CTRL寄存器的设置方式请参见[控制饱和行为的方式](../../data_type_conversion/overview.md#section1194916101549)。SIMT编程场景暂不支持设置CTRL寄存器。
+无
 
 ## 需要包含的头文件
 

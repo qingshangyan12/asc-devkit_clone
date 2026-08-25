@@ -49,7 +49,6 @@ bool __hequ(bfloat16_t x, bfloat16_t y)
 -   true：输入数据相等，或者任一输入为nan。
 -   false：输入数据不相等，且两个输入均不为nan。
 
--
 ## 约束说明
 
 无
