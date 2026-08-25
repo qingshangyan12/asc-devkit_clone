@@ -4,7 +4,7 @@
 
 上文介绍了Matmul矩阵乘的数据切分方案和数据流。Ascend C提供一组Matmul高阶API，封装了这些常用的切分和数据搬运、计算的算法逻辑，方便用户快速实现Matmul矩阵乘法的运算操作。开发者在host侧通过调用API自动获取Tiling参数，该参数传递到kernel侧后，在初始化操作时传入，通过几个简单的API即可完成矩阵乘操作。完整样例请参考[LINK](../../../../../../examples/01_simd_cpp_api/00_introduction/02_matrix/matmul_advanced_api)。
 
-**图1**  矩阵编程流程示意图<a name="zh-cn_topic_0000001622514006_fig264116391245"></a>  
+**图1**  矩阵编程流程示意图<a name="zh-cn_topic_0000001622514006_fig264116391245"></a>
 ![](../../../figures/mat_prog_flow.png "矩阵编程流程示意图")
 
 host侧自动获取Tiling参数的关键步骤介绍如下：
@@ -22,7 +22,7 @@ host侧自动获取Tiling参数的关键步骤介绍如下：
 2. **设置参与Matmul运算的核数，A、B的内存逻辑位置、格式和数据类型。**
 
     ```cpp
-    tilingApi.SetDim(ascendcPlatform->GetCoreNumAic());  
+    tilingApi.SetDim(ascendcPlatform->GetCoreNumAic());
     tilingApi.SetAType(AscendC::TPosition::GM, CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16, false);
     tilingApi.SetBType(AscendC::TPosition::GM, CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT16, false);
     tilingApi.SetCType(AscendC::TPosition::GM, CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT);
@@ -62,7 +62,7 @@ host侧自动获取Tiling参数的关键步骤介绍如下：
 <a name="zh-cn_topic_0000001622514006_li1032116474330"></a>
 kernel侧使用Matmul API矩阵乘运算的具体步骤如下：
 
-1. **创建Matmul对象**
+1. **创建Matmul对象。**
 
     创建Matmul对象的示例如下：
 
@@ -70,10 +70,10 @@ kernel侧使用Matmul API矩阵乘运算的具体步骤如下：
     - 默认为MIX模式（包含矩阵计算和矢量计算），该场景下通常不定义ASCENDC\_CUBE\_ONLY宏，如果在程序中使用了ASCENDC\_CUBE\_ONLY宏，则必须使用ASCEND\_IS\_AIC宏和ASCEND\_IS\_AIV宏将Cube计算和Vector计算隔离开，更多内容请参考[融合算子编程](../fusion_operator_programming/fusion_operator_programming.md)。
 
     ```cpp
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType; 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType; 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType; 
-    AscendC::Matmul<aType, bType, cType> mm; 
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
+    AscendC::Matmul<aType, bType, cType> mm;
     ```
 
     创建对象时需要传入A、B、C的参数类型信息，类型信息通过MatmulType来定义，包括：内存逻辑位置、数据格式、数据类型。
@@ -86,35 +86,39 @@ kernel侧使用Matmul API矩阵乘运算的具体步骤如下：
 
     >[!NOTE]说明
     >Matmul高阶API内部实现时需要使用系统workspace（即对应本步骤中的GetSysWorkSpacePtr接口），开发者需要自行申请系统workspace的空间：
-    >
     >- 在host侧Tiling实现时，设置总的workspace的数值大小（包含用户workspace和系统workspace），workspace空间由框架来申请并管理。系统workspace的空间大小通过[GetLibApiWorkSpaceSize](../../../../api/Utils-API/platform_info/PlatformAscendC/GetLibApiWorkSpaceSize.md)获取。
-    >
+>
     >    ```cpp
     >    size_t userWorkspaceSize = 0;
     >    size_t systemWorkspaceSize = static_cast<size_t>(ascendcPlatform.GetLibApiWorkSpaceSize());
     >    size_t workspaceSize = userWorkspaceSize + systemWorkspaceSize;
     >    ```
 
-3. **设置左矩阵A、右矩阵B。**
+3. **设置原始矩阵shape以及当前核使用的左矩阵A、右矩阵B。**
+
+    多核场景下，需要根据数据切分方向为每个核设置对应的矩阵起始地址。本样例中沿M轴切分A矩阵和C矩阵：每个核读取A矩阵中`singleCoreM`行数据，B矩阵不切分，由所有核共同读取完整B矩阵。`SetOrgShape`需要在`SetTensorA`、`SetTensorB`之前调用。
 
     ```cpp
-    mm.SetTensorA(gmA);    // 设置左矩阵A
-    mm.SetTensorB(gmB);    // 设置右矩阵B
+    mm.SetOrgShape(tiling.M, tiling.N, tiling.Ka, tiling.Kb);
+    mm.SetTensorA(aGlobal[GetBlockIdx() * tiling.singleCoreM * tiling.Ka], false);
+    mm.SetTensorB(bGlobal[0], false);
     ```
 
+    其中，`GetBlockIdx()`表示当前核号。A矩阵按`[M, Ka]`连续存放，因此当前核的A矩阵起始偏移为`GetBlockIdx() * tiling.singleCoreM * tiling.Ka`。各核计算C矩阵的不同行，但都需要完整的B矩阵参与K轴累加，因此B矩阵从`bGlobal[0]`开始读取。`SetTensorA`和`SetTensorB`的第二个参数`false`表示矩阵不转置。
+
 4. **完成矩阵乘操作。**
-    - 调用Iterate完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
+    - 调用Iterate完成单次迭代计算，叠加while循环完成当前核负责的数据计算。C矩阵按`[M, N]`连续存放，当前核的写回起始偏移为`GetBlockIdx() * tiling.singleCoreM * tiling.N`。Iterate方式可以自行控制迭代次数，使用方式比较灵活。
 
         ```cpp
-        while (mm.Iterate()) {   
-            mm.GetTensorC(gmC); 
+        while (mm.Iterate()) {
+            mm.GetTensorC(cGlobal[GetBlockIdx() * tiling.singleCoreM * tiling.N]);
         }
         ```
 
-    - 调用IterateAll完成单核上所有数据的计算。IterateAll方式，无需循环迭代，使用比较简单。
+    - 调用IterateAll完成当前核负责的全部数据计算并写回C矩阵。IterateAll方式无需循环迭代，使用比较简单。本节样例代码中调用IterateAll实现矩阵乘。
 
         ```cpp
-        mm.IterateAll(gmC);
+        mm.IterateAll(cGlobal[GetBlockIdx() * tiling.singleCoreM * tiling.N]);
         ```
 
 5. **结束矩阵乘操作。**
@@ -162,10 +166,10 @@ kernel侧使用Matmul API矩阵乘运算的具体步骤如下：
 创建Matmul对象时需要传入A、B、C的参数类型信息，类型信息通过MatmulType来定义，包括：内存逻辑位置、数据格式、数据类型。示例如下：
 
 ```cpp
-typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType; 
-typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType; 
-typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType; 
-AscendC::Matmul<aType, bType, cType> mm; 
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
+AscendC::Matmul<aType, bType, cType> mm;
 ```
 
 针对数据格式，包括CubeFormat::ND, CubeFormat::NZ, CubeFormat::ND\_ALIGN三种，ND和NZ格式在[数据格式](basics.md#zh-cn_topic_0000001622194138_section1453415011)章节已经介绍，ND\_ALIGN格式的介绍请参考[数据排布格式](../../../technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md#li075920427155)。
