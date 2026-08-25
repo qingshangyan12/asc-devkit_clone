@@ -37,42 +37,43 @@
 
 L0C Buffer中存储的float类型数据来自Mmad矩阵乘计算结果，当输入矩阵A中包含inf/-inf/nan时，L0C中对应行会出现inf/-inf/nan（详见[Mmad接口边界值汇总](mmad_interface_boundary_value_summary.md)）。
 
-**表1** float类型L0C中存在inf/-inf/nan时，各输出类型的计算结果说明
-| 输出数据类型 | 随路量化模式 | L0C中的元素取值 | 输出元素取值<br>（饱和模式，CTRL\[48\]=0） | 输出元素取值<br>（非饱和模式，CTRL\[48\]=1） |
-| --- | --- | --- | --- | --- |
-| half | QF322F16\_PRE / VQF322F16\_PRE | +inf | 65504.0（MAX） | +inf |
-| half | QF322F16\_PRE / VQF322F16\_PRE | -inf | -65504.0（MIN） | -inf |
-| half | QF322F16\_PRE / VQF322F16\_PRE | nan | 0.0 | nan |
-| half | F322F16（Cast） | +inf | 65504.0（MAX） | +inf |
-| half | F322F16（Cast） | -inf | -65504.0（MIN） | -inf |
-| half | F322F16（Cast） | nan | 0.0 | nan |
-| bfloat16\_t | QF322BF16\_PRE / VQF322BF16\_PRE | +inf | 0x7F7F（MAX） | 0x7F80（+inf） |
-| bfloat16\_t | QF322BF16\_PRE / VQF322BF16\_PRE | -inf | 0xFF7F（MIN） | 0xFF80（-inf） |
-| bfloat16\_t | QF322BF16\_PRE / VQF322BF16\_PRE | nan | 0x0000（0） | 0x7FFF（nan） |
-| bfloat16\_t | F322BF16（Cast） | +inf | 0x7F7F（MAX） | 0x7F80（+inf） |
-| bfloat16\_t | F322BF16（Cast） | -inf | 0xFF7F（MIN） | 0xFF80（-inf） |
-| bfloat16\_t | F322BF16（Cast） | nan | 0x0000（0） | 0x7FFF（nan） |
-| float | QF322F32\_PRE / VQF322F32\_PRE | +inf | +inf | +inf |
-| float | QF322F32\_PRE / VQF322F32\_PRE | -inf | -inf | -inf |
-| float | QF322F32\_PRE / VQF322F32\_PRE | nan | nan | nan |
-| fp8\_e4m3fn\_t | QF322FP8\_PRE / VQF322FP8\_PRE | +inf | 0x7E（448.0，MAX） | 0x7F（nan） |
-| fp8\_e4m3fn\_t | QF322FP8\_PRE / VQF322FP8\_PRE | -inf | 0xFE（-448.0，MIN） | 0x7F（nan） |
-| fp8\_e4m3fn\_t | QF322FP8\_PRE / VQF322FP8\_PRE | nan | 0x00（0）<br>CTRL\[50\]=0时 | 0x7F（nan） |
-| hifloat8\_t | QF322HIF8\_PRE / VQF322HIF8\_PRE | +inf | 111（HiF8+inf） | 111（HiF8+inf） |
-| hifloat8\_t | QF322HIF8\_PRE / VQF322HIF8\_PRE | -inf | 239（HiF8-inf） | 239（HiF8-inf） |
-| hifloat8\_t | QF322HIF8\_PRE / VQF322HIF8\_PRE | nan | 0 | 128（HiF8NAN） |
-| hifloat8\_t | QF322HIF8\_PRE\_HYBRID / VQF322HIF8\_PRE\_HYBRID | +inf | 111（HiF8+inf） | 111（HiF8+inf） |
-| hifloat8\_t | QF322HIF8\_PRE\_HYBRID / VQF322HIF8\_PRE\_HYBRID | -inf | 239（HiF8-inf） | 239（HiF8-inf） |
-| hifloat8\_t | QF322HIF8\_PRE\_HYBRID / VQF322HIF8\_PRE\_HYBRID | nan | 0 | 128（HiF8NAN） |
-| int8\_t | QF322B8\_PRE / VQF322B8\_PRE | +inf | 127（MAX） | 127（MAX） |
-| int8\_t | QF322B8\_PRE / VQF322B8\_PRE | -inf | -128（MIN） | -128（MIN） |
-| int8\_t | QF322B8\_PRE / VQF322B8\_PRE | nan | 0 | 0 |
-| uint8\_t | QF322B8\_PRE / VQF322B8\_PRE | +inf | 255（MAX） | 255（MAX） |
-| uint8\_t | QF322B8\_PRE / VQF322B8\_PRE | -inf | 0（MIN） | 0（MIN） |
-| uint8\_t | QF322B8\_PRE / VQF322B8\_PRE | nan | 0 | 0 |
-| int4b\_t | QF322S4\_PRE / VQF322S4\_PRE | +inf | 7（MAX） | 7（MAX） |
-| int4b\_t | QF322S4\_PRE / VQF322S4\_PRE | -inf | -8（MIN） | -8（MIN） |
-| int4b\_t | QF322S4\_PRE / VQF322S4\_PRE | nan | 0 | 0 |
+**表 1** float类型L0C中存在inf/-inf/nan时，各输出类型的计算结果说明
+
+| 输出数据类型 | 随路量化模式 | L0C中的元素取值 | 饱和模式输出元素取值 | 非饱和模式输出元素取值 |
+| --- | --- | --- |-------------------------|-------------|
+| half | QF322F16\_PRE / VQF322F16\_PRE | +inf | 65504.0（MAX）            | +inf        |
+| half | QF322F16\_PRE / VQF322F16\_PRE | -inf | -65504.0（MIN）           | -inf        |
+| half | QF322F16\_PRE / VQF322F16\_PRE | nan | 0.0                     | nan         |
+| half | F322F16（Cast） | +inf | 65504.0（MAX）            | +inf        |
+| half | F322F16（Cast） | -inf | -65504.0（MIN）           | -inf        |
+| half | F322F16（Cast） | nan | 0.0                     | nan         |
+| bfloat16\_t | QF322BF16\_PRE / VQF322BF16\_PRE | +inf | 0x7F7F（MAX）             | 0x7F80（+inf） |
+| bfloat16\_t | QF322BF16\_PRE / VQF322BF16\_PRE | -inf | 0xFF7F（MIN）             | 0xFF80（-inf） |
+| bfloat16\_t | QF322BF16\_PRE / VQF322BF16\_PRE | nan | 0x0000（0）               | 0x7FFF（nan） |
+| bfloat16\_t | F322BF16（Cast） | +inf | 0x7F7F（MAX）             | 0x7F80（+inf） |
+| bfloat16\_t | F322BF16（Cast） | -inf | 0xFF7F（MIN）             | 0xFF80（-inf） |
+| bfloat16\_t | F322BF16（Cast） | nan | 0x0000（0）               | 0x7FFF（nan） |
+| float | QF322F32\_PRE / VQF322F32\_PRE | +inf | +inf                    | +inf        |
+| float | QF322F32\_PRE / VQF322F32\_PRE | -inf | -inf                    | -inf        |
+| float | QF322F32\_PRE / VQF322F32\_PRE | nan | nan                     | nan         |
+| fp8\_e4m3fn\_t | QF322FP8\_PRE / VQF322FP8\_PRE | +inf | 0x7E（448.0，MAX）         | 0x7F（nan）   |
+| fp8\_e4m3fn\_t | QF322FP8\_PRE / VQF322FP8\_PRE | -inf | 0xFE（-448.0，MIN）        | 0x7F（nan）   |
+| fp8\_e4m3fn\_t | QF322FP8\_PRE / VQF322FP8\_PRE | nan | 0x00（0）<br>CTRL\[50\]=0时 | 0x7F（nan）   |
+| hifloat8\_t | QF322HIF8\_PRE / VQF322HIF8\_PRE | +inf | 111（HiF8+inf）           | 111（HiF8+inf） |
+| hifloat8\_t | QF322HIF8\_PRE / VQF322HIF8\_PRE | -inf | 239（HiF8-inf）           | 239（HiF8-inf） |
+| hifloat8\_t | QF322HIF8\_PRE / VQF322HIF8\_PRE | nan | 0                       | 128（HiF8NAN） |
+| hifloat8\_t | QF322HIF8\_PRE\_HYBRID / VQF322HIF8\_PRE\_HYBRID | +inf | 111（HiF8+inf）           | 111（HiF8+inf） |
+| hifloat8\_t | QF322HIF8\_PRE\_HYBRID / VQF322HIF8\_PRE\_HYBRID | -inf | 239（HiF8-inf）           | 239（HiF8-inf） |
+| hifloat8\_t | QF322HIF8\_PRE\_HYBRID / VQF322HIF8\_PRE\_HYBRID | nan | 0                       | 128（HiF8NAN） |
+| int8\_t | QF322B8\_PRE / VQF322B8\_PRE | +inf | 127（MAX）                | 127（MAX）    |
+| int8\_t | QF322B8\_PRE / VQF322B8\_PRE | -inf | -128（MIN）               | -128（MIN）   |
+| int8\_t | QF322B8\_PRE / VQF322B8\_PRE | nan | 0                       | 0           |
+| uint8\_t | QF322B8\_PRE / VQF322B8\_PRE | +inf | 255（MAX）                | 255（MAX）    |
+| uint8\_t | QF322B8\_PRE / VQF322B8\_PRE | -inf | 0（MIN）                  | 0（MIN）      |
+| uint8\_t | QF322B8\_PRE / VQF322B8\_PRE | nan | 0                       | 0           |
+| int4b\_t | QF322S4\_PRE / VQF322S4\_PRE | +inf | 7（MAX）                  | 7（MAX）      |
+| int4b\_t | QF322S4\_PRE / VQF322S4\_PRE | -inf | -8（MIN）                 | -8（MIN）     |
+| int4b\_t | QF322S4\_PRE / VQF322S4\_PRE | nan | 0                       | 0           |
 
 注：
 
@@ -88,7 +89,8 @@ L0C Buffer中存储的float类型数据来自Mmad矩阵乘计算结果，当输�
 
 int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生inf/nan，但量化后可能产生溢出。
 
-**表2** int32\_t类型L0C量化溢出时的计算结果说明
+**表 2** int32\_t类型L0C量化溢出时的计算结果说明
+
 | 输出数据类型 | 随路量化模式 | L0C中的元素取值 | 输出元素取值 |
 | --- | --- | --- | --- |
 | half | DEQF16 / VDEQF16 | 量化后超出half表示范围 | 65504.0（MAX） / -65504.0（MIN） |
@@ -106,7 +108,8 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 
 三个接口支持如下随路量化模式，scalar模式使用单个标量量化参数，tensor模式使用每列独立的量化参数：
 
-**表3** 量化模式说明
+**表 3** 量化模式说明
+
 | 源数据类型 | 量化模式 | 目标数据类型 | 量化方式 | 说明 |
 | --- | --- | --- | --- | --- |
 | - | NoQuant | - | 不量化 | 不开启量化功能 |
@@ -135,7 +138,7 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 | float | QF322HIF8\_PRE\_HYBRID | hifloat8\_t | scalar | float量化成hifloat8\_t，Hybrid舍入 |
 | float | VQF322HIF8\_PRE\_HYBRID | hifloat8\_t | tensor | float量化成hifloat8\_t，Hybrid舍入 |
 | float | QF322F32\_PRE | float | scalar | float量化成float，精度可达双千分之一，无法达双万分之一，有双万分之一精度要求时建议使用AscendDeQuant高阶API |
-| float | VQF322F32\_PRE | float | tensor | 同上 |
+| float | VQF322F32\_PRE | float | tensor | float量化成float，精度可达双千分之一，无法达双万分之一，有双万分之一精度要求时建议使用AscendDeQuant高阶API |
 
 注：同一输出类型的scalar模式与tensor模式使用相同的类型转换算法，inf/nan边界值处理行为完全一致，差异仅在于量化参数的传递方式（单个标量 vs 每列张量）。NoQuant模式不做类型转换和量化，数据原样搬运，float类型的inf/nan保持原样输出。三个接口（L0C->GM/L0C->L1/L0C->UB）的随路量化模式及inf/nan处理行为完全一致。
 
@@ -143,7 +146,8 @@ int32\_t类型的L0C来自int8\_t输入矩阵的Mmad计算结果，不会产生i
 
 NoQuant模式不做类型转换和量化，L0C中的float数据原样搬运到目标Buffer。由于CTRL\[48\]不支持float数据类型，饱和模式和非饱和模式下inf/nan均保持原样输出。NoQuant场景还覆盖了NZ2NZ、NZ2ND、双目标按M维度拆分、双目标按N维度拆分等输出格式，验证inf/-inf/nan在各种格式转换和双目标拆分场景下均能正确传递。
 
-**表4** NoQuant模式下float类型L0C中存在inf/-inf/nan时的输出结果
+**表 4** NoQuant模式下float类型L0C中存在inf/-inf/nan时的输出结果
+
 | 场景 | 输出格式 | 双目标 | L0C中的元素取值 | 输出元素取值 | 说明 |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Nz | 否 | +inf/-inf/nan | +inf/-inf/nan | 原样保留 |
