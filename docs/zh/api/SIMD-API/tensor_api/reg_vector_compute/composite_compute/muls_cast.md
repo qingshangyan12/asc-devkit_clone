@@ -18,6 +18,10 @@
 
 将`float`输入与标量逐元素相乘，并将结果转换为`half`。转换结果写入返回寄存器的偶数`half`位置。
 
+$$
+dst_{2i} = \operatorname{RNA}_{half}(src_i \times scalar)
+$$
+
 ## 函数原型
 
 ```cpp

@@ -18,6 +18,16 @@
 
 统计`uint8_t`输入值的频率分布或累计分布，并在`dst`初始值上累加结果。
 
+令$h$表示统计区间的起始值：`low`模式下$h=0$，`high`模式下$h=128$。对于输出位置
+$i\in[0,127]$，两种统计模式分别为：
+
+$$
+\begin{aligned}
+result_i^{frequency} &= dst_i + \sum_{j:\,src.mask_j=1}\mathbf{1}(src_j=h+i) \\
+result_i^{cumulative} &= dst_i + \sum_{j:\,src.mask_j=1}\mathbf{1}(h\le src_j\le h+i)
+\end{aligned}
+$$
+
 | 配置项 | 取值 | 含义 |
 | --- | --- | --- |
 | `options.half` | `histogram_half::low` | 统计输入值`[0, 127]`。 |

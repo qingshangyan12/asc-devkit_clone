@@ -18,6 +18,16 @@
 
 逐元素执行32位整数宽乘，并返回乘积的低32位和高32位。
 
+令$P_i$表示64位乘积，则：
+
+$$
+\begin{aligned}
+P_i &= src0_i \times src1_i \\
+first_i &= P_i[31:0] \\
+second_i &= P_i[63:32]
+\end{aligned}
+$$
+
 ## 函数原型
 
 ```cpp
