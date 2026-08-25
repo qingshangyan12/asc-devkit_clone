@@ -64,25 +64,24 @@ PIPE_S
 
 ## 调用示例
 
-场景：先将GM上一段int32数据通过标量路径逐元素读到UB，再将UB中的结果逐元素写回GM。调用前分别配置标量读、写的L2 Cache策略。
+场景：算子启动时分别配置标量读、写路径的L2 Cache默认策略。标量路径用于读取GM上的tiling元数据；向量主路径通过[asc_copy_gm2ub_align](../vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)搬运tile数据，二者相互独立。
 
 ```cpp
-constexpr int32_t data_len = 16;
-__ubuf__ int32_t* tmp_ub;
-__gm__ int32_t* src_gm;
-__gm__ int32_t* dst_gm;
+constexpr uint32_t tile_elems = 1024;
+__gm__ int32_t* tiling_gm;   // GM上的tiling元数据
+__gm__ half* src_gm;
+__ubuf__ half* dst_ub;
 
-// 配置标量读策略，后续标量读GM按该策略访问L2
-asc_set_scalar_cache_mode(asc_load_l2_cache_mode::NORMAL_LAST_VICTIM);
-// 标量GM读：将src_gm中的数据逐元素搬运到tmp_ub
-for (int32_t i = 0; i < data_len; ++i) {
-    tmp_ub[i] = src_gm[i];
-}
-
-// 配置标量写策略，后续标量写GM按该策略访问L2
+// 标量读：tiling元数据会被多次访问，启用L2复用
+asc_set_scalar_cache_mode(asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
+// 标量写：写GM控制字段时避免额外L2分配
 asc_set_scalar_cache_mode(asc_store_l2_cache_mode::NOTALLOC_CLEAN);
-// 标量GM写：将tmp_ub中的数据逐元素搬运到dst_gm
-for (int32_t i = 0; i < data_len; ++i) {
-    dst_gm[i] = tmp_ub[i];
+
+int32_t tile_count = tiling_gm[0];  // 标量读GM元数据
+for (int32_t tile = 0; tile < tile_count; ++tile) {
+    // 向量块搬运走MTE，l2_cache_mode由asc_copy_gm2ub_align参数单独控制
+    asc_copy_gm2ub_align(dst_ub, src_gm + tile * tile_elems,
+        tile_elems * sizeof(half));
+    // ... 向量计算 ...
 }
 ```

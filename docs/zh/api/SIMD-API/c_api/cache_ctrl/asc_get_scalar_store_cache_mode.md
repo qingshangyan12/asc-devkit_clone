@@ -55,23 +55,19 @@ PIPE_S
 
 ## 调用示例
 
-场景：将UB上一段int32数据通过标量路径逐元素写回GM。先查询并保存当前store策略，再切换为不allocate模式后完成UB到GM的标量搬运，最后恢复原策略。
+场景：多核算子通过[asc_atomic_add](../scalar_compute/asc_atomic_add.md)向GM上的统计counter做标量原子累加。原子写会绕过DCache，适合对控制字段做一次性更新；进入累加前查询并保存当前store策略，临时切换为`NOTALLOC_CLEAN`避免不必要的L2分配，累加结束后恢复原策略。
 
 ```cpp
-constexpr int32_t data_len = 16;
-__gm__ int32_t* dst_gm;
-__ubuf__ int32_t* src_ub;
+__gm__ int32_t* counter_gm;  // GM上的多核共享计数器
 
-// 查询当前标量store策略
+// 查询并保存当前标量store策略
 asc_store_l2_cache_mode old_mode = asc_get_scalar_store_cache_mode();
-// 切换为NOTALLOC_CLEAN，后续标量写GM按该策略访问L2
+// 标量原子写GM控制字段，避免额外L2分配
 asc_set_scalar_cache_mode(asc_store_l2_cache_mode::NOTALLOC_CLEAN);
 
-// 标量GM写：将src_ub中的数据逐元素搬运到dst_gm
-for (int32_t i = 0; i < data_len; ++i) {
-    dst_gm[i] = src_ub[i];
-}
+asc_dcci_entire_all();  // 标量原子操作前保证DCache一致性
+asc_atomic_add(counter_gm, 1);
 
-// 恢复原store策略
+// 恢复进入本段逻辑前的标量store策略
 asc_set_scalar_cache_mode(old_mode);
 ```

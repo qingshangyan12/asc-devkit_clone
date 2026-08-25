@@ -55,23 +55,27 @@ PIPE_S
 
 ## 调用示例
 
-场景：将GM上一段int32数据通过标量路径逐元素读到UB。先查询并保存当前load策略，再切换为驻留模式后完成GM到UB的标量搬运，最后恢复原策略。
+场景：向量主路径通过[asc_copy_gm2ub_align](../vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)搬运tile数据；标量路径仅读取GM上的tiling元数据（如`tile_count`）。该元数据在tile循环内会被多次标量读取，进入循环前查询并保存当前load策略，临时切换为`NORMAL_FIRST_VICTIM`以提升重复标量读的L2复用，循环结束后恢复原策略。若元数据只读一次、后续不再访问，可改用`NOTALLOC_KEEP`跳过L2写入。
 
 ```cpp
-constexpr int32_t data_len = 16;
-__ubuf__ int32_t* dst_ub;
-__gm__ int32_t* src_gm;
+constexpr uint32_t tile_elems = 1024;
+__gm__ int32_t* tiling_gm;   // GM上的tiling元数据，tile_count位于index 0
+__gm__ half* src_gm;
+__ubuf__ half* dst_ub;
 
-// 查询当前标量load策略
+// 查询并保存当前标量load策略
 asc_load_l2_cache_mode old_mode = asc_get_scalar_load_cache_mode();
-// 切换为驻留策略，后续标量读GM按该策略访问L2
-asc_set_scalar_cache_mode(asc_load_l2_cache_mode::NORMAL_PERSISTENT);
+// tiling元数据会被多次标量读取，启用L2复用
+asc_set_scalar_cache_mode(asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
 
-// 标量GM读：将src_gm中的数据逐元素搬运到dst_ub
-for (int32_t i = 0; i < data_len; ++i) {
-    dst_ub[i] = src_gm[i];
+int32_t tile_count = tiling_gm[0];  // 标量读GM元数据
+for (int32_t tile = 0; tile < tile_count; ++tile) {
+    // 向量块搬运走MTE，不受标量cache mode影响
+    asc_copy_gm2ub_align(dst_ub, src_gm + tile * tile_elems,
+        tile_elems * sizeof(half));
+    // ... 向量计算 ...
 }
 
-// 恢复原load策略
+// 恢复进入本段逻辑前的标量load策略
 asc_set_scalar_cache_mode(old_mode);
 ```

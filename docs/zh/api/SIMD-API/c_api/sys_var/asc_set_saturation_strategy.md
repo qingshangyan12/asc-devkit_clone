@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-设置饱和控制策略，对应CTRL[60]：
+设置饱和控制策略，默认为开启全局饱和配置：
 
 - `asc_override_strategy::USE_API`：表示按单指令/API路径配置饱和。
 - `asc_override_strategy::USE_GLOBAL`：表示使用全局CTRL饱和配置。
