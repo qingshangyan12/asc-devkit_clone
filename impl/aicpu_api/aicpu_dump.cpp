@@ -44,6 +44,9 @@ namespace AscendC {
 
 /* ── Constants ──────────────────────────────────────────────────────── */
 
+// Dump types 0-10 are inherited from the aicore dump framework and are kept
+// here only for protocol compatibility; aicpu itself uses only DUMP_BUFI, DUMP_BUFI, DUMP_AICPU
+// (= 8, 9, 11), which also doubles as the FIFO entry READY marker (PRINT_TYPE_READY).
 enum DumpType : uint32_t {
     DUMP_DEFAULT = 0U,
     DUMP_SCALAR,
@@ -118,10 +121,10 @@ struct RingBufReadInfo {
 };
 
 struct PrintfInfo {
-    uint32_t printfType;     // DumpType = DUMP_AICPU
-    uint32_t printfLength;   // length of print info
-    uint32_t blockIdx = 0U;  // threadIdx
-    uint32_t resv = 0U;      // reserved
+    uint32_t printfType = static_cast<uint32_t>(DumpType::DUMP_DEFAULT); // DumpType = DUMP_AICPU
+    uint32_t printfLength = 0U;                                          // length of print info
+    uint32_t blockIdx = 0U;                                              // threadIdx
+    uint32_t resv = 0U;                                                  // reserved
     uint64_t fmtOffset = 0U; // offset of fmt string from the start of fmtOffset addr
 };
 
