@@ -32,41 +32,32 @@
 
 ## 函数原型
 
-- 带返回值
+```c
+// 带返回值的接口
+__simd_callee__ inline vector_<dtype> asc_duplicate(vector_<dtype> src,
+                                                    vector_bool mask)
 
-  ```c
-  __simd_callee__ inline vector_<dtype> asc_duplicate(vector_<dtype> src,
-                                                      vector_bool mask)
-  ```
-
-- 无返回值
-
-  ```c
-  __simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,
-                                            vector_<dtype> src,
-                                            vector_bool mask)
-  ```
+// 无返回值的接口
+__simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,
+                                          vector_<dtype> src,
+                                          vector_bool mask)
+```
 
 ### dtype支持数据类型
 
 `dtype`取值为：`int8_t`、`uint8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
-**典型示例：**
+### 函数原型典型示例
 
-- 带返回值
-
-  ```c
-  __simd_callee__ inline vector_int8_t asc_duplicate(vector_int8_t src,
-                                                     vector_bool mask)
-  ```
-
-- 无返回值
-
-  ```c
-  __simd_callee__ inline void asc_duplicate(vector_int8_t& dst,
-                                            vector_int8_t src,
-                                            vector_bool mask)
-  ```
+```c
+// 带返回值的接口
+__simd_callee__ inline vector_int8_t asc_duplicate(vector_int8_t src,
+                                                   vector_bool mask)
+// 无返回值的接口
+__simd_callee__ inline void asc_duplicate(vector_int8_t& dst,
+                                          vector_int8_t src,
+                                          vector_bool mask)
+```
 
 ## 参数说明
 

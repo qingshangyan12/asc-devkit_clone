@@ -103,6 +103,90 @@ __simd_callee__ inline void asc_duplicate_scalar_impl(vector_float& dst, float v
     }
 }
 
+__simd_callee__ inline vector_uint8_t asc_duplicate_scalar_impl(uint8_t value, vector_bool mask)
+{
+    vector_uint8_t dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int8_t asc_duplicate_scalar_impl(int8_t value, vector_bool mask)
+{
+    vector_int8_t dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_duplicate_scalar_impl(fp8_e4m3fn_t value, vector_bool mask)
+{
+    vector_fp8_e4m3fn_t dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e5m2_t asc_duplicate_scalar_impl(fp8_e5m2_t value, vector_bool mask)
+{
+    vector_fp8_e5m2_t dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e8m0_t asc_duplicate_scalar_impl(fp8_e8m0_t value, vector_bool mask)
+{
+    vector_fp8_e8m0_t dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint16_t asc_duplicate_scalar_impl(uint16_t value, vector_bool mask)
+{
+    vector_uint16_t dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_duplicate_scalar_impl(int16_t value, vector_bool mask)
+{
+    vector_int16_t dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_half asc_duplicate_scalar_impl(half value, vector_bool mask)
+{
+    vector_half dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_bfloat16_t asc_duplicate_scalar_impl(bfloat16_t value, vector_bool mask)
+{
+    vector_bfloat16_t dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint32_t asc_duplicate_scalar_impl(uint32_t value, vector_bool mask)
+{
+    vector_uint32_t dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_duplicate_scalar_impl(int32_t value, vector_bool mask)
+{
+    vector_int32_t dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_float asc_duplicate_scalar_impl(float value, vector_bool mask)
+{
+    vector_float dst;
+    asc_duplicate_scalar_impl(dst, value, mask);
+    return dst;
+}
+
 // vdup with merging mode
 __simd_callee__ inline void asc_duplicate_scalar_merge_impl(vector_uint8_t& dst, uint8_t value, vector_bool mask)
 {
@@ -272,6 +356,90 @@ __simd_callee__ inline void asc_duplicate_scalar_impl(vector_fp8_e8m0_t& dst, fp
     if ASC_IS_AIV {
         vbr(dst, value);
     }
+}
+
+__simd_callee__ inline vector_uint8_t asc_duplicate_scalar_impl(uint8_t value)
+{
+    vector_uint8_t dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_int8_t asc_duplicate_scalar_impl(int8_t value)
+{
+    vector_int8_t dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint16_t asc_duplicate_scalar_impl(uint16_t value)
+{
+    vector_uint16_t dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_int16_t asc_duplicate_scalar_impl(int16_t value)
+{
+    vector_int16_t dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_uint32_t asc_duplicate_scalar_impl(uint32_t value)
+{
+    vector_uint32_t dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_duplicate_scalar_impl(int32_t value)
+{
+    vector_int32_t dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_half asc_duplicate_scalar_impl(half value)
+{
+    vector_half dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_float asc_duplicate_scalar_impl(float value)
+{
+    vector_float dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_bfloat16_t asc_duplicate_scalar_impl(bfloat16_t value)
+{
+    vector_bfloat16_t dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_duplicate_scalar_impl(fp8_e4m3fn_t value)
+{
+    vector_fp8_e4m3fn_t dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e5m2_t asc_duplicate_scalar_impl(fp8_e5m2_t value)
+{
+    vector_fp8_e5m2_t dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e8m0_t asc_duplicate_scalar_impl(fp8_e8m0_t value)
+{
+    vector_fp8_e8m0_t dst;
+    asc_duplicate_scalar_impl(dst, value);
+    return dst;
 }
 
 #endif
