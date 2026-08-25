@@ -92,7 +92,7 @@ __global__ void simt_stack_overflow(int32_t* input, float* output, uint32_t tota
 
 **Initial issue locating through log information**:
 
-- On the host side, call `aclGetRecentErrMsg()` after the `aclrtSynchronizeStream` API to obtain the error information on the device side. The implementation is as follows:
+- On the host side, call `aclGetRecentErrMsg()` after the `aclrtSynchronizeStream()` API to obtain the error information on the device side. The implementation is as follows:
 
     ```cpp
     const char* err = aclGetRecentErrMsg();
@@ -189,7 +189,7 @@ __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uin
 
 **Initial issue locating through log information**:
 
-- On the host side, call `aclGetRecentErrMsg()` after the `aclrtSynchronizeStream` API to obtain the error information on the device side. The implementation is as follows:
+- On the host side, call `aclGetRecentErrMsg()` after the `aclrtSynchronizeStream()` API to obtain the error information on the device side. The implementation is as follows:
 
     ```cpp
     const char* err = aclGetRecentErrMsg();

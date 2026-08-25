@@ -77,7 +77,7 @@ Run the following steps in the root directory of this example to build and execu
   | `CMAKE_ASC_RUN_MODE` | Set to `sim` to enable NPU simulation mode |
   | `CMAKE_ASC_ARCHITECTURES` | Specify the NPU architecture version. This example only supports `dav-3510` (Ascend 950PR/Ascend 950DT) |
 
-  > The `-g` compilation option has been added in CMakeLists.txt to generate debug information, enabling the simulator to collect instruction pipeline diagrams. To use the simulation tuning feature in your own project, ensure this option is also added during compilation.
+  > The `-g` compilation option has been added in `CMakeLists.txt` to generate debug information, enabling the simulator to collect instruction pipeline diagrams. To use the simulation tuning feature in your own project, ensure this option is also added during compilation.
 
   When accuracy verification is successful, the output is as follows:
 
