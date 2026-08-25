@@ -24,7 +24,7 @@ $i\in[0,127]$，两种统计模式分别为：
 $$
 \begin{aligned}
 result_i^{frequency} &= dst_i + \sum_{j:\,src.mask_j=1}\mathbf{1}(src_j=h+i) \\
-result_i^{cumulative} &= dst_i + \sum_{j:\,src.mask_j=1}\mathbf{1}(h\le src_j\le h+i)
+result_i^{cumulative} &= dst_i + \sum_{j:\,src.mask_j=1}\mathbf{1}(src_j\le h+i)
 \end{aligned}
 $$
 
@@ -57,6 +57,9 @@ __simd_callee__ inline reg_tensor<uint16_t> histograms(
 
 ## 约束说明
 
+- `src.mask`只用于筛选参与统计的输入元素，不用于筛选返回值中的统计位置。返回值中的所有位置都会在`dst`原值的基础上更新。
+- 统计结果在`dst`原有数据的基础上累加。首次统计前需要初始化`dst`，多次调用时后一次结果累加到前一次结果中。
+- `dst`的元素类型为`uint16_t`，单个统计结果的最大值为65535。用户需要保证累加结果不超过该范围，否则会发生溢出。
 - 完整统计`[0, 255]`需要分别选择`low`和`high`，并使用两个目标寄存器保存结果。
 - 非默认配置必须先定义具名的`constexpr histogram_options`，再作为模板实参传入。
 

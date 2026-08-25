@@ -56,6 +56,7 @@ __simd_callee__ inline reg_tensor<T> operator+(
 
 - 标量类型必须与寄存器元素类型一致。
 - 整型加法溢出时按环绕策略处理。
+- 浮点加法按照IEEE 754浮点加法规则执行。
 
 ## 调用示例
 

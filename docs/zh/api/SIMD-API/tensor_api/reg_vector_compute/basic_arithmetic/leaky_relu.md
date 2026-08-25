@@ -20,8 +20,8 @@
 
 $$
 dst_i = \begin{cases}
-src_i, & src_i \ge 0 \\
-src_i \times slope, & src_i < 0
+src_i, & src_i > 0 \\
+src_i \times slope, & src_i \le 0
 \end{cases}
 $$
 
@@ -40,11 +40,15 @@ __simd_callee__ inline reg_tensor<T> leaky_relu(
 | `T` | 模板参数 | 输入和返回值的元素类型，支持`half`、`float`。 |
 | `scalar_type` | 模板参数 | 标量斜率类型，必须可转换为`T`。 |
 | `src_reg` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src_reg.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| `slope` | 输入 | 负数区间使用的标量斜率。 |
+| `slope` | 输入 | 输入小于等于`0`时使用的标量斜率。 |
 
 ## 返回值说明
 
-返回`reg_tensor<T>`。`src_reg`中的元素大于等于`0`时，`reg`保存原值，否则保存该元素与`slope`的乘积。`src_reg.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src_reg.mask`相同。
+返回`reg_tensor<T>`。`src_reg`中的元素大于`0`时，`reg`保存原值，否则保存该元素与`slope`的乘积。`src_reg.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src_reg.mask`相同。
+
+## 约束说明
+
+输入为`-0`时按负数处理，并按照IEEE 754浮点乘法规则与`slope`相乘。
 
 ## 调用示例
 

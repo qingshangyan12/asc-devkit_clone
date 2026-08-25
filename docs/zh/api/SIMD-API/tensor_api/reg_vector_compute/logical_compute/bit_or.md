@@ -51,9 +51,7 @@ __simd_callee__ inline decltype(auto) operator|(const T& a, const U& b)
 
 ## 约束说明
 
-- 构造`reg_tensor<bool>{maskValue}`只初始化对象的`mask`，不会生成布尔寄存器数据。作为操作数前，
-  `reg`必须已经由mask生成、加载或其他布尔计算接口写入。
-- 对浮点类型执行的是元素二进制编码的按位或，不是数值逻辑或，结果可能为`nan`或其他特殊浮点值。
+构造`reg_tensor<bool>{maskValue}`只初始化对象的`mask`，不会生成布尔寄存器数据。作为操作数前，`reg`必须已经由mask生成、加载或其他布尔计算接口写入。
 
 ## 调用示例
 
