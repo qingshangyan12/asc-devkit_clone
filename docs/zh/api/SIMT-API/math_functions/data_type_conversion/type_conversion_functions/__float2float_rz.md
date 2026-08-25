@@ -72,7 +72,7 @@ inline float __float2float_rz(const float x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
 ```cpp
 __global__ __launch_bounds__(1024) void kernel__float2float_rz(float* dst, float* x)
@@ -82,7 +82,7 @@ __global__ __launch_bounds__(1024) void kernel__float2float_rz(float* dst, float
 }
 ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
 ```cpp
 __simt_vf__ __launch_bounds__(1024) inline void kernel__float2float_rz(__gm__ float* dst, __gm__ float* x)

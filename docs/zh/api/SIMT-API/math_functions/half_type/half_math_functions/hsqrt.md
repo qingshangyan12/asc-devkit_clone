@@ -69,7 +69,7 @@ inline half hsqrt(half x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void KernelSqrt(half* dst, half* x, uint32_t count)
@@ -82,7 +82,7 @@ inline half hsqrt(half x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelSqrt(__gm__ half* dst, __gm__ half* x, uint32_t count)

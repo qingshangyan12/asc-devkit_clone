@@ -68,7 +68,7 @@ inline bfloat16_t __habs(bfloat16_t x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void KernelAbs(bfloat16_t* dst, bfloat16_t* x, int n)
@@ -81,7 +81,7 @@ inline bfloat16_t __habs(bfloat16_t x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelAbs(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)

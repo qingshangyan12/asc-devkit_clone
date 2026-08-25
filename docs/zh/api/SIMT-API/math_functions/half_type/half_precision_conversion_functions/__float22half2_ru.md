@@ -68,7 +68,7 @@ inline half2 __float22half2_ru(const float2 x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
@@ -88,7 +88,7 @@ inline half2 __float22half2_ru(const float2 x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率

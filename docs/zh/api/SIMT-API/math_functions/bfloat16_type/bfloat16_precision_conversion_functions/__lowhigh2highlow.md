@@ -67,7 +67,7 @@ inline bfloat16x2_t __lowhigh2highlow(const bfloat16x2_t x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
@@ -86,7 +86,7 @@ inline bfloat16x2_t __lowhigh2highlow(const bfloat16x2_t x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率

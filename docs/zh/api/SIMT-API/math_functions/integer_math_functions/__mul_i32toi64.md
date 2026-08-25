@@ -64,7 +64,7 @@ unsigned long long __mul_i32toi64(unsigned int x, unsigned int y)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void KernelMul_i32toi64(long long* dst, int* x, int* y)
@@ -86,7 +86,7 @@ unsigned long long __mul_i32toi64(unsigned int x, unsigned int y)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelMul_i32toi64(__gm__ long long* dst, __gm__ int* x, __gm__ int* y)

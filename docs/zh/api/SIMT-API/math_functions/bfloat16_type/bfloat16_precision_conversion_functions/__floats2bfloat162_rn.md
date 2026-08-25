@@ -70,7 +70,7 @@ inline bfloat16x2_t __floats2bfloat162_rn(const float x, const float y)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
@@ -88,7 +88,7 @@ inline bfloat16x2_t __floats2bfloat162_rn(const float x, const float y)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率

@@ -67,7 +67,7 @@ inline unsigned int __float_as_uint(const float x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__float_as_uint(uint32_t* dst, float* x)
@@ -77,7 +77,7 @@ inline unsigned int __float_as_uint(const float x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel__float_as_uint(__gm__ uint32_t* dst, __gm__ float* x)

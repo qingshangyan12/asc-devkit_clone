@@ -68,7 +68,7 @@ inline float __ll2float_rd(const long long int x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__ll2float_rd(float* dst, int64_t* x)
@@ -78,7 +78,7 @@ inline float __ll2float_rd(const long long int x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel__ll2float_rd(__gm__ float* dst, __gm__ int64_t* x)

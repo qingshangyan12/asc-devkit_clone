@@ -97,7 +97,7 @@ unsigned int __hleux2_mask(half2 x, half2 y)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
@@ -114,7 +114,7 @@ unsigned int __hleux2_mask(half2 x, half2 y)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率

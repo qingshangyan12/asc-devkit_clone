@@ -46,8 +46,8 @@ bool __hbltux2(bfloat16x2_t x, bfloat16x2_t y)
 
 比较输入各分量是否均满足第一个数小于第二个数的结果。
 
--   true：各分量均满足第一个数小于第二个数。
--   false：任一分量不满足第一个数小于第二个数。
+- true：各分量均满足第一个数小于第二个数。
+- false：任一分量不满足第一个数小于第二个数。
 
 特殊值如下：
 
@@ -91,7 +91,7 @@ bool __hbltux2(bfloat16x2_t x, bfloat16x2_t y)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
@@ -108,7 +108,7 @@ bool __hbltux2(bfloat16x2_t x, bfloat16x2_t y)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率

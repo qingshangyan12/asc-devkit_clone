@@ -66,7 +66,7 @@ inline bfloat16_t htrunc(bfloat16_t x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void KernelTrunc(bfloat16_t* dst, bfloat16_t* x)
@@ -76,7 +76,7 @@ inline bfloat16_t htrunc(bfloat16_t x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelTrunc(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)

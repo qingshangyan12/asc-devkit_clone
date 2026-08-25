@@ -46,8 +46,8 @@ bool __hbneux2(bfloat16x2_t x, bfloat16x2_t y)
 
 比较输入数据各分量是否均不相等的结果。
 
--   true：输入数据各分量均不相等。
--   false：输入数据任一分量相等。
+- true：输入数据各分量均不相等。
+- false：输入数据任一分量相等。
 
 特殊值如下：
 
@@ -101,7 +101,7 @@ bool __hbneux2(bfloat16x2_t x, bfloat16x2_t y)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
@@ -118,7 +118,7 @@ bool __hbneux2(bfloat16x2_t x, bfloat16x2_t y)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率

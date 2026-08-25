@@ -68,7 +68,7 @@ inline half __ll2half_rd(const long long int x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__ll2half_rd(half* dst, int64_t* x)
@@ -78,7 +78,7 @@ inline half __ll2half_rd(const long long int x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel__ll2half_rd(__gm__ half* dst, __gm__ int64_t* x)

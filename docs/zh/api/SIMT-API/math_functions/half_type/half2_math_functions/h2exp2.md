@@ -69,7 +69,7 @@ inline half2 h2exp2(half2 x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void KernelExp2(half2* dst, half2* x)
@@ -79,7 +79,7 @@ inline half2 h2exp2(half2 x)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelExp2(__gm__ half2* dst, __gm__ half2* x)

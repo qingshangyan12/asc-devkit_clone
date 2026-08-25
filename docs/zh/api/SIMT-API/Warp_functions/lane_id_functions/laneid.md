@@ -57,7 +57,7 @@ int32_t laneid()
 
 下面示例使用`laneid`计算全部输入数据的和，并把结果赋值到输出数据的第0位置上，示例中使用[asc_reduce_add](../Warp_reduce_functions/asc_reduce_add.md)，需另外包含"simt_api/device_warp_functions.h"头文件，使用[asc_atomic_add](../../atomic_operations/asc_atomic_add.md)，需另外包含"simt_api/device_atomic_functions.h"头文件。
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void kernel_laneid(int32_t* dst, int32_t* src, uint32_t input_total_length)
@@ -73,7 +73,7 @@ int32_t laneid()
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel_laneid(__gm__ int32_t* dst, __gm__ int32_t* src, uint32_t input_total_length)

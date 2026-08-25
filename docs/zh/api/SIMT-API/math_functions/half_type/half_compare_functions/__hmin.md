@@ -76,7 +76,7 @@ inline half __hmin(half x, half y)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     __global__ __launch_bounds__(1024) void KernelMin(half* dst, half* x, half* y)
@@ -86,7 +86,7 @@ inline half __hmin(half x, half y)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void KernelMin(__gm__ half* dst, __gm__ half* x, __gm__ half* y)

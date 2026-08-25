@@ -73,7 +73,7 @@ half2 __hminx2(const half2 x, const half2 y)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
@@ -91,7 +91,7 @@ half2 __hminx2(const half2 x, const half2 y)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率

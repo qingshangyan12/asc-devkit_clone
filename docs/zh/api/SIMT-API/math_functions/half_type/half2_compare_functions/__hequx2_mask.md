@@ -46,7 +46,6 @@ unsigned int __hequx2_mask(half2 x, half2 y)
 
 比较输入数据各分量是否相等的结果：满足时对应16位掩码结果为0xFFFF，不满足时对应16位掩码结果为0x0。各分量掩码结果如下：
 
-
 <table>
   <tr>
     <th>x分量</th>
@@ -93,7 +92,7 @@ unsigned int __hequx2_mask(half2 x, half2 y)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
@@ -110,7 +109,7 @@ unsigned int __hequx2_mask(half2 x, half2 y)
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
