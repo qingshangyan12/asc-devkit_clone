@@ -75,7 +75,7 @@ PIPE_S
 
 <!-- npu="950" id8 -->
 
-在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -100,30 +100,23 @@ void print_data(const char* label, const std::vector<T>& values)
     std::cout << std::endl;
 }
 
-template <typename T>
-bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
-{
-    if (actual.size() != expected.size()) return false;
-    for (size_t i = 0; i < actual.size(); ++i) {
-        if (actual[i] == expected[i]) continue;
-        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
-        if (diff > tolerance || diff < -tolerance) return false;
-    }
-    return true;
-}
-
 constexpr uint32_t ELEMENTS = 8;
 
 __global__ __vector__ void asc_atomic_inc_kernel(__gm__ uint32_t* output)
 {
     asc_init();
-    __gm__ uint32_t* address = output;
-    asc_dcci_entire_all();
-    const uint32_t old_value = asc_atomic_inc(address, 20U);
+    // 确保Atomic访问GM前，目标Cache Line中的数据已写回。
+    asc_dcci_single(output);
     asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
-    asc_dcci_entire_all();
+    const uint32_t old_value = asc_atomic_inc(output, 20U);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    // Atomic绕过DCache，普通Scalar写前需使目标Cache Line中的旧副本失效。
+    asc_dcci_single(output);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
     output[1] = old_value;
-    asc_sync();
+    // 将普通Scalar写产生的Dirty Cache Line写回GM。
+    asc_dcci_single(output);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
 }
 } // namespace
 
@@ -148,7 +141,7 @@ int main()
     print_data("Input", input);
     print_data("Output", output);
     print_data("Golden", golden);
-    const bool passed = compare_data(output, golden);
+    const bool passed = output == golden;
     std::cout << (passed ? "[Success] asc_atomic_inc passed." : "[Failed] asc_atomic_inc failed.") << std::endl;
     aclrtFree(output_device);
     aclrtResetDevice(0);

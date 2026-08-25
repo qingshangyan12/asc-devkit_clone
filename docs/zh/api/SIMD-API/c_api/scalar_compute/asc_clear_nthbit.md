@@ -64,7 +64,7 @@ PIPE_S
 
 <!-- npu="950" id8 -->
 
-在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -89,31 +89,24 @@ void print_data(const char* label, const std::vector<T>& values)
     std::cout << std::endl;
 }
 
-template <typename T>
-bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
-{
-    if (actual.size() != expected.size()) return false;
-    for (size_t i = 0; i < actual.size(); ++i) {
-        if (actual[i] == expected[i]) continue;
-        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
-        if (diff > tolerance || diff < -tolerance) return false;
-    }
-    return true;
-}
-
 constexpr uint32_t ELEMENTS = 8;
 
 __global__ __vector__ void asc_clear_nthbit_kernel(__gm__ uint64_t* output)
 {
     asc_init();
-    output[0] = asc_clear_nthbit(15, 1);
-    asc_sync();
+    // 确保普通Scalar读取到GM中的最新输入。
+    asc_dcci_single(output);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    output[0] = asc_clear_nthbit(output[0], 1);
+    // 将普通Scalar写产生的Dirty Cache Line写回GM。
+    asc_dcci_single(output);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
 }
 } // namespace
 
 int main()
 {
-    std::vector<uint64_t> input = {0};
+    std::vector<uint64_t> input = {15};
     std::vector<uint64_t> golden = {13};
     input.resize(ELEMENTS, 0);
     golden.resize(ELEMENTS, 0);
@@ -132,7 +125,7 @@ int main()
     print_data("Input", input);
     print_data("Output", output);
     print_data("Golden", golden);
-    const bool passed = compare_data(output, golden);
+    const bool passed = output == golden;
     std::cout << (passed ? "[Success] asc_clear_nthbit passed." : "[Failed] asc_clear_nthbit failed.") << std::endl;
     aclrtFree(output_device);
     aclrtResetDevice(0);

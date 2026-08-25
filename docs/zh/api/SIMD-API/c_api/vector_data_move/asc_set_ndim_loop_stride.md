@@ -57,8 +57,8 @@ __aicore__ inline void asc_set_ndim_loop4_stride(uint64_t dst_stride,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| `dst_stride` | 输入 | 同一循环维度内，相邻两次迭代所处理的目的操作数元素起始地址之间的偏移量，单位为元素个数。取值范围为[0，2^20−1]。 |
-| `src_stride` | 输入 | 同一循环维度内，相邻两次迭代所处理的源操作数元素起始地址之间的偏移量，单位为元素个数。取值范围为[0，2^40−1]。 |
+| `dst_stride` | 输入 | 同一循环维度内，相邻两次迭代所处理的目的操作数元素起始地址之间的偏移量，单位为元素个数。取值范围为[0, $2^{20}−1$]。 |
+| `src_stride` | 输入 | 同一循环维度内，相邻两次迭代所处理的源操作数元素起始地址之间的偏移量，单位为元素个数。取值范围为[0, $2^{40}−1$]。 |
 
 ## 返回值说明
 
@@ -82,7 +82,7 @@ PIPE_S
 
 <!-- npu="950" id8 -->
 
-在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -114,9 +114,11 @@ __global__ __vector__ void asc_set_ndim_loop_stride_kernel(__gm__ uint8_t* outpu
     asc_set_ndim_pad_count(config);
     asc_ndim_copy_gm2ub(local, input, 3, 4, 1, 1, 1, 0, 0, false,
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
-    asc_sync_mte2(0);
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, local, OUTPUT_BYTES);
-    asc_sync_mte3(0);
+    asc_sync_notify(PIPE_MTE3, PIPE_S, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE3, PIPE_S, EVENT_ID0);
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)
