@@ -442,57 +442,54 @@ public:
     {
         const SteadyClock::time_point executionDeadline = startedAt_ + request_.executionTimeout;
         int waitStatus = 0;
+        bool terminateRunningProcess = false;
         while (true) {
             if (!ForwardAvailableOutput()) {
-                TerminateAndReap();
-                SetElapsedTime(result);
-                return;
+                terminateRunningProcess = true;
+                break;
             }
             const pid_t waitResult = WaitWithoutBlocking(waitStatus);
             if (waitResult == processLeaderId_) {
                 needsReaping_ = false;
-                if (!ForwardAvailableOutput()) {
-                    CloseOutputStreams();
-                    SetElapsedTime(result);
-                    return;
+                if (ForwardAvailableOutput()) {
+                    SetResultFromWaitStatus(waitStatus, result);
                 }
-                CloseOutputStreams();
-                SetResultFromWaitStatus(waitStatus, result);
-                SetElapsedTime(result);
-                return;
+                break;
             }
             if (waitResult < 0) {
                 const int waitError = errno;
                 if (waitError == ECHILD) {
                     needsReaping_ = false;
                 } else {
-                    TerminateAndReap();
+                    terminateRunningProcess = true;
                 }
                 ASCENDLOGE(
                     "Failed to wait for process: pid=%d errno=%d message=%s", static_cast<int>(processLeaderId_),
                     waitError, std::strerror(waitError));
-                CloseOutputStreams();
-                SetElapsedTime(result);
-                return;
+                break;
             }
             if (SteadyClock::now() >= executionDeadline) {
                 result.outcome = ProcessOutcome::TimedOut;
                 ASCENDLOGE(
                     "Process exceeded its execution timeout: executable=%s timeout_ms=%lld",
                     request_.arguments.front().c_str(), static_cast<long long>(request_.executionTimeout.count()));
-                TerminateAndReap();
-                (void)ForwardAvailableOutput();
-                CloseOutputStreams();
-                SetElapsedTime(result);
-                return;
+                terminateRunningProcess = true;
+                break;
             }
             if (!WaitForOutput(executionDeadline)) {
-                TerminateAndReap();
-                CloseOutputStreams();
-                SetElapsedTime(result);
-                return;
+                terminateRunningProcess = true;
+                break;
             }
         }
+        if (terminateRunningProcess) {
+            TerminateAndReap();
+        }
+        if (result.outcome == ProcessOutcome::TimedOut) {
+            (void)ForwardAvailableOutput();
+        }
+        stdoutForwarder_.Close();
+        stderrForwarder_.Close();
+        result.elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(SteadyClock::now() - startedAt_);
     }
 
 private:
@@ -551,17 +548,6 @@ private:
                 waitError, std::strerror(waitError));
         }
         needsReaping_ = false;
-    }
-
-    void CloseOutputStreams() noexcept
-    {
-        stdoutForwarder_.Close();
-        stderrForwarder_.Close();
-    }
-
-    void SetElapsedTime(ProcessExecutorResult& result) const noexcept
-    {
-        result.elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(SteadyClock::now() - startedAt_);
     }
 
     static void SetResultFromWaitStatus(int waitStatus, ProcessExecutorResult& result) noexcept
