@@ -67,7 +67,7 @@ PIPE_S
 
 <!-- npu="950" id8 -->
 
-在Ascend 950上，编译运行命令如下，NPU架构配置为`dav-3510`：
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
@@ -102,9 +102,11 @@ __global__ __vector__ void asc_set_ndim_pad_count_kernel(__gm__ uint8_t* output,
     asc_set_ndim_pad_count(config);
     asc_ndim_copy_gm2ub(local, input, 3, 2, 1, 1, 1, 1, 1, true,
         asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
-    asc_sync_mte2(0);
+    asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(output, local, OUTPUT_BYTES);
-    asc_sync_mte3(0);
+    asc_sync_notify(PIPE_MTE3, PIPE_S, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE3, PIPE_S, EVENT_ID0);
 }
 
 void print_data(const char* name, const std::vector<uint8_t>& data)
