@@ -30,6 +30,8 @@ enum class asc_store_l2_cache_mode : uint8_t {
     NOTALLOC_CLEAN = 4
 };
 
+enum class asc_l13d_repeat_direction : uint8_t { M_DIRECTION = 0, K_DIRECTION = 1 };
+
 enum class asc_hf32_round_mode : uint8_t {
     NEAREST_AWAY = 0,
     NEAREST_EVEN = 1,
