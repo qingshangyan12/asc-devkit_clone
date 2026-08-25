@@ -30,7 +30,7 @@
 
 不经过DCache向GM地址上写数据。
 <!-- npu="A3,910b" id8 -->
-> [!CAUTION]注意    
+> [!CAUTION]注意
 > 针对[NPU架构2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)，接口能否将value成功写入GM还与目标地址addr有关，具体请参见[约束说明](#约束说明)。
 <!-- end id8 -->
 
@@ -115,10 +115,10 @@ if (blockIdx == 1) {
     while (true) {
         __gm__ T *addr = const_cast<__gm__ T *>(srcGlobal.GetPhyAddr());
         // 轮询GM第0个元素，等待block 0写入同步标记。
-        T flagValue = AscendC::ReadGmByPassDCache<T>(addr);
+        T flagValue = AscendC::ReadGmBypassDCache<T>(addr);
         if (flagValue == SYNC_FLAG) {
             // DataSyncBarrier保证同步标记之前的srcGm[1]写入已完成。
-            T dataValue = AscendC::ReadGmByPassDCache<T>(addr + 1);
+            T dataValue = AscendC::ReadGmBypassDCache<T>(addr + 1);
             AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(dstGm), 2 * dataValue);
             return;
         }

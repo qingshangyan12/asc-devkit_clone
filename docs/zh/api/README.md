@@ -575,8 +575,8 @@
             -   [Cast（float转bfloat16\_t）](SIMD-API/basic_api/scalar_compute/Cast_float_to_bfloat16.md)
             -   [Cast（多类型转float）](SIMD-API/basic_api/scalar_compute/Cast_multi_type_to_float.md)
             -   [Nop](SIMD-API/basic_api/scalar_compute/Nop.md)
-            -   [WriteGmByPassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/WriteGmByPassDCache_ISASI.md)
-            -   [ReadGmByPassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/ReadGmByPassDCache_ISASI.md)
+            -   [WriteGmBypassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/WriteGmBypassDCache_ISASI.md)
+            -   [ReadGmBypassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/ReadGmBypassDCache_ISASI.md)
 
         -   [资源管理](SIMD-API/basic_api/resource_management/resource_management.md)
             -   [TPipe](SIMD-API/basic_api/resource_management/TPipe/TPipe.md)
