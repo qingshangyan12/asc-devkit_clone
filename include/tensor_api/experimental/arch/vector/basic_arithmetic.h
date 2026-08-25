@@ -62,7 +62,7 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor<T>& src);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add(
+__simd_callee__ inline reg_tensor<T> add_c(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
@@ -74,7 +74,7 @@ template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sub(
+__simd_callee__ inline reg_tensor<T> sub_c(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>

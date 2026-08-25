@@ -116,12 +116,12 @@ void check_min_max()
 template <typename T>
 void check_carry()
 {
-    static_assert(std::is_same_v<decltype(asc::te::experimental::add(std::declval<reg_type<bool>&>(),
+    static_assert(std::is_same_v<decltype(asc::te::experimental::add_c(std::declval<reg_type<bool>&>(),
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<T>>);
     static_assert(std::is_same_v<decltype(asc::te::experimental::add_c(std::declval<reg_type<bool>&>(),
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>(),
         std::declval<const reg_type<bool>&>())), reg_type<T>>);
-    static_assert(std::is_same_v<decltype(asc::te::experimental::sub(std::declval<reg_type<bool>&>(),
+    static_assert(std::is_same_v<decltype(asc::te::experimental::sub_c(std::declval<reg_type<bool>&>(),
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<T>>);
     static_assert(std::is_same_v<decltype(asc::te::experimental::sub_c(std::declval<reg_type<bool>&>(),
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>(),
