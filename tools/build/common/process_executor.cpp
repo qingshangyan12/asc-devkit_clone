@@ -42,20 +42,20 @@ enum class CapturedOutputDrainStatus : uint32_t {
     Failed,
 };
 
-enum class ProcessLeaderObservation : uint32_t {
+enum class ProcessLeaderCheckResult : uint32_t {
     Running,
     Terminated,
     InspectionFailed,
 };
 
-class ScopedFileDescriptor final {
+class FileDescriptorGuard final {
 public:
-    explicit ScopedFileDescriptor(int fileDescriptor = -1) noexcept : fileDescriptor_(fileDescriptor) {}
+    explicit FileDescriptorGuard(int fileDescriptor = -1) noexcept : fileDescriptor_(fileDescriptor) {}
 
-    ~ScopedFileDescriptor() noexcept { Close(); }
+    ~FileDescriptorGuard() noexcept { Close(); }
 
-    ScopedFileDescriptor(const ScopedFileDescriptor&) = delete;
-    ScopedFileDescriptor& operator=(const ScopedFileDescriptor&) = delete;
+    FileDescriptorGuard(const FileDescriptorGuard&) = delete;
+    FileDescriptorGuard& operator=(const FileDescriptorGuard&) = delete;
 
     int Get() const noexcept { return fileDescriptor_; }
 
@@ -84,9 +84,9 @@ private:
     int fileDescriptor_;
 };
 
-class PosixSpawnCStringArray final {
+class PosixSpawnStringStorage final {
 public:
-    explicit PosixSpawnCStringArray(std::vector<std::string> strings) : stringStorage_(std::move(strings))
+    explicit PosixSpawnStringStorage(std::vector<std::string> strings) : stringStorage_(std::move(strings))
     {
         cStringPointers_.reserve(stringStorage_.size() + 1U);
         for (std::string& string : stringStorage_) {
@@ -95,10 +95,10 @@ public:
         cStringPointers_.push_back(nullptr);
     }
 
-    PosixSpawnCStringArray(const PosixSpawnCStringArray&) = delete;
-    PosixSpawnCStringArray& operator=(const PosixSpawnCStringArray&) = delete;
-    PosixSpawnCStringArray(PosixSpawnCStringArray&&) = delete;
-    PosixSpawnCStringArray& operator=(PosixSpawnCStringArray&&) = delete;
+    PosixSpawnStringStorage(const PosixSpawnStringStorage&) = delete;
+    PosixSpawnStringStorage& operator=(const PosixSpawnStringStorage&) = delete;
+    PosixSpawnStringStorage(PosixSpawnStringStorage&&) = delete;
+    PosixSpawnStringStorage& operator=(PosixSpawnStringStorage&&) = delete;
 
     char* const* Data() noexcept { return cStringPointers_.data(); }
 
@@ -259,7 +259,7 @@ bool ValidateProcessExecutorRequest(const ProcessExecutorRequest& request) noexc
 }
 
 bool CreateNonblockingOutputCapturePipe(
-    ScopedFileDescriptor& outputReadFileDescriptor, ScopedFileDescriptor& outputWriteFileDescriptor)
+    FileDescriptorGuard& outputReadFileDescriptor, FileDescriptorGuard& outputWriteFileDescriptor)
 {
     int outputPipe[2]{-1, -1};
     if (pipe2(outputPipe, O_CLOEXEC) != 0) {
@@ -401,10 +401,10 @@ public:
 
     bool Start(const ProcessExecutorRequest& request)
     {
-        PosixSpawnCStringArray spawnArguments(request.arguments);
-        PosixSpawnCStringArray spawnEnvironment(BuildEffectiveSpawnEnvironment(request));
+        PosixSpawnStringStorage spawnArguments(request.arguments);
+        PosixSpawnStringStorage spawnEnvironment(BuildEffectiveSpawnEnvironment(request));
 
-        ScopedFileDescriptor outputWriteFileDescriptor;
+        FileDescriptorGuard outputWriteFileDescriptor;
         if (request.outputMode == ProcessOutputMode::CaptureCombined) {
             if (!CreateNonblockingOutputCapturePipe(outputReadFileDescriptor_, outputWriteFileDescriptor)) {
                 return false;
@@ -454,12 +454,12 @@ public:
                 }
             }
             if (!processLeaderTerminated) {
-                const ProcessLeaderObservation processLeaderObservation = ObserveProcessLeaderWithoutReaping();
-                if (processLeaderObservation == ProcessLeaderObservation::InspectionFailed) {
+                const ProcessLeaderCheckResult checkResult = CheckProcessLeaderWithoutReaping();
+                if (checkResult == ProcessLeaderCheckResult::InspectionFailed) {
                     infrastructureFailure = true;
                     break;
                 }
-                processLeaderTerminated = processLeaderObservation == ProcessLeaderObservation::Terminated;
+                processLeaderTerminated = checkResult == ProcessLeaderCheckResult::Terminated;
             }
             if (processLeaderTerminated && outputPipeClosed) {
                 break;
@@ -527,7 +527,7 @@ public:
     }
 
 private:
-    ProcessLeaderObservation ObserveProcessLeaderWithoutReaping() const noexcept
+    ProcessLeaderCheckResult CheckProcessLeaderWithoutReaping() const noexcept
     {
         siginfo_t processInformation{};
         int waitResult = 0;
@@ -540,10 +540,10 @@ private:
             ASCENDLOGE(
                 "Failed to inspect process: pid=%d errno=%d message=%s", static_cast<int>(processLeaderId_), waitError,
                 std::strerror(waitError));
-            return ProcessLeaderObservation::InspectionFailed;
+            return ProcessLeaderCheckResult::InspectionFailed;
         }
-        return processInformation.si_pid == 0 ? ProcessLeaderObservation::Running :
-                                                ProcessLeaderObservation::Terminated;
+        return processInformation.si_pid == 0 ? ProcessLeaderCheckResult::Running :
+                                                ProcessLeaderCheckResult::Terminated;
     }
 
     bool ReapProcessLeader(int& waitStatus) noexcept
@@ -578,7 +578,7 @@ private:
         (void)ReapProcessLeader(waitStatus);
     }
 
-    ScopedFileDescriptor outputReadFileDescriptor_;
+    FileDescriptorGuard outputReadFileDescriptor_;
     pid_t processLeaderId_{-1};
     SteadyClock::time_point startedAt_{};
     std::chrono::milliseconds terminationGracePeriod_;
