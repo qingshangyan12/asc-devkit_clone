@@ -1,0 +1,6 @@
+# 地址寄存器操作
+
+本节介绍地址寄存器操作相关的C API。
+
+- **[asc_create_iter_reg (废弃)](asc_create_iter_reg_deprecated.md)**
+- **[asc_update_addr_reg](asc_update_addr_reg.md)**
