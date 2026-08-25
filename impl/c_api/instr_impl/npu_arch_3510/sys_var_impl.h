@@ -106,6 +106,13 @@ __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config) { asc_set_l0
 
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config) { asc_set_l3d_rpt_b_impl(config); }
 
+__aicore__ inline void asc_set_l13d_rpt_b(
+    uint16_t repeat_stride, uint8_t repeat_times, asc_l13d_repeat_direction repeat_direction, uint16_t dst_stride_k,
+    uint16_t dst_start_pos_m)
+{
+    asc_set_l3d_rpt_b_impl(repeat_stride, repeat_times, repeat_direction, dst_stride_k, dst_start_pos_m);
+}
+
 __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config) { asc_set_gm2l1_nz_para_impl(config); }
 
 __aicore__ inline void asc_set_gm2l1_nz_para(
