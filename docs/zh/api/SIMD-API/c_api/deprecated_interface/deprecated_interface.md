@@ -1,5 +1,24 @@
 # 废弃接口
 
+## 矢量数据搬运
+<!-- npu="A3,910b" id1 -->
+- **[asc_copy_gm2ub_align（废弃）](asc_copy_gm2ub_align_arch_2201_deprecated.md)**
+<!-- end id1 -->
+
+<!-- npu="950" id2 -->
+- **[asc_copy_gm2ub_align（废弃）](asc_copy_gm2ub_align_arch_3510_deprecated.md)**
+<!-- end id2 -->
+
+<!-- npu="A3,910b" id3 -->
+- **[asc_copy_ub2gm_align（废弃）](asc_copy_ub2gm_align_arch_2201_deprecated.md)**
+<!-- end id3 -->
+
+<!-- npu="950" id4 -->
+- **[asc_copy_ub2gm_align（废弃）](asc_copy_ub2gm_align_arch_3510_deprecated.md)**
+<!-- end id4 -->
+
+- **[asc_copy_ub2l1_sync（废弃）](asc_copy_ub2l1_sync_deprecated.md)**
+
 ## 矢量计算
 - **[asc_abs_sync（废弃）](asc_abs_sync_deprecated.md)**
 
