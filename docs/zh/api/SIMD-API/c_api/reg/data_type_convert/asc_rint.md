@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-将`src`中的浮点数元素按照RINT（四舍六入五成双）舍入模式舍入到整数值并返回，结果仍保持原浮点数据类型。未被`mask`筛选的元素置零。
+将`src`中的浮点数元素按照RINT（四舍六入五成双）舍入模式舍入到整数值，结果仍保持原浮点数据类型。带返回值接口直接返回舍入结果；不带返回值接口（兼容形式）将舍入结果写入`dst`。未被`mask`筛选的元素置零。
 
 关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
@@ -34,14 +34,14 @@
 
 ### 带返回值接口
 
-```c
+```cpp
 __simd_callee__ inline vector_<dtype> asc_rint(vector_<dtype> src,
                                                 vector_bool mask)
 ```
 
 ### 不带返回值接口（兼容形式）
 
-```c
+```cpp
 __simd_callee__ inline void asc_rint(vector_<dtype>& dst,
                                      vector_<dtype> src,
                                      vector_bool mask)
@@ -52,7 +52,7 @@ __simd_callee__ inline void asc_rint(vector_<dtype>& dst,
 
 **典型示例**
 
-```c
+```cpp
 __simd_callee__ inline vector_half asc_rint(vector_half src,
                                              vector_bool mask)
 ```
@@ -79,8 +79,7 @@ __simd_callee__ inline vector_half asc_rint(vector_half src,
 - 本接口在非AIV上调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - mask需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
-- `half`和`bfloat16_t`支持饱和模式。使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../sys_var/asc_set_ctrl.md)。
-- `float`类型只支持不饱和模式。
+- `half`和`bfloat16_t`支持饱和模式。`float`类型只支持不饱和模式。
 - `mask`掩码位为0时，`dst`对应元素置0。
 
 ## 调用示例
@@ -95,7 +94,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```c
+```cpp
 #include <cstdint>
 #include <iostream>
 #include <vector>
