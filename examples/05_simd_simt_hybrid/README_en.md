@@ -53,7 +53,7 @@ When developing custom operators based on SIMD and SIMT hybrid programming, refe
 
 | Sample Name | Sample Description |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
-| simd_simt_ub_usage_limit | Uses a UB out-of-bounds access that causes an output accuracy error as an example to demonstrate UB capacity, memory layout, usable limits, and out-of-bounds access result analysis in hybrid programming. Sample link: [simd_simt_ub_usage_limit](./01_trouble_shooting/simd_simt_ub_usage_limit). |
+| simd_simt_ub_usage_limit | Uses a UB out-of-bounds access that causes an output accuracy error as an example to demonstrate UB static memory, dynamic memory, reserved space, Data Cache layout, and out-of-bounds troubleshooting in hybrid programming. Sample link: [simd_simt_ub_usage_limit](./01_trouble_shooting/simd_simt_ub_usage_limit). |
 
 ## best_practices
 

@@ -54,7 +54,7 @@ SIMD与SIMT混合编程是基于SIMD编程和SIMT编程的高阶编程方式，�
 
 | 样例名 | 样例描述 |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
-| simd_simt_ub_usage_limit | 以UB访问越界导致输出精度异常为例，展示混合编程场景下UB容量、内存布局、可用上限和越界访问结果的定位方法。样例链接：[simd_simt_ub_usage_limit](./01_trouble_shooting/simd_simt_ub_usage_limit)。 |
+| simd_simt_ub_usage_limit | 以UB访问越界导致输出精度异常为例，展示混合编程场景下UB静态内存、动态内存、预留空间、Data Cache布局，以及UB越界问题定位方法。样例链接：[simd_simt_ub_usage_limit](./01_trouble_shooting/simd_simt_ub_usage_limit)。 |
 
 ## best_practices
 
