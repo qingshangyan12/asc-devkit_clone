@@ -91,13 +91,18 @@ HcclAllocComResourceByTiling [hccl_mc2.cc:324]         ← tiling entry
 └─ Phase 3: Device side        (KFC server microcode → DispatchKfcSubKernel → collective kernel)
 ```
 
-**ST verification scope**: ST directly calls `SelectAlgAndPrepareEngine` + `GetCcuOpParamResCtx`, skipping `CcuSelectAlg` → `FillCcuAlgorithmInfo`, so `isKfc=false` and does not go through `ccuKfcExecutor->CalcRes`. The registered kernel is the original collective kernel (e.g., `CcuAlltoAllMesh1DKernel`), not the KFC server kernel.
+**ST verification scope**: ST skips `CcuSelectAlg` (including `FillCcuAlgorithmInfo`), and directly calls `AllocCcuOpResCtx` → `InitOpParamByTiling` → `TryForcedAlgAndPrepareEngine`/`SelectAlgAndPrepareEngine` → `HandleSingleRankAndCommMode` → `GetCcuOpParamResCtx`. Because `FillCcuAlgorithmInfo` is not called, `isKfc=false` and does not go through `ccuKfcExecutor->CalcRes`. The registered kernel is the original collective kernel (e.g., `CcuAlltoAllMesh1DKernel`), not the KFC server kernel.
 
 **ST does not verify**: KFC server's `InheritKfcServerKernelArg` replacement logic, `DispatchKfcSubKernel` dispatch logic, Phase 2/3 (KFC server / microcode / hardware).
 
 ### 2.2 Functional Code Real Call Chain (using AllToAll as example)
 
 ★ = AllToAll algorithm interaction boundary, 🔶 = KFC server interaction boundary, 🔹 = product function used by ST
+
+> **Product path vs ST path key difference**: In the product path, `FillCcuAlgorithmInfo` sets `opParam.isKfc = true`,
+> and `HcclGetAlgRes` executes KFC Server's `CalcRes`, which replaces `ccuKernelInfos.back()` with the KFC Server kernel
+> (`kernelFuncName` changes from `"CcuKernelAlltoAllMesh1D"` to `"CcuKernelKfcServer"`).
+> The ST path does not set `isKfc`, skips the KFC Server replacement, and directly registers the original AllToAll kernel.
 
 ```
 HcclAllocComResourceByTiling [hccl_mc2.cc:324]
@@ -122,8 +127,9 @@ HcclAllocComResourceByTiling [hccl_mc2.cc:324]
 │   │       │   └─ algorithmMap lookup → algorithmType
 │   │       │
 │   │       ├─ FillCcuAlgorithmInfo [hccl_alloc_ctx_res.cc:915]
-│   │       │   → opParam.isKfc = true           ← ST skips this step (isKfc remains false)
-│   │       │   → opResCtx.isKfc[tilingIndex] = true
+│   │       │   → Product: opParam.isKfc = true
+│   │       │   → Product: opResCtx.isKfc[tilingIndex] = true
+│   │       │   → ST: skips this step (isKfc remains false)
 │   │       │
 │   │       ├─ PrepareCcuAlgorithmResource [hccl_alloc_ctx_res.cc:929]
 │   │       │   ├─ 🔹 HandleSingleRankAndCommMode
@@ -132,11 +138,13 @@ HcclAllocComResourceByTiling [hccl_mc2.cc:324]
 │   │       │           │
 │   │       │           ├─ ★ 🔹 executor->CalcRes
 │   │       │           │   → CcuTempAlltoAllMesh1D::CalcRes
+│   │       │           │     ★ kernelFuncName = "CcuKernelAlltoAllMesh1D"
 │   │       │           │     ★ kernelFunc = CcuAlltoAllMesh1DKernel
 │   │       │           │     ★ kernelArg = CcuKernelArgAlltoAllMesh1D{channels, rankId, rankSize, ...}
 │   │       │           │     ★ channelDescs = produced by CalcChannelRequestMesh1D
+│   │       │           │     ★ push_back to ccuKernelInfos
 │   │       │           │
-│   │       │           ├─ 🔶 ccuKfcExecutor->CalcRes (executed when isKfc=true)
+│   │       │           ├─ 🔶 ccuKfcExecutor->CalcRes (product path only: executed when isKfc=true)
 │   │       │           │   → CcuTempKfcServer::CalcRes            ← ST does not go (isKfc=false)
 │   │       │           │     🔶 InheritKfcServerKernelArg:
 │   │       │           │       - create new CcuKernelArgKfcServer (inherits rankId/rankSize/loadFromMem/opParam/subCommRanks)
@@ -149,14 +157,17 @@ HcclAllocComResourceByTiling [hccl_mc2.cc:324]
 │   │       │               ├─ HcclAllocAlgResourceCcu (CCU resource allocation)
 │   │       │               ├─ 🔹 HcclGetThread (thread/notify allocation)
 │   │       │               ├─ 🔹 HcclGetChannelForCcu [op_common.cc:1394]
-│   │       │               │   → HcclChannelAcquire → channel handle written to kernelArg
+│   │       │               │   → HcclChannelAcquire → channel handle written to kernelArg.channels[i]
+│   │       │               │     (CalcChannelRequestMesh1D produces HcclChannelDesc → HcclChannelAcquire allocates ChannelHandle)
 │   │       │               └─ 🔹 HcclGetCcuKernel [op_common.cc:2095]
 │   │       │                   → RegisterCcuKernels [op_common.cc:1698]
 │   │       │                     ├─ 🔹 HcclCommQueryCcuIns
 │   │       │                     ├─ 🔹 HcommCcuKernelRegisterStart
-│   │       │                     ├─ 🔹 HcommCcuKernelRegister(kernelFuncName="CcuKernelAlltoAllMesh1D")
-│   │       │                     │   → Real: record Rep → CcuInstr microcode → LoadInstruction
-│   │       │                     │   → ST: lookup capture registry → adapter → RegisterManager → Program IR
+│   │       │                     ├─ 🔹 HcommCcuKernelRegister
+│   │       │                     │   Product path: kernelFuncName="CcuKernelKfcServer" (replaced by KFC Server)
+│   │       │                     │     → records KFC Server microcode → runtime dispatch to CcuAlltoAllMesh1DKernel
+│   │       │                     │   ST path: kernelFuncName="CcuKernelAlltoAllMesh1D" (not replaced)
+│   │       │                     │     → lookup capture registry → adapter → RegisterManager → Program IR
 │   │       │                     └─ 🔹 HcommCcuKernelRegisterEnd
 │   │       │                         → ST: Finalize (IF/ELSE/WHILE matching + LoadArg sorting)
 │   │       │
@@ -164,16 +175,23 @@ HcclAllocComResourceByTiling [hccl_mc2.cc:324]
 │   │
 │   └─ GetOrCreateCcuCtx + aclrtMemcpy (opResCtx H2D copy)  ← ST does not go
 │
-├─ Phase 2: CcuKernelLaunch [hccl_mc2.cc]
+├─ Phase 2: CcuKernelLaunch [hccl_mc2.cc]                   ← ST does not go
 │   → HcommCcuKernelLaunch(KFC server kernel, startup args)
 │
-└─ Phase 3: Device side (CCU hardware executes microcode)
+└─ Phase 3: Device side (CCU hardware executes microcode)     ← ST does not go
     → KFC server microcode loop
       → CCU_IF(param[0] == opId)
         → DispatchKfcSubKernel
-          → ★ CcuAllToAllMesh1DKernel(...)
-            → CCU API execution (Write/Notify/LocalCopy...)
+          → ★ CcuAlltoAllMesh1DKernel(11 Variable params, channels, channelCount, rankSize, rankId, loadFromMem)
+            → CCU API execution (Write/Notify/LocalCopy/GroupCopy...)
 ```
+
+**Registration name comparison**:
+
+| Path | isKfc | Registered kernelFuncName | Description |
+|------|-------|--------------------------|-------------|
+| Product | true | "CcuKernelKfcServer" | KFC Server replaced original kernel, runtime dispatch to AllToAll kernel |
+| ST | false | "CcuKernelAlltoAllMesh1D" | Original kernel preserved, ST capture registry looks up by this name |
 
 ### 2.3 ST Call Chain (differences from functional code)
 

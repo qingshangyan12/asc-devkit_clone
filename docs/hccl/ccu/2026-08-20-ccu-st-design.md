@@ -81,13 +81,18 @@ HcclAllocComResourceByTiling [hccl_mc2.cc:324]         ← tiling 入口
 └─ Phase 3: Device 侧          (KFC server 微码 → DispatchKfcSubKernel → collective kernel)
 ```
 
-**ST 验证范围**：ST 直接调 `SelectAlgAndPrepareEngine` + `GetCcuOpParamResCtx`，跳过 `CcuSelectAlg` → `FillCcuAlgorithmInfo`，因此 `isKfc=false`，不走 `ccuKfcExecutor->CalcRes`。注册的是原始 collective kernel（如 `CcuAlltoAllMesh1DKernel`），不是 KFC server kernel。
+**ST 验证范围**：ST 跳过 `CcuSelectAlg`（含 `FillCcuAlgorithmInfo`），直接调用 `AllocCcuOpResCtx` → `InitOpParamByTiling` → `TryForcedAlgAndPrepareEngine`/`SelectAlgAndPrepareEngine` → `HandleSingleRankAndCommMode` → `GetCcuOpParamResCtx`。因为不调 `FillCcuAlgorithmInfo`，所以 `isKfc=false`，不走 `ccuKfcExecutor->CalcRes`。注册的是原始 collective kernel（如 `CcuAlltoAllMesh1DKernel`），不是 KFC server kernel。
 
 **ST 不验证**：KFC server 的 `InheritKfcServerKernelArg` 替换逻辑、`DispatchKfcSubKernel` 分发逻辑、Phase 2/3（KFC server / 微码 / 硬件）。
 
 ### 2.2 功能代码真实调用链（以 AllToAll 为例）
 
 ★ = AllToAll 算法交互边界，🔶 = KFC server 交互边界，🔹 = ST 使用的产品函数
+
+> **产品路径 vs ST 路径的关键差异**：产品路径中 `FillCcuAlgorithmInfo` 设置 `opParam.isKfc = true`，
+> `HcclGetAlgRes` 会执行 KFC Server 的 `CalcRes`，将 `ccuKernelInfos.back()` 替换为 KFC Server kernel
+> （`kernelFuncName` 从 `"CcuKernelAlltoAllMesh1D"` 变为 `"CcuKernelKfcServer"`）。
+> ST 路径不设置 `isKfc`，跳过 KFC Server 替换，直接注册原始 AllToAll kernel。
 
 ```
 HcclAllocComResourceByTiling [hccl_mc2.cc:324]
@@ -112,8 +117,9 @@ HcclAllocComResourceByTiling [hccl_mc2.cc:324]
 │   │       │   └─ algorithmMap 查表 → algorithmType
 │   │       │
 │   │       ├─ FillCcuAlgorithmInfo [hccl_alloc_ctx_res.cc:915]
-│   │       │   → opParam.isKfc = true           ← ST 跳过此步（isKfc 保持 false）
-│   │       │   → opResCtx.isKfc[tilingIndex] = true
+│   │       │   → 产品：opParam.isKfc = true
+│   │       │   → 产品：opResCtx.isKfc[tilingIndex] = true
+│   │       │   → ST：跳过此步（isKfc 保持 false）
 │   │       │
 │   │       ├─ PrepareCcuAlgorithmResource [hccl_alloc_ctx_res.cc:929]
 │   │       │   ├─ 🔹 HandleSingleRankAndCommMode
@@ -122,11 +128,13 @@ HcclAllocComResourceByTiling [hccl_mc2.cc:324]
 │   │       │           │
 │   │       │           ├─ ★ 🔹 executor->CalcRes
 │   │       │           │   → CcuTempAlltoAllMesh1D::CalcRes
+│   │       │           │     ★ kernelFuncName = "CcuKernelAlltoAllMesh1D"
 │   │       │           │     ★ kernelFunc = CcuAlltoAllMesh1DKernel
 │   │       │           │     ★ kernelArg = CcuKernelArgAlltoAllMesh1D{channels, rankId, rankSize, ...}
 │   │       │           │     ★ channelDescs = CalcChannelRequestMesh1D 产出
+│   │       │           │     ★ push_back 到 ccuKernelInfos
 │   │       │           │
-│   │       │           ├─ 🔶 ccuKfcExecutor->CalcRes (isKfc=true 时执行)
+│   │       │           ├─ 🔶 ccuKfcExecutor->CalcRes (仅产品路径: isKfc=true 时执行)
 │   │       │           │   → CcuTempKfcServer::CalcRes            ← ST 不走（isKfc=false）
 │   │       │           │     🔶 InheritKfcServerKernelArg:
 │   │       │           │       - 新建 CcuKernelArgKfcServer（继承 rankId/rankSize/loadFromMem/opParam/subCommRanks）
@@ -139,14 +147,17 @@ HcclAllocComResourceByTiling [hccl_mc2.cc:324]
 │   │       │               ├─ HcclAllocAlgResourceCcu (CCU 资源分配)
 │   │       │               ├─ 🔹 HcclGetThread (线程/notify 分配)
 │   │       │               ├─ 🔹 HcclGetChannelForCcu [op_common.cc:1394]
-│   │       │               │   → HcclChannelAcquire → channel handle 写入 kernelArg
+│   │       │               │   → HcclChannelAcquire → channel handle 写入 kernelArg.channels[i]
+│   │       │               │     (CalcChannelRequestMesh1D 产出 HcclChannelDesc → HcclChannelAcquire 申请 ChannelHandle)
 │   │       │               └─ 🔹 HcclGetCcuKernel [op_common.cc:2095]
 │   │       │                   → RegisterCcuKernels [op_common.cc:1698]
 │   │       │                     ├─ 🔹 HcclCommQueryCcuIns
 │   │       │                     ├─ 🔹 HcommCcuKernelRegisterStart
-│   │       │                     ├─ 🔹 HcommCcuKernelRegister(kernelFuncName="CcuKernelAlltoAllMesh1D")
-│   │       │                     │   → 真实：录制 Rep → CcuInstr 微码 → LoadInstruction
-│   │       │                     │   → ST：查 capture 注册表 → adapter → RegisterManager → Program IR
+│   │       │                     ├─ 🔹 HcommCcuKernelRegister
+│   │       │                     │   产品路径：kernelFuncName="CcuKernelKfcServer"（已被 KFC Server 替换）
+│   │       │                     │     → 录制 KFC Server 微码 → 运行时 dispatch 到 CcuAlltoAllMesh1DKernel
+│   │       │                     │   ST 路径：kernelFuncName="CcuKernelAlltoAllMesh1D"（未被替换）
+│   │       │                     │     → 查 capture 注册表 → adapter → RegisterManager → Program IR
 │   │       │                     └─ 🔹 HcommCcuKernelRegisterEnd
 │   │       │                         → ST：Finalize（IF/ELSE/WHILE 匹配 + LoadArg 排序）
 │   │       │
@@ -154,16 +165,23 @@ HcclAllocComResourceByTiling [hccl_mc2.cc:324]
 │   │
 │   └─ GetOrCreateCcuCtx + aclrtMemcpy (opResCtx H2D 拷贝)  ← ST 不走
 │
-├─ Phase 2: CcuKernelLaunch [hccl_mc2.cc]
+├─ Phase 2: CcuKernelLaunch [hccl_mc2.cc]                   ← ST 不走
 │   → HcommCcuKernelLaunch(KFC server kernel, startup args)
 │
-└─ Phase 3: Device 侧 (CCU 硬件执行微码)
+└─ Phase 3: Device 侧 (CCU 硬件执行微码)                     ← ST 不走
     → KFC server 微码循环
       → CCU_IF(param[0] == opId)
         → DispatchKfcSubKernel
-          → ★ CcuAllToAllMesh1DKernel(...)
-            → CCU API 执行（Write/Notify/LocalCopy...）
+          → ★ CcuAlltoAllMesh1DKernel(11个Variable参数, channels, channelCount, rankSize, rankId, loadFromMem)
+            → CCU API 执行（Write/Notify/LocalCopy/GroupCopy...）
 ```
+
+**注册名称对比**：
+
+| 路径 | isKfc | 注册的 kernelFuncName | 说明 |
+|------|-------|----------------------|------|
+| 产品 | true | "CcuKernelKfcServer" | KFC Server 替换了原始 kernel，运行时 dispatch 到 AllToAll kernel |
+| ST | false | "CcuKernelAlltoAllMesh1D" | 保留原始 kernel，ST capture 注册表按此名称查找 |
 
 ### 2.3 ST 调用链（与功能代码的差异）
 
