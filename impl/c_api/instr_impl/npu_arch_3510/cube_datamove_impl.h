@@ -127,6 +127,12 @@ __aicore__ inline void asc_set_l13d_rpt(
 // ==========asc_set_l13d_fmatrix==========
 __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config) { asc_set_l13d_fmatrix_impl(config); }
 
+__aicore__ inline void asc_set_l13d_fmatrix(
+    uint16_t fmatrix_w, uint16_t fmatrix_h, uint8_t pad_left, uint8_t pad_right, uint8_t pad_top, uint8_t pad_bottom)
+{
+    asc_set_l13d_fmatrix_impl(fmatrix_w, fmatrix_h, pad_left, pad_right, pad_top, pad_bottom);
+}
+
 // ==========asc_copy_l12l0a,
 // uint8_t/int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t/half/bfloat16_t/int16_t/uint16_t/uint32_t/int32_t/float==========
 
