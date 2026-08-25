@@ -16,7 +16,7 @@
 
 命名空间：`asc::te::experimental`。
 
-二元`operator-`执行逐元素减法，支持寄存器与寄存器、寄存器与标量、标量与寄存器三种组合。
+二元`operator-`逐元素执行不带借位输出的减法，支持寄存器与寄存器、寄存器与标量、标量与寄存器三种操作数组合。
 
 ## 函数原型
 
@@ -35,36 +35,20 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b)
 
 ## 返回值说明
 
-返回元素类型与寄存器操作数相同的`reg_tensor`：
-
-- `reg`：有效元素保存左操作数减右操作数的结果。整型结果超出`T`的位宽时，
-  仅保留目标类型位宽内的结果。
-- `mask`：等于第一个`reg_tensor`操作数的`mask`。
+返回与寄存器操作数元素类型相同的`reg_tensor`。结果mask等于第一个寄存器操作数的mask。
 
 ## 约束说明
 
-- 整型`operator-`的结果超出元素类型表示范围时采用非饱和截断。
+- 整型结果超出元素类型表示范围时采用非饱和截断。
 - 标量位于左侧时执行`scalar - reg`，操作数顺序不会交换。
 
 ## 调用示例
 
-以下示例展示接口在AIV计算函数中的典型调用方式。示例先为加载结果绑定mask，
-再执行计算并将结果写回UB。
-
 ```cpp
-#include "tensor_api/tensor.h"
+using asc::te::experimental::operator-;
 
-template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void sub_example(
-    InputTensor input0, InputTensor input1, OutputTensor output)
-{
-    using asc::te::experimental::operator-;
-
-    auto mask = asc::te::all_mask<uint32_t>();
-    auto src0_reg = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
-    auto src1_reg = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
-
-    auto difference = src0_reg - src1_reg;
-    output.store(asc::te::make_coord(0, 0), difference);
-}
+auto mask = asc::te::all_mask<uint32_t>();
+auto src0 = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
+auto src1 = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
+auto result = src0 - src1;
 ```

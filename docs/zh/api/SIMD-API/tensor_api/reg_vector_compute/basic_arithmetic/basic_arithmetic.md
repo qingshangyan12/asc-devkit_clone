@@ -16,13 +16,11 @@
 | [relu](relu.md) | 逐元素执行ReLU。 |
 | [prelu](prelu.md) | 逐元素执行PReLU。 |
 | [leaky_relu](leaky_relu.md) | 逐元素执行Leaky ReLU。 |
-| [operator+](operator_add.md) | 逐元素执行加法。 |
-| [add](add.md) | 执行带进位输出的加法。 |
-| [add_c](add_c.md) | 加入进位输入并执行带进位输出的加法。 |
-| [operator-（二元）](operator_sub.md) | 逐元素执行减法。 |
-| [sub](sub.md) | 执行带进位输出的减法。 |
-| [sub_c](sub_c.md) | 加入进位输入并执行带进位输出的减法。 |
-| [operator*](operator_mul.md) | 逐元素执行乘法。 |
+| [operator+](operator+.md) | 逐元素执行不带进位输出的加法。 |
+| [add_c](addc.md) | 执行仅输出进位或输入并输出进位的加法。 |
+| [operator-（二元）](operator-.md) | 逐元素执行不带借位输出的减法。 |
+| [sub_c](subc.md) | 执行仅输出进位或输入并输出进位的减法。 |
+| [operator*](operator*.md) | 逐元素执行同位宽乘法。 |
 | [mull](mull.md) | 计算32位整数宽乘的低位和高位结果。 |
 | [operator/](div.md) | 逐元素执行除法。 |
 | [max](max.md) | 逐元素取最大值。 |
