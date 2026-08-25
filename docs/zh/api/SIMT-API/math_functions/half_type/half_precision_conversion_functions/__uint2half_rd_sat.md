@@ -50,9 +50,7 @@ inline half __uint2half_rd_sat(const unsigned int x)
 | 0 | 0 |
 | 2049 | 2048 |
 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
-| x>ASCRT\_MAX\_NORMAL\_FP16 且 x<65505 | 待与基准实现确认（参考 __uint2half_rd 取 ASCRT\_MAX\_NORMAL\_FP16） |
-| 65505 | ASCRT\_MAX\_NORMAL\_FP16 |
-| x≥65535 | inf |
+| x>ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 
