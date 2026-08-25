@@ -47,11 +47,11 @@ inline float log2f(float x)
 
 以2为底的x的对数。
 
--   当x为inf时，返回值为inf。
--   当x为-inf时，返回值为nan。
--   当x为nan时，返回值为nan。
--   当x为0时，返回值为-inf。
--   当x为其他负数时，返回值为nan。
+- 当x为inf时，返回值为inf。
+- 当x为-inf时，返回值为nan。
+- 当x为nan时，返回值为nan。
+- 当x为0时，返回值为-inf。
+- 当x为其他负数时，返回值为nan。
 
 ## 约束说明
 
@@ -100,7 +100,7 @@ inline float log2f(float x)
 
 输入输出示例如下：
 
-```
+```text
 x：1, 2, 3, 4
 result: 0 1 1.584962 2
 ```

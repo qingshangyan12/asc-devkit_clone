@@ -15,15 +15,20 @@
 </div>
 
 ## 🔥Latest News
+
 [2026/05] v9.1.0-beta.2 版本关键特性
+
 ### 🚀 关键特性
+
 - Ascend C框架基础API支持NPU Check（[PR#1557](https://gitcode.com/cann/asc-devkit/pull/1557) [PR#1467](https://gitcode.com/cann/asc-devkit/pull/1467)），增强算子运行时校验能力。
 - SIMD VF内支持printf和reg dump打印（[PR#1605](https://gitcode.com/cann/asc-devkit/pull/1605)），提供调试打印和寄存器数据dump能力。
 - A5支持L1 Tensor数据的DumpTensor（[PR#2175](https://gitcode.com/cann/asc-devkit/pull/2175)），扩展L1层数据调试支持。
 - 编译工程CMakeModule支持CMAKE<LANG>编译选项（[PR#2055](https://gitcode.com/cann/asc-devkit/pull/2055)）；新增optype_collector工具，支持检查optype重名（[PR#285](https://gitcode.com/cann/asc-tools/pull/285)）。
 - 基础API支持ctrl中的功能行为（饱和溢出管理）（[PR#2077](https://gitcode.com/cann/asc-devkit/pull/2077)）。
 - SIMT编程新增ld/st接口（[PR#2058](https://gitcode.com/cann/asc-devkit/pull/2058)）和AddrSpace类接口（[PR#1597](https://gitcode.com/cann/asc-devkit/pull/1597)），丰富SIMT内存访问编程能力。
+
 ### 🎯 样例更新
+
 - 最佳实践样例开发：matmul+gelu融合、datacopy优化、bank冲突优化、group_matmul量化组矩阵乘、simt&simd高性能编程（[PR#1814](https://gitcode.com/cann/asc-devkit/pull/1814) [PR#2137](https://gitcode.com/cann/asc-devkit/pull/2137) [PR#2141](https://gitcode.com/cann/asc-devkit/pull/2141) [PR#2166](https://gitcode.com/cann/asc-devkit/pull/2166) [PR#2363](https://gitcode.com/cann/asc-devkit/pull/2363)）。
 - Ascend 950新特性补充及兼容性样例整改：loopmode数据搬运、interleave矢量计算、datacopy_gm2l1、loadmx（Load2DMX）、mmad_mx、data_copy_pad等（[PR#2336](https://gitcode.com/cann/asc-devkit/pull/2336) [PR#1899](https://gitcode.com/cann/asc-devkit/pull/1899) [PR#2124](https://gitcode.com/cann/asc-devkit/pull/2124)）。
 - RegBase新增基础样例：基础算术、数据类型转换、归约、比较、索引等样例（[PR#1459](https://gitcode.com/cann/asc-devkit/pull/1459) [PR#1575](https://gitcode.com/cann/asc-devkit/pull/1575) [PR#2024](https://gitcode.com/cann/asc-devkit/pull/2024)）。
@@ -32,7 +37,9 @@
 - SIMT新增功能特性样例：pytorch注册自定义算子（[PR#2769](https://gitcode.com/cann/asc-devkit/pull/2769)）、编译相关样例（动态、静态、分离编译等）（[PR#2356](https://gitcode.com/cann/asc-devkit/pull/2356)）、profiling样例（[PR#1989](https://gitcode.com/cann/asc-devkit/pull/1989)）、内存屏障特性样例（[PR#1923](https://gitcode.com/cann/asc-devkit/pull/1923)）、Warp类特性样例（[PR#2876](https://gitcode.com/cann/asc-devkit/pull/2876)）、simulator样例（[PR#2692](https://gitcode.com/cann/asc-devkit/pull/2692)）、kernel log样例（[PR#2131](https://gitcode.com/cann/asc-devkit/pull/2131)）。
 - SIMT入门样例修改为gather（[PR#2405](https://gitcode.com/cann/asc-devkit/pull/2405)）。
 - 新增Tensor API入门及最佳实践样例：Matmul入门、数据搬入搬出、搬出随路量化、MX FP4最佳实践（[PR#2553](https://gitcode.com/cann/asc-devkit/pull/2553)）。
+
 ### 📖 资料文档
+
 - 新增矩阵计算概述和计算分形介绍的文档（[PR#2533](https://gitcode.com/cann/asc-devkit/pull/2533)）。
 - 优化矢量计算API文档，补充指令约束等（[PR#2676](https://gitcode.com/cann/asc-devkit/pull/2676)）。
 - 搭建VitePress文档站点，提供AscendC资料预览功能（[PR#2547](https://gitcode.com/cann/asc-devkit/pull/2547)）。
@@ -51,6 +58,7 @@
 Ascend C以「**兼容C/C++标准 · 释放极致算力**」为核心设计理念：在严格遵循C/C++语言规范的基础上做最小化语法扩展，让具备C/C++开发基础的开发者可低门槛平滑迁移至昇腾平台，自主释放芯片全部算力潜能。语言同时兼容指针式原生C开发范式与Tensor+Layout现代C++编程模式，在深度支撑算子定制优化的同时，实现与现有C/C++开发生态的无缝衔接，保障跨平台开发体验的一致性。
 
 我们坚持两大核心设计原则：
+
 - **没有银弹**：不同业务场景对性能、开发效率的诉求存在差异，不存在适配所有场景的最优单一接口，分层设计是兼顾效率与性能的核心路径；
 - **渐进式成长**：入门开发者可从高层易用接口快速上手，完成算法验证与原型落地；资深开发者可向下深入底层接口，通过精细化调优充分释放硬件潜能。
 
@@ -81,6 +89,7 @@ Ascend C采用分层架构设计，自下而上构建完整的算子开发技术
 <img src="docs/zh/guide/figures/architecture_ascendc.png" alt="Ascend C整体架构图"  width="1000px">
 
 各层级能力定义与说明如下：
+
 - **语言扩展层（SIMT API）**：面向多线程并行场景的原生C语言编程接口，支持业界通用的SIMT编程模型，保障跨技术栈开发体验的一致性，支撑离散、不规则计算场景下的高性能算子开发。
 - **语言扩展层（SIMD C API）**：基于SIMD向量化编程模型、面向极致性能调优的C语言级底层编程接口，原生支持数组式内存分配与指针式计算原语，具备指令级零封装开销的硬件访问能力。Ascend 950PR/Ascend 950DT架构新增SIMD/SIMT混合编程模式支持，可覆盖多形态并行计算场景。
 - **Tensor API**：面向高性能算子开发的C++ Tensor级核心编程接口。将内存布局（Layout）作为Tensor抽象的一等公民，原生支持携带Layout语义的Tensor对象；内置Layout代数运算能力，可自动化完成内存布局索引推导与布局变换管理，显著降低复杂内存排布场景的开发复杂度，提升代码可维护性与跨架构可移植性。
@@ -94,14 +103,16 @@ Ascend C采用分层架构设计，自下而上构建完整的算子开发技术
 - **Python前端（PyAsc）**：基于Python语言封装芯片底层完备可编程能力，持续完善Layout体系下的Tensor编程能力，新增SIMT编程模型支持，实现通过Python接口开发高性能算子。
 
 ### 如何选择多层级API进行算子开发
+
 - **基于C/C++语言开发**：详细请参考[Ascend C多级API选择指南](./docs/zh/asc_how_to_choose_api.md)
 - **基于Python语言开发，支撑完备编程能力，实现极致性能**：推荐选用Ascend C Python前端[PyAsc](https://gitcode.com/cann/pyasc)
 - **基于Python语言开发，快速开发验证，易用性优先**：推荐选用 [PyPTO](https://gitcode.com/cann/pypto)
 
 ## 🔍目录结构说明
+
 本仓主要包含Ascend C编程API和必要的cmake编译脚本，是算子开发所需的核心模块，其目录结构如下：
 
-```
+```text
 ├── cmake                               # Ascend C 构建源代码
 ├── docs                                # 项目文档介绍
 ├── examples                            # Ascend C API样例工程
@@ -207,6 +218,7 @@ Ascend C采用分层架构设计，自下而上构建完整的算子开发技术
 ## 📖相关资源
 
 - **编程指南**
+
   | 文档  |  说明   |
   |---------|--------|
   |[Ascend C 编程指南](https://hiascend.com/document/redirect/CannCommunityOpdevAscendC)|基于昇腾AI硬件，使用Ascend C编写算子程序，开发自定义算子。|
@@ -216,12 +228,14 @@ Ascend C采用分层架构设计，自下而上构建完整的算子开发技术
   |[Ascend C 编程指南（鸿蒙）](https://gitcode.com/cann/cann-recipes-harmony-infer/blob/master/docs/ascendc_develop_guide.md)|基于麒麟AI硬件，使用Ascend C编写算子程序，开发自定义算子。|
 
 - **贡献指南**
+
   | 文档  |  说明   |
   |---------|--------|
   |[CANN 社区贡献指南](https://gitcode.com/cann/community)| CANN社区Issue、PR等通用处理流程|
   |[ASC-DevKit贡献指南](./CONTRIBUTING.md) | Ascend C API、资料与样例等贡献指南|
 
 - **其他**
+
   | 文档  |  说明   |
   |---------|--------|
   |[Ascend C Meetup材料](https://gitcode.com/cann/community/tree/master/events/meetup/slides/sig-ascendc)|Ascend C对外宣传的PPT材料，包括950新增特性等|

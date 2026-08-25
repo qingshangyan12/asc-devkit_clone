@@ -1,5 +1,7 @@
 # C-API Sample Introduction
 
+<!-- UTF-8 encoding marker: 文档 -->
+
 ## Overview
 
 This sample demonstrates the compilation process for building Vector operator samples using C_API, supporting implementation of the main function and kernel function in the same cpp file.
