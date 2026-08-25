@@ -51,6 +51,8 @@ $$
 
 本接口为矩阵计算接口，仅在AIC上生效。
 
+MmadMx计算边界值情况说明请见[MmadMx接口边界值汇总](../../../appendix/mmad_mx_interface_boundary_value_summary.md)。
+
 ## 函数原型
 
 **占位符形式：**

@@ -124,6 +124,8 @@ MmadMx的计算公式为：C=(scaleA⊗A)*(scaleB⊗B)+Bias，“⊗”表示广
     </tbody>
   </table>
 
+MmadMx计算边界值情况说明请见[MmadMx接口边界值汇总](../../../../appendix/mmad_mx_interface_boundary_value_summary.md)。
+
 ## 函数原型
 
 - 不传入bias
