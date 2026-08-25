@@ -25,5 +25,3 @@
 | [operator/](div.md) | 逐元素执行除法。 |
 | [max](max.md) | 逐元素取最大值。 |
 | [min](min.md) | 逐元素取最小值。 |
-
-各接口的mask规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。

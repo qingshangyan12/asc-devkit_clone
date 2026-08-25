@@ -14,6 +14,8 @@
 
 头文件路径：`"tensor_api/tensor.h"`。
 
+命名空间：`asc::te::experimental`。
+
 `sub`对两个32位整数寄存器执行逐元素减法，返回低32位结果，并通过引用参数输出补码减法的
 进位；`sub_c`使用前一段产生的进位继续计算，并输出新的进位。二者用于构成从低位到高位的
 多字整数减法链：
@@ -46,17 +48,11 @@ __simd_callee__ inline reg_tensor<T> sub_c(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`int32_t`、`uint32_t`。 |
 | `carry` | 输出 | `sub`和`sub_c`的逐元素进位输出。`reg`保存进位，`mask`由接口写为`src0.mask`。 |
 | `src0` | 输入 | 被减数，类型为`reg_tensor<T>`，同时提供执行mask。 |
 | `src1` | 输入 | 减数，类型为与`src0`相同的`reg_tensor<T>`；`src1.mask`不参与执行mask的选择。 |
 | `carry_src` | 输入 | 仅用于`sub_c`。逐元素进位输入，读取其`reg`；`carry_src.mask`不参与执行mask的选择。 |
-
-## 支持的数据类型
-
-| 参数 | 支持的数据类型 |
-| --- | --- |
-| `T` | `int32_t`、`uint32_t` |
-| `carry`、`carry_src` | `reg_tensor<bool>` |
 
 ## 返回值说明
 
@@ -69,11 +65,6 @@ __simd_callee__ inline reg_tensor<T> sub_c(
 
 ## 约束说明
 
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
-- `sub`的`T`不是`int32_t`或`uint32_t`时，编译失败，并提示
-  `sub with carry supports int32_t and uint32_t`；`sub_c`对应提示为
-  `sub_c supports int32_t and uint32_t`。
-- `carry_src`仅用于`sub_c`，且必须是`reg_tensor<bool>`；类型不匹配时找不到对应重载，编译失败。
 - 用于多字整数分段减法时，未按照从低位到高位的顺序传递进位会得到错误的高位结果。
 
 ## 调用示例

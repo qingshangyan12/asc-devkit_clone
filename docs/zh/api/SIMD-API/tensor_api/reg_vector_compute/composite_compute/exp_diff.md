@@ -12,6 +12,8 @@
 
 ## 功能说明
 
+命名空间：`asc::te::experimental`。
+
 逐元素计算两个输入之差的自然指数：
 
 $$
@@ -55,7 +57,6 @@ __simd_callee__ inline reg_tensor<float> exp_diff(
 
 - 两个输入寄存器的元素类型必须一致。
 - 三参数形式仅支持`half`输入，`src_pos`仅支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`。
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
 
 ## 调用示例
 

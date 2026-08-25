@@ -12,6 +12,8 @@
 
 ## 功能说明
 
+命名空间：`asc::te::experimental`。
+
 逐元素计算两个输入之差的绝对值：
 
 $$
@@ -30,14 +32,9 @@ __simd_callee__ inline reg_tensor<T> abs_diff(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`half`、`float`。 |
 | `src0` | 输入 | 被减数，同时提供执行mask。 |
 | `src1` | 输入 | 减数。 |
-
-## 支持的数据类型
-
-| 模板参数 | 支持的数据类型 |
-| --- | --- |
-| `T` | `half`、`float` |
 
 ## 返回值说明
 
@@ -46,7 +43,6 @@ __simd_callee__ inline reg_tensor<T> abs_diff(
 ## 约束说明
 
 - 两个输入寄存器的元素类型必须一致。
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
 
 ## 调用示例
 

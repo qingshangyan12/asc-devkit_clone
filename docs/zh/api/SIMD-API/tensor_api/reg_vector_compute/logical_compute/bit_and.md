@@ -14,6 +14,8 @@
 
 头文件路径：`"tensor_api/tensor.h"`。
 
+命名空间：`asc::te::experimental`。
+
 逐元素执行按位与运算，支持寄存器与寄存器、寄存器与标量、标量与寄存器三种形式。
 
 ## 函数原型
@@ -34,9 +36,10 @@ __simd_callee__ inline decltype(auto) operator&(const T& a, const U& b)
 
 ## 支持的数据类型
 
-| 参数 | 支持的数据类型 |
+| 操作数组合 | 寄存器元素类型 |
 | --- | --- |
-| 寄存器元素类型 | `bool`、`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` |
+| 寄存器/寄存器 | `bool`、`int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` |
+| 寄存器/标量、标量/寄存器 | `int8_t`、`uint8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` |
 
 ## 返回值说明
 
@@ -48,10 +51,6 @@ __simd_callee__ inline decltype(auto) operator&(const T& a, const U& b)
 
 ## 约束说明
 
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
-- 双寄存器元素类型不一致时，编译失败，并提示寄存器操作数必须具有相同的元素类型。
-- 元素类型不在“支持的数据类型”列表中时，编译失败，并提示`operator& does not support this element type`。
-- `bool`与标量组合时，编译失败，并提示bool按位运算需要两个`reg_tensor<bool>`操作数。
 - 构造`reg_tensor<bool>{maskValue}`只初始化对象的`mask`，不会生成predicate数据；作为操作数前，
   `reg`必须已经由mask生成、加载或其他predicate计算接口写入。
 - 对浮点类型执行的是元素的二进制编码的按位与，不是数值逻辑与；结果可能为`nan`或其他特殊浮点值。

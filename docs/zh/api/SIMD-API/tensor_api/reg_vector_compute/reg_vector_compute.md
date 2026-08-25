@@ -1,6 +1,6 @@
 # Reg矢量计算
 
-Tensor API Reg矢量计算接口以`reg_tensor<T>`为操作对象，支持函数调用和C++运算符表达式。
+Tensor API Reg矢量计算接口位于`asc::te::experimental`命名空间，以`reg_tensor<T>`为操作对象，支持函数调用和C++运算符表达式。
 
 ## 头文件
 
@@ -28,12 +28,6 @@ Tensor API Reg矢量计算接口以`reg_tensor<T>`为操作对象，支持函数
 | [逻辑与位运算](logical_compute/logical_compute.md) | 取反、按位运算和移位。 |
 | [复合计算](composite_compute/composite_compute.md) | 乘加、差值、指数和类型转换等融合计算。 |
 | [直方图计算](histogram_compute/histogram_compute.md) | 频率直方图和累计直方图。 |
-
-## mask使用与传导
-
-`reg_tensor<T>`中的`reg`保存矢量数据，`mask`标识参与计算的有效元素。调用计算接口前必须初始化执行mask，通常在加载数据时通过`load(...).with_mask(m)`完成绑定。
-
-一元接口使用输入寄存器的`mask`。二元和多元接口使用文档指定的第一个寄存器操作数的`mask`，其他寄存器操作数的`mask`不参与本次执行范围的选择。返回对象继承本次执行mask；带进位接口还会为进位输出设置相同的mask。
 
 ## 调用示例
 

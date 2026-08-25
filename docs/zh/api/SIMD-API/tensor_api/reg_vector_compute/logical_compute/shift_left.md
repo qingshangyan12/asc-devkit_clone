@@ -14,6 +14,8 @@
 
 头文件路径：`"tensor_api/tensor.h"`。
 
+命名空间：`asc::te::experimental`。
+
 按照寄存器或标量给出的移位量，对`src`逐元素左移。
 
 ## 函数原型
@@ -49,10 +51,6 @@ __simd_callee__ inline reg_tensor<T> operator<<(
 
 ## 约束说明
 
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
-- `src`元素类型不在“支持的数据类型”列表中时，编译失败，并提示
-  `operator<< does not support this element type`。
-- 寄存器移位量不是与`src`等位宽的有符号整数时，编译失败；标量移位量不是`int16_t`时，编译失败。
 - 移位量为负数时行为未定义；移位量大于等于`src`元素类型位宽时，结果为`0`。
 - 左移结果超出`T`位宽的高位被丢弃，只保留低位结果。
 
