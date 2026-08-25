@@ -158,10 +158,10 @@ __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add_c(
+__simd_callee__ inline reg_tensor<T> addc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_carry_v<T>, "add_c supports int32_t and uint32_t");
+    static_assert(detail::supports_carry_v<T>, "addc supports int32_t and uint32_t");
     reg_tensor<T> dst;
     asc_add(carry.reg, dst.reg, src0.reg, src1.reg, src0.mask);
     carry.mask = src0.mask;
@@ -170,11 +170,11 @@ __simd_callee__ inline reg_tensor<T> add_c(
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add_c(
+__simd_callee__ inline reg_tensor<T> addc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
     const reg_tensor<bool>& carry_src)
 {
-    static_assert(detail::supports_carry_v<T>, "add_c supports int32_t and uint32_t");
+    static_assert(detail::supports_carry_v<T>, "addc supports int32_t and uint32_t");
     reg_tensor<T> dst;
     asc_addc(carry.reg, dst.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
     carry.mask = src0.mask;
@@ -199,10 +199,10 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b)
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sub_c(
+__simd_callee__ inline reg_tensor<T> subc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_carry_v<T>, "sub_c supports int32_t and uint32_t");
+    static_assert(detail::supports_carry_v<T>, "subc supports int32_t and uint32_t");
     reg_tensor<T> dst;
     asc_sub(carry.reg, dst.reg, src0.reg, src1.reg, src0.mask);
     carry.mask = src0.mask;
@@ -211,11 +211,11 @@ __simd_callee__ inline reg_tensor<T> sub_c(
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sub_c(
+__simd_callee__ inline reg_tensor<T> subc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
     const reg_tensor<bool>& carry_src)
 {
-    static_assert(detail::supports_carry_v<T>, "sub_c supports int32_t and uint32_t");
+    static_assert(detail::supports_carry_v<T>, "subc supports int32_t and uint32_t");
     reg_tensor<T> dst;
     asc_subc(carry.reg, dst.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
     carry.mask = src0.mask;
