@@ -1,4 +1,4 @@
-# operator*
+# operator+
 
 ## 产品支持情况
 
@@ -16,21 +16,21 @@
 
 命名空间：`asc::te::experimental`。
 
-逐元素执行乘法。支持寄存器与寄存器、寄存器与标量、标量与寄存器三种操作数组合。
+逐元素执行不带进位输出的加法，支持寄存器与寄存器、寄存器与标量、标量与寄存器三种操作数组合。
 
 ## 函数原型
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(
+__simd_callee__ inline reg_tensor<T> operator+(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(
+__simd_callee__ inline reg_tensor<T> operator+(
     const reg_tensor<T>& src, const T& scalar)
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(
+__simd_callee__ inline reg_tensor<T> operator+(
     const T& scalar, const reg_tensor<T>& src)
 ```
 
@@ -38,17 +38,10 @@ __simd_callee__ inline reg_tensor<T> operator*(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 模板参数 | 寄存器元素类型。具体支持范围请参见“支持的数据类型”。 |
-| `src0`、`src1` | 输入 | 寄存器/寄存器形式的两个乘数，类型均为`reg_tensor<T>`。 |
-| `src` | 输入 | 标量形式中的寄存器乘数，类型为`reg_tensor<T>`。 |
-| `scalar` | 输入 | 标量乘数，类型为`T`。 |
-
-## 支持的数据类型
-
-| 操作数组合 | 寄存器元素类型 |
-| --- | --- |
-| 寄存器/寄存器 | `int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` |
-| 寄存器/标量、标量/寄存器 | `int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float` |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。 |
+| `src0`、`src1` | 输入 | 寄存器/寄存器形式的两个加数，类型均为`reg_tensor<T>`。 |
+| `src` | 输入 | 标量形式中的寄存器加数，类型为`reg_tensor<T>`。 |
+| `scalar` | 输入 | 标量加数，类型为`T`。 |
 
 ## 返回值说明
 
@@ -57,14 +50,14 @@ __simd_callee__ inline reg_tensor<T> operator*(
 ## 约束说明
 
 - 标量类型必须与寄存器元素类型一致。
-- 整型结果只保留目标元素类型位宽内的数据。
+- 整型结果超出元素类型表示范围时采用非饱和截断。
 
 ## 调用示例
 
 ```cpp
-using asc::te::experimental::operator*;
+using asc::te::experimental::operator+;
 
 auto mask = asc::te::all_mask<float>();
 auto src = input.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto result = src * 2.0f;
+auto result = src + 1.0f;
 ```
