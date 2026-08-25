@@ -37,7 +37,7 @@ __simd_callee__ inline reg_tensor<T> axpy(
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> absdiff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_absdiff_v<T>, "absdiff supports half and float");
     reg_tensor<T> dst;
@@ -47,7 +47,7 @@ __simd_callee__ inline reg_tensor<T> absdiff(const reg_tensor<T>& src0, const re
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<float> exp_sub(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_exp_sub_v<T>, "exp_sub supports half and float");
     reg_tensor<float> dst;
