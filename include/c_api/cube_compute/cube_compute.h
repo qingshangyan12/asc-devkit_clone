@@ -34,6 +34,8 @@
 #include "c_api/composite/cube_compute_composite.h"
 
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag);
+__aicore__ inline void asc_set_l0c_copy_config(
+    uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool is_clean_unit_flag);
 
 __aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height,
