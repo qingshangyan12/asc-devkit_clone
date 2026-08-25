@@ -11,6 +11,7 @@
 #include "ccu_runtime_checker.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <sstream>
 
@@ -27,12 +28,162 @@ void ApplyCopy(
         dst.begin() + static_cast<size_t>(dstOffset));
 }
 
+uint32_t DataTypeSize(HcclDataType dataType)
+{
+    switch (dataType) {
+        case HCCL_DATA_TYPE_INT8:
+            return 1;
+        case HCCL_DATA_TYPE_FP16:
+        case HCCL_DATA_TYPE_BFP16:
+            return 2;
+        case HCCL_DATA_TYPE_INT32:
+        case HCCL_DATA_TYPE_FP32:
+            return 4;
+        default:
+            return 0;
+    }
+}
+
+float Float16ToFloat(uint16_t bits)
+{
+    uint32_t sign = (bits >> 15) & 0x1;
+    uint32_t exponent = (bits >> 10) & 0x1F;
+    uint32_t mantissa = bits & 0x3FF;
+    uint32_t floatBits = sign << 31;
+    if (exponent == 0) {
+        if (mantissa != 0) {
+            exponent = 1;
+            while ((mantissa & 0x400) == 0) {
+                mantissa <<= 1;
+                exponent--;
+            }
+            mantissa &= 0x3FF;
+            floatBits |= (127 + exponent - 14) << 23;
+            floatBits |= mantissa << 13;
+        }
+    } else if (exponent == 0x1F) {
+        floatBits |= 0x7F800000 | (mantissa << 13);
+    } else {
+        floatBits |= (exponent + 127 - 15) << 23;
+        floatBits |= mantissa << 13;
+    }
+    float result;
+    std::memcpy(&result, &floatBits, sizeof(float));
+    return result;
+}
+
+uint16_t FloatToFloat16(float value)
+{
+    uint32_t floatBits;
+    std::memcpy(&floatBits, &value, sizeof(float));
+    uint16_t sign = (floatBits >> 16) & 0x8000;
+    int32_t exponent = ((floatBits >> 23) & 0xFF) - 127 + 15;
+    uint32_t mantissa = floatBits & 0x7FFFFF;
+    if (exponent <= 0) {
+        if (exponent < -10) {
+            return sign;
+        }
+        mantissa |= 0x800000;
+        uint16_t rounded = static_cast<uint16_t>(mantissa >> (14 - exponent));
+        return sign | rounded;
+    } else if (exponent >= 0x1F) {
+        return sign | 0x7C00 | (mantissa ? 0x200 : 0);
+    } else {
+        return sign | (exponent << 10) | static_cast<uint16_t>(mantissa >> 13);
+    }
+}
+
+float Bfloat16ToFloat(uint16_t bits)
+{
+    uint32_t floatBits = static_cast<uint32_t>(bits) << 16;
+    float result;
+    std::memcpy(&result, &floatBits, sizeof(float));
+    return result;
+}
+
+uint16_t FloatToBfloat16(float value)
+{
+    uint32_t floatBits;
+    std::memcpy(&floatBits, &value, sizeof(float));
+    uint32_t rounded = floatBits + 0x7FFF + ((floatBits >> 16) & 1);
+    return static_cast<uint16_t>(rounded >> 16);
+}
+
+template <typename T>
+void ReduceElement(T& dst, T src, HcclReduceOp op)
+{
+    switch (op) {
+        case HCCL_REDUCE_SUM:
+            dst += src;
+            break;
+        case HCCL_REDUCE_PROD:
+            dst *= src;
+            break;
+        case HCCL_REDUCE_MAX:
+            dst = std::max(dst, src);
+            break;
+        case HCCL_REDUCE_MIN:
+            dst = std::min(dst, src);
+            break;
+        default:
+            break;
+    }
+}
+
 void ApplyReduce(
     std::vector<uint8_t>& dst, uint64_t dstOffset, const std::vector<uint8_t>& src, uint64_t srcOffset, uint64_t size,
     HcclDataType dataType, HcclReduceOp reduceOp)
 {
-    // TODO: 实现 reduce 逻辑（SUM/MAX/MIN/PROD），当前只支持纯拷贝
-    ApplyCopy(dst, dstOffset, src, srcOffset, size);
+    const uint32_t elemSize = DataTypeSize(dataType);
+    if (elemSize == 0 || size % elemSize != 0) {
+        ApplyCopy(dst, dstOffset, src, srcOffset, size);
+        return;
+    }
+    const uint64_t elemCount = size / elemSize;
+    for (uint64_t i = 0; i < elemCount; ++i) {
+        const size_t dstPos = static_cast<size_t>(dstOffset + i * elemSize);
+        const size_t srcPos = static_cast<size_t>(srcOffset + i * elemSize);
+        switch (dataType) {
+            case HCCL_DATA_TYPE_INT8:
+                ReduceElement(reinterpret_cast<int8_t&>(dst[dstPos]),
+                              reinterpret_cast<const int8_t&>(src[srcPos]), reduceOp);
+                break;
+            case HCCL_DATA_TYPE_FP16: {
+                uint16_t dstBits;
+                uint16_t srcBits;
+                std::memcpy(&dstBits, &dst[dstPos], sizeof(uint16_t));
+                std::memcpy(&srcBits, &src[srcPos], sizeof(uint16_t));
+                float dstFloat = Float16ToFloat(dstBits);
+                float srcFloat = Float16ToFloat(srcBits);
+                ReduceElement(dstFloat, srcFloat, reduceOp);
+                dstBits = FloatToFloat16(dstFloat);
+                std::memcpy(&dst[dstPos], &dstBits, sizeof(uint16_t));
+                break;
+            }
+            case HCCL_DATA_TYPE_BFP16: {
+                uint16_t dstBits;
+                uint16_t srcBits;
+                std::memcpy(&dstBits, &dst[dstPos], sizeof(uint16_t));
+                std::memcpy(&srcBits, &src[srcPos], sizeof(uint16_t));
+                float dstFloat = Bfloat16ToFloat(dstBits);
+                float srcFloat = Bfloat16ToFloat(srcBits);
+                ReduceElement(dstFloat, srcFloat, reduceOp);
+                dstBits = FloatToBfloat16(dstFloat);
+                std::memcpy(&dst[dstPos], &dstBits, sizeof(uint16_t));
+                break;
+            }
+            case HCCL_DATA_TYPE_INT32:
+                ReduceElement(reinterpret_cast<int32_t&>(dst[dstPos]),
+                              reinterpret_cast<const int32_t&>(src[srcPos]), reduceOp);
+                break;
+            case HCCL_DATA_TYPE_FP32:
+                ReduceElement(reinterpret_cast<float&>(dst[dstPos]),
+                              reinterpret_cast<const float&>(src[srcPos]), reduceOp);
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 } // namespace
