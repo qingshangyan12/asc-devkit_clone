@@ -14,11 +14,14 @@
 
 namespace {
 
+template <typename... Types>
+using void_t = void;
+
 template <typename T, typename = void>
 struct has_mask_member : AscendC::Std::false_type {};
 
 template <typename T>
-struct has_mask_member<T, AscendC::Std::void_t<decltype(&T::mask)>> : AscendC::Std::true_type {};
+struct has_mask_member<T, void_t<decltype(&T::mask)>> : AscendC::Std::true_type {};
 
 template <typename tensor_type, typename coord_type, typename = void>
 struct has_reg_load : AscendC::Std::false_type {};
@@ -26,9 +29,9 @@ struct has_reg_load : AscendC::Std::false_type {};
 template <typename tensor_type, typename coord_type>
 struct has_reg_load<
     tensor_type, coord_type,
-    AscendC::Std::void_t<decltype(AscendC::Std::declval<const tensor_type&>()
-                             .template load<asc::te::experimental::load_sideband_mode::direct>(
-                                 AscendC::Std::declval<const coord_type&>()))>> : AscendC::Std::true_type {};
+    void_t<decltype(AscendC::Std::declval<const tensor_type&>()
+                        .template load<asc::te::experimental::load_sideband_mode::direct>(
+                            AscendC::Std::declval<const coord_type&>()))>> : AscendC::Std::true_type {};
 
 template <typename T,
           asc::te::experimental::load_sideband_mode sideband_mode =
