@@ -46,7 +46,7 @@ __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
 
 ## 约束说明
 
-- 整数除数为`0`时结果未定义。浮点除数为`0`时按照浮点运算规则产生`inf`或`nan`。
+- 除数为`0`以及其他特殊值输入的计算结果请参见[Div特殊值/边界值输入的计算结果说明](../../../../appendix/reg_vector_compute_interface_boundary_value_summary.md#table1325925915217)。
 - 标量位于左侧时执行`scalar / reg`，操作数顺序不会交换。
 
 ## 调用示例

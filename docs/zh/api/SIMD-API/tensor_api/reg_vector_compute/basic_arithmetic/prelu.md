@@ -20,8 +20,8 @@
 
 $$
 dst_i = \begin{cases}
-src_i, & src_i \ge 0 \\
-src_i \times slope_i, & src_i < 0
+src_i, & src_i > 0 \\
+src_i \times slope_i, & src_i \le 0
 \end{cases}
 $$
 
@@ -39,15 +39,16 @@ __simd_callee__ inline reg_tensor<T> prelu(
 | --- | --- | --- |
 | `T` | 模板参数 | 输入、斜率和返回值的元素类型，支持`half`、`float`。 |
 | `src_reg` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src_reg.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| `slope` | 输入 | 负数区间使用的逐元素斜率，类型为`reg_tensor<T>`。`slope.mask`不用于本次计算。 |
+| `slope` | 输入 | `src_reg`中对应元素小于等于`0`时使用的逐元素斜率，类型为`reg_tensor<T>`。`slope.mask`不用于本次计算。 |
 
 ## 返回值说明
 
-返回`reg_tensor<T>`。`src_reg`中的元素大于等于`0`时，`reg`保存原值，否则保存该元素与`slope`对应元素的乘积。`src_reg.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src_reg.mask`相同。
+返回`reg_tensor<T>`。`src_reg`中的元素大于`0`时，`reg`保存原值，否则保存该元素与`slope`对应元素的乘积。`src_reg.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src_reg.mask`相同。
 
 ## 约束说明
 
-计算只使用`src_reg.mask`，不使用`slope.mask`。
+- 输入为`-0`时按负数处理，并按照IEEE 754浮点乘法规则与`slope`中的对应元素相乘。
+- 计算只使用`src_reg.mask`，不使用`slope.mask`。
 
 ## 调用示例
 

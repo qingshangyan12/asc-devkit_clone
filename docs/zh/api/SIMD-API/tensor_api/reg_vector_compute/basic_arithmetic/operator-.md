@@ -44,6 +44,7 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b)
 ## 约束说明
 
 - 整型减法溢出时按环绕策略处理。
+- 浮点减法按照IEEE 754浮点减法规则执行。
 - 标量位于左侧时执行`scalar - reg`，操作数顺序不会交换。
 
 ## 调用示例

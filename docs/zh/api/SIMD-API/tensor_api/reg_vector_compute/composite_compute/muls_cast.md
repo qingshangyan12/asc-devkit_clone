@@ -42,7 +42,7 @@ __simd_callee__ inline decltype(auto) muls_cast(
 
 ## 约束说明
 
-返回值采用偶数位置布局，不能按连续`half`数据解释。
+转换结果写入返回值的偶数位置，奇数位置置零。
 
 ## 调用示例
 
