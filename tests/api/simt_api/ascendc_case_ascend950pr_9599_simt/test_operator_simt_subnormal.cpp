@@ -113,3 +113,120 @@ TEST_F(FloatSubnormalTestsuite, InternalPreciseSqrtFloatCommon)
     EXPECT_NEAR(std::sqrt(static_cast<float>(scaled)), __internal_sqrtf_precise_impl(scaled), 1e-6f);
     EXPECT_NEAR(std::sqrt(static_cast<float>(normal)), __internal_sqrtf_precise_impl(normal), 1e-6f);
 }
+
+TEST_F(FloatSubnormalTestsuite, Log2Float)
+{
+    volatile float denormMin = std::numeric_limits<float>::denorm_min();
+    volatile float minNormal = std::numeric_limits<float>::min();
+    volatile float half = 0.5f;
+    volatile float normal = 3.5f;
+    volatile float zero = 0.0f;
+    volatile float negative = -1.0f;
+    volatile float inf = ASCRT_INF_F;
+    volatile float nan = ASCRT_NAN_F;
+
+    EXPECT_NEAR(std::log2(static_cast<float>(denormMin)), log2f(denormMin), 1e-4f);
+    EXPECT_NEAR(std::log2(static_cast<float>(minNormal)), log2f(minNormal), 1e-4f);
+    EXPECT_NEAR(std::log2(static_cast<float>(half)), log2f(half), 1e-6f);
+    EXPECT_NEAR(std::log2(static_cast<float>(normal)), log2f(normal), 1e-5f);
+    EXPECT_TRUE(std::isinf(log2f(zero)));
+    EXPECT_LT(log2f(zero), 0.0f);
+    EXPECT_TRUE(std::isnan(log2f(negative)));
+    EXPECT_TRUE(std::isinf(log2f(inf)));
+    EXPECT_GT(log2f(inf), 0.0f);
+    EXPECT_TRUE(std::isnan(log2f(nan)));
+}
+
+TEST_F(FloatSubnormalTestsuite, InternalLog2PositiveFiniteFloat)
+{
+    volatile float denormMin = std::numeric_limits<float>::denorm_min();
+    volatile float minNormal = std::numeric_limits<float>::min();
+    volatile float normal = 1.25f;
+    float log2Hi = 0.0f;
+    float log2Lo = 0.0f;
+
+    __internal_log2f_positive_finite(denormMin, log2Hi, log2Lo);
+    EXPECT_NEAR(std::log2(static_cast<float>(denormMin)), log2Hi + log2Lo, 1e-4f);
+
+    __internal_log2f_positive_finite(minNormal, log2Hi, log2Lo);
+    EXPECT_NEAR(std::log2(static_cast<float>(minNormal)), log2Hi + log2Lo, 1e-4f);
+
+    __internal_log2f_positive_finite(normal, log2Hi, log2Lo);
+    EXPECT_NEAR(std::log2(static_cast<float>(normal)), log2Hi + log2Lo, 1e-5f);
+}
+
+TEST_F(FloatSubnormalTestsuite, Exp2Float)
+{
+    volatile float negative = -4.25f;
+    volatile float positive = 3.5f;
+    volatile float zero = 0.0f;
+    volatile float overflowInput = 153.0f;
+    volatile float underflowInput = -153.0f;
+    volatile float positiveInf = ASCRT_INF_F;
+    volatile float negativeInf = -ASCRT_INF_F;
+    volatile float nan = ASCRT_NAN_F;
+
+    EXPECT_NEAR(std::exp2(static_cast<float>(negative)), exp2f(negative), 1e-7f);
+    EXPECT_NEAR(std::exp2(static_cast<float>(positive)), exp2f(positive), 1e-4f);
+    EXPECT_FLOAT_EQ(1.0f, exp2f(zero));
+    EXPECT_TRUE(std::isinf(exp2f(overflowInput)));
+    EXPECT_FLOAT_EQ(0.0f, exp2f(underflowInput));
+    EXPECT_TRUE(std::isinf(exp2f(positiveInf)));
+    EXPECT_FLOAT_EQ(0.0f, exp2f(negativeInf));
+    EXPECT_TRUE(std::isnan(exp2f(nan)));
+}
+
+TEST_F(FloatSubnormalTestsuite, InternalExp2ReconstructFloat)
+{
+    EXPECT_NEAR(std::exp2(2.25f), __internal_exp2f_reconstruct(2.0f, 0.25f), 1e-5f);
+    EXPECT_NEAR(std::exp2(-3.5f), __internal_exp2f_reconstruct(-3.0f, -0.5f), 1e-7f);
+    EXPECT_FLOAT_EQ(1.0f, __internal_exp2f_finite(0.0f));
+    EXPECT_TRUE(std::isinf(__internal_exp2f_reconstruct(153.0f, 0.0f)));
+    EXPECT_FLOAT_EQ(0.0f, __internal_exp2f_reconstruct(-153.0f, 0.0f));
+}
+
+TEST_F(FloatSubnormalTestsuite, PowFloat)
+{
+    volatile float denormMin = std::numeric_limits<float>::denorm_min();
+    volatile float negativeZero = -0.0f;
+    volatile float negativeBase = -2.0f;
+    volatile float nonIntegerExponent = 2.5f;
+    volatile float positiveInf = ASCRT_INF_F;
+    volatile float negativeInf = -ASCRT_INF_F;
+    volatile float nan = ASCRT_NAN_F;
+
+    EXPECT_NEAR(std::pow(2.0f, -3.0f), powf(2.0f, -3.0f), 1e-6f);
+    EXPECT_NEAR(std::pow(1.00097656f, 7.25f), powf(1.00097656f, 7.25f), 1e-6f);
+    EXPECT_FLOAT_EQ(1.0f, powf(nan, 0.0f));
+    EXPECT_FLOAT_EQ(1.0f, powf(1.0f, nan));
+    EXPECT_TRUE(std::isnan(powf(nan, 2.0f)));
+    EXPECT_FLOAT_EQ(-8.0f, powf(negativeBase, 3.0f));
+    EXPECT_FLOAT_EQ(16.0f, powf(negativeBase, 4.0f));
+    EXPECT_TRUE(std::isnan(powf(negativeBase, nonIntegerExponent)));
+    EXPECT_TRUE(std::isinf(powf(negativeZero, -3.0f)));
+    EXPECT_TRUE(std::signbit(powf(negativeZero, -3.0f)));
+    EXPECT_FLOAT_EQ(0.0f, powf(negativeZero, 2.0f));
+    EXPECT_FALSE(std::signbit(powf(negativeZero, 2.0f)));
+    EXPECT_FLOAT_EQ(1.0f, powf(-1.0f, positiveInf));
+    EXPECT_FLOAT_EQ(0.0f, powf(0.5f, positiveInf));
+    EXPECT_TRUE(std::isinf(powf(0.5f, negativeInf)));
+    EXPECT_NEAR(std::pow(static_cast<float>(denormMin), 0.5f), powf(denormMin, 0.5f), 1e-22f);
+}
+
+TEST_F(FloatSubnormalTestsuite, CopySignFloat)
+{
+    float negativeZero = copysignf(0.0f, -1.0f);
+    float positiveZero = copysignf(-0.0f, 1.0f);
+    float negativeValue = copysignf(2.0f, -0.0f);
+    float positiveValue = copysignf(-2.0f, 0.0f);
+
+    EXPECT_FLOAT_EQ(0.0f, negativeZero);
+    EXPECT_TRUE(std::signbit(negativeZero));
+    EXPECT_FLOAT_EQ(0.0f, positiveZero);
+    EXPECT_FALSE(std::signbit(positiveZero));
+    EXPECT_FLOAT_EQ(-2.0f, negativeValue);
+    EXPECT_TRUE(std::signbit(negativeValue));
+    EXPECT_FLOAT_EQ(2.0f, positiveValue);
+    EXPECT_FALSE(std::signbit(positiveValue));
+    EXPECT_TRUE(std::signbit(__internal_with_sign_bit(1.0f, -0.0f)));
+}
