@@ -34,7 +34,8 @@ public:
 
     // 现在的RunAsync就是之前的GenExtIns
     HcclResult KernelRun(
-        const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource) override;
+        const OpParam& param, const TemplateDataParams& tempAlgParams,
+        const TemplateResource& templateResource) override;
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         AlgResourceRequest& resourceRequest) override;
@@ -48,15 +49,38 @@ private:
     void GetNotifyIdxClosToMain(std::vector<u32>& notifyIdxSubToMain);
     void GetNotifyIdxMainToFullMesh(std::vector<u32>& notifyIdxMianToSub);
     void GetNotifyIdxFullMeshToMain(std::vector<u32>& notifyIdxSubToMain);
-    HcclResult
-    InitParam(const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource);
+    HcclResult InitParam(
+        const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource);
     HcclResult GetBoardSendRecvMatrix(u32 n, std::vector<std::vector<u32>>& sendRecvMatrix);
     HcclResult GetRankSendRecvMatrix(u32 board1, u32 board2, std::vector<std::vector<u32>>& rankSendRecvMatrix);
     HcclResult GetRankNumPerBoard(const TemplateResource& templateResource);
     HcclResult CheckPathNum(const TemplateResource& templateResource);
+    HcclResult RunFullMeshSelfCopy(
+        const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource, u32 targetRank,
+        u32 fullMeshThreadId);
+    HcclResult RunFullMeshPeer(
+        const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource, u32 targetRank,
+        u32 fullMeshThreadId);
     HcclResult RunFullMesh(const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource);
-    HcclResult
-    RunPairwise(const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource, u32 targetBoard);
+    HcclResult RunPairwiseStep(const std::vector<ThreadHandle>& threads);
+    HcclResult RunPairwiseChannel(
+        const TemplateDataParams& tempAlgParams, const std::vector<ChannelInfo>& channelSendRecv,
+        const std::vector<ThreadHandle>& threads, u32 targetRank, u32 channelIndex, u64& innerSendOffset,
+        u64& innerRecvOffset, u64 curSendDataCount, u64 curRecvDataCount);
+    HcclResult RunPairwiseTransfer(
+        const ChannelInfo& channel, const std::vector<ThreadHandle>& threads, u32 queId,
+        const std::vector<DataSlice>& txSrcSlices, const std::vector<DataSlice>& txDstSlices,
+        const std::vector<DataSlice>& rxSrcSlices, const std::vector<DataSlice>& rxDstSlices, u64 sendDataSize,
+        u64 recvDataSize);
+    void SavePairwiseLocalCopy(const TemplateDataParams& tempAlgParams, u32 targetRank, u64 curRecvDataCount);
+    HcclResult RunPairwise(
+        const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource, u32 targetBoard);
+    HcclResult InitRankAndDataType(const OpParam& param);
+    HcclResult InitBoardState(const TemplateResource& templateResource);
+    void InitDataState(const TemplateDataParams& tempAlgParams);
+    HcclResult InitThreadState(const TemplateResource& templateResource);
+    void LogInitState();
+    void LogDataSlices(const TemplateDataParams& tempAlgParams);
 
     u64 dataTypeSize_{0};
     bool isDmaRead_{false};
