@@ -34,19 +34,15 @@ __simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src_reg)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `T` | 模板参数 | 输入和返回值的元素类型，支持`int8_t`、`int16_t`、`half`、`int32_t`、`float`。 |
-| `src_reg` | 输入 | 待取负的`reg_tensor<T>`。 |
+| `src_reg` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src_reg.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
 
 ## 返回值说明
 
-返回`reg_tensor<T>`：
-
-- `reg`：有效元素为`-src_reg.reg`，无效元素置零。
-- `mask`：等于`src_reg.mask`。
+返回`reg_tensor<T>`。`reg`保存逐元素取负结果，`src_reg.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src_reg.mask`相同。
 
 ## 约束说明
 
-- 接口不会扩展整数结果的类型。对有符号整数的最小值取负时发生非饱和截断，例如
-  `-int8_t(-128)`的结果仍为`int8_t(-128)`。
+无。
 
 ## 调用示例
 

@@ -22,7 +22,7 @@ $$
 dst_i = e^{(src0_i - src1_i)}
 $$
 
-`float`输入按连续元素计算。`half`输入可以通过`ASC_POSITION_EVEN`或`ASC_POSITION_ODD`选择参与计算的偶数位置或奇数位置；未指定位置时默认选择偶数位置。
+`float`输入按连续元素计算。`half`输入可以通过`ASC_POSITION_EVEN`或`ASC_POSITION_ODD`选择参与计算的偶数位置或奇数位置，未指定位置时默认选择偶数位置。
 
 ## 函数原型
 
@@ -40,8 +40,8 @@ __simd_callee__ inline reg_tensor<float> exp_diff(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `src0` | 输入 | 被减数，同时提供执行mask。 |
-| `src1` | 输入 | 减数。 |
+| `src0` | 输入 | 被减数，类型为`reg_tensor<float>`或`reg_tensor<half>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `src1` | 输入 | 减数，类型与`src0`相同。`src1.mask`不用于本次计算。 |
 | `src_pos` | 输入 | `half`输入的位置选择，支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`。 |
 
 ## 支持的数据类型
@@ -53,12 +53,11 @@ __simd_callee__ inline reg_tensor<float> exp_diff(
 
 ## 返回值说明
 
-返回`reg_tensor<float>`，结果mask等于`src0.mask`。输入为`half`时，返回值中的每个元素对应所选位置上的一个输入元素。
+返回`reg_tensor<float>`。`reg`保存逐元素计算结果，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。输入为`half`时，返回值中的每个元素对应所选位置上的一个输入元素。
 
 ## 约束说明
 
-- 两个输入寄存器的元素类型必须一致。
-- 三参数形式仅支持`half`输入，`src_pos`仅支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`。
+三参数形式仅支持`half`输入，`src_pos`仅支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`。
 
 ## 调用示例
 

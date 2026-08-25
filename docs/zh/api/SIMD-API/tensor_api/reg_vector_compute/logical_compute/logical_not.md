@@ -16,7 +16,7 @@
 
 命名空间：`asc::te::experimental`。
 
-对输入寄存器中的有效元素逐位取反。`reg_tensor<bool>`对predicate位取反；其他类型对元素的二进制编码取反。
+对输入寄存器中参与计算的元素逐位取反。`reg_tensor<bool>`对布尔寄存器数据取反，其他类型对元素的二进制编码取反。
 
 $$
 dst_i = \mathord{\sim}src_i
@@ -34,15 +34,15 @@ __simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `T` | 模板参数 | 输入和返回值的元素类型，支持`bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。 |
-| `src` | 输入 | 待取反的寄存器，同时提供执行mask。 |
+| `src` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
 
 ## 返回值说明
 
-返回`reg_tensor<T>`，结果mask等于`src.mask`。
+返回`reg_tensor<T>`。`reg`保存逐元素按位取反结果，`src.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src.mask`相同。
 
 ## 约束说明
 
-- 本接口不是数值零值判断。对于非`bool`类型，结果是输入二进制编码逐位取反后的同类型数据。
+本接口不是数值零值判断。对于非`bool`类型，结果是输入二进制编码逐位取反后的同类型数据。
 
 ## 调用示例
 

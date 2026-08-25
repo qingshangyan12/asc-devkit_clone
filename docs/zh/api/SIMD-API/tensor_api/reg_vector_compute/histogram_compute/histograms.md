@@ -48,12 +48,12 @@ __simd_callee__ inline reg_tensor<uint16_t> histograms(
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `options` | 模板参数 | 选择统计区间和统计模式。 |
-| `dst` | 输入 | `reg_tensor<uint16_t>`类型的统计初值。 |
-| `src` | 输入 | `reg_tensor<uint8_t>`类型的待统计数据，`src.mask`标识参与统计的元素。 |
+| `dst` | 输入 | 统计初值，类型为`reg_tensor<uint16_t>`。返回值的`mask`与`dst.mask`相同。 |
+| `src` | 输入 | 待统计数据，类型为`reg_tensor<uint8_t>`。`src.mask`用于标记参与统计的元素，对应位置为`1`时参与统计，为`0`时不参与统计。 |
 
 ## 返回值说明
 
-返回更新后的`reg_tensor<uint16_t>`。频率模式在`dst`上累加每个输入值的出现次数；累计模式累加不大于对应值的输入数量。结果mask等于`dst.mask`，参与统计的输入由`src.mask`决定。
+返回更新后的`reg_tensor<uint16_t>`。频率模式在`dst`上累加每个输入值的出现次数，累计模式累加不大于对应值的输入数量。返回值的`mask`与`dst.mask`相同。
 
 ## 约束说明
 

@@ -33,10 +33,10 @@ __simd_callee__ inline decltype(auto) operator|(const T& a, const U& b)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `a` | 输入 | 左操作数。非`bool`类型可以是寄存器或标量；为寄存器时优先使用`a.mask`。 |
-| `b` | 输入 | 右操作数。非`bool`类型可以是同类型寄存器或可转换标量；仅`b`为寄存器时使用`b.mask`。 |
+| `a` | 输入 | 左操作数，可以是`reg_tensor`或标量。`a`为`reg_tensor`时，`a.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `b` | 输入 | 右操作数，可以是与`a`元素类型相同的`reg_tensor`或可转换为该元素类型的标量。`a`为标量时，使用`b.mask`标记参与计算的元素。`a`和`b`均为`reg_tensor`时，`b.mask`不用于本次计算。 |
 
-`bool`类型要求`a`、`b`均为`reg_tensor<bool>`：`reg`保存predicate数据，执行mask取`a.mask`。
+`bool`类型要求`a`和`b`均为`reg_tensor<bool>`，接口使用`a.mask`标记参与计算的元素。
 
 ## 支持的数据类型
 
@@ -47,17 +47,13 @@ __simd_callee__ inline decltype(auto) operator|(const T& a, const U& b)
 
 ## 返回值说明
 
-返回与寄存器操作数元素类型相同的`reg_tensor`：
-
-- `reg`：有效元素保存两个操作数逐bit或的结果。普通矢量类型的无效元素置零；
-  `bool`使用predicate指令。
-- `mask`：包括`reg_tensor<bool>`在内，均等于第一个寄存器操作数的`mask`。
+返回与寄存器操作数元素类型相同的`reg_tensor`。`reg`保存逐元素按位或结果，计算所用的输入`mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与本次计算所用的输入`mask`相同。
 
 ## 约束说明
 
-- 构造`reg_tensor<bool>{maskValue}`只初始化对象的`mask`，不会生成predicate数据；作为操作数前，
-  `reg`必须已经由mask生成、加载或其他predicate计算接口写入。
-- 对浮点类型执行的是元素的二进制编码的按位或，不是数值逻辑或；结果可能为`nan`或其他特殊浮点值。
+- 构造`reg_tensor<bool>{maskValue}`只初始化对象的`mask`，不会生成布尔寄存器数据。作为操作数前，
+  `reg`必须已经由mask生成、加载或其他布尔计算接口写入。
+- 对浮点类型执行的是元素二进制编码的按位或，不是数值逻辑或，结果可能为`nan`或其他特殊浮点值。
 
 ## 调用示例
 

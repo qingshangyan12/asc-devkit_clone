@@ -1,4 +1,4 @@
-# add_c
+# addc
 
 ## 产品支持情况
 
@@ -16,37 +16,41 @@
 
 命名空间：`asc::te::experimental`。
 
-`add_c`包含以下两种逐元素加法重载：
+`addc`提供带进位输出加法，以及带进位输入和输出加法。
 
-- 三参数形式返回两个32位整数寄存器之和的低32位，并通过`carry`输出进位。
-- 四参数形式在计算中加入`carry_src`提供的进位输入，并通过`carry`输出新的进位。
+### 带进位输出加法
 
-计算公式如下：
+对`src0`和`src1`按元素求和，返回加法和的低32位，并通过`carry`输出每个元素产生的进位。
 
 $$
-\begin{aligned}
-\{carry_i, dst_i\} &= \{1'b0, src0_i\} + \{1'b0, src1_i\} \\
-\{carry_i, dst_i\} &= \{1'b0, src0_i\} + \{1'b0, src1_i\} + carry\_src_i
-\end{aligned}
+\{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, src1_i\}
+$$
+
+### 带进位输入和输出加法
+
+对`src0`、`src1`和`carry_src`中的输入进位按元素求和，返回加法和的低32位，并通过`carry`输出每个元素产生的新进位。
+
+$$
+\{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, src1_i\} + \{32'b0, carry\_src_i\}
 $$
 
 ## 函数原型
 
-### 仅输出进位
+### 带进位输出加法
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add_c(
+__simd_callee__ inline reg_tensor<T> addc(
     reg_tensor<bool>& carry,
     const reg_tensor<T>& src0,
     const reg_tensor<T>& src1)
 ```
 
-### 输入并输出进位
+### 带进位输入和输出加法
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add_c(
+__simd_callee__ inline reg_tensor<T> addc(
     reg_tensor<bool>& carry,
     const reg_tensor<T>& src0,
     const reg_tensor<T>& src1,
@@ -55,27 +59,38 @@ __simd_callee__ inline reg_tensor<T> add_c(
 
 ## 参数说明
 
+### 带进位输出加法
+
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `T` | 模板参数 | 输入和返回值的元素类型，支持`int32_t`、`uint32_t`。 |
-| `carry` | 输出 | 逐元素进位输出，类型为`reg_tensor<bool>`。`reg`保存进位，`mask`由接口写为`src0.mask`。 |
-| `src0` | 输入 | 第一个加数，类型为`reg_tensor<T>`，同时提供执行mask。 |
-| `src1` | 输入 | 第二个加数，类型为`reg_tensor<T>`；`src1.mask`不参与执行mask的选择。 |
-| `carry_src` | 输入 | 仅四参数形式使用。逐元素进位输入，类型为`reg_tensor<bool>`；接口读取其`reg`，其`mask`不参与执行mask的选择。 |
+| `carry` | 输出 | 进位输出，类型为`reg_tensor<bool>`。`carry.reg`保存每个元素的进位标志，产生进位时为`1`，否则为`0`。返回时`carry.mask`与`src0.mask`相同，用于标记哪些进位结果有效。 |
+| `src0` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `src1` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
+
+### 带进位输入和输出加法
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`int32_t`、`uint32_t`。 |
+| `carry` | 输出 | 进位输出，类型为`reg_tensor<bool>`。`carry.reg`保存每个元素的新进位标志，产生进位时为`1`，否则为`0`。返回时`carry.mask`与`src0.mask`相同，用于标记哪些进位结果有效。 |
+| `src0` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `src1` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
+| `carry_src` | 输入 | 进位输入，类型为`reg_tensor<bool>`。`carry_src.reg`保存每个元素的输入进位标志，`carry_src.mask`不用于本次计算。 |
 
 ## 返回值说明
 
-返回`reg_tensor<T>`：
+### 带进位输出加法
 
-- 三参数形式的`reg`保存`src0.reg + src1.reg`的低32位。
-- 四参数形式的`reg`保存`src0.reg + src1.reg + carry_src.reg`的低32位。
-- 返回值的`mask`等于`src0.mask`。
+返回`reg_tensor<T>`。`reg`保存`src0`与`src1`逐元素相加后的低32位，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。
 
-`carry.reg`保存本次加法的逐元素进位，产生进位时为`1`，否则为`0`；`carry.mask`等于`src0.mask`。
+### 带进位输入和输出加法
+
+返回`reg_tensor<T>`。`reg`保存`src0`、`src1`和输入进位逐元素相加后的低32位，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。
 
 ## 约束说明
 
-- 用于多字整数分段加法时，低位使用三参数形式，高位按照从低到高的顺序使用四参数形式传递进位。
+用于多字整数分段加法时，最低32位使用带进位输出加法，其余部分按照从低位到高位的顺序使用带进位输入和输出加法传递进位。
 
 ## 调用示例
 
@@ -85,7 +100,7 @@ __simd_callee__ inline reg_tensor<T> add_c(
 #include "tensor_api/tensor.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void add_c_example(
+__simd_vf__ inline void addc_example(
     InputTensor input0, InputTensor input1, OutputTensor output)
 {
     auto mask = asc::te::all_mask<uint32_t>();
@@ -95,9 +110,9 @@ __simd_vf__ inline void add_c_example(
     auto src1_high = input1.load(asc::te::make_coord(1, 0)).with_mask(mask);
 
     asc::te::reg_tensor<bool> carry_low;
-    auto low = asc::te::experimental::add_c(carry_low, src0_low, src1_low);
+    auto low = asc::te::experimental::addc(carry_low, src0_low, src1_low);
     asc::te::reg_tensor<bool> carry_high;
-    auto high = asc::te::experimental::add_c(carry_high, src0_high, src1_high, carry_low);
+    auto high = asc::te::experimental::addc(carry_high, src0_high, src1_high, carry_low);
 
     output.store(asc::te::make_coord(0, 0), low);
     output.store(asc::te::make_coord(1, 0), high);
