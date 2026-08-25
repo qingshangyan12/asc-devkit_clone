@@ -777,15 +777,14 @@ static HcclResult AcquireAlgResources(
         resCtxHost->kfcServerArgs.reserve(missionNum * KFC_SERVER_ARG_NUM);
         for (uint32_t missionIndex = 0; missionIndex < missionNum; ++missionIndex) {
             resCtxHost->kfcServerArgs.insert(
-                resCtxHost->kfcServerArgs.end(),
-                {opResCtx.xnAddr, opResCtx.ckeAddr, 1U, missionNum, missionIndex, 0U});
+                resCtxHost->kfcServerArgs.end(), {opResCtx.xnAddr, opResCtx.ckeAddr, 1U, missionNum, missionIndex, 0U});
         }
         resCtxHost->kfcServerArgSize = KFC_SERVER_ARG_NUM;
         HCCL_INFO(
             "[AcquireAlgResources] generated [%u] KFC mission args, argSize[%u], xnAddr[0x%llx], "
             "ckeAddr[0x%llx]",
-            missionNum, resCtxHost->kfcServerArgSize,
-            static_cast<unsigned long long>(opResCtx.xnAddr), static_cast<unsigned long long>(opResCtx.ckeAddr));
+            missionNum, resCtxHost->kfcServerArgSize, static_cast<unsigned long long>(opResCtx.xnAddr),
+            static_cast<unsigned long long>(opResCtx.ckeAddr));
 
         CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
         opParam.resCtx = *resCtxOut;

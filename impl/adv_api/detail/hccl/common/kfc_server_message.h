@@ -19,7 +19,7 @@ constexpr uint32_t KFC_MAX_MISSION_NUM = 2U;
 constexpr uint32_t KFC_SIGNAL_REGIONS_PER_MISSION = 2U;
 constexpr uint32_t KFC_SIGNAL_REGION_NUM = KFC_MAX_MISSION_NUM * KFC_SIGNAL_REGIONS_PER_MISSION;
 constexpr uint32_t KFC_COMMIT_REGION_INDEX = 0U;
-constexpr uint32_t KFC_DONE_REGION_INDEX = 1U;
+constexpr uint32_t KFC_WAIT_REGION_INDEX = 1U;
 
 enum KfcConcurrentAllGatherParamIndex : uint32_t {
     KFC_CONCURRENT_AG_OP_ID = 0,

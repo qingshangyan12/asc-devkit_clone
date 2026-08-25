@@ -516,7 +516,8 @@ static bool IsEndPointEqual(EndpointDesc& endPoint0, EndpointDesc& endPoint1)
            (memcmp(endPoint0.commAddr.eid, endPoint1.commAddr.eid, sizeof(endPoint0.commAddr.eid)) == 0);
 }
 
-static bool IsNhrJettyPortMatched(const EndpointDesc& localEndpoint, const EndpointDesc& remoteEndpoint, bool isIsolation)
+static bool IsNhrJettyPortMatched(
+    const EndpointDesc& localEndpoint, const EndpointDesc& remoteEndpoint, bool isIsolation)
 {
     constexpr u32 portIndex = 5U;
     constexpr u32 sharedPort = 127U;
@@ -635,8 +636,8 @@ HcclResult ProcessLinksForChannel(
 }
 
 static HcclResult ProcessLinksForNhrMultiJetty(
-    HcclComm comm, CommProtocol expectedProtocol, std::vector<CommLink>& linkList, u32 remoteRank,
-    uint32_t netLayer, std::vector<HcclChannelDesc>& channels, bool isIsolation)
+    HcclComm comm, CommProtocol expectedProtocol, std::vector<CommLink>& linkList, u32 remoteRank, uint32_t netLayer,
+    std::vector<HcclChannelDesc>& channels, bool isIsolation)
 {
 #ifndef AICPU_COMPILE
     constexpr u32 minIsolatedLinkCount = 8U;
@@ -734,6 +735,7 @@ HcclResult CalcChannelRequestNhrMultiJetty(
 {
 #ifndef AICPU_COMPILE
     channels.clear();
+    CHK_PTR_NULL(topoInfo);
     CHK_PRT_RET(
         subcommInfo.empty(), HCCL_ERROR("[CalcChannelRequestNhrMultiJetty] subcommInfo is empty."), HCCL_E_PARA);
     const u32 myRank = topoInfo->userRank;

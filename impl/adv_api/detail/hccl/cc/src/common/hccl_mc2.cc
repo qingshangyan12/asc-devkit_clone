@@ -475,16 +475,13 @@ CcuResult GetLaunchMissionNum(const AlgResourceCtxSerializable& resourceCtx, uin
     CHK_PRT_RET(resourceCtx.threads.empty(), HCCL_ERROR("empty ccu threads"), CCU_E_PARA);
     CHK_PRT_RET(resourceCtx.ccuKernels.empty(), HCCL_ERROR("empty ccu kernels"), CCU_E_PARA);
     CHK_PRT_RET(
-        resourceCtx.kfcServerArgSize != KFC_SERVER_ARG_NUM ||
-            resourceCtx.kfcServerArgs.size() < KFC_SERVER_ARG_NUM,
+        resourceCtx.kfcServerArgSize != KFC_SERVER_ARG_NUM || resourceCtx.kfcServerArgs.size() < KFC_SERVER_ARG_NUM,
         HCCL_ERROR("invalid kfcServerArgs, kfcServerArgSize[%u].", resourceCtx.kfcServerArgSize), CCU_E_PTR);
-    missionNum = static_cast<uint32_t>(
-        resourceCtx.kfcServerArgs[KFC_SERVER_MISSION_NUM_ARG_INDEX]);
+    missionNum = static_cast<uint32_t>(resourceCtx.kfcServerArgs[KFC_SERVER_MISSION_NUM_ARG_INDEX]);
     CHK_PRT_RET(
         missionNum == 0U || missionNum > KFC_SERVER_MAX_MISSION_NUM ||
             resourceCtx.kfcServerArgs.size() != missionNum * KFC_SERVER_ARG_NUM,
-        HCCL_ERROR(
-            "invalid mission layout, missionNum[%u], args[%zu]", missionNum, resourceCtx.kfcServerArgs.size()),
+        HCCL_ERROR("invalid mission layout, missionNum[%u], args[%zu]", missionNum, resourceCtx.kfcServerArgs.size()),
         CCU_E_PARA);
     const uint64_t xnAddr = resourceCtx.kfcServerArgs[KFC_SERVER_XN_ADDR_ARG_INDEX];
     const uint64_t ckeAddr = resourceCtx.kfcServerArgs[KFC_SERVER_CKE_ADDR_ARG_INDEX];
@@ -575,11 +572,11 @@ CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx)
         const ThreadHandle threadHandle = resourceCtx.threads[missionIndex];
         const CcuKernelHandle kernelHandle = resourceCtx.ccuKernels[missionIndex];
         CHK_PRT_RET(
-            threadHandle == 0 || kernelHandle == 0,
-            HCCL_ERROR("invalid launch handles for mission[%u]", missionIndex), CCU_E_PARA);
+            threadHandle == 0 || kernelHandle == 0, HCCL_ERROR("invalid launch handles for mission[%u]", missionIndex),
+            CCU_E_PARA);
         LogKernelLaunchArgs(resourceCtx, missionIndex, threadHandle, kernelHandle);
-        const void* kfcArgs = static_cast<const void*>(
-            resourceCtx.kfcServerArgs.data() + missionIndex * KFC_SERVER_ARG_NUM);
+        const void* kfcArgs =
+            static_cast<const void*>(resourceCtx.kfcServerArgs.data() + missionIndex * KFC_SERVER_ARG_NUM);
         ret = HcommCcuKernelLaunch(threadHandle, kernelHandle, kfcArgs, resourceCtx.kfcServerArgSize);
         if (ret != CCU_SUCCESS) {
             HCCL_ERROR("[CcuKernelLaunch] mission[%u] launch failed, ret[%d]", missionIndex, ret);

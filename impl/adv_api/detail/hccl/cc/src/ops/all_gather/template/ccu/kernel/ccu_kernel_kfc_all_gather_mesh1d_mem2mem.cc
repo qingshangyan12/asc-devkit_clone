@@ -180,10 +180,9 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     InitCcuKernelCtxBase(ctx);
 
     CCU_CHK_RET(InitResource(ctx));
-    CCU_CHK_RET(
-        LoadArgs(
-            ctx, inputAddr, outputAddr, tokenInfo, outputOffset, sliceSize, goSize0, goSize1, goSize2, goSize3,
-            isInputOutputEqual));
+    CCU_CHK_RET(LoadArgs(
+        ctx, inputAddr, outputAddr, tokenInfo, outputOffset, sliceSize, goSize0, goSize1, goSize2, goSize3,
+        isInputOutputEqual));
     CCU_CHK_RET(PreSync(ctx));
     CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
