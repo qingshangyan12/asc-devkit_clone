@@ -12900,11 +12900,11 @@
     ]
   },
   {
-    "case": "02_simd_c_api/02_features/03_c_api/00_vector_compute/00_sync_add",
-    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/00_vector_compute/00_sync_add/run.sh",
+    "case": "02_simd_c_api/02_features/00_sync_and_async/00_sync_add",
+    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/00_sync_and_async/00_sync_add/run.sh",
     "source": "readme",
     "confidence": "high",
-    "source_case": "02_simd_c_api/02_features/03_c_api/00_vector_compute/00_sync_add",
+    "source_case": "02_simd_c_api/02_features/00_sync_and_async/00_sync_add",
     "supported_archs": [
       "dav-2201"
     ],
@@ -12923,11 +12923,11 @@
     ]
   },
   {
-    "case": "02_simd_c_api/02_features/03_c_api/00_vector_compute/01_async_add",
-    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/00_vector_compute/01_async_add/run.sh",
+    "case": "02_simd_c_api/02_features/00_sync_and_async/01_async_add",
+    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/00_sync_and_async/01_async_add/run.sh",
     "source": "readme",
     "confidence": "high",
-    "source_case": "02_simd_c_api/02_features/03_c_api/00_vector_compute/01_async_add",
+    "source_case": "02_simd_c_api/02_features/00_sync_and_async/01_async_add",
     "supported_archs": [
       "dav-2201"
     ],
@@ -12946,11 +12946,11 @@
     ]
   },
   {
-    "case": "02_simd_c_api/02_features/03_c_api/00_vector_compute/02_c_api_delicacy_async_add",
-    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/00_vector_compute/02_c_api_delicacy_async_add/run.sh",
+    "case": "02_simd_c_api/02_features/00_sync_and_async/02_c_api_delicacy_async_add",
+    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/00_sync_and_async/02_c_api_delicacy_async_add/run.sh",
     "source": "readme",
     "confidence": "high",
-    "source_case": "02_simd_c_api/02_features/03_c_api/00_vector_compute/02_c_api_delicacy_async_add",
+    "source_case": "02_simd_c_api/02_features/00_sync_and_async/02_c_api_delicacy_async_add",
     "supported_archs": [
       "dav-2201"
     ],
@@ -12969,11 +12969,11 @@
     ]
   },
   {
-    "case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_1",
-    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_1/run.sh",
+    "case": "02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode__scenario_1",
+    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode__scenario_1/run.sh",
     "source": "readme",
     "confidence": "medium",
-    "source_case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode",
+    "source_case": "02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode",
     "supported_archs": [
       "dav-3510"
     ],
@@ -12996,11 +12996,11 @@
     ]
   },
   {
-    "case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_2",
-    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_2/run.sh",
+    "case": "02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode__scenario_2",
+    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode__scenario_2/run.sh",
     "source": "readme",
     "confidence": "medium",
-    "source_case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode",
+    "source_case": "02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode",
     "supported_archs": [
       "dav-3510"
     ],
@@ -13023,11 +13023,11 @@
     ]
   },
   {
-    "case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_3",
-    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_3/run.sh",
+    "case": "02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode__scenario_3",
+    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode__scenario_3/run.sh",
     "source": "readme",
     "confidence": "medium",
-    "source_case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode",
+    "source_case": "02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode",
     "supported_archs": [
       "dav-3510"
     ],
@@ -13050,11 +13050,11 @@
     ]
   },
   {
-    "case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_4",
-    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode__scenario_4/run.sh",
+    "case": "02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode__scenario_4",
+    "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode__scenario_4/run.sh",
     "source": "readme",
     "confidence": "medium",
-    "source_case": "02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode",
+    "source_case": "02_simd_c_api/02_features/01_data_movement/00_set_l2_cache_mode",
     "supported_archs": [
       "dav-3510"
     ],
