@@ -27,15 +27,24 @@
 
 __aicore__ inline void asc_sync_data_barrier_impl(mem_dsb_t arg)
 {
-    if (arg == mem_dsb_t::DSB_ALL) {
-        dsb(mem_dsb_t::DSB_ALL);
-    } else if (arg == mem_dsb_t::DSB_DDR) {
-        dsb(mem_dsb_t::DSB_DDR);
-    } else if (arg == mem_dsb_t::DSB_UB) {
-        dsb(mem_dsb_t::DSB_UB);
-    } else if (arg == mem_dsb_t::DSB_SEQ) {
-        dsb(mem_dsb_t::DSB_SEQ);
-    } else {
+    if ASC_IS_AIV {
+        if (arg == mem_dsb_t::DSB_ALL) {
+            dsb(mem_dsb_t::DSB_ALL);
+        } else if (arg == mem_dsb_t::DSB_DDR) {
+            dsb(mem_dsb_t::DSB_DDR);
+        } else if (arg == mem_dsb_t::DSB_UB) {
+            dsb(mem_dsb_t::DSB_UB);
+        } else if (arg == mem_dsb_t::DSB_SEQ) {
+            dsb(mem_dsb_t::DSB_SEQ);
+        }
+    } else if ASC_IS_AIC {
+        if (arg == mem_dsb_t::DSB_ALL) {
+            dsb(mem_dsb_t::DSB_ALL);
+        } else if (arg == mem_dsb_t::DSB_DDR) {
+            dsb(mem_dsb_t::DSB_DDR);
+        } else if (arg == mem_dsb_t::DSB_SEQ) {
+            dsb(mem_dsb_t::DSB_SEQ);
+        }
     }
 }
 
