@@ -186,7 +186,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logf(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_log2f_positive_finite(float x, float& log2_hi, float& log2_lo)
 {
-    constexpr float fp32_min_normal = 1.175494350822287508e-38f;  // Smallest normal fp32 value.
     constexpr float subnormal_scale = 16777216.0f;                // 2^24, lifts subnormal input to normal range.
     constexpr float subnormal_exponent_fix = -24.0f;              // Compensates the 2^24 subnormal scaling.
     constexpr float log_exponent_scale = 1.1920928955078125e-07f; // 2^-23, converts exponent bits to log2 units.
@@ -197,7 +196,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_log2f_positive_finite(floa
 
     // The polynomial is accurate only on a small range.  Subnormal inputs are scaled up first, then the
     // exponent compensation is added back through exponent_base.
-    const bool is_normal_x = x >= fp32_min_normal;
+    const bool is_normal_x = x >= __internal_subnormal_boundary;
     const float log_input = is_normal_x ? x : x * subnormal_scale;
     const float exponent_base = is_normal_x ? 0.0f : subnormal_exponent_fix;
     const uint32_t log_input_bits = __float_as_uint(log_input);
