@@ -34,6 +34,7 @@ set(HCCL_CHECKER_COMMON_INCLUDE_LIST
     ${ASCENDC_DIR}
     ${HCCL_CC_INCLUDE_DIR}
     ${HCCL_CC_INCLUDE_DIR}/hcomm
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/types
     ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
     ${HCCL_CHECKER_LOCAL_PKG_INC}
     ${HCCL_CHECKER_LOCAL_PKG_INC}/hccl
@@ -83,6 +84,11 @@ set(HCCL_CHECKER_COMMON_INCLUDE_LIST
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/aiv
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/kernel
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/executor
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/aicpu
     ${UTILS_DIR}/sim_world
     ${UTILS_DIR}/common/utils
     ${UTILS_DIR}/common/exception

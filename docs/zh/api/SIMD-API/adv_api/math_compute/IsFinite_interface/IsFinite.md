@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/math_compute/IsFinite_interface/IsFinite_res.md#id1 -->
 
 ## 功能说明
 
@@ -80,7 +81,7 @@ __aicore__ inline void IsFinite(const LocalTensor<U>& dst, const LocalTensor<T>&
 ## 约束说明
 
 -   **不支持源操作数与目的操作数地址重叠。**
--   操作数地址偏移对齐要求请参见[通用说明和约束](../../../通用说明和约束.md)。
+-   操作数地址偏移对齐要求请参见[通用说明和约束](../../../general_description_and_constraints.md)。
 
 ## 调用示例
 

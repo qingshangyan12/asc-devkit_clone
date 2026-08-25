@@ -156,8 +156,8 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md#section668772811100)。
 - 当输出类型为b8时，目的操作数数据类型需要和`SetDeqScale`接口的signMode入参配合，当signMode=true时输出数据类型int8_t；signMode=false时输出数据类型uint8_t。
 - halfBlock参数仅在输出数据为b8类型时有效。
 <!-- npu="A3,910b,950" id12 -->
@@ -176,9 +176,9 @@
   <!-- end id16 -->
 <!-- end id12 -->
 <!-- npu="950" id17 -->
-- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
-  - tensor高维切分计算接口占用8KB Unified Buffer临时空间。
-  - tensor前n个数据连续计算接口不涉及8KB Unified Buffer临时空间的占用。
+- 对Unified Buffer（UB）空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+  - tensor高维切分计算接口占用8KB UB临时空间。
+  - tensor前n个数据连续计算接口不涉及8KB UB临时空间的占用。
 <!-- end id17 -->
 - 当输入类型为int16_t，开启向量量化模式时，`SetDeqScale`接口需要传入至少128B大小的UB空间，若空间不足128B，可能导致精度错误。
 - 该接口需要与`SetDeqScale`配合使用，使用关系映射表如下：
@@ -186,9 +186,9 @@
   **表**  CastDequant与SetDeqScale使用关系映射表
   |CastDequant使用场景|对应使用的SetDeqScale函数原型|
   |---|---|
-  |输入类型为int16_t，关闭向量量化模式|<pre>\_\_aicore\_\_ inline void SetDeqScale(float scale, int16_t offset, bool signMode)</pre>|
-  |输入类型为int16_t，开启向量量化模式|<pre>template &lt;typename T&gt;<br>\_\_aicore\_\_ inline void SetDeqScale(const LocalTensor&lt;T&gt;& vdeq, const VdeqInfo& vdeqInfo)</pre>|
-  |输入类型为int32_t，输出数据类型为half类型|<pre>\_\_aicore\_\_ inline void SetDeqScale(half scale)</pre>|
+  |输入类型为int16_t，关闭向量量化模式|<br>\_\_aicore\_\_ inline void SetDeqScale(float scale, int16_t offset, bool signMode)|
+  |输入类型为int16_t，开启向量量化模式|<br>template &lt;typename T&gt;<br>\_\_aicore\_\_ inline void SetDeqScale(const LocalTensor&lt;T&gt;& vdeq, const VdeqInfo& vdeqInfo)|
+  |输入类型为int32_t，输出数据类型为half类型|<br>\_\_aicore\_\_ inline void SetDeqScale(half scale)|
 
 ## 关键特性
 

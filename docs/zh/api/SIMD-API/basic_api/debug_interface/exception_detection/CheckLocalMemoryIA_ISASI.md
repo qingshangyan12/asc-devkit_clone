@@ -27,7 +27,7 @@
 ## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
-check设定范围内的UB读写行为，如果有设定范围的读写行为则会出现EXCEPTION报错，无设定范围的读写行为则不会报错。
+check设定范围内的Unified Buffer（UB）读写行为，如果有设定范围的读写行为则会出现EXCEPTION报错，无设定范围的读写行为则不会报错。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -63,7 +63,7 @@ __aicore__ inline void CheckLocalMemoryIA(const CheckLocalMemoryIAParam& checkPa
 
 - startAddr/endAddr的单位是32B，check的范围不包含startAddr，包含endAddr，即(startAddr,endAddr]。
 - 每次调用完该接口需要进行复位（配置isEnable为false进行复位）。
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

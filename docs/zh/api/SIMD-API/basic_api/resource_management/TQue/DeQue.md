@@ -46,7 +46,7 @@
         __aicore__ inline LocalTensor<T> DeQue()
         ```
 
-    -   inplace接口：通过出参的方式返回，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](../../../../../guide/编程指南/附录/常用操作/如何使用Tensor原地操作提升算子性能.md)。
+    -   inplace接口：通过出参的方式返回，可以减少Tensor反复创建的开销，具体使用指导可参考[Tensor原地操作](../../../../../guide/programming_guide/appendix/common_operations/tensor_inplace_performance.md)。
 
         ```cpp
         template <typename T>
@@ -80,7 +80,7 @@
 </tr>
 <tr id="row1629562101416"><td class="cellrowborder" valign="top" width="12.139999999999999%" headers="mcps1.2.3.1.1 "><p id="p174916484213"><a name="p174916484213"></a><a name="p174916484213"></a>srcUserPos</p>
 </td>
-<td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p24912414422"><a name="p24912414422"></a><a name="p24912414422"></a>用户指定队列的src position，当前只支持如下通路：GM-&gt;UB（VECIN/VECOUT）-&gt;GM。</p>
+<td class="cellrowborder" valign="top" width="87.86%" headers="mcps1.2.3.1.2 "><p id="p24912414422"><a name="p24912414422"></a><a name="p24912414422"></a>用户指定队列的src position，当前只支持如下通路：GM-&gt;Unified Buffer（UB，VECIN/VECOUT）-&gt;GM。</p>
 </td>
 </tr>
 <tr id="row1780112318146"><td class="cellrowborder" valign="top" width="12.139999999999999%" headers="mcps1.2.3.1.1 "><p id="p1469019111420"><a name="p1469019111420"></a><a name="p1469019111420"></a>dstUserPos</p>
