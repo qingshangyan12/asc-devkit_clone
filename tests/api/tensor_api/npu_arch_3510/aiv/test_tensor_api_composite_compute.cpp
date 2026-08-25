@@ -28,7 +28,7 @@ void check_composite_compute()
         std::declval<const reg_type<T>&>(), std::declval<const T&>())), reg_type<T>>);
     static_assert(std::is_same_v<decltype(asc::te::experimental::abs_diff(
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(std::is_same_v<decltype(asc::te::experimental::exp_sub(
+    static_assert(std::is_same_v<decltype(asc::te::experimental::exp_diff(
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<float>>);
     static_assert(std::is_same_v<decltype(asc::te::experimental::fma(std::declval<const reg_type<T>&>(),
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<T>>);
@@ -38,10 +38,10 @@ TEST(test_tensor_api_composite_compute, compile_public_apis_and_supported_types)
 {
     check_composite_compute<half>();
     check_composite_compute<float>();
-    static_assert(std::is_same_v<decltype(asc::te::experimental::exp_sub(
+    static_assert(std::is_same_v<decltype(asc::te::experimental::exp_diff(
         std::declval<const reg_type<half>&>(), std::declval<const reg_type<half>&>(), ASC_POSITION_EVEN)),
         reg_type<float>>);
-    static_assert(std::is_same_v<decltype(asc::te::experimental::exp_sub(
+    static_assert(std::is_same_v<decltype(asc::te::experimental::exp_diff(
         std::declval<const reg_type<half>&>(), std::declval<const reg_type<half>&>(), ASC_POSITION_ODD)),
         reg_type<float>>);
     static_assert(std::is_same_v<decltype(asc::te::experimental::muls_cast(
