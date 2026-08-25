@@ -16,9 +16,9 @@
 
 ```text
 ├── reduce_sum
-│   ├── figures                             // README中的图片资源
-│   ├── CMakeLists.txt                      // 编译工程文件
-│   ├── reduce_sum.asc                      // 样例实现文件，含三个kernel与host侧调用
+│   ├── figures             // README中的图片资源
+│   ├── CMakeLists.txt     // 编译工程文件
+│   ├── reduce_sum.asc    // 样例实现文件，含三个kernel与host侧调用
 │   ├── README.md
 │   └── README_en.md
 ```
@@ -27,10 +27,10 @@
 
 ### 样例功能
 
-本样例给出了3种归约求和算子的写法，分别展现协作组从grid、thread block、Warp粒度控制线程协作的方式。并且将归约求和操作提炼为一个通用函数`reduce_sum`，通过传入不同的协作组对象实现不同粒度的归约操作，展现协作组的代码抽象能力。
+本样例提出了三种基于协作组的归约求和实现，分别以grid、thread block、Warp为粒度控制线程协作。同时，我们将归约的逻辑封装为通用函数`reduce_sum`，通过传入不同的协作组对象即可适配不同粒度，充分体现了协作组在代码抽象与复用方面的优势。
 ### 样例规格
 
-三个用例采用同一执行配置：grid为4个线程块，每个block为1024个线程（默认线程配置），共4096个线程，动态ubuf为0，核函数调用形式为`<<<dim3(4), dim3(1024), DYN_UBUF_SIZE, stream>>>`。
+三个用例采用同一执行配置：grid为4个线程块，每个block为1024个线程（默认线程配置），共4096个线程，动态ubuf为0。
 
 <table>
 <tr><td rowspan="1" align="center">样例类型（OpType）</td><td colspan="4" align="center">Cooperative Groups</td></tr>
@@ -116,7 +116,7 @@ __global__ void reduce_thread_block(const int32_t* input, int32_t* output, int32
 
 #### Case2：warp内归约
 
-**核心实现**：归约分两级完成。第一级以Warp为单位进行归约，每个线程块1024个线程，共32个Warp，得到32个中间结果，第二级由Warp 0对这32个中间结果进行归约，然后由其rank 0通过`asc_atomic_add`把本块的和累加到输出地址上。
+**核心实现**：归约分两级完成。第一级创建32个线程的thread_block_tile协作组，实现以Warp为单位进行归约。每个线程块1024个线程，共32个Warp，得到32个中间结果，第二级由Warp 0对这32个中间结果进行归约，然后由其rank 0通过`asc_atomic_add`把本块的和累加到输出地址上。
 
 **图 4**  Case2warp内归约
 
@@ -148,7 +148,7 @@ __global__ void reduce_block_tile(const int32_t* input, int32_t* output, int32_t
     }
 }
 ```
-`TILE_SIZE`取32即一个warp的宽度，使`tiled_partition<TILE_SIZE>(block)`划分出的每个子组恰好落在一个warp内。由于warp内的32个线程天然同步，`reduce_sum`接口中的`sync()`调用不需要真正完成等待，开销远小于要等齐1024个线程的block级屏障。
+`TILE_SIZE`取32即一个warp的宽度，使`tiled_partition<TILE_SIZE>(block)`划分出的每个子组恰好落在一个warp内。
 
 ## 性能对比
 
