@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
@@ -31,4 +32,18 @@ TEST_F(TestVectorComputeCumulativeHistogram, c_api_cumulative_histogram_Succ)
     MOCKER_CPP(chistv2, void(vector_u16&, vector_u8, vector_bool, uint32_t)).times(2).will(invoke(chistv2_Stub));
     asc_cumulative_histogram_bin0(dst, src, mask);
     asc_cumulative_histogram_bin1(dst, src, mask);
+}
+
+TEST_F(TestVectorComputeCumulativeHistogram, c_api_cumulative_histogram_ReturnValueSucc)
+{
+    vector_u16 dst{};
+    vector_u8 src{};
+    vector_bool mask{};
+    static_assert(std::is_same_v<decltype(asc_cumulative_histogram_bin0(dst, src, mask)), vector_u16>);
+    static_assert(std::is_same_v<decltype(asc_cumulative_histogram_bin1(dst, src, mask)), vector_u16>);
+    MOCKER_CPP(chistv2, void(vector_u16&, vector_u8, vector_bool, uint32_t)).times(2).will(invoke(chistv2_Stub));
+    vector_u16 result0 = asc_cumulative_histogram_bin0(dst, src, mask);
+    vector_u16 result1 = asc_cumulative_histogram_bin1(dst, src, mask);
+    (void)result0;
+    (void)result1;
 }
