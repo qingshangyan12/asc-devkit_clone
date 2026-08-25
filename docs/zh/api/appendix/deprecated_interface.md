@@ -149,7 +149,15 @@
 
     此接口后续版本会废弃。
 
-- [asc_storealign_pack_v2](../SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md)接口
+- [asc_storealign_pack_v2](../SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md)接口（无偏移量原型）
+
+    此接口后续版本会废弃，请使用[asc_storealign_pack_quarter](../SIMD-API/c_api/reg/reg_store/asc_storealign_pack_quarter.md)接口。
+
+- [asc_storealign_pack_v2](../SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md)接口（addr_reg偏移原型）
+
+    此接口后续版本会废弃，请使用[asc_storealign_pack_quarter](../SIMD-API/c_api/reg/reg_store/asc_storealign_pack_quarter.md)接口。
+
+- [asc_storealign_pack_v2](../SIMD-API/c_api/deprecated_interface/asc_storealign_v3_deprecated.md)接口（int32_t偏移原型）
 
     此接口后续版本会废弃，请使用[asc_storealign_pack_quarter](../SIMD-API/c_api/reg/reg_store/asc_storealign_pack_quarter.md)接口。
 
