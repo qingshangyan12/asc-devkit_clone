@@ -26,45 +26,46 @@
 
 ## 功能说明
 
-将src中的浮点数元素按照TRUNC（向零方向截断）截断到整数值，结果仍保持原浮点数据类型写入dst，截断规则等价于C标准库`trunc`语义：向零方向舍入，即丢弃小数部分取整，正数向0方向取整（如1.7 → 1.0），负数向0方向取整（如-1.7 → -1.0），整数值保持不变。未被mask筛选的元素置零。
+将`src`中的浮点数元素按照TRUNC（向零方向截断）截断到整数值，结果仍保持原浮点数据类型。接口支持通过函数返回值返回结果，也支持通过引用和参数输出结果：前者直接返回截断结果，后者将截断结果写入`dst`。截断规则等价于C标准库`trunc`语义：向零方向舍入，即丢弃小数部分取整，正数向0方向取整（如1.7 -> 1.0），负数向0方向取整（如-1.7 -> -1.0），整数值保持不变。未被`mask`筛选的元素置零。
 
 关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
 计算公式如下：
 
 $$
-dst[i] = trunc(src[i])
+result[i] = trunc(src[i])
 $$
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
-## 函数原型
-
 ## 函数原型（占位符形式）
 
-### 带返回值接口
-
-```c
+```cpp
+// 通过函数返回值返回结果
 __simd_callee__ inline vector_<dtype> asc_trunc(vector_<dtype> src,
                                                  vector_bool mask)
-```
 
-### 不带返回值接口（兼容形式）
-
-```c
+// 通过引用和参数输出结果
 __simd_callee__ inline void asc_trunc(vector_<dtype>& dst,
                                       vector_<dtype> src,
                                       vector_bool mask)
 ```
 
-**占位符说明如下：**
-- `<dtype>`支持`half`、`bfloat16_t`和`float`。
+### dtype支持数据类型
+
+`<dtype>`取值为：`half`、`bfloat16_t`、`float`。
 
 **典型示例**
 
-```c
+```cpp
+// 通过函数返回值返回结果
 __simd_callee__ inline vector_half asc_trunc(vector_half src,
                                               vector_bool mask)
+
+// 通过引用和参数输出结果
+__simd_callee__ inline void asc_trunc(vector_half& dst,
+                                      vector_half src,
+                                      vector_bool mask)
 ```
 
 ## 参数说明
@@ -81,15 +82,15 @@ __simd_callee__ inline vector_half asc_trunc(vector_half src,
 
 ## 返回值说明
 
-- 带返回值接口：返回`vector_half`、`vector_bfloat16_t`或`vector_float`类型的矢量数据寄存器，保存舍入结果。
-- 不带返回值接口（兼容形式）：无返回值，舍入结果写入`dst`。
+- 通过函数返回值返回结果：返回`vector_half`、`vector_bfloat16_t`或`vector_float`类型的矢量数据寄存器，保存舍入结果。
+- 通过引用和参数输出结果：无返回值，舍入结果写入`dst`。
 
 ## 约束说明
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与mask为矢量数据寄存器/掩码寄存器。
 - float类型只支持不饱和模式。
-W
+
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
