@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_data_move/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_data_move/asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。
+本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。
 
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
 
@@ -59,7 +59,7 @@ PIPE_S
 ## 约束说明
 
 - 本接口仅在AIC上生效，在AIV上调用将直接返回。
-- 调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_data_move/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_data_move/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND格式之前，必须先调用本接口配置格式转换参数。
+- 调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND格式之前，必须先调用本接口配置格式转换参数。
 
 <!-- npu="950" id8 -->
 ## 调用示例
