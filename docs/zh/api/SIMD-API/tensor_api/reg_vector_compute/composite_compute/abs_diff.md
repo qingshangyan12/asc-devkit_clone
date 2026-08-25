@@ -48,9 +48,19 @@ __simd_callee__ inline reg_tensor<T> abs_diff(
 
 ## 调用示例
 
+以下示例展示接口在AIV计算函数中的典型调用方式。
+
 ```cpp
-auto mask = asc::te::all_mask<float>();
-auto src0 = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto src1 = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto result = asc::te::experimental::abs_diff(src0, src1);
+#include "tensor_api/tensor.h"
+
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void abs_diff_example(
+    InputTensor input0, InputTensor input1, OutputTensor output)
+{
+    auto mask = asc::te::all_mask<float>();
+    auto src0 = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto src1 = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto result = asc::te::experimental::abs_diff(src0, src1);
+    output.store(asc::te::make_coord(0, 0), result);
+}
 ```

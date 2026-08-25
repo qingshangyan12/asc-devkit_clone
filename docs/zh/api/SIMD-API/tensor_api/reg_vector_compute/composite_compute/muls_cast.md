@@ -46,7 +46,16 @@ __simd_callee__ inline decltype(auto) muls_cast(
 
 ## 调用示例
 
+以下示例展示接口在AIV计算函数中的典型调用方式。
+
 ```cpp
-auto src = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<float>());
-auto result = asc::te::experimental::muls_cast(src, 1.5f);
+#include "tensor_api/tensor.h"
+
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void muls_cast_example(InputTensor input, OutputTensor output)
+{
+    auto src = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<float>());
+    auto result = asc::te::experimental::muls_cast(src, 1.5f);
+    output.store(asc::te::make_coord(0, 0), result);
+}
 ```

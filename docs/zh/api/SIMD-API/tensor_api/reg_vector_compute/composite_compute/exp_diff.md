@@ -62,10 +62,22 @@ __simd_callee__ inline reg_tensor<float> exp_diff(
 
 ## 调用示例
 
+以下示例展示`half`输入分别选择偶数位置和奇数位置的调用方式。
+
 ```cpp
-auto mask = asc::te::all_mask<half>();
-auto src0 = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto src1 = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto even = asc::te::experimental::exp_diff(src0, src1, ASC_POSITION_EVEN);
-auto odd = asc::te::experimental::exp_diff(src0, src1, ASC_POSITION_ODD);
+#include "tensor_api/tensor.h"
+
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void exp_diff_example(
+    InputTensor input0, InputTensor input1, OutputTensor output)
+{
+    auto mask = asc::te::all_mask<half>();
+    auto src0 = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto src1 = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto even = asc::te::experimental::exp_diff(src0, src1, ASC_POSITION_EVEN);
+    auto odd = asc::te::experimental::exp_diff(src0, src1, ASC_POSITION_ODD);
+
+    output.store(asc::te::make_coord(0, 0), even);
+    output.store(asc::te::make_coord(1, 0), odd);
+}
 ```

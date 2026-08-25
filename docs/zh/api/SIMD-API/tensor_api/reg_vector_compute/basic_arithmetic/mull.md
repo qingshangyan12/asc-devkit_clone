@@ -54,9 +54,21 @@ __simd_callee__ inline reg_pair<T> mull(
 
 ## 调用示例
 
+以下示例展示接口在AIV计算函数中的典型调用方式。
+
 ```cpp
-auto mask = asc::te::all_mask<uint32_t>();
-auto src0 = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto src1 = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto [low, high] = asc::te::experimental::mull(src0, src1);
+#include "tensor_api/tensor.h"
+
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void mull_example(
+    InputTensor input0, InputTensor input1, OutputTensor output)
+{
+    auto mask = asc::te::all_mask<uint32_t>();
+    auto src0 = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto src1 = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto [low, high] = asc::te::experimental::mull(src0, src1);
+
+    output.store(asc::te::make_coord(0, 0), low);
+    output.store(asc::te::make_coord(1, 0), high);
+}
 ```

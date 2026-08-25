@@ -46,9 +46,18 @@ __simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
 
 ## 调用示例
 
-```cpp
-using asc::te::experimental::operator!;
+以下示例展示接口在AIV计算函数中的典型调用方式。
 
-auto src = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<int32_t>());
-auto result = !src;
+```cpp
+#include "tensor_api/tensor.h"
+
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void logical_not_example(InputTensor input, OutputTensor output)
+{
+    using asc::te::experimental::operator!;
+
+    auto src = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<int32_t>());
+    auto result = !src;
+    output.store(asc::te::make_coord(0, 0), result);
+}
 ```

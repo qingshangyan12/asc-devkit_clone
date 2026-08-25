@@ -58,10 +58,19 @@ __simd_callee__ inline reg_tensor<T> operator+(
 
 ## 调用示例
 
-```cpp
-using asc::te::experimental::operator+;
+以下示例展示接口在AIV计算函数中的典型调用方式。
 
-auto mask = asc::te::all_mask<float>();
-auto src = input.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto result = src + 1.0f;
+```cpp
+#include "tensor_api/tensor.h"
+
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void add_example(InputTensor input, OutputTensor output)
+{
+    using asc::te::experimental::operator+;
+
+    auto mask = asc::te::all_mask<float>();
+    auto src = input.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto result = src + 1.0f;
+    output.store(asc::te::make_coord(0, 0), result);
+}
 ```

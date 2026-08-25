@@ -62,13 +62,25 @@ __simd_callee__ inline reg_tensor<uint16_t> histograms(
 
 ## 调用示例
 
+以下示例分别统计输入数据低半区和高半区的频率分布。
+
 ```cpp
+#include "tensor_api/tensor.h"
+
 constexpr asc::te::experimental::histogram_options high_options {
     asc::te::experimental::histogram_half::high,
     asc::te::experimental::histogram_mode::frequency};
 
-auto src = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<uint8_t>());
-auto initial = initial_input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<uint16_t>());
-auto low = asc::te::experimental::histograms(initial, src);
-auto high = asc::te::experimental::histograms<high_options>(initial, src);
+template <typename SrcTensor, typename InitialTensor, typename OutputTensor>
+__simd_vf__ inline void histograms_example(
+    SrcTensor input, InitialTensor initial_input, OutputTensor output)
+{
+    auto src = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<uint8_t>());
+    auto initial = initial_input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<uint16_t>());
+    auto low = asc::te::experimental::histograms(initial, src);
+    auto high = asc::te::experimental::histograms<high_options>(initial, src);
+
+    output.store(asc::te::make_coord(0, 0), low);
+    output.store(asc::te::make_coord(1, 0), high);
+}
 ```

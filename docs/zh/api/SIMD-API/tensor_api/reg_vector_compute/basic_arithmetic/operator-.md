@@ -48,11 +48,21 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b)
 
 ## 调用示例
 
-```cpp
-using asc::te::experimental::operator-;
+以下示例展示接口在AIV计算函数中的典型调用方式。
 
-auto mask = asc::te::all_mask<uint32_t>();
-auto src0 = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto src1 = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
-auto result = src0 - src1;
+```cpp
+#include "tensor_api/tensor.h"
+
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void sub_example(
+    InputTensor input0, InputTensor input1, OutputTensor output)
+{
+    using asc::te::experimental::operator-;
+
+    auto mask = asc::te::all_mask<uint32_t>();
+    auto src0 = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto src1 = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto result = src0 - src1;
+    output.store(asc::te::make_coord(0, 0), result);
+}
 ```
