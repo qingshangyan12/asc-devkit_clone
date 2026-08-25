@@ -58,16 +58,14 @@ HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcRes(
 
     CcuKernelInfo kernelInfo{};
     CHK_SAFETY_FUNC_RET(strcpy_s(
-        kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName),
-        "CcuKernelAllGatherNHR1DMultiJettyMem2Mem"));
+        kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAllGatherNHR1DMultiJettyMem2Mem"));
     kernelInfo.channels = channelDescs;
     kernelInfo.setKernelArg(kernelArg);
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
     return HCCL_SUCCESS;
 }
 
-HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcNhrInfo(
-    std::vector<KfcNhrStepInfo>& stepInfoVector) const
+HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcNhrInfo(std::vector<KfcNhrStepInfo>& stepInfoVector) const
 {
     u32 stepNum = 0;
     for (u32 ranks = tempRankSize_ - 1U; ranks != 0U; ranks >>= 1U) {
@@ -81,8 +79,7 @@ HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcNhrInfo(
     return HCCL_SUCCESS;
 }
 
-HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::GetStepInfo(
-    u32 step, u32 stepNum, KfcNhrStepInfo& stepInfo) const
+HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::GetStepInfo(u32 step, u32 stepNum, KfcNhrStepInfo& stepInfo) const
 {
     const u32 deltaRank = 1U << (stepNum - 1U - step);
     const u32 deltaSlice = 1U << (stepNum - step);
@@ -118,8 +115,7 @@ HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::KernelRun(
     return HCCL_SUCCESS;
 }
 
-HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::GetRes(
-    AlgResourceRequest& resourceRequest) const
+HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::GetRes(AlgResourceRequest& resourceRequest) const
 {
     resourceRequest.slaveThreadNum = 0;
     resourceRequest.notifyNumOnMainThread = 0;
@@ -127,13 +123,9 @@ HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::GetRes(
     return HCCL_SUCCESS;
 }
 
-u64 CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::GetThreadNum() const
-{
-    return 1;
-}
+u64 CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::GetThreadNum() const { return 1; }
 
-u64 CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcScratchMultiple(
-    BufferType inBuffType, BufferType outBuffType)
+u64 CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType)
 {
     (void)inBuffType;
     (void)outBuffType;

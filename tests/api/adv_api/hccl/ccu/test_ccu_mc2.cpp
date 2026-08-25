@@ -377,9 +377,7 @@ TEST_F(CcuMc2TestSuite, algorithmMap_AllEntries)
 {
     EXPECT_EQ(algorithmMap.at("CcuAllGatherMesh1DMem2Mem"), CcuAllGatherMeshMem2Mem1D);
     EXPECT_EQ(algorithmMap.at("CcuAllGatherMeshMem2Mem1D"), CcuAllGatherMeshMem2Mem1D);
-    EXPECT_EQ(
-        algorithmMap.at("CcuSchedAllGatherConcurMeshNHRMultiLink"),
-        CcuSchedAllGatherConcurMeshNHRMultiLink);
+    EXPECT_EQ(algorithmMap.at("CcuSchedAllGatherConcurMeshNHRMultiLink"), CcuSchedAllGatherConcurMeshNHRMultiLink);
     EXPECT_EQ(algorithmMap.at("CcuKfcReduceScatterMesh1DMem2Mem"), CcuReduceScatterMeshMem2Mem1D);
     EXPECT_EQ(algorithmMap.size(), 4U);
 }

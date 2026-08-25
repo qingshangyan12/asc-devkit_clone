@@ -44,9 +44,8 @@ struct KfcNhrStepInfo {
 
 inline uint32_t GetKfcServerMissionNum(const char* algName)
 {
-    return algName != nullptr && std::strcmp(algName, KFC_CONCURRENT_ALL_GATHER_ALG_NAME) == 0 ?
-               KFC_MAX_MISSION_NUM :
-               1U;
+    return algName != nullptr && std::strcmp(algName, KFC_CONCURRENT_ALL_GATHER_ALG_NAME) == 0 ? KFC_MAX_MISSION_NUM :
+                                                                                                 1U;
 }
 
 enum class KfcServerRole : uint32_t {
