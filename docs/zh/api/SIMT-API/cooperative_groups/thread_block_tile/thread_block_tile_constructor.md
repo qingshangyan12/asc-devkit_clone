@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-`thread_block_tile`不提供默认构造函数，可通过`tiled_partition`接口从另一个协作组中划分得到。
+`thread_block_tile`不提供默认构造函数，可通过`tiled_partition()`接口从另一个协作组中划分得到。
 
 ## 函数原型
 

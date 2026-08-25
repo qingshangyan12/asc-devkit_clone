@@ -1,6 +1,6 @@
 # Utilities样例介绍
 ## 概述
-基于Ascend C SIMT编程的简单样例，通过`printf`、`clock`等API介绍上板打印、时钟打点等维测方法，适用于调试阶段。
+基于Ascend C SIMT编程的简单样例，通过`printf()`、`clock()`等API介绍上板打印、时钟打点等维测方法，适用于调试阶段。
 
 ## 样例列表
 |  目录名称                                                   |  功能描述                                              |
