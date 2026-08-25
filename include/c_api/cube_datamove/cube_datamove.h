@@ -67,6 +67,26 @@ __aicore__ inline void asc_set_l13d_padding(half config);
 __aicore__ inline void asc_set_l13d_padding(int16_t config);
 
 __aicore__ inline void asc_set_l13d_padding(uint16_t config);
+__aicore__ inline void asc_set_l12l0a_3d_padding(uint64_t config);
+__aicore__ inline void asc_set_l12l0a_3d_padding(int8_t padding_value);
+__aicore__ inline void asc_set_l12l0a_3d_padding(uint8_t padding_value);
+__aicore__ inline void asc_set_l12l0a_3d_padding(int16_t padding_value);
+__aicore__ inline void asc_set_l12l0a_3d_padding(uint16_t padding_value);
+__aicore__ inline void asc_set_l12l0a_3d_padding(half padding_value);
+__aicore__ inline void asc_set_l12l0a_3d_padding(bfloat16_t padding_value);
+__aicore__ inline void asc_set_l12l0a_3d_padding(int32_t padding_value);
+__aicore__ inline void asc_set_l12l0a_3d_padding(uint32_t padding_value);
+__aicore__ inline void asc_set_l12l0a_3d_padding(float padding_value);
+__aicore__ inline void asc_set_gm2l1_padding(uint64_t config);
+__aicore__ inline void asc_set_gm2l1_padding(int8_t padding_value);
+__aicore__ inline void asc_set_gm2l1_padding(uint8_t padding_value);
+__aicore__ inline void asc_set_gm2l1_padding(int16_t padding_value);
+__aicore__ inline void asc_set_gm2l1_padding(uint16_t padding_value);
+__aicore__ inline void asc_set_gm2l1_padding(half padding_value);
+__aicore__ inline void asc_set_gm2l1_padding(bfloat16_t padding_value);
+__aicore__ inline void asc_set_gm2l1_padding(int32_t padding_value);
+__aicore__ inline void asc_set_gm2l1_padding(uint32_t padding_value);
+__aicore__ inline void asc_set_gm2l1_padding(float padding_value);
 
 __aicore__ inline void asc_set_l12l0_padding_val(uint64_t config);
 
