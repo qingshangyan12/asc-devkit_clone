@@ -1,0 +1,20 @@
+# 基础算术
+
+- **[asc_abs](asc_abs.md)**
+- **[asc_add](../../../../appendix/c_api_composite/vector_compute_composite/asc_add.md)**
+- **[asc_add_scalar](../../../../appendix/c_api_composite/vector_compute_composite/asc_add_scalar.md)**
+- **[asc_div](../../../../appendix/c_api_composite/vector_compute_composite/asc_div.md)**
+- **[asc_exp](../../../../appendix/c_api_composite/vector_compute_composite/asc_exp.md)**
+- **[asc_log](../../../../appendix/c_api_composite/vector_compute_composite/asc_log.md)**
+- **[asc_max](../../../../appendix/c_api_composite/vector_compute_composite/asc_max.md)**
+- **[asc_max_scalar](../../../../appendix/c_api_composite/vector_compute_composite/asc_max_scalar.md)**
+- **[asc_min](../../../../appendix/c_api_composite/vector_compute_composite/asc_min.md)**
+- **[asc_min_scalar](../../../../appendix/c_api_composite/vector_compute_composite/asc_min_scalar.md)**
+- **[asc_mul](../../../../appendix/c_api_composite/vector_compute_composite/asc_mul.md)**
+- **[asc_mul_scalar](../../../../appendix/c_api_composite/vector_compute_composite/asc_mul_scalar.md)**
+- **[asc_rcp](../../../../appendix/c_api_composite/vector_compute_composite/asc_rcp.md)**
+- **[asc_rsqrt](../../../../appendix/c_api_composite/vector_compute_composite/asc_rsqrt.md)**
+- **[asc_sqrt](../../../../appendix/c_api_composite/vector_compute_composite/asc_sqrt.md)**
+- **[asc_sub](../../../../appendix/c_api_composite/vector_compute_composite/asc_sub.md)**
+- **[asc_sub_scalar](../../../../appendix/c_api_composite/vector_compute_composite/asc_sub_scalar.md)**
+- **[asc_abs_sync（废弃）](../../../../appendix/c_api_composite/vector_compute_composite/asc_abs_sync_deprecated.md)**

@@ -1,0 +1,26 @@
+# 类型转换
+
+- **[asc_bfloat162float](../../../../appendix/c_api_composite/vector_compute_composite/asc_bfloat162float.md)**
+- **[asc_bfloat162int32](../../../../appendix/c_api_composite/vector_compute_composite/asc_bfloat162int32.md)**
+- **[asc_float2bfloat16](../../../../appendix/c_api_composite/vector_compute_composite/asc_float2bfloat16.md)**
+- **[asc_float2float](../../../../appendix/c_api_composite/vector_compute_composite/asc_float2float.md)**
+- **[asc_float2half](../../../../appendix/c_api_composite/vector_compute_composite/asc_float2half.md)**
+- **[asc_float2int16](../../../../appendix/c_api_composite/vector_compute_composite/asc_float2int16.md)**
+- **[asc_float2int32](../../../../appendix/c_api_composite/vector_compute_composite/asc_float2int32.md)**
+- **[asc_float2int64](../../../../appendix/c_api_composite/vector_compute_composite/asc_float2int64.md)**
+- **[asc_half2float](../../../../appendix/c_api_composite/vector_compute_composite/asc_half2float.md)**
+- **[asc_half2int16](../../../../appendix/c_api_composite/vector_compute_composite/asc_half2int16.md)**
+- **[asc_half2int32](../../../../appendix/c_api_composite/vector_compute_composite/asc_half2int32.md)**
+- **[asc_half2int4](../../../../appendix/c_api_composite/vector_compute_composite/asc_half2int4.md)**
+- **[asc_half2int8](../../../../appendix/c_api_composite/vector_compute_composite/asc_half2int8.md)**
+- **[asc_half2uint8](../../../../appendix/c_api_composite/vector_compute_composite/asc_half2uint8.md)**
+- **[asc_int162float](../../../../appendix/c_api_composite/vector_compute_composite/asc_int162float.md)**
+- **[asc_int162half](../../../../appendix/c_api_composite/vector_compute_composite/asc_int162half.md)**
+- **[asc_int322float](../../../../appendix/c_api_composite/vector_compute_composite/asc_int322float.md)**
+- **[asc_int322int16](../../../../appendix/c_api_composite/vector_compute_composite/asc_int322int16.md)**
+- **[asc_int322int64](../../../../appendix/c_api_composite/vector_compute_composite/asc_int322int64.md)**
+- **[asc_int42half](../../../../appendix/c_api_composite/vector_compute_composite/asc_int42half.md)**
+- **[asc_int642float](../../../../appendix/c_api_composite/vector_compute_composite/asc_int642float.md)**
+- **[asc_int642int32](../../../../appendix/c_api_composite/vector_compute_composite/asc_int642int32.md)**
+- **[asc_int82half](../../../../appendix/c_api_composite/vector_compute_composite/asc_int82half.md)**
+- **[asc_uint82half](../../../../appendix/c_api_composite/vector_compute_composite/asc_uint82half.md)**
