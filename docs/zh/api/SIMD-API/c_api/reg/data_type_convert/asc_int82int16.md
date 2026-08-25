@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-将int8类型数据转换为int16类型。
+将int8_t类型数据转换为int16_t类型。
 
 由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。
 
@@ -65,6 +65,6 @@ __simd_callee__ inline void asc_int82int16_v2(vector_int16_t& dst, vector_int8_t
 vector_int16_t dst;
 vector_int8_t src;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_loadalign(src, src_addr); // src_addr是外部输入的Unified Buffer（UB）内存空间地址。
 asc_int82int16(dst, src, mask);
 ```

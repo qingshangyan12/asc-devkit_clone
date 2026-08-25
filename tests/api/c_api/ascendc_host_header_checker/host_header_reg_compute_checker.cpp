@@ -8,10 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "c_api/reg_compute/reg_convert.h"
-#include "c_api/reg_compute/reg_load.h"
-#include "c_api/reg_compute/reg_store.h"
-#include "c_api/reg_compute/reg_vector.h"
+#include "c_api/reg_compute/reg_compute.h"
 
 static void test_host_c_api_reg_compute_0()
 {
@@ -122,6 +119,8 @@ static void test_host_c_api_reg_compute_3()
     using ::asc_deintlv_b8;
     using ::asc_div;
     using ::asc_duplicate;
+    using ::asc_duplicate_highest;
+    using ::asc_duplicate_highest_merge;
     using ::asc_duplicate_merge;
     using ::asc_duplicate_scalar;
     using ::asc_duplicate_scalar_merge;
@@ -147,6 +146,7 @@ static void test_host_c_api_reg_compute_3()
     using ::asc_exp_sub;
     using ::asc_exp_sub_half2float;
     using ::asc_exp_sub_v2;
+    using ::asc_fma;
 }
 
 static void test_host_c_api_reg_compute_4()
@@ -576,6 +576,7 @@ static void test_host_c_api_reg_compute_16()
     using ::asc_min_scalar;
     using ::asc_mul;
     using ::asc_mul_scalar;
+    using ::asc_mula;
     using ::asc_mull;
     using ::asc_muls;
     using ::asc_muls_v2;

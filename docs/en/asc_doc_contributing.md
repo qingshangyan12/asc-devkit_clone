@@ -6,11 +6,11 @@ The Ascend C documentation system consists of five core documents. Developers ca
 
 | Document | Content | Directory |
 |----------|---------|-----------|
-| Getting Started Tutorial | Ascend C overview, environment setup, quick-start hands-on (HelloWorld, first operator) | `docs/zh/guide/入门教程` |
-| Programming Guide | Programming models, programming paradigms, compilation & execution, hardware architecture, advanced programming | `docs/zh/guide/编程指南` |
+| Getting Started Tutorial | Ascend C overview, environment setup, quick-start hands-on (HelloWorld, first operator) | `docs/zh/guide/getting_started` |
+| Programming Guide | Programming models, programming paradigms, compilation & execution, hardware architecture, advanced programming | `docs/zh/guide/programming_guide` |
 | API Reference Manual | Interface parameters, constraints, examples, API associations | `docs/zh/api/` |
-| Operator Practice Reference | Operator implementation, performance optimization, tuning cases | `docs/zh/guide/算子实践参考/` |
-| Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/zh/guide/跨代迁移兼容性指南/` |
+| Operator Practice Reference | Operator implementation, performance optimization, tuning cases | `docs/zh/guide/operator_practice/` |
+| Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/zh/guide/cross_gen_migration_guide/` |
 
 Before reading this document, ensure you have a basic understanding of the Ascend AI processor hardware architecture. New developers are recommended to start with the Getting Started Tutorial; developers with prior experience should read the Ascend C Programming Guide.
 
@@ -38,7 +38,7 @@ If you find that certain content is missing or incomplete in the documentation (
 
 If you have practical experience with Ascend C operator performance optimization to share:
 
-1. Refer to existing tuning case structures under `算子实践参考/优秀实践/`
+1. Refer to existing tuning case structures under `operator_practice/best_practices/`
 2. Write documentation following the "Performance Optimization Case Writing Convention" in this guide
 3. Submit a PR
 
@@ -76,11 +76,11 @@ The Getting Started Tutorial is the **zero-to-one entry point** for developers n
 
 | Tutorial Directory | Corresponding Programming Guide Chapter | Tutorial Purpose |
 |--------------------|---------------------------------------|-----------------|
-| `入门教程/` | Programming Model / Overview | Overview & learning path |
-| `环境准备.md` | Compilation & Execution | Quick environment setup; detailed compilation instructions link to Programming Guide |
-| `快速入门/异构系统与编程模型.md` | Programming Model / Heterogeneous System + Programming Model / Overview | Entry-level concepts + SIMD/SIMT selection; in-depth links to Programming Guide |
-| `快速入门/基于SIMD编程/` | Programming Model / AI-Core-SIMD | HelloWorld + Add operator quick start |
-| `快速入门/基于SIMT编程/` | Programming Model / AI-Core-SIMT | HelloWorld + Gather operator quick start |
+| `getting_started/` | Programming Model / Overview | Overview & learning path |
+| `environment_setup.md` | Compilation & Execution | Quick environment setup; detailed compilation instructions link to Programming Guide |
+| `quick_start/heterogeneous_system_and_programming_model.md` | Programming Model / Heterogeneous System + Programming Model / Overview | Entry-level concepts + SIMD/SIMT selection; in-depth links to Programming Guide |
+| `quick_start/simd_programming/` | Programming Model / AI-Core-SIMD | HelloWorld + Add operator quick start |
+| `quick_start/simt_programming/` | Programming Model / AI-Core-SIMT | HelloWorld + Gather operator quick start |
 
 **Link Direction**:
 - First mention of in-depth programming concepts → link to corresponding Programming Guide chapter
@@ -202,7 +202,7 @@ For Ascend 950PR/Ascend 950DT products:
 
 **Requirements**:
 - When different products use different layout formats (e.g., Zz vs Nz), **separate tables are required**
-- Physical location uses Buffer names (L0A/L0B/L0C/UB, etc.)
+- Physical location uses Buffer names, such as L0A Buffer, L0B Buffer, L0C Buffer, and Unified Buffer (UB)
 - Format uses fractal layout names (Zz/Zn/Nz/ND, etc.)
 - If a bias matrix exists, annotate in the C matrix row: "Can support bias matrix Bias initialization, dimension 1 x N"
 
@@ -540,7 +540,7 @@ __aicore__ inline void ExampleKernel(__gm__ uint8_t* x) {  // __aicore__=kernel 
 
 ## Performance Optimization Case Writing Conventions
 
-Refer to existing cases under `算子实践参考/优秀实践/` (e.g., FlashAttention, Matmul series). Recommended structure:
+Refer to existing cases under `operator_practice/best_practices/` (e.g., FlashAttention, Matmul series). Recommended structure:
 
 ```markdown
 # <Operator Name> Performance Tuning Case
@@ -576,7 +576,7 @@ Refer to existing cases under `算子实践参考/优秀实践/` (e.g., FlashAtt
 Before submitting a documentation PR, check each item:
 
 **Content Accuracy**:
-- [ ] All hardware parameter values (capacity, granularity, range) are consistent with Architecture Specifications
+- [ ] All hardware parameter values (capacity, granularity, range) are consistent with [Architecture Specifications](../../docs/zh/guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/architecture_spec.md)
 - [ ] "Fixed value" and other absolute descriptions have been verified (many "fixed values" are actually determined by configuration parameters)
 - [ ] Data path descriptions match actual routes (no contradictions with other documents)
 

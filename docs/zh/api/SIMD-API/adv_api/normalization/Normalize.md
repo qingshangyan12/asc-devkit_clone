@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/normalization/Normalize_res.md#id1 -->
 
 ## 功能说明
 
@@ -107,7 +108,7 @@ struct NormalizePara {
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../general_description_and_constraints.md#section796754519912)。
 -   缩放系数gamma和平移系数beta的数据类型精度必须不低于源操作数inputX的数据类型精度。比如，inputX的数据类型是half，gamma、beta的数据类型可以是half或者float，精度不低于inputX。比如，inputX的数据类型是bfloat16\_t，gamma、beta的数据类型可以是bfloat16\_t或者float，精度不低于inputX。
 -   src和dst的Tensor空间不可以复用。
 -   输入仅支持ND格式。

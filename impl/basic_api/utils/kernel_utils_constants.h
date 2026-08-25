@@ -616,11 +616,8 @@ using uint4b_t = IntegerSubType<INT4_BIT_NUM, false>;
 using uint3b_t = IntegerSubType<INT3_BIT_NUM, false>;
 using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
 #endif
-#if !(                                                                                                        \
-    (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))) || defined(__NPU_HOST__) || \
-    defined(__ASC_NPU_HOST__))
-using fp8_e8m0_t = uint8_t;
-#elif !defined(ASCENDC_CPU_DEBUG)
+
+#if !defined(ASCENDC_CPU_DEBUG)
 using fp8_e8m0_t = float8_e8m0_t;
 #endif
 
@@ -772,6 +769,11 @@ constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIV_WAIT = 1U <<
 // If set, WaitPreTaskEndV3Impl uses loose sync; otherwise it uses tight sync.
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_CTRL_SPLIT_CORE = 1U << 15;
 } // namespace Internal
+
+#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+constexpr int32_t SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE = 0x5A5A5A5A;
+__BLOCK_LOCAL__ __inline__ int32_t g_superKernelSetWaitFlagCountDifference;
+#endif
 
 #if defined(__ASCENDC_SUPERKERNEL_AUTO_SYNC_ALL__)
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_superKernelAutoSyncAllConfigGmBaseAddr;

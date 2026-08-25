@@ -95,11 +95,27 @@ DECL_WEAK_FUNC(
     HcclResult, HcclCommSymWinGet, HcclComm comm, void* ptr, size_t size, HcclCommSymWindow* winHandle, size_t* offset);
 DECL_SUPPORT_FLAG(HcommBatchTransferOnThread);
 
+bool Mc2HcommIsSupportAicpuTsTaskCache(void);
+int32_t Mc2HcommAicpuTsTaskCacheLookup(const char* tag, bool* isHit);
+int32_t Mc2HcommAicpuTsTaskCacheStart(const char* tag, void** addrs, uint64_t* sizes, uint64_t count);
+int32_t Mc2HcommAicpuTsTaskCacheEnd(const char* tag);
+int32_t Mc2HcommAicpuTsTaskCacheExecute(const char* tag, void** addrs, uint64_t* sizes, uint64_t count);
+int32_t Mc2HcommAicpuTsTaskCacheClear(const char* tag);
+
 int32_t HcclHcommBatchTransferOnThread(
     ThreadHandle thread, ChannelHandle channel, const HcclHcommBatchTransferDesc* transferDescs,
     uint32_t transferDescNum);
 
 void HcommPrimitivesDlInit(void* libHcommHandle); // 本模块独立初始化
+void Mc2HcommAicpuTaskCacheDlInit(void* libHcommHandle);
+
+#ifdef UT_TEST
+void Mc2HcommAicpuTsTaskCacheSetTestFunctions(
+    int32_t (*lookup)(const char*, bool*), int32_t (*start)(const char*, void**, uint64_t*, uint64_t),
+    int32_t (*end)(const char*), int32_t (*execute)(const char*, void**, uint64_t*, uint64_t),
+    int32_t (*clear)(const char*));
+void Mc2HcommAicpuTsTaskCacheResetTestFunctions(void);
+#endif
 
 #ifdef __cplusplus
 }

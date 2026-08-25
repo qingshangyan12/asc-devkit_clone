@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/normalization/BatchNorm_res.md#id1 -->
 
 ## 功能说明
 
@@ -84,7 +85,7 @@ BatchNorm是对于每一层的输入做规范化处理，使得每一层的分�
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../general_description_and_constraints.md#section796754519912)。
 -   当前仅支持ND格式的输入，不支持其他格式。
 -   输入数据的S\*H必须满足32B对齐的要求。
 

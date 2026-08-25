@@ -246,9 +246,9 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md)。
 
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md)。
 
 - 采用内置固定模式时，配置src1RepeatStride参数无效。
 
@@ -262,9 +262,9 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 - 若调用该接口前为Counter模式，在调用该接口后需要显式设置回Counter模式（接口内部执行结束后会设置为Normal模式）。
 
 <!-- npu="950" id26 -->
-- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
-  - 内置固定模式占用8KB Unified Buffer临时空间。
-  - 用户自定义模式不涉及8KB Unified Buffer临时空间的占用。
+- 对Unified Buffer（UB）空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+  - 内置固定模式占用8KB UB临时空间。
+  - 用户自定义模式不涉及8KB UB临时空间的占用。
 <!-- end id26 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

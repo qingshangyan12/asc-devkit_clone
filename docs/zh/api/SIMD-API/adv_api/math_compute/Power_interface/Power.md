@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/math_compute/Power_interface/Power_res.md#id1 -->
 
 ## 功能说明
 
@@ -175,7 +176,7 @@ struct PowerConfig {
 <!-- npu="310p" id8 -->
 -   对于Atlas 推理系列产品AI Core，幂运算的指数必须小于2<sup>31</sup>-1。
 <!-- end id8 -->
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 -   支持的数据类型<a id="li559613463410"></a>
 
     <!-- npu="950" id9 -->

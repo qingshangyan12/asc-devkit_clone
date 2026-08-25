@@ -6,7 +6,7 @@ C API开放芯片完备编程能力，支持[以数组形式分配内存](genera
 
 C API是Ascend C三层梯度化编程接口中的**语言扩展层SIMD API**，定位为最底层的C语言接口，基于指针编程，提供完备的C语言编程能力。C API可直接映射NPU硬件指令，开发者自主管理内存搬运与同步（与TPipe/TQue自动管理内存、同步不同），开放全部底层硬件能力。适配C语言开发习惯，适合对性能和可控性要求较高的算子开发场景，是追求极致性能、充分释放NPU硬件潜能的核心路径。
 
-详细内容请参考[C语言编程概述](../../../guide/编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/C语言编程概述.md)。
+详细内容请参考[C语言编程概述](../../../guide/programming_guide/programming_model/ai_core_simd_programming/c_pointer_programming/c_programming_overview.md)。
 
 ## 需要包含的头文件
 
@@ -31,7 +31,7 @@ C API是Ascend C三层梯度化编程接口中的**语言扩展层SIMD API**，�
 |名称|描述|
 |-----------------------|-----------------------|
 |\_\_gm\_\_|存储空间定义修饰符，表示被修饰的变量位于Global Memory地址空间。|
-|\_\_ubuf\_\_|存储空间定义修饰符，表示被修饰的变量位于Unified Buffer地址空间。|
+|\_\_ubuf\_\_|存储空间定义修饰符，表示被修饰的变量位于UB地址空间。|
 |\_\_aicore\_\_|执行空间限定符。表示该函数只能在Ai Core上执行。|
 |\_\_cbuf\_\_|存储空间定义修饰符，表示被修饰的变量位于L1 Buffer地址空间。|
 |\_\_simd\_callee\_\_|执行空间限定符。表示该函数只能在Reg上执行。|
@@ -42,9 +42,9 @@ NPU内部有不同的计算单元，在计算时往往需要把计算数据搬�
 - PIPE_S：标量流水线，负责指令分发和标量计算。
 - PIPE_V：矢量计算流水线。
 - PIPE_M：矩阵计算流水线。
-- PIPE_MTE1：搬运操作。包括从L1 Buffer到L0A Buffer或L0B Buffer，从L1 Buffer到UB的搬运操作和L0A Buffer或L0B Buffer的初始化操作。
+- PIPE_MTE1：搬运操作。包括从L1 Buffer到L0A Buffer或L0B Buffer，从L1 Buffer到Unified Buffer（UB）的搬运操作和L0A Buffer或L0B Buffer的初始化操作。
 - PIPE_MTE2：搬运操作。包括从GM到L1 Buffer、从GM到L0A Buffer或L0B Buffer、从GM到UB的搬运操作和L1 Buffer的初始化操作。
-- PIPE_MTE3：搬运操作。包括从UB到GM、从UB到L1 Buffer的操作和从UB到UB的搬运操作。
+- PIPE_MTE3：搬运操作。包括从UB到GM、从UB到L1 Buffer、从L1 Buffer到GM的操作和从UB到UB的搬运操作。
 - PIPE_FIX：Fixpipe流水线。
 - PIPE_ALL：所有流水线。
 

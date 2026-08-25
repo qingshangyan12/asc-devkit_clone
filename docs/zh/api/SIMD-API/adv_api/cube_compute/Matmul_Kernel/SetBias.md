@@ -24,6 +24,7 @@
 <!-- npu="x90" id1 -->
 - Kirin X90：支持
 <!-- end id1 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetBias_res.md#id1 -->
 
 ## 功能说明
 
@@ -45,8 +46,8 @@ __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| biasGlobal | 输入 | Bias矩阵。类型为[GlobalTensor](../../../basic_api/data_structures/GlobalTensor/GlobalTensor.md)。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。<br><br>A矩阵、B矩阵、Bias支持的数据类型组合可参考[Matmul输入输出数据类型的组合说明](Matmul_usage.md#table1996113269499)；在MxMatmul场景，A矩阵、B矩阵、Bias支持的数据类型组合可参考[MatmulTypeWithScale参数说明](../../../../../guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景.md#zh-cn_topic_0000002270097206_table14759942142014)。 |
-| inputBias | 输入 | Bias矩阵。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为TSCM/VECOUT。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。<br><br>A矩阵、B矩阵、Bias支持的数据类型组合可参考[Matmul输入输出数据类型的组合说明](Matmul_usage.md#table1996113269499)；在MxMatmul场景，A矩阵、B矩阵、Bias支持的数据类型组合可参考[MatmulTypeWithScale参数说明](../../../../../guide/算子实践参考/SIMD算子实现/矩阵编程（高阶API）/特性场景/MxMatmul场景.md#zh-cn_topic_0000002270097206_table14759942142014)。 |
+| biasGlobal | 输入 | Bias矩阵。类型为[GlobalTensor](../../../basic_api/data_structures/GlobalTensor/GlobalTensor.md)。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。<br><br>A矩阵、B矩阵、Bias支持的数据类型组合可参考[Matmul输入输出数据类型的组合说明](Matmul_usage.md#table1996113269499)；在MxMatmul场景，A矩阵、B矩阵、Bias支持的数据类型组合可参考[MatmulTypeWithScale参数说明](../../../../../guide/operator_practice/simd_operator_impl/matrix_advanced_api/feature_scenarios/mx_matmul_scenario.md#zh-cn_topic_0000002270097206_table14759942142014)。 |
+| inputBias | 输入 | Bias矩阵。类型为[LocalTensor](../../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为TSCM/VECOUT。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。<br><br>A矩阵、B矩阵、Bias支持的数据类型组合可参考[Matmul输入输出数据类型的组合说明](Matmul_usage.md#table1996113269499)；在MxMatmul场景，A矩阵、B矩阵、Bias支持的数据类型组合可参考[MatmulTypeWithScale参数说明](../../../../../guide/operator_practice/simd_operator_impl/matrix_advanced_api/feature_scenarios/mx_matmul_scenario.md#zh-cn_topic_0000002270097206_table14759942142014)。 |
 
 ## 返回值说明
 
@@ -59,6 +60,7 @@ __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
 <!-- npu="950" id13 -->
 -   对于Ascend 950PR/Ascend 950DT，Bias矩阵的内存逻辑位置为TSCM且数据类型为float或int32\_t时，Bias矩阵的LocalTensor空间必须64字节对齐。
 <!-- end id13 -->
+<!-- npu="950,A3,910b,310p,310b,x90" id14 -->
 -   支持的数据类型<a id="li12616155731720"></a>
 
     <!-- npu="950" id8 -->
@@ -81,9 +83,13 @@ __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
     Atlas 200I/500 A2 推理产品，支持的数据类型为：half、float、int32_t，其中仅在A、B的数据类型为int8_t时，Bias的数据类型可以设置为int32_t。
     <!-- end id12 -->
 
-    <!-- npu="x90" id2 -->
+    <!-- npu="x90" id15 -->
     Kirin X90，支持的数据类型为：half、int32_t，其中仅在A、B的数据类型为int8_t时，Bias的数据类型可以设置为int32_t。
-    <!-- end id2 -->
+    <!-- end id15 -->
+
+<!-- end id14 -->
+
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetBias_res.md#id2 -->
 
 ## 调用示例
 

@@ -60,15 +60,30 @@ __aicore__ inline int64_t asc_get_squeeze_status() { return asc_get_squeeze_stat
 
 __aicore__ inline int64_t asc_get_program_counter() { return asc_get_program_counter_impl(); }
 
-__aicore__ inline int64_t asc_get_block_idx() { return asc_get_block_idx_impl(); }
+[[deprecated("NOTICE: asc_get_block_idx is deprecated. "
+             "Please use block_idx for pure Vector, pure Cube, and Mix(1, 1). "
+             "For Mix(1, 2), please use block_idx on the Cube core and "
+             "block_idx * asc_get_sub_block_num() + asc_get_sub_block_id() "
+             "on Vector cores instead.")]] __aicore__ inline int64_t
+asc_get_block_idx()
+{
+    return asc_get_block_idx_impl();
+}
 
 __aicore__ inline int64_t asc_get_sub_block_num() { return asc_get_sub_block_num_impl(); }
 
 __aicore__ inline int64_t asc_get_sub_block_id() { return asc_get_sub_block_id_impl(); }
 
-__aicore__ inline int64_t asc_get_block_num() { return asc_get_block_num_impl(); }
+[[deprecated("NOTICE: asc_get_block_num is deprecated. "
+             "Please use block_num instead.")]] __aicore__ inline int64_t
+asc_get_block_num()
+{
+    return asc_get_block_num_impl();
+}
 
 __aicore__ inline int64_t asc_get_system_cycle() { return asc_get_system_cycle_impl(); }
+
+__aicore__ inline int64_t asc_get_system_clock() { return asc_get_system_clock_impl(); }
 
 __aicore__ inline void asc_set_ctrl(uint64_t config) { asc_set_ctrl_impl(config); }
 
@@ -82,11 +97,22 @@ __aicore__ inline void asc_get_arch_ver(uint32_t& core_version) { asc_get_arch_v
 
 __aicore__ inline int64_t asc_get_core_id() { return asc_get_core_id_impl(); }
 
+__aicore__ inline void asc_set_l0c_copy_channel_para(uint16_t src_nz_matrix_stride)
+{
+    asc_set_l0c_copy_channel_para_impl(src_nz_matrix_stride);
+}
+
 __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config) { asc_set_l0c2gm_channel_para_impl(config); }
 
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config) { asc_set_l3d_rpt_b_impl(config); }
 
 __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config) { asc_set_gm2l1_nz_para_impl(config); }
+
+__aicore__ inline void asc_set_gm2l1_nz_para(
+    uint16_t matrix_num, uint16_t dst_nz_n_stride, uint16_t dst_nz_c0_stride, uint16_t dst_nz_matrix_stride)
+{
+    asc_set_gm2l1_nz_para_impl(matrix_num, dst_nz_n_stride, dst_nz_c0_stride, dst_nz_matrix_stride);
+}
 
 __aicore__ inline void asc_set_l13d_padding(uint64_t config) { asc_set_l13d_padding_impl(config); }
 
