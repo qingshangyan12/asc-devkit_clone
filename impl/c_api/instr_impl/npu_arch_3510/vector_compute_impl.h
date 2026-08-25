@@ -2581,7 +2581,7 @@ __simd_callee__ inline vector_bool asc_update_mask_b16(uint32_t& value) { return
 __simd_callee__ inline vector_bool asc_update_mask_b32(uint32_t& value) { return asc_update_mask_b32_impl(value); }
 
 // ==========asc_set_vector_mask==========
-__aicore__ inline void asc_set_vector_mask(uint64_t mask1, uint64_t mask0) { asc_set_vector_mask_impl(mask1, mask0); }
+__aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low) { asc_set_vector_mask_impl(mask_high, mask_low); }
 
 // ==========asc_half2int8(rd/ru/rz/rn/rna)==========
 [[deprecated("NOTICE: asc_half2int8_rd(vector_int8_t& dst, vector_half src, vector_bool mask) is deprecated. "
@@ -6630,10 +6630,6 @@ __simd_callee__ inline void asc_clear_ar_spr()
 }
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign_init() { asc_clear_ar_spr_impl(); }
-
-namespace AscendC {
-__aicore__ inline void asc_clear_ar_spr() { asc_clear_ar_spr_impl(); }
-} // namespace AscendC
 
 // ==========asc_bitsort(half/float)==========
 __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat)
