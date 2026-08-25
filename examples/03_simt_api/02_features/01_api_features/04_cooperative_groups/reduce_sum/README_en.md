@@ -18,9 +18,9 @@ This sample demonstrates the basic usage of the [cooperative groups API](../../.
 
 ```text
 ├── reduce_sum
-│   ├── figures                             // Image resources for the README
-│   ├── CMakeLists.txt                      // Build project file
-│   ├── reduce_sum.asc                      // Sample implementation, three kernels plus host-side invocation
+│   ├── figures           // Image resources for the README
+│   ├── CMakeLists.txt    // Build project file
+│   ├── reduce_sum.asc    // Sample implementation, three kernels plus host-side invocation
 │   ├── README.md
 │   └── README_en.md
 ```
@@ -30,11 +30,11 @@ This sample demonstrates the basic usage of the [cooperative groups API](../../.
 
 ### Functionality
 
-This sample provides three implementations of reduction sum operations, demonstrating how cooperative groups control thread collaboration at `grid`, `thread block`, and `Warp` granularities. The reduction sum operation is abstracted into a common function `reduce_sum`, which achieves reductions at different granularities by accepting different cooperative group objects, showcasing the code abstraction capabilities of cooperative groups.
+This sample presents three cooperative-group-based implementations of reduction sum, controlling thread collaboration at grid, thread block, and Warp granularity respectively. The reduction logic is also encapsulated into a common function `reduce_sum`, which adapts to different granularities simply by taking a different cooperative group object, which fully demonstrates the strength of cooperative groups in code abstraction and reuse.
 
 ### Specifications
 
-All three cases use the same execution configuration: a grid of 4 thread blocks, 1024 threads per block (the default thread configuration), 4096 threads in total, with dynamic ubuf set to 0. The launch form is `<<<dim3(4), dim3(1024), DYN_UBUF_SIZE, stream>>>`.
+All three cases use the same execution configuration: a grid of 4 thread blocks, 1024 threads per block (the default thread configuration), 4096 threads in total, with dynamic ubuf set to 0.
 
 
 <table>
@@ -53,7 +53,7 @@ All three cases use the same execution configuration: a grid of 4 thread blocks,
 
 **Figure 1**  The halving reduction process
 
-![](./figures/halving_reduction_en.png)
+![](./figures/halving_reduction.png)
 
 The figure takes 16 threads as an example. The number of threads participating in the reduction is `N = g.size()`, that is 16. In each round, every active thread adds the value it holds to the value held `i` threads away (`i` starts at `N/2`), after which the number of active threads is halved and the stride `i` halves along with it.
 
@@ -80,7 +80,7 @@ __aicore__ inline int32_t reduce_sum(const thread_group& g, PtrT workspace, int3
 
 **Figure 2**  Case0 cross-block reduction
 
-![](./figures/reduce_sum_case0_en.png)
+![](./figures/reduce_sum_case0.png)
 
 ```cpp
 __global__ void reduce_grid_group(
@@ -105,7 +105,7 @@ Reducing at grid granularity requires communication across blocks, so the worksp
 
 **Figure 3**  Case1 whole-block reduction
 
-![](./figures/reduce_sum_case1_en.png)
+![](./figures/reduce_sum_case1.png)
 
 ```cpp
 __global__ void reduce_thread_block(const int32_t* input, int32_t* output, int32_t num_elements)
@@ -123,11 +123,11 @@ __global__ void reduce_thread_block(const int32_t* input, int32_t* output, int32
 
 #### Case2: Warp-internal Reduction
 
-**Core implementation**: the reduction is done in two levels. The first level reduces at Warp granularity: each thread block has 1024 threads, that is 32 Warps, which produce 32 intermediate results. The second level has Warp 0 reduce these 32 intermediate results, after which its rank 0 accumulates the sum of that block into the output address through `asc_atomic_add`.
+**Core implementation**: the reduction is done in two levels. The first level creates a thread_block_tile cooperative group of 32 threads, which reduces at Warp granularity. Each thread block has 1024 threads, that is 32 Warps, which produce 32 intermediate results. The second level has Warp 0 reduce these 32 intermediate results, after which its rank 0 accumulates the sum of that block into the output address through `asc_atomic_add`.
 
 **Figure 4**  Case2 warp-internal reduction
 
-![](./figures/reduce_sum_case2_en.png)
+![](./figures/reduce_sum_case2.png)
 
 ```cpp
 __global__ void reduce_block_tile(const int32_t* input, int32_t* output, int32_t num_elements)
@@ -156,7 +156,7 @@ __global__ void reduce_block_tile(const int32_t* input, int32_t* output, int32_t
 }
 ```
 
-`TILE_SIZE` is 32, the width of one warp, so that each sub-group produced by `tiled_partition<TILE_SIZE>(block)` falls exactly within one warp. Since the 32 threads within a warp are inherently synchronized under the hardware SIMT execution model, `sync()` calls in the code require no actual waiting, costing far less than a block-level barrier that waits for 1024 threads.
+`TILE_SIZE` is 32, the width of one warp, so that each sub-group produced by `tiled_partition<TILE_SIZE>(block)` falls exactly within one warp.
 
 ## Performance Comparison
 
