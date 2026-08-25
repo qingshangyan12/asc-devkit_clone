@@ -1,4 +1,4 @@
-# add/add_c
+# add_c
 
 ## 产品支持情况
 
@@ -16,26 +16,15 @@
 
 命名空间：`asc::te::experimental`。
 
-`add`对两个32位整数寄存器执行逐元素加法，返回低32位结果，并通过引用参数输出进位；
-`add_c`在此基础上继续加入逐元素进位输入，并输出新的进位。二者用于构成从低位到高位的
-多字整数加法链：
+对两个32位整数寄存器执行逐元素加法，同时加入`carry_src`提供的逐元素进位输入；返回结果的低32位，并通过引用参数`carry`输出新的进位：
 
 $$
-\begin{aligned}
-add:\quad dst_i &= src0_i + src1_i \\
-add\_c:\quad dst_i &= src0_i + src1_i + carrySrc_i
-\end{aligned}
+\{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, src1_i\} + carry\_src_i
 $$
 
 ## 函数原型
 
 ```cpp
-template <typename T>
-__simd_callee__ inline reg_tensor<T> add(
-    reg_tensor<bool>& carry,
-    const reg_tensor<T>& src0,
-    const reg_tensor<T>& src1)
-
 template <typename T>
 __simd_callee__ inline reg_tensor<T> add_c(
     reg_tensor<bool>& carry,
@@ -49,48 +38,43 @@ __simd_callee__ inline reg_tensor<T> add_c(
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `T` | 模板参数 | 输入和返回值的元素类型，支持`int32_t`、`uint32_t`。 |
-| `carry` | 输出 | `add`和`add_c`的逐元素进位输出。`reg`保存进位，`mask`由接口写为`src0.mask`。 |
-| `src0`、`src1` | 输入 | 两个相同元素类型的32位整数加数。执行mask取`src0.mask`。 |
-| `carry_src` | 输入 | 仅用于`add_c`。逐元素进位输入，读取其`reg`；`carry_src.mask`不参与执行mask的选择。 |
+| `carry` | 输出 | 逐元素进位输出，类型为`reg_tensor<bool>`。`reg`保存进位，`mask`由接口写为`src0.mask`。 |
+| `src0` | 输入 | 第一个加数，类型为`reg_tensor<T>`，同时提供执行mask。 |
+| `src1` | 输入 | 第二个加数，类型为`reg_tensor<T>`；`src1.mask`不参与执行mask的选择。 |
+| `carry_src` | 输入 | 逐元素进位输入，类型为`reg_tensor<bool>`；接口读取其`reg`，其`mask`不参与执行mask的选择。 |
 
 ## 返回值说明
 
-`add`和`add_c`均返回`reg_tensor<T>`，并通过`carry`返回进位：
+返回`reg_tensor<T>`：
 
-- 返回值`reg`：`add`保存`src0.reg + src1.reg`的低32位；`add_c`保存
-  `src0.reg + src1.reg + carry_src.reg`的低32位。
-- 返回值`mask`：等于`src0.mask`。
-- `carry.reg`：保存本次加法的逐元素进位，进位为`1`，否则为`0`；`carry.mask`等于`src0.mask`。
+- `reg`：保存`src0.reg + src1.reg + carry_src.reg`的低32位。
+- `mask`：等于`src0.mask`。
+
+`carry.reg`保存本次加法的逐元素进位，产生进位时为`1`，否则为`0`。
 
 ## 约束说明
 
-- 用于多字整数分段加法时，未按照从低位到高位的顺序传递进位会得到错误的高位结果。
+- 用于多字整数分段加法时，应按照从低位到高位的顺序传递进位。
 
 ## 调用示例
-
-以下示例展示接口在AIV计算函数中的典型调用方式。示例先为加载结果绑定mask，
-再执行计算并将结果写回UB。
 
 ```cpp
 #include "tensor_api/tensor.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void add_with_carry_example(
+__simd_vf__ inline void add_c_example(
     InputTensor input0, InputTensor input1, OutputTensor output)
 {
     auto mask = asc::te::all_mask<uint32_t>();
-
-    // 第0行保存低32位，第1行保存高32位。
     auto src0_low = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
     auto src1_low = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
     auto src0_high = input0.load(asc::te::make_coord(1, 0)).with_mask(mask);
     auto src1_high = input1.load(asc::te::make_coord(1, 0)).with_mask(mask);
 
-    asc::te::reg_tensor<bool> carry0;
-    auto low = asc::te::experimental::add(carry0, src0_low, src1_low);
-
-    asc::te::reg_tensor<bool> carry1;
-    auto high = asc::te::experimental::add_c(carry1, src0_high, src1_high, carry0);
+    asc::te::reg_tensor<bool> carry_low;
+    auto low = asc::te::experimental::add(carry_low, src0_low, src1_low);
+    asc::te::reg_tensor<bool> carry_high;
+    auto high = asc::te::experimental::add_c(carry_high, src0_high, src1_high, carry_low);
 
     output.store(asc::te::make_coord(0, 0), low);
     output.store(asc::te::make_coord(1, 0), high);

@@ -1,4 +1,4 @@
-# operator-（二元）
+# sub
 
 ## 产品支持情况
 
@@ -16,55 +16,55 @@
 
 命名空间：`asc::te::experimental`。
 
-二元`operator-`执行逐元素减法，支持寄存器与寄存器、寄存器与标量、标量与寄存器三种组合。
+对两个32位整数寄存器执行逐元素减法，返回减法结果的低32位，并通过引用参数`carry`输出补码减法的进位：
+
+$$
+dst_i = src0_i - src1_i
+$$
 
 ## 函数原型
 
 ```cpp
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator-(const T& a, const U& b)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> sub(
+    reg_tensor<bool>& carry,
+    const reg_tensor<T>& src0,
+    const reg_tensor<T>& src1)
 ```
 
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T`、`U` | 模板参数 | 至少一个为`reg_tensor`类型。寄存器元素类型支持`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`；标量须可转换为寄存器元素类型。 |
-| `a` | 输入 | 被减数，可以是`reg_tensor`或标量；`a`为寄存器时优先使用`a.mask`。 |
-| `b` | 输入 | 减数，可以是同元素类型寄存器或可转换标量；仅`b`为寄存器时使用`b.mask`。 |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`int32_t`、`uint32_t`。 |
+| `carry` | 输出 | 逐元素进位输出，类型为`reg_tensor<bool>`。`reg`保存进位，`mask`由接口写为`src0.mask`。 |
+| `src0` | 输入 | 被减数，类型为`reg_tensor<T>`，同时提供执行mask。 |
+| `src1` | 输入 | 减数，类型为`reg_tensor<T>`；`src1.mask`不参与执行mask的选择。 |
 
 ## 返回值说明
 
-返回元素类型与寄存器操作数相同的`reg_tensor`：
+返回`reg_tensor<T>`：
 
-- `reg`：有效元素保存左操作数减右操作数的结果。整型结果超出`T`的位宽时，
-  仅保留目标类型位宽内的结果。
-- `mask`：等于第一个`reg_tensor`操作数的`mask`。
+- `reg`：保存`src0.reg - src1.reg`的低32位。
+- `mask`：等于`src0.mask`。
 
-## 约束说明
-
-- 整型`operator-`的结果超出元素类型表示范围时采用非饱和截断。
-- 标量位于左侧时执行`scalar - reg`，操作数顺序不会交换。
+`carry.reg`保存补码减法的逐元素进位，`1`表示未借位，`0`表示发生借位。
 
 ## 调用示例
-
-以下示例展示接口在AIV计算函数中的典型调用方式。示例先为加载结果绑定mask，
-再执行计算并将结果写回UB。
 
 ```cpp
 #include "tensor_api/tensor.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void sub_example(
+__simd_vf__ inline void sub_with_carry_example(
     InputTensor input0, InputTensor input1, OutputTensor output)
 {
-    using asc::te::experimental::operator-;
-
     auto mask = asc::te::all_mask<uint32_t>();
-    auto src0_reg = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
-    auto src1_reg = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto src0 = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto src1 = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
 
-    auto difference = src0_reg - src1_reg;
-    output.store(asc::te::make_coord(0, 0), difference);
+    asc::te::reg_tensor<bool> carry;
+    auto result = asc::te::experimental::sub(carry, src0, src1);
+    output.store(asc::te::make_coord(0, 0), result);
 }
 ```
