@@ -553,14 +553,14 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long coalesced_group::thread
     return static_cast<unsigned long long>(__popc(_tiled_info.mask & lanemask_lt()));
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long coalesced_group::meta_group_size() const
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int coalesced_group::meta_group_size() const
 {
-    return static_cast<unsigned long long>(_tiled_info.meta_group_size);
+    return _tiled_info.meta_group_size;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long coalesced_group::meta_group_rank() const
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int coalesced_group::meta_group_rank() const
 {
-    return static_cast<unsigned long long>(_tiled_info.meta_group_rank);
+    return _tiled_info.meta_group_rank;
 }
 
 template <typename T>

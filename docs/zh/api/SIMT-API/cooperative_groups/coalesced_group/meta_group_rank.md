@@ -30,7 +30,7 @@
 ## 函数原型
 
 ```cpp
-unsigned long long meta_group_rank() const
+unsigned int meta_group_rank() const
 ```
 
 ## 参数说明

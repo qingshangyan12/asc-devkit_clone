@@ -11,8 +11,8 @@
 void sync() const;
 unsigned long long num_threads() const;
 unsigned long long thread_rank() const;
-unsigned long long meta_group_size() const;
-unsigned long long meta_group_rank() const;
+unsigned int meta_group_size() const;
+unsigned int meta_group_rank() const;
 template <typename T>
 T shfl(T var, int src_rank) const;
 template <typename T>

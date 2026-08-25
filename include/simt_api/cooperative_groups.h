@@ -260,8 +260,8 @@ public:
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long num_threads() const;
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long size() const;
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long thread_rank() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long meta_group_size() const;
-    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long meta_group_rank() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int meta_group_size() const;
+    __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int meta_group_rank() const;
 
     template <typename T>
     __SIMT_DEVICE_FUNCTIONS_DECL__ inline T shfl(T var, int src_rank) const;
