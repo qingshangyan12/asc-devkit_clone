@@ -34,7 +34,7 @@ else:
     )
 
 _TILING_DATA_TEMPLATE = "@@STATIC_VALUE_tiling_data@@"
-_LINK_OPTION = ("-m", "aicorelinux", "-r", "-Ttext=0", "-q", "-x")
+_LINK_OPTION = ("-m", "aicorelinux", "-Ttext=0", "-q", "-x")
 
 
 class ManifestGenerationError(RuntimeError):

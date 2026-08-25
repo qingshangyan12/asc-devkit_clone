@@ -490,7 +490,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         kernel = manifest["kernels"][0]
         self.assertEqual(
             kernel["link_options"],
-            ["-m", "aicorelinux", "-r", "-Ttext=0", "-q", "-x"],
+            ["-m", "aicorelinux", "-Ttext=0", "-q", "-x"],
         )
         constant_info = kernel["constant_infos"][0]
         self.assertEqual(constant_info["template"], "@@STATIC_VALUE_tiling_data@@")
