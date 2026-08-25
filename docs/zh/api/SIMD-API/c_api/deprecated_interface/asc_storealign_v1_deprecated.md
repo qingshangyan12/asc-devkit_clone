@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**该接口已废弃。其中asc_storealign_pack_v2请使用[asc_storealign_pack_quarter](asc_storealign_pack_quarter.md)实现此功能。**
+**该接口已废弃。其中asc_storealign_pack_v2请使用[asc_storealign_pack_quarter](../reg/reg_store/asc_storealign_pack_quarter.md)实现此功能。**
 
 reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续对齐搬出到Unified Buffer（UB）的场景，并支持多种搬出模式，接口不传入偏移，需要由用户自行更新目的操作数的地址。
 
@@ -147,7 +147,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
   | dst | 输出 | 目的操作数（矢量）的起始地址。 |
   | src | 输入 | 源操作数（掩码寄存器）。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg/reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 

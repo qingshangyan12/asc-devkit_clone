@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**该接口已废弃，请使用[asc_storealign_postupdate](asc_storealign_postupdate.md)实现此功能。**
+**该接口已废弃，请使用[asc_storealign_postupdate](../reg/reg_store/asc_storealign_postupdate.md)实现此功能。**
 
 reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到Unified Buffer（UB）的场景，接口使用repeat stride模式。
 
@@ -76,7 +76,7 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ float*& dst_align
 | repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg/reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
