@@ -62,7 +62,7 @@ bool __hlt(half x, half y)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelHlt(bool* dst, half* x, half* y)
+    __global__ __launch_bounds__(1024) void kernel_hlt(bool* dst, half* x, half* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __hlt(x[idx], y[idx]);
@@ -72,14 +72,14 @@ bool __hlt(half x, half y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelHlt(__gm__ bool* dst, __gm__ half* x, __gm__ half* y)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_hlt(__gm__ bool* dst, __gm__ half* x, __gm__ half* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __hlt(x[idx], y[idx]);
     }
 
-    __global__ __vector__ void runKernelHlt(__gm__ bool* dst, __gm__ half* x, __gm__ half* y)
+    __global__ __vector__ void run_kernel_hlt(__gm__ bool* dst, __gm__ half* x, __gm__ half* y)
     {
-        asc_vf_call<KernelHlt>(dim3(1024), dst, x, y);
+        asc_vf_call<kernel_hlt>(dim3(1024), dst, x, y);
     }
     ```

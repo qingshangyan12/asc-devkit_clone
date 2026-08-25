@@ -87,6 +87,11 @@ unsigned int __heqx2_mask(half2 x, half2 y)
     <td>0x0</td>
   </tr>
   <tr>
+    <td>-inf</td>
+    <td>inf</td>
+    <td>0x0</td>
+  </tr>
+  <tr>
     <td colspan="2">任一分量为nan</td>
     <td>0x0</td>
   </tr>
