@@ -49,6 +49,7 @@ ASCENDC_HOST_AICORE inline constexpr tuple<unwrap_decay_t<Tps>...> make_tuple(Tp
 template <typename ...Tps>
 ASCENDC_HOST_AICORE inline constexpr tuple<Tps& ...> tie(Tps& ...args) noexcept;
 
+// tuple
 // get
 template <size_t N, typename ...Tps>
 ASCENDC_HOST_AICORE inline constexpr typename tuple_element<N, tuple<Tps...> >::type& get(tuple<Tps...>& t) noexcept;
