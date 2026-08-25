@@ -17,7 +17,6 @@
 #include "utils.h"
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
-#include "../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
 #include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {

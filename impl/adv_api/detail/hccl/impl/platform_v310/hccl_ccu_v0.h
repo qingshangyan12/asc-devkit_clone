@@ -487,7 +487,7 @@ __aicore__ inline GM_ADDR HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     uint8_t msgId, uint8_t missionIndex)
 {
     const uint64_t region =
-        static_cast<uint64_t>(missionIndex) * KFC_SIGNAL_REGIONS_PER_MISSION + KFC_DONE_REGION_INDEX;
+        static_cast<uint64_t>(missionIndex) * KFC_SIGNAL_REGIONS_PER_MISSION + KFC_WAIT_REGION_INDEX;
     uint64_t offset = region * CCU_MAX_MSG_NUM * CCU_CKE_SIZE + static_cast<uint64_t>(msgId) * CCU_CKE_SIZE;
     GM_ADDR ckeAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->ckeAddr) : hcclContext_->ckeOffset;
     return ckeAddr + offset;

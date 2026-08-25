@@ -51,11 +51,11 @@ struct KfcAllGatherNhrContext : CcuKernelCtxBase {
 
 CcuResult InitResource(KfcAllGatherNhrContext& ctx)
 {
-    if (ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize || ctx.channelCount == 0U ||
-        ctx.rank2ChannelIdx == nullptr || ctx.rank2ChannelIdx->size() != ctx.channelCount || ctx.jettyNum == 0U) {
+    if (ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize || ctx.channelCount == 0U || ctx.rank2ChannelIdx == nullptr ||
+        ctx.rank2ChannelIdx->size() != ctx.channelCount || ctx.jettyNum == 0U) {
         HCCL_ERROR(
-            "[CcuKfcAllGatherNHR] invalid resource, rankSize[%u], rankId[%u], channels[%u], jetty[%u]",
-            ctx.rankSize, ctx.rankId, ctx.channelCount, ctx.jettyNum);
+            "[CcuKfcAllGatherNHR] invalid resource, rankSize[%u], rankId[%u], channels[%u], jetty[%u]", ctx.rankSize,
+            ctx.rankId, ctx.channelCount, ctx.jettyNum);
         return CCU_E_INTERNAL;
     }
     ctx.output.resize(ctx.channelCount + 1U);
@@ -96,8 +96,7 @@ CcuResult PostSync(KfcAllGatherNhrContext& ctx)
     return CCU_SUCCESS;
 }
 
-CcuResult WriteSlice(
-    KfcAllGatherNhrContext& ctx, uint32_t toRank, ccu::LocalAddr& source, ccu::RemoteAddr& destination)
+CcuResult WriteSlice(KfcAllGatherNhrContext& ctx, uint32_t toRank, ccu::LocalAddr& source, ccu::RemoteAddr& destination)
 {
     const ChannelHandle channel = ctx.channels[ctx.rank2ChannelIdx->at(toRank)];
     ccu::LocalAddr src = source;
@@ -224,10 +223,10 @@ CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
     ccu::Variable sliceSizePerJetty, ccu::Variable lastSliceSizePerJetty, ccu::Variable repeatNumInv,
     ccu::Variable inputSliceStride, ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride,
-    ccu::Variable outputRepeatStride, ccu::Variable isInputOutputEqual, ccu::Variable goSize0,
-    ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[],
-    uint32_t channelCount, uint32_t rankSize, uint32_t rankId, uint32_t jettyNum,
-    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
+    ccu::Variable outputRepeatStride, ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1,
+    ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
+    uint32_t rankSize, uint32_t rankId, uint32_t jettyNum, const std::vector<KfcNhrStepInfo>& stepInfoVector,
+    const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
 {
     KfcAllGatherNhrContext ctx;
     ctx.channels = channels;

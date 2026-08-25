@@ -394,9 +394,8 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherConcurMeshNHRMultiLink,
-    InsV2AllGatherConcurrentExecutor, TopoMatchUBX, CcuTempKfcAllGatherMesh1DMem2Mem,
-    CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem);
+    HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherConcurMeshNHRMultiLink, InsV2AllGatherConcurrentExecutor,
+    TopoMatchUBX, CcuTempKfcAllGatherMesh1DMem2Mem, CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem);
 #endif
 
 } // namespace mc2_ops_hccl
