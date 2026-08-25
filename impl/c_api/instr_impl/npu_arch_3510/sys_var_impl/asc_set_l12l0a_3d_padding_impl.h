@@ -31,43 +31,50 @@ __aicore__ inline void asc_set_l12l0a_3d_padding_impl(uint8_t padding_value)
 }
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(int16_t padding_value)
 {
-    asc_l12l0a_3d_padding_bitcode bitcode;
+    asc_3d_padding_bitcode bitcode;
+    bitcode.output = 0;
     bitcode.input_int16 = padding_value;
     asc_set_l12l0a_3d_padding_impl(bitcode.output);
 }
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(uint16_t padding_value)
 {
-    asc_l12l0a_3d_padding_bitcode bitcode;
+    asc_3d_padding_bitcode bitcode;
+    bitcode.output = 0;
     bitcode.input_uint16 = padding_value;
     asc_set_l12l0a_3d_padding_impl(bitcode.output);
 }
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(half padding_value)
 {
-    asc_l12l0a_3d_padding_bitcode bitcode;
+    asc_3d_padding_bitcode bitcode;
+    bitcode.output = 0;
     bitcode.input_half = padding_value;
     asc_set_l12l0a_3d_padding_impl(bitcode.output);
 }
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(bfloat16_t padding_value)
 {
-    asc_l12l0a_3d_padding_bitcode bitcode;
+    asc_3d_padding_bitcode bitcode;
+    bitcode.output = 0;
     bitcode.input_bfloat16 = padding_value;
     asc_set_l12l0a_3d_padding_impl(bitcode.output);
 }
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(int32_t padding_value)
 {
-    asc_l12l0a_3d_padding_bitcode bitcode;
+    asc_3d_padding_bitcode bitcode;
+    bitcode.output = 0;
     bitcode.input_int32 = padding_value;
     asc_set_l12l0a_3d_padding_impl(bitcode.output);
 }
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(uint32_t padding_value)
 {
-    asc_l12l0a_3d_padding_bitcode bitcode;
+    asc_3d_padding_bitcode bitcode;
+    bitcode.output = 0;
     bitcode.input_uint32 = padding_value;
     asc_set_l12l0a_3d_padding_impl(bitcode.output);
 }
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(float padding_value)
 {
-    asc_l12l0a_3d_padding_bitcode bitcode;
+    asc_3d_padding_bitcode bitcode;
+    bitcode.output = 0;
     bitcode.input_float = padding_value;
     asc_set_l12l0a_3d_padding_impl(bitcode.output);
 }
