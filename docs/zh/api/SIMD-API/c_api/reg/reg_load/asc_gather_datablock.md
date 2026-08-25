@@ -34,69 +34,143 @@
 
 ## 函数原型
 
-- 支持掩码控制，允许选择性收集数据
+### 支持掩码控制（占位符形式）
 
-    ```cpp
-    __simd_callee__ inline void asc_gather_datablock(vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_half& dst, __ubuf__ half* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__ int64_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index, vector_bool mask)
-    ```
-- 无掩码控制，默认收集所有索引对应的数据块
-    ```cpp
-    __simd_callee__ inline void asc_gather_datablock(vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_half& dst, __ubuf__ half* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_float& dst, __ubuf__ float* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__ int64_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index)
-    ```
+```c
+// 通过引用参数输出结果
+__simd_callee__ inline void asc_gather_datablock(vector_<dst_dtype>& dst,
+                                                 __ubuf__ <src_dtype>* src,
+                                                 vector_uint32_t index,
+                                                 vector_bool mask)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dtype>* src,
+                                                               vector_uint32_t index,
+                                                               vector_bool mask)
+```
+
+**表1** 支持的数据类型组合
+
+| dst类型 | src类型 | 函数返回值形式 |
+|---|---|---|
+| `vector_int4x2_t` | `int4b_t` | `vector_int4x2_t` |
+| `vector_int8_t` | `int8_t` | `vector_int8_t` |
+| `vector_uint8_t` | `uint8_t` | `vector_uint8_t` |
+| `vector_fp4x2_e2m1_t` | `fp4x2_e2m1_t` | `vector_fp4x2_e2m1_t` |
+| `vector_fp4x2_e1m2_t` | `fp4x2_e1m2_t` | `vector_fp4x2_e1m2_t` |
+| `vector_hifloat8_t` | `hifloat8_t` | `vector_hifloat8_t` |
+| `vector_fp8_e8m0_t` | `fp8_e8m0_t` | `vector_fp8_e8m0_t` |
+| `vector_fp8_e5m2_t` | `fp8_e5m2_t` | `vector_fp8_e5m2_t` |
+| `vector_fp8_e4m3fn_t` | `fp8_e4m3fn_t` | `vector_fp8_e4m3fn_t` |
+| `vector_int16_t` | `int16_t` | `vector_int16_t` |
+| `vector_uint16_t` | `uint16_t` | `vector_uint16_t` |
+| `vector_half` | `half` | `vector_half` |
+| `vector_bfloat16_t` | `bfloat16_t` | `vector_bfloat16_t` |
+| `vector_int32_t` | `int32_t` | `vector_int32_t` |
+| `vector_uint32_t` | `uint32_t` | `vector_uint32_t` |
+| `vector_float` | `float` | `vector_float` |
+| `vector_int64_t` | `int64_t` | 不支持 |
+| `vector_uint64_t` | `uint64_t` | 不支持 |
+
+**函数原型典型示例**
+
+```c
+// 通过引用参数输出结果示例：int8_t类型
+__simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst,
+                                                 __ubuf__ int8_t* src,
+                                                 vector_uint32_t index,
+                                                 vector_bool mask)
+
+// 通过函数返回值返回结果示例：int8_t类型
+__simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
+                                                          vector_uint32_t index,
+                                                          vector_bool mask)
+```
+
+### 无掩码控制（占位符形式）
+
+```c
+// 通过引用参数输出结果
+__simd_callee__ inline void asc_gather_datablock(vector_<dst_dtype>& dst,
+                                                 __ubuf__ <src_dtype>* src,
+                                                 vector_uint32_t index)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dtype>* src,
+                                                               vector_uint32_t index)
+```
+
+**表2** 支持的数据类型组合
+
+| dst类型 | src类型 | 函数返回值形式 |
+|---|---|---|
+| `vector_int4x2_t` | `int4b_t` | `vector_int4x2_t` |
+| `vector_int8_t` | `int8_t` | `vector_int8_t` |
+| `vector_uint8_t` | `uint8_t` | `vector_uint8_t` |
+| `vector_fp4x2_e2m1_t` | `fp4x2_e2m1_t` | `vector_fp4x2_e2m1_t` |
+| `vector_fp4x2_e1m2_t` | `fp4x2_e1m2_t` | `vector_fp4x2_e1m2_t` |
+| `vector_hifloat8_t` | `hifloat8_t` | `vector_hifloat8_t` |
+| `vector_fp8_e8m0_t` | `fp8_e8m0_t` | `vector_fp8_e8m0_t` |
+| `vector_fp8_e5m2_t` | `fp8_e5m2_t` | `vector_fp8_e5m2_t` |
+| `vector_fp8_e4m3fn_t` | `fp8_e4m3fn_t` | `vector_fp8_e4m3fn_t` |
+| `vector_int16_t` | `int16_t` | `vector_int16_t` |
+| `vector_uint16_t` | `uint16_t` | `vector_uint16_t` |
+| `vector_half` | `half` | `vector_half` |
+| `vector_bfloat16_t` | `bfloat16_t` | `vector_bfloat16_t` |
+| `vector_int32_t` | `int32_t` | `vector_int32_t` |
+| `vector_uint32_t` | `uint32_t` | `vector_uint32_t` |
+| `vector_float` | `float` | `vector_float` |
+| `vector_int64_t` | `int64_t` | 不支持 |
+| `vector_uint64_t` | `uint64_t` | 不支持 |
+
+**函数原型典型示例**
+
+```c
+// 通过引用参数输出结果示例：int8_t类型
+__simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst,
+                                                 __ubuf__ int8_t* src,
+                                                 vector_uint32_t index)
+
+// 通过函数返回值返回结果示例：int8_t类型
+__simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
+                                                          vector_uint32_t index)
+```
 
 ## 参数说明
 
-**表1** 参数说明
+### 支持掩码控制
 
-| 参数名  | 输入/输出 | 描述 |
-| :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+**表3** 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。 |
 | src | 输入 | 源操作数（矢量）的起始地址。 |
-| index | 输入 | 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。** 例如：<br>src: [DataBlock0, DataBlock1, DataBlock2, DataBlock3, DataBlock4, DataBlock5, DataBlock6, DataBlock7, ... , DataBlock32, ...]。<br>index: [0\*32, 1\*32, 2\*32, 3\*32, 4\*32, 5\*32, 6\*32, 32\*32]<br>dst: [DataBlock0, DataBlock1, DataBlock2, DataBlock3, DataBlock4, DataBlock5, DataBlock6, DataBlock32]。 |
+| index | 输入 | 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。** |
 | mask | 输入 | 源操作数掩码（掩码寄存器）。**DataBlock搬运的有效指示，按b32格式解释。一个DataBlock对应4bit，仅每4bit中的最低位有效。由于index仅前8个元素有效，因此mask仅使用前8个b32元素对应的bit 0、4、8、12、16、20、24、28，分别控制dstReg中DataBlock0至DataBlock7是否更新，其余bit无效。** |
+
+### 无掩码控制
+
+**表4** 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的操作数（矢量数据寄存器），仅适用于通过引用参数输出结果的函数原型。 |
+| src | 输入 | 源操作数（矢量）的起始地址。 |
+| index | 输入 | 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。** |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
 
 ## 返回值说明
 
-无
+- 通过引用参数输出结果的函数原型无返回值。
+- 通过函数返回值输出结果的函数原型返回收集结果，返回值类型与对应引用输出函数原型中`dst`参数的类型一致（去除引用）。
 
 ## 约束说明
 
+- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
+- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
+- b64数据类型属于编译器软件仿真实现，通过函数返回值输出结果的函数原型不做支持。
 - 源操作数在UB中的起始地址需要32B对齐。
 - 索引位置要大于等于0且32B对齐，即一个索引值对应一个DataBlock。
 - 索引可以存在相同的值，即可以多次读取源操作数中同一个DataBlock的数据。
