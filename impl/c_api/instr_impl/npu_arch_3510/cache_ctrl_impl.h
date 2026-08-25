@@ -47,6 +47,8 @@ __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst) { asc_ub_dcci_sing
 
 __aicore__ inline void asc_dcci_entire_all() { asc_dcci_entire_all_impl(); }
 
+__aicore__ inline void asc_dcci_entire_ub() { asc_dcci_entire_ub_impl(); }
+
 __aicore__ inline void asc_dcci_entire_out() { asc_dcci_entire_out_impl(); }
 
 __aicore__ inline void asc_dcci_entire_atomic() { asc_dcci_entire_atomic_impl(); }
