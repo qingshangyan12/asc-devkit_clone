@@ -28,8 +28,8 @@ HcclResult InheritKfcServerKernelArg(
     kfcArg->role = GetKfcServerRole(param.algName, missionIndex);
     const bool isAllGather =
         srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
-    const bool isAllGatherNhr = srcName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" &&
-                                param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+    const bool isAllGatherNhr =
+        srcName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isReduceScatter =
         srcName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
     if (isAllGatherNhr) {
@@ -107,13 +107,12 @@ HcclResult CcuTempKfcServer::CalcRes(
         const std::string sourceName(resourceRequest.ccuKernelInfos[kernelIndex].kernelFuncName);
         const bool isAllGather =
             sourceName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
-        const bool isAllGatherNhr = sourceName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" &&
-                                    param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
+        const bool isAllGatherNhr =
+            sourceName == "CcuKernelAllGatherNHR1DMultiJettyMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
         const bool isReduceScatter = sourceName == "CcuKernelKfcReduceScatterMesh1DMem2Mem" &&
                                      param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
-        const bool roleMatches = missionNum == 1U ||
-                                 (missionIndex == 0U && isAllGather) ||
-                                 (missionIndex == 1U && isAllGatherNhr);
+        const bool roleMatches =
+            missionNum == 1U || (missionIndex == 0U && isAllGather) || (missionIndex == 1U && isAllGatherNhr);
         if ((!isAllGather && !isAllGatherNhr && !isReduceScatter) || !roleMatches) {
             HCCL_ERROR(
                 "[CcuTempKfcServer::CalcRes] unsupported or misordered source kernel[%s] at mission[%u]",
@@ -121,8 +120,8 @@ HcclResult CcuTempKfcServer::CalcRes(
             return HCCL_E_NOT_SUPPORT;
         }
         HCCL_INFO(
-            "[CcuTempKfcServer::CalcRes] mission[%u] inheriting kernelargs from[%s]",
-            missionIndex, resourceRequest.ccuKernelInfos[kernelIndex].kernelFuncName);
+            "[CcuTempKfcServer::CalcRes] mission[%u] inheriting kernelargs from[%s]", missionIndex,
+            resourceRequest.ccuKernelInfos[kernelIndex].kernelFuncName);
         CHK_RET(InheritKfcServerKernelArg(
             resourceRequest.ccuKernelInfos[kernelIndex], kernelInfo, param, mySubCommRank_, subCommRanks_,
             missionIndex));

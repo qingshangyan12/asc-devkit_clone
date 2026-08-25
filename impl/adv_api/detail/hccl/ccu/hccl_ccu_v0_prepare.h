@@ -221,8 +221,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 }
 
 template <const auto& config>
-__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::
-    CcuPrepareForConcurrentAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam)
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForConcurrentAllGatherM2M(
+    __gm__ CommonPrepareParamCcu* commParam)
 {
     constexpr uint64_t meshBandwidth = 11U;
     constexpr uint64_t totalBandwidth = 21U;
@@ -233,11 +233,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::
     const uint64_t repeatOffset = totalSize * ccuParam_.repeatIndex;
     const uint64_t meshSize = (totalSize * meshBandwidth / totalBandwidth / splitAlignment) * splitAlignment;
     const uint64_t nhrSize = totalSize - meshSize;
-    const uint64_t nhrSliceSizePerJetty =
-        (nhrSize / nhrJettyNum / splitAlignment) * splitAlignment;
+    const uint64_t nhrSliceSizePerJetty = (nhrSize / nhrJettyNum / splitAlignment) * splitAlignment;
     const uint64_t nhrLastSliceSizePerJetty = nhrSize - nhrSliceSizePerJetty * (nhrJettyNum - 1U);
-    const uint64_t outputStride =
-        commParam->strideCount == 0U ? totalSize : commParam->strideCount * dataTypeSize;
+    const uint64_t outputStride = commParam->strideCount == 0U ? totalSize : commParam->strideCount * dataTypeSize;
     const uint64_t inputBase = reinterpret_cast<uint64_t>(commParam->sendBuf) + repeatOffset;
     const uint64_t outputBase = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
 
@@ -246,9 +244,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::
     xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT] = outputBase;
     xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET] = outputStride * ccuParam_.rankId;
     xnData_[KFC_CONCURRENT_AG_MESH_SLICE_SIZE] = meshSize;
-    CalcGoSize(
-        meshSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U,
-        &xnData_[KFC_CONCURRENT_AG_MESH_GO_SIZE_0]);
+    CalcGoSize(meshSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_AG_MESH_GO_SIZE_0]);
     xnData_[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL] =
         (inputBase == outputBase + xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET]) ? 1U : 0U;
 
@@ -267,9 +263,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::
          xnData_[KFC_CONCURRENT_AG_NHR_OUTPUT] + outputStride * ccuParam_.rankId) ?
             1U :
             0U;
-    CalcGoSize(
-        nhrSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U,
-        &xnData_[KFC_CONCURRENT_AG_NHR_GO_SIZE_0]);
+    CalcGoSize(nhrSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_AG_NHR_GO_SIZE_0]);
 }
 
 template <const auto& config>

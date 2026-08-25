@@ -830,6 +830,7 @@ HcclResult CalcChannelRequestNhrMultiJetty(
 {
 #ifndef AICPU_COMPILE
     channels.clear();
+    CHK_PTR_NULL(topoInfo);
     CHK_PRT_RET(
         subcommInfo.empty(), HCCL_ERROR("[CalcChannelRequestNhrMultiJetty] subcommInfo is empty."), HCCL_E_PARA);
     const u32 myRank = topoInfo->userRank;
