@@ -94,9 +94,11 @@ __simd_callee__ inline void asc_sub(vector_bool& carry,
                                     vector_bool mask)
 ```
 
-**dtype取值如下：**`int32_t`、`uint32_t`。
+#### dtype支持数据类型
 
-**函数原型典型示例**
+`dtype`取值为：`int32_t`、`uint32_t`。
+
+#### 函数原型典型示例
 
 ```c
 // 示例：int32_t类型的带借位输出减法

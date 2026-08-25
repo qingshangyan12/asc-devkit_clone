@@ -35,9 +35,7 @@ $$
 dst_i = \sqrt{src_i}
 $$
 
-## 函数原型
-
-### 占位符形式
+## 函数原型（占位符形式）
 
 ```c
 // 通过引用参数输出结果
@@ -50,9 +48,11 @@ __simd_callee__ inline vector_<dtype> asc_sqrt(vector_<dtype> src,
                                               vector_bool mask)
 ```
 
-**dtype取值如下：**`half`、`float`。
+### dtype支持数据类型
 
-**函数原型典型示例**
+`dtype`取值为：`half`、`float`。
+
+### 函数原型典型示例
 
 ```c
 // 通过引用参数输出结果示例：float类型

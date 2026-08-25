@@ -51,9 +51,11 @@ __simd_callee__ inline void asc_addc(vector_bool& carry,
                                      vector_bool mask)
 ```
 
-**dtype取值如下：**`int32_t`、`uint32_t`。
+### dtype支持数据类型
 
-**函数原型典型示例**
+`dtype`取值为：`int32_t`、`uint32_t`。
+
+### 函数原型典型示例
 
 ```cpp
 __simd_callee__ inline void asc_addc(vector_bool& carry,

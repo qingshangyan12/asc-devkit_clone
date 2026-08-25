@@ -72,7 +72,7 @@ __simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dty
 | `vector_int64_t` | `int64_t` | 不支持 |
 | `vector_uint64_t` | `uint64_t` | 不支持 |
 
-**函数原型典型示例**
+#### 函数原型典型示例
 
 ```c
 // 通过引用参数输出结果示例：int8_t类型
@@ -123,7 +123,7 @@ __simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dty
 | `vector_int64_t` | `int64_t` | 不支持 |
 | `vector_uint64_t` | `uint64_t` | 不支持 |
 
-**函数原型典型示例**
+#### 函数原型典型示例
 
 ```c
 // 通过引用参数输出结果示例：int8_t类型
