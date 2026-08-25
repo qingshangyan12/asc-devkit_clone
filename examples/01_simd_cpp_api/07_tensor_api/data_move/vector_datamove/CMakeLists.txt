@@ -18,12 +18,12 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 if(NOT DEFINED SCENARIO_NUM)
-    message(FATAL_ERROR "SCENARIO_NUM is not set. Please specify -DSCENARIO_NUM=1/2/3/4")
+    message(FATAL_ERROR "SCENARIO_NUM is not set. Please specify -DSCENARIO_NUM=1/2/3/4/5")
 endif()
 
 if(NOT SCENARIO_NUM EQUAL 1 AND NOT SCENARIO_NUM EQUAL 2 AND NOT SCENARIO_NUM EQUAL 3 AND
-   NOT SCENARIO_NUM EQUAL 4)
-    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3 or 4, got: ${SCENARIO_NUM}")
+   NOT SCENARIO_NUM EQUAL 4 AND NOT SCENARIO_NUM EQUAL 5)
+    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3, 4 or 5, got: ${SCENARIO_NUM}")
 endif()
 
 add_executable(demo
