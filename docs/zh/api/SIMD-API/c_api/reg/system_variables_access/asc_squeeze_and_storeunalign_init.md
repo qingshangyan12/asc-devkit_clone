@@ -31,15 +31,7 @@
 ## 函数原型
 
 ```cpp
-<<<<<<< HEAD:docs/zh/api/SIMD-API/c_api/reg/system_variables_access/asc_clear_ar_spr.md
-__simd_callee__ inline void asc_clear_ar_spr()
-
-namespace AscendC {
-__aicore__ inline void asc_clear_ar_spr()
-}
-=======
 __simd_callee__ inline void asc_squeeze_and_storeunalign_init()
->>>>>>> upstream/master:docs/zh/api/SIMD-API/c_api/reg/system_variables_access/asc_squeeze_and_storeunalign_init.md
 ```
 
 ## 参数说明
@@ -52,11 +44,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_init()
 
 ## 约束说明
 
-<<<<<<< HEAD:docs/zh/api/SIMD-API/c_api/reg/system_variables_access/asc_clear_ar_spr.md
-本接口可在VF函数内或VF函数外调用。VF函数内调用全局作用域接口，函数标记符为__simd_callee__；VF函数外调用AscendC命名空间接口，函数标记符为__aicore__。
-=======
 在首次调用asc_squeeze_and_storeunalign之前，需调用本接口将AR寄存器清零。
->>>>>>> upstream/master:docs/zh/api/SIMD-API/c_api/reg/system_variables_access/asc_squeeze_and_storeunalign_init.md
 
 ## 调用示例
 
