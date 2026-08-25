@@ -11,5 +11,3 @@
 | [exp_diff](exp_diff.md) | 减法与自然指数融合。 |
 | [fma](fma.md) | 融合乘加。 |
 | [muls_cast](muls_cast.md) | 标量乘与`float`到`half`转换融合。 |
-
-各接口的mask规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。

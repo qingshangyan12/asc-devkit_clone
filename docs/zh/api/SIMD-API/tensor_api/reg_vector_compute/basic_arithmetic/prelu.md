@@ -14,6 +14,8 @@
 
 头文件路径：`"tensor_api/tensor.h"`。
 
+命名空间：`asc::te::experimental`。
+
 使用逐元素斜率执行PReLU：
 
 $$
@@ -35,15 +37,9 @@ __simd_callee__ inline reg_tensor<T> prelu(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 模板参数 | 输入、斜率和返回值的元素类型。 |
+| `T` | 模板参数 | 输入、斜率和返回值的元素类型，支持`half`、`float`。 |
 | `src_reg` | 输入 | 待计算的输入寄存器，同时提供执行mask。 |
 | `slope` | 输入 | 负数区间使用的逐元素斜率寄存器；`slope.mask`不参与执行mask的选择。 |
-
-## 支持的数据类型
-
-| 模板参数 | 支持的数据类型 |
-| --- | --- |
-| `T` | `half`、`float` |
 
 ## 返回值说明
 
@@ -54,9 +50,6 @@ __simd_callee__ inline reg_tensor<T> prelu(
 
 ## 约束说明
 
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
-- `T`不是`half`或`float`时，编译失败，并提示`prelu supports half and float`。
-- `src_reg`和`slope`的元素类型不一致时，找不到匹配的`prelu`重载，编译失败。
 - 仅`src_reg.mask`中的有效元素参与计算；`slope.mask`不改变结果mask。
 
 ## 调用示例

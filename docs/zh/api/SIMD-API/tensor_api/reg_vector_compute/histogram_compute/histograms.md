@@ -12,6 +12,8 @@
 
 ## 功能说明
 
+命名空间：`asc::te::experimental`。
+
 统计`uint8_t`输入值的频率分布或累计分布，并在`dst`初始值上累加结果。
 
 | 配置项 | 取值 | 含义 |
@@ -25,7 +27,7 @@
 
 ```cpp
 template <const histogram_options& options = default_histogram_options>
-__simd_callee__ inline decltype(auto) histograms(
+__simd_callee__ inline reg_tensor<uint16_t> histograms(
     const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src)
 ```
 
@@ -34,14 +36,8 @@ __simd_callee__ inline decltype(auto) histograms(
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `options` | 模板参数 | 选择统计区间和统计模式。 |
-| `dst` | 输入 | `uint16_t`统计初值。 |
-| `src` | 输入 | 待统计的`uint8_t`数据，`src.mask`标识参与统计的元素。 |
-
-## 支持的数据类型
-
-| `src` | `dst`和返回类型 |
-| --- | --- |
-| `reg_tensor<uint8_t>` | `reg_tensor<uint16_t>` |
+| `dst` | 输入 | `reg_tensor<uint16_t>`类型的统计初值。 |
+| `src` | 输入 | `reg_tensor<uint8_t>`类型的待统计数据，`src.mask`标识参与统计的元素。 |
 
 ## 返回值说明
 
@@ -51,7 +47,6 @@ __simd_callee__ inline decltype(auto) histograms(
 
 - 完整统计`[0, 255]`需要分别选择`low`和`high`，并使用两个目标寄存器保存结果。
 - 非默认配置必须先定义具名的`constexpr histogram_options`，再作为模板实参传入。
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
 
 ## 调用示例
 

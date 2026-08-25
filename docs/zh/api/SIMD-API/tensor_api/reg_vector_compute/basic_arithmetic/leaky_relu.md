@@ -14,6 +14,8 @@
 
 头文件路径：`"tensor_api/tensor.h"`。
 
+命名空间：`asc::te::experimental`。
+
 使用标量斜率执行Leaky ReLU：
 
 $$
@@ -35,16 +37,10 @@ __simd_callee__ inline reg_tensor<T> leaky_relu(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 模板参数 | 输入和返回值的元素类型。 |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`half`、`float`。 |
 | `scalar_type` | 模板参数 | 标量斜率类型，必须可转换为`T`。 |
 | `src_reg` | 输入 | 待计算的输入寄存器。 |
 | `slope` | 输入 | 负数区间使用的标量斜率。 |
-
-## 支持的数据类型
-
-| 模板参数 | 支持的数据类型 |
-| --- | --- |
-| `T` | `half`、`float` |
 
 ## 返回值说明
 
@@ -52,12 +48,6 @@ __simd_callee__ inline reg_tensor<T> leaky_relu(
 
 - `reg`：有效元素在`src_reg.reg >= 0`时取原值，否则取`src_reg.reg * slope`；无效元素置零。
 - `mask`：等于`src_reg.mask`。
-
-## 约束说明
-
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
-- `T`不是`half`或`float`时，编译失败，并提示`leaky_relu supports half and float`。
-- `slope`是`reg_tensor`或不能转换为`T`时，编译失败，并提示该参数必须是可转换为输入元素类型的标量。
 
 ## 调用示例
 

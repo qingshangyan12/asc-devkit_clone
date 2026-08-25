@@ -14,6 +14,8 @@
 
 头文件路径：`"tensor_api/tensor.h"`。
 
+命名空间：`asc::te::experimental`。
+
 逐元素计算以10为底的对数：
 
 $$
@@ -33,14 +35,8 @@ __simd_callee__ inline reg_tensor<T> log10(const reg_tensor<T>& src_reg)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 模板参数 | 输入和返回值的元素类型。 |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`half`、`float`。 |
 | `src_reg` | 输入 | 待计算的`reg_tensor<T>`。 |
-
-## 支持的数据类型
-
-| 模板参数 | 支持的数据类型 |
-| --- | --- |
-| `T` | `half`、`float` |
 
 ## 返回值说明
 
@@ -51,8 +47,6 @@ __simd_callee__ inline reg_tensor<T> log10(const reg_tensor<T>& src_reg)
 
 ## 约束说明
 
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
-- `T`不是`half`或`float`时，编译失败，并提示`log supports half and float`。
 - 有效输入元素小于`0`时返回`nan`，等于`0`时返回`-inf`。
 - 接口通过自然对数和换底常数相乘实现，结果包含两步计算产生的舍入误差。
 

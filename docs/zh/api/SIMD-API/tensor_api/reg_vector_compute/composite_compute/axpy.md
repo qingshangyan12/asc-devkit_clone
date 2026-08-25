@@ -14,6 +14,8 @@
 
 头文件路径：`"tensor_api/tensor.h"`。
 
+命名空间：`asc::te::experimental`。
+
 逐元素将`src`与标量相乘，再与`dst`原值相加：
 
 $$
@@ -34,16 +36,11 @@ __simd_callee__ inline decltype(auto) axpy(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`half`、`float`。 |
+| `scalar_type` | 模板参数 | 标量类型，必须与`T`相同。 |
 | `dst` | 输入 | 累加初值，同时提供结果mask。 |
 | `src` | 输入 | 与标量相乘的输入寄存器。 |
 | `scalar` | 输入 | 标量乘数，类型必须与`T`完全一致。 |
-
-## 支持的数据类型
-
-| `dst` | `src` | `scalar` | 返回值 |
-| --- | --- | --- | --- |
-| `reg_tensor<half>` | `reg_tensor<half>` | `half` | `reg_tensor<half>` |
-| `reg_tensor<float>` | `reg_tensor<float>` | `float` | `reg_tensor<float>` |
 
 ## 返回值说明
 
@@ -51,14 +48,6 @@ __simd_callee__ inline decltype(auto) axpy(
 
 - `reg`：有效元素保存`dst.reg + scalar * src.reg`，无效元素置零。
 - `mask`：等于`dst.mask`；`src.mask`不参与执行mask的选择。
-
-## 约束说明
-
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
-- `T`不是`half`或`float`时，编译失败，并提示`axpy supports half and float`。
-- `dst`与`src`的元素类型不一致时，找不到匹配的`axpy`重载，编译失败。
-- `scalar`的类型与`T`不完全一致时，编译失败，并提示标量与寄存器元素类型必须匹配；例如`T`为`float`
-  时应传入`0.25f`，不能传入`0.25`。
 
 ## 调用示例
 

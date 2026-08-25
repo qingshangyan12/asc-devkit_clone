@@ -14,6 +14,8 @@
 
 头文件路径：`"tensor_api/tensor.h"`。
 
+命名空间：`asc::te::experimental`。
+
 对`src_reg`中mask有效的元素逐个取绝对值，并返回计算结果：
 
 $$
@@ -31,14 +33,8 @@ __simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src_reg)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 模板参数 | 输入和返回值的元素类型。 |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`int8_t`、`int16_t`、`half`、`int32_t`、`float`。 |
 | `src_reg` | 输入 | 待计算的`reg_tensor<T>`，同时携带有效元素mask。 |
-
-## 支持的数据类型
-
-| 模板参数 | 支持的数据类型 |
-| --- | --- |
-| `T` | `int8_t`、`int16_t`、`half`、`int32_t`、`float` |
 
 ## 返回值说明
 
@@ -49,11 +45,8 @@ __simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src_reg)
 
 ## 约束说明
 
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
 - 整型计算采用非饱和行为。对于有符号整数的最小值，其绝对值无法由原类型表示，结果按原位宽保留。
   例如，`int8_t(-128)`的计算结果仍为`int8_t(-128)`。
-- 当`T`可实例化为`reg_tensor<T>`、但不是上述支持类型时，编译期校验失败，诊断信息包含
-  `abs does not support this element type`。
 
 ## 调用示例
 

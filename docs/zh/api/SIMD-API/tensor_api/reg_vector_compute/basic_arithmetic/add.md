@@ -12,29 +12,34 @@
 
 ## 功能说明
 
+命名空间：`asc::te::experimental`。
+
 逐元素执行加法。支持寄存器与寄存器、寄存器与标量、标量与寄存器三种操作数组合。
 
 ## 函数原型
 
 ```cpp
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator+(const T& a, const U& b)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator+(
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator+(
+    const reg_tensor<T>& src, const T& scalar)
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator+(
+    const T& scalar, const reg_tensor<T>& src)
 ```
 
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `a` | 输入 | 左操作数，可以是`reg_tensor`或标量。 |
-| `b` | 输入 | 右操作数，可以是与寄存器元素类型相同的`reg_tensor`或可转换标量。 |
-
-至少一个操作数必须为`reg_tensor`。两个寄存器操作数的元素类型必须一致。
-
-## 支持的数据类型
-
-| 寄存器元素类型 | 支持的操作数组合 |
-| --- | --- |
-| `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 寄存器/寄存器、寄存器/标量、标量/寄存器 |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。 |
+| `src0`、`src1` | 输入 | 寄存器/寄存器形式的两个加数，类型均为`reg_tensor<T>`。 |
+| `src` | 输入 | 标量形式中的寄存器加数，类型为`reg_tensor<T>`。 |
+| `scalar` | 输入 | 标量加数，类型为`T`。 |
 
 ## 返回值说明
 
@@ -42,9 +47,8 @@ __simd_callee__ inline decltype(auto) operator+(const T& a, const U& b)
 
 ## 约束说明
 
-- 标量必须能够转换为寄存器元素类型。
+- 标量类型必须与寄存器元素类型一致。
 - 整型结果超出元素类型表示范围时采用非饱和截断。
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
 
 ## 调用示例
 

@@ -14,6 +14,8 @@
 
 头文件路径：`"tensor_api/tensor.h"`。
 
+命名空间：`asc::te::experimental`。
+
 `add`对两个32位整数寄存器执行逐元素加法，返回低32位结果，并通过引用参数输出进位；
 `add_c`在此基础上继续加入逐元素进位输入，并输出新的进位。二者用于构成从低位到高位的
 多字整数加法链：
@@ -46,16 +48,10 @@ __simd_callee__ inline reg_tensor<T> add_c(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`int32_t`、`uint32_t`。 |
 | `carry` | 输出 | `add`和`add_c`的逐元素进位输出。`reg`保存进位，`mask`由接口写为`src0.mask`。 |
 | `src0`、`src1` | 输入 | 两个相同元素类型的32位整数加数。执行mask取`src0.mask`。 |
 | `carry_src` | 输入 | 仅用于`add_c`。逐元素进位输入，读取其`reg`；`carry_src.mask`不参与执行mask的选择。 |
-
-## 支持的数据类型
-
-| 参数 | 支持的数据类型 |
-| --- | --- |
-| `T` | `int32_t`、`uint32_t` |
-| `carry`、`carry_src` | `reg_tensor<bool>` |
 
 ## 返回值说明
 
@@ -68,11 +64,6 @@ __simd_callee__ inline reg_tensor<T> add_c(
 
 ## 约束说明
 
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
-- `add`的`T`不是`int32_t`或`uint32_t`时，编译失败，并提示
-  `add with carry supports int32_t and uint32_t`；`add_c`对应提示为
-  `add_c supports int32_t and uint32_t`。
-- `carry_src`仅用于`add_c`，且必须是`reg_tensor<bool>`；类型不匹配时找不到对应重载，编译失败。
 - 用于多字整数分段加法时，未按照从低位到高位的顺序传递进位会得到错误的高位结果。
 
 ## 调用示例

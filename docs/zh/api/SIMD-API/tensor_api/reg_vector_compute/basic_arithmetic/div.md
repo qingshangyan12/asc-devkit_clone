@@ -14,6 +14,8 @@
 
 头文件路径：`"tensor_api/tensor.h"`。
 
+命名空间：`asc::te::experimental`。
+
 逐元素执行除法，支持寄存器与寄存器、寄存器与标量、标量与寄存器三种组合。
 
 ## 函数原型
@@ -27,17 +29,12 @@ __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
+| `T`、`U` | 模板参数 | 至少一个为`reg_tensor`类型。寄存器元素类型支持`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`；标量须可转换为寄存器元素类型。 |
 | `a` | 输入 | 被除数，可以是`reg_tensor`或标量；`a`为寄存器时优先使用`a.mask`。 |
 | `b` | 输入 | 除数，可以是同元素类型寄存器或可转换标量；仅`b`为寄存器时使用`b.mask`。 |
 
 至少一个操作数必须为`reg_tensor`。双寄存器形式要求元素类型一致；标量会转换为
 寄存器元素类型并广播。
-
-## 支持的数据类型
-
-| 参数 | 支持的数据类型 |
-| --- | --- |
-| 寄存器元素类型 | `int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float` |
 
 ## 返回值说明
 
@@ -48,8 +45,6 @@ __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
 
 ## 约束说明
 
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
-- 双寄存器元素类型不一致时，编译失败，并提示寄存器操作数必须具有相同的元素类型。
 - 整数除数为`0`时结果未定义；浮点除数为`0`时按照浮点运算规则产生`inf`或`nan`。
 - 标量位于左侧时执行`scalar / reg`，操作数顺序不会交换。
 

@@ -14,6 +14,8 @@
 
 头文件路径：`"tensor_api/tensor.h"`。
 
+命名空间：`asc::te::experimental`。
+
 逐元素执行融合乘加：
 
 $$
@@ -34,15 +36,10 @@ __simd_callee__ inline decltype(auto) fma(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`half`、`float`。 |
 | `src0` | 输入 | 第一个乘数，同时提供结果mask。 |
 | `src1` | 输入 | 第二个乘数。 |
 | `src2` | 输入 | 加数。 |
-
-## 支持的数据类型
-
-| 模板参数 | 支持的数据类型 |
-| --- | --- |
-| `T` | `half`、`float` |
 
 ## 返回值说明
 
@@ -50,12 +47,6 @@ __simd_callee__ inline decltype(auto) fma(
 
 - `reg`：有效元素保存`src0.reg * src1.reg + src2.reg`，无效元素置零。
 - `mask`：等于`src0.mask`；`src1.mask`和`src2.mask`不参与执行mask的选择。
-
-## 约束说明
-
-- mask初始化和传导规则请参见[mask使用与传导](../reg_vector_compute.md#mask使用与传导)。
-- `T`不是`half`或`float`时，编译失败，并提示`fma supports half and float`。
-- 三个输入寄存器的元素类型不一致时，找不到匹配的`fma`重载，编译失败。
 
 ## 调用示例
 
