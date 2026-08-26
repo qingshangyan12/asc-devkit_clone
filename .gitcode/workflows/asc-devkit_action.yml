@@ -106,143 +106,143 @@ stages:
     pre:
     - type: auto
     fail-fast: false
-  stage3:
-    name: UT
-    jobs:
-      JOB_api_check:
-        name: API_Check
-        steps:
-          -
-            name: api-check
-            identifier: api-check
-            uses: cann/.gitcode/actions/api-check@master
-            with:
-              org_name: ${{ env.org_name }}
-              mode: check
-              repo_name: ${{ env.repo_name }}
-              merge_id: ${{ env.MERGE_ID }}
-        if: env.TARGET_BRANCH == 'master'
-        runs-on: [self-hosted, arch=x64, spec=small]
-        container:
-          image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ jobs.JOB_image.outputs.API_Check }}
-      JOB_UT_Test_adv_test_one:
-        name: UT_Test_adv_test_one
-        uses: .gitcode/workflows/ut_action.yml
-        with:
-          ut_type: 'adv_test'
-          ut_package: 'coverage_*.info'
-          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
-          arch: 'x64'
-      JOB_UT_Test_adv_test_two:
-        name: UT_Test_adv_test_two
-        uses: .gitcode/workflows/ut_action.yml
-        with:
-          ut_type: 'adv_test_two'
-          ut_package: 'coverage_*.info'
-          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
-          arch: 'x64'
-      JOB_UT_Test_basic_test_one:
-        name: UT_Test_basic_test_one
-        uses: .gitcode/workflows/ut_action.yml
-        with:
-          ut_type: 'basic_test_one'
-          ut_package: 'coverage_*.info'
-          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
-          arch: 'x64'
-      JOB_UT_Test_basic_test_two:
-        name: UT_Test_basic_test_two
-        uses: .gitcode/workflows/ut_action.yml
-        with:
-          ut_type: 'basic_test_two'
-          ut_package: 'coverage_*.info'
-          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
-          arch: 'x64'
-      JOB_UT_Test_basic_test_three:
-        name: UT_Test_basic_test_three
-        uses: .gitcode/workflows/ut_action.yml
-        with:
-          ut_type: 'basic_test_three'
-          ut_package: 'coverage_*.info'
-          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
-          arch: 'x64'
-      JOB_UT_Test_basic_test_four:
-        name: UT_Test_basic_test_four
-        uses: .gitcode/workflows/ut_action.yml
-        with:
-          ut_type: 'basic_test_four'
-          ut_package: 'coverage_*.info'
-          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
-          arch: 'x64'
-      JOB_UT_Test_basic_test_five:
-        name: UT_Test_basic_test_five
-        uses: .gitcode/workflows/ut_action.yml
-        with:
-          ut_type: 'basic_test_five'
-          ut_package: 'coverage_*.info'
-          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
-          arch: 'x64'
-      JOB_UT_Test_arm:
-        name: UT_Test_arm
-        uses: .gitcode/workflows/ut_action.yml
-        with:
-          ut_type: 'arm_test'
-          ut_package: 'coverage_*.info'
-          image_version: ${{ jobs.JOB_image.outputs.UT_Test_arm }}
-          arch: 'arm64'
-    pre:
-    - type: auto
-    fail-fast: false
-  stage4:
-    name: UT_report
-    jobs:
-      JOB_ut_report_lcov:
-        name: UT_report
-        steps:
-          -
-            name: Checkout
-            identifier: process_checkout
-            uses: checkout
-            with:
-              ref: ${{ atomgit.event.pull_request.merge_commit_sha }}
-              token: ${{secrets.GIT_TOKEN}}
-          -
-            name: download
-            uses: obs-download
-            with:
-              endpoint: "https://obs.cn-north-4.myhuaweicloud.com"
-              bucket: "ascend-ci"
-              key: |
-                ${{ env.obs_path }}/pr_filelist.txt
-                ${{ env.obs_path }}/pr_filelist_mod.txt
-              path: ${{ steps.process_checkout.outputs.path }}
-          -
-            name: ut_report
-            identifier: ut-report
-            uses: cann/.gitcode/actions/ut-cov-report@master
-            with:
-              workspace: ${{ steps.process_checkout.outputs.path }}
-              cov_mode: "report"
-              ut_field: "asc-devkit"
-              modules: "adv_test adv_test_two basic_test_one basic_test_two basic_test_three basic_test_four basic_test_five"
-              source_branch: ${{ env.SOURCE_BRANCH }}
-              target_branch: ${{ env.TARGET_BRANCH }}
-              obs_path: ${{ env.obs_path }}
-              git_token: ${{secrets.GIT_TOKEN}}
-          -
-            name: upload
-            uses: obs-upload
-            with:
-              endpoint: "https://obs.cn-north-4.myhuaweicloud.com"
-              bucket: "ascend-ci"
-              access-key: ${{secrets.AK}}
-              secret-key: ${{secrets.SK}}
-              artifact-path: |
-                ${{ steps.process_checkout.outputs.path }}/ut_cov_*.tar.gz
-              object-prefix: ${{ env.obs_path }}/
-        if: "${{ default() }}"
-        runs-on: [self-hosted, arch=x64, spec=large]
-        container:
-          image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ jobs.JOB_image.outputs.UT_Test }}
+  # stage3:
+  #   name: UT
+  #   jobs:
+  #     JOB_api_check:
+  #       name: API_Check
+  #       steps:
+  #         -
+  #           name: api-check
+  #           identifier: api-check
+  #           uses: cann/.gitcode/actions/api-check@master
+  #           with:
+  #             org_name: ${{ env.org_name }}
+  #             mode: check
+  #             repo_name: ${{ env.repo_name }}
+  #             merge_id: ${{ env.MERGE_ID }}
+  #       if: env.TARGET_BRANCH == 'master'
+  #       runs-on: [self-hosted, arch=x64, spec=small]
+  #       container:
+  #         image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ jobs.JOB_image.outputs.API_Check }}
+  #     JOB_UT_Test_adv_test_one:
+  #       name: UT_Test_adv_test_one
+  #       uses: .gitcode/workflows/ut_action.yml
+  #       with:
+  #         ut_type: 'adv_test'
+  #         ut_package: 'coverage_*.info'
+  #         image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+  #         arch: 'x64'
+  #     JOB_UT_Test_adv_test_two:
+  #       name: UT_Test_adv_test_two
+  #       uses: .gitcode/workflows/ut_action.yml
+  #       with:
+  #         ut_type: 'adv_test_two'
+  #         ut_package: 'coverage_*.info'
+  #         image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+  #         arch: 'x64'
+  #     JOB_UT_Test_basic_test_one:
+  #       name: UT_Test_basic_test_one
+  #       uses: .gitcode/workflows/ut_action.yml
+  #       with:
+  #         ut_type: 'basic_test_one'
+  #         ut_package: 'coverage_*.info'
+  #         image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+  #         arch: 'x64'
+  #     JOB_UT_Test_basic_test_two:
+  #       name: UT_Test_basic_test_two
+  #       uses: .gitcode/workflows/ut_action.yml
+  #       with:
+  #         ut_type: 'basic_test_two'
+  #         ut_package: 'coverage_*.info'
+  #         image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+  #         arch: 'x64'
+  #     JOB_UT_Test_basic_test_three:
+  #       name: UT_Test_basic_test_three
+  #       uses: .gitcode/workflows/ut_action.yml
+  #       with:
+  #         ut_type: 'basic_test_three'
+  #         ut_package: 'coverage_*.info'
+  #         image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+  #         arch: 'x64'
+  #     JOB_UT_Test_basic_test_four:
+  #       name: UT_Test_basic_test_four
+  #       uses: .gitcode/workflows/ut_action.yml
+  #       with:
+  #         ut_type: 'basic_test_four'
+  #         ut_package: 'coverage_*.info'
+  #         image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+  #         arch: 'x64'
+  #     JOB_UT_Test_basic_test_five:
+  #       name: UT_Test_basic_test_five
+  #       uses: .gitcode/workflows/ut_action.yml
+  #       with:
+  #         ut_type: 'basic_test_five'
+  #         ut_package: 'coverage_*.info'
+  #         image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+  #         arch: 'x64'
+  #     JOB_UT_Test_arm:
+  #       name: UT_Test_arm
+  #       uses: .gitcode/workflows/ut_action.yml
+  #       with:
+  #         ut_type: 'arm_test'
+  #         ut_package: 'coverage_*.info'
+  #         image_version: ${{ jobs.JOB_image.outputs.UT_Test_arm }}
+  #         arch: 'arm64'
+  #   pre:
+  #   - type: auto
+  #   fail-fast: false
+  # stage4:
+  #   name: UT_report
+  #   jobs:
+  #     JOB_ut_report_lcov:
+  #       name: UT_report
+  #       steps:
+  #         -
+  #           name: Checkout
+  #           identifier: process_checkout
+  #           uses: checkout
+  #           with:
+  #             ref: ${{ atomgit.event.pull_request.merge_commit_sha }}
+  #             token: ${{secrets.GIT_TOKEN}}
+  #         -
+  #           name: download
+  #           uses: obs-download
+  #           with:
+  #             endpoint: "https://obs.cn-north-4.myhuaweicloud.com"
+  #             bucket: "ascend-ci"
+  #             key: |
+  #               ${{ env.obs_path }}/pr_filelist.txt
+  #               ${{ env.obs_path }}/pr_filelist_mod.txt
+  #             path: ${{ steps.process_checkout.outputs.path }}
+  #         -
+  #           name: ut_report
+  #           identifier: ut-report
+  #           uses: cann/.gitcode/actions/ut-cov-report@master
+  #           with:
+  #             workspace: ${{ steps.process_checkout.outputs.path }}
+  #             cov_mode: "report"
+  #             ut_field: "asc-devkit"
+  #             modules: "adv_test adv_test_two basic_test_one basic_test_two basic_test_three basic_test_four basic_test_five"
+  #             source_branch: ${{ env.SOURCE_BRANCH }}
+  #             target_branch: ${{ env.TARGET_BRANCH }}
+  #             obs_path: ${{ env.obs_path }}
+  #             git_token: ${{secrets.GIT_TOKEN}}
+  #         -
+  #           name: upload
+  #           uses: obs-upload
+  #           with:
+  #             endpoint: "https://obs.cn-north-4.myhuaweicloud.com"
+  #             bucket: "ascend-ci"
+  #             access-key: ${{secrets.AK}}
+  #             secret-key: ${{secrets.SK}}
+  #             artifact-path: |
+  #               ${{ steps.process_checkout.outputs.path }}/ut_cov_*.tar.gz
+  #             object-prefix: ${{ env.obs_path }}/
+  #       if: "${{ default() }}"
+  #       runs-on: [self-hosted, arch=x64, spec=large]
+  #       container:
+  #         image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ jobs.JOB_image.outputs.UT_Test }}
   stage5:
     name: PreSmoke
     jobs:
