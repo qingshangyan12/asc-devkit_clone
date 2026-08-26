@@ -11,6 +11,8 @@
 #define HCCLV2_INS_V2_ALL_TO_ALL_V_SOLE_EXECUTOR_H
 
 #include "executor_common_ops.h"
+#include "topo_match_ubx.h"
+#include "topo_match_ubx_1d.h"
 
 namespace mc2_ops_hccl {
 

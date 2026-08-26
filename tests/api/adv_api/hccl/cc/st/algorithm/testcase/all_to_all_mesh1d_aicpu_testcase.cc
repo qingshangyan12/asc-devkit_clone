@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <limits>
+#include <string>
 #include <vector>
 
 #include "alg_env_config.h"
@@ -107,12 +108,17 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_concurrent_selectors_obey_topology
     param.all2AllVDataDes.sendCounts = sendCounts;
     std::string algName;
 
-    EXPECT_EQ(alltoallSelector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
+    EXPECT_EQ(alltoallSelector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX");
     sendCounts[0] = 513U;
     param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
     param.all2AllVDataDes.sendCounts = sendCounts;
     EXPECT_EQ(alltoallSelector.Select(param, &topo, algName), SelectorStatus::MATCH);
+#if defined(HCCL_CANN_COMPAT_850)
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX");
+#else
     EXPECT_EQ(algName, "AicpuAllToAllSoleMeshConcurrent");
+#endif
 
     param = MakeAicpuParam(HCCL_CMD_ALLTOALLV);
     EXPECT_EQ(alltoallvSelector.Select(param, &topo, algName), SelectorStatus::MATCH);
@@ -126,6 +132,24 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_concurrent_selectors_obey_topology
     topo = MakeConcurrentTopo();
     topo.level0PcieMix = true;
     EXPECT_EQ(alltoallvSelector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, alltoall_selector_preserves_multi_level_mesh_clos_path)
+{
+    AlltoAllAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    topo.topoLevelNums = 2U;
+    u64 sendCounts[4] = {513U, 513U, 513U, 513U};
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
+    param.all2AllVDataDes.sendCounts = sendCounts;
+    std::string algName;
+
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+#if defined(HCCL_CANN_COMPAT_850)
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX");
+#else
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshConcurrent");
+#endif
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, concurrent_template_uses_all_channels_per_rank)
