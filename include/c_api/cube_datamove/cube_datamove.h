@@ -93,6 +93,9 @@ __aicore__ inline void asc_set_l12l0_padding_val(uint64_t config);
 __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
 
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
+__aicore__ inline void asc_set_l0c_copy_relu_alpha(float& scalar_relu_pre_alpha);
+__aicore__ inline void asc_set_l0c_copy_lrelu_alpha(half& scalar_relu_pre_alpha);
+__aicore__ inline void asc_set_l0c_copy_lrelu_alpha(float& scalar_relu_pre_alpha);
 
 // ==========asc_copy_l12fb==========
 __aicore__ inline void asc_copy_l12fb(
@@ -1383,7 +1386,7 @@ __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint3
 
 // =============asc_copy_l12ub===============
 __aicore__ inline void asc_copy_l12ub(
-    __ubuf__ void* dst_addr, __cbuf__ void* src_addr, bool sub_blockid, uint16_t n_burst, uint16_t len_burst,
+    __ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t n_burst, uint16_t len_burst,
     uint16_t src_gap, uint16_t dst_gap);
 
 //=============asc_copy_l0c2l1===============
