@@ -252,6 +252,9 @@ C API文档目录。除试验接口外，整体使用时可以引入`asc_simd.h`
 
 | API名称 | 说明 |
 | ------ | ----------- |
+| [系统同步能力概述](sync/system_sync_overview.md) | 介绍AI Core的同步分类以及各类同步对应的接口。 |
+| [核内同步能力概述](sync/intra_core_sync_overview.md) | 介绍AI Core内部不同流水线之间的同步机制。 |
+| [核间同步能力概述](sync/inter_core_sync_overview.md) | 介绍不同AI Core之间的同步场景和同步方式。 |
 | [asc_lock](sync/asc_lock.md) | 用于AI Core内部异步流水线同步的接口。 |
 | [asc_sync](sync/asc_sync.md) | 等待所有流水线操作完成。 |
 | [asc_sync_block_arrive](sync/asc_sync_block_arrive.md) | 该指令用于发送同步信息数据到核间同步寄存器，设置同步点。 |
@@ -327,6 +330,8 @@ C API文档目录。除试验接口外，整体使用时可以引入`asc_simd.h`
 
 | API名称 | 说明 |
 | ------ | ----------- |
+| [原子操作概述](simd_atomic/atomic_operations_overview.md) | 介绍数据搬运随路原子操作和Scalar原子操作。 |
+| [关键特性说明](simd_atomic/key_features.md) | 介绍原子操作场景下的确定性计算及相关同步要求。 |
 | [asc_get_store_atomic_config](simd_atomic/asc_get_store_atomic_config.md) | 获取原子操作启用位与原子操作类型的值。 |
 | [asc_set_atomic_add_bfloat](simd_atomic/asc_set_atomic_add.md) | 设置对后续的从UB/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为bfloat16_t。 |
 | [asc_set_atomic_add_float](simd_atomic/asc_set_atomic_add.md) | 设置对后续的从UB/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为float。 |
