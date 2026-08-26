@@ -11,6 +11,7 @@
 #ifndef TESTS_API_C_API_NPU_ARCH_3510_UTILS_TEST_BINARY_INSTR_UTILS_H
 #define TESTS_API_C_API_NPU_ARCH_3510_UTILS_TEST_BINARY_INSTR_UTILS_H
 
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
@@ -42,6 +43,31 @@
                                                                                                                        \
         c_api_name(dst, src0, src1, mask);                                                                             \
         GlobalMockObject::verify();                                                                                    \
+    }
+
+#define TEST_VECTOR_COMPUTE_BINARY_INSTR_RETURN(class_name, c_api_name, cce_name, data_type)               \
+    namespace {                                                                                            \
+    void cce_name##_##data_type##_ReturnStub(                                                              \
+        data_type& dst, data_type src0, data_type src1, vector_bool mask, Literal mode)                    \
+    {                                                                                                      \
+        dst = src0;                                                                                        \
+    }                                                                                                      \
+    }                                                                                                      \
+                                                                                                           \
+    TEST_F(TestVectorCompute##class_name##_##data_type##_CApi, c_api_name##_##data_type##_ReturnValueSucc) \
+    {                                                                                                      \
+        data_type src0{};                                                                                  \
+        data_type src1{};                                                                                  \
+        vector_bool mask{};                                                                                \
+        static_assert(std::is_same_v<decltype(c_api_name(src0, src1, mask)), data_type>);                  \
+                                                                                                           \
+        MOCKER_CPP(cce_name, void(data_type&, data_type, data_type, vector_bool, Literal))                 \
+            .times(1)                                                                                      \
+            .will(invoke(cce_name##_##data_type##_ReturnStub));                                            \
+                                                                                                           \
+        data_type result = c_api_name(src0, src1, mask);                                                   \
+        (void)result;                                                                                      \
+        GlobalMockObject::verify();                                                                        \
     }
 
 #define TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(class_name, c_api_name, cce_name, data_type)                             \
