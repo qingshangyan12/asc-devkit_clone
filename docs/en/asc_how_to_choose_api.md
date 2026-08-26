@@ -20,7 +20,7 @@ Ascend C provides three types of interfaces, all supporting complete low-level p
 |---------|------|------|----------|----------|
 | **Tpipe/Tque Framework Programming API** | C++ | Based on **Tensor** programming<br>Manages memory and synchronization through Tpipe/Tque framework | Operator library developers | Leverage framework for automatic synchronization and memory management,<br>improve programming ease of use |
 | **Basic API** | C++ | Based on **Tensor** programming, provides **C++ complete programming capabilities**<br>Allocates Tensor through MakeTensor / LocalMemoryAllocator, manages synchronization independently | Operator library developers | Independently manage synchronization and memory,<br>match C++ Tensor development habits, support extreme performance |
-| **Language Extension Layer<br>SIMD & SIMT API** | C | Based on **pointer** programming, provides **C complete programming capabilities**<br>Allocates memory through array `[]`, manages synchronization independently | Operator library developers | Independently manage synchronization and memory,<br>match C language development habits, support extreme performance |
+| **Language Extension Layer<br>SIMD & SIMT API** | C | Based on **pointer** programming, provides **C complete programming capabilities**<br>Allocates memory through array [], manages synchronization independently | Operator library developers | Independently manage synchronization and memory,<br>match C language development habits, support extreme performance |
 
 In addition, Ascend C provides high-level APIs and operator template libraries to further improve operator development efficiency.
 

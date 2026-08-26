@@ -166,7 +166,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 |---|---|---|
 | dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
 | src | 输入 | 源UB地址，实际读取地址需32字节对齐。 |
-| offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。当`dst`为`vector_bool`时，应使用b32模式。 |
+| offset | 输入 | 地址寄存器，类型为addr_reg，必须通过asc_update_addr_reg生成。该寄存器记录的实际字节偏移由创建地址寄存器时选择的位宽模式决定：b8、b16、b32模式分别以1字节、2字节、4字节为偏移单位。当dst为vector_bool时，应使用b32模式。 |
 
 ### 非连续对齐搬入模式
 

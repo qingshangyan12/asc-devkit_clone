@@ -76,7 +76,7 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_float& dst0,
 | :--- | :--- | :--- |
 | dst0 | 输出 | 第一个目的向量寄存器。 |
 | dst1 | 输出 | 第二个目的向量寄存器。 |
-| src | 输入/输出 | 源数据在UB中的起始地址，要求32B对齐。接口执行完成后，`src`会更新为`src + offset`。 |
+| src | 输入/输出 | 源数据在UB中的起始地址，要求32B对齐。接口执行完成后，src会更新为src + offset。 |
 | offset | 输入 | 地址偏移量，单位为元素个数。 |
 
 向量寄存器类型的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
@@ -87,24 +87,24 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(vector_float& dst0,
 
 **表2** 数据类型
 
-| 源数据类型`src` | 目的寄存器类型`dst0/dst1` |
+| 源数据类型src | 目的寄存器类型dst0/dst1 |
 | :--- | :--- |
-| `int4b_t` | `vector_int4x2_t` |
-| `fp4x2_e1m2_t` | `vector_fp4x2_e1m2_t` |
-| `fp4x2_e2m1_t` | `vector_fp4x2_e2m1_t` |
-| `int8_t` | `vector_int8_t` |
-| `uint8_t` | `vector_uint8_t` |
-| `fp8_e4m3fn_t` | `vector_fp8_e4m3fn_t` |
-| `fp8_e5m2_t` | `vector_fp8_e5m2_t` |
-| `fp8_e8m0_t` | `vector_fp8_e8m0_t` |
-| `hifloat8_t` | `vector_hifloat8_t` |
-| `int16_t` | `vector_int16_t` |
-| `uint16_t` | `vector_uint16_t` |
-| `half` | `vector_half` |
-| `bfloat16_t` | `vector_bfloat16_t` |
-| `int32_t` | `vector_int32_t` |
-| `uint32_t` | `vector_uint32_t` |
-| `float` | `vector_float` |
+| int4b_t | vector_int4x2_t |
+| fp4x2_e1m2_t | vector_fp4x2_e1m2_t |
+| fp4x2_e2m1_t | vector_fp4x2_e2m1_t |
+| int8_t | vector_int8_t |
+| uint8_t | vector_uint8_t |
+| fp8_e4m3fn_t | vector_fp8_e4m3fn_t |
+| fp8_e5m2_t | vector_fp8_e5m2_t |
+| fp8_e8m0_t | vector_fp8_e8m0_t |
+| hifloat8_t | vector_hifloat8_t |
+| int16_t | vector_int16_t |
+| uint16_t | vector_uint16_t |
+| half | vector_half |
+| bfloat16_t | vector_bfloat16_t |
+| int32_t | vector_int32_t |
+| uint32_t | vector_uint32_t |
+| float | vector_float |
 
 ## 返回值说明
 
