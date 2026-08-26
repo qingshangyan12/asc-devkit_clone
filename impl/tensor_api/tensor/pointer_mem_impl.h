@@ -65,7 +65,7 @@ template <typename T>
 struct IsMemPtrIterator<T, void_t<decltype(*Std::declval<T&>())>> : Std::true_type {};
 
 template <typename PtrPattern, typename Iterator>
-__aicore__ inline auto MakeLocationMemPtr(Iterator iter)
+__aicore__ inline constexpr auto MakeLocationMemPtr(Iterator iter)
 {
     return HardwareMemPtr<PtrPattern, Iterator>{iter};
 }

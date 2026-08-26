@@ -48,7 +48,7 @@ public:
         SetSingleShapeImpl(singleShape, AscendC::Std::integral_constant<PolicyType, IMPL::POLICY::POLICY_TYPE>{});
     }
 
-    __aicore__ inline uint32_t GetTotalIter() const { return totalIter_; }
+    __aicore__ inline constexpr uint32_t GetTotalIter() const { return totalIter_; }
 
     __aicore__ inline bool OuterNext()
     {
@@ -86,7 +86,7 @@ public:
         }
     }
 
-    __aicore__ inline uint32_t GetOuterIdx() const
+    __aicore__ inline constexpr uint32_t GetOuterIdx() const
     {
         if constexpr (IMPL::POLICY::POLICY_TYPE == PolicyType::MATMUL_NBUFFER_33) {
             return innerIndex_;
@@ -95,7 +95,7 @@ public:
         }
     }
 
-    __aicore__ inline uint32_t GetOuterIter() const
+    __aicore__ inline constexpr uint32_t GetOuterIter() const
     {
         if constexpr (IMPL::POLICY::POLICY_TYPE == PolicyType::MATMUL_NBUFFER_33) {
             return innerIter_;
@@ -134,9 +134,9 @@ public:
 
     __aicore__ inline bool IsLastInnerIter() { return innerIndex_ == innerStartIdx_ + innerIter_ - 1; }
 
-    __aicore__ inline uint32_t GetInnerIdx() const { return innerIndex_; }
+    __aicore__ inline constexpr uint32_t GetInnerIdx() const { return innerIndex_; }
 
-    __aicore__ inline uint32_t GetInnerIter() const { return innerIter_; }
+    __aicore__ inline constexpr uint32_t GetInnerIter() const { return innerIter_; }
 
     __aicore__ inline int32_t GetBaseShape() const { return baseShape_; }
 

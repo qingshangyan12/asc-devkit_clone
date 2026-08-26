@@ -57,8 +57,8 @@ struct BaseTensor {
     using engineType = EngineType;
     using layoutType = LayoutType;
 
-    __aicore__ inline BaseTensor() {}
-    __aicore__ inline BaseTensor(const EngineType& engine, const LayoutType& layout) : rep(layout, engine) {}
+    __aicore__ inline constexpr BaseTensor() {}
+    __aicore__ inline constexpr BaseTensor(const EngineType& engine, const LayoutType& layout) : rep(layout, engine) {}
 
     static constexpr int rank = LayoutType::rank; // tuple size
 
