@@ -63,13 +63,13 @@
 ## 函数原型
 
 ```cpp
-enum ascMutexExecuteMode {
+enum asc_mutex_execute_mode {
     ASC_LOCK_BLOCK = 0,
     ASC_LOCK_NON_BLOCK = 1
 };
 
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id)
-__aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode)
+__aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode)
 ```
 
 ## 参数说明
