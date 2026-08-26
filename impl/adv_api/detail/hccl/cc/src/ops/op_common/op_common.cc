@@ -1784,6 +1784,9 @@ static HcclResult RegisterCcuKernels(
                     case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
                         kfcFuncName = KFC_REDUCE_SCATTER_FUNC_NAME;
                         break;
+                    case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
+                        kfcFuncName = KFC_REDUCE_SCATTER_FUNC_NAME;
+                        break;
                     default:
                         HCCL_ERROR(
                             "[RegisterCcuKernels] unsupported KFC opType[%u]",
