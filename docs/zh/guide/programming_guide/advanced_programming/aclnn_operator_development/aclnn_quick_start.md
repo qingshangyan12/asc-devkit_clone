@@ -97,7 +97,7 @@ msopgen gen -i add_custom.json -c ai_core-ascendxxyy -lan cpp -out AddCustom
 -   -lan：参数cpp代表算子基于Ascend C编程框架，使用C/C++编程语言开发。
 -   -out：生成文件所在路径，可配置为绝对路径或者相对路径，并且工具执行用户对路径具有可读写权限。若不配置，则默认生成在执行命令的当前路径。
 
-将`ascendxxyy`替换为您的AI处理器型号`soc_version`。msOpGen会自动将芯片型号映射为框架统一标识，并写入`CMakePresets.json`的`ASCEND_COMPUTE_UNIT`和原型定义的`AddConfig`中。
+将`ascendxxyy`替换为您的AI处理器型号`soc_version`。msOpGen会自动将芯片型号映射为框架统一标识，并写入`CMakePresets.json`的`ASCEND_COMPUTE_UNIT`和原型定义的`AddConfig`中。已有工程可以继续使用`ASCEND_COMPUTE_UNIT`；新工程也可以将其替换为`ASCEND_SOC_SERIES`。`ASCEND_SOC_SERIES`是CMake列表，多个芯片型号用分号分隔，输入不区分大小写，且不能与`ASCEND_COMPUTE_UNIT`同时配置。
 
 >[!NOTE]说明 
 >其中，AI处理器型号`soc_version`请通过以下方式获取：
