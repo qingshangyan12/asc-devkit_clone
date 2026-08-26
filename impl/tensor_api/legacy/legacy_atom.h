@@ -247,7 +247,7 @@ struct CopyTraits<CopyOp, Traits, CopyOpWith, TraitsWith> {
     }
 
     template <const TraitType& trait = defaultTrait, typename... Args>
-    __aicore__ inline void copy_unpack(const Args&... args) const
+    __aicore__ inline void CopyUnpack(const Args&... args) const
     {
         using normalized_t = Std::remove_cvref_t<decltype(normalize_copy_trait(Traits::value))>;
         if constexpr (Std::is_same_v<TraitType, normalized_t>) {
@@ -265,12 +265,6 @@ struct CopyTraits<CopyOp, Traits, CopyOpWith, TraitsWith> {
             }
         }
     }
-
-    template <const TraitType& trait = defaultTrait, typename... Args>
-    __aicore__ inline void call(const Args&... args) const
-    {
-        copy_unpack<trait>(args...);
-    }
 };
 
 template <typename CopyOp, typename Traits, typename Params>
@@ -285,7 +279,7 @@ struct CopyTraitsWithParams {
     __aicore__ inline constexpr CopyTraitsWithParams(Params params) : params(params) {}
 
     template <const TraitType& trait = defaultTrait, typename... Args>
-    __aicore__ inline void copy_unpack(const Args&... args) const
+    __aicore__ inline void CopyUnpack(const Args&... args) const
     {
         using normalized_t = Std::remove_cvref_t<decltype(normalize_copy_trait(Traits::value))>;
         if constexpr (Std::is_same_v<TraitType, normalized_t>) {
@@ -294,12 +288,6 @@ struct CopyTraitsWithParams {
             static constexpr normalized_t normalized_trait = normalize_copy_trait(trait);
             CopyOp::template copy<normalized_t, normalized_trait, Args...>(args..., params);
         }
-    }
-
-    template <const TraitType& trait = defaultTrait, typename... Args>
-    __aicore__ inline void call(const Args&... args) const
-    {
-        copy_unpack<trait>(args...);
     }
 };
 
@@ -404,7 +392,8 @@ struct CopyAtom<CopyOperation> : public CopyTraits<CopyOperation> {
     template <const TraitType& trait = defaultTrait, typename... Params>
     __aicore__ inline void call(const Params&... params) const
     {
-        copy_trait_type::template call<trait>(params...);
+        using traits_type = copy_trait_type;
+        static_cast<const traits_type&>(*this).template CopyUnpack<trait, Params...>(params...);
     }
 
     template <typename... TraitsArgs>
@@ -425,7 +414,8 @@ struct CopyAtom<CopyTraits<Args...>> : public CopyTraits<Args...> {
     template <const TraitType& trait = defaultTrait, typename... Params>
     __aicore__ inline void call(const Params&... params) const
     {
-        copy_trait_type::template call<trait>(params...);
+        using traits_type = copy_trait_type;
+        static_cast<const traits_type&>(*this).template CopyUnpack<trait, Params...>(params...);
     }
 
     template <typename... TraitsArgs>
