@@ -37,7 +37,7 @@
 #elif __NPU_ARCH__ == 5102
 #include "dav_m510/kernel_operator_list_tensor_impl.h"
 #elif __NPU_ARCH__ == 5162
-#include "dav_v516/kernel_operator_list_tensor_impl.h"
+#include "dav_5162/kernel_operator_list_tensor_impl.h"
 #endif
 
 #endif // ASCENDC_MODULE_OPERATOR_LIST_TENSOR_INTERFACE_IMPL_H

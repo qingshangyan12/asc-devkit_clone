@@ -41,7 +41,7 @@
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_binary_scalar_impl.h"
 #elif (__NPU_ARCH__ == 5162)
-#include "dav_v516/kernel_operator_vec_binary_scalar_impl.h"
+#include "dav_5162/kernel_operator_vec_binary_scalar_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_binary_scalar_impl.h"
 #elif __NPU_ARCH__ == 3113

@@ -82,10 +82,10 @@
 #include "dav_m510/kernel_operator_sync_impl.h"
 #include "dav_m510/kernel_operator_vec_duplicate_impl.h"
 #elif (__NPU_ARCH__ == 5162)
-#include "dav_v516/kernel_operator_set_atomic_impl.h"
-#include "dav_v516/kernel_operator_common_impl.h"
-#include "dav_v516/kernel_operator_sync_impl.h"
-#include "dav_v516/kernel_operator_vec_duplicate_impl.h"
+#include "dav_5162/kernel_operator_set_atomic_impl.h"
+#include "dav_5162/kernel_operator_common_impl.h"
+#include "dav_5162/kernel_operator_sync_impl.h"
+#include "dav_5162/kernel_operator_vec_duplicate_impl.h"
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_sync_impl.h"
 #include "dav_l311/kernel_operator_set_atomic_impl.h"

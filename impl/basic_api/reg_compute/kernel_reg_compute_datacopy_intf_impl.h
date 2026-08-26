@@ -30,7 +30,7 @@
 #elif __NPU_ARCH__ == 5102
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_datacopy_impl.h"
 #elif __NPU_ARCH__ == 5162
-#include "../../basic_api/reg_compute/dav_v516/kernel_reg_compute_datacopy_impl.h"
+#include "../../basic_api/reg_compute/dav_5162/kernel_reg_compute_datacopy_impl.h"
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_datacopy_load_impl.h"
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_datacopy_store_impl.h"
 #else
