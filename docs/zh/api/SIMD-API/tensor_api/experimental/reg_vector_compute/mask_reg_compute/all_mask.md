@@ -45,7 +45,7 @@ __simd_callee__ inline reg_tensor<bool> all_mask();
 
 ## 数据类型<a name="section630mcpsimp"></a>
 
-支持1Byte、2Byte和4Byte元素类型。
+支持b8、b16和b32元素类型。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
