@@ -70,7 +70,7 @@ unsigned int meta_group_rank() const
         ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
-        unsigned long long group_rank = tile4.meta_group_rank();
+        unsigned int group_rank = tile4.meta_group_rank();
         ...
     }
     ```
