@@ -81,6 +81,8 @@ __simd_callee__ inline vector_<dst_dtype> asc_gather(__ubuf__ <src_dtype>* src,
 | uint32_t | uint32_t | uint32_t |
 | float | float | uint32_t |
 
+> 说明：`int16_t/int8_t`、`uint16_t/uint8_t` 两组位宽扩展组合仅支持“通过引用参数输出结果”形式，“通过函数返回值返回结果”形式不支持。
+
 #### 函数原型典型示例
 
 ```c
