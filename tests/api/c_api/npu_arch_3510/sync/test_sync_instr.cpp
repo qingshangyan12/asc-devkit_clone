@@ -20,18 +20,18 @@ protected:
 };
 
 namespace {
-void asc_sync_notify_stub(pipe_t pipe, pipe_t tpipe, uint64_t id)
+void asc_sync_notify_stub(pipe_t pipe, pipe_t tpipe, event_t id)
 {
     EXPECT_EQ(pipe_t::PIPE_V, pipe);
     EXPECT_EQ(pipe_t::PIPE_MTE2, tpipe);
-    EXPECT_EQ(0, id);
+    EXPECT_EQ(event_t::EVENT_ID0, id);
 }
 
-void asc_sync_wait_stub(pipe_t pipe, pipe_t tpipe, uint64_t id)
+void asc_sync_wait_stub(pipe_t pipe, pipe_t tpipe, event_t id)
 {
     EXPECT_EQ(pipe_t::PIPE_MTE2, pipe);
     EXPECT_EQ(pipe_t::PIPE_V, tpipe);
-    EXPECT_EQ(0, id);
+    EXPECT_EQ(event_t::EVENT_ID0, id);
 }
 
 void pipe_barrier_all_stub(pipe_t pipe) { EXPECT_EQ(pipe_t::PIPE_ALL, pipe); }
@@ -48,7 +48,7 @@ TEST_F(TestSyncInstrCAPI, c_api_sync_notify_Succ)
     pipe_t pipe = pipe_t::PIPE_V;
     pipe_t tpipe = pipe_t::PIPE_MTE2;
     event_t id = event_t::EVENT_ID0;
-    MOCKER_CPP(set_flag, void(pipe_t, pipe_t, uint64_t)).times(1).will(invoke(asc_sync_notify_stub));
+    MOCKER_CPP(set_flag, void(pipe_t, pipe_t, event_t)).times(1).will(invoke(asc_sync_notify_stub));
 
     asc_sync_notify(pipe, tpipe, id);
     GlobalMockObject::verify();
@@ -59,7 +59,7 @@ TEST_F(TestSyncInstrCAPI, c_api_sync_wait_Succ)
     pipe_t pipe = pipe_t::PIPE_MTE2;
     pipe_t tpipe = pipe_t::PIPE_V;
     event_t id = event_t::EVENT_ID0;
-    MOCKER_CPP(wait_flag, void(pipe_t, pipe_t, uint64_t)).times(1).will(invoke(asc_sync_wait_stub));
+    MOCKER_CPP(wait_flag, void(pipe_t, pipe_t, event_t)).times(1).will(invoke(asc_sync_wait_stub));
 
     asc_sync_wait(pipe, tpipe, id);
     GlobalMockObject::verify();

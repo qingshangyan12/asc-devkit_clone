@@ -29,41 +29,41 @@ __aicore__ inline void asc_sync_wait_impl_aic(pipe_t pipe, pipe_t tpipe, event_t
 {
     if (pipe == pipe_t::PIPE_S) {
         if (tpipe == pipe_t::PIPE_MTE2) {
-            wait_flag(pipe_t::PIPE_S, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_S, pipe_t::PIPE_MTE2, id);
         } else if (tpipe == pipe_t::PIPE_FIX) {
-            wait_flag(pipe_t::PIPE_S, pipe_t::PIPE_FIX, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_S, pipe_t::PIPE_FIX, id);
         }
     } else if (pipe == pipe_t::PIPE_M) {
         if (tpipe == pipe_t::PIPE_MTE1) {
-            wait_flag(pipe_t::PIPE_M, pipe_t::PIPE_MTE1, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_M, pipe_t::PIPE_MTE1, id);
         } else if (tpipe == pipe_t::PIPE_FIX) {
-            wait_flag(pipe_t::PIPE_M, pipe_t::PIPE_FIX, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_M, pipe_t::PIPE_FIX, id);
         }
     } else if (pipe == pipe_t::PIPE_MTE1) {
         if (tpipe == pipe_t::PIPE_M) {
-            wait_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_M, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_M, id);
         } else if (tpipe == pipe_t::PIPE_MTE2) {
-            wait_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_MTE2, id);
         } else if (tpipe == pipe_t::PIPE_FIX) {
-            wait_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_FIX, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE1, pipe_t::PIPE_FIX, id);
         }
     } else if (pipe == pipe_t::PIPE_MTE2) {
         if (tpipe == pipe_t::PIPE_S) {
-            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_S, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_S, id);
         } else if (tpipe == pipe_t::PIPE_MTE1) {
-            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE1, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE1, id);
         } else if (tpipe == pipe_t::PIPE_FIX) {
-            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_FIX, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_FIX, id);
         }
     } else if (pipe == pipe_t::PIPE_FIX) {
         if (tpipe == pipe_t::PIPE_S) {
-            wait_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_S, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_S, id);
         } else if (tpipe == pipe_t::PIPE_M) {
-            wait_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_M, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_M, id);
         } else if (tpipe == pipe_t::PIPE_MTE1) {
-            wait_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_MTE1, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_MTE1, id);
         } else if (tpipe == pipe_t::PIPE_MTE2) {
-            wait_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_FIX, pipe_t::PIPE_MTE2, id);
         }
     }
 }
@@ -72,35 +72,35 @@ __aicore__ inline void asc_sync_wait_impl_aiv(pipe_t pipe, pipe_t tpipe, event_t
 {
     if (pipe == pipe_t::PIPE_S) {
         if (tpipe == pipe_t::PIPE_V) {
-            wait_flag(pipe_t::PIPE_S, pipe_t::PIPE_V, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_S, pipe_t::PIPE_V, id);
         } else if (tpipe == pipe_t::PIPE_MTE2) {
-            wait_flag(pipe_t::PIPE_S, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_S, pipe_t::PIPE_MTE2, id);
         } else if (tpipe == pipe_t::PIPE_MTE3) {
-            wait_flag(pipe_t::PIPE_S, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_S, pipe_t::PIPE_MTE3, id);
         }
     } else if (pipe == pipe_t::PIPE_V) {
         if (tpipe == pipe_t::PIPE_S) {
-            wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_S, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_S, id);
         } else if (tpipe == pipe_t::PIPE_MTE2) {
-            wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE2, id);
         } else if (tpipe == pipe_t::PIPE_MTE3) {
-            wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_V, pipe_t::PIPE_MTE3, id);
         }
     } else if (pipe == pipe_t::PIPE_MTE2) {
         if (tpipe == pipe_t::PIPE_S) {
-            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_S, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_S, id);
         } else if (tpipe == pipe_t::PIPE_V) {
-            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_V, id);
         } else if (tpipe == pipe_t::PIPE_MTE3) {
-            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE2, pipe_t::PIPE_MTE3, id);
         }
     } else if (pipe == pipe_t::PIPE_MTE3) {
         if (tpipe == pipe_t::PIPE_S) {
-            wait_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_S, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_S, id);
         } else if (tpipe == pipe_t::PIPE_V) {
-            wait_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_V, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_V, id);
         } else if (tpipe == pipe_t::PIPE_MTE2) {
-            wait_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE2, static_cast<uint64_t>(id));
+            wait_flag(pipe_t::PIPE_MTE3, pipe_t::PIPE_MTE2, id);
         }
     }
 }

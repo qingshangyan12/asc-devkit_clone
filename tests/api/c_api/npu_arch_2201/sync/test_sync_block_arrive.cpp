@@ -36,7 +36,6 @@ protected:
                                                                                                                \
     TEST_F(TestSyncBlkArrive, sync_block_arrive_##coreType##_##pipeVal)                                        \
     {                                                                                                          \
-        g_coreType = coreType;                                                                                 \
         MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))                                               \
             .times(1)                                                                                          \
             .will(invoke(sync_block_arrive_2201_ffts_cross_core_sync_stub_##coreType##_##pipeVal));            \
