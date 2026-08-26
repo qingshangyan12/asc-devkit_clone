@@ -74,8 +74,8 @@ Result CaptureAllToAllMesh1DKernel(void* kernelArg)
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
 
     const CcuResult result = mc2_ops_hccl::CcuAlltoAllMesh1DKernel(
-        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
-        arguments[8], arguments[9], arguments[10], config.channels.data(),
+        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6],
+        arguments[7], arguments[8], arguments[9], arguments[10], config.channels.data(),
         static_cast<uint32_t>(config.channels.size()), config.rankSize, config.rankId, config.loadFromMem);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
@@ -83,7 +83,7 @@ Result CaptureAllToAllMesh1DKernel(void* kernelArg)
 std::vector<uint64_t> PrepareAllToAllTaskArgs(const AllToAllLaunchConfig& config)
 {
     return {config.inputAddress, config.outputAddress,  config.token,     config.sliceSize,
-            config.srcStride,    config.writeLoopCount, config.dstOffset, config.goSize[0],
+            config.srcStride,    config.srcOffset, config.dstOffset, config.goSize[0],
             config.goSize[1],    config.goSize[2],      config.goSize[3]};
 }
 
@@ -121,9 +121,7 @@ ScenarioData BuildMesh1DScenario(const CcuStScenario& scenario, const std::vecto
         config.token = 0x1000U + rank;
         config.sliceSize = sliceSize;
         config.srcStride = sliceSize;
-        config.srcOffset = sourceBaseOffset;
-        constexpr uint64_t MAX_DMA_TRANS_SIZE = 256ULL * 1024 * 1024;
-        config.writeLoopCount = UINT64_MAX - (sliceSize / MAX_DMA_TRANS_SIZE);
+        config.srcOffset = 0;
         config.dstOffset = destinationBaseOffset + static_cast<uint64_t>(rank) * sliceSize;
         config.rankId = rank;
         config.goSize = {goSize[0], goSize[1], goSize[2], goSize[3]};

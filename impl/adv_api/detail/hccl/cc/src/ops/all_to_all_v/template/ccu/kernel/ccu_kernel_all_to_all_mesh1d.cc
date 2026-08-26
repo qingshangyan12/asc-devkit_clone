@@ -19,9 +19,6 @@ constexpr int CKE_IDX_0 = 0;
 constexpr int CKE_IDX_1 = 1;
 constexpr int CKE_IDX_2 = 2;
 
-constexpr uint64_t MAX_DMA_TRANS_SIZE = 256ULL * 1024 * 1024;
-constexpr uint64_t NEG_256MB = 0ULL - MAX_DMA_TRANS_SIZE;
-
 static CcuResult InitResource(AlltoAllMesh1DContext& ctx)
 {
     uint32_t channelIdx = 0;
@@ -51,7 +48,7 @@ static CcuResult InitResource(AlltoAllMesh1DContext& ctx)
 
 static CcuResult LoadArgs(
     AlltoAllMesh1DContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-    ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable writeLoopCount, ccu::Variable dstOffset,
+    ccu::Variable sliceSize, ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
     ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4)
 {
     ctx.input[ctx.rankId] = inputAddr;
@@ -59,8 +56,7 @@ static CcuResult LoadArgs(
     ctx.token[ctx.rankId] = tokenInfo;
     ctx.sliceSize = sliceSize;
     ctx.srcStride = srcStride;
-    ctx.writeLoopCount = writeLoopCount;
-    ctx.srcOffset = 0;
+    ctx.srcOffset = srcOffset;
     ctx.dstOffset = dstOffset;
     ctx.goSize.addrOffset = goSize1;
     ctx.goSize.loopParam = goSize2;
@@ -101,35 +97,6 @@ static void PostSync(AlltoAllMesh1DContext& ctx)
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D PostSync end.");
 }
 
-static void WriteChunked(
-    AlltoAllMesh1DContext& ctx, ChannelHandle channelId, ccu::RemoteAddr& curDst, ccu::LocalAddr& curSrc,
-    uint64_t rankIdx)
-{
-    // Variable 类型必须先默认构造（分配 handle）再赋值，不支持声明时初始化
-    ccu::Variable chunkSize;
-    chunkSize = MAX_DMA_TRANS_SIZE;
-    ccu::Variable neg256MB;
-    neg256MB = NEG_256MB;
-    ccu::Variable constOne;
-    constOne = 1;
-    ccu::Variable loopCount;
-    loopCount = ctx.writeLoopCount;
-    ccu::Variable remaining;
-    remaining = ctx.sliceSize;
-
-    CCU_WHILE(loopCount != UINT64_MAX)
-    {
-        ccu::Write(channelId, curDst, curSrc, chunkSize, ctx.event, 0);
-        curDst.addr += chunkSize;
-        curSrc.addr += chunkSize;
-        remaining += neg256MB;
-        loopCount += constOne;
-    }
-
-    CCU_IF(remaining != 0) { ccu::Write(channelId, curDst, curSrc, remaining, ctx.event, 1 << rankIdx); }
-    CCU_ELSE { ccu::EventRecord(ctx.event, 1 << rankIdx); }
-}
-
 static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
 {
     HCCL_INFO("DoAlltoAll Start.");
@@ -159,23 +126,23 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
     uint16_t allBit = static_cast<uint16_t>(((1U << ctx.rankSize) - 1) & (~(1U << ctx.rankId)));
 
     if (ctx.loadFromMem) {
-        HCCL_INFO("[DoAlltoAll] loadFromMem=true, rankSize[%u] rankId[%u] chunkSize=256MB", ctx.rankSize, ctx.rankId);
+        HCCL_INFO("[DoAlltoAll] loadFromMem=true, rankSize[%u] rankId[%u] sliceSize", ctx.rankSize, ctx.rankId);
         for (uint64_t r = 0; r < ctx.rankSize; r++) {
             if (r == ctx.rankId) {
                 ccu::LocalCopy(localDst, src[r], ctx.sliceSize, ctx.event, 1 << r);
             } else {
-                WriteChunked(ctx, ctx.channels[channelId], dst[r], src[r], r);
+                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
                 channelId++;
             }
         }
         ccu::EventWait(ctx.event, static_cast<uint16_t>((1U << ctx.rankSize) - 1));
     } else {
         HCCL_INFO(
-            "[DoAlltoAll] loadFromMem=false, rankSize[%u] rankId[%u] chunkSize=256MB allBit[0x%x]", ctx.rankSize,
+            "[DoAlltoAll] loadFromMem=false, rankSize[%u] rankId[%u] sliceSize allBit[0x%x]", ctx.rankSize,
             ctx.rankId, allBit);
         for (uint64_t r = 0; r < ctx.rankSize; r++) {
             if (r != ctx.rankId) {
-                WriteChunked(ctx, ctx.channels[channelId], dst[r], src[r], r);
+                ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
                 channelId++;
             }
         }
@@ -191,7 +158,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
 // ============================================================================
 CcuResult CcuAlltoAllMesh1DKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
-    ccu::Variable srcStride, ccu::Variable writeLoopCount, ccu::Variable dstOffset, ccu::Variable goSize1,
+    ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize1,
     ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4, const ChannelHandle channels[],
     uint32_t channelCount, uint32_t rankSize, uint32_t rankId, bool loadFromMem)
 {
@@ -212,7 +179,7 @@ CcuResult CcuAlltoAllMesh1DKernel(
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D run");
     CCU_CHK_RET(InitResource(ctx));
     CCU_CHK_RET(LoadArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, writeLoopCount, dstOffset, goSize1, goSize2,
+        ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, srcOffset, dstOffset, goSize1, goSize2,
         goSize3, goSize4));
 
     PreSync(ctx);
