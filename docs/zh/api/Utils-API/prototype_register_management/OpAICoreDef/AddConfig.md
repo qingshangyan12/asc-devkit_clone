@@ -39,6 +39,8 @@ void AddConfig(const char *soc, OpAICoreConfig &aicore_config)
 </tbody>
 </table>
 
+`soc`参数与构建配置使用同一套series标识。建议使用平台short名称；Full SKU不属于series配置。大小写不影响匹配，但配置值仍应与当前版本支持的series保持一致。
+
 ## 返回值说明<a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section25791320141317"></a>
 
 无
