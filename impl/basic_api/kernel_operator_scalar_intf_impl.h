@@ -87,13 +87,14 @@ __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value)
     return WriteGmBypassDCacheImpl(addr, value);
 }
 
-[[deprecated("NOTICE: ReadGmByPassDCache has been deprecated and will be removed in the 2028 release.")]]
 template <typename T>
+[[deprecated("NOTICE: ReadGmByPassDCache has been deprecated and will be removed in the 2028 release.")]]
 __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr)
 {
     return ReadGmBypassDCacheImpl(addr);
 }
 
+template <typename T>
 __aicore__ inline void WriteGmBypassDCache(__gm__ T* addr, T value)
 {
     return WriteGmBypassDCacheImpl(addr, value);

@@ -120,7 +120,7 @@ __aicore__ inline void WriteGmBypassDCacheImpl(__gm__ T* addr, T value)
 {
     static_assert(
         SupportType<T, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t>(),
-        "WriteGmByPassDCache only support int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t "
+        "WriteGmBypassDCache only support int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t "
         "data type on current device!");
 
 #if __NPU_ARCH__ == 2201

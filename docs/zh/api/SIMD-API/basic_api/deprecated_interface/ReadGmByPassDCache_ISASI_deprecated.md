@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-**该接口已废弃，请使用[ReadGmByPassDCache\(ISASI\)](../scalar_compute/ReadGmByPassDCache_ISASI.md)接口替代。**
+**该接口已废弃，请使用[ReadGmBypassDCache\(ISASI\)](../scalar_compute/ReadGmBypassDCache_ISASI.md)接口替代。**
 
 头文件路径为：`"basic_api/kernel_operator_scalar_intf.h"`。
 

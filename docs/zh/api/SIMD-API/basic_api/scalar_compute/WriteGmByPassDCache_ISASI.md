@@ -1,4 +1,4 @@
-# WriteGmByPassDCache\(ISASI\)<a name="ZH-CN_TOPIC_0000002327151478"></a>
+# WriteGmBypassDCache\(ISASI\)<a name="ZH-CN_TOPIC_0000002327151478"></a>
 
 ## 产品支持情况
 
@@ -39,25 +39,25 @@
 - 当多个核写入的数据落在同一条Cache Line内时，经过DCache的读写将以64B为粒度，可能引发多核数据随机覆盖问题（参考[DataCacheCleanAndInvalid调用示例3](../cache_control/DataCacheCleanAndInvalid.md#example3_multi_core)）。使用该接口不经过DCache直接按操作数大小写GM，可避免此问题。
 - 经过DCache写GM时可能导致多核间的数据不一致问题（详细原因请参考[Cache写策略与Cache一致性问题](../cache_control/system_cache_overview.md#zh-cn_topic_0000002583420201_section053731716357)），使用该接口不经过DCache直接向GM写数据，可避免此问题。
 
-由于WriteGmByPassDCache接口向GM写数据时不经过DCache，因此开发者需要考虑如下场景：
-- 当GM上地址addr已经在DCache缓存并且其对应的Cache Line标记为“脏”（dirty，表示该数据已被修改但尚未写回到GM）时，开发者应该在WriteGmByPassDCache接口之前调用[DataCacheCleanAndInvalid](../cache_control/DataCacheCleanAndInvalid.md)接口将addr对应的Cache Line立即写回GM，否则WriteGmByPassDCache接口写入addr的数据后续可能被DCache写回的脏数据覆盖。
-- DataCacheCleanAndInvalid接口与WriteGmByPassDCache接口向GM写数据时硬件不能保证两个接口的执行顺序，因此开发者应该在WriteGmByPassDCache接口之前调用[DataSyncBarrier](../sync_control/intra_core_sync/DataSyncBarrier_ISASI.md)接口对这两个接口进行同步，否则WriteGmByPassDCache接口写入addr的数据依然可能被DCache写回的脏数据覆盖。
+由于WriteGmBypassDCache接口向GM写数据时不经过DCache，因此开发者需要考虑如下场景：
+- 当GM上地址addr已经在DCache缓存并且其对应的Cache Line标记为“脏”（dirty，表示该数据已被修改但尚未写回到GM）时，开发者应该在WriteGmBypassDCache接口之前调用[DataCacheCleanAndInvalid](../cache_control/DataCacheCleanAndInvalid.md)接口将addr对应的Cache Line立即写回GM，否则WriteGmBypassDCache接口写入addr的数据后续可能被DCache写回的脏数据覆盖。
+- DataCacheCleanAndInvalid接口与WriteGmBypassDCache接口向GM写数据时硬件不能保证两个接口的执行顺序，因此开发者应该在WriteGmBypassDCache接口之前调用[DataSyncBarrier](../sync_control/intra_core_sync/DataSyncBarrier_ISASI.md)接口对这两个接口进行同步，否则WriteGmBypassDCache接口写入addr的数据依然可能被DCache写回的脏数据覆盖。
 
-根据以上的描述，为了简化编程（开发者无需关心addr是否在DCache缓存以及是否被标记为“脏”），建议开发者在使用WriteGmByPassDCache接口时采用如下代码片段：
+根据以上的描述，为了简化编程（开发者无需关心addr是否在DCache缓存以及是否被标记为“脏”），建议开发者在使用WriteGmBypassDCache接口时采用如下代码片段：
 
 ```cpp
 AscendC::GlobalTensor<T> global; // global为addr对应的GlobalTensor
 AscendC::DataCacheCleanAndInvalid<T, AscendC::CacheLine::SINGLE_CACHE_LINE, AscendC::DcciDst::CACHELINE_OUT>(global);
-// 保证WriteGmByPassDCache接口向addr写入value之前，DCache中的脏数据已经写回GM。
+// 保证WriteGmBypassDCache接口向addr写入value之前，DCache中的脏数据已经写回GM。
 AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();
-AscendC::WriteGmByPassDCache<T>(addr, value);
+AscendC::WriteGmBypassDCache<T>(addr, value);
 ```
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
 template <typename T>
-__aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value)
+__aicore__ inline void WriteGmBypassDCache(__gm__ T* addr, T value)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -104,11 +104,11 @@ __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value)
 ```cpp
 if (blockIdx == 0) {
     // 先写入被依赖数据，再通过DataSyncBarrier等待DDR访问完成。
-    AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm) + 1, DATA_VALUE);
+    AscendC::WriteGmBypassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm) + 1, DATA_VALUE);
     // DataSyncBarrier<DDR>阻塞后续GM写，确保上一条GM写对其他核可见。
     AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();
     // 最后写入同步标记，block 1读到该标记后即可安全读取srcGm[1]。
-    AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm), SYNC_FLAG);
+    AscendC::WriteGmBypassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm), SYNC_FLAG);
 }
 
 if (blockIdx == 1) {
@@ -119,7 +119,7 @@ if (blockIdx == 1) {
         if (flagValue == SYNC_FLAG) {
             // DataSyncBarrier保证同步标记之前的srcGm[1]写入已完成。
             T dataValue = AscendC::ReadGmBypassDCache<T>(addr + 1);
-            AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(dstGm), 2 * dataValue);
+            AscendC::WriteGmBypassDCache<T>(reinterpret_cast<__gm__ T *>(dstGm), 2 * dataValue);
             return;
         }
     }
