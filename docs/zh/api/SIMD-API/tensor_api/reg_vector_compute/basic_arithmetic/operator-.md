@@ -43,7 +43,7 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b)
 
 ## 约束说明
 
-- 整型减法溢出时按环绕策略处理。
+- 整型减法结果超出元素类型的取值范围时，仅保留该类型位宽内的低位。例如，`int8_t(-128) - int8_t(1)`的结果为`int8_t(127)`，`uint8_t(0) - uint8_t(1)`的结果为`uint8_t(255)`。
 - 浮点减法按照IEEE 754浮点减法规则执行。
 - 标量位于左侧时执行`scalar - reg`，操作数顺序不会交换。
 
