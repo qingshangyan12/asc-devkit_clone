@@ -138,8 +138,8 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
         ccu::EventWait(ctx.event, static_cast<uint16_t>((1U << ctx.rankSize) - 1));
     } else {
         HCCL_INFO(
-            "[DoAlltoAll] loadFromMem=false, rankSize[%u] rankId[%u] sliceSize allBit[0x%x]", ctx.rankSize,
-            ctx.rankId, allBit);
+            "[DoAlltoAll] loadFromMem=false, rankSize[%u] rankId[%u] sliceSize allBit[0x%x]", ctx.rankSize, ctx.rankId,
+            allBit);
         for (uint64_t r = 0; r < ctx.rankSize; r++) {
             if (r != ctx.rankId) {
                 ccu::Write(ctx.channels[channelId], dst[r], src[r], ctx.sliceSize, ctx.event, 1 << r);
@@ -179,8 +179,8 @@ CcuResult CcuAlltoAllMesh1DKernel(
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D run");
     CCU_CHK_RET(InitResource(ctx));
     CCU_CHK_RET(LoadArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, srcOffset, dstOffset, goSize1, goSize2,
-        goSize3, goSize4));
+        ctx, inputAddr, outputAddr, tokenInfo, sliceSize, srcStride, srcOffset, dstOffset, goSize1, goSize2, goSize3,
+        goSize4));
 
     PreSync(ctx);
 
