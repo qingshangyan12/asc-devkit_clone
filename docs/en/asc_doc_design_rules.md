@@ -358,7 +358,7 @@ The [**DMA (Direct Memory Access) transfer unit**](../../../technical_appendix/c
 
 [Level] Principle
 
-[Description] Each file has a clear single responsibility. Overview files serve as **navigation pages**:
+[Description] Each file has a clear single responsibility:
 
 | File Type | Responsibility | Prohibited |
 |-----------|---------------|------------|
@@ -374,74 +374,57 @@ The [**DMA (Direct Memory Access) transfer unit**](../../../technical_appendix/c
 - Detailed description of the same content appears only once (authoritative version); other locations use "See Chapter X for details"
 - Hardware architecture description is unified into a single file; separate SIMD/SIMT versions describing different halves are not allowed
 
-[Positive example] As a concept introduction file, the thread architecture document contains only thread-related topics, has clear file responsibilities, and uses the following structure:
+[Positive example] The following is an overview file for vector programming. It serves only as a navigation page: it lists topics, provides brief descriptions, and links to subchapters without expanding implementation details:
 
 ```text
-# Thread Architecture
+# Overview
 
-## Thread Hierarchy
+This section uses the Add operator as an example to help you quickly build an Ascend C vector operator program and learn typical scenarios and approaches for vector operator development. The scenarios include:
 
-## Warp Execution Mechanism
-
-## Configuring the Maximum Number of Threads
+-   [Basic Vector Operator](basic_vector_operator.md): Develop a simple Add vector operator.
+-   [Using TBuf](tbuf_usage.md): Use temporary storage to store intermediate results during operator computation.
+-   [Multi-core Tiling](multi_core_tiling/overview.md): When an operator requires multi-core parallel computation or supports dynamic shapes, split and block the input data and assign different data blocks to multiple AI Cores.
+    -   [Even Split of Main Blocks](multi_core_tiling/main_block_even_split.md): The operator runs on multiple cores of the AI processor, with an equal amount of computation on each core and 32-byte alignment.
+    -   [Even Split of Tail Blocks](multi_core_tiling/tail_block_even_split.md): The operator runs on multiple cores of the AI processor with an equal amount of computation on each core. Except for the last data block (tail block) on each core, the remaining data blocks have equal sizes, and each core processes its tail block.
+    -   [Tail-core Split](multi_core_tiling/tail_core_split.md): The data cannot be evenly distributed among the cores. The cores are divided into full cores and tail cores; the computation amounts are equal among full cores and among tail cores.
+    -   [Tail-core and Tail-block Split](multi_core_tiling/tail_core_tail_block_split.md): The data cannot be evenly distributed among the cores, and the data within each core cannot be evenly divided. Except for the last data block (tail block), the remaining data blocks have equal sizes, and each core processes its tail block separately.
+-   [Double-buffering Scenario](double_buffer_scenario.md): Enable double buffering so that multiple pipelines in the operator execute in parallel.
+-   [Broadcast Scenario](broadcast_scenario.md): The shapes of the two operator inputs are different. Broadcast one input to match the other before performing the computation.
+-   [Unaligned Scenario](unaligned_scenario.md): More solutions for handling data that is not 32-byte aligned.
 ```
 
-[Negative example] The structure of the following concept introduction file shows that it contains more than three unrelated topics. The content on the memory hierarchy, kernel functions, and synchronization mechanisms should be split into three separate subfiles:
+[Negative example] The following is an overview file for vector programming that expands on technical details and contains extensive code, exceeding the responsibilities of an overview file:
 
-```text
-# Thread Architecture
+````text
+# Overview
 
-## Thread Hierarchy
+## Basic Vector Operator
+The process of implementing a basic vector operator kernel using Ascend C is shown in the following figure...... (details of the basic vector operator are expanded here)
 
-## Warp Execution Mechanism
+## Using TBuf
+During kernel computation for most operators, temporary memory is required to store intermediate results. These results are represented by temporary variables, and the memory occupied by them can be managed using the TBuf data structure...... (details of TBuf are expanded here)
 
-## Configuring the Maximum Number of Threads
-
-## Memory Hierarchy
-
-## Kernel Function
-
-## Synchronization Mechanism
+```cpp
+// Compute stage
+xLocal = inQueueX.DeQue<bfloat16_t>();
+yLocal = inQueueY.DeQue<bfloat16_t>();
+AscendC::LocalTensor<bfloat16_t> zLocal = outQueueZ.AllocTensor<bfloat16_t>();
+AscendC::LocalTensor<float> tmpTensor0 = tmpBuf0.Get<float>();
+AscendC::LocalTensor<float> tmpTensor1 = tmpBuf1.Get<float>();
+// Use the Cast interface to convert bfloat16_t to float and store the result in the temporary TBuf
+AscendC::Cast(tmpTensor0, xLocal, AscendC::RoundMode::CAST_NONE, totalLength);
+AscendC::Cast(tmpTensor1, yLocal, AscendC::RoundMode::CAST_NONE, totalLength);
+AscendC::Add(tmpTensor0, tmpTensor0, tmpTensor1, totalLength);
+AscendC::Cast(zLocal, tmpTensor0, AscendC::RoundMode::CAST_RINT, totalLength);
+outQueueZ.EnQue<bfloat16_t>(zLocal);
+inQueueX.FreeTensor(xLocal);
+inQueueY.FreeTensor(yLocal);
 ```
+````
 
 ## 3 Readability
 
-### DOC-READ-00 Using Terminology by Abstraction Level
-
-[Level] Principle
-
-[Description] Documents use terminology appropriate to the chapter's abstraction level. **Cross-level references must be explicitly linked on first occurrence**:
-
-| Chapter Level | Terminology Used | Cross-level Handling |
-|--------------|-----------------|---------------------|
-| High-level (abstract hardware architecture, overview) | Abstract names: Global Memory, Local Memory, compute units | Do not abruptly mix in UB, L0A, or other low-level names |
-| Low-level (programming model, data transfer) | Hardware names: UB, L1 Buffer, L0A/B/C | **On first occurrence**, parenthetical association: `UB (i.e., part of Local Memory in the abstract architecture)` |
-| API Level (API Reference Manual) | API names: DataCopy, LocalTensor | - |
-
-[Positive example]
-
-**Abstract hardware architecture**:
-
-```text
-## Storage Units and Transfer Units
-
-Storage units can be classified by usage location into Local Memory and Global Memory.
-
--   **Local Memory**: On-chip storage of the AI Core, used to temporarily store data slices transferred from Global Memory and to retain computation outputs and intermediate results. This data can be efficiently accessed by compute units such as Vector and Cube to continue participating in on-chip computation or can be transferred to Global Memory through transfer units. Local Memory includes on-chip resources for different programming methods and compute units, as shown in [Figure 2](#fig_simd_reg_memory_hierarchy).
--   **Global Memory**: Global storage on the device side and the primary source or destination for data transferred into and out of Local Memory.
-```
-
-**Programming model**:
-
-```text
-# Memory Vector Computation Programming
-
-This document describes the Ascend C vector computation development method based on the Unified Buffer (hereinafter referred to as UB, which is part of Local Memory in the abstract architecture). This computing capability is referred to as Memory vector computation programming and is the most fundamental and widely used vector programming method in Ascend C.
-```
-
-[Negative example] The abstract hardware architecture document directly states, "Data is transferred into VEC through UB for computation," skipping the abstract layer.
-
-### DOC-READ-01 Explicitly Distinguish Easily Confused Concepts
+### DOC-READ-00 Explicitly Distinguish Easily Confused Concepts
 
 [Level] Principle
 
@@ -478,7 +461,7 @@ This document describes the Ascend C vector computation development method based
 | \_\_fbuf\_\_ | Fixpipe Buffer |
 | \_\_ssbuf\_\_ | SSBuffer |
 
-### DOC-READ-02 Present Constraints Prominently and Centrally
+### DOC-READ-01 Present Constraints Prominently and Centrally
 
 [Level] Specification
 
@@ -531,7 +514,7 @@ If repeat_time (the number of iterations) is set to 2, the unit performs two ite
 > 📌 Hardware constraint: The value range of repeat_time is 1–255. This constraint applies to all products with [NPU architecture version 2201](../../../language_extension/simd_builtin_keywords.md) and [NPU architecture version 3510](../../../language_extension/simd_builtin_keywords.md).
 ```
 
-### DOC-READ-03 Visualize Parameter Semantics
+### DOC-READ-02 Visualize Parameter Semantics
 
 [Level] Specification
 
@@ -564,7 +547,7 @@ For non-continuous computation, set `dataBlockStride` to a value greater than 1 
 
 [Negative example] A complex parameter is explained only in prose, using more than three sentences.
 
-### DOC-READ-04 Keep Code Snippets Concise and Focused
+### DOC-READ-03 Keep Code Snippets Concise and Focused
 
 [Level] Specification
 
@@ -631,7 +614,7 @@ AscendC::Mutex::Unlock<PIPE_MTE2>(mutex_id);
 ```
 ````
 
-### DOC-READ-05 Explicitly Establish Prerequisites
+### DOC-READ-04 Explicitly Establish Prerequisites
 
 [Level] Principle
 
@@ -759,7 +742,18 @@ None
 <!-- end id29 -->
 ```
 
-[Negative example] The API documentation does not completely list the supported data types and constraints, and some of the listed information is inaccurately described or inconsistent with the actual behavior.
+[Negative example] The following API documentation lists only some data types and does not distinguish support across different products. The constraint description does not specify address alignment requirements for different storage locations, and omits alignment requirements for the transfer size and synchronization requirements when the source and destination addresses overlap.
+
+```text
+## Data Types
+
+The supported data types are: half and float.
+
+## Constraint Description
+
+- Both the source and destination addresses must be aligned to 32 bytes.
+- The transfer size has no alignment requirement.
+```
 
 ### DOC-COMP-01 Layered Example Coverage
 
@@ -830,57 +824,7 @@ int32_t main(int32_t argc, char* argv[])
 ```
 ````
 
-### DOC-COMP-02 Describe API Relationships and Combined Usage
-
-[Level] Principle
-
-[Description] Each API page explains the combined usage relationships and prohibitions between APIs within the same version. If an API is deprecated, link to the page for the new API that implements the same functionality.
-
-**Requirements**:
-
-- Annotate mutually exclusive combinations in a standalone warning box (for example, "Combining BatchMatmul with SetQuantVector is not supported").
-- Provide a selection decision tree or comparison table for API families with similar functionality.
-- Deprecated APIs must link to the page for the new API that implements the same functionality.
-- If an API must work with other interfaces, explicitly list the related APIs.
-
-[Positive example]
-
-**Annotate mutually exclusive combinations in a standalone warning box**:
-
-```text
->[!NOTE]Description
->- Batch Matmul does not support quantization/dequantization modes. That is, the [SetQuantScalar](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantScalar.md) and [SetQuantVector](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantVector.md) interfaces are not supported.
-```
-
-**Provide a selection decision tree or comparison table for API families with similar functionality**:
-
-```text
-Compare and Compares are referred to as comparison interfaces. They compare the values of Tensor or Scalar elements one by one and generate a mask based on the comparison result. The recommended usage scenarios are as follows:
-
-**Table 1**  Recommended usage scenarios for comparison interfaces
-
-| API | Core functionality | Mask type | Recommended usage scenario |
-| --- | --- | --- | --- |
-| [Compare](Compare.md) | Compares the values of two tensors element by element. If a comparison result is true, the corresponding bit in the output result is 1; otherwise, it is 0. Multiple comparison modes are supported (equal to, less than, greater than, ...).<br>Mask settings for Vector computation are not supported. The result is stored in UB. | Not used | Element-by-element comparison, with the result written to memory. |
-| [Compare (result stored in a register)](Compare_store_to_register.md) | Compares the values of two tensors element by element. If a comparison result is true, the corresponding bit in the output result is 1; otherwise, it is 0. Multiple comparison modes are supported.<br>Mask settings for Vector computation are supported. The result is temporarily stored in the CmpMask register. For details, see [Table 2 CmpMask and VectorMask](#cmpMask-vectorMask). | The mask passed through src is used for Vector computation;<br>the output result is CmpMask (comparison mask). | Element-by-element comparison, with the result written to a register. |
-| [Compares](Compares.md) | Compares each element in a tensor with another scalar. If a comparison result is true, the corresponding bit in the output result is 1; otherwise, it is 0.<br>Multiple comparison modes are supported. | Not used | Element-by-element comparison between a tensor and a scalar, with the result written to memory. |
-```
-
-**Link a deprecated API to the page for the new API that implements the same functionality**:
-
-```text
-## Function Description
-
-**This interface has been deprecated. Use [asc_set_atomic_add_int32](../simd_atomic/asc_set_atomic_add.md) instead.**
-```
-
-**If an API must work with other interfaces, explicitly list the related APIs**:
-
-```text
-WaitPreBlock and NotifyNextBlock must be used together with the [InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md#) interface. Using these three interfaces together ensures that multiple AIV cores execute strictly in ascending order of blockIdx. This is applicable to scenarios requiring deterministic computation. For the specific meaning of deterministic computation, see [Deterministic Computation](../../atomic_operations/key_features.md).
-```
-
-### DOC-COMP-03 Complete Cross-Generation Migration Coverage
+### DOC-COMP-02 Complete Cross-Generation Migration Coverage
 
 [Level] Principle
 
@@ -964,24 +908,21 @@ Specifically, the main changes in the 3510 architecture are shown in the followi
     ```
 ````
 
-### DOC-COMP-04 Version Constraint Annotation Specifications
+### DOC-COMP-03 Version Constraint Annotation Specifications
 
-[Level] Specification
+[Level] Principle
 
-[Description] Content involving version differences across the five documents must use a unified annotation format, ensuring that developers can identify the applicable scope at a glance:
+[Description] Content involving version differences across the five documents must be annotated, ensuring that developers can identify the applicable scope at a glance:
 
-**Annotation format**: `[Applicable version: xxx]`+`> **Note**: xxx`
-
-| Annotation scenario | Format | Example |
-|---------|------|------|
-| Constraints differ by version | `> **Version difference**: 2201 requires 32B alignment; 3510 requires 512B alignment` | `src_stride → For version differences, see the Migration Guide` |
-| Performance optimization solutions differ by version | `[Applicable version: 2201 only]`/`[Applicable version: 3510 only]` | `IBShare → [Applicable version: 2201 only]` |
+| Annotation scenario | Example |
+|---------|------|
+| Constraints differ by version | Matrix fractal formats are affected by hardware reading logic: for NPU architecture version 2201, the left matrix A uses the Zz format; for NPU architecture version 3510, the left matrix A uses the Nz format |
+| Performance optimization solutions differ by version | The bank conflict avoidance solutions for NPU architecture versions 2201 and 3510 are different |
 
 **Operational requirements**:
 
-- In the Programming Guide, annotate hardware parameters/constraints that differ by version with `[Applicable version: xxx]` next to the parameter value.
-- In the Operator Practice Reference, annotate version-specific optimization solutions with `[Applicable version: xxx only]` in the title or at the beginning.
-- In the Cross-Generation Migration Guide, use the unified format for each entry rather than inventing new formats.
+- In the Programming Guide, annotate specific differences in hardware parameters and constraints that vary by version.
+- In the Operator Practice Reference, annotate the applicable architecture versions for version-specific optimization solutions.
 
 [Positive example]
 
@@ -992,7 +933,9 @@ Specifically, the main changes in the 3510 architecture are shown in the followi
 
 Matrix fractal formats define the layout rules for multidimensional tensors in memory. Due to hardware reading logic, different product models have different format requirements for matrix multiplication C = A × B:
 
-> **Version difference**: 2201 requires the left matrix A to use the Zz format, the right matrix B to use the Zn format, and the result matrix C to use the Nz format; 3510 requires the left matrix A to use the Nz format, the right matrix B to use the Zn format, and the result matrix C to use the Nz format.
+- For [NPU architecture version 2201](../../../language_extension/simd_builtin_keywords.md), matrix multiplication C = A × B requires the left matrix A to use the Zz format, the right matrix B to use the Zn format, and the result matrix C to use the Nz format.
+
+- For [NPU architecture version 3510](../../../language_extension/simd_builtin_keywords.md), matrix multiplication C = A × B requires the left matrix A to use the Nz format, the right matrix B to use the Zn format, and the result matrix C to use the Nz format.
 ```
 
 **Performance optimization solutions differ by version**:
@@ -1000,10 +943,15 @@ Matrix fractal formats define the layout rules for multidimensional tensors in m
 ```text
 # Avoiding Bank Conflicts (NPU Architecture Version 2201)
 
-[Applicable version: 2201 only]
+>[!NOTE] Note
+>This performance optimization recommendation applies to the following product models:
+><!-- npu="A3" id30 -->
+>- Atlas A3 Training Series products/Atlas A3 Inference Series products
+><!-- end id30 -->
+><!-- npu="910b" id31 -->
+>- Atlas A2 Training Series products/Atlas A2 Inference Series products
+><!-- end id31 -->
 ```
-
-[Negative example] Content involving version differences across the five documents does not use a unified format.
 
 ---
 
@@ -1014,9 +962,9 @@ Some design requirements span multiple dimensions and must satisfy them simultan
 | Design requirement | Discoverability | Readability | Completeness | Specific operation |
 |---------|---------|--------|--------|---------|
 | **Terminology mapping table** | Unified entry point | Terminology appropriate to each level | — | Create a standalone appendix file |
-| **Decision tree/comparison table** | Three-level navigation | Distinguish easily confused concepts | API relationships | Provide one at every branch requiring a choice among multiple options |
+| **Decision tree/comparison table** | Three-level navigation | Distinguish easily confused concepts | — | Provide one at every branch requiring a choice among multiple options |
 | **Code examples** | Link to the example repository | Concise and focused | Layered coverage | Provide at least one Standard example on each API page; provide a Minimal example and complete example link in the guides and practice documents |
 | **Constraint box** | — | Prominent and introduced in advance | Zero omission | Provide constraint information where the relevant item is first defined |
 | **Parameter diagrams** | — | Visualization | Constraint visualization | Complex parameters such as stride/layout/mask types must include diagrams |
-| **Version constraint annotations** | Identify the version scope at a glance | Do not confuse version differences | Zero omission of migration paths | Use a unified annotation format consistently across all five documents |
+| **Version constraint annotations** | Identify the version scope at a glance | Do not confuse version differences | Zero omission of migration paths | Content involving version differences in any of the five documents must be annotated |
 | **Cross-generation migration mapping** | — | Migration steps are understandable | Zero omission from the change list | List architectural changes, API compatibility policies, verification steps, and compilation options |

@@ -358,7 +358,7 @@ C API是Ascend C三层梯度化编程接口中的**语言扩展层SIMD API**，�
 
 【级别】原则
 
-【描述】每个文件有明确的单一职责，概述文件定位为**导航页**：
+【描述】每个文件有明确的单一职责：
 
 | 文件类型 | 职责 | 禁止 |
 |---------|------|------|
@@ -374,74 +374,57 @@ C API是Ascend C三层梯度化编程接口中的**语言扩展层SIMD API**，�
 - 同一内容的详细描述只出现一次（权威版本），其余位置用"详见X章节"引用
 - 硬件架构描述统一到一份文件，不允许SIMD版/SIMT版各描述一半
 
-【正例】线程架构文档作为概念介绍文件，只包含线程相关主题，文件职责明确，它的结构如下：
+【正例】如下为矢量编程的概述文件，仅承担导航职责，列出主题并提供简要说明和子章节链接，不展开具体实现细节：
 
 ```text
-# 线程架构
+# 概述
 
-## 线程层次结构
+本节将以Add算子为例，带您快速构建Ascend C矢量算子程序，并学习矢量算子开发的典型场景以及处理方式。涉及的场景包括：
 
-## Warp执行机制
-
-## 配置最大线程数
+-   [基础矢量算子](basic_vector_operator.md)：开发一个简单的Add矢量算子。
+-   [TBuf的使用](tbuf_usage.md)：在算子计算过程中使用临时空间存储运算的中间结果。
+-   [多核Tiling切分](multi_core_tiling/overview.md)：当算子需要多核并行计算或支持动态shape时，对输入数据进行切分、分块计算，并将不同数据块分配到多个AI Core上处理。
+    -   [主块均分](multi_core_tiling/main_block_even_split.md)：算子在AI处理器的多个核上运行，所有核的计算数据量相等且32字节对齐。
+    -   [尾块均分](multi_core_tiling/tail_block_even_split.md)：算子在AI处理器的多个核上运行，所有核的计算数据量相等，每个核上除最后一个数据块（尾块）外，其余数据块的数据量相等，每个核都需要处理尾块数据的计算。
+    -   [尾核切分](multi_core_tiling/tail_core_split.md)：算子在AI处理器的多个核上运行，数据无法平均分配到每个核。将所有核分为多个整核和多个尾核，整核的计算数据量相等，尾核的计算数据量相等。
+    -   [尾核尾块切分](multi_core_tiling/tail_core_tail_block_split.md)：算子在AI处理器的多个核上运行，数据无法平均分配到每个核，同时每个核内的数据无法均分，除最后一个数据块（尾块）外，其余数据块的数据量相等，每个核都需要单独处理尾块数据的计算。
+-   [DoubleBuffer场景](double_buffer_scenario.md)：开启double buffer，算子中的多条流水并行执行。
+-   [Broadcast场景](broadcast_scenario.md)：算子中两个输入的shape（形状）不相等，需要将一个输入的shape进行Broadcast（广播）后，再执行计算。
+-   [非对齐场景](unaligned_scenario.md)：更多数据非32字节对齐场景的处理方案。
 ```
 
-【反例】根据如下概念介绍文件的结构可以看出，它包含了超过3个不相关主题，需要将内存层级、核函数、同步机制的内容拆分成3个子文件：
+【反例】如下为矢量编程的概述文件，展开了技术细节，并包含了大量代码，超出了概述文件的职责范围：
 
-```text
-# 线程架构
+````text
+# 概述
 
-## 线程层次结构
+## 基础矢量算子
+基于Ascend C方式实现基础矢量算子核函数（Kernel）的流程如下图所示......（此处展开基础矢量算子细节）
 
-## Warp执行机制
+## TBuf的使用
+在大多数算子开发时，核函数（Kernel）计算过程需要使用临时内存来存储运算的中间结果，这些中间结果以临时变量表示，临时变量占用的内存可以使用TBuf数据结构来管理......（此处展开TBuf细节）
 
-## 配置最大线程数
-
-## 内存层级
-
-## 核函数
-
-## 同步机制
 ```
+// Compute阶段
+xLocal = inQueueX.DeQue<bfloat16_t>();
+yLocal = inQueueY.DeQue<bfloat16_t>();
+AscendC::LocalTensor<bfloat16_t> zLocal = outQueueZ.AllocTensor<bfloat16_t>();
+AscendC::LocalTensor<float> tmpTensor0 = tmpBuf0.Get<float>();
+AscendC::LocalTensor<float> tmpTensor1 = tmpBuf1.Get<float>();
+// 使用Cast接口将bfloat16_t转换为float类型，存入TBuf临时缓冲区
+AscendC::Cast(tmpTensor0, xLocal, AscendC::RoundMode::CAST_NONE, totalLength);
+AscendC::Cast(tmpTensor1, yLocal, AscendC::RoundMode::CAST_NONE, totalLength);
+AscendC::Add(tmpTensor0, tmpTensor0, tmpTensor1, totalLength);
+AscendC::Cast(zLocal, tmpTensor0, AscendC::RoundMode::CAST_RINT, totalLength);
+outQueueZ.EnQue<bfloat16_t>(zLocal);
+inQueueX.FreeTensor(xLocal);
+inQueueY.FreeTensor(yLocal);
+```
+````
 
 ## 3 可读性（Readability）
 
-### DOC-READ-00 按抽象层级使用术语
-
-【级别】原则
-
-【描述】文档按章节的抽象层级使用对应术语，**首次跨界时必须关联**：
-
-| 章节层级 | 使用术语 | 首次跨界处理 |
-|---------|---------|-------------|
-| 高层（抽象硬件架构、概述） | 抽象名：Global Memory、Local Memory、计算单元 | 不突兀混入UB、L0A等底层名 |
-| 低层（编程模型、数据搬运） | 硬件名：UB、L1 Buffer、L0A/B/C | **首次出现时**括号关联：`UB（即抽象架构中Local Memory的一部分）` |
-| API层（API参考手册） | API名：DataCopy、LocalTensor | — |
-
-【正例】
-
-**抽象硬件架构**：
-
-```text
-## 存储单元和搬运单元
-
-存储单元可以从使用位置上分为Local Memory和Global Memory。
-
--   **Local Memory**：AI Core片内存储，用于暂存从Global Memory搬入的数据分片，并保存计算输出和中间结果。这些数据可供Vector、Cube等计算单元高效访问，继续参与片内计算，或通过搬运单元搬出到Global Memory。Local Memory包含面向不同编程方式和计算单元的片内资源，如[图2](#fig_simd_reg_memory_hierarchy)所示。
--   **Global Memory**：Device侧全局存储，是Local Memory中数据搬入和搬出的主要来源或目的位置。
-```
-
-**编程模型**：
-
-```text
-# Memory矢量计算编程
-
-本文介绍基于统一缓存（Unified Buffer，下文简称UB，为抽象架构中Local Memory的一部分）的Ascend C矢量计算开发方法，该计算能力简称Memory矢量计算编程，是Ascend C中最基础、应用最广泛的矢量编程方式。
-```
-
-【反例】抽象硬件架构文档直接写"数据通过UB搬入VEC运算"，跳过抽象层。
-
-### DOC-READ-01 易混概念显式区分
+### DOC-READ-00 易混概念显式区分
 
 【级别】原则
 
@@ -478,7 +461,7 @@ C API是Ascend C三层梯度化编程接口中的**语言扩展层SIMD API**，�
 | \_\_fbuf\_\_ | Fixpipe Buffer |
 | \_\_ssbuf\_\_ | SSBuffer |
 
-### DOC-READ-02 约束醒目且集中说明
+### DOC-READ-01 约束醒目且集中说明
 
 【级别】规范
 
@@ -531,7 +514,7 @@ C API是Ascend C三层梯度化编程接口中的**语言扩展层SIMD API**，�
 > 📌 硬件约束：repeat_time取值范围为1~255，该约束对[NPU架构版本2201](../../../language_extension/simd_builtin_keywords.md)、[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)全系列产品生效。
 ```
 
-### DOC-READ-03 参数语义图解化
+### DOC-READ-02 参数语义图解化
 
 【级别】规范
 
@@ -564,7 +547,7 @@ C API是Ascend C三层梯度化编程接口中的**语言扩展层SIMD API**，�
 
 【反例】复杂参数使用纯文字解释，且超过三句。
 
-### DOC-READ-04 代码片段精简聚焦
+### DOC-READ-03 代码片段精简聚焦
 
 【级别】规范
 
@@ -631,17 +614,17 @@ AscendC::Mutex::Unlock<PIPE_MTE2>(mutex_id);
 ```
 ````
 
-### DOC-READ-05 前置知识显式铺垫
+### DOC-READ-04 前置知识显式铺垫
 
 【级别】原则
 
 【描述】每个概念/API首次出现时提供前置知识铺垫，确保**不逆序阅读**：
 
-- 若章节涉及前置知识，该章节的开头需要放置相关的概念说明
+- 若章节涉及前置知识，该章节的起始处需要放置相关的概念说明
 - 编程指南章节按学习路径排列：基础概念→编程模型→编程范式→性能优化（不按功能模块平铺）
 - 概念B依赖概念A时，A先出现或在B处有明确引用链接
 
-【正例】如下算子功能设计章节涉及到了aclnn工程化算子开发的前置知识，在开头放置了相关说明：
+【正例】如下算子功能设计章节涉及到了aclnn工程化算子开发的前置知识，在章节起始处放置了相关说明：
 
 ```text
 # 算子功能设计
@@ -759,7 +742,18 @@ AscendC::Mutex::Unlock<PIPE_MTE2>(mutex_id);
 <!-- end id29 -->
 ```
 
-【反例】API文档中未完整列出支持的数据类型及约束条件，且部分已列出的信息存在描述不准确或与实际不符的情况。
+【反例】如下API文档仅列出部分数据类型，未区分不同产品的支持情况；约束说明未明确不同存储位置的地址对齐要求，并遗漏搬运量对齐和目的地址重叠场景下的同步要求。
+
+```text
+## 数据类型
+
+支持的数据类型为：half、float。
+
+## 约束说明
+
+- 源地址和目的地址均需要32字节对齐。
+- 搬运的数据量不受限制。
+```
 
 ### DOC-COMP-01 示例分层覆盖
 
@@ -830,57 +824,7 @@ int32_t main(int32_t argc, char* argv[])
 ```
 ````
 
-### DOC-COMP-02 API关联与组合使用说明
-
-【级别】原则
-
-【描述】每个API页面说明同一版本内API之间的组合使用关系和禁忌。若API废弃需要链接到实现此功能的新API页面。
-
-**要求**：
-
-- 互斥组合用独立警告框标注（如"BatchMatmul与SetQuantVector组合不支持"）
-- 功能相近API族提供选择决策树或对照表
-- 废弃API需要链接到实现此功能的新API页面
-- 若API需与其他接口协同工作，应明确列出相关API
-
-【正例】
-
-**互斥组合用独立警告框标注**：
-
-```text
->[!NOTE]说明
->- Batch Matmul不支持量化/反量化模式，即不支持[SetQuantScalar](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantScalar.md)、[SetQuantVector](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantVector.md)接口。
-```
-
-**功能相近API族提供选择决策树或对照表**：
-
-```text
-Compare、Compares称之为比较接口，用于逐元素比较Tensor或Scalar的大小，并根据比较结果生成掩码。推荐使用场景如下：
-
-**表1**  比较接口推荐使用场景
-
-| API | 核心功能 | Mask类型 | 推荐使用场景 |
-| --- | --- | --- | --- |
-| [Compare](Compare.md) | 逐元素比较两个tensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。支持多种比较模式（等于、小于、大于...）。<br>不支持Vector计算的Mask设置。结果存入UB。 | 未使用 | 逐元素比较，结果写入内存。 |
-| [Compare（结果存入寄存器）](Compare_store_to_register.md) | 逐元素比较两个tensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。支持多种比较模式。<br>支持Vector计算的Mask设置。结果暂存CmpMask寄存器。详情参考[表2 CmpMask与VectorMask](#cmpMask-vectorMask)。 | src传参mask用于Vector计算；<br>输出结果为CmpMask（比较掩码）。 | 逐元素比较，结果写寄存器。 |
-| [Compares](Compares.md) | 逐元素比较一个tensor中的元素和另一个scalar的大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。<br>支持多种比较模式。 | 未使用 | 张量和标量逐元素比较，结果写入内存。 |
-```
-
-**废弃API链接到实现此功能的新API页面**:
-
-```text
-## 功能说明
-
-**该接口已废弃，请使用[asc_set_atomic_add_int32](../simd_atomic/asc_set_atomic_add.md)替代。**
-```
-
-**API需与其他接口协同工作，明确列出相关API**:
-
-```text
-WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md#)接口配合使用，这三个接口组合使用能够确保多个AIV核严格按照blockIdx的升序执行，适用于要求确定性计算的场景，确定性计算的具体含义请参考[确定性计算](../../atomic_operations/key_features.md)。
-```
-
-### DOC-COMP-03 跨代迁移覆盖完备
+### DOC-COMP-02 跨代迁移覆盖完备
 
 【级别】原则
 
@@ -964,24 +908,21 @@ WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDeter
     ```
 ````
 
-### DOC-COMP-04 版本约束标注规范
+### DOC-COMP-03 版本约束标注规范
 
-【级别】规范
+【级别】原则
 
-【描述】五份文档中涉及版本差异的内容必须统一标注格式，确保开发者一眼识别适用范围：
+【描述】五份文档中涉及版本差异的内容必须标注，确保开发者一眼识别适用范围：
 
-**标注格式**：`[适用版本：xxx]`+`> **注意**：xxx`
-
-| 标注场景 | 格式 | 示例 |
-|---------|------|------|
-| 约束因版本不同 | `> **版本差异**：2201要求32B对齐；3510要求512B对齐` | `src_stride → 版本差异见迁移指南` |
-| 性能优化方案因版本不同 | `[适用版本：仅2201]`/`[适用版本：仅3510]` | `IBShare → [适用版本：仅2201]` |
+| 标注场景 | 示例 |
+|---------|------|
+| 约束因版本不同 | 矩阵分形格式受硬件读取逻辑影响，针对NPU架构版本2201，左矩阵A使用Zz格式；针对NPU架构版本3510，左矩阵A使用Nz格式 |
+| 性能优化方案因版本不同 | NPU架构版本2201和NPU架构版本3510的避免bank冲突方案存在差异 |
 
 **操作要求**：
 
-- 编程指南中涉及版本差异的硬件参数/约束，在参数值旁用`[适用版本：xxx]`标注
-- 算子实践参考中版本特定的优化方案，在标题或开头用`[适用版本：仅xxx]`标注
-- 跨代迁移指南中每个条目使用统一格式，不自行发明新格式
+- 编程指南中涉及版本差异的硬件参数/约束，需要标注具体的差异信息
+- 算子实践参考中版本特定的优化方案，需要标注适用的架构版本
 
 【正例】
 
@@ -992,7 +933,9 @@ WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDeter
 
 矩阵分形格式用于定义多维张量在内存中的排布规则。受硬件读取逻辑影响，不同产品型号对矩阵乘法 C = A × B 的格式要求存在差异：
 
-> **版本差异**：2201要求左矩阵A使用Zz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式；3510要求左矩阵A使用Nz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式。
+- 针对[NPU架构版本2201](../../../language_extension/simd_builtin_keywords.md)，矩阵乘法C = A × B要求：左矩阵A使用Zz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式。
+
+- 针对[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)，矩阵乘法C = A × B要求：左矩阵A使用Nz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式。
 ```
 
 **性能优化方案因版本不同**：
@@ -1000,23 +943,28 @@ WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDeter
 ```text
 # 避免bank冲突（NPU架构版本2201）
 
-[适用版本：仅2201]
+>[!NOTE]说明
+>该性能优化建议适用于如下产品型号：
+><!-- npu="A3" id30 -->
+>- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+><!-- end id30 -->
+><!-- npu="910b" id31 -->
+>- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+><!-- end id31 -->
 ```
-
-【反例】五份文档中涉及版本差异的内容未统一格式。
 
 ---
 
 ## 5 三维度交叉设计
 
-部分设计要求横跨多个维度，需同时满足：
+部分设计要求横跨可获取性、可读性、完备性中的多个维度，需同时满足：
 
 | 设计要求 | 可获取性 | 可读性 | 完备性 | 具体操作 |
 |---------|---------|--------|--------|---------|
 | **术语对照表** | 统一入口 | 按层用词 | — | 建立独立附录文件 |
-| **决策树/对比表** | 三层导航 | 易混区分 | API关联 | 每个多选岔路口提供 |
+| **决策树/对比表** | 三层导航 | 易混区分 | — | 每个多选岔路口提供 |
 | **代码示例** | 链接样例库 | 精简聚焦 | 分层覆盖 | API页至少1个Standard示例；指南和实践提供Minimal示例及完整样例链接 |
 | **约束框** | — | 前置醒目 | 零遗漏 | 约束信息在首次定义处 |
 | **参数图解** | — | 图解化 | 约束可视化 | stride/layout/mask类等复杂参数必须配图 |
-| **版本约束标注** | 一眼识别版本范围 | 版本差异不混淆 | 迁移路径零遗漏 | 统一格式标注，五份文档一致 |
+| **版本约束标注** | 一眼识别版本范围 | 版本差异不混淆 | 迁移路径零遗漏 | 五份文档中涉及版本差异的内容必须标注 |
 | **跨代迁移映射** | — | 迁移步骤可理解 | 变更清单零遗漏 | 列出架构变化、API兼容策略、验证步骤和编译选项 |
