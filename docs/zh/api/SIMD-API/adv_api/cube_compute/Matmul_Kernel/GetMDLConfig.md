@@ -27,6 +27,7 @@
 <!-- npu="9030" id2 -->
 - Kirin 9030：不支持
 <!-- end id2 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetMDLConfig_res.md#id1 -->
 
 ## 功能说明
 
@@ -66,6 +67,8 @@ __aicore__ constexpr MatmulConfig GetMDLConfig(const bool intrinsicsLimit = fals
 ## 约束说明
 
 无
+
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetMDLConfig_res.md#id2 -->
 
 ## 调用示例
 

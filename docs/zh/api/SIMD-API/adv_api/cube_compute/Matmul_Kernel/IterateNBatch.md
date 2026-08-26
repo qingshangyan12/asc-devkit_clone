@@ -27,6 +27,7 @@
 <!-- npu="9030" id2 -->
 - Kirin 9030：不支持
 <!-- end id2 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/IterateNBatch_res.md#id1 -->
 
 ## 功能说明
 
@@ -72,6 +73,8 @@ __aicore__ inline void IterateNBatch(const uint32_t batchLoop, uint32_t batchA, 
 -   对于BSNGD、SBNGD、BNGS1S2 Layout格式，输入A、B矩阵多Batch数据总和应小于L1 Buffer的大小。
 -   当开启MixDualMaster（双主模式）场景时，即模板参数[enableMixDualMaster](MatmulConfig.md#matmulconfig-params)设置为true，不支持使用该接口。
 -   当使用ND格式输入，且单个BMM内A或B矩阵的[源矩阵内轴](IterateBatch.md#row_width)大于65535时，需在MatmulConfig中设置intrinsicsCheck为true。开启此选项后，API会将一次从Global Memory到L1 Buffer的ND2NZ搬运操作拆分为多次循环搬运，从而避免单次搬运指令参数超限。
+
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/IterateNBatch_res.md#id2 -->
 
 ## 调用示例
 

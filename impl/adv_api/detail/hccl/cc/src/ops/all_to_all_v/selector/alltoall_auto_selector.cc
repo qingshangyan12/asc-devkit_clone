@@ -13,52 +13,50 @@
 
 namespace mc2_ops_hccl {
 namespace {
-constexpr u32 CONCURRENT_RANK_LIMIT = 4;
-constexpr u64 BIG_DATA_SIZE_LIMIT = 512;
-}
+constexpr u32 CONCURRENT_RANK_LIMIT = 4U;
+constexpr u64 CONCURRENT_COUNT_LIMIT = 512U;
+} // namespace
 
 SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
-    (void)opParam;
     (void)configAlgMap;
     CHK_PRT_RET(
         topoInfo == nullptr, HCCL_ERROR("[AlltoAllAutoSelector] topoInfo is nullptr."), SelectorStatus::NOT_MATCH);
-    if (topoInfo->userRankSize <= 1U ||
-        (topoInfo->level0Topo != Level0Shape::MESH_1D && topoInfo->level0Topo != Level0Shape::CLOS &&
-         topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS)) {
+    if (topoInfo->userRankSize <= 1U) {
         HCCL_WARNING(
-            "[AlltoAllAutoSelector] rankSize[%u], level0Topo[%u] is not supported by local AICPU Mesh1D.",
+            "[AlltoAllAutoSelector] rankSize[%u] is not supported by local AICPU AllToAll.", topoInfo->userRankSize);
+        return SelectorStatus::NOT_MATCH;
+    }
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D || topoInfo->level0Topo == Level0Shape::CLOS) {
+        // Host tiling has no runtime count. Select the multi-channel token to allocate a resource upper bound.
+        selectAlgName = "AicpuAlltoAllSoleMesh";
+        HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
+    if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS || topoInfo->level0PcieMix) {
+        HCCL_WARNING(
+            "[AlltoAllAutoSelector] rankSize[%u], level0Topo[%u] is not supported by local AICPU AllToAll.",
             topoInfo->userRankSize, static_cast<u32>(topoInfo->level0Topo));
         return SelectorStatus::NOT_MATCH;
     }
-
-    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
-        const auto* sendCounts = reinterpret_cast<const u64*>(opParam.all2AllVDataDes.sendCounts);
-        CHK_PRT_RET(
-            sendCounts == nullptr, HCCL_WARNING("[AlltoAllAutoSelector] sendCounts is nullptr."),
-            SelectorStatus::NOT_MATCH);
-
-        bool isMeshNumEqualToClosNum = false;
-        CHK_PRT_RET(
-            CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
-            HCCL_ERROR("[AlltoAllAutoSelector] CheckMeshNumEqualToClosNum failed."), SelectorStatus::NOT_MATCH);
-
-        const bool concurrentCondition = isMeshNumEqualToClosNum &&
-                                         topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT &&
-                                         sendCounts[0] > BIG_DATA_SIZE_LIMIT;
-        if (concurrentCondition) {
-            // Concurrent is outside this migration scope. UBX is the confirmed local fallback.
-            HCCL_WARNING(
-                "[AlltoAllAutoSelector] HCCL concurrent condition matched, but Concurrent is not migrated; "
-                "fallback to AicpuAllToAllSoleMeshUBX.");
-        }
-        selectAlgName = "AicpuAllToAllSoleMeshUBX";
-    } else {
-        // Preserve the existing ordinary path for PCIe-mix and single-topology cases.
-        selectAlgName = "InsAlltoAllMesh1D";
-    }
+#if !defined(HCCL_CANN_COMPAT_850)
+    bool isMeshNumEqualToClosNum = false;
+    CHK_PRT_RET(
+        CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
+        HCCL_ERROR("[AlltoAllAutoSelector] failed to compare Mesh/CLOS rank counts."), SelectorStatus::NOT_MATCH);
+    CHK_PRT_RET(
+        opParam.all2AllVDataDes.sendCounts == nullptr, HCCL_WARNING("[AlltoAllAutoSelector] sendCounts is nullptr."),
+        SelectorStatus::NOT_MATCH);
+    const auto* sendCounts = static_cast<const u64*>(opParam.all2AllVDataDes.sendCounts);
+    const bool concurrentCondition = isMeshNumEqualToClosNum &&
+                                     topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT &&
+                                     sendCounts[0] > CONCURRENT_COUNT_LIMIT;
+    selectAlgName = concurrentCondition ? "AicpuAllToAllSoleMeshConcurrent" : "AicpuAllToAllSoleMeshUBX";
+#else
+    selectAlgName = "AicpuAllToAllSoleMeshUBX";
+#endif
     HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
