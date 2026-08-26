@@ -39,37 +39,37 @@ struct TensorTrait {
     static constexpr const TPosition tPos = pos;
 
 public:
-    __aicore__ inline TensorTrait(const LayoutType& t = {})
+    __aicore__ inline constexpr TensorTrait(const LayoutType& t = {})
     {
         static_assert(is_layout_v<LayoutType>, "TensorTrait without layout instantiation!");
         this->layout_ = t;
     }
 
-    __aicore__ inline LayoutType& GetLayout()
+    __aicore__ inline constexpr LayoutType& GetLayout()
     {
         static_assert(is_layout_v<LayoutType>, "TensorTrait without layout instantiation!");
         return layout_;
     }
 
-    __aicore__ inline const LayoutType& GetLayout() const
+    __aicore__ inline constexpr const LayoutType& GetLayout() const
     {
         static_assert(is_layout_v<LayoutType>, "TensorTrait without layout instantiation!");
         return layout_;
     }
 
-    __aicore__ inline void SetLayout(const LayoutType& t)
+    __aicore__ inline constexpr void SetLayout(const LayoutType& t)
     {
         static_assert(is_layout_v<LayoutType>, "TensorTrait without layout instantiation!");
         this->layout_ = t;
     }
 
-    __aicore__ inline decltype(auto) GetShape() const
+    __aicore__ inline constexpr decltype(auto) GetShape() const
     {
         static_assert(is_layout_v<LayoutType>, "TensorTrait without layout instantiation!");
         return layout_.GetShape();
     }
 
-    __aicore__ inline decltype(auto) GetStride() const
+    __aicore__ inline constexpr decltype(auto) GetStride() const
     {
         static_assert(is_layout_v<LayoutType>, "TensorTrait without layout instantiation!");
         return layout_.GetStride();

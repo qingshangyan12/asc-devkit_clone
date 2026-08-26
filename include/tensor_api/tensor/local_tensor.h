@@ -30,7 +30,7 @@ struct local_tensor : public base_tensor<EngineT, LayoutT> {
     using layoutType = typename tensor_api_base::layout_type;
 
     __aicore__ inline local_tensor();
-    __aicore__ inline local_tensor(const EngineT& engine, const LayoutT& layout);
+    __aicore__ inline constexpr local_tensor(const EngineT& engine, const LayoutT& layout);
 };
 
 } // namespace te
