@@ -11,6 +11,10 @@
 - **[asc_int322uint16（废弃）](asc_int322uint16_deprecated.md)**
 - **[asc_uint82uint16（废弃）](asc_uint82uint16_deprecated.md)**
 
+### 复合计算
+
+- **[asc_exp_sub（废弃）](asc_exp_sub_deprecated.md)**
+
 ## 原子操作
 - **[asc_set_atomic_add_int（废弃）](asc_set_atomic_add_int_deprecated.md)**
 
