@@ -26,13 +26,7 @@
 #define UB_ADDR __ubuf__ uint8_t*
 #define SSBUF_ADDR __ssbuf__ uint32_t*
 
-#ifndef likely
-#define likely(x) __builtin_expect(!!(x), 1)
-#endif
-#ifndef unlikely
-#define unlikely(x) __builtin_expect(!!(x), 0)
-#endif
-
+#include "utils/base/sys_macros.h"
 #include "../kernel_macros.h"
 #include "../kernel_log.h"
 #include "../kernel_event.h"
@@ -79,24 +73,6 @@ enum SidOutSMMU {
     SID_OUT_L1_IMAGE = 4,
     SID_L1_TO_OUT = 5,
     SID_WEIGHT_LLM_DECODER = 9,
-};
-#endif
-
-#ifndef __PLUGIN__KERNEL_META_TYPE_ENUME_DEFINED__
-#define __PLUGIN__KERNEL_META_TYPE_ENUME_DEFINED__
-// define macro for deterministic compile options
-enum KernelMetaType : uint8_t {
-    KERNEL_TYPE_AIV_ONLY,
-    KERNEL_TYPE_AIC_ONLY,
-    KERNEL_TYPE_MIX_AIV_1_0,
-    KERNEL_TYPE_MIX_AIC_1_0,
-    KERNEL_TYPE_MIX_AIC_1_1,
-    KERNEL_TYPE_MIX_AIC_1_2,
-    KERNEL_TYPE_AICORE,
-    KERNEL_TYPE_VECTORCORE,
-    KERNEL_TYPE_MIX_AICORE,
-    KERNEL_TYPE_MIX_VECTOR_CORE,
-    KERNEL_TYPE_MAX,
 };
 #endif
 
@@ -353,19 +329,14 @@ struct SknlKernelMap {
         g_sknl_map_, __COUNTER__) = {                                                                    \
         {B_TYPE_SK_INFO, sizeof(uint32_t) + sizeof(SknlMapInfo)}, 0, SknlKernelMap<__VA_ARGS__>::value}
 
-// In order to pass __COUNTER__ to variable name, need 3 times of MACRO to pass argument
-#define TILING_STRUCT_SECTION_INIT_BASE(counter, val)                                                                 \
-    static const uint64_t __ascendc_tiling_struct_##counter __attribute__((used, section(".ascendc_tiling." #val))) = \
-        sizeof(val)
-#define TILING_STRUCT_SECTION_INIT(counter, val) TILING_STRUCT_SECTION_INIT_BASE(counter, val)
+#define TILING_STRUCT_SECTION_INIT_BASE(counter, val) ASCENDC_TILING_STRUCT_SECTION_INIT_BASE_IMPL(counter, val)
+#define TILING_STRUCT_SECTION_INIT(counter, val) ASCENDC_TILING_STRUCT_SECTION_INIT_IMPL(counter, val)
+#define ENABLE_FEATURE_FOR_COMPILE(f, val) ASCENDC_ENABLE_FEATURE_FOR_COMPILE_IMPL(f, val)
+#define ENABLE_FEATURE_FOR_TILING(expression, val) ASCENDC_ENABLE_FEATURE_FOR_TILING_IMPL(expression, val)
 
 #ifdef __CHECK_FEATURE_AT_PRECOMPILE
-#define ENABLE_FEATURE_FOR_COMPILE(f, val) auto __enable_feature_for_compile_##f = val
-#define ENABLE_FEATURE_FOR_TILING(expression, val) auto __enable_custom_tiling val = expression
 #define REGISTER_NONE_TILING auto __enable_no_register_custom_tiling ascendc_trigger_tiling_struct = default
 #else
-#define ENABLE_FEATURE_FOR_COMPILE(f, val)
-#define ENABLE_FEATURE_FOR_TILING(expression, val) TILING_STRUCT_SECTION_INIT(__COUNTER__, val)
 #define REGISTER_NONE_TILING
 #endif
 
@@ -373,16 +344,10 @@ struct SknlKernelMap {
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 #define KERNEL_TASK_TYPE(key, value)
-#define KERNEL_TASK_TYPE_DEFAULT(value)
 #else
 #define KERNEL_TASK_TYPE(key, value) ENABLE_FEATURE_FOR_COMPILE(key, value)
-#ifndef __PLUGIN__KERNEL_TASK_TYPE_DEFAULT_DEFINED__
-#define __PLUGIN__KERNEL_TASK_TYPE_DEFAULT_DEFINED__
-#define KERNEL_TASK_TYPE_DEFAULT(value) ENABLE_FEATURE_FOR_COMPILE(default, value)
-#endif
 #endif
 
-#define REGISTER_TILING_DEFAULT(tiling_struct) ENABLE_FEATURE_FOR_TILING(default, tiling_struct)
 #define REGISTER_TILING_FOR_TILINGKEY(expression, tiling_struct) ENABLE_FEATURE_FOR_TILING(expression, tiling_struct)
 
 #ifndef ONE_CORE_DUMP_SIZE
@@ -401,21 +366,9 @@ namespace AscendC {
 constexpr size_t DUMP_UINTSIZE = ONE_CORE_DUMP_SIZE;
 } // namespace AscendC
 
-#include <stdint.h>
 #ifndef TILING_KEY_VAR
-#if defined(ASCENDC_CPU_DEBUG)
-extern uint64_t g_tilingKey;
-#else
-#if __NPU_ARCH__ == 2002
-[[block_local]] uint64_t g_tilingKey;
-#else
-[[workgroup_local]] __gm__ uint64_t g_tilingKey;
+#define TILING_KEY_VAR ASCENDC_TILING_KEY_VAR_IMPL
 #endif
-#endif
-#define TILING_KEY_VAR g_tilingKey
-#endif
-
-#define TILING_KEY_IS(k) (TILING_KEY_VAR == (k))
 
 #define TILING_KEY_LIST_INOUT(...) TILING_KEY_LIST_INOUT_IMPL(__VA_ARGS__)
 #define TILING_KEY_LIST_INOUT_IMPL(...) \

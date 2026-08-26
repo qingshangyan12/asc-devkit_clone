@@ -17,4 +17,27 @@
 
 #include "impl/utils/sys_macros.h"
 
+#ifndef likely
+#define likely(x) __builtin_expect(!!(x), 1)
+#endif
+
+#ifndef unlikely
+#define unlikely(x) __builtin_expect(!!(x), 0)
+#endif
+
+#define PRELOAD(len) ASCENDC_PRELOAD_IMPL(len)
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#define KERNEL_TASK_TYPE_DEFAULT(value)
+#else
+#ifndef __PLUGIN__KERNEL_TASK_TYPE_DEFAULT_DEFINED__
+#define __PLUGIN__KERNEL_TASK_TYPE_DEFAULT_DEFINED__
+#define KERNEL_TASK_TYPE_DEFAULT(value) ASCENDC_KERNEL_TASK_TYPE_DEFAULT_IMPL(value)
+#endif
+#endif
+
+#define REGISTER_TILING_DEFAULT(tiling_struct) ASCENDC_REGISTER_TILING_DEFAULT_IMPL(tiling_struct)
+
+#define TILING_KEY_IS(k) ASCENDC_TILING_KEY_IS_IMPL(k)
+
 #endif
