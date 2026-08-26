@@ -1784,8 +1784,8 @@ static HcclResult RegisterCcuKernels(
                     case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
                         kfcFuncName = KFC_REDUCE_SCATTER_FUNC_NAME;
                         break;
-                    case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
-                        kfcFuncName = KFC_REDUCE_SCATTER_FUNC_NAME;
+                    case HcclCMDType::HCCL_CMD_ALLREDUCE:
+                        kfcFuncName = KFC_ALL_REDUCE_FUNC_NAME;
                         break;
                     default:
                         HCCL_ERROR(
