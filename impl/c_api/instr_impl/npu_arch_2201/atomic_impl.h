@@ -21,6 +21,7 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_none_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/atomic_impl/asc_get_store_atomic_config_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/atomic_impl/asc_set_store_atomic_config_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/atomic_impl/asc_store_atomic_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_add_bfloat_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_add_float_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_add_float16_impl.h"
@@ -53,6 +54,21 @@ __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& conf
 __aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op)
 {
     asc_set_store_atomic_config_v1_impl(type, op);
+}
+
+__aicore__ inline void asc_store_atomic(__gm__ int8_t* addr, int8_t value) { asc_store_atomic_impl(addr, value); }
+
+__aicore__ inline void asc_store_atomic(__gm__ int16_t* addr, int16_t value) { asc_store_atomic_impl(addr, value); }
+
+__aicore__ inline void asc_store_atomic(__gm__ int32_t* addr, int32_t value) { asc_store_atomic_impl(addr, value); }
+
+__aicore__ inline void asc_store_atomic(__gm__ half* addr, half value) { asc_store_atomic_impl(addr, value); }
+
+__aicore__ inline void asc_store_atomic(__gm__ float* addr, float value) { asc_store_atomic_impl(addr, value); }
+
+__aicore__ inline void asc_store_atomic(__gm__ bfloat16_t* addr, bfloat16_t value)
+{
+    asc_store_atomic_impl(addr, value);
 }
 
 __aicore__ inline void asc_set_atomic_add_bfloat() { asc_set_atomic_add_bfloat_impl(); }

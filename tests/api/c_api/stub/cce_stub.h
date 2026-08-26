@@ -15,6 +15,11 @@
 // The compiler supports this overload, but it is missing from the CPU debug stub header.
 int64_t ld_dev(__gm__ int64_t* src, int16_t offset);
 
+// These overloads are used by the dav-2201 scalar atomic store wrapper.
+void st_atomic(int8_t value, __gm__ int8_t* addr);
+void st_atomic(int16_t value, __gm__ int16_t* addr);
+void st_atomic(int32_t value, __gm__ int32_t* addr);
+
 #ifndef ULL
 #define ULL unsigned long long
 #endif

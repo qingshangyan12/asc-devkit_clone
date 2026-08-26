@@ -34,4 +34,7 @@ static void test_host_c_api_atomic_0()
     using ::asc_set_atomic_none;
     using ::asc_set_store_atomic_config_v1;
     using ::asc_set_store_atomic_config_v2;
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ == 2201)
+    using ::asc_store_atomic;
+#endif
 }

@@ -14,6 +14,7 @@
 | [asc_set_atomic_min](asc_set_atomic_min.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最小值写入GM。 |
 | [asc_set_atomic_none](asc_set_atomic_none.md) | 关闭数据搬运随路原子操作功能。 |
 | [asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md) | 设置数据搬运的原子操作配置。 |
+| [asc_store_atomic](asc_store_atomic.md) | 根据原子操作配置，对指定GM地址执行标量原子操作。 |
 | [asc_get_store_atomic_config](asc_get_store_atomic_config.md) | 获取数据搬运的原子操作配置。 |
 
 <!-- npu="950" id1 -->

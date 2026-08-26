@@ -55,6 +55,7 @@ PIPE_S
 
 - 使用完成后，建议通过[asc_set_atomic_none](./asc_set_atomic_none.md)清空原子操作的状态，以免影响后续相关指令功能。
 - 该指令执行前不会对GM的数据做清零操作，开发者需在需要时手动添加清零操作。
+- 配置完成后，可通过[asc_store_atomic](./asc_store_atomic.md)对指定GM地址执行原子操作。`type`对应的数据类型必须与`asc_store_atomic`的`addr`和`value`类型一致。
 
 ## 调用示例
 
@@ -62,4 +63,7 @@ PIPE_S
 uint16_t type = 1;
 uint16_t op = 0;
 asc_set_store_atomic_config_v1(type, op);
+__gm__ float* dst = ...;
+asc_store_atomic(dst, 1.0f);
+asc_set_atomic_none();
 ```

@@ -85,6 +85,15 @@ __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& conf
 
 __aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op);
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ == 2201)
+__aicore__ inline void asc_store_atomic(__gm__ int8_t* addr, int8_t value);
+__aicore__ inline void asc_store_atomic(__gm__ int16_t* addr, int16_t value);
+__aicore__ inline void asc_store_atomic(__gm__ int32_t* addr, int32_t value);
+__aicore__ inline void asc_store_atomic(__gm__ half* addr, half value);
+__aicore__ inline void asc_store_atomic(__gm__ float* addr, float value);
+__aicore__ inline void asc_store_atomic(__gm__ bfloat16_t* addr, bfloat16_t value);
+#endif
+
 [[deprecated("NOTICE: asc_set_store_atomic_config_v2 is deprecated."
              "Please use asc_atomic_add instead for atomic add operation.")]] __aicore__ inline void
 asc_set_store_atomic_config_v2(uint16_t type, uint16_t op);
