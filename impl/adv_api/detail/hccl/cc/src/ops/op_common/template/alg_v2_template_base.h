@@ -19,7 +19,7 @@ namespace mc2_ops_hccl {
 
 class InsAlgTemplateBase {
 public:
-    explicit InsAlgTemplateBase(){};
+    explicit InsAlgTemplateBase() {};
     explicit InsAlgTemplateBase(
         const OpParam& param, const u32 rankId, // 传通信域的rankId，userRank
         const std::vector<std::vector<u32>>& subCommRanks);
@@ -52,17 +52,13 @@ public:
 
     bool IsPcieProtocol(const std::map<u32, std::vector<ChannelInfo>>& channels);
 
-protected:
-    // 按port group权重把一份数据切分到多个channel上；channelsPerRank由派生模板自行决定
-    HcclResult CalcDataSplitByPortGroup(
-        u64 totalDataCount, u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
-        std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset,
-        u32 channelsPerRank) const
-    {
-        return CalcDataSplitByPortGroupCommon(
-            totalDataCount, dataTypeSize, channels, elemCountOut, sizeOut, elemOffset, channelsPerRank);
-    }
+    virtual HcclResult CalcDataSplitByPortGroup(
+        const u64 totalDataCount, const u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
+        std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset);
 
+    virtual HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels);
+
+protected:
     OpMode opMode_; // 单算子还是图模式
     u32 root_ = 0;  // 一般是scatter、broadcast需要
 
@@ -86,6 +82,7 @@ protected:
     bool enableRemoteMemAccess_ = false;
     // Whether symmetric memory is enabled.
     bool supportSymmetricMemory_ = false;
+    u32 channelsPerRank_ = 1;
 };
 } // namespace mc2_ops_hccl
 

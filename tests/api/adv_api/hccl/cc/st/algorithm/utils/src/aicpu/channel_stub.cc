@@ -101,22 +101,6 @@ HcclResult CalcChannelRequestNhr(
     return CalcChannelRequestMesh1D(comm, param, topoInfo, subcommInfo, channels);
 }
 
-HcclResult ProcessLinksForChannelMutiJetty(
-    HcclComm comm, CommProtocol& expectedProtocol, std::vector<CommLink>& linkList, u32 myRank, u32 remoteRank,
-    uint32_t netLayer, std::vector<HcclChannelDesc>& channels, bool execptMesh, bool isIsolation)
-{
-    (void)comm;
-    (void)expectedProtocol;
-    (void)linkList;
-    (void)myRank;
-    (void)remoteRank;
-    (void)netLayer;
-    (void)channels;
-    (void)execptMesh;
-    (void)isIsolation;
-    return HCCL_SUCCESS;
-}
-
 HcclResult CalcChannelRequestNhrMultiJetty(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation)
@@ -151,7 +135,43 @@ HcclResult CalcChannelRequestNHRWithPriorityTopo(
     return CalcChannelRequestMesh1DWithPriorityTopo(comm, param, topoInfo, subcommInfo, channels, priorityTopo);
 }
 
-HcclResult GetTopoTypeByLink(HcclComm comm, uint32_t netLayer, CommLink& link, CommTopo& topoType)
+HcclResult ProcessLinksForChannelMutiJetty(
+    HcclComm comm, CommProtocol expectedProtocol, const std::vector<CommLink>& linkList, u32 myRank, u32 remoteRank,
+    uint32_t netLayer, std::vector<HcclChannelDesc>& channels, bool expectMesh, bool isIsolation)
+{
+    (void)comm;
+    (void)expectedProtocol;
+    (void)linkList;
+    (void)myRank;
+    (void)netLayer;
+    (void)expectMesh;
+    (void)isIsolation;
+    OpParam param{};
+    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+    return AddChannelRequest(param, remoteRank, channels, 4U);
+}
+
+HcclResult CalcChannelRequestMeshClosMultiJetty(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation,
+    bool expectMesh)
+{
+    (void)comm;
+    (void)isIsolation;
+    (void)expectMesh;
+    CHK_PTR_NULL(topoInfo);
+    CHK_PRT_RET(
+        subcommInfo.empty(), HCCL_ERROR("[CalcChannelRequestMeshClosMultiJetty][UT] empty subcommInfo"), HCCL_E_PARA);
+    channels.clear();
+    for (u32 rank : subcommInfo[COMM_LEVEL0]) {
+        if (rank != topoInfo->userRank) {
+            CHK_RET(AddChannelRequest(param, rank, channels, 4U));
+        }
+    }
+    return HCCL_SUCCESS;
+}
+
+HcclResult GetTopoTypeByLink(HcclComm comm, uint32_t netLayer, const CommLink& link, CommTopo& topoType)
 {
     (void)comm;
     (void)netLayer;
