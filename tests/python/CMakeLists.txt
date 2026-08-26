@@ -62,6 +62,29 @@ add_dependencies(ascendc_pyut_asc_op_compiler
 )
 
 run_python_llt_test(
+    TARGET ascendc_pyut_adapter
+    SRC_FILES_DIR ${ASCENDC_DIR}/tools/build/asc_op_compile_base/adapter/
+    TEST_FILES_DIR ${ASCENDC_DIR}/tests/python/adapter/
+    ENV_FILE ${ASCENDC_DIR}/tests/python/ci/set_python_env.sh
+    ENV_PARAMS ${ASCENDC_DIR}\ py_ut
+    PRE_TEST_COMMAND
+    COVERAGERC_DIR
+)
+
+add_dependencies(ascendc_pyut_adapter
+    register
+    kernel_tiling
+    install_adapter_api_ut
+    generate_hidden_dat_file_ut
+    asc_platform_test
+)
+
+# Both suites write kernel_meta and the shared coverage result under the source tree.
+if(TARGET ascendc_pyut_asc_op_compiler)
+    add_dependencies(ascendc_pyut_adapter ascendc_pyut_asc_op_compiler)
+endif()
+
+run_python_llt_test(
     TARGET ascendc_pyut_compile_trace_log
     SRC_FILES_DIR ${ASCENDC_DIR}/tools/scripts/compile_trace_log
     TEST_FILES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/compile_trace_log
@@ -102,7 +125,7 @@ add_custom_target(run_all_tests_and_clean ALL
     COMMAND rm -rf ${ASCENDC_DIR}/out/
     # created by run_python_llt_test
     COMMAND rm -f ${ASCENDC_DIR}/null
-    DEPENDS ascendc_pyut_asc_compile_common ascendc_pyut_asc_op_compiler asc_opc_unittest ascendc_pyut_compile_trace_log ascendc_pyut_aclrt_launch_kernel
+    DEPENDS ascendc_pyut_asc_compile_common ascendc_pyut_asc_op_compiler ascendc_pyut_adapter asc_opc_unittest ascendc_pyut_compile_trace_log ascendc_pyut_aclrt_launch_kernel
     COMMENT "clean generated test files"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
