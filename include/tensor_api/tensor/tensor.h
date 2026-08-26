@@ -119,6 +119,7 @@ private:
 template <typename EngineT, typename LayoutT>
 struct local_tensor : public base_tensor<EngineT, LayoutT> {
     using tensor_api_base = base_tensor<EngineT, LayoutT>;
+    using element_type = typename tensor_api_base::element_type;
     using data_type = get_attribute_element_type<element_type*>;
     using layoutType = typename tensor_api_base::layout_type;
     using tensor_api_base::tensor_api_base;
