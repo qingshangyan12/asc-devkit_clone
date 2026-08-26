@@ -54,16 +54,16 @@
 
 - 输入：A逻辑规格为`[127, 129]`，按`[128, 144]`补齐后以`half` Nz格式存储；B输入不参与该场景
 - 输出：A经L1往返后的`[128, 144]` Nz格式数据，`half`类型
-- 实现：AIV侧通过`asc_copy_gm2ub`和`asc_copy_ub2l1`完成GM->UB->L1搬运；AIC侧等待L1数据就绪后，通过`asc_copy_l12ub`完成L1->UB搬运；随后AIV侧等待AIC通知，再通过`asc_copy_ub2gm`将UB数据写回GM
+- 实现：场景3使用`asc_get_phy_buf_addr`按固定offset管理UB和L1地址，避免AIC写入的UB地址与AIV读取的UB地址不一致。AIV侧通过`asc_copy_gm2ub`和`asc_copy_ub2l1`完成GM->UB->L1搬运；AIC侧等待L1数据就绪后，通过`asc_copy_l12ub_sync`完成L1->UB同步搬运；随后AIV侧等待AIC通知，再通过`asc_copy_ub2gm`将UB数据写回GM。
 
 ### 数据流与同步
 
 1. 场景1中，AIV侧调用`asc_copy_gm2ub`，通过MTE2将补齐后的Nz格式数据从GM搬运到UB。场景2中，AIV侧调用`asc_ndim_copy_gm2ub`，将紧凑ND输入搬入补齐后的UB区域，并通过`asc_set_ndim_pad_value`和`asc_set_ndim_pad_count`补零。
 2. 场景1中，AIV侧建立MTE2到MTE3同步后，调用`asc_copy_ub2l1`将Nz格式数据从UB连续搬运到L1。场景2中，AIV侧先建立MTE2到V同步，再调用`copy_ub_nd_to_nz`，由其按C0列块调用`asc_copy_ub2ub`将UB中的ND格式数据重排为Nz格式数据；随后建立V到MTE3同步，并调用`asc_copy_ub2l1`将数据从UB连续搬运到L1。
-3. 场景1和场景2中，AIV侧调用`asc_sync_block_arrive`通知AIC侧，AIC侧再通过`asc_sync_block_wait`等待L1数据就绪。
+3. 场景1和场景2中，`__mix__(1, 2)`启动两个AIV。AIV0完成实际数据搬运后调用`asc_sync_intra_arrive`通知AIC侧，两个AIV均调用`asc_sync_block_arrive`参与组内同步；AIC侧先通过`asc_sync_intra_wait`等待真实数据生产者到达，再通过`asc_sync_block_wait`等待组内同步完成后读取L1数据。
 4. 场景1和场景2中，AIC侧调用`asc_copy_l12l0a`和`asc_copy_l12l0b_transpose`，将L1 Buffer中的Nz格式数据分别搬运到L0A Buffer和L0B Buffer；再通过`asc_sync_notify`和`asc_sync_wait`建立MTE1到M同步，调用`asc_mmad`完成非对齐逻辑规格的矩阵乘计算。
 5. 场景1和场景2中，AIC侧通过`asc_sync_notify`和`asc_sync_wait`建立M到FIX同步后，调用`asc_set_l0c2gm_nz2nd`配置Nz格式到ND格式的转换，再通过Fixpipe接口`asc_copy_l0c2gm`将`[127, 130]`的计算结果搬运到GM。
-6. 场景3中，AIV侧完成GM->UB->L1后通过`asc_sync_block_arrive`通知AIC侧；AIC侧调用`asc_copy_l12ub`完成L1->UB，并通过`asc_sync_intra_arrive`通知AIV侧；AIV侧通过`asc_copy_ub2gm`将往返后的数据写回GM。
+6. 场景3中，AIV0使用固定UB offset完成GM->UB->L1后通过`asc_sync_intra_arrive`通知AIC侧，两个AIV均调用`asc_sync_block_arrive`参与组内同步；AIC侧将L1数据同步搬运到AIV0对应的固定UB offset，并通过`asc_sync_intra_arrive`通知AIV0；AIV0通过`asc_copy_ub2gm`将往返后的数据写回GM。
 
 上述过程按需建立流水依赖；核函数结束时调用`asc_sync_pipe(PIPE_ALL)`，确保全部流水完成。
 
