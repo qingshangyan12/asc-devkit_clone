@@ -374,6 +374,7 @@ class TestCompileOp(unittest.TestCase):
         tiling_key_struct_map=None,
         register_tiling_struct=None,
         tpl_tiling_struct=None,
+        no_kfc_server_flag=False,
     ):
         op_info = OpInfo(
             kernel_name="TestKernel", op_type="TestOp", inputs=[], outputs=[]
@@ -382,7 +383,7 @@ class TestCompileOp(unittest.TestCase):
             tiling_key_list=[0],
             code_channel=CORE_TYPE_VEC,
             hard_sync=False,
-            no_kfc_server_flag=False,
+            no_kfc_server_flag=no_kfc_server_flag,
             enable_deterministic=False,
             tiling_key_kernel_type={},
             no_set_kernel_type=False,
@@ -6880,6 +6881,15 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             compile_option_tuple.mllvm_options, ["-mllvm", "test", "-mllvm", "test"]
         )
 
+    def test_no_kfc_server_detected_compile_option(self):
+        calls = self._run_kernel_spec_common_part("None", no_kfc_server_flag=True)
+        compile_options = calls["compile_kernel"].call_args.args[2].compile_options
+        self.assertIn("-DNO_KFC_SERVER_DETECTED", compile_options)
+
+        calls = self._run_kernel_spec_common_part("None", no_kfc_server_flag=False)
+        compile_options = calls["compile_kernel"].call_args.args[2].compile_options
+        self.assertNotIn("-DNO_KFC_SERVER_DETECTED", compile_options)
+
     def test_get_code_for_l2_cache(self):
         from asc_op_compile_base.asc_op_compiler.ascendc_compile_gen_code import (
             get_code_for_l2_cache,
@@ -7183,8 +7193,11 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             "    GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);\n",
             result,
         )
+        global_var_storage.set_variable("ascendc_short_soc_version", "Ascend950")
         with mock.patch.object(
-            CommonUtility, "is_support_workspace_offset", return_value=True
+            CommonUtility,
+            "is_support_workspace_offset",
+            side_effect=AssertionError("workspace code generation must not use it"),
         ):
             result = _gen_set_workspace_codes(
                 is_mix,
@@ -7195,13 +7208,27 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
                 compile_info,
             )
         self.assertIn(
-            "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
+            "#if defined(NO_KFC_SERVER_DETECTED) || \\\n"
+            "    (ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1)\n"
             "    GM_ADDR usrWorkspace = workspace;\n"
             "#else\n"
             "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n"
             "#endif\n",
             result,
         )
+        with mock.patch.object(CommonUtility, "is_m510", return_value=True):
+            result = _gen_set_workspace_codes(
+                is_mix,
+                is_single_and_using_hard_sync,
+                op_info,
+                tiling_info,
+                compile_options,
+                compile_info,
+            )
+        self.assertTrue(result.startswith("    GM_ADDR usrWorkspace = workspace;\n"))
+        self.assertNotIn("NO_KFC_SERVER_DETECTED", result)
+        self.assertNotIn("AscendC::GetUserWorkspace", result)
+        self.assertNotIn("AscendC::RESERVED_WORKSPACE", result)
         with buildcfg.build_config() as cfg:
             cfg.current()["tir.op_debug_config"] = ["oom"]
             result = _gen_set_workspace_codes(
@@ -9913,6 +9940,7 @@ void add_custom();
             self.assertEqual(
                 kernel_info.default_tiling_struct, "optiling::TilingData_A"
             )
+            self.assertTrue(kernel_info.no_kfc_server_flag)
 
         with open(src_file, "w") as file:
             context = """
@@ -9920,6 +9948,7 @@ auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR >= 1";
 auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
 auto __enable_custom_tiling optiling::TilingData_A = default;
 auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
+AscendC::KfcServer kfcServer;
 void add_custom();
 """
             file.write(context)
@@ -9935,6 +9964,7 @@ void add_custom();
                 self.assertEqual(
                     kernel_info.default_tiling_struct, "optiling::TilingData_A"
                 )
+                self.assertFalse(kernel_info.no_kfc_server_flag)
         global_var_storage.set_variable("ascendc_short_soc_version", get_soc)
 
     def test_infer_info_from_ifile_template_tiling(self):
