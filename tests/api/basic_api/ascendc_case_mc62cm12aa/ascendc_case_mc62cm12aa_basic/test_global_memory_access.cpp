@@ -26,11 +26,11 @@ public:
     __aicore__ inline void Process(GM_ADDR dst0_gm, GM_ADDR src0_gm, uint32_t calcount)
     {
         if (Mode == 0) {
-            T value = ReadGmByPassDCache<T>(reinterpret_cast<__gm__ T*>(src0_gm));
-            WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T*>(dst0_gm), value);
+            T value = ReadGmBypassDCache<T>(reinterpret_cast<__gm__ T*>(src0_gm));
+            WriteGmBypassDCache<T>(reinterpret_cast<__gm__ T*>(dst0_gm), value);
         } else {
-            T value = ReadGmByPassDCache<T>(reinterpret_cast<__gm__ T*>(src0_gm + sizeof(T)));
-            WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T*>(dst0_gm), value);
+            T value = ReadGmBypassDCache<T>(reinterpret_cast<__gm__ T*>(src0_gm + sizeof(T)));
+            WriteGmBypassDCache<T>(reinterpret_cast<__gm__ T*>(dst0_gm), value);
         }
     }
 
