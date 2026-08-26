@@ -1,11 +1,7 @@
-
 # new-pr-branch.sh
 # 功能：基于主线仓 master 最新内容创建新分支并推送到 fork 仓
 # 用法：./new-pr-branch.sh [PR标题]
 # 要求：需要先配置 UPSTREAM_URL 为实际的主线仓地址
-
-set -euo pipefail
-
 # ===== 配置区：请根据实际情况修改以下变量 =====
 UPSTREAM_URL="https://gitcode.com/cann/asc-devkit"   # 主线仓地址（替换为实际地址）
 UPSTREAM_REMOTE="upstream"                                  # 主线仓的远程名称
