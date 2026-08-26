@@ -61,6 +61,13 @@ def _check_binary_json(binary_json, expected_op_type):
         ):
             raise ValueError(f"{op_path}.bin_filename: invalid value '{bin_filename}'")
         output_name = os.path.splitext(bin_filename)[0]
+        if output_name != expected_op_type and not output_name.startswith(
+            f"{expected_op_type}_"
+        ):
+            raise ValueError(
+                f"{op_path}.bin_filename: expected '{expected_op_type}' or "
+                f"prefix '{expected_op_type}_', got '{bin_filename}'"
+            )
         if output_name in bin_filenames:
             raise ValueError(
                 f"{op_path}.bin_filename: duplicate output '{output_name}'"

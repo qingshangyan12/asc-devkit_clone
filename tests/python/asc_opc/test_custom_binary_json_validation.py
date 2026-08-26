@@ -317,6 +317,26 @@ def test_rejects_duplicate_binary_filename(tmp_path, custom_binary_modules):
         )
 
 
+def test_rejects_binary_filename_without_op_type_prefix(
+    tmp_path, custom_binary_modules
+):
+    _, split_json_files, _ = custom_binary_modules
+    content = _valid_config()
+    content["op_list"][0]["bin_filename"] = "Kernel_FP16"
+    path = tmp_path / "binary.json"
+    path.write_text(json.dumps(content), encoding="utf-8")
+
+    with pytest.raises(
+        ValueError,
+        match=r"op_list\[0\]\.bin_filename: expected 'AddCustomTemplate' or prefix 'AddCustomTemplate_'",
+    ):
+        split_json_files(
+            str(path),
+            str(tmp_path),
+            expected_op_type="AddCustomTemplate",
+        )
+
+
 def test_rejects_duplicate_simplified_key(tmp_path, custom_binary_modules):
     _, split_json_files, _ = custom_binary_modules
     content = _valid_config()
