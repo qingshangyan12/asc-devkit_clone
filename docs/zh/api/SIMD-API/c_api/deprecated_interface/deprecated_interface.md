@@ -27,6 +27,10 @@
 - **[asc_scatter（废弃）](asc_scatter_deprecated.md)**
 - **[asc_storeunalign_post（废弃）](asc_storeunalign_post_deprecated.md)**
 - **[asc_storeunalign_postupdate（废弃）](asc_storeunalign_postupdate_deprecated.md)**
+- 
+### 复合计算
+
+- **[asc_exp_sub（废弃）](asc_exp_sub_deprecated.md)**
 
 ## 原子操作
 - **[asc_set_atomic_add_int（废弃）](asc_set_atomic_add_int_deprecated.md)**

@@ -10,4 +10,4 @@
 
 -   **[asc_mula](asc_mula.md)**
 
--   **[asc_exp_sub（废弃）](asc_exp_sub_deprecated.md)**
+-   **[asc_exp_sub](asc_exp_sub.md)**
