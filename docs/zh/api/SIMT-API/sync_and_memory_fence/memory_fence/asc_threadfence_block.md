@@ -62,9 +62,13 @@ inline void asc_threadfence_block()
     ```cpp
     __global__ __launch_bounds__(1024) void KernelThreadFenceBlock(float* dst, float* src)
     {
-        src[0] = src[0] + 1;
-        asc_threadfence_block();
-        dst[0] = src[0];
+        if (threadIdx.x == 0) {
+            src[0] = src[0] + 1;
+            asc_threadfence_block();
+        }
+        if (threadIdx.x == 1) {
+            dst[0] = src[0];
+        }
     }
     ```
 

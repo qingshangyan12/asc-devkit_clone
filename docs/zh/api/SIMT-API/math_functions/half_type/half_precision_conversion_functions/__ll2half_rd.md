@@ -49,12 +49,10 @@ inline half __ll2half_rd(const long long int x)
 | --- | --- | --- |
 | 9223372036854775807（long long最大值） | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | -9223372036854775808（long long最小值） | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
-| x>9223372036854775807（long long最大值） | inf | ASCRT\_MAX\_NORMAL\_FP16 |
-| x<-9223372036854775808（long long最小值） | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 | -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
 | 2049 | 2048 | 2048 |
-| 2051 | 2052 | 2052 |
+| 2051 | 2050 | 2050 |
 
 ## 约束说明
 

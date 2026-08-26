@@ -37,6 +37,14 @@
 inline void asc_dcci_entire(void *dst)
 ```
 
+```cpp
+inline void asc_dcci_entire(__gm__ void* dst)
+```
+
+```cpp
+inline void asc_dcci_entire(__gm__ void* dst)
+```
+
 ## 参数说明
 
 **表1**  参数说明

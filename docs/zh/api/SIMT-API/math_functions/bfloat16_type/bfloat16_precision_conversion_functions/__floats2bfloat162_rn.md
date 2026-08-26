@@ -77,7 +77,7 @@ inline bfloat16x2_t __floats2bfloat162_rn(const float x, const float y)
     __aicore__ void simt_floats2bfloat162_rn(float* input1, float* input2, bfloat16x2_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx > input_total_length) {
+        if (idx >= input_total_length) {
             return;
         }
         output[idx] = __floats2bfloat162_rn(input1[idx], input2[idx]);

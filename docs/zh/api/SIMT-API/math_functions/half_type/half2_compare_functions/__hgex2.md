@@ -100,7 +100,7 @@ half2 __hgex2(half2 x, half2 y)
     __global__ __launch_bounds__(1024) void simt_hgex2(half* x, half* y, half* dst, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
+        // 每个线程处理1个half2类型的数据，即2个half类型的数据；本示例要求input_total_length为偶数，input_total_length / 2的线程不处理数据
         if (idx >= input_total_length / 2) {
             return;
         }
