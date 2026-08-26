@@ -26,7 +26,7 @@ void AddConfig(const char *soc, OpAICoreConfig &aicore_config)
 </td>
 <td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.1.4.1.2 "><p id="zh-cn_topic_0000001575929572_p9611345141418"><a name="zh-cn_topic_0000001575929572_p9611345141418"></a><a name="zh-cn_topic_0000001575929572_p9611345141418"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="zh-cn_topic_0000001575929572_p14611945131415"><a name="zh-cn_topic_0000001575929572_p14611945131415"></a><a name="zh-cn_topic_0000001575929572_p14611945131415"></a>支持的AI处理器型号。填写规则请参考<span>算子工程目录下编译配置项文件CMakePresets.json中的ASCEND_COMPUTE_UNIT字段，该字段取值在使用msOpGen创建工程时自动生成</span>。</p>
+<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="zh-cn_topic_0000001575929572_p14611945131415"><a name="zh-cn_topic_0000001575929572_p14611945131415"></a><a name="zh-cn_topic_0000001575929572_p14611945131415"></a>支持的AI处理器型号。填写规则请参考<span>算子工程目录下编译配置项文件CMakePresets.json中的<code>ASCEND_COMPUTE_UNIT</code>字，该字段取值在使用msOpGen创建工程时自动生成</span>。</p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_row152234713443"><td class="cellrowborder" valign="top" width="17.22%" headers="mcps1.1.4.1.1 "><p id="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_p318615392613"><a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_p318615392613"></a><a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_p318615392613"></a>aicore_config</p>
@@ -38,6 +38,8 @@ void AddConfig(const char *soc, OpAICoreConfig &aicore_config)
 </tr>
 </tbody>
 </table>
+
+`soc`参数与构建配置使用同一套series标识。建议使用平台short名称；Full SKU不属于series配置。大小写不影响匹配，但配置值仍应与当前版本支持的series保持一致。
 
 ## 返回值说明<a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section25791320141317"></a>
 
