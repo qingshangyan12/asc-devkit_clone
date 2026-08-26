@@ -48,6 +48,7 @@
 #include "hccl_ccu_res_dl.h"
 #include "ccu_log.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
+#include "../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 
 #ifndef MC2_CLIENT_ENABLE_CCU
 #define MC2_CLIENT_ENABLE_CCU 0
@@ -155,9 +156,22 @@ static HcclResult UpdateCcuCtxTokenOnReuse(
     AlgResourceCtxSerializable tempCtx;
     tempCtx.DeSerialize(seq);
 
-    // 用 resCtxHost 中已设置的 kfcServerArgs（含占位符）覆盖旧数据
+    CHK_PRT_RET(
+        tempCtx.kfcServerArgs.size() <= KFC_SERVER_SUB_KERNEL_PC_ARG_IDX,
+        HCCL_ERROR(
+            "[UpdateCcuCtxTokenOnReuse] invalid cached KFC args size[%zu]", tempCtx.kfcServerArgs.size()),
+        HCCL_E_INTERNAL);
+    const uint64_t subKernelPc = tempCtx.kfcServerArgs[KFC_SERVER_SUB_KERNEL_PC_ARG_IDX];
+
+    // 用本次资源地址覆盖旧数据，同时保留与缓存 kernel handle 配对的 sub-kernel PC。
     tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
     tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
+    CHK_PRT_RET(
+        tempCtx.kfcServerArgs.size() <= KFC_SERVER_SUB_KERNEL_PC_ARG_IDX,
+        HCCL_ERROR(
+            "[UpdateCcuCtxTokenOnReuse] invalid new KFC args size[%zu]", tempCtx.kfcServerArgs.size()),
+        HCCL_E_INTERNAL);
+    tempCtx.kfcServerArgs[KFC_SERVER_SUB_KERNEL_PC_ARG_IDX] = subKernelPc;
 
     // 从 cclBuffer 获取 token 并更新第6个字段（而非 push_back，保证序列化大小一致）
     void* cclBufferAddr = nullptr;
@@ -1729,6 +1743,8 @@ static HcclResult RegisterCcuKernels(
 
     for (u32 currentResGroup = 0; currentResGroup <= maxResGroup; currentResGroup++) {
         HCCL_INFO("[RegisterCcuKernels] register resGroup[%u] start, maxResGroup[%u].", currentResGroup, maxResGroup);
+        CcuKernelHandle kfcKernelHandle = 0;
+        const char* kfcFuncName = nullptr;
         CcuResult regStartRet = HcommCcuKernelRegisterStart(insHandle);
         CHK_PRT_RET(
             regStartRet != CCU_SUCCESS, HCCL_ERROR("ccu kernel register start failed: ccuRet -> %d", regStartRet),
@@ -1751,11 +1767,47 @@ static HcclResult RegisterCcuKernels(
                 HCCL_ERROR("ccu kernel register failed: ccuRet -> %d, kernel[%s]", regRet, kernelInfo.kernelFuncName),
                 ConvertCcuToHccl(regRet));
             resCtxHost->ccuKernels[i] = kernelHandle;
+            if (strcmp(kernelInfo.kernelFuncName, "CcuKernelKfcServer") == 0) {
+                const auto* kfcArg = static_cast<const CcuKernelArgKfcServer*>(kernelInfo.kernelArg);
+                CHK_PTR_NULL(kfcArg);
+                kfcKernelHandle = kernelHandle;
+                switch (kfcArg->opParam.opType) {
+                    case HcclCMDType::HCCL_CMD_ALLGATHER:
+                        kfcFuncName = KFC_ALL_GATHER_FUNC_NAME;
+                        break;
+                    case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
+                        kfcFuncName = KFC_REDUCE_SCATTER_FUNC_NAME;
+                        break;
+                    default:
+                        HCCL_ERROR(
+                            "[RegisterCcuKernels] unsupported KFC opType[%u]",
+                            static_cast<uint32_t>(kfcArg->opParam.opType));
+                        return HCCL_E_NOT_SUPPORT;
+                }
+            }
         }
         CcuResult regEndRet = HcommCcuKernelRegisterEnd(insHandle);
         CHK_PRT_RET(
             regEndRet != CCU_SUCCESS, HCCL_ERROR("ccu kernel register end failed: ccuRet -> %d", regEndRet),
             ConvertCcuToHccl(regEndRet));
+        if (kfcKernelHandle != 0) {
+            uint64_t subKernelPc = 0;
+            CcuResult getFuncRet = HcommCcuFunctionGet(kfcKernelHandle, kfcFuncName, &subKernelPc);
+            CHK_PRT_RET(
+                getFuncRet != CCU_SUCCESS,
+                HCCL_ERROR(
+                    "[RegisterCcuKernels] get KFC func[%s] failed: ccuRet -> %d", kfcFuncName, getFuncRet),
+                ConvertCcuToHccl(getFuncRet));
+            CHK_PRT_RET(
+                resCtxHost->kfcServerArgs.size() <= KFC_SERVER_SUB_KERNEL_PC_ARG_IDX,
+                HCCL_ERROR(
+                    "[RegisterCcuKernels] invalid KFC args size[%zu]", resCtxHost->kfcServerArgs.size()),
+                HCCL_E_INTERNAL);
+            resCtxHost->kfcServerArgs[KFC_SERVER_SUB_KERNEL_PC_ARG_IDX] = subKernelPc;
+            HCCL_INFO(
+                "[RegisterCcuKernels] KFC func[%s] PC[0x%llx]", kfcFuncName,
+                static_cast<unsigned long long>(subKernelPc));
+        }
         HCCL_INFO("[RegisterCcuKernels] register resGroup[%u] finish.", currentResGroup);
     }
     resCtxHost->ccuKernelNum = resRequest.ccuKernelNum;
