@@ -274,6 +274,8 @@ uint32_t PlatformAscendC::GetLibApiWorkSpaceSize(void) const
     if (npuArch == NpuArch::DAV_RESV) {
         PF_LOGE("get platform failed, CurNpuArch is NpuArch::DAV_RESV");
         return -1;
+    } else if (npuArch == NpuArch::DAV_5102) {
+        return 0;
     } else if (npuArch == NpuArch::DAV_2201) {
         return WORK_SPACE_SIZE_910B;
     } else if (npuArch == NpuArch::DAV_3510) {
