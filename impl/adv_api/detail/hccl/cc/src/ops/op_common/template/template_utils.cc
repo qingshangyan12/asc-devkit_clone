@@ -31,6 +31,37 @@ u32 GetNHRStepNum(u32 rankSize)
     return nSteps;
 }
 
+bool IsAllConnetedWithTopo(const TopoInfoWithNetLayerDetails* topoInfo, const u32 netLayer, const CommTopo topoType)
+{
+    CHK_PRT_RET(topoInfo == nullptr, HCCL_WARNING("[IsAllConnetedWithTopo] topoInfo is nullptr"), false);
+    CHK_PRT_RET(
+        topoInfo->netLayerDetails.localNetInsSizeOfLayer.size() <= netLayer,
+        HCCL_WARNING(
+            "[IsAllConnetedWithTopo] localNetInsSizeOfLayer size[%zu] <= netLayer[%u]",
+            topoInfo->netLayerDetails.localNetInsSizeOfLayer.size(), netLayer),
+        false);
+    u32 localRankSize = topoInfo->netLayerDetails.localNetInsSizeOfLayer[netLayer];
+
+    CHK_PRT_RET(
+        topoInfo->topoInstDetailsOfLayer.size() <= netLayer,
+        HCCL_WARNING(
+            "[IsAllConnetedWithTopo] topoInstDetailsOfLayer size[%zu] <= netLayer[%u]",
+            topoInfo->topoInstDetailsOfLayer.size(), netLayer),
+        false);
+
+    auto rankNumForTopoTypeItr = topoInfo->topoInstDetailsOfLayer[netLayer].rankNumForTopoType.find(topoType);
+    if (rankNumForTopoTypeItr == topoInfo->topoInstDetailsOfLayer[netLayer].rankNumForTopoType.end()) {
+        return false;
+    }
+
+    for (auto topoRankNum : rankNumForTopoTypeItr->second) {
+        if (topoRankNum == localRankSize) {
+            return true;
+        }
+    }
+    return false;
+}
+
 HcclResult CalcDataSplitByPortGroupCommon(
     const u64 totalDataCount, const u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
     std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset, const u32 channelsPerRank)
