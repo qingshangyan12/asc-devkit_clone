@@ -46,7 +46,10 @@ __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
 
 ## 约束说明
 
-- 除数为`0`以及其他特殊值输入的计算结果请参见[Div特殊值/边界值输入的计算结果说明](../../../../appendix/reg_vector_compute_interface_boundary_value_summary.md#table1325925915217)。
+- 使用整数类型时，除数不能为`0`。
+- 使用浮点类型时，非零有限值除以`0`得到带符号的`inf`，`0`除以`0`、`inf`除以`inf`或任一操作数为`nan`时得到`nan`，有限值除以`inf`得到`0`，`inf`除以有限值或`0`得到带符号的`inf`。
+- `half`在INF/NAN模式下遵循上述浮点规则。
+- `half`在饱和模式下，结果为`inf`的计算将饱和为带符号的最大有限值`65504.0`或`-65504.0`，结果为`nan`的计算将得到`0`。`float`在饱和模式下的结果与INF/NAN模式相同。
 - 标量位于左侧时执行`scalar / reg`，操作数顺序不会交换。
 
 ## 调用示例
