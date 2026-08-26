@@ -21,6 +21,8 @@
 #include "sim_common.h"
 #include "hccl_alloc_ctx_res.h"
 
+extern "C" void SetTestLogLevel(uint32_t level);
+
 namespace HcclSim {
 namespace CcuSt {
 
@@ -31,6 +33,9 @@ protected:
     void TearDown() override { RegisterManager::Global().Reset(); }
 
     void VerifyScenario(const CcuStScenario& scenario);
+
+    void EnableLog(uint32_t level = 0) { SetTestLogLevel(level); }
+    void DisableLog() { SetTestLogLevel(0x03); }
 
     // ===== 子类必须实现的虚函数 =====
 

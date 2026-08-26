@@ -55,10 +55,6 @@ struct CcuStScenario {
 
     // In-place operation (e.g. AllReduce input==output)
     bool inPlace = false;
-
-    // negative test controls
-    bool corruptOutput = false;
-    bool outOfRangeParam = false;
 };
 
 } // namespace CcuSt
