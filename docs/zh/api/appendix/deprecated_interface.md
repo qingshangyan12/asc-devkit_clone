@@ -73,37 +73,53 @@
 <!-- npu="950" id7 -->
 ### Reg数据搬运
 
-- [asc_loadalign_brc_v2](../SIMD-API/c_api/reg/reg_load/asc_loadalign_v2_deprecated.md)接口
+- [asc_loadalign_brc_v2](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v1_deprecated.md)接口（无偏移量原型）
 
     此接口后续版本会废弃，请使用[asc_loadalign_brc_datablock](../SIMD-API/c_api/reg/reg_load/asc_loadalign_brc_datablock.md)接口。
 
-- [asc_loadalign_brc_v3](../SIMD-API/c_api/reg/reg_load/asc_loadalign_v3_deprecated.md)接口
+- [asc_loadalign_brc_v3](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v1_deprecated.md)接口（无偏移量原型）
 
     此接口后续版本会废弃，请使用[asc_loadalign_brc_elem2datablock](../SIMD-API/c_api/reg/reg_load/asc_loadalign_brc_elem2datablock.md)接口。
 
-- [asc_loadalign_unpack_v2](../SIMD-API/c_api/reg/reg_load/asc_loadalign_v1_deprecated.md)接口
+- [asc_loadalign_unpack_v2](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v1_deprecated.md)接口（无偏移量原型）
 
     此接口后续版本会废弃，请使用[asc_loadalign_unpack4](../SIMD-API/c_api/reg/reg_load/asc_loadalign_unpack4.md)接口。
 
-- [asc_loadalign_brc_postupdate_v2](../SIMD-API/c_api/reg/reg_load/asc_loadalign_v4_deprecated.md)接口
+- [asc_loadalign_brc_v2](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v2_deprecated.md)接口（addr_reg偏移原型）
+
+    此接口后续版本会废弃，请使用[asc_loadalign_brc_datablock](../SIMD-API/c_api/reg/reg_load/asc_loadalign_brc_datablock.md)接口。
+
+- [asc_loadalign_brc_v3](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v2_deprecated.md)接口（addr_reg偏移原型）
+
+    此接口后续版本会废弃，请使用[asc_loadalign_brc_elem2datablock](../SIMD-API/c_api/reg/reg_load/asc_loadalign_brc_elem2datablock.md)接口。
+
+- [asc_loadalign_unpack_v2](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v2_deprecated.md)接口（addr_reg偏移原型）
+
+    此接口后续版本会废弃，请使用[asc_loadalign_unpack4](../SIMD-API/c_api/reg/reg_load/asc_loadalign_unpack4.md)接口。
+
+- [asc_loadalign_brc_v2](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v3_deprecated.md)接口（int32_t偏移原型）
+
+    此接口后续版本会废弃，请使用[asc_loadalign_brc_datablock](../SIMD-API/c_api/reg/reg_load/asc_loadalign_brc_datablock.md)接口。
+
+- [asc_loadalign_brc_v3](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v3_deprecated.md)接口（int32_t偏移原型）
+
+    此接口后续版本会废弃，请使用[asc_loadalign_brc_elem2datablock](../SIMD-API/c_api/reg/reg_load/asc_loadalign_brc_elem2datablock.md)接口。
+
+- [asc_loadalign_unpack_v2](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v3_deprecated.md)接口（int32_t偏移原型）
+
+    此接口后续版本会废弃，请使用[asc_loadalign_unpack4](../SIMD-API/c_api/reg/reg_load/asc_loadalign_unpack4.md)接口。
+
+- [asc_loadalign_brc_postupdate_v2](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v4_deprecated.md)接口（int32_t偏移Post Update原型）
 
     此接口后续版本会废弃，请使用[asc_loadalign_brc_datablock_postupdate](../SIMD-API/c_api/reg/reg_load/asc_loadalign_brc_datablock_postupdate.md)接口。
 
-- [asc_loadalign_brc_postupdate_v3](../SIMD-API/c_api/reg/reg_load/asc_loadalign_v4_deprecated.md)接口
+- [asc_loadalign_brc_postupdate_v3](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v4_deprecated.md)接口（int32_t偏移Post Update原型）
 
     此接口后续版本会废弃，请使用[asc_loadalign_brc_elem2datablock_postupdate](../SIMD-API/c_api/reg/reg_load/asc_loadalign_brc_elem2datablock_postupdate.md)接口。
 
-- [asc_loadalign_unpack_postupdate_v2](../SIMD-API/c_api/reg/reg_load/asc_loadalign_v4_deprecated.md)接口
+- [asc_loadalign_unpack_postupdate_v2](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v4_deprecated.md)接口（int32_t偏移Post Update原型）
 
     此接口后续版本会废弃，请使用[asc_loadalign_unpack4_postupdate](../SIMD-API/c_api/reg/reg_load/asc_loadalign_unpack4_postupdate.md)接口。
-
-- [asc_loadalign (repeat stride)](../SIMD-API/c_api/reg/reg_load/asc_loadalign_v5_deprecated.md)接口
-
-    此接口后续版本会废弃，请使用[asc_loadalign_postupdate](../SIMD-API/c_api/reg/reg_load/asc_loadalign_postupdate.md)接口。
-
-- [asc_loadalign_postupdate (repeat stride)](../SIMD-API/c_api/reg/reg_load/asc_loadalign_v5_deprecated.md)接口
-
-    此接口后续版本会废弃，请使用[asc_loadalign_postupdate](../SIMD-API/c_api/reg/reg_load/asc_loadalign_postupdate.md)接口。
 
 - [asc_loadalign (多模式重载)](../SIMD-API/c_api/reg/reg_load/asc_loadalign.md)接口
 
@@ -145,25 +161,21 @@
 
     原asc_loadalign重载之一，已拆分为独立函数[asc_loadalign_upsample](../SIMD-API/c_api/reg/reg_load/asc_loadalign_upsample.md)。
 
-- [asc_loadalign_v6](../SIMD-API/c_api/reg/reg_load/asc_loadalign_v6_deprecated.md)接口
-
-    此接口后续版本会废弃。
-
-- [asc_storealign_pack_v2](../SIMD-API/c_api/reg/reg_store/asc_storealign_v1_deprecated.md)接口
+- [asc_storealign_pack_v2](../SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md)接口（无偏移量原型）
 
     此接口后续版本会废弃，请使用[asc_storealign_pack_quarter](../SIMD-API/c_api/reg/reg_store/asc_storealign_pack_quarter.md)接口。
 
-- [asc_storealign_pack_postupdate_v2](../SIMD-API/c_api/reg/reg_store/asc_storealign_v4_deprecated.md)接口
+- [asc_storealign_pack_v2](../SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md)接口（addr_reg偏移原型）
+
+    此接口后续版本会废弃，请使用[asc_storealign_pack_quarter](../SIMD-API/c_api/reg/reg_store/asc_storealign_pack_quarter.md)接口。
+
+- [asc_storealign_pack_v2](../SIMD-API/c_api/deprecated_interface/asc_storealign_v3_deprecated.md)接口（int32_t偏移原型）
+
+    此接口后续版本会废弃，请使用[asc_storealign_pack_quarter](../SIMD-API/c_api/reg/reg_store/asc_storealign_pack_quarter.md)接口。
+
+- [asc_storealign_pack_postupdate_v2](../SIMD-API/c_api/deprecated_interface/asc_storealign_v4_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_storealign_pack_quarter_postupdate](../SIMD-API/c_api/reg/reg_store/asc_storealign_pack_quarter_postupdate.md)接口。
-
-- [asc_storealign (repeat stride)](../SIMD-API/c_api/reg/reg_store/asc_storealign_v5_deprecated.md)接口
-
-    此接口后续版本会废弃，请使用[asc_storealign_postupdate](../SIMD-API/c_api/reg/reg_store/asc_storealign_postupdate.md)接口。
-
-- [asc_storealign_postupdate (repeat stride)](../SIMD-API/c_api/reg/reg_store/asc_storealign_v5_deprecated.md)接口
-
-    此接口后续版本会废弃，请使用[asc_storealign_postupdate](../SIMD-API/c_api/reg/reg_store/asc_storealign_postupdate.md)接口。
 
 - [asc_storealign (多模式重载)](../SIMD-API/c_api/reg/reg_store/asc_storealign.md)接口
 
@@ -189,9 +201,17 @@
 
     原asc_storealign重载之一，已拆分为独立函数[asc_storealign_postupdate](../SIMD-API/c_api/reg/reg_store/asc_storealign_postupdate.md)。
 
-- [asc_scatter (reg_store)](../SIMD-API/c_api/reg/reg_store/asc_scatter_deprecated.md)接口
+- [asc_scatter (reg_store)](../SIMD-API/c_api/deprecated_interface/asc_scatter_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_scatter (reg_store)](../SIMD-API/c_api/reg/reg_store/asc_scatter.md)接口。
+
+- [asc_storeunalign_post](../SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md)接口（无偏移量原型）
+
+    此接口后续版本会废弃，请使用[asc_squeeze_and_storeunalign_finalize](../SIMD-API/c_api/reg/reg_store/asc_squeeze_and_storeunalign_finalize.md)接口。
+
+- [asc_storeunalign_postupdate](../SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md)接口（不指定存储偏移量原型）
+
+    此接口后续版本会废弃，请使用[asc_squeeze_and_storeunalign](../SIMD-API/c_api/reg/reg_store/asc_squeeze_and_storeunalign.md)接口。
 
 <!-- end id7 -->
 
