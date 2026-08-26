@@ -40,7 +40,7 @@ __aicore__ inline void asc_set_ndim_pad_count(asc_ndim_pad_count_config& config)
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|

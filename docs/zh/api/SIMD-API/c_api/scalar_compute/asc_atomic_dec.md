@@ -26,7 +26,13 @@
 
 ## 功能说明
 
-对Global Memory中`address`指向的单个无符号计数器执行原子递减操作。读取该计数器的旧值`old_value`，若`old_value`等于0或大于`val`，则将`val`写回该地址，否则将`old_value - 1`写回该地址。无论写回哪个值，均返回`old_value`。整个读取、判断和写回过程为原子操作。
+对Global Memory中`address`指向的一个`uint32_t`或`uint64_t`元素执行原子递减操作。读取该元素的旧值`old_value`，按照以下公式计算并写回新值`new_value`：
+
+$$
+new\_value = (old\_value == 0 || old\_value > val) ? val : (old\_value - 1)
+$$
+
+接口返回`old_value`。整个读取、判断和写回过程为原子操作。
 
 ## 函数原型
 
@@ -53,7 +59,7 @@ __aicore__ inline uint32_t asc_atomic_dec(__gm__ uint32_t* address,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| address | 输入/输出 | Global Memory的地址。 |
+| address | 输入 | Global Memory的地址。 |
 | val | 输入 | 源操作数。 |
 
 ## 返回值说明

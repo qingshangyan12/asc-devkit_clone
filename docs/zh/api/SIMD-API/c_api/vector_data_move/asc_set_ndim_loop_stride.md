@@ -53,7 +53,7 @@ __aicore__ inline void asc_set_ndim_loop4_stride(uint64_t dst_stride,
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
