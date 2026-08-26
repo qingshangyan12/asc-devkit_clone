@@ -55,8 +55,8 @@ __simd_callee__ inline reg_tensor<T> operator+(
 ## 约束说明
 
 - 标量类型必须与寄存器元素类型一致。
-- 整型加法结果超出元素类型的取值范围时，仅保留该类型位宽内的低位。例如，`int8_t(127) + int8_t(1)`的结果为`int8_t(-128)`，`uint8_t(255) + uint8_t(1)`的结果为`uint8_t(0)`。
-- 浮点加法按照IEEE 754浮点加法规则执行。
+- 整型dtype加法溢出时按环绕（wrap-around）策略处理：有符号类型溢出回绕到对应dtype的最小值或最大值（MAX+1->MIN，MIN-1->MAX），无符号类型溢出回绕到0（UMAX+1->0）。
+- 浮点dtype（half、bfloat16_t、float）加法按IEEE 754浮点加法语义执行，溢出与无效输入（如nan、inf）的处理遵循浮点运算规则。
 
 ## 调用示例
 
