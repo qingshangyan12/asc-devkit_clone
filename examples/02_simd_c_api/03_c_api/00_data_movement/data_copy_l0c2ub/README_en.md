@@ -41,7 +41,7 @@ Use the `SCENARIO_NUM` build parameter to select a scenario. Every scenario uses
 
 `SCENARIO_NUM` is passed by CMake as a compile-time macro. The kernel selects the corresponding scenario with `if constexpr`. After changing the scenario, recompile the project.
 
-The device-side flow is as follows. Each K chunk follows `GM→L1 Buffer (MTE2)→L0A Buffer/L0B Buffer (MTE1)→Mmad (M)`. `MTE1→MTE2` and `M→MTE1` protect L1 Buffer, L0A Buffer, and L0B Buffer reuse for the next chunk. The final `M→FIX` dependency ensures that Fixpipe moves the L0C Buffer result to UB after Mmad completes. The AIV side waits for the UB data and calls `asc_copy_ub2gm` to copy the result to GM for verification. `asc_sync_pipe(PIPE_ALL)` is called at the end of the kernel to ensure that all pipelines complete.
+The device-side flow is as follows. Each K chunk follows `GM→L1 Buffer (MTE2)→L0A Buffer/L0B Buffer (MTE1)→Mmad (M)`. `MTE1→MTE2` and `M→MTE1` protect L1 Buffer, L0A Buffer, and L0B Buffer reuse for the next chunk. The final `M→FIX` dependency ensures that Fixpipe uses `asc_copy_l0c2ub_sync` to move the L0C Buffer result to the UB of subblock0 after Mmad completes. After the AIV side waits for the UB data, only subblock0 calls `asc_copy_ub2gm_align` to copy the result to GM for verification. `asc_sync_pipe(PIPE_ALL)` is called at the end of the kernel to ensure that all pipelines complete.
 
 **Scenario 1: int8 input, scalar dequantization, and ND half output**
 
