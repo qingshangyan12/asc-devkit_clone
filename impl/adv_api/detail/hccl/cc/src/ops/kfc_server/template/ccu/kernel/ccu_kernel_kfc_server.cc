@@ -93,7 +93,7 @@ static CcuResult DefineKfcSubKernelFunc(const CcuKernelArgKfcServer* kernelArg)
             return ccu::DefineFunc<KfcAllGatherFunc>();
         case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
             return ccu::DefineFunc<KfcReduceScatterFunc>();
-        case HcclCMDType::HCCL_CMD_ALL_REDUCE:
+        case HcclCMDType::HCCL_CMD_ALLREDUCE:
             return ccu::DefineFunc<KfcAllReduceFunc>();
         default:
             HCCL_ERROR(
