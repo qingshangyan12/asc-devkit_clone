@@ -54,9 +54,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     uint64_t strideSize = commParam->strideCount == 0 ? sliceSizeAlltoall : commParam->strideCount * dataSize;
     xnData_[3] = sliceSizeAlltoall;
     xnData_[4] = strideSize;
-    constexpr uint64_t MAX_DMA_TRANS_SIZE = 256ULL * 1024 * 1024;
-    uint64_t fullChunkCount = sliceSizeAlltoall / MAX_DMA_TRANS_SIZE;
-    xnData_[5] = UINT64_MAX - fullChunkCount;
+    xnData_[5] = 0;
     xnData_[6] = strideSize * ccuParam_.rankId;
     uint64_t loopCount = 8;
     CalcGoSize(sliceSizeAlltoall, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[7]);

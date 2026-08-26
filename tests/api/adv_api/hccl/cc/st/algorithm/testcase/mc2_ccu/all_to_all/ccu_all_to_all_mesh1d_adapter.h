@@ -34,11 +34,10 @@ struct AllToAllLaunchConfig {
     uint64_t token{0};
     uint64_t sliceSize{0};
     uint64_t srcStride{0};
-    uint64_t writeLoopCount{0};
+    uint64_t srcOffset{0};
     uint64_t dstOffset{0};
     std::array<uint64_t, 4> goSize{};
     uint32_t rankId{0};
-    uint64_t srcOffset{0};
 };
 
 Result CaptureAllToAllMesh1DKernel(void* kernelArg);

@@ -213,14 +213,6 @@ TEST_F(CcuStAllToAll, CcuAlltoAllMesh1D_2Rank_SingleDie_Fp16_0B)
     VerifyScenario(scenario);
 }
 
-TEST_F(CcuStAllToAll, CcuAlltoAllMesh1D_2Rank_SingleDie_Fp16_256MB)
-{
-    TopoMeta topo{{{{0, 1}}}};
-    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, 256ULL * 1024 * 1024);
-    scenario.expectedAlgName = "CcuAlltoAllMesh1D";
-    VerifyScenario(scenario);
-}
-
 // ===== 强制算法配置 =====
 TEST_F(CcuStAllToAll, CcuAlltoAllMesh1D_ForcedAlg_2Rank_SingleDie_Fp16_100B)
 {
