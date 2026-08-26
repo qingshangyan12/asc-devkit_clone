@@ -663,7 +663,8 @@ def _gen_set_workspace_codes(
         source += "    GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);\n"
     else:
         source += (
-            "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
+            "#if defined(NO_KFC_SERVER_DETECTED) || \\\n"
+            "    (ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1)\n"
             "    GM_ADDR usrWorkspace = workspace;\n"
             "#else\n"
             "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n"
@@ -1991,6 +1992,9 @@ def compile_op_common_part(
     compile_info.tiling_key_struct_map = infered_info_from_ifile.tiling_key_struct_map
     compile_info.register_tiling_struct = infered_info_from_ifile.register_tiling_struct
     compile_info.tpl_tiling_struct = infered_info_from_ifile.tpl_tiling_struct
+
+    if infered_info_from_ifile.no_kfc_server_flag:
+        compile_option_tuple.compile_options.append("-DNO_KFC_SERVER_DETECTED")
 
     kernel_spec = KernelSpecCompilation.create(
         compile_info, compile_option_tuple, tiling_info
