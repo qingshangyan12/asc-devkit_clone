@@ -33,11 +33,11 @@
 ## 函数原型
 
 ```c
-// 带返回值的接口
+// 通过函数返回值返回结果
 __simd_callee__ inline vector_<dtype> asc_duplicate(vector_<dtype> src,
                                                     vector_bool mask)
 
-// 无返回值的接口
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,
                                           vector_<dtype> src,
                                           vector_bool mask)
@@ -50,10 +50,10 @@ __simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,
 ### 函数原型典型示例
 
 ```c
-// 带返回值的接口
+// 通过函数返回值返回结果
 __simd_callee__ inline vector_int8_t asc_duplicate(vector_int8_t src,
                                                    vector_bool mask)
-// 无返回值的接口
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_duplicate(vector_int8_t& dst,
                                           vector_int8_t src,
                                           vector_bool mask)

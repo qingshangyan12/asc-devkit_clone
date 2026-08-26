@@ -38,10 +38,10 @@
 ### 带mask（占位符形式）
 
 ```c
-// 带返回值的接口
+// 通过函数返回值返回结果
 __simd_callee__ inline vector_<dtype> asc_duplicate_scalar(<dtype> value,
                                                            vector_bool mask)
-// 无返回值的接口
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_duplicate_scalar(vector_<dtype>& dst,
                                                  <dtype> value,
                                                  vector_bool mask)
@@ -54,10 +54,10 @@ __simd_callee__ inline void asc_duplicate_scalar(vector_<dtype>& dst,
 #### 函数原型典型示例
 
 ```c
-// 带返回值的接口
+// 通过函数返回值返回结果
 __simd_callee__ inline vector_int8_t asc_duplicate_scalar(int8_t value,
                                                           vector_bool mask)
-// 无返回值的接口
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst,
                                                  int8_t value,
                                                  vector_bool mask)
@@ -66,9 +66,10 @@ __simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst,
 ### 不带mask（占位符形式）
 
 ```c
-// 带返回值的接口
+// 通过函数返回值返回结果
 __simd_callee__ inline vector_<dtype> asc_duplicate_scalar(<dtype> value)
-// 无返回值的接口
+
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_duplicate_scalar(vector_<dtype>& dst,
                                                  <dtype> value)
 ```
@@ -81,9 +82,10 @@ __simd_callee__ inline void asc_duplicate_scalar(vector_<dtype>& dst,
 #### 函数原型典型示例
 
 ```c
-// 带返回值的接口
+// 通过函数返回值返回结果
 __simd_callee__ inline vector_int8_t asc_duplicate_scalar(int8_t value)
-// 无返回值的接口
+
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst,
                                                  int8_t value)
 ```
