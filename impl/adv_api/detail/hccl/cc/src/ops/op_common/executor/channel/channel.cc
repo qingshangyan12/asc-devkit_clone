@@ -512,6 +512,63 @@ HcclResult CalcChannelRequestNhr(
     return HCCL_SUCCESS;
 }
 
+HcclResult CalcChannelRequestNhrMultiJetty(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation)
+{
+#ifndef AICPU_COMPILE
+    (void)param;
+    channels.clear();
+    std::set<u32> connectRanks;
+    u32 myRank = topoInfo->userRank;
+    auto it = std::find(subcommInfo[0].begin(), subcommInfo[0].end(), myRank);
+    CHK_PRT_RET(
+        (it == subcommInfo[0].end()), HCCL_ERROR("[CollAlgFactory] [channel] Rank [%d] is not in commInfo.", myRank),
+        HcclResult::HCCL_E_PARA);
+
+    u32 localRank = std::distance(subcommInfo[0].begin(), it);
+    u32 localRankSize = subcommInfo[0].size();
+    CHK_RET(CalcNHRChannelConnect(localRank, localRankSize, INVALID_VALUE_RANKID, connectRanks));
+    CommProtocol expectedProtocol = param.engine == CommEngine::COMM_ENGINE_AIV ?
+                                        CommProtocol::COMM_PROTOCOL_UB_MEM :
+                                        CommProtocol::COMM_PROTOCOL_UBC_CTP;
+    for (u32 rankIdx : connectRanks) {
+        size_t channelCountBefore = channels.size();
+        uint32_t* netLayers;
+        uint32_t netLayerNum;
+        CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum));
+        std::vector<uint32_t> netLayersVector(netLayers, netLayers + netLayerNum);
+
+        for (auto netLayer : netLayersVector) {
+            CommLink* linkList = nullptr;
+            u32 listSize;
+            CHK_RET(HcclRankGraphGetLinks(comm, netLayer, myRank, subcommInfo[0][rankIdx], &linkList, &listSize));
+            if (listSize == 0) {
+                continue;
+            }
+            std::vector<CommLink> links(linkList, linkList + listSize);
+            if (rankIdx != localRank) {
+                CHK_RET(ProcessLinksForChannelMutiJetty(
+                    comm, expectedProtocol, links, myRank, subcommInfo[0][rankIdx], netLayer, channels, false,
+                    isIsolation));
+            }
+            if (channels.size() > channelCountBefore) {
+                break;
+            }
+        }
+
+        CHK_PRT_RET(
+            channels.size() == channelCountBefore,
+            HCCL_ERROR(
+                "[CalcChannelRequestNhrMultiJetty] Failed to create channel between myRank=%u and rank=%u, there is "
+                "no link.",
+                myRank, subcommInfo[0][rankIdx]),
+            HcclResult::HCCL_E_INTERNAL);
+    }
+#endif
+    return HCCL_SUCCESS;
+}
+
 static bool IsEndPointEqual(const EndpointDesc& endPoint0, const EndpointDesc& endPoint1)
 {
     HCCL_INFO(

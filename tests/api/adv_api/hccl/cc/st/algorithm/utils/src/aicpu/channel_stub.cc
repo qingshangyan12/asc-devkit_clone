@@ -101,6 +101,24 @@ HcclResult CalcChannelRequestNhr(
     return CalcChannelRequestMesh1D(comm, param, topoInfo, subcommInfo, channels);
 }
 
+HcclResult CalcChannelRequestNhrMultiJetty(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation)
+{
+    (void)comm;
+    (void)isIsolation;
+    CHK_PTR_NULL(topoInfo);
+    CHK_PRT_RET(
+        subcommInfo.empty(), HCCL_ERROR("[CalcChannelRequestNhrMultiJetty][UT] empty subcommInfo"), HCCL_E_PARA);
+    channels.clear();
+    for (u32 rank : subcommInfo[COMM_LEVEL0]) {
+        if (rank != topoInfo->userRank) {
+            CHK_RET(AddChannelRequest(param, rank, channels, 4U));
+        }
+    }
+    return HCCL_SUCCESS;
+}
+
 HcclResult CalcChannelRequestMesh2D(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels)
