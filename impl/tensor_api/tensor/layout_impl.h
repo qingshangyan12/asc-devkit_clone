@@ -49,7 +49,7 @@ struct DiffOp {
 };
 
 template <typename Coord, typename LayoutType>
-__aicore__ inline decltype(auto) MakeCoordLayout(const Coord& coord, const LayoutType& layout)
+__aicore__ inline constexpr decltype(auto) MakeCoordLayout(const Coord& coord, const LayoutType& layout)
 {
     using ShapeType = Std::remove_cvref_t<decltype(layout.Shape())>;
     using CoordType = Std::remove_cvref_t<Coord>;
@@ -82,7 +82,7 @@ __aicore__ inline decltype(auto) MakeSameShapeSliceLayout(
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape>
-__aicore__ inline decltype(auto) MakeFourDimSliceLayout(
+__aicore__ inline constexpr decltype(auto) MakeFourDimSliceLayout(
     const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     static_assert(NestingDepthV<SliceShape> == TWO_DIM_DATA, "SliceShape must be Two Dim when layout is Four Dim");
@@ -117,7 +117,7 @@ __aicore__ inline decltype(auto) MakeFiveDimSliceLayout(
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!IsLayoutV<SliceShape>, int> = 0>
-__aicore__ inline decltype(auto) MakeSliceLayout(
+__aicore__ inline constexpr decltype(auto) MakeSliceLayout(
     const Coord& coord, const LayoutType& layout, const SliceShape& sliceShape)
 {
     static_assert(IsLayoutV<LayoutType>, "LayoutType must be Layout");
@@ -146,7 +146,7 @@ __aicore__ inline decltype(auto) MakeSliceLayout(
 
 template <
     typename Coord, typename SrcLayoutType, typename DstLayoutType, Std::enable_if_t<IsLayoutV<DstLayoutType>, int> = 0>
-__aicore__ inline decltype(auto) MakeSliceLayout(
+__aicore__ inline constexpr decltype(auto) MakeSliceLayout(
     const Coord& coord, const SrcLayoutType& srcLayout, const DstLayoutType& dstLayout)
 {
     static_assert(IsLayoutV<SrcLayoutType>, "SrcLayoutType must be Layout");

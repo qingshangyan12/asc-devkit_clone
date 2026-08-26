@@ -67,7 +67,7 @@ public:
 
     __aicore__ inline void Reset() { MATMUL_MODULE(CubeInBuffer)->Reset(); }
 
-    __aicore__ inline int32_t GetIterIndex(int32_t curRow, int32_t curCol)
+    __aicore__ inline constexpr int32_t GetIterIndex(int32_t curRow, int32_t curCol)
     {
         if constexpr (INPUT_TYPE::TAG == InputTypeTag::A) {
             return curCol % MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepKa();

@@ -55,7 +55,7 @@ public:
      * @param: void
      * @return: total number of iteration on N-dimension
      */
-    __aicore__ inline uint32_t GetTotalIter() const
+    __aicore__ inline constexpr uint32_t GetTotalIter() const
     {
         return 0;
     }
@@ -92,7 +92,7 @@ public:
      * @param: void
      * @return: current outer loop index.
      */
-    __aicore__ inline uint32_t GetOuterIdx() const
+    __aicore__ inline constexpr uint32_t GetOuterIdx() const
     {
         return 0;
     }
@@ -102,7 +102,7 @@ public:
      * @param: void
      * @return: the iteration number of outer loop.
      */
-    __aicore__ inline uint32_t GetOuterIter() const
+    __aicore__ inline constexpr uint32_t GetOuterIter() const
     {
         return 0;
     }
@@ -169,7 +169,7 @@ public:
      * @param: void
      * @return: current inner loop index.
      */
-    __aicore__ inline uint32_t GetInnerIdx() const
+    __aicore__ inline constexpr uint32_t GetInnerIdx() const
     {
         return 0;
     }
@@ -179,7 +179,7 @@ public:
      * @param: void
      * @return: the iteration number of inner loop.
      */
-    __aicore__ inline uint32_t GetInnerIter() const
+    __aicore__ inline constexpr uint32_t GetInnerIter() const
     {
         return 0;
     }

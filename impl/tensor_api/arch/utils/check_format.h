@@ -254,7 +254,7 @@ using LayoutPatternCheckSet = TupleMap<
     Std::tuple<ScaleBDNLayoutPtn, CheckScaleBDNLayoutPattern>>;
 
 template <typename T>
-__aicore__ inline void CheckOneLayoutPattern()
+__aicore__ inline constexpr void CheckOneLayoutPattern()
 {
     using Layout = typename T::layoutType;
     using LayoutPattern = GetLayoutPattern<Layout>;
@@ -265,7 +265,7 @@ __aicore__ inline void CheckOneLayoutPattern()
 }
 
 template <typename... Args>
-__aicore__ inline void CheckLayoutPattern()
+__aicore__ inline constexpr void CheckLayoutPattern()
 {
     (CheckOneLayoutPattern<Args>(), ...);
 }

@@ -74,9 +74,9 @@ public:
 
     __aicore__ inline bool OuterEnd() { return BASE_MODULE::innerStartIdx_ >= BASE_MODULE::totalIter_; }
 
-    __aicore__ inline uint32_t GetOuterIdx() const { return Ceil(BASE_MODULE::innerStartIdx_, GetStepM()); }
+    __aicore__ inline constexpr uint32_t GetOuterIdx() const { return Ceil(BASE_MODULE::innerStartIdx_, GetStepM()); }
 
-    __aicore__ inline uint32_t GetOuterIter() const { return Ceil(BASE_MODULE::totalIter_, GetStepM()); }
+    __aicore__ inline constexpr uint32_t GetOuterIter() const { return Ceil(BASE_MODULE::totalIter_, GetStepM()); }
 
     __aicore__ inline bool InnerNext()
     {
@@ -87,7 +87,7 @@ public:
     __aicore__ inline void InnerStart() { BASE_MODULE::innerIndex_ = BASE_MODULE::innerStartIdx_; }
 
 private:
-    __aicore__ inline uint32_t GetStepM() const
+    __aicore__ inline constexpr uint32_t GetStepM() const
     {
         if constexpr (ToMatmulConfig(MM_CFG).stepM != 0) {
             return ToMatmulConfig(MM_CFG).stepM;

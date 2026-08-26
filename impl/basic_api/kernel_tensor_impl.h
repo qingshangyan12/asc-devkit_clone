@@ -1027,7 +1027,7 @@ LocalTensor<T>::GetLength() const
 }
 
 template <typename T>
-__aicore__ inline void LocalTensor<T>::SetBufferLen(uint32_t dataLen)
+__aicore__ inline constexpr void LocalTensor<T>::SetBufferLen(uint32_t dataLen)
 {
     this->address_.dataLen = dataLen;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
@@ -1106,7 +1106,7 @@ __aicore__ inline LocalTensor<T>::LocalTensor(AscendC::TPosition pos, uint32_t a
 }
 
 template <typename T>
-__aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr)
+__aicore__ inline constexpr LocalTensor<T>::LocalTensor(uint32_t addr)
 {
     static_assert(is_tensorTrait_v<T>, "only support TensorTrait type Tensor!");
     static_assert(

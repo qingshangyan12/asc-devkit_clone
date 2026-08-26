@@ -147,7 +147,7 @@ template <typename T>
 class LocalTensor : public BaseLocalTensor<T>, public BaseTensorTraitTensor<T> {
 public:
     using PrimType = PrimT<T>;
-    __aicore__ inline LocalTensor<T>(){};
+    __aicore__ inline constexpr LocalTensor<T>(){};
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ~LocalTensor();
     explicit LocalTensor<T>(TBuffAddr& address);
@@ -189,7 +189,7 @@ public:
     __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize);
     template <typename U>
     __aicore__ inline LocalTensor<T>(uint32_t addr, const U& layout);
-    __aicore__ inline LocalTensor<T>(uint32_t addr);
+    __aicore__ inline constexpr LocalTensor<T>(uint32_t addr);
     __aicore__ inline int32_t GetPosition() const;
     __aicore__ inline void SetSize(const uint32_t size);
     __aicore__ inline uint32_t GetSize() const;
@@ -198,7 +198,7 @@ public:
                  "it!")]] __aicore__ inline uint32_t
     GetLength() const;
 
-    __aicore__ inline void SetBufferLen(uint32_t dataLen);
+    __aicore__ inline constexpr void SetBufferLen(uint32_t dataLen);
     __aicore__ inline void SetUserTag(const TTagType tag);
     __aicore__ inline TTagType GetUserTag() const;
     // symbol override
