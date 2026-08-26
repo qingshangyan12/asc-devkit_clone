@@ -28,6 +28,6 @@ private:
     std::unique_ptr<Hccl::ProfilingReporterLite> profilingReporterLite_;
     bool initializedFlag_{false};
 };
-}
+} // namespace hccl
 
 #endif

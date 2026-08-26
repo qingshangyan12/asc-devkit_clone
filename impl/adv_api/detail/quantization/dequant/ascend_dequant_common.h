@@ -25,8 +25,7 @@
 
 #include "../../../../../include/adv_api/quantization/ascend_dequant_utils.h"
 
-namespace AscendC {
-} // namespace AscendC
+namespace AscendC {} // namespace AscendC
 #endif // LIB_ASCEND_ANTIQUANT_IMPL_ASCEND_ANTIQUANT_COMMON_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_QUANTIZATION_DEQUANT_ASCEND_DEQUANT_COMMON_H__)

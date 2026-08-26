@@ -36,7 +36,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T1>& softMaxRes, const LocalTensor<T2>& maxTensor, const uint32_t from, const T1 to,
-        const SoftMaxShapeInfo& softmaxShapeInfo){};
+        const SoftMaxShapeInfo& softmaxShapeInfo) {};
 };
 
 } // namespace HighLevelApiCheck

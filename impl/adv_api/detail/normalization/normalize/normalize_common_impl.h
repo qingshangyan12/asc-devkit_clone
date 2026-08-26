@@ -37,7 +37,7 @@ const float DEFAULT_EPSILON = 1e-5;
 
 template <typename T>
 struct NormalizeTmpTensor {
-    __aicore__ NormalizeTmpTensor(){};
+    __aicore__ NormalizeTmpTensor() {};
     LocalTensor<T> tempTensorA;
     LocalTensor<T> tempTensorB;
     LocalTensor<T> gammaTmpTensor;

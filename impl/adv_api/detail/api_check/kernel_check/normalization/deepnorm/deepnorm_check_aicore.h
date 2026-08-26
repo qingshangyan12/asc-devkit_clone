@@ -37,7 +37,7 @@ public:
         const LocalTensor<T>& dstLocal, const LocalTensor<T>& meanLocal, const LocalTensor<T>& rstdLocal,
         const LocalTensor<T>& srcLocal, const LocalTensor<T>& gxLocal, const LocalTensor<T>& betaLocal,
         const LocalTensor<T>& gammaLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const T alpha, const T epsilon,
-        DeepNormTiling& tiling){};
+        DeepNormTiling& tiling) {};
 };
 
 } // namespace HighLevelApiCheck

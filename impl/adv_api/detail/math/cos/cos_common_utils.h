@@ -23,8 +23,7 @@
 #define IMPL_MATH_COS_COS_COMMON_UTILS_H
 #include "../../../../../include/adv_api/math/cos_utils.h"
 
-namespace AscendC {
-}
+namespace AscendC {}
 
 #endif // IMPL_MATH_COS_COS_COMMON_UTILS_H
 

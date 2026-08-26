@@ -33,7 +33,7 @@ struct TanhConfig {
 
 constexpr TanhConfig DEFAULT_TANH_CONFIG = {TanhAlgo::INTRINSIC};
 
-};     // namespace AscendC
+}; // namespace AscendC
 #endif // LIB_MATH_TANH_UTILS_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_TANH_TANH_UTILS_H__)

@@ -36,7 +36,7 @@ public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean,
         const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const WelfordUpdateParam& para){};
+        const WelfordUpdateParam& para) {};
 };
 
 } // namespace HighLevelApiCheck

@@ -33,7 +33,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const T scalar, const uint32_t calCount){};
+        const T scalar, const uint32_t calCount) {};
 };
 
 template <typename T, bool isReuseSource = false>
@@ -45,7 +45,7 @@ public:
 public:
     __aicore__ inline void VerifyingParameters(
         const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const T scalar, const uint32_t calCount){};
+        const T scalar, const uint32_t calCount) {};
 };
 
 template <typename T, typename U, typename S, bool isReuseSource = false>
@@ -56,7 +56,7 @@ public:
 
 public:
     __aicore__ inline void VerifyingParameters(
-        const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& min, const S& max, const uint32_t count){};
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& min, const S& max, const uint32_t count) {};
 };
 
 } // namespace HighLevelApiCheck

@@ -17,7 +17,7 @@ namespace Hccl {
 class SuspendingException : public HcclException {
 public:
     explicit SuspendingException(const std::string& userDefinedMsg)
-        : HcclException(ExceptionType::SUSPENDING_EXCEPTION, userDefinedMsg){};
+        : HcclException(ExceptionType::SUSPENDING_EXCEPTION, userDefinedMsg) {};
 };
 
 } // namespace Hccl

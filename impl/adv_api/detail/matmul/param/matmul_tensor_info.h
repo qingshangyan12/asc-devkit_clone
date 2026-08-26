@@ -202,8 +202,8 @@ private:
 };
 
 template <const auto& MM_CFG, typename INPUT_TYPE>
-constexpr bool IsSparseMatmul = (INPUT_TYPE::TAG == InputTypeTag::B) && HasSparseIndex<INPUT_TYPE>() &&
-                                DoMatmulMDL(MM_CFG);
+constexpr bool IsSparseMatmul =
+    (INPUT_TYPE::TAG == InputTypeTag::B) && HasSparseIndex<INPUT_TYPE>() && DoMatmulMDL(MM_CFG);
 
 template <typename IMPL, const auto& MM_CFG, class INPUT_TYPE>
 class MatmulTensorInfo<

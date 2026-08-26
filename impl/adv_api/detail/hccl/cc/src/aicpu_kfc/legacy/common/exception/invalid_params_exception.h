@@ -16,7 +16,7 @@ namespace Hccl {
 class InvalidParamsException : public HcclException {
 public:
     explicit InvalidParamsException(const std::string& userDefinedMsg)
-        : HcclException(ExceptionType::INVALID_PARAMS_EXCEPTION, userDefinedMsg){};
+        : HcclException(ExceptionType::INVALID_PARAMS_EXCEPTION, userDefinedMsg) {};
 };
 } // namespace Hccl
 

@@ -66,7 +66,7 @@ public:
 
 public:
     __aicore__ inline void VerifyingParameters(
-        const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& min, const S& max, const uint32_t count){};
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& min, const S& max, const uint32_t count) {};
 };
 } // namespace HighLevelApiCheck
 } // namespace AscendC

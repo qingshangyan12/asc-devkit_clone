@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file pad_v200_impl.h
@@ -14,7 +14,8 @@
  */
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
-#pragma message("impl/adv_api/detail/pad/pad/pad_v200_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/pad/pad.h\"\" and use public functions or variables defined in interface headers files.")
+#pragma message( \
+    "impl/adv_api/detail/pad/pad/pad_v200_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/pad/pad.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_PAD_PAD_V200_IMPL_H__
 #endif
@@ -27,8 +28,9 @@
 
 namespace AscendC {
 template <typename T>
-__aicore__ inline void PadCompute(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    PadParams& padParams, const LocalTensor<uint8_t>& sharedTmpBuffer, PadTiling& tiling)
+__aicore__ inline void PadCompute(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, PadParams& padParams,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, PadTiling& tiling)
 {
     uint32_t width = tiling.srcWidth;
     // 32B aligned
@@ -41,8 +43,9 @@ __aicore__ inline void PadCompute(const LocalTensor<T>& dstTensor, const LocalTe
 }
 
 template <typename T>
-__aicore__ inline void UnPadCompute(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
-    UnPadParams& unPadParams, LocalTensor<uint8_t>& sharedTmpBuffer, UnPadTiling& tiling)
+__aicore__ inline void UnPadCompute(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, UnPadParams& unPadParams,
+    LocalTensor<uint8_t>& sharedTmpBuffer, UnPadTiling& tiling)
 {
     uint16_t rightPad = unPadParams.rightPad;
     uint16_t height = tiling.srcHeight;
@@ -115,11 +118,11 @@ __aicore__ inline void UnPadCompute(const LocalTensor<T>& dstTensor, const Local
 
             // load data to tmp1 from src
             if (i == (widthFractal - 1)) {
-                DuplicateLastDimImpl(tmp1, srcTensor[j * width + i * widthTiling], widthFractalTail,
-                    ONE_BLK_SIZE / sizeof(T));
+                DuplicateLastDimImpl(
+                    tmp1, srcTensor[j * width + i * widthTiling], widthFractalTail, ONE_BLK_SIZE / sizeof(T));
             } else {
-                DuplicateLastDimImpl(tmp1, srcTensor[j * width + i * widthTiling], widthTiling,
-                    ONE_BLK_SIZE / sizeof(T));
+                DuplicateLastDimImpl(
+                    tmp1, srcTensor[j * width + i * widthTiling], widthTiling, ONE_BLK_SIZE / sizeof(T));
             }
 
             // update tmp1RowCount and tmp1RowFull
@@ -132,14 +135,14 @@ __aicore__ inline void UnPadCompute(const LocalTensor<T>& dstTensor, const Local
             while (tmp1RowCount != tmp1RowFull) {
                 tmp1RemainRow = tmp1RowFull - tmp1RowCount;
                 if (tmp2NeedRow > tmp1RemainRow) {
-                    DataCopyParams repeatParams { 1, static_cast<uint16_t>(tmp1RemainRow), 0, 0 };
+                    DataCopyParams repeatParams{1, static_cast<uint16_t>(tmp1RemainRow), 0, 0};
                     DataCopy(tmp2[tmp2RowCount * tmpWidth], tmp1[tmp1RowCount * tmpWidth], repeatParams);
                     tmp1RowCount += tmp1RemainRow;
                     tmp2RowCount += tmp1RemainRow;
                     tmp2NeedRow -= tmp1RemainRow;
                     break;
                 } else {
-                    DataCopyParams repeatParams { 1, static_cast<uint16_t>(tmp2NeedRow), 0, 0 };
+                    DataCopyParams repeatParams{1, static_cast<uint16_t>(tmp2NeedRow), 0, 0};
                     DataCopy(tmp2[tmp2RowCount * tmpWidth], tmp1[tmp1RowCount * tmpWidth], repeatParams);
                     tmp1RowCount += tmp2NeedRow;
                     tmp2RowCount += tmp2NeedRow;
@@ -154,25 +157,30 @@ __aicore__ inline void UnPadCompute(const LocalTensor<T>& dstTensor, const Local
                 if (tmp2ToDstCount == tmp2ToDstFractal) {
                     uint32_t repeatInUnit16 = tmp2ToDstFractalTail / 16;
                     if (sizeof(T) == sizeof(half)) {
-                        DataCopy(dstTensor[tmp2ToDstCount * tmp1BlockNum * 16], tmp2,
-                            { static_cast<uint16_t>(repeatInUnit16), 1, 15, 0 });
+                        DataCopy(
+                            dstTensor[tmp2ToDstCount * tmp1BlockNum * 16], tmp2,
+                            {static_cast<uint16_t>(repeatInUnit16), 1, 15, 0});
                     } else if (sizeof(T) == sizeof(float)) {
                         if (repeatInUnit16 != 0) {
-                            DataCopy(dstTensor[tmp2ToDstCount * tmp1BlockNum * 16], tmp2,
-                                { static_cast<uint16_t>(repeatInUnit16), 2, 14, 0 });
+                            DataCopy(
+                                dstTensor[tmp2ToDstCount * tmp1BlockNum * 16], tmp2,
+                                {static_cast<uint16_t>(repeatInUnit16), 2, 14, 0});
                         }
                         if (tmp2ToDstFractalTail % 16) {
-                            DataCopy(dstTensor[tmp2ToDstCount * tmp1BlockNum * 16 + repeatInUnit16 * 16],
-                                tmp2[repeatInUnit16 * (16 * ONE_BLK_SIZE / sizeof(T))], { 1, 1, 15, 0 });
+                            DataCopy(
+                                dstTensor[tmp2ToDstCount * tmp1BlockNum * 16 + repeatInUnit16 * 16],
+                                tmp2[repeatInUnit16 * (16 * ONE_BLK_SIZE / sizeof(T))], {1, 1, 15, 0});
                         }
                     }
                 } else {
                     if (sizeof(T) == sizeof(half)) {
-                        DataCopy(dstTensor[tmp2ToDstCount * tmp1BlockNum * 16], tmp2,
-                            { static_cast<uint16_t>(tmp1BlockNum), 1, 15, 0 });
+                        DataCopy(
+                            dstTensor[tmp2ToDstCount * tmp1BlockNum * 16], tmp2,
+                            {static_cast<uint16_t>(tmp1BlockNum), 1, 15, 0});
                     } else if (sizeof(T) == sizeof(float)) {
-                        DataCopy(dstTensor[tmp2ToDstCount * tmp1BlockNum * 16], tmp2,
-                            { static_cast<uint16_t>(tmp1BlockNum), 2, 14, 0 });
+                        DataCopy(
+                            dstTensor[tmp2ToDstCount * tmp1BlockNum * 16], tmp2,
+                            {static_cast<uint16_t>(tmp1BlockNum), 2, 14, 0});
                     }
                 }
 

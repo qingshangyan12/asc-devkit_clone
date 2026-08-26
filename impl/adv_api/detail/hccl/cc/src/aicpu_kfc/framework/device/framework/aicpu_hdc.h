@@ -16,8 +16,8 @@
 
 class AicpuHdc {
 public:
-    AicpuHdc(){};
-    ~AicpuHdc(){};
+    AicpuHdc() {};
+    ~AicpuHdc() {};
 
     HcclResult InitOpExecStatus(std::shared_ptr<hccl::HDCommunicate> d2hTransfer, HcclOpIdentifier& opId);
     HcclResult GetOpExecCtrlCmd(std::shared_ptr<hccl::HDCommunicate> h2dTransfer, KfcCommand& cmd);

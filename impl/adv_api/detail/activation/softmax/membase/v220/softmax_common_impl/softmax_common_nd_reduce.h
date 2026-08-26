@@ -335,7 +335,7 @@ __aicore__ inline void NewReduceSumLastNDImpl(
     }
 }
 
-};     // namespace AscendC
+}; // namespace AscendC
 #endif // IMPL_ACTIVATION_SOFTMAX_V220_SOFTMAX_COMMON_ND_REDUCE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_COMMON_ND_REDUCE_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
