@@ -36,7 +36,7 @@ class MatmulShapeTiling {
 public:
     __aicore__ inline void SetTiling(const TCubeTiling* __restrict tiling) { tiling_.SetTiling(tiling); }
 
-    __aicore__ inline const MatmulTiling<MM_CFG>& GetTiling() const { return tiling_; }
+    __aicore__ __callee__ inline const MatmulTiling<MM_CFG>& GetTiling() const { return tiling_; }
 
     template <typename SrcT, typename L0cT>
     __aicore__ inline void CheckTiling()

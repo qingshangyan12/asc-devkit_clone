@@ -246,7 +246,7 @@ private:
         }
     }
 
-    __aicore__ int32_t GetNormIterBIdxForUndef(int32_t curRow, int32_t curCol)
+    __aicore__ __callee__ int32_t GetNormIterBIdxForUndef(int32_t curRow, int32_t curCol)
     {
         if (MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetIterateOrder() ==
             static_cast<int>(IterateOrder::ORDER_M)) {

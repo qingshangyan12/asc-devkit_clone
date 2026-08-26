@@ -91,33 +91,33 @@ public:
 
     __aicore__ inline bool FirstInnerIter() const { return innerIdx_ == 0; }
 
-    __aicore__ inline int32_t GetTotalIter() const { return kIter_; }
+    __aicore__ __callee__ inline int32_t GetTotalIter() const { return kIter_; }
 
-    __aicore__ inline bool IsAKL1FullLoad() const { return isA1KFullLoad_; }
+    __aicore__ __callee__ inline bool IsAKL1FullLoad() const { return isA1KFullLoad_; }
 
-    __aicore__ inline bool IsBKL1FullLoad() const { return isB1KFullLoad_; }
+    __aicore__ __callee__ inline bool IsBKL1FullLoad() const { return isB1KFullLoad_; }
 
-    __aicore__ inline int32_t GetInnerStartIdx() const { return innerStartIdx_; }
+    __aicore__ __callee__ inline int32_t GetInnerStartIdx() const { return innerStartIdx_; }
 
-    __aicore__ inline int32_t GetOuterIter() const { return outIter_; }
+    __aicore__ __callee__ inline int32_t GetOuterIter() const { return outIter_; }
 
-    __aicore__ inline int32_t GetInnerIter() const { return innerIter_; }
+    __aicore__ __callee__ inline int32_t GetInnerIter() const { return innerIter_; }
 
-    __aicore__ inline int32_t GetOuterIdx() const { return outerIdx_; }
+    __aicore__ __callee__ inline int32_t GetOuterIdx() const { return outerIdx_; }
 
     /**
      * @description: Get current ka outer loop index, used for GetBufferPos in CopyCubeIn
      * @param: void
      * @return: return current ka outerIdx
      */
-    __aicore__ inline int32_t GetOuterKaIdx() const { return outerIdx_ / kaStepFactor_; }
+    __aicore__ __callee__ inline int32_t GetOuterKaIdx() const { return outerIdx_ / kaStepFactor_; }
 
     /**
      * @description: Get current kb outer loop index, used for GetBufferPos in CopyCubeIn
      * @param: void
      * @return: return current kb outerIdx
      */
-    __aicore__ inline int32_t GetOuterKbIdx() const { return outerIdx_ / kbStepFactor_; }
+    __aicore__ __callee__ inline int32_t GetOuterKbIdx() const { return outerIdx_ / kbStepFactor_; }
 
     /**
      * @description: Get next ka outer loop index, used for ClearL1BufferCache in SchedulerMDL
@@ -133,7 +133,7 @@ public:
      */
     __aicore__ inline int32_t GetNextOuterKbIdx() const { return (outerIdx_ + 1) / kbStepFactor_; }
 
-    __aicore__ inline int32_t GetInnerIdx() const { return innerIdx_; }
+    __aicore__ __callee__ inline int32_t GetInnerIdx() const { return innerIdx_; }
 
     __aicore__ inline int32_t GetTileShapeA() const { return tileShapeA_; }
 

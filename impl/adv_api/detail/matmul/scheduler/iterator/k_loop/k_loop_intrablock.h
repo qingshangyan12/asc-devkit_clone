@@ -127,7 +127,7 @@ public:
     }
 
     template <bool IS_INTRA_BLOCK = false>
-    __aicore__ inline uint32_t GetTotalIter() const
+    __aicore__ __callee__ inline uint32_t GetTotalIter() const
     {
         if constexpr (IS_INTRA_BLOCK) {
             return intrablockKIter_;
@@ -137,7 +137,7 @@ public:
     }
 
     template <bool IS_INTRA_BLOCK = false>
-    __aicore__ inline uint32_t GetOuterIter() const
+    __aicore__ __callee__ inline uint32_t GetOuterIter() const
     {
         if constexpr (IS_INTRA_BLOCK) {
             return intrablockKIter_;
@@ -146,10 +146,10 @@ public:
         }
     }
 
-    __aicore__ inline uint32_t GetInnerIter() const { return 1; }
+    __aicore__ __callee__ inline uint32_t GetInnerIter() const { return 1; }
 
     template <bool IS_INTRA_BLOCK = false>
-    __aicore__ inline uint32_t GetOuterIdx() const
+    __aicore__ __callee__ inline uint32_t GetOuterIdx() const
     {
         if constexpr (IS_INTRA_BLOCK) {
             return intrablockOuterIdx_;
@@ -159,7 +159,7 @@ public:
     }
 
     template <bool IS_INTRA_BLOCK = false>
-    __aicore__ inline uint32_t GetInnerIdx() const
+    __aicore__ __callee__ inline uint32_t GetInnerIdx() const
     {
         if constexpr (IS_INTRA_BLOCK) {
             return intrablockOuterIdx_;
