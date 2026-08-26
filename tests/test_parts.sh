@@ -98,6 +98,7 @@ basic_test_four_targets=(
     ascendc_ut_std_api_ascend950pr_9599
     ascendc_pyut_asc_compile_common
     ascendc_pyut_asc_op_compiler
+    ascendc_pyut_adapter
     ascendc_pyut_aclrt_launch_kernel
     ascendc_pyut_compile_trace_log
     generate_hidden_dat_file_ut
