@@ -876,7 +876,7 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [this_grid](../cooperative_groups/grid_group/grid_group_constructor.md) | 获取当前Grid协作组对象。 |
-| [is_valid](../cooperative_groups/grid_group/is_valid.md) | 判断当前Grid协作组是否可使用`sync()`接口进行跨线程块同步。 |
+| [is_valid](../cooperative_groups/grid_group/is_valid.md) | 判断当前Grid协作组是否可使用sync()接口进行跨线程块同步。 |
 | [sync](../cooperative_groups/grid_group/sync.md) | 同步Grid内所有线程。 |
 | [thread_rank](../cooperative_groups/grid_group/thread_rank.md) | 获取当前线程在Grid内的排名。 |
 | [block_rank](../cooperative_groups/grid_group/block_rank.md) | 获取当前线程所属线程块在Grid内的排名。 |

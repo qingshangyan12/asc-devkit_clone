@@ -245,7 +245,7 @@ asc_stcg(&output[idx], y);
 msopprof ./data_cache_hint   # 分析case的性能
 ```
 
-命令完成后，会在默认目录下生成以`OPPROF_{timestamp}_XXX`命名的文件夹，性能数据文件夹结构示例如下：
+命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹,性能数据文件夹结构示例如下：
 
 ```text
 ├──dump                       # 原始的性能数据，用户无需关注
