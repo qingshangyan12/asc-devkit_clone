@@ -26,20 +26,12 @@
 namespace asc {
 namespace te {
 namespace experimental {
+namespace detail {
 
-template <load_sideband_mode sideband_mode, typename Tensor, typename Coord>
-__simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord)
+template <load_sideband_mode sideband_mode, typename DataType, typename Pointer>
+__simd_callee__ inline reg_tensor<DataType> load_from_ptr(Pointer src)
 {
-    using engine_type = typename Tensor::engine_type;
-    using data_type = typename Tensor::data_type;
-    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "load only supports tensors located in UB");
-    TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "load");
-
-    auto src_engine = tensor.engine() + tensor.layout()(coord);
-    auto src = src_engine.begin().get();
-
-    reg_tensor<data_type> dst;
+    reg_tensor<DataType> dst;
     if constexpr (sideband_mode == load_sideband_mode::direct) {
         asc_loadalign(dst.reg, src);
     } else if constexpr (sideband_mode == load_sideband_mode::downsample) {
@@ -52,11 +44,65 @@ __simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& co
         asc_loadalign_upsample(dst.reg, src);
     } else if constexpr (sideband_mode == load_sideband_mode::deintlv) {
         static_assert(sideband_mode != load_sideband_mode::deintlv,
-            "deintlv requires the load(tensor, coord, dst0, dst1) overload");
+            "deintlv requires the two-destination load overload");
     } else {
         static_assert(sideband_mode == load_sideband_mode::direct, "unsupported load sideband mode");
     }
     return dst;
+}
+
+template <load_sideband_mode sideband_mode, typename Pointer, typename RegDataType>
+__simd_callee__ inline void load_from_ptr(
+    Pointer src, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
+{
+    if constexpr (sideband_mode == load_sideband_mode::deintlv) {
+        asc_loadalign_deintlv(dst0.reg, dst1.reg, src);
+    } else {
+        static_assert(sideband_mode == load_sideband_mode::deintlv,
+            "the two-destination load overload only supports deintlv");
+    }
+}
+
+template <broadcast_mode brc_mode, typename DataType, typename Pointer>
+__simd_callee__ inline reg_tensor<DataType> load_broadcast_from_ptr(Pointer src)
+{
+    reg_tensor<DataType> dst;
+    if constexpr (brc_mode == broadcast_mode::elem) {
+        asc_loadalign_brc_elem(dst.reg, src);
+    } else if constexpr (brc_mode == broadcast_mode::datablock) {
+        asc_loadalign_brc_datablock(dst.reg, src);
+    } else if constexpr (brc_mode == broadcast_mode::elem2datablock) {
+        asc_loadalign_brc_elem2datablock(dst.reg, src);
+    } else {
+        static_assert(brc_mode == broadcast_mode::elem, "unsupported broadcast mode");
+    }
+    return dst;
+}
+
+} // namespace detail
+
+template <load_sideband_mode sideband_mode, typename Tensor, typename Coord>
+__simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "load only supports tensors located in UB");
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "load");
+
+    auto src_engine = tensor.engine() + tensor.layout()(coord);
+    return detail::load_from_ptr<sideband_mode, data_type>(src_engine.begin().get());
+}
+
+template <load_sideband_mode sideband_mode, typename Tensor>
+__simd_callee__ inline decltype(auto) load(const Tensor& tensor)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "load only supports tensors located in UB");
+
+    return detail::load_from_ptr<sideband_mode, data_type>(tensor.engine().begin().get());
 }
 
 template <load_sideband_mode sideband_mode, typename Tensor, typename Coord, typename RegDataType>
@@ -71,13 +117,22 @@ __simd_callee__ inline void load(const Tensor& tensor, const Coord& coord, reg_t
         "load requires matching tensor and register element types");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "load");
 
-    if constexpr (sideband_mode == load_sideband_mode::deintlv) {
-        auto src_engine = tensor.engine() + tensor.layout()(coord);
-        asc_loadalign_deintlv(dst0.reg, dst1.reg, src_engine.begin().get());
-    } else {
-        static_assert(sideband_mode == load_sideband_mode::deintlv,
-            "the two-destination load overload only supports deintlv");
-    }
+    auto src_engine = tensor.engine() + tensor.layout()(coord);
+    detail::load_from_ptr<sideband_mode>(src_engine.begin().get(), dst0, dst1);
+}
+
+template <load_sideband_mode sideband_mode, typename Tensor, typename RegDataType>
+__simd_callee__ inline void load(
+    const Tensor& tensor, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "load only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, RegDataType>,
+        "load requires matching tensor and register element types");
+
+    detail::load_from_ptr<sideband_mode>(tensor.engine().begin().get(), dst0, dst1);
 }
 
 template <broadcast_mode brc_mode, typename Tensor, typename Coord>
@@ -90,19 +145,18 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor, const
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "load_broadcast");
 
     auto src_engine = tensor.engine() + tensor.layout()(coord);
-    auto src = src_engine.begin().get();
+    return detail::load_broadcast_from_ptr<brc_mode, data_type>(src_engine.begin().get());
+}
 
-    reg_tensor<data_type> dst;
-    if constexpr (brc_mode == broadcast_mode::elem) {
-        asc_loadalign_brc_elem(dst.reg, src);
-    } else if constexpr (brc_mode == broadcast_mode::datablock) {
-        asc_loadalign_brc_datablock(dst.reg, src);
-    } else if constexpr (brc_mode == broadcast_mode::elem2datablock) {
-        asc_loadalign_brc_elem2datablock(dst.reg, src);
-    } else {
-        static_assert(brc_mode == broadcast_mode::elem, "unsupported broadcast mode");
-    }
-    return dst;
+template <broadcast_mode brc_mode, typename Tensor>
+__simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "load_broadcast only supports tensors located in UB");
+
+    return detail::load_broadcast_from_ptr<brc_mode, data_type>(tensor.engine().begin().get());
 }
 
 } // namespace experimental

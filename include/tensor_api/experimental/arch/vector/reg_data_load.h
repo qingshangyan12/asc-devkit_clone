@@ -26,13 +26,23 @@ namespace experimental {
 template <load_sideband_mode sideband_mode = load_sideband_mode::direct, typename Tensor, typename Coord>
 __simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord);
 
+template <load_sideband_mode sideband_mode = load_sideband_mode::direct, typename Tensor>
+__simd_callee__ inline decltype(auto) load(const Tensor& tensor);
+
 template <load_sideband_mode sideband_mode = load_sideband_mode::deintlv, typename Tensor, typename Coord,
     typename RegDataType>
 __simd_callee__ inline void load(const Tensor& tensor, const Coord& coord, reg_tensor<RegDataType>& dst0,
     reg_tensor<RegDataType>& dst1);
 
+template <load_sideband_mode sideband_mode = load_sideband_mode::deintlv, typename Tensor, typename RegDataType>
+__simd_callee__ inline void load(
+    const Tensor& tensor, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1);
+
 template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor, typename Coord>
 __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor, const Coord& coord);
+
+template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor>
+__simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
 
 } // namespace experimental
 } // namespace te

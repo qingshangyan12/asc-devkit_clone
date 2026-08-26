@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 
 #include "tensor_api/stub/cce_stub.h"
+#include "tensor_api/experimental/vector_experimental.h"
 #include "tensor_api/tensor.h"
 
 namespace {

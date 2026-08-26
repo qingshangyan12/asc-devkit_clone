@@ -63,6 +63,33 @@ __simd_vf__ inline void compile_reg_local_tensor_load_store(
     static_assert(AscendC::Std::is_same_v<typename decltype(full_value)::elem_type, T>);
 }
 
+template <typename T>
+__simd_vf__ inline void compile_reg_local_tensor_load_store_without_coord(
+    __ubuf__ T* dst, __ubuf__ T* src, vector_bool mask)
+{
+    auto layout = asc::te::make_layout(asc::te::make_shape(64));
+    auto dst_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst), layout);
+    auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
+
+    auto value = asc::te::experimental::load(src_tensor).with_mask(
+        asc::te::experimental::reg_tensor<bool> {mask});
+    static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::store(dst_tensor, value)), void>);
+    asc::te::experimental::store(dst_tensor, value);
+
+    asc::te::experimental::reg_tensor<T> dst0 {mask};
+    asc::te::experimental::reg_tensor<T> dst1 {mask};
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::load(src_tensor, dst0, dst1)), void>);
+    asc::te::experimental::load(src_tensor, dst0, dst1);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::store(dst_tensor, dst0, dst1)), void>);
+    asc::te::experimental::store(dst_tensor, dst0, dst1);
+
+    auto broadcast = asc::te::experimental::load_broadcast(src_tensor);
+    static_assert(AscendC::Std::is_same_v<decltype(broadcast), asc::te::experimental::reg_tensor<T>>);
+    (void)broadcast;
+}
+
 template <asc::te::experimental::load_sideband_mode sideband_mode>
 __simd_vf__ inline void compile_reg_local_tensor_load_mode(__ubuf__ uint8_t* src)
 {
@@ -151,7 +178,9 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)value.mask;
 
     auto compile_load_store = &compile_reg_local_tensor_load_store<float>;
+    auto compile_load_store_without_coord = &compile_reg_local_tensor_load_store_without_coord<float>;
     (void)compile_load_store;
+    (void)compile_load_store_without_coord;
 
     auto compile_direct =
         &compile_reg_local_tensor_load_mode<asc::te::experimental::load_sideband_mode::direct>;

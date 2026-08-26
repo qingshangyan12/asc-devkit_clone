@@ -26,6 +26,40 @@
 namespace asc {
 namespace te {
 namespace experimental {
+namespace detail {
+
+template <store_sideband_mode sideband_mode, typename Pointer, typename RegDataType>
+__simd_callee__ inline void store_to_ptr(Pointer dst, const reg_tensor<RegDataType>& src)
+{
+    if constexpr (sideband_mode == store_sideband_mode::direct) {
+        asc_storealign(dst, src.reg, src.mask);
+    } else if constexpr (sideband_mode == store_sideband_mode::store_1st) {
+        asc_storealign_1st(dst, src.reg);
+    } else if constexpr (sideband_mode == store_sideband_mode::pack) {
+        asc_storealign_pack(dst, src.reg, src.mask);
+    } else if constexpr (sideband_mode == store_sideband_mode::pack_quarter) {
+        asc_storealign_pack_quarter(dst, src.reg, src.mask);
+    } else if constexpr (sideband_mode == store_sideband_mode::intlv) {
+        static_assert(sideband_mode != store_sideband_mode::intlv,
+            "intlv requires the two-source store overload");
+    } else {
+        static_assert(sideband_mode == store_sideband_mode::direct, "unsupported store sideband mode");
+    }
+}
+
+template <store_sideband_mode sideband_mode, typename Pointer, typename RegDataType>
+__simd_callee__ inline void store_to_ptr(
+    Pointer dst, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1)
+{
+    if constexpr (sideband_mode == store_sideband_mode::intlv) {
+        asc_storealign_intlv(dst, src0.reg, src1.reg);
+    } else {
+        static_assert(sideband_mode == store_sideband_mode::intlv,
+            "the two-source store overload only supports intlv");
+    }
+}
+
+} // namespace detail
 
 template <store_sideband_mode sideband_mode, typename Tensor, typename Coord, typename RegDataType>
 __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src)
@@ -39,21 +73,20 @@ __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "store");
 
     auto dst_engine = tensor.engine() + tensor.layout()(coord);
-    auto dst = dst_engine.begin().get();
-    if constexpr (sideband_mode == store_sideband_mode::direct) {
-        asc_storealign(dst, src.reg, src.mask);
-    } else if constexpr (sideband_mode == store_sideband_mode::store_1st) {
-        asc_storealign_1st(dst, src.reg);
-    } else if constexpr (sideband_mode == store_sideband_mode::pack) {
-        asc_storealign_pack(dst, src.reg, src.mask);
-    } else if constexpr (sideband_mode == store_sideband_mode::pack_quarter) {
-        asc_storealign_pack_quarter(dst, src.reg, src.mask);
-    } else if constexpr (sideband_mode == store_sideband_mode::intlv) {
-        static_assert(sideband_mode != store_sideband_mode::intlv,
-            "intlv requires the store(tensor, coord, src0, src1) overload");
-    } else {
-        static_assert(sideband_mode == store_sideband_mode::direct, "unsupported store sideband mode");
-    }
+    detail::store_to_ptr<sideband_mode>(dst_engine.begin().get(), src);
+}
+
+template <store_sideband_mode sideband_mode, typename Tensor, typename RegDataType>
+__simd_callee__ inline void store(Tensor& tensor, const reg_tensor<RegDataType>& src)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "store only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, RegDataType>,
+        "store requires matching tensor and register element types");
+
+    detail::store_to_ptr<sideband_mode>(tensor.engine().begin().get(), src);
 }
 
 template <store_sideband_mode sideband_mode, typename Tensor, typename Coord, typename RegDataType>
@@ -68,13 +101,22 @@ __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_
         "store requires matching tensor and register element types");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "store");
 
-    if constexpr (sideband_mode == store_sideband_mode::intlv) {
-        auto dst_engine = tensor.engine() + tensor.layout()(coord);
-        asc_storealign_intlv(dst_engine.begin().get(), src0.reg, src1.reg);
-    } else {
-        static_assert(sideband_mode == store_sideband_mode::intlv,
-            "the two-source store overload only supports intlv");
-    }
+    auto dst_engine = tensor.engine() + tensor.layout()(coord);
+    detail::store_to_ptr<sideband_mode>(dst_engine.begin().get(), src0, src1);
+}
+
+template <store_sideband_mode sideband_mode, typename Tensor, typename RegDataType>
+__simd_callee__ inline void store(
+    Tensor& tensor, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "store only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, RegDataType>,
+        "store requires matching tensor and register element types");
+
+    detail::store_to_ptr<sideband_mode>(tensor.engine().begin().get(), src0, src1);
 }
 
 } // namespace experimental

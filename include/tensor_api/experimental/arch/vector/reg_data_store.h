@@ -27,10 +27,17 @@ template <store_sideband_mode sideband_mode = store_sideband_mode::direct, typen
     typename RegDataType>
 __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src);
 
+template <store_sideband_mode sideband_mode = store_sideband_mode::direct, typename Tensor, typename RegDataType>
+__simd_callee__ inline void store(Tensor& tensor, const reg_tensor<RegDataType>& src);
+
 template <store_sideband_mode sideband_mode = store_sideband_mode::intlv, typename Tensor, typename Coord,
     typename RegDataType>
 __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src0,
     const reg_tensor<RegDataType>& src1);
+
+template <store_sideband_mode sideband_mode = store_sideband_mode::intlv, typename Tensor, typename RegDataType>
+__simd_callee__ inline void store(
+    Tensor& tensor, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
 
 } // namespace experimental
 } // namespace te
