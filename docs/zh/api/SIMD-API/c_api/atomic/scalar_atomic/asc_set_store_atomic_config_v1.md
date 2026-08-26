@@ -29,13 +29,19 @@
 头文件路径为：`"c_api/atomic/scalar_atomic.h"`。
 
 设置原子操作启用位与原子操作类型的值。
+该接口包含两类重载：`type`和`op`形态用于设置原子操作启用位与原子操作类型；`type`、`op`、`value`和`addr`形态在设置配置后，对指定GM地址执行标量原子操作。
 
 ## 函数原型
 
 ```c
-__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type,
-                                                      uint16_t op)
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op)
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op,
+    <dtype> value, __gm__ <dtype>* addr)
 ```
+
+### dtype支持数据类型
+
+`dtype`取值为：`float`、`half`、`int16_t`、`int32_t`、`int8_t`、`bfloat16_t`。
 
 ## 参数说明
 
@@ -43,8 +49,10 @@ __aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type,
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| type | 输入 | 原子操作启用位。<br>0：无原子操作。<br>1：开启原子操作，进行原子操作的数据类型为float。<br>2：开启原子操作，进行原子操作的数据类型为half。<br>3：开启原子操作，进行原子操作的数据类型为int16_t。<br>4：开启原子操作，进行原子操作的数据类型为int32_t。<br>5：开启原子操作，进行原子操作的数据类型为int8_t。<br>6：开启原子操作，进行原子操作的数据类型为bfloat16_t。 |
-| op | 输入 | 原子操作类型。<br>0：求和操作。 |
+| type | 输入 | 原子操作启用位。<br>0：无原子操作。<br>1：开启原子操作，进行原子操作的数据类型为float。<br>2：开启原子操作，进行原子操作的数据类型为half。<br>3：开启原子操作，进行原子操作的数据类型为int16_t。<br>4：开启原子操作，进行原子操作的数据类型为int32_t。<br>5：开启原子操作，进行原子操作的数据类型为int8_t。<br>6：开启原子操作，进行原子操作的数据类型为bfloat16_t。<br>其余值无具体含义。 |
+| op | 输入 | 原子操作类型。<br>0：求和操作。<br>其余值无具体含义。 |
+| value | 输入 | 参与原子操作的输入标量。 |
+| addr | 输入/输出 | 原子操作的目标GM地址。 |
 
 ## 返回值说明
 
@@ -58,6 +66,9 @@ PIPE_S
 
 - 使用完成后，建议通过[asc_disable_dma_atomic](../datamove_atomic/asc_disable_dma_atomic.md)清空原子操作的状态，以免影响后续相关指令功能。
 - 该指令执行前不会对GM的数据做清零操作，开发者需在需要时手动添加清零操作。
+- 调用四参数重载时，`type`对应的数据类型必须与`value`和`addr`的数据类型一致。
+- 当前仅支持`op`为0，即求和操作。
+- `addr`起始地址须按`dtype`的字节数对齐，并且须落在GM可访问地址空间内。
 
 ## 调用示例
 
