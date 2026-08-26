@@ -759,7 +759,18 @@ None
 <!-- end id29 -->
 ```
 
-[Negative example] The API documentation does not completely list the supported data types and constraints, and some of the listed information is inaccurately described or inconsistent with the actual behavior.
+[Negative example] The following API documentation lists only some data types and does not distinguish support across different products. The constraint description does not specify address alignment requirements for different storage locations, and omits alignment requirements for the transfer size and synchronization requirements when the source and destination addresses overlap.
+
+```text
+## Data Types
+
+The supported data types are: half and float.
+
+## Constraint Description
+
+- Both the source and destination addresses must be aligned to 32 bytes.
+- The transfer size has no alignment requirement.
+```
 
 ### DOC-COMP-01 Layered Example Coverage
 
@@ -830,57 +841,7 @@ int32_t main(int32_t argc, char* argv[])
 ```
 ````
 
-### DOC-COMP-02 Describe API Relationships and Combined Usage
-
-[Level] Principle
-
-[Description] Each API page explains the combined usage relationships and prohibitions between APIs within the same version. If an API is deprecated, link to the page for the new API that implements the same functionality.
-
-**Requirements**:
-
-- Annotate mutually exclusive combinations in a standalone warning box (for example, "Combining BatchMatmul with SetQuantVector is not supported").
-- Provide a selection decision tree or comparison table for API families with similar functionality.
-- Deprecated APIs must link to the page for the new API that implements the same functionality.
-- If an API must work with other interfaces, explicitly list the related APIs.
-
-[Positive example]
-
-**Annotate mutually exclusive combinations in a standalone warning box**:
-
-```text
->[!NOTE]Description
->- Batch Matmul does not support quantization/dequantization modes. That is, the [SetQuantScalar](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantScalar.md) and [SetQuantVector](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantVector.md) interfaces are not supported.
-```
-
-**Provide a selection decision tree or comparison table for API families with similar functionality**:
-
-```text
-Compare and Compares are referred to as comparison interfaces. They compare the values of Tensor or Scalar elements one by one and generate a mask based on the comparison result. The recommended usage scenarios are as follows:
-
-**Table 1**  Recommended usage scenarios for comparison interfaces
-
-| API | Core functionality | Mask type | Recommended usage scenario |
-| --- | --- | --- | --- |
-| [Compare](Compare.md) | Compares the values of two tensors element by element. If a comparison result is true, the corresponding bit in the output result is 1; otherwise, it is 0. Multiple comparison modes are supported (equal to, less than, greater than, ...).<br>Mask settings for Vector computation are not supported. The result is stored in UB. | Not used | Element-by-element comparison, with the result written to memory. |
-| [Compare (result stored in a register)](Compare_store_to_register.md) | Compares the values of two tensors element by element. If a comparison result is true, the corresponding bit in the output result is 1; otherwise, it is 0. Multiple comparison modes are supported.<br>Mask settings for Vector computation are supported. The result is temporarily stored in the CmpMask register. For details, see [Table 2 CmpMask and VectorMask](#cmpMask-vectorMask). | The mask passed through src is used for Vector computation;<br>the output result is CmpMask (comparison mask). | Element-by-element comparison, with the result written to a register. |
-| [Compares](Compares.md) | Compares each element in a tensor with another scalar. If a comparison result is true, the corresponding bit in the output result is 1; otherwise, it is 0.<br>Multiple comparison modes are supported. | Not used | Element-by-element comparison between a tensor and a scalar, with the result written to memory. |
-```
-
-**Link a deprecated API to the page for the new API that implements the same functionality**:
-
-```text
-## Function Description
-
-**This interface has been deprecated. Use [asc_set_atomic_add_int32](../simd_atomic/asc_set_atomic_add.md) instead.**
-```
-
-**If an API must work with other interfaces, explicitly list the related APIs**:
-
-```text
-WaitPreBlock and NotifyNextBlock must be used together with the [InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md#) interface. Using these three interfaces together ensures that multiple AIV cores execute strictly in ascending order of blockIdx. This is applicable to scenarios requiring deterministic computation. For the specific meaning of deterministic computation, see [Deterministic Computation](../../atomic_operations/key_features.md).
-```
-
-### DOC-COMP-03 Complete Cross-Generation Migration Coverage
+### DOC-COMP-02 Complete Cross-Generation Migration Coverage
 
 [Level] Principle
 
@@ -964,7 +925,7 @@ Specifically, the main changes in the 3510 architecture are shown in the followi
     ```
 ````
 
-### DOC-COMP-04 Version Constraint Annotation Specifications
+### DOC-COMP-03 Version Constraint Annotation Specifications
 
 [Level] Specification
 
@@ -1014,7 +975,7 @@ Some design requirements span multiple dimensions and must satisfy them simultan
 | Design requirement | Discoverability | Readability | Completeness | Specific operation |
 |---------|---------|--------|--------|---------|
 | **Terminology mapping table** | Unified entry point | Terminology appropriate to each level | — | Create a standalone appendix file |
-| **Decision tree/comparison table** | Three-level navigation | Distinguish easily confused concepts | API relationships | Provide one at every branch requiring a choice among multiple options |
+| **Decision tree/comparison table** | Three-level navigation | Distinguish easily confused concepts | — | Provide one at every branch requiring a choice among multiple options |
 | **Code examples** | Link to the example repository | Concise and focused | Layered coverage | Provide at least one Standard example on each API page; provide a Minimal example and complete example link in the guides and practice documents |
 | **Constraint box** | — | Prominent and introduced in advance | Zero omission | Provide constraint information where the relevant item is first defined |
 | **Parameter diagrams** | — | Visualization | Constraint visualization | Complex parameters such as stride/layout/mask types must include diagrams |

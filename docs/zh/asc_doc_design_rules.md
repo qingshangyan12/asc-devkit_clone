@@ -637,11 +637,11 @@ AscendC::Mutex::Unlock<PIPE_MTE2>(mutex_id);
 
 【描述】每个概念/API首次出现时提供前置知识铺垫，确保**不逆序阅读**：
 
-- 若章节涉及前置知识，该章节的开头需要放置相关的概念说明
+- 若章节涉及前置知识，该章节的起始处需要放置相关的概念说明
 - 编程指南章节按学习路径排列：基础概念→编程模型→编程范式→性能优化（不按功能模块平铺）
 - 概念B依赖概念A时，A先出现或在B处有明确引用链接
 
-【正例】如下算子功能设计章节涉及到了aclnn工程化算子开发的前置知识，在开头放置了相关说明：
+【正例】如下算子功能设计章节涉及到了aclnn工程化算子开发的前置知识，在章节起始处放置了相关说明：
 
 ```text
 # 算子功能设计
@@ -759,7 +759,18 @@ AscendC::Mutex::Unlock<PIPE_MTE2>(mutex_id);
 <!-- end id29 -->
 ```
 
-【反例】API文档中未完整列出支持的数据类型及约束条件，且部分已列出的信息存在描述不准确或与实际不符的情况。
+【反例】如下API文档仅列出部分数据类型，未区分不同产品的支持情况；约束说明未明确不同存储位置的地址对齐要求，并遗漏搬运量对齐和目的地址重叠场景下的同步要求。
+
+```text
+## 数据类型
+
+支持的数据类型为：half、float。
+
+## 约束说明
+
+- 源地址和目的地址均需要32字节对齐。
+- 搬运的数据量不受限制。
+```
 
 ### DOC-COMP-01 示例分层覆盖
 
@@ -830,57 +841,7 @@ int32_t main(int32_t argc, char* argv[])
 ```
 ````
 
-### DOC-COMP-02 API关联与组合使用说明
-
-【级别】原则
-
-【描述】每个API页面说明同一版本内API之间的组合使用关系和禁忌。若API废弃需要链接到实现此功能的新API页面。
-
-**要求**：
-
-- 互斥组合用独立警告框标注（如"BatchMatmul与SetQuantVector组合不支持"）
-- 功能相近API族提供选择决策树或对照表
-- 废弃API需要链接到实现此功能的新API页面
-- 若API需与其他接口协同工作，应明确列出相关API
-
-【正例】
-
-**互斥组合用独立警告框标注**：
-
-```text
->[!NOTE]说明
->- Batch Matmul不支持量化/反量化模式，即不支持[SetQuantScalar](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantScalar.md)、[SetQuantVector](../../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantVector.md)接口。
-```
-
-**功能相近API族提供选择决策树或对照表**：
-
-```text
-Compare、Compares称之为比较接口，用于逐元素比较Tensor或Scalar的大小，并根据比较结果生成掩码。推荐使用场景如下：
-
-**表1**  比较接口推荐使用场景
-
-| API | 核心功能 | Mask类型 | 推荐使用场景 |
-| --- | --- | --- | --- |
-| [Compare](Compare.md) | 逐元素比较两个tensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。支持多种比较模式（等于、小于、大于...）。<br>不支持Vector计算的Mask设置。结果存入UB。 | 未使用 | 逐元素比较，结果写入内存。 |
-| [Compare（结果存入寄存器）](Compare_store_to_register.md) | 逐元素比较两个tensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。支持多种比较模式。<br>支持Vector计算的Mask设置。结果暂存CmpMask寄存器。详情参考[表2 CmpMask与VectorMask](#cmpMask-vectorMask)。 | src传参mask用于Vector计算；<br>输出结果为CmpMask（比较掩码）。 | 逐元素比较，结果写寄存器。 |
-| [Compares](Compares.md) | 逐元素比较一个tensor中的元素和另一个scalar的大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。<br>支持多种比较模式。 | 未使用 | 张量和标量逐元素比较，结果写入内存。 |
-```
-
-**废弃API链接到实现此功能的新API页面**:
-
-```text
-## 功能说明
-
-**该接口已废弃，请使用[asc_set_atomic_add_int32](../simd_atomic/asc_set_atomic_add.md)替代。**
-```
-
-**API需与其他接口协同工作，明确列出相关API**:
-
-```text
-WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md#)接口配合使用，这三个接口组合使用能够确保多个AIV核严格按照blockIdx的升序执行，适用于要求确定性计算的场景，确定性计算的具体含义请参考[确定性计算](../../atomic_operations/key_features.md)。
-```
-
-### DOC-COMP-03 跨代迁移覆盖完备
+### DOC-COMP-02 跨代迁移覆盖完备
 
 【级别】原则
 
@@ -964,7 +925,7 @@ WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDeter
     ```
 ````
 
-### DOC-COMP-04 版本约束标注规范
+### DOC-COMP-03 版本约束标注规范
 
 【级别】规范
 
@@ -1009,12 +970,12 @@ WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDeter
 
 ## 5 三维度交叉设计
 
-部分设计要求横跨多个维度，需同时满足：
+部分设计要求横跨可获取性、可读性、完备性中的多个维度，需同时满足：
 
 | 设计要求 | 可获取性 | 可读性 | 完备性 | 具体操作 |
 |---------|---------|--------|--------|---------|
 | **术语对照表** | 统一入口 | 按层用词 | — | 建立独立附录文件 |
-| **决策树/对比表** | 三层导航 | 易混区分 | API关联 | 每个多选岔路口提供 |
+| **决策树/对比表** | 三层导航 | 易混区分 | — | 每个多选岔路口提供 |
 | **代码示例** | 链接样例库 | 精简聚焦 | 分层覆盖 | API页至少1个Standard示例；指南和实践提供Minimal示例及完整样例链接 |
 | **约束框** | — | 前置醒目 | 零遗漏 | 约束信息在首次定义处 |
 | **参数图解** | — | 图解化 | 约束可视化 | stride/layout/mask类等复杂参数必须配图 |
