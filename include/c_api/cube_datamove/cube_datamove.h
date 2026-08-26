@@ -40,6 +40,8 @@ __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config);
 
 __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config);
 
+__aicore__ inline void asc_set_l0c_copy_channel_para(uint16_t src_nz_matrix_stride);
+
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
 
 __aicore__ inline void asc_set_l13d_padding(uint64_t config);
