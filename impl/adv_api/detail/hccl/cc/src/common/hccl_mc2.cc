@@ -490,19 +490,20 @@ CcuResult GetLaunchHandles(
 void LogKernelLaunchArgs(
     const AlgResourceCtxSerializable& resourceCtx, ThreadHandle threadHandle, CcuKernelHandle kernelHandle)
 {
-    if (resourceCtx.kfcServerArgs.size() >= 6U) {
+    if (resourceCtx.kfcServerArgs.size() >= 7U) {
         HCCL_INFO(
             "[CcuKernelLaunch] HcommCcuKernelLaunch args: "
             "threadHandle[0x%llx], kernelHandle[0x%llx], argSize[%u], "
             "xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], missionNum[%llu], "
-            "missionIndex[%llu], token[%llu]",
+            "missionIndex[%llu], token[%llu], subKernelPc[0x%llx]",
             static_cast<unsigned long long>(threadHandle), static_cast<unsigned long long>(kernelHandle),
             resourceCtx.kfcServerArgSize, static_cast<unsigned long long>(resourceCtx.kfcServerArgs[0]),
             static_cast<unsigned long long>(resourceCtx.kfcServerArgs[1]),
             static_cast<unsigned long long>(resourceCtx.kfcServerArgs[2]),
             static_cast<unsigned long long>(resourceCtx.kfcServerArgs[3]),
             static_cast<unsigned long long>(resourceCtx.kfcServerArgs[4]),
-            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[5]));
+            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[5]),
+            static_cast<unsigned long long>(resourceCtx.kfcServerArgs[6]));
     } else {
         HCCL_INFO(
             "[CcuKernelLaunch] HcommCcuKernelLaunch args: "

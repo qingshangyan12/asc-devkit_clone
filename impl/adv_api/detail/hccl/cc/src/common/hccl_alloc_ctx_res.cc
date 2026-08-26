@@ -140,7 +140,8 @@ namespace {
 bool IsCcuKfcSupportedOp(uint32_t opType)
 {
     return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
-           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE);
 }
 } // namespace
 
@@ -196,6 +197,7 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
     void* comSyncPtr = nullptr;
 
     CHK_RET(GetOrCreateCcuCtx(comm, tagWorkspace, Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
+    HCCL_INFO("Used scratchSize: %zu.", scratchSize);
     CHK_RET(GetOrCreateCcuCtx(comm, tagScratch, scratchSize, &scratchPtr));
     CHK_RET(GetOrCreateCcuCtx(comm, tagComParam, comParamBufSize, &comParamPtr));
     CHK_RET(GetOrCreateCcuCtx(comm, tagComSync, comSyncBufSize, &comSyncPtr));
@@ -771,25 +773,29 @@ static HcclResult AcquireAlgResources(
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     if (opParam.engine == COMM_ENGINE_CCU) {
-        // 填充 kfcServerArgs 的所有6个字段（最后一个为 token 占位符，后续更新）
+        // The device-side open resource cache validates this token against OpParam::hcclComm.
+        resCtxHost->commInfoPtr = static_cast<void*>(comm);
+        // 填充 kfcServerArgs：token 和 sub-kernel PC 先占位，后续分别更新。
         resCtxHost->kfcServerArgs = {
             opResCtx.xnAddr,          opResCtx.ckeAddr,
             static_cast<uint64_t>(1), // dieNum
             static_cast<uint64_t>(1), // missionNum
             static_cast<uint64_t>(0), // missionIndex
             static_cast<uint64_t>(0), // token 占位符，后续在 GetAlgResCcu 中更新
+            static_cast<uint64_t>(0), // sub-kernel PC 占位符，kernel 注册翻译后更新
         };
-        resCtxHost->kfcServerArgSize = 6;
+        resCtxHost->kfcServerArgSize = 7;
         HCCL_INFO(
             "[AcquireAlgResources] kfcServerArgs generated: "
             "argSize[%u], xnAddr[0x%llx], ckeAddr[0x%llx], dieNum[%llu], "
-            "missionNum[%llu], missionIndex[%llu], token[%llu]",
+            "missionNum[%llu], missionIndex[%llu], token[%llu], subKernelPc[0x%llx]",
             resCtxHost->kfcServerArgSize, static_cast<unsigned long long>(resCtxHost->kfcServerArgs[0]),
             static_cast<unsigned long long>(resCtxHost->kfcServerArgs[1]),
             static_cast<unsigned long long>(resCtxHost->kfcServerArgs[2]),
             static_cast<unsigned long long>(resCtxHost->kfcServerArgs[3]),
             static_cast<unsigned long long>(resCtxHost->kfcServerArgs[4]),
-            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[5]));
+            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[5]),
+            static_cast<unsigned long long>(resCtxHost->kfcServerArgs[6]));
 
         CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
         opParam.resCtx = *resCtxOut;
