@@ -40,9 +40,11 @@ def pad_matrix(data_nd, rows, columns):
 
 def nd_to_nz(data_nd):
     rows, columns = data_nd.shape
-    return data_nd.reshape(
-        rows // C0_SIZE, C0_SIZE, columns // C0_SIZE, C0_SIZE
-    ).transpose(2, 0, 1, 3).copy()
+    return (
+        data_nd.reshape(rows // C0_SIZE, C0_SIZE, columns // C0_SIZE, C0_SIZE)
+        .transpose(2, 0, 1, 3)
+        .copy()
+    )
 
 
 def generate_data(scenario_num=1):
