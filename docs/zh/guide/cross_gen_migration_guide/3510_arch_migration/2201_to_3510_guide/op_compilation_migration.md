@@ -13,14 +13,14 @@
     )
     ```
 
-- 对于使用msOpGen工具生成的标准自定义算子工程的情况，会自动在算子工程目录下生成编译配置项文件CMakePresets.json中，并自动填充ASCEND\_COMPUTE\_UNIT字段。开发者需要在进行算子原型定义时，通过AddConfig接口注册算子支持的AI处理器型号以及相关的配置信息。AddConfig接口原型如下：soc参数表示AI处理器型号，aicore\_config表示其他配置信息。
+- 对于使用msOpGen工具生成的标准自定义算子工程的情况，会自动在算子工程目录下生成编译配置项文件CMakePresets.json中，并自动填充ASCEND\_COMPUTE\_UNIT字段。新工程也可以使用ASCEND\_SOC\_SERIES替代该字段，二者不能同时配置。开发者需要在进行算子原型定义时，通过AddConfig接口注册算子支持的AI处理器系列以及相关的配置信息。AddConfig接口原型如下：soc参数表示AI处理器系列，aicore\_config表示其他配置信息。
 
     ```
     void AddConfig(const char *soc);
     void AddConfig(const char *soc, OpAICoreConfig &aicore_config);
     ```
 
-    通过该接口注册AI处理器型号的样例如下，ascendxxx填写规则请参考算子工程目录下编译配置项文件CMakePresets.json中的ASCEND\_COMPUTE\_UNIT字段，该字段取值在使用msOpGen创建工程时自动生成。
+    通过该接口注册AI处理器系列的样例如下，ascendxxx填写规则请参考算子工程目录下编译配置项文件CMakePresets.json中的ASCEND\_SOC\_SERIES或ASCEND\_COMPUTE\_UNIT字段，ASCEND_SOC_SERIES字段大小写不敏感。字段取值在使用msOpGen创建工程时自动生成。
 
     ```
     ...
