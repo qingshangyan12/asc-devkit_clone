@@ -2581,7 +2581,10 @@ __simd_callee__ inline vector_bool asc_update_mask_b16(uint32_t& value) { return
 __simd_callee__ inline vector_bool asc_update_mask_b32(uint32_t& value) { return asc_update_mask_b32_impl(value); }
 
 // ==========asc_set_vector_mask==========
-__aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low) { asc_set_vector_mask_impl(mask_high, mask_low); }
+__aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low)
+{
+    asc_set_vector_mask_impl(mask_high, mask_low);
+}
 
 // ==========asc_half2int8(rd/ru/rz/rn/rna)==========
 [[deprecated("NOTICE: asc_half2int8_rd(vector_int8_t& dst, vector_half src, vector_bool mask) is deprecated. "
