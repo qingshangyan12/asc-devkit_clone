@@ -62,6 +62,37 @@ __aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op
     asc_set_store_atomic_config_v1_impl(type, op);
 }
 
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, int8_t value, __gm__ int8_t* addr)
+{
+    asc_set_store_atomic_config_v1_impl(type, op, value, addr);
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, int16_t value, __gm__ int16_t* addr)
+{
+    asc_set_store_atomic_config_v1_impl(type, op, value, addr);
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, int32_t value, __gm__ int32_t* addr)
+{
+    asc_set_store_atomic_config_v1_impl(type, op, value, addr);
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, half value, __gm__ half* addr)
+{
+    asc_set_store_atomic_config_v1_impl(type, op, value, addr);
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, float value, __gm__ float* addr)
+{
+    asc_set_store_atomic_config_v1_impl(type, op, value, addr);
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1(
+    uint16_t type, uint16_t op, bfloat16_t value, __gm__ bfloat16_t* addr)
+{
+    asc_set_store_atomic_config_v1_impl(type, op, value, addr);
+}
+
 __aicore__ inline void asc_set_atomic_add_bfloat() { asc_set_atomic_add_bfloat_impl(); }
 
 __aicore__ inline void asc_set_atomic_add_float() { asc_set_atomic_add_float_impl(); }
