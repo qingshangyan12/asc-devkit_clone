@@ -19,39 +19,39 @@ protected:
     void TearDown() { g_coreType = C_API_AIV_TYPE; }
 };
 
-#define TEST_ASC_SYNC_SUBBLOCK_ARRIVE(coreType, pipeVal)                                                          \
-    void sync_subblock_arrive_2201_ffts_cross_core_sync_stub_##coreType##_##pipeVal(pipe_t pipe, uint64_t config) \
-    {                                                                                                             \
-        constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;                                                             \
-        constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;                                                             \
-                                                                                                                  \
-        uint16_t mode = 0x01;                                                                                     \
-        uint64_t flag_id = 2;                                                                                     \
-        uint64_t expectedConfig =                                                                                 \
-            (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE));         \
-        EXPECT_EQ(pipe, pipeVal);                                                                                 \
-        EXPECT_EQ(config, expectedConfig);                                                                        \
-    }                                                                                                             \
-                                                                                                                  \
-    TEST_F(TestAscSyncSubBlockArriveCAPI, c_api_asc_sync_subblock_arrive_##coreType##_##pipeVal)                  \
-    {                                                                                                             \
-        g_coreType = coreType;                                                                                    \
-        MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))                                                  \
-            .times(1)                                                                                             \
-            .will(invoke(sync_subblock_arrive_2201_ffts_cross_core_sync_stub_##coreType##_##pipeVal));            \
-                                                                                                                  \
-        pipe_t pipe = pipeVal;                                                                                    \
-        int64_t flag_id = 2;                                                                                      \
-                                                                                                                  \
-        asc_sync_subblock_arrive(pipe, flag_id);                                                                  \
-        GlobalMockObject::verify();                                                                               \
+#define TEST_ASC_SYNC_SUBBLOCK_ARRIVE(pipeVal)                                                            \
+    void sync_subblock_arrive_2201_ffts_cross_core_sync_stub_##pipeVal(pipe_t pipe, uint64_t config)      \
+    {                                                                                                     \
+        constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;                                                     \
+        constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;                                                     \
+                                                                                                          \
+        uint16_t mode = 0x01;                                                                             \
+        uint64_t flag_id = 2;                                                                             \
+        uint64_t expectedConfig =                                                                         \
+            (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE)); \
+        EXPECT_EQ(pipe, pipeVal);                                                                         \
+        EXPECT_EQ(config, expectedConfig);                                                                \
+    }                                                                                                     \
+                                                                                                          \
+    TEST_F(TestAscSyncSubBlockArriveCAPI, c_api_asc_sync_subblock_arrive_##pipeVal)                       \
+    {                                                                                                     \
+        MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))                                          \
+            .times(1)                                                                                     \
+            .will(invoke(sync_subblock_arrive_2201_ffts_cross_core_sync_stub_##pipeVal));                 \
+                                                                                                          \
+        pipe_t pipe = pipeVal;                                                                            \
+        int64_t flag_id = 2;                                                                              \
+                                                                                                          \
+        asc_sync_subblock_arrive(pipe, flag_id);                                                          \
+        GlobalMockObject::verify();                                                                       \
     }
 
-TEST_ASC_SYNC_SUBBLOCK_ARRIVE(C_API_AIC_TYPE, PIPE_M);
-TEST_ASC_SYNC_SUBBLOCK_ARRIVE(C_API_AIC_TYPE, PIPE_MTE1);
-TEST_ASC_SYNC_SUBBLOCK_ARRIVE(C_API_AIC_TYPE, PIPE_MTE2);
-TEST_ASC_SYNC_SUBBLOCK_ARRIVE(C_API_AIC_TYPE, PIPE_MTE3);
-TEST_ASC_SYNC_SUBBLOCK_ARRIVE(C_API_AIC_TYPE, PIPE_FIX);
-TEST_ASC_SYNC_SUBBLOCK_ARRIVE(C_API_AIV_TYPE, PIPE_MTE2);
-TEST_ASC_SYNC_SUBBLOCK_ARRIVE(C_API_AIV_TYPE, PIPE_MTE3);
-TEST_ASC_SYNC_SUBBLOCK_ARRIVE(C_API_AIV_TYPE, PIPE_V);
+// ==========asc_sync_subblock_arrive==========
+TEST_ASC_SYNC_SUBBLOCK_ARRIVE(PIPE_S);
+TEST_ASC_SYNC_SUBBLOCK_ARRIVE(PIPE_V);
+TEST_ASC_SYNC_SUBBLOCK_ARRIVE(PIPE_M);
+TEST_ASC_SYNC_SUBBLOCK_ARRIVE(PIPE_MTE1);
+TEST_ASC_SYNC_SUBBLOCK_ARRIVE(PIPE_MTE2);
+TEST_ASC_SYNC_SUBBLOCK_ARRIVE(PIPE_MTE3);
+TEST_ASC_SYNC_SUBBLOCK_ARRIVE(PIPE_ALL);
+TEST_ASC_SYNC_SUBBLOCK_ARRIVE(PIPE_FIX);
