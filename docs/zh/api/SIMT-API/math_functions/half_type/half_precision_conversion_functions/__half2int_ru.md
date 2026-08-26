@@ -51,8 +51,8 @@ inline int __half2int_ru(const half x)
 | nan | 0 |
 | inf | 2147483647（int32_t最大值） |
 | -inf | -2147483648（int32_t最小值） |
-| ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
-| -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
+| ASCRT\_MAX\_NORMAL\_FP16 | 65504 |
+| -ASCRT\_MAX\_NORMAL\_FP16 | -65504 |
 | 0.5 | 1 |
 | -0.5 | 0 |
 | ASCRT\_MIN\_DENORM\_FP16 | 1 |
