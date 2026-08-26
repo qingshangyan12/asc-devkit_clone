@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/tensor_transform/TransData_res.md#id1 -->
 
 ## 功能说明
 
@@ -37,28 +38,28 @@
     输入Tensor \{shape:\[N, C, D, H, W\]\}，输出Tensor \{shape:\[N, D, C/16, H, W, 16\]\}。请注意，C0实际上等于16，为便于展示，下图中C0被设定为2。
 
     **图1**  NCDHW格式转为NDC1HWC0格式示意图
-    ![](../../../figures/NCDHW格式转为NDC1HWC0格式示意图.png "NCDHW格式转为NDC1HWC0格式示意图")
+    ![](../../../figures/ncdhw_to_ndc1hwc0.png "NCDHW格式转为NDC1HWC0格式示意图")
 
 -   场景2：NDC1HWC0 -\> NCDHW
 
     输入Tensor \{shape:\[N, D, C/16, H, W, 16\]\}，输出Tensor \{shape:\[N, C, D, H, W\]\}。请注意，C0实际上等于16，为便于展示，下图中C0被设定为2。
 
     **图2**  NDC1HWC0格式转为NCDHW格式示意图
-    ![](../../../figures/NDC1HWC0格式转为NCDHW格式示意图.png "NDC1HWC0格式转为NCDHW格式示意图")
+    ![](../../../figures/ndc1hwc0_to_ncdhw.png "NDC1HWC0格式转为NCDHW格式示意图")
 
 -   场景3：NCDHW -\> FRACTAL\_Z\_3D
 
     输入Tensor \{shape:\[N, C, D, H, W\]\}，输出Tensor \{shape:\[D, C/16, H, W, N/16, 16, 16\]\}。请注意，C0和N0实际上等于16，为便于展示，下图中C0和N0被设定为2。
 
     **图3**  NCDHW格式转为FRACTAL\_Z\_3D格式示意图
-    ![](../../../figures/NCDHW格式转为FRACTAL_Z_3D格式示意图.png "NCDHW格式转为FRACTAL_Z_3D格式示意图")
+    ![](../../../figures/ncdhw_to_fractal_z_3d.png "NCDHW格式转为FRACTAL_Z_3D格式示意图")
 
 -   场景4：FRACTAL\_Z\_3D -\> NCDHW
 
     输入Tensor \{shape:\[D, C/16, H, W, N/16, 16, 16\]\}，输出Tensor \{shape:\[N, C, D, H, W\]\}。请注意，C0和N0实际上等于16，为便于展示，下图中C0和N0被设定为2。
 
     **图4**  FRACTAL\_Z\_3D格式转为NCDHW格式示意图
-    ![](../../../figures/FRACTAL_Z_3D格式转为NCDHW格式示意图.png "FRACTAL_Z_3D格式转为NCDHW格式示意图")
+    ![](../../../figures/fractal_z_3d_to_ncdhw.png "FRACTAL_Z_3D格式转为NCDHW格式示意图")
 
 ## 函数原型
 
@@ -142,7 +143,7 @@ params = {ncdhwLayout, fractalzLayout};
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../general_description_and_constraints.md#section796754519912)。
 -   不支持源操作数与目的操作数地址重叠。
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
 -   对于NCDHW格式的输入，如果H轴和W轴合并后的轴不是32字节对齐，则在调用此接口前，用户需要在合并后的轴上填充数据，使其达到32字节对齐。调用此接口时，在指定Shape信息的参数处，应传入原始Shape，即合轴前的Shape。例如，如果输入的原始Shape是\[1, 16, 2, 3, 5\]，则用户需要将输入数据填充至Shape \[1, 16, 2, 16\]，填充的数据为无效数据。

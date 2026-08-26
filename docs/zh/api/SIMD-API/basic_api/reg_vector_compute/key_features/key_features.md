@@ -15,7 +15,7 @@ Reg矢量计算架构中，Vector Function（VF）是实现高性能向量计算
 ## 指令双发优化
 Reg矢量计算接口指令单双发的情况请参考[Reg矢量计算接口指令单双发汇总](../../../../appendix/reg_vector_compute_interface_instruction_single_dual_issue_summary.md)。
 
-指令双发优化的性能优化详细内容请参考[算子实践参考-指令双发优化](../../../../../guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/指令双发优化.md)。
+指令双发优化的性能优化详细内容请参考[算子实践参考-指令双发优化](../../../../../guide/operator_practice/simd_operator_optimization/vector_compute/vf_optimization/dual_issue_optimization.md)。
 
 ### 指令双发
 
@@ -25,7 +25,7 @@ Reg矢量计算接口指令单双发的情况请参考[Reg矢量计算接口指�
 
 ### 合理拆分VF循环
 
-VF并不是写的越长，把所有运算都放在一个for循环内就好，需要适当的搬出中间结果到UB，减少数据依赖。当指令数量过多，可能触发Icache Miss，即使循环间不存在依赖，也无法进行双发。当循环内包含同步，可以通过切分循环将同步外提减少同步次数。
+VF并不是写的越长，把所有运算都放在一个for循环内就好，需要适当的搬出中间结果到Unified Buffer（UB），减少数据依赖。当指令数量过多，可能触发Icache Miss，即使循环间不存在依赖，也无法进行双发。当循环内包含同步，可以通过切分循环将同步外提减少同步次数。
 
 ### 手动控制循环拆分
 
@@ -34,10 +34,10 @@ VF并不是写的越长，把所有运算都放在一个for循环内就好，需
 ## VF融合
 VF融合是将代码中多个VF函数融合成一个VF函数，有效提升性能。VF融合特性是编译器优化特性，通过编译选项--cce-simd-vf-fusion=true开启，VF自动融合会借助Loop Fuse算法，将VF转换成Loop形态，然后将控制流等价（Control-Flow-Equivalent）的VF进行融合，最后将VF进行还原。编译器首先会做融合前的合法性检查，判断两个VF是否等价，Main侧中间代码是否能在VF内执行以及融合后是否可产生正收益。如果满足VF融合条件，编译器会自动执行VF融合优化，为保证融合后的VF执行逻辑与语义与融合前一致，会在原来两个VF之间保守地插入同步指令，编译器还会尝试外提、合并融合后的VF中的指令，对VF代码进行优化。融合策略是能融尽融，用户按照符合融合的合法性检查的模式进行编码，可以增加VF融合的机会。用户也可以参考融合原理手动进行融合优化。
 
-VF融合的性能优化详细内容请参考[算子实践参考-VF融合优化](../../../../../guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF融合优化.md)。
+VF融合的性能优化详细内容请参考[算子实践参考-VF融合优化](../../../../../guide/operator_practice/simd_operator_optimization/vector_compute/vf_optimization/vf_fusion_optimization.md)。
 
 ## 数据搬运优化
-Reg矢量计算API提供了下表所示多种搬运指令，合理选择搬运接口以及利用接口能力进行优化。连续非对齐场景优化的性能优化详细内容请参考[算子实践参考-连续非对齐场景优化](../../../../../guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/连续非对齐场景优化.md)。
+Reg矢量计算API提供了下表所示多种搬运指令，合理选择搬运接口以及利用接口能力进行优化。连续非对齐场景优化的性能优化详细内容请参考[算子实践参考-连续非对齐场景优化](../../../../../guide/operator_practice/simd_operator_optimization/vector_compute/vf_optimization/continuous_unaligned_optimization.md)。
 | 场景 | 描述 |
 | :-- | :-- | 
 | 连续对齐搬入(LoadAlign) | 能够实现数据从起始地址32B对齐的UB连续搬入RegTensor。 |
@@ -56,7 +56,7 @@ Reg矢量计算API提供了下表所示多种搬运指令，合理选择搬运�
 
   **图1** half转int32_t类型转换过程<a id="fig1"></a>
 
-  ![](../../../../figures/half转int32_t类型转换过程.png "half转int32_t类型转换过程")
+  ![](../../../../figures/half_to_int32_conversion.png "half转int32_t类型转换过程")
 
   ```cpp
   // 位宽小转大，以half->int32_t为例 
@@ -77,7 +77,7 @@ Reg矢量计算API提供了下表所示多种搬运指令，合理选择搬运�
 
   **图2** float转int16_t类型转换过程<a id="fig2"></a>
 
-  ![](../../../../figures/float转int16_t类型转换过程.png "float转int16_t类型转换过程")
+  ![](../../../../figures/float_to_int16_conversion.png "float转int16_t类型转换过程")
 
   ```cpp
   // 位宽大转小，以float->int16_t为例 

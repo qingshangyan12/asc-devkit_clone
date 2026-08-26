@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftmaxGrad_res.md#id1 -->
 
 ## 功能说明
 
@@ -47,7 +48,7 @@ def softmax_grad(grad, src, isFront = None):
 以float类型，ND格式，shape为\[m,k\]的输入Tensor为例，描述SoftmaxGrad高阶API内部算法框图，如下图所示。
 
 **图1**  SoftmaxGrad算法框图  
-![](../../../../figures/SoftmaxGrad算法框图.png "SoftmaxGrad算法框图")
+![](../../../../figures/softmaxgrad_algorithm_diagram.png "SoftmaxGrad算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
 
@@ -121,9 +122,11 @@ struct SoftMaxShapeInfo {
 ## 约束说明
 
 -   srcTensor和dstTensor的Tensor空间可以复用。
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
+<!-- npu="A3,910b,310p" id8 -->
 -   当参数softmaxShapeInfo中srcM != oriSrcM或者srcK != oriSrcK时，开发者需要对GM上的原始输入\(oriSrcM, oriSrcK\)在M或K方向补齐数据到\(srcM, srcK\)，补齐的数据会参与部分运算，在输入输出复用的场景下，API的计算结果会覆盖srcTensor中补齐的原始数据，在输入输出不复用的场景下，API的计算结果会覆盖dstTensor中对应srcTensor补齐位置的数据。
+<!-- end id8 -->
 
 ## 调用示例
 

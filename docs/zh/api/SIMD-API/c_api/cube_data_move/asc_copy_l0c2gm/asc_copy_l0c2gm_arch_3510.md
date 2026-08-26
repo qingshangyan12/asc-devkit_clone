@@ -207,7 +207,7 @@ PIPE_FIX
 - 本接口非AIC调用直接返回。
 - `src`起始地址需64字节对齐，否则会导致搬运异常。
 - `dst`起始地址需1字节对齐，否则会导致搬运异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令，详见[核内同步](../../sync/system_sync_overview.md)。
 - L0C Buffer容量上限：L0C Buffer总容量256KB，src偏移量与搬运大小之和不可超过L0C Buffer容量，否则触发源地址越界异常。
 - Nz矩阵以16×16个元素为一个基本分形。边界分形中超出`n_size`或`m_size`指定范围的数据不属于有效搬运结果。
 
@@ -225,7 +225,7 @@ PIPE_FIX
 
 完整工程样例请参考[data_copy_l0c2gm样例](../../../../../../../examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2gm)。
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 本示例占用32KB L1 Buffer、16KB L0A Buffer、16KB L0B Buffer和64KB L0C Buffer，并使用`EVENT_ID0`完成流水同步。
 

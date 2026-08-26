@@ -27,6 +27,7 @@
 <!-- npu="9030" id2 -->
 - Kirin 9030：支持
 <!-- end id2 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/data_filter/DropOut_res.md#id1 -->
 
 ## 功能说明
 
@@ -75,7 +76,7 @@
 以float类型，ND格式，shape为\[srcM, srcN\]的SrcTensor，shape为\[maskM, maskN\]的MaskTensor，比特模式场景为例，描述Dropout高阶API内部算法框图，如下图所示。
 
 **图1**  Dropout算法框图  
-![](../../../figures/Dropout算法框图.png "Dropout算法框图")
+![](../../../figures/dropout_algorithm_diagram.png "Dropout算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
 
@@ -84,7 +85,7 @@
 3.  Muls步骤：将输出数据每个元素除以keepProb。
 
 **图2**  Dropout算法框图  
-![](../../../figures/Dropout算法框图-55.png "Dropout算法框图-55")
+![](../../../figures/dropout_algorithm_diagram_1.png "Dropout算法框图-55")
 
 计算过程在Vector上进行，循环srcM次，每次对srcN个元素进行如下操作：
 
@@ -140,7 +141,7 @@ struct DropOutShapeInfo {
 ## 约束说明
 
 -   srcTensor和dstTensor的Tensor空间可以复用。
--   srcLocal和dstLocal地址对齐要求请见：[通用说明和约束](../../通用说明和约束.md)。
+-   srcLocal和dstLocal地址对齐要求请见：[通用说明和约束](../../general_description_and_constraints.md)。
 -   仅支持输入shape为ND格式。
 -   maskLocal含有脏数据的场景，要求info.maskLastAxis中有效数值的个数，应为2的整数倍。
 -   maskLocal含有脏数据的场景，maskLocal中的数据可能会被修改，脏数据可能会被舍弃。

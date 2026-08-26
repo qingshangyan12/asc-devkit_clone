@@ -26,11 +26,7 @@
 
 ## 功能说明
 
-设置第二组3D格式分形矩阵搬运（im2col展开）的repeat控制参数，包含相邻repeat之间的步长、repeat次数与repeat方向，以及输出矩阵在K维的步长与M维起始位置。本接口接收`uint64_t`立即数整体写入配置寄存器，调用方须按`config`字段拼装说明自行拼装64 bit `config`后传入。配置写入后作用于后续调用的3D格式分形矩阵搬运接口在第二组Feature Map描述（双源拼接场景下由搬运指令的Feature Map选择位选用）下的repeat行为。
-
-本接口仅在AIC上执行有效，在AIV上调用为空操作。
-
-双源拼接场景下，需通过[asc_set_l13d_fmatrix_b](asc_set_l13d_fmatrix_b.md)预先配置第二组Feature Map属性、通过[asc_set_l12l0_padding_val](asc_set_l12l0_padding_val.md)预先配置第二组填充值、通过[asc_set_l13d_size](asc_set_l13d_size.md)预先配置L1 Buffer边界值，再调用本接口配置第二组repeat参数。
+用于设置接口[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)、[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)的2D格式搬运的repeat参数。
 
 ## 函数原型
 
@@ -42,21 +38,19 @@ __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config)
 
 **表1** 参数说明
 
-| 参数名 | 输入/输出 | 含义 |
-|---|---|---|
-| `config` | 输入 | 第二组3D格式分形搬运repeat控制参数的64 bit立即数，类型为`uint64_t`，与配置寄存器位宽一致（64 bit），整个64 bit立即数原样写入寄存器。调用方须按`config`字段拼装说明（表2）的位域定义自行拼装后整体传入。取值范围[0, 2^64−1]。 |
+| 参数名  | 输入/输出 | 描述 |
+| :----- | :------- | :------- |
+| config | 输入 | 用于设置接口asc_copy_l12l0a、asc_copy_l12l0b的2D格式搬运repeat参数。比特位说明参考表2。 |
 
-**表2** `config`字段拼装说明
+**表2** 常用重复控制寄存器比特位说明
 
-| 字段名 | 含义 | 位宽 | 取值范围 |
-|---|---|---|---|
-| `rpt_stride` | 相邻repeat之间的步长。<br>&nbsp;&nbsp;&bull; `rpt_mode=0`（M方向repeat）：单位为16个元素，步长作用于M方向相邻repeat之间的地址偏移；<br>&nbsp;&nbsp;&bull; `rpt_mode=1`（K方向repeat）：单位随搬运数据类型变化，`int4b_t`为64个元素，`b8`为32个元素，`b16`为16个元素，`b32`为8个元素，步长作用于K方向相邻repeat之间的地址偏移。占用`config`的低16位（第0~15位）。 | 16 bit | [0, 2^16−1] |
-| `rpt_time` | repeat次数，即3D格式分形搬运接口对同一批Feature Map重复搬运的迭代次数。不可为0，传入0时硬件不执行搬运（指令置为空操作）。占用`config`的第16~23位。 | 8 bit | [0, 2^8−1] |
-| `rpt_mode` | repeat方向选择。<br>&nbsp;&nbsp;&bull; `0`：M方向repeat，沿M维（行方向）重复搬运；<br>&nbsp;&nbsp;&bull; `1`：K方向repeat，沿K维（通道方向）重复搬运。占用`config`的第24位。 | 1 bit | [0, 1] |
-| `m_dst_stride` | 输出矩阵在K维的步长，单位512字节，用于K方向repeat时控制相邻repeat输出矩阵在K维的地址偏移。占用`config`的第32~47位。 | 16 bit | [0, 2^16−1] |
-| `m_dst_start` | 输出矩阵在M维的起始位置，单位为16个元素，用于控制首个repeat输出矩阵在M维的写入起点。占用`config`的高16位（第48~63位）。 | 16 bit | [0, 2^16−1] |
-
-未列出的位（第25~31位）为保留位，调用方拼装`config`时应填0，避免改变默认行为。
+|L3D_RPT_B比特位    |功能|
+| :-------     | :---- |
+| L3D_RPT_B[15:0]    | 表示重复步长    | 
+| L3D_RPT_B[23:16]   | 表示在M或K方向的重复次数，默认值为1。      | 
+| L3D_RPT_B[24]      | 表示重复模式 <br> - 1'b0: 在M方向重复。 <br> - 1'b1: 在K方向重复。     | 
+| L3D_RPT_B[47:32]   | 表示输出矩阵在K方向上的步长，以分形为单位。     | 
+| L3D_RPT_B[63:48]   | 表示输出矩阵在M方向上的起始位置，以分形为单位。      | 
 
 ## 返回值说明
 
@@ -69,21 +63,6 @@ PIPE_S
 ## 约束说明
 
 - 需要配合接口[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)、[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)使用。
-
-### 通用约束
-
-- **本接口仅在AIC上生效，非AIC调用直接返回。**
-- 本接口仅设置repeat控制参数，实际搬运由后续调用的3D格式搬运接口执行，须先调用本接口写入配置，再调用对应搬运接口。
-- 配置写入后对后续3D格式搬运接口生效，直至再次调用本接口覆盖配置；不同搬运任务间若需不同repeat参数，应在调用搬运接口前重新设置。
-- `config`参数类型为`uint64_t`，与配置寄存器位宽一致（64 bit），整个64 bit立即数原样写入寄存器，无字段截断风险；调用方须自行保证各字段值落在对应位宽范围内。
-- 配置寄存器为只写类型，本接口仅写不读，调用方无法通过本接口确认写入是否生效。
-
-### repeat参数约束
-
-- `rpt_time`为0时，后续3D格式搬运接口不执行搬运，被视为NOP（空操作）。
-- 调用3D格式搬运接口时，必须配置输出矩阵在K方向上的步长和M方向上的起始位置。
-- 未使能repeat模式时，repeat相关字段使用默认值。
-- `rpt_mode`仅取0或1，其他值因1 bit字段会被截断为低1位，实际repeat方向可能与预期不符。
 
 ## 调用示例
 

@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/normalization/LayerNormGrad_res.md#id1 -->
 
 ## 功能说明
 
@@ -41,7 +42,7 @@ res_for_gamma(BSH) = (data_x - data_mean) * np.power((data_variance + EPSILON), 
 以float类型，ND格式，输入为inputDy\[B, S, H\], inputX\[B, S, H\], inputVariance\[B, S\], inputMean\[B, S\], inputGamma\[H\]为例，描述LayerNormGrad高阶API内部算法框图，如下图所示。
 
 **图1**  LayerNormGrad算法框图  
-![](../../../figures/LayerNormGrad算法框图.png "LayerNormGrad算法框图")
+![](../../../figures/layernormgrad_diagram.png "LayerNormGrad算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
 
@@ -112,7 +113,7 @@ struct LayerNormGradShapeInfo {
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../general_description_and_constraints.md#section796754519912)。
 -   源操作数和目的操作数的Tensor空间可以复用。
 -   仅支持输入shape为ND格式。
 -   输入数据不满足对齐要求时，开发者需要进行补齐，补齐的数据应设置为0，防止出现异常值从而影响网络计算。

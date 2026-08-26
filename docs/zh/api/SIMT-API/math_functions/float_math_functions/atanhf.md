@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/float_math_functions/atanhf_res.md#id1 -->
 
 ## 功能说明
 
@@ -46,9 +47,10 @@ inline float atanhf(float x)
 
 输入数据的反双曲正切值。
 
--   当x为inf时，返回值为nan。
--   当x为-inf时，返回值为nan。
 -   当x为nan时，返回值为nan。
+-   当x为1时，返回值为inf。
+-   当x为-1时，返回值为-inf。
+-   当x大于1或小于-1时，返回值为nan。
 
 ## 约束说明
 

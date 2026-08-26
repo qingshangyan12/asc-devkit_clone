@@ -48,15 +48,15 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>* dst,
                                             uint16_t n_value,
                                             uint32_t d_value,
                                             uint64_t loop4_src_stride,
-                                            bool smallc0_en)
+                                            bool enable_small_c0)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ <dtype>* dst,
-                                                 __gm__ <dtype>* src,
-                                                 uint64_t loop1_src_stride,
-                                                 uint8_t l2_cache_ctl,
-                                                 uint16_t n_value,
-                                                 uint32_t d_value,
-                                                 uint64_t loop4_src_stride,
-                                                 bool smallc0_en)
+                                            __gm__ <dtype>* src,
+                                            uint64_t loop1_src_stride,
+                                            uint8_t l2_cache_ctl,
+                                            uint16_t n_value,
+                                            uint32_t d_value,
+                                            uint64_t loop4_src_stride,
+                                            bool enable_small_c0)
 ```
 
 ### dtype支持的数据类型
@@ -74,9 +74,9 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ half* dst,
                                             uint16_t n_value,
                                             uint32_t d_value,
                                             uint64_t loop4_src_stride,
-                                            bool smallc0_en)
-__aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ half* dst,
-                                                 __gm__ half* src,
+                                            bool enable_small_c0)
+__aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ <dtype>* dst,
+                                                 __gm__ <dtype>* src,
                                                  uint64_t loop1_src_stride,
                                                  uint8_t l2_cache_ctl,
                                                  uint16_t n_value,
@@ -144,7 +144,7 @@ PIPE_MTE2
 
 ## 调用示例
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：

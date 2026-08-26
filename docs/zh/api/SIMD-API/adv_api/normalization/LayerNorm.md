@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/normalization/LayerNorm_res.md#id1 -->
 
 ## 功能说明
 
@@ -55,7 +56,7 @@
     以float类型，ND格式，输入为inputX\[B, S, H\]，gamma\[H\]和beta\[H\]为例，描述LayerNorm高阶API内部算法框图，如下图所示。
 
     **图1**  LayerNorm算法框图
-    ![](../../../figures/LayerNorm算法框图.png "LayerNorm算法框图")
+    ![](../../../figures/layernorm_diagram.png "LayerNorm算法框图")
 
     计算过程分为如下几步，均在Vector上进行（下文中m指尾轴H的长度）：
 
@@ -196,7 +197,7 @@
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../general_description_and_constraints.md#section796754519912)。
 -   对shape为\[B，S，H\]的输入数据，输出归一化结果、均值和方差的接口：
     -   output和inputX的空间可以复用。其他输出与输入的空间不可复用。
     -   输入数据中尾轴H不满足对齐要求时，开发者需要进行补齐，补齐的数据应设置为0，防止出现异常值从而影响网络计算。

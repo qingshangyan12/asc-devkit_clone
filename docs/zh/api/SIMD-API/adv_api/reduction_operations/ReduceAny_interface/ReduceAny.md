@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/reduction_operations/ReduceAny_interface/ReduceAny_res.md#id1 -->
 
 ## 功能说明
 
@@ -29,10 +30,10 @@
 定义指定计算的维度（Reduce轴）为R轴，非指定维度（Normal轴）为A轴。如下图所示，对shape为\(2, 3\)的二维矩阵进行运算，指定在第一维求逻辑或，输出结果为\[1, 0, 1\]；指定在第二维求逻辑或，输出结果为\[1, 1\]。
 
 **图1**  ReduceAny按第一个维度计算示例  
-![](../../../../figures/ReduceAny按第一个维度计算示例.png "ReduceAny按第一个维度计算示例")
+![](../../../../figures/reduceany_first_axis.png "ReduceAny按第一个维度计算示例")
 
 **图2**  ReduceAny按最后一个维度计算示例  
-![](../../../../figures/ReduceAny按最后一个维度计算示例.png "ReduceAny按最后一个维度计算示例")
+![](../../../../figures/reduceany_last_axis.png "ReduceAny按最后一个维度计算示例")
 
 ## 函数原型
 
@@ -83,7 +84,7 @@
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 -   源操作数srcTensor的输入数据只能为0或1。
 
 -   **不支持源操作数与目的操作数地址重叠。**

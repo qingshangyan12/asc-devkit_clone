@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/random_functions/PhiloxRandom_res.md#id1 -->
 
 ## 功能说明
 
@@ -72,7 +73,7 @@ struct PhiloxRandomParams {
 ```
 
 **图1**  PhiloxRandom示意图  
-![](../../../figures/PhiloxRandom示意图.png "PhiloxRandom示意图")
+![](../../../figures/philoxrandom_diagram.png "PhiloxRandom示意图")
 
 上图是一个生成随机数的示意图。
 

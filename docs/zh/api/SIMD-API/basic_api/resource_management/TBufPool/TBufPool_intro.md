@@ -1,6 +1,6 @@
 # TBufPool简介<a name="ZH-CN_TOPIC_0000001912912993"></a>
 
-TPipe可以管理全局内存资源，而TBufPool可以手动管理或复用Unified Buffer/L1 Buffer物理内存，主要用于多个stage计算中Unified Buffer/L1 Buffer物理内存不足的场景。
+TPipe可以管理全局内存资源，而TBufPool可以手动管理或复用Unified Buffer（UB）/L1 Buffer物理内存，主要用于多个stage计算中UB/L1 Buffer物理内存不足的场景。
 
 ## 功能图示<a name="section10900194131112"></a>
 
@@ -12,7 +12,7 @@ TPipe可以管理全局内存资源，而TBufPool可以手动管理或复用Unif
 4.  通过TBufPool::[InitBuffer](InitBuffer.md)及TBufPool::[InitBufPool](InitBufPool.md)接口继续将BufPool1及BufPool3划分成Buffer或TBufPool资源池。
 
 **图1**  BufPool资源池划分<a name="fig14900125316552"></a>  
-![](../../../../figures/BufPool资源池划分.png "BufPool资源池划分")
+![](../../../../figures/bufpool_resource_pool.png "BufPool资源池划分")
 
 如图示的嵌套关系，最外层TBufPool\(BufPool1与BufPool3\)需要通过TPipe::InitBufPool申请并初始化，内层TBufPool\(BufPool2\)可以通过TBufPool::InitBufPool申请并初始化。
 

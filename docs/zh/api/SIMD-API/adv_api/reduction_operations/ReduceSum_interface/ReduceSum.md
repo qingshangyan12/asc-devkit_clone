@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/reduction_operations/ReduceSum_interface/ReduceSum_res.md#id1 -->
 
 ## 功能说明
 
@@ -29,10 +30,10 @@
 定义指定计算的维度（Reduce轴）为R轴，非指定维度（Normal轴）为A轴。如下图所示，对shape为\(2, 3\)的二维矩阵进行运算，指定在第一维计算数据的累加，输出结果为\[5, 7, 9\]；指定在第二维计算数据的累加，输出结果为\[6, 15\]。
 
 **图1**  ReduceSum按第一个维度计算示例  
-![](../../../../figures/ReduceSum按第一个维度计算示例.png "ReduceSum按第一个维度计算示例")
+![](../../../../figures/reducesum_first_axis.png "ReduceSum按第一个维度计算示例")
 
 **图2**  ReduceSum按最后一个维度计算示例  
-![](../../../../figures/ReduceSum按最后一个维度计算示例.png "ReduceSum按最后一个维度计算示例")
+![](../../../../figures/reducesum_last_axis.png "ReduceSum按最后一个维度计算示例")
 
 ## 函数原型
 
@@ -83,7 +84,7 @@
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 
 -   **不支持源操作数与目的操作数地址重叠。**
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。

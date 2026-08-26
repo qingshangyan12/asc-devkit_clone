@@ -33,8 +33,7 @@ Mask（掩码）是Ascend C中用于控制数据元素是否参与计算的标�
 >   <!-- end id3 -->
 > <!-- end id1 -->
 > <!-- npu="950" id4 -->
-> 在Ascend 950PR/Ascend 950DT上，Mask为保证兼容性采用软仿实现，其硬件底层提供的能力与Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品存在一定差异。<br>
-> 推荐使用Tensor前n个数据计算接口，该接口通过VF调用[Reg矢量计算API](../../reg_vector_compute/reg_vector_compute.md)实现兼容。Tensor前n个数据计算接口内部不会将Mask模式切换为Normal模式。若调用该接口前已通过[SetMaskCount](../mask_operations/SetMaskCount.md)设置为Counter模式，接口调用后仍为Counter模式；后续计算需要使用Normal模式时，需手动调用[SetMaskNorm](../mask_operations/SetMaskNorm.md)进行设置。
+> - 在Ascend 950PR/Ascend 950DT上，Mask为保证兼容性采用软仿实现，其硬件底层提供的能力与Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品存在一定差异。推荐使用Tensor前n个数据计算接口，该接口通过VF调用[Reg矢量计算API](../../reg_vector_compute/reg_vector_compute.md)实现兼容。Tensor前n个数据计算接口内部不会将Mask模式切换为Normal模式。若调用该接口前已通过[SetMaskCount](../mask_operations/SetMaskCount.md)设置为Counter模式，接口调用后仍为Counter模式；后续计算需要使用Normal模式时，需手动调用[SetMaskNorm](../mask_operations/SetMaskNorm.md)进行设置。
 > <!-- end id4 -->
 
 ### 掩码配置方式
@@ -77,7 +76,7 @@ Mask操作的使用方式如下：
 >
 > - 仅部分API支持isSetMask，具体支持情况请参考对应API的函数原型；
 >
-> - 接口外设置Mask**性能实践参考：[基于全局掩码复用的计算性能优化](../../../../../guide/算子实践参考/SIMD算子性能优化/矢量计算/基于全局掩码复用的计算性能优化.md)**。
+> - 接口外设置Mask**性能实践参考：[基于全局掩码复用的计算性能优化](../../../../../guide/operator_practice/simd_operator_optimization/vector_compute/mask_reuse_optimization.md)**。
 
 ## 接口内设置Mask
 
@@ -163,7 +162,9 @@ Mask操作的使用方式如下：
 
 > [!NOTE]说明
 > 
-> 当数据类型为half（操作数为16位）时，每次迭代内能够处理的元素个数mask∈\[0, 128\]。当mask\>128时，仍按一次repeat（128元素）执行，不支持超过128元素的mask控制。
+> 在Normal模式的高维切分连续计算场景下，每次迭代内能够处理的元素个数与操作数的数据类型位宽有关：操作数为16位时，mask∈\[0, 128\]；操作数为32位时，mask∈\[0, 64\]；操作数为64位时，mask∈\[0, 32\]。
+>
+> 当mask大于当前数据类型在单次repeat内可处理的最大元素个数时，仍按一次repeat执行，即按该最大元素个数执行，不支持超过最大元素个数的mask控制。例如：16位操作数单次repeat最多处理128个元素，32位操作数最多处理64个元素，64位操作数最多处理32个元素。
 
 ## 接口外设置Mask
 
@@ -251,7 +252,9 @@ Mask操作的使用方式如下：
 
 > [!NOTE]说明
 > 
-> 当数据类型为half（操作数为16位）时，每次迭代内能够处理的元素个数mask∈\[0, 128\]。当mask\>128时，仍按一次repeat（128元素）执行，不支持超过128元素的mask控制。
+> 在Normal模式的高维切分连续计算场景下，每次迭代内能够处理的元素个数与操作数的数据类型位宽有关：操作数为16位时，mask∈\[0, 128\]；操作数为32位时，mask∈\[0, 64\]；操作数为64位时，mask∈\[0, 32\]。
+>
+> 当mask大于当前数据类型在单次repeat内可处理的最大元素个数时，仍按一次repeat执行，即按该最大元素个数执行，不支持超过最大元素个数的mask控制。例如：16位操作数单次repeat最多处理128个元素，32位操作数最多处理64个元素，64位操作数最多处理32个元素。
 
 ## 通用说明
 
@@ -296,6 +299,6 @@ Mask操作的使用方式如下：
 
 > [!CAUTION]注意
 >
-> - 参数count的最大取值受限于输入数据总容量，该容量由系统UB大小限制及操作数数据类型共同约束：不同数据类型下，相同UB容量内可容纳的最大元素数量不同。
+> - 参数count的最大取值受限于输入数据总容量，该容量由系统Unified Buffer（UB）大小限制及操作数数据类型共同约束：不同数据类型下，相同UB容量内可容纳的最大元素数量不同。
 >
 > - 参数mask\[\]/mask仅在高维切分计算时有效，mask为0时，目的操作数保持原值。

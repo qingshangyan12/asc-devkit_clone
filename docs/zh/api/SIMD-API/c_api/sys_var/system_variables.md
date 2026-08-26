@@ -2,13 +2,7 @@
 
 - **[asc_get_arch_ver](asc_get_arch_ver.md)**
 
-- **[asc_get_ar_spr（废弃）](asc_get_ar_spr_deprecated.md)**
-
 - **[asc_get_squeeze_status](asc_get_squeeze_status.md)**
-
-- **[asc_get_block_idx](asc_get_block_idx.md)**
-
-- **[asc_get_block_num](asc_get_block_num.md)**
 
 - **[asc_get_core_id](asc_get_core_id.md)**
 
@@ -39,3 +33,7 @@
 - **[asc_set_ctrl](asc_set_ctrl.md)**
 
 - **[asc_set_ffts_base_addr](asc_set_ffts_base_addr.md)**
+
+- **[指令发射队列空闲槽位查询](asc_get_pipe_idle_slot_count.md)**
+
+- **[asc_get_ar_spr（废弃）](asc_get_ar_spr_deprecated.md)**

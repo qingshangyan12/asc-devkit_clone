@@ -92,14 +92,14 @@ __aicore__ inline CubeResGroupHandle(GM_ADDR workspace, uint8_t blockStart, uint
 如下图所示，CubeResGroupHandle1的blockStart为4，blockSize为4，表示起始的AIC序号为2，即blockStart / 2；AIC数量为2，即blockSize / 2。msgQueueSize为10，表示消息队列个数为10，每个Block分配的消息队列个数为Ceil\(msgQueueSize，blockSize/2\)，Block2和Block3分配到的消息队列个数均为5。CubeResGroupHandle2的msgQueueSize数量为11，最后一个Block只能分配5个消息队列。
 
 **图1**  Block和消息队列映射示意图<a name="fig38005710136"></a>  
-![](../../../../figures/Block和消息队列映射示意图.png "Block和消息队列映射示意图")
+![](../../../../figures/block_message_queue_mapping.png "Block和消息队列映射示意图")
 
 ## 约束说明<a name="zh-cn_topic_0000001526206862_section65498832"></a>
 
 -   假设芯片的AIV核数为x，那么blockStart + blockSize <= x - 1, msgQueueSize <= x。
 -   每个AIC至少被分配1个消息队列msgQueue。
 -   blockStart和blockSize必须为偶数。
--   使用该接口，UB空间末尾的1600B + sizeof\(CubeMsgType\)将被占用。
+-   使用该接口，Unified Buffer（UB）空间末尾的1600B + sizeof\(CubeMsgType\)将被占用。
 -   1个AIC只能属于1个CubeGroupHandle，即多个CubeGroupHandle的\[blockStart / 2, blockStart / 2+blockSize / 2\]区间不能重叠。
 -   不能和[REGIST\_MATMUL\_OBJ](../../../adv_api/cube_compute/Matmul_Kernel/REGIST_MATMUL_OBJ.md)接口同时使用。使用资源管理API时，用户自主管理AIC和AIV的核间通信，REGIST\_MATMUL\_OBJ内部是由框架管理AIC和AIV的核间通信，同时使用可能会导致通信消息错误等异常。
 

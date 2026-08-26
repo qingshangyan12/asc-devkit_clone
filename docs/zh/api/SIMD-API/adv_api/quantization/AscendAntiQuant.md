@@ -27,6 +27,7 @@
 <!-- npu="9030" id2 -->
 - Kirin 9030：支持
 <!-- end id2 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/quantization/AscendAntiQuant_res.md#id1 -->
 
 ## 功能说明
 
@@ -97,7 +98,7 @@
 ## 实现原理
 
 **图1**  AscendAntiQuant算法框图  
-![](../../../figures/AscendAntiQuant算法框图.png "AscendAntiQuant算法框图")
+![](../../../figures/ascendantiquant_diagram.png "AscendAntiQuant算法框图")
 
 如上图所示，为AscendAntiQuant的典型场景算法框图，计算过程分为如下几步，均在Vector上进行：
 
@@ -106,7 +107,7 @@
 3.  计算scale：当scale为向量时做Mul计算，当scale为scalar时做Muls计算。
 
 **图2**  isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图  
-![](../../../figures/isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图.png "isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图")
+![](../../../figures/ascendantiquant_no_transpose_bfloat16.png "isTranspose为False且输出为bfloat16的AscendAntiQuant算法框图")
 
 在Atlas A2 训练系列产品/Atlas A2 推理系列产品上，当输出为bfloat16时，计算过程分为如下几步：
 
@@ -118,7 +119,7 @@
 6.  dst精度转换：将tmp1转换为bf16类型。
 
 **图3**  AscendAntiQuant PER\_TOKEN/PER\_GROUP算法框图  
-![](../../../figures/AscendAntiQuant-PER_TOKEN-PER_GROUP算法框图.png "AscendAntiQuant-PER_TOKEN-PER_GROUP算法框图")
+![](../../../figures/ascendantiquant_per_token_per_group.png "AscendAntiQuant-PER_TOKEN-PER_GROUP算法框图")
 
 PER\_TOKEN/PER\_GROUP b8/float4场景的计算逻辑如下：
 
@@ -323,7 +324,7 @@ struct AscendAntiQuantParam {
 ## 约束说明
 
 -   **不支持源操作数与目的操作数地址重叠。**
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../general_description_and_constraints.md#section796754519912)。
 -   输入输出操作数参与计算的数据长度要求32B对齐。
 -   输入带转置场景，k需要32B对齐。
 -   调用接口前，确保输入数据的size正确，offset和scale的size和shape正确。

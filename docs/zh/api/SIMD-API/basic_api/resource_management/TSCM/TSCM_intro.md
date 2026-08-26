@@ -44,7 +44,7 @@ que.FreeTensor(a2);</pre>
 </tr>
 <tr id="row3501135910920"><td class="cellrowborder" valign="top" width="13.63%" headers="mcps1.2.3.1.1 "><p id="p6501175912914"><a name="p6501175912914"></a><a name="p6501175912914"></a>mask</p>
 </td>
-<td class="cellrowborder" valign="top" width="86.37%" headers="mcps1.2.3.1.2 "><a name="ul4317543497"></a><a name="ul4317543497"></a><ul id="ul4317543497"><li>mask是int类型时，采用比特位表达信息：<a name="ul196262325012"></a><a name="ul196262325012"></a><ul id="ul196262325012"><li>bit 0位为预留参数。</li><li>bit 1位为预留参数。</li><li>bit 2位为0时，VECTOR0与VECTOR1映射到CUBE上的内存位置错开，为1时，VECTOR0与VECTOR1映射到CUBE上的内存位置相同。<p id="p8524124174715"><a name="p8524124174715"></a><a name="p8524124174715"></a><a name="image147520519109"></a><a name="image147520519109"></a><span><img class="eddx" id="image147520519109" src="../../../../figures/矩阵编程逻辑位置示意图.png"></span></p>
+<td class="cellrowborder" valign="top" width="86.37%" headers="mcps1.2.3.1.2 "><a name="ul4317543497"></a><a name="ul4317543497"></a><ul id="ul4317543497"><li>mask是int类型时，采用比特位表达信息：<a name="ul196262325012"></a><a name="ul196262325012"></a><ul id="ul196262325012"><li>bit 0位为预留参数。</li><li>bit 1位为预留参数。</li><li>bit 2位为0时，VECTOR0与VECTOR1映射到CUBE上的内存位置错开，为1时，VECTOR0与VECTOR1映射到CUBE上的内存位置相同。<p id="p8524124174715"><a name="p8524124174715"></a><a name="p8524124174715"></a><a name="image147520519109"></a><a name="image147520519109"></a><span><img class="eddx" id="image147520519109" src="../../../../figures/tscm.png"></span></p>
 </li></ul>
 </li><li>mask是const TQueConfig*类型时，TQueConfig结构定义和参数说明如下。<a name="screen13896155731115"></a><a name="screen13896155731115"></a><pre class="screen" codetype="Cpp" id="screen13896155731115">struct TQueConfig {
     bool nd2nz = false;  // 不支持，默认为false
@@ -68,7 +68,7 @@ que.FreeTensor(a2);</pre>
 >    -   支持AllocTensor/EnQue/DeQue/FreeTensor接口。必须严格按照AllocTensor-\>EnQue-\>DeQue-\>FreeTensor的操作执行完整的生命周期，且配对使用。
 >    -   但TSCM并不需要支持TQueBind的所有接口。不支持VacantInQue/HasTensorInQue/GetTensorCountInQue/HasIdleBuffer。
 >-   由于TSCM分配的Buffer中存储着同步事件eventID，且该结构伴随着与Cube类高阶API如（Matmul高阶API，宏函数调用方式\)共同使用，故同一个TPosition上TSCM Buffer的数量与硬件的同步事件eventID以及Matmul对象数量有关。
->    **L1 Buffer（TSCM）从UB（VECIN）发起的Buffer块数量与Matmul对象数量之和最大为10个。**
+>    **L1 Buffer（TSCM）从Unified Buffer（UB，VECIN）发起的Buffer块数量与Matmul对象数量之和最大为10个。**
 >    **不允许申请的TSCM Buffer超出规格限制，超出规格可能会引起未定义行为。**
 
 如下是一个简单的使用示例：

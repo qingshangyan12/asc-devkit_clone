@@ -79,13 +79,13 @@ __aicore__ inline void asc_copy_l12l0a_mx_sync(uint64_t dst,
 
 **图 1**  ScaleA在L0A_MX Buffer中的分形排布<a id="l12l0a_mx_layout"></a>
 
-![ScaleA在L0A_MX Buffer中的分形排布](../../../figures/ScaleA在L0A的分形排布.png "ScaleA在L0A_MX Buffer中的分形排布")
+![ScaleA在L0A_MX Buffer中的分形排布](../../../figures/scalea_l0a_fractal.png "ScaleA在L0A_MX Buffer中的分形排布")
 
 [图2](#fig_l12l0a_mx_params)为ScaleA从L1 Buffer搬运至L0A_MX Buffer过程中的配置参数示意。每一行为32字节，对应[图1](#l12l0a_mx_layout)中的一个分形。`x_step`为M维度分形个数，示例中$x\_step=M/16=3$；`y_step`为K维度32字节数据块的个数，示例中$y\_step=K/32/2=21$；`src_stride`和`dst_stride`表示K维度上相邻数据块起始地址的间隔，单位为32字节。
 
 **图 2**  ScaleA从L1 Buffer搬运至L0A_MX Buffer的配置参数示意<a id="fig_l12l0a_mx_params"></a>
 
-![ScaleA从L1 Buffer搬运至L0A_MX Buffer的配置参数示意](../../../figures/load2dmx_scale_transfer_demo.png "ScaleA从L1 Buffer搬运至L0A_MX Buffer的配置参数示意")
+![ScaleA从L1 Buffer搬运至L0A_MX Buffer的配置参数示意](../../../figures/LoadData_2D_MX_nd2nz.png "ScaleA从L1 Buffer搬运至L0A_MX Buffer的配置参数示意")
 
 ## 返回值说明
 
@@ -117,7 +117,7 @@ PIPE_MTE1
 
 仓库中的完整工程样例请参考[mmad_mx样例](../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx)。
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 Ascend 950PR/Ascend 950DT产品对应的NPU架构为`dav-3510`，编译运行命令如下：

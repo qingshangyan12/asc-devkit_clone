@@ -27,10 +27,11 @@
 <!-- npu="9030" id2 -->
 - Kirin 9030：支持
 <!-- end id2 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetTensorC_res.md#id1 -->
 
 ## 功能说明
 
-Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor中，也可以输出到UB（VECIN）tensor中。当[MatmulConfig](MatmulConfig.md#matmulconfig-params)参数中的ScheduleType取值为ScheduleType::INNER\_PRODUCT时，获取一块C矩阵片；当[MatmulConfig](MatmulConfig.md#matmulconfig-params)参数中的ScheduleType取值为ScheduleType::OUTER\_PRODUCT时，获取两块C矩阵片。
+Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor中，也可以输出到Unified Buffer（UB，VECIN）tensor中。当[MatmulConfig](MatmulConfig.md#matmulconfig-params)参数中的ScheduleType取值为ScheduleType::INNER\_PRODUCT时，获取一块C矩阵片；当[MatmulConfig](MatmulConfig.md#matmulconfig-params)参数中的ScheduleType取值为ScheduleType::OUTER\_PRODUCT时，获取两块C矩阵片。
 
 该接口和[Iterate](Iterate.md)接口配合使用，用于在调用Iterate完成迭代计算后，根据[MatmulConfig](MatmulConfig.md#matmulconfig-params)参数中的ScheduleType取值获取一块或两块baseM \* baseN大小的矩阵分片。
 
@@ -80,7 +81,7 @@ Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor
 
     C矩阵输出到UB（VECIN）时，分配给UB（VECIN）的空间大小会影响Matmul计算的力度，分配给UB（VECIN）的空间过小时，无法充分利用硬件算力。提供该接口支持返回缓存在Workspace上的C矩阵，由开发者自行控制后续使用过程。
 
-    注意，在初始化时，C矩阵的逻辑位置应设置为TPosition::VECIN，调用该接口获取缓存的C矩阵后，自行拷贝到Unified Buffer。
+    注意，在初始化时，C矩阵的逻辑位置应设置为TPosition::VECIN，调用该接口获取缓存的C矩阵后，自行拷贝到UB。
 
     ```
     template <bool sync = true>
@@ -115,11 +116,11 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 
 <a name="fig322951853119"></a>
 **图1**  非连续写模式示意图  
-![](../../../../figures/非连续写模式示意图.png "非连续写模式示意图")
+![](../../../../figures/non_continuous_write_mode.png "非连续写模式示意图")
 
 <a name="fig580415103338"></a>
 **图2**  连续写模式示意图  
-![](../../../../figures/连续写模式示意图.png "连续写模式示意图")
+![](../../../../figures/continuous_write_mode.png "连续写模式示意图")
 
 ## 返回值说明
 
@@ -130,6 +131,7 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 -   传入的C矩阵地址空间大小需要保证不小于baseM \* baseN。
 -   异步场景时，需要使用一块临时空间来缓存Iterate计算结果，调用GetTensorC时会在该临时空间中获取C的矩阵分片。临时空间通过[SetWorkspace](SetWorkspace.md)接口进行设置。SetWorkspace接口需要在Iterate接口之前调用。
 -   当开启MixDualMaster（双主模式）场景时，即模板参数[enableMixDualMaster](MatmulConfig.md#matmulconfig-params)设置为true，不支持使用该接口。
+<!-- npu="950,A3,910b,310p,310b,x90,9030" id28 -->
 -   支持的数据类型<a id="li12616155731720"></a>
 
     <!-- npu="950" id14 -->
@@ -181,6 +183,9 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
     <!-- npu="310b" id23 -->
     Atlas 200I/500 A2 推理产品，支持的数据类型为：ND、NZ。
     <!-- end id23 -->
+<!-- end id28 -->
+
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/GetTensorC_res.md#id2 -->
 
 ## 调用示例
 

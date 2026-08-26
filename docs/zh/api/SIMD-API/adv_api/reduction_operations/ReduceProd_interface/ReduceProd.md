@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/reduction_operations/ReduceProd_interface/ReduceProd_res.md#id1 -->
 
 ## 功能说明
 
@@ -29,10 +30,10 @@
 定义指定计算的维度（Reduce轴）为R轴，非指定维度（Normal轴）为A轴。如下图所示，对shape为\(2, 3\)的二维矩阵进行运算，指定在第一维求乘积，输出结果为\[4, 10, 18\]；指定在第二维求乘积，输出结果为\[6, 120\]。
 
 **图1**  ReduceProd按第一个维度计算示例  
-![](../../../../figures/ReduceProd按第一个维度计算示例.png "ReduceProd按第一个维度计算示例")
+![](../../../../figures/reduceprod_first_axis.png "ReduceProd按第一个维度计算示例")
 
 **图2**  ReduceProd按最后一个维度计算示例  
-![](../../../../figures/ReduceProd按最后一个维度计算示例.png "ReduceProd按最后一个维度计算示例")
+![](../../../../figures/reduceprod_last_axis.png "ReduceProd按最后一个维度计算示例")
 
 ## 函数原型
 
@@ -83,7 +84,7 @@
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 -   内部算法不处理累乘计算时的数据溢出，溢出场景不保证接口精度。
 -   **不支持源操作数与目的操作数地址重叠。**
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。

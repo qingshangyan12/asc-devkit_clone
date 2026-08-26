@@ -1,6 +1,6 @@
 # HCCL使用说明
 
-Ascend C提供一组HCCL通信类高阶API，方便算子Kernel开发用户在AI Core侧灵活管理通算融合算子中计算与通信任务的执行顺序。
+Ascend C提供一组HCCL通信类高阶API，方便算子核函数（Kernel）开发用户在AI Core侧灵活管理通算融合算子中计算与通信任务的执行顺序。
 
 HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语接口（以下统称为Prepare接口），对标[集合通信C++接口](https://gitcode.com/cann/hccl/blob/master/docs/zh/api_ref/comm_op_interface/README.md)，当前支持[AllReduce](AllReduce.md)、[AllGather](AllGather.md)、[ReduceScatter](ReduceScatter.md)、[AlltoAll](AlltoAll.md)、[AlltoAllV](AlltoAllV.md)、[AlltoAllvWrite](AlltoAllvWrite.md)、[BatchWrite](BatchWrite.md)接口。本章的所有接口运行在AI Core上，且不执行通信任务，而是由用户调用Prepare接口将对应类型的通信任务信息发送给AI CPU或CCU服务端，并在合适的时机通过[Commit](Commit.md)接口通知AI CPU或CCU上的服务端执行对应的通信任务。<!-- npu="950" id1 -->注意，当前Ascend 950PR/Ascend 950DT上仅支持CCU服务端。<!-- end id1 -->
 
@@ -12,11 +12,11 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
 当后续无通信任务时，调用[Finalize](Finalize.md)接口，通知服务端后续无通信任务，执行结束后退出，客户端检测并等待最后一个通信任务执行结束。以上介绍的AI Core下发HCCL通信任务的机制如下图所示。
 
 **图1**  AI Core下发HCCL通信任务机制  
-![](../../../../figures/AI-Core下发HCCL通信任务机制.png "AI-Core下发HCCL通信任务机制")
+![](../../../../figures/ai_core_hccl_dispatch.png "AI-Core下发HCCL通信任务机制")
 
 <!-- npu="950" id3 -->
 **图2** Ascend 950PR/Ascend 950DT  AI Core下发HCCL通信任务机制  
-![](../../../../figures/Ascend-950PR-Ascend-950DT-AI-Core下发HCCL通信任务机制.png "Ascend-950PR-Ascend-950DT-AI-Core下发HCCL通信任务机制")
+![](../../../../figures/ascend950pr_950dt_ai_core_hccl_dispatch.png "Ascend-950PR-Ascend-950DT-AI-Core下发HCCL通信任务机制")
 <!-- end id3 -->
 
 <!-- npu="A3" id2 -->
@@ -39,7 +39,7 @@ HCCL为**集合通信任务客户端**，主要对外提供了集合通信原语
     hccl.InitV2(contextGM, &tilingData);
     ```
 
-    当调用InitV2接口时，必须使用标准C++语法定义TilingData结构体的开发方式。如上示例代码中的tilingGM为host侧传入的、作为核函数入参的算子TilingData的GM地址，通过[GET\_TILING\_DATA\_WITH\_STRUCT](../../../basic_api/Kernel-Tiling/GET_TILING_DATA_WITH_STRUCT.md)获取TilingData。调用[InitV2](InitV2.md)初始化接口时，需要传入通信上下文信息，可以通过框架提供的获取通信上下文的接口[GetHcclContext](../HCCL-Context/GetHcclContext.md)获取。
+    当调用InitV2接口时，必须使用标准C++语法定义TilingData结构体的开发方式。如上示例代码中的tilingGM为host侧传入的、作为核函数（Kernel）入参的算子TilingData的GM地址，通过[GET\_TILING\_DATA\_WITH\_STRUCT](../../../basic_api/Kernel-Tiling/GET_TILING_DATA_WITH_STRUCT.md)获取TilingData。调用[InitV2](InitV2.md)初始化接口时，需要传入通信上下文信息，可以通过框架提供的获取通信上下文的接口[GetHcclContext](../HCCL-Context/GetHcclContext.md)获取。
 
 2.  设置对应通信算法的Tiling地址。
 
@@ -241,7 +241,7 @@ extern "C" __global__ __aicore__ void reduce_scatter_custom(
 ```
 
 **图3**  ReduceScatter通信示例<a name="fig19780192164210"></a>  
-![](../../../../figures/ReduceScatter通信示例.png "ReduceScatter通信示例")
+![](../../../../figures/reducescatter_example.png "ReduceScatter通信示例")
 
 **表3**  MC2\_BUFFER\_LOCATION参数说明
 

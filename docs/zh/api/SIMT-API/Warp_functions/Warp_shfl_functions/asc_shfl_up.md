@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_up_res.md#id1 -->
 
 ## 功能说明
 
@@ -32,7 +33,7 @@
 
 **图1**  asc\_shfl\_up结果示意图
 
-![](../../../figures/asc_shfl_up结果示意图.png "asc_shfl_up结果示意图")
+![](../../../figures/asc_shfl_up_result.png "asc_shfl_up结果示意图")
 
 ## 函数原型
 

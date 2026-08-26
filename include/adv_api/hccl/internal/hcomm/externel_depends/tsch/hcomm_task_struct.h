@@ -1766,7 +1766,7 @@ typedef struct tag_ts_call_back_info {
     uint32_t fndata_high;
 
     /* word12-13 */
-    uint32_t res2; // noly vf & topic AICPU & callback msg use for hostpid.
+    uint32_t res2; // only vf & topic AICPU & callback msg use for hostpid.
     uint32_t res3;
 
     /* word14 */
@@ -1834,7 +1834,7 @@ typedef struct stars_function_call_sqe {
     uint8_t kernel_credit;
     uint8_t reserved3 : 4;
     uint8_t debug_flag : 1;
-    uint8_t sqe_length : 3; // use reserved filed
+    uint8_t sqe_length : 3; // use reserved field
 
     ts_stars_cond_op_LHWI_t lhwi1;
     ts_stars_cond_op_LLWI_t llwi1;
@@ -2001,7 +2001,7 @@ typedef struct ts_david_stars_memcpy_sqe {
     uint8_t mpamns : 1;
     uint8_t pmg : 2;
     uint8_t qos : 4;
-    uint8_t d2d_offset_flag : 1; // use reserved filed
+    uint8_t d2d_offset_flag : 1; // use reserved field
 
     /* word6 */
     uint16_t src_stream_id;
@@ -2229,15 +2229,15 @@ typedef struct stars_aicpu_sqe {
 typedef struct stars_get_float_status_sqe {
     ts_stars_sqe_header_t header;
 
-    uint8_t conds_sub_type; // use reserved filed
+    uint8_t conds_sub_type; // use reserved field
     uint16_t reserved0;
     uint8_t reserved1 : 7;
-    uint8_t csc : 1; // use reserved filed
+    uint8_t csc : 1; // use reserved field
     uint16_t reserved2;
     uint8_t kernel_credit;
     uint8_t reserved3 : 4;
     uint8_t debug_flag : 1;
-    uint8_t sqe_length : 3; // use reserved filed
+    uint8_t sqe_length : 3; // use reserved field
 
     ts_stars_cond_op_loadimm_t ldi;
     ts_stars_cond_op_LLWI_t llwi;
@@ -2455,7 +2455,7 @@ typedef struct ts_stars_callback_sqe {
     uint32_t fndata_high;
 
     /* word12-13 */
-    uint32_t res5; // noly vf & topic AICPU & callback use for hostpid.
+    uint32_t res5; // only vf & topic AICPU & callback use for hostpid.
     uint32_t res6;
 
     /* word14 */
@@ -2752,7 +2752,7 @@ typedef struct ts_stars_cqe {
     uint16_t stream_id;
     uint16_t task_id;
     uint16_t err_type : 8;
-    uint16_t drop_flag : 1; /* software define, means drop hw cqe and no dispatch to logic cq */
+    uint16_t drop_flag : 1; /* software defined, means drop hw cqe and no dispatch to logic cq */
     uint16_t rsv : 1;
     uint16_t sqe_type : 6;
     uint16_t sq_index;

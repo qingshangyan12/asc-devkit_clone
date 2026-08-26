@@ -12,6 +12,9 @@
 #include <cstdint>
 #include "stub_fun.h"
 
+// The compiler supports this overload, but it is missing from the CPU debug stub header.
+int64_t ld_dev(__gm__ int64_t* src, int16_t offset);
+
 #ifndef ULL
 #define ULL unsigned long long
 #endif
@@ -601,6 +604,8 @@ inline void vgather2_bc(vector_bf16& dst, __ubuf__ bfloat16_t* src, vector_u32 i
 inline void vbr(vector_f8e4m3& dst, fp8_e4m3fn_t value) {}
 inline void vbr(vector_f8e5m2& dst, fp8_e5m2_t value) {}
 inline void vbr(vector_f8e8m0& dst, fp8_e8m0_t value) {}
+inline void vdup(vector_f8e8m0& dst, fp8_e8m0_t value, vector_bool mask, Literal mode) {}
+inline void vdup(vector_f8e8m0& dst, vector_f8e8m0 src, vector_bool mask, int32_t type, Literal mode) {}
 
 inline void copy_gm_to_cbuf_v2(
     __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
@@ -629,12 +634,22 @@ inline void img2colv2_cbuf_to_cb(
 inline void wait_flag_dev(pipe_t pipe, uint8_t flag_id) {}
 inline void wait_intra_block(pipe_t pipe, uint8_t flag_id) {}
 inline void set_intra_block(pipe_t pipe, uint8_t sync_id) {}
+inline void wait_intra_block(pipe_t pipe, uint16_t flag_id) {}
+inline void set_intra_block(pipe_t pipe, uint16_t sync_id) {}
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+inline void wait_intra_block(pipe_t pipe, int flag_id) {}
+inline void set_intra_block(pipe_t pipe, int sync_id) {}
+#endif
 inline void rls_buf(pipe_t pipe, uint64_t buf_id, bool mode) {}
 
 inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {}
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+inline int64_t get_iqent(pipe_t pipe) { return 0; }
+#endif
+
 #if defined(__DAV_VEC__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "instr_impl/npu_arch_3510/utils_impl/utils_type.h"
+#include "c_api/defs/type.h"
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint16_t*& dst) {}
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint32_t*& dst) {}
 #endif
@@ -701,143 +716,5 @@ typedef std::integral_constant<Pos, Pos::LOWEST> Lowest_Type;
 typedef std::integral_constant<Pos, Pos::HIGHEST> Highest_Type;
 constexpr Lowest_Type POS_LOWEST = Lowest_Type();
 constexpr Highest_Type POS_HIGHEST = Highest_Type();
-
-// ========== __builtin_cce_vcvt* stubs for CPU mode ==========
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-inline vector_f32 __builtin_cce_vcvtff_bf162f32_x(vector_bf16 src, vector_bool mask, ULL arg0) { return vector_f32(); }
-inline vector_f4e1m2x2 __builtin_cce_vcvtff_bf162f4e1m2x2_x(vector_bf16 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_f4e1m2x2();
-}
-inline vector_f4e2m1x2 __builtin_cce_vcvtff_bf162f4e2m1x2_x(vector_bf16 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_f4e2m1x2();
-}
-inline vector_f32 __builtin_cce_vcvtff_f162f32_x(vector_f16 src, vector_bool mask, ULL arg0) { return vector_f32(); }
-inline vector_hif8 __builtin_cce_vcvtff_f162hif8_x(vector_f16 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_hif8();
-}
-inline vector_bf16 __builtin_cce_vcvtff_f322bf16_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_bf16();
-}
-inline vector_f16 __builtin_cce_vcvtff_f322f16_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_f16();
-}
-inline vector_f8e4m3 __builtin_cce_vcvtff_f322f8e4m3_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_f8e4m3();
-}
-inline vector_f8e5m2 __builtin_cce_vcvtff_f322f8e5m2_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_f8e5m2();
-}
-inline vector_hif8 __builtin_cce_vcvtff_f322hif8_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_hif8();
-}
-inline vector_bf16 __builtin_cce_vcvtff_f4e1m2x22bf16_x(vector_f4e1m2x2 src, vector_bool mask, ULL arg0)
-{
-    return vector_bf16();
-}
-inline vector_bf16 __builtin_cce_vcvtff_f4e2m1x22bf16_x(vector_f4e2m1x2 src, vector_bool mask, ULL arg0)
-{
-    return vector_bf16();
-}
-inline vector_f32 __builtin_cce_vcvtff_f8e4m32f32_x(vector_f8e4m3 src, vector_bool mask, ULL arg0)
-{
-    return vector_f32();
-}
-inline vector_f32 __builtin_cce_vcvtff_f8e5m22f32_x(vector_f8e5m2 src, vector_bool mask, ULL arg0)
-{
-    return vector_f32();
-}
-inline vector_f16 __builtin_cce_vcvtff_hif82f16_x(vector_hif8 src, vector_bool mask, ULL arg0) { return vector_f16(); }
-inline vector_f32 __builtin_cce_vcvtff_hif82f32_x(vector_hif8 src, vector_bool mask, ULL arg0) { return vector_f32(); }
-inline vector_s32 __builtin_cce_vcvtfi_bf162s32_x(vector_bf16 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_s32();
-}
-inline vector_s32 __builtin_cce_vcvtfi_f162s32_x(vector_f16 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_s32();
-}
-inline vector_s4x2 __builtin_cce_vcvtfi_f162s4x2_x(vector_f16 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_s4x2();
-}
-inline vector_s8 __builtin_cce_vcvtfi_f162s8_x(vector_f16 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_s8();
-}
-inline vector_u8 __builtin_cce_vcvtfi_f162u8_x(vector_f16 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_u8();
-}
-inline vector_s16 __builtin_cce_vcvtfi_f322s16_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_s16();
-}
-inline vector_s64 __builtin_cce_vcvtfi_f322s64_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_s64();
-}
-inline vector_f32 __builtin_cce_vcvtif_s162f32_x(vector_s16 src, vector_bool mask, ULL arg0) { return vector_f32(); }
-inline vector_bf16 __builtin_cce_vcvtif_s4x22bf16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_bf16(); }
-inline vector_f16 __builtin_cce_vcvtif_s4x22f16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_f16(); }
-inline vector_f32 __builtin_cce_vcvtif_s642f32_x(vector_s64 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_f32();
-}
-inline vector_f16 __builtin_cce_vcvtif_s82f16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_f16(); }
-inline vector_f16 __builtin_cce_vcvtif_u82f16_x(vector_u8 src, vector_bool mask, ULL arg0) { return vector_f16(); }
-inline vector_s32 __builtin_cce_vcvtii_s162s32_x(vector_s16 src, vector_bool mask, ULL arg0) { return vector_s32(); }
-inline vector_u32 __builtin_cce_vcvtii_s162u32_x(vector_s16 src, vector_bool mask, ULL arg0) { return vector_u32(); }
-inline vector_u8 __builtin_cce_vcvtii_s162u8_x(vector_s16 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u8();
-}
-inline vector_s16 __builtin_cce_vcvtii_s322s16_x(vector_s32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_s16();
-}
-inline vector_s64 __builtin_cce_vcvtii_s322s64_x(vector_s32 src, vector_bool mask, ULL arg0) { return vector_s64(); }
-inline vector_u16 __builtin_cce_vcvtii_s322u16_x(vector_s32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u16();
-}
-inline vector_u8 __builtin_cce_vcvtii_s322u8_x(vector_s32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u8();
-}
-inline vector_s16 __builtin_cce_vcvtii_s4x22s16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_s16(); }
-inline vector_s32 __builtin_cce_vcvtii_s642s32_x(vector_s64 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_s32();
-}
-inline vector_s16 __builtin_cce_vcvtii_s82s16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_s16(); }
-inline vector_s32 __builtin_cce_vcvtii_s82s32_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_s32(); }
-inline vector_u32 __builtin_cce_vcvtii_u162u32_x(vector_u16 src, vector_bool mask, ULL arg0) { return vector_u32(); }
-inline vector_u8 __builtin_cce_vcvtii_u162u8_x(vector_u16 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u8();
-}
-inline vector_s16 __builtin_cce_vcvtii_u322s16_x(vector_u32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_s16();
-}
-inline vector_u16 __builtin_cce_vcvtii_u322u16_x(vector_u32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u16();
-}
-inline vector_u8 __builtin_cce_vcvtii_u322u8_x(vector_u32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u8();
-}
-inline vector_u16 __builtin_cce_vcvtii_u82u16_x(vector_u8 src, vector_bool mask, ULL arg0) { return vector_u16(); }
-inline vector_u32 __builtin_cce_vcvtii_u82u32_x(vector_u8 src, vector_bool mask, ULL arg0) { return vector_u32(); }
-#endif
 
 #endif

@@ -106,15 +106,15 @@ dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`�
 ### 函数原型典型示例
 
 ```cpp
-// 示例：half类型的2D转置搬运。
+// 示例：half类型的2D搬运。
 __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ half* dst,
-                                                 __cbuf__ half* src,
-                                                 uint16_t m_start_position,
-                                                 uint16_t k_start_position,
-                                                 uint8_t m_step,
-                                                 uint8_t k_step,
-                                                 int16_t src_stride,
-                                                 uint16_t dst_stride)
+                                       __cbuf__ half* src,
+                                       uint16_t m_start_position,
+                                       uint16_t k_start_position,
+                                       uint8_t m_step,
+                                       uint8_t k_step,
+                                       int16_t src_stride,
+                                       uint16_t dst_stride)
 ```
 
 ## 参数说明
@@ -143,7 +143,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ half* dst,
 
 **图 1**  l12l0a_2d搬运参数示例（以half数据类型，非转置为例）
 
-![l12l0a_2d搬运参数示例](../../../../figures/LoadData2DParamsV2结构体参数示例（以half数据类型-不启用转置为例）.png)
+![l12l0a_2d搬运参数示例](../../../../figures/loaddata2dparamsv2_half_no_transpose.png)
 
 ## 返回值说明
 
@@ -225,7 +225,7 @@ $$
 
 仓库中的完整工程样例请参考[mmad样例](../../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad)。
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：

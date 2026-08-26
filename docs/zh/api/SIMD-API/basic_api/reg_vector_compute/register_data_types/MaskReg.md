@@ -32,7 +32,7 @@ MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度�
 
 **图1** MaskReg计算过程<a id="fig1"></a>
 
-![](../../../../figures/MaskReg计算过程.png "MaskReg计算过程")
+![](../../../../figures/maskreg_process.png "MaskReg计算过程")
 
 ## 函数原型<a name="section620mcpsimp"></a>
 - CreateMask接口
@@ -54,7 +54,7 @@ MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度�
 | 参数名 | 输入/输出 | 描述 |
 | :-- | :------------ | :------------ |
 | T | 输入 | 模板参数，支持的数据类型为b8/b16/b32/b64。 |
-| mode | 输入 | 创建MaskReg的模式，enum class类型。<br><pre>enum class MaskPattern {<br>    ALL,        // 所有元素设置为有效数据<br>    VL1,        // 最低1个元素设置为有效数据<br>    VL2,        // 最低2个元素设置为有效数据<br>    VL3,        // 最低3个元素设置为有效数据<br>    VL4,        // 最低4个元素设置为有效数据<br>    VL8,        // 最低8个元素设置为有效数据<br>    VL16,       // 最低16个元素设置为有效数据<br>    VL32,       // 最低32个元素设置为有效数据<br>    VL64,       // 最低64个元素设置为有效数据<br>    VL128,      // 最低128个元素设置为有效数据<br>    M3,         // 3的倍数设置为有效数据<br>    M4,         // 4的倍数设置为有效数据<br>    H,          // 最低一半元素设置为有效数据<br>    Q,          // 最低四分之一元素设置为有效数据<br>    ALLF = 15   // 所有元素设置为无效数据<br>};</pre> |
+| mode | 输入 | 创建MaskReg的模式，enum class类型。<br>enum class MaskPattern {<br>    ALL,        // 所有元素设置为有效数据<br>    VL1,        // 最低1个元素设置为有效数据<br>    VL2,        // 最低2个元素设置为有效数据<br>    VL3,        // 最低3个元素设置为有效数据<br>    VL4,        // 最低4个元素设置为有效数据<br>    VL8,        // 最低8个元素设置为有效数据<br>    VL16,       // 最低16个元素设置为有效数据<br>    VL32,       // 最低32个元素设置为有效数据<br>    VL64,       // 最低64个元素设置为有效数据<br>    VL128,      // 最低128个元素设置为有效数据<br>    M3,         // 3的倍数设置为有效数据<br>    M4,         // 4的倍数设置为有效数据<br>    H,          // 最低一半元素设置为有效数据<br>    Q,          // 最低四分之一元素设置为有效数据<br>    ALLF = 15   // 所有元素设置为无效数据<br>}; |
 | regTrait | 输入 | 该参数默认值为RegTraitNumOne。 |
 
 <a id="update-mask-params"></a>
@@ -85,11 +85,11 @@ MaskReg
 
 **图4** b16到b32类型转换过程<a id="fig4"></a>
 
-![](../../../../figures/b16到b32类型转换过程.png "b16到b32类型转换过程")
+![](../../../../figures/b16_to_b32_conversion.png "b16到b32类型转换过程")
 
 **图5** b32到b16类型转换过程<a id="fig5"></a>
 
-![](../../../../figures/b32到b16类型转换过程.png "b32到b16类型转换过程")
+![](../../../../figures/b32_to_b16_conversion.png "b32到b16类型转换过程")
 
 特别的，int4x2_t/fp4x2_e2m1_t/fp4x2_e1m2_t和b16之间的转换，指令会以每2个元素为一对进行读写，大转小时mask有效位以偶数位为准。
 
@@ -97,15 +97,15 @@ MaskReg
 
 **图6** fp4x2_e2m1_t到bfloat16_t类型转换过程<a id="fig6"></a>
 
-![](../../../../figures/fp4x2_e2m1_t到bfloat16_t转换过程.png "fp4x2_e2m1_t到bfloat16_t类型转换过程")
+![](../../../../figures/fp4x2_e2m1_to_bfloat16.png "fp4x2_e2m1_t到bfloat16_t类型转换过程")
 
 **图7** bfloat16_t到fp4x2_e2m1_t类型转换过程<a id="fig7"></a>
 
-![](../../../../figures/bfloat16_t到fp4x2_e2m1_t转换过程.png "bfloat16_t到fp4x2_e2m1_t类型转换过程")
+![](../../../../figures/bfloat16_to_fp4x2_e2m1.png "bfloat16_t到fp4x2_e2m1_t类型转换过程")
 
 ### Mask设置方式
 
-在Mask设置中，Reg矢量计算支持多种灵活配置方式，可根据实际计算场景选择固定Mask模式、从UB搬运或从RegTensor搬运等策略，以满足不同计算场景的需求。具体设置方式如下表所示：
+在Mask设置中，Reg矢量计算支持多种灵活配置方式，可根据实际计算场景选择固定Mask模式、从Unified Buffer（UB）搬运或从RegTensor搬运等策略，以满足不同计算场景的需求。具体设置方式如下表所示：
 
 **表3**  Mask设置方式
 
@@ -123,13 +123,13 @@ Reg矢量计算中，掩码的配置方式由MaskReg寄存器决定，仅支持�
 
   **图2** b8数据类型下CreateMask接口不同MaskReg的模式下元素选取<a id="fig2"></a>
 
-![](../../../../figures/b8数据类型下CreateMask接口不同MaskReg的模式下元素选取.png "b8数据类型下CreateMask接口不同MaskReg的模式下元素选取")
+![](../../../../figures/b8_createmask_maskreg.png "b8数据类型下CreateMask接口不同MaskReg的模式下元素选取")
 
 - UpdateMask：根据当前scalarValue的值生成对应长度的有效位掩码，并自动将scalarValue减去当前向量长度以更新剩余待处理元素数量。
 
   **图3** b16数据类型下UpdateMask接口基于scalarValue的掩码生成<a id="fig3"></a>
 
-![](../../../../figures/b16数据类型下UpdateMask接口基于scalarValue的掩码生成.png "b16数据类型下UpdateMask接口基于scalarValue的掩码生成")
+![](../../../../figures/b16_updatemask_scalarvalue.png "b16数据类型下UpdateMask接口基于scalarValue的掩码生成")
 
 以基础算术API Add为例介绍Mask设置的不同方式。
 
@@ -267,7 +267,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 ### NPU架构版本2201与NPU架构版本3510之间Mask机制对比
 
-本节对比[NPU架构版本2201](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)在Normal模式的逐bit计算中Mask机制，与[NPU架构版本3510](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)基于Reg矢量计算中Mask机制的差异。
+本节对比[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)在Normal模式的逐bit计算中Mask机制，与[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)基于Reg矢量计算中Mask机制的差异。
 
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品
 
@@ -283,7 +283,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 **图8** NPU架构版本2201的Memory矢量计算与NPU架构版本3510的Reg矢量计算Mask机制对比<a id="fig8"></a>
 
-![](../../../../figures/Memory矢量计算与Reg矢量计算Mask机制对比.png "NPU架构版本2201的Memory矢量计算与NPU架构版本3510的Reg矢量计算Mask机制对比")
+![](../../../../figures/memory_vs_reg_mask_comparison.png "NPU架构版本2201的Memory矢量计算与NPU架构版本3510的Reg矢量计算Mask机制对比")
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

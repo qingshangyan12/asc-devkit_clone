@@ -164,7 +164,7 @@ struct TopoInfo {
     u32 deviceNumPerModule = 0;                   // A2 每个module的卡数
     u32 serverNumPerSuperPod = 0;                 // 每个超节点的服务器个数
     u32 serverNum = 0;                            // 服务器数量
-    u32 moduleNum = 0;                            // A2 A+X场景moudleNum可能与serverNum不符
+    u32 moduleNum = 0;                            // A2 A+X场景moduleNum可能与serverNum不符
     u32 superPodNum = 0;                          // 超节点数量
     u32 moduleIdx = INVALID_UINT;                 // moduleId
     bool isDiffDeviceModule = false;              // A2 A+X
@@ -186,6 +186,10 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     bool level0PcieMix{false};
     bool level0BigClosRange{false};
     bool level2Uboe{false};
+    bool level2Ubg{false};
+    bool hostDpuOnly{false};
+    bool level0Symmetric{false};
+    bool level1Symmetric{false};
     u32 topoInstDetailsOfLayerSize = 0;
     Level0MeshType level0MeshType;
     NetLayerDetails netLayerDetails;
@@ -220,6 +224,10 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream << level0PcieMix;
         binaryStream << level0BigClosRange;
         binaryStream << level2Uboe;
+        binaryStream << level2Ubg;
+        binaryStream << hostDpuOnly;
+        binaryStream << level0Symmetric;
+        binaryStream << level1Symmetric;
         binaryStream << topoInstDetailsOfLayerSize;
         binaryStream << level0MeshType;
         binaryStream << netLayerDetails.netLayerNum;
@@ -268,6 +276,10 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream >> level0PcieMix;
         binaryStream >> level0BigClosRange;
         binaryStream >> level2Uboe;
+        binaryStream >> level2Ubg;
+        binaryStream >> hostDpuOnly;
+        binaryStream >> level0Symmetric;
+        binaryStream >> level1Symmetric;
         binaryStream >> topoInstDetailsOfLayerSize;
         binaryStream >> level0MeshType;
         binaryStream >> netLayerDetails.netLayerNum;
@@ -299,6 +311,8 @@ struct CcuKernelArgBase {
 struct CcuKernelInfo {
     // kernel资源组序号，group号不同时，资源复用
     u32 resGroup = 0;
+    // kernel所属dieId，从channel所在die获取，由各算法在CalcRes中填充；单die算法默认为0
+    u32 dieId = 0;
     // kernel名 string？
     char kernelFuncName[64];
     // kernel函数
@@ -356,6 +370,12 @@ struct CcuFastLaunchCtx {
                sizeof(CcuKernelSubmitInfo) * totalCcuKernelNum;
     }
 };
+
+static_assert(
+    offsetof(CcuFastLaunchCtx, ccuKernelNum) + sizeof(u32) * MAX_TEMP_NUM_IN_ALGO == sizeof(CcuFastLaunchCtx),
+    "ccuKernelNum must be the last member of CcuFastLaunchCtx");
+static_assert(
+    sizeof(CcuFastLaunchCtx) % alignof(ThreadHandle) == 0, "CcuFastLaunchCtx must preserve ThreadHandle alignment");
 
 // A5用了cntNotify
 struct AlgResourceRequest {
@@ -512,6 +532,14 @@ struct AlgResourceCtxSerializable {
         binaryStream >> kfcServerArgs;
         binaryStream >> kfcServerArgSize;
         binaryStream >> topoInfoSeqSize;
+        if ((topoInfoSeqSize == 0) || (topoInfoSeqSize > data.size())) {
+            HCCL_ERROR(
+                "[AlgResourceCtxSerializable::DeSerialize] invalid topo info size[%u], data size[%zu]", topoInfoSeqSize,
+                data.size());
+            topoInfoSeqSize = 0;
+            topoInfo = TopoInfoWithNetLayerDetails{};
+            return;
+        }
         size_t startPos = data.size() - topoInfoSeqSize;
         std::vector<char> tailData(data.begin() + startPos, data.end());
         TopoInfoWithNetLayerDetails topoTemp;
@@ -606,9 +634,13 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     u64 ctxSize = 0;
     void* resCtx = nullptr;
     ThreadHandle opThread = 0;
-    u32 aicpuRecordCpuIdx = 0; // aicpu record host的notifyIdx
-    u32 dataCount = 0;         // 算子上报dfx的数据量
-    DevAicpuOpConfig opConfig; // 收编算子配置类变量
+    u32 aicpuRecordCpuIdx = 0;              // aicpu record host的notifyIdx
+    u32 dataCount = 0;                      // 算子上报dfx的数据量
+    DevAicpuOpConfig opConfig;              // 收编算子配置类变量
+    bool aicpuCacheEnable = false;          // aicpu task cache开关
+    bool isCapture = false;                 // 是否为aclgraph
+    ThreadHandle exportHostOrderThread = 0; // host侧保序流映射到device
+    ThreadHandle deviceOrderThread = 0;     // device侧保序流
     u64 varMemSize{0};
     u8 varData[0];
     u64 ccuKfcArgs[4];  // 测试，ccu-kfc作为通信算子

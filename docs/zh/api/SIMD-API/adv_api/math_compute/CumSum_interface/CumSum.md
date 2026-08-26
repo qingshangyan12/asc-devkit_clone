@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/math_compute/CumSum_interface/CumSum_res.md#id1 -->
 
 ## 功能说明
 
@@ -50,10 +51,10 @@
     Sklansky二分累加算法是基于Sklansky Adder的并行前缀和逻辑实现的。[图1](#fig45153311379)为一维二进制的并行前缀和算法示意图。将该算法扩展至二维张量的累加和算法，以按行累加为例，[图2](#fig7422174293712)为该算法的执行步骤示意图，通过并行计算多行的加和，实现Sklansky二分累加算法下的按行累加和。
 
     **图1**  Sklansky Adder算法示意图<a name="fig45153311379"></a>  
-    ![](../../../../figures/Sklansky-Adder算法示意图.png "Sklansky-Adder算法示意图")
+    ![](../../../../figures/sklansky_adder_diagram.png "Sklansky-Adder算法示意图")
 
     **图2**  基于Sklansky的二分累加示意图<a name="fig7422174293712"></a>  
-    ![](../../../../figures/基于Sklansky的二分累加示意图.png "基于Sklansky的二分累加示意图")
+    ![](../../../../figures/sklansky_binary_accumulation.png "基于Sklansky的二分累加示意图")
 
 ## 函数原型
 
@@ -121,7 +122,7 @@ struct CumSumInfo {
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 -   输入input只支持二维结构。
 -   cumSumInfo.inner \* sizeof\(T\)必须是32字节的整数倍。
 

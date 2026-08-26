@@ -346,13 +346,13 @@
 
 将源值按照精度舍入模式取整，以fp4x2_e1m2_t格式存入目的操作数中。
 
-**示例**：输入：2.5。
+**示例**：输入：1.375。
 
-- **CAST_RINT模式**输出：2。
-- **CAST_FLOOR模式**输出：2。
-- **CAST_CEIL模式**输出：3。
-- **CAST_ROUND模式**输出：3。
-- **CAST_TRUNC模式**输出：2。
+- **CAST_RINT模式**输出：1.5。
+- **CAST_FLOOR模式**输出：1.25。
+- **CAST_CEIL模式**输出：1.5。
+- **CAST_ROUND模式**输出：1.5。
+- **CAST_TRUNC模式**输出：1.25。
 
 ---
 
@@ -682,7 +682,7 @@ complex64实部和虚部都是float类型，complex32实部和虚部都是half�
 
 **图9** double转bfloat16_t示意图
 
-![double转bfloat16_t示意图](../../../figures/绘图2.png)
+![double转bfloat16_t示意图](../../../figures/double2bfloat16.png)
 
 由于bfloat16_t只有8bit指数，指数部分需要转换，只有7bit尾数，因此灰色部分要进行舍入：
 

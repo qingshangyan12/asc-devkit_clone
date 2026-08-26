@@ -222,7 +222,7 @@ PIPE_FIX
 
 ## 调用示例
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 本示例占用32KB L1 Buffer、16KB L0A Buffer、16KB L0B Buffer、64KB L0C Buffer和64KB UB，并使用`EVENT_ID0`与同步资源编号`0x8`完成流水及核间同步。
 

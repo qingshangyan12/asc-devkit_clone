@@ -11,7 +11,8 @@
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
-#include "include/c_api/asc_simd.h"
+#include "c_api/cube_datamove/cube_datamove.h"
+#include "c_api/utils/sys_init.h"
 
 #define TEST_SYS_VAR_SET_PADDING(data_type)                                           \
                                                                                       \
@@ -24,7 +25,7 @@
     TEST_F(TestSysVarSetL13dPadding##data_type, c_api_set_l12ub_loop_size##data_type) \
     {                                                                                 \
         data_type input = 33;                                                         \
-        MOCKER_CPP(set_padding, void(uint64_t)).times(1);                             \
+        MOCKER_CPP(set_padding, void(uint64_t)).times(2);                             \
         asc_set_l13d_padding(input);                                                  \
         asc_init();                                                                   \
         GlobalMockObject::verify();                                                   \

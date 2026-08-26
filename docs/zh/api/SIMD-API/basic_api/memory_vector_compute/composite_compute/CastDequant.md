@@ -88,7 +88,7 @@
 |U|源操作数数据类型。<br> |
 |isSetMask|是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../mask_operations/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。|
 |isVecDeq|控制是否选择向量量化模式。<br>和`SetDeqScale`接口配合使用，当`SetDeqScale`接口传入Tensor时，isVecDeq必须为true。|
-|halfBlock|输出数据类型为b8时有效，用于指示输出元素存放在上半还是下半DataBlock。<br>halfBlock=true时，结果存放在下半DataBlock；halfBlock=false时，结果存放在上半DataBlock。<br>如下图所示，一个DataBlock大小的输入得到8个b8类型输出，当halfBlock为false时，这8个输出数据存放在上半DataBlock。<br>![](../../../../figures/halfBlock说明.png)<br>若需要得到连续的目的操作数数据，可以通过将DataBlock分为奇偶块，调用两次接口分别处理奇偶块，奇数块的输出存放在下半DataBlock，偶数块输出存放在上半DataBlock。<br>![](../../../../figures/castdequant_continous.png) |
+|halfBlock|输出数据类型为b8时有效，用于指示输出元素存放在上半还是下半DataBlock。<br>halfBlock=true时，结果存放在下半DataBlock；halfBlock=false时，结果存放在上半DataBlock。<br>如下图所示，一个DataBlock大小的输入得到8个b8类型输出，当halfBlock为false时，这8个输出数据存放在上半DataBlock。<br>![](../../../../figures/halfblock_description.png)<br>若需要得到连续的目的操作数数据，可以通过将DataBlock分为奇偶块，调用两次接口分别处理奇偶块，奇数块的输出存放在下半DataBlock，偶数块输出存放在上半DataBlock。<br>![](../../../../figures/castdequant_continous.png) |
 
 **表**  参数说明
 
@@ -156,8 +156,8 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md#section668772811100)。
 - 当输出类型为b8时，目的操作数数据类型需要和`SetDeqScale`接口的signMode入参配合，当signMode=true时输出数据类型int8_t；signMode=false时输出数据类型uint8_t。
 - halfBlock参数仅在输出数据为b8类型时有效。
 <!-- npu="A3,910b,950" id12 -->
@@ -176,9 +176,9 @@
   <!-- end id16 -->
 <!-- end id12 -->
 <!-- npu="950" id17 -->
-- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
-  - tensor高维切分计算接口占用8KB Unified Buffer临时空间。
-  - tensor前n个数据连续计算接口不涉及8KB Unified Buffer临时空间的占用。
+- 对Unified Buffer（UB）空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+  - tensor高维切分计算接口占用8KB UB临时空间。
+  - tensor前n个数据连续计算接口不涉及8KB UB临时空间的占用。
 <!-- end id17 -->
 - 当输入类型为int16_t，开启向量量化模式时，`SetDeqScale`接口需要传入至少128B大小的UB空间，若空间不足128B，可能导致精度错误。
 - 该接口需要与`SetDeqScale`配合使用，使用关系映射表如下：
@@ -186,9 +186,9 @@
   **表**  CastDequant与SetDeqScale使用关系映射表
   |CastDequant使用场景|对应使用的SetDeqScale函数原型|
   |---|---|
-  |输入类型为int16_t，关闭向量量化模式|<pre>\_\_aicore\_\_ inline void SetDeqScale(float scale, int16_t offset, bool signMode)</pre>|
-  |输入类型为int16_t，开启向量量化模式|<pre>template &lt;typename T&gt;<br>\_\_aicore\_\_ inline void SetDeqScale(const LocalTensor&lt;T&gt;& vdeq, const VdeqInfo& vdeqInfo)</pre>|
-  |输入类型为int32_t，输出数据类型为half类型|<pre>\_\_aicore\_\_ inline void SetDeqScale(half scale)</pre>|
+  |输入类型为int16_t，关闭向量量化模式|<br>\_\_aicore\_\_ inline void SetDeqScale(float scale, int16_t offset, bool signMode)|
+  |输入类型为int16_t，开启向量量化模式|<br>template &lt;typename T&gt;<br>\_\_aicore\_\_ inline void SetDeqScale(const LocalTensor&lt;T&gt;& vdeq, const VdeqInfo& vdeqInfo)|
+  |输入类型为int32_t，输出数据类型为half类型|<br>\_\_aicore\_\_ inline void SetDeqScale(half scale)|
 
 ## 关键特性
 

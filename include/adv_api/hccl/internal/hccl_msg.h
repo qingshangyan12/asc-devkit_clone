@@ -105,6 +105,11 @@ struct HcclMsg {
 // Current HcclMsgExt support 256 ranks max.
 // Current size of HcclMsgExt is 8256B, while stack frame size is 32KB limited. Thus, do not define HcclMsgExt object.
 constexpr uint32_t HCCL_MAX_RANK_NUM_V2 = 256;
+constexpr bool IsValidHcclMsgRankSize(uint64_t rankSize)
+{
+    return (rankSize > 0U) && (rankSize <= HCCL_MAX_RANK_NUM_V2);
+}
+
 struct HcclMsgExt {
     // sendCounts[i] represents the data count sent to rank i by this rank.
     uint64_t sendCounts[HCCL_MAX_RANK_NUM_V2];
@@ -135,8 +140,8 @@ constexpr uint32_t BYTE_PER_MB = BYTE_PER_KB * BYTE_PER_KB;
 // HcclMsgArea is the 16MB space reserved by workspace in struct HcclCombinOpParam and belongs to each comm group.
 // cacheline size aligned by 64 bytes
 struct TurnCnt {
-    uint64_t valid; // COMMIT_VALID_MASK, writen by client when Commit, checked by server
-    uint64_t cnt;   // commit cnt, writen by client, reset by server
+    uint64_t valid; // COMMIT_VALID_MASK, written by client when Commit, checked by server
+    uint64_t cnt;   // commit cnt, written by client, reset by server
     uint64_t reserved[6];
 };
 
@@ -144,8 +149,8 @@ struct SingleQueueMsg {
     HcclMsg sendMsgs[HCCL_MSG_CNT];
     HcclMsg recvMsgs[HCCL_MSG_CNT];
     uint8_t reserved0[8 * BYTE_PER_KB];    // for abi compatibility
-    TurnCnt commitTurnCnt[HCCL_MSG_CNT];   // writen by client, indicating task num needed to be executed.
-    TurnCnt finishedTurnCnt[HCCL_MSG_CNT]; // writen by server, indicating task num has been executed.
+    TurnCnt commitTurnCnt[HCCL_MSG_CNT];   // written by client, indicating task num needed to be executed.
+    TurnCnt finishedTurnCnt[HCCL_MSG_CNT]; // written by server, indicating task num has been executed.
     uint8_t reserved1[BYTE_PER_MB];
     HcclMsgExt paramExtMsgList[HCCL_MSG_CNT];
 };
@@ -227,6 +232,7 @@ struct OpResCtx {
     uint64_t resCtx;                   // 资源地址，用于资源下发时的处理
     uint32_t opType[HCCL_API_MAX_OP_NUM];
     uint32_t algorithmType[HCCL_API_MAX_OP_NUM];
+    uint64_t opParamSize[HCCL_API_MAX_OP_NUM];
 };
 } // namespace HcclApi
 

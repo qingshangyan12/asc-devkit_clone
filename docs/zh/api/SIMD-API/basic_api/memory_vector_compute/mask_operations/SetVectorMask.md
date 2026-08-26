@@ -70,7 +70,7 @@
 | 参数名 | 描述 |
 | --- | --- |
 | T | 矢量计算操作数数据类型。 |
-| mode | Mask模式，MaskMode类型，定义如下：<br><pre>enum class MaskMode : uint8_t {<br>    NORMAL = 0,  // Normal模式<br>    COUNTER      // Counter模式<br>};</pre>|
+| mode | Mask模式，MaskMode类型，定义如下：<br>enum class MaskMode : uint8_t {<br>    NORMAL = 0,  // Normal模式<br>    COUNTER      // Counter模式<br>};|
 
 **表2**  参数说明
 
@@ -111,9 +111,9 @@
     // 多次调用矢量计算API,可以统一设置为Normal模式，并设置mask参数，无需在API内部反复设置，省去了在API反复设置的过程，会有一定的性能优势
     // dstBlkStride, src0BlkStride, src1BlkStride = 1,单次迭代内数据连续读取和写入
     // dstRepStride, src0RepStride, src1RepStride = 8,相邻迭代间数据连续读取和写入
-    AscendC::Add<half, false>(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
-    AscendC::Sub<half, false>(src0Local, dstLocal, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
-    AscendC::Mul<half, false>(src1Local, dstLocal, src0Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
+    AscendC::Add<half, false>(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 1, 1, 1, 8, 8, 8 });
+    AscendC::Sub<half, false>(src0Local, dstLocal, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 1, 1, 1, 8, 8, 8 });
+    AscendC::Mul<half, false>(src1Local, dstLocal, src0Local, AscendC::MASK_PLACEHOLDER, 1, { 1, 1, 1, 8, 8, 8 });
     AscendC::ResetMask();
     ```
 

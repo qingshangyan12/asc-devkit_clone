@@ -27,7 +27,7 @@ MXMmad为带有量化系数X的矩阵乘法，即左矩阵和右矩阵均有对�
 
 - **MX scaleA系数矩阵分形介绍**<a name="section_mx_scalea_fractal_format"></a>
 
-    - **物理位置：** Global Memory/L1 Buffer/Unified Buffer：保存离线/在线生成左矩阵量化系数数据。
+    - **物理位置：** Global Memory/L1 Buffer/Unified Buffer（UB）：保存离线/在线生成左矩阵量化系数数据。
 
     - **设计原理：** MX矩阵乘法中A矩阵与scaleA矩阵物理地址上一一映射，LoadData（MX矩阵搬运）接口要求在L1 Buffer中scaleA矩阵满足行读取需求，因此在L1 Buffer上scaleA矩阵为按行存储的小z大Z排布（Zz）。
 
@@ -48,7 +48,7 @@ MXMmad为带有量化系数X的矩阵乘法，即左矩阵和右矩阵均有对�
 
 - **MX scaleB系数矩阵分形介绍**<a name="section_mx_scaleb_fractal_format"></a>
 
-    - **物理位置：** Global Memory/L1 Buffer/Unified Buffer：保存离线/在线生成右矩阵量化系数数据。
+    - **物理位置：** Global Memory/L1 Buffer/UB：保存离线/在线生成右矩阵量化系数数据。
 
     - **设计原理：** MX矩阵乘法中B矩阵与scaleB矩阵物理地址上一一映射，LoadData（MX矩阵搬运）接口要求在L1 Buffer上scaleB矩阵满足列读取需求，因此在L1 Buffer上scaleB矩阵为按列存储的大N小n排布（Nn）。
 
@@ -79,7 +79,7 @@ MXMmad为带有量化系数X的矩阵乘法，即左矩阵和右矩阵均有对�
 - 场景：通常存在于Global Memory（GM）中。在进行sparse矩阵运算前，通常需要离线生成并将其转换为大Z小n格式（Zn）以适配Cube单元。
 - 生成过程：如下图所示，对于原始矩阵B中的每4个元素，将在index矩阵中生成2个2位索引，并按照以下规则进行编码。索引必须在\{0, 1, 2\}范围内。
 **图5** index生成示意图<a name="zh-cn_topic_0000002563445163_fig1423214854720"></a>  
-![](../../../../figures/index生成示意图.png "index生成示意图")
+![](../../../../figures/index_generation.png "index生成示意图")
     - 第一个索引用于指示前3个元素中第1个非零元素的相对位置。
     - 第二个索引用于指示第2个非零元素在后3个元素中的相对位置。
     - 索引矩阵中的一个uint8的元素是由4个uint2\_t组合而成的，例如上图：生成的索引数据为1 2 0 1 ，索引数据在Global Memory（GM）地址中的排布从高位到低位为1 0 2 1 ，其中1 0 2 1（对应索引矩阵前四位1 2 0 1）为一个uint8\_t。

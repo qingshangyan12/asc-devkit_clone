@@ -104,7 +104,7 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ half* dst,
 
 **表1** 参数说明
 
-| 参数名 | 输入/输出 | 含义 |
+| 参数名 | 输入/输出 | 描述 |
 |---|---|---|
 | `dst` | 输出 | 目的操作数，存储位置为L0B Buffer。目的地址需512字节对齐。 |
 | `src` | 输入 | 源操作数，存储位置为L1 Buffer。源地址需32字节对齐。 |
@@ -174,7 +174,7 @@ PIPE_MTE1
 
 ## 调用示例
 
-将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)。
+将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：

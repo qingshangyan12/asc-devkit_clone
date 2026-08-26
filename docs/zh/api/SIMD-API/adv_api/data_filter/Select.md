@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/data_filter/Select_res.md#id1 -->
 
 ## 功能说明
 
@@ -33,14 +34,14 @@
 
 如下图样例，源操作数src0为Tensor，shape为\(2,16\)，数据类型为half，尾轴长度满足32字节对齐；源操作数src1为scalar，数据类型为half；maskTensor的数据类型为bool，为满足对齐要求shape为\(2,32\)，仅有图中蓝色部分的mask掩码生效，灰色部分不参与计算。输出目的操作数dstTensor如下图所示。
 
-![](../../../figures/nz-reduce-53.png)
+![](../../../figures/nz_reduce_53.png)
 
 ## 实现原理
 
 以float类型，ND格式，shape为\[m, k1\]的source输入Tensor，shape为\[m, k2\]的mask Tensor为例，描述Select高阶API内部算法框图，如下图所示。
 
 **图1**  Select算法框图  
-![](../../../figures/Select算法框图.png "Select算法框图")
+![](../../../figures/select_diagram.png "Select算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
 
@@ -50,7 +51,7 @@
 4.  Select步骤：根据cmpmask的结果，选择srcTensor相应位置的值或者scalar值，输出Output。
 
 **图2**  Select算法框图  
-![](../../../figures/Select算法框图-54.png "Select算法框图-54")
+![](../../../figures/select_diagram_1.png "Select算法框图-54")
 
 计算过程在Vector上进行，循环m次，每次对k1个元素进行如下操作：
 
@@ -112,7 +113,7 @@ struct SelectWithBytesMaskShapeInfo {
 ## 约束说明
 
 -   源操作数与目的操作数可以复用。
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../general_description_and_constraints.md#section796754519912)。
 -   maskTensor尾轴元素个数和源操作数尾轴元素个数不同的情况下， maskTensor的数据有可能被接口改写。
 
 ## 调用示例

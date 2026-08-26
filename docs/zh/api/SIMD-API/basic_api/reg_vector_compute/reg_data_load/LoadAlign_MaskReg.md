@@ -42,13 +42,13 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../regist
 [图1](#fig-loadalign-maskreg-norm)、[图2](#fig-loadalign-maskreg-us)、[图3](#fig-loadalign-maskreg-ds)展示了DIST_NORM、DIST_US、DIST_DS分布模式。
 
 **图1**  DIST_NORM模式搬入<a id="fig-loadalign-maskreg-norm"></a>  
-![](../../../../figures/DIST_NORM模式搬入.png)
+![](../../../../figures/dist_norm_mode_load.png)
 
 **图2**  DIST_US模式搬入<a id="fig-loadalign-maskreg-us"></a>  
-![](../../../../figures/DIST_US模式搬入.png)
+![](../../../../figures/dist_us_mode_load.png)
 
 **图3**  DIST_DS模式搬入<a id="fig-loadalign-maskreg-ds"></a>  
-![](../../../../figures/DIST_DS模式搬入.png)
+![](../../../../figures/dist_ds_mode_load.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -110,7 +110,7 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../regist
 
 ## 约束说明<a name="section11585101304320"></a>
 
-- 位于Unified Buffer的地址约束、offset的对齐约束、AddrReg寄存器中存储的偏移量 \* sizeof(T)的对齐约束与分布模式MaskDist有关，具体地址约束请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。
+- 位于UB的地址约束、offset的对齐约束、AddrReg寄存器中存储的偏移量 \* sizeof(T)的对齐约束与分布模式MaskDist有关，具体地址约束请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。
 - MaskReg模板参数regTrait只支持RegTraitNumOne。
 
 ## 调用示例<a name="section642mcpsimp"></a>
