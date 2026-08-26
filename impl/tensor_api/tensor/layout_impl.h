@@ -107,7 +107,7 @@ __aicore__ inline constexpr const Coord& resolve_copy_coord(const LayoutType&, c
 }
 
 template <typename Coord, typename LayoutType>
-__aicore__ inline decltype(auto) make_coord_layout(const Coord& coord, const LayoutType& layout)
+__aicore__ inline constexpr decltype(auto) make_coord_layout(const Coord& coord, const LayoutType& layout)
 {
     using shape_type = Std::remove_cvref_t<decltype(layout.shape())>;
     using coord_type = Std::remove_cvref_t<Coord>;
@@ -139,7 +139,7 @@ __aicore__ inline decltype(auto) make_same_slice_shape(
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape>
-__aicore__ inline decltype(auto) make_4d_slice_shape(
+__aicore__ inline constexpr decltype(auto) make_4d_slice_shape(
     const Coord& coord, const LayoutType& layout, const SliceShape& slice_shape)
 {
     static_assert(nesting_depth_v<SliceShape> == two_dim_data, "SliceShape must be Two Dim when layout is Four Dim");
@@ -187,7 +187,7 @@ __aicore__ inline decltype(auto) make_flat_slice_shape(
 }
 
 template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!is_layout_v<SliceShape>, int> = 0>
-__aicore__ inline decltype(auto) make_slice_shape(
+__aicore__ inline constexpr decltype(auto) make_slice_shape(
     const Coord& coord, const LayoutType& layout, const SliceShape& slice_shape)
 {
     static_assert(is_layout_v<LayoutType>, "LayoutType must be Layout");
@@ -232,7 +232,7 @@ __aicore__ inline decltype(auto) make_slice_layout(
 template <
     typename Coord, typename SrcLayoutType, typename DstLayoutType,
     Std::enable_if_t<is_layout_v<DstLayoutType>, int> = 0>
-__aicore__ inline decltype(auto) make_slice_layout(
+__aicore__ inline constexpr decltype(auto) make_slice_layout(
     const Coord& coord, const SrcLayoutType& src_layout, const DstLayoutType& dst_layout)
 {
     static_assert(is_layout_v<SrcLayoutType>, "SrcLayoutType must be Layout");
