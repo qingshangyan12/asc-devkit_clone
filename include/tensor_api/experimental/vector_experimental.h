@@ -8,6 +8,11 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_VECTOR_EXPERIMENTAL
+#endif
+
 /**
  * \file vector_experimental.h
  * \brief Aggregate header for Tensor API experimental vector interfaces.
@@ -27,5 +32,12 @@
 #include "tensor_api/experimental/arch/vector/data_reorder.h"
 #include "tensor_api/experimental/arch/vector/data_padding.h"
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 #endif // INCLUDE_TENSOR_API_EXPERIMENTAL_VECTOR_EXPERIMENTAL_H
+
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_VECTOR_EXPERIMENTAL)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_VECTOR_EXPERIMENTAL
+#endif

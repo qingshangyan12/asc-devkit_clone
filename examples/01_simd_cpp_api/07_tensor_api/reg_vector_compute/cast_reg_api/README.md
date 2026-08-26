@@ -101,13 +101,13 @@ y[i] = cast<To, Options>(x[i])
     核心转换代码如下：
 
     ```cpp
-    auto srcReg = src.load(coord);
+    auto srcReg = asc::te::experimental::load(src, coord);
     srcReg = srcReg.with_mask(asc::te::update_mask<WiderT>(remain));
 
     constexpr asc::te::cast_options options = {
         Layout, Round, Sat};
     auto dstReg = asc::te::cast<DstT, options>(srcReg);
-    dst.store(coord, dstReg);
+    asc::te::experimental::store(dst, coord, dstReg);
     ```
 
     当源类型和目标类型位宽不同时，样例会为 `load` 或 `store` 指定对应的 sideband mode，保证寄存器数据排布与转换指令匹配。

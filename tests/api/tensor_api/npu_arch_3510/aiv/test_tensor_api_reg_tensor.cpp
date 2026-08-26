@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include "tensor_api/stub/cce_stub.h"
+#include "tensor_api/experimental/vector_experimental.h"
 #include "tensor_api/tensor.h"
 
 namespace {
@@ -24,14 +25,14 @@ template <typename T>
 struct has_mask_member<T, void_t<decltype(&T::mask)>> : AscendC::Std::true_type {};
 
 template <typename tensor_type, typename coord_type, typename = void>
-struct has_reg_load : AscendC::Std::false_type {};
+struct has_member_reg_load : AscendC::Std::false_type {};
 
 template <typename tensor_type, typename coord_type>
-struct has_reg_load<
+struct has_member_reg_load<
     tensor_type, coord_type,
     void_t<decltype(AscendC::Std::declval<const tensor_type&>()
-                        .template load<asc::te::experimental::load_sideband_mode::direct>(
-                            AscendC::Std::declval<const coord_type&>()))>> : AscendC::Std::true_type {};
+                         .template load<asc::te::experimental::load_sideband_mode::direct>(
+                             AscendC::Std::declval<const coord_type&>()))>> : AscendC::Std::true_type {};
 
 template <typename T,
           asc::te::experimental::load_sideband_mode sideband_mode =
@@ -48,16 +49,17 @@ __simd_vf__ inline void compile_reg_local_tensor_load_store(
     asc::te::local_tensor<engine_type, layout_type> src_tensor(src_mem, layout);
     using coord_type = decltype(asc::te::make_coord(0));
     using tensor_api_base = typename decltype(src_tensor)::tensor_api_base;
-    static_assert(!has_reg_load<tensor_api_base, coord_type>::value);
-    static_assert(has_reg_load<decltype(src_tensor), coord_type>::value);
+    static_assert(!has_member_reg_load<tensor_api_base, coord_type>::value);
+    static_assert(!has_member_reg_load<decltype(src_tensor), coord_type>::value);
     static_assert(AscendC::Std::is_base_of_v<tensor_api_base, decltype(src_tensor)>);
 
     asc::te::experimental::reg_tensor<bool> mask_reg {mask};
-    auto value = src_tensor.template load<sideband_mode>(asc::te::make_coord(0)).with_mask(mask_reg);
+    auto value = asc::te::experimental::load<sideband_mode>(src_tensor, asc::te::make_coord(0)).with_mask(mask_reg);
     static_assert(AscendC::Std::is_same_v<typename decltype(value)::elem_type, T>);
-    dst_tensor.store(asc::te::make_coord(0), value);
+    asc::te::experimental::store(dst_tensor, asc::te::make_coord(0), value);
 
-    auto full_value = src_tensor.load(asc::te::make_coord(0)).with_mask(asc::te::experimental::all_mask<T>());
+    auto full_value =
+        asc::te::experimental::load(src_tensor, asc::te::make_coord(0)).with_mask(asc::te::experimental::all_mask<T>());
     static_assert(AscendC::Std::is_same_v<typename decltype(full_value)::elem_type, T>);
 }
 
@@ -69,14 +71,14 @@ __simd_vf__ inline void compile_reg_local_tensor_load_mode(__ubuf__ uint8_t* src
     if constexpr (sideband_mode == asc::te::experimental::load_sideband_mode::deintlv) {
         asc::te::experimental::reg_tensor<uint8_t> dst0;
         asc::te::experimental::reg_tensor<uint8_t> dst1;
-        static_assert(
-            AscendC::Std::is_same_v<decltype(src_tensor.load(asc::te::make_coord(0), dst0, dst1)), void>);
-        src_tensor.template load<sideband_mode>(asc::te::make_coord(0), dst0, dst1);
+        static_assert(AscendC::Std::is_same_v<
+                      decltype(asc::te::experimental::load(src_tensor, asc::te::make_coord(0), dst0, dst1)), void>);
+        asc::te::experimental::load<sideband_mode>(src_tensor, asc::te::make_coord(0), dst0, dst1);
         auto mask = asc::te::experimental::all_mask<uint8_t>();
         dst0.with_mask(mask);
         dst1.with_mask(mask);
     } else {
-        auto value = src_tensor.template load<sideband_mode>(asc::te::make_coord(0));
+        auto value = asc::te::experimental::load<sideband_mode>(src_tensor, asc::te::make_coord(0));
         static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<uint8_t>>);
         value.with_mask(asc::te::experimental::all_mask<uint8_t>());
     }
@@ -87,7 +89,7 @@ __simd_vf__ inline void compile_reg_local_tensor_broadcast(__ubuf__ float* src)
 {
     auto layout = asc::te::make_layout(asc::te::make_shape(64));
     auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
-    auto value = src_tensor.template load_broadcast<broadcast_mode_value>(asc::te::make_coord(0));
+    auto value = asc::te::experimental::load_broadcast<broadcast_mode_value>(src_tensor, asc::te::make_coord(0));
     static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<float>>);
     value.with_mask(asc::te::experimental::all_mask<float>());
 }
@@ -100,13 +102,13 @@ __simd_vf__ inline void compile_reg_local_tensor_store_mode(__ubuf__ uint32_t* d
     asc::te::experimental::reg_tensor<uint32_t> src0 {mask};
     if constexpr (sideband_mode == asc::te::experimental::store_sideband_mode::intlv) {
         asc::te::experimental::reg_tensor<uint32_t> src1 {mask};
-        static_assert(
-            AscendC::Std::is_same_v<decltype(dst_tensor.store(asc::te::make_coord(0), src0, src1)), void>);
-        dst_tensor.template store<sideband_mode>(asc::te::make_coord(0), src0, src1);
-    } else {
         static_assert(AscendC::Std::is_same_v<
-                      decltype(dst_tensor.template store<sideband_mode>(asc::te::make_coord(0), src0)), void>);
-        dst_tensor.template store<sideband_mode>(asc::te::make_coord(0), src0);
+                      decltype(asc::te::experimental::store(dst_tensor, asc::te::make_coord(0), src0, src1)), void>);
+        asc::te::experimental::store<sideband_mode>(dst_tensor, asc::te::make_coord(0), src0, src1);
+    } else {
+        static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::store<sideband_mode>(
+                                                     dst_tensor, asc::te::make_coord(0), src0)), void>);
+        asc::te::experimental::store<sideband_mode>(dst_tensor, asc::te::make_coord(0), src0);
     }
 }
 

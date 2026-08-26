@@ -90,18 +90,18 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
     1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct two-dimensional tensors in GM and UB.
     2. Wrap the MTE2 pipeline with `asc_lock/asc_unlock`, and use `asc::te::copy` to move the input from GM to UB.
     3. Calculate the number of elements processed by each register operation from the register size and element type size, and use `asc::te::all_mask<T>()` to generate an all-valid mask.
-    4. Use the tensor `load` interface to load UB data into `asc::te::reg_tensor<T>`, call `asc::te::trunc` to round the data toward zero, and use the tensor `store` interface to write the result back to UB.
+    4. Use `asc::te::experimental::load` to load UB data into a register, call `asc::te::trunc` to round the data toward zero, and use `asc::te::experimental::store` to write the result back to UB.
     5. Lock the Vector and MTE3 pipelines in sequence with the same mutex, and then move the result from UB to GM.
 
     The core computation code is as follows:
 
     ```cpp
     const auto coord = asc::te::make_coord(offset / columnCount, offset % columnCount);
-    auto srcReg = src.load(coord);
+    auto srcReg = asc::te::experimental::load(src, coord);
     srcReg.with_mask(asc::te::all_mask<T>());
 
     auto dstReg = asc::te::trunc(srcReg);
-    dst.store(coord, dstReg);
+    asc::te::experimental::store(dst, coord, dstReg);
     ```
 
   - Invocation

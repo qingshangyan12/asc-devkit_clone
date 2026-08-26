@@ -14,6 +14,7 @@
 
 #include "tensor_api/stub/cce_stub.h"
 
+#include "tensor_api/experimental/vector_experimental.h"
 #include "tensor_api/tensor.h"
 
 namespace {
@@ -59,11 +60,11 @@ __simd_vf__ inline void truncate_reg_loop(const SrcTensor src, DstTensor dst, ui
     for (uint32_t i = 0; i < repeat; ++i) {
         const uint32_t offset = i * elements_per_reg;
         const auto coord = asc::te::make_coord(offset / column_count, offset % column_count);
-        auto src_reg = src.load(coord);
+        auto src_reg = asc::te::experimental::load(src, coord);
         src_reg.with_mask(full_mask);
 
         auto dst_reg = asc::te::experimental::trunc(src_reg);
-        dst.store(coord, dst_reg);
+        asc::te::experimental::store(dst, coord, dst_reg);
     }
 }
 

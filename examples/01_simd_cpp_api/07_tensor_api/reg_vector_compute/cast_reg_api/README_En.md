@@ -101,13 +101,13 @@ y[i] = cast<To, Options>(x[i])
     The core conversion code is as follows:
 
     ```cpp
-    auto srcReg = src.load(coord);
+    auto srcReg = asc::te::experimental::load(src, coord);
     srcReg = srcReg.with_mask(asc::te::update_mask<WiderT>(remain));
 
     constexpr asc::te::cast_options options = {
         Layout, Round, Sat};
     auto dstReg = asc::te::cast<DstT, options>(srcReg);
-    dst.store(coord, dstReg);
+    asc::te::experimental::store(dst, coord, dstReg);
     ```
 
     When the source and destination types have different widths, the sample specifies the corresponding sideband mode for `load` or `store` so that the register data layout matches the conversion instruction.
