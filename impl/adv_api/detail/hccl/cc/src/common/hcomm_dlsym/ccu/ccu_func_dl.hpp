@@ -179,4 +179,28 @@ inline CcuResult CallFuncByAddr(const Variable& funcPc, Args... args)
 } // namespace AscendC
 
 #endif // CANN_VERSION_NUM >= 90100000
+
+namespace AscendC {
+namespace ccu {
+
+class FuncCall {
+public:
+    explicit FuncCall(const Variable& funcPc) : funcPc_(funcPc) {}
+
+    void SetInArg(const Variable& arg) { inArgs_.push_back(arg.handle); }
+
+    CcuResult AppendToContext() const
+    {
+        return ::CcuFuncCallByAddr(
+            funcPc_.handle, inArgs_.empty() ? nullptr : inArgs_.data(), static_cast<uint32_t>(inArgs_.size()));
+    }
+
+private:
+    const Variable& funcPc_;
+    std::vector<::CcuVariableHandle> inArgs_;
+};
+
+} // namespace ccu
+} // namespace AscendC
+
 #endif // CCU_FUNC_DL_HPP

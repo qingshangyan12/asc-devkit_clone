@@ -8,8 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include <utility>
-
 #include "ccu_kernel_alg_base.h"
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
 #include "../../../../all_reduce/template/ccu/kernel/ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.h"
@@ -28,6 +26,8 @@ const uint32_t HBM_PARAM_IDX_0 = 0;
 const uint32_t HBM_PARAM_IDX_1 = 1;
 const uint32_t HBM_PARAM_IDX_2 = 2;
 const uint32_t HBM_PARAM_IDX_3 = 3;
+const uint32_t HBM_PARAM_IDX_8 = 8;
+const uint32_t HBM_PARAM_IDX_17 = 17;
 
 const uint32_t SINGLE_DIE = 1;
 const uint32_t DOUBLE_DIE = 2;
@@ -179,19 +179,16 @@ CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Vari
     return CCU_SUCCESS;
 }
 
-template <std::size_t... Is>
-static CcuResult CallKfcSubKernel(
-    ccu::Array<ccu::Variable>& param, KfcServerContext& ctx, std::index_sequence<Is...>)
-{
-    return ccu::CallFuncByAddr(
-        ctx.subKernelPc, param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token,
-        param[HBM_PARAM_IDX_3 + Is]...);
-}
-
 static CcuResult DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
-    return CallKfcSubKernel(
-        param, ctx, std::make_index_sequence<CCU_PARAM_NUM_PER_DIE - HBM_PARAM_IDX_3>{});
+    ccu::FuncCall funcCall(ctx.subKernelPc);
+    funcCall.SetInArg(param[HBM_PARAM_IDX_1]);
+    funcCall.SetInArg(param[HBM_PARAM_IDX_2]);
+    funcCall.SetInArg(ctx.token);
+    for (uint32_t i = HBM_PARAM_IDX_3; i <= HBM_PARAM_IDX_17; ++i) {
+        funcCall.SetInArg(param[i]);
+    }
+    return funcCall.AppendToContext();
 }
 
 CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
