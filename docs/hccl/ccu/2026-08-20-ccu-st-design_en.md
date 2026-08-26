@@ -290,12 +290,9 @@ tests/api/adv_api/hccl/cc/st/algorithm/
 ├── testcase/mc2_ccu/                       ← operator self-contained
 │   ├── CMakeLists.txt                      ← build target
 │   └── all_to_all/                         ← AllToAll-specific
-│       ├── all_to_all_testcase.cpp          ← test cases (14 TEST_F)
+│       ├── all_to_all_testcase.cpp          ← test cases (24 TEST_F)
 │       ├── ccu_all_to_all.h/.cc             ← primitive-level: CcuStAllToAll + registry + PrepareOpParam
-│       ├── ccu_all_to_all_mesh1d_adapter.h/.cc  ← algorithm-level: config + capture + BuildMesh1DScenario
-│       └── shim/                            ← stubs
-│           ├── ccu_primitives_dl.hpp         ← header redirection (product include → ST stub)
-│           └── stubs.cc                      ← product function stubs
+│       └── ccu_all_to_all_mesh1d_adapter.h/.cc  ← algorithm-level: config + capture + BuildMesh1DScenario
 │
 └── utils/src/                              ← pure generic framework
     │
@@ -306,6 +303,7 @@ tests/api/adv_api/hccl/cc/st/algorithm/
     ├── hccl_proxy/                         ← stub/proxy layer
     │   ├── ccu_st_types.h                  ← OpCode / Operation / Program
     │   ├── ccu_primitives_stub.h/.cc       ← CCU API stubs (record IR)
+    │   ├── ccu_primitives_dl.hpp           ← header redirection (product include → ST stub)
     │   ├── ccu_kernel_proxy.h/.cc          ← RegisterManager + channelMap
     │   ├── hcomm_ccu_stub.cc               ← HcommCcuKernelRegister bridge
     │   ├── hccl_stub.cc                    ← HcclChannelAcquire etc. stubs
@@ -418,13 +416,12 @@ struct CcuStScenario {
     HcclDataType outputType = HCCL_DATA_TYPE_RESERVED;  // low-precision reduce output type (RESERVED = same as dataType)
     uint32_t root = 0;                    // root rank for Broadcast/Reduce/Scatter
     bool inPlace = false;                 // in-place operation (input==output, for AllReduce)
-
-    bool corruptOutput = false;           // negative: corrupt output
-    bool outOfRangeParam = false;         // negative: parameter out of range (reserved, currently unused)
 };
 ```
 
 The test case only needs to construct a `CcuStScenario` + call `VerifyScenario`.
+
+**Test naming convention**: `{AlgorithmName}_{Dimensions}_{Params}`, e.g. `CcuAlltoAllMesh1D_2Rank_SingleDie_Fp16_100B`. Each test case explicitly sets `expectedAlgName`, not hidden in the `MakeScenario` helper.
 
 ---
 
@@ -466,9 +463,6 @@ VerifyScenario(scenario)
 │   RuntimeWorld::Launch(data.launches)   ← execute IR, precise localization on deadlock
 │   CcuDagChecker::Check(executionLog)    ← memory conflict detection
 │   CheckRuntimeOutput(memories, expectation, world)  ← byte-by-byte comparison
-│
-│   if (corruptOutput):
-│     corrupt output → EXPECT_FALSE(CheckRuntimeOutput)
 │
 └── 7. Cleanup
     SimWorld::Deinit()
@@ -741,10 +735,9 @@ all_gather/
 ├── all_gather_testcase.cpp              ← test cases
 ├── ccu_all_gather.h/.cc                 ← primitive-level: CcuStAllGather + PrepareOpParam + registry
 ├── ccu_all_gather_mesh1d_adapter.h/.cc  ← algorithm-level: config + capture + builder
-└── shim/
-    ├── ccu_primitives_dl.hpp
-    └── stubs.cc
 ```
+
+**Note**: New algorithms do **not** need a `shim/` directory. CCU primitive interception is handled by `utils/src/hccl_proxy/ccu_primitives_dl.hpp` (shared by all operators). Product function stubs have been eliminated — see Section 9.
 
 Primitive-level implementation:
 - `PrepareOpParam` — fill `opParam.DataDes.count` / `opParam.DataDes.dataType`
@@ -766,9 +759,8 @@ When adding a new communication primitive, utils needs changes:
 |------|------|
 | `testcase/mc2_ccu/CMakeLists.txt` | Add AllGather product sources + include paths + testcase source files |
 | `utils/src/ccu_scenario/ccu_scenario.h` | `CcuStScenario`'s `opType` supports new primitive enum value (e.g., `HCCL_OP_ALLGATHER`) |
-| `utils/src/hccl_proxy/stubs.cc` | If the new primitive has additional product functions that need stubs, add stub |
 
-The framework logic of utils (`VerifyScenario`, `CcuProgramChecker`, `RuntimeWorld`, `CaptureRuntimeExpectation`, `CheckRuntimeOutput`) does not need to change — they are primitive-agnostic generic flows.
+The framework logic of utils (`VerifyScenario`, `CcuProgramChecker`, `RuntimeWorld`, `CaptureRuntimeExpectation`, `CheckRuntimeOutput`) does not need to change — they are primitive-agnostic generic flows. Product function stubs have been fully eliminated — new operators do not need to write any stubs.
 
 ### 15.4 Expected Output Computation
 

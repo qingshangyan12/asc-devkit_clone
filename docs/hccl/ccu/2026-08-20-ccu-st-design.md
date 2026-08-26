@@ -280,12 +280,9 @@ tests/api/adv_api/hccl/cc/st/algorithm/
 ├── testcase/mc2_ccu/                       ← 算子自包含
 │   ├── CMakeLists.txt                      ← 构建 target
 │   └── all_to_all/                         ← AllToAll 专属
-│       ├── all_to_all_testcase.cpp          ← 用例（14 个 TEST_F）
+│       ├── all_to_all_testcase.cpp          ← 用例（24 个 TEST_F）
 │       ├── ccu_all_to_all.h/.cc             ← 原语级：CcuStAllToAll + 注册表 + PrepareOpParam
-│       ├── ccu_all_to_all_mesh1d_adapter.h/.cc  ← 算法级：config + capture + BuildMesh1DScenario
-│       └── shim/                            ← 桩
-│           ├── ccu_primitives_dl.hpp         ← 头文件重定向（产品 include → ST stub）
-│           └── stubs.cc                      ← 产品函数桩
+│       └── ccu_all_to_all_mesh1d_adapter.h/.cc  ← 算法级：config + capture + BuildMesh1DScenario
 │
 └── utils/src/                              ← 纯通用框架
     │
@@ -296,10 +293,12 @@ tests/api/adv_api/hccl/cc/st/algorithm/
     ├── hccl_proxy/                         ← 桩/代理层
     │   ├── ccu_st_types.h                  ← OpCode / Operation / Program
     │   ├── ccu_primitives_stub.h/.cc       ← CCU API 桩（录制 IR）
+    │   ├── ccu_primitives_dl.hpp           ← 头文件重定向（产品 include → ST stub）
     │   ├── ccu_kernel_proxy.h/.cc          ← RegisterManager + channelMap
     │   ├── hcomm_ccu_stub.cc               ← HcommCcuKernelRegister 桥接
     │   ├── hccl_stub.cc                    ← HcclChannelAcquire 等 stub
     │   ├── aclrt_stub.cc                   ← ACL Runtime stub
+    │   ├── log_stub.cc                     ← 日志桩（支持 HCCL_LOG_LEVEL 环境变量）
     │   ├── communicator/                   ← SimCommunicator / SimChannel
     │   └── topo_model/                     ← TopoModel 拓扑模型
     │
@@ -408,13 +407,14 @@ struct CcuStScenario {
     HcclDataType outputType = HCCL_DATA_TYPE_RESERVED;  // 低精度归约输出类型（RESERVED=同 dataType）
     uint32_t root = 0;                    // Broadcast/Reduce/Scatter 的 root rank
     bool inPlace = false;                 // 原地操作（input==output，AllReduce 用）
-
-    bool corruptOutput = false;           // 负向：篡改 output
-    bool outOfRangeParam = false;         // 负向：参数越界（预留，当前未使用）
 };
 ```
 
 用例只需构造 `CcuStScenario` + 调 `VerifyScenario`。
+
+**用例命名规范**：`{算法名}_{维度}_{参数}`，如 `CcuAlltoAllMesh1D_2Rank_SingleDie_Fp16_100B`。每个用例显式设置 `expectedAlgName`，不隐藏在 `MakeScenario` 辅助函数中。
+
+**`expectedAlgName` 检查机制**：fixture 中 rank 0 检查 `algName != scenario.expectedAlgName` 时不匹配则返回 0（无 kernel handle），后续 `ASSERT_NE(handles[rank], 0U)` 失败。`expectedAlgName` 为空时跳过检查。
 
 ---
 
@@ -425,6 +425,8 @@ VerifyScenario(scenario)
 │
 ├── 1. 初始化
 │   RegisterManager::Reset()
+│   setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED")
+│   InitEnvConfig()                     ← 初始化 g_algEnvConfig（解析环境变量）
 │   SimWorld::Init(topoMeta, devType)    ← 只 Init 一次
 │
 ├── 2. 多线程注册 kernel
@@ -456,9 +458,6 @@ VerifyScenario(scenario)
 │   RuntimeWorld::Launch(data.launches)   ← 执行 IR，死锁时精确定位
 │   CcuDagChecker::Check(executionLog)    ← 内存冲突检测
 │   CheckRuntimeOutput(memories, expectation, world)  ← 逐字节比对
-│
-│   if (corruptOutput):
-│     篡改 output → EXPECT_FALSE(CheckRuntimeOutput)
 │
 └── 7. 清理
     SimWorld::Deinit()
@@ -546,6 +545,56 @@ CCU_WHILE(cond)                    → Operation{WHILE_BEGIN} + body + Operation
 - `WHILE_BEGIN` 条件 false → 跳到 WHILE_END+1
 - 全部 completed → SUCCESS
 - 全部阻塞 → DEADLOCK（精确定位）
+
+### 9.4 产品函数桩消除
+
+早期设计中，`testcase/mc2_ccu/all_to_all/shim/stubs.cc` 包含约 159 行产品函数桩，shadow 了 proxy 库中的真实实现。现已全部消除，改用 `hccl-model-proxy` 真实实现：
+
+**链接策略**：
+
+```
+target_link_libraries(${HCCL_CCU_ST_TARGET} PRIVATE
+    -Wl,--whole-archive hccl-model-proxy -Wl,--no-whole-archive
+    ${HCCL_CHECKER_KERNEL_TARGET} hccl-verifier ...
+)
+```
+
+`--whole-archive` 强制拉入 proxy 的所有 object（包括 `mmpa_stub.cc`、`hccl_profiling_dfx_stub.cc` 等），解决弱符号链接问题。CANN 头文件中 `mmSysGetEnv`、`HcclDfxRegOpInfoByCommId` 等声明为 `__attribute__((weak))`，弱定义在静态库中不会被链接器自动拉入。
+
+**直接编译的产品源文件**（替代桩）：
+
+| 产品源文件 | 替代的桩 | 说明 |
+|-----------|---------|------|
+| `ccu_log.cc` | `ConvertCcuToHccl` 桩 | CCU 错误码映射 |
+| `ccu_res_dl.cc` | 9 个 `HcommIsSupportHcommCcu*` 桩 | CCU 资源 API 能力查询 |
+| `hccl_ccu_res_dl.cc` | `HcommIsSupportHcclCommAssignCcuIns` 桩 | CCU ins 能力查询 |
+
+**`InitEnvConfig()` 调用**：
+
+fixture 在 `setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED")` 之后调用 `InitEnvConfig()`，初始化 `g_algEnvConfig` 全局变量。真实版 `GetExternalInputHcclCcuSchedMode()` 返回 `g_algEnvConfig.ccuSchedMode`，依赖初始化；旧桩版直接读环境变量，行为不一致。
+
+**剩余的唯一 header shim**：
+
+`utils/src/hccl_proxy/ccu_primitives_dl.hpp` — 拦截产品代码的 `#include "ccu_primitives_dl.hpp"`，redirect 到 `ccu_primitives_stub.h`，是 ST 框架录制 CCU 原语为 IR 的核心入口。所有算子共享，不需要每个算子单独维护。
+
+### 9.5 日志动态控制
+
+`log_stub.cc` 支持运行时控制日志级别：
+
+```
+默认级别：INFO（0x01）
+环境变量：HCCL_LOG_LEVEL=0（DEBUG）~ HCCL_LOG_LEVEL=3（ERROR）
+API：     EnableLog(0) / DisableLog()（fixture 内调用）
+```
+
+日志级别对照：
+
+| 值 | 级别 | 说明 |
+|----|------|------|
+| 0 | DEBUG | 全开 |
+| 1 | INFO | 默认 |
+| 2 | WARNING | 警告+错误 |
+| 3 | ERROR | 只看错误 |
 
 ---
 
@@ -731,10 +780,9 @@ all_gather/
 ├── all_gather_testcase.cpp              ← 用例
 ├── ccu_all_gather.h/.cc                 ← 原语级：CcuStAllGather + PrepareOpParam + 注册表
 ├── ccu_all_gather_mesh1d_adapter.h/.cc  ← 算法级：config + capture + builder
-└── shim/
-    ├── ccu_primitives_dl.hpp
-    └── stubs.cc
 ```
+
+**注意**：新增算法**不需要** shim 目录。CCU 原语拦截由 `utils/src/hccl_proxy/ccu_primitives_dl.hpp` 统一处理，所有算子共享。产品函数桩已全部消除，改用 `hccl-model-proxy` 真实实现（见第 9 节）。
 
 原语级实现：
 - `PrepareOpParam` — 填 `opParam.DataDes.count` / `opParam.DataDes.dataType`
@@ -756,9 +804,8 @@ all_gather/
 |------|------|
 | `testcase/mc2_ccu/CMakeLists.txt` | 加 AllGather product sources + include 路径 + testcase 源文件 |
 | `utils/src/ccu_scenario/ccu_scenario.h` | `CcuStScenario` 的 `opType` 支持新原语枚举值（如 `HCCL_OP_ALLGATHER`） |
-| `utils/src/hccl_proxy/stubs.cc` | 如新原语有额外的产品函数需要桩，补充 stub |
 
-utils 的框架逻辑（`VerifyScenario`、`CcuProgramChecker`、`RuntimeWorld`、`CaptureRuntimeExpectation`、`CheckRuntimeOutput`）不需要改——它们是原语无关的通用流程。
+utils 的框架逻辑（`VerifyScenario`、`CcuProgramChecker`、`RuntimeWorld`、`CaptureRuntimeExpectation`、`CheckRuntimeOutput`）不需要改——它们是原语无关的通用流程。产品函数桩已全部消除，新增算子不需要写任何桩。
 
 ### 15.4 期望输出计算
 
