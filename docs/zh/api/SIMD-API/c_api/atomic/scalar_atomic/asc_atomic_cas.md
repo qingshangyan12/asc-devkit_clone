@@ -26,7 +26,13 @@
 
 ## 功能说明
 
-对Global Memory中`address`指向的单个元素执行原子比较交换操作。读取该元素的旧值`old_value`，若`old_value`与`compare`相等，则将`val`写回该地址，否则保持原值不变。无论比较是否成功，均返回`old_value`。整个读取、比较和条件写回过程为原子操作。
+对Global Memory中`address`指向的单个元素执行原子比较交换操作。读取该元素的旧值`old_value`，按照以下公式计算并写回新值`new_value`：
+
+$$
+new\_value = (old\_value == compare) ? val : old\_value
+$$
+
+接口返回`old_value`。整个读取、比较和条件写回过程为原子操作。
 
 ## 函数原型
 
@@ -55,7 +61,7 @@ __aicore__ inline int32_t asc_atomic_cas(__gm__ int32_t* address,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| address | 输入/输出 | Global Memory的地址。 |
+| address | 输入 | Global Memory的地址。 |
 | compare | 输入 | 源操作数，做比较的值。 |
 | val | 输入 | 源操作数，用于赋值的值。 |
 

@@ -39,7 +39,7 @@ __aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits,
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|

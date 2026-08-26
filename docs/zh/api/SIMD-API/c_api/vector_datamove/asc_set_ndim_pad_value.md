@@ -51,7 +51,7 @@ __aicore__ inline void asc_set_ndim_pad_value(int32_t pad_value)
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|

@@ -49,7 +49,7 @@
 
 ## 掩码寄存器
 
-掩码寄存器的类型为`vector_bool`，用于在矢量计算中筛选参与计算的元素，其长度为`VL / 8`，即32字节（256 bit）。使用立即数偏移或Post Update模式搬运掩码寄存器时，UB地址偏移量的单位为字节；使用`addr_reg`搬运时，偏移量的单位为元素个数，并使用`b32`寻址模式。
+掩码寄存器的类型为`vector_bool`，用于在矢量计算中筛选参与计算的元素，其长度为`VL / 8`，即32字节（256 bit）。
 
 如图1所示，当操作数类型为`b8`时，每个元素对应1 bit掩码；当操作数类型为`b16`时，每个元素对应2 bit掩码，且仅最低有效位（LSB）有效；当操作数类型为`b32`时，每个元素对应4 bit掩码，且仅最低有效位有效。
 
@@ -73,7 +73,7 @@ asc_unpack_lower(mask_b64, mask_b32);
 | :-- | :------------ | :------------ | :------------ |
 | 1 | 调用接口设置 | [asc_create_mask](../../reg_compute/reg_mask/asc_create_mask.md) | 通过参数指定掩码模式，即指定参与计算的元素位置。 |
 | 2 | 调用接口设置 | [asc_update_mask](../../reg_compute/reg_mask/asc_update_mask.md) | &bull; 在循环外调用时，设置固定掩码，表示每次循环中前`count`个元素参与计算。<br>&bull; 在循环内调用时，根据剩余的`count`生成当前循环的掩码，并自动更新`count`。 |
-| 3 | 从UB搬入 | [asc_loadalign_postupdate](../../reg_compute/load/asc_loadalign_postupdate.md) | 将掩码从UB搬入掩码寄存器。 |
+| 3 | 从UB搬入 | [asc_loadalign](../../reg_compute/load/asc_loadalign.md)、[asc_loadalign_postupdate](../../reg_compute/load/asc_loadalign_postupdate.md)等接口 | 将掩码从UB搬入掩码寄存器。 |
 | 4 | 从矢量数据寄存器搬入 | [asc_copy](../../reg_compute/reg_copy/asc_copy.md) | 从`vector_uint16_t`或`vector_uint32_t`搬运至掩码寄存器。 |
 
 **注意：**
@@ -117,7 +117,7 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 
 地址寄存器的类型为`addr_reg`，用于存储地址偏移量。通过[asc_update_addr_reg](../../reg_compute/reg_addr_reg/asc_update_addr_reg.md)在循环内生成地址寄存器后，地址寄存器会根据各层循环设置的步长计算偏移量。
 
-`addr_reg`的偏移量计算公式为`offset = Σ(index_i × stride_i)`，其中`index_i`为第`i`层循环的迭代变量，`stride_i`为对应循环层的步长。地址寄存器中的偏移量以元素个数为单位：`b8`、`b16`和`b32`寻址模式分别以1字节、2字节和4字节为一个元素。
+`addr_reg`的偏移量计算公式为`offset = Σ(index_i × stride_i)`，其中`index_i`为第`i`层循环的迭代变量，`stride_i`为对应循环层的步长。地址寄存器中的偏移量以元素个数为单位。调用`asc_update_addr_reg_b8`、`asc_update_addr_reg_b16`和`asc_update_addr_reg_b32`生成地址寄存器时，每个元素分别按1字节、2字节和4字节计算实际地址偏移。
 
 **注意：**
 
@@ -125,7 +125,7 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 
 - 使用`addr_reg`进行地址偏移时，实际访问地址必须满足对应数据搬运接口的地址对齐约束。
 
-- `asc_update_addr_reg`不支持`b64`寻址模式。搬运`int64_t`或`uint64_t`数据时，应使用`asc_update_addr_reg_b32`生成地址寄存器。一个`b64`元素占用两个`b32`寻址单元，因此各维步长必须设置为期望的`b64`元素步长的2倍。例如：
+- `asc_update_addr_reg`未提供`b64`模式。搬运`int64_t`或`uint64_t`数据时，应使用`asc_update_addr_reg_b32`生成地址寄存器。一个`int64_t`或`uint64_t`元素占用两个`b32`偏移单元，因此传入`asc_update_addr_reg_b32`的各维偏移量必须设置为期望的64位元素偏移量的2倍。例如：
 
     ```cpp
     __simd_vf__ inline void load_int64_vf(__ubuf__ int64_t* src_addr,
@@ -176,10 +176,10 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
     __simd_vf__ inline void addr_reg_4d_vf(
         __ubuf__ float* dst_addr,
         __ubuf__ float* src_addr,
-        uint32_t n_stride,    // N维相邻切片之间的float元素数
-        uint32_t c_stride,    // C维相邻切片之间的float元素数
-        uint32_t h_stride,    // H维相邻切片之间的float元素数
-        uint32_t w_stride,    // W维相邻数据块之间的float元素数，例如64
+        uint32_t n_stride,    // N维间偏移（float类型元素个数）
+        uint32_t c_stride,    // C维间偏移（float类型元素个数）
+        uint32_t h_stride,    // H维间偏移（float类型元素个数）
+        uint32_t w_stride,    // W维间偏移（float类型元素个数）
         uint16_t n_count, uint16_t c_count, uint16_t h_count, uint16_t w_count)
     {
         vector_float src_reg, dst_reg;
