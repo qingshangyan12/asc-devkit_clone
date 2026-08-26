@@ -1044,7 +1044,7 @@
                 -   [asc_fma](SIMD-API/c_api/reg/compound_compute/asc_fma.md)
                 -   [asc_mula](SIMD-API/c_api/reg/compound_compute/asc_mula.md)
                 -   [asc_madd](SIMD-API/c_api/reg/compound_compute/asc_madd.md)
-                -   [asc_exp_sub（废弃）](SIMD-API/c_api/reg/compound_compute/asc_exp_sub_deprecated.md)
+                -   [asc_exp_sub](SIMD-API/c_api/reg/compound_compute/asc_exp_sub.md)
             -   [逻辑计算](SIMD-API/c_api/reg/logic_compute/logic_compute.md)
                 -   [asc_and](SIMD-API/c_api/reg/logic_compute/asc_and.md)
                 -   [asc_not](SIMD-API/c_api/reg/logic_compute/asc_not.md)
@@ -1352,6 +1352,7 @@
             -   [asc_scatter（废弃）](SIMD-API/c_api/deprecated_interface/asc_scatter_deprecated.md)
             -   [asc_storeunalign_post（废弃）](SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md)
             -   [asc_storeunalign_postupdate（废弃）](SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md)
+            -   [asc_exp_sub（废弃）](SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md)
 
     -   [高阶API](SIMD-API/adv_api/adv_api.md)
         -   [高阶API列表](SIMD-API/adv_api/adv_api_list.md)
