@@ -79,6 +79,26 @@ ccu::Func KfcReduceScatterFunc(
     },
     KFC_REDUCE_SCATTER_FUNC_NAME);
 
+
+ccu::Func KfcAllReduceFunc(
+    [](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
+        ccu::Variable currentRankSliceInputOffset, ccu::Variable currentRankSliceOutputOffset,
+        ccu::Variable normalSliceSize, ccu::Variable lastSliceSize, ccu::Variable mySliceSize, ccu::Variable sliceOffset,
+        ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
+        ccu::Variable goSize3, ccu::Variable chunkSize, ccu::Variable tailSize, ccu::Variable chunkLoopNum) {
+        const auto& arg = *g_kfcRegisterArg;
+        CCU_THROW_IF_FAILED(
+            CcuKfcAllReduceMesh1DMem2MemKernel(
+                inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset,
+                currentRankSliceOutputOffset, normalSliceSize, lastSliceSize, mySliceSize,
+                sliceOffset, isInputOutputEqual, goSize0, goSize1, goSize2, goSize3,
+                chunkSize, tailSize, chunkLoopNum, arg.channels, arg.channelCount,
+                static_cast<uint32_t>(arg.rankSize), arg.rankId, arg.opParam.DataDes.dataType,
+                arg.opParam.DataDes.outputType, arg.opParam.reduceType),
+            "define KFC ReduceScatter func failed");
+    },
+    KFC_ALL_REDUCE_FUNC_NAME);
+
 static CcuResult DefineKfcSubKernelFunc(const CcuKernelArgKfcServer* kernelArg)
 {
     g_kfcRegisterArg = kernelArg;
@@ -87,6 +107,8 @@ static CcuResult DefineKfcSubKernelFunc(const CcuKernelArgKfcServer* kernelArg)
             return ccu::DefineFunc<KfcAllGatherFunc>();
         case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
             return ccu::DefineFunc<KfcReduceScatterFunc>();
+        case HcclCMDType::HCCL_CMD_ALL_REDUCE:
+            return ccu::DefineFunc<KfcAllReduceFunc>();
         default:
             HCCL_ERROR(
                 "[DefineKfcSubKernelFunc] unsupported opType[%u]",
@@ -291,7 +313,7 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
     HCCL_INFO("[GenCircularQueue] KfcServer start");
     CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(KfcServerGenCircularQueue(ctx)); }
-    // CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
+    CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
     return CCU_SUCCESS;
 }
