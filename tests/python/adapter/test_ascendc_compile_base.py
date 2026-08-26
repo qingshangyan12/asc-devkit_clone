@@ -33,7 +33,10 @@ from adapter.super_kernel_constants import (
     SuperKernelEarlyStartMode,
     SuperKernelStreamFusionMode,
 )
-from adapter.super_kernel_utility import check_exist_instrinsic_when_super_kernel
+from adapter.super_kernel_utility import (
+    check_exist_forbidden_symbols,
+    check_exist_instrinsic_when_super_kernel,
+)
 from adapter.super_kernel_op_compile import (
     gen_file_header,
     split_spk_kernel_objs,
@@ -879,6 +882,34 @@ const static uint64_t L0A_SIZE = 65536 * get_block_idx();
             self.assertRaises(
                 Exception, check_exist_instrinsic_when_super_kernel, dst_i_file
             )
+
+    def test_check_exist_forbidden_symbols_preserves_matches(self):
+        data = (
+            '# 1 "/user/op_a.cpp"\n'
+            "get_block_idx() + get_block_idx() + my_block_idx + block_idx2;\n"
+            '# 2 "/tool/impl/basic_api/safe.h"\n'
+            "get_block_num();\n"
+            '# 3 "/user/op_b.cpp"\n'
+            "block_idx + get_task_ration();\n"
+        )
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data=data):
+            result = check_exist_forbidden_symbols(
+                "./a.i",
+                ["get_block_idx", "get_block_num", "get_task_ration", "block_idx"],
+                ["impl/basic_api"],
+            )
+
+        self.assertEqual(
+            result,
+            (
+                ["get_block_idx, get_block_idx", "block_idx, get_task_ration"],
+                ["/user/op_a.cpp", "/user/op_b.cpp"],
+                [
+                    "get_block_idx() + get_block_idx() + my_block_idx + block_idx2;\n",
+                    "block_idx + get_task_ration();\n",
+                ],
+            ),
+        )
 
     def test_gen_sub_kernel_name(self):
         with tbe.common.context.op_context.OpContext() as ctx:
