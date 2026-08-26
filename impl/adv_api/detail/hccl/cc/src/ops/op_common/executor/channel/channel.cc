@@ -771,6 +771,49 @@ HcclResult CalcChannelRequestMeshClosMultiJetty(
     return HCCL_SUCCESS;
 }
 
+HcclResult CalcChannelRequestNhrMultiJetty(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation)
+{
+#ifndef AICPU_COMPILE
+    CHK_PTR_NULL(topoInfo);
+    CHK_PRT_RET(
+        subcommInfo.empty() || subcommInfo[COMM_LEVEL0].empty(),
+        HCCL_ERROR("[CalcChannelRequestNhrMultiJetty] subcommInfo is empty."), HCCL_E_PARA);
+    const auto localRankIt =
+        std::find(subcommInfo[COMM_LEVEL0].begin(), subcommInfo[COMM_LEVEL0].end(), topoInfo->userRank);
+    CHK_PRT_RET(
+        localRankIt == subcommInfo[COMM_LEVEL0].end(),
+        HCCL_ERROR("[CalcChannelRequestNhrMultiJetty] local rank[%u] is absent.", topoInfo->userRank), HCCL_E_PARA);
+
+    const u32 localRank = static_cast<u32>(std::distance(subcommInfo[COMM_LEVEL0].begin(), localRankIt));
+    const u32 localRankSize = static_cast<u32>(subcommInfo[COMM_LEVEL0].size());
+    std::set<u32> connectRanks;
+    CHK_RET(CalcNHRChannelConnect(localRank, localRankSize, INVALID_VALUE_RANKID, connectRanks));
+
+    channels.clear();
+    const CommProtocol expectedProtocol = param.engine == CommEngine::COMM_ENGINE_AIV ?
+                                              CommProtocol::COMM_PROTOCOL_UB_MEM :
+                                              CommProtocol::COMM_PROTOCOL_UBC_CTP;
+    for (const u32 rankIdx : connectRanks) {
+        if (rankIdx == localRank) {
+            continue;
+        }
+        CHK_RET(CalcChannelRequestMeshClosMultiJettyByRank(
+            comm, expectedProtocol, topoInfo->userRank, subcommInfo[COMM_LEVEL0][rankIdx], channels, isIsolation,
+            false));
+    }
+#else
+    (void)comm;
+    (void)param;
+    (void)topoInfo;
+    (void)subcommInfo;
+    (void)channels;
+    (void)isIsolation;
+#endif
+    return HCCL_SUCCESS;
+}
+
 HcclResult CalcChannelRequestMesh1DWithPriorityTopo(
     HcclComm comm, const OpParam& param, const TopoInfo* topoInfo, const std::vector<std::vector<u32>>& subcommInfo,
     std::vector<HcclChannelDesc>& channels, CommTopo priorityTopo)
