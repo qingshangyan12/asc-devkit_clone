@@ -824,7 +824,7 @@ typename LocalTensor<T>::PrimType& LocalTensor<T>::operator()(const uint32_t off
 
 template <typename T>
 template <typename U>
-__aicore__ inline __sync_alias__ LocalTensor<U> LocalTensor<T>::ReinterpretCast() const
+__aicore__ inline constexpr __sync_alias__ LocalTensor<U> LocalTensor<T>::ReinterpretCast() const
 {
     LocalTensor<U> output;
     output.address_.logicPos = static_cast<uint8_t>(this->GetPosition());
@@ -924,7 +924,7 @@ __aicore__ inline __inout_pipe__(S) void LocalTensor<T>::SetValue(const uint32_t
 }
 
 template <typename T>
-__aicore__ inline LocalTensor<T> LocalTensor<T>::operator[](const uint32_t offset) const
+__aicore__ inline constexpr LocalTensor<T> LocalTensor<T>::operator[](const uint32_t offset) const
 {
     LocalTensor result = *this;
     if constexpr (IsHalfByteDataType<PrimType>()) {
@@ -962,7 +962,7 @@ LocalTensor<T>::SetAddrWithOffset(LocalTensor<U>& src, uint32_t offset)
 }
 #endif
 template <typename T>
-__aicore__ inline int32_t LocalTensor<T>::GetPosition() const
+__aicore__ inline constexpr int32_t LocalTensor<T>::GetPosition() const
 {
     return this->address_.logicPos;
 }
@@ -998,7 +998,7 @@ __aicore__ inline void LocalTensor<T>::SetSize(const uint32_t size)
     }
 }
 template <typename T>
-__aicore__ inline uint32_t LocalTensor<T>::GetSize() const
+__aicore__ inline constexpr uint32_t LocalTensor<T>::GetSize() const
 {
     if constexpr (IsHalfByteDataType<PrimType>()) {
         return this->address_.dataLen * INT4_TWO;
@@ -1027,7 +1027,7 @@ LocalTensor<T>::GetLength() const
 }
 
 template <typename T>
-__aicore__ inline void LocalTensor<T>::SetBufferLen(uint32_t dataLen)
+__aicore__ inline constexpr void LocalTensor<T>::SetBufferLen(uint32_t dataLen)
 {
     this->address_.dataLen = dataLen;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
@@ -1106,7 +1106,7 @@ __aicore__ inline LocalTensor<T>::LocalTensor(AscendC::TPosition pos, uint32_t a
 }
 
 template <typename T>
-__aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr)
+__aicore__ inline constexpr LocalTensor<T>::LocalTensor(uint32_t addr)
 {
     static_assert(is_tensorTrait_v<T>, "only support TensorTrait type Tensor!");
     static_assert(
