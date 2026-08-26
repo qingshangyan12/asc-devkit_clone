@@ -1,0 +1,3 @@
+#ifndef HCCL_CCU_KFC_ST_MC2_TYPE_SHIM_H
+#define HCCL_CCU_KFC_ST_MC2_TYPE_SHIM_H
+#endif

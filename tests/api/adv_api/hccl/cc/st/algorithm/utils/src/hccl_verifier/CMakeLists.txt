@@ -14,6 +14,7 @@ target_sources(hccl-verifier PRIVATE
     ccu_checker.cc
     ccu_dag_checker.cc
     ccu_runtime_checker.cc
+    ccu_kfc_checker.cc
     hccl_verifier.cc
 )
 

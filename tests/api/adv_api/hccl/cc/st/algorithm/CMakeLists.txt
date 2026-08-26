@@ -98,6 +98,8 @@ set(HCCL_CHECKER_COMMON_INCLUDE_LIST
     ${UTILS_DIR}/hccl_verifier/mem_conflict_check
     ${UTILS_DIR}/hccl_verifier/singletask_check
     ${UTILS_DIR}/hccl_proxy
+    ${UTILS_DIR}/ccu
+    ${UTILS_DIR}/mc2_ccu
     ${UTILS_DIR}/hccl_proxy/communicator
     ${UTILS_DIR}/hccl_proxy/topo_model
 )

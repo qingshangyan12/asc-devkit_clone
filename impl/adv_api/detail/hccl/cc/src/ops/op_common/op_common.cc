@@ -134,60 +134,6 @@ static uint64_t GetTokenFromBuffInfo(void* bufferAddr, uint64_t bufferSize)
     return 0;
 }
 
-static HcclResult UpdateCcuCtxTokenOnReuse(
-    HcclComm comm, void* ctx, uint64_t ctxSize, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
-{
-    if (ctxSize == 0) {
-        return HCCL_SUCCESS;
-    }
-
-    // AIV ctx 位于 device 侧，先拷贝到 host 内存后再反序列化
-    std::vector<char> seq(ctxSize);
-    aclError aclRet = aclrtMemcpy(seq.data(), ctxSize, ctx, ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
-    if (aclRet != ACL_SUCCESS) {
-        HCCL_ERROR(
-            "[UpdateCcuCtxTokenOnReuse] aclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].", aclRet,
-            seq.data(), ctx, static_cast<unsigned long long>(ctxSize));
-        return HCCL_E_RUNTIME;
-    }
-    AlgResourceCtxSerializable tempCtx;
-    tempCtx.DeSerialize(seq);
-
-    // 用 resCtxHost 中已设置的 kfcServerArgs（含占位符）覆盖旧数据
-    tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
-    tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
-
-    // 从 cclBuffer 获取 token 并更新第6个字段（而非 push_back，保证序列化大小一致）
-    void* cclBufferAddr = nullptr;
-    uint64_t cclBufferSize = 0;
-    if (HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize) == HCCL_SUCCESS) {
-        uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
-        if (tempCtx.kfcServerArgs.size() >= 6U) {
-            tempCtx.kfcServerArgs[5] = token; // 更新占位符为真实 token
-            HCCL_INFO("[UpdateCcuCtxTokenOnReuse] token[%llu] updated at kfcServerArgs[5]", token);
-        }
-
-        // 复用的 device ctx 大小不能变化
-        std::vector<char> updatedSeq = tempCtx.Serialize();
-        if (updatedSeq.size() != ctxSize) {
-            HCCL_ERROR(
-                "[UpdateCcuCtxTokenOnReuse] serialized ctx size changed, oldSize[%llu], newSize[%zu].",
-                static_cast<unsigned long long>(ctxSize), updatedSeq.size());
-            return HCCL_E_INTERNAL;
-        }
-        aclRet = aclrtMemcpy(ctx, ctxSize, updatedSeq.data(), updatedSeq.size(), ACL_MEMCPY_HOST_TO_DEVICE);
-        if (aclRet != ACL_SUCCESS) {
-            HCCL_ERROR(
-                "[UpdateCcuCtxTokenOnReuse] aclrtMemcpy H2D failed, ret[%d], dst[%p], src[%p], size[%zu].", aclRet, ctx,
-                updatedSeq.data(), updatedSeq.size());
-            return HCCL_E_RUNTIME;
-        }
-    } else {
-        HCCL_WARNING("[UpdateCcuCtxTokenOnReuse] HcclGetHcclBuffer failed, device ctx remains unchanged");
-    }
-    return HCCL_SUCCESS;
-}
-
 HcclResult Selector(
     HcclComm comm, OpParam& param, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName)
 {
@@ -807,9 +753,6 @@ HcclResult HcclGetAlgRes(
             *resCtxSequence = ctx;
             param.ctxSize = size;
 
-            if (param.engine == COMM_ENGINE_CCU) {
-                CHK_RET(UpdateCcuCtxTokenOnReuse(comm, ctx, size, resCtxHost));
-            }
             return HCCL_SUCCESS;
         }
     }
