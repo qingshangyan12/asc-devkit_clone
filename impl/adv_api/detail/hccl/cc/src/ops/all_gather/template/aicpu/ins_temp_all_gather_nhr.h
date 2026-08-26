@@ -35,21 +35,58 @@ public:
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         AlgResourceRequest& resourceRequest) override;
     HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
-
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
     u64 GetThreadNum() const override;
-    void GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainnToSub) override{};
-    void GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain) override{};
+    void GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub) override;
+    void GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain) override;
 
 private:
+    enum class StepBuildMode { NORMAL, LAST_STEP_READ_TO_OUTPUT };
+    struct SliceCalcInfo {
+        u32 txIdx;
+        u32 rxIdx;
+        u64 txPartialOffset;
+        u64 rxPartialOffset;
+        u64 txScratchOff;
+        u64 rxScratchOff;
+        u64 txSliceSize;
+        u64 rxSliceSize;
+        u64 scratchBase;
+    };
     HcclResult GetStepInfo(u32 step, u32 nSteps, AicpuNHRStepInfo& stepInfo);
-
-    HcclResult LocalDataCopy(const std::vector<ThreadHandle>& threads);
-    HcclResult PostLocalCopy(const std::vector<ThreadHandle>& threads);
+    HcclResult PrepareDataSplitForMultiChannel(const TemplateResource& templateResource);
+    HcclResult LocalDataCopy(const std::vector<ThreadHandle>& threads, const u32& channelIdx);
+    HcclResult PostLocalCopy(const ThreadHandle& thread, const u32& channelIdx);
+    HcclResult BuildStepSlices(
+        const ChannelInfo& channelSend, const ChannelInfo& channelRecv, const AicpuNHRStepInfo& stepInfo,
+        const u32& channelIdx, StepBuildMode mode, std::vector<DataSlice>& txSrcSlices,
+        std::vector<DataSlice>& txDstSlices, std::vector<DataSlice>& rxSrcSlices,
+        std::vector<DataSlice>& rxDstSlices);
+    HcclResult RunStepNHR(
+        const std::vector<ThreadHandle>& threads, const std::map<u32, std::vector<ChannelInfo>>& channels,
+        const u32& channelIdx, u32 step, u32 nSteps, bool& postLocalCopyLaunched);
     HcclResult RunAllGatherNHR(
-        const std::vector<ThreadHandle>& threads, const std::map<u32, std::vector<ChannelInfo>>& channels);
+        const std::vector<ThreadHandle>& threads, const std::map<u32, std::vector<ChannelInfo>>& channels,
+        const u32& channelIdx, bool& postLocalCopyLaunched);
+    HcclResult RunLastStepReadToOutput(
+        const std::vector<ThreadHandle>& threads, const ChannelInfo& channelSend, const ChannelInfo& channelRecv,
+        const AicpuNHRStepInfo& stepInfo, const u32& channelIdx, u32 step, bool& postLocalCopyLaunched);
+    SliceCalcInfo CalcSliceInfo(const AicpuNHRStepInfo& stepInfo, u32 rpt, u32 i, u32 channelIdx) const;
     u32 GetRankFromMap(const u32 algRankIdx) const;
+    bool CanReadLastStepToOutput() const;
+    bool CanSkipOwnSliceCopy() const;
+    bool IsLastStepReadSlice(u32 algRank) const;
     TemplateDataParams tempAlgParams_;
+    bool isDmaRead_{false};
+    bool readLastStepToOutput_{false};
+    bool skipOwnSliceCopy_{false};
+    std::vector<u32> lastStepReadSliceIdxs_;
+    u32 maxChannelsPerRank_{1};
+    std::vector<u64> dataSplit_;
+    std::vector<u64> dataOffset_;
+    std::vector<u64> dataSplitTail_;
+    std::vector<u64> dataOffsetTail_;
+    u32 channelsPerRank_{1};
 };
 
 } // namespace mc2_ops_hccl

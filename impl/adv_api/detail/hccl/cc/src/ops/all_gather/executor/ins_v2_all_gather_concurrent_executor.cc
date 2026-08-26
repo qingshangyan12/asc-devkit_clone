@@ -12,6 +12,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "hccl_res.h"
 #include "ccu_alg_template_base.h"
+#include <algorithm>
 
 // AICPU template 头文件
 #include "ins_temp_all_gather_mesh_1D.h"
@@ -62,6 +63,10 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 {
     // 初始化一些基本成员变量
     InitCommInfo(param, topoInfo, algHierarchyInfo);
+    if (algHierarchyInfo.infos.empty() || algHierarchyInfo.infos[0].size() < 2) {
+        HCCL_ERROR("[%s] algHierarchyInfo.infos[0] is invalid (empty or size < 2).", __func__);
+        return HCCL_E_PARA;
+    }
     // 拆分algHierarchyInfo
     std::vector<std::vector<u32>> temp0HierarchyInfo = {algHierarchyInfo.infos[0][0]};
     std::vector<std::vector<u32>> temp1HierarchyInfo = {algHierarchyInfo.infos[0][1]};
@@ -71,8 +76,8 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     // 调用计算资源的函数
     AlgResourceRequest temp0ResReq;
     AlgResourceRequest temp1ResReq;
-    temp0Alg->CalcRes(comm, param, topoInfo, temp0ResReq);
-    temp1Alg->CalcRes(comm, param, topoInfo, temp1ResReq);
+    CHK_RET(temp0Alg->CalcRes(comm, param, topoInfo, temp0ResReq));
+    CHK_RET(temp1Alg->CalcRes(comm, param, topoInfo, temp1ResReq));
 
     // 两个模板并行，资源累加
     resourceRequest.slaveThreadNum = temp0ResReq.slaveThreadNum + temp1ResReq.slaveThreadNum + 1;
@@ -109,6 +114,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
                 "temp1Channels.size()[%zu]",
                 temp0Channels.size(), temp1Channels.size()),
             HcclResult::HCCL_E_INTERNAL);
+        resourceRequest.channels.resize(1);
         resourceRequest.channels[0].insert(
             resourceRequest.channels[0].end(), temp0Channels.begin(), temp0Channels.end());
         resourceRequest.channels[0].insert(
@@ -131,6 +137,7 @@ void InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
     tempAlgParams.buffInfo.outBuffType = BufferType::OUTPUT;
     tempAlgParams.count = dataCountPerLoop;
     tempAlgParams.sliceSize = dataCountPerLoop * dataTypeSize_;
+    tempAlgParams.tailSize = dataCountPerLoop * dataTypeSize_;
     tempAlgParams.buffInfo.inBuffBaseOff = dataOffset;
     tempAlgParams.buffInfo.outBuffBaseOff = dataOffset;
     tempAlgParams.buffInfo.hcclBuffBaseOff = scratchOffset;
@@ -179,6 +186,12 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     auto tmp0NotifyOnMainThread = temp0Request.notifyNumOnMainThread;
     auto tmp1NotifyOnMainThread = temp1Request.notifyNumOnMainThread;
 
+    CHK_PRT_RET(
+        threads_.size() < tmp0ThreadsNum + tmp1ThreadsNum,
+        HCCL_ERROR(
+            "[%s] threads resource is not enough. threads.size=[%zu], tmp0ThreadsNum=[%u], tmp1ThreadsNum=[%u].",
+            __func__, threads_.size(), tmp0ThreadsNum, tmp1ThreadsNum),
+        HcclResult::HCCL_E_INTERNAL);
     tmp0Threads_.assign(threads_.begin(), threads_.begin() + tmp0ThreadsNum);
     tmp1Threads_.assign(threads_.begin() + tmp0ThreadsNum, threads_.end());
     // 用于两个算法同步
@@ -206,9 +219,13 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     dataTypeSize_ = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
     dataSize_ = dataCount_ * dataTypeSize_;
     strideCount_ = param.DataDes.strideCount;
-    HCCL_DEBUG("[InsV2AllGatherConcurrentExecutor][Orchestrate] strideCount[%lu]", strideCount_);
+    HCCL_INFO("[InsV2AllGatherConcurrentExecutor][Orchestrate] strideCount[%lu]", strideCount_);
 
     // 拆分algHierarchyInfo
+    if (algHierarchyInfo_.infos.empty() || algHierarchyInfo_.infos[0].size() < 2) {
+        HCCL_ERROR("[%s] algHierarchyInfo.infos[0] is invalid (empty or size < 2).", __func__);
+        return HCCL_E_PARA;
+    }
     std::vector<std::vector<u32>> temp0HierarchyInfo = {algHierarchyInfo_.infos[0][0]};
     std::vector<std::vector<u32>> temp1HierarchyInfo = {algHierarchyInfo_.infos[0][1]};
 
@@ -221,15 +238,26 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 
     // 分配channels或者ccuKernels
     if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+        CHK_PRT_RET(
+            resCtx.ccuKernelNum.size() < 2
+                || resCtx.ccuKernels.size() < static_cast<size_t>(resCtx.ccuKernelNum[0]) + resCtx.ccuKernelNum[1],
+            HCCL_ERROR(
+                "[%s] resCtx resource not enough. ccuKernelNum.size[%zu], ccuKernels.size[%zu].", __func__,
+                resCtx.ccuKernelNum.size(), resCtx.ccuKernels.size()),
+            HcclResult::HCCL_E_INTERNAL);
         tmp0CcuKernels_.assign(resCtx.ccuKernels.begin(), resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0]);
         tmp1CcuKernels_.assign(
             resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0],
             resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0] + resCtx.ccuKernelNum[1]);
     } else {
         const u64 splitIndex = rankSize_ - 1; // 默认第一个算法为mesh，使用 rankSize_ - 1 个 link
+        const auto& temp0Ranks = algHierarchyInfo_.infos[0][0];
+        (void)splitIndex;
         for (u64 i = 0; i < resCtx.channels[0].size(); ++i) {
             const auto& channel = resCtx.channels[0][i];
-            auto& targetMap = (i < splitIndex) ? tmp0LinkMap_ : tmp1LinkMap_;
+            const bool isTemp0Channel =
+                std::find(temp0Ranks.begin(), temp0Ranks.end(), channel.remoteRank) != temp0Ranks.end();
+            auto& targetMap = isTemp0Channel ? tmp0LinkMap_ : tmp1LinkMap_;
             targetMap[channel.remoteRank].push_back(channel);
         }
     }
@@ -287,7 +315,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
         scratchMemBlockSize = (maxTmpMemSize_ / HCCL_MIN_SLICE_ALIGN / totalScratchMultiple) * HCCL_MIN_SLICE_ALIGN;
     }
     u64 scratchSizeforTemp0 = ScratchMultiplier0 * scratchMemBlockSize;
-    u64 scratchSizeforTemp1 = scratchMemBlockSize - scratchSizeforTemp0;
+    u64 scratchSizeforTemp1 = maxTmpMemSize_ - scratchSizeforTemp0;
     u64 scratchOffsetforTemp0 = 0;
     u64 scratchOffsetforTemp1 = scratchSizeforTemp0;
 
@@ -373,7 +401,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 
 // 算法注册
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
-    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherConcurrentMesh1DNHR, InsV2AllGatherConcurrentExecutor, TopoMatchUBX,
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherConcurMeshNHR, InsV2AllGatherConcurrentExecutor, TopoMatchUBX,
     InsTempAllGatherMesh1D, InsTempAllGatherNHR);
 
 } // namespace mc2_ops_hccl

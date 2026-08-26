@@ -337,12 +337,16 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     tempAlgIntra.GetRes(intraTempRequest);
     tempAlgInter.GetRes(interTempRequest);
     auto intraThreadsNum = intraTempRequest.slaveThreadNum + 1;
-    auto interThreadsNum = intraTempRequest.slaveThreadNum + 1;
+    auto interThreadsNum = interTempRequest.slaveThreadNum + 1;
     auto intraNotifyOnMainThread = intraTempRequest.notifyNumOnMainThread;
     auto interNotifyOnMainThread = interTempRequest.notifyNumOnMainThread;
 
-    intraThreads_.assign(threads_.begin() + 1, threads_.begin() + intraThreadsNum + 1);
-    interThreads_.assign(threads_.begin() + intraThreadsNum + 1, threads_.end());
+    CHK_PRT_RET(
+        threads_.size() < 1 + intraThreadsNum + interThreadsNum,
+        HCCL_ERROR("[%s] threads resource is not enough.", __func__), HCCL_E_INTERNAL);
+    intraThreads_.assign(threads_.begin() + 1, threads_.begin() + 1 + intraThreadsNum);
+    interThreads_.assign(
+        threads_.begin() + 1 + intraThreadsNum, threads_.begin() + 1 + intraThreadsNum + interThreadsNum);
     // 用于两个算法同步
     mainThread_ = threads_.at(0);
     templateMainThreads_.emplace_back(intraThreads_.at(0));
