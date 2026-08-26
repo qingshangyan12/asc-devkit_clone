@@ -33,6 +33,36 @@ __aicore__ inline void asc_set_store_atomic_config_v1_impl(uint16_t type, uint16
     set_st_atomic_cfg(config);
 }
 
+__aicore__ inline void asc_set_store_atomic_config_v1_impl(int8_t value, __gm__ int8_t* addr)
+{
+    st_atomic(value, addr);
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1_impl(int16_t value, __gm__ int16_t* addr)
+{
+    st_atomic(value, addr);
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1_impl(int32_t value, __gm__ int32_t* addr)
+{
+    st_atomic(value, addr);
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1_impl(half value, __gm__ half* addr)
+{
+    st_atomic(*(reinterpret_cast<int16_t*>(&value)), reinterpret_cast<__gm__ int16_t*>(addr));
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1_impl(float value, __gm__ float* addr)
+{
+    st_atomic(*(reinterpret_cast<int32_t*>(&value)), reinterpret_cast<__gm__ int32_t*>(addr));
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1_impl(bfloat16_t value, __gm__ bfloat16_t* addr)
+{
+    st_atomic(*(reinterpret_cast<int16_t*>(&value)), reinterpret_cast<__gm__ int16_t*>(addr));
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
