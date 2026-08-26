@@ -47,8 +47,8 @@ void* __cvta_global_to_generic(size_t rawbits)
 
 | 输入场景 | 返回值 |
 | --- | --- |
-| `rawbits`为`0` | 返回指针使用`__isGlobal()`、`__isUbuf()`、`__isLocal()`均判断为0。 |
-| `rawbits`为全1 | 返回指针使用`__isGlobal()`判断为1，但该指针不是可安全访问的Global Memory地址。 |
+| rawbits为0 | 返回指针使用__isGlobal()、__isUbuf()、__isLocal()均判断为0。 |
+| rawbits为全1 | 返回指针使用__isGlobal()判断为1，但该指针不是可安全访问的Global Memory地址。 |
 
 ## 约束说明
 
