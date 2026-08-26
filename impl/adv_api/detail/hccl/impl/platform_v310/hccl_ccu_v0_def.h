@@ -161,7 +161,7 @@ private:
     uint8_t ccuUsedXnNum_ = 0;
 
     bool msgQueueIsAvailable_[CCU_MAX_MSG_NUM];
-    uint64_t xnData_[CCU_USED_XN_NUM];
+    uint64_t xnData_[CCU_XN_DATA_CAPACITY];
 };
 } // namespace AscendC
 

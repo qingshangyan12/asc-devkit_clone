@@ -235,20 +235,22 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         KERNEL_INFO, "ApiClient CcuPrepareForReduceScatterM2M scratchAddr:0x%llx, rankSliceOffset:%d",
         ccuParam_.scratchAddr, rankSliceOffset);
     xnData_[4] = rankSliceOffset;
-    xnData_[5] = 0;
-    xnData_[6] = 0;
-    // XN7/XN8 carry the tail size and inverse total chunk count.
     constexpr uint64_t scratchSize = 16 * 1024 * 1024;
     constexpr uint64_t minSliceAlign = 128;
-    uint64_t chunkSize = scratchSize / ccuParam_.rankNum / minSliceAlign * minSliceAlign;
+    uint64_t chunkSize = scratchSize / ccuParam_.rankNum;
+    chunkSize = chunkSize / minSliceAlign * minSliceAlign;
     uint64_t fullChunkCount = sliceSize == 0 ? 0 : (sliceSize - 1) / chunkSize;
     uint64_t chunkCount = sliceSize == 0 ? 0 : fullChunkCount + 1;
-    xnData_[7] = sliceSize - fullChunkCount * chunkSize;
-    xnData_[8] = UINT64_MAX - chunkCount;
+    uint64_t tailSize = sliceSize - fullChunkCount * chunkSize;
+
+    xnData_[5] = chunkSize;
+    xnData_[6] = UINT64_MAX - chunkCount;
+    xnData_[7] = tailSize;
+    CalcGoSize(chunkSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[8]);
+    CalcGoSize(tailSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[12]);
     KERNEL_LOG(
-        KERNEL_INFO, "RS chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n",
-        sliceSize, chunkSize, fullChunkCount, xnData_[7], xnData_[8]);
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+        KERNEL_INFO, "RS chunk debug: slice=0x%llx, chunk=0x%llx, count=0x%llx, tail=0x%llx\n", sliceSize,
+        chunkSize, chunkCount, tailSize);
 }
 } // namespace AscendC
 
