@@ -178,7 +178,7 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)value.mask;
 
     auto compile_load_store = &compile_reg_local_tensor_load_store<float>;
-    auto compile_load_store_without_coord = &compile_reg_local_tensor_load_store_without_coord<float>;
+    auto compile_load_store_without_coord = &compile_reg_local_tensor_load_store_without_coord<uint32_t>;
     (void)compile_load_store;
     (void)compile_load_store_without_coord;
 
