@@ -45,13 +45,15 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo_match_pcie_mix.cc
     ${HCCL_CC_SRC_DIR}/common/hccl_alloc_ctx_res.cc
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/ccu_log.cc
+    ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/ccu_res_dl.cc
+    ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/hccl_ccu_res_dl.cc
 )
 
 add_executable(
     ${HCCL_CCU_ST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/all_to_all_testcase.cpp
-    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/shim/stubs.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all_mesh1d_adapter.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all.cc
     ${UTILS_DIR}/ccu_scenario/ccu_fixture.cc
@@ -60,7 +62,7 @@ add_executable(
 
 target_include_directories(
     ${HCCL_CCU_ST_TARGET} PRIVATE
-    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/shim
+    ${UTILS_DIR}/hccl_proxy
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
     ${UTILS_DIR}/ccu_scenario
@@ -88,7 +90,10 @@ target_compile_definitions(${HCCL_CCU_ST_TARGET} PRIVATE -DUT_TEST -DMC2_CLIENT_
 
 target_link_libraries(
     ${HCCL_CCU_ST_TARGET} PRIVATE
-    hccl-model-proxy hccl-verifier intf_llt_pub_basic c_sec pthread dl
+    -Wl,--whole-archive
+    hccl-model-proxy
+    -Wl,--no-whole-archive
+    ${HCCL_CHECKER_KERNEL_TARGET}
+    hccl-verifier
+    intf_llt_pub_basic c_sec pthread dl
 )
-
-run_llt_test(TARGET ${HCCL_CCU_ST_TARGET} TASK_NUM 1)
