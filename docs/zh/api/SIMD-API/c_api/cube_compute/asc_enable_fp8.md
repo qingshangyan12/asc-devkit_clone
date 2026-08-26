@@ -30,7 +30,7 @@
 
 ## 函数原型
 
- ```cpp
+```cpp
 __aicore__ inline void asc_enable_fp8()
 ```
 
@@ -60,7 +60,7 @@ uint16_t n_dim = 16;        // K
 uint16_t right_width = 16;  // N
 
 // 在 asc_mmad 前调用：以 FP8 格式参与矩阵运算（非 HiF8 转换路径）
-asc_enable_fp8();
+asc_disable_hif8();
 
 uint8_t unit_flag = 0;
 bool disable_gemv = false;

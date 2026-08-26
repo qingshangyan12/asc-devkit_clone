@@ -50,6 +50,8 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_str
 
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag);
 
+__aicore__ inline void asc_set_l0c_copy_channel_para(uint16_t src_nz_matrix_stride);
+
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
 
 __aicore__ inline void asc_set_l13d_padding(uint64_t config);
