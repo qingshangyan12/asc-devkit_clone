@@ -145,8 +145,8 @@ void ApplyReduce(
         const size_t srcPos = static_cast<size_t>(srcOffset + i * elemSize);
         switch (dataType) {
             case HCCL_DATA_TYPE_INT8:
-                ReduceElement(reinterpret_cast<int8_t&>(dst[dstPos]),
-                              reinterpret_cast<const int8_t&>(src[srcPos]), reduceOp);
+                ReduceElement(
+                    reinterpret_cast<int8_t&>(dst[dstPos]), reinterpret_cast<const int8_t&>(src[srcPos]), reduceOp);
                 break;
             case HCCL_DATA_TYPE_FP16: {
                 uint16_t dstBits;
@@ -173,12 +173,12 @@ void ApplyReduce(
                 break;
             }
             case HCCL_DATA_TYPE_INT32:
-                ReduceElement(reinterpret_cast<int32_t&>(dst[dstPos]),
-                              reinterpret_cast<const int32_t&>(src[srcPos]), reduceOp);
+                ReduceElement(
+                    reinterpret_cast<int32_t&>(dst[dstPos]), reinterpret_cast<const int32_t&>(src[srcPos]), reduceOp);
                 break;
             case HCCL_DATA_TYPE_FP32:
-                ReduceElement(reinterpret_cast<float&>(dst[dstPos]),
-                              reinterpret_cast<const float&>(src[srcPos]), reduceOp);
+                ReduceElement(
+                    reinterpret_cast<float&>(dst[dstPos]), reinterpret_cast<const float&>(src[srcPos]), reduceOp);
                 break;
             default:
                 break;
