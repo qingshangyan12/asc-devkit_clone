@@ -1,7 +1,7 @@
 # fill样例
 
 ## 概述
-本样例基于Tensor API实现fill运算（标量填充模式），主要调用fill接口。
+本样例基于Tensor API实现fill运算（标量填充模式），主要调用实验性接口 `asc::te::experimental::fill`。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -28,7 +28,7 @@
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
   <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">y</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">duplicate</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">fill</td></tr>
   </table>
 - 样例实现：  
   fill_vf函数内调用fill接口进行标量填充：
@@ -40,7 +40,7 @@
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -52,7 +52,7 @@
   在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程（默认npu模式）
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..;make -j; # 编译工程（默认npu模式）
   python3 ../scripts/gen_data.py                                            # 生成测试真值数据
   ./demo                                                                    # 执行编译生成的可执行程序，执行样例
   ```
@@ -61,7 +61,7 @@
 
   示例如下：
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -72,6 +72,7 @@
 | ---------------------------| -----------------------------| ---------------------------------------------------|
 | `CMAKE_ASC_RUN_MODE`　　　| `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真　　　　　　　|
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`　　　　　　　　　| NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+| `CANN_ASC_USE_EXPERIMENTAL` | `ON`（本样例必选）、`OFF`（默认） | 开启实验性ASC接口 |
 
 - 执行结果
 
