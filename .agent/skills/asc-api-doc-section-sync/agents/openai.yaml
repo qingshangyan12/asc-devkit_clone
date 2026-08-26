@@ -1,0 +1,4 @@
+interface:
+  display_name: "AscendC API文档章节同步"
+  short_description: "同步API文档章节、解决主线冲突并校验接口事实"
+  default_prompt: "使用 $asc-api-doc-section-sync 同步正式API文档章节或解决主线文档冲突，并依据代码、Basic API和仓库链接规则校验结果。"

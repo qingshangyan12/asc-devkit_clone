@@ -26,94 +26,67 @@
 
 ## 功能说明
 
-该接口实现带转置的2D格式数据从L1 Buffer到L0A Buffer的加载。
+将L1 Buffer中以大小为512字节的数据分形为单位组织的2D格式矩阵数据搬运到L0A Buffer，搬运过程中伴随二维分形矩阵转置。本接口按分形索引、重复次数、源侧步长、目的侧间隔、地址递减模式与分形间间隔等参数组织搬运，适用于普通矩阵计算所需2D格式数据在L1 Buffer与L0A Buffer之间伴随转置的搬运场景。
 
-下面通过示例来讲解接口功能和关键参数：下文图中一个N形或者一个Z形代表一个分形。
+本芯片的Cube单元上未启用L1 Buffer到L0A Buffer伴随转置的2D搬运功能，即该转置通路在本芯片上不支持；头文件提供原型声明但无对应实现，调用本接口不产生实际搬运行为。如需在L0 Buffer侧完成伴随转置的2D分形搬运，请使用L0B Buffer侧的对应转置接口。
 
-- 对于uint8_t/int8_t数据类型，每次迭代处理32 × 32 × 1B数据，可处理2个分形（一个分形512B），每次迭代中，源操作数中2个连续的16 × 32分形将被合并为1个32 × 32的方块矩阵，基于方块矩阵做转置，转置后分裂为2个16 × 32分形，根据目的操作数分形间隔等参数可以有不同的排布。
-
-如下图示例：
-
-- 共处理3072B的数据，每次迭代处理32 × 32 × 1B数据，需要3次迭代可以完成，repeat_time = 3；
-- src_stride = 1，表示相邻迭代间，源操作数前一个方块矩阵与后一个方块矩阵起始地址的间隔为1（单位：32 × 32 × 1B），这里的单位实际上是拼接后的方块矩阵的大小；
-- dst_gap = 1，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔为1（单位：512B）；
-- dst_frac_gap = 0，表示每个迭代内目的操作数前一个分形的结束地址与后一个分形起始地址的间隔为0（单位：512B）。
-
-![](../figures/asc_copy_l12l0_trans_b8_example1.png)
-
-如下图示例：
-
-- repeat_time和src_stride的解释和上图示例一致。
-- dst_gap = 0，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址和下一个迭代第一个分形起始地址无间隔。
-- dst_frac_gap = 2，表示每个迭代内目的操作数前一个分形的结束地址与后一个分形起始地址的间隔为2（单位：512B）。
-
-![](../figures/asc_copy_l12l0_trans_b8_example2.png)
-
-- 对于half/bfloat16_t数据类型，每次迭代处理16 × 16 × 2B数据，可处理1个分形（一个分形512B），每次迭代中，源操作数中1个16 × 16分形将被转置。
-  - 因为每次迭代处理16 × 16 × 2B数据，需要3次迭代可以完成，repeat_time = 3；
-  - src_stride = 1，表示相邻迭代间，源操作数前一个方块矩阵与后一个方块矩阵起始地址的间隔为1 （单位：16 × 16 × 2B）；
-  - dst_gap = 0，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址无间隔；
-  - 该场景下，因为其分形即为方块矩阵，每个迭代处理一个分形，不存在迭代内分形的间隔，该参数设置无效。
-
-![](../figures/asc_copy_l12l0_trans_b16_example.png)
-
-- 对于float/int32_t/uint32_t数据类型，每次迭代处理16 × 16 × 4B数据，可处理2个分形（一个分形512B），每次迭代中，源操作数2个连续的16 × 8分形将被合并为1个16 × 16的方块矩阵，基于方块矩阵做转置，转置后分裂为2个16 × 8分形，根据目的操作数分形间隔等参数可以有不同的排布。
-如下图示例：
-  - 因为每次迭代处理16 × 16 × 4B数据，需要3次迭代可以完成，repeat_time = 3；
-  - src_stride = 1，表示相邻迭代间，源操作数前一个方块矩阵与后一个方块矩阵起始地址的间隔为1（单位：16 × 16 × 4B），这里的单位实际上是拼接后的方块矩阵的大小；
-  - dst_gap = 1，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔为1（单位：512B）；
-  - dst_frac_gap = 0，表示每个迭代内目的操作数前一个分形结束地址与后一个分形起始地址的间隔为0（单位：512B）。
-
-![](../figures/asc_copy_l12l0_trans_b32_example1.png)
-
-如下图示例：
-- repeat_time和src_stride的解释和上图示例一致。
-- dst_gap = 0，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址和下一个迭代第一个分形起始地址无间隔。
-- dst_frac_gap = 2，表示每个迭代内目的操作数前一个分形结束地址与后一个分形起始地址的间隔为2（单位：512B）。
-
-![](../figures/asc_copy_l12l0_trans_b32_example2.png)
-
+本接口仅在AIC上执行有效，在AIV上调用为空操作。
 
 ## 函数原型
 
-- 高维切分搬运
+### 模板原型（占位符形式）
 
-    ```cpp
-    __aicore__ inline void asc_copy_l12l0a_trans(__ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans(__ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans(__ca__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans(__ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans(__ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans(__ca__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    ```
+```cpp
+__aicore__ inline void asc_copy_l12l0a_trans(__ca__ <dtype>* dst,
+                                             __cbuf__ <dtype>* src,
+                                             uint16_t index_id,
+                                             uint8_t repeat,
+                                             uint16_t src_stride,
+                                             uint16_t dst_gap,
+                                             bool enable_addr_decrement,
+                                             uint16_t dst_frac_gap)
+__aicore__ inline void asc_copy_l12l0a_trans_sync(__ca__ <dtype>* dst,
+                                                  __cbuf__ <dtype>* src,
+                                                  uint16_t index_id,
+                                                  uint8_t repeat,
+                                                  uint16_t src_stride,
+                                                  uint16_t dst_gap,
+                                                  bool enable_addr_decrement,
+                                                  uint16_t dst_frac_gap)
+```
 
-- 同步高维切分搬运 
+### dtype支持的数据类型
 
-    ```cpp
-    __aicore__ inline void asc_copy_l12l0a_trans_sync(__ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans_sync(__ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans_sync(__ca__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans_sync(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans_sync(__ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans_sync(__ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    __aicore__ inline void asc_copy_l12l0a_trans_sync(__ca__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
-    ```
+dtype支持的数据类型为`int8_t`、`uint8_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+### 典型示例
+
+```cpp
+// 示例：half类型的高维切分搬运。
+__aicore__ inline void asc_copy_l12l0a_trans(__ca__ half* dst,
+                                             __cbuf__ half* src,
+                                             uint16_t index_id,
+                                             uint8_t repeat,
+                                             uint16_t src_stride,
+                                             uint16_t dst_gap,
+                                             bool enable_addr_decrement,
+                                             uint16_t dst_frac_gap)
+```
 
 ## 参数说明
 
 **表1** 参数说明
 
-| 参数名       | 输入/输出 | 描述               |
-| --------- | ----- | ---------------- |
-| dst       | 输出    | 目的操作数。            |
-| src | 输入    | 源操作数。            |
-| index_id |输入 |方块矩阵的ID，搬运起始位置为源操作数中第几个方块矩阵（0为源操作数中第1个方块矩阵）。取值范围：index_id∈[0, 65535]。|
-| repeat |输入 |迭代重复次数。repeat∈[0, 255]。<br> 对于uint8_t/int8_t数据类型，每次迭代处理32 × 32 × 1B数据；<br> 对于half/bfloat16_t数据类型，每次迭代处理16 × 16 × 2B数据；<br> 对于float/int32_t/uint32_t数据类型，每次迭代处理16 × 16 × 4B数据。|
-| src_stride | 输入|表示相邻迭代间，源操作数前一个方块矩阵与后一个方块矩阵起始地址的间隔，单位：（1024B）。取值范围：src_stride∈[0, 65535]。<br> 对于uint8_t/int8_t数据类型，单位是32 × 32 × 1B； <br> 对于half/bfloat16_t数据类型，单位是16 × 16 × 2B；<br> 对于float/int32_t/uint32_t数据类型，单位是16 × 16 × 4B； <br> 对于int4b_t数据类型，每次迭代处理16 × 64 × 0.5B数据。|
-| dst_gap | 输入|表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔。取值范围：dst_gap∈[0, 65535]。 |
-| enable_addr_decrement | 输入| 控制地址更新方式。<br>false: 递增，每次迭代在前一个地址的基础上加上src_stride。<br>true: 递减，每次迭代在前一个地址的基础上减去src_stride。 |
-| dst_frac_gap | 输入  | 每个迭代内目的操作数转置前一个分形结束地址与后一个分形起始地址的间隔，单位为512B，仅在数据类型为float/int32_t/uint32_t/uint8_t/int8_t时有效。|
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的操作数，存储位置为L0A Buffer。目的地址需512字节对齐。 |
+| src | 输入 | 源操作数，存储位置为L1 Buffer。源地址需32字节对齐。 |
+| index_id | 输入 | 源侧起始分形索引，即源矩阵中起始分形矩阵的序号（从0计起）。取值范围 [0, 2^16−1]。 |
+| repeat | 输入 | 重复搬运次数。取值范围 [1, 255]。取0时指令不执行，被跳过。 |
+| src_stride | 输入 | 相邻repeat之间源侧（L1 Buffer）的分形步长，单位512字节。取值范围 [0, 2^16−1]。 |
+| dst_gap | 输入 | 相邻repeat之间目的侧（L0A Buffer）的分形间隔，单位512字节。底层解码时实际生效步长为传入值加1（即传入0表1个分形步长）。取值范围 [0, 2^16−1]。 |
+| `enable_addr_decrement` | 输入 | 相邻repeat之间源侧地址更新方向控制位。<br>&nbsp;&nbsp;&bull; `false`：源侧地址按递增方向更新（index_id随repeat递增，即index_id[i] = index_id + src_stride × i）；<br>&nbsp;&nbsp;&bull; `true`：源侧地址按递减方向更新（index_id随repeat递减，即index_id[i] = index_id − src_stride × i），分形步长计算仍按正值进行。 |
+| dst_frac_gap | 输入 | 同一repeat内转置后相邻分形之间目的侧（L0A Buffer）的分形间隔，单位512字节。底层解码时实际生效步长为传入值加1。仅`b8`/`b32`系列dtype下参与地址计算；`b16`系列（`half`/`bfloat16_t`）等分形数为1的dtype下不参与地址计算。取值范围 [0, 2^16−1]。 |
 
 ## 返回值说明
 
@@ -126,8 +99,22 @@ PIPE_MTE1
 ## 约束说明
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-- repeat=0表示不执行搬运操作。
 - 开发者需要保证目的操作数转置后的分形没有重叠。
+
+<!-- npu="950" id8 -->
+### 通用约束
+
+- **本接口在本芯片的Cube单元上不支持，未启用L1 Buffer到L0A Buffer伴随转置的2D搬运功能，调用本接口不产生实际搬运行为。**如需在L0侧完成伴随转置的2D分形搬运，请使用L0B Buffer侧的对应转置接口。
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- dst起始地址需512字节对齐（L0A Buffer对齐要求），否则触发地址对齐异常。
+- src起始地址需32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- L1 Buffer容量上限：L1 Buffer总容量512KB，src偏移+源矩阵占用大小不可越界，否则触发地址溢出异常。
+- L0A Buffer容量上限：L0A Buffer总容量64KB，dst偏移+搬运大小不可越界，否则触发地址溢出异常。
+- repeat为0时不执行搬运，本接口被视为NOP（空操作）。
+- index_id、src_stride等参数任意迭代组合后的源侧分形索引不可小于0，否则触发异常。
+- dtype仅支持`b8`/`b16`/`b32`对应的C类型（即`int8_t`/`uint8_t`/`half`/`bfloat16_t`/`int32_t`/`uint32_t`/`float`），其他dtype触发指令未定义异常。
+<!-- end id8 -->
 
 ## 调用示例
 

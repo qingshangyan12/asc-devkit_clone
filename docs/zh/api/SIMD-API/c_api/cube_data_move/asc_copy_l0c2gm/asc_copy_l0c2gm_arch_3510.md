@@ -37,10 +37,10 @@
 本接口支持多种随路能力的组合，需通过配套接口预先配置量化参数、激活参数、通道参数等寄存器，再调用本接口完成搬运。
 
 - Nz2ND格式转换场景下，需通过[asc_set_l0c2gm_nz2nd](../../cube_compute/asc_set_l0c2gm_nz2nd.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2nd`使用；
-- Nz2DN格式转换场景下，需通过[asc_set_l0c2gm_nz2nd](../../cube_compute/asc_set_l0c2gm_nz2nd.md)、[asc_set_l0c2gm_channel_para](../../sys_var/asc_set_l0c2gm_channel_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2dn`使用；
+- Nz2DN格式转换场景下，需通过[asc_set_l0c2gm_nz2nd](../../cube_compute/asc_set_l0c2gm_nz2nd.md)、[asc_set_l0c2gm_channel_para](../asc_set_l0c2gm_channel_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2dn`使用；
 - 随路scalar量化模式下，需通过[asc_set_l0c_copy_prequant](../asc_set_l0c_copy_prequant.md)设置随路scalar量化参数，并且需要搭配本接口`quant_pre_mode`使用;
 - 随路tensor量化模式下，需通过[asc_set_l0c2gm_config](../../cube_compute/asc_set_l0c2gm_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用;
-- 随路激活模式下，需通过[asc_set_l0c2gm_relu_alpha](../../sys_var/asc_set_l0c2gm_relu_alpha.md)、[asc_set_l0c2gm_lrelu_alpha](../asc_set_l0c2gm_lrelu_alpha.md)预先配置ReLU/Leaky ReLU激活参数，并且需要搭配本接口`enable_clip_relu_pre`与`relu_pre_mode`使用；
+- 随路激活模式下，需通过[asc_set_l0c2gm_relu_alpha](../asc_set_l0c2gm_relu_alpha.md)、[asc_set_l0c2gm_lrelu_alpha](../asc_set_l0c2gm_lrelu_alpha.md)预先配置ReLU/Leaky ReLU激活参数，并且需要搭配本接口`enable_clip_relu_pre`与`relu_pre_mode`使用；
 
 `quant_pre_mode`量化模式参数支持的枚举值如下：
 
@@ -217,8 +217,8 @@ PIPE_FIX
 - src与dst dtype组合需与`quant_pre_mode`量化模式匹配，否则会导致搬运结果不符合预期。
 - `enable_channel_split`仅在输出dtype为`float`且输出为Nz格式时可设为true。
 - 量化与激活模式中使用的量化系数不可为INF/NaN和非规格化数，否则会导致量化激活结果错误。
-- 开启Nz2DN转换时，需通过[asc_set_l0c2gm_channel_para](../../sys_var/asc_set_l0c2gm_channel_para.md)预先配置源矩阵步长，且源矩阵步长不可为0，否则会导致搬运异常。
-- 开启Nz2DN转换时，仅当通过[asc_set_l0c2gm_channel_para](../../sys_var/asc_set_l0c2gm_channel_para.md)配置源矩阵步长为1时，可同时开启UnitFlag功能。
+- 开启Nz2DN转换时，需通过[asc_set_l0c2gm_channel_para](../asc_set_l0c2gm_channel_para.md)预先配置源矩阵步长，且源矩阵步长不可为0，否则会导致搬运异常。
+- 开启Nz2DN转换时，仅当通过[asc_set_l0c2gm_channel_para](../asc_set_l0c2gm_channel_para.md)配置源矩阵步长为1时，可同时开启UnitFlag功能。
 - `enable_clip_relu_pre`设为Clip ReLU（标量模式）时需搭配`relu_pre_mode`与量化功能一起使用。
 
 ## 调用示例

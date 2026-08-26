@@ -50,7 +50,7 @@
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量）的起始地址。 |
+| dst | 输出 | 目的操作数，存储位置为L1 Buffer。 |
 | hor_size | 输入 | 从源图中加载图片的水平宽度，单位为像素。取值范围：[1, 4094]。 |
 | ver_size | 输入 | 从源图中加载图片的垂直高度，单位为像素。取值范围：[1, 4094]。 |
 | hor_start_pos | 输入 | 加载图片在源图片上的水平起始地址，单位为像素。取值范围：[0, 4095]。 |
@@ -73,6 +73,8 @@ PIPE_MTE2
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。
+- 搬运到dst的图片大小与padding大小之和不能超过L1 Buffer可用空间。
+- 使用块填充或镜像块填充模式时，left_pad_size和right_pad_size不能超过hor_size，top_pad_size和bot_pad_size不能超过ver_size。
 
 ## 调用示例
 
