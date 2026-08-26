@@ -151,7 +151,7 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
                 HCCL_INFO("[hld][test222] level0Topo=[%d] dataSize=[%d]", topoInfo->level0Topo, dataSize);
                 if (dataSize > SMALL_COUNT_512KB) {
                     HCCL_INFO("[hld][test3333] level0Topo=[%d]", topoInfo->level0Topo);
-                    selectAlgName = "InsAllGatherConcurrentMesh1DNHR";
+                    selectAlgName = "AicpuAllGatherConcurMeshNHR";
                 } else {
                     HCCL_INFO("[hld][test4444] level0Topo=[%d]", topoInfo->level0Topo);
                     selectAlgName = "InsAllGatherMesh1D";

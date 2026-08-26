@@ -12,6 +12,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "hccl_res.h"
 #include "ccu_alg_template_base.h"
+#include <algorithm>
 
 // AICPU template 头文件
 #include "ins_temp_all_gather_mesh_1D.h"
@@ -250,9 +251,13 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
             resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0] + resCtx.ccuKernelNum[1]);
     } else {
         const u64 splitIndex = rankSize_ - 1; // 默认第一个算法为mesh，使用 rankSize_ - 1 个 link
+        const auto& temp0Ranks = algHierarchyInfo_.infos[0][0];
+        (void)splitIndex;
         for (u64 i = 0; i < resCtx.channels[0].size(); ++i) {
             const auto& channel = resCtx.channels[0][i];
-            auto& targetMap = (i < splitIndex) ? tmp0LinkMap_ : tmp1LinkMap_;
+            const bool isTemp0Channel =
+                std::find(temp0Ranks.begin(), temp0Ranks.end(), channel.remoteRank) != temp0Ranks.end();
+            auto& targetMap = isTemp0Channel ? tmp0LinkMap_ : tmp1LinkMap_;
             targetMap[channel.remoteRank].push_back(channel);
         }
     }
