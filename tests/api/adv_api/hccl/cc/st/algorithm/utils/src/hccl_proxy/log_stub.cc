@@ -26,9 +26,11 @@ static uint32_t InitLogLevel()
     const char* envVal = std::getenv("HCCL_LOG_LEVEL");
     if (envVal != nullptr) {
         uint32_t val = static_cast<uint32_t>(std::strtoul(envVal, nullptr, 10));
-        if (val <= 0x10) { return val; }
+        if (val <= 0x10) {
+            return val;
+        }
     }
-    return 0x01;
+    return 0x03;
 }
 
 static uint32_t g_runtimeLogLevel = InitLogLevel();
@@ -43,10 +45,7 @@ extern "C" {
 
 int32_t CheckLogLevel(int32_t moduleId, int32_t logLevel) { return 1; }
 
-void SetTestLogLevel(uint32_t level)
-{
-    g_runtimeLogLevel = (level <= 0x10) ? level : 0x01;
-}
+void SetTestLogLevel(uint32_t level) { g_runtimeLogLevel = (level <= 0x10) ? level : 0x01; }
 
 void GetCurTimeStr(char* timeStr, int len)
 {
