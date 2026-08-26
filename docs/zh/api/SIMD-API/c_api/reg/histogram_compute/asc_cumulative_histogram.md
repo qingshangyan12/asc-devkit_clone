@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-对输入矢量数据寄存器中的元素进行累计频率统计，生成累计直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。支持配置掩码用于指示参与统计的元素，掩码位为1时，对应元素参与统计；为0时不统计。掩码不影响目的矢量数据寄存器的写入行为。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。
+对输入矢量数据寄存器中的元素进行累计频率统计，生成累计直方图。统计结果在目的矢量数据寄存器原有数据基础上累加，并将更新后的`dst`作为返回值返回。支持配置掩码用于指示参与统计的元素，掩码位为1时，对应元素参与统计；为0时不统计。掩码不影响目的矢量数据寄存器的写入行为。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。
 
 由于源矢量数据寄存器`src`的数据类型为`uint8_t`，取值范围为[0, 255]，而目的矢量数据寄存器`dst`的元素类型为`uint16_t`，且一个Vector Length可存储128个`uint16_t`数据，因此本接口支持以下两种模式，其中n为`dst`的元素索引，n ∈ {0, 1, ..., 127}：
 
@@ -44,17 +44,17 @@
 ### 低位模式
 
 ```c
-__simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst,
-                                                          vector_uint8_t src,
-                                                          vector_bool mask)
+__simd_callee__ inline vector_uint16_t asc_cumulative_histogram_bin0(vector_uint16_t& dst,
+                                                                     vector_uint8_t src,
+                                                                     vector_bool mask)
 ```
 
 ### 高位模式
 
 ```c
-__simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst,
-                                                          vector_uint8_t src,
-                                                          vector_bool mask)
+__simd_callee__ inline vector_uint16_t asc_cumulative_histogram_bin1(vector_uint16_t& dst,
+                                                                     vector_uint8_t src,
+                                                                     vector_bool mask)
 ```
 
 `src`支持的数据类型为`uint8_t`，`dst`支持的数据类型为`uint16_t`。
@@ -73,7 +73,7 @@ __simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst,
 
 ## 返回值说明
 
-无
+返回累计直方图计算结果，类型为`vector_uint16_t`，与`dst`的值相同。
 
 ## 约束说明
 
