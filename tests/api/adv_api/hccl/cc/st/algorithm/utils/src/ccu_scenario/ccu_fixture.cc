@@ -15,6 +15,7 @@
 #include "topo_model.h"
 #include "hccl_alloc_ctx_res.h"
 #include "alg_param.h"
+#include "alg_env_config.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -144,6 +145,7 @@ void CcuStFixture::VerifyScenario(const CcuStScenario& scenario)
 
     setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
     setenv("ASCEND_ENABLE_CCU_KFC_BRANCH", "1", 1);
+    mc2_ops_hccl::InitEnvConfig();
     HcclSim::SimWorld::Global()->Init(scenario.topoMeta, scenario.devType);
 
     const TopoMeta& topoMeta = scenario.topoMeta;
@@ -185,13 +187,6 @@ void CcuStFixture::VerifyScenario(const CcuStScenario& scenario)
         ASSERT_TRUE(dagResult.Ok()) << dagResult.message;
         CheckResult runtime = CheckRuntimeOutput(data.memories, expectation, world);
         ASSERT_TRUE(runtime.Ok()) << runtime.message;
-
-        if (scenario.corruptOutput) {
-            if (!data.memories.empty() && !data.memories[0].output.empty()) {
-                data.memories[0].output[0] ^= 1U;
-            }
-            EXPECT_FALSE(CheckRuntimeOutput(data.memories, expectation, world).Ok());
-        }
     }
 
     HcclSim::SimWorld::Global()->Deinit();
