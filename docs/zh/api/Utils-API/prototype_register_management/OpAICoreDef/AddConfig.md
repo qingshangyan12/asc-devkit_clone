@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section36583473819"></a>
 
-注册算子支持的AI处理器型号以及[OpAICoreConfig](../OpAICoreConfig/OpAICoreConfig.md)信息。
+注册算子支持的SoC系列以及[OpAICoreConfig](../OpAICoreConfig/OpAICoreConfig.md)信息。
 
 ## 函数原型<a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001525424352_section13230182415108"></a>
 
@@ -26,7 +26,7 @@ void AddConfig(const char *soc, OpAICoreConfig &aicore_config)
 </td>
 <td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.1.4.1.2 "><p id="zh-cn_topic_0000001575929572_p9611345141418"><a name="zh-cn_topic_0000001575929572_p9611345141418"></a><a name="zh-cn_topic_0000001575929572_p9611345141418"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="zh-cn_topic_0000001575929572_p14611945131415"><a name="zh-cn_topic_0000001575929572_p14611945131415"></a><a name="zh-cn_topic_0000001575929572_p14611945131415"></a>支持的AI处理器型号。填写规则请参考<span>算子工程目录下编译配置项文件CMakePresets.json中的ASCEND_COMPUTE_UNIT字段，该字段取值在使用msOpGen创建工程时自动生成</span>。</p>
+<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="zh-cn_topic_0000001575929572_p14611945131415"><a name="zh-cn_topic_0000001575929572_p14611945131415"></a><a name="zh-cn_topic_0000001575929572_p14611945131415"></a>支持的SoC系列short名称。对于框架支持的系列名，取值不区分大小写，生成算子配置信息时会统一转换为小写。推荐使用平台short格式，例如Ascend910B、Ascend950。填写的系列应与算子工程目录下编译配置项文件CMakePresets.json中的ASCEND_SOC_SERIES或ASCEND_COMPUTE_UNIT对应；使用msOpGen创建工程时，相关取值会自动生成。</p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_row152234713443"><td class="cellrowborder" valign="top" width="17.22%" headers="mcps1.1.4.1.1 "><p id="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_p318615392613"><a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_p318615392613"></a><a name="zh-cn_topic_0000001575929572_zh-cn_topic_0000001526442954_zh-cn_topic_0000001575944081_p318615392613"></a>aicore_config</p>

@@ -185,7 +185,7 @@ TilingData字段设计、Tiling函数写法、workspace设置和`numBlocks`配�
 
 ### 使用OpAICoreConfig注册差异化配置
 
-当某个AI处理器的输入输出原型或其他编译配置与通用配置不同时，在算子原型构造函数中创建`OpAICoreConfig`，并通过`AddConfig("ascendxxx", config)`注册。"ascendxxx"填写规则请参考算子工程目录下编译配置项文件`CMakePresets.json`中的`ASCEND_COMPUTE_UNIT`字段，该字段取值在使用msOpGen创建工程时自动生成。
+当某个SoC系列的输入输出原型或其他编译配置与通用配置不同时，在算子原型构造函数中创建`OpAICoreConfig`，并通过`AddConfig("Ascendxxx", config)`注册。对于框架支持的SoC系列short名称，`AddConfig`的系列名不区分大小写，生成算子配置信息时会统一转换为小写。推荐使用平台short格式，例如`Ascend910B`、`Ascend950`。填写的系列应与算子工程目录下编译配置项文件`CMakePresets.json`中的`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`对应；使用msOpGen创建工程时，相关取值会自动生成。
 
 `OpAICoreConfig`中未配置的输入输出继承`OpDef`中的定义；重新配置的同名输入输出覆盖通用定义。以下示例为指定AI处理器增加`DT_BF16`支持：
 
@@ -209,7 +209,7 @@ public:
             .ParamType(REQUIRED)
             .DataType({ge::DT_FLOAT16, ge::DT_BF16})
             .Format({ge::FORMAT_ND, ge::FORMAT_ND});
-        this->AICore().AddConfig("ascendxxx", config);
+        this->AICore().AddConfig("Ascendxxx", config);
     }
 };
 } // namespace ops

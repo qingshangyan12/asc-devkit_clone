@@ -20,7 +20,7 @@
 
 使用msOpGen生成的工程，已经包含完整CMake结构，不需要单独编写CMakeLists.txt处理；如果需要自行编写CMakeLists.txt，请参考[编译组织](#编译组织)。以[快速入门的AddCustom](../aclnn_quick_start.md)为例，msOpGen生成的算子工程编译部署只需三步：
 
-1. 修改`CMakePresets.json`，填写`ASCEND_COMPUTE_UNIT`（AI处理器型号）和`vendor_name`（厂商名称）等编译配置选项；
+1. 修改`CMakePresets.json`，通过`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`填写SoC系列，并配置`vendor_name`（厂商名称）等编译选项；
 2. 执行`./build.sh`，生成`custom_opp_*.run`安装包；
 3. 执行`./custom_opp_*.run`，安装到运行环境。
 
@@ -28,12 +28,22 @@
 
 ## 编译配置<a id="compile-configuration"></a>
 
-编译配置选项的必改参数有两个：
+编译时需要配置目标SoC系列和自定义算子厂商。目标SoC系列可通过新增的`ASCEND_SOC_SERIES`配置，也可继续使用原有的`ASCEND_COMPUTE_UNIT`配置：
 
 | 参数名称 | 参数描述 | 默认值 |
 |---------|---------|--------|
-| ASCEND_COMPUTE_UNIT | AI处理器型号，按实际运行芯片配置。 | "ascendxxx" |
+| ASCEND_SOC_SERIES | SoC系列名，不区分大小写。推荐使用平台short格式，例如`Ascend910B`、`Ascend910_93`、`Ascend950`。配置值会转换为小写后进入原有编译和打包流程。与`ASCEND_COMPUTE_UNIT`互斥。 | - |
+| ASCEND_COMPUTE_UNIT | 原有的SoC系列配置，仅支持小写形式，例如`ascend910b`、`ascend910_93`、`ascend950`。原有配置和行为保持不变。与`ASCEND_SOC_SERIES`互斥。 | 两个目标参数均未配置时，默认为`ascend910b`。 |
 | vendor_name | 自定义算子所属厂商名称，用于形成`vendors/<vendor_name>`安装目录，避免与其他厂商算子包冲突；同一安装路径下`vendor_name`相同的算子包会安装到同一目录，同名文件会覆盖。 | "customize" |
+
+`ASCEND_SOC_SERIES`转换为小写后支持以下取值：`ascend310b`、`ascend310p`、`ascend610`、`ascend910`、`ascend910b`、`ascend910_93`、`ascend950`、`bs9sx1a`、`bs9sx2a`、`ascend610lite`、`mc61am21a`、`mc62`、`ascend910_96`、`kirinx90`、`kirin9030`、`mc32dm11a`、`ascend350`。需要配置多个系列时，在CMakeLists.txt中以列表形式填写，例如`set(ASCEND_SOC_SERIES Ascend910B Ascend950)`；在`CMakePresets.json`或CMake命令行中使用英文分号（;）分隔。
+
+> [!NOTE]说明
+>
+> - `ASCEND_SOC_SERIES`和`ASCEND_COMPUTE_UNIT`不能同时配置。
+> - 两个参数均用于配置SoC系列。`ASCEND_SOC_SERIES`支持任意大小写并在构建入口统一转换为小写；`ASCEND_COMPUTE_UNIT`保留原有的全小写输入约定。两种方式使用等价系列值时，生成的编译产物及小写SoC路径一致。
+> - 此处填写SoC系列short名称，不支持填写full SKU。例如，应填写`Ascend950`，不能填写`Ascend950PR_9599`。
+> - `ASCEND_SOC_SERIES`不能为空；配置值转换为小写后不在支持列表中时，CMake configure阶段会报错并终止。
 
 除上述必改参数外，其他可选编译配置选项详情如下：
 
@@ -73,9 +83,9 @@
         {
             "name": "default",
             "cacheVariables": {
-                "ASCEND_COMPUTE_UNIT": {
+                "ASCEND_SOC_SERIES": {
                     "type": "STRING",
-                    "value": "ascendxxyy"
+                    "value": "Ascend910B"
                 },
                 "vendor_name": {
                     "type": "STRING",
@@ -92,8 +102,10 @@
 直接在顶层CMakeLists.txt中设置变量，并通过`npu_op_*`接口配置编译行为，无需CMakePresets.json文件。
 
 ```cmake
-# 设置必要变量
-set(ASCEND_COMPUTE_UNIT "ascendxxyy")
+# 在find_package(ASC REQUIRED)之前设置目标SoC系列
+set(ASCEND_SOC_SERIES "Ascend910B")
+find_package(ASC REQUIRED)
+
 set(vendor_name "customize")
 
 # 配置编译产物包（通过CONFIG参数替代ENABLE_SOURCE_PACKAGE / ENABLE_BINARY_PACKAGE等变量）
@@ -609,7 +621,7 @@ npu_op_package_add(${package_name}
 在CMakeLists.txt中，用`npu_op_kernel_options`为核函数（Kernel）侧代码添加编译选项：
 
 ```cmake
-npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version>] OPTIONS ...)
+npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version> ... | SOC_SERIES <soc_series> ...] OPTIONS ...)
 ```
 
 **表4** 参数说明。
@@ -618,7 +630,8 @@ npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version>] OPTIO
 |---------|----------|---------|
 | target_name | 必选 | 核函数（Kernel）库的目标名称（如`ascendc_kernels`）。 |
 | op_type | 必选 | 算子类型。如需对所有算子生效，配置为`ALL`。 |
-| COMPUTE_UNIT | 可选 | AI处理器型号，不配置时对所有型号生效。 |
+| COMPUTE_UNIT | 可选 | 精确的AI处理器型号，支持配置多个型号。不能与`SOC_SERIES`同时配置。 |
+| SOC_SERIES | 可选 | SoC系列名，支持配置多个系列，取值不区分大小写。支持的取值参见[编译配置](#compile-configuration)。不能与`COMPUTE_UNIT`同时配置。`COMPUTE_UNIT`和`SOC_SERIES`均不配置时，对所有型号生效。 |
 | OPTIONS | 必选 | 自定义编译选项，多个选项用空格间隔。支持`--save-temp-files`、`-g`、`-DASCENDC_DEBUG`等。 |
 
 **常见示例**：
@@ -629,11 +642,14 @@ npu_op_kernel_options(ascendc_kernels ALL OPTIONS --save-temp-files)
 
 # 为特定算子在特定型号上开启AscendC调试宏
 npu_op_kernel_options(ascendc_kernels AddCustom COMPUTE_UNIT ascendxxyy OPTIONS -DASCENDC_DEBUG)
+
+# 为特定算子在指定SoC系列上开启AscendC调试宏
+npu_op_kernel_options(ascendc_kernels AddCustom SOC_SERIES Ascend910B Ascend950 OPTIONS -DASCENDC_DEBUG)
 ```
 
 > [!NOTE]说明
-> - 编译选项是基于“算子类型+AI处理器型号系列”进行配置的，也就是说不同的“算子类型+AI处理器型号系列”可以配置不同的编译选项。
-> - 对相同算子类型+AI处理器型号系列，做多次编译选项配置，以后配置的为准。
+> - 编译选项基于“算子类型+目标AI处理器范围”进行配置。目标范围可以通过`COMPUTE_UNIT`指定精确型号，也可以通过`SOC_SERIES`指定SoC系列。
+> - 对相同算子类型和目标AI处理器范围多次配置编译选项时，以后配置的为准。
 > - 对ALL生效的编译选项和对单一算子生效的编译选项如果没有冲突，同时生效，如果有冲突，以单一算子的编译选项为准。
 
 Ascend C框架提供的编译选项介绍如下：
