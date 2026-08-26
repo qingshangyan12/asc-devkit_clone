@@ -54,7 +54,7 @@ inline int __half2int_ru(const half x)
 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 | -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
 | 0.5 | 1 |
-| -0.5 | -1 |
+| -0.5 | 0 |
 | ASCRT\_MIN\_DENORM\_FP16 | 1 |
 
 ## 约束说明

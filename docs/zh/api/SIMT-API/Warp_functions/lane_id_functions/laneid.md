@@ -60,9 +60,12 @@ int32_t laneid()
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_laneid(int32_t* dst, int32_t* src)
+    __global__ __launch_bounds__(1024) void kernel_laneid(int32_t* dst, int32_t* src, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         int32_t result = asc_reduce_add(src[idx]);
         if (laneid() == 0) {
             asc_atomic_add(dst, result);
@@ -73,9 +76,12 @@ int32_t laneid()
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_laneid(__gm__ int32_t* dst, __gm__ int32_t* src)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_laneid(__gm__ int32_t* dst, __gm__ int32_t* src, uint32_t input_total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= input_total_length) {
+            return;
+        }
         int32_t result = asc_reduce_add(src[idx]);
         if (laneid() == 0) {
             asc_atomic_add(dst, result);

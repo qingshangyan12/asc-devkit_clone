@@ -52,7 +52,7 @@ e的x次方。本接口受全局饱和模式影响，特殊值如下：
 | inf | inf | ASCRT_MAX_NORMAL_BF16 |
 | -inf | 0 | 0 |
 | nan | nan | 0 |
-| 其他 | 2的x次方，当结果超出bfloat16_t最大有限值时，结果为inf | 2的x次方，当结果超出bfloat16_t最大有限值时，结果为ASCRT_MAX_NORMAL_BF16 |
+| 其他 | e的x次方，当结果超出bfloat16_t最大有限值时，结果为inf | e的x次方，当结果超出bfloat16_t最大有限值时，结果为ASCRT_MAX_NORMAL_BF16 |
 
 ## 约束说明
 

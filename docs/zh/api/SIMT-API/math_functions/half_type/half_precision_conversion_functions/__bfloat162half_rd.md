@@ -52,6 +52,8 @@ inline half __bfloat162half_rd(const bfloat16_t x)
 | nan | nan | 0 |
 | inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | -inf | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
+| x>ASCRT\_MAX\_NORMAL\_FP16 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| x<-ASCRT\_MAX\_NORMAL\_FP16 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 
