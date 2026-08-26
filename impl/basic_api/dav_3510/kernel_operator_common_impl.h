@@ -55,7 +55,7 @@ __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
     return workspace;
 #else
     (void)(workspace);
-#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1
+#if defined(NO_KFC_SERVER_DETECTED) || (ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1)
     return GetSysWorkSpacePtr();
 #else
     return GetSysWorkSpacePtr() + RESERVED_WORKSPACE;
