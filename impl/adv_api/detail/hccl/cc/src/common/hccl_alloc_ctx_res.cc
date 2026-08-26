@@ -773,6 +773,8 @@ static HcclResult AcquireAlgResources(
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     if (opParam.engine == COMM_ENGINE_CCU) {
+        // The device-side open resource cache validates this token against OpParam::hcclComm.
+        resCtxHost->commInfoPtr = static_cast<void*>(comm);
         // 填充 kfcServerArgs：token 和 sub-kernel PC 先占位，后续分别更新。
         resCtxHost->kfcServerArgs = {
             opResCtx.xnAddr,          opResCtx.ckeAddr,
