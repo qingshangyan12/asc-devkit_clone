@@ -42,7 +42,7 @@ __aicore__ inline void asc_set_ndim_pad_value(<dtype> pad_value)
 
 dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
-### 典型示例
+### 函数原型典型示例
 
 ```c
 // 示例：int32_t类型填充值设置。
