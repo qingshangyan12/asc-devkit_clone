@@ -39,7 +39,7 @@ __aicore__ inline <dtype> asc_atomic_dec(__gm__ <dtype>* address,
 
 dtype支持的数据类型为`uint32_t`、`uint64_t`。
 
-### 典型示例
+### 函数原型典型示例
 
 ```c
 // 示例：uint32_t类型标量原子递减。
