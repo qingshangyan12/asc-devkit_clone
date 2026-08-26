@@ -116,9 +116,7 @@ __aicore__ inline void asc_entire_dcci_impl(__gm__ uint64_t* ptr)
 
 __aicore__ inline uint64_t asc_debug_get_system_cycle_impl()
 {
-    uint64_t sysCnt = 0;
-    asm volatile("MOV %0, SYS_CNT\n" : "+l"(sysCnt));
-    return sysCnt;
+    return get_sys_cnt();
 }
 
 template <uint64_t timeoutCycle>
