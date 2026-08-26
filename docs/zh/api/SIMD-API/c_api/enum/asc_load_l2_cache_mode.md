@@ -15,6 +15,8 @@ enum class asc_load_l2_cache_mode : uint8_t {
 };
 ```
 
+> **类型说明**：`asc_load_l2_cache_mode` 的底层类型为 `uint8_t`（枚举值即 `uint8_t` 数值）。在 CANN 9.1.0 / dav-3510 平台下，使用本枚举的接口（如 `asc_copy_gm2ub_align`、`asc_ndim_copy_gm2ub`）中 `l2_cache_mode` 参数的实际类型为 `uint8_t`，请按 `uint8_t` 传参。可传入本枚举的枚举值（底层为 `uint8_t`，值一致），也可直接传入枚举值对应的 `uint8_t` 数值（0、1、2、4、5、6）。
+
 ## 枚举值详解
 
 **表1** 枚举值说明
