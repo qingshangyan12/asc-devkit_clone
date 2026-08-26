@@ -30,6 +30,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_gm2l1_nz_para_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c2gm_quant_post_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c2gm_relu_alpha_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_l0c_copy_relu_alpha_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_l12l0_padding_val_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_l13d_padding_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_l12l0a_3d_padding_impl.h"
@@ -212,6 +213,11 @@ __aicore__ inline void asc_set_l12l0_padding_val(uint64_t config) { asc_set_l12l
 __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config) { asc_set_l0c2gm_quant_post_impl(config); }
 
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config) { asc_set_l0c2gm_relu_alpha_impl(config); }
+
+__aicore__ inline void asc_set_l0c_copy_relu_alpha(float& scalar_relu_pre_alpha)
+{
+    asc_set_l0c_copy_relu_alpha_impl(scalar_relu_pre_alpha);
+}
 
 __aicore__ inline int64_t asc_get_smmu_tag_version() { return asc_get_smmu_tag_version_impl(); }
 

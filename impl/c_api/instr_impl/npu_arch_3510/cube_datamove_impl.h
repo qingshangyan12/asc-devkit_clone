@@ -29,6 +29,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl/asc_set_l13d_fmatrix_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl/asc_set_l13d_fmatrix_b_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl/asc_set_l0c2gm_lrelu_alpha_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl/asc_set_l0c_copy_lrelu_alpha_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl/asc_set_l0c_copy_prequant_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl/asc_set_gm2l1_loop_size_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl/asc_set_gm2l1_loop1_stride_impl.h"
@@ -2618,14 +2619,14 @@ __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* sr
 
 // =============asc_copy_l12ub===============
 __aicore__ inline void asc_copy_l12ub(
-    __ubuf__ void* dst_addr, __cbuf__ void* src_addr, bool sub_blockid, uint16_t n_burst, uint16_t len_burst,
+    __ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t n_burst, uint16_t len_burst,
     uint16_t src_gap, uint16_t dst_gap)
 {
     asc_copy_l12ub_impl(dst_addr, src_addr, sub_blockid, n_burst, len_burst, src_gap, dst_gap);
 }
 
 __aicore__ inline void asc_copy_l12ub_sync(
-    __ubuf__ void* dst_addr, __cbuf__ void* src_addr, bool sub_blockid, uint16_t n_burst, uint16_t len_burst,
+    __ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t n_burst, uint16_t len_burst,
     uint16_t src_gap, uint16_t dst_gap)
 {
     asc_copy_l12ub_sync_impl(dst_addr, src_addr, sub_blockid, n_burst, len_burst, src_gap, dst_gap);
@@ -4617,6 +4618,16 @@ __aicore__ inline void asc_set_l13d_fmatrix_b(
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config) { asc_set_l0c2gm_lrelu_alpha_impl(config); }
 
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config) { asc_set_l0c2gm_lrelu_alpha_impl(config); }
+
+__aicore__ inline void asc_set_l0c_copy_lrelu_alpha(half& scalar_relu_pre_alpha)
+{
+    asc_set_l0c_copy_lrelu_alpha_impl(scalar_relu_pre_alpha);
+}
+
+__aicore__ inline void asc_set_l0c_copy_lrelu_alpha(float& scalar_relu_pre_alpha)
+{
+    asc_set_l0c_copy_lrelu_alpha_impl(scalar_relu_pre_alpha);
+}
 
 #endif
 
