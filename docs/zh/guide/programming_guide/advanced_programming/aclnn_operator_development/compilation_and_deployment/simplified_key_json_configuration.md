@@ -111,7 +111,7 @@ JSON文件最外层包含`op_type`和`op_list`两个字段：`op_type`指定算�
 |---|---|
 | `op_type` | 必填，必须与`npu_op_kernel_sources()`中的`OP_TYPE`一致。 |
 | `op_list` | 必填非空数组；数组中的每一项对应一份独立编译的binary。 |
-| `bin_filename` | 必填，不含目录；用于生成`.o`和配套`.json`文件名。去掉扩展名后必须等于`op_type`或以`${op_type}_`开头，其中`op_type`为大驼峰风格的算子名，且文件名不能重复。 |
+| `bin_filename` | 必填，不含目录；用于生成`.o`和配套`.json`文件名。去掉扩展名后必须等于`${op_type}`或以`${op_type}_`开头，其中`${op_type}`为大驼峰风格的算子名，且文件名不能重复。 |
 | `simplified_key` | 必填非空字符串；是`GenSimplifiedKey`回调返回的自定义片段，必须与回调逐字节一致；字符串经UTF-8编码后的长度必须小于256字节。 |
 | `inputs`、`outputs` | 每个输入输出包含`name`、`index`、`dtype`、`format`和`shape`，描述本项binary支持的组合。 |
 
