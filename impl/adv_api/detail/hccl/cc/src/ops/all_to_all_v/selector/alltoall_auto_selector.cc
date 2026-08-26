@@ -50,8 +50,7 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
         opParam.all2AllVDataDes.sendCounts == nullptr, HCCL_WARNING("[AlltoAllAutoSelector] sendCounts is nullptr."),
         SelectorStatus::NOT_MATCH);
     const auto* sendCounts = static_cast<const u64*>(opParam.all2AllVDataDes.sendCounts);
-    const bool concurrentCondition = isMeshNumEqualToClosNum &&
-                                     topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT &&
+    const bool concurrentCondition = isMeshNumEqualToClosNum && topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT &&
                                      sendCounts[0] > CONCURRENT_COUNT_LIMIT;
     selectAlgName = concurrentCondition ? "AicpuAllToAllSoleMeshConcurrent" : "AicpuAllToAllSoleMeshUBX";
 #else
