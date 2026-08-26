@@ -60,8 +60,8 @@ class TestGetOpTiling(unittest.TestCase):
         mock_exist.return_value = True
         mock_get_dft_pathlist.return_value = []
         mock_get_opp_pathlist.return_value = []
-        mock_cdll.return_value = None
-        self.assertIsNone(load_lib())
+        mock_cdll.return_value = mock.MagicMock()
+        self.assertIs(load_lib(), mock_cdll.return_value)
 
     @mock.patch(
         "os.environ", {"ASCEND_CUSTOM_OPP_PATH": ["path_1", "path_2", "path_3"]}
@@ -306,10 +306,10 @@ class TestGetOpTiling(unittest.TestCase):
             }
         )
         all_dynamic_struct_def_except_self = gen_all_dynamic_struct_def_except_self(
-            False, None, None, "AddCustom", None
+            False, None, [], "AddCustom", {}
         )
         with mock.patch(
-            "asc_op_compile_base.asc_op_compiler.get_op_tiling.get_tiling_def",
+            "adapter.get_op_tiling.get_tiling_def",
             return_value=TilingDef(
                 {
                     "class_name": "add_custiom",
@@ -732,13 +732,13 @@ public:
 
         from adapter.get_op_tiling import TilingDef
         from adapter.get_op_tiling import get_tiling_info
-        from adapter.compile_op import _set_compile_info
 
         with (
             tbe.common.context.op_context.OpContext(),
             buildcfg.build_config(),
             mock.patch(
-                "adapter.get_op_tiling.get_tiling_def", return_value=None
+                "adapter.get_op_tiling.get_tiling_def",
+                return_value=None,
             ) as mock_get_tiling_def,
             mock.patch(
                 "adapter.get_op_tiling.do_op_tiling",
@@ -753,9 +753,8 @@ public:
                 },
             ) as mock_do_op_tiling,
         ):
-            _set_compile_info(op_info)
-            tiling_info = get_tiling_info(op_info, ["1"])
-            self.assertEqual(tiling_info.block_dim, -1)
+            tiling_info = get_tiling_info(op_info, ["1"], None, False, {})
+            self.assertEqual(tiling_info.block_num, -1)
             self.assertEqual(tiling_info.clear_atomic, 1)
             self.assertEqual(tiling_info.schedule_mode, 0)
 
@@ -771,8 +770,8 @@ public:
                 "workspaces": [4096],
                 "ret_code": False,
             }
-            tiling_info = get_tiling_info(op_info, ["1"])
-            self.assertEqual(tiling_info.block_dim, 1)
+            tiling_info = get_tiling_info(op_info, ["1"], None, False, {})
+            self.assertEqual(tiling_info.block_num, 1)
             self.assertEqual(tiling_info.clear_atomic, 0)
             self.assertEqual(tiling_info.schedule_mode, 0)
 
@@ -792,8 +791,8 @@ public:
                 "workspaces": [8192],
                 "ret_code": False,
             }
-            tiling_info = get_tiling_info(op_info, ["1"])
-            self.assertEqual(tiling_info.block_dim, 1)
+            tiling_info = get_tiling_info(op_info, ["1"], None, False, {})
+            self.assertEqual(tiling_info.block_num, 1)
             self.assertEqual(tiling_info.clear_atomic, 0)
             self.assertEqual(tiling_info.schedule_mode, 0)
 
@@ -808,7 +807,6 @@ public:
             }
             self.assertRaises(Exception, get_tiling_info, op_info, ["1"])
 
-            _set_compile_info(op_info_no_static)
             mock_do_op_tiling.return_value = {
                 "tiling_data": b"\x00",
                 "tiling_key": "0",
@@ -818,12 +816,12 @@ public:
                 "workspaces": [1024],
                 "ret_code": False,
             }
-            tiling_info = get_tiling_info(op_info_no_static, ["1"])
-            self.assertEqual(tiling_info.block_dim, -1)
+            tiling_info = get_tiling_info(op_info_no_static, ["1"], None, False, {})
+            self.assertEqual(tiling_info.block_num, -1)
             self.assertEqual(tiling_info.clear_atomic, 1)
             self.assertEqual(tiling_info.schedule_mode, 0)
-            tiling_info = get_tiling_info(op_info_no_static, [])
-            self.assertEqual(tiling_info.block_dim, -1)
+            tiling_info = get_tiling_info(op_info_no_static, [], None, False, {})
+            self.assertEqual(tiling_info.block_num, -1)
             self.assertEqual(tiling_info.clear_atomic, 1)
             self.assertEqual(tiling_info.schedule_mode, 0)
 
@@ -1086,13 +1084,13 @@ public:
 
         from adapter.get_op_tiling import TilingDef
         from adapter.get_op_tiling import get_tiling_info
-        from adapter.compile_op import _set_compile_info
 
         with (
             tbe.common.context.op_context.OpContext(),
             buildcfg.build_config(),
             mock.patch(
-                "adapter.get_op_tiling.get_tiling_def", return_value=None
+                "adapter.get_op_tiling.get_tiling_def",
+                return_value=None,
             ) as mock_get_tiling_def,
             mock.patch(
                 "adapter.get_op_tiling.do_op_tiling",
@@ -1108,9 +1106,8 @@ public:
                 },
             ) as mock_do_op_tiling,
         ):
-            _set_compile_info(op_info)
-            tiling_info = get_tiling_info(op_info, ["1"])
-            self.assertEqual(tiling_info.block_dim, -1)
+            tiling_info = get_tiling_info(op_info, ["1"], None, False, {})
+            self.assertEqual(tiling_info.block_num, -1)
             self.assertEqual(tiling_info.clear_atomic, 1)
             self.assertEqual(tiling_info.schedule_mode, 0)
 
@@ -1126,8 +1123,8 @@ public:
                 "workspaces": [4096],
                 "ret_code": False,
             }
-            tiling_info = get_tiling_info(op_info, ["1"])
-            self.assertEqual(tiling_info.block_dim, 1)
+            tiling_info = get_tiling_info(op_info, ["1"], None, False, {})
+            self.assertEqual(tiling_info.block_num, 1)
             self.assertEqual(tiling_info.clear_atomic, 0)
             self.assertEqual(tiling_info.schedule_mode, 0)
 
@@ -1147,8 +1144,8 @@ public:
                 "workspaces": [8192],
                 "ret_code": False,
             }
-            tiling_info = get_tiling_info(op_info, ["1"])
-            self.assertEqual(tiling_info.block_dim, 1)
+            tiling_info = get_tiling_info(op_info, ["1"], None, False, {})
+            self.assertEqual(tiling_info.block_num, 1)
             self.assertEqual(tiling_info.clear_atomic, 0)
             self.assertEqual(tiling_info.schedule_mode, 0)
 
@@ -1163,7 +1160,6 @@ public:
             }
             self.assertRaises(Exception, get_tiling_info, op_info, ["1"])
 
-            _set_compile_info(op_info_no_static)
             mock_do_op_tiling.return_value = {
                 "tiling_data": b"\x00",
                 "tiling_key": "0",
@@ -1173,12 +1169,12 @@ public:
                 "workspaces": [1024],
                 "ret_code": False,
             }
-            tiling_info = get_tiling_info(op_info_no_static, ["1"])
-            self.assertEqual(tiling_info.block_dim, -1)
+            tiling_info = get_tiling_info(op_info_no_static, ["1"], None, False, {})
+            self.assertEqual(tiling_info.block_num, -1)
             self.assertEqual(tiling_info.clear_atomic, 1)
             self.assertEqual(tiling_info.schedule_mode, 0)
             tiling_info = get_tiling_info(op_info_no_static, [])
-            self.assertEqual(tiling_info.block_dim, -1)
+            self.assertEqual(tiling_info.block_num, -1)
             self.assertEqual(tiling_info.clear_atomic, 1)
             self.assertEqual(tiling_info.schedule_mode, 0)
 
