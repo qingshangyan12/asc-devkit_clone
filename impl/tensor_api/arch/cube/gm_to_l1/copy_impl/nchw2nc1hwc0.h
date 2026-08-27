@@ -66,7 +66,7 @@ public:
 
         copy_gm_to_l1_multi_dn2nz_instr::data_copy(dst.data().get(), src.data().get(), dn_num, loop2_dst_stride,
                                                    loop3_dst_stride, loop4_dst_stride, loop1_src_stride, cache_mode,
-                                                   n_value, d_value, loop4_src_stride, false);
+                                                   n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
     }
 
     template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename DstCoord, typename SrcCoord,
@@ -92,7 +92,7 @@ public:
         }
         copy_gm_to_l1_multi_dn2nz_instr::data_copy_with_offset(
             dst, src, dst_offset, src_offset, dn_num, 1, loop3_dst_stride, loop4_dst_stride, loop1_src_stride,
-            src.engine().get_cache_mode(), n_value, d_value, loop4_src_stride, false);
+            src.engine().get_cache_mode(), n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
     }
 };
 

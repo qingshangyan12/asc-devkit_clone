@@ -64,7 +64,8 @@ public:
         }
         copy_gm_to_l1_multi_nd2nz_instr::data_copy_with_offset(
             dst, src, dst_offset, src_offset, matrix_num, 1, dst_stride, dst_matrix_stride,
-            src_row_stride * sizeof(type), src.engine().get_cache_mode(), n_value, d_value, src_matrix_stride, false);
+            src_row_stride * sizeof(type), src.engine().get_cache_mode(), n_value, d_value, src_matrix_stride, false,
+            trait.pre_allocation);
     }
 
     template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor>
@@ -74,7 +75,7 @@ public:
         check_data_type::check_gm_to_l1_scale_data_type<DstTensor, SrcTensor>();
     }
 
-    template <typename DstTensor, typename SrcTensor, typename SrcLayout, typename DstLayout>
+    template <const gm_to_l1_trait& trait, typename DstTensor, typename SrcTensor, typename SrcLayout, typename DstLayout>
     __aicore__ inline static void emit_copy(const DstTensor& dst, const SrcTensor& src, const SrcLayout& src_layout,
                                             const DstLayout& dst_layout, uint16_t nd_num, uint64_t src_nd_matrix_stride,
                                             uint32_t dst_nz_matrix_stride)
@@ -111,7 +112,8 @@ public:
         copy_gm_to_l1_multi_nd2nz_instr::data_copy(reinterpret_cast<__cbuf__ half*>(dst.data().get()),
                                                    reinterpret_cast<__gm__ half*>(src.data().get()), nd_num,
                                                    loop2_dst_stride, loop3_dst_stride, loop4_dst_stride, loop1_src_stride,
-                                                   cache_mode, n_value, d_value, loop4_src_stride, false);
+                                                   cache_mode, n_value, d_value, loop4_src_stride, false,
+                                                   trait.pre_allocation);
     }
 };
 
