@@ -143,7 +143,7 @@ __simd_callee__ inline reg_tensor<bool> operator>=(const reg_tensor<T>& src0, co
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/tensor_api/experimental/arch/vector/compare_and_select_impl.h"
 #endif
 
