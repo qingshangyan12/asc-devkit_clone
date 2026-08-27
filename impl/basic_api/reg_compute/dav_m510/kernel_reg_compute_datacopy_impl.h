@@ -24,7 +24,7 @@
 #define ASCENDC_MODULE_REG_COMPUTE_DATACOPY_IMPL_H
 
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_struct_intf.h"
-#include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_duplicate_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_data_reorder_intf.h"
 #include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_binary_intf.h"
 
 namespace AscendC {

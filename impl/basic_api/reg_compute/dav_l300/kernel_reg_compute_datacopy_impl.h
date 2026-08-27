@@ -25,7 +25,7 @@
 
 #include "kernel_reg_compute_common_impl.h"
 #include "../../../../include/basic_api/kernel_operator_sys_var_intf.h"
-#include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_duplicate_intf.h"
+#include "../../../../include/basic_api/reg_compute/kernel_reg_compute_vec_data_reorder_intf.h"
 
 namespace AscendC {
 namespace Reg {
