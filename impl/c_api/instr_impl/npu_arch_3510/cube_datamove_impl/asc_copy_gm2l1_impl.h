@@ -48,14 +48,6 @@ __aicore__ inline void asc_copy_gm2l1_impl(
     }
 }
 
-__aicore__ inline void asc_copy_gm2l1_sync_impl(
-    __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, asc_channel_pad_mode pad_mode,
-    uint64_t src_stride, uint32_t dst_stride)
-{
-    asc_copy_gm2l1_impl(dst, src, n_burst, len_burst, pad_mode, src_stride, dst_stride);
-    asc_sync_post_process();
-}
-
 // bfloat16_t
 __aicore__ inline void asc_copy_gm2l1_impl(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t m_start_position, uint32_t k_start_position,
