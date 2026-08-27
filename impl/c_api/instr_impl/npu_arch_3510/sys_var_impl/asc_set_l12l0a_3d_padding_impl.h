@@ -16,7 +16,7 @@
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(uint64_t config)
 {
     if ASC_IS_AIC {
-        set_padding((config << 8) | (config & 0xFF));
+        set_padding(config);
     }
 }
 

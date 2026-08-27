@@ -105,7 +105,6 @@ __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
 
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
 __aicore__ inline void asc_set_l0c_copy_relu_alpha(float& scalar_relu_pre_alpha);
-__aicore__ inline void asc_set_l0c_copy_lrelu_alpha(half& scalar_relu_pre_alpha);
 __aicore__ inline void asc_set_l0c_copy_lrelu_alpha(float& scalar_relu_pre_alpha);
 
 // ==========asc_copy_l12fb==========
@@ -1401,7 +1400,7 @@ __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint3
 
 // =============asc_copy_l12ub===============
 __aicore__ inline void asc_copy_l12ub(
-    __ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t n_burst, uint16_t len_burst,
+    __ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t burst_count, uint16_t burst_len,
     uint16_t src_gap, uint16_t dst_gap);
 
 //=============asc_copy_l0c2l1===============
@@ -1478,13 +1477,6 @@ __aicore__ inline void asc_copy_l0c2l1(
 
 // int4b_t int32_t
 __aicore__ inline void asc_copy_l0c2l1(
-    __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
-    uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
-    uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
-    uint8_t relu_post, bool clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool c0_pad_en, bool broadcast_en,
-    bool enable_nz2dn);
-
-__aicore__ inline void asc_copy_l0c2l1_sync(
     __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
     uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, uint64_t quant_post,
