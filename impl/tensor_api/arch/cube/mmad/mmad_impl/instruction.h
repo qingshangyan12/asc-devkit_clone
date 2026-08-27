@@ -68,6 +68,24 @@ private:
             asc_mmad(dst, fm, filter, m, k, n, unit_flag, disable_gemv, init_with_btbuf, init_with_zero);
         }
     }
+
+    template <typename CType, typename AType, typename BType>
+    __aicore__ inline static void mmad_impl(
+        __cc__ CType* dst, __ca__ AType* fm, __cb__ BType* filter, uint16_t m, uint16_t k, uint16_t n,
+        uint8_t unit_flag, bool disable_gemv, bool init_with_btbuf, bool init_with_zero, bool enable_c_scale)
+    {
+        if constexpr (current_arch_version == arch_version::v9202) {
+            if constexpr (Std::is_same_v<AType, hifloat8_t> && Std::is_same_v<BType, hifloat8_t>) {
+                set_ctrl_for_hifloat8();
+                asc_mmad(
+                    dst, reinterpret_cast<__ca__ fp8_e4m3fn_t*>(fm), reinterpret_cast<__cb__ fp8_e4m3fn_t*>(filter), m, k,
+                    n, unit_flag, enable_c_scale, disable_gemv, init_with_btbuf, init_with_zero);
+                reset_ctrl_for_hifloat8();
+            } else {
+                asc_mmad(dst, fm, filter, m, k, n, unit_flag, enable_c_scale, disable_gemv, init_with_btbuf, init_with_zero);
+            }
+        }
+    }
 };
 
 class mmad_bias_instr {
@@ -101,6 +119,28 @@ private:
                 init_with_zero);
         }
     }
+
+    template <typename CType, typename AType, typename BType>
+    __aicore__ inline static void mmad_impl(
+        __cc__ CType* dst, __ca__ AType* fm, __cb__ BType* filter, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
+        int8_t unit_flag, bool disable_gemv, bool init_with_btbuf, bool init_with_zero, bool enable_c_scale)
+    {
+        if constexpr (current_arch_version == arch_version::v9202) {
+            uint64_t xd = reinterpret_cast<uint64_t>(dst) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
+            if constexpr (Std::is_same_v<AType, hifloat8_t> && Std::is_same_v<BType, hifloat8_t>) {
+                set_ctrl_for_hifloat8();
+                asc_mmad(
+                    reinterpret_cast<__cc__ CType*>(xd), reinterpret_cast<__ca__ fp8_e4m3fn_t*>(fm),
+                    reinterpret_cast<__cb__ fp8_e4m3fn_t*>(filter), m, k, n, unit_flag, enable_c_scale, 
+                    disable_gemv, init_with_btbuf, init_with_zero);
+                reset_ctrl_for_hifloat8();
+            } else {
+                asc_mmad(
+                    reinterpret_cast<__cc__ CType*>(xd), fm, filter, m, k, n, unit_flag, enable_c_scale, 
+                    disable_gemv, init_with_btbuf, init_with_zero);
+            }
+        }
+    }
 };
 
 class mmad_mx_instr {
@@ -118,7 +158,31 @@ private:
         __cc__ CType* dst, __ca__ AType* fm, __cb__ BType* filter, uint16_t m, uint16_t k, uint16_t n,
         asc_unit_flag_mode unit_flag, bool disable_gemv, bool init_with_btbuf, bool init_with_zero)
     {
-        asc_mmad_mx(dst, fm, filter, m, k, n, unit_flag, disable_gemv, init_with_btbuf, init_with_zero);
+        if constexpr (current_arch_version == arch_version::v9201) {
+            uint64_t l0a_mx_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(fm)) / get_scale_divisor<AType>();
+            uint64_t l0b_mx_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(filter)) / get_scale_divisor<BType>();
+            __ca__ fp8_e8m0_t* l0a_mx_ptr = reinterpret_cast<__ca__ fp8_e8m0_t*>(l0a_mx_start_addr);
+            __cb__ fp8_e8m0_t* l0b_mx_ptr = reinterpret_cast<__cb__ fp8_e8m0_t*>(l0b_mx_start_addr);
+            asc_mmad_mx(dst, fm, l0a_mx_ptr, filter, l0b_mx_ptr, m, k, n, unit_flag, disable_gemv, init_with_btbuf, init_with_zero);
+        } else if constexpr (current_arch_version == arch_version::v3510 || current_arch_version == arch_version::V3510) {
+            asc_mmad_mx(dst, fm, filter, m, k, n, unit_flag, disable_gemv, init_with_btbuf, init_with_zero);
+        }
+    }
+
+    template <typename CType, typename AType, typename BType>
+    __aicore__ inline static void mmad_impl(
+        __cc__ CType* dst, __ca__ AType* fm, __cb__ BType* filter, uint16_t m, uint16_t k, uint16_t n,
+        uint8_t unit_flag, bool disable_gemv, bool init_with_btbuf, bool init_with_zero, bool enable_c_scale,
+        bool enable_hif4_a_model, bool enable_hif4_b_model)
+    {
+        if constexpr (current_arch_version == arch_version::v9202) {
+            uint64_t l0a_mx_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(fm)) / get_scale_divisor<AType>();
+            uint64_t l0b_mx_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(filter)) / get_scale_divisor<BType>();
+            __ca__ fp8_e8m0_t* l0a_mx_ptr = reinterpret_cast<__ca__ fp8_e8m0_t*>(l0a_mx_start_addr);
+            __cb__ fp8_e8m0_t* l0b_mx_ptr = reinterpret_cast<__cb__ fp8_e8m0_t*>(l0b_mx_start_addr);
+            asc_mmad_mx(dst, fm, l0a_mx_ptr, filter, l0b_mx_ptr, m, k, n, enable_hif4_a_model, enable_hif4_b_model,
+                unit_flag, disable_gemv, init_with_btbuf, init_with_zero);
+        }
     }
 };
 
@@ -139,10 +203,35 @@ private:
         __cc__ CType* dst, __ca__ AType* fm, __cb__ BType* filter, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
         asc_unit_flag_mode unit_flag, bool disable_gemv, bool init_with_btbuf, bool init_with_zero)
     {
-        uint64_t xd = reinterpret_cast<uint64_t>(dst) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
-        asc_mmad_mx(
-            reinterpret_cast<__cc__ CType*>(xd), fm, filter, m, k, n, unit_flag, disable_gemv, init_with_btbuf,
-            init_with_zero);
+        if constexpr (current_arch_version == arch_version::v9201) {
+            uint64_t l0a_mx_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(fm)) / get_scale_divisor<AType>();
+            uint64_t l0b_mx_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(filter)) / get_scale_divisor<BType>();
+            __ca__ fp8_e8m0_t* l0a_mx_ptr = reinterpret_cast<__ca__ fp8_e8m0_t*>(l0a_mx_start_addr);
+            __cb__ fp8_e8m0_t* l0b_mx_ptr = reinterpret_cast<__cb__ fp8_e8m0_t*>(l0b_mx_start_addr);
+            asc_mmad_mx(dst, fm, l0a_mx_ptr, filter, l0b_mx_ptr, bias, m, k, n, unit_flag, disable_gemv,
+                init_with_btbuf, init_with_zero);
+        } else if constexpr (current_arch_version == arch_version::v3510 || current_arch_version == arch_version::V3510) {
+            uint64_t xd = reinterpret_cast<uint64_t>(dst) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
+            asc_mmad_mx(
+                reinterpret_cast<__cc__ CType*>(xd), fm, filter, m, k, n, unit_flag, disable_gemv, init_with_btbuf,
+                init_with_zero);
+        }
+    }
+
+    template <typename CType, typename AType, typename BType>
+    __aicore__ inline static void mmad_impl(
+        __cc__ CType* dst, __ca__ AType* fm, __cb__ BType* filter, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
+        int8_t unit_flag, bool disable_gemv, bool init_with_btbuf, bool init_with_zero,
+        bool enable_hif4_a_model, bool enable_hif4_b_model)
+    {
+        if constexpr (current_arch_version == arch_version::v9202) {
+            uint64_t l0a_mx_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(fm)) / get_scale_divisor<AType>();
+            uint64_t l0b_mx_start_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(filter)) / get_scale_divisor<BType>();
+            __ca__ fp8_e8m0_t* l0a_mx_ptr = reinterpret_cast<__ca__ fp8_e8m0_t*>(l0a_mx_start_addr);
+            __cb__ fp8_e8m0_t* l0b_mx_ptr = reinterpret_cast<__cb__ fp8_e8m0_t*>(l0b_mx_start_addr);
+            asc_mmad_mx(dst, fm, l0a_mx_ptr, filter, l0b_mx_ptr, bias, m, k, n, enable_hif4_a_model, enable_hif4_b_model,
+                unit_flag, disable_gemv, init_with_btbuf, init_with_zero);
+        }
     }
 };
 
