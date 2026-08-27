@@ -26,8 +26,8 @@
 三个接口的随路量化inf/nan处理行为完全一致，差异仅在于搬运目标及验证路径：
 
 - **L0C->GM**：直接将L0C数据搬运到GM，无需中转路径，非饱和模式下inf/nan能完整传递到GM输出，无验证路径限制。
-- **L0C->L1**：将L0C数据搬运到L1。由于架构中L1数据无法直接搬运到GM，样例通过第二次Mmad（量化结果×单位矩阵D）将数据从L1经L0A->L0C搬运到GM，最终输出为int32_t或float。需要注意，当量化结果中包含inf时，第二次Mmad中inf与单位矩阵的off-diagonal零元素相乘会产生nan，累加后整行变为nan。此为验证路径的限制，不影响`asc_copy_l0c2l1`本身对inf/nan处理行为。golden数据已适配此行为：非饱和模式下inf/-inf/nan位置的golden值设为nan，使测试能端到端通过。
-- **L0C->UB**：将L0C数据搬运到UB，随后通过`asc_copy_ub2gm`将数据从UB搬运到GM。AIC执行`asc_copy_l0c2ub`将数据从L0C搬运到UB，AIV执行`asc_copy_ub2gm`将数据从UB搬运到GM，通过跨核同步协调。此路径无第二次Mmad，不存在inf×0=nan问题，非饱和模式下inf/nan能完整传递到GM输出。
+- **L0C->L1**：将L0C数据搬运到L1，由于L1数据无法直接搬运到GM，样例通过第二次Mmad（量化结果×单位矩阵D）将数据从L1经L0A->L0C搬运到GM，最终输出为int32_t或float。当量化结果中包含inf时，第二次Mmad中inf与单位矩阵的非对角线零元素相乘会产生nan，累加后整行变为nan。此为验证路径的限制，不影响该接口本身对inf/nan的处理行为。golden数据已适配此行为：非饱和模式下inf/-inf/nan位置的golden值设为nan，使测试能端到端通过。
+- **L0C->UB**：将L0C数据搬运到UB，再从UB搬运到GM。AIC负责L0C到UB的搬运，AIV负责UB到GM的搬运，通过跨核同步协调。此路径无第二次Mmad，不存在inf×0=nan问题，非饱和模式下inf/nan能完整传递到GM输出。
 
 ## float类型L0C搬运至各输出类型
 
