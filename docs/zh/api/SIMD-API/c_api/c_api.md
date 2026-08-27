@@ -395,6 +395,7 @@ Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表�
 | [asc_loadunalign_postupdate](reg/reg_load/asc_loadunalign_postupdate.md) | 数据搬运接口，适用于从UB非32B对齐地址起始连续搬入，并自动更新源操作数地址。 |
 | [asc_loadunalign_pre](reg/reg_load/asc_loadunalign_pre.md) | 用于在进行非对齐数据搬入前的初始化，需配合[asc_loadunalign](reg/reg_load/asc_loadunalign.md)接口使用。 |
 | [asc_storealign](reg/reg_store/asc_storealign.md) | reg计算数据搬运接口，从矢量数据寄存器连续对齐搬出到UB，NORM搬出模式。 |
+| [asc_storealign_mask](reg/reg_store/asc_storealign_mask.md) | reg计算数据搬运接口，将掩码寄存器连续对齐搬出到UB，NORM搬出模式。 |
 | [asc_scatter](reg/reg_store/asc_scatter.md) | 根据索引值index将源操作数src中的元素分散到目的操作数dst中。 |
 | [asc_squeeze_and_storeunalign](reg/reg_store/asc_squeeze_and_storeunalign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器中筛选出有效元素后按照连续非32B对齐的起始地址连续搬出到UB的场景。 |
 | [asc_squeeze_and_storeunalign_finalize](reg/reg_store/asc_squeeze_and_storeunalign_finalize.md) | reg计算数据搬运接口，适用于从矢量数据寄存器中筛选出有效元素后按照连续非32B对齐的起始地址连续搬出到UB的尾块场景。 |
@@ -403,14 +404,18 @@ Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表�
 | [asc_storealign_1st_postupdate](reg/reg_store/asc_storealign_1st_postupdate.md) | reg计算数据搬运接口，忽略mask向dst搬出src第一个元素，启用Post Update。 |
 | [asc_storealign_intlv](reg/reg_store/asc_storealign_intlv.md) | reg计算数据搬运接口，将src0和src1中的元素交错搬出到UB。 |
 | [asc_storealign_pack](reg/reg_store/asc_storealign_pack.md) | reg计算数据搬运接口，根据mask将src中有效元素的低半部分数据连续存储于dst中。 |
+| [asc_storealign_mask_pack](reg/reg_store/asc_storealign_mask_pack.md) | reg计算数据搬运接口，将掩码寄存器连续对齐搬出到UB，PACK搬出模式。 |
 | [asc_storealign_pack_postupdate](reg/reg_store/asc_storealign_pack_postupdate.md) | reg计算数据搬运接口，根据mask压缩搬出，启用Post Update。 |
+| [asc_storealign_mask_pack_postupdate](reg/reg_store/asc_storealign_mask_pack_postupdate.md) | reg计算数据搬运接口，将掩码寄存器连续对齐搬出到UB，PACK搬出模式，启用Post Update。 |
 | [asc_storealign_pack_quarter](reg/reg_store/asc_storealign_pack_quarter.md) | reg计算数据搬运接口，根据mask将src中有效元素的低8bits数据连续存储于dst中。 |
 | [asc_storealign_pack_quarter_postupdate](reg/reg_store/asc_storealign_pack_quarter_postupdate.md) | reg计算数据搬运接口，根据mask将src中有效元素的低8bits数据连续存储于dst中，启用Post Update。 |
 | [asc_storealign_postupdate](reg/reg_store/asc_storealign_postupdate.md) | reg计算数据搬运接口，从矢量数据寄存器连续对齐搬出到UB，NORM搬出模式，启用Post Update。 |
+| [asc_storealign_mask_postupdate](reg/reg_store/asc_storealign_mask_postupdate.md) | reg计算数据搬运接口，将掩码寄存器连续对齐搬出到UB，NORM搬出模式，启用Post Update。 |
 | [asc_storeunalign](reg/reg_store/asc_storeunalign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 | [asc_storeunalign_post](reg/reg_store/asc_storeunalign_post.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址搬出到UB的尾块场景。 |
 | [asc_storeunalign_post_postupdate](reg/reg_store/asc_storeunalign_post_postupdate.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址搬出到UB的尾块场景，并自动更新目的操作数地址。 |
 | [asc_storeunalign_postupdate](reg/reg_store/asc_storeunalign_postupdate.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
+| [asc_storeunalign_mask_postupdate](reg/reg_store/asc_storeunalign_mask_postupdate.md) | reg计算数据搬运接口，适用于从掩码寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 
 ## Reg矢量计算
 

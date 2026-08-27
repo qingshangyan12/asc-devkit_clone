@@ -749,6 +749,41 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t*& dst, ve
 
 __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint8_t*& dst, vector_bool src, int32_t offset);
 
+__simd_callee__ inline void asc_storealign_mask(__ubuf__ uint32_t* dst, vector_bool src, addr_reg offset);
+__simd_callee__ inline void asc_storealign_mask(__ubuf__ uint16_t* dst, vector_bool src, addr_reg offset);
+__simd_callee__ inline void asc_storealign_mask(__ubuf__ uint8_t* dst, vector_bool src, addr_reg offset);
+
+__simd_callee__ inline void asc_storealign_mask(__ubuf__ uint32_t* dst, vector_bool src);
+__simd_callee__ inline void asc_storealign_mask(__ubuf__ uint16_t* dst, vector_bool src);
+__simd_callee__ inline void asc_storealign_mask(__ubuf__ uint8_t* dst, vector_bool src);
+
+__simd_callee__ inline void asc_storealign_mask(__ubuf__ uint32_t* dst, vector_bool src, int32_t offset);
+__simd_callee__ inline void asc_storealign_mask(__ubuf__ uint16_t* dst, vector_bool src, int32_t offset);
+__simd_callee__ inline void asc_storealign_mask(__ubuf__ uint8_t* dst, vector_bool src, int32_t offset);
+
+__simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint32_t* dst, vector_bool src, addr_reg offset);
+__simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint16_t* dst, vector_bool src, addr_reg offset);
+__simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint8_t* dst, vector_bool src, addr_reg offset);
+
+__simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint32_t* dst, vector_bool src);
+__simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint16_t* dst, vector_bool src);
+__simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint8_t* dst, vector_bool src);
+
+__simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint32_t* dst, vector_bool src, int32_t offset);
+__simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint16_t* dst, vector_bool src, int32_t offset);
+__simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint8_t* dst, vector_bool src, int32_t offset);
+
+__simd_callee__ inline void asc_storealign_mask_postupdate(__ubuf__ uint32_t*& dst, vector_bool src, int32_t offset);
+__simd_callee__ inline void asc_storealign_mask_postupdate(__ubuf__ uint16_t*& dst, vector_bool src, int32_t offset);
+__simd_callee__ inline void asc_storealign_mask_postupdate(__ubuf__ uint8_t*& dst, vector_bool src, int32_t offset);
+
+__simd_callee__ inline void asc_storealign_mask_pack_postupdate(
+    __ubuf__ uint32_t*& dst, vector_bool src, int32_t offset);
+__simd_callee__ inline void asc_storealign_mask_pack_postupdate(
+    __ubuf__ uint16_t*& dst, vector_bool src, int32_t offset);
+__simd_callee__ inline void asc_storealign_mask_pack_postupdate(
+    __ubuf__ uint8_t*& dst, vector_bool src, int32_t offset);
+
 __simd_callee__ inline void asc_storealign_pack_quarter(
     __ubuf__ int32_t* dst_align32b, vector_int32_t src, vector_bool mask);
 

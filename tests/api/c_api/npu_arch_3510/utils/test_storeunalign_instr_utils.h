@@ -346,7 +346,9 @@
     };                                                                                                               \
                                                                                                                      \
     namespace {                                                                                                      \
-    void cce_name##_##data_type##_Stub(vector_store_unalign& src0, vector_bool mask, __ubuf__ cce_dst_type*& dst) {} \
+    void cce_name##_##class_name##_##data_type##_Stub(                                                               \
+        vector_store_unalign& src0, vector_bool mask, __ubuf__ cce_dst_type*& dst)                                   \
+    {}                                                                                                                \
     }                                                                                                                \
                                                                                                                      \
     TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_type##_Succ)                     \
@@ -357,7 +359,7 @@
                                                                                                                      \
         MOCKER_CPP(cce_name, void(vector_store_unalign&, vector_bool, __ubuf__ cce_dst_type*&))                      \
             .times(1)                                                                                                \
-            .will(invoke(cce_name##_##data_type##_Stub));                                                            \
+            .will(invoke(cce_name##_##class_name##_##data_type##_Stub));                                             \
                                                                                                                      \
         c_api_name(dst, src0, mask);                                                                                 \
         GlobalMockObject::verify();                                                                                  \
