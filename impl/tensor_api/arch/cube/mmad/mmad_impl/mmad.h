@@ -57,14 +57,27 @@ private:
     {
         if constexpr (trait.mmad_type == mmad_type::normal) {
             check_template_for_normal<trait, CTensor, ATensor, BTensor>();
-            mmad_instr::mmad(
-                dst, fm, filter, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
-                trait.disable_gemv, trait.init_with_btbuf, params.init_with_zero);
+            if constexpr (current_arch_version == arch_version::v9202 && Std::is_same_v<Std::remove_cvref_t<decltype(trait)>, mmad_trait_arch9202) {
+                mmad_instr::mmad(
+                    dst, fm, filter, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
+                    trait.disable_gemv, trait.init_with_btbuf, params.init_with_zero, trait.enable_c_scale);
+            } else {
+                mmad_instr::mmad(
+                    dst, fm, filter, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
+                    trait.disable_gemv, trait.init_with_btbuf, params.init_with_zero);
+            }
         } else if constexpr (trait.mmad_type == mmad_type::mx) {
             check_template_for_mx<trait, CTensor, ATensor, BTensor>();
-            mmad_mx_instr::mmad(
-                dst, fm, filter, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
-                trait.disable_gemv, trait.init_with_btbuf, params.init_with_zero);
+            if constexpr (current_arch_version == arch_version::v9202 && Std::is_same_v<Std::remove_cvref_t<decltype(trait)>, mmad_trait_arch9202) {
+                mmad_mx_instr::mmad(
+                    dst, fm, filter, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
+                    trait.disable_gemv, trait.init_with_btbuf, params.init_with_zero, trait.enable_c_scale,
+                    trait.enable_hif4_a_model, trait.enable_hif4_b_model);
+            } else {
+                mmad_mx_instr::mmad(
+                    dst, fm, filter, params.m, params.k, params.n, static_cast<asc_unit_flag_mode>(params.unit_flag),
+                    trait.disable_gemv, trait.init_with_btbuf, params.init_with_zero);
+            }
         }
     }
 };
