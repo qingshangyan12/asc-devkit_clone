@@ -42,6 +42,12 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sub_block_id_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sub_block_num_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_sys_virtual_base_impl.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_saturation_flag_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_saturation_flag_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_saturation_strategy_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_saturation_strategy_impl.h"
+#endif
 
 [[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
              "Please use asc_get_squeeze_status instead.")]] __aicore__ inline int64_t
@@ -54,13 +60,26 @@ __aicore__ inline int64_t asc_get_squeeze_status() { return asc_get_squeeze_stat
 
 __aicore__ inline int64_t asc_get_program_counter() { return asc_get_program_counter_impl(); }
 
-__aicore__ inline int64_t asc_get_block_idx() { return asc_get_block_idx_impl(); }
+[[deprecated("NOTICE: asc_get_block_idx is deprecated. "
+             "Please use block_idx for pure Vector, pure Cube, and Mix(1, 1). "
+             "For Mix(1, 2), please use block_idx on the Cube core and "
+             "block_idx * asc_get_sub_block_num() + asc_get_sub_block_id() "
+             "on Vector cores instead.")]] __aicore__ inline int64_t
+asc_get_block_idx()
+{
+    return asc_get_block_idx_impl();
+}
 
 __aicore__ inline int64_t asc_get_sub_block_num() { return asc_get_sub_block_num_impl(); }
 
 __aicore__ inline int64_t asc_get_sub_block_id() { return asc_get_sub_block_id_impl(); }
 
-__aicore__ inline int64_t asc_get_block_num() { return asc_get_block_num_impl(); }
+[[deprecated("NOTICE: asc_get_block_num is deprecated. "
+             "Please use block_num instead.")]] __aicore__ inline int64_t
+asc_get_block_num()
+{
+    return asc_get_block_num_impl();
+}
 
 __aicore__ inline int64_t asc_get_system_cycle() { return asc_get_system_cycle_impl(); }
 
@@ -78,11 +97,22 @@ __aicore__ inline void asc_get_arch_ver(uint32_t& core_version) { asc_get_arch_v
 
 __aicore__ inline int64_t asc_get_core_id() { return asc_get_core_id_impl(); }
 
+__aicore__ inline void asc_set_l0c_copy_channel_para(uint16_t src_nz_matrix_stride)
+{
+    asc_set_l0c_copy_channel_para_impl(src_nz_matrix_stride);
+}
+
 __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config) { asc_set_l0c2gm_channel_para_impl(config); }
 
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config) { asc_set_l3d_rpt_b_impl(config); }
 
 __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config) { asc_set_gm2l1_nz_para_impl(config); }
+
+__aicore__ inline void asc_set_gm2l1_nz_para(
+    uint16_t matrix_num, uint16_t dst_nz_n_stride, uint16_t dst_nz_c0_stride, uint16_t dst_nz_matrix_stride)
+{
+    asc_set_gm2l1_nz_para_impl(matrix_num, dst_nz_n_stride, dst_nz_c0_stride, dst_nz_matrix_stride);
+}
 
 __aicore__ inline void asc_set_l13d_padding(uint64_t config) { asc_set_l13d_padding_impl(config); }
 
@@ -105,6 +135,25 @@ __aicore__ inline int64_t asc_get_phy_stack_base() { return asc_get_phy_stack_ba
 __aicore__ inline int64_t asc_get_status() { return asc_get_status_impl(); }
 
 __aicore__ inline int64_t asc_get_sys_virtual_base() { return asc_get_sys_virtual_base_impl(); }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+__aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat)
+{
+    asc_set_saturation_flag_impl(saturation_mode, enable_sat);
+}
+
+__aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode)
+{
+    return asc_get_saturation_flag_impl(saturation_mode);
+}
+
+__aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy)
+{
+    asc_set_saturation_strategy_impl(strategy);
+}
+
+__aicore__ inline asc_override_strategy asc_get_saturation_strategy() { return asc_get_saturation_strategy_impl(); }
+#endif
 
 #endif
 
