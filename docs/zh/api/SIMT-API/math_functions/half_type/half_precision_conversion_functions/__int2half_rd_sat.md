@@ -56,7 +56,7 @@ inline half __int2half_rd_sat(const int x)
 
 ## 约束说明
 
-SIMT编程场景由于无法设置`CTRL`寄存器，本接口的饱和模式不生效。
+SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生效。
 
 ## 需要包含的头文件
 
