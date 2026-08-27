@@ -48,14 +48,45 @@ PIPE_S
 
 ## 约束说明
 
-如果需要精确阻塞n拍流水，需要在n个`asc_nop`接口调用前后插入[`asc_sync`](../../sync/asc_sync.md)，例如：
-```c
-// 阻塞3拍流水
-asc_sync();
+如果需要在流水间精确插入n拍空操作，需要在n个`asc_nop`接口调用前后插入[`asc_sync`](../sync/asc_sync.md)。
+
+假设不插入`asc_sync`，参考以下伪代码：
+
+```cpp                    
+vf(dst_ub, src_ub);                  
 asc_nop();
+asc_nop(); 
+asc_nop(); 
+asc_nop();                           
+asc_copy_ub2gm(dst_gm, dst_ub);         
+```
+
+对应的流水排布如下，nop指令会在VF指令发射的下一拍立即发射并执行4拍空操作，由于nop指令不会打断正在执行的流水，此时VF函数仍在执行，在nop指令都执行完成后搬运指令才会发射执行，所以计算和搬运之间的间隔不足4拍：
+```txt
+S:       |==nop==||==nop==||==nop==||==nop==|
+V:    |========计算========|
+MTE3:                                       |======搬运======|
+```
+
+假设插入`asc_sync`，参考以下伪代码：
+
+```cpp
+vf(dst_ub, src_ub);               
+asc_sync();   
 asc_nop();
-asc_nop();
-asc_sync();
+asc_nop(); 
+asc_nop(); 
+asc_nop(); 
+asc_sync();                          
+asc_copy_ub2gm(dst_gm, dst_ub);
+```
+
+对应的流水排布如下，nop指令会在VF执行完成后发射并执行4拍空操作，在nop指令都执行完成后搬运指令才会发射执行，此时，计算和搬运之间的间隔为4拍。：
+
+```
+S:                         |==nop==||==nop==||==nop==||==nop==|
+V:    |========计算========|
+MTE3:                                                         |======搬运======|
 ```
 
 ## 调用示例
@@ -73,7 +104,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```cpp
 #include <iostream>
 #include "acl/acl.h"
-#include "kernel_operator.h"
 #include "c_api/asc_simd.h"
 
 namespace {
