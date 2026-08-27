@@ -19,7 +19,7 @@
 
 #ifndef INCLUDE_C_API_CACHE_CTRL_CACHE_CTRL_H
 #define INCLUDE_C_API_CACHE_CTRL_CACHE_CTRL_H
-#include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
+#include "c_api/defs/defs.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
@@ -52,6 +52,14 @@ __aicore__ inline int64_t asc_get_icache_preload_status();
 __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset);
 
 __aicore__ inline void asc_dci();
+
+__aicore__ inline void asc_set_scalar_cache_mode(asc_load_l2_cache_mode l2_cache_mode);
+
+__aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode l2_cache_mode);
+
+__aicore__ inline asc_load_l2_cache_mode asc_get_scalar_load_cache_mode();
+
+__aicore__ inline asc_store_l2_cache_mode asc_get_scalar_store_cache_mode();
 
 #endif
 

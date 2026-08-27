@@ -27,6 +27,7 @@
 <!-- npu="9030" id2 -->
 - Kirin 9030：支持
 <!-- end id2 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/sort_operations/TopK_res.md#id1 -->
 
 ## 功能说明
 
@@ -36,13 +37,13 @@
 
 如下图所示，对shape为\(4, 32\)的二维矩阵进行排序，k设置为1，输出结果为\[\[32\] \[32\] \[32\] \[32\]\]。
 
-![](../../../figures/nz-reduce-48.png)
+![](../../../figures/nz_reduce_48.png)
 
 -   **必备概念**
 
     基于如上样例，我们引入一些必备概念：行数称之为**外轴长度（outter）**，每行实际的元素个数称之为**内轴的实际长度（n）**。本接口要求输入的内轴长度为32的整数倍，所以当n不是32的整数倍时，需要开发者将其向上补齐到32的整数倍，补齐后的长度称之为**内轴长度（inner）**。比如，如下的样例中，每行的实际长度n为31，不是32的整数倍，向上补齐后得到inner为32，图中的padding代表补齐操作。n和inner的关系如下：当n是32的整数倍时，inner=n；否则，inner \> n。
 
-    ![](../../../figures/nz-reduce-49.png)
+    ![](../../../figures/nz_reduce_49.png)
 
 -   **接口模式**
 
@@ -50,7 +51,7 @@
 
 -   **附加功能**：本接口支持开发者指定某些行的排序是无效排序。通过传入finishLocal参数值来控制，finishLocal对应行的值为true时，表示该行排序无效，此时排序后输出的dstIndexLocal的k个索引值会全部被置为无效索引n。
 
-    ![](../../../figures/nz-reduce-50.png)
+    ![](../../../figures/nz_reduce_50.png)
 
 ## 实现原理
 
@@ -289,7 +290,7 @@ struct TopKInfo {
 
 ## 约束说明
 
--   操作数地址偏移对齐要求请参见[通用说明和约束](../../通用说明和约束.md)。
+-   操作数地址偏移对齐要求请参见[通用说明和约束](../../general_description_and_constraints.md)。
 -   **不支持源操作数与目的操作数地址重叠。**
 -   当存在srcLocal\[i\]与srcLocal\[j\]相同时，如果i\>j，则srcLocal\[j\]将首先被选出来，排在前面。
 -   inf在Topk中被认为是极大值。

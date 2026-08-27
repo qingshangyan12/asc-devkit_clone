@@ -42,6 +42,10 @@ enum SocType {
     SOC_VERSION_KIRINX90 = 14,
     SOC_VERSION_KIRIN9030 = 15,
     SOC_VERSION_ASCEND350 = 16,
+    SOC_VERSION_KIRINDEV0000 = 17,
+    SOC_VERSION_KIRINDEV0001 = 18,
+    SOC_VERSION_KIRINDEV0002 = 19,
+    SOC_VERSION_KIRINDEV0003 = 20,
     SOC_VERSION_INVALID = 99
 };
 enum NnopbaseAttrDtype {
@@ -235,7 +239,7 @@ aclnnStatus aclnnAddTik2GetWorkspaceSize(
     if (bias3Optional) {
         NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddFloatArrayAttr(*executor, bias3Optional, 3));
     } else {
-        static float bias3OptionalDef[] = {0.1, 0.2};
+        static float bias3OptionalDef[] = {0.100000001, 0.200000003};
         static size_t bias3OptionalLen = 2;
         NNOPBASE_ASSERT_OK_RETVAL(NnopbaseAddArrayAttrWithDtype(*executor, static_cast<void*>(bias3OptionalDef), bias3OptionalLen, sizeof(float), 3, kNnopbaseFloat));
     }

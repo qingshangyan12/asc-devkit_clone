@@ -122,8 +122,8 @@
 
 ## 约束说明
 
-- 源操作数及`sharedTmpBuffer`的地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[ReduceRepeat-表3](./ReduceRepeat.md#tab3)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
+- 源操作数及`sharedTmpBuffer`的地址对齐约束请参考[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[ReduceRepeat-表3](./ReduceRepeat.md#tab3)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md#通用地址重叠约束)。
 - 需要使用`sharedTmpBuffer`的情况下，支持`dst`与`sharedTmpBuffer`地址重叠（通常情况下`dst`比`sharedTmpBuffer`所需的空间要小），此时`sharedTmpBuffer`必须满足所需空间要求，详情请参考[关键特性说明](#关键特性说明)。
 
 <!-- npu="950,A3,910b" id18 -->
@@ -143,7 +143,7 @@
   <!-- end id22 -->
 <!-- end id18 -->
 
-- `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
+- `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合Unified Buffer（UB）的实际大小避免出现越界。
 
 <!-- npu="950,910,310p,310b,x90,9030" id23 -->
 - 针对以下型号，模板参数`isSetMask`参数不生效，保持默认值即可：

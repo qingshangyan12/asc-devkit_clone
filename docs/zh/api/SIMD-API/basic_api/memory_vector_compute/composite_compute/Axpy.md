@@ -197,8 +197,8 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
+- 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../general_description_and_constraints.md#section668772811100)。
 - 源操作数的数据类型为half、目的操作数的数据类型为float的情况下，不支持地址重叠。
 - 使用tensor高维切分计算接口时，src和scalarValue的数据类型为half、dst的数据类型为float的情况下，一个迭代处理内最多处理64个输入数据。
 <!-- npu="A3,910b,950" id18 -->
@@ -217,9 +217,9 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
   <!-- end id22 -->
 <!-- end id18 -->
 <!-- npu="950" id23 -->
-- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
-  - tensor高维切分计算接口占用8KB Unified Buffer临时空间。
-  - tensor前n个数据连续计算接口不涉及8KB Unified Buffer临时空间的占用。
+- 对Unified Buffer（UB）空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+  - tensor高维切分计算接口占用8KB UB临时空间。
+  - tensor前n个数据连续计算接口不涉及8KB UB临时空间的占用。
 <!-- end id23 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

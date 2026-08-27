@@ -72,9 +72,8 @@ enum class HardEvent : uint8_t {
     MTE1_FIX,
     FIX_MTE1,
     FIX_FIX,
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
-                              (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-                              (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
     FIX_V,
     V_FIX,
 #endif
@@ -289,9 +288,8 @@ __aicore__ inline void PipeBarrierInternal()
         }
     }
 #else
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-                              __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
     if constexpr (pipe == PIPE_V) {
         return;
     }
@@ -300,21 +298,34 @@ __aicore__ inline void PipeBarrierInternal()
 #endif
 }
 
+#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+__BLOCK_LOCAL__ __inline__ int32_t g_superKernelSetWaitFlagCountDifference;
+#endif
+
 template <pipe_t srcPipe, pipe_t dstPipe>
 __aicore__ inline void SetFlagInternal(event_t evt)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (IsSplitVectorPipe<srcPipe>() && IsSplitVectorPipe<dstPipe>()) {
         if ASCEND_IS_AIV {
+#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+            g_superKernelSetWaitFlagCountDifference += 1;
+#endif
             set_flag(srcPipe, dstPipe, evt);
         }
     }
     if constexpr (IsSplitCubePipe<srcPipe>() && IsSplitCubePipe<dstPipe>()) {
         if ASCEND_IS_AIC {
+#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+            g_superKernelSetWaitFlagCountDifference += 1;
+#endif
             set_flag(srcPipe, dstPipe, evt);
         }
     }
 #else
+#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+    g_superKernelSetWaitFlagCountDifference += 1;
+#endif
     set_flag(srcPipe, dstPipe, evt);
 #endif
 }
@@ -326,15 +337,24 @@ __aicore__ inline void WaitFlagInternal(event_t evt)
     (void)evt;
     if constexpr (IsSplitVectorPipe<srcPipe>() && IsSplitVectorPipe<dstPipe>()) {
         if ASCEND_IS_AIV {
+#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+            g_superKernelSetWaitFlagCountDifference -= 1;
+#endif
             wait_flag(srcPipe, dstPipe, evt);
         }
     }
     if constexpr (IsSplitCubePipe<srcPipe>() && IsSplitCubePipe<dstPipe>()) {
         if ASCEND_IS_AIC {
+#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+            g_superKernelSetWaitFlagCountDifference -= 1;
+#endif
             wait_flag(srcPipe, dstPipe, evt);
         }
     }
 #else
+#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+    g_superKernelSetWaitFlagCountDifference -= 1;
+#endif
     wait_flag(srcPipe, dstPipe, evt);
 #endif
 }
@@ -379,8 +399,8 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
     } else if (pos == TPosition::A1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::A2) {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
         hard = Hardware::L1;
 #else
         hard = Hardware::L0A;
@@ -426,9 +446,8 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
         hard = Hardware::GM;
     } else if (pos == TPosition::C2PIPE2GM) {
         hard = Hardware::FIXBUF;
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3113 || \
-                                __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-                                __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+                                __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
     } else if (pos == TPosition::C1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::C2) {
@@ -439,8 +458,8 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
         hard = Hardware::FIXBUF;
 #endif
     } else if (pos == TPosition::CO1) {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
         hard = Hardware::L1;
 #else
         hard = Hardware::L0C;
@@ -449,8 +468,8 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
         hard = Hardware::L1;
     } else if (pos == TPosition::TSCM) {
         hard = Hardware::L1;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
     } else if (pos == TPosition::C2PT) {
         hard = Hardware::PT;
 #endif
@@ -527,8 +546,8 @@ __aicore__ constexpr TPosition GetBufferLogicPos(TPosition pos, bool isSrc)
         return isSrc ? TPosition::VECOUT : TPosition::GM;
     } else if (pos == TPosition::C2PIPE2GM) {
         return isSrc ? TPosition::B1 : TPosition::C2PIPE2GM;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
     } else if (pos == TPosition::C2PT) {
         return isSrc ? TPosition::B1 : TPosition::C2PT;
 #endif
@@ -671,8 +690,8 @@ __aicore__ constexpr HardEvent GetQueEvt(
     return HardEvent::MAX;
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 __aicore__ constexpr HardEvent GetQueEvt(TPosition src, TPosition dst, bool fwdDirect)
 {
     if (src == TPosition::GM) {
@@ -853,7 +872,7 @@ __aicore__ constexpr bool IsUseBufId(Hardware src, Hardware dst)
 
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
-     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)|| (__NPU_ARCH__ == 5101) || \
+     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
      (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
 template <MemDsbT arg>
 __aicore__ inline void DataSyncBarrierImpl()

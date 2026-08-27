@@ -27,6 +27,7 @@
 <!-- npu="9030" id2 -->
 - Kirin 9030：支持
 <!-- end id2 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/data_filter/DropOut_res.md#id1 -->
 
 ## 功能说明
 
@@ -140,7 +141,7 @@ struct DropOutShapeInfo {
 ## 约束说明
 
 -   srcTensor和dstTensor的Tensor空间可以复用。
--   srcLocal和dstLocal地址对齐要求请见：[通用说明和约束](../../通用说明和约束.md)。
+-   srcLocal和dstLocal地址对齐要求请见：[通用说明和约束](../../general_description_and_constraints.md)。
 -   仅支持输入shape为ND格式。
 -   maskLocal含有脏数据的场景，要求info.maskLastAxis中有效数值的个数，应为2的整数倍。
 -   maskLocal含有脏数据的场景，maskLocal中的数据可能会被修改，脏数据可能会被舍弃。

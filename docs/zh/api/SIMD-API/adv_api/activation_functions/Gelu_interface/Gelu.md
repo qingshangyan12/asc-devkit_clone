@@ -27,6 +27,7 @@
 <!-- npu="9030" id2 -->
 - Kirin 9030：支持
 <!-- end id2 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/activation_functions/Gelu_interface/Gelu_res.md#id1 -->
 
 ## 功能说明
 
@@ -79,7 +80,7 @@
 
 -   源操作数和目的操作数的Tensor空间可以复用。
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 -   仅支持输入shape为ND格式。
 
 ## 调用示例
