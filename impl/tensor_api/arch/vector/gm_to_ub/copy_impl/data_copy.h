@@ -47,8 +47,8 @@ protected:
         auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
         copy_gm_to_ub_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len,
                                        params.left_padding_count, params.right_padding_count,
-                                       params.enable_constant_pad, trait.pre_allocation, cache_mode, src_stride,
-                                       dst_stride);
+                                       params.enable_constant_pad, cache_mode, src_stride, dst_stride,
+                                       trait.pre_allocation);
     }
 
     template <const gm_to_ub_trait& trait, typename T, typename U, typename DstOffset, typename SrcOffset>
@@ -62,7 +62,7 @@ protected:
         auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
         copy_gm_to_ub_instr::data_copy((dst.data() + dst_offset).get(), (src.data() + src_offset).get(),
             block_count, block_len, params.left_padding_count, params.right_padding_count,
-            params.enable_constant_pad, trait.pre_allocation, cache_mode, src_stride, dst_stride);
+            params.enable_constant_pad, cache_mode, src_stride, dst_stride, trait.pre_allocation);
     }
 };
 
