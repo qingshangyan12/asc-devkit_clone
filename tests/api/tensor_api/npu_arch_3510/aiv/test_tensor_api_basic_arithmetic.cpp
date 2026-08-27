@@ -23,6 +23,13 @@ using namespace asc::te::experimental;
 template <typename T>
 using reg_type = asc::te::reg_tensor<T>;
 
+template <typename Left, typename Right, typename = void>
+struct has_division : std::false_type {};
+
+template <typename Left, typename Right>
+struct has_division<Left, Right,
+    std::void_t<decltype(std::declval<Left>() / std::declval<Right>())>> : std::true_type {};
+
 template <typename T>
 void check_unary_arithmetic()
 {
@@ -82,18 +89,21 @@ void check_register_mul()
 }
 
 template <typename T>
-void check_scalar_mul_and_div()
+void check_scalar_mul()
 {
     static_assert(std::is_same_v<decltype(
         std::declval<const reg_type<T>&>() * std::declval<const T&>()), reg_type<T>>);
     static_assert(std::is_same_v<decltype(
         std::declval<const T&>() * std::declval<const reg_type<T>&>()), reg_type<T>>);
+}
+
+template <typename T>
+void check_div()
+{
     static_assert(std::is_same_v<decltype(
         std::declval<const reg_type<T>&>() / std::declval<const reg_type<T>&>()), reg_type<T>>);
-    static_assert(std::is_same_v<decltype(
-        std::declval<const reg_type<T>&>() / std::declval<const T&>()), reg_type<T>>);
-    static_assert(std::is_same_v<decltype(
-        std::declval<const T&>() / std::declval<const reg_type<T>&>()), reg_type<T>>);
+    static_assert(!has_division<const reg_type<T>&, const T&>::value);
+    static_assert(!has_division<const T&, const reg_type<T>&>::value);
 }
 
 template <typename T>
@@ -116,14 +126,14 @@ void check_min_max()
 template <typename T>
 void check_carry()
 {
-    static_assert(std::is_same_v<decltype(asc::te::experimental::add(std::declval<reg_type<bool>&>(),
+    static_assert(std::is_same_v<decltype(asc::te::experimental::addc(std::declval<reg_type<bool>&>(),
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(std::is_same_v<decltype(asc::te::experimental::add_c(std::declval<reg_type<bool>&>(),
+    static_assert(std::is_same_v<decltype(asc::te::experimental::addc(std::declval<reg_type<bool>&>(),
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>(),
         std::declval<const reg_type<bool>&>())), reg_type<T>>);
-    static_assert(std::is_same_v<decltype(asc::te::experimental::sub(std::declval<reg_type<bool>&>(),
+    static_assert(std::is_same_v<decltype(asc::te::experimental::subc(std::declval<reg_type<bool>&>(),
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(std::is_same_v<decltype(asc::te::experimental::sub_c(std::declval<reg_type<bool>&>(),
+    static_assert(std::is_same_v<decltype(asc::te::experimental::subc(std::declval<reg_type<bool>&>(),
         std::declval<const reg_type<T>&>(), std::declval<const reg_type<T>&>(),
         std::declval<const reg_type<bool>&>())), reg_type<T>>);
 }
@@ -137,6 +147,9 @@ void check_mull()
 
 TEST(test_tensor_api_basic_arithmetic, compile_public_apis_and_supported_types)
 {
+    static_assert(!asc::te::detail::supports_carry_v<int32_t>);
+    static_assert(asc::te::detail::supports_carry_v<uint32_t>);
+
     check_unary_arithmetic<int8_t>();
     check_unary_arithmetic<int16_t>();
     check_unary_arithmetic<half>();
@@ -166,12 +179,19 @@ TEST(test_tensor_api_basic_arithmetic, compile_public_apis_and_supported_types)
     check_register_mul<uint32_t>();
     check_register_mul<float>();
 
-    check_scalar_mul_and_div<int16_t>();
-    check_scalar_mul_and_div<uint16_t>();
-    check_scalar_mul_and_div<half>();
-    check_scalar_mul_and_div<int32_t>();
-    check_scalar_mul_and_div<uint32_t>();
-    check_scalar_mul_and_div<float>();
+    check_scalar_mul<int16_t>();
+    check_scalar_mul<uint16_t>();
+    check_scalar_mul<half>();
+    check_scalar_mul<int32_t>();
+    check_scalar_mul<uint32_t>();
+    check_scalar_mul<float>();
+
+    check_div<int16_t>();
+    check_div<uint16_t>();
+    check_div<half>();
+    check_div<int32_t>();
+    check_div<uint32_t>();
+    check_div<float>();
 
     check_min_max<int8_t>();
     check_min_max<uint8_t>();
@@ -182,7 +202,6 @@ TEST(test_tensor_api_basic_arithmetic, compile_public_apis_and_supported_types)
     check_min_max<int32_t>();
     check_min_max<uint32_t>();
     check_min_max<float>();
-    check_carry<int32_t>();
     check_carry<uint32_t>();
     check_mull<int32_t>();
     check_mull<uint32_t>();

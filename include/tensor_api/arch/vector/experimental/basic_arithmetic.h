@@ -53,44 +53,56 @@ template <typename T, typename scalar_type>
 __simd_callee__ inline decltype(auto) leaky_relu(const reg_tensor<T>& src_reg, const scalar_type& slope);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator+(const reg_tensor<T>& src, const T& scalar);
+__simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src, const T& scalar);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) operator+(const T& scalar, const reg_tensor<T>& src);
+__simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor<T>& src);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) add(
+__simd_callee__ inline reg_tensor<T> addc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) add_c(
+__simd_callee__ inline reg_tensor<T> addc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
     const reg_tensor<bool>& carry_src);
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator-(const T& a, const U& b);
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) sub(
+__simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src, const T& scalar);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator-(const T& scalar, const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> subc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline decltype(auto) sub_c(
+__simd_callee__ inline reg_tensor<T> subc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
     const reg_tensor<bool>& carry_src);
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator*(const T& a, const U& b);
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src, const T& scalar);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator*(const T& scalar, const reg_tensor<T>& src);
 
 template <typename T>
 __simd_callee__ inline decltype(auto) mull(
     reg_tensor<T>& high, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator/(const T& a, const U& b);
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) max(const T& a, const U& b);
