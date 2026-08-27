@@ -101,9 +101,9 @@ __aicore__ inline void asc_get_arch_ver(uint32_t& core_version) { asc_get_arch_v
 
 __aicore__ inline int64_t asc_get_core_id() { return asc_get_core_id_impl(); }
 
-__aicore__ inline void asc_set_l0c_copy_channel_para(uint16_t src_nz_matrix_stride)
+__aicore__ inline void asc_set_l0c_copy_channel_para(uint16_t src_nz_fractal_stride)
 {
-    asc_set_l0c_copy_channel_para_impl(src_nz_matrix_stride);
+    asc_set_l0c_copy_channel_para_impl(src_nz_fractal_stride);
 }
 
 __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config) { asc_set_l0c2gm_channel_para_impl(config); }

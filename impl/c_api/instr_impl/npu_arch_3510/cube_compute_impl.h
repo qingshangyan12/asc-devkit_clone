@@ -45,9 +45,10 @@ __aicore__ inline void asc_set_l0c_copy_config(uint64_t relu_pre_addr, uint64_t 
     asc_set_l0c_copy_config_impl(relu_pre_addr, quant_pre_addr, is_clean_unit_flag);
 }
 
-__aicore__ inline void asc_set_l0c_copy_nz_para(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride)
+__aicore__ inline void asc_set_l0c_copy_nz_para(
+    uint16_t matrix_num, uint16_t src_nz_matrix_stride, uint32_t dst_matrix_stride)
 {
-    asc_set_l0c_copy_nz_para_impl(nd_num, src_nd_stride, dst_nd_stride);
+    asc_set_l0c_copy_nz_para_impl(matrix_num, src_nz_matrix_stride, dst_matrix_stride);
 }
 
 // ==========mmad_mx(e1m2/e1m2, e4m3/e5m2)==========
