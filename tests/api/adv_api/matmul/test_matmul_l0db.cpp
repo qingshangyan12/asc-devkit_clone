@@ -165,7 +165,7 @@ __aicore__ inline void main_kernel_matmul_l0db(
     using C_T = typename C_TYPE::T;
     using BiasT = typename BIAS_TYPE::T;
 
-    SetAtomicNone();
+    DisableDmaAtomic();
     TPipe que;
     TCubeTiling tiling;
     tilingParam.GetTiling(tiling);
@@ -240,7 +240,7 @@ __aicore__ inline void main_kernel_matmul_l0db(
     mm2.End();
 
     PipeBarrier<PIPE_ALL>();
-    SetAtomicNone();
+    DisableDmaAtomic();
 }
 
 class TEST_KERNEL_MATMUL_L0DB : public testing::Test {

@@ -59,7 +59,7 @@ private:
             pipe_barrier(PIPE_ALL);
             DataCopy(mDstGlobal, dstLocal, mElementCount);
             pipe_barrier(PIPE_ALL);
-            SetAtomicNone();
+            DisableDmaAtomic();
             pipe_barrier(PIPE_ALL);
             NotifyNextBlock(mGmWorkspace, ubWorkspace);
         }

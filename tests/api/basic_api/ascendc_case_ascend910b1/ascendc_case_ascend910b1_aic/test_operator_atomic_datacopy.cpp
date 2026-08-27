@@ -69,7 +69,7 @@ private:
                 SetAtomicMin<T>();
             }
             DataCopy(dstGlobal, dstLocal, tensorSize);
-            SetAtomicNone();
+            DisableDmaAtomic();
             inQueueSrcVecIn.FreeTensor(dstLocal);
         } else {
             LocalTensor<T> dstLocal = inQueueSrcL1In.DeQue<T>();
@@ -81,7 +81,7 @@ private:
                 SetAtomicMin<T>();
             }
             DataCopy(dstGlobal, dstLocal, tensorSize);
-            SetAtomicNone();
+            DisableDmaAtomic();
             inQueueSrcL1In.FreeTensor(dstLocal);
         }
     }

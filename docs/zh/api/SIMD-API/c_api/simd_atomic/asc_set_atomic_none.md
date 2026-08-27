@@ -1,4 +1,4 @@
-# asc_set_atomic_none
+# asc_set_atomic_none（废弃）
 
 ## 产品支持情况
 
@@ -26,11 +26,14 @@
 
 ## 功能说明
 
+**该接口已废弃，请使用[asc_disable_dma_atomic](asc_disable_dma_atomic.md)替代。**
+
 与[asc_set_atomic_add](asc_set_atomic_add.md)、[asc_set_atomic_max](asc_set_atomic_max.md)、[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。
 
 ## 函数原型
 
 ```c
+[[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]
 __aicore__ inline void asc_set_atomic_none()
 ```
 
@@ -52,4 +55,4 @@ __aicore__ inline void asc_set_atomic_none()
 
 ## 调用示例
 
-asc_set_atomic_none与[asc_set_atomic_add](asc_set_atomic_add.md)等原子操作接口配合使用，调用示例请参见[asc_set_atomic_add的调用示例](asc_set_atomic_add.md#调用示例)。
+asc_set_atomic_none与[asc_set_atomic_add](asc_set_atomic_add.md)等原子操作接口配合使用，调用示例请参见[asc_set_atomic_add的调用示例](asc_set_atomic_add.md#调用示例)。新代码请使用[asc_disable_dma_atomic](asc_disable_dma_atomic.md)。

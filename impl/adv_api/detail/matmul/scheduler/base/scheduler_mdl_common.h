@@ -420,7 +420,7 @@ private:
         }
 
         if (enAtomic != 0) {
-            SetAtomicNone();
+            DisableDmaAtomic();
         }
     }
 

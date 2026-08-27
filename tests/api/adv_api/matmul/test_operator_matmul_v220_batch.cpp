@@ -59,7 +59,7 @@ __aicore__ inline void main_kernel_matmul_batch(
     using C_T = typename C_TYPE::T;
     using BiasT = typename BIAS_TYPE::T;
 
-    SetAtomicNone();
+    DisableDmaAtomic();
     TCubeTiling tiling;
     tilingParam.GetTiling(tiling);
 
@@ -158,7 +158,7 @@ __aicore__ inline void main_kernel_matmul_batch(
         mm1.IterateBatch(gm_c[batchOffsetC], batchA, batchB, false);
     }
     PipeBarrier<PIPE_ALL>();
-    SetAtomicNone();
+    DisableDmaAtomic();
 }
 
 class TEST_KERNEL_MATMUL : public testing::Test {

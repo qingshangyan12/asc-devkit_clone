@@ -20,8 +20,8 @@ extern "C" __global__ __aicore__ void KernelTestSetAtomicType1() { AscendC::SetA
 // __aicore__ inline void SetAtomicAdd();
 extern "C" __global__ __aicore__ void KernelTestSetAtomicAdd1() { AscendC::SetAtomicAdd<int32_t>(); }
 
-// __aicore__ inline void SetAtomicNone();
-extern "C" __global__ __aicore__ void KernelTestSetAtomicNone1() { AscendC::SetAtomicNone(); }
+// __aicore__ inline void DisableDmaAtomic();
+extern "C" __global__ __aicore__ void KernelTestSetAtomicNone1() { AscendC::DisableDmaAtomic(); }
 
 // __aicore__ inline void SetAtomicMax();
 extern "C" __global__ __aicore__ void KernelTestSetAtomicMax1() { AscendC::SetAtomicMax<int32_t>(); }

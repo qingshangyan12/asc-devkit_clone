@@ -98,7 +98,7 @@ void MainDataCopyPadKernelWrongPos(
     DataCopyPad(inputLocal2, srcGlobal, copyExtParams, padExtParams);
     DataCopyPad(dstGlobal, inputLocal2, copyExtParams);
     DataCopyPad(inputLocal2, srcGlobal, copyExtParams, DataCopyPadExtParams<T>());
-    SetAtomicNone();
+    DisableDmaAtomic();
 }
 
 template <typename T>

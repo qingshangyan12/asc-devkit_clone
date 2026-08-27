@@ -15,7 +15,7 @@
 | CompareScalar | [Compares](../SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compares.md) | 无 |
 | GetAccVal | [GetReduceRepeatSumSpr](../SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatSumSpr_ISASI.md) | 无 |
 | GetReduceMaxMinCount | [GetReduceRepeatMaxMinSpr](../SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatMaxMinSpr_ISASI.md) | 无 |
-| SetAtomicNone | [DisableDmaAtomic](../SIMD-API/basic_api/atomic_operations/DisableDmaAtomic.md) | 无 |
+| SetAtomicNone | [DisableDmaAtomic](../SIMD-API/basic_api/atomic_operations/DisableDmaAtomic.md) | 同步将CAPI`asc_set_atomic_none`更名为`asc_disable_dma_atomic`，原接口保留并标记为废弃。 |
 | InitConstValue | [Fill](../SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/Fill.md) | 无 |
 | SetMMLayoutTransform | [SetMMRowMajor](../SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_aux_config/SetMMColumnMajor-SetMMRowMajor.md)/[SetMMColumnMajor](../SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_aux_config/SetMMColumnMajor-SetMMRowMajor.md) | SetMMLayoutTransform(true)对应SetMMRowMajor()。<br>SetMMLayoutTransform(false)对应SetMMColumnMajor()。 |
 | SetHF32Mode | [SetHF32Mode](../SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_aux_config/SetHF32Mode.md) | 接口名不变，参数类型由bool修改为枚举HF32Mode。 |

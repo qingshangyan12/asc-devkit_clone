@@ -59,6 +59,7 @@ __aicore__ inline void SetAtomicAdd()
 __aicore__ inline void DisableDmaAtomic() { SetAtomicNoneImpl(); }
 
 // SetAtomicNone has been updated, please use DisableDmaAtomic instead.
+[[deprecated("NOTICE: SetAtomicNone is deprecated. Please use DisableDmaAtomic instead.")]]
 __aicore__ inline void SetAtomicNone() { DisableDmaAtomic(); }
 
 template <typename T>

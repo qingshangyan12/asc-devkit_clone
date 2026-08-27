@@ -101,7 +101,7 @@ void MainDataCopyPadKernelWrongPos(
     DataCopyPad(dstGlobal, inputLocal3, copyExtParams);
     DataCopyPad(inputLocal3, srcGlobal, copyExtParams, DataCopyPadExtParams<T>());
 
-    SetAtomicNone();
+    DisableDmaAtomic();
 }
 
 INSTANTIATE_TEST_CASE_P(

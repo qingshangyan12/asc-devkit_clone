@@ -437,7 +437,7 @@ private:
             dstOffset += offset;
             CopyLocal2GMNZ2NDDeQue();
         }
-        SetAtomicNone();
+        DisableDmaAtomic();
     }
 
     template <bool isDstB8>

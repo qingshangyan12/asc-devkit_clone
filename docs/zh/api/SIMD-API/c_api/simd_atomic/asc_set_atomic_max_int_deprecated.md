@@ -53,7 +53,7 @@ PIPE_S
 
 ## 约束说明
 
-- 使用结束后，建议通过[asc_set_atomic_none](./asc_set_atomic_none.md)关闭原子最大操作，以免影响后续相关指令功能。
+- 使用结束后，建议通过[asc_disable_dma_atomic](./asc_disable_dma_atomic.md)关闭原子最大操作，以免影响后续相关指令功能。
 
 ## 调用示例
 

@@ -30,7 +30,7 @@ constexpr uint16_t WORKSPACE_SYNC_ID = 15;
 __aicore__ inline void clearWorkspace(__gm__ uint8_t* workspace)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-    AscendC::SetAtomicNone();
+    AscendC::DisableDmaAtomic();
     if ASCEND_IS_AIC {
         AscendC::SetMaskNorm();
         AscendC::SetLoadDataBoundary((uint64_t)0);

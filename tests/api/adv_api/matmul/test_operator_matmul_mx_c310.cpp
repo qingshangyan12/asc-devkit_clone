@@ -31,7 +31,7 @@ __aicore__ inline void main_kernel_matmul(
     using BiasT = typename BIAS_TYPE::T;
     typedef fp8_e8m0_t MX_T;
 
-    SetAtomicNone();
+    DisableDmaAtomic();
     TPipe pipe;
     TCubeTiling tiling;
     tilingParam.GetTiling(tiling);
@@ -301,7 +301,7 @@ __aicore__ inline void main_kernel_matmul(
     if constexpr (C_TYPE::pos == TPosition::VECIN) {
         resultCMatrix.FreeTensor(bufferC);
     }
-    SetAtomicNone();
+    DisableDmaAtomic();
 }
 
 class TEST_KERNEL_MATMUL : public testing::Test {
