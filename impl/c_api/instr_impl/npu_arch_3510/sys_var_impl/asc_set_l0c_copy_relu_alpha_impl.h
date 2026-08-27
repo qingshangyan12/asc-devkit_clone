@@ -13,7 +13,7 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
-__aicore__ inline void asc_set_l0c_copy_relu_alpha_impl(float& scalar_relu_pre_alpha)
+__aicore__ inline void asc_set_l0c_copy_relu_alpha_impl(float scalar_relu_pre_alpha)
 {
     if ASC_IS_AIC {
         set_relu_alpha(static_cast<uint64_t>(*(reinterpret_cast<uint32_t*>(&scalar_relu_pre_alpha)) & 0xFFFFE000u));
