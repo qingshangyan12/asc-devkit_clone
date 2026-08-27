@@ -179,32 +179,118 @@ __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
 
 ## 调用示例
 
-- 支持掩码控制，允许选择性收集数据
-    ```cpp
-    __simd_vf__ inline void gather_datablock_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, int32_t index_repeat_size, int32_t dst_repeat_size, uint16_t repeat_time)
-    {
-        vector_int8_t dst;
-        vector_uint32_t index;
-        vector_bool cal_mask = asc_create_mask_b32(PAT_VL4); // PAT_VL4表示仅前4个DataBlock更新。
-        vector_bool store_mask = asc_create_mask_b8(PAT_H); // PAT_H表示仅前一半的元素搬出。
-        for (uint16_t i = 0; i < repeat_time; ++i) {
-            asc_loadalign_postupdate(index, index_addr, index_repeat_size);
-            asc_gather_datablock(dst, src_addr, index, cal_mask);
-            asc_storealign_postupdate(dst_addr, dst, dst_repeat_size, store_mask);
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
+
+```c
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void PrintData(const char* label, const std::vector<T>& values)
+{
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+constexpr uint32_t DATA_BLOCK_SIZE = 32;
+constexpr uint32_t DATA_BLOCK_COUNT = 8;
+constexpr uint32_t BUFFER_BYTES = DATA_BLOCK_SIZE * DATA_BLOCK_COUNT;
+constexpr uint32_t INDEX_WORDS = 64;
+
+__simd_vf__ inline void gather_datablock_vf(
+    __ubuf__ uint8_t* output, __ubuf__ uint8_t* data, __ubuf__ uint32_t* index)
+{
+    vector_bool mask = asc_create_mask_b32(PAT_ALL);
+    vector_uint32_t index_reg;
+    asc_loadalign(index_reg, index);
+    vector_uint8_t dst;
+    asc_gather_datablock(dst, data, index_reg, mask);
+    asc_storealign(output, dst, mask);
+}
+
+__global__ __vector__ void asc_gather_datablock_kernel(
+    __gm__ uint8_t* output, __gm__ uint8_t* data, __gm__ uint32_t* index)
+{
+    asc_init();
+    __ubuf__ uint8_t output_local[BUFFER_BYTES];
+    __ubuf__ uint8_t data_local[BUFFER_BYTES];
+    __ubuf__ uint32_t index_local[INDEX_WORDS];
+    asc_copy_gm2ub_align(data_local, data, BUFFER_BYTES);
+    asc_copy_gm2ub_align(index_local, index, INDEX_WORDS * sizeof(uint32_t));
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    gather_datablock_vf(output_local, data_local, index_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint8_t> data(BUFFER_BYTES);
+    std::vector<uint32_t> index(INDEX_WORDS);
+    std::vector<uint8_t> output(BUFFER_BYTES, 0xff);
+    std::vector<uint8_t> golden(BUFFER_BYTES);
+    for (uint32_t i = 0; i < BUFFER_BYTES; ++i) {
+        data[i] = static_cast<uint8_t>(i);
+    }
+    for (uint32_t b = 0; b < DATA_BLOCK_COUNT; ++b) {
+        index[b] = (DATA_BLOCK_COUNT - 1 - b) * DATA_BLOCK_SIZE;
+    }
+    for (uint32_t b = 0; b < DATA_BLOCK_COUNT; ++b) {
+        for (uint32_t j = 0; j < DATA_BLOCK_SIZE; ++j) {
+            golden[b * DATA_BLOCK_SIZE + j] =
+                static_cast<uint8_t>((DATA_BLOCK_COUNT - 1 - b) * DATA_BLOCK_SIZE + j);
         }
     }
-    ```
-- 无掩码控制，默认收集所有索引对应的数据块
-    ```cpp
-    __simd_vf__ inline void gather_datablock_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, __ubuf__ uint32_t* index_addr, int32_t index_repeat_size, int32_t dst_repeat_size, uint16_t repeat_time)
-    {
-        vector_int8_t dst;
-        vector_uint32_t index;
-        vector_bool mask = asc_create_mask_b8(PAT_ALL);
-        for (uint16_t i = 0; i < repeat_time; ++i) {
-            asc_loadalign_postupdate(index, index_addr, index_repeat_size);
-            asc_gather_datablock(dst, src_addr, index);
-            asc_storealign_postupdate(dst_addr, dst, dst_repeat_size, mask);
-        }
-    }
-    ```
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t* data_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&data_device), BUFFER_BYTES,
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    uint32_t* index_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&index_device), INDEX_WORDS * sizeof(uint32_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    uint8_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BUFFER_BYTES,
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(data_device, data.size() * sizeof(uint8_t), data.data(), data.size() * sizeof(uint8_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(index_device, index.size() * sizeof(uint32_t), index.data(), index.size() * sizeof(uint32_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_gather_datablock_kernel<<<1, 0>>>(output_device, data_device, index_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(uint8_t), output_device, output.size() * sizeof(uint8_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Data", data);
+    PrintData("Output bytes", output);
+    PrintData("Golden", golden);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_gather_datablock completed."
+                         : "[Failed] asc_gather_datablock output mismatch.")
+              << std::endl;
+    aclrtFree(data_device);
+    aclrtFree(index_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
+```
