@@ -33,7 +33,6 @@
 
 #include "c_api/composite/cube_compute_composite.h"
 
-__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag);
 __aicore__ inline void asc_set_l0c_copy_config(
     uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool is_clean_unit_flag);
 
@@ -100,7 +99,6 @@ __aicore__ inline uint64_t asc_get_l0c2gm_unitflag();
 __aicore__ inline uint64_t asc_get_l0c2gm_prequant();
 __aicore__ inline void asc_set_l0c_copy_nz_para(
     uint16_t matrix_num, uint16_t src_nz_matrix_stride, uint32_t dst_matrix_stride);
-__aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride);
 // ==========mmad_mx(e1m2/e1m2, e4m3/e5m2)==========
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
