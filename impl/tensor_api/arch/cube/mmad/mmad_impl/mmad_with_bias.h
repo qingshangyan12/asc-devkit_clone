@@ -43,6 +43,11 @@ private:
     __aicore__ inline static constexpr void check_template_for_normal()
     {
         check_layout_pattern<CTensor, ATensor, BTensor, BiasTensor>();
+        if constexpr (current_arch_version == arch_version::v9202 && Std::is_same_v<Std::remove_cvref_t<decltype(trait)>, mmad_trait_arch9202) {
+            if constexpr (trait.enable_c_scale) {
+                check_data_type::check_mmad_bias_data_type<CTensor, ATensor, BTensor>();
+            }
+        }
         check_data_type::check_mmad_bias_data_type<CTensor, ATensor, BTensor, BiasTensor>();
     }
 
