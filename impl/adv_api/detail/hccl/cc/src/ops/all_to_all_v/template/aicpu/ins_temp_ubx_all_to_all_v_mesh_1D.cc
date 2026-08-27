@@ -14,15 +14,9 @@
 
 namespace mc2_ops_hccl {
 namespace {
-bool AddOverflows(u64 lhs, u64 rhs)
-{
-    return lhs > std::numeric_limits<u64>::max() - rhs;
-}
+bool AddOverflows(u64 lhs, u64 rhs) { return lhs > std::numeric_limits<u64>::max() - rhs; }
 
-bool MultiplyOverflows(u64 lhs, u64 rhs)
-{
-    return lhs != 0U && rhs > std::numeric_limits<u64>::max() / lhs;
-}
+bool MultiplyOverflows(u64 lhs, u64 rhs) { return lhs != 0U && rhs > std::numeric_limits<u64>::max() / lhs; }
 
 HcclResult CalcUserSliceOffset(u64 displacement, u64 dataTypeSize, u64 splitOffset, u64& byteOffset)
 {
@@ -44,8 +38,8 @@ HcclResult CalcCclSliceOffset(u32 bufferIndex, u64 sliceStride, u64 splitOffset,
         HCCL_ERROR("[InsTempUBXAllToAllVMesh1D] CCL buffer stride overflows."), HCCL_E_PARA);
     const u64 bufferOffset = static_cast<u64>(bufferIndex) * sliceStride;
     CHK_PRT_RET(
-        AddOverflows(bufferOffset, splitOffset),
-        HCCL_ERROR("[InsTempUBXAllToAllVMesh1D] CCL buffer offset overflows."), HCCL_E_PARA);
+        AddOverflows(bufferOffset, splitOffset), HCCL_ERROR("[InsTempUBXAllToAllVMesh1D] CCL buffer offset overflows."),
+        HCCL_E_PARA);
     byteOffset = bufferOffset + splitOffset;
     return HCCL_SUCCESS;
 }
@@ -53,8 +47,8 @@ HcclResult CalcCclSliceOffset(u32 bufferIndex, u64 sliceStride, u64 splitOffset,
 HcclResult CalcDataSize(u64 count, u64 dataTypeSize, u64& dataSize)
 {
     CHK_PRT_RET(
-        MultiplyOverflows(count, dataTypeSize),
-        HCCL_ERROR("[InsTempUBXAllToAllVMesh1D] data size overflows."), HCCL_E_PARA);
+        MultiplyOverflows(count, dataTypeSize), HCCL_ERROR("[InsTempUBXAllToAllVMesh1D] data size overflows."),
+        HCCL_E_PARA);
     dataSize = count * dataTypeSize;
     return HCCL_SUCCESS;
 }
@@ -338,8 +332,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunFullMeshPeer(
         CHK_RET(RecvWrite(recvInfo, threads[fullMeshThreadId]));
     }
     if (recvCount > 0) {
-        DataSlice usrOutSlices(
-            tempAlgParams.buffInfo.outputPtr, userOutputOffset, recvSize, recvCount);
+        DataSlice usrOutSlices(tempAlgParams.buffInfo.outputPtr, userOutputOffset, recvSize, recvCount);
         localCopyInfoFullMesh_.push_back(std::vector<DataSlice>{rxDstSlice, usrOutSlices});
     }
     return HcclResult::HCCL_SUCCESS;
@@ -408,8 +401,8 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunPairwiseChannel(
     CHK_RET(CalcDataSize(innerRecvOffset, dataTypeSize_, innerRecvOffsetBytes));
     CHK_RET(CalcDataSize(innerCurrSendDataCount, dataTypeSize_, innerCurrSendDataSize));
     CHK_RET(CalcDataSize(innerCurrRecvDataCount, dataTypeSize_, innerCurrRecvDataSize));
-    CHK_RET(CalcUserSliceOffset(
-        tempAlgParams.sdispls[targetRank], dataTypeSize_, innerSendOffsetBytes, txSourceOffset));
+    CHK_RET(
+        CalcUserSliceOffset(tempAlgParams.sdispls[targetRank], dataTypeSize_, innerSendOffsetBytes, txSourceOffset));
     CHK_RET(CalcCclSliceOffset(myAlgRank_, scratchBufferSizePerRank_, innerSendOffsetBytes, txDestinationOffset));
     CHK_RET(CalcCclSliceOffset(targetRank, scratchBufferSizePerRank_, innerRecvOffsetBytes, rxSourceOffset));
     CHK_RET(CalcCclSliceOffset(targetRank, scratchBufferSizePerRank_, innerRecvOffsetBytes, rxDestinationOffset));
@@ -466,10 +459,8 @@ HcclResult InsTempUBXAllToAllVMesh1D::SavePairwiseLocalCopy(
     CHK_RET(CalcCclSliceOffset(targetRank, scratchBufferSizePerRank_, 0U, scratchOffset));
     CHK_RET(CalcUserSliceOffset(tempAlgParams.rdispls[targetRank], dataTypeSize_, 0U, outputOffset));
     CHK_RET(CalcDataSize(curRecvDataCount, dataTypeSize_, recvSize));
-    DataSlice scratchSlices(
-        tempAlgParams.buffInfo.hcclBuff.addr, scratchOffset, recvSize, curRecvDataCount);
-    DataSlice usrOutSlices(
-        tempAlgParams.buffInfo.outputPtr, outputOffset, recvSize, curRecvDataCount);
+    DataSlice scratchSlices(tempAlgParams.buffInfo.hcclBuff.addr, scratchOffset, recvSize, curRecvDataCount);
+    DataSlice usrOutSlices(tempAlgParams.buffInfo.outputPtr, outputOffset, recvSize, curRecvDataCount);
     localCopyInfo_.clear();
     if (curRecvDataCount > 0) {
         localCopyInfo_.push_back(std::vector<DataSlice>{scratchSlices, usrOutSlices});

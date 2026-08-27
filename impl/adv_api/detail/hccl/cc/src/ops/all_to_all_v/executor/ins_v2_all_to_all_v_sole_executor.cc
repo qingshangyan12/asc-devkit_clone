@@ -58,8 +58,8 @@ HcclResult BuildExecutionHierarchyInfo(
     CHK_PRT_RET(
         algHierarchyInfo.infos.empty() || algHierarchyInfo.infos[0].empty(),
         HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] execution hierarchy info is empty."), HCCL_E_PARA);
-    if (topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo.level0PcieMix
-        && param.engine != CommEngine::COMM_ENGINE_AIV && algHierarchyInfo.infos.size() > 1U) {
+    if (topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo.level0PcieMix &&
+        param.engine != CommEngine::COMM_ENGINE_AIV && algHierarchyInfo.infos.size() > 1U) {
         CHK_PRT_RET(
             algHierarchyInfo.infos[0].size() != 2U,
             HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] MESH_1D_CLOS requires two level-0 instances."), HCCL_E_PARA);
