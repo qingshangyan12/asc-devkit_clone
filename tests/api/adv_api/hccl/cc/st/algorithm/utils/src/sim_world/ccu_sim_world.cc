@@ -18,6 +18,83 @@
 namespace HcclSim {
 namespace CcuSt {
 
+namespace {
+
+uint32_t ReduceDataTypeSize(HcclDataType dataType)
+{
+    switch (dataType) {
+        case HCCL_DATA_TYPE_INT8:
+            return 1;
+        case HCCL_DATA_TYPE_FP16:
+        case HCCL_DATA_TYPE_BFP16:
+            return 2;
+        case HCCL_DATA_TYPE_INT32:
+        case HCCL_DATA_TYPE_FP32:
+            return 4;
+        case HCCL_DATA_TYPE_INT64:
+        case HCCL_DATA_TYPE_UINT64:
+        case HCCL_DATA_TYPE_FP64:
+            return 8;
+        default:
+            return 0;
+    }
+}
+
+template <typename T>
+void ReduceElementRaw(T& dst, T src, HcclReduceOp op)
+{
+    switch (op) {
+        case HCCL_REDUCE_SUM:
+            dst += src;
+            break;
+        case HCCL_REDUCE_PROD:
+            dst *= src;
+            break;
+        case HCCL_REDUCE_MAX:
+            dst = std::max(dst, src);
+            break;
+        case HCCL_REDUCE_MIN:
+            dst = std::min(dst, src);
+            break;
+        default:
+            break;
+    }
+}
+
+void ApplyReduceRaw(uint8_t* dst, const uint8_t* src, uint64_t size, HcclDataType dataType, HcclReduceOp opType)
+{
+    const uint32_t elemSize = ReduceDataTypeSize(dataType);
+    if (elemSize == 0 || size % elemSize != 0) {
+        std::memmove(dst, src, static_cast<size_t>(size));
+        return;
+    }
+    const uint64_t elemCount = size / elemSize;
+    for (uint64_t i = 0; i < elemCount; ++i) {
+        const size_t pos = static_cast<size_t>(i * elemSize);
+        switch (dataType) {
+            case HCCL_DATA_TYPE_INT8:
+                ReduceElementRaw(
+                    reinterpret_cast<int8_t&>(dst[pos]), reinterpret_cast<const int8_t&>(src[pos]), opType);
+                break;
+            case HCCL_DATA_TYPE_INT32:
+                ReduceElementRaw(
+                    reinterpret_cast<int32_t&>(dst[pos]), reinterpret_cast<const int32_t&>(src[pos]), opType);
+                break;
+            case HCCL_DATA_TYPE_INT64:
+                ReduceElementRaw(
+                    reinterpret_cast<int64_t&>(dst[pos]), reinterpret_cast<const int64_t&>(src[pos]), opType);
+                break;
+            case HCCL_DATA_TYPE_FP32:
+                ReduceElementRaw(reinterpret_cast<float&>(dst[pos]), reinterpret_cast<const float&>(src[pos]), opType);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+} // namespace
+
 uint64_t RankMemory::InputAddress() { return static_cast<const RankMemory&>(*this).InputAddress(); }
 
 uint64_t RankMemory::OutputAddress() { return static_cast<const RankMemory&>(*this).OutputAddress(); }
@@ -327,7 +404,10 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
             break;
         }
         case OpCode::WRITE:
-        case OpCode::LOCAL_COPY: {
+        case OpCode::LOCAL_COPY:
+        case OpCode::READ_REDUCE:
+        case OpCode::LOCAL_REDUCE:
+        case OpCode::WRITE_REDUCE: {
             auto resolveAddr = [&](ResourceHandle handle, bool isRemote, ResourceHandle& outAddrHandle,
                                    bool& outIsBuffer) -> bool {
                 outIsBuffer = false;
@@ -353,9 +433,15 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
                 return false;
             };
 
+            const bool srcIsRemote = (operation.code == OpCode::READ_REDUCE);
+            const bool dstIsRemote = (operation.code == OpCode::WRITE || operation.code == OpCode::WRITE_REDUCE);
+            const bool isReduce =
+                (operation.code == OpCode::READ_REDUCE || operation.code == OpCode::LOCAL_REDUCE ||
+                 operation.code == OpCode::WRITE_REDUCE);
+
             ResourceHandle srcAddrHandle = 0;
             bool srcIsBuffer = false;
-            if (!resolveAddr(operation.src0, false, srcAddrHandle, srcIsBuffer)) {
+            if (!resolveAddr(operation.src0, srcIsRemote, srcAddrHandle, srcIsBuffer)) {
                 result = Result::CONTRACT_ERROR;
                 SetError("source handle is invalid");
                 return false;
@@ -364,7 +450,7 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
             ResourceHandle dstAddrHandle = 0;
             bool dstIsBuffer = false;
             uint32_t expectedDestinationRank = static_cast<uint32_t>(rankIndex);
-            if (operation.code == OpCode::WRITE) {
+            if (dstIsRemote) {
                 if (!resolveAddr(operation.dst, true, dstAddrHandle, dstIsBuffer)) {
                     result = Result::CONTRACT_ERROR;
                     SetError("remote address handle is invalid");
@@ -426,7 +512,11 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
                 return false;
             }
 
-            std::memmove(destinationPointer, sourcePointer, static_cast<size_t>(length));
+            if (isReduce) {
+                ApplyReduceRaw(destinationPointer, sourcePointer, length, operation.dataType, operation.opType);
+            } else {
+                std::memmove(destinationPointer, sourcePointer, static_cast<size_t>(length));
+            }
             ExecutionLogEntry logEntry;
             logEntry.rank = static_cast<uint32_t>(rankIndex);
             logEntry.operationIndex = state.pc;
