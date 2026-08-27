@@ -24,15 +24,16 @@
 ## 目录结构
 
 ```text
-add_l2_cache_split/
-├── add_l2cache_nosplit.asc       // 反例Kernel入口：384MB整体处理
-├── add_l2cache_split.asc         // 正例Kernel入口：按L2 Batch切分处理
-├── l2_cache_kernel.h             // 固定负载和公共Device处理逻辑
-├── l2_cache_runner.h             // 公共Host运行逻辑
+10_add_l2_cache_split/
+├── add_l2cache_nosplit.asc       // 反例Kernel入口和Host main：384MB整体处理
+├── add_l2cache_split.asc         // 正例Kernel入口和Host main：按L2 Batch切分处理
+├── add_l2cache_split_test.asc    // ACL初始化测试占位文件，未纳入CMake构建目标
+├── l2_cache_kernel.h             // 固定负载参数和公共Device处理逻辑
+├── l2_cache_runner.h             // 公共Host运行逻辑：ACL初始化、输入读取、Kernel启动、输出写回
 ├── data_utils.h                  // 二进制文件读写工具
-├── CMakeLists.txt                // 双目标编译工程文件
+├── CMakeLists.txt                // 生成demo_nosplit和demo_split两个可执行文件
 ├── scripts/
-│   └── gen_data.py               // 生成固定输入
+│   └── gen_data.py               // 生成固定384MB输入文件input/input.bin
 ├── README.md                     // 中文说明
 └── README_en.md                  // 英文说明
 ```
@@ -103,7 +104,7 @@ Batch B3: Round 0 -> Round 1
 | 反例 | `l2_cache_nosplit` | 不切分 | 384MB | 201326592 | 384MB | 20 | 2 |
 | 正例 | `l2_cache_split` | 4个96MB Batch | 96MB | 201326592 | 384MB | 20 | 2 |
 
-两者均使用`input/input.bin`作为输入，并将计算结果写入`output/`目录。性能归因时，建议手动对比Profile中的`GM_to_UB_datas(KB)`，确认正反例逻辑GM->UB搬运量接近。
+两者均使用`scripts/gen_data.py`生成的`input/input.bin`作为输入，并将计算结果写入`output/`目录。性能归因时，建议手动对比Profile中的`GM_to_UB_datas(KB)`，确认正反例逻辑GM->UB搬运量接近。
 
 ## 编译运行
 
@@ -123,12 +124,21 @@ cmake --build build -j
 
 `CMAKE_ASC_ARCHITECTURES`支持`dav-2201`和`dav-3510`。实际运行时，编译架构需要与当前NPU架构一致。
 
+构建生成的目标如下：
+
+| 目标 | 源文件 | Kernel入口 | 输出文件 |
+| --- | --- | --- | --- |
+| `demo_nosplit` | `add_l2cache_nosplit.asc` | `l2_cache_nosplit` | `output/no_split.bin` |
+| `demo_split` | `add_l2cache_split.asc` | `l2_cache_split` | `output/l2_split.bin` |
+
 运行后输出文件为：
 
 ```text
 output/no_split.bin
 output/l2_split.bin
 ```
+
+程序运行时会打印当前用例名、总数据量、L2 Cache切分开关、有效工作集大小、逻辑GM->UB搬运量、Vector Core数、L2 Batch数和计算轮数。两个输出文件应逐字节一致，且每个`half`元素结果为`input + 2`。
 
 ## 性能采集与分析
 
