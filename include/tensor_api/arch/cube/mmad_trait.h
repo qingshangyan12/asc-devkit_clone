@@ -40,6 +40,23 @@ struct mmad_trait {
     asc::te::mmad_type mmad_type = asc::te::mmad_type::normal;
 };
 
+struct mmad_trait_arch9202 : mmad_trait {
+    __aicore__ constexpr mmad_trait_arch9202(){};
+
+    __aicore__ constexpr mmad_trait_arch9202(
+        int32_t fm_offset, bool k_direction_align, bool init_with_btbuf, bool disable_gemv,
+        asc::te::mmad_type mmad_type, bool enable_hif4_a_model = false, bool enable_hif4_b_model = false,
+        bool enable_c_scale = false)
+        : asc::te::mmad_trait(fm_offset, k_direction_align, init_with_btbuf, disable_gemv, asc::te::mmad_type::normal),
+          enable_hif4_a_model(enable_hif4_a_model),
+          enable_hif4_b_model(enable_hif4_b_model),
+          enable_c_scale(enable_c_scale) {}
+
+    bool enable_hif4_a_model = false;
+    bool enable_hif4_b_model = false;
+    bool enable_c_scale = false;
+};
+
 struct mmad_trait_default {
     using trait_type = mmad_trait;
     static constexpr const trait_type value = {};
