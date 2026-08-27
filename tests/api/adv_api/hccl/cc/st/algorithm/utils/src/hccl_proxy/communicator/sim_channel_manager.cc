@@ -37,7 +37,6 @@ HcclResult SimChannelMgr::ChannelCommCreate(
         string channelKey = tag + ":" + to_string(engine) + ":" + to_string(channelDescList[i].remoteRank) + ":" +
                             to_string(channelDescList[i].channelProtocol);
         auto channelIdx = channelIdxMap_[channelKey]++;
-        // channel不再支持复用
         shared_ptr<SimChannel> channel = make_shared<SimChannel>(
             commId, tag, engine, channelDescList[i].channelProtocol, curRank_, channelDescList[i].remoteRank,
             channelDescList[i].notifyNum, channelIdx);
@@ -45,7 +44,6 @@ HcclResult SimChannelMgr::ChannelCommCreate(
         tmpChannels.push_back(channel);
     }
 
-    // 模拟建链
     auto timeout = std::chrono::milliseconds(WAIT_CHANNEL_READY_TIMEOUT_MS);
     auto startTime = std::chrono::steady_clock::now();
     for (auto& channel : tmpChannels) {
@@ -55,11 +53,9 @@ HcclResult SimChannelMgr::ChannelCommCreate(
         uint32_t finCount = 0;
         for (auto& channel : tmpChannels) {
             if (channel->IsReady()) {
-                // 已完成资源交换，计数
                 finCount++;
                 continue;
             }
-            // 尝试交换资源
             string exchangeKey = SimChannelExchangeHandler::GetExchangeKey(channel);
             auto reverseChannel = SimChannelExchangeHandler::GetInstance().GetChannel(
                 exchangeKey, channel->GetRmtRankId(), channel->GetLocRankId(), channel->GetChannelIdx());

@@ -11,6 +11,8 @@
 #include "hccl_ccu_res.h"
 #include "ccu_assist_pub.h"
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
+#include "ccu_kernel_kfc_server.h"
+#include "ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
 
@@ -31,11 +33,19 @@ HcclResult CcuTempKfcReduceScatterMesh1DMem2Mem::CalcRes(
     CcuKernelInfo kernelInfo;
     CHK_SAFETY_FUNC_RET(strcpy_s(
         kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcReduceScatterMesh1DMem2Mem"));
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuReduceScatterMesh1DMem2MemKernel);
 
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
 
-    // CcuKernelKfcServer replaces this placeholder before registration and reuses these Mesh1D channels.
+    auto kernelArg = std::make_shared<CcuKernelArgKfcServer>();
+    kernelArg->rankSize = subCommRanks_[0].size();
+    kernelArg->rankId = mySubCommRank_;
+    kernelArg->loadFromMem = false;
+    kernelArg->opParam = param;
+    kernelArg->subCommRanks = subCommRanks_;
+    kernelInfo.setKernelArg(kernelArg);
+
     kernelInfo.channels = channelDescs;
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
     return HcclResult::HCCL_SUCCESS;

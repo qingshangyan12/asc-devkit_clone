@@ -139,6 +139,15 @@ CheckResult CcuLogicalResourceChecker::Check(const Program& program) const
                 }
                 break;
             }
+            case OpCode::READ: {
+                bool srcValid = program.remoteAddresses.count(operation.src0) == 1;
+                bool dstValid =
+                    program.localAddresses.count(operation.dst) == 1 || program.buffers.count(operation.dst) == 1;
+                if (!srcValid || !dstValid || !isVariable(operation.src1) || !isEvent(operation.immediate)) {
+                    return Failure("Read references an invalid address, length, or Event");
+                }
+                break;
+            }
             case OpCode::READ_REDUCE: {
                 bool srcValid = program.remoteAddresses.count(operation.src0) == 1;
                 bool dstValid =
