@@ -35,7 +35,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline asc_override_strategy asc_get_saturation_strategy()
 ```
 
@@ -57,10 +57,10 @@ PIPE_S
 
 ## 调用示例
 
-场景：动态量化场景，溢出需饱和到 ±MAX 而非截断。须先将策略设为`USE_GLOBAL`并开启 CAST 饱和。
+场景：动态量化场景，溢出需饱和到±MAX而非截断。须先将策略设为`USE_GLOBAL`并开启CAST饱和。
 
 ```cpp
-// SIMD_VF 外：保存并切换饱和策略（动态量化段开始前）
+// SIMD_VF外：保存并切换饱和策略（动态量化段开始前）
 asc_override_strategy old_strategy = asc_get_saturation_strategy();
 bool old_cast_sat = asc_get_saturation_flag(asc_saturation_mode::CAST);
 asc_set_saturation_strategy(asc_override_strategy::USE_GLOBAL);
@@ -71,9 +71,9 @@ asc_copy_gm2ub_align(bias_ub, bias_gm, bias_burst_bytes);
 asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
-// 矢量计算循环内：激活 + bias 加法后 float→int32（全局 CAST 饱和生效）
+// 矢量计算循环内：激活+bias加法后float→int32（全局CAST饱和生效）
 
-// SIMD_VF 外：恢复进入本段前的配置
+// SIMD_VF外：恢复进入本段前的配置
 asc_set_saturation_flag(asc_saturation_mode::CAST, old_cast_sat);
 asc_set_saturation_strategy(old_strategy);
 ```

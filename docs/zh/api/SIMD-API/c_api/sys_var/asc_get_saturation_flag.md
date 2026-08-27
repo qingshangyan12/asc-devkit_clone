@@ -30,7 +30,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode)
 ```
 
@@ -52,15 +52,15 @@ PIPE_S
 
 ## 约束说明
 
-- 返回值是 API 语义层结果：`true`表示该模式下饱和已开启，`false`表示未开启（对 INT 为截断；对 FLOAT/FLOAT8/CAST 为非饱和或截断）。各模式语义差异见[asc_set_saturation_flag](asc_set_saturation_flag.md)表1。
-- 对`CAST`模式，即使本接口返回`true`，也需同时满足饱和策略为`USE_GLOBAL`，CAST 饱和配置才会在精度转换中真正生效。详见[asc_set_saturation_strategy](asc_set_saturation_strategy.md)。
+- 返回值是API语义层结果：`true`表示该模式下饱和已开启，`false`表示未开启（对INT为截断；对FLOAT/FLOAT8/CAST为非饱和或截断）。各模式语义差异见[asc_set_saturation_flag](asc_set_saturation_flag.md)表1。
+- 对`CAST`模式，即使本接口返回`true`，也需同时满足饱和策略为`USE_GLOBAL`，CAST饱和配置才会在精度转换中真正生效。详见[asc_set_saturation_strategy](asc_set_saturation_strategy.md)。
 
 ## 调用示例
 
-场景：动态量化场景，溢出需饱和到 ±MAX 而非截断。须先将策略设为`USE_GLOBAL`并开启 CAST 饱和。
+场景：动态量化场景，溢出需饱和到±MAX而非截断。须先将策略设为`USE_GLOBAL`并开启CAST饱和。
 
 ```cpp
-// SIMD_VF 外：asc_get_saturation_flag 查询当前 CAST 饱和开关
+// SIMD_VF外：asc_get_saturation_flag查询当前CAST饱和开关
 bool cast_sat_enabled = asc_get_saturation_flag(asc_saturation_mode::CAST);
 asc_override_strategy old_strategy = asc_get_saturation_strategy();
 
@@ -74,13 +74,13 @@ asc_copy_gm2ub_align(bias_ub, bias_gm, bias_burst_bytes);
 asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
-// 矢量计算循环内：激活 + bias 加法后 float→int32（全局 CAST 饱和生效）
+// 矢量计算循环内：激活+bias加法后float→int32（全局CAST饱和生效）
 
-// SIMD_VF 外：若本段临时开启过 CAST 饱和，则恢复进入本段前的配置
+// SIMD_VF外：若本段临时开启过CAST饱和，则恢复进入本段前的配置
 if (!cast_sat_enabled) {
     asc_set_saturation_flag(asc_saturation_mode::CAST, false);
     asc_set_saturation_strategy(old_strategy);
 }
 ```
 
-数据搬运与 Reg cast 模式可参考[Cast样例](../../../../../../examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast)。
+数据搬运与Reg cast模式可参考[Cast样例](../../../../../../examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast)。

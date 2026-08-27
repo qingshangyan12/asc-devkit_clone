@@ -32,7 +32,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline asc_load_l2_cache_mode asc_get_scalar_load_cache_mode()
 ```
 
