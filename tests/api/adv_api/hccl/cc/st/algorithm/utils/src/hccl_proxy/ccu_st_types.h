@@ -56,6 +56,7 @@ enum class OpCode {
     EVENT_RECORD,
     EVENT_WAIT,
     WRITE,
+    READ,
     LOCAL_COPY,
     GROUP_COPY,
     READ_REDUCE,

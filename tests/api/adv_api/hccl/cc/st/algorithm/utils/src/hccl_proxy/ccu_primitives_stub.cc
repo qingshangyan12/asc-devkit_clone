@@ -606,13 +606,13 @@ void AppendRead(
 
 Result Read(ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length, Event event, uint16_t mask)
 {
-    AppendRead(OpCode::WRITE, channel, local.handle, remote.handle, length.handle, event.handle, mask);
+    AppendRead(OpCode::READ, channel, local.handle, remote.handle, length.handle, event.handle, mask);
     return Result::SUCCESS;
 }
 
 Result Read(ChannelHandle channel, CcuBuffer local, RemoteAddr remote, Variable length, Event event, uint16_t mask)
 {
-    AppendRead(OpCode::WRITE, channel, local.handle, remote.handle, length.handle, event.handle, mask);
+    AppendRead(OpCode::READ, channel, local.handle, remote.handle, length.handle, event.handle, mask);
     return Result::SUCCESS;
 }
 

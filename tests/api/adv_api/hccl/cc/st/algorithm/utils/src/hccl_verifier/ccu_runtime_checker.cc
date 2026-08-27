@@ -235,7 +235,16 @@ CheckResult CheckRuntimeOutput(
             std::ostringstream message;
             message << "output mismatch at rank " << rank;
             if (mismatch.first != memories[rank].output.end()) {
-                message << ", byte " << std::distance(memories[rank].output.begin(), mismatch.first);
+                size_t pos = std::distance(memories[rank].output.begin(), mismatch.first);
+                message << ", byte " << pos;
+                message << " actual[0x" << std::hex << static_cast<int>(*mismatch.first) << std::dec;
+                message << " expected[0x" << std::hex << static_cast<int>(*mismatch.second) << std::dec;
+                if (pos + 1 < memories[rank].output.size()) {
+                    message << " actual+1[0x" << std::hex << static_cast<int>(memories[rank].output[pos + 1])
+                            << std::dec;
+                    message << " expected+1[0x" << std::hex << static_cast<int>(expectation.outputs[rank][pos + 1])
+                            << std::dec;
+                }
             }
             return {Result::CONTRACT_ERROR, message.str()};
         }

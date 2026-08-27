@@ -69,25 +69,33 @@ KernelHandle CcuStFixture::RegisterKernelForRank(
     uint32_t rank, uint32_t rankSize, const CcuStScenario& scenario, const TopoMeta& topoMeta,
     const Mc2CcTilingInner& tiling)
 {
-    if (aclrtSetDevice(rank) != ACL_SUCCESS)
+    if (aclrtSetDevice(rank) != ACL_SUCCESS) {
+        HCCL_ERROR("[CcuStFixture] rank[%u] aclrtSetDevice failed", rank);
         return 0;
+    }
 
     aclrtStream stream = nullptr;
-    if (aclrtCreateStream(&stream) != ACL_SUCCESS)
+    if (aclrtCreateStream(&stream) != ACL_SUCCESS) {
+        HCCL_ERROR("[CcuStFixture] rank[%u] aclrtCreateStream failed", rank);
         return 0;
+    }
 
     HcclComm comm = nullptr;
-    if (HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, rank, &comm) != HCCL_SUCCESS)
+    if (HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, rank, &comm) != HCCL_SUCCESS) {
+        HCCL_ERROR("[CcuStFixture] rank[%u] Sim_HcclCommInitClusterInfo failed", rank);
         return 0;
+    }
 
     OpResCtx resCtx{};
     if (AllocCcuOpResCtx(comm, "selector_st_ctx", rankSize, rank, resCtx) != HCCL_SUCCESS) {
+        HCCL_ERROR("[CcuStFixture] rank[%u] AllocCcuOpResCtx failed", rank);
         CleanupHostEnv(comm);
         return 0;
     }
 
     OpParam opParam{};
     if (InitOpParamByTiling(comm, stream, "ccu_st", &tiling, opParam) != HCCL_SUCCESS) {
+        HCCL_ERROR("[CcuStFixture] rank[%u] InitOpParamByTiling failed", rank);
         CleanupHostEnv(comm);
         return 0;
     }
@@ -101,16 +109,24 @@ KernelHandle CcuStFixture::RegisterKernelForRank(
 
     bool forcedAlgAccepted = false;
     if (TryForcedAlgAndPrepareEngine(comm, &tiling, opParam, algName, topoInfo, forcedAlgAccepted) != HCCL_SUCCESS) {
+        HCCL_ERROR("[CcuStFixture] rank[%u] TryForcedAlgAndPrepareEngine failed", rank);
         CleanupHostEnv(comm);
         return 0;
     }
     if (!forcedAlgAccepted) {
         if (SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo) != HCCL_SUCCESS || algName.empty()) {
+            HCCL_ERROR("[CcuStFixture] rank[%u] SelectAlgAndPrepareEngine failed, algName[%s]", rank, algName.c_str());
             CleanupHostEnv(comm);
             return 0;
         }
     }
+    HCCL_INFO(
+        "[CcuStFixture] rank[%u] selected algName[%s] engine[%u]", rank, algName.c_str(),
+        static_cast<uint32_t>(opParam.engine));
     if (rank == 0 && !scenario.expectedAlgName.empty() && algName != scenario.expectedAlgName) {
+        HCCL_ERROR(
+            "[CcuStFixture] rank[%u] algName mismatch: expected[%s] got[%s]", rank, scenario.expectedAlgName.c_str(),
+            algName.c_str());
         CleanupHostEnv(comm);
         return 0;
     }
@@ -119,6 +135,9 @@ KernelHandle CcuStFixture::RegisterKernelForRank(
     opParam.isMc2 = false;
     bool skipGetRes = false;
     if (HandleSingleRankAndCommMode(comm, opParam, skipGetRes) != HCCL_SUCCESS || skipGetRes) {
+        HCCL_ERROR(
+            "[CcuStFixture] rank[%u] HandleSingleRankAndCommMode failed, skipGetRes[%d]", rank,
+            static_cast<int>(skipGetRes));
         CleanupHostEnv(comm);
         return 0;
     }
