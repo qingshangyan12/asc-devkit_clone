@@ -28,37 +28,6 @@ namespace te {
 namespace experimental {
 namespace detail {
 
-template <size_t Bytes>
-struct store_datatype;
-
-template <>
-struct store_datatype<1> {
-    using type = uint8_t;
-};
-
-template <>
-struct store_datatype<2> {
-    using type = uint16_t;
-};
-
-template <>
-struct store_datatype<4> {
-    using type = uint32_t;
-};
-
-template <>
-struct store_datatype<8> {
-    using type = uint64_t;
-};
-
-template <typename DataType>
-inline constexpr size_t store_element_bytes =
-    is_b4_type<Std::remove_cvref_t<DataType>> ? 1 : sizeof(Std::remove_cvref_t<DataType>);
-
-template <typename DataType, size_t PhysicalWidthRatio = 1>
-using store_datatype_t =
-    typename store_datatype<store_element_bytes<DataType> * PhysicalWidthRatio>::type;
-
 template <store_sideband_mode sideband_mode>
 struct store_to_ptr_impl;
 
@@ -67,11 +36,7 @@ struct store_to_ptr_impl<store_sideband_mode::direct> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
-        using scalar_type = store_datatype_t<RegDataType>;
-        using reg_type = typename type_get<scalar_type>::type;
-        auto* rep_dst = reinterpret_cast<__ubuf__ scalar_type*>(dst);
-        const auto& rep_src = reinterpret_cast<const reg_type&>(src.reg);
-        asc_storealign(rep_dst, rep_src, src.mask);
+        asc_storealign(dst, src.reg, src.mask);
     }
 };
 
@@ -80,11 +45,7 @@ struct store_to_ptr_impl<store_sideband_mode::store_1st> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
-        using scalar_type = store_datatype_t<RegDataType>;
-        using reg_type = typename type_get<scalar_type>::type;
-        auto* rep_dst = reinterpret_cast<__ubuf__ scalar_type*>(dst);
-        const auto& rep_src = reinterpret_cast<const reg_type&>(src.reg);
-        asc_storealign_1st(rep_dst, rep_src);
+        asc_storealign_1st(dst, src.reg);
     }
 };
 
@@ -93,12 +54,7 @@ struct store_to_ptr_impl<store_sideband_mode::pack> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
-        // Select matching pointer and register C API types from the pre-pack lane width.
-        using scalar_type = store_datatype_t<RegDataType, 2>;
-        using reg_type = typename type_get<scalar_type>::type;
-        auto* rep_dst = reinterpret_cast<__ubuf__ scalar_type*>(dst);
-        const auto& rep_src = reinterpret_cast<const reg_type&>(src.reg);
-        asc_storealign_pack(rep_dst, rep_src, src.mask);
+        asc_storealign_pack(dst, src.reg, src.mask);
     }
 };
 
@@ -107,13 +63,7 @@ struct store_to_ptr_impl<store_sideband_mode::pack_quarter> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
-        using scalar_type = store_datatype_t<RegDataType, 4>;
-        static_assert(sizeof(scalar_type) == sizeof(uint32_t),
-            "pack_quarter requires a b32 physical lane type");
-        using reg_type = typename type_get<scalar_type>::type;
-        auto* rep_dst = reinterpret_cast<__ubuf__ scalar_type*>(dst);
-        const auto& rep_src = reinterpret_cast<const reg_type&>(src.reg);
-        asc_storealign_pack_quarter(rep_dst, rep_src, src.mask);
+        asc_storealign_pack_quarter(dst, src.reg, src.mask);
     }
 };
 
@@ -123,12 +73,7 @@ struct store_to_ptr_impl<store_sideband_mode::intlv> {
     __simd_callee__ static inline void run(
         Pointer dst, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1)
     {
-        using scalar_type = store_datatype_t<RegDataType>;
-        using reg_type = typename type_get<scalar_type>::type;
-        auto* rep_dst = reinterpret_cast<__ubuf__ scalar_type*>(dst);
-        const auto& rep_src0 = reinterpret_cast<const reg_type&>(src0.reg);
-        const auto& rep_src1 = reinterpret_cast<const reg_type&>(src1.reg);
-        asc_storealign_intlv(rep_dst, rep_src0, rep_src1);
+        asc_storealign_intlv(dst, src0.reg, src1.reg);
     }
 };
 
