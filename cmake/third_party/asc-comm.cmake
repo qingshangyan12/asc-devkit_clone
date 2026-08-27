@@ -9,7 +9,7 @@
 # -----------------------------------------------------------------------------------------------------------
 
 # 后续如果更新asc-comm代码需要同步更新至devkit run包需要更新change id
-set(ASC_COMM_TAG_ID 0eff184c367e6d67263745e57abc485237d34019)
+set(ASC_COMM_TAG_ID 039a8f905a5e906a753f929dba71b3a993de6655)
 
 # asc-comm 与 asc-devkit 按同级目录放置。路径以本文件所在目录(<devkit>/cmake/third_party)为锚，
 # 对于CI环境已经存在asc-comm代码, 不去拉取代码否则使用submodule方式拉取asc-comm仓代码
@@ -63,6 +63,11 @@ if(NOT EXISTS ${ASC_COMM_SRC_DIR})
 endif()
 if(NOT EXISTS ${ASC_COMM_INCLUDE_DIR})
     message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing include dir: ${ASC_COMM_INCLUDE_DIR}")
+endif()
+
+set(ASC_COMM_AICPU_PUBLIC_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/include/aicpu/hcomm)
+if(NOT EXISTS ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR})
+    message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Missing public aicpu headers: ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR}")
 endif()
 
 # 将 src 下代码（hcomm 除外）统一打包到 asc/impl/comm_api/
@@ -133,3 +138,9 @@ if(EXISTS "${ASC_COMM_CCU_CMAKE_DIR}/CMakeLists.txt")
 else()
     message(STATUS "[ThirdPartyLib][asc-comm] Missing CCU cmake dir: ${ASC_COMM_CCU_CMAKE_DIR}, skip CCU so build")
 endif()
+
+install(DIRECTORY ${ASC_COMM_AICPU_PUBLIC_HEADER_DIR}/
+    DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/asc_comm/aicpu/hcomm
+    COMPONENT asc-devkit
+    FILES_MATCHING PATTERN "*.h"
+)
