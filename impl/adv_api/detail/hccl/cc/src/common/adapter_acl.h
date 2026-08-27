@@ -17,6 +17,17 @@
 #include "acl_rt.h"
 #include "workflow.h"
 
+/* ACL_DEV_ATTR_DEVICE_FORM_FACTOR is only available in newer ACL headers.
+ * Detect the matching form-factor macro so older CANN headers do not compile this enum reference.
+ */
+#ifndef HCCL_SUPPORT_DEV_FORM_FACTOR
+#ifdef ACL_DEVICE_FORM_FACTOR_POD
+#define HCCL_SUPPORT_DEV_FORM_FACTOR 1
+#else
+#define HCCL_SUPPORT_DEV_FORM_FACTOR 0
+#endif
+#endif
+
 namespace mc2_ops_hccl {
 
 #define ACLCHECK(cmd)                                                                                           \
@@ -38,7 +49,7 @@ HcclResult haclrtGetCaptureInfo(
 
 HcclResult haclrtGetDeviceIndexByPhyId(u32 devicePhyId, u32& deviceLogicId);
 
-HcclResult hcalrtGetDeviceInfo(u32 deviceId, aclrtDevAttr devAttr, s64& val);
+HcclResult hcalrtGetDeviceInfo(u32 deviceId, aclrtDevAttr devAttr, s64& val, bool quiet = false);
 
 HcclResult LoadBinaryFromFile(
     const char* binPath, aclrtBinaryLoadOptionType optionType, uint32_t cpuKernelMode, aclrtBinHandle& binHandle);

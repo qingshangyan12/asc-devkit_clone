@@ -321,7 +321,25 @@ aclError aclrtRecordNotify(aclrtNotify notify, aclrtStream stream)
 
 aclError aclrtGetDeviceInfo(uint32_t deviceId, aclrtDevAttr attr, int64_t* value)
 {
+#ifdef ACL_DEVICE_FORM_FACTOR_POD
+    if (attr == ACL_DEV_ATTR_DEVICE_FORM_FACTOR) {
+        if (value == nullptr) {
+            return ACL_ERROR_INVALID_PARAM;
+        }
+        *value = ACL_DEVICE_FORM_FACTOR_POD;
+        return ACL_SUCCESS;
+    }
+#endif
     HCCL_WARNING("[%s] not support.", __func__);
+    return ACL_SUCCESS;
+}
+
+aclError aclrtGetLogicDevIdByUserDevId(const int32_t userDevId, int32_t* const logicDevId)
+{
+    if (logicDevId == nullptr) {
+        return ACL_ERROR_INVALID_PARAM;
+    }
+    *logicDevId = userDevId;
     return ACL_SUCCESS;
 }
 

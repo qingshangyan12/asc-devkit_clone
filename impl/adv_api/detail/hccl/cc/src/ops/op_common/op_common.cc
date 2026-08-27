@@ -450,7 +450,7 @@ HcclResult HcclExecOp(
         "engine[%d].",
         param.opType, algName.c_str(), param.algTag, param.engine);
     HcclResult getAlgResRet =
-        HcclGetAlgRes(comm, param, executor, topoInfo.get(), resCtxHost, &resCtxSequence, isResourceReused);
+        HcclGetAlgRes(comm, param, executor, topoInfo.get(), resCtxHost, &resCtxSequence, isResourceReused, algName);
     HCCL_INFO(
         "[asc][AlgoResource][HcclExecOp] after HcclGetAlgRes, ret[%d], resCtxSequence[%p], "
         "isResourceReused[%d], ctxSize[%llu].",
@@ -785,7 +785,8 @@ void CompReqChannelWithExistChannel(
 
 HcclResult HcclGetAlgRes(
     HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor, TopoInfoWithNetLayerDetails* topoInfo,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxSequence, bool& isResourceReused)
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxSequence, bool& isResourceReused,
+    const std::string& algName)
 {
     CHK_PTR_NULL(topoInfo);
     CHK_PTR_NULL(resCtxSequence);
@@ -831,7 +832,20 @@ HcclResult HcclGetAlgRes(
     HCCL_INFO(
         "[asc][AlgoResource][HcclGetAlgRes] before CalcAlgHierarchyInfo, opType[%d], algTag[%s].", param.opType,
         param.algTag);
-    HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfo(comm, topoInfo, algHierarchyInfo);
+    HcclResult calcHierarchyRet;
+    if (param.opType == HcclCMDType::HCCL_CMD_ALLGATHER_V || param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER_V) {
+        AlgAttrs algAttrs = executor->GetAlgoMeta(algName);
+        calcHierarchyRet = executor->CalcAlgHierarchyInfoV2(topoInfo, algHierarchyInfo, algAttrs);
+        if (calcHierarchyRet == HCCL_SUCCESS && algHierarchyInfo.infos.empty()) {
+            HCCL_WARNING(
+                "[asc][AlgoResource][HcclGetAlgRes] CalcAlgHierarchyInfoV2 produced empty hierarchy, fallback to "
+                "CalcAlgHierarchyInfo, opType[%d], algName[%s].",
+                param.opType, algName.c_str());
+            calcHierarchyRet = executor->CalcAlgHierarchyInfo(comm, topoInfo, algHierarchyInfo);
+        }
+    } else {
+        calcHierarchyRet = executor->CalcAlgHierarchyInfo(comm, topoInfo, algHierarchyInfo);
+    }
     HCCL_INFO(
         "[asc][AlgoResource][HcclGetAlgRes] after CalcAlgHierarchyInfo, ret[%d], levelNum[%zu].", calcHierarchyRet,
         algHierarchyInfo.infos.size());
