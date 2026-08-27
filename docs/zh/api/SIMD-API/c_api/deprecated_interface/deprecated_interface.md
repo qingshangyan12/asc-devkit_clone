@@ -21,3 +21,4 @@
 ## 矩阵计算
 - **[asc_mmad（废弃）](asc_mmad_deprecated.md)**
 - **[asc_mmad_mx（废弃）](asc_mmad_mx_deprecated.md)**
+- **[asc_mmad_sparse（废弃）](asc_mmad_sparse_deprecated.md)**

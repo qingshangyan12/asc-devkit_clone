@@ -6,10 +6,10 @@
 - Ascend 950PR/Ascend 950DT：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
@@ -26,7 +26,9 @@
 
 ## 功能说明
 
-**针对Ascend 950PR/Ascend 950DT产品，入参`unit_flag`类型为`uint8_t`的`asc_mmad`接口和`asc_mmad_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad](../cube_compute/asc_mmad.md)接口替代；原`asc_mmad_sync`接口的同步功能请通过新`asc_mmad`接口和`asc_sync_pipe(PIPE_ALL)`实现，具体请参见[asc_sync_pipe](../sync/asc_sync_pipe.md)。**
+**入参`unit_flag`类型为`uint8_t`的`asc_mmad`接口以及`asc_mmad_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad](../cube_compute/asc_mmad.md)接口替代；原同步功能请通过新接口和`asc_sync_pipe(PIPE_ALL)`实现，具体请参见[asc_sync_pipe](../sync/asc_sync_pipe.md)。**
+
+**针对Atlas A3/A2系列产品，带`feat_offset`参数的`asc_mmad`、`asc_mmad_s4`接口以及全部`asc_mmad_sync`、`asc_mmad_s4_sync`接口也已废弃。带`feat_offset`参数的接口请改用不带该参数且使用`asc_unit_flag_mode`的对应接口。**
 
 本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发，其计算公式如下：
 
@@ -48,6 +50,19 @@ $$
 
 表格中K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。
 <!-- end id8 -->
+
+<!-- npu="A3,910b" id19 -->
+**表** 矩阵信息说明（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+
+| 矩阵 | 存储位置 | 形状 | 数据格式 | 分形大小 |
+| --- | --- | --- | --- | --- |
+| A | L0A Buffer | M×K | Zz | 16×K0 |
+| B | L0B Buffer | K×N | Zn | K0×16 |
+| C | L0C Buffer | M×N | Nz | 16×16 |
+| Bias（用于C矩阵初始化） | BiasTable Buffer | 1×N，使用时通过广播复制M行来初始化C矩阵 | ND | - |
+
+K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。当数据类型为`int4b_t`时，`K0 = 64`。
+<!-- end id19 -->
 
 本接口为矩阵计算接口，仅在AIC上生效。
 
@@ -116,6 +131,30 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 ```
 <!-- end id12 -->
 
+<!-- npu="A3,910b" id20 -->
+### 函数原型（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+
+- `asc_mmad`及`asc_mmad_sync`：
+
+  ```c
+  __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+  ```
+
+  `c_dtype`、`a_dtype`、`b_dtype`支持以下组合：`float/bfloat16_t/bfloat16_t`、`float/half/half`、`float/float/float`和`int32_t/int8_t/int8_t`。
+
+- `asc_mmad_s4`及`asc_mmad_s4_sync`：
+
+  ```c
+  __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+  ```
+<!-- end id20 -->
+
 ## 参数说明
 
 <!-- npu="950" id14 -->
@@ -134,6 +173,26 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 | c_matrix_source | 输入 | 当参数`c_matrix_init_val`为false时，配置矩阵C的初始值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初始值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初始值来源于BiasTable Buffer。 |
 | c_matrix_init_val | 输入 | 配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数`c_matrix_source`配置。 |
 <!-- end id14 -->
+
+<!-- npu="A3,910b" id21 -->
+**表** 参数说明（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| c_matrix | 输出 | 结果矩阵C在L0C Buffer中的起始地址，需按照1024字节对齐。 |
+| a_matrix | 输入 | 左矩阵A在L0A Buffer中的起始地址，需按照512字节对齐。 |
+| b_matrix | 输入 | 右矩阵B在L0B Buffer中的起始地址，需按照512字节对齐。 |
+| left_height | 输入 | 左矩阵A和结果矩阵C的M维大小，取值范围为[0, 4095]。 |
+| n_dim | 输入 | 左矩阵A和右矩阵B的K维大小，取值范围为[0, 4095]。 |
+| right_width | 输入 | 右矩阵B和结果矩阵C的N维大小，取值范围为[0, 4095]。 |
+| feat_offset | 输入 | 无效参数，用户无需关注，传入0即可。 |
+| smask_offset | 输入 | 无效参数，用户无需关注，传入0即可。 |
+| unit_flag | 输入 | UnitFlag控制参数。0表示关闭；2表示开启且执行后保持单元标志位；3表示开启且执行后更新单元标志位。 |
+| k_direction_align | 输入 | 使用float数据类型时控制K方向的对齐方式。false表示对齐到`ceil(n_dim / 8) * 8`，true表示对齐到`ceil(n_dim / 16) * 16`。 |
+| is_weight_offset | 输入 | 是否启用权重矩阵偏移。 |
+| c_matrix_source | 输入 | 当`c_matrix_init_val`为false时，配置矩阵C的初始值是否来自BiasTable Buffer。 |
+| c_matrix_init_val | 输入 | 配置是否将矩阵C的初始值设置为0。 |
+<!-- end id21 -->
 
 ## 返回值说明
 
@@ -157,6 +216,10 @@ PIPE_M
       - 申请矩阵存储空间时，需使用按照分形大小补齐后的数值进行申请：M、N分别向上补齐到16的倍数，K向上补齐到K0的倍数，K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。`left_height`、`n_dim`和`right_width`仍传入矩阵的有效M、K、N值，补齐部分为无效数据，不参与结果矩阵有效区域的计算。
       - 当M为1且`disable_gemv`为false时，将开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需按照512字节对齐。
   <!-- end id10 -->
+
+  <!-- npu="A3,910b" id22 -->
+  - 针对Atlas A3/A2系列产品，L0C Buffer大小为128KB，L0A Buffer和L0B Buffer大小均为64KB，BiasTable Buffer大小为1KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
+  <!-- end id22 -->
 
 - 同步约束说明：
 
