@@ -3,7 +3,7 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：不支持
+- Ascend 950PR/Ascend 950DT：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
@@ -58,6 +58,10 @@ PIPE_S
 ## 约束说明
 
 需先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。
+
+<!-- npu="950" id8 -->
+- Ascend 950PR/Ascend 950DT：配置Reg矢量计算时，可通过[asc_get_mask_spr](../reg/reg_data_types/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`读入掩码寄存器。
+<!-- end id8 -->
 
 ## 调用示例
 
