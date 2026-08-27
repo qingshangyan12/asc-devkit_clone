@@ -4752,11 +4752,6 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config) { asc_set_l0c2gm
 
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config) { asc_set_l0c2gm_lrelu_alpha_impl(config); }
 
-__aicore__ inline void asc_set_l0c_copy_lrelu_alpha(half& scalar_relu_pre_alpha)
-{
-    asc_set_l0c_copy_lrelu_alpha_impl(scalar_relu_pre_alpha);
-}
-
 __aicore__ inline void asc_set_l0c_copy_lrelu_alpha(float& scalar_relu_pre_alpha)
 {
     asc_set_l0c_copy_lrelu_alpha_impl(scalar_relu_pre_alpha);
