@@ -55,7 +55,7 @@ TEST_F(TestMmadSparseCAPI, mmad_sparse_Succ)
     expectedUnitFlag = 1;
     MOCKER(
         mad_sp, void(
-                    __cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n,
+                    __cc__ int32_t * c, __ca__ int8_t * a, __cb__ int8_t * b, uint16_t m, uint16_t k, uint16_t n,
                     uint8_t unit_flag, bool cmatrix_source, bool cmatrix_init_val))
         .times(1)
         .will(invoke(mad_sp_Stub));
@@ -77,7 +77,7 @@ TEST_F(TestMmadSparseCAPI, mmad_sparse_enum_Succ)
     expectedUnitFlag = 2;
     MOCKER(
         mad_sp, void(
-                    __cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n,
+                    __cc__ int32_t * c, __ca__ int8_t * a, __cb__ int8_t * b, uint16_t m, uint16_t k, uint16_t n,
                     uint8_t unit_flag, bool cmatrix_source, bool cmatrix_init_val))
         .times(1)
         .will(invoke(mad_sp_Stub));
@@ -100,7 +100,7 @@ TEST_F(TestMmadSparseCAPI, mmad_sparse_sync_Succ)
     expectedUnitFlag = 1;
     MOCKER(
         mad_sp, void(
-                    __cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n,
+                    __cc__ int32_t * c, __ca__ int8_t * a, __cb__ int8_t * b, uint16_t m, uint16_t k, uint16_t n,
                     uint8_t unit_flag, bool cmatrix_source, bool cmatrix_init_val))
         .times(1)
         .will(invoke(mad_sp_Stub));
