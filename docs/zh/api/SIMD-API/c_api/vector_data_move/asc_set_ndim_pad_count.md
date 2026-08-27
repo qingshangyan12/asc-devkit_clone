@@ -44,7 +44,7 @@ __aicore__ inline void asc_set_ndim_pad_count(asc_ndim_pad_count_config& config)
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| `config` | 输入 | NDDMA高维切分搬运的填充元素数配置，类型为`asc_ndim_pad_count_config&`。详细字段说明请参见[asc_ndim_pad_count_config](../struct/asc_ndim_pad_count_config.md)。 |
+| config | 输入 | NDDMA高维切分搬运的填充元素数配置，类型为`asc_ndim_pad_count_config&`。详细字段说明请参见[asc_ndim_pad_count_config](../struct/asc_ndim_pad_count_config.md)。 |
 
 ## 返回值说明
 
