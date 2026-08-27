@@ -27,6 +27,9 @@
 namespace asc {
 namespace te {
 
+__aicore__ constexpr gm_to_l1_trait::gm_to_l1_trait(bool pre_allocation) : pre_allocation(pre_allocation)
+{}
+
 // Shared GM->L1 batch dispatch for the four copy ops (ND2Nz/DN2Nz/ND2Zn/DN2Zn). The op-specific
 // single-matrix parameter extraction lives in CopyOp::EmitCopy; this routine handles the parts that
 // are identical across ops: depth-based batch detection, stripping the leading B axis, and reading
@@ -47,20 +50,17 @@ __aicore__ inline void run_gm_to_l1_batched(const DstTensor& dst, const SrcTenso
         uint16_t matrix_num = get<0>(src_layout.shape());
         uint64_t src_matrix_stride = get<0>(src_layout.stride());
         uint32_t dst_matrix_stride = get<0>(dst_layout.stride());
-        CopyOp::emit_copy(
-            dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout), matrix_num, src_matrix_stride,
-            dst_matrix_stride);
+        CopyOp::template emit_copy<trait>(dst, src, remove_batch_dim(src_layout), remove_batch_dim(dst_layout), matrix_num,
+                          src_matrix_stride, dst_matrix_stride);
     } else {
-        CopyOp::emit_copy(dst, src, src.layout(), dst.layout(), 1, 0, 0);
+        CopyOp::template emit_copy<trait>(dst, src, src.layout(), dst.layout(), 1, 0, 0);
     }
 }
 
-template <
-    const gm_to_l1_trait& trait, typename CopyOp, typename DstTensor, typename SrcTensor, typename DstCoord,
-    typename SrcCoord, typename CopyShape>
-__aicore__ inline void run_gm_to_l1_batched(
-    const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord, const SrcCoord& src_coord,
-    const CopyShape& copy_shape)
+template <const gm_to_l1_trait& trait, typename CopyOp, typename DstTensor, typename SrcTensor, typename DstCoord,
+          typename SrcCoord, typename CopyShape>
+__aicore__ inline void run_gm_to_l1_batched(const DstTensor& dst, const SrcTensor& src, const DstCoord& dst_coord,
+                                            const SrcCoord& src_coord, const CopyShape& copy_shape)
 {
     CopyOp::template check_template<trait, DstTensor, SrcTensor>();
     auto src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
@@ -75,7 +75,7 @@ __aicore__ inline void run_gm_to_l1_batched(
         dst_matrix_stride = get<0>(dst.layout().stride());
     }
     // emit_copy receives matrix strides in element units and performs instruction-specific conversion.
-    CopyOp::emit_copy(dst, src, src_shape, matrix_num, src_matrix_stride, dst_matrix_stride, dst_offset, src_offset);
+    CopyOp::template emit_copy<trait>(dst, src, src_shape, matrix_num, src_matrix_stride, dst_matrix_stride, dst_offset, src_offset);
 }
 
 } // namespace te
