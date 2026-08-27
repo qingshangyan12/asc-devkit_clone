@@ -64,7 +64,7 @@ Warp内所有线程输入val的和。
 
 ## 需要包含的头文件
 
-使用除half类型之外的接口需要包含"simt\_api/device\_warp\_functions.h"头文件，使用half类型接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用除half类型之外的接口需要包含`simt_api/device_warp_functions.h`头文件，使用half类型接口需要包含`simt_api/asc_fp16.h`头文件。
 
 ```cpp
 #include "simt_api/device_warp_functions.h"
