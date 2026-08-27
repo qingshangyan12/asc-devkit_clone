@@ -49,7 +49,7 @@ public:
         auto block_len = get_shape_rows(src_shape) * sizeof(src_type);
         auto src_stride = get_column_stride(src.layout()) * sizeof(src_type);
         auto dst_stride = get_column_stride(dst.layout()) * sizeof(dst_type);
-        emit_copy(
+        emit_copy<trait>(
             dst, src, dst.layout()(dst_coord), src.layout()(src_coord), block_count, block_len, src_stride, dst_stride,
             params);
     }
@@ -80,7 +80,7 @@ private:
         int64_t src_stride = get_column_stride(src_layout) * sizeof(src_type);
         int64_t dst_stride = get_column_stride(dst_layout) * sizeof(dst_type);
 
-        emit_copy(dst, src, block_count, block_len, src_stride, dst_stride, params);
+        emit_copy<trait>(dst, src, block_count, block_len, src_stride, dst_stride, params);
     }
 };
 
