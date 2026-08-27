@@ -40,9 +40,9 @@ constexpr uint64_t hifloat8_mmad_ctrl_mask = 0x200000000000ULL;
 
 struct arch_version {
     static constexpr uint32_t v3510 = 3510;
-    static constexpr uint32_t v2201 = 2201;
+    static constexpr uint32_t v9201 = 9201;
     static constexpr uint32_t V3510 = 3510;
-    static constexpr uint32_t V2201 = 2201;
+    static constexpr uint32_t V9201 = 9201;
 };
 
 struct get_arch_version {

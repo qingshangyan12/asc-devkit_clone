@@ -23,7 +23,12 @@
 namespace asc {
 namespace te {
 
-struct gm_to_ub_trait {};
+struct gm_to_ub_trait {
+    __aicore__ constexpr gm_to_ub_trait() = default;
+    __aicore__ constexpr gm_to_ub_trait(bool pre_allocation);
+
+    bool pre_allocation = false;
+};
 struct ub_to_l1_trait {};
 struct ub_to_gm_trait {};
 struct ub_to_ub_trait {};
