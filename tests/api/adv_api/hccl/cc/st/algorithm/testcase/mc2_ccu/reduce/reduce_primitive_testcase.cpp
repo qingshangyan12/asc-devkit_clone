@@ -218,7 +218,7 @@ TEST(CcuStReducePrimitive, LocalReduce_BufferArray_GeneratesMultipleOps)
             EXPECT_EQ(op.dataType, HCCL_DATA_TYPE_INT32);
         }
     }
-    EXPECT_EQ(reduceCount, 3U) << "Buffer array LocalReduce should generate 3 LOCAL_REDUCE operations";
+    EXPECT_EQ(reduceCount, 2U) << "Buffer array LocalReduce(3 buffers) should generate 2 LOCAL_REDUCE ops (reduce buf[1],buf[2] into buf[0])";
 }
 
 // ===== 运行时执行验证 =====
