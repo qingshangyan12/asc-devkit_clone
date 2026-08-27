@@ -126,11 +126,28 @@ ScenarioData BuildReduceScatterScenario(const CcuStScenario& scenario, const std
         memory.output.assign(perRankBytes + outputGuard, 0);
         memory.parameter.assign(scratchSize / sizeof(uint64_t), 0);
 
+        const uint32_t elemSize = typeSize;
+        const uint64_t perRankElems = perRankBytes / elemSize;
         for (uint32_t slice = 0; slice < rankSize; ++slice) {
             const uint64_t sliceOffset = inputGuard + static_cast<uint64_t>(slice) * perRankBytes;
-            for (uint64_t byte = 0; byte < perRankBytes; ++byte) {
-                memory.input[sliceOffset + byte] = static_cast<uint8_t>(
-                    (rank + 1) * 10 + (slice + 1) * 3 + static_cast<uint8_t>(byte % 200));
+            for (uint64_t elem = 0; elem < perRankElems; ++elem) {
+                const uint64_t pos = sliceOffset + elem * elemSize;
+                if (scenario.dataType == HCCL_DATA_TYPE_FP16) {
+                    uint16_t bits = static_cast<uint16_t>(0x1000 + (rank << 8) + (slice << 4) + (elem & 0xF));
+                    std::memcpy(&memory.input[pos], &bits, sizeof(uint16_t));
+                } else if (scenario.dataType == HCCL_DATA_TYPE_BFP16) {
+                    uint16_t bits = static_cast<uint16_t>(0x3F00 + (rank << 4) + (slice << 2) + (elem & 0x3));
+                    uint32_t floatBits = static_cast<uint32_t>(bits) << 16;
+                    std::memcpy(&memory.input[pos], &floatBits, sizeof(uint32_t));
+                } else if (scenario.dataType == HCCL_DATA_TYPE_INT32) {
+                    int32_t val = static_cast<int32_t>((rank + 1) * 100 + (slice + 1) * 10 + elem);
+                    std::memcpy(&memory.input[pos], &val, sizeof(int32_t));
+                } else if (scenario.dataType == HCCL_DATA_TYPE_FP32) {
+                    float val = static_cast<float>((rank + 1) * 10 + (slice + 1) * 3 + elem) * 0.1f;
+                    std::memcpy(&memory.input[pos], &val, sizeof(float));
+                } else {
+                    memory.input[pos] = static_cast<uint8_t>((rank + 1) * 10 + (slice + 1) * 3 + (elem % 200));
+                }
             }
         }
 

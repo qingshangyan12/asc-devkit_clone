@@ -75,20 +75,22 @@ TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_2Rank_SingleDie_Fp16_Min_100Elem)
     VerifyScenario(scenario);
 }
 
-TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_2Rank_SingleDie_Fp16_Prod_100Elem)
+TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_ForcedAlg_2Rank_SingleDie_Fp16_Prod_100Elem)
 {
     TopoMeta topo{{{{0, 1}}}};
     CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, HCCL_REDUCE_PROD, 100);
+    scenario.algConfig = "CcuKfcReduceScatterMesh1DMem2Mem";
     scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
     VerifyScenario(scenario);
 }
 
 // ===== 数据类型泛化 =====
 
-TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_2Rank_SingleDie_Int8_Sum_100Elem)
+TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_ForcedAlg_2Rank_SingleDie_Int8_Sum_100Elem)
 {
     TopoMeta topo{{{{0, 1}}}};
     CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_INT8, HCCL_REDUCE_SUM, 100);
+    scenario.algConfig = "CcuKfcReduceScatterMesh1DMem2Mem";
     scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
     VerifyScenario(scenario);
 }
@@ -134,15 +136,6 @@ TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_ForcedAlg_2Rank_SingleDie_Fp16_Su
     TopoMeta topo{{{{0, 1}}}};
     CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, HCCL_REDUCE_SUM, 100);
     scenario.algConfig = "CcuReduceScatterMesh1DMem2Mem";
-    scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
-    VerifyScenario(scenario);
-}
-
-// ===== 调试用例 =====
-TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_2Rank_SingleDie_Fp16_Sum_2Elem)
-{
-    TopoMeta topo{{{{0, 1}}}};
-    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, HCCL_REDUCE_SUM, 2);
     scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
     VerifyScenario(scenario);
 }

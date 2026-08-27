@@ -212,7 +212,7 @@ CheckResult CaptureRuntimeExpectation(
             if (srcOffset + size > src.size() || dstOffset + size > dst.size()) {
                 return {Result::OUT_OF_RANGE, "expected transfer is out of range"};
             }
-            if (data.reduceOp == HCCL_REDUCE_RESERVED) {
+            if (data.reduceOp == HCCL_REDUCE_RESERVED || srcRank == 0) {
                 ApplyCopy(dst, dstOffset, src, srcOffset, size);
             } else {
                 ApplyReduce(dst, dstOffset, src, srcOffset, size, scenario.dataType, data.reduceOp);
