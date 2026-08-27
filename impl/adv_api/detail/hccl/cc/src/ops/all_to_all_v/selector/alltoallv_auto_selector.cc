@@ -33,7 +33,18 @@ SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
         selectAlgName = "AicpuAllToAllVSoleMesh";
         HCCL_INFO("[AlltoAllVAutoSelector] Algo match[%s].", selectAlgName.c_str());
         return SelectorStatus::MATCH;
+    } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
+        // PCIE-SW定制机型，Mesh无法链接全卡时，需要跨pcie链路，不支持ccu模式
+        if (topoInfo->level0PcieMix) {
+            if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
+                selectAlgName = "CcuSchedAllToAllVSoleMesh";
+            } else {
+                HCCL_WARNING("[AlltoAllVAutoSelector] pcie mixed topo is not supported yet for ccu schedule mode.");
+                return SelectorStatus::NOT_MATCH;
+            }
+        }
     }
+
     if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS || topoInfo->topoLevelNums != 1U || topoInfo->level0PcieMix) {
         HCCL_WARNING(
             "[AlltoAllVAutoSelector] rankSize[%u], level0Topo[%u] is not supported by local AICPU AllToAllV.",
