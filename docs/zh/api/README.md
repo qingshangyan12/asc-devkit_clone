@@ -44,7 +44,7 @@
                 -   [GetShapeInfo](SIMD-API/basic_api/data_structures/GlobalTensor/GetShapeInfo.md)
                 -   [SetL2CacheHint](SIMD-API/basic_api/data_structures/GlobalTensor/SetL2CacheHint.md)
                 -   [ReinterpretCast](SIMD-API/basic_api/data_structures/GlobalTensor/ReinterpretCast.md)
-                    
+
         -   [数据结构(TensorAPI，试验特性)](SIMD-API/basic_api/data_structure_TensorAPI/data_structure_TensorAPI.md)
             -   [Layout数据结构](SIMD-API/basic_api/data_structure_TensorAPI/layout_structure/layout_structure.md)
                 -   [Capacity](SIMD-API/basic_api/data_structure_TensorAPI/layout_structure/Capacity.md)
@@ -148,7 +148,7 @@
                 -   [辅助矩阵分形格式详解](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_fractal_intro/aux_cube_fractal_format_details.md)
 
                 </cann-filter>
-            
+
             -   [矩阵计算的搬入](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/cube_compute_load.md)
                 -   [总体说明](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/overall_description.md)
                 -   [矩阵计算输入搬运约束](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/cube_compute_input_move_constraint.md)
@@ -246,7 +246,7 @@
                 -   [SetFixpipeNz2ndFlag](SIMD-API/basic_api/cube_compute_ISASI/cube_store_aux_config/SetFixpipeNz2ndFlag.md)
                 -   [SetFixPipeClipRelu](SIMD-API/basic_api/cube_compute_ISASI/cube_store_aux_config/SetFixPipeClipRelu.md)
                 -   [SetFixPipeAddr](SIMD-API/basic_api/cube_compute_ISASI/cube_store_aux_config/SetFixPipeAddr.md)
-                
+
         -   [矩阵计算（Tensor API，试验特性）](SIMD-API/basic_api/cube_compute_TensorAPI/cube_compute_TensorAPI.md)
             -   [概述](SIMD-API/basic_api/cube_compute_TensorAPI/overview/overview.md)
             -   [矩阵计算的搬入](SIMD-API/basic_api/cube_compute_TensorAPI/cube_compute_load/cube_compute_load.md)
@@ -383,12 +383,12 @@
 
             -   [归约计算](SIMD-API/basic_api/memory_vector_compute/reduction_compute/reduction_compute.md)
                 -   [概述](SIMD-API/basic_api/memory_vector_compute/reduction_compute/Introduction.md)
-                -   [ReduceDataBlock](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceDataBlock.md) 
-                -   [ReduceRepeat](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceRepeat.md)  
-                -   [ReducePairElem](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReducePairElem.md)  
-                -   [ReduceMax](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMax.md)  
-                -   [ReduceMin](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMin.md)  
-                -   [ReduceSum](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceSum.md)  
+                -   [ReduceDataBlock](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceDataBlock.md)
+                -   [ReduceRepeat](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceRepeat.md)
+                -   [ReducePairElem](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReducePairElem.md)
+                -   [ReduceMax](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMax.md)
+                -   [ReduceMin](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceMin.md)
+                -   [ReduceSum](SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceSum.md)
 
             -   [归约计算辅助配置接口](SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/reduction_compute_aux_config.md)
                 -   [GetReduceRepeatSumSpr\(ISASI\)](SIMD-API/basic_api/memory_vector_compute/reduction_compute_aux_config/GetReduceRepeatSumSpr_ISASI.md)
@@ -571,7 +571,6 @@
             -   [CountLeadingZero](SIMD-API/basic_api/scalar_compute/CountLeadingZero.md)
             -   [CountBitsCntSameAsSignBit](SIMD-API/basic_api/scalar_compute/CountBitsCntSameAsSignBit.md)
             -   [GetSFFValue](SIMD-API/basic_api/scalar_compute/GetSFFValue.md)
-            -   [CeilDivision](SIMD-API/basic_api/scalar_compute/CeilDivision.md)
             -   [Cast（float转half/int32\_t）](SIMD-API/basic_api/scalar_compute/Cast_float_to_half_int32.md)
             -   [Cast（float转bfloat16\_t）](SIMD-API/basic_api/scalar_compute/Cast_float_to_bfloat16.md)
             -   [Cast（多类型转float）](SIMD-API/basic_api/scalar_compute/Cast_multi_type_to_float.md)
@@ -815,8 +814,8 @@
             -   [REGISTER\_TILING\_DEFAULT](SIMD-API/basic_api/Kernel-Tiling/REGISTER_TILING_DEFAULT.md)
             -   [REGISTER\_TILING\_FOR\_TILINGKEY](SIMD-API/basic_api/Kernel-Tiling/REGISTER_TILING_FOR_TILINGKEY.md)
             -   [REGISTER\_NONE\_TILING](SIMD-API/basic_api/Kernel-Tiling/REGISTER_NONE_TILING.md)
-            -   [设置Kernel类型](SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)
-        
+            -   [设置核函数（Kernel）类型](SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)
+
         -   [特殊寄存器访问](SIMD-API/basic_api/special_register_access/special_register_access.md)
             -   [GetSpr](SIMD-API/basic_api/special_register_access/GetSpr.md)
             -   [ClearSpr](SIMD-API/basic_api/special_register_access/ClearSpr.md)
@@ -1057,6 +1056,7 @@
                 -   [asc_abs_sub](SIMD-API/c_api/reg/compound_compute/asc_abs_sub.md)
                 -   [asc_axpy](SIMD-API/c_api/reg/compound_compute/asc_axpy.md)
                 -   [asc_fma](SIMD-API/c_api/reg/compound_compute/asc_fma.md)
+                -   [asc_mula](SIMD-API/c_api/reg/compound_compute/asc_mula.md)
                 -   [asc_madd](SIMD-API/c_api/reg/compound_compute/asc_madd.md)
                 -   [asc_exp_sub（废弃）](SIMD-API/c_api/reg/compound_compute/asc_exp_sub_deprecated.md)
             -   [逻辑计算](SIMD-API/c_api/reg/logic_compute/logic_compute.md)
@@ -1297,14 +1297,14 @@
         -   [系统变量](SIMD-API/c_api/sys_var/system_variables.md)
             -   [asc_get_arch_ver](SIMD-API/c_api/sys_var/asc_get_arch_ver.md)
             -   [asc_get_squeeze_status](SIMD-API/c_api/sys_var/asc_get_squeeze_status.md)
-            -   [asc_get_block_idx](SIMD-API/c_api/sys_var/asc_get_block_idx.md)
-            -   [asc_get_block_num](SIMD-API/c_api/sys_var/asc_get_block_num.md)
             -   [asc_get_core_id](SIMD-API/c_api/sys_var/asc_get_core_id.md)
             -   [asc_get_ctrl](SIMD-API/c_api/sys_var/asc_get_ctrl.md)
             -   [asc_get_ffts_base_addr](SIMD-API/c_api/sys_var/asc_get_ffts_base_addr.md)
             -   [asc_get_phy_buf_addr](SIMD-API/c_api/sys_var/asc_get_phy_buf_addr.md)
             -   [asc_get_phy_stack_base](SIMD-API/c_api/sys_var/asc_get_phy_stack_base.md)
             -   [asc_get_program_counter](SIMD-API/c_api/sys_var/asc_get_program_counter.md)
+            -   [asc_get_saturation_flag](SIMD-API/c_api/sys_var/asc_get_saturation_flag.md)
+            -   [asc_get_saturation_strategy](SIMD-API/c_api/sys_var/asc_get_saturation_strategy.md)
             -   [asc_get_smmu_tag_version](SIMD-API/c_api/sys_var/asc_get_smmu_tag_version.md)
             -   [asc_get_status](SIMD-API/c_api/sys_var/asc_get_status.md)
             -   [asc_get_sub_block_id](SIMD-API/c_api/sys_var/asc_get_sub_block_id.md)
@@ -1320,6 +1320,8 @@
             -   [asc_set_l0c2gm_relu_alpha](SIMD-API/c_api/sys_var/asc_set_l0c2gm_relu_alpha.md)
             -   [asc_set_l12l0_padding_val](SIMD-API/c_api/sys_var/asc_set_l12l0_padding_val.md)
             -   [asc_set_l3d_rpt_b](SIMD-API/c_api/sys_var/asc_set_l3d_rpt_b.md)
+            -   [asc_set_saturation_flag](SIMD-API/c_api/sys_var/asc_set_saturation_flag.md)
+            -   [asc_set_saturation_strategy](SIMD-API/c_api/sys_var/asc_set_saturation_strategy.md)
             -   [指令发射队列空闲槽位查询](SIMD-API/c_api/sys_var/asc_get_pipe_idle_slot_count.md)
             -   [asc_get_ar_spr（废弃）](SIMD-API/c_api/sys_var/asc_get_ar_spr_deprecated.md)
         -   [缓存控制](SIMD-API/c_api/cache_ctrl/cache_control.md)
@@ -1327,7 +1329,10 @@
             -   [asc_dcci](SIMD-API/c_api/cache_ctrl/asc_dcci.md)
             -   [asc_dci](SIMD-API/c_api/cache_ctrl/asc_dci.md)
             -   [asc_get_icache_preload_status](SIMD-API/c_api/cache_ctrl/asc_get_icache_preload_status.md)
+            -   [asc_get_scalar_load_cache_mode](SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md)
+            -   [asc_get_scalar_store_cache_mode](SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md)
             -   [asc_icache_preload](SIMD-API/c_api/cache_ctrl/asc_icache_preload.md)
+            -   [asc_set_scalar_cache_mode](SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md)
         -   [原子操作](SIMD-API/c_api/simd_atomic/atomic_operations.md)
             -   [asc_get_store_atomic_config](SIMD-API/c_api/simd_atomic/asc_get_store_atomic_config.md)
             -   [asc_set_atomic_add](SIMD-API/c_api/simd_atomic/asc_set_atomic_add.md)
@@ -1340,13 +1345,23 @@
             -   [asc_set_store_atomic_config_v2（废弃）](SIMD-API/c_api/simd_atomic/asc_set_store_atomic_config_v2_deprecated.md)
         -   [其他操作](SIMD-API/c_api/misc/other_operations.md)
             -   [asc_init](SIMD-API/c_api/misc/asc_init.md)
+            -   [asc_nop](SIMD-API/c_api/misc/asc_nop.md)
         -   [枚举类型](SIMD-API/c_api/enum/enum_types.md)
             -   [asc_hf32_round_mode](SIMD-API/c_api/enum/asc_hf32_round_mode.md)
             -   [asc_load_l2_cache_mode](SIMD-API/c_api/enum/asc_load_l2_cache_mode.md)
+            -   [asc_override_strategy](SIMD-API/c_api/enum/asc_override_strategy.md)
+            -   [asc_saturation_mode](SIMD-API/c_api/enum/asc_saturation_mode.md)
             -   [asc_store_l2_cache_mode](SIMD-API/c_api/enum/asc_store_l2_cache_mode.md)
         -   [废弃接口](SIMD-API/c_api/deprecated_interface/deprecated_interface.md)
+            -   [asc_get_block_idx（废弃）](SIMD-API/c_api/deprecated_interface/asc_get_block_idx_deprecated.md)
+            -   [asc_get_block_num（废弃）](SIMD-API/c_api/deprecated_interface/asc_get_block_num_deprecated.md)
             -   [asc_set_atomic_add_int（废弃）](SIMD-API/c_api/deprecated_interface/asc_set_atomic_add_int_deprecated.md)
             -   [asc_abs_sync（废弃）](SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md)
+            -   [asc_float2bfloat16（废弃）](SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md)
+            -   [asc_int322int16（废弃）](SIMD-API/c_api/deprecated_interface/asc_int322int16_deprecated.md)
+            -   [asc_int322int64（废弃）](SIMD-API/c_api/deprecated_interface/asc_int322int64_deprecated.md)
+            -   [asc_int322uint16（废弃）](SIMD-API/c_api/deprecated_interface/asc_int322uint16_deprecated.md)
+            -   [asc_uint82uint16（废弃）](SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md)
 
     -   [高阶API](SIMD-API/adv_api/adv_api.md)
         -   [高阶API列表](SIMD-API/adv_api/adv_api_list.md)
@@ -1597,7 +1612,7 @@
             -   [更多样例](SIMD-API/adv_api/math_compute/more_examples.md)
 
         -   [矩阵计算](SIMD-API/adv_api/cube_compute/cube_compute.md)
-            -   [Matmul Kernel侧接口](SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_Kernel.md)
+            -   [Matmul核函数（Kernel）侧接口](SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_Kernel.md)
                 -   [Matmul使用说明](SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_usage.md)
                 -   [Matmul模板参数](SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_template_params.md)
                 -   [MatmulConfig](SIMD-API/adv_api/cube_compute/Matmul_Kernel/MatmulConfig.md)
@@ -1874,7 +1889,7 @@
             -   [Fill](SIMD-API/adv_api/tensor_transform/Fill.md)
 
         -   [HCCL通信类](SIMD-API/adv_api/HCCL_communication/HCCL_communication.md)
-            -   [HCCL Kernel侧接口](SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/HCCL_Kernel.md)
+            -   [HCCL核函数（Kernel）侧接口](SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/HCCL_Kernel.md)
                 -   [HCCL使用说明](SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/HCCL_usage.md)
                 -   [HCCL模板参数](SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/HCCL_template_params.md)
                 -   [InitV2](SIMD-API/adv_api/HCCL_communication/HCCL_Kernel/InitV2.md)
@@ -1926,7 +1941,7 @@
                 -   [GetHcclContext](SIMD-API/adv_api/HCCL_communication/HCCL-Context/GetHcclContext.md)
 
         -   [卷积计算](SIMD-API/adv_api/convolution_compute/convolution_compute.md)
-            -   [Conv3D Kernel侧接口](SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/Conv3d_Kernel.md)
+            -   [Conv3D核函数（Kernel）侧接口](SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/Conv3d_Kernel.md)
                 -   [Conv3D使用说明](SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/Conv3D_usage.md)
                 -   [Conv3D模板参数](SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/Conv3D_template_params.md)
                 -   [Init](SIMD-API/adv_api/convolution_compute/Conv3D_Kernel/Init.md)
@@ -1956,7 +1971,7 @@
                 -   [SetStride](SIMD-API/adv_api/convolution_compute/Conv3D_Tiling/SetStride.md)
                 -   [SetGroups](SIMD-API/adv_api/convolution_compute/Conv3D_Tiling/SetGroups.md)
 
-            -   [Conv3DBackpropInput Kernel侧接口](SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/Conv3DBackpropInput_Kernel.md)
+            -   [Conv3DBackpropInput核函数（Kernel）侧接口](SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/Conv3DBackpropInput_Kernel.md)
                 -   [Conv3DBackpropInput使用说明](SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/Conv3DBackpropInput_usage.md)
                 -   [Init](SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/Init.md)
                 -   [SetGradOutput](SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Kernel/SetGradOutput.md)
@@ -1983,7 +1998,7 @@
                 -   [SetDilation](SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Tiling/SetDilation.md)
                 -   [SetOutputPadding](SIMD-API/adv_api/convolution_compute/Conv3DBackpropInput_Tiling/SetOutputPadding.md)
 
-            -   [Conv3DBackpropFilter Kernel侧接口](SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/Conv3DBackpropFilter_Kernel.md)
+            -   [Conv3DBackpropFilter核函数（Kernel）侧接口](SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/Conv3DBackpropFilter_Kernel.md)
                 -   [Conv3DBackpropFilter使用说明](SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/Conv3DBackpropFilter_usage.md)
                 -   [Init](SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/Init.md)
                 -   [SetInput](SIMD-API/adv_api/convolution_compute/Conv3DBackpropFilter_Kernel/SetInput.md)
@@ -2022,7 +2037,7 @@
             -   [内置数据类型](SIMT-API/SIMT_programming_intro/extended_syntax/builtin_data_types.md)
             -   [内置变量](SIMT-API/SIMT_programming_intro/extended_syntax/builtin_variables.md)
             -   [内置宏](SIMT-API/SIMT_programming_intro/extended_syntax/builtin_macros.md)
-            -   [核函数配置](SIMT-API/SIMT_programming_intro/extended_syntax/kernel_function_config.md)
+            -   [核函数（Kernel）配置](SIMT-API/SIMT_programming_intro/extended_syntax/kernel_function_config.md)
 
         -   [API列表](SIMT-API/SIMT_programming_intro/api_list.md)
 
@@ -2034,7 +2049,7 @@
             -   [内置数据类型](SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/builtin_data_types.md)
             -   [内置变量](SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/builtin_variables.md)
             -   [内置宏](SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/builtin_macros.md)
-            -   [核函数配置](SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config.md)
+            -   [核函数（Kernel）配置](SIMT-API/SIMD_SIMT_hybrid_programming_intro/extended_syntax/kernel_function_config.md)
 
         -   [API列表](SIMT-API/SIMD_SIMT_hybrid_programming_intro/api_list.md)
 
@@ -2745,7 +2760,7 @@
         -   [协作组简介](SIMT-API/cooperative_groups/cooperative_groups_intro.md)
         -   [grid_group](SIMT-API/cooperative_groups/grid_group/grid_group.md)
             -   [grid_group简介](SIMT-API/cooperative_groups/grid_group/grid_group_intro.md)
-            -   [grid_group_constructor](SIMT-API/cooperative_groups/grid_group/grid_group_constructor.md)
+            -   [grid_group构造函数](SIMT-API/cooperative_groups/grid_group/grid_group_constructor.md)
             -   [is_valid](SIMT-API/cooperative_groups/grid_group/is_valid.md)
             -   [sync](SIMT-API/cooperative_groups/grid_group/sync.md)
             -   [thread_rank](SIMT-API/cooperative_groups/grid_group/thread_rank.md)
@@ -2817,6 +2832,7 @@
             -   [abs](Utils-API/cpp_stdlib/math_functions/abs.md)
             -   [sqrt](Utils-API/cpp_stdlib/math_functions/sqrt.md)
             -   [ceil\_div](Utils-API/cpp_stdlib/math_functions/ceil_div.md)
+            -   [CeilDivision](Utils-API/cpp_stdlib/math_functions/CeilDivision.md)
 
         -   [容器函数](Utils-API/cpp_stdlib/container_functions/container_functions.md)
             -   [tuple](Utils-API/cpp_stdlib/container_functions/tuple.md)

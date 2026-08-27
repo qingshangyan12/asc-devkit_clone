@@ -1,5 +1,5 @@
 # AI Core编译基本用法<a name="section229217121411"></a>
-当开发者完成一个Kernel核函数的编写，并在Host侧通过<<<\>\>\>方式完成核函数的启动调用后，就需要进行算子源码编译与算子运行，接下来我们介绍通过bisheng编译器完成算子编译的基本用法。
+当开发者完成一个核函数（Kernel）的编写，并在Host侧通过<<<\>\>\>方式完成核函数（Kernel）的启动调用后，就需要进行算子源码编译与算子运行，接下来我们介绍通过bisheng编译器完成算子编译的基本用法。
 
 ## AI Core SIMD编译
 使用bisheng编译Ascend C源文件的基本命令如下，其中--npu-arch=dav-\<npu architecture\>用于指定AI处理器架构版本：
@@ -18,7 +18,7 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
 - 异构编译，完整样例请参考[LINK](../../../../../../examples/01_simd_cpp_api/02_features/04_compile/00_basic_compile/README.md)。
   ```shell
   // ----- add_kernel.asc -----
-  //  指定核函数在AI Core上执行
+  //  指定核函数（Kernel）在AI Core上执行
   __global__ __vector__ add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 
   bisheng -c add_kernel.asc -o add_kernel.o --npu-arch=dav-xxxx
@@ -114,10 +114,41 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 | -O | 否 | 用于指定编译器的优化级别，当前支持-O3，-O2，-O0。 |
 | --run-mode=sim | 否 | sim模式：链接时用户添加仿真模式对应的实现库，实现代码在仿真模式下运行，可以查看仿真相关日志，方便用户性能调试。 |
 | --enable-simt | 否 | SIMT编程场景，指定SIMT方式编译。设置编译选项`--enable-simt`时，若包含[SIMD API](../../../../api/SIMD-API/SIMD-API.md)的头文件会导致编译失败。 |
-| --cce-disable-asc-reserved-ubuf | 否 | 禁用Ascend C接口使用预留UB空间。开启后，依赖预留UB空间的Ascend C接口在对应芯片架构下不可用，使用时编译报错。使用预留UB空间的API列表参考：[使用预留UB空间的API](../../programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md#使用预留ub空间的api范围)。由于同一API使用预留UB空间的情况在不同NPU架构下有差异，开启该编译选项后，需要手动调整API调用方式或替换为不依赖预留UB空间的实现，才能完成兼容性迁移。 |
+| --cce-disable-asc-reserved-ubuf | 否 | 禁用Ascend C接口使用预留Unified Buffer（UB）空间。开启后，依赖预留UB空间的Ascend C接口在对应芯片架构下不可用，使用时编译报错。使用预留UB空间的API列表参考：[使用预留UB空间的API](../../programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md#使用预留ub空间的api范围)。由于同一API使用预留UB空间的情况在不同NPU架构下有差异，开启该编译选项后，需要手动调整API调用方式或替换为不依赖预留UB空间的实现，才能完成兼容性迁移。 |
 | --cce-disable-vf-stack-reserved-ubuf | 否 | 禁用SIMD VF栈预留的UB空间。开启后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用。针对 [NPU架构版本2201](../../language_extension/simd_builtin_keywords.md#npu-arch)，此编译选项无实际效果；针对 [NPU架构版本3510](../../language_extension/simd_builtin_keywords.md#npu-arch)，此编译选项生效，当用户使用此编译选项后，编译器将无法使用预留的UB空间进行寄存器溢出的缓存，需要用户保证寄存器不溢出。 |
 | --cce-auto-sync | 否 | 开启毕昇编译器自动同步。AI Core内部的执行单元是异步并行的，Tensor的读写可能存在数据依赖，开启后可由毕昇编译器自动插入部分同步。详细内容请参考[关键特性说明](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/key_features.md)。 |
 | --cce-auto-sync-log=&lt;file&gt; | 否 | 输出毕昇编译器自动同步插入信息到&lt;file&gt;文件中。 |
+| --cce-ftz=false/true | 否 | 控制非规格化数（极小数）的处理方式。 true表示将非规格化数直接刷新为0，可提升性能；false表示保留，精度更高但可能更慢，默认true。当前只支持SIMT。 |
+| --cce-prec-div=false/true | 否 | 是否使用精确的除法计算，默认为false。当前只支持SIMT。 |
+| --cce-prec-sqrt=false/true | 否 | 是否使用精确的平方根函数，默认false。当前只支持SIMT。 |
+| --cce-use-fast-math=false/true | 否 | 是否开启快速计算模式，开启时相当于--cce-ftz=true --cce-prec-div=false --cce-prec-sqrt=false（若有冲突，以--cce-ftz，--cce-prec-div，--cce-prec-sqrt设置的为准）。当前只支持SIMT。 |
+
+>[!NOTE]说明
+><!-- npu="A3,910b,910,310p,310b" id13 -->
+>- 针对如下产品：不支持使用编译选项：--cce-ftz，--cce-prec-div，--cce-prec-sqrt，--cce-use-fast-math。<br><br>
+>    <!-- npu="A3" id18 -->
+>    Atlas A3 训练系列产品/Atlas A3 推理系列产品
+>    <!-- end id18 -->
+>
+>    <!-- npu="910b" id14 -->
+>    Atlas A2 训练系列产品/Atlas A2 推理系列产品  
+>    <!-- end id14 -->
+>
+>    <!-- npu="310b" id15 -->
+>    Atlas 200I/500 A2 推理产品  
+>    <!-- end id15 -->
+>
+>    <!-- npu="310p" id16 -->
+>    Atlas 推理系列产品  
+>    <!-- end id16 -->
+>
+>    <!-- npu="910" id17 -->
+>    Atlas 训练系列产品<br><br> 
+>    <!-- end id17 -->
+><!-- end id13 -->
+><!-- npu="950" id19 -->
+>- 针对Ascend 950PR/Ascend 950DT，支持使用编译选项：--cce-ftz，--cce-prec-div，--cce-prec-sqrt，--cce-use-fast-math。
+><!-- end id19 -->
 
 更多的编译命令和用法可以参见[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
 

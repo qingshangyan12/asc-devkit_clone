@@ -7,7 +7,7 @@ The Ascend C documentation system consists of five core documents. Developers ca
 | Document | Content | Directory |
 |----------|---------|-----------|
 | Getting Started Tutorial | Ascend C overview, environment setup, quick-start hands-on (HelloWorld, first operator) | `docs/zh/guide/getting_started` |
-| Programming Guide | Programming models, programming paradigms, compilation & execution, hardware architecture, advanced programming | `docs/zh/guide/编程指南` |
+| Programming Guide | Programming models, programming paradigms, compilation & execution, hardware architecture, advanced programming | `docs/zh/guide/programming_guide` |
 | API Reference Manual | Interface parameters, constraints, examples, API associations | `docs/zh/api/` |
 | Operator Practice Reference | Operator implementation, performance optimization, tuning cases | `docs/zh/guide/operator_practice/` |
 | Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/zh/guide/cross_gen_migration_guide/` |
@@ -202,7 +202,7 @@ For Ascend 950PR/Ascend 950DT products:
 
 **Requirements**:
 - When different products use different layout formats (e.g., Zz vs Nz), **separate tables are required**
-- Physical location uses Buffer names (L0A/L0B/L0C/UB, etc.)
+- Physical location uses Buffer names, such as L0A Buffer, L0B Buffer, L0C Buffer, and Unified Buffer (UB)
 - Format uses fractal layout names (Zz/Zn/Nz/ND, etc.)
 - If a bias matrix exists, annotate in the C matrix row: "Can support bias matrix Bias initialization, dimension 1 x N"
 
