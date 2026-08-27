@@ -116,6 +116,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
                 "temp1Channels.size()[%zu]",
                 temp0Channels.size(), temp1Channels.size()),
             HcclResult::HCCL_E_INTERNAL);
+        resourceRequest.channels.resize(1);
         resourceRequest.channels[0].insert(
             resourceRequest.channels[0].end(), temp0Channels.begin(), temp0Channels.end());
         resourceRequest.channels[0].insert(
