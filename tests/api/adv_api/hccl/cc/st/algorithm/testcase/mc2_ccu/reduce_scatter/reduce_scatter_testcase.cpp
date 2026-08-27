@@ -139,3 +139,86 @@ TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_ForcedAlg_2Rank_SingleDie_Fp16_Su
     scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
     VerifyScenario(scenario);
 }
+
+// ===== 多 rank Reduce 操作类型泛化 =====
+
+TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_4Rank_SingleDie_Fp16_Max_64Elem)
+{
+    TopoMeta topo{{{{0, 1, 2, 3}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, HCCL_REDUCE_MAX, 64);
+    scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_4Rank_SingleDie_Fp16_Min_64Elem)
+{
+    TopoMeta topo{{{{0, 1, 2, 3}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, HCCL_REDUCE_MIN, 64);
+    scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_8Rank_SingleDie_Fp16_Max_32Elem)
+{
+    TopoMeta topo{{{{0, 1, 2, 3, 4, 5, 6, 7}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, HCCL_REDUCE_MAX, 32);
+    scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_8Rank_SingleDie_Fp16_Min_32Elem)
+{
+    TopoMeta topo{{{{0, 1, 2, 3, 4, 5, 6, 7}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_FP16, HCCL_REDUCE_MIN, 32);
+    scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_4Rank_SingleDie_Int32_Sum_64Elem)
+{
+    TopoMeta topo{{{{0, 1, 2, 3}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_INT32, HCCL_REDUCE_SUM, 64);
+    scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
+    VerifyScenario(scenario);
+}
+
+TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_8Rank_SingleDie_Int32_Sum_32Elem)
+{
+    TopoMeta topo{{{{0, 1, 2, 3, 4, 5, 6, 7}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_INT32, HCCL_REDUCE_SUM, 32);
+    scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
+    VerifyScenario(scenario);
+}
+
+// ===== BFP16 数据类型 =====
+
+TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_2Rank_SingleDie_Bfp16_Sum_100Elem)
+{
+    TopoMeta topo{{{{0, 1}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_BFP16, HCCL_REDUCE_SUM, 100);
+    scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
+    VerifyScenario(scenario);
+}
+
+// ===== 多次迭代（大数据分块） =====
+
+TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_2Rank_SingleDie_Int32_Sum_MultiIter)
+{
+    // chunkSize = 16MB/2 = 8MB. perRankBytes = count*4/2 = count*2.
+    // For multi-iteration: count*2 > 8MB → count > 4M. Use 4194305 (8MB+4 bytes).
+    TopoMeta topo{{{{0, 1}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_INT32, HCCL_REDUCE_SUM, 4194305);
+    scenario.algConfig = "CcuKfcReduceScatterMesh1DMem2Mem";
+    scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
+    VerifyScenario(scenario);
+}
+
+// ===== 边界条件 =====
+
+TEST_F(CcuStReduceScatter, ReduceScatterMesh1D_2Rank_SingleDie_Int32_Sum_1Elem)
+{
+    TopoMeta topo{{{{0, 1}}}};
+    CcuStScenario scenario = MakeScenario(topo, HCCL_DATA_TYPE_INT32, HCCL_REDUCE_SUM, 1);
+    scenario.expectedAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
+    VerifyScenario(scenario);
+}

@@ -164,8 +164,17 @@ ScenarioData BuildReduceScatterScenario(const CcuStScenario& scenario, const std
         cfg.token = 0x2000U + rank;
         cfg.scratchAddress = memory.ParameterAddress();
         cfg.currentRankSliceInputOffset = static_cast<uint64_t>(rank) * perRankBytes;
-        cfg.tailSize = perRankBytes;
-        cfg.repeatNum = UINT64_MAX - 1; // single iteration
+
+        // Calculate iteration count: kernel processes chunkSize bytes per iteration (last uses tailSize)
+        const uint64_t effectiveChunk = (perRankBytes > chunkSize) ? chunkSize : perRankBytes;
+        const uint64_t numIter = (perRankBytes + effectiveChunk - 1) / effectiveChunk;
+        if (numIter <= 1) {
+            cfg.tailSize = perRankBytes;
+            cfg.repeatNum = UINT64_MAX - 1; // single iteration
+        } else {
+            cfg.tailSize = perRankBytes - (numIter - 1) * effectiveChunk;
+            cfg.repeatNum = UINT64_MAX - numIter;
+        }
 
         data.launches[rank] = RankLaunch{handles[rank], PrepareReduceScatterTaskArgs(cfg), &memory};
     }
