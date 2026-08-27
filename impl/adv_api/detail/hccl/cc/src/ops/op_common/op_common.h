@@ -40,7 +40,8 @@ HcclResult HcclCalcTopoInfo(HcclComm comm, OpParam& param, std::unique_ptr<TopoI
 
 HcclResult HcclGetAlgRes(
     HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor, TopoInfoWithNetLayerDetails* topoInfo,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxSequence, bool& isResourceReused);
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxSequence, bool& isResourceReused,
+    const std::string& algName);
 
 HcclResult GetAlgResAICPU(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,

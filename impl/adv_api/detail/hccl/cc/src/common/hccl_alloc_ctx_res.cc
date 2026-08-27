@@ -786,10 +786,12 @@ static HcclResult AcquireAlgResources(
             missionNum, resCtxHost->kfcServerArgSize, static_cast<unsigned long long>(opResCtx.xnAddr),
             static_cast<unsigned long long>(opResCtx.ckeAddr));
 
-        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+        CHK_RET(
+            HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused, opParam.algName));
         opParam.resCtx = *resCtxOut;
     } else {
-        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+        CHK_RET(
+            HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused, opParam.algName));
         opParam.resCtx = *resCtxOut;
     }
     HCCL_INFO("[AcquireAlgResources]end AcquireAlgResources!");
@@ -826,7 +828,7 @@ HcclResult GetOpParamResCtx(
         CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
-    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused, opParam.algName));
     CHK_PTR_NULL(*resCtxOut);
     opParam.cacheValid = isResourceReused;
     opParam.resCtx = *resCtxOut;
