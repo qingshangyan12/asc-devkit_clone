@@ -13,6 +13,7 @@
 #include "sim_channel_manager.h"
 #include "log.h"
 #include "sim_channel_exchange_handler.h"
+#include "ccu_kernel_proxy.h"
 
 using namespace std;
 
@@ -81,6 +82,8 @@ HcclResult SimChannelMgr::ChannelCommCreate(
 
     for (int i = 0; i < tmpChannels.size(); i++) {
         channelList[i] = reinterpret_cast<ChannelHandle>(tmpChannels[i].get());
+        HcclSim::CcuSt::RegisterManager::RegisterChannelMap(
+            channelList[i], tmpChannels[i]->GetLocRankId(), tmpChannels[i]->GetRmtRankId());
     }
     return HCCL_SUCCESS;
 }
