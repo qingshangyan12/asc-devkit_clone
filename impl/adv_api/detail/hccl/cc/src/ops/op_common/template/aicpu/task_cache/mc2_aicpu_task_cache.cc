@@ -166,7 +166,8 @@ bool RequiresAicpuReduction(const OpParam& param)
 
 bool IsSupportedProtocol(CommProtocol protocol)
 {
-    return protocol == CommProtocol::COMM_PROTOCOL_UBC_CTP || protocol == CommProtocol::COMM_PROTOCOL_UBC_TP;
+    return protocol == CommProtocol::COMM_PROTOCOL_UBC_CTP || protocol == CommProtocol::COMM_PROTOCOL_UBC_TP ||
+           protocol == CommProtocol::COMM_PROTOCOL_PCIE;
 }
 
 void SetBypass(Mc2AicpuTaskCachePlan& plan, const char* reason)
