@@ -13,6 +13,10 @@
 #define __UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_MASK_REG_COMPUTE_H__
 #endif
 
+/*!
+ * \file mask_reg_compute.h
+ * \brief Register mask construction and update interfaces.
+ */
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_MASK_REG_COMPUTE_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_MASK_REG_COMPUTE_H
 
@@ -23,15 +27,36 @@ namespace asc {
 namespace te {
 namespace experimental {
 
+/**
+ * @brief Creates a register mask with the specified pattern for an element type.
+ * @return A register mask containing the selected pattern.
+ * @note Supported element widths are 8, 16, and 32 bits.
+ */
 template <mask_pattern Pattern = mask_pattern::all, typename DataType>
 __simd_callee__ inline reg_tensor<bool> make_mask();
 
+/**
+ * @brief Creates a register mask with all lanes enabled for an element type.
+ * @return A register mask with all lanes enabled.
+ * @note Supported element widths are 8, 16, and 32 bits.
+ */
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> all_mask();
 
+/**
+ * @brief Creates a register mask with all lanes disabled for an element type.
+ * @return A register mask with all lanes disabled.
+ * @note Supported element widths are 8, 16, and 32 bits.
+ */
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> none_mask();
 
+/**
+ * @brief Creates a mask for a vector iteration and updates the remaining element count.
+ * @param remain Element count used to create the mask and updated for the subsequent call.
+ * @return A register mask enabling the elements processed by the current iteration.
+ * @note Supported element widths are 8, 16, and 32 bits.
+ */
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 
