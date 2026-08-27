@@ -21,7 +21,7 @@ protected:
 };
 
 #define TEST_ASC_SYNC_BLOCK_WAIT(coreType, pipeVal)                                                 \
-    void asc_sync_block_wait_stub_##coreType##_##pipeVal(int64_t flagID) { EXPECT_EQ(33, flagID); } \
+    void asc_sync_block_wait_stub_##coreType##_##pipeVal(int64_t flag_id) { EXPECT_EQ(33, flag_id); } \
                                                                                                     \
     TEST_F(TestSyncBlkWait, sync_block_wait_##coreType##_##pipeVal)                                 \
     {                                                                                               \
@@ -31,9 +31,9 @@ protected:
             .will(invoke(asc_sync_block_wait_stub_##coreType##_##pipeVal));                         \
                                                                                                     \
         pipe_t pipe = pipeVal;                                                                      \
-        int64_t flagID = 33;                                                                        \
+        uint16_t flag_id = 33;                                                                      \
                                                                                                     \
-        asc_sync_block_wait(pipe, flagID);                                                          \
+        asc_sync_block_wait(pipe, flag_id);                                                         \
         GlobalMockObject::verify();                                                                 \
     }
 

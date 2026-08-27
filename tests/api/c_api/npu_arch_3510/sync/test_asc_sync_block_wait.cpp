@@ -20,21 +20,21 @@ protected:
 };
 
 #define TEST_ASC_SYNC_BLOCK_WAIT_BY_PIPE(coreType, pipeVal)                                 \
-    void wait_flag_dev_block_mode_stub_##coreType##_##pipeVal(pipe_t pipe, int64_t flag_id) \
+    void wait_flag_dev_block_mode_stub_##coreType##_##pipeVal(pipe_t pipe, uint16_t flag_id) \
     {                                                                                       \
         EXPECT_EQ(pipe, pipeVal);                                                           \
-        EXPECT_EQ(flag_id, static_cast<int64_t>(11));                                       \
+        EXPECT_EQ(flag_id, static_cast<uint16_t>(11));                                       \
     }                                                                                       \
                                                                                             \
     TEST_F(TEST_ASC_SYNC_BLOCK_WAIT, TEST_ASC_SYNC_BLOCK_WAIT_##coreType##_##pipeVal)       \
     {                                                                                       \
         g_coreType = coreType;                                                              \
-        MOCKER_CPP(wait_flag_dev, void(pipe_t, int64_t))                                    \
+        MOCKER_CPP(wait_flag_dev, void(pipe_t, uint16_t))                                    \
             .times(1)                                                                       \
             .will(invoke(wait_flag_dev_block_mode_stub_##coreType##_##pipeVal));            \
                                                                                             \
         pipe_t pipe = pipeVal;                                                              \
-        int64_t flag_id = static_cast<int64_t>(11);                                         \
+        uint16_t flag_id = static_cast<uint16_t>(11);                                         \
                                                                                             \
         asc_sync_block_wait(pipe, flag_id);                                                 \
         GlobalMockObject::verify();                                                         \

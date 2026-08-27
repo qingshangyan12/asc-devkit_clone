@@ -39,7 +39,7 @@ protected:
             .times(1)                                                                                             \
             .will(invoke(sync_subblock_arrive_3510_ffts_cross_core_sync_stub_##coreType##_##pipeVal));            \
         pipe_t pipe = pipeVal;                                                                                    \
-        int64_t flag_id = 2;                                                                                      \
+        uint16_t flag_id = 2;                                                                                      \
         asc_sync_subblock_arrive(pipe, flag_id);                                                                  \
         GlobalMockObject::verify();                                                                               \
     }

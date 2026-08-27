@@ -41,23 +41,23 @@ __aicore__ inline void asc_sync_mte2(int id);
 
 __aicore__ inline void asc_sync();
 
-__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, int64_t flag_id);
+__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint16_t flag_id);
 
-__aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, int64_t flag_id);
+__aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, uint16_t flag_id);
 
-__aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id);
+__aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, uint16_t flag_id);
 
 __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
 
-__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id);
+__aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint16_t flag_id);
 
-__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id);
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint16_t flag_id);
 
-__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id);
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, uint16_t flag_id);
 
-__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id);
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint16_t flag_id);
 
-__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id);
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, uint16_t flag_id);
 
 __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id);
 

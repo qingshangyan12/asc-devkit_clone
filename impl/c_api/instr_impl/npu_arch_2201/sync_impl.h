@@ -60,31 +60,31 @@ __aicore__ inline void asc_sync_mte2(int id) { asc_sync_mte2_impl(id); }
 
 __aicore__ inline void asc_sync() { asc_sync_impl(); }
 
-__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, uint16_t flag_id)
 {
     asc_sync_block_arrive_impl(pipe, flag_id);
 }
 
-__aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, uint16_t flag_id)
 {
     asc_sync_subblock_arrive_impl(pipe, flag_id);
 }
 
-__aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, uint16_t flag_id)
 {
     asc_sync_inter_arrive_impl(pipe, flag_id);
 }
 
 __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg) { asc_sync_data_barrier_impl(arg); }
 
-__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, uint16_t flag_id)
 {
     asc_sync_subblock_wait_impl(pipe, flag_id);
 }
 
-__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id) { asc_sync_block_wait_impl(pipe, flag_id); }
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, uint16_t flag_id) { asc_sync_block_wait_impl(pipe, flag_id); }
 
-__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id) { asc_sync_inter_wait_impl(pipe, flag_id); }
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint16_t flag_id) { asc_sync_inter_wait_impl(pipe, flag_id); }
 
 #endif
 

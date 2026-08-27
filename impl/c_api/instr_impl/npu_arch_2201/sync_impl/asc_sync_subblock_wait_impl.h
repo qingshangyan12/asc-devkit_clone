@@ -25,7 +25,7 @@
 
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_sync_subblock_wait_impl(pipe_t pipe, int64_t flag_id) { wait_flag_dev(flag_id); }
+__aicore__ inline void asc_sync_subblock_wait_impl(pipe_t pipe, uint16_t flag_id) { wait_flag_dev(flag_id); }
 
 #endif
 

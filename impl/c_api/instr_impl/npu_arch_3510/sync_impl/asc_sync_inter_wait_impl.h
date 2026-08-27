@@ -25,7 +25,7 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_sync_inter_wait_impl(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void asc_sync_inter_wait_impl(pipe_t pipe, uint16_t flag_id)
 {
     if ASC_IS_AIC {
         if (pipe == pipe_t::PIPE_S) {

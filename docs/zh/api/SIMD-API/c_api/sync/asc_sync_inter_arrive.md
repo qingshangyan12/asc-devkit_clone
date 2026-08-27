@@ -41,7 +41,7 @@
 
 ```c
 __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe,
-                                             int64_t flag_id)
+                                             uint16_t flag_id)
 ```
 
 ## 参数说明
@@ -97,7 +97,7 @@ constexpr uint32_t ELEMENTS_PER_AIV = 8;
 constexpr uint32_t TOTAL_ELEMENTS = 4 * ELEMENTS_PER_AIV;
 constexpr uint32_t AIV_BYTES = ELEMENTS_PER_AIV * sizeof(float);
 constexpr uint32_t TOTAL_BYTES = TOTAL_ELEMENTS * sizeof(float);
-constexpr int64_t FLAG_ID = 8;
+constexpr uint16_t FLAG_ID = 8;
 
 /*
  * 本示例说明：

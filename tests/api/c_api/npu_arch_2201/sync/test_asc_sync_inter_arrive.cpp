@@ -26,7 +26,7 @@ void sync_inter_arrive_2201_ffts_cross_core_sync_stub(pipe_t pipe, uint64_t conf
     constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;
 
     uint16_t mode = 0x00;
-    uint64_t flag_id = 5;
+    uint64_t flag_id = 1;
     uint64_t expectedConfig =
         (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE));
     EXPECT_EQ(pipe, pipe_t::PIPE_V);
@@ -37,7 +37,31 @@ void sync_inter_arrive_2201_ffts_cross_core_sync_stub(pipe_t pipe, uint64_t conf
 TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_succ)
 {
     pipe_t pipe = pipe_t::PIPE_V;
-    int64_t flag_id = 5;
+    uint16_t flag_id = 1;
+    MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))
+        .times(1)
+        .will(invoke(sync_inter_arrive_2201_ffts_cross_core_sync_stub));
+
+    asc_sync_inter_arrive(pipe, flag_id);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_accepts_positive_int64)
+{
+    pipe_t pipe = pipe_t::PIPE_V;
+    int64_t flag_id = 65537;
+    MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))
+        .times(1)
+        .will(invoke(sync_inter_arrive_2201_ffts_cross_core_sync_stub));
+
+    asc_sync_inter_arrive(pipe, flag_id);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_accepts_uint64)
+{
+    pipe_t pipe = pipe_t::PIPE_V;
+    uint64_t flag_id = 65537;
     MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))
         .times(1)
         .will(invoke(sync_inter_arrive_2201_ffts_cross_core_sync_stub));

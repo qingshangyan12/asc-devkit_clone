@@ -41,7 +41,7 @@
 
 ```c
 __aicore__ inline void asc_sync_block_arrive(pipe_t pipe,
-                                             int64_t flag_id)
+                                             uint16_t flag_id)
 ```
 
 ## 参数说明
@@ -97,7 +97,7 @@ constexpr uint32_t MATRIX_DIM = 16;
 constexpr uint32_t MATRIX_ELEMENTS = MATRIX_DIM * MATRIX_DIM;
 constexpr uint32_t MATRIX_BYTES = MATRIX_ELEMENTS * sizeof(half);
 constexpr uint32_t OUTPUT_BYTES = MATRIX_ELEMENTS * sizeof(float);
-constexpr int64_t FLAG_ID = 8;
+constexpr uint16_t FLAG_ID = 8;
 
 /*
  * 本示例说明：
