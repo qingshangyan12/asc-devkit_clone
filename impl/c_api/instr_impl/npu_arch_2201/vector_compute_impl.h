@@ -2026,7 +2026,10 @@ __aicore__ inline void asc_set_mask_count() { asc_set_mask_count_impl(); }
 
 __aicore__ inline void asc_set_mask_norm() { asc_set_mask_norm_impl(); }
 
-__aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low) { asc_set_vector_mask_impl(mask_high, mask_low); }
+__aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low)
+{
+    asc_set_vector_mask_impl(mask_high, mask_low);
+}
 
 // ==========asc_lt(half/float)==========
 __aicore__ inline void asc_lt(
