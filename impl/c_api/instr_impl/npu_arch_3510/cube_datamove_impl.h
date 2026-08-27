@@ -2598,6 +2598,20 @@ __aicore__ inline void asc_copy_gm2l1_sync(
     asc_copy_gm2l1_sync_impl(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
 }
 
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, asc_channel_pad_mode pad_mode,
+    uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2l1_impl(dst, src, n_burst, len_burst, pad_mode, src_stride, dst_stride);
+}
+
+__aicore__ inline void asc_copy_gm2l1_sync(
+    __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, asc_channel_pad_mode pad_mode,
+    uint64_t src_stride, uint32_t dst_stride)
+{
+    asc_copy_gm2l1_sync_impl(dst, src, n_burst, len_burst, pad_mode, src_stride, dst_stride);
+}
+
 // =============asc_copy_l12fb===============
 __aicore__ inline void asc_copy_l12fb(
     __fbuf__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap_size,
@@ -4453,6 +4467,126 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 {
     asc_copy_gm2l1_sync_impl(
         dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, decomp_mode, l2_cache_ctl);
+}
+
+// bfloat16_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// float
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ float* dst, __gm__ float* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
+    uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// fp8_e4m3fn_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// fp8_e5m2_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// half
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ half* dst, __gm__ half* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
+    uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// hifloat8_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// int16_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// int32_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// int8_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
+    uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// uint16_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// uint32_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// uint8_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// fp4x2_e1m2_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// fp4x2_e2m1_t
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
+}
+
+// void
+__aicore__ inline void asc_copy_gm2l1(
+    __cbuf__ void* dst, __gm__ void* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
+    uint16_t m_step, uint16_t k_step, asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, l2_cache_mode);
 }
 
 // ==========asc_fill_l1(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
