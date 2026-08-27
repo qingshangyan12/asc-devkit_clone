@@ -83,6 +83,8 @@ __aicore__ inline uint64_t asc_atomic_dec(__gm__ uint64_t* address, uint64_t val
              "Please use asc_atomic_add instead for atomic add operation.")]]
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
 
+__aicore__ inline asc_store_atomic_config asc_get_store_atomic_config();
+
 __aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op);
 
 [[deprecated("NOTICE: asc_set_store_atomic_config_v2 is deprecated."
