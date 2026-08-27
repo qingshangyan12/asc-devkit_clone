@@ -29,9 +29,11 @@
 namespace asc {
 namespace te {
 
+__aicore__ constexpr gm_to_ub_trait::gm_to_ub_trait(bool pre_allocation) : pre_allocation(pre_allocation) {}
+
 class copy_gm_to_ub_common {
 protected:
-    template <typename DstTensor, typename SrcTensor>
+    template <const gm_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
     __aicore__ inline static void emit_copy(
         const DstTensor& dst, const SrcTensor& src, uint16_t block_count, uint32_t block_len, int64_t src_stride,
         int64_t dst_stride, const gm_to_ub_params& params)
@@ -44,10 +46,11 @@ protected:
         auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
         copy_gm_to_ub_instr::data_copy(
             dst.data().get(), src.data().get(), block_count, block_len, params.left_padding_count,
-            params.right_padding_count, params.enable_constant_pad, cache_mode, src_stride, dst_stride);
+            params.right_padding_count, params.enable_constant_pad, cache_mode, src_stride, dst_stride,
+            trait.pre_allocation);
     }
 
-    template <typename T, typename U, typename DstOffset, typename SrcOffset>
+    template <const gm_to_ub_trait& trait, typename T, typename U, typename DstOffset, typename SrcOffset>
     __aicore__ inline static void emit_copy(
         const T& dst, const U& src, const DstOffset& dst_offset, const SrcOffset& src_offset, uint16_t block_count,
         uint32_t block_len, int64_t src_stride, int64_t dst_stride, const gm_to_ub_params& params)
@@ -59,7 +62,7 @@ protected:
         copy_gm_to_ub_instr::data_copy(
             (dst.data() + dst_offset).get(), (src.data() + src_offset).get(), block_count, block_len,
             params.left_padding_count, params.right_padding_count, params.enable_constant_pad, cache_mode, src_stride,
-            dst_stride);
+            dst_stride, trait.pre_allocation);
     }
 };
 
