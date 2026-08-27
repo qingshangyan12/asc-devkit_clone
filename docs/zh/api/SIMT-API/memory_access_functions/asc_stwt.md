@@ -231,7 +231,7 @@ inline void asc_stwt(half2* address, half2 val)
 
 -   SIMD与SIMT混合编程场景：
 
-    SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间。
+    SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：`__gm__`表示Global Memory内存空间。
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel_asc_stwt(__gm__ float* dst, __gm__ float* val, uint32_t input_total_length)

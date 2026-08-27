@@ -223,7 +223,7 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
 
 -   SIMD与SIMT混合编程场景：
 
-    SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间。
+    SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：`__gm__`表示Global Memory内存空间。
 
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel_asc_ldcg(__gm__ float* dst, __gm__ float* src)
