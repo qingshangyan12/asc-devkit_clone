@@ -112,3 +112,4 @@ run_llt_test(
 )
 
 add_subdirectory(mc2_ccu)
+add_subdirectory(framework)
