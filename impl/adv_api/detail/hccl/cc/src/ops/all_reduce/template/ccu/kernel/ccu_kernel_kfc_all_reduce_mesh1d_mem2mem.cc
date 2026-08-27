@@ -430,28 +430,38 @@ static CcuResult ReduceRmtToLoc(
 
         ctx.reduceScatterDst[rankIdx].addr = ctx.myScratch;
         ctx.reduceScatterDst[rankIdx].addr += scratchOffset;
-        scratchOffset += ctx.chunkSize;
+        scratchOffset += ctx.sliceSize;
         ctx.reduceScatterDst[rankIdx].token = ctx.token[ctx.rankId];
     }
 
     uint32_t channelIdx = 0;
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
+        uint32_t eventIdx = rankIdx / BIT_NUM_PER_CKE;
         if (rankIdx == ctx.rankId) {
             if (ctx.rankSize <= GROUP_REDUCE_MAX_PIECE_CNT) {
-                ccu::EventRecord(ctx.events[0], 1);
+                ccu::EventRecord(ctx.events[eventIdx], 1 << (rankIdx % BIT_NUM_PER_CKE));
             } else {
                 ccu::LocalAddr src;
                 src.addr = ctx.reduceScatterSrc[rankIdx].addr;
                 src.token = ctx.reduceScatterSrc[rankIdx].token;
-                ccu::LocalCopy(ctx.reduceScatterDst[rankIdx], src, ctx.sliceSize, ctx.events[0], 1);
+                ccu::LocalCopy(
+                    ctx.reduceScatterDst[rankIdx], src, ctx.sliceSize, ctx.events[eventIdx],
+                    1 << (rankIdx % BIT_NUM_PER_CKE));
             }
         } else {
             ccu::Read(
                 ctx.channels[channelIdx], ctx.reduceScatterDst[rankIdx], ctx.reduceScatterSrc[rankIdx], ctx.sliceSize,
-                ctx.events[0], 1);
+                ctx.events[eventIdx], 1 << (rankIdx % BIT_NUM_PER_CKE));
             channelIdx++;
         }
-        ccu::EventWait(ctx.events[0], 1);
+    }
+    uint32_t eventNum = (ctx.rankSize + BIT_NUM_PER_CKE - 1) / BIT_NUM_PER_CKE;
+    for (uint32_t i = 0; i < eventNum; i++) {
+        uint32_t sigNum = BIT_NUM_PER_CKE;
+        if (ctx.rankSize % BIT_NUM_PER_CKE != 0 && i == (eventNum - 1)) {
+            sigNum = ctx.rankSize % BIT_NUM_PER_CKE;
+        }
+        ccu::EventWait(ctx.events[i], (1 << sigNum) - 1);
     }
     CCU_CHK_RET(DoLocalReduce(ctx));
     return CCU_SUCCESS;
