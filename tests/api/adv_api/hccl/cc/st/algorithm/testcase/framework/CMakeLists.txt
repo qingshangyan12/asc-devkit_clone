@@ -18,6 +18,7 @@ add_executable(
     ${HCCL_CCU_FRAMEWORK_SELFTEST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/framework_selftest.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/checker_selftest.cpp
 )
 
 target_include_directories(
