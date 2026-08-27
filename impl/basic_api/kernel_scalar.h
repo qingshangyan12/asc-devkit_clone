@@ -130,8 +130,7 @@ __aicore__ inline void WriteGmBypassDCacheImpl(__gm__ T* addr, T value)
             KERNEL_ERROR,
             "For WriteGmBypassDCache, current addr offset in a 128-byte aligned range is %u, which should be in "
             "range [0, 32).",
-            static_cast<uint32_t>(reinterpret_cast<uint64_t>(addr) % 128)
-        );
+            static_cast<uint32_t>(reinterpret_cast<uint64_t>(addr) % 128));
     });
 #endif
 
