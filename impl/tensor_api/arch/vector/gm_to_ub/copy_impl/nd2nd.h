@@ -49,7 +49,7 @@ public:
         auto block_len = get_shape_columns(src_shape) * sizeof(src_type);
         auto src_stride = get_row_stride(src.layout()) * sizeof(src_type);
         auto dst_stride = get_row_stride(dst.layout()) * sizeof(dst_type);
-        emit_copy(
+        emit_copy<trait>(
             dst, src, dst.layout()(dst_coord), src.layout()(src_coord), block_count, block_len, src_stride, dst_stride,
             params);
     }
@@ -80,7 +80,7 @@ private:
         int64_t src_stride = get_row_stride(src_layout) * sizeof(src_type);
         int64_t dst_stride = get_row_stride(dst_layout) * sizeof(dst_type);
 
-        emit_copy(dst, src, block_count, block_len, src_stride, dst_stride, params);
+        emit_copy<trait>(dst, src, block_count, block_len, src_stride, dst_stride, params);
     }
 };
 
@@ -93,7 +93,7 @@ public:
         using src_type = typename SrcTensor::element_type;
         constexpr uint16_t block_count = 1;
         uint32_t block_len = get<0>(src.layout().shape()) * sizeof(src_type);
-        emit_copy(dst, src, block_count, block_len, 0, 0, params);
+        emit_copy<trait>(dst, src, block_count, block_len, 0, 0, params);
     }
 
     template <
@@ -106,7 +106,8 @@ public:
         using src_type = typename U::element_type;
         constexpr uint16_t block_count = 1;
         uint32_t block_len = get<0>(copy_shape) * sizeof(src_type);
-        emit_copy(dst, src, dst.layout()(dst_coord), src.layout()(src_coord), block_count, block_len, 0, 0, params);
+        emit_copy<trait>(
+            dst, src, dst.layout()(dst_coord), src.layout()(src_coord), block_count, block_len, 0, 0, params);
     }
 
 private:

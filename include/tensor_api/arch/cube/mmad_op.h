@@ -44,11 +44,11 @@ public:
     __aicore__ inline static void mmad(const Args&... args);
 
 private:
-    template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor>
+    template <auto& trait, typename CTensor, typename ATensor, typename BTensor>
     __aicore__ inline static void mmad_impl(
         const CTensor& c, const ATensor& a, const BTensor& b, const mmad_params& params);
 
-    template <const mmad_trait& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
+    template <auto& trait, typename CTensor, typename ATensor, typename BTensor, typename BiasTensor>
     __aicore__ inline static void mmad_impl(
         const CTensor& c, const ATensor& a, const BTensor& b, const BiasTensor& bias, const mmad_params& params);
 };
