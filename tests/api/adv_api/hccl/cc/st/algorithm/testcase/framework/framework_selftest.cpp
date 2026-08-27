@@ -427,7 +427,7 @@ TEST(CcuStFrameworkL1, LocalReduceBufferArray)
     };
     auto* prog = GetProgram(BuildProgram("test", fn));
     ASSERT_NE(prog, nullptr);
-    EXPECT_EQ(CountOp(*prog, OpCode::LOCAL_REDUCE), 4U);
+    EXPECT_EQ(CountOp(*prog, OpCode::LOCAL_REDUCE), 3U) << "4 buffers → 3 LOCAL_REDUCE (reduce buf[1..3] into buf[0])";
 }
 
 // --- Notify/Event ---
@@ -671,4 +671,115 @@ TEST(CcuStFrameworkL1, Finalize_ArgIdsContiguous)
     EXPECT_EQ(prog->arguments[0].id, 0U);
     EXPECT_EQ(prog->arguments[1].id, 1U);
     EXPECT_EQ(prog->arguments[2].id, 2U);
+}
+
+// ===== L1 补充: hcomm 对齐验证 =====
+
+TEST(CcuStFrameworkL1, LocalReduceBufferArray_ReduceIntoFirst)
+{
+    // hcomm semantics: CcuLocalBufferReduce reduces all buffers into buffers[0]
+    // Our stub should generate N-1 LOCAL_REDUCE ops: dst=buf[0], src0=buf[i]
+    auto fn = [](void*) {
+        CcuBuffer bufs[4] = {CcuBuffer(), CcuBuffer(), CcuBuffer(), CcuBuffer()};
+        Variable len;
+        Event evt;
+        LocalReduce(bufs, 4, HCCL_DATA_TYPE_INT32, HCCL_DATA_TYPE_INT32, HCCL_REDUCE_SUM, len, evt);
+        return Result::SUCCESS;
+    };
+    auto* prog = GetProgram(BuildProgram("test", fn));
+    ASSERT_NE(prog, nullptr);
+    // Should generate 3 LOCAL_REDUCE (count-1), not 4
+    EXPECT_EQ(CountOp(*prog, OpCode::LOCAL_REDUCE), 3U);
+    // All should have dst = bufs[0] handle (first buffer allocated)
+    ResourceHandle firstBuf = *prog->buffers.begin();
+    for (const auto& op : prog->operations) {
+        if (op.code == OpCode::LOCAL_REDUCE) {
+            EXPECT_EQ(op.dst, firstBuf);
+            EXPECT_NE(op.src0, firstBuf); // src should be buf[1], buf[2], buf[3]
+        }
+    }
+}
+
+TEST(CcuStFrameworkL1, AddressPlusAddress)
+{
+    // hcomm: addr + addr returns CcuArithmeticOperator<Address,Address>
+    // Our stub: addr + addr returns AddressExpr
+    auto fn = [](void*) {
+        Address a;
+        Address b;
+        Address c;
+        c = a + b;
+        return Result::SUCCESS;
+    };
+    auto* prog = GetProgram(BuildProgram("test", fn));
+    ASSERT_NE(prog, nullptr);
+    // Should generate ADDRESS_ADD_VAR or ADDRESS_ASSIGN_ADDRESS
+    // The key: it should NOT be a move (no IR) — must generate an operation
+    EXPECT_GE(prog->operations.size(), 1u);
+}
+
+TEST(CcuStFrameworkL1, AddressPlusVariable)
+{
+    auto fn = [](void*) {
+        Address a;
+        Variable v;
+        Address c;
+        c = a + v;
+        return Result::SUCCESS;
+    };
+    auto* prog = GetProgram(BuildProgram("test", fn));
+    ASSERT_NE(prog, nullptr);
+    EXPECT_GE(prog->operations.size(), 1u);
+}
+
+TEST(CcuStFrameworkL1, VariablePlusAddress)
+{
+    auto fn = [](void*) {
+        Address a;
+        Variable v;
+        Address c;
+        c = v + a;
+        return Result::SUCCESS;
+    };
+    auto* prog = GetProgram(BuildProgram("test", fn));
+    ASSERT_NE(prog, nullptr);
+    EXPECT_GE(prog->operations.size(), 1u);
+}
+
+TEST(CcuStFrameworkL1, AddressPlusEqualAddress)
+{
+    auto fn = [](void*) {
+        Address a;
+        Address b;
+        a += b;
+        return Result::SUCCESS;
+    };
+    auto* prog = GetProgram(BuildProgram("test", fn));
+    ASSERT_NE(prog, nullptr);
+    EXPECT_GE(prog->operations.size(), 1u);
+}
+
+TEST(CcuStFrameworkL1, LoadUint64Addr)
+{
+    auto fn = [](void*) {
+        Variable v;
+        Load(static_cast<uint64_t>(0x1000), v);
+        return Result::SUCCESS;
+    };
+    auto* prog = GetProgram(BuildProgram("test", fn));
+    ASSERT_NE(prog, nullptr);
+    // Should generate ASSIGN_IMM (for addr var) + LOAD_MEMORY
+    EXPECT_GE(CountOp(*prog, OpCode::LOAD_MEMORY), 1u);
+}
+
+TEST(CcuStFrameworkL1, StoreUint64Addr)
+{
+    auto fn = [](void*) {
+        Variable v;
+        Store(static_cast<uint64_t>(0x2000), v);
+        return Result::SUCCESS;
+    };
+    auto* prog = GetProgram(BuildProgram("test", fn));
+    ASSERT_NE(prog, nullptr);
+    EXPECT_GE(CountOp(*prog, OpCode::STORE_MEMORY), 1u);
 }

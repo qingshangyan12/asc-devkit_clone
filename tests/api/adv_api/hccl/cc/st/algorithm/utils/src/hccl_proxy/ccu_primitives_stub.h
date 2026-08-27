@@ -121,6 +121,18 @@ private:
     friend T GetResByChannel(ChannelHandle channel, uint32_t index);
 };
 
+class AddressExpr {
+public:
+    AddressExpr(ResourceHandle lhs, ResourceHandle rhs, bool lhsIsAddr) : lhsHandle(lhs), rhsHandle(rhs), lhsIsAddress(lhsIsAddr) {}
+    ResourceHandle LhsHandle() const { return lhsHandle; }
+    ResourceHandle RhsHandle() const { return rhsHandle; }
+    bool LhsIsAddress() const { return lhsIsAddress; }
+private:
+    ResourceHandle lhsHandle{0};
+    ResourceHandle rhsHandle{0};
+    bool lhsIsAddress{true};
+};
+
 class Address {
 public:
     Address();
@@ -131,7 +143,11 @@ public:
 
     void operator=(const Variable& variable) const;
     void operator=(const Address& address) const;
+    void operator=(const AddressExpr& expr) const;
     void operator+=(const Variable& variable) const;
+    void operator+=(const Address& other) const;
+    AddressExpr operator+(const Address& other) const;
+    AddressExpr operator+(const Variable& variable) const;
 
     ResourceHandle handle{0};
 
@@ -139,6 +155,11 @@ private:
     friend class LocalAddr;
     friend class RemoteAddr;
 };
+
+inline AddressExpr operator+(const Variable& var, const Address& addr)
+{
+    return AddressExpr(var.handle, addr.handle, false);
+}
 
 class LocalAddr {
 public:
@@ -215,7 +236,10 @@ Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t index);
 Result LoadArg(Variable variable, uint32_t argId);
 Result Load(Variable address, Variable destination);
 Result Load(Variable address, Array<Variable>& destinations, uint32_t count);
+Result Load(uint64_t address, Variable destination);
+Result Load(uint64_t address, Array<Variable>& destinations, uint32_t count);
 Result Store(Variable address, Variable source);
+Result Store(uint64_t address, Variable source);
 Result WriteVariableWithNotify(
     ChannelHandle channel, Variable variable, uint32_t remoteVarIndex, uint32_t remoteNotifyIndex, uint16_t mask = 1);
 Result NotifyWait(ChannelHandle channel, uint32_t localNotifyIndex, uint16_t mask = 1);

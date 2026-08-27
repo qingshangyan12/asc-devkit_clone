@@ -393,9 +393,38 @@ void Address::operator=(const Address& address) const
     AppendSimple(OpCode::ADDRESS_ASSIGN_ADDRESS, handle, address.handle);
 }
 
+void Address::operator=(const AddressExpr& expr) const
+{
+    Operation operation;
+    operation.code = OpCode::ADDRESS_ADD_VAR;
+    operation.dst = handle;
+    operation.src0 = expr.RhsHandle();
+    CompilerContext::Current().Append(operation);
+}
+
 void Address::operator+=(const Variable& variable) const
 {
     AppendSimple(OpCode::ADDRESS_ADD_VAR, handle, variable.handle);
+}
+
+void Address::operator+=(const Address& other) const
+{
+    Operation operation;
+    operation.code = OpCode::ADDRESS_ASSIGN_ADDRESS;
+    operation.dst = handle;
+    operation.src0 = handle;
+    operation.src1 = other.handle;
+    CompilerContext::Current().Append(operation);
+}
+
+AddressExpr Address::operator+(const Address& other) const
+{
+    return AddressExpr(handle, other.handle, true);
+}
+
+AddressExpr Address::operator+(const Variable& variable) const
+{
+    return AddressExpr(handle, variable.handle, true);
 }
 
 LocalAddr::LocalAddr() : addr(0), token(0)
@@ -453,6 +482,13 @@ Result Load(Variable address, Variable destination)
     return Result::SUCCESS;
 }
 
+Result Load(uint64_t address, Variable destination)
+{
+    Variable addrVar;
+    addrVar = address;
+    return Load(addrVar, destination);
+}
+
 Result Load(Variable address, Array<Variable>& destinations, uint32_t count)
 {
     if (count > destinations.size()) {
@@ -469,6 +505,13 @@ Result Load(Variable address, Array<Variable>& destinations, uint32_t count)
     return Result::SUCCESS;
 }
 
+Result Load(uint64_t address, Array<Variable>& destinations, uint32_t count)
+{
+    Variable addrVar;
+    addrVar = address;
+    return Load(addrVar, destinations, count);
+}
+
 Result Store(Variable address, Variable source)
 {
     Operation operation;
@@ -477,6 +520,13 @@ Result Store(Variable address, Variable source)
     operation.src0 = source.handle;
     CompilerContext::Current().Append(operation);
     return Result::SUCCESS;
+}
+
+Result Store(uint64_t address, Variable source)
+{
+    Variable addrVar;
+    addrVar = address;
+    return Store(addrVar, source);
 }
 
 Result WriteVariableWithNotify(
@@ -660,10 +710,11 @@ Result LocalReduce(
     if (buffers == nullptr || count == 0) {
         return Result::PARAM_ERROR;
     }
-    for (uint32_t i = 0; i < count; ++i) {
+    // hcomm semantics: reduce all buffers into buffers[0]
+    for (uint32_t i = 1; i < count; ++i) {
         Operation operation;
         operation.code = OpCode::LOCAL_REDUCE;
-        operation.dst = buffers[i].handle;
+        operation.dst = buffers[0].handle;
         operation.src0 = buffers[i].handle;
         operation.src1 = len.handle;
         operation.immediate = event.handle;
