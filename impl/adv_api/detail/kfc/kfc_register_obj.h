@@ -21,7 +21,7 @@ __aicore__ inline void ClearWorkspace(__gm__ uint8_t* workspace)
 {
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
-    DisableDmaAtomic();
+    SetAtomicNone();
     if ASCEND_IS_AIC {
         SetMaskNorm();
         SetLoadDataBoundary((uint64_t)0);
@@ -35,7 +35,7 @@ __aicore__ inline void ClearWorkspace(__gm__ uint8_t* workspace)
 #endif
 #endif
 #if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510) && KFC_C310_SSBUF
-    DisableDmaAtomic();
+    SetAtomicNone();
     if ASCEND_IS_AIC {
         SetMaskNorm();
         SetLoadDataPaddingValue((uint64_t)0);
@@ -50,7 +50,7 @@ __aicore__ inline void ClearWorkspace(__gm__ uint8_t* workspace)
     }
 #elif (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510) && KFC_C310_SSBUF == 0
     if ASCEND_IS_AIC {
-        DisableDmaAtomic();
+        SetAtomicNone();
         SetMaskNorm();
 #ifndef ASCENDC_CPU_DEBUG
         SetLoadDataBoundary((uint64_t)0);

@@ -169,7 +169,7 @@ __aicore__ inline void main_kernel_matmul(
     using C_T = typename C_TYPE::T;
     using BiasT = typename BIAS_TYPE::T;
 
-    DisableDmaAtomic();
+    SetAtomicNone();
     TPipe que;
     TCubeTiling tiling;
     tilingParam.GetTiling(tiling);
@@ -387,7 +387,7 @@ __aicore__ inline void main_kernel_matmul(
         ubWorkspace.FreeTensor(workspaceBuffer);
     }
 #endif
-    DisableDmaAtomic();
+    SetAtomicNone();
 }
 
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG>
@@ -402,7 +402,7 @@ __aicore__ inline void main_kernel_matmul_for_L0cBufferExtend(
     using L0cT = typename AscendC::GetMmDstType<A_T>::Type;
     typedef MatmulType<AscendC::TPosition::CO1, CubeFormat::NZ, L0cT> cType;
 
-    DisableDmaAtomic();
+    SetAtomicNone();
     TPipe que;
     TCubeTiling tiling;
     tilingParam.GetTiling(tiling);
@@ -497,7 +497,7 @@ __aicore__ inline void main_kernel_matmul_for_L0cBufferExtend(
 
     mm.End();
     PipeBarrier<PIPE_ALL>();
-    DisableDmaAtomic();
+    SetAtomicNone();
 }
 
 class TEST_KERNEL_MATMUL : public testing::Test {

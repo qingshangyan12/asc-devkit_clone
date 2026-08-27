@@ -48,7 +48,7 @@ private:
     __aicore__ inline void ComputeAtomicAdd()
     {
         LocalTensor<T> dstLocal = outQueueZ.AllocTensor<T>();
-        DisableDmaAtomic();
+        SetAtomicNone();
         Duplicate(dstLocal, static_cast<T>(1), 256);
         outQueueZ.EnQue<T>(dstLocal);
     }

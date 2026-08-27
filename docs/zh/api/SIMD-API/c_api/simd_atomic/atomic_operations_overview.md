@@ -12,8 +12,7 @@
 | [asc_set_atomic_add](asc_set_atomic_add.md) | 对后续目的地址为GM的数据搬运开启原子累加。原子累加过程：将待拷贝的内容和GM已有内容进行求和，然后将求和结果写入GM。 |
 | [asc_set_atomic_max](asc_set_atomic_max.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最大值写入GM。 |
 | [asc_set_atomic_min](asc_set_atomic_min.md) | 设置后续搬运到GM的数据是否执行原子比较：将待拷贝的内容和GM已有内容进行比较，然后将最小值写入GM。 |
-| [asc_disable_dma_atomic](asc_disable_dma_atomic.md) | 关闭数据搬运随路原子操作功能。 |
-| [asc_set_atomic_none（废弃）](asc_set_atomic_none.md) | 关闭数据搬运随路原子操作功能。 |
+| [asc_set_atomic_none](asc_set_atomic_none.md) | 关闭数据搬运随路原子操作功能。 |
 | [asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md) | 设置数据搬运的原子操作配置。 |
 | [asc_get_store_atomic_config](asc_get_store_atomic_config.md) | 获取数据搬运的原子操作配置。 |
 

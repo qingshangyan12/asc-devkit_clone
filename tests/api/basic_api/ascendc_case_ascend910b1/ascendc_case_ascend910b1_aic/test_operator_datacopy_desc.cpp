@@ -65,7 +65,7 @@ private:
         dataCopyParams.dstStride = 0;
         DataCopyEnhancedParams enhancedParams;
         DataCopy(dstLocal, srcLocal, dataCopyParams, enhancedParams);
-        DisableDmaAtomic();
+        SetAtomicNone();
         outQueueCO1.EnQue<SelfTensorDesc<T>>(dstLocal);
         inQueueSrcA1.FreeTensor(srcLocal);
     }

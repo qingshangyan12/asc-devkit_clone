@@ -165,7 +165,7 @@ __aicore__ inline void main_kernel_matmul_channel_split(
     using C_T = typename C_TYPE::T;
     using BiasT = typename BIAS_TYPE::T;
 
-    DisableDmaAtomic();
+    SetAtomicNone();
     TPipe que;
     TCubeTiling tiling;
     tilingParam.GetTiling(tiling);
@@ -274,7 +274,7 @@ __aicore__ inline void main_kernel_matmul_channel_split(
     if constexpr (C_TYPE::pos == TPosition::VECCALC) {
         resultCMatrix.FreeTensor(bufferC);
     }
-    DisableDmaAtomic();
+    SetAtomicNone();
 }
 
 class TEST_KERNEL_MATMUL_CHANNEL_SPLIT : public testing::Test {

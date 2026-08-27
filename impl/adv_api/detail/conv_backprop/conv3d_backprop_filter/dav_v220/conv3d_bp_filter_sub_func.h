@@ -453,7 +453,7 @@ static __aicore__ inline void LoadL0c2Gm(
         }
     }
     if (enAtomic == 1) {
-        AscendC::DisableDmaAtomic();
+        AscendC::SetAtomicNone();
     }
     if (self->ctx.l0cPingPongFlag_) {
         self->ctx.l0cPing_.FreeTensor(l0c);

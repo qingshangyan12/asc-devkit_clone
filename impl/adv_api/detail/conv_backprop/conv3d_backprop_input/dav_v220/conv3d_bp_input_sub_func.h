@@ -496,7 +496,7 @@ __aicore__ inline void LoadL0c2Gm(
         }
     }
     if (enAtomic == 1) {
-        AscendC::DisableDmaAtomic();
+        AscendC::SetAtomicNone();
     }
 
     FreeL0cTensor<Intf>(self, useC1Buf);

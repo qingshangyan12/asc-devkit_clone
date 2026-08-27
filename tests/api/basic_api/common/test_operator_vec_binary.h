@@ -61,7 +61,7 @@ void main_vec_binary_operator_simple_demo(
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     wait_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     DataCopy(output_global, output_local, data_size);
-    DisableDmaAtomic();
+    SetAtomicNone();
     pipe_barrier(PIPE_ALL);
 }
 
@@ -202,7 +202,7 @@ void main_vec_binary_operator_addrelu_demo(
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     wait_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     DataCopy(output_global, output_local, data_size);
-    DisableDmaAtomic();
+    SetAtomicNone();
     pipe_barrier(PIPE_ALL);
 }
 
@@ -248,7 +248,7 @@ void main_vec_binary_operator_subrelu_demo(
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     wait_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     DataCopy(output_global, output_local, data_size);
-    DisableDmaAtomic();
+    SetAtomicNone();
     pipe_barrier(PIPE_ALL);
 }
 

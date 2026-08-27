@@ -536,7 +536,7 @@ protected:
     __aicore__ inline void ClearAtomic(uint8_t enAtomic)
     {
         if (enAtomic != 0) {
-            DisableDmaAtomic();
+            SetAtomicNone();
         }
     }
 };

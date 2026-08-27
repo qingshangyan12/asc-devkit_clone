@@ -73,7 +73,7 @@ void MainVecBinaryOperatorSimpleDemo(
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     wait_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     DataCopy(outputGlobal, outputLocal, dataSize);
-    DisableDmaAtomic();
+    SetAtomicNone();
     pipe_barrier(PIPE_ALL);
 }
 
@@ -144,7 +144,7 @@ void MainVecBinaryOperatorSimpleErrorDemo(
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     wait_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     DataCopy(outputGlobal, outputLocal, dataSize);
-    DisableDmaAtomic();
+    SetAtomicNone();
     pipe_barrier(PIPE_ALL);
 }
 
@@ -412,7 +412,7 @@ void MainVecBinaryOperatorAddreluDemo(
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     wait_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     DataCopy(outputGlobal, outputLocal, dataSize);
-    DisableDmaAtomic();
+    SetAtomicNone();
     pipe_barrier(PIPE_ALL);
 }
 
@@ -471,7 +471,7 @@ void MainVecBinaryOperatorAddreluSubreluErrorDemo(
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     wait_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     DataCopy(outputGlobal, outputLocal, dataSize);
-    DisableDmaAtomic();
+    SetAtomicNone();
     pipe_barrier(PIPE_ALL);
 }
 
@@ -520,7 +520,7 @@ void MainVecBinaryOperatorSubreluDemo(
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     wait_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
     DataCopy(outputGlobal, outputLocal, dataSize);
-    DisableDmaAtomic();
+    SetAtomicNone();
     pipe_barrier(PIPE_ALL);
 }
 

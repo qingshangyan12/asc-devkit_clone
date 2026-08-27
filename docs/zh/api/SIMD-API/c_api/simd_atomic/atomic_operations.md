@@ -8,9 +8,7 @@
 
 - **[asc_set_atomic_min](asc_set_atomic_min.md)**
 
-- **[asc_disable_dma_atomic](asc_disable_dma_atomic.md)**
-
-- **[asc_set_atomic_none（废弃）](asc_set_atomic_none.md)**
+- **[asc_set_atomic_none](asc_set_atomic_none.md)**
 
 - **[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)**
 

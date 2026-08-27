@@ -185,7 +185,7 @@ __aicore__ inline void kernel_matmul(
     using B_Tensor = typename ExtractTensor<B_T, bType::pos>::type;
     using C_Tensor = typename ExtractTensor<C_T, cType::pos>::type;
 
-    DisableDmaAtomic();
+    SetAtomicNone();
     TPipe que;
     TCubeTiling tiling;
     tilingParam.GetTiling(tiling);
@@ -228,7 +228,7 @@ __aicore__ inline void kernel_matmul(
     TQue<TPosition::B1, 2> qidB1;
     TQue<TPosition::C1, 2> qidRes;
 
-    DisableDmaAtomic();
+    SetAtomicNone();
     MatmulImpl<aType, bType, cType, biasType> mm;
     if constexpr (mmMatmul) {
         REGIST_MATMUL_OBJ(&que, GetSysWorkSpacePtr(), mm);
@@ -304,7 +304,7 @@ __aicore__ inline void kernel_matmul(
     if constexpr (cType::pos == TPosition::SHM) {
         qidRes.FreeTensor(outputC);
     }
-    DisableDmaAtomic();
+    SetAtomicNone();
     PipeBarrier<PIPE_ALL>();
 }
 

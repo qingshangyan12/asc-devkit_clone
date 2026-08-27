@@ -424,7 +424,7 @@ public:
 
         if constexpr (A_TYPE::layout != LayoutMode::NORMAL) {
             if (ctx.isReduceG) {
-                DisableDmaAtomic();
+                SetAtomicNone();
             }
         }
     }
@@ -572,7 +572,7 @@ private:
             gm, co1Local, curRow, curCol, baseHeight, baseWidth, baseBlockHeight, baseBlockWidth, enAtomic,
             enSequentialWrite);
         if (enAtomic != 0) {
-            DisableDmaAtomic();
+            SetAtomicNone();
         }
     }
 

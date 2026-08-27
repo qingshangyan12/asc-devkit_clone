@@ -31,7 +31,7 @@ static void test_host_c_api_atomic_0()
     using ::asc_set_atomic_min_int;
     using ::asc_set_atomic_min_int16;
     using ::asc_set_atomic_min_int8;
-    using ::asc_disable_dma_atomic;
+    using ::asc_set_atomic_none;
     using ::asc_set_store_atomic_config_v1;
     using ::asc_set_store_atomic_config_v2;
 }
