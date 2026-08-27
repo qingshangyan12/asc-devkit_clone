@@ -43,6 +43,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     auto dataSlice = ((allToAllVParam->sendCounts[ccuParam_.rankId]) * dataSize) % CCU_MAX_COMM_DATA;
     CalcGoSize(dataSlice, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
     xnData_[9] = reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt) + CCU_MSG_EXT_RANK_OFFSET * ccuParam_.alltoallvCnt;
+    KERNEL_LOG(
+        KERNEL_INFO, "ApiClient CcuPrepareForAllToAllV xn0(opId):0x%llx, xn1(sendBuf+off):0x%llx, xn2(recvBuf+off):0x%llx, "
+        "xn5(goSize):0x%llx, xn9(msgExt):0x%llx",
+        (unsigned long long)xnData_[0],
+        (unsigned long long)xnData_[1],
+        (unsigned long long)xnData_[2],
+        (unsigned long long)xnData_[5],
+        (unsigned long long)xnData_[9]);
     return;
 }
 
