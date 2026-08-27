@@ -66,8 +66,8 @@ TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_PSTU(Pstu0, asc_storeunalign_postupdate,
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_PSTU(Pstu0, asc_storeunalign_postupdate, pstu, uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_PSTU(Pstu0, asc_storeunalign_postupdate, pstu, uint32_t, uint32_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_PSTU(
-    PstuMask, asc_storeunalign_mask_postupdate, pstu, uint8_t, uint32_t);
+    PstuMaskPackQuarter, asc_storeunalign_mask_pack_quarter_postupdate, pstu, uint8_t, uint32_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_PSTU(
-    PstuMask, asc_storeunalign_mask_postupdate, pstu, uint16_t, uint16_t);
+    PstuMaskPackQuarter, asc_storeunalign_mask_pack_quarter_postupdate, pstu, uint16_t, uint32_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_PSTU(
-    PstuMask, asc_storeunalign_mask_postupdate, pstu, uint32_t, uint32_t);
+    PstuMaskPackQuarter, asc_storeunalign_mask_pack_quarter_postupdate, pstu, uint32_t, uint32_t);

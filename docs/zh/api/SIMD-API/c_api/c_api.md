@@ -415,7 +415,7 @@ Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表�
 | [asc_storeunalign_post](reg/reg_store/asc_storeunalign_post.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址搬出到UB的尾块场景。 |
 | [asc_storeunalign_post_postupdate](reg/reg_store/asc_storeunalign_post_postupdate.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址搬出到UB的尾块场景，并自动更新目的操作数地址。 |
 | [asc_storeunalign_postupdate](reg/reg_store/asc_storeunalign_postupdate.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
-| [asc_storeunalign_mask_postupdate](reg/reg_store/asc_storeunalign_mask_postupdate.md) | reg计算数据搬运接口，适用于从掩码寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
+| [asc_storeunalign_mask_pack_quarter_postupdate](reg/reg_store/asc_storeunalign_mask_pack_quarter_postupdate.md) | reg计算数据搬运接口，适用于从掩码寄存器连续非32B对齐的起始地址连续搬出到UB的场景，按每4bit保留1bit的PACK_QUARTER模式搬出并自动更新目的操作数地址。 |
 
 ## Reg矢量计算
 

@@ -637,7 +637,7 @@ static void test_host_c_api_reg_compute_18()
     using ::asc_storeunalign_post;
     using ::asc_storeunalign_post_postupdate;
     using ::asc_storeunalign_postupdate;
-    using ::asc_storeunalign_mask_postupdate;
+    using ::asc_storeunalign_mask_pack_quarter_postupdate;
     using ::asc_sub;
     using ::asc_subc;
     using ::asc_trunc;

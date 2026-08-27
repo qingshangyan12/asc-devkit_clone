@@ -1015,6 +1015,7 @@
                 -   [asc_storeunalign_post](SIMD-API/c_api/reg/reg_store/asc_storeunalign_post.md)
                 -   [asc_storeunalign_post_postupdate](SIMD-API/c_api/reg/reg_store/asc_storeunalign_post_postupdate.md)
                 -   [asc_storeunalign_postupdate](SIMD-API/c_api/reg/reg_store/asc_storeunalign_postupdate.md)
+                -   [asc_storeunalign_mask_pack_quarter_postupdate](SIMD-API/c_api/reg/reg_store/asc_storeunalign_mask_pack_quarter_postupdate.md)
             -   [基础算术](SIMD-API/c_api/reg/arithmetic_compute/arithmetic_compute.md)
                 -   [asc_abs](SIMD-API/c_api/reg/arithmetic_compute/asc_abs.md)
                 -   [asc_add](SIMD-API/c_api/reg/arithmetic_compute/asc_add.md)

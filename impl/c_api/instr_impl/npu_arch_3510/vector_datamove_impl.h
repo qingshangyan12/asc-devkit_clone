@@ -1496,22 +1496,25 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
     asc_storeunalign_postupdate_impl(dst, src0, src1);
 }
 
-__simd_callee__ inline void asc_storeunalign_mask_postupdate(
+__simd_callee__ inline void asc_storeunalign_mask_pack_quarter_postupdate(
     __ubuf__ uint8_t*& dst, vector_store_unalign& src0, vector_bool src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    __ubuf__ uint32_t*& dst_tmp = reinterpret_cast<__ubuf__ uint32_t*&>(dst);
+    asc_storeunalign_postupdate_impl(dst_tmp, src0, src1);
 }
 
-__simd_callee__ inline void asc_storeunalign_mask_postupdate(
+__simd_callee__ inline void asc_storeunalign_mask_pack_quarter_postupdate(
     __ubuf__ uint16_t*& dst, vector_store_unalign& src0, vector_bool src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    __ubuf__ uint32_t*& dst_tmp = reinterpret_cast<__ubuf__ uint32_t*&>(dst);
+    asc_storeunalign_postupdate_impl(dst_tmp, src0, src1);
 }
 
-__simd_callee__ inline void asc_storeunalign_mask_postupdate(
+__simd_callee__ inline void asc_storeunalign_mask_pack_quarter_postupdate(
     __ubuf__ uint32_t*& dst, vector_store_unalign& src0, vector_bool src1)
 {
-    asc_storeunalign_postupdate_impl(dst, src0, src1);
+    __ubuf__ uint32_t*& dst_tmp = reinterpret_cast<__ubuf__ uint32_t*&>(dst);
+    asc_storeunalign_postupdate_impl(dst_tmp, src0, src1);
 }
 
 // ==========asc_storeunalign_postupdate(u8/s8/half/u16/s16/float/u32/s32/s64/bf16/e4m3/e5m2/e8m0/e1m2/e2m1)=========
