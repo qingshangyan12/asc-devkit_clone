@@ -428,7 +428,7 @@ static CcuResult ReduceRmtToLoc(
 
         ctx.reduceScatterDst[rankIdx].addr = ctx.myScratch;
         ctx.reduceScatterDst[rankIdx].addr += scratchOffset;
-        scratchOffset += ctx.sliceSize;
+        scratchOffset += ctx.chunkSize;
         ctx.reduceScatterDst[rankIdx].token = ctx.token[ctx.rankId];
     }
 
