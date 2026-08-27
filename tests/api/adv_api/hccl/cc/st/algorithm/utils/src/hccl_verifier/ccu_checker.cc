@@ -129,7 +129,8 @@ CheckResult CcuLogicalResourceChecker::Check(const Program& program) const
                     return Failure("EventWait source is not an Event");
                 }
                 break;
-            case OpCode::WRITE: {
+            case OpCode::WRITE:
+            case OpCode::WRITE_REDUCE: {
                 bool srcValid =
                     program.localAddresses.count(operation.src0) == 1 || program.buffers.count(operation.src0) == 1;
                 bool dstValid = program.remoteAddresses.count(operation.dst) == 1;
@@ -138,13 +139,23 @@ CheckResult CcuLogicalResourceChecker::Check(const Program& program) const
                 }
                 break;
             }
-            case OpCode::LOCAL_COPY: {
+            case OpCode::READ_REDUCE: {
+                bool srcValid = program.remoteAddresses.count(operation.src0) == 1;
+                bool dstValid =
+                    program.localAddresses.count(operation.dst) == 1 || program.buffers.count(operation.dst) == 1;
+                if (!srcValid || !dstValid || !isVariable(operation.src1) || !isEvent(operation.immediate)) {
+                    return Failure("ReadReduce references an invalid address, length, or Event");
+                }
+                break;
+            }
+            case OpCode::LOCAL_COPY:
+            case OpCode::LOCAL_REDUCE: {
                 bool srcValid =
                     program.localAddresses.count(operation.src0) == 1 || program.buffers.count(operation.src0) == 1;
                 bool dstValid =
                     program.localAddresses.count(operation.dst) == 1 || program.buffers.count(operation.dst) == 1;
                 if (!srcValid || !dstValid || !isVariable(operation.src1) || !isEvent(operation.immediate)) {
-                    return Failure("LocalCopy references an invalid address, length, or Event");
+                    return Failure("LocalCopy or LocalReduce references an invalid address, length, or Event");
                 }
                 break;
             }

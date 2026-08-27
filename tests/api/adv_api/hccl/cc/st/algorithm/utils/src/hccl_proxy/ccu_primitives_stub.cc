@@ -620,7 +620,17 @@ Result ReadReduce(
     ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length, HcclDataType dataType,
     HcclReduceOp opType, Event event, uint16_t mask)
 {
-    AppendRead(OpCode::WRITE, channel, local.handle, remote.handle, length.handle, event.handle, mask);
+    Operation operation;
+    operation.code = OpCode::READ_REDUCE;
+    operation.channel = channel;
+    operation.dst = local.handle;
+    operation.src0 = remote.handle;
+    operation.src1 = length.handle;
+    operation.immediate = event.handle;
+    operation.mask = mask;
+    operation.dataType = dataType;
+    operation.opType = opType;
+    CompilerContext::Current().Append(operation);
     return Result::SUCCESS;
 }
 
@@ -628,12 +638,14 @@ Result LocalReduce(
     LocalAddr dst, LocalAddr src, Variable len, HcclDataType dataType, HcclReduceOp opType, Event event, uint16_t mask)
 {
     Operation operation;
-    operation.code = OpCode::LOCAL_COPY;
+    operation.code = OpCode::LOCAL_REDUCE;
     operation.dst = dst.handle;
     operation.src0 = src.handle;
     operation.src1 = len.handle;
     operation.immediate = event.handle;
     operation.mask = mask;
+    operation.dataType = dataType;
+    operation.opType = opType;
     CompilerContext::Current().Append(operation);
     return Result::SUCCESS;
 }
@@ -642,6 +654,22 @@ Result LocalReduce(
     CcuBuffer* buffers, uint32_t count, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType,
     Variable len, Event event, uint16_t mask)
 {
+    if (buffers == nullptr || count == 0) {
+        return Result::PARAM_ERROR;
+    }
+    for (uint32_t i = 0; i < count; ++i) {
+        Operation operation;
+        operation.code = OpCode::LOCAL_REDUCE;
+        operation.dst = buffers[i].handle;
+        operation.src0 = buffers[i].handle;
+        operation.src1 = len.handle;
+        operation.immediate = event.handle;
+        operation.mask = mask;
+        operation.dataType = dataType;
+        operation.outputDataType = outputDataType;
+        operation.opType = opType;
+        CompilerContext::Current().Append(operation);
+    }
     return Result::SUCCESS;
 }
 
@@ -664,13 +692,15 @@ Result WriteReduce(
     HcclReduceOp opType, Event event, uint16_t mask)
 {
     Operation operation;
-    operation.code = OpCode::WRITE;
+    operation.code = OpCode::WRITE_REDUCE;
     operation.channel = channel;
     operation.dst = remote.handle;
     operation.src0 = local.handle;
     operation.src1 = length.handle;
     operation.immediate = event.handle;
     operation.mask = mask;
+    operation.dataType = dataType;
+    operation.opType = opType;
     CompilerContext::Current().Append(operation);
     return Result::SUCCESS;
 }

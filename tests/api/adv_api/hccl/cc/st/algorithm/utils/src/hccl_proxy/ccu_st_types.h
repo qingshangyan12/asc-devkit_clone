@@ -18,6 +18,7 @@
 #include <set>
 #include <utility>
 #include <vector>
+#include "hccl_types.h"
 
 namespace HcclSim {
 namespace CcuSt {
@@ -57,6 +58,9 @@ enum class OpCode {
     WRITE,
     LOCAL_COPY,
     GROUP_COPY,
+    READ_REDUCE,
+    LOCAL_REDUCE,
+    WRITE_REDUCE,
     IF_BEGIN,
     ELSE_BEGIN,
     IF_END,
@@ -76,6 +80,9 @@ struct Operation {
     uint16_t mask{0};
     bool equal{true};
     size_t peerIndex{0};
+    HcclDataType dataType{HCCL_DATA_TYPE_RESERVED};
+    HcclDataType outputDataType{HCCL_DATA_TYPE_RESERVED};
+    HcclReduceOp opType{HCCL_REDUCE_RESERVED};
 };
 
 struct ArgDescriptor {
