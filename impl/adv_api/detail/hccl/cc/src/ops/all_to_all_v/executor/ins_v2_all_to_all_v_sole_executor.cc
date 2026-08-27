@@ -14,11 +14,8 @@
 
 #include "ins_temp_all_to_all_v_mesh_1D.h"
 #include "topo_match_1d.h"
-#if !defined(AICPU_COMPILE)
-#include "ccu_temp_all_to_all_mesh_1D.h"
-#if MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_all_to_all_v_mesh_1D.h"
-#endif
 #endif
 
 namespace mc2_ops_hccl {
@@ -256,14 +253,10 @@ REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLTOALL, AicpuAlltoAllSoleMesh, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
     InsTempAlltoAllVMesh1D);
 
-#ifndef AICPU_COMPILE
-REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D, CcuTempAlltoAllMesh1D);
-#if MC2_CLIENT_ENABLE_CCU
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLTOALLV, CcuAlltoAllVMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
     CcuTempAlltoAllVMesh1D);
-#endif
 #endif
 
 } // namespace mc2_ops_hccl

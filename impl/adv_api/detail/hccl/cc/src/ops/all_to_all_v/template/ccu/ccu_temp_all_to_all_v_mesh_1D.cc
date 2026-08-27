@@ -85,11 +85,11 @@ HcclResult CcuTempAlltoAllVMesh1D::CalcRes(
 HcclResult CcuTempAlltoAllVMesh1D::KernelRun(
     const OpParam& param, const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
 {
+    // Per-round parameters are written by CcuPrepareForAllToAllV and consumed by the KFC server.
     (void)param;
     (void)templateDataParams;
     (void)templateResource;
-    HCCL_ERROR("[CcuTempAlltoAllVMesh1D::KernelRun] direct launch is not supported; use the MC2 KFC server.");
-    return HCCL_E_NOT_SUPPORT;
+    return HCCL_SUCCESS;
 }
 
 u64 CcuTempAlltoAllVMesh1D::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType)

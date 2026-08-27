@@ -14,7 +14,6 @@
 #include "ccu_temp_kfc_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #include "kernel/ccu_kernel_kfc_server.h"
 #include "ccu_temp_kfc_server.h"
-#include "ccu_temp_all_to_all_mesh_1D.h"
 #include "ccu_temp_all_to_all_v_mesh_1D.h"
 #include "ccu_launch_dl.h"
 
