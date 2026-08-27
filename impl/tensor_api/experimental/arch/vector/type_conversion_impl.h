@@ -23,6 +23,7 @@
 #endif
 #include "c_api/reg_compute/reg_convert.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
+#include "impl/tensor_api/utils/constant_impl.h"
 
 namespace asc {
 namespace te {
@@ -34,13 +35,50 @@ template <typename DstType, typename SrcType, cast_layout Layout, cast_round_mod
 struct reg_cast_op {
     static constexpr bool supported = false;
 };
+template <typename T>
+struct cast_element_bits {
+    using data_type = Std::remove_cvref_t<T>;
+    static constexpr uint32_t value = is_b4_type<data_type> ? 4U : sizeof(data_type) * 8U;
+};
 
 } // namespace detail
 } // namespace experimental
 } // namespace te
 } // namespace asc
 
+
+#define ASC_CAST_POSITION_2_zero ASC_POSITION_EVEN
+#define ASC_CAST_POSITION_2_one ASC_POSITION_ODD
+#define ASC_CAST_POSITION_2_two ASC_POSITION_EVEN
+#define ASC_CAST_POSITION_2_three ASC_POSITION_ODD
+#define ASC_CAST_POSITION_4_zero ASC_DISPERSE_FIRST_QUARTER
+#define ASC_CAST_POSITION_4_one ASC_DISPERSE_SECOND_QUARTER
+#define ASC_CAST_POSITION_4_two ASC_DISPERSE_THIRD_QUARTER
+#define ASC_CAST_POSITION_4_three ASC_DISPERSE_FOURTH_QUARTER
+
 #define ASC_REG_CAST_OP(TO, FROM, LAYOUT, ROUND, SAT, FUNC)                                                           \
+    template <>                                                                                                       \
+    struct reg_cast_op<TO, FROM, cast_layout::LAYOUT, cast_round_mode::ROUND, cast_sat_mode::SAT> {                  \
+        static constexpr bool supported = true;                                                                       \
+                                                                                                                       \
+        template <typename DstReg, typename SrcReg>                                                                   \
+        __simd_callee__ static void run(DstReg& dst, SrcReg src, vector_bool mask)                                   \
+        {                                                                                                              \
+            constexpr uint32_t dst_bits = cast_element_bits<TO>::value;                                              \
+            constexpr uint32_t src_bits = cast_element_bits<FROM>::value;                                            \
+            if constexpr (dst_bits == src_bits) {                                                                     \
+                FUNC(dst, src, mask);                                                                                  \
+            } else if constexpr (dst_bits == 2U * src_bits || src_bits == 2U * dst_bits) {                          \
+                FUNC(dst, src, mask, ASC_CAST_POSITION_2_##LAYOUT);                                                   \
+            } else if constexpr (dst_bits == 4U * src_bits || src_bits == 4U * dst_bits) {                          \
+                FUNC(dst, src, mask, ASC_CAST_POSITION_4_##LAYOUT);                                                   \
+            } else {                                                                                                  \
+                static_assert(sizeof(DstReg) == 0, "unsupported register cast width ratio");                       \
+            }                                                                                                         \
+        }                                                                                                              \
+    }
+
+#define ASC_REG_CAST_OP_NO_POSITION(TO, FROM, LAYOUT, ROUND, SAT, FUNC)                                               \
     template <>                                                                                                       \
     struct reg_cast_op<TO, FROM, cast_layout::LAYOUT, cast_round_mode::ROUND, cast_sat_mode::SAT> {                  \
         static constexpr bool supported = true;                                                                       \
@@ -55,6 +93,15 @@ struct reg_cast_op {
 #include "impl/tensor_api/experimental/arch/vector/type_conversion_table.h"
 
 #undef ASC_REG_CAST_OP
+#undef ASC_REG_CAST_OP_NO_POSITION
+#undef ASC_CAST_POSITION_2_zero
+#undef ASC_CAST_POSITION_2_one
+#undef ASC_CAST_POSITION_2_two
+#undef ASC_CAST_POSITION_2_three
+#undef ASC_CAST_POSITION_4_zero
+#undef ASC_CAST_POSITION_4_one
+#undef ASC_CAST_POSITION_4_two
+#undef ASC_CAST_POSITION_4_three
 
 namespace asc {
 namespace te {
