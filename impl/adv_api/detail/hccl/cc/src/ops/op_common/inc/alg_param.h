@@ -191,56 +191,57 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     bool level0Symmetric{false};
     bool level1Symmetric{false};
     u32 topoInstDetailsOfLayerSize = 0;
+    // 本卡是否为POD机型, 由CalcDeviceFormFactor查ACL_DEV_ATTR_DEVICE_FORM_FACTOR得到, 取不到停在false
+    bool isPod = false;
     Level0MeshType level0MeshType;
     NetLayerDetails netLayerDetails;
     std::vector<TopoInstDetails> topoInstDetailsOfLayer;
+    // physicalLevels的条目数, 由Serialize统一回填。
+    u32 physicalLevelNum = 0;
+    std::vector<PhysicalLevelInfo> physicalLevels;
+
+    // 全部定长字段与netLayerDetails, 按声明顺序列出一次。Serialize与DeSerialize共用本清单
+    template <typename Ar>
+    void VisitFields(Ar& ar)
+    {
+        ar & userRank & userRankSize & serverIdx & superPodIdx & deviceType & deviceNumPerModule;
+        ar & serverNumPerSuperPod & serverNum & moduleNum & superPodNum & moduleIdx;
+        ar & isDiffDeviceModule & multiModuleDiffDeviceNumMode & multiSuperPodDiffServerNumMode;
+        ar & isHCCSSWNumEqualToTwiceSIONum & mainThread & notifyNumOnMainThread;
+        ar & topoLevelNums & level0Topo & Level0Nhr & Level1Nhr & Level1Hd & is2DieFullMesh;
+        ar & level0PcieMix & level0BigClosRange & level2Uboe & level2UbRtp & hostDpuOnly;
+        ar & level0Symmetric & level1Symmetric & topoInstDetailsOfLayerSize & isPod & level0MeshType;
+        ar & netLayerDetails.netLayerNum & netLayerDetails.netLayers & netLayerDetails.netInstNumOfLayer;
+        ar & netLayerDetails.instSizeListOfLayer & netLayerDetails.localNetInsSizeOfLayer;
+    }
+
+    template <typename Ar>
+    static void VisitTopoInstDetails(Ar& ar, TopoInstDetails& details)
+    {
+        ar & details.topoInstNum & details.sizeOfTopo & details.typeOfTopo & details.ranksInTopo;
+        ar & details.rankNumForTopoType;
+    }
+
+    template <typename Ar>
+    static void VisitPhysicalLevel(Ar& ar, PhysicalLevelInfo& level)
+    {
+        ar & level.localRanks & level.view & level.instSizeListByLayer;
+        ar & level.ref.netLayer & level.ref.topoInstId & level.hasTopoInst & level.topoType;
+        ar & level.locType & level.protocols & level.portNums & level.endpoints;
+    }
 
     std::vector<char> Serialize()
     {
         BinaryStream binaryStream;
-        binaryStream << userRank;
-        binaryStream << userRankSize;
-        binaryStream << serverIdx;
-        binaryStream << superPodIdx;
-        binaryStream << deviceType;
-        binaryStream << deviceNumPerModule;
-        binaryStream << serverNumPerSuperPod;
-        binaryStream << serverNum;
-        binaryStream << moduleNum;
-        binaryStream << superPodNum;
-        binaryStream << moduleIdx;
-        binaryStream << isDiffDeviceModule;
-        binaryStream << multiModuleDiffDeviceNumMode;
-        binaryStream << multiSuperPodDiffServerNumMode;
-        binaryStream << isHCCSSWNumEqualToTwiceSIONum;
-        binaryStream << mainThread;
-        binaryStream << notifyNumOnMainThread;
-        binaryStream << topoLevelNums;
-        binaryStream << level0Topo;
-        binaryStream << Level0Nhr;
-        binaryStream << Level1Nhr;
-        binaryStream << Level1Hd;
-        binaryStream << is2DieFullMesh;
-        binaryStream << level0PcieMix;
-        binaryStream << level0BigClosRange;
-        binaryStream << level2Uboe;
-        binaryStream << level2Ubg;
-        binaryStream << hostDpuOnly;
-        binaryStream << level0Symmetric;
-        binaryStream << level1Symmetric;
-        binaryStream << topoInstDetailsOfLayerSize;
-        binaryStream << level0MeshType;
-        binaryStream << netLayerDetails.netLayerNum;
-        binaryStream << netLayerDetails.netLayers;
-        binaryStream << netLayerDetails.netInstNumOfLayer;
-        binaryStream << netLayerDetails.instSizeListOfLayer;
-        binaryStream << netLayerDetails.localNetInsSizeOfLayer;
+        BinaryWriter ar(binaryStream);
+        VisitFields(ar);
         for (uint32_t idx = 0; idx < topoInstDetailsOfLayerSize; idx++) {
-            binaryStream << topoInstDetailsOfLayer[idx].topoInstNum;
-            binaryStream << topoInstDetailsOfLayer[idx].sizeOfTopo;
-            binaryStream << topoInstDetailsOfLayer[idx].typeOfTopo;
-            binaryStream << topoInstDetailsOfLayer[idx].ranksInTopo;
-            binaryStream << topoInstDetailsOfLayer[idx].rankNumForTopoType;
+            VisitTopoInstDetails(ar, topoInstDetailsOfLayer[idx]);
+        }
+        physicalLevelNum = static_cast<u32>(physicalLevels.size());
+        binaryStream << physicalLevelNum;
+        for (auto& level : physicalLevels) {
+            VisitPhysicalLevel(ar, level);
         }
         std::vector<char> result;
         binaryStream.Dump(result);
@@ -250,53 +251,28 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     void DeSerialize(std::vector<char>& data)
     {
         BinaryStream binaryStream(data);
-        binaryStream >> userRank;
-        binaryStream >> userRankSize;
-        binaryStream >> serverIdx;
-        binaryStream >> superPodIdx;
-        binaryStream >> deviceType;
-        binaryStream >> deviceNumPerModule;
-        binaryStream >> serverNumPerSuperPod;
-        binaryStream >> serverNum;
-        binaryStream >> moduleNum;
-        binaryStream >> superPodNum;
-        binaryStream >> moduleIdx;
-        binaryStream >> isDiffDeviceModule;
-        binaryStream >> multiModuleDiffDeviceNumMode;
-        binaryStream >> multiSuperPodDiffServerNumMode;
-        binaryStream >> isHCCSSWNumEqualToTwiceSIONum;
-        binaryStream >> mainThread;
-        binaryStream >> notifyNumOnMainThread;
-        binaryStream >> topoLevelNums;
-        binaryStream >> level0Topo;
-        binaryStream >> Level0Nhr;
-        binaryStream >> Level1Nhr;
-        binaryStream >> Level1Hd;
-        binaryStream >> is2DieFullMesh;
-        binaryStream >> level0PcieMix;
-        binaryStream >> level0BigClosRange;
-        binaryStream >> level2Uboe;
-        binaryStream >> level2Ubg;
-        binaryStream >> hostDpuOnly;
-        binaryStream >> level0Symmetric;
-        binaryStream >> level1Symmetric;
-        binaryStream >> topoInstDetailsOfLayerSize;
-        binaryStream >> level0MeshType;
-        binaryStream >> netLayerDetails.netLayerNum;
-        binaryStream >> netLayerDetails.netLayers;
-        binaryStream >> netLayerDetails.netInstNumOfLayer;
-        binaryStream >> netLayerDetails.instSizeListOfLayer;
-        binaryStream >> netLayerDetails.localNetInsSizeOfLayer;
+        BinaryReader ar(binaryStream);
+        VisitFields(ar);
         if (topoInstDetailsOfLayerSize > HCCL_LOGIC_TOPO_LEVEL_NUM) {
             topoInstDetailsOfLayerSize = HCCL_LOGIC_TOPO_LEVEL_NUM;
         }
         topoInstDetailsOfLayer.resize(topoInstDetailsOfLayerSize);
         for (uint32_t idx = 0; idx < topoInstDetailsOfLayerSize; idx++) {
-            binaryStream >> topoInstDetailsOfLayer[idx].topoInstNum;
-            binaryStream >> topoInstDetailsOfLayer[idx].sizeOfTopo;
-            binaryStream >> topoInstDetailsOfLayer[idx].typeOfTopo;
-            binaryStream >> topoInstDetailsOfLayer[idx].ranksInTopo;
-            binaryStream >> topoInstDetailsOfLayer[idx].rankNumForTopoType;
+            VisitTopoInstDetails(ar, topoInstDetailsOfLayer[idx]);
+        }
+        physicalLevelNum = 0;
+        physicalLevels.clear();
+        binaryStream >> physicalLevelNum;
+        if (physicalLevelNum > PHYSICAL_LEVEL_NUM_LIMIT) {
+            HCCL_WARNING(
+                "[TopoInfo][DeSerialize] implausible physicalLevelNum[%u], drop the whole physical level section",
+                physicalLevelNum);
+            physicalLevelNum = 0;
+            return;
+        }
+        physicalLevels.resize(physicalLevelNum);
+        for (auto& level : physicalLevels) {
+            VisitPhysicalLevel(ar, level);
         }
     }
 };
@@ -433,9 +409,24 @@ struct AlgResourceCtx {
     // ChannelInfo* channels; // 通信链路，数量可根据algHierarchyInfo字段进行推算
 };
 
+// 物理层索引，用于 physicalIdxForAlgoLevels
+enum class PhysicalLevelIndex : uint32_t {
+    PHYSICAL_LEVEL_IDX_0,
+    PHYSICAL_LEVEL_IDX_1,
+    PHYSICAL_LEVEL_IDX_2,
+    PHYSICAL_LEVEL_IDX_3,
+    PHYSICAL_LEVEL_IDX_4,
+    PHYSICAL_LEVEL_IDX_5,
+    PHYSICAL_LEVEL_IDX_6,
+    PHYSICAL_LEVEL_IDX_7,
+    PHYSICAL_LEVEL_IDX_8,
+    PHYSICAL_LEVEL_IDX_9,
+};
+
 // 如果能够序列化那么就是下面的结构体
 struct AlgHierarchyInfoForAllLevel {
     std::vector<std::vector<std::vector<u32>>> infos; // 第一维表示有多少level，第二维是每个level的rankID
+    std::vector<std::vector<PhysicalLevelIndex>> physicalIdxForAlgoLevels; // 每个算法层可对应多个物理层
 };
 // 如果能够序列化那么就是下面的结构体
 // 先序列化，把东西考到device，然后把指针存到OpParam，在device侧反序列该指针执行的内存
@@ -473,6 +464,7 @@ struct AlgResourceCtxSerializable {
 
         binaryStream << algType;
         binaryStream << algHierarchyInfo.infos;
+        binaryStream << algHierarchyInfo.physicalIdxForAlgoLevels;
         binaryStream << cclMem;
         binaryStream << notifyNumOnMainThread;
         binaryStream << slaveThreadNum;
@@ -510,6 +502,7 @@ struct AlgResourceCtxSerializable {
 
         binaryStream >> algType;
         binaryStream >> algHierarchyInfo.infos;
+        binaryStream >> algHierarchyInfo.physicalIdxForAlgoLevels;
         binaryStream >> cclMem;
         binaryStream >> notifyNumOnMainThread;
         binaryStream >> slaveThreadNum;
