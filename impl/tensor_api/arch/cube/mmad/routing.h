@@ -30,7 +30,7 @@ namespace te {
 
 class mmad_ignore {
 public:
-    template <const mmad_trait& trait, typename... Args>
+    template <auto& trait, typename... Args>
     __aicore__ inline static void run(const Args&... args)
     {
         static_assert(Std::is_same_v<Args..., void>, "mmad_ignore should not be called");
