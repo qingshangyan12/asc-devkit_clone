@@ -23,7 +23,11 @@
 
 namespace mc2_ops_hccl {
 
-constexpr u32 CLOS_PORT_NUM = 4;
+constexpr u32 CLOS_BW = 10;
+constexpr u32 MESH_BW = 11;
+constexpr u32 CLOS_JETTY = 4;
+constexpr u32 MESH_BW_AICPU = 37;
+constexpr u32 CLOS_BW_AICPU = 25;
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::InsV2AllGatherConcurrentExecutor()
@@ -105,10 +109,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
         CommTopo temp0PriorityTopo = COMM_TOPO_1DMESH;
         CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(
             comm, param, topoInfo, temp0HierarchyInfo, temp0Channels, temp0PriorityTopo));
-        CommTopo temp1PriorityTopo = COMM_TOPO_CLOS;
-        CHK_RET(CalcChannelRequestNHRWithPriorityTopo(
-            comm, param, topoInfo, temp1HierarchyInfo, temp1Channels, temp1PriorityTopo));
-
+        CHK_RET(CalcChannelRequestNhrMultiJetty(comm, param, topoInfo, temp1HierarchyInfo, temp1Channels));
         CHK_PRT_RET(
             temp0Channels.size() != temp1Channels.size(),
             HCCL_ERROR(
@@ -139,12 +140,13 @@ void InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
     tempAlgParams.buffInfo.outBuffType = BufferType::OUTPUT;
     tempAlgParams.count = dataCountPerLoop;
     tempAlgParams.sliceSize = dataCountPerLoop * dataTypeSize_;
+    tempAlgParams.tailSize = dataCountPerLoop * dataTypeSize_;
     tempAlgParams.buffInfo.inBuffBaseOff = dataOffset;
     tempAlgParams.buffInfo.outBuffBaseOff = dataOffset;
     tempAlgParams.buffInfo.hcclBuffBaseOff = scratchOffset;
 
     tempAlgParams.inputSliceStride = 0;
-    tempAlgParams.outputSliceStride = (strideCount_ == 0) ? dataSize_ : strideCount_ * dataTypeSize_;
+    tempAlgParams.outputSliceStride = dataSize_;
     tempAlgParams.repeatNum = 1;
     tempAlgParams.inputRepeatStride = 0;
     tempAlgParams.outputRepeatStride = 0;
@@ -160,10 +162,17 @@ void InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 void InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GetParallelDataSplit(
-    std::vector<float>& splitDataSize) const
+    const OpParam& param, std::vector<float>& splitDataSize) const
 {
-    const u32 portNum0 = rankSize_ - 1; // mesh端口数为rank size - 1
-    const u32 portNum1 = CLOS_PORT_NUM;
+    u32 portNum0 = rankSize_ - 1; // mesh端口数为rank size - 1
+    u32 portNum1 = CLOS_JETTY;
+    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+        portNum0 = MESH_BW;
+        portNum1 = CLOS_BW;
+    } else if (param.opExecuteConfig == OpExecuteConfig::AICPU_TS) {
+        portNum0 = MESH_BW_AICPU;
+        portNum1 = CLOS_BW_AICPU;
+    }
     double splitData = static_cast<double>(portNum0) / (portNum0 + portNum1);
     splitDataSize.push_back(splitData);
     splitDataSize.push_back(1 - splitData);
@@ -219,8 +228,6 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     dataType_ = param.DataDes.dataType;
     dataTypeSize_ = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
     dataSize_ = dataCount_ * dataTypeSize_;
-    strideCount_ = param.DataDes.strideCount;
-    HCCL_DEBUG("[InsV2AllGatherConcurrentExecutor][Orchestrate] strideCount[%lu]", strideCount_);
 
     // 拆分algHierarchyInfo
     CHK_PRT_RET(
@@ -288,7 +295,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 
     // 计算数据切分比例
     std::vector<float> dataSplitSize;
-    GetParallelDataSplit(dataSplitSize);
+    GetParallelDataSplit(param, dataSplitSize);
 
     // 缓存切分
     u32 scratchMultiplierforTemp0 =
@@ -304,7 +311,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
         scratchMemBlockSize = (maxTmpMemSize_ / HCCL_MIN_SLICE_ALIGN / totalScratchMultiple) * HCCL_MIN_SLICE_ALIGN;
     }
     u64 scratchSizeforTemp0 = ScratchMultiplier0 * scratchMemBlockSize;
-    u64 scratchSizeforTemp1 = scratchMemBlockSize - scratchSizeforTemp0;
+    u64 scratchSizeforTemp1 = maxTmpMemSize_ - scratchSizeforTemp0;
     u64 scratchOffsetforTemp0 = 0;
     u64 scratchOffsetforTemp1 = scratchSizeforTemp0;
 
