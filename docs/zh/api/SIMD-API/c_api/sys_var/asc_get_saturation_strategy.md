@@ -26,10 +26,10 @@
 
 ## 功能说明
 
-读取当前饱和控制策略，对应CTRL[60]：
+读取当前饱和控制策略，默认为开启全局饱和配置：
 
-- CTRL[60]=0时，返回`asc_override_strategy::USE_API`。
-- CTRL[60]=1时，返回`asc_override_strategy::USE_GLOBAL`。
+- 当前为单指令/API路径配置时，返回`asc_override_strategy::USE_API`。
+- 当前为全局饱和配置时，返回`asc_override_strategy::USE_GLOBAL`。
 
 常用于临时切换策略前保存原配置，或与[asc_set_saturation_strategy](asc_set_saturation_strategy.md)配合做回读校验。
 
@@ -57,24 +57,23 @@ PIPE_S
 
 ## 调用示例
 
-场景：进入float转int32量化前，先查询当前饱和策略。若不是全局策略，则临时切到`USE_GLOBAL`并开启CAST饱和，转换结束后恢复原策略。
+场景：动态量化场景，溢出需饱和到 ±MAX 而非截断。须先将策略设为`USE_GLOBAL`并开启 CAST 饱和。
 
 ```cpp
-float src = 3.0e9f;  // 可能超出int32正数范围的浮点值
-int32_t dst;
-
-// 查询并保存当前饱和策略
+// SIMD_VF 外：保存并切换饱和策略（动态量化段开始前）
 asc_override_strategy old_strategy = asc_get_saturation_strategy();
-
-// CAST饱和仅在USE_GLOBAL时生效，必要时切换策略并打开开关
-if (old_strategy != asc_override_strategy::USE_GLOBAL) {
-    asc_set_saturation_strategy(asc_override_strategy::USE_GLOBAL);
-}
+bool old_cast_sat = asc_get_saturation_flag(asc_saturation_mode::CAST);
+asc_set_saturation_strategy(asc_override_strategy::USE_GLOBAL);
 asc_set_saturation_flag(asc_saturation_mode::CAST, true);
 
-// 浮点转整数：超出范围时按饱和模式处理
-dst = asc_float2int32_rn(src);
+asc_copy_gm2ub_align(act_ub, act_gm, act_burst_bytes);
+asc_copy_gm2ub_align(bias_ub, bias_gm, bias_burst_bytes);
+asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
-// 恢复进入本段逻辑前的饱和策略
+// 矢量计算循环内：激活 + bias 加法后 float→int32（全局 CAST 饱和生效）
+
+// SIMD_VF 外：恢复进入本段前的配置
+asc_set_saturation_flag(asc_saturation_mode::CAST, old_cast_sat);
 asc_set_saturation_strategy(old_strategy);
 ```

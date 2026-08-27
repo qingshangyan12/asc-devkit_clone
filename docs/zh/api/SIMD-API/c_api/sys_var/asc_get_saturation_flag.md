@@ -52,30 +52,35 @@ PIPE_S
 
 ## 约束说明
 
-- 返回值是语义层结果，不能直接当作CTRL原始比特值使用；若需要原始寄存器值，请使用[asc_get_ctrl](asc_get_ctrl.md)。
-- 对`CAST`模式，即使本接口返回`true`，也需同时满足饱和策略为`USE_GLOBAL`，CAST饱和配置才会在精度转换中真正生效。详见[asc_set_saturation_strategy](asc_set_saturation_strategy.md)。
-- 各模式对应的CTRL比特位与极性说明见[asc_set_saturation_flag](asc_set_saturation_flag.md)。
+- 返回值是 API 语义层结果：`true`表示该模式下饱和已开启，`false`表示未开启（对 INT 为截断；对 FLOAT/FLOAT8/CAST 为非饱和或截断）。各模式语义差异见[asc_set_saturation_flag](asc_set_saturation_flag.md)表1。
+- 对`CAST`模式，即使本接口返回`true`，也需同时满足饱和策略为`USE_GLOBAL`，CAST 饱和配置才会在精度转换中真正生效。详见[asc_set_saturation_strategy](asc_set_saturation_strategy.md)。
 
 ## 调用示例
 
-场景：进入float转int32量化逻辑前，先查询当前CAST饱和是否已开启。若未开启则临时打开并完成转换，转换结束后恢复原状态，避免影响后续其他计算路径。
+场景：动态量化场景，溢出需饱和到 ±MAX 而非截断。须先将策略设为`USE_GLOBAL`并开启 CAST 饱和。
 
 ```cpp
-float src = 3.0e9f;  // 可能超出int32正数范围的浮点值
-int32_t dst;
+// SIMD_VF 外：asc_get_saturation_flag 查询当前 CAST 饱和开关
+bool cast_sat_enabled = asc_get_saturation_flag(asc_saturation_mode::CAST);
+asc_override_strategy old_strategy = asc_get_saturation_strategy();
 
-// 查询并保存当前CAST饱和状态
-bool old_sat = asc_get_saturation_flag(asc_saturation_mode::CAST);
-
-// 保证CAST全局策略生效；若尚未开启饱和则打开
-asc_set_saturation_strategy(asc_override_strategy::USE_GLOBAL);
-if (!old_sat) {
+if (!cast_sat_enabled) {
+    asc_set_saturation_strategy(asc_override_strategy::USE_GLOBAL);
     asc_set_saturation_flag(asc_saturation_mode::CAST, true);
 }
 
-// 浮点转整数：超出范围时按饱和模式处理
-dst = asc_float2int32_rn(src);
+asc_copy_gm2ub_align(act_ub, act_gm, act_burst_bytes);
+asc_copy_gm2ub_align(bias_ub, bias_gm, bias_burst_bytes);
+asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
-// 恢复进入本段逻辑前的CAST饱和状态
-asc_set_saturation_flag(asc_saturation_mode::CAST, old_sat);
+// 矢量计算循环内：激活 + bias 加法后 float→int32（全局 CAST 饱和生效）
+
+// SIMD_VF 外：若本段临时开启过 CAST 饱和，则恢复进入本段前的配置
+if (!cast_sat_enabled) {
+    asc_set_saturation_flag(asc_saturation_mode::CAST, false);
+    asc_set_saturation_strategy(old_strategy);
+}
 ```
+
+数据搬运与 Reg cast 模式可参考[Cast样例](../../../../../../examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast)。

@@ -29,7 +29,7 @@
 设置饱和控制策略，默认为开启全局饱和配置：
 
 - `asc_override_strategy::USE_API`：表示按单指令/API路径配置饱和。
-- `asc_override_strategy::USE_GLOBAL`：表示使用全局CTRL饱和配置。
+- `asc_override_strategy::USE_GLOBAL`：表示使用全局饱和配置。
 
 该策略尤其影响CAST类饱和：只有在`USE_GLOBAL`时，通过[asc_set_saturation_flag](asc_set_saturation_flag.md)配置的`asc_saturation_mode::CAST`才会生效。枚举含义详见[asc_override_strategy](../enum/asc_override_strategy.md)。
 
@@ -57,22 +57,28 @@ PIPE_S
 
 ## 约束说明
 
-- 当策略为`USE_API`时，全局CAST饱和位不生效；若需要CAST全局饱和，必须先或同时将策略设置为`USE_GLOBAL`。
-- 切换策略不会自动修改FLOAT/FLOAT8/INT/CAST各自的饱和开关位。
+- 当策略为`USE_API`时，全局CAST饱和配置不生效；若需要CAST全局饱和，必须先或同时将策略设置为`USE_GLOBAL`。
+- 切换策略不会自动修改各[asc_saturation_mode](../enum/asc_saturation_mode.md)饱和开关。
 
 ## 调用示例
 
-场景：算子中将浮点激活值量化为int32时，源值可能超出int32表示范围。先将饱和策略切到`USE_GLOBAL`，再开启CAST饱和，然后调用[asc_float2int32](../scalar_compute/asc_float2int32.md)做转换。
+场景：动态量化场景，溢出需饱和到 ±MAX 而非截断。须先将策略设为`USE_GLOBAL`并开启 CAST 饱和。
 
 ```cpp
-float src = 3.0e9f;  // 可能超出int32正数范围的浮点值
-int32_t dst;
-
-// 切到全局饱和策略
+// SIMD_VF 外：保存并切换饱和策略（动态量化段开始前）
+asc_override_strategy old_strategy = asc_get_saturation_strategy();
+bool old_cast_sat = asc_get_saturation_flag(asc_saturation_mode::CAST);
 asc_set_saturation_strategy(asc_override_strategy::USE_GLOBAL);
-// 开启CAST饱和
 asc_set_saturation_flag(asc_saturation_mode::CAST, true);
 
-// 浮点转整数：超出范围时按饱和模式处理
-dst = asc_float2int32_rn(src);
+asc_copy_gm2ub_align(act_ub, act_gm, act_burst_bytes);
+asc_copy_gm2ub_align(bias_ub, bias_gm, bias_burst_bytes);
+asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+
+// 矢量计算循环内：激活 + bias 加法后 float→int32（全局 CAST 饱和生效）
+
+// SIMD_VF 外：恢复进入本段前的配置
+asc_set_saturation_flag(asc_saturation_mode::CAST, old_cast_sat);
+asc_set_saturation_strategy(old_strategy);
 ```

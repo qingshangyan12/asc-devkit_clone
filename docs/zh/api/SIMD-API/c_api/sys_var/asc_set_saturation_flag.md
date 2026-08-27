@@ -26,20 +26,19 @@
 
 ## 功能说明
 
-按饱和模式类型设置CTRL寄存器上对应的饱和控制位。`enable_sat`表示API语义上的“是否开启饱和”，接口内部会按模式写入正确的比特极性，开发者无需手动区分不同模式的0/1含义。
+按饱和模式类型设置对应饱和开关。`enable_sat`表示 API 语义上的“是否开启饱和”，接口内部会按模式处理不同语义。
 
-各模式与CTRL比特位及`enable_sat=true`时的写入值如下：
+各模式下`enable_sat`的含义如下：
 
-**表1** 饱和模式与CTRL比特位映射
+**表1** 饱和模式与 enable_sat 语义
 
-| saturation_mode | CTRL比特位 | enable_sat=true时写入 | enable_sat=false时写入 | 说明 |
-| :--- | :--- | :--- | :--- | :--- |
-| FLOAT | CTRL[48] | 0（饱和） | 1（非饱和） | 浮点计算/部分浮点精度转换场景的饱和控制。 |
-| FLOAT8 | CTRL[50] | 0（饱和） | 1（非饱和） | 浮点8相关场景的饱和控制。 |
-| INT | CTRL[53] | 1（饱和） | 0（截断） | 整数计算溢出时的饱和/截断控制。 |
-| CAST | CTRL[59] | 0（饱和） | 1（截断） | 浮点转整数或整数转整数时的精度转换饱和控制。仅在饱和策略为`USE_GLOBAL`时生效。 |
+| saturation_mode | enable_sat=true | enable_sat=false | 说明 |
+| :--- | :--- | :--- | :--- |
+| FLOAT | 饱和 | 非饱和 | 浮点计算及部分浮点精度转换场景的饱和控制，默认为非饱和状态。 |
+| FLOAT8 | 饱和 | 非饱和 | 浮点8相关场景的饱和控制，默认为饱和状态。 |
+| INT | 饱和 | 截断 | 整数计算溢出时的饱和/截断控制，默认为非饱和状态。 |
+| CAST | 饱和 | 截断 | 浮点转整数或整数转整数时的精度转换饱和控制，默认为饱和状态。仅在饱和策略为`USE_GLOBAL`时生效。 |
 
-CTRL寄存器更完整的比特位说明还可参考[asc_set_ctrl](asc_set_ctrl.md)。推荐优先使用本接口，而不是直接对CTRL做位运算。
 
 ## 函数原型
 
@@ -54,7 +53,7 @@ __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mo
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | saturation_mode | 输入 | 饱和模式类型，取值见[asc_saturation_mode](../enum/asc_saturation_mode.md)。 |
-| enable_sat | 输入 | 是否开启饱和。`true`表示开启饱和，`false`表示关闭饱和（对INT模式为截断；对FLOAT/FLOAT8/CAST为非饱和或截断，见上表）。 |
+| enable_sat | 输入 | 是否开启饱和。`true`表示开启饱和，`false`表示关闭饱和（对 INT 为截断；对 FLOAT/FLOAT8/CAST 为非饱和或截断，见上表）。 |
 
 ## 返回值说明
 
@@ -66,23 +65,31 @@ PIPE_S
 
 ## 约束说明
 
-- `enable_sat`是API语义参数，不是CTRL原始比特值。FLOAT/FLOAT8/CAST开启饱和时写入0，INT开启饱和时写入1，二者极性相反，请勿按同一bit语义理解。
-- 当`saturation_mode`为`CAST`时，还需将饱和策略设置为`asc_override_strategy::USE_GLOBAL`，CAST才会生效。可通过[asc_set_saturation_strategy](asc_set_saturation_strategy.md)配置。
-- 本接口仅修改对应饱和控制位，不会破坏CTRL上其他无关比特位。
+- `enable_sat`是 API 语义参数：同一布尔值在不同模式下的关闭语义不同（INT 为截断，FLOAT/FLOAT8/CAST 为非饱和或截断），请以表1为准。
+- 当`saturation_mode`为`CAST`时，还需将饱和策略设置为`asc_override_strategy::USE_GLOBAL`，CAST 才会生效。可通过[asc_set_saturation_strategy](asc_set_saturation_strategy.md)配置。
+- 本接口仅修改对应模式的饱和配置，不影响其他模式。
 
 ## 调用示例
 
-场景：算子中将浮点激活值量化为int32时，源值可能超出int32表示范围。先切到全局CAST策略并开启CAST饱和，再调用[asc_float2int32](../scalar_compute/asc_float2int32.md)做转换，使溢出结果饱和到±MAX，而不是按位截断。
+场景：动态量化场景，溢出需饱和到 ±MAX 而非截断。须先将策略设为`USE_GLOBAL`并开启 CAST 饱和。
 
 ```cpp
-float src = 3.0e9f;  // 可能超出int32正数范围的浮点值
-int32_t dst;
-
-// 使用全局CAST饱和策略
+// SIMD_VF 外：保存并切换饱和策略（动态量化段开始前）
+asc_override_strategy old_strategy = asc_get_saturation_strategy();
+bool old_cast_sat = asc_get_saturation_flag(asc_saturation_mode::CAST);
 asc_set_saturation_strategy(asc_override_strategy::USE_GLOBAL);
-// 开启CAST饱和
 asc_set_saturation_flag(asc_saturation_mode::CAST, true);
 
-// 浮点转整数：超出范围时按饱和模式处理
-dst = asc_float2int32_rn(src);
+asc_copy_gm2ub_align(act_ub, act_gm, act_burst_bytes);
+asc_copy_gm2ub_align(bias_ub, bias_gm, bias_burst_bytes);
+asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+
+// 矢量计算循环内：激活 + bias 加法后 float→int32（全局 CAST 饱和生效）
+
+// SIMD_VF 外：恢复进入本段前的配置
+asc_set_saturation_flag(asc_saturation_mode::CAST, old_cast_sat);
+asc_set_saturation_strategy(old_strategy);
 ```
+
+数据搬运与 Reg cast 模式可参考[Cast样例](../../../../../../examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast)。

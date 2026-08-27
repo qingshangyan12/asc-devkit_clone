@@ -6,10 +6,10 @@ asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[
 
 ```cpp
 enum class asc_saturation_mode : uint8_t {
-    FLOAT = 48,
-    FLOAT8 = 50,
-    INT = 53,
-    CAST = 59
+    FLOAT,
+    FLOAT8,
+    INT,
+    CAST
 };
 ```
 
@@ -17,9 +17,11 @@ enum class asc_saturation_mode : uint8_t {
 
 **表1** 枚举值说明
 
-| 枚举值 | 对应CTRL比特位 | 说明 |
-| ------ | ----------- | ----------- |
-| FLOAT | CTRL[48] | 浮点计算/部分浮点精度转换场景的饱和控制。开启饱和时CTRL[48]=0，关闭时为1。 |
-| FLOAT8 | CTRL[50] | 浮点8相关场景的饱和控制。开启饱和时CTRL[50]=0，关闭时为1。 |
-| INT | CTRL[53] | 整数计算溢出时的饱和/截断控制。开启饱和时CTRL[53]=1，关闭（截断）时为0。 |
-| CAST | CTRL[59] | 浮点转整数或整数转整数时的精度转换饱和控制。开启饱和时CTRL[59]=0，关闭（截断）时为1。仅在饱和策略为`USE_GLOBAL`时生效。 |
+| 枚举值 | 说明 |
+| ------ | ----------- |
+| FLOAT | 浮点计算及部分浮点精度转换场景的饱和控制。 |
+| FLOAT8 | 浮点8相关场景的饱和控制。 |
+| INT | 整数计算溢出时的饱和/截断控制。 |
+| CAST | 浮点转整数或整数转整数时的精度转换饱和控制。仅在饱和策略为[asc_override_strategy::USE_GLOBAL](asc_override_strategy.md)时生效。 |
+
+各模式下开启/关闭饱和的行为差异，见[asc_set_saturation_flag](../sys_var/asc_set_saturation_flag.md)中`enable_sat`参数说明。

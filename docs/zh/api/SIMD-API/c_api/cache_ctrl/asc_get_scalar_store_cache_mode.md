@@ -51,11 +51,10 @@ PIPE_S
 ## 约束说明
 
 - 本接口仅反映标量store侧策略，与标量load侧以及向量搬运接口参数中的`l2_cache_mode`无关。
-- 若CTRL对应4bit编码不属于已定义枚举值，接口仍按该编码原样强转为枚举返回。开发者应优先通过[asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md)写入合法枚举值。
 
 ## 调用示例
 
-场景：多核算子通过[asc_atomic_add](../scalar_compute/asc_atomic_add.md)向GM上的统计counter做标量原子累加。原子写会绕过DCache，适合对控制字段做一次性更新；进入累加前查询并保存当前store策略，临时切换为`NOTALLOC_CLEAN`避免不必要的L2分配，累加结束后恢复原策略。
+场景：与[asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md)场景B一致。多核算子通过[asc_atomic_add](../scalar_compute/asc_atomic_add.md)向GM统计counter做标量原子累加；进入累加前查询并保存当前store策略，临时切换为`NOTALLOC_CLEAN`避免不必要的L2分配，累加结束后恢复原策略。
 
 ```cpp
 __gm__ int32_t* counter_gm;  // GM上的多核共享计数器
