@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/math_compute/Round_interface/Round_res.md#id1 -->
 
 ## 功能说明
 
@@ -83,7 +84,7 @@ Round\(-3.4\) = -3.0
 
 -   只支持四舍五入到整数，不支持四舍五入到小数。如果该数恰好在两个整数中间，即小数部分为0.5，则“向偶数舍入”。
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 
 ## 调用示例
 

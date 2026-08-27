@@ -52,14 +52,14 @@ __aicore__ inline void SyncAllImpl()
 
 template <uint8_t modeId, pipe_t pipe>
 __aicore__ inline void NotifyEventImpl(uint16_t flagId)
-{}
+{
+    ASCENDC_ASSERT((false), "NotifyEvent is not supported!");
+}
 
 template <uint8_t modeId = 0, pipe_t pipe = PIPE_S>
 __aicore__ inline void WaitEventImpl(uint16_t flagId)
 {
-    if (modeId == 2) {
-        PipeBarrier<PIPE_ALL>();
-    }
+    ASCENDC_ASSERT((false), "WaitEvent is not supported!");
 }
 __aicore__ inline void SetSyncBaseAddrImpl(uint64_t config)
 {

@@ -37,8 +37,8 @@ const uint64_t FULL_MASK = 0xffffffffffffffff;
 const uint64_t CONST_MASK_VALUE = 0x8000000000000000;
 const uint16_t MAX_HALF_MASK_LEN = 64;
 const int32_t DEFAULT_C0_SIZE = 32;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1501 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 const int32_t DEFAULT_BLOCK_SIZE = 64;
 #else
 const int32_t DEFAULT_BLOCK_SIZE = 256;
@@ -49,9 +49,8 @@ const bool DEFAULT_REPEAT_STRIDE_MODE = 0;
 const bool STRIDE_SIZE_MODE = 0;
 const int32_t ONE_BYTE_BIT_SIZE = 8;
 const uint16_t MASK_ARRAY_SIZE = 4;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-                              __NPU_ARCH__ == 1501 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 const int32_t B32_BIT_SIZE = 32;
 #endif
 const uint32_t TOTAL_L0A_SIZE = 64 * 1024;
@@ -95,9 +94,8 @@ constexpr uint32_t INT2_BIT_NUM = 2;
 constexpr uint32_t INT1_BIT_NUM = 1;
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-                              __NPU_ARCH__ == 1501 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 // int3b_t param
 constexpr uint32_t INT3_BIT_NUM = 3;
 // int2b_t param
@@ -271,9 +269,8 @@ const int32_t SRC_GAP_SIZE_BYTE = 32;
 const int32_t DST_BURST_LEN_SIZE_ELE = 256;
 const int32_t VREDUCE_PER_REP_OUTPUT = 2;
 const uint16_t ONE_PARAM_SIZE = 8;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-                              __NPU_ARCH__ == 1501 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 const int32_t BLOCK_COUT = 16;
 const uint16_t TWO_BLK_SIZE = 64;
 #endif
@@ -283,8 +280,8 @@ const uint16_t AIV_CORE_NUM = 72;
 const uint16_t AIV_CORE_NUM = 50;
 #endif
 const uint16_t DUMP_MSG_HEAD_SIZE = 24;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1501 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 const int32_t ONE_REPEAT_BYTE_SIZE = 64;
 #else
 const int32_t ONE_REPEAT_BYTE_SIZE = 256;
@@ -298,8 +295,8 @@ const uint8_t B16_BYTE_SIZE = 2;
 const uint8_t B8_BYTE_SIZE = 1;
 const uint8_t B32_DATA_NUM_PER_BLOCK = 8;
 const uint8_t B16_DATA_NUM_PER_BLOCK = 16;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1501 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 const int32_t B16_DATA_NUM_PER_REPEAT = 32;
 const int32_t B32_DATA_NUM_PER_REPEAT = 16;
 #else
@@ -338,8 +335,8 @@ constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 constexpr size_t RESERVED_WORKSPACE = 0;
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113))
 constexpr size_t RESERVED_WORKSPACE = 0;
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1501 || __NPU_ARCH__ == 5161 || \
-                                __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#elif defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 constexpr size_t RESERVED_WORKSPACE = 16 * 1024 * 1024;
 #endif
 
@@ -668,9 +665,8 @@ using int1b_t = IntegerSubType<INT1_BIT_NUM, true>;
 using uint1b_t = IntegerSubType<INT1_BIT_NUM, false>;
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-                              __NPU_ARCH__ == 1501 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 using uint4b_t = IntegerSubType<INT4_BIT_NUM, false>;
 using uint3b_t = IntegerSubType<INT3_BIT_NUM, false>;
 using uint2b_t = IntegerSubType<INT2_BIT_NUM, false>;
@@ -740,9 +736,8 @@ struct SizeOfBits<uint1b_t> {
 };
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-                              __NPU_ARCH__ == 1501 || __NPU_ARCH__ == 5161 || \
-                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 template <>
 struct SizeOfBits<uint4b_t> {
     static int const value = INT4_BIT_NUM;
@@ -830,6 +825,10 @@ constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIV_WAIT = 1U <<
 // If set, WaitPreTaskEndV3Impl uses loose sync; otherwise it uses tight sync.
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_CTRL_SPLIT_CORE = 1U << 15;
 } // namespace Internal
+
+#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+constexpr int32_t SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE = 0x5A5A5A5A;
+#endif
 
 #if defined(__ASCENDC_SUPERKERNEL_AUTO_SYNC_ALL__)
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_superKernelAutoSyncAllConfigGmBaseAddr;

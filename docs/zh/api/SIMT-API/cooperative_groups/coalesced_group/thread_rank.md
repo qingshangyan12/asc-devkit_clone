@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/cooperative_groups/coalesced_group/thread_rank_res.md#id1 -->
 
 ## 功能说明
 
@@ -29,7 +30,7 @@
 ## 函数原型
 
 ```cpp
-unsigned long long thread_rank() const
+unsigned int thread_rank() const
 ```
 
 ## 参数说明
@@ -60,7 +61,7 @@ unsigned long long thread_rank() const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            unsigned long long rank = active.thread_rank();
+            unsigned int rank = active.thread_rank();
         }
         ...
     }
@@ -75,7 +76,7 @@ unsigned long long thread_rank() const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            unsigned long long rank = active.thread_rank();
+            unsigned int rank = active.thread_rank();
         }
         ...
     }

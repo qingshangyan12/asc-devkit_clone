@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftmaxFlashV3_res.md#id1 -->
 
 ## 功能说明
 
@@ -76,9 +77,9 @@ def softmax_flash_3(src, height, width, loopCnt, alpha, baseK, inmax=None, insum
         x_sub = src - maxTmp
         dst = np.exp(x_sub)
         exp_max = np.exp(inmax - x_max + shiftPrev)
-        x_sum = np.sum(x_exp, axis=-1, keepdims=True)
+        x_sum = np.sum(dst, axis=-1, keepdims=True)
         x_sum = exp_max * insum +  x_sum
-        return x_exp, x_max, x_sum, x_mean, exp_max
+        return dst, x_max, x_sum, x_mean, exp_max
 ```
 
 ## 函数原型
@@ -154,7 +155,7 @@ struct SoftMaxParams {
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 -   对于输入srcTensor需要满足：尾轴长度n大于等于512，同时n是64的倍数；非尾轴长度的乘积m为8的倍数。
 -   srcTensor和dstTensor的Tensor的空间可以复用，meanTensor和inMeanTensor的空间可以复用，maxTensor和inMaxTensor的空间可以复用，expSumTensor和inExpSumTensor的空间可以复用。
 -   meanTensor、expSumTensor、maxTensor、expMaxTensor、inMeanTensor、inExpSumTensor、inMaxTensor的Tensor空间，last轴长度必须是32字节。

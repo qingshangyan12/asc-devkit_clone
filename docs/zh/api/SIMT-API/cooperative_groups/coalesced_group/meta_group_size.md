@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/cooperative_groups/coalesced_group/meta_group_size_res.md#id1 -->
 
 ## 功能说明
 
@@ -29,7 +30,7 @@
 ## 函数原型
 
 ```cpp
-unsigned long long meta_group_size() const
+unsigned int meta_group_size() const
 ```
 
 ## 参数说明
@@ -57,7 +58,7 @@ unsigned long long meta_group_size() const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            unsigned long long thread_num = active.meta_group_size(); // 返回1
+            unsigned int group_size = active.meta_group_size(); // 返回1
         }
         ...
     }
@@ -72,7 +73,7 @@ unsigned long long meta_group_size() const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            unsigned long long thread_num = active.meta_group_size(); // 返回1
+            unsigned int group_size = active.meta_group_size(); // 返回1
         }
         ...
     }

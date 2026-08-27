@@ -21,11 +21,11 @@ Ascend 950PR/Ascend 950DT
 | asc_add_scalar | uint8_t | uint8_t | 128 |
 | asc_add_scalar | int16_t | int16_t | 64 |
 | asc_add_scalar | uint16_t | uint16_t | 64 |
-| asc_add_scalar | half | half | 64 |
-| asc_add_scalar | bfloat16_t | bfloat16_t | 64 |
+| asc_add_scalar | half | half | 128 |
+| asc_add_scalar | bfloat16_t | bfloat16_t | 128 |
 | asc_add_scalar | int32_t | int32_t | 32 |
 | asc_add_scalar | uint32_t | uint32_t | 32 |
-| asc_add_scalar | float | float | 32 |
+| asc_add_scalar | float | float | 64 |
 | asc_ln | half | half | 16 |
 | asc_ln | float | float | 16 |
 | asc_max_scalar | int8_t | int8_t | 256 |
@@ -82,7 +82,6 @@ Ascend 950PR/Ascend 950DT
 | asc_or | int16_t | int16_t | 128 |
 | asc_or | uint16_t | uint16_t | 128 |
 | asc_or | half | half | 128 |
-| asc_or | bfloat16_t | bfloat16_t | 128 |
 | asc_or | int32_t | int32_t | 64 |
 | asc_or | uint32_t | uint32_t | 64 |
 | asc_or | float | float | 64 |
@@ -240,5 +239,5 @@ Ascend 950PR/Ascend 950DT
 
 | 接口 | 源操作数数据类型 | 目的操作数数据类型 | 理论并行度（element/cycle） |
 | -------- | ---------------- | ---------------- | ---------------- |
-| asc_cumulative_histogram_bin0 | uint8_t | uint16_t | 64 |
-| asc_cumulative_histogram_bin1 | uint8_t | uint16_t | 64 |
+| asc_cumulative_histogram_bin0 | uint8_t | uint16_t | 32 |
+| asc_cumulative_histogram_bin1 | uint8_t | uint16_t | 32 |

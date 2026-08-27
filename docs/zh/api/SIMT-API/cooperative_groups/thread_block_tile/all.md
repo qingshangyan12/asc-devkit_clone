@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/cooperative_groups/thread_block_tile/all_res.md#id1 -->
 
 ## 功能说明
 
@@ -59,7 +60,7 @@ int all(int predicate) const
         ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
-        uint32_t result = tile4.all(1);             // 返回1
+        int result = tile4.all(1);                  // 返回1
         ...
     }
     ```
@@ -73,7 +74,7 @@ int all(int predicate) const
         ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
-        uint32_t result = tile4.all(1);             // 返回1
+        int result = tile4.all(1);                  // 返回1
         ...
     }
     ```

@@ -21,17 +21,17 @@
 
 | 接口名 | 功能描述 |
 | --- | --- |
-| [asc_atomic_add](../atomic_operations/asc_atomic_add.md) | 对Unified Buffer或Global Memory上的数据与指定数据执行原子加操作，即将指定数据累加到Unified Buffer或Global Memory的数据中。 |
-| [asc_atomic_sub](../atomic_operations/asc_atomic_sub.md) | 对Unified Buffer或Global Memory上的数据与指定数据执行原子减操作，即在Unified Buffer或Global Memory的数据上减去指定数据。 |
-| [asc_atomic_exch](../atomic_operations/asc_atomic_exch.md) | 对Unified Buffer或Global Memory地址做原子赋值操作，即将指定数据赋值到Unified Buffer或Global Memory地址中。 |
-| [asc_atomic_max](../atomic_operations/asc_atomic_max.md) | 对Unified Buffer或Global Memory数据做原子求最大值操作，即将Unified Buffer或Global Memory的数据与指定数据中的最大值赋值到Unified Buffer或Global Memory地址中。 |
-| [asc_atomic_min](../atomic_operations/asc_atomic_min.md) | 对Unified Buffer或Global Memory数据做原子求最小值操作，即将Unified Buffer或Global Memory的数据与指定数据中的最小值赋值到Unified Buffer或Global Memory地址中。 |
-| [asc_atomic_inc](../atomic_operations/asc_atomic_inc.md) | 对Unified Buffer或Global Memory上address的数值进行原子加1操作，如果address上的数值大于等于指定数值val，则对address赋值为0，否则将address上数值加1。 |
-| [asc_atomic_dec](../atomic_operations/asc_atomic_dec.md) | 对Unified Buffer或Global Memory上address的数值进行原子减1操作，如果address上的数值等于0或大于指定数值val，则对address赋值为val，否则将address上数值减1。 |
-| [asc_atomic_cas](../atomic_operations/asc_atomic_cas.md) | 对Unified Buffer或Global Memory上address的数值进行原子比较赋值操作，如果address上的数值等于指定数值compare，则对address赋值为指定数值val，否则address的数值不变。 |
-| [asc_atomic_and](../atomic_operations/asc_atomic_and.md) | 对Unified Buffer或Global Memory上address的数值与指定数值val进行原子与（&）操作，即将address数值与（&）val的结果赋值到Unified Buffer或Global Memory上。 |
-| [asc_atomic_or](../atomic_operations/asc_atomic_or.md) | 对Unified Buffer或Global Memory上address的数值与指定数值val进行原子或（\|）操作，即将address数值或（\|）val的结果赋值到Unified Buffer或Global Memory上。 |
-| [asc_atomic_xor](../atomic_operations/asc_atomic_xor.md) | 对Unified Buffer或Global Memory上address的数值与指定数值val进行原子异或（^）操作，即将address数值异或（^）val的结果赋值到Unified Buffer或Global Memory上。 |
+| [asc_atomic_add](../atomic_operations/asc_atomic_add.md) | 对UB或Global Memory上的数据与指定数据执行原子加操作，即将指定数据累加到UB或Global Memory的数据中。 |
+| [asc_atomic_sub](../atomic_operations/asc_atomic_sub.md) | 对UB或Global Memory上的数据与指定数据执行原子减操作，即在UB或Global Memory的数据上减去指定数据。 |
+| [asc_atomic_exch](../atomic_operations/asc_atomic_exch.md) | 对UB或Global Memory地址做原子赋值操作，即将指定数据赋值到UB或Global Memory地址中。 |
+| [asc_atomic_max](../atomic_operations/asc_atomic_max.md) | 对UB或Global Memory数据做原子求最大值操作，即将UB或Global Memory的数据与指定数据中的最大值赋值到UB或Global Memory地址中。 |
+| [asc_atomic_min](../atomic_operations/asc_atomic_min.md) | 对UB或Global Memory数据做原子求最小值操作，即将UB或Global Memory的数据与指定数据中的最小值赋值到UB或Global Memory地址中。 |
+| [asc_atomic_inc](../atomic_operations/asc_atomic_inc.md) | 对UB或Global Memory上address的数值进行原子加1操作，如果address上的数值大于等于指定数值val，则对address赋值为0，否则将address上数值加1。 |
+| [asc_atomic_dec](../atomic_operations/asc_atomic_dec.md) | 对UB或Global Memory上address的数值进行原子减1操作，如果address上的数值等于0或大于指定数值val，则对address赋值为val，否则将address上数值减1。 |
+| [asc_atomic_cas](../atomic_operations/asc_atomic_cas.md) | 对UB或Global Memory上address的数值进行原子比较赋值操作，如果address上的数值等于指定数值compare，则对address赋值为指定数值val，否则address的数值不变。 |
+| [asc_atomic_and](../atomic_operations/asc_atomic_and.md) | 对UB或Global Memory上address的数值与指定数值val进行原子与（&）操作，即将address数值与（&）val的结果赋值到UB或Global Memory上。 |
+| [asc_atomic_or](../atomic_operations/asc_atomic_or.md) | 对UB或Global Memory上address的数值与指定数值val进行原子或（\|）操作，即将address数值或（\|）val的结果赋值到UB或Global Memory上。 |
+| [asc_atomic_xor](../atomic_operations/asc_atomic_xor.md) | 对UB或Global Memory上address的数值与指定数值val进行原子异或（^）操作，即将address数值异或（^）val的结果赋值到UB或Global Memory上。 |
 
 ## Warp函数
 
@@ -175,6 +175,16 @@
 | [__half2int_rd](../math_functions/half_type/half_precision_conversion_functions/__half2int_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的有符号整数。 |
 | [__half2int_ru](../math_functions/half_type/half_precision_conversion_functions/__half2int_ru.md) | 获取输入遵循CAST_CEIL模式转换成的有符号整数。 |
 | [__half2int_rna](../math_functions/half_type/half_precision_conversion_functions/__half2int_rna.md) | 获取输入遵循CAST_ROUND模式转换成的有符号整数。 |
+| [__half2char_rz](../math_functions/half_type/half_precision_conversion_functions/__half2char_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的signed char类型数据。 |
+| [__half2uchar_rz](../math_functions/half_type/half_precision_conversion_functions/__half2uchar_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的unsigned char类型数据。 |
+| [__half2short_rn](../math_functions/half_type/half_precision_conversion_functions/__half2short_rn.md) | 获取输入遵循CAST_RINT模式转换成的short int类型数据。 |
+| [__half2short_rz](../math_functions/half_type/half_precision_conversion_functions/__half2short_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的short int类型数据。 |
+| [__half2short_rd](../math_functions/half_type/half_precision_conversion_functions/__half2short_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的short int类型数据。 |
+| [__half2short_ru](../math_functions/half_type/half_precision_conversion_functions/__half2short_ru.md) | 获取输入遵循CAST_CEIL模式转换成的short int类型数据。 |
+| [__half2ushort_rn](../math_functions/half_type/half_precision_conversion_functions/__half2ushort_rn.md) | 获取输入遵循CAST_RINT模式转换成的unsigned short int类型数据。 |
+| [__half2ushort_rz](../math_functions/half_type/half_precision_conversion_functions/__half2ushort_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的unsigned short int类型数据。 |
+| [__half2ushort_rd](../math_functions/half_type/half_precision_conversion_functions/__half2ushort_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的unsigned short int类型数据。 |
+| [__half2ushort_ru](../math_functions/half_type/half_precision_conversion_functions/__half2ushort_ru.md) | 获取输入遵循CAST_CEIL模式转换成的unsigned short int类型数据。 |
 | [__half2ull_rn](../math_functions/half_type/half_precision_conversion_functions/__half2ull_rn.md) | 获取输入遵循CAST_RINT模式转换成的64位无符号整数。 |
 | [__half2ull_rz](../math_functions/half_type/half_precision_conversion_functions/__half2ull_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的64位无符号整数。 |
 | [__half2ull_rd](../math_functions/half_type/half_precision_conversion_functions/__half2ull_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的64位无符号整数。 |
@@ -215,6 +225,14 @@
 | [__int2half_ru_sat](../math_functions/half_type/half_precision_conversion_functions/__int2half_ru_sat.md) | 饱和模式下获取输入的int32数据转换成的half数据，并遵循CAST_CEIL模式。 |
 | [__int2half_rna](../math_functions/half_type/half_precision_conversion_functions/__int2half_rna.md) | 获取输入遵循CAST_ROUND模式转换成的half类型数据。 |
 | [__int2half_rna_sat](../math_functions/half_type/half_precision_conversion_functions/__int2half_rna_sat.md) | 饱和模式下获取输入的int32数据转换成的half数据，并遵循CAST_ROUND模式。 |
+| [__short2half_rn](../math_functions/half_type/half_precision_conversion_functions/__short2half_rn.md) | 获取输入遵循CAST_RINT模式转换成的half类型数据。 |
+| [__short2half_rz](../math_functions/half_type/half_precision_conversion_functions/__short2half_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的half类型数据。 |
+| [__short2half_rd](../math_functions/half_type/half_precision_conversion_functions/__short2half_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的half类型数据。 |
+| [__short2half_ru](../math_functions/half_type/half_precision_conversion_functions/__short2half_ru.md) | 获取输入遵循CAST_CEIL模式转换成的half类型数据。 |
+| [__ushort2half_rn](../math_functions/half_type/half_precision_conversion_functions/__ushort2half_rn.md) | 获取输入遵循CAST_RINT模式转换成的half类型数据。 |
+| [__ushort2half_rz](../math_functions/half_type/half_precision_conversion_functions/__ushort2half_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的half类型数据。 |
+| [__ushort2half_rd](../math_functions/half_type/half_precision_conversion_functions/__ushort2half_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的half类型数据。 |
+| [__ushort2half_ru](../math_functions/half_type/half_precision_conversion_functions/__ushort2half_ru.md) | 获取输入遵循CAST_CEIL模式转换成的half类型数据。 |
 | [__ull2half_rn](../math_functions/half_type/half_precision_conversion_functions/__ull2half_rn.md) | 获取输入遵循CAST_RINT模式转换成的half类型数据。 |
 | [__ull2half_rz](../math_functions/half_type/half_precision_conversion_functions/__ull2half_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的half类型数据。 |
 | [__ull2half_rd](../math_functions/half_type/half_precision_conversion_functions/__ull2half_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的half类型数据。 |
@@ -227,6 +245,7 @@
 | [__ll2half_rna](../math_functions/half_type/half_precision_conversion_functions/__ll2half_rna.md) | 获取输入遵循CAST_ROUND模式转换成的half类型数据。 |
 | [__floats2half2_rn](../math_functions/half_type/half_precision_conversion_functions/__floats2half2_rn.md) | 将输入的数据x，y遵循CAST_RINT模式分别转换为half类型并填充到half2的前后两部分，返回转换后的half2类型数据。 |
 | [__float22half2_rn](../math_functions/half_type/half_precision_conversion_functions/__float22half2_rn.md) | 将float2类型数据遵循CAST_RINT模式转换为half2类型，返回转换后的half2类型数据。 |
+| [__float2half2_rn](../math_functions/half_type/half_precision_conversion_functions/__float2half2_rn.md) | 获取输入遵循CAST_RINT模式转换并复制到两个分量后的half2类型数据。 |
 | [__low2half](../math_functions/half_type/half_precision_conversion_functions/__low2half.md) | 返回输入数据的低16位。 |
 | [__low2half2](../math_functions/half_type/half_precision_conversion_functions/__low2half2.md) | 将输入数据的低16位填充到half2并返回。 |
 | [__low2float](../math_functions/half_type/half_precision_conversion_functions/__low2float.md) | 将输入数据的低16位转换为浮点数并返回结果。 |
@@ -237,7 +256,11 @@
 | [__highs2half2](../math_functions/half_type/half_precision_conversion_functions/__highs2half2.md) | 分别提取两个half2输入的高16位，并填充到half2中。返回填充后的数据。 |
 | [__lows2half2](../math_functions/half_type/half_precision_conversion_functions/__lows2half2.md) | 分别提取两个half2输入的低16位，并填充到half2中。返回填充后的数据。 |
 | [__halves2half2](../math_functions/half_type/half_precision_conversion_functions/__halves2half2.md) | 将输入的数据分别填充为half2前后两个分量，返回填充后数据。 |
+| [__half2half2](../math_functions/half_type/half_precision_conversion_functions/__half2half2.md) | 将half输入数据复制到half2的两个分量并返回。 |
 | [__half22float2](../math_functions/half_type/half_precision_conversion_functions/__half22float2.md) | 将half2的两个分量分别转换为float，并填充到float2返回。 |
+| [__half_as_short](../math_functions/half_type/half_precision_conversion_functions/__half_as_short.md) | 将half数据按位重新解释为short int类型数据。 |
+| [__half_as_ushort](../math_functions/half_type/half_precision_conversion_functions/__half_as_ushort.md) | 将half数据按位重新解释为unsigned short int类型数据。 |
+| [__short_as_half](../math_functions/half_type/half_precision_conversion_functions/__short_as_half.md) | 将short int的按位重新解释为half，即将short int的数据存储的位按照half的格式进行读取。 |
 | [__ushort_as_half](../math_functions/half_type/half_precision_conversion_functions/__ushort_as_half.md) | 将unsigned short int的按位重新解释为half，即将unsigned short int的数据存储的位按照half的格式进行读取。 |
 
 **表12**  half2类型算术函数
@@ -423,6 +446,16 @@
 | [__bfloat162int_rd](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162int_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的有符号整数。 |
 | [__bfloat162int_ru](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162int_ru.md) | 获取输入遵循CAST_CEIL模式转换成的有符号整数。 |
 | [__bfloat162int_rna](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162int_rna.md) | 获取输入遵循CAST_ROUND模式转换成的有符号整数。 |
+| [__bfloat162char_rz](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162char_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的signed char类型数据。 |
+| [__bfloat162uchar_rz](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162uchar_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的unsigned char类型数据。 |
+| [__bfloat162short_rn](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162short_rn.md) | 获取输入遵循CAST_RINT模式转换成的short int类型数据。 |
+| [__bfloat162short_rz](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162short_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的short int类型数据。 |
+| [__bfloat162short_rd](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162short_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的short int类型数据。 |
+| [__bfloat162short_ru](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162short_ru.md) | 获取输入遵循CAST_CEIL模式转换成的short int类型数据。 |
+| [__bfloat162ushort_rn](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162ushort_rn.md) | 获取输入遵循CAST_RINT模式转换成的unsigned short int类型数据。 |
+| [__bfloat162ushort_rz](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162ushort_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的unsigned short int类型数据。 |
+| [__bfloat162ushort_rd](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162ushort_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的unsigned short int类型数据。 |
+| [__bfloat162ushort_ru](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162ushort_ru.md) | 获取输入遵循CAST_CEIL模式转换成的unsigned short int类型数据。 |
 | [__bfloat162ull_rn](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162ull_rn.md) | 获取输入遵循CAST_RINT模式转换成的64位无符号整数。 |
 | [__bfloat162ull_rz](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162ull_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的64位无符号整数。 |
 | [__bfloat162ull_rd](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat162ull_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的64位无符号整数。 |
@@ -443,6 +476,14 @@
 | [__int2bfloat16_rd](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__int2bfloat16_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的bfloat16类型数据。 |
 | [__int2bfloat16_ru](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__int2bfloat16_ru.md) | 获取输入遵循CAST_CEIL模式转换成的bfloat16类型数据。 |
 | [__int2bfloat16_rna](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__int2bfloat16_rna.md) | 获取输入遵循CAST_ROUND模式转换成的bfloat16类型数据。 |
+| [__short2bfloat16_rn](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__short2bfloat16_rn.md) | 获取输入遵循CAST_RINT模式转换成的bfloat16类型数据。 |
+| [__short2bfloat16_rz](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__short2bfloat16_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的bfloat16类型数据。 |
+| [__short2bfloat16_rd](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__short2bfloat16_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的bfloat16类型数据。 |
+| [__short2bfloat16_ru](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__short2bfloat16_ru.md) | 获取输入遵循CAST_CEIL模式转换成的bfloat16类型数据。 |
+| [__ushort2bfloat16_rn](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__ushort2bfloat16_rn.md) | 获取输入遵循CAST_RINT模式转换成的bfloat16类型数据。 |
+| [__ushort2bfloat16_rz](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__ushort2bfloat16_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的bfloat16类型数据。 |
+| [__ushort2bfloat16_rd](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__ushort2bfloat16_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的bfloat16类型数据。 |
+| [__ushort2bfloat16_ru](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__ushort2bfloat16_ru.md) | 获取输入遵循CAST_CEIL模式转换成的bfloat16类型数据。 |
 | [__ull2bfloat16_rn](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__ull2bfloat16_rn.md) | 获取输入遵循CAST_RINT模式转换成的bfloat16类型数据。 |
 | [__ull2bfloat16_rz](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__ull2bfloat16_rz.md) | 获取输入遵循CAST_TRUNC模式转换成的bfloat16类型数据。 |
 | [__ull2bfloat16_rd](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__ull2bfloat16_rd.md) | 获取输入遵循CAST_FLOOR模式转换成的bfloat16类型数据。 |
@@ -468,6 +509,9 @@
 | [__lowhigh2highlow](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__lowhigh2highlow.md) | 将输入数据的高低16位进行交换并返回。 |
 | [__lows2bfloat162](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__lows2bfloat162.md) | 分别提取两个bfloat162输入的低16位，并填充到bfloat162中。返回填充后的数据。 |
 | [__bfloat1622float2](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat1622float2.md) | 将bfloat16x2的两个分量分别转换为float，并填充到float2返回。 |
+| [__bfloat16_as_short](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat16_as_short.md) | 将bfloat16数据按位重新解释为short int类型数据。 |
+| [__bfloat16_as_ushort](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__bfloat16_as_ushort.md) | 将bfloat16数据按位重新解释为unsigned short int类型数据。 |
+| [__short_as_bfloat16](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__short_as_bfloat16.md) | 将short int的按位重新解释为bfloat16，即将short int的数据存储的位按照bfloat16的格式进行读取。 |
 | [__ushort_as_bfloat16](../math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__ushort_as_bfloat16.md) | 将unsigned short int的按位重新解释为bfloat16，即将unsigned short int的数据存储的位按照bfloat16的格式进行读取。 |
 
 **表19**  bfloat16x2类型算术函数
@@ -616,9 +660,13 @@
 | [y1f](../math_functions/float_math_functions/y1f.md) | 获取输入数据x的1阶第二类贝塞尔函数y1的值。 |
 | [ynf](../math_functions/float_math_functions/ynf.md) | 获取输入数据x的n阶第二类贝塞尔函数yn的值。 |
 | [fabsf](../math_functions/float_math_functions/fabsf.md) | 获取输入数据的绝对值。 |
+| [abs](../math_functions/float_math_functions/abs.md) | 获取float类型输入数据的绝对值。 |
 | [fmaf](../math_functions/float_math_functions/fmaf.md) | 对输入数据x、y、z，计算x与y相乘加上z的结果。 |
 | [fmaxf](../math_functions/float_math_functions/fmaxf.md) | 获取两个输入数据中的最大值。 |
+| [max](../math_functions/float_math_functions/max.md) | 获取两个输入数据中的最大值。 |
 | [fminf](../math_functions/float_math_functions/fminf.md) | 获取两个输入数据中的最小值。 |
+| [min](../math_functions/float_math_functions/min.md) | 获取两个输入数据中的最小值。 |
+| [nanf](../math_functions/float_math_functions/nanf.md) | 根据字符串生成float类型的安静NaN值（浮点尾数最高位为1）。 |
 | [fdimf](../math_functions/float_math_functions/fdimf.md) | 获取输入数据的差值，差值小于0时，返回0。 |
 | [remquof](../math_functions/float_math_functions/remquof.md) | 获取输入数据x除以y的余数。求余数时，商取最接近x除以y浮点数结果的整数，当x除以y的浮点数结果与左右最接近的整数距离相等时，商取偶数，同时将商赋值给指针变量quo。 |
 | [fmodf](../math_functions/float_math_functions/fmodf.md) | 获取输入数据x除以y的余数。求余数时，商取x除以y浮点数结果的整数部分。 |
@@ -754,7 +802,7 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [__isGlobal](../address_space_predicate_functions/__isGlobal.md) | 判断输入的指针是否指向Global Memory内存空间的地址。 |
-| [__isUbuf](../address_space_predicate_functions/__isUbuf.md) | 判断输入的指针是否指向Unified Buffer内存空间的地址。 |
+| [__isUbuf](../address_space_predicate_functions/__isUbuf.md) | 判断输入的指针是否指向UB内存空间的地址。 |
 | [__isLocal](../address_space_predicate_functions/__isLocal.md) | 判断输入的指针是否指向栈空间的地址。 |
 
 ## 地址空间转换函数
@@ -764,10 +812,10 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [__cvta_generic_to_global](../address_space_conversion_functions/__cvta_generic_to_global.md) | 将输入的指针转换为其指向的Global Memory内存空间的地址值并返回。 |
-| [__cvta_generic_to_ubuf](../address_space_conversion_functions/__cvta_generic_to_ubuf.md) | 将输入的指针转换为其指向的Unified Buffer内存空间的地址值并返回。 |
+| [__cvta_generic_to_ubuf](../address_space_conversion_functions/__cvta_generic_to_ubuf.md) | 将输入的指针转换为其指向的UB内存空间的地址值并返回。 |
 | [__cvta_generic_to_local](../address_space_conversion_functions/__cvta_generic_to_local.md) | 将输入的指针转换为其指向的栈空间地址的值并返回。 |
 | [__cvta_global_to_generic](../address_space_conversion_functions/__cvta_global_to_generic.md) | 将Global Memory内存空间的地址值转换为对应的指针。 |
-| [__cvta_ubuf_to_generic](../address_space_conversion_functions/__cvta_ubuf_to_generic.md) | 将Unified Buffer内存空间的地址值转换为对应的指针。 |
+| [__cvta_ubuf_to_generic](../address_space_conversion_functions/__cvta_ubuf_to_generic.md) | 将UB内存空间的地址值转换为对应的指针。 |
 | [__cvta_local_to_generic](../address_space_conversion_functions/__cvta_local_to_generic.md) | 将栈空间的地址值转换为对应的指针。 |
 
 ## 协作组
@@ -823,9 +871,26 @@
 | [any](../cooperative_groups/thread_block_tile/any.md) | 判断是否有组内线程的输入不为0。 |
 | [all](../cooperative_groups/thread_block_tile/all.md) | 判断是否所有组内线程的输入均不为0。 |
 
-**表31**  协作组划分接口
+**表31**  grid_group接口
 
 | 接口名 | 功能描述 |
 | --- | --- |
+| [this_grid](../cooperative_groups/grid_group/grid_group_constructor.md) | 获取当前Grid协作组对象。 |
+| [is_valid](../cooperative_groups/grid_group/is_valid.md) | 判断当前Grid协作组是否可使用`sync`接口进行跨线程块同步。 |
+| [sync](../cooperative_groups/grid_group/sync.md) | 同步Grid内所有线程。 |
+| [thread_rank](../cooperative_groups/grid_group/thread_rank.md) | 获取当前线程在Grid内的排名。 |
+| [block_rank](../cooperative_groups/grid_group/block_rank.md) | 获取当前线程所属线程块在Grid内的排名。 |
+| [num_threads](../cooperative_groups/grid_group/num_threads.md) | 获取Grid内线程总数。 |
+| [num_blocks](../cooperative_groups/grid_group/num_blocks.md) | 获取Grid内线程块总数。 |
+| [dim_blocks](../cooperative_groups/grid_group/dim_blocks.md) | 获取Grid的线程块维度配置。 |
+| [block_index](../cooperative_groups/grid_group/block_index.md) | 获取当前线程所属线程块在Grid中的三维索引。 |
+| [size](../cooperative_groups/grid_group/size.md) | 获取Grid内线程总数。 |
+| [group_dim](../cooperative_groups/grid_group/group_dim.md) | 获取Grid的线程块维度配置。 |
+
+**表32**  协作组通用与划分接口
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [sync](../cooperative_groups/sync.md) | 同步指定协作组内的所有线程。 |
 | [tiled_partition](../cooperative_groups/tiled_partition.md) | 将一个线程组按指定大小划分为多个子组。 |
 | [binary_partition](../cooperative_groups/binary_partition.md) | 根据一个标签（0或1）将父组划分为两个子组。 |

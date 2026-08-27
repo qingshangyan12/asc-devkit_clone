@@ -34,7 +34,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_sys_var_intf.h"`。
 
-在[分离模式架构](../../../../../guide/编程指南/高级编程/硬件实现/基本架构.md)下，获取当前配置中，一个逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。
+在[分离模式架构](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，获取当前配置中，一个逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。
 
 ## 函数原型
 
@@ -48,7 +48,7 @@ __aicore__ inline int64_t GetSubBlockNum()
 
 ## 返回值说明
 
-在融合编译场景下，不同[算子类型](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#section1074418132518)在AIC和AIV上调用该接口的返回值如下：
+在融合编译场景下，不同[算子类型](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#section1074418132518)在AIC和AIV上调用该接口的返回值如下：
 
 **表1** 融合编译场景返回值列表
 
@@ -61,11 +61,11 @@ __aicore__ inline int64_t GetSubBlockNum()
 | Mix算子 | \_\_mix\_\_(1, 1) | 1 | 1 |
 | Mix算子 | \_\_mix\_\_(1, 2) | 1 | 2 |
 
-在自定义算子工程和Kernel直调工程场景下，不同Kernel类型（通过[设置Kernel类型](../../Kernel-Tiling/set_Kernel_type.md)设置）在AIC和AIV上调用该接口的返回值如下：
+在自定义算子工程和核函数（Kernel）直调工程场景下，不同核函数（Kernel）类型（通过[设置核函数（Kernel）类型](../../Kernel-Tiling/set_Kernel_type.md)设置）在AIC和AIV上调用该接口的返回值如下：
 
-**表2** 自定义算子工程和Kernel直调工程场景返回值列表
+**表2** 自定义算子工程和核函数（Kernel）直调工程场景返回值列表
 
-| Kernel类型 | KERNEL_TYPE_AIV_ONLY | KERNEL_TYPE_AIC_ONLY | KERNEL_TYPE_MIX_AIC_1_2 | KERNEL_TYPE_MIX_AIC_1_1 | KERNEL_TYPE_MIX_AIC_1_0 | KERNEL_TYPE_MIX_AIV_1_0 |
+| 核函数（Kernel）类型 | KERNEL_TYPE_AIV_ONLY | KERNEL_TYPE_AIC_ONLY | KERNEL_TYPE_MIX_AIC_1_2 | KERNEL_TYPE_MIX_AIC_1_1 | KERNEL_TYPE_MIX_AIC_1_0 | KERNEL_TYPE_MIX_AIV_1_0 |
 | --- | --- | --- | --- | --- | --- | --- |
 | AIV | 1 | - | 2 | 1 | - | 1 |
 | AIC | - | 1 | 1 | 1 | 1 | - |

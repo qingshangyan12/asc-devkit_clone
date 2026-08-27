@@ -186,6 +186,10 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     bool level0PcieMix{false};
     bool level0BigClosRange{false};
     bool level2Uboe{false};
+    bool level2Ubg{false};
+    bool hostDpuOnly{false};
+    bool level0Symmetric{false};
+    bool level1Symmetric{false};
     u32 topoInstDetailsOfLayerSize = 0;
     Level0MeshType level0MeshType;
     NetLayerDetails netLayerDetails;
@@ -220,6 +224,10 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream << level0PcieMix;
         binaryStream << level0BigClosRange;
         binaryStream << level2Uboe;
+        binaryStream << level2Ubg;
+        binaryStream << hostDpuOnly;
+        binaryStream << level0Symmetric;
+        binaryStream << level1Symmetric;
         binaryStream << topoInstDetailsOfLayerSize;
         binaryStream << level0MeshType;
         binaryStream << netLayerDetails.netLayerNum;
@@ -268,6 +276,10 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream >> level0PcieMix;
         binaryStream >> level0BigClosRange;
         binaryStream >> level2Uboe;
+        binaryStream >> level2Ubg;
+        binaryStream >> hostDpuOnly;
+        binaryStream >> level0Symmetric;
+        binaryStream >> level1Symmetric;
         binaryStream >> topoInstDetailsOfLayerSize;
         binaryStream >> level0MeshType;
         binaryStream >> netLayerDetails.netLayerNum;
@@ -358,6 +370,12 @@ struct CcuFastLaunchCtx {
                sizeof(CcuKernelSubmitInfo) * totalCcuKernelNum;
     }
 };
+
+static_assert(
+    offsetof(CcuFastLaunchCtx, ccuKernelNum) + sizeof(u32) * MAX_TEMP_NUM_IN_ALGO == sizeof(CcuFastLaunchCtx),
+    "ccuKernelNum must be the last member of CcuFastLaunchCtx");
+static_assert(
+    sizeof(CcuFastLaunchCtx) % alignof(ThreadHandle) == 0, "CcuFastLaunchCtx must preserve ThreadHandle alignment");
 
 // A5用了cntNotify
 struct AlgResourceRequest {
@@ -514,6 +532,14 @@ struct AlgResourceCtxSerializable {
         binaryStream >> kfcServerArgs;
         binaryStream >> kfcServerArgSize;
         binaryStream >> topoInfoSeqSize;
+        if ((topoInfoSeqSize == 0) || (topoInfoSeqSize > data.size())) {
+            HCCL_ERROR(
+                "[AlgResourceCtxSerializable::DeSerialize] invalid topo info size[%u], data size[%zu]", topoInfoSeqSize,
+                data.size());
+            topoInfoSeqSize = 0;
+            topoInfo = TopoInfoWithNetLayerDetails{};
+            return;
+        }
         size_t startPos = data.size() - topoInfoSeqSize;
         std::vector<char> tailData(data.begin() + startPos, data.end());
         TopoInfoWithNetLayerDetails topoTemp;

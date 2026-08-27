@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/reduction_operations/ReduceSum_interface/ReduceSum_res.md#id1 -->
 
 ## 功能说明
 
@@ -83,7 +84,7 @@
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 
 -   **不支持源操作数与目的操作数地址重叠。**
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
