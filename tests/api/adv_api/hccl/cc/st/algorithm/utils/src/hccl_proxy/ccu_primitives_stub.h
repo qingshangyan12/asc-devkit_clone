@@ -88,6 +88,16 @@ using HcclSim::CcuSt::Condition;
 using HcclSim::CcuSt::ResourceHandle;
 using HcclSim::CcuSt::Result;
 
+class VariableExpr {
+public:
+    VariableExpr(ResourceHandle lhs, ResourceHandle rhs) : lhsHandle(lhs), rhsHandle(rhs) {}
+    ResourceHandle LhsHandle() const { return lhsHandle; }
+    ResourceHandle RhsHandle() const { return rhsHandle; }
+private:
+    ResourceHandle lhsHandle{0};
+    ResourceHandle rhsHandle{0};
+};
+
 class Variable {
 public:
     Variable();
@@ -97,9 +107,10 @@ public:
     Variable& operator=(Variable&& other) noexcept = default;
 
     void operator=(const Variable& other) const;
+    void operator=(const VariableExpr& expr) const;
     void operator=(uint64_t immediate) const;
     void operator+=(const Variable& other) const;
-    Variable operator+(const Variable& other) const;
+    VariableExpr operator+(const Variable& other) const;
     Condition operator==(uint64_t immediate) const;
     Condition operator!=(uint64_t immediate) const;
 

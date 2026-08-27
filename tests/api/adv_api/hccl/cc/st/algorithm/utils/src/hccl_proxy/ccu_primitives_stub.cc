@@ -342,6 +342,16 @@ Variable::Variable(ResourceHandle existingHandle) : handle(existingHandle) {}
 
 void Variable::operator=(const Variable& other) const { AppendSimple(OpCode::ASSIGN_VAR, handle, other.handle); }
 
+void Variable::operator=(const VariableExpr& expr) const
+{
+    Operation addOp;
+    addOp.code = OpCode::ADD_VAR;
+    addOp.dst = handle;
+    addOp.src0 = expr.LhsHandle();
+    addOp.src1 = expr.RhsHandle();
+    CompilerContext::Current().Append(addOp);
+}
+
 void Variable::operator=(uint64_t immediate) const
 {
     Operation operation;
@@ -361,16 +371,9 @@ void Variable::operator+=(const Variable& other) const
     CompilerContext::Current().Append(operation);
 }
 
-Variable Variable::operator+(const Variable& other) const
+VariableExpr Variable::operator+(const Variable& other) const
 {
-    Variable result;
-    Operation operation;
-    operation.code = OpCode::ADD_VAR;
-    operation.dst = result.handle;
-    operation.src0 = handle;
-    operation.src1 = other.handle;
-    CompilerContext::Current().Append(operation);
-    return result;
+    return VariableExpr(handle, other.handle);
 }
 
 Condition Variable::operator==(uint64_t immediate) const { return Condition{handle, immediate, true}; }
