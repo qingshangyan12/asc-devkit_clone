@@ -222,58 +222,6 @@ bool RuntimeWorld::ExecuteOne(std::vector<RankState>& states, size_t rankIndex, 
                 return false;
             }
             const auto& descriptor = state.program->groupCopies[operation.index];
-            if (descriptor.groupSize[0] != 0) {
-                const uint64_t addressOffset = state.variables[descriptor.groupSize[0]];
-                const uint64_t parallelParam = state.variables[descriptor.groupSize[2]];
-                const uint64_t residual = state.variables[descriptor.groupSize[3]];
-                uint64_t length = addressOffset;
-                if (parallelParam != 0) {
-                    const uint64_t repeatNum = (parallelParam >> 55) & 0x7F;
-                    const uint64_t repeatLoopIndex = (parallelParam >> 48) & 0x7F;
-                    const uint64_t totalLoopNum = (parallelParam >> 41) & 0x7F;
-                    for (uint64_t repeat = 0; repeat <= repeatNum; ++repeat) {
-                        const uint64_t loopStart = repeat == 0 ? 0 : repeatLoopIndex;
-                        for (uint64_t loop = loopStart; loop < totalLoopNum; ++loop) {
-                            length += loop == 0 ? residual : descriptor.memSlice;
-                        }
-                    }
-                }
-
-                auto source = state.program->localAddresses.find(descriptor.source);
-                auto destination = state.program->localAddresses.find(descriptor.destination);
-                if (source == state.program->localAddresses.end() ||
-                    destination == state.program->localAddresses.end()) {
-                    result = Result::CONTRACT_ERROR;
-                    SetError("GroupCopy local address binding is invalid");
-                    return false;
-                }
-                if (length != 0) {
-                    uint8_t* sourcePointer = nullptr;
-                    uint8_t* destinationPointer = nullptr;
-                    uint32_t sourceRank = 0;
-                    uint32_t destinationRank = 0;
-                    const uint64_t sourceAddress = state.addresses[source->second.first];
-                    const uint64_t destinationAddress = state.addresses[destination->second.first];
-                    if (!ResolveMemory(states, sourceAddress, length, sourcePointer, sourceRank) ||
-                        !ResolveMemory(states, destinationAddress, length, destinationPointer, destinationRank)) {
-                        result = Result::OUT_OF_RANGE;
-                        SetError("GroupCopy summarized memory range is out of bounds");
-                        return false;
-                    }
-                    if (sourceRank != rankIndex || destinationRank != rankIndex) {
-                        result = Result::CONTRACT_ERROR;
-                        SetError("GroupCopy summarized address resolves to the wrong rank");
-                        return false;
-                    }
-                    std::memmove(destinationPointer, sourcePointer, static_cast<size_t>(length));
-                }
-                ExecutionLogEntry logEntry;
-                logEntry.rank = static_cast<uint32_t>(rankIndex);
-                logEntry.operationIndex = state.pc;
-                logEntry.code = operation.code;
-                executionLog_.rankEntries[rankIndex].push_back(logEntry);
-                break;
-            }
             for (const auto& loopGroup : descriptor.loopGroups) {
                 const uint64_t parallelParam = state.variables.count(loopGroup.parallelParamVariable) ?
                                                    state.variables[loopGroup.parallelParamVariable] :

@@ -10,7 +10,6 @@
 
 target_sources(hccl-model-proxy PRIVATE
     ccu_kernel_proxy.cc
-    ccu_kfc_proxy.cc
     ccu_primitives_stub.cc
     aclrt_stub.cc
     hccl_algorithm_stub.cc
