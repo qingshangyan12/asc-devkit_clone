@@ -342,6 +342,16 @@ Variable::Variable(ResourceHandle existingHandle) : handle(existingHandle) {}
 
 void Variable::operator=(const Variable& other) const { AppendSimple(OpCode::ASSIGN_VAR, handle, other.handle); }
 
+void Variable::operator=(const VariableExpr& expr) const
+{
+    Operation addOp;
+    addOp.code = OpCode::ADD_VAR;
+    addOp.dst = handle;
+    addOp.src0 = expr.LhsHandle();
+    addOp.src1 = expr.RhsHandle();
+    CompilerContext::Current().Append(addOp);
+}
+
 void Variable::operator=(uint64_t immediate) const
 {
     Operation operation;
@@ -361,16 +371,9 @@ void Variable::operator+=(const Variable& other) const
     CompilerContext::Current().Append(operation);
 }
 
-Variable Variable::operator+(const Variable& other) const
+VariableExpr Variable::operator+(const Variable& other) const
 {
-    Variable result;
-    Operation operation;
-    operation.code = OpCode::ADD_VAR;
-    operation.dst = result.handle;
-    operation.src0 = handle;
-    operation.src1 = other.handle;
-    CompilerContext::Current().Append(operation);
-    return result;
+    return VariableExpr(handle, other.handle);
 }
 
 Condition Variable::operator==(uint64_t immediate) const { return Condition{handle, immediate, true}; }
@@ -390,9 +393,38 @@ void Address::operator=(const Address& address) const
     AppendSimple(OpCode::ADDRESS_ASSIGN_ADDRESS, handle, address.handle);
 }
 
+void Address::operator=(const AddressExpr& expr) const
+{
+    Operation operation;
+    operation.code = OpCode::ADDRESS_ADD_VAR;
+    operation.dst = handle;
+    operation.src0 = expr.RhsHandle();
+    CompilerContext::Current().Append(operation);
+}
+
 void Address::operator+=(const Variable& variable) const
 {
     AppendSimple(OpCode::ADDRESS_ADD_VAR, handle, variable.handle);
+}
+
+void Address::operator+=(const Address& other) const
+{
+    Operation operation;
+    operation.code = OpCode::ADDRESS_ASSIGN_ADDRESS;
+    operation.dst = handle;
+    operation.src0 = handle;
+    operation.src1 = other.handle;
+    CompilerContext::Current().Append(operation);
+}
+
+AddressExpr Address::operator+(const Address& other) const
+{
+    return AddressExpr(handle, other.handle, true);
+}
+
+AddressExpr Address::operator+(const Variable& variable) const
+{
+    return AddressExpr(handle, variable.handle, true);
 }
 
 LocalAddr::LocalAddr() : addr(0), token(0)
@@ -450,6 +482,13 @@ Result Load(Variable address, Variable destination)
     return Result::SUCCESS;
 }
 
+Result Load(uint64_t address, Variable destination)
+{
+    Variable addrVar;
+    addrVar = address;
+    return Load(addrVar, destination);
+}
+
 Result Load(Variable address, Array<Variable>& destinations, uint32_t count)
 {
     if (count > destinations.size()) {
@@ -466,6 +505,13 @@ Result Load(Variable address, Array<Variable>& destinations, uint32_t count)
     return Result::SUCCESS;
 }
 
+Result Load(uint64_t address, Array<Variable>& destinations, uint32_t count)
+{
+    Variable addrVar;
+    addrVar = address;
+    return Load(addrVar, destinations, count);
+}
+
 Result Store(Variable address, Variable source)
 {
     Operation operation;
@@ -474,6 +520,13 @@ Result Store(Variable address, Variable source)
     operation.src0 = source.handle;
     CompilerContext::Current().Append(operation);
     return Result::SUCCESS;
+}
+
+Result Store(uint64_t address, Variable source)
+{
+    Variable addrVar;
+    addrVar = address;
+    return Store(addrVar, source);
 }
 
 Result WriteVariableWithNotify(
@@ -606,13 +659,13 @@ void AppendRead(
 
 Result Read(ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length, Event event, uint16_t mask)
 {
-    AppendRead(OpCode::WRITE, channel, local.handle, remote.handle, length.handle, event.handle, mask);
+    AppendRead(OpCode::READ, channel, local.handle, remote.handle, length.handle, event.handle, mask);
     return Result::SUCCESS;
 }
 
 Result Read(ChannelHandle channel, CcuBuffer local, RemoteAddr remote, Variable length, Event event, uint16_t mask)
 {
-    AppendRead(OpCode::WRITE, channel, local.handle, remote.handle, length.handle, event.handle, mask);
+    AppendRead(OpCode::READ, channel, local.handle, remote.handle, length.handle, event.handle, mask);
     return Result::SUCCESS;
 }
 
@@ -620,7 +673,17 @@ Result ReadReduce(
     ChannelHandle channel, LocalAddr local, RemoteAddr remote, Variable length, HcclDataType dataType,
     HcclReduceOp opType, Event event, uint16_t mask)
 {
-    AppendRead(OpCode::WRITE, channel, local.handle, remote.handle, length.handle, event.handle, mask);
+    Operation operation;
+    operation.code = OpCode::READ_REDUCE;
+    operation.channel = channel;
+    operation.dst = local.handle;
+    operation.src0 = remote.handle;
+    operation.src1 = length.handle;
+    operation.immediate = event.handle;
+    operation.mask = mask;
+    operation.dataType = dataType;
+    operation.opType = opType;
+    CompilerContext::Current().Append(operation);
     return Result::SUCCESS;
 }
 
@@ -628,12 +691,14 @@ Result LocalReduce(
     LocalAddr dst, LocalAddr src, Variable len, HcclDataType dataType, HcclReduceOp opType, Event event, uint16_t mask)
 {
     Operation operation;
-    operation.code = OpCode::LOCAL_COPY;
+    operation.code = OpCode::LOCAL_REDUCE;
     operation.dst = dst.handle;
     operation.src0 = src.handle;
     operation.src1 = len.handle;
     operation.immediate = event.handle;
     operation.mask = mask;
+    operation.dataType = dataType;
+    operation.opType = opType;
     CompilerContext::Current().Append(operation);
     return Result::SUCCESS;
 }
@@ -642,6 +707,23 @@ Result LocalReduce(
     CcuBuffer* buffers, uint32_t count, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType,
     Variable len, Event event, uint16_t mask)
 {
+    if (buffers == nullptr || count == 0) {
+        return Result::PARAM_ERROR;
+    }
+    // hcomm semantics: reduce all buffers into buffers[0]
+    for (uint32_t i = 1; i < count; ++i) {
+        Operation operation;
+        operation.code = OpCode::LOCAL_REDUCE;
+        operation.dst = buffers[0].handle;
+        operation.src0 = buffers[i].handle;
+        operation.src1 = len.handle;
+        operation.immediate = event.handle;
+        operation.mask = mask;
+        operation.dataType = dataType;
+        operation.outputDataType = outputDataType;
+        operation.opType = opType;
+        CompilerContext::Current().Append(operation);
+    }
     return Result::SUCCESS;
 }
 
@@ -664,13 +746,15 @@ Result WriteReduce(
     HcclReduceOp opType, Event event, uint16_t mask)
 {
     Operation operation;
-    operation.code = OpCode::WRITE;
+    operation.code = OpCode::WRITE_REDUCE;
     operation.channel = channel;
     operation.dst = remote.handle;
     operation.src0 = local.handle;
     operation.src1 = length.handle;
     operation.immediate = event.handle;
     operation.mask = mask;
+    operation.dataType = dataType;
+    operation.opType = opType;
     CompilerContext::Current().Append(operation);
     return Result::SUCCESS;
 }
