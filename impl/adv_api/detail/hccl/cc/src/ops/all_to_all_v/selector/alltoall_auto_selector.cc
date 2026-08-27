@@ -31,7 +31,7 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
     }
     if (topoInfo->level0Topo == Level0Shape::MESH_1D || topoInfo->level0Topo == Level0Shape::CLOS) {
         // Host tiling has no runtime count. Select the multi-channel token to allocate a resource upper bound.
-        selectAlgName = "AicpuAlltoAllSoleMesh";
+        selectAlgName = "AicpuAllToAllSoleMesh";
         HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
         return SelectorStatus::MATCH;
     }

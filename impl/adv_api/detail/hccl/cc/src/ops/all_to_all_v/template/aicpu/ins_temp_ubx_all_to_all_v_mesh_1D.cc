@@ -10,8 +10,6 @@
 
 #include "ins_temp_ubx_all_to_all_v_mesh_1D.h"
 
-#define NET_NUM 2
-
 namespace mc2_ops_hccl {
 constexpr u32 UBX_BOARD_PAIR_SIZE = 2;
 InsTempUBXAllToAllVMesh1D::InsTempUBXAllToAllVMesh1D(

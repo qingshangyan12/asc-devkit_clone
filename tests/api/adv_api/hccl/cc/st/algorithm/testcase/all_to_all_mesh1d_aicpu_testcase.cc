@@ -93,7 +93,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_mesh1d_and_concu
     CollAlgExecRegistryV2& registry = CollAlgExecRegistryV2::Instance();
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALLV, "AicpuAlltoAllVSoleMesh"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAlltoAllSoleMeshSingleChannel"), nullptr);
-    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAlltoAllSoleMesh"), nullptr);
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMesh"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMeshConcurrent"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALLV, "AicpuAllToAllVSoleMeshConcurrent"), nullptr);
 }
