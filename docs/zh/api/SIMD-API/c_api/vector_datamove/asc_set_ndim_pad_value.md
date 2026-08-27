@@ -55,7 +55,7 @@ __aicore__ inline void asc_set_ndim_pad_value(int32_t pad_value)
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| `pad_value` | 输入 | 常数填充值。当`padding_mode`设置为`true`时，后续调用`asc_ndim_copy_gm2ub`将使用该值填充搬运数据的边界区域。对于本接口直接支持的数据类型，`pad_value`的数据类型应与搬运数据类型一致。 |
+| pad_value | 输入 | 常数填充值。当`padding_mode`设置为`true`时，后续调用`asc_ndim_copy_gm2ub`将使用该值填充搬运数据的边界区域。对于本接口直接支持的数据类型，`pad_value`的数据类型应与搬运数据类型一致。 |
 
 ## 返回值说明
 

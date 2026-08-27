@@ -49,8 +49,8 @@ __aicore__ inline void asc_set_ub2gm_loop2_stride(uint64_t loop2_src_stride,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| `loop2_src_stride` | 输入 | 外层循环中，相邻两次迭代源操作数数据块起始地址之间的偏移量，单位为字节。取值范围为[0, $2^{21}−1$]，且必须32字节对齐。 |
-| `loop2_dst_stride` | 输入 | 外层循环中，相邻两次迭代目的操作数数据块起始地址之间的偏移量，单位为字节。取值范围为[0, $2^{40}−1$]。 |
+| loop2_src_stride | 输入 | 外层循环中，相邻两次迭代源操作数数据块起始地址之间的偏移量，单位为字节。取值范围为[0, $2^{21}−1$]，且必须32字节对齐。 |
+| loop2_dst_stride | 输入 | 外层循环中，相邻两次迭代目的操作数数据块起始地址之间的偏移量，单位为字节。取值范围为[0, $2^{40}−1$]。 |
 
 ## 返回值说明
 
@@ -61,8 +61,6 @@ __aicore__ inline void asc_set_ub2gm_loop2_stride(uint64_t loop2_src_stride,
 PIPE_S
 
 ## 约束说明
-
-### 通用约束
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 调用`asc_copy_ub2gm_align`前，必须通过本接口、`asc_set_ub2gm_loop_size`和`asc_set_ub2gm_loop1_stride`完成循环次数及两层循环步长的配置。
