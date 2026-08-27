@@ -113,10 +113,15 @@ HcclResult InsTempAlltoAllVMesh1D::CalcRes(
     AlgResourceRequest& resourceRequest)
 {
     CHK_PTR_NULL(topoInfo);
+    // MESH_1D_CLOS 上仅支持 PCIE 混合机型：Mesh 无法链接全卡时需要跨 PCIE 链路，
+    // 按单层平铺通信域走 Mesh1D pairwise，由 CalcChannelRequestMesh1D 逐 rank 选择最优协议。
+    // 非 PCIE 混合的 MESH_1D_CLOS 由 UBX / Concurrent 算法承接，不走本模板。
+    const bool isPcieMixMeshClos = topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix;
     CHK_PRT_RET(
-        topoInfo->level0Topo != Level0Shape::MESH_1D && topoInfo->level0Topo != Level0Shape::CLOS,
+        topoInfo->level0Topo != Level0Shape::MESH_1D && topoInfo->level0Topo != Level0Shape::CLOS && !isPcieMixMeshClos,
         HCCL_ERROR(
-            "[InsTempAlltoAllVMesh1D][CalcRes] unsupported level0Topo[%u].", static_cast<u32>(topoInfo->level0Topo)),
+            "[InsTempAlltoAllVMesh1D][CalcRes] unsupported level0Topo[%u], level0PcieMix[%d].",
+            static_cast<u32>(topoInfo->level0Topo), static_cast<int>(topoInfo->level0PcieMix)),
         HCCL_E_NOT_SUPPORT);
     CHK_PRT_RET(
         subCommRanks_.empty() || templateRankSize_ == 0U,

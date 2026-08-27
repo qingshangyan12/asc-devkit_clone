@@ -1016,14 +1016,6 @@ HcclResult IsLevel0PcieMix(HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo)
         CommLink* links = nullptr;
         uint32_t linkNum;
         CHK_RET(HcclRankGraphGetLinks(comm, netLayer, myRank, ranks[rankIdx], &links, &linkNum));
-        CHK_PTR_NULL(links);
-        CHK_PRT_RET(
-            linkNum == 0,
-            HCCL_INFO(
-                "[Topo][IsLevel0PcieMix] Can not find path from Local[%u] to Rmt[%u], in netLayer %u. "
-                "Topo is not mesh",
-                myRank, ranks[rankIdx], netLayer),
-            HCCL_E_INTERNAL);
 
         for (u32 i = 0; i < linkNum; i++) {
             CommProtocol srcProtocol = links[i].srcEndpointDesc.protocol;
