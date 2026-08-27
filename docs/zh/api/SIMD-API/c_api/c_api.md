@@ -684,6 +684,8 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_abs_sync（废弃）](deprecated_interface/asc_abs_sync_deprecated.md)|按元素取绝对值同步接口。|`c_api/composite/vector_compute_composite.h`|
+|[asc_and浮点类型接口（废弃）](deprecated_interface/asc_and_float_deprecated.md)|`asc_and`的浮点类型重载；浮点数据类型不再支持，按位宽比较的迁移说明见文档。|`c_api/reg_compute/compute/reg_logic.h`|
+|[asc_or浮点类型接口（废弃）](deprecated_interface/asc_or_float_deprecated.md)|`asc_or`的浮点类型重载；浮点数据类型不再支持，按位宽比较的迁移说明见文档。|`c_api/reg_compute/compute/reg_logic.h`|
 |[asc_bfloat162e1m2x2 (废弃)](reg_compute/reg_convert/asc_bfloat162e1m2x2_deprecated.md)|将bfloat16_t类型转换为fp4x2_e1m2_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_bfloat162e2m1x2 (废弃)](reg_compute/reg_convert/asc_bfloat162e2m1x2_deprecated.md)|将bfloat16_t类型转换为fp4x2_e2m1_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_clear_ar_spr（废弃）](reg_compute/reg_permute_sel/asc_clear_ar_spr_deprecated.md)|对AR寄存器进行清理。请使用[asc_squeeze_and_storeunalign_init](reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md)替换。|`c_api/reg_compute/compute/reg_permute_sel.h`|
