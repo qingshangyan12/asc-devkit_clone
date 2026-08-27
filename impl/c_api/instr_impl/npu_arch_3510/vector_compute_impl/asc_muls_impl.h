@@ -32,25 +32,11 @@ __simd_callee__ inline void asc_muls_impl(vector_half& dst, vector_float src, fl
     }
 }
 
-__simd_callee__ inline vector_half asc_muls_impl(vector_float src, float value, vector_bool mask)
-{
-    vector_half dst;
-    asc_muls_impl(dst, src, value, mask);
-    return dst;
-}
-
 __simd_callee__ inline void asc_muls_v2_impl(vector_half& dst, vector_float src, float value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vmulscvt(dst, src, value, mask, PART_ODD);
     }
-}
-
-__simd_callee__ inline vector_half asc_muls_v2_impl(vector_float src, float value, vector_bool mask)
-{
-    vector_half dst;
-    asc_muls_v2_impl(dst, src, value, mask);
-    return dst;
 }
 
 #endif
