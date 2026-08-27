@@ -147,11 +147,13 @@ static CcuResult CreateReduceLoopV1(
                                                opType]() {
             for (uint32_t i = 0; i < size; i++) {
                 if (i == ctx.rankId) {
-                    ccu::LocalCopy(ctx.moRes.ccuBuf[bufBase + i], var.loopSrc[index], var.loopLen[index], e, 1);
+                    ccu::LocalCopy(
+                        ctx.moRes.ccuBuf[bufBase + i], var.loopSrc[index], var.loopLen[index], e, 1 << i);
                 } else {
-                    ccu::LocalCopy(ctx.moRes.ccuBuf[bufBase + i], var.loopScratch[index][i], var.loopLen[index], e, 1);
+                    ccu::LocalCopy(
+                        ctx.moRes.ccuBuf[bufBase + i], var.loopScratch[index][i], var.loopLen[index], e, 1 << i);
                 }
-                ccu::EventWait(e, 1);
+                ccu::EventWait(e, 1 << i);
             }
             if (size > 1) {
                 ccu::LocalReduce(
