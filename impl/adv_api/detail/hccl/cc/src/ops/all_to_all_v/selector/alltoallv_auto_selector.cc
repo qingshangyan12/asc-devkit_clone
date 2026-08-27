@@ -34,10 +34,30 @@ SelectorStatus AlltoAllVAutoSelector::SelectAicpuAlgo(
         HCCL_INFO("[AlltoAllVAutoSelector] Algo match[%s].", selectAlgName.c_str());
         return SelectorStatus::MATCH;
     }
-    if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS || topoInfo->topoLevelNums != 1U || topoInfo->level0PcieMix) {
+    if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
         HCCL_WARNING(
             "[AlltoAllVAutoSelector] rankSize[%u], level0Topo[%u] is not supported by local AICPU AllToAllV.",
             topoInfo->userRankSize, static_cast<u32>(topoInfo->level0Topo));
+        return SelectorStatus::NOT_MATCH;
+    }
+    if (topoInfo->level0PcieMix) {
+        // PCIE-SW定制机型：Mesh 无法链接全卡时需要跨 PCIE 链路，统一按 Mesh1D pairwise 处理，
+        // fullmesh 与非 fullmesh 都走同一算法，混合协议由 channel 层逐 rank 选择。
+        // TopoMatchPcieMix 暂不支持多层，此处限制为单层拓扑。
+        CHK_PRT_RET(
+            topoInfo->topoLevelNums != 1U,
+            HCCL_WARNING(
+                "[AlltoAllVAutoSelector] pcie mixed topo with topoLevelNums[%u] is not supported yet.",
+                topoInfo->topoLevelNums),
+            SelectorStatus::NOT_MATCH);
+        selectAlgName = "AicpuAllToAllVSoleMesh";
+        HCCL_INFO("[AlltoAllVAutoSelector] Algo match[%s].", selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
+    if (topoInfo->topoLevelNums != 1U) {
+        HCCL_WARNING(
+            "[AlltoAllVAutoSelector] rankSize[%u], topoLevelNums[%u] is not supported by local AICPU AllToAllV.",
+            topoInfo->userRankSize, topoInfo->topoLevelNums);
         return SelectorStatus::NOT_MATCH;
     }
 #if defined(HCCL_CANN_COMPAT_850)
