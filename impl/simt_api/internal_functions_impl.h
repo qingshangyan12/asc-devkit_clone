@@ -25,10 +25,10 @@
 
 #include "simt_api/device_types.h"
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) // 3510:dav-3510, 5102:dav-5102
 
 enum class __RoundMode {
-    CAST_RINT = 0,
+    CAST_RINT = 0, // 0:enum base value for round-to-nearest-even
     CAST_FLOOR,
     CAST_CEIL,
     CAST_ROUND,
@@ -41,7 +41,7 @@ enum class __RoundMode {
 template <__RoundMode mode>
 __aicore__ inline constexpr ::ROUND __internal_get_round()
 {
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1 // 1:enable CPU debug path
     if constexpr (mode == __RoundMode::CAST_RINT) {
         return ::ROUND::CAST_RINT;
     } else if constexpr (mode == __RoundMode::CAST_ROUND) {
@@ -79,38 +79,38 @@ __aicore__ inline constexpr ::ROUND __internal_get_round()
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline signed char __internal_int_to_char(int32_t x)
 {
-    if (x > 127) {
-        return static_cast<signed char>(127);
+    if (x > 127) {                            // 127:upper bound of int8
+        return static_cast<signed char>(127); // 127:upper bound of int8
     }
-    if (x < -128) {
-        return static_cast<signed char>(-128);
+    if (x < -128) {                            // -128:lower bound of int8
+        return static_cast<signed char>(-128); // -128:lower bound of int8
     }
     return static_cast<signed char>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned char __internal_uint_to_uchar(uint32_t x)
 {
-    if (x > 255U) {
-        return static_cast<unsigned char>(255U);
+    if (x > 255U) {                              // 255:upper bound of uint8
+        return static_cast<unsigned char>(255U); // 255:upper bound of uint8
     }
     return static_cast<unsigned char>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline short int __internal_int_to_short(int32_t x)
 {
-    if (x > 32767) {
-        return static_cast<short int>(32767);
+    if (x > 32767) {                          // 32767:upper bound of short
+        return static_cast<short int>(32767); // 32767:upper bound of short
     }
-    if (x < -32768) {
-        return static_cast<short int>(-32768);
+    if (x < -32768) {                          // -32768:lower bound of short
+        return static_cast<short int>(-32768); // -32768:lower bound of short
     }
     return static_cast<short int>(x);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short int __internal_uint_to_ushort(uint32_t x)
 {
-    if (x > 65535U) {
-        return static_cast<unsigned short int>(65535U);
+    if (x > 65535U) {                                   // 65535U:upper bound of ushort
+        return static_cast<unsigned short int>(65535U); // 65535U:upper bound of ushort
     }
     return static_cast<unsigned short int>(x);
 }
