@@ -154,7 +154,6 @@ B3阶段：
 
 B0的全核合计工作集为96MB，不超过100MB阈值；B0在两次访问之间也没有其他大数据插入更新L2 Cache，因此R1更有机会从L2 Cache读取R0的结果。B0处理完毕后再依次处理B1至B3，原理相同。
 
-
 **表 1**  样例数据量口径
 
 | 数据量 | 计算方法 | 结果 |
@@ -259,4 +258,4 @@ __aicore__ inline void ProcessDataRange(int64_t rangeOffsetInData, uint32_t rang
 | 搬运效率 | 对比`aiv_mte2_time(us)`和有效带宽 | 正例MTE2耗时中位数通常降低，有效带宽通常提升 |
 | 端到端耗时 | 正反例各采集多组独立Profile并比较`Task Duration(us)`中位数 | 搬运受限场景下，正例耗时通常低于反例 |
 
-> **说明**：`aiv_gm_to_ub_bw(GB/s)`表示有效带宽，不表示GM读取量。优化后有效带宽可能升高，不能以“带宽更低”作为预期。性能采集应交替安排正反例的先后顺序，并使用多组结果的中位数降低系统波动影响。完整实现和Profile采集方法请参考[add_l2_cache_split样例](../../../../../../examples/01_simd_cpp_api/05_best_practices/00_vector_compute/add_l2_cache_split)。
+> **说明**：`aiv_gm_to_ub_bw(GB/s)`表示有效带宽，不表示GM读取量。优化后有效带宽可能升高，不能以“带宽更低”作为预期。性能采集应交替安排正反例的先后顺序，并使用多组结果的中位数降低系统波动影响。完整实现和Profile采集方法请参考[add_l2_cache_split样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/10_add_l2_cache_split)。

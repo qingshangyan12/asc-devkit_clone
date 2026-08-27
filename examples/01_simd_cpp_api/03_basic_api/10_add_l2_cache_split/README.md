@@ -142,7 +142,7 @@ output/l2_split.bin
 
 ## 性能采集与分析
 
-### 使用msopprof采集性能
+### 使用msOpProf采集性能
 
 分别启动独立进程采集正反例，避免同一进程中前一个Kernel残留的Cache状态影响后一个Kernel：
 
@@ -160,7 +160,7 @@ msopprof --output=./prof_384m_inplace_l2_split_1 \
 
 ### Profile报告结构
 
-`msopprof`在输出目录下生成`OPPROF_*`报告，主要文件如下：
+`msOpProf`在输出目录下生成`OPPROF_*`报告，主要文件如下：
 
 ```text
 OPPROF_<timestamp>/
