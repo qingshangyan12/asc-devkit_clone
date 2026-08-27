@@ -10,11 +10,8 @@
 
 #include "ccu_kernel_alg_base.h"
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
-<<<<<<< HEAD
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
-=======
 #include "../../../../all_reduce/template/ccu/kernel/ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.h"
->>>>>>> af1a98ca5 (ccuAllReduce迁移修改)
 #include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
