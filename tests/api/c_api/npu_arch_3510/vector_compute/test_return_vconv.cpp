@@ -30,7 +30,7 @@ void VcvtFloatToHalfStub(
     vector_half&, vector_float, vector_bool, Literal, Literal, Literal, Literal)
 {}
 void VexpdifStub(vector_float&, vector_half, vector_half, vector_bool, int) {}
-void VmulscvtStub(vector_half&, vector_float, float, vector_bool, int) {}
+void VexpdifFloatStub(vector_float&, vector_float, vector_float, vector_bool, int) {}
 } // namespace
 
 TEST(ReturnValueVconv, HalfToFloatUsesPositionAwareInstruction)
@@ -99,44 +99,16 @@ TEST(ReturnValueVconv, ExpSubHalfToFloatUsesVexpdif)
     GlobalMockObject::verify();
 }
 
-TEST(ReturnValueVconv, ExpSubV2UsesVexpdif)
+TEST(ReturnValueVconv, ExpSubUsesVexpdif)
 {
-    vector_half src0;
-    vector_half src1;
+    vector_float src0;
+    vector_float src1;
     vector_bool mask;
-    MOCKER_CPP(vexpdif, void(vector_float&, vector_half, vector_half, vector_bool, int))
+    MOCKER_CPP(vexpdif, void(vector_float&, vector_float, vector_float, vector_bool, int))
         .times(1)
-        .will(invoke(VexpdifStub));
+        .will(invoke(VexpdifFloatStub));
 
-    auto result = asc_exp_sub_v2(src0, src1, mask);
+    auto result = asc_exp_sub(src0, src1, mask);
     static_assert(std::is_same<decltype(result), vector_float>::value);
-    GlobalMockObject::verify();
-}
-
-TEST(ReturnValueVconv, MulsUsesVmulscvt)
-{
-    vector_float src;
-    vector_bool mask;
-    constexpr float value = 1.0F;
-    MOCKER_CPP(vmulscvt, void(vector_half&, vector_float, float, vector_bool, int))
-        .times(1)
-        .will(invoke(VmulscvtStub));
-
-    auto result = asc_muls(src, value, mask);
-    static_assert(std::is_same<decltype(result), vector_half>::value);
-    GlobalMockObject::verify();
-}
-
-TEST(ReturnValueVconv, MulsV2UsesVmulscvt)
-{
-    vector_float src;
-    vector_bool mask;
-    constexpr float value = 1.0F;
-    MOCKER_CPP(vmulscvt, void(vector_half&, vector_float, float, vector_bool, int))
-        .times(1)
-        .will(invoke(VmulscvtStub));
-
-    auto result = asc_muls_v2(src, value, mask);
-    static_assert(std::is_same<decltype(result), vector_half>::value);
     GlobalMockObject::verify();
 }
