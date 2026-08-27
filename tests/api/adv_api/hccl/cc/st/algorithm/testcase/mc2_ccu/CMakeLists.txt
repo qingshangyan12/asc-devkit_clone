@@ -14,8 +14,6 @@
 # ==========================================================================================================
 set(HCCL_CCU_ST_TARGET ascendc_ut_adv_api_ccu_st)
 set(HCCL_MC2_CCU_ALL_TO_ALL_V_DIR ${CMAKE_CURRENT_SOURCE_DIR}/all_to_all_v)
-set(HCCL_MC2_CCU_REDUCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/reduce)
-set(HCCL_MC2_CCU_REDUCE_SCATTER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/reduce_scatter)
 
 set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
@@ -23,11 +21,6 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/aicpu/ins_temp_ubx_all_to_all_v_mesh_1D.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/ccu_temp_all_to_all_v_mesh_1D.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.cc
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/selector/reduce_scatter_auto_selector.cc
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sole_executor.cc
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_aicpu_reduce_nhr.cc
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.cc
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/op_common.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/selector/auto_selector_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/selector/execute_selector.cc
@@ -64,10 +57,6 @@ add_executable(
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}/all_to_all_v_testcase.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}/ccu_all_to_all_v_mesh1d_adapter.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}/ccu_all_to_all_v.cc
-    ${HCCL_MC2_CCU_REDUCE_DIR}/reduce_primitive_testcase.cpp
-    ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/reduce_scatter_testcase.cpp
-    ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter.cc
-    ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_mesh1d_adapter.cc
     ${UTILS_DIR}/ccu_scenario/ccu_fixture.cc
     ${HCCL_SELECTOR_PRODUCT_SOURCES}
 )
@@ -77,7 +66,6 @@ target_include_directories(
     PRIVATE
     ${UTILS_DIR}/hccl_proxy
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}
-    ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
     ${UTILS_DIR}/ccu_scenario
     ${HCCL_CC_SRC_DIR}
@@ -85,10 +73,6 @@ target_include_directories(
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/executor
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/selector
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/executor
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu
-    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel
     ${HCCL_CC_SRC_DIR}/ops/kfc_server/template/ccu
     ${HCCL_CC_SRC_DIR}/ops/kfc_server/template/ccu/kernel
     ${HCCL_CC_INCLUDE_DIR}/hcomm/types
