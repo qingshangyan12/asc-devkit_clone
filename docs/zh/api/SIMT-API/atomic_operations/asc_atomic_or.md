@@ -77,7 +77,7 @@ UB或Global Memory上的初始数据。
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/device\_atomic\_functions.h"头文件。
+使用该接口需要包含`simt_api/device_atomic_functions.h`头文件。
 
 ```cpp
 #include "simt_api/device_atomic_functions.h"

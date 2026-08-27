@@ -99,7 +99,7 @@ inline bfloat16x2_t asc_atomic_sub(bfloat16x2_t* address, bfloat16x2_t val)
 
 ## 需要包含的头文件
 
-使用除half、half2、bfloat16_t、bfloat16x2_t类型之外的接口需要包含"simt_api/device_atomic_functions.h"头文件，使用half、half2类型接口需要包含"simt_api/asc_fp16.h"头文件，使用bfloat16_t、bfloat16x2_t类型接口需要包含"simt_api/asc_bf16.h"头文件。
+使用除half、half2、bfloat16_t、bfloat16x2_t类型之外的接口需要包含`simt_api/device_atomic_functions.h`头文件，使用half、half2类型接口需要包含`simt_api/asc_fp16.h`头文件，使用bfloat16_t、bfloat16x2_t类型接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/device_atomic_functions.h"

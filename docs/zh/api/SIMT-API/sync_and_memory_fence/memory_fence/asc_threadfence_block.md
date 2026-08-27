@@ -49,7 +49,7 @@ inline void asc_threadfence_block()
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/device\_sync\_functions.h"头文件。
+使用该接口需要包含`simt_api/device_sync_functions.h`头文件。
 
 ```cpp
 #include "simt_api/device_sync_functions.h"
