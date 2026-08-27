@@ -72,12 +72,13 @@ private:
         const std::vector<DataSlice>& txSrcSlices, const std::vector<DataSlice>& txDstSlices,
         const std::vector<DataSlice>& rxSrcSlices, const std::vector<DataSlice>& rxDstSlices, u64 sendDataSize,
         u64 recvDataSize);
-    void SavePairwiseLocalCopy(const TemplateDataParams& tempAlgParams, u32 targetRank, u64 curRecvDataCount);
+    HcclResult SavePairwiseLocalCopy(
+        const TemplateDataParams& tempAlgParams, u32 targetRank, u64 curRecvDataCount);
     HcclResult RunPairwise(
         const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource, u32 targetBoard);
     HcclResult InitRankAndDataType(const OpParam& param);
     HcclResult InitBoardState(const TemplateResource& templateResource);
-    void InitDataState(const TemplateDataParams& tempAlgParams);
+    HcclResult InitDataState(const TemplateDataParams& tempAlgParams);
     HcclResult InitThreadState(const TemplateResource& templateResource);
     void LogInitState();
     void LogDataSlices(const TemplateDataParams& tempAlgParams);

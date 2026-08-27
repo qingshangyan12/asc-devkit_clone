@@ -24,7 +24,7 @@ bool IsSupportedMesh1DTopo(Level0Shape topo)
     return topo == Level0Shape::MESH_1D || topo == Level0Shape::CLOS || topo == Level0Shape::MESH_1D_CLOS;
 }
 
-HcclResult BuildTemplateHierarchyInfo(
+HcclResult BuildResourceHierarchyInfo(
     const OpParam& param, const TopoInfoWithNetLayerDetails& topoInfo,
     const AlgHierarchyInfoForAllLevel& algHierarchyInfo, std::vector<std::vector<u32>>& templateHierarchyInfo)
 {
@@ -44,6 +44,32 @@ HcclResult BuildTemplateHierarchyInfo(
                     algHierarchyInfo.infos[0][1].size() >= algHierarchyInfo.infos[1][0].size(),
                 HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] invalid MESH_1D_CLOS hierarchy sizes."), HCCL_E_PARA);
             templateHierarchyInfo = {algHierarchyInfo.infos[0][1], algHierarchyInfo.infos[1][0]};
+        }
+    } else {
+        templateHierarchyInfo = algHierarchyInfo.infos[0];
+    }
+    return HCCL_SUCCESS;
+}
+
+HcclResult BuildExecutionHierarchyInfo(
+    const OpParam& param, const TopoInfoWithNetLayerDetails& topoInfo,
+    const AlgHierarchyInfoForAllLevel& algHierarchyInfo, std::vector<std::vector<u32>>& templateHierarchyInfo)
+{
+    CHK_PRT_RET(
+        algHierarchyInfo.infos.empty() || algHierarchyInfo.infos[0].empty(),
+        HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] execution hierarchy info is empty."), HCCL_E_PARA);
+    if (topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo.level0PcieMix
+        && param.engine != CommEngine::COMM_ENGINE_AIV && algHierarchyInfo.infos.size() > 1U) {
+        CHK_PRT_RET(
+            algHierarchyInfo.infos[0].size() != 2U,
+            HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] MESH_1D_CLOS requires two level-0 instances."), HCCL_E_PARA);
+        if (topoInfo.topoLevelNums == 1U) {
+            templateHierarchyInfo = {algHierarchyInfo.infos[0][1]};
+        } else {
+            CHK_PRT_RET(
+                algHierarchyInfo.infos[1].empty(),
+                HCCL_ERROR("[InsV2AlltoAllVSoleExecutor] execution hierarchy level is empty."), HCCL_E_PARA);
+            templateHierarchyInfo = algHierarchyInfo.infos[1];
         }
     } else {
         templateHierarchyInfo = algHierarchyInfo.infos[0];
@@ -90,7 +116,7 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
             static_cast<u32>(topoInfo->level0Topo)),
         HCCL_E_NOT_SUPPORT);
     std::vector<std::vector<u32>> templateHierarchyInfo;
-    CHK_RET(BuildTemplateHierarchyInfo(param, *topoInfo, algHierarchyInfo, templateHierarchyInfo));
+    CHK_RET(BuildResourceHierarchyInfo(param, *topoInfo, algHierarchyInfo, templateHierarchyInfo));
     InsAlgTemplate algTemplate(param, topoInfo->userRank, templateHierarchyInfo);
     return algTemplate.CalcRes(comm, param, topoInfo, resourceRequest);
 }
@@ -194,7 +220,7 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     std::vector<u64> recvDispls(sourceRecvDispls, sourceRecvDispls + rankSize_);
 
     std::vector<std::vector<u32>> templateHierarchyInfo;
-    CHK_RET(BuildTemplateHierarchyInfo(param, resCtx.topoInfo, resCtx.algHierarchyInfo, templateHierarchyInfo));
+    CHK_RET(BuildExecutionHierarchyInfo(param, resCtx.topoInfo, resCtx.algHierarchyInfo, templateHierarchyInfo));
     InsAlgTemplate algTemplate(param, resCtx.topoInfo.userRank, templateHierarchyInfo);
     const u64 scratchMultiplier =
         algTemplate.CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
@@ -285,10 +311,10 @@ HcclResult InsV2AlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
 }
 
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLTOALLV, AicpuAlltoAllVSoleMesh, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+    HcclCMDType::HCCL_CMD_ALLTOALLV, AicpuAllToAllVSoleMesh, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
     InsTempAlltoAllVMesh1D);
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLTOALL, AicpuAlltoAllSoleMeshSingleChannel, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
+    HcclCMDType::HCCL_CMD_ALLTOALL, AicpuAllToAllSoleMeshSingleChannel, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
     InsTempAlltoAllVMesh1D);
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLTOALL, AicpuAllToAllSoleMesh, InsV2AlltoAllVSoleExecutor, TopoMatch1D,

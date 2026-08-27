@@ -10,7 +10,56 @@
 
 #include "ins_temp_ubx_all_to_all_v_mesh_1D.h"
 
+#include <limits>
+
 namespace mc2_ops_hccl {
+namespace {
+bool AddOverflows(u64 lhs, u64 rhs)
+{
+    return lhs > std::numeric_limits<u64>::max() - rhs;
+}
+
+bool MultiplyOverflows(u64 lhs, u64 rhs)
+{
+    return lhs != 0U && rhs > std::numeric_limits<u64>::max() / lhs;
+}
+
+HcclResult CalcUserSliceOffset(u64 displacement, u64 dataTypeSize, u64 splitOffset, u64& byteOffset)
+{
+    CHK_PRT_RET(
+        MultiplyOverflows(displacement, dataTypeSize),
+        HCCL_ERROR("[InsTempUBXAllToAllVMesh1D] user buffer displacement overflows."), HCCL_E_PARA);
+    const u64 displacementBytes = displacement * dataTypeSize;
+    CHK_PRT_RET(
+        AddOverflows(displacementBytes, splitOffset),
+        HCCL_ERROR("[InsTempUBXAllToAllVMesh1D] user buffer offset overflows."), HCCL_E_PARA);
+    byteOffset = displacementBytes + splitOffset;
+    return HCCL_SUCCESS;
+}
+
+HcclResult CalcCclSliceOffset(u32 bufferIndex, u64 sliceStride, u64 splitOffset, u64& byteOffset)
+{
+    CHK_PRT_RET(
+        MultiplyOverflows(bufferIndex, sliceStride),
+        HCCL_ERROR("[InsTempUBXAllToAllVMesh1D] CCL buffer stride overflows."), HCCL_E_PARA);
+    const u64 bufferOffset = static_cast<u64>(bufferIndex) * sliceStride;
+    CHK_PRT_RET(
+        AddOverflows(bufferOffset, splitOffset),
+        HCCL_ERROR("[InsTempUBXAllToAllVMesh1D] CCL buffer offset overflows."), HCCL_E_PARA);
+    byteOffset = bufferOffset + splitOffset;
+    return HCCL_SUCCESS;
+}
+
+HcclResult CalcDataSize(u64 count, u64 dataTypeSize, u64& dataSize)
+{
+    CHK_PRT_RET(
+        MultiplyOverflows(count, dataTypeSize),
+        HCCL_ERROR("[InsTempUBXAllToAllVMesh1D] data size overflows."), HCCL_E_PARA);
+    dataSize = count * dataTypeSize;
+    return HCCL_SUCCESS;
+}
+} // namespace
+
 constexpr u32 UBX_BOARD_PAIR_SIZE = 2;
 InsTempUBXAllToAllVMesh1D::InsTempUBXAllToAllVMesh1D(
     const OpParam& param, const u32 rankId, // 传通信域的rankId，userRank
@@ -229,12 +278,18 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunFullMeshSelfCopy(
     u32 fullMeshThreadId)
 {
     const std::vector<ThreadHandle>& threads = templateResource.threads;
-    DataSlice usrInSlices = DataSlice(
-        tempAlgParams.buffInfo.inputPtr, tempAlgParams.sdispls[targetRank] * dataTypeSize_,
-        tempAlgParams.sendCounts[targetRank] * dataTypeSize_, tempAlgParams.sendCounts[targetRank]);
-    DataSlice usrOutSlices = DataSlice(
-        tempAlgParams.buffInfo.outputPtr, tempAlgParams.rdispls[targetRank] * dataTypeSize_,
-        tempAlgParams.recvCounts[targetRank] * dataTypeSize_, tempAlgParams.recvCounts[targetRank]);
+    u64 inputOffset = 0U;
+    u64 outputOffset = 0U;
+    u64 inputSize = 0U;
+    u64 outputSize = 0U;
+    CHK_RET(CalcUserSliceOffset(tempAlgParams.sdispls[targetRank], dataTypeSize_, 0U, inputOffset));
+    CHK_RET(CalcUserSliceOffset(tempAlgParams.rdispls[targetRank], dataTypeSize_, 0U, outputOffset));
+    CHK_RET(CalcDataSize(tempAlgParams.sendCounts[targetRank], dataTypeSize_, inputSize));
+    CHK_RET(CalcDataSize(tempAlgParams.recvCounts[targetRank], dataTypeSize_, outputSize));
+    DataSlice usrInSlices(
+        tempAlgParams.buffInfo.inputPtr, inputOffset, inputSize, tempAlgParams.sendCounts[targetRank]);
+    DataSlice usrOutSlices(
+        tempAlgParams.buffInfo.outputPtr, outputOffset, outputSize, tempAlgParams.recvCounts[targetRank]);
     return LocalCopy(threads[fullMeshThreadId], usrInSlices, usrOutSlices);
 }
 
@@ -247,18 +302,26 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunFullMeshPeer(
     const ChannelInfo& channelSendRecv = channels.at(targetRank)[0];
     const u64 sendCount = tempAlgParams.sendCounts[targetRank];
     const u64 recvCount = tempAlgParams.recvCounts[targetRank];
-    DataSlice txSrcSlice(
-        tempAlgParams.buffInfo.inputPtr, tempAlgParams.sdispls[targetRank] * dataTypeSize_, sendCount * dataTypeSize_,
-        sendCount);
-    DataSlice txDstSlice(
-        channelSendRecv.remoteCclMem.addr, myAlgRank_ * scratchBufferSizePerRank_, sendCount * dataTypeSize_,
-        sendCount);
-    DataSlice rxSrcSlice(
-        channelSendRecv.remoteCclMem.addr, targetRank * scratchBufferSizePerRank_, recvCount * dataTypeSize_,
-        recvCount);
-    DataSlice rxDstSlice(
-        tempAlgParams.buffInfo.hcclBuff.addr, targetRank * scratchBufferSizePerRank_, recvCount * dataTypeSize_,
-        recvCount);
+    u64 txSourceOffset = 0U;
+    u64 txDestinationOffset = 0U;
+    u64 rxSourceOffset = 0U;
+    u64 rxDestinationOffset = 0U;
+    u64 sendSize = 0U;
+    u64 recvSize = 0U;
+    CHK_RET(CalcUserSliceOffset(tempAlgParams.sdispls[targetRank], dataTypeSize_, 0U, txSourceOffset));
+    CHK_RET(CalcCclSliceOffset(myAlgRank_, scratchBufferSizePerRank_, 0U, txDestinationOffset));
+    CHK_RET(CalcCclSliceOffset(targetRank, scratchBufferSizePerRank_, 0U, rxSourceOffset));
+    CHK_RET(CalcCclSliceOffset(targetRank, scratchBufferSizePerRank_, 0U, rxDestinationOffset));
+    CHK_RET(CalcDataSize(sendCount, dataTypeSize_, sendSize));
+    CHK_RET(CalcDataSize(recvCount, dataTypeSize_, recvSize));
+    u64 userOutputOffset = 0U;
+    if (recvCount > 0U) {
+        CHK_RET(CalcUserSliceOffset(tempAlgParams.rdispls[targetRank], dataTypeSize_, 0U, userOutputOffset));
+    }
+    DataSlice txSrcSlice(tempAlgParams.buffInfo.inputPtr, txSourceOffset, sendSize, sendCount);
+    DataSlice txDstSlice(channelSendRecv.remoteCclMem.addr, txDestinationOffset, sendSize, sendCount);
+    DataSlice rxSrcSlice(channelSendRecv.remoteCclMem.addr, rxSourceOffset, recvSize, recvCount);
+    DataSlice rxDstSlice(tempAlgParams.buffInfo.hcclBuff.addr, rxDestinationOffset, recvSize, recvCount);
     std::vector<DataSlice> txSrcSlices{txSrcSlice};
     std::vector<DataSlice> txDstSlices{txDstSlice};
     std::vector<DataSlice> rxSrcSlices{rxSrcSlice};
@@ -276,8 +339,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunFullMeshPeer(
     }
     if (recvCount > 0) {
         DataSlice usrOutSlices(
-            tempAlgParams.buffInfo.outputPtr, tempAlgParams.rdispls[targetRank] * dataTypeSize_,
-            recvCount * dataTypeSize_, recvCount);
+            tempAlgParams.buffInfo.outputPtr, userOutputOffset, recvSize, recvCount);
         localCopyInfoFullMesh_.push_back(std::vector<DataSlice>{rxDstSlice, usrOutSlices});
     }
     return HcclResult::HCCL_SUCCESS;
@@ -334,23 +396,36 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunPairwiseChannel(
         innerCurrSendDataCount = curSendDataCount - innerSendOffset;
         innerCurrRecvDataCount = curRecvDataCount - innerRecvOffset;
     }
-    const u64 innerCurrSendDataSize = innerCurrSendDataCount * dataTypeSize_;
-    const u64 innerCurrRecvDataSize = innerCurrRecvDataCount * dataTypeSize_;
+    u64 innerSendOffsetBytes = 0U;
+    u64 innerRecvOffsetBytes = 0U;
+    u64 innerCurrSendDataSize = 0U;
+    u64 innerCurrRecvDataSize = 0U;
+    u64 txSourceOffset = 0U;
+    u64 txDestinationOffset = 0U;
+    u64 rxSourceOffset = 0U;
+    u64 rxDestinationOffset = 0U;
+    CHK_RET(CalcDataSize(innerSendOffset, dataTypeSize_, innerSendOffsetBytes));
+    CHK_RET(CalcDataSize(innerRecvOffset, dataTypeSize_, innerRecvOffsetBytes));
+    CHK_RET(CalcDataSize(innerCurrSendDataCount, dataTypeSize_, innerCurrSendDataSize));
+    CHK_RET(CalcDataSize(innerCurrRecvDataCount, dataTypeSize_, innerCurrRecvDataSize));
+    CHK_RET(CalcUserSliceOffset(
+        tempAlgParams.sdispls[targetRank], dataTypeSize_, innerSendOffsetBytes, txSourceOffset));
+    CHK_RET(CalcCclSliceOffset(myAlgRank_, scratchBufferSizePerRank_, innerSendOffsetBytes, txDestinationOffset));
+    CHK_RET(CalcCclSliceOffset(targetRank, scratchBufferSizePerRank_, innerRecvOffsetBytes, rxSourceOffset));
+    CHK_RET(CalcCclSliceOffset(targetRank, scratchBufferSizePerRank_, innerRecvOffsetBytes, rxDestinationOffset));
+    CHK_PRT_RET(
+        AddOverflows(innerSendOffset, innerCurrSendDataCount) || AddOverflows(innerRecvOffset, innerCurrRecvDataCount),
+        HCCL_ERROR("[InsTempUBXAllToAllVMesh1D] pairwise data offset overflows."), HCCL_E_PARA);
     const u32 queId = channelIndex + 1; // 主流用来后同步了
     DataSlice txSrcSlice(
-        tempAlgParams.buffInfo.inputPtr, (tempAlgParams.sdispls[targetRank] + innerSendOffset) * dataTypeSize_,
-        innerCurrSendDataSize, innerCurrSendDataCount);
+        tempAlgParams.buffInfo.inputPtr, txSourceOffset, innerCurrSendDataSize, innerCurrSendDataCount);
     DataSlice txDstSlice(
-        channelSendRecv[channelIndex].remoteCclMem.addr,
-        myAlgRank_ * scratchBufferSizePerRank_ + innerSendOffset * dataTypeSize_, innerCurrSendDataSize,
+        channelSendRecv[channelIndex].remoteCclMem.addr, txDestinationOffset, innerCurrSendDataSize,
         innerCurrSendDataCount);
     DataSlice rxSrcSlice(
-        channelSendRecv[channelIndex].remoteCclMem.addr,
-        targetRank * scratchBufferSizePerRank_ + innerRecvOffset * dataTypeSize_, innerCurrRecvDataSize,
-        innerCurrRecvDataCount);
+        channelSendRecv[channelIndex].remoteCclMem.addr, rxSourceOffset, innerCurrRecvDataSize, innerCurrRecvDataCount);
     DataSlice rxDstSlice(
-        tempAlgParams.buffInfo.hcclBuff.addr, targetRank * scratchBufferSizePerRank_ + innerRecvOffset * dataTypeSize_,
-        innerCurrRecvDataSize, innerCurrRecvDataCount);
+        tempAlgParams.buffInfo.hcclBuff.addr, rxDestinationOffset, innerCurrRecvDataSize, innerCurrRecvDataCount);
     std::vector<DataSlice> txSrcSlices{txSrcSlice};
     std::vector<DataSlice> txDstSlices{txDstSlice};
     std::vector<DataSlice> rxSrcSlices{rxSrcSlice};
@@ -382,19 +457,24 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunPairwiseTransfer(
     return HcclResult::HCCL_SUCCESS;
 }
 
-void InsTempUBXAllToAllVMesh1D::SavePairwiseLocalCopy(
+HcclResult InsTempUBXAllToAllVMesh1D::SavePairwiseLocalCopy(
     const TemplateDataParams& tempAlgParams, u32 targetRank, u64 curRecvDataCount)
 {
+    u64 scratchOffset = 0U;
+    u64 outputOffset = 0U;
+    u64 recvSize = 0U;
+    CHK_RET(CalcCclSliceOffset(targetRank, scratchBufferSizePerRank_, 0U, scratchOffset));
+    CHK_RET(CalcUserSliceOffset(tempAlgParams.rdispls[targetRank], dataTypeSize_, 0U, outputOffset));
+    CHK_RET(CalcDataSize(curRecvDataCount, dataTypeSize_, recvSize));
     DataSlice scratchSlices(
-        tempAlgParams.buffInfo.hcclBuff.addr, targetRank * scratchBufferSizePerRank_, curRecvDataCount * dataTypeSize_,
-        curRecvDataCount);
+        tempAlgParams.buffInfo.hcclBuff.addr, scratchOffset, recvSize, curRecvDataCount);
     DataSlice usrOutSlices(
-        tempAlgParams.buffInfo.outputPtr, tempAlgParams.rdispls[targetRank] * dataTypeSize_,
-        curRecvDataCount * dataTypeSize_, curRecvDataCount);
+        tempAlgParams.buffInfo.outputPtr, outputOffset, recvSize, curRecvDataCount);
     localCopyInfo_.clear();
     if (curRecvDataCount > 0) {
         localCopyInfo_.push_back(std::vector<DataSlice>{scratchSlices, usrOutSlices});
     }
+    return HcclResult::HCCL_SUCCESS;
 }
 
 HcclResult InsTempUBXAllToAllVMesh1D::RunPairwise(
@@ -438,7 +518,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::RunPairwise(
         }
 
         // recv 完成之后，后同步信息保留下来
-        SavePairwiseLocalCopy(tempAlgParams, targetRank, curRecvDataCount);
+        CHK_RET(SavePairwiseLocalCopy(tempAlgParams, targetRank, curRecvDataCount));
 
         if (threadNum_ > 1) {
             GetNotifyIdxClosToMain(notifyIdxSubToMain_);
@@ -479,13 +559,14 @@ HcclResult InsTempUBXAllToAllVMesh1D::InitBoardState(const TemplateResource& tem
     return HcclResult::HCCL_SUCCESS;
 }
 
-void InsTempUBXAllToAllVMesh1D::InitDataState(const TemplateDataParams& tempAlgParams)
+HcclResult InsTempUBXAllToAllVMesh1D::InitDataState(const TemplateDataParams& tempAlgParams)
 {
     scratchBufferSizePerRank_ = tempAlgParams.inputSliceStride;
     dataStridePerRank_ = tempAlgParams.outputSliceStride;
     curProcessedDataCount_ = tempAlgParams.processedDataCount;
     curDataCount_ = tempAlgParams.count;
-    curDataSize_ = curDataCount_ * dataTypeSize_;
+    CHK_RET(CalcDataSize(curDataCount_, dataTypeSize_, curDataSize_));
+    return HcclResult::HCCL_SUCCESS;
 }
 
 HcclResult InsTempUBXAllToAllVMesh1D::InitThreadState(const TemplateResource& templateResource)
@@ -528,7 +609,7 @@ HcclResult InsTempUBXAllToAllVMesh1D::InitParam(
     HCCL_INFO("[InsTempUBXAllToAllVMesh1D][InitParam] Run Start");
     CHK_RET(InitRankAndDataType(param));
     CHK_RET(InitBoardState(templateResource));
-    InitDataState(tempAlgParams);
+    CHK_RET(InitDataState(tempAlgParams));
     CHK_RET(InitThreadState(templateResource));
     LogInitState();
     LogDataSlices(tempAlgParams);

@@ -41,7 +41,6 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
             topoInfo->userRankSize, static_cast<u32>(topoInfo->level0Topo));
         return SelectorStatus::NOT_MATCH;
     }
-#if !defined(HCCL_CANN_COMPAT_850)
     bool isMeshNumEqualToClosNum = false;
     CHK_PRT_RET(
         CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
@@ -53,9 +52,6 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
     const bool concurrentCondition = isMeshNumEqualToClosNum && topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT &&
                                      sendCounts[0] > CONCURRENT_COUNT_LIMIT;
     selectAlgName = concurrentCondition ? "AicpuAllToAllSoleMeshConcurrent" : "AicpuAllToAllSoleMeshUBX";
-#else
-    selectAlgName = "AicpuAllToAllSoleMeshUBX";
-#endif
     HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }

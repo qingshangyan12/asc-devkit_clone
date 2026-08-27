@@ -91,8 +91,8 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_cann_brid
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_mesh1d_and_concurrent_algorithms)
 {
     CollAlgExecRegistryV2& registry = CollAlgExecRegistryV2::Instance();
-    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALLV, "AicpuAlltoAllVSoleMesh"), nullptr);
-    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAlltoAllSoleMeshSingleChannel"), nullptr);
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALLV, "AicpuAllToAllVSoleMesh"), nullptr);
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMeshSingleChannel"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMesh"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMeshConcurrent"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALLV, "AicpuAllToAllVSoleMeshConcurrent"), nullptr);
@@ -114,11 +114,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_concurrent_selectors_obey_topology
     param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
     param.all2AllVDataDes.sendCounts = sendCounts;
     EXPECT_EQ(alltoallSelector.Select(param, &topo, algName), SelectorStatus::MATCH);
-#if defined(HCCL_CANN_COMPAT_850)
-    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX");
-#else
     EXPECT_EQ(algName, "AicpuAllToAllSoleMeshConcurrent");
-#endif
 
     param = MakeAicpuParam(HCCL_CMD_ALLTOALLV);
     EXPECT_EQ(alltoallvSelector.Select(param, &topo, algName), SelectorStatus::MATCH);
