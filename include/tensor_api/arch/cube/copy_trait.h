@@ -24,7 +24,12 @@ enum class round_mode : uint8_t { default_round = 0, hybrid = 1 };
 
 enum class dual_dst_mode : uint8_t { disable = 0, split_m = 1, split_n = 2 };
 
-struct gm_to_l1_trait {};
+struct gm_to_l1_trait {
+    __aicore__ constexpr gm_to_l1_trait() = default;
+    __aicore__ constexpr gm_to_l1_trait(bool pre_allocation);
+
+    bool pre_allocation = false;
+};
 struct l1_to_ub_trait {};
 struct l1_to_l0a_trait {};
 struct l1_to_l0b_trait {};
@@ -51,6 +56,20 @@ struct l0c_to_ub_trait {
     bool enable_relu = false;
     bool enable_channel_split = false;
     dual_dst_mode dual_dst_ctl = dual_dst_mode::disable;
+};
+
+struct l0c_to_ub_trait_arch9202 : l0c_to_ub_trait {
+    __aicore__ constexpr l0c_to_ub_trait_arch9202() = default;
+    __aicore__ constexpr l0c_to_ub_trait_arch9202(
+        asc::te::round_mode round_mode, bool enable_relu, bool enable_channel_split, dual_dst_mode dual_dst_ctl,
+        bool enable_row_max, bool enable_group_max)
+        : l0c_to_ub_trait(round_mode, enable_relu, enable_channel_split, dual_dst_ctl),
+          enable_row_max(enable_row_max),
+          enable_group_max(enable_group_max)
+    {}
+
+    bool enable_row_max = false;
+    bool enable_group_max = false;
 };
 
 struct l0c_to_l1_trait {

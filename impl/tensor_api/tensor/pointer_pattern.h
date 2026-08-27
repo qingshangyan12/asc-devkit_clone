@@ -73,6 +73,20 @@ __aicore__ inline constexpr auto make_mem_ptr(Iterator iterator)
     return make_location_mem_ptr<ptr_pattern>(iterator);
 }
 
+template <typename T>
+__aicore__ inline constexpr size_t get_scale_divisor()
+{
+    if constexpr (current_arch_version == arch_version::v9201 || current_arch_version == arch_version::v9202) {
+        if constexpr (Std::is_same_v<Std::remove_cvref_t<T>, hifloat4x2_t>) {
+            return scale_divisor_hif4;
+        } else {
+            return scale_divisor;
+        }
+    } else if constexpr (current_arch_version == arch_version::v3510 || current_arch_version == arch_version::V3510) {
+        return scale_divisor;
+    }
+}
+
 } // namespace te
 } // namespace asc
 
