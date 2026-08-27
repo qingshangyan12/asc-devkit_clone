@@ -103,7 +103,8 @@ TEST(CcuStFrameworkL1, VariableAdd)
     auto fn = [](void*) {
         Variable a;
         Variable b;
-        Variable c = a + b;
+        Variable c;
+        c = a + b;
         (void)c;
         return Result::SUCCESS;
     };

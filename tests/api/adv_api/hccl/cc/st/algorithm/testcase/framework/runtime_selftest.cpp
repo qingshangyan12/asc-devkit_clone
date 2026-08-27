@@ -392,7 +392,7 @@ TEST(CcuStFrameworkL3, WhileLoop)
         Variable counter, one, addr;
         counter = 0U;
         one = 1U;
-        CCU_WHILE(counter != 3U) { counter += one; }
+        CCU_WHILE(counter != 3U) { counter = counter + one; }
         LoadArg(addr, 0);
         Store(addr, counter);
         CompilerContext::Current().ConfigureProgram(0, 1, {});
