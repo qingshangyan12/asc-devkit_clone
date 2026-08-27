@@ -55,7 +55,8 @@ __aicore__ inline void asc_mmad_mx(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
@@ -63,7 +64,8 @@ __aicore__ inline void asc_mmad_mx(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
@@ -71,7 +73,8 @@ __aicore__ inline void asc_mmad_mx(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
@@ -79,7 +82,8 @@ __aicore__ inline void asc_mmad_mx(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
@@ -87,7 +91,8 @@ __aicore__ inline void asc_mmad_mx(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
@@ -95,7 +100,8 @@ __aicore__ inline void asc_mmad_mx(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
@@ -103,7 +109,8 @@ __aicore__ inline void asc_mmad_mx(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
@@ -111,7 +118,8 @@ __aicore__ inline void asc_mmad_mx(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_mx_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad_mx(
@@ -280,7 +288,8 @@ __aicore__ inline void asc_mmad(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad(
@@ -288,7 +297,8 @@ __aicore__ inline void asc_mmad(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad(
@@ -296,7 +306,8 @@ __aicore__ inline void asc_mmad(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad(
@@ -304,7 +315,8 @@ __aicore__ inline void asc_mmad(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad(
@@ -312,7 +324,8 @@ __aicore__ inline void asc_mmad(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad(
@@ -320,7 +333,8 @@ __aicore__ inline void asc_mmad(
     asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad(
@@ -328,7 +342,8 @@ __aicore__ inline void asc_mmad(
     asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad(
@@ -336,7 +351,8 @@ __aicore__ inline void asc_mmad(
     asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad(
@@ -344,7 +360,8 @@ __aicore__ inline void asc_mmad(
     uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {
     asc_mmad_impl(
-        c_matrix, a_matrix, b_matrix, m, k, n, unit_flag_mode, disable_gemv, c_matrix_source, c_matrix_init_val);
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
 }
 
 __aicore__ inline void asc_mmad(
