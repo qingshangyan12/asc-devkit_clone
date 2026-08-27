@@ -16,33 +16,31 @@
 
 命名空间：`asc::te::experimental`。
 
-逐元素执行除法，支持寄存器与寄存器、寄存器与标量、标量与寄存器三种组合。
+根据`src0.mask`，对`src0`和`src1`按元素求商。
 
 $$
-dst_i = \frac{a_i}{b_i}
+dst_i = \frac{src0_i}{src1_i}
 $$
 
 ## 函数原型
 
 ```cpp
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator/(
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 ```
 
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T`、`U` | 模板参数 | 至少一个模板参数为`reg_tensor`类型。寄存器元素类型支持`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`，标量须可转换为寄存器元素类型。 |
-| `a` | 输入 | 被除数，可以是`reg_tensor`或标量。`a`为`reg_tensor`时，`a.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| `b` | 输入 | 除数，可以是与`a`元素类型相同的`reg_tensor`或可转换为该元素类型的标量。`a`为标量时，使用`b.mask`标记参与计算的元素。`a`和`b`均为`reg_tensor`时，`b.mask`不用于本次计算。 |
-
-至少一个操作数必须为`reg_tensor`。双寄存器形式要求元素类型一致。标量会转换为
-寄存器元素类型并广播。
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。 |
+| `src0` | 输入 | 被除数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `src1` | 输入 | 除数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
 
 ## 返回值说明
 
-返回与寄存器操作数元素类型相同的`reg_tensor`。`reg`保存逐元素除法结果，计算所用的输入`mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与本次计算所用的输入`mask`相同。
+返回`reg_tensor<T>`。`reg`保存逐元素求商结果，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。
 
 ## 约束说明
 
@@ -50,7 +48,6 @@ __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
 - 使用浮点类型时，非零有限值除以`0`得到带符号的`inf`，`0`除以`0`、`inf`除以`inf`或任一操作数为`nan`时得到`nan`，有限值除以`inf`得到`0`，`inf`除以有限值或`0`得到带符号的`inf`。
 - `half`在INF/NAN模式下遵循上述浮点规则。
 - `half`在饱和模式下，结果为`inf`的计算将饱和为带符号的最大有限值`65504.0`或`-65504.0`，结果为`nan`的计算将得到`0`。`float`在饱和模式下的结果与INF/NAN模式相同。
-- 标量位于左侧时执行`scalar / reg`，操作数顺序不会交换。
 
 ## 调用示例
 
@@ -61,7 +58,7 @@ __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
 #include "tensor_api/tensor.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void div_example(
+__simd_vf__ inline void operator_slash_example(
     InputTensor input0, InputTensor input1, OutputTensor output)
 {
     using asc::te::experimental::operator/;

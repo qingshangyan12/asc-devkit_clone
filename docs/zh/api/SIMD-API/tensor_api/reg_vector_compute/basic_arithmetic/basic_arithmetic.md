@@ -22,6 +22,6 @@
 | [subc](subc.md) | 执行带借位输出减法，或带借位输入和输出减法。 |
 | [operator*](operator*.md) | 逐元素执行同位宽乘法。 |
 | [mull](mull.md) | 计算32位整数宽乘的低位和高位结果。 |
-| [operator/](div.md) | 逐元素执行除法。 |
+| [operator/](operator_div.md) | 逐元素执行除法。 |
 | [max](max.md) | 逐元素取最大值。 |
 | [min](min.md) | 逐元素取最小值。 |
