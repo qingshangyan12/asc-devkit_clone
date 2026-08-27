@@ -21,11 +21,10 @@ enum class AlgorithmType : uint8_t {
     CcuAllGatherMesh1D = 0,
     CcuAllGatherMeshMem2Mem1D,
     CcuAllGatherMesh2D,
-    CcuSchedAllGatherConcurMeshNHRMultiLink = 3,
-    CcuReduceScatterMesh1D = 50,
+    CcuReduceScatterMesh1D,
     CcuReduceScatterMeshMem2Mem1D,
     CcuReduceScatterMesh2D,
-    CcuAllReduceMesh1D = 100,
+    CcuAllReduceMesh1D,
     CcuAllReduceMeshMem2Mem1D,
     CcuAllReduceMesh2DOneShot,
     CcuReduceMesh1D,
@@ -96,13 +95,11 @@ private:
 
     __aicore__ inline void CommitMsgInner(const HcclHandle handleId);
 
-    __aicore__ inline void CcuSendMsg(uint8_t resourceId, HcclHandle handleId);
+    __aicore__ inline void CcuSendMsg(uint8_t resourceId);
 
-    __aicore__ inline GM_ADDR GetCommitCkeAddr(uint8_t msgId, uint8_t missionIndex = 0);
+    __aicore__ inline GM_ADDR GetCommitCkeAddr(uint8_t msgId);
 
-    __aicore__ inline GM_ADDR GetWaitCkeAddr(uint8_t msgId, uint8_t missionIndex = 0);
-
-    __aicore__ inline uint8_t GetKfcMissionNum(HcclHandle handleId) const;
+    __aicore__ inline GM_ADDR GetWaitCkeAddr(uint8_t msgId);
 
     __aicore__ inline bool IsFinish(uint8_t reqId);
 
@@ -124,7 +121,6 @@ private:
     __aicore__ inline void CcuPrepareForReduceScatter(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllReduceM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
-    __aicore__ inline void CcuPrepareForConcurrentAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
