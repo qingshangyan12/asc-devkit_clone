@@ -125,13 +125,13 @@ __aicore__ inline void WriteGmBypassDCacheImpl(__gm__ T* addr, T value)
 
 #if __NPU_ARCH__ == 2201
     // The write only takes effect in the first 32 bytes of each 128-byte aligned range.
-    ASCENDC_DEBUG_ASSERT((static_cast<uint32_t>(reinterpret_cast<uint64_t>(addr) % 128) < 32), {
-        KERNEL_LOG(
+    ASCENDC_DEBUG_ASSERT(
+        (static_cast<uint32_t>(reinterpret_cast<uint64_t>(addr) % 128) < 32),
+        KERNEL_LOG_INTERNAL(
             KERNEL_ERROR,
             "For WriteGmBypassDCache, current addr offset in a 128-byte aligned range is %u, which should be in "
             "range [0, 32).",
-            static_cast<uint32_t>(reinterpret_cast<uint64_t>(addr) % 128));
-    });
+            static_cast<uint32_t>(reinterpret_cast<uint64_t>(addr) % 128)));
 #endif
 
     if constexpr (SupportBytes<T, 8>()) {
