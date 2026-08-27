@@ -53,15 +53,15 @@ __simd_callee__ inline void asc_or(vector_<dtype>& dst,
 
 #### dtype支持数据类型
 
-`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`。浮点类型重载（`half`、`float`）已废弃，请参见[浮点类型废弃说明](../../deprecated_interface/asc_or_float_deprecated.md)。
 
 #### 函数原型典型示例
 
 ```c
-// 示例：对half矢量数据寄存器执行按位或
-__simd_callee__ inline void asc_or(vector_half& dst,
-                                   vector_half src0,
-                                   vector_half src1,
+// 示例：对int16_t矢量数据寄存器执行按位或
+__simd_callee__ inline void asc_or(vector_int16_t& dst,
+                                   vector_int16_t src0,
+                                   vector_int16_t src1,
                                    vector_bool mask)
 ```
 

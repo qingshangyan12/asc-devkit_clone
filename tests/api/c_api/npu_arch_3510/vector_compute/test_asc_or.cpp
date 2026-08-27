@@ -10,6 +10,12 @@
 
 #include "tests/api/c_api/npu_arch_3510/utils/test_binary_instr_utils.h"
 
+// These cases verify source compatibility for the deprecated floating-point overloads.
+#if defined(__clang__) || defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 // ==========asc_or(int8_t/uint8_t/int16_t/uint16_t/half/int32_t/uint32_t/float/bool)==========
 TEST_VECTOR_COMPUTE_BINARY_INSTR(ASCVOR, asc_or, vor, vector_int16_t);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(ASCVOR, asc_or, vor, vector_uint16_t);
@@ -48,3 +54,7 @@ TEST_VECTOR_COMPUTE_BINARY_INSTR(ASCVOR, asc_or, vor, vector_float);
     }
 
 TEST_VECTOR_COMPUTE_BINARY_INSTR_NOLI(ASCVOR, asc_or, por, vector_bool);
+
+#if defined(__clang__) || defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif

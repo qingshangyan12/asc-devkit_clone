@@ -1332,6 +1332,8 @@
             -   [asc_load_l2_cache_mode](SIMD-API/c_api/enum/asc_load_l2_cache_mode.md)
             -   [asc_store_l2_cache_mode](SIMD-API/c_api/enum/asc_store_l2_cache_mode.md)
         -   [废弃接口](SIMD-API/c_api/deprecated_interface/deprecated_interface.md)
+            -   [asc_and浮点类型接口（废弃）](SIMD-API/c_api/deprecated_interface/asc_and_float_deprecated.md)
+            -   [asc_or浮点类型接口（废弃）](SIMD-API/c_api/deprecated_interface/asc_or_float_deprecated.md)
             -   [asc_get_block_idx（废弃）](SIMD-API/c_api/deprecated_interface/asc_get_block_idx_deprecated.md)
             -   [asc_get_block_num（废弃）](SIMD-API/c_api/deprecated_interface/asc_get_block_num_deprecated.md)
             -   [asc_set_atomic_add_int（废弃）](SIMD-API/c_api/deprecated_interface/asc_set_atomic_add_int_deprecated.md)

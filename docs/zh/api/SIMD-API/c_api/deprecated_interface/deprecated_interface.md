@@ -1,6 +1,9 @@
 # 废弃接口
 
 ## 矢量计算
+
+- **[asc_and浮点类型接口（废弃）](asc_and_float_deprecated.md)**
+- **[asc_or浮点类型接口（废弃）](asc_or_float_deprecated.md)**
 - **[asc_abs_sync（废弃）](asc_abs_sync_deprecated.md)**
 
 ### 类型转换
