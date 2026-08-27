@@ -12,12 +12,15 @@
 #include <mockcpp/mockcpp.hpp>
 
 #include <cstdlib>
+#include <csignal>
 #include <dlfcn.h>
 #include <fstream>
 #include <iterator>
 #include <memory>
 #include <set>
 #include <string>
+#include <sys/resource.h>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -41,6 +44,12 @@ constexpr uint64_t TEST_MAX_MANIFEST_COUNT = 4096U;
 constexpr uint64_t TEST_MAX_EXTENSION_COUNT = 4096U;
 constexpr uint64_t TEST_MAX_FILE_COUNT = 65536U;
 constexpr uint64_t TEST_MAX_REGISTRY_FILE_COUNT = 131072U;
+
+static_assert(
+    std::is_same<std::underlying_type_t<ResourceStatus>, uint32_t>::value, "ResourceStatus must have a stable width");
+static_assert(
+    std::is_same<std::underlying_type_t<ResourceSourceType>, uint32_t>::value,
+    "ResourceSourceType must have a stable width");
 
 const AcCompileResourceBundleHeader* gBundleHeader = nullptr;
 uint32_t gDlopenCalls = 0U;
@@ -1111,6 +1120,30 @@ TEST_F(ResourceRegistryTest, WriteMaterializedFilesWritesNestedAndEmptyPayloadsA
     EXPECT_EQ(ResourceRegistry::WriteMaterializedFiles(direct, directoryTarget.string()), ResourceStatus::IoError);
 }
 
+TEST_F(ResourceRegistryTest, ReportsMaterializedFileFinalizeFailure)
+{
+    struct rlimit originalFileSizeLimit {};
+    ASSERT_EQ(getrlimit(RLIMIT_FSIZE, &originalFileSizeLimit), 0);
+    struct sigaction ignoreFileSizeSignal {};
+    struct sigaction originalFileSizeSignal {};
+    ignoreFileSizeSignal.sa_handler = SIG_IGN;
+    ASSERT_EQ(sigemptyset(&ignoreFileSizeSignal.sa_mask), 0);
+    ASSERT_EQ(sigaction(SIGXFSZ, &ignoreFileSizeSignal, &originalFileSizeSignal), 0);
+    struct rlimit zeroFileSizeLimit = originalFileSizeLimit;
+    zeroFileSizeLimit.rlim_cur = 0U;
+    ASSERT_EQ(setrlimit(RLIMIT_FSIZE, &zeroFileSizeLimit), 0);
+
+    const fs::path output = Path("materialized-finalize-failure");
+    const std::vector<ResourceFileData> files = {{"data.bin", "data.bin", {1U}}};
+    const ResourceStatus writeStatus = ResourceRegistry::WriteMaterializedFiles(files, output.string());
+
+    const int restoreLimitResult = setrlimit(RLIMIT_FSIZE, &originalFileSizeLimit);
+    const int restoreSignalResult = sigaction(SIGXFSZ, &originalFileSizeSignal, nullptr);
+    ASSERT_EQ(restoreLimitResult, 0);
+    ASSERT_EQ(restoreSignalResult, 0);
+    EXPECT_EQ(writeStatus, ResourceStatus::IoError);
+}
+
 TEST_F(ResourceRegistryTest, LookupValidatesInputsAndReturnsIndependentMaterializations)
 {
     ResourceData output;
@@ -1169,8 +1202,8 @@ TEST_F(ResourceRegistryTest, LookupReportsTemporaryRootAndMaterializationFailure
     EXPECT_EQ(registry_->Lookup("bad-temp", output), ResourceStatus::IoError);
     EXPECT_TRUE(output.resourceDir.empty());
 
-    registry_->temporaryRoot_ = Path("forced-materialize").string();
-    WriteFile(fs::path(registry_->temporaryRoot_) / "external", "blocking file");
+    ASSERT_TRUE(registry_->ownedMaterializationRoot_.RegisterDirectoryForCleanup(Path("forced-materialize").string()));
+    WriteFile(fs::path(registry_->ownedMaterializationRoot_.GetDirectoryPath()) / "external", "blocking file");
     output.resourceDir = "stale";
     EXPECT_EQ(registry_->Lookup("bad-temp", output), ResourceStatus::IoError);
     EXPECT_TRUE(output.resourceDir.empty());
@@ -1183,7 +1216,7 @@ TEST_F(ResourceRegistryTest, DestructorHonorsSaveKernelMetaAtTemporaryRootCreati
     registry_->externalResources_.emplace("keep-temp", MakeEntry(ResourceSourceType::External));
     ResourceData output;
     EXPECT_EQ(registry_->Lookup("keep-temp", output), ResourceStatus::Success);
-    const std::string retainedRoot = registry_->temporaryRoot_;
+    const std::string retainedRoot = registry_->ownedMaterializationRoot_.GetDirectoryPath();
     ASSERT_TRUE(fs::is_directory(retainedRoot));
     registry_.reset();
     EXPECT_TRUE(fs::is_directory(retainedRoot));
@@ -1192,7 +1225,7 @@ TEST_F(ResourceRegistryTest, DestructorHonorsSaveKernelMetaAtTemporaryRootCreati
     SetEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "true");
     registry_->externalResources_.emplace("remove-temp", MakeEntry(ResourceSourceType::External));
     EXPECT_EQ(registry_->Lookup("remove-temp", output), ResourceStatus::Success);
-    const std::string removedRoot = registry_->temporaryRoot_;
+    const std::string removedRoot = registry_->ownedMaterializationRoot_.GetDirectoryPath();
     ASSERT_TRUE(fs::is_directory(removedRoot));
     registry_.reset();
     EXPECT_FALSE(fs::exists(removedRoot));
@@ -1208,8 +1241,8 @@ TEST_F(ResourceRegistryTest, SaveKernelMetaTrimsWhitespaceAndKeepsFailedMaterial
     ResourceData output;
     EXPECT_EQ(registry_->Lookup("failed-materialization", output), ResourceStatus::IoError);
     EXPECT_TRUE(output.resourceDir.empty());
-    EXPECT_TRUE(registry_->keepTemporaryRoot_);
-    const fs::path retainedRoot(registry_->temporaryRoot_);
+    EXPECT_TRUE(registry_->retainMaterializedDirectories_);
+    const fs::path retainedRoot(registry_->ownedMaterializationRoot_.GetDirectoryPath());
     const fs::path categoryParent = retainedRoot / "external";
     std::vector<fs::path> retainedCategories;
     for (fs::directory_iterator current(categoryParent), end; current != end; ++current) {

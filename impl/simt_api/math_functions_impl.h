@@ -29,6 +29,8 @@
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 
 #define ASCRT_FOUR_BYTE_LEN_U 32U
+constexpr float __internal_subnormal_boundary =
+    1.17549435e-38f; // 1.17549435e-38f: subnormal floating-point number boundary
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lroundf(float x)
 {
@@ -75,7 +77,103 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fabsf(float x) { return __fabsf(x); 
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmaf(float x, float y, float z) { return __fma(x, y, z); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expf(float x) { return __expf(x); }
+/*
+ * Computes a refined sqrt approximation for float inputs.
+ *
+ * calculation to move subnormal or very small values into a more stable
+ * range. The result is scaled back by 2^-12 because sqrt(x * 2^24)
+ * equals sqrt(x) * 2^12.
+ *
+ * then applies one Newton-style correction to inv:
+ *   err0 = 1 - b * inv * inv
+ *   inv = inv + err0 * inv * 0.5
+ *
+ * The final sqrt value is reconstructed and corrected:
+ *   y = inv * b
+ *   err1 = b - y * y
+ *   y = y + 0.5 * inv * err1
+ *
+ * @param x The input value.
+ * @return The refined square root approximation.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf_precise_impl(float x)
+{
+    constexpr float scale_up = 16777216.0f;       // 2^24
+    constexpr float scale_down = 0.000244140625f; // 2^-12
+    constexpr float half = 0.5f;
+
+    // Return early for zero and positive infinity.
+    if (x == 0.0f || x == ASCRT_INF_F) {
+        return x;
+    }
+
+    // Scale inputs smaller than 1 to the normal range.
+    bool scaled = x < 1.0f;
+    float b = scaled ? x * scale_up : x;
+
+    // Compute an approximate reciprocal square root.
+    float sqrt_b = __sqrtf(b);
+    float inv = 1.0f / sqrt_b;
+
+    // Refine the reciprocal square root.
+    float err0 = fmaf(-(b * inv), inv, 1.0f);
+    inv = fmaf(err0, inv * half, inv);
+
+    // Convert to a square-root approximation, then compensate the sqrt residual.
+    float y = inv * b;
+    float err1 = fmaf(-y, y, b);
+    y = fmaf(inv * half, err1, y);
+
+    // Scale the result back if the input was multiplied by 2^24.
+    return scaled ? y * scale_down : y;
+}
+
+#ifdef __ASC_FTZ__
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_expf(float x) { return __expf(x); }
+
+#ifdef __ASC_PREC_SQRT__
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x)
+{
+    // Treat positive subnormal inputs as 0 before entering the precise sqrt path.
+    if (x > 0.0f && x < __internal_subnormal_boundary) {
+        x = 0.0f;
+    }
+    return __internal_sqrtf_precise_impl(x);
+}
+#else
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x) { return __sqrtf(x); }
+#endif
+#endif
+
+#ifndef __ASC_FTZ__
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_expf(float x)
+{
+    constexpr float __internal_subnormal_input_boundary =
+        -87.3365478515625f; // Input range where expf returns a subnormal result
+    if (x <= __internal_subnormal_input_boundary) {
+        float half_y = __expf(x * 0.5f);
+        return half_y * half_y;
+    }
+    return __expf(x);
+}
+
+#ifdef __ASC_PREC_SQRT__
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x) { return __internal_sqrtf_precise_impl(x); }
+#else
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x)
+{
+    constexpr float scale_up = 16777216.0f;       // 2^24
+    constexpr float scale_down = 0.000244140625f; // 2^-12
+    // Scale positive subnormal inputs to the normal range, then scale the result back.
+    if (x < __internal_subnormal_boundary) {
+        return __sqrtf(x * scale_up) * scale_down;
+    }
+    return __sqrtf(x);
+}
+#endif
+#endif
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expf(float x) { return __internal_expf(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logf(float x)
 {
@@ -87,7 +185,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logf(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x) { return logf(x) / logf(2.0f); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sqrtf(float x) { return __sqrtf(x); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sqrtf(float x) { return __internal_sqrtf(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rsqrtf(float x) { return 1.0f / sqrtf(x); }
 
@@ -196,6 +294,91 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isfinite(float x) { return __isfinite
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isnan(float x) { return __isnan(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool isinf(float x) { return __isinf(x); }
+
+#define __INTERNAL_NANF(tagp)                                                                       \
+    do {                                                                                            \
+        unsigned long long i = 0;                                                                   \
+        int c;                                                                                      \
+        int ovfl = 0;                                                                               \
+        int invld = 0;                                                                              \
+        if (tagp && (*tagp == '0')) {                                                               \
+            tagp++;                                                                                 \
+            if ((*tagp == 'x') || (*tagp == 'X')) {                                                 \
+                tagp++;                                                                             \
+                while (*tagp == '0')                                                                \
+                    tagp++;                                                                         \
+                while (*tagp) {                                                                     \
+                    if (i > 0x0fffffffffffffffULL) {                                                \
+                        ovfl = 1;                                                                   \
+                    }                                                                               \
+                    c = (((*tagp) >= 'A') && ((*tagp) <= 'F')) ? (*tagp + 'a' - 'A') : (*tagp);     \
+                    if ((c >= 'a') && (c <= 'f')) {                                                 \
+                        c = c - 'a' + 10;                                                           \
+                        i = i * 16 + c;                                                             \
+                    } else if ((c >= '0') && (c <= '9')) {                                          \
+                        c = c - '0';                                                                \
+                        i = i * 16 + c;                                                             \
+                    } else {                                                                        \
+                        invld = 1;                                                                  \
+                    }                                                                               \
+                    tagp++;                                                                         \
+                }                                                                                   \
+            } else {                                                                                \
+                while (*tagp == '0')                                                                \
+                    tagp++;                                                                         \
+                while (*tagp) {                                                                     \
+                    if (i > 0x1fffffffffffffffULL) {                                                \
+                        ovfl = 1;                                                                   \
+                    }                                                                               \
+                    c = *tagp;                                                                      \
+                    if ((c >= '0') && (c <= '7')) {                                                 \
+                        c = c - '0';                                                                \
+                        i = i * 8 + c;                                                              \
+                    } else {                                                                        \
+                        invld = 1;                                                                  \
+                    }                                                                               \
+                    tagp++;                                                                         \
+                }                                                                                   \
+            }                                                                                       \
+        } else if (tagp) {                                                                          \
+            while (*tagp) {                                                                         \
+                c = *tagp;                                                                          \
+                if ((i > 1844674407370955161ULL) || ((i == 1844674407370955161ULL) && (c > '5'))) { \
+                    ovfl = 1;                                                                       \
+                }                                                                                   \
+                if ((c >= '0') && (c <= '9')) {                                                     \
+                    c = c - '0';                                                                    \
+                    i = i * 10 + c;                                                                 \
+                } else {                                                                            \
+                    invld = 1;                                                                      \
+                }                                                                                   \
+                tagp++;                                                                             \
+            }                                                                                       \
+        }                                                                                           \
+        if (ovfl) {                                                                                 \
+            i = ~0ULL;                                                                              \
+        }                                                                                           \
+        if (invld) {                                                                                \
+            i = 0ULL;                                                                               \
+        }                                                                                           \
+        i = (i & 0x000fffffffffffffULL) | 0x7ff8000000000000ULL;                                    \
+        unsigned int i1 = (unsigned int)i;                                                          \
+        i1 = (i1 & 0x007fffff) | 0x7fc00000;                                                        \
+        union Data {                                                                                \
+            unsigned int u;                                                                         \
+            float f;                                                                                \
+        };                                                                                          \
+        union Data data = {.u = i1};                                                                \
+        return data.f;                                                                              \
+    } while (0)
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float nanf(const char* tagp) { __INTERNAL_NANF(tagp); }
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#if defined(__NPU_ARCH__) && !defined(ASCENDC_CPU_DEBUG)
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float nanf(const __gm__ char* tagp) { __INTERNAL_NANF(tagp); }
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float nanf(const __ubuf__ char* tagp) { __INTERNAL_NANF(tagp); }
+#endif
+#endif
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdimf(float x, float y)
 {
@@ -2897,6 +3080,54 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int ullmin(
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int umin(const unsigned int x, const unsigned int y)
 {
     return min(x, y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int max(unsigned int x, int y) { return max(x, (unsigned int)y); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int max(int x, unsigned int y) { return max((unsigned int)x, y); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long int max(long int x, unsigned long int y)
+{
+    return ullmax((unsigned long int)x, y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long int max(unsigned long int x, long int y)
+{
+    return ullmax(x, (unsigned long int)y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int max(long long int x, unsigned long long int y)
+{
+    return max((unsigned long long int)x, y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int max(unsigned long long int x, long long int y)
+{
+    return max(x, (unsigned long long int)y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int min(unsigned int x, int y) { return min(x, (unsigned int)y); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned int min(int x, unsigned int y) { return min((unsigned int)x, y); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long int min(long int x, unsigned long int y)
+{
+    return ullmin((unsigned long int)x, y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long int min(unsigned long int x, long int y)
+{
+    return ullmin(x, (unsigned long int)(y));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int min(long long int x, unsigned long long int y)
+{
+    return min((unsigned long long int)x, y);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int min(unsigned long long int x, long long int y)
+{
+    return min(x, (unsigned long long int)y);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y) { return x / y; }

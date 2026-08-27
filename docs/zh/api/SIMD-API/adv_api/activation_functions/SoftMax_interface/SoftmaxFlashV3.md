@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftmaxFlashV3_res.md#id1 -->
 
 ## 功能说明
 
@@ -76,9 +77,9 @@ def softmax_flash_3(src, height, width, loopCnt, alpha, baseK, inmax=None, insum
         x_sub = src - maxTmp
         dst = np.exp(x_sub)
         exp_max = np.exp(inmax - x_max + shiftPrev)
-        x_sum = np.sum(x_exp, axis=-1, keepdims=True)
+        x_sum = np.sum(dst, axis=-1, keepdims=True)
         x_sum = exp_max * insum +  x_sum
-        return x_exp, x_max, x_sum, x_mean, exp_max
+        return dst, x_max, x_sum, x_mean, exp_max
 ```
 
 ## 函数原型

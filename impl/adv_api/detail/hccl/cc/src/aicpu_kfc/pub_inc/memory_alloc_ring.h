@@ -215,7 +215,7 @@ private:
             newRingQueue[i] = new (std::nothrow) T;
             if (newRingQueue[i] == nullptr) {
                 for (size_t j = newHead; j < i; j++) {
-                    delete newRingQueue[i];
+                    delete newRingQueue[j];
                 }
                 delete[] newStatus;
                 delete[] newRingQueue;
@@ -227,18 +227,11 @@ private:
             newStatus[i] = OperateState::MEMORY_VALID;
         }
 
-        if (ringQueue_ != nullptr) {
-            delete[] ringQueue_;
-        }
-        if (recordQueue_ != nullptr) {
-            delete[] recordQueue_;
-        }
-        if (status_ != nullptr) {
-            delete[] status_;
-        }
-
+        delete[] ringQueue_;
         ringQueue_ = newRingQueue;
+        delete[] recordQueue_;
         recordQueue_ = newRecordQueue;
+        delete[] status_;
         status_ = newStatus;
         head_ = newHead;
         tail_ = newCapacity;
