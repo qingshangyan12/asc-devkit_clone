@@ -35,6 +35,12 @@ __simd_callee__ inline reg_tensor<bool> none_mask();
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 
+template <typename DataType>
+__simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
+
+template <typename DataType>
+__simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

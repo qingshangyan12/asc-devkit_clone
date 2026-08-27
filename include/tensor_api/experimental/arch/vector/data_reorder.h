@@ -21,13 +21,11 @@
 namespace asc {
 namespace te {
 namespace experimental {
-template <typename DataType = void, typename RegDataType = DataType>
-__simd_callee__ inline reg_pair<RegDataType> interleave(
-    const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
+template <typename T>
+__simd_callee__ inline reg_pair<T> interleave(reg_tensor<T> src0, reg_tensor<T> src1);
 
-template <typename DataType = void, typename RegDataType = DataType>
-__simd_callee__ inline reg_pair<RegDataType> deinterleave(
-    const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
+template <typename T>
+__simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T> src1);
 } // namespace experimental
 } // namespace te
 } // namespace asc
