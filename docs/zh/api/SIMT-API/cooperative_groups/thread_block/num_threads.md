@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/cooperative_groups/thread_block/num_threads_res.md#id1 -->
 
 ## 功能说明
 
@@ -38,7 +39,7 @@ static unsigned int num_threads()
 
 ## 返回值说明
 
-当前线程所属线程块内的线程总数，即blockDim.x * blockDim.y * blockDim.z。
+当前线程所属线程块内的线程总数，即`blockDim.x * blockDim.y * blockDim.z`。
 
 ## 约束说明
 

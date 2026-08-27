@@ -28,14 +28,14 @@ This sample implements multi-core matrix multiplication computation based on the
 ## Sample Description
 
 - Sample Functionality:  
-  This sample uses Ascend C basic API to implement a basic matrix multiplication (Matmul) [kernel function](../../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数.md). The matrix multiplication formula is as follows:
+  This sample uses Ascend C basic API to implement a basic matrix multiplication (Matmul) [kernel function](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simd_programming/kernel_function.md). The matrix multiplication formula is as follows:
   $$
   C = A * B
   $$
   Where matrix A has shape `[M, K]`, matrix B has shape `[K, N]`, and output matrix C has shape `[M, N]`. For each element `C[m, n]` in the output matrix C, the product of row `m` of matrix A and column `n` of matrix B along the K axis accumulates. In matrix multiplication, **M direction** refers to the row direction of matrix C, **N direction** refers to the column direction of matrix C, and **K direction** refers to the inner dimension (accumulation dimension) of matrix C multiplication.
 
 - Sample Specifications:  
-  This sample uses parameters `M = 256, N = 256, K = 64`, with both input and output in `half` type and [`ND`](../../../../../docs/zh/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md) format. The sample launches 2 cores to complete the computation, with each core responsible for 128 rows in the M axis direction and all 256 columns in the N axis direction of the output matrix C:
+  This sample uses parameters `M = 256, N = 256, K = 64`, with both input and output in `half` type and [`ND`](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md) format. The sample launches 2 cores to complete the computation, with each core responsible for 128 rows in the M axis direction and all 256 columns in the N axis direction of the output matrix C:
   - Core 0 computes rows `0~127` of matrix C.
   - Core 1 computes rows `128~255` of matrix C.
 
@@ -51,12 +51,12 @@ This sample implements multi-core matrix multiplication computation based on the
 
 - Sample Implementation:
   - Kernel-side Overall Approach
-    - `mmad_custom` is a [`__global__`](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md) [`__cube__`](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md) kernel function, which indicates that this function runs on the [Cube](../../../../../docs/zh/guide/技术附录/概念原理和术语/术语表.md) computation unit of [AI Core](../../../../../docs/zh/guide/技术附录/概念原理和术语/术语表.md), primarily used for matrix computation.
-    - The sample uses the [static Tensor programming method](../../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md) and creates [`LocalTensor`](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md) through [`LocalMemAllocator`](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/LocalMemAllocator/LocalMemAllocator_intro.md).
+    - `mmad_custom` is a [`__global__`](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md) [`__cube__`](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md) kernel function, which indicates that this function runs on the [Cube](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md) computation unit of [AI Core](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md), primarily used for matrix computation.
+    - The sample uses the [static Tensor programming method](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md) and creates [`LocalTensor`](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md) through [`LocalMemAllocator`](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/LocalMemAllocator/LocalMemAllocator_intro.md).
     - `CUBE_BLOCK = 16` indicates that the half data type fractal is `16 x 16`, and the code performs [`LoadData`](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D.md) transfers in units of `16 x 16` fractals.
 
   - Kernel-side Detailed Process
-    - Create [`GlobalTensor`](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor_intro.md)`<half>` objects `aGM`, `bGM`, `cGM`, representing matrices A, B, C in [GM (Global Memory)](../../../../../docs/zh/guide/编程指南/高级编程/硬件实现/基本架构.md).
+    - Create [`GlobalTensor`](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor_intro.md)`<half>` objects `aGM`, `bGM`, `cGM`, representing matrices A, B, C in [GM (Global Memory)](../../../../../docs/zh/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md).
     - Obtain the current core ID through [AscendC::GetBlockIdx()](../../../../../docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md) and calculate `mIterIdx`. This sample only splits tasks along the M axis, so each core only needs to process its own M-axis slice of matrix A and matrix C.
     - Set GM address offsets:
       - `aGM` offset by `mIterIdx * singleCoreM * K`, enabling the current core to read its assigned row block of matrix A.
@@ -68,8 +68,8 @@ This sample implements multi-core matrix multiplication computation based on the
       - `b1Local`: Temporary storage of matrix B in L1. `a1Local` and `b1Local` use the same L1 allocator and are allocated in order, avoiding manual L1 address offset maintenance.
       - `b2Local`: Temporary storage of matrix B in L0B, for `Mmad` to read.
       - `cLocal`: Temporary storage of matrix multiplication result in L0C.
-    - Call [`DataCopy`](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMToUB_ND2NZ.md) to transfer matrices A and B from GM to L1. Use [`Nd2NzParams`](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMToUB_ND2NZ.md) parameters to convert the input [ND](../../../../../docs/zh/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md) format data to [Nz](../../../../../docs/zh/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md) format required by Cube computation during the transfer.
-    - Call [`SetFlag<HardEvent::MTE2_MTE1>`](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) and [`WaitFlag<HardEvent::MTE2_MTE1>`](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) for synchronization. `DataCopy` belongs to the MTE2 pipeline, and the subsequent `LoadData` belongs to the [MTE1](../../../../../docs/zh/guide/技术附录/概念原理和术语/术语表.md) pipeline. [MTE1](../../../../../docs/zh/guide/技术附录/概念原理和术语/术语表.md) must wait for [MTE2](../../../../../docs/zh/guide/技术附录/概念原理和术语/术语表.md) to complete, to avoid reading L1 data that has not finished transferring.
+    - Call [`DataCopy`](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMToUB_ND2NZ.md) to transfer matrices A and B from GM to L1. Use [`Nd2NzParams`](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMToUB_ND2NZ.md) parameters to convert the input [ND](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md) format data to [Nz](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md) format required by Cube computation during the transfer.
+    - Call [`SetFlag<HardEvent::MTE2_MTE1>`](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) and [`WaitFlag<HardEvent::MTE2_MTE1>`](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) for synchronization. `DataCopy` belongs to the MTE2 pipeline, and the subsequent `LoadData` belongs to the [MTE1](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md) pipeline. [MTE1](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md) must wait for [MTE2](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md) to complete, to avoid reading L1 data that has not finished transferring.
     - Call `LoadData` to transfer matrix A from L1 to L0A, and matrix B from L1 to L0B. L0A and L0B are input buffers that the Cube matrix computation unit reads directly.
     - Call [`SetFlag<HardEvent::MTE1_M>`](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) and [`WaitFlag<HardEvent::MTE1_M>`](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI.md) for synchronization. `LoadData` belongs to the MTE1 pipeline, and the subsequent `Mmad` belongs to the M pipeline. The M pipeline must wait for MTE1 to complete, to avoid reading L0A/L0B data that has not finished transferring.
     - Call [`Mmad`](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md)`(cLocal, a2Local, b2Local, {baseM, baseN, baseK, 0, false, true})` to execute matrix multiplication. Here `baseM = 128`, `baseN = 256`, `baseK = 64`, corresponding to the matrix block size computed by a single core at one time.
@@ -78,7 +78,7 @@ This sample implements multi-core matrix multiplication computation based on the
     - Finally, call [`PipeBarrier`](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/PipeBarrier_ISASI.md)`<PIPE_ALL>()` to ensure that related pipeline tasks within the current core complete.
 
   - Invocation Implementation  
-    Use the [kernel invocation operator](../../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数.md)`<<<>>>` to invoke the [kernel function](../../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMD编程/核函数.md). When invoking, pass matrix specifications, single-core computation amount, and basic tile size as template parameters, and pass Device-side A, B, C matrix addresses as runtime parameters.
+    Use the [kernel invocation operator](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simd_programming/kernel_function.md)`<<<>>>` to invoke the [kernel function](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simd_programming/kernel_function.md). When invoking, pass matrix specifications, single-core computation amount, and basic tile size as template parameters, and pass Device-side A, B, C matrix addresses as runtime parameters.
 
 - API Parameter Description:
 
@@ -166,7 +166,7 @@ This sample implements multi-core matrix multiplication computation based on the
 
 Execute the following steps in the root directory of this sample to compile and run the sample.
 - Configure Environment Variables  
-  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

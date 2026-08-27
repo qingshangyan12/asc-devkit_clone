@@ -12,6 +12,9 @@
 #include <cstdint>
 #include "stub_fun.h"
 
+// The compiler supports this overload, but it is missing from the CPU debug stub header.
+int64_t ld_dev(__gm__ int64_t* src, int16_t offset);
+
 #ifndef ULL
 #define ULL unsigned long long
 #endif
@@ -601,6 +604,8 @@ inline void vgather2_bc(vector_bf16& dst, __ubuf__ bfloat16_t* src, vector_u32 i
 inline void vbr(vector_f8e4m3& dst, fp8_e4m3fn_t value) {}
 inline void vbr(vector_f8e5m2& dst, fp8_e5m2_t value) {}
 inline void vbr(vector_f8e8m0& dst, fp8_e8m0_t value) {}
+inline void vdup(vector_f8e8m0& dst, fp8_e8m0_t value, vector_bool mask, Literal mode) {}
+inline void vdup(vector_f8e8m0& dst, vector_f8e8m0 src, vector_bool mask, int32_t type, Literal mode) {}
 
 inline void copy_gm_to_cbuf_v2(
     __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
@@ -629,12 +634,22 @@ inline void img2colv2_cbuf_to_cb(
 inline void wait_flag_dev(pipe_t pipe, uint8_t flag_id) {}
 inline void wait_intra_block(pipe_t pipe, uint8_t flag_id) {}
 inline void set_intra_block(pipe_t pipe, uint8_t sync_id) {}
+inline void wait_intra_block(pipe_t pipe, uint16_t flag_id) {}
+inline void set_intra_block(pipe_t pipe, uint16_t sync_id) {}
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+inline void wait_intra_block(pipe_t pipe, int flag_id) {}
+inline void set_intra_block(pipe_t pipe, int sync_id) {}
+#endif
 inline void rls_buf(pipe_t pipe, uint64_t buf_id, bool mode) {}
 
 inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {}
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+inline int64_t get_iqent(pipe_t pipe) { return 0; }
+#endif
+
 #if defined(__DAV_VEC__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "instr_impl/npu_arch_3510/utils_impl/utils_type.h"
+#include "c_api/defs/type.h"
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint16_t*& dst) {}
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint32_t*& dst) {}
 #endif

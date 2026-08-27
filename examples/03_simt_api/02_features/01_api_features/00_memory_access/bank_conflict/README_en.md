@@ -92,7 +92,7 @@ for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
 }
 ```
 
-**Table 2** Case implementation description
+**Table 1** Case implementation description
 
 | Case   | Scenario Description                                                 | Expected Access Characteristics                                                                |
 | ------ | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -301,7 +301,7 @@ Run the following steps in the root directory of this example to build and execu
 
 - Configure Environment Variables
 
-  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh

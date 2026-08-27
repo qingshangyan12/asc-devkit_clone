@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/Warp_functions/Warp_reduce_functions/asc_reduce_max_res.md#id1 -->
 
 ## 功能说明
 
@@ -62,7 +63,7 @@ Warp内所有活跃线程输入val的最大值。
 
 ## 需要包含的头文件
 
-使用除half类型之外的接口需要包含"simt\_api/device\_warp\_functions.h"头文件，使用half类型接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用除half类型之外的接口需要包含`simt_api/device_warp_functions.h`头文件，使用half类型接口需要包含`simt_api/asc_fp16.h`头文件。
 
 ```cpp
 #include "simt_api/device_warp_functions.h"

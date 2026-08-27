@@ -62,13 +62,15 @@ const std::map<HcclCMDType, std::string> OP_TYPE_TO_DPU_ALG_MAP = {
 const std::unordered_map<std::string, std::string> RES_RESUSE_ALG = {
     {"InsReduceScatterMesh1D", "InsReduceScatterMeshClass"},
     {"InsReduceScatterMesh1DMeshChunk", "InsReduceScatterMeshClass"},
-    {"InsAllReduceMesh1DOneShot", "InsAllReduceMeshClass"},
-    {"InsAllReduceMesh1DTwoShot", "InsAllReduceMeshClass"},
+    {"AicpuAllReduceSoleMeshOneShot", "InsAllReduceMeshClass"},
+    {"AicpuAllReduceSoleMeshTwoShot", "InsAllReduceMeshClass"},
     {"InsSend", "InsSendRecv"},
     {"InsRecv", "InsSendRecv"}};
 
 class AutoSelectorBase {
 public:
+    virtual ~AutoSelectorBase() = default;
+
     SelectorStatus Select(OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName) const;
     bool IsDefaultAlg(const HcclAlgoType algoType) const;
     bool IsSmallData(const u64 dataSize) const;

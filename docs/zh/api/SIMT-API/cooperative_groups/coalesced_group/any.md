@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/cooperative_groups/coalesced_group/any_res.md#id1 -->
 
 ## 功能说明
 
@@ -59,7 +60,7 @@ int any(int predicate) const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            uint32_t result = active.any(1); // 返回1
+            int result = active.any(1); // 返回1
         }
         ...
     }
@@ -74,7 +75,7 @@ int any(int predicate) const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            uint32_t result = active.any(1); // 返回1
+            int result = active.any(1); // 返回1
         }
         ...
     }

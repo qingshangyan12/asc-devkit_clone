@@ -21,10 +21,11 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/bfloat16_type/bfloat16_math_functions/htanh_res.md#id1 -->
 
 ## 功能说明
 
-获取输入数据的三角函数双曲正切值。
+获取输入数据的双曲正切值。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002576421043.png)
 
@@ -58,7 +59,7 @@ inline bfloat16_t htanh(bfloat16_t x)
 
 ## 需要包含的头文件
 
-使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用bfloat16_t类型接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"

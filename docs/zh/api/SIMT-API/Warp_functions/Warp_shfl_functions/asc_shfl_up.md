@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_up_res.md#id1 -->
 
 ## 功能说明
 
@@ -94,7 +95,7 @@ Warp内指定线程的var值。
 
 ## 需要包含的头文件
 
-使用除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口需要包含"simt\_api/device\_warp\_functions.h"头文件，使用half和half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件，使用bfloat16\_t和bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口需要包含`simt_api/device_warp_functions.h`头文件，使用half和half2类型接口需要包含`simt_api/asc_fp16.h`头文件，使用bfloat16\_t和bfloat16x2\_t类型接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/device_warp_functions.h"

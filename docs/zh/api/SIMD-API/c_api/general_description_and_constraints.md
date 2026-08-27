@@ -15,7 +15,7 @@ AI Core内外包含多级存储单元，各存储单元的主要用途如下：
 <!-- npu="950" id1 -->
 **针对Ascend 950PR/Ascend 950DT：**
 
-各存储单元的空间大小和对齐要求请参见[存储单元规格](../../../guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本3510.md#section6500173264510)。如果具体C API中已明确操作数起始地址的对齐要求，则以具体C API中的说明为准。
+各存储单元的空间大小和对齐要求请参见[存储单元规格](../../../guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_3510.md#section6500173264510)。如果具体C API中已明确操作数起始地址的对齐要求，则以具体C API中的说明为准。
 
 > [!NOTE]说明
 >
@@ -30,7 +30,7 @@ AI Core内外包含多级存储单元，各存储单元的主要用途如下：
 <!-- npu="910b" id4 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id4 -->
-各存储单元的空间大小和对齐要求请参见[存储单元规格](../../../guide/编程指南/高级编程/硬件实现/架构规格/NPU架构版本2201.md#section6500173264510)。如果具体C API中已明确操作数起始地址的对齐要求，则以具体C API中的说明为准。
+各存储单元的空间大小和对齐要求请参见[存储单元规格](../../../guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_2201.md#section6500173264510)。如果具体C API中已明确操作数起始地址的对齐要求，则以具体C API中的说明为准。
 
 > [!NOTE]说明
 >
@@ -151,10 +151,10 @@ asc_add(dstLocal, src0Local, src1Local, repeatTime, dst_block_stride, src0_block
 
 结果示例如下：
 
-```cpp
-输入数据(src0Local)： [1 2 3 ... 64 ...127 128]
-输入数据(src1Local)： [1 2 3 ... 64 ...127 128]
-输出数据(dstLocal)：  [2 undefined 6 ... undefined  ...254 undefined]
+```text
+输入数据(src0Local): [1 2 3 ... 64 ...127 128]
+输入数据(src1Local): [1 2 3 ... 64 ...127 128]
+输出数据(dstLocal):  [2 undefined 6 ... undefined  ...254 undefined]
 ```
 
 mask过程如下：<br/>
@@ -178,10 +178,10 @@ asc_add(dstLocal, src0Local, src1Local, repeatTime, dst_block_stride, src0_block
 
 结果示例如下：
 
-```cpp
-输入数据(src0Local)： [1 2 3 ... 63 64]
-输入数据(src1Local)： [1 2 3 ... 63 64]
-输出数据(dstLocal)： [2 undefined 6 ... 126 undefined]
+```text
+输入数据(src0Local): [1 2 3 ... 63 64]
+输入数据(src1Local): [1 2 3 ... 63 64]
+输出数据(dstLocal): [2 undefined 6 ... 126 undefined]
 ```
 
 mask过程如下：<br/>
@@ -192,7 +192,6 @@ mask={6148914691236517205, 0}（注：6148914691236517205表示64位二进制数
 
 编译器支持以数组方式申请内存。但需注意以下约束：
 
-- 当前仅支持Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品。
 - 数组方式的申请方式，和asc_get_phy_buf_addr API接口不能混用。否则可能导致地址重叠。
 - 不支持多维数组和嵌套的数组。
 - 封装到数据结构中时，不支持隐式构造。
@@ -224,5 +223,4 @@ __ubuf__ float buff[result_len]; // 不支持动态数组。result_len为前置�
 // 不支持两种地址申请方式混用。下面的写法获取的src0和src1的起始位置相同：
 __ubuf__ float* src0 = (__ubuf__ float*)asc_get_phy_buf_addr(0);
 __ubuf__ float src1[src_len];
-
 ```

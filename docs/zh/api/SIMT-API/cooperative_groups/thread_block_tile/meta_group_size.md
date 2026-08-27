@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/cooperative_groups/thread_block_tile/meta_group_size_res.md#id1 -->
 
 ## 功能说明
 
@@ -29,7 +30,7 @@
 ## 函数原型
 
 ```cpp
-unsigned long long meta_group_size() const
+unsigned int meta_group_size() const
 ```
 
 ## 参数说明
@@ -57,7 +58,7 @@ unsigned long long meta_group_size() const
         ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
-        unsigned long long group_size = tile4.meta_group_size();    // 返回256
+        unsigned int group_size = tile4.meta_group_size();    // 返回256
         ...
     }
     ```
@@ -71,7 +72,7 @@ unsigned long long meta_group_size() const
         ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
-        unsigned long long group_size = tile4.meta_group_size();    // 返回256
+        unsigned int group_size = tile4.meta_group_size();    // 返回256
         ...
     }
     ```

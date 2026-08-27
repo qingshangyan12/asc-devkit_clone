@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example demonstrates how to use the `assert()` interface in SIMT programming for on-board functional debugging.
+This example demonstrates how to use the `assert()` interface in the SIMT programming model for on-board functional debugging.
 
 ## Supported Products
 
@@ -52,7 +52,7 @@ This example demonstrates how to use the `assert()` interface in SIMT programmin
 Run the following steps in the root directory of this example to build and execute the operator.
 
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

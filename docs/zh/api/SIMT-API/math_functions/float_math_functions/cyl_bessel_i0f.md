@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/float_math_functions/cyl_bessel_i0f_res.md#id1 -->
 
 ## 功能说明
 
@@ -58,7 +59,7 @@ inline float cyl_bessel_i0f(float x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/math\_functions.h"头文件。
+使用该接口需要包含`simt_api/math_functions.h`头文件。
 
 ```cpp
 #include "simt_api/math_functions.h"

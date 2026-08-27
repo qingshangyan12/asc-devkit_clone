@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/half_type/half_precision_conversion_functions/__high2half2_res.md#id1 -->
 
 ## 功能说明
 
@@ -42,7 +43,7 @@ inline half2 __high2half2(const half2 x)
 
 ## 返回值说明
 
-输入数据的的高16位填充到half2的结果。特殊值如下：
+输入数据的高16位填充到half2的结果。特殊值如下：
 
 | x值 | 返回值 |
 | --- | --- |
@@ -60,7 +61,7 @@ inline half2 __high2half2(const half2 x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用该接口需要包含`simt_api/asc_fp16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_fp16.h"

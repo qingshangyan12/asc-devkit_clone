@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/Warp_functions/lane_id_functions/laneid_res.md#id1 -->
 
 ## 功能说明
 
@@ -46,7 +47,7 @@ int32_t laneid()
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/device\_functions.h"头文件。 
+使用该接口需要包含`simt_api/device_functions.h`头文件。 
 
 ```cpp
 #include "simt_api/device_functions.h" 
@@ -54,7 +55,7 @@ int32_t laneid()
 
 ## 调用示例
 
-下面示例使用`laneid`计算全部输入数据的和，并把结果赋值到输出数据的第0位置上，示例中使用[asc_reduce_add](../Warp_reduce_functions/asc_reduce_add.md)，需另外包含"simt_api/device_warp_functions.h"头文件，使用[asc_atomic_add](../../atomic_operations/asc_atomic_add.md)，需另外包含"simt_api/device_atomic_functions.h"头文件。
+下面示例使用`laneid()`计算全部输入数据的和，并把结果赋值到输出数据的第0位置上，示例中使用[asc_reduce_add](../Warp_reduce_functions/asc_reduce_add.md)，需另外包含`simt_api/device_warp_functions.h`头文件，使用[asc_atomic_add](../../atomic_operations/asc_atomic_add.md)，需另外包含`simt_api/device_atomic_functions.h`头文件。
 
 -   SIMT编程场景：
 

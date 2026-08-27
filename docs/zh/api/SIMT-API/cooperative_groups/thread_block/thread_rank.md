@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/cooperative_groups/thread_block/thread_rank_res.md#id1 -->
 
 ## 功能说明
 
@@ -38,7 +39,7 @@ static unsigned int thread_rank()
 
 ## 返回值说明
 
-当前线程在线程块内所有线程中的排名（等价于threadIdx.x + threadIdx.y * blockDim.x + threadIdx.z * blockDim.x * blockDim.y）。
+当前线程在线程块内所有线程中的排名（等价于`threadIdx.x + threadIdx.y * blockDim.x + threadIdx.z * blockDim.x * blockDim.y`）。
 
 ## 约束说明
 

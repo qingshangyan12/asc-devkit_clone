@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**该接口已废弃，请使用[asc_squeeze_with_status](asc_squeeze_with_status.md)实现此功能。**
+**该接口已废弃，请使用[asc_squeeze_and_storeunalign](../reg_store/asc_squeeze_and_storeunalign.md)实现筛选并连续搬出有效元素的功能。**
 
 将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。dst中剩余位置元素置为0。
 
@@ -79,7 +79,7 @@ PIPE_V
 ```cpp
 vector_int8_t src;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_loadalign(src, src_addr); // src_addr是外部输入的Unified Buffer（UB）内存空间地址。
 vector_int8_t dst;
 asc_squeeze_v2(dst, src, mask);
 ```

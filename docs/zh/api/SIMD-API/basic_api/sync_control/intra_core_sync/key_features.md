@@ -1,4 +1,4 @@
-# 关键特性说明<a id="sync-key-features"></a>
+# 关键特性说明
 
 ## 自动同步概述
 
@@ -6,20 +6,20 @@
 
 - 自动插入同步的范围是**SIMD-API的核内同步（包含单流水同步和多流水同步）**。
 - 部分接口间的同步由硬件保证，无需手动或者自动插入同步，具体内容请参考[硬件保证的同步](#硬件保证的同步)。
-- [TPipe-TQue框架编程范式](../../../../../../zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md)和开启[cce-auto-sync编译选项](../../../../../../zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md#常用的编译选项)都能自动插入同步（后者由毕昇编译器自动插入），两种方式不互斥、各自插入的同步类型不同，可同时生效。
+- [TPipe-TQue框架编程范式](../../../../../../zh/guide/programming_guide/programming_model/ai_core_simd_programming/tpipe_tque_programming/tpipe_tque_paradigm.md)和开启[cce-auto-sync编译选项](../../../../../../zh/guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#常用的编译选项)都能自动插入同步（后者由毕昇编译器自动插入），两种方式不互斥、各自插入的同步类型不同，可同时生效。
 - TPipe-TQue框架编程范式和开启cce-auto-sync编译选项自动插入同步的前提是必须满足各自的使用约束。
 
 ## 自动同步决策树
 
 如图1所示，开发者可以按照图中流程判断一对接口之间是否需要手动插入同步，自动同步的支持情况见[表1](#table-aiv-tpipe-sync)、[表2](#table-aic-tpipe-sync)和[表3](#table-aiv-cce-sync)。
 
-Ascend C提供了[三层梯度化SIMD编程接口](../../../../../../zh/guide/编程指南/编程模型/AI-Core-SIMD编程/概述.md#ascend-c多级编程接口)，下面列出了各类接口管理同步的具体情况：
+Ascend C提供了[三层梯度化SIMD编程接口](../../../../../../zh/guide/programming_guide/programming_model/ai_core_simd_programming/overview.md#ascend-c多级编程接口)，下面列出了各类接口管理同步的具体情况：
 
-- [基于TPipe-TQue框架编程-同步机制](../../../../../../zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md#数据依赖与同步机制双api的协同工作)。
-- [基于指针的C语言编程-同步机制](../../../../../../zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/C语言编程概述.md#同步机制)。
-- [基于Tensor的CPP编程-同步机制](../../../../../../zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/CPPTensor编程概述.md#同步机制)。
+- [基于TPipe-TQue框架编程-同步机制](../../../../../../zh/guide/programming_guide/programming_model/ai_core_simd_programming/tpipe_tque_programming/tpipe_tque_principles.md#数据依赖与同步机制双api的协同工作)。
+- [基于指针的C语言编程-同步机制](../../../../../../zh/guide/programming_guide/programming_model/ai_core_simd_programming/c_pointer_programming/c_programming_overview.md#同步机制)。
+- [基于Tensor的CPP编程-同步机制](../../../../../../zh/guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/cpp_tensor_programming_overview.md#同步机制)。
 
-基于Tensor的CPP编程操作的Tensor可以分为基础Tensor和扩展Tensor，两种Tensor的具体含义和区别请参考[Tensor内存抽象](../../../../../../zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/CPPTensor编程概述.md#tensor内存抽象)。
+基于Tensor的CPP编程操作的Tensor可以分为基础Tensor和扩展Tensor，两种Tensor的具体含义和区别请参考[Tensor内存抽象](../../../../../../zh/guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/cpp_tensor_programming_overview.md#tensor内存抽象)。
 
 两种方式的使用约束和支持的同步类型分别在后续章节展开：[TPipe-TQue框架范式自动同步](#tpipe-tque-auto-sync)和[开启cce-auto-sync编译选项自动同步](#cce-compiler-auto-sync)。
 
@@ -50,12 +50,12 @@ Ascend C提供了[三层梯度化SIMD编程接口](../../../../../../zh/guide/�
 
 ## TPipe-TQue框架编程范式自动同步<a id="tpipe-tque-auto-sync"></a>
 
-### 使用约束
+### 使用约束<a id="tpipe-tque-auto-sync-constraints"></a>
 
 TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方可生效：
 
 - 使用TPipe-TQue框架编程范式。
-- 正确使用EnQue/DeQue、AllocTensor/FreeTensor接口才能保证其自动同步功能正常运作，本条约束对应[反例2](#反例)。
+- 正确使用EnQue/DeQue、AllocTensor/FreeTensor接口才能保证其自动同步功能正常运作，本条约束对应[反例2](#tpipe-tque-auto-sync-counterexamples)。
 
 ### 支持的同步类型
 
@@ -64,10 +64,10 @@ TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方�
     TPipe-TQue框架编程范式不支持插入单流水同步。
 - 多流水同步
 
-    在TPipe-TQue框架编程范式下，框架能够自动插入部分多流水同步，以解决写后读（WAR,Write‑After‑Read）和读后写（RAW,Read‑After‑Write）两类数据依赖，具体原理参考[TPipe-TQue框架数据依赖与同步机制](../../../../../../zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md#数据依赖与同步机制双api的协同工作)。
+    在TPipe-TQue框架编程范式下，框架能够自动插入部分多流水同步，以解决先写后读（RAW，Read-After-Write）和先读后写（WAR，Write-After-Read）两类数据依赖，具体原理参考[TPipe-TQue框架数据依赖与同步机制](../../../../../../zh/guide/programming_guide/programming_model/ai_core_simd_programming/tpipe_tque_programming/tpipe_tque_principles.md#数据依赖与同步机制双api的协同工作)。
 
     <!-- npu="A3,910b" id5 -->
-    以[NPU架构2201](../../../../../../zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)为例，该硬件架构下AIV和AIC中不同流水线的自动同步支持情况分别如[表1](#table-aiv-tpipe-sync)和[表2](#table-aic-tpipe-sync)所示。
+    以[NPU架构2201](../../../../../../zh/guide/programming_guide/language_extension/simd_builtin_keywords.md)为例，该硬件架构下AIV和AIC中不同流水线的自动同步支持情况分别如[表1](#table-aiv-tpipe-sync)和[表2](#table-aic-tpipe-sync)所示。
     <!-- end id5 -->
 
     **表1**  在TPipe-TQue框架编程范式下，AIV中不同流水线的同步情况 <a id="table-aiv-tpipe-sync"></a>
@@ -90,11 +90,11 @@ TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方�
     | PIPE_MTE3 | - | - | 支持 | 支持 | - | - |
     | PIPE_FIX | - | 支持 | 支持 | - | - | - |
 
-### 反例
+### 反例<a id="tpipe-tque-auto-sync-counterexamples"></a>
 
-以下反例展示了因未满足[使用约束](#使用约束)而无法自动插入同步的典型场景。
+以下反例展示了因未满足[使用约束](#tpipe-tque-auto-sync-constraints)而无法自动插入同步的典型场景。
 
-- 反例1：未使用TPipe-TQue框架编程范式。例如，将[基于TPipe-TQue框架编程范式的Add向量加法的样例](../../../../../../../examples/01_simd_cpp_api/00_introduction/01_add/add_tpipe_tque)改写为基于[静态Tensor编程范式](../../../../../../zh/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)时，静态Tensor编程范式无法自动插入MTE2_V，并最终导致样例执行失败。
+- 反例1：未使用TPipe-TQue框架编程范式。例如，将[基于TPipe-TQue框架编程范式的Add向量加法的样例](../../../../../../../examples/01_simd_cpp_api/00_introduction/01_add/add_tpipe_tque)改写为基于[静态Tensor编程范式](../../../../../../zh/guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md)时，静态Tensor编程范式无法自动插入`MTE2_V`，并最终导致样例执行失败。
 
     ```cpp
     AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
@@ -111,7 +111,7 @@ TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方�
 - 反例2：未正确使用EnQue/DeQue、AllocTensor/FreeTensor接口（由TPipe-TQue框架编程范式提供）。例如，在[基于TPipe-TQue框架编程范式的Add向量加法的样例](../../../../../../../examples/01_simd_cpp_api/00_introduction/01_add/add_tpipe_tque)中，如果缺失了`xLocal = inQueueX.DeQue<float>()`会导致TPipe-TQue框架编程范式无法自动插入`MTE2_V`，并最终导致样例执行失败。
 
     ```cpp
-    // 使用DataCopy将输入从GM搬运到UB，并通过EnQue将LocalTensor入队，供后续计算阶段DeQue取用。
+    // 使用DataCopy将输入从GM搬运到Unified Buffer（UB），并通过EnQue将LocalTensor入队，供后续计算阶段DeQue取用。
     AscendC::LocalTensor<float> xLocal = inQueueX.AllocTensor<float>();
     AscendC::LocalTensor<float> yLocal = inQueueY.AllocTensor<float>();
     AscendC::DataCopy(xLocal, xGm, blockLength);
@@ -128,11 +128,11 @@ TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方�
 
 ## 开启cce-auto-sync编译选项自动同步（毕昇编译器自动插入）<a id="cce-compiler-auto-sync"></a>
 
-### 使用约束
+### 使用约束<a id="cce-compiler-auto-sync-constraints"></a>
 
 开启cce-auto-sync编译选项的自动同步功能需满足以下前提条件方可生效：
 
-- 异构编译直调（<<<>>>调用）、Kernel直调算子工程以及自定义算子开发工程已默认设置`--cce-auto-sync=on`，如果开发者手动设置`--cce-auto-sync=off`，毕昇编译器无法自动插入同步。
+- 异构编译直调（<<<>>>调用）、核函数（Kernel）直调算子工程以及自定义算子开发工程已默认设置`--cce-auto-sync=on`，如果开发者手动设置`--cce-auto-sync=off`，毕昇编译器无法自动插入同步。
 - 属于PIPE\_V、PIPE\_MTE2、PIPE\_MTE3的接口必须操作基础Tensor（包含[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)和[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)）。
 - 属于PIPE\_S的接口必须在以下接口集合内：
     - Tensor标量读写：[LocalTensor::GetValue](../../data_structures/LocalTensor/GetValue.md)、[LocalTensor::SetValue](../../data_structures/LocalTensor/SetValue.md)、[LocalTensor::operator()](../../data_structures/LocalTensor/operator_call.md)、[GlobalTensor::GetValue](../../data_structures/GlobalTensor/GetValue.md)、[GlobalTensor::operator()](../../data_structures/GlobalTensor/operator_call.md)。
@@ -141,7 +141,7 @@ TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方�
 
     不在以上集合中的PIPE\_S接口，毕昇编译器无法自动插入同步：
     <!-- npu="950" id6 -->
-    例如，针对Ascend 950PR/Ascend 950DT，标量原子操作接口均不在以上接口集合内（包括[AtomicAdd](../../atomic_operations/AtomicAdd.md)、[AtomicCas](../../atomic_operations/AtomicCas.md)、[AtomicExch](../../atomic_operations/AtomicExch.md)、[AtomicMax](../../atomic_operations/AtomicMax.md)、[AtomicMin](../../atomic_operations/AtomicMin.md)），因此这些接口与属于PIPE\_MTE2、PIPE\_MTE3的接口在读写GM时存在数据依赖时，毕昇编译器无法自动插入同步，开发者需根据实际情况手动插入同步。
+    例如，针对Ascend 950PR/Ascend 950DT，标量原子操作接口均不在以上接口集合内（包括[AtomicAdd](../../atomic_operations/AtomicAdd.md)、[AtomicCas](../../atomic_operations/AtomicCas.md)、[AtomicExch](../../atomic_operations/AtomicExch.md)、[AtomicMax](../../atomic_operations/AtomicMax.md)、[AtomicMin](../../atomic_operations/AtomicMin.md)），因此，当这些接口与属于PIPE\_MTE2、PIPE\_MTE3的接口在读写GM时存在数据依赖，毕昇编译器无法自动插入同步，开发者需根据实际情况手动插入同步。
     <!-- end id6 -->
 
 ### 支持的同步类型
@@ -149,11 +149,11 @@ TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方�
 - 单流水同步
 
     <!-- npu="A3,910b" id7 -->
-    - 针对[NPU架构2201](../../../../../../zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)，PIPE\_V之间由毕昇编译器自动完成同步插入。
+    - 针对[NPU架构2201](../../../../../../zh/guide/programming_guide/language_extension/simd_builtin_keywords.md)，PIPE\_V之间由毕昇编译器自动完成同步插入。
     <!-- end id7 -->
 
     <!-- npu="950" id8 -->
-    - 针对[NPU架构3510](../../../../../../zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)，PIPE\_V之间的同步由硬件保证。
+    - 针对[NPU架构3510](../../../../../../zh/guide/programming_guide/language_extension/simd_builtin_keywords.md)，PIPE\_V之间的同步由硬件保证。
     <!-- end id8 -->
 
     - PIPE\_MTE2/PIPE\_MTE3在搬运地址有重叠的情况下需要开发者插入同步（具体示例请参考[PipeBarrier约束说明](../intra_core_sync/PipeBarrier_ISASI.md)）。
@@ -163,7 +163,7 @@ TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方�
     - Cube计算单元中，毕昇编译器不支持自动插入任何类型的同步。
 
 <!-- npu="A3,910b" id9 -->
-以[NPU架构2201](../../../../../../zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)为例，该硬件架构下AIV中不同流水线的自动同步支持情况如[表3](#table-aiv-cce-sync)所示。
+以[NPU架构2201](../../../../../../zh/guide/programming_guide/language_extension/simd_builtin_keywords.md)为例，该硬件架构下AIV中不同流水线的自动同步支持情况如[表3](#table-aiv-cce-sync)所示。
 <!-- end id9 -->
 
 **表3**  开启cce-auto-sync编译选项，AIV中不同流水线的同步情况 <a id="table-aiv-cce-sync"></a>
@@ -175,13 +175,13 @@ TPipe-TQue框架编程范式的自动同步功能需满足以下前提条件方�
 | PIPE_MTE2 | 支持 | - | - | - |
 | PIPE_MTE3 | 支持 | - | - | - |
 
-### 反例
+### 反例<a id="cce-compiler-auto-sync-counterexamples"></a>
 
-以下反例展示了因未满足[使用约束](#使用约束)而无法自动插入同步的典型场景。
+以下反例展示了因未满足[使用约束](#cce-compiler-auto-sync-constraints)而无法自动插入同步的典型场景。
 
 [基于指针的C语言编程的Add样例](../../../../../../../examples/02_simd_c_api/00_introduction/01_add/c_api_async_add)中，操作x_local的第0个元素时直接通过指针访问。此时，毕昇编译器无法在PIPE_MTE2（asc_copy_gm2ub）与PIPE_S之间自动插入同步。
 
-```cpp
+```c
 __gm__ float* x_gm = x + block_idx * block_length;
 __gm__ float* y_gm = y + block_idx * block_length;
 __gm__ float* z_gm = z + block_idx * block_length;
@@ -207,13 +207,17 @@ asc_sync();
 
 ## 自动同步日志功能
 
-开发者在使用自动同步功能时，往往不确定TPipe-TQue框架编程范式或毕昇编译器是否已插入同步指令、插入了哪些类型的同步、以及插入的具体位置。为了帮助开发者验证自动同步的插入情况，本节介绍两种查看自动同步信息的方式：NPU仿真模式的指令日志功能和毕昇编译器的自动同步日志功能。
+开发者在使用自动同步功能时，往往不确定TPipe-TQue框架编程范式或毕昇编译器是否已插入同步指令、插入了哪些类型的同步以及插入的具体位置。为了帮助开发者验证自动同步的插入情况，本节介绍两种查看自动同步信息的方式：NPU仿真模式的指令日志功能和毕昇编译器的自动同步日志功能。
 
 ### NPU仿真模式指令日志
 
-TPipe-TQue框架编程范式插入的同步并没有单独的日志功能，但是开启NPU仿真模式后（设置编译选项`DCMAKE_ASC_RUN_MODE=sim`，参考[编译运行](../../../../../../../examples/01_simd_cpp_api/00_introduction/01_add/add_tpipe_tque/README.md#编译运行)），可以通过指令日志**同时查看**TPipe-TQue框架编程范式和毕昇编译器自动插入的同步指令信息。
+TPipe-TQue框架编程范式插入的同步并没有单独的日志功能，但是开启NPU仿真模式后（设置编译选项`-DCMAKE_ASC_RUN_MODE=sim`，参考[编译运行](../../../../../../../examples/01_simd_cpp_api/00_introduction/01_add/add_tpipe_tque/README.md#编译运行)），可以通过指令日志**同时查看**TPipe-TQue框架编程范式和毕昇编译器自动插入的同步指令信息。
 
 基于TPipe-TQue框架编程范式的Add向量加法的样例中，开启NPU仿真模式后，在build目录下查看vector核0的指令日志（`core0.veccore0.instr_log.dump`）片段如下：
+
+<!-- npu="A3,910b" id10 -->
+> [!NOTE]说明
+> 以下日志片段及对应分析仅针对[NPU架构2201](../../../../../../zh/guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)成立。
 
 ```text
 [info] [00002009] (PC: 0x10d0d378) MTE2     : (Binary: 0x40a210bc) SET_FLAG  PIPE:MTE2, TRIGGER PIPE:VEC, FLAG ID:0, 
@@ -231,7 +235,8 @@ TPipe-TQue框架编程范式插入的同步并没有单独的日志功能，但�
 [info] [00002118] (PC: 0x10d0d4b8) VEC      : (Binary: 0x85c4c6bc) VADD  XD:X2=0x4000, XN:X12=0, XM:X13=0x2000, XT:X15=0x100080808010101, Dtype:F32, Id:308
 ```
 
-以上日志片段大致与Add向量加法样例的如下代码片段对应，日志中`MOV_OUT_TO_UB`对应`DataCopy`（源地址GM、目的地址UB）、`SET_FLAG`对应`SetFlag`、`WAIT_FLAG`对应`WaitFlag`、`VADD`对应`Add`，从日志第2009行、第2010行和第2011行可以看到，TPipe-TQue框架编程范式在PIPE_MTE2和PIPE_V之间自动插入了`SetFlag`和`WaitFlag`指令。
+以上日志片段大致与Add向量加法样例的如下代码片段对应，日志中`MOV_OUT_TO_UB`对应`DataCopy`（源地址GM、目的地址UB）、`SET_FLAG`对应`SetFlag`、`WAIT_FLAG`对应`WaitFlag`、`VADD`对应`Add`，从日志中序号为00002009、00002010和00002011的条目可以看到，TPipe-TQue框架编程范式在PIPE_MTE2和PIPE_V之间自动插入了`SetFlag`和`WaitFlag`指令。
+<!-- end id10 -->
 
 ```cpp
 AscendC::LocalTensor<float> xLocal = inQueueX.AllocTensor<float>();
@@ -253,7 +258,7 @@ AscendC::Add(zLocal, xLocal, yLocal, blockLength);
 毕昇编译器提供`--cce-auto-sync-log=<file>`编译选项可以输出同步插入信息到`<file>`文件中，帮助开发者显式地识别毕昇编译器在算子文件中插入的同步指令信息。
 
 > [!CAUTION]注意    
-> 获取毕昇编译器自动同步日志，还需要设置[`-g`编译选项](../../../../../../zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md#常用的编译选项)，用于获取算子代码文件行号。
+> 获取毕昇编译器自动同步日志，还需要设置[`-g`编译选项](../../../../../../zh/guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#常用的编译选项)，用于获取算子代码文件行号。
 
 根据开发场景不同，添加该编译选项的方式如下：
 

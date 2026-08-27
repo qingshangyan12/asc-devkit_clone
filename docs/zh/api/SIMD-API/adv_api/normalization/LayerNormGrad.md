@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/normalization/LayerNormGrad_res.md#id1 -->
 
 ## 功能说明
 
@@ -112,7 +113,7 @@ struct LayerNormGradShapeInfo {
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../general_description_and_constraints.md#section796754519912)。
 -   源操作数和目的操作数的Tensor空间可以复用。
 -   仅支持输入shape为ND格式。
 -   输入数据不满足对齐要求时，开发者需要进行补齐，补齐的数据应设置为0，防止出现异常值从而影响网络计算。

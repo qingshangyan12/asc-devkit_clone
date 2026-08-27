@@ -21,10 +21,11 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/bfloat16_type/bfloat16x2_compare_functions/__hbeqx2_res.md#id1 -->
 
 ## 功能说明
 
-比较两个bfloat16x2\_t类型数据的两个分量是否相等，仅当两个分量均相等时返回true。
+比较两个bfloat16x2_t类型数据的两个分量是否相等，仅当两个分量均相等时返回true。
 
 ## 函数原型
 
@@ -67,7 +68,7 @@ bool __hbeqx2(bfloat16x2_t x, bfloat16x2_t y)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用该接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"

@@ -21,10 +21,11 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/float_math_functions/frexpf_res.md#id1 -->
 
 ## 功能说明
 
-将x转换为归一化\[1/2, 1\)的有符号数乘以2的积分幂。返回归一化的有符号数，指数存储在exp中。
+将`x`转换为归一化\[1/2, 1\)的有符号数乘以2的积分幂。返回归一化的有符号数，指数存储在`exp`中。
 
 ![](../../../figures/zh-cn_formulaimage_0000002516816359.png)
 
@@ -41,7 +42,7 @@ inline float frexpf(float x, int *exp)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | x | 输入 | 源操作数。 |
-| exp | 输出 | Unified Buffer、Global Memory或栈空间的地址，用于存储以2为底的指数。 |
+| exp | 输出 | UB、Global Memory或栈空间的地址，用于存储以2为底的指数。 |
 
 ## 返回值说明
 
@@ -57,7 +58,7 @@ inline float frexpf(float x, int *exp)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/math\_functions.h"头文件。
+使用该接口需要包含`simt_api/math_functions.h`头文件。
 
 ```cpp
 #include "simt_api/math_functions.h"

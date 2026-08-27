@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Gather算子，演示了Host侧.cpp文件调用Host + Device混合.asc文件（含Kernel定义与<<<>>>内核调用）的基本编译流程。其中.asc文件中包含<<<>>>核函数调用的Host侧入口函数通过extern暴露给纯Host侧的.cpp。代码结构与调用关系如图 1 所示：
+本样例基于Gather算子，演示了Host侧.cpp文件调用Host + Device混合.asc文件（含Kernel定义与`<<<>>>`内核调用）的基本编译流程。其中.asc文件中包含`<<<>>>`核函数调用的Host侧入口函数通过extern暴露给纯Host侧的.cpp。代码结构与调用关系如图 1 所示：
 
 <p align="center">
   <img src="./figures/basic_compile.png" width="50%">
@@ -34,7 +34,7 @@ gather算子实现了从长度为100000的一维输入向量中获取指定索�
 
 ## 异构编译介绍
 
-本样例采用**异构编译**方式，Host侧 `.cpp` 与Device侧 `.asc` 分开编译后再链接。AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码由Device编译器编译成SIMT二进制，先将SIMT二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
+本样例采用**异构编译**方式，Host侧`.cpp`与Device侧`.asc`分开编译后再链接。AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码由Device编译器编译成SIMT二进制，先将SIMT二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
 
 ### bisheng命令行编译
 
@@ -50,9 +50,9 @@ bisheng kernel.o host.o -o demo
 bisheng host.cpp kernel.asc -o demo --npu-arch=dav-3510 --enable-simt -I${ASCEND_HOME_PATH}/include
 ```
 
-其中，`--npu-arch`为编译时指定的AI处理器架构，本样例仅支持`dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)进行查询。`--enable-simt`用于指定SIMT方式编译。
+其中，`--npu-arch`为编译时指定的AI处理器架构，本样例仅支持`dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)进行查询。`--enable-simt`用于指定SIMT方式编译。
 
-更多 bisheng 编译选项及用法说明，请参考[AI-Core算子编译基本用法](../../../../../docs/zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md)。
+更多 bisheng 编译选项及用法说明，请参考[AI-Core算子编译基本用法](../../../../../docs/zh/guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md)。
 
 ### CMake方式编译
 

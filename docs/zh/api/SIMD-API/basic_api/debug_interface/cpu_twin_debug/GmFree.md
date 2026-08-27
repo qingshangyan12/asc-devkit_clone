@@ -34,7 +34,7 @@
 
 头文件路径为：`"tools/cpudebug/include/stub_def.h"`。
 
-进行核函数的CPU侧运行验证时，用于释放通过[GmAlloc](GmAlloc.md)申请的共享内存。
+进行核函数（Kernel）的CPU侧运行验证时，用于释放通过[GmAlloc](GmAlloc.md)申请的共享内存。
 
 ## 函数原型<a name="zh-cn_topic_0000002000199397_zh-cn_topic_0000001592243993_section2067518173415"></a>
 
@@ -56,7 +56,7 @@ void GmFree(void *ptr)
 
 ## 约束说明<a name="zh-cn_topic_0000002000199397_zh-cn_topic_0000001592243993_section794123819592"></a>
 
-- 为了保留接口兼容，推荐[<<<>>>](../../../../../guide/编程指南/调试调优/功能调试/CPU域孪生调试.md)编译使用。
+- 为了保留接口兼容，推荐[<<<>>>](../../../../../guide/programming_guide/debug_and_tuning/functional_debug/cpu_twin_debug.md)编译使用。
 - 传入的指针必须是之前通过GmAlloc申请过的共享内存的指针。
 
 ## 调用示例<a name="zh-cn_topic_0000002000199397_zh-cn_topic_0000001592243993_section82241477610"></a>

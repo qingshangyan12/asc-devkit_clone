@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/bfloat16_type/bfloat16_compare_functions/__hmin_res.md#id1 -->
 
 ## 功能说明
 
@@ -64,7 +65,7 @@ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
 
 ## 需要包含的头文件
 
-使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用bfloat16\_t类型接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"

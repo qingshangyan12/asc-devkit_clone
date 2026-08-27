@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/reduction_operations/ReduceMax_interface/ReduceMax_res.md#id1 -->
 
 ## 功能说明
 
@@ -83,7 +84,7 @@
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 -   当srcInnerPad为True时，输入向量的内轴必须为32字节的整数倍。当原始向量的内轴长度n占据的字节长度不是32的整数倍时，需要开发者将其向上补齐到32的整数倍。开发者自行padding补齐后的内轴大小为inner = \(n \* sizeof\(T\) + 32 - 1\) / 32 \* 32 / sizeof\(T\)。
 
 -   **不支持源操作数与目的操作数地址重叠。**

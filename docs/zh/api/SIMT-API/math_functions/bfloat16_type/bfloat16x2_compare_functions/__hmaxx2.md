@@ -21,10 +21,11 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/bfloat16_type/bfloat16x2_compare_functions/__hmaxx2_res.md#id1 -->
 
 ## 功能说明
 
-获取两个bfloat16x2\_t类型数据各分量的最大值。
+获取两个bfloat16x2_t类型数据各分量的最大值。
 
 ## 函数原型
 
@@ -60,7 +61,7 @@ bfloat16x2_t __hmaxx2(const bfloat16x2_t x, const bfloat16x2_t y)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用该接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"

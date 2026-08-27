@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/bfloat16_type/bfloat16_precision_conversion_functions/__half2bfloat16_rd_res.md#id1 -->
 
 ## 功能说明
 
@@ -58,7 +59,7 @@ inline bfloat16_t __half2bfloat16_rd(const half x)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用该接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"
