@@ -65,11 +65,9 @@ Perform the following steps in the sample root directory to build and run the op
   ./demo
   ```
 
-  To use CPU debug mode or NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=cpu` or
-  `-DCMAKE_ASC_RUN_MODE=sim`, respectively. For example:
+  To use NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=sim`, respectively. For example:
 
   ```bash
-  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j
   cmake -DSCENARIO_NUM=4 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. && make -j
   ```
 
@@ -80,7 +78,7 @@ Perform the following steps in the sample root directory to build and run the op
 
   | Option | Value | Description |
   | --- | --- | --- |
-  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, or NPU simulation |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, or NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: dav-3510 corresponds to Ascend 950PR/Ascend 950DT, Atlas A3 training products, and Atlas A3 inference products |
 
 - Execution result

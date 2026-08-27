@@ -95,7 +95,7 @@ y[i] = cast<To, Options>(x[i])
     2. 使用 `asc_lock/asc_unlock` 包围MTE2流水，通过 `asc::te::copy` 将输入从GM搬运到UB。
     3. 根据源类型和目标类型的较大位宽计算单次寄存器处理元素数，使用 `asc::te::experimental::update_mask` 设置有效元素掩码。
     4. 相同位宽使用普通 `load`；扩宽转换使用 `unpack` 或 `unpack4` 模式加载；窄化转换使用 `pack` 或 `pack_quarter` 模式存储。
-    5. 调用C++17模板参数形式的 `asc::te::experimental::cast` 完成寄存器类型转换。
+    5. 使用 `asc::te::experimental::cast` 完成寄存器类型转换。
     6. 使用同一个mutex依次锁定Vector和MTE3流水，再将结果从UB搬运回GM。
 
     核心转换代码如下：
@@ -118,7 +118,7 @@ y[i] = cast<To, Options>(x[i])
 
 - 配置环境变量
 
-  配置CANN软件包环境变量，详细操作请参考[环境变量配置](../../../../../docs/quick_start.md#prepare&install)。
+  配置CANN软件包环境变量，详细操作请参考[环境变量配置](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md)。
 
   ```bash
   source ${install_path}/set_env.sh
