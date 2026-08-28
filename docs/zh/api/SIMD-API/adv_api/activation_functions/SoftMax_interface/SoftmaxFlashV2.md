@@ -236,14 +236,15 @@ struct SoftMaxShapeInfo {
     -   config.mode只支持配置为非拓展模式SOFTMAX\_OUTPUT\_WITHOUT\_BRC，其配置为SOFTMAX\_NORMAL模式时，接口功能不执行，不保存各输出；
     -   模板参数isUpdate为false时，outReduceMax不输出；
     -   除outReduceMax外，其余每个输出的计算结果与[不输出ReduceMax的接口](#section620mcpsimp)相同。
-
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
 <!-- npu="A3,910b,310p" id11 -->
 -   当参数softmaxShapeInfo中srcM != oriSrcM或者srcK != oriSrcK时，开发者需要对GM上的原始输入\(oriSrcM, oriSrcK\)在M或K方向补齐数据到\(srcM, srcK\)，补齐的数据会参与部分运算，在输入输出复用的场景下，API的计算结果会覆盖srcTensor中补齐的原始数据，在输入输出不复用的场景下，API的计算结果会覆盖dstTensor中对应srcTensor补齐位置的数据。
 <!-- end id11 -->
-
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/activation_functions/SoftMax_interface/SoftmaxFlashV2_res.md#id2 -->
+- 在Ascend 950PR/Ascend 950DT上，接口内部计算对Subnormal的处理方式受编译选项`--cce-ftz`控制：
+    - 配置为`false`时，计算过程中保留Subnormal，并按照其实际数值参与后续计算。
+    - 配置为`true`时，启用FTZ（Flush-To-Zero）模式，计算过程中产生或参与运算的Subnormal将按0处理，可能导致计算结果与保留Subnormal时存在精度差异。
 
 ## 调用示例
 
