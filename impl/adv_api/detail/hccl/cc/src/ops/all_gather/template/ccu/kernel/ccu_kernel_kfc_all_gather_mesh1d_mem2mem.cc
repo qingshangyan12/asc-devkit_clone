@@ -27,8 +27,6 @@ struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::Variable input;
     std::vector<ccu::Variable> output;
     std::vector<ccu::Variable> token;
-    ccu::Variable outputOffset;
-    ccu::Variable sliceSize;
     ccu::Variable currentRankSliceInputOffset;
     ccu::Variable currentRankSliceOutputOffset;
     ccu::Variable tmpRepeatNum;
@@ -108,7 +106,6 @@ static CcuResult LoadArgs(
     ctx.goSize.loopParam = goSize1;
     ctx.goSize.parallelParam = goSize2;
     ctx.goSize.residual = goSize3;
-    ctx.isInputOutputEqual = isInputOutputEqual;
     return CCU_SUCCESS;
 }
 
@@ -278,9 +275,6 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
         }
     }
 
-    CCU_CHK_RET(DoAllGatherWrite(ctx, src, dst));
-    CCU_IF(ctx.isInputOutputEqual == 0) { CCU_CHK_RET(GroupCopy(ctx, localDst, src, ctx.goSize)); }
-    CCU_CHK_RET(DoAllGatherWait(ctx));
     return CCU_SUCCESS;
 }
 
