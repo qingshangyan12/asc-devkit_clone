@@ -168,7 +168,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/vconv/asc_uint82uint32_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/vconv/asc_uint322uint16_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_muls_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_muls_cast_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_mul_scalar_float2half_rn_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_exp_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_add_scalar_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/vconv/asc_float2bfloat16_impl/asc_float2bfloat16_rd_impl.h"
@@ -5777,35 +5777,33 @@ asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask)
     asc_muls_v2_impl(dst, src, value, mask);
 }
 
-// ==========asc_muls_cast==========
-__simd_callee__ inline void asc_muls_cast(
+// ==========asc_mul_scalar_float2half_rn==========
+__simd_callee__ inline void asc_mul_scalar_float2half_rn(
     vector_half& dst, vector_float src, float value, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
-    asc_muls_cast_impl(dst, src, value, mask, dst_pos);
+    asc_mul_scalar_float2half_rn_impl(dst, src, value, mask, dst_pos);
 }
 
-__simd_callee__ inline void asc_muls_cast(
+__simd_callee__ inline void asc_mul_scalar_float2half_rn(
     vector_half& dst, vector_float src, float value, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
-    asc_muls_cast_impl(dst, src, value, mask, dst_pos);
+    asc_mul_scalar_float2half_rn_impl(dst, src, value, mask, dst_pos);
 }
-__simd_callee__ inline vector_half asc_muls_cast(
-    vector_float src, float value, vector_bool mask,
+__simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(vector_float src, float value, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
     vector_half dst;
-    asc_muls_cast_impl(dst, src, value, mask, dst_pos);
+    asc_mul_scalar_float2half_rn_impl(dst, src, value, mask, dst_pos);
     return dst;
 }
 
-__simd_callee__ inline vector_half asc_muls_cast(
-    vector_float src, float value, vector_bool mask,
+__simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(vector_float src, float value, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
     vector_half dst;
-    asc_muls_cast_impl(dst, src, value, mask, dst_pos);
+    asc_mul_scalar_float2half_rn_impl(dst, src, value, mask, dst_pos);
     return dst;
 }
 

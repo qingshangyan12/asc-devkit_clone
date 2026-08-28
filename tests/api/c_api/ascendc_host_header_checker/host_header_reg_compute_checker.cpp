@@ -579,7 +579,7 @@ static void test_host_c_api_reg_compute_16()
     using ::asc_mula;
     using ::asc_mull;
     using ::asc_muls;
-    using ::asc_muls_cast;
+    using ::asc_mul_scalar_float2half_rn;
     using ::asc_muls_v2;
     using ::asc_ne;
     using ::asc_ne_scalar;
