@@ -39,8 +39,6 @@ target_link_libraries(ascendc_ut_aicpu_api PRIVATE
     -Wl,--as-needed
 )
 
-target_link_options(ascendc_ut_aicpu_api PRIVATE "-Wl,--wrap=malloc")
-
 run_llt_test(
     TARGET ascendc_ut_aicpu_api
     TASK_NUM 1
