@@ -17,7 +17,6 @@
 #ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_UTILS_REG_UTILS_H
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_UTILS_REG_UTILS_H
 
-#include "tensor_api/experimental/arch/vector/reg_tensor.h"
 #include "tensor_api/utils/utils.h"
 #include "utils/std/type_traits.h"
 
