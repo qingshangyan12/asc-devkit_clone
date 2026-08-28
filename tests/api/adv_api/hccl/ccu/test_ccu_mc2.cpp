@@ -379,7 +379,8 @@ TEST_F(CcuMc2TestSuite, algorithmMap_AllEntries)
     EXPECT_EQ(algorithmMap.at("CcuAllGatherMeshMem2Mem1D"), CcuAllGatherMeshMem2Mem1D);
     EXPECT_EQ(algorithmMap.at("CcuSchedAllGatherConcurMeshNHRMultiLink"), CcuSchedAllGatherConcurMeshNHRMultiLink);
     EXPECT_EQ(algorithmMap.at("CcuKfcReduceScatterMesh1DMem2Mem"), CcuReduceScatterMeshMem2Mem1D);
-    EXPECT_EQ(algorithmMap.size(), 4U);
+    EXPECT_EQ(algorithmMap.at("CcuSchedAllToAllSoleMeshConcurrent"), CcuSchedAllToAllSoleMeshConcurrent);
+    EXPECT_EQ(algorithmMap.size(), 5U);
 }
 
 TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
@@ -388,6 +389,7 @@ TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
     EXPECT_EQ(CcuAllGatherMeshMem2Mem1D, 1);
     EXPECT_EQ(CcuAllGatherMesh2D, 2);
     EXPECT_EQ(CcuSchedAllGatherConcurMeshNHRMultiLink, 3);
+    EXPECT_EQ(CcuSchedAllToAllSoleMeshConcurrent, 4);
     EXPECT_EQ(CcuReduceScatterMesh1D, 50);
     EXPECT_EQ(CcuReduceScatterMeshMem2Mem1D, 51);
     EXPECT_EQ(CcuReduceScatterMesh2D, 52);

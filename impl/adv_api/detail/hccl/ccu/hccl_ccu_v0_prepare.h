@@ -22,6 +22,7 @@
 namespace AscendC {
 using namespace HcclKfcProtocol;
 static_assert(KFC_CONCURRENT_AG_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent AllGather parameters exceed XN capacity");
+static_assert(KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent AllToAll parameters exceed XN capacity");
 static_assert(CCU_USED_XN_NUM <= CCU_MSG_XN_NUM, "KFC loaded parameters exceed the message slot");
 
 template <const auto& config>
@@ -301,6 +302,43 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         KERNEL_INFO, "RS chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n", sliceSize,
         chunkSize, fullChunkCount, xnData_[7], xnData_[8]);
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+}
+
+template <const auto& config>
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::
+    CcuPrepareForConcurrentAllToAllM2M(__gm__ CommonPrepareParamCcu* commParam)
+{
+    constexpr uint64_t splitAlignment = 128U;
+    constexpr uint64_t closBwConstant = 8U;
+    uint64_t totalSize = commParam->count * DATA_TYPE_MAP[commParam->dataType];
+    uint64_t strideSize = commParam->strideCount == 0 ? totalSize :
+        commParam->strideCount * DATA_TYPE_MAP[commParam->dataType];
+    uint32_t meshBw = ccuParam_.rankNum - 1;
+    uint32_t closBw = closBwConstant;
+    uint32_t factor = meshBw + closBw;
+    uint64_t meshSize = (totalSize * meshBw / factor / splitAlignment) * splitAlignment;
+    uint64_t closSize = totalSize - meshSize;
+
+    xnData_[KFC_CONCURRENT_A2A_OP_ID] = GetOpId(commParam);
+
+    uint64_t offset = commParam->count * ccuParam_.repeatIndex * DATA_TYPE_MAP[commParam->dataType];
+    xnData_[KFC_CONCURRENT_A2A_MESH_INPUT] = (uint64_t)commParam->sendBuf + offset;
+    xnData_[KFC_CONCURRENT_A2A_MESH_OUTPUT] = (uint64_t)commParam->recvBuf + offset;
+    xnData_[KFC_CONCURRENT_A2A_MESH_SLICE_SIZE] = meshSize;
+    xnData_[KFC_CONCURRENT_A2A_MESH_SRC_STRIDE] = strideSize;
+    xnData_[KFC_CONCURRENT_A2A_MESH_SRC_OFFSET] = 0;
+    xnData_[KFC_CONCURRENT_A2A_MESH_DST_OFFSET] = strideSize * ccuParam_.rankId;
+    CalcGoSize(meshSize, closBwConstant, CCU_MEMSLICE_SIZE * closBwConstant,
+        &xnData_[KFC_CONCURRENT_A2A_MESH_GO_SIZE_0]);
+
+    xnData_[KFC_CONCURRENT_A2A_CLOS_INPUT] = (uint64_t)commParam->sendBuf + offset + meshSize;
+    xnData_[KFC_CONCURRENT_A2A_CLOS_OUTPUT] = (uint64_t)commParam->recvBuf + offset;
+    xnData_[KFC_CONCURRENT_A2A_CLOS_SLICE_SIZE] = closSize;
+    xnData_[KFC_CONCURRENT_A2A_CLOS_SRC_STRIDE] = strideSize;
+    xnData_[KFC_CONCURRENT_A2A_CLOS_SRC_OFFSET] = 0;
+    xnData_[KFC_CONCURRENT_A2A_CLOS_DST_OFFSET] = strideSize * ccuParam_.rankId + meshSize;
+    CalcGoSize(closSize, closBwConstant, CCU_MEMSLICE_SIZE * closBwConstant,
+        &xnData_[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_0]);
 }
 } // namespace AscendC
 

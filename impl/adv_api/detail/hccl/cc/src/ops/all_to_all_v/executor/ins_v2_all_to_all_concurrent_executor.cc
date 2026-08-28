@@ -15,6 +15,9 @@
 
 #include "alg_data_trans_wrapper.h"
 #include "ins_temp_all_to_all_v_mesh_1D.h"
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+#include "ccu_temp_kfc_all_to_all_mesh1d_multi_jetty_mem2mem.h"
+#endif
 
 namespace mc2_ops_hccl {
 namespace {
@@ -27,9 +30,10 @@ bool AddOverflows(u64 lhs, u64 rhs) { return lhs > std::numeric_limits<u64>::max
 
 bool MultiplyOverflows(u64 lhs, u64 rhs) { return lhs != 0U && rhs > std::numeric_limits<u64>::max() / lhs; }
 
-bool IsAicpuEngine(CommEngine engine)
+bool IsSupportedEngine(CommEngine engine)
 {
-    return engine == CommEngine::COMM_ENGINE_AICPU || engine == CommEngine::COMM_ENGINE_AICPU_TS;
+    return engine == CommEngine::COMM_ENGINE_AICPU || engine == CommEngine::COMM_ENGINE_AICPU_TS ||
+           engine == CommEngine::COMM_ENGINE_CCU;
 }
 
 bool ContainsRank(const std::vector<u32>& ranks, u32 rank)
@@ -44,7 +48,7 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
     const OpParam& param, u32 rankSize, u32 myRank) const
 {
     CHK_PRT_RET(
-        !IsAicpuEngine(param.engine),
+        !IsSupportedEngine(param.engine),
         HCCL_ERROR("[InsV2AllToAllConcurrentExecutor] unsupported engine[%u].", static_cast<u32>(param.engine)),
         HCCL_E_NOT_SUPPORT);
     CHK_PRT_RET(
@@ -112,8 +116,15 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
     InsAlgTemplate1 template1(param, topoInfo->userRank, closSubComm);
     AlgResourceRequest request0;
     AlgResourceRequest request1;
-    CHK_RET(template0.CalcResByChannelDescs(param, meshChannels, request0));
-    CHK_RET(template1.CalcResByChannelDescs(param, closChannels, request1));
+    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+        CHK_RET(template0.CalcRes(comm, param, topoInfo, request0));
+        CHK_RET(template1.CalcRes(comm, param, topoInfo, request1));
+        request0.ccuKernelInfos[0].channels = meshChannels;
+        request1.ccuKernelInfos[0].channels = closChannels;
+    } else {
+        CHK_RET(template0.CalcResByChannelDescs(param, meshChannels, request0));
+        CHK_RET(template1.CalcResByChannelDescs(param, closChannels, request1));
+    }
     CHK_PRT_RET(
         request1.slaveThreadNum == std::numeric_limits<u32>::max() ||
             request0.slaveThreadNum > std::numeric_limits<u32>::max() - request1.slaveThreadNum - 1U ||
@@ -128,10 +139,19 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
     resourceRequest.notifyNumPerThread.insert(
         resourceRequest.notifyNumPerThread.end(), request1.notifyNumPerThread.begin(),
         request1.notifyNumPerThread.end());
-    resourceRequest.channels.resize(1U);
-    resourceRequest.channels[0].reserve(meshChannels.size() + closChannels.size());
-    resourceRequest.channels[0].insert(resourceRequest.channels[0].end(), meshChannels.begin(), meshChannels.end());
-    resourceRequest.channels[0].insert(resourceRequest.channels[0].end(), closChannels.begin(), closChannels.end());
+    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+        resourceRequest.ccuKernelNum.push_back(request0.ccuKernelNum[0]);
+        resourceRequest.ccuKernelNum.push_back(request1.ccuKernelNum[0]);
+        resourceRequest.ccuKernelInfos.insert(
+            resourceRequest.ccuKernelInfos.end(), request0.ccuKernelInfos.begin(), request0.ccuKernelInfos.end());
+        resourceRequest.ccuKernelInfos.insert(
+            resourceRequest.ccuKernelInfos.end(), request1.ccuKernelInfos.begin(), request1.ccuKernelInfos.end());
+    } else {
+        resourceRequest.channels.resize(1U);
+        resourceRequest.channels[0].reserve(meshChannels.size() + closChannels.size());
+        resourceRequest.channels[0].insert(resourceRequest.channels[0].end(), meshChannels.begin(), meshChannels.end());
+        resourceRequest.channels[0].insert(resourceRequest.channels[0].end(), closChannels.begin(), closChannels.end());
+    }
     return HCCL_SUCCESS;
 }
 
@@ -333,7 +353,12 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
     CHK_PRT_RET(
         dataTypeSize_ == 0U, HCCL_ERROR("[InsV2AllToAllConcurrentExecutor] datatype size is zero."), HCCL_E_PARA);
     maxTmpMemSize_ = resCtx.cclMem.size;
-    CHK_RET(RestoreChannels(resCtx, algHierarchyInfo_.infos[0][0], algHierarchyInfo_.infos[0][1]));
+    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+        template0Threads_.assign(resCtx.threads.begin(), resCtx.threads.begin() + 1U);
+        template1Threads_.assign(resCtx.threads.begin() + 1U, resCtx.threads.end());
+    } else {
+        CHK_RET(RestoreChannels(resCtx, algHierarchyInfo_.infos[0][0], algHierarchyInfo_.infos[0][1]));
+    }
     return OrchestrateLoop(param, resCtx);
 }
 
@@ -348,8 +373,13 @@ HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlg
 
     TemplateResource resource0{};
     TemplateResource resource1{};
-    resource0.channels = templateChannels_[0];
-    resource1.channels = templateChannels_[1];
+    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
+        resource0.ccuKernels = {resCtx.ccuKernels[0]};
+        resource1.ccuKernels = {resCtx.ccuKernels[1]};
+    } else {
+        resource0.channels = templateChannels_[0];
+        resource1.channels = templateChannels_[1];
+    }
     resource0.threads = template0Threads_;
     resource1.threads = template1Threads_;
     for (TemplateResource* resource : {&resource0, &resource1}) {
@@ -431,5 +461,11 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLTOALLV, AicpuAllToAllVSoleMeshConcurrent, InsV2AllToAllConcurrentExecutor, TopoMatchUBX,
     InsTempAlltoAllVMesh1D, InsTempAlltoAllVMesh1D);
+
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+REGISTER_EXECUTOR_BY_TWO_TEMPS(
+    HcclCMDType::HCCL_CMD_ALLTOALL, CcuSchedAllToAllSoleMeshConcurrent, InsV2AllToAllConcurrentExecutor, TopoMatchUBX,
+    CcuTempKfcAllToAllMesh1DMultiJettyMem2Mem, CcuTempKfcAllToAllMesh1DMultiJettyMem2Mem);
+#endif
 
 } // namespace mc2_ops_hccl

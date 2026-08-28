@@ -42,6 +42,10 @@ HcclResult CalcChannelRequestNhr(
 HcclResult CalcChannelRequestNhrMultiJetty(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation = false);
+HcclResult CalcChannelRequestMeshClosMultiJetty(
+    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels,
+    bool isIsolation = false, bool execptMesh = false);
 HcclResult CalcChannelRequestMesh2D(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels);
@@ -60,10 +64,6 @@ HcclResult ProcessLinksForChannel(
 HcclResult ProcessLinksForChannelMutiJetty(
     HcclComm comm, CommProtocol expectedProtocol, const std::vector<CommLink>& linkList, u32 myRank, u32 remoteRank,
     uint32_t netLayer, std::vector<HcclChannelDesc>& channels, bool expectMesh, bool isIsolation = false);
-HcclResult CalcChannelRequestMeshClosMultiJetty(
-    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation = false,
-    bool expectMesh = true);
 HcclResult GetProtocolByEngine(const OpParam& param, std::vector<CommProtocol>& protocols);
 } // namespace mc2_ops_hccl
 
