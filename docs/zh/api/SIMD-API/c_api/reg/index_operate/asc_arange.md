@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../reg_data_types/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。算法逻辑表示如下：
+以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。算法逻辑表示如下：
 
 ```cpp
 // 递增
@@ -100,7 +100,7 @@ __simd_callee__ inline void asc_arange_descend(vector_half& dst,
 | dst       | 输出    | 目的操作数（矢量数据寄存器）。 |
 | value     | 输入    | 源操作数（标量），dtype须与dst一致。作为递减序列的起点，序列第0个元素等于`value + VL_T - 1`，后续元素按1递减。取值范围为该dtype的可表示范围。 |
 
-矢量数据寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
