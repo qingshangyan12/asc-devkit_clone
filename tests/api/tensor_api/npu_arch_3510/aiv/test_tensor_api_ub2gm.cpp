@@ -201,3 +201,23 @@ TEST_F(tensor_api_vector_copy_3510, copy_ub_to_gm_nz_to_nz)
 
     EXPECT_EQ(dst[0], 0);
 }
+
+TEST_F(tensor_api_vector_copy_3510, copy_ub_to_gm_zn_to_zn)
+{
+    using namespace asc::te;
+
+    constexpr uint32_t m = 64;
+    constexpr uint32_t n = 64;
+    __ubuf__ int8_t src[m * n] = {0};
+    __gm__ int8_t dst[m * n] = {0};
+
+    auto ub_tensor =
+        make_tensor_at<location::ub>(src, make_frame_layout<zn_layout_ptn, layout_trait_default<int8_t>>(m, n));
+    auto gm_tensor =
+        make_tensor_at<location::gm>(dst, make_frame_layout<zn_layout_ptn, layout_trait_default<int8_t>>(m, n));
+
+    run_copy_call_paths<copy_ub_to_gm, ub_to_gm_trait_default>(gm_tensor, ub_tensor);
+    run_copy_default_paths<copy_ub_to_gm, ub_to_gm_trait_default>(gm_tensor, ub_tensor);
+
+    EXPECT_EQ(dst[0], 0);
+}
