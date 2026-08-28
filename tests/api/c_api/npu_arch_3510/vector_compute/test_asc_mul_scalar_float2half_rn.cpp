@@ -13,7 +13,7 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-#define TEST_VECTOR_COMPUTE_MULS_CAST_INSTR(class_name, c_api_name, cce_name, dst_type, data_type, scalar_type) \
+#define TEST_VECTOR_COMPUTE_MUL_SCALAR_FLOAT2HALF_RN_INSTR(class_name, c_api_name, cce_name, dst_type, data_type, scalar_type) \
                                                                                                                 \
     class TestVectorCompute##class_name##_##data_type##_##scalar_type##_CApi : public testing::Test {           \
     protected:                                                                                                  \
@@ -45,4 +45,8 @@
         GlobalMockObject::verify();                                                                             \
     }
 
+<<<<<<< Updated upstream:tests/api/c_api/npu_arch_3510/vector_compute/test_asc_muls_cast.cpp
 TEST_VECTOR_COMPUTE_MULS_CAST_INSTR(MULSCAST, asc_muls_cast, vmulscvt, vector_half, vector_float, float);
+=======
+TEST_VECTOR_COMPUTE_MUL_SCALAR_FLOAT2HALF_RN_INSTR(MUL_SCALAR_FLOAT2HALF_RN, asc_mul_scalar_float2half_rn, vmulscvt, vector_half, vector_float, float);
+>>>>>>> Stashed changes:tests/api/c_api/npu_arch_3510/vector_compute/test_asc_mul_scalar_float2half_rn.cpp
