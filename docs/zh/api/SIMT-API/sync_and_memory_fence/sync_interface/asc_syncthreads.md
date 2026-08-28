@@ -81,7 +81,7 @@ inline void asc_syncthreads()
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelSyncThreads(float* dst, int count)
+    __global__ __launch_bounds__(1024) void kernel_sync_threads(float* dst, int count)
     {
          int idx = threadIdx.x;
          if (idx > 0 && idx < count) {
@@ -110,7 +110,7 @@ inline void asc_syncthreads()
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelSyncThreads(__gm__ float* dst, int count)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_sync_threads(__gm__ float* dst, int count)
     {
          int idx = threadIdx.x;
          if (idx > 0 && idx < count) {
@@ -123,7 +123,9 @@ inline void asc_syncthreads()
          if (idx == 0) {
              dst[0] = 0;
              for(int i = 1023; i > 0; i--) {
-                 dst[0] += dst[i];
+                 if (i < count) {
+                     dst[0] += dst[i];
+                 }
              }
          }
     }

@@ -65,7 +65,7 @@ inline long long int llmax(const long long int x, const long long int y)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelLlmax(long long int* dst, long long int* x, long long int* y, uint64_t total_length)
+    __global__ __launch_bounds__(1024) void kernel_llmax(long long int* dst, long long int* x, long long int* y, uint64_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         if (idx >= total_length) {
@@ -78,7 +78,7 @@ inline long long int llmax(const long long int x, const long long int y)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelLlmax(__gm__ long long int* dst, __gm__ long long int* x, __gm__ long long int* y)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_llmax(__gm__ long long int* dst, __gm__ long long int* x, __gm__ long long int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = llmax(x[idx], y[idx]);

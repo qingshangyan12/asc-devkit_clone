@@ -76,7 +76,7 @@ inline bfloat16_t hrsqrt(bfloat16_t x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelRsqrt(bfloat16_t* dst, bfloat16_t* x)
+    __global__ __launch_bounds__(1024) void kernel_rsqrt(bfloat16_t* dst, bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = hrsqrt(x[idx]);
@@ -86,7 +86,7 @@ inline bfloat16_t hrsqrt(bfloat16_t x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelRsqrt(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_rsqrt(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = hrsqrt(x[idx]);

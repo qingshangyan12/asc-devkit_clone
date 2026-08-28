@@ -70,7 +70,7 @@ inline bfloat16x2_t h2rint(bfloat16x2_t x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelRint(bfloat16x2_t* dst, bfloat16x2_t* x)
+    __global__ __launch_bounds__(1024) void kernel_rint(bfloat16x2_t* dst, bfloat16x2_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = h2rint(x[idx]);
@@ -80,7 +80,7 @@ inline bfloat16x2_t h2rint(bfloat16x2_t x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelRint(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_rint(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = h2rint(x[idx]);

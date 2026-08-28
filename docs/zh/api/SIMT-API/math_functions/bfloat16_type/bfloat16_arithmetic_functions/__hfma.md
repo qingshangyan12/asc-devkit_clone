@@ -76,7 +76,7 @@ x \* y+ z的值。本接口不受全局饱和模式影响，特殊值如下：
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelFma(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y, bfloat16_t* z){
+    __global__ __launch_bounds__(1024) void kernel_fma(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y, bfloat16_t* z){
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __hfma(x[idx], y[idx], z[idx]);
     }
@@ -85,7 +85,7 @@ x \* y+ z的值。本接口不受全局饱和模式影响，特殊值如下：
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelFma(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, __gm__ bfloat16_t* z){
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_fma(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, __gm__ bfloat16_t* z){
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = __hfma(x[idx], y[idx], z[idx]);
     }

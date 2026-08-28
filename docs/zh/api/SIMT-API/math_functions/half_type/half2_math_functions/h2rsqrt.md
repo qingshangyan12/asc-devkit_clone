@@ -73,7 +73,7 @@ inline half2 h2rsqrt(half2 x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelRsqrt(half2* dst, half2* x)
+    __global__ __launch_bounds__(1024) void kernel_rsqrt(half2* dst, half2* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = h2rsqrt(x[idx]);
@@ -83,7 +83,7 @@ inline half2 h2rsqrt(half2 x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelRsqrt(__gm__ half2* dst, __gm__ half2* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_rsqrt(__gm__ half2* dst, __gm__ half2* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = h2rsqrt(x[idx]);

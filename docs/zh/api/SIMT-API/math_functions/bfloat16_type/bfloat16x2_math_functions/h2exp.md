@@ -76,7 +76,7 @@ inline bfloat16x2_t h2exp(bfloat16x2_t x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelExp(bfloat16x2_t* dst, bfloat16x2_t* x)
+    __global__ __launch_bounds__(1024) void kernel_exp(bfloat16x2_t* dst, bfloat16x2_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = h2exp(x[idx]);
@@ -86,7 +86,7 @@ inline bfloat16x2_t h2exp(bfloat16x2_t x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelExp(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_exp(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = h2exp(x[idx]);
