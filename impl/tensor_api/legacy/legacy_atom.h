@@ -8,6 +8,11 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_LEGACY_LEGACY_ATOM_H
+#endif
+
 #ifndef IMPL_TENSOR_API_LEGACY_LEGACY_ATOM_H
 #define IMPL_TENSOR_API_LEGACY_LEGACY_ATOM_H
 
@@ -38,8 +43,7 @@ __aicore__ inline constexpr l0c_to_gm_params normalize_l0c_to_gm_params(const Pa
     if constexpr (Std::is_same_v<params_type, l0c_to_gm_params>) {
         return params;
     } else {
-        static_assert(Std::is_same_v<params_type, FixpipeParams>,
-                      "Params must be l0c_to_gm_params or FixpipeParams.");
+        static_assert(Std::is_same_v<params_type, FixpipeParams>, "Params must be l0c_to_gm_params or FixpipeParams.");
         return l0c_to_gm_params{static_cast<unit_flag_mode>(params.unitFlag)};
     }
 }
@@ -51,10 +55,8 @@ __aicore__ inline constexpr l0c_to_ub_params normalize_l0c_to_ub_params(const Pa
     if constexpr (Std::is_same_v<params_type, l0c_to_ub_params>) {
         return params;
     } else {
-        static_assert(Std::is_same_v<params_type, FixpipeParams>,
-                      "Params must be l0c_to_ub_params or FixpipeParams.");
-        return l0c_to_ub_params{static_cast<unit_flag_mode>(params.unitFlag),
-                               static_cast<uint8_t>(params.subBlockId)};
+        static_assert(Std::is_same_v<params_type, FixpipeParams>, "Params must be l0c_to_ub_params or FixpipeParams.");
+        return l0c_to_ub_params{static_cast<unit_flag_mode>(params.unitFlag), static_cast<uint8_t>(params.subBlockId)};
     }
 }
 
@@ -65,8 +67,7 @@ __aicore__ inline constexpr l0c_to_l1_params normalize_l0c_to_l1_params(const Pa
     if constexpr (Std::is_same_v<params_type, l0c_to_l1_params>) {
         return params;
     } else {
-        static_assert(Std::is_same_v<params_type, FixpipeParams>,
-                      "Params must be l0c_to_l1_params or FixpipeParams.");
+        static_assert(Std::is_same_v<params_type, FixpipeParams>, "Params must be l0c_to_l1_params or FixpipeParams.");
         return l0c_to_l1_params{static_cast<unit_flag_mode>(params.unitFlag)};
     }
 }
@@ -134,7 +135,8 @@ template <typename MmadOp, typename MmadTraitsType>
 struct MmadTraits<MmadOp, MmadTraitsType> : public MmadTraits<MmadOp, MmadTraitsType, mmad_op_with, MmadTraitsType> {};
 
 // MmadTraits 1参数特化: 标准操作绑定默认 trait
-template <> struct MmadTraits<mmad_operation> : public MmadTraits<mmad_operation, mmad_trait_default> {};
+template <>
+struct MmadTraits<mmad_operation> : public MmadTraits<mmad_operation, mmad_trait_default> {};
 
 // MmadAtom: 独立的 PascalCase 模板，不依赖 mmad_atom
 template <typename... Args>
@@ -210,8 +212,8 @@ template <typename AlwaysVoid, typename Op, typename Trait, const Trait& T, type
 struct has_copy_method : Std::false_type {};
 
 template <typename Op, typename Trait, const Trait& T, typename... Args>
-struct has_copy_method<void_t<decltype(Op::template copy<Trait, T, Args...>(std::declval<Args>()...))>,
-                       Op, Trait, T, Args...> : Std::true_type {};
+struct has_copy_method<void_t<decltype(Op::template copy<Trait, T, Args...>(std::declval<Args>()...))>, Op, Trait, T,
+                       Args...> : Std::true_type {};
 
 // CopyTraits: 独立的 PascalCase 模板，不依赖 copy_traits
 template <typename CopyOperation, typename... CopyOpArgs>
@@ -314,8 +316,7 @@ struct CopyTraits<copy_l0c_to_l1_with, Traits>
 template <typename Traits, typename PadType>
 struct CopyTraits<copy_l1_to_l0a_with, Traits, PadType>
     : public CopyTraitsWithParams<copy_l1_to_l0a_with, Traits, img2col_params<PadType>> {
-    using CopyTraitsWithParams<copy_l1_to_l0a_with, Traits,
-                               img2col_params<PadType>>::CopyTraitsWithParams;
+    using CopyTraitsWithParams<copy_l1_to_l0a_with, Traits, img2col_params<PadType>>::CopyTraitsWithParams;
 };
 
 // CopyTraits 2参数特化: 继承4参数
@@ -323,20 +324,16 @@ template <typename CopyOp, typename Traits>
 struct CopyTraits<CopyOp, Traits> : public CopyTraits<CopyOp, Traits, CopyOp, Traits> {};
 
 template <typename Traits>
-struct CopyTraits<copy_l0c_to_gm, Traits>
-    : public CopyTraits<copy_l0c_to_gm, Traits, copy_l0c_to_gm_with, Traits> {};
+struct CopyTraits<copy_l0c_to_gm, Traits> : public CopyTraits<copy_l0c_to_gm, Traits, copy_l0c_to_gm_with, Traits> {};
 
 template <typename Traits>
-struct CopyTraits<copy_l0c_to_ub, Traits>
-    : public CopyTraits<copy_l0c_to_ub, Traits, copy_l0c_to_ub_with, Traits> {};
+struct CopyTraits<copy_l0c_to_ub, Traits> : public CopyTraits<copy_l0c_to_ub, Traits, copy_l0c_to_ub_with, Traits> {};
 
 template <typename Traits>
-struct CopyTraits<copy_l0c_to_l1, Traits>
-    : public CopyTraits<copy_l0c_to_l1, Traits, copy_l0c_to_l1_with, Traits> {};
+struct CopyTraits<copy_l0c_to_l1, Traits> : public CopyTraits<copy_l0c_to_l1, Traits, copy_l0c_to_l1_with, Traits> {};
 
 template <typename Traits>
-struct CopyTraits<copy_l1_to_l0a, Traits>
-    : public CopyTraits<copy_l1_to_l0a, Traits, copy_l1_to_l0a_with, Traits> {
+struct CopyTraits<copy_l1_to_l0a, Traits> : public CopyTraits<copy_l1_to_l0a, Traits, copy_l1_to_l0a_with, Traits> {
     using base_type = CopyTraits<copy_l1_to_l0a, Traits, copy_l1_to_l0a_with, Traits>;
     using base_type::with;
 
@@ -354,21 +351,36 @@ struct CopyTraits<copy_l1_to_l0a, Traits>
 };
 
 // CopyTraits 1参数特化: 标准操作绑定默认 trait
-template <> struct CopyTraits<copy_gm_to_l1> : public CopyTraits<copy_gm_to_l1, gm_to_l1_trait_default> {};
-template <> struct CopyTraits<copy_gm_to_ub> : public CopyTraits<copy_gm_to_ub, gm_to_ub_trait_default> {};
-template <> struct CopyTraits<copy_ub_to_gm> : public CopyTraits<copy_ub_to_gm, ub_to_gm_trait_default> {};
-template <> struct CopyTraits<copy_ub_to_l1> : public CopyTraits<copy_ub_to_l1, ub_to_l1_trait_default> {};
-template <> struct CopyTraits<copy_ub_to_ub> : public CopyTraits<copy_ub_to_ub, ub_to_ub_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_ub> : public CopyTraits<copy_l1_to_ub, l1_to_ub_trait_default> {};
-template <> struct CopyTraits<copy_l0c_to_gm> : public CopyTraits<copy_l0c_to_gm, l0c_to_gm_trait_default> {};
-template <> struct CopyTraits<copy_l0c_to_ub> : public CopyTraits<copy_l0c_to_ub, l0c_to_ub_trait_default> {};
-template <> struct CopyTraits<copy_l0c_to_l1> : public CopyTraits<copy_l0c_to_l1, l0c_to_l1_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_l0a> : public CopyTraits<copy_l1_to_l0a, l1_to_l0a_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_l0b> : public CopyTraits<copy_l1_to_l0b, l1_to_l0b_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_l0scalea> : public CopyTraits<copy_l1_to_l0scalea, l1_to_l0scalea_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_l0scaleb> : public CopyTraits<copy_l1_to_l0scaleb, l1_to_l0scaleb_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_fixbuf> : public CopyTraits<copy_l1_to_fixbuf, l1_to_fixbuf_trait_default> {};
-template <> struct CopyTraits<copy_l1_to_biastable> : public CopyTraits<copy_l1_to_biastable, l1_to_biastable_trait_default> {};
+template <>
+struct CopyTraits<copy_gm_to_l1> : public CopyTraits<copy_gm_to_l1, gm_to_l1_trait_default> {};
+template <>
+struct CopyTraits<copy_gm_to_ub> : public CopyTraits<copy_gm_to_ub, gm_to_ub_trait_default> {};
+template <>
+struct CopyTraits<copy_ub_to_gm> : public CopyTraits<copy_ub_to_gm, ub_to_gm_trait_default> {};
+template <>
+struct CopyTraits<copy_ub_to_l1> : public CopyTraits<copy_ub_to_l1, ub_to_l1_trait_default> {};
+template <>
+struct CopyTraits<copy_ub_to_ub> : public CopyTraits<copy_ub_to_ub, ub_to_ub_trait_default> {};
+template <>
+struct CopyTraits<copy_l1_to_ub> : public CopyTraits<copy_l1_to_ub, l1_to_ub_trait_default> {};
+template <>
+struct CopyTraits<copy_l0c_to_gm> : public CopyTraits<copy_l0c_to_gm, l0c_to_gm_trait_default> {};
+template <>
+struct CopyTraits<copy_l0c_to_ub> : public CopyTraits<copy_l0c_to_ub, l0c_to_ub_trait_default> {};
+template <>
+struct CopyTraits<copy_l0c_to_l1> : public CopyTraits<copy_l0c_to_l1, l0c_to_l1_trait_default> {};
+template <>
+struct CopyTraits<copy_l1_to_l0a> : public CopyTraits<copy_l1_to_l0a, l1_to_l0a_trait_default> {};
+template <>
+struct CopyTraits<copy_l1_to_l0b> : public CopyTraits<copy_l1_to_l0b, l1_to_l0b_trait_default> {};
+template <>
+struct CopyTraits<copy_l1_to_l0scalea> : public CopyTraits<copy_l1_to_l0scalea, l1_to_l0scalea_trait_default> {};
+template <>
+struct CopyTraits<copy_l1_to_l0scaleb> : public CopyTraits<copy_l1_to_l0scaleb, l1_to_l0scaleb_trait_default> {};
+template <>
+struct CopyTraits<copy_l1_to_fixbuf> : public CopyTraits<copy_l1_to_fixbuf, l1_to_fixbuf_trait_default> {};
+template <>
+struct CopyTraits<copy_l1_to_biastable> : public CopyTraits<copy_l1_to_biastable, l1_to_biastable_trait_default> {};
 
 // CopyAtom: 独立的 PascalCase 模板，不依赖 copy_atom
 template <typename... Args>
@@ -427,8 +439,7 @@ __aicore__ inline void Copy(const AtomType& atom, const DstTensor& dst, const Sr
 
 template <typename AtomType, typename DstTensor, typename SrcTensor, typename Quant,
           Std::enable_if_t<is_valid_quant_v<Quant>, int> = 0>
-__aicore__ inline void Copy(const AtomType& atom, const DstTensor& dst, const SrcTensor& src,
-                            const Quant& quant)
+__aicore__ inline void Copy(const AtomType& atom, const DstTensor& dst, const SrcTensor& src, const Quant& quant)
 {
     atom.call(dst, src, quant);
 }
@@ -449,3 +460,8 @@ __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copy_operatio
 } // namespace AscendC
 
 #endif // IMPL_TENSOR_API_LEGACY_LEGACY_ATOM_H
+
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_LEGACY_LEGACY_ATOM_H)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_LEGACY_LEGACY_ATOM_H
+#endif
