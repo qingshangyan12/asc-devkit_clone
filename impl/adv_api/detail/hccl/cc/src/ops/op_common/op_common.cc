@@ -1408,8 +1408,8 @@ HcclResult HcclAllocAlgResourceCcu(
     uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
     if (resCtxHost->kfcServerArgs.size() < KFC_SERVER_ARG_NUM) {
         HCCL_WARNING(
-            "[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < 6, cannot update token",
-            resCtxHost->kfcServerArgs.size());
+            "[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < %u, cannot update token",
+            resCtxHost->kfcServerArgs.size(), KFC_SERVER_ARG_NUM);
     } else {
         for (size_t offset = 0; offset + KFC_SERVER_TOKEN_ARG_INDEX < resCtxHost->kfcServerArgs.size();
              offset += KFC_SERVER_ARG_NUM) {
