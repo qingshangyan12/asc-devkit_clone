@@ -49,6 +49,12 @@ const uint32_t HBM_PARAM_IDX_14 = 14;
 const uint32_t HBM_PARAM_IDX_15 = 15;
 const uint32_t HBM_PARAM_IDX_16 = 16;
 const uint32_t HBM_PARAM_IDX_17 = 17;
+const uint32_t HBM_PARAM_IDX_18 = 18;
+const uint32_t HBM_PARAM_IDX_19 = 19;
+const uint32_t HBM_PARAM_IDX_20 = 20;
+const uint32_t HBM_PARAM_IDX_21 = 21;
+const uint32_t HBM_PARAM_IDX_22 = 22;
+const uint32_t HBM_PARAM_IDX_23 = 23;
 
 const uint32_t SINGLE_DIE = 1;
 const uint32_t DOUBLE_DIE = 2;
@@ -163,7 +169,12 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
     } else if (opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)) {
         CcuReduceScatterMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
+            param[HBM_PARAM_IDX_13], param[HBM_PARAM_IDX_14],
+            param[HBM_PARAM_IDX_15], param[HBM_PARAM_IDX_16],
+            param[HBM_PARAM_IDX_17], param[HBM_PARAM_IDX_18],
+            param[HBM_PARAM_IDX_19], param[HBM_PARAM_IDX_20],
+            param[HBM_PARAM_IDX_21], param[HBM_PARAM_IDX_22],
+            param[HBM_PARAM_IDX_23], ctx.arg->channels, ctx.arg->channelCount,
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
             ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
     } else if (opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLREDUCE)) {
