@@ -233,14 +233,8 @@ static CcuResult CallKfcSubKernel(
 
 static CcuResult DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
-    ccu::FuncCall opFunc(ctx.subKernelPc);
-    opFunc.SetInArg(param[HBM_PARAM_IDX_1]);
-    opFunc.SetInArg(param[HBM_PARAM_IDX_2]);
-    opFunc.SetInArg(ctx.token);
-    for (uint32_t i = HBM_PARAM_IDX_3; i < CCU_PARAM_NUM_PER_DIE; ++i) {
-        opFunc.SetInArg(param[i]);
-    }
-    return opFunc.AppendToContext();
+    return CallKfcSubKernel(
+        param, ctx, std::make_index_sequence<CCU_PARAM_NUM_PER_DIE - HBM_PARAM_IDX_3>{});
 }
 
 CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
