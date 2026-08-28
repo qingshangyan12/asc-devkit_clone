@@ -53,11 +53,11 @@ RankMemory MakeMemory(uint64_t inputSize, uint64_t outputSize)
     return mem;
 }
 
-#define LAUNCH_SINGLE(h, mem)                                                                      \
-    do {                                                                                           \
-        std::vector<RankLaunch> launches = {{(h), {}, &(mem)}};                                   \
-        RuntimeWorld world;                                                                        \
-        ASSERT_EQ(world.Launch(launches), Result::SUCCESS) << world.LastError();                   \
+#define LAUNCH_SINGLE(h, mem)                                                    \
+    do {                                                                         \
+        std::vector<RankLaunch> launches = {{(h), {}, &(mem)}};                  \
+        RuntimeWorld world;                                                      \
+        ASSERT_EQ(world.Launch(launches), Result::SUCCESS) << world.LastError(); \
     } while (0)
 
 } // namespace
@@ -66,7 +66,10 @@ RankMemory MakeMemory(uint64_t inputSize, uint64_t outputSize)
 
 TEST(CcuStFrameworkL3, AssignImm)
 {
-    auto h = BuildSingleRank("t", []() { Variable v; v = 42U; });
+    auto h = BuildSingleRank("t", []() {
+        Variable v;
+        v = 42U;
+    });
     RankMemory mem = MakeMemory(64, 64);
     LAUNCH_SINGLE(h, mem);
 }
@@ -165,7 +168,8 @@ TEST(CcuStFrameworkL3, LocalCopy)
     };
     KernelHandle h = BuildProgram("t", fn);
     RankMemory mem = MakeMemory(64, 64);
-    for (uint32_t i = 0; i < 32; ++i) mem.input[i] = static_cast<uint8_t>(0x40 + i);
+    for (uint32_t i = 0; i < 32; ++i)
+        mem.input[i] = static_cast<uint8_t>(0x40 + i);
     std::vector<RankLaunch> launches = {{h, {mem.InputAddress(), mem.OutputAddress(), 32}, &mem}};
     RuntimeWorld world;
     ASSERT_EQ(world.Launch(launches), Result::SUCCESS) << world.LastError();
@@ -178,8 +182,9 @@ TEST(CcuStFrameworkL3, LocalCopy)
 
 namespace {
 
-void TestLocalReduce(HcclDataType dataType, HcclReduceOp opType,
-    const std::vector<uint8_t>& src, const std::vector<uint8_t>& dst, const std::vector<uint8_t>& expected)
+void TestLocalReduce(
+    HcclDataType dataType, HcclReduceOp opType, const std::vector<uint8_t>& src, const std::vector<uint8_t>& dst,
+    const std::vector<uint8_t>& expected)
 {
     auto fn = [=](void*) {
         Variable srcAddr, dstAddr, len;
@@ -214,8 +219,8 @@ TEST(CcuStFrameworkL3, LocalReduce_Int32_Sum)
     int32_t src[] = {1, 2, 3, 4};
     int32_t dst[] = {10, 20, 30, 40};
     int32_t exp[] = {11, 22, 33, 44};
-    TestLocalReduce(HCCL_DATA_TYPE_INT32, HCCL_REDUCE_SUM,
-        std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 16),
+    TestLocalReduce(
+        HCCL_DATA_TYPE_INT32, HCCL_REDUCE_SUM, std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 16),
         std::vector<uint8_t>((uint8_t*)dst, (uint8_t*)dst + 16),
         std::vector<uint8_t>((uint8_t*)exp, (uint8_t*)exp + 16));
 }
@@ -225,8 +230,8 @@ TEST(CcuStFrameworkL3, LocalReduce_Int32_Max)
     int32_t src[] = {5, 50, 3};
     int32_t dst[] = {10, 20, 30};
     int32_t exp[] = {10, 50, 30};
-    TestLocalReduce(HCCL_DATA_TYPE_INT32, HCCL_REDUCE_MAX,
-        std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 12),
+    TestLocalReduce(
+        HCCL_DATA_TYPE_INT32, HCCL_REDUCE_MAX, std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 12),
         std::vector<uint8_t>((uint8_t*)dst, (uint8_t*)dst + 12),
         std::vector<uint8_t>((uint8_t*)exp, (uint8_t*)exp + 12));
 }
@@ -236,8 +241,8 @@ TEST(CcuStFrameworkL3, LocalReduce_Int32_Min)
     int32_t src[] = {5, 1, 30};
     int32_t dst[] = {10, 20, 3};
     int32_t exp[] = {5, 1, 3};
-    TestLocalReduce(HCCL_DATA_TYPE_INT32, HCCL_REDUCE_MIN,
-        std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 12),
+    TestLocalReduce(
+        HCCL_DATA_TYPE_INT32, HCCL_REDUCE_MIN, std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 12),
         std::vector<uint8_t>((uint8_t*)dst, (uint8_t*)dst + 12),
         std::vector<uint8_t>((uint8_t*)exp, (uint8_t*)exp + 12));
 }
@@ -247,8 +252,8 @@ TEST(CcuStFrameworkL3, LocalReduce_Int32_Prod)
     int32_t src[] = {2, 3, 4};
     int32_t dst[] = {10, 20, 30};
     int32_t exp[] = {20, 60, 120};
-    TestLocalReduce(HCCL_DATA_TYPE_INT32, HCCL_REDUCE_PROD,
-        std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 12),
+    TestLocalReduce(
+        HCCL_DATA_TYPE_INT32, HCCL_REDUCE_PROD, std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 12),
         std::vector<uint8_t>((uint8_t*)dst, (uint8_t*)dst + 12),
         std::vector<uint8_t>((uint8_t*)exp, (uint8_t*)exp + 12));
 }
@@ -258,10 +263,9 @@ TEST(CcuStFrameworkL3, LocalReduce_Int8_Sum)
     int8_t src[] = {1, 2, 3, 4};
     int8_t dst[] = {10, 20, 30, 40};
     int8_t exp[] = {11, 22, 33, 44};
-    TestLocalReduce(HCCL_DATA_TYPE_INT8, HCCL_REDUCE_SUM,
-        std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 4),
-        std::vector<uint8_t>((uint8_t*)dst, (uint8_t*)dst + 4),
-        std::vector<uint8_t>((uint8_t*)exp, (uint8_t*)exp + 4));
+    TestLocalReduce(
+        HCCL_DATA_TYPE_INT8, HCCL_REDUCE_SUM, std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 4),
+        std::vector<uint8_t>((uint8_t*)dst, (uint8_t*)dst + 4), std::vector<uint8_t>((uint8_t*)exp, (uint8_t*)exp + 4));
 }
 
 TEST(CcuStFrameworkL3, LocalReduce_Fp32_Sum)
@@ -269,10 +273,9 @@ TEST(CcuStFrameworkL3, LocalReduce_Fp32_Sum)
     float src[] = {1.5f, 2.5f};
     float dst[] = {10.0f, 20.0f};
     float exp[] = {11.5f, 22.5f};
-    TestLocalReduce(HCCL_DATA_TYPE_FP32, HCCL_REDUCE_SUM,
-        std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 8),
-        std::vector<uint8_t>((uint8_t*)dst, (uint8_t*)dst + 8),
-        std::vector<uint8_t>((uint8_t*)exp, (uint8_t*)exp + 8));
+    TestLocalReduce(
+        HCCL_DATA_TYPE_FP32, HCCL_REDUCE_SUM, std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 8),
+        std::vector<uint8_t>((uint8_t*)dst, (uint8_t*)dst + 8), std::vector<uint8_t>((uint8_t*)exp, (uint8_t*)exp + 8));
 }
 
 TEST(CcuStFrameworkL3, LocalReduce_Fp16_Sum)
@@ -280,10 +283,9 @@ TEST(CcuStFrameworkL3, LocalReduce_Fp16_Sum)
     uint16_t src[] = {0x3C00, 0x4000, 0x4200, 0x4400}; // 1.0, 2.0, 3.0, 4.0
     uint16_t dst[] = {0x3C00, 0x3C00, 0x3C00, 0x3C00}; // 1.0, 1.0, 1.0, 1.0
     uint16_t exp[] = {0x4000, 0x4200, 0x4400, 0x4500}; // 2.0, 3.0, 4.0, 5.0
-    TestLocalReduce(HCCL_DATA_TYPE_FP16, HCCL_REDUCE_SUM,
-        std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 8),
-        std::vector<uint8_t>((uint8_t*)dst, (uint8_t*)dst + 8),
-        std::vector<uint8_t>((uint8_t*)exp, (uint8_t*)exp + 8));
+    TestLocalReduce(
+        HCCL_DATA_TYPE_FP16, HCCL_REDUCE_SUM, std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 8),
+        std::vector<uint8_t>((uint8_t*)dst, (uint8_t*)dst + 8), std::vector<uint8_t>((uint8_t*)exp, (uint8_t*)exp + 8));
 }
 
 TEST(CcuStFrameworkL3, LocalReduce_Int64_Sum)
@@ -291,8 +293,8 @@ TEST(CcuStFrameworkL3, LocalReduce_Int64_Sum)
     int64_t src[] = {100, 200};
     int64_t dst[] = {1, 2};
     int64_t exp[] = {101, 202};
-    TestLocalReduce(HCCL_DATA_TYPE_INT64, HCCL_REDUCE_SUM,
-        std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 16),
+    TestLocalReduce(
+        HCCL_DATA_TYPE_INT64, HCCL_REDUCE_SUM, std::vector<uint8_t>((uint8_t*)src, (uint8_t*)src + 16),
         std::vector<uint8_t>((uint8_t*)dst, (uint8_t*)dst + 16),
         std::vector<uint8_t>((uint8_t*)exp, (uint8_t*)exp + 16));
 }
@@ -331,9 +333,9 @@ TEST(CcuStFrameworkL3, WhileOneIteration)
     ASSERT_NE(prog, nullptr);
     for (size_t i = 0; i < prog->operations.size(); ++i) {
         const auto& op = prog->operations[i];
-        fprintf(stderr, "  IR[%zu] code=%d dst=%lu src0=%lu imm=%lu equal=%d peer=%zu\n",
-                i, static_cast<int>(op.code), op.dst, op.src0, op.immediate,
-                static_cast<int>(op.equal), op.peerIndex);
+        fprintf(
+            stderr, "  IR[%zu] code=%d dst=%lu src0=%lu imm=%lu equal=%d peer=%zu\n", i, static_cast<int>(op.code),
+            op.dst, op.src0, op.immediate, static_cast<int>(op.equal), op.peerIndex);
     }
     RankMemory mem = MakeMemory(64, 64);
     std::vector<RankLaunch> launches = {{h, {}, &mem}};
@@ -445,7 +447,8 @@ TEST(CcuStFrameworkL3, TwoRankWrite)
 
     RankMemory mem0 = MakeMemory(64, 64);
     RankMemory mem1 = MakeMemory(64, 64);
-    for (uint32_t i = 0; i < 32; ++i) mem0.input[i] = static_cast<uint8_t>(0x80 + i);
+    for (uint32_t i = 0; i < 32; ++i)
+        mem0.input[i] = static_cast<uint8_t>(0x80 + i);
     std::vector<RankLaunch> launches = {
         {h0, {mem0.InputAddress(), mem1.OutputAddress(), 32}, &mem0},
         {h1, {}, &mem1},
@@ -536,7 +539,8 @@ TEST(CcuStFrameworkL3, ZeroLengthSkips)
     };
     KernelHandle h = BuildProgram("t", fn);
     RankMemory mem = MakeMemory(64, 64);
-    for (uint32_t i = 0; i < 64; ++i) mem.output[i] = 0xAA;
+    for (uint32_t i = 0; i < 64; ++i)
+        mem.output[i] = 0xAA;
     std::vector<RankLaunch> launches = {{h, {mem.InputAddress(), mem.OutputAddress()}, &mem}};
     RuntimeWorld world;
     ASSERT_EQ(world.Launch(launches), Result::SUCCESS) << world.LastError();
@@ -563,7 +567,8 @@ TEST(CcuStFrameworkL3, BufferGrows)
     };
     KernelHandle h = BuildProgram("t", fn);
     RankMemory mem = MakeMemory(64, 64);
-    for (uint32_t i = 0; i < 16; ++i) mem.input[i] = static_cast<uint8_t>(0x50 + i);
+    for (uint32_t i = 0; i < 16; ++i)
+        mem.input[i] = static_cast<uint8_t>(0x50 + i);
     std::vector<RankLaunch> launches = {{h, {mem.InputAddress(), mem.OutputAddress(), 16}, &mem}};
     RuntimeWorld world;
     ASSERT_EQ(world.Launch(launches), Result::SUCCESS) << world.LastError();

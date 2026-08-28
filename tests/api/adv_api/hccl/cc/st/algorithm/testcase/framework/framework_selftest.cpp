@@ -35,16 +35,14 @@ KernelHandle BuildProgram(const std::string& name, const RegisterManager::Kernel
     return handle;
 }
 
-const Program* GetProgram(KernelHandle handle)
-{
-    return RegisterManager::Global().GetProgram(handle);
-}
+const Program* GetProgram(KernelHandle handle) { return RegisterManager::Global().GetProgram(handle); }
 
 size_t CountOp(const Program& prog, OpCode code)
 {
     size_t n = 0;
     for (const auto& op : prog.operations) {
-        if (op.code == code) ++n;
+        if (op.code == code)
+            ++n;
     }
     return n;
 }
@@ -52,7 +50,8 @@ size_t CountOp(const Program& prog, OpCode code)
 const Operation* FindOp(const Program& prog, OpCode code)
 {
     for (const auto& op : prog.operations) {
-        if (op.code == code) return &op;
+        if (op.code == code)
+            return &op;
     }
     return nullptr;
 }
@@ -500,9 +499,7 @@ TEST(CcuStFrameworkL1, CcuIf)
 {
     auto fn = [](void*) {
         Variable v;
-        CCU_IF(v == 1U) {
-            v = 10U;
-        }
+        CCU_IF(v == 1U) { v = 10U; }
         return Result::SUCCESS;
     };
     auto* prog = GetProgram(BuildProgram("test", fn));
@@ -523,9 +520,7 @@ TEST(CcuStFrameworkL1, CcuWhile)
 {
     auto fn = [](void*) {
         Variable v;
-        CCU_WHILE(v != 0U) {
-            v = 1U;
-        }
+        CCU_WHILE(v != 0U) { v = 1U; }
         return Result::SUCCESS;
     };
     auto* prog = GetProgram(BuildProgram("test", fn));
@@ -546,13 +541,8 @@ TEST(CcuStFrameworkL1, CcuIfElse)
 {
     auto fn = [](void*) {
         Variable v;
-        CCU_IF(v == 1U) {
-            v = 10U;
-        }
-        CCU_ELSE
-        {
-            v = 20U;
-        }
+        CCU_IF(v == 1U) { v = 10U; }
+        CCU_ELSE { v = 20U; }
         return Result::SUCCESS;
     };
     auto* prog = GetProgram(BuildProgram("test", fn));

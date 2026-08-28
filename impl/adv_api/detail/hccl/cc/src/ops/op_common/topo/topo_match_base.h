@@ -62,6 +62,6 @@ public:
         const HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo);
 };
 
-} // namespace ops_hccl
+} // namespace mc2_ops_hccl
 
 #endif // !HCCLV2_TOPO_MATCH_BASE

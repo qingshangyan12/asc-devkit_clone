@@ -34,16 +34,16 @@ public:
 
     std::string Describe() const override
     {
-        return StringFormat("Template of MC2 AllToAllV CCU mesh 1D with tempRankSize [%u].",
-                            tempRankSize_);
+        return StringFormat("Template of MC2 AllToAllV CCU mesh 1D with tempRankSize [%u].", tempRankSize_);
     }
 
-    HcclResult CalcRes(HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-                       AlgResourceRequest& resourceRequest) override;
+    HcclResult CalcRes(
+        HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+        AlgResourceRequest& resourceRequest) override;
 
-    HcclResult KernelRun(const OpParam& param,
-                         const TemplateDataParams& templateDataParams,
-                         TemplateResource& templateResource) override;
+    HcclResult KernelRun(
+        const OpParam& param, const TemplateDataParams& templateDataParams,
+        TemplateResource& templateResource) override;
 
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
 
@@ -52,6 +52,6 @@ private:
     uint32_t tempRankSize_ = 0;
 };
 
-}// namespace mc2_ops_hccl
+} // namespace mc2_ops_hccl
 
 #endif // HCCL_CCU_TEMP_ALL_TO_ALL_V_MESH_1D_H

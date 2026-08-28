@@ -39,8 +39,8 @@ HcclResult CcuTempAlltoAllVMesh1D::CalcRes(
     CHK_PRT_RET(
         tempRankSize_ < 2U || tempRankSize_ > CCU_MAX_RANK_SIZE || mySubCommRank_ >= tempRankSize_,
         HCCL_ERROR(
-            "[CcuTempAlltoallVMesh1D::CalcRes] invalid rank metadata, rankSize[%u], rankId[%u].",
-            tempRankSize_, mySubCommRank_),
+            "[CcuTempAlltoallVMesh1D::CalcRes] invalid rank metadata, rankSize[%u], rankId[%u].", tempRankSize_,
+            mySubCommRank_),
         HCCL_E_PARA);
 
     resourceRequest.notifyNumOnMainThread = 0;
@@ -48,8 +48,8 @@ HcclResult CcuTempAlltoAllVMesh1D::CalcRes(
     resourceRequest.ccuKernelNum.push_back(1);
 
     CcuKernelInfo kernelInfo{};
-    CHK_SAFETY_FUNC_RET(strcpy_s(
-        kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAlltoAllVMesh1D"));
+    CHK_SAFETY_FUNC_RET(
+        strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAlltoAllVMesh1D"));
     std::vector<HcclChannelDesc> channelDescs;
     if (topoInfo->level0Topo != Level0Shape::MESH_1D_CLOS) {
         CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
@@ -57,17 +57,17 @@ HcclResult CcuTempAlltoAllVMesh1D::CalcRes(
         CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(
             comm, param, topoInfo, subCommRanks_, channelDescs, CommTopo::COMM_TOPO_1DMESH));
         for (const auto& channel : channelDescs) {
-            CHK_PRT_RET(channel.channelProtocol != COMM_PROTOCOL_UBC_CTP,
-                HCCL_ERROR("[CcuTempAlltoAllVMesh1D::CalcRes] invalid channel protocol[%u].",
-                    channel.channelProtocol),
+            CHK_PRT_RET(
+                channel.channelProtocol != COMM_PROTOCOL_UBC_CTP,
+                HCCL_ERROR("[CcuTempAlltoAllVMesh1D::CalcRes] invalid channel protocol[%u].", channel.channelProtocol),
                 HCCL_E_INTERNAL);
         }
     }
     CHK_PRT_RET(
         channelDescs.size() + 1U != tempRankSize_,
         HCCL_ERROR(
-            "[CcuTempAlltoallVMesh1D::CalcRes] invalid channel count[%zu] for rankSize[%u].",
-            channelDescs.size(), tempRankSize_),
+            "[CcuTempAlltoallVMesh1D::CalcRes] invalid channel count[%zu] for rankSize[%u].", channelDescs.size(),
+            tempRankSize_),
         HCCL_E_INTERNAL);
 
     auto kernelArg = std::make_shared<CcuKernelArgAlltoAllVMesh1D>();

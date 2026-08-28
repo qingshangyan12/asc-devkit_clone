@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -30,11 +30,10 @@ constexpr uint64_t A2AV_MAX_TRANSPORT_SIZE = 256ULL * 1024ULL * 1024ULL;
 constexpr uint64_t A2AV_GROUP_MEMSLICE_SIZE = 32ULL * 1024ULL;
 constexpr uint64_t A2AV_GROUP_LOOP_COUNT = 8ULL;
 
-CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-                                   ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable extAddr,
-                                   ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
-                                   ccu::Variable goSize4, const ChannelHandle channels[], uint32_t channelCount,
-                                   uint32_t rankSize, uint32_t rankId)
+CcuResult CcuAlltoAllVMesh1DKernel(
+    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable srcOffset,
+    ccu::Variable dstOffset, ccu::Variable extAddr, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
+    ccu::Variable goSize4, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId)
 {
     std::vector<ccu::Variable> output(rankSize);
     std::vector<ccu::Variable> token(rankSize);
@@ -47,8 +46,7 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
     GroupOpSizeVars tailGoSize{goSize1, goSize2, goSize3, goSize4};
     GroupOpSizeVars fullBlockGoSize;
     fullBlockGoSize.addrOffset = A2AV_MAX_TRANSPORT_SIZE;
-    fullBlockGoSize.loopParam =
-        A2AV_MAX_TRANSPORT_SIZE / (A2AV_GROUP_MEMSLICE_SIZE * A2AV_GROUP_LOOP_COUNT);
+    fullBlockGoSize.loopParam = A2AV_MAX_TRANSPORT_SIZE / (A2AV_GROUP_MEMSLICE_SIZE * A2AV_GROUP_LOOP_COUNT);
     fullBlockGoSize.parallelParam = 0;
     fullBlockGoSize.residual = 0;
 
@@ -76,10 +74,10 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
         }
         ccu::Variable peerRecvBase;
         peerRecvBase = outputAddr + extArgs[peerId * A2AV_EXT_FIELD_NUM + A2AV_RECV_OFFSET_IDX];
-        ccu::WriteVariableWithNotify(channels[channelIdx], peerRecvBase,
-            A2AV_OUTPUT_XN_ID, A2AV_PRE_SYNC_CKE_IDX, A2AV_OUTPUT_BIT);
-        ccu::WriteVariableWithNotify(channels[channelIdx], tokenInfo,
-            A2AV_TOKEN_XN_ID, A2AV_PRE_SYNC_CKE_IDX, A2AV_TOKEN_BIT);
+        ccu::WriteVariableWithNotify(
+            channels[channelIdx], peerRecvBase, A2AV_OUTPUT_XN_ID, A2AV_PRE_SYNC_CKE_IDX, A2AV_OUTPUT_BIT);
+        ccu::WriteVariableWithNotify(
+            channels[channelIdx], tokenInfo, A2AV_TOKEN_XN_ID, A2AV_PRE_SYNC_CKE_IDX, A2AV_TOKEN_BIT);
         channelIdx++;
     }
 
@@ -131,10 +129,11 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
                         CCU_IF(tailSize != 0) { CCU_CHK_RET(GroupCopy(ctx, localDst, src[rankIdx], tailGoSize)); }
                         CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask));
                     } else {
-                        CCU_IF(tailSize != 0) {
+                        CCU_IF(tailSize != 0)
+                        {
                             CCU_CHK_RET(ccu::Write(
-                                channels[channelIdx], dst[rankIdx], src[rankIdx], tailSize,
-                                events[eventIdx], rankMask));
+                                channels[channelIdx], dst[rankIdx], src[rankIdx], tailSize, events[eventIdx],
+                                rankMask));
                         }
                         CCU_IF(tailSize == 0) { CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask)); }
                     }
@@ -148,8 +147,8 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
                         localDst.addr += maxTransportSize;
                     } else {
                         CCU_CHK_RET(ccu::Write(
-                            channels[channelIdx], dst[rankIdx], src[rankIdx], maxTransportSize,
-                            events[eventIdx], rankMask));
+                            channels[channelIdx], dst[rankIdx], src[rankIdx], maxTransportSize, events[eventIdx],
+                            rankMask));
                         dst[rankIdx].addr += maxTransportSize;
                     }
                     src[rankIdx].addr += maxTransportSize;
@@ -165,7 +164,7 @@ CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable output
             const uint32_t remainingRanks = rankSize - eventIdx * A2AV_BITS_PER_EVENT;
             const uint32_t bitCount = std::min(remainingRanks, A2AV_BITS_PER_EVENT);
             const uint16_t eventMask = bitCount == A2AV_BITS_PER_EVENT ? static_cast<uint16_t>(UINT16_MAX) :
-                                                                        static_cast<uint16_t>((1U << bitCount) - 1);
+                                                                         static_cast<uint16_t>((1U << bitCount) - 1);
             CCU_CHK_RET(ccu::EventWait(events[eventIdx], eventMask));
         }
     }

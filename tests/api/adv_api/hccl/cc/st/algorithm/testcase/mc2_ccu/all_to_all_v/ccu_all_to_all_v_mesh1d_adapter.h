@@ -41,8 +41,7 @@ struct AllToAllVLaunchConfig {
 Result CaptureAllToAllVMesh1DKernel(void* kernelArg);
 std::array<uint64_t, 4> CalculateAllToAllVGoSize(uint64_t size);
 std::vector<uint64_t> PrepareAllToAllVTaskArgs(const AllToAllVLaunchConfig& config);
-ScenarioData BuildAllToAllVMesh1DScenario(
-    const CcuStScenario& scenario, const std::vector<KernelHandle>& handles);
+ScenarioData BuildAllToAllVMesh1DScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles);
 
 } // namespace CcuSt
 } // namespace HcclSim

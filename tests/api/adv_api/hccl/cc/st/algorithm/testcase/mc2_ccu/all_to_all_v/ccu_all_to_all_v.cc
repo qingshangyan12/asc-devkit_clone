@@ -65,8 +65,7 @@ void CcuStAllToAllV::PrepareOpParam(OpParam& opParam, uint32_t rankSize, const C
     opParam.isKfc = true;
 }
 
-ScenarioData CcuStAllToAllV::BuildScenarioData(
-    const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)
+ScenarioData CcuStAllToAllV::BuildScenarioData(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)
 {
     auto it = GetVariantRegistry().find(scenario.expectedAlgName);
     return it == GetVariantRegistry().end() ? ScenarioData{} : it->second(scenario, handles);

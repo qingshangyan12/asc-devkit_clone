@@ -180,7 +180,8 @@ TEST(CcuStFrameworkL2, ValidControlFlow)
     auto* prog = BuildValidProgram("test", [](void*) {
         Variable v;
         v = 0U;
-        CCU_WHILE(v != 10U) {
+        CCU_WHILE(v != 10U)
+        {
             Variable one;
             one = 1U;
             v += one;

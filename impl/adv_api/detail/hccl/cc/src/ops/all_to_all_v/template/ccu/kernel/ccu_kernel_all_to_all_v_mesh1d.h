@@ -1,5 +1,5 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
 
 namespace mc2_ops_hccl {
 
-CcuResult CcuAlltoAllVMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-                                   ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable extAddr,
-                                   ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
-                                   ccu::Variable goSize4, const ChannelHandle channels[], uint32_t channelCount,
-                                   uint32_t rankSize, uint32_t rankId);
+CcuResult CcuAlltoAllVMesh1DKernel(
+    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable srcOffset,
+    ccu::Variable dstOffset, ccu::Variable extAddr, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
+    ccu::Variable goSize4, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId);
 
 } // namespace mc2_ops_hccl
 #endif // HCCL_CCU_KERNEL_ALL_TO_ALL_V_MESH_1D_H

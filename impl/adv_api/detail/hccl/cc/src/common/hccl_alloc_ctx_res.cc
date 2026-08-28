@@ -1017,8 +1017,9 @@ HcclResult PrepareCcuAlgorithmResource(
     void* resCtxSequence = nullptr;
     HcclResult ret = GetCcuOpParamResCtx(comm, algName, opParam, topoInfo, opResCtx, &resCtxSequence);
     if (ret != HCCL_SUCCESS) {
-        HCCL_ERROR("[CcuSelectAlg] rank[%u] GetCcuOpParamResCtx FAILED, ret[%d], algName[%s]",
-            userRank, static_cast<int>(ret), algName.c_str());
+        HCCL_ERROR(
+            "[CcuSelectAlg] rank[%u] GetCcuOpParamResCtx FAILED, ret[%d], algName[%s]", userRank, static_cast<int>(ret),
+            algName.c_str());
         return ret;
     }
     HCCL_INFO("[CcuSelectAlg]GetCcuOpParamResCtx[%u] successfully! rank[%u]", tilingIndex, userRank);
@@ -1066,13 +1067,15 @@ HcclResult ProcessCcuTiling(
     bool skipGetRes = false;
     CHK_RET(PrepareCcuAlgorithmResource(comm, tilingIndex, algName, opParam, topoInfo.get(), opResCtx, skipGetRes));
     if (skipGetRes) {
-        HCCL_INFO("[CcuSelectAlg] rank[%u] ProcessCcuTiling[%u] DONE (skipGetRes), opType[%u]",
-            userRank, tilingIndex, ccTiling->opType);
+        HCCL_INFO(
+            "[CcuSelectAlg] rank[%u] ProcessCcuTiling[%u] DONE (skipGetRes), opType[%u]", userRank, tilingIndex,
+            ccTiling->opType);
         return HCCL_SUCCESS;
     }
     HcclResult copyRet = CopyCcuOpParamToDevice(comm, tilingIndex, initTiling, opParam, opResCtx);
-    HCCL_INFO("[CcuSelectAlg] rank[%u] ProcessCcuTiling[%u] DONE, opType[%u], ret[%d]",
-        userRank, tilingIndex, ccTiling->opType, static_cast<int>(copyRet));
+    HCCL_INFO(
+        "[CcuSelectAlg] rank[%u] ProcessCcuTiling[%u] DONE, opType[%u], ret[%d]", userRank, tilingIndex,
+        ccTiling->opType, static_cast<int>(copyRet));
     return copyRet;
 }
 } // namespace

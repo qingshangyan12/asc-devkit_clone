@@ -57,8 +57,10 @@ TEST(CcuStFrameworkL5, CopyOnly_2Rank)
     data.dstOffsets.assign(rankSize, std::vector<uint64_t>(rankSize, 0));
 
     for (uint32_t r = 0; r < rankSize; ++r) {
-        data.memories[r] = MakeMemWithInput({static_cast<uint8_t>(0x10 + r), static_cast<uint8_t>(0x20 + r),
-                                              static_cast<uint8_t>(0x30 + r), static_cast<uint8_t>(0x40 + r)}, bytes);
+        data.memories[r] = MakeMemWithInput(
+            {static_cast<uint8_t>(0x10 + r), static_cast<uint8_t>(0x20 + r), static_cast<uint8_t>(0x30 + r),
+             static_cast<uint8_t>(0x40 + r)},
+            bytes);
         for (uint32_t d = 0; d < rankSize; ++d) {
             data.srcOffsets[r][d] = 0;
             data.dstOffsets[r][d] = 0;

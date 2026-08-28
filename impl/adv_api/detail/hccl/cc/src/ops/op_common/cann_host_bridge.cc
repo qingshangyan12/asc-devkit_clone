@@ -146,8 +146,7 @@ bool UseCannBridge(const OpParam& param)
             param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
 }
 
-HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo,
-    std::string& algName)
+HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName)
 {
     const cann_abi::CannSyms& syms = cann_abi::LoadCannSyms();
     if (!syms.selectorOk) {
@@ -179,8 +178,7 @@ HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo
     }
     if (algName.empty()) {
         HCCL_ERROR(
-            "[HostCannBridge][Select] CANN selected empty algName, opType=%u",
-            static_cast<u32>(ascParam.opType));
+            "[HostCannBridge][Select] CANN selected empty algName, opType=%u", static_cast<u32>(ascParam.opType));
         return HCCL_E_NOT_SUPPORT;
     }
 

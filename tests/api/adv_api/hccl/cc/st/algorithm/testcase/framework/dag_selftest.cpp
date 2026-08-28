@@ -18,9 +18,9 @@ using namespace HcclSim::CcuSt;
 
 namespace {
 
-ExecutionLogEntry MakeEntry(uint32_t rank, size_t opIdx, OpCode code,
-    uint32_t srcRank, uint64_t srcAddr, uint64_t srcSize,
-    uint32_t dstRank, uint64_t dstAddr, uint64_t dstSize)
+ExecutionLogEntry MakeEntry(
+    uint32_t rank, size_t opIdx, OpCode code, uint32_t srcRank, uint64_t srcAddr, uint64_t srcSize, uint32_t dstRank,
+    uint64_t dstAddr, uint64_t dstSize)
 {
     ExecutionLogEntry e;
     e.rank = rank;

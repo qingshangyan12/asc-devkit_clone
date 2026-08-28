@@ -282,10 +282,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         ccuUsedXnNum_ = 10;
         FlushDataCache(&allToAllVParam_[handleId]);
         KERNEL_LOG(
-            KERNEL_INFO, "ApiClient CcuPrepareForOp handleId:%u, dataType:%d, dstDataType:%d, count:%llu",
-            handleId,
-            static_cast<int>(handleParamGM_[handleId].dataType),
-            static_cast<int>(handleParamGM_[handleId].dstDataType),
+            KERNEL_INFO, "ApiClient CcuPrepareForOp handleId:%u, dataType:%d, dstDataType:%d, count:%llu", handleId,
+            static_cast<int>(handleParamGM_[handleId].dataType), static_cast<int>(handleParamGM_[handleId].dstDataType),
             (unsigned long long)handleParamGM_[handleId].count);
         CcuPrepareForAllToAllV(&handleParamGM_[handleId], &allToAllVParam_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
@@ -339,10 +337,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         KERNEL_LOG(
             KERNEL_INFO,
             "ApiClient InitCcuParam handleId:%u, prepareType:%d, tiling srcDataType:%d, dstDataType:%d, reduceType:%d",
-            handleId,
-            static_cast<int>(handleParamGM_[handleId].commType.prepareType),
-            static_cast<int>(tilingPtr->srcDataType),
-            static_cast<int>(tilingPtr->dstDataType),
+            handleId, static_cast<int>(handleParamGM_[handleId].commType.prepareType),
+            static_cast<int>(tilingPtr->srcDataType), static_cast<int>(tilingPtr->dstDataType),
             static_cast<int>(tilingPtr->reduceType));
         handleParamGM_[handleId].dataType = static_cast<HcclDataType>(tilingPtr->srcDataType);
         handleParamGM_[handleId].dstDataType = static_cast<HcclDataType>(tilingPtr->dstDataType);

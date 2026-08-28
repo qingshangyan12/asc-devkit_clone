@@ -28,8 +28,7 @@ constexpr uint64_t LOOP_SIZE = 8ULL * MEM_SLICE;
 uint64_t PackParallelParameters(uint64_t repeatNum, uint64_t repeatLoopIndex, uint64_t totalLoopNum)
 {
     constexpr uint64_t mask = 0x7f;
-    return ((repeatNum & mask) << 55U) | ((repeatLoopIndex & mask) << 48U) |
-        ((totalLoopNum & mask) << 41U);
+    return ((repeatNum & mask) << 55U) | ((repeatLoopIndex & mask) << 48U) | ((totalLoopNum & mask) << 41U);
 }
 
 void* ConvertAllToAllVArg(const void* productArg, uint32_t)
@@ -68,8 +67,7 @@ Result CaptureAllToAllVMesh1DKernel(void* kernelArg)
         return Result::PARAM_ERROR;
     }
     const auto& config = *static_cast<AllToAllVKernelConfig*>(kernelArg);
-    if (config.rankSize < 2 || config.rankId >= config.rankSize ||
-        config.channels.size() != config.rankSize - 1) {
+    if (config.rankSize < 2 || config.rankId >= config.rankSize || config.channels.size() != config.rankSize - 1) {
         return Result::PARAM_ERROR;
     }
     std::array<AscendC::ccu::Variable, ALL_TO_ALL_V_TASK_ARG_COUNT> arguments;
@@ -80,9 +78,8 @@ Result CaptureAllToAllVMesh1DKernel(void* kernelArg)
     }
     CompilerContext::Current().ConfigureProgram(config.rankId, config.rankSize, config.channels);
     const CcuResult result = mc2_ops_hccl::CcuAlltoAllVMesh1DKernel(
-        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6],
-        arguments[7], arguments[8], arguments[9], config.channels.data(),
-        static_cast<uint32_t>(config.channels.size()),
+        arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7],
+        arguments[8], arguments[9], config.channels.data(), static_cast<uint32_t>(config.channels.size()),
         config.rankSize, config.rankId);
     return result == CCU_SUCCESS ? Result::SUCCESS : Result::CONTRACT_ERROR;
 }
@@ -109,13 +106,19 @@ std::array<uint64_t, 4> CalculateAllToAllVGoSize(uint64_t size)
 
 std::vector<uint64_t> PrepareAllToAllVTaskArgs(const AllToAllVLaunchConfig& config)
 {
-    return {config.inputAddress, config.outputAddress, config.token, config.sourceBaseOffset,
-        config.destinationBaseOffset, config.parameterAddress, config.goSize[0], config.goSize[1],
-        config.goSize[2], config.goSize[3]};
+    return {config.inputAddress,
+            config.outputAddress,
+            config.token,
+            config.sourceBaseOffset,
+            config.destinationBaseOffset,
+            config.parameterAddress,
+            config.goSize[0],
+            config.goSize[1],
+            config.goSize[2],
+            config.goSize[3]};
 }
 
-ScenarioData BuildAllToAllVMesh1DScenario(
-    const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)
+ScenarioData BuildAllToAllVMesh1DScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)
 {
     const uint32_t rankSize = CcuStFixture::CountRanks(scenario.topoMeta);
     constexpr uint64_t guard = 32;
