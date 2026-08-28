@@ -73,18 +73,21 @@ inline bfloat16_t __high2bfloat16(const bfloat16x2_t x)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __aicore__ void simt_high2bfloat16(bfloat16x2_t* input, bfloat16_t* output, uint32_t input_total_length)
+    __aicore__ void simt_high2bfloat16(bfloat16x2_t* input, bfloat16_t* output, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx >= input_total_length / 2) {
+        if (idx >= total_length) {
+            return;
+        }
+        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= total_length / 2的线程不处理数据
+        if (idx >= total_length / 2) {
             return;
         }
         output[idx] = __high2bfloat16(input[idx]);
     }
-    __global__ __launch_bounds__(1024) void cast_kernel(bfloat16_t* input, bfloat16_t* output, uint32_t input_total_length)
+    __global__ __launch_bounds__(1024) void cast_kernel(bfloat16_t* input, bfloat16_t* output, uint32_t total_length)
     {
-        simt_high2bfloat16(( bfloat16x2_t*)input, output, input_total_length);
+        simt_high2bfloat16(( bfloat16x2_t*)input, output, total_length);
     }
     ```
 
@@ -92,17 +95,20 @@ inline bfloat16_t __high2bfloat16(const bfloat16x2_t x)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_high2bfloat16(__gm__ bfloat16x2_t* input, __gm__ bfloat16_t* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_high2bfloat16(__gm__ bfloat16x2_t* input, __gm__ bfloat16_t* output, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length / 2) {
+        if (idx >= total_length) {
+            return;
+        }
+        // 每个线程处理1个bfloat16x2_t类型的数据，即2个bfloat16_t类型的数据，因此idx >= total_length / 2的线程不处理数据
+        if (idx > total_length / 2) {
             return;
         }
         output[idx] = __high2bfloat16(input[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ bfloat16_t* input, __gm__ bfloat16_t* output, uint32_t input_total_length)
+    __global__ __vector__ void cast_kernel(__gm__ bfloat16_t* input, __gm__ bfloat16_t* output, uint32_t total_length)
     {
-        asc_vf_call<simt_high2bfloat16>(dim3(1024), (__gm__ bfloat16x2_t*)input, output, input_total_length);
+        asc_vf_call<simt_high2bfloat16>(dim3(1024), (__gm__ bfloat16x2_t*)input, output, total_length);
     }
     ```

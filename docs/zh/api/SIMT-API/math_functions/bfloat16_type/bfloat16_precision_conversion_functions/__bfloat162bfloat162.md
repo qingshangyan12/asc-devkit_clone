@@ -73,17 +73,17 @@ inline bfloat16x2_t __bfloat162bfloat162(const bfloat16_t x)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __aicore__ void simt_bfloat162bfloat162(bfloat16_t* input, bfloat16x2_t* output, uint32_t input_total_length)
+    __aicore__ void simt_bfloat162bfloat162(bfloat16_t* input, bfloat16x2_t* output, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= input_total_length) {
+        if (idx >= total_length) {
             return;
         }
         output[idx] = __bfloat162bfloat162(input[idx]);
     }
-    __global__ __launch_bounds__(1024) void cast_kernel(bfloat16_t* input, bfloat16_t* output, uint32_t input_total_length)
+    __global__ __launch_bounds__(1024) void cast_kernel(bfloat16_t* input, bfloat16_t* output, uint32_t total_length)
     {
-        simt_bfloat162bfloat162(input, (bfloat16x2_t*)output, input_total_length);
+        simt_bfloat162bfloat162(input, (bfloat16x2_t*)output, total_length);
     }
     ```
 
@@ -91,16 +91,19 @@ inline bfloat16x2_t __bfloat162bfloat162(const bfloat16_t x)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_bfloat162bfloat162(__gm__ bfloat16_t* input, __gm__ bfloat16x2_t* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_bfloat162bfloat162(__gm__ bfloat16_t* input, __gm__ bfloat16x2_t* output, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx > input_total_length) {
+        if (idx >= total_length) {
+            return;
+        }
+        if (idx > total_length) {
             return;
         }
         output[idx] = __bfloat162bfloat162(input[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ bfloat16_t* input, __gm__ bfloat16_t* output, uint32_t input_total_length)
+    __global__ __vector__ void cast_kernel(__gm__ bfloat16_t* input, __gm__ bfloat16_t* output, uint32_t total_length)
     {
-        asc_vf_call<simt_bfloat162bfloat162>(dim3(1024), input, (__gm__ bfloat16x2_t*)output, input_total_length);
+        asc_vf_call<simt_bfloat162bfloat162>(dim3(1024), input, (__gm__ bfloat16x2_t*)output, total_length);
     }
     ```

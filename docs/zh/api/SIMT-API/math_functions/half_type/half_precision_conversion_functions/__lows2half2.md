@@ -75,18 +75,21 @@ inline half2 __lows2half2(const half2 x, const half2 y)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __aicore__ void simt_lows2half2(half2* input1, half2* input2, half2* output, uint32_t input_total_length)
+    __aicore__ void simt_lows2half2(half2* input1, half2* input2, half2* output, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx >= input_total_length / 2) {
+        if (idx >= total_length) {
+            return;
+        }
+        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= total_length / 2的线程不处理数据
+        if (idx >= total_length / 2) {
             return;
         }
         output[idx] = __lows2half2(input1[idx], input2[idx]);
     }
-    __global__ __launch_bounds__(1024)void cast_kernel(half* input1, half* input2, half* output, uint32_t input_total_length)
+    __global__ __launch_bounds__(1024)void cast_kernel(half* input1, half* input2, half* output, uint32_t total_length)
     {
-        simt_lows2half2((half2*)input1, (half2*)input2, (half2*)output, input_total_length);
+        simt_lows2half2((half2*)input1, (half2*)input2, (half2*)output, total_length);
     }
     ```
 
@@ -94,17 +97,20 @@ inline half2 __lows2half2(const half2 x, const half2 y)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_lows2half2(__gm__ half2* input1, __gm__ half2* input2, __gm__ half2* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_lows2half2(__gm__ half2* input1, __gm__ half2* input2, __gm__ half2* output, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx >= input_total_length / 2) {
+        if (idx >= total_length) {
+            return;
+        }
+        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= total_length / 2的线程不处理数据
+        if (idx >= total_length / 2) {
             return;
         }
         output[idx] = __lows2half2(input1[idx], input2[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ half* input1,  __gm__ half* input2, __gm__ half* output, uint32_t input_total_length)
+    __global__ __vector__ void cast_kernel(__gm__ half* input1,  __gm__ half* input2, __gm__ half* output, uint32_t total_length)
     {
-        asc_vf_call<simt_lows2half2>(dim3(1024), (__gm__ half2*)input1, (__gm__ half2*)input2, (__gm__ half2*)output, input_total_length);
+        asc_vf_call<simt_lows2half2>(dim3(1024), (__gm__ half2*)input1, (__gm__ half2*)input2, (__gm__ half2*)output, total_length);
     }
     ```

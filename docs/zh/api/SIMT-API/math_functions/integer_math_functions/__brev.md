@@ -75,17 +75,23 @@ unsigned long __brev(unsigned long x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_brev(unsigned int* dst, unsigned int* x)
+    __global__ __launch_bounds__(1024) void kernel_brev(unsigned int* dst, unsigned int* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __brev(x[idx]);
     }
     ```
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_brev(unsigned long long* dst, unsigned long long* x)
+    __global__ __launch_bounds__(1024) void kernel_brev(unsigned long long* dst, unsigned long long* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __brev(x[idx]);
     }
     ```
@@ -93,17 +99,23 @@ unsigned long __brev(unsigned long x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_brev(__gm__ unsigned int* dst, __gm__ unsigned int* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_brev(__gm__ unsigned int* dst, __gm__ unsigned int* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __brev(x[idx]);
     }
     ```
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_brev(__gm__ unsigned long long* dst, __gm__ unsigned long long* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_brev(__gm__ unsigned long long* dst, __gm__ unsigned long long* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __brev(x[idx]);
     }
     ```

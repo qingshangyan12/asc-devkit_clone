@@ -116,11 +116,14 @@ unsigned int __heqx2_mask(half2 x, half2 y)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __global__ __launch_bounds__(1024) void simt_heqx2_mask(half* x, half* y, unsigned int* dst, uint32_t input_total_length)
+    __global__ __launch_bounds__(1024) void simt_heqx2_mask(half* x, half* y, unsigned int* dst, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx >= input_total_length / 2) {
+        if (idx >= total_length) {
+            return;
+        }
+        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= total_length / 2的线程不处理数据
+        if (idx >= total_length / 2) {
             return;
         }
         half2* input1 = (half2*)x;
@@ -133,18 +136,21 @@ unsigned int __heqx2_mask(half2 x, half2 y)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_heqx2_mask(__gm__ half2* x, __gm__ half2* y, __gm__ unsigned int* dst, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_heqx2_mask(__gm__ half2* x, __gm__ half2* y, __gm__ unsigned int* dst, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx >= input_total_length / 2) {
+        if (idx >= total_length) {
+            return;
+        }
+        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= total_length / 2的线程不处理数据
+        if (idx >= total_length / 2) {
             return;
         }
         dst[idx] = __heqx2_mask(x[idx], y[idx]);
     }
 
-    __global__ __vector__ void compare_kernel(__gm__ half* x, __gm__ half* y, __gm__ unsigned int* dst, uint32_t input_total_length)
+    __global__ __vector__ void compare_kernel(__gm__ half* x, __gm__ half* y, __gm__ unsigned int* dst, uint32_t total_length)
     {
-        asc_vf_call<simt_heqx2_mask>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)y, dst, input_total_length);
+        asc_vf_call<simt_heqx2_mask>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)y, dst, total_length);
     }
     ```

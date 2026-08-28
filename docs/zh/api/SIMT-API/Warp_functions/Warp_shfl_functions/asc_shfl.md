@@ -125,9 +125,12 @@ Warp内指定线程的`var`值。
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_shfl(int32_t* dst, int32_t total_num)
+    __global__ __launch_bounds__(1024) void kernel_shfl(int32_t* dst, int32_t total_num, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         if (idx >= total_num) {
             return;
         }
@@ -141,10 +144,13 @@ Warp内指定线程的`var`值。
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_shfl(__gm__ int32_t* dst, int32_t total_num)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_shfl(__gm__ int32_t* dst, int32_t total_num, uint32_t total_length)
     {
         // asc_vf_call参数：dim3{1024, 1, 1}
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         if (idx >= total_num) {
             return;
         }

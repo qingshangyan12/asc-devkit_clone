@@ -69,10 +69,10 @@ inline float fabsf(float x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void compute_fabsf(float *result, const float *x, uint32_t count)
+    __global__ __launch_bounds__(256) void compute_fabsf(float *result, const float *x, uint32_t total_length)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= count) {
+        if (idx >= total_length) {
             return;
         }
         result[idx] = fabsf(x[idx]);
@@ -82,18 +82,18 @@ inline float fabsf(float x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(256) inline void compute_fabsf_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    __simt_vf__ __launch_bounds__(256) inline void compute_fabsf_vf(__gm__ float *result, __gm__ const float *x, uint32_t total_length)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= count) {
+        if (idx >= total_length) {
             return;
         }
         result[idx] = fabsf(x[idx]);
     }
 
-    __global__ __vector__ void run_fabsf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    __global__ __vector__ void run_fabsf(__gm__ float *result, __gm__ const float *x, uint32_t total_length)
     {
-        asc_vf_call<compute_fabsf_vf>(dim3(256), result, x, count);
+        asc_vf_call<compute_fabsf_vf>(dim3(256), result, x, total_length);
     }
     ```
 

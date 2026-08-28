@@ -107,9 +107,12 @@ half __hsub(const half x, const half y)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_hsub(half* dst, half* x, half* y)
+    __global__ __launch_bounds__(1024) void kernel_hsub(half* dst, half* x, half* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hsub(x[idx], y[idx]);
     }
     ```
@@ -117,9 +120,12 @@ half __hsub(const half x, const half y)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_hsub(__gm__ half* dst, __gm__ half* x, __gm__ half* y)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_hsub(__gm__ half* dst, __gm__ half* x, __gm__ half* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hsub(x[idx], y[idx]);
     }
     ```

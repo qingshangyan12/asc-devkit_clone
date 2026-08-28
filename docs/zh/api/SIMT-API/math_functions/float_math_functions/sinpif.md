@@ -70,10 +70,10 @@ inline float sinpif(float x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void compute_sinpif(float *result, const float *x, uint32_t count)
+    __global__ __launch_bounds__(256) void compute_sinpif(float *result, const float *x, uint32_t total_length)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= count) {
+        if (idx >= total_length) {
             return;
         }
         result[idx] = sinpif(x[idx]);
@@ -83,18 +83,18 @@ inline float sinpif(float x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(256) inline void compute_sinpif_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    __simt_vf__ __launch_bounds__(256) inline void compute_sinpif_vf(__gm__ float *result, __gm__ const float *x, uint32_t total_length)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= count) {
+        if (idx >= total_length) {
             return;
         }
         result[idx] = sinpif(x[idx]);
     }
 
-    __global__ __vector__ void run_sinpif(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    __global__ __vector__ void run_sinpif(__gm__ float *result, __gm__ const float *x, uint32_t total_length)
     {
-        asc_vf_call<compute_sinpif_vf>(dim3(256), result, x, count);
+        asc_vf_call<compute_sinpif_vf>(dim3(256), result, x, total_length);
     }
     ```
 
