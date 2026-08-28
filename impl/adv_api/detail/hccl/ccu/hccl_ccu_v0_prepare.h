@@ -270,7 +270,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[10] = UINT64_MAX - 1; // tmpRepeatNum：单次执行
     xnData_[11] = 0;         // inputRepeatStride
     xnData_[12] = 0;         // outputRepeatStride
-    xnData_[13] = sliceSize; // lastSliceSize
+    xnData_[13] = meshSize; // lastSliceSize
     xnData_[14] = 0;         // isInputOutputEqual
 }
 
