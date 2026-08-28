@@ -1422,9 +1422,13 @@ HcclResult HcclAllocAlgResourceCcu(
     resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
+    HCCL_INFO("[HcclAllocAlgResourceCcu]Start HcclGetThread.");
     CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
+    HCCL_INFO("[HcclAllocAlgResourceCcu]Start HcclGetChannelForCcu.");
     CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
+    HCCL_INFO("[HcclAllocAlgResourceCcu]Start HcclGetCcuKernel.");
     CHK_RET(HcclGetCcuKernel(comm, param, resRequest, resCtxHost));
+    HCCL_INFO("[HcclAllocAlgResourceCcu]Finish HcclGetCcuKernel.");
     return HCCL_SUCCESS;
 #endif
 }
