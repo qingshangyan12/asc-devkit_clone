@@ -413,6 +413,7 @@ static void PrintfFifo(const char* fmt, va_list otherArgs)
     }
 
     enable_asc_aicpu_fifo_debug();
+    // empty
     BlockRingBufInfo* blockInfo = GetAicpuDebugBlockInfo(memInfo);
     if (blockInfo == nullptr) {
         return;
