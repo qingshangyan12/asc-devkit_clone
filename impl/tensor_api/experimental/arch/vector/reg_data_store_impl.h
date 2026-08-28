@@ -9,7 +9,8 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning "reg_data_store_impl.h is internal; include <tensor_api/experimental/arch/vector/reg_data_store.h> instead."
+#warning \
+    "impl/tensor_api/experimental/arch/vector/reg_data_store_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use tensor_api/experimental/arch/vector/reg_data_store.h instead."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE_IMPL
 #endif
@@ -17,9 +18,6 @@
 #ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_STORE_IMPL_H
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_STORE_IMPL_H
 
-#if !defined(INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_STORE_H)
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
-#endif
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
 #include "tensor_api/tensor/tensor.h"
 
