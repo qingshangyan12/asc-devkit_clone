@@ -27,8 +27,6 @@ struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::Variable input;
     std::vector<ccu::Variable> output;
     std::vector<ccu::Variable> token;
-    ccu::Variable outputOffset;
-    ccu::Variable sliceSize;
     ccu::Variable currentRankSliceInputOffset;
     ccu::Variable currentRankSliceOutputOffset;
     ccu::Variable tmpRepeatNum;
@@ -89,10 +87,9 @@ static CcuResult InitResource(KfcAllGatherMesh1DMem2MemContext& ctx)
 static CcuResult LoadArgs(
     KfcAllGatherMesh1DMem2MemContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
     ccu::Variable outputOffset, ccu::Variable sliceSize, ccu::Variable goSize0, ccu::Variable goSize1,
-    ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable isInputOutputEqual)
-    ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum,
-    ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize,
-    ccu::Variable isInputOutputEqual)
+    ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable currentRankSliceInputOffset,
+    ccu::Variable tmpRepeatNum, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
+    ccu::Variable lastSliceSize, ccu::Variable isInputOutputEqual)
 {
     ctx.input = inputAddr;
     ctx.output[ctx.rankId] = outputAddr;
@@ -109,7 +106,6 @@ static CcuResult LoadArgs(
     ctx.goSize.loopParam = goSize1;
     ctx.goSize.parallelParam = goSize2;
     ctx.goSize.residual = goSize3;
-    ctx.isInputOutputEqual = isInputOutputEqual;
     return CCU_SUCCESS;
 }
 
@@ -279,21 +275,16 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
         }
     }
 
-    CCU_CHK_RET(DoAllGatherWrite(ctx, src, dst));
-    CCU_IF(ctx.isInputOutputEqual == 0) { CCU_CHK_RET(GroupCopy(ctx, localDst, src, ctx.goSize)); }
-    CCU_CHK_RET(DoAllGatherWait(ctx));
-
     return CCU_SUCCESS;
 }
 
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable outputOffset,
-    ccu::Variable sliceSize, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
+    ccu::Variable sliceSize, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
+    ccu::Variable goSize3, ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum,
+    ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize,
     ccu::Variable isInputOutputEqual, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
     uint32_t rankId)
-    ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum, ccu::Variable inputRepeatStride,
-    ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize, ccu::Variable isInputOutputEqual,
-    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId)
 {
     KfcAllGatherMesh1DMem2MemContext ctx;
     ctx.channels = channels;
@@ -303,8 +294,6 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     InitCcuKernelCtxBase(ctx);
 
     CCU_CHK_RET(InitResource(ctx));
-    CCU_CHK_RET(LoadArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, outputOffset, sliceSize, goSize0, goSize1, goSize2, goSize3,
     CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, outputOffset, sliceSize, goSize0, goSize1, goSize2,
         goSize3, currentRankSliceInputOffset, tmpRepeatNum, inputRepeatStride, outputRepeatStride, lastSliceSize,
         isInputOutputEqual));
