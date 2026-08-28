@@ -24,7 +24,6 @@
 
 #include "impl/tensor_api/arch/vector/ub_to_gm/copy_impl/dn2dn.h"
 #include "impl/tensor_api/arch/vector/ub_to_gm/copy_impl/nd2nd.h"
-#include "impl/tensor_api/arch/vector/ub_to_gm/copy_impl/one_dim.h"
 #include "impl/tensor_api/arch/vector/ub_to_gm/copy_impl/nz2nz.h"
 
 namespace asc {
