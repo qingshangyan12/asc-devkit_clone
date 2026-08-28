@@ -117,6 +117,7 @@ constexpr const char* Ascend_910_9381 = "Ascend910_9381";
 constexpr const char* Ascend_910_9382 = "Ascend910_9382";
 constexpr const char* Ascend_910_9372 = "Ascend910_9372";
 constexpr const char* Ascend_910_9362 = "Ascend910_9362";
+constexpr const char* Ascend_910_9363 = "Ascend910_9363";
 constexpr const char* Ascend_950 = "Ascend950";
 constexpr const char* Ascend_350 = "Ascend350";
 constexpr const char* MC62CM12AA = "MC62CM12AA";
@@ -642,7 +643,7 @@ private:
         Ascend_910B4,      Ascend_910B4_1,   Ascend_310B,      Ascend_310B1,     Ascend_310B2,       Ascend_310B3,
         Ascend_310B4,      Ascend_310P1,     Ascend_310P2,     Ascend_310P3,     Ascend_310P4,       Ascend_310P5,
         Ascend_310P7,      Ascend_310P,      Ascend_610B,      Ascend_610B1,     Ascend_610B2,       Ascend_910_93,
-        Ascend_910_9391,   Ascend_910_9392,  Ascend_910_9381,  Ascend_910_9382,  Ascend_910_9372,    Ascend_910_9362,
+        Ascend_910_9391,   Ascend_910_9392,  Ascend_910_9381,  Ascend_910_9382,  Ascend_910_9372,    Ascend_910_9362, Ascend_910_9363,
         kAscend610Lite,    BS9SX2AA,         BS9SX2AB,         MC61AM21AA,       MC61AM21AB,         Ascend_035,
         Ascend_035A,       Ascend_035B,      AS31XM1,          AS31XM1X,         MC62CM13AA,         MC62DM23AA,
         MC62CM13AB,        MC62DM23AB,       MC62CM12AA,       MC62DM22AA,       MC62CM12AC,         MC62DM22AC,

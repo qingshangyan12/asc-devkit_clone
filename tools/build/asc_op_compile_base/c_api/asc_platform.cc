@@ -72,7 +72,8 @@ bool CceConfBase::IsC220()
            this->target_opti_compilation_infos_.GetSocVersion() == Ascend_910_9381 ||
            this->target_opti_compilation_infos_.GetSocVersion() == Ascend_910_9382 ||
            this->target_opti_compilation_infos_.GetSocVersion() == Ascend_910_9372 ||
-           this->target_opti_compilation_infos_.GetSocVersion() == Ascend_910_9362;
+           this->target_opti_compilation_infos_.GetSocVersion() == Ascend_910_9362 ||
+           this->target_opti_compilation_infos_.GetSocVersion() == Ascend_910_9363;
 }
 
 bool CceConfBase::IsM210()
@@ -493,7 +494,7 @@ bool CceConfBase::SetOptionalCoreType(const std::string& key)
             Ascend_610,        BS9SX1AA,          BS9SX1AB,         BS9SX1AC,         Ascend_031,
             Ascend_910B1,      Ascend_910B2,      Ascend_910B2C,    Ascend_910B3,     Ascend_910B4,
             Ascend_910B4_1,    Ascend_910_9391,   Ascend_910_9381,  Ascend_910_9392,  Ascend_910_9382,
-            Ascend_910_9372,   Ascend_910_9362,   Ascend_310B1,     Ascend_310B2,     Ascend_310B3,
+            Ascend_910_9372,   Ascend_910_9362,  Ascend_910_9363, Ascend_310B1,     Ascend_310B2,     Ascend_310B3,
             Ascend_310B4,      Ascend_310P1,      Ascend_310P2,     Ascend_310P3,     Ascend_310P4,
             Ascend_310P5,      Ascend_310P7,      Ascend_610B1,     Ascend_610B2,     AS31XM1X,
             Ascend950PR_9599,  Ascend950PR_958a,  Ascend950PR_9589, Ascend950PR_958b, Ascend950PR_9579,
