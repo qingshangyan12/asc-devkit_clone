@@ -17,6 +17,7 @@
 #include "alltoallv_auto_selector.h"
 #include "cann_host_bridge.h"
 #include "coll_alg_v2_exec_registry.h"
+#include "execute_selector.h"
 #include "executor_v2_base.h"
 #include "gtest/gtest.h"
 #include "ins_temp_all_to_all_v_mesh_1D.h"
@@ -77,7 +78,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_cann_brid
     for (CommEngine engine : {COMM_ENGINE_AICPU_TS, COMM_ENGINE_AICPU}) {
         EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, engine)));
         EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, engine)));
-        EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, engine)));
+        EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, engine)));
         EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLGATHER, engine)));
         EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_REDUCE_SCATTER, engine)));
     }
@@ -85,6 +86,24 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_cann_brid
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, COMM_ENGINE_CPU)));
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, COMM_ENGINE_CPU)));
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, COMM_ENGINE_CPU)));
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, execute_selector_uses_local_devkit_for_allreduce)
+{
+    ExecuteSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLREDUCE);
+    std::string algName;
+
+    EXPECT_EQ(selector.Run(param, &topo, algName), HCCL_SUCCESS);
+    EXPECT_EQ(algName, "AicpuAllReduceSoleMeshOneShot");
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_all_reduce_algorithms)
+{
+    CollAlgExecRegistryV2& registry = CollAlgExecRegistryV2::Instance();
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLREDUCE, "AicpuAllReduceSoleMeshOneShot"), nullptr);
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLREDUCE, "AicpuAllReduceSoleMeshTwoShot"), nullptr);
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_mesh1d_and_concurrent_algorithms)
