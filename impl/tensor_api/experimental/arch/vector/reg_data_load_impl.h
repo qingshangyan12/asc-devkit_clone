@@ -21,6 +21,7 @@
 #if !defined(INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_LOAD_H)
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
 #endif
+#include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
 #include "tensor_api/tensor/tensor.h"
 
 namespace asc {
@@ -28,55 +29,150 @@ namespace te {
 namespace experimental {
 namespace detail {
 
+template <load_sideband_mode sideband_mode>
+struct load_from_ptr_impl;
+
+template <>
+struct load_from_ptr_impl<load_sideband_mode::direct> {
+    template <typename DataType, typename Pointer>
+    __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
+    {
+        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> ||
+                          is_b32_type_v<DataType> || is_b64_type_v<DataType>,
+            "load direct does not support this element type");
+        reg_tensor<DataType> dst;
+        asc_loadalign(dst.reg, src);
+        return dst;
+    }
+};
+
+template <>
+struct load_from_ptr_impl<load_sideband_mode::downsample> {
+    template <typename DataType, typename Pointer>
+    __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
+    {
+        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType>,
+            "load downsample does not support this element type");
+        reg_tensor<DataType> dst;
+        asc_loadalign_downsample(dst.reg, src);
+        return dst;
+    }
+};
+
+template <>
+struct load_from_ptr_impl<load_sideband_mode::unpack> {
+    template <typename DataType, typename Pointer>
+    __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
+    {
+        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> ||
+                          is_b32_type_v<DataType>,
+            "load unpack does not support this element type");
+        reg_tensor<DataType> dst;
+        asc_loadalign_unpack(dst.reg, src);
+        return dst;
+    }
+};
+
+template <>
+struct load_from_ptr_impl<load_sideband_mode::unpack4> {
+    template <typename DataType, typename Pointer>
+    __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
+    {
+        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType>,
+            "load unpack4 does not support this element type");
+        reg_tensor<DataType> dst;
+        asc_loadalign_unpack4(dst.reg, src);
+        return dst;
+    }
+};
+
+template <>
+struct load_from_ptr_impl<load_sideband_mode::upsample> {
+    template <typename DataType, typename Pointer>
+    __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
+    {
+        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType>,
+            "load upsample does not support this element type");
+        reg_tensor<DataType> dst;
+        asc_loadalign_upsample(dst.reg, src);
+        return dst;
+    }
+};
+
+template <>
+struct load_from_ptr_impl<load_sideband_mode::deintlv> {
+    template <typename Pointer, typename RegDataType>
+    __simd_callee__ static inline void run(
+        Pointer src, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
+    {
+        static_assert(is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> ||
+                          is_b16_type_v<RegDataType> || is_b32_type_v<RegDataType>,
+            "load deintlv does not support this element type");
+        asc_loadalign_deintlv(dst0.reg, dst1.reg, src);
+    }
+};
+
 template <load_sideband_mode sideband_mode, typename DataType, typename Pointer>
 __simd_callee__ inline reg_tensor<DataType> load_from_ptr(Pointer src)
 {
-    reg_tensor<DataType> dst;
-    if constexpr (sideband_mode == load_sideband_mode::direct) {
-        asc_loadalign(dst.reg, src);
-    } else if constexpr (sideband_mode == load_sideband_mode::downsample) {
-        asc_loadalign_downsample(dst.reg, src);
-    } else if constexpr (sideband_mode == load_sideband_mode::unpack) {
-        asc_loadalign_unpack(dst.reg, src);
-    } else if constexpr (sideband_mode == load_sideband_mode::unpack4) {
-        asc_loadalign_unpack4(dst.reg, src);
-    } else if constexpr (sideband_mode == load_sideband_mode::upsample) {
-        asc_loadalign_upsample(dst.reg, src);
-    } else if constexpr (sideband_mode == load_sideband_mode::deintlv) {
-        static_assert(sideband_mode != load_sideband_mode::deintlv,
-            "deintlv requires the two-destination load overload");
-    } else {
-        static_assert(sideband_mode == load_sideband_mode::direct, "unsupported load sideband mode");
-    }
-    return dst;
+    return load_from_ptr_impl<sideband_mode>::template run<DataType>(src);
 }
 
 template <load_sideband_mode sideband_mode, typename Pointer, typename RegDataType>
 __simd_callee__ inline void load_from_ptr(
     Pointer src, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
 {
-    if constexpr (sideband_mode == load_sideband_mode::deintlv) {
-        asc_loadalign_deintlv(dst0.reg, dst1.reg, src);
-    } else {
-        static_assert(sideband_mode == load_sideband_mode::deintlv,
-            "the two-destination load overload only supports deintlv");
-    }
+    load_from_ptr_impl<sideband_mode>::run(src, dst0, dst1);
 }
+
+template <broadcast_mode brc_mode>
+struct load_broadcast_from_ptr_impl;
+
+template <>
+struct load_broadcast_from_ptr_impl<broadcast_mode::elem> {
+    template <typename DataType, typename Pointer>
+    __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
+    {
+        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> ||
+                          is_b32_type_v<DataType>,
+            "load_broadcast elem does not support this element type");
+        reg_tensor<DataType> dst;
+        asc_loadalign_brc_elem(dst.reg, src);
+        return dst;
+    }
+};
+
+template <>
+struct load_broadcast_from_ptr_impl<broadcast_mode::datablock> {
+    template <typename DataType, typename Pointer>
+    __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
+    {
+        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> ||
+                          is_b32_type_v<DataType>,
+            "load_broadcast datablock does not support this element type");
+        reg_tensor<DataType> dst;
+        asc_loadalign_brc_datablock(dst.reg, src);
+        return dst;
+    }
+};
+
+template <>
+struct load_broadcast_from_ptr_impl<broadcast_mode::elem2datablock> {
+    template <typename DataType, typename Pointer>
+    __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
+    {
+        static_assert(is_b16_type_v<DataType> || is_b32_type_v<DataType>,
+            "load_broadcast elem2datablock does not support this element type");
+        reg_tensor<DataType> dst;
+        asc_loadalign_brc_elem2datablock(dst.reg, src);
+        return dst;
+    }
+};
 
 template <broadcast_mode brc_mode, typename DataType, typename Pointer>
 __simd_callee__ inline reg_tensor<DataType> load_broadcast_from_ptr(Pointer src)
 {
-    reg_tensor<DataType> dst;
-    if constexpr (brc_mode == broadcast_mode::elem) {
-        asc_loadalign_brc_elem(dst.reg, src);
-    } else if constexpr (brc_mode == broadcast_mode::datablock) {
-        asc_loadalign_brc_datablock(dst.reg, src);
-    } else if constexpr (brc_mode == broadcast_mode::elem2datablock) {
-        asc_loadalign_brc_elem2datablock(dst.reg, src);
-    } else {
-        static_assert(brc_mode == broadcast_mode::elem, "unsupported broadcast mode");
-    }
-    return dst;
+    return load_broadcast_from_ptr_impl<brc_mode>::template run<DataType>(src);
 }
 
 } // namespace detail

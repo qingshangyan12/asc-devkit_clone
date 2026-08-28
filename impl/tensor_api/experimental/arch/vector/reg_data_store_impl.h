@@ -21,6 +21,7 @@
 #if !defined(INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_STORE_H)
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
 #endif
+#include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
 #include "tensor_api/tensor/tensor.h"
 
 namespace asc {
@@ -36,6 +37,9 @@ struct store_to_ptr_impl<store_sideband_mode::direct> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
+        static_assert(is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> ||
+                          is_b16_type_v<RegDataType> || is_b32_type_v<RegDataType>,
+            "store direct does not support this element type");
         asc_storealign(dst, src.reg, src.mask);
     }
 };
@@ -45,6 +49,9 @@ struct store_to_ptr_impl<store_sideband_mode::store_1st> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
+        static_assert(is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> ||
+                          is_b16_type_v<RegDataType> || is_b32_type_v<RegDataType>,
+            "store store_1st does not support this element type");
         asc_storealign_1st(dst, src.reg);
     }
 };
@@ -54,6 +61,8 @@ struct store_to_ptr_impl<store_sideband_mode::pack> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
+        static_assert(is_b16_type_v<RegDataType> || is_b32_type_v<RegDataType> || is_b64_type_v<RegDataType>,
+            "store pack does not support this element type");
         asc_storealign_pack(dst, src.reg, src.mask);
     }
 };
@@ -63,6 +72,8 @@ struct store_to_ptr_impl<store_sideband_mode::pack_quarter> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
+        static_assert(AscendC::Std::is_one_of_v<RegDataType, int32_t, uint32_t, float>,
+            "store pack_quarter does not support this element type");
         asc_storealign_pack_quarter(dst, src.reg, src.mask);
     }
 };
@@ -73,6 +84,10 @@ struct store_to_ptr_impl<store_sideband_mode::intlv> {
     __simd_callee__ static inline void run(
         Pointer dst, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1)
     {
+        static_assert(is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> ||
+                          is_b16_type_v<RegDataType> ||
+                          AscendC::Std::is_one_of_v<RegDataType, int32_t, uint32_t>,
+            "store intlv does not support this element type");
         asc_storealign_intlv(dst, src0.reg, src1.reg);
     }
 };
