@@ -159,12 +159,12 @@ public:
 private:
     __aicore__ inline uint16_t CeilDiv(uint16_t numerator, uint16_t denominator)
     {
-        return (numerator + denominator - 1) / denominator;
+        return static_cast<uint16_t>(AscendC::Std::ceil_div(numerator, denominator));
     }
 
     __aicore__ inline uint16_t CeilAlign(uint16_t numerator, uint16_t denominator)
     {
-        return (numerator + denominator - 1) / denominator * denominator;
+        return static_cast<uint16_t>(AscendC::Std::ceil_div(numerator, denominator) * denominator);
     }
     __aicore__ inline void CopyIn(AscendC::LocalTensor<half>& a1Local, AscendC::LocalTensor<half>& b1Local)
     {
