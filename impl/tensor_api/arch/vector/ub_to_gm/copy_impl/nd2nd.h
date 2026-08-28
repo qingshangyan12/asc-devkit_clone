@@ -83,6 +83,39 @@ private:
     }
 };
 
+class copy_ub_to_gm_one_dim : private copy_ub_to_gm_common {
+public:
+    template <const ub_to_gm_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void run(const DstTensor& dst, const SrcTensor& src)
+    {
+        check_template<trait, DstTensor, SrcTensor>();
+        using src_type = typename SrcTensor::element_type;
+        constexpr uint16_t block_count = 1;
+        uint32_t block_len = get<0>(src.layout().shape()) * sizeof(src_type);
+        emit_copy(dst, src, block_count, block_len, 0, 0);
+    }
+
+    template <
+        const ub_to_gm_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static void run(
+        const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const ShapeType& copy_shape)
+    {
+        check_template<trait, T, U>();
+        using src_type = typename U::element_type;
+        constexpr uint16_t block_count = 1;
+        uint32_t block_len = get<0>(copy_shape) * sizeof(src_type);
+        emit_copy(dst, src, dst.layout()(dst_coord), src.layout()(src_coord), block_count, block_len, 0, 0);
+    }
+
+private:
+    template <const ub_to_gm_trait& trait, typename DstTensor, typename SrcTensor>
+    __aicore__ inline static constexpr void check_template()
+    {
+        check_layout_pattern<SrcTensor, DstTensor>();
+        check_data_type::check_ub_to_gm_data_type<DstTensor, SrcTensor>();
+    }
+};
+
 } // namespace te
 } // namespace asc
 
