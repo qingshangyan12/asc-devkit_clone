@@ -67,9 +67,12 @@ SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__uint2half_rn_sat(__gm__ half* dst, __gm__ uint32_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__uint2half_rn_sat(__gm__ half* dst, __gm__ uint32_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __uint2half_rn_sat(x[idx]);
     }
     ```

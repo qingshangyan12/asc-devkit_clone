@@ -71,9 +71,12 @@ inline unsigned int __float2uint_rd(const float x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__float2uint_rd(uint32_t* dst, float* x)
+    __global__ __launch_bounds__(1024) void kernel__float2uint_rd(uint32_t* dst, float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2uint_rd(x[idx]);
     }
     ```
@@ -81,9 +84,12 @@ inline unsigned int __float2uint_rd(const float x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2uint_rd(__gm__ uint32_t* dst, __gm__ float* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2uint_rd(__gm__ uint32_t* dst, __gm__ float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2uint_rd(x[idx]);
     }
     ```

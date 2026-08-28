@@ -73,9 +73,12 @@ inline long long int __half2ll_rn(const half x)
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__half2ll_rn(int64_t* dst, half* x)
+    __global__ __launch_bounds__(1024) void kernel__half2ll_rn(int64_t* dst, half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __half2ll_rn(x[idx]);
     }
     ```
@@ -83,9 +86,12 @@ inline long long int __half2ll_rn(const half x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__half2ll_rn(__gm__ int64_t* dst, __gm__ half* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__half2ll_rn(__gm__ int64_t* dst, __gm__ half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __half2ll_rn(x[idx]);
     }
     ```

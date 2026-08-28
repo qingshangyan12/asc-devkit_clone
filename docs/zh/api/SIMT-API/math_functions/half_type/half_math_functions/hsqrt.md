@@ -72,10 +72,10 @@ inline half hsqrt(half x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_sqrt(half* dst, half* x, uint32_t count)
+    __global__ __launch_bounds__(1024) void kernel_sqrt(half* dst, half* x, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= count) {
+        if (idx >= total_length) {
             return;
         }
         dst[idx] = hsqrt(x[idx]);
@@ -85,17 +85,17 @@ inline half hsqrt(half x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_sqrt(__gm__ half* dst, __gm__ half* x, uint32_t count)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_sqrt(__gm__ half* dst, __gm__ half* x, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= count) {
+        if (idx >= total_length) {
             return;
         }
         dst[idx] = hsqrt(x[idx]);
     }
 
-    __global__ __vector__ void run_sqrt(__gm__ half* dst, __gm__ half* x, uint32_t count)
+    __global__ __vector__ void run_sqrt(__gm__ half* dst, __gm__ half* x, uint32_t total_length)
     {
-        asc_vf_call<kernel_sqrt>(dim3(1024), dst, x, count);
+        asc_vf_call<kernel_sqrt>(dim3(1024), dst, x, total_length);
     }
     ```

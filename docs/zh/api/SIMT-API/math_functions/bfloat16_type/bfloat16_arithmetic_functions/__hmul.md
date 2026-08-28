@@ -70,10 +70,10 @@ bfloat16_t __hmul(const bfloat16_t x, const bfloat16_t y)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_hmul(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y, int input_total_length)
+    __global__ __launch_bounds__(1024) void kernel_hmul(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        if (idx >= input_total_length) {
+        if (idx >= total_length) {
             return;
         }
         dst[idx] = __hmul(x[idx], y[idx]);
@@ -83,17 +83,17 @@ bfloat16_t __hmul(const bfloat16_t x, const bfloat16_t y)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_hmul(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, int input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_hmul(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        if (idx >= input_total_length) {
+        if (idx >= total_length) {
             return;
         }
         dst[idx] = __hmul(x[idx], y[idx]);
     }
 
-    __global__ __vector__ void compute_kernel(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, int input_total_length)
+    __global__ __vector__ void compute_kernel(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, uint32_t total_length)
     {
-        asc_vf_call<kernel_hmul>(dim3(1024), dst, x, y, input_total_length);
+        asc_vf_call<kernel_hmul>(dim3(1024), dst, x, y, total_length);
     }
     ```

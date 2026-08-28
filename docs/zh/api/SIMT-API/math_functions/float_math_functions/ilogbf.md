@@ -74,10 +74,10 @@ inline int ilogbf(float x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void compute_ilogbf(int *result, const float *x, uint32_t count)
+    __global__ __launch_bounds__(256) void compute_ilogbf(int *result, const float *x, uint32_t total_length)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= count) {
+        if (idx >= total_length) {
             return;
         }
         result[idx] = ilogbf(x[idx]);
@@ -87,18 +87,18 @@ inline int ilogbf(float x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(256) inline void compute_ilogbf_vf(__gm__ int *result, __gm__ const float *x, uint32_t count)
+    __simt_vf__ __launch_bounds__(256) inline void compute_ilogbf_vf(__gm__ int *result, __gm__ const float *x, uint32_t total_length)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= count) {
+        if (idx >= total_length) {
             return;
         }
         result[idx] = ilogbf(x[idx]);
     }
 
-    __global__ __vector__ void run_ilogbf(__gm__ int *result, __gm__ const float *x, uint32_t count)
+    __global__ __vector__ void run_ilogbf(__gm__ int *result, __gm__ const float *x, uint32_t total_length)
     {
-        asc_vf_call<compute_ilogbf_vf>(dim3(256), result, x, count);
+        asc_vf_call<compute_ilogbf_vf>(dim3(256), result, x, total_length);
     }
     ```
 

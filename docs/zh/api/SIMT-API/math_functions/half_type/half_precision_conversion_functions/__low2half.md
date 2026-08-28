@@ -74,18 +74,18 @@ inline half __low2half(const half2 x)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __aicore__ void simt_low2half(half2* input, half* output, uint32_t input_total_length)
+    __aicore__ void simt_low2half(half2* input, half* output, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx >= input_total_length / 2) {
+        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= total_length / 2的线程不处理数据
+        if (idx >= total_length / 2) {
             return;
         }
         output[idx] = __low2half(input[idx]);
     }
-    __global__ __launch_bounds__(1024) void cast_kernel(half* input, half* output, uint32_t input_total_length)
+    __global__ __launch_bounds__(1024) void cast_kernel(half* input, half* output, uint32_t total_length)
     {
-        simt_low2half((half2*)input, output, input_total_length);
+        simt_low2half((half2*)input, output, total_length);
     }
     ```
 
@@ -93,17 +93,17 @@ inline half __low2half(const half2 x)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_low2half(__gm__ half2* input, __gm__ half* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_low2half(__gm__ half2* input, __gm__ half* output, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length / 2) {
+        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= total_length / 2的线程不处理数据
+        if (idx > total_length / 2) {
             return;
         }
         output[idx] = __low2half(input[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ half* input, __gm__ half* output, uint32_t input_total_length)
+    __global__ __vector__ void cast_kernel(__gm__ half* input, __gm__ half* output, uint32_t total_length)
     {
-        asc_vf_call<simt_low2half>(dim3(1024), (__gm__ half2*)input, output, input_total_length);
+        asc_vf_call<simt_low2half>(dim3(1024), (__gm__ half2*)input, output, total_length);
     }
     ```

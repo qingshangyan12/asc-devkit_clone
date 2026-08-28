@@ -71,9 +71,12 @@ inline half __float2half(const float x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__float2half(half* dst, float* x)
+    __global__ __launch_bounds__(1024) void kernel__float2half(half* dst, float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2half(x[idx]);
     }
     ```
@@ -81,9 +84,12 @@ inline half __float2half(const float x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2half(__gm__ half* dst, __gm__ float* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2half(__gm__ half* dst, __gm__ float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2half(x[idx]);
     }
     ```

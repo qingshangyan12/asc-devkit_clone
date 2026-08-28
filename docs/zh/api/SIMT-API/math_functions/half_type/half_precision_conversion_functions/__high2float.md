@@ -71,18 +71,18 @@ inline float __high2float(const half2 x)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __aicore__ void simt_high2float(half2* input, float* output, uint32_t input_total_length)
+    __aicore__ void simt_high2float(half2* input, float* output, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx >= input_total_length / 2) {
+        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= total_length / 2的线程不处理数据
+        if (idx >= total_length / 2) {
             return;
         }
         output[idx] = __high2float(input[idx]);
     }
-    __global__ __launch_bounds__(1024) void cast_kernel(half* input, float* output, uint32_t input_total_length)
+    __global__ __launch_bounds__(1024) void cast_kernel(half* input, float* output, uint32_t total_length)
     {
-        simt_high2float((half2*)input, output, input_total_length);
+        simt_high2float((half2*)input, output, total_length);
     }
     ```
 
@@ -90,17 +90,17 @@ inline float __high2float(const half2 x)
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_high2float(__gm__ half2* input, __gm__ float* output, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_high2float(__gm__ half2* input, __gm__ float* output, uint32_t total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx >= input_total_length / 2) {
+        // 每个线程处理1个half2类型的数据，即2个half类型的数据，因此idx >= total_length / 2的线程不处理数据
+        if (idx >= total_length / 2) {
             return;
         }
         output[idx] = __high2float(input[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ half* input, __gm__ float* output, uint32_t input_total_length)
+    __global__ __vector__ void cast_kernel(__gm__ half* input, __gm__ float* output, uint32_t total_length)
     {
-        asc_vf_call<simt_high2float>(dim3(1024), (__gm__ half2*)input, output, input_total_length);
+        asc_vf_call<simt_high2float>(dim3(1024), (__gm__ half2*)input, output, total_length);
     }
     ```
