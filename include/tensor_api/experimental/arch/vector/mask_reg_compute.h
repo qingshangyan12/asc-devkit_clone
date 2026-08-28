@@ -60,11 +60,35 @@ __simd_callee__ inline reg_tensor<bool> none_mask();
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 
+/**
+ * @brief Interleaves the lanes of two register masks for the specified element type.
+ * @tparam DataType Element type whose width determines the mask lane granularity.
+ * @param src0 First source register mask.
+ * @param src1 Second source register mask.
+ * @return A register-mask pair containing the interleaved sequence. The first and second halves of the sequence
+ *         are stored in the first and second members, respectively.
+ * @note Supported element widths are 8, 16, and 32 bits.
+ */
+template <typename DataType>
+__simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
+
+/**
+ * @brief Deinterleaves the lanes of two register masks for the specified element type.
+ * @tparam DataType Element type whose width determines the mask lane granularity.
+ * @param src0 First half of the interleaved register-mask sequence.
+ * @param src1 Second half of the interleaved register-mask sequence.
+ * @return A register-mask pair containing the deinterleaved sequence. The first member contains the even lanes,
+ *         and the second member contains the odd lanes.
+ * @note Supported element widths are 8, 16, and 32 bits.
+ */
+template <typename DataType>
+__simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
+
 } // namespace experimental
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/tensor_api/experimental/arch/vector/mask_reg_compute_impl.h"
 #endif
 
