@@ -378,7 +378,7 @@ bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& r
     resource.AddBool(topo.is2DieFullMesh);
     resource.AddBool(topo.level0PcieMix);
     resource.AddBool(topo.level0BigClosRange);
-    resource.AddBool(topo.level2Uboe);
+    resource.AddBool(topo.topLevelUboe);
     resource.AddU32(topo.topoInstDetailsOfLayerSize);
     resource.AddU32(static_cast<uint32_t>(topo.level0MeshType));
 
