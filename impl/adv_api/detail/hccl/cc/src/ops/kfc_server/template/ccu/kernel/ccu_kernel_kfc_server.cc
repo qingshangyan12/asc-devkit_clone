@@ -140,7 +140,6 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
         static_cast<uint32_t>(ctx.arg->opParam.DataDes.dataType));
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER))
     {
-
         if (ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
             CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
                 param[KFC_CONCURRENT_AG_NHR_INPUT], param[KFC_CONCURRENT_AG_NHR_OUTPUT], ctx.token,
@@ -171,7 +170,6 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 param[HBM_PARAM_IDX_13], param[HBM_PARAM_IDX_14], ctx.arg->channels, ctx.arg->channelCount,
                 static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
         }
-
     }
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER))
     {
