@@ -28,7 +28,7 @@
 
 获取标量原子操作的配置，包括原子操作的类型以及数据类型。接口支持通过函数返回值返回配置，也支持通过引用和参数输出配置：前者直接返回配置，后者将配置写入`config`。
 
-该接口可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型是否符合预期。
+该接口可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)设置的原子操作启用位和原子操作类型是否符合预期。
 
 <!-- npu="950" id8 -->
 **Ascend 950PR/Ascend 950DT产品上该接口已废弃。原子加操作可以直接使用[asc_atomic_add](asc_atomic_add.md)实现。无需再对原子操作启用位和原子操作类型的值进行配置和校验。**
@@ -36,7 +36,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 // 通过引用和参数输出配置
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config)
 
@@ -63,7 +63,7 @@ PIPE_S
 
 ## 约束说明
 
-需配合[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](asc_set_store_atomic_config_v2_deprecated.md)接口使用。上述接口用于设置原子操作启用位和原子操作类型，本接口用于获取配置。
+需配合[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)接口使用。上述接口用于设置原子操作启用位和原子操作类型，本接口用于获取配置。
 
 ## 调用示例
 
