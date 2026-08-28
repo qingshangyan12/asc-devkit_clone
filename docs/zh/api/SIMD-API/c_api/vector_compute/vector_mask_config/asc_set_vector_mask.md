@@ -51,25 +51,21 @@ __aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low
 ## 参数说明
 
 <!-- npu="950" id12 -->
-  **表** 参数说明（[NPU架构版本3510](../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+**表** 参数说明（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
-  |参数名|输入/输出|描述|
-  | ------------ | ------------ | ------------ |
-  |mask_high|输入|高64位Mask值。|
-  |mask_low|输入|低64位Mask值。|
+|参数名|输入/输出|描述|
+| ------------ | ------------ | ------------ |
+|mask_high|输入|高64位Mask值。|
+|mask_low|输入|低64位Mask值。|
 <!-- end id12 -->
 
 <!-- npu="A3,910b" id13 -->
-  <!-- npu="A3" id14 -->
-  <!-- end id14 -->
-  <!-- npu="910b" id15 -->
-  <!-- end id15 -->
-  **表** 参数说明（[NPU架构版本2201](../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+**表** 参数说明（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
-  |参数名|输入/输出|描述|
-  | ------------ | ------------ | ------------ |
-  |mask_high|输入|Normal模式：高位mask值。<br>Counter模式：需要置0，本入参不生效。|
-  |mask_low|输入|Normal模式：低位mask值。<br>Counter模式：整个矢量计算过程中，参与计算的元素个数。|
+|参数名|输入/输出|描述|
+| ------------ | ------------ | ------------ |
+|mask_high|输入|Normal模式：高位mask值。<br>Counter模式：需要置0，本入参不生效。|
+|mask_low|输入|Normal模式：低位mask值。<br>Counter模式：整个矢量计算过程中，参与计算的元素个数。|
 <!-- end id13 -->
 
 ## 返回值说明
@@ -82,33 +78,33 @@ PIPE_S
 
 ## 约束说明
 
-<!-- npu="950" id16 -->
+<!-- npu="950" id14 -->
 - 针对Ascend 950PR/Ascend 950DT：该接口用于在VF场景外设置掩码寄存器。在Reg矢量计算配置时，通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`配合获取掩码寄存器的值。更推荐用户使用VF场景内[掩码寄存器操作](../../reg_compute/reg_mask/reg_mask.md)章节中的接口完成Reg矢量计算掩码配置。
-<!-- end id16 -->
-<!-- npu="A3,910b" id17 -->
+<!-- end id14 -->
+<!-- npu="A3,910b" id15 -->
 - 针对如下产品型号：
-  <!-- npu="A3" id18 -->
+  <!-- npu="A3" id16 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id18 -->
-  <!-- npu="910b" id19 -->
+  <!-- end id16 -->
+  <!-- npu="910b" id17 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id19 -->
+  <!-- end id17 -->
   需先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。
-<!-- end id17 -->
+<!-- end id15 -->
 
 ## 调用示例
 
-<!-- npu="A3,910b" id20 -->
-- 针对如下产品型号：
-  <!-- npu="A3" id21 -->
-  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-  <!-- end id21 -->
-  <!-- npu="910b" id22 -->
-  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-  <!-- end id22 -->
-    请参考[asc_set_mask_count](asc_set_mask_count.md#调用示例)或[asc_set_mask_norm](asc_set_mask_norm.md#调用示例)。
-<!-- end id20 -->
-<!-- npu="950" id23 -->
+<!-- npu="950" id18 -->
 - 针对Ascend 950PR/Ascend 950DT：
   请参考[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md#调用示例)，该示例中`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`读取的掩码值即为`asc_set_vector_mask`设置值，用户可在VF外设置。
-<!-- end id23 -->
+<!-- end id18 -->
+<!-- npu="A3,910b" id19 -->
+- 针对如下产品型号：
+  <!-- npu="A3" id20 -->
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+  <!-- end id20 -->
+  <!-- npu="910b" id21 -->
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id21 -->
+  请参考[asc_set_mask_count](asc_set_mask_count.md#调用示例)或[asc_set_mask_norm](asc_set_mask_norm.md#调用示例)。
+<!-- end id19 -->
