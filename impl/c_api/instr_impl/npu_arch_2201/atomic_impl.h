@@ -47,7 +47,10 @@
 __aicore__ inline void asc_disable_dma_atomic() { asc_disable_dma_atomic_impl(); }
 
 [[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]
-__aicore__ inline void asc_set_atomic_none() { asc_disable_dma_atomic(); }
+__aicore__ inline void asc_set_atomic_none()
+{
+    asc_disable_dma_atomic();
+}
 
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config)
 {
