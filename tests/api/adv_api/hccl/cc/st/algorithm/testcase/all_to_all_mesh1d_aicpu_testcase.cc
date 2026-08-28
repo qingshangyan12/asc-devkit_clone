@@ -107,10 +107,8 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_mesh1d_and_concu
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALLV, "AicpuAllToAllVSoleMesh"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMeshSingleChannel"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMesh"), nullptr);
-#if !defined(HCCL_CANN_COMPAT_850)
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMeshConcurrent"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALLV, "AicpuAllToAllVSoleMeshConcurrent"), nullptr);
-#endif
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_concurrent_selectors_obey_topology_and_count_boundaries)
@@ -129,19 +127,11 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_concurrent_selectors_obey_topology
     param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
     param.all2AllVDataDes.sendCounts = sendCounts;
     EXPECT_EQ(alltoallSelector.Select(param, &topo, algName), SelectorStatus::MATCH);
-#if defined(HCCL_CANN_COMPAT_850)
-    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX");
-#else
     EXPECT_EQ(algName, "AicpuAllToAllSoleMeshConcurrent");
-#endif
 
     param = MakeAicpuParam(HCCL_CMD_ALLTOALLV);
-#if defined(HCCL_CANN_COMPAT_850)
-    EXPECT_EQ(alltoallvSelector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
-#else
     EXPECT_EQ(alltoallvSelector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllToAllVSoleMeshConcurrent");
-#endif
 
     topo.userRankSize = 5U;
     EXPECT_EQ(alltoallvSelector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
