@@ -73,10 +73,8 @@ __simd_callee__ inline reg_tensor<T> fma(
 
 __simd_callee__ inline reg_tensor<half> muls_cast(const reg_tensor<float>& src, const float& scalar)
 {
-    reg_tensor<float> product;
-    asc_mul_scalar(product.reg, src.reg, scalar, src.mask);
     reg_tensor<half> dst;
-    asc_float2half_rna(dst.reg, product.reg, src.mask, ASC_POSITION_EVEN);
+    asc_muls(dst.reg, src.reg, scalar, src.mask);
     dst.mask = src.mask;
     return dst;
 }
