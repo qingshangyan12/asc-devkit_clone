@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2 推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品 AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas 推理系列产品 Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
@@ -26,15 +26,13 @@
 
 ## 功能说明
 
-**该接口已废弃，请使用[asc_set_atomic_min_int32](asc_set_atomic_min.md)替代。**
-
-头文件路径：`"c_api/atomic/datamove_atomic.h"`。
+**该接口已废弃，请使用[asc_set_atomic_min_int32](../atomic/datamove_atomic/asc_set_atomic_min.md)替代。**
 
 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。
 
 ## 函数原型
 
-```cpp
+```c
 [[deprecated("NOTICE: asc_set_atomic_min_int is deprecated. Please use asc_set_atomic_min_int32 instead.")]]
 __aicore__ inline void asc_set_atomic_min_int()
 ```
@@ -53,8 +51,8 @@ PIPE_S
 
 ## 约束说明
 
-- 使用结束后，建议通过[asc_set_atomic_none](asc_set_atomic_none.md)关闭原子最小操作，以免影响后续相关指令功能。
+使用结束后，建议通过[asc_disable_dma_atomic](../atomic/datamove_atomic/asc_disable_dma_atomic.md)关闭原子最小操作，以免影响后续相关指令功能。
 
 ## 调用示例
 
-请参考[asc_set_atomic_min](asc_set_atomic_min.md)的调用示例。
+请参考[asc_set_atomic_min](../atomic/datamove_atomic/asc_set_atomic_min.md)的调用示例。

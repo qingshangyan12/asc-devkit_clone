@@ -31,7 +31,7 @@
 <!-- npu="950" id5 -->
 ### 原子操作
 
-- [asc_set_store_atomic_config_v2](../SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v2_deprecated.md)接口
+- [asc_set_store_atomic_config_v2](../SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_atomic_add](../SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md)接口。
 
@@ -43,11 +43,15 @@
 
     此接口后续版本会废弃，请使用[asc_set_atomic_add_int32](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md)接口。
 
-- [asc_set_atomic_max_int](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max_int_deprecated.md)接口
+- [asc_set_atomic_none](../SIMD-API/c_api/deprecated_interface/asc_set_atomic_none_deprecated.md)接口
+
+    此接口后续版本会废弃，请使用[asc_disable_dma_atomic](../SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md)接口。
+
+- [asc_set_atomic_max_int](../SIMD-API/c_api/deprecated_interface/asc_set_atomic_max_int_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_set_atomic_max_int32](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md)接口。
 
-- [asc_set_atomic_min_int](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min_int_deprecated.md)接口
+- [asc_set_atomic_min_int](../SIMD-API/c_api/deprecated_interface/asc_set_atomic_min_int_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_set_atomic_min_int32](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md)接口。
 
