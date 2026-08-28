@@ -34,7 +34,7 @@
 > 除上表中所列特性以外，3510还新增以下内容：
 >
 > - **新增SIMT编程模型**（[详细说明](#section_simt)）：该模型为独立编程模型，配套使用[SIMT-API接口集](../../../api/SIMT-API/SIMT-API.md)，涵盖同步与内存栅栏、原子操作、Warp函数、数学函数、访存函数、地址空间函数和协作组等功能，与上表中的基础API和高阶API（C++ Tensor方式）分属不同的编程体系，因此未纳入上表。该模型仅支持Ascend 950PR/Ascend 950DT，编译时需配置`--enable-simt`。
-> - **新增Tensor API编程接口**：该接口是基于`tensor_api/tensor.h`的试验接口，采用“内存指针+布局（Layout）”绑定的编程范式，由Layout自动推导搬运和计算参数，与上表中的基础API和高阶API（C++ Tensor方式）不属同一编程体系，因此未纳入上表。接口清单请参见[数据结构（TensorAPI）](../../../api/SIMD-API/basic_api/data_structure_TensorAPI/data_structure_TensorAPI.md)和[矩阵计算（TensorAPI，试验特性）](../../../api/SIMD-API/basic_api/cube_compute_TensorAPI/cube_compute_TensorAPI.md)。
+
 
 ## 特性说明
 
