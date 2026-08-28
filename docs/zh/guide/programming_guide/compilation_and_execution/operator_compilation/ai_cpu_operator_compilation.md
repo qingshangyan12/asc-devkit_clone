@@ -59,7 +59,7 @@ int32_t main(int argc, char const *argv[])
 各产品型号对应的架构版本号请通过[对应关系表](../../language_extension/simd_builtin_keywords.md#npu-arch)进行查询。
 
 ```
-bisheng -O2 hello_world.aicpu --cce-aicpu-L${INSTALL_DIR}/lib64/device/lib64 --cce-aicpu-laicpu_api -I${INSTALL_DIR}/asc/include/aicpu_api -c -o hello_world.aicpu.o
+bisheng -O2 hello_world.aicpu --cce-aicpu-L${INSTALL_DIR}/lib64/device/lib64 --cce-aicpu-laicpu_api --cce-aicpu-toolkit-path=${INSTALL_DIR}/toolkit/toolchain/hcc/bin --cce-aicpu-sysroot=${INSTALL_DIR}/toolkit/toolchain/hcc/sysroot -I${INSTALL_DIR}/asc/include/aicpu_api -c -o hello_world.aicpu.o
 bisheng --npu-arch=dav-2201 main.asc -c -o main.asc.o
 bisheng hello_world.aicpu.o main.asc.o -o demo
 ```
