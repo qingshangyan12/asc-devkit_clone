@@ -2,12 +2,12 @@
 
 ## Overview
 
-This sample demonstrates how to use the experimental Tensor API `asc::te::experimental::cast` to perform element-wise data type conversion. Both the input and output are two-dimensional ND tensors with shape `[16, 16]`, containing 256 elements.
+This sample combines the experimental Tensor API register load/store operations with current C API conversion interfaces to perform element-wise data type conversion. Both input and output are one-dimensional tensors with shape `[256]`.
 
-The sample covers six conversion scenarios between floating-point types and between integer and floating-point types. It also demonstrates the `unpack`, `unpack4`, `pack`, and `pack_quarter` memory access modes used for conversions between types of different widths. The computation is as follows:
+The sample covers six conversion scenarios between floating-point types and between integer and floating-point types. It also demonstrates the `unpack` and `unpack4` memory access modes together with `deinterleave` data reordering used for conversions between types of different widths. The computation is as follows:
 
 ```text
-y[i] = cast<To, Options>(x[i])
+y[i] = convert<To>(x[i])
 ```
 
 ## Supported Products
@@ -55,9 +55,9 @@ y[i] = cast<To, Options>(x[i])
     </tr>
     <tr>
       <td align="center">x</td>
-      <td align="center">[16, 16]</td>
+      <td align="center">[256]</td>
       <td align="center">half/float/int8_t/int32_t/bfloat16_t</td>
-      <td align="center">ND</td>
+      <td align="center">One-dimensional</td>
     </tr>
     <tr>
       <td rowspan="2" align="center">Output</td>
@@ -68,9 +68,9 @@ y[i] = cast<To, Options>(x[i])
     </tr>
     <tr>
       <td align="center">y</td>
-      <td align="center">[16, 16]</td>
+      <td align="center">[256]</td>
       <td align="center">int32_t/int16_t/uint8_t/float/bfloat16_t</td>
-      <td align="center">ND</td>
+      <td align="center">One-dimensional</td>
     </tr>
     <tr>
       <td align="center">Kernel Name</td>
@@ -91,11 +91,11 @@ y[i] = cast<To, Options>(x[i])
 
   - Key Kernel Steps
 
-    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct two-dimensional tensors in GM and UB.
+    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and a one-dimensional layout with `make_shape(256)` and `make_stride(1)` to construct the GM and UB tensors.
     2. Wrap the MTE2 pipeline with `asc_lock/asc_unlock`, and use `asc::te::copy` to move the input from GM to UB.
     3. Calculate the number of elements processed by each register operation based on the larger width of the source and destination types, and use `asc::te::experimental::update_mask` to set the valid-element mask.
-    4. Use a normal `load` for equal-width conversions, `unpack` or `unpack4` load modes for widening conversions, and `pack` or `pack_quarter` store modes for narrowing conversions.
-    5. Call `asc::te::experimental::cast` with C++17 template parameters to perform register data type conversion.
+    4. Use normal `load/store` for equal-width conversions, `unpack` or `unpack4` for widening loads, and use `deinterleave` to compact narrowing results before a normal `store`.
+    5. Call the current C API conversion overloads with `ASC_POSITION_EVEN` or `ASC_DISPERSE_FIRST_QUARTER`.
     6. Lock the Vector and MTE3 pipelines in sequence with the same mutex, and then move the result from UB to GM.
 
     The core conversion code is as follows:
@@ -104,13 +104,11 @@ y[i] = cast<To, Options>(x[i])
     auto srcReg = asc::te::experimental::load(src, coord);
     srcReg = srcReg.with_mask(asc::te::experimental::update_mask<WiderT>(remain));
 
-    constexpr asc::te::experimental::cast_options options = {
-        Layout, Round, Sat};
-    auto dstReg = asc::te::experimental::cast<DstT, options>(srcReg);
+    auto dstReg = asc::te::experimental::cast<int32_t>(srcReg);
     asc::te::experimental::store(dst, coord, dstReg);
     ```
 
-    When the source and destination types have different widths, the sample specifies the corresponding sideband mode for `load` or `store` so that the register data layout matches the conversion instruction.
+    A narrowing conversion uses layout zero for the register result. A 2x narrowing conversion applies one `deinterleave` operation to extract even positions, while a 4x narrowing conversion applies two to extract every fourth element before writing contiguous destination data with a normal `store`.
 
 ## Build and Run
 

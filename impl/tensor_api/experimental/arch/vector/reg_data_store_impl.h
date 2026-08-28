@@ -9,18 +9,15 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
-    "reg_data_store_impl.h is internal; include <tensor_api/experimental/arch/vector/reg_data_store.h> instead."
+#warning \
+    "impl/tensor_api/experimental/arch/vector/reg_data_store_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use tensor_api/experimental/arch/vector/reg_data_store.h instead."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE_IMPL
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE_IMPL_H
 #endif
 
 #ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_STORE_IMPL_H
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_STORE_IMPL_H
 
-#if !defined(INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_STORE_H)
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
-#endif
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
 #include "tensor_api/tensor/tensor.h"
 
@@ -37,8 +34,9 @@ struct store_to_ptr_impl<store_sideband_mode::direct> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
-        static_assert(is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> ||
-                          is_b16_type_v<RegDataType> || is_b32_type_v<RegDataType>,
+        static_assert(
+            is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> || is_b16_type_v<RegDataType> ||
+                is_b32_type_v<RegDataType>,
             "store direct supports b4, b8, b16, and b32 element types only");
         asc_storealign(dst, src.reg, src.mask);
     }
@@ -49,8 +47,9 @@ struct store_to_ptr_impl<store_sideband_mode::store_1st> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
-        static_assert(is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> ||
-                          is_b16_type_v<RegDataType> || is_b32_type_v<RegDataType>,
+        static_assert(
+            is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> || is_b16_type_v<RegDataType> ||
+                is_b32_type_v<RegDataType>,
             "store store_1st supports b4, b8, b16, and b32 element types only");
         asc_storealign_1st(dst, src.reg);
     }
@@ -61,7 +60,8 @@ struct store_to_ptr_impl<store_sideband_mode::pack> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
-        static_assert(is_b16_type_v<RegDataType> || is_b32_type_v<RegDataType> || is_b64_type_v<RegDataType>,
+        static_assert(
+            is_b16_type_v<RegDataType> || is_b32_type_v<RegDataType> || is_b64_type_v<RegDataType>,
             "store pack supports b16, b32, and b64 element types only");
         asc_storealign_pack(dst, src.reg, src.mask);
     }
@@ -72,7 +72,8 @@ struct store_to_ptr_impl<store_sideband_mode::pack_quarter> {
     template <typename Pointer, typename RegDataType>
     __simd_callee__ static inline void run(Pointer dst, const reg_tensor<RegDataType>& src)
     {
-        static_assert(AscendC::Std::is_one_of_v<RegDataType, int32_t, uint32_t, float>,
+        static_assert(
+            AscendC::Std::is_one_of_v<RegDataType, int32_t, uint32_t, float>,
             "store pack_quarter supports b32 element types (int32_t, uint32_t, and float) only");
         asc_storealign_pack_quarter(dst, src.reg, src.mask);
     }
@@ -84,9 +85,9 @@ struct store_to_ptr_impl<store_sideband_mode::intlv> {
     __simd_callee__ static inline void run(
         Pointer dst, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1)
     {
-        static_assert(is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> ||
-                          is_b16_type_v<RegDataType> ||
-                          AscendC::Std::is_one_of_v<RegDataType, int32_t, uint32_t>,
+        static_assert(
+            is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> || is_b16_type_v<RegDataType> ||
+                AscendC::Std::is_one_of_v<RegDataType, int32_t, uint32_t>,
             "store intlv supports b4, b8, b16, int32_t, and uint32_t element types only");
         asc_storealign_intlv(dst, src0.reg, src1.reg);
     }
@@ -112,10 +113,9 @@ __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
-    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<data_type, RegDataType>,
-        "store requires matching tensor and register element types");
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, RegDataType>, "store requires matching tensor and register element types");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "store");
 
     auto dst_engine = tensor.engine() + tensor.layout()(coord);
@@ -127,24 +127,22 @@ __simd_callee__ inline void store(Tensor& tensor, const reg_tensor<RegDataType>&
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
-    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<data_type, RegDataType>,
-        "store requires matching tensor and register element types");
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, RegDataType>, "store requires matching tensor and register element types");
 
     detail::store_to_ptr<sideband_mode>(tensor.engine().begin().get(), src);
 }
 
 template <store_sideband_mode sideband_mode, typename Tensor, typename Coord, typename RegDataType>
-__simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src0,
-    const reg_tensor<RegDataType>& src1)
+__simd_callee__ inline void store(
+    Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
-    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<data_type, RegDataType>,
-        "store requires matching tensor and register element types");
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, RegDataType>, "store requires matching tensor and register element types");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "store");
 
     auto dst_engine = tensor.engine() + tensor.layout()(coord);
@@ -157,10 +155,9 @@ __simd_callee__ inline void store(
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
-    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "store only supports tensors located in UB");
-    static_assert(Std::is_same_v<data_type, RegDataType>,
-        "store requires matching tensor and register element types");
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, RegDataType>, "store requires matching tensor and register element types");
 
     detail::store_to_ptr<sideband_mode>(tensor.engine().begin().get(), src0, src1);
 }
@@ -171,7 +168,7 @@ __simd_callee__ inline void store(
 
 #endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_STORE_IMPL_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE_IMPL)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE_IMPL_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE_IMPL
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE_IMPL_H
 #endif
