@@ -22,12 +22,13 @@ def main() -> None:
 
     indexes = np.arange(input_length, dtype=np.uint16)
     data = (indexes * np.uint16(37) + indexes % np.uint16(11)).astype(np.uint8)
-    frequency = np.bincount(data, minlength=256).astype(np.uint16)
-    golden = (frequency[:128] + initial_value).astype(np.uint16)
+    frequency = np.bincount(data, minlength=256).astype(np.uint32)
+    cumulative = np.cumsum(frequency, dtype=np.uint32)
+    golden = (cumulative[128:] + np.uint32(initial_value)).astype(np.uint16)
 
     data.tofile(Path("input") / "input.bin")
     golden.tofile(Path("output") / "golden.bin")
-    print("Generated frequency histogram data for low half bins.")
+    print("Generated cumulative histogram data for high half bins.")
 
 
 if __name__ == "__main__":

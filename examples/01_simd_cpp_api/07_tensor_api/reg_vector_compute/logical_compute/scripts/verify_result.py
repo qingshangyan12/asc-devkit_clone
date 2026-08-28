@@ -13,29 +13,18 @@ from pathlib import Path
 import numpy as np
 
 
-cases = (
-    ("int8", np.int8),
-    ("uint8", np.uint8),
-    ("int16", np.int16),
-    ("uint16", np.uint16),
-    ("int32", np.int32),
-    ("uint32", np.uint32),
-)
-
-
 def main() -> None:
     if len(sys.argv) > 2:
         raise ValueError("Usage: verify_result.py [output_dir]")
     output_dir = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("output")
-    golden_dir = output_dir
-    for name, dtype in cases:
-        actual = np.fromfile(output_dir / f"{name}_output.bin", dtype=dtype)
-        golden = np.fromfile(golden_dir / f"{name}_golden.bin", dtype=dtype)
-        if actual.shape == golden.shape and np.array_equal(actual, golden):
-            continue
+    actual = np.fromfile(output_dir / "output.bin", dtype=np.uint32)
+    golden = np.fromfile(output_dir / "golden.bin", dtype=np.uint32)
+    if actual.shape != golden.shape:
+        raise ValueError(f"expected shape {golden.shape}, got {actual.shape}")
+    if not np.array_equal(actual, golden):
         index = int(np.flatnonzero(actual != golden)[0])
-        raise ValueError(f"{name}: mismatch at index {index}, actual={actual[index]}, golden={golden[index]}")
-    print("test pass! verified scalar shift-left for six integer types.")
+        raise ValueError(f"mismatch at index {index}: actual={actual[index]}, golden={golden[index]}")
+    print("test pass! verified uint32 register shift-left.")
 
 
 if __name__ == "__main__":
