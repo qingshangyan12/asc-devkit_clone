@@ -114,22 +114,23 @@ struct NormalizePara {
 -   输入仅支持ND格式。
 -   R轴不支持切分。
 -   支持的数据类型<a id="li171091334311"></a>
-
     <!-- npu="950" id8 -->
     Ascend 950PR/Ascend 950DT，支持的数据类型为：half、bfloat16\_t、float。
     <!-- end id8 -->
-
     <!-- npu="A3" id9 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为: half、float。
     <!-- end id9 -->
-
     <!-- npu="910b" id10 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为: half、float。
     <!-- end id10 -->
-
     <!-- npu="310p" id11 -->
     Atlas 推理系列产品AI Core，支持的数据类型为: half、float。
     <!-- end id11 -->
+<!-- npu="950" id12 -->
+-   在Ascend 950PR/Ascend 950DT上，接口内部计算对Subnormal的处理方式受编译选项`--cce-ftz`控制（默认值为`true`）：
+    -   配置为`false`时，计算过程中保留Subnormal，并按照其实际数值参与后续计算。
+    -   配置为`true`时，启用FTZ（Flush-To-Zero）模式，计算过程中产生或参与运算的Subnormal将按0处理，可能导致计算结果与保留Subnormal时存在精度差异。
+<!-- end id12 -->
 
 ## 调用示例
 

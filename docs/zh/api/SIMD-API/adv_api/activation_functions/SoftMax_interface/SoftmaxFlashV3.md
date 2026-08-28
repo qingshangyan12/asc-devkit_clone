@@ -160,6 +160,11 @@ struct SoftMaxParams {
 -   srcTensor和dstTensor的Tensor的空间可以复用，meanTensor和inMeanTensor的空间可以复用，maxTensor和inMaxTensor的空间可以复用，expSumTensor和inExpSumTensor的空间可以复用。
 -   meanTensor、expSumTensor、maxTensor、expMaxTensor、inMeanTensor、inExpSumTensor、inMaxTensor的Tensor空间，last轴长度必须是32字节。
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
+<!-- npu="950" id7 -->
+-   在Ascend 950PR/Ascend 950DT上，接口内部计算对Subnormal的处理方式受编译选项`--cce-ftz`控制（默认值为`true`）：
+    -   配置为`false`时，计算过程中保留Subnormal，并按照其实际数值参与后续计算。
+    -   配置为`true`时，启用FTZ（Flush-To-Zero）模式，计算过程中产生或参与运算的Subnormal将按0处理，可能导致计算结果与保留Subnormal时存在精度差异。
+<!-- end id7 -->
 
 ## 调用示例
 
