@@ -17,6 +17,7 @@
 #include "alltoallv_auto_selector.h"
 #include "cann_host_bridge.h"
 #include "coll_alg_v2_exec_registry.h"
+#include "execute_selector.h"
 #include "executor_v2_base.h"
 #include "gtest/gtest.h"
 #include "ins_temp_all_to_all_v_mesh_1D.h"
@@ -72,10 +73,10 @@ protected:
     void SetUp() override { ResetAlgEnvConfigInitState(); }
 };
 
-TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_cann_bridge_routes)
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_bridge_routes)
 {
     for (CommEngine engine : {COMM_ENGINE_AICPU_TS, COMM_ENGINE_AICPU}) {
-        EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, engine)));
+        EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, engine)));
         EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, engine)));
         EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, engine)));
         EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLGATHER, engine)));
@@ -87,14 +88,29 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_cann_brid
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, COMM_ENGINE_CPU)));
 }
 
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, execute_selector_uses_local_devkit_for_alltoall)
+{
+    ExecuteSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    u64 sendCounts[4] = {1U, 1U, 1U, 1U};
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
+    param.all2AllVDataDes.sendCounts = sendCounts;
+    std::string algName;
+
+    EXPECT_EQ(selector.Run(param, &topo, algName), HCCL_SUCCESS);
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX");
+}
+
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_mesh1d_and_concurrent_algorithms)
 {
     CollAlgExecRegistryV2& registry = CollAlgExecRegistryV2::Instance();
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALLV, "AicpuAllToAllVSoleMesh"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMeshSingleChannel"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMesh"), nullptr);
+#if !defined(HCCL_CANN_COMPAT_850)
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALL, "AicpuAllToAllSoleMeshConcurrent"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLTOALLV, "AicpuAllToAllVSoleMeshConcurrent"), nullptr);
+#endif
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_concurrent_selectors_obey_topology_and_count_boundaries)
@@ -113,11 +129,19 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_concurrent_selectors_obey_topology
     param = MakeAicpuParam(HCCL_CMD_ALLTOALL);
     param.all2AllVDataDes.sendCounts = sendCounts;
     EXPECT_EQ(alltoallSelector.Select(param, &topo, algName), SelectorStatus::MATCH);
+#if defined(HCCL_CANN_COMPAT_850)
+    EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX");
+#else
     EXPECT_EQ(algName, "AicpuAllToAllSoleMeshConcurrent");
+#endif
 
     param = MakeAicpuParam(HCCL_CMD_ALLTOALLV);
+#if defined(HCCL_CANN_COMPAT_850)
+    EXPECT_EQ(alltoallvSelector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
+#else
     EXPECT_EQ(alltoallvSelector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllToAllVSoleMeshConcurrent");
+#endif
 
     topo.userRankSize = 5U;
     EXPECT_EQ(alltoallvSelector.Select(param, &topo, algName), SelectorStatus::NOT_MATCH);
