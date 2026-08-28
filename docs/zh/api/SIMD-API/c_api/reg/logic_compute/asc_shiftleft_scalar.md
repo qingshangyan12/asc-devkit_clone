@@ -29,7 +29,7 @@
 根据掩码将源操作数矢量数据寄存器中的元素左移，左移位数由标量立即数指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：
 
 $$
-dst_i = src_i \ll value
+dst_i = src_i \ll shift
 $$
 
 根据源操作数的数据类型，左移操作分为以下两种情况：
@@ -44,13 +44,13 @@ $$
 ```c
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_<dtype> asc_shiftleft_scalar(vector_<dtype> src,
-                                                           int16_t value,
+                                                           int16_t shift,
                                                            vector_bool mask)
 
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_shiftleft_scalar(vector_<dtype>& dst,
                                                  vector_<dtype> src,
-                                                 int16_t value,
+                                                 int16_t shift,
                                                  vector_bool mask)
 ```
 
@@ -63,13 +63,13 @@ __simd_callee__ inline void asc_shiftleft_scalar(vector_<dtype>& dst,
 ```c
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_int8_t asc_shiftleft_scalar(vector_int8_t src,
-                                                          int16_t value,
+                                                          int16_t shift,
                                                           vector_bool mask)
 
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_shiftleft_scalar(vector_int8_t& dst,
                                                  vector_int8_t src,
-                                                 int16_t value,
+                                                 int16_t shift,
                                                  vector_bool mask)
 ```
 
@@ -81,7 +81,7 @@ __simd_callee__ inline void asc_shiftleft_scalar(vector_int8_t& dst,
 |---|---|---|
 | dst | 输出 | 目的操作数（矢量数据寄存器）。仅无返回值类型接口包含该参数，数据类型须与`src`一致。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
-| value | 输入 | 源操作数（标量），类型为`int16_t`，不支持设置为负数。 |
+| shift | 输入 | 位移量（标量），类型为`int16_t`，不支持设置为负数。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示参与计算的元素。对应位置为1时参与计算，为0时不参与计算且输出结果对应元素置零。需通过掩码设置接口预先赋值后再传入。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
@@ -101,8 +101,8 @@ __simd_callee__ inline void asc_shiftleft_scalar(vector_int8_t& dst,
 
 ### 位移约束
 
-- `value`不支持设置为负数，负数行为未定义。
-- 当`value`大于`src`的数据类型位宽时，输出结果中的有效元素置零。
+- `shift`不支持设置为负数，负数行为未定义。
+- 当`shift`大于`src`的数据类型位宽时，输出结果中的有效元素置零。
 
 ## 调用示例
 
