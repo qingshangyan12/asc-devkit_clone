@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include <securec.h>
 
-uint32_t logLevel = 0x01; // INFO级别，可通过 HCCL_LOG_LEVEL 环境变量覆盖
+uint32_t logLevel = 0x03; // ERROR级别，可通过 HCCL_LOG_LEVEL 环境变量覆盖
 
 static uint32_t InitLogLevel()
 {

@@ -194,6 +194,12 @@ TEST_F(TestHcclTilingCcuKfc, AllToAllVCcuSchedUsesCcuNewVersion)
         INIT_TILING_CCU_NEW_VERSION);
 }
 
+TEST_F(TestHcclTilingCcuKfc, AllToAllCcuSchedUsesCcuNewVersion)
+{
+    ExpectInitTilingVersion(
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuAlltoAllMesh1D", 6U, INIT_TILING_CCU_NEW_VERSION);
+}
+
 TEST_F(TestHcclTilingCcuKfc, UnsupportedCommEngineUsesDefaultVersion)
 {
     ExpectInitTilingVersion(

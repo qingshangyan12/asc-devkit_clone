@@ -371,10 +371,7 @@ void Variable::operator+=(const Variable& other) const
     CompilerContext::Current().Append(operation);
 }
 
-VariableExpr Variable::operator+(const Variable& other) const
-{
-    return VariableExpr(handle, other.handle);
-}
+VariableExpr Variable::operator+(const Variable& other) const { return VariableExpr(handle, other.handle); }
 
 Condition Variable::operator==(uint64_t immediate) const { return Condition{handle, immediate, true}; }
 
@@ -417,15 +414,9 @@ void Address::operator+=(const Address& other) const
     CompilerContext::Current().Append(operation);
 }
 
-AddressExpr Address::operator+(const Address& other) const
-{
-    return AddressExpr(handle, other.handle, true);
-}
+AddressExpr Address::operator+(const Address& other) const { return AddressExpr(handle, other.handle, true); }
 
-AddressExpr Address::operator+(const Variable& variable) const
-{
-    return AddressExpr(handle, variable.handle, true);
-}
+AddressExpr Address::operator+(const Variable& variable) const { return AddressExpr(handle, variable.handle, true); }
 
 LocalAddr::LocalAddr() : addr(0), token(0)
 {

@@ -14,12 +14,16 @@
 # ==========================================================================================================
 set(HCCL_CCU_ST_TARGET ascendc_ut_adv_api_ccu_st)
 set(HCCL_MC2_CCU_ALL_TO_ALL_V_DIR ${CMAKE_CURRENT_SOURCE_DIR}/all_to_all_v)
+set(HCCL_MC2_CCU_ALL_TO_ALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/all_to_all)
 
 set(HCCL_SELECTOR_PRODUCT_SOURCES
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector/alltoall_auto_selector.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/aicpu/ins_temp_ubx_all_to_all_v_mesh_1D.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/ccu_temp_all_to_all_mesh_1D.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/ccu_temp_all_to_all_v_mesh_1D.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/op_common.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/selector/auto_selector_base.cc
@@ -57,6 +61,9 @@ add_executable(
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}/all_to_all_v_testcase.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}/ccu_all_to_all_v_mesh1d_adapter.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}/ccu_all_to_all_v.cc
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/all_to_all_testcase.cpp
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all_mesh1d_adapter.cc
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all.cc
     ${UTILS_DIR}/ccu_scenario/ccu_fixture.cc
     ${HCCL_SELECTOR_PRODUCT_SOURCES}
 )
@@ -66,6 +73,7 @@ target_include_directories(
     PRIVATE
     ${UTILS_DIR}/hccl_proxy
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}
+    ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}
     ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
     ${UTILS_DIR}/ccu_scenario
     ${HCCL_CC_SRC_DIR}

@@ -39,6 +39,10 @@ uint32_t DataTypeSize(HcclDataType dataType)
         case HCCL_DATA_TYPE_INT32:
         case HCCL_DATA_TYPE_FP32:
             return 4;
+        case HCCL_DATA_TYPE_INT64:
+        case HCCL_DATA_TYPE_UINT64:
+        case HCCL_DATA_TYPE_FP64:
+            return 8;
         default:
             return 0;
     }

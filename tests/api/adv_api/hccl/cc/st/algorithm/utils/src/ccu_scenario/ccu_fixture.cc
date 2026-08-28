@@ -10,6 +10,8 @@
 
 #include "ccu_fixture.h"
 
+#include <functional>
+
 #include "sim_communicator.h"
 #include "sim_world.h"
 #include "topo_model.h"
@@ -162,6 +164,20 @@ void CcuStFixture::VerifyScenario(const CcuStScenario& scenario)
     RegisterManager::Global().Reset();
     ResetCcuKernelRegisterCount();
 
+    // RAII: 保证 ASSERT 失败时也能清理 SimWorld 和环境变量
+    struct ScopeGuard {
+        std::function<void()> onExit;
+        ~ScopeGuard()
+        {
+            if (onExit)
+                onExit();
+        }
+    } guard{[]() {
+        HcclSim::SimWorld::Global()->Deinit();
+        unsetenv("HCCL_OP_EXPANSION_MODE");
+        unsetenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
+    }};
+
     setenv("HCCL_OP_EXPANSION_MODE", "CCU_SCHED", 1);
     setenv("ASCEND_ENABLE_CCU_KFC_BRANCH", "1", 1);
     mc2_ops_hccl::InitEnvConfig();
@@ -207,10 +223,6 @@ void CcuStFixture::VerifyScenario(const CcuStScenario& scenario)
         CheckResult runtime = CheckRuntimeOutput(data.memories, expectation, world);
         ASSERT_TRUE(runtime.Ok()) << runtime.message;
     }
-
-    HcclSim::SimWorld::Global()->Deinit();
-    unsetenv("HCCL_OP_EXPANSION_MODE");
-    unsetenv("ASCEND_ENABLE_CCU_KFC_BRANCH");
 }
 
 } // namespace CcuSt

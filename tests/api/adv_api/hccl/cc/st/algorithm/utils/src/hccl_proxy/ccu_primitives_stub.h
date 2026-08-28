@@ -93,6 +93,7 @@ public:
     VariableExpr(ResourceHandle lhs, ResourceHandle rhs) : lhsHandle(lhs), rhsHandle(rhs) {}
     ResourceHandle LhsHandle() const { return lhsHandle; }
     ResourceHandle RhsHandle() const { return rhsHandle; }
+
 private:
     ResourceHandle lhsHandle{0};
     ResourceHandle rhsHandle{0};
@@ -123,10 +124,13 @@ private:
 
 class AddressExpr {
 public:
-    AddressExpr(ResourceHandle lhs, ResourceHandle rhs, bool lhsIsAddr) : lhsHandle(lhs), rhsHandle(rhs), lhsIsAddress(lhsIsAddr) {}
+    AddressExpr(ResourceHandle lhs, ResourceHandle rhs, bool lhsIsAddr)
+        : lhsHandle(lhs), rhsHandle(rhs), lhsIsAddress(lhsIsAddr)
+    {}
     ResourceHandle LhsHandle() const { return lhsHandle; }
     ResourceHandle RhsHandle() const { return rhsHandle; }
     bool LhsIsAddress() const { return lhsIsAddress; }
+
 private:
     ResourceHandle lhsHandle{0};
     ResourceHandle rhsHandle{0};

@@ -142,6 +142,7 @@ bool IsCcuKfcSupportedOp(uint32_t opType)
 {
     return opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER) ||
            opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER) ||
+           opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL) ||
            opType == static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV);
 }
 } // namespace
@@ -509,6 +510,7 @@ HcclResult PrepareParamForAlltoAll(
     u64 varMemSize = ALL_TO_ALL_V_VECTOR_NUM * userRankSize * sizeof(u64);
     param.varMemSize = varMemSize;
     param.opType = HcclCMDType::HCCL_CMD_ALLTOALL;
+    param.reduceType = HcclReduceOp::HCCL_REDUCE_SUM;
     param.all2AllVDataDes.sendType = static_cast<HcclDataType>(ccTiling->srcDataType);
     param.all2AllVDataDes.recvType = static_cast<HcclDataType>(ccTiling->dstDataType);
     param.all2AllVDataDes.sendCounts = nullptr;
