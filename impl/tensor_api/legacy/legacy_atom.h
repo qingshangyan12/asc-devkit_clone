@@ -13,10 +13,6 @@
 
 #include "impl/tensor_api/legacy/legacy_type.h"
 
-#define ASCENDC_TENSOR_API_LEGACY_FUNCTION_DEPRECATED                                                           \
-    [[deprecated("PascalCase Tensor API is deprecated. Please use the corresponding snake_case API in asc::te " \
-                 "instead.")]]
-
 namespace AscendC {
 namespace Te {
 
@@ -428,7 +424,7 @@ struct CopyAtom<CopyTraits<Args...>> : public CopyTraits<Args...> {
 
 // Copy / MakeCopy: PascalCase 接口
 template <typename AtomType, typename DstTensor, typename SrcTensor>
-ASCENDC_TENSOR_API_LEGACY_FUNCTION_DEPRECATED __aicore__ inline void Copy(
+__aicore__ inline void Copy(
     const AtomType& atom, const DstTensor& dst, const SrcTensor& src)
 {
     atom.call(dst, src);
@@ -437,21 +433,21 @@ ASCENDC_TENSOR_API_LEGACY_FUNCTION_DEPRECATED __aicore__ inline void Copy(
 template <
     typename AtomType, typename DstTensor, typename SrcTensor, typename Quant,
     Std::enable_if_t<is_valid_quant_v<Quant>, int> = 0>
-ASCENDC_TENSOR_API_LEGACY_FUNCTION_DEPRECATED __aicore__ inline void Copy(
+__aicore__ inline void Copy(
     const AtomType& atom, const DstTensor& dst, const SrcTensor& src, const Quant& quant)
 {
     atom.call(dst, src, quant);
 }
 
 template <typename CopyOperationType>
-ASCENDC_TENSOR_API_LEGACY_FUNCTION_DEPRECATED __aicore__ inline constexpr auto MakeCopy(
+__aicore__ inline constexpr auto MakeCopy(
     const CopyOperationType& copy_operation)
 {
     return CopyAtom<CopyOperationType>{};
 }
 
 template <typename CopyOperationType, typename CopyTraitType>
-ASCENDC_TENSOR_API_LEGACY_FUNCTION_DEPRECATED __aicore__ inline constexpr auto MakeCopy(
+__aicore__ inline constexpr auto MakeCopy(
     const CopyOperationType& copy_operation, const CopyTraitType& copy_trait)
 {
     return CopyAtom<CopyTraits<CopyOperationType, CopyTraitType>>{};
@@ -459,7 +455,5 @@ ASCENDC_TENSOR_API_LEGACY_FUNCTION_DEPRECATED __aicore__ inline constexpr auto M
 
 } // namespace Te
 } // namespace AscendC
-
-#undef ASCENDC_TENSOR_API_LEGACY_FUNCTION_DEPRECATED
 
 #endif // IMPL_TENSOR_API_LEGACY_LEGACY_ATOM_H
