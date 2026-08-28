@@ -28,7 +28,7 @@
 #endif
 
 namespace __asc_simd_vf {
-__simd_callee__ inline void trap()
+__simd_callee__ inline void __trap()
 {
 #if !defined(ASCENDC_CPU_DEBUG)
     *((volatile __ubuf__ uint8_t*)-1) = 0;
@@ -43,7 +43,7 @@ static __attribute__((noinline)) __simd_callee__ void __assert_fail(
 {
     printf_impl_assert("[ASSERT] %s:%u: %s: Assertion `%s' failed.\n", file, line, function, assertion);
     wait_vf_assert_handshake();
-    trap();
+    __trap();
 }
 
 template <typename... Args>
@@ -53,7 +53,7 @@ static __attribute__((noinline)) __simd_callee__ void __assert_fail_msg(
 {
     printf_impl_assert_msg(assertion, file, line, function, fmt, args...);
     wait_vf_assert_handshake();
-    trap();
+    __trap();
 }
 #endif
 } // namespace __asc_simd_vf
