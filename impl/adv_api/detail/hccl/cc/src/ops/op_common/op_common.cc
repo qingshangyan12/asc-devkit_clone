@@ -1786,10 +1786,17 @@ static HcclResult RegisterCcuKernels(
                 kfcKernelHandle = kernelHandle;
                 switch (kfcArg->opParam.opType) {
                     case HcclCMDType::HCCL_CMD_ALLGATHER:
-                        kfcFuncName = KFC_ALL_GATHER_FUNC_NAME;
+                        if (kfcArg->role == KfcServerRole::ALL_GATHER_NHR) {
+                            kfcFuncName = KFC_ALL_GATHER_NHR_FUNC_NAME;
+                        } else {
+                            kfcFuncName = KFC_ALL_GATHER_FUNC_NAME;
+                        }
                         break;
                     case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
                         kfcFuncName = KFC_REDUCE_SCATTER_FUNC_NAME;
+                        break;
+                    case HcclCMDType::HCCL_CMD_ALLREDUCE:
+                        kfcFuncName = KFC_ALL_REDUCE_FUNC_NAME;
                         break;
                     default:
                         HCCL_ERROR(
