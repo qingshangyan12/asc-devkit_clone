@@ -14,6 +14,92 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
+namespace {
+template <typename T>
+constexpr Literal LoadAlignReturnExpectedDist()
+{
+    return Literal::NORM;
+}
+
+template <typename T>
+constexpr Literal LoadAlignBrcElemReturnExpectedDist()
+{
+    if constexpr (sizeof(T) == 1) {
+        return Literal::BRC_B8;
+    } else if constexpr (sizeof(T) == 2) {
+        return Literal::BRC_B16;
+    } else {
+        return Literal::BRC_B32;
+    }
+}
+
+template <typename T>
+constexpr Literal LoadAlignBrcDatablockReturnExpectedDist()
+{
+    return Literal::BLK;
+}
+
+template <typename T>
+constexpr Literal LoadAlignBrcElem2DatablockReturnExpectedDist()
+{
+    if constexpr (sizeof(T) == 2) {
+        return Literal::E2B_B16;
+    } else {
+        return Literal::E2B_B32;
+    }
+}
+
+template <typename T>
+constexpr Literal LoadAlignDownsampleReturnExpectedDist()
+{
+    if constexpr (sizeof(T) == 1) {
+        return Literal::DS_B8;
+    } else {
+        return Literal::DS_B16;
+    }
+}
+
+template <typename T>
+constexpr Literal LoadAlignMaskDownsampleReturnExpectedDist()
+{
+    return Literal::DS;
+}
+
+template <typename T>
+constexpr Literal LoadAlignUnpackReturnExpectedDist()
+{
+    if constexpr (sizeof(T) == 1) {
+        return Literal::UNPK_B8;
+    } else if constexpr (sizeof(T) == 2) {
+        return Literal::UNPK_B16;
+    } else {
+        return Literal::UNPK_B32;
+    }
+}
+
+template <typename T>
+constexpr Literal LoadAlignUnpack4ReturnExpectedDist()
+{
+    return Literal::UNPK4_B8;
+}
+
+template <typename T>
+constexpr Literal LoadAlignUpsampleReturnExpectedDist()
+{
+    if constexpr (sizeof(T) == 1) {
+        return Literal::US_B8;
+    } else {
+        return Literal::US_B16;
+    }
+}
+
+template <typename T>
+constexpr Literal LoadAlignMaskUpsampleReturnExpectedDist()
+{
+    return Literal::US;
+}
+} // namespace
+
 #define TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(                                                                  \
     class_name, c_api_name, cce_name, dst_type, src_type, cce_dst_type, cce_src_type)                           \
     class TestVectorDatamove##class_name##dst_type##src_type##CApi : public testing::Test {                     \
@@ -25,14 +111,18 @@
     namespace {                                                                                                 \
     void c_api_name##_##dst_type##_##src_type##_ReturnStub(                                                     \
         cce_dst_type& dst, __ubuf__ cce_src_type* src, int32_t offset, Literal load_dist)                       \
-    {}                                                                                                          \
+    {                                                                                                           \
+        EXPECT_EQ(src, reinterpret_cast<__ubuf__ cce_src_type*>(11));                                           \
+        EXPECT_EQ(offset, static_cast<int32_t>(0));                                                             \
+        EXPECT_EQ(load_dist, class_name##ExpectedDist<src_type>());                                             \
+    }                                                                                                           \
     }                                                                                                           \
                                                                                                                 \
     TEST_F(                                                                                                     \
         TestVectorDatamove##class_name##dst_type##src_type##CApi,                                              \
         c_api_name##_##dst_type##_##src_type##_ReturnSucc)                                                     \
     {                                                                                                           \
-        __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(0);                                      \
+        __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                     \
                                                                                                                 \
         MOCKER_CPP(cce_name, void(cce_dst_type&, __ubuf__ cce_src_type*, int32_t, Literal))                     \
             .times(1)                                                                                           \

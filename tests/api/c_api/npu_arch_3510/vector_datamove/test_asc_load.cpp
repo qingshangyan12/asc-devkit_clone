@@ -24,15 +24,20 @@
     };                                                                                                       \
                                                                                                              \
     namespace {                                                                                              \
-    void cce_name1##_##data_type##_Stub1(vector_load_unalign& src0, __ubuf__ cce_data_type* src1) {}         \
+    void cce_name1##_##data_type##_Stub1(vector_load_unalign& src0, __ubuf__ cce_data_type* src1)            \
+    {                                                                                                        \
+        EXPECT_EQ(src1, reinterpret_cast<__ubuf__ cce_data_type*>(11));                                      \
+    }                                                                                                        \
     void cce_name0##_##data_type##_Stub0(                                                                    \
         vector_##cce_data_type& dst, vector_load_unalign& src0, __ubuf__ cce_data_type* src1)                \
-    {}                                                                                                       \
+    {                                                                                                        \
+        EXPECT_EQ(src1, reinterpret_cast<__ubuf__ cce_data_type*>(11));                                      \
+    }                                                                                                        \
     }                                                                                                        \
                                                                                                              \
     TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_type##_Succ)             \
     {                                                                                                        \
-        __ubuf__ data_type* src = reinterpret_cast<__ubuf__ data_type*>(0);                                  \
+        __ubuf__ data_type* src = reinterpret_cast<__ubuf__ data_type*>(11);                                 \
         dst_data_type dst;                                                                                   \
                                                                                                              \
         MOCKER_CPP(cce_name1, void(vector_load_unalign&, __ubuf__ cce_data_type*))                           \
@@ -51,7 +56,7 @@
     class_name, c_api_name, cce_name0, cce_name1, dst_data_type, data_type, cce_data_type)                   \
     TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_type##_ReturnSucc)       \
     {                                                                                                        \
-        __ubuf__ data_type* src = reinterpret_cast<__ubuf__ data_type*>(0);                                  \
+        __ubuf__ data_type* src = reinterpret_cast<__ubuf__ data_type*>(11);                                 \
                                                                                                              \
         MOCKER_CPP(cce_name1, void(vector_load_unalign&, __ubuf__ cce_data_type*))                           \
             .times(1)                                                                                        \
