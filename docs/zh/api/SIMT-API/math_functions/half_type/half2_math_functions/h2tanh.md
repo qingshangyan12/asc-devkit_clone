@@ -73,9 +73,12 @@ inline half2 h2tanh(half2 x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel_tanh(half2* dst, half2* x)
+    __global__ __launch_bounds__(1024) void kernel_tanh(half2* dst, half2* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2tanh(x[idx]);
     }
     ```
@@ -83,9 +86,12 @@ inline half2 h2tanh(half2 x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_tanh(__gm__ half2* dst, __gm__ half2* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_tanh(__gm__ half2* dst, __gm__ half2* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = h2tanh(x[idx]);
     }
     ```

@@ -70,10 +70,10 @@ unsigned short int的数据按位重新解释为bfloat16的值。以下列出典
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__ushort_as_bfloat16(bfloat16_t* dst, unsigned short int* x, uint32_t input_total_length)
+    __global__ __launch_bounds__(1024) void kernel__ushort_as_bfloat16(bfloat16_t* dst, unsigned short int* x, uint32_t total_length)
     {
         uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
-        if (idx >= input_total_length) {
+        if (idx >= total_length) {
             return;
         }
         dst[idx] = __ushort_as_bfloat16(x[idx]);
@@ -83,10 +83,10 @@ unsigned short int的数据按位重新解释为bfloat16的值。以下列出典
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__ushort_as_bfloat16(__gm__ bfloat16_t* dst, __gm__ unsigned short int* x, uint32_t input_total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__ushort_as_bfloat16(__gm__ bfloat16_t* dst, __gm__ unsigned short int* x, uint32_t total_length)
     {
         uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
-        if (idx >= input_total_length) {
+        if (idx >= total_length) {
             return;
         }
         dst[idx] = __ushort_as_bfloat16(x[idx]);
