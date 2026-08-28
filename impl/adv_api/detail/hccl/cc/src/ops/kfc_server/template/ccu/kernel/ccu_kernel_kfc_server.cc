@@ -100,7 +100,7 @@ ccu::Func KfcAllReduceFunc(
                 normalSliceSize, lastSliceSize, mySliceSize, sliceOffset, isInputOutputEqual, goSize0, goSize1, goSize2,
                 goSize3, chunkSize, tailSize, chunkLoopNum, arg.channels, arg.channelCount, static_cast<uint32_t>(arg.rankSize),
                 arg.rankId, arg.opParam.DataDes.dataType, arg.opParam.DataDes.outputType, arg.opParam.reduceType),
-            "define KFC AllReducer func failed");
+            "define KFC AllReduce func failed");
     },
     KFC_ALL_REDUCE_FUNC_NAME);
 
