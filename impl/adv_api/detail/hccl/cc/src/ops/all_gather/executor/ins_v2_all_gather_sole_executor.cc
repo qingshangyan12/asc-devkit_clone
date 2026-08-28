@@ -186,7 +186,8 @@ REGISTER_EXEC_V2(
     InsTempAllGatherMesh1D);
 
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherNHR, InsV2AllGatherSoleExecutor, TopoMatch1D, InsTempAllGatherNHR);
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHR, InsV2AllGatherSoleExecutor, TopoMatch1D,
+    InsTempAllGatherNHR);
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 
