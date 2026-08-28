@@ -51,7 +51,7 @@ int32_t main(int argc, char const *argv[])
 
 开发者可以使用bisheng命令行将hello\_world.aicpu与main.asc分别编译成.o，再链接成为可执行文件，编译命令如下：
 
--   编译hello\_world.aicpu时，通过-I指定依赖头文件所在路径；通过--cce-aicpu-laicpu\_api为Device链接依赖的库libaicpu\_api.a，通过--cce-aicpu-L指定libaicpu\_api.a的库路径；通过--cce-aicpu-toolkit-path指定AI CPU交叉编译工具链路径；通过--cce-aicpu-sysroot指定AI CPU交叉编译所使用的系统根目录。
+-   编译hello\_world.aicpu时，通过-I指定依赖头文件所在路径；通过--cce-aicpu-laicpu\_api为Device链接依赖的库libaicpu\_api.a，通过--cce-aicpu-L指定libaicpu\_api.a的库路径；通过--cce-aicpu-toolkit-path指定AI CPU编译工具链路径；通过--cce-aicpu-sysroot指定AI CPU编译所使用的系统根目录。
 -   编译main.asc时，通过--npu-arch编译选项指定对应的架构版本号。
 
 `${INSTALL_DIR}`请替换为CANN软件安装后文件存储路径。以root用户安装为例，安装后文件默认存储路径为：/usr/local/Ascend/cann。
