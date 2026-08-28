@@ -37,7 +37,7 @@ struct store_to_ptr_impl<store_sideband_mode::direct> {
         static_assert(
             is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> || is_b16_type_v<RegDataType> ||
                 is_b32_type_v<RegDataType>,
-           "store direct supports b4, b8, b16, and b32 element types only");
+            "store direct supports b4, b8, b16, and b32 element types only");
         asc_storealign(dst, src.reg, src.mask);
     }
 };

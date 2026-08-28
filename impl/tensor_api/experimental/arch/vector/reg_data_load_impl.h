@@ -37,7 +37,7 @@ struct load_from_ptr_impl<load_sideband_mode::direct> {
         static_assert(
             is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> || is_b32_type_v<DataType> ||
                 is_b64_type_v<DataType>,
-             "load direct supports b4, b8, b16, b32, and b64 element types only");
+            "load direct supports b4, b8, b16, b32, and b64 element types only");
         reg_tensor<DataType> dst;
         asc_loadalign(dst.reg, src);
         return dst;
