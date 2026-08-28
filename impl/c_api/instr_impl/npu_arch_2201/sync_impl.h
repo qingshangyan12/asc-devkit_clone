@@ -27,8 +27,6 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_SYNC_C_API_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_SYNC_C_API_IMPL_SYNC_C_API_IMPL_H
 
-#include <type_traits>
-
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 #include "impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_set_flag_impl.h"
@@ -88,44 +86,38 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe, uint16_t flag_id) { asc_
 
 __aicore__ inline void asc_sync_inter_wait(pipe_t pipe, uint16_t flag_id) { asc_sync_inter_wait_impl(pipe, flag_id); }
 
-template <typename T, typename std::enable_if<std::is_same<T, int64_t>::value, int>::type = 0>
 [[deprecated("NOTICE: int64_t flag_id overload is deprecated. Please use uint16_t flag_id instead")]]
-__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, T flag_id)
+__aicore__ inline void asc_sync_block_arrive(pipe_t pipe, int64_t flag_id)
 {
     asc_sync_block_arrive(pipe, static_cast<uint16_t>(flag_id));
 }
 
-template <typename T, typename std::enable_if<std::is_same<T, int64_t>::value, int>::type = 0>
 [[deprecated("NOTICE: int64_t flag_id overload is deprecated. Please use uint16_t flag_id instead")]]
-__aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, T flag_id)
+__aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, int64_t flag_id)
 {
     asc_sync_subblock_arrive(pipe, static_cast<uint16_t>(flag_id));
 }
 
-template <typename T, typename std::enable_if<std::is_same<T, int64_t>::value, int>::type = 0>
 [[deprecated("NOTICE: int64_t flag_id overload is deprecated. Please use uint16_t flag_id instead")]]
-__aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, T flag_id)
+__aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id)
 {
     asc_sync_inter_arrive(pipe, static_cast<uint16_t>(flag_id));
 }
 
-template <typename T, typename std::enable_if<std::is_same<T, int64_t>::value, int>::type = 0>
 [[deprecated("NOTICE: int64_t flag_id overload is deprecated. Please use uint16_t flag_id instead")]]
-__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, T flag_id)
+__aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id)
 {
     asc_sync_subblock_wait(pipe, static_cast<uint16_t>(flag_id));
 }
 
-template <typename T, typename std::enable_if<std::is_same<T, int64_t>::value, int>::type = 0>
 [[deprecated("NOTICE: int64_t flag_id overload is deprecated. Please use uint16_t flag_id instead")]]
-__aicore__ inline void asc_sync_block_wait(pipe_t pipe, T flag_id)
+__aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id)
 {
     asc_sync_block_wait(pipe, static_cast<uint16_t>(flag_id));
 }
 
-template <typename T, typename std::enable_if<std::is_same<T, int64_t>::value, int>::type = 0>
 [[deprecated("NOTICE: int64_t flag_id overload is deprecated. Please use uint16_t flag_id instead")]]
-__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, T flag_id)
+__aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id)
 {
     asc_sync_inter_wait(pipe, static_cast<uint16_t>(flag_id));
 }

@@ -9,6 +9,17 @@ RUN_TIMEOUT=${SYNC_TEST_TIMEOUT:-60}
 BUILD_DIR="${SCRIPT_DIR}/build-dav-3510"
 MODES=(block subblock inter intra)
 FAILED_MODES=()
+CONSTEXPR_FLAG_ID_MODE=${1:-0}
+
+if [[ "$#" -gt 1 || ( "${CONSTEXPR_FLAG_ID_MODE}" != 0 && "${CONSTEXPR_FLAG_ID_MODE}" != 1 ) ]]; then
+    echo "Usage: $0 [0|1]" >&2
+    exit 2
+fi
+
+BISHENG_OPTIONS=()
+if [[ "${CONSTEXPR_FLAG_ID_MODE}" == 1 ]]; then
+    BISHENG_OPTIONS+=("-DSYNC_FLAG_ID_CONSTEXPR=1")
+fi
 
 if [[ -z "${CANN_ROOT}" || ! -f "${CANN_ROOT}/set_env.sh" ]]; then
     echo "ASCEND_HOME_PATH or ASCEND_TOOLKIT_HOME must point to a valid CANN installation." >&2
@@ -16,70 +27,63 @@ if [[ -z "${CANN_ROOT}" || ! -f "${CANN_ROOT}/set_env.sh" ]]; then
 fi
 
 CANN_ASC_ROOT="${CANN_ROOT}/asc"
-PACKAGE_PATHS=(
-    "${CANN_ASC_ROOT}/include/c_api"
-    "${CANN_ASC_ROOT}/impl/c_api"
-    "${CANN_ASC_ROOT}/include/utils"
-    "${CANN_ASC_ROOT}/impl/utils"
-)
 REPO_PATHS=(
     "${REPO_ROOT}/include/c_api"
     "${REPO_ROOT}/impl/c_api"
     "${REPO_ROOT}/include/utils"
     "${REPO_ROOT}/impl/utils"
 )
-BACKUP_SUFFIX=".sync_flag_id_backup"
-SWAPPED_PATHS=()
+OVERLAY_FILE=$(mktemp "${TMPDIR:-/tmp}/sync_flag_id.XXXXXX.vfsoverlay")
 
-restore_package()
+cleanup()
 {
-    for index in "${SWAPPED_PATHS[@]}"; do
-        target="${PACKAGE_PATHS[index]}"
-        backup="${target}${BACKUP_SUFFIX}"
-        if [[ -L "${target}" ]]; then
-            unlink "${target}"
-        fi
-        if [[ -e "${backup}" || -L "${backup}" ]]; then
-            mv "${backup}" "${target}"
-        fi
-    done
+    rm -f "${OVERLAY_FILE}"
 }
 
-trap restore_package EXIT
+create_vfs_overlay()
+{
+    local first_entry=1
+    local repo_path
+    local file_path
+    local relative_path
+
+    {
+        printf '{\n  "version": 0,\n  "roots": [\n'
+        for repo_path in "${REPO_PATHS[@]}"; do
+            while IFS= read -r file_path; do
+                relative_path=${file_path#"${REPO_ROOT}/"}
+                if [[ "${first_entry}" -eq 0 ]]; then
+                    printf ',\n'
+                fi
+                printf '    {"type":"file","name":"%s","external-contents":"%s","use-external-name":"false"}' \
+                    "${CANN_ASC_ROOT}/${relative_path}" "${file_path}"
+                first_entry=0
+            done < <(find "${repo_path}" -type f | sort)
+        done
+        printf '\n  ]\n}\n'
+    } > "${OVERLAY_FILE}"
+}
+
+trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
-for index in "${!PACKAGE_PATHS[@]}"; do
-    target="${PACKAGE_PATHS[index]}"
-    backup="${target}${BACKUP_SUFFIX}"
-    if [[ -e "${backup}" || -L "${backup}" ]]; then
-        echo "Stale backup exists: ${backup}. Restore or remove it before rerunning." >&2
+for repo_path in "${REPO_PATHS[@]}"; do
+    if [[ ! -d "${repo_path}" ]]; then
+        echo "Repository interface path does not exist: ${repo_path}" >&2
         exit 2
     fi
-    if [[ ! -e "${target}" && ! -L "${target}" ]]; then
-        echo "CANN interface path does not exist: ${target}" >&2
-        exit 2
-    fi
-    if [[ ! -e "${REPO_PATHS[index]}" ]]; then
-        echo "Repository interface path does not exist: ${REPO_PATHS[index]}" >&2
-        exit 2
-    fi
-done
-
-for index in "${!PACKAGE_PATHS[@]}"; do
-    target="${PACKAGE_PATHS[index]}"
-    mv "${target}" "${target}${BACKUP_SUFFIX}"
-    SWAPPED_PATHS+=("${index}")
-    ln -s "${REPO_PATHS[index]}" "${target}"
 done
 
 source "${CANN_ROOT}/set_env.sh"
+create_vfs_overlay
 
 mkdir -p "${BUILD_DIR}"
 
 for mode in "${MODES[@]}"; do
     echo "[ BUILD ] ${mode}"
-    bisheng "${SCRIPT_DIR}/sync_${mode}.asc" -o "${BUILD_DIR}/sync_${mode}" --npu-arch=dav-3510
+    bisheng -ivfsoverlay "${OVERLAY_FILE}" "${SCRIPT_DIR}/sync_${mode}.asc" -o "${BUILD_DIR}/sync_${mode}" \
+        --npu-arch=dav-3510 "${BISHENG_OPTIONS[@]}"
 done
 
 for mode in "${MODES[@]}"; do

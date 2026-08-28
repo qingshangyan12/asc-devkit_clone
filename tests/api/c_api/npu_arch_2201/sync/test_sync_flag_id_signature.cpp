@@ -16,6 +16,10 @@
 using SyncFunction = void (*)(pipe_t, uint16_t);
 using DeprecatedSyncFunction = void (*)(pipe_t, int64_t);
 
+namespace {
+constexpr int64_t kConstexprDeprecatedFlagId = 65537;
+}
+
 static_assert(std::is_same_v<decltype(static_cast<SyncFunction>(&asc_sync_block_arrive)), SyncFunction>);
 static_assert(std::is_same_v<decltype(static_cast<SyncFunction>(&asc_sync_block_wait)), SyncFunction>);
 static_assert(std::is_same_v<decltype(static_cast<SyncFunction>(&asc_sync_subblock_arrive)), SyncFunction>);
@@ -25,20 +29,34 @@ static_assert(std::is_same_v<decltype(static_cast<SyncFunction>(&asc_sync_inter_
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-static_assert(std::is_same_v<decltype(&asc_sync_block_arrive<int64_t>), DeprecatedSyncFunction>);
-static_assert(std::is_same_v<decltype(&asc_sync_block_wait<int64_t>), DeprecatedSyncFunction>);
-static_assert(std::is_same_v<decltype(&asc_sync_subblock_arrive<int64_t>), DeprecatedSyncFunction>);
-static_assert(std::is_same_v<decltype(&asc_sync_subblock_wait<int64_t>), DeprecatedSyncFunction>);
-static_assert(std::is_same_v<decltype(&asc_sync_inter_arrive<int64_t>), DeprecatedSyncFunction>);
-static_assert(std::is_same_v<decltype(&asc_sync_inter_wait<int64_t>), DeprecatedSyncFunction>);
+static_assert(std::is_same_v<decltype(static_cast<DeprecatedSyncFunction>(&asc_sync_block_arrive)), DeprecatedSyncFunction>);
+static_assert(std::is_same_v<decltype(static_cast<DeprecatedSyncFunction>(&asc_sync_block_wait)), DeprecatedSyncFunction>);
+static_assert(std::is_same_v<decltype(static_cast<DeprecatedSyncFunction>(&asc_sync_subblock_arrive)), DeprecatedSyncFunction>);
+static_assert(std::is_same_v<decltype(static_cast<DeprecatedSyncFunction>(&asc_sync_subblock_wait)), DeprecatedSyncFunction>);
+static_assert(std::is_same_v<decltype(static_cast<DeprecatedSyncFunction>(&asc_sync_inter_arrive)), DeprecatedSyncFunction>);
+static_assert(std::is_same_v<decltype(static_cast<DeprecatedSyncFunction>(&asc_sync_inter_wait)), DeprecatedSyncFunction>);
 #pragma GCC diagnostic pop
 
-[[maybe_unused]] void SyncFlagIdIntLiteralUsesCanonicalOverload(pipe_t pipe)
+[[maybe_unused]] void SyncFlagIdUint16UsesCanonicalOverload(pipe_t pipe)
 {
-    asc_sync_block_arrive(pipe, 1);
-    asc_sync_block_wait(pipe, 1);
-    asc_sync_subblock_arrive(pipe, 1);
-    asc_sync_subblock_wait(pipe, 1);
-    asc_sync_inter_arrive(pipe, 1);
-    asc_sync_inter_wait(pipe, 1);
+    constexpr uint16_t flag_id = 1;
+    asc_sync_block_arrive(pipe, flag_id);
+    asc_sync_block_wait(pipe, flag_id);
+    asc_sync_subblock_arrive(pipe, flag_id);
+    asc_sync_subblock_wait(pipe, flag_id);
+    asc_sync_inter_arrive(pipe, flag_id);
+    asc_sync_inter_wait(pipe, flag_id);
+}
+
+[[maybe_unused]] void SyncFlagIdConstexprUsesDeprecatedOverload(pipe_t pipe)
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    asc_sync_block_arrive(pipe, kConstexprDeprecatedFlagId);
+    asc_sync_block_wait(pipe, kConstexprDeprecatedFlagId);
+    asc_sync_subblock_arrive(pipe, kConstexprDeprecatedFlagId);
+    asc_sync_subblock_wait(pipe, kConstexprDeprecatedFlagId);
+    asc_sync_inter_arrive(pipe, kConstexprDeprecatedFlagId);
+    asc_sync_inter_wait(pipe, kConstexprDeprecatedFlagId);
+#pragma GCC diagnostic pop
 }
