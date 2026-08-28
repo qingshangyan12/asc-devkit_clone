@@ -78,7 +78,7 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_bridge_ro
     for (CommEngine engine : {COMM_ENGINE_AICPU_TS, COMM_ENGINE_AICPU}) {
         EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, engine)));
         EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, engine)));
-        EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, engine)));
+        EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, engine)));
         EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLGATHER, engine)));
         EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_REDUCE_SCATTER, engine)));
     }
@@ -99,6 +99,24 @@ TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, execute_selector_uses_local_devkit_for_a
 
     EXPECT_EQ(selector.Run(param, &topo, algName), HCCL_SUCCESS);
     EXPECT_EQ(algName, "AicpuAllToAllSoleMeshUBX");
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, execute_selector_uses_local_devkit_for_allreduce)
+{
+    ExecuteSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeConcurrentTopo();
+    OpParam param = MakeAicpuParam(HCCL_CMD_ALLREDUCE);
+    std::string algName;
+
+    EXPECT_EQ(selector.Run(param, &topo, algName), HCCL_SUCCESS);
+    EXPECT_EQ(algName, "AicpuAllReduceSoleMeshOneShot");
+}
+
+TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_all_reduce_algorithms)
+{
+    CollAlgExecRegistryV2& registry = CollAlgExecRegistryV2::Instance();
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLREDUCE, "AicpuAllReduceSoleMeshOneShot"), nullptr);
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLREDUCE, "AicpuAllReduceSoleMeshTwoShot"), nullptr);
 }
 
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, local_registry_contains_mesh1d_and_concurrent_algorithms)
