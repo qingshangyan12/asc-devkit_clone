@@ -1081,6 +1081,7 @@ HcclResult HcclGetThread(
             }
         }
         if (param.engine == COMM_ENGINE_CCU && param.isKfc) {
+            HCCL_INFO("[HcclGetThread] param.engine == COMM_ENGINE_CCU && param.isKfc.");
             const u32 threadNum = resRequest.slaveThreadNum + 1U;
             const u32 notifyNum = std::max(resRequest.notifyNumOnMainThread, maxNotifyNum);
             std::vector<ThreadHandle> threads(threadNum);
@@ -1088,6 +1089,7 @@ HcclResult HcclGetThread(
             resCtxHost->threads.insert(resCtxHost->threads.end(), threads.begin(), threads.end());
             HCCL_INFO("[HcclGetThread] acquired [%u] CCU KFC threads in one request.", threadNum);
         } else {
+            HCCL_INFO("[HcclGetThread] HcclThreadAcquireWithStream.");
             ThreadHandle thread;
             // host模式下，将主流封装为thread，并创建主流上的notify
             CHK_RET(HcclThreadAcquireWithStream(
