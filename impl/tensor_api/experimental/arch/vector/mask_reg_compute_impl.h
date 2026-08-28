@@ -124,7 +124,7 @@ __simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tens
 {
     static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t)
                       || sizeof(DataType) == sizeof(uint32_t),
-                  "interleave only supports 8-bit, 16-bit, and 32-bit element types");
+                  "interleave with reg_tensor<bool> only supports 8-bit, 16-bit, and 32-bit element types");
  
     reg_pair<bool> result;
     if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
@@ -142,7 +142,7 @@ __simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_te
 {
     static_assert(sizeof(DataType) == sizeof(uint8_t) || sizeof(DataType) == sizeof(uint16_t)
                       || sizeof(DataType) == sizeof(uint32_t),
-                  "deinterleave only supports 8-bit, 16-bit, and 32-bit element types");
+                  "deinterleave with reg_tensor<bool> only supports 8-bit, 16-bit, and 32-bit element types");
  
     reg_pair<bool> result;
     if constexpr (sizeof(DataType) == sizeof(uint32_t)) {
