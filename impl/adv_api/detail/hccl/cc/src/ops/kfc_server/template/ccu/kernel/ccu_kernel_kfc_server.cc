@@ -63,11 +63,11 @@ thread_local const CcuKernelArgKfcServer* g_kfcRegisterArg = nullptr;
 ccu::Func KfcAllGatherFunc(
     [](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable outputOffset,
        ccu::Variable sliceSize, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
-       ccu::Variable goSize3) {
+       ccu::Variable goSize3, ccu::Variable isInputOutputEqual) {
         const auto& arg = *g_kfcRegisterArg;
         CCU_THROW_IF_FAILED(
             CcuKfcAllGatherMesh1DMem2MemKernel(
-                inputAddr, outputAddr, tokenInfo, outputOffset, sliceSize, goSize0, goSize1, goSize2, goSize3,
+                inputAddr, outputAddr, tokenInfo, outputOffset, sliceSize, goSize0, goSize1, goSize2, goSize3, isInputOutputEqual,
                 arg.channels, arg.channelCount, static_cast<uint32_t>(arg.rankSize), arg.rankId),
             "define KFC AllGather func failed");
     },
@@ -89,13 +89,15 @@ ccu::Func KfcReduceScatterFunc(
 
 ccu::Func KfcAllReduceFunc(
     [](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
-       ccu::Variable currentRankSliceInputOffset, ccu::Variable, ccu::Variable, ccu::Variable sliceSize,
-       ccu::Variable repeatNum) {
+        ccu::Variable currentRankSliceInputOffset, ccu::Variable currentRankSliceOutputOffset,
+        ccu::Variable normalSliceSize, ccu::Variable lastSliceSize, ccu::Variable mySliceSize, ccu::Variable sliceOffset,
+        ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
+        ccu::Variable goSize3, ccu::Variable chunkSize, ccu::Variable tailSize, ccu::Variable chunkLoopNum) {
         const auto& arg = *g_kfcRegisterArg;
         CCU_THROW_IF_FAILED(
             CcuKfcAllReduceMesh1DMem2MemKernel(
                 inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, currentRankSliceOutputOffset,
-                normalSliceSize, lastSliceSize,  mySliceSize, sliceOffset, isInputOutputEqual, goSize0, goSize1, goSize2,
+                normalSliceSize, lastSliceSize, mySliceSize, sliceOffset, isInputOutputEqual, goSize0, goSize1, goSize2,
                 goSize3, chunkSize, tailSize, chunkLoopNum, arg.channels, arg.channelCount, static_cast<uint32_t>(arg.rankSize),
                 arg.rankId, arg.opParam.DataDes.dataType, arg.opParam.DataDes.outputType, arg.opParam.reduceType),
             "define KFC AllReducer func failed");
