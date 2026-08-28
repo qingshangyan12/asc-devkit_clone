@@ -753,6 +753,8 @@ TEST_F(ResourceRegistryTest, LoadManifestValidatesJsonOwnershipSourceAndDuplicat
     EXPECT_EQ(loadText("[]"), ResourceStatus::InvalidResource);
     EXPECT_EQ(loadText(R"({"source_file":"source.cpp"})"), ResourceStatus::InvalidResource);
     EXPECT_EQ(loadText(R"({"resource_id":1,"source_file":"source.cpp"})"), ResourceStatus::InvalidResource);
+    EXPECT_EQ(loadText(R"({"resource_id":""})"), ResourceStatus::InvalidResource);
+    EXPECT_EQ(stage.external.resources.find(""), stage.external.resources.end());
     EXPECT_EQ(loadText(R"({"resource_id":"metadata-only"})"), ResourceStatus::Success);
     EXPECT_TRUE(stage.external.resources.at("metadata-only")->data.sourceFilePath.empty());
     EXPECT_EQ(loadText(R"({"resource_id":"resource","source_file":1})"), ResourceStatus::InvalidResource);
@@ -1202,8 +1204,8 @@ TEST_F(ResourceRegistryTest, LookupReportsTemporaryRootAndMaterializationFailure
     EXPECT_EQ(registry_->Lookup("bad-temp", output), ResourceStatus::IoError);
     EXPECT_TRUE(output.resourceDir.empty());
 
-    registry_->temporaryRoot_ = Path("forced-materialize").string();
-    WriteFile(fs::path(registry_->temporaryRoot_) / "external", "blocking file");
+    ASSERT_TRUE(registry_->ownedMaterializationRoot_.RegisterDirectoryForCleanup(Path("forced-materialize").string()));
+    WriteFile(fs::path(registry_->ownedMaterializationRoot_.GetDirectoryPath()) / "external", "blocking file");
     output.resourceDir = "stale";
     EXPECT_EQ(registry_->Lookup("bad-temp", output), ResourceStatus::IoError);
     EXPECT_TRUE(output.resourceDir.empty());
@@ -1216,7 +1218,7 @@ TEST_F(ResourceRegistryTest, DestructorHonorsSaveKernelMetaAtTemporaryRootCreati
     registry_->externalResources_.emplace("keep-temp", MakeEntry(ResourceSourceType::External));
     ResourceData output;
     EXPECT_EQ(registry_->Lookup("keep-temp", output), ResourceStatus::Success);
-    const std::string retainedRoot = registry_->temporaryRoot_;
+    const std::string retainedRoot = registry_->ownedMaterializationRoot_.GetDirectoryPath();
     ASSERT_TRUE(fs::is_directory(retainedRoot));
     registry_.reset();
     EXPECT_TRUE(fs::is_directory(retainedRoot));
@@ -1225,7 +1227,7 @@ TEST_F(ResourceRegistryTest, DestructorHonorsSaveKernelMetaAtTemporaryRootCreati
     SetEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "true");
     registry_->externalResources_.emplace("remove-temp", MakeEntry(ResourceSourceType::External));
     EXPECT_EQ(registry_->Lookup("remove-temp", output), ResourceStatus::Success);
-    const std::string removedRoot = registry_->temporaryRoot_;
+    const std::string removedRoot = registry_->ownedMaterializationRoot_.GetDirectoryPath();
     ASSERT_TRUE(fs::is_directory(removedRoot));
     registry_.reset();
     EXPECT_FALSE(fs::exists(removedRoot));
@@ -1241,8 +1243,8 @@ TEST_F(ResourceRegistryTest, SaveKernelMetaTrimsWhitespaceAndKeepsFailedMaterial
     ResourceData output;
     EXPECT_EQ(registry_->Lookup("failed-materialization", output), ResourceStatus::IoError);
     EXPECT_TRUE(output.resourceDir.empty());
-    EXPECT_TRUE(registry_->keepTemporaryRoot_);
-    const fs::path retainedRoot(registry_->temporaryRoot_);
+    EXPECT_TRUE(registry_->retainMaterializedDirectories_);
+    const fs::path retainedRoot(registry_->ownedMaterializationRoot_.GetDirectoryPath());
     const fs::path categoryParent = retainedRoot / "external";
     std::vector<fs::path> retainedCategories;
     for (fs::directory_iterator current(categoryParent), end; current != end; ++current) {
@@ -1301,6 +1303,31 @@ TEST_F(ResourceRegistryTest, LoadReportsManifestFailure)
 
     EXPECT_EQ(registry_->Load(layout.soPath.c_str()), ResourceStatus::InvalidResource);
     EXPECT_EQ(registry_->FindResource("public-invalid-manifest"), nullptr);
+}
+
+TEST_F(ResourceRegistryTest, LoadRejectsEmptyResourceIdAndDoesNotCommitPartialBundle)
+{
+    const SourceLayout layout = CreateLayout("public-empty-resource-id");
+    const std::string validJson = R"({"resource_id":"valid-resource"})";
+    const std::string emptyJson = R"({"resource_id":""})";
+    AcCompileResourceManifest invalidManifests[] = {
+        {StringView(validJson), nullptr, 0U},
+        {StringView(emptyJson), nullptr, 0U},
+    };
+    AcCompileResourceBundle invalidBundle = MakeBundle(invalidManifests, 2U);
+    gBundleHeader = &invalidBundle.header;
+    MockSuccessfulLoader();
+
+    EXPECT_EQ(registry_->Load(layout.soPath.c_str()), ResourceStatus::InvalidResource);
+    EXPECT_EQ(registry_->FindResource(""), nullptr);
+    EXPECT_EQ(registry_->FindResource("valid-resource"), nullptr);
+
+    AcCompileResourceManifest validManifest{StringView(validJson), nullptr, 0U};
+    AcCompileResourceBundle validBundle = MakeBundle(&validManifest, 1U);
+    gBundleHeader = &validBundle.header;
+    EXPECT_EQ(registry_->Load(layout.soPath.c_str()), ResourceStatus::Success);
+    ResourceData output;
+    EXPECT_EQ(registry_->Lookup("valid-resource", output), ResourceStatus::Success);
 }
 
 TEST_F(ResourceRegistryTest, LoadAutomaticCachesFirstStatus)

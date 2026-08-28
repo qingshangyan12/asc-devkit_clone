@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#warning "misc.h is deprecated.Please use c_api/utils/sys_init.h."
+#warning "misc.h is deprecated.Please use c_api/utils/sys_init.h and c_api/utils/sys_misc.h."
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
@@ -23,10 +23,7 @@
 #define INCLUDE_C_API_MISC_H
 
 #include "c_api/utils/sys_init.h"
-
-namespace __asc_aicore {
-__aicore__ inline void asc_nop();
-} // namespace __asc_aicore
+#include "c_api/utils/sys_misc.h"
 
 #endif
 

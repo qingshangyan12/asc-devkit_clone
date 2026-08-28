@@ -93,13 +93,22 @@ __aicore__ inline uint64_t clock(void) { return clock_impl(); }
 template <pipe_t pipe>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
 {
-    bisheng::cce::mark_stamp<pipe>(idx);
+    if constexpr (pipe == PIPE_S || pipe == PIPE_V || pipe == PIPE_MTE2 || pipe == PIPE_MTE3) {
+        if ASCEND_IS_AIV {
+            bisheng::cce::mark_stamp<pipe>(idx);
+        }
+    }
+    if constexpr (pipe == PIPE_S || pipe == PIPE_MTE1 || pipe == PIPE_MTE2 || pipe == PIPE_FIX || pipe == PIPE_M) {
+        if ASCEND_IS_AIC {
+            bisheng::cce::mark_stamp<pipe>(idx);
+        }
+    }
 }
 
 template <pipe_t pipe, uint16_t idx>
 __aicore__ inline void asc_mark_stamp()
 {
-    bisheng::cce::mark_stamp<pipe>(idx);
+    asc_mark_stamp<pipe>(idx);
 }
 #endif
 } // namespace __asc_aicore
@@ -166,7 +175,8 @@ __aicore__ inline void TRACE_STOP_1(TraceId apid) {}
 #define TRACE_START_1(apid) __asc_aicore::asc_mark_stamp<PIPE_S>(static_cast<uint16_t>(apid) | 0x400)
 #define TRACE_STOP_1(apid) __asc_aicore::asc_mark_stamp<PIPE_S>(static_cast<uint16_t>(apid) | 0xc00)
 
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+                                __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #define TRACE_START_1(apid)                                                \
     do {                                                                   \
         uint32_t v = (ASC_PROF_START_EVENT | static_cast<uint32_t>(apid)); \
