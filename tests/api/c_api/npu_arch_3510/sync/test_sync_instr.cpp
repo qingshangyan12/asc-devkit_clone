@@ -80,8 +80,8 @@ TEST_F(TestSyncInstrCAPI, asc_sync_vec_Succ)
 
 TEST_F(TestSyncInstrCAPI, asc_sync_vec_new_Succ)
 {
-    MOCKER_CPP(set_flag, void(pipe_t, pipe_t, event_t)).times(1).will(invoke(set_flag_stub));
-    MOCKER_CPP(set_flag, void(pipe_t, pipe_t, event_t)).times(AnyNumber()).will(Return());
+    MOCKER_CPP(set_flag, void(pipe_t, pipe_t, event_t)).times(3).will(returnValue(0));
+    MOCKER_CPP(wait_flag, void(pipe_t, pipe_t, event_t)).times(3).will(returnValue(0));
 
     asc_sync_vec(0);
     GlobalMockObject::verify();
