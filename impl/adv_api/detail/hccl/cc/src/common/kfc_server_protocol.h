@@ -21,7 +21,7 @@ namespace mc2_ops_hccl {
 using namespace HcclKfcProtocol;
 
 constexpr uint32_t KFC_SERVER_PROTOCOL_VERSION = 2U;
-constexpr uint32_t KFC_SERVER_ARG_NUM = 6U;
+constexpr uint32_t KFC_SERVER_ARG_NUM = 7U;
 constexpr uint32_t KFC_SERVER_XN_ADDR_ARG_INDEX = 0U;
 constexpr uint32_t KFC_SERVER_CKE_ADDR_ARG_INDEX = 1U;
 constexpr uint32_t KFC_SERVER_MISSION_NUM_ARG_INDEX = 3U;
