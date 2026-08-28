@@ -21,56 +21,53 @@ constexpr vector_bool LOAD_MASK = 0x5A5A;
 constexpr int32_t LOAD_OFFSET = (BLOCK_STRIDE << 16u) | REPEAT_STRIDE;
 } // namespace
 
-#define TEST_VECTOR_COMPUTE_LOADALIGNV2(dst_type, src_type, cce_dst_type, cce_src_type)                                \
-                                                                                                                       \
-    class TestVectorDataMoveLoadAlignV2##dst_type##CApi : public testing::Test {                                       \
-    protected:                                                                                                         \
-        void SetUp() {}                                                                                                \
-        void TearDown() {}                                                                                             \
-    };                                                                                                                 \
-                                                                                                                       \
-    namespace {                                                                                                        \
-    void vsldb##_##dst_type##_Stub(                                                                                     \
-        cce_dst_type& dst, __ubuf__ cce_src_type* src, int32_t offset, vector_bool mask)                                \
-    {                                                                                                                   \
-        EXPECT_EQ(src, reinterpret_cast<__ubuf__ cce_src_type*>(11));                                                   \
-        EXPECT_EQ(offset, LOAD_OFFSET);                                                                                 \
-        EXPECT_EQ(mask, LOAD_MASK);                                                                                     \
-    }                                                                                                                   \
-    }                                                                                                                  \
-                                                                                                                       \
-    TEST_F(TestVectorDataMoveLoadAlignV2##dst_type##CApi, c_api_asc_loadalign_v2_##dst_type##_Succ)                    \
-    {                                                                                                                  \
-        dst_type dst;                                                                                                  \
-        __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                             \
-        vector_bool mask = LOAD_MASK;                                                                                  \
-                                                                                                                       \
-        MOCKER_CPP(vsldb, void(cce_dst_type&, __ubuf__ cce_src_type*, int32_t, vector_bool))                           \
-            .times(1)                                                                                                  \
-            .will(invoke(vsldb##_##dst_type##_Stub));                                                                  \
-                                                                                                                       \
-        asc_loadalign(dst, src, BLOCK_STRIDE, REPEAT_STRIDE, mask);                                                     \
-        GlobalMockObject::verify();                                                                                    \
+#define TEST_VECTOR_COMPUTE_LOADALIGNV2(dst_type, src_type, cce_dst_type, cce_src_type)                             \
+                                                                                                                    \
+    class TestVectorDataMoveLoadAlignV2##dst_type##CApi : public testing::Test {                                    \
+    protected:                                                                                                      \
+        void SetUp() {}                                                                                             \
+        void TearDown() {}                                                                                          \
+    };                                                                                                              \
+                                                                                                                    \
+    namespace {                                                                                                     \
+    void vsldb##_##dst_type##_Stub(cce_dst_type& dst, __ubuf__ cce_src_type* src, int32_t offset, vector_bool mask) \
+    {                                                                                                               \
+        EXPECT_EQ(src, reinterpret_cast<__ubuf__ cce_src_type*>(11));                                               \
+        EXPECT_EQ(offset, LOAD_OFFSET);                                                                             \
+        EXPECT_EQ(mask, LOAD_MASK);                                                                                 \
+    }                                                                                                               \
+    }                                                                                                               \
+                                                                                                                    \
+    TEST_F(TestVectorDataMoveLoadAlignV2##dst_type##CApi, c_api_asc_loadalign_v2_##dst_type##_Succ)                 \
+    {                                                                                                               \
+        dst_type dst;                                                                                               \
+        __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                          \
+        vector_bool mask = LOAD_MASK;                                                                               \
+                                                                                                                    \
+        MOCKER_CPP(vsldb, void(cce_dst_type&, __ubuf__ cce_src_type*, int32_t, vector_bool))                        \
+            .times(1)                                                                                               \
+            .will(invoke(vsldb##_##dst_type##_Stub));                                                               \
+                                                                                                                    \
+        asc_loadalign(dst, src, BLOCK_STRIDE, REPEAT_STRIDE, mask);                                                 \
+        GlobalMockObject::verify();                                                                                 \
     }
 
-#define TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(dst_type, src_type, cce_dst_type, cce_src_type)                           \
-    TEST_F(TestVectorDataMoveLoadAlignV2##dst_type##CApi,                                                          \
-        c_api_asc_loadalign_datablock_strided_##dst_type##_ReturnSucc)                                             \
-    {                                                                                                                  \
-        __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                             \
-        vector_bool mask = LOAD_MASK;                                                                                  \
-                                                                                                                       \
-        MOCKER_CPP(vsldb, void(cce_dst_type&, __ubuf__ cce_src_type*, int32_t, vector_bool))                           \
-            .times(1)                                                                                                  \
-            .will(invoke(vsldb##_##dst_type##_Stub));                                                                  \
-                                                                                                                       \
-        static_assert(std::is_same_v<                                                                                   \
-                      decltype(asc_loadalign_datablock_strided(                                                        \
-                          src, BLOCK_STRIDE, REPEAT_STRIDE, mask)),                                                    \
-                      dst_type>);                                                                                      \
+#define TEST_VECTOR_COMPUTE_LOADALIGN_RETURN(dst_type, src_type, cce_dst_type, cce_src_type)                          \
+    TEST_F(                                                                                                           \
+        TestVectorDataMoveLoadAlignV2##dst_type##CApi, c_api_asc_loadalign_datablock_strided_##dst_type##_ReturnSucc) \
+    {                                                                                                                 \
+        __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                            \
+        vector_bool mask = LOAD_MASK;                                                                                 \
+                                                                                                                      \
+        MOCKER_CPP(vsldb, void(cce_dst_type&, __ubuf__ cce_src_type*, int32_t, vector_bool))                          \
+            .times(1)                                                                                                 \
+            .will(invoke(vsldb##_##dst_type##_Stub));                                                                 \
+                                                                                                                      \
+        static_assert(std::is_same_v<                                                                                 \
+                      decltype(asc_loadalign_datablock_strided(src, BLOCK_STRIDE, REPEAT_STRIDE, mask)), dst_type>);  \
         dst_type dst = asc_loadalign_datablock_strided(src, BLOCK_STRIDE, REPEAT_STRIDE, mask);                       \
-        (void)dst;                                                                                                     \
-        GlobalMockObject::verify();                                                                                    \
+        (void)dst;                                                                                                    \
+        GlobalMockObject::verify();                                                                                   \
     }
 
 TEST_VECTOR_COMPUTE_LOADALIGNV2(vector_int8_t, int8_t, vector_int8_t, int8_t);

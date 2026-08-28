@@ -100,38 +100,37 @@ constexpr Literal LoadAlignMaskUpsampleReturnExpectedDist()
 }
 } // namespace
 
-#define TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(                                                                  \
-    class_name, c_api_name, cce_name, dst_type, src_type, cce_dst_type, cce_src_type)                           \
-    class TestVectorDatamove##class_name##dst_type##src_type##CApi : public testing::Test {                     \
-    protected:                                                                                                  \
-        void SetUp() {}                                                                                         \
-        void TearDown() {}                                                                                      \
-    };                                                                                                          \
-                                                                                                                \
-    namespace {                                                                                                 \
-    void c_api_name##_##dst_type##_##src_type##_ReturnStub(                                                     \
-        cce_dst_type& dst, __ubuf__ cce_src_type* src, int32_t offset, Literal load_dist)                       \
-    {                                                                                                           \
-        EXPECT_EQ(src, reinterpret_cast<__ubuf__ cce_src_type*>(11));                                           \
-        EXPECT_EQ(offset, static_cast<int32_t>(0));                                                             \
-        EXPECT_EQ(load_dist, class_name##ExpectedDist<src_type>());                                             \
-    }                                                                                                           \
-    }                                                                                                           \
-                                                                                                                \
-    TEST_F(                                                                                                     \
-        TestVectorDatamove##class_name##dst_type##src_type##CApi,                                              \
-        c_api_name##_##dst_type##_##src_type##_ReturnSucc)                                                     \
-    {                                                                                                           \
-        __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                     \
-                                                                                                                \
-        MOCKER_CPP(cce_name, void(cce_dst_type&, __ubuf__ cce_src_type*, int32_t, Literal))                     \
-            .times(1)                                                                                           \
-            .will(invoke(c_api_name##_##dst_type##_##src_type##_ReturnStub));                                  \
-                                                                                                                \
-        static_assert(std::is_same_v<decltype(c_api_name(src)), dst_type>);                                     \
-        dst_type dst = c_api_name(src);                                                                         \
-        (void)dst;                                                                                              \
-        GlobalMockObject::verify();                                                                             \
+#define TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(                                                                       \
+    class_name, c_api_name, cce_name, dst_type, src_type, cce_dst_type, cce_src_type)                                \
+    class TestVectorDatamove##class_name##dst_type##src_type##CApi : public testing::Test {                          \
+    protected:                                                                                                       \
+        void SetUp() {}                                                                                              \
+        void TearDown() {}                                                                                           \
+    };                                                                                                               \
+                                                                                                                     \
+    namespace {                                                                                                      \
+    void c_api_name##_##dst_type##_##src_type##_ReturnStub(                                                          \
+        cce_dst_type& dst, __ubuf__ cce_src_type* src, int32_t offset, Literal load_dist)                            \
+    {                                                                                                                \
+        EXPECT_EQ(src, reinterpret_cast<__ubuf__ cce_src_type*>(11));                                                \
+        EXPECT_EQ(offset, static_cast<int32_t>(0));                                                                  \
+        EXPECT_EQ(load_dist, class_name##ExpectedDist<src_type>());                                                  \
+    }                                                                                                                \
+    }                                                                                                                \
+                                                                                                                     \
+    TEST_F(                                                                                                          \
+        TestVectorDatamove##class_name##dst_type##src_type##CApi, c_api_name##_##dst_type##_##src_type##_ReturnSucc) \
+    {                                                                                                                \
+        __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                           \
+                                                                                                                     \
+        MOCKER_CPP(cce_name, void(cce_dst_type&, __ubuf__ cce_src_type*, int32_t, Literal))                          \
+            .times(1)                                                                                                \
+            .will(invoke(c_api_name##_##dst_type##_##src_type##_ReturnStub));                                        \
+                                                                                                                     \
+        static_assert(std::is_same_v<decltype(c_api_name(src)), dst_type>);                                          \
+        dst_type dst = c_api_name(src);                                                                              \
+        (void)dst;                                                                                                   \
+        GlobalMockObject::verify();                                                                                  \
     }
 
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
@@ -156,33 +155,35 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignReturn, asc_loadalign, vlds, vector_int16_t, int16_t, vector_int16_t, int16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignReturn, asc_loadalign, vlds, vector_uint16_t, uint16_t, vector_uint16_t, uint16_t);
-TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignReturn, asc_loadalign, vlds, vector_half, half, vector_half, half);
+TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(LoadAlignReturn, asc_loadalign, vlds, vector_half, half, vector_half, half);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignReturn, asc_loadalign, vlds, vector_bfloat16_t, bfloat16_t, vector_bfloat16_t, bfloat16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignReturn, asc_loadalign, vlds, vector_int32_t, int32_t, vector_int32_t, int32_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignReturn, asc_loadalign, vlds, vector_uint32_t, uint32_t, vector_uint32_t, uint32_t);
-TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignReturn, asc_loadalign, vlds, vector_float, float, vector_float, float);
+TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(LoadAlignReturn, asc_loadalign, vlds, vector_float, float, vector_float, float);
 
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_int8_t, int8_t, vector_int8_t, int8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_uint8_t, uint8_t, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t, fp4x2_e2m1_t);
+    LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t,
+    fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t, fp4x2_e1m2_t);
+    LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t,
+    fp4x2_e1m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t, float4_e1m2x2_t);
+    LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t,
+    float4_e1m2x2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_fp8_e8m0_t, fp8_e8m0_t, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+    LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t,
+    fp8_e4m3fn_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcElemReturn, asc_loadalign_brc_elem, vlds, vector_hifloat8_t, hifloat8_t, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
@@ -205,46 +206,61 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_uint8_t, uint8_t, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t, fp4x2_e2m1_t);
+    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t,
+    vector_fp4x2_e2m1_t, fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t, fp4x2_e1m2_t);
+    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t,
+    vector_fp4x2_e1m2_t, fp4x2_e1m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t, float4_e1m2x2_t);
+    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t,
+    float4_e1m2x2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_fp8_e8m0_t, fp8_e8m0_t, vector_fp8_e8m0_t, fp8_e8m0_t);
+    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_fp8_e8m0_t, fp8_e8m0_t, vector_fp8_e8m0_t,
+    fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t, fp8_e5m2_t);
+    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t,
+    fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t,
+    vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_hifloat8_t, hifloat8_t, vector_uint8_t, uint8_t);
+    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_hifloat8_t, hifloat8_t, vector_uint8_t,
+    uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_int16_t, int16_t, vector_int16_t, int16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_uint16_t, uint16_t, vector_uint16_t, uint16_t);
+    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_uint16_t, uint16_t, vector_uint16_t,
+    uint16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_half, half, vector_half, half);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_bfloat16_t, bfloat16_t, vector_bfloat16_t, bfloat16_t);
+    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_bfloat16_t, bfloat16_t, vector_bfloat16_t,
+    bfloat16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_int32_t, int32_t, vector_int32_t, int32_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_uint32_t, uint32_t, vector_uint32_t, uint32_t);
+    LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_uint32_t, uint32_t, vector_uint32_t,
+    uint32_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcDatablockReturn, asc_loadalign_brc_datablock, vlds, vector_float, float, vector_float, float);
 
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_int16_t, int16_t, vector_int16_t, int16_t);
+    LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_int16_t, int16_t, vector_int16_t,
+    int16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_uint16_t, uint16_t, vector_uint16_t, uint16_t);
+    LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_uint16_t, uint16_t,
+    vector_uint16_t, uint16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_half, half, vector_half, half);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_bfloat16_t, bfloat16_t, vector_bfloat16_t, bfloat16_t);
+    LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_bfloat16_t, bfloat16_t,
+    vector_bfloat16_t, bfloat16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_int32_t, int32_t, vector_int32_t, int32_t);
+    LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_int32_t, int32_t, vector_int32_t,
+    int32_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_uint32_t, uint32_t, vector_uint32_t, uint32_t);
+    LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_uint32_t, uint32_t,
+    vector_uint32_t, uint32_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignBrcElem2DatablockReturn, asc_loadalign_brc_elem2datablock, vlds, vector_float, float, vector_float, float);
 
@@ -253,17 +269,23 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_uint8_t, uint8_t, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t, fp4x2_e2m1_t);
+    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t,
+    fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t, fp4x2_e1m2_t);
+    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t,
+    fp4x2_e1m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t, float4_e1m2x2_t);
+    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t,
+    float4_e1m2x2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_fp8_e8m0_t, fp8_e8m0_t, vector_fp8_e8m0_t, fp8_e8m0_t);
+    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_fp8_e8m0_t, fp8_e8m0_t, vector_fp8_e8m0_t,
+    fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t, fp8_e5m2_t);
+    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t,
+    fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t,
+    fp8_e4m3fn_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_hifloat8_t, hifloat8_t, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
@@ -273,7 +295,8 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_half, half, vector_half, half);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_bfloat16_t, bfloat16_t, vector_bfloat16_t, bfloat16_t);
+    LoadAlignDownsampleReturn, asc_loadalign_downsample, vlds, vector_bfloat16_t, bfloat16_t, vector_bfloat16_t,
+    bfloat16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignMaskDownsampleReturn, asc_loadalign_mask_downsample, plds, vector_bool, uint32_t, vector_bool, uint32_t);
 
@@ -282,9 +305,11 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUnpackReturn, asc_loadalign_unpack, vlds, vector_uint8_t, uint8_t, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUnpackReturn, asc_loadalign_unpack, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t, fp4x2_e2m1_t);
+    LoadAlignUnpackReturn, asc_loadalign_unpack, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t,
+    fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUnpackReturn, asc_loadalign_unpack, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t, fp4x2_e1m2_t);
+    LoadAlignUnpackReturn, asc_loadalign_unpack, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t,
+    fp4x2_e1m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUnpackReturn, asc_loadalign_unpack, vlds, vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t, float4_e1m2x2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
@@ -292,7 +317,8 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUnpackReturn, asc_loadalign_unpack, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUnpackReturn, asc_loadalign_unpack, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+    LoadAlignUnpackReturn, asc_loadalign_unpack, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t,
+    fp8_e4m3fn_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUnpackReturn, asc_loadalign_unpack, vlds, vector_hifloat8_t, hifloat8_t, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
@@ -315,17 +341,21 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_uint8_t, uint8_t, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t, fp4x2_e2m1_t);
+    LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t,
+    fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t, fp4x2_e1m2_t);
+    LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t,
+    fp4x2_e1m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t, float4_e1m2x2_t);
+    LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t,
+    float4_e1m2x2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_fp8_e8m0_t, fp8_e8m0_t, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+    LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t,
+    fp8_e4m3fn_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUnpack4Return, asc_loadalign_unpack4, vlds, vector_hifloat8_t, hifloat8_t, vector_uint8_t, uint8_t);
 
@@ -334,17 +364,23 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_uint8_t, uint8_t, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t, fp4x2_e2m1_t);
+    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, vector_fp4x2_e2m1_t,
+    fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t, fp4x2_e1m2_t);
+    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, vector_fp4x2_e1m2_t,
+    fp4x2_e1m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t, float4_e1m2x2_t);
+    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_int4x2_t, int4b_t, vector_fp4x2_e1m2_t,
+    float4_e1m2x2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_fp8_e8m0_t, fp8_e8m0_t, vector_fp8_e8m0_t, fp8_e8m0_t);
+    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_fp8_e8m0_t, fp8_e8m0_t, vector_fp8_e8m0_t,
+    fp8_e8m0_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t, fp8_e5m2_t);
+    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, vector_fp8_e5m2_t,
+    fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t, fp8_e4m3fn_t);
+    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, vector_fp8_e4m3fn_t,
+    fp8_e4m3fn_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_hifloat8_t, hifloat8_t, vector_uint8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
@@ -354,6 +390,7 @@ TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_half, half, vector_half, half);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
-    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_bfloat16_t, bfloat16_t, vector_bfloat16_t, bfloat16_t);
+    LoadAlignUpsampleReturn, asc_loadalign_upsample, vlds, vector_bfloat16_t, bfloat16_t, vector_bfloat16_t,
+    bfloat16_t);
 TEST_VECTOR_DATAMOVE_LOADALIGN_RETURN(
     LoadAlignMaskUpsampleReturn, asc_loadalign_mask_upsample, plds, vector_bool, uint32_t, vector_bool, uint32_t);

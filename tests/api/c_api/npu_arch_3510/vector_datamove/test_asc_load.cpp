@@ -99,10 +99,13 @@ TEST_VECTOR_DATAMOVE_LOAD_RETURN(Vldasandvldus, asc_load, vldus, vldas, vector_u
 TEST_VECTOR_DATAMOVE_LOAD_RETURN(Vldasandvldus, asc_load, vldus, vldas, vector_half, half, half);
 TEST_VECTOR_DATAMOVE_LOAD_RETURN(Vldasandvldus, asc_load, vldus, vldas, vector_float, float, float);
 TEST_VECTOR_DATAMOVE_LOAD_RETURN(Vldasandvldus, asc_load, vldus, vldas, vector_bfloat16_t, bfloat16_t, bfloat16_t);
-TEST_VECTOR_DATAMOVE_LOAD_RETURN(Vldasandvldus, asc_load, vldus, vldas, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, fp8_e4m3fn_t);
+TEST_VECTOR_DATAMOVE_LOAD_RETURN(
+    Vldasandvldus, asc_load, vldus, vldas, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, fp8_e4m3fn_t);
 TEST_VECTOR_DATAMOVE_LOAD_RETURN(Vldasandvldus, asc_load, vldus, vldas, vector_hifloat8_t, hifloat8_t, uint8_t);
 TEST_VECTOR_DATAMOVE_LOAD_RETURN(Vldasandvldus, asc_load, vldus, vldas, vector_fp8_e5m2_t, fp8_e5m2_t, fp8_e5m2_t);
 TEST_VECTOR_DATAMOVE_LOAD_RETURN(Vldasandvldus, asc_load, vldus, vldas, vector_fp8_e8m0_t, fp8_e8m0_t, fp8_e8m0_t);
-TEST_VECTOR_DATAMOVE_LOAD_RETURN(Vldasandvldus, asc_load, vldus, vldas, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, fp4x2_e2m1_t);
-TEST_VECTOR_DATAMOVE_LOAD_RETURN(Vldasandvldus, asc_load, vldus, vldas, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, fp4x2_e1m2_t);
+TEST_VECTOR_DATAMOVE_LOAD_RETURN(
+    Vldasandvldus, asc_load, vldus, vldas, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, fp4x2_e2m1_t);
+TEST_VECTOR_DATAMOVE_LOAD_RETURN(
+    Vldasandvldus, asc_load, vldus, vldas, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, fp4x2_e1m2_t);
 TEST_VECTOR_DATAMOVE_LOAD_RETURN(Vldasandvldus, asc_load, vldus, vldas, vector_int4x2_t, int4b_t, fp4x2_e1m2_t);
