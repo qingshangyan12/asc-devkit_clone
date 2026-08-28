@@ -269,11 +269,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             ccuUsedXnNum_ = KFC_CONCURRENT_AG_PARAM_NUM;
             CcuPrepareForConcurrentAllGatherM2M(&handleParamGM_[handleId]);
         } else {
-            ccuUsedXnNum_ = 10;
+            ccuUsedXnNum_ = KFC_CONCURRENT_AG_MESH_PARAM_NUM;
             CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
         }
-        ccuUsedXnNum_ = 15;
-        CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
         ccuUsedXnNum_ = 18;
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);

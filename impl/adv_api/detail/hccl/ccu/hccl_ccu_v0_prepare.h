@@ -219,20 +219,30 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllGatherM2M(
     __gm__ CommonPrepareParamCcu* commParam)
 {
-    xnData_[0] = GetOpId(commParam); // ccu xn0
+    xnData_[KFC_CONCURRENT_AG_OP_ID] = GetOpId(commParam);
     auto dataSize = GetHcclDataTypeSize(commParam->dataType);
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
-    xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
-    xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
+    xnData_[KFC_CONCURRENT_AG_MESH_INPUT] = (uint64_t)commParam->sendBuf + offset;
+    xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT] = (uint64_t)commParam->recvBuf + offset;
 
     uint64_t loopCount = CCU_LOOP_COUNT_M2M_AG;
     uint64_t sliceCount = commParam->count;
     uint64_t sliceSize = sliceCount * dataSize;
 
-    xnData_[3] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
-    xnData_[4] = sliceSize;
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
-    xnData_[9] = (xnData_[1] == xnData_[2] + xnData_[3]) ? 1U : 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET] =
+        ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
+    xnData_[KFC_CONCURRENT_AG_MESH_SLICE_SIZE] = sliceSize;
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[KFC_CONCURRENT_AG_MESH_GO_SIZE_0]);
+    xnData_[KFC_CONCURRENT_AG_MESH_CURRENT_RANK_SLICE_INPUT_OFFSET] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_REPEAT_NUM_INV] = UINT64_MAX - 1U;
+    xnData_[KFC_CONCURRENT_AG_MESH_INPUT_REPEAT_STRIDE] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_REPEAT_STRIDE] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_LAST_SLICE_SIZE] = sliceSize;
+    xnData_[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL] =
+        (xnData_[KFC_CONCURRENT_AG_MESH_INPUT] ==
+         xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT] + xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET]) ?
+            1U :
+            0U;
 }
 
 template <const auto& config>
@@ -260,6 +270,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET] = outputStride * ccuParam_.rankId;
     xnData_[KFC_CONCURRENT_AG_MESH_SLICE_SIZE] = meshSize;
     CalcGoSize(meshSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_AG_MESH_GO_SIZE_0]);
+    xnData_[KFC_CONCURRENT_AG_MESH_CURRENT_RANK_SLICE_INPUT_OFFSET] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_REPEAT_NUM_INV] = UINT64_MAX - 1U;
+    xnData_[KFC_CONCURRENT_AG_MESH_INPUT_REPEAT_STRIDE] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_REPEAT_STRIDE] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_LAST_SLICE_SIZE] = meshSize;
     xnData_[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL] =
         (inputBase == outputBase + xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET]) ? 1U : 0U;
 
@@ -279,14 +294,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             1U :
             0U;
     CalcGoSize(nhrSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_AG_NHR_GO_SIZE_0]);
-
-    // 3 阶段 unroll 高性能版 DoRepeatAllGather 所需参数（与 KFC server 分发保持一致）
-    xnData_[9] = 0;          // currentRankSliceInputOffset：input 为独立 sendBuf，无 slice 偏移
-    xnData_[10] = UINT64_MAX - 1; // tmpRepeatNum：单次执行
-    xnData_[11] = 0;         // inputRepeatStride
-    xnData_[12] = 0;         // outputRepeatStride
-    xnData_[13] = sliceSize; // lastSliceSize
-    xnData_[14] = 0;         // isInputOutputEqual
 }
 
 template <const auto& config>
