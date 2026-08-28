@@ -233,7 +233,7 @@ PIPE_M
 
 - 特殊值/边界值约束说明：
 
-  浮点类型的输入或输出包含inf/nan时，可通过[asc_set_ctrl](../sys_var/asc_set_ctrl.md)接口配置CTRL寄存器的CTRL\[48\]比特位控制计算时的模式：
+  浮点类型的输入或输出包含inf/nan时，可通过[asc_set_ctrl](../spr/asc_set_ctrl.md)接口配置CTRL寄存器的CTRL\[48\]比特位控制计算时的模式：
 
   - 设置为0时使用饱和模式，inf输出饱和为±MAX、nan输出饱和为0；
   - 设置为1时使用非饱和模式，inf/nan保持原输出。
