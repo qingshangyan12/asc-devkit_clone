@@ -9,8 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
-    "impl/tensor_api/experimental/arch/utils/reg_utils.h is an internal header file and must not be used directly."
+#warning "impl/tensor_api/experimental/arch/utils/reg_utils.h is an internal header file and must not be used directly."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_UTILS
 #endif
@@ -28,20 +27,17 @@ namespace experimental {
 namespace detail {
 
 template <typename T>
-inline constexpr bool is_b4_type_v =
-    AscendC::Std::is_one_of_v<T, fp4x2_e1m2_t, fp4x2_e2m1_t, int4x2_t>;
+inline constexpr bool is_b4_type_v = AscendC::Std::is_one_of_v<T, fp4x2_e1m2_t, fp4x2_e2m1_t, int4x2_t>;
 
 template <typename T>
 inline constexpr bool is_b8_type_v =
     AscendC::Std::is_one_of_v<T, int8_t, uint8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, hifloat8_t>;
 
 template <typename T>
-inline constexpr bool is_b16_type_v =
-    AscendC::Std::is_one_of_v<T, int16_t, uint16_t, half, bfloat16_t>;
+inline constexpr bool is_b16_type_v = AscendC::Std::is_one_of_v<T, int16_t, uint16_t, half, bfloat16_t>;
 
 template <typename T>
-inline constexpr bool is_b32_type_v =
-    AscendC::Std::is_one_of_v<T, int32_t, uint32_t, float>;
+inline constexpr bool is_b32_type_v = AscendC::Std::is_one_of_v<T, int32_t, uint32_t, float>;
 
 template <typename T>
 inline constexpr bool is_b64_type_v = AscendC::Std::is_one_of_v<T, int64_t>;

@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/arch/vector/gm_to_ub/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -33,15 +33,15 @@ constexpr gm_to_ub_params default_gm_to_ub_params{};
 struct copy_gm_to_ub_base {
 public:
     template <const gm_to_ub_trait& trait, typename DstTensor, typename SrcTensor>
-    __aicore__ inline static void data_copy_impl(const DstTensor& dst, const SrcTensor& src,
-                                                 const gm_to_ub_params& params = default_gm_to_ub_params)
+    __aicore__ inline static void data_copy_impl(
+        const DstTensor& dst, const SrcTensor& src, const gm_to_ub_params& params = default_gm_to_ub_params)
     {
         using dst_pos = get_mem_location<DstTensor>;
         using src_pos = get_mem_location<SrcTensor>;
-        static_assert(Std::is_same_v<dst_pos, location::ub>,
-                      "For copy_gm_to_ub, the destination tensor must be located in UB.");
-        static_assert(Std::is_same_v<src_pos, location::gm>,
-                      "For copy_gm_to_ub, the source tensor must be located in GM.");
+        static_assert(
+            Std::is_same_v<dst_pos, location::ub>, "For copy_gm_to_ub, the destination tensor must be located in UB.");
+        static_assert(
+            Std::is_same_v<src_pos, location::gm>, "For copy_gm_to_ub, the source tensor must be located in GM.");
         TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.layout(), "dst", "copy_gm_to_ub");
         TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy_gm_to_ub");
         TENSOR_API_DEBUG_CHECK(debug_check_copy_size, src, dst, "copy_gm_to_ub");
@@ -52,10 +52,10 @@ public:
         copy_gm_to_ub_impl::template run<trait, DstTensor, SrcTensor>(dst, src, params);
     }
 
-    template <const gm_to_ub_trait& trait, typename T, typename U,
-        typename DstCoord, typename SrcCoord, typename ShapeType>
-    __aicore__ inline static void data_copy_impl(const T& dst, const U& src, const DstCoord& dst_coord,
-        const SrcCoord& src_coord, const ShapeType& copy_shape,
+    template <
+        const gm_to_ub_trait& trait, typename T, typename U, typename DstCoord, typename SrcCoord, typename ShapeType>
+    __aicore__ inline static void data_copy_impl(
+        const T& dst, const U& src, const DstCoord& dst_coord, const SrcCoord& src_coord, const ShapeType& copy_shape,
         const gm_to_ub_params& params = default_gm_to_ub_params)
     {
         using dst_pos = get_mem_location<T>;

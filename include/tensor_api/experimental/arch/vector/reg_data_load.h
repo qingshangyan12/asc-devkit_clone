@@ -52,10 +52,11 @@ __simd_callee__ inline decltype(auto) load(const Tensor& tensor);
  * @param dst1 Second destination register tensor.
  * @note This overload supports only load_sideband_mode::deintlv.
  */
-template <load_sideband_mode sideband_mode = load_sideband_mode::deintlv, typename Tensor, typename Coord,
+template <
+    load_sideband_mode sideband_mode = load_sideband_mode::deintlv, typename Tensor, typename Coord,
     typename RegDataType>
-__simd_callee__ inline void load(const Tensor& tensor, const Coord& coord, reg_tensor<RegDataType>& dst0,
-    reg_tensor<RegDataType>& dst1);
+__simd_callee__ inline void load(
+    const Tensor& tensor, const Coord& coord, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1);
 
 /**
  * @brief Loads and deinterleaves data from the beginning of a UB tensor into two register tensors.
@@ -65,8 +66,7 @@ __simd_callee__ inline void load(const Tensor& tensor, const Coord& coord, reg_t
  * @note This overload supports only load_sideband_mode::deintlv.
  */
 template <load_sideband_mode sideband_mode = load_sideband_mode::deintlv, typename Tensor, typename RegDataType>
-__simd_callee__ inline void load(
-    const Tensor& tensor, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1);
+__simd_callee__ inline void load(const Tensor& tensor, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1);
 
 /**
  * @brief Loads and broadcasts data from a UB tensor at the specified coordinate.

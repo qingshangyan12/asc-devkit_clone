@@ -9,8 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
-    "reg_data_load_impl.h is internal; include <tensor_api/experimental/arch/vector/reg_data_load.h> instead."
+#warning "reg_data_load_impl.h is internal; include <tensor_api/experimental/arch/vector/reg_data_load.h> instead."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_LOAD_IMPL
 #endif
@@ -37,8 +36,9 @@ struct load_from_ptr_impl<load_sideband_mode::direct> {
     template <typename DataType, typename Pointer>
     __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
     {
-        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> ||
-                          is_b32_type_v<DataType> || is_b64_type_v<DataType>,
+        static_assert(
+            is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> || is_b32_type_v<DataType> ||
+                is_b64_type_v<DataType>,
             "load direct does not support this element type");
         reg_tensor<DataType> dst;
         asc_loadalign(dst.reg, src);
@@ -51,7 +51,8 @@ struct load_from_ptr_impl<load_sideband_mode::downsample> {
     template <typename DataType, typename Pointer>
     __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
     {
-        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType>,
+        static_assert(
+            is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType>,
             "load downsample does not support this element type");
         reg_tensor<DataType> dst;
         asc_loadalign_downsample(dst.reg, src);
@@ -64,8 +65,8 @@ struct load_from_ptr_impl<load_sideband_mode::unpack> {
     template <typename DataType, typename Pointer>
     __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
     {
-        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> ||
-                          is_b32_type_v<DataType>,
+        static_assert(
+            is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> || is_b32_type_v<DataType>,
             "load unpack does not support this element type");
         reg_tensor<DataType> dst;
         asc_loadalign_unpack(dst.reg, src);
@@ -78,8 +79,8 @@ struct load_from_ptr_impl<load_sideband_mode::unpack4> {
     template <typename DataType, typename Pointer>
     __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
     {
-        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType>,
-            "load unpack4 does not support this element type");
+        static_assert(
+            is_b4_type_v<DataType> || is_b8_type_v<DataType>, "load unpack4 does not support this element type");
         reg_tensor<DataType> dst;
         asc_loadalign_unpack4(dst.reg, src);
         return dst;
@@ -91,7 +92,8 @@ struct load_from_ptr_impl<load_sideband_mode::upsample> {
     template <typename DataType, typename Pointer>
     __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
     {
-        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType>,
+        static_assert(
+            is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType>,
             "load upsample does not support this element type");
         reg_tensor<DataType> dst;
         asc_loadalign_upsample(dst.reg, src);
@@ -102,11 +104,11 @@ struct load_from_ptr_impl<load_sideband_mode::upsample> {
 template <>
 struct load_from_ptr_impl<load_sideband_mode::deintlv> {
     template <typename Pointer, typename RegDataType>
-    __simd_callee__ static inline void run(
-        Pointer src, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
+    __simd_callee__ static inline void run(Pointer src, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
     {
-        static_assert(is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> ||
-                          is_b16_type_v<RegDataType> || is_b32_type_v<RegDataType>,
+        static_assert(
+            is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> || is_b16_type_v<RegDataType> ||
+                is_b32_type_v<RegDataType>,
             "load deintlv does not support this element type");
         asc_loadalign_deintlv(dst0.reg, dst1.reg, src);
     }
@@ -119,8 +121,7 @@ __simd_callee__ inline reg_tensor<DataType> load_from_ptr(Pointer src)
 }
 
 template <load_sideband_mode sideband_mode, typename Pointer, typename RegDataType>
-__simd_callee__ inline void load_from_ptr(
-    Pointer src, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
+__simd_callee__ inline void load_from_ptr(Pointer src, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
 {
     load_from_ptr_impl<sideband_mode>::run(src, dst0, dst1);
 }
@@ -133,8 +134,8 @@ struct load_broadcast_from_ptr_impl<broadcast_mode::elem> {
     template <typename DataType, typename Pointer>
     __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
     {
-        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> ||
-                          is_b32_type_v<DataType>,
+        static_assert(
+            is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> || is_b32_type_v<DataType>,
             "load_broadcast elem does not support this element type");
         reg_tensor<DataType> dst;
         asc_loadalign_brc_elem(dst.reg, src);
@@ -147,8 +148,8 @@ struct load_broadcast_from_ptr_impl<broadcast_mode::datablock> {
     template <typename DataType, typename Pointer>
     __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
     {
-        static_assert(is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> ||
-                          is_b32_type_v<DataType>,
+        static_assert(
+            is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> || is_b32_type_v<DataType>,
             "load_broadcast datablock does not support this element type");
         reg_tensor<DataType> dst;
         asc_loadalign_brc_datablock(dst.reg, src);
@@ -161,7 +162,8 @@ struct load_broadcast_from_ptr_impl<broadcast_mode::elem2datablock> {
     template <typename DataType, typename Pointer>
     __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
     {
-        static_assert(is_b16_type_v<DataType> || is_b32_type_v<DataType>,
+        static_assert(
+            is_b16_type_v<DataType> || is_b32_type_v<DataType>,
             "load_broadcast elem2datablock does not support this element type");
         reg_tensor<DataType> dst;
         asc_loadalign_brc_elem2datablock(dst.reg, src);
@@ -182,8 +184,8 @@ __simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& co
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
-    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "load only supports tensors located in UB");
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "load only supports tensors located in UB");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "load");
 
     auto src_engine = tensor.engine() + tensor.layout()(coord);
@@ -195,22 +197,21 @@ __simd_callee__ inline decltype(auto) load(const Tensor& tensor)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
-    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "load only supports tensors located in UB");
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "load only supports tensors located in UB");
 
     return detail::load_from_ptr<sideband_mode, data_type>(tensor.engine().begin().get());
 }
 
 template <load_sideband_mode sideband_mode, typename Tensor, typename Coord, typename RegDataType>
-__simd_callee__ inline void load(const Tensor& tensor, const Coord& coord, reg_tensor<RegDataType>& dst0,
-    reg_tensor<RegDataType>& dst1)
+__simd_callee__ inline void load(
+    const Tensor& tensor, const Coord& coord, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
-    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "load only supports tensors located in UB");
-    static_assert(Std::is_same_v<data_type, RegDataType>,
-        "load requires matching tensor and register element types");
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "load only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, RegDataType>, "load requires matching tensor and register element types");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "load");
 
     auto src_engine = tensor.engine() + tensor.layout()(coord);
@@ -218,15 +219,13 @@ __simd_callee__ inline void load(const Tensor& tensor, const Coord& coord, reg_t
 }
 
 template <load_sideband_mode sideband_mode, typename Tensor, typename RegDataType>
-__simd_callee__ inline void load(
-    const Tensor& tensor, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
+__simd_callee__ inline void load(const Tensor& tensor, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
-    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
-        "load only supports tensors located in UB");
-    static_assert(Std::is_same_v<data_type, RegDataType>,
-        "load requires matching tensor and register element types");
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "load only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, RegDataType>, "load requires matching tensor and register element types");
 
     detail::load_from_ptr<sideband_mode>(tensor.engine().begin().get(), dst0, dst1);
 }
@@ -236,7 +235,8 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor, const
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
-    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
         "load_broadcast only supports tensors located in UB");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "load_broadcast");
 
@@ -249,7 +249,8 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
-    static_assert(Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
         "load_broadcast only supports tensors located in UB");
 
     return detail::load_broadcast_from_ptr<brc_mode, data_type>(tensor.engine().begin().get());
