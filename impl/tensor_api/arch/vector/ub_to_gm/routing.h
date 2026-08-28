@@ -24,6 +24,7 @@
 
 #include "impl/tensor_api/arch/vector/ub_to_gm/copy_impl/dn2dn.h"
 #include "impl/tensor_api/arch/vector/ub_to_gm/copy_impl/nd2nd.h"
+#include "impl/tensor_api/arch/vector/ub_to_gm/copy_impl/one_dim.h"
 #include "impl/tensor_api/arch/vector/ub_to_gm/copy_impl/nz2nz.h"
 
 namespace asc {
@@ -51,6 +52,11 @@ struct copy_ub_to_gm_routing<version, nd_ext_layout_ptn, nd_ext_layout_ptn> {
 template <uint32_t version>
 struct copy_ub_to_gm_routing<version, nd_layout_ptn, nd_layout_ptn> {
     using type = copy_ub_to_gm_nd;
+};
+
+template <uint32_t version>
+struct copy_ub_to_gm_routing<version, one_dim_layout_ptn, one_dim_layout_ptn> {
+    using type = copy_ub_to_gm_one_dim;
 };
 
 template <uint32_t version>

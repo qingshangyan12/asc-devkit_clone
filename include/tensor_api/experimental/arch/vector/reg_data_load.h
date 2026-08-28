@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_LOAD
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_LOAD_H
 #endif
 
 /*!
@@ -52,10 +52,11 @@ __simd_callee__ inline decltype(auto) load(const Tensor& tensor);
  * @param dst1 Second destination register tensor.
  * @note This overload supports only load_sideband_mode::deintlv.
  */
-template <load_sideband_mode sideband_mode = load_sideband_mode::deintlv, typename Tensor, typename Coord,
+template <
+    load_sideband_mode sideband_mode = load_sideband_mode::deintlv, typename Tensor, typename Coord,
     typename RegDataType>
-__simd_callee__ inline void load(const Tensor& tensor, const Coord& coord, reg_tensor<RegDataType>& dst0,
-    reg_tensor<RegDataType>& dst1);
+__simd_callee__ inline void load(
+    const Tensor& tensor, const Coord& coord, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1);
 
 /**
  * @brief Loads and deinterleaves data from the beginning of a UB tensor into two register tensors.
@@ -65,8 +66,7 @@ __simd_callee__ inline void load(const Tensor& tensor, const Coord& coord, reg_t
  * @note This overload supports only load_sideband_mode::deintlv.
  */
 template <load_sideband_mode sideband_mode = load_sideband_mode::deintlv, typename Tensor, typename RegDataType>
-__simd_callee__ inline void load(
-    const Tensor& tensor, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1);
+__simd_callee__ inline void load(const Tensor& tensor, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1);
 
 /**
  * @brief Loads and broadcasts data from a UB tensor at the specified coordinate.
@@ -95,7 +95,7 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
 
 #endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_LOAD_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_LOAD)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_LOAD_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_LOAD
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_LOAD_H
 #endif

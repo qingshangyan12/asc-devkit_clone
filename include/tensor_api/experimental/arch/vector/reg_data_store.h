@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE_H
 #endif
 
 /*!
@@ -34,7 +34,8 @@ namespace experimental {
  * @param src Source register tensor.
  * @note The tensor and register element types must match.
  */
-template <store_sideband_mode sideband_mode = store_sideband_mode::direct, typename Tensor, typename Coord,
+template <
+    store_sideband_mode sideband_mode = store_sideband_mode::direct, typename Tensor, typename Coord,
     typename RegDataType>
 __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src);
 
@@ -55,10 +56,11 @@ __simd_callee__ inline void store(Tensor& tensor, const reg_tensor<RegDataType>&
  * @param src1 Second source register tensor.
  * @note This overload supports only store_sideband_mode::intlv. The tensor and register element types must match.
  */
-template <store_sideband_mode sideband_mode = store_sideband_mode::intlv, typename Tensor, typename Coord,
+template <
+    store_sideband_mode sideband_mode = store_sideband_mode::intlv, typename Tensor, typename Coord,
     typename RegDataType>
-__simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src0,
-    const reg_tensor<RegDataType>& src1);
+__simd_callee__ inline void store(
+    Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
 
 /**
  * @brief Interleaves two register tensors and stores the result at the beginning of a UB tensor.
@@ -81,7 +83,7 @@ __simd_callee__ inline void store(
 
 #endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_REG_DATA_STORE_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_STORE_H
 #endif

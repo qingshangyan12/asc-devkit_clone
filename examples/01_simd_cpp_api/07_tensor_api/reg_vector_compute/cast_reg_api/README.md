@@ -2,12 +2,12 @@
 
 ## 概述
 
-本样例介绍如何使用实验性 Tensor API `asc::te::experimental::cast` 完成逐元素数据类型转换。样例输入和输出均为 `[16, 16]` 的二维 ND Tensor，共包含256个元素。
+本样例组合实验性 Tensor API 的寄存器加载、类型转换和存储能力，完成逐元素数据类型转换。样例输入和输出均为 `[256]` 的一维 Tensor。
 
-样例覆盖浮点类型和浮点类型、整数类型和浮点类型之间的6种转换场景，并演示不同位宽转换时的 `unpack`、`unpack4`、`pack` 和 `pack_quarter` 访存模式。计算关系如下：
+样例覆盖浮点类型和浮点类型、整数类型和浮点类型之间的6种转换场景，并演示不同位宽转换时的 `unpack`、`unpack4` 访存模式和 `deinterleave` 数据重排。计算关系如下：
 
 ```text
-y[i] = cast<To, Options>(x[i])
+y[i] = convert<To>(x[i])
 ```
 
 ## 支持的产品
@@ -55,9 +55,9 @@ y[i] = cast<To, Options>(x[i])
     </tr>
     <tr>
       <td align="center">x</td>
-      <td align="center">[16, 16]</td>
+      <td align="center">[256]</td>
       <td align="center">half/float/int8_t/int32_t/bfloat16_t</td>
-      <td align="center">ND</td>
+      <td align="center">一维</td>
     </tr>
     <tr>
       <td rowspan="2" align="center">样例输出</td>
@@ -68,9 +68,9 @@ y[i] = cast<To, Options>(x[i])
     </tr>
     <tr>
       <td align="center">y</td>
-      <td align="center">[16, 16]</td>
+      <td align="center">[256]</td>
       <td align="center">int32_t/int16_t/uint8_t/float/bfloat16_t</td>
-      <td align="center">ND</td>
+      <td align="center">一维</td>
     </tr>
     <tr>
       <td align="center">样例Kernel名</td>
@@ -91,11 +91,11 @@ y[i] = cast<To, Options>(x[i])
 
   - Kernel关键步骤
 
-    1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_frame_layout` 构造GM、UB上的二维Tensor。
+    1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和一维 layout 构造GM、UB Tensor；layout 使用 `make_shape(256)` 和 `make_stride(1)`。
     2. 使用 `asc_lock/asc_unlock` 包围MTE2流水，通过 `asc::te::copy` 将输入从GM搬运到UB。
     3. 根据源类型和目标类型的较大位宽计算单次寄存器处理元素数，使用 `asc::te::experimental::update_mask` 设置有效元素掩码。
-    4. 相同位宽使用普通 `load`；扩宽转换使用 `unpack` 或 `unpack4` 模式加载；窄化转换使用 `pack` 或 `pack_quarter` 模式存储。
-    5. 使用 `asc::te::experimental::cast` 完成寄存器类型转换。
+    4. 相同位宽使用普通 `load/store`；扩宽转换使用 `unpack` 或 `unpack4` 加载；窄化转换使用 `deinterleave` 压紧寄存器数据后调用普通 `store`。
+    5. 调用 `experimental::cast` 完成寄存器类型转换。
     6. 使用同一个mutex依次锁定Vector和MTE3流水，再将结果从UB搬运回GM。
 
     核心转换代码如下：
@@ -104,13 +104,11 @@ y[i] = cast<To, Options>(x[i])
     auto srcReg = asc::te::experimental::load(src, coord);
     srcReg = srcReg.with_mask(asc::te::experimental::update_mask<WiderT>(remain));
 
-    constexpr asc::te::experimental::cast_options options = {
-        Layout, Round, Sat};
-    auto dstReg = asc::te::experimental::cast<DstT, options>(srcReg);
+    auto dstReg = asc::te::experimental::cast<int32_t>(srcReg);
     asc::te::experimental::store(dst, coord, dstReg);
     ```
 
-    当源类型和目标类型位宽不同时，样例会为 `load` 或 `store` 指定对应的 sideband mode，保证寄存器数据排布与转换指令匹配。
+    窄化转换使用 layout zero 生成寄存器结果：2倍窄化通过一级 `deinterleave` 提取偶数位置，4倍窄化通过两级 `deinterleave` 提取每四个位置中的第一个元素，再使用普通 `store` 写入连续的目标数据。
 
 ## 编译运行
 
