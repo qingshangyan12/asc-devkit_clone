@@ -156,7 +156,7 @@ PIPE_M
 
 - 同步约束说明：
 
-  针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景，当`(left_height / 16) * (right_width / 16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../spr/asc_set_ctrl.md)，并将入参`pipe`设置为`PIPE_M`。
+  针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景，当`(left_height / 16) * (right_width / 16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../sync/asc_sync_pipe.md)，并将入参`pipe`设置为`PIPE_M`。
 
 - UnitFlag约束说明：
 
@@ -166,7 +166,7 @@ PIPE_M
 
 - 特殊值/边界值约束说明：
 
-  浮点类型的输入或输出包含inf/nan时，可通过[asc_set_ctrl](../sys_var/asc_set_ctrl.md)接口配置CTRL寄存器的CTRL\[48\]比特位控制计算时的模式：
+  浮点类型的输入或输出包含inf/nan时，可通过[asc_set_ctrl](../spr/asc_set_ctrl.md)接口配置CTRL寄存器的CTRL\[48\]比特位控制计算时的模式：
 
   - 设置为0时使用饱和模式，inf输出饱和为±MAX、nan输出饱和为0；
   - 设置为1时使用非饱和模式，inf/nan保持原输出。
