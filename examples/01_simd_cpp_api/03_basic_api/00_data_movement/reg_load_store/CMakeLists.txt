@@ -11,7 +11,12 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
+set_property(CACHE CMAKE_ASC_RUN_MODE PROPERTY STRINGS npu cpu sim)
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
+
+if(NOT CMAKE_ASC_RUN_MODE MATCHES "^(npu|cpu|sim)$")
+    message(FATAL_ERROR "CMAKE_ASC_RUN_MODE must be npu, cpu, or sim, got: ${CMAKE_ASC_RUN_MODE}")
+endif()
 
 find_package(ASC REQUIRED)
 
@@ -19,6 +24,7 @@ project(kernel_samples LANGUAGES ASC CXX)
 
 set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-4)")
 
+message(STATUS "[INFO] CMAKE_ASC_RUN_MODE is ${CMAKE_ASC_RUN_MODE}")
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
 
 if(SCENARIO_NUM LESS 1 OR SCENARIO_NUM GREATER 4)

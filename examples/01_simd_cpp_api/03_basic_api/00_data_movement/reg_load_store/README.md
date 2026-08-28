@@ -2,22 +2,20 @@
 
 ## 概述
 
-本样例演示`Load`和`Store`易用性接口在`RegTraitNumOne`和`RegTraitNumTwo`场景下的使用方法。通过CMake编译参数`SCENARIO_NUM`选择场景，分别覆盖`Store`不带`count`和带`count`的两个重载。
+本样例演示`Load`和`Store`易用性接口对`RegTraitNumOne`和`RegTraitNumTwo`的支持。通过CMake编译参数`SCENARIO_NUM`选择场景，分别覆盖`Store`不带`count`和带`count`的两个重载。
 
-| SCENARIO_NUM | RegTensor类型 | Store接口 | 搬运量 |
-| --- | --- | --- | --- |
-| 1 | `RegTensor<uint64_t, RegTraitNumOne>` | `Store(dstAddr, srcReg)` | 32个`uint64_t`元素（256B） |
-| 2 | `RegTensor<uint64_t, RegTraitNumOne>` | `Store(dstAddr, srcReg, count)`，`count`为32 | 32个`uint64_t`元素（256B） |
-| 3 | `RegTensor<uint64_t, RegTraitNumTwo>` | `Store(dstAddr, srcReg)` | 64个`uint64_t`元素（512B） |
-| 4 | `RegTensor<uint64_t, RegTraitNumTwo>` | `Store(dstAddr, srcReg, count)`，`count`为64 | 64个`uint64_t`元素（512B） |
-
-四个场景均将源地址和目的地址偏移一个`uint64_t`元素，使UB起始地址不满足32B对齐要求。`Load`和`Store`内部会完成非对齐搬运所需的预处理及后处理。
+| SCENARIO_NUM | RegTensor类型 | Load接口 | Store接口 | 单次搬运量 | 调用次数 | 总搬运量 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | `RegTensor<uint64_t, RegTraitNumOne>` | `Load(srcReg, srcAddr)` | `Store(dstAddr, srcReg)` | 32个`uint64_t`元素（256B） | 2 | 64个`uint64_t`元素（512B） |
+| 2 | `RegTensor<uint64_t, RegTraitNumOne>` | `Load(srcReg, srcAddr)` | `Store(dstAddr, srcReg, count)`，`count`为32 | 32个`uint64_t`元素（256B） | 2 | 64个`uint64_t`元素（512B） |
+| 3 | `RegTensor<uint64_t, RegTraitNumTwo>` | `Load(srcReg, srcAddr)` | `Store(dstAddr, srcReg)` | 64个`uint64_t`元素（512B） | 1 | 64个`uint64_t`元素（512B） |
+| 4 | `RegTensor<uint64_t, RegTraitNumTwo>` | `Load(srcReg, srcAddr)` | `Store(dstAddr, srcReg, count)`，`count`为64 | 64个`uint64_t`元素（512B） | 1 | 64个`uint64_t`元素（512B） |
 
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | 支持本特性的版本 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -34,31 +32,61 @@ reg_load_store/
 
 ## 样例描述
 
-输入和输出均为68个`uint64_t`元素。Kernel先将数据从GM搬入UB，并将输入、输出UB地址各偏移8B，再调用`Load`将数据搬入RegTensor，最后调用当前场景对应的`Store`重载搬回输出区域。
+输入和输出缓冲区均为68个`uint64_t`元素，其中包含64个有效搬运元素、1个用于构造非对齐地址的前置元素，以及3个用于保证缓冲区总长度32B对齐的尾部填充元素。样例按照以下流程完成数据搬运和精度验证：
 
-- 场景1使用`RegTraitNumOne`和不带`count`的`Store`，搬运一个VL，即32个`uint64_t`元素。
-- 场景2使用`RegTraitNumOne`和带`count`的`Store`，`count`设置为32，搬运一个VL。
-- 场景3使用`RegTraitNumTwo`和不带`count`的`Store`，搬运两个VL，即64个`uint64_t`元素。
-- 场景4使用`RegTraitNumTwo`和带`count`的`Store`，`count`设置为64，搬运两个VL。
+1. 将输入数据从GM搬入UB，并将输出UB初始化为0。
+2. 将输入和输出UB地址分别偏移一个`uint64_t`元素（8B），构造起始地址非32B对齐的场景。
+3. 调用`Load`将数据从UB搬入RegTensor。
+4. 根据`SCENARIO_NUM`调用对应的SIMD VF，将数据从RegTensor搬回UB。
+5. 将结果从UB搬回GM，并与真值数据进行比较。
+
+四个场景的总搬运量均为512B。`RegTraitNumOne`场景单次搬运一个VL（256B），循环调用两次；`RegTraitNumTwo`场景单次搬运两个VL（512B），调用一次。`Load`和`Store`内部完成非对齐搬运所需的预处理和后处理。
 
 ## 编译运行
 
-配置CANN环境后，在本样例目录执行：
+- 配置环境变量
 
-```bash
-source ${install_path}/cann/set_env.sh
-SCENARIO_NUM=1
-mkdir -p build && cd build
-cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=${SCENARIO_NUM} ..
-make -j
-python3 ../scripts/gen_data.py -scenarioNum=${SCENARIO_NUM}
-./demo
-```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
-将`SCENARIO_NUM`设置为`1`、`2`、`3`或`4`，可运行对应场景。切换场景前需要清理CMake缓存并重新编译。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-执行成功时输出：
+  > **说明：** `${install_path}`为CANN包安装目录，未指定安装目录时默认安装至`/usr/local/Ascend`。
 
-```text
-test pass!
-```
+- 执行样例
+
+  在本样例目录下执行以下命令。默认使用NPU模式：
+
+  ```bash
+  SCENARIO_NUM=4
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;    # 编译工程，默认npu模式
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
+  ./demo                           # 执行编译生成的可执行程序，执行样例
+  ```
+
+  使用CPU调试或NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  ```
+
+  > **注意：** 切换运行模式或场景前，需要删除`build`目录中的`CMakeCache.txt`，再重新执行CMake和编译命令。
+
+- 编译参数说明
+
+  | 参数 | 可选值 | 说明 |
+  | --- | --- | --- |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 分别表示NPU执行、CPU调试和NPU仿真模式。 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | `dav-3510`对应Ascend 950PR/Ascend 950DT。 |
+  | `SCENARIO_NUM` | `1`、`2`、`3`、`4` | 场景编号，具体含义参见概述中的场景表。 |
+
+- 执行结果
+
+  执行结果如下，说明精度对比成功。
+  ```bash
+  test pass!
+  ```

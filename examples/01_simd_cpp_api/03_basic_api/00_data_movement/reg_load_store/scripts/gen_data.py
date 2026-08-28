@@ -19,7 +19,7 @@ import numpy as np
 
 def gen_golden_data(scenario_num):
     buffer_count = 68
-    copied_count = 32 if scenario_num in (1, 2) else 64
+    copied_count = 64
 
     input_x = np.arange(1000, 1000 + buffer_count, dtype=np.uint64)
     golden = np.zeros(buffer_count, dtype=np.uint64)
