@@ -13,8 +13,10 @@
 
 namespace mc2_ops_hccl {
 namespace {
+#if !defined(HCCL_CANN_COMPAT_850)
 constexpr u32 CONCURRENT_RANK_LIMIT = 4U;
 constexpr u64 CONCURRENT_COUNT_LIMIT = 512U;
+#endif
 } // namespace
 
 SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
@@ -22,6 +24,9 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
     (void)configAlgMap;
+#if defined(HCCL_CANN_COMPAT_850)
+    (void)opParam;
+#endif
     CHK_PRT_RET(
         topoInfo == nullptr, HCCL_ERROR("[AlltoAllAutoSelector] topoInfo is nullptr."), SelectorStatus::NOT_MATCH);
     if (topoInfo->userRankSize <= 1U) {
@@ -48,6 +53,10 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
             topoInfo->userRankSize, static_cast<u32>(topoInfo->level0Topo));
         return SelectorStatus::NOT_MATCH;
     }
+#if defined(HCCL_CANN_COMPAT_850)
+    // The Concurrent executor is not built for CANN 8.5 compatibility packages.
+    selectAlgName = "AicpuAllToAllSoleMeshUBX";
+#else
     bool isMeshNumEqualToClosNum = false;
     CHK_PRT_RET(
         CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
@@ -59,6 +68,7 @@ SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
     const bool concurrentCondition = isMeshNumEqualToClosNum && topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT &&
                                      sendCounts[0] > CONCURRENT_COUNT_LIMIT;
     selectAlgName = concurrentCondition ? "AicpuAllToAllSoleMeshConcurrent" : "AicpuAllToAllSoleMeshUBX";
+#endif
     HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
