@@ -47,17 +47,7 @@ __simd_callee__ inline void trap();
 #endif
 #endif
 
-#define ASC_INTERNAL_COUNT_ARGS_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N, ...) N
-#define ASC_INTERNAL_COUNT_ARGS(...) ASC_INTERNAL_COUNT_ARGS_IMPL(__VA_ARGS__, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1)
-#define ASC_INTERNAL_GET_ARG_COUNT(...) ASC_INTERNAL_COUNT_ARGS(__VA_ARGS__)
-#define ASC_INTERNAL_ASSERT_IMPL(N, ...) ASC_INTERNAL_ASSERT_FUNC(N, __VA_ARGS__)
-#define ASC_INTERNAL_ASSERT_FUNC(N, ...) ASC_INTERNAL_ASSERT_##N(__VA_ARGS__)
-#define ASC_INTERNAL_ASSERT_1(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, (__PRETTY_FUNCTION__)))
-#ifndef ASCENDC_CPU_DEBUG
-#define ASC_INTERNAL_ASSERT_2(expr, fmt, ...) (static_cast<bool>(expr) ? void(0) : __assert_fail_msg(#expr, __FILE__, __LINE__, (__PRETTY_FUNCTION__), fmt, ##__VA_ARGS__))
-#else
-#define ASC_INTERNAL_ASSERT_2(expr, ...) ASC_INTERNAL_ASSERT_1(expr)
-#endif
+#include "impl/utils/debug/asc_assert_macro_impl.h"
 
 #undef assert
 #undef ascendc_assert

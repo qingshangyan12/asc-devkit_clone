@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include "utils/debug/asc_assert.h"
 #include "kernel_operator.h"
 #include "leaky_relu_custom_tiling.h"
 

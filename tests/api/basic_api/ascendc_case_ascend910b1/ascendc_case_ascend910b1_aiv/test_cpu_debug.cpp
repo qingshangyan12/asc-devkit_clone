@@ -14,6 +14,7 @@
 
 #define ASCENDC_DUMP 0
 #include "kernel_operator.h"
+#include "utils/debug/asc_assert.h"
 
 using namespace std;
 using namespace AscendC;
