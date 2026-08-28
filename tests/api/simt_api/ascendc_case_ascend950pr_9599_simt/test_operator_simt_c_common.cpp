@@ -12,6 +12,7 @@
 #include "simt_compiler_stub.h"
 #include "kernel_operator.h"
 #include "simt_api/asc_simt.h"
+#include "utils/debug/asc_assert.h"
 
 class CommoncTestsuite : public testing::Test {
 protected:

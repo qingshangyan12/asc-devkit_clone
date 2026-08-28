@@ -23,6 +23,9 @@
 #ifndef IMPL_SIMT_API_COOPERATIVE_GROUPS_IMPL_H
 #define IMPL_SIMT_API_COOPERATIVE_GROUPS_IMPL_H
 
+#include "impl/utils/debug/asc_assert_simt_impl.h"
+#include "impl/utils/debug/asc_assert_macro_impl.h"
+
 namespace cooperative_groups {
 
 template <typename T, typename... Args>
@@ -303,8 +306,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline thread_block::thread_block(
     uint64_t scratch_address, unsigned int max_block_size, details::tile_memory_type_tag<MemoryType>)
     : thread_group(group_type::thread_block_type), _tile_memory(scratch_address), _tile_memory_type(MemoryType)
 {
-#ifdef ASCENDC_DEBUG
-    assert(num_threads() <= max_block_size);
+#if defined(ASCENDC_DEBUG) && !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(NDEBUG)
+    ASC_INTERNAL_ASSERT_1(num_threads() <= max_block_size);
 #endif
     constexpr unsigned int barrierWords = details::multi_warp_scratch::memory_barriers_count *
                                           sizeof(details::multi_warp_scratch::barrier_t) / sizeof(unsigned int);
@@ -652,8 +655,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline multi_warp_thread_block_tile_base<Size>::m
     uint64_t tile_memory, details::tile_memory_type memory_type)
     : _tile_memory(tile_memory), _tile_memory_type(memory_type)
 {
-#if defined(ASCENDC_DEBUG)
-    assert(_tile_memory != 0U);
+#if defined(ASCENDC_DEBUG) && !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(NDEBUG)
+    ASC_INTERNAL_ASSERT_1(_tile_memory != 0U);
 #endif
 }
 
@@ -788,8 +791,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline T multi_warp_thread_block_tile_base<Size>:
     static_assert(
         sizeof(T) <= details::multi_warp_scratch::communication_size,
         "Collectives with tiles larger than 32 threads are limited to types no larger than 8 bytes.");
-#if defined(ASCENDC_DEBUG)
-    assert(asc_activemask() == 0xFFFFFFFFU);
+#if defined(ASCENDC_DEBUG) && !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(NDEBUG)
+    ASC_INTERNAL_ASSERT_1(asc_activemask() == 0xFFFFFFFFU);
 #endif
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
     return shfl_impl<details::tile_memory_type::generic>(var, src_rank);
@@ -894,8 +897,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int single_warp_thread_block_tile_base<Siz
 template <unsigned int Size>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int multi_warp_thread_block_tile_base<Size>::any(int predicate) const
 {
-#if defined(ASCENDC_DEBUG)
-    assert(asc_activemask() == 0xFFFFFFFFU);
+#if defined(ASCENDC_DEBUG) && !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(NDEBUG)
+    ASC_INTERNAL_ASSERT_1(asc_activemask() == 0xFFFFFFFFU);
 #endif
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
     return any_impl<details::tile_memory_type::generic>(predicate);
@@ -965,8 +968,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int multi_warp_thread_block_tile_base<Size
 template <unsigned int Size>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int multi_warp_thread_block_tile_base<Size>::all(int predicate) const
 {
-#if defined(ASCENDC_DEBUG)
-    assert(asc_activemask() == 0xFFFFFFFFU);
+#if defined(ASCENDC_DEBUG) && !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(NDEBUG)
+    ASC_INTERNAL_ASSERT_1(asc_activemask() == 0xFFFFFFFFU);
 #endif
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
     return all_impl<details::tile_memory_type::generic>(predicate);
