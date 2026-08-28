@@ -28,8 +28,8 @@
 
 配置标量单元访问Global Memory时的L2 Cache管理策略。接口通过修改CTRL寄存器对应比特域生效：
 
-- 传入[asc_load_l2_cache_mode](../enum/asc_load_l2_cache_mode.md)时，设置标量读（load）策略。
-- 传入[asc_store_l2_cache_mode](../enum/asc_store_l2_cache_mode.md)时，设置标量写（store）策略。
+- 传入[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)时，设置标量读（load）策略。
+- 传入[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)时，设置标量写（store）策略。
 
 设置后，后续标量路径上的GM读写将按该策略访问L2 Cache，直至再次调用本接口修改。
 
@@ -46,7 +46,7 @@ __aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode l2_cach
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| l2_cache_mode | 输入 | L2 Cache管理策略。load重载传入[asc_load_l2_cache_mode](../enum/asc_load_l2_cache_mode.md)枚举值；store重载传入[asc_store_l2_cache_mode](../enum/asc_store_l2_cache_mode.md)枚举值。 |
+| l2_cache_mode | 输入 | L2 Cache管理策略。load重载传入[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值；store重载传入[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)枚举值。 |
 
 ## 返回值说明
 
@@ -58,7 +58,7 @@ PIPE_S
 
 ## 约束说明
 
-- 本接口仅影响**标量访存路径**的L2 Cache默认策略，不会修改向量搬运类接口（如[asc_copy_gm2ub_align](../vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)、[asc_copy_ub2gm_align](../vector_data_move/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)、[asc_ndim_copy_gm2ub](../vector_data_move/asc_ndim_copy_gm2ub.md)等）参数中的`l2_cache_mode`；二者相互独立。大块tile数据的L2 Cache优化应通过向量搬运入参配置，参见[L2 Cache Mode最佳实践样例](../../../../../../examples/02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode)。
+- 本接口仅影响**标量访存路径**的L2 Cache默认策略，不会修改向量搬运类接口（如[asc_copy_gm2ub_align](../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)、[asc_copy_ub2gm_align](../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)、[asc_ndim_copy_gm2ub](../vector_datamove/asc_ndim_copy_gm2ub.md)等）参数中的`l2_cache_mode`；二者相互独立。大块tile数据的L2 Cache优化应通过向量搬运入参配置，参见[L2 Cache Mode最佳实践样例](../../../../../../examples/02_simd_c_api/02_features/03_c_api/01_data_movement/00_set_l2_cache_mode)。
 - load与store策略分属CTRL不同比特域（load对应CTRL[19:16]，store对应CTRL[23:20]），设置其一不会覆盖另一侧已配置的值。
 
 ## 调用示例
