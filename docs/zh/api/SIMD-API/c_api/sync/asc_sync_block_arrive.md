@@ -68,6 +68,7 @@ __aicore__ inline void asc_sync_block_arrive(pipe_t pipe,
 - `pipe`不支持的取值：`PIPE_ALL`和`PIPE_S`。
 - 本接口不阻塞`pipe`流水中的后续指令。
 - `flag_id`取值范围为[0, 15]，超出范围值会被按位宽截断处理为低4位（例如，flagId=16时，截取后为0；flagId=17时，截取后为1）。
+- 使用`int64_t`类型实参会命中已废弃的兼容接口并产生弃用告警，请将`flag_id`变量改为`uint16_t`。该兼容接口仅用于迁移，后续版本将移除。
 
 ## 调用示例
 

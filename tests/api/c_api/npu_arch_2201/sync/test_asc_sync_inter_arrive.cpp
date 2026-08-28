@@ -46,7 +46,7 @@ TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_succ)
     GlobalMockObject::verify();
 }
 
-TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_accepts_positive_int64)
+TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_deprecated_int64_forwards_low_16_bits)
 {
     pipe_t pipe = pipe_t::PIPE_V;
     int64_t flag_id = 65537;
@@ -54,7 +54,10 @@ TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_accepts_positive_
         .times(1)
         .will(invoke(sync_inter_arrive_2201_ffts_cross_core_sync_stub));
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     asc_sync_inter_arrive(pipe, flag_id);
+#pragma GCC diagnostic pop
     GlobalMockObject::verify();
 }
 
