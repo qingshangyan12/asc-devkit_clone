@@ -52,7 +52,7 @@ __simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<T>& src0, con
     static_assert(detail::supports_exp_sub_v<T>, "exp_sub supports half and float");
     reg_tensor<float> dst;
     if constexpr (Std::is_same_v<T, half>) {
-        // Preserve the deprecated half overload's PART_EVEN behavior.
+        // Preserve the legacy half overload's PART_EVEN behavior.
         asc_exp_sub_half2float(dst.reg, src0.reg, src1.reg, src0.mask,
             std::integral_constant<asc_position_mode, asc_position_mode::EVEN> {});
     } else {
