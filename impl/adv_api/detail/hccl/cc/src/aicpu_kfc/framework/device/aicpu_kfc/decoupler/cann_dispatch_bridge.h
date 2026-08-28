@@ -19,9 +19,12 @@ namespace cann_abi {
 class InsCollAlgBase {
 public:
     virtual ~InsCollAlgBase() {}
-    virtual std::string Describe() const = 0;                                     // slot: Describe
-    virtual void* CalcCostCoeffAbiPlaceholder(void*, void*, const char*) = 0;     // slot: CalcCostCoeff
-    virtual void* GetAlgNetMetaAbiPlaceholder(void*) const = 0;                   // slot: GetAlgNetMeta
+    virtual std::string Describe() const = 0; // slot: Describe
+
+    // Keep these placeholders to match HCCL's vtable layout.
+    virtual void CalcCostCoeffAbiPlaceholder() = 0; // slot: CalcCostCoeff
+    virtual void GetAlgNetMetaAbiPlaceholder() = 0; // slot: GetAlgNetMeta
+
     virtual int CalcAlgHierarchyInfo(void*, void*, void*) = 0;                    // slot: CalcAlgHierarchyInfo
     virtual int CalcRes(void*, const void*, const void*, const void*, void*) = 0; // slot: CalcRes
     virtual HcclResult Orchestrate(
