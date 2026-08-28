@@ -2871,7 +2871,7 @@
             -   [abs](Utils-API/cpp_stdlib/math_functions/abs.md)
             -   [sqrt](Utils-API/cpp_stdlib/math_functions/sqrt.md)
             -   [ceil\_div](Utils-API/cpp_stdlib/math_functions/ceil_div.md)
-            -   [CeilDivision](Utils-API/cpp_stdlib/math_functions/CeilDivision.md)
+            -   [CeilDivision（废弃）](Utils-API/cpp_stdlib/math_functions/CeilDivision.md)
 
         -   [容器函数](Utils-API/cpp_stdlib/container_functions/container_functions.md)
             -   [tuple](Utils-API/cpp_stdlib/container_functions/tuple.md)
