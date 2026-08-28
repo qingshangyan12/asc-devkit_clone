@@ -10,12 +10,61 @@
 #include "alltoall_auto_selector.h"
 
 #include "selector_registry.h"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
 namespace {
 constexpr u32 CONCURRENT_RANK_LIMIT = 4U;
 constexpr u64 CONCURRENT_COUNT_LIMIT = 512U;
+constexpr uint32_t TOPO_LEVEL_NUM_3 = 3;
 } // namespace
+
+SelectorStatus AlltoAllAutoSelector::SelectCcuScheduleAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
+{
+    (void)configAlgMap;
+    if (topoInfo == nullptr) {
+        HCCL_ERROR("[AlltoAllAutoSelector] topoInfo is nullptr.");
+        return SelectorStatus::NOT_MATCH;
+    }
+    if (topoInfo->topoLevelNums >= TOPO_LEVEL_NUM_3) {
+        return SelectorStatus::NOT_MATCH;
+    }
+    CHK_PRT_RET(
+        IsInputOutputOverlap(opParam) == true,
+        HCCL_WARNING("[AlltoAllAutoSelector] ccu schedule does not support inplace alltoall."),
+        SelectorStatus::NOT_MATCH);
+
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
+        uint32_t dataTypeSize = DATATYPE_SIZE_TABLE[opParam.all2AllVDataDes.sendType];
+        u64* sendCounts = reinterpret_cast<u64*>(opParam.all2AllVDataDes.sendCounts);
+        CHK_PRT_RET(
+            sendCounts == nullptr, HCCL_WARNING("[AlltoAllAutoSelector] sendCounts is nullptr."),
+            SelectorStatus::NOT_MATCH);
+        uint64_t dataSize = sendCounts[0] * dataTypeSize;
+        bool isMeshNumEqualToClosNum = false;
+        CHK_PRT_RET(
+            CheckMeshNumEqualToClosNum(topoInfo, isMeshNumEqualToClosNum) != HCCL_SUCCESS,
+            HCCL_DEBUG("[AlltoAllAutoSelector] CheckMeshNumEqualToClosNum failed."), SelectorStatus::NOT_MATCH);
+        if ((isMeshNumEqualToClosNum == true) && (topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT)
+            && (dataSize > CONCURRENT_COUNT_LIMIT)) {
+            selectAlgName = KFC_CONCURRENT_ALL_TO_ALL_ALG_NAME;
+        } else {
+            selectAlgName = "CcuSchedAllToAllSoleMeshUBX";
+        }
+        HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
+
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
+        selectAlgName = "CcuSchedAllToAllSoleMesh";
+        HCCL_INFO("[AlltoAllAutoSelector] Algo match[%s].", selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
+
+    return SelectorStatus::NOT_MATCH;
+}
 
 SelectorStatus AlltoAllAutoSelector::SelectAicpuAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
