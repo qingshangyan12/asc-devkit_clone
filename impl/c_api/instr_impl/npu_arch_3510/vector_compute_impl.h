@@ -3914,24 +3914,24 @@ __simd_callee__ inline void asc_reduce_max_datablock(vector_int32_t& dst, vector
 }
 
 //================asc_leakyrelu===================
-__simd_callee__ inline void asc_leakyrelu(vector_float& dst, vector_float src, float value, vector_bool mask)
+__simd_callee__ inline void asc_leakyrelu(vector_float& dst, vector_float src, float alpha, vector_bool mask)
 {
-    asc_leakyrelu_impl(dst, src, value, mask);
+    asc_leakyrelu_impl(dst, src, alpha, mask);
 }
 
-__simd_callee__ inline void asc_leakyrelu(vector_half& dst, vector_half src, half value, vector_bool mask)
+__simd_callee__ inline void asc_leakyrelu(vector_half& dst, vector_half src, half alpha, vector_bool mask)
 {
-    asc_leakyrelu_impl(dst, src, value, mask);
+    asc_leakyrelu_impl(dst, src, alpha, mask);
 }
 
-__simd_callee__ inline vector_float asc_leakyrelu(vector_float src, float value, vector_bool mask)
+__simd_callee__ inline vector_float asc_leakyrelu(vector_float src, float alpha, vector_bool mask)
 {
-    return asc_leakyrelu_impl(src, value, mask);
+    return asc_leakyrelu_impl(src, alpha, mask);
 }
 
-__simd_callee__ inline vector_half asc_leakyrelu(vector_half src, half value, vector_bool mask)
+__simd_callee__ inline vector_half asc_leakyrelu(vector_half src, half alpha, vector_bool mask)
 {
-    return asc_leakyrelu_impl(src, value, mask);
+    return asc_leakyrelu_impl(src, alpha, mask);
 }
 
 //=================asc_gt=====================
@@ -6726,24 +6726,24 @@ __simd_callee__ inline void asc_xor(vector_bool& dst, vector_bool src0, vector_b
 }
 
 //===================asc_prelu=====================
-__simd_callee__ inline void asc_prelu(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
+__simd_callee__ inline void asc_prelu(vector_float& dst, vector_float src0, vector_float alpha, vector_bool mask)
 {
-    asc_prelu_impl(dst, src0, src1, mask);
+    asc_prelu_impl(dst, src0, alpha, mask);
 }
 
-__simd_callee__ inline void asc_prelu(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
+__simd_callee__ inline void asc_prelu(vector_half& dst, vector_half src0, vector_half alpha, vector_bool mask)
 {
-    asc_prelu_impl(dst, src0, src1, mask);
+    asc_prelu_impl(dst, src0, alpha, mask);
 }
 
-__simd_callee__ inline vector_float asc_prelu(vector_float src0, vector_float src1, vector_bool mask)
+__simd_callee__ inline vector_float asc_prelu(vector_float src0, vector_float alpha, vector_bool mask)
 {
-    return asc_prelu_impl(src0, src1, mask);
+    return asc_prelu_impl(src0, alpha, mask);
 }
 
-__simd_callee__ inline vector_half asc_prelu(vector_half src0, vector_half src1, vector_bool mask)
+__simd_callee__ inline vector_half asc_prelu(vector_half src0, vector_half alpha, vector_bool mask)
 {
-    return asc_prelu_impl(src0, src1, mask);
+    return asc_prelu_impl(src0, alpha, mask);
 }
 
 // ==========asc_mull(uint32_t/int32_t)==========
