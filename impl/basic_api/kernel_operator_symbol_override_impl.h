@@ -169,10 +169,10 @@ public:
             ASCENDC_REPORT_CHECK_ERROR("And operator", KernelFuncType::NONE_MODE);
         });
 #endif
-        if constexpr (SupportType<T, int32_t, uint32_t>()) {
+        if constexpr (SupportType<PrimT<T>, int32_t, uint32_t>()) {
             AndImpl(
-                (__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)this->src0_.GetPhyAddr(),
-                (__ubuf__ PrimT<T>*)this->src1_.GetPhyAddr(), dst.GetSize() * 2);
+                (__ubuf__ uint16_t*)dst.GetPhyAddr(), (__ubuf__ uint16_t*)this->src0_.GetPhyAddr(),
+                (__ubuf__ uint16_t*)this->src1_.GetPhyAddr(), dst.GetSize() * 2);
         } else { // mainly for uint16_t  + int16_t
             AndImpl(
                 (__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)this->src0_.GetPhyAddr(),
@@ -199,10 +199,10 @@ public:
             ASCENDC_REPORT_CHECK_ERROR("Or operator", KernelFuncType::NONE_MODE);
         });
 #endif
-        if constexpr (SupportType<T, int32_t, uint32_t>()) {
+        if constexpr (SupportType<PrimT<T>, int32_t, uint32_t>()) {
             OrImpl(
-                (__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)this->src0_.GetPhyAddr(),
-                (__ubuf__ PrimT<T>*)this->src1_.GetPhyAddr(), dst.GetSize() * 2);
+                (__ubuf__ uint16_t*)dst.GetPhyAddr(), (__ubuf__ uint16_t*)this->src0_.GetPhyAddr(),
+                (__ubuf__ uint16_t*)this->src1_.GetPhyAddr(), dst.GetSize() * 2);
         } else { // mainly for uint16_t  + int16_t
             OrImpl(
                 (__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__ubuf__ PrimT<T>*)this->src0_.GetPhyAddr(),
