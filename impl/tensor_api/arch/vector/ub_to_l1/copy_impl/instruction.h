@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
+#warning                                                                                                               \
     "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/instruction.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
@@ -30,16 +30,15 @@ namespace te {
 class copy_ub_to_l1_instr {
 public:
     template <typename DataType>
-    __aicore__ inline static void data_copy(
-        __cbuf__ DataType* dst, __ubuf__ DataType* src, const uint16_t block_count, const uint16_t block_len,
-        const uint16_t src_stride, const uint16_t dst_stride)
+    __aicore__ inline static void data_copy(__cbuf__ DataType* dst, __ubuf__ DataType* src, const uint16_t block_count,
+                                            const uint16_t block_len, const uint16_t src_gap,
+                                            const uint16_t dst_gap)
     {
         TENSOR_API_DEBUG_CHECK(debug_check_block_count, block_count, "block_count", "copy_ub_to_l1 instruction");
         TENSOR_API_DEBUG_CHECK(debug_check_block_len, block_len, debug_block_len_max, "copy_ub_to_l1 instruction");
 
-        asc_copy_ub2l1(
-            reinterpret_cast<__cbuf__ void*>(dst), reinterpret_cast<__ubuf__ void*>(src), block_count, block_len,
-            src_stride, dst_stride);
+        asc_copy_ub2l1(reinterpret_cast<__cbuf__ void*>(dst), reinterpret_cast<__ubuf__ void*>(src), block_count,
+                       block_len, src_gap, dst_gap);
     }
 };
 
