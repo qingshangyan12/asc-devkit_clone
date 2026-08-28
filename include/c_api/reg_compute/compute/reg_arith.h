@@ -90,6 +90,16 @@ __simd_callee__ inline void asc_abs(vector_half& dst, vector_half src, vector_bo
 
 __simd_callee__ inline void asc_abs(vector_float& dst, vector_float src, vector_bool mask);
 
+__simd_callee__ inline vector_int8_t asc_abs(vector_int8_t src, vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_abs(vector_int16_t src, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_abs(vector_int32_t src, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_abs(vector_half src, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_abs(vector_float src, vector_bool mask);
+
 __simd_callee__ inline void asc_mull(
     vector_uint32_t& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
@@ -126,6 +136,18 @@ __simd_callee__ inline void asc_mul_scalar(vector_int32_t& dst, vector_int32_t s
 __simd_callee__ inline void asc_mul_scalar(vector_uint32_t& dst, vector_uint32_t src, uint32_t value, vector_bool mask);
 
 __simd_callee__ inline void asc_mul_scalar(vector_float& dst, vector_float src, float value, vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_mul_scalar(vector_int16_t src, int16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint16_t asc_mul_scalar(vector_uint16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_mul_scalar(vector_half src, half value, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_mul_scalar(vector_int32_t src, int32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_mul_scalar(vector_uint32_t src, uint32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_mul_scalar(vector_float src, float value, vector_bool mask);
 
 __simd_callee__ inline void asc_add(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
 
@@ -191,6 +213,25 @@ __simd_callee__ inline void asc_min_scalar(vector_half& dst, vector_half src, ha
 __simd_callee__ inline void asc_min_scalar(
     vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
 
+__simd_callee__ inline vector_int32_t asc_min_scalar(vector_int32_t src, int32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_min_scalar(vector_uint32_t src, uint32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_min_scalar(vector_int16_t src, int16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint16_t asc_min_scalar(vector_uint16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int8_t asc_min_scalar(vector_int8_t src, int8_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint8_t asc_min_scalar(vector_uint8_t src, uint8_t value, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_min_scalar(vector_float src, float value, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_min_scalar(vector_half src, half value, vector_bool mask);
+
+__simd_callee__ inline vector_bfloat16_t asc_min_scalar(
+    vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+
 __simd_callee__ inline void asc_exp(vector_half& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_exp(vector_float& dst, vector_float src, vector_bool mask);
@@ -214,9 +255,32 @@ __simd_callee__ inline void asc_add_scalar(vector_uint32_t& dst, vector_uint32_t
 
 __simd_callee__ inline void asc_add_scalar(vector_float& dst, vector_float src, float value, vector_bool mask);
 
+__simd_callee__ inline vector_int8_t asc_add_scalar(vector_int8_t src, int8_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint8_t asc_add_scalar(vector_uint8_t src, uint8_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_add_scalar(vector_int16_t src, int16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint16_t asc_add_scalar(vector_uint16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_add_scalar(vector_half src, half value, vector_bool mask);
+
+__simd_callee__ inline vector_bfloat16_t asc_add_scalar(
+    vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_add_scalar(vector_int32_t src, int32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_add_scalar(vector_uint32_t src, uint32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_add_scalar(vector_float src, float value, vector_bool mask);
+
 __simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_bool mask);
 
 __simd_callee__ inline void asc_ln(vector_float& dst, vector_float src, vector_bool mask);
+
+__simd_callee__ inline void asc_log(vector_half& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_log(vector_float& dst, vector_float src, vector_bool mask);
 
 __simd_callee__ inline void asc_div(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
@@ -248,6 +312,25 @@ __simd_callee__ inline void asc_max_scalar(vector_float& dst, vector_float src, 
 
 __simd_callee__ inline void asc_max_scalar(
     vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int8_t asc_max_scalar(vector_int8_t src, int8_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_max_scalar(vector_int16_t src, int16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_max_scalar(vector_int32_t src, int32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint8_t asc_max_scalar(vector_uint8_t src, uint8_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint16_t asc_max_scalar(vector_uint16_t src, uint16_t value, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_max_scalar(vector_uint32_t src, uint32_t value, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_max_scalar(vector_half src, half value, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_max_scalar(vector_float src, float value, vector_bool mask);
+
+__simd_callee__ inline vector_bfloat16_t asc_max_scalar(
+    vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
 
 #endif
 
