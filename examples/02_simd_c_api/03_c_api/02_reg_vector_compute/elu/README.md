@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于C API编程接口实现ELU（Exponential Linear Unit）激活运算，主要调用[asc_exp](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_exp.md)、[asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul_scalar.md)、[asc_select](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md)接口。
+本样例基于C API编程接口实现ELU（Exponential Linear Unit）激活运算。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -14,10 +14,7 @@
 
 ```text
 ├── elu
-│   ├── scripts
-│   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
-│   ├── data_utils.h                   // 数据读入写出函数
 │   ├── elu.asc                        // AscendC样例实现 & 调用样例
 │   ├── README.md                      // 样例介绍
 │   └── README_en.md                   // 样例介绍（英文版）
@@ -52,7 +49,7 @@
 
 - 样例实现：
 
-  采用段式动态tiling将输入分段搬入UB，在寄存器域（`vector_float`）完成ELU计算后搬出至GM；fp16在fp32域计算后转回half写回。
+  采用动态tiling将输入分段搬入UB，完成ELU计算后搬出至GM；fp16在fp32域计算后转回half写回。
 
   - 调用实现
 
@@ -79,7 +76,6 @@
   ```bash
   mkdir -p build && cd build;                                                    # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                           # 编译工程（默认npu模式）
-  python3 ../scripts/gen_data.py                                                 # 生成测试输入数据
   ./demo                                                                         # 执行编译生成的可执行程序
   ```
 
@@ -105,13 +101,7 @@
   执行结果如下，说明精度对比成功。
 
   ```bash
-  [Success] File mode verification passed.
+  [Success] All cases verification passed.
   ```
 
-  内置全量自测（验证算子在不同 shape 下的正确性）：
-
-  ```bash
-  ./demo --selftest
-  ```
-
-  输出 `[Success] All cases verification passed.`，程序返回 0。
+  程序返回 0。

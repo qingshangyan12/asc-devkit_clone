@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example implements the ELU (Exponential Linear Unit) activation operator using the C API, mainly calling the [asc_exp](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_exp.md), [asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul_scalar.md) and [asc_select](../../../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md) APIs.
+This example implements the ELU (Exponential Linear Unit) activation operator using the C API.
 
 ## Supported Products and CANN Versions
 
@@ -14,10 +14,7 @@ This example implements the ELU (Exponential Linear Unit) activation operator us
 
 ```text
 ├── elu
-│   ├── scripts
-│   │   ├── gen_data.py                // Input data and ground truth generation script
 │   ├── CMakeLists.txt                 // Build configuration file
-│   ├── data_utils.h                   // Data read/write functions
 │   ├── elu.asc                        // AscendC example implementation & invocation example
 │   ├── README.md                      // Example description
 │   └── README_en.md                   // Example description (English)
@@ -52,7 +49,7 @@ This example implements the ELU (Exponential Linear Unit) activation operator us
 
 - Example implementation:
 
-  It uses segment-based dynamic tiling to copy the input into UB in segments, computes the ELU in the register domain (`vector_float`), then copies it out to GM; fp16 is computed in the fp32 domain and written back as half.
+  It uses dynamic tiling to copy the input into UB in segments, computes the ELU, then copies it out to GM; fp16 is computed in the fp32 domain and written back as half.
 
   - Invocation
 
@@ -79,7 +76,6 @@ Execute the following steps in the example root directory.
   ```bash
   mkdir -p build && cd build;                                                    # create and enter the build directory
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                           # build the project (npu mode by default)
-  python3 ../scripts/gen_data.py                                                 # generate test input data
   ./demo                                                                         # run the compiled executable
   ```
 
@@ -93,16 +89,10 @@ Execute the following steps in the example root directory.
 
 - Sample execution output
 
-  The output below indicates that the precision comparison passed.
+  The output below indicates that the correctness verification passed.
 
   ```bash
-  [Success] File mode verification passed.
+  [Success] All cases verification passed.
   ```
 
-  Built-in comprehensive self-test (validates correctness across various shapes):
-
-  ```bash
-  ./demo --selftest
-  ```
-
-  It outputs `[Success] All cases verification passed.` and returns exit code 0.
+  The program returns exit code 0.
