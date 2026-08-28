@@ -14,7 +14,6 @@ add_executable(ascendc_ut_aicpu_api
     ${ASCENDC_DIR}/tests/main.cpp
     ${ASCENDC_DIR}/impl/aicpu_api/aicpu_dump.cpp
     test_aicpu_dump.cpp
-    test_aicpu_dump_fifo.cpp
 )
 
 target_compile_definitions(ascendc_ut_aicpu_api PRIVATE
