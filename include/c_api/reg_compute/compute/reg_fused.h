@@ -43,6 +43,22 @@ __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float v
 
 __simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask);
 
+__simd_callee__ inline void asc_mul_scalar_float2half_rn(
+    vector_half& dst, vector_float src, float value, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_mul_scalar_float2half_rn(
+    vector_half& dst, vector_float src, float value, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(
+    vector_float src, float value, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(
+    vector_float src, float value, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
 __simd_callee__ inline void asc_madd(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
 __simd_callee__ inline void asc_madd(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
