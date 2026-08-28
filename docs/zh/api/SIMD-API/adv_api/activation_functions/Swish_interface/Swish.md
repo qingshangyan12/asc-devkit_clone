@@ -65,6 +65,9 @@ __aicore__ inline void Swish(const LocalTensor<T>& dstLocal, const LocalTensor<T
 -   操作数地址偏移对齐要求请参见[通用说明和约束](../../../general_description_and_constraints.md)。
 -   **不支持源操作数与目的操作数地址重叠。**
 -   当前仅支持ND格式的输入，不支持其他格式。
+-   在Ascend 950PR/Ascend 950DT上，接口内部计算对Subnormal的处理方式受编译选项`--cce-ftz`控制：
+    -   配置为`false`时，计算过程中保留Subnormal，并按照其实际数值参与后续计算。
+    -   配置为`true`时，启用FTZ（Flush-To-Zero）模式，计算过程中产生或参与运算的Subnormal将按0处理，可能导致计算结果与保留Subnormal时存在精度差异。
 
 ## 调用示例
 
