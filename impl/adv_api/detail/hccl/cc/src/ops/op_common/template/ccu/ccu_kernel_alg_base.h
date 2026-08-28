@@ -46,10 +46,10 @@ struct LoopGroupResource {
 };
 
 struct GroupOpSizeVars {
-    ccu::Variable addrOffset; // 第二个loopGroup搬运的起始偏移
-    ccu::Variable loopParam;  // loop串行重复执行次数
+    ccu::Variable addrOffset;    // 第二个loopGroup搬运的起始偏移
+    ccu::Variable loopParam;     // loop串行重复执行次数
     ccu::Variable parallelParam; // loopgroup展开参数，包括展开次数、从第几个loop开始展开、共有几个loop
-    ccu::Variable residual; // 尾块数据size
+    ccu::Variable residual;      // 尾块数据size
 };
 
 struct GroupCopyVar {

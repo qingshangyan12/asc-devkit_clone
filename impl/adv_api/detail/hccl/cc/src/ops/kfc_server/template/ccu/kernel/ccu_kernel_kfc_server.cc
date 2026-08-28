@@ -145,8 +145,7 @@ CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Vari
 
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
-    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER)
-    {
+    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
         if (ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
             CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
                 param[KFC_CONCURRENT_AG_NHR_INPUT], param[KFC_CONCURRENT_AG_NHR_OUTPUT], ctx.token,
@@ -172,14 +171,14 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
     if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
         CcuReduceScatterMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_KFC_CHUNK_SIZE], param[HBM_PARAM_IDX_KFC_CHUNK_LOOP_NUM], param[HBM_PARAM_IDX_KFC_TAIL_SIZE],
-            param[HBM_PARAM_IDX_KFC_FULL_GO_ADDR_OFFSET], param[HBM_PARAM_IDX_KFC_FULL_GO_LOOP_PARAM],
-            param[HBM_PARAM_IDX_KFC_FULL_GO_PARALLEL_PARAM], param[HBM_PARAM_IDX_KFC_FULL_GO_RESIDUAL],
-            param[HBM_PARAM_IDX_KFC_TAIL_GO_ADDR_OFFSET], param[HBM_PARAM_IDX_KFC_TAIL_GO_LOOP_PARAM],
-            param[HBM_PARAM_IDX_KFC_TAIL_GO_PARALLEL_PARAM], param[HBM_PARAM_IDX_KFC_TAIL_GO_RESIDUAL],
-            ctx.arg->channels,
-            ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId,
-            ctx.arg->opParam.DataDes.dataType, ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
+            param[HBM_PARAM_IDX_KFC_CHUNK_SIZE], param[HBM_PARAM_IDX_KFC_CHUNK_LOOP_NUM],
+            param[HBM_PARAM_IDX_KFC_TAIL_SIZE], param[HBM_PARAM_IDX_KFC_FULL_GO_ADDR_OFFSET],
+            param[HBM_PARAM_IDX_KFC_FULL_GO_LOOP_PARAM], param[HBM_PARAM_IDX_KFC_FULL_GO_PARALLEL_PARAM],
+            param[HBM_PARAM_IDX_KFC_FULL_GO_RESIDUAL], param[HBM_PARAM_IDX_KFC_TAIL_GO_ADDR_OFFSET],
+            param[HBM_PARAM_IDX_KFC_TAIL_GO_LOOP_PARAM], param[HBM_PARAM_IDX_KFC_TAIL_GO_PARALLEL_PARAM],
+            param[HBM_PARAM_IDX_KFC_TAIL_GO_RESIDUAL], ctx.arg->channels, ctx.arg->channelCount,
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
+            ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
     }
 }
 
