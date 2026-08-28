@@ -28,6 +28,8 @@ constexpr uint32_t CCU_TASK_NUM_MAX = 64;
 constexpr uint32_t KFC_SERVER_SUB_KERNEL_PC_ARG_IDX = 6;
 constexpr const char* KFC_ALL_GATHER_FUNC_NAME = "KfcAllGatherMesh1DMem2MemFunc";
 constexpr const char* KFC_REDUCE_SCATTER_FUNC_NAME = "KfcReduceScatterMesh1DMem2MemFunc";
+constexpr const char* KFC_ALL_REDUCE_FUNC_NAME = "KfcAllReduceMesh1DMem2MemFunc";
+constexpr const char* KFC_ALL_GATHER_NHR_FUNC_NAME = "KfcAllGatherNHR1DMultiJettyMem2MemFunc";
 
 // new---20260603
 struct CcuKernelArgKfcServer : CcuKernelArgBase {

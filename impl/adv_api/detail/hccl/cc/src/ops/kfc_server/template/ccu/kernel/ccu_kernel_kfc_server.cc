@@ -87,14 +87,52 @@ ccu::Func KfcReduceScatterFunc(
     },
     KFC_REDUCE_SCATTER_FUNC_NAME);
 
+ccu::Func KfcAllReduceFunc(
+    [](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
+       ccu::Variable currentRankSliceInputOffset, ccu::Variable, ccu::Variable, ccu::Variable sliceSize,
+       ccu::Variable repeatNum) {
+        const auto& arg = *g_kfcRegisterArg;
+        CCU_THROW_IF_FAILED(
+            CcuKfcAllReduceMesh1DMem2MemKernel(
+                inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, currentRankSliceOutputOffset,
+                normalSliceSize, lastSliceSize,  mySliceSize, sliceOffset, isInputOutputEqual, goSize0, goSize1, goSize2,
+                goSize3, chunkSize, tailSize, chunkLoopNum, arg.channels, arg.channelCount, static_cast<uint32_t>(arg.rankSize),
+                arg.rankId, arg.opParam.DataDes.dataType, arg.opParam.DataDes.outputType, arg.opParam.reduceType),
+            "define KFC AllReducer func failed");
+    },
+    KFC_ALL_REDUCE_FUNC_NAME);
+
+ccu::Func KfcAllGatherNHRFunc(
+    [](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
+        ccu::Variable sliceSizePerJetty, ccu::Variable lastSliceSizePerJetty, ccu::Variable repeatNumInv,
+        ccu::Variable inputSliceStride, ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride,
+        ccu::Variable outputRepeatStride, ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1,
+        ccu::Variable goSize2, ccu::Variable goSize3) {
+        const auto& arg = *g_kfcRegisterArg;
+        CCU_THROW_IF_FAILED(
+            CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
+                inputAddr, outputAddr, tokenInfo, sliceSize, sliceSizePerJetty, lastSliceSizePerJetty, repeatNumInv,
+                inputSliceStride, outputSliceStride, inputRepeatStride, outputRepeatStride, isInputOutputEqual,
+                goSize0, goSize1, goSize2, goSize3, arg.channels, arg.channelCount, static_cast<uint32_t>(arg.rankSize),
+                arg.rankId, arg.jettyNum, arg.nhrStepInfoVector, arg.nhrRank2ChannelIdx),
+            "define KFC AllGatherNHR func failed");
+    },
+    KFC_ALL_GATHER_NHR_FUNC_NAME);
+
 static CcuResult DefineKfcSubKernelFunc(const CcuKernelArgKfcServer* kernelArg)
 {
     g_kfcRegisterArg = kernelArg;
     switch (kernelArg->opParam.opType) {
         case HcclCMDType::HCCL_CMD_ALLGATHER:
-            return ccu::DefineFunc<KfcAllGatherFunc>();
+            if (kernelArg->role == KfcServerRole::ALL_GATHER_NHR) {
+                return ccu::DefineFunc<KfcAllGatherNHRFunc>();
+            } else {
+                return ccu::DefineFunc<KfcAllGatherFunc>();
+            }
         case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
             return ccu::DefineFunc<KfcReduceScatterFunc>();
+        case HcclCMDType::HCCL_CMD_ALLREDUCE:
+            return ccu::DefineFunc<KfcAllReduceFunc>();
         default:
             HCCL_ERROR(
                 "[DefineKfcSubKernelFunc] unsupported opType[%u]",
