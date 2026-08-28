@@ -1,6 +1,16 @@
-# Fixpipe接口边界值汇总
+# 矩阵计算搬出相关接口边界值汇总
 
-本节汇总介绍了Fixpipe L0C->GM/L0C->L1/L0C->UB搬运接口在L0C中存在inf/-inf/nan等边界值时的输出结果，以下内容针对如下型号生效：
+本节汇总介绍了L0C Buffer->GM/L0C Buffer->L1 Buffer/L0C Buffer->UB搬运接口在L0C Buffer中存在inf/-inf/nan等边界值时的输出结果，涉及接口如下：
+
+**表1**  矩阵计算搬出相关接口说明
+
+| 搬运路径 | 基础API | C API |
+|---|---|---|
+| L0C Buffer->GM | [Fixpipe（L0C到GM）](../SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md) | [asc_copy_l0c2gm](../SIMD-API/c_api/cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md) |
+| L0C Buffer->L1 Buffer | [Fixpipe（L0C到L1）](../SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToL1.md) | [asc_copy_l0c2l1](../SIMD-API/c_api/cube_data_move/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md) |
+| L0C Buffer->UB | [Fixpipe（L0C到UB）](../SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB.md) | [asc_copy_l0c2ub](../SIMD-API/c_api/cube_data_move/asc_copy_l0c2ub.md) |
+
+以下内容针对如下型号生效：
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT
@@ -8,7 +18,7 @@
 
 ## 概述
 
-三个接口均将L0C Buffer中的矩阵计算结果搬运到目标Buffer（GM、L1 Buffer、UB），在搬运过程中支持随路量化，将L0C Buffer中的float或int32_t数据转换为目标数据类型输出。随路量化的inf/nan处理行为在三个接口间完全一致，通过[asc_set_ctrl](../SIMD-API/c_api/sys_var/asc_set_ctrl.md)设置CTRL[48]比特位控制饱和模式：
+三个搬运指令均将L0C Buffer中的矩阵计算结果搬运到目标Buffer（GM、L1 Buffer、UB），在搬运过程中支持随路量化，将L0C Buffer中的float或int32_t数据转换为目标数据类型输出。随路量化的inf/nan处理行为在三个搬运指令间完全一致，通过基础API [SetCtrlSpr](../SIMD-API/basic_api/special_register_access/SetCtrlSpr_ISASI.md) 或 C API [asc_set_ctrl](../SIMD-API/c_api/spr/asc_set_ctrl.md) 设置CTRL[48]比特位控制饱和模式：
 
 - **饱和模式（CTRL[48]=1'b0）**：inf输出会被饱和为±MAX，nan输出会被饱和为0。
 - **非饱和模式（CTRL[48]=1'b1）**：inf/nan保持原输出。
@@ -23,17 +33,17 @@
 
 ### 数据搬运路径差异
 
-三个接口的随路量化inf/nan处理行为完全一致，差异仅在于搬运目标及验证路径：
+三个搬运指令的随路量化inf/nan处理行为完全一致，差异仅在于搬运目标及验证路径：
 
 - **L0C Buffer->GM**：直接将L0C Buffer数据搬运到GM，无需中转路径，非饱和模式下inf/nan能完整传递到GM输出，无验证路径限制。
-- **L0C Buffer->L1 Buffer**：将L0C Buffer数据搬运到L1 Buffer，由于L1 Buffer数据无法直接搬运到GM，样例通过第二次Mmad（量化结果×单位矩阵D）将数据从L1 Buffer经L0A->L0C Buffer搬运到GM，最终输出为int32_t或float。当量化结果中包含inf时，第二次Mmad中inf与单位矩阵的非对角线零元素相乘会产生nan，累加后整行变为nan。此为验证路径的限制，不影响该接口本身对inf/nan的处理行为。golden数据已适配此行为：非饱和模式下inf/-inf/nan位置的golden值设为nan，使测试能端到端通过。
-- **L0C Buffer->UB**：将L0C Buffer数据搬运到UB，再从UB搬运到GM。AIC负责L0C Buffer到UB的搬运，AIV负责UB到GM的搬运，通过跨核同步协调。此路径无第二次Mmad，不存在inf×0=nan问题，非饱和模式下inf/nan能完整传递到GM输出。
+- **L0C Buffer->L1 Buffer**：将L0C Buffer数据搬运到L1 Buffer，由于L1 Buffer数据无法直接搬运到GM，样例通过二次矩阵计算（量化结果×单位矩阵D）将数据从L1 Buffer经L0A->L0C Buffer搬运到GM，最终输出为int32_t或float。当量化结果中包含inf时，二次矩阵计算中inf与单位矩阵的非对角线零元素相乘会产生nan，累加后整行变为nan。此为验证路径的限制，不影响该搬运指令本身对inf/nan的处理行为。golden数据已适配此行为：非饱和模式下inf/-inf/nan位置的golden值设为nan，使测试能端到端通过。
+- **L0C Buffer->UB**：将L0C Buffer数据搬运到UB，再从UB搬运到GM。AIC负责L0C Buffer到UB的搬运，AIV负责UB到GM的搬运，通过跨核同步协调。此路径无二次矩阵计算，不存在inf×0=nan问题，非饱和模式下inf/nan能完整传递到GM输出。
 
 ## float类型L0C Buffer搬运至各输出类型
 
-L0C Buffer中存储的float类型数据来自Mmad矩阵乘计算结果，当输入矩阵A中包含inf/-inf/nan时，L0C Buffer中对应行会出现inf/-inf/nan（详见[Mmad接口边界值汇总](mmad_interface_boundary_value_summary.md)）。
+L0C Buffer中存储的float类型数据来自矩阵乘计算的结果，当输入矩阵A中包含inf/-inf/nan时，L0C Buffer中对应行会出现inf/-inf/nan。
 
-**表1**  float类型L0C Buffer中存在inf/-inf/nan时，各输出类型的计算结果说明
+**表2**  float类型L0C Buffer中存在inf/-inf/nan时，各输出类型的计算结果说明
 
 | 输出数据类型 | 随路量化模式 | L0C Buffer中的元素取值 | 饱和模式输出元素取值       | 非饱和模式输出元素取值 |
 | --- | --- | --- |------------------|-------------|
@@ -83,9 +93,9 @@ L0C Buffer中存储的float类型数据来自Mmad矩阵乘计算结果，当输�
 
 ## int32_t类型L0C Buffer搬运至各输出类型
 
-int32_t类型的L0C Buffer来自int8_t输入矩阵的Mmad计算结果，不会产生inf/nan，但量化后可能产生溢出。
+L0C Buffer中存储的int32_t类型数据来自矩阵乘计算的结果，不会产生inf/nan，但量化后可能产生溢出。
 
-**表2**  int32_t类型L0C Buffer量化溢出时的计算结果说明
+**表3**  int32_t类型L0C Buffer量化溢出时的计算结果说明
 
 | 输出数据类型 | 随路量化模式 | L0C Buffer中的元素取值 | 输出元素取值 |
 | --- | --- | --- | --- |
@@ -104,7 +114,7 @@ int32_t类型的L0C Buffer来自int8_t输入矩阵的Mmad计算结果，不会�
 
 NoQuant模式不做类型转换和量化，L0C Buffer中的float数据原样搬运到目标Buffer。由于CTRL[48]不支持float数据类型，饱和模式和非饱和模式下inf/nan均保持原样输出。NoQuant场景还覆盖了NZ2NZ、NZ2ND、双目标按M维度拆分、双目标按N维度拆分等输出格式，验证inf/-inf/nan在各种格式转换和双目标拆分场景下均能正确传递。
 
-**表3**  NoQuant模式下float类型L0C Buffer中存在inf/-inf/nan时的输出结果
+**表4**  NoQuant模式下float类型L0C Buffer中存在inf/-inf/nan时的输出结果
 
 | 场景 | 输出格式 | 双目标 | L0C Buffer中的元素取值 | 输出元素取值 | 说明 |
 | --- | --- | --- | --- | --- | --- |
