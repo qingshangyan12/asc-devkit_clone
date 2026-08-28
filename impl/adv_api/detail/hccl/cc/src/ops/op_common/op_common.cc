@@ -1354,6 +1354,7 @@ HcclResult GetAlgResCcu(
     CHK_PTR_NULL(resCtxSequence);
     *resCtxSequence = nullptr;
     HCCL_INFO("[GetAlgResCcu]start GetAlgResCcu!");
+    resCtxHost->commInfoPtr = static_cast<void*>(comm);
     resCtxHost->topoInfo = *topoInfo;
     resCtxHost->algHierarchyInfo = algHierarchyInfo;
 
