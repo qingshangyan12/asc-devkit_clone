@@ -117,6 +117,7 @@ constexpr const char* Ascend_910_9381 = "Ascend910_9381";
 constexpr const char* Ascend_910_9382 = "Ascend910_9382";
 constexpr const char* Ascend_910_9372 = "Ascend910_9372";
 constexpr const char* Ascend_910_9362 = "Ascend910_9362";
+constexpr const char* Ascend_910_9363 = "Ascend910_9363";
 constexpr const char* Ascend_950 = "Ascend950";
 constexpr const char* Ascend_350 = "Ascend350";
 constexpr const char* MC62CM12AA = "MC62CM12AA";
