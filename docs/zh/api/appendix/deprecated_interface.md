@@ -31,7 +31,7 @@
 <!-- npu="950" id5 -->
 ### 原子操作
 
-- [asc_set_store_atomic_config_v2](../SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v2_deprecated.md)接口
+- [asc_set_store_atomic_config_v2](../SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_atomic_add](../SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md)接口。
 

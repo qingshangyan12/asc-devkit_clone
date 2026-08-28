@@ -722,7 +722,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_atomic_min_int（废弃）](deprecated_interface/asc_set_atomic_min_int_deprecated.md)|设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。|`c_api/atomic/datamove_atomic.h`|
 |[asc_set_atomic_none（废弃）](deprecated_interface/asc_set_atomic_none_deprecated.md)|清空原子操作的状态。|`c_api/atomic/datamove_atomic.h`|
 |[asc_set_gm2ub_pad（废弃）](vector_datamove/asc_set_gm2ub_pad_deprecated.md)|使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到UB且源操作数非对齐时，设置连续搬运数据块左右两侧需要填补的数据值。|`c_api/vector_datamove/vector_datamove.h`|
-|[asc_set_store_atomic_config_v2（废弃）](atomic/scalar_atomic/asc_set_store_atomic_config_v2_deprecated.md)|设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。|`c_api/atomic/scalar_atomic.h`|
+|[asc_set_store_atomic_config_v2（废弃）](deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)|设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。|`c_api/atomic/scalar_atomic.h`|
 |[asc_squeeze_v2 (废弃)](reg_compute/reg_permute_sel/asc_squeeze_deprecated.md)|将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。|`c_api/reg_compute/compute/reg_permute_sel.h`|
 |[asc_squeeze_with_status（废弃）](reg_compute/reg_permute_sel/asc_squeeze_with_status_deprecated.md)|将src中被mask选择的有效元素依次复制到dst，并将有效数据大小保存至AR寄存器。请使用[asc_squeeze_and_storeunalign](reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)替换。|`c_api/reg_compute/compute/reg_permute_sel.h`|
 |[asc_storealign (废弃)](deprecated_interface/asc_storealign_v1_deprecated.md)|reg计算数据搬运接口，支持从矢量数据寄存器或掩码寄存器连续对齐搬出到UB，目的操作数地址由用户更新。|`c_api/reg_compute/store/storealign.h`|
