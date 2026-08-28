@@ -18,7 +18,7 @@
 
 ## 概述
 
-三个搬运指令均将L0C Buffer中的矩阵计算结果搬运到目标Buffer（GM、L1 Buffer、UB），在搬运过程中支持随路量化，将L0C Buffer中的float或int32_t数据转换为目标数据类型输出。随路量化的inf/nan处理行为在三个搬运指令间完全一致，通过基础API [SetCtrlSpr](../SIMD-API/basic_api/special_register_access/SetCtrlSpr_ISASI.md) 或 C API [asc_set_ctrl](../SIMD-API/c_api/spr/asc_set_ctrl.md) 设置CTRL[48]比特位控制饱和模式：
+三个搬运指令分别将L0C Buffer中的矩阵计算结果搬运到GM、L1 Buffer和UB，在搬运过程中支持随路量化，将L0C Buffer中的float或int32_t数据转换为目标数据类型输出。随路量化的inf/nan处理行为在三个搬运指令间完全一致，通过基础API [SetCtrlSpr](../SIMD-API/basic_api/special_register_access/SetCtrlSpr_ISASI.md) 或 C API [asc_set_ctrl](../SIMD-API/c_api/spr/asc_set_ctrl.md) 设置CTRL[48]比特位控制饱和模式：
 
 - **饱和模式（CTRL[48]=1'b0）**：inf输出会被饱和为±MAX，nan输出会被饱和为0。
 - **非饱和模式（CTRL[48]=1'b1）**：inf/nan保持原输出。
@@ -33,11 +33,11 @@
 
 ### 数据搬运路径差异
 
-三个搬运指令的随路量化inf/nan处理行为完全一致，差异仅在于搬运目标及验证路径：
+三个搬运指令的随路量化inf/nan处理行为完全一致，差异仅在验证路径：
 
 - **L0C Buffer->GM**：直接将L0C Buffer数据搬运到GM，无需中转路径，非饱和模式下inf/nan能完整传递到GM输出，无验证路径限制。
-- **L0C Buffer->L1 Buffer**：将L0C Buffer数据搬运到L1 Buffer，由于L1 Buffer数据无法直接搬运到GM，样例通过二次矩阵计算（量化结果×单位矩阵D）将数据从L1 Buffer经L0A->L0C Buffer搬运到GM，最终输出为int32_t或float。当量化结果中包含inf时，二次矩阵计算中inf与单位矩阵的非对角线零元素相乘会产生nan，累加后整行变为nan。此为验证路径的限制，不影响该搬运指令本身对inf/nan的处理行为。golden数据已适配此行为：非饱和模式下inf/-inf/nan位置的golden值设为nan，使测试能端到端通过。
-- **L0C Buffer->UB**：将L0C Buffer数据搬运到UB，再从UB搬运到GM。AIC负责L0C Buffer到UB的搬运，AIV负责UB到GM的搬运，通过跨核同步协调。此路径无二次矩阵计算，不存在inf×0=nan问题，非饱和模式下inf/nan能完整传递到GM输出。
+- **L0C Buffer->L1 Buffer**：将L0C Buffer数据搬运到L1 Buffer，再通过搬运指令将数据从L1 Buffer搬运至UB，最后从UB搬运到GM。由于L1 Buffer无法直接搬运到GM，此处采用L1->UB->GM的中转路径。该路径无二次矩阵计算，不会引入inf×0=nan的伪影，非饱和模式下inf/-inf/nan能完整传递到GM输出，golden数据可直接设为inf/-inf/nan，实现端到端真实验证。
+- **L0C Buffer->UB**：将L0C Buffer数据搬运到UB，再从UB搬运到GM。AIC负责L0C Buffer到UB的搬运，AIV负责UB到GM的搬运，通过跨核同步协调。此路径无二次矩阵计算，非饱和模式下inf/nan能完整传递到GM输出。
 
 ## float类型L0C Buffer搬运至各输出类型
 
@@ -88,7 +88,7 @@ L0C Buffer中存储的float类型数据来自矩阵乘计算的结果，当输�
 - hifloat8_t类型中，111（0b01101111）为HiF8+inf编码，239（0b11101111）为HiF8-inf编码，128（0b10000000）为HiF8NAN编码。饱和模式下，inf保持为对应的inf编码，nan被饱和为0。
 - hifloat8_t的溢出判断阈值为1.25×2^15=40960，当量化后的值绝对值大于等于40960时输出inf编码（111/239），而非饱和为240。
 - 整数类型只有饱和模式，饱和模式和非饱和模式下的输出结果一致。
-- VQF322HIF8_PRE使用Half to Away舍入模式，VQF322HIF8_PRE_HYBRID使用Hybrid舍入模式（|exp|<4时为Half to Away，|exp|≥4时为SSR随机舍入）。两种模式对inf/nan的处理一致。
+- VQF322HIF8_PRE使用Half to Away舍入模式，VQF322HIF8_PRE_HYBRID使用Hybrid舍入模式（|exp|<4时为Half to Away，|exp|≥4时为SSR随机舍入）。随机舍入（Stochastic Rounding）是数值计算领域的通用概念，指以小数部分为概率进行向上或向下舍入，SSR为本实现中专有缩写。两种模式对inf/nan的处理一致。
 - 同一输出类型的scalar模式（如QF322F16_PRE）与tensor模式（如VQF322F16_PRE）使用相同的类型转换算法，inf/nan边界值处理行为完全一致，差异仅在于量化参数的传递方式（单个标量vs每列张量），因此表中将scalar模式与tensor模式合并列出。
 
 ## int32_t类型L0C Buffer搬运至各输出类型
@@ -112,7 +112,7 @@ L0C Buffer中存储的int32_t类型数据来自矩阵乘计算的结果，不会
 
 ## NoQuant（无量化）场景
 
-NoQuant模式不做类型转换和量化，L0C Buffer中的float数据原样搬运到目标Buffer。由于CTRL[48]不支持float数据类型，饱和模式和非饱和模式下inf/nan均保持原样输出。NoQuant场景还覆盖了NZ2NZ、NZ2ND、双目标按M维度拆分、双目标按N维度拆分等输出格式，验证inf/-inf/nan在各种格式转换和双目标拆分场景下均能正确传递。
+NoQuant模式不做类型转换和量化，L0C Buffer中的float或int32_t数据原样搬运到目标Buffer。CTRL[48]不支持这两种数据类型，饱和模式与非饱和模式下结果一致。float数据可能包含inf/-inf/nan（来自含特殊值的矩阵乘输入），保持原样输出；int32_t为矩阵乘的整数结果，不含inf/nan。NoQuant场景还覆盖了NZ2NZ、NZ2ND、双目标按M维度拆分、双目标按N维度拆分等输出格式，验证float场景下inf/-inf/nan在各种格式转换和双目标拆分中均能正确传递。
 
 **表4**  NoQuant模式下float类型L0C Buffer中存在inf/-inf/nan时的输出结果
 
@@ -123,4 +123,4 @@ NoQuant模式不做类型转换和量化，L0C Buffer中的float数据原样搬�
 | 3 | ND | 是（按M拆分） | +inf/-inf/nan | +inf/-inf/nan | 双目标均正确传递 |
 | 4 | ND | 是（按N拆分） | +inf/-inf/nan | +inf/-inf/nan | 双目标均正确传递 |
 
-注：NoQuant场景的输出为float类型，CTRL[48]不生效，饱和模式和非饱和模式结果一致。场景3按M维度拆分时M必须为2的倍数，场景4按N维度拆分时N必须为32的倍数。
+注：NoQuant场景的输出为float或int32_t类型，CTRL[48]均不生效，饱和模式与非饱和模式结果一致。表4仅针对float类型，int32_t不含inf/nan，无需单独验证。场景3按M维度拆分时M需为2的倍数，场景4按N维度拆分时N需为32的倍数。
