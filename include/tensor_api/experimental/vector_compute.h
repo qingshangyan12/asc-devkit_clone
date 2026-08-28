@@ -26,6 +26,9 @@
 
 #include "tensor_api/tensor.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 #endif // INCLUDE_TENSOR_API_EXPERIMENTAL_VECTOR_COMPUTE_H
 
