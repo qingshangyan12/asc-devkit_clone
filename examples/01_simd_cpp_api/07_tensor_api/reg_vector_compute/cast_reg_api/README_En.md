@@ -118,7 +118,7 @@ Run the following steps in the sample root directory to build and execute the op
 
 - Configure Environment Variables
 
-  Configure the CANN software package environment variables. For details, see [Environment Variable Configuration](../../../../../docs/quick_start.md#prepare&install).
+  Configure the CANN software package environment variables. For details, see [Environment Variable Configuration](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md).
 
   ```bash
   source ${install_path}/set_env.sh
