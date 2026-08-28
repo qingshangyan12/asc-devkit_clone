@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2 推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：不支持
+- Atlas 推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
@@ -26,15 +26,13 @@
 
 ## 功能说明
 
-**该接口已废弃。原子加操作请使用[asc_atomic_add](../atomic/scalar_atomic/asc_atomic_add.md)实现。**
+**该接口已废弃。原子加操作请使用[asc_atomic_add](asc_atomic_add.md)实现。**
 
 设置原子操作启用位与原子操作类型的值。
 
 ## 函数原型
 
-```c
-[[deprecated("NOTICE: asc_set_store_atomic_config_v2 is deprecated."
-             "Please use asc_atomic_add instead for atomic add operation.")]]
+```cpp
 __aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op)
 ```
 
@@ -61,7 +59,7 @@ PIPE_S
 
 ## 调用示例
 
-```c
+```cpp
 uint16_t type = 1;
 uint16_t op = 2;
 asc_set_store_atomic_config_v2(type, op);
