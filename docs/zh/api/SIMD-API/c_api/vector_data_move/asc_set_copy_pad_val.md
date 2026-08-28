@@ -75,11 +75,78 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
-// src是外部输入的int8_t类型的GM地址。
-__ubuf__ int8_t dst[128];
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-asc_set_copy_pad_val(0);
-// 在搬运过程中，每个数据块左右两侧各补充8个int8_t的数据，补充的数据值为0。
-asc_copy_gm2ub_align(dst, src, 2, 48 * sizeof(int8_t), 8, 8, true, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 48 * sizeof(int8_t), 64 * sizeof(int8_t));
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
+
+```c
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+
+constexpr uint32_t INPUT_BYTES = 48;
+constexpr uint32_t OUTPUT_BYTES = 64;
+
+__global__ __vector__ void asc_set_copy_pad_val_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+{
+    asc_init();
+    __ubuf__ uint8_t local[OUTPUT_BYTES];
+    asc_set_copy_pad_val(static_cast<uint8_t>(42));
+    asc_copy_gm2ub_align(local, input, 2, 24, 4, 4, true,
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 24, 32);
+    asc_sync_mte2(0);
+    asc_copy_ub2gm_align(output, local, OUTPUT_BYTES);
+    asc_sync_mte3(0);
+}
+
+void print_data(const char* name, const std::vector<uint8_t>& data)
+{
+    std::cout << name << ":";
+    const uint32_t count = data.size() < 32 ? data.size() : 32;
+    for (uint32_t i = 0; i < count; ++i) std::cout << ' ' << +data[i];
+    if (data.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint8_t> input(INPUT_BYTES), output(OUTPUT_BYTES, 0), golden(OUTPUT_BYTES, 0);
+    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i + 1);
+    for (uint32_t block = 0; block < 2; ++block) {
+        for (uint32_t i = 0; i < 4; ++i) golden[block * 32 + i] = 42;
+        for (uint32_t i = 0; i < 24; ++i) golden[block * 32 + 4 + i] = input[block * 24 + i];
+        for (uint32_t i = 28; i < 32; ++i) golden[block * 32 + i] = 42;
+    }
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t *input_device = nullptr, *output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(output_device, OUTPUT_BYTES, output.data(), OUTPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_set_copy_pad_val_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_set_copy_pad_val passed." : "[Failed] asc_set_copy_pad_val failed.") << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

@@ -51,14 +51,6 @@ __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
                                       uint16_t dst_stride)
 ```
 
-### 同步数据搬运
-
-```c
-__aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst,
-                                           __gm__ void* src,
-                                           uint32_t size)
-```
-
 ## 参数说明
 
 **表1** 参数说明
@@ -85,15 +77,78 @@ PIPE_MTE2
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 如果需要执行多条asc_copy_gm2ub指令，且asc_copy_gm2ub指令的目的地址存在重叠，需要插入同步指令，保证多个asc_copy_gm2ub指令的串行化，防止出现异常数据。
-- 同步计算包含同步等待。
 - 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
 - 当dst_stride不等于len_burst时，dst_stride要求32字节对齐。
 
 ## 调用示例
 
-```cpp
-//total_length指参与搬运的数据总长度。src是外部输入的half类型的GM内存。
-constexpr uint64_t total_length = 128;
-__ubuf__ half dst[total_length];
-asc_copy_gm2ub(dst, src, total_length * sizeof(half));
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
+
+```c
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+
+constexpr uint32_t INPUT_BYTES = 256;
+constexpr uint32_t OUTPUT_BYTES = 256;
+
+__global__ __vector__ void asc_copy_gm2ub_arch_3510_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+{
+    asc_init();
+    __ubuf__ uint8_t local[INPUT_BYTES];
+    // Copy INPUT_BYTES from GM to UB, then wait only for PIPE_MTE2.
+    asc_copy_gm2ub(local, input, INPUT_BYTES);
+    asc_sync_mte2(0);
+    asc_copy_ub2gm_align(output, local, INPUT_BYTES);
+    asc_sync_mte3(0);
+}
+
+void print_data(const char* name, const std::vector<uint8_t>& data)
+{
+    std::cout << name << ":";
+    const uint32_t count = data.size() < 32 ? data.size() : 32;
+    for (uint32_t i = 0; i < count; ++i) std::cout << ' ' << +data[i];
+    if (data.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint8_t> input(INPUT_BYTES), output(OUTPUT_BYTES, 0), golden(OUTPUT_BYTES, 0);
+    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i + 1);
+    for (uint32_t i = 0; i < 256; ++i) golden[i] = input[i];
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t *input_device = nullptr, *output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(output_device, OUTPUT_BYTES, output.data(), OUTPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_copy_gm2ub_arch_3510_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_copy_gm2ub passed." : "[Failed] asc_copy_gm2ub failed.") << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

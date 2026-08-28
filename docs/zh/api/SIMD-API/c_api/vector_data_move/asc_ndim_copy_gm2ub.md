@@ -66,9 +66,7 @@
 
 本接口仅在AIV上生效。
 
-## 函数原型
-
-### L2 Cache枚举配置（占位符形式）
+## 函数原型（占位符形式）
 
 ```c
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ <dtype>* dst,
@@ -102,26 +100,6 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ half* dst,
                                            bool padding_mode,
                                            asc_load_l2_cache_mode l2_cache_mode)
 ```
-
-### 已废弃原型（占位符形式）
-
-**以下函数原型已废弃，请使用`asc_load_l2_cache_mode`类型的枚举值配置L2 Cache管理策略。**
-
-```c
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ <dtype>* dst,
-                                           __gm__ <dtype>* src,
-                                           uint32_t loop0_size,
-                                           uint32_t loop1_size,
-                                           uint32_t loop2_size,
-                                           uint32_t loop3_size,
-                                           uint32_t loop4_size,
-                                           uint8_t loop0_lp_count,
-                                           uint8_t loop0_rp_count,
-                                           bool padding_mode,
-                                           uint8_t cache_mode)
-```
-
-**dtype取值如下：**`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ## 参数说明
 
@@ -162,47 +140,82 @@ PIPE_MTE2
 2D Padding场景，使用固定值填充方式
 ![ ](../figures/asc_ndim_copy_gm2ub_2d_padding_constant.png)
 
-```cpp
-// total_length指参与搬运的数据总长度。src是外部输入的half类型的GM内存。
-constexpr uint64_t total_length = 54;
-__ubuf__ half dst[total_length];
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-uint32_t loop0_size = 3;
-uint32_t loop1_size = 4;
-uint32_t loop2_size = 1;
-uint32_t loop3_size = 1;
-uint32_t loop4_size = 1;
-uint64_t loop0_src_stride = 1;
-uint64_t loop1_src_stride = 3;
-uint64_t loop2_src_stride = 0;
-uint64_t loop3_src_stride = 0;
-uint64_t loop4_src_stride = 0;
-uint64_t loop0_dst_stride = 1;
-uint64_t loop1_dst_stride = 6;
-uint64_t loop2_dst_stride = 0;
-uint64_t loop3_dst_stride = 0;
-uint64_t loop4_dst_stride = 0;
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
-bool padding_mode = true;
-half pad_value = 88.0;
-uint8_t loop0_lp_count = 2;
-uint8_t loop1_lp_count = 2;
-uint8_t loop0_rp_count = 1;
-uint8_t loop1_rp_count = 3;
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
 
-asc_set_ndim_loop0_stride(loop0_dst_stride, loop0_src_stride);
-asc_set_ndim_loop1_stride(loop1_dst_stride, loop1_src_stride);
-asc_set_ndim_loop2_stride(loop2_dst_stride, loop2_src_stride);
-asc_set_ndim_loop3_stride(loop3_dst_stride, loop3_src_stride);
-asc_set_ndim_loop4_stride(loop4_dst_stride, loop4_src_stride);
+```c
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
 
-asc_set_ndim_pad_value(pad_value);
+namespace {
 
-asc_ndim_pad_count_config pad_count_config;
-pad_count_config.loop1_lp_count = loop1_lp_count;
-pad_count_config.loop1_rp_count = loop1_rp_count;
-asc_set_ndim_pad_count(pad_count_config);
+constexpr uint32_t INPUT_BYTES = 12;
+constexpr uint32_t OUTPUT_BYTES = 12;
 
-asc_ndim_copy_gm2ub(dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
-    loop0_lp_count, loop0_rp_count, padding_mode, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
+__global__ __vector__ void asc_ndim_copy_gm2ub_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+{
+    asc_init();
+    __ubuf__ uint8_t local[32];
+    asc_set_ndim_loop0_stride(4, 1);
+    asc_set_ndim_loop1_stride(1, 3);
+    asc_set_ndim_loop2_stride(0, 0);
+    asc_set_ndim_loop3_stride(0, 0);
+    asc_set_ndim_loop4_stride(0, 0);
+    asc_ndim_pad_count_config config;
+    asc_set_ndim_pad_count(config);
+    asc_ndim_copy_gm2ub(local, input, 3, 4, 1, 1, 1, 0, 0, false,
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
+    asc_sync_mte2(0);
+    asc_copy_ub2gm_align(output, local, OUTPUT_BYTES);
+    asc_sync_mte3(0);
+}
+
+void print_data(const char* name, const std::vector<uint8_t>& data)
+{
+    std::cout << name << ":";
+    const uint32_t count = data.size() < 32 ? data.size() : 32;
+    for (uint32_t i = 0; i < count; ++i) std::cout << ' ' << +data[i];
+    if (data.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint8_t> input(INPUT_BYTES), output(OUTPUT_BYTES, 0), golden(OUTPUT_BYTES, 0);
+    for (uint32_t i = 0; i < INPUT_BYTES; ++i) input[i] = static_cast<uint8_t>(i + 1);
+    for (uint32_t column = 0; column < 3; ++column) {
+        for (uint32_t row = 0; row < 4; ++row) golden[column * 4 + row] = input[row * 3 + column];
+    }
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t *input_device = nullptr, *output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(output_device, OUTPUT_BYTES, output.data(), OUTPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_ndim_copy_gm2ub_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input", input);
+    print_data("Output", output);
+    print_data("Golden", golden);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_ndim_copy_gm2ub passed." : "[Failed] asc_ndim_copy_gm2ub failed.") << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
