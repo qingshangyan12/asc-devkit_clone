@@ -86,14 +86,52 @@ ccu::Func KfcReduceScatterFunc(
     },
     KFC_REDUCE_SCATTER_FUNC_NAME);
 
+ccu::Func KfcAllReduceFunc(
+    [](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
+       ccu::Variable currentRankSliceInputOffset, ccu::Variable, ccu::Variable, ccu::Variable sliceSize,
+       ccu::Variable repeatNum) {
+        const auto& arg = *g_kfcRegisterArg;
+        CCU_THROW_IF_FAILED(
+            CcuKfcAllReduceMesh1DMem2MemKernel(
+                inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, currentRankSliceOutputOffset,
+                normalSliceSize, lastSliceSize,  mySliceSize, sliceOffset, isInputOutputEqual, goSize0, goSize1, goSize2,
+                goSize3, chunkSize, tailSize, chunkLoopNum, arg.channels, arg.channelCount, static_cast<uint32_t>(arg.rankSize),
+                arg.rankId, arg.opParam.DataDes.dataType, arg.opParam.DataDes.outputType, arg.opParam.reduceType),
+            "define KFC AllReducer func failed");
+    },
+    KFC_ALL_REDUCE_FUNC_NAME);
+
+ccu::Func KfcAllGatherNHRFunc(
+    [](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
+        ccu::Variable sliceSizePerJetty, ccu::Variable lastSliceSizePerJetty, ccu::Variable repeatNumInv,
+        ccu::Variable inputSliceStride, ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride,
+        ccu::Variable outputRepeatStride, ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1,
+        ccu::Variable goSize2, ccu::Variable goSize3) {
+        const auto& arg = *g_kfcRegisterArg;
+        CCU_THROW_IF_FAILED(
+            CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
+                inputAddr, outputAddr, tokenInfo, sliceSize, sliceSizePerJetty, lastSliceSizePerJetty, repeatNumInv,
+                inputSliceStride, outputSliceStride, inputRepeatStride, outputRepeatStride, isInputOutputEqual,
+                goSize0, goSize1, goSize2, goSize3, arg.channels, arg.channelCount, static_cast<uint32_t>(arg.rankSize),
+                arg.rankId, arg.jettyNum, arg.nhrStepInfoVector, arg.nhrRank2ChannelIdx),
+            "define KFC AllGatherNHR func failed");
+    },
+    KFC_ALL_GATHER_NHR_FUNC_NAME);
+
 static CcuResult DefineKfcSubKernelFunc(const CcuKernelArgKfcServer* kernelArg)
 {
     g_kfcRegisterArg = kernelArg;
     switch (kernelArg->opParam.opType) {
         case HcclCMDType::HCCL_CMD_ALLGATHER:
-            return ccu::DefineFunc<KfcAllGatherFunc>();
+            if (kernelArg->role == KfcServerRole::ALL_GATHER_NHR) {
+                return ccu::DefineFunc<KfcAllGatherNHRFunc>();
+            } else {
+                return ccu::DefineFunc<KfcAllGatherFunc>();
+            }
         case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
             return ccu::DefineFunc<KfcReduceScatterFunc>();
+        case HcclCMDType::HCCL_CMD_ALLREDUCE:
+            return ccu::DefineFunc<KfcAllReduceFunc>();
         default:
             HCCL_ERROR(
                 "[DefineKfcSubKernelFunc] unsupported opType[%u]",
@@ -193,45 +231,6 @@ static CcuResult CallKfcSubKernel(
 
 static CcuResult DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
-    uint64_t opType = static_cast<uint64_t>(ctx.arg->opParam.opType);
-    if (opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLGATHER)) {
-        if (ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
-            CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
-                param[KFC_CONCURRENT_AG_NHR_INPUT], param[KFC_CONCURRENT_AG_NHR_OUTPUT], ctx.token,
-                param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE], param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE_PER_JETTY],
-                param[KFC_CONCURRENT_AG_NHR_LAST_SLICE_SIZE_PER_JETTY], param[KFC_CONCURRENT_AG_NHR_REPEAT_NUM_INV],
-                param[KFC_CONCURRENT_AG_NHR_INPUT_SLICE_STRIDE], param[KFC_CONCURRENT_AG_NHR_OUTPUT_SLICE_STRIDE],
-                param[KFC_CONCURRENT_AG_NHR_INPUT_REPEAT_STRIDE], param[KFC_CONCURRENT_AG_NHR_OUTPUT_REPEAT_STRIDE],
-                param[KFC_CONCURRENT_AG_NHR_INPUT_OUTPUT_EQUAL], param[KFC_CONCURRENT_AG_NHR_GO_SIZE_0],
-                param[KFC_CONCURRENT_AG_NHR_GO_SIZE_1], param[KFC_CONCURRENT_AG_NHR_GO_SIZE_2],
-                param[KFC_CONCURRENT_AG_NHR_GO_SIZE_3], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->jettyNum,
-                ctx.arg->nhrStepInfoVector, ctx.arg->nhrRank2ChannelIdx);
-        } else {
-            CcuKfcAllGatherMesh1DMem2MemKernel(
-                param[KFC_CONCURRENT_AG_MESH_INPUT], param[KFC_CONCURRENT_AG_MESH_OUTPUT], ctx.token,
-                param[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET], param[KFC_CONCURRENT_AG_MESH_SLICE_SIZE],
-                param[KFC_CONCURRENT_AG_MESH_GO_SIZE_0], param[KFC_CONCURRENT_AG_MESH_GO_SIZE_1],
-                param[KFC_CONCURRENT_AG_MESH_GO_SIZE_2], param[KFC_CONCURRENT_AG_MESH_GO_SIZE_3],
-                param[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
-        }
-    } else if (opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)) {
-        CcuReduceScatterMesh1DMem2MemKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
-            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
-            ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
-    } else if (opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLREDUCE)) {
-        CcuKfcAllReduceMesh1DMem2MemKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
-            param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], param[HBM_PARAM_IDX_12],
-            param[HBM_PARAM_IDX_13], param[HBM_PARAM_IDX_14], param[HBM_PARAM_IDX_15], param[HBM_PARAM_IDX_16],
-            param[HBM_PARAM_IDX_17], ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
-            ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType, ctx.arg->opParam.DataDes.outputType,
-            ctx.arg->opParam.reduceType);
-    /*
     ccu::FuncCall opFunc(ctx.subKernelPc);
     opFunc.SetInArg(param[HBM_PARAM_IDX_1]);
     opFunc.SetInArg(param[HBM_PARAM_IDX_2]);
@@ -239,7 +238,6 @@ static CcuResult DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServe
     for (uint32_t i = HBM_PARAM_IDX_3; i < CCU_PARAM_NUM_PER_DIE; ++i) {
         opFunc.SetInArg(param[i]);
     }
-    */
     return opFunc.AppendToContext();
 }
 
