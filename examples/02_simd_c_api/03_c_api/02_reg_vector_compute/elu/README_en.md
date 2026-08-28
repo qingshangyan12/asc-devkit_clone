@@ -49,7 +49,7 @@ This example implements the ELU (Exponential Linear Unit) activation operator us
 
 - Example implementation:
 
-  It uses dynamic tiling to copy the input into UB in segments, computes the ELU, then copies it out to GM; fp16 is computed in the fp32 domain and written back as half.
+  It uses dynamic tiling to copy the input into UB in segments, calls C API functions to compute the ELU, then copies the result back to GM; fp16 input is converted to float for computation and written back as fp16.
 
   - Invocation
 

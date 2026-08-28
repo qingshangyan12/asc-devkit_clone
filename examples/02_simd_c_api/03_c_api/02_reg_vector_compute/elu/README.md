@@ -49,7 +49,7 @@
 
 - 样例实现：
 
-  采用动态tiling将输入分段搬入UB，完成ELU计算后搬出至GM；fp16在fp32域计算后转回half写回。
+  采用动态tiling将输入分段搬入UB，调用C API接口完成ELU计算后搬出至GM；fp16输入转换为float计算后写回fp16。
 
   - 调用实现
 
