@@ -55,6 +55,11 @@ struct copy_ub_to_l1_routing<version, nd_layout_ptn, nd_layout_ptn> {
 };
 
 template <uint32_t version>
+struct copy_ub_to_l1_routing<version, one_dim_layout_ptn, one_dim_layout_ptn> {
+    using type = copy_ub_to_l1_one_dim;
+};
+
+template <uint32_t version>
 struct copy_ub_to_l1_routing<version, dn_ext_layout_ptn, dn_ext_layout_ptn> {
     using type = copy_ub_to_l1_dn;
 };
