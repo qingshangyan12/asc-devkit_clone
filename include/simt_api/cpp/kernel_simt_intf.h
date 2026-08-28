@@ -42,7 +42,6 @@
 #include "simt_api/cpp/kernel_simt_transcendental_intf.h"
 #include "simt_api/cpp/kernel_simt_warp_level_intf.h"
 #include "simt_api/cpp/kernel_simt_bessel_intf.h"
-#include "utils/debug/asc_assert.h"
 #endif
 
 #endif // ASCENDC_MODULE_SIMT_INTERFACE_H

@@ -27,6 +27,7 @@
 #include "kernel_tensor.h"
 #include "kernel_type.h"
 #include "kernel_operator_intf.h"
+#include "utils/debug/asc_assert.h"
 
 #endif // ASCENDC_MODULE_OPERATOR_H
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_H)

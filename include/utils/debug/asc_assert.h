@@ -25,20 +25,10 @@
 #include "simt_api/device_types.h"
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #include "impl/utils/debug/asc_assert_simt_impl.h"
-#if (__NPU_ARCH__ == 3510) && !defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-#include "impl/utils/debug/asc_simd_debug_enable.h"
-#include "impl/utils/debug/asc_assert_simd_impl.h"
-#endif
 
 namespace __asc_simt_vf {
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 } // namespace __asc_simt_vf
-
-#if (__NPU_ARCH__ == 3510) && !defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
-namespace __asc_simd_vf {
-__simd_callee__ inline void trap();
-} // namespace __asc_simd_vf
-#endif
 #endif
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
@@ -47,17 +37,7 @@ __simd_callee__ inline void trap();
 #endif
 #endif
 
-#define ASC_INTERNAL_COUNT_ARGS_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N, ...) N
-#define ASC_INTERNAL_COUNT_ARGS(...) ASC_INTERNAL_COUNT_ARGS_IMPL(__VA_ARGS__, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1)
-#define ASC_INTERNAL_GET_ARG_COUNT(...) ASC_INTERNAL_COUNT_ARGS(__VA_ARGS__)
-#define ASC_INTERNAL_ASSERT_IMPL(N, ...) ASC_INTERNAL_ASSERT_FUNC(N, __VA_ARGS__)
-#define ASC_INTERNAL_ASSERT_FUNC(N, ...) ASC_INTERNAL_ASSERT_##N(__VA_ARGS__)
-#define ASC_INTERNAL_ASSERT_1(expr) (static_cast<bool>(expr) ? void(0) : __assert_fail(#expr, __FILE__, __LINE__, (__PRETTY_FUNCTION__)))
-#ifndef ASCENDC_CPU_DEBUG
-#define ASC_INTERNAL_ASSERT_2(expr, fmt, ...) (static_cast<bool>(expr) ? void(0) : __assert_fail_msg(#expr, __FILE__, __LINE__, (__PRETTY_FUNCTION__), fmt, ##__VA_ARGS__))
-#else
-#define ASC_INTERNAL_ASSERT_2(expr, ...) ASC_INTERNAL_ASSERT_1(expr)
-#endif
+#include "impl/utils/debug/asc_assert_macro_impl.h"
 
 #undef assert
 #undef ascendc_assert
@@ -74,5 +54,21 @@ __simd_callee__ inline void trap();
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_ASSERT_H__
 #endif
+
+#endif
+
+#if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
+#define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
+
+#if (__NPU_ARCH__ == 3510) && !defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#include "impl/utils/debug/asc_simd_debug_enable.h"
+#include "impl/utils/debug/asc_assert_simd_impl.h"
+
+namespace __asc_simd_vf {
+__simd_callee__ inline void trap();
+} // namespace __asc_simd_vf
+#endif
+
+#undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 
 #endif

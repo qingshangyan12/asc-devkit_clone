@@ -21,8 +21,6 @@
 #include "simt_api/device_types.h"
 #include "simt_api/asc_fp16.h"
 #include "simt_api/asc_bf16.h"
-#include "utils/debug/asc_assert.h"
-
 namespace cooperative_groups {
 
 namespace details {
