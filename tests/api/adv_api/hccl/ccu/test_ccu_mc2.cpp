@@ -381,7 +381,8 @@ TEST_F(CcuMc2TestSuite, algorithmMap_AllEntries)
     EXPECT_EQ(algorithmMap.at("CcuKfcReduceScatterMesh1DMem2Mem"), CcuReduceScatterMeshMem2Mem1D);
     EXPECT_EQ(algorithmMap.at("CcuAlltoAllMesh1D"), CcuAlltoAllMesh1D);
     EXPECT_EQ(algorithmMap.at("CcuAlltoAllVMesh1D"), CcuAlltoAllVMesh1D);
-    EXPECT_EQ(algorithmMap.size(), 6U);
+    EXPECT_EQ(algorithmMap.at("CcuSchedAllReduceSoleMesh"), CcuAllReduceMeshMem2Mem1D);
+    EXPECT_EQ(algorithmMap.size(), 7U);
 }
 
 TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
