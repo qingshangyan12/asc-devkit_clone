@@ -74,30 +74,15 @@ __simd_callee__ inline void Load(U& dstReg, __ubuf__ T* srcAddr)
 
 ## 调用示例
 
-- RegTraitNumOne场景
-
-    ```cpp
-    template<typename T>
-    __simd_vf__ inline void LoadStoreVF(
-        __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t count, uint16_t repeatTimes)
-    {
-        AscendC::Reg::RegTensor<T> srcReg;
-        for (uint16_t i = 0; i < repeatTimes; i++) {
-            AscendC::Reg::Load(srcReg, srcAddr + i * count);
-            AscendC::Reg::Store(dstAddr + i * count, srcReg);
-        }
+```cpp
+template<typename T>
+__simd_vf__ inline void LoadStoreVF(
+    __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t count, uint16_t repeatTimes)
+{
+    AscendC::Reg::RegTensor<T> srcReg;
+    for (uint16_t i = 0; i < repeatTimes; i++) {
+        AscendC::Reg::Load(srcReg, srcAddr + i * count);
+        AscendC::Reg::Store(dstAddr + i * count, srcReg);
     }
-    ```
-
-- RegTraitNumTwo场景，count需要设置为`2*VL/sizeof(T)`。
-
-    ```cpp
-    template<typename T>
-    __simd_vf__ inline void LoadTraitTwoVF(__ubuf__ T* srcAddr, uint16_t count, uint16_t repeatTimes)
-    {
-        AscendC::Reg::RegTensor<T, AscendC::Reg::RegTraitNumTwo> srcReg;
-        for (uint16_t i = 0; i < repeatTimes; i++) {
-            AscendC::Reg::Load(srcReg, srcAddr + i * count);
-        }
-    }
-    ```
+}
+```
