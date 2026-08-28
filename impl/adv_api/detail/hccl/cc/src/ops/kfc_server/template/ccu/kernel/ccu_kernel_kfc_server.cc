@@ -163,7 +163,6 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
             ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
     }
-#endif
     CCU_IF(opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLTOALLV))
     {
         CcuAlltoAllVMesh1DKernel(
@@ -172,6 +171,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
     }
+#endif
 }
 
 CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
