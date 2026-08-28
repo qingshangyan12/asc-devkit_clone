@@ -37,7 +37,7 @@ struct store_to_ptr_impl<store_sideband_mode::direct> {
         static_assert(
             is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> || is_b16_type_v<RegDataType> ||
                 is_b32_type_v<RegDataType>,
-            "store direct does not support this element type");
+           "store direct supports b4, b8, b16, and b32 element types only");
         asc_storealign(dst, src.reg, src.mask);
     }
 };
@@ -50,7 +50,7 @@ struct store_to_ptr_impl<store_sideband_mode::store_1st> {
         static_assert(
             is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> || is_b16_type_v<RegDataType> ||
                 is_b32_type_v<RegDataType>,
-            "store store_1st does not support this element type");
+            "store store_1st supports b4, b8, b16, and b32 element types only");
         asc_storealign_1st(dst, src.reg);
     }
 };
@@ -62,7 +62,7 @@ struct store_to_ptr_impl<store_sideband_mode::pack> {
     {
         static_assert(
             is_b16_type_v<RegDataType> || is_b32_type_v<RegDataType> || is_b64_type_v<RegDataType>,
-            "store pack does not support this element type");
+            "store pack supports b16, b32, and b64 element types only");
         asc_storealign_pack(dst, src.reg, src.mask);
     }
 };
@@ -74,7 +74,7 @@ struct store_to_ptr_impl<store_sideband_mode::pack_quarter> {
     {
         static_assert(
             AscendC::Std::is_one_of_v<RegDataType, int32_t, uint32_t, float>,
-            "store pack_quarter does not support this element type");
+            "store pack_quarter supports b32 element types (int32_t, uint32_t, and float) only");
         asc_storealign_pack_quarter(dst, src.reg, src.mask);
     }
 };
@@ -88,7 +88,7 @@ struct store_to_ptr_impl<store_sideband_mode::intlv> {
         static_assert(
             is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> || is_b16_type_v<RegDataType> ||
                 AscendC::Std::is_one_of_v<RegDataType, int32_t, uint32_t>,
-            "store intlv does not support this element type");
+            "store intlv supports b4, b8, b16, int32_t, and uint32_t element types only");
         asc_storealign_intlv(dst, src0.reg, src1.reg);
     }
 };

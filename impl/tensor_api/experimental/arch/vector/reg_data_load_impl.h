@@ -37,7 +37,7 @@ struct load_from_ptr_impl<load_sideband_mode::direct> {
         static_assert(
             is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> || is_b32_type_v<DataType> ||
                 is_b64_type_v<DataType>,
-            "load direct does not support this element type");
+             "load direct supports b4, b8, b16, b32, and b64 element types only");
         reg_tensor<DataType> dst;
         asc_loadalign(dst.reg, src);
         return dst;
@@ -51,7 +51,7 @@ struct load_from_ptr_impl<load_sideband_mode::downsample> {
     {
         static_assert(
             is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType>,
-            "load downsample does not support this element type");
+            "load downsample supports b4, b8, and b16 element types only");
         reg_tensor<DataType> dst;
         asc_loadalign_downsample(dst.reg, src);
         return dst;
@@ -65,7 +65,7 @@ struct load_from_ptr_impl<load_sideband_mode::unpack> {
     {
         static_assert(
             is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> || is_b32_type_v<DataType>,
-            "load unpack does not support this element type");
+            "load unpack supports b4, b8, b16, and b32 element types only");
         reg_tensor<DataType> dst;
         asc_loadalign_unpack(dst.reg, src);
         return dst;
@@ -78,7 +78,7 @@ struct load_from_ptr_impl<load_sideband_mode::unpack4> {
     __simd_callee__ static inline reg_tensor<DataType> run(Pointer src)
     {
         static_assert(
-            is_b4_type_v<DataType> || is_b8_type_v<DataType>, "load unpack4 does not support this element type");
+            is_b4_type_v<DataType> || is_b8_type_v<DataType>, "load unpack4 supports b4 and b8 element types only");
         reg_tensor<DataType> dst;
         asc_loadalign_unpack4(dst.reg, src);
         return dst;
@@ -92,7 +92,7 @@ struct load_from_ptr_impl<load_sideband_mode::upsample> {
     {
         static_assert(
             is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType>,
-            "load upsample does not support this element type");
+            "load upsample supports b4, b8, and b16 element types only");
         reg_tensor<DataType> dst;
         asc_loadalign_upsample(dst.reg, src);
         return dst;
@@ -107,7 +107,7 @@ struct load_from_ptr_impl<load_sideband_mode::deintlv> {
         static_assert(
             is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> || is_b16_type_v<RegDataType> ||
                 is_b32_type_v<RegDataType>,
-            "load deintlv does not support this element type");
+            "load deintlv supports b4, b8, b16, and b32 element types only");
         asc_loadalign_deintlv(dst0.reg, dst1.reg, src);
     }
 };
