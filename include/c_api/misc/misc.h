@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#warning "misc.h is deprecated.Please use c_api/utils/sys_init.h and c_api/utils/sys_misc.h."
+#pragma message("misc.h is deprecated.Please use c_api/utils/sys_init.h and c_api/utils/sys_misc.h.")
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
