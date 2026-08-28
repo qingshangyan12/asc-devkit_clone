@@ -1,8 +1,8 @@
-# Tensor API基础计算样例
+# Mull Tensor API 样例
 
 ## 概述
 
-本样例基于Tensor API演示寄存器基础计算接口`asc::te::experimental::abs`的使用方法。样例覆盖`int8_t`、`int16_t`、`half`、`int32_t`和`float`五种类型，每种类型输入64个元素，计算绝对值后输出。
+本样例基于Tensor API实现`mull`接口，对两组各64个`uint32_t`元素执行乘法，并分别输出乘积的低32位和高32位。
 
 ## 支持的产品
 
@@ -25,46 +25,32 @@
 ## 样例描述
 
 - 样例功能：
-  对输入Tensor中的每个元素执行绝对值计算，计算公式如下：
 
   ```text
-  output_i = abs(input_i)
+  product_i = uint64(src0_i) * uint64(src1_i)
+  low_i = product_i & 0xffffffff
+  high_i = product_i >> 32
   ```
 
 - 样例规格：
+
   <table>
-  <caption>表1：样例输入输出规格</caption>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">basic_arithmetic_tensor_api</td></tr>
-  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input</td><td align="center">[1, 64]</td><td align="center">int8_t/int16_t/half/int32_t/float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[1, 64]</td><td align="center">int8_t/int16_t/half/int32_t/float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">basic_arithmetic_tensor_api</td></tr>
+    <tr><td align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
+    <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+    <tr><td align="center">src0</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
+    <tr><td align="center">src1</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
+    <tr><td rowspan="2" align="center">样例输出</td><td align="center">low</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
+    <tr><td align="center">high</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
+    <tr><td align="center">核函数名</td><td colspan="3" align="center">basic_arithmetic_tensor_api</td></tr>
   </table>
 
 - 样例实现：
 
-  - Kernel实现
-
-    1. 使用`asc::te::make_tensor`、`asc::te::make_mem_ptr`和`asc::te::make_frame_layout`创建GM和UB上的Tensor对象。
-    2. 使用`asc::te::make_copy`和`asc::te::copy`完成GM到UB的数据搬运。
-    3. 使用Tensor `load`接口加载为`reg_tensor`，通过`make_mask<mask_pattern::vl64, T>()`指定64个元素参与计算。
-    4. 调用`asc::te::experimental::abs`计算绝对值，并使用Tensor `store`接口写回UB。
-    5. 使用`asc::te::copy`将结果从UB搬运回GM。
-
-  - 调用实现
-
-    Host侧程序读取`scripts/gen_data.py`生成的输入文件，使用内核调用符`<<<>>>`调用核函数，执行完成后保存输出文件并通过`scripts/verify_result.py`进行逐元素校验。
-
-## 核心接口说明
-
-### asc::te::experimental::abs
-
-```cpp
-template <typename T>
-__simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg);
-```
-
-该接口对输入`reg_tensor`执行绝对值计算，返回相同元素类型的`reg_tensor`。
+  1. 为GM和UB数据搬运创建ND Tensor视图，并为UB寄存器计算创建一维Tensor视图。
+  2. 将`src0`和`src1`从GM搬运到UB，使用一维坐标`make_coord(offset)`加载到寄存器。
+  3. 使用64元素mask调用`mull`，函数返回乘积低32位，并通过`high`输出乘积高32位。
+  4. 将两个结果写回UB，再搬运到GM。
+  5. Host侧保存输出文件，校验脚本分别比较低32位和高32位结果与真值。
 
 ## 编译运行
 
@@ -72,7 +58,7 @@ __simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg);
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的安装路径配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -89,19 +75,23 @@ __simd_callee__ inline decltype(auto) abs(const reg_tensor<T>& src_reg);
   python3 ../scripts/verify_result.py
   ```
 
+  使用NPU仿真模式时，在CMake命令中添加`-DCMAKE_ASC_RUN_MODE=sim`参数。
+
+  > **注意：** 切换编译模式前需清理CMake缓存，可在`build`目录下删除`CMakeCache.txt`后重新执行CMake命令。
+
 - 编译选项说明
 
   | 选项 | 可选值 | 说明 |
-  |------|--------|------|
+  | --- | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：`dav-3510`对应Ascend 950PR/Ascend 950DT |
   | `CANN_ASC_USE_EXPERIMENTAL` | `ON`（本样例必选）、`OFF`（默认） | 开启实验性ASC接口 |
 
 - 执行结果
 
-  执行成功时输出如下：
+  执行结果如下，说明精度对比成功。
 
   ```text
   basic_arithmetic_tensor_api executed successfully.
-  test pass! verified abs for int8, int16, half, int32, and float.
+  test pass! verified low and high uint32 mull results.
   ```

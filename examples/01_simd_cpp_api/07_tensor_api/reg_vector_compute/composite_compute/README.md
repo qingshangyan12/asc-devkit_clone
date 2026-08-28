@@ -1,8 +1,8 @@
-# Tensor API复合计算样例
+# Fma Tensor API 样例
 
 ## 概述
 
-本样例基于Tensor API演示寄存器复合计算接口`asc::te::experimental::fma`的使用方法。样例覆盖`half`和`float`两种类型，每种类型包含三组64元素输入，计算`a * b + c`后输出。
+本样例基于Tensor API实现`fma`接口，对三组各64个`float`元素执行融合乘加计算。
 
 ## 支持的产品
 
@@ -33,41 +33,22 @@
 
 - 样例规格：
   <table>
-  <caption>表1：样例输入输出规格</caption>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">composite_compute_tensor_api</td></tr>
-  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input_a</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td align="center">input_b</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td align="center">input_c</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[1, 64]</td><td align="center">half/float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">composite_compute_tensor_api</td></tr>
+  <tr><td align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
+  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+  <tr><td align="center">input_a</td><td align="center">[64]</td><td align="center">float</td></tr>
+  <tr><td align="center">input_b</td><td align="center">[64]</td><td align="center">float</td></tr>
+  <tr><td align="center">input_c</td><td align="center">[64]</td><td align="center">float</td></tr>
+  <tr><td align="center">样例输出</td><td align="center">output</td><td align="center">[64]</td><td align="center">float</td></tr>
+  <tr><td align="center">核函数名</td><td colspan="3" align="center">composite_compute_tensor_api</td></tr>
   </table>
 
 - 样例实现：
 
-  - Kernel实现
-
-    1. 使用`asc::te::make_tensor`、`asc::te::make_mem_ptr`和`asc::te::make_frame_layout`创建GM和UB上的Tensor对象。
-    2. 使用`asc::te::make_copy`和`asc::te::copy`完成GM到UB的数据搬运。
-    3. 使用Tensor `load`接口加载三组输入为`reg_tensor`，通过`make_mask<mask_pattern::vl64, T>()`指定64个元素参与计算。
-    4. 调用`asc::te::experimental::fma(input_a, input_b, input_c)`执行融合乘加计算，并使用Tensor `store`接口写回UB。
-    5. 使用`asc::te::copy`将结果从UB搬运回GM。
-
-  - 调用实现
-
-    Host侧程序读取`scripts/gen_data.py`生成的输入文件，使用内核调用符`<<<>>>`调用核函数，执行完成后保存输出文件并通过`scripts/verify_result.py`进行逐元素校验。
-
-## 核心接口说明
-
-### asc::te::experimental::fma
-
-```cpp
-template <typename T>
-__simd_callee__ inline decltype(auto) fma(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2);
-```
-
-该接口对三个输入`reg_tensor`执行融合乘加计算，返回相同元素类型的`reg_tensor`。
+  1. 为GM和UB数据搬运创建ND Tensor视图，并为UB寄存器计算创建一维Tensor视图。
+  2. 使用`asc::te::copy`将三组输入从GM搬运到UB。
+  3. 使用一维坐标`make_coord(offset)`将三组输入加载为`reg_tensor<float>`，并指定64个元素参与计算。
+  4. 调用`fma(input_a, input_b, input_c)`执行融合乘加计算，将结果写回UB并搬运到GM。
+  5. Host侧使用内核调用符`<<<>>>`调用核函数，并通过校验脚本比较输出与真值。
 
 ## 编译运行
 
@@ -75,7 +56,7 @@ __simd_callee__ inline decltype(auto) fma(
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的安装路径配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -92,12 +73,16 @@ __simd_callee__ inline decltype(auto) fma(
   python3 ../scripts/verify_result.py
   ```
 
+  使用NPU仿真模式时，在CMake命令中添加`-DCMAKE_ASC_RUN_MODE=sim`参数。
+
+  > **注意：** 切换编译模式前需清理CMake缓存，可在`build`目录下删除`CMakeCache.txt`后重新执行CMake命令。
+
 - 编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：`dav-3510`对应Ascend 950PR/Ascend 950DT |
   | `CANN_ASC_USE_EXPERIMENTAL` | `ON`（本样例必选）、`OFF`（默认） | 开启实验性ASC接口 |
 
 - 执行结果
@@ -106,5 +91,5 @@ __simd_callee__ inline decltype(auto) fma(
 
   ```text
   composite_compute_tensor_api executed successfully.
-  test pass! verified fma for half and float.
+  test pass! verified float fma.
   ```

@@ -15,26 +15,23 @@ import numpy as np
 vector_length = 64
 
 
-def write_case(name: str, dtype: type) -> None:
+def main() -> None:
     input_dir = Path("input")
     output_dir = Path("output")
-    input_a = np.linspace(-1.0, 1.0, vector_length, dtype=dtype)
-    input_b = np.linspace(0.25, 1.25, vector_length, dtype=dtype)
-    input_c = np.linspace(-0.5, 0.5, vector_length, dtype=dtype)
-    golden = (input_a * input_b + input_c).astype(dtype)
-    input_a.tofile(input_dir / f"{name}_input_a.bin")
-    input_b.tofile(input_dir / f"{name}_input_b.bin")
-    input_c.tofile(input_dir / f"{name}_input_c.bin")
-    golden.tofile(output_dir / f"{name}_golden.bin")
+    input_dir.mkdir(exist_ok=True)
+    output_dir.mkdir(exist_ok=True)
 
-
-def main() -> None:
-    Path("input").mkdir(exist_ok=True)
-    Path("output").mkdir(exist_ok=True)
-
-    write_case("half", np.float16)
-    write_case("float", np.float32)
-    print("Generated fma input and golden data for half and float.")
+    input_a = np.linspace(-1.0, 1.0, vector_length, dtype=np.float32)
+    input_b = np.linspace(0.25, 1.25, vector_length, dtype=np.float32)
+    input_c = np.linspace(-0.5, 0.5, vector_length, dtype=np.float32)
+    golden = (
+        input_a.astype(np.float64) * input_b.astype(np.float64) + input_c.astype(np.float64)
+    ).astype(np.float32)
+    input_a.tofile(input_dir / "input_a.bin")
+    input_b.tofile(input_dir / "input_b.bin")
+    input_c.tofile(input_dir / "input_c.bin")
+    golden.tofile(output_dir / "golden.bin")
+    print("Generated float fma input and golden data.")
 
 
 if __name__ == "__main__":

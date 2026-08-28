@@ -1,8 +1,8 @@
-# Tensor API直方图计算样例
+# Histograms Tensor API 样例
 
 ## 概述
 
-本样例基于Tensor API演示寄存器直方图计算接口`asc::te::experimental::histograms`的默认模式，即低半区间`frequency`统计。样例读取256个`uint8_t`输入元素，输出128个`uint16_t`统计结果。
+本样例基于Tensor API实现`histograms`接口，使用高半区间累计模式统计256个`uint8_t`输入元素，并输出128个`uint16_t`结果。
 
 ## 支持的产品
 
@@ -25,46 +25,28 @@
 ## 样例描述
 
 - 样例功能：
-  统计输入元素在低半区间`[0, 127]`内的频次。输出初始值为3，计算公式如下：
+  对高半区间`[128, 255]`执行累计统计。输出初始值为3，计算公式如下：
 
   ```text
-  output_i = 3 + count(input_j == i), 0 <= i < 128
+  output_i = 3 + count(input_j <= 128 + i), 0 <= i < 128
   ```
 
 - 样例规格：
   <table>
-  <caption>表1：样例输入输出规格</caption>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">histogram_compute_tensor_api</td></tr>
-  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input</td><td align="center">[1, 256]</td><td align="center">uint8_t</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[1, 128]</td><td align="center">uint16_t</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">histogram_compute_tensor_api</td></tr>
+  <tr><td align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+  <tr><td align="center">input</td><td align="center">[256]</td><td align="center">uint8_t</td></tr>
+  <tr><td align="center">样例输出</td><td align="center">output</td><td align="center">[128]</td><td align="center">uint16_t</td></tr>
+  <tr><td align="center">核函数名</td><td colspan="3" align="center">histogram_compute_tensor_api</td></tr>
   </table>
 
 - 样例实现：
 
-  - Kernel实现
-
-    1. 使用`asc::te::make_tensor`、`asc::te::make_mem_ptr`和`asc::te::make_frame_layout`创建GM和UB上的Tensor对象。
-    2. 使用`asc::te::make_copy`和`asc::te::copy`完成GM到UB的数据搬运。
-    3. 使用Tensor `load`接口加载输入为`reg_tensor<uint8_t>`。
-    4. 初始化`reg_tensor<uint16_t>`目的寄存器为3，调用`asc::te::experimental::histograms`统计低半区间频次。
-    5. 使用Tensor `store`接口写回UB，并使用`asc::te::copy`将结果从UB搬运回GM。
-
-  - 调用实现
-
-    Host侧程序读取`scripts/gen_data.py`生成的输入文件，使用内核调用符`<<<>>>`调用核函数，执行完成后保存输出文件并通过`scripts/verify_result.py`进行逐元素校验。
-
-## 核心接口说明
-
-### asc::te::experimental::histograms
-
-```cpp
-__simd_callee__ inline decltype(auto) histograms(
-    const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src);
-```
-
-该接口统计`uint8_t`输入寄存器中低半区间元素的频次，并返回`reg_tensor<uint16_t>`结果。
+  1. 为GM和UB数据搬运创建ND Tensor视图，并为UB寄存器计算创建一维Tensor视图。
+  2. 使用`asc::te::copy`将输入从GM搬运到UB，并使用一维坐标`make_coord(offset)`加载为`reg_tensor<uint8_t>`。
+  3. 将`reg_tensor<uint16_t>`初始值设置为3，并配置`histogram_half::high`和`histogram_mode::cumulative`。
+  4. 调用`histograms<histogram_config>`执行累计统计，将结果写回UB并搬运到GM。
+  5. Host侧使用内核调用符`<<<>>>`调用核函数，并通过校验脚本比较输出与真值。
 
 ## 编译运行
 
@@ -72,7 +54,7 @@ __simd_callee__ inline decltype(auto) histograms(
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的安装路径配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -89,12 +71,16 @@ __simd_callee__ inline decltype(auto) histograms(
   python3 ../scripts/verify_result.py
   ```
 
+  使用NPU仿真模式时，在CMake命令中添加`-DCMAKE_ASC_RUN_MODE=sim`参数。
+
+  > **注意：** 切换编译模式前需清理CMake缓存，可在`build`目录下删除`CMakeCache.txt`后重新执行CMake命令。
+
 - 编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：`dav-3510`对应Ascend 950PR/Ascend 950DT |
   | `CANN_ASC_USE_EXPERIMENTAL` | `ON`（本样例必选）、`OFF`（默认） | 开启实验性ASC接口 |
 
 - 执行结果
@@ -103,5 +89,5 @@ __simd_callee__ inline decltype(auto) histograms(
 
   ```text
   histogram_compute_tensor_api executed successfully.
-  test pass!
+  test pass! verified cumulative histogram for high half bins.
   ```

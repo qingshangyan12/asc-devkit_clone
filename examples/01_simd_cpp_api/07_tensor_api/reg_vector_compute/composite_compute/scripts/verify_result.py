@@ -13,28 +13,25 @@ from pathlib import Path
 import numpy as np
 
 
-cases = (
-    ("half", np.float16, 1e-3, 1e-3),
-    ("float", np.float32, 1e-4, 1e-4),
-)
+def verify_output(output_dir: Path, output_name: str, golden_name: str, rtol: float, atol: float) -> None:
+    actual = np.fromfile(output_dir / output_name, dtype=np.float32)
+    golden = np.fromfile(output_dir / golden_name, dtype=np.float32)
+    if actual.shape != golden.shape:
+        raise ValueError(f"{output_name}: expected shape {golden.shape}, got {actual.shape}")
+    matches = np.isclose(actual, golden, rtol=rtol, atol=atol)
+    if not np.all(matches):
+        index = int(np.flatnonzero(~matches)[0])
+        raise ValueError(
+            f"{output_name}: mismatch at index {index}: actual={actual[index]}, golden={golden[index]}"
+        )
 
 
 def main() -> None:
     if len(sys.argv) > 2:
         raise ValueError("Usage: verify_result.py [output_dir]")
     output_dir = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("output")
-    golden_dir = output_dir
-    for name, dtype, rtol, atol in cases:
-        actual = np.fromfile(output_dir / f"{name}_output.bin", dtype=dtype)
-        golden = np.fromfile(golden_dir / f"{name}_golden.bin", dtype=dtype)
-        if actual.shape != golden.shape:
-            raise ValueError(f"{name}: expected shape {golden.shape}, got {actual.shape}")
-        matches = np.isclose(actual, golden, rtol=rtol, atol=atol)
-        if np.all(matches):
-            continue
-        index = int(np.flatnonzero(~matches)[0])
-        raise ValueError(f"{name}: mismatch at index {index}, actual={actual[index]}, golden={golden[index]}")
-    print("test pass! verified fma for half and float.")
+    verify_output(output_dir, "output.bin", "golden.bin", rtol=1e-5, atol=1e-5)
+    print("test pass! verified float fma.")
 
 
 if __name__ == "__main__":
