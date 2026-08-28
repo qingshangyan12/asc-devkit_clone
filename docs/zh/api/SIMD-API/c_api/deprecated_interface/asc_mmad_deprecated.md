@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**入参`unit_flag`类型为`uint8_t`的`asc_mmad`接口以及`asc_mmad_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad](../cube_compute/asc_mmad.md)接口替代；原同步功能请通过新接口和`asc_sync_pipe(PIPE_ALL)`实现，具体请参见[asc_sync_pipe](../sync/asc_sync_pipe.md)。**
+**入参`unit_flag`类型为`uint8_t`的`asc_mmad`接口以及`asc_mmad_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad](../cube_compute/asc_mmad.md)接口替代；原同步功能请通过新接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/asc_sync.md)。**
 
 **针对Atlas A3/A2系列产品，带`feat_offset`参数的`asc_mmad`、`asc_mmad_s4`接口以及全部`asc_mmad_sync`、`asc_mmad_s4_sync`接口也已废弃。带`feat_offset`参数的接口请改用不带该参数且使用`asc_unit_flag_mode`的对应接口。**
 
@@ -189,7 +189,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 | smask_offset | 输入 | 无效参数，用户无需关注，传入0即可。 |
 | unit_flag | 输入 | UnitFlag控制参数。0表示关闭；2表示开启且执行后保持单元标志位；3表示开启且执行后更新单元标志位。 |
 | k_direction_align | 输入 | 使用float数据类型时控制K方向的对齐方式。false表示对齐到`ceil(n_dim / 8) * 8`，true表示对齐到`ceil(n_dim / 16) * 16`。 |
-| is_weight_offset | 输入 | 是否启用权重矩阵偏移。 |
+| is_weight_offset | 输入 | 无效参数，用户无需关注，传入false即可。 |
 | c_matrix_source | 输入 | 当`c_matrix_init_val`为false时，配置矩阵C的初始值是否来自BiasTable Buffer。 |
 | c_matrix_init_val | 输入 | 配置是否将矩阵C的初始值设置为0。 |
 <!-- end id21 -->
