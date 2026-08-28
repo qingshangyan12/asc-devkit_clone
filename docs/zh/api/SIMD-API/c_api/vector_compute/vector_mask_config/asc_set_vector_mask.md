@@ -69,7 +69,7 @@ PIPE_S
 ## 约束说明
 
 <!-- npu="950" id11 -->
-- Ascend 950PR/Ascend 950DT：配置Reg矢量计算时，可通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`读入掩码寄存器。
+- Ascend 950PR/Ascend 950DT：该接口用于在VF场景外设置掩码寄存器。在Reg矢量计算配置时，通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`配合获取掩码寄存器的值。更推荐用户使用VF场景内[掩码寄存器操作](../../reg_compute/reg_mask/reg_mask.md)章节中的接口完成Reg矢量计算掩码配置。
 <!-- end id11 -->
 <!-- npu="A3,910b" id12 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：需先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。
@@ -77,4 +77,9 @@ PIPE_S
 
 ## 调用示例
 
-请参考[asc_set_mask_count](asc_set_mask_count.md#调用示例)或[asc_set_mask_norm](asc_set_mask_norm.md#调用示例)。
+<!-- npu="A3,910b" id13 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：请参考[asc_set_mask_count](asc_set_mask_count.md#调用示例)或[asc_set_mask_norm](asc_set_mask_norm.md#调用示例)。
+<!-- end id13 -->
+<!-- npu="950" id14 -->
+- Ascend 950PR/Ascend 950DT：请参考[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md#调用示例)，该示例中`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`读取的掩码值即为`asc_set_vector_mask`设置值，用户可在VF外设置。
+<!-- end id14 -->
