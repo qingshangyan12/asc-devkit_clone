@@ -38,6 +38,7 @@
 - [asc_get_store_atomic_config](../SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md)接口（仅Ascend 950PR/Ascend 950DT）
 
     Ascend 950PR/Ascend 950DT上该接口已废弃，请使用[asc_atomic_add](../SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md)接口。
+<!-- end id5 -->
 
 - [asc_set_atomic_add_int](../SIMD-API/c_api/deprecated_interface/asc_set_atomic_add_int_deprecated.md)接口
 
@@ -54,8 +55,6 @@
 - [asc_set_atomic_min_int](../SIMD-API/c_api/deprecated_interface/asc_set_atomic_min_int_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_set_atomic_min_int32](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md)接口。
-
-<!-- end id5 -->
 
 <!-- npu="950" id6 -->
 ### 系统变量
