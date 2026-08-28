@@ -9,20 +9,15 @@
  */
 #include <gtest/gtest.h>
 #include <stdarg.h>
-#include <stdint.h>
 #include <mutex>
 #include <stdio.h>
 #include "securec.h"
 #include "aicpu_api/aicpu_api.h"
 #include <mockcpp/mockcpp.hpp>
 
-extern "C" {
-extern int32_t (*g_utAicpuGetDfxInfoHook)(uint64_t* infoAddr);
-}
-
 class TEST_AICPU_DUMP : public testing::Test {
 protected:
-    void SetUp() { g_utAicpuGetDfxInfoHook = nullptr; }
+    void SetUp() {}
     void TearDown() { GlobalMockObject::verify(); }
 };
 
