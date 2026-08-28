@@ -533,6 +533,7 @@ static void test_host_c_api_reg_compute_15()
     using ::asc_le_scalar;
     using ::asc_leakyrelu;
     using ::asc_ln;
+    using ::asc_log;
     using ::asc_load;
     using ::asc_loadalign;
     using ::asc_loadalign_brc;
@@ -576,6 +577,7 @@ static void test_host_c_api_reg_compute_16()
     using ::asc_min_scalar;
     using ::asc_mul;
     using ::asc_mul_scalar;
+    using ::asc_mul_scalar_float2half_rn;
     using ::asc_mula;
     using ::asc_mull;
     using ::asc_muls;
