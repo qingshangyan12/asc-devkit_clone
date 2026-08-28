@@ -159,7 +159,7 @@ __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
 | src | 输入 | 源操作数（矢量）的起始地址。 |
 | index | 输入 | 源操作数（矢量数据寄存器），表示dst中每个DataBlock在UB中相对于src的索引位置。索引位置要大于等于0且32B对齐，索引可以存在相同的值。**index仅前8个数有效，单位是字节。** |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg_data_types/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
