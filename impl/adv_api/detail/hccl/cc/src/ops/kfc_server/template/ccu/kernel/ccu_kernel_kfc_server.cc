@@ -123,20 +123,18 @@ ccu::Func KfcAllGatherNHRFunc(
 
 ccu::Func KfcAlltoAllFunc(
     [](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
-        ccu::Variable sliceSizePerJetty, ccu::Variable lastSliceSizePerJetty, ccu::Variable repeatNumInv,
-        ccu::Variable inputSliceStride, ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride,
-        ccu::Variable outputRepeatStride, ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1,
-        ccu::Variable goSize2, ccu::Variable goSize3) {
+        ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset, ccu::Variable goSize1,
+        ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSize4) {
         const auto& arg = *g_kfcRegisterArg;
         CCU_THROW_IF_FAILED(
             CcuAlltoAllMesh1DKernel(
-                param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-                param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
-                param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->loadFromMem),
+                inputAddr, outputAddr, tokenInfo, sliceSize, srcStride,
+                srcOffset, dstOffset, goSize1, goSize2, goSize3, goSize4,
+                arg.channels, arg.channelCount,
+                static_cast<uint32_t>(arg.rankSize), arg.rankId, arg.loadFromMem),
             "define KFC AlltoAll func failed");
     },
-    KFC_ALL_GATHER_NHR_FUNC_NAME);
+    KFC_ALL_TO_ALL_FUNC_NAME);
 
 
 static CcuResult DefineKfcSubKernelFunc(const CcuKernelArgKfcServer* kernelArg)
@@ -153,6 +151,8 @@ static CcuResult DefineKfcSubKernelFunc(const CcuKernelArgKfcServer* kernelArg)
             return ccu::DefineFunc<KfcReduceScatterFunc>();
         case HcclCMDType::HCCL_CMD_ALLREDUCE:
             return ccu::DefineFunc<KfcAllReduceFunc>();
+        case HcclCMDType::HCCL_CMD_ALLTOALL:
+            return ccu::DefineFunc<KfcAlltoAllFunc>();
         default:
             HCCL_ERROR(
                 "[DefineKfcSubKernelFunc] unsupported opType[%u]",

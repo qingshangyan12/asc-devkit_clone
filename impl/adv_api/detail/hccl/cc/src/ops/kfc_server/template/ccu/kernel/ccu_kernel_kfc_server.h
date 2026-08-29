@@ -30,6 +30,8 @@ constexpr const char* KFC_ALL_GATHER_FUNC_NAME = "KfcAllGatherMesh1DMem2MemFunc"
 constexpr const char* KFC_REDUCE_SCATTER_FUNC_NAME = "KfcReduceScatterMesh1DMem2MemFunc";
 constexpr const char* KFC_ALL_REDUCE_FUNC_NAME = "KfcAllReduceMesh1DMem2MemFunc";
 constexpr const char* KFC_ALL_GATHER_NHR_FUNC_NAME = "KfcAllGatherNHR1DMultiJettyMem2MemFunc";
+constexpr const char* KFC_ALL_TO_ALL_FUNC_NAME =
+"CcuAlltoAllMesh1DKernel";
 
 // new---20260603
 struct CcuKernelArgKfcServer : CcuKernelArgBase {

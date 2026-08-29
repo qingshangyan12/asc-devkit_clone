@@ -1805,6 +1805,9 @@ static HcclResult RegisterCcuKernels(
                     case HcclCMDType::HCCL_CMD_ALLREDUCE:
                         kfcFuncName = KFC_ALL_REDUCE_FUNC_NAME;
                         break;
+                    case HcclCMDType::HCCL_CMD_ALLTOALL:
+                        kfcFuncName = KFC_ALL_TO_ALL_FUNC_NAME;
+                        break;
                     default:
                         HCCL_ERROR(
                             "[RegisterCcuKernels] unsupported KFC opType[%u]",
