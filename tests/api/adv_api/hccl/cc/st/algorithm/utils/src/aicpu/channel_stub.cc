@@ -12,6 +12,10 @@
 #include <algorithm>
 
 namespace mc2_ops_hccl {
+uint32_t g_calcChannelRequestNhrCallCount = 0;
+uint32_t g_calcChannelRequestNhrMultiJettyCallCount = 0;
+bool g_lastNhrMultiJettyIsolation = false;
+
 namespace {
 CommProtocol SelectLocalProtocol(const OpParam& param)
 {
@@ -98,6 +102,7 @@ HcclResult CalcChannelRequestNhr(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels)
 {
+    ++g_calcChannelRequestNhrCallCount;
     return CalcChannelRequestMesh1D(comm, param, topoInfo, subcommInfo, channels);
 }
 
@@ -105,8 +110,9 @@ HcclResult CalcChannelRequestNhrMultiJetty(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation)
 {
-    (void)isIsolation;
-    return CalcChannelRequestNhr(comm, param, topoInfo, subcommInfo, channels);
+    ++g_calcChannelRequestNhrMultiJettyCallCount;
+    g_lastNhrMultiJettyIsolation = isIsolation;
+    return CalcChannelRequestMesh1D(comm, param, topoInfo, subcommInfo, channels);
 }
 
 HcclResult CalcChannelRequestMesh2D(

@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <future>
 #include <map>
+#include <limits>
 #include <numeric>
 #include <string>
 #include <memory>
@@ -1034,24 +1035,87 @@ HcclResult HcclAllocAlgResourceAICPU(
     return HCCL_SUCCESS;
 }
 
+HcclResult BuildAicpuThreadConfigs(
+    const AlgResourceRequest& resRequest, std::vector<ThreadConfig>& threadConfigs,
+    ThreadConfig& unfoldThreadConfig)
+{
+    constexpr u32 ORDER_UNFOLD_THREAD_NOTIFY_NUM = 1;
+    constexpr u32 MAX_THREAD_CONFIG_NOTIFY_NUM = std::numeric_limits<uint16_t>::max();
+    const u32 threadNum = resRequest.slaveThreadNum + 1;
+    CHK_PRT_RET(
+        threadNum == 0,
+        HCCL_ERROR("[BuildAicpuThreadConfigs] threadNum overflow, slaveThreadNum[%u].", resRequest.slaveThreadNum),
+        HCCL_E_PARA);
+    CHK_PRT_RET(
+        resRequest.notifyNumPerThread.size() < resRequest.slaveThreadNum,
+        HCCL_ERROR(
+            "[BuildAicpuThreadConfigs] notifyNumPerThread size[%zu] is less than slaveThreadNum[%u].",
+            resRequest.notifyNumPerThread.size(), resRequest.slaveThreadNum),
+        HCCL_E_INTERNAL);
+    CHK_PRT_RET(
+        resRequest.notifyNumOnMainThread >= MAX_THREAD_CONFIG_NOTIFY_NUM,
+        HCCL_ERROR(
+            "[BuildAicpuThreadConfigs] notifyNumOnMainThread[%u] cannot add host-device notify within uint16_t.",
+            resRequest.notifyNumOnMainThread),
+        HCCL_E_PARA);
+    for (u32 i = 0; i < resRequest.slaveThreadNum; ++i) {
+        CHK_PRT_RET(
+            resRequest.notifyNumPerThread[i] > MAX_THREAD_CONFIG_NOTIFY_NUM,
+            HCCL_ERROR(
+                "[BuildAicpuThreadConfigs] notifyNumPerThread[%u]=[%u] exceeds uint16_t.", i,
+                resRequest.notifyNumPerThread[i]),
+            HCCL_E_PARA);
+    }
+
+    threadConfigs.resize(threadNum);
+    CHK_RET(static_cast<HcclResult>(ThreadConfigInit(threadConfigs.data(), threadNum)));
+    threadConfigs[0].notifyNumPerThread = resRequest.notifyNumOnMainThread + 1;
+    for (u32 i = 1; i < threadNum; ++i) {
+        threadConfigs[i].notifyNumPerThread = resRequest.notifyNumPerThread[i - 1];
+    }
+    CHK_RET(static_cast<HcclResult>(ThreadConfigInit(&unfoldThreadConfig, 1)));
+    unfoldThreadConfig.notifyNumPerThread = ORDER_UNFOLD_THREAD_NOTIFY_NUM;
+    return HCCL_SUCCESS;
+}
+
 HcclResult HcclGetThread(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
+    resCtxHost->isHcclThreadAcquireWithConfigSupported = HcommIsSupportHcclThreadAcquireWithConfig();
     if ((param.engine == COMM_ENGINE_AICPU_TS) || (param.engine == COMM_ENGINE_CPU)) {
+        CHK_PRT_RET(
+            resRequest.slaveThreadNum == std::numeric_limits<u32>::max(),
+            HCCL_ERROR("[HcclGetThread] threadNum overflow, slaveThreadNum[%u].", resRequest.slaveThreadNum),
+            HCCL_E_PARA);
+        const u32 threadNum = resRequest.slaveThreadNum + 1;
+
         u32 maxNotifyNum = resRequest.notifyNumOnMainThread;
         for (u32 i = 0; i < resRequest.notifyNumPerThread.size(); i++) {
             if (resRequest.notifyNumPerThread[i] > maxNotifyNum) {
                 maxNotifyNum = resRequest.notifyNumPerThread[i];
             }
         }
-        u32 threadNum = resRequest.slaveThreadNum + 1;
         std::vector<ThreadHandle> threads(threadNum);
-        // maxNotifyNum需要再增加一个用于host-device同步
-        CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, maxNotifyNum + 1, threads.data()));
-        CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 1));
-        // 申请展开流对应的Thread
-        CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_CPU, 1, 0, &resCtxHost->unfoldThread));
+        if (resCtxHost->isHcclThreadAcquireWithConfigSupported) {
+            std::vector<ThreadConfig> threadConfigs;
+            ThreadConfig unfoldThreadConfig;
+            CHK_RET(BuildAicpuThreadConfigs(resRequest, threadConfigs, unfoldThreadConfig));
+            CHK_RET(HcclThreadAcquireWithConfig(
+                comm, COMM_ENGINE_AICPU, threadNum, THREAD_TYPE_TS, threadConfigs.data(), threads.data()));
+            CHK_RET(HcclThreadAcquireWithConfig(
+                comm, COMM_ENGINE_CPU, 1, THREAD_TYPE_TS, &unfoldThreadConfig, &resCtxHost->unfoldThread));
+            CHK_RET(SaveMainThreadInfo(comm, param, threads[0], resRequest.notifyNumOnMainThread + 1));
+            HCCL_INFO("[HcclGetThread] acquired exact notify configs for [%u] AICPU threads.", threadNum);
+        } else {
+            CHK_PRT_RET(
+                maxNotifyNum == std::numeric_limits<u32>::max(),
+                HCCL_ERROR("[HcclGetThread] maxNotifyNum cannot add host-device notify."), HCCL_E_PARA);
+            // 旧HCOMM不支持精确配置时，完整保留统一最大Notify数量的兼容路径。
+            CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, maxNotifyNum + 1, threads.data()));
+            CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 1));
+            CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_CPU, 1, 0, &resCtxHost->unfoldThread));
+        }
         CHK_RET(SaveUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread));
         HCCL_INFO("[HcclGetThread] unfoldThread [%lu]", resCtxHost->unfoldThread);
         HCCL_DEBUG("threads ptr is %p\n", threads.data());
