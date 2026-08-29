@@ -25,6 +25,7 @@ import {
 } from '../../scripts/api-support.mjs'
 import { loadGitTimestamps } from '../../scripts/git-timestamps.mjs'
 import { shellQuote } from '../../scripts/shell-utils.mjs'
+import { baiduAnalyticsHead } from './baidu-analytics.mjs'
 
 const docsRoot = resolve(import.meta.dirname, '..')
 const repoRoot = resolve(import.meta.dirname, '..', '..', '..', '..', '..')
@@ -890,7 +891,7 @@ function balanceDivTags(html) {
     },
   },
 
-  head: [],
+  head: baiduAnalyticsHead,
 
   themeConfig: {
     documentationBuild,
