@@ -354,17 +354,17 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_storealign](reg_compute/store/asc_storealign.md)|reg计算数据搬运接口，从矢量数据寄存器连续对齐搬出到UB，NORM搬出模式。|`c_api/reg_compute/store/storealign.h`|
-|[asc_storealign_mask](reg_compute/store/asc_storealign_mask.md)|reg计算数据搬运接口，将掩码寄存器连续对齐搬出到UB，NORM搬出模式。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storealign_1st](reg_compute/store/asc_storealign_1st.md)|reg计算数据搬运接口，忽略mask向dst搬出src第一个元素。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storealign_1st_postupdate](reg_compute/store/asc_storealign_1st_postupdate.md)|reg计算数据搬运接口，忽略mask向dst搬出src第一个元素，启用Post Update。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storealign_intlv](reg_compute/store/asc_storealign_intlv.md)|reg计算数据搬运接口，将src0和src1中的元素交错搬出到UB。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storealign_pack](reg_compute/store/asc_storealign_pack.md)|reg计算数据搬运接口，根据mask将src中有效元素的低半部分数据连续存储于dst中。|`c_api/reg_compute/store/storealign.h`|
-|[asc_storealign_mask_pack](reg_compute/store/asc_storealign_mask_pack.md)|reg计算数据搬运接口，将掩码寄存器连续对齐搬出到UB，PACK搬出模式。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storealign_pack_postupdate](reg_compute/store/asc_storealign_pack_postupdate.md)|reg计算数据搬运接口，根据mask压缩搬出，启用Post Update。|`c_api/reg_compute/store/storealign.h`|
-|[asc_storealign_mask_pack_postupdate](reg_compute/store/asc_storealign_mask_pack_postupdate.md)|reg计算数据搬运接口，将掩码寄存器连续对齐搬出到UB，PACK搬出模式，启用Post Update。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storealign_pack_quarter](reg_compute/store/asc_storealign_pack_quarter.md)|reg计算数据搬运接口，根据mask将src中有效元素的低8bits数据连续存储于dst中。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storealign_pack_quarter_postupdate](reg_compute/store/asc_storealign_pack_quarter_postupdate.md)|reg计算数据搬运接口，根据mask将src中有效元素的低8bits数据连续存储于dst中，启用Post Update。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storealign_postupdate](reg_compute/store/asc_storealign_postupdate.md)|reg计算数据搬运接口，从矢量数据寄存器连续对齐搬出到UB，NORM搬出模式，启用Post Update。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_mask](reg_compute/store/asc_storealign_mask.md)|reg计算数据搬运接口，将掩码寄存器连续对齐搬出到UB，NORM搬出模式。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_mask_pack](reg_compute/store/asc_storealign_mask_pack.md)|reg计算数据搬运接口，将掩码寄存器连续对齐搬出到UB，PACK搬出模式。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_mask_pack_postupdate](reg_compute/store/asc_storealign_mask_pack_postupdate.md)|reg计算数据搬运接口，将掩码寄存器连续对齐搬出到UB，PACK搬出模式，启用Post Update。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storealign_mask_postupdate](reg_compute/store/asc_storealign_mask_postupdate.md)|reg计算数据搬运接口，将掩码寄存器连续对齐搬出到UB，NORM搬出模式，启用Post Update。|`c_api/reg_compute/store/storealign.h`|
 |[asc_store](reg_compute/store/asc_store.md)|reg计算数据搬运接口，适用于从矢量数据寄存器搬出到UB的场景，不区分是否对齐，在追求极致性能时，应尽量避免使用该接口。|`c_api/composite/storeunalign_composite.h`|
 |[asc_storeunalign](reg_compute/store/asc_storeunalign.md)|reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。|`c_api/reg_compute/store/storeunalign.h`|
