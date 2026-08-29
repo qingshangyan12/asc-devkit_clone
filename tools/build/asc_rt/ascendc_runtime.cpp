@@ -154,9 +154,10 @@ bool AscendCheckSoCVersion(const char* socVersion, char* errMsg)
         ASCENDLOGE("bin soc version %s is incorrected.", compileSocVersion.c_str());
         return false;
     }
+    ASCENDLOGI("  NEWNEW11111111111111111111111111111.");
     const auto& it1 = ascendcSocVersionMap.find(lowerCurSocVersion);
     if (it1 == ascendcSocVersionMap.end()) {
-        ASCENDLOGE("cur soc version %s not found.", lowerCurSocVersion.c_str());
+        ASCENDLOGE("cur soc version %s not found NEWNEW11111111111111111111111111111.", lowerCurSocVersion.c_str());
         return false;
     }
 
