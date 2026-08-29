@@ -359,3 +359,6 @@
 - [asc_abs_sync](../SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md)接口
 
     `asc_abs_sync()`接口已废弃。请使用[asc_abs](../SIMD-API/c_api/vector_compute/vector_arith/asc_abs.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
+- [asc_transto5hd_sync](../SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md)接口
+
+    `asc_transto5hd_b8_sync()`、`asc_transto5hd_b16_sync()`和`asc_transto5hd_b32_sync()`接口已废弃。请使用[asc_transto5hd](../SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
