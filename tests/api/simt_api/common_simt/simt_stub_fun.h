@@ -307,4 +307,10 @@ bfloat16x2_t atomicCAS(__gm__ bfloat16x2_t* address, bfloat16x2_t value1, bfloat
 
 float __fabsf(float x);
 
+int64_t clz(uint64_t x);
+
+int64_t bcnt1(uint64_t x);
+
+uint64_t __cce_simt_get_para_base_imp();
+
 #endif
