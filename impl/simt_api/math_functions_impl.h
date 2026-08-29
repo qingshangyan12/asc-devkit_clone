@@ -555,62 +555,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_set_res_mod_neg(float mod
     return mod_res;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
-{
-    bool is_x_pos = x > 0;
-    float abs_x = fabsf(x);
-    float abs_y = fabsf(y);
-    bool is_x_nan = isnan(x);
-    bool is_y_nan = isnan(y);
-
-    bool is_inf_not_nan = isinf(abs_x) && !is_x_nan;
-    bool is_zero_not_nan = (abs_y == 0) && !is_y_nan;
-    if (is_inf_not_nan | is_zero_not_nan) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-    if (is_y_nan || is_x_nan || abs_x < abs_y) {
-        bool gt_inf_or_nan = (abs_y > ASCRT_INF_F) || is_x_nan || is_y_nan;
-        float xy_val = (gt_inf_or_nan) ? (x + y) : x;
-        bool lt_zero_or_nan = (abs_x <= 0) || is_x_nan;
-        return (lt_zero_or_nan) ? (xy_val + x) : xy_val;
-    }
-
-    uint32_t* uabs_y = reinterpret_cast<uint32_t*>(&abs_y);
-    uint32_t y_man_bits = (*uabs_y) & ASCRT_MAN_BIT_FLOAT_U;
-    uint32_t* uabs_x = reinterpret_cast<uint32_t*>(&abs_x);
-    uint32_t x_exp_bits = (*uabs_x) & ASCRT_EXP_BIT_FLOAT_U;
-    uint32_t xy_bits = y_man_bits | x_exp_bits;
-
-    float xy_val = 0;
-    uint32_t* uxy_val = reinterpret_cast<uint32_t*>(&xy_val);
-    *uxy_val = xy_bits;
-    bool is_gt_x = (xy_val > abs_x) && !isnan(xy_val) && !is_x_nan;
-    float half_xy_val = xy_val * 0.5f;
-    xy_val = (is_gt_x) ? half_xy_val : xy_val;
-    float mod_res = abs_x;
-
-    if (xy_val < abs_y || isnan(xy_val) || is_y_nan) {
-        if (!is_x_pos) {
-            return __internal_set_res_mod_neg(mod_res);
-        }
-        return mod_res;
-    }
-    float sub_tmp;
-    bool xy_val_ge_y = true;
-    bool cmp_tmp;
-    while (xy_val_ge_y) {
-        sub_tmp = mod_res - xy_val;
-        cmp_tmp = mod_res < xy_val || isnan(mod_res) || isnan(xy_val);
-        mod_res = (cmp_tmp) ? mod_res : sub_tmp;
-        xy_val = xy_val * 0.5f;
-        xy_val_ge_y = (xy_val >= abs_y) || isnan(xy_val) || is_y_nan;
-    }
-    if (!is_x_pos) {
-        return __internal_set_res_mod_neg(mod_res);
-    }
-    return mod_res;
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float remainderf(float x, float y)
 {
     int32_t quo = -1;
@@ -920,50 +864,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x)
     return dst;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
-{
-    if (isnan(y)) {
-        return y;
-    } else if (isnan(x)) {
-        return x;
-    }
-
-    int d = (y >= 0) ? 1 : -1;
-    if (y == 0.0f) {
-        if (x > 0.0f) {
-            return y;
-        }
-        uint32_t x_bits = *reinterpret_cast<uint32_t*>(&x);
-        if ((x_bits & ASCRT_NEG_SIGN_BIT_U) != 0) {
-            uint32_t y_bits = *reinterpret_cast<uint32_t*>(&y);
-            int zero_sign = ((y_bits & ASCRT_NEG_SIGN_BIT_U) != 0) ? -1 : 1;
-            return zero_sign * ASCRT_PI_F;
-        }
-        return y;
-    } else if (isinf(y) && isinf(x)) {
-        int s = 1;
-        if (x < 0) {
-            s = 3; // 3 : ATAN2_THREE
-        }
-        return d * ASCRT_PIO4_F * s;
-    } else if (isinf(y)) {
-        return d * ASCRT_PIO2_F;
-    } else if (isinf(x)) {
-        if (x > 0) {
-            d = 0;
-        }
-        return d * ASCRT_PI_F;
-    }
-
-    if (x == 0) {
-        return d * ASCRT_PIO2_F;
-    } else if (x > 0) {
-        d = 0;
-    }
-
-    return atanf(y / x) + d * ASCRT_PI_F;
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanhf(float x) { return logf((1.0f + x) / (1.0f - x)) / 2.0f; }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cos_poly(float x)
@@ -1011,15 +911,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float cosf(float x)
     return c;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float coshf(float x)
-{
-    float y = fabsf(x);
-    const float tmp = expf(y - ASCRT_SCALAR_LN2_F);
-    return tmp + 0.25f / tmp;
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cospif(float x) { return cosf(x * ASCRT_PI_F); }
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinf(float x)
 {
     if (fabsf(x) > 1) {
@@ -1053,14 +944,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinf(float x)
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acosf(float x) { return ASCRT_PIO2_F - asinf(x); }
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
-{
-    if (x < 1) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-    return logf(x + sqrtf(x * x - 1.0f));
-}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinf(float x)
 {
@@ -1105,29 +988,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinhf(float x)
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x) { return sinf(x * ASCRT_PI_F); }
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
-{
-    if (fabsf(x) > 0.1f) {
-        return x > 0 ? logf(x + sqrtf(x * x + 1.0f)) : logf(sqrtf(x * x + 1.0f) - x) * (-1);
-    } else {
-        float square_v = 0;
-        float dst = 0;
-        float src = x;
-        float factor[] = {
-            1.0,
-            -0.16666666666666666666666666666667,
-            0.075,
-            -0.04464285714285714285714285714286,
-            0.03038194444444444444444444444444,
-            -0.02237215909090909090909090909091,
-            0.01735276442307692307692307692308,
-            -0.01396484375,
-        };
-        __internal_taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
-        return dst;
-    }
-}
 
 #define __INTERNAL_SINCOSF(x, s, c)                                              \
     do {                                                                         \
@@ -1245,10 +1105,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, __gm__ float* s, _
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y) { return __powf(x, y); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x) { return powf(2.0f, x); }
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x) { return powf(10.0f, x); }
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x) { return expf(x) - 1.0f; }
 
 #define __INTERNAL_FREXPF(x, exp)                        \
     do {                                                 \
@@ -1473,98 +1329,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log10f(float x) { return logf(x) / l
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x) { return logf(1.0f + x); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float logbf(float x)
-{
-    if (isnan(x)) {
-        return x;
-    }
-    if (x < 0) {
-        x = -x;
-    }
-    float inf = ASCRT_INF_F;
-    if (isinf(x)) {
-        return inf;
-    }
-    if (x == 0) {
-        return -inf;
-    }
-
-    uint32_t fp32_inf_exponent = 255;
-    uint32_t fp32_decimal_bit = 23;
-    uint32_t fp32_sign_bit = 256;
-    uint32_t fp32_exponent_h = 127;
-    uint32_t* exponent = reinterpret_cast<uint32_t*>(&x);
-    (*exponent) >>= fp32_decimal_bit;
-    uint32_t sign = fp32_sign_bit;
-    if ((*exponent) > sign) {
-        (*exponent) -= sign;
-    }
-    if ((*exponent) == fp32_inf_exponent) {
-        return inf;
-    } else {
-        float res = (*exponent);
-        res -= fp32_exponent_h;
-        return res;
-    }
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ilogbf(float x)
-{
-    if (x == 0.0f || isnan(x)) {
-        return ASCRT_MIN_VAL_S;
-    }
-    if (isinf(x)) {
-        return ASCRT_MAX_VAL_S;
-    }
-    if (x < 0) {
-        x = -x;
-    }
-    return static_cast<int>(logbf(x));
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cbrtf(float x)
-{
-    uint32_t x_bits = *reinterpret_cast<uint32_t*>(&x);
-    int32_t exp_bits = (x_bits >> 23) & 0xFF;
-    if (x == 0.0f || exp_bits == 0xFF) {
-        return x;
-    }
-
-    // In order for Newtonian iteration method to converge quickly, we need to reduce x to a certain range(0.125, 8).
-    // Depending on the computer's float number storage structure, we can adjust the exponential part of x.
-    // the adjustment factor(k) ensures the exponent of x' is in (-3, 3)
-    int32_t exponent = exp_bits - 127;
-    int32_t k;
-    if (exponent >= 3) {              // 3:ensures the exponent of x' is in (-3, 3)
-        k = ((exponent - 3) / 3) + 1; // 3:ensures the exponent of x' is in (-3, 3)
-    } else if (exponent <= -4) {      //-4:ensures the exponent of x' is in (-3, 3)
-        k = (exponent + 1) / 3;       // 3:ensures the exponent of x' is in (-3, 3)
-    } else {
-        k = 0;
-    }
-
-    // get the adjusted x value
-    int32_t exp_adjusted_bits = exponent - 3 * k + 127;
-    uint32_t x_adjusted_bits = (x_bits & 0x7FFFFF) | (exp_adjusted_bits << 23);
-    float x_adjusted = *reinterpret_cast<float*>(&x_adjusted_bits);
-
-    // Newton's iteration method,f(x) = x^3 - b, x_i+1 = x_i - f(x_i)/f'(x_i) = (2*x_i + b/x_i^2)/3
-    // the initial value of x_i = 1.0
-    float y = 1.0f;
-    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
-    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
-    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
-    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
-    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
-
-    // adjust the exponent of y by k
-    uint32_t y_bits = *reinterpret_cast<uint32_t*>(&y);
-    int32_t yexp_bits = ((y_bits >> 23) & 0xFF) + k;
-    y_bits = (y_bits & 0x807FFFFF) | ((yexp_bits & 0xFF) << 23) | // 23:the number of bits to shift left
-             (x_bits & 0x80000000);
-    return *reinterpret_cast<float*>(&y_bits);
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rcbrtf(float x)
 {
     if (x == 0.0f) {
@@ -1674,49 +1438,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cal_poly(float abs_x)
     poly = fmaf(poly, w, -0.13962108f);
     poly = fmaf(poly, w, 1.2329951f);
     return poly;
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcf(float x)
-{
-    float abs_x = fabsf(x);
-
-    float poly = __internal_cal_poly(abs_x);
-
-    float tmp2 = fmaf(2.0f, abs_x, 1.0f);
-    float inv_tmp2 = 1.0f / tmp2;
-    float q = poly * inv_tmp2;
-    float t = fmaf(abs_x, q * -2.0f, poly);
-    float u = t - q;
-    float v = fmaf(u, inv_tmp2, q);
-
-    float x_squared = abs_x * abs_x;
-    float neg_x2 = -x_squared;
-    float f1 = 1.442695f;
-    float scaled = neg_x2 * f1;
-    float int_part = scaled > 0 ? __floorf(x) : __ceilf(x);
-    float abs_part = fabsf(int_part);
-    uint32_t sign_bit = *reinterpret_cast<uint32_t*>(&int_part) & 0x80000000;
-    float clamped_bits = sign_bit | 0x42FC0000;
-    float clamped = *reinterpret_cast<float*>(&clamped_bits);
-    float safe_int = (abs_part > 126.0f) ? clamped : int_part;
-
-    float remainder = fmaf(safe_int, -0.6931472f, neg_x2);
-    remainder = fmaf(safe_int, 1.9046542e-9f, remainder);
-    float exponent_arg = remainder * f1;
-    float exponent_base = safe_int + 12583039.0f;
-    uint32_t exponent_bits = *reinterpret_cast<uint32_t*>(&exponent_base) << 23;
-    float exponent_scale = *reinterpret_cast<float*>(&exponent_bits);
-    float exp_val = exp2f(exponent_arg) * exponent_scale;
-
-    float term3 = fmaf(-abs_x, abs_x, x_squared);
-    float term4 = fmaf(exp_val, term3, exp_val);
-    float result = v * term4;
-
-    if (abs_x > 10.055f) {
-        result = 0.0f;
-    }
-
-    return (x < 0) ? (2.0f - result) : result;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfinvf(float x)
@@ -2896,40 +2617,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_yn_case3(int n, float x)
     return value / scale_factor;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float j0f(float x)
-{
-    if (isnan(x)) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-    float f1 = fabsf(x);
-    if (f1 > 1e13f && isfinite(f1)) {
-        return 0;
-    }
-    if (f1 > 8.0f) {
-        return __internal_cal_j0_x_larger8(f1);
-    } else {
-        return __internal_cal_j0_x_less8(f1);
-    }
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float j1f(float x)
-{
-    if (isnan(x)) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-    float f1 = fabsf(x);
-    if (f1 > 1e13f && isfinite(f1)) {
-        return 0;
-    }
-    float res;
-    if (f1 > 8.0f) {
-        res = __internal_cal_j1_x_lager8(f1);
-    } else {
-        res = __internal_cal_j1_x_less8(f1);
-    }
-    return (x < 0) ? -res : res;
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float jnf(int n, float x)
 {
     if (n == 0) {
@@ -3133,6 +2820,1040 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int min(unsigned long l
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y) { return x / y; }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int signbit(float x) { return signbitf(x); }
+
+#if defined(ASCENDC_USE_LEGACY_PRECISION)
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
+{
+    bool is_x_pos = x > 0;
+    float abs_x = fabsf(x);
+    float abs_y = fabsf(y);
+    bool is_x_nan = isnan(x);
+    bool is_y_nan = isnan(y);
+
+    bool is_inf_not_nan = isinf(abs_x) && !is_x_nan;
+    bool is_zero_not_nan = (abs_y == 0) && !is_y_nan;
+    if (is_inf_not_nan | is_zero_not_nan) {
+        return ASCRT_INF_F / ASCRT_INF_F;
+    }
+    if (is_y_nan || is_x_nan || abs_x < abs_y) {
+        bool gt_inf_or_nan = (abs_y > ASCRT_INF_F) || is_x_nan || is_y_nan;
+        float xy_val = (gt_inf_or_nan) ? (x + y) : x;
+        bool lt_zero_or_nan = (abs_x <= 0) || is_x_nan;
+        return (lt_zero_or_nan) ? (xy_val + x) : xy_val;
+    }
+
+    uint32_t* uabs_y = reinterpret_cast<uint32_t*>(&abs_y);
+    uint32_t y_man_bits = (*uabs_y) & ASCRT_MAN_BIT_FLOAT_U;
+    uint32_t* uabs_x = reinterpret_cast<uint32_t*>(&abs_x);
+    uint32_t x_exp_bits = (*uabs_x) & ASCRT_EXP_BIT_FLOAT_U;
+    uint32_t xy_bits = y_man_bits | x_exp_bits;
+
+    float xy_val = 0;
+    uint32_t* uxy_val = reinterpret_cast<uint32_t*>(&xy_val);
+    *uxy_val = xy_bits;
+    bool is_gt_x = (xy_val > abs_x) && !isnan(xy_val) && !is_x_nan;
+    float half_xy_val = xy_val * 0.5f;
+    xy_val = (is_gt_x) ? half_xy_val : xy_val;
+    float mod_res = abs_x;
+
+    if (xy_val < abs_y || isnan(xy_val) || is_y_nan) {
+        if (!is_x_pos) {
+            return __internal_set_res_mod_neg(mod_res);
+        }
+        return mod_res;
+    }
+    float sub_tmp;
+    bool xy_val_ge_y = true;
+    bool cmp_tmp;
+    while (xy_val_ge_y) {
+        sub_tmp = mod_res - xy_val;
+        cmp_tmp = mod_res < xy_val || isnan(mod_res) || isnan(xy_val);
+        mod_res = (cmp_tmp) ? mod_res : sub_tmp;
+        xy_val = xy_val * 0.5f;
+        xy_val_ge_y = (xy_val >= abs_y) || isnan(xy_val) || is_y_nan;
+    }
+    if (!is_x_pos) {
+        return __internal_set_res_mod_neg(mod_res);
+    }
+    return mod_res;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
+{
+    if (isnan(y)) {
+        return y;
+    } else if (isnan(x)) {
+        return x;
+    }
+
+    int d = (y >= 0) ? 1 : -1;
+    if (y == 0.0f) {
+        if (x > 0.0f) {
+            return y;
+        }
+        uint32_t x_bits = *reinterpret_cast<uint32_t*>(&x);
+        if ((x_bits & ASCRT_NEG_SIGN_BIT_U) != 0) {
+            uint32_t y_bits = *reinterpret_cast<uint32_t*>(&y);
+            int zero_sign = ((y_bits & ASCRT_NEG_SIGN_BIT_U) != 0) ? -1 : 1;
+            return zero_sign * ASCRT_PI_F;
+        }
+        return y;
+    } else if (isinf(y) && isinf(x)) {
+        int s = 1;
+        if (x < 0) {
+            s = 3; // 3 : ATAN2_THREE
+        }
+        return d * ASCRT_PIO4_F * s;
+    } else if (isinf(y)) {
+        return d * ASCRT_PIO2_F;
+    } else if (isinf(x)) {
+        if (x > 0) {
+            d = 0;
+        }
+        return d * ASCRT_PI_F;
+    }
+
+    if (x == 0) {
+        return d * ASCRT_PIO2_F;
+    } else if (x > 0) {
+        d = 0;
+    }
+
+    return atanf(y / x) + d * ASCRT_PI_F;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float coshf(float x)
+{
+    float y = fabsf(x);
+    const float tmp = expf(y - ASCRT_SCALAR_LN2_F);
+    return tmp + 0.25f / tmp;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cospif(float x) { return cosf(x * ASCRT_PI_F); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
+{
+    if (x < 1) {
+        return ASCRT_INF_F / ASCRT_INF_F;
+    }
+    return logf(x + sqrtf(x * x - 1.0f));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
+{
+    if (fabsf(x) > 0.1f) {
+        return x > 0 ? logf(x + sqrtf(x * x + 1.0f)) : logf(sqrtf(x * x + 1.0f) - x) * (-1);
+    } else {
+        float square_v = 0;
+        float dst = 0;
+        float src = x;
+        float factor[] = {
+            1.0,
+            -0.16666666666666666666666666666667,
+            0.075,
+            -0.04464285714285714285714285714286,
+            0.03038194444444444444444444444444,
+            -0.02237215909090909090909090909091,
+            0.01735276442307692307692307692308,
+            -0.01396484375,
+        };
+        __internal_taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
+        return dst;
+    }
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x) { return powf(10.0f, x); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x) { return expf(x) - 1.0f; }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float logbf(float x)
+{
+    if (isnan(x)) {
+        return x;
+    }
+    if (x < 0) {
+        x = -x;
+    }
+    float inf = ASCRT_INF_F;
+    if (isinf(x)) {
+        return inf;
+    }
+    if (x == 0) {
+        return -inf;
+    }
+
+    uint32_t fp32_inf_exponent = 255;
+    uint32_t fp32_decimal_bit = 23;
+    uint32_t fp32_sign_bit = 256;
+    uint32_t fp32_exponent_h = 127;
+    uint32_t* exponent = reinterpret_cast<uint32_t*>(&x);
+    (*exponent) >>= fp32_decimal_bit;
+    uint32_t sign = fp32_sign_bit;
+    if ((*exponent) > sign) {
+        (*exponent) -= sign;
+    }
+    if ((*exponent) == fp32_inf_exponent) {
+        return inf;
+    } else {
+        float res = (*exponent);
+        res -= fp32_exponent_h;
+        return res;
+    }
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ilogbf(float x)
+{
+    if (x == 0.0f || isnan(x)) {
+        return ASCRT_MIN_VAL_S;
+    }
+    if (isinf(x)) {
+        return ASCRT_MAX_VAL_S;
+    }
+    if (x < 0) {
+        x = -x;
+    }
+    return static_cast<int>(logbf(x));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cbrtf(float x)
+{
+    uint32_t x_bits = *reinterpret_cast<uint32_t*>(&x);
+    int32_t exp_bits = (x_bits >> 23) & 0xFF;
+    if (x == 0.0f || exp_bits == 0xFF) {
+        return x;
+    }
+
+    // In order for Newtonian iteration method to converge quickly, we need to reduce x to a certain range(0.125, 8).
+    // Depending on the computer's float number storage structure, we can adjust the exponential part of x.
+    // the adjustment factor(k) ensures the exponent of x' is in (-3, 3)
+    int32_t exponent = exp_bits - 127;
+    int32_t k;
+    if (exponent >= 3) {              // 3:ensures the exponent of x' is in (-3, 3)
+        k = ((exponent - 3) / 3) + 1; // 3:ensures the exponent of x' is in (-3, 3)
+    } else if (exponent <= -4) {      //-4:ensures the exponent of x' is in (-3, 3)
+        k = (exponent + 1) / 3;       // 3:ensures the exponent of x' is in (-3, 3)
+    } else {
+        k = 0;
+    }
+
+    // get the adjusted x value
+    int32_t exp_adjusted_bits = exponent - 3 * k + 127;
+    uint32_t x_adjusted_bits = (x_bits & 0x7FFFFF) | (exp_adjusted_bits << 23);
+    float x_adjusted = *reinterpret_cast<float*>(&x_adjusted_bits);
+
+    // Newton's iteration method,f(x) = x^3 - b, x_i+1 = x_i - f(x_i)/f'(x_i) = (2*x_i + b/x_i^2)/3
+    // the initial value of x_i = 1.0
+    float y = 1.0f;
+    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
+    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
+    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
+    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
+    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
+
+    // adjust the exponent of y by k
+    uint32_t y_bits = *reinterpret_cast<uint32_t*>(&y);
+    int32_t yexp_bits = ((y_bits >> 23) & 0xFF) + k;
+    y_bits = (y_bits & 0x807FFFFF) | ((yexp_bits & 0xFF) << 23) | // 23:the number of bits to shift left
+             (x_bits & 0x80000000);
+    return *reinterpret_cast<float*>(&y_bits);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcf(float x)
+{
+    float abs_x = fabsf(x);
+
+    float poly = __internal_cal_poly(abs_x);
+
+    float tmp2 = fmaf(2.0f, abs_x, 1.0f);
+    float inv_tmp2 = 1.0f / tmp2;
+    float q = poly * inv_tmp2;
+    float t = fmaf(abs_x, q * -2.0f, poly);
+    float u = t - q;
+    float v = fmaf(u, inv_tmp2, q);
+
+    float x_squared = abs_x * abs_x;
+    float neg_x2 = -x_squared;
+    float f1 = 1.442695f;
+    float scaled = neg_x2 * f1;
+    float int_part = scaled > 0 ? __floorf(x) : __ceilf(x);
+    float abs_part = fabsf(int_part);
+    uint32_t sign_bit = *reinterpret_cast<uint32_t*>(&int_part) & 0x80000000;
+    float clamped_bits = sign_bit | 0x42FC0000;
+    float clamped = *reinterpret_cast<float*>(&clamped_bits);
+    float safe_int = (abs_part > 126.0f) ? clamped : int_part;
+
+    float remainder = fmaf(safe_int, -0.6931472f, neg_x2);
+    remainder = fmaf(safe_int, 1.9046542e-9f, remainder);
+    float exponent_arg = remainder * f1;
+    float exponent_base = safe_int + 12583039.0f;
+    uint32_t exponent_bits = *reinterpret_cast<uint32_t*>(&exponent_base) << 23;
+    float exponent_scale = *reinterpret_cast<float*>(&exponent_bits);
+    float exp_val = exp2f(exponent_arg) * exponent_scale;
+
+    float term3 = fmaf(-abs_x, abs_x, x_squared);
+    float term4 = fmaf(exp_val, term3, exp_val);
+    float result = v * term4;
+
+    if (abs_x > 10.055f) {
+        result = 0.0f;
+    }
+
+    return (x < 0) ? (2.0f - result) : result;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float j0f(float x)
+{
+    if (isnan(x)) {
+        return ASCRT_INF_F / ASCRT_INF_F;
+    }
+    float f1 = fabsf(x);
+    if (f1 > 1e13f && isfinite(f1)) {
+        return 0;
+    }
+    if (f1 > 8.0f) {
+        return __internal_cal_j0_x_larger8(f1);
+    } else {
+        return __internal_cal_j0_x_less8(f1);
+    }
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float j1f(float x)
+{
+    if (isnan(x)) {
+        return ASCRT_INF_F / ASCRT_INF_F;
+    }
+    float f1 = fabsf(x);
+    if (f1 > 1e13f && isfinite(f1)) {
+        return 0;
+    }
+    float res;
+    if (f1 > 8.0f) {
+        res = __internal_cal_j1_x_lager8(f1);
+    } else {
+        res = __internal_cal_j1_x_less8(f1);
+    }
+    return (x < 0) ? -res : res;
+}
+
+#else
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
+{
+    if (x < 1) {
+        return ASCRT_INF_F / ASCRT_INF_F;
+    }
+    float t = x - 1.0f;
+    if (t <= 0.5f) {
+        float factor = 0.000045124618889065459371f;
+        factor = __fma(factor, t, -0.000109100341796875f);
+        factor = __fma(factor, t, 0.00027113739657215774059f);
+        factor = __fma(factor, t, -0.00069930072128772735596f);
+        factor = __fma(factor, t, 0.0018988715019077062607f);
+        factor = __fma(factor, t, -0.0055803572759032249451f);
+        factor = __fma(factor, t, 0.018750000745058059692f);
+        factor = __fma(factor, t, -0.083333335816860198975f);
+        factor = __fma(factor, t, 1.0f);
+        return __sqrtf(2.0f * t) * factor;
+    }
+    if (x > 8388609.0f) {
+        return __logf(x) + 0.69314718246459960938f;
+    }
+    return __logf(1.0f + t + __sqrtf(t * (x + 1.0f)));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
+{
+    float ax = __fabsf(x);
+    if (ax == ASCRT_INF_F) {
+        return x;
+    }
+    if (ax < 1.0e-8f) {
+        return x;
+    }
+
+    float y;
+    if (ax <= 0.5f) {
+        float z = ax * ax;
+        float p = -0.01396484375f;
+        p = __fma(p, z, 0.017352764423076923077f);
+        p = __fma(p, z, -0.022372159090909090909f);
+        p = __fma(p, z, 0.030381944444444444444f);
+        p = __fma(p, z, -0.044642857142857142857f);
+        p = __fma(p, z, 0.075f);
+        p = __fma(p, z, -0.16666666666666666667f);
+        y = __fma(ax * z, p, ax);
+    } else if (ax > 1.0e19f) {
+        y = __logf(ax) + 0.69314718246459960938f;
+    } else {
+        float s = __sqrtf(__fma(ax, ax, 1.0f));
+        float u = ax + ax * ax / (1.0f + s);
+        y = __logf(1.0f + u);
+    }
+    return signbit(x) ? -y : y;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
+{
+    float ay = __fabsf(y);
+    float ax = __fabsf(x);
+    float sum = ax + ay;
+    if (__isnan(sum)) {
+        return sum;
+    }
+
+    bool y_gt_x = ay > ax;
+    float hi = y_gt_x ? ay : ax;
+    float lo = y_gt_x ? ax : ay;
+
+    float a = 0.0f;
+    if (hi != 0.0f) {
+        float r = lo / hi;
+        float z = r * r;
+        float p = 0.0027380611281841993332f /* 0x3b33710b */;
+        p = __fma(z, p, -0.015681877732276916504f /* 0xbc807748 */);
+        p = __fma(z, p, 0.042200751602649688721f /* 0x3d2cdab2 */);
+        p = __fma(z, p, -0.074792981147766113281f /* 0xbd992d10 */);
+        p = __fma(z, p, 0.10640415549278259277f /* 0x3dd9ea6c */);
+        p = __fma(z, p, -0.14207722246646881104f /* 0xbe117cb1 */);
+        p = __fma(z, p, 0.19993925094604492188f /* 0x3e4cbce0 */);
+        p = __fma(z, p, -0.33333197236061096191f /* 0xbeaaaa7d */);
+        float t = __fma(z * p, r, r);
+
+        if (ay == ax) {
+            a = signbit(x) ? 2.35619449615478515625f /* 0x4016cbe4 */
+                           : 0.78539818525314331055f /* 0x3f490fdb */;
+        } else if (y_gt_x) {
+            float pio2 = 1.57079637050628662109f /* 0x3fc90fdb */;
+            a = signbit(x) ? (pio2 + t) : (pio2 - t);
+        } else {
+            a = signbit(x) ? (3.14159274101257324219f /* 0x40490fdb */ - t) : t;
+        }
+    } else {
+        a = signbit(x) ? 3.14159274101257324219f /* 0x40490fdb */ : 0.0f;
+    }
+
+    return signbit(y) ? -a : a;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cbrtf(float x)
+{
+    if (x == 0.0f || isinf(x) || __isnan(x)) {
+        return x;
+    }
+
+    float ax = __fabsf(x);
+    float loga;
+    if (ax < 1.175494350822287508e-38f /* 0x00800000 */) {
+        float scaled = ax * 16777216.0f;
+        loga = __logf(scaled) - 16.635532333438686f;
+    } else {
+        loga = __logf(ax);
+    }
+
+    float inv2 = __expf(loga * -0.6666666865348815918f /* 0xbf2aaaab */);
+    float y = ax * inv2;
+    float t = inv2 * y;
+    float corr = __fma(-y, t, 1.0f) * 0.3333333432674407959f /* 0x3eaaaaab */;
+    y = __fma(y, corr, y);
+    return signbit(x) ? -y : y;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float coshf(float x)
+{
+    float ax = __fabsf(x);
+    if (__isnan(ax) || ax == ASCRT_INF_F) {
+        return ax;
+    }
+
+    float n = truncf(ax * 1.4426950216293334961f /* 0x3fb8aa3b */);
+    if (__fabsf(n) > 126.0f /* 0x42fc0000 */) {
+        n = 126.0f;
+    }
+
+    float r = __fma(n, -0.69314718246459960938f /* 0xbf317218 */, ax);
+    r = __fma(n, 1.9046542121259335545e-09f /* 0x3102e308 */, r);
+    float scale_base = n + 12583037.0f;
+    uint32_t scale_bits = reinterpret_cast<uint32_t&>(scale_base) << 23;
+    float scale = reinterpret_cast<float&>(scale_bits);
+    float e = scale * __expf(r);
+    float inv_term = (1.0f / e) * 0.125f /* 0x3e000000 */;
+    return __fma(e, 2.0f, inv_term);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cospif(float x)
+{
+    if (__isnan(x)) {
+        return x + x;
+    }
+    if (x == ASCRT_INF_F || x == -ASCRT_INF_F) {
+        return x * 0.0f;
+    }
+    if (__fabsf(x) > 16777216.0f) {
+        return 1.0f;
+    }
+
+    float t = x + x;
+    int k = __cvt_int32_t<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_ENABLE_VALUE>(t);
+    float kf = rintf(t);
+    float r = __fma(-kf, 0.5f, x);
+    float z = r * r;
+
+    float c = __fma(z, 0.226860314607620239257812f /* 0x3e684e12 */, -1.334560394287109375f /* 0xbfaad2e0 */);
+    c = __fma(z, c, 4.058692455291748046875f /* 0x4081e0cf */);
+    c = __fma(z, c, -4.93480205535888671875f /* 0xc09de9e6 */);
+    c = __fma(z, c, 1.0f);
+
+    float s = __fma(z, -0.592480242252349853515625f /* 0xbf17acc9 */, 2.550144195556640625f /* 0x40233590 */);
+    s = __fma(z, s, -5.16771984100341796875f /* 0xc0a55df6 */);
+    s = s * (r * z);
+    s = __fma(r, 3.1415927410125732421875f /* 0x40490fdb */, s);
+
+    int q = k + 1;
+    float y = ((q & 1) != 1) ? s : c;
+    return (q & 2) ? -y : y;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcf(float x)
+{
+    float abs_x = __fabsf(x);
+
+    float term1 = abs_x + -4.0f;
+    float term2 = abs_x + 4.0f;
+    float inv_term2 = 1.0f / term2;
+    float y = term1 * inv_term2;
+    float z = y + 1.0f;
+    float numerator = __fma(-4.0f, z, abs_x);
+    float tmp = __fma(-y, abs_x, numerator);
+    float w = __fma(inv_term2, tmp, y);
+
+    float poly = __fma(0.00089121708879247307777f /* 0x3a69a091 */, w,
+        0.0070457882247865200043f /* 0x3be6e05b */);
+    poly = __fma(poly, w, -0.015866896137595176697f /* 0xbc81fb4b */);
+    poly = __fma(poly, w, 0.036429625004529953003f /* 0x3d15373b */);
+    poly = __fma(poly, w, -0.066643431782722473145f /* 0xbd887c5a */);
+    poly = __fma(poly, w, 0.093814529478549957275f /* 0x3dc021d5 */);
+    poly = __fma(poly, w, -0.10099056363105773926f /* 0xbdced424 */);
+    poly = __fma(poly, w, 0.06809400022029876709f /* 0x3d8b74de */);
+    poly = __fma(poly, w, 0.015377387404441833496f /* 0x3c7bf170 */);
+    poly = __fma(poly, w, -0.1396210789680480957f /* 0xbe0ef8d4 */);
+    poly = __fma(poly, w, 1.232995152473449707f /* 0x3f9dd2c9 */);
+
+    float tmp2 = __fma(2.0f, abs_x, 1.0f);
+    float inv_tmp2 = 1.0f / tmp2;
+    float q = poly * inv_tmp2;
+    float t = __fma(abs_x, q * -2.0f, poly);
+    float u = t - q;
+    float v = __fma(u, inv_tmp2, q);
+
+    float x_squared = abs_x * abs_x;
+    float neg_x2 = -x_squared;
+    float scaled = neg_x2 * 1.4426950216293334961f /* 0x3fb8aa3b */;
+    float int_part = truncf(scaled);
+    float abs_part = __fabsf(int_part);
+    uint32_t sign_bit = reinterpret_cast<uint32_t&>(int_part) & 0x80000000U;
+    uint32_t clamped_bits = sign_bit | 0x42FC0000U;
+    float clamped = reinterpret_cast<float&>(clamped_bits);
+    float safe_int = (abs_part > 126.0f) ? clamped : int_part;
+
+    float remainder = __fma(safe_int, -0.69314718246459960938f /* 0xbf317218 */, neg_x2);
+    remainder = __fma(safe_int, 1.9046542121259335545e-09f /* 0x3102e308 */, remainder);
+    float exponent_arg = remainder * 1.4426950216293334961f /* 0x3fb8aa3b */;
+    float exponent_base = safe_int + 12583039.0f;
+    uint32_t exponent_bits = reinterpret_cast<uint32_t&>(exponent_base) << 23;
+    float exponent_scale = reinterpret_cast<float&>(exponent_bits);
+    float exp_val = __powf(2.0f, exponent_arg) * exponent_scale;
+
+    float term3 = __fma(-abs_x, abs_x, x_squared);
+    float term4 = __fma(exp_val, term3, exp_val);
+    float result = v * term4;
+
+    if (abs_x > 10.05500030517578125f /* 0x4120e148 */) {
+        result = 0.0f;
+    }
+
+    return (x < 0.0f) ? (2.0f - result) : result;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x)
+{
+    if (__isnan(x)) {
+        return x;
+    }
+    if (__isinf(x)) {
+        return x > 0.0f ? x : 0.0f;
+    }
+
+    float t = __fma(x, 0.0131822545081377029418945f, 0.5f); // 0x3c57fa62
+    if (t < 0.0f) {
+        t = 0.0f;
+    } else if (t > 1.0f) {
+        t = 1.0f;
+    }
+
+    float biased = __floorf(t * 252.0f) + 12582913.0f; // 252: 0x437c0000
+    float k = biased - 12583039.0f;
+    uint32_t scale_bits = reinterpret_cast<uint32_t&>(biased) << 23;
+    float scale = reinterpret_cast<float&>(scale_bits);
+
+    float r = __fma(x, 3.3219280242919921875f, -k); // 0x40549a78
+    r = __fma(x, 7.0595369550119357882e-08f, r); // 0x33979a37
+    return scale * __powf(2.0f, r);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x)
+{
+    if (x == 0.0f) {
+        return x;
+    }
+    if (__isnan(x)) {
+        return x;
+    }
+    if (__isinf(x)) {
+        return x > 0.0f ? x : -1.0f;
+    }
+
+    float ax = __fabsf(x);
+    float z = x;
+    if (ax > 88.72283935546875f /* 0x42b17218 */) {
+        z = x > 0.0f ? 88.72283935546875f : -88.72283935546875f;
+    }
+
+    float biased = __fma(z, 1.44269502162933349609375f /* 0x3fb8aa3b */, 12583039.0f);
+    float k = biased - 12583039.0f;
+    float r = __fma(-k, 0.69314712285995483398f /* 0x3f317217 */, z);
+    r = __fma(-k, 5.7699988786907852045e-08f /* 0x3377d1cf */, r);
+
+    float p = __fma(r, 0.00138624827377498149871826f /* 0x3ab5b2c6 */,
+        0.0083664264529943466187f /* 0x3c091356 */);
+    p = __fma(r, p, 0.041665729135274887085f /* 0x3d2aa9af */);
+    p = __fma(r, p, 0.16666544973850250244f /* 0x3e2aaa59 */);
+    p = __fma(r, p, 0.50000017881393432617f /* 0x3f000003 */);
+    p = r * p;
+    float em1_r = __fma(r, p, r);
+
+    uint32_t scale_bits = reinterpret_cast<uint32_t&>(biased) << 23;
+    bool large_k = k >= 25.0f;
+    if (large_k) {
+        scale_bits -= 0x00800000U;
+    }
+    float scale = (k != -128.0f) ? reinterpret_cast<float&>(scale_bits) : 0.0f;
+    float one_minus_scale = 1.0f - scale;
+    float y = __fma(scale, em1_r, -one_minus_scale);
+    if (large_k) {
+        y = y + y;
+    }
+    return y;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
+{
+    uint32_t ux = reinterpret_cast<uint32_t&>(x);
+    uint32_t uy = reinterpret_cast<uint32_t&>(y);
+    uint32_t sx = ux & 0x80000000U;
+    ux &= 0x7FFFFFFFU;
+    uy &= 0x7FFFFFFFU;
+
+    if (uy == 0U || ux >= 0x7F800000U || uy > 0x7F800000U) {
+        return ASCRT_INF_F / ASCRT_INF_F;
+    }
+    if (ux < uy) {
+        return x;
+    }
+    if (ux == uy) {
+        return reinterpret_cast<float&>(sx);
+    }
+
+    int32_t ex = static_cast<int32_t>(ux >> 23);
+    int32_t ey = static_cast<int32_t>(uy >> 23);
+    uint32_t mx = ux;
+    uint32_t my = uy;
+
+    if (ex == 0) {
+        int32_t i = 0;
+        mx = ux;
+        while ((mx & 0x00800000U) == 0U) {
+            mx <<= 1;
+            i++;
+        }
+        ex = 1 - i;
+    } else {
+        mx = (ux & 0x007FFFFFU) | 0x00800000U;
+    }
+
+    if (ey == 0) {
+        int32_t i = 0;
+        my = uy;
+        while ((my & 0x00800000U) == 0U) {
+            my <<= 1;
+            i++;
+        }
+        ey = 1 - i;
+    } else {
+        my = (uy & 0x007FFFFFU) | 0x00800000U;
+    }
+
+    while (ex > ey) {
+        uint32_t d = mx - my;
+        if ((d & 0x80000000U) == 0U) {
+            if (d == 0U) {
+                return reinterpret_cast<float&>(sx);
+            }
+            mx = d;
+        }
+        mx <<= 1;
+        ex--;
+    }
+
+    uint32_t d = mx - my;
+    if ((d & 0x80000000U) == 0U) {
+        if (d == 0U) {
+            return reinterpret_cast<float&>(sx);
+        }
+        mx = d;
+    }
+
+    while ((mx & 0x00800000U) == 0U) {
+        mx <<= 1;
+        ex--;
+    }
+
+    uint32_t out;
+    if (ex > 0) {
+        mx -= 0x00800000U;
+        out = mx | (static_cast<uint32_t>(ex) << 23);
+    } else {
+        mx >>= static_cast<uint32_t>(1 - ex);
+        out = mx;
+    }
+    out |= sx;
+    return reinterpret_cast<float&>(out);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t __internal_ilogbf_finite_abs(float ax)
+{
+    if (ax >= 1.17549435082228750797e-38f) {
+        uint32_t bits = reinterpret_cast<uint32_t&>(ax);
+        return static_cast<int32_t>((bits >> 23) & 0xFFU) - 127;
+    }
+
+    float scaled = ax * 8388608.0f;
+    uint32_t bits = reinterpret_cast<uint32_t&>(scaled);
+    return static_cast<int32_t>((bits >> 23) & 0xFFU) - 127 - 23;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ilogbf(float x)
+{
+    if (__isnan(x) || x == 0.0f) {
+        return static_cast<int32_t>(0x80000000U);
+    }
+
+    float ax = __fabsf(x);
+    if (ax == ASCRT_INF_F) {
+        return static_cast<int32_t>(0x7FFFFFFFU);
+    }
+
+    return __internal_ilogbf_finite_abs(ax);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float logbf(float x)
+{
+    if (__isnan(x)) {
+        return x;
+    }
+
+    float ax = __fabsf(x);
+    if (ax == 0.0f) {
+        return -ASCRT_INF_F;
+    }
+    if (ax == ASCRT_INF_F) {
+        return ASCRT_INF_F;
+    }
+
+    return static_cast<float>(__internal_ilogbf_finite_abs(ax));
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j0f_huge_range(float ax)
+{
+    float inv = 1.0f / ax;
+    float inv2 = inv * inv;
+
+    float alpha_poly = __fma(inv2, 1.13964951038360595703125f, -0.205326750874519348144531f);
+    alpha_poly = __fma(inv2, alpha_poly, 0.0650917366147041320800781f);
+    alpha_poly = __fma(inv2, alpha_poly, -0.124999992549419403076172f);
+    float alpha = __fma(inv, alpha_poly, ax);
+
+    float beta = __fma(inv2, 3.3592879772186279296875f, -0.51452267169952392578125f);
+    beta = __fma(inv2, beta, 0.103370569646358489990234f);
+    beta = __fma(inv2, beta, -0.0624997243285179138183594f);
+    beta = __fma(inv2, beta, 1.0f);
+
+    float r = alpha;
+    int q = 0;
+    if (alpha >= 105615.0f) {
+        r = __internal_payne_hanek_radian_reduction(alpha, &q);
+        q = q & 3;
+        r = r + static_cast<float>(q) * 1.57079637050628662109375f;
+    }
+
+    float amp = beta * rsqrtf(ax) * 0.79788458347320556640625f;
+    return amp * cosf(r - 0.785398185253143310546875f);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j1f_huge_range(float ax)
+{
+    float inv = 1.0f / ax;
+    float inv2 = inv * inv;
+
+    float alpha_poly = __fma(inv2, -1.5799448490142822265625f, 0.361485868692398071289062f);
+    alpha_poly = __fma(inv2, alpha_poly, -0.164012610912322998046875f);
+    alpha_poly = __fma(inv2, alpha_poly, 0.374999910593032836914062f);
+    float alpha = __fma(inv, alpha_poly, ax);
+
+    float beta = __fma(inv2, 4.087306499481201171875f, 0.749876558780670166015625f);
+    beta = __fma(inv2, beta, -0.192915648221969604492188f);
+    beta = __fma(inv2, beta, 0.187498256564140319824219f);
+    beta = __fma(inv2, beta, 1.0f);
+
+    float r = alpha;
+    int q = 0;
+    if (alpha >= 105615.0f) {
+        r = __internal_payne_hanek_radian_reduction(alpha, &q);
+        q = q & 3;
+        r = r + static_cast<float>(q) * 1.57079637050628662109375f;
+    }
+
+    float amp = beta * rsqrtf(ax) * 0.79788458347320556640625f;
+    return amp * cosf(r - 2.35619449615478515625f);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j0j1_middle_trig_red_slowpath_f_fast_mode(float a, int* quadrant)
+{
+    int64_t q = static_cast<int64_t>(a * ASCRT_2OPI_F);
+    a = fmaf(static_cast<float>(q), ASCRT_MINUS_PIO2_HI_F, a);
+    a = fmaf(static_cast<float>(q), ASCRT_MINUS_PIO2_LO_F, a);
+    int64_t q2 = static_cast<int64_t>(a * ASCRT_2OPI_F);
+    a = fmaf(static_cast<float>(q2), ASCRT_MINUS_PIO2_HI_F, a);
+    int q_mod = static_cast<int>((q + q2) % 4);
+    if (q_mod < 0) {
+        q_mod += 4;
+    }
+    a = a - 0.7853982f;
+    *quadrant = q_mod;
+    return a;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j0j1_middle_sinf_poly(float a, float s)
+{
+    float r = 2.86567956e-6f;
+    r = fmaf(r, s, -1.98559923e-4f);
+    r = fmaf(r, s, 8.33338592e-3f);
+    r = fmaf(r, s, -1.66666672e-1f);
+    float t = fmaf(a, s, 0.0f);
+    r = fmaf(r, t, a);
+    return r;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j0j1_middle_cosf_poly(float s)
+{
+    float r = 2.44677067e-5f;
+    r = fmaf(r, s, -1.38877297e-3f);
+    r = fmaf(r, s, 4.16666567e-2f);
+    r = fmaf(r, s, -5.00000000e-1f);
+    r = fmaf(r, s, 1.00000000e+0f);
+    return r;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j0j1_middle_sin_cosf_minus_pi_over_four(float a, int index)
+{
+    int i = 0;
+    a = a * 0.0f + a;
+    float r = __internal_j0j1_middle_trig_red_slowpath_f_fast_mode(a, &i);
+    float s2 = r * r;
+    float c = __internal_j0j1_middle_cosf_poly(s2);
+    float s = __internal_j0j1_middle_sinf_poly(r, s2);
+    if (i & 2) {
+        s = 0.0f - s;
+        c = 0.0f - c;
+    }
+    if (index == 0) {
+        if (i & 1) {
+            c = 0.0f - s;
+        }
+        return c;
+    }
+    if (i & 1) {
+        s = c;
+    }
+    return s;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j0_middle_pre_coeff(float x, float inv_x, float inv_x2)
+{
+    float beta = fmaf(5.848699569702148f, inv_x2, -0.5428466796875f);
+    beta = fmaf(beta, inv_x2, 0.103515625f);
+    beta = fmaf(beta, inv_x2, -0.0625f);
+    beta = fmaf(beta, inv_x2, 1.0f);
+    float theta = rsqrtf(x);
+    theta = theta * 0.7978846f;
+    return beta * theta;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j0_middle_alpha(float x, float inv_x, float inv_x2)
+{
+    float alpha = fmaf(1.6380658830915178f, inv_x2, -0.2095703125f);
+    alpha = fmaf(alpha, inv_x2, 0.06510416666666666f);
+    alpha = fmaf(alpha, inv_x2, -0.125f);
+    alpha = fmaf(alpha, inv_x, x);
+    return alpha;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j1_middle_pre_coeff(float x, float inv_x, float inv_x2)
+{
+    float beta = fmaf(-7.739953994751f, inv_x2, 0.8052978515625f);
+    beta = fmaf(beta, inv_x2, -0.193359375f);
+    beta = fmaf(beta, inv_x2, 0.1875f);
+    beta = fmaf(beta, inv_x2, 1.0f);
+    float theta = rsqrtf(x);
+    theta = theta * 0.7978846f;
+    return beta * theta;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j1_middle_alpha(float x, float inv_x, float inv_x2)
+{
+    float alpha = fmaf(-2.3693978445870534f, inv_x2, 0.3708984375f);
+    alpha = fmaf(alpha, inv_x2, -0.1640625f);
+    alpha = fmaf(alpha, inv_x2, 0.375f);
+    alpha = fmaf(alpha, inv_x, x);
+    return alpha;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j0f_middle_range(float x)
+{
+    if (isinf(x)) {
+        return 0.0f;
+    }
+    float inv_x = 1.0f / x;
+    float inv_x2 = inv_x * inv_x;
+    float alpha = __internal_j0_middle_alpha(x, inv_x, inv_x2);
+    float after_coeff = __internal_j0j1_middle_sin_cosf_minus_pi_over_four(alpha, 0);
+    float pre_coeff = __internal_j0_middle_pre_coeff(x, inv_x, inv_x2);
+    return after_coeff * pre_coeff;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j1f_middle_range(float x)
+{
+    if (isinf(x)) {
+        return 0.0f;
+    }
+    float inv_x = 1.0f / x;
+    float inv_x2 = inv_x * inv_x;
+    float alpha = __internal_j1_middle_alpha(x, inv_x, inv_x2);
+    float after_coeff = __internal_j0j1_middle_sin_cosf_minus_pi_over_four(alpha, 1);
+    float pre_coeff = __internal_j1_middle_pre_coeff(x, inv_x, inv_x2);
+    return after_coeff * pre_coeff;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j0f_less8(float x)
+{
+    float d1 = x - 2.4048254f;
+    d1 = d1 - 1.087059e-7f;
+    float res = 9.619266247e-13f;
+    res = fmaf(res, d1, 5.702105547e-12f);
+    res = fmaf(res, d1, -4.398487105e-10f);
+    res = fmaf(res, d1, 4.604940853e-10f);
+    res = fmaf(res, d1, 5.847321173e-08f);
+    res = fmaf(res, d1, 2.084518856e-09f);
+    res = fmaf(res, d1, -5.452075416e-06f);
+    res = fmaf(res, d1, -7.342953250e-06f);
+    res = fmaf(res, d1, 3.017067874e-04f);
+    res = fmaf(res, d1, 7.739535477e-04f);
+    res = fmaf(res, d1, -7.283463700e-03f);
+    res = fmaf(res, d1, -2.666820353e-02f);
+    res = d1 * res;
+    float d2 = x - 5.520078f;
+    d2 = d2 + 7.1934145e-8f;
+    res = d2 * res;
+    float d3 = x - 8.653728f;
+    d3 = d3 - 3.8147791e-7f;
+    res = d3 * res;
+    return res;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_j1f_less8(float x)
+{
+    float d1 = x - 3.831706f;
+    d1 = d1 + 7.685059e-8f;
+    float res = 9.206492556e-14f;
+    res = fmaf(res, d1, 9.126927192e-13f);
+    res = fmaf(res, d1, -2.641634001e-11f);
+    res = fmaf(res, d1, -2.014359882e-10f);
+    res = fmaf(res, d1, 4.525844770e-09f);
+    res = fmaf(res, d1, 2.701145918e-08f);
+    res = fmaf(res, d1, -5.348958058e-07f);
+    res = fmaf(res, d1, -2.360248564e-06f);
+    res = fmaf(res, d1, 4.121127279e-05f);
+    res = fmaf(res, d1, 1.191702295e-04f);
+    res = fmaf(res, d1, -1.807559530e-03f);
+    res = fmaf(res, d1, -2.554892713e-03f);
+    res = fmaf(res, d1, 3.301389139e-02f);
+    res = d1 * res;
+    float d2 = x - 7.015587f;
+    d2 = d2 + 1.8321172e-7f;
+    res = d2 * res;
+    res = res * x;
+    return res;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float j0f(float x)
+{
+    if (__isnan(x)) {
+        return x;
+    }
+    float ax = __fabsf(x);
+    if (__isinf(ax)) {
+        return 0.0f;
+    }
+    if (ax <= 8.0f) {
+        return __internal_j0f_less8(ax);
+    }
+    if (ax <= 1.0e13f) {
+        return __internal_j0f_middle_range(ax);
+    }
+    return __internal_j0f_huge_range(ax);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float j1f(float x)
+{
+    if (__isnan(x)) {
+        return x;
+    }
+    if (x == 0.0f) {
+        return x;
+    }
+    float ax = __fabsf(x);
+    if (__isinf(ax)) {
+        if (x < 0.0f) {
+            uint32_t neg_zero_bits = 0x80000000U;
+            return reinterpret_cast<float&>(neg_zero_bits);
+        }
+        return 0.0f;
+    }
+    float y;
+    if (ax <= 8.0f) {
+        y = __internal_j1f_less8(ax);
+    } else if (ax <= 1.0e13f) {
+        y = __internal_j1f_middle_range(ax);
+    } else {
+        y = __internal_j1f_huge_range(ax);
+    }
+    if (x < 0.0f) {
+        y = -y;
+    }
+    return y;
+}
+
+#endif // ASCENDC_USE_LEGACY_PRECISION
 
 #endif
 #endif // IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
