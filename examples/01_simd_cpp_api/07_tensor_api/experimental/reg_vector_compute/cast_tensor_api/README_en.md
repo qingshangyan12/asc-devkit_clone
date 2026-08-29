@@ -84,8 +84,8 @@ y[i] = convert<To>(x[i])
   | 2 | 256 `float` elements | 1024 B | 256 `int16_t` elements | 512 B |
   | 3 | 256 `int8_t` elements | 256 B | 256 `int32_t` elements | 1024 B |
   | 4 | 256 `int32_t` elements | 1024 B | 256 `uint8_t` elements | 256 B |
-  | 5 | 256 BF16 bit patterns stored as `uint16_t` | 512 B | 256 `float` elements | 1024 B |
-  | 6 | 256 `float` elements | 1024 B | 256 BF16 bit patterns stored as `uint16_t` | 512 B |
+  | 5 | 256 `bfloat16_t` | 512 B | 256 `float` elements | 1024 B |
+  | 6 | 256 `float` elements | 1024 B | 256 `bfloat16_t` | 512 B |
 
 - Sample Implementation:
 

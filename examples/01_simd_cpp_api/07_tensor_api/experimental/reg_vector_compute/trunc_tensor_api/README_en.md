@@ -80,7 +80,7 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
   | SCENARIO_NUM | `input/input_x.bin` | Input Size | `output/output.bin` / `output/golden.bin` | Output Size |
   | --- | --- | --- | --- | --- |
   | 1 | 256 `half` elements | 512 B | 256 `half` elements | 512 B |
-  | 2 | 256 BF16 bit patterns stored as `uint16_t` | 512 B | 256 BF16 bit patterns stored as `uint16_t` | 512 B |
+  | 2 | 256 BF16  | 512 B | 256 BF16 | 512 B |
   | 3 | 256 `float` elements | 1024 B | 256 `float` elements | 1024 B |
 
 - Sample Implementation:

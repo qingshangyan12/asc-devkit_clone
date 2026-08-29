@@ -80,7 +80,7 @@ y[i] = trunc(x[i])
   | SCENARIO_NUM | `input/input_x.bin` | 输入大小 | `output/output.bin` / `output/golden.bin` | 输出大小 |
   | --- | --- | --- | --- | --- |
   | 1 | 256个 `half` | 512 B | 256个 `half` | 512 B |
-  | 2 | 256个BF16位模式（`uint16_t` 存储） | 512 B | 256个BF16位模式（`uint16_t` 存储） | 512 B |
+  | 2 | 256个 `bfloat16_t` | 512 B | 256个 `bfloat16_t` | 512 B |
   | 3 | 256个 `float` | 1024 B | 256个 `float` | 1024 B |
 
 - 样例实现：

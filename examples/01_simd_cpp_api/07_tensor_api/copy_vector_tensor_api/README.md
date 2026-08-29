@@ -12,8 +12,8 @@ shape为`[1024]` 的一维 tensor，场景5将 `[32, 24]` 输入填充为 `[32, 
 
 ## 样例场景
 
-| SCENARIO_NUM |维度 | 重点通路 | Layout | 主要写法 |
-| --- | --- | --- | --- |
+| SCENARIO_NUM | 重点通路 | Layout | 维度 | 主要写法 |
+| --- | --- | --- | --- | --- |
 | 1 | GM->UB | ND | 四维 | `copy(dst, src)` 自动推导通路 |
 | 2 | UB->GM | DN | 四维 | `make_copy(..., trait)` 后调用 `atom.call(dst, src)` |
 | 3 | UB->UB | NZ | 四维 | 显式 atom 与坐标/shape 区域搬运重载 |
