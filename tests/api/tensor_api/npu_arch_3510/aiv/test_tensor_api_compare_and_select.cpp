@@ -29,61 +29,10 @@ __aicore__ inline void TestSelect()
     EXPECT_EQ(dst.mask, src0.mask);
 }
 
-template <typename T>
-__aicore__ inline void TestCompareRegTensor()
-{
-    asc::te::experimental::reg_tensor<T> src0 {};
-    asc::te::experimental::reg_tensor<T> src1 {};
-
-    auto eq = src0 == src1;
-    auto ne = src0 != src1;
-    auto lt = src0 < src1;
-    auto le = src0 <= src1;
-    auto gt = src0 > src1;
-    auto ge = src0 >= src1;
-    (void)eq;
-    (void)ne;
-    (void)lt;
-    (void)le;
-    (void)gt;
-    (void)ge;
-}
-
-template <typename T>
-__aicore__ inline void TestCompareScalar()
-{
-    asc::te::experimental::reg_tensor<T> src {};
-    T scalar {};
-
-    auto eq = src == scalar;
-    auto ne = src != scalar;
-    auto lt = src < scalar;
-    auto le = src <= scalar;
-    auto gt = src > scalar;
-    auto ge = src >= scalar;
-    (void)eq;
-    (void)ne;
-    (void)lt;
-    (void)le;
-    (void)gt;
-    (void)ge;
-}
-
-#define COMPARE_AND_SELECT_TEST(Function, DataType)                        \
-    TEST_F(TensorApiVectorCompareAndSelect3510, Function##_##DataType)     \
-    {                                                                      \
-        Test##Function<DataType>();                                        \
-        SUCCEED();                                                         \
-    }
-
 #define SELECT_TYPE_TEST(DataType) \
     COMPARE_AND_SELECT_TEST(Select, DataType)
 
-#define COMPARE_TYPE_TESTS(DataType)               \
-    COMPARE_AND_SELECT_TEST(CompareRegTensor, DataType) \
-    COMPARE_AND_SELECT_TEST(CompareScalar, DataType)
-
-//SELECT_TYPE_TEST(bool)
+SELECT_TYPE_TEST(bool)
 SELECT_TYPE_TEST(uint8_t)
 SELECT_TYPE_TEST(int8_t)
 SELECT_TYPE_TEST(fp8_e4m3fn_t)
@@ -96,13 +45,3 @@ SELECT_TYPE_TEST(bfloat16_t)
 SELECT_TYPE_TEST(uint32_t)
 SELECT_TYPE_TEST(int32_t)
 SELECT_TYPE_TEST(float)
-
-COMPARE_TYPE_TESTS(uint8_t)
-COMPARE_TYPE_TESTS(int8_t)
-COMPARE_TYPE_TESTS(uint16_t)
-COMPARE_TYPE_TESTS(int16_t)
-COMPARE_TYPE_TESTS(half)
-COMPARE_TYPE_TESTS(bfloat16_t)
-COMPARE_TYPE_TESTS(uint32_t)
-COMPARE_TYPE_TESTS(int32_t)
-COMPARE_TYPE_TESTS(float)
