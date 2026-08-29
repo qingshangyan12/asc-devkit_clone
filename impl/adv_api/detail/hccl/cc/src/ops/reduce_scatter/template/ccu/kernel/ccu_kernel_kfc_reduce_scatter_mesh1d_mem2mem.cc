@@ -30,6 +30,7 @@ struct KfcReduceScatterMesh1DMem2MemContext : CcuKernelCtxBase {
     HcclDataType dataType;
     HcclDataType outputDataType;
     HcclReduceOp reduceOp;
+    bool peerOnly{false};
 
     std::vector<ccu::Variable> input;
     ccu::Variable output;
@@ -130,6 +131,18 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
     myOutput.addr += ctx.currentRankSliceOutputOffset;
     myOutput.token = ctx.token[ctx.rankId];
 
+    if (ctx.peerOnly) {
+        const uint32_t peerRank = ctx.rankId ^ 1U;
+        CCU_IF(ctx.currentSliceSize != 0)
+        {
+            ccu::ReadReduce(
+                ctx.channels[0], myOutput, ctx.remoteInput[peerRank], ctx.currentSliceSize, ctx.dataType, ctx.reduceOp,
+                ctx.event, 1 << peerRank);
+            ccu::EventWait(ctx.event, 1 << peerRank);
+        }
+        return CCU_SUCCESS;
+    }
+
     CCU_IF(ctx.currentSliceSize != 0)
     {
         for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
@@ -210,7 +223,7 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
     ccu::Variable currentRankSliceInputOffset, ccu::Variable tailSize, ccu::Variable repeatNum,
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType)
+    const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType, bool peerOnly)
 {
     KfcReduceScatterMesh1DMem2MemContext ctx;
     ctx.channels = channels;
@@ -223,6 +236,7 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
         ctx.outputDataType = dataType;
     }
     ctx.reduceOp = reduceType;
+    ctx.peerOnly = peerOnly;
     HCCL_INFO(
         "[CcuKernelReduceScatterMesh1DMem2Mem] Init, KernelArgs are rankId[%u], rankSize_[%u], dataType[%d], "
         "outputDataType[%d], reduceOp[%d]",
