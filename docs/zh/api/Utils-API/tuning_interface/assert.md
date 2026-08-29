@@ -113,7 +113,7 @@ extern "C" __global__ __vector__ void AssertSimdKernel()
 
 ```plain
 [AIV Block 0/1] before assert, value is 7.
-[AIV Block 0/1] [ASSERT] .../assert_simd.asc:10: void AssertSimdKernel(): Assertion `value == 6' failed. value is 7.
+[AIV Block 0/1] [ASSERT] .../assert_simd.asc:10: void AssertSimdKernel(): Assertion 'value == 6' failed. value is 7.
 ```
 
 ## SIMT VF编程场景
@@ -167,5 +167,5 @@ __simd_vf__ inline void AssertSimdVf()
 程序运行时会触发断言，打印格式如下：
 
 ```plain
-[ASSERT] .../assert_simd_vf.asc:12: void AssertSimdVf(): Assertion `value == 6' failed. value is 7.
+[ASSERT] .../assert_simd_vf.asc:12: void AssertSimdVf(): Assertion 'value == 6' failed. value is 7.
 ```
