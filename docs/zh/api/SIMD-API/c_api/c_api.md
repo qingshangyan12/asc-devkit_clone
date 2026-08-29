@@ -773,3 +773,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_mmad(废弃)](deprecated_interface/asc_mmad_deprecated.md)|矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad_mx(废弃)](deprecated_interface/asc_mmad_mx_deprecated.md)|带有量化系数的矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad_sparse(废弃)](deprecated_interface/asc_mmad_sparse_deprecated.md)|稀疏矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|
+| [asc_copy_gm2ub_align_arch_3510（废弃）](deprecated_interface/asc_copy_gm2ub_align_arch_3510_deprecated.md) | 提供数据非对齐搬运的功能，将数据从Global Memory搬运到Unified Buffer，并支持8位/16位/32位数据类型搬运。 |
+| [asc_copy_gm2ub_align_arch_2201（废弃）](deprecated_interface/asc_copy_gm2ub_align_arch_2201_deprecated.md) | 提供数据非对齐搬运的功能，将数据从Global Memory搬运到Unified Buffer，并支持8位/16位/32位数据类型搬运。 |
+| [asc_copy_ub2gm_align_arch_3510（废弃）](deprecated_interface/asc_copy_ub2gm_align_arch_3510_deprecated.md) | 提供数据非对齐搬运的功能，将数据从Unified Buffer (UB)搬运到Global Memory (GM)，并支持8位/16位/32位数据类型搬运。 |
+| [asc_copy_ub2gm_align_arch_2201（废弃）](deprecated_interface/asc_copy_ub2gm_align_arch_2201_deprecated.md) | 提供数据非对齐搬运的功能，将数据从Unified Buffer (UB)搬运到Global Memory (GM)，并支持8位/16位/32位数据类型搬运。 |

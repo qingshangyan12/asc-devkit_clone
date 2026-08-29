@@ -11,24 +11,40 @@
 <!-- end id1 -->
 
 <!-- npu="950" id2 -->
-- [asc_copy_gm2ub_align](../SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)接口（仅Ascend 950PR/Ascend 950DT上原高维切分搬运形式函数原型）
+- [asc_copy_gm2ub_align](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_align_arch_3510_deprecated.md)接口（仅Ascend 950PR/Ascend 950DT上原高维切分搬运形式和同步搬运函数原型）
 
     Ascend 950PR/Ascend 950DT上此接口的原高维切分搬运形式函数原型已废弃，请使用[asc_load_l2_cache_mode](../SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md)类型枚举值进行L2 Cache管理策略配置。
+
+    `asc_copy_gm2ub_align_sync`接口已废弃，请使用[asc_copy_gm2ub_align](../SIMD-API/c_api/vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
 <!-- end id2 -->
 
-<!-- npu="950" id3 -->
-- [asc_copy_ub2gm_align](../SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)接口（仅Ascend 950PR/Ascend 950DT上原高维切分搬运形式函数原型）
+<!-- npu="A3,910b" id3 -->
+- [asc_copy_gm2ub_align](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_align_arch_2201_deprecated.md)接口（Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品的同步搬运函数原型）
 
-    Ascend 950PR/Ascend 950DT上此接口的原高维切分搬运形式函数原型已废弃，请使用[asc_store_l2_cache_mode](../SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md)类型枚举值进行L2 Cache管理策略配置。
+    `asc_copy_gm2ub_align_sync`接口已废弃，请使用[asc_copy_gm2ub_align](../SIMD-API/c_api/vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
 <!-- end id3 -->
 
 <!-- npu="950" id4 -->
-- [asc_ndim_copy_gm2ub](../SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md)
+- [asc_copy_ub2gm_align](../SIMD-API/c_api/deprecated_interface/asc_copy_ub2gm_align_arch_3510_deprecated.md)接口（仅Ascend 950PR/Ascend 950DT上原高维切分搬运形式和同步搬运函数原型）
 
-    此接口的原函数原型已废弃，请使用[asc_load_l2_cache_mode](../SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md)类型枚举值进行L2 Cache管理策略配置。
+    Ascend 950PR/Ascend 950DT上此接口的原高维切分搬运形式函数原型已废弃，请使用[asc_store_l2_cache_mode](../SIMD-API/c_api/enum/asc_store_l2_cache_mode.md)类型枚举值进行L2 Cache管理策略配置。
+
+    `asc_copy_ub2gm_align_sync`接口已废弃，请使用[asc_copy_ub2gm_align](../SIMD-API/c_api/vector_data_move/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
 <!-- end id4 -->
 
+<!-- npu="A3,910b" id5 -->
+- [asc_copy_ub2gm_align](../SIMD-API/c_api/deprecated_interface/asc_copy_ub2gm_align_arch_2201_deprecated.md)接口（Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品的同步搬运函数原型）
 
+    `asc_copy_ub2gm_align_sync`接口已废弃，请使用[asc_copy_ub2gm_align](../SIMD-API/c_api/vector_data_move/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
+<!-- end id5 -->
+
+<!-- npu="950" id6 -->
+- [asc_ndim_copy_gm2ub](../SIMD-API/c_api/vector_data_move/asc_ndim_copy_gm2ub.md)
+
+    此接口的原函数原型已废弃，请使用[asc_load_l2_cache_mode](../SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md)类型枚举值进行L2 Cache管理策略配置。
+<!-- end id6 -->
+
+<!-- npu="950" id7 -->
 ### 原子操作
 
 <!-- npu="950" id5 -->
@@ -55,8 +71,11 @@
 - [asc_set_atomic_min_int](../SIMD-API/c_api/deprecated_interface/asc_set_atomic_min_int_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_set_atomic_min_int32](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md)接口。
+    此接口后续版本会废弃，请使用[asc_set_atomic_min_int32](../SIMD-API/c_api/simd_atomic/asc_set_atomic_min.md)接口。
 
-<!-- npu="950" id6 -->
+<!-- end id7 -->
+
+<!-- npu="950" id8 -->
 ### 系统变量
 
 - [asc_get_block_idx](../SIMD-API/c_api/deprecated_interface/asc_get_block_idx_deprecated.md)接口
@@ -71,9 +90,9 @@
 
     此接口后续版本会废弃，请使用[asc_get_squeeze_status](../SIMD-API/c_api/spr/asc_get_squeeze_status.md)接口。
 
-<!-- end id6 -->
+<!-- end id8 -->
 
-<!-- npu="950" id7 -->
+<!-- npu="950" id9 -->
 ### Reg数据搬运
 
 - [asc_loadalign_brc_v2](../SIMD-API/c_api/deprecated_interface/asc_loadalign_v1_deprecated.md)接口（无偏移量原型）
@@ -224,9 +243,9 @@
 
     此接口后续版本会废弃，请使用[asc_squeeze_and_storeunalign](../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)接口。
 
-<!-- end id7 -->
+<!-- end id9 -->
 
-<!-- npu="950" id8 -->
+<!-- npu="950" id10 -->
 ### Reg矢量计算
 
 - [asc_float2bfloat16](../SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
@@ -421,7 +440,7 @@
 
     此接口后续版本会废弃，请使用[asc_pack_to_high](../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md)接口。
 
-<!-- end id8 -->
+<!-- end id10 -->
 
 ### 同步控制
 
