@@ -24,7 +24,7 @@ template <const auto& TILING>
 struct MatmulTiling {
     using TILING_TYPE = typename std::remove_cv<typename std::remove_reference<decltype(TILING)>::type>::type;
     __aicore__ inline void SetTiling(const TCubeTiling* __restrict tiling) { tiling_ = tiling; }
-    __aicore__ inline constexpr const TCubeTiling* __restrict GetTiling() { return tiling_; }
+    __aicore__ __callee__ inline const TCubeTiling* __restrict GetTiling() { return tiling_; }
     __aicore__ inline bool IsNull() const { return (tiling_ == nullptr); }
     __aicore__ inline int32_t GetUsedCoreNum() const
     {
@@ -82,7 +82,7 @@ struct MatmulTiling {
             return tiling_->singleCoreN;
         }
     }
-    __aicore__ inline constexpr int32_t GetSingleCoreK() const
+    __aicore__ __callee__ inline int32_t GetSingleCoreK() const
     {
         if constexpr (IsSameTypeV<TILING_TYPE, MatmulApiStaticTiling>) {
             return (TILING.singleCoreK != -1) ? TILING.singleCoreK : tiling_->singleCoreK;
@@ -106,7 +106,7 @@ struct MatmulTiling {
             return tiling_->baseN;
         }
     }
-    __aicore__ inline constexpr int32_t GetBaseK() const
+    __aicore__ __callee__ inline int32_t GetBaseK() const
     {
         if constexpr (IsSameTypeV<TILING_TYPE, MatmulApiStaticTiling>) {
             return (TILING.baseK != -1) ? TILING.baseK : tiling_->baseK;
@@ -130,7 +130,7 @@ struct MatmulTiling {
             return tiling_->depthB1;
         }
     }
-    __aicore__ inline constexpr int32_t GetStepM() const
+    __aicore__ __callee__ inline int32_t GetStepM() const
     {
         if constexpr (IsSameTypeV<TILING_TYPE, MatmulApiStaticTiling>) {
             return (TILING.stepM != -1) ? TILING.stepM : tiling_->stepM;
@@ -138,7 +138,7 @@ struct MatmulTiling {
             return tiling_->stepM;
         }
     }
-    __aicore__ inline constexpr int32_t GetStepN() const
+    __aicore__ __callee__ inline int32_t GetStepN() const
     {
         if constexpr (IsSameTypeV<TILING_TYPE, MatmulApiStaticTiling>) {
             return (TILING.stepN != -1) ? TILING.stepN : tiling_->stepN;
@@ -162,7 +162,7 @@ struct MatmulTiling {
             return tiling_->transLength;
         }
     }
-    __aicore__ inline constexpr int32_t GetIterateOrder() const
+    __aicore__ __callee__ inline int32_t GetIterateOrder() const
     {
         if constexpr (IsSameTypeV<TILING_TYPE, MatmulApiStaticTiling>) {
             return (TILING.iterateOrder != -1) ? TILING.iterateOrder : tiling_->iterateOrder;
@@ -206,7 +206,7 @@ struct MatmulTiling {
         }
 #endif
     }
-    __aicore__ inline constexpr int32_t GetStepKa() const
+    __aicore__ __callee__ inline int32_t GetStepKa() const
     {
         if constexpr (IsSameTypeV<TILING_TYPE, MatmulApiStaticTiling>) {
             return (TILING.stepKa != -1) ? TILING.stepKa : tiling_->stepKa;
@@ -214,7 +214,7 @@ struct MatmulTiling {
             return tiling_->stepKa;
         }
     }
-    __aicore__ inline constexpr int32_t GetStepKb() const
+    __aicore__ __callee__ inline int32_t GetStepKb() const
     {
         if constexpr (IsSameTypeV<TILING_TYPE, MatmulApiStaticTiling>) {
             return (TILING.stepKb != -1) ? TILING.stepKb : tiling_->stepKb;

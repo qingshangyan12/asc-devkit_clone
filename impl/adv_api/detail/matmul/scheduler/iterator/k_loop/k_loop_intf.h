@@ -138,7 +138,7 @@ public:
      * @param: void
      * @return: return total iteration nums
      */
-    __aicore__ inline constexpr uint32_t GetTotalIter() const
+    __aicore__ __callee__ inline uint32_t GetTotalIter() const
     {
         return 0;
     }
@@ -148,7 +148,7 @@ public:
      * @param: void
      * @return: return outer loop counts
      */
-    __aicore__ inline constexpr uint32_t GetOuterIter() const
+    __aicore__ __callee__ inline uint32_t GetOuterIter() const
     {
         return 0;
     }
@@ -158,7 +158,7 @@ public:
      * @param: void
      * @return: return inner loop counts
      */
-    __aicore__ inline constexpr uint32_t GetInnerIter() const
+    __aicore__ __callee__ inline uint32_t GetInnerIter() const
     {
         return 0;
     }
@@ -168,7 +168,7 @@ public:
      * @param: void
      * @return: return current outer loop index
      */
-        __aicore__ inline constexpr uint32_t GetOuterIdx() const
+        __aicore__ __callee__ inline uint32_t GetOuterIdx() const
     {
         return 0;
     }
@@ -178,7 +178,7 @@ public:
      * @param: void
      * @return: return current inner loop index
      */
-    __aicore__ inline constexpr uint32_t GetInnerIdx() const
+    __aicore__ __callee__ inline uint32_t GetInnerIdx() const
     {
         return 0;
     }

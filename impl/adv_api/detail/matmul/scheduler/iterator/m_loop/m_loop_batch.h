@@ -58,7 +58,7 @@ public:
         });
     }
 
-    __aicore__ inline constexpr uint32_t GetTotalIter() const { return mIter_; }
+    __aicore__ __callee__ inline uint32_t GetTotalIter() const { return mIter_; }
 
     // About Outer Loop
     // Action Function
@@ -86,11 +86,11 @@ public:
 
     __aicore__ inline bool InnerEnd() { return OuterEnd(); }
 
-    __aicore__ inline constexpr uint32_t GetOuterIdx() const { return mIdx_; }
+    __aicore__ __callee__ inline uint32_t GetOuterIdx() const { return mIdx_; }
 
-    __aicore__ inline constexpr uint32_t GetInnerIdx() const { return mIdx_; }
+    __aicore__ __callee__ inline uint32_t GetInnerIdx() const { return mIdx_; }
 
-    __aicore__ inline constexpr uint32_t GetOuterIter() const { return mIter_; }
+    __aicore__ __callee__ inline uint32_t GetOuterIter() const { return mIter_; }
 
     __aicore__ inline int32_t GetTileShape() const { return baseShape_; }
 

@@ -56,7 +56,7 @@ public:
         });
     }
 
-    __aicore__ inline constexpr uint32_t GetTotalIter() const { return totalIter_; }
+    __aicore__ __callee__ inline uint32_t GetTotalIter() const { return totalIter_; }
 
     __aicore__ inline bool OuterNext()
     {
@@ -84,12 +84,12 @@ public:
         }
     }
 
-    __aicore__ inline constexpr uint32_t GetOuterIdx() const
+    __aicore__ __callee__ inline uint32_t GetOuterIdx() const
     {
         return Ceil(innerStartIdx_, MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepM());
     }
 
-    __aicore__ inline constexpr uint32_t GetOuterIter() const
+    __aicore__ __callee__ inline uint32_t GetOuterIter() const
     {
         return Ceil(totalIter_, MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepM());
     }
@@ -119,9 +119,9 @@ public:
 
     __aicore__ inline bool InnerEnd() { return innerIndex_ >= innerStartIdx_ + innerIter_; }
 
-    __aicore__ inline constexpr uint32_t GetInnerIdx() const { return innerIndex_; }
+    __aicore__ __callee__ inline uint32_t GetInnerIdx() const { return innerIndex_; }
 
-    __aicore__ inline constexpr uint32_t GetInnerIter() const { return innerIter_; }
+    __aicore__ __callee__ inline uint32_t GetInnerIter() const { return innerIter_; }
 
     __aicore__ inline int32_t GetBaseShape() const { return baseShape_; }
 
