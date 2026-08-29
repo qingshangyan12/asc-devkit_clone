@@ -50,7 +50,7 @@ struct base_tensor {
 
     static constexpr int rank = LayoutT::rank_size;
 
-    __aicore__ inline base_tensor();
+    __aicore__ inline constexpr base_tensor();
     __aicore__ inline constexpr base_tensor(const EngineT& engine, const LayoutT& layout);
 
     __aicore__ inline constexpr decltype(auto) tensor() const;

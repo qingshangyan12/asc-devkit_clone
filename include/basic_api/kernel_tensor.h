@@ -53,7 +53,7 @@ namespace AscendC {
  */
 struct ShapeInfo {
 public:
-    __aicore__ inline constexpr ShapeInfo() {}
+    __aicore__ __callee__ inline ShapeInfo() {}
     __aicore__ inline ShapeInfo(
         const uint8_t inputShapeDim, const uint32_t inputShape[], const uint8_t inputOriginalShapeDim,
         const uint32_t inputOriginalShape[], const DataFormat inputFormat)
@@ -147,7 +147,7 @@ template <typename T>
 class LocalTensor : public BaseLocalTensor<T>, public BaseTensorTraitTensor<T> {
 public:
     using PrimType = PrimT<T>;
-    __aicore__ inline constexpr LocalTensor<T>(){};
+    __aicore__ __callee__ inline LocalTensor<T>(){};
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ~LocalTensor();
     explicit LocalTensor<T>(TBuffAddr& address);
@@ -176,10 +176,10 @@ public:
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint32_t index) const;
     __aicore__ inline __inout_pipe__(S) __ubuf__ PrimType& operator()(const uint32_t offset) const;
     template <typename U>
-    __aicore__ inline constexpr LocalTensor<U> ReinterpretCast() const;
+    __aicore__ __callee__ inline LocalTensor<U> ReinterpretCast() const;
     template <typename S>
     __aicore__ inline __inout_pipe__(S) void SetValue(const uint32_t index, const S value) const;
-    __aicore__ inline constexpr LocalTensor operator[](const uint32_t offset) const;
+    __aicore__ __callee__ inline LocalTensor operator[](const uint32_t offset) const;
 
     template <typename S>
     [[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
@@ -189,16 +189,16 @@ public:
     __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize);
     template <typename U>
     __aicore__ inline LocalTensor<T>(uint32_t addr, const U& layout);
-    __aicore__ inline constexpr LocalTensor<T>(uint32_t addr);
-    __aicore__ inline constexpr int32_t GetPosition() const;
+    __aicore__ __callee__ inline LocalTensor<T>(uint32_t addr);
+    __aicore__ __callee__ inline int32_t GetPosition() const;
     __aicore__ inline void SetSize(const uint32_t size);
-    __aicore__ inline constexpr uint32_t GetSize() const;
+    __aicore__ __callee__ inline uint32_t GetSize() const;
 
     [[deprecated("NOTICE: GetLength has been deprecated and will be removed in the next version. Please do not use "
                  "it!")]] __aicore__ inline uint32_t
     GetLength() const;
 
-    __aicore__ inline constexpr void SetBufferLen(uint32_t dataLen);
+    __aicore__ __callee__ inline void SetBufferLen(uint32_t dataLen);
     __aicore__ inline void SetUserTag(const TTagType tag);
     __aicore__ inline TTagType GetUserTag() const;
     // symbol override
