@@ -119,7 +119,7 @@ __simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src_reg, co
 {
     static_assert(detail::supports_float_math_v<T>, "leaky_relu supports half and float");
     static_assert(!is_reg_tensor_v<scalar_type> &&
-            ::AscendC::Std::is_convertible_v<::AscendC::Std::remove_cvref_t<scalar_type>, T>,
+            Std::is_convertible_v<Std::remove_cvref_t<scalar_type>, T>,
         "leaky_relu requires a scalar convertible to the reg_tensor element type");
     reg_tensor<T> dst;
     asc_leakyrelu(dst.reg, src_reg.reg, static_cast<T>(slope), src_reg.mask);

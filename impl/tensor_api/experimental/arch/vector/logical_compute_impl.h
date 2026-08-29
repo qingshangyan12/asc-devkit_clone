@@ -50,7 +50,7 @@ __simd_callee__ inline decltype(auto) bitwise_compute(const T& a, const U& b)
     check_binary_reg_types<T, U>();
     check_bitwise_type<op, elem_type>();
 
-    static_assert(!::AscendC::Std::is_same_v<elem_type, bool> || (is_reg_tensor_v<T> && is_reg_tensor_v<U>),
+    static_assert(!Std::is_same_v<elem_type, bool> || (is_reg_tensor_v<T> && is_reg_tensor_v<U>),
         "bool bitwise operators require two reg_tensor<bool> operands");
 
     vector_bool mask = binary_mask(a, b);
@@ -75,7 +75,7 @@ __simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
 {
     static_assert(detail::supports_not_v<T>, "operator! does not support this element type");
 
-    if constexpr (::AscendC::Std::is_same_v<T, bool>) {
+    if constexpr (Std::is_same_v<T, bool>) {
         reg_tensor<bool> dst;
         asc_not(dst.reg, src.reg, src.mask);
         dst.mask = src.mask;
@@ -121,7 +121,7 @@ __simd_callee__ inline reg_tensor<T> operator<<(const reg_tensor<T>& src, const 
             "register operator<< requires a signed shift register of the same width");
         asc_shiftleft(dst.reg, src.reg, shift.reg, src.mask);
     } else {
-        static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<U>, int16_t>,
+        static_assert(Std::is_same_v<Std::remove_cvref_t<U>, int16_t>,
             "scalar operator<< requires an int16_t shift value");
         asc_shiftleft_scalar(dst.reg, src.reg, shift, src.mask);
     }
@@ -141,7 +141,7 @@ __simd_callee__ inline reg_tensor<T> operator>>(const reg_tensor<T>& src, const 
             "register operator>> requires a signed shift register of the same width");
         asc_shiftright(dst.reg, src.reg, shift.reg, src.mask);
     } else {
-        static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<U>, int16_t>,
+        static_assert(Std::is_same_v<Std::remove_cvref_t<U>, int16_t>,
             "scalar operator>> requires an int16_t shift value");
         asc_shiftright_scalar(dst.reg, src.reg, shift, src.mask);
     }
