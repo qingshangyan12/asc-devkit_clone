@@ -15,3 +15,4 @@
 | [conv2d_forward_tensor_api](./conv2d_forward_tensor_api) | 基于Tensor API实现Conv2D Forward计算，支持NC1HWC0、NCHW和NHWC三种GM输入/输出格式 | Ascend 950PR/Ascend 950DT |
 | [mmad_tensor_api](./mmad_tensor_api) | 基于Tensor API实现动态Shape矩阵乘法和随路量化计算 | Ascend 950PR/Ascend 950DT |
 | [matmul_mxfp4_tensor_api_high_performance](./matmul_mxfp4_tensor_api_high_performance) | MxFP4 Matmul Tensor API高性能样例，展示基于静态Tensor编程的高性能实现路径 | Ascend 950PR/Ascend 950DT |
+| [experimental/reg_vector_add_tensor_api](./experimental/reg_vector_add_tensor_api) | 使用实验性Reg Tensor `operator+`接口实现float向量加法 | Ascend 950PR/Ascend 950DT |
