@@ -27,7 +27,7 @@ if(NOT SCENARIO_NUM EQUAL 1 AND NOT SCENARIO_NUM EQUAL 2 AND NOT SCENARIO_NUM EQ
 endif()
 
 add_executable(demo
-    truncate_reg_api.asc
+    trunc_tensor_api.asc
 )
 
 target_compile_definitions(demo PRIVATE

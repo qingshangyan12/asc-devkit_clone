@@ -21,7 +21,7 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
 ```text
 ├── CMakeLists.txt              // Build configuration
 ├── README.md                   // Sample description
-├── trunc_reg_api.asc        // Operator kernel, host invocation, and result verification
+├── trunc_tensor_api.asc        // Operator kernel, host invocation, and result verification
 └── scripts
     └── gen_data.py             // Script for generating input and golden data
 ```
@@ -43,7 +43,7 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
   <table>
     <tr>
       <td align="center">Sample Type (OpType)</td>
-      <td colspan="4" align="center">trunc_reg_api</td>
+      <td colspan="4" align="center">trunc_tensor_api</td>
     </tr>
     <tr>
       <td rowspan="2" align="center">Input</td>
@@ -73,7 +73,7 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
     </tr>
     <tr>
       <td align="center">Kernel Name</td>
-      <td colspan="4" align="center">trunc_reg_api</td>
+      <td colspan="4" align="center">trunc_tensor_api</td>
     </tr>
   </table>
 

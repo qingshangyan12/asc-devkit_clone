@@ -21,7 +21,7 @@ y[i] = trunc(x[i])
 ```text
 ├── CMakeLists.txt              // 编译工程
 ├── README.md                   // 样例说明
-├── trunc_reg_api.asc        // 算子Kernel、Host调用与结果校验
+├── trunc_tensor_api.asc        // 算子Kernel、Host调用与结果校验
 └── scripts
     └── gen_data.py             // 输入数据和真值数据生成脚本
 ```
@@ -43,7 +43,7 @@ y[i] = trunc(x[i])
   <table>
     <tr>
       <td align="center">样例类型（OpType）</td>
-      <td colspan="4" align="center">trunc_reg_api</td>
+      <td colspan="4" align="center">trunc_tensor_api</td>
     </tr>
     <tr>
       <td rowspan="2" align="center">样例输入</td>
@@ -73,7 +73,7 @@ y[i] = trunc(x[i])
     </tr>
     <tr>
       <td align="center">样例Kernel名</td>
-      <td colspan="4" align="center">trunc_reg_api</td>
+      <td colspan="4" align="center">trunc_tensor_api</td>
     </tr>
   </table>
 
