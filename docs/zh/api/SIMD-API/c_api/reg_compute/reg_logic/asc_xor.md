@@ -36,7 +36,7 @@ asc_xor支持两种接口：
 计算公式如下：
 
 $$
-dst_i = src0_i ^ src1_i
+dst_i = src0_i \oplus src1_i
 $$
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
