@@ -27,6 +27,9 @@ DEFINE_WEAK_FUNC(
 DEFINE_WEAK_FUNC(
     HcclResult, HcclCommMemReg, HcclComm comm, const char* memTag, const CommMem* mem, HcclMemHandle* memHandle);
 DEFINE_WEAK_FUNC(HcclResult, HcclEngineCtxDestroy, HcclComm comm, const char* ctxTag, CommEngine engine);
+DEFINE_WEAK_FUNC(
+    HcclResult, HcclThreadAcquireWithConfig, HcclComm comm, CommEngine engine, uint32_t threadNum, ThreadType type,
+    const ThreadConfig* config, ThreadHandle* threads);
 
 // 初始化
 void HcclResDlInit(void* libHcommHandle)
@@ -39,4 +42,5 @@ void HcclResDlInit(void* libHcommHandle)
     INIT_SUPPORT_FLAG(libHcommHandle, HcclChannelGetRemoteMems);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclCommMemReg);
     INIT_SUPPORT_FLAG(libHcommHandle, HcclEngineCtxDestroy);
+    INIT_SUPPORT_FLAG(libHcommHandle, HcclThreadAcquireWithConfig);
 }

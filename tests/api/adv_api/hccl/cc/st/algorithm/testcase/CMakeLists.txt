@@ -11,6 +11,7 @@
 set(src_list
     main.cc
     all_gather_nhr_testcase.cc
+    a5_16p_resource_strategy_testcase.cc
     all_to_all_mesh1d_aicpu_testcase.cc
     mc2_aicpu_task_cache_testcase.cc
 )
@@ -90,7 +91,7 @@ target_compile_definitions(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
 # The test must exercise the mc2_client built from the current source tree even
 # when an older CANN installation is present in LD_LIBRARY_PATH.
 set_target_properties(${HCCL_AICPU_ALLOC_CTX_TARGET} PROPERTIES
-    BUILD_RPATH "$<TARGET_FILE_DIR:mc2_client>"
+    BUILD_RPATH "$<TARGET_FILE_DIR:mc2_client>;$<TARGET_FILE_DIR:mc2_compat>"
 )
 target_link_options(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
     -Wl,--disable-new-dtags
@@ -99,6 +100,9 @@ target_link_options(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
 target_link_libraries(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
     intf_llt_pub_basic
     mc2_client
+    -Wl,--no-as-needed
+    mc2_compat
+    -Wl,--as-needed
     -Wl,--whole-archive
     ${HCCL_CHECKER_MODEL_PROXY_TARGET}
     -Wl,--no-whole-archive

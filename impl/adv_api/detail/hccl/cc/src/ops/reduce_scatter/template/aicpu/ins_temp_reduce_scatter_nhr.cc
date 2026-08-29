@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ins_temp_reduce_scatter_nhr.h"
+#include <limits>
 
 namespace mc2_ops_hccl {
 InsTempReduceScatterNHR::InsTempReduceScatterNHR(
@@ -22,12 +23,57 @@ HcclResult InsTempReduceScatterNHR::CalcRes(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     AlgResourceRequest& resourceRequest)
 {
+    CHK_PTR_NULL(topoInfo);
+    const u32 dataType = static_cast<u32>(param.DataDes.dataType);
+    CHK_PRT_RET(
+        dataType >= static_cast<u32>(HCCL_DATA_TYPE_RESERVED) || DATATYPE_SIZE_TABLE[dataType] == 0,
+        HCCL_ERROR("[InsTempReduceScatterNHR][CalcRes] invalid dataType[%u].", dataType), HCCL_E_PARA);
+    const u64 dataTypeSize = DATATYPE_SIZE_TABLE[dataType];
+    CHK_PRT_RET(
+        param.DataDes.count > std::numeric_limits<u64>::max() / dataTypeSize,
+        HCCL_ERROR(
+            "[InsTempReduceScatterNHR][CalcRes] data size overflow, count[%llu], dataTypeSize[%llu].",
+            param.DataDes.count, dataTypeSize),
+        HCCL_E_PARA);
+    const u64 dataSize = param.DataDes.count * dataTypeSize;
+
     std::vector<HcclChannelDesc> channels;
-    CHK_RET(CalcChannelRequestNhr(comm, param, topoInfo, subCommRanks_, channels));
+    std::vector<HcclChannelDesc> candidateChannels;
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
+        const bool isIsolation =
+            !(IsAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH) || dataSize <= SMALL_SIZE_512KB);
+        CHK_RET(CalcChannelRequestNhrMultiJetty(
+            comm, param, topoInfo, subCommRanks_, candidateChannels, isIsolation));
+        for (const auto& channel : candidateChannels) {
+            if (channel.channelProtocol == COMM_PROTOCOL_UBC_CTP) {
+                channels.push_back(channel);
+            }
+        }
+    } else {
+        CHK_RET(CalcChannelRequestNhr(comm, param, topoInfo, subCommRanks_, candidateChannels));
+        channels = candidateChannels;
+    }
+    CHK_PRT_RET(
+        channels.empty(),
+        HCCL_ERROR(
+            "[InsTempReduceScatterNHR][CalcRes] no usable channels, candidateNum[%zu], level0Topo[%d], "
+            "level0PcieMix[%d].",
+            candidateChannels.size(), topoInfo->level0Topo, topoInfo->level0PcieMix),
+        HCCL_E_UNAVAIL);
     resourceRequest.channels.push_back(channels);
     u32 channelsPerRank = CalcChannelsPerRank(channels);
+    CHK_PRT_RET(
+        channelsPerRank == 0,
+        HCCL_ERROR("[InsTempReduceScatterNHR][CalcRes] channelsPerRank is 0."), HCCL_E_INTERNAL);
     HCCL_INFO("[InsTempReduceScatterNHR][CalcRes] channelsPerRank: [%u].", channelsPerRank);
     channelsPerRank_ = channelsPerRank;
+    if (channelsPerRank_ > MAX_JETTY_NUM) {
+        HCCL_ERROR(
+            "[%s] channelsPerRank[%u] is greater than MAX_JETTY_NUM[%u].", __func__, channelsPerRank_,
+            MAX_JETTY_NUM);
+    } else {
+        HCCL_DEBUG("[%s] channelsPerRank[%u].", __func__, channelsPerRank_);
+    }
     GetRes(resourceRequest);
     HCCL_INFO(
         "[InsTempReduceScatterNHR][CalcRes] slaveThreadNum: [%u], notifyNumOnMainThread: [%u].",

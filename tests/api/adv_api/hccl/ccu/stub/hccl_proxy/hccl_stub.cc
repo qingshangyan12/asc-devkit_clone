@@ -340,6 +340,11 @@ HcclResult HcclThreadAcquire(
     return simComm->independentOpThreadMgr_->HcclThreadAcquire(engine, threadNum, notifyNumPerThread, threads);
 }
 
+bool HcommIsSupportHcclThreadAcquireWithConfig()
+{
+    return false;
+}
+
 HcclResult HcclThreadAcquireWithStream(
     HcclComm comm, CommEngine engine, aclrtStream stream, uint32_t notifyNum, ThreadHandle* thread)
 {

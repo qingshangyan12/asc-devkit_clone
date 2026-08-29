@@ -8,11 +8,14 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <limits>
+
 #include "gtest/gtest.h"
 
 #include "sim_communicator.h"
 #include "sim_world.h"
 #include "hccl_alloc_ctx_res.h"
+#include "op_common.h"
 
 namespace mc2_ops_hccl {
 extern bool g_rejectDirectAclrtMemcpy;
@@ -85,6 +88,60 @@ TEST_F(AicpuAllocCtxResTest, CaptureSafeCopyCoversOpParamAndOpResCtx)
 
     const auto* copiedOpParam = reinterpret_cast<const OpParam*>(opResCtx->algInfo[0].opParam);
     EXPECT_EQ(copiedOpParam->opType, HcclCMDType::HCCL_CMD_ALLGATHER);
+}
+
+TEST_F(AicpuAllocCtxResTest, ExactThreadConfigsKeepPerThreadNotifyCounts)
+{
+    AlgResourceRequest request{};
+    request.notifyNumOnMainThread = 2U;
+    request.slaveThreadNum = 3U;
+    request.notifyNumPerThread = {1U, 4U, 2U};
+
+    std::vector<ThreadConfig> configs;
+    ThreadConfig unfoldConfig;
+    ASSERT_EQ(BuildAicpuThreadConfigs(request, configs, unfoldConfig), HCCL_SUCCESS);
+    ASSERT_EQ(configs.size(), 4U);
+    EXPECT_EQ(configs[0].notifyNumPerThread, 3U);
+    EXPECT_EQ(configs[1].notifyNumPerThread, 1U);
+    EXPECT_EQ(configs[2].notifyNumPerThread, 4U);
+    EXPECT_EQ(configs[3].notifyNumPerThread, 2U);
+    EXPECT_EQ(unfoldConfig.notifyNumPerThread, 1U);
+}
+
+TEST_F(AicpuAllocCtxResTest, ThreadConfigRejectsMissingSlaveNotifyBeforeAllocation)
+{
+    AlgResourceRequest request{};
+    request.notifyNumOnMainThread = 1U;
+    request.slaveThreadNum = 2U;
+    request.notifyNumPerThread = {1U};
+
+    std::vector<ThreadConfig> configs;
+    ThreadConfig unfoldConfig;
+    EXPECT_EQ(BuildAicpuThreadConfigs(request, configs, unfoldConfig), HCCL_E_INTERNAL);
+    EXPECT_TRUE(configs.empty());
+}
+
+TEST_F(AicpuAllocCtxResTest, ThreadConfigRejectsMainNotifyOverflowBeforeAllocation)
+{
+    AlgResourceRequest request{};
+    request.notifyNumOnMainThread = std::numeric_limits<uint16_t>::max();
+
+    std::vector<ThreadConfig> configs;
+    ThreadConfig unfoldConfig;
+    EXPECT_EQ(BuildAicpuThreadConfigs(request, configs, unfoldConfig), HCCL_E_PARA);
+    EXPECT_TRUE(configs.empty());
+}
+
+TEST_F(AicpuAllocCtxResTest, ThreadConfigRejectsSlaveNotifyOverflowBeforeAllocation)
+{
+    AlgResourceRequest request{};
+    request.slaveThreadNum = 1U;
+    request.notifyNumPerThread = {static_cast<u32>(std::numeric_limits<uint16_t>::max()) + 1U};
+
+    std::vector<ThreadConfig> configs;
+    ThreadConfig unfoldConfig;
+    EXPECT_EQ(BuildAicpuThreadConfigs(request, configs, unfoldConfig), HCCL_E_PARA);
+    EXPECT_TRUE(configs.empty());
 }
 
 } // namespace
