@@ -275,6 +275,13 @@ template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTempla
 HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::Orchestrate(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
+    constexpr size_t TOPO_LEVEL_NUM = 2;
+    if (resCtx.algHierarchyInfo.infos.size() < TOPO_LEVEL_NUM) {
+        HCCL_ERROR(
+            "[InsV2AllGatherParallelExecutor][Orchestrate] hierarchy level count[%zu] is less than [%zu].",
+            resCtx.algHierarchyInfo.infos.size(), TOPO_LEVEL_NUM);
+        return HCCL_E_PARA;
+    }
     HCCL_INFO("[InsV2AllGatherParallelExecutor][Orchestrate] Orchestrate Start");
     maxTmpMemSize_ = resCtx.cclMem.size; // maxTmpMemSize_设定为cclIn的大小，op中将申请的HcclBuff全给了cclIn
     myRank_ = resCtx.topoInfo.userRank;
@@ -282,6 +289,12 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     threads_ = resCtx.threads;
     if (param.engine != CommEngine::COMM_ENGINE_AIV && param.engine != CommEngine::COMM_ENGINE_CCU) {
         CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
+        CHK_PRT_RET(
+            remoteRankToChannelInfo_.size() < TOPO_LEVEL_NUM,
+            HCCL_ERROR(
+                "[InsV2AllGatherParallelExecutor][Orchestrate] channel level count[%zu] is less than [%zu].",
+                remoteRankToChannelInfo_.size(), TOPO_LEVEL_NUM),
+            HCCL_E_PARA);
         intraLinkMap_ = remoteRankToChannelInfo_[0];
         interLinkMap_ = remoteRankToChannelInfo_[1];
     }
@@ -294,9 +307,19 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     HCCL_DEBUG("[InsV2AllGatherParallelExecutor][Orchestrate] strideCount[%lu]", strideCount_);
 
     if (resCtx.topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS && !resCtx.topoInfo.level0PcieMix) {
+        constexpr size_t PARALLEL_SUBGROUP_NUM = 2;
+        CHK_PRT_RET(
+            resCtx.algHierarchyInfo.infos[0].size() < PARALLEL_SUBGROUP_NUM,
+            HCCL_ERROR(
+                "[InsV2AllGatherParallelExecutor][Orchestrate] level0 subgroup count[%zu] is less than [%zu].",
+                resCtx.algHierarchyInfo.infos[0].size(), PARALLEL_SUBGROUP_NUM),
+            HCCL_E_PARA);
         intraHierarchyInfo_ = {resCtx.algHierarchyInfo.infos[0][0]};
         std::vector<u32> closRanks;
         u32 meshSize = resCtx.algHierarchyInfo.infos[0][0].size();
+        CHK_PRT_RET(
+            meshSize == 0, HCCL_ERROR("[InsV2AllGatherParallelExecutor][Orchestrate] meshSize is 0."),
+            HCCL_E_PARA);
         for (auto rank : resCtx.algHierarchyInfo.infos[0][1]) {
             if (rank % meshSize == resCtx.topoInfo.userRank % meshSize) {
                 closRanks.push_back(rank);
@@ -309,12 +332,21 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     }
     rankSizeLevel0_ = GetRankSize(intraHierarchyInfo_);
     rankSizeLevel1_ = GetRankSize(interHierarchyInfo_);
+    CHK_PRT_RET(
+        rankSizeLevel0_ == 0 || rankSizeLevel1_ == 0,
+        HCCL_ERROR(
+            "[InsV2AllGatherParallelExecutor][Orchestrate] invalid rank size, level0[%llu], level1[%llu].",
+            rankSizeLevel0_, rankSizeLevel1_),
+        HCCL_E_PARA);
     rankIdxLevel0_ = myRank_ % rankSizeLevel0_;
     rankIdxLevel1_ = myRank_ / rankSizeLevel0_;
     // 实例化算法模板类
     // 构建template
-    InsAlgTemplate0 intraTempAlg(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
-    InsAlgTemplate1 interTempAlg(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[1]);
+    InsAlgTemplate0 intraTempAlg(param, resCtx.topoInfo.userRank, intraHierarchyInfo_);
+    InsAlgTemplate1 interTempAlg(param, resCtx.topoInfo.userRank, interHierarchyInfo_);
+    if (param.engine == CommEngine::COMM_ENGINE_AICPU_TS) {
+        CHK_RET(interTempAlg.SetchannelsPerRank(interLinkMap_));
+    }
     // 将计算资源分配个每个算法
     PrepareResForTemplate(intraTempAlg, interTempAlg);
     // 算法展开
@@ -357,9 +389,18 @@ template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTempla
 void InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GetParallelDataSplit(
     std::vector<float>& splitDataSize) const
 {
-    double splitData = 0.5;
-    splitDataSize.push_back(splitData);
-    splitDataSize.push_back(splitData);
+    double ratio = multipleDimensionSplitRatio_;
+    if (multipleDimensionSplitRatioSource_ == MultipleDimensionSplitRatioSource::BUILTIN_FORMULA) {
+        ratio = CalcParallelDataSplitRatio(
+            rankSizeLevel0_, rankSizeLevel1_, intraLinkMap_, interLinkMap_, ParallelDataSplitType::ALL_GATHER,
+            multipleDimensionSplitRatio_);
+        ratio = 1.0 - ratio;
+    }
+    splitDataSize.push_back(1.0 - ratio);
+    splitDataSize.push_back(ratio);
+    HCCL_INFO(
+        "[InsV2AllGatherParallelExecutor] meshFirstRatio[%f], closFirstRatio[%f]", splitDataSize[0],
+        splitDataSize[1]);
     return;
 }
 
@@ -370,6 +411,8 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
 {
     HCCL_INFO("[InsV2AllGatherParallelExecutor] AlgTemplate intra server is [%s]", tempAlgIntra.Describe().c_str());
     HCCL_INFO("[InsV2AllGatherParallelExecutor] AlgTemplate inter server is [%s]", tempAlgInter.Describe().c_str());
+    multipleDimensionSplitRatio_ = param.opConfig.multipleDimensionSplitRatio;
+    multipleDimensionSplitRatioSource_ = param.opConfig.multipleDimensionSplitRatioSource;
     std::vector<float> dataSplitSize;
     GetParallelDataSplit(dataSplitSize);
     u32 intraScatchteMultipleStage0 = tempAlgIntra.CalcScratchMultiple(BufferType::INPUT, BufferType::OUTPUT);
