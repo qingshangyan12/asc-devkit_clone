@@ -9,8 +9,6 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
-    "type_conversion_impl.h is internal; include <tensor_api/experimental/arch/vector/type_conversion.h> instead."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_TYPE_CONVERSION_IMPL_H
 #endif
@@ -18,11 +16,7 @@
 #ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_TYPE_CONVERSION_IMPL_H
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_TYPE_CONVERSION_IMPL_H
 
-#if !defined(INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_TYPE_CONVERSION_H)
 #include "tensor_api/experimental/arch/vector/type_conversion.h"
-#endif
-#include "c_api/reg_compute/reg_convert.h"
-#include "impl/tensor_api/arch/utils/arch_utils.h"
 #include "impl/tensor_api/utils/constant_impl.h"
 
 namespace asc {
