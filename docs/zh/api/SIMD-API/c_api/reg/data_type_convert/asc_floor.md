@@ -30,7 +30,7 @@
 
 关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
-## 函数原型（占位符形式）
+## 函数原型
 
 ```cpp
 // 通过函数返回值返回结果
@@ -47,7 +47,7 @@ __simd_callee__ inline void asc_floor(vector_<dtype>& dst,
 
 `<dtype>`取值为：`half`、`bfloat16_t`、`float`。
 
-**典型示例**
+### 函数原型典型示例
 
 ```cpp
 // 通过函数返回值返回结果
