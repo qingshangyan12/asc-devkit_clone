@@ -103,6 +103,7 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
     {"CcuSchedAllGatherConcurMeshNHRMultiLink", CcuSchedAllGatherConcurMeshNHRMultiLink},
     {"CcuKfcReduceScatterMesh1DMem2Mem", CcuReduceScatterMeshMem2Mem1D},
+    {"CcuReduceScatterMeshMem2Mem1DPeerOnly", CcuReduceScatterMeshMem2Mem1D},
     {"CcuAlltoAllMesh1D", CcuAlltoAllMesh1D},
     {"CcuSchedAllReduceSoleMesh", CcuAllReduceMeshMem2Mem1D}};
 
@@ -121,7 +122,7 @@ HcclResult CheckCommEngine(const void* ccTilingList[], uint32_t tilingNum);
 
 HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint8_t& commEngine);
 
-HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum);
+HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum, uint32_t rankSize);
 
 // 构建 opResCtx 基础字段
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx);
