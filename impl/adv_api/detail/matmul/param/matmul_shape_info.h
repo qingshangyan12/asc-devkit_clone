@@ -185,7 +185,7 @@ public:
     }
 
     template <bool IS_INTRA_BLOCK = false, bool IS_BASIC = false>
-    __aicore__ inline int32_t GetSingleCoreM() const
+    __aicore__ inline constexpr int32_t GetSingleCoreM() const
     {
         if constexpr (IS_BASIC) {
             return ToMatmulConfig(MM_CFG).singleCoreM;
@@ -195,7 +195,7 @@ public:
     }
 
     template <bool IS_INTRA_BLOCK = false, bool IS_BASIC = false>
-    __aicore__ inline int32_t GetSingleCoreN() const
+    __aicore__ inline constexpr int32_t GetSingleCoreN() const
     {
         if constexpr (IS_BASIC) {
             return ToMatmulConfig(MM_CFG).singleCoreN;
@@ -205,7 +205,7 @@ public:
     }
 
     template <bool IS_INTRA_BLOCK = false, bool IS_BASIC = false>
-    __aicore__ inline int32_t GetSingleCoreK() const
+    __aicore__ inline constexpr int32_t GetSingleCoreK() const
     {
         if constexpr (IS_BASIC) {
             return ToMatmulConfig(MM_CFG).singleCoreK;
@@ -381,7 +381,7 @@ public:
     }
 
     template <bool IS_INTRA_BLOCK = false, bool IS_BASIC = false>
-    __aicore__ inline int32_t GetSingleCoreM() const
+    __aicore__ inline constexpr int32_t GetSingleCoreM() const
     {
         if constexpr (IS_INTRA_BLOCK) {
             return intraBlock.singleCoreM;
@@ -391,7 +391,7 @@ public:
     }
 
     template <bool IS_INTRA_BLOCK = false, bool IS_BASIC = false>
-    __aicore__ inline int32_t GetSingleCoreN() const
+    __aicore__ inline constexpr int32_t GetSingleCoreN() const
     {
         if constexpr (IS_INTRA_BLOCK) {
             return intraBlock.singleCoreN;
@@ -401,7 +401,7 @@ public:
     }
 
     template <bool IS_INTRA_BLOCK = false, bool IS_BASIC = false>
-    __aicore__ inline int32_t GetSingleCoreK() const
+    __aicore__ inline constexpr int32_t GetSingleCoreK() const
     {
         if constexpr (IS_INTRA_BLOCK) {
             return intraBlock.singleCoreK;
