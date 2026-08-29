@@ -13,6 +13,7 @@
 #include "../../../../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
 #include "../../../../all_reduce/template/ccu/kernel/ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.h"
 #include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
+#include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
@@ -161,11 +162,20 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
         }
     } else if (opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER)) {
-        CcuReduceScatterMesh1DMem2MemKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
-            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
-            ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
+        if (std::strcmp(ctx.arg->opParam.algName, KFC_REDUCE_SCATTER_PEER_ONLY_ALG_NAME) == 0) {
+            CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
+                param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_4],
+                param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
+                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
+                ctx.arg->opParam.reduceType);
+        } else {
+            CcuReduceScatterMesh1DMem2MemKernel(
+                param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
+                param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels,
+                ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId,
+                ctx.arg->opParam.DataDes.dataType, ctx.arg->opParam.DataDes.outputType,
+                ctx.arg->opParam.reduceType);
+        }
     } else if (opType == static_cast<uint64_t>(HcclCMDType::HCCL_CMD_ALLREDUCE)) {
         CcuKfcAllReduceMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],

@@ -15,6 +15,7 @@
 #include "ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
+#include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.h"
 // Legacy direct-launch CCU headers are retained in source but are incompatible with the current hcomm API.
 #endif
 
@@ -259,6 +260,9 @@ REGISTER_EXEC_V2(
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuKfcReduceScatterMesh1DMem2Mem, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     CcuTempKfcReduceScatterMesh1DMem2Mem);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterMeshMem2Mem1DPeerOnly,
+    InsV2ReduceScatterSoleExecutor, TopoMatch1D, CcuTempKfcReduceScatterMesh1DMem2MemPeerOnly);
 #endif
 
 } // namespace mc2_ops_hccl
