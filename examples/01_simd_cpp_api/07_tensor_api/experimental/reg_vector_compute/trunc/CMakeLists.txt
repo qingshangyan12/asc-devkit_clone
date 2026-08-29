@@ -27,7 +27,7 @@ if(NOT SCENARIO_NUM EQUAL 1 AND NOT SCENARIO_NUM EQUAL 2 AND NOT SCENARIO_NUM EQ
 endif()
 
 add_executable(demo
-    trunc_tensor_api.asc
+    trunc.asc
 )
 
 target_compile_definitions(demo PRIVATE

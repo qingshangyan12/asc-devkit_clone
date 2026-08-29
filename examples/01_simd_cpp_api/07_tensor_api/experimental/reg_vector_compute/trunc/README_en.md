@@ -21,7 +21,7 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
 ```text
 ├── CMakeLists.txt              // Build configuration
 ├── README.md                   // Sample description
-├── trunc_tensor_api.asc        // Operator kernel, host invocation, and result verification
+├── trunc.asc                   // Operator kernel, host invocation, and result verification
 └── scripts
     └── gen_data.py             // Script for generating input and golden data
 ```
@@ -43,7 +43,7 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
   <table>
     <tr>
       <td align="center">Sample Type (OpType)</td>
-      <td colspan="4" align="center">trunc_tensor_api</td>
+      <td colspan="4" align="center">trunc</td>
     </tr>
     <tr>
       <td rowspan="2" align="center">Input</td>
@@ -73,7 +73,7 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
     </tr>
     <tr>
       <td align="center">Kernel Name</td>
-      <td colspan="4" align="center">trunc_tensor_api</td>
+      <td colspan="4" align="center">trunc</td>
     </tr>
   </table>
 
@@ -96,12 +96,12 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
     The core computation code is as follows:
 
     ```cpp
-    const auto coord = asc::te::make_coord(offset / columnCount, offset % columnCount);
-    auto srcReg = asc::te::experimental::load(src, coord);
-    srcReg.with_mask(asc::te::experimental::all_mask<T>());
+    const auto coord = asc::te::make_coord(offset / column_count, offset % column_count);
+    auto src_reg = asc::te::experimental::load(src, coord);
+    src_reg.with_mask(asc::te::experimental::all_mask<T>());
 
-    auto dstReg = asc::te::experimental::trunc(srcReg);
-    asc::te::experimental::store(dst, coord, dstReg);
+    auto dst_reg = asc::te::experimental::trunc(src_reg);
+    asc::te::experimental::store(dst, coord, dst_reg);
     ```
 
 ## Build and Run
@@ -126,11 +126,11 @@ Run the following steps in the sample root directory to build and execute the op
   mkdir -p build && cd build
   cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
-  python3 ../scripts/gen_data.py -scenarioNum=${SCENARIO_NUM}
+  python3 ../scripts/gen_data.py --scenario_num=${SCENARIO_NUM}
   ./demo
   ```
 
-  The `scenarioNum` passed to the data generation script must match the `SCENARIO_NUM` used during compilation. To run another scenario, set both values to the corresponding number from 1 to 3.
+  The `scenario_num` passed to the data generation script must match the `SCENARIO_NUM` used during compilation. To run another scenario, set both values to the corresponding number from 1 to 3.
 
   To use NPU simulation, add the corresponding build option:
 

@@ -28,7 +28,7 @@ shape为`[1024]` 的一维 tensor，场景5将 `[32, 24]` 输入填充为 `[32, 
 ├── CMakeLists.txt
 ├── README.md
 ├── README_En.md
-├── copy_vector_tensor_api.asc
+├── copy_vector.asc
 ├── data_utils.h
 └── scripts
     └── gen_data.py
@@ -39,7 +39,8 @@ shape为`[1024]` 的一维 tensor，场景5将 `[32, 24]` 输入填充为 `[32, 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](../../../../docs/zh/quick_start.md#cann-install)**。
+
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](../../../../../../docs/zh/quick_start.md#cann-install)**。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -61,11 +62,11 @@ shape为`[1024]` 的一维 tensor，场景5将 `[32, 24]` 输入填充为 `[32, 
   mkdir -p build && cd build
   cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
-  python3 ../scripts/gen_data.py -scenarioNum=1
+  python3 ../scripts/gen_data.py --scenario_num=1
   ./demo
   ```
 
-  生成数据时传入的 `scenarioNum` 必须与编译时的 `SCENARIO_NUM` 一致。运行其他场景时，将其修改为1至6之间的对应值。
+  生成数据时传入的 `scenario_num` 必须与编译时的 `SCENARIO_NUM` 一致。运行其他场景时，将其修改为1至6之间的对应值。
 
   使用NPU仿真时，可分别增加以下编译选项：
 

@@ -21,7 +21,7 @@ y[i] = trunc(x[i])
 ```text
 ├── CMakeLists.txt              // 编译工程
 ├── README.md                   // 样例说明
-├── trunc_tensor_api.asc        // 算子Kernel、Host调用与结果校验
+├── trunc.asc                   // 算子Kernel、Host调用与结果校验
 └── scripts
     └── gen_data.py             // 输入数据和真值数据生成脚本
 ```
@@ -43,7 +43,7 @@ y[i] = trunc(x[i])
   <table>
     <tr>
       <td align="center">样例类型（OpType）</td>
-      <td colspan="4" align="center">trunc_tensor_api</td>
+      <td colspan="4" align="center">trunc</td>
     </tr>
     <tr>
       <td rowspan="2" align="center">样例输入</td>
@@ -73,7 +73,7 @@ y[i] = trunc(x[i])
     </tr>
     <tr>
       <td align="center">样例Kernel名</td>
-      <td colspan="4" align="center">trunc_tensor_api</td>
+      <td colspan="4" align="center">trunc</td>
     </tr>
   </table>
 
@@ -96,12 +96,12 @@ y[i] = trunc(x[i])
     核心计算代码如下：
 
     ```cpp
-    const auto coord = asc::te::make_coord(offset / columnCount, offset % columnCount);
-    auto srcReg = asc::te::experimental::load(src, coord);
-    srcReg.with_mask(asc::te::experimental::all_mask<T>());
+    const auto coord = asc::te::make_coord(offset / column_count, offset % column_count);
+    auto src_reg = asc::te::experimental::load(src, coord);
+    src_reg.with_mask(asc::te::experimental::all_mask<T>());
 
-    auto dstReg = asc::te::experimental::trunc(srcReg);
-    asc::te::experimental::store(dst, coord, dstReg);
+    auto dst_reg = asc::te::experimental::trunc(src_reg);
+    asc::te::experimental::store(dst, coord, dst_reg);
     ```
 
 ## 编译运行
@@ -125,11 +125,11 @@ y[i] = trunc(x[i])
   mkdir -p build && cd build
   cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
-  python3 ../scripts/gen_data.py -scenarioNum=${SCENARIO_NUM}
+  python3 ../scripts/gen_data.py --scenario_num=${SCENARIO_NUM}
   ./demo
   ```
 
-  生成数据时传入的 `scenarioNum` 必须与编译时的 `SCENARIO_NUM` 一致。运行其他场景时，将其修改为1至3之间的对应值。
+  生成数据时传入的 `scenario_num` 必须与编译时的 `SCENARIO_NUM` 一致。运行其他场景时，将其修改为1至3之间的对应值。
 
   使用NPU仿真时，可分别增加以下编译选项：
 

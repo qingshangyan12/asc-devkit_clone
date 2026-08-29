@@ -19,7 +19,7 @@ y[i] = convert<To>(x[i])
 ```text
 ├── CMakeLists.txt          // 编译工程
 ├── README.md               // 样例说明
-├── cast_tensor_api.asc        // 算子Kernel、Host调用与结果校验
+├── cast.asc                   // 算子Kernel、Host调用与结果校验
 └── scripts
     └── gen_data.py         // 输入数据和真值数据生成脚本
 ```
@@ -44,7 +44,7 @@ y[i] = convert<To>(x[i])
   <table>
     <tr>
       <td align="center">样例类型（OpType）</td>
-      <td colspan="4" align="center">cast_tensor_api</td>
+      <td colspan="4" align="center">cast</td>
     </tr>
     <tr>
       <td rowspan="2" align="center">样例输入</td>
@@ -74,7 +74,7 @@ y[i] = convert<To>(x[i])
     </tr>
     <tr>
       <td align="center">样例Kernel名</td>
-      <td colspan="4" align="center">cast_tensor_api</td>
+      <td colspan="4" align="center">cast</td>
     </tr>
   </table>
 
@@ -101,11 +101,11 @@ y[i] = convert<To>(x[i])
     核心转换代码如下：
 
     ```cpp
-    auto srcReg = asc::te::experimental::load(src, coord);
-    srcReg = srcReg.with_mask(asc::te::experimental::update_mask<WiderT>(remain));
+    auto src_reg = asc::te::experimental::load(src, coord);
+    src_reg = src_reg.with_mask(asc::te::experimental::update_mask<WiderT>(remain));
 
-    auto dstReg = asc::te::experimental::cast<int32_t>(srcReg);
-    asc::te::experimental::store(dst, coord, dstReg);
+    auto dst_reg = asc::te::experimental::cast<int32_t>(src_reg);
+    asc::te::experimental::store(dst, coord, dst_reg);
     ```
 
     窄化转换使用 layout zero 生成寄存器结果：2倍窄化通过一级 `deinterleave` 提取偶数位置，4倍窄化通过两级 `deinterleave` 提取每四个位置中的第一个元素，再使用普通 `store` 写入连续的目标数据。
@@ -115,6 +115,7 @@ y[i] = convert<To>(x[i])
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量
+
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](../../../../../../docs/zh/quick_start.md#cann-install)**。
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -131,11 +132,11 @@ y[i] = convert<To>(x[i])
   mkdir -p build && cd build
   cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
-  python3 ../scripts/gen_data.py -scenarioNum=1
+  python3 ../scripts/gen_data.py --scenario_num=1
   ./demo
   ```
 
-  生成数据时传入的 `scenarioNum` 必须与编译时的 `SCENARIO_NUM` 一致。运行其他场景时，将其修改为1至6之间的对应值。
+  生成数据时传入的 `scenario_num` 必须与编译时的 `SCENARIO_NUM` 一致。运行其他场景时，将其修改为1至6之间的对应值。
 
   使用NPU仿真时，可分别增加以下编译选项：
 

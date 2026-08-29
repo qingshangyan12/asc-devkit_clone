@@ -30,7 +30,7 @@ The kernels for all five scenarios are declared with `__global__ __vector__`.
 ├── CMakeLists.txt
 ├── README.md
 ├── README_en.md
-├── copy_vector_tensor_api.asc
+├── copy_vector.asc
 ├── data_utils.h
 └── scripts
     └── gen_data.py
@@ -41,10 +41,7 @@ The kernels for all five scenarios are declared with `__global__ __vector__`.
 Run the following steps in the sample root directory to build and execute the operator.
 
 - Configure environment variables
-
-  Configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install)
-  of the CANN development kit in the current environment. **Currently, only
-  [CANN master](../../../../docs/en/quick_start.md#cann-install) is supported.**
+  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -68,11 +65,11 @@ Run the following steps in the sample root directory to build and execute the op
   mkdir -p build && cd build
   cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
-  python3 ../scripts/gen_data.py -scenarioNum=1
+  python3 ../scripts/gen_data.py --scenario_num=1
   ./demo
   ```
 
-  The `scenarioNum` passed when generating data must match the `SCENARIO_NUM` used at build time. To run a
+  The `scenario_num` passed when generating data must match the `SCENARIO_NUM` used at build time. To run a
   different scenario, change both values to the corresponding number from 1 through 6.
 
   To use NPU simulation, add the following build option:

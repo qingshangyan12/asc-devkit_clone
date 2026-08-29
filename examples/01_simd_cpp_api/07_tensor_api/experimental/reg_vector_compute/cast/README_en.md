@@ -19,7 +19,7 @@ y[i] = convert<To>(x[i])
 ```text
 ├── CMakeLists.txt          // Build configuration
 ├── README.md               // Sample description
-├── cast_tensor_api.asc        // Operator kernel, host invocation, and result verification
+├── cast.asc                   // Operator kernel, host invocation, and result verification
 └── scripts
     └── gen_data.py         // Script for generating input and golden data
 ```
@@ -44,7 +44,7 @@ y[i] = convert<To>(x[i])
   <table>
     <tr>
       <td align="center">Sample Type (OpType)</td>
-      <td colspan="4" align="center">cast_tensor_api</td>
+      <td colspan="4" align="center">cast</td>
     </tr>
     <tr>
       <td rowspan="2" align="center">Input</td>
@@ -74,7 +74,7 @@ y[i] = convert<To>(x[i])
     </tr>
     <tr>
       <td align="center">Kernel Name</td>
-      <td colspan="4" align="center">cast_tensor_api</td>
+      <td colspan="4" align="center">cast</td>
     </tr>
   </table>
 
@@ -101,11 +101,11 @@ y[i] = convert<To>(x[i])
     The core conversion code is as follows:
 
     ```cpp
-    auto srcReg = asc::te::experimental::load(src, coord);
-    srcReg = srcReg.with_mask(asc::te::experimental::update_mask<WiderT>(remain));
+    auto src_reg = asc::te::experimental::load(src, coord);
+    src_reg = src_reg.with_mask(asc::te::experimental::update_mask<WiderT>(remain));
 
-    auto dstReg = asc::te::experimental::cast<int32_t>(srcReg);
-    asc::te::experimental::store(dst, coord, dstReg);
+    auto dst_reg = asc::te::experimental::cast<int32_t>(src_reg);
+    asc::te::experimental::store(dst, coord, dst_reg);
     ```
 
     A narrowing conversion uses layout zero for the register result. A 2x narrowing conversion applies one `deinterleave` operation to extract even positions, while a 4x narrowing conversion applies two to extract every fourth element before writing contiguous destination data with a normal `store`.
@@ -132,11 +132,11 @@ Run the following steps in the sample root directory to build and execute the op
   mkdir -p build && cd build
   cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
-  python3 ../scripts/gen_data.py -scenarioNum=1
+  python3 ../scripts/gen_data.py --scenario_num=1
   ./demo
   ```
 
-  The `scenarioNum` passed to the data generation script must match the `SCENARIO_NUM` used during compilation. To run another scenario, set both values to the corresponding number from 1 to 6.
+  The `scenario_num` passed to the data generation script must match the `SCENARIO_NUM` used during compilation. To run another scenario, set both values to the corresponding number from 1 to 6.
 
   To use NPU simulation, add the following build option:
 
