@@ -58,8 +58,8 @@ __aicore__ inline void asc_transto5hd_b8(ub_addr8_t dst, ub_addr8_t src, uint8_t
 
 |参数名|输入/输出|描述|
 | ------------ | ------------ | ------------ |
-|dst|输出|目的地址寄存器。|
-|src|输入|源地址寄存器。|
+|dst|输出|目的地址寄存器起始位置，仅支持VA0、VA2、VA4、VA6。每个地址寄存器存储8个地址，接口会自动将`dst`与其相邻的下一个地址寄存器组成一组，用于存储16个目的地址。例如，传入VA0时，接口使用VA0和VA1中的16个地址。|
+|src|输入|源地址寄存器起始位置，仅支持VA0、VA2、VA4、VA6。每个地址寄存器存储8个地址，接口会自动将`src`与其相邻的下一个地址寄存器组成一组，用于读取16个源地址。例如，传入VA2时，接口使用VA2和VA3中的16个地址。|
 |repeat|输入|重复迭代次数， repeat∈[0,255]。<br>注意事项：<br>&bull;当repeat为1时，目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置加上dst_stride/src_stride。如果要让目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置，需要将dst_stride/src_stride置为0。<br>&bull;当repeat大于1时，第一次repeat中目的操作数/源操作数的有效起始位置为dst/src序列输入的起始位置，第二次会加上dst_stride/src_stride。以此类推。|
 |dst_stride|输入|相邻迭代间，目的操作数相同DataBlock地址Stride，单位：DataBlock。<br>相邻迭代间相同DataBlock的地址步长参数的详细说明请参考[repeatStride](../../general_description_and_constraints.md#repeatStride)。|
 |src_stride|输入|相邻迭代间，源操作数相同DataBlock地址Stride，单位：DataBlock。<br>相邻迭代间相同DataBlock的地址步长参数的详细说明请参考[repeatStride](../../general_description_and_constraints.md#repeatStride)。|
@@ -78,6 +78,7 @@ PIPE_V
 
 - 操作数地址对齐约束请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
+- `dst`和`src`不能传入相同的地址寄存器起始位置，即目的地址寄存器对和源地址寄存器对不能重叠。
 - 进行NCHW格式到NC1HWC0格式的转换时，一般用法是将src/dst中的每个元素配置为每个HW平面的起点。
 - 为了性能更优，数据类型位宽为8位时建议先固定dst_high_half/src_high_half，再HW方向Repeat后，再改变dst_high_half/src_high_half。
 
