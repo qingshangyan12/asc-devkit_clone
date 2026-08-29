@@ -30,8 +30,7 @@ namespace experimental {
 /**
  * @brief Defines the default register cast options with zero layout, rint rounding, and no saturation.
  */
-constexpr cast_options default_cast_ops = {
-    cast_layout::zero, cast_round_mode::rint, cast_sat_mode::not_sat};
+constexpr cast_options default_cast_ops = {cast_layout::zero, cast_round_mode::rint, cast_sat_mode::not_sat};
 
 /**
  * @brief Converts the active elements of a register tensor to another element type.

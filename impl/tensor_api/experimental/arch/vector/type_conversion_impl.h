@@ -40,7 +40,6 @@ struct cast_element_bits {
 } // namespace te
 } // namespace asc
 
-
 #define ASC_CAST_POSITION_2_zero ASC_POSITION_EVEN
 #define ASC_CAST_POSITION_2_one ASC_POSITION_ODD
 #define ASC_CAST_POSITION_2_two ASC_POSITION_EVEN
@@ -50,38 +49,38 @@ struct cast_element_bits {
 #define ASC_CAST_POSITION_4_two ASC_DISPERSE_THIRD_QUARTER
 #define ASC_CAST_POSITION_4_three ASC_DISPERSE_FOURTH_QUARTER
 
-#define ASC_REG_CAST_OP(TO, FROM, LAYOUT, ROUND, SAT, FUNC)                                                           \
-    template <>                                                                                                       \
-    struct reg_cast_op<TO, FROM, cast_layout::LAYOUT, cast_round_mode::ROUND, cast_sat_mode::SAT> {                  \
-        static constexpr bool supported = true;                                                                       \
-                                                                                                                       \
-        template <typename DstReg, typename SrcReg>                                                                   \
-        __simd_callee__ static void run(DstReg& dst, SrcReg src, vector_bool mask)                                   \
-        {                                                                                                              \
-            constexpr uint32_t dst_bits = cast_element_bits<TO>::value;                                              \
-            constexpr uint32_t src_bits = cast_element_bits<FROM>::value;                                            \
-            if constexpr (dst_bits == src_bits) {                                                                     \
-                FUNC(dst, src, mask);                                                                                  \
-            } else if constexpr (dst_bits == 2U * src_bits || src_bits == 2U * dst_bits) {                          \
-                FUNC(dst, src, mask, ASC_CAST_POSITION_2_##LAYOUT);                                                   \
-            } else if constexpr (dst_bits == 4U * src_bits || src_bits == 4U * dst_bits) {                          \
-                FUNC(dst, src, mask, ASC_CAST_POSITION_4_##LAYOUT);                                                   \
-            } else {                                                                                                  \
-                static_assert(sizeof(DstReg) == 0, "unsupported register cast width ratio");                       \
-            }                                                                                                         \
-        }                                                                                                              \
+#define ASC_REG_CAST_OP(TO, FROM, LAYOUT, ROUND, SAT, FUNC)                                         \
+    template <>                                                                                     \
+    struct reg_cast_op<TO, FROM, cast_layout::LAYOUT, cast_round_mode::ROUND, cast_sat_mode::SAT> { \
+        static constexpr bool supported = true;                                                     \
+                                                                                                    \
+        template <typename DstReg, typename SrcReg>                                                 \
+        __simd_callee__ static void run(DstReg& dst, SrcReg src, vector_bool mask)                  \
+        {                                                                                           \
+            constexpr uint32_t dst_bits = cast_element_bits<TO>::value;                             \
+            constexpr uint32_t src_bits = cast_element_bits<FROM>::value;                           \
+            if constexpr (dst_bits == src_bits) {                                                   \
+                FUNC(dst, src, mask);                                                               \
+            } else if constexpr (dst_bits == 2U * src_bits || src_bits == 2U * dst_bits) {          \
+                FUNC(dst, src, mask, ASC_CAST_POSITION_2_##LAYOUT);                                 \
+            } else if constexpr (dst_bits == 4U * src_bits || src_bits == 4U * dst_bits) {          \
+                FUNC(dst, src, mask, ASC_CAST_POSITION_4_##LAYOUT);                                 \
+            } else {                                                                                \
+                static_assert(sizeof(DstReg) == 0, "unsupported register cast width ratio");        \
+            }                                                                                       \
+        }                                                                                           \
     }
 
-#define ASC_REG_CAST_OP_NO_POSITION(TO, FROM, LAYOUT, ROUND, SAT, FUNC)                                               \
-    template <>                                                                                                       \
-    struct reg_cast_op<TO, FROM, cast_layout::LAYOUT, cast_round_mode::ROUND, cast_sat_mode::SAT> {                  \
-        static constexpr bool supported = true;                                                                       \
-                                                                                                                       \
-        template <typename DstReg, typename SrcReg>                                                                   \
-        __simd_callee__ static void run(DstReg& dst, SrcReg src, vector_bool mask)                                   \
-        {                                                                                                              \
-            FUNC(dst, src, mask);                                                                                      \
-        }                                                                                                              \
+#define ASC_REG_CAST_OP_NO_POSITION(TO, FROM, LAYOUT, ROUND, SAT, FUNC)                             \
+    template <>                                                                                     \
+    struct reg_cast_op<TO, FROM, cast_layout::LAYOUT, cast_round_mode::ROUND, cast_sat_mode::SAT> { \
+        static constexpr bool supported = true;                                                     \
+                                                                                                    \
+        template <typename DstReg, typename SrcReg>                                                 \
+        __simd_callee__ static void run(DstReg& dst, SrcReg src, vector_bool mask)                  \
+        {                                                                                           \
+            FUNC(dst, src, mask);                                                                   \
+        }                                                                                           \
     }
 
 #include "impl/tensor_api/experimental/arch/vector/type_conversion_table.h"
@@ -105,12 +104,12 @@ namespace detail {
 template <typename DstType, typename SrcType, cast_layout Layout, cast_round_mode Round, cast_sat_mode Sat>
 __simd_callee__ inline reg_tensor<DstType> cast_impl(const reg_tensor<SrcType>& src)
 {
-    static_assert(!AscendC::Std::is_same_v<DstType, SrcType>,
+    static_assert(
+        !AscendC::Std::is_same_v<DstType, SrcType>,
         "reg_tensor cast requires different source and destination element types");
 
     using op = reg_cast_op<DstType, SrcType, Layout, Round, Sat>;
-    static_assert(op::supported,
-        "register cast type or option combination is unsupported on the current architecture");
+    static_assert(op::supported, "register cast type or option combination is unsupported on the current architecture");
 
     reg_tensor<DstType> dst;
     op::run(dst.reg, src.reg, src.mask);
@@ -159,8 +158,7 @@ __simd_callee__ inline reg_tensor<T> trunc(const reg_tensor<T>& src)
         dst.mask = src.mask;
         return dst;
     } else {
-        static_assert(detail::is_supported<T>::value,
-            "reg_tensor trunc supports only half, bfloat16_t, and float");
+        static_assert(detail::is_supported<T>::value, "reg_tensor trunc supports only half, bfloat16_t, and float");
     }
 }
 

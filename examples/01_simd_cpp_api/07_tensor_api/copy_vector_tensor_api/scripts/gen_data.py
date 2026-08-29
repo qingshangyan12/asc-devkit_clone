@@ -1,8 +1,15 @@
 #!/usr/bin/python3
 # coding=utf-8
 
+# ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
-# Licensed under CANN Open Software License Agreement Version 2.0.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
 
 import argparse
 import os
@@ -19,12 +26,14 @@ PADDING_VALUE = -9
 
 def gen_golden_data(scenario_num):
     input_col = COL - LEFT_PADDING - RIGHT_PADDING if scenario_num == 5 else COL
-    data = ((np.arange(ROW * input_col, dtype=np.int16) * 13 + 7) % 251 - 125).astype(np.int8)
+    data = ((np.arange(ROW * input_col, dtype=np.int16) * 13 + 7) % 251 - 125).astype(
+        np.int8
+    )
 
     golden = data
     if scenario_num == 5:
         golden = np.full((ROW, COL), PADDING_VALUE, dtype=np.int8)
-        golden[:, LEFT_PADDING:COL - RIGHT_PADDING] = data.reshape(ROW, input_col)
+        golden[:, LEFT_PADDING : COL - RIGHT_PADDING] = data.reshape(ROW, input_col)
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
