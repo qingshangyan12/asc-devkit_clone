@@ -306,5 +306,4 @@ bfloat16x2_t atomicMin(__gm__ bfloat16x2_t* address, bfloat16x2_t value);
 bfloat16x2_t atomicCAS(__gm__ bfloat16x2_t* address, bfloat16x2_t value1, bfloat16x2_t value2);
 
 float __fabsf(float x);
-
 #endif
