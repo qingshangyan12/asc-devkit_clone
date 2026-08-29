@@ -38,6 +38,7 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     std::vector<std::vector<uint32_t>> subCommRanks;
     std::vector<KfcNhrStepInfo> nhrStepInfoVector;
     std::map<uint32_t, uint32_t> nhrRank2ChannelIdx;
+    std::vector<uint32_t> a2aJettyNums;
 };
 
 // 多mission由Host使用独立start/done区域调度；Server之间不在CCU侧同步。
