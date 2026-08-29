@@ -140,7 +140,7 @@ Each core only processes its assigned `2048 x 1024` output region. Within the co
 The corresponding core index computation is:
 
 ```cpp
-constexpr uint32_t mIter = DivCeil(M, singleCoreM);
+constexpr uint32_t mIter = AscendC::Std::ceil_div(M, singleCoreM);
 uint32_t mIterIdx = block_idx % mIter;
 uint32_t nIterIdx = block_idx / mIter;
 ```
