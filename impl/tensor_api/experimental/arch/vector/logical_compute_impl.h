@@ -1,0 +1,43 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+#ifndef IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_IMPL_H
+#define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_IMPL_H
+
+#include "impl/tensor_api/experimental/arch/vector/reg_compute_traits.h"
+
+namespace asc {
+namespace te {
+namespace experimental {
+
+template <typename T, typename U>
+__simd_callee__ inline decltype(auto) operator|(const T& a, const U& b)
+{
+    using elem_type = detail::binary_elem_t<T, U>;
+    detail::check_binary_reg_types<T, U>();
+    static_assert(detail::supports_or_v<elem_type>, "operator| does not support this element type");
+    static_assert(
+        !::AscendC::Std::is_same_v<elem_type, bool> || (is_reg_tensor_v<T> && is_reg_tensor_v<U>),
+        "bool operator| requires two reg_tensor<bool> operands");
+
+    vector_bool mask = detail::binary_mask(a, b);
+    auto left = detail::make_reg_operand<elem_type>(a, mask);
+    auto right = detail::make_reg_operand<elem_type>(b, mask);
+    reg_tensor<elem_type> dst;
+    asc_or(dst.reg, left.reg, right.reg, mask);
+    dst.mask = mask;
+    return dst;
+}
+
+} // namespace experimental
+} // namespace te
+} // namespace asc
+
+#endif // IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_LOGICAL_COMPUTE_IMPL_H

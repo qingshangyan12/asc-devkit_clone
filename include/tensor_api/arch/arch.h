@@ -23,6 +23,12 @@
 #include "tensor_api/arch/cube/mmad_op.h"
 #include "tensor_api/arch/cube/copy_op.h"
 #include "tensor_api/arch/vector/copy_op.h"
+#include "tensor_api/experimental/arch/vector/reg_tensor.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
+#include "tensor_api/experimental/arch/vector/logical_compute.h"
 
 #endif // INCLUDE_TENSOR_API_ARCH_ARCH_H
 
