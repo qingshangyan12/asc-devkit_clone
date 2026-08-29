@@ -26,17 +26,13 @@
 
 ## 功能说明
 
-将掩码寄存器中的数据压缩搬出到Unified Buffer（UB），写入完成后启用Post Update模式自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。当源操作数为掩码寄存器时，每间隔1 bit丢弃1 bit，将保留的bit连续压缩存储到目的地址，掩码寄存器搬出场景不支持配置掩码。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。
-
-掩码寄存器搬出场景提供以下一种模式：
-
-- **掩码寄存器搬出模式**：`offset`单位为字节。搬出完成后，目的地址累加`offset`字节。
+将掩码寄存器中的数据每间隔1 bit丢弃1 bit，压缩搬出到Unified Buffer（UB），启用Post Update模式写入完成后自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。掩码寄存器搬出场景不支持配置掩码。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。
 
 本接口仅在AIV上执行有效。
 
 ## 函数原型
 
-### 掩码寄存器立即数偏移搬出模式
+### 掩码寄存器搬出模式
 
 ```c
 __simd_callee__ inline void asc_storealign_mask_pack_postupdate(__ubuf__ <dtype>*& dst,
@@ -46,9 +42,9 @@ __simd_callee__ inline void asc_storealign_mask_pack_postupdate(__ubuf__ <dtype>
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
+`dtype`支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign_mask_pack_postupdate(__ubuf__ uint8_t*& dst,
@@ -58,15 +54,15 @@ __simd_callee__ inline void asc_storealign_mask_pack_postupdate(__ubuf__ uint8_t
 
 ## 参数说明
 
-### 掩码寄存器立即数偏移搬出模式
+### 掩码寄存器搬出模式
 
-**表 1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输入/输出 | 目的操作数（矢量）的起始地址，搬运完成后该地址会被硬件自动Post Update。 |
+| dst | 输入/输出 | 目的操作数的起始地址，按指针引用传入。类型为`__ubuf__ <dtype>*&`，起始地址需16字节对齐。搬出完成后，该指针由硬件自动更新。 |
 | src | 输入 | 源操作数（掩码寄存器）。 |
-| offset | 输入 | 地址偏移量。 |
+| offset | 输入 | 地址偏移量，类型为`int32_t`，单位为字节。接口执行后，`dst`指针的底层UB地址更新`offset`字节。 |
 
 掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
@@ -76,12 +72,17 @@ __simd_callee__ inline void asc_storealign_mask_pack_postupdate(__ubuf__ uint8_t
 
 ## 约束说明
 
-- 非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- dst起始地址需32字节对齐，否则会报错。
-- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的操作数的实际访问地址和Post Update后的地址不可超过实际可用容量，否则会报错。
+### 通用约束
+
+- 本接口非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为掩码寄存器，目的操作数为UB地址。UB地址空间外的指针不可作为目的地址传入。
+- UB总容量为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈和2KB Ascend C预留空间，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作为Data Cache，可用容量进一步减少）。目的操作数的写出范围和Post Update后的地址不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
-- Post Update后的dst新地址仍需32字节对齐，否则下一次调用本接口会报错。
+
+### 掩码寄存器压缩搬出场景
+
+- `dst`起始地址需16字节对齐。
+- `offset`的单位为字节。Post Update后的`dst`新地址仍需16字节对齐，且本次写出范围和更新后的地址均需落在UB可用容量范围内。
 
 ## 调用示例
 

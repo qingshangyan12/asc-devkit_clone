@@ -26,9 +26,7 @@
 
 ## 功能说明
 
-将掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）。
-
-当源操作数为掩码寄存器时，单次搬出量为掩码寄存器长度（32字节），将掩码寄存器中的数据直接搬出，不支持配置掩码。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。
+将掩码寄存器中的数据搬出到32字节对齐的Unified Buffer（UB）地址，单次搬出量为掩码寄存器长度（32字节），将掩码寄存器中的数据直接搬出，不支持配置掩码。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。
 
 掩码寄存器搬出场景提供以下三种模式：
 
@@ -51,7 +49,7 @@ __simd_callee__ inline void asc_storealign_mask(__ubuf__ <dtype>* dst,
 
 dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign_mask(__ubuf__ uint8_t* dst,
@@ -70,7 +68,7 @@ __simd_callee__ inline void asc_storealign_mask(__ubuf__ <dtype>* dst,
 
 dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign_mask(__ubuf__ uint8_t* dst,
@@ -90,7 +88,7 @@ __simd_callee__ inline void asc_storealign_mask(__ubuf__ <dtype>* dst,
 
 dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign_mask(__ubuf__ uint8_t* dst,
@@ -129,7 +127,7 @@ __simd_callee__ inline void asc_storealign_mask(__ubuf__ uint8_t* dst,
 | src | 输入 | 源操作数（掩码寄存器）。 |
 | offset | 输入 | 地址寄存器偏移，类型为`addr_reg`，由配套的地址寄存器构造接口预先构造。 |
 
-掩码寄存器和地址寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
+掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -137,11 +135,16 @@ __simd_callee__ inline void asc_storealign_mask(__ubuf__ uint8_t* dst,
 
 ## 约束说明
 
+### 通用约束
+
 - 非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - dst起始地址需32字节对齐，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的操作数地址偏移后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+
+### 掩码寄存器搬出场景
+
 - `int32_t offset`的单位为字节。通过offset参数偏移后的实际访问地址需落在UB地址范围内，且仍需32字节对齐，否则会报错。
 
 ## 调用示例

@@ -47,16 +47,16 @@ __simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
+`dtype`支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint8_t* dst,
                                                      vector_bool src)
 ```
 
-### 掩码寄存器立即数偏移搬出模式
+### 掩码寄存器立即数偏移压缩搬出
 
 ```c
 __simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ <dtype>* dst,
@@ -66,9 +66,9 @@ __simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
+`dtype`支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint8_t* dst,
@@ -76,7 +76,7 @@ __simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint8_t* dst,
                                                      int32_t offset)
 ```
 
-### 掩码寄存器地址寄存器偏移搬出模式
+### 掩码寄存器地址寄存器偏移压缩搬出
 
 ```c
 __simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ <dtype>* dst,
@@ -86,9 +86,9 @@ __simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
+`dtype`支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint8_t* dst,
@@ -100,30 +100,30 @@ __simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint8_t* dst,
 
 ### 掩码寄存器连续对齐搬出模式
 
-**表 1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。 |
+| dst | 输出 | 目的操作数的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需16字节对齐。 |
 | src | 输入 | 源操作数（掩码寄存器）。 |
 
 ### 掩码寄存器立即数偏移搬出模式
 
-**表 2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。 |
+| dst | 输出 | 目的操作数的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需16字节对齐。 |
 | src | 输入 | 源操作数（掩码寄存器）。 |
-| offset | 输入 | 相对dst起始地址的偏移量，类型为`int32_t`，单位为字节。 |
+| offset | 输入 | 相对`dst`起始地址的偏移量，类型为`int32_t`，单位为字节。 |
 
 ### 掩码寄存器地址寄存器偏移搬出模式
 
-**表 3**  参数说明
+**表3** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的操作数（矢量）的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。 |
+| dst | 输出 | 目的操作数的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需16字节对齐。 |
 | src | 输入 | 源操作数（掩码寄存器）。 |
 | offset | 输入 | 地址寄存器偏移，类型为`addr_reg`，由配套的地址寄存器构造接口预先构造。 |
 
@@ -135,12 +135,18 @@ __simd_callee__ inline void asc_storealign_mask_pack(__ubuf__ uint8_t* dst,
 
 ## 约束说明
 
-- 非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- dst起始地址需32字节对齐，否则会报错。
-- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的操作数地址偏移后不可超过实际可用容量，否则会报错。
+### 通用约束
+
+- 本接口非AIV调用直接返回。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为掩码寄存器，目的操作数为UB地址。UB地址空间外的指针不可作为目的地址传入。
+- UB总容量为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈和2KB Ascend C预留空间，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作为Data Cache，可用容量进一步减少）。目的操作数地址偏移后对应的UB范围不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
-- `int32_t offset`的单位为字节。通过offset参数偏移后的实际访问地址需落在UB地址范围内，且仍需32字节对齐，否则会报错。
+
+### 掩码寄存器搬出场景
+
+- `dst`起始地址需16字节对齐。
+- `int32_t offset`的单位为字节，通过`offset`参数偏移后的实际访问地址需落在UB地址范围内，且仍需16字节对齐，否则会报错。
+- `addr_reg offset`必须由配套的地址寄存器构造接口预先构造。偏移后的实际访问地址需落在UB地址范围内，且仍需16字节对齐，否则会报错。
 
 ## 调用示例
 

@@ -26,11 +26,7 @@
 
 ## 功能说明
 
-将掩码寄存器中的数据连续对齐搬出到Unified Buffer（UB），启用Post Update模式在搬出后自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。当源操作数为掩码寄存器时，单次搬出量为掩码寄存器长度（32字节），不支持配置掩码。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。
-
-掩码寄存器搬出场景提供以下一种模式：
-
-- **立即数偏移搬出模式**：将掩码寄存器中的数据连续对齐搬出到当前目的地址，搬出完成后基于立即数累加目的地址指针，单位为字节。
+将掩码寄存器中的数据连续搬出到32字节对齐的Unified Buffer（UB）地址，启用Post Update模式在搬出后自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。单次搬出量为掩码寄存器长度（32字节），不支持配置掩码。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。
 
 本接口仅在AIV上生效。
 
@@ -48,7 +44,7 @@ __simd_callee__ inline void asc_storealign_mask_postupdate(__ubuf__ <dtype>*& ds
 
 dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-#### 典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign_mask_postupdate(__ubuf__ uint8_t*& dst,
@@ -76,11 +72,16 @@ __simd_callee__ inline void asc_storealign_mask_postupdate(__ubuf__ uint8_t*& ds
 
 ## 约束说明
 
+### 通用约束
+
 - 非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - dst起始地址需32字节对齐，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的操作数的实际访问地址和Post Update后的地址不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+
+### 掩码寄存器搬出场景
+
 - Post Update后的dst新地址仍需32字节对齐，否则下一次调用本接口会报错。
 
 ## 调用示例

@@ -26,13 +26,19 @@
 
 ## 功能说明
 
-将掩码寄存器中的数据压缩后连续搬出到8字节对齐的Unified Buffer（UB）地址，硬件指令均从每4bit数据中提取最低有效位（LSB），将掩码寄存器中32B数据打包成8B，写入UB。启用Post Update模式在搬出后自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。需配合后处理接口[asc_storeunalign_post](asc_storeunalign_post.md)使用。
+将掩码寄存器中的数据连续搬出到8字节对齐的Unified Buffer（UB）地址，启用Post Update模式在搬出后自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。
+
+针对掩码寄存器，本接口提供一种模式：
+
+- **掩码寄存器PACK_QUARTER搬出模式：** 硬件指令从每4bit数据中提取最低有效位（LSB），将掩码寄存器中32B数据打包成8B，写入UB。搬运完成后UB地址按8B偏移量更新。需配合后处理接口[asc_storeunalign_post](asc_storeunalign_post.md)使用。
 
 本接口可以拼接上一段**连续的尾块**和本次搬运主块部分，并同时更新本次尾块数据至非对齐寄存器中。首次搬运可以使用未初始化的非对齐寄存器。若上一次搬运的尾块和本次搬运主块不连续，则每一次尾块处理都需要调用后处理接口。若连续，仅最后一次尾块处理需要调用后处理接口。
 
 本接口仅在AIV上生效。
 
 ## 函数原型
+
+### 掩码寄存器搬出模式
 
 ```c
 __simd_callee__ inline void asc_storeunalign_mask_pack_quarter_postupdate(
@@ -41,11 +47,11 @@ __simd_callee__ inline void asc_storeunalign_mask_pack_quarter_postupdate(
     vector_bool src)
 ```
 
-### dtype支持数据类型
+#### dtype支持数据类型
 
 `dtype`支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
-### 函数原型典型示例
+#### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storeunalign_mask_pack_quarter_postupdate(
@@ -55,6 +61,8 @@ __simd_callee__ inline void asc_storeunalign_mask_pack_quarter_postupdate(
 ```
 
 ## 参数说明
+
+### 掩码寄存器搬出模式
 
 **表1** 参数说明
 
@@ -83,7 +91,7 @@ __simd_callee__ inline void asc_storeunalign_mask_pack_quarter_postupdate(
 
 - 连续调用时须复用同一个`unalign_reg`。
 - 掩码寄存器PACK_QUARTER搬出模式须使用[asc_storeunalign_post](asc_storeunalign_post.md)的立即数偏移搬出模式收尾，复用同一个`unalign_reg`。
-- `b8`、`b16`、`b32`类型目的地址均需8字节对齐。
+- 掩码寄存器搬出场景，`b8`、`b16`、`b32`类型目的地址均需8字节对齐。
 
 ## 调用示例
 
