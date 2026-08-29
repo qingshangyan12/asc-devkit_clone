@@ -38,6 +38,7 @@ struct KfcReduceScatterMesh1DMem2MemContext : CcuKernelCtxBase {
     HcclDataType dataType;
     HcclDataType outputDataType;
     HcclReduceOp reduceOp;
+    bool peerOnly{false};
 
     std::vector<ccu::Variable> input;
     ccu::Variable output;
@@ -70,7 +71,6 @@ struct KfcReduceScatterMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::LocalAddr myInput;
     std::vector<ccu::RemoteAddr> remoteInput;
     std::vector<ccu::LocalAddr> scratchMem;
-    ccu::Event event;
 };
 
 static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext& ctx)
@@ -233,6 +233,18 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
     myOutput.addr += ctx.currentRankSliceOutputOffset;
     myOutput.token = ctx.token[ctx.rankId];
 
+    if (ctx.peerOnly) {
+        const uint32_t peerRank = ctx.rankId ^ 1U;
+        CCU_IF(ctx.currentSliceSize != 0)
+        {
+            ccu::ReadReduce(
+                ctx.channels[0], myOutput, ctx.remoteInput[peerRank], ctx.currentSliceSize, ctx.dataType, ctx.reduceOp,
+                ctx.events[0], 1 << peerRank);
+            ccu::EventWait(ctx.events[0], 1 << peerRank);
+        }
+        return CCU_SUCCESS;
+    }
+
     CCU_IF(ctx.sliceSize != 0)
     {
         if (ctx.rankSize <= REDUCE_SCATTER_GROUP_REDUCE_MAX_PIECE_CNT) {
@@ -312,6 +324,11 @@ static CcuResult DoReduceScatterReduce(KfcReduceScatterMesh1DMem2MemContext& ctx
 static CcuResult DoReduceScatterThreePhase(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
     InitReduceScatterAddr(ctx);
+
+    // Peer-only consumes the peer's matmul result directly and does not need the normal scratch pipeline.
+    if (ctx.peerOnly) {
+        return DoReduceScatter(ctx);
+    }
 
     // 软件展开三阶段:Phase1 批量非阻塞 ReadNb / Phase2 批量 Wait / Phase3 串行 Reduce
     ctx.waitRepeatNum = ctx.repeatNum;
@@ -409,7 +426,7 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     ccu::Variable fullGoParallelParam, ccu::Variable fullGoResidual, ccu::Variable tailGoAddrOffset,
     ccu::Variable tailGoLoopParam, ccu::Variable tailGoParallelParam, ccu::Variable tailGoResidual,
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType)
+    const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType, bool peerOnly)
 {
     KfcReduceScatterMesh1DMem2MemContext ctx;
     ctx.channels = channels;
@@ -422,6 +439,7 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
         ctx.outputDataType = dataType;
     }
     ctx.reduceOp = reduceType;
+    ctx.peerOnly = peerOnly;
     HCCL_INFO(
         "[CcuKernelReduceScatterMesh1DMem2Mem] Init, KernelArgs are rankId[%u], rankSize_[%u], dataType[%d], "
         "outputDataType[%d], reduceOp[%d]",

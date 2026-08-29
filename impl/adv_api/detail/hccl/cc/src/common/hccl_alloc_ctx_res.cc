@@ -148,7 +148,7 @@ bool IsCcuKfcSupportedOp(uint32_t opType)
 }
 } // namespace
 
-HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum)
+HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], uint32_t tilingNum, uint32_t rankSize)
 {
     CHK_PTR_NULL(mc2Tiling);
     CHK_PTR_NULL(ccTilingList);
@@ -174,6 +174,10 @@ HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], ui
             HCCL_ERROR(
                 "Unsupported CCU KFC tiling at index %u, opType %u, commEngine %u.", i, ccTiling->opType,
                 ccTiling->commEngine);
+            return HCCL_E_NOT_SUPPORT;
+        }
+        if (rankSize != 2U && std::string(ccTiling->algConfig) == "CcuReduceScatterMeshMem2Mem1DPeerOnly") {
+            HCCL_ERROR("Peer-only ReduceScatter requires rank size 2, but got %u.", rankSize);
             return HCCL_E_NOT_SUPPORT;
         }
     }
