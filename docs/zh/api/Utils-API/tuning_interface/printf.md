@@ -105,7 +105,7 @@ static __attribute__((noinline)) void printf(const char* fmt, Args&&... args);
     ```
 
 <!-- npu="950" id15 -->
--   在`simd_vf`场景下，每个AIV核使用2KB预留UB空间作为FIFO临时缓冲区。同一次`asc_vf_call`中，`printf`、`asc_dump`和`assert`产生的累计调测数据可以超过2KB，但每条完整编码数据必须能放入该缓冲区；否则，该条数据不会打印。
+-   SIMD VF场景下，每个AIV核在单次`asc_vf_call`执行期间使用2KB预留UB空间临时保存调测数据。同一次`asc_vf_call`中的`assert`、`ascendc_assert`、`printf`和`asc_dump`共享该空间。该空间中的数据传输完成后会被复用，因此上述接口产生的累计调测数据可以超过2KB。单条调测数据必须能完整保存在该空间中，否则该条数据不会打印。
 -   每次调用`simd_vf`的`printf`时，除格式字符串和参数外，还会固定占用32字节；整条打印数据需要按8字节对齐。
 <!-- end id15 -->
 
