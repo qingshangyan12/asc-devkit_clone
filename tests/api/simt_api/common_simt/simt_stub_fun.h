@@ -307,4 +307,82 @@ bfloat16x2_t atomicCAS(__gm__ bfloat16x2_t* address, bfloat16x2_t value1, bfloat
 
 float __fabsf(float x);
 
+int32_t __shfl(int32_t var, int32_t src_lane, int32_t width);
+
+uint32_t __shfl(uint32_t var, int32_t src_lane, int32_t width);
+
+float __shfl(float var, int32_t src_lane, int32_t width);
+
+int64_t __shfl(int64_t var, int32_t src_lane, int32_t width);
+
+uint64_t __shfl(uint64_t var, int32_t src_lane, int32_t width);
+
+half __shfl(half var, int32_t src_lane, int32_t width);
+
+half2 __shfl(half2 var, int32_t src_lane, int32_t width);
+
+int32_t __shfl_up(int32_t var, int32_t delta, int32_t width);
+
+uint32_t __shfl_up(uint32_t var, int32_t delta, int32_t width);
+
+float __shfl_up(float var, int32_t delta, int32_t width);
+
+int64_t __shfl_up(int64_t var, int32_t delta, int32_t width);
+
+uint64_t __shfl_up(uint64_t var, int32_t delta, int32_t width);
+
+int32_t __shfl_down(int32_t var, int32_t delta, int32_t width);
+
+uint32_t __shfl_down(uint32_t var, int32_t delta, int32_t width);
+
+float __shfl_down(float var, int32_t delta, int32_t width);
+
+int64_t __shfl_down(int64_t var, int32_t delta, int32_t width);
+
+uint64_t __shfl_down(uint64_t var, int32_t delta, int32_t width);
+
+int32_t __shfl_xor(int32_t var, int32_t lane_mask, int32_t width);
+
+uint32_t __shfl_xor(uint32_t var, int32_t lane_mask, int32_t width);
+
+float __shfl_xor(float var, int32_t lane_mask, int32_t width);
+
+int64_t __shfl_xor(int64_t var, int32_t lane_mask, int32_t width);
+
+uint64_t __shfl_xor(uint64_t var, int32_t lane_mask, int32_t width);
+
+half __shfl_up(half var, int32_t delta, int32_t width);
+
+half2 __shfl_up(half2 var, int32_t delta, int32_t width);
+
+half __shfl_down(half var, int32_t delta, int32_t width);
+
+half2 __shfl_down(half2 var, int32_t delta, int32_t width);
+
+half __shfl_xor(half var, int32_t lane_mask, int32_t width);
+
+half2 __shfl_xor(half2 var, int32_t lane_mask, int32_t width);
+
+bfloat16_t __shfl(bfloat16_t var, int32_t src_lane, int32_t width);
+
+bfloat16x2_t __shfl(bfloat16x2_t var, int32_t src_lane, int32_t width);
+
+bfloat16_t __shfl_up(bfloat16_t var, int32_t delta, int32_t width);
+
+bfloat16x2_t __shfl_up(bfloat16x2_t var, int32_t delta, int32_t width);
+
+bfloat16_t __shfl_down(bfloat16_t var, int32_t delta, int32_t width);
+
+bfloat16x2_t __shfl_down(bfloat16x2_t var, int32_t delta, int32_t width);
+
+bfloat16_t __shfl_xor(bfloat16_t var, int32_t lane_mask, int32_t width);
+
+bfloat16x2_t __shfl_xor(bfloat16x2_t var, int32_t lane_mask, int32_t width);
+
+int64_t clz(uint64_t x);
+
+int64_t bcnt1(uint64_t x);
+
+uint64_t __cce_simt_get_para_base_imp();
+
 #endif
