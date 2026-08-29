@@ -222,7 +222,7 @@ public:
         }
     }
 #endif
-    __aicore__ inline constexpr TBufHandle GetBufferHandle() const { return address_.bufferHandle; }
+    __aicore__ __callee__ inline TBufHandle GetBufferHandle() const { return address_.bufferHandle; }
 
 public:
     TBuffAddr address_;
@@ -265,33 +265,33 @@ class BaseTensorTraitTensor {};
 template <typename T, TPosition pos, typename LayoutType>
 class BaseTensorTraitTensor<TensorTrait<T, pos, LayoutType>> {
 public:
-    __aicore__ inline constexpr TensorTrait<T, pos, LayoutType>& GetTensorTrait();
-    __aicore__ inline constexpr const TensorTrait<T, pos, LayoutType>& GetTensorTrait() const;
-    __aicore__ inline constexpr void SetTensorTrait(const TensorTrait<T, pos, LayoutType>& newTrait);
-    __aicore__ inline constexpr decltype(auto) GetLayout() const { return trait.GetLayout(); }
-    __aicore__ inline constexpr decltype(auto) GetShape() const { return trait.GetShape(); }
-    __aicore__ inline constexpr decltype(auto) GetStride() const { return trait.GetStride(); }
+    __aicore__ __callee__ inline TensorTrait<T, pos, LayoutType>& GetTensorTrait();
+    __aicore__ __callee__ inline const TensorTrait<T, pos, LayoutType>& GetTensorTrait() const;
+    __aicore__ __callee__ inline void SetTensorTrait(const TensorTrait<T, pos, LayoutType>& newTrait);
+    __aicore__ __callee__ inline decltype(auto) GetLayout() const { return trait.GetLayout(); }
+    __aicore__ __callee__ inline decltype(auto) GetShape() const { return trait.GetShape(); }
+    __aicore__ __callee__ inline decltype(auto) GetStride() const { return trait.GetStride(); }
 
 private:
     TensorTrait<T, pos, LayoutType> trait = {};
 };
 
 template <typename T, TPosition pos, typename LayoutType>
-__aicore__ inline constexpr TensorTrait<T, pos, LayoutType>&
+__aicore__ __callee__ inline TensorTrait<T, pos, LayoutType>&
 BaseTensorTraitTensor<TensorTrait<T, pos, LayoutType>>::GetTensorTrait()
 {
     return this->trait;
 }
 
 template <typename T, TPosition pos, typename LayoutType>
-__aicore__ inline constexpr const TensorTrait<T, pos, LayoutType>&
+__aicore__ __callee__ inline const TensorTrait<T, pos, LayoutType>&
 BaseTensorTraitTensor<TensorTrait<T, pos, LayoutType>>::GetTensorTrait() const
 {
     return this->trait;
 }
 
 template <typename T, TPosition pos, typename LayoutType>
-__aicore__ inline constexpr void BaseTensorTraitTensor<TensorTrait<T, pos, LayoutType>>::SetTensorTrait(
+__aicore__ __callee__ inline void BaseTensorTraitTensor<TensorTrait<T, pos, LayoutType>>::SetTensorTrait(
     const TensorTrait<T, pos, LayoutType>& newTrait)
 {
     this->trait = newTrait;

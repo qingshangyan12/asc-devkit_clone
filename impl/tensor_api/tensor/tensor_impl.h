@@ -40,7 +40,7 @@ __aicore__ inline base_tensor<EngineT, LayoutT>::base_tensor()
 {}
 
 template <typename EngineT, typename LayoutT>
-__aicore__ inline constexpr base_tensor<EngineT, LayoutT>::base_tensor(const EngineT& engine, const LayoutT& layout)
+__aicore__ __callee__ inline base_tensor<EngineT, LayoutT>::base_tensor(const EngineT& engine, const LayoutT& layout)
     : rep(layout, engine)
 {}
 
