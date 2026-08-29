@@ -239,14 +239,12 @@ npu_op_kernel_options(ascendc_kernels AddCustomTemplate COMPUTE_UNIT Ascendxxyy 
 
 ### 收窄芯片范围
 
-`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`配置了多少个芯片型号，核函数（Kernel）侧通常就会按芯片型号分别编译。开发阶段如果只在当前机器上验证，可修改CMakeLists.txt中的任一配置保留当前SOC，或者在CMake配置阶段临时只构建某个SOC。以下示例只构建ascendxxyy SOC的示例：
+`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`配置了多少个芯片型号，核函数（Kernel）侧通常就会按芯片型号分别编译。开发阶段如果只在当前机器上验证，可修改CMakeLists.txt中的任一配置保留当前SOC，或者在CMake配置阶段临时只构建某个SOC。以下示例只构建ascendxxx SOC的示例：
 
 ```bash
-cmake -S . -B build_out --preset=default -DASCEND_SOC_SERIES=ascendxxyy
+cmake -S . -B build_out --preset=default -DASCEND_SOC_SERIES=ascendxxx
 ```
-
-也可以使用兼容的旧参数`-DASCEND_COMPUTE_UNIT=ascendxxyy`；两个参数不能同时传入。
-
+也可以使用参数`-DASCEND_COMPUTE_UNIT=ascendxxxyy`；两个参数不能同时传入。
 ### 跳过核函数（Kernel）二进制编译
 
 如果当前只需要生成源码包，或暂时不需要核函数（Kernel） `.o`二进制，可关闭二进制包生成。顶层`CMakeLists.txt`中应使用变量形式传递`ENABLE_BINARY_PACKAGE`：

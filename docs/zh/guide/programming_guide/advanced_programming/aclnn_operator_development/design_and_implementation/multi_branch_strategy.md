@@ -126,7 +126,7 @@ npu_op_kernel_options(ascendc_kernels MyOp
     OPTIONS --tiling_key=1)
 ```
 
-按系列配置时可将`COMPUTE_UNIT`替换为`SOC_SERIES`，例如`SOC_SERIES Ascendxxxyy Ascendzzzww`。同一次调用中两者不能同时使用。
+按系列配置时可将`COMPUTE_UNIT`替换为`SOC_SERIES`，例如`SOC_SERIES Ascendxxx`。同一次调用中两者不能同时使用。
 
 关于编译选项的完整说明见[编译与部署基本流程](../compilation_and_deployment/basic_process.md#custom-compile-options)。
 

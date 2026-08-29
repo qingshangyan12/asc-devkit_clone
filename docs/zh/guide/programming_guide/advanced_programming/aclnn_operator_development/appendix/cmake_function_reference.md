@@ -181,7 +181,6 @@ npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version>... | S
 - `<op_type>`（必选）：定义配置生效的范围，取值为`ALL`、`OP_TYPE`。`ALL`表示对所有算子生效，`OP_TYPE`表示对特定算子生效。
 - `[COMPUTE_UNIT <soc_version>...]`（可选）：用于设置算子在具体AI处理器型号上的编译选项，不填写该选项时默认对所有型号生效。与`SOC_SERIES`不能同时使用。
 - `[SOC_SERIES <series>...]`（可选）：用于按AI处理器系列设置编译选项。输入不区分大小写；与`COMPUTE_UNIT`不能同时使用。`SOC_SERIES`关键字后必须提供至少一个值；同一次调用同时提供`SOC_SERIES`和`COMPUTE_UNIT`，或只提供`SOC_SERIES`关键字不提供值，CMake配置阶段会报错。
-
 >[!NOTE]说明 
 >其中，AI处理器型号`soc_version`请通过以下方式获取：
 ><!-- npu="910b,910,310p,310b" id1 -->
@@ -214,9 +213,8 @@ npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version>... | S
 
 ```cmake
 npu_op_kernel_options(ascendc_kernels ALL OPTIONS --save-temp-files -g)   #为算子添加编译选项
-npu_op_kernel_options(ascendc_kernels AddCustom SOC_SERIES Ascendxxxyy Ascendzzzww OPTIONS -DASCENDC_DEBUG)
 ```
-
+npu_op_kernel_options(ascendc_kernels AddCustom SOC_SERIES Ascendxxx Ascendyyy OPTIONS -DASCENDC_DEBUG)
 ### npu_op_kernel_sources
 
 描述核函数（Kernel）目标的源码信息，包括设置算子的核函数（Kernel）实现文件和源码路径等。
@@ -244,18 +242,15 @@ npu_op_kernel_sources(ascendc_kernels
     KERNEL_FILE add_custom.cpp
 )
 ```
-
-也可以使用`SOC_SERIES`按系列指定源码，多个系列值用空格分隔：
-
+也可以使用`SOC_SERIES`按系列指定：
 ```cmake
 npu_op_kernel_sources(ascendc_kernels
     OP_TYPE AddCustom
     KERNEL_DIR ./Add
-    SOC_SERIES Ascendxxxyy Ascendzzzww
+    SOC_SERIES Ascendxxx
     KERNEL_FILE add_custom.cpp
 )
 ```
-
 ### npu_op_device_tiling_library
 
 创建Device侧Tiling库。使用该选项时，package的类型仅支持配置为RUN（run包模式）。

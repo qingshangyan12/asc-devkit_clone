@@ -133,7 +133,7 @@ build_out/op_kernel/AddCustom_ascendxxyy/kernel_*/kernel_meta_<kernel_name>/kern
 
 ### 部分芯片编译失败处理
 
-当`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`配置了多个芯片型号时，核函数（Kernel）编译会对每个芯片独立执行一轮。如果某个芯片对应的核函数（Kernel）编译失败，默认行为是终止整个构建流程。
+当`ASCEND_SOC_SERIES`或`ASCEND_COMPUTE_UNIT`配置了多个芯片型号时，核函数（Kernel）编译会对每个芯片独立执行一轮。如果某个芯片的核函数（Kernel）编译失败，默认行为是终止整个构建流程。
 
 `ASCEND_SKIP_FAILED_COMPUTE_UNIT`选项允许跳过单个芯片的编译失败，继续编译其余芯片。适用场景：
 

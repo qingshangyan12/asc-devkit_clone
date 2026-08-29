@@ -33,10 +33,10 @@
 | 参数名称 | 参数描述 | 默认值 |
 |---------|---------|--------|
 | ASCEND_SOC_SERIES | AI处理器系列，支持配置一个或多个值。输入不区分大小写，配置值会先归一为小写。 | 无 |
-| ASCEND_COMPUTE_UNIT | AI处理器系列，按实际运行芯片配置。旧配置方式，行为保持不变。 | 框架默认值（未配置`ASCEND_SOC_SERIES`时） |
+| ASCEND_COMPUTE_UNIT | AI处理器型号，按实际运行芯片配置。 | "ascendxxx" |
 | vendor_name | 自定义算子所属厂商名称，用于形成`vendors/<vendor_name>`安装目录，避免与其他厂商算子包冲突；同一安装路径下`vendor_name`相同的算子包会安装到同一目录，同名文件会覆盖。 | "customize" |
 
-`ASCEND_SOC_SERIES`与`ASCEND_COMPUTE_UNIT`不能同时配置，且`ASCEND_SOC_SERIES`不能为空。`ASCEND_SOC_SERIES`是CMake列表，在`CMakePresets.json`或CMake命令中使用分号分隔多个值（例如`Ascendxxxyy;Ascendzzzww`）；同一芯片型号的不同大小写形式会归一为相同值。
+`ASCEND_SOC_SERIES`与`ASCEND_COMPUTE_UNIT`不能同时配置，且`ASCEND_SOC_SERIES`不能为空。
 
 除上述必改参数外，其他可选编译配置选项详情如下：
 
@@ -76,9 +76,9 @@
         {
             "name": "default",
             "cacheVariables": {
-                "ASCEND_SOC_SERIES": {
+                "ASCEND_COMPUTE_UNIT": {
                     "type": "STRING",
-                    "value": "Ascendxxxyy;Ascendzzzww"
+                    "value": "ascendxxyy"
                 },
                 "vendor_name": {
                     "type": "STRING",
@@ -95,8 +95,8 @@
 直接在顶层CMakeLists.txt中设置变量，并通过`npu_op_*`接口配置编译行为，无需CMakePresets.json文件。
 
 ```cmake
-# 设置必要变量。也可以使用旧变量ASCEND_COMPUTE_UNIT，二者不能同时设置。
-set(ASCEND_SOC_SERIES "Ascendxxxyy;Ascendzzzww")
+# 设置必要变量。也可以使用变量ASCEND_SOC_SERIES，二者不能同时设置。
+set(ASCEND_COMPUTE_UNIT "ascendxxxyy") | set(ASCEND_SOC_SERIES "Ascendxxx")
 set(vendor_name "customize")
 
 # 配置编译产物包（通过CONFIG参数替代ENABLE_SOURCE_PACKAGE / ENABLE_BINARY_PACKAGE等变量）
@@ -444,7 +444,13 @@ npu_op_kernel_options(ascendc_kernels ALL OPTIONS --save-temp-files -g)
 # 2. 指定核函数（Kernel）源码
 npu_op_kernel_sources(ascendc_kernels
     OP_TYPE AddCustom                              #算子类型
-    SOC_SERIES Ascendxxxyy Ascendzzzww           # AI处理器型号，可填写多个值
+    COMPUTE_UNIT ascendxxxyy                       # AI处理器型号
+    KERNEL_FILE add_custom.cpp                     # kernel实现文件名
+)
+或者
+npu_op_kernel_sources(ascendc_kernels
+    OP_TYPE AddCustom                              #算子类型
+    SOC_SERIES Ascendxxx                           # AI处理器型号
     KERNEL_FILE add_custom.cpp                     # kernel实现文件名
 )
 
@@ -622,7 +628,7 @@ npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version>... | S
 | target_name | 必选 | 核函数（Kernel）库的目标名称（如`ascendc_kernels`）。 |
 | op_type | 必选 | 算子类型。如需对所有算子生效，配置为`ALL`。 |
 | COMPUTE_UNIT | 可选 | AI处理器型号，不配置时对所有型号生效。与`SOC_SERIES`不能同时使用。 |
-| SOC_SERIES | 可选 | AI处理器系列，支持一个或多个值，输入不区分大小写。与`COMPUTE_UNIT`不能同时使用。 |
+| SOC_SERIES | 可选 | AI处理器系列，输入不区分大小写。与`COMPUTE_UNIT`不能同时使用。 |
 | OPTIONS | 必选 | 自定义编译选项，多个选项用空格间隔。支持`--save-temp-files`、`-g`、`-DASCENDC_DEBUG`等。 |
 
 **常见示例**：
@@ -632,10 +638,10 @@ npu_op_kernel_options(<target_name> <op_type> [COMPUTE_UNIT <soc_version>... | S
 npu_op_kernel_options(ascendc_kernels ALL OPTIONS --save-temp-files)
 
 # 为特定算子在特定型号上开启AscendC调试宏
-npu_op_kernel_options(ascendc_kernels AddCustom COMPUTE_UNIT ascendxxyy OPTIONS -DASCENDC_DEBUG)
+npu_op_kernel_options(ascendc_kernels AddCustom COMPUTE_UNIT ascendxxxyy OPTIONS -DASCENDC_DEBUG)
 
 # 使用SOC_SERIES按系列配置，多个值用空格分隔
-npu_op_kernel_options(ascendc_kernels AddCustom SOC_SERIES Ascendxxxyy Ascendzzzww OPTIONS -DASCENDC_DEBUG)
+npu_op_kernel_options(ascendc_kernels AddCustom SOC_SERIES Ascendxxx OPTIONS -DASCENDC_DEBUG)
 ```
 
 > [!NOTE]说明
@@ -679,4 +685,5 @@ Ascend C框架提供的编译选项介绍如下：
 - [算子动态库和静态库编译](./dynamic_static_lib_compilation.md) — 动态库/静态库编译方式。
 - [编译过程调试](./compilation_debug.md) — 查看实际编译命令、保留中间产物和常见错误诊断。
 - [编译加速](./compilation_acceleration.md) — 构建加速策略（选择性编译、缓存、增量编译等）。
+- [simplified key二进制配置JSON](./simplified_key_json_configuration.md) — 按自定义simplified key编译多份binary的配置方法。
 - [交叉编译](./cross_compilation.md) — 跨平台架构编译。
