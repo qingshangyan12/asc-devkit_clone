@@ -19,9 +19,9 @@ class TensorApiVectorCompareAndSelect3510 : public testing::Test {};
 template <typename T>
 __aicore__ inline void TestSelect()
 {
-    asc::te::experimental::reg_tensor<bool> condition {};
-    asc::te::experimental::reg_tensor<T> src0 {};
-    asc::te::experimental::reg_tensor<T> src1 {};
+    asc::te::experimental::reg_tensor<bool> condition{};
+    asc::te::experimental::reg_tensor<T> src0{};
+    asc::te::experimental::reg_tensor<T> src1{};
     src0.mask = asc::te::experimental::all_mask<T>().reg;
 
     auto dst = asc::te::experimental::select(condition, src0, src1);
@@ -29,8 +29,7 @@ __aicore__ inline void TestSelect()
     EXPECT_EQ(dst.mask, src0.mask);
 }
 
-#define SELECT_TYPE_TEST(DataType) \
-    COMPARE_AND_SELECT_TEST(Select, DataType)
+#define SELECT_TYPE_TEST(DataType) COMPARE_AND_SELECT_TEST(Select, DataType)
 
 SELECT_TYPE_TEST(bool)
 SELECT_TYPE_TEST(uint8_t)

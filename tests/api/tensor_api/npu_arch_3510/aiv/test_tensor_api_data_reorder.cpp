@@ -19,8 +19,8 @@ class TensorApiVectorDataReorder3510 : public testing::Test {};
 template <typename T>
 __aicore__ inline void TestInterleave()
 {
-    asc::te::experimental::reg_tensor<T> src0 {};
-    asc::te::experimental::reg_tensor<T> src1 {};
+    asc::te::experimental::reg_tensor<T> src0{};
+    asc::te::experimental::reg_tensor<T> src1{};
 
     auto [dst0, dst1] = asc::te::experimental::interleave<T>(src0, src1);
     auto mask = asc::te::experimental::all_mask<uint8_t>();
@@ -31,23 +31,23 @@ __aicore__ inline void TestInterleave()
 template <typename T>
 __aicore__ inline void TestDeinterleave()
 {
-    asc::te::experimental::reg_tensor<T> src0 {};
-    asc::te::experimental::reg_tensor<T> src1 {};
-    
+    asc::te::experimental::reg_tensor<T> src0{};
+    asc::te::experimental::reg_tensor<T> src1{};
+
     auto mask = asc::te::experimental::all_mask<uint8_t>();
     auto [dst0, dst1] = asc::te::experimental::deinterleave<T>(src0, src1);
     EXPECT_EQ(dst0.mask, mask.reg);
     EXPECT_EQ(dst1.mask, mask.reg);
 }
 
-#define DATA_REORDER_TEST(Function, DataType)                                   \
-    TEST_F(TensorApiVectorDataReorder3510, Function##_##DataType)               \
-    {                                                                            \
-        Test##Function<DataType>();                                              \
-        SUCCEED();                                                               \
+#define DATA_REORDER_TEST(Function, DataType)                     \
+    TEST_F(TensorApiVectorDataReorder3510, Function##_##DataType) \
+    {                                                             \
+        Test##Function<DataType>();                               \
+        SUCCEED();                                                \
     }
 
-#define DATA_REORDER_TYPE_TESTS(DataType) \
+#define DATA_REORDER_TYPE_TESTS(DataType)   \
     DATA_REORDER_TEST(Interleave, DataType) \
     DATA_REORDER_TEST(Deinterleave, DataType)
 

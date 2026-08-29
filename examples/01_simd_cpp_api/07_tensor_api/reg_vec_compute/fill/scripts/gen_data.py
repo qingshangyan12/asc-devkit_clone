@@ -16,6 +16,7 @@ import os
 import argparse
 import numpy as np
 
+
 def gen_golden_data_simple():
     total_length = 256
     data_type = np.float32
