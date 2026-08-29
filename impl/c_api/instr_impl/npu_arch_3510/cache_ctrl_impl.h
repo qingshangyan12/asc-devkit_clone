@@ -9,8 +9,7 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.
+
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -23,6 +22,10 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_dcci_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_get_icache_preload_status_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_dci_impl.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_set_scalar_cache_mode_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/cache_ctrl_impl/asc_get_scalar_cache_mode_impl.h"
+#endif
 
 // ==========asc_icache_preload==========
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len)
@@ -52,6 +55,30 @@ __aicore__ inline int64_t asc_get_icache_preload_status() { return asc_get_icach
 
 //==============asc_dci===============
 __aicore__ inline void asc_dci() { asc_dci_impl(); }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+//==============asc_set_scalar_cache_mode===============
+__aicore__ inline void asc_set_scalar_cache_mode(asc_load_l2_cache_mode l2_cache_mode)
+{
+    asc_set_scalar_cache_mode_impl(l2_cache_mode);
+}
+
+__aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode l2_cache_mode)
+{
+    asc_set_scalar_cache_mode_impl(l2_cache_mode);
+}
+
+//==============asc_get_scalar_load/store_cache_mode===============
+__aicore__ inline asc_load_l2_cache_mode asc_get_scalar_load_cache_mode()
+{
+    return asc_get_scalar_load_cache_mode_impl();
+}
+
+__aicore__ inline asc_store_l2_cache_mode asc_get_scalar_store_cache_mode()
+{
+    return asc_get_scalar_store_cache_mode_impl();
+}
+#endif
 
 #endif
 

@@ -27,6 +27,7 @@ static uint16_t src_stride_global = 0;
 static bool NZ2ND_en_global = false;
 static bool NZ2DN_en_global = false;
 static void* gm_addr_global = nullptr;
+static void* l0c_addr_global = nullptr;
 static bool is_mock_copy_matrix_cc_to_ub = false;
 static void* ub_addr_global = nullptr;
 static uint64_t quant_pre_global = 0;
@@ -49,6 +50,9 @@ static uint64_t quant_pre_global = 0;
             EXPECT_EQ(nz2dn_en, NZ2DN_en_global);                                                               \
             if (gm_addr_global != nullptr) {                                                                    \
                 EXPECT_EQ(dst_addr, gm_addr_global);                                                            \
+            }                                                                                                   \
+            if (l0c_addr_global != nullptr) {                                                                   \
+                EXPECT_EQ(src_addr, l0c_addr_global);                                                           \
             }                                                                                                   \
             EXPECT_EQ(quant_pre, quant_pre_global);                                                             \
         }                                                                                                       \
@@ -634,6 +638,12 @@ inline void img2colv2_cbuf_to_cb(
 inline void wait_flag_dev(pipe_t pipe, uint8_t flag_id) {}
 inline void wait_intra_block(pipe_t pipe, uint8_t flag_id) {}
 inline void set_intra_block(pipe_t pipe, uint8_t sync_id) {}
+inline void wait_intra_block(pipe_t pipe, uint16_t flag_id) {}
+inline void set_intra_block(pipe_t pipe, uint16_t sync_id) {}
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+inline void wait_intra_block(pipe_t pipe, int flag_id) {}
+inline void set_intra_block(pipe_t pipe, int sync_id) {}
+#endif
 inline void rls_buf(pipe_t pipe, uint64_t buf_id, bool mode) {}
 
 inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {}
@@ -643,7 +653,7 @@ inline int64_t get_iqent(pipe_t pipe) { return 0; }
 #endif
 
 #if defined(__DAV_VEC__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "instr_impl/npu_arch_3510/utils_impl/utils_type.h"
+#include "c_api/defs/type.h"
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint16_t*& dst) {}
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint32_t*& dst) {}
 #endif

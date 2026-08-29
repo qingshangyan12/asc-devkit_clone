@@ -9,8 +9,7 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.
+
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -18,8 +17,6 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CUBE_COMPUTE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CUBE_COMPUTE_IMPL_H
 
-#include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_l0c2gm_config_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_l0c2gm_nz2nd_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_l0c_copy_nz_para_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_mmad_mx_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_mmad_impl.h"
@@ -34,19 +31,9 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_mmad_direction_m_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_mmad_direction_n_impl.h"
 
-__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
-{
-    asc_set_l0c2gm_config_impl(relu_pre, quant_pre, enable_unit_flag);
-}
-
 __aicore__ inline void asc_set_l0c_copy_nz_para(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride)
 {
     asc_set_l0c_copy_nz_para_impl(nd_num, src_nd_stride, dst_nd_stride);
-}
-
-__aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride)
-{
-    asc_set_l0c2gm_nz2nd_impl(nd_num, src_nd_stride, dst_nd_stride);
 }
 
 // ==========mmad_mx(e1m2/e1m2, e4m3/e5m2)==========
