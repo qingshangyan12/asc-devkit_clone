@@ -1127,6 +1127,7 @@
                 -   [asc_fma](SIMD-API/c_api/reg_compute/reg_fused/asc_fma.md)
                 -   [asc_leakyrelu](SIMD-API/c_api/reg_compute/reg_fused/asc_leakyrelu.md)
                 -   [asc_madd](SIMD-API/c_api/reg_compute/reg_fused/asc_madd.md)
+                -   [asc_mul_scalar_float2half_rn](SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md)
                 -   [asc_mula](SIMD-API/c_api/reg_compute/reg_fused/asc_mula.md)
                 -   [asc_prelu](SIMD-API/c_api/reg_compute/reg_fused/asc_prelu.md)
                 -   [asc_relu](SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md)
