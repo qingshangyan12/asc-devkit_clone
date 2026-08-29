@@ -20,10 +20,10 @@ namespace cann_abi {
 class InsCollAlgBase {
 public:
     virtual ~InsCollAlgBase() {}
-    virtual std::string Describe() const = 0;                                 // slot: Describe
-    virtual void* CalcCostCoeffAbiPlaceholder(void*, void*, const char*) = 0; // slot: CalcCostCoeff
-    virtual void* GetAlgNetMetaAbiPlaceholder(void*) const = 0;               // slot: GetAlgNetMeta
-    virtual int CalcAlgHierarchyInfo(void*, void*, void*) = 0;                // slot: CalcAlgHierarchyInfo
+    virtual std::string Describe() const = 0;                  // slot: Describe
+    virtual void CalcCostCoeffAbiPlaceholder() = 0;            // slot: CalcCostCoeff
+    virtual void GetAlgNetMetaAbiPlaceholder() = 0;            // slot: GetAlgNetMeta
+    virtual int CalcAlgHierarchyInfo(void*, void*, void*) = 0; // slot: CalcAlgHierarchyInfo
     virtual HcclResult CalcAlgHierarchyInfoV2(
         TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo,
         const AlgAttrs& algAttrs) = 0;                                            // slot: CalcAlgHierarchyInfoV2
