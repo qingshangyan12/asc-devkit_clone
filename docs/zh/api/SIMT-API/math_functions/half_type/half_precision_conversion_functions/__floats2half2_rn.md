@@ -70,38 +70,38 @@ inline half2 __floats2half2_rn(const float x, const float y)
 
 ## 调用示例
 
-- SIMT编程场景：
+-   SIMT编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __aicore__ void simt_floats2half2_rn(float* input1, float* input2, half2* output, uint32_t total_length)
+    __aicore__ void simt_floats2half2_rn(float* input1, float* input2, half2* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= total_length) {
+        if (idx > input_total_length) {
             return;
         }
         output[idx] = __floats2half2_rn(input1[idx], input2[idx]);
     }
-    __global__ __launch_bounds__(1024) void cast_kernel(float* input1, float* input2, half* output, uint32_t total_length)
+    __global__ __launch_bounds__(1024) void cast_kernel(float* input1, float* input2, half* output, uint32_t input_total_length)
     {
-        simt_floats2half2_rn(input1, input2, (half2*)output, total_length);
+        simt_floats2half2_rn(input1, input2, (half2*)output, input_total_length);
     }
     ```
 
-- SIMD与SIMT混合编程场景：
+-   SIMD与SIMT混合编程场景：
 
     ```cpp
     // 使用短向量可提升数据搬运效率
-    __simt_vf__ __launch_bounds__(1024) inline void simt_floats2half2_rn(__gm__ float* input1, __gm__ float* input2, __gm__ half2* output, uint32_t total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void simt_floats2half2_rn(__gm__ float* input1, __gm__ float* input2, __gm__ half2* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx > total_length) {
+        if (idx > input_total_length) {
             return;
         }
         output[idx] = __floats2half2_rn(input1[idx], input2[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ float* input1,  __gm__ float* input2, __gm__ half* output, uint32_t total_length)
+    __global__ __vector__ void cast_kernel(__gm__ float* input1,  __gm__ float* input2, __gm__ half* output, uint32_t input_total_length)
     {
-        asc_vf_call<simt_floats2half2_rn>(dim3(1024), input1, input2, (__gm__ half2*)output, total_length);
+        asc_vf_call<simt_floats2half2_rn>(dim3(1024), input1, input2, (__gm__ half2*)output, input_total_length);
     }
     ```

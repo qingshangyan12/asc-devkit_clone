@@ -70,10 +70,10 @@ inline float log2f(float x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void compute_log2f(float *result, const float *x, uint32_t total_length)
+    __global__ __launch_bounds__(256) void compute_log2f(float *result, const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= total_length) {
+        if (idx >= count) {
             return;
         }
         result[idx] = log2f(x[idx]);
@@ -83,24 +83,24 @@ inline float log2f(float x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(256) inline void compute_log2f_vf(__gm__ float *result, __gm__ const float *x, uint32_t total_length)
+    __simt_vf__ __launch_bounds__(256) inline void compute_log2f_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= total_length) {
+        if (idx >= count) {
             return;
         }
         result[idx] = log2f(x[idx]);
     }
 
-    __global__ __vector__ void run_log2f(__gm__ float *result, __gm__ const float *x, uint32_t total_length)
+    __global__ __vector__ void run_log2f(__gm__ float *result, __gm__ const float *x, uint32_t count)
     {
-        asc_vf_call<compute_log2f_vf>(dim3(256), result, x, total_length);
+        asc_vf_call<compute_log2f_vf>(dim3(256), result, x, count);
     }
     ```
 
 输入输出示例如下：
 
-```text
+```
 x：1, 2, 3, 4
 result: 0 1 1.584962 2
 ```

@@ -70,10 +70,10 @@ inline float frexpf(float x, int *exp)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void compute_frexpf(float *result, int *exp_out, const float *x, uint32_t total_length)
+    __global__ __launch_bounds__(256) void compute_frexpf(float *result, int *exp_out, const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= total_length) {
+        if (idx >= count) {
             return;
         }
         result[idx] = frexpf(x[idx], exp_out + idx);
@@ -83,24 +83,24 @@ inline float frexpf(float x, int *exp)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(256) inline void compute_frexpf_vf(__gm__ float *result, __gm__ int *exp_out, __gm__ const float *x, uint32_t total_length)
+    __simt_vf__ __launch_bounds__(256) inline void compute_frexpf_vf(__gm__ float *result, __gm__ int *exp_out, __gm__ const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= total_length) {
+        if (idx >= count) {
             return;
         }
         result[idx] = frexpf(x[idx], exp_out + idx);
     }
 
-    __global__ __vector__ void run_frexpf(__gm__ float *result, __gm__ int *exp_out, __gm__ const float *x, uint32_t total_length)
+    __global__ __vector__ void run_frexpf(__gm__ float *result, __gm__ int *exp_out, __gm__ const float *x, uint32_t count)
     {
-        asc_vf_call<compute_frexpf_vf>(dim3(256), result, exp_out, x, total_length);
+        asc_vf_call<compute_frexpf_vf>(dim3(256), result, exp_out, x, count);
     }
     ```
 
 输入输出示例如下：
 
-```text
+```
 x：0.25, 0.75, 1.25, 1.75
 result: 0.5 0.75 0.625 0.875
 exp_out: -1 0 1 1

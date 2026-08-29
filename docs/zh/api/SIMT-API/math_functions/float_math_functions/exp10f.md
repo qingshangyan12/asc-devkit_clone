@@ -71,10 +71,10 @@ inline float exp10f(float x)
 - SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void compute_exp10f(float *result, const float *x, uint32_t total_length)
+    __global__ __launch_bounds__(256) void compute_exp10f(float *result, const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= total_length) {
+        if (idx >= count) {
             return;
         }
         result[idx] = exp10f(x[idx]);
@@ -84,24 +84,24 @@ inline float exp10f(float x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(256) inline void compute_exp10f_vf(__gm__ float *result, __gm__ const float *x, uint32_t total_length)
+    __simt_vf__ __launch_bounds__(256) inline void compute_exp10f_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= total_length) {
+        if (idx >= count) {
             return;
         }
         result[idx] = exp10f(x[idx]);
     }
 
-    __global__ __vector__ void run_exp10f(__gm__ float *result, __gm__ const float *x, uint32_t total_length)
+    __global__ __vector__ void run_exp10f(__gm__ float *result, __gm__ const float *x, uint32_t count)
     {
-        asc_vf_call<compute_exp10f_vf>(dim3(256), result, x, total_length);
+        asc_vf_call<compute_exp10f_vf>(dim3(256), result, x, count);
     }
     ```
 
 输入输出示例如下：
 
-```text
+```
 x：0.25, 0.75, 1.25, 1.75
 result: 1.778279 5.623414 17.7828 56.23413
 ```

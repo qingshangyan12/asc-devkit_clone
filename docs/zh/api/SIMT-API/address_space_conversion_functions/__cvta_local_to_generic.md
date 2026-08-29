@@ -67,7 +67,7 @@ SIMD与SIMT混合编程场景不支持使用该接口。
 SIMT编程场景：
 
 ```cpp
-__global__ __launch_bounds__(1024) void kernel__cvta_local_to_generic(uint32_t* dst, uint64_t addr_val, uint32_t total_len, uint32_t total_length)
+__global__ __launch_bounds__(1024) void kernel__cvta_local_to_generic(uint32_t* dst, uint64_t addr_val, uint32_t total_len)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
     if (idx >= total_len) {
