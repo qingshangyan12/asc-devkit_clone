@@ -15,8 +15,6 @@
 
 #if defined(ASCENDC_CPU_DEBUG)
 #include "stub_def.h"
-#include <cmath>
-#include <dlfcn.h>
 
 constexpr uint32_t float_inf = 0x7F800000;
 constexpr uint32_t float_neg_inf = 0xFF800000;
