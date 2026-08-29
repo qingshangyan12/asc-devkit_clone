@@ -215,12 +215,13 @@ constexpr uint32_t INDEX_WORDS = 64;
 __simd_vf__ inline void gather_datablock_vf(
     __ubuf__ uint8_t* output, __ubuf__ uint8_t* data, __ubuf__ uint32_t* index)
 {
-    vector_bool mask = asc_create_mask_b32(PAT_ALL);
+    vector_bool gather_mask = asc_create_mask_b32(PAT_ALL);
     vector_uint32_t index_reg;
     asc_loadalign(index_reg, index);
     vector_uint8_t dst;
-    asc_gather_datablock(dst, data, index_reg, mask);
-    asc_storealign(output, dst, mask);
+    asc_gather_datablock(dst, data, index_reg, gather_mask);
+    vector_bool store_mask = asc_create_mask_b8(PAT_ALL);
+    asc_storealign(output, dst, store_mask);
 }
 
 __global__ __vector__ void asc_gather_datablock_kernel(

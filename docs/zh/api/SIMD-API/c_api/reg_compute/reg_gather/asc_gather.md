@@ -158,14 +158,13 @@ __global__ __vector__ void asc_gather_kernel(__gm__ uint16_t* output, __gm__ uin
     asc_init();
     __ubuf__ uint16_t output_local[ELEMENT_COUNT];
     __ubuf__ uint16_t input_local[ELEMENT_COUNT];
-    asc_copy_gm2ub_align(input_local, input, ELEMENT_COUNT);
-    asc_copy_gm2ub_align(output_local, input, ELEMENT_COUNT);
+    asc_copy_gm2ub_align(input_local, input, ELEMENT_COUNT * sizeof(uint16_t));
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     gather_vf(output_local, input_local);
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(output, output_local, ELEMENT_COUNT);
+    asc_copy_ub2gm_align(output, output_local, ELEMENT_COUNT * sizeof(uint16_t));
     asc_sync();
 }
 } // namespace
