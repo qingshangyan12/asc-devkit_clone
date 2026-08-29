@@ -140,7 +140,7 @@ Total blocks = 4 * 8 = 32
 对应的核索引计算如下：
 
 ```cpp
-constexpr uint32_t mIter = DivCeil(M, singleCoreM);
+constexpr uint32_t mIter = AscendC::Std::ceil_div(M, singleCoreM);
 uint32_t mIterIdx = block_idx % mIter;
 uint32_t nIterIdx = block_idx / mIter;
 ```

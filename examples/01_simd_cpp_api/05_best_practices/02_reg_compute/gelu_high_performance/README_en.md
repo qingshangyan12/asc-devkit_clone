@@ -345,7 +345,7 @@ The above VF function defines the GELU computation logic within registers. It is
 ```cpp
 // Code snippet for calling VF function in the kernel function
 constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-uint32_t loopNum = DivCeil(n, oneRepeatSize);
+uint32_t loopNum = AscendC::Std::ceil_div(n, oneRepeatSize);
 __ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
 __ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
 // Call VF function through asc_vf_call, passing UB address, element count n, and loop count
