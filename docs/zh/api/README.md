@@ -1085,6 +1085,7 @@
                 -   [asc_div](SIMD-API/c_api/reg_compute/reg_arith/asc_div.md)
                 -   [asc_exp](SIMD-API/c_api/reg_compute/reg_arith/asc_exp.md)
                 -   [asc_ln](SIMD-API/c_api/reg_compute/reg_arith/asc_ln.md)
+                -   [asc_log](SIMD-API/c_api/reg_compute/reg_arith/asc_log.md)
                 -   [asc_max](SIMD-API/c_api/reg_compute/reg_arith/asc_max.md)
                 -   [asc_max_scalar](SIMD-API/c_api/reg_compute/reg_arith/asc_max_scalar.md)
                 -   [asc_min](SIMD-API/c_api/reg_compute/reg_arith/asc_min.md)
