@@ -1228,7 +1228,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __short_as_half(const short int x)
     return data.f;
 }
 
-#ifdef ASCEND_USE_LEGACY_PRECISION
+#ifdef ASCENDC_USE_LEGACY_PRECISION
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hrsqrt(half x) { return (half)1.0 / hsqrt(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2rsqrt(half2 x)
@@ -1285,7 +1285,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2log(half2 x)
 {
     half tmp1 = hlog(x.x);
     half tmp2 = hlog(x.y);
-    return { tmp1, tmp2 }
+    return { tmp1, tmp2 };
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hlog10(half x)
