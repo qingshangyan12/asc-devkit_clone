@@ -260,3 +260,58 @@ TEST_VECTOR_DATAMOVE_STOREALIGN_INSTR_PSTS_2(uint8_t);
 TEST_VECTOR_DATAMOVE_STOREALIGN_INSTR_PSTS_3(uint32_t);
 TEST_VECTOR_DATAMOVE_STOREALIGN_INSTR_PSTS_3(uint16_t);
 TEST_VECTOR_DATAMOVE_STOREALIGN_INSTR_PSTS_3(uint8_t);
+
+namespace {
+void StorealignMaskPstStub(vector_bool, __ubuf__ uint32_t*, vector_address, Literal) {}
+void StorealignMaskPstsStub(vector_bool, __ubuf__ uint32_t*, int32_t, Literal) {}
+void StorealignMaskPostupdateStub(vector_bool, __ubuf__ uint32_t*&, int32_t, Literal, Literal) {}
+} // namespace
+
+TEST(TestVectorDataMoveStorealignMask, AddrReg)
+{
+    __ubuf__ uint32_t* dst = reinterpret_cast<__ubuf__ uint32_t*>(0);
+    vector_bool src;
+    addr_reg offset;
+    MOCKER_CPP(pst, void(vector_bool, __ubuf__ uint32_t*, vector_address, Literal))
+        .times(2)
+        .will(invoke(StorealignMaskPstStub));
+    asc_storealign_mask(dst, src, offset);
+    asc_storealign_mask_pack(dst, src, offset);
+    GlobalMockObject::verify();
+}
+
+TEST(TestVectorDataMoveStorealignMask, DefaultOffset)
+{
+    __ubuf__ uint32_t* dst = reinterpret_cast<__ubuf__ uint32_t*>(0);
+    vector_bool src;
+    MOCKER_CPP(psts, void(vector_bool, __ubuf__ uint32_t*, int32_t, Literal))
+        .times(2)
+        .will(invoke(StorealignMaskPstsStub));
+    asc_storealign_mask(dst, src);
+    asc_storealign_mask_pack(dst, src);
+    GlobalMockObject::verify();
+}
+
+TEST(TestVectorDataMoveStorealignMask, ImmediateOffset)
+{
+    __ubuf__ uint32_t* dst = reinterpret_cast<__ubuf__ uint32_t*>(0);
+    vector_bool src;
+    MOCKER_CPP(psts, void(vector_bool, __ubuf__ uint32_t*, int32_t, Literal))
+        .times(2)
+        .will(invoke(StorealignMaskPstsStub));
+    asc_storealign_mask(dst, src, 0);
+    asc_storealign_mask_pack(dst, src, 0);
+    GlobalMockObject::verify();
+}
+
+TEST(TestVectorDataMoveStorealignMask, Postupdate)
+{
+    __ubuf__ uint32_t* dst = reinterpret_cast<__ubuf__ uint32_t*>(0);
+    vector_bool src;
+    MOCKER_CPP(psts, void(vector_bool, __ubuf__ uint32_t*&, int32_t, Literal, Literal))
+        .times(2)
+        .will(invoke(StorealignMaskPostupdateStub));
+    asc_storealign_mask_postupdate(dst, src, 0);
+    asc_storealign_mask_pack_postupdate(dst, src, 0);
+    GlobalMockObject::verify();
+}

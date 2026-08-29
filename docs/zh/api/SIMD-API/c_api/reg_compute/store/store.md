@@ -11,6 +11,10 @@
 - **[asc_storealign_pack_quarter](asc_storealign_pack_quarter.md)**
 - **[asc_storealign_pack_quarter_postupdate](asc_storealign_pack_quarter_postupdate.md)**
 - **[asc_storealign_postupdate](asc_storealign_postupdate.md)**
+- **[asc_storealign_mask](asc_storealign_mask.md)**
+- **[asc_storealign_mask_pack](asc_storealign_mask_pack.md)**
+- **[asc_storealign_mask_pack_postupdate](asc_storealign_mask_pack_postupdate.md)**
+- **[asc_storealign_mask_postupdate](asc_storealign_mask_postupdate.md)**
 
 ## Reg非对齐搬出
 
@@ -19,6 +23,7 @@
 - **[asc_storeunalign_post](asc_storeunalign_post.md)**
 - **[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)**
 - **[asc_storeunalign_postupdate](asc_storeunalign_postupdate.md)**
+- **[asc_storeunalign_mask_pack_quarter_postupdate](asc_storeunalign_mask_pack_quarter_postupdate.md)**
 
 ## 废弃接口
 

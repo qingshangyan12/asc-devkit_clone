@@ -622,6 +622,9 @@ static void test_host_c_api_reg_compute_17()
     using ::asc_storealign_1st;
     using ::asc_storealign_1st_postupdate;
     using ::asc_storealign_intlv;
+    using ::asc_storealign_mask;
+    using ::asc_storealign_mask_pack;
+    using ::asc_storealign_mask_pack_postupdate;
     using ::asc_storealign_pack;
     using ::asc_storealign_pack_postupdate;
     using ::asc_storealign_pack_postupdate_v2;
@@ -632,8 +635,10 @@ static void test_host_c_api_reg_compute_17()
 
 static void test_host_c_api_reg_compute_18()
 {
+    using ::asc_storealign_mask_postupdate;
     using ::asc_storealign_postupdate;
     using ::asc_storeunalign;
+    using ::asc_storeunalign_mask_pack_quarter_postupdate;
     using ::asc_storeunalign_post;
     using ::asc_storeunalign_post_postupdate;
     using ::asc_storeunalign_postupdate;
