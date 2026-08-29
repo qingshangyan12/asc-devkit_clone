@@ -452,3 +452,6 @@
 
     使用`uint8_t unit_flag`入参的`asc_mmad_sparse()`接口已废弃，请使用[asc_mmad_sparse](../SIMD-API/c_api/cube_compute/asc_mmad_sparse.md)接口。`asc_mmad_sparse_sync()`接口已废弃，请使用[asc_mmad_sparse](../SIMD-API/c_api/cube_compute/asc_mmad_sparse.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
 <!-- end id10 -->
+- [asc_transto5hd_sync](../SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md)接口
+
+    `asc_transto5hd_b8_sync()`、`asc_transto5hd_b16_sync()`和`asc_transto5hd_b32_sync()`接口已废弃。请使用[asc_transto5hd](../SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
