@@ -9,8 +9,10 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_hf32_round_mode](defs/enum/asc_hf32_round_mode.md)|表示Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略。|`c_api/defs/enum.h`|
-|[asc_load_l2_cache_mode](defs/enum/asc_load_l2_cache_mode.md)|表示数据从GM搬运到UB时的L2 cache策略。|`c_api/defs/enum.h`|
-|[asc_store_l2_cache_mode](defs/enum/asc_store_l2_cache_mode.md)|表示数据从UB搬运到GM时的L2 cache策略。|`c_api/defs/enum.h`|
+|[asc_load_l2_cache_mode](defs/enum/asc_load_l2_cache_mode.md)|表示数据从GM搬运到UB时的L2 cache策略，也可用于标量load策略配置。|`c_api/defs/enum.h`|
+|[asc_override_strategy](defs/enum/asc_override_strategy.md)|表示饱和控制策略。|`c_api/defs/enum.h`|
+|[asc_saturation_mode](defs/enum/asc_saturation_mode.md)|表示饱和控制模式。|`c_api/defs/enum.h`|
+|[asc_store_l2_cache_mode](defs/enum/asc_store_l2_cache_mode.md)|表示数据从UB搬运到GM时的L2 cache策略，也可用于标量store策略配置。|`c_api/defs/enum.h`|
 
 ### 联合体
 
@@ -426,6 +428,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |---|---|---|
 |[asc_abs_sub](reg_compute/reg_fused/asc_abs_sub.md)|逐元素计算差的绝对值。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_axpy](reg_compute/reg_fused/asc_axpy.md)|根据mask对源操作数src、value进行按元素做乘加操作，将结果写入目的操作数dst。|`c_api/reg_compute/compute/reg_fused.h`|
+|[asc_exp_sub](reg_compute/reg_fused/asc_exp_sub.md)|根据mask将src0与src1按元素相减，并计算以差值为指数的自然指数函数。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_fma](reg_compute/reg_fused/asc_fma.md)|逐元素乘加运算。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_leakyrelu](reg_compute/reg_fused/asc_leakyrelu.md)|按元素执行Leaky ReLU（Leaky Rectified Linear Unit）操作。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_madd](reg_compute/reg_fused/asc_madd.md)|madd（multiply-add），对源操作数执行逐元素乘法和加法。|`c_api/reg_compute/compute/reg_fused.h`|
@@ -638,7 +641,10 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_dcci](cache_ctrl/asc_dcci.md)|用于刷新Cache，保证Cache的一致性。|`c_api/cache_ctrl/cache_ctrl.h`|
 |[asc_dci](cache_ctrl/asc_dci.md)|数据缓存失效，使整个数据缓存无效化。|`c_api/cache_ctrl/cache_ctrl.h`|
 |[asc_get_icache_preload_status](cache_ctrl/asc_get_icache_preload_status.md)|获取ICache的Preload的状态。|`c_api/cache_ctrl/cache_ctrl.h`|
+|[asc_get_scalar_load_cache_mode](cache_ctrl/asc_get_scalar_load_cache_mode.md)|获取标量load路径的L2 Cache管理策略。|`c_api/cache_ctrl/cache_ctrl.h`|
+|[asc_get_scalar_store_cache_mode](cache_ctrl/asc_get_scalar_store_cache_mode.md)|获取标量store路径的L2 Cache管理策略。|`c_api/cache_ctrl/cache_ctrl.h`|
 |[asc_icache_preload](cache_ctrl/asc_icache_preload.md)|从指令所在GM地址预加载数据到对应的cacheline中。|`c_api/cache_ctrl/cache_ctrl.h`|
+|[asc_set_scalar_cache_mode](cache_ctrl/asc_set_scalar_cache_mode.md)|配置标量单元访问Global Memory时的L2 Cache管理策略。|`c_api/cache_ctrl/cache_ctrl.h`|
 
 ## 同步控制
 
@@ -674,8 +680,12 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_get_ctrl](spr/asc_get_ctrl.md)|读取CTRL寄存器（控制寄存器）的值。|`c_api/spr/spr.h`|
+|[asc_get_saturation_flag](spr/asc_get_saturation_flag.md)|读取指定饱和模式的开关状态。|`c_api/spr/spr.h`|
+|[asc_get_saturation_strategy](spr/asc_get_saturation_strategy.md)|读取饱和控制策略。|`c_api/spr/spr.h`|
 |[asc_get_squeeze_status](spr/asc_get_squeeze_status.md)|读取squeeze操作后保存至AR特殊寄存器的有效数据长度值。|`c_api/spr/spr.h`|
 |[asc_set_ctrl](spr/asc_set_ctrl.md)|设置CTRL寄存器（控制寄存器）的值。|`c_api/spr/spr.h`|
+|[asc_set_saturation_flag](spr/asc_set_saturation_flag.md)|设置指定饱和模式的开关状态。|`c_api/spr/spr.h`|
+|[asc_set_saturation_strategy](spr/asc_set_saturation_strategy.md)|设置饱和控制策略。|`c_api/spr/spr.h`|
 
 ## 废弃接口
 
@@ -692,7 +702,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_e2m1x22bfloat16 (废弃)](reg_compute/reg_convert/asc_e2m1x22bfloat16_deprecated.md)|将fp4x2_e2m1_t类型转换为bfloat16_t类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_e4m32float (废弃)](reg_compute/reg_convert/asc_e4m32float_deprecated.md)|将fp8_e4m3fn_t类型转换为float类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_e5m22float (废弃)](reg_compute/reg_convert/asc_e5m22float_deprecated.md)|将vector_fp8_e5m2_t类型的源操作数以256B为单位分为四部分，读取其中一部分元素，将其转换成vector_float类型并写入目的操作数。|`c_api/reg_compute/reg_convert.h`|
-|[asc_exp_sub (废弃)](reg_compute/reg_fused/asc_exp_sub_deprecated.md)|将src0与src1相减，差值作为e的指数计算。|`c_api/reg_compute/compute/reg_fused.h`|
+|[asc_exp_sub（废弃）](deprecated_interface/asc_exp_sub_deprecated.md)|`half`输入且不带`src_pos`参数的`asc_exp_sub`原型以及`asc_exp_sub_v2`原型已废弃，`half`输入请使用`asc_exp_sub_half2float`原型（显式传入`src_pos`参数）。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_float2bfloat16（废弃）](deprecated_interface/asc_float2bfloat16_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2e4m3 (废弃)](reg_compute/reg_convert/asc_float2e4m3_deprecated.md)|将float类型转换为fp8_e4m3fn_t类型，支持RINT舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2e5m2 (废弃)](reg_compute/reg_convert/asc_float2e5m2_deprecated.md)|将float类型数据转换为fp8_e5m2类型。|`c_api/reg_compute/reg_convert.h`|
