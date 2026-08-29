@@ -7194,19 +7194,14 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             result,
         )
         global_var_storage.set_variable("ascendc_short_soc_version", "Ascend950")
-        with mock.patch.object(
-            CommonUtility,
-            "is_support_workspace_offset",
-            side_effect=AssertionError("workspace code generation must not use it"),
-        ):
-            result = _gen_set_workspace_codes(
-                is_mix,
-                is_single_and_using_hard_sync,
-                op_info,
-                tiling_info,
-                compile_options,
-                compile_info,
-            )
+        result = _gen_set_workspace_codes(
+            is_mix,
+            is_single_and_using_hard_sync,
+            op_info,
+            tiling_info,
+            compile_options,
+            compile_info,
+        )
         self.assertIn(
             "#if defined(NO_KFC_SERVER_DETECTED) || \\\n"
             "    (ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1)\n"
@@ -7216,15 +7211,15 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
             "#endif\n",
             result,
         )
-        with mock.patch.object(CommonUtility, "is_m510", return_value=True):
-            result = _gen_set_workspace_codes(
-                is_mix,
-                is_single_and_using_hard_sync,
-                op_info,
-                tiling_info,
-                compile_options,
-                compile_info,
-            )
+        global_var_storage.set_variable("ascendc_short_soc_version", "MC62")
+        result = _gen_set_workspace_codes(
+            is_mix,
+            is_single_and_using_hard_sync,
+            op_info,
+            tiling_info,
+            compile_options,
+            compile_info,
+        )
         self.assertTrue(result.startswith("    GM_ADDR usrWorkspace = workspace;\n"))
         self.assertNotIn("NO_KFC_SERVER_DETECTED", result)
         self.assertNotIn("AscendC::GetUserWorkspace", result)
@@ -7240,6 +7235,58 @@ Contents of section .ascendc_tiling.struct1_1234UL.0:
                 compile_info,
             )
         self.assertNotEqual(result, "")
+
+    def test_gen_usr_workspace_codes(self):
+        from asc_op_compile_base.asc_op_compiler.compile_op import (
+            _gen_usr_workspace_codes,
+        )
+
+        with (
+            mock.patch.object(CommonUtility, "is_c310", return_value=False),
+            mock.patch.object(
+                CommonUtility, "is_support_workspace_offset", return_value=False
+            ),
+            mock.patch.object(
+                global_var_storage,
+                "get_variable",
+                side_effect=AssertionError(
+                    "workspace generation must not inspect dump"
+                ),
+            ),
+        ):
+            self.assertEqual(
+                _gen_usr_workspace_codes(),
+                "    GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);\n",
+            )
+
+        with (
+            mock.patch.object(CommonUtility, "is_c310", return_value=False),
+            mock.patch.object(
+                CommonUtility, "is_support_workspace_offset", return_value=True
+            ),
+        ):
+            self.assertEqual(
+                _gen_usr_workspace_codes(),
+                "    GM_ADDR usrWorkspace = workspace;\n",
+            )
+
+        with (
+            mock.patch.object(CommonUtility, "is_c310", return_value=True),
+            mock.patch.object(
+                CommonUtility,
+                "is_support_workspace_offset",
+                return_value=True,
+            ),
+        ):
+            self.assertEqual(
+                _gen_usr_workspace_codes(),
+                "#if defined(NO_KFC_SERVER_DETECTED) || \\\n"
+                "    (ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1)\n"
+                "    GM_ADDR usrWorkspace = workspace;\n"
+                "#else\n"
+                "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n"
+                "#endif\n",
+            )
 
     def test_dump_compile_log(self):
         with open(os.devnull, "a") as file:
