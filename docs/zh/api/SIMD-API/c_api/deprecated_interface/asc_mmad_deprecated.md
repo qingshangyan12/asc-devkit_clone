@@ -28,7 +28,18 @@
 
 **入参`unit_flag`类型为`uint8_t`的`asc_mmad`接口以及`asc_mmad_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad](../cube_compute/asc_mmad.md)接口替代；原同步功能请通过新接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/asc_sync.md)。**
 
-**针对Atlas A3/A2系列产品，带`feat_offset`参数的`asc_mmad`、`asc_mmad_s4`接口以及全部`asc_mmad_sync`、`asc_mmad_s4_sync`接口也已废弃。带`feat_offset`参数的接口请改用不带该参数且使用`asc_unit_flag_mode`的对应接口。**
+<!-- npu="A3,910b" id18 -->
+针对如下产品型号：
+
+<!-- npu="A3" id22 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id22 -->
+<!-- npu="910b" id23 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id23 -->
+**入参带有`feat_offset`参数的`asc_mmad`、`asc_mmad_s4`接口以及全部`asc_mmad_sync`、`asc_mmad_s4_sync`接口已废弃。带`feat_offset`参数的接口请改用不带该参数且使用`asc_unit_flag_mode`的对应接口。**
+<!-- end id18 -->
+
 
 本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发，其计算公式如下：
 
@@ -217,9 +228,17 @@ PIPE_M
       - 当M为1且`disable_gemv`为false时，将开启GEMV模式。此时从L0A Buffer读取矩阵A时按照ND格式读取，矩阵A需按照ND格式排布，起始地址仍需按照512字节对齐。
   <!-- end id10 -->
 
-  <!-- npu="A3,910b" id22 -->
-  - 针对Atlas A3/A2系列产品，L0C Buffer大小为128KB，L0A Buffer和L0B Buffer大小均为64KB，BiasTable Buffer大小为1KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
-  <!-- end id22 -->
+  <!-- npu="A3,910b" id11 -->
+  - 针对如下产品型号：
+
+ 	  <!-- npu="A3" id16 -->
+    Atlas A3 训练系列产品/Atlas A3 推理系列产品
+ 	  <!-- end id16 -->
+ 	  <!-- npu="910b" id17 -->
+ 	  Atlas A2 训练系列产品/Atlas A2 推理系列产品
+ 	  <!-- end id17 -->
+ 	  L0C Buffer大小为128KB，L0A Buffer和L0B Buffer大小均为64KB。BiasTable Buffer大小为1KB。矩阵的起始地址和占用空间不能超出对应Buffer的范围。
+  <!-- end id11 -->
 
 - 同步约束说明：
 
@@ -239,116 +258,3 @@ PIPE_M
   - 设置为1时使用非饱和模式，inf/nan保持原输出。
 
   注意，应避免nan输入，否则可能会产生执行报错；整数类型仅支持饱和模式。
-
-<!-- npu="950" id18 -->
-## 调用示例
-
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
-
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
-
-```bash
-bisheng example.asc -o main --npu-arch=dav-3510 && ./main
-```
-
-以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
-
-```cpp
-#include <cstdint>
-#include <iostream>
-#include <vector>
-#include "c_api/asc_simd.h"
-#include "acl/acl.h"
-
-namespace {
-constexpr uint32_t M = 16;
-constexpr uint32_t K = 32;
-constexpr uint32_t N = 16;
-
-__global__ __cube__ void asc_mmad_kernel(__gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
-{
-    asc_init();
-    __cbuf__ int8_t a_l1[M * K];
-    __cbuf__ int8_t b_l1[K * N];
-    __ca__ int8_t a_l0[M * K];
-    __cb__ int8_t b_l0[K * N];
-    __cc__ int32_t c_l0[M * N];
-    constexpr uint64_t a_nz_config = (32ULL << 32) | (1ULL << 16) | 1ULL;
-    constexpr uint64_t b_nz_config = (32ULL << 32) | (1ULL << 16) | 1ULL;
-
-    asc_set_gm2l1_nz_para(a_nz_config);
-    asc_copy_gm2l1_nd2nz(a_l1, a, K * sizeof(int8_t), 0, M, K, 0, false);
-    asc_set_gm2l1_nz_para(b_nz_config);
-    asc_copy_gm2l1_nd2nz(b_l1, b, N * sizeof(int8_t), 0, K, N, 0, false);
-    asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
-    asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);
-    asc_copy_l12l0b_trans(b_l0, b_l1, static_cast<uint16_t>(0), static_cast<uint8_t>(1),
-        static_cast<uint16_t>(2), static_cast<uint16_t>(1), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
-    asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
-    asc_mmad(c_l0, a_l0, b_l0, M, K, N, 0, true, false, true);
-    asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
-    asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
-    asc_set_l0c2gm_nz2nd(1, 0, 0);
-    asc_copy_l0c2gm(output, c_l0, N, M, N, M, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
-    asc_sync_pipe(PIPE_ALL);
-}
-
-template <typename T>
-void print_row(const char* label, const std::vector<T>& data)
-{
-    std::cout << label << ':';
-    for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << +data[i];
-    std::cout << " ..." << std::endl;
-}
-} // namespace
-
-int main()
-{
-    std::vector<int8_t> a(M * K), b(K * N);
-    std::vector<int32_t> output(M * N), golden(M * N);
-    for (uint32_t row = 0; row < M; ++row) {
-        for (uint32_t k = 0; k < K; ++k) a[row * K + k] = static_cast<int8_t>((row + k) % 5 - 2);
-    }
-    for (uint32_t k = 0; k < K; ++k) {
-        for (uint32_t col = 0; col < N; ++col) b[k * N + col] = static_cast<int8_t>((k + 2 * col) % 7 - 3);
-    }
-    for (uint32_t row = 0; row < M; ++row) {
-        for (uint32_t col = 0; col < N; ++col) {
-            for (uint32_t k = 0; k < K; ++k) golden[row * N + col] += a[row * K + k] * b[k * N + col];
-        }
-    }
-
-    aclInit(nullptr);
-    aclrtSetDevice(0);
-    int8_t *a_device = nullptr, *b_device = nullptr;
-    int32_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&a_device), a.size(), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&b_device), b.size(), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(a_device, a.size(), a.data(), a.size(), ACL_MEMCPY_HOST_TO_DEVICE);
-    aclrtMemcpy(b_device, b.size(), b.data(), b.size(), ACL_MEMCPY_HOST_TO_DEVICE);
-    asc_mmad_kernel<<<1, 0>>>(a_device, b_device, output_device);
-    aclrtSynchronizeDevice();
-    aclrtMemcpy(output.data(), output.size() * sizeof(int32_t), output_device, output.size() * sizeof(int32_t),
-        ACL_MEMCPY_DEVICE_TO_HOST);
-    print_row("Input A row 0", a);
-    print_row("Input B row 0", b);
-    print_row("Output row 0", output);
-    print_row("Golden row 0", golden);
-    const bool passed = output == golden;
-    std::cout << (passed ? "[Success] asc_mmad passed." : "[Failed] asc_mmad failed.") << std::endl;
-    aclrtFree(a_device);
-    aclrtFree(b_device);
-    aclrtFree(output_device);
-    aclrtResetDevice(0);
-    aclFinalize();
-    return passed ? 0 : 1;
-}
-```
-
-更多场景使用样例请参考[asc_mmad样例](../../../../../../examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad)。
-<!-- end id18 -->
