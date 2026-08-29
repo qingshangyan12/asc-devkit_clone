@@ -183,6 +183,8 @@ float __ceilf(float x);
 
 float __fma(float x, float y, float z);
 
+float __fabsf(float x);
+
 bool __isnan(half x);
 
 bool __isinf(half x);
@@ -304,7 +306,5 @@ bfloat16x2_t atomicMax(__gm__ bfloat16x2_t* address, bfloat16x2_t value);
 bfloat16x2_t atomicMin(__gm__ bfloat16x2_t* address, bfloat16x2_t value);
 
 bfloat16x2_t atomicCAS(__gm__ bfloat16x2_t* address, bfloat16x2_t value1, bfloat16x2_t value2);
-
-float __fabsf(float x);
 
 #endif
