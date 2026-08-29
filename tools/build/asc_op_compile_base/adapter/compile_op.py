@@ -664,20 +664,18 @@ def _gen_kernel_func_declare_head(
 
 
 def _gen_usr_workspace_codes():
-    if global_var_storage.get_variable("ascendc_enable_dump_workspace") is True:
-        return "    GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);\n"
-    if CommonUtility.is_m510():
-        return "    GM_ADDR usrWorkspace = workspace;\n"
+    workspace_ptr = "AscendC::GetUserWorkspace(workspace)"
+    if CommonUtility.is_support_workspace_offset():
+        workspace_ptr = "workspace"
     if CommonUtility.is_c310():
         return (
-            "#if defined(NO_KFC_SERVER_DETECTED) || \\\n"
-            "    (ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1)\n"
-            "    GM_ADDR usrWorkspace = workspace;\n"
+            "#if ENABLE_CV_COMM_VIA_SSBUF != 0 && __MIX_CORE_AIC_RATION__ != 1\n"
+            f"    GM_ADDR usrWorkspace = {workspace_ptr};\n"
             "#else\n"
-            "    GM_ADDR usrWorkspace = workspace + AscendC::RESERVED_WORKSPACE;\n"
+            f"    GM_ADDR usrWorkspace = {workspace_ptr} + AscendC::RESERVED_WORKSPACE;\n"
             "#endif\n"
         )
-    return "    GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);\n"
+    return f"    GM_ADDR usrWorkspace = {workspace_ptr};\n"
 
 
 def _gen_set_workspace_codes(
@@ -2014,9 +2012,6 @@ def compile_op_common_part(
     compile_info.tiling_key_struct_map = infered_info_from_ifile.tiling_key_struct_map
     compile_info.register_tiling_struct = infered_info_from_ifile.register_tiling_struct
     compile_info.tpl_tiling_struct = infered_info_from_ifile.tpl_tiling_struct
-
-    if infered_info_from_ifile.no_kfc_server_flag:
-        compile_option_tuple.compile_options.append("-DNO_KFC_SERVER_DETECTED")
 
     kernel_spec = KernelSpecCompilation.create(
         compile_info, compile_option_tuple, tiling_info
