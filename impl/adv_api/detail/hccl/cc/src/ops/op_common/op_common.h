@@ -56,6 +56,10 @@ HcclResult HcclGetThread(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);
 
+HcclResult BuildAicpuThreadConfigs(
+    const AlgResourceRequest& resRequest, std::vector<ThreadConfig>& threadConfigs,
+    ThreadConfig& unfoldThreadConfig);
+
 HcclResult HcclGetChannel(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);

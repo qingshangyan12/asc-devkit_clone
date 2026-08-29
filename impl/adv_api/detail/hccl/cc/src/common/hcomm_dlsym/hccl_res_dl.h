@@ -19,6 +19,10 @@ extern "C" {
 #endif
 
 DECL_SUPPORT_FLAG(HcclThreadExportToCommEngine);
+DECL_WEAK_FUNC(
+    HcclResult, HcclThreadAcquireWithConfig, HcclComm comm, CommEngine engine, uint32_t threadNum, ThreadType type,
+    const ThreadConfig* config, ThreadHandle* threads);
+DECL_SUPPORT_FLAG(HcclThreadAcquireWithConfig);
 // 动态库管理接口（大驼峰命名）
 void HcclResDlInit(void* libHcommHandle);
 
