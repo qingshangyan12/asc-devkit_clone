@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例演示如何使用Ascend C C API，通过Fixpipe将矩阵乘计算结果从L0C Buffer搬运到L1（L1 Buffer），并在搬运过程中完成标量/Vector量化、ReLU激活和NZ2ND格式转换。输入矩阵A和B均为ND格式，先从GM搬运到L1 Buffer并转换为Nz格式，再经L0A Buffer和L0B Buffer完成两次K轴分块矩阵乘。为便于Host侧校验，样例随后将L1中的输出数据经UB搬运回GM。
+本样例演示如何使用Ascend C C API，通过Fixpipe将矩阵乘计算结果从L0C Buffer搬运到L1（L1 Buffer），并在搬运过程中完成标量、Vector量化、ReLU激活和NZ2ND格式转换。输入矩阵A和B均为ND格式，先从GM搬运到L1 Buffer并转换为Nz格式，再经L0A Buffer和L0B Buffer完成两次K轴分块矩阵乘。为便于Host侧校验，样例随后将L1中的输出数据经UB搬运回GM。
 
 本样例适用于Ascend 950PR/Ascend 950DT（`dav-3510`），可在NPU运行模式或NPU仿真模式下执行，不提供CPU域调试模式。
 
