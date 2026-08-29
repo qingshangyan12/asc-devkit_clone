@@ -156,62 +156,6 @@ __simd_callee__ inline void asc_float2hif8_rh_sat_impl(
 }
 
 // ASC_RETURN_VALUE_VCONV_IMPL
-__simd_callee__ inline vector_hifloat8_t asc_float2hif8_rh_sat_impl(vector_float src, vector_bool mask)
-{
-    vector_hifloat8_t dst;
-    asc_float2hif8_rh_sat_impl(dst, src, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_hifloat8_t asc_float2hif8_rh_impl(vector_float src, vector_bool mask)
-{
-    vector_hifloat8_t dst;
-    asc_float2hif8_rh_impl(dst, src, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_hifloat8_t asc_float2hif8_rh_sat_v2_impl(vector_float src, vector_bool mask)
-{
-    vector_hifloat8_t dst;
-    asc_float2hif8_rh_sat_v2_impl(dst, src, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_hifloat8_t asc_float2hif8_rh_v2_impl(vector_float src, vector_bool mask)
-{
-    vector_hifloat8_t dst;
-    asc_float2hif8_rh_v2_impl(dst, src, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_hifloat8_t asc_float2hif8_rh_sat_v3_impl(vector_float src, vector_bool mask)
-{
-    vector_hifloat8_t dst;
-    asc_float2hif8_rh_sat_v3_impl(dst, src, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_hifloat8_t asc_float2hif8_rh_v3_impl(vector_float src, vector_bool mask)
-{
-    vector_hifloat8_t dst;
-    asc_float2hif8_rh_v3_impl(dst, src, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_hifloat8_t asc_float2hif8_rh_sat_v4_impl(vector_float src, vector_bool mask)
-{
-    vector_hifloat8_t dst;
-    asc_float2hif8_rh_sat_v4_impl(dst, src, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_hifloat8_t asc_float2hif8_rh_v4_impl(vector_float src, vector_bool mask)
-{
-    vector_hifloat8_t dst;
-    asc_float2hif8_rh_v4_impl(dst, src, mask);
-    return dst;
-}
-
 __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rh_impl(
     vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>

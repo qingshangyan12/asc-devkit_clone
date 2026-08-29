@@ -46,20 +46,6 @@ __simd_callee__ inline void asc_uint82half_impl(
 }
 
 // ASC_RETURN_VALUE_VCONV_IMPL
-__simd_callee__ inline vector_half asc_uint82half_impl(vector_uint8_t src, vector_bool mask)
-{
-    vector_half dst;
-    asc_uint82half_impl(dst, src, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_half asc_uint82half_v2_impl(vector_uint8_t src, vector_bool mask)
-{
-    vector_half dst;
-    asc_uint82half_v2_impl(dst, src, mask);
-    return dst;
-}
-
 __simd_callee__ inline vector_half asc_uint82half_impl(
     vector_uint8_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {

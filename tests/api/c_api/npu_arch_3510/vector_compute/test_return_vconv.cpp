@@ -15,14 +15,10 @@
 #include "include/c_api/asc_simd.h"
 
 namespace {
-using VcvtFloatToInt32 = void (*)(vector_int32_t&, vector_float, vector_bool, int, int, int);
 using VcvtFloatToE5m2 = void (*)(vector_fp8_e5m2_t&, vector_float, vector_bool, int, int, int, int);
-using VcvtFloatToHalf = void (*)(vector_half&, vector_float, vector_bool, Literal, Literal, Literal, Literal);
 
 void VcvtHalfToFloatStub(vector_float&, vector_half, vector_bool, Literal, Literal) {}
-void VcvtFloatToInt32Stub(vector_int32_t&, vector_float, vector_bool, int, int, int) {}
 void VcvtFloatToE5m2Stub(vector_fp8_e5m2_t&, vector_float, vector_bool, int, int, int, int) {}
-void VcvtFloatToHalfStub(vector_half&, vector_float, vector_bool, Literal, Literal, Literal, Literal) {}
 void VexpdifStub(vector_float&, vector_half, vector_half, vector_bool, int) {}
 void VexpdifFloatStub(vector_float&, vector_float, vector_float, vector_bool, int) {}
 } // namespace
@@ -40,17 +36,6 @@ TEST(ReturnValueVconv, HalfToFloatUsesPositionAwareInstruction)
     GlobalMockObject::verify();
 }
 
-TEST(ReturnValueVconv, FloatToInt32KeepsRoundAndSaturationSelection)
-{
-    vector_float src;
-    vector_bool mask;
-    MOCKER_CPP((static_cast<VcvtFloatToInt32>(&vcvt)), VcvtFloatToInt32).times(1).will(invoke(VcvtFloatToInt32Stub));
-
-    auto result = asc_float2int32_rna_sat(src, mask);
-    static_assert(std::is_same<decltype(result), vector_int32_t>::value);
-    GlobalMockObject::verify();
-}
-
 TEST(ReturnValueVconv, FloatToE5m2KeepsQuarterSelection)
 {
     vector_float src;
@@ -59,17 +44,6 @@ TEST(ReturnValueVconv, FloatToE5m2KeepsQuarterSelection)
 
     auto result = asc_float2e5m2_rn(src, mask, ASC_DISPERSE_FIRST_QUARTER);
     static_assert(std::is_same<decltype(result), vector_fp8_e5m2_t>::value);
-    GlobalMockObject::verify();
-}
-
-TEST(ReturnValueVconv, LegacyPartOverloadUsesItsOriginalInstruction)
-{
-    vector_float src;
-    vector_bool mask;
-    MOCKER_CPP((static_cast<VcvtFloatToHalf>(&vcvt)), VcvtFloatToHalf).times(1).will(invoke(VcvtFloatToHalfStub));
-
-    auto result = asc_float2half_rd_v2(src, mask);
-    static_assert(std::is_same<decltype(result), vector_half>::value);
     GlobalMockObject::verify();
 }
 

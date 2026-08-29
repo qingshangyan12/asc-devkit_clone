@@ -33,20 +33,6 @@ __simd_callee__ inline void asc_float2int32_ru_impl(vector_int32_t& dst, vector_
     }
 }
 // ASC_RETURN_VALUE_VCONV_IMPL
-__simd_callee__ inline vector_int32_t asc_float2int32_ru_sat_impl(vector_float src, vector_bool mask)
-{
-    vector_int32_t dst;
-    asc_float2int32_ru_sat_impl(dst, src, mask);
-    return dst;
-}
-
-__simd_callee__ inline vector_int32_t asc_float2int32_ru_impl(vector_float src, vector_bool mask)
-{
-    vector_int32_t dst;
-    asc_float2int32_ru_impl(dst, src, mask);
-    return dst;
-}
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
