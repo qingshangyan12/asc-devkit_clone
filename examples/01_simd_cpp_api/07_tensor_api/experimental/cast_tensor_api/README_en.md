@@ -114,9 +114,8 @@ y[i] = convert<To>(x[i])
 
 Run the following steps in the sample root directory to build and execute the operator.
 
-- Configure Environment Variables
-
-  Configure the CANN software package environment variables. For details, see [Environment Variable Configuration](../../../../../docs/en/quick_start.md).
+- Configure environment variables
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../docs/en/quick_start.md#cann-install) is supported.**
 
   ```bash
   source ${install_path}/set_env.sh
