@@ -81,7 +81,7 @@ TEST_F(tensor_api_vector_copy_3510, copy_ub_to_gm_one_dim)
     __ubuf__ int8_t src[copy_size] = {0};
     __gm__ int8_t dst[copy_size] = {0};
 
-    auto layout = make_layout(make_shape(copy_size), make_stride(0));
+    auto layout = make_layout(make_shape(copy_size), make_stride(1));
     auto ub_tensor = make_tensor_at<location::ub>(src, layout);
     auto gm_tensor = make_tensor_at<location::gm>(dst, layout);
 
