@@ -36,7 +36,7 @@
 三个搬运指令的随路量化inf/nan处理行为完全一致，差异仅在验证路径：
 
 - **L0C Buffer->GM**：直接将L0C Buffer数据搬运到GM，无需中转路径，非饱和模式下inf/nan能完整传递到GM输出，无验证路径限制。
-- **L0C Buffer->L1 Buffer**：将L0C Buffer数据搬运到L1 Buffer，再通过搬运指令将数据从L1 Buffer搬运至UB，最后从UB搬运到GM。由于L1 Buffer无法直接搬运到GM，此处采用L1->UB->GM的中转路径。该路径无二次矩阵计算，不会引入inf×0=nan的伪影，非饱和模式下inf/-inf/nan能完整传递到GM输出，golden数据可直接设为inf/-inf/nan，实现端到端真实验证。
+- **L0C Buffer->L1 Buffer**：将L0C Buffer数据搬运到L1 Buffer，再通过搬运指令将数据从L1 Buffer搬运至UB，最后从UB搬运到GM。由于L1 Buffer无法直接搬运到GM，此处采用L1->UB->GM的中转路径。该路径无二次矩阵计算。
 - **L0C Buffer->UB**：将L0C Buffer数据搬运到UB，再从UB搬运到GM。AIC负责L0C Buffer到UB的搬运，AIV负责UB到GM的搬运，通过跨核同步协调。此路径无二次矩阵计算，非饱和模式下inf/nan能完整传递到GM输出。
 
 ## float类型L0C Buffer搬运至各输出类型
@@ -88,7 +88,7 @@ L0C Buffer中存储的float类型数据来自矩阵乘计算的结果，当输�
 - hifloat8_t类型中，111（0b01101111）为HiF8+inf编码，239（0b11101111）为HiF8-inf编码，128（0b10000000）为HiF8NAN编码。饱和模式下，inf保持为对应的inf编码，nan被饱和为0。
 - hifloat8_t的溢出判断阈值为1.25×2^15=40960，当量化后的值绝对值大于等于40960时，输出inf编码（111/239），而非饱和为最大值240。
 - 整数类型只有饱和模式，饱和模式和非饱和模式下的输出结果一致。
-- VQF322HIF8_PRE使用Half to Away舍入模式，VQF322HIF8_PRE_HYBRID使用Hybrid舍入模式（|exp|<4时为Half to Away，|exp|≥4时为SSR随机舍入）。随机舍入（Stochastic Rounding）是数值计算领域的通用概念，指以小数部分为概率进行向上或向下舍入，SSR为本实现中专有缩写。两种模式对inf/nan的处理一致。
+- VQF322HIF8_PRE使用Half to Away舍入模式，VQF322HIF8_PRE_HYBRID使用Hybrid舍入模式（|exp|<4时为Half to Away，|exp|≥4时为SSR（Stochastic Rounding）随机舍入）。两种模式对inf/nan的处理一致。
 - 同一输出类型的scalar模式（如QF322F16_PRE）与tensor模式（如VQF322F16_PRE）使用相同的类型转换算法，inf/nan边界值处理行为完全一致，差异仅在于量化参数的传递方式（单个标量vs每列张量），因此表中将scalar模式与tensor模式合并列出。
 
 ## int32_t类型L0C Buffer搬运至各输出类型
