@@ -27,7 +27,9 @@
 | [新增Regbase矢量计算方式](#section_regbase) | AIV核采用Regbase架构，支持直接操作Vector寄存器，中间结果可暂存寄存器，减少UB读写 | [Reg::RegTensor/MaskReg等Reg基础API](../../../api/SIMD-API/basic_api/reg_vector_compute/overview.md) | / |
 
 > [!NOTE]
-> 除上表中所列特性以外，3510架构还新增SIMT编程模型。具体说明请参见[SIMT API](../../../api/SIMT-API/SIMT-API.md)。
+> 除上表中所列特性以外，3510架构还新增SIMT编程模型和SIMD与SIMT混合编程，具体说明请参见：
+> - SIMT编程：[AI Core SIMT编程](../../programming_guide/programming_model/ai_core_simt_programming/ai_core_simt_programming.md)、[SIMT API](../../../api/SIMT-API/overview.md)
+> - SIMD与SIMT混编：[SIMD与SIMT混合编程](../../programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/overview.md)
 
 
 ## 特性说明
@@ -307,6 +309,7 @@ NZ2DN随路转换可通过基础API实现：
 | [LoadDataWithStride](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadDataWithStride.md) | 卷积场景的L1 Buffer到L0A Buffer/L0B Buffer搬运，支持配置输出矩阵K轴方向偏移量dstStride（需配合[SetLoadDataRepeatWithStride](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/SetLoadDataRepeatWithStride.md)使用） |
 | [DataCopy（GMToL1随路转换-DN2NZ搬运）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_DN2NZ.md) | 将矩阵从GM搬运至L1 Buffer，搬运过程中完成DN到NZ格式转换 |
 | [DataCopyPad（GMToL1非对齐数据搬运）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopyPad_GMToL1.md) | 将矩阵从GM搬运至L1 Buffer，支持非对齐数据搬运及按需填充 |
+| [Mmad（hifloat8矩阵乘加）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md) | 新增支持hifloat8_t数据类型的矩阵乘加计算，左/右矩阵均为hifloat8_t，结果类型为float，可带float类型Bias |
 | [MmadMx（带量化系数的矩阵乘）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadMx.md) | MicroScaling矩阵乘，左/右矩阵均有对应的量化系数矩阵，计算公式为C=(scaleA⊗A)*(scaleB⊗B)+Bias |
 | [MmadBitMode（BitMode矩阵乘）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadBitMode.md) | BitMode场景（低位宽数据类型）的矩阵乘加计算，与LoadData 2D/3D BitMode配合使用 |
 | [SetFmatrixBitMode（BitMode参数设置）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_load_aux_config/SetFmatrixBitMode.md) | BitMode场景下配置Fmatrix值，与LoadData 2D/3D BitMode配合使用 |
