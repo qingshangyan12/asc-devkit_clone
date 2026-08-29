@@ -371,7 +371,7 @@ protected:
     }
 #endif
 
-    __aicore__ inline constexpr void CheckSupportTrianMatmul()
+    __aicore__ __callee__ inline void CheckSupportTrianMatmul()
     {
         if constexpr (!MatmulFeatureTrait<MM_CFG>::IsSupportTrianMatmul()) {
             ASCENDC_ASSERT(

@@ -118,17 +118,17 @@ public:
 
     __aicore__ inline bool FirstInnerIter() const { return outerIdx_ == 0; }
 
-    __aicore__ inline constexpr uint32_t GetTotalIter() const { return kIter_; }
+    __aicore__ __callee__ inline uint32_t GetTotalIter() const { return kIter_; }
 
-    __aicore__ inline constexpr uint32_t GetOuterIter() const { return kIter_; }
+    __aicore__ __callee__ inline uint32_t GetOuterIter() const { return kIter_; }
 
-    __aicore__ inline constexpr uint32_t GetInnerIter() const { return 1; }
+    __aicore__ __callee__ inline uint32_t GetInnerIter() const { return 1; }
 
-    __aicore__ inline constexpr uint32_t GetOuterIdx() const { return outerIdx_; }
+    __aicore__ __callee__ inline uint32_t GetOuterIdx() const { return outerIdx_; }
 
-    __aicore__ inline constexpr uint32_t GetInnerStartIdx() const { return outerIdx_; }
+    __aicore__ __callee__ inline uint32_t GetInnerStartIdx() const { return outerIdx_; }
 
-    __aicore__ inline constexpr uint32_t GetInnerIdx() const { return outerIdx_; }
+    __aicore__ __callee__ inline uint32_t GetInnerIdx() const { return outerIdx_; }
 
     __aicore__ inline int32_t GetTileShapeA() const { return tileShape_; }
 

@@ -75,7 +75,7 @@ public:
     }
 
     template <bool IS_INTRA_BLOCK = false>
-    __aicore__ inline constexpr uint32_t GetTotalIter() const
+    __aicore__ __callee__ inline uint32_t GetTotalIter() const
     {
         if constexpr (IS_INTRA_BLOCK) {
             return v1TotalIter_;
@@ -113,12 +113,12 @@ public:
         }
     }
 
-    __aicore__ inline constexpr uint32_t GetOuterIdx() const
+    __aicore__ __callee__ inline uint32_t GetOuterIdx() const
     {
         return Ceil(innerStartIdx_, MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepN());
     }
 
-    __aicore__ inline constexpr uint32_t GetOuterIter() const
+    __aicore__ __callee__ inline uint32_t GetOuterIter() const
     {
         return Ceil(totalIter_, MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepN());
     }
@@ -158,10 +158,10 @@ public:
 
     __aicore__ inline bool InnerEnd() { return innerIndex_ >= innerStartIdx_ + innerIter_; }
 
-    __aicore__ inline constexpr uint32_t GetInnerIdx() const { return innerIndex_; }
+    __aicore__ __callee__ inline uint32_t GetInnerIdx() const { return innerIndex_; }
 
     template <bool IS_INTRA_BLOCK = false>
-    __aicore__ inline constexpr uint32_t GetInnerIter() const
+    __aicore__ __callee__ inline uint32_t GetInnerIter() const
     {
         return innerIter_;
     }

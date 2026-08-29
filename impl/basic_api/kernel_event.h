@@ -762,7 +762,7 @@ constexpr TBufId MAX_TBUFID = (static_cast<TBufId>(31));
 constexpr TBufId MAX_MUTEXID = (static_cast<TBufId>(27));
 
 template <pipe_t pipe, bool mode>
-__aicore__ inline void GetBufInternal(uint8_t bufId)
+__aicore__ __callee__ inline void GetBufInternal(uint8_t bufId)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (IsSplitVectorPipe<pipe>()) {
@@ -781,7 +781,7 @@ __aicore__ inline void GetBufInternal(uint8_t bufId)
 }
 
 template <pipe_t pipe, bool mode>
-__aicore__ inline void RlsBufInternal(uint8_t bufId)
+__aicore__ __callee__ inline void RlsBufInternal(uint8_t bufId)
 {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (IsSplitVectorPipe<pipe>()) {
