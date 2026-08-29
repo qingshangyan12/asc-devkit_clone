@@ -75,7 +75,9 @@ SelectorStatus AlltoAllAutoSelector::SelectMesh1DClosAlgo(
         HCCL_DEBUG("[AlltoAllAutoSelector] CheckMeshNumEqualToClosNum failed."), SelectorStatus::NOT_MATCH);
     if ((isMeshNumEqualToClosNum == true) && (topoInfo->userRankSize <= CONCURRENT_RANK_LIMIT) &&
         (dataSize > BIG_DATA_SIZE_LIMIT)) {
-        selectAlgName = "CcuAllToAllMesh1DConcurrent";
+        selectAlgName = "CcuSchedAllToAllSoleMeshConcurrent";
+        HCCL_INFO("[AlltoAllAutoSelector][%s] Algo match[%s].", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
     } else {
         selectAlgName = "CcuAlltoAllMesh1DMultiJetty";
     }
