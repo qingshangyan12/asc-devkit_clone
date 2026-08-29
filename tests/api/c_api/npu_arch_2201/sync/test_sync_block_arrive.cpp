@@ -41,7 +41,7 @@ protected:
             .will(invoke(sync_block_arrive_2201_ffts_cross_core_sync_stub_##pipeVal));                    \
                                                                                                           \
         pipe_t pipe = pipeVal;                                                                            \
-        int64_t flag_id = 5;                                                                              \
+        uint16_t flag_id = 5;                                                                              \
                                                                                                           \
         asc_sync_block_arrive(pipe, flag_id);                                                             \
         GlobalMockObject::verify();                                                                       \

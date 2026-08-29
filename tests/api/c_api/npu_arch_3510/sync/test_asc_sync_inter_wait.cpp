@@ -13,10 +13,10 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-__aicore__ inline void wait_flag_dev_inter_mode_stub(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void wait_flag_dev_inter_mode_stub(pipe_t pipe, uint16_t flag_id)
 {
     EXPECT_EQ(pipe, static_cast<pipe_t>(pipe_t::PIPE_S));
-    EXPECT_EQ(flag_id, static_cast<int64_t>(11));
+    EXPECT_EQ(flag_id, static_cast<uint16_t>(11));
 }
 
 class TEST_ASC_SYNC_INTER_WAIT : public testing::Test {
@@ -26,20 +26,20 @@ protected:
 };
 
 #define TEST_ASC_SYNC_INTER_WAIT_BY_PIPE(coreType, pipeVal)                                 \
-    void wait_flag_dev_inter_mode_stub_##coreType##_##pipeVal(pipe_t pipe, int64_t flag_id) \
+    void wait_flag_dev_inter_mode_stub_##coreType##_##pipeVal(pipe_t pipe, uint16_t flag_id) \
     {                                                                                       \
         EXPECT_EQ(pipe, pipeVal);                                                           \
-        EXPECT_EQ(flag_id, static_cast<int64_t>(11));                                       \
+        EXPECT_EQ(flag_id, static_cast<uint16_t>(11));                                       \
     }                                                                                       \
                                                                                             \
     TEST_F(TEST_ASC_SYNC_INTER_WAIT, TEST_ASC_SYNC_INTER_WAIT_##coreType##_##pipeVal)       \
     {                                                                                       \
         g_coreType = coreType;                                                              \
-        MOCKER_CPP(wait_flag_dev, void(pipe_t, int64_t))                                    \
+        MOCKER_CPP(wait_flag_dev, void(pipe_t, uint16_t))                                    \
             .times(1)                                                                       \
             .will(invoke(wait_flag_dev_inter_mode_stub_##coreType##_##pipeVal));            \
         pipe_t pipe = pipeVal;                                                              \
-        int64_t flag_id = static_cast<int64_t>(11);                                         \
+        uint16_t flag_id = static_cast<uint16_t>(11);                                         \
         asc_sync_inter_wait(pipe, flag_id);                                                 \
         GlobalMockObject::verify();                                                         \
     }

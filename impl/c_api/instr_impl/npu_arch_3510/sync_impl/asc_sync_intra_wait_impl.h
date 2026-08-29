@@ -24,29 +24,29 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_sync_intra_wait_impl(pipe_t pipe, uint64_t sync_id)
+__aicore__ inline void asc_sync_intra_wait_impl(pipe_t pipe, uint16_t flag_id)
 {
     if ASC_IS_AIC {
         if (pipe == pipe_t::PIPE_S) {
-            wait_intra_block(pipe_t::PIPE_S, sync_id);
+            wait_intra_block(pipe_t::PIPE_S, flag_id);
         } else if (pipe == pipe_t::PIPE_M) {
-            wait_intra_block(pipe_t::PIPE_M, sync_id);
+            wait_intra_block(pipe_t::PIPE_M, flag_id);
         } else if (pipe == pipe_t::PIPE_MTE1) {
-            wait_intra_block(pipe_t::PIPE_MTE1, sync_id);
+            wait_intra_block(pipe_t::PIPE_MTE1, flag_id);
         } else if (pipe == pipe_t::PIPE_MTE2) {
-            wait_intra_block(pipe_t::PIPE_MTE2, sync_id);
+            wait_intra_block(pipe_t::PIPE_MTE2, flag_id);
         } else if (pipe == pipe_t::PIPE_FIX) {
-            wait_intra_block(pipe_t::PIPE_FIX, sync_id);
+            wait_intra_block(pipe_t::PIPE_FIX, flag_id);
         }
     } else if ASC_IS_AIV {
         if (pipe == pipe_t::PIPE_S) {
-            wait_intra_block(pipe_t::PIPE_S, sync_id);
+            wait_intra_block(pipe_t::PIPE_S, flag_id);
         } else if (pipe == pipe_t::PIPE_MTE2) {
-            wait_intra_block(pipe_t::PIPE_MTE2, sync_id);
+            wait_intra_block(pipe_t::PIPE_MTE2, flag_id);
         } else if (pipe == pipe_t::PIPE_MTE3) {
-            wait_intra_block(pipe_t::PIPE_MTE3, sync_id);
+            wait_intra_block(pipe_t::PIPE_MTE3, flag_id);
         } else if (pipe == pipe_t::PIPE_V) {
-            wait_intra_block(pipe_t::PIPE_V, sync_id);
+            wait_intra_block(pipe_t::PIPE_V, flag_id);
         }
     }
 }

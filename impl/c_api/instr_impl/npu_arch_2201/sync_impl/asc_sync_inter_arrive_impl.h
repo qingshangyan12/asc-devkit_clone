@@ -25,7 +25,7 @@
 
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_sync_inter_arrive_impl(pipe_t pipe, int64_t flag_id)
+__aicore__ inline void asc_sync_inter_arrive_impl(pipe_t pipe, uint16_t flag_id)
 {
     constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
     constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;

@@ -20,13 +20,15 @@ protected:
 };
 
 namespace {
+constexpr int64_t kConstexprDeprecatedFlagId = 65537;
+
 void sync_inter_arrive_2201_ffts_cross_core_sync_stub(pipe_t pipe, uint64_t config)
 {
     constexpr uint16_t SYNC_MODE_SHIFT_VALUE = 4;
     constexpr uint16_t SYNC_FLAG_SHIFT_VALUE = 8;
 
     uint16_t mode = 0x00;
-    uint64_t flag_id = 5;
+    uint64_t flag_id = 1;
     uint64_t expectedConfig =
         (0x1 + ((mode & 0x3) << SYNC_MODE_SHIFT_VALUE) + ((flag_id & 0xf) << SYNC_FLAG_SHIFT_VALUE));
     EXPECT_EQ(pipe, pipe_t::PIPE_V);
@@ -37,11 +39,25 @@ void sync_inter_arrive_2201_ffts_cross_core_sync_stub(pipe_t pipe, uint64_t conf
 TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_succ)
 {
     pipe_t pipe = pipe_t::PIPE_V;
-    int64_t flag_id = 5;
+    uint16_t flag_id = 1;
     MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))
         .times(1)
         .will(invoke(sync_inter_arrive_2201_ffts_cross_core_sync_stub));
 
     asc_sync_inter_arrive(pipe, flag_id);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_deprecated_int64_forwards_low_16_bits)
+{
+    pipe_t pipe = pipe_t::PIPE_V;
+    MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t))
+        .times(1)
+        .will(invoke(sync_inter_arrive_2201_ffts_cross_core_sync_stub));
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    asc_sync_inter_arrive(pipe, kConstexprDeprecatedFlagId);
+#pragma GCC diagnostic pop
     GlobalMockObject::verify();
 }

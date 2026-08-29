@@ -21,14 +21,14 @@ protected:
 };
 
 namespace {
-void asc_sync_inter_wait_stub(int64_t flagID) { EXPECT_EQ(33, flagID); }
+void asc_sync_inter_wait_stub(int64_t flag_id) { EXPECT_EQ(33, flag_id); }
 } // namespace
 
 TEST_F(TestSyncInterWait, sync_inter_wait_Succ)
 {
-    int64_t flagID = 33;
+    uint16_t flag_id = 33;
     MOCKER_CPP(wait_flag_dev, void(int64_t)).times(1).will(invoke(asc_sync_inter_wait_stub));
 
-    asc_sync_inter_wait(pipe_t::PIPE_S, flagID);
+    asc_sync_inter_wait(pipe_t::PIPE_S, flag_id);
     GlobalMockObject::verify();
 }

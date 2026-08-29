@@ -324,7 +324,14 @@ public:
         // DataCopy属于PIPE_MTE3流水操作
         AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
         // 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成
-        AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
+        // 验证低4位截取 
+        AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(1);
+
+
+        // [info] [00001690] (PC: 0x112f2680) MTE3     : (Binary: 0x41f0142c) SET_CROSS_CORE  PIPE:MTE3, TRIGGER PIPE:UNDEF, FLAG ID:0, XT:X11=0x1,  id: 8
+        // [info] [00001712] (PC: 0x112f2684) FC       : (Binary: 0x41ec0000) WAIT_FLAG_DEVI  UIMM:0, 
+
+
         // 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
         AscendC::CrossCoreWaitFlag(0);
         // 关闭原子累加
