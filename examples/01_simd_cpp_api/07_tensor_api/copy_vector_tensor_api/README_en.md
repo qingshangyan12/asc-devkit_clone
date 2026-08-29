@@ -2,53 +2,101 @@
 
 ## Overview
 
-This sample demonstrates AIV-side Tensor API `GM->UB`, `UB->GM`, and `UB->UB` copies, including
-a one-dimensional `GM->UB` copy and constant left and right padding. Scenarios 1 through 3 use a
-`[32, 32]` `int8_t` tensor, scenario 4 uses a one-dimensional `[1024]` tensor, and scenario 5 pads
-a `[32, 24]` input to a `[32, 32]` output. Every scenario validates the complete output.
+This sample demonstrates Tensor API data transfers on the AIV, including `GM->UB`, `UB->GM`, and `UB->UB`
+transfers across multiple layout patterns, as well as constant left and right padding on the `GM->UB` path.
+Scenarios 1 through 3 use `int8_t` tensors with a shape of `[32, 32]`. Scenario 4 uses a one-dimensional
+tensor with a shape of `[1024]`. Scenario 5 pads an input of shape `[32, 24]` to produce an output of shape
+`[32, 32]`. Each scenario validates the entire output.
 
 ## Supported Products
 
 - Ascend 950PR/Ascend 950DT
 
-## Scenarios
+## Sample Scenarios
 
-| SCENARIO_NUM | Primary path | Layout | API form |
-| --- | --- | --- | --- |
-| 1 | GM->UB | ND | `copy(dst, src)` with automatic path inference |
-| 2 | UB->GM | DN | `make_copy(..., trait)` followed by `atom.call(dst, src)` |
-| 3 | UB->UB | NZ | Explicit atom with the coordinate/shape copy overload |
-| 4 | GM->UB | One-dimensional | `make_shape(1024)` and `make_stride(1)` select the one-dim copy route |
-| 5 | GM->UB | ND | Three left-padding and five right-padding elements, with `asc_set_copy_pad_val` configuring the value |
+| SCENARIO_NUM | Key path | Layout | Dimensions | Main API usage |
+| --- | --- | --- | --- | --- |
+| 1 | GM->UB | ND | Four-dimensional | `copy(dst, src)` automatically infers the transfer path |
+| 2 | UB->GM | DN | Four-dimensional | Calls `atom.call(dst, src)` after `make_copy(..., trait)` |
+| 3 | UB->UB | NZ | Four-dimensional | Uses an explicit atom and the coordinate/shape region transfer overload |
+| 4 | GM->UB | ND | One-dimensional | Uses `make_shape(1024)` and `make_stride(1)` to select the one-dimensional copy route |
+| 5 | GM->UB | ND | Four-dimensional | Pads three elements on the left and five on the right, and uses `asc_set_copy_pad_val` to set the padding value to `-9` |
 
-All five kernels are declared with `__global__ __vector__`. Auxiliary copies only prepare input or return
-the result to GM. Scenario 4 uses a rank-1 layout so that the GM and UB tensors match the one-dimensional
-layout pattern.
+The kernels for all five scenarios are declared with `__global__ __vector__`.
 
-Scenario 5 uses `gm_to_ub_params{3, 5, true}` to configure three left-padding and five right-padding
-elements per row. `asc_set_copy_pad_val(padding_value)` sets each padding element to `-9`.
+## Directory Structure
+
+```text
+├── CMakeLists.txt
+├── README.md
+├── README_en.md
+├── copy_vector_tensor_api.asc
+├── data_utils.h
+└── scripts
+    └── gen_data.py
+```
 
 ## Build and Run
 
-After setting up the CANN environment, run the following commands from the sample directory. This
-example runs scenario 1 in simulator mode:
+Run the following steps in the sample root directory to build and execute the operator.
 
-```bash
-source ${install_path}/set_env.sh
-cmake -S . -B build \
-    -DCMAKE_ASC_RUN_MODE=sim \
-    -DCMAKE_ASC_ARCHITECTURES=dav-3510 \
-    -DSCENARIO_NUM=1
-cmake --build build -j
-cd build
-python3 ../scripts/gen_data.py -scenarioNum=1
-./demo
-```
+- Configure environment variables
 
-The data-generation `scenarioNum` must match the build-time `SCENARIO_NUM`.
+  Configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install)
+  of the CANN development kit in the current environment. **Currently, only
+  [CANN master](../../../../docs/en/quick_start.md#cann-install) is supported.**
 
-A successful run prints:
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-```text
-test pass!
-```
+  > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is
+  > specified, the package is installed under `/usr/local/Ascend` by default.
+
+  ```bash
+  source ${install_path}/set_env.sh
+  ```
+
+  Replace `${install_path}` with the actual CANN software package installation directory.
+
+- Run the sample
+
+  The following example uses scenario 1:
+
+  ```bash
+  SCENARIO_NUM=1
+  mkdir -p build && cd build
+  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  make -j
+  python3 ../scripts/gen_data.py -scenarioNum=1
+  ./demo
+  ```
+
+  The `scenarioNum` passed when generating data must match the `SCENARIO_NUM` used at build time. To run a
+  different scenario, change both values to the corresponding number from 1 through 6.
+
+  To use NPU simulation, add the following build option:
+
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=1 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  ```
+
+  When changing the run mode, chip model, or scenario, clear the CMake cache in the `build` directory before
+  configuring the project again.
+
+- Build options
+
+  | Option | Description |
+  | --- | --- |
+  | `CMAKE_ASC_RUN_MODE` | Operator execution mode. Available values are `npu` and `sim`. The default value is `npu`. |
+  | `CMAKE_ASC_ARCHITECTURES` | NPU chip model. The default value is `dav-3510`. |
+  | `CANN_ASC_USE_EXPERIMENTAL` | Enables experimental ASC interfaces. This sample requires `ON`. The default value is `OFF`. |
+  | `SCENARIO_NUM` | Type conversion scenario number. This option is required and accepts values from 1 through 6. |
+
+- Expected result
+
+  A successful execution prints:
+
+  ```text
+  test pass!
+  ```
