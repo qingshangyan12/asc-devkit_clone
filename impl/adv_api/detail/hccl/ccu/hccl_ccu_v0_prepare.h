@@ -349,6 +349,29 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         KERNEL_INFO, "RS chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n", sliceSize,
         chunkSize, fullChunkCount, xnData_[15], xnData_[14]);
 }
+
+template <const auto& config>
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::
+    CcuPrepareForReduceScatterPeerOnlyM2M(__gm__ CommonPrepareParamCcu* commParam)
+{
+    xnData_[0] = GetOpId(commParam);
+    const uint64_t dataSize = GetHcclDataTypeSize(commParam->dataType);
+    const uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
+    xnData_[1] = (uint64_t)commParam->sendBuf + offset;
+    xnData_[2] = (uint64_t)commParam->recvBuf + offset;
+    xnData_[3] = 0;
+
+    const uint64_t sliceSize = commParam->count * dataSize;
+    xnData_[4] = ccuParam_.rankId *
+                 ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
+    xnData_[5] = 0;
+    xnData_[6] = 0;
+    xnData_[7] = sliceSize;
+    xnData_[8] = UINT64_MAX - 1;
+    KERNEL_LOG(
+        KERNEL_INFO, "PeerOnly RS prepare: input=0x%llx, output=0x%llx, rankOffset=0x%llx, slice=0x%llx\n",
+        xnData_[1], xnData_[2], xnData_[4], xnData_[7]);
+}
 } // namespace AscendC
 
 #endif
