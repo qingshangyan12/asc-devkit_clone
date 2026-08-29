@@ -30,7 +30,7 @@
 
 关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
-## 函数原型（占位符形式）
+## 函数原型
 
 ```cpp
 // 通过函数返回值返回结果
@@ -47,7 +47,7 @@ __simd_callee__ inline void asc_ceil(vector_<dtype>& dst,
 
 `<dtype>`取值为：`half`、`bfloat16_t`、`float`。
 
-**典型示例**
+### 函数原型典型示例
 
 ```cpp
 // 通过函数返回值返回结果
@@ -81,7 +81,7 @@ __simd_callee__ inline void asc_ceil(vector_half& dst,
 
 - 本接口在非AIV上调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- mask需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
+- `mask`需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 - `half`和`bfloat16_t`支持饱和模式。`float`类型只支持不饱和模式。
 - `mask`掩码位为0时，`dst`对应元素置0。
 
@@ -105,7 +105,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 namespace {
 template <typename T>
-void PrintData(const char* label, const std::vector<T>& values)
+void print_data(const char* label, const std::vector<T>& values)
 {
     std::cout << label << ":";
     const size_t count = values.size() < 8 ? values.size() : 8;
@@ -114,7 +114,7 @@ void PrintData(const char* label, const std::vector<T>& values)
     std::cout << std::endl;
 }
 template <typename T>
-bool CompareData(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
 {
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
@@ -178,10 +178,10 @@ int main()
     aclrtMemcpy(output.data(), output.size() * sizeof(uint8_t), output_device, output.size() * sizeof(uint8_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
     std::cout << "Operation: asc_ceil(vector_half)" << std::endl;
-    PrintData("Input 1.25 (raw bytes)", input);
-    PrintData("Output (raw bytes)", output);
-    PrintData("Golden 2.0 (raw bytes)", golden);
-    const bool passed = CompareData(output, golden);
+    print_data("Input 1.25 (raw bytes)", input);
+    print_data("Output (raw bytes)", output);
+    print_data("Golden 2.0 (raw bytes)", golden);
+    const bool passed = compare_data(output, golden);
     std::cout << (passed ? "[Success] asc_ceil passed." : "[Failed] asc_ceil failed.") << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);

@@ -33,12 +33,12 @@
 计算公式如下：
 
 $$
-result[i] = trunc(src[i])
+dst[i] = trunc(src[i])
 $$
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
-## 函数原型（占位符形式）
+## 函数原型
 
 ```cpp
 // 通过函数返回值返回结果
@@ -55,7 +55,7 @@ __simd_callee__ inline void asc_trunc(vector_<dtype>& dst,
 
 `<dtype>`取值为：`half`、`bfloat16_t`、`float`。
 
-**典型示例**
+### 函数原型典型示例
 
 ```cpp
 // 通过函数返回值返回结果
@@ -76,7 +76,7 @@ __simd_callee__ inline void asc_trunc(vector_half& dst,
 | --- | --- | --- |
 | dst | 输出 | 目的矢量数据寄存器，dtype须与src一致，掩码为真位置写入向零方向截断结果（仍以原浮点类型表示整数），掩码为假位置清零。 |
 | src | 输入 | 源矢量数据寄存器，dtype须与dst一致，提供待截断的浮点元素。 |
-| mask | 输入 | 源掩码寄存器，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| mask | 输入 | 源掩码寄存器，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。`mask`未筛选的元素在输出中置零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
@@ -88,7 +88,7 @@ __simd_callee__ inline void asc_trunc(vector_half& dst,
 ## 约束说明
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，dst与mask为矢量数据寄存器/掩码寄存器。
+- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，`dst`与`mask`为矢量数据寄存器/掩码寄存器。
 - float类型只支持不饱和模式。
 
 ## 调用示例
