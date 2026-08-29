@@ -307,4 +307,33 @@ bfloat16x2_t atomicCAS(__gm__ bfloat16x2_t* address, bfloat16x2_t value1, bfloat
 
 float __fabsf(float x);
 
+namespace AscendC {
+namespace Simt {
+uint32_t GetThreadIdx();
+uint32_t GetLaneId();
+uint32_t GetWarpId();
+void Sync();
+} // namespace Simt
+} // namespace AscendC
+
+int32_t asc_get_block_idx();
+
+int32_t asc_get_block_num();
+
+int64_t clz(uint64_t x);
+
+int64_t bcnt1(uint64_t x);
+
+uint64_t __cce_simt_get_para_base_imp();
+
+static inline int32_t laneid()
+{
+    return 0;
+}
+
+static inline int32_t lanemask_lt()
+{
+    return 0xFFFFFFFF;
+}
+
 #endif

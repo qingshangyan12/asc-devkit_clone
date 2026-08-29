@@ -19,6 +19,7 @@
 #include <chrono>
 
 #include "stub_def.h"
+#include "simt_stub_fun.h"
 
 namespace cce {
 struct dim3 {
@@ -146,14 +147,6 @@ void FuncWrapper(Func func, uint32_t warpId, uint32_t threadIndex)
     func();
     ThreadBlock::GetBlockInstance().ThreadFinished();
 }
-
-uint32_t GetThreadIdx();
-
-uint32_t GetLaneId();
-
-uint32_t GetWarpId();
-
-void Sync();
 } // namespace Simt
 } // namespace AscendC
 
