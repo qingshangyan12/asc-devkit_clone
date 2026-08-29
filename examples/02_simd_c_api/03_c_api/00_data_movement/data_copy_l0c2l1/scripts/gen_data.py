@@ -662,66 +662,37 @@ def apply_prequant(matrix, quant_mode, quant_params, output_type, is_relu):
     return result
 
 
-# ============================================================================
-# D matrix (identity) generation in output type format
-# ============================================================================
-
-def generate_d_matrix(output_type):
-    if output_type == 'int8':
-        return np.eye(N, dtype=np.int8)
-    elif output_type == 'half':
-        return np.eye(N, dtype=np.float16)
-    elif output_type == 'bfloat16':
-        d_eye = np.eye(N, dtype=np.float32)
-        return np.array([float32_to_bfloat16(v) for v in d_eye.flatten()],
-                         dtype=np.uint16).reshape(N, N)
-    elif output_type == 'int4b':
-        return pack_int4b(np.eye(N, dtype=np.int8))
-    elif output_type == 'fp8_e4m3fn':
-        d_eye = np.eye(N, dtype=np.float32)
-        return np.array([float32_to_fp8_e4m3fn(v) for v in d_eye.flatten()],
-                         dtype=np.uint8).reshape(N, N)
-    elif output_type == 'hifloat8':
-        d_eye = np.eye(N, dtype=np.float32)
-        return np.array([float32_to_hifloat8(v) for v in d_eye.flatten()],
-                         dtype=np.uint8).reshape(N, N)
-    elif output_type == 'float':
-        return np.eye(N, dtype=np.float32)
-    else:
-        raise ValueError("Unsupported output type: %s" % output_type)
-
-
 def apply_non_saturation_override(result, l0c_matrix, output_type):
     """Override quantized result for positions where L0C had inf/nan in non-saturation mode.
 
-    In non-saturation mode (CTRL[48]=1), the L0C→L1 copy preserves inf/nan
-    for half/bfloat16/float types (see boundary value table). However, the
-    verification path uses a second Mmad (C × identity_D) to move L1 data to
-    GM. When the quantized C contains inf, IEEE 754 inf×0.0=nan corrupts the
-    entire row to nan in the second Mmad output. This override accounts for
-    that corruption so the golden matches the actual full-pipeline output.
-
-    - half/bfloat16/float: inf/-inf/nan → nan (second Mmad corruption)
-    - fp8_e4m3fn: inf → nan, nan → nan (API behavior, no inf encoding)
+    In non-saturation mode (CTRL[48]=1):
+    - Float types (half, bfloat16, float): preserve inf/nan
+    - fp8_e4m3fn: inf → nan, nan → nan
     - hifloat8: _cvt_float32_to_hifuint8(over_mode=True) already returns the
       inf/nan encodings (111/239/128) that match the non-saturation behavior
     - Integer types: always saturation (no override)
     """
     inf_mask = np.isinf(l0c_matrix)
     nan_mask = np.isnan(l0c_matrix)
-    boundary_mask = inf_mask | nan_mask
 
     if output_type in ('half', 'bfloat16', 'float'):
+        pos_inf_mask = l0c_matrix == np.inf
+        neg_inf_mask = l0c_matrix == -np.inf
         if output_type == 'half':
-            result[boundary_mask] = np.float16(np.nan)
+            result[pos_inf_mask] = np.float16(np.inf)
+            result[neg_inf_mask] = np.float16(-np.inf)
+            result[nan_mask] = np.float16(np.nan)
         elif output_type == 'bfloat16':
-            result[boundary_mask] = np.uint16(0x7FFF)  # bfloat16 nan (hardware pattern)
+            result[pos_inf_mask] = np.uint16(0x7F80)  # bfloat16 +inf
+            result[neg_inf_mask] = np.uint16(0xFF80)  # bfloat16 -inf
+            result[nan_mask] = np.uint16(0x7FFF)      # bfloat16 nan (hardware pattern)
         else:  # float
-            result[boundary_mask] = np.float32(np.nan)
+            result[pos_inf_mask] = np.float32(np.inf)
+            result[neg_inf_mask] = np.float32(-np.inf)
+            result[nan_mask] = np.float32(np.nan)
     elif output_type == 'fp8_e4m3fn':
         fp8_nan = np.uint8(0x7F)  # fp8_e4m3fn nan encoding
-        result[boundary_mask] = fp8_nan
-
+        result[inf_mask | nan_mask] = fp8_nan
     return result
 
 
@@ -761,6 +732,12 @@ def apply_saturation_override(result, l0c_matrix, output_type):
 # ============================================================================
 # Golden data generation
 # ============================================================================
+
+def get_nz_block_columns(output_type):
+    """Get the number of columns per Nz C0 block for the output type."""
+    byte_size = TYPE_BYTE_SIZE[output_type]
+    return max(CUBE_BLOCK, int(C0_BYTES / byte_size))
+
 
 def gen_golden_data(scenario_num, boundary=False, saturation=True):
     np.random.seed(9)
@@ -823,9 +800,6 @@ def gen_golden_data(scenario_num, boundary=False, saturation=True):
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
-    d_gm = generate_d_matrix(output_type)
-    d_gm.tofile("./input/x3_gm.bin")
-
     if is_tensor:
         quant_params.tofile("./input/quant_pre.bin")
 
@@ -833,24 +807,16 @@ def gen_golden_data(scenario_num, boundary=False, saturation=True):
         "./input/x1_gm.bin")
     x2.astype(input_dtype).tofile("./input/x2_gm.bin")
 
-    if output_type == 'int8':
-        golden = golden.astype(np.int32)
-    elif output_type == 'int4b':
-        golden = golden.astype(np.int32)
-    elif output_type == 'half':
-        golden = golden.astype(np.float32)
-    elif output_type == 'bfloat16':
-        golden = bf16_to_float32(golden.astype(np.uint16)).astype(np.float32)
-    elif output_type == 'fp8_e4m3fn':
-        golden = np.array([fp8_e4m3fn_to_float32(b) for b in golden.ravel()],
-                         dtype=np.float32).reshape(M, N)
-    elif output_type == 'hifloat8':
-        golden = np.array([cvt_hifuint8_to_float(b) for b in golden.ravel()],
-                         dtype=np.float32).reshape(M, N)
-    elif output_type == 'float':
-        golden = golden.astype(np.float32)
+    # All l0c2l1 scenarios output Nz format (no NZ2ND scenario)
+    block_columns = get_nz_block_columns(output_type)
+    golden = golden.reshape(
+        M // 16, 16, N // block_columns, block_columns
+    ).transpose(2, 0, 1, 3)
 
-    golden.tofile("./output/golden.bin")
+    if output_type == 'int4b':
+        golden = pack_int4b(golden)
+
+    golden.astype(SAVE_DTYPE[output_type]).tofile("./output/golden.bin")
 
 
 if __name__ == "__main__":
