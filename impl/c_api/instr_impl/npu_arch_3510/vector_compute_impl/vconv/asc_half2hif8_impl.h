@@ -147,72 +147,56 @@ __simd_callee__ inline void asc_half2hif8_rna_sat_impl(
 }
 
 // ASC_RETURN_VALUE_VCONV_IMPL
-__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_impl(
-    vector_half src,
-    vector_bool mask)
+__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_impl(vector_half src, vector_bool mask)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rh_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_sat_impl(
-    vector_half src,
-    vector_bool mask)
+__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_sat_impl(vector_half src, vector_bool mask)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rh_sat_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_v2_impl(
-    vector_half src,
-    vector_bool mask)
+__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_v2_impl(vector_half src, vector_bool mask)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rh_v2_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_sat_v2_impl(
-    vector_half src,
-    vector_bool mask)
+__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_sat_v2_impl(vector_half src, vector_bool mask)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rh_sat_v2_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_impl(
-    vector_half src,
-    vector_bool mask)
+__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_impl(vector_half src, vector_bool mask)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rna_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_sat_impl(
-    vector_half src,
-    vector_bool mask)
+__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_sat_impl(vector_half src, vector_bool mask)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rna_sat_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_v2_impl(
-    vector_half src,
-    vector_bool mask)
+__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_v2_impl(vector_half src, vector_bool mask)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rna_v2_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_sat_v2_impl(
-    vector_half src,
-    vector_bool mask)
+__simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_sat_v2_impl(vector_half src, vector_bool mask)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rna_sat_v2_impl(dst, src, mask);
@@ -220,9 +204,7 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_sat_v2_impl(
 }
 
 __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_impl(
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+    vector_half src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rh_impl(dst, src, mask, dst_pos);
@@ -230,9 +212,7 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_impl(
 }
 
 __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_impl(
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+    vector_half src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rh_impl(dst, src, mask, dst_pos);
@@ -240,9 +220,7 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_impl(
 }
 
 __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_sat_impl(
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+    vector_half src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rh_sat_impl(dst, src, mask, dst_pos);
@@ -250,9 +228,7 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_sat_impl(
 }
 
 __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_sat_impl(
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+    vector_half src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rh_sat_impl(dst, src, mask, dst_pos);
@@ -260,9 +236,7 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rh_sat_impl(
 }
 
 __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_impl(
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+    vector_half src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rna_impl(dst, src, mask, dst_pos);
@@ -270,9 +244,7 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_impl(
 }
 
 __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_impl(
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+    vector_half src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rna_impl(dst, src, mask, dst_pos);
@@ -280,9 +252,7 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_impl(
 }
 
 __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_sat_impl(
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+    vector_half src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rna_sat_impl(dst, src, mask, dst_pos);
@@ -290,9 +260,7 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_sat_impl(
 }
 
 __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna_sat_impl(
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+    vector_half src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 {
     vector_hifloat8_t dst;
     asc_half2hif8_rna_sat_impl(dst, src, mask, dst_pos);

@@ -90,36 +90,28 @@ __simd_callee__ inline void asc_bfloat162int32_ru_sat_impl(
 }
 
 // ASC_RETURN_VALUE_VCONV_IMPL
-__simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_impl(
-    vector_bfloat16_t src,
-    vector_bool mask)
+__simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_impl(vector_bfloat16_t src, vector_bool mask)
 {
     vector_int32_t dst;
     asc_bfloat162int32_ru_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat_impl(
-    vector_bfloat16_t src,
-    vector_bool mask)
+__simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat_impl(vector_bfloat16_t src, vector_bool mask)
 {
     vector_int32_t dst;
     asc_bfloat162int32_ru_sat_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_v2_impl(
-    vector_bfloat16_t src,
-    vector_bool mask)
+__simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_v2_impl(vector_bfloat16_t src, vector_bool mask)
 {
     vector_int32_t dst;
     asc_bfloat162int32_ru_v2_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat_v2_impl(
-    vector_bfloat16_t src,
-    vector_bool mask)
+__simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat_v2_impl(vector_bfloat16_t src, vector_bool mask)
 {
     vector_int32_t dst;
     asc_bfloat162int32_ru_sat_v2_impl(dst, src, mask);
@@ -127,9 +119,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat_v2_impl(
 }
 
 __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_impl(
-    vector_bfloat16_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+    vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {
     vector_int32_t dst;
     asc_bfloat162int32_ru_impl(dst, src, mask, src_pos);
@@ -137,9 +127,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_impl(
 }
 
 __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_impl(
-    vector_bfloat16_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
+    vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 {
     vector_int32_t dst;
     asc_bfloat162int32_ru_impl(dst, src, mask, src_pos);
@@ -147,9 +135,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_impl(
 }
 
 __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat_impl(
-    vector_bfloat16_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+    vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 {
     vector_int32_t dst;
     asc_bfloat162int32_ru_sat_impl(dst, src, mask, src_pos);
@@ -157,9 +143,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat_impl(
 }
 
 __simd_callee__ inline vector_int32_t asc_bfloat162int32_ru_sat_impl(
-    vector_bfloat16_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
+    vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 {
     vector_int32_t dst;
     asc_bfloat162int32_ru_sat_impl(dst, src, mask, src_pos);

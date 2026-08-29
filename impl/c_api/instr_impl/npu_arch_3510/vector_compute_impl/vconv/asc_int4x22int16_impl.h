@@ -47,36 +47,28 @@ __simd_callee__ inline void asc_int4x22int16_v4_impl(vector_int16_t& dst, vector
 }
 
 // ASC_RETURN_VALUE_VCONV_IMPL
-__simd_callee__ inline vector_int16_t asc_int4x22int16_impl(
-    vector_int4x2_t src,
-    vector_bool mask)
+__simd_callee__ inline vector_int16_t asc_int4x22int16_impl(vector_int4x2_t src, vector_bool mask)
 {
     vector_int16_t dst;
     asc_int4x22int16_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_int16_t asc_int4x22int16_v2_impl(
-    vector_int4x2_t src,
-    vector_bool mask)
+__simd_callee__ inline vector_int16_t asc_int4x22int16_v2_impl(vector_int4x2_t src, vector_bool mask)
 {
     vector_int16_t dst;
     asc_int4x22int16_v2_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_int16_t asc_int4x22int16_v3_impl(
-    vector_int4x2_t src,
-    vector_bool mask)
+__simd_callee__ inline vector_int16_t asc_int4x22int16_v3_impl(vector_int4x2_t src, vector_bool mask)
 {
     vector_int16_t dst;
     asc_int4x22int16_v3_impl(dst, src, mask);
     return dst;
 }
 
-__simd_callee__ inline vector_int16_t asc_int4x22int16_v4_impl(
-    vector_int4x2_t src,
-    vector_bool mask)
+__simd_callee__ inline vector_int16_t asc_int4x22int16_v4_impl(vector_int4x2_t src, vector_bool mask)
 {
     vector_int16_t dst;
     asc_int4x22int16_v4_impl(dst, src, mask);
