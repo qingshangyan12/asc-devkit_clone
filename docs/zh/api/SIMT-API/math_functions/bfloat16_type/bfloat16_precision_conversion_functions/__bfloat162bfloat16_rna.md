@@ -71,38 +71,22 @@ inline bfloat16_t __bfloat162bfloat16_rna(const bfloat16_t x)
 
 ## 调用示例
 
-- SIMT编程场景：
+-   SIMT编程场景：
 
     ```cpp
-    __aicore__ void simt_bfloat162bfloat16_rna(bfloat16_t* input, bfloat16_t* output, uint32_t total_length)
+    __global__ __launch_bounds__(1024) void kernel__bfloat162bfloat16_rna(bfloat16_t* dst, bfloat16_t* x)
     {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= total_length) {
-            return;
-        }
-        output[idx] = __bfloat162bfloat16_rna(input[idx]);
-    }
-
-    __global__ __launch_bounds__(1024) void cast_kernel(bfloat16_t* input, bfloat16_t* output, uint32_t total_length)
-    {
-        simt_bfloat162bfloat16_rna(input, output, total_length);
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        dst[idx] = __bfloat162bfloat16_rna(x[idx]);
     }
     ```
 
-- SIMD与SIMT混合编程场景：
+-   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void simt_bfloat162bfloat16_rna(__gm__ bfloat16_t* input, __gm__ bfloat16_t* output, uint32_t total_length)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__bfloat162bfloat16_rna(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)
     {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= total_length) {
-            return;
-        }
-        output[idx] = __bfloat162bfloat16_rna(input[idx]);
-    }
-
-    __global__ __vector__ void cast_kernel(__gm__ bfloat16_t* input, __gm__ bfloat16_t* output, uint32_t total_length)
-    {
-        asc_vf_call<simt_bfloat162bfloat16_rna>(dim3(1024), input, output, total_length);
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        dst[idx] = __bfloat162bfloat16_rna(x[idx]);
     }
     ```
