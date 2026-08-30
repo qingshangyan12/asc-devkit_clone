@@ -77,12 +77,7 @@ $$\Phi(x)=p$$
 
 ## 约束说明
 
-- 仅支持AI Vector Core。
-- calCount不能超过输入或输出Tensor的元素个数。calCount为0时接口执行空操作，输入输出Tensor内容均保持不变。
-- srcTensor和dstTensor的起始地址需要保证32字节对齐。
-- srcTensor和dstTensor地址分离时，调用后srcTensor中的数据保持不变。
-- 支持srcTensor和dstTensor使用完全相同的起始地址进行原地计算。原地计算后，同一存储中的输入被输出结果覆盖。
-- 不支持srcTensor和dstTensor部分地址重叠。
+- srcTensor和dstTensor支持完全同址原地计算，不支持部分地址重叠。
 - 操作数地址对齐要求遵循通用地址对齐约束。
 
 ## 调用示例
