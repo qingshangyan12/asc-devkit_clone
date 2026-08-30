@@ -1,6 +1,6 @@
 # 3510新特性使用说明
 
-本文介绍[NPU架构版本3510](../../programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)新增特性的功能、适用场景、使用约束及开启方法，为开发者将算子程序从其他架构迁移至3510架构提供参考。有关3510架构的整体变更，请参见[2201到3510架构变更](../3510_arch_migration/2201_to_3510_arch_changes.md)。
+本文介绍[NPU架构版本3510](../../programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)新增特性，为开发者将算子程序从其他架构迁移至3510架构提供参考。有关3510架构的整体变更，请参见[2201到3510架构变更](../3510_arch_migration/2201_to_3510_arch_changes.md)。
 
 ## 特性总览
 
@@ -10,7 +10,7 @@
 |------|---------|-----------------|----------------|
 | [新增UB到L1搬运数据通路](#section_ub2l1) | 支持将数据从UB直接搬运至L1 Buffer，无需经由GM中转，从而缩短数据搬运链路并提升性能。使用该通路的基础API需配置`ENABLE_CV_COMM_VIA_SSBUF=true`，相关C API无需配置。 | [DataCopy（UBToL1）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_UBToL1_continuous.md)、[DataCopyPad（UBToL1）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopyPad_UBToL1.md) | [asc_copy_ub2l1](../../../api/SIMD-API/c_api/vector_data_move/asc_copy_ub2l1.md) |
 | [新增L1到UB搬运数据通路](#section_l12ub) | 支持Mix场景下将数据从L1 Buffer直接搬运至指定Vector核的UB，无需经过GM中转 | [DataCopyL1ToUB](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopyL1ToUB.md) | [asc_copy_l12ub](../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l12ub.md) |
-| [新增L0C到UB搬运数据通路](#section_fixpipe_l0c2ub) | 支持将矩阵计算结果从L0C Buffer直接搬运到UB，并支持双目标模式将结果同时写入两个Vector核的UB；L0C到L1 Buffer/L0C到GM支持Fixpipe和DataCopy两种方式 | [Fixpipe（L0CToUB）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB.md)、[DataCopy（L0CToL1）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopy_L0CToL1.md)、[DataCopy（L0CToGM）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopy_L0CToGM.md) | [asc_copy_l0c2ub](../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l0c2ub.md)、[asc_copy_l0c2l1（arch3510）](../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2gm（arch3510）](../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md) |
+| [新增L0C到UB搬运数据通路](#section_fixpipe_l0c2ub) | 支持通过Fixpipe将矩阵计算结果从L0C Buffer直接搬运到UB，并支持双目标模式将结果同时写入两个Vector核的UB | [Fixpipe（L0CToUB）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB.md) | [asc_copy_l0c2ub](../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l0c2ub.md) |
 | [新增ND-DMA多维数据搬运](#section_nddma) | 扩展DataCopy的数据搬运能力，支持配置搬入数据的维度信息和Stride，适用于转置、Broadcast、Slice、Padding等场景 | [DataCopy（GMToUB NDDMA）](../../../api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMToUB_NDDMA.md)、[NdDmaDci](../../../api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/NdDmaDci.md) | [asc_ndim_copy_gm2ub](../../../api/SIMD-API/c_api/vector_data_move/asc_ndim_copy_gm2ub.md) |
 | [DataCopy/DataCopyPad新增loop模式](#section_loop_mode) | 支持L1 Buffer与GM之间、GM与UB之间通路的loop模式搬运，配合DataCopyPad可实现五维数据搬运 | [SetLoopModePara](../../../api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/SetLoopModePara.md)、[ResetLoopModePara](../../../api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/ResetLoopModePara.md) | [asc_set_gm2l1_loop_size等](../../../api/SIMD-API/c_api/cube_data_move/asc_set_gm2l1_loop_size.md)、[asc_set_ub2gm_loop1_stride等](../../../api/SIMD-API/c_api/vector_data_move/asc_set_ub2gm_loop1_stride.md) |
 | [新增MX矩阵搬运与计算](#section_mx) | LoadData新增MX矩阵搬运能力，将矩阵数据与其量化系数矩阵同步搬入L0A/L0B及L0A_MX/L0B_MX；MmadMx新增支持带量化系数的MX低比特矩阵乘加计算 | [LoadData（2D MX搬运）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D_MX.md)、[MmadMx](../../../api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadMx.md) | [asc_copy_l12l0a_mx](../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l12l0a_mx.md)、[asc_copy_l12l0b_mx](../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l12l0b_mx.md)、[asc_mmad_mx](../../../api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md) |
@@ -138,13 +138,11 @@ L1 Buffer到UB数据搬运可通过基础API和C API实现：
 
 #### 功能说明
 
-- L0C Buffer的搬出（L0C到UB、L0C到L1 Buffer、L0C到GM）可通过基础API和C API实现：
-  - 基础API：
-    - [Fixpipe（L0C到UB数据搬运）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB.md)：使用带有`FixpipeParamsArch3510`参数的Fixpipe接口实现L0C到UB搬出，是3510架构新增L0C到UB通路的推荐实现方式。
-    - [DataCopy（L0C到L1 Buffer数据搬运）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopy_L0CToL1.md)、[DataCopy（L0C到GM数据搬运）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopy_L0CToGM.md)：使用`DataCopyCO12DstParams`参数的DataCopy接口实现L0C到L1 Buffer/L0C到GM搬出；L0C到UB通路在3510架构上不支持DataCopy方式，请使用Fixpipe实现。
-  - C API：[asc_copy_l0c2ub](../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l0c2ub.md)、[asc_copy_l0c2l1（arch3510）](../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2gm（arch3510）](../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)接口分别实现L0C到UB、L0C到L1 Buffer、L0C到GM的数据搬出。
+- L0C Buffer到UB搬出可通过基础API和C API实现：
+  - 基础API：[Fixpipe（L0C到UB数据搬运）](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB.md)。使用带有`FixpipeParamsArch3510`参数的Fixpipe接口实现L0C到UB搬出。
+  - C API：[asc_copy_l0c2ub](../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l0c2ub.md)。
 
-- L0C Buffer搬出支持随路格式转换（[NZ2DN](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/NZ2DN.md)）、随路量化、随路ReLU（Normal ReLU/ClipReLU）、随路通道拆分/合并（F32 Channel Split/Int8 Channel Merge）等操作，详情请参考[随路量化](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/accompanying_quantization.md)、[随路ReLU](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/accompanying_relu.md)、[随路量化与随路ReLU场景组合](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md)。
+- L0C Buffer到UB搬出支持随路格式转换（[NZ2ND](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/NZ2ND.md)、[NZ2DN](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/NZ2DN.md)）、随路量化、随路ReLU（Normal ReLU/ClipReLU）、随路通道拆分/合并（F32 Channel Split/Int8 Channel Merge）等操作，详情请参考[随路量化](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/accompanying_quantization.md)、[随路ReLU](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/accompanying_relu.md)、[随路量化与随路ReLU场景组合](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md)。
 - 搬出过程支持fp8、hifloat8、bf16等低比特量化模式与cast能力，例如float量化成fp8_e4m3fn_t（QF322FP8_PRE）、float量化成hifloat8_t（QF322HIF8_PRE）、int32_t量化成bfloat16_t（QS322BF16_PRE）、float量化成half、bfloat16_t、float等，覆盖L0C结果的低比特搬出场景。
 - 支持`dualDstCtrl`双目标模式（1个Cube+2个Vector场景），M×N矩阵可被拆分为两半并同时写入两个Vector核各自的UB（支持按M维度或N维度拆分），详情请参考[L0C Buffer到UB双目标模式](../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/L0C_to_UB_dual_target_mode.md)。
 
@@ -169,10 +167,10 @@ ND-DMA多维数据搬运可通过基础API和C API实现：
 - 支持维度`dim∈[1, 5]`的多维数据搬运，支持逐维配置Stride，支持左右Padding（常数填充或最近值填充）、Transpose、Broadcast、Slice等场景。
 - 使用要点：
 
-  - 该数据通路仅支持GM到UB（GM到VECIN）方向。
-  - 单条指令访问的地址范围宽度不得超过40位（1TB）。每层循环的`dstStride`按升序排列时，不同循环的地址空间不得交织或重叠。
+  - 该数据通路仅支持GM到UB方向。
+  - 每层循环的`dstStride`按升序排列时，不同循环的地址空间不得交织或重叠。
   - 多个核读取同一GM地址时，搬运前必须刷新NDDMA Cache，否则可能读取到错误数据。
-  - 数据类型为b64（int64_t/uint64_t/double/complex64）时，不能开启最近值填充，constantValue必须为0。
+  - 数据类型为b64（int64_t、uint64_t、double、complex64）时，不能开启最近值填充，constantValue必须为0。
 
 #### 典型样例说明
 
@@ -614,7 +612,7 @@ Reg矢量计算相关接口的完整接口清单请参考[Reg矢量计算](../..
 #### 架构规格
 
 - **AI Core核数增加**：3510架构的AI Core核数较2201架构有所增加，可支持更大的片上并行规模。
-- **UB容量提升**：3510架构UB容量提升（总容量256KB，16个bank组成8个bank group，每个bank group包含2个bank，每个bank 16KB），若发生UB冲突，可参考[避免UB的bank冲突](../../operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/overview.md)解决；相关样例请参考[bank_conflict_3510样例](../../../../../examples/01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_3510)（UB Bank冲突场景验证与分析（架构3510））。
+- **UB容量提升**：3510架构的UB总容量提升至256KB，由16个bank组成8个bank group，每个bank group包含2个bank，每个bank大小为16KB。若发生UB冲突，可参考[避免UB的bank冲突](../../operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/overview.md)解决；[bank_conflict_3510样例](../../../../../examples/01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_3510)提供了3510架构下UB Bank冲突场景的验证与分析方法。
 
 #### 数据类型
 
@@ -628,12 +626,12 @@ Reg矢量计算相关接口的完整接口清单请参考[Reg矢量计算](../..
 
 #### 编译选项与空间优化
 
-- **UB空间使用与编译选项**：UB总容量为256KB，其中部分空间可能用于系统预留或划分为Data Cache。3510架构下Ascend C接口内部使用**2KB**预留UB空间（2201架构为8KB），用于指令兼容或存储中间数据。以下编译选项生效，可调整可用的UB空间大小：
+- **UB空间使用与编译选项**：UB总容量为256KB，其中部分空间可能用于系统预留或划分为Data Cache。3510架构下Ascend C接口内部使用**2KB**预留UB空间，用于指令兼容或存储中间数据；2201架构下的预留UB空间为8KB。以下编译选项生效，可调整可用的UB空间大小：
   - `--cce-disable-asc-reserved-ubuf`：禁用Ascend C接口使用预留UB空间，开启后依赖预留UB空间的接口不可用（3510架构下使用预留UB空间的API范围请参考[使用预留UB空间的API列表](../../programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md#section_reserved_ubuf_api)）。
-  - `--cce-disable-vf-stack-reserved-ubuf`：禁用SIMD VF栈预留的UB空间（3510架构生效，开启后可释放6KB预留空间作为普通UB使用，但编译器无法再使用该空间缓存寄存器溢出数据，需保证寄存器不溢出）。
+  - `--cce-disable-vf-stack-reserved-ubuf`：禁用SIMD VF栈预留的UB空间。该选项仅在3510架构下生效。开启后可释放6KB预留空间作为普通UB使用，但编译器无法再使用该空间缓存寄存器溢出数据，需保证寄存器不溢出。
 - **性能优化编译宏**：`NO_OVERLAP_IN_MULTI_REPEAT`可在没有地址重叠的情况下移除不必要的内存同步指令，提升基础API高维切分计算场景的性能，详情请参考[内置编译宏开关](../../programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#内置编译宏开关)。
 - **DCI编译选项（性能优化）**：`--cce-no-dcache-flush`编译选项可在算子尾部插入DCI（DataCacheInvalid）指令替代默认的DCCI（DataCacheCleanAndInvalid）指令使DCache失效，减少数据从DCache同步回GM（Clean）的过程，降低算子尾开销，详细说明请参考[新增DCI数据缓存失效能力](#section_dci)。
 
 #### 兼容性样例
 
-- **兼容性样例**：涉及2201到3510架构变更（如L1 Buffer到GM通路删除、SetLoadDataBoundary删除、int4b_t不支持、L0A Buffer分形变化、Fill接口不支持直接初始化L0A/L0B等）的兼容性适配样例，请参考[兼容性样例说明](../3510_arch_migration/2201_to_3510_arch_changes.md)中“影响”列对应的[06_compatibility_guide样例目录](../../../../../examples/01_simd_cpp_api/06_compatibility_guide)，包括[data_copy_l1togm样例](../../../../../examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)、[set_loaddata_boundary样例](../../../../../examples/01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary)、[matmul_s4样例](../../../../../examples/01_simd_cpp_api/06_compatibility_guide/matmul_s4)、[pattern_transformation样例](../../../../../examples/01_simd_cpp_api/06_compatibility_guide/pattern_transformation)、[fill样例](../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fill)。
+- **兼容性样例**：涉及2201到3510架构变更的适配方式，请分别参见[搬运单元变更](../3510_arch_migration/2201_to_3510_arch_changes.md#section_2201_to_3510_data_move_unit_changes)、[计算单元变更](../3510_arch_migration/2201_to_3510_arch_changes.md#section_2201_to_3510_compute_unit_changes)和[存储单元变更](../3510_arch_migration/2201_to_3510_arch_changes.md#section_2201_to_3510_storage_unit_changes)表格中的“产生的影响”列。相关[06_compatibility_guide样例目录](../../../../../examples/01_simd_cpp_api/06_compatibility_guide)包括[data_copy_l1togm样例](../../../../../examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)、[set_loaddata_boundary样例](../../../../../examples/01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary)、[matmul_s4样例](../../../../../examples/01_simd_cpp_api/06_compatibility_guide/matmul_s4)、[pattern_transformation样例](../../../../../examples/01_simd_cpp_api/06_compatibility_guide/pattern_transformation)和[fill样例](../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fill)。
