@@ -388,6 +388,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     math/hypot/test_operator_hypot.cpp
     math/log/test_operator_log.cpp
     math/ndtri/test_operator_ndtri.cpp
+    api_check/math/ndtri/kernel_ndtri_check.cpp
     math/philox/test_operator_philox_c310.cpp
     math/power/test_operator_power_c310.cpp
     math/sin/test_operator_sin_c310.cpp

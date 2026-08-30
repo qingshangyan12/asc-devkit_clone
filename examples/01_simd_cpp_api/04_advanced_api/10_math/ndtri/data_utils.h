@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <cstdio>
 #include <fstream>
+#include <string>
 
 #define ERROR_LOG(fmt, args...) fprintf(stdout, "[ERROR]  " fmt "\n", ##args)
 
@@ -74,15 +75,15 @@ bool WriteFile(const std::string& filePath, const void* buffer, size_t size)
         return false;
     }
 
-    int fd = open(filePath.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWRITE);
+    int fd = open(filePath.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
     if (fd < 0) {
         ERROR_LOG("Open file failed. path = %s", filePath.c_str());
         return false;
     }
 
-    size_t writeSize = write(fd, buffer, size);
+    ssize_t writeSize = write(fd, buffer, size);
     (void)close(fd);
-    if (writeSize != size) {
+    if (writeSize < 0 || static_cast<size_t>(writeSize) != size) {
         ERROR_LOG("Write file Failed.");
         return false;
     }

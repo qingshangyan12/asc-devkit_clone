@@ -52,6 +52,9 @@ namespace AscendC {
 template <typename T, bool isReuseSource = false>
 __aicore__ inline void Ndtri(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510)
+    static_assert(sizeof(T) == 0, "Ndtri is only supported on NPU architecture 3510.");
+#endif
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     NdtriImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 #endif
@@ -73,6 +76,9 @@ __aicore__ inline void Ndtri(const LocalTensor<T>& dstTensor, const LocalTensor<
 template <typename T, bool isReuseSource = false>
 __aicore__ inline void Ndtri(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510)
+    static_assert(sizeof(T) == 0, "Ndtri is only supported on NPU architecture 3510.");
+#endif
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
     NdtriImpl<T, isReuseSource>(dstTensor, srcTensor, srcTensor.GetSize());
 #endif
