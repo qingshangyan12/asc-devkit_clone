@@ -29,6 +29,13 @@ namespace AscendC {
 namespace experimental {
 namespace HighLevelApiCheck {
 
+using AscendC::HighLevelApiCheck::CalCountCheckFuncBasicClass;
+using AscendC::HighLevelApiCheck::DataTypeCheckFuncBasicClass;
+using AscendC::HighLevelApiCheck::MakeParameters2Tuple;
+using AscendC::HighLevelApiCheck::MakeString2Tuple;
+using AscendC::HighLevelApiCheck::ReuseSourceCheckFuncBasicClass;
+using AscendC::HighLevelApiCheck::SingleTensorCheckFuncBasicClass;
+
 template <typename T, bool isReuseSource = false>
 class CheckFuncClassNdtri : public DataTypeCheckFuncBasicClass,
                             public CalCountCheckFuncBasicClass,
