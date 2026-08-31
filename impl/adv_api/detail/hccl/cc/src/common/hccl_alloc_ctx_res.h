@@ -108,7 +108,8 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuReduceScatterMeshMem2Mem1DPeerOnly", CcuReduceScatterMeshMem2Mem1DPeerOnly},
     {"CcuSchedAllToAllSoleMesh", CcuSchedAllToAllSoleMesh},
     {"CcuSchedAllToAllVSoleMesh", CcuSchedAllToAllVSoleMesh},
-    {"CcuSchedAllReduceSoleMesh", CcuAllReduceMeshMem2Mem1D}};
+    {"CcuSchedAllReduceSoleMesh", CcuAllReduceMeshMem2Mem1D},
+    {"CcuSchedAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D}};
 
 typedef HcclResult (*OpParamPrepareFunc)(
     HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
