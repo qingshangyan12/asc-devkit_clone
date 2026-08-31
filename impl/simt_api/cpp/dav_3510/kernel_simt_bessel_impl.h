@@ -76,6 +76,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float CosfPoly(float s)
     return r;
 }
 
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float SinCosfMinusPIOverFour(float a, int index)
 {
     float r;
