@@ -84,7 +84,9 @@ $$
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 用于控制计算的mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
-- 输入的两个浮点数分别为-0和+0时，返回+0。
+- reg_tensor与reg_tensor形式中，src0对应元素为-0、src1对应元素为+0时，返回+0。
+- reg_tensor位于左侧时，src对应元素为-0、scalar为+0时，返回+0。
+- 标量位于左侧时，scalar为+0、src对应元素为-0时，返回+0。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

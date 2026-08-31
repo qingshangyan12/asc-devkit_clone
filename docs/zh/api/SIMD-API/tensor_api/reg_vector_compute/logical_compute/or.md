@@ -28,7 +28,7 @@
 
 头文件路径：`"tensor_api/experimental/vector_compute.h"`。
 
-该接口根据src0.mask，对源操作数src0、src1进行按元素按位或（|）操作，并返回计算结果。计算公式如下：
+该接口根据src0.mask，对源操作数src0、src1进行按位或（|）操作，并返回计算结果。T不为bool时，对两个矢量数据寄存器按元素计算；T为bool时，对两个掩码寄存器的有效bit计算。计算公式如下：
 
 $$
 dst_i = src0_i \mathbin{|} src1_i
@@ -54,8 +54,8 @@ __simd_callee__ inline reg_tensor<T> operator|(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src0 | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。其中，src0.reg保存矢量数据，src0.mask用于控制各元素是否参与计算。src0.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
-| src1 | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
+| src0 | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。T不为bool时，src0.reg保存矢量数据；T为bool时，src0.reg保存掩码寄存器数据。src0.mask用于控制各元素或bit是否参与计算，对应位置为1时参与计算，为0时不参与计算。 |
+| src1 | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。T不为bool时，src1.reg保存矢量数据；T为bool时，src1.reg保存掩码寄存器数据。src1.mask不参与本次计算。 |
 
 ## 数据类型
 
@@ -68,6 +68,7 @@ __simd_callee__ inline reg_tensor<T> operator|(
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - `src0.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- 参与计算的数据量由矢量长度VL决定。T不为bool时，元素个数为VL除以sizeof(T)；T为bool时，参与计算的bit数为VL。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
