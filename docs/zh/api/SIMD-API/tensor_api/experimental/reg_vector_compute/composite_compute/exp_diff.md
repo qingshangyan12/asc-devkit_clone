@@ -1,4 +1,4 @@
-# exp_diff<a name="ZH-CN_TOPIC_TENSOR_API_EXP_DIFF"></a>
+# exp_diff
 
 ## 产品支持情况
 

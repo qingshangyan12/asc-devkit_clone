@@ -1,4 +1,4 @@
-# relu<a name="ZH-CN_TOPIC_TENSOR_API_RELU"></a>
+# relu
 
 ## 产品支持情况
 

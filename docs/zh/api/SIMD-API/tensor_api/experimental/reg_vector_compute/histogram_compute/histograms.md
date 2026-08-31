@@ -1,4 +1,4 @@
-# histograms<a name="ZH-CN_TOPIC_TENSOR_API_HISTOGRAMS"></a>
+# histograms
 
 ## 产品支持情况
 

@@ -1,4 +1,4 @@
-# min<a name="ZH-CN_TOPIC_TENSOR_API_MIN"></a>
+# min
 
 ## 产品支持情况
 

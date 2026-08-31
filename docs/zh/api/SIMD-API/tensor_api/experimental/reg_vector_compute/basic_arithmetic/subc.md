@@ -1,4 +1,4 @@
-# subc<a name="ZH-CN_TOPIC_TENSOR_API_SUBC"></a>
+# subc
 
 ## 产品支持情况
 

@@ -1,4 +1,4 @@
-# addc<a name="ZH-CN_TOPIC_TENSOR_API_ADDC"></a>
+# addc
 
 ## 产品支持情况
 

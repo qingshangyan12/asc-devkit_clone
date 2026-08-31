@@ -1,4 +1,4 @@
-# log2<a name="ZH-CN_TOPIC_TENSOR_API_LOG2"></a>
+# log2
 
 ## 产品支持情况
 

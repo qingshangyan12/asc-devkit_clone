@@ -1,4 +1,4 @@
-# exp<a name="ZH-CN_TOPIC_TENSOR_API_EXP"></a>
+# exp
 
 ## 产品支持情况
 

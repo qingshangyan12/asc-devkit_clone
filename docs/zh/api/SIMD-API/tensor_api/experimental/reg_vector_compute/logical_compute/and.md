@@ -1,4 +1,4 @@
-# and<a name="ZH-CN_TOPIC_TENSOR_API_AND"></a>
+# and
 
 ## 产品支持情况
 

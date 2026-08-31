@@ -1,4 +1,4 @@
-# sqrt<a name="ZH-CN_TOPIC_TENSOR_API_SQRT"></a>
+# sqrt
 
 ## 产品支持情况
 

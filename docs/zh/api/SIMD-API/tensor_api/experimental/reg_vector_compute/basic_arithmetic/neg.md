@@ -1,4 +1,4 @@
-# neg<a name="ZH-CN_TOPIC_TENSOR_API_NEG"></a>
+# neg
 
 ## 产品支持情况
 

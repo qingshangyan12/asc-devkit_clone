@@ -1,4 +1,4 @@
-# abs_diff<a name="ZH-CN_TOPIC_TENSOR_API_ABS_DIFF"></a>
+# abs_diff
 
 ## 产品支持情况
 

@@ -1,4 +1,4 @@
-# muls_cast<a name="ZH-CN_TOPIC_TENSOR_API_MULS_CAST"></a>
+# muls_cast
 
 ## 产品支持情况
 

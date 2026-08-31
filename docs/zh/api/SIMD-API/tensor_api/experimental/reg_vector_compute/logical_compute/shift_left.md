@@ -1,4 +1,4 @@
-# shift_left<a name="ZH-CN_TOPIC_TENSOR_API_SHIFT_LEFT"></a>
+# shift_left
 
 ## 产品支持情况
 

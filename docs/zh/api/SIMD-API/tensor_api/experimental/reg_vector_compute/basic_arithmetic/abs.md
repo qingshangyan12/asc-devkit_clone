@@ -1,4 +1,4 @@
-# abs<a name="ZH-CN_TOPIC_TENSOR_API_ABS"></a>
+# abs
 
 ## 产品支持情况
 

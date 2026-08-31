@@ -1,4 +1,4 @@
-# prelu<a name="ZH-CN_TOPIC_TENSOR_API_PRELU"></a>
+# prelu
 
 ## 产品支持情况
 

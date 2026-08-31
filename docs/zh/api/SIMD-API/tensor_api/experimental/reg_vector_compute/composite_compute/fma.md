@@ -1,4 +1,4 @@
-# fma<a name="ZH-CN_TOPIC_TENSOR_API_FMA"></a>
+# fma
 
 ## 产品支持情况
 

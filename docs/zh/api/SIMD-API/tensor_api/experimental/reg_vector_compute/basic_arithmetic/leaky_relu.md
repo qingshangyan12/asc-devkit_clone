@@ -1,4 +1,4 @@
-# leaky_relu<a name="ZH-CN_TOPIC_TENSOR_API_LEAKY_RELU"></a>
+# leaky_relu
 
 ## 产品支持情况
 
