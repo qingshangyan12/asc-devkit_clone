@@ -6,7 +6,7 @@
 
 | 接口 | 功能 |
 | --- | --- |
-| [operator!](logical_not.md) | 逐元素取反。 |
+| [operator!](logical_not.md) | 逐元素按位取反。 |
 | [operator&](bit_and.md) | 逐元素按位与。 |
 | [operator\|](bit_or.md) | 逐元素按位或。 |
 | [operator^](bit_xor.md) | 逐元素按位异或。 |
