@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 获取输入int32类型数据x和y乘积的高32位。
 
 ![](../../../figures/zh-cn_formulaimage_0000002562010439.png)
@@ -51,14 +53,6 @@ int __mulhi(int x, int y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
 
 ## 调用示例
 

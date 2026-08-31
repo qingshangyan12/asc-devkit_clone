@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 获取输入int64类型数据x和y乘积的高64位。
 
 ![](../../../figures/zh-cn_formulaimage_0000002562010435.png)
@@ -51,14 +53,6 @@ long long __mul64hi(long long x, long long y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
 
 ## 调用示例
 
