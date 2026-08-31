@@ -91,6 +91,6 @@ inline half hsin(half x)
         if (idx >= total_length) {
             return;
         }
-        dst[idx] = hsin(x[idx]); // 对src源地址的第idx个元素取三角函数正弦值
+        dst[idx] = hsin(x[idx]); // 对x源地址的第idx个元素取三角函数正弦值
     }
     ```

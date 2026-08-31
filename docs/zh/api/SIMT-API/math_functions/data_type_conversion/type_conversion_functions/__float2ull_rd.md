@@ -71,10 +71,11 @@ inline unsigned long long int __float2ull_rd(const float x)
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__float2ull_rd(uint64_t* dst, float* x, uint32_t total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        if (idx < total_length) {
-            dst[idx] = __float2ull_rd(x[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= total_length) {
+            return;
         }
+        dst[idx] = __float2ull_rd(x[idx]);
     }
     ```
 
@@ -83,7 +84,7 @@ inline unsigned long long int __float2ull_rd(const float x)
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel__float2ull_rd(__gm__ uint64_t* dst, __gm__ float* x, uint32_t total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= total_length) {
             return;
         }

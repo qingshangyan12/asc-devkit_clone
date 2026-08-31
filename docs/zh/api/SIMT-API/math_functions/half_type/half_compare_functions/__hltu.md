@@ -65,10 +65,11 @@ bool __hltu(half x, half y)
     ```cpp
     __global__ __launch_bounds__(1024) void kernel_hltu(bool* dst, half* x, half* y, uint32_t total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        if (idx < total_length) {
-            dst[idx] = __hltu(x[idx], y[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= total_length) {
+            return;
         }
+        dst[idx] = __hltu(x[idx], y[idx]);
     }
     ```
 
@@ -77,7 +78,7 @@ bool __hltu(half x, half y)
     ```cpp
     __simt_vf__ __launch_bounds__(1024) inline void kernel_hltu(__gm__ bool* dst, __gm__ half* x, __gm__ half* y, uint32_t total_length)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= total_length) {
             return;
         }
