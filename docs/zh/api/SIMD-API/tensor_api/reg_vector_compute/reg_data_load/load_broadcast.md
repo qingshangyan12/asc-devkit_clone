@@ -28,7 +28,7 @@
 
 头文件路径为：`"tensor_api/experimental/arch/vector/reg_data_load.h"`，命名空间为`asc::te::experimental`。
 
-`load_broadcast`用于从Unified Buffer（UB）Tensor中搬入数据，并按照`broadcast_mode`指定的方式广播到一个[reg_tensor](../register_data_types/reg_tensor.md)。
+`load_broadcast`用于从Unified Buffer（UB）Tensor中搬入数据，并按照`broadcast_mode`指定的方式广播到一个[reg_tensor](../reg_tensor/reg_tensor.md)。
 
 传入`coord`时，从`tensor.engine() + tensor.layout()(coord)`对应的元素开始搬入；不传入`coord`时，从`tensor`起始位置开始搬入。
 
