@@ -67,6 +67,8 @@ SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_float22bfloat162_rna_sat(__gm__ float2* input, __gm__ bfloat16x2_t* output, uint32_t input_total_length)
     {

@@ -64,6 +64,8 @@ inline bfloat16x2_t h2rint(bfloat16x2_t x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __global__ __launch_bounds__(1024) void KernelRint(bfloat16x2_t* dst, bfloat16x2_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -74,6 +76,8 @@ inline bfloat16x2_t h2rint(bfloat16x2_t x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelRint(__gm__ bfloat16x2_t* dst, __gm__ bfloat16x2_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

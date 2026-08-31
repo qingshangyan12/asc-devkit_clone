@@ -65,6 +65,8 @@ bfloat16_t __hadd(const bfloat16_t x, const bfloat16_t y)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __global__ __launch_bounds__(1024) void KernelHadd(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -75,6 +77,8 @@ bfloat16_t __hadd(const bfloat16_t x, const bfloat16_t y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelHadd(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

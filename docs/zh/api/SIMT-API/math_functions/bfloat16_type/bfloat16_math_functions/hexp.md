@@ -67,6 +67,8 @@ e的x次方。本接口受全局饱和模式影响，特殊值如下：
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __global__ __launch_bounds__(1024) void KernelExp(bfloat16_t* dst, bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -77,6 +79,8 @@ e的x次方。本接口受全局饱和模式影响，特殊值如下：
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelExp(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

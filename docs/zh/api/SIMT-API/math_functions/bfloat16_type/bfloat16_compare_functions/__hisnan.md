@@ -59,6 +59,8 @@ inline bool __hisnan(bfloat16_t x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __global__ __launch_bounds__(1024) void KernelIsNan(bool* dst, bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -69,6 +71,8 @@ inline bool __hisnan(bfloat16_t x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelIsNan(__gm__ bool* dst, __gm__ bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

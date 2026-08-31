@@ -127,6 +127,8 @@ bfloat16x2_t __hfmax2_relu(const bfloat16x2_t x, const bfloat16x2_t y, const bfl
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     // 使用短向量可提升数据搬运效率
     __global__ __launch_bounds__(1024) void simt_hfmax2_relu(bfloat16_t* x, bfloat16_t* y, bfloat16_t* z, bfloat16_t* dst, uint32_t input_total_length)
     {
@@ -146,6 +148,8 @@ bfloat16x2_t __hfmax2_relu(const bfloat16x2_t x, const bfloat16x2_t y, const bfl
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_hfmax2_relu(__gm__ bfloat16x2_t* x, __gm__ bfloat16x2_t* y, __gm__ bfloat16x2_t* z, __gm__ bfloat16x2_t* dst, uint32_t input_total_length)
     {

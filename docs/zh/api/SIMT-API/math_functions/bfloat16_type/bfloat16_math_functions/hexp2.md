@@ -67,6 +67,8 @@ inline bfloat16_t hexp2(bfloat16_t x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __global__ __launch_bounds__(1024) void KernelExp2(bfloat16_t* dst, bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -77,6 +79,8 @@ inline bfloat16_t hexp2(bfloat16_t x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelExp2(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

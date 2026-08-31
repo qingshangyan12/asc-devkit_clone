@@ -61,6 +61,8 @@ bfloat16x2_t __hcmadd(const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     // 使用短向量可提升数据搬运效率
     __global__ __launch_bounds__(1024) void simt_hcmadd(bfloat16_t* x, bfloat16_t* y, bfloat16_t* z, bfloat16_t* dst, uint32_t input_total_length)
     {
@@ -80,6 +82,8 @@ bfloat16x2_t __hcmadd(const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_hcmadd(__gm__ bfloat16x2_t* x, __gm__ bfloat16x2_t* y, __gm__ bfloat16x2_t* z, __gm__ bfloat16x2_t* dst, uint32_t input_total_length)
     {

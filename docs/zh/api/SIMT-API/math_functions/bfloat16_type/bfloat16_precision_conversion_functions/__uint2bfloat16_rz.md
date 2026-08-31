@@ -64,6 +64,8 @@ inline bfloat16_t __uint2bfloat16_rz(const unsigned int x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __global__ __launch_bounds__(1024) void kernel__uint2bfloat16_rz(bfloat16_t* dst, uint32_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -74,6 +76,8 @@ inline bfloat16_t __uint2bfloat16_rz(const unsigned int x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel__uint2bfloat16_rz(__gm__ bfloat16_t* dst, __gm__ uint32_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

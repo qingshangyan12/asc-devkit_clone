@@ -68,6 +68,8 @@ SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel__float2bfloat16_rd_sat(__gm__ bfloat16_t* dst, __gm__ float* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
