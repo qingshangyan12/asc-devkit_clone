@@ -40,10 +40,10 @@ asc_copy_gm2l1_nd2nz  asc_copy_l12l0*        asc_mmad  asc_copy_l0c2gm
 
 **Step details**:
 
-1. **GM -> L1**: Use `asc_copy_gm2l1_nd2nz` to implement ND to Nz format conversion.
+1. **GM -> L1**: Use the four-parameter `asc_set_gm2l1_nz_para` to configure the Nz layout, then use the `asc_copy_gm2l1_nd2nz` overload with an `asc_load_l2_cache_mode` parameter to convert ND to Nz.
 2. **L1 -> L0A / L0B**: Use `asc_copy_l12l0a` / `asc_copy_l12l0b` for non-transpose transfer and their `_transpose` variants for transpose transfer.
-3. **Matrix multiplication**: Use `asc_mmad` interface to perform matrix multiplication.
-4. **L0C -> GM**: Use `asc_copy_l0c2gm` interface to transfer results out.
+3. **Matrix multiplication**: Use the `asc_mmad` overload with an `asc_unit_flag_mode` parameter to perform matrix multiplication.
+4. **L0C -> GM**: Use `asc_set_l0c_copy_nz_para` to configure Nz-to-ND conversion, then use the simplified `asc_copy_l0c2gm` overload with enum parameters to transfer results out.
 
 This example uses a fixed matrix multiplication specification of `[m, n, k] = [40, 50, 70]`, with output C matrix `[40, 50]` in ND format. The kernel function selects different scenarios through `scenario_num`.
 
@@ -395,7 +395,7 @@ The following figure shows calling `asc_copy_l12l0a_transpose` once to complete 
   Figure 2: int8_t data type, L1 -> L0A transpose, single asc_copy_l12l0a_transpose call data layout diagram
 </div>
 
-In this example `m = 40`. During B8 transpose transfer, `m_align_l1 = ceil_align(m, fractal_shape[1]) = 64`, `m_align_l1 - m = 24 > 16`. When calling `asc_copy_l12l0a_transpose` once, 1 extra invalid fractal is transferred in the m direction; `asc_mmad` uses `left_height = ceil_align(m, fractal_shape[0] * fractal_num)` to include that fractal in computation, and `asc_copy_l0c2gm` transfers out only the valid region with `m_size = m`.
+In this example `m = 40`. During B8 transpose transfer, `m_align_l1 = ceil_align(m, fractal_shape[1]) = 64`, `m_align_l1 - m = 24 > 16`. When calling `asc_copy_l12l0a_transpose` once, 1 extra invalid fractal is transferred in the m direction; `asc_mmad` uses `m = ceil_align(m, fractal_shape[0] * fractal_num)` to include that fractal in computation, and `asc_copy_l0c2gm` transfers out only the valid region with `m_size = m`.
 
 ```cpp
 ka_align_l1 = ceil_align(k, fractal_shape[0] * fractal_num); // 96
@@ -476,7 +476,7 @@ B32 input data type fractal is 16 * 8. During L1 -> L0 transpose, 2 fractals of 
   Figure 5: float data type, L1 -> L0A transpose, single asc_copy_l12l0a_transpose call data layout diagram
 </div>
 
-In this example `m = 40`. B32 transpose transfer requires combining 2 fractals in the col direction into a square, **`k_step` must be a multiple of 2**, so L1 col direction (m direction) reads 1 extra invalid fractal. After writing to L0A, there is 1 extra invalid fractal at the tail of the k direction; since L0A is in Nz layout, configuring `n_dim = k` in `asc_mmad` ensures only valid k axis data participates in computation.
+In this example `m = 40`. B32 transpose transfer requires combining 2 fractals in the col direction into a square, **`k_step` must be a multiple of 2**, so L1 col direction (m direction) reads 1 extra invalid fractal. After writing to L0A, there is 1 extra invalid fractal at the tail of the k direction; since L0A is in Nz layout, configuring `k = matrix_k` in `asc_mmad` ensures only valid k axis data participates in computation.
 
 ```cpp
 ka_align_l1 = ceil_align(k, fractal_shape[0]); // 80
@@ -580,7 +580,7 @@ B32 input data type fractal is 16 * 8. During L1 -> L0 transpose, 2 fractals of 
   Figure 9: float data type, L1 -> L0B transpose, single asc_copy_l12l0b_transpose call data layout diagram
 </div>
 
-In this example `n = 50`. B32 transpose transfer requires combining 2 fractals in the col direction into a square, **`k_step` must be a multiple of 2**, so L1 col direction (n direction) reads 1 extra invalid fractal. After writing to L0B, there is 1 extra invalid fractal at the tail of the k direction; since L0B is in Zn layout, configuring `n_dim = k` in `asc_mmad` ensures only valid k axis data participates in computation.
+In this example `n = 50`. B32 transpose transfer requires combining 2 fractals in the col direction into a square, **`k_step` must be a multiple of 2**, so L1 col direction (n direction) reads 1 extra invalid fractal. After writing to L0B, there is 1 extra invalid fractal at the tail of the k direction; since L0B is in Zn layout, configuring `k = matrix_k` in `asc_mmad` ensures only valid k axis data participates in computation.
 
 ```cpp
 kb_align_l1 = ceil_align(k, fractal_shape[0]); // 80

@@ -40,10 +40,10 @@ asc_copy_gm2l1_nd2nz   asc_copy_l12l0*    asc_mmad   asc_copy_l0c2gm
 
 **步骤详解**：
 
-1. **GM -> L1**：使用`asc_copy_gm2l1_nd2nz`实现ND到Nz格式转换。
+1. **GM -> L1**：使用四参数`asc_set_gm2l1_nz_para`配置Nz排布参数，使用带`asc_load_l2_cache_mode`枚举参数的`asc_copy_gm2l1_nd2nz`实现ND到Nz格式转换。
 2. **L1 -> L0A / L0B**：使用`asc_copy_l12l0a` / `asc_copy_l12l0b`进行非转置搬运，使用对应的`_transpose`接口进行转置搬运。
-3. **矩阵乘**：使用`asc_mmad`接口执行矩阵乘法。
-4. **L0C -> GM**：使用`asc_copy_l0c2gm`接口搬出结果。
+3. **矩阵乘**：使用带`asc_unit_flag_mode`枚举参数的`asc_mmad`接口执行矩阵乘法。
+4. **L0C -> GM**：使用`asc_set_l0c_copy_nz_para`配置Nz到ND格式转换参数，使用带枚举参数的精简版`asc_copy_l0c2gm`接口搬出结果。
 
 本样例固定矩阵乘规格为`[m, n, k] = [40, 50, 70]`，输出C矩阵为`[40, 50]`，ND格式。核函数通过`scenario_num`选择不同场景。
 
@@ -396,7 +396,7 @@ B8输入数据类型分形为16 * 32，L1 -> L0转置时会按照方型将row方
   图2: int8_t数据类型下，L1 -> L0A转置，调用一次asc_copy_l12l0a_transpose数据排布示意图
 </div>
 
-本样例`m = 40`，B8转置搬运时`m_align_l1 = ceil_align(m, fractal_shape[1]) = 64`，`m_align_l1 - m = 24 > 16`。单次调用`asc_copy_l12l0a_transpose`时，m方向会多搬1个无效分形；`asc_mmad`计算时需要设置`left_height = ceil_align(m, fractal_shape[0] * fractal_num)`让该分形参与计算，最后由`asc_copy_l0c2gm`通过`m_size = m`只搬出有效区域。
+本样例`m = 40`，B8转置搬运时`m_align_l1 = ceil_align(m, fractal_shape[1]) = 64`，`m_align_l1 - m = 24 > 16`。单次调用`asc_copy_l12l0a_transpose`时，m方向会多搬1个无效分形；`asc_mmad`计算时需要设置`m = ceil_align(m, fractal_shape[0] * fractal_num)`让该分形参与计算，最后由`asc_copy_l0c2gm`通过`m_size = m`只搬出有效区域。
 
 ```cpp
 ka_align_l1 = ceil_align(k, fractal_shape[0] * fractal_num); // 96
@@ -477,7 +477,7 @@ B32输入数据类型分形为16 * 8，L1 -> L0转置时会按照方型将col方
   图5: float数据类型下，L1 -> L0A转置，调用一次asc_copy_l12l0a_transpose数据排布示意图
 </div>
 
-本样例`m = 40`。B32转置搬运时需要将col方向2个分形拼成方型，**`k_step`必须是2的倍数**，因此L1上col方向（m方向）会多读1个无效分形。写入L0A后，k方向尾部会多1个无效分形；由于L0A为Nz排布，`asc_mmad`配置`n_dim = k`即可只让有效k轴数据参与计算。
+本样例`m = 40`。B32转置搬运时需要将col方向2个分形拼成方型，**`k_step`必须是2的倍数**，因此L1上col方向（m方向）会多读1个无效分形。写入L0A后，k方向尾部会多1个无效分形；由于L0A为Nz排布，`asc_mmad`配置`k = matrix_k`即可只让有效k轴数据参与计算。
 
 ```cpp
 ka_align_l1 = ceil_align(k, fractal_shape[0]); // 80
@@ -581,7 +581,7 @@ B32输入数据类型分形为16 * 8，L1 -> L0转置时会按照方型将col方
   图9: float数据类型下，L1 -> L0B转置，调用一次asc_copy_l12l0b_transpose数据排布示意图
 </div>
 
-本样例`n = 50`。B32转置搬运时需要将col方向2个分形拼成方型，**`k_step`必须是2的倍数**，因此L1上col方向（n方向）会多读1个无效分形。写入L0B后，k方向尾部会多1个无效分形；由于L0B为Zn排布，`asc_mmad`配置`n_dim = k`即可只让有效k轴数据参与计算。
+本样例`n = 50`。B32转置搬运时需要将col方向2个分形拼成方型，**`k_step`必须是2的倍数**，因此L1上col方向（n方向）会多读1个无效分形。写入L0B后，k方向尾部会多1个无效分形；由于L0B为Zn排布，`asc_mmad`配置`k = matrix_k`即可只让有效k轴数据参与计算。
 
 ```cpp
 kb_align_l1 = ceil_align(k, fractal_shape[0]); // 80
