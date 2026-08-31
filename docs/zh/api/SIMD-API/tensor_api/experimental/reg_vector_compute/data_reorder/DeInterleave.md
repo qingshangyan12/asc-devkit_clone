@@ -1,0 +1,88 @@
+# deinterleave
+
+## 产品支持情况
+
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+
+## 功能说明
+
+头文件路径：`"include/tensor_api/experimental/arch/vector/data_reorder.h"`。
+
+给定源操作数寄存器src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。解交织排列方式如下图所示，其中每个方格代表一个元素：
+
+![](../../../../figures/reg_regdeinterleave.png)
+
+## 函数原型
+
+```cpp
+template <typename T>
+__simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T> src1);
+```
+
+## 参数说明
+
+**表 1**  模板参数说明
+
+| 参数名 | 描述 |
+| --- | --- |
+| T | 目的操作数和源操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
+
+**表 2**  函数参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| src0<br>src1 | 输入 | 源操作数。<br>类型为[reg_tensor]。 |
+
+## 数据类型
+
+支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+
+## 返回值说明
+
+无
+
+## 约束说明<a name="section1240634052310"></a>
+
+- src0、src1的数据类型需要保持一致。
+- src0和src1可以为同一个RegTensor。
+
+## 调用示例<a name="section642mcpsimp"></a>
+
+```cpp
+template<typename T>
+__simd_vf__ inline void DeInterLeaveVF(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint16_t oneRepeatSize, uint16_t repeatTimes)
+{
+    AscendC::Reg::RegTensor<T> srcReg0;
+    AscendC::Reg::RegTensor<T> srcReg1;
+    AscendC::Reg::RegTensor<T> dstReg0;
+    AscendC::Reg::RegTensor<T> dstReg1;
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+    for (uint16_t i = 0; i < repeatTimes; i++) {
+        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
+        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
+        AscendC::Reg::DeInterleave(dstReg0, dstReg1, srcReg0, srcReg1);
+        AscendC::Reg::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
+        AscendC::Reg::StoreAlign(dst1Addr + i * oneRepeatSize, dstReg1, mask);
+    }
+}
+```

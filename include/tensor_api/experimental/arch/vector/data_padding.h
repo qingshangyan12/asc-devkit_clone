@@ -44,7 +44,7 @@ __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>
  * @return A register tensor containing the copied elements and the input mask.
  */
 template <size_t N = 1, typename T>
-__simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& val, const reg_tensor<bool>& mask = all_mask<T>());
+__simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
 } // namespace experimental
 } // namespace te
 } // namespace asc

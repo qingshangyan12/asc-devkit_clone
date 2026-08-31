@@ -46,7 +46,7 @@ __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>
 }
 
 template <size_t N, typename T>
-__simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& val, const reg_tensor<bool>& mask)
+__simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask)
 {
     static_assert(
         detail::is_fill_support_type<T>,
