@@ -1,120 +1,132 @@
-# addc
+# addc<a name="ZH-CN_TOPIC_TENSOR_API_ADDC"></a>
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-- Atlas A3训练系列产品/Atlas A3推理系列产品：不支持
-- Atlas A2训练系列产品/Atlas A2推理系列产品：不支持
-- Atlas 200I/500 A2推理产品：不支持
-- Atlas推理系列产品AI Core：不支持
-- Atlas推理系列产品Vector Core：不支持
-- Atlas训练系列产品：不支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
-## 功能说明
+## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径：`"tensor_api/tensor.h"`。
+头文件路径：`"tensor_api/experimental/vector_compute.h"`。
 
-命名空间：`asc::te::experimental`。
+该接口支持以下两种按元素加法：
 
-`addc`提供带进位输出加法，以及带进位输入和输出加法。
+- 带进位输出加法：对src0和src1相加，返回计算结果的低32位，并通过carry输出进位。
+- 带进位输入和输出加法：对src0、src1和carry_src中的进位相加，返回计算结果的低32位，并通过carry输出新的进位。
 
-### 带进位输出加法
-
-对`src0`和`src1`按元素求和，返回加法和的低32位，并通过`carry`输出每个元素产生的进位。
+计算公式如下：
 
 $$
 \{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, src1_i\}
 $$
 
-### 带进位输入和输出加法
-
-对`src0`、`src1`和`carry_src`中的输入进位按元素求和，返回加法和的低32位，并通过`carry`输出每个元素产生的新进位。
-
 $$
 \{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, src1_i\} + \{32'b0, carry\_src_i\}
 $$
 
-## 函数原型
+## 函数原型<a name="section620mcpsimp"></a>
+
+- 带进位输出加法
+
+    ```cpp
+    template <typename T>
+    __simd_callee__ inline reg_tensor<T> addc(
+        reg_tensor<bool>& carry,
+        const reg_tensor<T>& src0,
+        const reg_tensor<T>& src1)
+    ```
+
+- 带进位输入和输出加法
+
+    ```cpp
+    template <typename T>
+    __simd_callee__ inline reg_tensor<T> addc(
+        reg_tensor<bool>& carry,
+        const reg_tensor<T>& src0,
+        const reg_tensor<T>& src1,
+        const reg_tensor<bool>& carry_src)
+    ```
+
+## 参数说明<a name="section622mcpsimp"></a>
+
+**表 1**  模板参数说明
+
+| 参数名 | 描述 |
+| --- | --- |
+| T | 操作数数据类型。仅支持uint32_t。 |
 
 ### 带进位输出加法
 
-```cpp
-template <typename T>
-__simd_callee__ inline reg_tensor<T> addc(
-    reg_tensor<bool>& carry,
-    const reg_tensor<T>& src0,
-    const reg_tensor<T>& src1)
-```
-
-### 带进位输入和输出加法
-
-```cpp
-template <typename T>
-__simd_callee__ inline reg_tensor<T> addc(
-    reg_tensor<bool>& carry,
-    const reg_tensor<T>& src0,
-    const reg_tensor<T>& src1,
-    const reg_tensor<bool>& carry_src)
-```
-
-## 参数说明
-
-### 带进位输出加法
+**表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 模板参数 | 输入和返回值的元素类型，仅支持`uint32_t`。 |
-| `carry` | 输出 | 进位输出，类型为`reg_tensor<bool>`。`carry.reg`保存每个元素的进位标志，产生进位时为`1`，否则为`0`。返回时`carry.mask`与`src0.mask`相同，用于标记哪些进位结果有效。 |
-| `src0` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| `src1` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
+| carry | 输出 | 进位输出，类型为reg_tensor&lt;bool&gt;。carry.reg中，产生进位的元素为1，否则为0；返回时carry.mask与src0.mask相同。 |
+| src0 | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。src0.reg保存矢量数据，src0.mask控制各元素是否参与计算。 |
+| src1 | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
 
 ### 带进位输入和输出加法
+
+**表 3**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 模板参数 | 输入和返回值的元素类型，仅支持`uint32_t`。 |
-| `carry` | 输出 | 进位输出，类型为`reg_tensor<bool>`。`carry.reg`保存每个元素的新进位标志，产生进位时为`1`，否则为`0`。返回时`carry.mask`与`src0.mask`相同，用于标记哪些进位结果有效。 |
-| `src0` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| `src1` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
-| `carry_src` | 输入 | 进位输入，类型为`reg_tensor<bool>`。`carry_src.reg`保存每个元素的输入进位标志，`carry_src.mask`不用于本次计算。 |
+| carry | 输出 | 新的进位输出，类型为reg_tensor&lt;bool&gt;。carry.reg中，产生进位的元素为1，否则为0；返回时carry.mask与src0.mask相同。 |
+| src0 | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。src0.reg保存矢量数据，src0.mask控制各元素是否参与计算。 |
+| src1 | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
+| carry_src | 输入 | 进位输入，类型为reg_tensor&lt;bool&gt;。carry_src.reg中，输入进位为1的元素参与进位计算；carry_src.mask不参与本次计算。 |
 
-## 返回值说明
+## 数据类型
 
-### 带进位输出加法
+src0、src1与返回值的数据类型保持一致，仅支持uint32_t。carry和carry_src的元素类型为bool。
 
-返回`reg_tensor<T>`。`reg`保存`src0`与`src1`逐元素相加后的低32位，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。
+## 返回值说明<a name="section640mcpsimp"></a>
 
-### 带进位输入和输出加法
+返回加法结果的低32位，类型为reg_tensor&lt;T&gt;。返回值mask与src0.mask相同；src0.mask对应位置为0时，返回值和carry的对应元素均置零。
 
-返回`reg_tensor<T>`。`reg`保存`src0`、`src1`和输入进位逐元素相加后的低32位，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。
+## 约束说明<a name="section633mcpsimp"></a>
 
-## 约束说明
+src0.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
 
-当一个大于32位的整数拆成多个32位部分进行加法时，最低32位使用带进位输出加法，其余部分从低位到高位依次使用带进位输入和输出加法，并将前一部分输出的进位传给后一部分。
-
-## 调用示例
-
-以下示例展示接口在AIV计算函数中的典型调用方式。第0行保存低32位，第1行保存高32位。
+## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/vector_compute.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void addc_example(
-    InputTensor input0, InputTensor input1, OutputTensor output)
+__simd_vf__ inline void addc_example(InputTensor input0, InputTensor input1, OutputTensor output)
 {
-    auto mask = asc::te::all_mask<uint32_t>();
-    auto src0_low = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
-    auto src1_low = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
-    auto src0_high = input0.load(asc::te::make_coord(1, 0)).with_mask(mask);
-    auto src1_high = input1.load(asc::te::make_coord(1, 0)).with_mask(mask);
+    auto mask = asc::te::experimental::all_mask<uint32_t>();
+    auto src0_low = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
+    auto src1_low = asc::te::experimental::load(input1, asc::te::make_coord(0));
+    auto src0_high = asc::te::experimental::load(input0, asc::te::make_coord(1)).with_mask(mask);
+    auto src1_high = asc::te::experimental::load(input1, asc::te::make_coord(1));
 
     asc::te::reg_tensor<bool> carry_low;
     auto low = asc::te::experimental::addc(carry_low, src0_low, src1_low);
     asc::te::reg_tensor<bool> carry_high;
     auto high = asc::te::experimental::addc(carry_high, src0_high, src1_high, carry_low);
 
-    output.store(asc::te::make_coord(0, 0), low);
-    output.store(asc::te::make_coord(1, 0), high);
+    asc::te::experimental::store(output, asc::te::make_coord(0), low);
+    asc::te::experimental::store(output, asc::te::make_coord(1), high);
 }
 ```

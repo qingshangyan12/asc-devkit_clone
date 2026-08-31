@@ -1,59 +1,83 @@
-# relu
+# relu<a name="ZH-CN_TOPIC_TENSOR_API_RELU"></a>
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-- Atlas A3训练系列产品/Atlas A3推理系列产品：不支持
-- Atlas A2训练系列产品/Atlas A2推理系列产品：不支持
-- Atlas 200I/500 A2推理产品：不支持
-- Atlas推理系列产品AI Core：不支持
-- Atlas推理系列产品Vector Core：不支持
-- Atlas训练系列产品：不支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
-## 功能说明
+## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径：`"tensor_api/tensor.h"`。
+头文件路径：`"tensor_api/experimental/vector_compute.h"`。
 
-命名空间：`asc::te::experimental`。
-
-逐元素执行ReLU：
+该接口根据输入reg_tensor携带的mask，对源操作数按元素执行ReLU计算，并返回计算结果。计算公式如下：
 
 $$
 dst_i = \max(src_i, 0)
 $$
 
-## 函数原型
+## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
 template <typename T>
 __simd_callee__ inline reg_tensor<T> relu(const reg_tensor<T>& src_reg)
 ```
 
-## 参数说明
+## 参数说明<a name="section622mcpsimp"></a>
+
+**表 1**  模板参数说明
+
+| 参数名 | 描述 |
+| --- | --- |
+| T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
+
+**表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 模板参数 | 输入和返回值的元素类型，支持`half`、`int32_t`、`float`。 |
-| `src_reg` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src_reg.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| src_reg | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。其中，src_reg.reg保存矢量数据，src_reg.mask用于控制各元素是否参与计算。src_reg.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
-## 返回值说明
+## 数据类型
 
-返回`reg_tensor<T>`。`reg`保存逐元素ReLU计算结果，`src_reg.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src_reg.mask`相同。
+源操作数与返回值的数据类型保持一致。支持的数据类型为：half、int32_t、float。
 
-## 调用示例
+## 返回值说明<a name="section640mcpsimp"></a>
 
-以下示例展示接口在AIV计算函数中的典型调用方式。示例先为加载结果绑定mask，
-再执行计算并将结果写回UB。
+返回按元素执行ReLU计算的结果，类型为reg_tensor&lt;T&gt;。返回值mask与src_reg.mask相同；src_reg.mask对应位置为0时，返回值的对应元素置零。
+
+## 约束说明<a name="section633mcpsimp"></a>
+
+src_reg.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+
+## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/vector_compute.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void relu_example(InputTensor input, OutputTensor output)
 {
-    auto src_reg = input.load(asc::te::make_coord(0, 0)).with_mask(asc::te::all_mask<float>());
-
-    auto dst_reg = asc::te::experimental::relu(src_reg);
-    output.store(asc::te::make_coord(0, 0), dst_reg);
+    auto mask = asc::te::experimental::all_mask<float>();
+    auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(mask);
+    auto dst = asc::te::experimental::relu(src);
+    asc::te::experimental::store(output, asc::te::make_coord(0), dst);
 }
 ```

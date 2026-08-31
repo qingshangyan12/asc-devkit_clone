@@ -1,20 +1,32 @@
-# operator^
+# xor<a name="ZH-CN_TOPIC_TENSOR_API_XOR"></a>
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-- Atlas A3训练系列产品/Atlas A3推理系列产品：不支持
-- Atlas A2训练系列产品/Atlas A2推理系列产品：不支持
-- Atlas 200I/500 A2推理产品：不支持
-- Atlas推理系列产品AI Core：不支持
-- Atlas推理系列产品Vector Core：不支持
-- Atlas训练系列产品：不支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
-## 功能说明
+## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径：`"tensor_api/tensor.h"`。
-
-命名空间：`asc::te::experimental`。
+头文件路径：`"tensor_api/experimental/vector_compute.h"`。
 
 逐元素执行按位异或运算，支持寄存器与寄存器、寄存器与标量、标量与寄存器三种形式。
 
@@ -22,14 +34,22 @@ $$
 dst_i = a_i \,\mathbin{\oplus}\, b_i
 $$
 
-## 函数原型
+## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator^(const T& a, const U& b)
 ```
 
-## 参数说明
+## 参数说明<a name="section622mcpsimp"></a>
+
+**表 1**  模板参数说明
+
+| 参数名 | 描述 |
+| --- | --- |
+| T、U | 操作数类型。两个参数中必须至少有一个为reg_tensor，且两个操作数的元素类型需保持一致。支持的数据类型请参考[数据类型](#数据类型)。 |
+
+**表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -38,28 +58,29 @@ __simd_callee__ inline decltype(auto) operator^(const T& a, const U& b)
 
 `bool`类型要求`a`和`b`均为`reg_tensor<bool>`，接口使用`a.mask`标记参与计算的元素。
 
-## 支持的数据类型
+## 数据类型
 
 | 操作数组合 | 寄存器元素类型 |
 | --- | --- |
 | 寄存器/寄存器 | `bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t` |
 | 寄存器/标量、标量/寄存器 | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t` |
 
-## 返回值说明
+## 返回值说明<a name="section640mcpsimp"></a>
 
 返回与寄存器操作数元素类型相同的`reg_tensor`。`reg`保存逐元素按位异或结果，计算所用的输入`mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与本次计算所用的输入`mask`相同。
 
-## 约束说明
+## 约束说明<a name="section633mcpsimp"></a>
 
-构造`reg_tensor<bool>{maskValue}`只初始化对象的`mask`，不会生成布尔寄存器数据。作为操作数前，`reg`必须已经由mask生成、加载或其他布尔计算接口写入。
+- 用于控制计算的mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- 构造`reg_tensor<bool>{maskValue}`只初始化对象的mask，不会生成布尔寄存器数据。作为操作数前，reg必须已经由mask生成、加载或其他布尔计算接口写入。
 
-## 调用示例
+## 调用示例<a name="section642mcpsimp"></a>
 
 以下示例展示接口在AIV计算函数中的典型调用方式。示例先为加载结果绑定mask，
 再执行计算并将结果写回UB。
 
 ```cpp
-#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/vector_compute.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void bit_xor_example(
@@ -67,11 +88,11 @@ __simd_vf__ inline void bit_xor_example(
 {
     using asc::te::experimental::operator^;
 
-    auto mask = asc::te::all_mask<int32_t>();
-    auto src0_reg = input0.load(asc::te::make_coord(0, 0)).with_mask(mask);
-    auto src1_reg = input1.load(asc::te::make_coord(0, 0)).with_mask(mask);
+    auto mask = asc::te::experimental::all_mask<int32_t>();
+    auto src0_reg = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
+    auto src1_reg = asc::te::experimental::load(input1, asc::te::make_coord(0)).with_mask(mask);
 
     auto result = src0_reg ^ src1_reg;
-    output.store(asc::te::make_coord(0, 0), result);
+    asc::te::experimental::store(output, asc::te::make_coord(0), result);
 }
 ```
