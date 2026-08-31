@@ -4,7 +4,7 @@
 
 This example demonstrates how to call `asc_copy_l12l0a` / `asc_copy_l12l0b` and their `_transpose` variants to transfer A / B matrices from L1 to L0A / L0B Buffer.
 
-The example covers three input data types: int8_t, half, and float, as well as A / B matrix transposed and non-transposed input scenarios. L0A data layout is Nz format, L0B data layout is Zn format. The kernel uses a C-like straight-line structure, with `constexpr` values and compile-time preprocessor branches for scenario configuration, and does not use templates.
+The example covers three input data types: int8_t, half, and float, as well as A / B matrix transposed and non-transposed input scenarios. L0A data layout is Nz format, L0B data layout is Zn format.
 
 ## Supported Products and CANN Versions
 
@@ -40,10 +40,10 @@ asc_copy_gm2l1_nd2nz  asc_copy_l12l0*        asc_mmad  asc_copy_l0c2gm
 
 **Step details**:
 
-1. **GM -> L1**: Use the four-parameter `asc_set_gm2l1_nz_para` to configure the Nz layout, then use the `asc_copy_gm2l1_nd2nz` overload with an `asc_load_l2_cache_mode` parameter to convert ND to Nz.
+1. **GM -> L1**: Use `asc_set_gm2l1_nz_para` to configure the Nz layout, then use `asc_copy_gm2l1_nd2nz` to convert ND to Nz.
 2. **L1 -> L0A / L0B**: Use `asc_copy_l12l0a` / `asc_copy_l12l0b` for non-transpose transfer and their `_transpose` variants for transpose transfer.
-3. **Matrix multiplication**: Use the `asc_mmad` overload with an `asc_unit_flag_mode` parameter to perform matrix multiplication.
-4. **L0C -> GM**: Use `asc_set_l0c_copy_nz_para` to configure Nz-to-ND conversion, then use the simplified `asc_copy_l0c2gm` overload with enum parameters to transfer results out.
+3. **Matrix multiplication**: Use `asc_mmad` to perform matrix multiplication.
+4. **L0C -> GM**: Use `asc_set_l0c_copy_nz_para` to configure Nz-to-ND conversion, then use `asc_copy_l0c2gm` to transfer results out.
 
 This example uses a fixed matrix multiplication specification of `[m, n, k] = [40, 50, 70]`, with output C matrix `[40, 50]` in ND format. The kernel function selects different scenarios through `scenario_num`.
 

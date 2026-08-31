@@ -4,7 +4,7 @@
 
 本样例展示如何调用`asc_copy_l12l0a` / `asc_copy_l12l0b`及其`_transpose`接口，将A / B矩阵从L1搬运到L0A / L0B Buffer。
 
-样例覆盖int8_t、half、float三种输入数据类型，以及A / B矩阵转置和不转置输入场景。L0A数据排布为Nz格式，L0B数据排布为Zn格式。核侧代码采用类C语言的直线式组织，通过`constexpr`和编译期预处理分支配置不同场景，不使用模板。
+样例覆盖int8_t、half、float三种输入数据类型，以及A / B矩阵转置和不转置输入场景。L0A数据排布为Nz格式，L0B数据排布为Zn格式。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -40,10 +40,10 @@ asc_copy_gm2l1_nd2nz   asc_copy_l12l0*    asc_mmad   asc_copy_l0c2gm
 
 **步骤详解**：
 
-1. **GM -> L1**：使用四参数`asc_set_gm2l1_nz_para`配置Nz排布参数，使用带`asc_load_l2_cache_mode`枚举参数的`asc_copy_gm2l1_nd2nz`实现ND到Nz格式转换。
+1. **GM -> L1**：使用`asc_set_gm2l1_nz_para`配置Nz排布参数，使用`asc_copy_gm2l1_nd2nz`实现ND到Nz格式转换。
 2. **L1 -> L0A / L0B**：使用`asc_copy_l12l0a` / `asc_copy_l12l0b`进行非转置搬运，使用对应的`_transpose`接口进行转置搬运。
-3. **矩阵乘**：使用带`asc_unit_flag_mode`枚举参数的`asc_mmad`接口执行矩阵乘法。
-4. **L0C -> GM**：使用`asc_set_l0c_copy_nz_para`配置Nz到ND格式转换参数，使用带枚举参数的精简版`asc_copy_l0c2gm`接口搬出结果。
+3. **矩阵乘**：使用`asc_mmad`接口执行矩阵乘法。
+4. **L0C -> GM**：使用`asc_set_l0c_copy_nz_para`配置Nz到ND格式转换参数，使用`asc_copy_l0c2gm`接口搬出结果。
 
 本样例固定矩阵乘规格为`[m, n, k] = [40, 50, 70]`，输出C矩阵为`[40, 50]`，ND格式。核函数通过`scenario_num`选择不同场景。
 
