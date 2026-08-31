@@ -146,10 +146,10 @@ def apply_prequant(matrix, scenario_num, quant_params):
 
 def gen_golden_data(scenario_num):
     np.random.seed(9)
-    if scenario_num in (1, 2, 5, 6, 7):
+    if scenario_num in (1, 2, 5, 6):
         input_dtype = np.int8
         mm_dtype = np.int32
-        output_dtype = np.int32 if scenario_num == 7 else (np.float16 if scenario_num in (1, 2) else np.int8)
+        output_dtype = np.float16 if scenario_num in (1, 2) else np.int8
         x1 = np.random.randint(-3, 3, (M, K)).astype(input_dtype)
         x2 = np.random.randint(-3, 3, (K, N)).astype(input_dtype)
     else:
@@ -161,8 +161,7 @@ def gen_golden_data(scenario_num):
 
     golden = np.matmul(x1.astype(mm_dtype), x2.astype(mm_dtype)).astype(mm_dtype)
     quant_params = make_quant_params()
-    if scenario_num != 7:
-        golden = apply_prequant(golden, scenario_num, quant_params)
+    golden = apply_prequant(golden, scenario_num, quant_params)
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
@@ -185,6 +184,6 @@ def gen_golden_data(scenario_num):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 8))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 7))
     args = parser.parse_args()
     gen_golden_data(args.scenarioNum)

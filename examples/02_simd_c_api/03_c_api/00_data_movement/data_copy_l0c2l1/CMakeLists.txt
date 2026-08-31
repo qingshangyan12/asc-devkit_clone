@@ -25,9 +25,9 @@ if(NOT CMAKE_ASC_RUN_MODE MATCHES "^(npu|sim)$")
     message(FATAL_ERROR "CMAKE_ASC_RUN_MODE must be npu or sim, but got ${CMAKE_ASC_RUN_MODE}.")
 endif()
 
-set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-7)")
-if(NOT SCENARIO_NUM MATCHES "^[1-7]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3, 4, 5, 6, or 7, but got ${SCENARIO_NUM}")
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-6)")
+if(NOT SCENARIO_NUM MATCHES "^[1-6]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3, 4, 5, or 6, but got ${SCENARIO_NUM}")
 endif()
 
 add_executable(demo data_copy_l0c2l1.asc)

@@ -38,10 +38,11 @@ Use the `SCENARIO_NUM` build parameter to select a scenario. Every scenario uses
 | 4 | half | float | int8_t, ND | Vector `VQF322B8_PRE` | Yes | Yes |
 | 5 | int8_t | int32_t | int8_t, ND | Scalar `REQ8` | No | Yes |
 | 6 | int8_t | int32_t | int8_t, Nz | Vector `VREQ8` | Yes | No |
+| 7 | int8_t | int32_t | int32_t, ND | `NoQuant` | No | Yes, M-axis dual-destination split |
 
 `SCENARIO_NUM` is passed by CMake as a compile-time macro. The kernel selects the corresponding scenario with `if constexpr`. After changing the scenario, recompile the project.
 
-The device-side flow is as follows. Each K chunk follows `GM→L1 Buffer (MTE2)→L0A Buffer/L0B Buffer (MTE1)→Mmad (M)`. `MTE1→MTE2` and `M→MTE1` protect L1 Buffer, L0A Buffer, and L0B Buffer reuse for the next chunk. The final `M→FIX` dependency ensures that Fixpipe uses `asc_copy_l0c2ub` to move the L0C Buffer result to the UB of subblock0 after Mmad completes. After the AIV side waits for the UB data, only subblock0 calls `asc_copy_ub2gm_align` to copy the result to GM for verification. `asc_sync_pipe(PIPE_ALL)` is called at the end of the kernel to ensure that all pipelines complete.
+The device-side flow is as follows. Each K chunk follows `GM→L1 Buffer (MTE2)→L0A Buffer/L0B Buffer (MTE1)→Mmad (M)`. `MTE1→MTE2` and `M→MTE1` protect L1 Buffer, L0A Buffer, and L0B Buffer reuse for the next chunk. The final `M→FIX` dependency ensures that Fixpipe uses `asc_copy_l0c2ub` to move the L0C Buffer result to UB after Mmad completes. Scenarios 1 through 6 use single-destination mode, write the result to subblock0 UB, and let subblock0 write it back to GM. Scenario 7 uses `DUAL_DST_SPLIT_M` to split the L0C result along M and write each half to one AIV UB; both AIVs wait for the result and write their own GM slice. `asc_sync_pipe(PIPE_ALL)` is called at the end of the kernel to ensure that all pipelines complete.
 
 **Scenario 1: int8 input, scalar dequantization, and ND half output**
 
@@ -78,6 +79,12 @@ The device-side flow is as follows. Each K chunk follows `GM→L1 Buffer (MTE2)�
 - Input: A `[128, 128]` and B `[128, 256]`, both ND `int8_t`; `[256] uint64_t` quantization parameters
 - Output: C `[128, 256]` in Nz `int8_t`
 - Implementation: Use `VREQ8` and enable ReLU
+
+**Scenario 7: int8 input, L0C-to-UB dual-destination M split, and ND int32_t output**
+
+- Input: A `[128, 128]` and B `[128, 256]`, both ND `int8_t`
+- Output: C `[128, 256]` in ND `int32_t`
+- Implementation: Use `asc_copy_l0c2ub` with `DUAL_DST_SPLIT_M` and `NoQuant` to split the result across the two AIV UBs, then let each AIV write back its GM slice
 
 For scenarios 2, 4, and 6, the parameters are moved from GM to L1 Buffer with `asc_copy_gm2l1`, then from L1 Buffer to Fixpipe Buffer with `asc_copy_l12fb`. `asc_set_l0c_copy_config` configures the vector-quantization parameter address. Its parameter address is expressed in 128B units, so the parameter file must be rounded up to 128B and any padding must be zero-filled. The `[256] uint64_t` parameters in this example occupy 2048B and already meet this requirement. Moving these parameters from L1 Buffer to Fixpipe Buffer transfers 2048B of data in 64B data blocks, so `len_burst` in `asc_copy_l12fb` is set to 32. `asc_sync_pipe(PIPE_FIX)` completes the L1 Buffer-to-Fixpipe Buffer movement and parameter configuration before Fixpipe moves the L0C Buffer result to UB.
 
@@ -120,7 +127,7 @@ Run the following steps in the example root directory.
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture for Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | 1-6 | Scenario number |
+  | `SCENARIO_NUM` | 1-7 | Scenario number |
 
 - Expected result
 
