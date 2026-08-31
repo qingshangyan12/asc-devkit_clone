@@ -87,6 +87,16 @@ __aicore__ inline constexpr void debug_check_copy_size(const tensor_api_assert_c
                                TENSOR_API_REPORT_INTERNAL(report_copy_size_error, src, dst, api_name));
 }
 
+template <typename ShapeType>
+__aicore__ inline constexpr void debug_check_copy_shape(const tensor_api_assert_context& context,
+                                                        const ShapeType& shape, __gm__ const char* api_name)
+{
+    TENSOR_API_DEBUG_ASSERT_AT(
+        context, (is_shape_valid(shape)),
+        TENSOR_API_LOG_INTERNAL(
+            "Failed to check copy shape in %s; every copy shape dimension must be greater than 0.", api_name));
+}
+
 template <typename LayoutType, typename CoordType, typename InfoType>
 __aicore__ inline constexpr void debug_check_slice_args(const tensor_api_assert_context& context,
                                                         const LayoutType& layout, const CoordType& coord,
