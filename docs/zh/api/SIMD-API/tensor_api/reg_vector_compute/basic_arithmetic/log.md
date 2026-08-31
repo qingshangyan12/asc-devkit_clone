@@ -66,7 +66,6 @@ __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src_reg)
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - `src_reg.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
-- `src_reg.mask`中与元素对应的比特位为0时，返回值的对应元素置0。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
