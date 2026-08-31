@@ -25,8 +25,9 @@ constexpr int32_t HCCL_SUCCESS = 0;
 constexpr uint8_t HCCL_ONLY_COMPUTE = 1U;
 constexpr uint8_t HCCL_ASCEND910B = 1U;
 constexpr uint32_t MAX_DCCI_CNT = 64U;
-constexpr uint64_t DATA_TYPE_MAP[] = {1, 2, 4, 2, 4, 8, 8, 1, 8, 4, 8, 2, 0, 0, 1, 1, 1, 1, 1};
+constexpr uint64_t DATA_TYPE_MAP[] = {1, 2, 4, 2, 4, 8, 8, 1, 2, 4, 8, 2, 0, 0, 1, 1, 1, 1, 1};
 constexpr uint32_t DATA_TYPE_MAP_SIZE = sizeof(DATA_TYPE_MAP) / sizeof(DATA_TYPE_MAP[0]);
+static_assert(DATA_TYPE_MAP[HCCL_DATA_TYPE_UINT16] == 2U, "UINT16 elements occupy two bytes");
 static_assert(DATA_TYPE_MAP[HCCL_DATA_TYPE_MXFP8] == 1U, "MXFP8 elements occupy one byte");
 
 __aicore__ inline uint64_t GetHcclDataTypeSize(HcclDataType dataType)
@@ -102,7 +103,6 @@ __aicore__ inline constexpr bool IsValidCcuRankNum(uint32_t rankNum)
 {
     return rankNum > 0U && rankNum <= HCCL_CCU_MAX_RANK_NUM;
 }
-
 struct HcclCombineOpParam {
     uint64_t workSpace;     // Address for communication between client and server,
                             // hccl requests and clears
@@ -158,7 +158,7 @@ struct HcclOpResParam {
 } // namespace HcclContextDef
 constexpr uint16_t CCU_CKE_SIZE = 8;
 constexpr uint64_t CCU_XN_DATA_SIZE = 8;       // Number of bytes per xn
-constexpr uint16_t CCU_USED_XN_NUM = 15;       // Currently xn are used
+constexpr uint16_t CCU_USED_XN_NUM = 32;       // Maximum parameters loaded from a KFC message
 constexpr uint16_t CCU_MAX_MSG_NUM = 64;       // The message queue length sent to CCU
 constexpr uint16_t CCU_MSG_XN_NUM = 64;        // Maximum xn number, each CCU message body occupies 8 registers
                                                // the message body length is 64*8B=512B
@@ -180,7 +180,7 @@ struct CCUMsg {
 };
 
 struct CCUMsgExt { // AllToAllv HcclMsgExt trans for ccu
-    uint64_t sendSize;
+    uint64_t tailSize;
     uint64_t loopNum = UINT64_MAX - 1;
     uint64_t sendOffset;
     uint64_t recvOffset;
