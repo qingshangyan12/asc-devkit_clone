@@ -8,16 +8,17 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "../../../../include/adv_api/normalization/welfordfinalize_tiling.h"
+#include "adv_api/utils/types.h"
+#include "adv_api/normalization/welfordfinalize_tiling.h"
 #include "../../detail/host_log.h"
-#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
+#include "utils/tiling/platform/platform_ascendc.h"
 
 namespace AscendC {
 constexpr uint32_t WELFORDFINALIZE_BASICBLOCK_UNIT = 64;
 constexpr uint32_t WELFORDFINALIZE_BASIC_SIZE = 32 / sizeof(float);
 
 void GetWelfordFinalizeMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
     uint32_t& minValue)
 {
     (void)isReuseSource;
@@ -26,7 +27,8 @@ void GetWelfordFinalizeMaxMinTmpSize(
     platform_ascendc::PlatformAscendC* platform = platform_ascendc::PlatformAscendCManager::GetInstance();
     ASCENDC_HOST_ASSERT((platform != nullptr), return, "Failed to get PlatformAscendC.");
     const auto npuArch = platform->GetCurNpuArch();
-    if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102) {
+    if (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_5102 || npuArch == NpuArch::DAV_3003 ||
+        npuArch == NpuArch::DAV_3113) {
         const uint32_t srcK = shapeDims.back();
         // next is to get the max 2^k
         uint32_t reduceK = srcK;

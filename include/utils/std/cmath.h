@@ -12,10 +12,16 @@
  * \file cmath.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "cmath.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #ifndef AICORE_UTILS_STD_CMATH_H
 #define AICORE_UTILS_STD_CMATH_H
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#include <cstdint>
 #include "stub_def.h"
 #endif
 
@@ -23,6 +29,17 @@ namespace AscendC {
 namespace Std {
 template <typename T> __aicore__ inline T sqrt(const T src);
 template <typename T> __aicore__ inline T abs(const T src);
+
+/*
+ * @ingroup Cmath
+ * @brief Divide a by b and return the ceiling of the quotient
+ * @param [in] a dividend
+ * @param [in] b divisor
+ * @return Ceiling of the quotient a / b
+ * @note For signed inputs, callers must ensure a >= 0 and b > 0.
+ */
+template <typename T, typename U> __host__ __aicore__ inline constexpr auto ceil_div(const T& a, const U& b);
+
 }
 }
 

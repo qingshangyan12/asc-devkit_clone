@@ -13,19 +13,19 @@ This example uses the Add operator to show how to capture Ascend C `<<<>>>` kern
 | Product | CANN Version |
 |---------|-------------|
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.1.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.1.0 |
 
 ## Directory Structure
 
 ```text
 ├── 04_aclgraph
-│   ├── figures                 // Diagrams
+│   ├── figures                        // Diagrams
 │   │   ├── single_stream_capture.png  // Single-stream capture flowchart
 │   │   └── double_stream_capture.png  // Double-stream capture flowchart
-│   ├── CMakeLists.txt          // Build project
-│   ├── add.asc                 // Ascend C kernel implementation and ACLGraph capture invocation example
-│   └── README.md               // Example documentation
+│   ├── CMakeLists.txt                 // Build project
+│   ├── add.asc                        // Ascend C kernel implementation and ACLGraph capture invocation example
+│   └── README.md                      // Example documentation
 ```
 
 ## Scenario Details
@@ -34,7 +34,7 @@ This example uses the CMake build parameter `SCENARIO_NUM` to select different A
 
 <table>
 <caption style="font-weight: normal;">
-         <span style="font-weight: bold; font-size: 1.2em;">📌 Table 1: Values of SCENARIO_NUM</span></caption>
+         <span style="font-weight: bold; font-size: 1.2em;">Table 1: Values of SCENARIO_NUM</span></caption>
 <tr><td rowspan="1" align="center">SCENARIO_NUM</td><td align="center">Scenario</td><td align="center">Task organization</td><td align="center">Description</td></tr>
 <tr><td align="center">1</td><td align="center">Single stream</td><td align="center">All tasks are submitted to <code>mainStream</code></td><td align="center">Demonstrates the basic linear task capture and repeated execution process</td></tr>
 <tr><td align="center">2</td><td align="center">Double stream</td><td align="center"><code>mainStream</code> and <code>computeStream</code> synchronize through events</td><td align="center">Demonstrates how to capture cross-stream tasks and event synchronization relationships</td></tr>
@@ -112,7 +112,7 @@ The example also calls `aclmdlRIDebugJsonPrint` to output the captured task info
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../../docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh

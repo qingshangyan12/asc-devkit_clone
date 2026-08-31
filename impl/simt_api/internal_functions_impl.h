@@ -16,7 +16,8 @@
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_INTERNAL_FUNCTIONS_IMPL__
-#warning "impl/simt_api/internal_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use public functions or variables defined in interface header files."
+#warning \
+    "impl/simt_api/internal_functions_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use public functions or variables defined in interface header files."
 #endif
 
 #ifndef IMPL_SIMT_API_INTERNAL_FUNCTIONS_IMPL_H
@@ -75,6 +76,44 @@ __aicore__ inline constexpr ::ROUND __internal_get_round()
 #endif
 }
 #endif
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline signed char __internal_int_to_char(int32_t x)
+{
+    if (x > 127) {                            // 127:upper bound of int8
+        return static_cast<signed char>(127); // 127:upper bound of int8
+    }
+    if (x < -128) {                            // -128:lower bound of int8
+        return static_cast<signed char>(-128); // -128:lower bound of int8
+    }
+    return static_cast<signed char>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned char __internal_uint_to_uchar(uint32_t x)
+{
+    if (x > 255U) {                              // 255:upper bound of uint8
+        return static_cast<unsigned char>(255U); // 255:upper bound of uint8
+    }
+    return static_cast<unsigned char>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline short int __internal_int_to_short(int32_t x)
+{
+    if (x > 32767) {                          // 32767:upper bound of short
+        return static_cast<short int>(32767); // 32767:upper bound of short
+    }
+    if (x < -32768) {                          // -32768:lower bound of short
+        return static_cast<short int>(-32768); // -32768:lower bound of short
+    }
+    return static_cast<short int>(x);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned short int __internal_uint_to_ushort(uint32_t x)
+{
+    if (x > 65535U) {                                   // 65535U:upper bound of ushort
+        return static_cast<unsigned short int>(65535U); // 65535U:upper bound of ushort
+    }
+    return static_cast<unsigned short int>(x);
+}
 
 #endif
 #endif // IMPL_SIMT_API_INTERNAL_FUNCTIONS_IMPL_H

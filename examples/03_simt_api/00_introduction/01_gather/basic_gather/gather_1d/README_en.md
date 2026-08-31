@@ -18,7 +18,7 @@ This sample implements a one-dimensional Gather operator in a simple scenario (w
 ├── gather_1d
 │   ├── CMakeLists.txt         # CMake build file
 │   ├── gather_1d.asc          # Sample for one-dimensional gather using SIMT
-|   └── README.md
+│   └── README.md
 ```
 
 ## Operator Description
@@ -51,14 +51,14 @@ This sample implements a one-dimensional Gather operator in a simple scenario (w
   The implementation process of the gather_1d operator retrieves data at specified indices from the input (Global Memory). Based on the above data partitioning, it first calculates the index of data that the thread should process, then reads one element according to index[i] and writes it to output[i].
 
 - Invocation Implementation:  
-  Use the kernel call operator <<<>>> to launch the kernel.
+  Use the kernel call operator `<<<>>>` to launch the kernel.
 
 ## Build and Run
 
 Execute the following steps in the root directory of this sample to build and run the operator.
 
 - Configure Environment Variables  
-  Configure the environment variables according to the [installation method](../../../../../../docs/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Configure the environment variables according to the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

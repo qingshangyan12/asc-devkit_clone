@@ -8,14 +8,27 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_MISC_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_MISC_IMPL_H
 
 #include "impl/c_api/instr_impl/npu_arch_3510/misc_impl/init_soc_state_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/misc_impl/asc_nop_impl.h"
 
-__aicore__ inline void asc_init()
-{
-    asc_init_soc_state_impl();
-}
+__aicore__ inline void asc_init() { asc_init_soc_state_impl(); }
 
+namespace __asc_aicore {
+__aicore__ inline void asc_nop() { asc_nop_impl(); }
+} // namespace __asc_aicore
+
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif

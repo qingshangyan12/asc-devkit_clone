@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /*!
  * \file common_types.h
@@ -20,7 +20,21 @@
 #include "sys_macros.h"
 
 namespace AscendC {
-enum class Hardware : uint8_t { GM, UB, L1, L0A, L0B, L0C, BIAS, FIXBUF, MAX };
+enum class Hardware : uint8_t {
+    GM,
+    UB,
+    L1,
+    L0A,
+    L0B,
+    L0C,
+    BIAS,
+    FIXBUF,
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+    PT,
+#endif
+    MAX
+};
 
 enum class ReduceType {
     NONE = -1,
@@ -31,19 +45,11 @@ enum class ReduceType {
 } // namespace AscendC
 
 #if !defined(ASCENDC_CPU_DEBUG)
-#if (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3510))) || defined(__NPU_HOST__) || defined(__ASC_NPU_HOST__)
-    using fp4x2_e2m1_t = float4_e2m1x2_t;
-    using fp4x2_e1m2_t = float4_e1m2x2_t;
-    using fp8_e5m2_t = float8_e5m2_t;
-    using fp8_e4m3fn_t = float8_e4m3_t;
-    using fp8_e8m0_t = float8_e8m0_t;
-#else
-    using fp4x2_e2m1_t = uint8_t;
-    using fp4x2_e1m2_t = uint8_t;
-    using fp8_e5m2_t = uint8_t;
-    using fp8_e4m3fn_t = uint8_t;
-    using fp8_e8m0_t = uint8_t;
-#endif
+using fp4x2_e2m1_t = float4_e2m1x2_t;
+using fp4x2_e1m2_t = float4_e1m2x2_t;
+using fp8_e5m2_t = float8_e5m2_t;
+using fp8_e4m3fn_t = float8_e4m3_t;
+using fp8_e8m0_t = float8_e8m0_t;
 #endif
 
 constexpr uint32_t INT4_BIT_NUM = 4;
@@ -65,11 +71,9 @@ struct integer_sub_type {
     Storage storage;
     __aicore__ inline integer_sub_type() = default;
 
-    __aicore__ inline integer_sub_type(uint32_t value)
-        : storage(reinterpret_cast<Storage const &>(value) & mask) {}
+    __aicore__ inline integer_sub_type(uint32_t value) : storage(reinterpret_cast<Storage const&>(value) & mask) {}
 
-    __aicore__ inline integer_sub_type(int32_t value)
-        : storage(reinterpret_cast<Storage const &>(value) & mask) {}
+    __aicore__ inline integer_sub_type(int32_t value) : storage(reinterpret_cast<Storage const&>(value) & mask) {}
 
     __aicore__ inline operator T() const
     {
@@ -80,17 +84,11 @@ struct integer_sub_type {
         return T(storage);
     }
 
-    __aicore__ inline bool operator == (integer_sub_type const &rhs) const
-    {
-        return storage == rhs.storage;
-    }
+    __aicore__ inline bool operator==(integer_sub_type const& rhs) const { return storage == rhs.storage; }
 
-    __aicore__ inline bool operator != (integer_sub_type const &rhs) const
-    {
-        return storage != rhs.storage;
-    }
+    __aicore__ inline bool operator!=(integer_sub_type const& rhs) const { return storage != rhs.storage; }
 
-    __aicore__ inline bool operator > (integer_sub_type const &rhs) const
+    __aicore__ inline bool operator>(integer_sub_type const& rhs) const
     {
         bool lhs_is_neg = (this->storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(this->k_bits - 1)));
         bool rhs_is_neg = (rhs.storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(rhs.k_bits - 1)));
@@ -100,7 +98,7 @@ struct integer_sub_type {
         return this->storage > rhs.storage;
     }
 
-    __aicore__ inline bool operator >= (integer_sub_type const &rhs) const
+    __aicore__ inline bool operator>=(integer_sub_type const& rhs) const
     {
         bool lhs_is_neg = (this->storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(this->k_bits - 1)));
         bool rhs_is_neg = (rhs.storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(rhs.k_bits - 1)));
@@ -110,15 +108,9 @@ struct integer_sub_type {
         return storage >= rhs.storage;
     }
 
-    __aicore__ inline bool operator < (integer_sub_type const &rhs) const
-    {
-        return !(*this >= rhs);
-    }
+    __aicore__ inline bool operator<(integer_sub_type const& rhs) const { return !(*this >= rhs); }
 
-    __aicore__ inline bool operator <= (integer_sub_type const &rhs) const
-    {
-        return !(*this > rhs);
-    }
+    __aicore__ inline bool operator<=(integer_sub_type const& rhs) const { return !(*this > rhs); }
 };
 
 using int4b_t = integer_sub_type<INT4_BIT_NUM, true>;

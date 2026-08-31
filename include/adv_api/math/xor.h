@@ -13,6 +13,10 @@
  * \brief
  */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "xor.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_XOR_H__
@@ -55,9 +59,10 @@ __aicore__ inline void Xor(
         (std::is_same<T, int16_t>::value || std::is_same<T, uint16_t>::value),
         "Failed to check the data types, current api support data types are int16_t/uint16_t.");
 
-#if (                                                                                                 \
-    defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3002 || \
-                              __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102))
+#if (                                                                                                \
+    defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3510 || \
+     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
     XorImpl<T, isReuseSource>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
 #endif
 }

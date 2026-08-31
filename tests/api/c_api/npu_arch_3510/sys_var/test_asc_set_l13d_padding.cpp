@@ -11,7 +11,8 @@
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
-#include "include/c_api/asc_simd.h"
+#include "c_api/cube_datamove/cube_datamove.h"
+#include "c_api/utils/sys_init.h"
 
 #define TEST_SYS_VAR_SET_PADDING(data_type)                                           \
                                                                                       \
@@ -24,13 +25,36 @@
     TEST_F(TestSysVarSetL13dPadding##data_type, c_api_set_l12ub_loop_size##data_type) \
     {                                                                                 \
         data_type input = 33;                                                         \
-        MOCKER_CPP(set_padding, void(uint64_t)).times(1);                             \
+        MOCKER_CPP(set_padding, void(uint64_t)).times(2);                             \
         asc_set_l13d_padding(input);                                                  \
         asc_init();                                                                   \
         GlobalMockObject::verify();                                                   \
+    }
+
+#define TEST_NEW_SYS_VAR_SET_PADDING(data_type)                      \
+    TEST(TestSysVarSetNewPadding, c_api_set_new_padding_##data_type) \
+    {                                                                \
+        g_coreType = C_API_AIC_TYPE;                                 \
+        data_type input = 33;                                        \
+        MOCKER_CPP(set_padding, void(uint64_t)).times(3);            \
+        asc_set_l12l0a_3d_padding(input);                            \
+        asc_set_gm2l1_padding(input);                                \
+        asc_init();                                                  \
+        GlobalMockObject::verify();                                  \
+        g_coreType = C_API_AIV_TYPE;                                 \
     }
 
 TEST_SYS_VAR_SET_PADDING(uint64_t);
 TEST_SYS_VAR_SET_PADDING(half);
 TEST_SYS_VAR_SET_PADDING(int16_t);
 TEST_SYS_VAR_SET_PADDING(uint16_t);
+TEST_NEW_SYS_VAR_SET_PADDING(uint64_t);
+TEST_NEW_SYS_VAR_SET_PADDING(int8_t);
+TEST_NEW_SYS_VAR_SET_PADDING(uint8_t);
+TEST_NEW_SYS_VAR_SET_PADDING(int16_t);
+TEST_NEW_SYS_VAR_SET_PADDING(uint16_t);
+TEST_NEW_SYS_VAR_SET_PADDING(half);
+TEST_NEW_SYS_VAR_SET_PADDING(bfloat16_t);
+TEST_NEW_SYS_VAR_SET_PADDING(int32_t);
+TEST_NEW_SYS_VAR_SET_PADDING(uint32_t);
+TEST_NEW_SYS_VAR_SET_PADDING(float);

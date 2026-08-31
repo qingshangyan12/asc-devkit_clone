@@ -6,11 +6,11 @@ SIMD and SIMT hybrid programming applies to scenarios where the same kernel need
 
 SIMD and SIMT hybrid programming is an advanced programming mode based on SIMD programming and SIMT programming. Related samples are mainly distributed in the following paths:
 
-- The `examples/05_simd_simt_hybrid` path provides introductory hybrid programming samples and samples that use SIMD and SIMT together for performance optimization.
+- The `examples/05_simd_simt_hybrid` path provides introductory hybrid programming samples, troubleshooting samples, and samples that use SIMD and SIMT together for performance optimization.
 - Because the kernel entry of hybrid programming is consistent with the SIMD programming mode, end-to-end profiling and debugging samples can refer to the samples under `examples/01_simd_cpp_api`.
 - Hybrid programming starts SIMT VF functions to implement SIMT thread-level operations. Key features, profiling/debugging, and performance optimization samples related to SIMT VF can refer to samples under `examples/03_simt_api`.
 
-The following sections introduce the introduction, utilities, features, and best_practices samples involved in hybrid programming scenarios.
+The following sections introduce the introduction, utilities, features, trouble_shooting, and best_practices samples involved in hybrid programming scenarios.
 
 ## introduction
 
@@ -47,6 +47,14 @@ When developing custom operators based on SIMD and SIMT hybrid programming, refe
 | atomic_operation | SIMT reference sample. Demonstrates the usage of atomic operation APIs. It is applicable to multi-thread accumulation, counting, or conflict write handling in hybrid programming. Sample link: [atomic_operation](../03_simt_api/02_features/01_api_features/02_atomic_operation). | This sample is implemented in SIMT programming mode as a reference sample. It can be converted into the corresponding hybrid programming sample implementation. For details, see [SIMT Reference Sample Conversion Guide](#simt-reference-sample-conversion-guide). |
 | warp_instruction | SIMT reference sample. Demonstrates Warp-level data exchange capability, which can be used to understand thread collaboration and data transfer within a Warp. Sample link: [warp_instruction](../03_simt_api/02_features/01_api_features/03_warp_instruction). | This sample is implemented in SIMT programming mode as a reference sample. It can be converted into the corresponding hybrid programming sample implementation. For details, see [SIMT Reference Sample Conversion Guide](#simt-reference-sample-conversion-guide). |
 
+## trouble_shooting
+
+[01_trouble_shooting](./01_trouble_shooting) is the troubleshooting reference directory for SIMD and SIMT hybrid programming. It contains the following samples.
+
+| Sample Name | Sample Description |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| simd_simt_ub_usage_limit | Uses a UB out-of-bounds access that causes an output accuracy error as an example to demonstrate UB static memory, dynamic memory, reserved space, Data Cache layout, and out-of-bounds troubleshooting in hybrid programming. Sample link: [simd_simt_ub_usage_limit](./01_trouble_shooting/simd_simt_ub_usage_limit). |
+
 ## best_practices
 
 Common performance optimization paths for SIMD and SIMT hybrid programming are as follows:
@@ -59,12 +67,12 @@ Common performance optimization paths for SIMD and SIMT hybrid programming are a
 - Execution configuration optimization: Configure gridDim, blockDim, and VF function invocation granularity based on data size and per-thread workload to reduce invalid threads and scheduling overhead.
 - Compute instruction optimization: For scenarios such as integer division by a fixed divisor, use multiplication and shift operations to replace high-overhead division instructions.
 
-The `02_best_practices` path provides performance optimization samples implemented using SIMD and SIMT hybrid programming. These samples mainly demonstrate how to use SIMD and SIMT together to improve performance.
+The [`02_best_practices`](./02_best_practices) path provides performance optimization samples implemented using SIMD and SIMT hybrid programming. These samples mainly demonstrate how to use SIMD and SIMT together to improve performance.
 
 | Sample Name | Sample Description |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
 | simd_simt_matrix_transpose | Uses matrix transpose as an example to introduce UB staging and Global Memory access coalescing optimization. Sample link: [simd_simt_matrix_transpose](./02_best_practices/simd_simt_matrix_transpose). |
-| simd_simt_high_performance | Uses FloorMod computation as an example to compare implementations such as direct GM access by SIMT, SIMD RegBase computation, SIMT access to UB, and continuous thread mapping. Sample link: [simd_simt_high_performance](./02_best_practices/simd_simt_high_performance). |
+| simd_simt_high_performance | Uses FloorMod computation as an example to compare implementations such as direct GM access by SIMT, SIMD Reg vector computation, SIMT access to UB, and continuous thread mapping. Sample link: [simd_simt_high_performance](./02_best_practices/simd_simt_high_performance). |
 | simd_simt_grid_dim_config | Uses Gather computation as an example to introduce thread block count configuration and VF function invocation optimization. Sample link: [simd_simt_grid_dim_config](./02_best_practices/simd_simt_grid_dim_config). |
 | simd_simt_integer_fast_div | Uses integer division by a fixed divisor as an example to demonstrate the instruction optimization method of replacing normal division with multiplication and shift operations. Sample link: [simd_simt_integer_fast_div](./02_best_practices/simd_simt_integer_fast_div). |
 
@@ -101,7 +109,7 @@ __global__ __launch_bounds__(MAX_THREAD_COUNT) void gather_custom(
 SIMD and SIMT hybrid programming: thread-level SIMT logic is split into a `__simt_vf__` function.
 
 ```cpp
-__simt_vf__ __launch_bounds__(thread_count) inline void simt_gather(
+__simt_vf__ __launch_bounds__(MAX_THREAD_COUNT) inline void simt_gather(
     __gm__ float* input, __gm__ uint32_t* index, __ubuf__ float* gather_output, ...)
 {
     uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -110,7 +118,7 @@ __simt_vf__ __launch_bounds__(thread_count) inline void simt_gather(
 
 // SIMD and SIMT hybrid programming: the entry Kernel keeps the __global__ __vector__
 // definition and invokes the SIMT VF function through asc_vf_call.
-__global__ __vector__ void gather_and_adds_kernel(
+__global__ __vector__ void gather_custom(
     __gm__ float* input, __gm__ uint32_t* index, __gm__ float* output, ...)
 {
     ...
@@ -129,26 +137,26 @@ The specific differences are as follows:
 
 SIMT programming and SIMD and SIMT hybrid programming configure invocation parameters in different places. A typical comparison is as follows:
 
-```cpp
-// SIMT programming: Host-side <<<>>> directly configures the SIMT Kernel
-// thread block count, thread count, dynamic UB, and stream.
-gather_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(...);
+SIMT programming: the Host side uses `<<<>>>` to directly configure the number of thread blocks, number of threads, dynamic UB size, and stream for the SIMT Kernel.
 
-// SIMD and SIMT hybrid programming: Host-side <<<>>> starts the Vector Core entry Kernel.
-constexpr uint32_t num_blocks = 8;
-constexpr uint32_t dyn_ub_size = 2048;
-gather_and_adds_kernel<<<num_blocks, dyn_ub_size, stream>>>(...);
+```cpp
+gather_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(...);
+```
+
+```cpp
+// SIMD and SIMT hybrid programming: the Host side uses <<<>>> to launch the Vector Core entry Kernel.
+gather_and_adds_kernel<<<blocks_per_grid, dyn_ubuf_size, stream>>>(...);
 
 // SIMD and SIMT hybrid programming: the SIMT thread count is configured
 // inside the entry Kernel through asc_vf_call.
-asc_vf_call<simt_gather>(dim3(thread_count), input, index, gather_output, ...);
+asc_vf_call<simt_gather>(dim3(threads_per_block), input, index, gather_output, ...);
 ```
 
 The specific differences are as follows:
 
 - In SIMT programming samples, the Host-side `<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>` directly starts the SIMT Kernel. The first parameter indicates the thread block count, the second parameter indicates the thread count in each thread block, the third parameter indicates the dynamic UB size, and the fourth parameter indicates the stream.
-- In SIMD and SIMT hybrid programming samples, the Host-side `<<<num_blocks, dyn_ub_size, stream>>>` starts the `__global__ __vector__` entry Kernel. The first parameter indicates the number of Vector Cores or logical cores to start, the second parameter indicates the dynamic UB size, and the third parameter indicates the stream.
-- The SIMT thread count in hybrid programming is not configured by Host-side `<<<>>>`. It is configured inside the entry Kernel through `asc_vf_call<simt_func>(dim3(thread_count), ...)`.
+- In SIMD and SIMT hybrid programming samples, the Host-side `<<<blocks_per_grid, dyn_ubuf_size, stream>>>` starts the `__global__ __vector__` entry Kernel. The first parameter indicates the number of Vector Cores or logical cores to start (equivalent to the number of thread blocks), the second parameter indicates the dynamic UB size, and the third parameter indicates the stream.
+- The SIMT thread count in hybrid programming is not configured by Host-side `<<<>>>`. It is configured inside the entry Kernel through `asc_vf_call<simt_func>(dim3(threads_per_block), ...)`.
 
 ### CMake Compilation Option Difference
 

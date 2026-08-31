@@ -12,6 +12,11 @@
  * \file tuple.h
  * \brief
  */
+
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "tuple.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #ifndef AICORE_UTILS_STD_TUPLE_H
 #define AICORE_UTILS_STD_TUPLE_H
 
@@ -46,16 +51,16 @@ ASCENDC_HOST_AICORE inline constexpr tuple<Tps& ...> tie(Tps& ...args) noexcept;
 
 // get
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline typename tuple_element<N, tuple<Tps...> >::type& get(tuple<Tps...>& t) noexcept;
+ASCENDC_HOST_AICORE inline constexpr typename tuple_element<N, tuple<Tps...> >::type& get(tuple<Tps...>& t) noexcept;
 
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline const typename tuple_element<N, tuple<Tps...> >::type& get(const tuple<Tps...>& t) noexcept;
+ASCENDC_HOST_AICORE inline constexpr const typename tuple_element<N, tuple<Tps...> >::type& get(const tuple<Tps...>& t) noexcept;
 
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline typename tuple_element<N, tuple<Tps...> >::type&& get(tuple<Tps...>&& t) noexcept;
+ASCENDC_HOST_AICORE inline constexpr typename tuple_element<N, tuple<Tps...> >::type&& get(tuple<Tps...>&& t) noexcept;
 
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline const typename tuple_element<N, tuple<Tps...> >::type&& get(const tuple<Tps...>&& t) noexcept;
+ASCENDC_HOST_AICORE inline constexpr const typename tuple_element<N, tuple<Tps...> >::type&& get(const tuple<Tps...>&& t) noexcept;
 
 }
 }

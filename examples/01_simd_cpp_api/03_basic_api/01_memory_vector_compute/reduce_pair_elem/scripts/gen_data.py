@@ -15,6 +15,7 @@
 import os
 import numpy as np
 
+
 def gen_golden_data_simple():
     """
     生成ReducePairElem样例的测试数据和golden数据
@@ -24,10 +25,10 @@ def gen_golden_data_simple():
     input_type = np.float16
     output_type = input_type
     block_length = 128
-    
+
     min_val, max_val = -1000, 1000
     input_shape = [block_length]
-    output_shape = [block_length // 2] 
+    output_shape = [block_length // 2]
     input_x = np.random.uniform(min_val, max_val, input_shape).astype(input_type)
     golden = np.zeros(output_shape).astype(output_type)
     for i in range(len(golden)):

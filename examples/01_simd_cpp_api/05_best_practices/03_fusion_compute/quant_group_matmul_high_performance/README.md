@@ -1,5 +1,6 @@
 # QuantGroupMatmul最佳实践样例
 
+
 ## 概述
 
 本样例实现了per-token量化的分组矩阵乘法（QuantGroupMatmul），展示CV融合时Vector bound场景下的性能调优方法。
@@ -430,7 +431,7 @@ Atlas A2/A3上表现不同：Scenario 2中`aiv_vec_time`为235.872μs，高于`a
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

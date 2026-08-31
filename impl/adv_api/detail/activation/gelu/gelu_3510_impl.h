@@ -60,8 +60,8 @@ __simd_vf__ inline void GeluImplVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t co
         Reg::Add(tmpReg0, tmpReg0, srcVreg, mask);
         Reg::Muls(tmpReg0, tmpReg0, coefficientsB, mask);
         // exp(min(y, 0))
-        Reg::Mins(tmpReg1, tmpReg0, 0.0f, mask);
-        Reg::Exp(tmpReg1, tmpReg1, mask);
+        Reg::Mins(tmpReg2, tmpReg0, 0.0f, mask);
+        Reg::Exp(tmpReg1, tmpReg2, mask);
         // x / (exp^(-abs(y)) + 1)
         Reg::Abs(tmpReg2, tmpReg0, mask);
         Reg::Muls(tmpReg2, tmpReg2, -1.0f, mask);
@@ -86,8 +86,8 @@ __simd_callee__ inline void FastGeluCoreAlg(
 {
     constexpr float coefficients = -1.702f;
     constexpr float oneFloatScalar = 1.0f;
-    Reg::Muls(stackVreg, srcVreg, coefficients, mask);
-    Reg::Exp(stackVreg, stackVreg, mask);
+    Reg::Muls(dstVreg, srcVreg, coefficients, mask);
+    Reg::Exp(stackVreg, dstVreg, mask);
     Reg::Adds(stackVreg, stackVreg, oneFloatScalar, mask);
     Reg::Div(dstVreg, srcVreg, stackVreg, mask);
 }
@@ -271,8 +271,8 @@ __aicore__ inline void GeluImpl(const LocalTensor<T>& dstLocal, const LocalTenso
     }
     (void)highPerformance;
     static_assert(SupportType<T, half, float>(), "Gelu only support half/float data type on current device!");
-    CheckTensorPosition(dstLocal, "dstLocal", "VECIN, VECOUT, VECCALC");
-    CheckTensorPosition(srcLocal, "srcLocal", "VECIN, VECOUT, VECCALC");
+    CheckTensorPosition(dstLocal, "dstLocal", "VECIN/VECOUT/VECCALC");
+    CheckTensorPosition(srcLocal, "srcLocal", "VECIN/VECOUT/VECCALC");
     CheckCalCount(count, "calCount", dstLocal, "dstLocal", "Gelu");
     CheckCalCount(count, "calCount", srcLocal, "srcLocal", "Gelu");
     if constexpr (highPrecision && sizeof(T) == sizeof(half)) {
@@ -293,7 +293,7 @@ __aicore__ inline void GeluImpl(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const uint32_t count)
 {
-    CheckTensorPosition(sharedTmpBuffer, "sharedTmpBuffer", "VECIN, VECOUT, VECCALC");
+    CheckTensorPosition(sharedTmpBuffer, "sharedTmpBuffer", "VECIN/VECOUT/VECCALC");
     GeluImpl<T, highPrecision, highPerformance>(dstLocal, srcLocal, count);
 }
 

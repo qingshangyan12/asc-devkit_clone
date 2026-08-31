@@ -23,8 +23,13 @@ cce_default_static_build_config = {
     predicate_realize_bound: True,
     constant_realize_extent_in_infer_bound: True,
     bool_storage_as_1bit: True,
-    Pass_InjectSync: {sync_mode: 2, sync_opt_for_notail_db: 0, loop_ext_gt_one: True,
-                      sync_opt_for_preload_loop_zero: False, multi_dims_mem_analysis: False},
+    Pass_InjectSync: {
+        sync_mode: 2,
+        sync_opt_for_notail_db: 0,
+        loop_ext_gt_one: True,
+        sync_opt_for_preload_loop_zero: False,
+        multi_dims_mem_analysis: False,
+    },
     debug_message: False,
     out_of_bound_sync_check: False,
     save_temp_cce_file: False,
@@ -117,7 +122,7 @@ cce_default_static_build_config = {
     enable_super_kernel: False,
     workspace_tensor_size: [],
     compile_feature_list: [],
-    deterministic_level: "",
+    deterministic_level: 0,
 }
 
 # dynamic build config dict

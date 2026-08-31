@@ -26,11 +26,11 @@ For users without NPU devices, you can use the NPU computing resources provided 
 
 1. Go to the open source repository Gitcode page and click the "`Cloud Development`" button. Log in with a verified Huawei Cloud account. If not registered or verified, follow the page prompts to register and verify.
 
-   <p align="center"><img src="../figures/cloudIDE.png" alt="Cloud Platform" width="750px" height="90px"></p>
+   <p align="center"><img src="../zh/figures/cloudIDE.png" alt="Cloud Platform" width="750px" height="90px"></p>
 
 2. Follow the page prompts to create and start the cloud development environment. Click "`Connect > WebIDE or Visual Studio Code`" to enter the cloud development environment. Open source project resources are in the `/mnt/workspace` directory by default.
 
-   <p align="center"><img src="../figures/webIDE.png" alt="Cloud Platform" width="1000px" height="150px"></p>
+   <p align="center"><img src="../zh/figures/webIDE.png" alt="Cloud Platform" width="1000px" height="150px"></p>
 
 > [!NOTE] Usage Instructions
 >
@@ -254,7 +254,7 @@ The following are basic dependencies for source code compilation and examples op
     Execute the following command to install:
 
     ```bash
-    pip3 install pytest
+    pip3 install "pytest>=8.0.0"
     ```
 
 - coverage >= 4.5.4
@@ -262,7 +262,7 @@ The following are basic dependencies for source code compilation and examples op
     Execute the following command to install:
 
     ```bash
-    pip3 install coverage
+    pip3 install "coverage>=4.5.4"
     ```
 
 - lcov >= 1.16 (Only required for coverage statistics scenario)

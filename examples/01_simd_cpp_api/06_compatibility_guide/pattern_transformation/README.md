@@ -1,5 +1,6 @@
 # pattern_transformation 兼容性样例
 
+
 ## 概述
 
 本样例基于基础的mmad样例，演示了 L1 Buffer -> L0A Buffer 通路的分形转换逻辑，通过编译时宏 `__NPU_ARCH__` 隔离不同硬件实现。
@@ -228,7 +229,7 @@ AscendC::Fixpipe(cGM[M * N / 2], co1Local[M * N / 2], fixpipeParams);
 
 - 配置环境变量
 
-  请根据当前环境上 CANN 开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上 CANN 开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

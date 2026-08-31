@@ -21,16 +21,17 @@ enum class AlgorithmType : uint8_t {
     CcuAllGatherMesh1D = 0,
     CcuAllGatherMeshMem2Mem1D,
     CcuAllGatherMesh2D,
-    CcuReduceScatterMesh1D,
+    CcuSchedAllGatherConcurMeshNHRMultiLink = 3,
+    CcuReduceScatterMesh1D = 50,
     CcuReduceScatterMeshMem2Mem1D,
     CcuReduceScatterMesh2D,
-    CcuAllReduceMesh1D,
+    CcuAllReduceMesh1D = 100,
     CcuAllReduceMeshMem2Mem1D,
     CcuAllReduceMesh2DOneShot,
     CcuReduceMesh1D,
     CcuReduceMesh2D,
-    CcuAlltoAllMesh1D,
-    CcuAlltoAllVMesh1D,
+    CcuSchedAllToAllSoleMesh,
+    CcuSchedAllToAllVSoleMesh,
     CcuHalfAll2AllVMesh1D
 };
 
@@ -80,9 +81,12 @@ public:
     template <bool sync = true>
     __aicore__ inline void Finalize();
 
-    __aicore__ inline uint32_t GetRankId() { return hcclContext_->rankId; }
+    __aicore__ inline uint32_t GetRankId() { return (newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId); }
 
-    __aicore__ inline uint32_t GetRankDim() { return hcclContext_->rankNum; }
+    __aicore__ inline uint32_t GetRankDim()
+    {
+        return (newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum);
+    }
 
 private:
     __aicore__ inline void InitWorkingFlag();
@@ -92,11 +96,13 @@ private:
 
     __aicore__ inline void CommitMsgInner(const HcclHandle handleId);
 
-    __aicore__ inline void CcuSendMsg(uint8_t resourceId);
+    __aicore__ inline void CcuSendMsg(uint8_t resourceId, HcclHandle handleId);
 
-    __aicore__ inline GM_ADDR GetCommitCkeAddr(uint8_t msgId);
+    __aicore__ inline GM_ADDR GetCommitCkeAddr(uint8_t msgId, uint8_t missionIndex = 0);
 
-    __aicore__ inline GM_ADDR GetWaitCkeAddr(uint8_t msgId);
+    __aicore__ inline GM_ADDR GetWaitCkeAddr(uint8_t msgId, uint8_t missionIndex = 0);
+
+    __aicore__ inline uint8_t GetKfcMissionNum(HcclHandle handleId) const;
 
     __aicore__ inline bool IsFinish(uint8_t reqId);
 
@@ -118,11 +124,15 @@ private:
     __aicore__ inline void CcuPrepareForReduceScatter(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllReduceM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForConcurrentAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
     __gm__ HcclCombineOpParam* hcclContext_;
+    __gm__ HcclApi::OpResCtx* hcclNewContext_;
+
     HcclHandle curHandleId_ = INVALID_HANDLE_ID;
+    bool newCcuFlag_ = false;
 
     uint8_t workingFlag_ = false;
     bool isInited_ = false;

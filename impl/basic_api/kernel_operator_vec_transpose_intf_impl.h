@@ -14,7 +14,7 @@
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-        "impl/basic_api/kernel_operator_vec_transpose_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_transpose_intf.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/basic_api/kernel_operator_vec_transpose_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_vec_transpose_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TRANSPOSE_INTF_IMPL_H__
 #endif
@@ -137,8 +137,8 @@ __aicore__ inline void TransDataTo5HD(
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckTransDataTo5HDParams<T>(nchwconvParams);
     for (int32_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
-        CheckTensorPhyPosition<Hardware::UB>(dstList[i], "dstList", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
-        CheckTensorPhyPosition<Hardware::UB>(srcList[i], "srcList", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
+        CheckTensorPhyPosition<Hardware::UB>(dstList[i], "dstList", "UB(VECIN/VECCALC/VECOUT)", "TransDataTo5HD");
+        CheckTensorPhyPosition<Hardware::UB>(srcList[i], "srcList", "UB(VECIN/VECCALC/VECOUT)", "TransDataTo5HD");
         CheckTensorAlignment(dstList[i], ONE_BLK_SIZE, "dstList", "TransDataTo5HD");
         CheckTensorAlignment(srcList[i], ONE_BLK_SIZE, "srcList", "TransDataTo5HD");
     }
@@ -255,8 +255,8 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckTransDataTo5HDParams<T>(nchwconvParams);
-    CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
-    CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
+    CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "UB(VECIN/VECCALC/VECOUT)", "TransDataTo5HD");
+    CheckTensorPhyPosition<Hardware::UB>(src, "src", "UB(VECIN/VECCALC/VECOUT)", "TransDataTo5HD");
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", "TransDataTo5HD");
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", "TransDataTo5HD");
 #endif

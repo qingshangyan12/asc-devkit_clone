@@ -22,13 +22,16 @@ Ascend C high-level API development process mainly includes the following steps:
 Below uses high-level API `Axpy` as an example to introduce how to develop a high-level API from scratch. This case removes some unnecessary code. You can view all code in the repository files [axpy.h](../../include/adv_api/math/axpy.h), [axpy_tiling.h](../../include/adv_api/math/axpy_tiling.h), [axpy_tiling_intf.h](../../include/adv_api/math/axpy_tiling_intf.h), [axpy_common_impl.h](../../impl/adv_api/detail/math/axpy/axpy_common_impl.h), [axpy_tiling_impl.cpp](../../impl/adv_api/tiling/math/axpy_tiling_impl.cpp).
 ### Design API
 Axpy's function is to multiply each element in source operand `srcTensor` with a scalar, then add it with the corresponding element in destination operand `dstTensor`. The calculation formula is as follows.
-$$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 
-- Kernel Side
+$$
+dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i
+$$
 
-    Consider the data flow during operator execution. Host side applies for GlobalMemory space and writes data into it. Kernel side moves data from GlobalMemory to LocalMemory. Compute unit fetches data from LocalMemory for computation, writes results back to LocalMemory, and finally moves computation results from LocalMemory to GlobalMemory. High-level API completes the computation part, so high-level API source operands and destination operands are both in LocalMemory. That is, high-level API interface parameters include LocalTensor with already moved-in data and other parameters.
+- Kernel Function Side
 
-    From `Axpy` formula, the interface needs input parameters `srcTensor` and `scalarValue`, output parameter `dstTensor`, and also needs an input parameter `calCount` indicating the number of elements participating in computation. Since intermediate results of multiplication are generated during this computation, extra LocalMemory space needs to be allocated for storing intermediate computation results. To pass this temporary buffer space in the interface, add a `shardTmpBuffer` input parameter. To extend API supported data types, define two template parameters as source operand and destination operand data types. The template parameter `isReuseSource` is a reserved parameter and can be omitted during development. After analyzing and determining all interface parameters based on API algorithm function or formula, the following Kernel side function prototype is obtained.
+    Consider the data flow during operator execution. Host side applies for GlobalMemory space and writes data into it. On the kernel function side, data is moved from GlobalMemory to LocalMemory. Compute unit fetches data from LocalMemory for computation, writes results back to LocalMemory, and finally moves computation results from LocalMemory to GlobalMemory. High-level API completes the computation part, so high-level API source operands and destination operands are both in LocalMemory. That is, high-level API interface parameters include LocalTensor with already moved-in data and other parameters.
+
+    From `Axpy` formula, the interface needs input parameters `srcTensor` and `scalarValue`, output parameter `dstTensor`, and also needs an input parameter `calCount` indicating the number of elements participating in computation. Since intermediate results of multiplication are generated during this computation, extra LocalMemory space needs to be allocated for storing intermediate computation results. To pass this temporary buffer space in the interface, add a `shardTmpBuffer` input parameter. To extend API supported data types, define two template parameters as source operand and destination operand data types. The template parameter `isReuseSource` is a reserved parameter and can be omitted during development. After analyzing and determining all interface parameters based on API algorithm function or formula, the following kernel function prototype is obtained.
 
     After defining the function prototype, analyze and determine the basic APIs used in API implementation. The multiplication operation between Tensor and Scalar in `Axpy` formula can be implemented using Ascend C provided basic API `Muls`. The addition operation between two Tensors can be implemented using Ascend C provided basic API `Add`.
 
@@ -53,9 +56,9 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     | calCount | Input | Number of elements participating in computation. |
 - Tiling Side
 
-    Kernel side interface computation requires developer to reserve/apply for temporary space. The size of this temporary space needs to be calculated on Tiling side based on obtained source operand shape size, computing high-level API required maximum (maxValue) temporary space and minimum temporary space (minValue) sizes. Therefore, Tiling side provides an interface for computing maxValue and minValue. Interface input parameters include source operand Tensor shape size and source operand data type byte size. Shape size parameter uses ge::Shape type, data type byte size uses `uint32_t` type. Output parameters include minValue and maxValue. Similar to isReuseSource parameter in Axpy interface, isReuseSource in Tiling interface is a reserved parameter.
+    The kernel function interface requires developers to reserve/apply for temporary space. The size of this temporary space needs to be calculated on Tiling side based on obtained source operand shape size, computing high-level API required maximum (maxValue) temporary space and minimum temporary space (minValue) sizes. Therefore, Tiling side provides an interface for computing maxValue and minValue. Interface input parameters include source operand Tensor shape size and source operand data type byte size. Shape size parameter uses AscendC::TensorShape type, data type byte size uses `uint32_t` type. Output parameters include minValue and maxValue. Similar to isReuseSource parameter in Axpy interface, isReuseSource in Tiling interface is a reserved parameter.
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
+    void GetAxpyMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
     ```
     Interface parameter description
     | Parameter Name | Input/Output | Description |
@@ -63,11 +66,11 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     | srcShape | Input | Input shape information. |
     | typeSize | Input | Operator input data type size, in bytes. For example, if operator input data type is half, pass 2 here. |
     | isReuseSource | Input | Reserved parameter. |
-    | maxValue | Output | Maximum temporary space size required by Axpy interface to complete computation. Space exceeding this value will not be used by the interface. Within the minimum temporary space to maximum temporary space range, as temporary space increases, kernel side interface computation performance will have certain optimization improvement. To achieve better performance, developers can apply for space based on actual memory usage. Maximum space size of 0 indicates computation does not need temporary space. |
+    | maxValue | Output | Maximum temporary space size required by Axpy interface to complete computation. Space exceeding this value will not be used by the interface. Within the minimum temporary space to maximum temporary space range, as temporary space increases, the computation performance of the kernel function interface will improve. To achieve better performance, developers can apply for space based on actual memory usage. Maximum space size of 0 indicates computation does not need temporary space. |
     | minValue | Output | Minimum temporary space size required by Axpy interface to complete computation. To ensure correct functionality, temporary space applied for during interface computation cannot be smaller than this value. Minimum space size of 0 indicates computation does not need temporary space. |
 ### Develop API
 #### Write API External Interface
-- Kernel Side Interface
+- Kernel Function Side Interface
     
     In the corresponding category directory under `include/adv_api/`, add new file [axpy.h](../../include/adv_api/math/axpy.h). Based on the above analyzed and designed API function prototype, write external interface code. Function implementation calls AxpyImpl implementation.
     ```c++
@@ -82,7 +85,9 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     
     In the corresponding category directory under `include/adv_api/`, add new file [axpy_tiling.h](../../include/adv_api/math/axpy_tiling.h). Based on the above analyzed and designed Tiling side interface, write function declaration.
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
+    #include "../utils/types.h"
+
+    void GetAxpyMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
     ```
 - Include header files in common files.
 
@@ -101,9 +106,9 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     ```
 
 #### Write API Internal Implementation
-- Kernel Side Implementation
+- Kernel Function Side Implementation
 
-    In Kernel interface implementation file path [impl/adv_api/detail](../../impl/adv_api/detail) corresponding category directory (this case is `math`), add new `axpy` directory. In this directory, add new interface implementation file [axpy_common_impl.h](../../impl/adv_api/detail/math/axpy/axpy_common_impl.h), then write interface implementation code in this implementation file.
+    In the kernel function interface implementation path [impl/adv_api/detail](../../impl/adv_api/detail), add a new `axpy` directory under the corresponding category directory (`math` in this case). In this directory, add new interface implementation file [axpy_common_impl.h](../../impl/adv_api/detail/math/axpy/axpy_common_impl.h), then write interface implementation code in this implementation file.
 
     First, include necessary header files.
     ```c++
@@ -131,8 +136,14 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     \\ 
     Align32(tmpbufferSize) &T = float
     \end{cases}$$
-    $$round = calCount/stackSize$$
-    $$tail = calCount%stackSize$$
+
+    $$
+    round = calCount/stackSize
+    $$
+
+    $$
+    tail = calCount%stackSize
+    $$
     If tail is not 0, that is tail block exists, need extra processing for tail block data. Before tail block data computation, set compute unit working mode to Count mode through setMaskCount interface.
     ```c++
     template <typename T, typename U, bool isReuseSource = false>
@@ -207,7 +218,6 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     ```c++
     #include "lib/math/axpy_tiling.h"  // Tiling interface header file
     #include <cstdint>  // Type library
-    #include "graph/tensor.h" // ge::Shape uses this library
     #include "impl/host_log.h" // Log library
     ```
     Define constants used in Tiling computation.
@@ -219,7 +229,7 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     In `GetAxpyMaxMinTmpSize` interface, call `GetAxpyMaxTmpSize` interface to get required temporary space maximum value, call `GetAxpyMinTmpSize` interface to get required temporary space minimum value.
    
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource,
+    void GetAxpyMaxMinTmpSize(const AscendC::TensorShape& srcShape, const uint32_t typeSize, const bool isReuseSource,
     uint32_t& maxValue, uint32_t& minValue)
     {
         (void)isReuseSource;
@@ -249,7 +259,10 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     Cast(dstTensor, tmp4)
     ```
     Considering Vector compute unit single Repeat computes 256 bytes of data, the maximum temporary space calculation formula is as follows:
-    $$MaxValue=\begin{cases}\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_HALF\_CALC\_PROC &dstType = half\\\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}$$
+
+    $$
+    MaxValue=\begin{cases}\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_HALF\_CALC\_PROC &dstType = half\\\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}
+    $$
     ```c++
     inline uint32_t GetAxpyMaxTmpSize(const uint32_t inputSize, const uint32_t typeSize)
     {
@@ -260,7 +273,10 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     }
     ```
     Analyze the computation of required temporary space minimum value. If temporary space is minimum, single computation data amount is minimum, that is each computation data amount is fixed as single Repeat processed data size, 256 bytes. The minimum temporary space calculation formula is as follows:
-    $$MinValue=\begin{cases}\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_HALF\_CALC\_PROC &dstType = half\\\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}$$
+
+    $$
+    MinValue=\begin{cases}\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_HALF\_CALC\_PROC &dstType = half\\\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}
+    $$
     ```c++
     inline uint32_t GetAxpyMinTmpSize(const uint32_t typeSize)
     {
@@ -295,7 +311,7 @@ After completing API coding, developers can write corresponding test cases and t
 #### UT Testing
 UT testing uses gTest as testing framework, generally verifies interface compilation is normal and cannot guard interface function.
 ##### UT Coding
-###### Kernel Side
+###### Kernel Function Side
 
 In UT directory [tests/api/adv_api/math](../../tests/api/adv_api/math), add new directory `axpy`, file [test_operator_axpy.cpp](../../tests/api/adv_api/math/axpy/test_operator_axpy.cpp). UT implementation mainly includes the following three parts:
 1. Include header files
@@ -397,16 +413,16 @@ TEST_F(TestTiling, TestAxpyTiling)
 {
     uint32_t maxVal = 0;
     uint32_t minVal = 0;
-    GetAxpyMaxMinTmpSize(ge::Shape({128}), 4, false, maxVal, minVal);
+    GetAxpyMaxMinTmpSize(AscendC::TensorShape({128}), 4, false, maxVal, minVal);
     EXPECT_EQ(maxVal, 0);
     EXPECT_EQ(minVal, 0);
-    GetAxpyMaxMinTmpSize(ge::Shape({256}), 2, false, maxVal, minVal);
+    GetAxpyMaxMinTmpSize(AscendC::TensorShape({256}), 2, false, maxVal, minVal);
     EXPECT_EQ(maxVal, 256 * 4 * 2);
     EXPECT_EQ(minVal, 256 * 4);
 }
 ```
 ##### Modify cmake file
-Before executing UT cases, need to modify [CMakeLists.txt](../../tests/api/adv_api/CMakeLists.txt) file. Since Kernel side and Tiling side UT execution objects are different, need to add test files under different targets. Using Kernel side UT for Atlas A2 training series products/Atlas A2 inference series products as example, add UT test file path to case source file list `ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES`, that is add new file path `${ASCENDC_TESTS_DIR}/math/axpy/test_operator_axpy.cpp`. Same for Tiling side, need to add test file to `ASCENDC_TILING_TEST_SRC_FILES` list.
+Before executing UT cases, modify the [CMakeLists.txt](../../tests/api/adv_api/CMakeLists.txt) file. Since kernel function-side UTs and Tiling-side UTs have different test targets, add the test files to their respective targets. Using the kernel function-side UT for Atlas A2 training series products/Atlas A2 inference series products as an example, add the UT test file path to the case source file list `ASCENDC_TEST_ASCEND910B1_AIV_CASE_SRC_PART_FILES`, that is, add the new file path `${ASCENDC_TESTS_DIR}/math/axpy/test_operator_axpy.cpp`. For the Tiling-side UT, add the test file to the `ASCENDC_TILING_TEST_SRC_FILES` list.
 ##### Execute UT
 - Execute all UT cases
   
@@ -420,12 +436,12 @@ Before executing UT cases, need to modify [CMakeLists.txt](../../tests/api/adv_a
     ```c++
     ::testing::GTEST_FLAG(filter) = "*Axpy*";
     ```
-  Modify [build.sh](../../build.sh), change all to needed UT target. Using Kernel side Ascend 910B1 UT as example, target is ascendc_utest_ascend910B1_AIV.
-  ```
+  Modify [build.sh](../../build.sh), change all to needed UT target. Using the Ascend 910B1 kernel function-side UT as an example, the target is ascendc_ut_adv_api_kernel_ascend910B1_AIV.
+  ```bash
   function build_test() {
     cmake_config
     # build all
-    build ascendc_utest_ascend910B1_AIV
+    build ascendc_ut_adv_api_kernel_ascend910B1_AIV
   }
   ```
   Execute command `bash build.sh -t` to run only new UT cases.

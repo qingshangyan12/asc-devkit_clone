@@ -19,19 +19,22 @@ import os
 import shutil
 import subprocess
 import sys
-import time
-from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterator, List
+from typing import List
 
 from .arch import detect_arch
 from .case_runners import CaseRunnerOptions, build_case_runner_cells_with_skips
 from .model import RunReport, RunResult, Suggestion
 from .report import print_console, write_json, write_markdown, write_suggestions
 from .runner import CPU_RUN_TIMEOUT, PipelineOptions, run_cells_pipeline_with_options
-from .scheduler import export_schedule_file, read_schedule_file, schedule_cells, ScheduleOptions
+from .scheduler import (
+    export_schedule_file,
+    read_schedule_file,
+    schedule_cells,
+    ScheduleOptions,
+)
 from .suggest import dedupe_suggestions
 from .werror import enabled_from_env as werror_enabled_from_env
 
@@ -101,7 +104,9 @@ def build_runtime_config(args: argparse.Namespace) -> RuntimeConfig:
         results_dir=results_dir,
         log_dir=Path(args.log_dir).resolve() if args.log_dir else results_dir / "logs",
         started_at=now_iso(),
-        parallel_config=parallel_config(args, jobs, make_jobs, cpu_run_slots, cpu_run_timeout),
+        parallel_config=parallel_config(
+            args, jobs, make_jobs, cpu_run_slots, cpu_run_timeout
+        ),
     )
 
 
@@ -137,16 +142,24 @@ def collect_cases(args: argparse.Namespace, config: RuntimeConfig) -> CaseSelect
     return CaseSelection(cells, dedupe_suggestions(suggestions), skipped_results)
 
 
-def schedule_selected_cases(selected: CaseSelection, args: argparse.Namespace, config: RuntimeConfig) -> list:
+def schedule_selected_cases(
+    selected: CaseSelection, args: argparse.Namespace, config: RuntimeConfig
+) -> list:
     schedule_file = resolve_schedule_file(
-        config.project_root, config.host_arch, config.modes, args.schedule, args.schedule_file
+        config.project_root,
+        config.host_arch,
+        config.modes,
+        args.schedule,
+        args.schedule_file,
     )
     validate_fixed_schedule_coverage(selected, args, schedule_file)
     return schedule_cells(
         selected.cells,
         ScheduleOptions(
             schedule=args.schedule,
-            schedule_report=Path(args.schedule_report).resolve() if args.schedule_report else None,
+            schedule_report=Path(args.schedule_report).resolve()
+            if args.schedule_report
+            else None,
             schedule_file=schedule_file,
             frontload_count=args.schedule_frontload_count,
             jobs=config.jobs,
@@ -171,24 +184,37 @@ def validate_fixed_schedule_coverage(
 
     schedule_only = sorted(schedule_names - planned_names)
     planned_only = sorted(planned_names - schedule_names)
-    duplicates = sorted({name for name in schedule_order if schedule_order.count(name) > 1})
+    duplicates = sorted(
+        {name for name in schedule_order if schedule_order.count(name) > 1}
+    )
     if not schedule_only and not planned_only and not duplicates:
         return
 
     lines = [f"fixed schedule coverage mismatch: {schedule_file}"]
     if schedule_only:
-        lines.append(f"  schedule-only cases ({len(schedule_only)}): {', '.join(schedule_only)}")
+        lines.append(
+            f"  schedule-only cases ({len(schedule_only)}): {', '.join(schedule_only)}"
+        )
     if planned_only:
-        lines.append(f"  unscheduled planned cases ({len(planned_only)}): {', '.join(planned_only)}")
+        lines.append(
+            f"  unscheduled planned cases ({len(planned_only)}): {', '.join(planned_only)}"
+        )
     if duplicates:
-        lines.append(f"  duplicate schedule cases ({len(duplicates)}): {', '.join(duplicates)}")
+        lines.append(
+            f"  duplicate schedule cases ({len(duplicates)}): {', '.join(duplicates)}"
+        )
     message = "\n".join(lines)
     if args.strict_schedule:
         raise ValueError(message)
     LOG.warning(message)
 
 
-def emit_dry_run(args: argparse.Namespace, config: RuntimeConfig, cells: list, selected: CaseSelection) -> int:
+def emit_dry_run(
+    args: argparse.Namespace,
+    config: RuntimeConfig,
+    cells: list,
+    selected: CaseSelection,
+) -> int:
     dry_results = [
         RunResult(
             cell.example.rel_path,
@@ -214,20 +240,25 @@ def emit_dry_run(args: argparse.Namespace, config: RuntimeConfig, cells: list, s
     return 0
 
 
-def run_and_emit(args: argparse.Namespace, config: RuntimeConfig, cells: list, selected: CaseSelection) -> int:
-    with presmoke_run_lock(config.project_root):
-        run = run_cells_pipeline_with_options(
-            cells,
-            PipelineOptions(
-                log_dir=config.log_dir,
-                timeout=args.timeout,
-                cpu_run_timeout=config.cpu_run_timeout,
-                keep_artifacts=args.keep_artifacts,
-                jobs=config.jobs,
-                npu_slots=args.npu_slots,
-                cpu_run_slots=config.cpu_run_slots,
-            ),
-        )
+def run_and_emit(
+    args: argparse.Namespace,
+    config: RuntimeConfig,
+    cells: list,
+    selected: CaseSelection,
+) -> int:
+    run = run_cells_pipeline_with_options(
+        cells,
+        PipelineOptions(
+            log_dir=config.log_dir,
+            timeout=args.timeout,
+            cpu_run_timeout=config.cpu_run_timeout,
+            keep_artifacts=args.keep_artifacts,
+            jobs=config.jobs,
+            npu_slots=args.npu_slots,
+            cpu_run_slots=config.cpu_run_slots,
+            stages=args.stages,
+        ),
+    )
     results = run.results
     results.extend(selected.skipped_results)
     results = sorted(results, key=lambda result: (result.example, result.mode))
@@ -258,13 +289,24 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--exact-filter", action="append", default=[])
     parser.add_argument("--exclude", action="append", default=[])
     parser.add_argument("--timeout", type=int, default=120)
-    parser.add_argument("--report-format", choices=["console", "json", "markdown", "all"], default="console")
+    parser.add_argument(
+        "--report-format",
+        choices=["console", "json", "markdown", "all"],
+        default="console",
+    )
     parser.add_argument("--results", default="presmoke_reports")
     parser.add_argument("--log-dir")
     parser.add_argument("--keep-artifacts", action="store_true")
+    parser.add_argument("--stages", choices=["all", "build"], default="all")
     parser.add_argument(
         "--schedule",
-        choices=["default", "build-desc", "frontload-build-desc", "npu-idle-min", "fixed"],
+        choices=[
+            "default",
+            "build-desc",
+            "frontload-build-desc",
+            "npu-idle-min",
+            "fixed",
+        ],
         default="default",
     )
     parser.add_argument("--schedule-report")
@@ -292,11 +334,15 @@ def resolve_schedule_file(
     if schedule != "fixed":
         return None
     mode = modes[0] if modes else "npu"
-    schedule_file = project_root / "scripts" / "presmoke" / "schedules" / f"{host_arch}_{mode}.txt"
+    schedule_file = (
+        project_root / "scripts" / "presmoke" / "schedules" / f"{host_arch}_{mode}.txt"
+    )
     return schedule_file if schedule_file.exists() else None
 
 
-def resolve_jobs(value: str | int, cpu_count: int | None = None, modes: List[str] | None = None) -> int:
+def resolve_jobs(
+    value: str | int, cpu_count: int | None = None, modes: List[str] | None = None
+) -> int:
     if isinstance(value, int):
         return max(value, 1)
     if value != "auto":
@@ -328,7 +374,9 @@ def resolve_cpu_run_slots(value: str | int, cpu_count: int | None = None) -> int
     return max(cpus, 1)
 
 
-def resolve_make_jobs(value: str | int, build_jobs: int, cpu_count: int | None = None) -> int:
+def resolve_make_jobs(
+    value: str | int, build_jobs: int, cpu_count: int | None = None
+) -> int:
     if isinstance(value, int):
         return max(value, 1)
     if value != "auto":
@@ -378,59 +426,14 @@ def detect_cpu_count() -> int:
     return os.cpu_count() or 1
 
 
-@contextmanager
-def presmoke_run_lock(project_root: Path) -> Iterator[None]:
-    lock_parent = Path(os.environ.get("PRESMOKE_LOCK_DIR", project_root / ".presmoke_locks"))
-    lock_dir = lock_parent / "presmoke_run.lock"
-    lock_parent.mkdir(parents=True, exist_ok=True)
-
-    while True:
-        try:
-            lock_dir.mkdir()
-            break
-        except FileExistsError:
-            active_pid = active_lock_pid(lock_dir)
-            if active_pid:
-                LOG.info("Waiting for existing presmoke run pid=%s", active_pid)
-                time.sleep(5)
-                continue
-            shutil.rmtree(lock_dir, ignore_errors=True)
-
-    (lock_dir / "pid").write_text(str(os.getpid()), encoding="utf-8")
-    try:
-        yield
-    finally:
-        shutil.rmtree(lock_dir, ignore_errors=True)
-
-
-def active_lock_pid(lock_dir: Path) -> int:
-    pid = read_lock_pid(lock_dir / "pid")
-    return pid if pid and process_exists(pid) else 0
-
-
-def read_lock_pid(pid_file: Path) -> int:
-    try:
-        return int(pid_file.read_text(encoding="utf-8").strip())
-    except (OSError, ValueError):
-        return 0
-
-
-def process_exists(pid: int) -> bool:
-    try:
-        os.kill(pid, 0)
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True
-    return True
-
-
 def parse_modes(value: str) -> List[str]:
     modes = [item.strip() for item in value.split(",") if item.strip()]
     return modes or ["npu"]
 
 
-def emit_reports(report: RunReport, args: argparse.Namespace, results_dir: Path) -> None:
+def emit_reports(
+    report: RunReport, args: argparse.Namespace, results_dir: Path
+) -> None:
     results_dir.mkdir(parents=True, exist_ok=True)
     fmt = args.report_format
     if fmt in ("console", "all"):

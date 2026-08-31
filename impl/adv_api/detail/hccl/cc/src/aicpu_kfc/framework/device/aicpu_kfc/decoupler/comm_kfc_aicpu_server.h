@@ -18,6 +18,7 @@
 #include "aicpu_hccl_common.h"
 #include "common/aicpu_kfc_def.h"
 #include "comm_kfc_open_kernel_adapter.h"
+#include "open_res_ctx_cache.h"
 #include "dispatcher.h"
 #include "hcomm_primitives.h"
 
@@ -25,8 +26,6 @@ namespace hccl {
 class HcclCommAicpu;
 class Stream;
 } // namespace hccl
-class CollCommAicpuMgr;
-class CollCommAicpu;
 
 enum class ServerExecResourceType { LEGACY, NEXT_AICPU };
 
@@ -39,9 +38,8 @@ struct ServerExecCtx {
     hccl::HcclCommAicpu* commAicpu{nullptr};
     HcclDispatcher dispatcher{nullptr};
     hccl::Stream* mainStream{nullptr};
-    CollCommAicpuMgr* commMgr{nullptr};
-    CollCommAicpu* collCommAicpu{nullptr};
     ThreadHandle mainThread{0};
+    mc2_open::OpenResCtxHolder resCtxHolder{};
 };
 
 struct ServerProgress {
@@ -70,7 +68,8 @@ public:
     HcclResult LaunchOpenCcorePost(const ServerExecCtx& execCtx, u64 recordAddr, u32 turnNum, u64 turnNumsAddr);
     HcclResult LaunchOpenCcoreWait(
         const ServerExecCtx& execCtx, u64 waitAddr, u32 turnNum, u64 turnNumsAddr, bool isLast);
-    HcclResult LaunchOpenAicpuKernelServer(std::vector<uint8_t>& opParam);
+    HcclResult LaunchOpenAicpuKernelServer(
+        std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
     HcclResult FormatOpParamFromMsg(
         const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, const ServerExecCtx& execCtx, u32 repeat,
         std::vector<uint8_t>& runParam);

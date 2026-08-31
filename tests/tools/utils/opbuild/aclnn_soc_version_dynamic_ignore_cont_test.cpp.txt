@@ -45,6 +45,10 @@ enum SocType {
     SOC_VERSION_KIRINX90 = 14,
     SOC_VERSION_KIRIN9030 = 15,
     SOC_VERSION_ASCEND350 = 16,
+    SOC_VERSION_KIRINDEV0000 = 17,
+    SOC_VERSION_KIRINDEV0001 = 18,
+    SOC_VERSION_KIRINDEV0002 = 19,
+    SOC_VERSION_KIRINDEV0003 = 20,
     SOC_VERSION_INVALID = 99
 };
 enum NnopbaseAttrDtype {
@@ -300,8 +304,8 @@ aclnnStatus aclnnSocVersionDynamicIgnoreContTest(
             const std::string value = std::to_string(workspaceSize);
             const std::string requiredSize = std::to_string(inContWorkspaceSize);
             const std::string reason = std::string("The passed workspace size ") + value +
-                " does not meet the workspace size " + requiredSize +
-                " actually required by the AutoContiguous() function";
+                " does not meet the minimum workspace size " + requiredSize +
+                " actually required by the AutoContiguous API";
             const std::vector<const char*> msgKey = {"value", "paraName", "reason"};
             const std::vector<const char*> msgValue = {value.c_str(), "workspaceSize", reason.c_str()};
             REPORT_PREDEFINED_ERR_MSG(NNOPBASE_INVALID_ARGUMENT, msgKey, msgValue);

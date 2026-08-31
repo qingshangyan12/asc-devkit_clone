@@ -12,6 +12,7 @@
 """
 op context
 """
+
 import functools
 import threading
 from typing import Any
@@ -65,7 +66,7 @@ class OpContext:
         # workspace info of operator
         ## element in list: (name, size, type)
         ### type in tuple: 0-DDR, 1-L1
-        self._workspaces = [] # type: List[Tuple[str, int, int]]
+        self._workspaces = []  # type: List[Tuple[str, int, int]]
 
         self._additional_params = {}  # type: Dict[str, Any]
 
@@ -313,7 +314,12 @@ def get_context():
 
     :return:
     """
-    return _get_contexts()[-1] if _get_contexts() else None
+    _ctxs = _get_contexts()
+    if _ctxs:
+        return _ctxs[-1]
+    _default = OpContext()
+    _ctxs.append(_default)
+    return _default
 
 
 def get_op_mode():

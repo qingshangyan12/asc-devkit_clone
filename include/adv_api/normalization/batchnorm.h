@@ -13,6 +13,10 @@
  * \brief
  */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "batchnorm.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_BATCHNORM_H__
@@ -27,7 +31,7 @@
 #include "kernel_tiling/kernel_tiling.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/normalization/batchnorm/batchnorm_common_impl.h"
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/normalization/batchnorm/batchnorm_3510_impl.h"
 #endif
 namespace AscendC {
@@ -59,7 +63,8 @@ __aicore__ inline void BatchNorm(
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
+                              __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     BatchNormAPI::BatchNormImpl<T, isReuseSource, isBasicBlock>(
         output, outputMean, outputVariance, inputX, gamm, beta, sharedTmpBuffer, epsilon, tiling);
 #endif
@@ -74,7 +79,8 @@ __aicore__ inline void BatchNorm(
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
+                              __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     BatchNormAPI::BatchNormImpl<T, isReuseSource, isBasicBlock>(
         output, outputMean, outputVariance, inputX, gamm, beta, epsilon, tiling);
 #endif

@@ -13,6 +13,7 @@
 
 import numpy as np
 
+
 def gemm_custom_tiled(m, k, n, A, B, C, k0):
     """
     执行分块矩阵乘加运算: C = A * B^T + C
@@ -28,7 +29,7 @@ def gemm_custom_tiled(m, k, n, A, B, C, k0):
     # 0. 维度校验(虽然传入了m, k, n， 但在Python中最好校验一下实际矩阵是否符合)
     if A.shape != (m, k) or B.shape != (n, k) or C.shape != (m, n):
         raise ValueError(f"矩阵实际尺寸与传入的m = {m}, k = {k}, n = {n} 不匹配")
-    
+
     print(f"正在计算: C({m}x{n}) += A({m}x{k}) * B.T({k}x{n}) | 分块 k0={k0}")
 
     # 1. 外层循环： 遍历行(m)
@@ -42,7 +43,6 @@ def gemm_custom_tiled(m, k, n, A, B, C, k0):
             # 3. 内层循环：在k维度上分块前进
             # range(start, stop, step) -> 每次跳跃 k0
             for p in range(0, k, k0):
-
                 # 计算当前块的终点，处理剩余长度不足 k0 的边界情况
                 p_end = min(p + k0, k)
 
@@ -62,6 +62,7 @@ def gemm_custom_tiled(m, k, n, A, B, C, k0):
             C[i, j] = accumulate_sum
 
     return C
+
 
 # ---测试代码---
 if __name__ == "__main__":

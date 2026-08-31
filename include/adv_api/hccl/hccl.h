@@ -13,6 +13,10 @@
  * \brief
  */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "hccl.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCCL_H__
@@ -229,7 +233,7 @@ public:
      * @class Hccl
      * @brief The task launching interface of the AlltoAllvWrite collective communication operator, returns the
      *        identifier handleId. (task content: Each communication will send a segment of data to a specified
-     *        memory addresson the designated rank, supporting multiple communications in batch.)
+     *        memory address on the designated rank, supporting multiple communications in batch.)
      * @tparam commit: true/false true: simultaneously notify server to execute the task launched by AlltoAllvWrite.
      * @param [in] usrIn: Source data buffer address.
      * @param [in] sendOffsets: A uint64 array represents the offset of data sent by this rank, where 'sendOffsets[i]=n'
@@ -257,7 +261,7 @@ public:
      * @return Returns 0 if the legitimate call succeeds, -1 otherwise
      * @note Must be called after Init
      */
-    [[deprecated("It is obsoleted and use SetCcTilingV2 instead.")]]
+    [[deprecated("It is obsolete and use SetCcTilingV2 instead.")]]
     __aicore__ inline int32_t SetCcTiling(__gm__ void* ccOpTilingData);
 
     /*!
@@ -276,7 +280,7 @@ public:
      * @param [in] initTiling: Address of InitTilingData
      * @note Must be called first to initialize Hccl instance.
      */
-    [[deprecated("It is obsoleted and use InitV2 instead.")]]
+    [[deprecated("It is obsolete and use InitV2 instead.")]]
     __aicore__ inline void Init(GM_ADDR context, __gm__ void* initTiling = nullptr);
 
     /*!

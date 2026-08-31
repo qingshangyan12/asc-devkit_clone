@@ -12,11 +12,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
-#include "ccu_temp_all_gather_nhr_1D_mem2mem.h"
-#include "ccu_temp_all_gather_mesh_1D_mem2mem.h"
-#include "ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.h"
-#endif
+#include "topo_match_pcie_mix.h"
 #include "alg_data_trans_wrapper.h"
 
 #include "topo_match_multilevel.h"
@@ -46,7 +42,7 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     // 构建template
     std::vector<std::vector<u32>> intraHierarchyInfo;
     std::vector<std::vector<u32>> interHierarchyInfo;
-    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
         intraHierarchyInfo = {algHierarchyInfo.infos[0][0]};
         std::vector<u32> closRanks;
         u32 meshSize = algHierarchyInfo.infos[0][0].size();
@@ -297,7 +293,7 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     strideCount_ = param.DataDes.strideCount;
     HCCL_DEBUG("[InsV2AllGatherParallelExecutor][Orchestrate] strideCount[%lu]", strideCount_);
 
-    if (resCtx.topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS) {
+    if (resCtx.topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS && !resCtx.topoInfo.level0PcieMix) {
         intraHierarchyInfo_ = {resCtx.algHierarchyInfo.infos[0][0]};
         std::vector<u32> closRanks;
         u32 meshSize = resCtx.algHierarchyInfo.infos[0][0].size();
@@ -327,7 +323,7 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     CHK_PRT_RET(
         ret != HCCL_SUCCESS,
         HCCL_ERROR(
-            "[InsV2AllGatherParallelExecutor][Orchestrate]errNo[0x%016llx] All Gather excutor kernel run failed",
+            "[InsV2AllGatherParallelExecutor][Orchestrate]errNo[0x%016llx] All Gather executor kernel run failed",
             HCCL_ERROR_CODE(ret)),
         ret);
     return HCCL_SUCCESS;
@@ -469,15 +465,8 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherParallelMesh1DNHRUBX, InsV2AllGatherParallelExecutor, TopoMatchUBX,
     InsTempAllGatherMesh1D, InsTempAllGatherNHR);
-#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherParallelMesh1DNHR, InsV2AllGatherParallelExecutor, TopoMatchMultilevel,
-    CcuTempAllGatherMesh1DMem2Mem, CcuTempAllGatherNHR1DMem2Mem);
-
-REGISTER_EXECUTOR_BY_TWO_TEMPS(
-    HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherParallelMesh1DNHRMemUBX, InsV2AllGatherParallelExecutor, TopoMatchUBX,
-    CcuTempAllGatherMesh1DMem2Mem, CcuTempAllGatherNHR1DMultiJettyMem2Mem);
-
-#endif
+    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherParallelMesh1DNHRPcie, InsV2AllGatherParallelExecutor,
+    TopoMatchPcieMix, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
 } // namespace mc2_ops_hccl
 // 算法注册

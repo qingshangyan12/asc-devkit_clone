@@ -13,6 +13,10 @@
  * \brief
  */
 
+#if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
+#error "matmul_client.h cannot be used with compile flag --enable-simt enabled."
+#endif
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATMUL_CLIENT_H__
@@ -991,7 +995,7 @@ public:
         ASSERT(sync == true);
         ASSERT(enAtomic == 0);
         ASSERT(kfcMsg_.body.isFirstIter == 1);
-        ASSERT((PhyPosIsL1(C_TYPE::pos)) && "IterateAll LocalTensor only support TPosition A1 or B1");
+        ASSERT((PhyPosIsL1(C_TYPE::pos)) && "IterateAll LocalTensor only supports L1 Buffer(A1/B1)");
         ASSERT(
             !(A_TYPE::ibShare && B_TYPE::ibShare) && "IterateAll LocalTensor not support when sameab"
                                                      " is enabled");
