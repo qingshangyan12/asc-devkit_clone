@@ -45,7 +45,7 @@ __simd_callee__ inline reg_tensor<T> Select(reg_tensor<bool> condition, reg_tens
 | `src0` | 输入 | 条件为 `true` 时选择的源操作数，类型为 `reg_tensor<T>`。其 `mask` 作为返回值的有效元素掩码。 |
 | `src1` | 输入 | 条件为 `false` 时选择的源操作数，类型为 `reg_tensor<T>`。 |
 
-## 返回值
+## 返回值说明
 
 返回 `reg_tensor<T>`，包含逐元素选择的结果。返回值的 `mask` 与 `src0.mask` 相同。
 
