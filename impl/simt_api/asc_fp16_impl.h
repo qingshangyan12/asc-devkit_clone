@@ -1275,11 +1275,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2rsqrt(half2 x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hlog(half x)
 {
+    half temp = __logf(x);
     // One input (half bits 0x1D78) needs an explicit correction to match the expected half-precision result.
     if (x == static_cast<half>(0.005340576171875f)) {
-        return static_cast<half>(-5.23046875f);
+        temp = static_cast<half>(-5.23046875f);
     }
-    return __logf(x);
+    return temp;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2log(half2 x)
