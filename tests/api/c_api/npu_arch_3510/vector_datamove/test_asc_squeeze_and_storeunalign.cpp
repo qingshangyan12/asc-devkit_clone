@@ -23,7 +23,7 @@
     };                                                                                                              \
                                                                                                                     \
     namespace {                                                                                                     \
-    const void* expected_dst_##data_type = nullptr;                                                                \
+    const void* expected_dst_##data_type = nullptr;                                                                 \
                                                                                                                     \
     void sprclr_##data_type##_Stub(Literal spr_id) { EXPECT_EQ(spr_id, SPR_AR); }                                   \
                                                                                                                     \

@@ -88,7 +88,8 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
 }
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign_impl(
-    __ubuf__ float* dst_addr, vector_float& dst, vector_store_unalign& src0, vector_float src1, vector_bool squeeze_mask)
+    __ubuf__ float* dst_addr, vector_float& dst, vector_store_unalign& src0, vector_float src1,
+    vector_bool squeeze_mask)
 {
     if ASC_IS_AIV {
         vsqz(dst, src1, squeeze_mask, MODE_STORED);

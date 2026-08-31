@@ -1673,7 +1673,8 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
 }
 
 __simd_callee__ inline void asc_squeeze_and_storeunalign(
-    __ubuf__ float* dst_addr, vector_float& dst, vector_store_unalign& src0, vector_float src1, vector_bool squeeze_mask)
+    __ubuf__ float* dst_addr, vector_float& dst, vector_store_unalign& src0, vector_float src1,
+    vector_bool squeeze_mask)
 {
     asc_squeeze_and_storeunalign_impl(dst_addr, dst, src0, src1, squeeze_mask);
 }
