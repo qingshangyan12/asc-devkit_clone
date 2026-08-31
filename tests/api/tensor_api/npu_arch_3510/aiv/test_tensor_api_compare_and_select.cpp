@@ -29,15 +29,14 @@ __aicore__ inline void TestSelect()
     EXPECT_EQ(dst.mask, src0.mask);
 }
 
-#define COMPARE_AND_SELECT_TEST(Function, DataType)                        \
-    TEST_F(TensorApiVectorCompareAndSelect3510, Function##_##DataType)     \
-    {                                                                      \
-        Test##Function<DataType>();                                        \
-        SUCCEED();                                                         \
+#define COMPARE_AND_SELECT_TEST(Function, DataType)                    \
+    TEST_F(TensorApiVectorCompareAndSelect3510, Function##_##DataType) \
+    {                                                                  \
+        Test##Function<DataType>();                                    \
+        SUCCEED();                                                     \
     }
 
-#define SELECT_TYPE_TEST(DataType) \
-    COMPARE_AND_SELECT_TEST(Select, DataType)
+#define SELECT_TYPE_TEST(DataType) COMPARE_AND_SELECT_TEST(Select, DataType)
 
 SELECT_TYPE_TEST(bool)
 SELECT_TYPE_TEST(uint8_t)
