@@ -210,6 +210,8 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather)
     EXPECT_EQ(RunCcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 1, resCtx), HCCL_SUCCESS);
     EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuAllGatherMeshMem2Mem1D));
+    EXPECT_NE(resCtx.resCtx, 0U);
+    EXPECT_NE(resCtx.resCtxSize, 0U);
 }
 
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ReduceScatterKfcMesh1DMem2Mem)

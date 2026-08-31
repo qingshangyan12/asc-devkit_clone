@@ -230,6 +230,7 @@ struct OpResCtx {
     uint64_t sprAddr;                  // spr寄存器地址，预留
     uint64_t res[HCCL_API_MAX_OP_NUM]; // MS地址，预留
     uint64_t resCtx;                   // 资源地址，用于资源下发时的处理
+    uint64_t resCtxSize;               // 资源序列化数据大小
     uint32_t opType[HCCL_API_MAX_OP_NUM];
     uint32_t algorithmType[HCCL_API_MAX_OP_NUM];
     uint64_t opParamSize[HCCL_API_MAX_OP_NUM];
