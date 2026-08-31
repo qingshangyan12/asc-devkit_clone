@@ -43,6 +43,8 @@
 - **[舍入模式与饱和模式](rounding_mode.md)**
 - **[asc_bfloat162e1m2x2 (废弃)](asc_bfloat162e1m2x2_deprecated.md)**
 - **[asc_bfloat162e2m1x2 (废弃)](asc_bfloat162e2m1x2_deprecated.md)**
+- **[asc_bfloat162float（废弃）](../../deprecated_interface/asc_bfloat162float_deprecated.md)**
+- **[asc_bfloat162int32（废弃）](../../deprecated_interface/asc_bfloat162int32_deprecated.md)**
 - **[asc_e1m2x22bfloat16 (废弃)](asc_e1m2x22bfloat16_deprecated.md)**
 - **[asc_e2m1x22bfloat16 (废弃)](asc_e2m1x22bfloat16_deprecated.md)**
 - **[asc_e4m32float (废弃)](asc_e4m32float_deprecated.md)**
@@ -51,7 +53,12 @@
 - **[asc_float2e4m3 (废弃)](asc_float2e4m3_deprecated.md)**
 - **[asc_float2e5m2 (废弃)](asc_float2e5m2_deprecated.md)**
 - **[asc_float2hif8 (废弃)](asc_float2hif8_deprecated.md)**
+- **[asc_half2float（废弃）](../../deprecated_interface/asc_half2float_deprecated.md)**
+- **[asc_half2hif8（废弃）](../../deprecated_interface/asc_half2hif8_deprecated.md)**
+- **[asc_half2int32（废弃）](../../deprecated_interface/asc_half2int32_deprecated.md)**
 - **[asc_half2int4x2 (废弃)](asc_half2int4x2_deprecated.md)**
+- **[asc_half2int8（废弃）](../../deprecated_interface/asc_half2int8_deprecated.md)**
+- **[asc_half2uint8（废弃）](../../deprecated_interface/asc_half2uint8_deprecated.md)**
 - **[asc_hif82float (废弃)](asc_hif82float_deprecated.md)**
 - **[asc_int322int16（废弃）](../../deprecated_interface/asc_int322int16_deprecated.md)**
 - **[asc_int322int64（废弃）](../../deprecated_interface/asc_int322int64_deprecated.md)**
