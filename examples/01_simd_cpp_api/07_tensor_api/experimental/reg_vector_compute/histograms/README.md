@@ -1,8 +1,8 @@
-# Fma Tensor API 样例
+# Histograms Tensor API 样例
 
 ## 概述
 
-本样例基于Tensor API实现`fma`接口，对三组各64个`float`元素执行融合乘加计算。
+本样例基于Tensor API实现`histograms`接口，使用高半区间累计模式统计256个`uint8_t`输入元素，并输出128个`uint16_t`结果。
 
 ## 支持的产品
 
@@ -11,43 +11,41 @@
 ## 目录结构介绍
 
 ```plain
-├── composite_compute
+├── histograms
 │   ├── scripts
 │   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py     // 输出结果校验脚本
 │   ├── CMakeLists.txt           // 编译工程文件
 │   ├── data_utils.h             // 数据读写工具
 │   ├── README.md
-│   ├── README_En.md
-│   └── composite_compute_tensor_api.asc  // Ascend C算子实现与调用样例
+│   ├── README_en.md
+│   └── histograms.asc  // Ascend C算子实现与调用样例
 ```
 
 ## 样例描述
 
 - 样例功能：
-  对三组输入Tensor执行融合乘加计算，计算公式如下：
+  对高半区间`[128, 255]`执行累计统计。输出初始值为3，计算公式如下：
 
   ```text
-  output_i = input_a_i * input_b_i + input_c_i
+  output_i = 3 + count(input_j <= 128 + i), 0 <= i < 128
   ```
 
 - 样例规格：
   <table>
   <tr><td align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
-  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">input_a</td><td align="center">[64]</td><td align="center">float</td></tr>
-  <tr><td align="center">input_b</td><td align="center">[64]</td><td align="center">float</td></tr>
-  <tr><td align="center">input_c</td><td align="center">[64]</td><td align="center">float</td></tr>
-  <tr><td align="center">样例输出</td><td align="center">output</td><td align="center">[64]</td><td align="center">float</td></tr>
-  <tr><td align="center">核函数名</td><td colspan="3" align="center">composite_compute_tensor_api</td></tr>
+  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+  <tr><td align="center">input</td><td align="center">[256]</td><td align="center">uint8_t</td></tr>
+  <tr><td align="center">样例输出</td><td align="center">output</td><td align="center">[128]</td><td align="center">uint16_t</td></tr>
+  <tr><td align="center">核函数名</td><td colspan="3" align="center">histograms</td></tr>
   </table>
 
 - 样例实现：
 
   1. 为GM和UB数据搬运创建ND Tensor视图，并为UB寄存器计算创建一维Tensor视图。
-  2. 使用`asc::te::copy`将三组输入从GM搬运到UB。
-  3. 使用一维坐标`make_coord(offset)`将三组输入加载为`reg_tensor<float>`，并指定64个元素参与计算。
-  4. 调用`fma(input_a, input_b, input_c)`执行融合乘加计算，将结果写回UB并搬运到GM。
+  2. 使用`asc::te::copy`将输入从GM搬运到UB，并使用一维坐标`make_coord(offset)`加载为`reg_tensor<uint8_t>`。
+  3. 将`reg_tensor<uint16_t>`初始值设置为3，并配置`histogram_half::high`和`histogram_mode::cumulative`。
+  4. 调用`histograms<histogram_config>`执行累计统计，将结果写回UB并搬运到GM。
   5. Host侧使用内核调用符`<<<>>>`调用核函数，并通过校验脚本比较输出与真值。
 
 ## 编译运行
@@ -90,6 +88,6 @@
   执行成功时输出如下：
 
   ```text
-  composite_compute_tensor_api executed successfully.
-  test pass! verified float fma.
+  histograms executed successfully.
+  test pass! verified cumulative histogram for high half bins.
   ```

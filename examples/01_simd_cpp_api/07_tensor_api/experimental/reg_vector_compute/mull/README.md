@@ -1,8 +1,8 @@
-# Histograms Tensor API 样例
+# Mull Tensor API 样例
 
 ## 概述
 
-本样例基于Tensor API实现`histograms`接口，使用高半区间累计模式统计256个`uint8_t`输入元素，并输出128个`uint16_t`结果。
+本样例基于Tensor API实现`mull`接口，对两组各64个`uint32_t`元素执行乘法，并分别输出乘积的低32位和高32位。
 
 ## 支持的产品
 
@@ -11,42 +11,46 @@
 ## 目录结构介绍
 
 ```plain
-├── histogram_compute
+├── mull
 │   ├── scripts
 │   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py     // 输出结果校验脚本
 │   ├── CMakeLists.txt           // 编译工程文件
 │   ├── data_utils.h             // 数据读写工具
 │   ├── README.md
-│   ├── README_En.md
-│   └── histogram_compute_tensor_api.asc  // Ascend C算子实现与调用样例
+│   ├── README_en.md
+│   └── mull.asc  // Ascend C算子实现与调用样例
 ```
 
 ## 样例描述
 
 - 样例功能：
-  对高半区间`[128, 255]`执行累计统计。输出初始值为3，计算公式如下：
 
   ```text
-  output_i = 3 + count(input_j <= 128 + i), 0 <= i < 128
+  product_i = uint64(src0_i) * uint64(src1_i)
+  low_i = product_i & 0xffffffff
+  high_i = product_i >> 32
   ```
 
 - 样例规格：
+
   <table>
-  <tr><td align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
-  <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">input</td><td align="center">[256]</td><td align="center">uint8_t</td></tr>
-  <tr><td align="center">样例输出</td><td align="center">output</td><td align="center">[128]</td><td align="center">uint16_t</td></tr>
-  <tr><td align="center">核函数名</td><td colspan="3" align="center">histogram_compute_tensor_api</td></tr>
+    <tr><td align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
+    <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
+    <tr><td align="center">src0</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
+    <tr><td align="center">src1</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
+    <tr><td rowspan="2" align="center">样例输出</td><td align="center">low</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
+    <tr><td align="center">high</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
+    <tr><td align="center">核函数名</td><td colspan="3" align="center">mull</td></tr>
   </table>
 
 - 样例实现：
 
   1. 为GM和UB数据搬运创建ND Tensor视图，并为UB寄存器计算创建一维Tensor视图。
-  2. 使用`asc::te::copy`将输入从GM搬运到UB，并使用一维坐标`make_coord(offset)`加载为`reg_tensor<uint8_t>`。
-  3. 将`reg_tensor<uint16_t>`初始值设置为3，并配置`histogram_half::high`和`histogram_mode::cumulative`。
-  4. 调用`histograms<histogram_config>`执行累计统计，将结果写回UB并搬运到GM。
-  5. Host侧使用内核调用符`<<<>>>`调用核函数，并通过校验脚本比较输出与真值。
+  2. 将`src0`和`src1`从GM搬运到UB，使用一维坐标`make_coord(offset)`加载到寄存器。
+  3. 使用64元素mask调用`mull`，函数返回乘积低32位，并通过`high`输出乘积高32位。
+  4. 将两个结果写回UB，再搬运到GM。
+  5. Host侧保存输出文件，校验脚本分别比较低32位和高32位结果与真值。
 
 ## 编译运行
 
@@ -78,16 +82,16 @@
 - 编译选项说明
 
   | 选项 | 可选值 | 说明 |
-  |------|--------|------|
+  | --- | --- | --- |
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：`dav-3510`对应Ascend 950PR/Ascend 950DT |
   | `CANN_ASC_USE_EXPERIMENTAL` | `ON`（本样例必选）、`OFF`（默认） | 开启实验性ASC接口 |
 
 - 执行结果
 
-  执行成功时输出如下：
+  执行结果如下，说明精度对比成功。
 
   ```text
-  histogram_compute_tensor_api executed successfully.
-  test pass! verified cumulative histogram for high half bins.
+  mull executed successfully.
+  test pass! verified low and high uint32 mull results.
   ```

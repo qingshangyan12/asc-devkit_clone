@@ -11,15 +11,15 @@ This sample uses the Tensor API `histograms` in high-half cumulative mode to pro
 ## Directory Structure
 
 ```plain
-├── histogram_compute
+├── histograms
 │   ├── scripts
 │   │   ├── gen_data.py          // Generates input and golden data.
 │   │   └── verify_result.py     // Verifies output data.
 │   ├── CMakeLists.txt           // Build project file.
 │   ├── data_utils.h             // Data input and output utilities.
 │   ├── README.md
-│   ├── README_En.md
-│   └── histogram_compute_tensor_api.asc  // Ascend C operator implementation and invocation sample.
+│   ├── README_en.md
+│   └── histograms.asc  // Ascend C operator implementation and invocation sample.
 ```
 
 ## Sample Description
@@ -37,7 +37,7 @@ This sample uses the Tensor API `histograms` in high-half cumulative mode to pro
   <tr><td rowspan="2" align="center">Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">input</td><td align="center">[256]</td><td align="center">uint8_t</td></tr>
   <tr><td align="center">Output</td><td align="center">output</td><td align="center">[128]</td><td align="center">uint16_t</td></tr>
-  <tr><td align="center">Kernel Function Name</td><td colspan="3" align="center">histogram_compute_tensor_api</td></tr>
+  <tr><td align="center">Kernel Function Name</td><td colspan="3" align="center">histograms</td></tr>
   </table>
 
 - Sample implementation:
@@ -88,6 +88,6 @@ Run the following steps in the sample root directory to build and execute the sa
   The following output indicates that the result matches the golden data:
 
   ```text
-  histogram_compute_tensor_api executed successfully.
+  histograms executed successfully.
   test pass! verified cumulative histogram for high half bins.
   ```

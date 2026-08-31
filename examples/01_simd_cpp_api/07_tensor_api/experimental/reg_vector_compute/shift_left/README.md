@@ -11,15 +11,15 @@
 ## 目录结构介绍
 
 ```plain
-├── logical_compute
+├── shift_left
 │   ├── scripts
 │   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py     // 输出结果校验脚本
 │   ├── CMakeLists.txt           // 编译工程文件
 │   ├── data_utils.h             // 数据读写工具
 │   ├── README.md
-│   ├── README_En.md
-│   └── logical_compute_tensor_api.asc  // Ascend C算子实现与调用样例
+│   ├── README_en.md
+│   └── shift_left.asc  // Ascend C算子实现与调用样例
 ```
 
 ## 样例描述
@@ -38,7 +38,7 @@
   <tr><td align="center">input</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
   <tr><td align="center">shifts</td><td align="center">[64]</td><td align="center">int32_t</td></tr>
   <tr><td align="center">样例输出</td><td align="center">output</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
-  <tr><td align="center">核函数名</td><td colspan="3" align="center">logical_compute_tensor_api</td></tr>
+  <tr><td align="center">核函数名</td><td colspan="3" align="center">shift_left</td></tr>
   </table>
 
 - 样例实现：
@@ -89,6 +89,6 @@
   执行成功时输出如下：
 
   ```text
-  logical_compute_tensor_api executed successfully.
+  shift_left executed successfully.
   test pass! verified uint32 register shift-left.
   ```

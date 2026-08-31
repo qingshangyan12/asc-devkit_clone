@@ -14,12 +14,20 @@ set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 option(CANN_ASC_USE_EXPERIMENTAL "Enable experimental CANN ASC APIs" OFF)
 
+if(NOT CMAKE_ASC_RUN_MODE STREQUAL "npu" AND NOT CMAKE_ASC_RUN_MODE STREQUAL "sim")
+    message(FATAL_ERROR "CMAKE_ASC_RUN_MODE must be 'npu' or 'sim', got: '${CMAKE_ASC_RUN_MODE}'")
+endif()
+
+if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
+    message(FATAL_ERROR "histograms only supports CMAKE_ASC_ARCHITECTURES=dav-3510")
+endif()
+
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    basic_arithmetic_tensor_api.asc
+    histograms.asc
 )
 
 target_link_libraries(demo PRIVATE

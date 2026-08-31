@@ -11,15 +11,15 @@ This sample uses the Tensor API `operator<<` to shift 64 `uint32_t` elements by 
 ## Directory Structure
 
 ```plain
-├── logical_compute
+├── shift_left
 │   ├── scripts
 │   │   ├── gen_data.py          // Generates input and golden data.
 │   │   └── verify_result.py     // Verifies output data.
 │   ├── CMakeLists.txt           // Build project file.
 │   ├── data_utils.h             // Data input and output utilities.
 │   ├── README.md
-│   ├── README_En.md
-│   └── logical_compute_tensor_api.asc  // Ascend C operator implementation and invocation sample.
+│   ├── README_en.md
+│   └── shift_left.asc  // Ascend C operator implementation and invocation sample.
 ```
 
 ## Sample Description
@@ -38,7 +38,7 @@ This sample uses the Tensor API `operator<<` to shift 64 `uint32_t` elements by 
   <tr><td align="center">input</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
   <tr><td align="center">shifts</td><td align="center">[64]</td><td align="center">int32_t</td></tr>
   <tr><td align="center">Output</td><td align="center">output</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
-  <tr><td align="center">Kernel Function Name</td><td colspan="3" align="center">logical_compute_tensor_api</td></tr>
+  <tr><td align="center">Kernel Function Name</td><td colspan="3" align="center">shift_left</td></tr>
   </table>
 
 - Sample implementation:
@@ -89,6 +89,6 @@ Run the following steps in the sample root directory to build and execute the sa
   The following output indicates that the result matches the golden data:
 
   ```text
-  logical_compute_tensor_api executed successfully.
+  shift_left executed successfully.
   test pass! verified uint32 register shift-left.
   ```
