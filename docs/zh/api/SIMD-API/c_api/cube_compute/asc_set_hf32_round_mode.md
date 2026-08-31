@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](./asc_enable_hf32.md)开启HF32模式。
+本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](asc_enable_hf32.md)开启HF32模式。
 
 ## 函数原型
 
@@ -38,7 +38,7 @@ __aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mo
 
 | 参数名 | 输入/输出 | 描述 |
 |:-------|:----------|:------|
-| hf32_round_mode | 输入 | HF32舍入模式控制入参，[asc_hf32_round_mode](../enum/asc_hf32_round_mode.md)枚举类型，支持如下2种枚举值：<br>&nbsp;&nbsp;&bull; NEAREST_AWAY：FP32将以向最接近的值舍入，平局时远离零的方式舍入为HF32。<br>&nbsp;&nbsp;&bull; NEAREST_EVEN：FP32将以向最接近的值舍入，平局时向偶数舍入的方式舍入为HF32。 |
+| hf32_round_mode | 输入 | HF32舍入模式控制入参，[asc_hf32_round_mode](../defs/enum/asc_hf32_round_mode.md)枚举类型，支持如下2种枚举值：<br>&nbsp;&nbsp;&bull; NEAREST_AWAY：FP32将以向最接近的值舍入，平局时远离零的方式舍入为HF32。<br>&nbsp;&nbsp;&bull; NEAREST_EVEN：FP32将以向最接近的值舍入，平局时向偶数舍入的方式舍入为HF32。 |
 
 ## 返回值说明
 
@@ -51,7 +51,7 @@ PIPE_S
 ## 约束说明
 
 - 开启HF32模式后，若不调用本接口，则默认使用`NEAREST_EVEN`代表的舍入模式。
-- 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
+- 本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
 - 本接口配置的舍入模式仅在HF32模式开启期间生效，需先开启HF32模式再调用本接口，否则舍入模式配置不产生实际作用。
 - 舍入模式配置后会持续生效，HF32模式关闭后再次开启仍将沿用上次的舍入模式配置，如需切换舍入模式，请重新调用本接口。
 
@@ -86,10 +86,9 @@ __global__ __cube__ void asc_set_hf32_round_mode_kernel(
     __ca__ float a_l0[ELEMENTS];
     __cb__ float b_l0[ELEMENTS];
     __cc__ float c_l0[ELEMENTS];
-    constexpr uint64_t nz_config = (16ULL << 32) | (1ULL << 16) | 1ULL;
-    asc_set_gm2l1_nz_para(nz_config);
+    asc_set_gm2l1_nz_para(1, 1, 16, 0);
     asc_copy_gm2l1_nd2nz(a_l1, a, DIM * sizeof(float), 0, DIM, DIM, 0, false);
-    asc_set_gm2l1_nz_para(nz_config);
+    asc_set_gm2l1_nz_para(1, 1, 16, 0);
     asc_copy_gm2l1_nd2nz(b_l1, b, DIM * sizeof(float), 0, DIM, DIM, 0, false);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
@@ -103,7 +102,7 @@ __global__ __cube__ void asc_set_hf32_round_mode_kernel(
     asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, 0, true, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
-    asc_set_l0c2gm_nz2nd(1, 0, 0);
+    asc_set_l0c_copy_nz_para(1, 0, 0);
     asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
