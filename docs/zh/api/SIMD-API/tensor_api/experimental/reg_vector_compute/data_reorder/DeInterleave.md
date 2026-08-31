@@ -30,7 +30,7 @@
 
 给定源操作数寄存器src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。解交织排列方式如下图所示，其中每个方格代表一个元素：
 
-![](../../../../figures/reg_regdeinterleave.png)
+![DeInterleave示意图](../../../../../figures/reg_regdeinterleave.png)
 
 ## 函数原型
 
