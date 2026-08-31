@@ -739,6 +739,11 @@ HcclResult ParseOpExpansion()
         } else {
             g_algEnvConfig.aicpuUnfold = true;
         }
+        
+        // A5默认开启aicpu task cache
+        if (deviceType == HcclDevType::DEV_TYPE_950) {
+            g_algEnvConfig.aicpuCacheEnable = 1;
+        }
     } else if (opExpansionModeEnv == "AIV") {
         if (g_algEnvConfig.hcclDeterministic == true) {
             HCCL_WARNING("Deterministic do not support aiv");
@@ -772,8 +777,10 @@ HcclResult ParseOpExpansion()
         return HCCL_E_PARA;
     }
     HCCL_INFO(
-        "environmental variable HCCL_OP_EXPANSION_MODE is [%s], aicpuUnfold[%u], aivMode[%u], enableFfts[%u]",
-        opExpansionModeEnv.c_str(), g_algEnvConfig.aicpuUnfold, g_algEnvConfig.aivMode, g_algEnvConfig.enableFfts);
+        "environmental variable HCCL_OP_EXPANSION_MODE is [%s], aicpuUnfold[%u], aicpuCacheEnable[%u], "
+        "aivMode[%u], enableFfts[%u]",
+        opExpansionModeEnv.c_str(), g_algEnvConfig.aicpuUnfold, g_algEnvConfig.aicpuCacheEnable,
+        g_algEnvConfig.aivMode, g_algEnvConfig.enableFfts);
     return HCCL_SUCCESS;
 }
 
@@ -976,7 +983,8 @@ bool RunIndependentOpExpansion(DevType deviceType)
 {
     std::string opExpansionModeEnv = GetEnv(MM_ENV_HCCL_OP_EXPANSION_MODE);
     if (deviceType == DevType::DEV_TYPE_910_93) {
-        return opExpansionModeEnv == "AI_CPU" || opExpansionModeEnv == "HOST_TS" || opExpansionModeEnv == "EmptyString";
+        return opExpansionModeEnv == "AI_CPU" || opExpansionModeEnv == "AICPU_CacheDisable" ||
+               opExpansionModeEnv == "HOST_TS" || opExpansionModeEnv == "EmptyString";
     }
 
 #ifdef MACRO_DEV_TYPE_NEW
@@ -984,7 +992,8 @@ bool RunIndependentOpExpansion(DevType deviceType)
 #else
     if (deviceType == DevType::DEV_TYPE_910_95) {
 #endif
-        return opExpansionModeEnv == "AI_CPU" || opExpansionModeEnv == "HOST_TS" ||
+        return opExpansionModeEnv == "AI_CPU" || opExpansionModeEnv == "AICPU_CacheDisable" ||
+               opExpansionModeEnv == "HOST_TS" ||
                opExpansionModeEnv == "EmptyString" || opExpansionModeEnv == "AIV" || opExpansionModeEnv == "AIV_ONLY" ||
                opExpansionModeEnv == "CCU_SCHED" || opExpansionModeEnv == "CCU_MS";
     }

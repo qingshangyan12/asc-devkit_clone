@@ -106,6 +106,17 @@ int32_t HcclHcommBatchTransferOnThread(
     ThreadHandle thread, ChannelHandle channel, const HcclHcommBatchTransferDesc* transferDescs,
     uint32_t transferDescNum);
 
+DECL_WEAK_FUNC(int32_t, HcommAicpuTsTaskCacheLookup, const char *tag, bool *isHit);
+DECL_SUPPORT_FLAG(HcommAicpuTsTaskCacheLookup);
+DECL_WEAK_FUNC(int32_t, HcommAicpuTsTaskCacheStart, const char *tag, void **addrs, uint64_t* sizes, uint64_t count);
+DECL_SUPPORT_FLAG(HcommAicpuTsTaskCacheStart);
+DECL_WEAK_FUNC(int32_t, HcommAicpuTsTaskCacheEnd, const char *tag);
+DECL_SUPPORT_FLAG(HcommAicpuTsTaskCacheEnd);
+DECL_WEAK_FUNC(int32_t, HcommAicpuTsTaskCacheExecute, const char *tag, void **addrs, uint64_t *sizes, uint64_t count);
+DECL_SUPPORT_FLAG(HcommAicpuTsTaskCacheExecute);
+DECL_WEAK_FUNC(int32_t, HcommAicpuTsTaskCacheClear, const char *tag);
+DECL_SUPPORT_FLAG(HcommAicpuTsTaskCacheClear);
+
 void HcommPrimitivesDlInit(void* libHcommHandle); // 本模块独立初始化
 void Mc2HcommAicpuTaskCacheDlInit(void* libHcommHandle);
 

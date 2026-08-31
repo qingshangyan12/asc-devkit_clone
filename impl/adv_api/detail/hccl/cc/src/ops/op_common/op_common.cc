@@ -500,7 +500,9 @@ HcclResult HcclExecOp(
         ThreadHandle unfoldThread;
         CHK_RET(GetUnfoldThreadInfo(comm, param, unfoldThread));
         // 根据主流的捕获状态决定展开流的状态
-        CHK_RET(CaptureSlaveStreams(comm, param.stream, {mainThread, unfoldThread}));
+        CHK_RET(CaptureSlaveStreams(comm, param.stream, {mainThread, unfoldThread}, param.isCapture));
+        // aicpu task cache使能
+        param.aicpuCacheEnable = GetExternalInputHcclAicpuCacheEnable();
         HCCL_INFO(
             "[asc][AlgoExecute][HcclExecOp] before HcclAicpuKernelEntranceLaunch, opType[%d], algName[%s], "
             "algTag[%s], cpuTsThread[%lu], exportedCpuTsThread[%lu], unfoldThread[%lu].",
@@ -526,7 +528,7 @@ HcclResult HcclExecOp(
             return HCCL_E_INTERNAL;
         }
         if (resCtxHost->slaveThreadNum > 0) {
-            CHK_RET(CaptureSlaveStreams(comm, param.stream, resCtxHost->threads));
+            CHK_RET(CaptureSlaveStreams(comm, param.stream, resCtxHost->threads, param.isCapture));
         }
         HCCL_INFO(
             "[asc][AlgoOrchestrate][HcclExecOp] before Orchestrate, opType[%d], algName[%s], "
@@ -698,8 +700,10 @@ HcclResult AicpuKernelLaunch(HcclComm comm, OpParam& param, ThreadHandle unfoldT
     return HCCL_SUCCESS;
 }
 
-HcclResult CaptureSlaveStreams(HcclComm comm, aclrtStream mainStream, const std::vector<ThreadHandle>& threads)
+HcclResult CaptureSlaveStreams(HcclComm comm, aclrtStream mainStream, const std::vector<ThreadHandle>& threads,
+    bool &isCapture)
 {
+    isCapture = false;
     aclmdlRI rtModel = nullptr;
     aclmdlRICaptureStatus captureStatus = aclmdlRICaptureStatus::ACL_MODEL_RI_CAPTURE_STATUS_NONE;
     aclError ret = aclmdlRICaptureGetInfo(mainStream, &captureStatus, &rtModel);
@@ -715,6 +719,7 @@ HcclResult CaptureSlaveStreams(HcclComm comm, aclrtStream mainStream, const std:
         HCCL_INFO("[%s]captureStatus is not active, captureStatus[%d]", __func__, captureStatus);
         return HCCL_SUCCESS;
     }
+    isCapture = true;
     // thread[0] is main thread
     auto& HcclThreadResGetInfoFunc = mc2_ops_hccl::DlHcommFunction::GetInstance();
     for (size_t i = 1; i < threads.size(); ++i) {

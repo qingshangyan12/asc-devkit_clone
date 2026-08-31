@@ -164,16 +164,7 @@ public:
         (void)stream;
     }
 
-    HcclResult SetAddTaskInfoCallback(std::function<HcclResult(u32, u32, const TaskParam&, u64)> callback)
-    {
-        CHK_PTR_NULL(callback);
-        newCallback_ = callback;
-        return HCCL_SUCCESS;
-    }
-
 protected:
-    std::function<HcclResult(u32, u32, const TaskParam&, u64)> newCallback_{nullptr};
-
 private:
 };
 

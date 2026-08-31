@@ -23,6 +23,7 @@
 #include "hccl_common.h"
 #include "stream_lite.h"
 #include "thread.h"
+#include "dfx_profiling_handler_lite.h"
 
 using namespace HcclApi;
 namespace {
@@ -332,6 +333,20 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcoreWait(
             groupIdx_, thread, streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(waitAddr),
             static_cast<unsigned long long>(valueAddr));
         EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyWait(waitAddr, valueAddr, isLast), return HCCL_E_INTERNAL);
+        {
+            auto* dfxSlot = streamLite->NextTaskSlot();
+            if (dfxSlot != nullptr) {
+                dfxSlot->taskType = static_cast<u8>(Hccl::TaskParamTypeVal::TASK_NOTIFY_WAIT);
+                dfxSlot->sqId = streamLite->GetSqId();
+                dfxSlot->taskId = streamLite->GetRtsq()->GetTaskId();
+                const void* opInfo = Hccl::DfxProfilingHandlerLite::GetInstance().GetCurrDfxOpInfo();
+                dfxSlot->dfxOpInfo = (opInfo != nullptr) ? reinterpret_cast<u64>(opInfo) : DFX_INVALID_U64;
+                dfxSlot->linkType = static_cast<u8>(Hccl::DfxLinkTypeVal::LINK_ONCHIP);
+                dfxSlot->transportType = static_cast<u8>(Hccl::DfxTransportType::DFX_TRANSPORT_TYPE_LOCAL);
+                dfxSlot->channelHandle = DFX_INVALID_U64;
+                dfxSlot->taskPara.Notify.sqeAddr = DFX_INVALID_U64;
+            }
+        }
         HCCL_INFO(
             "[MC2_OPEN_DIAG][CcoreWaitSqeDone] group %u, turnNum %u, thread %p, streamLite %p.", groupIdx_, turnNum,
             thread, streamLite);
@@ -417,6 +432,20 @@ HcclResult CommKfcAicpuServer::LaunchOpenCcorePost(
             groupIdx_, thread, streamLite, streamLite->GetRtsq(), static_cast<unsigned long long>(recordAddr),
             static_cast<unsigned long long>(valueAddr));
         EXECEPTION_CATCH(streamLite->GetRtsq()->CCoreNotifyRecord(recordAddr, valueAddr), return HCCL_E_INTERNAL);
+        {
+            auto* dfxSlot = streamLite->NextTaskSlot();
+            if (dfxSlot != nullptr) {
+                dfxSlot->taskType = static_cast<u8>(Hccl::TaskParamTypeVal::TASK_NOTIFY_RECORD);
+                dfxSlot->sqId = streamLite->GetSqId();
+                dfxSlot->taskId = streamLite->GetRtsq()->GetTaskId();
+                const void* opInfo = Hccl::DfxProfilingHandlerLite::GetInstance().GetCurrDfxOpInfo();
+                dfxSlot->dfxOpInfo = (opInfo != nullptr) ? reinterpret_cast<u64>(opInfo) : DFX_INVALID_U64;
+                dfxSlot->linkType = static_cast<u8>(Hccl::DfxLinkTypeVal::LINK_ONCHIP);
+                dfxSlot->transportType = static_cast<u8>(Hccl::DfxTransportType::DFX_TRANSPORT_TYPE_LOCAL);
+                dfxSlot->channelHandle = DFX_INVALID_U64;
+                dfxSlot->taskPara.Notify.sqeAddr = DFX_INVALID_U64;
+            }
+        }
         HCCL_INFO(
             "[MC2_OPEN_DIAG][CcorePostSqeDone] group %u, turnNum %u, thread %p, streamLite %p.", groupIdx_, turnNum,
             thread, streamLite);

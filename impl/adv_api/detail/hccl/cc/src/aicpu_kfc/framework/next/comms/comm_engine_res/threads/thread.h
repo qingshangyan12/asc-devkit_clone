@@ -25,6 +25,8 @@
 #include "sal_pub.h"
 #include "stream_lite.h"
 #include "task_info.h"
+#include "res_pub.h"
+#include "dfx_circular_queue.h"
 #include "adapter_prof.h"
 #include "../../../../../legacy/framework/dfx/profiling/dlprof_function.h"
 
@@ -90,13 +92,22 @@ public:
 
     HcclResult AddThreadHandleToMap(CommEngine commEngine, ThreadHandle threadHandle);
     Thread* FindThreadByCommEngine(CommEngine commEngine);
-    HcclResult SetAddTaskInfoCallback(std::function<HcclResult(u32, u32, const Hccl::TaskParam&, u64)> callback)
+
+    void SetReportStreamTaskCallback(std::function<void(Hccl::TaskInfoCircularQueue*)> callback)
     {
-        CHK_PTR_NULL(callback);
-        callback_ = callback;
-        return HCCL_SUCCESS;
+        auto* sl = static_cast<Hccl::StreamLite*>(GetStreamLitePtr());
+        if (sl != nullptr) {
+            sl->SetReportStreamTaskCallback(std::move(callback));
+        }
     }
-    std::function<HcclResult(u32, u32, const Hccl::TaskParam&, u64)> GetCallback() { return callback_; }
+
+    void SetGetLatestDfxOpInfoCallback(std::function<const void*()> callback)
+    {
+        auto* sl = static_cast<Hccl::StreamLite*>(GetStreamLitePtr());
+        if (sl != nullptr) {
+            sl->SetGetLatestDfxOpInfoCallback(std::move(callback));
+        }
+    }
 
 protected:
     HcclResult ReportAicpuNotifyWaitTask(u64 notifyId, u64 beginTime, u32 taskId, u32 sqId) const;
@@ -117,7 +128,6 @@ protected:
 private:
     std::unordered_map<CommEngine, ThreadHandle>
         threadHandleMap_; // CPU_TS上的ThreadHandle与其他引擎上的ThreadHandle的映射
-    std::function<HcclResult(u32, u32, const Hccl::TaskParam&, u64)> callback_; // 上报task信息的回调函数
 };
 
 inline Stream* GetStream(uint64_t thread)

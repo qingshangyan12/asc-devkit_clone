@@ -20,6 +20,10 @@
 #include "kernel_launch.h"
 #include "hcomm_diag_dl.h"
 #include "hcomm_device_profiling_dl.h"
+#include "task_cache/aicpu_task_cache_key.h"
+#include "task_cache/aicpu_task_cache_comm_manager.h"
+#include "task_cache/aicpu_task_cache_utils.h"
+#include "task_cache/aicpu_task_cache_policy.h"
 #include <unordered_map>
 #include <shared_mutex>
 #include <atomic>
@@ -228,6 +232,54 @@ private:
 thread_local CommDomainCacheManager g_cacheManager;
 } // namespace
 
+inline HcclResult EnforceLaunchTask(const char *algTag)
+{
+    if (HcommBatchModeEnd(algTag) != HCCL_SUCCESS) {
+        HCCL_ERROR("failed set eager mode, tag is %s.", algTag);
+        return HCCL_E_INTERNAL;
+    }
+    if (HcommBatchModeStart(algTag) != HCCL_SUCCESS) {
+        HCCL_ERROR("failed set batch mode, tag is %s.", algTag);
+        return HCCL_E_INTERNAL;
+    }
+    return HCCL_SUCCESS;
+}
+
+inline HcclResult OpOrchestrate(OpParam *param, const AlgResourceCtxSerializable& resCtx, ThreadHandle thread,
+    std::string& algName)
+{
+    // RTSQ等待时间: 与算子展开无关, 但resCtx固定该设置不会再变更
+    // 主thread等待Host stream的通知
+    u32 maxNotifyNum = resCtx.notifyNumOnMainThread;
+    for (u32 i = 0; i < resCtx.notifyNumPerThread.size(); i++) {
+        if (resCtx.notifyNumPerThread[i] > maxNotifyNum) {
+            maxNotifyNum = resCtx.notifyNumPerThread[i];
+        }
+    }
+    HCCL_DEBUG(
+        "[%s]Notify wait on thread[%llu], maxNotifyNum[%u], timeout[%u]", __func__, thread, maxNotifyNum,
+        CUSTOM_TIMEOUT);
+    CHK_RET(static_cast<HcclResult>(HcommThreadNotifyWaitOnThread(thread, maxNotifyNum, CUSTOM_TIMEOUT)));
+
+    // 设置BatchTransfer是否可行: 只在算子展开过程中使用
+    CHK_RET(InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
+
+    // 根据算法名字获取executor: 只用于算子展开
+    std::shared_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, algName);
+    if (executor.get() == nullptr) {
+        HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str());
+        return HCCL_E_INTERNAL;
+    }
+
+    // 执行算法编排: 只用于算子展开
+    if (executor->Orchestrate(*param, resCtx) != HCCL_SUCCESS) {
+        HCCL_ERROR("orchestrate failed for alg:%s", param->algName);
+        return HCCL_E_INTERNAL;
+    }
+
+    return HCCL_SUCCESS;
+}
+
 extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKernel(OpParam* param)
 {
     if (param == nullptr) {
@@ -338,29 +390,100 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             return 1;
         }
 
-        // 主thread等待Host stream的通知
         ThreadHandle exportedAicpuTsThread = param->opThread;
-        u32 maxNotifyNum = resCtx.notifyNumOnMainThread;
-        for (u32 i = 0; i < resCtx.notifyNumPerThread.size(); i++) {
-            if (resCtx.notifyNumPerThread[i] > maxNotifyNum) {
-                maxNotifyNum = resCtx.notifyNumPerThread[i];
+
+        // 检查aicpu task cache使能约束
+        bool enableCache = false;
+        if (Mc2HcommIsSupportAicpuTsTaskCache()) {
+            CHK_RET(ops_hccl::AicpuTaskCachePolicy::IsAicpuTaskCacheEnable(*param, resCtx, enableCache));
+        }
+
+        // 打印算子信息用于调试
+        static std::atomic<uint64_t> opUnfoldIdx{0};
+        HCCL_INFO("[HcclLaunchAicpuKernel] opUnfoldIdx[%llu] commName[%s] opType[%u] inputPtr[0x%016llx] inputSize[%llu] "
+            "outputPtr[0x%016llx] outputSize[%llu] opMode[%u] algName[%s] isZeroCopy[%d] opExpanMode[%u] enableCache[%d]",
+            opUnfoldIdx.fetch_add(1, std::memory_order_relaxed), param->commName, static_cast<uint32_t>(param->opType),
+            param->inputPtr, param->inputSize, param->outputPtr, param->outputSize,
+            static_cast<uint32_t>(param->opMode), param->algName, param->isZeroCopy,
+            static_cast<uint32_t>(param->commOpExpansionMode), enableCache);
+
+        if (enableCache) { // 使能aicpu task cache
+            // 注意: OpOrchestrate尚未调用, 首个NotifyWait与算子展开相关的task尚未生成, AicpuTsThread中一定无SQE
+            // 因此, 无需通过强制下发SQE, 来避免cache miss下缓存算法无关的task 或 cache hit下task下发乱序
+
+            // 准备地址信息 (当前rank的userIn和userOut)
+            constexpr uint64_t ADDRS_COUNT = 2;
+            void* addrs[ADDRS_COUNT] = {param->inputPtr, param->outputPtr};
+            uint64_t inputSize = 0;
+            uint64_t outputSize = 0;
+            CHK_RET(static_cast<HcclResult>(ops_hccl::AicpuTaskCacheUtils::GetInputOutputInfoForCache(
+                *param, resCtx.topoInfo.userRankSize, inputSize, outputSize)));
+            uint64_t sizes[ADDRS_COUNT] = {inputSize, outputSize};
+
+            std::string cacheTag;
+            bool isCacheHit = false;
+            // 组装aicpu task cache tag
+            CHK_RET(ops_hccl::AicpuTaskCacheKey::GetAicpuTaskCacheTag(*param, inputSize, cacheTag));
+
+            // 查询aicpu task cache
+            if (Mc2HcommIsSupportAicpuTsTaskCache()) {
+                CHK_RET(static_cast<HcclResult>(Mc2HcommAicpuTsTaskCacheLookup(cacheTag.c_str(), &isCacheHit)));
             }
-        }
-        HCCL_DEBUG(
-            "[%s]Notify wait on thread[%llu], maxNotifyNum[%u], timeout[%u]", __func__, thread, maxNotifyNum,
-            CUSTOM_TIMEOUT);
-        CHK_RET(static_cast<HcclResult>(HcommThreadNotifyWaitOnThread(thread, maxNotifyNum, CUSTOM_TIMEOUT)));
+            HCCL_INFO("[HcclLaunchAicpuKernel] isCacheHit[%d] for cacheTag[%s]", isCacheHit, cacheTag.c_str());
 
-        std::shared_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, algName);
-        if (executor.get() == nullptr) {
-            HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str());
-            return 1;
-        }
+            if (!isCacheHit) { // cache miss
+                HcclResult cacheRet = HCCL_SUCCESS;
+                do {
+                    // 算子展开前, 通知aicpu task cache开始缓存task
+                    if (Mc2HcommIsSupportAicpuTsTaskCache()) {
+                        cacheRet = static_cast<HcclResult>(
+                            Mc2HcommAicpuTsTaskCacheStart(cacheTag.c_str(), addrs, sizes, ADDRS_COUNT));
+                        CHK_PRT_BREAK(cacheRet != HCCL_SUCCESS,
+                            HCCL_ERROR("[%s] HcommAicpuTsTaskCacheStart error, ret[%d]", __func__, cacheRet), (void)0);
+                    }
 
-        // 执行算法编排
-        if (executor->Orchestrate(*param, resCtx) != HCCL_SUCCESS) {
-            HCCL_ERROR("orchestrate failed for alg:%s", param->algName);
-            return 1;
+                    // 设置算子展开相关的配置, 下发首个NotifyWait, 构造executor并执行算子展开
+                    cacheRet = OpOrchestrate(param, resCtx, thread, algName);
+                    CHK_PRT_BREAK(
+                        cacheRet != HCCL_SUCCESS, HCCL_ERROR("[%s] OpOrchestrate error, ret[%d]", __func__, cacheRet),
+                        (void)0);
+
+                    // 使用aicpu task cache后确保算子展开相关的SQE通过LaunchTask被缓存, 用于cache
+                    // miss下避免缓存算法无关的task 注意: cache hit时, task刷新后直接下发, 这里无需强制下发 注意:
+                    // hccl无法识别cache容量是否已满; 理论上如果cache容量满了, cache不使能, 无需强制下发
+                    // (仅首次执行触发, 开销有限)
+                    cacheRet = EnforceLaunchTask(param->algTag);
+                    CHK_PRT_BREAK(cacheRet != HCCL_SUCCESS,
+                        HCCL_ERROR("[%s] EnforceLaunchTask error, ret[%d]", __func__, cacheRet), (void)0);
+
+                    // 算子展开后, 通知aicpu task cache停止缓存task
+                    if (Mc2HcommIsSupportAicpuTsTaskCache()) {
+                        cacheRet = static_cast<HcclResult>(Mc2HcommAicpuTsTaskCacheEnd(cacheTag.c_str()));
+                        CHK_PRT_BREAK(cacheRet != HCCL_SUCCESS,
+                            HCCL_ERROR("[%s] HcommAicpuTsTaskCacheEnd error, ret[%d]", __func__, cacheRet), (void)0);
+                    }
+                } while (0);
+
+                if (UNLIKELY(cacheRet != HCCL_SUCCESS)) {
+                    if (Mc2HcommIsSupportAicpuTsTaskCache()) {
+                        HCCL_ERROR("[%s] cache submit error, clear tag[%s]", __func__, cacheTag.c_str());
+                        (void)Mc2HcommAicpuTsTaskCacheClear(cacheTag.c_str());
+                    }
+                    return cacheRet;
+                }
+
+                // 首次缓存记录通信域与tag关系
+                ops_hccl::AicpuTaskCacheCommManager::Instance().AddCommTagMap(param->hcclComm, cacheTag);
+            } else { // cache hit
+                // 刷新并下发task
+                if (Mc2HcommIsSupportAicpuTsTaskCache()) {
+                    CHK_RET(static_cast<HcclResult>(
+                        Mc2HcommAicpuTsTaskCacheExecute(cacheTag.c_str(), addrs, sizes, ADDRS_COUNT)));
+                }
+            }
+        } else { // 不使能aicpu task cache
+            // 设置算子展开相关的配置, 下发首个NotifyWait, 构造executor并执行算子展开
+            CHK_RET(OpOrchestrate(param, resCtx, thread, algName));
         }
 
         if (HcommProfilingReportDeviceOp(param->commName) != HCCL_SUCCESS) {
@@ -495,6 +618,23 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         return 1;
     }
     HCCL_INFO("%s success, tag[%s], algTag[%s], commName[%s]", __func__, param->tag, param->algTag, param->commName);
+    return 0;
+}
+
+extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuCacheEvictKernel(HcclComm *comm)
+{
+    if (comm == nullptr) {
+        HCCL_ERROR("%s comm is nullptr", __func__);
+        return 1;
+    }
+    HCCL_INFO("Entry-%s, comm[%p]", __func__, *comm);
+    if (*comm != nullptr) {
+        if (ops_hccl::AicpuTaskCacheCommManager::Instance().EvictTaskCache(*comm) != HCCL_SUCCESS) {
+            HCCL_ERROR("%s EvictTaskCache fail, comm[%p]", __func__, *comm);
+            return 1;
+        }
+    }
+
     return 0;
 }
 

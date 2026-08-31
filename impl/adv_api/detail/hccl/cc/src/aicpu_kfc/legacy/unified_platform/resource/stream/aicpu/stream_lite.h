@@ -12,8 +12,10 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <functional>
 #include "types.h"
 #include "rtsq_base.h"
+#include "dfx_circular_queue.h"
 namespace Hccl {
 
 class StreamLite {
@@ -34,6 +36,38 @@ public:
 
     std::string Describe() const;
 
+    inline DfxTaskInfo* NextTaskSlot() const
+    {
+        if (taskInfos_.IsFull()) {
+            ReportStreamTask();
+        }
+        return static_cast<DfxTaskInfo*>(taskInfos_.NextSlot());
+    }
+
+    inline void SetReportStreamTaskCallback(std::function<void(TaskInfoCircularQueue*)> callback)
+    {
+        reportStreamTaskCallback_ = std::move(callback);
+    }
+
+    inline bool HasReportStreamTaskCallback() const { return static_cast<bool>(reportStreamTaskCallback_); }
+
+    inline void ReportStreamTask() const
+    {
+        if (reportStreamTaskCallback_ != nullptr) {
+            reportStreamTaskCallback_(&taskInfos_);
+        }
+    }
+
+    inline void SetGetLatestDfxOpInfoCallback(std::function<const void*()> callback)
+    {
+        getLatestDfxOpInfoCallback_ = std::move(callback);
+    }
+
+    inline const void* GetLatestDfxOpInfo() const
+    {
+        return (getLatestDfxOpInfoCallback_ != nullptr) ? getLatestDfxOpInfoCallback_() : nullptr;
+    }
+
 private:
     u32 id;
     u32 sqId;
@@ -41,6 +75,11 @@ private:
     u32 cqId{0};
 
     std::unique_ptr<RtsqBase> rtsq;
+
+    // DFX: 流级任务信息环形队列 + 上报回调（mutable 以支持 const 方法写入）
+    mutable TaskInfoCircularQueue taskInfos_;
+    std::function<void(TaskInfoCircularQueue*)> reportStreamTaskCallback_{nullptr};
+    std::function<const void*()> getLatestDfxOpInfoCallback_{nullptr};
 };
 
 } // namespace Hccl

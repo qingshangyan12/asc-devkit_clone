@@ -62,7 +62,7 @@ struct AlgEnvConfig {
             DeterministicEnableLevel::
                 DETERMINISTIC_DISABLE); // 确定性配置 0：不支持；1：支持确定性不支持规约保序；2：支持确定性&规约保序
         enableFfts = true;
-        aicpuCacheEnable = 1; // 默认开启aicpu cache (只有当aicpuUnfold为true时才生效)
+        aicpuCacheEnable = 0; // 默认关闭aicpu cache
         aivOnlyMode = false;
         execTimeOutSet = false;
         execTimeout = 0;
