@@ -812,8 +812,6 @@ CcuResult GroupCopyV1(CcuKernelCtxBase& ctx, ccu::LocalAddr dst, ccu::LocalAddr 
         loops.loopParam[1] = loopCfg1;
         std::vector<ccu::Loop> grpLoops{*loops.loops[0], *loops.loops[1]};
         ccu::LoopGroup group(goSize.parallelParam, offsetCfg, ctx.moConfig.loopCount, grpLoops);
-<<<<<<< HEAD
-=======
     }
     return CCU_SUCCESS;
 }
@@ -866,7 +864,6 @@ CcuResult GroupCopyV2(CcuKernelCtxBase& ctx, ccu::LocalAddr dst, ccu::LocalAddr 
         offsetCfg = GetOffsetParam(ctx.moConfig.memSlice, ctx.moConfig.msInterleave, CCU_LOOP_CKE_NUM_COPY_V2);
         xnOffsetCfg = 0;
         ccu::LoopGroup group(goSize.parallelParam, offsetCfg, xnOffsetCfg, ctx.moConfig.loopCount, grpLoops);
->>>>>>> 061d655a6 (add works)
     }
     return CCU_SUCCESS;
 }
