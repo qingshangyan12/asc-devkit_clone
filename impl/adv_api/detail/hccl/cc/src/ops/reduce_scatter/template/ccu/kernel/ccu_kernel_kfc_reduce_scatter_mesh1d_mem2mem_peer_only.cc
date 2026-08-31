@@ -39,7 +39,7 @@ static CcuResult InitPeerOnlyResource(KfcReduceScatterMesh1DMem2MemPeerOnlyConte
 {
     if (ctx.rankSize != 2U || ctx.rankId >= ctx.rankSize || ctx.channelCount != 1U) {
         HCCL_ERROR(
-            "[CcuReduceScatterMeshMem2Mem1DPeerOnly] requires TP2 and one peer channel, rankSize[%u], "
+            "[CcuSchedReduceScatterSoleMeshPeerOnly] requires TP2 and one peer channel, rankSize[%u], "
             "rankId[%u], channelCount[%u].",
             ctx.rankSize, ctx.rankId, ctx.channelCount);
         return CcuResult::CCU_E_INTERNAL;
@@ -144,7 +144,7 @@ CcuResult CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
     ctx.moRes.bufCount = 0;
 
     HCCL_INFO(
-        "[CcuReduceScatterMeshMem2Mem1DPeerOnly] run, rankId[%u], rankSize[%u], dataType[%d], reduceOp[%d].",
+        "[CcuSchedReduceScatterSoleMeshPeerOnly] run, rankId[%u], rankSize[%u], dataType[%d], reduceOp[%d].",
         ctx.rankId, ctx.rankSize, ctx.dataType, ctx.reduceOp);
     CCU_CHK_RET(InitPeerOnlyResource(ctx));
     CCU_CHK_RET(LoadPeerOnlyArgs(
@@ -152,7 +152,7 @@ CcuResult CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
     CCU_CHK_RET(PeerOnlyPreSync(ctx));
     CCU_CHK_RET(DoPeerOnlyReduceScatter(ctx));
     CCU_CHK_RET(PeerOnlyPostSync(ctx));
-    HCCL_INFO("[CcuReduceScatterMeshMem2Mem1DPeerOnly] end.");
+    HCCL_INFO("[CcuSchedReduceScatterSoleMeshPeerOnly] end.");
     return CCU_SUCCESS;
 }
 

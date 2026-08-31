@@ -106,7 +106,7 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuAllGatherMeshMem2Mem1D", AlgorithmType::CcuAllGatherMeshMem2Mem1D},
     {"CcuSchedAllGatherConcurMeshNHRMultiLink", AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink},
     {"CcuSchedReduceScatterSoleMesh", AlgorithmType::CcuReduceScatterMeshMem2Mem1D},
-    {"CcuReduceScatterMeshMem2Mem1DPeerOnly", AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly},
+    {"CcuSchedReduceScatterSoleMeshPeerOnly", AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly},
     {"CcuSchedAllToAllSoleMesh", AlgorithmType::CcuSchedAllToAllSoleMesh},
     {"CcuSchedAllToAllVSoleMesh", AlgorithmType::CcuSchedAllToAllVSoleMesh},
     {"CcuSchedAllReduceSoleMesh", AlgorithmType::CcuAllReduceMeshMem2Mem1D},
