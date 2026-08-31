@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 计算输入32位整数x和y的乘积，返回64位结果。
 
 ## 函数原型
@@ -53,14 +55,6 @@ unsigned long long __mul_i32toi64(unsigned int x, unsigned int y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
 
 ## 调用示例
 
