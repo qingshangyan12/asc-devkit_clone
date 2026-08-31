@@ -10,53 +10,13 @@
 
 export const BAIDU_ANALYTICS_SITE_ID = '21ffa0c0dcb3d3e9f19b3eb55aeb97c7'
 
-export const BAIDU_ANALYTICS_ALLOWED_SITES = [
-  { protocol: 'https:', hostname: 'asc.gitcode.com', pathPrefix: '/' },
-  { protocol: 'https:', hostname: 'ascendc.github.io', pathPrefix: '/' },
-  {
-    protocol: 'https:',
-    hostname: 'chx163.github.io',
-    pathPrefix: '/ascendc.github.io',
-  },
-]
-
-export function isBaiduAnalyticsAllowed(
-  location,
-  allowedSites = BAIDU_ANALYTICS_ALLOWED_SITES,
-) {
-  if (!location) return false
-
-  const protocol = String(location.protocol || '').toLowerCase()
-  const hostname = String(location.hostname || '').toLowerCase().replace(/\.$/, '')
-  const pathname = String(location.pathname || '/')
-
-  return allowedSites.some((site) => {
-    if (protocol !== site.protocol || hostname !== site.hostname) return false
-    if (site.pathPrefix === '/') return true
-    return pathname === site.pathPrefix || pathname.startsWith(`${site.pathPrefix}/`)
-  })
-}
-
-const baiduAnalyticsAllowedSitesJson = JSON.stringify(BAIDU_ANALYTICS_ALLOWED_SITES)
-
 export const baiduAnalyticsHead = [
   [
     'script',
     {},
     `
+      var _hmt = _hmt || [];
       (function () {
-        var allowedSites = ${baiduAnalyticsAllowedSitesJson};
-        var protocol = String(window.location.protocol || "").toLowerCase();
-        var hostname = String(window.location.hostname || "").toLowerCase().replace(/\\.$/, "");
-        var pathname = String(window.location.pathname || "/");
-        var allowed = allowedSites.some(function (site) {
-          if (protocol !== site.protocol || hostname !== site.hostname) return false;
-          if (site.pathPrefix === "/") return true;
-          return pathname === site.pathPrefix || pathname.indexOf(site.pathPrefix + "/") === 0;
-        });
-        if (!allowed) return;
-
-        window._hmt = window._hmt || [];
         var hm = document.createElement("script");
         hm.src = "https://hm.baidu.com/hm.js?${BAIDU_ANALYTICS_SITE_ID}";
         var s = document.getElementsByTagName("script")[0];
@@ -75,7 +35,7 @@ export function installBaiduAnalytics(
   router,
   browser = typeof window === 'undefined' ? undefined : window,
 ) {
-  if (!router || !browser || !isBaiduAnalyticsAllowed(browser.location)) return false
+  if (!router || !browser) return false
 
   let currentPath = getBaiduPageviewPath(browser.location)
   const previousAfterRouteChange = router.onAfterRouteChange
@@ -89,7 +49,6 @@ export function installBaiduAnalytics(
     if (nextPath === currentPath) return
 
     currentPath = nextPath
-    if (!isBaiduAnalyticsAllowed(browser.location)) return
     browser._hmt = browser._hmt || []
     browser._hmt.push(['_trackPageview', nextPath])
   }
