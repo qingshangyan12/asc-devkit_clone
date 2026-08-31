@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning \
-    "impl/tensor_api/experimental/reg/compare_and_select_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future."
+    "impl/tensor_api/experimental/arch/vector/compare_and_select_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_COMPARE_AND_SELECT_IMPL_H
 #endif

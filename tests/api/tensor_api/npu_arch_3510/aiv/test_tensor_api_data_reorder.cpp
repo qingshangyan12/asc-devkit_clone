@@ -23,7 +23,7 @@ __aicore__ inline void TestInterleave()
     asc::te::experimental::reg_tensor<T> src1{};
 
     auto [dst0, dst1] = asc::te::experimental::interleave<T>(src0, src1);
-    auto mask = asc::te::experimental::all_mask<uint8_t>();
+    auto mask = asc::te::experimental::all_mask<T>();
     EXPECT_EQ(dst0.mask, mask.reg);
     EXPECT_EQ(dst1.mask, mask.reg);
 }
@@ -34,7 +34,7 @@ __aicore__ inline void TestDeinterleave()
     asc::te::experimental::reg_tensor<T> src0{};
     asc::te::experimental::reg_tensor<T> src1{};
 
-    auto mask = asc::te::experimental::all_mask<uint8_t>();
+    auto mask = asc::te::experimental::all_mask<T>();
     auto [dst0, dst1] = asc::te::experimental::deinterleave<T>(src0, src1);
     EXPECT_EQ(dst0.mask, mask.reg);
     EXPECT_EQ(dst1.mask, mask.reg);
