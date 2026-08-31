@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 将浮点数四舍五入取整，并遵循CAST\_CEIL模式。
 
 ## 函数原型
@@ -56,14 +58,6 @@ inline float __float2float_ru(const float x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
 
 ## 调用示例
 
