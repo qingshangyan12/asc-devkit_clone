@@ -1,4 +1,4 @@
-# operator+<a name="ZH-CN_TOPIC_TENSOR_API_OPERATOR_ADD"></a>
+# operator+
 
 ## 产品支持情况
 

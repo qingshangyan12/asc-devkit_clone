@@ -1,4 +1,4 @@
-# max<a name="ZH-CN_TOPIC_TENSOR_API_MAX"></a>
+# max
 
 ## 产品支持情况
 
