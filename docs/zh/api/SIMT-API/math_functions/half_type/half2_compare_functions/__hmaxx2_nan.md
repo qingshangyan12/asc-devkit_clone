@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 获取两个half2类型数据中各分量的最大值。任一分量为nan时对应结果为nan。
 
 ## 函数原型
@@ -84,14 +86,6 @@ half2 __hmaxx2_nan(const half2 x, const half2 y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
 
 ## 调用示例
 

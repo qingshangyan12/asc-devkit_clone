@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 指定输入x，对x的各元素，获取e的该元素次方。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002513174468.png)
@@ -59,14 +61,6 @@ inline half2 h2exp(half2 x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用half2类型接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
 
 ## 调用示例
 

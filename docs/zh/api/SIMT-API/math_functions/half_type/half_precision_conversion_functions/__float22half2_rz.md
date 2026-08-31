@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 将float2类型数据的两个分量遵循CAST\_TRUNC模式转换为半精度浮点数，返回转换后的half2类型数据。
 
 ## 函数原型
@@ -55,10 +57,6 @@ inline half2 __float22half2_rz(const float2 x)
 | x<-ASCRT\_MAX\_NORMAL\_FP16 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
-
-无
-
-## 需要包含的头文件
 
 无
 

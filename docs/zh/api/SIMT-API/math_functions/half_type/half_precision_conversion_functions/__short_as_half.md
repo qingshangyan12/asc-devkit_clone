@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 将short int类型数据按位重新解释为half类型数据。
 
 ## 函数原型
@@ -56,14 +58,6 @@ inline half __short_as_half(const short int x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
 
 ## 调用示例
 

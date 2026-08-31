@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 获取输入数据x的平方根的倒数。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002533360289.png)
@@ -59,14 +61,6 @@ inline half hrsqrt(half x)
 ## 约束说明
 
 本接口支持的输入数据范围为x大于等于0，否则返回值为nan。
-
-## 需要包含的头文件
-
-使用half类型接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
 
 ## 调用示例
 

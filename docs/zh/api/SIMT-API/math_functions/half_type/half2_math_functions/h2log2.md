@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 获取以2为底，输入数据各元素的对数。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002513174472.png)
@@ -58,14 +60,6 @@ inline half2 h2log2(half2 x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用half2类型接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
 
 ## 调用示例
 

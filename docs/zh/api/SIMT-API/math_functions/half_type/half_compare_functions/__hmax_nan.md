@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 获取两个输入数据中的最大值。任一输入为nan时结果为nan。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002545918676.png)
@@ -67,14 +69,6 @@ half __hmax_nan(const half x, const half y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
 
 ## 调用示例
 

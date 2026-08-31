@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 分别提取两个half2输入的低16位，并填充到half2中，返回填充后的数据。
 
 ## 函数原型
@@ -61,14 +63,6 @@ inline half2 __lows2half2(const half2 x, const half2 y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
 
 ## 调用示例
 

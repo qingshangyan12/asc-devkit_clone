@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 比较两个half2类型数据的两个分量是否不相等，仅当两个分量均不相等时返回true。
 
 ## 函数原型
@@ -49,14 +51,6 @@ bool __hbnex2(half2 x, half2 y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
 
 ## 调用示例
 

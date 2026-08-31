@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 指定输入x，获取10的x次方。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002533480319.png)
@@ -57,14 +59,6 @@ inline half hexp10(half x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用half类型接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
 
 ## 调用示例
 
