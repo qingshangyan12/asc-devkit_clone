@@ -121,9 +121,9 @@ __simd_vf__ inline void addc_example(InputTensor input0, InputTensor input1, Out
     auto src0_high = asc::te::experimental::load(input0, asc::te::make_coord(1)).with_mask(mask);
     auto src1_high = asc::te::experimental::load(input1, asc::te::make_coord(1));
 
-    asc::te::reg_tensor<bool> carry_low;
+    asc::te::experimental::reg_tensor<bool> carry_low;
     auto low = asc::te::experimental::addc(carry_low, src0_low, src1_low);
-    asc::te::reg_tensor<bool> carry_high;
+    asc::te::experimental::reg_tensor<bool> carry_high;
     auto high = asc::te::experimental::addc(carry_high, src0_high, src1_high, carry_low);
 
     asc::te::experimental::store(output, asc::te::make_coord(0), low);

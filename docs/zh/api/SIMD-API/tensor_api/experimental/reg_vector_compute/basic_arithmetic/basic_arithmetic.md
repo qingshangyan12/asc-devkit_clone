@@ -16,6 +16,7 @@
 | [prelu](prelu.md) | 逐元素执行PReLU。 |
 | [leaky_relu](leaky_relu.md) | 逐元素执行Leaky ReLU。 |
 | [addc](addc.md) | 执行带进位输出加法，或带进位输入和输出加法。 |
+| [subc](subc.md) | 执行带进位输出减法，或带进位输入和输出减法。 |
 | [mull](mull.md) | 计算32位整数宽乘的低位和高位结果。 |
 | [operator/](div.md) | 逐元素执行除法。 |
 | [min](min.md) | 逐元素取最小值。 |

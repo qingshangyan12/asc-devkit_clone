@@ -83,7 +83,7 @@ __simd_vf__ inline void mull_example(InputTensor input0, InputTensor input1, Out
     auto mask = asc::te::experimental::all_mask<uint32_t>();
     auto src0 = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
     auto src1 = asc::te::experimental::load(input1, asc::te::make_coord(0));
-    asc::te::reg_tensor<uint32_t> high;
+    asc::te::experimental::reg_tensor<uint32_t> high;
     auto low = asc::te::experimental::mull(high, src0, src1);
     asc::te::experimental::store(output, asc::te::make_coord(0), low);
     asc::te::experimental::store(output, asc::te::make_coord(1), high);
