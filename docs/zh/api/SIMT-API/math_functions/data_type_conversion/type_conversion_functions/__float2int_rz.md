@@ -73,7 +73,7 @@ inline int __float2int_rz(const float x)
     ```cpp
     __global__ __launch_bounds__(1024) void kernel__float2int_rz(int32_t* dst, float* x, uint32_t total_length)
     {
-        uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
+        int idx = threadIdx.x + blockIdx.x * blockDim.x;
         if (idx >= total_length) {
             return;
         }
