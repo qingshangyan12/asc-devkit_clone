@@ -2577,7 +2577,10 @@ void AclnnOpGenerator::AclnnOpGenCodeRunForWorkspaceVersionImpl(
     AclnnOpGenIoParam(opDef.GetOutputs(), opdefName.outputsName, version, false, outfile);
     outfile << "        workspaceSize,\n";
     outfile << "        executor);\n";
-    outfile << "    if (NnopbaseDisableOptionalInput != NULL) {\n";
+    outfile << "    if (ret != ACLNN_SUCCESS) {\n";
+    outfile << "        return ret;\n";
+    outfile << "    }\n";
+    outfile << "    if (NnopbaseDisableOptionalInput != NULL && executor != nullptr) {\n";
     AclnnAddDisableInputIndex(opDef, version, outfile);
     outfile << "    }\n";
     outfile << "    return ret;\n";

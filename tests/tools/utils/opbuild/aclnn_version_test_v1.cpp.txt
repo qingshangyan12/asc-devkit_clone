@@ -41,7 +41,10 @@ aclnnStatus aclnnVersionTestV1GetWorkspaceSize(
         yOut,
         workspaceSize,
         executor);
-    if (NnopbaseDisableOptionalInput != NULL) {
+    if (ret != ACLNN_SUCCESS) {
+        return ret;
+    }
+    if (NnopbaseDisableOptionalInput != NULL && executor != nullptr) {
         NnopbaseDisableOptionalInput(*executor, 3);
     }
     return ret;
