@@ -19,7 +19,7 @@ if(NOT CMAKE_ASC_RUN_MODE STREQUAL "npu" AND NOT CMAKE_ASC_RUN_MODE STREQUAL "si
 endif()
 
 if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
-    message(FATAL_ERROR "reg_vector_add_tensor_api only supports CMAKE_ASC_ARCHITECTURES=dav-3510")
+    message(FATAL_ERROR "add only supports CMAKE_ASC_ARCHITECTURES=dav-3510")
 endif()
 
 find_package(ASC REQUIRED)
