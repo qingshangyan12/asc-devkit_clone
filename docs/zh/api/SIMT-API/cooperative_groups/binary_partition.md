@@ -53,7 +53,6 @@ coalesced_group binary_partition(const thread_block_tile<Size, ParentT>& g, bool
 
 ## 约束说明
 
-- 当`g`为`thread_block_tile<Size, ParentT>`类型时，`Size`必须为2的幂且小于等于32（即1、2、4、8、16、32），否则编译报错。
 - 组内所有线程必须共同调用该接口，否则行为未定义。
 
 ## 调用示例
