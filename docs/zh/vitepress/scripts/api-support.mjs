@@ -71,6 +71,22 @@ export function normalizeApiRoute(value) {
   return route || '/'
 }
 
+export function getSiteRelativeRoute(value, base = '/') {
+  const route = normalizeApiRoute(value)
+  const normalizedBase = normalizeApiRoute(base)
+  if (!route || !normalizedBase || normalizedBase === '/') return route
+  if (route === normalizedBase) return '/'
+
+  const basePrefix = `${normalizedBase}/`
+  return route.startsWith(basePrefix)
+    ? route.slice(normalizedBase.length)
+    : route
+}
+
+export function isApiPageRoute(value, base = '/') {
+  return getSiteRelativeRoute(value, base).startsWith('/api/')
+}
+
 export function isApiRouteUnsupported(index, route, selectedFilter) {
   if (!selectedFilter || selectedFilter === 'all') return false
   const unsupported = index?.[normalizeApiRoute(route)]

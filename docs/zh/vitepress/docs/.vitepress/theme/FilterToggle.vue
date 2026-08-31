@@ -12,12 +12,14 @@
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useData, useRoute } from 'vitepress'
 import {
+  getSiteRelativeRoute,
+  isApiPageRoute,
   isApiRouteUnsupported,
 } from '../../../scripts/api-support.mjs'
 import { selectedFilter } from './filter-state.js'
 
 const route = useRoute()
-const { theme } = useData()
+const { site, theme } = useData()
 const isApiPage = ref(false)
 
 const filterOptions = [
@@ -48,7 +50,7 @@ function applyPageSupportFilter(content) {
 
   const unsupported = isApiRouteUnsupported(
     theme.value.apiUnsupportedIndex,
-    route.path,
+    getSiteRelativeRoute(route.path, site.value.base),
     selectedFilter.value
   )
   if (!unsupported) return
@@ -113,13 +115,13 @@ let filterTimer = null
 
 onMounted(async () => {
   loadSavedFilter()
-  isApiPage.value = route.path.startsWith('/api/')
+  isApiPage.value = isApiPageRoute(route.path, site.value.base)
   await nextTick()
   filterTimer = setTimeout(applyFilter, 100)
 })
 
 watch(() => route.path, async (path) => {
-  isApiPage.value = path.startsWith('/api/')
+  isApiPage.value = isApiPageRoute(path, site.value.base)
   if (isApiPage.value) {
     await nextTick()
     clearTimeout(filterTimer)
