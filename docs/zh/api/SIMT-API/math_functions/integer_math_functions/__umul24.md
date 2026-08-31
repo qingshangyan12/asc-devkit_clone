@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 获取uint32类型数据x和y的低24位乘积的低32位运算结果。x和y的高8位数据被忽略。
 
 ## 函数原型
@@ -49,14 +51,6 @@ unsigned int __umul24(unsigned int x, unsigned int y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
 
 ## 调用示例
 

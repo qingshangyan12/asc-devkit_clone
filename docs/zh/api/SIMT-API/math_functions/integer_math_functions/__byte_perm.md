@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 由输入的两个4字节的uint32\_t类型数据组成一个8个字节的64比特位的整数，通过选择器s指定选取其中的4个字节，将这4个字节从低位到高位拼成一个uint32\_t类型的整数。具体实现逻辑如下：
 
 ```cpp
@@ -71,14 +73,6 @@ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
 
 ## 调用示例
 
