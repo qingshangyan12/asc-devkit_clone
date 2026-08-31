@@ -161,9 +161,8 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             // [5..8]=goSize, [9]=inputOffset, [10]=repeat, [11..12]=strides,
             // [13]=lastSliceSize, [14]=inplace.  The memory token is immutable
             // for the KFC server lifetime and comes from ctx.token.
-            HCCL_INFO(
-                "[KFC][AllGather][Dispatch] route queue payload to CcuKfcAllGatherMesh1DMem2MemKernel, "
-                "token=serverContext");
+            HCCL_INFO("[KFC][AllGather][Dispatch] route queue payload to CcuKfcAllGatherMesh1DMem2MemKernel, "
+                      "token=serverContext");
 
             CcuKfcAllGatherMesh1DMem2MemKernel(
                 param[KFC_CONCURRENT_AG_MESH_INPUT], param[KFC_CONCURRENT_AG_MESH_OUTPUT], ctx.token,

@@ -34,14 +34,7 @@ static const std::set<std::string> REGISTERED_CCU_ALGORITHMS = {
     "CcuAllGatherMesh1DMem2Mem",     "CcuSchedAllGatherConcurMeshNHRMultiLink",
     "CcuSchedReduceScatterSoleMesh", "CcuSchedAllToAllSoleMesh",
     "CcuSchedAllToAllVSoleMesh",     "CcuSchedAllReduceSoleMesh",
-    "CcuAllGatherMesh1DMem2Mem",
-    "CcuSchedAllGatherConcurMeshNHRMultiLink",
-    "CcuKfcAllGatherMesh1DMem2Mem",
-    "CcuSchedReduceScatterSoleMesh",
-    "CcuKfcReduceScatterMesh1DMem2Mem",
-    "CcuAlltoAllMesh1D",
-    "CcuAlltoAllVMesh1D",
-    "CcuSchedAllReduceSoleMesh"};
+    "CcuSchedAllGatherMesh1DMem2Mem"};
 
 bool IsCcuAlgorithmRegistered(const std::string& algConfig, uint8_t commEngine)
 {

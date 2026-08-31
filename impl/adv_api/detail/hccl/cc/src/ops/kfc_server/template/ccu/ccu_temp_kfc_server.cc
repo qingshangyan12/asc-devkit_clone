@@ -136,9 +136,8 @@ HcclResult CcuTempKfcServer::CalcRes(
             sourceName == "CcuKernelAlltoAllVMesh1D" && param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV;
         const bool isAllReduce =
             sourceName == "CcuKernelAllReduceMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE;
-        const bool roleMatches =
-            missionNum == 1U || (missionIndex == 0U && (isAllGather || isAllGatherKfc)) ||
-            (missionIndex == 1U && isAllGatherNhr);
+        const bool roleMatches = missionNum == 1U || (missionIndex == 0U && (isAllGather || isAllGatherKfc)) ||
+                                 (missionIndex == 1U && isAllGatherNhr);
         if ((!isAllGather && !isAllGatherKfc && !isAllGatherNhr && !isReduceScatter && !isAlltoAll && !isAllToAllV &&
              !isAllReduce) ||
             !roleMatches) {
