@@ -10,12 +10,14 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vitepress'
+import { useData, useRoute } from 'vitepress'
+import { isApiPageRoute } from '../../../scripts/api-support.mjs'
 
 const route = useRoute()
+const { site } = useData()
 const loading = ref(false)
 const progress = ref('')
-const isApiPage = computed(() => route.path.startsWith('/api/'))
+const isApiPage = computed(() => isApiPageRoute(route.path, site.value.base))
 
 function getFilterVersion() {
   try {
