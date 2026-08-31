@@ -24,6 +24,15 @@ using namespace HcclKfcProtocol;
 static_assert(KFC_CONCURRENT_AG_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent AllGather parameters exceed XN capacity");
 static_assert(CCU_USED_XN_NUM <= CCU_MSG_XN_NUM, "KFC loaded parameters exceed the message slot");
 
+__aicore__ inline void CalcPeerOnlyChunkParams(
+    uint64_t sliceSize, uint64_t* tailSize, uint64_t* chunkLoopNum)
+{
+    const uint64_t fullChunkCount = sliceSize == 0 ? 0 : (sliceSize - 1) / CCU_MAX_COMM_DATA;
+    *tailSize = sliceSize - fullChunkCount * CCU_MAX_COMM_DATA;
+    const uint64_t chunkCount = sliceSize == 0 ? 0 : fullChunkCount + 1;
+    *chunkLoopNum = UINT64_MAX - chunkCount;
+}
+
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllToAllV(
     __gm__ CommonPrepareParamCcu* commParam, __gm__ AlltoAllVParamCcu* allToAllVParam)
@@ -366,11 +375,12 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::
                  ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
     xnData_[5] = 0;
     xnData_[6] = 0;
-    xnData_[7] = sliceSize;
-    xnData_[8] = UINT64_MAX - 1;
+    CalcPeerOnlyChunkParams(sliceSize, &xnData_[7], &xnData_[8]);
     KERNEL_LOG(
-        KERNEL_INFO, "PeerOnly RS prepare: input=0x%llx, output=0x%llx, rankOffset=0x%llx, slice=0x%llx\n",
-        xnData_[1], xnData_[2], xnData_[4], xnData_[7]);
+        KERNEL_INFO,
+        "PeerOnly RS prepare: input=0x%llx, output=0x%llx, rankOffset=0x%llx, slice=0x%llx, "
+        "chunk=0x%llx, tail=0x%llx, loop=0x%llx\n",
+        xnData_[1], xnData_[2], xnData_[4], sliceSize, CCU_MAX_COMM_DATA, xnData_[7], xnData_[8]);
 }
 } // namespace AscendC
 
