@@ -1,4 +1,4 @@
-# Select
+# select
 
 ## 产品支持情况
 
@@ -26,9 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/arch/vector/experimental/reg_compute.h"`。
-
-本接口属于实验特性，需要在构建时设置 `CANN_ASC_USE_EXPERIMENTAL=ON`。接口位于 `asc::te::experimental` 命名空间。
+头文件路径：`"include/tensor_api/experimental/arch/vector/compare_and_select.h"`。
 
 给定两个源操作数src0和src1，根据condition的比特位值选取元素，得到目的操作数dstReg。当condition的比特位是1时，从src0中选取对应位置的数，比特位是0时从src1选取对应位置的数。
 
@@ -68,6 +66,7 @@ __simd_vf__ inline void select_vf(T x_tensor, U y_tensor, V z_tensor,
 {
     uint32_t count = TOTAL_LENGTH;
     using data_type = typename T::data_type;
+    auto condition = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::vl8, data_type>();
     for (uint16_t i = 0; i < repeat_times; ++i) {
         auto mask = asc::te::experimental::update_mask<data_type>(count);
         uint32_t offset = i * one_repeat_size;

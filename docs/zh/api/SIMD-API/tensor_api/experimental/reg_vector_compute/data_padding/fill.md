@@ -83,14 +83,17 @@
 - 示例一
 
     ```cpp
-    template<typename T>
-    __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint16_t oneRepeatSize, uint16_t repeatTimes)
+    template <typename T, typename U>
+    __simd_vf__ inline void fill_vf(T y_tensor, U scalar, uint32_t repeat_times, uint32_t one_repeat_size)
     {
-        AscendC::Reg::RegTensor<T> dstReg;
-        AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();    
-        for (uint16_t i = 0; i < repeatTimes; i++) {
-            AscendC::Reg::Duplicate(dstReg, scalarValue);
-            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+        uint32_t count = total_length;
+        using data_type = typename T::data_type;
+        for (uint16_t i = 0; i < repeat_times; ++i) {
+            auto mask = asc::te::experimental::update_mask<data_type>(count);
+            uint32_t offset = i * one_repeat_size;
+            const auto coord = asc::te::make_coord(offset);
+            auto y_reg = asc::te::experimental::fill(scalar, mask);
+            asc::te::experimental::store(y_tensor, coord, y_reg);
         }
     }
     ```
@@ -98,33 +101,18 @@
 - 示例二
 
     ```cpp
-    template<typename T>
-    __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
+    template <typename T, typename U>
+    __simd_vf__ inline void fill_vf(T x_tensor, U y_tensor, uint32_t repeat_times, uint32_t one_repeat_size)
     {
-        AscendC::Reg::RegTensor<T> dstReg;
-        AscendC::Reg::MaskReg mask;    
-        for (uint16_t i = 0; i < repeatTimes; i++) {
-            mask = AscendC::Reg::UpdateMask<T>(count);
-            AscendC::Reg::Duplicate(dstReg, scalarValue, mask);
-            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-        }
-    }
-    ```
-
-- 示例三
-
-    ```cpp
-    template<typename T>
-    __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
-    {
-        AscendC::Reg::RegTensor<T> srcReg;
-        AscendC::Reg::RegTensor<T> dstReg;
-        AscendC::Reg::MaskReg mask;
-        for (uint16_t i = 0; i < repeatTimes; i++) {
-            mask = AscendC::Reg::UpdateMask<T>(count);
-            AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-            AscendC::Reg::Duplicate(dstReg, srcReg, mask);
-            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+        uint32_t count = total_length;
+        using data_type = typename T::data_type;
+        for (uint16_t i = 0; i < repeat_times; ++i) {
+            auto mask = asc::te::experimental::update_mask<data_type>(count);
+            uint32_t offset = i * one_repeat_size;
+            const auto coord = asc::te::make_coord(offset);
+            auto x_reg = asc::te::experimental::load(x_tensor, coord);
+            auto y_reg = asc::te::experimental::fill(x_reg, mask);
+            asc::te::experimental::store(y_tensor, coord, y_reg);
         }
     }
     ```

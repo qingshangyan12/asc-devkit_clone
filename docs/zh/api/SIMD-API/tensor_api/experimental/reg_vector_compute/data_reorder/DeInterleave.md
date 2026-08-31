@@ -55,34 +55,35 @@ __simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T
 
 ## 数据类型
 
-支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 
 ## 返回值说明
 
-无
+返回 `reg_pair<T>`，由两个reg_tensor<T>组成，存放交织后的两个结果值。返回值的 `mask` 是和数据类型T相关的满mask。
 
-## 约束说明<a name="section1240634052310"></a>
+## 约束说明
 
 - src0、src1的数据类型需要保持一致。
 - src0和src1可以为同一个RegTensor。
 
-## 调用示例<a name="section642mcpsimp"></a>
+## 调用示例
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void DeInterLeaveVF(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint16_t oneRepeatSize, uint16_t repeatTimes)
+template <typename Src0TensorType, typename Src1TensorType, typename Dst0TensorType, typename Dst1TensorType>
+__simd_vf__ inline void data_reorder_vf(
+    Src0TensorType src0_tensor, Src1TensorType src1_tensor, Dst0TensorType dst0_tensor, Dst1TensorType dst1_tensor,
+    uint32_t repeat_times, uint32_t one_repeat_size)
 {
-    AscendC::Reg::RegTensor<T> srcReg0;
-    AscendC::Reg::RegTensor<T> srcReg1;
-    AscendC::Reg::RegTensor<T> dstReg0;
-    AscendC::Reg::RegTensor<T> dstReg1;
-    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
-        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
-        AscendC::Reg::DeInterleave(dstReg0, dstReg1, srcReg0, srcReg1);
-        AscendC::Reg::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
-        AscendC::Reg::StoreAlign(dst1Addr + i * oneRepeatSize, dstReg1, mask);
+    uint32_t count = total_length;
+    using data_type = typename Src0TensorType::data_type;
+    for (uint16_t i = 0; i < repeat_times; ++i) {
+        uint32_t offset = i * one_repeat_size;
+        const auto coord = asc::te::make_coord(offset);
+        auto src0_reg = asc::te::experimental::load(src0_tensor, coord);
+        auto src1_reg = asc::te::experimental::load(src1_tensor, coord);
+        auto result = asc::te::experimental::deinterleave(src0_reg, src1_reg);
+        asc::te::experimental::store(dst0_tensor, coord, result.first);
+        asc::te::experimental::store(dst1_tensor, coord, result.second);
     }
 }
 ```
