@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`（除`half`、`half2`、`bfloat16_t`、`bfloat16x2_t`类型之外的接口）、`"simt_api/asc_fp16.h"`（`half`和`half2`类型接口）、`"simt_api/asc_bf16.h"`（`bfloat16_t`和`bfloat16x2_t`类型接口）。
+
 将指定数据存储到Global Memory的地址`address`中，并缓存至Data Cache和L2 Cache。
 
 ## 函数原型
@@ -197,22 +199,6 @@ inline void asc_stwt(half2* address, half2 val)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口需要包含`simt_api/device_functions.h`头文件，使用half和half2类型接口需要包含`simt_api/asc_fp16.h`头文件，使用bfloat16\_t和bfloat16x2\_t类型接口需要包含`simt_api/asc_bf16.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 
