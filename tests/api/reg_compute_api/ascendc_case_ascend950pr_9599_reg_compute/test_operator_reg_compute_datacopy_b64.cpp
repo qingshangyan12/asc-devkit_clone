@@ -390,8 +390,7 @@ TEST(TestMicroDatacopyB64, LoadRegTraitNumTwoFromUnalignedAddress)
     uint64_t srcGm[alignedSize] = {0};
     uint64_t dstGm[alignedSize] = {0};
 
-    MicroDatacopyB64<uint64_t, 901, 0, 2>(
-        reinterpret_cast<uint8_t*>(dstGm), reinterpret_cast<uint8_t*>(srcGm), size);
+    MicroDatacopyB64<uint64_t, 901, 0, 2>(reinterpret_cast<uint8_t*>(dstGm), reinterpret_cast<uint8_t*>(srcGm), size);
 
     for (uint32_t i = 0; i < alignedSize; ++i) {
         EXPECT_EQ(dstGm[i], 0);
@@ -420,8 +419,7 @@ TEST(TestMicroDatacopyB64, StoreRegTraitNumTwoToUnalignedAddress)
     uint64_t srcGm[alignedSize] = {0};
     uint64_t dstGm[alignedSize] = {0};
 
-    MicroDatacopyB64<uint64_t, 902, 0, 2>(
-        reinterpret_cast<uint8_t*>(dstGm), reinterpret_cast<uint8_t*>(srcGm), size);
+    MicroDatacopyB64<uint64_t, 902, 0, 2>(reinterpret_cast<uint8_t*>(dstGm), reinterpret_cast<uint8_t*>(srcGm), size);
 
     for (uint32_t i = 0; i < alignedSize; ++i) {
         EXPECT_EQ(dstGm[i], 0);
@@ -435,8 +433,7 @@ TEST(TestMicroDatacopyB64, StoreRegTraitNumTwoWithCountToUnalignedAddress)
     uint64_t srcGm[alignedSize] = {0};
     uint64_t dstGm[alignedSize] = {0};
 
-    MicroDatacopyB64<uint64_t, 903, 0, 2>(
-        reinterpret_cast<uint8_t*>(dstGm), reinterpret_cast<uint8_t*>(srcGm), size);
+    MicroDatacopyB64<uint64_t, 903, 0, 2>(reinterpret_cast<uint8_t*>(dstGm), reinterpret_cast<uint8_t*>(srcGm), size);
 
     for (uint32_t i = 0; i < alignedSize; ++i) {
         EXPECT_EQ(dstGm[i], 0);
