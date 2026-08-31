@@ -978,6 +978,127 @@ __simd_callee__ inline void DivPrecisionImpl(U& dstReg, U& srcReg0, U& srcReg1, 
     vsel(dstReg, tmpDst, z, infNanCmp);
 }
 
+template <auto mode = MaskMergeMode::ZEROING>
+__simd_callee__ inline void CorrectUnderflowBoundaryDivResultImpl(
+    RegTensor<float>& dst, RegTensor<float>& src0Abs, RegTensor<float>& src1Abs, MaskReg& mask)
+{
+    constexpr DivSpecificMode sprMode = Internal::GetDivSpecificMode(mode);
+    constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
+    constexpr uint32_t minNormal = 0x00800000u;
+    constexpr uint32_t minSubnormal = 0x00000001u;
+    constexpr uint32_t exponentMask = 0x7F800000u;
+    constexpr uint32_t signMask = 0x80000000u;
+    constexpr int32_t precisionThreshold = -64;
+    constexpr int32_t exponentBias = 127;
+
+    RegTensor<float> dstAbs;
+    RegTensor<uint32_t> tmpU32;
+    MaskReg subnormalMask;
+    MaskReg tinyResultMask;
+    MaskReg nonTinyResultMask;
+    MaskReg correctionMask;
+
+    // src0Abs/src1Abs are snapshots made before Div writes dst, so this path
+    // remains valid when dst aliases either input register.
+    Abs(dstAbs, dst, mask);
+
+    // The zero/min-subnormal boundary is 2^-150. Scale it to a normal-range
+    // comparison to avoid depending on a subnormal FMA residual.
+    Duplicate(tmpU32, minSubnormal, mask);
+    Compare<uint32_t, CMPMODE::LE>(tinyResultMask, (RegTensor<uint32_t>&)dstAbs, tmpU32, mask);
+    RegTensor<float> scaledDividend;
+    RegTensor<float> scaledDivisor;
+    RegTensor<float> zeroCandidate;
+    RegTensor<float> minSubnormalCandidate;
+    RegTensor<float> tinyCandidate;
+    MaskReg chooseZeroMask;
+    NotNumUnion scaleDividend;
+    NotNumUnion scaleDivisor;
+    scaleDividend.i = 0x7E800000u; // 2^126
+    scaleDivisor.i = 0x33800000u;  // 2^-24
+    Muls(scaledDividend, src0Abs, scaleDividend.f, tinyResultMask);
+    Muls(scaledDivisor, src1Abs, scaleDivisor.f, tinyResultMask);
+    Compare<float, CMPMODE::LE>(chooseZeroMask, scaledDividend, scaledDivisor, tinyResultMask);
+    Duplicate(tmpU32, signMask, tinyResultMask);
+    And((RegTensor<uint32_t>&)zeroCandidate, (RegTensor<uint32_t>&)dst, tmpU32, tinyResultMask);
+    Duplicate(tmpU32, minSubnormal, tinyResultMask);
+    Add((RegTensor<uint32_t>&)minSubnormalCandidate, (RegTensor<uint32_t>&)zeroCandidate, tmpU32, tinyResultMask);
+    Select(tinyCandidate, zeroCandidate, minSubnormalCandidate, chooseZeroMask);
+    Select(dst, tinyCandidate, dst, tinyResultMask);
+
+    Duplicate(tmpU32, minNormal, mask);
+    Compare<uint32_t, CMPMODE::LE>(subnormalMask, (RegTensor<uint32_t>&)dstAbs, tmpU32, mask);
+    MaskNot(nonTinyResultMask, tinyResultMask, mask);
+    MaskAnd(correctionMask, subnormalMask, nonTinyResultMask, mask);
+
+    // Scale both operands equally before evaluating a - q*b. The quotient is
+    // unchanged while the dividend and residual stay in the normal range.
+    RegTensor<uint32_t> src0ExpBits;
+    RegTensor<uint32_t> scaleBits;
+    RegTensor<int32_t> src0Exp;
+    RegTensor<int32_t> thresholdVec;
+    RegTensor<int32_t> zeroVec;
+    RegTensor<int32_t> k;
+    RegTensor<int32_t> newExp;
+    RegTensor<float> scale;
+    RegTensor<float> scaleOne;
+    RegTensor<float> aScaled;
+    RegTensor<float> bScaled;
+    MaskReg needScaleMask;
+
+    Duplicate(tmpU32, exponentMask, correctionMask);
+    And(src0ExpBits, (RegTensor<uint32_t>&)src0Abs, tmpU32, correctionMask);
+    ShiftRights(src0ExpBits, src0ExpBits, (int16_t)23, correctionMask);
+    Duplicate(tmpU32, static_cast<uint32_t>(exponentBias), correctionMask);
+    Sub(src0Exp, (RegTensor<int32_t>&)src0ExpBits, (RegTensor<int32_t>&)tmpU32, correctionMask);
+    Duplicate(thresholdVec, precisionThreshold, correctionMask);
+    Compare<int32_t, CMPMODE::LT>(needScaleMask, src0Exp, thresholdVec, correctionMask);
+    Duplicate(zeroVec, 0, correctionMask);
+    Sub(k, thresholdVec, src0Exp, correctionMask);
+    Max(k, k, zeroVec, correctionMask);
+    Adds(newExp, k, exponentBias, needScaleMask);
+    ShiftLefts(scaleBits, (RegTensor<uint32_t>&)newExp, (int16_t)23, needScaleMask);
+    Duplicate(scaleOne, 1.0f, correctionMask);
+    Select(scale, (RegTensor<float>&)scaleBits, scaleOne, needScaleMask);
+    Mul(aScaled, src0Abs, scale, correctionMask);
+    Mul(bScaled, src1Abs, scale, correctionMask);
+
+    // Choose among the restored value and its adjacent magnitudes using the
+    // original quotient residual. Work on magnitudes and restore the sign at
+    // the end, so IEEE bit ordering cannot invert negative neighbours.
+    RegTensor<float> z;
+    RegTensor<float> zPre;
+    RegTensor<float> zNext;
+    RegTensor<float> zNeighbor;
+    RegTensor<float> y;
+    RegTensor<float> r;
+    RegTensor<float> rNeighbor;
+    RegTensor<float> zero;
+    RegTensor<uint32_t> dstSign;
+    MaskReg cmpMask;
+    MaskReg chooseNextMask;
+
+    z = dstAbs;
+    vadds((vector_s32&)zPre, (vector_s32&)z, -1, correctionMask, modeValue);
+    vadds((vector_s32&)zNext, (vector_s32&)z, 1, correctionMask, modeValue);
+    Muls(y, bScaled, -1.0f, correctionMask);
+    r = aScaled;
+    vmula(r, z, y, correctionMask, modeValue);
+    Duplicate(zero, 0.0f, correctionMask);
+    Compare<float, CMPMODE::GT>(chooseNextMask, r, zero, correctionMask);
+    Select(zNeighbor, zPre, zNext, chooseNextMask);
+    rNeighbor = aScaled;
+    vmula(rNeighbor, zNeighbor, y, correctionMask, modeValue);
+    Abs(r, r, correctionMask);
+    Abs(rNeighbor, rNeighbor, correctionMask);
+    Compare<float, CMPMODE::LT>(cmpMask, rNeighbor, r, correctionMask);
+    Select(z, zNeighbor, z, cmpMask);
+    Duplicate(tmpU32, signMask, correctionMask);
+    And(dstSign, (RegTensor<uint32_t>&)dst, tmpU32, correctionMask);
+    Or((RegTensor<uint32_t>&)z, (RegTensor<uint32_t>&)z, dstSign, correctionMask);
+    Select(dst, z, dst, correctionMask);
+}
+
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U, bool is0ULP>
 __simd_callee__ inline void DivIEEE754FloatImpl(
     RegTensor<float>& dst, RegTensor<float>& src0, RegTensor<float>& src1, MaskReg& mask)
@@ -1064,14 +1185,16 @@ __simd_callee__ inline void DivIEEE754FloatImpl(
 
     // normalize subnormal elements of src0
     // get positions of subnormal numbers in dividend
-    Compare<float, CMPMODE::LT>(maskSrc0Subnormal, src0Abs, maxSubnormal, mask);
+    Compare<uint32_t, CMPMODE::LE>(
+        maskSrc0Subnormal, (RegTensor<uint32_t>&)src0Abs, (RegTensor<uint32_t>&)maxSubnormal, mask);
     // negating for normal positions
     MaskNot(maskSrc0Normal, maskSrc0Subnormal, mask);
     // normalizatoin
     Muls(src0Subnormal, src0, normalizeScaleEnlarge.f, maskSrc0Subnormal);
 
     // normalize subnormal elements of src1
-    Compare<float, CMPMODE::LT>(maskSrc1Subnormal, src1Abs, maxSubnormal, mask);
+    Compare<uint32_t, CMPMODE::LE>(
+        maskSrc1Subnormal, (RegTensor<uint32_t>&)src1Abs, (RegTensor<uint32_t>&)maxSubnormal, mask);
     MaskNot(maskSrc1Normal, maskSrc1Subnormal, mask);
     Muls(src1Subnormal, src1, normalizeScaleEnlarge.f, maskSrc1Subnormal);
 
@@ -1188,6 +1311,10 @@ __simd_callee__ inline void DivIEEE754FloatImpl(
     ShiftRight(scale, (RegTensor<int32_t>&)tmp0, scale, mask0);
     Mul(z1, dst, (RegTensor<float>&)scale, mask0);
     Select(dst, z1, dst, mask0);
+
+    if constexpr (is0ULP) {
+        CorrectUnderflowBoundaryDivResultImpl<mode>(dst, src0Abs, src1Abs, mask);
+    }
 
     // get the position of nan
     Duplicate(tmp0, nan.i, mask);
