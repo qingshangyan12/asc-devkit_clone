@@ -198,6 +198,31 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b)
     return dst;
 }
 
+template <typename T>
+__simd_callee__ inline reg_tensor<T> subc(
+    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+{
+    static_assert(detail::supports_carry_v<T>, "subc does not support this element type");
+    reg_tensor<T> dst;
+    asc_sub(carry.reg, dst.reg, src0.reg, src1.reg, src0.mask);
+    carry.mask = src0.mask;
+    dst.mask = src0.mask;
+    return dst;
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> subc(
+    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
+    const reg_tensor<bool>& carry_src)
+{
+    static_assert(detail::supports_carry_v<T>, "subc does not support this element type");
+    reg_tensor<T> dst;
+    asc_subc(carry.reg, dst.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
+    carry.mask = src0.mask;
+    dst.mask = src0.mask;
+    return dst;
+}
+
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator*(const T& a, const U& b)
 {

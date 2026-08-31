@@ -114,6 +114,11 @@ void check_carry()
     static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::addc(AscendC::Std::declval<reg_type<bool>&>(),
         AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
         AscendC::Std::declval<const reg_type<bool>&>())), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::subc(AscendC::Std::declval<reg_type<bool>&>(),
+        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::subc(AscendC::Std::declval<reg_type<bool>&>(),
+        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
+        AscendC::Std::declval<const reg_type<bool>&>())), reg_type<T>>);
 }
 
 template <typename T>
