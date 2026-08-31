@@ -55,7 +55,7 @@ __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_te
         "and float.");
     static_assert(N == 1, "fill only supports N==1.");
     reg_tensor<T> dst;
-    asc_duplicate(dst.reg, val.reg, mask.reg);
+    asc_duplicate(dst.reg, src.reg, mask.reg);
     dst.mask = mask.reg;
     return dst;
 }
