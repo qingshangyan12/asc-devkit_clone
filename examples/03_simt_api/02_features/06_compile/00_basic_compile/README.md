@@ -42,12 +42,12 @@ gather算子实现了从长度为100000的一维输入向量中获取指定索�
 
 ```shell
 # 分步编译
-bisheng -c kernel.asc -o kernel.o --npu-arch=dav-3510 --enable-simt
-bisheng -c host.cpp -o host.o -I${ASCEND_HOME_PATH}/include
-bisheng kernel.o host.o -o demo
+bisheng -c gather_kernel.asc -o gather_kernel.o --npu-arch=dav-3510 --enable-simt
+bisheng -c main.cpp -o main.o -I${ASCEND_HOME_PATH}/include
+bisheng gather_kernel.o main.o -o demo
 
 # 或一条编译命令
-bisheng host.cpp kernel.asc -o demo --npu-arch=dav-3510 --enable-simt -I${ASCEND_HOME_PATH}/include
+bisheng main.cpp gather_kernel.asc -o demo --npu-arch=dav-3510 --enable-simt -I${ASCEND_HOME_PATH}/include
 ```
 
 其中，`--npu-arch`为编译时指定的AI处理器架构，本样例仅支持`dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)进行查询。`--enable-simt`用于指定SIMT方式编译。
@@ -71,8 +71,8 @@ project(kernel LANGUAGES ASC CXX)
 
 # 4、使用CMake接口编译可执行文件
 add_executable(demo
-    kernel.asc
-    host.cpp)
+    gather_kernel.asc
+    main.cpp)
 
 # 5、设置链接器语言为ASC
 set_target_properties(demo PROPERTIES LINKER_LANGUAGE ASC)
