@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 将三个bfloat16x2\_t输入视为复数，第一个分量为实部，第二个分量为虚部，执行复数乘加运算x\*y+z。
 
 ## 函数原型
@@ -53,14 +55,6 @@ bfloat16x2_t __hcmadd(const bfloat16x2_t x, const bfloat16x2_t y, const bfloat16
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

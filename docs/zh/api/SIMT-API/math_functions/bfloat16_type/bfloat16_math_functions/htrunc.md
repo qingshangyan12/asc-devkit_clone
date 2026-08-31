@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 获取对输入数据的浮点数截断后的整数。
 
 ## 函数原型
@@ -54,14 +56,6 @@ inline bfloat16_t htrunc(bfloat16_t x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

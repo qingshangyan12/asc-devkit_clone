@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 将unsigned short int的数据按位重新解释为bfloat16，即将unsigned short int的数据存储的位按照bfloat16的格式进行读取。
 
 ## 函数原型
@@ -60,14 +62,6 @@ unsigned short int的数据按位重新解释为bfloat16的值。特殊值如下
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 比较两个bfloat16类型数据是否不相等，不相等时返回true。若任一输入为nan，返回true。
 
 ## 函数原型
@@ -52,14 +54,6 @@ bool __hneu(bfloat16_t x, bfloat16_t y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

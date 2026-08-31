@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 获取大于或等于输入数据各元素的最小整数值。
 
 ## 函数原型
@@ -55,14 +57,6 @@ inline bfloat16x2_t h2ceil(bfloat16x2_t x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

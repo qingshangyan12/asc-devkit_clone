@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 遵循CAST\_FLOOR模式，将uint32类型数据转换为bfloat16类型数据，返回转换后的值。
 
 ## 函数原型
@@ -55,14 +57,6 @@ inline bfloat16_t __uint2bfloat16_rd(const unsigned int x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

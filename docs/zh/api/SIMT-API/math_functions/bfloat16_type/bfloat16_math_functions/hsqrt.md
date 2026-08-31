@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 获取输入数据x的平方根。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002545900868.png)
@@ -62,14 +64,6 @@ inline bfloat16_t hsqrt(bfloat16_t x)
 <!-- npu="950" id7 -->
 针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
 <!-- end id7 -->
-
-## 需要包含的头文件
-
-使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

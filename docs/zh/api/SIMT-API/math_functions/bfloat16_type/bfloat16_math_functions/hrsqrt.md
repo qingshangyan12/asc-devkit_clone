@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 获取输入数据x的平方根的倒数。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002576421053.png)
@@ -62,14 +64,6 @@ inline bfloat16_t hrsqrt(bfloat16_t x)
 <!-- npu="950" id7 -->
 针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了sqrtf，由于sqrtf不支持Subnormal场景，当输入x为Subnormal数据时，会导致本接口最终结果为+inf。
 <!-- end id7 -->
-
-## 需要包含的头文件
-
-使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

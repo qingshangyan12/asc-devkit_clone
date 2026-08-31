@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 获取两个输入数据中的最小值。任一输入为nan时，结果为nan。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002574049837.png)
@@ -58,14 +60,6 @@ bfloat16_t __hmin_nan(const bfloat16_t x, const bfloat16_t y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

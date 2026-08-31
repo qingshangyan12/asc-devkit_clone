@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 获取与输入数据各元素最接近的整数，若存在两个同样接近的整数，则取其中的偶数。
 
 ## 函数原型
@@ -56,14 +58,6 @@ inline bfloat16x2_t h2rint(bfloat16x2_t x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

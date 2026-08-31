@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 将bfloat16\_t数据遵循CAST\_ROUND模式取整。
 
 ## 函数原型
@@ -60,14 +62,6 @@ inline bfloat16_t __bfloat162bfloat16_rna(const bfloat16_t x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

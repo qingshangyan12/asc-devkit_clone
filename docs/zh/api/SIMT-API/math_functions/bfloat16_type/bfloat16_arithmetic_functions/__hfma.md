@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 对输入数据x、y、z，计算x与y相乘加上z的结果，并遵循CAST\_RINT模式对结果进行舍入处理。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002545900872.png)
@@ -62,14 +64,6 @@ x \* y+ z的值。本接口不受全局饱和模式影响，特殊值如下：
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

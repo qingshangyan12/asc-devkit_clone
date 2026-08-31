@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 获取两个输入数据中的最小值。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002545900874.png)
@@ -62,14 +64,6 @@ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

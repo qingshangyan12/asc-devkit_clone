@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 计算两个bfloat16类型数据相除的结果，并遵循CAST\_RINT模式对结果进行舍入。
 
 ## 函数原型
@@ -67,14 +69,6 @@ bfloat16_t __hdiv(const bfloat16_t x, const bfloat16_t y)
 <!-- npu="950" id7 -->
 针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
 <!-- end id7 -->
-
-## 需要包含的头文件
-
-使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 
