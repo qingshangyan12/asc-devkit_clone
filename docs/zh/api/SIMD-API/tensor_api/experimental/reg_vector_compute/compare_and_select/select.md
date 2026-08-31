@@ -34,7 +34,7 @@
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> Select(reg_tensor<bool> condition, reg_tensor<T> src0, reg_tensor<T> src1)
+__simd_callee__ inline reg_tensor<T> select(reg_tensor<bool> condition, reg_tensor<T> src0, reg_tensor<T> src1)
 ```
 
 ## 参数说明
@@ -51,9 +51,9 @@ __simd_callee__ inline reg_tensor<T> Select(reg_tensor<bool> condition, reg_tens
 
 ## 数据类型支持
 
-支持的数据类型为：bool、int8\_t、uint8\_t、fp8\_e4m3fn\_t、hifloat8\_t、fp8\_e5m2\_t、int16\_t、uint16\_t、half、bfloat16\_t、int32\_t、uint32\_t、float。
+支持的数据类型为：bool、int8_t、uint8_t、fp8_e4m3fn_t、hifloat8_t、fp8_e5m2_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 
-## 约束说明<a name="section633mcpsimp"></a>
+## 约束说明
 
 通过src0的mask参数控制的未选中的元素是未定义行为。
 
@@ -70,7 +70,7 @@ __simd_vf__ inline void select_vf(T x_tensor, U y_tensor, V z_tensor,
     for (uint16_t i = 0; i < repeat_times; ++i) {
         auto mask = asc::te::experimental::update_mask<data_type>(count);
         uint32_t offset = i * one_repeat_size;
-        const auto coord = asc::te::make_coord(offset / COL, offset % COL);
+        const auto coord = asc::te::make_coord(offset);
         auto x_reg = x_tensor.load(coord).with_mask(mask);
         auto y_reg = y_tensor.load(coord).with_mask(mask);
         auto z_reg = asc::te::experimental::select((x_reg > y_reg), x_reg, y_reg);
