@@ -621,16 +621,16 @@ Reg矢量计算相关接口的完整接口清单请参考[Reg矢量计算](../..
 
 #### 缓存管理
 
-- **新增Cache类型**：3510架构新增支持NDDMA Cache（2201架构仅支持L2 Cache、DCache和ICache），NDDMA Cache用于ND-DMA指令（[NDDMA多维搬运](#section_nddma)）的数据缓存，多核间数据一致性说明请参考[Cache一致性](../../programming_guide/advanced_programming/memory_model/cache_coherence.md)。完整Cache类型与功能说明请参考[系统缓存概述](../../../api/SIMD-API/basic_api/cache_control/system_cache_overview.md)。
+- **新增Cache类型**：2201架构仅支持L2 Cache、DCache和ICache，3510架构新增支持NDDMA Cache，NDDMA Cache用于ND-DMA指令（[NDDMA多维搬运](#section_nddma)）的数据缓存，多核间数据一致性说明请参考[Cache一致性](../../programming_guide/advanced_programming/memory_model/cache_coherence.md)。完整Cache类型与功能说明请参考[系统缓存概述](../../../api/SIMD-API/basic_api/cache_control/system_cache_overview.md)。
 - **Cache控制接口增强**：3510架构下的[DataCacheCleanAndInvalid](../../../api/SIMD-API/basic_api/cache_control/DataCacheCleanAndInvalid.md)接口新增支持`CACHELINE_ATOMIC`参数，用于在原子操作过程中保证DCache与GM的一致性。
 
 #### 编译选项与空间优化
 
 - **UB空间使用与编译选项**：UB总容量为256KB，其中部分空间可能用于系统预留或划分为Data Cache。3510架构下Ascend C接口内部使用**2KB**预留UB空间，用于指令兼容或存储中间数据；2201架构下的预留UB空间为8KB。以下编译选项生效，可调整可用的UB空间大小：
-  - `--cce-disable-asc-reserved-ubuf`：禁用Ascend C接口使用预留UB空间，开启后依赖预留UB空间的接口不可用（3510架构下使用预留UB空间的API范围请参考[使用预留UB空间的API列表](../../programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md#section_reserved_ubuf_api)）。
+  - `--cce-disable-asc-reserved-ubuf`：禁用Ascend C接口使用预留UB空间，开启后依赖预留UB空间的接口不可用，3510架构下使用预留UB空间的API范围请参考[使用预留UB空间的API列表](../../programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md#section_reserved_ubuf_api)。
   - `--cce-disable-vf-stack-reserved-ubuf`：禁用SIMD VF栈预留的UB空间。该选项仅在3510架构下生效。开启后可释放6KB预留空间作为普通UB使用，但编译器无法再使用该空间缓存寄存器溢出数据，需保证寄存器不溢出。
 - **性能优化编译宏**：`NO_OVERLAP_IN_MULTI_REPEAT`可在没有地址重叠的情况下移除不必要的内存同步指令，提升基础API高维切分计算场景的性能，详情请参考[内置编译宏开关](../../programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#内置编译宏开关)。
-- **DCI编译选项（性能优化）**：`--cce-no-dcache-flush`编译选项可在算子尾部插入DCI（DataCacheInvalid）指令替代默认的DCCI（DataCacheCleanAndInvalid）指令使DCache失效，减少数据从DCache同步回GM（Clean）的过程，降低算子尾开销，详细说明请参考[新增DCI数据缓存失效能力](#section_dci)。
+- **DCI编译选项（性能优化）**：`--cce-no-dcache-flush`编译选项可在算子尾部插入DCI（DataCacheInvalid）指令替代默认的DCCI（DataCacheCleanAndInvalid）指令使DCache失效，减少数据从DCache同步回GM的过程，降低算子尾开销，详细说明请参考[新增DCI数据缓存失效能力](#section_dci)。
 
 #### 兼容性样例
 
