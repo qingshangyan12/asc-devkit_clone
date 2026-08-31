@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"tensor_api/experimental/arch/vector/reg_data_load.h"`，命名空间为 `asc::te::experimental`。
+头文件路径为：`"tensor_api/experimental/arch/vector/reg_data_load.h"`，命名空间为`asc::te::experimental`。
 
 `load`用于将Unified Buffer（UB）中的数据搬入[reg_tensor](../register_data_types/reg_tensor.md)。接口通过`load_sideband_mode`配置正常搬入、上采样、下采样、解压缩或解交织等数据排列方式。
 

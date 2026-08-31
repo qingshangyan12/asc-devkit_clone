@@ -26,9 +26,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"tensor_api/arch/vector/experimental/reg_tensor.h"`，命名空间为 `asc::te::experimental`。
+头文件路径为：`"tensor_api/arch/vector/experimental/reg_tensor.h"`，命名空间为`asc::te::experimental`。
 
-将输入的`reg_tensor<bool>`寄存器 `maskReg.reg` 绑定到当前`reg_tensor<DataType>`的 `mask` 成员，不修改数据成员 `reg`。可与 `local_tensor::load` 链式调用。
+将输入的`reg_tensor<bool>`寄存器`maskReg.reg`绑定到当前`reg_tensor<DataType>`的`mask`成员，不修改数据成员`reg`。可与`local_tensor::load`链式调用。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -41,15 +41,15 @@ __simd_callee__ inline reg_tensor& with_mask(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `maskReg` | 输入 | `reg_tensor<bool>`类型的寄存器，必须保证其 `reg` 成员已初始化。 |
+| `maskReg` | 输入 | `reg_tensor<bool>`类型的寄存器，必须保证其`reg`成员已初始化。 |
 
 ## 返回值说明<a name="section630mcpsimp"></a>
 
-返回当前 `reg_tensor` 的引用。
+返回当前`reg_tensor`的引用。
 
 ## 约束说明<a name="section640mcpsimp"></a>
 
-`with_mask` 只复制掩码寄存器，不校验掩码寄存器与数据元素宽度是否一致。
+`with_mask`只复制掩码寄存器，不校验掩码寄存器与数据元素宽度是否一致。
 
 ## 调用示例<a name="section650mcpsimp"></a>
 

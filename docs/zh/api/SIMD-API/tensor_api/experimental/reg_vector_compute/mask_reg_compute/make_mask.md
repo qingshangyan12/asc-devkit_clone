@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"tensor_api/experimental/arch/vector/mask_reg_compute.h"`，接口命名空间为 `asc::te::experimental`。
+头文件路径为：`"tensor_api/experimental/arch/vector/mask_reg_compute.h"`，接口命名空间为`asc::te::experimental`。
 
 根据模式和数据元素宽度创建掩码寄存器。
 
@@ -50,7 +50,7 @@ __simd_callee__ inline reg_tensor<bool> make_mask();
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-返回 `reg_tensor<bool>`，其 `reg` 成员保存生成的掩码。
+返回`reg_tensor<bool>`，其`reg`成员保存生成的掩码。
 
 ## 约束说明<a name="section650mcpsimp"></a>
 

@@ -26,9 +26,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"tensor_api/arch/vector/experimental/mask_reg_compute.h"`，命名空间为 `asc::te::experimental`。
+头文件路径为：`"tensor_api/arch/vector/experimental/mask_reg_compute.h"`，命名空间为`asc::te::experimental`。
 
-创建与 `DataType` 元素位宽匹配的全无效掩码，等价于 `make_mask<mask_pattern::none, DataType>()`。
+创建与`DataType`元素位宽匹配的全无效掩码，等价于`make_mask<mask_pattern::none, DataType>()`。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -45,11 +45,11 @@ __simd_callee__ inline reg_tensor<bool> none_mask();
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-返回 `reg_tensor<bool>`，其 `reg` 成员类型为vector_bool，掩码寄存器，其对应的元素全为无效数据。
+返回`reg_tensor<bool>`，其`reg`成员类型为vector_bool，掩码寄存器，其对应的元素全为无效数据。
 
 ## 约束说明<a name="section650mcpsimp"></a>
 
-返回对象只保证 `reg` 成员有效，不应读取其 `mask` 成员。
+返回对象只保证`reg`成员有效，不应读取其`mask`成员。
 
 ## 调用示例<a name="section660mcpsimp"></a>
 

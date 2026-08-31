@@ -26,9 +26,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"tensor_api/arch/vector/experimental/reg_tensor.h"`，命名空间为 `asc::te::experimental`。
+头文件路径为：`"tensor_api/arch/vector/experimental/reg_tensor.h"`，命名空间为`asc::te::experimental`。
 
-保存两个相同元素类型的 `reg_tensor`，用于 `interleave`、`deinterleave` 等双结果接口。
+保存两个相同元素类型的`reg_tensor`，用于`interleave`、`deinterleave`等双结果接口。
 
 ## 定义原型<a name="section620mcpsimp"></a>
 
@@ -44,7 +44,7 @@ struct reg_pair {
 
 | 参数名 | 描述 |
 | --- | --- |
-| `DataType` | `reg_tensor<DataType> first` 和 `reg_tensor<DataType> second` 的元素类型。 |
+| `DataType` | `reg_tensor<DataType> first`和`reg_tensor<DataType> second`的元素类型。 |
 
 ## 成员说明<a name="section630mcpsimp"></a>
 

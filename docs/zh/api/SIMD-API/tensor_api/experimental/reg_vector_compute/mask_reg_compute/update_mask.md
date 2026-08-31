@@ -26,7 +26,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"tensor_api/experimental/arch/vector/mask_reg_compute.h"`，命名空间为 `asc::te::experimental`。
+头文件路径为：`"tensor_api/experimental/arch/vector/mask_reg_compute.h"`，命名空间为`asc::te::experimental`。
 
 根据当前剩余待处理元素数的值生成对应长度的有效位掩码，并自动将前剩余待处理元素数减去当前向量长度以更新剩余待处理元素数量。
 
@@ -47,7 +47,7 @@ __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-返回 `reg_tensor<bool>`，其 `reg` 成员类型为vector_bool，掩码寄存器，其对应的元素为有效数据。
+返回`reg_tensor<bool>`，其`reg`成员类型为vector_bool，掩码寄存器，其对应的元素为有效数据。
 
 ## 约束说明<a name="section650mcpsimp"></a>
 
