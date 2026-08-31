@@ -39,11 +39,11 @@
 
 ```cpp
 template <typename DstTensor, typename SrcTensor>
-__aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src);
+__aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src)
 
 template <typename Atom, typename DstTensor, typename SrcTensor>
 __aicore__ inline void copy(const copy_atom<Atom>& atom,
-    const DstTensor& dst, const SrcTensor& src);
+    const DstTensor& dst, const SrcTensor& src)
 
 template <typename DstTensor, typename SrcTensor, typename DstCoord,
     typename SrcCoord, typename CopyShape>
@@ -52,11 +52,11 @@ __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src,
     const CopyShape& copy_shape);
 
 template <typename CopyOperation>
-__aicore__ inline constexpr auto make_copy(const CopyOperation& operation);
+__aicore__ inline constexpr auto make_copy(const CopyOperation& operation)
 
 template <typename CopyOperation, typename CopyTrait>
 __aicore__ inline constexpr auto make_copy(
-    const CopyOperation& operation, const CopyTrait& trait);
+    const CopyOperation& operation, const CopyTrait& trait)
 ```
 
 UB到L1 Buffer通路使用`copy_ub_to_l1{}`作为搬运操作对象，默认trait为`ub_to_l1_trait_default{}`。
@@ -95,7 +95,7 @@ UB到L1 Buffer通路使用`copy_ub_to_l1{}`作为搬运操作对象，默认trai
 
 | 源/目的Layout | 支持的数据类型 |
 | :--- | :--- |
-| ND、DN、NZ、ZN | `fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t` |
+| ND、DN、NZ、ZN | `fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t` |
 
 ## 返回值说明
 

@@ -28,7 +28,7 @@
 
 头文件路径：`"tensor_api/arch/vector/experimental/type_conversion.h"`。
 
-命名空间：`asc::te`。
+命名空间：`asc::te::experimental`。
 
 `cast`用于寄存器数据类型转换，将源操作数`reg_tensor<SrcType>`中的有效元素转换为`DstType`，支持浮点转整数、浮点转浮点、整数转浮点和整数转整数。转换过程中可能发生位宽或精度变化，可通过编译期`cast_options`配置以下行为：
 
@@ -44,7 +44,7 @@
 template <typename DstType,
           const cast_options& opt = default_cast_ops,
           typename SrcType>
-__simd_callee__ inline reg_tensor<DstType> cast(reg_tensor<SrcType> src);
+__simd_callee__ inline reg_tensor<DstType> cast(reg_tensor<SrcType> src)
 ```
 
 默认配置为：
@@ -116,13 +116,6 @@ constexpr cast_options default_cast_ops = {
 | 整数转浮点 | 该场景不提供`sat`配置。转换精度由目的浮点格式以及对应行支持的`round`配置决定。 | 不支持。 |
 | 整数转整数 | 窄化转换超出目的类型范围时，结果截断为目的格式的数据宽度。例如，`int32_t`值256转换为`uint8_t`时结果为0。一般的扩宽转换保持数值。特别地，`int16_t`转`uint32_t`的`opt.sat`必须配置为表中固定的`not_sat`，但转换本身采用饱和语义，负数结果为0。 | 输入超出目的类型范围时，结果钳位到目的类型边界。 |
 
-浮点格式还需注意以下特殊值规则：
-
-- 当目的类型为`float`时，仅支持`not_sat`。
-- `fp8_e4m3fn_t`没有无穷表示。`float`到`fp8_e4m3fn_t`采用`not_sat`时，输入无穷或超出有限值范围会得到NaN。
-- `float`到`fp8_e5m2_t`或`fp8_e4m3fn_t`采用`sat`时，输入NaN默认得到0；当`CTRL[50]`设置为`1'b1`时得到NaN。`cast_options`不负责配置该控制位。
-- `fp4x2_e2m1_t`和`fp4x2_e1m2_t`没有无穷和NaN定义。`bfloat16_t`转换到这两种类型时，输入无穷或超出表示范围会得到对应符号的有限最大值，输入NaN得到0。
-
 ### 舍入模式<a name="舍入模式"></a>
 
 舍入模式只在转换可能损失精度时影响结果。例如，浮点转整数、宽浮点转窄浮点以及`int32_t`或`int64_t`转`float`可能需要舍入；精确扩宽转换虽然在类型表中以`rint`表示固定配置，但不会额外改变精确结果。必须使用[数据类型](#数据类型)表中对应转换支持的模式，不支持的模式会在编译期报错。
@@ -157,12 +150,10 @@ constexpr cast_options default_cast_ops = {
 
 ## 约束说明<a name="section650mcpsimp"></a>
 
-- 仅在NPU架构版本3510下提供实现。
 - `DstType`和`SrcType`必须不同；相同类型转换会产生编译期错误。
 - 调用前必须初始化`src.reg`和`src.mask`。`cast`根据源操作数类型和数据排布解释mask，不会检查mask是否与源数据匹配。
 - 返回值仅原样传递`src.mask`，不会根据`DstType`重新生成mask。发生位宽变化时，调用方必须保证mask、`layout`以及搬入/搬出sideband模式相互匹配。
 - 接口只支持[数据类型](#数据类型)表中列出的完整配置组合。其他类型或选项组合会产生编译期错误。
-- mask未选中的目的元素置0。当目的类型位宽小于源类型时，受mask和`layout`共同影响的无效目的元素也置0。
 - 寄存器计算应在`__simd_vf__`函数或`__simd_callee__`函数中完成。
 
 ## 调用示例<a name="section660mcpsimp"></a>
@@ -172,22 +163,20 @@ constexpr cast_options default_cast_ops = {
 以下示例将`half`转换为`int32_t`。源类型位宽为目的类型的一半，因此使用`unpack`模式搬入，并以位宽较大的`int32_t`生成mask。
 
 ```cpp
-namespace te = asc::te::experimental;
-
-constexpr te::cast_options f16ToS32Options = {
-    te::cast_layout::zero,
-    te::cast_round_mode::floor,
-    te::cast_sat_mode::not_sat
+constexpr asc::te::experimental::cast_options f16ToS32Options = {
+    asc::te::experimental::cast_layout::zero,
+    asc::te::experimental::cast_round_mode::floor,
+    asc::te::experimental::cast_sat_mode::not_sat
 };
 
 template <typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void cast_f16_to_s32(const SrcTensor src, DstTensor dst)
 {
-    auto srcReg = src.template load<te::load_sideband_mode::unpack>(te::make_coord(0));
-    srcReg.with_mask(te::all_mask<int32_t>());
+    auto srcReg = src.template load<asc::te::experimental::load_sideband_mode::unpack>(asc::te::experimental::make_coord(0));
+    srcReg.with_mask(asc::te::experimental::all_mask<int32_t>());
 
-    auto dstReg = te::cast<int32_t, f16ToS32Options>(srcReg);
-    dst.store(te::make_coord(0), dstReg);
+    auto dstReg = asc::te::experimental::cast<int32_t, f16ToS32Options>(srcReg);
+    dst.store(asc::te::experimental::make_coord(0), dstReg);
 }
 ```
 
@@ -198,19 +187,19 @@ __simd_vf__ inline void cast_f16_to_s32(const SrcTensor src, DstTensor dst)
 ```cpp
 namespace te = asc::te::experimental;
 
-constexpr te::cast_options f32ToS16Options = {
-    te::cast_layout::zero,
-    te::cast_round_mode::rint,
-    te::cast_sat_mode::sat
+constexpr asc::te::experimental::cast_options f32ToS16Options = {
+    asc::te::experimental::cast_layout::zero,
+    asc::te::experimental::cast_round_mode::rint,
+    asc::te::experimental::cast_sat_mode::sat
 };
 
 template <typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void CastF32ToS16(const SrcTensor src, DstTensor dst)
 {
-    auto srcReg = src.load(te::make_coord(0));
-    srcReg.with_mask(te::all_mask<float>());
+    auto srcReg = src.load(asc::te::experimental::make_coord(0));
+    srcReg.with_mask(asc::te::experimental::all_mask<float>());
 
-    auto dstReg = te::cast<int16_t, f32ToS16Options>(srcReg);
-    dst.template store<te::store_sideband_mode::pack>(te::make_coord(0), dstReg);
+    auto dstReg = asc::te::experimental::cast<int16_t, f32ToS16Options>(srcReg);
+    dst.template store<asc::te::experimental::store_sideband_mode::pack>(asc::te::experimental::make_coord(0), dstReg);
 }
 ```

@@ -49,7 +49,7 @@
     __simd_callee__ inline void store(
         Tensor& tensor,
         const Coord& coord,
-        const reg_tensor<RegDataType>& src);
+        const reg_tensor<RegDataType>& src)
     ```
 
 - 单源操作数，从Tensor起始位置搬出：
@@ -59,7 +59,7 @@
               typename Tensor,
               typename RegDataType>
     __simd_callee__ inline void store(
-        Tensor& tensor, const reg_tensor<RegDataType>& src);
+        Tensor& tensor, const reg_tensor<RegDataType>& src)
     ```
 
 - 双源操作数，指定坐标：
@@ -73,7 +73,7 @@
         Tensor& tensor,
         const Coord& coord,
         const reg_tensor<RegDataType>& src0,
-        const reg_tensor<RegDataType>& src1);
+        const reg_tensor<RegDataType>& src1)
     ```
 
 - 双源操作数，从Tensor起始位置搬出：
@@ -85,7 +85,7 @@
     __simd_callee__ inline void store(
         Tensor& tensor,
         const reg_tensor<RegDataType>& src0,
-        const reg_tensor<RegDataType>& src1);
+        const reg_tensor<RegDataType>& src1)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -129,7 +129,7 @@
 | --- | --- |
 | `direct`、`store_1st` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4x2_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` |
 | `intlv` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4x2_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` |
-| `pack` | `int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`、`half`、`bfloat16_t`、`float` |
+| `pack` | `int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`half`、`bfloat16_t`、`float` |
 | `pack_quarter` | `int32_t`、`uint32_t`、`float` |
 
 ## 返回值说明<a name="section640mcpsimp"></a>

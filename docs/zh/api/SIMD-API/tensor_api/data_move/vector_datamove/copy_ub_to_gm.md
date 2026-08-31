@@ -33,30 +33,30 @@
 
 该接口用于将Unified Buffer（UB）中的数据搬运到Global Memory。接口根据源、目的Tensor的存储位置自动选择`copy_ub_to_gm`通路，并根据源、目的Layout推导搬运块数、单块长度、源步长和目的步长，支持单块长度非32字节对齐的数据搬运。
 
-当前支持ND2ND、DN2DN和NZ2NZ搬运，不支持ZN2ZN以及不同Layout Pattern之间的格式转换。搬运过程中不执行数据类型转换，数据格式和有效内容保持不变。接口支持整Tensor搬运和通过坐标、Shape指定的局部区域搬运。Global Memory目的Tensor设置的L2 Cache Hint会传递给底层搬运指令。
+当前支持ND2ND、DN2DN和NZ2NZ搬运，不支持ZN2ZN以及不同Layout Pattern之间的格式转换。搬运过程中不执行数据类型转换，数据格式和有效内容保持不变。接口支持整Tensor搬运和通过坐标、Shape指定的局部区域搬运。Global Memory目的Tensor设置的L2 Cache Hint会传递给搬运指令。
 
 ## 函数原型
 
 ```cpp
 template <typename DstTensor, typename SrcTensor>
-__aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src);
+__aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src)
 
 template <typename Atom, typename DstTensor, typename SrcTensor>
 __aicore__ inline void copy(const copy_atom<Atom>& atom,
-    const DstTensor& dst, const SrcTensor& src);
+    const DstTensor& dst, const SrcTensor& src)
 
 template <typename DstTensor, typename SrcTensor, typename DstCoord,
     typename SrcCoord, typename CopyShape>
 __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src,
     const DstCoord& dst_coord, const SrcCoord& src_coord,
-    const CopyShape& copy_shape);
+    const CopyShape& copy_shape)
 
 template <typename CopyOperation>
-__aicore__ inline constexpr auto make_copy(const CopyOperation& operation);
+__aicore__ inline constexpr auto make_copy(const CopyOperation& operation)
 
 template <typename CopyOperation, typename CopyTrait>
 __aicore__ inline constexpr auto make_copy(
-    const CopyOperation& operation, const CopyTrait& trait);
+    const CopyOperation& operation, const CopyTrait& trait)
 ```
 
 UB到Global Memory通路使用`copy_ub_to_gm{}`作为搬运操作对象，默认trait为`ub_to_gm_trait_default{}`。
@@ -90,7 +90,7 @@ UB到Global Memory通路使用`copy_ub_to_gm{}`作为搬运操作对象，默认
 
 | 源/目的Layout | 支持的数据类型 |
 | :--- | :--- |
-| ND、DN、NZ | `fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t` |
+| ND、DN、NZ | `fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t` |
 
 ## 返回值说明
 
@@ -100,7 +100,7 @@ UB到Global Memory通路使用`copy_ub_to_gm{}`作为搬运操作对象，默认
 
 - 源Tensor必须位于UB，目的Tensor必须位于Global Memory。
 - 源UB地址需满足32字节对齐要求，目的Global Memory地址支持1字节对齐。
-- 源、目的Layout Pattern必须相同。当前支持ND2ND、DN2DN和NZ2NZ，不支持ZN2ZN。
+- 源、目的Layout Pattern必须相同。当前支持ND2ND、DN2DN和NZ2NZ、ZN2ZN。
 - 源、目的数据类型必须相同，目的Tensor或目的区域容量必须不小于搬运区域。
 - Layout推导出的搬运块数、单块长度和步长必须满足底层`asc_copy_ub2gm_align`指令的字段范围及对齐要求。有效搬运的块数取值范围为[1, 4095]，单块长度取值范围为[1, 2097151]字节，且单块长度必须为元素字节数的整数倍。
 - 有效搬运的源步长必须等于单块长度，或为32字节的正整数倍。前者表示UB中的数据块紧凑排列，后者表示各数据块按32字节边界排列。

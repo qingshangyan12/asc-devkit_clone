@@ -28,7 +28,7 @@
 
 头文件路径为：`"tensor_api/arch/vector/experimental/reg_tensor.h"`，命名空间为`asc::te::experimental`。
 
-将输入的`reg_tensor<bool>`寄存器`maskReg.reg`绑定到当前`reg_tensor<DataType>`的`mask`成员，不修改数据成员`reg`。可与`local_tensor::load`链式调用。
+将输入`reg_tensor<bool>`寄存器的`maskReg.reg`绑定到当前`reg_tensor<DataType>`的`mask`成员，不修改数据成员`reg`。可与`local_tensor::load`链式调用。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

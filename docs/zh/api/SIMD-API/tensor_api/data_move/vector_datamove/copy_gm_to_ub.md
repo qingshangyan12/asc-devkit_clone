@@ -43,7 +43,7 @@ Tensor API通过`copy`接口统一执行不同通路的数据搬运。该接口�
 
     ```cpp
     template <typename DstTensor, typename SrcTensor>
-    __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src);
+    __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src)
     ```
 
 - 使用搬运原子对象执行搬运。
@@ -51,7 +51,7 @@ Tensor API通过`copy`接口统一执行不同通路的数据搬运。该接口�
     ```cpp
     template <typename Atom, typename DstTensor, typename SrcTensor>
     __aicore__ inline void copy(const copy_atom<Atom>& atom,
-        const DstTensor& dst, const SrcTensor& src);
+        const DstTensor& dst, const SrcTensor& src)
     ```
 
 - 搬运指定区域。
@@ -61,7 +61,7 @@ Tensor API通过`copy`接口统一执行不同通路的数据搬运。该接口�
         typename SrcCoord, typename CopyShape>
     __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src,
         const DstCoord& dst_coord, const SrcCoord& src_coord,
-        const CopyShape& copy_shape);
+        const CopyShape& copy_shape)
     ```
 
 - 构造搬运原子对象。
@@ -72,7 +72,7 @@ Tensor API通过`copy`接口统一执行不同通路的数据搬运。该接口�
 
     template <typename CopyOperation, typename CopyTrait>
     __aicore__ inline constexpr auto make_copy(
-        const CopyOperation& operation, const CopyTrait& trait);
+        const CopyOperation& operation, const CopyTrait& trait)
     ```
 
 Global Memory到UB通路使用`copy_gm_to_ub{}`作为搬运操作对象，默认trait为`gm_to_ub_trait_default{}`。
@@ -134,7 +134,7 @@ copy(atom, dst, src);
 
 | 源/目的Layout | 支持的数据类型 |
 | :--- | :--- |
-| ND、DN、NZ、ZN | `fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t` |
+| ND、DN、NZ、ZN | `fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t` |
 
 ## 返回值说明
 
@@ -182,21 +182,19 @@ ND通路沿行方向生成搬运块，DN通路沿列方向生成搬运块。NZ�
 ```cpp
 #include "tensor_api/tensor.h"
 
-using namespace asc::te;
-
-constexpr uint32_t M = 8;
-constexpr uint32_t N = 64;
+constexpr uint32_t m = 8;
+constexpr uint32_t n = 64;
 
 __aicore__ inline void copy_gm_to_ub_example(__gm__ half* gm_addr)
 {
-    __ubuf__ half ub_buf[M * N];
+    __ubuf__ half ub_buf[m * n];
 
-    auto layout = make_frame_layout<nd_ext_layout_ptn,
-        layout_trait_default<half>>(M, N);
-    auto src = make_tensor(make_mem_ptr<location::gm>(gm_addr), layout);
-    auto dst = make_tensor(make_mem_ptr<location::ub>(ub_buf), layout);
+    auto layout = asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn,
+        asc::te::layout_trait_default<half>>(m, n);
+    auto src = asc::te::temake_tensor(asc::te::make_mem_ptr<location::gm>(gm_addr), layout);
+    auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<location::ub>(ub_buf), layout);
 
-    copy(dst, src);
+    asc::te::copy(dst, src);
 }
 ```
 
@@ -205,9 +203,8 @@ __aicore__ inline void copy_gm_to_ub_example(__gm__ half* gm_addr)
 以下示例搬运局部区域，并显式构造搬运原子对象：
 
 ```cpp
-auto atom = make_copy(copy_gm_to_ub{}, gm_to_ub_trait_default{});
-copy(atom, dst, src, make_coord(1, 0), make_coord(2, 0),
-    make_shape(2, 32));
+auto atom = asc::te::make_copy(asc::te::copy_gm_to_ub{}, asc::te::gm_to_ub_trait_default{});
+asc::te::copy(atom, dst, src, asc::te::make_coord(1, 0), asc::te::make_coord(2, 0), asc::te::make_shape(2, 32));
 ```
 
 该区域包含2行，每行搬运32个`half`元素，因此接口推导出块数为2、单块长度为64字节。源、目的Tensor的行步长均为128字节，所以源步长和目的步长均为128字节，相邻数据块之间各有64字节间隔。

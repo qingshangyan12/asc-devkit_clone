@@ -50,8 +50,8 @@ struct reg_pair {
 
 | 成员名 | 描述 |
 | --- | --- |
-| `first` | 第一个结果寄存器。 |
-| `second` | 第二个结果寄存器。 |
+| `first` | 第一个矢量寄存器。 |
+| `second` | 第二个矢量寄存器。 |
 
 ## 调用示例<a name="section640mcpsimp"></a>
 

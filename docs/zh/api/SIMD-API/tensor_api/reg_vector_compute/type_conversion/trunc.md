@@ -51,7 +51,7 @@ src[i] <  0：dst[i] = ceil(src[i])
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src);
+__simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -100,29 +100,27 @@ __simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src);
 以下示例对UB中的一段浮点数据执行向0取整。[update_mask](../mask_reg_compute/update_mask.md)`<T>(remain)`根据剩余待处理元素数生成当前循环的mask，并通过引用参数自动更新`remain`，因此完整寄存器块和尾块可以使用同一计算流程。
 
 ```cpp
-namespace te = asc::te;
-
 template <typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void TruncRegLoop(
     const SrcTensor src, DstTensor dst, uint32_t dataSize, uint32_t columnCount)
 {
     using T = typename SrcTensor::data_type;
-    using RegType = typename te::reg_tensor<T>::reg_type;
-    static_assert(te::Std::is_same_v<T, typename DstTensor::data_type>,
+    using RegType = typename asc::te::experimental::reg_tensor<T>::reg_type;
+    static_assert(AscendC::Std::is_same_v<T, typename DstTensor::data_type>,
         "trunc requires matching source and destination data types");
 
     constexpr uint32_t ONE_REPEAT = sizeof(RegType) / sizeof(T);
     const uint32_t repeatTimes = (dataSize + ONE_REPEAT - 1) / ONE_REPEAT;
     uint32_t remain = dataSize;
 
-    for (uint32_t i = 0; i < repeatTimes; ++i) {
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
         const uint32_t offset = i * ONE_REPEAT;
-        const auto coord = te::make_coord(offset / columnCount, offset % columnCount);
+        const auto coord = asc::te::experimental::make_coord(offset / columnCount, offset % columnCount);
 
         auto srcReg = src.load(coord);
-        srcReg.with_mask(te::update_mask<T>(remain));
+        srcReg.with_mask(asc::te::experimental::update_mask<T>(remain));
 
-        auto dstReg = te::trunc(srcReg);
+        auto dstReg = asc::te::experimental::trunc(srcReg);
         dst.store(coord, dstReg);
     }
 }

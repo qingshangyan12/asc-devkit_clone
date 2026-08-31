@@ -41,7 +41,7 @@
               typename Tensor,
               typename Coord>
     __simd_callee__ inline decltype(auto) load_broadcast(
-        const Tensor& tensor, const Coord& coord);
+        const Tensor& tensor, const Coord& coord)
     ```
 
 - 从Tensor起始位置搬入：
@@ -49,7 +49,7 @@
     ```cpp
     template <broadcast_mode brc_mode = broadcast_mode::elem,
               typename Tensor>
-    __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
+    __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
