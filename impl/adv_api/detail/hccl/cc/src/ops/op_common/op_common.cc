@@ -84,8 +84,17 @@ struct HcclDfxOpInfo {
     uint64_t cpuTsThread = 0;                      // host侧算子主流的threadhandle
     uint32_t cpuWaitAicpuNotifyIdx = INVALID_UINT; // host wait device notifyIdx
     uint32_t cpuWaitAicpuNotifyId = INVALID_UINT;  // host wait device notifyId
-    int8_t reserve[128];                           // 预留扩展字段
+    // 算子内存信息
+    uint64_t inputMemAddr = 0;
+    uint64_t inputMemSize = 0;
+    uint64_t outputMemAddr = 0;
+    uint64_t outputMemSize = 0;
+    int8_t reserve[96]; // 预留扩展字段
 };
+
+static_assert(sizeof(HcclDfxOpInfo) == 504U, "HcclDfxOpInfo size must match HCOMM ABI");
+static_assert(offsetof(HcclDfxOpInfo, inputMemAddr) == 376U, "HcclDfxOpInfo inputMemAddr offset mismatch");
+static_assert(offsetof(HcclDfxOpInfo, reserve) == 408U, "HcclDfxOpInfo reserve offset mismatch");
 
 #ifdef __cplusplus
 }
@@ -475,6 +484,10 @@ HcclResult HcclExecOp(
     hcclDfxOpInfo.engine = param.engine;
     hcclDfxOpInfo.cpuTsThread = cpuTsThread;
     hcclDfxOpInfo.cpuWaitAicpuNotifyIdx = HOST_WAIT_AICPU_NOTIFYIDX;
+    hcclDfxOpInfo.inputMemAddr = reinterpret_cast<uint64_t>(param.inputPtr);
+    hcclDfxOpInfo.inputMemSize = param.inputSize;
+    hcclDfxOpInfo.outputMemAddr = reinterpret_cast<uint64_t>(param.outputPtr);
+    hcclDfxOpInfo.outputMemSize = param.outputSize;
     s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
     CHK_PRT_RET(
         sRet != EOK,
@@ -1497,6 +1510,10 @@ HcclResult RegisterCcuDfxOpInfo(HcclComm comm, const OpParam& param)
     CHK_RET(HcclGetRankSize(comm, &userRankSize));
     hcclDfxOpInfo.root = param.root;
     hcclDfxOpInfo.engine = param.engine;
+    hcclDfxOpInfo.inputMemAddr = reinterpret_cast<uint64_t>(param.inputPtr);
+    hcclDfxOpInfo.inputMemSize = param.inputSize;
+    hcclDfxOpInfo.outputMemAddr = reinterpret_cast<uint64_t>(param.outputPtr);
+    hcclDfxOpInfo.outputMemSize = param.outputSize;
     s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
     CHK_PRT_RET(
         sRet != EOK, HCCL_ERROR("%s call strncpy_s failed, param.algTag %s,  return %d.", __func__, param.algTag, sRet),
