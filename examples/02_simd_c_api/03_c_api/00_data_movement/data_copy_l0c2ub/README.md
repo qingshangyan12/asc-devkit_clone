@@ -113,6 +113,8 @@ data_copy_l0c2ub
   python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin ./output/golden.bin  # 验证输出结果是否正确
   ```
 
+  > **说明：** `gen_data.py`和`verify_result.py`必须传入相同的`SCENARIO_NUM`。若校验命令不传`-scenarioNum`，脚本默认按场景1解析输出；场景7输出为`float32`，会被误按`float16`读取并导致校验失败。
+
 - NPU仿真
 
   ```bash

@@ -113,6 +113,8 @@ Run the following steps in the example root directory.
   python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin ./output/golden.bin  # Verify the result
   ```
 
+  > **Note:** `gen_data.py` and `verify_result.py` must use the same `SCENARIO_NUM`. If `-scenarioNum` is omitted from the verification command, the script uses scenario 1 by default. Scenario 7 writes `float32` output, which would be read as `float16` and cause verification to fail.
+
 - NPU simulation
 
   ```bash
