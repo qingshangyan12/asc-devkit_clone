@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 获取与输入数据最接近的整数，若存在两个同样接近的整数，则获取其中的偶数。
 
 ## 函数原型
@@ -53,14 +55,6 @@ inline long long int llrintf(float x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 

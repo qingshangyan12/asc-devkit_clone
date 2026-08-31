@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 获取输入数据x、y的平方和（即x^2 + y^2）的平方根。
 
 ![](../../../figures/zh-cn_formulaimage_0000002516816363.png)
@@ -57,14 +59,6 @@ x^2 + y^2的平方根。
 <!-- npu="950" id7 -->
 针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了除法运算符，由于除法运算符不支持Subnormal场景，当所有输入均为Subnormal数据时，本接口最终返回nan。
 <!-- end id7 -->
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 

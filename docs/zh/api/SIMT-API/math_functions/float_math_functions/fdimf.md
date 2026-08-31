@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 获取两个输入数据的差值，差值小于0时，返回0。
 
 ![](../../../figures/zh-cn_formulaimage_0000002486622056.png)
@@ -56,14 +58,6 @@ inline float fdimf(float x, float y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 

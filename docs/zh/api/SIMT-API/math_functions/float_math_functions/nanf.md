@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 根据输入的字符串生成一个float类型的安静NaN值（浮点尾数最高位为1），并将`tagp`解析值的低22位写入该NaN值的低22位。
 
 ![](../../../figures/nanf.png)
@@ -50,14 +52,6 @@ inline float nanf(const char* tagp)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 

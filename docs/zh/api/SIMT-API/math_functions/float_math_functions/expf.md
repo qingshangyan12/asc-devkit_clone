@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 根据输入x，获取e的x次方的计算结果。
 
 ![](../../../figures/zh-cn_formulaimage_0000002516816333.png)
@@ -56,14 +58,6 @@ e的x次方。
 本接口受编译选项[--cce-use-fast-math](../../../../guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#常用的编译选项)的影响。
 -   --cce-use-fast-math=true：开启快速计算模式，不支持Subnormal场景，处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
 -   --cce-use-fast-math=false：支持Subnormal场景。
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 

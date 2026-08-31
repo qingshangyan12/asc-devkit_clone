@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp8.h"`。
+
 将hifloat8x2_t类型数据的两个分量转换为半精度浮点数，返回转换后的half2类型数据。
 
 ## 函数原型
@@ -55,14 +57,6 @@ inline half2 __hif822half2(const hifloat8x2_t x)
 ## 约束说明
 
 SIMT编程场景当前不支持使用该接口。
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp8.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp8.h"
-```
 
 ## 调用示例
 

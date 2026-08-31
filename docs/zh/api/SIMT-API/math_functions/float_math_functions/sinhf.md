@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 获取输入数据的双曲正弦值。
 
 ![](../../../figures/zh-cn_formulaimage_0000002516816353.png)
@@ -55,14 +57,6 @@ inline float sinhf(float x)
 ## 约束说明
 
 本接口支持的输入数据为\[-89.4, 89.4\]范围内的数据。
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 

@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 获取输入数据y/x的反正切值。
 
 ![](../../../figures/zh-cn_formulaimage_0000002516816331.png)
@@ -72,14 +74,6 @@ y/x的反正切值。
 <!-- npu="950" id7 -->
 针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了除法运算符，由于除法运算符不支持Subnormal场景，当x和y均为Subnormal数据时，本接口最终返回nan；当仅y为Subnormal数据且x为正数且非Subnormal数据时，本接口最终返回0；当仅y为Subnormal数据且x为负数且非Subnormal数据时，本接口最终返回与y同号的π。
 <!-- end id7 -->
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 

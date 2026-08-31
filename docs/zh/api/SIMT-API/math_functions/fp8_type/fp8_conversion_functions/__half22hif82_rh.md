@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp8.h"`。
+
 将half2类型数据的两个分量遵循CAST\_HYBRID模式转换为hifloat8\_t精度，返回转换后的hifloat8x2\_t类型数据。
 
 ## 函数原型
@@ -56,14 +58,6 @@ inline hifloat8x2_t __half22hif82_rh(const half2 x)
 ## 约束说明
 
 SIMT编程场景当前不支持使用该接口。
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp8.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp8.h"
-```
 
 ## 调用示例
 

@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 获取输入数据x的1阶第二类贝塞尔函数y1的值。
 
 ![](../../../figures/zh-cn_formulaimage_0000002484776434.png)
@@ -57,14 +59,6 @@ inline float y1f(float x)
 <!-- npu="950" id7 -->
 -   针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了除法运算符。由于除法运算符不支持Subnormal场景，在极少数场景下内部中间计算值的除数为Subnormal数据，会导致本接口最终结果为-inf。
 <!-- end id7 -->
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 

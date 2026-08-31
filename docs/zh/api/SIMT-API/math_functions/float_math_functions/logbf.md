@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 计算以2为底，输入数据的对数，并对结果向下取整，返回浮点数。
 
 ![](../../../figures/zh-cn_formulaimage_0000002516816343.png)
@@ -55,14 +57,6 @@ inline float logbf(float x)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 

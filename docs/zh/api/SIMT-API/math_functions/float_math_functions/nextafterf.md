@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 对于两个数据x、y：
 
 如果y大于x，返回比x大的下一个可表示的浮点值。
@@ -59,14 +61,6 @@ inline float nextafterf(float x, float y)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 

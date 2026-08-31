@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 获取输入数据的互补误差函数值。
 
 ![](../../../figures/zh-cn_formulaimage_0000002516816375.png)
@@ -54,14 +56,6 @@ inline float erfcf(float x)
 <!-- npu="950" id7 -->
 针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了`exp2f()`，由于`exp2f()`不支持Subnormal场景，在极少数场景下内部指数计算结果为Subnormal数据，导致本接口最终结果为0。
 <!-- end id7 -->
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 
