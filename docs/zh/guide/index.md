@@ -370,6 +370,8 @@
 -   [跨代迁移兼容性指南](cross_gen_migration_guide/overview.md)
     -   [概述](cross_gen_migration_guide/overview.md)
     -   [Ascend C API兼容策略](cross_gen_migration_guide/ascend_c_api_compatibility.md)
+    -   [新特性使用指导](cross_gen_migration_guide/instructions_for_new_features/3510_new_features.md)
+        -   [3510新特性使用说明](cross_gen_migration_guide/instructions_for_new_features/3510_new_features.md)
     -   [3510架构迁移指导](cross_gen_migration_guide/3510_arch_migration/2201_to_3510_arch_changes.md)
         -   [2201到3510架构变更](cross_gen_migration_guide/3510_arch_migration/2201_to_3510_arch_changes.md)
         -   [2201迁移3510指导](cross_gen_migration_guide/3510_arch_migration/2201_to_3510_guide/basic_api_migration.md)
