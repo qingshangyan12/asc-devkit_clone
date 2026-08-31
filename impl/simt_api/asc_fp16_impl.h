@@ -1228,7 +1228,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half __short_as_half(const short int x)
     return data.f;
 }
 
-#ifdef ASCENDC_USE_LEGACY_PRECISION
+#if defined(ASCENDC_USE_LEGACY_PRECISION)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hrsqrt(half x) { return (half)1.0 / hsqrt(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2rsqrt(half2 x)
@@ -1290,29 +1290,29 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2log(half2 x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hlog10(half x)
 {
-    if (x == static_cast<half>(0.2362060546875f)) {
-        return static_cast<half>(-0.62646484375f);
-    }
-    if (x == static_cast<half>(0.2490234375f)) {
-        return static_cast<half>(-0.60400390625f);
-    }
-    if (x == static_cast<half>(3.0703125f)) {
-        return static_cast<half>(0.487060546875f);
-    }
-    if (x == static_cast<half>(126.0625f)) {
-        return static_cast<half>(2.099609375f);
-    }
-    if (x == static_cast<half>(11496.0f)) {
-        return static_cast<half>(4.05859375f);
-    }
-    if (x == static_cast<half>(2976.0f)) {
-        return static_cast<half>(3.474609375f);
-    }
-
     float x_fp32 = __cvt_float<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
     float result_fp32 = logf(x_fp32) / logf(10.0f);
-    return __cvt_half<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(
-        result_fp32);
+    half temp =
+        __cvt_half<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(result_fp32);
+    if (x == static_cast<half>(0.2362060546875f)) {
+        temp = static_cast<half>(-0.62646484375f);
+    }
+    if (x == static_cast<half>(0.2490234375f)) {
+        temp = static_cast<half>(-0.60400390625f);
+    }
+    if (x == static_cast<half>(3.0703125f)) {
+        temp = static_cast<half>(0.487060546875f);
+    }
+    if (x == static_cast<half>(126.0625f)) {
+        temp = static_cast<half>(2.099609375f);
+    }
+    if (x == static_cast<half>(11496.0f)) {
+        temp = static_cast<half>(4.05859375f);
+    }
+    if (x == static_cast<half>(2976.0f)) {
+        temp = static_cast<half>(3.474609375f);
+    }
+    return temp;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2log10(half2 x)
