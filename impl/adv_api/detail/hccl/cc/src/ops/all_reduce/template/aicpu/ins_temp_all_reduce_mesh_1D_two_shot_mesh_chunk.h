@@ -38,7 +38,8 @@ public:
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         AlgResourceRequest& resourceRequest) override;
     HcclResult KernelRun(
-        const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource) override;
+        const OpParam& param, const TemplateDataParams& tempAlgParams,
+        const TemplateResource& templateResource) override;
 
     HcclResult PreCopy(
         const TemplateDataParams& tempAlgParams, const std::vector<ThreadHandle>& threads,
