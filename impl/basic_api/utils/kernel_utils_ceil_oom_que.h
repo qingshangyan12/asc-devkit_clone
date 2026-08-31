@@ -271,9 +271,7 @@ __aicore__ constexpr TQueConfig GetTQueConfig(const TQueConfig* conf)
         .enableLoopQueue = conf->enableLoopQueue};
 }
 
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165)) || \
-    defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
 __aicore__ constexpr bool UseAltBufId(TPosition queDstPos, TPosition dstConsumerPos, uint32_t consumerSize)
 {
     if (consumerSize <= 1) {

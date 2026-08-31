@@ -263,7 +263,7 @@ public:
         {TPosition::C1, Hardware::L1},      {TPosition::C2, Hardware::BIAS},  {TPosition::CO1, Hardware::L0C},
         {TPosition::CO2, Hardware::GM},
     };
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113))
     const std::map<TPosition, Hardware> positionHardMap = {
         {TPosition::GM, Hardware::GM},      {TPosition::A1, Hardware::L1},    {TPosition::B1, Hardware::L1},
         {TPosition::TSCM, Hardware::L1},    {TPosition::VECIN, Hardware::UB}, {TPosition::VECOUT, Hardware::UB},
@@ -314,7 +314,7 @@ public:
         {Hardware::L0A, 1024 * 64},  {Hardware::L0B, 1024 * 64},   {Hardware::L0C, 1024 * 128},
         {Hardware::BIAS, 1024 * 1},  {Hardware::FIXBUF, 1024 * 7},
     };
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113))
     const std::map<Hardware, uint32_t> bufferInitLen = {
         {Hardware::GM, 1024 * 1024}, {Hardware::UB, TOTAL_UB_SIZE}, {Hardware::L1, TOTAL_L1_SIZE},
         {Hardware::L0A, 1024 * 32},  {Hardware::L0B, 1024 * 32},    {Hardware::L0C, 1024 * 64},
@@ -420,8 +420,7 @@ public:
         }
         cpuL0AMx = new uint8_t[4 * 1024]; // 4k
         cpuL0BMx = new uint8_t[4 * 1024]; // 4k
-#elif defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
         cpuUB = new uint8_t[bufferInitLen.at(Hardware::UB)];
         cpuL1 = new uint8_t[bufferInitLen.at(Hardware::L1)];
 #endif
@@ -559,8 +558,7 @@ inline std::string GetPositionDisplay(TPosition pos)
 }
 #endif
 
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 enum class AntiQuantMode {
     DEFAULT,
     INPUT_INTLV,
