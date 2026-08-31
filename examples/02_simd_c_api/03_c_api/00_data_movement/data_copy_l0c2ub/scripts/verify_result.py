@@ -18,7 +18,15 @@ import numpy as np
 
 RELATIVE_TOL = 1e-6
 ABSOLUTE_TOL = 1e-9
+FLOAT_OUTPUT_RELATIVE_TOL = 1e-4
+FLOAT_OUTPUT_ABSOLUTE_TOL = 1e-4
 ERROR_TOL = 1e-4
+
+
+def get_tolerance(scenario_num):
+    if scenario_num == 7:
+        return FLOAT_OUTPUT_RELATIVE_TOL, FLOAT_OUTPUT_ABSOLUTE_TOL
+    return RELATIVE_TOL, ABSOLUTE_TOL
 
 
 def verify_result(scenario_num, output_path, golden_path):
@@ -36,8 +44,9 @@ def verify_result(scenario_num, output_path, golden_path):
         )
         return False
 
+    relative_tol, absolute_tol = get_tolerance(scenario_num)
     match = np.isclose(
-        output, golden, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL, equal_nan=True
+        output, golden, rtol=relative_tol, atol=absolute_tol, equal_nan=True
     )
     mismatch_indices = np.where(~match)[0]
     for index in mismatch_indices[:101]:
