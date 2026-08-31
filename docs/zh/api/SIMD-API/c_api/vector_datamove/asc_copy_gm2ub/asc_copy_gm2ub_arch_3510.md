@@ -32,7 +32,7 @@
 
 ## 函数原型
 
-### 连续数据搬运
+### 连续数据搬运（占位符形式）
 
 ```c
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
@@ -40,7 +40,7 @@ __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
                                       uint32_t size)
 ```
 
-### 高维切分数据搬运
+### 高维切分数据搬运（占位符形式）
 
 ```c
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
@@ -53,6 +53,8 @@ __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
 
 ## 参数说明
 
+### 连续数据搬运（占位符形式）
+
 **表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
@@ -60,6 +62,16 @@ __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
 | dst | 输出 | 目的地址（UB）。 |
 | src | 输入 | 源地址（GM）。 |
 | size | 输入 | 搬运数据大小，单位为字节。 |
+| n_burst | 输入 | 待搬运的连续传输数据块个数，取值范围为[1, 4095]。 |
+
+### 高维切分数据搬运（占位符形式）
+
+**表2** 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输出 | 目的地址（UB）。 |
+| src | 输入 | 源地址（GM）。 |
 | n_burst | 输入 | 待搬运的连续传输数据块个数，取值范围为[1, 4095]。 |
 | len_burst | 输入 | 每个连续传输数据块的长度，单位为字节，取值范围为[1, 2097151]。 |
 | src_stride | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为字节。 |
