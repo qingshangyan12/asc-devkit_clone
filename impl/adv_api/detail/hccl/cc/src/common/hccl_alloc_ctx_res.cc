@@ -1022,6 +1022,8 @@ HcclResult PrepareCcuAlgorithmResource(
             algName.c_str());
         return ret;
     }
+    opResCtx.resCtx = reinterpret_cast<uint64_t>(resCtxSequence);
+    opResCtx.resCtxSize = opParam.ctxSize;
     HCCL_INFO("[CcuSelectAlg]GetCcuOpParamResCtx[%u] successfully! rank[%u]", tilingIndex, userRank);
     return HCCL_SUCCESS;
 }
