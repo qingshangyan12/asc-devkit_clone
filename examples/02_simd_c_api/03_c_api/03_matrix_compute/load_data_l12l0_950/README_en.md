@@ -1,8 +1,8 @@
-# copy_l12l0_950 Example
+# load_data_l12l0_950 Example
 
 ## Overview
 
-This example demonstrates how to call `asc_copy_l12l0a` / `asc_copy_l12l0b` and their `_transpose` variants to transfer A / B matrices from L1 to L0A / L0B.
+This example demonstrates how to call `asc_copy_l12l0a` / `asc_copy_l12l0b` and their `_transpose` variants to transfer A / B matrices from L1 to L0A / L0B Buffer.
 
 The example covers three input data types: int8_t, half, and float, as well as A / B matrix transposed and non-transposed input scenarios. L0A data layout is Nz format, L0B data layout is Zn format. The kernel uses a C-like straight-line structure, with `constexpr` values and compile-time preprocessor branches for scenario configuration, and does not use templates.
 
@@ -15,14 +15,14 @@ The example covers three input data types: int8_t, half, and float, as well as A
 ## Directory Structure
 
 ```
-├── copy_l12l0_950
+├── load_data_l12l0_950
 │   ├── figures                          // Illustrations
 │   ├── scripts
 │   │   ├── gen_data.py                  // Script for generating input data and ground truth data
 │   │   └── verify_result.py             // Script for verifying whether output data matches ground truth data
 │   ├── CMakeLists.txt                   // Build project file
 │   ├── data_utils.h                     // Data read/write functions
-│   ├── copy_l12l0_950.asc               // SIMD C API implementation and invocation example
+│   ├── load_data_l12l0_950.asc          // SIMD C API implementation and invocation example
 │   └── README.md                        // Example documentation
 ```
 
@@ -615,12 +615,11 @@ Run the following steps in the root directory of this example to build and run t
   ./demo
   python3 ../scripts/verify_result.py -scenario_num=$SCENARIO_NUM output/output.bin output/golden.bin
   ```
-  To use CPU debug or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+  To use NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
 
   Examples:
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;   # CPU debug mode
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;   # NPU simulation mode
   ```
   > **Notice:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory and then re-run cmake.
@@ -629,7 +628,7 @@ Run the following steps in the root directory of this example to build and run t
 
   | Option | Values | Description |
   |--------|--------|-------------|
-  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`-`7` | Scenario number: different data types and transpose combinations |
 

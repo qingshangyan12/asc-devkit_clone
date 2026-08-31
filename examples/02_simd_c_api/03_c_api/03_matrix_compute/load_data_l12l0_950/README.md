@@ -1,8 +1,8 @@
-# copy_l12l0_950样例
+# load_data_l12l0_950样例
 
 ## 概述
 
-本样例展示如何调用`asc_copy_l12l0a` / `asc_copy_l12l0b`及其`_transpose`接口，将A / B矩阵从L1搬运到L0A / L0B。
+本样例展示如何调用`asc_copy_l12l0a` / `asc_copy_l12l0b`及其`_transpose`接口，将A / B矩阵从L1搬运到L0A / L0B Buffer。
 
 样例覆盖int8_t、half、float三种输入数据类型，以及A / B矩阵转置和不转置输入场景。L0A数据排布为Nz格式，L0B数据排布为Zn格式。核侧代码采用类C语言的直线式组织，通过`constexpr`和编译期预处理分支配置不同场景，不使用模板。
 
@@ -15,14 +15,14 @@
 ## 目录结构介绍
 
 ```
-├── copy_l12l0_950
+├── load_data_l12l0_950
 │   ├── figures                          // 图示
 │   ├── scripts
 │   │   ├── gen_data.py                  // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py             // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt                   // 编译工程文件
 │   ├── data_utils.h                     // 数据读入写出函数
-│   ├── copy_l12l0_950.asc               // SIMD C API样例实现 & 调用样例
+│   ├── load_data_l12l0_950.asc          // SIMD C API样例实现 & 调用样例
 │   └── README.md                        // 样例说明文档
 ```
 
@@ -616,12 +616,11 @@ asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0,
   ./demo
   python3 ../scripts/verify_result.py -scenario_num=$SCENARIO_NUM output/output.bin output/golden.bin
   ```
-  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;   # CPU调试模式
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;   # NPU仿真模式
   ```
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -630,7 +629,7 @@ asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0,
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`-`7` | 场景编号：不同数据类型和转置组合 |
 

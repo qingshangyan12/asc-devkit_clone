@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 
 if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
-    message(FATAL_ERROR "copy_l12l0_950 only supports dav-3510, but got ${CMAKE_ASC_ARCHITECTURES}")
+    message(FATAL_ERROR "load_data_l12l0_950 only supports dav-3510, but got ${CMAKE_ASC_ARCHITECTURES}")
 endif()
 
 find_package(ASC REQUIRED)
@@ -21,7 +21,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    copy_l12l0_950.asc
+    load_data_l12l0_950.asc
 )
 
 set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-7)")
