@@ -64,7 +64,7 @@ __simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T
 ## 约束说明
 
 - src0、src1的数据类型需要保持一致。
-- src0和src1可以为同一个RegTensor。
+- src0和src1可以为同一个reg_tensor。
 
 ## 调用示例
 

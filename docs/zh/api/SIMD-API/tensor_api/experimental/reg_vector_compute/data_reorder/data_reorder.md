@@ -1,3 +1,3 @@
 # 数据重排
 
--   **[DeInterleave](DeInterleave.md)**
+-   **[deinterleave](deinterleave.md)**

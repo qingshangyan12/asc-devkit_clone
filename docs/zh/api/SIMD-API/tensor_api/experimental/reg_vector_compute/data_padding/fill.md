@@ -1,4 +1,4 @@
-# Fill
+# fill
 
 ## 产品支持情况
 
@@ -28,10 +28,10 @@
 
 头文件路径：`"include/tensor_api/experimental/arch/vector/compare_and_select.h"`。
 
-支持Scalar和Tensor两种模式：
+支持scalar和tensor两种模式：
 
--   Scalar模式：将scalarValue广播到寄存器，并保存在dstReg中（如果有mask，则保存在dstReg中被mask筛选的位置）。
--   Tensor模式：将srcReg的最低位元素广播到寄存器，并保存在dstReg中被mask筛选的位置。
+-   scalar模式：将scalarValue广播到寄存器，并保存在dstReg中（如果有mask，则保存在dstReg中被mask筛选的位置）。
+-   tensor模式：将srcReg的最低位元素广播到寄存器，并保存在dstReg中被mask筛选的位置。
 
 ## 函数原型
 
