@@ -53,7 +53,7 @@ __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src_reg)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src_reg | 输入 | 源操作数。<br>类型为reg_tensor&lt;T&gt;。src_reg.mask用于指示哪些元素参与计算，对应位置为1时参与计算，为0时不参与计算。 |
+| src_reg | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。其中，src_reg.reg保存矢量数据，src_reg.mask用于控制各元素是否参与计算。src_reg.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 
 ## 数据类型
 
@@ -65,7 +65,8 @@ __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src_reg)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+- `src_reg.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- `src_reg.mask`中与元素对应的比特位为0时，返回值的对应元素置0。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

@@ -68,10 +68,10 @@ $$
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src0 | 输入 | reg_tensor与reg_tensor形式中的源操作数。<br>类型为reg_tensor&lt;T&gt;。src0.mask用于指示哪些元素参与计算，对应位置为1时参与计算，为0时不参与计算。 |
-| src1 | 输入 | reg_tensor与reg_tensor形式中的源操作数。<br>类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
-| src | 输入 | reg_tensor与标量形式中的源操作数。<br>类型为reg_tensor&lt;T&gt;。src.mask用于指示哪些元素参与计算，对应位置为1时参与计算，为0时不参与计算。 |
-| scalar | 输入 | 标量源操作数。<br>类型为T。 |
+| src0 | 输入 | reg_tensor与reg_tensor形式中的源操作数，类型为reg_tensor&lt;T&gt;。其中，src0.reg保存矢量数据，src0.mask用于控制各元素是否参与计算。src0.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| src1 | 输入 | reg_tensor与reg_tensor形式中的源操作数，类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
+| src | 输入 | reg_tensor与标量形式中的源操作数，类型为reg_tensor&lt;T&gt;。其中，src.reg保存矢量数据，src.mask用于控制各元素是否参与计算。src.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| scalar | 输入 | 源操作数，类型为标量T。 |
 
 ## 数据类型
 
@@ -83,7 +83,9 @@ $$
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+- 用于控制计算的mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- 整型数据加法溢出时按环绕策略处理。有符号类型的最大值加1得到该类型的最小值，最小值减1得到该类型的最大值；无符号类型的最大值加1得到0。
+- half、bfloat16_t和float类型按IEEE 754浮点加法规则计算，溢出以及nan、inf等特殊值的处理遵循浮点运算规则。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
