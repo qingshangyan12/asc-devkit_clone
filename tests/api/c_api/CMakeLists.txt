@@ -25,8 +25,14 @@ set(ASCENDC_UT_HEADER
     ${CMAKE_CURRENT_LIST_DIR}/..
     ${ASCENDC_DIR}
     ${ASCENDC_DIR}/include
+    ${ASCENDC_DIR}/include/basic_api
     ${ASCENDC_DIR}/include/c_api
+    ${ASCENDC_DIR}/include/simt_api
+    ${ASCENDC_DIR}/include/utils
+    ${ASCENDC_DIR}/impl
+    ${ASCENDC_DIR}/impl/basic_api
     ${ASCENDC_DIR}/impl/c_api
+    ${ASCENDC_DIR}/impl/simt_api
     ${ASCENDC_DIR}/
 )
 
@@ -57,6 +63,8 @@ file(GLOB ASCENDC_UT_ascend950pr_9599_AIC_CASE_SRC
     npu_arch_3510/cube_compute/*.cpp
     npu_arch_3510/cube_datamove/*.cpp
     npu_arch_3510/sys_var/test_asc_get_pipe_idle_slot_count.cpp
+    npu_arch_3510/sys_var/test_asc_set_l13d_padding.cpp
+    npu_arch_3510/sys_var/test_asc_set_l12l0_padding_val.cpp
 )
 
 file(GLOB ASCENDC_UT_ascend950pr_9599_AIV_CASE_SRC
@@ -87,6 +95,7 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_CUBE__;__DAV_CUBE__>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_VEC__;__DAV_VEC__>
         __disable_kernel_type_autoinfer__=
+        __callee__=
     )
 
     target_include_directories(ascendc_ut_c_api_${product_type} PRIVATE
