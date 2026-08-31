@@ -9,6 +9,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <cstring>
 #include <type_traits>
 #include "kernel_operator.h"
 using namespace std;
@@ -132,6 +133,15 @@ private:
                     psts(carryOut, (__ubuf__ uint32_t*)dst1Ptr, i * oneRepSize, NORM);
                 } else if constexpr (mD == 17) {
                     Reg::Div<T, &divMode>(vDstReg0, vSrcReg0, vSrcReg1, maskReg);
+                } else if constexpr (mD == 24) {
+                    static constexpr Reg::DivSpecificMode gradualMode = {
+                        Reg::MaskMergeMode::ZEROING, true, DivAlgo::PRECISION_0ULP_FTZ_FALSE};
+                    Reg::Div<T, &gradualMode>(vDstReg0, vSrcReg0, vSrcReg1, maskReg);
+                } else if constexpr (mD == 25) {
+                    static constexpr Reg::DivSpecificMode gradualMode = {
+                        Reg::MaskMergeMode::ZEROING, true, DivAlgo::PRECISION_0ULP_FTZ_FALSE};
+                    Reg::Div<T, &gradualMode>(vSrcReg0, vSrcReg0, vSrcReg1, maskReg);
+                    vDstReg0 = vSrcReg0;
                 } else if constexpr (mD == 20) {
                     Reg::FusedExpSub(fp32DstReg, vSrcReg0, vSrcReg1, maskReg);
                 } else if constexpr (mD == 21) {
@@ -302,4 +312,53 @@ TEST_P(MicroBinaryTestsuite, MicroBinaryTestCase)
 {
     auto param = GetParam();
     param.CallFunc();
+}
+
+template <int32_t mode>
+void RunDiv0UlpUnderflowCase(const uint32_t dividendBits[], const uint32_t divisorBits[], const uint32_t expectedBits[])
+{
+    constexpr int shapeSize = 1024;
+    constexpr int laneCount = 64;
+    float dstGm[shapeSize] = {};
+    float dst1Gm[shapeSize] = {};
+    float src0Gm[shapeSize] = {};
+    float src1Gm[shapeSize] = {};
+    for (int i = 0; i < laneCount; ++i) {
+        std::memcpy(&src0Gm[i], &dividendBits[i], sizeof(uint32_t));
+        std::memcpy(&src1Gm[i], &divisorBits[i], sizeof(uint32_t));
+    }
+
+    KernelBinary<float, float, mode> op;
+    op.Init(
+        reinterpret_cast<uint8_t*>(dstGm), reinterpret_cast<uint8_t*>(dst1Gm), reinterpret_cast<uint8_t*>(src0Gm),
+        reinterpret_cast<uint8_t*>(src1Gm), shapeSize, laneCount);
+    op.Process();
+
+    for (int i = 0; i < laneCount; ++i) {
+        uint32_t actualBits = 0;
+        std::memcpy(&actualBits, &dstGm[i], sizeof(uint32_t));
+        EXPECT_EQ(actualBits, expectedBits[i]) << "lane=" << i;
+    }
+}
+
+TEST(RegDiv0UlpFtzFalse, CorrectlyRoundsUnderflowAndSupportsDstSrc0Alias)
+{
+    constexpr int laneCount = 64;
+    uint32_t dividendBits[laneCount] = {};
+    uint32_t divisorBits[laneCount] = {};
+    uint32_t expectedBits[laneCount] = {};
+    constexpr uint32_t dividends[] = {0x00615d49, 0x0035ca7c, 0x00515b65, 0x005f4952, 0x007fffff, 0x8007fd5f};
+    constexpr uint32_t divisors[] = {0xc07fc2a1, 0x3f1ef424, 0xbf5a1cea, 0xc00a0c58, 0x00000001, 0x54d3fd48};
+    constexpr uint32_t expected[] = {0x80185d29, 0x0056a1cf, 0x805f7d31, 0x802c2ce5, 0x4afffffe, 0x80000000};
+    for (int i = 0; i < laneCount; ++i) {
+        const int caseIndex = i % static_cast<int>(sizeof(dividends) / sizeof(dividends[0]));
+        const uint32_t signMirror =
+            (i / static_cast<int>(sizeof(dividends) / sizeof(dividends[0]))) % 2 == 0 ? 0 : 0x80000000;
+        dividendBits[i] = dividends[caseIndex] ^ signMirror;
+        divisorBits[i] = divisors[caseIndex];
+        expectedBits[i] = expected[caseIndex] ^ signMirror;
+    }
+
+    RunDiv0UlpUnderflowCase<24>(dividendBits, divisorBits, expectedBits);
+    RunDiv0UlpUnderflowCase<25>(dividendBits, divisorBits, expectedBits);
 }

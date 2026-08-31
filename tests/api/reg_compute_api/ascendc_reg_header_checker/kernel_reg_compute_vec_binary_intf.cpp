@@ -36,6 +36,10 @@ extern "C" __simd_vf__ void vec_binary_test()
     // template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
     // __simd_callee__ inline void Div(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
     AscendC::Reg::Div(dstReg, srcReg0, srcReg1, mask);
+    static constexpr AscendC::Reg::DivSpecificMode gradualMode = {
+        AscendC::Reg::MaskMergeMode::ZEROING, true, AscendC::DivAlgo::PRECISION_0ULP_FTZ_FALSE};
+    AscendC::Reg::Div<float, &gradualMode>(dstReg, srcReg0, srcReg1, mask);
+    AscendC::Reg::Div<float, &gradualMode>(srcReg0, srcReg0, srcReg1, mask);
 
     // template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
     // __simd_callee__ inline void Max(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
