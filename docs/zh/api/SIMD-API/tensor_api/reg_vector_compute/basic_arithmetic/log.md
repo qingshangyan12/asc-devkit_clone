@@ -1,53 +1,73 @@
-# log
+# log<a name="ZH-CN_TOPIC_TENSOR_API_LOG"></a>
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-- Atlas A3训练系列产品/Atlas A3推理系列产品：不支持
-- Atlas A2训练系列产品/Atlas A2推理系列产品：不支持
-- Atlas 200I/500 A2推理产品：不支持
-- Atlas推理系列产品AI Core：不支持
-- Atlas推理系列产品Vector Core：不支持
-- Atlas训练系列产品：不支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
-## 功能说明
+## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径：`"tensor_api/experimental/vector_compute.h"`。
 
-命名空间：`asc::te::experimental`。
-
-逐元素计算自然对数：
+该接口根据src_reg.mask，对源操作数src_reg中的有效元素逐个求自然对数（以e为底），并返回计算结果。计算公式如下：
 
 $$
-dst_i = \ln(src_i)
+dst_i = \ln(src\_reg_i)
 $$
 
-## 函数原型
+## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
 template <typename T>
 __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src_reg)
 ```
 
-## 参数说明
+## 参数说明<a name="section622mcpsimp"></a>
+
+**表 1**  模板参数说明
+
+| 参数名 | 描述 |
+| --- | --- |
+| T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
+
+**表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 模板参数 | 输入和返回值的元素类型，支持`half`、`float`。 |
-| `src_reg` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src_reg.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| src_reg | 输入 | 源操作数。<br>类型为reg_tensor&lt;T&gt;。src_reg.mask用于指示哪些元素参与计算，对应位置为1时参与计算，为0时不参与计算。 |
 
-## 返回值说明
+## 数据类型
 
-返回`reg_tensor<T>`。`reg`保存逐元素自然对数计算结果，返回值的`mask`与`src_reg.mask`相同。
+源操作数与返回值的数据类型保持一致。支持的数据类型为：half、float。
 
-## 约束说明
+## 返回值说明<a name="section640mcpsimp"></a>
 
-`src_reg.mask`对应位置为`0`的元素不参与计算，返回值的`reg`对应位置置零。
+返回自然对数计算结果，类型为reg_tensor&lt;T&gt;。返回值的mask与src_reg.mask相同；src_reg.mask对应位置为0时，返回值的对应元素置零。
 
-## 调用示例
+## 约束说明<a name="section633mcpsimp"></a>
 
-以下示例展示接口在AIV计算函数中的典型调用方式。示例先为加载结果绑定mask，
-再执行计算并将结果写回UB。
+无
+
+## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
@@ -55,13 +75,9 @@ __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src_reg)
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void log_example(InputTensor input, OutputTensor output)
 {
-    using asc::te::experimental::all_mask;
-    using asc::te::experimental::load;
-    using asc::te::experimental::store;
-
-    auto src_reg = load(input, asc::te::make_coord(0)).with_mask(all_mask<float>());
-
+    auto src_reg = asc::te::experimental::load(input, asc::te::make_coord(0))
+                       .with_mask(asc::te::experimental::all_mask<float>());
     auto dst_reg = asc::te::experimental::log(src_reg);
-    store(output, asc::te::make_coord(0), dst_reg);
+    asc::te::experimental::store(output, asc::te::make_coord(0), dst_reg);
 }
 ```

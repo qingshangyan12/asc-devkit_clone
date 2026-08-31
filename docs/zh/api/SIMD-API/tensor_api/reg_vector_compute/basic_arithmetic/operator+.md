@@ -1,66 +1,91 @@
-# operator+
+# operator+<a name="ZH-CN_TOPIC_TENSOR_API_OPERATOR_ADD"></a>
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-- Atlas A3训练系列产品/Atlas A3推理系列产品：不支持
-- Atlas A2训练系列产品/Atlas A2推理系列产品：不支持
-- Atlas 200I/500 A2推理产品：不支持
-- Atlas推理系列产品AI Core：不支持
-- Atlas推理系列产品Vector Core：不支持
-- Atlas训练系列产品：不支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
-## 功能说明
+## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径：`"tensor_api/experimental/vector_compute.h"`。
 
-命名空间：`asc::te::experimental`。
-
-逐元素执行不带进位输出的加法，支持寄存器与寄存器、寄存器与标量、标量与寄存器三种操作数组合。
+该接口根据输入reg_tensor携带的mask，对两个源操作数进行按元素求和操作，并返回计算结果。支持reg_tensor与reg_tensor、reg_tensor与标量、标量与reg_tensor三种操作数组合。计算公式如下：
 
 $$
-dst_i = a_i + b_i
+dst_i = src0_i + src1_i
 $$
 
-## 函数原型
+## 函数原型<a name="section620mcpsimp"></a>
 
-```cpp
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+- reg_tensor与reg_tensor
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(
-    const reg_tensor<T>& src, const T& scalar)
+    ```cpp
+    template <typename T>
+    __simd_callee__ inline reg_tensor<T> operator+(
+        const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+    ```
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(
-    const T& scalar, const reg_tensor<T>& src)
-```
+- reg_tensor与标量
 
-## 参数说明
+    ```cpp
+    template <typename T>
+    __simd_callee__ inline reg_tensor<T> operator+(
+        const reg_tensor<T>& src, const T& scalar)
+
+    template <typename T>
+    __simd_callee__ inline reg_tensor<T> operator+(
+        const T& scalar, const reg_tensor<T>& src)
+    ```
+
+## 参数说明<a name="section622mcpsimp"></a>
+
+**表 1**  模板参数说明
+
+| 参数名 | 描述 |
+| --- | --- |
+| T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
+
+**表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `T` | 模板参数 | 输入和返回值的元素类型，支持`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。 |
-| `src0` | 输入 | 寄存器/寄存器形式中的源操作数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| `src1` | 输入 | 寄存器/寄存器形式中的源操作数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
-| `src` | 输入 | 寄存器/标量或标量/寄存器形式中的源操作数，类型为`reg_tensor<T>`。`src.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| `scalar` | 输入 | 标量加数，类型为`T`。 |
+| src0 | 输入 | reg_tensor与reg_tensor形式中的源操作数。<br>类型为reg_tensor&lt;T&gt;。src0.mask用于指示哪些元素参与计算，对应位置为1时参与计算，为0时不参与计算。 |
+| src1 | 输入 | reg_tensor与reg_tensor形式中的源操作数。<br>类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
+| src | 输入 | reg_tensor与标量形式中的源操作数。<br>类型为reg_tensor&lt;T&gt;。src.mask用于指示哪些元素参与计算，对应位置为1时参与计算，为0时不参与计算。 |
+| scalar | 输入 | 标量源操作数。<br>类型为T。 |
 
-## 返回值说明
+## 数据类型
 
-返回`reg_tensor<T>`。`reg`保存逐元素加法结果，计算所用的输入`mask`对应位置为`0`时，`reg`的对应位置置零。寄存器/寄存器形式的返回值`mask`与`src0.mask`相同，包含标量的形式与`src.mask`相同。
+源操作数与返回值的数据类型保持一致。支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 
-## 约束说明
+## 返回值说明<a name="section640mcpsimp"></a>
 
-- 标量类型必须与寄存器元素类型一致。
-- 整型dtype加法溢出时按环绕（wrap-around）策略处理：有符号类型溢出回绕到对应dtype的最小值或最大值（MAX+1->MIN，MIN-1->MAX），无符号类型溢出回绕到0（UMAX+1->0）。
-- 浮点dtype（half、bfloat16_t、float）加法按IEEE 754浮点加法语义执行，溢出与无效输入（如nan、inf）的处理遵循浮点运算规则。
+返回逐元素求和结果，类型为reg_tensor&lt;T&gt;。reg_tensor与reg_tensor形式的返回值mask与src0.mask相同，包含标量的形式与src.mask相同；输入mask对应位置为0时，返回值的对应元素置零。
 
-## 调用示例
+## 约束说明<a name="section633mcpsimp"></a>
 
-以下示例展示接口在AIV计算函数中的典型调用方式。
+无
+
+## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
@@ -69,13 +94,9 @@ template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void add_example(InputTensor input, OutputTensor output)
 {
     using asc::te::experimental::operator+;
-    using asc::te::experimental::all_mask;
-    using asc::te::experimental::load;
-    using asc::te::experimental::store;
-
-    auto mask = all_mask<float>();
-    auto src = load(input, asc::te::make_coord(0)).with_mask(mask);
-    auto result = src + 1.0f;
-    store(output, asc::te::make_coord(0), result);
+    auto src = asc::te::experimental::load(input, asc::te::make_coord(0))
+                   .with_mask(asc::te::experimental::all_mask<float>());
+    auto dst = src + 1.0f;
+    asc::te::experimental::store(output, asc::te::make_coord(0), dst);
 }
 ```

@@ -1,77 +1,116 @@
-# subc
+# subc<a name="ZH-CN_TOPIC_TENSOR_API_SUBC"></a>
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
-- Atlas A3训练系列产品/Atlas A3推理系列产品：不支持
-- Atlas A2训练系列产品/Atlas A2推理系列产品：不支持
-- Atlas 200I/500 A2推理产品：不支持
-- Atlas推理系列产品AI Core：不支持
-- Atlas推理系列产品Vector Core：不支持
-- Atlas训练系列产品：不支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
-## 功能说明
+## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径：`"tensor_api/experimental/vector_compute.h"`。
 
-命名空间：`asc::te::experimental`。
+该接口根据src0.mask，对源操作数src0、src1进行按元素求差操作，并返回计算结果，同时将每个元素的进位结果写入carry。减法运算在硬件底层通过补码加法实现，进位结果为1表示减法未借位，为0表示减法发生借位。
 
-`subc`提供带借位输出减法，以及带借位输入和输出减法。减法通过补码加法实现，输出的进位标志为`1`表示未借位，为`0`表示发生借位。
+- 不带进位输入
 
-### 带借位输出减法
+    计算公式如下：
 
-对`src0`和`src1`按元素求差，返回结果的低32位，并通过`carry`输出每个元素的进位标志。
+    $$
+    \{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, \sim src1_i\} + 33'b1
+    $$
 
-$$
-\{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, \mathord{\sim}src1_i\} + 33'b1
-$$
+- 带进位输入和输出
 
-### 带借位输入和输出减法
+    该形式将carry_src作为输入进位，计算公式如下：
 
-使用`carry_src`中的输入进位继续进行按元素减法，返回结果的低32位，并通过`carry`输出每个元素的新进位标志。
+    $$
+    \{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, \sim src1_i\} + \{32'b0, carry\_src_i\}
+    $$
 
-$$
-\{carry_i, dst_i\} = \{1'b0, src0_i\} + \{1'b0, \mathord{\sim}src1_i\} + \{32'b0, carry\_src_i\}
-$$
+## 函数原型<a name="section620mcpsimp"></a>
 
-## 函数原型
+- 不带进位输入
 
-```cpp
-template <typename T>
-__simd_callee__ inline reg_tensor<T> subc(
-    reg_tensor<bool>& carry,
-    const reg_tensor<T>& src0,
-    const reg_tensor<T>& src1)
+    ```cpp
+    template <typename T>
+    __simd_callee__ inline reg_tensor<T> subc(
+        reg_tensor<bool>& carry,
+        const reg_tensor<T>& src0,
+        const reg_tensor<T>& src1)
+    ```
 
-template <typename T>
-__simd_callee__ inline reg_tensor<T> subc(
-    reg_tensor<bool>& carry,
-    const reg_tensor<T>& src0,
-    const reg_tensor<T>& src1,
-    const reg_tensor<bool>& carry_src)
-```
+- 带进位输入和输出
 
-## 参数说明
+    ```cpp
+    template <typename T>
+    __simd_callee__ inline reg_tensor<T> subc(
+        reg_tensor<bool>& carry,
+        const reg_tensor<T>& src0,
+        const reg_tensor<T>& src1,
+        const reg_tensor<bool>& carry_src)
+    ```
 
-| 参数名 | 输入/输出 | 描述 |
-| --- | --- | --- |
-| `T` | 模板参数 | 输入和返回值的元素类型，仅支持`uint32_t`。 |
-| `carry` | 输出 | 借位输出，类型为`reg_tensor<bool>`。对应元素为`1`表示未借位，为`0`表示发生借位；返回时`carry.mask`与`src0.mask`相同。 |
-| `src0` | 输入 | 被减数，类型为`reg_tensor<T>`。`src0.mask`标记参与计算的元素。 |
-| `src1` | 输入 | 减数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
-| `carry_src` | 可选输入 | 上一部分减法输出的进位标志，类型为`reg_tensor<bool>`。`carry_src.mask`不用于本次计算。 |
+## 参数说明<a name="section622mcpsimp"></a>
 
-## 返回值说明
+**表 1**  模板参数说明
 
-返回`reg_tensor<T>`。`reg`保存逐元素相减后的低32位；`src0.mask`对应位置为`0`时，结果的对应位置置零。返回值的`mask`与`src0.mask`相同。
+| 参数名 | 描述 |
+| --- | --- |
+| T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
-## 约束说明
+- 不带进位输入
 
-当一个大于32位的整数拆成多个32位部分进行减法时，最低32位使用不带`carry_src`的重载，其余部分从低位到高位依次使用带`carry_src`的重载。
+    **表 2**  参数说明
 
-## 调用示例
+    | 参数名 | 输入/输出 | 描述 |
+    | --- | --- | --- |
+    | carry | 输出 | 进位结果。<br>类型为reg_tensor&lt;bool&gt;。对应元素为1表示减法未借位，为0表示减法发生借位。返回时carry.mask与src0.mask相同。 |
+    | src0 | 输入 | 被减数。<br>类型为reg_tensor&lt;T&gt;。src0.mask用于指示哪些元素参与计算，对应位置为1时参与计算，为0时不参与计算。 |
+    | src1 | 输入 | 减数。<br>类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
 
-以下示例展示64位无符号整数拆分为高低两个32位部分时的减法。
+- 带进位输入和输出
+
+    **表 3**  参数说明
+
+    | 参数名 | 输入/输出 | 描述 |
+    | --- | --- | --- |
+    | carry | 输出 | 进位结果。<br>类型为reg_tensor&lt;bool&gt;。对应元素为1表示减法未借位，为0表示减法发生借位。返回时carry.mask与src0.mask相同。 |
+    | src0 | 输入 | 被减数。<br>类型为reg_tensor&lt;T&gt;。src0.mask用于指示哪些元素参与计算，对应位置为1时参与计算，为0时不参与计算。 |
+    | src1 | 输入 | 减数。<br>类型为reg_tensor&lt;T&gt;。src1.mask不参与本次计算。 |
+    | carry_src | 输入 | 输入进位。<br>类型为reg_tensor&lt;bool&gt;。carry_src.mask不参与本次计算。 |
+
+## 数据类型
+
+src0、src1与返回值的数据类型保持一致，仅支持uint32_t。carry与carry_src的数据类型为bool。
+
+## 返回值说明<a name="section640mcpsimp"></a>
+
+返回逐元素求差结果的低32位，类型为reg_tensor&lt;T&gt;。返回值的mask与src0.mask相同；src0.mask对应位置为0时，返回值的对应元素置零。
+
+## 约束说明<a name="section633mcpsimp"></a>
+
+无
+
+## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
