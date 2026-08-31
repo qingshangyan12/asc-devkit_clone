@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`（除half、half2、bfloat16_t、bfloat16x2_t类型之外的接口）、`"simt_api/asc_fp16.h"`（half和half2类型接口）、`"simt_api/asc_bf16.h"`（bfloat16_t和bfloat16x2_t类型接口）。
+
 首先从Data Cache加载缓存数据，若未命中，则尝试从L2 Cache加载。L2 Cache与Global Memory之间的数据一致性由硬件保证，但Data Cache和Global Memory之间的数据一致性并不能保证。如果Data Cache和L2 Cache中均未找到所需数据，则从Global Memory中读取数据，然后将其缓存到L2 Cache和Data Cache中。  
 默认访存的底层实现与本接口一致，例如：
 ```cpp
@@ -204,22 +206,6 @@ inline half2 asc_ldca(half2* address)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用除half、half2、bfloat16_t、bfloat16x2_t类型之外的接口需要包含`simt_api/device_functions.h`头文件，使用half和half2类型接口需要包含`simt_api/asc_fp16.h`头文件，使用bfloat16_t和bfloat16x2_t类型接口需要包含`simt_api/asc_bf16.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_warp_functions.h"`。
+
 判断Warp中每个活跃线程的输入是否非零。
 
 当Warp内所有活跃线程执行本接口后，对所有活跃线程的输入操作数predicate进行判断，返回一个32bit的无符号整数，若Warp内活跃线程输入的predicate不为0，则返回值中与线程Lane ID对应的bit位为1，否则为0。Warp内所有活跃线程返回相同的结果。
@@ -50,14 +52,6 @@ inline uint32_t asc_ballot(int32_t predicate)
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_warp_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_warp_functions.h"
-```
 
 ## 调用示例
 

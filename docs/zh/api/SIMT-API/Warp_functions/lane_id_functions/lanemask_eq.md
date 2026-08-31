@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 获取当前线程的一个32位掩码，在当前线程所属的Warp中，只有当前线程所在的Lane位被置为1，其余位为0。
 
 如Lane ID为0的线程，调用本接口获取到32位掩码：0000 0000 0000 0000 0000 0000 0000 0001。
@@ -52,14 +54,6 @@ int32_t lanemask_eq()
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。 
-
-```cpp
-#include "simt_api/device_functions.h" 
-```
 
 ## 调用示例
 

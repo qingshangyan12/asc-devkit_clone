@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_warp_functions.h"`（除half类型之外的接口）、`"simt_api/asc_fp16.h"`（half类型接口）。
+
 对Warp内所有活跃线程输入val求最小值。Warp内所有活跃线程返回相同的结果。
 
 ## 函数原型
@@ -60,18 +62,6 @@ Warp内所有活跃线程输入val的最小值。
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用除half类型之外的接口需要包含`simt_api/device_warp_functions.h`头文件，使用half类型接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/device_warp_functions.h"
-```
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
 
 ## 调用示例
 

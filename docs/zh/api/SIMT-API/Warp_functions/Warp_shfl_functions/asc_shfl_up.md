@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_warp_functions.h"`（除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口）、`"simt_api/asc_fp16.h"`（half和half2类型接口）、`"simt_api/asc_bf16.h"`（bfloat16\_t和bfloat16x2\_t类型接口）。
+
 获取Warp内当前线程向前偏移delta（当前线程Lane ID - delta）的线程输入的用于交换的var值；如果目标线程是非活跃状态，获取到寄存器中未初始化的值。其中，参数width用于划分Warp内线程的分组。参数width设置参与交换的32个线程的分组宽度，默认值为32，即所有线程分为1组。
 
 在多个分组场景（width小于32）下，每个分组交换操作是独立的，每个线程获取本组内当前线程向前偏移delta的线程的var值。如果当前线程向前偏移delta的线程编号，即Lane ID - delta，小于所在分组的起始Lane ID，则返回当前线程的var值。
@@ -92,22 +94,6 @@ Warp内指定线程的var值。
 -   如果目标线程是非活跃状态，获取到寄存器中未初始化的值。
 -   若delta \>=width，所有线程都返回当前线程的var值。
 -   width不是2的倍数或者超出32，返回值异常。
-
-## 需要包含的头文件
-
-使用除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口需要包含`simt_api/device_warp_functions.h`头文件，使用half和half2类型接口需要包含`simt_api/asc_fp16.h`头文件，使用bfloat16\_t和bfloat16x2\_t类型接口需要包含`simt_api/asc_bf16.h`头文件。
-
-```cpp
-#include "simt_api/device_warp_functions.h"
-```
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 

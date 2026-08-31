@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`（除half、half2、bfloat16_t、bfloat16x2_t类型之外的接口）、`"simt_api/asc_fp16.h"`（half和half2类型接口）、`"simt_api/asc_bf16.h"`（bfloat16_t和bfloat16x2_t类型接口）。
+
 从L2 Cache加载缓存的数据，如果缓存命中，则直接返回数据。L2 Cache与Global Memory之间的数据一致性由硬件保证。若未命中，则从Global Memory地址预加载数据缓存至L2 Cache，并返回数据。
 
 ## 函数原型
@@ -192,22 +194,6 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用除half、half2、bfloat16_t、bfloat16x2_t类型之外的接口需要包含`simt_api/device_functions.h`头文件，使用half和half2类型接口需要包含`simt_api/asc_fp16.h`头文件，使用bfloat16_t和bfloat16x2_t类型接口需要包含`simt_api/asc_bf16.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
 
 ## 调用示例
 
