@@ -25,7 +25,6 @@ VECTOR_QUANT_SCENARIOS = (2, 4, 6)
 NZ_OUTPUT_SCENARIOS = (2, 3, 6)
 RELU_SCENARIOS = (1, 4, 6)
 
-
 def decode_quant_pre(quant_pre):
     quant_pre = int(quant_pre)
     alpha_bits = (quant_pre >> 13) & 0xFFFFF

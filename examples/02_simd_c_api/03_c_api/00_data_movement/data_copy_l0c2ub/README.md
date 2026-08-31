@@ -10,7 +10,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -41,7 +41,7 @@ data_copy_l0c2ub
 
 `SCENARIO_NUM`由CMake作为编译期宏传入，内核通过`if constexpr`选择对应场景。切换场景后，需要重新编译。
 
-设备侧数据流如下：每个K轴分块按照`GM→L1 Buffer（MTE2）→L0A Buffer/L0B Buffer（MTE1）→Mmad（M）`执行；`MTE1→MTE2`和`M→MTE1`仅用于保护下一轮分块对L1 Buffer、L0A Buffer和L0B Buffer的复用。最终建立`M→FIX`依赖，使Fixpipe在Mmad完成后通过`asc_copy_l0c2ub_sync`将L0C Buffer中的计算结果搬运到subblock0的UB；AIV侧等待UB数据就绪后仅subblock0调用`asc_copy_ub2gm_align`将结果搬运到GM用于校验。核函数结束时调用`asc_sync_pipe(PIPE_ALL)`，确保全部流水完成。
+设备侧数据流如下：每个K轴分块按照`GM→L1 Buffer（MTE2）→L0A Buffer/L0B Buffer（MTE1）→Mmad（M）`执行；`MTE1→MTE2`和`M→MTE1`仅用于保护下一轮分块对L1 Buffer、L0A Buffer和L0B Buffer的复用。最终建立`M→FIX`依赖，使Fixpipe在Mmad完成后通过`asc_copy_l0c2ub`将L0C Buffer中的计算结果搬运到subblock0的UB；AIV侧等待UB数据就绪后仅subblock0调用`asc_copy_ub2gm_align`将结果搬运到GM用于校验。核函数结束时调用`asc_sync_pipe(PIPE_ALL)`，确保全部流水完成。
 
 **场景1：int8输入、标量反量化并输出ND half**
 
