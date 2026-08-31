@@ -386,4 +386,29 @@ TEST_F(HcclSuiteAIC, ReduceScatter_CcuReduceScatterMeshMem2Mem1DPeerOnly)
     EXPECT_EQ(hccl.Wait(handleId), HCCL_SUCCESS);
 }
 
+TEST_F(HcclSuiteAIC, ReduceScatterPeerOnlyChunkParams)
+{
+    constexpr uint64_t chunkSize = 256ULL * 1024ULL * 1024ULL;
+    constexpr uint64_t alignSize = 128ULL;
+    struct TestCase {
+        uint64_t sliceSize;
+        uint64_t expectedTailSize;
+        uint64_t expectedChunkCount;
+    };
+    const TestCase cases[] = {
+        {0, 0, 0},
+        {chunkSize, chunkSize, 1},
+        {chunkSize + alignSize, alignSize, 2},
+        {2 * chunkSize, chunkSize, 2},
+    };
+
+    for (const auto& testCase : cases) {
+        uint64_t tailSize = 0;
+        uint64_t chunkLoopNum = 0;
+        CalcPeerOnlyChunkParams(testCase.sliceSize, &tailSize, &chunkLoopNum);
+        EXPECT_EQ(tailSize, testCase.expectedTailSize);
+        EXPECT_EQ(UINT64_MAX - chunkLoopNum, testCase.expectedChunkCount);
+    }
+}
+
 } // namespace
