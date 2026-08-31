@@ -97,7 +97,6 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_obeys_count_and_rank_boundaries)
     EXPECT_EQ(algName, "AicpuAllGatherSoleNHR");
 }
 
-
 TEST_F(ST_ALL_GATHER_AICPU_TEST, concurrent_executor_calculates_resources_with_host_all_gather_param)
 {
     constexpr u32 rankSize = 4U;
