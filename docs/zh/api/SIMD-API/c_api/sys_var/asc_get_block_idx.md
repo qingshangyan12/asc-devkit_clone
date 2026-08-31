@@ -26,21 +26,21 @@
 
 ## 功能说明
 
-获取当前运行核的索引。
+读取当前正在运行本kernel的block在所有启动block中的索引。block索引由运行时在kernel启动时为每个block分配，用于标识同一kernel的不同block实例，取值范围为[0, 总block数−1]，总block数由kernel启动配置决定。调用方可据此区分各block并计算各block负责处理的数据分片偏移。本接口可在AIC与AIV上调用，返回当前block的全局索引。
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline int64_t asc_get_block_idx()
 ```
 
 ## 参数说明
 
-无
+本接口无参数。
 
 ## 返回值说明
 
-当前运行核的索引。
+返回类型为`int64_t`，表示当前block的索引。该值为非负整数，取值范围为[0, 总block数−1]，总block数由kernel启动配置决定。同一kernel的不同block实例返回不同的索引值。
 
 ## 流水类型
 
@@ -48,7 +48,10 @@ PIPE_S
 
 ## 约束说明
 
-无
+- 本接口不触发硬件访存动作，仅读取运行时分配的block索引。
+- block索引由运行时在kernel启动时分配，本接口仅读取当前block的索引值，调用方不可设置或修改该值。
+- 返回值为非负整数，取值范围[0, 总block数−1]，总block数由kernel启动配置决定；调用方应按非负整数解析使用。
+- 本接口可在AIC与AIV上调用，返回值反映当前执行本kernel的block的全局索引，与所在核类型无关。
 
 ## 调用示例
 

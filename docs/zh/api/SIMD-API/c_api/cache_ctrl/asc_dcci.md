@@ -45,6 +45,23 @@ Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../sys_var/as
 针对Ascend 950PR/Ascend 950DT，不支持asc_dcci_entire_ub接口。
 <!-- end id8 -->
 
+<font color="red">
+
+头文件路径：`"c_api/cache_ctrl/cache_ctrl.h"`。
+
+数据缓存清理与失效接口，用于维护DCache数据一致性。本接口对DCache中的缓存行执行clean（将脏数据写回到Global Memory或Unified Buffer）与invalidate（置缓存行为无效）操作，按接口形态分为两类：按地址清理单条Cache Line，或按目标域清理整个DCache。
+
+本接口在以下场景下使用：当Scalar单元读取可能被其他核修改的Global Memory数据前，需先失效对应地址的Cache Line，避免读到过期数据；当Scalar单元写入Global Memory后要求写入立即对外可见时，需清理对应Cache Line，使脏数据写回到下级内存。由于硬件不保证多核间DCache一致性，本接口以软件方式维护一致性。
+
+本接口提供两种操作模式，用户按使用场景选择对应重载：
+
+- **按地址清理模式**：对`dst`指定地址所在的单条Cache Line执行clean + invalidate。适用于已知具体地址的一致性维护场景。
+- **全清理模式**：对整个DCache中按目标域（ALL/OUT/ATOMIC）过滤的所有Cache Line执行clean + invalidate。适用于需要批量清理的场景，目标域决定哪些内存域对应的Cache Line参与操作。
+
+本接口作用于本核DCache，DCache为多核独立缓存，不涉及核间共享。本接口不能与`--enable-simt`编译选项同时使用。
+
+</font>
+
 ## 函数原型
 
    ```cpp
@@ -69,6 +86,34 @@ Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../sys_var/as
 | :--- | :--- | :--- |
 | dst | 输入 | 需要刷新缓存的向量的起始地址。 |
 
+<font color="red">
+
+### 按地址清理模式
+
+**表1** 按地址清理模式参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输入 | 待清理与失效的Cache Line所在地址。`asc_dcci_single`的`dst`为Global Memory地址（`__gm__`限定），`asc_ub_dcci_single`的`dst`为Unified Buffer地址（`__ubuf__`限定）。硬件按Cache Line边界对齐定位目标行，传入地址无需满足Cache Line对齐。 |
+
+### 全清理模式
+
+**表2** 全清理模式参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| （无参数） | — | 全清理模式重载无入参，目标域由接口名决定：`asc_dcci_entire_all`操作整个DCache（目标域ALL），`asc_dcci_entire_out`操作Global Memory域对应的全部Cache Line（目标域OUT），`asc_dcci_entire_atomic`操作原子写域对应的全部Cache Line（目标域ATOMIC）。 |
+
+**表3** 全清理模式目标域取值说明
+
+| 接口名 | 目标域 | 含义 |
+|---|---|---|
+| `asc_dcci_entire_all` | ALL | 操作整个DCache中所有valid行，不按内存域过滤。 |
+| `asc_dcci_entire_out` | OUT | 仅操作Global Memory域对应的Cache Line。 |
+| `asc_dcci_entire_atomic` | ATOMIC | 仅操作原子写域对应的Cache Line。 |
+
+</font>
+
 ## 返回值说明
 
 无
@@ -80,6 +125,29 @@ PIPE_S
 ## 约束说明
 
 无
+
+<font color="red">
+
+### 通用约束
+
+- 本接口面向AIC与AIV上由Scalar单元发起的Global Memory访问场景，AIC与AIV均可调用，无AIC/AIV守护限制。
+- 本接口作用于本核DCache，DCache为多核独立缓存，多核间不共享；若其他核可能修改同一Global Memory地址的数据，需在各核分别调用本接口或配合其他缓存维护机制保证一致性。
+- 本接口为强同步指令，发起后阻塞本核DCache后续请求，直到当前clean + invalidate操作完成；调用前应确认本接口的阻塞语义可接受，避免在高吞吐访存密集区段频繁调用导致流水停顿。
+- 本接口与`--enable-simt`编译选项互斥，启用该编译选项时不可引入`cache_ctrl.h`，否则编译报错。C4
+- 按地址清理模式下，若目标Cache Line命中且为脏，硬件会先生成回写请求将脏数据写回到对应内存域，再置该行为无效；命中且非脏时直接置为无效；未命中时本接口直接完成，不产生任何操作。
+- 全清理模式下，硬件遍历整个DCache，按目标域过滤valid行：脏行先回写再置无效，非脏行直接置无效；目标域为ALL时不按内存域过滤，操作所有valid行。
+
+### 按地址清理模式约束
+
+- `dst`需为有效地址。C7
+- 按地址清理模式的tag查找放宽内存域匹配，仅按地址匹配：只要某内存域中存在持有该地址的Cache Line，均会被清理与失效，不区分该行属于哪个内存域。
+
+### 全清理模式约束
+
+- 全清理模式无入参，目标域由接口名决定，不可在运行时切换；若需对不同内存域分别清理，需分别调用对应接口。C9
+- 全清理模式下若整个DCache中无任何valid行需处理，硬件直接解除阻塞，不产生任何操作。
+
+</font>
 
 ## 调用示例
 

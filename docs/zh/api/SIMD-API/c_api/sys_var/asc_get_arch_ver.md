@@ -28,9 +28,11 @@
 
 获取当前AI处理器架构版本号。
 
+读取ARCH_VER特殊寄存器，并通过输出参数`core_version`返回当前核的核心版本字段值。该寄存器由系统控制在芯片初始化阶段配置，反映当前核的核心版本编码，kernel运行期间不期望被修改。本接口将寄存器原始值中的核心版本字段提取为`uint32_t`写入调用方提供的引用参数，常用于在kernel内根据当前核的核心版本选择不同代码分支或配置不同参数。
+
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_get_arch_ver(uint32_t& core_version)
 ```
 
@@ -40,7 +42,7 @@ __aicore__ inline void asc_get_arch_ver(uint32_t& core_version)
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| core_version | 输出 | AI处理器架构版本，数据类型uint32_t。 |
+| core_version | 输出 | AI处理器架构版本，数据类型uint32_t。接收当前核的核心版本字段值，接口返回时该参数被覆写为ARCH_VER寄存器中的核心版本字段值，调用前无需初始化。 |
 
 ## 返回值说明
 
@@ -52,8 +54,17 @@ PIPE_S
 
 ## 约束说明
 
-在调用asc_get_arch_ver接口前，需先定义core_version,调用asc_get_arch_ver接口后core_version会变成相对应架构版本号的值。
-由于硬件约束，在查看转换后的AI处理器架构版本号时需要将其打印成十六进制的数或者自行转换成十六进制的数。
+- 在调用asc_get_arch_ver接口前，需先定义core_version，调用asc_get_arch_ver接口后core_version会变成相对应架构版本号的值。
+- 由于硬件约束，在查看转换后的AI处理器架构版本号时需要将其打印成十六进制的数或者自行转换成十六进制的数。
+- 本接口为只读查询接口，不修改任何寄存器或存储状态，可在AIC与AIV上下文中调用。
+- ARCH_VER寄存器由系统控制在芯片初始化阶段配置完成，kernel运行期间不应依赖返回值发生变化。
+- 本接口仅返回ARCH_VER中的核心版本字段，不返回核ID、子块ID、Block ID等其他层级标识，调用方不应将本接口返回值用于核路由或子块路由逻辑。
+
+<font color="red">
+
+- 本接口不支持纯SIMT编译模式，在该模式下包含对应头文件会触发编译错误。
+
+</font>
 
 ## 调用示例
 

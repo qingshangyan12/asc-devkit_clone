@@ -26,21 +26,21 @@
 
 ## 功能说明
 
-获取核间同步寄存器的基地址。需要在Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步寄存器的基地址，并作为参数传入[asc_set_ffts_base_addr](asc_set_ffts_base_addr.md)后使用。
+获取核间同步寄存器（FFTS基地址寄存器）的基地址。需要在Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步寄存器的基地址，并作为参数传入[asc_set_ffts_base_addr](asc_set_ffts_base_addr.md)后使用。本接口仅读取当前核上下文中已配置的基地址值。
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline int64_t asc_get_ffts_base_addr()
 ```
 
 ## 参数说明
 
-无
+本接口无参数。
 
 ## 返回值说明
 
-核间同步寄存器的基地址。
+返回`int64_t`类型的核间同步寄存器基地址。
 
 ## 流水类型
 
@@ -48,7 +48,13 @@ PIPE_S
 
 ## 约束说明
 
-无
+- 本接口为只读查询接口，读取的是核间同步寄存器的基地址，调用方不可直接设置或修改返回的基地址值；基地址需通过[asc_set_ffts_base_addr](asc_set_ffts_base_addr.md)预先配置后方可用于核间同步。
+
+<font color="red">
+
+- 本接口不支持纯SIMT编译模式，在该模式下包含`sys_var.h`头文件会触发编译错误。
+
+</font>
 
 ## 调用示例
 

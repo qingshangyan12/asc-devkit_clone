@@ -12,6 +12,10 @@ AI Core的同步，总共分成2类：[核内同步](./intra_core_sync_overview.
 | [asc_sync_pipe](asc_sync_pipe.md) | 单流水同步：同一核内相同流水之间的同步指令（不支持PIPE_S单流水同步）。 |
 | [asc_sync_data_barrier](asc_sync_data_barrier.md) | 阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束。 |
 | [asc_lock](asc_lock.md)/[asc_unlock](asc_unlock.md) | 用于核内异步流水指令之间的同步处理，其功能类似于传统CPU中的锁机制。通过锁定指定流水再释放流水来完成流水间的同步依赖。 |
+| [asc_sync](asc_sync.md) | 全流水同步：同一核内所有流水线之间的同步，阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。 |
+| [asc_sync_vec](asc_sync_vec.md) | 单流水同步：针对PIPE_V流水线执行同步操作，保证PIPE_V流水线中前序指令全部完成后，其他流水线的后续指令才能开始执行。易用性接口，只能在AIV中调用。 |
+| [asc_sync_mte2](asc_sync_mte2.md) | 单流水同步：针对PIPE_MTE2流水线执行同步操作，保证PIPE_MTE2流水线中前序指令全部完成后，其他流水线的后续指令才能开始执行。易用性接口，只能在AIV中调用。 |
+| [asc_sync_mte3](asc_sync_mte3.md) | 单流水同步：针对PIPE_MTE3流水线执行同步操作，保证PIPE_MTE3流水线中前序指令全部完成后，其他流水线的后续指令才能开始执行。易用性接口，只能在AIV中调用。 |
 
 如图1所示，支持的四种同步控制模式的功能描述如下：
 
