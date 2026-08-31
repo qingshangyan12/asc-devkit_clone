@@ -34,18 +34,21 @@ Tensor API通过`copy`接口统一执行不同通路数据搬运。该接口用�
 
 该通路以512Byte数据分形为基本搬运单位。不同数据类型对应的分形矩阵形态如下：
 
-**表1**  数据位宽与分形矩阵形态
+**表1**  数据类型、数据位宽与分形矩阵形态
 
-| 数据位宽 | 分形矩阵形态 |
-| :--- | :--- |
-| b4 | 64 * 16 |
-| b8 | 32 * 16 |
-| b16 | 16 * 16 |
-| b32 | 8 * 16 |
+| 数据位宽 | 支持的数据类型 | 分形矩阵形态 |
+| :--- | :--- | :--- |
+| b4 | `fp4x2_e2m1_t`、`fp4x2_e1m2_t` | 64 * 16 |
+| b8 | `int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t` | 32 * 16 |
+| b16 | `int16_t`、`uint16_t`、`half`、`bfloat16_t` | 16 * 16 |
+| b32 | `int32_t`、`uint32_t`、`float` | 8 * 16 |
 
-接口支持非转置搬运和转置搬运。源张量和目的张量的layout需要匹配当前通路支持的格式组合。
+接口支持非转置搬运和转置搬运。源张量和目的张量的layout需要匹配当前通路支持的格式组合：
 
-接口支持Batch模式。Batch模式下，源张量和目的张量的layout需要在原有分形layout最前面增加Batch维，形状结构为`(b, 单矩阵形状)`，其中`b`表示Batch数量。用户可使用`make_frame_layout<zn_layout_ptn, DataType>(b, k, n)`或`make_frame_layout<nz_layout_ptn, DataType>(b, k, n)`构造带Batch维的layout。
+- 非转置搬运：`ZN -> ZN`；
+- 转置搬运：`NZ -> ZN`。
+
+接口支持Batch模式。Batch模式下，源张量和目的张量的layout需要在原有分形layout最前面增加Batch维，形状结构为`(b, 单矩阵形状)`，其中`b`表示Batch数量。源张量和目的张量的Batch数量必须一致，Batch维stride需要与单Batch数据的物理占用空间一致。用户可使用`make_frame_layout<zn_layout_ptn, DataType>(b, k, n)`或`make_frame_layout<nz_layout_ptn, DataType>(b, k, n)`构造连续的Batch layout。
 
 ## 函数原型
 
@@ -209,7 +212,7 @@ struct l1_to_l0b_trait_default {
 
 ### Batch搬运
 
-当源张量和目的张量均使用带Batch维的layout时，`copy`接口会按照Batch维描述的数据范围完成L1 Buffer到L0B Buffer的数据搬运。非转置搬运时源张量、目的张量均为`ZN`格式，转置搬运时源张量为`NZ`格式，目的张量为`ZN`格式。
+当源张量和目的张量均使用带Batch维的layout时，`copy`接口会按照Batch维描述的数据范围完成L1 Buffer到L0B Buffer的数据搬运。非转置搬运时源张量、目的张量均为`ZN`格式，转置搬运时源张量为`NZ`格式，目的张量为`ZN`格式。Batch维位于最外层，源和目的Batch数量必须一致，并且每个Batch的Batch stride应等于对应单Batch layout的物理占用空间。
 
 ## 调用示例
 

@@ -32,7 +32,7 @@ Tensor API通过`copy`接口统一执行不同通路数据搬运。该接口用�
 
 接口支持完整Tensor搬运，也支持通过`dst_coord`、`src_coord`和`copy_shape`指定目的Tensor中的起始坐标、源Tensor中的起始坐标和搬运区域的形状，执行区域搬运。
 
-该通路的数据类型固定为`fp8_e8m0_t`。左矩阵和右矩阵的缩放数据的分形排布和缩放计算关系可参考下图，其中右矩阵缩放数据是`NN`的数据格式：
+该通路的数据类型固定为`fp8_e8m0_t`。ScaleB的逻辑矩阵形状为`(K / 32, N)`，物理存储使用`NN`分形布局，单个分形大小为2 * 16。构造layout时需要根据物理分形对逻辑形状进行补齐。左矩阵和右矩阵的缩放数据的分形排布和缩放计算关系可参考下图，其中右矩阵缩放数据是`NN`的数据格式：
 
 **图1**  左矩阵和右矩阵缩放数据缩放示意图
 
@@ -150,6 +150,23 @@ struct l1_to_l0scaleb_trait_default {
 
 - 源张量和目的张量数据格式为`NN`，使用`make_frame_layout<nn_layout_ptn, _2>(...)`构造。
 - 源地址和目的地址需要满足32Byte对齐要求。
+- ScaleB的逻辑形状为`(K / 32, N)`；传入`make_frame_layout`的行列参数需要满足`NN`布局的物理分形要求，物理存储空间可能包含补齐数据。
+- ScaleB的目的地址由对应L0B矩阵地址按1/16地址编码关系推导得到，不能将普通L0B地址直接作为L0ScaleB地址使用。
+
+## Batch搬运
+
+当源张量和目的张量均使用带Batch维的`NN` layout时，`copy`接口会循环搬运每个Batch。Batch维位于最外层，源张量和目的张量的Batch数量必须一致。Batch维stride需要手动配置为对应L0矩阵单Batch的占用字节数；源张量和目的张量应使用相同的Batch stride。
+
+可以使用`make_pattern_layout`在基础`NN` layout外增加Batch维，并手动设置Batch stride：
+
+```cpp
+auto single_layout = make_frame_layout<nn_layout_ptn, _2>(scale_k, n);
+using layout_trait = get_layout_trait<decltype(single_layout)>;
+auto batch_layout = make_pattern_layout<nn_layout_ptn, layout_trait>(
+    make_shape(batch, single_layout.shape()), make_stride(l0_matrix_batch_bytes, single_layout.stride()));
+```
+
+其中`l0_matrix_batch_bytes`为对应L0B矩阵单Batch的占用字节数。示例中的`scale_k`表示物理`NN` layout的构造参数，逻辑ScaleB的K维度仍按`K / 32`理解。
 
 ## 调用示例
 
@@ -172,6 +189,38 @@ __aicore__ inline void copy_l1_to_l0scaleb_example()
     // ScaleB地址由右矩阵的L0B Buffer地址按1/16地址编码换算得到。
     auto l0scaleb_ptr = make_mem_ptr<location::l0scaleb, fp8_e8m0_t>(reinterpret_cast<uint64_t>(l0b_buf) / 16);
     auto l0scaleb_tensor = make_tensor(l0scaleb_ptr, make_frame_layout<nn_layout_ptn, _2>(scale_k, n));
+
+    auto atom = make_copy(copy_l1_to_l0scaleb{}, l1_to_l0scaleb_trait_default{});
+    copy(atom, l0scaleb_tensor, l1_tensor);
+}
+```
+
+Batch模式示例如下。此示例使用手动配置的Batch stride，`l0_matrix_batch_bytes`应替换为对应L0B矩阵单Batch的实际占用字节数。
+
+```cpp
+#include "tensor_api/tensor.h"
+
+using namespace asc::te;
+
+__aicore__ inline void copy_l1_to_l0scaleb_batch_example()
+{
+    constexpr uint32_t batch = 2;
+    constexpr uint32_t k = 32;
+    constexpr uint32_t n = 16;
+    constexpr uint32_t scale_k = k / 16;
+    constexpr uint32_t l0_matrix_batch_bytes = 512;
+
+    __cbuf__ fp8_e8m0_t l1_buf[batch * l0_matrix_batch_bytes];
+    __cb__ fp8_e5m2_t l0b_buf[batch * l0_matrix_batch_bytes];
+
+    auto single_layout = make_frame_layout<nn_layout_ptn, _2>(scale_k, n);
+    using layout_trait = get_layout_trait<decltype(single_layout)>;
+    auto batch_layout = make_pattern_layout<nn_layout_ptn, layout_trait>(
+        make_shape(batch, single_layout.shape()), make_stride(l0_matrix_batch_bytes, single_layout.stride()));
+
+    auto l1_tensor = make_tensor(make_mem_ptr<location::l1>(l1_buf), batch_layout);
+    auto l0scaleb_ptr = make_mem_ptr<location::l0scaleb, fp8_e8m0_t>(reinterpret_cast<uint64_t>(l0b_buf) / 16);
+    auto l0scaleb_tensor = make_tensor(l0scaleb_ptr, batch_layout);
 
     auto atom = make_copy(copy_l1_to_l0scaleb{}, l1_to_l0scaleb_trait_default{});
     copy(atom, l0scaleb_tensor, l1_tensor);
