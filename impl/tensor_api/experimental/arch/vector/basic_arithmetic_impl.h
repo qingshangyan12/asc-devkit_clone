@@ -158,10 +158,10 @@ __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add(
+__simd_callee__ inline reg_tensor<T> addc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_carry_v<T>, "add with carry supports int32_t and uint32_t");
+    static_assert(detail::supports_carry_v<T>, "addc does not support this element type");
     reg_tensor<T> dst;
     asc_add(carry.reg, dst.reg, src0.reg, src1.reg, src0.mask);
     carry.mask = src0.mask;
@@ -170,11 +170,11 @@ __simd_callee__ inline reg_tensor<T> add(
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add_c(
+__simd_callee__ inline reg_tensor<T> addc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
     const reg_tensor<bool>& carry_src)
 {
-    static_assert(detail::supports_carry_v<T>, "add_c supports int32_t and uint32_t");
+    static_assert(detail::supports_carry_v<T>, "addc does not support this element type");
     reg_tensor<T> dst;
     asc_addc(carry.reg, dst.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
     carry.mask = src0.mask;
@@ -199,10 +199,10 @@ __simd_callee__ inline decltype(auto) operator-(const T& a, const U& b)
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sub(
+__simd_callee__ inline reg_tensor<T> subc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_carry_v<T>, "sub with carry supports int32_t and uint32_t");
+    static_assert(detail::supports_carry_v<T>, "subc does not support this element type");
     reg_tensor<T> dst;
     asc_sub(carry.reg, dst.reg, src0.reg, src1.reg, src0.mask);
     carry.mask = src0.mask;
@@ -211,11 +211,11 @@ __simd_callee__ inline reg_tensor<T> sub(
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sub_c(
+__simd_callee__ inline reg_tensor<T> subc(
     reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
     const reg_tensor<bool>& carry_src)
 {
-    static_assert(detail::supports_carry_v<T>, "sub_c supports int32_t and uint32_t");
+    static_assert(detail::supports_carry_v<T>, "subc does not support this element type");
     reg_tensor<T> dst;
     asc_subc(carry.reg, dst.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
     carry.mask = src0.mask;
@@ -260,19 +260,13 @@ __simd_callee__ inline reg_tensor<T> mull(
     return low;
 }
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    using elem_type = detail::binary_elem_t<T, U>;
-    detail::check_binary_reg_types<T, U>();
-    static_assert(detail::supports_div_v<elem_type>, "operator/ does not support this element type");
-
-    vector_bool mask = detail::binary_mask(a, b);
-    auto left = detail::make_reg_operand<elem_type>(a, mask);
-    auto right = detail::make_reg_operand<elem_type>(b, mask);
-    reg_tensor<elem_type> dst;
-    asc_div(dst.reg, left.reg, right.reg, mask);
-    dst.mask = mask;
+    static_assert(detail::supports_div_v<T>, "operator/ does not support this element type");
+    reg_tensor<T> dst;
+    asc_div(dst.reg, src0.reg, src1.reg, src0.mask);
+    dst.mask = src0.mask;
     return dst;
 }
 
@@ -296,20 +290,30 @@ __simd_callee__ inline decltype(auto) max(const T& a, const U& b)
     return dst;
 }
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) min(const T& a, const U& b)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    using elem_type = detail::binary_elem_t<T, U>;
-    detail::check_binary_reg_types<T, U>();
-    static_assert(detail::supports_min_max_v<elem_type>, "min does not support this element type");
-
-    vector_bool mask = detail::binary_mask(a, b);
-    auto left = detail::make_reg_operand<elem_type>(a, mask);
-    auto right = detail::make_reg_operand<elem_type>(b, mask);
-    reg_tensor<elem_type> dst;
-    asc_min(dst.reg, left.reg, right.reg, mask);
-    dst.mask = mask;
+    static_assert(detail::supports_min_max_v<T>, "min does not support this element type");
+    reg_tensor<T> dst;
+    asc_min(dst.reg, src0.reg, src1.reg, src0.mask);
+    dst.mask = src0.mask;
     return dst;
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src, const T& scalar)
+{
+    static_assert(detail::supports_min_max_v<T>, "min does not support this element type");
+    reg_tensor<T> dst;
+    asc_min_scalar(dst.reg, src.reg, scalar, src.mask);
+    dst.mask = src.mask;
+    return dst;
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> min(const T& scalar, const reg_tensor<T>& src)
+{
+    return min(src, scalar);
 }
 
 } // namespace experimental

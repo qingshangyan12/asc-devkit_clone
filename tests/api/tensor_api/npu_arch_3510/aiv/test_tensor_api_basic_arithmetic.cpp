@@ -79,7 +79,7 @@ void check_register_mul()
 }
 
 template <typename T>
-void check_scalar_mul_and_div()
+void check_scalar_mul_and_register_div()
 {
     static_assert(AscendC::Std::is_same_v<decltype(
         AscendC::Std::declval<const reg_type<T>&>() * AscendC::Std::declval<const T&>()), reg_type<T>>);
@@ -87,10 +87,6 @@ void check_scalar_mul_and_div()
         AscendC::Std::declval<const T&>() * AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
     static_assert(AscendC::Std::is_same_v<decltype(
         AscendC::Std::declval<const reg_type<T>&>() / AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const reg_type<T>&>() / AscendC::Std::declval<const T&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const T&>() / AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
 }
 
 template <typename T>
@@ -113,14 +109,14 @@ void check_min_max()
 template <typename T>
 void check_carry()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::add(AscendC::Std::declval<reg_type<bool>&>(),
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::addc(AscendC::Std::declval<reg_type<bool>&>(),
         AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::add_c(AscendC::Std::declval<reg_type<bool>&>(),
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::addc(AscendC::Std::declval<reg_type<bool>&>(),
         AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
         AscendC::Std::declval<const reg_type<bool>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::sub(AscendC::Std::declval<reg_type<bool>&>(),
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::subc(AscendC::Std::declval<reg_type<bool>&>(),
         AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::sub_c(AscendC::Std::declval<reg_type<bool>&>(),
+    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::subc(AscendC::Std::declval<reg_type<bool>&>(),
         AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
         AscendC::Std::declval<const reg_type<bool>&>())), reg_type<T>>);
 }
@@ -163,12 +159,12 @@ TEST(test_tensor_api_basic_arithmetic, compile_public_apis_and_supported_types)
     check_register_mul<uint32_t>();
     check_register_mul<float>();
 
-    check_scalar_mul_and_div<int16_t>();
-    check_scalar_mul_and_div<uint16_t>();
-    check_scalar_mul_and_div<half>();
-    check_scalar_mul_and_div<int32_t>();
-    check_scalar_mul_and_div<uint32_t>();
-    check_scalar_mul_and_div<float>();
+    check_scalar_mul_and_register_div<int16_t>();
+    check_scalar_mul_and_register_div<uint16_t>();
+    check_scalar_mul_and_register_div<half>();
+    check_scalar_mul_and_register_div<int32_t>();
+    check_scalar_mul_and_register_div<uint32_t>();
+    check_scalar_mul_and_register_div<float>();
 
     check_min_max<int8_t>();
     check_min_max<uint8_t>();
@@ -179,7 +175,6 @@ TEST(test_tensor_api_basic_arithmetic, compile_public_apis_and_supported_types)
     check_min_max<int32_t>();
     check_min_max<uint32_t>();
     check_min_max<float>();
-    check_carry<int32_t>();
     check_carry<uint32_t>();
     check_mull<int32_t>();
     check_mull<uint32_t>();

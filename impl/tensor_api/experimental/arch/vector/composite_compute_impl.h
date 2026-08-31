@@ -37,7 +37,7 @@ __simd_callee__ inline reg_tensor<T> axpy(const reg_tensor<T>& dst, const reg_te
 template <typename T>
 __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_absdiff_v<T>, "absdiff supports half and float");
+    static_assert(detail::supports_abs_diff_v<T>, "abs_diff does not support this element type");
     reg_tensor<T> dst;
     asc_abs_sub(dst.reg, src0.reg, src1.reg, src0.mask);
     dst.mask = src0.mask;
@@ -47,12 +47,10 @@ __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const r
 template <typename T>
 __simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    static_assert(detail::supports_exp_sub_v<T>, "exp_sub supports half and float");
+    static_assert(detail::supports_exp_diff_v<T>, "exp_diff does not support this element type");
     reg_tensor<float> dst;
     if constexpr (Std::is_same_v<T, half>) {
-        // Preserve the legacy half overload's PART_EVEN behavior.
-        asc_exp_sub_half2float(dst.reg, src0.reg, src1.reg, src0.mask,
-                               std::integral_constant<asc_position_mode, asc_position_mode::EVEN>{});
+        asc_exp_sub_half2float(dst.reg, src0.reg, src1.reg, src0.mask, ASC_POSITION_EVEN);
     } else {
         asc_exp_sub(dst.reg, src0.reg, src1.reg, src0.mask);
     }
@@ -67,16 +65,13 @@ __simd_callee__ inline reg_tensor<T> fma(const reg_tensor<T>& src0, const reg_te
     static_assert(detail::supports_fma_v<T>, "fma supports half and float");
     reg_tensor<T> dst = src0;
     asc_madd(dst.reg, src1.reg, src2.reg, src0.mask);
-    dst.mask = src0.mask;
     return dst;
 }
 
 __simd_callee__ inline reg_tensor<half> muls_cast(const reg_tensor<float>& src, const float& scalar)
 {
-    reg_tensor<float> product;
-    asc_mul_scalar(product.reg, src.reg, scalar, src.mask);
     reg_tensor<half> dst;
-    asc_float2half_rna(dst.reg, product.reg, src.mask, ASC_POSITION_EVEN);
+    asc_muls(dst.reg, src.reg, scalar, src.mask);
     dst.mask = src.mask;
     return dst;
 }
