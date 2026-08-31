@@ -22,7 +22,11 @@ ERROR_TOL = 1e-4
 
 
 def verify_result(scenario_num, output_path, golden_path):
-    output_dtype = np.int32 if scenario_num == 7 else (np.float16 if scenario_num in (1, 2) else np.int8)
+    output_dtype = (
+        np.float32
+        if scenario_num == 7
+        else (np.float16 if scenario_num in (1, 2) else np.int8)
+    )
     output = np.fromfile(output_path, dtype=output_dtype).reshape(-1)
     golden = np.fromfile(golden_path, dtype=output_dtype).reshape(-1)
     if output.size != golden.size:
