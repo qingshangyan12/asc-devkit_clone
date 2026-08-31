@@ -3,6 +3,7 @@
 #include "aclnn_version_test.h"
 #include "aclnn_version_test_v2.h"
 
+#define ACLNN_SUCCESS  0
 
 #ifdef __cplusplus
 extern "C" {
