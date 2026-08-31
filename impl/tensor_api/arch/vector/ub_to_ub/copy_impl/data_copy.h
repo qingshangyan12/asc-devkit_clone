@@ -9,10 +9,10 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    "impl/tensor_api/arch/vector/ub_to_ub/copy_impl/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#pragma message( \
+    "impl/tensor_api/arch/vector/ub_to_ub/copy_impl/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/tensor.h\"\" and use public functions or variables defined in interface headers files.")
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_IMPL_DATA_COPY_H
 #endif
 
 /*!
@@ -23,46 +23,57 @@
 #define IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_IMPL_DATA_COPY_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
+#include "impl/tensor_api/arch/vector/utils/copy_utils.h"
 #include "impl/tensor_api/arch/vector/ub_to_ub/copy_impl/instruction.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-struct CopyUB2UBTrait {};
-
-class CopyUbufToUbufAlignV2Common {
+class copy_ub_to_ub_common {
 protected:
-    template <typename T, typename U>
-    __aicore__ inline static void EmitCopy(
-        const T& dst, const U& src, uint16_t blockCount, uint32_t blockLen, int64_t srcStride, int64_t dstStride)
+    template <typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void emit_copy(
+        const DstTensor& dst, const SrcTensor& src, uint16_t block_count, uint32_t block_len, int64_t src_gap,
+        int64_t dst_gap)
     {
-        using SrcType = typename U::elementType;
-        using DstType = typename T::elementType;
+        using src_type = typename SrcTensor::element_type;
+        using dst_type = typename DstTensor::element_type;
 
-        if constexpr (IsB4Type<SrcType>) {
-            blockLen = blockLen >> 1;
-            srcStride = srcStride >> 1;
-        }
-
-        if constexpr (IsB4Type<DstType>) {
-            dstStride = dstStride >> 1;
-        }
+        adjust_b4_copy_params<src_type, dst_type>(block_len, src_gap, dst_gap);
 
         // Convert from bytes to 32B units for asc_copy_ub2ub
-        uint16_t blockLenIn32B = static_cast<uint16_t>(blockLen >> 5);
-        uint16_t srcStrideIn32B = static_cast<uint16_t>(srcStride >> 5);
-        uint16_t dstStrideIn32B = static_cast<uint16_t>(dstStride >> 5);
+        uint16_t block_len_in32_b = static_cast<uint16_t>(block_len >> 5);
+        uint16_t src_gap_in32_b = static_cast<uint16_t>(src_gap >> 5);
+        uint16_t dst_gap_in32_b = static_cast<uint16_t>(dst_gap >> 5);
 
-        CopyUbufToUbufInstr::DataCopy(dst, src, blockCount, blockLenIn32B, srcStrideIn32B, dstStrideIn32B);
+        copy_ub_to_ub_instr::data_copy(
+            dst.data().get(), src.data().get(), block_count, block_len_in32_b, src_gap_in32_b, dst_gap_in32_b);
+    }
+
+    template <typename T, typename U, typename DstOffset, typename SrcOffset>
+    __aicore__ inline static void emit_copy(
+        const T& dst, const U& src, const DstOffset& dst_offset, const SrcOffset& src_offset, uint16_t block_count,
+        uint32_t block_len, int64_t src_gap, int64_t dst_gap)
+    {
+        using src_type = typename U::element_type;
+        using dst_type = typename T::element_type;
+        adjust_b4_copy_params<src_type, dst_type>(block_len, src_gap, dst_gap);
+        uint16_t block_len_in32_b = static_cast<uint16_t>(block_len >> 5);
+        uint16_t src_gap_in32_b = static_cast<uint16_t>(src_gap >> 5);
+        uint16_t dst_gap_in32_b = static_cast<uint16_t>(dst_gap >> 5);
+        copy_ub_to_ub_instr::data_copy(
+            (dst.data() + dst_offset).get(), (src.data() + src_offset).get(), block_count, block_len_in32_b,
+            src_gap_in32_b, dst_gap_in32_b);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_IMPL_DATA_COPY_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#if defined( \
+    UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_IMPL_DATA_COPY_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_UB_COPY_IMPL_DATA_COPY_H
 #endif
