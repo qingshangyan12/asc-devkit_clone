@@ -112,12 +112,6 @@
 float x = input[idx];
 float index_float = x * static_cast<float>(table_length) / PI;
 uint32_t n = static_cast<uint32_t>(floorf(index_float));
-if (n >= table_length) {
-    n = table_length - 1;
-}
-if (n >= table_length) {
-    n = table_length - 1;
-}
 float frac = index_float - static_cast<float>(n);
 float low_val = sin_table[n];
 float high_val = 0.0f;
