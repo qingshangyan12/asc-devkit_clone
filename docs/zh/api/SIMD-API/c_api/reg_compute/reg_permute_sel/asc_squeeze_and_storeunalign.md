@@ -56,7 +56,7 @@ __simd_callee__ inline void asc_squeeze_and_storeunalign(
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
@@ -90,8 +90,6 @@ PIPE_V
 - 每组连续搬出操作开始前，需调用一次[asc_squeeze_and_storeunalign_init](asc_squeeze_and_storeunalign_init.md)。连续调用本接口时，需保持`dst_addr`和`src0`不变；最后一次调用后，需调用一次[asc_squeeze_and_storeunalign_finalize](asc_squeeze_and_storeunalign_finalize.md)完成收尾。
 
 ## 调用示例
-
-以下示例连续处理两个`vector_float`输入，目的UB数组的起始地址按32B对齐。掩码`PAT_M3`选择每3个元素中的第1个元素，每次选择22个元素，两次共选择44个元素，即176B。176B不是32B的整数倍，因此需调用`asc_squeeze_and_storeunalign_finalize`写入最后16B尾块。示例还将第二次调用得到的`dst`保存到`register_output`，用于验证引用输出结果。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
