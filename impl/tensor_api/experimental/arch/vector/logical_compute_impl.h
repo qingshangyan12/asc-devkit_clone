@@ -22,22 +22,13 @@ namespace asc {
 namespace te {
 namespace experimental {
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator|(const T& a, const U& b)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator|(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    using elem_type = detail::binary_elem_t<T, U>;
-    detail::check_binary_reg_types<T, U>();
-    static_assert(detail::supports_or_v<elem_type>, "operator| does not support this element type");
-    static_assert(
-        !::AscendC::Std::is_same_v<elem_type, bool> || (is_reg_tensor_v<T> && is_reg_tensor_v<U>),
-        "bool operator| requires two reg_tensor<bool> operands");
-
-    vector_bool mask = detail::binary_mask(a, b);
-    auto left = detail::make_reg_operand<elem_type>(a, mask);
-    auto right = detail::make_reg_operand<elem_type>(b, mask);
-    reg_tensor<elem_type> dst;
-    asc_or(dst.reg, left.reg, right.reg, mask);
-    dst.mask = mask;
+    static_assert(detail::supports_or_v<T>, "operator| does not support this element type");
+    reg_tensor<T> dst;
+    asc_or(dst.reg, src0.reg, src1.reg, src0.mask);
+    dst.mask = src0.mask;
     return dst;
 }
 

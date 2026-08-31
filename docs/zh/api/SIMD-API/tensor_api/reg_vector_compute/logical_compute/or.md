@@ -16,38 +16,31 @@
 
 命名空间：`asc::te::experimental`。
 
-逐元素执行按位或运算，支持寄存器与寄存器、寄存器与标量、标量与寄存器三种形式。
+对`src0`和`src1`按元素执行按位或运算。
 
 $$
-dst_i = a_i \,\mathbin{|}\, b_i
+dst_i = src0_i \,\mathbin{|}\, src1_i
 $$
 
 ## 函数原型
 
 ```cpp
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator|(const T& a, const U& b)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator|(
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 ```
 
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `a` | 输入 | 左操作数，可以是`reg_tensor`或标量。`a`为`reg_tensor`时，`a.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| `b` | 输入 | 右操作数，可以是与`a`元素类型相同的`reg_tensor`或可转换为该元素类型的标量。`a`为标量时，使用`b.mask`标记参与计算的元素。`a`和`b`均为`reg_tensor`时，`b.mask`不用于本次计算。 |
-
-`bool`类型要求`a`和`b`均为`reg_tensor<bool>`，接口使用`a.mask`标记参与计算的元素。
-
-## 支持的数据类型
-
-| 操作数组合 | 寄存器元素类型 |
-| --- | --- |
-| 寄存器/寄存器 | `bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float` |
-| 寄存器/标量、标量/寄存器 | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float` |
+| `T` | 模板参数 | 输入和返回值的元素类型，支持`bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`。 |
+| `src0` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| `src1` | 输入 | 源操作数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
 
 ## 返回值说明
 
-返回与寄存器操作数元素类型相同的`reg_tensor`。`reg`保存逐元素按位或结果，计算所用的输入`mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与本次计算所用的输入`mask`相同。
+返回`reg_tensor<T>`。`reg`保存逐元素按位或结果，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。
 
 ## 约束说明
 
@@ -62,7 +55,7 @@ __simd_callee__ inline decltype(auto) operator|(const T& a, const U& b)
 #include "tensor_api/experimental/vector_compute.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void bit_or_example(
+__simd_vf__ inline void or_example(
     InputTensor input0, InputTensor input1, OutputTensor output)
 {
     using asc::te::experimental::operator|;

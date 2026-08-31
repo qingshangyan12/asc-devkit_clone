@@ -50,26 +50,6 @@ __aicore__ inline void TestAdd()
 }
 
 template <typename T>
-__aicore__ inline void TestAddc()
-{
-    RegTensor<T> src0{};
-    RegTensor<T> src1{};
-    RegTensor<bool> carry_src{};
-    RegTensor<bool> carry{};
-    RegTensor<bool> carry_with_input{};
-    src0.mask = asc::te::experimental::all_mask<T>().reg;
-
-    auto dst = asc::te::experimental::addc(carry, src0, src1);
-    auto dst_with_input = asc::te::experimental::addc(carry_with_input, src0, src1, carry_src);
-    static_assert(AscendC::Std::is_same_v<decltype(dst), RegTensor<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(dst_with_input), RegTensor<T>>);
-    EXPECT_EQ(dst.mask, src0.mask);
-    EXPECT_EQ(carry.mask, src0.mask);
-    EXPECT_EQ(dst_with_input.mask, src0.mask);
-    EXPECT_EQ(carry_with_input.mask, src0.mask);
-}
-
-template <typename T>
 __aicore__ inline void TestSub()
 {
     RegTensor<T> src0{};
@@ -151,18 +131,11 @@ __aicore__ inline void TestBitOr()
 {
     RegTensor<T> src0{};
     RegTensor<T> src1{};
-    T scalar{};
     src0.mask = asc::te::experimental::all_mask<T>().reg;
 
-    auto reg_dst = src0 | src1;
-    auto right_scalar_dst = src0 | scalar;
-    auto left_scalar_dst = scalar | src0;
-    static_assert(AscendC::Std::is_same_v<decltype(reg_dst), RegTensor<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(right_scalar_dst), RegTensor<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(left_scalar_dst), RegTensor<T>>);
-    EXPECT_EQ(reg_dst.mask, src0.mask);
-    EXPECT_EQ(right_scalar_dst.mask, src0.mask);
-    EXPECT_EQ(left_scalar_dst.mask, src0.mask);
+    auto dst = src0 | src1;
+    static_assert(AscendC::Std::is_same_v<decltype(dst), RegTensor<T>>);
+    EXPECT_EQ(dst.mask, src0.mask);
 }
 
 template <typename T>
@@ -186,10 +159,11 @@ __aicore__ inline void TestBitOrBool()
 
 REG_VECTOR_COMPUTE_TEST(Log, float)
 REG_VECTOR_COMPUTE_TEST(Add, float)
-REG_VECTOR_COMPUTE_TEST(Addc, uint32_t)
 REG_VECTOR_COMPUTE_TEST(Sub, float)
 REG_VECTOR_COMPUTE_TEST(Subc, uint32_t)
 REG_VECTOR_COMPUTE_TEST(Mul, int16_t)
 REG_VECTOR_COMPUTE_TEST(Max, float)
 REG_VECTOR_COMPUTE_TEST(BitOr, int32_t)
+REG_VECTOR_COMPUTE_TEST(BitOr, half)
+REG_VECTOR_COMPUTE_TEST(BitOr, float)
 REG_VECTOR_COMPUTE_TEST(BitOrBool, bool)

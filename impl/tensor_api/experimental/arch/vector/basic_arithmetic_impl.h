@@ -24,7 +24,7 @@ namespace experimental {
 template <typename T>
 __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src)
 {
-    static_assert(detail::supports_float_math_v<T>, "log supports half and float");
+    static_assert(detail::supports_float_math_v<T>, "log does not support this element type");
     reg_tensor<T> dst;
     asc_ln(dst.reg, src.reg, src.mask);
     dst.mask = src.mask;
@@ -58,29 +58,6 @@ __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor
     reg_tensor<T> dst;
     asc_add_scalar(dst.reg, src.reg, scalar, src.mask);
     dst.mask = src.mask;
-    return dst;
-}
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> addc(reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
-{
-    static_assert(detail::supports_carry_v<T>, "addc supports uint32_t");
-    reg_tensor<T> dst;
-    asc_add(carry.reg, dst.reg, src0.reg, src1.reg, src0.mask);
-    carry.mask = src0.mask;
-    dst.mask = src0.mask;
-    return dst;
-}
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> addc(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src)
-{
-    static_assert(detail::supports_carry_v<T>, "addc supports uint32_t");
-    reg_tensor<T> dst;
-    asc_addc(carry.reg, dst.reg, src0.reg, src1.reg, carry_src.reg, src0.mask);
-    carry.mask = src0.mask;
-    dst.mask = src0.mask;
     return dst;
 }
 
