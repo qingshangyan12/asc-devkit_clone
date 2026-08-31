@@ -44,7 +44,7 @@ fill
 Perform the following steps in the example root directory to build and run the example.
 
 - Configure environment variables  
-  Configure the environment variables according to the CANN development kit [installation instructions](../../../../../docs/en/quick_start.md#prepare&install). **Currently, only [CANN master](../../../../../docs/en/quick_start.md#cann-install) is supported.**
+  Configure the environment variables according to the CANN development kit [installation instructions](../../../../../../docs/en/quick_start.md#prepare&install). **Currently, only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
 
   > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, the default directory is `/usr/local/Ascend`.
 
