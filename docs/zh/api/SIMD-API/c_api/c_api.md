@@ -390,6 +390,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_gather_datablock](reg_compute/ub_gather/asc_gather_datablock.md)|给定源操作数在UB中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。|`c_api/reg_compute/gather/ub_gather.h`|
 
 ### Reg聚合
+
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_gather](reg_compute/reg_gather/asc_gather.md)|根据索引位置index将源操作数src按元素收集到目的操作数dst中（寄存器源收集模式）。|`c_api/reg_compute/compute/reg_gather.h`|
