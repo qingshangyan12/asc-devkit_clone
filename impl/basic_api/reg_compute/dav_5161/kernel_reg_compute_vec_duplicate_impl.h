@@ -30,36 +30,20 @@
 
 namespace AscendC {
 namespace Reg {
-// template <typename T, typename U>
-// __simd_callee__ inline void DuplicateComplexTraitTwoImpl(U& dstReg, T scalarValue)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(
-//         SupportType<ActualT, complex32, complex64>(), "current data type is not supported on current device!");
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo for DuplicateComplexTraitTwoImpl");
-//     ActualT scalarAux(scalarValue);
-//     vbr((RegTensor<typename ActualT::EleType>&)dstReg.reg[0], scalarAux.real);
-//     vbr((RegTensor<typename ActualT::EleType>&)dstReg.reg[1], scalarAux.imag);
-// }
-
 template <typename T, typename U>
 __simd_callee__ inline void DuplicateB64Impl(U& dstReg, T scalarValue)
 {
     using ActualT = typename U::ActualT;
     static_assert(sizeof(ActualT) == 8, "data type should be B64");
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo for DuplicateB64Impl");
-    // if constexpr (SupportType<ActualT, complex64>()) {
-    //     DuplicateComplexTraitTwoImpl(dstReg, scalarValue);
-    // } else {
-        vbr((RegTensor<uint32_t>&)dstReg.reg[0], static_cast<uint32_t>(scalarValue));
-        if constexpr (sizeof(T) == 8) {
-            vbr((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 32));
-        } else if constexpr (IsSameType<T, uint32_t>::value) {
-            vbr((RegTensor<uint32_t>&)dstReg.reg[1], 0);
-        } else {
-            vbr((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 31));
-        }
-    // }
+    vbr((RegTensor<uint32_t>&)dstReg.reg[0], static_cast<uint32_t>(scalarValue));
+    if constexpr (sizeof(T) == 8) {
+        vbr((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 32));
+    } else if constexpr (IsSameType<T, uint32_t>::value) {
+        vbr((RegTensor<uint32_t>&)dstReg.reg[1], 0);
+    } else {
+        vbr((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 31));
+    }
 }
 
 template <typename T = DefaultType, typename U, typename S>
@@ -82,17 +66,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue)
         IsSameType<ActualT, fp8_e5m2_t>::value || IsSameType<ActualT, fp8_e4m3fn_t>::value) {
         vbr((RegTensor<int8_t>&)dstReg, (int8_t&)scalarValue);
     } else if constexpr (sizeof(ActualT) != 8) {
-        // if constexpr (SupportType<ActualT, complex32>()) {
-        //     if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
-        //         RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-        //         DuplicateComplexTraitTwoImpl(traitTwoDstReg, scalarValue);
-        //         B32TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-        //     } else {
-        //         DuplicateComplexTraitTwoImpl(dstReg, scalarValue);
-        //     }
-        // } else {
-            vbr(dstReg, (ActualT)scalarValue);
-        // }
+        vbr(dstReg, (ActualT)scalarValue);
     } else {
         if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
@@ -104,19 +78,6 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue)
     }
 }
 
-// template <MaskMergeMode mode = MaskMergeMode::ZEROING, typename T, typename U>
-// __simd_callee__ inline void DuplicateComplexTraitTwoImpl(U& dstReg, T scalarValue, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(
-//         SupportType<ActualT, complex32, complex64>(), "current data type is not supported on current device!");
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo for DuplicateComplexTraitTwoImpl");
-//     ActualT scalarAux(scalarValue);
-//     constexpr auto modeValue = GetMaskMergeMode<mode>();
-//     vdup((RegTensor<typename ActualT::EleType>&)dstReg.reg[0], scalarAux.real, mask, modeValue);
-//     vdup((RegTensor<typename ActualT::EleType>&)dstReg.reg[1], scalarAux.imag, mask, modeValue);
-// }
-
 template <MaskMergeMode mode = MaskMergeMode::ZEROING, typename T, typename U>
 __simd_callee__ inline void DuplicateB64Impl(U& dstReg, T scalarValue, MaskReg& mask)
 {
@@ -124,18 +85,14 @@ __simd_callee__ inline void DuplicateB64Impl(U& dstReg, T scalarValue, MaskReg& 
     static_assert(sizeof(ActualT) == 8, "data type should be B64");
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo for DuplicateB64Impl");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-    // if constexpr (SupportType<ActualT, complex64>()) {
-    //     DuplicateComplexTraitTwoImpl(dstReg, scalarValue, mask);
-    // } else {
-        vdup((RegTensor<uint32_t>&)dstReg.reg[0], static_cast<uint32_t>(scalarValue), mask, modeValue);
-        if constexpr (sizeof(T) == 8) {
-            vdup((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 32), mask, modeValue);
-        } else if constexpr (IsSameType<T, uint32_t>::value) {
-            vdup((RegTensor<uint32_t>&)dstReg.reg[1], 0, mask, modeValue);
-        } else {
-            vdup((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 31), mask, modeValue);
-        }
-    // }
+    vdup((RegTensor<uint32_t>&)dstReg.reg[0], static_cast<uint32_t>(scalarValue), mask, modeValue);
+    if constexpr (sizeof(T) == 8) {
+        vdup((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 32), mask, modeValue);
+    } else if constexpr (IsSameType<T, uint32_t>::value) {
+        vdup((RegTensor<uint32_t>&)dstReg.reg[1], 0, mask, modeValue);
+    } else {
+        vdup((RegTensor<uint32_t>&)dstReg.reg[1], static_cast<uint32_t>(scalarValue >> 31), mask, modeValue);
+    }
 }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U, typename S>
@@ -161,19 +118,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue, MaskReg& mas
         IsSameType<ActualT, fp8_e5m2_t>::value || IsSameType<ActualT, fp8_e4m3fn_t>::value) {
         vdup((RegTensor<int8_t>&)dstReg, (int8_t&)scalarValue, mask, modeValue);
     } else if constexpr (sizeof(ActualT) != 8) {
-        // if constexpr (IsSameType<ActualT, complex32>::value) {
-        //     if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
-        //         MaskReg maskTrait2;
-        //         MaskPack(maskTrait2, mask);
-        //         RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-        //         DuplicateComplexTraitTwoImpl(traitTwoDstReg, scalarValue, maskTrait2);
-        //         B32TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-        //     } else {
-        //         DuplicateComplexTraitTwoImpl(dstReg, scalarValue, mask);
-        //     }
-        // } else {
-            vdup(dstReg, (ActualT)scalarValue, mask, modeValue);
-        // }
+        vdup(dstReg, (ActualT)scalarValue, mask, modeValue);
     } else {
         if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
             MaskReg maskTrait2;
@@ -194,37 +139,16 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue, MaskReg& mas
     }
 }
 
-// template <HighLowPart pos = HighLowPart::LOWEST, MaskMergeMode mode = MaskMergeMode::ZEROING, typename T>
-// __simd_callee__ inline void DuplicateComplexTraitTwoImpl(T& dstReg, T& srcReg, MaskReg& mask)
-// {
-//     using ActualT = typename T::ActualT;
-//     static_assert(
-//         SupportType<ActualT, complex32, complex64>(), "current data type is not supported on current device!");
-//     static_assert(CheckRegTrait<T, RegTraitNumTwo>(), "T should be RegTraitNumTwo for DuplicateComplexTraitTwoImpl");
-//     constexpr auto posValue = std::integral_constant<::Pos, static_cast<::Pos>(pos)>();
-//     constexpr auto modeValue = GetMaskMergeMode<mode>();
-//     vdup(
-//         (RegTensor<typename ActualT::EleType>&)dstReg.reg[0], (RegTensor<typename ActualT::EleType>&)srcReg.reg[0],
-//         mask, posValue, modeValue);
-//     vdup(
-//         (RegTensor<typename ActualT::EleType>&)dstReg.reg[1], (RegTensor<typename ActualT::EleType>&)srcReg.reg[1],
-//         mask, posValue, modeValue);
-// }
-
 template <HighLowPart pos = HighLowPart::LOWEST, MaskMergeMode mode = MaskMergeMode::ZEROING, typename T>
 __simd_callee__ inline void DuplicateB64Impl(T& dstReg, T& srcReg, MaskReg& mask)
 {
     using ActualT = typename T::ActualT;
     static_assert(sizeof(ActualT) == 8, "data type should be B64");
     static_assert(CheckRegTrait<T, RegTraitNumTwo>(), "T should be RegTraitNumTwo for DuplicateB64Impl");
-    // if constexpr (SupportType<ActualT, complex64>()) {
-    //     DuplicateComplexTraitTwoImpl(dstReg, srcReg, mask);
-    // } else {
-        constexpr auto posValue = std::integral_constant<::Pos, static_cast<::Pos>(pos)>();
-        constexpr auto modeValue = GetMaskMergeMode<mode>();
-        vdup((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], mask, posValue, modeValue);
-        vdup((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, posValue, modeValue);
-    // }
+    constexpr auto posValue = std::integral_constant<::Pos, static_cast<::Pos>(pos)>();
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    vdup((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], mask, posValue, modeValue);
+    vdup((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, posValue, modeValue);
 }
 
 template <
@@ -252,21 +176,7 @@ __simd_callee__ inline void DuplicateImpl(U& dstReg, U& srcReg, MaskReg& mask)
         IsSameType<ActualT, fp8_e5m2_t>::value || IsSameType<ActualT, fp8_e4m3fn_t>::value) {
         vdup((RegTensor<int8_t>&)dstReg, (RegTensor<int8_t>&)srcReg, mask, posValue, modeValue);
     } else if constexpr (sizeof(ActualT) != 8) {
-        // if constexpr (IsSameType<ActualT, complex32>::value) {
-        //     if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
-        //         MaskReg maskTrait2;
-        //         MaskPack(maskTrait2, mask);
-        //         RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-        //         RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
-        //         B32TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
-        //         DuplicateComplexTraitTwoImpl(traitTwoDstReg, traitTwoSrcReg, maskTrait2);
-        //         B32TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-        //     } else {
-        //         DuplicateComplexTraitTwoImpl(dstReg, srcReg, mask);
-        //     }
-        // } else {
-            vdup(dstReg, srcReg, mask, posValue, modeValue);
-        // }
+        vdup(dstReg, srcReg, mask, posValue, modeValue);
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;

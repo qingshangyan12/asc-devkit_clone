@@ -138,60 +138,6 @@ __simd_callee__ inline void AbsImpl(U& dstReg, U& srcReg, MaskReg& mask)
     }
 }
 
-// template <
-//     typename T = DefaultType, typename U = DefaultType, auto mode = MaskMergeMode::ZEROING, typename S, typename V>
-// __simd_callee__ inline void ComplexAbsKernel(S& dstReg, V& srcReg, MaskReg& mask)
-// {
-//     using ActualU = typename V::ActualT;
-//     static_assert(CheckRegTrait<V, RegTraitNumTwo>(), "V should be RegTraitNumTwo");
-//     static_assert(CheckRegTrait<S, RegTraitNumOne>(), "S should be RegTraitNumOne");
-//     static_assert(
-//         Std::is_same_v<typename S::ActualT, typename ActualU::EleType>,
-//         "dst type do not match with src complex elements' type");
-
-//     RegTensor<typename ActualU::EleType>& srcReal = (RegTensor<typename ActualU::EleType>&)srcReg.reg[0];
-//     RegTensor<typename ActualU::EleType>& srcImag = (RegTensor<typename ActualU::EleType>&)srcReg.reg[1];
-//     RegTensor<typename ActualU::EleType> srcRealSquare;
-//     RegTensor<typename ActualU::EleType> srcImagSquare;
-
-//     Mul<T, mode, RegTensor<typename ActualU::EleType>>(srcRealSquare, srcReal, srcReal, mask);
-//     Mul<T, mode, RegTensor<typename ActualU::EleType>>(srcImagSquare, srcImag, srcImag, mask);
-//     Add<T, mode, RegTensor<typename ActualU::EleType>>(srcRealSquare, srcRealSquare, srcImagSquare, mask);
-//     Sqrt<T, mode, RegTensor<typename ActualU::EleType>>(dstReg, srcRealSquare, mask);
-// }
-
-// template <
-//     typename T = DefaultType, typename U = DefaultType, auto mode = MaskMergeMode::ZEROING, typename S, typename V>
-// __simd_callee__ inline void AbsImpl(S& dstReg, V& srcReg, MaskReg& mask)
-// {
-//     using ActualT = typename S::ActualT;
-//     using ActualU = typename V::ActualT;
-//     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
-//     static_assert(Std::is_same_v<U, DefaultType> || Std::is_same_v<U, ActualU>, "U type is not correct!");
-//     static_assert(
-//         SupportType<ActualU, complex32, complex64>(),
-//         "current src data type ActualU is not supported on current device!");
-//     static_assert(
-//         SupportType<ActualT, half, float>(), "current dst data type ActualT is not supported on current device!");
-//     static_assert(
-//         Std::is_same_v<ActualT, typename ActualU::EleType>, "dst type do not match with src complex elements' type");
-//     static_assert(
-//         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Abs api only supported Mode ZEROING on current device!");
-//     if constexpr (CheckRegTrait<V, RegTraitNumOne>()) {
-//         MaskReg maskTrait2;
-//         MaskPack(maskTrait2, mask);
-//         RegTensor<ActualU, RegTraitNumTwo> traitTwoSrcReg;
-//         TraitOneToTraitTwoTmpl<
-//             RegTensor<ActualU, RegTraitNumTwo>, RegTensor<ActualU, RegTraitNumOne>, typename ActualU::EleType>(
-//             traitTwoSrcReg, srcReg);
-//         ComplexAbsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumOne>, RegTensor<ActualU, RegTraitNumTwo>>(
-//             dstReg, traitTwoSrcReg, maskTrait2);
-//     } else {
-//         ComplexAbsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumOne>, RegTensor<ActualU, RegTraitNumTwo>>(
-//             dstReg, srcReg, mask);
-//     }
-// }
-
 template <MaskMergeMode mode = MaskMergeMode::ZEROING, typename T>
 __simd_callee__ inline void ReluB64Impl(T& dstReg, T& srcReg, MaskReg& mask)
 {

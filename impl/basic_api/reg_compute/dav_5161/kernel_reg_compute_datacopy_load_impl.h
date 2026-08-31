@@ -67,23 +67,13 @@ __simd_callee__ inline void DataCopyImpl(U& dstReg, __ubuf__ T* srcAddr)
                 0, dintlvDist);
         }
     } else {
-        // if constexpr (SupportType<ActualT, complex32>() && (CheckRegTrait<U, RegTraitNumTwo>())) {
-        //     constexpr auto dintlvDist =
-        //         std::integral_constant<::Dist, static_cast<::Dist>(LoadDist::DIST_DINTLV_B16)>();
-        //     vlds(
-        //         (RegTensor<uint16_t>&)dstReg.reg[0], (RegTensor<uint16_t>&)dstReg.reg[1], (__ubuf__ uint16_t*)srcAddr,
-        //         0, dintlvDist);
-        // } else {
-            static_assert(
-                SupportBytes<ActualT, 1, 2, 4, 8>(), "LoadAlign only support type b8/b16/b32/b64 on current device");
-            if constexpr (Std::is_same_v<T, bool>) {
-                vlds((RegTensor<int8_t>&)dstReg, (__ubuf__ int8_t*)srcAddr, 0, distValue);
-            // } else if constexpr (Std::is_same_v<T, complex32>) {
-            //     vlds((RegTensor<int32_t>&)dstReg, (__ubuf__ int32_t*)srcAddr, 0, distValue);
-            } else {
-                vlds(dstReg, srcAddr, 0, distValue);
-            }
-        // }
+        static_assert(
+            SupportBytes<ActualT, 1, 2, 4, 8>(), "LoadAlign only support type b8/b16/b32/b64 on current device");
+        if constexpr (Std::is_same_v<T, bool>) {
+            vlds((RegTensor<int8_t>&)dstReg, (__ubuf__ int8_t*)srcAddr, 0, distValue);
+        } else {
+            vlds(dstReg, srcAddr, 0, distValue);
+        }
     }
 }
 
@@ -111,23 +101,15 @@ __simd_callee__ inline void DataCopyImpl(U& dstReg, __ubuf__ T*& srcAddr, int32_
                 postUpdateStride * 2, dintlvDist, postValue);
         }
     } else {
-        // if constexpr (SupportType<ActualT, complex32>() && (CheckRegTrait<U, RegTraitNumTwo>())) {
-        //     constexpr auto dintlvDist =
-        //         std::integral_constant<::Dist, static_cast<::Dist>(LoadDist::DIST_DINTLV_B16)>();
-        //     vlds(
-        //         (RegTensor<uint16_t>&)dstReg.reg[0], (RegTensor<uint16_t>&)dstReg.reg[1], (__ubuf__ uint16_t*&)srcAddr,
-        //         postUpdateStride * 2, dintlvDist, postValue);
-        // } else {
-            static_assert(
-                SupportBytes<ActualT, 1, 2, 4, 8>(), "LoadAlign only support type b8/b16/b32/b64 on current device");
-            if constexpr (Std::is_same_v<T, bool>) {
-                vlds((RegTensor<int8_t>&)dstReg, (__ubuf__ int8_t*&)srcAddr, postUpdateStride, distValue, postValue);
-            } else if constexpr (SupportBytes<ActualT, 4>()) {
-                vlds((RegTensor<int32_t>&)dstReg, (__ubuf__ int32_t*&)srcAddr, postUpdateStride, distValue, postValue);
-            } else {
-                vlds(dstReg, srcAddr, postUpdateStride, distValue, postValue);
-            }
-        // }
+        static_assert(
+            SupportBytes<ActualT, 1, 2, 4, 8>(), "LoadAlign only support type b8/b16/b32/b64 on current device");
+        if constexpr (Std::is_same_v<T, bool>) {
+            vlds((RegTensor<int8_t>&)dstReg, (__ubuf__ int8_t*&)srcAddr, postUpdateStride, distValue, postValue);
+        } else if constexpr (SupportBytes<ActualT, 4>()) {
+            vlds((RegTensor<int32_t>&)dstReg, (__ubuf__ int32_t*&)srcAddr, postUpdateStride, distValue, postValue);
+        } else {
+            vlds(dstReg, srcAddr, postUpdateStride, distValue, postValue);
+        }
     }
 }
 
@@ -293,24 +275,13 @@ __simd_callee__ inline void DataCopyUnAlignImpl(U& dstReg, UnalignReg& ureg, __u
             DeInterleave((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)dstReg.reg[1], tmp1, tmp2);
         }
     } else {
-        // if constexpr (SupportType<ActualT, complex32>() && (CheckRegTrait<U, RegTraitNumTwo>())) {
-        //     RegTensor<uint16_t> tmp1;
-        //     RegTensor<uint16_t> tmp2;
-        //     constexpr uint32_t one_repeat_num = VECTOR_REG_WIDTH / sizeof(ActualT);
-        //     uint32_t tmpStride1 = (stride > one_repeat_num) ? one_repeat_num : stride;
-        //     vldus(tmp1, ureg, (__ubuf__ uint16_t*&)srcAddr, tmpStride1 * 2, postValue);
-        //     uint32_t tmpStride2 = (stride > one_repeat_num) ? stride - one_repeat_num : 0;
-        //     vldus(tmp2, ureg, (__ubuf__ uint16_t*&)srcAddr, tmpStride2 * 2, postValue);
-        //     DeInterleave((RegTensor<uint16_t>&)dstReg.reg[0], (RegTensor<uint16_t>&)dstReg.reg[1], tmp1, tmp2);
-        // } else {
-            if constexpr (Std::is_same_v<T, bool>) {
-                vldus((RegTensor<int8_t>&)dstReg, ureg, (__ubuf__ int8_t*&)srcAddr, stride, postValue);
-            } else if constexpr (SupportBytes<ActualT, 4>()) {
-                vldus((RegTensor<int32_t>&)dstReg, ureg, (__ubuf__ int32_t*&)srcAddr, stride, postValue);
-            } else {
-                vldus(dstReg, ureg, srcAddr, stride, postValue);
-            }
-        // }
+        if constexpr (Std::is_same_v<T, bool>) {
+            vldus((RegTensor<int8_t>&)dstReg, ureg, (__ubuf__ int8_t*&)srcAddr, stride, postValue);
+        } else if constexpr (SupportBytes<ActualT, 4>()) {
+            vldus((RegTensor<int32_t>&)dstReg, ureg, (__ubuf__ int32_t*&)srcAddr, stride, postValue);
+        } else {
+            vldus(dstReg, ureg, srcAddr, stride, postValue);
+        }
     }
 }
 
@@ -405,8 +376,6 @@ __simd_callee__ inline void DataCopyImpl(U& dstReg, __ubuf__ T* srcAddr, uint32_
         static_assert(SupportBytes<ActualT, 1, 2, 4>(), "LoadAlign only support type b8/b16/b32 on current device");
         if constexpr (Std::is_same_v<T, bool>) {
             vsldb((RegTensor<int8_t>&)dstReg, (__ubuf__ int8_t*)srcAddr, (dataBlockStride << 16u), mask);
-        // } else if constexpr (Std::is_same_v<T, complex32>) {
-        //     vsldb((RegTensor<int32_t>&)dstReg, (__ubuf__ int32_t*)srcAddr, (dataBlockStride << 16u), mask);
         } else {
             vsldb(dstReg, srcAddr, (dataBlockStride << 16u), mask);
         }
@@ -436,10 +405,6 @@ __simd_callee__ inline void DataCopyImpl(
                 vsldb(
                     (RegTensor<int8_t>&)dstReg, (__ubuf__ int8_t*&)srcAddr,
                     (dataBlockStride << 16u) | (repeatStride & 0xFFFFU), mask, postValue);
-            // } else if constexpr (Std::is_same_v<T, complex32>) {
-            //     vsldb(
-            //         (RegTensor<int32_t>&)dstReg, (__ubuf__ int32_t*&)srcAddr,
-            //         (dataBlockStride << 16u) | (repeatStride & 0xFFFFU), mask, postValue);
             } else {
                 vsldb(dstReg, srcAddr, (dataBlockStride << 16u) | (repeatStride & 0xFFFFU), mask, postValue);
             }

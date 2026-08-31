@@ -29,44 +29,6 @@
 
 namespace AscendC {
 namespace Reg {
-// template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
-// __simd_callee__ inline void AddsComplexTraitTwoImpl(S& dstReg, S& srcReg, const U& scalarValue, MaskReg& mask)
-// {
-//     using ActualT = typename S::ActualT;
-//     static_assert(CheckRegTrait<S, RegTraitNumTwo>(), "S should be RegTraitNumTwo");
-//     constexpr auto modeValue = GetMaskMergeMode<mode>();
-//     RegTensor<typename ActualT::EleType> realSrc1tReg;
-//     RegTensor<typename ActualT::EleType> imagSrc1Reg;
-//     ActualT scalarAux(scalarValue);
-//     Duplicate(realSrc1tReg, scalarAux.real, mask);
-//     Duplicate(imagSrc1Reg, scalarAux.imag, mask);
-
-//     vadd(
-//         (RegTensor<typename ActualT::EleType>&)dstReg.reg[0], (RegTensor<typename ActualT::EleType>&)srcReg.reg[0],
-//         realSrc1tReg, mask, modeValue);
-//     vadd(
-//         (RegTensor<typename ActualT::EleType>&)dstReg.reg[1], (RegTensor<typename ActualT::EleType>&)srcReg.reg[1],
-//         imagSrc1Reg, mask, modeValue);
-// }
-
-// template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
-// __simd_callee__ inline void AddsComplexTraitOneImpl(S& dstReg, S& srcReg, const U& scalarValue, MaskReg& mask)
-// {
-//     using ActualT = typename S::ActualT;
-//     static_assert(CheckRegTrait<S, RegTraitNumOne>(), "S should be RegTraitNumOne");
-//     constexpr auto modeValue = GetMaskMergeMode<mode>();
-//     MaskReg maskTrait2;
-//     MaskPack(maskTrait2, mask);
-//     RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
-//     RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-//     TraitOneToTraitTwoTmpl<
-//         RegTensor<ActualT, RegTraitNumTwo>, RegTensor<ActualT, RegTraitNumOne>, typename ActualT::EleType>(
-//         traitTwoSrcReg, srcReg);
-//     AddsComplexTraitTwoImpl(traitTwoDstReg, traitTwoSrcReg, scalarValue, maskTrait2);
-//     TraitTwoToTraitOneTmpl<
-//         RegTensor<ActualT, RegTraitNumOne>, RegTensor<ActualT, RegTraitNumTwo>, typename ActualT::EleType>(
-//         dstReg, traitTwoDstReg);
-// }
 
 template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
 __simd_callee__ inline void AddsImpl(S& dstReg, S& srcReg, U scalarValue, MaskReg& mask)
@@ -86,31 +48,10 @@ __simd_callee__ inline void AddsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Adds api only supported Mode ZEROING on current device!");
 
-    // if constexpr (SupportType<ActualT, complex32>()) {
-    //     if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-    //         AddsComplexTraitTwoImpl(dstReg, srcReg, scalarValue, mask);
-    //     } else {
-    //         AddsComplexTraitOneImpl(dstReg, srcReg, scalarValue, mask);
-    //     }
-    // } else if constexpr (sizeof(ActualT) == 8) {
     if constexpr (sizeof(ActualT) == 8) {
-        // if constexpr (SupportType<ActualT, complex64>()) {
-        //     if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-        //         AddsComplexTraitTwoImpl(dstReg, srcReg, scalarValue, mask);
-        //     } else {
-        //         MaskReg maskTrait2;
-        //         MaskPack(maskTrait2, mask);
-        //         RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
-        //         RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-        //         B64TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
-        //         AddsComplexTraitTwoImpl(traitTwoDstReg, traitTwoSrcReg, scalarValue, maskTrait2);
-        //         B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-        //     }
-        // } else {
-            S srcReg1;
-            Duplicate(srcReg1, scalarValue, mask);
-            Add(dstReg, srcReg, srcReg1, mask);
-        // }
+        S srcReg1;
+        Duplicate(srcReg1, scalarValue, mask);
+        Add(dstReg, srcReg, srcReg1, mask);
     } else {
         constexpr auto modeValue = GetMaskMergeMode<mode>();
         vadds(dstReg, srcReg, scalarValue, mask, modeValue);
@@ -151,8 +92,7 @@ __simd_callee__ inline void MulsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
     using ActualT = typename S::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<
-            ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, uint64_t, int64_t>(),
+        SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, uint64_t, int64_t>(),
         "current data type is not supported on current device!");
     static_assert(
         SupportType<U, uint16_t, int16_t, uint32_t, int32_t, half, float, uint64_t, int64_t>(),
@@ -162,41 +102,11 @@ __simd_callee__ inline void MulsImpl(S& dstReg, S& srcReg, U scalarValue, MaskRe
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Muls api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
     if constexpr (sizeof(ActualT) != 8) {
-        // if constexpr (SupportType<ActualT, complex32>()) {
-        //     if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-        //         MulsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumTwo>>(dstReg, srcReg, scalarValue, mask);
-        //     } else {
-        //         MaskReg maskTrait2;
-        //         MaskPack(maskTrait2, mask);
-        //         RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
-        //         RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-        //         B32TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
-        //         MulsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumTwo>>(
-        //             traitTwoDstReg, traitTwoSrcReg, scalarValue, maskTrait2);
-        //         B32TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-        //     }
-        // } else {
-            vmuls(dstReg, srcReg, scalarValue, mask, modeValue);
-        // }
+        vmuls(dstReg, srcReg, scalarValue, mask, modeValue);
     } else {
-        // if constexpr (SupportType<ActualT, complex64>()) {
-        //     if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-        //         MulsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumTwo>>(dstReg, srcReg, scalarValue, mask);
-        //     } else {
-        //         MaskReg maskTrait2;
-        //         MaskPack(maskTrait2, mask);
-        //         RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
-        //         RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-        //         B64TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
-        //         MulsKernel<T, U, mode, RegTensor<ActualT, RegTraitNumTwo>>(
-        //             traitTwoDstReg, traitTwoSrcReg, scalarValue, maskTrait2);
-        //         B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-        //     }
-        // } else {
-            S srcReg1;
-            Duplicate(srcReg1, scalarValue, mask);
-            Mul(dstReg, srcReg, srcReg1, mask);
-        // }
+        S srcReg1;
+        Duplicate(srcReg1, scalarValue, mask);
+        Mul(dstReg, srcReg, srcReg1, mask);
     }
 }
 

@@ -39,16 +39,6 @@ __aicore__ inline constexpr DivSpecificMode GetDivSpecificMode(const DivSpecific
     return {.mrgMode = sprMode->mrgMode, .precisionMode = sprMode->precisionMode, .algo = sprMode->algo};
 }
 } // namespace Internal
-// template <typename T, MaskMergeMode mode, typename U>
-// __simd_callee__ inline void AddComplexTwoRegImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-//     Add((RegTensor<typename ActualT::EleType>&)dstReg.reg[0], (RegTensor<typename ActualT::EleType>&)srcReg0.reg[0],
-//         (RegTensor<typename ActualT::EleType>&)srcReg1.reg[0], mask);
-//     Add((RegTensor<typename ActualT::EleType>&)dstReg.reg[1], (RegTensor<typename ActualT::EleType>&)srcReg0.reg[1],
-//         (RegTensor<typename ActualT::EleType>&)srcReg1.reg[1], mask);
-// }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void AddB64Impl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
@@ -56,44 +46,22 @@ __simd_callee__ inline void AddB64Impl(U& dstReg, U& srcReg0, U& srcReg1, MaskRe
     using ActualT = typename U::ActualT;
     static_assert(sizeof(ActualT) == 8, "data type should be B64");
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-    // if constexpr (SupportType<ActualT, complex64>()) {
-    //     AddComplexTwoRegImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
-    // } else {
-        MaskReg carryMask;
-        MaskReg carrySrcMask;
-        if constexpr (Std::is_same_v<ActualT, uint64_t>) {
-            Add(carryMask, (RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg0.reg[0],
-                (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
-            AddC(
-                carrySrcMask, (RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg0.reg[1],
-                (RegTensor<uint32_t>&)srcReg1.reg[1], carryMask, mask);
-        } else if constexpr (Std::is_same_v<ActualT, int64_t>) {
-            Add(carryMask, (RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)srcReg0.reg[0],
-                (RegTensor<int32_t>&)srcReg1.reg[0], mask);
-            AddC(
-                carrySrcMask, (RegTensor<int32_t>&)dstReg.reg[1], (RegTensor<int32_t>&)srcReg0.reg[1],
-                (RegTensor<int32_t>&)srcReg1.reg[1], carryMask, mask);
-        }
-    // }
+    MaskReg carryMask;
+    MaskReg carrySrcMask;
+    if constexpr (Std::is_same_v<ActualT, uint64_t>) {
+        Add(carryMask, (RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg0.reg[0],
+            (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
+        AddC(
+            carrySrcMask, (RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg0.reg[1],
+            (RegTensor<uint32_t>&)srcReg1.reg[1], carryMask, mask);
+    } else if constexpr (Std::is_same_v<ActualT, int64_t>) {
+        Add(carryMask, (RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)srcReg0.reg[0],
+            (RegTensor<int32_t>&)srcReg1.reg[0], mask);
+        AddC(
+            carrySrcMask, (RegTensor<int32_t>&)dstReg.reg[1], (RegTensor<int32_t>&)srcReg0.reg[1],
+            (RegTensor<int32_t>&)srcReg1.reg[1], carryMask, mask);
+    }
 }
-
-// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void AddComplex32OnetraitImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(sizeof(ActualT) == 4, "data type should be B32");
-//     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "U should be RegTraitNumOne");
-//     MaskReg maskTrait2;
-//     MaskPack(maskTrait2, mask);
-//     RegTensor<ActualT, RegTraitNumTwo> addTraitTwoSrcReg0;
-//     RegTensor<ActualT, RegTraitNumTwo> addTraitTwoSrcReg1;
-//     RegTensor<ActualT, RegTraitNumTwo> addTraitTwoDstReg;
-//     B32TraitOneToTraitTwo(addTraitTwoSrcReg0, srcReg0);
-//     B32TraitOneToTraitTwo(addTraitTwoSrcReg1, srcReg1);
-//     AddComplexTwoRegImpl<T, mode, RegTensor<ActualT, RegTraitNumTwo>>(
-//         addTraitTwoDstReg, addTraitTwoSrcReg0, addTraitTwoSrcReg1, maskTrait2);
-//     B32TraitTwoToTraitOne(dstReg, addTraitTwoDstReg);
-// }
 
 template <typename T, auto mode, typename U, auto func>
 __simd_callee__ inline void CalTraitOneByTransToTraitTwo(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
@@ -114,13 +82,6 @@ template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
 __simd_callee__ inline void AddOperator(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
     using ActualT = typename U::ActualT;
-    // if constexpr (SupportType<ActualT, complex32>()) {
-    //     if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-    //         AddComplexTwoRegImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
-    //     } else {
-    //         AddComplex32OnetraitImpl(dstReg, srcReg0, srcReg1, mask);
-    //     }
-    // } else if constexpr (SupportBytes<ActualT, 8>()) {
     if constexpr (SupportBytes<ActualT, 8>()) {
         if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
             U dstTemp;
@@ -166,62 +127,20 @@ __simd_callee__ inline void SubB64Impl(U& dstReg, U& srcReg0, U& srcReg1, MaskRe
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
     MaskReg carryMask;
     MaskReg carrySrcMask;
-    // if constexpr (SupportType<ActualT, complex64>()) {
-    //     SubComplex64Impl(dstReg, srcReg0, srcReg1, mask);
-    // } else {
-        if constexpr (Std::is_same_v<ActualT, uint64_t>) {
-            Sub(carryMask, (RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg0.reg[0],
-                (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
-            SubC(
-                carrySrcMask, (RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg0.reg[1],
-                (RegTensor<uint32_t>&)srcReg1.reg[1], carryMask, mask);
-        } else if constexpr (Std::is_same_v<ActualT, int64_t>) {
-            Sub(carryMask, (RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)srcReg0.reg[0],
-                (RegTensor<int32_t>&)srcReg1.reg[0], mask);
-            SubC(
-                carrySrcMask, (RegTensor<int32_t>&)dstReg.reg[1], (RegTensor<int32_t>&)srcReg0.reg[1],
-                (RegTensor<int32_t>&)srcReg1.reg[1], carryMask, mask);
-        }
-    // }
+    if constexpr (Std::is_same_v<ActualT, uint64_t>) {
+        Sub(carryMask, (RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg0.reg[0],
+            (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
+        SubC(
+            carrySrcMask, (RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg0.reg[1],
+            (RegTensor<uint32_t>&)srcReg1.reg[1], carryMask, mask);
+    } else if constexpr (Std::is_same_v<ActualT, int64_t>) {
+        Sub(carryMask, (RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)srcReg0.reg[0],
+            (RegTensor<int32_t>&)srcReg1.reg[0], mask);
+        SubC(
+            carrySrcMask, (RegTensor<int32_t>&)dstReg.reg[1], (RegTensor<int32_t>&)srcReg0.reg[1],
+            (RegTensor<int32_t>&)srcReg1.reg[1], carryMask, mask);
+    }
 }
-
-// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void SubComplex64Impl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(sizeof(ActualT) == 8, "data type should be B64");
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-//     Sub((RegTensor<float>&)dstReg.reg[0], (RegTensor<float>&)srcReg0.reg[0], (RegTensor<float>&)srcReg1.reg[0], mask);
-//     Sub((RegTensor<float>&)dstReg.reg[1], (RegTensor<float>&)srcReg0.reg[1], (RegTensor<float>&)srcReg1.reg[1], mask);
-// }
-
-// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void SubComplex32TwoImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(sizeof(ActualT) == 4, "data type should be B32");
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-//     Sub((RegTensor<half>&)dstReg.reg[0], (RegTensor<half>&)srcReg0.reg[0], (RegTensor<half>&)srcReg1.reg[0], mask);
-//     Sub((RegTensor<half>&)dstReg.reg[1], (RegTensor<half>&)srcReg0.reg[1], (RegTensor<half>&)srcReg1.reg[1], mask);
-// }
-
-// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void SubComplex32OnetraitImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(sizeof(ActualT) == 4, "data type should be B32");
-//     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "U should be RegTraitNumOne");
-//     MaskReg maskTrait2;
-//     MaskPack(maskTrait2, mask);
-//     RegTensor<ActualT, RegTraitNumTwo> subTraitTwoSrcReg0;
-//     RegTensor<ActualT, RegTraitNumTwo> subTraitTwoSrcReg1;
-//     RegTensor<ActualT, RegTraitNumTwo> subTraitTwoDstReg;
-//     B32TraitOneToTraitTwo(subTraitTwoSrcReg0, srcReg0);
-//     B32TraitOneToTraitTwo(subTraitTwoSrcReg1, srcReg1);
-//     SubComplex32TwoImpl<T, mode, RegTensor<ActualT, RegTraitNumTwo>>(
-//         subTraitTwoDstReg, subTraitTwoSrcReg0, subTraitTwoSrcReg1, maskTrait2);
-//     B32TraitTwoToTraitOne(dstReg, subTraitTwoDstReg);
-// }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void SubImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
@@ -235,13 +154,6 @@ __simd_callee__ inline void SubImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
         "current data type is not supported on current device!");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Sub api only supported Mode ZEROING on current device!");
-    // if constexpr (SupportType<ActualT, complex32>()) {
-    //     if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-    //         SubComplex32TwoImpl(dstReg, srcReg0, srcReg1, mask);
-    //     } else {
-    //         SubComplex32OnetraitImpl(dstReg, srcReg0, srcReg1, mask);
-    //     }
-    // } else if constexpr (SupportBytes<ActualT, 8>()) {
     if constexpr (SupportBytes<ActualT, 8>()) {
         if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
             U dstTemp;
@@ -265,92 +177,28 @@ __simd_callee__ inline void MulB64Impl(U& dstReg, U& srcReg0, U& srcReg1, MaskRe
     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "MulB64Impl U should be RegTraitNumTwo");
     static_assert(SupportEnum<mode, MaskMergeMode::ZEROING>(), "MulB64Impl only support Mode ZEROING");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-    // if constexpr (SupportType<ActualT, complex64>()) {
-    //     MulComplex64Impl(dstReg, srcReg0, srcReg1, mask);
-    // } else {
-        if constexpr (Std::is_same_v<ActualT, uint64_t>) {
-            Mull(
-                (RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)dstReg.reg[1],
-                (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
-            vmula(
-                (RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg0.reg[0],
-                (RegTensor<uint32_t>&)srcReg1.reg[1], mask, modeValue);
-            vmula(
-                (RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg0.reg[1],
-                (RegTensor<uint32_t>&)srcReg1.reg[0], mask, modeValue);
-        } else if constexpr (Std::is_same_v<ActualT, int64_t>) {
-            Mull(
-                (RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)dstReg.reg[1],
-                (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
-            vmula(
-                (RegTensor<int32_t>&)dstReg.reg[1], (RegTensor<int32_t>&)srcReg0.reg[0],
-                (RegTensor<int32_t>&)srcReg1.reg[1], mask, modeValue);
-            vmula(
-                (RegTensor<int32_t>&)dstReg.reg[1], (RegTensor<int32_t>&)srcReg0.reg[1],
-                (RegTensor<int32_t>&)srcReg1.reg[0], mask, modeValue);
-        }
-    // }
+    if constexpr (Std::is_same_v<ActualT, uint64_t>) {
+        Mull(
+            (RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)dstReg.reg[1],
+            (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
+        vmula(
+            (RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg0.reg[0],
+            (RegTensor<uint32_t>&)srcReg1.reg[1], mask, modeValue);
+        vmula(
+            (RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg0.reg[1],
+            (RegTensor<uint32_t>&)srcReg1.reg[0], mask, modeValue);
+    } else if constexpr (Std::is_same_v<ActualT, int64_t>) {
+        Mull(
+            (RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)dstReg.reg[1],
+            (RegTensor<uint32_t>&)srcReg0.reg[0], (RegTensor<uint32_t>&)srcReg1.reg[0], mask);
+        vmula(
+            (RegTensor<int32_t>&)dstReg.reg[1], (RegTensor<int32_t>&)srcReg0.reg[0],
+            (RegTensor<int32_t>&)srcReg1.reg[1], mask, modeValue);
+        vmula(
+            (RegTensor<int32_t>&)dstReg.reg[1], (RegTensor<int32_t>&)srcReg0.reg[1],
+            (RegTensor<int32_t>&)srcReg1.reg[0], mask, modeValue);
+    }
 }
-
-// template <typename T, MaskMergeMode mode, typename U>
-// __simd_callee__ inline void ComplexMulKernel(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-//     RegTensor<typename ActualT::EleType>& src0Real = (RegTensor<typename ActualT::EleType>&)srcReg0.reg[0];
-//     RegTensor<typename ActualT::EleType>& src0Imag = (RegTensor<typename ActualT::EleType>&)srcReg0.reg[1];
-//     RegTensor<typename ActualT::EleType>& src1Real = (RegTensor<typename ActualT::EleType>&)srcReg1.reg[0];
-//     RegTensor<typename ActualT::EleType>& src1Imag = (RegTensor<typename ActualT::EleType>&)srcReg1.reg[1];
-//     RegTensor<typename ActualT::EleType>& dstReal = (RegTensor<typename ActualT::EleType>&)dstReg.reg[0];
-//     RegTensor<typename ActualT::EleType>& dstImag = (RegTensor<typename ActualT::EleType>&)dstReg.reg[1];
-//     RegTensor<typename ActualT::EleType> e;
-//     RegTensor<typename ActualT::EleType> f;
-//     RegTensor<typename ActualT::EleType> g;
-//     RegTensor<typename ActualT::EleType> h;
-//     Mul(e, src0Real, src1Real, mask);
-//     Mul(f, src0Imag, src1Imag, mask);
-//     Mul(g, src0Imag, src1Real, mask);
-//     Mul(h, src0Real, src1Imag, mask);
-//     Sub(dstReal, e, f, mask);
-//     Add(dstImag, g, h, mask);
-// }
-
-// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void MulComplex64Impl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(sizeof(ActualT) == 8, "data type should be B64");
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-//     ComplexMulKernel<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
-// }
-
-// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void MulComplex32TwoImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(sizeof(ActualT) == 4, "data type should be B32");
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-//     ComplexMulKernel<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
-// }
-
-// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void MulComplex32OnetraitImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(sizeof(ActualT) == 4, "data type should be B32");
-//     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "U should be RegTraitNumOne");
-
-//     MaskReg maskTrait2;
-//     MaskPack(maskTrait2, mask);
-//     RegTensor<ActualT, RegTraitNumTwo> mulTraitTwoSrcReg0;
-//     RegTensor<ActualT, RegTraitNumTwo> mulTraitTwoSrcReg1;
-//     RegTensor<ActualT, RegTraitNumTwo> mulTraitTwoDstReg;
-
-//     B32TraitOneToTraitTwo(mulTraitTwoSrcReg0, srcReg0);
-//     B32TraitOneToTraitTwo(mulTraitTwoSrcReg1, srcReg1);
-//     MulComplex32TwoImpl(mulTraitTwoDstReg, mulTraitTwoSrcReg0, mulTraitTwoSrcReg1, maskTrait2);
-//     B32TraitTwoToTraitOne(dstReg, mulTraitTwoDstReg);
-// }
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void MulImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
@@ -358,18 +206,10 @@ __simd_callee__ inline void MulImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     using ActualT = typename U::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<
-            ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, uint64_t, int64_t>(),
+        SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, uint64_t, int64_t>(),
         "current data type is not supported on current device!");
     static_assert(
         SupportEnum<mode, MaskMergeMode::ZEROING>(), "current Mul api only supported Mode ZEROING on current device!");
-    // if constexpr (SupportType<ActualT, complex32>()) {
-    //     if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-    //         MulComplex32TwoImpl(dstReg, srcReg0, srcReg1, mask);
-    //     } else {
-    //         MulComplex32OnetraitImpl(dstReg, srcReg0, srcReg1, mask);
-    //     }
-    // } else if constexpr (SupportBytes<ActualT, 8>()) {
     if constexpr (SupportBytes<ActualT, 8>()) {
         if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
             U dstTemp;
@@ -404,35 +244,6 @@ __simd_callee__ inline void VbrUsingU32(T& dstReg, uint32_t highScalar, uint32_t
     vbr((RegTensor<uint32_t>&)dstReg.reg[0], highScalar);
     vbr((RegTensor<uint32_t>&)dstReg.reg[1], lowScalar);
 }
-
-// template <typename T, typename U>
-// __simd_callee__ inline void VcvtS642F32(T& vDst, U& vSrc)
-// {
-//     RegTensor<float, RegTraitNumOne> vDummy, vVcvt0Tmp1, vVcvt0Tmp2;
-//     RegTensor<int64_t, RegTraitNumTwo> vVcvt0Tmp0;
-
-//     vintlv(
-//         (RegTensor<int32_t>&)vVcvt0Tmp0.reg[0], (RegTensor<int32_t>&)vVcvt0Tmp0.reg[1],
-//         (RegTensor<int32_t>&)vSrc.reg[0], (RegTensor<int32_t>&)vSrc.reg[1]);
-//     MaskReg maskTmp = pset_b32(PAT_ALL);
-//     vcvt(vVcvt0Tmp1, (RegTensor<int64_t>&)vVcvt0Tmp0.reg[0], maskTmp, ROUND_R, PART_EVEN);
-//     vcvt(vVcvt0Tmp2, (RegTensor<int64_t>&)vVcvt0Tmp0.reg[1], maskTmp, ROUND_R, PART_EVEN);
-//     vdintlv(vDst, vDummy, vVcvt0Tmp1, vVcvt0Tmp2);
-// }
-
-// template <typename T, typename U>
-// __simd_callee__ inline void VcvtF322S64(T& vDst, U& vSrc)
-// {
-//     RegTensor<int64_t, RegTraitNumOne> vVcvt1Tmp0, vVcvt1Tmp1;
-//     RegTensor<float, RegTraitNumOne> vVcvt1Tmp2, vVcvt1Tmp3;
-//     vintlv(vVcvt1Tmp2, vVcvt1Tmp3, (RegTensor<float>&)vSrc, (RegTensor<float>&)vSrc);
-//     MaskReg maskTmp = pset_b32(PAT_ALL);
-//     vcvt(vVcvt1Tmp0, vVcvt1Tmp2, maskTmp, ROUND_Z, RS_DISABLE, PART_EVEN);
-//     vcvt(vVcvt1Tmp1, vVcvt1Tmp3, maskTmp, ROUND_Z, RS_DISABLE, PART_EVEN);
-//     vdintlv(
-//         (RegTensor<int32_t>&)vDst.reg[0], (RegTensor<int32_t>&)vDst.reg[1], (RegTensor<int32_t>&)vVcvt1Tmp0,
-//         (RegTensor<int32_t>&)vVcvt1Tmp1);
-// }
 
 template <typename T>
 __simd_callee__ inline void VnotInPlace(T& vReg, MaskReg& mask)
@@ -559,273 +370,6 @@ __simd_callee__ inline void F32PreProcess(T& vTmp4, U& vTmp3, S& vTmp2, MaskReg&
     vadds(vTmp4, (RegTensor<uint32_t>&)vTmp3, divF32Bias, mask);
 }
 
-// template <typename T>
-// __simd_callee__ inline void DivS64Impl(T& dstReg, T& srcReg0, T& srcReg1, MaskReg& mask)
-// {
-//     MaskReg startMask = mask;
-//     RegTensor<int64_t, RegTraitNumTwo> vAbsSrc0, vAbsSrc1, vTmp5;
-//     RegTensor<float, RegTraitNumOne> vTmp2, vTmp3;
-//     RegTensor<uint32_t, RegTraitNumOne> vTmp4;
-//     RegTensor<uint64_t, RegTraitNumTwo> vConstDup0, qZero, vConstDup1, vTmp6, vTmp7, vTmp8, vTmp9;
-//     MaskReg zeroMask, nonZeroMask, oriMask, nonOneMask, oneMask, signResP, ge0P;
-//     AbsUsingS32(vAbsSrc0, srcReg0, mask);
-//     AbsUsingS32(vAbsSrc1, srcReg1, mask);
-//     VbrUsingU32(vConstDup0, static_cast<uint32_t>(0), static_cast<uint32_t>(0));
-//     constexpr uint32_t u32MaxNum = 0xFFFFFFFFU;
-//     VbrUsingU32(qZero, u32MaxNum, u32MaxNum);
-//     VbrUsingU32(vConstDup1, static_cast<uint32_t>(1), static_cast<uint32_t>(0));
-//     VcmpEqUsingU32(zeroMask, srcReg1, vConstDup0, mask);
-//     pnot(nonZeroMask, zeroMask, mask);
-//     mask = nonZeroMask;
-//     VcmpEqUsingU32(oneMask, vAbsSrc1, vConstDup1, mask);
-//     pnot(nonOneMask, oneMask, mask);
-//     oriMask = mask;
-//     pand(mask, nonOneMask, nonZeroMask, mask);
-//     VcvtS642F32(vTmp2, vAbsSrc1);
-//     F32PreProcess(vTmp4, vTmp3, vTmp2, mask);
-//     VcvtF322S64(vTmp5, vTmp4);
-//     VmulUsingU32(vTmp6, vAbsSrc1, vTmp5, mask);
-//     VnotInPlace(vTmp6, mask);
-//     AddB64Impl(vTmp6, vTmp6, vConstDup1, mask);
-//     vbr(vTmp4, 0);
-//     B128Calc(vTmp5, vTmp6, vTmp4, mask);
-//     VaddUsingU32(vTmp7, vTmp5, vTmp6, mask);
-//     VmulUsingU32(vTmp6, vAbsSrc1, vTmp7, mask);
-//     VnotInPlace(vTmp6, mask);
-//     AddB64Impl(vTmp6, vTmp6, vConstDup1, mask);
-//     B128Calc(vTmp7, vTmp6, vTmp4, mask);
-//     VaddUsingU32(vTmp6, vTmp7, vTmp6, mask);
-//     B128Calc(vAbsSrc0, vTmp6, vTmp4, mask);
-//     VmulUsingU32(vTmp7, vTmp6, vAbsSrc1, mask);
-//     VsubUsingU32(vTmp7, vAbsSrc0, vTmp7, mask);
-//     VcmpGeUsingU32(ge0P, vTmp7, vAbsSrc1, mask);
-//     VsubUsingU32(vTmp8, vTmp7, vAbsSrc1, ge0P);
-//     AddB64Impl(vTmp9, vTmp6, vConstDup1, ge0P);
-//     VselUsingU32(vTmp7, vTmp8, vTmp7, ge0P);
-//     VselUsingU32(vTmp6, vTmp9, vTmp6, ge0P);
-//     VcmpGeUsingU32(ge0P, vTmp7, vAbsSrc1, mask);
-//     AddB64Impl(vTmp9, vTmp6, vConstDup1, ge0P);
-//     VselUsingU32(vTmp6, vTmp9, vTmp6, ge0P);
-//     VselUsingU32(vTmp6, vAbsSrc0, vTmp6, oneMask);
-//     mask = oriMask;
-//     DivSignCal(signResP, srcReg0, srcReg1, vTmp4, mask);
-//     MaskReg pg1 = pset_b32(PAT_ALL);
-//     VsubUsingU32(vTmp8, vConstDup0, vTmp6, pg1);
-//     VselUsingU32(vTmp6, vTmp6, vTmp8, signResP);
-//     VselUsingU32(dstReg, qZero, vTmp6, zeroMask);
-//     mask = startMask;
-// }
-
-// template <typename T>
-// __simd_callee__ inline void DivU64Impl(T& dstReg, T& srcReg0, T& srcReg1, MaskReg& mask)
-// {
-//     MaskReg beginMask = mask;
-//     MaskReg zeroMask, nonZeroMask, nonOneMask, oneMask, sDivMask, uSrc1Mask, srcCmpMask, cmpDivMask, ge0P;
-//     RegTensor<uint64_t, RegTraitNumTwo> vConstDup0, qZero, vConstDup1, vAbsSrc0, vResQ, vTmp6, vTmp7, vTmp8, vTmp9;
-//     RegTensor<int64_t, RegTraitNumTwo> vAbsSrc1, vTmp5;
-//     RegTensor<float, RegTraitNumOne> vTmp2, vTmp3;
-//     RegTensor<uint32_t, RegTraitNumOne> vTmp4;
-//     VbrUsingU32(vConstDup0, static_cast<uint32_t>(0), static_cast<uint32_t>(0));
-//     constexpr uint32_t u32MaxNum = 0xFFFFFFFFU;
-//     VbrUsingU32(qZero, u32MaxNum, u32MaxNum);
-//     VbrUsingU32(vConstDup1, static_cast<uint32_t>(1), static_cast<uint32_t>(0));
-//     VcmpEqUsingU32(zeroMask, srcReg1, vConstDup0, mask);
-//     pnot(nonZeroMask, zeroMask, mask);
-//     mask = nonZeroMask;
-//     vAbsSrc0 = srcReg0;
-//     vmov((RegTensor<int32_t>&)vAbsSrc1.reg[0], (RegTensor<int32_t>&)srcReg1.reg[0]);
-//     vmov((RegTensor<int32_t>&)vAbsSrc1.reg[1], (RegTensor<int32_t>&)srcReg1.reg[1]);
-//     constexpr uint64_t vdivU64Const = 0x7FFFFFFFFFFFFFFFULL;
-//     CompareScalar<uint64_t, CMPMODE::GT, T>(uSrc1Mask, srcReg1, vdivU64Const, mask);
-//     Compare<uint64_t, CMPMODE::GE, T>(srcCmpMask, srcReg0, srcReg1, mask);
-//     pand(cmpDivMask, srcCmpMask, uSrc1Mask, mask);
-//     Select<uint64_t, T>(vResQ, vConstDup1, vConstDup0, cmpDivMask);
-//     cmpDivMask = pset_b32(PAT_ALLF);
-//     srcCmpMask = pset_b32(PAT_ALLF);
-//     Compare<uint64_t, CMPMODE::LT, T>(srcCmpMask, srcReg0, srcReg1, mask);
-//     pand(cmpDivMask, srcCmpMask, uSrc1Mask, mask);
-//     Select<uint64_t, T>(vResQ, vConstDup0, vConstDup1, cmpDivMask);
-//     CompareScalar<uint64_t, CMPMODE::LE, T>(sDivMask, srcReg1, vdivU64Const, mask);
-//     mask = sDivMask;
-//     VcmpEqUsingU32(oneMask, vAbsSrc1, vConstDup1, mask);
-//     pnot(nonOneMask, oneMask, mask);
-//     pand(mask, nonOneMask, nonZeroMask, mask);
-//     VcvtS642F32(vTmp2, vAbsSrc1);
-//     F32PreProcess(vTmp4, vTmp3, vTmp2, mask);
-//     VcvtF322S64(vTmp5, vTmp4);
-//     VmulUsingU32(vTmp6, vAbsSrc1, vTmp5, mask);
-//     VnotInPlace(vTmp6, mask);
-//     AddB64Impl(vTmp6, vTmp6, vConstDup1, mask);
-//     vbr(vTmp4, 0);
-//     B128Calc(vTmp5, vTmp6, vTmp4, mask);
-//     VaddUsingU32(vTmp7, vTmp5, vTmp6, mask);
-//     VmulUsingU32(vTmp6, vAbsSrc1, vTmp7, mask);
-//     VnotInPlace(vTmp6, mask);
-//     AddB64Impl(vTmp6, vTmp6, vConstDup1, mask);
-//     B128Calc(vTmp7, vTmp6, vTmp4, mask);
-//     VaddUsingU32(vTmp6, vTmp7, vTmp6, mask);
-//     B128Calc(vAbsSrc0, vTmp6, vTmp4, mask);
-//     VmulUsingU32(vTmp7, vTmp6, vAbsSrc1, mask);
-//     VsubUsingU32(vTmp7, vAbsSrc0, vTmp7, mask);
-//     VcmpGeUsingU32(ge0P, vTmp7, vAbsSrc1, mask);
-//     VsubUsingU32(vTmp8, vTmp7, vAbsSrc1, mask);
-//     AddB64Impl(vTmp9, vTmp6, vConstDup1, ge0P);
-//     VselUsingU32(vTmp7, vTmp8, vTmp7, ge0P);
-//     VselUsingU32(vTmp6, vTmp9, vTmp6, ge0P);
-//     VcmpGeUsingU32(ge0P, vTmp7, vAbsSrc1, mask);
-//     AddB64Impl(vTmp9, vTmp6, vConstDup1, ge0P);
-//     VselUsingU32(vTmp6, vTmp9, vTmp6, ge0P);
-//     VselUsingU32(vTmp6, vResQ, vTmp6, uSrc1Mask);
-//     VselUsingU32(vTmp6, vAbsSrc0, vTmp6, oneMask);
-//     VselUsingU32(dstReg, qZero, vTmp6, zeroMask);
-//     mask = beginMask;
-// }
-
-// template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void ComplexDivKernel(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-//     static_assert(
-//         SupportType<ActualT, complex32, complex64>(), "current data type is not supported on current device!");
-
-//     RegTensor<typename ActualT::EleType>& src0Real = (RegTensor<typename ActualT::EleType>&)srcReg0.reg[0];
-//     RegTensor<typename ActualT::EleType>& src0Imag = (RegTensor<typename ActualT::EleType>&)srcReg0.reg[1];
-//     RegTensor<typename ActualT::EleType>& src1Real = (RegTensor<typename ActualT::EleType>&)srcReg1.reg[0];
-//     RegTensor<typename ActualT::EleType>& src1Imag = (RegTensor<typename ActualT::EleType>&)srcReg1.reg[1];
-//     RegTensor<typename ActualT::EleType>& dstReal = (RegTensor<typename ActualT::EleType>&)dstReg.reg[0];
-//     RegTensor<typename ActualT::EleType>& dstImag = (RegTensor<typename ActualT::EleType>&)dstReg.reg[1];
-//     RegTensor<typename ActualT::EleType> absSrc1Real;
-//     RegTensor<typename ActualT::EleType> absSrc1Imag;
-//     RegTensor<typename ActualT::EleType> dstRealTmp;
-//     RegTensor<typename ActualT::EleType> dstImagTmp;
-//     // abs_c
-//     Abs(absSrc1Real, src1Real, mask);
-//     // abs_d
-//     Abs(absSrc1Imag, src1Imag, mask);
-//     RegTensor<typename ActualT::EleType> one;
-//     RegTensor<typename ActualT::EleType> zero;
-//     Reg::Duplicate<typename ActualT::EleType, typename ActualT::EleType, RegTensor<typename ActualT::EleType>>(
-//         one, 1.0f);
-//     Reg::Duplicate<typename ActualT::EleType, typename ActualT::EleType, RegTensor<typename ActualT::EleType>>(
-//         zero, 0.0f);
-//     MaskReg maskFull = Reg::CreateMask<typename ActualT::EleType, Reg::MaskPattern::ALL>();
-
-//     // condition : if abs_c >= abs_d
-//     MaskReg compareAbsCDMask;
-//     Compare<typename ActualT::EleType, CMPMODE::GE, RegTensor<typename ActualT::EleType>>(
-//         compareAbsCDMask, absSrc1Real, absSrc1Imag, mask);
-//     // condition : if abs_c < abs_d
-//     MaskReg compareAbsCDMaskNot;
-//     MaskNot(compareAbsCDMaskNot, compareAbsCDMask, maskFull);
-//     // condition: abs_c == 0 && abs_d == 0
-//     MaskReg equalZero;
-//     Compare<typename ActualT::EleType, CMPMODE::EQ, RegTensor<typename ActualT::EleType>>(
-//         equalZero, absSrc1Real, zero, compareAbsCDMask);
-//     Compare<typename ActualT::EleType, CMPMODE::EQ, RegTensor<typename ActualT::EleType>>(
-//         equalZero, absSrc1Imag, zero, equalZero);
-//     RegTensor<typename ActualT::EleType> dstRealTmp0;
-//     RegTensor<typename ActualT::EleType> dstImagTmp0;
-//     Div<typename ActualT::EleType, mode, RegTensor<typename ActualT::EleType>>(
-//         dstRealTmp0, src0Real, absSrc1Real, equalZero);
-//     Select(dstRealTmp, dstRealTmp0, zero, equalZero);
-//     Div<typename ActualT::EleType, mode, RegTensor<typename ActualT::EleType>>(
-//         dstImagTmp0, src0Imag, absSrc1Imag, equalZero);
-//     Select(dstImagTmp, dstImagTmp0, zero, equalZero);
-
-//     // abs_c >= abs_d && !(abs_c == 0 && abs_d == 0)
-//     MaskNot(compareAbsCDMask, equalZero, compareAbsCDMask);
-//     RegTensor<typename ActualT::EleType> rat;
-//     // formula: rat = d / c
-//     Div<typename ActualT::EleType, mode, RegTensor<typename ActualT::EleType>>(
-//         rat, src1Imag, src1Real, compareAbsCDMask);
-//     RegTensor<typename ActualT::EleType> dMulRat;
-//     // formula: d*rat
-//     Mul(dMulRat, src1Imag, rat, compareAbsCDMask);
-//     // formula: c + d*rat
-//     Add(dMulRat, src1Real, dMulRat, compareAbsCDMask);
-//     // formula: scl = 1/(c + d*rat)
-//     Div<typename ActualT::EleType, mode, RegTensor<typename ActualT::EleType>>(dMulRat, one, dMulRat, compareAbsCDMask);
-//     RegTensor<typename ActualT::EleType> bMulRat;
-//     // formula: b * rat
-//     Mul(bMulRat, src0Imag, rat, compareAbsCDMask);
-//     // formula: a + b*rat
-//     Add(bMulRat, src0Real, bMulRat, compareAbsCDMask);
-//     // formula: (a + b*rat)*scl
-//     Mul<typename ActualT::EleType, MaskMergeMode::ZEROING, RegTensor<typename ActualT::EleType>>(
-//         dstRealTmp0, bMulRat, dMulRat, compareAbsCDMask);
-//     Select(dstRealTmp, dstRealTmp0, dstRealTmp, compareAbsCDMask);
-//     RegTensor<typename ActualT::EleType> aMulRat;
-//     // formula: a * rat
-//     Mul(aMulRat, src0Real, rat, compareAbsCDMask);
-//     // formula: b - a * rat
-//     Sub(aMulRat, src0Imag, aMulRat, compareAbsCDMask);
-//     // formula: (b - a * rat)*scl
-//     Mul<typename ActualT::EleType, MaskMergeMode::ZEROING, RegTensor<typename ActualT::EleType>>(
-//         dstImagTmp0, aMulRat, dMulRat, compareAbsCDMask);
-//     Select(dstImagTmp, dstImagTmp0, dstImagTmp, compareAbsCDMask);
-
-//     // formula: rat = c/d
-//     Div<typename ActualT::EleType, mode, RegTensor<typename ActualT::EleType>>(
-//         rat, src1Real, src1Imag, compareAbsCDMaskNot);
-//     // formula: c*rat
-//     Mul(dMulRat, src1Real, rat, compareAbsCDMaskNot);
-//     // formula: d+c*rat
-//     Add(dMulRat, src1Imag, dMulRat, compareAbsCDMaskNot);
-//     // formula: scl = 1/(d+c*rat)
-//     Div<typename ActualT::EleType, mode, RegTensor<typename ActualT::EleType>>(
-//         dMulRat, one, dMulRat, compareAbsCDMaskNot);
-//     // formula: a*rat
-//     Mul(aMulRat, src0Real, rat, compareAbsCDMaskNot);
-//     // formula: a*rat + b
-//     Add(aMulRat, aMulRat, src0Imag, compareAbsCDMaskNot);
-//     // formula: (a*rat + b)*scl
-//     Mul<typename ActualT::EleType, MaskMergeMode::ZEROING, RegTensor<typename ActualT::EleType>>(
-//         dstRealTmp0, aMulRat, dMulRat, compareAbsCDMaskNot);
-//     Select(dstRealTmp, dstRealTmp0, dstRealTmp, compareAbsCDMaskNot);
-//     // formula: b*rat
-//     Mul(bMulRat, src0Imag, rat, compareAbsCDMaskNot);
-//     // formula: b*rat - a
-//     Sub(bMulRat, bMulRat, src0Real, compareAbsCDMaskNot);
-//     // formula: (b*rat - a) * scl
-//     Mul<typename ActualT::EleType, MaskMergeMode::ZEROING, RegTensor<typename ActualT::EleType>>(
-//         dstImagTmp0, bMulRat, dMulRat, compareAbsCDMaskNot);
-
-//     Select(dstImagTmp, dstImagTmp0, dstImagTmp, compareAbsCDMaskNot);
-//     dstReal = dstRealTmp;
-//     dstImag = dstImagTmp;
-// }
-
-// template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void DivComplex64Impl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(sizeof(ActualT) == 8, "data type should be B64");
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-//     ComplexDivKernel<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
-// }
-
-// template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void DivB64Impl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(sizeof(ActualT) == 8, "DivB64Impl data type should be B64");
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "DivB64Impl U should be RegTraitNumTwo");
-//     // if constexpr (SupportType<ActualT, complex64>()) {
-//     //     DivComplex64Impl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
-//     // } else {
-//         if constexpr (Std::is_same_v<ActualT, uint64_t>) {
-//             U dstTemp;
-//             DivU64Impl(dstTemp, srcReg0, srcReg1, mask);
-//             dstReg = dstTemp;
-//         } else if constexpr (Std::is_same_v<ActualT, int64_t>) {
-//             U dstTemp;
-//             DivS64Impl(dstTemp, srcReg0, srcReg1, mask);
-//             dstReg = dstTemp;
-//         }
-//     // }
-// }
-
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void MergeTwoFloatELementRegs(U& dst, U& src0, U& src1, MaskReg& mask)
 {
@@ -838,33 +382,6 @@ __simd_callee__ inline void MergeTwoFloatELementRegs(U& dst, U& src0, U& src1, M
         Or((RegTensor<uint16_t>&)dst, (RegTensor<uint16_t>&)src0, (RegTensor<uint16_t>&)src1, mask);
     }
 }
-
-// template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void DivComplex32TwoImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(sizeof(ActualT) == 4, "data type should be B32");
-//     static_assert(CheckRegTrait<U, RegTraitNumTwo>(), "U should be RegTraitNumTwo");
-//     ComplexDivKernel<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstReg, srcReg0, srcReg1, mask);
-// }
-
-// template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
-// __simd_callee__ inline void DivComplex32OnetraitImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     using ActualT = typename U::ActualT;
-//     static_assert(sizeof(ActualT) == 4, "data type should be B32");
-//     static_assert(CheckRegTrait<U, RegTraitNumOne>(), "U should be RegTraitNumOne");
-//     MaskReg maskTrait2;
-//     MaskPack(maskTrait2, mask);
-//     RegTensor<ActualT, RegTraitNumTwo> divTraitTwoSrcReg0;
-//     RegTensor<ActualT, RegTraitNumTwo> divTraitTwoSrcReg1;
-//     RegTensor<ActualT, RegTraitNumTwo> divTraitTwoDstReg;
-
-//     B32TraitOneToTraitTwo(divTraitTwoSrcReg0, srcReg0);
-//     B32TraitOneToTraitTwo(divTraitTwoSrcReg1, srcReg1);
-//     DivComplex32TwoImpl(divTraitTwoDstReg, divTraitTwoSrcReg0, divTraitTwoSrcReg1, maskTrait2);
-//     B32TraitTwoToTraitOne(dstReg, divTraitTwoDstReg);
-// }
 
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void DivPrecisionImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
@@ -1424,43 +941,22 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     constexpr DivSpecificMode sprMode = Internal::GetDivSpecificMode(mode);
     static_assert(
-        SupportType<
-            ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, int64_t, uint64_t>(),
+        SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, half, float, int64_t, uint64_t>(),
         "current data type is not supported on current device!");
     static_assert(
         SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
         "current Div api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
     if constexpr (sprMode.precisionMode) {
-        static_assert(
-            SupportType<ActualT, float>(),
-            "only float data type is supported in precsion mode.");
+        static_assert(SupportType<ActualT, float>(), "only float data type is supported in precsion mode.");
     }
     if constexpr (sprMode.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
         static_assert(SupportType<T, half, float>(), "Reg Div for PRECISION_1ULP_FTZ_FALSE only supports half/float.");
     } else if constexpr (sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_FALSE) {
         static_assert(SupportType<T, float>(), "Reg Div for PRECISION_0ULP_FTZ_FALSE only supports float.");
     } else if constexpr (sprMode.algo == DivAlgo::PRECISION_0ULP_FTZ_TRUE) {
-        static_assert(
-            SupportType<T, float>(), "Reg Div for PRECISION_0ULP_FTZ_TRUE only supports float.");
+        static_assert(SupportType<T, float>(), "Reg Div for PRECISION_0ULP_FTZ_TRUE only supports float.");
     }
-    // if constexpr (SupportType<ActualT, complex32>()) {
-    //     if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-    //         DivComplex32TwoImpl(dstReg, srcReg0, srcReg1, mask);
-    //     } else {
-    //         DivComplex32OnetraitImpl(dstReg, srcReg0, srcReg1, mask);
-    //     }
-    // } else if constexpr (SupportBytes<ActualT, 8>()) {
-    // if constexpr (SupportBytes<ActualT, 8>()) {
-    //     if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-    //         U dstTemp;
-    //         DivB64Impl<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>(dstTemp, srcReg0, srcReg1, mask);
-    //         dstReg = dstTemp;
-    //     } else {
-    //         CalTraitOneByTransToTraitTwo<T, mode, U, DivB64Impl<T, mode, Reg::RegTensor<ActualT, Reg::RegTraitNumTwo>>>(
-    //             dstReg, srcReg0, srcReg1, mask);
-    //     }
-    // } else if constexpr (SupportType<ActualT, half>()) {
     if constexpr (SupportType<ActualT, half>()) {
         if constexpr (sprMode.algo == DivAlgo::PRECISION_1ULP_FTZ_FALSE) {
             DivIEEE754HalfImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
@@ -1485,8 +981,8 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
                 vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
             }
         }
-        } else {
-            vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
+    } else {
+        vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
     }
 }
 

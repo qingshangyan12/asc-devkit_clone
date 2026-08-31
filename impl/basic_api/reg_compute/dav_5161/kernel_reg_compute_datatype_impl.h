@@ -30,16 +30,6 @@ namespace Reg {
 template <typename T>
 struct TypeGet;
 
-// template <>
-// struct TypeGet<complex32> {
-//     // only for passing compilation, T is actually ineffective here
-// #if defined(__ASC_NPU_HOST__)
-//     using T = int;
-// #else
-//     using T = vector_u32;
-// #endif
-// };
-
 template <>
 struct TypeGet<double> {
 #if defined(__ASC_NPU_HOST__)
@@ -48,16 +38,6 @@ struct TypeGet<double> {
     using T = vector_u64;
 #endif
 };
-
-// template <>
-// struct TypeGet<complex64> {
-//     // only for passing compilation, T is actually ineffective here
-// #if defined(__ASC_NPU_HOST__)
-//     using T = int;
-// #else
-//     using T = vector_u64;
-// #endif
-// };
 
 template <>
 struct TypeGet<uint64_t> {
