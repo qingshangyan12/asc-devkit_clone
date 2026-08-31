@@ -10,7 +10,7 @@ The example covers three input data types: int8_t, half, and float, as well as A
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
