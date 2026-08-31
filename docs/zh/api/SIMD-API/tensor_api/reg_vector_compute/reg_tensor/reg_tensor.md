@@ -28,7 +28,7 @@
 
 头文件路径为：`"tensor_api/arch/vector/experimental/reg_tensor.h"`，命名空间为`asc::te::experimental`。
 
-`reg_tensor<DataType>`是矢量寄存器值的轻量级封装。同时保存矢量数据寄存器`reg`和掩码寄存器`mask`；`reg_tensor<bool>`的reg和mask均为掩码寄存器。
+`reg_tensor<DataType>`是矢量寄存器值的轻量级封装。同时保存矢量数据寄存器`reg`和掩码寄存器`mask`，当`DataType`为`bool`时，`reg_tensor<bool>`的reg和mask均为掩码寄存器。
 
 ## 定义原型<a name="section620mcpsimp"></a>
 
@@ -45,7 +45,7 @@ struct reg_tensor {
 
     reg_type reg;
     vector_bool mask;
-};
+}
 ```
 
 成员变量mask绑定接口请参考[with_mask](with_mask.md)。
@@ -54,8 +54,8 @@ struct reg_tensor {
 
 | 参数名 | 描述 |
 | --- | --- |
-| `DataType` | 寄存器元素类型，支持类型请参考[数据类型](#数据类型)。 |
-| `maskValue` | 原生谓词寄存器值，带参构造函数将其写入对象的`mask`成员。 |
+| `DataType` | `reg_tensor`的元素类型，支持类型请参考[数据类型](#数据类型)。 |
+| `maskValue` | 掩码寄存器值，带参构造函数将其写入`reg_tensor`对象的`mask`成员。 |
 
 ## 成员说明<a name="section630mcpsimp"></a>
 

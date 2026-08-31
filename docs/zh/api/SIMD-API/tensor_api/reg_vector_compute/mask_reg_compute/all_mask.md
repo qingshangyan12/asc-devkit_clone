@@ -39,9 +39,9 @@ __simd_callee__ inline reg_tensor<bool> all_mask()
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-| 参数名 | 描述 |
-| --- | --- |
-| `DataType` | 模板参数，支持的数据类型为b8/b16/b32。 |
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| `DataType` | 输入 | 模板参数，支持的数据类型为b8/b16/b32。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
