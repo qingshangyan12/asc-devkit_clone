@@ -27,6 +27,7 @@
 #endif
 
 namespace AscendC {
+namespace experimental {
 namespace HighLevelApiCheck {
 
 template <typename T, bool isReuseSource = false>
@@ -39,6 +40,7 @@ __aicore__ inline void CheckFuncNdtri(
 }
 
 } // namespace HighLevelApiCheck
+} // namespace experimental
 } // namespace AscendC
 
 #endif // IMPL_API_CHECK_KERNEL_CHECK_MATH_NDTRI_NDTRI_CHECK_H_

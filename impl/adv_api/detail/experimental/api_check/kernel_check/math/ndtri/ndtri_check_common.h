@@ -20,12 +20,13 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_MATH_NDTRI_NDTRI_CHECK_COMMON_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_MATH_NDTRI_NDTRI_CHECK_COMMON_H_
 
-#include "../../basic_check/calcount_check.h"
-#include "../../basic_check/datatype_check.h"
-#include "../../basic_check/reuse_source_check.h"
-#include "../../basic_check/single_tensor_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/calcount_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/datatype_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/reuse_source_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/single_tensor_check.h"
 
 namespace AscendC {
+namespace experimental {
 namespace HighLevelApiCheck {
 
 template <typename T, bool isReuseSource = false>
@@ -55,6 +56,7 @@ public:
 };
 
 } // namespace HighLevelApiCheck
+} // namespace experimental
 } // namespace AscendC
 
 #endif // IMPL_API_CHECK_KERNEL_CHECK_MATH_NDTRI_NDTRI_CHECK_COMMON_H_

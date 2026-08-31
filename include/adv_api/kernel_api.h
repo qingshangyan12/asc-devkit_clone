@@ -99,7 +99,6 @@
 #include "quantization/antiquantize.h"
 #include "utils/init_global_memory.h"
 #include "math/digamma.h"
-#include "math/ndtri.h"
 #include "sort/sort.h"
 #include "sort/topk.h"
 #include "transpose/confusion_transpose.h"

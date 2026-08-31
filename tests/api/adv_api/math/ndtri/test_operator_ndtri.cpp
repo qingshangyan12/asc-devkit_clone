@@ -10,8 +10,11 @@
 
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
+#define CANN_ASC_USE_EXPERIMENTAL
+#include "adv_api/experimental/ndtri.h"
 
 using namespace AscendC;
+using namespace AscendC::experimental;
 
 class TestNdtri : public testing::Test {
 protected:

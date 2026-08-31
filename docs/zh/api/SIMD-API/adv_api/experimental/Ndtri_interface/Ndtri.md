@@ -1,5 +1,12 @@
 # Ndtri
 
+Ndtri 当前属于实验性接口。使用前需要定义 `CANN_ASC_USE_EXPERIMENTAL`，并显式包含头文件：
+
+```cpp
+#define CANN_ASC_USE_EXPERIMENTAL
+#include "adv_api/experimental/ndtri.h"
+```
+
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
@@ -86,7 +93,7 @@ $$\Phi(x)=p$$
 // dstLocal：存放计算结果的Tensor
 // srcLocal：存放输入概率的Tensor
 // 计算1024个float元素
-AscendC::Ndtri<float, false>(dstLocal, srcLocal, 1024);
+AscendC::experimental::Ndtri<float, false>(dstLocal, srcLocal, 1024);
 // 计算srcLocal中的全部元素
-AscendC::Ndtri<float, false>(dstLocal, srcLocal);
+AscendC::experimental::Ndtri<float, false>(dstLocal, srcLocal);
 ```

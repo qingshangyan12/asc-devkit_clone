@@ -35,7 +35,6 @@
 | [IsFinite](math_compute/IsFinite_interface/IsFinite.md) | 按元素判断输入的浮点数是否非NAN、非±INF。 |
 | [Lgamma](math_compute/Lgamma_interface/Lgamma.md) | 按元素计算x的gamma函数的绝对值并求自然对数。 |
 | [Log](math_compute/Log_interface/Log.md) | 按元素以e、2、10为底做对数运算。 |
-| [Ndtri](math_compute/Ndtri_interface/Ndtri.md) | 按元素计算标准正态分布累积分布函数的反函数。 |
 | [Power](math_compute/Power_interface/Power.md) | 实现按元素做幂运算功能。 |
 | [Round](math_compute/Round_interface/Round.md) | 将输入的元素四舍五入到最接近的整数。 |
 | [Sign](math_compute/Sign_interface/Sign.md) | 按元素执行Sign操作，Sign是指返回输入数据的符号。 |

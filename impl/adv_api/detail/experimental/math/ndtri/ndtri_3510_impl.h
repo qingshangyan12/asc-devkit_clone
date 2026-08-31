@@ -15,23 +15,24 @@
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/adv_api/detail/math/ndtri/ndtri_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/math/ndtri.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/adv_api/detail/experimental/math/ndtri/ndtri_3510_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"adv_api/experimental/ndtri.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_NDTRI_NDTRI_3510_IMPL_H__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_EXPERIMENTAL_DETAIL_MATH_NDTRI_NDTRI_3510_IMPL_H__
 #endif
 
-#ifndef IMPL_MATH_NDTRI_NDTRI_3510_IMPL_H
-#define IMPL_MATH_NDTRI_NDTRI_3510_IMPL_H
+#ifndef IMPL_EXPERIMENTAL_DETAIL_MATH_NDTRI_NDTRI_3510_IMPL_H
+#define IMPL_EXPERIMENTAL_DETAIL_MATH_NDTRI_NDTRI_3510_IMPL_H
 
 #include "basic_api/kernel_basic_intf.h"
 #include "basic_api/kernel_tensor.h"
 #include "impl/adv_api/detail/common/check.h"
 #ifdef ASCENDC_CPU_DEBUG
-#include "impl/adv_api/detail/api_check/kernel_check/math/ndtri/ndtri_check.h"
+#include "impl/adv_api/detail/experimental/api_check/kernel_check/math/ndtri/ndtri_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
 namespace AscendC {
+namespace experimental {
 namespace NdtriInternal {
 
 union FloatU32Union {
@@ -337,11 +338,12 @@ __aicore__ inline void NdtriImpl(
     NdtriInternal::NdtriImpl<isReuseSource>(dstUb, srcUb, calCount);
 }
 
+} // namespace experimental
 } // namespace AscendC
 
-#endif // IMPL_MATH_NDTRI_NDTRI_3510_IMPL_H
+#endif // IMPL_EXPERIMENTAL_DETAIL_MATH_NDTRI_NDTRI_3510_IMPL_H
 
-#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_NDTRI_NDTRI_3510_IMPL_H__)
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_EXPERIMENTAL_DETAIL_MATH_NDTRI_NDTRI_3510_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_MATH_NDTRI_NDTRI_3510_IMPL_H__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_EXPERIMENTAL_DETAIL_MATH_NDTRI_NDTRI_3510_IMPL_H__
 #endif

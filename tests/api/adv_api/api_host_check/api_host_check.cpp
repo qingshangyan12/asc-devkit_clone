@@ -57,7 +57,6 @@
 #include "math/is_nan.h"
 #include "math/lgamma.h"
 #include "math/log.h"
-#include "math/ndtri.h"
 #include "math/logical_and.h"
 #include "math/logical_ands.h"
 #include "math/logical_not.h"
@@ -170,7 +169,6 @@ using AscendC::MakeLayout;
 using AscendC::MakeShape;
 using AscendC::MakeStride;
 using AscendC::Mean;
-using AscendC::Ndtri;
 using AscendC::Normalize;
 using AscendC::Pad;
 using AscendC::PhiloxRandom;

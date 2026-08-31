@@ -13,25 +13,30 @@
  * \brief Ndtri high-level API declaration.
  */
 
+#ifndef CANN_ASC_USE_EXPERIMENTAL
+#error "This is an experimental feature, please define CANN_ASC_USE_EXPERIMENTAL to use it."
+#endif
+
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #error "ndtri.h cannot be used with compile flag --enable-simt enabled."
 #endif
 
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NDTRI_H__
+#define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_EXPERIMENTAL_NDTRI_H__
 #endif
 
-#ifndef ASCENDC_ADV_API_MATH_NDTRI_H
-#define ASCENDC_ADV_API_MATH_NDTRI_H
+#ifndef ASCENDC_ADV_API_EXPERIMENTAL_NDTRI_H
+#define ASCENDC_ADV_API_EXPERIMENTAL_NDTRI_H
 
 #include "basic_api/kernel_tensor.h"
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
-#include "impl/adv_api/detail/math/ndtri/ndtri_3510_impl.h"
+#include "impl/adv_api/detail/experimental/math/ndtri/ndtri_3510_impl.h"
 #endif
 
 namespace AscendC {
+namespace experimental {
 #pragma begin_pipe(V)
 
 /*!
@@ -85,11 +90,12 @@ __aicore__ inline void Ndtri(const LocalTensor<T>& dstTensor, const LocalTensor<
 }
 
 #pragma end_pipe
+} // namespace experimental
 } // namespace AscendC
 
-#endif // ASCENDC_ADV_API_MATH_NDTRI_H
+#endif // ASCENDC_ADV_API_EXPERIMENTAL_NDTRI_H
 
-#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NDTRI_H__)
+#if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_EXPERIMENTAL_NDTRI_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
-#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_NDTRI_H__
+#undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_EXPERIMENTAL_NDTRI_H__
 #endif

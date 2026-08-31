@@ -10,8 +10,10 @@
 
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
+#define CANN_ASC_USE_EXPERIMENTAL
+#include "adv_api/experimental/ndtri.h"
 #ifdef ASCENDC_CPU_DEBUG
-#include "impl/adv_api/detail/api_check/kernel_check/math/ndtri/ndtri_check.h"
+#include "impl/adv_api/detail/experimental/api_check/kernel_check/math/ndtri/ndtri_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
@@ -35,7 +37,7 @@ TEST_F(NdtriApiCheck, ValidFloatArgumentsDoNotRaise)
     srcTensor.SetSize(32);
 
     const uint64_t startCount = AscendC::KernelRaise::GetInstance().GetRaiseCount();
-    AscendC::CHECK_FUNC_HIGHLEVEL_API(Ndtri, (float, false), (dstTensor, srcTensor, 8));
+    AscendC::experimental::CHECK_FUNC_HIGHLEVEL_API(Ndtri, (float, false), (dstTensor, srcTensor, 8));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCount, 0);
 }
 
@@ -49,7 +51,7 @@ TEST_F(NdtriApiCheck, InPlaceArgumentsDoNotRaise)
     tensor.SetSize(32);
 
     const uint64_t startCount = AscendC::KernelRaise::GetInstance().GetRaiseCount();
-    AscendC::CHECK_FUNC_HIGHLEVEL_API(Ndtri, (float, false), (tensor, tensor, 8));
+    AscendC::experimental::CHECK_FUNC_HIGHLEVEL_API(Ndtri, (float, false), (tensor, tensor, 8));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCount, 0);
 }
 
@@ -67,7 +69,7 @@ TEST_F(NdtriApiCheck, InvalidTensorPositionRaisesExpectedCheck)
     srcTensor.SetSize(32);
 
     const uint64_t startCount = AscendC::KernelRaise::GetInstance().GetRaiseCount();
-    AscendC::CHECK_FUNC_HIGHLEVEL_API(Ndtri, (float, false), (dstTensor, srcTensor, 8));
+    AscendC::experimental::CHECK_FUNC_HIGHLEVEL_API(Ndtri, (float, false), (dstTensor, srcTensor, 8));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCount, 1);
 }
 
@@ -81,6 +83,6 @@ TEST_F(NdtriApiCheck, InvalidTypeReuseCountAndAlignmentRaiseExpectedChecks)
     tensor.SetSize(16);
 
     const uint64_t startCount = AscendC::KernelRaise::GetInstance().GetRaiseCount();
-    AscendC::CHECK_FUNC_HIGHLEVEL_API(Ndtri, (uint8_t, true), (tensor[1], tensor[1], 32));
+    AscendC::experimental::CHECK_FUNC_HIGHLEVEL_API(Ndtri, (uint8_t, true), (tensor[1], tensor[1], 32));
     EXPECT_EQ(AscendC::KernelRaise::GetInstance().GetRaiseCount() - startCount, 5);
 }
