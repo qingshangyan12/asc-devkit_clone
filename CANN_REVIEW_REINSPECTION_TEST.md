@@ -10,8 +10,8 @@ instead of starting a new full review.
 
 ## Test cases
 
-- `REINSPECTION-TEST-001` retry limit: `0`
-- `REINSPECTION-TEST-002` owner: `TODO`
+- `REINSPECTION-TEST-001` retry limit: `3`
+- `REINSPECTION-TEST-002` owner: `cann-review`
 - `REINSPECTION-TEST-003` cleanup after test: `disabled`
 
 Expected follow-up values:
