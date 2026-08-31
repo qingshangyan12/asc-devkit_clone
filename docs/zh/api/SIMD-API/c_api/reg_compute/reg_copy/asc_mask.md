@@ -26,19 +26,14 @@
 
 ## 功能说明
 
-本接口包含asc_mask和asc_extract_mask两个接口，均通过函数返回值返回结果，是与[asc_copy](asc_copy.md)对应的返回值类型接口。
+将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0（ZEROING模式），并通过函数返回值返回结果。支持以下两种模式：
 
-- asc_mask：与asc_copy的矢量数据寄存器复制到矢量数据寄存器模式及掩码寄存器复制到掩码寄存器模式功能相同，区别在于本接口通过函数返回值返回结果，且未被mask筛选的位置置为0（ZEROING模式）。
-    - 矢量数据寄存器复制到矢量数据寄存器：将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置置为0。
-    - 掩码寄存器复制到掩码寄存器：将src中被mask筛选的bit复制到返回值中，未被mask筛选的位置置为0。支持带mask和不带mask两种重载：
-        - 带mask：将src中被mask筛选的bit复制到返回值。对于b8模式，mask的每个bit控制src的一个bit；对于b16模式，mask的每2bit为一组、仅LSB控制src的一个bit；对于b32模式，mask的每4bit为一组、仅LSB控制src的一个bit。
-        - 不带mask：将src的所有bit复制到返回值。
+- 矢量数据寄存器复制到矢量数据寄存器：将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置保持原值。
+- 掩码寄存器复制到掩码寄存器：将src中被mask筛选的bit复制到返回值中，未被mask筛选的位置置为0。支持带mask和不带mask两种重载：
+    - 带mask：将src中被mask筛选的bit复制到返回值。对于b8模式，mask的每个bit控制src的一个bit；对于b16模式，mask的每2bit为一组、仅LSB控制src的一个bit；对于b32模式，mask的每4bit为一组、仅LSB控制src的一个bit。
+    - 不带mask：将src的所有bit复制到返回值。
 
-- asc_extract_mask：与asc_copy的矢量数据寄存器复制到掩码寄存器模式功能相同，区别在于本接口通过函数返回值返回结果。
-    - 数据类型为uint16_t时，矢量数据寄存器（256B）分成16个数据块（16B），用户通过参数可选择某一个数据块，数据块的每个bit broadcast成2bit后变为32B，即输出的mask。
-    - 数据类型为uint32_t时，矢量数据寄存器（256B）分成32个数据块（8B），用户通过参数可选择某一个数据块，数据块的每个bit broadcast成4bit后变为32B，即输出的mask。
-    
-    具体搬运原理请参考[asc_copy关键特性说明](asc_copy.md#关键特性说明)。
+本接口与[asc_copy](asc_copy.md)的矢量数据寄存器复制到矢量数据寄存器模式及掩码寄存器复制到掩码寄存器模式功能相同，区别在于本接口通过函数返回值返回结果。
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
@@ -70,25 +65,6 @@ __simd_callee__ inline vector_bool asc_mask(vector_bool src,
 __simd_callee__ inline vector_bool asc_mask(vector_bool src)
 ```
 
-### 矢量数据寄存器复制到掩码寄存器
-
-**part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**
-
-```c
-__simd_callee__ inline vector_bool asc_extract_mask(vector_uint16_t src,
-                                                     int16_t part)
-__simd_callee__ inline vector_bool asc_extract_mask(vector_uint32_t src,
-                                                     int16_t part)
-```
-
-#### 函数原型典型示例
-
-```c
-// 示例：从uint16_t矢量数据寄存器中提取掩码寄存器。
-__simd_callee__ inline vector_bool asc_extract_mask(vector_uint16_t src,
-                                                     int16_t part)
-```
-
 ## 参数说明
 
 **表1** 参数说明（矢量数据寄存器复制到矢量数据寄存器）
@@ -96,7 +72,7 @@ __simd_callee__ inline vector_bool asc_extract_mask(vector_uint16_t src,
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | src | 输入 | 源矢量数据寄存器。 |
-| mask | 输入 | 源掩码寄存器，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在返回值中置0（ZEROING模式）。 |
+| mask | 输入 | 源掩码寄存器，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在返回值保持原值。 |
 
 **表2** 参数说明（掩码寄存器复制到掩码寄存器）
 
@@ -105,29 +81,17 @@ __simd_callee__ inline vector_bool asc_extract_mask(vector_uint16_t src,
 | src | 输入 | 源掩码寄存器。 |
 | mask | 输入 | 源掩码寄存器，用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在返回值中置0。仅带mask的重载包含该参数。 |
 
-**表3** 参数说明（矢量数据寄存器复制到掩码寄存器）
-
-| 参数名 | 输入/输出 | 描述 |
-| --- | --- | --- |
-| src | 输入 | 源矢量数据寄存器。 |
-| part | 输入 | part决定了src中需要搬运的数据块，具体描述请参考[asc_copy关键特性说明](asc_copy.md#关键特性说明)。<br>&bull; 当数据类型为uint16_t，part∈[0, 15]。<br>&bull; 当数据类型为uint32_t，part∈[0, 31]。 |
-
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
-- asc_mask（矢量数据寄存器复制到矢量数据寄存器）：返回保存掩码复制结果的矢量数据寄存器，数据类型与`src`保持一致。
-- asc_mask（掩码寄存器复制到掩码寄存器）：返回保存掩码复制结果的掩码寄存器，类型为`vector_bool`。
-- asc_extract_mask：返回保存提取结果的掩码寄存器，类型为`vector_bool`。
+- 矢量数据寄存器复制到矢量数据寄存器：返回保存掩码复制结果的矢量数据寄存器，数据类型与`src`保持一致。
+- 掩码寄存器复制到掩码寄存器：返回保存掩码复制结果的掩码寄存器，类型为`vector_bool`。
 
 ## 约束说明
 
 - 本接口仅在AIV上生效，非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，src为矢量数据寄存器或掩码寄存器。
-- asc_mask返回值中未被mask筛选的位置置为0（ZEROING模式）。
-- asc_extract_mask：**part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**
-    - 当数据类型为uint16_t时，part∈[0, 15]。
-    - 当数据类型为uint32_t时，part∈[0, 31]。
 
 ## 调用示例
 
