@@ -325,9 +325,8 @@ __simd_callee__ inline void DataCopyUnAlignImpl(U& dstReg, UnalignReg& ureg, __u
         static_assert(
             SupportType<ActualT, complex32>() || SupportBytes<ActualT, 8>(),
             "RegTraitNumTwo only support type complex32/b64 on current device!");
-        __ubuf__ T* tmpSrcAddr = srcAddr;
         constexpr uint32_t twoRepeatNum = VECTOR_REG_WIDTH * 2 / sizeof(ActualT);
-        DataCopyUnAlignImpl<T, PostLiteral::POST_MODE_UPDATE, U>(dstReg, ureg, tmpSrcAddr, twoRepeatNum);
+        DataCopyUnAlignImpl<T, PostLiteral::POST_MODE_UPDATE, U>(dstReg, ureg, srcAddr, twoRepeatNum);
     } else if constexpr (SupportBytes<T, 1>()) {
         vldus((RegTensor<uint8_t>&)dstReg, ureg, (__ubuf__ uint8_t*)srcAddr);
     } else {
