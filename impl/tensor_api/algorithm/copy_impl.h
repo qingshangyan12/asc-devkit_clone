@@ -133,6 +133,32 @@ __aicore__ inline void dispatch_copy(const DstTensor& dst, const SrcTensor& src,
     copy_atom<copy_traits<operation>>{}.call(dst, src, args...);
 }
 
+#ifdef ASCENDC_DEBUG
+template <typename SrcTensor, typename DstTensor, typename SrcCoord, typename DstCoord, typename CopyShape>
+__aicore__ inline constexpr void debug_check_copy_region(
+    const tensor_api_assert_context& context, const SrcTensor& src, const DstTensor& dst,
+    const SrcCoord& src_coord, const DstCoord& dst_coord, const CopyShape& copy_shape, __gm__ const char* api_name)
+{
+    auto actual_src_shape = make_slice_shape(src_coord, src.layout(), copy_shape);
+    auto actual_dst_shape = make_slice_shape(dst_coord, dst.layout(), copy_shape);
+    auto requested_size = product{}(copy_shape);
+    auto actual_src_size = product{}(actual_src_shape);
+    auto actual_dst_capacity = product{}(actual_dst_shape);
+    TENSOR_API_DEBUG_ASSERT_AT(
+        context, (actual_src_size == requested_size),
+        TENSOR_API_LOG_INTERNAL(
+            "Failed to check source copy region in %s; copy shape exceeds source tensor boundary; "
+            "requestedRegionElements=%lld, availableSourceRegionElements=%lld.",
+            api_name, static_cast<long long>(requested_size), static_cast<long long>(actual_src_size)));
+    TENSOR_API_DEBUG_ASSERT_AT(
+        context, (actual_dst_capacity == requested_size),
+        TENSOR_API_LOG_INTERNAL(
+            "Failed to check destination copy region in %s; copy shape exceeds destination tensor boundary; "
+            "requestedRegionElements=%lld, availableDestinationRegionElements=%lld.",
+            api_name, static_cast<long long>(requested_size), static_cast<long long>(actual_dst_capacity)));
+}
+#endif // ASCENDC_DEBUG
+
 template <typename Atom, typename DstTensor, typename SrcTensor>
 __aicore__ inline void copy(const copy_atom<Atom>& atom, const DstTensor& dst, const SrcTensor& src)
 {
@@ -173,6 +199,16 @@ __aicore__ inline void copy(
     const SrcCoord& src_coord, const CopyShape& copy_shape)
 {
     check_copy_params<SrcTensor, SrcCoord, CopyShape>();
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.layout(), "dst", "copy");
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy");
+    TENSOR_API_DEBUG_CHECK(debug_check_copy_shape, copy_shape, "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_coord, dst.layout(), resolve_copy_coord(dst.layout(), copy_shape, dst_coord), "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_coord, src.layout(), resolve_copy_coord(src.layout(), copy_shape, src_coord), "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_copy_region, src, dst, resolve_copy_coord(src.layout(), copy_shape, src_coord),
+        resolve_copy_coord(dst.layout(), copy_shape, dst_coord), copy_shape, "copy");
     atom.call(dst, src, dst_coord, src_coord, copy_shape);
 }
 
@@ -188,6 +224,19 @@ __aicore__ inline void copy(
     const DstCoord& dst_coord, const SrcCoord& src_coord, const CopyShape& copy_shape)
 {
     check_copy_params<SrcTensor, SrcCoord, CopyShape>();
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.layout(), "dst", "copy");
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy");
+    if constexpr (is_attr_tensor_v<Quant>) {
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, quant.layout(), "quant", "copy");
+    }
+    TENSOR_API_DEBUG_CHECK(debug_check_copy_shape, copy_shape, "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_coord, dst.layout(), resolve_copy_coord(dst.layout(), copy_shape, dst_coord), "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_coord, src.layout(), resolve_copy_coord(src.layout(), copy_shape, src_coord), "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_copy_region, src, dst, resolve_copy_coord(src.layout(), copy_shape, src_coord),
+        resolve_copy_coord(dst.layout(), copy_shape, dst_coord), copy_shape, "copy");
     atom.call(dst, src, quant, dst_coord, src_coord, copy_shape);
 }
 
@@ -202,6 +251,16 @@ __aicore__ inline void copy(
     const CopyShape& copy_shape)
 {
     check_copy_params<SrcTensor, SrcCoord, CopyShape>();
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.layout(), "dst", "copy");
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy");
+    TENSOR_API_DEBUG_CHECK(debug_check_copy_shape, copy_shape, "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_coord, dst.layout(), resolve_copy_coord(dst.layout(), copy_shape, dst_coord), "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_coord, src.layout(), resolve_copy_coord(src.layout(), copy_shape, src_coord), "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_copy_region, src, dst, resolve_copy_coord(src.layout(), copy_shape, src_coord),
+        resolve_copy_coord(dst.layout(), copy_shape, dst_coord), copy_shape, "copy");
     dispatch_copy(dst, src, dst_coord, src_coord, copy_shape);
 }
 
@@ -218,6 +277,19 @@ __aicore__ inline void copy(
 {
     check_copy_params<SrcTensor, SrcCoord, CopyShape>();
     check_quant_copy_locations<DstTensor, SrcTensor>();
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, dst.layout(), "dst", "copy");
+    TENSOR_API_DEBUG_CHECK(debug_check_layout, src.layout(), "src", "copy");
+    if constexpr (is_attr_tensor_v<QuantParam>) {
+        TENSOR_API_DEBUG_CHECK(debug_check_layout, quant.layout(), "quant", "copy");
+    }
+    TENSOR_API_DEBUG_CHECK(debug_check_copy_shape, copy_shape, "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_coord, dst.layout(), resolve_copy_coord(dst.layout(), copy_shape, dst_coord), "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_coord, src.layout(), resolve_copy_coord(src.layout(), copy_shape, src_coord), "copy");
+    TENSOR_API_DEBUG_CHECK(
+        debug_check_copy_region, src, dst, resolve_copy_coord(src.layout(), copy_shape, src_coord),
+        resolve_copy_coord(dst.layout(), copy_shape, dst_coord), copy_shape, "copy");
     dispatch_copy(dst, src, quant, dst_coord, src_coord, copy_shape);
 }
 
