@@ -43,10 +43,6 @@ AscendC推荐使用**标准C++语法**定义Tiling结构体。这种方式便于
 
 `numBlocks`指定核函数（Kernel）启动的SIMD Block数量，应根据数据规模、切分策略和硬件资源确定。可设置范围还受AI处理器型号、核函数（Kernel）执行类型和运行时资源约束，更多信息请参考[核函数（Kernel）配置](../../../language_extension/simd_builtin_keywords.md#section97005415463)。
 
-> [!NOTE] Ascend 950PR/Ascend 950DT SIMD与SIMT混合场景的动态UBuf配置
->
-> 开发Ascend 950PR/Ascend 950DT算子并使能SIMD与SIMT混合编程时，需要为SIMT预留至少32KB Data Cache。Host侧Tiling需要根据核函数（Kernel）使用的静态UB、预留空间和Data Cache大小确定动态UBuf大小，并调用[`SetDynUBufSize`](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/maintenref/basicdataapi/atlasopapi_07_00786.html)进行设置；可调用[`GetDynUBufSize`](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/maintenref/basicdataapi/atlasopapi_07_00787.html)查询已设置的动态UBuf大小。
-
 ### workspace大小
 
 workspace是设备侧Global Memory上的临时内存，用于为核函数（Kernel）计算提供辅助存储，例如保存中间结果、作为Ascend C API的临时缓存，或为核函数（Kernel）提供临时空间。Host侧Tiling函数只负责计算并设置所需的workspace大小，不直接使用这块内存。单算子API执行场景下，开发者通过第一段接口获取workspace大小，并申请对应大小的Global Memory；入图场景下，框架会根据Host侧Tiling设置的大小自动申请。申请完成后，核函数（Kernel）可以通过入口参数`workspace`访问这块内存。
@@ -143,6 +139,23 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
 5. 返回`ge::GRAPH_SUCCESS`。
 
 标准C++结构体方式下，Host侧通过`GetTilingData<T>()`获取结构体指针并直接写字段，框架负责后续数据传递。核函数（Kernel）侧读取方式会在[核函数（Kernel）侧算子实现](./kernel_operator_implementation.md)中说明。
+
+<!-- npu="950" id1 -->
+> [!NOTE] SIMD与SIMT混合场景的动态UB配置
+>
+> 使能SIMD与SIMT混合编程时，需要为SIMT预留至少32KB Data Cache。Host侧Tiling需要根据核函数（Kernel）使用的静态UB、预留空间和Data Cache大小确定动态UB大小，并调用[`SetDynUBufSize`](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/maintenref/basicdataapi/atlasopapi_07_00786.html)进行设置；可调用[`GetDynUBufSize`](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/maintenref/basicdataapi/atlasopapi_07_00787.html)查询已设置的动态UB大小。
+>
+> 假设TilingFunc已经根据核函数（Kernel）的实际需求计算得到`dynUBufSize`，调用示例如下：
+>
+> ```cpp
+> ge::graphStatus ret = context->SetDynUBufSize(dynUBufSize);
+> if (ret != ge::GRAPH_SUCCESS) {
+>     return ret;
+> }
+> ```
+>
+> 共享内存的动态申请方式、大小限制和Data Cache布局请参见[共享内存](../../../programming_model/ai_core_simt_programming/memory_hierarchy.md#section66329146410)。
+<!-- end id1 -->
 
 ### 关联算子原型
 
