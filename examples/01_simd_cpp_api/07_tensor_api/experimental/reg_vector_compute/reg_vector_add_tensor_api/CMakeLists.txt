@@ -27,7 +27,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    reg_vector_add_tensor_api.asc
+    add.asc
 )
 
 target_link_libraries(demo PRIVATE)

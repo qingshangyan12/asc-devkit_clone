@@ -20,7 +20,7 @@ dst[i] = src0[i] + src1[i]
 ├── CMakeLists.txt                 // 编译工程
 ├── README.md                      // 样例说明
 ├── data_utils.h                   // 数据读写函数
-└── reg_vector_add_tensor_api.asc  // operator+接口样例实现
+└── add.asc                         // operator+接口样例实现
 ```
 
 ## 样例描述

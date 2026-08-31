@@ -20,7 +20,7 @@ dst[i] = src0[i] + src1[i]
 ├── CMakeLists.txt                 // Build project
 ├── README.md                      // Sample description
 ├── data_utils.h                   // Data input and output functions
-└── reg_vector_add_tensor_api.asc  // operator+ interface sample implementation
+└── add.asc                         // operator+ interface sample implementation
 ```
 
 ## Sample Description
