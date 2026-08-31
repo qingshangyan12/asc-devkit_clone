@@ -34,7 +34,7 @@
 
 ```cpp
 template <typename DataType>
-__simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
+__simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -43,15 +43,16 @@ __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 | --- | --- | --- |
 | `DataType` | 输入 | 模板参数，支持的数据类型为b8/b16/b32。 |
 | `remain` | 输入/输出 | 元素个数。调用后自动减去当前向量处理单元的元素个数（b8模式、b16模式、b32模式分别为256、128、64）。
-执行完一次该接口后，value = (value < VL_T) ? 0 : (value - VL_T)，VL_T表示位宽为VL的矢量数据寄存器中，可存放数据类型T的元素个数。 |
+执行完一次该接口后，remain = (remain< VL_T) ? 0 : (remain - VL_T)，VL_T表示位宽为VL的矢量数据寄存器中，可存放数据类型T的元素个数。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-返回`reg_tensor<bool>`，其`reg`成员类型为vector_bool，掩码寄存器，其对应的元素为有效数据。
+返回`reg_tensor<bool>`，其`reg`成员是类型为vector_bool的掩码寄存器，其对应的元素为有效数据。
 
 ## 约束说明<a name="section650mcpsimp"></a>
 
-掩码寄存器的数量上限为8，超过上限的掩码寄存器会写入预留的8K Unified Buffer（UB）内存中，可能引起性能劣化。编译器会自动复用生命周期结束的寄存器和预留内存，若两者均可用，优先复用寄存器。
+- 返回对象只保证`reg`成员有效，并不会初始化成员变量`mask`。
+- 掩码寄存器数量上限为8。超出限制上限的寄存器数据会写入预留的8KUB内存中，可能会引起性能劣化。编译器会自动复用生命周期结束的寄存器和预留内存，若寄存器与预留内存均存在可用空间，将优先复用寄存器。
 
 ## 调用示例<a name="section660mcpsimp"></a>
 

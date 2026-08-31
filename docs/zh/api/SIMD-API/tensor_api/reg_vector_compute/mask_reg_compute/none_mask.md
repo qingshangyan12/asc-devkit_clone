@@ -28,13 +28,13 @@
 
 头文件路径为：`"tensor_api/arch/vector/experimental/mask_reg_compute.h"`，命名空间为`asc::te::experimental`。
 
-创建与`DataType`元素位宽匹配的全无效掩码，等价于`make_mask<mask_pattern::none, DataType>()`。
+创建`reg_tensor<bool>`，其成员变量reg是与`DataType`元素位宽匹配的全无效掩码寄存器，等价于`make_mask<mask_pattern::none, DataType>()`。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
 template <typename DataType>
-__simd_callee__ inline reg_tensor<bool> none_mask();
+__simd_callee__ inline reg_tensor<bool> none_mask()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -45,11 +45,13 @@ __simd_callee__ inline reg_tensor<bool> none_mask();
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-返回`reg_tensor<bool>`，其`reg`成员类型为vector_bool，掩码寄存器，其对应的元素全为无效数据。
+返回`reg_tensor<bool>`，其`reg`成员是类型为vector_bool的掩码寄存器，其对应的元素全为无效数据。
+
 
 ## 约束说明<a name="section650mcpsimp"></a>
 
-返回对象只保证`reg`成员有效，不应读取其`mask`成员。
+- 返回对象只保证`reg`成员有效，并不会初始化成员变量`mask`。
+- 掩码寄存器数量上限为8。超出限制上限的寄存器数据会写入预留的8KUB内存中，可能会引起性能劣化。编译器会自动复用生命周期结束的寄存器和预留内存，若寄存器与预留内存均存在可用空间，将优先复用寄存器。
 
 ## 调用示例<a name="section660mcpsimp"></a>
 
