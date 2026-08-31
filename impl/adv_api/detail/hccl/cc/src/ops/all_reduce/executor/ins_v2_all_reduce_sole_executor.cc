@@ -253,7 +253,7 @@ REGISTER_EXEC_V2(
     InsTempAllReduceMesh1DTwoShot);
 
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, InsAllReduceNHR, InsV2AllReduceSoleExecutor, TopoMatch1D,
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleNHR, InsV2AllReduceSoleExecutor, TopoMatch1D,
     InsTempAllReduceNHR);
 
 REGISTER_EXEC_V2(
