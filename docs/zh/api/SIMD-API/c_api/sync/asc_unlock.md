@@ -98,4 +98,93 @@ PIPE_S
 
 ## 调用示例
 
-asc_unlock与asc_lock必须成对使用，调用示例请参见[asc_lock的调用示例](asc_lock.md#调用示例)。
+本示例通过`asc_unlock`释放对应mutex，确保后续流水在前序操作完成后执行。
+
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+
+<!-- end id8 -->
+
+```cpp
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+
+constexpr uint32_t ELEMENTS = 64;
+constexpr uint32_t BYTES = ELEMENTS * sizeof(float);
+constexpr uint8_t MUTEX_ID = 1;
+
+__simd_vf__ inline void add_vf(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1)
+{
+    vector_float dst_reg;
+    vector_float src0_reg;
+    vector_float src1_reg;
+    uint32_t count = ELEMENTS;
+    vector_bool mask = asc_update_mask_b32(count);
+    asc_loadalign(src0_reg, src0);
+    asc_loadalign(src1_reg, src1);
+    asc_add(dst_reg, src0_reg, src1_reg, mask);
+    asc_storealign(dst, dst_reg, mask);
+}
+
+__global__ __vector__ void asc_unlock_kernel(__gm__ float* output, __gm__ float* src0, __gm__ float* src1)
+{
+    asc_init();
+    __ubuf__ float x[ELEMENTS], y[ELEMENTS], z[ELEMENTS];
+    asc_lock(PIPE_MTE2, MUTEX_ID);
+    asc_copy_gm2ub_align(x, src0, BYTES);
+    asc_copy_gm2ub_align(y, src1, BYTES);
+    asc_unlock(PIPE_MTE2, MUTEX_ID);
+
+    asc_lock(PIPE_V, MUTEX_ID);
+    add_vf(z, x, y);
+    asc_unlock(PIPE_V, MUTEX_ID);
+
+    asc_lock(PIPE_MTE3, MUTEX_ID);
+    asc_copy_ub2gm_align(output, z, BYTES);
+    asc_unlock(PIPE_MTE3, MUTEX_ID);
+    asc_sync_pipe(PIPE_ALL);
+}
+
+} // namespace
+
+int main()
+{
+    std::vector<float> src0(ELEMENTS), src1(ELEMENTS), output(ELEMENTS, 0.0f), golden(ELEMENTS);
+    for (uint32_t i = 0; i < ELEMENTS; ++i) {
+        src0[i] = static_cast<float>(i) * 0.25f;
+        src1[i] = static_cast<float>(ELEMENTS - i) * 0.5f;
+        golden[i] = src0[i] + src1[i];
+    }
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    float *src0_device = nullptr, *src1_device = nullptr, *output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&src0_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&src1_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(src0_device, BYTES, src0.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(src1_device, BYTES, src1.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_unlock_kernel<<<1, 0>>>(output_device, src0_device, src1_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), BYTES, output_device, BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    const bool passed = output == golden;
+    std::cout << (passed ? "[Success] asc_unlock passed." : "[Failed] asc_unlock failed.") << std::endl;
+    aclrtFree(src0_device);
+    aclrtFree(src1_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
+```

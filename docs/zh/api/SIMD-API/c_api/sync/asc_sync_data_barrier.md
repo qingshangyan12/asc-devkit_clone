@@ -57,12 +57,55 @@ PIPE_S
 
 ## 调用示例
 
-由于[asc_store_dev](../scalar_compute/asc_store_dev.md)接口向GM写数据时不经过DCache，因此开发者需要考虑如下场景：当GM上地址addr已经在DCache缓存并且其对应的Cache Line标记为"脏"（dirty，表示该数据已被修改但尚未写回到GM）时，开发者应该在asc_store_dev接口之前调用[asc_dcci](../cache_ctrl/asc_dcci.md)接口将addr对应的Cache Line立即写回GM，否则asc_store_dev接口写入addr的数据后续可能被DCache写回的脏数据覆盖。
+本示例使用`asc_store_dev`向GM写入数据，并通过`asc_sync_data_barrier`等待GM访问完成。
 
-asc_dcci接口与asc_store_dev接口向GM写数据时硬件不能保证两个接口的执行顺序，因此开发者应该在asc_store_dev接口之前调用asc_sync_data_barrier接口对这两个接口进行同步，否则asc_store_dev接口写入addr的数据依然可能被DCache写回的脏数据覆盖。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-根据以上的描述，为了简化编程（开发者无需关心addr是否在DCache缓存以及是否被标记为"脏"），建议开发者在使用asc_store_dev接口时采用如下代码片段：
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+
+<!-- end id8 -->
 
 ```cpp
-asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+#include <cstdint>
+#include <iostream>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+
+constexpr int32_t EXPECTED = 42;
+
+__global__ __vector__ void asc_sync_data_barrier_kernel(__gm__ int32_t* output)
+{
+    asc_init();
+    asc_store_dev(output, EXPECTED);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+}
+
+} // namespace
+
+int main()
+{
+    int32_t output = 0;
+    int32_t* output_device = nullptr;
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    asc_sync_data_barrier_kernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(&output, sizeof(int32_t), output_device, sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
+    const bool passed = output == EXPECTED;
+    std::cout << (passed ? "[Success] asc_sync_data_barrier passed."
+                          : "[Failed] asc_sync_data_barrier failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

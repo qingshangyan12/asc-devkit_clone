@@ -83,4 +83,107 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe,
 
 ## 调用示例
 
-`asc_sync_block_wait`需与`asc_sync_block_arrive`配对使用，具体调用示例请参考[asc_sync_block_arrive调用示例](asc_sync_block_arrive.md#调用示例)。
+本示例演示AIC执行`asc_sync_block_wait`后进入等待，直到两个AIV均执行完数据搬运并发送通知后，AIC才能开始执行。
+
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+
+<!-- npu="950" id12 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+
+<!-- end id12 -->
+
+```cpp
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+
+constexpr uint32_t MATRIX_DIM = 16;
+constexpr uint32_t MATRIX_ELEMENTS = MATRIX_DIM * MATRIX_DIM;
+constexpr uint32_t MATRIX_BYTES = MATRIX_ELEMENTS * sizeof(half);
+constexpr uint32_t OUTPUT_BYTES = MATRIX_ELEMENTS * sizeof(float);
+constexpr int64_t FLAG_ID = 8;
+
+/*
+ * 本示例说明：
+ * - 采用__mix__(1, 2)标识核函数，同一AI Core内包含1个AIC和2个AIV。
+ * - AIV0和AIV1分别将矩阵从GM搬入UB，通过asc_get_sub_block_id区分不同的AIV。
+ * - 两个AIV将矩阵从UB搬运至L1 Buffer（PIPE_MTE3）操作执行完后，才能执行asc_sync_block_arrive向调度模块发送通知。
+ * - AIC中从L1 Buffer搬运数据到L0A Buffer、L0B Buffer（PIPE_MTE1）的操作被asc_sync_block_wait阻塞，直到两个AIV均执行了asc_sync_block_arrive后才能执行。
+ */
+__global__ __mix__(1, 2) void asc_sync_block_kernel(__gm__ half* input, __gm__ float* output)
+{
+    asc_init();
+    __cbuf__ half matrix_a_l1[MATRIX_ELEMENTS], matrix_b_l1[MATRIX_ELEMENTS];
+    __ubuf__ half input_ub[MATRIX_ELEMENTS];
+    __ca__ half matrix_a_l0[MATRIX_ELEMENTS];
+    __cb__ half matrix_b_l0[MATRIX_ELEMENTS];
+    __cc__ float output_l0[MATRIX_ELEMENTS];
+
+    if ASC_IS_AIV {
+        asc_copy_gm2ub_align(input_ub, input, MATRIX_BYTES);
+        asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
+        if (asc_get_sub_block_id() == 0) {
+            asc_copy_ub2l1(matrix_a_l1, input_ub, MATRIX_BYTES);
+        } else {
+            asc_copy_ub2l1(matrix_b_l1, input_ub, MATRIX_BYTES);
+        }
+        asc_sync_block_arrive(PIPE_MTE3, FLAG_ID);
+    }
+
+    if ASC_IS_AIC {
+        asc_sync_block_wait(PIPE_MTE1, FLAG_ID);
+        asc_copy_l12l0a(matrix_a_l0, matrix_a_l1, 0, 0, 1, 1, 1, 1);
+        asc_copy_l12l0b_transpose(matrix_b_l0, matrix_b_l1, 0, 0, 1, 1, 1, 1);
+        asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
+        asc_mmad(output_l0, matrix_a_l0, matrix_b_l0, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, 0, false, false, true);
+        asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
+        asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
+        asc_set_l0c2gm_nz2nd(1, 2, MATRIX_ELEMENTS);
+        asc_copy_l0c2gm(output, output_l0, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, 0, 0, 0,
+                        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
+                        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    }
+    asc_sync_pipe(PIPE_ALL);
+}
+
+} // namespace
+
+int main()
+{
+    uint32_t numBlocks = 1;
+    std::vector<half> input(MATRIX_ELEMENTS, static_cast<half>(1.0f));
+    std::vector<float> output(MATRIX_ELEMENTS, 0.0f);
+    half* input_device = nullptr;
+    float* output_device = nullptr;
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), MATRIX_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, MATRIX_BYTES, input.data(), MATRIX_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_sync_block_kernel<<<numBlocks, 0>>>(input_device, output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), OUTPUT_BYTES, output_device, OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    bool passed = true;
+    for (float value : output) {
+        passed = passed && (value == static_cast<float>(MATRIX_DIM));
+    }
+    std::cout << (passed ? "[Success] asc_sync_block_wait passed."
+                          : "[Failed] asc_sync_block_wait failed.") << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
+```

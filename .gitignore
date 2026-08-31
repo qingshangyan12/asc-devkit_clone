@@ -15,6 +15,7 @@ CLAUDE.md
 oat_reports/
 presmoke_reports/
 log/
+/Ascend/
 .DS_Store
 !/examples/**/10_math/log/
 !/scripts/presmoke/cases/**/10_math/log/
