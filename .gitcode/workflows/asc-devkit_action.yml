@@ -41,7 +41,8 @@ stages:
             with:
               repo_name: "asc-devkit"
               target_branch: ${{ env.TARGET_BRANCH }}
-              repo_url: ${{ vars.CI_PATH }}
+              comment: ${{ atomgit.event.comment.body }}
+              token: ${{ secrets.GIT_TOKEN }}
           -
             name: show_output
             run: |
@@ -290,7 +291,7 @@ stages:
               bucket: "ascend-ci"
               access-key: ${{ secrets.AK }}
               secret-key: ${{ secrets.SK }}
-              artifact-path: "${{ steps.process_checkout.outputs.path }}/slog.tar.gz"
+              artifact-path: "${{ steps.process_checkout.outputs.path }}/slog*.tar.gz"
               object-prefix: ${obs_smoke_path}/plog/
         if: env.TARGET_BRANCH == 'master'
         runs-on: ['self-hosted','npu=8','smoke=204']

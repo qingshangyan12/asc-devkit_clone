@@ -27,7 +27,7 @@
 
 头文件路径为：`"simt_api/asc_bf16.h"`。
 
-判断bfloat16x2\_t类型数据的两个分量是否为nan。
+判断bfloat16x2_t类型数据的两个分量是否为nan。
 
 ## 函数原型
 

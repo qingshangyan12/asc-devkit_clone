@@ -65,7 +65,7 @@ inline bfloat16_t hcos(bfloat16_t x)
     __global__ __launch_bounds__(1024) void KernelCos(bfloat16_t* dst, bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = hcos(x[idx]); // 对src源地址的第idx个元素取三角函数余弦值
+        dst[idx] = hcos(x[idx]); // 对入参x的第idx个元素取三角函数余弦值
     }
     ```
 
