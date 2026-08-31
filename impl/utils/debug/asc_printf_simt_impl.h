@@ -136,9 +136,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void enable_printf()
 template <uint32_t count = 1>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_nop()
 {
-#pragma unroll
+#pragma unroll 8
     for (uint32_t i = 0; i < count; ++i) {
-        asm volatile("NOP wait:0b0000000 stall:15" ::); // skip 15 cycle
+        __nop();
     }
 }
 
