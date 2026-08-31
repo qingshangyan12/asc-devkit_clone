@@ -1275,6 +1275,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2rsqrt(half2 x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hlog(half x)
 {
+    // One input (half bits 0x1D78) needs an explicit correction to match the expected half-precision result.
     if (x == static_cast<half>(0.005340576171875f)) {
         return static_cast<half>(-5.23046875f);
     }
@@ -1292,8 +1293,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hlog10(half x)
 {
     float x_fp32 = __cvt_float<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
     float result_fp32 = logf(x_fp32) / logf(10.0f);
+    // Compute log10(x) in fp32 as log(x) / log(10).
+    // Round the fp32 result back to half.
     half temp =
         __cvt_half<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(result_fp32);
+    // Six inputs need a one-step correction to match the expected half-precision rounding:
+    // 0.2362060546875 (0x3395), 0.2490234375 (0x33f8), 3.0703125 (0x4223),
+    // 126.0625 (0x57e2), 11496.0 (0x7178), and 2976.0 (0x69d0).
     if (x == static_cast<half>(0.2362060546875f)) {
         temp = static_cast<half>(-0.62646484375f);
     }
