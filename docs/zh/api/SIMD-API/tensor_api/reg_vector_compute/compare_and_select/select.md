@@ -41,15 +41,15 @@ __simd_callee__ inline reg_tensor<T> select(reg_tensor<bool> condition, reg_tens
 
 | 参数 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `condition` | 输入 | 选择条件，类型为 `reg_tensor<bool>`。每个元素决定对应位置选择 `src0` 还是 `src1`。 |
-| `src0` | 输入 | 条件为 `true` 时选择的源操作数，类型为 `reg_tensor<T>`。其 `mask` 作为返回值的有效元素掩码。 |
-| `src1` | 输入 | 条件为 `false` 时选择的源操作数，类型为 `reg_tensor<T>`。 |
+| condition | 输入 | 选择条件，类型为 `reg_tensor<bool>`。每个元素决定对应位置选择 `src0` 还是 `src1`。 |
+| src0 | 输入 | 条件为 `true` 时选择的源操作数，类型为 `reg_tensor<T>`。其 `mask` 作为返回值的有效元素掩码。 |
+| src1 | 输入 | 条件为 `false` 时选择的源操作数，类型为 `reg_tensor<T>`。 |
 
 ## 返回值说明
 
 返回 `reg_tensor<T>`，包含逐元素选择的结果。返回值的 `mask` 与 `src0.mask` 相同。
 
-## 数据类型支持
+## 数据类型
 
 支持的数据类型为：bool、int8_t、uint8_t、fp8_e4m3fn_t、hifloat8_t、fp8_e5m2_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 
