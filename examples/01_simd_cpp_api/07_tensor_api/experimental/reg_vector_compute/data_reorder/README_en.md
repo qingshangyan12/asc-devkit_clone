@@ -4,6 +4,12 @@
 
 This example implements data reordering based on the static Tensor API programming model. It primarily calls the experimental `asc::te::experimental::deinterleave` interface.
 
+## Supported Products and CANN Versions
+
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+
 ## Directory Structure
 
 ```text

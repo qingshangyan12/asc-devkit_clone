@@ -4,6 +4,12 @@
 
 本样例基于静态Tensor API编程范式实现数据重排功能，主要调用实验性接口 `asc::te::experimental::deinterleave`。
 
+## 本样例支持的产品及CANN软件版本
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+
 ## 目录结构
 
 ```text
