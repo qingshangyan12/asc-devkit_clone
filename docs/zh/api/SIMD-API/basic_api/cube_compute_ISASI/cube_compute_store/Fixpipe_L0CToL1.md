@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToL1_res.md#id1 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002511188540_section106841136114319"></a>
 
@@ -133,7 +134,7 @@
 | mSize | 必选输入 | 源NZ矩阵在M方向上的大小。取值范围为mSize∈[0, 65535]。<br>**注：mSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
 | srcStride | 必选输入 | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围为srcStride∈[0, 65535]，单位为C0_Size（16*sizeof(T)），T为src的数据类型，其值应填成mSize对16向上取整。 |
 | dstStride | 必选输入 | 目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位为datablock（32字节）。 |
-| [quantPre](../../cube_compute_TensorAPI/cube_store_key_features/quant_pre.md) | 可选输入 | 用于控制量化模式，QuantMode_t类型，默认值为`QuantMode_t::NoQuant`，具体定义如下：<br>&nbsp;&nbsp;&bull; half/bfloat16_t输出，此参数需配置为`QuantMode_t::F322F16`/`QuantMode_t::F322BF16`。<br>注：此参数需要用户手动配置，不会自动推导配置对应量化模式。此通路不支持NoQuant模式。<br>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能，此通路不支持<br>    F322F16,      // Float32_2_Float16：float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // Float32_2_BFloat16：float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // DeQuant_Float16：int32_t量化成half，scalar量化<br>    VDEQF16,      // Vector_DeQuant_Float16：int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // Quant_Float32_2_B8：float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8：float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // ReQuant_int8：int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // Vector_ReQuant_int8：int32_t量化成int8_t/uint8_t，tensor量化<br>}; |
+| quantPre | 可选输入 | 用于控制量化模式，QuantMode_t类型，默认值为`QuantMode_t::NoQuant`，具体定义如下：<br>&nbsp;&nbsp;&bull; half/bfloat16_t输出，此参数需配置为`QuantMode_t::F322F16`/`QuantMode_t::F322BF16`。<br>注：此参数需要用户手动配置，不会自动推导配置对应量化模式。此通路不支持NoQuant模式。<br>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能，此通路不支持<br>    F322F16,      // Float32_2_Float16：float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // Float32_2_BFloat16：float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // DeQuant_Float16：int32_t量化成half，scalar量化<br>    VDEQF16,      // Vector_DeQuant_Float16：int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // Quant_Float32_2_B8：float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8：float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // ReQuant_int8：int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // Vector_ReQuant_int8：int32_t量化成int8_t/uint8_t，tensor量化<br>}; |
 | deqScalar | 可选输入 | scalar量化参数，表示单个scale值，quantPre量化模式为[随路量化](../cube_store_key_features/accompanying_quantization.md)时需要设置该参数。支持的数据类型为`uint64_t`。 |
 | [reluEn](../cube_store_key_features/accompanying_relu.md) | 可选输入 | 是否开启NormReLU的开关：<br>&nbsp;&nbsp;&bull; `false`：不开启NormReLU功能，默认为`false`；<br>&nbsp;&nbsp;&bull; `true`：开启NormReLU功能。 |
 | unitFlag | 可选输入 | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0（2'b00）：不开启unitFlag；<br>&nbsp;&nbsp;&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不复位单元标记位；<br>&nbsp;&nbsp;&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。<br>参数设置方案和特性细节可参考：Mmad计算中关键特性说明的[UnitFlag](../mmad_compute_key_features/UnitFlag.md)章节。 |
@@ -227,6 +228,7 @@
         ```
 
     对于整数类型只有饱和模式。
+    L0C Buffer到L1 Buffer搬运接口的边界值汇总请见[矩阵计算搬出相关接口边界值汇总](../../../../appendix/matrix_compute_move_out_interface_boundary_value_summary.md)。
 <!-- end id28 -->
 <!-- npu="950" id31 -->
 - Ascend 950PR/Ascend 950DT特殊值/边界值约束说明：

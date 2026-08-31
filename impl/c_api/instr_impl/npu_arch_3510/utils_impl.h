@@ -9,8 +9,7 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    impl/c_api/instr_impl/npu_arch_3510/utils_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.
+
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -18,9 +17,9 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_UTILS_IMPL_H
 
-#include "c_api/utils/enum.h"
+#include "c_api/defs/enum.h"
+#include "c_api/defs/type.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/utils_impl/utils_type.h"
 
 #endif
 

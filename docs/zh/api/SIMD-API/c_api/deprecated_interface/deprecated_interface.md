@@ -1,19 +1,5 @@
 # 废弃接口
 
-## 矢量计算
-- **[asc_abs_sync（废弃）](asc_abs_sync_deprecated.md)**
+本目录保留为废弃接口的兼容入口。已迁入本目录的废弃接口资料以本目录为唯一位置，查找完整的废弃状态、替代接口和资料链接时，请使用[废弃接口清单](../../../appendix/deprecated_interface.md)。
 
-### 类型转换
-
-- **[asc_float2bfloat16（废弃）](asc_float2bfloat16_deprecated.md)**
-- **[asc_int322int16（废弃）](asc_int322int16_deprecated.md)**
-- **[asc_int322int64（废弃）](asc_int322int64_deprecated.md)**
-- **[asc_int322uint16（废弃）](asc_int322uint16_deprecated.md)**
-- **[asc_uint82uint16（废弃）](asc_uint82uint16_deprecated.md)**
-
-## 原子操作
-- **[asc_set_atomic_add_int（废弃）](asc_set_atomic_add_int_deprecated.md)**
-
-## 系统变量
-- **[asc_get_block_idx（废弃）](asc_get_block_idx_deprecated.md)**
-- **[asc_get_block_num（废弃）](asc_get_block_num_deprecated.md)**
+C API分类列表中的废弃接口说明请参见[C API列表](../c_api.md#废弃接口)。
