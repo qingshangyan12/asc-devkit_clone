@@ -50,7 +50,7 @@
 
     第一步将 Global Memory 上的输入 x 和 y 搬运到 Local Memory，分别存储在 xLocal、yLocal。
 
-    第二步从 Unified Buffer 加载数据到寄存器 reg_src0 和 reg_src1，使用 `asc_add` 对寄存器数据执行加法操作，结果存储在寄存器reg_dst 中，计算完成后将结果搬回zLocal。
+    第二步从 Unified Buffer 加载数据到寄存器 src0 和 src1，使用 `asc_add` 对寄存器数据执行加法操作，结果存储在寄存器 dst 中，计算完成后将结果搬回zLocal。
 
     第三步将输出数据从zLocal搬运至Global Memory上的输出z中。
 
