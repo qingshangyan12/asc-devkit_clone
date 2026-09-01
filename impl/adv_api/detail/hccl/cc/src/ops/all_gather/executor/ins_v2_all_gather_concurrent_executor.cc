@@ -360,7 +360,7 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     // 前同步
     CHK_RET(PreSyncInterThreads(mainThread_, templateMainThreads_, syncNotifyOnTemplates_));
 
-    // 交替下发两个template的任务
+    // 交替下发两个template的任务test
     for (u32 loopIndex = 0; loopIndex < loopTimesforTemp0 || loopIndex < loopTimesforTemp1; loopIndex++) {
         if (loopIndex < loopTimesforTemp0) {
             u64 currCountforTemp0 = (loopIndex == loopTimesforTemp0 - 1) ?
