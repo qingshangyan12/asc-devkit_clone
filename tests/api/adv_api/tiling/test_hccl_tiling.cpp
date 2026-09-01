@@ -204,7 +204,8 @@ TEST_F(TestHcclTilingCcuKfc, AllToAllCcuSchedUsesCcuNewVersion)
 TEST_F(TestHcclTilingCcuKfc, UnsupportedCommEngineUsesDefaultVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1DMem2Mem", 4U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 4U,
+        INIT_TILING_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, UnregisteredAlgorithmUsesDefaultVersion)
@@ -213,24 +214,17 @@ TEST_F(TestHcclTilingCcuKfc, UnregisteredAlgorithmUsesDefaultVersion)
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuUnregisteredAlgorithm", 6U, INIT_TILING_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, AllGatherCcuMsUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, AllGatherSoleMeshCcuMsUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1DMem2Mem", 5U,
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 5U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 
-TEST_F(TestHcclTilingCcuKfc, AllGatherCcuSchedUsesCcuNewVersion)
+TEST_F(TestHcclTilingCcuKfc, AllGatherSoleMeshCcuSchedUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1DMem2Mem", 6U,
-        INIT_TILING_CCU_NEW_VERSION);
-}
-
-TEST_F(TestHcclTilingCcuKfc, KfcAllGatherCcuSchedUsesCcuNewVersion)
-{
-    ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherMesh1DMem2Mem", 6U,
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 6U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 

@@ -100,14 +100,13 @@ enum AlgorithmType {
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
-    {"CcuAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
+    {"CcuSchedAllGatherSoleMesh", CcuAllGatherMeshMem2Mem1D},
     {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
     {"CcuSchedAllGatherConcurMeshNHRMultiLink", CcuSchedAllGatherConcurMeshNHRMultiLink},
     {"CcuSchedReduceScatterSoleMesh", CcuReduceScatterMeshMem2Mem1D},
     {"CcuSchedAllToAllSoleMesh", CcuSchedAllToAllSoleMesh},
     {"CcuSchedAllToAllVSoleMesh", CcuSchedAllToAllVSoleMesh},
-    {"CcuSchedAllReduceSoleMesh", CcuAllReduceMeshMem2Mem1D},
-    {"CcuSchedAllGatherSoleMesh", CcuAllGatherMeshMem2Mem1D}};
+    {"CcuSchedAllReduceSoleMesh", CcuAllReduceMeshMem2Mem1D}};
 
 typedef HcclResult (*OpParamPrepareFunc)(
     HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
