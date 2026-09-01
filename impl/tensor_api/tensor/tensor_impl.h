@@ -36,11 +36,11 @@ template <typename LocationType, typename EngineT, typename LayoutT>
 struct make_tensor_result;
 
 template <typename EngineT, typename LayoutT>
-__aicore__ inline base_tensor<EngineT, LayoutT>::base_tensor()
+__aicore__ inline constexpr base_tensor<EngineT, LayoutT>::base_tensor()
 {}
 
 template <typename EngineT, typename LayoutT>
-__aicore__ __callee__ inline base_tensor<EngineT, LayoutT>::base_tensor(const EngineT& engine, const LayoutT& layout)
+__aicore__ inline constexpr base_tensor<EngineT, LayoutT>::base_tensor(const EngineT& engine, const LayoutT& layout)
     : rep(layout, engine)
 {}
 
