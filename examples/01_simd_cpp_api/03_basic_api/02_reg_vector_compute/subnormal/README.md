@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例演示了在Ascend C Reg矢量计算中，Div操作在Subnormal模式开启或关闭情况下的行为差异。通过两种不同的Div精度算法配置（PRECISION_1ULP_FTZ_FALSE和PRECISION_1ULP_FTZ_TRUE），展示是否支持Subnormal浮点数对计算结果的影响。
+本样例演示了在Ascend C Reg矢量计算中，使用DivAlgo::DIFF_COMPENSATION差值补偿算法进行除法运算，验证其0ulp精度特性。通过选取在float32中无法精确表示的normal值除法，展示差值补偿算法输出与IEEE 754正确舍入结果完全一致。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -26,7 +26,7 @@ subnormal
 
 - 样例功能：
 
-  样例计算float类型数据，分别使用PRECISION_1ULP_FTZ_FALSE和PRECISION_1ULP_FTZ_TRUE配置DivSpecificMode作为Div操作的精度算法参数，执行除法运算。计算公式如下：
+  样例计算float类型数据，使用DivAlgo::DIFF_COMPENSATION差值补偿算法配置DivSpecificMode作为Div操作的精度算法参数，对normal值执行除法运算。golden数据由float64高精度除法结果舍入到float32生成（模拟IEEE 754正确舍入），用于验证0ulp精度。计算公式如下：
   $$z_i = \frac{x_i}{y_i}$$
 
 - 样例规格
@@ -50,43 +50,31 @@ subnormal
         7. 将计算结果从Unified Buffer搬回Global Memory
         8. 在Host端进行精度验证和golden data对比
 
-  - Subnormal与FTZ概念说明：
-      - Subnormal：指数部分全为0，尾数部分不全为0的浮点数，表示接近0的极小数值。IEEE 754标准支持Subnormal数，提供更好的数值精度和渐进下溢出特性。
-      - FTZ：将Subnormal数强制置为0的模式。虽然简化了硬件设计和提高性能，但会损失数值精度。
+  - 0ulp精度说明：
+      - 差值补偿算法（DIFF_COMPENSATION）：通过计算初步商后，利用余数对结果进行差值补偿修正，消除单指令除法的舍入误差，使输出与IEEE 754正确舍入结果完全一致，最大精度误差为0ulp。
+      - 默认算法（INTRINSIC）：使用单指令计算，最大精度误差为1ulp，对于无法精确表示的除法结果可能产生1ulp的舍入偏差。
 
-  - 多场景说明：
-      - 场景1（SCENARIO_NUM=1）：使用PRECISION_1ULP_FTZ_FALSE作为Div的精度算法参数
-          - 实现函数：SubnormalFTZFalseVF<T>
-          - 实现：
-            ```cpp
-            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, PRECISION_1ULP_FTZ_FALSE};
-            AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
-            ```
-          - 说明：支持Subnormal数据计算，使用单指令计算得出结果，最大精度误差为1 ulp。除法结果为Subnormal数时，保留该值。
-          - 应用场景：需要精确处理Subnormal浮点数的科学计算、数值模拟、高精度计算等场景。
+  - 场景说明：
+      - 实现函数：SubnormalDivVF<T>
+      - 实现：
+        ```cpp
+        static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, DIFF_COMPENSATION};
+        AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
+        ```
+      - 说明：使用差值补偿算法对normal值执行除法，最大精度误差为0ulp，输出与golden（IEEE 754正确舍入）完全一致。
+      - 应用场景：对除法精度有严格要求的科学计算、数值模拟、高精度计算等场景。
 
-      - 场景2（SCENARIO_NUM=2）：使用PRECISION_1ULP_FTZ_TRUE作为Div的精度算法参数
-          - 实现函数：SubnormalFTZTrueVF<T>
-          - 实现：
-            ```cpp
-            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, PRECISION_1ULP_FTZ_TRUE};
-            AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
-            ```
-          - 说明：不支持Subnormal数据计算，FTZ模式，使用单指令计算得出结果，最大精度误差为1 ulp。除法结果为Subnormal数时，被强制置为0。
-          - 应用场景：对Subnormal处理精度要求不高的深度学习、图像处理、实时推理等场景，可简化硬件实现，提高计算性能。
+    - 计算数据示例：
 
-    - 计算数据场景对比：
+      | 序号 | 被除数 | 除数 | float32精确舍入结果（golden） | 说明 |
+      |:---:|:---:|:---:|:---:|:---|
+      | 1 | 1.0 | 3.0 | 0.33333334（0x3EAAAAAB） | 1/3在float32中无法精确表示，需舍入 |
+      | 2 | 1.0 | 7.0 | 0.14285715（0x3E124925） | 1/7在float32中无法精确表示，需舍入 |
+      | 3 | 2.0 | 3.0 | 0.6666667（0x3F2AAAAB） | 2/3在float32中无法精确表示，需舍入 |
+      | 4 | 1.0 | 10.0 | 0.100000001（0x3DCCCCCD） | 1/10在float32中无法精确表示，需舍入 |
+      | 5 | 3.0 | 7.0 | 0.42857143（0x3EDB6DB7） | 3/7在float32中无法精确表示，需舍入 |
 
-      | 序号 |   Div组合   |     被除数      |     除数     | 场景1（golden一致） | 原因解析              | 场景2输出（丢失精度） | 原因解析                            |
-      |:---:|:---------:|:------------:|:----------:|:-------------:|:------------------|:-----------:|:--------------------------------|
-      | 1  | N / N = S | $2^{-126}$ |    4.0     |  0x00200000   | 结果是次正规数$2^{-128}$ | 0x00000000  | 计算结果落在Subnormal区间，结果强制归零        |
-      | 2  | N / S = N | $2^{-125}$ | $2^{-127}$ |  0x40800000   | 结果是正规数$2^{2}$     | 0x7f800000  | 除数S被视作0，任何非零正数除以0结果为无穷大         |
-      | 3  | S / N = S | $2^{-130}$ |    2.0     |  0x00040000   | 结果为次正规数$2^{-131}$ | 0x00000000  | 被除数S输入时即被视为0，结果为0               |
-      | 4  | S / N = N | $2^{-130}$ | $2^{-20}$  |  0x08800000   | 结果是正规数$2^{110}$   | 0x00000000  | 被除数S输入时即被视为0，结果为0               |
-      | 5  | S / S = N | $2^{-140}$ | $2^{-145}$ |  0x42000000   | 结果为正规数$2^{5}$     | 0x7fffffff  | 被除数S与除数S都被视为0，$0 \div 0$，结果是NaN |
-        
-      - N：normal数据，正规数。
-      - S：Subnormal数据，次正规数。
+      - DIFF_COMPENSATION输出与golden完全一致（0ulp误差）。
 
   - 约束条件：
       - 输入数据长度必须为GetVecLen()的整数倍
@@ -107,10 +95,8 @@ subnormal
 
   在本样例目录下执行如下命令。
   ```bash
-  # 场景2：使用PRECISION_1ULP_FTZ_TRUE（FTZ模式）
-  SCENARIO_NUM=2
   mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake .. -DSCENARIO_NUM=$SCENARIO_NUM; make -j;                           # 编译工程
+  cmake ..; make -j;                                                        # 编译工程
   python3 ../scripts/gen_data.py;                                           # 生成测试输入数据
   ./demo                                                                    # 执行样例
   ```
@@ -128,7 +114,6 @@ subnormal
 
   | 选项 | 可选值                   | 说明                                           |
   |:--------------------------|:----------------------|:---------------------------------------------|
-  | `SCENARIO_NUM`            | `1`（默认）、`2`        | 1：支持subnormal计算；<br/>2：不支持subnormal计算；       |
   | `CMAKE_ASC_RUN_MODE`      | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真                      |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`            | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 

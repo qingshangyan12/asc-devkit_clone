@@ -922,16 +922,13 @@ __simd_callee__ inline void DivPrecisionImpl(U& dstReg, U& srcReg0, U& srcReg1, 
     RegTensor<ActualT> scale;
     RegTensor<ActualT> aScaled, bScaled;
     MaskReg needScaleMask;
-    MaskReg noScaleMask;
 
     vdup(src0Reg, exponentMask, mask, modeValue);
     And(src0ExpBits, (RegTensor<uint32_t>&)srcReg0, src0Reg, mask);
     vshrs(src0ExpBits, src0ExpBits, (int16_t)23, mask, modeValue);
-    vdup(src0Reg, exponentBias, mask, modeValue);
-    vsub(src0Exp, (RegTensor<int32_t>&)src0ExpBits, (RegTensor<int32_t>&)src0Reg, mask, modeValue);
+    vadds(src0Exp, (RegTensor<int32_t>&)src0ExpBits, -exponentBias, mask, modeValue);
 
     Compares<int32_t, CMPMODE::LT>(needScaleMask, src0Exp, precisionThreshold, mask);
-    MaskNot(noScaleMask, needScaleMask, mask);
 
     RegTensor<int32_t> k;
     RegTensor<int32_t> thresholdVec;
