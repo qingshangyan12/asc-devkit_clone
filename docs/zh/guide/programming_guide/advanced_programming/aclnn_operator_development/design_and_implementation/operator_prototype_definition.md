@@ -183,12 +183,12 @@ TilingData字段设计、Tiling函数写法、workspace设置和`numBlocks`配�
 
 当算子需要依据运行时输入、输出或属性，从多份预编译核函数（Kernel）binary中快速选择一份时，可以注册`GenSimplifiedKey`回调。回调由算子开发者编写，只负责生成自定义simplified key片段；运行时框架负责在该片段前补齐算子类型和运行时公共维度，使用完整Key查找并选择对应的binary。
 
-在已有Tiling注册的`AICore()`链式调用中增加`SetGenSimplifiedKey`即可：
+完成算子原型注册后，通过`IMPL_OP`注册`GenSimplifiedKey`回调，并确保该注册只编译到Tiling注册库中：
 
 ```cpp
-this->AICore()
-    .SetTiling(optiling::TilingFunc)
-    .SetGenSimplifiedKey(optiling::GenSimplifiedKeyFunc);
+#if defined(OP_TILING_LIB)
+IMPL_OP(AddCustom).GenSimplifiedKey(optiling::GenSimplifiedKeyFunc);
+#endif
 ```
 
 该接口适用于同一算子存在多份二进制，且选择维度可由Host侧`TilingContext`读取的场景，例如输入dtype、format、shape分档或属性组合。回调生成的片段必须与编译配置JSON中每个`op_list`项的`simplified_key`严格对应；没有注册回调或不提供这类JSON时，保持原有binary匹配流程。

@@ -89,16 +89,15 @@ static ge::graphStatus GenSimplifiedKeyFunc(
 
 ## 注册回调
 
-在算子原型的`OpDef`构造函数中注册回调，通常与Tiling函数一起配置：
+通过`IMPL_OP`注册回调，并确保该注册只编译到Tiling注册库中：
 
 ```cpp
-this->AICore()
-    .SetTiling(optiling::TilingFunc)
-    .SetGenSimplifiedKey(optiling::GenSimplifiedKeyFunc)
-    .AddConfig("ascendxxx");
+#if defined(OP_TILING_LIB)
+IMPL_OP(AddCustomTemplate).GenSimplifiedKey(optiling::GenSimplifiedKeyFunc);
+#endif
 ```
 
-`OP_ADD`注册算子原型时，会将该函数写入算子实现注册信息。运行时加载Host侧算子实现后，才能在调用过程中取得并调用此回调。
+`IMPL_OP`会将该函数写入算子实现注册信息。运行时加载Host侧算子实现后，才能在调用过程中取得并调用此回调。
 
 ## 编写要求
 
@@ -110,6 +109,6 @@ this->AICore()
 
 ## 相关文档
 
-- [算子原型定义](./operator_prototype_definition.md)：了解`SetGenSimplifiedKey`所在的原型注册位置。
+- [算子原型定义](./operator_prototype_definition.md)：了解`GenSimplifiedKey`回调的注册位置。
 - [simplified key二进制配置JSON](../compilation_and_deployment/simplified_key_json_configuration.md)：了解JSON与编译产物的对应关系。
 - [基于simplified key的运行时选择流程](../invocation/simplified_key_runtime_flow.md)：了解运行时如何使用回调结果选择binary。

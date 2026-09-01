@@ -106,9 +106,11 @@ public:
         this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
         this->AICore()
             .SetTiling(optiling::TilingFunc)
-            .SetGenSimplifiedKey(optiling::GenSimplifiedKeyFunc)
             .AddConfig("ascend910b");
     }
 };
 OP_ADD(AddCustomTemplate);
+#if defined(OP_TILING_LIB)
+IMPL_OP(AddCustomTemplate).GenSimplifiedKey(optiling::GenSimplifiedKeyFunc);
+#endif
 } // namespace ops
