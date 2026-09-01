@@ -33,7 +33,7 @@
 
 该接口用于将Unified Buffer（UB）中的数据搬运到Global Memory。接口根据源、目的Tensor的存储位置自动选择`copy_ub_to_gm`通路，并根据源、目的Layout推导搬运块数、单块长度、源步长和目的步长，支持单块长度非32字节对齐的数据搬运。
 
-当前支持ND2ND、DN2DN和NZ2NZ搬运，不支持ZN2ZN以及不同Layout Pattern之间的格式转换。搬运过程中不执行数据类型转换，数据格式和有效内容保持不变。接口支持整Tensor搬运和通过坐标、Shape指定的局部区域搬运。Global Memory目的Tensor设置的L2 Cache Hint会传递给搬运指令。
+当前支持ND2ND、DN2DN、NZ2NZ和ZN2ZN搬运。搬运过程中不执行数据类型转换，数据格式和有效内容保持不变。接口支持整Tensor搬运和通过坐标、Shape指定的局部区域搬运。Global Memory目的Tensor设置的L2 Cache Hint会传递给搬运指令。
 
 ## 函数原型
 
@@ -102,10 +102,7 @@ UB到Global Memory通路使用`copy_ub_to_gm{}`作为搬运操作对象，默认
 - 源UB地址需满足32字节对齐要求，目的Global Memory地址支持1字节对齐。
 - 源、目的Layout Pattern必须相同。当前支持ND2ND、DN2DN和NZ2NZ、ZN2ZN。
 - 源、目的数据类型必须相同，目的Tensor或目的区域容量必须不小于搬运区域。
-- Layout推导出的搬运块数、单块长度和步长必须满足底层`asc_copy_ub2gm_align`指令的字段范围及对齐要求。有效搬运的块数取值范围为[1, 4095]，单块长度取值范围为[1, 2097151]字节，且单块长度必须为元素字节数的整数倍。
 - 有效搬运的源步长必须等于单块长度，或为32字节的正整数倍。前者表示UB中的数据块紧凑排列，后者表示各数据块按32字节边界排列。
-- 与部分产品上的`DataCopyExtParams`接口不同，Tensor API要求源、目的Layout以及区域搬运Shape合法，不能依赖搬运块数或单块长度为0表示空操作。
-- b4类型按b8搬运粒度调整块长度和步长。
 
 ## 关键特性说明
 
@@ -124,7 +121,7 @@ UB源地址按32字节对齐，Global Memory目的端允许1字节对齐。单�
 
 ### L2 Cache模式
 
-接口从目的Global Memory Tensor的Engine中取得Cache Hint，并转换为底层`asc_store_l2_cache_mode`参数。需要指定Cache策略时，应在目的Tensor上设置对应Hint，无需向`copy`额外传参。
+接口从目的Global Memory Tensor的Engine中取得Cache Hint，需要指定Cache策略时，应在目的Tensor上设置对应Hint，无需向`copy`额外传参。
 
 ## 调用示例
 
