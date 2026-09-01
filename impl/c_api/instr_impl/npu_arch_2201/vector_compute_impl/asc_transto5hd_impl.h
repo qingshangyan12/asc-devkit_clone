@@ -20,22 +20,20 @@
 
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-template <ub_addr8_t dst, ub_addr8_t src>
-__aicore__ inline void asc_transto5hd_b8_va_impl(
-    uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
-{
-    if (!dst_high_half) {
-        if (!src_high_half) {
-            scatter_vnchwconv_b8(dst, src, repeat, dst_stride, src_stride, false, false);
-        } else {
-            scatter_vnchwconv_b8(dst, src, repeat, dst_stride, src_stride, false, true);
-        }
-    } else if (!src_high_half) {
-        scatter_vnchwconv_b8(dst, src, repeat, dst_stride, src_stride, true, false);
-    } else {
-        scatter_vnchwconv_b8(dst, src, repeat, dst_stride, src_stride, true, true);
-    }
-}
+#define ASC_TRANSTO5HD_B8_CALL(dst_va, src_va, repeat, dst_stride, src_stride, dst_high_half, src_high_half) \
+    do {                                                                                                     \
+        if (!(dst_high_half)) {                                                                              \
+            if (!(src_high_half)) {                                                                          \
+                scatter_vnchwconv_b8(dst_va, src_va, repeat, dst_stride, src_stride, false, false);          \
+            } else {                                                                                         \
+                scatter_vnchwconv_b8(dst_va, src_va, repeat, dst_stride, src_stride, false, true);           \
+            }                                                                                                \
+        } else if (!(src_high_half)) {                                                                       \
+            scatter_vnchwconv_b8(dst_va, src_va, repeat, dst_stride, src_stride, true, false);               \
+        } else {                                                                                             \
+            scatter_vnchwconv_b8(dst_va, src_va, repeat, dst_stride, src_stride, true, true);                \
+        }                                                                                                    \
+    } while (0)
 
 __aicore__ inline void asc_transto5hd_b8_impl(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half,
@@ -44,39 +42,41 @@ __aicore__ inline void asc_transto5hd_b8_impl(
     if ASC_IS_AIV {
         if (dst == ub_addr8_t::VA0) {
             if (src == ub_addr8_t::VA2) {
-                asc_transto5hd_b8_va_impl<VA0, VA2>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA0, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             } else if (src == ub_addr8_t::VA4) {
-                asc_transto5hd_b8_va_impl<VA0, VA4>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA0, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             } else if (src == ub_addr8_t::VA6) {
-                asc_transto5hd_b8_va_impl<VA0, VA6>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA0, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             }
         } else if (dst == ub_addr8_t::VA2) {
             if (src == ub_addr8_t::VA0) {
-                asc_transto5hd_b8_va_impl<VA2, VA0>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA2, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             } else if (src == ub_addr8_t::VA4) {
-                asc_transto5hd_b8_va_impl<VA2, VA4>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA2, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             } else if (src == ub_addr8_t::VA6) {
-                asc_transto5hd_b8_va_impl<VA2, VA6>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA2, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             }
         } else if (dst == ub_addr8_t::VA4) {
             if (src == ub_addr8_t::VA0) {
-                asc_transto5hd_b8_va_impl<VA4, VA0>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA4, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             } else if (src == ub_addr8_t::VA2) {
-                asc_transto5hd_b8_va_impl<VA4, VA2>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA4, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             } else if (src == ub_addr8_t::VA6) {
-                asc_transto5hd_b8_va_impl<VA4, VA6>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA4, VA6, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             }
         } else if (dst == ub_addr8_t::VA6) {
             if (src == ub_addr8_t::VA0) {
-                asc_transto5hd_b8_va_impl<VA6, VA0>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA6, VA0, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             } else if (src == ub_addr8_t::VA2) {
-                asc_transto5hd_b8_va_impl<VA6, VA2>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA6, VA2, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             } else if (src == ub_addr8_t::VA4) {
-                asc_transto5hd_b8_va_impl<VA6, VA4>(repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+                ASC_TRANSTO5HD_B8_CALL(VA6, VA4, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
             }
         }
     }
 }
+
+#undef ASC_TRANSTO5HD_B8_CALL
 
 __aicore__ inline void asc_transto5hd_b8_sync_impl(
     ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half,
