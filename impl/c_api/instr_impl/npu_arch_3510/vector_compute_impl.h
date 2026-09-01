@@ -221,6 +221,21 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_set_va_reg_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_mula_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_fma_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_vcvt_impl.h"
+
+template <typename Dst, typename Src, typename... Args>
+__simd_callee__ inline void asc_vcvt(Dst& dst, Src src, Args... args)
+{
+    asc_vcvt_impl(dst, src, args...);
+}
+
+template <typename Dst, typename Src, typename... Args>
+__simd_callee__ inline Dst asc_vcvt(Src src, Args... args)
+{
+    Dst dst;
+    asc_vcvt_impl(dst, src, args...);
+    return dst;
+}
 
 // ==========asc_update_addr_reg(b8/b16/b32)=========
 #define ASC_DEFINE_UPDATE_ADDR_REG_API(bxx)                                                                         \

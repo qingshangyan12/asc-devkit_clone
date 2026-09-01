@@ -572,6 +572,14 @@ __aicore__ inline void asc_half2uint8_rz(
 
 __aicore__ inline void asc_half2uint8_rz(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename Dst, typename Src, typename... Args>
+__simd_callee__ inline void asc_vcvt(Dst& dst, Src src, Args... args);
+
+template <typename Dst, typename Src, typename... Args>
+__simd_callee__ inline Dst asc_vcvt(Src src, Args... args);
+#endif
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
