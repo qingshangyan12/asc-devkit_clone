@@ -26,6 +26,7 @@ CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
     ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
     uint32_t rankSize, uint32_t rankId, uint32_t jettyNum, const std::vector<KfcNhrStepInfo>& stepInfoVector,
     const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
+CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl
 
