@@ -63,6 +63,8 @@ SIMT编程场景当前不支持使用该接口。
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp8.h"
+
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_hif822half2(__gm__ hifloat8x2_t* input, __gm__ half2* output, uint32_t input_total_length)
     {

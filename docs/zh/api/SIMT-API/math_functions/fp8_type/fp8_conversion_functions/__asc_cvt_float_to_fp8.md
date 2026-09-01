@@ -80,6 +80,8 @@ SIMT编程场景当前不支持使用该接口。
 - SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp8.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void simt_asc_cvt_float_to_fp8(__gm__ float* input, __gm__ uint8_t* output, uint32_t input_total_length)
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;

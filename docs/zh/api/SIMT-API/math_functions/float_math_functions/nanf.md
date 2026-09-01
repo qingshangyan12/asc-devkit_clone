@@ -58,6 +58,8 @@ inline float nanf(const char* tagp)
 - SIMT编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __global__ __launch_bounds__(1024) void kernel_nanf(float* dst)
     {
         dst[0] = nanf("0x1A");
@@ -70,6 +72,8 @@ inline float nanf(const char* tagp)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel_nanf(__gm__ float* dst)
     {
         dst[0] = nanf("0x1A");

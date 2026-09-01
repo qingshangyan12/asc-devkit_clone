@@ -70,6 +70,8 @@ a\[0\]^2 + a\[1\]^2 + ...+ a\[n-1\]^2的平方根的倒数。
 - SIMT编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __global__ __launch_bounds__(256) void compute_rnormf(float *result, const int *n, float *vector_data, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -83,6 +85,8 @@ a\[0\]^2 + a\[1\]^2 + ...+ a\[n-1\]^2的平方根的倒数。
 - SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __simt_vf__ __launch_bounds__(256) inline void compute_rnormf_vf(__gm__ float *result, __gm__ const int *n, __gm__ float *vector_data, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
