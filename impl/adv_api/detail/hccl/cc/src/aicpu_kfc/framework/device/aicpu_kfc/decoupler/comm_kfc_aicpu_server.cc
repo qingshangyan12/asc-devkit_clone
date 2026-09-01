@@ -169,7 +169,7 @@ u64 GetDfxDataTypeSize(HcclDataType dataType)
 
 HcclResult BuildOpenDfxOpInfo(
     const mc2_ops_hccl::OpParam& param, const HcclMsg& msg, const HcclMsgExt& extMsg, u32 rankNum, u32 repeatCnt,
-    HcclDfxOpInfo& dfxOpInfo)
+    u64 mainThread, HcclDfxOpInfo& dfxOpInfo)
 {
     const bool isAllToAll = param.opType == HCCL_CMD_ALLTOALL || param.opType == HCCL_CMD_ALLTOALLV;
     const HcclDataType inputType = isAllToAll ? param.all2AllVDataDes.sendType : param.DataDes.dataType;
@@ -206,7 +206,7 @@ HcclResult BuildOpenDfxOpInfo(
     dfxOpInfo.dataCount = param.dataCount == 0U ? dfxCount : static_cast<u64>(param.dataCount);
     dfxOpInfo.root = param.root;
     dfxOpInfo.engine = param.engine;
-    dfxOpInfo.cpuTsThread = param.opThread;
+    dfxOpInfo.cpuTsThread = mainThread;
     dfxOpInfo.cpuWaitAicpuNotifyIdx = param.aicpuRecordCpuIdx;
     dfxOpInfo.inputMemAddr = reinterpret_cast<u64>(param.inputPtr);
     dfxOpInfo.inputMemSize = param.inputSize == 0U ? SafeMultiplyForDfx(inputCount, GetDfxDataTypeSize(inputType)) :
@@ -707,7 +707,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
                 HCCL_E_PARA);
             const auto* dfxParam = reinterpret_cast<const mc2_ops_hccl::OpParam*>(runParam.data());
             HcclDfxOpInfo dfxOpInfo{};
-            ret = BuildOpenDfxOpInfo(*dfxParam, msg, extMsg, rankNum_, repeatCnt, dfxOpInfo);
+            ret = BuildOpenDfxOpInfo(
+                *dfxParam, msg, extMsg, rankNum_, repeatCnt, execCtx->mainThread, dfxOpInfo);
             if (ret == HCCL_SUCCESS) {
                 ret = HcclDfxRegOpInfoByCommId(
                     const_cast<char*>(dfxParam->commName), reinterpret_cast<void*>(&dfxOpInfo));
