@@ -388,10 +388,15 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
 
     HcclHandle handleId = curHandleId_;
 
-    ASCENDC_HCCL_API_ASSERT(
-        handleId < HCCL_MAX_HANDLE_ID, { return INVALID_HANDLE_ID; },
-        "Call Prepare[%d] failed, Prepare interface call num is[%d], expected less than[%d].",
-        static_cast<int32_t>(commonPrepareParam.commType.prepareType), handleId + 1, HCCL_MAX_HANDLE_ID);
+    const uint64_t dataTypeSize = GetHcclDataTypeSize(commonPrepareParam.dataType);
+    ascendc_assert(
+        dataTypeSize > 0U && commonPrepareParam.count <= CCU_MAX_COMM_DATA / dataTypeSize,
+        "Call Prepare failed, count is %lu, dataTypeSize is %lu, max comm data is %lu.\n",
+        commonPrepareParam.count, dataTypeSize, CCU_MAX_COMM_DATA);
+
+    ascendc_assert(
+        handleId < HCCL_MAX_HANDLE_ID,
+        "Call Prepare failed, Prepare interface call num is expected less than HCCL_MAX_HANDLE_ID.\n");
 
     InitHandleInfo(handleId);
     uint64_t reqId = handleId == 0 ? 0 : handleReqId_[handleId - 1] + handleRepeatCnt_[handleId - 1];
