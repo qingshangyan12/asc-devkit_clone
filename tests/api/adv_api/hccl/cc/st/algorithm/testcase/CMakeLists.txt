@@ -11,6 +11,7 @@
 set(src_list
     main.cc
     all_gather_nhr_testcase.cc
+    all_gather_aicpu_testcase.cc
     all_to_all_mesh1d_aicpu_testcase.cc
     mc2_aicpu_task_cache_testcase.cc
 )
@@ -111,3 +112,5 @@ run_llt_test(
     TARGET ${HCCL_AICPU_ALLOC_CTX_TARGET}
     TASK_NUM 1
 )
+
+add_subdirectory(mc2_ccu)
