@@ -1,3 +1,52 @@
+---
+okftype: reference.api.cpp
+title: "asc_deintlv"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_deintlv.md"
+description: "将src0和src1中的元素解交织存入dst0和dst1中。"
+signature:
+  - function: "asc_deintlv(vector_<dtype>&,vector_<dtype>&,vector_<dtype>,vector_<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_deintlv_b8(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_deintlv_b16(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_deintlv_b32(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_deintlv
 
 ## 产品支持情况
@@ -42,6 +91,16 @@
 ## 函数原型
 
 ### 矢量数据解交织
+```yaml
+api_signature:
+  - function: "asc_deintlv(vector_<dtype>&,vector_<dtype>&,vector_<dtype>,vector_<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_deintlv(vector_<dtype>& dst0,
@@ -65,6 +124,28 @@ __simd_callee__ inline void asc_deintlv(vector_half& dst0,
 ```
 
 ### 掩码解交织
+```yaml
+api_signature:
+  - function: "asc_deintlv_b8(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_deintlv_b16(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_deintlv_b32(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_deintlv_b8(vector_bool& dst0,

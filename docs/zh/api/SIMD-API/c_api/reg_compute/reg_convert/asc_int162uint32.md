@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_int162uint32"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint32.md"
+description: "`src`中int16_t类型的元素转换为uint32_t类型，并将结果写入dst。转换过程将16位有符号整数转换为32位无符号整数。"
+signature:
+  - function: "asc_int162uint32(vector_uint32_t&,vector_int16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_int162uint32(vector_uint32_t&,vector_int16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int162uint32
 
 ## 产品支持情况
@@ -44,6 +66,22 @@ def asc_int162uint32(dst, src, mask, src_pos):
 本接口为`reg`矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_int162uint32(vector_uint32_t&,vector_int16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_int162uint32(vector_uint32_t&,vector_int16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_int162uint32(vector_uint32_t& dst,

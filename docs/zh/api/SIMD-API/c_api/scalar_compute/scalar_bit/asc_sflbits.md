@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_sflbits"
+path: "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_sflbits.md"
+description: "对一个64位有符号整数，取其最高位（即符号位）作为参考位，统计从次高位（即最高数值位）开始与符号位相同的连续比特位的个数。"
+signature:
+  - function: "asc_sflbits(int64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_bit.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_sflbits
 
 ## 产品支持情况
@@ -37,6 +54,17 @@
 本接口仅在AIC上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_sflbits(int64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_bit.h"
+```
+
 
 ```c
 __aicore__ inline int64_t asc_sflbits(int64_t value)

@@ -1,3 +1,39 @@
+---
+okftype: reference.api.cpp
+title: "asc_lock"
+path: "docs/zh/api/SIMD-API/c_api/sync/asc_lock.md"
+description: "该接口用于AI Core内部异步流水线之间的同步，可按需阻塞指定流水线的执行。"
+signature:
+  - function: "asc_lock(pipe_t,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/sync/sync.h"
+        header: "/include/c_api/sync/sync.h"
+  - function: "asc_lock(pipe_t,uint8_t,ascMutexExecuteMode)"
+    archs:
+      - "3510"
+    headers: []
+examples:
+  - path: "/examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_lock(pipe_t,uint8_t)"
+        snippets:
+          - id: "asc_lock"
+            file: "add_double_buffer.asc"
+  - path: "/examples/02_simd_c_api/02_features/02_matrix_compute/00_mmad_double_buffer"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_lock(pipe_t,uint8_t)"
+        snippets:
+          - id: "asc_lock"
+            file: "mmad_double_buffer.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_lock
 
 ## 产品支持情况
@@ -63,6 +99,20 @@
 - 可以使用更多的同步信号量。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_lock(pipe_t,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/sync/sync.h"
+        header: "/include/c_api/sync/sync.h"
+  - function: "asc_lock(pipe_t,uint8_t,ascMutexExecuteMode)"
+    archs:
+      - "3510"
+    headers: []
+```
+
 
 ```cpp
 enum ascMutexExecuteMode {

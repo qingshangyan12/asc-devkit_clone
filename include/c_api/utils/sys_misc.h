@@ -27,6 +27,11 @@
 #endif
 
 namespace __asc_aicore {
+/**
+ * @ingroup simd_c_api.utils.sys_misc
+ * @function asc_nop()
+ * @archs 3510
+ */
 __aicore__ inline void asc_nop();
 } // namespace __asc_aicore
 

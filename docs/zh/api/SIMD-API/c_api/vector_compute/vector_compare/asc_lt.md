@@ -1,3 +1,61 @@
+---
+okftype: reference.api.cpp
+title: "asc_lt"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md"
+description: "按元素判断src0 < src1是否成立，若成立则输出结果dst上的对应比特位为1，否则为0。"
+signature:
+  - function: "asc_lt(__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_lt(__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_lt(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_lt(__ubuf__ uint8_t*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_lt_sync(__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_lt_sync(__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_lt_sync(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_lt_sync(__ubuf__ uint8_t*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_lt
 
 ## 产品支持情况
@@ -32,6 +90,34 @@
 
 
 - 高维切分计算
+```yaml
+api_signature:
+  - function: "asc_lt(__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_lt(__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_lt(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_lt(__ubuf__ uint8_t*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
 
   ```cpp
   //结果存入寄存器
@@ -43,6 +129,34 @@
   ```
 
 - 同步计算
+```yaml
+api_signature:
+  - function: "asc_lt_sync(__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_lt_sync(__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_lt_sync(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_lt_sync(__ubuf__ uint8_t*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+```
+
 
   ```cpp
   //结果存入寄存器

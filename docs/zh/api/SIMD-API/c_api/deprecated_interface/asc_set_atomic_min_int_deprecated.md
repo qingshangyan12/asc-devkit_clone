@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_atomic_min_int（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_atomic_min_int_deprecated.md"
+description: "**该接口已废弃，请使用[asc_set_atomic_min_int32](../atomic/datamove_atomic/asc_set_atomic_min.md)替代。"
+signature:
+  - function: "asc_set_atomic_min_int()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/atomic/datamove_atomic.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_atomic_min_int（废弃）
 
 ## 产品支持情况
@@ -31,6 +48,17 @@
 设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_atomic_min_int()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/atomic/datamove_atomic.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+```
+
 
 ```c
 [[deprecated("NOTICE: asc_set_atomic_min_int is deprecated. Please use asc_set_atomic_min_int32 instead.")]]

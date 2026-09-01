@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_ub2l1"
+path: "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md"
+description: "提供数据搬运功能，将数据从Unified Buffer (UB)搬运到L1 Buffer。"
+signature:
+  - function: "asc_copy_ub2l1(__cbuf__ void*,__ubuf__ void*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_ub2l1(__cbuf__ void*,__ubuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_ub2l1
 
 ## 产品支持情况
@@ -43,6 +65,16 @@
 ## 函数原型
 
 ### 连续数据搬运
+```yaml
+api_signature:
+  - function: "asc_copy_ub2l1(__cbuf__ void*,__ubuf__ void*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```c
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst,
@@ -51,6 +83,16 @@ __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst,
 ```
 
 ### 高维切分数据搬运
+```yaml
+api_signature:
+  - function: "asc_copy_ub2l1(__cbuf__ void*,__ubuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```c
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst,

@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_mul_add_relu"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md"
+description: "按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。"
+signature:
+  - function: "asc_mul_add_relu(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_mul_add_relu(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_mul_add_relu(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_mul_add_relu(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_mul_add_relu_sync(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_mul_add_relu_sync(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_mul_add_relu
 
 ## 产品支持情况

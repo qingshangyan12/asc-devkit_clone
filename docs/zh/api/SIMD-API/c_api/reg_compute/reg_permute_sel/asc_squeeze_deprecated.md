@@ -1,3 +1,91 @@
+---
+okftype: reference.api.cpp
+title: "asc_squeeze_v2 (废弃)"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_deprecated.md"
+description: "**该接口已废弃，请使用[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)实现筛选并连续搬出有效元素的功能。"
+signature:
+  - function: "asc_squeeze_v2(vector_int8_t&,vector_int8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_uint8_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_hifloat8_t&,vector_hifloat8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_fp8_e5m2_t&,vector_fp8_e5m2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_fp8_e4m3fn_t&,vector_fp8_e4m3fn_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_fp8_e8m0_t&,vector_fp8_e8m0_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_int16_t&,vector_int16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_uint16_t&,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_half&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_bfloat16_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_int32_t&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_uint32_t&,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_float&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_squeeze_v2 (废弃)
 
 ## 产品支持情况
@@ -33,6 +121,88 @@
 asc_squeeze_v2接口搭配[asc_storeunalign_postupdate](../store/asc_storeunalign_postupdate.md)接口使用时，会将有效数据大小保存至AR寄存器，搬出时使用该值作为存储偏移量。AR寄存器中的数值可以通过[asc_get_squeeze_status](../../spr/asc_get_squeeze_status.md)接口获取。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_squeeze_v2(vector_int8_t&,vector_int8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_uint8_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_hifloat8_t&,vector_hifloat8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_fp8_e5m2_t&,vector_fp8_e5m2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_fp8_e4m3fn_t&,vector_fp8_e4m3fn_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_fp8_e8m0_t&,vector_fp8_e8m0_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_int16_t&,vector_int16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_uint16_t&,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_half&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_bfloat16_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_int32_t&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_uint32_t&,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze_v2(vector_float&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```cpp
 __simd_callee__ inline void asc_squeeze_v2(vector_int8_t& dst, vector_int8_t src, vector_bool mask)

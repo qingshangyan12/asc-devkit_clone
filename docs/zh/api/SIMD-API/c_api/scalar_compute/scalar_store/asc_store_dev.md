@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: "asc_store_dev"
+path: "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md"
+description: "不经过DCache向GM地址上写数据。 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。"
+signature:
+  - function: "asc_store_dev(__gm__ <dtype>*,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/scalar_store.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "int64_t"
+        - "uint64_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_store_dev
 
 ## 产品支持情况
@@ -30,6 +56,16 @@
 当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_store_dev(__gm__ <dtype>*,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/scalar_store.h"
+```
+
 
 ```c
 __aicore__ inline void asc_store_dev(__gm__ <dtype>* addr,

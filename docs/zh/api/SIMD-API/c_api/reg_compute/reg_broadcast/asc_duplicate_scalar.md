@@ -1,3 +1,101 @@
+---
+okftype: reference.api.cpp
+title: "asc_duplicate_scalar"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar.md"
+description: "将标量值广播到目的操作数中。"
+signature:
+  - function: "asc_duplicate_scalar(<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_duplicate_scalar(vector_<dtype>&,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_duplicate_scalar(<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_duplicate_scalar(vector_<dtype>&,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/duplicate"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_duplicate_scalar(vector_float&,float,vector_bool)"
+        snippets:
+          - id: "asc_duplicate_scalar"
+            file: "duplicate.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_duplicate_scalar
 
 ## 产品支持情况
@@ -36,6 +134,22 @@
 ## 函数原型
 
 ### 带mask（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_duplicate_scalar(<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar(vector_<dtype>&,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果
@@ -64,6 +178,22 @@ __simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst,
 ```
 
 ### 不带mask（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_duplicate_scalar(<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar(vector_<dtype>&,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

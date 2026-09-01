@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_exp_sub"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md"
+description: "根据`mask`将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数。"
+signature:
+  - function: "asc_exp_sub(vector_float&,vector_float,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_exp_sub_half2float(vector_float&,vector_half,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_exp_sub_half2float(vector_float&,vector_half,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_exp_sub
 
 ## 产品支持情况
@@ -46,6 +74,16 @@
 ## 函数原型
 
 - 用于处理`float`数据类型的源操作数。
+```yaml
+api_signature:
+  - function: "asc_exp_sub(vector_float&,vector_float,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 
   ```c
   __simd_callee__ inline void asc_exp_sub(vector_float& dst,
@@ -55,6 +93,22 @@
   ```
 
 - 处理`half`数据类型的源操作数，支持读取偶数索引或奇数索引的源数据。
+```yaml
+api_signature:
+  - function: "asc_exp_sub_half2float(vector_float&,vector_half,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_exp_sub_half2float(vector_float&,vector_half,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 
   ```c
   __simd_callee__ inline void asc_exp_sub_half2float(

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_clear_ar_spr（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_clear_ar_spr_deprecated.md"
+description: "**该接口已废弃。请使用[asc_squeeze_and_storeunalign_init](asc_squeeze_and_storeunalign_init.md)实现此功能。"
+signature:
+  - function: "asc_clear_ar_spr()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_clear_ar_spr（废弃）
 ## 产品支持情况
 
@@ -32,6 +48,16 @@
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_clear_ar_spr()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_clear_ar_spr()

@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_intra_wait"
+path: "docs/zh/api/SIMD-API/c_api/sync/asc_sync_intra_wait.md"
+description: "本接口与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式4）。"
+signature:
+  - function: "asc_sync_intra_wait(pipe_t,uint8_t)"
+    archs:
+      - "3510"
+    headers: []
+  - function: "asc_sync_intra_wait(pipe_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/sync/sync.h"
+        header: "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_sync_intra_wait
 
 ## 产品支持情况
@@ -36,6 +56,20 @@
   - AIC上配对的`asc_sync_intra_wait`检测到对应`sync_id`的计数器非0后解除阻塞并将计数器减1。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_sync_intra_wait(pipe_t,uint8_t)"
+    archs:
+      - "3510"
+    headers: []
+  - function: "asc_sync_intra_wait(pipe_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/sync/sync.h"
+        header: "/include/c_api/sync/sync.h"
+```
+
 
 ```c
 __aicore__ inline void asc_sync_intra_wait(pipe_t pipe,

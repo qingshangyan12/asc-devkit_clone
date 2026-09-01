@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l13d_padding"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_padding.md"
+description: "设置Pad属性描述，用于在调用[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a.md)接口时配置填充数值。"
+signature:
+  - function: "asc_set_l13d_padding(uint64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_set_l13d_padding(half)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_set_l13d_padding(int16_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_set_l13d_padding(uint16_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_l13d_padding
 
 ## 产品支持情况
@@ -29,6 +67,38 @@
 设置Pad属性描述，用于在调用[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a.md)接口时配置填充数值。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_l13d_padding(uint64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_set_l13d_padding(half)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_set_l13d_padding(int16_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_set_l13d_padding(uint16_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_set_l13d_padding(uint64_t config)

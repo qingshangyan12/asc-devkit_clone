@@ -1,3 +1,58 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_gm2l1_dn2nz"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md"
+description: "将数据从Global Memory搬运到L1 Buffer，并在搬运过程中进行DN到Nz格式的转换，使其满足后续矩阵计算对分形列连续性的要求。"
+signature:
+  - function: "asc_copy_gm2l1_dn2nz(__cbuf__ <dtype>*,__gm__ <dtype>*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_copy_gm2l1_dn2nz_sync(__cbuf__ <dtype>*,__gm__ <dtype>*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples:
+  - path: "/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1"
+    archs:
+      - "2201"
+      - "3510"
+    signature: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_gm2l1_dn2nz
 
 ## 产品支持情况
@@ -41,6 +96,22 @@
 ## 函数原型
 
 ### 模板原型（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_copy_gm2l1_dn2nz(__cbuf__ <dtype>*,__gm__ <dtype>*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_dn2nz_sync(__cbuf__ <dtype>*,__gm__ <dtype>*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_copy_gm2l1_dn2nz(__cbuf__ <dtype>* dst,

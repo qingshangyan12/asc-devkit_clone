@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_reduce"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md"
+description: "以内置固定模式对应的二进制或者用户自定义输入的数值对应的gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。"
+signature:
+  - function: "asc_reduce(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_reduce(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_reduce(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint16_t,uint8_t,uint8_t,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_reduce(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_reduce_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_reduce_sync(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_reduce
 
 ## 产品支持情况
@@ -38,6 +84,22 @@
     ```
 
 - 高维切分计算
+```yaml
+api_signature:
+  - function: "asc_reduce(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint16_t,uint8_t,uint8_t,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_reduce(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
 
   ```cpp
   __aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1,
@@ -47,6 +109,22 @@
   ```
 
 - 同步计算
+```yaml
+api_signature:
+  - function: "asc_reduce_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_reduce_sync(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+```
+
 
   ```cpp
   __aicore__ inline void asc_reduce_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)

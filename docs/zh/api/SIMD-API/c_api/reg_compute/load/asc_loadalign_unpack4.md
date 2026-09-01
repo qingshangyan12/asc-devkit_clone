@@ -1,3 +1,81 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign_unpack4"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md"
+description: "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度的连续数据，在每个源元素后补3个值为0的元素，并将得到的VL长度数据通过函数返回值返回或写入目的矢量数据寄存器。"
+signature:
+  - function: "asc_loadalign_unpack4(__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+  - function: "asc_loadalign_unpack4(vector_<dtype>&,__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+  - function: "asc_loadalign_unpack4(vector_<dtype>&,__ubuf__ <dtype>*,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+  - function: "asc_loadalign_unpack4(vector_<dtype>&,__ubuf__ <dtype>*,addr_reg)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_loadalign_unpack4
 
 ## 产品支持情况
@@ -37,6 +115,22 @@
 ## 函数原型
 
 ### 对齐搬入模式
+```yaml
+api_signature:
+  - function: "asc_loadalign_unpack4(__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack4(vector_<dtype>&,__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果。
@@ -62,6 +156,16 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst,
 ```
 
 ### 立即数偏移搬入模式
+```yaml
+api_signature:
+  - function: "asc_loadalign_unpack4(vector_<dtype>&,__ubuf__ <dtype>*,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_loadalign_unpack4(vector_<dtype>& dst,
@@ -83,6 +187,16 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst,
 ```
 
 ### 地址寄存器偏移搬入模式
+```yaml
+api_signature:
+  - function: "asc_loadalign_unpack4(vector_<dtype>&,__ubuf__ <dtype>*,addr_reg)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_loadalign_unpack4(vector_<dtype>& dst,

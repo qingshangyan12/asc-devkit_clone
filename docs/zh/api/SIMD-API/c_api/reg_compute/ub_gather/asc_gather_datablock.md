@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: "asc_gather_datablock"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md"
+description: "给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。"
+signature:
+  - function: "asc_gather_datablock(vector_<dst_dtype>&,__ubuf__ <src_dtype>*,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+  - function: "asc_gather_datablock(__ubuf__ <src_dtype>*,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+  - function: "asc_gather_datablock(vector_<dst_dtype>&,__ubuf__ <src_dtype>*,vector_uint32_t)"
+    archs:
+      - "3510"
+    headers: []
+  - function: "asc_gather_datablock(__ubuf__ <src_dtype>*,vector_uint32_t)"
+    archs:
+      - "3510"
+    headers: []
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_gather_datablock
 
 ## 产品支持情况
@@ -35,6 +61,18 @@
 ## 函数原型
 
 ### 支持掩码控制（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_gather_datablock(vector_<dst_dtype>&,__ubuf__ <src_dtype>*,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+  - function: "asc_gather_datablock(__ubuf__ <src_dtype>*,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+```
+
 
 ```c
 // 通过引用参数输出结果
@@ -88,6 +126,18 @@ __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
 ```
 
 ### 无掩码控制（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_gather_datablock(vector_<dst_dtype>&,__ubuf__ <src_dtype>*,vector_uint32_t)"
+    archs:
+      - "3510"
+    headers: []
+  - function: "asc_gather_datablock(__ubuf__ <src_dtype>*,vector_uint32_t)"
+    archs:
+      - "3510"
+    headers: []
+```
+
 
 ```c
 // 通过引用参数输出结果

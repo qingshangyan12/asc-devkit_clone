@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_ub2gm_loop1_stride"
+path: "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md"
+description: "本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+signature:
+  - function: "asc_set_ub2gm_loop1_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_ub2gm_loop1_stride
 
 ## 产品支持情况
@@ -37,6 +53,16 @@
 ![源操作数搬运场景示例](../figures/source_operand_move_example.png)
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_ub2gm_loop1_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```c
 __aicore__ inline void asc_set_ub2gm_loop1_stride(uint64_t loop1_src_stride,

@@ -1,3 +1,63 @@
+---
+okftype: reference.api.cpp
+title: "asc_unsqueeze"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md"
+description: "将dst中数据根据mask进行解压缩，或将解压缩结果通过函数返回值返回。解压缩方式：dst中第0个元素置为0，dst中的第i个元素等于mask中从第0个到第(i-1)个元素中1的数量。mask最高位被忽略，不参与统计。"
+signature:
+  - function: "asc_unsqueeze_u8(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze_s8(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze_u16(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze_s16(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze_u32(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze_s32(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze(vector_<dtype>&,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "int32_t"
+        - "uint32_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_unsqueeze
 
 ## 产品支持情况
@@ -37,6 +97,52 @@
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_unsqueeze_u8(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze_s8(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze_u16(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze_s16(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze_u32(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze_s32(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unsqueeze(vector_<dtype>&,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果。
@@ -65,6 +171,16 @@ dtype支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、int32_t、u
 | s32 | int32_t |
 
 #### 函数原型典型示例
+```yaml
+api_signature:
+  - function: "asc_unsqueeze_s8(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```c
 // 示例：对int8_t矢量数据寄存器执行解压缩，通过函数返回值返回结果。

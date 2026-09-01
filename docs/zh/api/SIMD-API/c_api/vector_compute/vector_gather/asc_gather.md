@@ -1,3 +1,138 @@
+---
+okftype: reference.api.cpp
+title: "asc_gather"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md"
+description: "将src按照src_offset给定的偏移按元素收集到dst中。"
+signature:
+  - function: "asc_gather(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ half*,__ubuf__ half*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ bfloat16_t*,__ubuf__ bfloat16_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ int32_t*,__ubuf__ int32_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ float*,__ubuf__ float*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ uint32_t*,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint32_t*,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ half*,__ubuf__ half*,__ubuf__ uint32_t*,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ bfloat16_t*,__ubuf__ bfloat16_t*,__ubuf__ uint32_t*,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ int32_t*,__ubuf__ int32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather(__ubuf__ float*,__ubuf__ float*,__ubuf__ uint32_t*,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather_sync(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_gather_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_gather_sync(__ubuf__ half*,__ubuf__ half*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_gather_sync(__ubuf__ bfloat16_t*,__ubuf__ bfloat16_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_gather_sync(__ubuf__ int32_t*,__ubuf__ int32_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_gather_sync(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_gather_sync(__ubuf__ float*,__ubuf__ float*,__ubuf__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
 
 # asc_gather
 

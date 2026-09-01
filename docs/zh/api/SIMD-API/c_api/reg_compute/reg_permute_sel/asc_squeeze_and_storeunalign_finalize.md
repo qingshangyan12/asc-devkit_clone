@@ -1,3 +1,17 @@
+---
+okftype: reference.api.cpp
+title: "asc_squeeze_and_storeunalign_finalize"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md"
+description: "Reg计算数据搬运接口，用于结束一组[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)连续搬出操作，将暂存在非对齐寄存器中的尾块写入Unified Buffer（UB）。"
+signature:
+  - function: "asc_squeeze_and_storeunalign_finalize(__ubuf__ <dtype>*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers: []
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_squeeze_and_storeunalign_finalize
 
 ## 产品支持情况
@@ -31,6 +45,14 @@ Reg计算数据搬运接口，用于结束一组[asc_squeeze_and_storeunalign](a
 本接口仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_squeeze_and_storeunalign_finalize(__ubuf__ <dtype>*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers: []
+```
+
 
 ```c
 __simd_callee__ inline void asc_squeeze_and_storeunalign_finalize(

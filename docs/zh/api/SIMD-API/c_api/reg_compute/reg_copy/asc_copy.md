@@ -1,3 +1,62 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md"
+description: "完成数据在寄存器间的搬运。"
+signature:
+  - function: "asc_copy(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_copy(vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+  - function: "asc_copy(vector_bool&,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+  - function: "asc_copy(vector_bool&,vector_uint16_t,int16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+  - function: "asc_copy(vector_bool&,vector_uint32_t,int16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mergemode"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_copy(vector_float&,vector_float,vector_bool)"
+        snippets:
+          - id: "asc_copy"
+            file: "mergemode.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_copy
 
 ## 产品支持情况
@@ -45,6 +104,16 @@
 ## 函数原型
 
 ### 矢量数据寄存器复制到矢量数据寄存器
+```yaml
+api_signature:
+  - function: "asc_copy(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_copy(vector_<dtype>& dst,
@@ -65,6 +134,16 @@ __simd_callee__ inline void asc_copy(vector_half& dst,
 ```
 
 ### 掩码寄存器复制到掩码寄存器
+```yaml
+api_signature:
+  - function: "asc_copy(vector_bool&,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_copy(vector_bool& dst,
@@ -77,6 +156,22 @@ __simd_callee__ inline void asc_copy(vector_bool& dst,
 ### 矢量数据寄存器复制到掩码寄存器
 
 **part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**
+```yaml
+api_signature:
+  - function: "asc_copy(vector_bool&,vector_uint16_t,int16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+  - function: "asc_copy(vector_bool&,vector_uint32_t,int16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_copy(vector_bool& dst,

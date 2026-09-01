@@ -1,3 +1,181 @@
+---
+okftype: reference.api.cpp
+title: "asc_ndim_copy_gm2ub"
+path: "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md"
+description: "多维数据搬运接口，将数据从Global Memory (GM)搬运到Unified Buffer（UB）。相比于基础数据搬移接口，可以更加自由配置搬入的维度信息。 本功能最多能处理5个维度，每个维度都可以单独配置Stride，且支持随路Padding功能。相关配置参数有很多，需要通过不同的接口传入。"
+signature:
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int8_t*,__gm__ int8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint8_t*,__gm__ uint8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t*,__gm__ fp4x2_e2m1_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t*,__gm__ fp4x2_e1m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t*,__gm__ fp8_e8m0_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t*,__gm__ fp8_e5m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t*,__gm__ fp8_e4m3fn_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int16_t*,__gm__ int16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint16_t*,__gm__ uint16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ half*,__gm__ half*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int32_t*,__gm__ int32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint32_t*,__gm__ uint32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ float*,__gm__ float*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int8_t*,__gm__ int8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint8_t*,__gm__ uint8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t*,__gm__ fp4x2_e2m1_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t*,__gm__ fp4x2_e1m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t*,__gm__ fp8_e8m0_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t*,__gm__ fp8_e5m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t*,__gm__ fp8_e4m3fn_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int16_t*,__gm__ int16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint16_t*,__gm__ uint16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ half*,__gm__ half*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int32_t*,__gm__ int32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint32_t*,__gm__ uint32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ float*,__gm__ float*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_ndim_copy_gm2ub
 
 ## 产品支持情况
@@ -62,6 +240,94 @@
 ![ ](../figures/asc_ndim_copy_gm2ub_2d_broadcast.png)
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int8_t*,__gm__ int8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint8_t*,__gm__ uint8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t*,__gm__ fp4x2_e2m1_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t*,__gm__ fp4x2_e1m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t*,__gm__ fp8_e8m0_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t*,__gm__ fp8_e5m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t*,__gm__ fp8_e4m3fn_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int16_t*,__gm__ int16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint16_t*,__gm__ uint16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ half*,__gm__ half*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int32_t*,__gm__ int32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint32_t*,__gm__ uint32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ float*,__gm__ float*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, asc_load_l2_cache_mode l2_cache_mode)
@@ -81,6 +347,94 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ float* dst, __gm__ float* sr
 ```
 
 **以下函数原型已废弃，请使用asc_load_l2_cache_mode类型枚举值进行L2 Cache管理策略配置。**
+```yaml
+api_signature:
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int8_t*,__gm__ int8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint8_t*,__gm__ uint8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t*,__gm__ fp4x2_e2m1_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t*,__gm__ fp4x2_e1m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t*,__gm__ fp8_e8m0_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t*,__gm__ fp8_e5m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t*,__gm__ fp8_e4m3fn_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int16_t*,__gm__ int16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint16_t*,__gm__ uint16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ half*,__gm__ half*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ int32_t*,__gm__ int32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ uint32_t*,__gm__ uint32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_ndim_copy_gm2ub(__ubuf__ float*,__gm__ float*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)

@@ -1,3 +1,73 @@
+---
+okftype: reference.api.cpp
+title: "asc_arange"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md"
+description: "以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中，[Vector Length (VL)](../../defs/type/data_type_definition.md)表示矢量数据寄存器的位宽，`VL_T`表示该寄存器可存储的元素数量。"
+signature:
+  - function: "asc_arange(vector_<dtype>&,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_index.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "int16_t"
+        - "half"
+        - "int32_t"
+        - "float"
+  - function: "asc_arange(<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_index.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "int16_t"
+        - "half"
+        - "int32_t"
+        - "float"
+  - function: "asc_arange_descend(vector_<dtype>&,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_index.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "int16_t"
+        - "half"
+        - "int32_t"
+        - "float"
+  - function: "asc_arange_descend(<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_index.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "int16_t"
+        - "half"
+        - "int32_t"
+        - "float"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/arange"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_arange(vector_float&,float)"
+        snippets:
+          - id: "asc_arange"
+            file: "arange.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_arange
 
 ## 产品支持情况
@@ -43,6 +113,22 @@
 ## 函数原型
 
 ### 递增模式
+```yaml
+api_signature:
+  - function: "asc_arange(vector_<dtype>&,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_index.h"
+  - function: "asc_arange(<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_index.h"
+```
+
 
 ```c
 // 通过引用参数输出结果
@@ -70,6 +156,22 @@ __simd_callee__ inline vector_half asc_arange(half value)
 ```
 
 ### 递减模式
+```yaml
+api_signature:
+  - function: "asc_arange_descend(vector_<dtype>&,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_index.h"
+  - function: "asc_arange_descend(<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_index.h"
+```
+
 
 ```c
 // 通过引用参数输出结果

@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: "asc_atomic_add"
+path: "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md"
+description: "对Global Memory中`address`指向的单个元素执行原子加操作。读取该元素的旧值`old_value`，将`old_value + val`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+signature:
+  - function: "asc_atomic_add(__gm__ <dtype>*,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/scalar_atomic.h"
+    dtype:
+      values:
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+        - "int64_t"
+        - "uint64_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_atomic_add
 
 ## 产品支持情况
@@ -29,6 +52,16 @@
 对Global Memory中`address`指向的单个元素执行原子加操作。读取该元素的旧值`old_value`，将`old_value + val`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_atomic_add(__gm__ <dtype>*,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/scalar_atomic.h"
+```
+
 
 ```c
 __aicore__ inline <dtype> asc_atomic_add(__gm__ <dtype>* address,

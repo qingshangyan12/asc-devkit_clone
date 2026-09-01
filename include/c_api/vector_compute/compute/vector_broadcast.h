@@ -26,47 +26,127 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_brcb(__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint16_t,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_brcb(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_brcb(__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_brcb(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t dst_block_stride, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ half*,half,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ half* dst, half src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ half*,half,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ half* dst, half src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ int16_t*,int16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ int16_t* dst, int16_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ int16_t*,int16_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ int16_t* dst, int16_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ uint16_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ uint16_t* dst, uint16_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ uint16_t*,uint16_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ uint16_t* dst, uint16_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ bfloat16_t*,bfloat16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ bfloat16_t* dst, bfloat16_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ bfloat16_t*,bfloat16_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ bfloat16_t* dst, bfloat16_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ float*,float,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ float* dst, float src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ float*,float,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ float* dst, float src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ int32_t*,int32_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ int32_t* dst, int32_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ int32_t*,int32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ int32_t* dst, int32_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ uint32_t*,uint32_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(
     __ubuf__ uint32_t* dst, uint32_t src, uint8_t repeat, uint16_t dst_block_stride, uint16_t dst_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_broadcast
+ * @function asc_duplicate(__ubuf__ uint32_t*,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_duplicate(__ubuf__ uint32_t* dst, uint32_t src, uint32_t count);
 
 #endif

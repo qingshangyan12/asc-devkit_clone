@@ -1,3 +1,55 @@
+---
+okftype: reference.api.cpp
+title: "asc_gt"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_gt.md"
+description: "gt表示大于（greater than），该接口用于逐元素比较两个源操作数大小，将比较结果（$src0_i > src1_i$）作为返回值返回或写入目的操作数`dst`对应比特位。如果比较结果为真，则对应比特位为1，否则为0。"
+signature:
+  - function: "asc_gt(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_gt(vector_bool&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_gt(vector_bool&,vector_float,vector_float,vector_bool)"
+        snippets:
+          - id: "asc_gt"
+            file: "compare.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_gt
 
 ## 产品支持情况
@@ -37,6 +89,22 @@ $$
 本接口仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_gt(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+  - function: "asc_gt(vector_bool&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

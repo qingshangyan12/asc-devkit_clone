@@ -25,12 +25,32 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @function asc_cumulative_histogram_bin0(vector_uint16_t&,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @function asc_cumulative_histogram_bin1(vector_uint16_t&,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @function asc_frequency_histogram_bin0(vector_uint16_t&,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_frequency_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @function asc_frequency_histogram_bin1(vector_uint16_t&,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
 #endif

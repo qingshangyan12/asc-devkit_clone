@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_ffts_base_addr"
+path: "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md"
+description: "在[asc_sync_block_wait](../../sync/asc_sync_block_wait.md)和[asc_sync_block_arrive](../../sync/asc_sync_block_arrive.md)之前使用，设置核间同步寄存器的基地址。需要在Host侧调用接口aclrtGetHardwareSyncAddr获取，并作为参数传入。"
+signature:
+  - function: "asc_set_ffts_base_addr(uint64_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/utils/sys_var.h"
+        header: "/include/c_api/utils/sys_var.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_ffts_base_addr
 
 ## 产品支持情况
@@ -33,6 +49,16 @@ aclError aclrtGetHardwareSyncAddr(void **addr);
 ```
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_ffts_base_addr(uint64_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/utils/sys_var.h"
+        header: "/include/c_api/utils/sys_var.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_set_ffts_base_addr(uint64_t config)

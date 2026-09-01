@@ -1,3 +1,97 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12l0b_trans"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md"
+description: "该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。"
+signature:
+  - function: "asc_copy_l12l0b_trans(__cb__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ half*,__cbuf__ half*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ int32_t*,__cbuf__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ float*,__cbuf__ float*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ half*,__cbuf__ half*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ int32_t*,__cbuf__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ float*,__cbuf__ float*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_l12l0b_trans
 
 ## 产品支持情况
@@ -77,6 +171,52 @@
 ## 函数原型
 
 - 高维切分搬运
+```yaml
+api_signature:
+  - function: "asc_copy_l12l0b_trans(__cb__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ half*,__cbuf__ half*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ int32_t*,__cbuf__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_trans(__cb__ float*,__cbuf__ float*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
@@ -88,6 +228,52 @@ __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float* dst, __cbuf__ float* 
 ```
 
 - 同步高维切分搬运 
+```yaml
+api_signature:
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ half*,__cbuf__ half*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ int32_t*,__cbuf__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0b_trans_sync(__cb__ float*,__cbuf__ float*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+```
+
 ```cpp
 __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)
 __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap)

@@ -1,3 +1,43 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_ndim_loop_stride"
+path: "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md"
+description: "本接口用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)进行NDDMA多维数据搬运时，`loop0`至`loop4`各循环维度的源操作数步长和目的操作数步长。"
+signature:
+  - function: "asc_set_ndim_loop0_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_ndim_loop1_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_ndim_loop2_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_ndim_loop3_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_ndim_loop4_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_ndim_loop_stride
 
 ## 产品支持情况
@@ -37,6 +77,40 @@
 本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_ndim_loop0_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_ndim_loop1_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_ndim_loop2_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_ndim_loop3_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_ndim_loop4_stride(uint64_t,uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```c
 __aicore__ inline void asc_set_ndim_loop0_stride(uint64_t dst_stride,

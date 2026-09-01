@@ -28,13 +28,53 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @function asc_store_dev(__gm__ int8_t*,int8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_store_dev(__gm__ int8_t* addr, int8_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @function asc_store_dev(__gm__ uint8_t*,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_store_dev(__gm__ uint8_t* addr, uint8_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @function asc_store_dev(__gm__ int16_t*,int16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_store_dev(__gm__ int16_t* addr, int16_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @function asc_store_dev(__gm__ uint16_t*,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_store_dev(__gm__ uint16_t* addr, uint16_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @function asc_store_dev(__gm__ int32_t*,int32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_store_dev(__gm__ int32_t* addr, int32_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @function asc_store_dev(__gm__ uint32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_store_dev(__gm__ uint32_t* addr, uint32_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @function asc_store_dev(__gm__ int64_t*,int64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_store
+ * @function asc_store_dev(__gm__ uint64_t*,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value);
 
 #endif

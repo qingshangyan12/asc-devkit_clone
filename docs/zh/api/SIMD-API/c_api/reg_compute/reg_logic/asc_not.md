@@ -1,3 +1,57 @@
+---
+okftype: reference.api.cpp
+title: "asc_not"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md"
+description: "根据`mask`对源操作数`src`执行按位取反操作，将结果作为返回值返回或写入目的操作数`dst`。"
+signature:
+  - function: "asc_not(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_not(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_not(vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+  - function: "asc_not(vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_not
 
 ## 产品支持情况
@@ -43,6 +97,22 @@ $$
 ## 函数原型
 
 ### 矢量数据寄存器按位取反
+```yaml
+api_signature:
+  - function: "asc_not(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+  - function: "asc_not(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

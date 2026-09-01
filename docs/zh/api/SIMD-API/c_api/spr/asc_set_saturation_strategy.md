@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_saturation_strategy"
+path: "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md"
+description: "设置饱和控制策略。"
+signature:
+  - function: "asc_set_saturation_strategy(asc_override_strategy)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/spr/spr.h"
+        header: "/include/c_api/spr/spr.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_saturation_strategy
 
 ## 产品支持情况
@@ -34,6 +50,16 @@
 该策略尤其影响CAST类饱和：只有在`USE_GLOBAL`时，通过[asc_set_saturation_flag](asc_set_saturation_flag.md)配置的`asc_saturation_mode::CAST`才会生效。枚举含义详见[asc_override_strategy](../defs/enum/asc_override_strategy.md)。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_saturation_strategy(asc_override_strategy)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/spr/spr.h"
+        header: "/include/c_api/spr/spr.h"
+```
+
 
 ```c
 __aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy)

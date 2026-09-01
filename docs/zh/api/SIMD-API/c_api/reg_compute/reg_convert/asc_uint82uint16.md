@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_uint82uint16"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md"
+description: "根据`mask`将源操作数`src`中的每个`uint8_t`类型元素转为`uint16_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据位置参数选择输入数据索引为奇数的位置或偶数的位置。"
+signature:
+  - function: "asc_uint82uint16(vector_uint16_t&,vector_uint8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_uint82uint16(vector_uint16_t&,vector_uint8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_uint82uint16
 
 ## 产品支持情况
@@ -41,6 +63,22 @@ def asc_uint82uint16(dst, src, mask, src_pos):
 本接口为`reg`矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_uint82uint16(vector_uint16_t&,vector_uint8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_uint82uint16(vector_uint16_t&,vector_uint8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_uint82uint16(vector_uint16_t& dst,

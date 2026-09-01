@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_update_mask"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md"
+description: "根据元素个数value生成mask，并自动将value减去当前向量处理单元的元素个数。"
+signature:
+  - function: "asc_update_mask_b8(uint32_t&)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_mask.h"
+  - function: "asc_update_mask_b16(uint32_t&)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_mask.h"
+  - function: "asc_update_mask_b32(uint32_t&)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_mask.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_update_mask
 
 ## 产品支持情况
@@ -39,6 +67,28 @@
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_update_mask_b8(uint32_t&)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_mask.h"
+  - function: "asc_update_mask_b16(uint32_t&)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_mask.h"
+  - function: "asc_update_mask_b32(uint32_t&)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_mask.h"
+```
+
 
 ```c
 __simd_callee__ inline vector_bool asc_update_mask_b8(uint32_t& value)

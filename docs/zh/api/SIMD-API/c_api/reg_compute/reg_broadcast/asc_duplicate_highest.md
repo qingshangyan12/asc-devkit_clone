@@ -1,3 +1,85 @@
+---
+okftype: reference.api.cpp
+title: "asc_duplicate_highest"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest.md"
+description: "将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。"
+signature:
+  - function: "asc_duplicate_highest(vector_int8_t&,vector_int8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_uint8_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_fp8_e8m0_t&,vector_fp8_e8m0_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_fp8_e5m2_t&,vector_fp8_e5m2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_fp8_e4m3fn_t&,vector_fp8_e4m3fn_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_int16_t&,vector_int16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_uint16_t&,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_half&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_bfloat16_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_int32_t&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_uint32_t&,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_float&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_duplicate_highest
 
 ## 产品支持情况
@@ -29,6 +111,82 @@
 将src的最高位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的位置被置为0。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_duplicate_highest(vector_int8_t&,vector_int8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_uint8_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_fp8_e8m0_t&,vector_fp8_e8m0_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_fp8_e5m2_t&,vector_fp8_e5m2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_fp8_e4m3fn_t&,vector_fp8_e4m3fn_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_int16_t&,vector_int16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_uint16_t&,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_half&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_bfloat16_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_int32_t&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_uint32_t&,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_highest(vector_float&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
 
 ```cpp
 __simd_callee__ inline void asc_duplicate_highest(vector_int8_t& dst, vector_int8_t src, vector_bool mask)

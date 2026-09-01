@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l13d_size"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_size.md"
+description: "设置[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。"
+signature:
+  - function: "asc_set_l13d_size(uint64_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_l13d_size
 
 ## 产品支持情况
@@ -29,6 +45,16 @@
 设置[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_l13d_size(uint64_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_set_l13d_size(uint64_t value)

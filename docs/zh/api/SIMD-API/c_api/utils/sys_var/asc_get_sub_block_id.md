@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_sub_block_id"
+path: "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md"
+description: "获取AI Core上Vector核的ID。"
+signature:
+  - function: "asc_get_sub_block_id()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/utils/sys_var.h"
+        header: "/include/c_api/utils/sys_var.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_sub_block_id
 
 ## 产品支持情况
@@ -29,6 +46,17 @@
 获取AI Core上Vector核的ID。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_sub_block_id()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/utils/sys_var.h"
+        header: "/include/c_api/utils/sys_var.h"
+```
+
 
 ```cpp
 __aicore__ inline int64_t asc_get_sub_block_id()

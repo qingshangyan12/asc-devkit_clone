@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_load_image_to_cbuf"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_load_image_to_cbuf.md"
+description: "将图像数据从Global Memory搬运到L1 Buffer。"
+signature:
+  - function: "asc_load_image_to_cbuf(__cbuf__ int8_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_load_image_to_cbuf(__cbuf__ half*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_load_image_to_cbuf_sync(__cbuf__ int8_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_load_image_to_cbuf_sync(__cbuf__ half*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_load_image_to_cbuf
 
 ## 产品支持情况

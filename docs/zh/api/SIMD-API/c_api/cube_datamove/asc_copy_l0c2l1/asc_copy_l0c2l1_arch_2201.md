@@ -1,3 +1,121 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l0c2l1"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_2201.md"
+description: "矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到L1 Buffer中。"
+signature:
+  - function: "asc_copy_l0c2l1(__cbuf__ half*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l0c2l1(__cbuf__ bfloat16_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l0c2l1(__cbuf__ int8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l0c2l1(__cbuf__ half*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l0c2l1(__cbuf__ int16_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l0c2l1(__cbuf__ int8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l0c2l1(__cbuf__ uint8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l0c2l1(__cbuf__ void*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l0c2l1(__cbuf__ void*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l0c2l1_sync(__cbuf__ half*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l0c2l1_sync(__cbuf__ bfloat16_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l0c2l1_sync(__cbuf__ int8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l0c2l1_sync(__cbuf__ half*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l0c2l1_sync(__cbuf__ int16_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l0c2l1_sync(__cbuf__ int8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l0c2l1_sync(__cbuf__ uint8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l0c2l1_sync(__cbuf__ void*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l0c2l1_sync(__cbuf__ void*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_l0c2l1
 
 ## 产品支持情况

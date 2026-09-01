@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12fb"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md"
+description: "将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。"
+signature:
+  - function: "asc_copy_l12fb(__fbuf__ void*,__cbuf__ void*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12fb(__fbuf__ void*,__cbuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12fb_sync(__fbuf__ void*,__cbuf__ void*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_l12fb
 
 ## 产品支持情况

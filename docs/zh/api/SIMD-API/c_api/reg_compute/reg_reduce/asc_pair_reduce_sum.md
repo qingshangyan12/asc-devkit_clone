@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: "asc_pair_reduce_sum"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md"
+description: "根据`mask`将源操作数`src`中每两个相邻元素相加，得到计算结果。结果连续保存在目的操作数`dst`的低半部分，`dst`的高半部分置0。"
+signature:
+  - function: "asc_pair_reduce_sum(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+    dtype:
+      values:
+        - "half"
+        - "float"
+  - function: "asc_pair_reduce_sum(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+    dtype:
+      values:
+        - "half"
+        - "float"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_pair_reduce_sum(vector_float&,vector_float,vector_bool)"
+        snippets:
+          - id: "asc_pair_reduce_sum"
+            file: "reduce_pair.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_pair_reduce_sum
 
 ## 产品支持情况
@@ -39,6 +77,22 @@ $$
 其中，$N$为矢量数据寄存器的元素个数。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_pair_reduce_sum(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+  - function: "asc_pair_reduce_sum(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

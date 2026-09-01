@@ -28,35 +28,150 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_add_float()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_add_float();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_add_int8()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_add_int8();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_add_int16()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_add_int16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_add_int32()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_add_int32();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_disable_dma_atomic()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_disable_dma_atomic();
 [[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @function asc_set_atomic_none()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_none();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_add_bfloat()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_add_bfloat();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_add_float16()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_add_float16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_max_bfloat()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_max_bfloat();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_max_float()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_max_float();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_max_float16()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_max_float16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_max_int8()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_max_int8();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_max_int16()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_max_int16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_max_int32()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_max_int32();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_min_bfloat()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_min_bfloat();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_min_float()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_min_float();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_min_float16()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_min_float16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_min_int8()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_min_int8();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_min_int16()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_min_int16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @function asc_set_atomic_min_int32()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_min_int32();
 
 [[deprecated("NOTICE: asc_set_atomic_add_int is deprecated. Please use asc_set_atomic_add_int32 instead.")]]
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @function asc_set_atomic_add_int()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_add_int();
 
 [[deprecated("NOTICE: asc_set_atomic_max_int is deprecated. Please use asc_set_atomic_max_int32 instead.")]]
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @function asc_set_atomic_max_int()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_max_int();
 
 [[deprecated("NOTICE: asc_set_atomic_min_int is deprecated. Please use asc_set_atomic_min_int32 instead.")]]
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @function asc_set_atomic_min_int()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_atomic_min_int();
 
 #endif

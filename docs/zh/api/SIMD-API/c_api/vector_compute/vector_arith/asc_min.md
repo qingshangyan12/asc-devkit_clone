@@ -1,3 +1,85 @@
+---
+okftype: reference.api.cpp
+title: "asc_min"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min.md"
+description: "按元素求最小值。"
+signature:
+  - function: "asc_min(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ int32_t*,__ubuf__ int32_t*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ int32_t*,__ubuf__ int32_t*,__ubuf__ int32_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min_sync(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_min_sync(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_min_sync(__ubuf__ int32_t*,__ubuf__ int32_t*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_min_sync(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_min
 
 ## 产品支持情况
@@ -34,6 +116,34 @@ $$
 ## 函数原型
 
 - 前n个数据计算
+```yaml
+api_signature:
+  - function: "asc_min(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ int32_t*,__ubuf__ int32_t*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
 ```cpp
 __aicore__ inline void asc_min(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
 __aicore__ inline void asc_min(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)
@@ -42,6 +152,34 @@ __aicore__ inline void asc_min(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf
 ```
 
 - 高维切分计算
+```yaml
+api_signature:
+  - function: "asc_min(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ int32_t*,__ubuf__ int32_t*,__ubuf__ int32_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+```
+
 ```cpp
 __aicore__ inline void asc_min(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, 
     uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, 
@@ -58,6 +196,34 @@ __aicore__ inline void asc_min(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf
 ```
 
 - 同步计算
+```yaml
+api_signature:
+  - function: "asc_min_sync(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_min_sync(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_min_sync(__ubuf__ int32_t*,__ubuf__ int32_t*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_min_sync(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+```
+
 ```cpp
 __aicore__ inline void asc_min_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
 __aicore__ inline void asc_min_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count)

@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_mul_scalar_float2half_rn"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md"
+description: "根据`mask`将源操作数`src`（float类型）按元素与标量`value`相乘后，按照RINT舍入模式转换为half类型，得到计算结果。"
+signature:
+  - function: "asc_mul_scalar_float2half_rn(vector_float,float,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_mul_scalar_float2half_rn(vector_float,float,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_mul_scalar_float2half_rn(vector_half&,vector_float,float,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_mul_scalar_float2half_rn(vector_half&,vector_float,float,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_mul_scalar_float2half_rn
 
 ## 产品支持情况
@@ -35,6 +69,34 @@ $$
 由于源操作数（float，32位）与目的操作数（half，16位）的位宽比为2:1，一个`vector_float`的数据转换后会填满一个`vector_half`。通过`dst_pos`参数指定结果写入`dst`中索引为偶数或奇数的位置，未写入的位置置0。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_mul_scalar_float2half_rn(vector_float,float,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_mul_scalar_float2half_rn(vector_float,float,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_mul_scalar_float2half_rn(vector_half&,vector_float,float,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_mul_scalar_float2half_rn(vector_half&,vector_float,float,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果，数据写入索引为偶数的位置
@@ -59,6 +121,16 @@ __simd_callee__ inline void asc_mul_scalar_float2half_rn(
 ```
 
 ### 函数原型典型示例
+```yaml
+api_signature:
+  - function: "asc_mul_scalar_float2half_rn(vector_half&,vector_float,float,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 
 ```c
 // 示例：对float矢量数据寄存器与float标量执行乘法后转换为half类型，结果写入偶数位置

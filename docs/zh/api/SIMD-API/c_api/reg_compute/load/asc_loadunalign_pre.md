@@ -1,3 +1,63 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadunalign_pre"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md"
+description: "本接口根据Unified Buffer（UB）中按dtype对齐的起始地址，初始化[非对齐寄存器](../../defs/type/data_type_definition.md#非对齐寄存器)，作为后续非对齐搬入的前置缓存。该阶段仅完成非对齐寄存器初始化，不会将数据搬入矢量数据寄存器。"
+signature:
+  - function: "asc_loadunalign_pre(vector_load_unalign&,__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadunalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+        - "int64_t"
+  - function: "asc_loadunalign_pre(vector_load_unalign&,__ubuf__ <dtype>*,addr_reg)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadunalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+        - "int64_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_loadunalign_pre
 
 ## 产品支持情况
@@ -40,6 +100,16 @@
 ## 函数原型
 
 ### 源地址预处理模式
+```yaml
+api_signature:
+  - function: "asc_loadunalign_pre(vector_load_unalign&,__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadunalign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
@@ -59,6 +129,16 @@ __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,
 ```
 
 ### 地址寄存器偏移预处理模式
+```yaml
+api_signature:
+  - function: "asc_loadunalign_pre(vector_load_unalign&,__ubuf__ <dtype>*,addr_reg)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadunalign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_loadunalign_pre(vector_load_unalign& dst,

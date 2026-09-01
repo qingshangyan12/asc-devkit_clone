@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: "asc_mrgsort4"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md"
+description: "将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。"
+signature:
+  - function: "asc_mrgsort4(__ubuf__ half*,__ubuf__ half*src[ASC_C_API_MRGSORT_ELEMENT_LEN],uint8_t,uint16_t,uint16_t,uint16_t,uint16_t,bool,uint8_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_sort.h"
+        header: "/include/c_api/vector_compute/compute/vector_sort.h"
+  - function: "asc_mrgsort4(__ubuf__ float*,__ubuf__ float*src[ASC_C_API_MRGSORT_ELEMENT_LEN],uint8_t,uint16_t,uint16_t,uint16_t,uint16_t,bool,uint8_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_sort.h"
+        header: "/include/c_api/vector_compute/compute/vector_sort.h"
+  - function: "asc_mrgsort4_sync(__ubuf__ half*,__ubuf__ half*src[ASC_C_API_MRGSORT_ELEMENT_LEN],uint8_t,uint16_t,uint16_t,uint16_t,uint16_t,bool,uint8_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_mrgsort4_sync(__ubuf__ float*,__ubuf__ float*src[ASC_C_API_MRGSORT_ELEMENT_LEN],uint8_t,uint16_t,uint16_t,uint16_t,uint16_t,bool,uint8_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_mrgsort4
 
 ## 产品支持情况

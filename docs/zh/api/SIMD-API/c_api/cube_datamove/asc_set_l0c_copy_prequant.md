@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l0c_copy_prequant"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md"
+description: "本接口用于在L0C Buffer搬出过程中进行随路Scalar量化时，配置量化计算所需的缩放系数、偏移量和量化结果符号。配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`quant_pre_mode`搭配使用。"
+signature:
+  - function: "asc_set_l0c_copy_prequant(float,uint16_t,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_set_l0c_copy_prequant(uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_l0c_copy_prequant
 
 ## 产品支持情况
@@ -46,6 +68,22 @@
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_l0c_copy_prequant(float,uint16_t,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_set_l0c_copy_prequant(uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_set_l0c_copy_prequant(float scale, uint16_t offset, bool is_signed);

@@ -1,3 +1,53 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_ub2gm_align"
+path: "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md"
+description: "提供数据非对齐搬运的功能，将数据从Unified Buffer (UB)搬运到Global Memory (GM)，并支持8位/16位/32位数据类型搬运。"
+signature:
+  - function: "asc_copy_ub2gm_align(__gm__ <dtype>*,__ubuf__ <dtype>*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_copy_ub2gm_align(__gm__ <dtype>*,__ubuf__ <dtype>*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_ub2gm_align
 
 ## 产品支持情况
@@ -54,6 +104,16 @@
 ## 函数原型
 
 ### 连续数据搬运（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_copy_ub2gm_align(__gm__ <dtype>*,__ubuf__ <dtype>*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```c
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,
@@ -75,6 +135,16 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ bfloat16_t* dst,
 ```
 
 ### 高维切分数据搬运（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_copy_ub2gm_align(__gm__ <dtype>*,__ubuf__ <dtype>*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```c
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,

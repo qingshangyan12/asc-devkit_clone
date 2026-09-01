@@ -1,3 +1,169 @@
+---
+okftype: reference.api.cpp
+title: "asc_storealign (废弃)"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_v5_deprecated.md"
+description: "**该接口已废弃，请使用[asc_storealign_postupdate](asc_storealign_postupdate.md)实现此功能。"
+signature:
+  - function: "asc_storealign(__ubuf__ int8_t*,vector_int8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ uint8_t*,vector_uint8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ fp8_e5m2_t*,vector_fp8_e5m2_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ fp8_e4m3fn_t*,vector_fp8_e4m3fn_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ hifloat8_t*,vector_hifloat8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ fp8_e8m0_t*,vector_fp8_e8m0_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ int16_t*,vector_int16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ uint16_t*,vector_uint16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ half*,vector_half,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ bfloat16_t*,vector_bfloat16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ int32_t*,vector_int32_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ uint32_t*,vector_uint32_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ float*,vector_float,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ int8_t*&,vector_int8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ uint8_t*&,vector_uint8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ fp8_e5m2_t*&,vector_fp8_e5m2_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ fp8_e4m3fn_t*&,vector_fp8_e4m3fn_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ hifloat8_t*&,vector_hifloat8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ fp8_e8m0_t*&,vector_fp8_e8m0_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ int16_t*&,vector_int16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ uint16_t*&,vector_uint16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ half*&,vector_half,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ bfloat16_t*&,vector_bfloat16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ int32_t*&,vector_int32_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ uint32_t*&,vector_uint32_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ float*&,vector_float,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_storealign (废弃)
 
 ## 产品支持情况
@@ -31,6 +197,166 @@
 reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到Unified Buffer（UB）的场景，接口使用repeat stride模式。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_storealign(__ubuf__ int8_t*,vector_int8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ uint8_t*,vector_uint8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ fp8_e5m2_t*,vector_fp8_e5m2_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ fp8_e4m3fn_t*,vector_fp8_e4m3fn_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ hifloat8_t*,vector_hifloat8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ fp8_e8m0_t*,vector_fp8_e8m0_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ int16_t*,vector_int16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ uint16_t*,vector_uint16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ half*,vector_half,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ bfloat16_t*,vector_bfloat16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ int32_t*,vector_int32_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ uint32_t*,vector_uint32_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign(__ubuf__ float*,vector_float,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ int8_t*&,vector_int8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ uint8_t*&,vector_uint8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ fp8_e5m2_t*&,vector_fp8_e5m2_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ fp8_e4m3fn_t*&,vector_fp8_e4m3fn_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ hifloat8_t*&,vector_hifloat8_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ fp8_e8m0_t*&,vector_fp8_e8m0_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ int16_t*&,vector_int16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ uint16_t*&,vector_uint16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ half*&,vector_half,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ bfloat16_t*&,vector_bfloat16_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ int32_t*&,vector_int32_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ uint32_t*&,vector_uint32_t,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_postupdate(__ubuf__ float*&,vector_float,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+```
+
 
 ```cpp
 // repeat stride模式搬出

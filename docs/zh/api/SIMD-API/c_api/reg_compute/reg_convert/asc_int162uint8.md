@@ -1,3 +1,53 @@
+---
+okftype: reference.api.cpp
+title: "asc_int162uint8"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint8.md"
+description: "`src`中int16_t类型的元素转换为uint8_t类型，并将结果写入dst。支持非饱和与饱和两种模式。"
+signature:
+  - function: "asc_int162uint8(vector_uint8_t&,vector_int16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          sat_mode: ""
+  - function: "asc_int162uint8_sat(vector_uint8_t&,vector_int16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          sat_mode: "_sat"
+  - function: "asc_int162uint8(vector_uint8_t&,vector_int16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          sat_mode: ""
+  - function: "asc_int162uint8_sat(vector_uint8_t&,vector_int16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          sat_mode: "_sat"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int162uint8
 
 ## 产品支持情况
@@ -61,6 +111,16 @@ __simd_callee__ inline void asc_int162uint8<sat_mode>(vector_uint8_t& dst,
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 
 ### 函数原型典型示例
+```yaml
+api_signature:
+  - function: "asc_int162uint8(vector_uint8_t&,vector_int16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```c
 // 非饱和模式，数据写入索引为偶数的位置

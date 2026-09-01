@@ -1,3 +1,117 @@
+---
+okftype: reference.api.cpp
+title: "asc_unpack"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md"
+description: "将src中低半部分或高半部分的元素以扩充位宽的方式写入dst或通过函数返回值返回。"
+signature:
+  - function: "asc_unpack_lower(vector_<dtype_src>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    dtype:
+      variants:
+        -
+          dtype_dst: "uint16_t"
+          dtype_src: "uint8_t"
+        -
+          dtype_dst: "int16_t"
+          dtype_src: "int8_t"
+        -
+          dtype_dst: "uint32_t"
+          dtype_src: "uint16_t"
+        -
+          dtype_dst: "int32_t"
+          dtype_src: "int16_t"
+  - function: "asc_unpack_upper(vector_<dtype_src>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    dtype:
+      variants:
+        -
+          dtype_dst: "uint16_t"
+          dtype_src: "uint8_t"
+        -
+          dtype_dst: "int16_t"
+          dtype_src: "int8_t"
+        -
+          dtype_dst: "uint32_t"
+          dtype_src: "uint16_t"
+        -
+          dtype_dst: "int32_t"
+          dtype_src: "int16_t"
+  - function: "asc_unpack_lower(vector_<dtype_dst>&,vector_<dtype_src>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    dtype:
+      variants:
+        -
+          dtype_dst: "uint16_t"
+          dtype_src: "uint8_t"
+        -
+          dtype_dst: "int16_t"
+          dtype_src: "int8_t"
+        -
+          dtype_dst: "uint32_t"
+          dtype_src: "uint16_t"
+        -
+          dtype_dst: "int32_t"
+          dtype_src: "int16_t"
+  - function: "asc_unpack_upper(vector_<dtype_dst>&,vector_<dtype_src>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    dtype:
+      variants:
+        -
+          dtype_dst: "uint16_t"
+          dtype_src: "uint8_t"
+        -
+          dtype_dst: "int16_t"
+          dtype_src: "int8_t"
+        -
+          dtype_dst: "uint32_t"
+          dtype_src: "uint16_t"
+        -
+          dtype_dst: "int32_t"
+          dtype_src: "int16_t"
+  - function: "asc_unpack_lower(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unpack_upper(vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unpack_lower(vector_bool&,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unpack_upper(vector_bool&,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_unpack
 
 ## 产品支持情况
@@ -54,6 +168,34 @@
 ## 函数原型
 
 ### 矢量数据寄存器解压缩
+```yaml
+api_signature:
+  - function: "asc_unpack_lower(vector_<dtype_src>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unpack_upper(vector_<dtype_src>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unpack_lower(vector_<dtype_dst>&,vector_<dtype_src>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_unpack_upper(vector_<dtype_dst>&,vector_<dtype_src>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```c
 // 解压缩低位，通过函数返回值返回结果。

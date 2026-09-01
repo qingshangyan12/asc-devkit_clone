@@ -1,3 +1,85 @@
+---
+okftype: reference.api.cpp
+title: "asc_create_iter_reg (废弃)"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_create_iter_reg_deprecated.md"
+description: "**该接口已废弃，请使用[asc_update_addr_reg](asc_update_addr_reg.md)实现此功能。"
+signature:
+  - function: "asc_create_iter_reg_b32(uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b16(uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b8(uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b32(uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b16(uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b8(uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b32(uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b16(uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b8(uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b32(uint32_t,uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b16(uint32_t,uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b8(uint32_t,uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_create_iter_reg (废弃)
 
 ## 产品支持情况
@@ -31,6 +113,82 @@
 地址寄存器通过该接口初始化，然后在循环之中使用地址寄存器存储地址偏移量，该重载接口同步支持1-4个offset参数，并支持初始化b8/b16/b32位宽的寄存器，适配1-4维Tensor。底层在多维循环中自动计算地址偏移，消除标量地址运算开销。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_create_iter_reg_b32(uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b16(uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b8(uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b32(uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b16(uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b8(uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b32(uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b16(uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b8(uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b32(uint32_t,uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b16(uint32_t,uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_create_iter_reg_b8(uint32_t,uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+```
+
 
   ```cpp
   __simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset)

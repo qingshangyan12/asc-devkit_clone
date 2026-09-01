@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_hif82float (废弃)"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float_deprecated.md"
+description: "将hifloat8_t类型数据转换为float类型。"
+signature:
+  - function: "asc_hif82float(vector_float&,vector_hifloat8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_hif82float_v2(vector_float&,vector_hifloat8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_hif82float_v3(vector_float&,vector_hifloat8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_hif82float_v4(vector_float&,vector_hifloat8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_hif82float (废弃)
 
 ## 产品支持情况
@@ -31,6 +65,34 @@
 由于源操作数与目的操作数类型位宽比为1:4，读取数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_hif82float(vector_float&,vector_hifloat8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_hif82float_v2(vector_float&,vector_hifloat8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_hif82float_v3(vector_float&,vector_hifloat8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_hif82float_v4(vector_float&,vector_hifloat8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```cpp
 // 选取索引0的位置

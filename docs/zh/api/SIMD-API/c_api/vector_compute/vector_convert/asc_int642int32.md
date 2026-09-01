@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_int642int32"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642int32.md"
+description: "将int64_t类型数据转换为int32_t类型。"
+signature:
+  - function: "asc_int642int32(__ubuf__ int32_t*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642int32(__ubuf__ int32_t*,__ubuf__ int64_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642int32_sync(__ubuf__ int32_t*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int642int32
 
 ## 产品支持情况

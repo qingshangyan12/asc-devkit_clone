@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: "asc_cumulative_histogram"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md"
+description: "对输入矢量数据寄存器中的元素进行累计频率统计，生成累计直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。支持配置掩码用于指示参与统计的元素，掩码位为1时，对应元素参与统计；为0时不统计。掩码不影响目的矢量数据寄存器的写入行为。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。"
+signature:
+  - function: "asc_cumulative_histogram_bin0(vector_uint16_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_histogram.h"
+  - function: "asc_cumulative_histogram_bin1(vector_uint16_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_histogram.h"
+    dtype:
+      variants:
+        -
+          src: "uint8_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_cumulative_histogram
 
 ## 产品支持情况
@@ -42,6 +68,16 @@
 ## 函数原型
 
 ### 低位模式
+```yaml
+api_signature:
+  - function: "asc_cumulative_histogram_bin0(vector_uint16_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_histogram.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst,
@@ -50,6 +86,16 @@ __simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst,
 ```
 
 ### 高位模式
+```yaml
+api_signature:
+  - function: "asc_cumulative_histogram_bin1(vector_uint16_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_histogram.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst,

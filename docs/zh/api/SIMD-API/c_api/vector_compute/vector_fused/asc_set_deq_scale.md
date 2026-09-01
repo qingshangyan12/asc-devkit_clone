@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_deq_scale"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md"
+description: "设置DEQSCALE（量化参数）寄存器的值。"
+signature:
+  - function: "asc_set_deq_scale(__ubuf__ uint64_t*,float scale_arr[ASC_VDEQ_SIZE],int16_t offset_arr[ASC_VDEQ_SIZE],bool sign_mode_arr[ASC_VDEQ_SIZE])"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_set_deq_scale(float,int16_t,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_set_deq_scale(half)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_deq_scale
 
 ## 产品支持情况
@@ -29,6 +57,28 @@
 设置DEQSCALE（量化参数）寄存器的值。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_deq_scale(__ubuf__ uint64_t*,float scale_arr[ASC_VDEQ_SIZE],int16_t offset_arr[ASC_VDEQ_SIZE],bool sign_mode_arr[ASC_VDEQ_SIZE])"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_set_deq_scale(float,int16_t,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_set_deq_scale(half)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_set_deq_scale(__ubuf__ uint64_t* tmp, float scale_arr[ASC_VDEQ_SIZE], int16_t offset_arr[ASC_VDEQ_SIZE], bool sign_mode_arr[ASC_VDEQ_SIZE])

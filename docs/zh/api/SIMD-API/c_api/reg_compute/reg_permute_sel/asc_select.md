@@ -1,3 +1,63 @@
+---
+okftype: reference.api.cpp
+title: "asc_select"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md"
+description: "根据`mask`从源操作数`src0`、`src1`中选择元素，得到计算结果。选择的规则为：当`mask`的比特位为1时，从`src0`中选取对应位置的数；当`mask`的比特位为0时，从`src1`中选取对应位置的数。"
+signature:
+  - function: "asc_select(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    dtype:
+      values:
+        - "bool"
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_select(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    dtype:
+      values:
+        - "bool"
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/select"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_select(vector_float&,vector_float,vector_float,vector_bool)"
+        snippets:
+          - id: "asc_select"
+            file: "select.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_select
 
 ## 产品支持情况
@@ -36,6 +96,22 @@ dst_i =
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_select(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_select(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

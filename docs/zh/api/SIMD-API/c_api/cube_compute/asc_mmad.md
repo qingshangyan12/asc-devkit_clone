@@ -1,3 +1,97 @@
+---
+okftype: reference.api.cpp
+title: "asc_mmad"
+path: "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md"
+description: "本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力。"
+signature:
+  - function: "asc_mmad(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+    dtype:
+      variants:
+        -
+          c_dtype: "int32_t"
+          a_dtype: "int8_t"
+          b_dtype: "int8_t"
+        -
+          c_dtype: "float"
+          a_dtype: "hifloat8_t"
+          b_dtype: "hifloat8_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e5m2_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e5m2_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          c_dtype: "float"
+          a_dtype: "half"
+          b_dtype: "half"
+        -
+          c_dtype: "float"
+          a_dtype: "bfloat16_t"
+          b_dtype: "bfloat16_t"
+        -
+          c_dtype: "float"
+          a_dtype: "float"
+          b_dtype: "float"
+  - function: "asc_mmad(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+    dtype:
+      variants:
+        -
+          c_dtype: "int32_t"
+          a_dtype: "int8_t"
+          b_dtype: "int8_t"
+        -
+          c_dtype: "float"
+          a_dtype: "half"
+          b_dtype: "half"
+        -
+          c_dtype: "float"
+          a_dtype: "bfloat16_t"
+          b_dtype: "bfloat16_t"
+        -
+          c_dtype: "float"
+          a_dtype: "float"
+          b_dtype: "float"
+  - function: "asc_mmad_s4(__cc__ int32_t*,__ca__ int4b_t*,__cb__ int4b_t*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_mmad(__cc__ <c_matrix_type>*,__ca__ <a_matrix_type>*,__cb__ <b_matrix_type>*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool,bool)"
+        snippets:
+          - id: "asc_mmad.int32_t.int8_t.c_matrix_source_true.c_matrix_init_val_false"
+            file: "mmad_s1.h"
+          - id: "asc_mmad.float.bfloat16_t.c_matrix_source_false.c_matrix_init_val_true"
+            file: "mmad_s2.h"
+timestamp: "2026-09-01"
+---
+
 # asc_mmad
 
 ## 产品支持情况
@@ -68,6 +162,16 @@ $$
 ### 函数原型（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 **占位符形式：**
+```yaml
+api_signature:
+  - function: "asc_mmad(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+```
+
 
 ```c
 __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
@@ -122,6 +226,16 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 **占位符形式：**
 
 - asc_mmad接口：
+```yaml
+api_signature:
+  - function: "asc_mmad(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+```
+
 
   ```c
   __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
@@ -139,6 +253,16 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
   | `float` | `float` | `float` | `float` |
 
 - asc_mmad_s4接口，当输入矩阵数据类型为`int4b_t`时调用此类接口：
+```yaml
+api_signature:
+  - function: "asc_mmad_s4(__cc__ int32_t*,__ca__ int4b_t*,__cb__ int4b_t*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+```
+
 
   ```c
   __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)

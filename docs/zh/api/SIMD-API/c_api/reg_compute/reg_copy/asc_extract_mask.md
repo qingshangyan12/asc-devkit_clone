@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_extract_mask"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md"
+description: "从矢量数据寄存器中提取掩码寄存器，并通过函数返回值返回结果。"
+signature:
+  - function: "asc_extract_mask(vector_uint16_t,int16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+  - function: "asc_extract_mask(vector_uint32_t,int16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_extract_mask
 
 ## 产品支持情况
@@ -40,6 +62,22 @@
 ## 函数原型
 
 **part的值必须在编译期确定，可传入整数字面量或constexpr整数常量，不支持传入运行时变量。**
+```yaml
+api_signature:
+  - function: "asc_extract_mask(vector_uint16_t,int16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+  - function: "asc_extract_mask(vector_uint32_t,int16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_copy.h"
+```
+
 
 ```c
 __simd_callee__ inline vector_bool asc_extract_mask(vector_uint16_t src,

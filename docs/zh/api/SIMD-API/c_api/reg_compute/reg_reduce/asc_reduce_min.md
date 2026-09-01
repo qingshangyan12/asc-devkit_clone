@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: "asc_reduce_min"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min.md"
+description: "根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。"
+signature:
+  - function: "asc_reduce_min(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+    dtype:
+      values:
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_reduce_min(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+    dtype:
+      values:
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_reduce_min
 
 ## 产品支持情况
@@ -36,6 +74,22 @@ dst_1 &= \operatorname{argmin}\{src_i \mid mask_i = 1\}
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_reduce_min(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+  - function: "asc_reduce_min(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

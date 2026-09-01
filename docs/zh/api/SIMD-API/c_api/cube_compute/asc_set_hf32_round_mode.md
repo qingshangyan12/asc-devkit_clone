@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_hf32_round_mode"
+path: "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md"
+description: "本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](asc_enable_hf32.md)开启HF32模式。"
+signature:
+  - function: "asc_set_hf32_round_mode(asc_hf32_round_mode)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_hf32_round_mode
 
 ## 产品支持情况
@@ -29,6 +46,17 @@
 本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](asc_enable_hf32.md)开启HF32模式。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_hf32_round_mode(asc_hf32_round_mode)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+```
+
 
 ```c
 __aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mode)

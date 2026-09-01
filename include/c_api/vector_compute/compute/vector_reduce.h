@@ -27,186 +27,491 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_reduce(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint16_t,uint8_t,uint8_t,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_reduce(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint16_t repeat,
     uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_reduce(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_reduce(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_reduce(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_reduce(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint16_t repeat,
     uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_reduce(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_reduce(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_get_reduce_max_cnt(half&,uint32_t&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_get_reduce_max_cnt(half& val, uint32_t& index);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_get_reduce_max_cnt(float&,uint32_t&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_get_reduce_max_cnt(float& val, uint32_t& index);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_get_reduce_min_cnt(half&,uint32_t&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_get_reduce_min_cnt(half& val, uint32_t& index);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_get_reduce_min_cnt(float&,uint32_t&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_get_reduce_min_cnt(float& val, uint32_t& index);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_get_rsvd_count()
+ * @archs 2201
+ */
 __aicore__ inline int64_t asc_get_rsvd_count();
 
 __aicore__ inline int64_t asc_get_acc_val();
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_sum(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_sum(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_sum(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_sum(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_sum(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_sum(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_sum(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_max(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_max(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_max(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_max(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_max(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_max(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_max(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_max(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_min(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_min(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_min(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_min(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_min(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_min(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_datablock_reduce_min(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_datablock_reduce_min(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_sum(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_sum(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_sum(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_sum(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_sum(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_sum(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_sum(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_index_value(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_index_value(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_index_value(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_index_value(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_index_value(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_index_value(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_index_value(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_index_value(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_value_index(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_value_index(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_value_index(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_value_index(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_value_index(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_value_index(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_value_index(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_value_index(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_only_value(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_only_value(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_only_value(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_only_value(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_only_value(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_only_value(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_only_value(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_only_value(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_only_index(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_only_index(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_only_index(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_only_index(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_only_index(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_only_index(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_max_only_index(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_max_only_index(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_index_value(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_index_value(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_index_value(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_index_value(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_index_value(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_index_value(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_index_value(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_index_value(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_value_index(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_value_index(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_value_index(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_value_index(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_value_index(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_value_index(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_value_index(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_value_index(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_only_value(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_only_value(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_only_value(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_only_value(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_only_value(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_only_value(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_only_value(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_only_value(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_only_index(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_only_index(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_only_index(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_only_index(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_only_index(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_only_index(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_repeat_reduce_min_only_index(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_repeat_reduce_min_only_index(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_pair_reduce_sum(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_pair_reduce_sum(
     __ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_pair_reduce_sum(__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_pair_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_pair_reduce_sum(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_pair_reduce_sum(
     __ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride,
     uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_reduce
+ * @function asc_pair_reduce_sum(__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_pair_reduce_sum(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count);
 
 #endif

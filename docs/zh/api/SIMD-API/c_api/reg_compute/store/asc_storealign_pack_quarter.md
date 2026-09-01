@@ -1,3 +1,46 @@
+---
+okftype: reference.api.cpp
+title: "asc_storealign_pack_quarter"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md"
+description: "将矢量数据寄存器中的数据压缩搬出到Unified Buffer（UB）。`mask`用于指示参与搬出的元素，`mask`对应位置为1时，将`src`中每个32bit的有效元素中低8bit数据写入压缩后对应的目的位置，`mask`对应位置为0时，压缩后对应的目的位置保持原值。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。"
+signature:
+  - function: "asc_storealign_pack_quarter(__ubuf__ <dtype>*,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+    dtype:
+      values:
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_storealign_pack_quarter(__ubuf__ <dtype>*,vector_<dtype>,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+    dtype:
+      values:
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_storealign_pack_quarter(__ubuf__ <dtype>*,vector_<dtype>,addr_reg,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+    dtype:
+      values:
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_storealign_pack_quarter
 
 ## 产品支持情况
@@ -39,6 +82,16 @@
 ## 函数原型
 
 ### 对齐搬出模式
+```yaml
+api_signature:
+  - function: "asc_storealign_pack_quarter(__ubuf__ <dtype>*,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst_align32b,
@@ -59,6 +112,16 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst_al
 ```
 
 ### 立即数偏移搬出模式
+```yaml
+api_signature:
+  - function: "asc_storealign_pack_quarter(__ubuf__ <dtype>*,vector_<dtype>,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst_align32b,
@@ -81,6 +144,16 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst_al
 ```
 
 ### 地址寄存器偏移搬出模式
+```yaml
+api_signature:
+  - function: "asc_storealign_pack_quarter(__ubuf__ <dtype>*,vector_<dtype>,addr_reg,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst_align32b,

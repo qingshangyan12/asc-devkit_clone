@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_gm2l1_arch_3510（高维切分数据搬运）"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md"
+description: "将数据从Global Memory搬运到L1 Buffer，数据搬运时格式和内容保持不变。高维切分是指能够通过配置数据块个数、单个数据块长度、地址偏移等搬运参数实现非连续搬运。并且此接口支持在搬运过程中按通道padding模式对32字节粒度的数据插入或移除padding。其中padding值需要通过[asc_set_gm2l1_pad](../asc_set_gm2l1_pad.md)设置。"
+signature:
+  - function: "asc_copy_gm2l1(__cbuf__ void*,__gm__ void*,uint32_t,uint32_t,uint8_t,uint64_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_sync(__cbuf__ void*,__gm__ void*,uint32_t,uint32_t,uint8_t,uint64_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_gm2l1_arch_3510（高维切分数据搬运）
 
 ## 产品支持情况
@@ -33,6 +55,22 @@
 ## 函数原型
 
 ### 高维切分数据搬运
+```yaml
+api_signature:
+  - function: "asc_copy_gm2l1(__cbuf__ void*,__gm__ void*,uint32_t,uint32_t,uint8_t,uint64_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_sync(__cbuf__ void*,__gm__ void*,uint32_t,uint32_t,uint8_t,uint64_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst,

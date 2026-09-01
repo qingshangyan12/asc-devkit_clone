@@ -34,220 +34,615 @@
 #include "c_api/composite/vector_compute_composite.h"
 
 //===========asc_set_copy_pad_val(int8/uint8/int16/uint16/half/bfloat16/int32/uint32/float)===========
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_copy_pad_val(int8_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_copy_pad_val(int8_t pad_value);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_copy_pad_val(uint8_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_copy_pad_val(uint8_t pad_value);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_copy_pad_val(int16_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_copy_pad_val(int16_t pad_value);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_copy_pad_val(uint16_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_copy_pad_val(uint16_t pad_value);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_copy_pad_val(half)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_copy_pad_val(half pad_value);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_copy_pad_val(bfloat16_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_copy_pad_val(bfloat16_t pad_value);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_copy_pad_val(int32_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_copy_pad_val(int32_t pad_value);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_copy_pad_val(uint32_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_copy_pad_val(float)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_copy_pad_val(float pad_value);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy_ub2ub(__ubuf__ void*,__ubuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_copy_ub2ub(
     __ubuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap,
     uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy_ub2ub(__ubuf__ void*,__ubuf__ void*,uint32_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy(__ubuf__ int16_t*,__ubuf__ int16_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy(__ubuf__ int16_t*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy(__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy(__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy(__ubuf__ int32_t*,__ubuf__ int32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy(__ubuf__ int32_t*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy(__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy(__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub
+ * @function asc_copy_gm2ub(__ubuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub(
     __ubuf__ void* dst, __gm__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub
+ * @function asc_copy_gm2ub(__ubuf__ void*,__gm__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm
+ * @function asc_copy_ub2gm(__gm__ void*,__ubuf__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint32_t size);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm
+ * @function asc_copy_ub2gm(__gm__ void*,__ubuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm(
     __gm__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
 
 // asc_copy_gm2ub_align  int8_t / uint8_t / half / bfloat16_t / int16_t / uint16_t / float / int32_t / uint32_t
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ int8_t*,__gm__ int8_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ int8_t*,__gm__ int8_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ uint8_t*,__gm__ uint8_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ uint8_t*,__gm__ uint8_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ half*,__gm__ half*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ half* dst, __gm__ half* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ half*,__gm__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ half* dst, __gm__ half* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ int16_t*,__gm__ int16_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int16_t* dst, __gm__ int16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ int16_t*,__gm__ int16_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ uint16_t*,__gm__ uint16_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ uint16_t*,__gm__ uint16_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ float*,__gm__ float*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ float* dst, __gm__ float* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ float*,__gm__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ float* dst, __gm__ float* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ int32_t*,__gm__ int32_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int32_t* dst, __gm__ int32_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ int32_t*,__gm__ int32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ uint32_t*,__gm__ uint32_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ uint32_t*,__gm__ uint32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size);
 
 // asc_copy_ub2gm_align
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ uint8_t*,__ubuf__ uint8_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ uint8_t*,__ubuf__ uint8_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ int8_t*,__ubuf__ int8_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int8_t* dst, __ubuf__ int8_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ int8_t*,__ubuf__ int8_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ int8_t* dst, __ubuf__ int8_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ half*,__ubuf__ half*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ half* dst, __ubuf__ half* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ half* dst, __ubuf__ half* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ uint16_t*,__ubuf__ uint16_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ uint16_t*,__ubuf__ uint16_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ int16_t*,__ubuf__ int16_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int16_t* dst, __ubuf__ int16_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ int16_t*,__ubuf__ int16_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ int16_t* dst, __ubuf__ int16_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ bfloat16_t*,__ubuf__ bfloat16_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint16_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ bfloat16_t*,__ubuf__ bfloat16_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ uint32_t*,__ubuf__ uint32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ float*,__ubuf__ float*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ float* dst, __ubuf__ float* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ float* dst, __ubuf__ float* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ int32_t*,__ubuf__ int32_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int32_t* dst, __ubuf__ int32_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ int32_t*,__ubuf__ int32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ int32_t* dst, __ubuf__ int32_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ double*,__ubuf__ double*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ double* dst, __ubuf__ double* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ double*,__ubuf__ double*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ double* dst, __ubuf__ double* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ int64_t*,__ubuf__ int64_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int64_t* dst, __ubuf__ int64_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ int64_t*,__ubuf__ int64_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ int64_t* dst, __ubuf__ int64_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ uint64_t*,__ubuf__ uint64_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint64_t* dst, __ubuf__ uint64_t* src, uint16_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, uint32_t src_gap, uint32_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ uint64_t*,__ubuf__ uint64_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint64_t* dst, __ubuf__ uint64_t* src, uint32_t size);
 
 // ==========asc_copy_gm2ub==========
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub
+ * @function asc_copy_gm2ub(__ubuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub(
     __ubuf__ void* dst, __gm__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride,
     uint16_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm
+ * @function asc_copy_ub2gm(__gm__ void*,__ubuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm(
     __gm__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t dst_stride,
     uint16_t src_stride);
 // ==========asc_copy_gm2ub_align(int8_t/uint8_t/fp8_e5m2_t/fp8_e4m3fn_t/hifloat8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ uint8_t*,__gm__ uint8_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ int8_t*,__gm__ int8_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ uint16_t*,__gm__ uint16_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ int16_t*,__gm__ int16_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ uint32_t*,__gm__ uint32_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ int32_t*,__gm__ int32_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ half*,__gm__ half*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ half* dst, __gm__ half* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ float*,__gm__ float*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ float* dst, __gm__ float* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_num,
     uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ hifloat8_t*,__gm__ hifloat8_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode,
     uint64_t src_stride, uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode,
     uint64_t src_stride, uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ fp8_e5m2_t*,__gm__ fp8_e5m2_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode,
     uint64_t src_stride, uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ fp8_e4m3fn_t*,__gm__ fp8_e4m3fn_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, asc_load_l2_cache_mode l2_cache_mode,
@@ -324,46 +719,121 @@ __aicore__ inline void asc_copy_gm2ub_align(
     __ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t left_padding_num, uint8_t right_padding_num, bool enable_constant_pad, uint8_t l2_cache_mode,
     uint64_t src_stride, uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ hifloat8_t*,__gm__ hifloat8_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ fp8_e5m2_t*,__gm__ fp8_e5m2_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_gm2ub_align
+ * @function asc_copy_gm2ub_align(__ubuf__ fp8_e4m3fn_t*,__gm__ fp8_e4m3fn_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t size);
 
 // ==========asc_copy_ub2gm_align(int8_t/uint8_t/fp8_e5m2_t/fp8_e4m3fn_t/hifloat8_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float)==========
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ uint8_t*,__ubuf__ uint8_t*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ int8_t*,__ubuf__ int8_t*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int8_t* dst, __ubuf__ int8_t* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ uint16_t*,__ubuf__ uint16_t*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ int16_t*,__ubuf__ int16_t*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int16_t* dst, __ubuf__ int16_t* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ uint32_t*,__ubuf__ uint32_t*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ int32_t*,__ubuf__ int32_t*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ int32_t* dst, __ubuf__ int32_t* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ half*,__ubuf__ half*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ half* dst, __ubuf__ half* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ float*,__ubuf__ float*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ float* dst, __ubuf__ float* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ hifloat8_t*,__ubuf__ hifloat8_t*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ hifloat8_t* dst, __ubuf__ hifloat8_t* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ bfloat16_t*,__ubuf__ bfloat16_t*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ fp8_e5m2_t*,__ubuf__ fp8_e5m2_t*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ fp8_e5m2_t* dst, __ubuf__ fp8_e5m2_t* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ fp8_e4m3fn_t*,__ubuf__ fp8_e4m3fn_t*,uint32_t,uint32_t,asc_store_l2_cache_mode,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint32_t burst_count, uint32_t burst_len,
     asc_store_l2_cache_mode l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
@@ -427,173 +897,433 @@ __aicore__ inline void asc_copy_ub2gm_align(
 __aicore__ inline void asc_copy_ub2gm_align(
     __gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint32_t burst_count, uint32_t burst_len,
     uint8_t l2_cache_mode, uint64_t dst_stride, uint32_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ hifloat8_t*,__ubuf__ hifloat8_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ hifloat8_t* dst, __ubuf__ hifloat8_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ fp8_e5m2_t*,__ubuf__ fp8_e5m2_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ fp8_e5m2_t* dst, __ubuf__ fp8_e5m2_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove.asc_copy_ub2gm_align
+ * @function asc_copy_ub2gm_align(__gm__ fp8_e4m3fn_t*,__ubuf__ fp8_e4m3fn_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ fp8_e4m3fn_t* dst, __ubuf__ fp8_e4m3fn_t* src, uint32_t size);
 
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ub2gm_loop_size(uint32_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ub2gm_loop_size(uint32_t loop1_size, uint32_t loop2_size);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ub2gm_loop1_stride(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ub2gm_loop1_stride(uint64_t loop1_src_stride, uint64_t loop1_dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ub2gm_loop2_stride(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ub2gm_loop2_stride(uint64_t loop2_src_stride, uint64_t loop2_dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_gm2ub_loop_size(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_gm2ub_loop_size(uint64_t loop1_size, uint64_t loop2_size);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_gm2ub_loop1_stride(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_gm2ub_loop1_stride(uint64_t loop1_src_stride, uint64_t loop1_dst_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_gm2ub_loop2_stride(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_gm2ub_loop2_stride(uint64_t loop2_src_stride, uint64_t loop2_dst_stride);
 // ==========asc_set_ndim_loop_stride==========
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_loop0_stride(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_loop0_stride(uint64_t dst_stride, uint64_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_loop1_stride(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_loop1_stride(uint64_t dst_stride, uint64_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_loop2_stride(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_loop2_stride(uint64_t dst_stride, uint64_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_loop3_stride(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_loop3_stride(uint64_t dst_stride, uint64_t src_stride);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_loop4_stride(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_loop4_stride(uint64_t dst_stride, uint64_t src_stride);
 //===========asc_set_ndim_pad_count===========
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_pad_count(asc_ndim_pad_count_config&)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_pad_count(asc_ndim_pad_count_config& config);
 //===========asc_set_ndim_pad_value(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float)===========
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_pad_value(int8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_pad_value(int8_t pad_value);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_pad_value(uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_pad_value(uint8_t pad_value);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_pad_value(int16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_pad_value(int16_t pad_value);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_pad_value(uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_pad_value(uint16_t pad_value);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_pad_value(half)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_pad_value(half pad_value);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_pad_value(bfloat16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_pad_value(bfloat16_t pad_value);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_pad_value(int32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_pad_value(int32_t pad_value);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_pad_value(uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_pad_value(uint32_t pad_value);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_ndim_pad_value(float)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_ndim_pad_value(float pad_value);
 //===========asc_ndim_copy_gm2ub(int8/uint8/e2m1/e1m2/e8m0/e5m2/e4m3fn/int16/uint16/half/bfloat16/int32/uint32/float)===========
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ int8_t*,__gm__ int8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ uint8_t*,__gm__ uint8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t*,__gm__ fp4x2_e2m1_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t*,__gm__ fp4x2_e1m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t*,__gm__ fp8_e8m0_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e8m0_t* dst, __gm__ fp8_e8m0_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t*,__gm__ fp8_e5m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t*,__gm__ fp8_e4m3fn_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ int16_t*,__gm__ int16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ uint16_t*,__gm__ uint16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ half*,__gm__ half*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ half* dst, __gm__ half* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ int32_t*,__gm__ int32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ uint32_t*,__gm__ uint32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ float*,__gm__ float*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,asc_load_l2_cache_mode)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ float* dst, __gm__ float* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     asc_load_l2_cache_mode l2_cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ int8_t*,__gm__ int8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ uint8_t*,__gm__ uint8_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t*,__gm__ fp4x2_e2m1_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t*,__gm__ fp4x2_e1m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t*,__gm__ fp8_e8m0_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e8m0_t* dst, __gm__ fp8_e8m0_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t*,__gm__ fp8_e5m2_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t*,__gm__ fp8_e4m3fn_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ int16_t*,__gm__ int16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ uint16_t*,__gm__ uint16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ half*,__gm__ half*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ half* dst, __gm__ half* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ int32_t*,__gm__ int32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ uint32_t*,__gm__ uint32_t*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
     uint8_t cache_mode);
 [[deprecated("NOTICE: asc_ndim_copy_gm2ub the uint8_t cache_mode parameter is deprecated. "
              "Please use enum class asc_load_l2_cache_mode instead")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_ndim_copy_gm2ub(__ubuf__ float*,__gm__ float*,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_ndim_copy_gm2ub(
     __ubuf__ float* dst, __gm__ float* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size,
     uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode,
@@ -601,14 +1331,29 @@ __aicore__ inline void asc_ndim_copy_gm2ub(
 //======asc_ndim_copy_dci=====
 __aicore__ inline void asc_ndim_copy_dci();
 //======asc_copy_ub2l1=======
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy_ub2l1(__cbuf__ void*,__ubuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2l1(
     __cbuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap,
     uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_copy_ub2l1(__cbuf__ void*,__ubuf__ void*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst, __ubuf__ void* src, uint32_t size);
 
 //======asc_set_gm2ub_pad=======
 [[deprecated("NOTICE: asc_set_gm2ub_pad is deprecated. "
              "Please use asc_set_copy_pad_val instead for pad value setting")]]
+/**
+ * @ingroup simd_c_api.vector_datamove
+ * @function asc_set_gm2ub_pad(uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_gm2ub_pad(uint32_t pad_val);
 
 #endif

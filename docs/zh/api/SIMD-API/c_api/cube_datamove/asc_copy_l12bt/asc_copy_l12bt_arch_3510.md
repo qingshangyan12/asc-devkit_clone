@@ -1,3 +1,103 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12bt"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md"
+description: "将MMAD指令的Bias数据从L1 Buffer搬运到BiasTable Buffer中。"
+signature:
+  - function: "asc_copy_l12bt(uint64_t,__cbuf__ void*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12bt(uint64_t,__cbuf__ bfloat16_t*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12bt(uint64_t,__cbuf__ half*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12bt(uint64_t,__cbuf__ float*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12bt(uint64_t,__cbuf__ int32_t*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12bt(uint64_t,__cbuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12bt(uint64_t,__cbuf__ bfloat16_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12bt(uint64_t,__cbuf__ half*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12bt(uint64_t,__cbuf__ float*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12bt(uint64_t,__cbuf__ int32_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12bt_sync(uint64_t,__cbuf__ void*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12bt_sync(uint64_t,__cbuf__ bfloat16_t*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12bt_sync(uint64_t,__cbuf__ half*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12bt_sync(uint64_t,__cbuf__ float*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12bt_sync(uint64_t,__cbuf__ int32_t*,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_l12bt
 
 ## 产品支持情况

@@ -25,70 +25,235 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ int8_t*,vector_int8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst, vector_int8_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ uint8_t*,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ uint8_t* dst, vector_uint8_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ fp4x2_e2m1_t*,vector_fp4x2_e2m1_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ fp4x2_e2m1_t* dst, vector_fp4x2_e2m1_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ fp4x2_e1m2_t*,vector_fp4x2_e1m2_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ int4b_t*,vector_int4x2_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ int4b_t* dst, vector_int4x2_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ fp8_e8m0_t*,vector_fp8_e8m0_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ fp8_e8m0_t* dst, vector_fp8_e8m0_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ fp8_e5m2_t*,vector_fp8_e5m2_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ fp8_e5m2_t* dst, vector_fp8_e5m2_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ fp8_e4m3fn_t*,vector_fp8_e4m3fn_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ fp8_e4m3fn_t* dst, vector_fp8_e4m3fn_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ hifloat8_t*,vector_hifloat8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ hifloat8_t* dst, vector_hifloat8_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ int16_t*,vector_int16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ int16_t* dst, vector_int16_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ uint16_t*,vector_uint16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ uint16_t* dst, vector_uint16_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ half*,vector_half)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ half* dst, vector_half src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ bfloat16_t*,vector_bfloat16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ int32_t*,vector_int32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ int32_t* dst, vector_int32_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ uint32_t*,vector_uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ uint32_t* dst, vector_uint32_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ float*,vector_float)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ float* dst, vector_float src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ int64_t*,vector_int64_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ int64_t* dst, vector_int64_t src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ int8_t*,vector_int8_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst, vector_int8_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ uint8_t*,vector_uint8_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ uint8_t* dst, vector_uint8_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ int16_t*,vector_int16_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ int16_t* dst, vector_int16_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ uint16_t*,vector_uint16_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ uint16_t* dst, vector_uint16_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ int32_t*,vector_int32_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ int32_t* dst, vector_int32_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ uint32_t*,vector_uint32_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ uint32_t* dst, vector_uint32_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ float*,vector_float,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ float* dst, vector_float src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ int64_t*,vector_int64_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ int64_t* dst, vector_int64_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ bfloat16_t*,vector_bfloat16_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ fp8_e8m0_t*,vector_fp8_e8m0_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ fp8_e8m0_t* dst, vector_fp8_e8m0_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ fp8_e5m2_t*,vector_fp8_e5m2_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ fp8_e5m2_t* dst, vector_fp8_e5m2_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ fp8_e4m3fn_t*,vector_fp8_e4m3fn_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ fp8_e4m3fn_t* dst, vector_fp8_e4m3fn_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ hifloat8_t*,vector_hifloat8_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ hifloat8_t* dst, vector_hifloat8_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ fp4x2_e2m1_t*,vector_fp4x2_e2m1_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ fp4x2_e2m1_t* dst, vector_fp4x2_e2m1_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ fp4x2_e1m2_t*,vector_fp4x2_e1m2_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ fp4x2_e1m2_t* dst, vector_fp4x2_e1m2_t src, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.reg_compute.store
+ * @function asc_store(__ubuf__ int4b_t*,vector_int4x2_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_store(__ubuf__ int4b_t* dst, vector_int4x2_t src, uint32_t count);
 
 #endif

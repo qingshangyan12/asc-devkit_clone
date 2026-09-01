@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_sub_block_num"
+path: "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md"
+description: "分离模式下，获取一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。"
+signature:
+  - function: "asc_get_sub_block_num()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/utils/sys_var.h"
+        header: "/include/c_api/utils/sys_var.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_sub_block_num
 
 ## 产品支持情况
@@ -29,6 +46,17 @@
 分离模式下，获取一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_sub_block_num()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/utils/sys_var.h"
+        header: "/include/c_api/utils/sys_var.h"
+```
+
 
 ```cpp
 __aicore__ inline int64_t asc_get_sub_block_num()

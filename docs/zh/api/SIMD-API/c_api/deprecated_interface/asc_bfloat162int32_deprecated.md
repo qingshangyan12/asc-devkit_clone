@@ -1,3 +1,253 @@
+---
+okftype: reference.api.cpp
+title: "asc_bfloat162int32（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bfloat162int32_deprecated.md"
+description: "**该接口通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_bfloat162int32](../reg_compute/reg_convert/asc_bfloat162int32.md)的显式位置参数重载替代。"
+signature:
+  - function: "asc_bfloat162int32_rd(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: ""
+          position_mode: ""
+  - function: "asc_bfloat162int32_rd_v2(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: ""
+          position_mode: "_v2"
+  - function: "asc_bfloat162int32_rd_sat(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: "_sat"
+          position_mode: ""
+  - function: "asc_bfloat162int32_rd_sat_v2(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: "_sat"
+          position_mode: "_v2"
+  - function: "asc_bfloat162int32_rn(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: ""
+          position_mode: ""
+  - function: "asc_bfloat162int32_rn_v2(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: ""
+          position_mode: "_v2"
+  - function: "asc_bfloat162int32_rn_sat(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: "_sat"
+          position_mode: ""
+  - function: "asc_bfloat162int32_rn_sat_v2(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: "_sat"
+          position_mode: "_v2"
+  - function: "asc_bfloat162int32_rna(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+          position_mode: ""
+  - function: "asc_bfloat162int32_rna_v2(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+          position_mode: "_v2"
+  - function: "asc_bfloat162int32_rna_sat(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+          position_mode: ""
+  - function: "asc_bfloat162int32_rna_sat_v2(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+          position_mode: "_v2"
+  - function: "asc_bfloat162int32_ru(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: ""
+          position_mode: ""
+  - function: "asc_bfloat162int32_ru_v2(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: ""
+          position_mode: "_v2"
+  - function: "asc_bfloat162int32_ru_sat(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: "_sat"
+          position_mode: ""
+  - function: "asc_bfloat162int32_ru_sat_v2(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: "_sat"
+          position_mode: "_v2"
+  - function: "asc_bfloat162int32_rz(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: ""
+          position_mode: ""
+  - function: "asc_bfloat162int32_rz_v2(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: ""
+          position_mode: "_v2"
+  - function: "asc_bfloat162int32_rz_sat(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: "_sat"
+          position_mode: ""
+  - function: "asc_bfloat162int32_rz_sat_v2(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: "_sat"
+          position_mode: "_v2"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_bfloat162int32（废弃）
 
 ## 产品支持情况
@@ -76,6 +326,16 @@ __simd_callee__ inline void asc_bfloat162int32_<round_mode><sat_mode><position_m
 - `<position_mode>`表示`src`读取的位置，为空时，结果读取`src`的偶数索引位置；取值为`_v2`时，结果读取`src`的奇数索引位置。
 
 ### 函数原型典型示例
+```yaml
+api_signature:
+  - function: "asc_bfloat162int32_rn(vector_int32_t&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```c
 // RINT舍入模式，非饱和模式，读取src索引为偶数的位置

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_scalar_load_cache_mode"
+path: "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md"
+description: "读取当前标量读（load）路径的L2 Cache管理策略，并返回[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值。"
+signature:
+  - function: "asc_get_scalar_load_cache_mode()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_scalar_load_cache_mode
 
 ## 产品支持情况
@@ -31,6 +47,16 @@
 常用于临时切换策略前保存原配置，或在设置后做回读校验。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_scalar_load_cache_mode()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
+
 
 ```c
 __aicore__ inline asc_load_l2_cache_mode asc_get_scalar_load_cache_mode()

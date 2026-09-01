@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "指令发射队列空闲槽位查询"
+path: "docs/zh/api/SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md"
+description: "本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。"
+signature:
+  - function: "asc_get_pipe_mte2_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - function: "asc_get_pipe_mte3_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - function: "asc_get_pipe_v_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - function: "asc_get_pipe_m_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - function: "asc_get_pipe_mte1_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - function: "asc_get_pipe_fix_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # 指令发射队列空闲槽位查询
 
 ## 产品支持情况
@@ -43,6 +89,46 @@
 | `asc_get_pipe_fix_idle_slot_count` | PIPE_FIX | AIC | 32 |
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_pipe_mte2_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - function: "asc_get_pipe_mte3_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - function: "asc_get_pipe_v_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - function: "asc_get_pipe_m_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - function: "asc_get_pipe_mte1_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+  - function: "asc_get_pipe_fix_idle_slot_count()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+        header: "/include/c_api/experimental/asc_get_pipe_idle_slot_count.h"
+```
+
 
   ```cpp
   // 获取PIPE_MTE2发射队列的空闲槽位数量。
