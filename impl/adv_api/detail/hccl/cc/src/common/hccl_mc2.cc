@@ -19,6 +19,7 @@
 #include "hccl_ccu_res.h"
 #include "adapter_acl.h"
 #include "kfc_server_protocol.h"
+#include "hcomm_host_profiling_dl.h"
 
 using namespace mc2_ops_hccl;
 
@@ -545,6 +546,7 @@ CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx)
 {
     CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
     CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
+    const uint64_t beginTime = HcommGetProfilingSysCycleTime();
 
     // HcclEngineCtxCreate分配的OpResCtx、OpParam和序列化资源均位于device，需逐层拷贝到host。
     OpResCtx opResHost{};
@@ -583,5 +585,8 @@ CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx)
             return ret;
         }
     }
+    // CCU任务经HcommCcuKernelLaunch进入镜像队列后，需在本次下发结束时flush上报给msprof，
+    // 否则trace中不产出CCU指令级事件；上报时机与老路径HcclExecOpCcuFastLaunch保持一致。
+    (void)HcclProfilingReportOp(comm, beginTime);
     return CCU_SUCCESS;
 }
