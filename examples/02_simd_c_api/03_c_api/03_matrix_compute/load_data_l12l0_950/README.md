@@ -187,14 +187,16 @@ asc_copy_gm2l1_nd2nz   asc_copy_l12l0*    asc_mmad   asc_copy_l0c2gm
   </tr>
 </table>
 
-- `ceil_align`：向上对齐操作。例如`m = 30`时，`ceil_align(30, 16) = 32`，表示将m轴向16对齐，对齐后m轴长度为32。
+- `AscendC::Std::ceil_align`：向上对齐操作。例如`m = 30`时，`AscendC::Std::ceil_align(30, 16) = 32`，表示将m轴向16对齐，对齐后m轴长度为32。
 
   ```cpp
-  #define ceil_div(value, align) (((value) + (align) - 1) / (align))
-  #define ceil_align(value, align) (ceil_div((value), (align)) * (align))
+  #include "utils/std/cmath.h"
+
+  constexpr uint32_t aligned_m = AscendC::Std::ceil_align(30, 16); // 32
+  constexpr uint32_t loop_num = AscendC::Std::ceil_division(30, 16); // 2
   ```
 
-- `ceil_div`：向上取整除法，一般用于求解向上对齐后的循环次数。
+- `AscendC::Std::ceil_division`：向上取整除法，一般用于求解向上对齐后的循环次数。
 - `m_align_value`：m轴向`m_align_value`对齐。例如`m_align_value = 32`，代表m轴对齐到32；依次类推还有`n_align_value`、`ka_align_value`、`kb_align_value`。
 - `m_align_l1`和`m_align_l0`：A矩阵分别在L1和L0A上时，m轴对齐后的值。依次类推还有`n_align_l1`、`n_align_l0`、`ka_align_l1`、`ka_align_l0`、`kb_align_l1`、`kb_align_l0`。
 
@@ -363,20 +365,20 @@ L1 -> L0A不转置时，B8 / B16 / B32三种数据类型的参数配置基本相
 
 参数配置要点：
 
-- `m_step = ceil_div(m_align_l1, fractal_shape[0])`，表示row方向搬运m轴对应的小分形个数。
-- `k_step = ceil_div(ka_align_l1, fractal_shape[1])`，表示col方向搬运k轴对应的小分形个数。
+- `m_step = AscendC::Std::ceil_division(m_align_l1, fractal_shape[0])`，表示row方向搬运m轴对应的小分形个数。
+- `k_step = AscendC::Std::ceil_division(ka_align_l1, fractal_shape[1])`，表示col方向搬运k轴对应的小分形个数。
 - 调用`asc_copy_l12l0a`，表示只完成L1 Nz到L0A Nz的排布搬运，不做转置。
 
 ```cpp
-m_align_l1 = ceil_align(m, fractal_shape[0]); // 48
-ka_align_l1 = ceil_align(k, fractal_shape[1]); // 96
-m_align_l0 = ceil_align(m, fractal_shape[0]); // 48
-ka_align_l0 = ceil_align(k, fractal_shape[1]); // 96
+m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[0]);  // 48
+ka_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 96
+m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0]);  // 48
+ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 96
 asc_copy_l12l0a(a_l0, a_l1, 0, 0,
-    ceil_div(m_align_l1, fractal_shape[0]),  // m_step = 3
-    ceil_div(ka_align_l1, fractal_shape[1]), // k_step = 3
-    ceil_div(m_align_l1, fractal_shape[0]),  // src_stride = 3
-    ceil_div(m_align_l0, fractal_shape[0])); // dst_stride = 3
+                AscendC::Std::ceil_division(m_align_l1, fractal_shape[0]),  // m_step = 3
+                AscendC::Std::ceil_division(ka_align_l1, fractal_shape[1]), // k_step = 3
+                AscendC::Std::ceil_division(m_align_l1, fractal_shape[0]),  // src_stride = 3
+                AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
 ```
 
 #### 5.2. A矩阵 L1 -> L0A 转置
@@ -396,18 +398,18 @@ B8输入数据类型分形为16 * 32，L1 -> L0转置时会按照方型将row方
   图2: int8_t数据类型下，L1 -> L0A转置，调用一次asc_copy_l12l0a_transpose数据排布示意图
 </div>
 
-本样例`m = 40`，B8转置搬运时`m_align_l1 = ceil_align(m, fractal_shape[1]) = 64`，`m_align_l1 - m = 24 > 16`。单次调用`asc_copy_l12l0a_transpose`时，m方向会多搬1个无效分形；`asc_mmad`计算时需要设置`m = ceil_align(m, fractal_shape[0] * fractal_num)`让该分形参与计算，最后由`asc_copy_l0c2gm`通过`m_size = m`只搬出有效区域。
+本样例`m = 40`，B8转置搬运时`m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1]) = 64`，`m_align_l1 - m = 24 > 16`。单次调用`asc_copy_l12l0a_transpose`时，m方向会多搬1个无效分形；`asc_mmad`计算时需要设置`m = AscendC::Std::ceil_align(m, fractal_shape[0] * fractal_num)`让该分形参与计算，最后由`asc_copy_l0c2gm`通过`m_size = m`只搬出有效区域。
 
 ```cpp
-ka_align_l1 = ceil_align(k, fractal_shape[0] * fractal_num); // 96
-m_align_l1 = ceil_align(m, fractal_shape[1]); // 64
-m_align_l0 = ceil_align(m, fractal_shape[0] * fractal_num); // 64
-ka_align_l0 = ceil_align(k, fractal_shape[1]); // 96
+ka_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0] * fractal_num); // 96
+m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1]);                // 64
+m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0] * fractal_num);  // 64
+ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]);               // 96
 asc_copy_l12l0a_transpose(a_l0, a_l1, 0, 0,
-    ceil_div(ka_align_l1, fractal_shape[0]),  // m_step = 6
-    ceil_div(m_align_l1, fractal_shape[1]),  // k_step = 2
-    ceil_div(ka_align_l1, fractal_shape[0]),  // src_stride = 6
-    ceil_div(m_align_l0, fractal_shape[0])); // dst_stride = 4
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // m_step = 6
+                          AscendC::Std::ceil_division(m_align_l1, fractal_shape[1]),  // k_step = 2
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // src_stride = 6
+                          AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 4
 ```
 
 **for循环调用**
@@ -419,25 +421,25 @@ for循环调用多次`asc_copy_l12l0a_transpose`完成L1 -> L0A搬运和转置�
   图3: int8_t数据类型下，L1 -> L0A转置，for循环调用多次asc_copy_l12l0a_transpose数据排布示意图
 </div>
 
-for循环调用时，沿L1 row方向（A矩阵k轴）分段搬运，每次搬运k轴方向2个分形、m轴方向`ceil_div(m_align_l0, fractal_shape[1])`个分形。`dst_stride`按m方向有效数据向`fractal_shape[0]`对齐配置，写入L0A时跳过转置多读的m方向脏数据分形，使`asc_mmad`计算时m方向没有额外脏数据分形参与。
+for循环调用时，沿L1 row方向（A矩阵k轴）分段搬运，每次搬运k轴方向2个分形、m轴方向`AscendC::Std::ceil_division(m_align_l0, fractal_shape[1])`个分形。`dst_stride`按m方向有效数据向`fractal_shape[0]`对齐配置，写入L0A时跳过转置多读的m方向脏数据分形，使`asc_mmad`计算时m方向没有额外脏数据分形参与。
 
 ```cpp
-ka_align_l1 = ceil_align(k, fractal_shape[0] * fractal_num); // 96
-m_align_l1 = ceil_align(m, fractal_shape[1]); // 64
-m_align_l0 = ceil_align(m, fractal_shape[0]); // 48
-ka_align_l0 = ceil_align(k, fractal_shape[1]); // 96
+ka_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0] * fractal_num); // 96
+m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1]);                // 64
+m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0]);                // 48
+ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]);               // 96
 // 输入为int8类型，A矩阵[k,m]转置输入，L1 -> L0A需要转置
 // for循环调用asc_copy_l12l0a_transpose，以k轴方向做for循环，每次循环在L1的k方向搬运2个分形，在L0A上跳过m方向尾脏数据分形，m方向多搬运数据不超过1个分形
-uint16_t a_loop_num = ceil_div(ka_align_l0, fractal_shape[0] * fractal_num); // 3
+uint16_t a_loop_num = AscendC::Std::ceil_division(ka_align_l0, fractal_shape[0] * fractal_num); // 3
 uint32_t dst_offset = 0;
 for (uint16_t loopIdx = 0; loopIdx < a_loop_num; ++loopIdx) {
     asc_copy_l12l0a_transpose(a_l0 + dst_offset, a_l1,
-        int8_m_step_align * loopIdx, 0,           // m_start_position, k_start_position
-        int8_m_step_align,                         // m_step = 2
-        ceil_div(m_align_l0, fractal_shape[1]),  // k_step = 2
-        ceil_div(ka_align_l1, fractal_shape[0]), // src_stride = 6
-        ceil_div(m_align_l0, fractal_shape[0])); // dst_stride = 3
-    dst_offset += ceil_align(m_align_l0, fractal_shape[0]) * fractal_shape[1]; // 1536
+                              int8_m_step_align * loopIdx, 0,  // m_start_position, k_start_position
+                              int8_m_step_align,                                          // m_step = 2
+                              AscendC::Std::ceil_division(m_align_l0, fractal_shape[1]),  // k_step = 2
+                              AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // src_stride = 6
+                              AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
+    dst_offset += AscendC::Std::ceil_align(m_align_l0, fractal_shape[0]) * fractal_shape[1]; // 1536
 }
 ```
 
@@ -452,20 +454,20 @@ B16输入数据类型分形为16 * 16，一个分形即一个方型，L1 -> L0�
 
 参数配置要点：
 
-- `m_step = ceil_div(ka_align_l1, fractal_shape[0])`，表示row方向搬运k轴对应的小分形个数。
-- `k_step = ceil_div(m_align_l1, fractal_shape[1])`，表示col方向搬运m轴对应的小分形个数。
+- `m_step = AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0])`，表示row方向搬运k轴对应的小分形个数。
+- `k_step = AscendC::Std::ceil_division(m_align_l1, fractal_shape[1])`，表示col方向搬运m轴对应的小分形个数。
 - 调用`asc_copy_l12l0a_transpose`，表示搬运到L0A时完成转置。
 
 ```cpp
-ka_align_l1 = ceil_align(k, fractal_shape[0] * fractal_num); // 80
-m_align_l1 = ceil_align(m, fractal_shape[1]); // 48
-m_align_l0 = ceil_align(m, fractal_shape[0] * fractal_num); // 48
-ka_align_l0 = ceil_align(k, fractal_shape[1]); // 80
+ka_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0] * fractal_num); // 80
+m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1]);                // 48
+m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0] * fractal_num);  // 48
+ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]);               // 80
 asc_copy_l12l0a_transpose(a_l0, a_l1, 0, 0,
-    ceil_div(ka_align_l1, fractal_shape[0]),  // m_step = 5
-    ceil_div(m_align_l1, fractal_shape[1]),  // k_step = 3
-    ceil_div(ka_align_l1, fractal_shape[0]),  // src_stride = 5
-    ceil_div(m_align_l0, fractal_shape[0])); // dst_stride = 3
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // m_step = 5
+                          AscendC::Std::ceil_division(m_align_l1, fractal_shape[1]),  // k_step = 3
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // src_stride = 5
+                          AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
 ```
 
 ##### 5.2.3. B32输入数据类型
@@ -480,15 +482,15 @@ B32输入数据类型分形为16 * 8，L1 -> L0转置时会按照方型将col方
 本样例`m = 40`。B32转置搬运时需要将col方向2个分形拼成方型，**`k_step`必须是2的倍数**，因此L1上col方向（m方向）会多读1个无效分形。写入L0A后，k方向尾部会多1个无效分形；由于L0A为Nz排布，`asc_mmad`配置`k = matrix_k`即可只让有效k轴数据参与计算。
 
 ```cpp
-ka_align_l1 = ceil_align(k, fractal_shape[0]); // 80
-m_align_l1 = ceil_align(m, fractal_shape[1] * fractal_num); // 48
-m_align_l0 = ceil_align(m, fractal_shape[0]); // 48
-ka_align_l0 = ceil_align(k, fractal_shape[1] * fractal_num); // 80
+ka_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0]);               // 80
+m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1] * fractal_num);  // 48
+m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0]);                // 48
+ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1] * fractal_num); // 80
 asc_copy_l12l0a_transpose(a_l0, a_l1, 0, 0,
-    ceil_div(ka_align_l1, fractal_shape[0]),  // m_step = 5
-    ceil_div(m_align_l1, fractal_shape[1]),  // k_step = 6
-    ceil_div(ka_align_l1, fractal_shape[0]),  // src_stride = 5
-    ceil_div(m_align_l0, fractal_shape[0])); // dst_stride = 3
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // m_step = 5
+                          AscendC::Std::ceil_division(m_align_l1, fractal_shape[1]),  // k_step = 6
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // src_stride = 5
+                          AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
 ```
 
 #### 5.3. B矩阵 L1 -> L0B 不转置
@@ -502,20 +504,20 @@ L1 -> L0B不转置时，B8 / B16 / B32三种数据类型的参数配置基本相
 
 参数配置要点：
 
-- `m_step = ceil_div(n_align_l1, fractal_shape[0])`，表示row方向搬运n轴对应的小分形个数。
-- `k_step = ceil_div(kb_align_l1, fractal_shape[1])`，表示col方向搬运k轴对应的小分形个数。
+- `m_step = AscendC::Std::ceil_division(n_align_l1, fractal_shape[0])`，表示row方向搬运n轴对应的小分形个数。
+- `k_step = AscendC::Std::ceil_division(kb_align_l1, fractal_shape[1])`，表示col方向搬运k轴对应的小分形个数。
 - 调用`asc_copy_l12l0b`，表示只完成L1 Nz到L0B Zn的排布搬运，不做转置。
 
 ```cpp
-n_align_l1 = ceil_align(n, fractal_shape[0]); // 64
-kb_align_l1 = ceil_align(k, fractal_shape[1]); // 72
-kb_align_l0 = ceil_align(k, fractal_shape[1]); // 72
-n_align_l0 = ceil_align(n, fractal_shape[0]); // 64
+n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[0]);  // 64
+kb_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 72
+kb_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 72
+n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0]);  // 64
 asc_copy_l12l0b(b_l0, b_l1, 0, 0,
-    ceil_div(n_align_l1, fractal_shape[0]),  // m_step = 4
-    ceil_div(kb_align_l1, fractal_shape[1]), // k_step = 9
-    ceil_div(n_align_l1, fractal_shape[0]),  // src_stride = 4
-    ceil_div(n_align_l0, fractal_shape[0])); // dst_stride = 4
+                AscendC::Std::ceil_division(n_align_l1, fractal_shape[0]),  // m_step = 4
+                AscendC::Std::ceil_division(kb_align_l1, fractal_shape[1]), // k_step = 9
+                AscendC::Std::ceil_division(n_align_l1, fractal_shape[0]),  // src_stride = 4
+                AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
 ```
 
 #### 5.4. B矩阵 L1 -> L0B 转置
@@ -534,15 +536,15 @@ B8输入数据类型分形为16 * 32，L1 -> L0转置时会按照方型将row方
 本样例`k = 70`。B8转置搬运时需要将row方向2个分形拼成方型，**`m_step`必须是2的倍数**，因此L1上row方向（k方向）会多读1个无效分形。
 
 ```cpp
-kb_align_l1 = ceil_align(k, fractal_shape[0] * fractal_num); // 96
-n_align_l1 = ceil_align(n, fractal_shape[1]); // 64
-kb_align_l0 = ceil_align(k, fractal_shape[1]); // 96
-n_align_l0 = ceil_align(n, fractal_shape[0] * fractal_num); // 64
+kb_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0] * fractal_num); // 96
+n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[1]);                // 64
+kb_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]);               // 96
+n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0] * fractal_num);  // 64
 asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0,
-    ceil_div(kb_align_l1, fractal_shape[0]), // m_step = 6
-    ceil_div(n_align_l1, fractal_shape[1]),  // k_step = 2
-    ceil_div(kb_align_l1, fractal_shape[0]), // src_stride = 6
-    ceil_div(n_align_l0, fractal_shape[0])); // dst_stride = 4
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // m_step = 6
+                          AscendC::Std::ceil_division(n_align_l1, fractal_shape[1]),  // k_step = 2
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // src_stride = 6
+                          AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
 ```
 
 ##### 5.4.2. B16输入数据类型
@@ -556,20 +558,20 @@ B16输入数据类型分形为16 * 16，一个分形即一个方型，L1 -> L0�
 
 参数配置要点：
 
-- `m_step = ceil_div(kb_align_l1, fractal_shape[0])`，表示row方向搬运k轴对应的小分形个数。
-- `k_step = ceil_div(n_align_l1, fractal_shape[1])`，表示col方向搬运n轴对应的小分形个数。
+- `m_step = AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0])`，表示row方向搬运k轴对应的小分形个数。
+- `k_step = AscendC::Std::ceil_division(n_align_l1, fractal_shape[1])`，表示col方向搬运n轴对应的小分形个数。
 - 调用`asc_copy_l12l0b_transpose`，表示搬运到L0B时完成转置。
 
 ```cpp
-kb_align_l1 = ceil_align(k, fractal_shape[0] * fractal_num); // 80
-n_align_l1 = ceil_align(n, fractal_shape[1]); // 64
-kb_align_l0 = ceil_align(k, fractal_shape[1]); // 80
-n_align_l0 = ceil_align(n, fractal_shape[0] * fractal_num); // 64
+kb_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0] * fractal_num); // 80
+n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[1]);                // 64
+kb_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]);               // 80
+n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0] * fractal_num);  // 64
 asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0,
-    ceil_div(kb_align_l1, fractal_shape[0]), // m_step = 5
-    ceil_div(n_align_l1, fractal_shape[1]),  // k_step = 4
-    ceil_div(kb_align_l1, fractal_shape[0]), // src_stride = 5
-    ceil_div(n_align_l0, fractal_shape[0])); // dst_stride = 4
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // m_step = 5
+                          AscendC::Std::ceil_division(n_align_l1, fractal_shape[1]),  // k_step = 4
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // src_stride = 5
+                          AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
 ```
 
 ##### 5.4.3. B32输入数据类型
@@ -584,15 +586,15 @@ B32输入数据类型分形为16 * 8，L1 -> L0转置时会按照方型将col方
 本样例`n = 50`。B32转置搬运时需要将col方向2个分形拼成方型，**`k_step`必须是2的倍数**，因此L1上col方向（n方向）会多读1个无效分形。写入L0B后，k方向尾部会多1个无效分形；由于L0B为Zn排布，`asc_mmad`配置`k = matrix_k`即可只让有效k轴数据参与计算。
 
 ```cpp
-kb_align_l1 = ceil_align(k, fractal_shape[0]); // 80
-n_align_l1 = ceil_align(n, fractal_shape[1] * fractal_num); // 64
-kb_align_l0 = ceil_align(k, fractal_shape[1] * fractal_num); // 80
-n_align_l0 = ceil_align(n, fractal_shape[0]); // 64
+kb_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0]);               // 80
+n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[1] * fractal_num);  // 64
+kb_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1] * fractal_num); // 80
+n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0]);                // 64
 asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0,
-    ceil_div(kb_align_l1, fractal_shape[0]), // m_step = 5
-    ceil_div(n_align_l1, fractal_shape[1]),  // k_step = 8
-    ceil_div(kb_align_l1, fractal_shape[0]), // src_stride = 5
-    ceil_div(n_align_l0, fractal_shape[0])); // dst_stride = 4
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // m_step = 5
+                          AscendC::Std::ceil_division(n_align_l1, fractal_shape[1]),  // k_step = 8
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // src_stride = 5
+                          AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
 ```
 
 ## 编译运行
