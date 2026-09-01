@@ -56,6 +56,8 @@ inline uint32_t asc_activemask()
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_warp_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelActiveMask(uint32_t* active_masks, uint64_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -75,6 +77,8 @@ inline uint32_t asc_activemask()
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_warp_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelActiveMask(
         __gm__ uint32_t* active_masks, uint64_t total_length)
     {

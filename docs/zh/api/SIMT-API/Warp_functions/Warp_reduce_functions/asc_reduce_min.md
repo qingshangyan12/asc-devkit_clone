@@ -68,6 +68,9 @@ Warp内所有活跃线程输入val的最小值。
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_warp_functions.h"
+    #include "simt_api/asc_fp16.h"
+
     __global__ __launch_bounds__(1024) void KernelReduceMin(int32_t* dst)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -80,6 +83,9 @@ Warp内所有活跃线程输入val的最小值。
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_warp_functions.h"
+    #include "simt_api/asc_fp16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelReduceMin(__gm__ int32_t* dst)
     {
         // asc_vf_call参数：dim3{1024, 1, 1}

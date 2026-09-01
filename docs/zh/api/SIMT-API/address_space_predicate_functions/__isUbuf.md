@@ -69,6 +69,8 @@ SIMD与SIMT混合编程场景不支持使用该接口。
 SIMT编程场景：
 
 ```cpp
+#include "simt_api/device_functions.h"
+
 __global__ __launch_bounds__(1024) void kernel__isUbuf(uint32_t* dst,
 uint32_t* src)
 {

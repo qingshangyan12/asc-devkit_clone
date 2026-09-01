@@ -60,6 +60,8 @@ inline int32_t asc_any(int32_t predicate)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_warp_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelAny(
         const int32_t* input, int32_t* match_flags, uint64_t total_length, int32_t target)
     {
@@ -80,6 +82,8 @@ inline int32_t asc_any(int32_t predicate)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_warp_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelAny(
         __gm__ const int32_t* input, __gm__ int32_t* match_flags, uint64_t total_length, int32_t target)
     {

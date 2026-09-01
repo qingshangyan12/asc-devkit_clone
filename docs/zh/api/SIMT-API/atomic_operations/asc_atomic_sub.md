@@ -114,6 +114,10 @@ inline bfloat16x2_t asc_atomic_sub(bfloat16x2_t* address, bfloat16x2_t val)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_atomic_functions.h"
+    #include "simt_api/asc_fp16.h"
+    #include "simt_api/asc_bf16.h"
+
     __global__ __launch_bounds__(256) void consume_quota(uint32_t *remaining,
                                                          uint32_t *requests,
                                                          uint32_t n)
@@ -132,6 +136,10 @@ inline bfloat16x2_t asc_atomic_sub(bfloat16x2_t* address, bfloat16x2_t val)
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：`__gm__`表示Global Memory内存空间，`__ubuf__`表示UB内存空间。
 
     ```cpp
+    #include "simt_api/device_atomic_functions.h"
+    #include "simt_api/asc_fp16.h"
+    #include "simt_api/asc_bf16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void consume_quota(__gm__ uint32_t *remaining,
                                                                   __gm__ uint32_t *requests,
                                                                   uint32_t n)

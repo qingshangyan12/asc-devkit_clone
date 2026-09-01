@@ -85,6 +85,8 @@ UB或Global Memory上的初始数据。
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_atomic_functions.h"
+
     __global__ __launch_bounds__(256) void allocate_ring_slot(uint32_t *ticket,
                                                              uint32_t *slots,
                                                              uint32_t capacity,
@@ -105,6 +107,8 @@ UB或Global Memory上的初始数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：`__gm__`表示Global Memory内存空间，`__ubuf__`表示UB内存空间。
 
     ```cpp
+    #include "simt_api/device_atomic_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void allocate_ring_slot(__gm__ uint32_t *ticket,
                                                                       __gm__ uint32_t *slots,
                                                                       uint32_t capacity,

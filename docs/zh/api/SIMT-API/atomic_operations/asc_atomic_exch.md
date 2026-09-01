@@ -105,6 +105,10 @@ UB或Global Memory上的初始数据。
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_atomic_functions.h"
+    #include "simt_api/asc_fp16.h"
+    #include "simt_api/asc_bf16.h"
+
     __global__ __launch_bounds__(256) void publish_fault_status(uint32_t *status,
                                                                uint32_t *old_status,
                                                                uint32_t *fault_flags,
@@ -126,6 +130,10 @@ UB或Global Memory上的初始数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：`__gm__`表示Global Memory内存空间，`__ubuf__`表示UB内存空间。
 
     ```cpp
+    #include "simt_api/device_atomic_functions.h"
+    #include "simt_api/asc_fp16.h"
+    #include "simt_api/asc_bf16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void publish_fault_status(__gm__ uint32_t *status,
                                                                         __gm__ uint32_t *old_status,
                                                                         __gm__ uint32_t *fault_flags,

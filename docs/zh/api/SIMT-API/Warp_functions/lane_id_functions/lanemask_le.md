@@ -62,6 +62,9 @@ int32_t lanemask_le()
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+    #include "simt_api/device_warp_functions.h"
+
     __global__ __launch_bounds__(1024) void kernel_lanemask_le(int32_t* src, int32_t* dst, int32_t srcLane)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -76,6 +79,9 @@ int32_t lanemask_le()
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+    #include "simt_api/device_warp_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) void kernel_lanemask_le(__gm__ int32_t* src, __gm__ int32_t* dst, int32_t srcLane)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

@@ -75,6 +75,8 @@ inline void asc_syncthreads()
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_sync_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelSyncThreads(float* dst, int count)
     {
          int idx = threadIdx.x;
@@ -102,6 +104,8 @@ inline void asc_syncthreads()
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_sync_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelSyncThreads(__gm__ float* dst, int count)
     {
          int idx = threadIdx.x;

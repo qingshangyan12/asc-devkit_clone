@@ -62,6 +62,8 @@ inline uint32_t asc_ballot(int32_t predicate)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_warp_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelBallot(
         const float* input, uint32_t* selected_mask, uint64_t total_length, float threshold)
     {
@@ -82,6 +84,8 @@ inline uint32_t asc_ballot(int32_t predicate)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_warp_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelBallot(
         __gm__ const float* input, __gm__ uint32_t* selected_mask, uint64_t total_length, float threshold)
     {

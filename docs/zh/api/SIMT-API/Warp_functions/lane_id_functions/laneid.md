@@ -54,6 +54,10 @@ int32_t laneid()
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+    #include "simt_api/device_warp_functions.h"
+    #include "simt_api/device_atomic_functions.h"
+
     __global__ __launch_bounds__(1024) void kernel_laneid(int32_t* dst, int32_t* src)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -67,6 +71,10 @@ int32_t laneid()
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+    #include "simt_api/device_warp_functions.h"
+    #include "simt_api/device_atomic_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel_laneid(__gm__ int32_t* dst, __gm__ int32_t* src)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

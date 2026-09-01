@@ -200,6 +200,10 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+    #include "simt_api/asc_fp16.h"
+    #include "simt_api/asc_bf16.h"
+
     __global__ __launch_bounds__(1024) void kernel_asc_ldcg(float* dst, float* src)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -212,6 +216,10 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：`__gm__`表示Global Memory内存空间。
 
     ```cpp
+    #include "simt_api/device_functions.h"
+    #include "simt_api/asc_fp16.h"
+    #include "simt_api/asc_bf16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel_asc_ldcg(__gm__ float* dst, __gm__ float* src)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
