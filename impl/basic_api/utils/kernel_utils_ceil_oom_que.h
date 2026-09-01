@@ -347,7 +347,7 @@ struct Complex {
         return (real == val.real) && (imag == val.imag);
     }
 
-    __simd_callee__ inline Complex& operator=(const Complex& other)
+    __simd_callee__ nline Complex& operator=(const Complex& other)
     {
         if (this == &other) {
             return *this;

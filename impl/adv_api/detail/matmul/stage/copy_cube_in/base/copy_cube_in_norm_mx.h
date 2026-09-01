@@ -86,7 +86,7 @@ public:
     }
 
 private:
-    __aicore__ constexpr int32_t GetIterIndex(int32_t curRow, int32_t curCol)
+    __aicore__ int32_t GetIterIndex(int32_t curRow, int32_t curCol)
     {
         if constexpr (GetCubeInBufferType<INPUT_TYPE, MM_CFG>() == CubeInBufferType::NORMAL_MX) {
             return GetIterIndexInner(curRow, curCol);

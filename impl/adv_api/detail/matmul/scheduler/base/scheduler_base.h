@@ -371,7 +371,7 @@ protected:
     }
 #endif
 
-    __aicore__ __callee__ inline void CheckSupportTrianMatmul()
+    __aicore__ inline void CheckSupportTrianMatmul()
     {
         if constexpr (!MatmulFeatureTrait<MM_CFG>::IsSupportTrianMatmul()) {
             ASCENDC_ASSERT(
@@ -379,7 +379,7 @@ protected:
         }
     }
 
-    __aicore__ inline constexpr bool IsInTrianMatmul()
+    __aicore__ inline bool IsInTrianMatmul()
     {
         if constexpr (POLICY_TYPE == PolicyType::MATMUL_UPPER_TRIANGULAR) {
             CheckSupportTrianMatmul();
