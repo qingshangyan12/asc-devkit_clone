@@ -88,18 +88,26 @@ enum AlgorithmType {
     CcuAllGatherMesh1D = 0,
     CcuAllGatherMeshMem2Mem1D,
     CcuAllGatherMesh2D,
+    CcuSchedAllGatherConcurMeshNHRMultiLink = 3,
     CcuReduceScatterMesh1D = 50,
     CcuReduceScatterMeshMem2Mem1D,
     CcuReduceScatterMesh2D,
     CcuAllReduceMesh1D = 100,
     CcuAllReduceMeshMem2Mem1D,
-    CcuAllReduceMesh2DOneShot
+    CcuAllReduceMesh2DOneShot,
+    CcuSchedAllToAllSoleMesh = 150,
+    CcuSchedAllToAllVSoleMesh,
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
     {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
-    {"CcuKfcReduceScatterMesh1DMem2Mem", CcuReduceScatterMeshMem2Mem1D}};
+    {"CcuSchedAllGatherConcurMeshNHRMultiLink", CcuSchedAllGatherConcurMeshNHRMultiLink},
+    {"CcuSchedReduceScatterSoleMesh", CcuReduceScatterMeshMem2Mem1D},
+    {"CcuSchedAllToAllSoleMesh", CcuSchedAllToAllSoleMesh},
+    {"CcuSchedAllToAllVSoleMesh", CcuSchedAllToAllVSoleMesh},
+    {"CcuSchedAllReduceSoleMesh", CcuAllReduceMeshMem2Mem1D},
+    {"CcuSchedAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D}};
 
 typedef HcclResult (*OpParamPrepareFunc)(
     HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);

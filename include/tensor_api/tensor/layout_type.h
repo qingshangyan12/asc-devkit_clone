@@ -43,6 +43,7 @@ struct nd_layout_ptn {};
 struct dn_layout_ptn {};
 struct nd_ext_layout_ptn {};
 struct dn_ext_layout_ptn {};
+struct one_dim_layout_ptn {};
 struct scalea_nd_layout_ptn {};
 struct scalea_dn_layout_ptn {};
 struct scaleb_nd_layout_ptn {};
@@ -100,39 +101,30 @@ public:
     __aicore__ inline constexpr decltype(auto) get() const;
 
     template <size_t... I>
-    [[deprecated("Capacity() is deprecated. Please use capacity() instead.")]]
     __aicore__ inline constexpr decltype(auto) Capacity() const;
 
     template <size_t... I>
-    [[deprecated("Shape() is deprecated. Please use shape() instead.")]]
     __aicore__ inline constexpr decltype(auto) Shape();
 
     template <size_t... I>
-    [[deprecated("Shape() is deprecated. Please use shape() instead.")]]
     __aicore__ inline constexpr decltype(auto) Shape() const;
 
     template <size_t... I>
-    [[deprecated("Stride() is deprecated. Please use stride() instead.")]]
     __aicore__ inline constexpr decltype(auto) Stride();
 
     template <size_t... I>
-    [[deprecated("Stride() is deprecated. Please use stride() instead.")]]
     __aicore__ inline constexpr decltype(auto) Stride() const;
 
     template <size_t... I>
-    [[deprecated("Rank() is deprecated. Please use rank() instead.")]]
     __aicore__ inline constexpr decltype(auto) Rank() const;
 
     template <size_t... I>
-    [[deprecated("Size() is deprecated. Please use size() instead.")]]
     __aicore__ inline constexpr decltype(auto) Size() const;
 
     template <size_t... I>
-    [[deprecated("Get() is deprecated. Please use get() instead.")]]
     __aicore__ inline constexpr decltype(auto) Get();
 
     template <size_t... I>
-    [[deprecated("Get() is deprecated. Please use get() instead.")]]
     __aicore__ inline constexpr decltype(auto) Get() const;
 
 private:
