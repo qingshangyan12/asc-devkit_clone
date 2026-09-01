@@ -94,9 +94,22 @@
 | [Batch搬运](matrix_compute/cube_store_key_features/batch_copy.md) | 介绍矩阵结果的多Batch搬出能力。 |
 | [L0C到Unified Buffer双目标模式](matrix_compute/cube_store_key_features/l0c_to_ub_dual_dst.md) | 介绍L0C到Unified Buffer的双目标搬出模式。 |
 
+## 寄存器矢量计算（实验）
+
+**表6**  寄存器矢量计算接口列表
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [operator+](reg_vector_compute/basic_arithmetic/operator_add.md) | 对两个操作数进行逐元素加法。 |
+| [operator-](reg_vector_compute/basic_arithmetic/operator_sub.md) | 对输入进行逐元素取负，或对两个操作数进行逐元素减法。 |
+| [operator*](reg_vector_compute/basic_arithmetic/operator_mul.md) | 对两个操作数进行逐元素乘法。 |
+| [max](reg_vector_compute/basic_arithmetic/max.md) | 返回两个操作数对应元素中的较大值。 |
+| [log](reg_vector_compute/basic_arithmetic/log.md) | 对输入进行逐元素自然对数计算。 |
+| [or](reg_vector_compute/logical_compute/or.md) | 对两个操作数进行逐元素按位或运算。 |
+
 ## 工具接口
 
-**表6**  工具接口列表
+**表7**  工具接口列表
 
 | 接口或类型名 | 功能描述 |
 | --- | --- |
@@ -107,7 +120,7 @@
 
 ## 废弃接口
 
-**表7**  废弃接口列表
+**表8**  废弃接口列表
 
 | 接口名 | 功能描述 |
 | --- | --- |
