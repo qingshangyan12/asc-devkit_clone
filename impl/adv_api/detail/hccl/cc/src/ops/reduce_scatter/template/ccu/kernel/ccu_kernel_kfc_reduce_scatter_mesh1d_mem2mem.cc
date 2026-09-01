@@ -175,7 +175,11 @@ static void DoReduceScatterRead(KfcReduceScatterMesh1DMem2MemContext& ctx, uint3
         uint16_t rankMask = 1U << (rankIdx % BIT_NUM_PER_CKE);
 
         if (rankIdx == ctx.rankId) {
-            ccu::LocalCopy(ctx.scratchMem[rankIdx], ctx.myInput, ctx.sliceSize, ctx.events[eventIdx], rankMask);
+            if (ctx.rankSize <= REDUCE_SCATTER_GROUP_REDUCE_MAX_PIECE_CNT) {
+                ccu::EventRecord(ctx.events[eventIdx], rankMask);
+            } else {
+                ccu::LocalCopy(ctx.scratchMem[rankIdx], ctx.myInput, ctx.sliceSize, ctx.events[eventIdx], rankMask);
+            }
         } else {
             ccu::Read(
                 ctx.channels[channelId], ctx.scratchMem[rankIdx], ctx.remoteInput[rankIdx], ctx.sliceSize,
@@ -253,6 +257,7 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
 }
 
 // 设本 chunk 的基址(myInput/remoteInput/scratchMem 从当前 input/scratch 派生)
+// rankSize<=8 时本地数据不进 scratch,直接 alias scratchMem[rankId]→myInput,省一次 Phase1 LocalCopy。
 static void InitReduceScatterAddr(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
     ccu::Variable scratchOffset;
@@ -263,16 +268,24 @@ static void InitReduceScatterAddr(KfcReduceScatterMesh1DMem2MemContext& ctx)
             ctx.myInput.addr = ctx.input[rankIdx];
             ctx.myInput.addr += ctx.currentRankSliceInputOffset;
             ctx.myInput.token = ctx.token[rankIdx];
+            if (ctx.rankSize <= REDUCE_SCATTER_GROUP_REDUCE_MAX_PIECE_CNT) {
+                ctx.scratchMem[rankIdx].addr = ctx.myInput.addr;
+                ctx.scratchMem[rankIdx].token = ctx.myInput.token;
+            } else {
+                ctx.scratchMem[rankIdx].addr = ctx.scratch[ctx.rankId];
+                ctx.scratchMem[rankIdx].addr += scratchOffset;
+                scratchOffset += ctx.sliceSize;
+                ctx.scratchMem[rankIdx].token = ctx.token[ctx.rankId];
+            }
         } else {
             ctx.remoteInput[rankIdx].addr = ctx.input[rankIdx];
             ctx.remoteInput[rankIdx].addr += ctx.currentRankSliceInputOffset;
             ctx.remoteInput[rankIdx].token = ctx.token[rankIdx];
+            ctx.scratchMem[rankIdx].addr = ctx.scratch[ctx.rankId];
+            ctx.scratchMem[rankIdx].addr += scratchOffset;
+            scratchOffset += ctx.sliceSize;
+            ctx.scratchMem[rankIdx].token = ctx.token[ctx.rankId];
         }
-
-        ctx.scratchMem[rankIdx].addr = ctx.scratch[ctx.rankId];
-        ctx.scratchMem[rankIdx].addr += scratchOffset;
-        scratchOffset += ctx.sliceSize;
-        ctx.scratchMem[rankIdx].token = ctx.token[ctx.rankId];
     }
 }
 
@@ -284,9 +297,13 @@ static void ResetReduceScatterAddr(KfcReduceScatterMesh1DMem2MemContext& ctx)
     ctx.myInput.addr = ctx.input[ctx.rankId];
     ctx.myInput.addr += ctx.currentRankSliceInputOffset;
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
-        ctx.scratchMem[rankIdx].addr = ctx.scratch[ctx.rankId];
-        ctx.scratchMem[rankIdx].addr += scratchOffset;
-        scratchOffset += ctx.sliceSize;
+        if (rankIdx == ctx.rankId && ctx.rankSize <= REDUCE_SCATTER_GROUP_REDUCE_MAX_PIECE_CNT) {
+            ctx.scratchMem[rankIdx].addr = ctx.myInput.addr;
+        } else {
+            ctx.scratchMem[rankIdx].addr = ctx.scratch[ctx.rankId];
+            ctx.scratchMem[rankIdx].addr += scratchOffset;
+            scratchOffset += ctx.sliceSize;
+        }
     }
 }
 
@@ -302,7 +319,9 @@ static CcuResult DoReduceScatterReduce(KfcReduceScatterMesh1DMem2MemContext& ctx
             CCU_IF(ctx.flag != 0)
             {
                 for (uint64_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
-                    ctx.scratchMem[rankIdx].addr += ctx.scratchRepeatStride;
+                    if (rankIdx != ctx.rankId || ctx.rankSize > REDUCE_SCATTER_GROUP_REDUCE_MAX_PIECE_CNT) {
+                        ctx.scratchMem[rankIdx].addr += ctx.scratchRepeatStride;
+                    }
                 }
                 ctx.myInput.addr += ctx.inputRepeatStride;
                 ctx.output += ctx.outputRepeatStride;
@@ -340,8 +359,8 @@ static CcuResult DoReduceScatterThreePhase(KfcReduceScatterMesh1DMem2MemContext&
                     ctx.myInput.addr += ctx.inputRepeatStride;
                 } else {
                     ctx.remoteInput[rankIdx].addr += ctx.inputRepeatStride;
+                    ctx.scratchMem[rankIdx].addr += ctx.scratchRepeatStride;
                 }
-                ctx.scratchMem[rankIdx].addr += ctx.scratchRepeatStride;
             }
             DoReduceScatterRead(ctx, i);
         }
