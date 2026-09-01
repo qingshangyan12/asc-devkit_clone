@@ -150,7 +150,7 @@ __aicore__ inline T ReadGmBypassDCacheImpl(__gm__ T* addr)
 {
     static_assert(
         SupportType<T, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t>(),
-        "ReadGmByPassDCache only support int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t "
+        "ReadGmBypassDCache only support int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t "
         "data type on current device!");
 
     if constexpr (SupportBytes<T, 8>()) {
