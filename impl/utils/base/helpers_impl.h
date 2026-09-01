@@ -37,7 +37,7 @@ __aicore__ static inline void asc_vf_call_impl(Args&&... args)
 #ifdef ASCENDC_INTERNAL_SIMD_VF_OVERFLOW_WARNING_ENABLED
         if (transferFailed) {
             __asc_aicore::printf_impl(
-                "[WARNING]: SIMD VF debug record exceeds the 2024-byte limit. The record was dropped.\n");
+                "[WARNING]: SIMD VF debug record dropped: exceeds reserved UB or GM print fifo is too small.\n");
         }
 #else
         (void)transferFailed;
