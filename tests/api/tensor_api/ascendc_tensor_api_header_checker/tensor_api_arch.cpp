@@ -14,7 +14,9 @@
 #include "include/tensor_api/tensor/tensor.h"
 #include "include/tensor_api/arch/cube/mmad_op.h"
 #include "include/tensor_api/arch/cube/cube_copy_op.h"
+#include "include/tensor_api/arch/cube/copy_op.h"
 #include "include/tensor_api/arch/vector/vector_copy_op.h"
+#include "include/tensor_api/arch/vector/copy_op.h"
 #endif
 
 static void test_host_tensor_api_arch_cube_mmad_op()

@@ -10,17 +10,17 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #pragma message( \
-    "impl/tensor_api/arch/vector/ub_to_gm/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/tensor.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/tensor_api/arch/vector/ub_to_gm/ub_to_gm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/tensor.h\"\" and use public functions or variables defined in interface headers files.")
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_COPY_H
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_H
 #endif
 
 /*!
- * \file copy.h
+ * \file ub_to_gm.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_COPY_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_COPY_H
+#ifndef IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_H
+#define IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_H
 
 #include "impl/tensor_api/arch/vector/ub_to_gm/routing.h"
 
@@ -73,9 +73,9 @@ __aicore__ inline void copy_ub_to_gm::data_copy_impl(
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_COPY_H
+#endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_COPY_H)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_COPY_H
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_GM_H
 #endif
