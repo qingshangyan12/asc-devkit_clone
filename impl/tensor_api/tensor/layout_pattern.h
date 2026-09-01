@@ -43,7 +43,7 @@ __aicore__ inline constexpr auto make_batch_pattern_layout(const Batch& batch, c
 
 struct make_nz_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
         auto shape = make_shape(
@@ -57,7 +57,7 @@ struct make_nz_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<nz_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -65,7 +65,7 @@ struct make_nz_frame_layout {
 
 struct make_nd_ext_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         auto shape = make_shape(make_shape(_1{}, row), make_shape(_1{}, column));
         auto stride = make_stride(make_stride(_0{}, column), make_stride(_0{}, _1{}));
@@ -74,7 +74,7 @@ struct make_nd_ext_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<nd_ext_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -82,7 +82,7 @@ struct make_nd_ext_frame_layout {
 
 struct make_nd_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         auto shape = make_shape(row, column);
         auto stride = make_stride(column, _1{});
@@ -91,7 +91,7 @@ struct make_nd_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<nd_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -99,7 +99,7 @@ struct make_nd_frame_layout {
 
 struct make_zn_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
         auto shape = make_shape(
@@ -113,7 +113,7 @@ struct make_zn_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<zn_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -121,7 +121,7 @@ struct make_zn_frame_layout {
 
 struct make_dn_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         auto shape = make_shape(row, column);
         auto stride = make_stride(_1{}, row);
@@ -130,7 +130,7 @@ struct make_dn_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<dn_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -138,7 +138,7 @@ struct make_dn_frame_layout {
 
 struct make_dn_ext_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         auto shape = make_shape(make_shape(_1{}, row), make_shape(_1{}, column));
         auto stride = make_stride(make_stride(_0{}, _1{}), make_stride(_0{}, row));
@@ -147,7 +147,7 @@ struct make_dn_ext_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<dn_ext_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -155,7 +155,7 @@ struct make_dn_ext_frame_layout {
 
 struct make_zz_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
         auto shape = make_shape(
@@ -169,7 +169,7 @@ struct make_zz_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<zz_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -177,7 +177,7 @@ struct make_zz_frame_layout {
 
 struct make_nn_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
         static_assert(c0_ele == 2, "NnLayoutPtn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
@@ -191,7 +191,7 @@ struct make_nn_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<nn_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -199,7 +199,7 @@ struct make_nn_frame_layout {
 
 struct make_scalea_nd_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
         static_assert(c0_ele == 2, "scalea_nd_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
@@ -210,7 +210,7 @@ struct make_scalea_nd_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<scalea_nd_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -218,7 +218,7 @@ struct make_scalea_nd_frame_layout {
 
 struct make_scalea_dn_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
         static_assert(c0_ele == 2, "scalea_dn_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
@@ -229,7 +229,7 @@ struct make_scalea_dn_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<scalea_dn_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -237,7 +237,7 @@ struct make_scalea_dn_frame_layout {
 
 struct make_scaleb_nd_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         constexpr auto c0_ele = TraitType::c0_element;
         static_assert(c0_ele == 2, "scaleb_nd_layout_ptn only supports fp8_e8m0_t and ShapeColumn0 as 2.");
@@ -248,7 +248,7 @@ struct make_scaleb_nd_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<scaleb_nd_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -256,7 +256,7 @@ struct make_scaleb_nd_frame_layout {
 
 struct make_scaleb_dn_frame_layout {
     template <typename TraitType, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Row row, Column column)
+    __aicore__ inline static auto make(Row row, Column column)
     {
         auto shape = make_shape(make_shape(_1{}, row), make_shape(_1{}, column));
         auto stride = make_stride(make_stride(_0{}, _1{}), make_stride(_0{}, row));
@@ -265,7 +265,7 @@ struct make_scaleb_dn_frame_layout {
     }
 
     template <typename TraitType, typename Batch, typename Row, typename Column>
-    __aicore__ __callee__ inline static auto make(Batch batch, Row row, Column column)
+    __aicore__ inline static auto make(Batch batch, Row row, Column column)
     {
         return make_batch_pattern_layout<scaleb_dn_layout_ptn, TraitType>(batch, make<TraitType>(row, column));
     }
@@ -273,7 +273,7 @@ struct make_scaleb_dn_frame_layout {
 
 struct make_nchw_frame_layout {
     template <typename TraitType, typename N, typename C, typename H, typename W>
-    __aicore__ __callee__ inline static auto make(N n, C c, H h, W w)
+    __aicore__ inline static auto make(N n, C c, H h, W w)
     {
         auto shape = make_shape(n, c, h, w);
         auto stride = make_stride(c * h * w, h * w, w, _1{});
@@ -284,7 +284,7 @@ struct make_nchw_frame_layout {
 
 struct make_nhwc_frame_layout {
     template <typename TraitType, typename N, typename H, typename W, typename C>
-    __aicore__ __callee__ inline static auto make(N n, H h, W w, C c)
+    __aicore__ inline static auto make(N n, H h, W w, C c)
     {
         auto shape = make_shape(n, h, w, c);
         auto stride = make_stride(h * w * c, w * c, c, _1{});
@@ -295,7 +295,7 @@ struct make_nhwc_frame_layout {
 
 struct make_nc1hwc0_frame_layout {
     template <typename TraitType, typename N, typename C1, typename H, typename W, typename C0>
-    __aicore__ __callee__ inline static auto make(N n, C1 c1, H h, W w, C0 c0)
+    __aicore__ inline static auto make(N n, C1 c1, H h, W w, C0 c0)
     {
         auto shape = make_shape(n, c1, h, w, c0);
         auto stride = make_stride(c1 * h * w * c0, h * w * c0, w * c0, c0, _1{});
@@ -308,7 +308,7 @@ struct make_nc1hwc0_frame_layout {
 // layout (C split into C1 outer / C0 inner, with the depth axis D between N and C1).
 struct make_ncdhw_frame_layout { // Shape = (N, C, D, H, W)
     template <typename TraitType, typename N, typename C, typename D, typename H, typename W>
-    __aicore__ __callee__ inline static auto make(N n, C c, D d, H h, W w)
+    __aicore__ inline static auto make(N n, C c, D d, H h, W w)
     {
         auto shape = make_shape(n, c, d, h, w);
         auto stride = make_stride(c * d * h * w, d * h * w, h * w, w, _1{});
@@ -319,7 +319,7 @@ struct make_ncdhw_frame_layout { // Shape = (N, C, D, H, W)
 
 struct make_ndc1hwc0_frame_layout { // Shape = (N, D, C1, H, W, C0)
     template <typename TraitType, typename N, typename D, typename C1, typename H, typename W, typename C0>
-    __aicore__ __callee__ inline static auto make(N n, D d, C1 c1, H h, W w, C0 c0)
+    __aicore__ inline static auto make(N n, D d, C1 c1, H h, W w, C0 c0)
     {
         auto shape = make_shape(n, d, c1, h, w, c0);
         auto stride = make_stride(d * c1 * h * w * c0, c1 * h * w * c0, h * w * c0, w * c0, c0, _1{});
