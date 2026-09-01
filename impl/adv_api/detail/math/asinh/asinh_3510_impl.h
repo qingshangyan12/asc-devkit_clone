@@ -28,47 +28,97 @@
 
 namespace AscendC {
 namespace Internal {
-constexpr float ASINH_ONE = 1;
-constexpr float ASINH_NEG_ONE = -1;
-constexpr float ASINH_ZERO = 0;
-/*
-    when x < 0 : asinh = -ln(-x + sqrt(x ^ 2 - 1))
-    when x > 0 : asinh = ln(x + sqrt(x ^ 2 - 1))
-*/
+constexpr float ASINH_ONE = 1.0f;
+constexpr float ASINH_NEG_ONE = -1.0f;
+constexpr float ASINH_ZERO = 0.0f;
+constexpr float ASINH_S_MIN = 1.0e-45f;
+constexpr float ASINH_S_MAX = 3.4028235e34f;
+constexpr float ASINH_LN_TWO = 0.6931472f;
+constexpr float ASINH_SMALL_THRESHOLD = 0.00024414063f;
+constexpr float ASINH_DIRECT_LOG_THRESHOLD = 10.0f;
+constexpr float ASINH_ASYMPTOTIC_THRESHOLD = 268435456.0f;
+
 template <typename T>
 __simd_vf__ inline void AsinhImplVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t calCount, uint16_t repeatTimes)
 {
     Reg::RegTensor<T> srcVreg;
     Reg::RegTensor<T> dstVreg;
-    Reg::RegTensor<float> tmpReg1;
-    Reg::RegTensor<float> tmpReg2;
+    Reg::RegTensor<float> xReg;
+    Reg::RegTensor<float> absReg;
+    Reg::RegTensor<float> bReg;
+    Reg::RegTensor<float> rReg;
+    Reg::RegTensor<float> sReg;
+    Reg::RegTensor<float> tmpReg;
     Reg::MaskReg mask;
-    Reg::MaskReg signMaskReg;
+    Reg::MaskReg selectMask;
+    Reg::MaskReg signMask;
     constexpr int32_t oneRepElm = static_cast<int32_t>(GetVecLen() / sizeof(float));
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = Reg::UpdateMask<float>(calCount);
         if constexpr (sizeof(T) == sizeof(half)) {
             Reg::LoadAlign<half, Reg::LoadDist::DIST_UNPACK_B16>(srcVreg, src + i * oneRepElm);
-            Reg::Cast<float, half, castTraitB16ToB32>((Reg::RegTensor<float>&)srcVreg, srcVreg, mask);
+            Reg::Cast<float, half, castTraitB16ToB32>(xReg, srcVreg, mask);
         } else {
-            Reg::LoadAlign(srcVreg, src + i * oneRepElm);
+            Reg::LoadAlign(xReg, src + i * oneRepElm);
         }
-        Reg::CompareScalar<float, CMPMODE::LT>(signMaskReg, (Reg::RegTensor<float>&)srcVreg, ASINH_ZERO, mask);
-        Reg::Abs(tmpReg1, (Reg::RegTensor<float>&)srcVreg, mask);
-        Reg::Mul(tmpReg2, (Reg::RegTensor<float>&)srcVreg, (Reg::RegTensor<float>&)srcVreg, mask);
-        Reg::Adds(tmpReg2, tmpReg2, ASINH_ONE, mask);
-        Reg::Sqrt(tmpReg2, tmpReg2, mask);
-        Reg::Add(tmpReg1, tmpReg1, tmpReg2, mask);
-        Reg::Ln(tmpReg1, tmpReg1, mask);
-        Reg::Muls((Reg::RegTensor<float>&)dstVreg, tmpReg1, ASINH_NEG_ONE, signMaskReg);
-        Reg::Or(
-            (Reg::RegTensor<uint32_t>&)dstVreg, (Reg::RegTensor<uint32_t>&)dstVreg, (Reg::RegTensor<uint32_t>&)tmpReg1,
-            mask);
+
+        Reg::Abs(absReg, xReg, mask);
+
+        // Compute r = |x| + sqrt(1 + |x|^2) - 1 without forming |x|^2.
+        Reg::Duplicate(bReg, ASINH_ONE);
+        Reg::Div(bReg, bReg, absReg, mask);
+        Reg::Mul(rReg, bReg, bReg, mask);
+        Reg::Adds(rReg, rReg, ASINH_ONE, mask);
+        Reg::Sqrt(rReg, rReg, mask);
+        Reg::Add(rReg, rReg, bReg, mask);
+        Reg::Div(rReg, absReg, rReg, mask);
+        Reg::Add(rReg, absReg, rReg, mask);
+
+        // log1p-style compensation for |x| < 10.
+        Reg::Adds(sReg, rReg, ASINH_ONE, mask);
+        Reg::Adds(bReg, sReg, ASINH_NEG_ONE, mask);
+        Reg::Maxs(bReg, bReg, ASINH_S_MIN, mask);
+        Reg::Mins(bReg, bReg, ASINH_S_MAX, mask);
+        Reg::Ln(sReg, sReg, mask);
+
+        Reg::Duplicate(tmpReg, ASINH_ONE);
+        Reg::CompareScalar<float, CMPMODE::LT>(selectMask, absReg, ASINH_DIRECT_LOG_THRESHOLD, mask);
+        Reg::Select(rReg, rReg, tmpReg, selectMask);
+        Reg::Select(bReg, bReg, tmpReg, selectMask);
+        Reg::Mul(sReg, sReg, rReg, mask);
+        Reg::Div(sReg, sReg, bReg, mask);
+
+        // Use log(|x|) + ln(2) for very large inputs to avoid intermediate overflow.
+        Reg::Ln(rReg, absReg, mask);
+        Reg::Adds(rReg, rReg, ASINH_LN_TWO, mask);
+        Reg::Duplicate(bReg, ASINH_ONE);
+        Reg::Div(bReg, bReg, absReg, mask);
+        Reg::Mul(bReg, bReg, bReg, mask);
+        Reg::Add(rReg, rReg, bReg, mask);
+        Reg::Adds(bReg, rReg, ASINH_ZERO, mask);
+
+        Reg::Duplicate(tmpReg, ASINH_S_MAX);
+        Reg::CompareScalar<float, CMPMODE::LT>(selectMask, absReg, ASINH_DIRECT_LOG_THRESHOLD, mask);
+        Reg::Select(rReg, rReg, tmpReg, selectMask);
+        Reg::CompareScalar<float, CMPMODE::GE>(selectMask, absReg, ASINH_ASYMPTOTIC_THRESHOLD, mask);
+        Reg::Select(rReg, bReg, rReg, selectMask);
+
+        // NaN compares false; restore its correction lane to preserve NaN propagation.
+        Reg::Compare<float, CMPMODE::EQ>(selectMask, absReg, absReg, mask);
+        Reg::Select(rReg, rReg, bReg, selectMask);
+        Reg::Min(sReg, sReg, rReg, mask);
+
+        Reg::CompareScalar<float, CMPMODE::LT>(selectMask, absReg, ASINH_SMALL_THRESHOLD, mask);
+        Reg::Select(sReg, absReg, sReg, selectMask);
+        Reg::Neg(tmpReg, sReg, mask);
+        Reg::CompareScalar<float, CMPMODE::GE>(signMask, xReg, ASINH_ZERO, mask);
+        Reg::Select(rReg, sReg, tmpReg, signMask);
+
         if constexpr (sizeof(T) == sizeof(half)) {
-            Reg::Cast<half, float, castTraitB32ToB16>(dstVreg, (Reg::RegTensor<float>&)dstVreg, mask);
+            Reg::Cast<half, float, castTraitB32ToB16>(dstVreg, rReg, mask);
             Reg::StoreAlign<half, Reg::StoreDist::DIST_PACK_B32>(dst + i * oneRepElm, dstVreg, mask);
         } else {
-            Reg::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
+            Reg::StoreAlign(dst + i * oneRepElm, rReg, mask);
         }
     }
 }

@@ -32,39 +32,98 @@ namespace SinhInternal {
 template <typename T>
 __simd_vf__ inline void SinhCompute(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint32_t calCount, uint16_t repeatTimes)
 {
-    constexpr float scalarNegLnTwo = -0.6931472;
-    constexpr float scalarBrc = 0.25;
+    constexpr float taylorC2 = 0.16666667f;
+    constexpr float taylorC3 = 0.008333347f;
+    constexpr float taylorC4 = 0.00019841270f;
+    constexpr float taylorC5 = 0.0000027557319f;
+    constexpr float one = 1.0f;
+    constexpr float zero = 0.0f;
+    constexpr float quarter = 0.25f;
+    constexpr float overflow = 89.4159927368164f;
+    constexpr float negLnTwoHi = -0.6931471824645996f;
+    constexpr float lnTwoLo = 1.9046542e-9f;
+    const float inf = __builtin_huge_valf();
     constexpr uint32_t vlSize = static_cast<uint32_t>(GetVecLen() / sizeof(float));
     static constexpr Reg::CastTrait sinhCastTraitUpper = {
         Reg::RegLayout::ZERO, Reg::SatMode::UNKNOWN, Reg::MaskMergeMode::ZEROING, RoundMode::UNKNOWN};
     static constexpr Reg::CastTrait sinhCastTraitLower = {
         Reg::RegLayout::ZERO, Reg::SatMode::NO_SAT, Reg::MaskMergeMode::ZEROING, RoundMode::CAST_RINT};
+    static constexpr Reg::DivSpecificMode sinhDivMode = {Reg::MaskMergeMode::ZEROING, true};
     Reg::MaskReg sinhMask;
-    Reg::RegTensor<float> dupReg;
+    Reg::MaskReg negativeMask;
+    Reg::MaskReg selectMask;
     Reg::RegTensor<T> srcReg;
-    Reg::RegTensor<float> castUpperReg;
-    Reg::RegTensor<float> computeReg0;
-    Reg::RegTensor<float> computeReg1;
-    Reg::RegTensor<float> resReg;
+    Reg::RegTensor<float> xReg;
+    Reg::RegTensor<float> absReg;
+    Reg::RegTensor<float> x2Reg;
+    Reg::RegTensor<float> polyReg;
+    Reg::RegTensor<float> tmpReg;
+    Reg::RegTensor<float> expReg;
+    Reg::RegTensor<float> resultReg;
     Reg::RegTensor<T> dstReg;
-    Reg::Duplicate(dupReg, scalarBrc);
     for (uint16_t i = 0; i < repeatTimes; i++) {
         sinhMask = Reg::UpdateMask<float>(calCount);
         if constexpr (SupportBytes<T, 2>()) {
             Reg::LoadAlign<half, Reg::LoadDist::DIST_UNPACK_B16>(srcReg, srcUb + i * vlSize);
-            Reg::Cast<float, half, sinhCastTraitUpper>(castUpperReg, srcReg, sinhMask);
+            Reg::Cast<float, half, sinhCastTraitUpper>(xReg, srcReg, sinhMask);
         } else {
-            Reg::LoadAlign(castUpperReg, srcUb + i * vlSize);
+            Reg::LoadAlign(xReg, srcUb + i * vlSize);
         }
-        Reg::Adds(castUpperReg, castUpperReg, scalarNegLnTwo, sinhMask);
-        Reg::Exp(computeReg0, castUpperReg, sinhMask);
-        Reg::Div(computeReg1, dupReg, computeReg0, sinhMask);
-        Reg::Sub(resReg, computeReg0, computeReg1, sinhMask);
+
+        Reg::Abs(absReg, xReg, sinhMask);
+
+        // |x| < 1: sinh(x) = x + x^3 * P(x^2).
+        Reg::Mul(x2Reg, xReg, xReg, sinhMask);
+        Reg::Duplicate(polyReg, taylorC5);
+        Reg::Mul(polyReg, polyReg, x2Reg, sinhMask);
+        Reg::Adds(polyReg, polyReg, taylorC4, sinhMask);
+        Reg::Mul(polyReg, polyReg, x2Reg, sinhMask);
+        Reg::Adds(polyReg, polyReg, taylorC3, sinhMask);
+        Reg::Mul(polyReg, polyReg, x2Reg, sinhMask);
+        Reg::Adds(polyReg, polyReg, taylorC2, sinhMask);
+        Reg::Mul(tmpReg, x2Reg, xReg, sinhMask);
+        Reg::Mul(polyReg, polyReg, tmpReg, sinhMask);
+        Reg::Add(polyReg, xReg, polyReg, sinhMask);
+
+        // |x| >= 1: offset exp with compensated |x| - ln(2).
+        Reg::Adds(tmpReg, absReg, negLnTwoHi, sinhMask);
+        Reg::Sub(expReg, tmpReg, absReg, sinhMask);
+        Reg::Sub(resultReg, tmpReg, expReg, sinhMask);
+        Reg::Sub(resultReg, absReg, resultReg, sinhMask);
+        Reg::Neg(x2Reg, expReg, sinhMask);
+        Reg::Adds(x2Reg, x2Reg, negLnTwoHi, sinhMask);
+        Reg::Add(resultReg, resultReg, x2Reg, sinhMask);
+        Reg::Adds(resultReg, resultReg, lnTwoLo, sinhMask);
+
+        Reg::Exp(expReg, tmpReg, sinhMask);
+        Reg::CompareScalar<float, CMPMODE::LT>(selectMask, absReg, overflow, sinhMask);
+        Reg::Mul(x2Reg, expReg, resultReg, selectMask);
+        Reg::Add(x2Reg, expReg, x2Reg, selectMask);
+        Reg::Select(expReg, x2Reg, expReg, selectMask);
+
+        Reg::Duplicate(tmpReg, quarter);
+        Reg::Div<float, &sinhDivMode>(tmpReg, tmpReg, expReg, sinhMask);
+        Reg::Sub(expReg, expReg, tmpReg, sinhMask);
+
+        Reg::CompareScalar<float, CMPMODE::LT>(negativeMask, xReg, zero, sinhMask);
+        Reg::Neg(tmpReg, expReg, sinhMask);
+        Reg::Select(expReg, tmpReg, expReg, negativeMask);
+
+        Reg::CompareScalar<float, CMPMODE::LT>(selectMask, absReg, one, sinhMask);
+        Reg::Select(resultReg, polyReg, expReg, selectMask);
+
+        // Use the first FP32 input whose correctly rounded sinh overflows.
+        Reg::CompareScalar<float, CMPMODE::GE>(selectMask, absReg, overflow, sinhMask);
+        Reg::Duplicate(tmpReg, inf);
+        Reg::Neg(expReg, tmpReg, sinhMask);
+        Reg::Select(tmpReg, expReg, tmpReg, negativeMask);
+        Reg::Select(resultReg, tmpReg, resultReg, selectMask);
+
         if constexpr (SupportBytes<T, 2>()) {
-            Reg::Cast<half, float, sinhCastTraitLower>(dstReg, resReg, sinhMask);
+            Reg::Cast<half, float, sinhCastTraitLower>(dstReg, resultReg, sinhMask);
             Reg::StoreAlign<half, Reg::StoreDist::DIST_PACK_B32>(dstUb + i * vlSize, dstReg, sinhMask);
         } else {
-            Reg::StoreAlign(dstUb + i * vlSize, resReg, sinhMask);
+            Reg::StoreAlign(dstUb + i * vlSize, resultReg, sinhMask);
         }
     }
 }
