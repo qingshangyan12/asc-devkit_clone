@@ -14,15 +14,45 @@
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_ASC_SET_L0C2GM_QUANT_POST_IMPL_H
-#define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_ASC_SET_L0C2GM_QUANT_POST_IMPL_H
+#ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_CUBE_DATAMOVE_IMPL_ASC_SET_L13D_PADDING_IMPL_H
+#define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_CUBE_DATAMOVE_IMPL_ASC_SET_L13D_PADDING_IMPL_H
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
-__aicore__ inline void asc_set_l0c2gm_quant_post_impl(uint64_t config)
+__aicore__ inline void asc_set_l13d_padding_impl(uint64_t config)
 {
     if ASC_IS_AIC {
-        set_quant_post(config);
+        uint64_t paddingValue = 0;
+        uint64_t padValueShiftBit = 8;
+        paddingValue = (config << padValueShiftBit) | (config & 0xFF);
+        set_padding(paddingValue);
+    }
+}
+
+__aicore__ inline void asc_set_l13d_padding_impl(half config)
+{
+    if ASC_IS_AIC {
+        asc_scalar_bitcode bitcode;
+        bitcode.input_half = config;
+        set_padding(bitcode.output);
+    }
+}
+
+__aicore__ inline void asc_set_l13d_padding_impl(int16_t config)
+{
+    if ASC_IS_AIC {
+        asc_scalar_bitcode bitcode;
+        bitcode.input_int16_t = config;
+        set_padding(bitcode.output);
+    }
+}
+
+__aicore__ inline void asc_set_l13d_padding_impl(uint16_t config)
+{
+    if ASC_IS_AIC {
+        asc_scalar_bitcode bitcode;
+        bitcode.input_uint16_t = config;
+        set_padding(bitcode.output);
     }
 }
 
