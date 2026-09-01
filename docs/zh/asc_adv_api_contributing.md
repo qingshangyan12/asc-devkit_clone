@@ -35,7 +35,7 @@ $$
 
     定义出函数原型后，分析并确定API实现中使用的基础API。`Axpy`公式中Tensor与Scalar的相乘运算，可以使用Ascend C提供的基础API `Muls`实现；两个Tensor的加法运算，可以使用Ascend C提供的基础API `Add`实现。
 
-    ```c++
+    ```
     template <typename T, typename U, bool isReuseSource = false>
     __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
     ```
