@@ -205,7 +205,7 @@ private:
     }
 
     template <typename INPUT_TYPE_ALIAS = INPUT_TYPE>
-    __aicore__ constexpr enable_if_t<INPUT_TYPE_ALIAS::TAG == InputTypeTag::B, int32_t> GetIterIndexInner(
+    __aicore__ enable_if_t<INPUT_TYPE_ALIAS::TAG == InputTypeTag::B, int32_t> GetIterIndexInner(
         int32_t curRow, int32_t curCol)
     {
         if constexpr (DoMatmulNorm(MM_CFG) || DoMatmulIBShareNorm(MM_CFG) || DoMatmulBasicBlock(MM_CFG)) {
@@ -246,7 +246,7 @@ private:
         }
     }
 
-    __aicore__ __callee__ int32_t GetNormIterBIdxForUndef(int32_t curRow, int32_t curCol)
+    __aicore__ int32_t GetNormIterBIdxForUndef(int32_t curRow, int32_t curCol)
     {
         if (MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetIterateOrder() ==
             static_cast<int>(IterateOrder::ORDER_M)) {
