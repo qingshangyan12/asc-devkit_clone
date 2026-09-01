@@ -281,37 +281,39 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t M = 16;
-constexpr uint32_t K = 32;
-constexpr uint32_t N = 16;
+constexpr uint32_t M = 48;
+constexpr uint32_t K = 96;
+constexpr uint32_t N = 80;
+constexpr uint32_t CUBE_M = 16;
+constexpr uint32_t CUBE_K = 32;
 
 __global__ __cube__ void asc_mmad_kernel(__gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
 {
     asc_init();
     __cbuf__ int8_t a_l1[M * K];
-    __cbuf__ int8_t b_l1[K * N];
+    __cbuf__ int8_t b_l1[N * K];
     __ca__ int8_t a_l0[M * K];
-    __cb__ int8_t b_l0[K * N];
+    __cb__ int8_t b_l0[N * K];
     __cc__ int32_t c_l0[M * N];
 
-    asc_set_gm2l1_nz_para(1, 1, 32, 0);
-    asc_copy_gm2l1_nd2nz(a_l1, a, K * sizeof(int8_t), 0, M, K, 0, false);
-    asc_set_gm2l1_nz_para(1, 1, 32, 0);
-    asc_copy_gm2l1_nd2nz(b_l1, b, N * sizeof(int8_t), 0, K, N, 0, false);
+    asc_set_gm2l1_nz_para(1, 1, M, 0);
+    asc_copy_gm2l1_nd2nz(
+        a_l1, a, K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, M, K, 0, false);
+    asc_set_gm2l1_nz_para(1, 1, N, 0);
+    asc_copy_gm2l1_nd2nz(
+        b_l1, b, K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, N, K, 0, false);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
-    asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);
-    asc_copy_l12l0b_trans(b_l0, b_l1, static_cast<uint16_t>(0), static_cast<uint8_t>(1),
-        static_cast<uint16_t>(2), static_cast<uint16_t>(1), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+    asc_copy_l12l0a(a_l0, a_l1, 0, 0, M / CUBE_M, K / CUBE_K, M / CUBE_M, M / CUBE_M);
+    asc_copy_l12l0b(b_l0, b_l1, 0, 0, N / CUBE_M, K / CUBE_K, N / CUBE_M, N / CUBE_M);
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_mmad(c_l0, a_l0, b_l0, M, K, N, asc_unit_flag_mode::DISABLE, true, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_set_l0c_copy_nz_para(1, 0, 0);
-    asc_copy_l0c2gm(output, c_l0, N, M, N, M, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    asc_copy_l0c2gm(output, c_l0, N, M, N, M, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM,
+        asc_unit_flag_mode::DISABLE, QuantMode_t::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
     asc_sync_pipe(PIPE_ALL);
 }
 
@@ -326,17 +328,24 @@ void print_row(const char* label, const std::vector<T>& data)
 
 int main()
 {
-    std::vector<int8_t> a(M * K), b(K * N);
+    // B在GM中按N x K存放，搬入L0B后形成MMAD所需的K x N矩阵。
+    std::vector<int8_t> a(M * K), b(N * K);
     std::vector<int32_t> output(M * N), golden(M * N);
     for (uint32_t row = 0; row < M; ++row) {
-        for (uint32_t k = 0; k < K; ++k) a[row * K + k] = static_cast<int8_t>((row + k) % 5 - 2);
+        for (uint32_t k = 0; k < K; ++k) {
+            a[row * K + k] = static_cast<int8_t>(static_cast<int32_t>((row + 2 * k) % 5) - 2);
+        }
     }
-    for (uint32_t k = 0; k < K; ++k) {
-        for (uint32_t col = 0; col < N; ++col) b[k * N + col] = static_cast<int8_t>((k + 2 * col) % 7 - 3);
+    for (uint32_t col = 0; col < N; ++col) {
+        for (uint32_t k = 0; k < K; ++k) {
+            b[col * K + k] = static_cast<int8_t>(static_cast<int32_t>((3 * col + k) % 7) - 3);
+        }
     }
     for (uint32_t row = 0; row < M; ++row) {
         for (uint32_t col = 0; col < N; ++col) {
-            for (uint32_t k = 0; k < K; ++k) golden[row * N + col] += a[row * K + k] * b[k * N + col];
+            for (uint32_t k = 0; k < K; ++k) {
+                golden[row * N + col] += a[row * K + k] * b[col * K + k];
+            }
         }
     }
 

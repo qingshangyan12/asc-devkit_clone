@@ -199,6 +199,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 
 ```cpp
+#include <cmath>
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -206,45 +207,75 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 
 namespace {
-constexpr uint32_t M = 16, K = 64, N = 16, SCALE_K = 2;
+constexpr uint32_t M = 40;
+constexpr uint32_t K = 70;
+constexpr uint32_t N = 50;
+constexpr uint32_t SCALE_K = 4;
+constexpr uint32_t M_ALIGN = 48;
+constexpr uint32_t K_ALIGN = 128;
+constexpr uint32_t N_ALIGN = 64;
+constexpr uint32_t CUBE_M = 16;
+constexpr uint32_t CUBE_K = 32;
+constexpr uint32_t GM2L1_K_ALIGN = 96;
+constexpr uint8_t FP8_E4M3_ONE = 0x38;
+constexpr uint8_t FP8_E4M3_NEG_ONE = 0xb8;
+constexpr uint8_t FP8_E5M2_ONE = 0x3c;
+constexpr uint8_t FP8_E5M2_NEG_ONE = 0xbc;
 
 __global__ __cube__ void asc_mmad_mx_kernel(__gm__ uint8_t* a, __gm__ uint8_t* scale_a,
     __gm__ uint8_t* b, __gm__ uint8_t* scale_b, __gm__ float* output)
 {
     asc_init();
-    __cbuf__ fp8_e4m3fn_t a_l1[M * K], b_l1[N * K];
-    __cbuf__ fp8_e8m0_t scale_a_l1[M * SCALE_K], scale_b_l1[N * SCALE_K];
-    __ca__ fp8_e4m3fn_t a_l0[M * K];
-    __cb__ fp8_e4m3fn_t b_l0[N * K];
-    __cc__ float c_l0[M * N];
+    __cbuf__ fp8_e4m3fn_t a_l1[M_ALIGN * K_ALIGN];
+    __cbuf__ fp8_e5m2_t b_l1[N_ALIGN * K_ALIGN];
+    __cbuf__ fp8_e8m0_t scale_a_l1[M_ALIGN * SCALE_K], scale_b_l1[N_ALIGN * SCALE_K];
+    __ca__ fp8_e4m3fn_t a_l0[M_ALIGN * K_ALIGN];
+    __cb__ fp8_e5m2_t b_l0[N_ALIGN * K_ALIGN];
+    __cc__ float c_l0[M_ALIGN * N_ALIGN];
 
-    asc_set_gm2l1_nz_para(1, 1, 16, 0);
-    asc_copy_gm2l1_nd2nz(a_l1, reinterpret_cast<__gm__ fp8_e4m3fn_t*>(a), K, 0, M, K, 0, false);
-    asc_set_gm2l1_nz_para(1, 1, 1, 0);
+    asc_set_gm2l1_nz_para(1, 1, M_ALIGN, 0);
+    asc_copy_gm2l1_nd2nz(a_l1, reinterpret_cast<__gm__ fp8_e4m3fn_t*>(a), K,
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, M, K, 0, false);
+    asc_set_gm2l1_nz_para(1, 1, SCALE_K / 2, 0);
     asc_copy_gm2l1_dn2nz(reinterpret_cast<__cbuf__ half*>(scale_a_l1),
-        reinterpret_cast<__gm__ half*>(scale_a), SCALE_K, 0, SCALE_K / 2, M, 0, false);
-    asc_set_gm2l1_nz_para(1, 1, 16, 0);
-    asc_copy_gm2l1_nd2nz(b_l1, reinterpret_cast<__gm__ fp8_e4m3fn_t*>(b), K, 0, N, K, 0, false);
-    asc_set_gm2l1_nz_para(1, 1, 1, 0);
+        reinterpret_cast<__gm__ half*>(scale_a), SCALE_K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM,
+        SCALE_K / 2, M, 0, false);
+    asc_set_gm2l1_nz_para(1, 1, N_ALIGN, 0);
+    asc_copy_gm2l1_nd2nz(b_l1, reinterpret_cast<__gm__ fp8_e5m2_t*>(b), K,
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, N, K, 0, false);
+    asc_set_gm2l1_nz_para(1, 1, SCALE_K / 2, 0);
     asc_copy_gm2l1_dn2nz(reinterpret_cast<__cbuf__ half*>(scale_b_l1),
-        reinterpret_cast<__gm__ half*>(scale_b), SCALE_K, 0, SCALE_K / 2, N, 0, false);
+        reinterpret_cast<__gm__ half*>(scale_b), SCALE_K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM,
+        SCALE_K / 2, N, 0, false);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
-    asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 2, 1, 1);
+
+    // ND2NZ搬运已将K方向补齐到96，还需将[96, 128)区域清零。
+    asc_fill_value_config fill_config;
+    fill_config.repeat = M_ALIGN;
+    fill_config.blk_num = 1;
+    fill_config.dst_gap = 0;
+    asc_fill_l1(reinterpret_cast<__cbuf__ uint16_t*>(a_l1) + M_ALIGN * GM2L1_K_ALIGN / 2, 0U, fill_config);
+    fill_config.repeat = N_ALIGN;
+    asc_fill_l1(reinterpret_cast<__cbuf__ uint16_t*>(b_l1) + N_ALIGN * GM2L1_K_ALIGN / 2, 0U, fill_config);
+    asc_sync_pipe(PIPE_MTE1);
+
+    asc_copy_l12l0a(a_l0, a_l1, 0, 0, M_ALIGN / CUBE_M, K_ALIGN / CUBE_K,
+        M_ALIGN / CUBE_M, M_ALIGN / CUBE_M);
     asc_copy_l12l0a_mx(static_cast<uint64_t>(reinterpret_cast<uintptr_t>(a_l0)) / 16,
-        scale_a_l1, 0, 0, 1, SCALE_K / 2, SCALE_K / 2, SCALE_K / 2);
-    asc_copy_l12l0b(b_l0, b_l1, 0, 0, 1, 2, 1, 1);
+        scale_a_l1, 0, 0, M_ALIGN / CUBE_M, SCALE_K / 2, SCALE_K / 2, SCALE_K / 2);
+    asc_copy_l12l0b(b_l0, b_l1, 0, 0, N_ALIGN / CUBE_M, K_ALIGN / CUBE_K,
+        N_ALIGN / CUBE_M, N_ALIGN / CUBE_M);
     asc_copy_l12l0b_mx(static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b_l0)) / 16,
-        scale_b_l1, 0, 0, 1, SCALE_K / 2, SCALE_K / 2, SCALE_K / 2);
+        scale_b_l1, 0, 0, N_ALIGN / CUBE_M, SCALE_K / 2, SCALE_K / 2, SCALE_K / 2);
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
-    asc_mmad_mx(c_l0, a_l0, b_l0, M, K, N, asc_unit_flag_mode::DISABLE, true, false, true);
+    asc_mmad_mx(c_l0, a_l0, b_l0, M, K_ALIGN, N, asc_unit_flag_mode::DISABLE, true, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_set_l0c_copy_nz_para(1, 0, 0);
-    asc_copy_l0c2gm(output, c_l0, N, M, N, M, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    asc_copy_l0c2gm(output, c_l0, N, M, N, M_ALIGN, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM,
+        asc_unit_flag_mode::DISABLE, QuantMode_t::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
     asc_sync_pipe(PIPE_ALL);
 }
 
@@ -260,9 +291,30 @@ int main()
 {
     std::vector<uint8_t> a(M * K), b(N * K), scale_a(M * SCALE_K, 127), scale_b(N * SCALE_K, 127);
     std::vector<float> output(M * N), golden(M * N);
-    for (uint32_t i = 0; i < M; ++i) a[i * K + i] = 0x38;
-    for (uint32_t i = 0; i < N; ++i) b[i * K + i] = 0x38;
-    for (uint32_t i = 0; i < M; ++i) golden[i * N + i] = 1.0f;
+    for (uint32_t row = 0; row < M; ++row) {
+        for (uint32_t k = 0; k < K; ++k) {
+            a[row * K + k] = (row + 2 * k) % 5 < 2 ? FP8_E4M3_ONE : FP8_E4M3_NEG_ONE;
+        }
+    }
+    for (uint32_t col = 0; col < N; ++col) {
+        for (uint32_t k = 0; k < K; ++k) {
+            b[col * K + k] = (3 * col + k) % 7 < 3 ? FP8_E5M2_ONE : FP8_E5M2_NEG_ONE;
+        }
+        for (uint32_t block = 0; block < SCALE_K; ++block) {
+            scale_b[col * SCALE_K + block] = static_cast<uint8_t>(126 + (col + block) % 3);
+        }
+    }
+    for (uint32_t row = 0; row < M; ++row) {
+        for (uint32_t col = 0; col < N; ++col) {
+            for (uint32_t k = 0; k < K; ++k) {
+                const float a_value = a[row * K + k] == FP8_E4M3_ONE ? 1.0f : -1.0f;
+                const float b_value = b[col * K + k] == FP8_E5M2_ONE ? 1.0f : -1.0f;
+                const float b_scale = std::ldexp(1.0f,
+                    static_cast<int32_t>(scale_b[col * SCALE_K + k / CUBE_K]) - 127);
+                golden[row * N + col] += a_value * b_value * b_scale;
+            }
+        }
+    }
     aclInit(nullptr);
     aclrtSetDevice(0);
     uint8_t *a_device = nullptr, *b_device = nullptr, *scale_a_device = nullptr, *scale_b_device = nullptr;
@@ -283,8 +335,14 @@ int main()
     print_row("MX output row 0", output);
     print_row("Golden row 0", golden);
     std::cout << "Scale exponent bytes: " << +scale_a[0] << ' ' << +scale_b[0] << std::endl;
-    const bool passed = output == golden;
-    std::cout << (passed ? "[Success] asc_mmad_mx applied unit MX scales."
+    bool passed = true;
+    for (uint32_t i = 0; i < output.size(); ++i) {
+        if (std::fabs(output[i] - golden[i]) >= 0.01f) {
+            passed = false;
+            break;
+        }
+    }
+    std::cout << (passed ? "[Success] asc_mmad_mx applied MX scales."
                          : "[Failed] asc_mmad_mx result mismatch.") << std::endl;
     aclrtFree(a_device); aclrtFree(b_device); aclrtFree(scale_a_device); aclrtFree(scale_b_device);
     aclrtFree(output_device);
