@@ -341,6 +341,10 @@ struct CcuKernelInfo {
     char kernelFuncName[64];
     // kernel函数
     void* kernelFunc;
+    // KFC Server调用的子任务函数
+    char callableTaskFuncName[64]{};
+    void* callableTaskFunc = nullptr;
+    u32 callableTaskPcArgOffset = 0;
     // KernelArg实例指针
     void* kernelArg;
     // kernel所需channel

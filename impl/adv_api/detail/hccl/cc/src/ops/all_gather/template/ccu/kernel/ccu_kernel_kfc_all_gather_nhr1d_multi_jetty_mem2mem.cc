@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
+#include "../../../../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -262,6 +263,25 @@ CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
     CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(RunNhr(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
+}
+
+CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
+    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
+    ccu::Variable token;
+    CCU_CHK_RET(LoadKfcCallArgs(param, token));
+    return CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
+        param[KFC_CONCURRENT_AG_NHR_INPUT], param[KFC_CONCURRENT_AG_NHR_OUTPUT], token,
+        param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE], param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE_PER_JETTY],
+        param[KFC_CONCURRENT_AG_NHR_LAST_SLICE_SIZE_PER_JETTY], param[KFC_CONCURRENT_AG_NHR_REPEAT_NUM_INV],
+        param[KFC_CONCURRENT_AG_NHR_INPUT_SLICE_STRIDE], param[KFC_CONCURRENT_AG_NHR_OUTPUT_SLICE_STRIDE],
+        param[KFC_CONCURRENT_AG_NHR_INPUT_REPEAT_STRIDE], param[KFC_CONCURRENT_AG_NHR_OUTPUT_REPEAT_STRIDE],
+        param[KFC_CONCURRENT_AG_NHR_INPUT_OUTPUT_EQUAL], param[KFC_CONCURRENT_AG_NHR_GO_SIZE_0],
+        param[KFC_CONCURRENT_AG_NHR_GO_SIZE_1], param[KFC_CONCURRENT_AG_NHR_GO_SIZE_2],
+        param[KFC_CONCURRENT_AG_NHR_GO_SIZE_3], kernelArg->channels, kernelArg->channelCount,
+        static_cast<uint32_t>(kernelArg->rankSize), kernelArg->rankId, kernelArg->jettyNum,
+        kernelArg->nhrStepInfoVector, kernelArg->nhrRank2ChannelIdx);
 }
 
 } // namespace mc2_ops_hccl

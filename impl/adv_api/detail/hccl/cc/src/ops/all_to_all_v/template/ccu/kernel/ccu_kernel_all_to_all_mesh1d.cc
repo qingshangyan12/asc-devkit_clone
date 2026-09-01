@@ -10,6 +10,7 @@
 
 #include "ccu_kernel_all_to_all_mesh1d.h"
 #include "ccu_kernel_alg_base.h"
+#include "../../../../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 
 namespace mc2_ops_hccl {
 
@@ -186,6 +187,18 @@ CcuResult CcuAlltoAllMesh1DKernel(
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D end");
 
     return CCU_SUCCESS;
+}
+
+CcuResult CcuAlltoAllMesh1DKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
+    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
+    ccu::Variable token;
+    CCU_CHK_RET(LoadKfcCallArgs(param, token));
+    return CcuAlltoAllMesh1DKernel(
+        param[1], param[2], token, param[3], param[4], param[5], param[6], param[7], param[8], param[9], param[10],
+        kernelArg->channels, kernelArg->channelCount, static_cast<uint32_t>(kernelArg->rankSize), kernelArg->rankId,
+        kernelArg->loadFromMem);
 }
 
 } // namespace mc2_ops_hccl

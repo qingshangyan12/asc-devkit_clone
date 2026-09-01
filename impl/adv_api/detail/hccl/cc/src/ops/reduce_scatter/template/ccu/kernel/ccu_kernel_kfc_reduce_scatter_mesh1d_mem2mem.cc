@@ -10,6 +10,7 @@
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
 #include "mc2_type.h"
+#include "../../../../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 
 namespace mc2_ops_hccl {
 using namespace hcomm;
@@ -449,5 +450,18 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem end");
 
     return CCU_SUCCESS;
+}
+
+CcuResult CcuReduceScatterMesh1DMem2MemKernel(CcuKernelArg arg)
+{
+    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
+    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
+    ccu::Variable token;
+    CCU_CHK_RET(LoadKfcCallArgs(param, token));
+    return CcuReduceScatterMesh1DMem2MemKernel(
+        param[1], param[2], token, param[3], param[4], param[13], param[14], param[15], param[16], param[17],
+        param[18], param[19], param[20], param[21], param[22], param[23], kernelArg->channels,
+        kernelArg->channelCount, static_cast<uint32_t>(kernelArg->rankSize), kernelArg->rankId,
+        kernelArg->opParam.DataDes.dataType, kernelArg->opParam.DataDes.outputType, kernelArg->opParam.reduceType);
 }
 } // namespace mc2_ops_hccl

@@ -23,6 +23,7 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
     ccu::Variable currentRankSliceInputOffset, ccu::Variable tmpRepeatNum, ccu::Variable inputRepeatStride,
     ccu::Variable outputRepeatStride, ccu::Variable lastSliceSize, ccu::Variable isInputOutputEqual,
     const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId);
+CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl
 
