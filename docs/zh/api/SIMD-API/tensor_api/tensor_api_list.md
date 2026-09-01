@@ -119,6 +119,12 @@
 | [fill](reg_vector_compute/data_padding/fill.md) | 将标量或源寄存器最低位元素广播并填充到目的寄存器。 |
 | [数据重排](reg_vector_compute/data_reorder/data_reorder.md) | 给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数。 |
 | [deinterleave（数据寄存器解交织）](reg_vector_compute/data_reorder/deinterleave.md) | 将两个源寄存器中的元素解交织到两个结果寄存器。 |
+| [operator+](reg_vector_compute/basic_arithmetic/operator_add.md) | 对两个操作数进行逐元素加法。 |
+| [operator-](reg_vector_compute/basic_arithmetic/operator_sub.md) | 对输入进行逐元素取负，或对两个操作数进行逐元素减法。 |
+| [operator*](reg_vector_compute/basic_arithmetic/operator_mul.md) | 对两个操作数进行逐元素乘法。 |
+| [max](reg_vector_compute/basic_arithmetic/max.md) | 返回两个操作数对应元素中的较大值。 |
+| [log](reg_vector_compute/basic_arithmetic/log.md) | 对输入进行逐元素自然对数计算。 |
+| [or](reg_vector_compute/logical_compute/or.md) | 对两个操作数进行逐元素按位或运算。 |
 
 ## 工具接口
 
