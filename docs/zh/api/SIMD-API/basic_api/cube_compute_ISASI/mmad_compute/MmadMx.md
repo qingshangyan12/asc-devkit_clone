@@ -31,6 +31,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：不支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadMx_res.md#id1 -->
 
 ### 传入bias的原型
 
@@ -61,6 +62,7 @@
 <!-- npu="9030" id18 -->
 - Kirin 9030：不支持
 <!-- end id18 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/MmadMx_res.md#id2 -->
 
 ## 功能说明
 
@@ -184,6 +186,7 @@ MmadMx的计算公式为：C=(scaleA⊗A)*(scaleB⊗B)+Bias，“⊗”表示广
 - 对于fp4场景A/B矩阵的起始地址需要按照512字节对齐，对于fp8场景A/B矩阵的起始地址需要按照1024字节对齐。
 - 左矩阵A/B对应的scale矩阵起始地址为：A/B矩阵起始对应地址/16。
 - 其他特殊场景约束可参考[Mmad接口约束说明](Mmad.md#约束说明)。
+- 边界值计算结果请见[MmadMx接口边界值汇总](../../../../appendix/mmad_mx_interface_boundary_value_summary.md)。
 
 ## 调用示例
 

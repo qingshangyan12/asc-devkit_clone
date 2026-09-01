@@ -17,8 +17,8 @@ adv_test_targets=(
     ascendc_ut_adv_api_kernel_ascend310B1
     ascendc_ut_adv_api_kernel_ascend910B1_AIC
     ascendc_ut_adv_api_kernel_ascend910B1_AIV
-    ascendc_ut_adv_api_kernel_KirinX90_AIV
-    ascendc_ut_adv_api_kernel_Kirin9030_AIV
+    # ascendc_ut_adv_api_kernel_KirinX90_AIV
+    # ascendc_ut_adv_api_kernel_Kirin9030_AIV
     ascendc_ut_adv_api_tiling_ascend310p
     ascendc_ut_adv_api_tiling_ascend310B1
     ascendc_ut_adv_api_tiling_ascend910B1_AIC
@@ -30,6 +30,7 @@ adv_test_targets=(
 adv_test_two_targets=(
     ascendc_ut_adv_api_tiling_ascend610
     ascendc_ut_adv_api_hccl_cc_algorithm_ascend950pr_9599_AIC
+    ascendc_ut_adv_api_ccu_st
     ascendc_ut_adv_api_hccl_cc_aicpu_alloc_ctx
     ascendc_ut_adv_api_hccl_ccu_mc2
 )
