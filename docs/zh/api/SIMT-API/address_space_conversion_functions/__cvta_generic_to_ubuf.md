@@ -68,10 +68,6 @@ SIMD与SIMT混合编程场景不支持使用该接口。
 
 SIMT编程场景：
 
-<!-- npu="950" id7 -->
-该示例中的`256`表示UB总容量，`32`表示Dcache容量，相关取值适用于Ascend 950PR/Ascend 950DT。
-<!-- end id7 -->
-
 ```cpp
 __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_ubuf(uint32_t* src, uint32_t total_length)
 {
@@ -82,10 +78,6 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_ubuf(uint32_t* s
     }
     ubuf_data[threadIdx.x] = src[idx];
     size_t addr_val = __cvta_generic_to_ubuf(ubuf_data + threadIdx.x);
-    if (addr_val > (256-32) * 1024) { // 256:UB总容量，32:Dcache容量
-        printf("UB(ubuf_data)溢出，偏移量为：%lu\n", addr_val);
-    } else {
-        printf("UB(ubuf_data)的偏移量为：%lu\n", addr_val);
-    }
+    printf("UB(ubuf_data)的地址值为：%lu\n", addr_val);
 }
 ```
