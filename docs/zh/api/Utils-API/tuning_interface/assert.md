@@ -144,6 +144,7 @@ ascendc_assert(expr, fmt, args...)
 
 - 每个AIV核在单次`asc_vf_call`执行期间使用2KB预留UB空间临时保存调测数据。同一次`asc_vf_call`中的`assert`、`ascendc_assert`、`printf`和`asc_dump`共享该空间。该空间中的数据传输完成后会被复用，因此上述接口产生的累计调测数据可以超过2KB。单条断言失败信息必须能完整保存在该空间中，否则该条信息不会打印，但接口仍会触发异常。
 - SIMD VF场景下，本接口需要使用2KB预留UB空间传递断言信息。开启`--cce-disable-asc-reserved-ubuf`选项后，本接口不可用。
+- SIMD VF场景下，`simd_printf_fifo_size_per_core`建议配置为3KB以上。配置过小时，打印数据量较大会导致断言失败信息不被打印，但接口仍会触发异常。
 
 ## 调用示例
 
