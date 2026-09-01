@@ -61,6 +61,8 @@ unsigned long long __mul_i32toi64(unsigned int x, unsigned int y)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelMul_i32toi64(long long* dst, int* x, int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -69,6 +71,8 @@ unsigned long long __mul_i32toi64(unsigned int x, unsigned int y)
     ```
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelMul_i32toi64(unsigned long long* dst, unsigned int* x, unsigned int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -79,6 +83,8 @@ unsigned long long __mul_i32toi64(unsigned int x, unsigned int y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelMul_i32toi64(__gm__ long long* dst, __gm__ int* x, __gm__ int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -87,6 +93,8 @@ unsigned long long __mul_i32toi64(unsigned int x, unsigned int y)
     ```
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelMul_i32toi64(__gm__ unsigned long long* dst, __gm__ unsigned int* x, __gm__ unsigned int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

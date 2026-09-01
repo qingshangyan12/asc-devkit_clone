@@ -65,6 +65,8 @@ inline unsigned long long int __float2ull_ru(const float x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void kernel__float2ull_ru(uint64_t* dst, float* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -75,6 +77,8 @@ inline unsigned long long int __float2ull_ru(const float x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel__float2ull_ru(__gm__ uint64_t* dst, __gm__ float* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

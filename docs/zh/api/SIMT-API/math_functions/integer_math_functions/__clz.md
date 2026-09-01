@@ -64,6 +64,8 @@ int __clz(long x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelClz(int* dst, int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -72,6 +74,8 @@ int __clz(long x)
     ```
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelClz(int* dst, long long* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -82,6 +86,8 @@ int __clz(long x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelClz(__gm__ int* dst, __gm__ int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -90,6 +96,8 @@ int __clz(long x)
     ```
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelClz(__gm__ int* dst, __gm__ long long* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

@@ -59,6 +59,8 @@ long long __mul64hi(long long x, long long y)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelMul64hi(long long* dst, long long* x, long long* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -69,6 +71,8 @@ long long __mul64hi(long long x, long long y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelMul64hi(__gm__ long long* dst, __gm__ long long* x,  __gm__ long long* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

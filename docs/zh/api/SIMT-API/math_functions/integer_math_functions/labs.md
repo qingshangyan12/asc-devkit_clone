@@ -56,6 +56,8 @@ inline long int labs(long int x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelLabs(long int* dst, long int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -66,6 +68,8 @@ inline long int labs(long int x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelLabs(__gm__ long int* dst, __gm__ long int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

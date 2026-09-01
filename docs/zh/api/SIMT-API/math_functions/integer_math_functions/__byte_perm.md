@@ -79,6 +79,8 @@ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelByte_perm(unsigned int* dst, unsigned int* x, unsigned int* y, unsigned int* s)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -89,6 +91,8 @@ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelByte_perm(__gm__ unsigned int* dst, __gm__ unsigned int* x, __gm__ unsigned int* y, __gm__ unsigned int* s)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

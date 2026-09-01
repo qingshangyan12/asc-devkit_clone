@@ -62,6 +62,8 @@ inline void asc_dcci_entire(void *dst)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void kernelDcci_entire(uint32_t* data, uint32_t* output) {
         // 线程块0的线程0进行数据写操作
         if (blockIdx.x == 0 && threadIdx.x == 0) {
@@ -83,6 +85,8 @@ inline void asc_dcci_entire(void *dst)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernelDcci_entire(__gm__ uint32_t* data, __gm__ uint32_t* output)
     {
         // 线程块0的线程0进行数据写操作

@@ -59,6 +59,8 @@ unsigned long long __umul64hi(unsigned long long x, unsigned long long y)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelUmul64hi(unsigned long long* dst, unsigned long long* x, unsigned long long* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -69,6 +71,8 @@ unsigned long long __umul64hi(unsigned long long x, unsigned long long y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelUmul64hi(__gm__ unsigned long long* dst, __gm__ unsigned long long* x, __gm__ unsigned long long* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

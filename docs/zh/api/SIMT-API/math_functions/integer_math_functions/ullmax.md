@@ -59,6 +59,8 @@ inline unsigned long long int ullmax(const unsigned long long int x, const unsig
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelUllmax(unsigned long long int* dst, unsigned long long int* x, unsigned long long int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -69,6 +71,8 @@ inline unsigned long long int ullmax(const unsigned long long int x, const unsig
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelUllmax(__gm__ unsigned long long int* dst, __gm__ unsigned long long int* x, __gm__ unsigned long long int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

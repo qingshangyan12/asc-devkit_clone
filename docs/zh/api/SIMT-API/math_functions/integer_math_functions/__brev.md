@@ -69,6 +69,8 @@ unsigned long __brev(unsigned long x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelBrev(unsigned int* dst, unsigned int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -77,6 +79,8 @@ unsigned long __brev(unsigned long x)
     ```
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelBrev(unsigned long long* dst, unsigned long long* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -87,6 +91,8 @@ unsigned long __brev(unsigned long x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelBrev(__gm__ unsigned int* dst, __gm__ unsigned int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -95,6 +101,8 @@ unsigned long __brev(unsigned long x)
     ```
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelBrev(__gm__ unsigned long long* dst, __gm__ unsigned long long* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

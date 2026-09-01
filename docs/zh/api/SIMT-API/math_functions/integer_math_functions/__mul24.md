@@ -57,6 +57,8 @@ int __mul24(int x, int y)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelMul32(int* dst, int* x, int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -67,6 +69,8 @@ int __mul24(int x, int y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelMul32(__gm__ int* dst, __gm__ int* x, __gm__ int* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

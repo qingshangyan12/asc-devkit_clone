@@ -56,6 +56,8 @@ inline long long int llabs(long long int x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __global__ __launch_bounds__(1024) void KernelLlabs(long long int* dst, long long int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -66,6 +68,8 @@ inline long long int llabs(long long int x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelLlabs(__gm__ long long int* dst, __gm__ long long int* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

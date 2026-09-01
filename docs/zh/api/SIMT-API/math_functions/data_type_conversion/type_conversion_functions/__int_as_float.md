@@ -67,6 +67,8 @@ inline float __int_as_float(const int x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __global__ __launch_bounds__(1024) void kernel__int_as_float(float* dst, int32_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -77,6 +79,8 @@ inline float __int_as_float(const int x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/device_functions.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel__int_as_float(__gm__ float* dst, __gm__ int32_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
