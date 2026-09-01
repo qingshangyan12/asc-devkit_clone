@@ -205,13 +205,13 @@ __aicore__ inline constexpr auto Crd2Idx(const CoordType& coord, const LayoutTyp
 }
 
 template <typename LayoutPattern, typename TraitType = Std::ignore_t, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
+__aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args)
 {
     return make_frame_layout<LayoutPattern, TraitType>(args...);
 }
 
 template <typename LayoutPattern, size_t C0Element, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
+__aicore__ inline decltype(auto) MakeFrameLayout(const Args&... args)
 {
     return make_frame_layout<LayoutPattern, C0Element>(args...);
 }
@@ -236,13 +236,13 @@ __aicore__ inline auto MakeMemPtr(Addr address)
 }
 
 template <typename PtrPattern, typename Iterator, asc::te::enable_make_hardware_ptr<PtrPattern, Iterator> = 0>
-__aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
+__aicore__ inline auto MakeMemPtr(Iterator iterator)
 {
     return make_mem_ptr<PtrPattern>(iterator);
 }
 
 template <typename Iterator, asc::te::enable_make_ptr_by_iter<Iterator> = 0>
-__aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
+__aicore__ inline auto MakeMemPtr(Iterator iterator)
 {
     return make_mem_ptr(iterator);
 }
