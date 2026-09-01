@@ -50,8 +50,8 @@ struct base_tensor {
 
     static constexpr int rank = LayoutT::rank_size;
 
-    __aicore__ inline __callee__ base_tensor();
-    __aicore__ inline __callee__ base_tensor(const EngineT& engine, const LayoutT& layout);
+    __aicore__ inline constexpr base_tensor();
+    __aicore__ inline constexpr base_tensor(const EngineT& engine, const LayoutT& layout);
 
     __aicore__ inline constexpr decltype(auto) tensor() const;
     __aicore__ inline constexpr decltype(auto) engine() const;
@@ -120,7 +120,7 @@ struct global_tensor : public base_tensor<EngineT, LayoutT> {
     using layoutType = typename tensor_api_base::layout_type;
     using tensor_api_base::tensor_api_base;
 
-    __aicore__ inline global_tensor();
+    __aicore__ inline constexpr global_tensor();
     __aicore__ inline constexpr cache_mode get_cache_mode() const;
     __aicore__ inline constexpr void set_l2_cache_hint(cache_mode mode);
     __aicore__ inline constexpr void SetL2CacheHint(AscendC::Te::CacheMode mode);

@@ -139,7 +139,7 @@ using MutexID = uint8_t;
 class Mutex {
 public:
     template <pipe_t pipe>
-    static __aicore__ __callee__ inline void Lock(MutexID id)
+    static __aicore__ inline void Lock(MutexID id)
     {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
                               (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
@@ -151,7 +151,7 @@ public:
     }
 
     template <pipe_t pipe>
-    static __aicore__ __callee__ inline void Unlock(MutexID id)
+    static __aicore__ inline void Unlock(MutexID id)
     {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
                               (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
