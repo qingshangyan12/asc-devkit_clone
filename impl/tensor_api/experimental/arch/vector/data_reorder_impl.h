@@ -26,8 +26,8 @@ namespace experimental {
 namespace detail {
 template <typename T>
 inline constexpr bool is_data_reorder_support_type = AscendC::Std::is_one_of_v<
-    T, uint8_t, int8_t, fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, hifloat8_t, uint16_t, int16_t, half, bfloat16_t,
-    uint32_t, int32_t, float>;
+    T, uint8_t, int8_t, fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, hifloat8_t, uint16_t, int16_t, half, bfloat16_t, uint32_t,
+    int32_t, float>;
 } // namespace detail
 
 template <typename T>
