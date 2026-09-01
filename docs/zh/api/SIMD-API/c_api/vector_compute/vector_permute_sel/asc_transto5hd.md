@@ -79,6 +79,7 @@ PIPE_V
 - 操作数地址对齐约束请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
 - `dst`和`src`不能传入相同的地址寄存器起始位置，即目的地址寄存器对和源地址寄存器对不能重叠。
+- 为获得更优性能，建议`dst`和`src`传入编译期常量，例如直接传入VA0、VA2，或传入由VA0、VA2初始化的局部变量。编译器可在内联后消除地址寄存器分发分支；传入运行时变量时会保留分支判断。
 - 进行NCHW格式到NC1HWC0格式的转换时，一般用法是将src/dst中的每个元素配置为每个HW平面的起点。
 - 为了性能更优，数据类型位宽为8位时建议先固定dst_high_half/src_high_half，再HW方向Repeat后，再改变dst_high_half/src_high_half。
 
