@@ -69,4 +69,4 @@ asc::te::experimental::store(dst, asc::te::make_coord(offset), dstReg);
 
 ## 特殊接口说明
 
-- `interleave`、`deinterleave`等重排接口可能重新生成输出mask，不遵循普通多输入计算的传递规则，具体以对应接口说明为准。
+- `deinterleave`等重排接口可能重新生成输出mask，不遵循普通多输入计算的传递规则，具体以对应接口说明为准。
