@@ -78,8 +78,7 @@ bool g_registered = []() {
     return true;
 }();
 
-void FillKfcQueue(
-    RankMemory& memory, uint32_t rank, uint64_t sliceSize, uint64_t inputAddress, uint64_t outputAddress)
+void FillKfcQueue(RankMemory& memory, uint32_t rank, uint64_t sliceSize, uint64_t inputAddress, uint64_t outputAddress)
 {
     memory.parameter.assign(KFC_PARAMETER_WORDS, 0U);
     if (sliceSize == 0U) {
@@ -145,8 +144,7 @@ ScenarioData BuildAllGatherKfcServerScenario(const CcuStScenario& scenario, cons
             memory.input[SOURCE_BASE_OFFSET + byte] = static_cast<uint8_t>(17U + rank * 41U + byte);
         }
 
-        FillKfcQueue(
-            memory, rank, sliceSize, memory.InputAddress() + SOURCE_BASE_OFFSET, memory.OutputAddress());
+        FillKfcQueue(memory, rank, sliceSize, memory.InputAddress() + SOURCE_BASE_OFFSET, memory.OutputAddress());
         data.launches[rank] = RankLaunch{handles[rank], PrepareKfcServerTaskArgs(memory, rank), &memory};
     }
     return data;
