@@ -11,17 +11,17 @@
 <!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910" id4 -->
+- Atlas 训练系列产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品 AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas 推理系列产品 Vector Core：不支持
 <!-- end id6 -->
-<!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310b" id7 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -30,7 +30,7 @@
 
 Tensor API通过`copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的bias数据搬运到BiasTable Buffer，作为mmad计算中的bias输入。
 
-接口支持完整Tensor搬运，也支持通过`dst_coord`、`src_coord`和`copy_shape`指定目的Tensor中的起始坐标、源Tensor中的起始坐标和搬运区域的形状，执行区域搬运。
+接口支持完整Tensor搬运，也支持通过`dst_coord`、`src_coord`和`copy_shape`指定目的张量中的起始坐标、源张量中的起始坐标和搬运区域的形状，执行区域搬运。连续搬运时源张量和目的张量可使用`nd_layout_ptn`或`nd_ext_layout_ptn`；高维切分和Batch搬运通过Layout的Stride和Batch轴表达。
 
 接口支持batch模式。batch模式用于一次完成多块bias数据的搬运。layout在原layout最外层增加Batch维度，可通过`make_frame_layout<nd_layout_ptn>(batch, 1, n)`或`make_frame_layout<nd_ext_layout_ptn>(batch, 1, n)`构造。
 
@@ -69,7 +69,7 @@ Tensor API通过`copy`接口统一执行不同通路数据搬运。该接口用�
 
 ## 参数说明
 
-**表1**  模板参数说明
+**表 1**  模板参数说明
 
 | 参数名 | 描述 |
 | :--- | :--- |
@@ -82,7 +82,7 @@ Tensor API通过`copy`接口统一执行不同通路数据搬运。该接口用�
 | CopyOperation | 搬运操作对象类型。 |
 | CopyTrait | 搬运trait对象类型。 |
 
-**表2**  copy接口参数说明
+**表 2**  `copy`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -93,7 +93,7 @@ Tensor API通过`copy`接口统一执行不同通路数据搬运。该接口用�
 | src_coord | 输入 | 搬运区域在源张量中的起始坐标，也可传入`zero_coord`。 |
 | copy_shape | 输入 | 搬运区域的形状，用于指定搬运区域的大小。 |
 
-**表3**  make_copy接口参数说明
+**表 3**  `make_copy`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -134,7 +134,7 @@ struct l1_to_biastable_trait_default {
 
 支持的目的张量和源张量的数据类型组合如下：
 
-**表4**  支持的数据类型组合
+**表 4**  支持的数据类型组合
 
 | 目的张量数据类型 | 源张量数据类型 |
 | :--- | :--- |
@@ -149,11 +149,14 @@ struct l1_to_biastable_trait_default {
 
 ## 约束说明
 
-- 源张量内存地址和大小需要满足32Byte对齐要求。
-- 目的张量内存地址和大小需要满足64Byte对齐要求。
-- 由于BiasTable Buffer大小为4KB，因此每次搬运最多4KB数据。
-- batch模式要求源张量和目的张量Batch数量一致。
-- batch模式下，如果Global Memory上的shape大小非对齐，由于L1 Buffer和BiasTable Buffer上有数据对齐要求，源张量和目的张量列方向shape大小必须按32Byte对齐。
+- 源张量必须位于`location::l1`，目的张量必须位于`location::bias`；源、目的Layout均必须为`nd_layout_ptn`或`nd_ext_layout_ptn`。
+- 源张量和目的张量的数据类型组合必须符合数据类型表，不能将任意类型转换为Bias类型。
+- 源张量内存地址和大小需要满足32B对齐，目的张量内存地址和大小需要满足64B对齐。
+- 由于BiasTable Buffer大小为4KB，因此每次搬运最多4KB数据；区域搬运也必须满足该容量限制。
+- 高维切分搬运时，搬运长度、源Stride和目的Stride需满足搬运指令的字段范围和对齐要求。
+- Batch模式要求源张量和目的张量的Batch数量一致。如果源数据Shape大小未对齐，考虑到L1 Buffer和BiasTable Buffer的对齐要求，源张量和目的张量的列方向Shape必须分别按照对应元素大小进行32B对齐；示例中的`ceil_align`结果必须覆盖实际搬运区域。
+- `src_coord`、`dst_coord`和`copy_shape`的维度必须匹配对应张量，区域不能越界。
+- 不支持的Layout组合会在编译期触发路由静态断言；调试构建会检查Layout、容量、Batch匹配和搬运大小。
 
 ## 调用示例
 

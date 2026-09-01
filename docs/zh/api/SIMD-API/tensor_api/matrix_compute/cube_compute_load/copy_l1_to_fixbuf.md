@@ -11,17 +11,17 @@
 <!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910" id4 -->
+- Atlas 训练系列产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品 AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas 推理系列产品 Vector Core：不支持
 <!-- end id6 -->
-<!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310b" id7 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -30,7 +30,9 @@
 
 Tensor API通过`copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的量化数据搬运到Fixpipe Buffer。量化数据可用于L0C输出到GM/Unified Buffer（UB）时做随路量化。
 
-接口支持完整Tensor搬运，也支持通过`dst_coord`、`src_coord`和`copy_shape`指定目的Tensor中的起始坐标、源Tensor中的起始坐标和搬运区域的形状，执行区域搬运。
+接口支持完整Tensor搬运，也支持通过`dst_coord`、`src_coord`和`copy_shape`指定目的张量中的起始坐标、源张量中的起始坐标和搬运区域的形状，执行区域搬运。
+
+连续搬运用于一次搬运连续的Fixpipe参数；当参数在L1 Buffer中按Stride非连续存放时，通过ND Layout表达高维切分。该接口只准备Fixpipe参数，实际量化、激活和结果搬出由后续Fixpipe通路完成。
 
 ## 函数原型
 
@@ -68,7 +70,7 @@ Tensor API通过`copy`接口统一执行不同通路数据搬运。该接口用�
 
 ## 参数说明
 
-**表1**  模板参数说明
+**表 1**  模板参数说明
 
 | 参数名 | 描述 |
 | :--- | :--- |
@@ -81,7 +83,7 @@ Tensor API通过`copy`接口统一执行不同通路数据搬运。该接口用�
 | CopyOperation | 搬运操作对象类型。 |
 | CopyTrait | 搬运trait对象类型。 |
 
-**表2**  `copy`接口参数说明
+**表 2**  `copy`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -92,7 +94,7 @@ Tensor API通过`copy`接口统一执行不同通路数据搬运。该接口用�
 | src_coord | 输入 | 搬运区域在源张量中的起始坐标，也可传入`zero_coord`。 |
 | copy_shape | 输入 | 搬运区域的形状，用于指定搬运区域的大小。 |
 
-**表3**  `make_copy`接口参数说明
+**表 3**  `make_copy`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -132,7 +134,7 @@ struct l1_to_fixbuf_trait_default {
 
 ## 数据类型
 
-源张量和目的张量的数据类型要求是`uint64_t`。
+源张量和目的张量的数据类型必须为`uint64_t`，用于存放后续Fixpipe搬出所需的量化、激活等参数。
 
 ## 返回值说明
 
@@ -140,9 +142,14 @@ struct l1_to_fixbuf_trait_default {
 
 ## 约束说明
 
-- 源Tensor内存地址和大小需要满足32Byte对齐要求。
-- 目的Tensor内存地址和大小需要满足128Byte对齐要求。
-- 由于Fixpipe Buffer大小为4KB，因此每次搬运最多4KB数据。
+- 源张量必须位于`location::l1`，目的张量必须位于`location::fixbuf`；源、目的Layout均必须为`nd_layout_ptn`或`nd_ext_layout_ptn`。
+- 源张量和目的张量的数据类型必须为`uint64_t`，且区域Shape、元素数量和存储容量必须匹配。
+- 源张量内存地址和大小需要满足32B对齐，目的张量内存地址和大小需要满足128B对齐。
+- Fixpipe Buffer容量为4KB，每次搬运的数据量不能超过4KB。
+- 高维切分搬运时，块数、块长度和源/目的Stride必须满足搬运指令字段范围和对齐要求。
+- `src_coord`、`dst_coord`和`copy_shape`的维度必须匹配对应张量，区域不能越界。
+- 本接口只搬运Fixpipe参数，不执行量化、反量化或ReLU；参数内容必须满足后续Fixpipe接口的格式要求。
+- 不支持的Layout组合会在编译期触发路由静态断言；调试构建会检查Layout、容量和搬运大小。
 
 ## 调用示例
 
