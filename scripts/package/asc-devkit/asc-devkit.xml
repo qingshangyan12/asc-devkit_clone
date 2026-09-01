@@ -47,6 +47,8 @@
         <path value="$(TARGET_ENV)/pkg_inc" install_softlink="pkg_inc"/>
         <path value="$(TARGET_ENV)/pkg_inc/asc"/>
         <path value="$(TARGET_ENV)/pkg_inc/asc/hccl"/>
+        <path value="$(TARGET_ENV)/pkg_inc/asccomm"/>
+        <path value="$(TARGET_ENV)/pkg_inc/asccomm/hcomm"/>
         <path value="$(TARGET_ENV)/ascendc" install_softlink="compiler/ascendc"/>
         <path value="$(TARGET_ENV)/ascendc/include"/>
         <path value="$(TARGET_ENV)/ascendc/include/basic_api"/>
@@ -71,6 +73,8 @@
         <path value="$(TARGET_ENV)/asc/include/adv_api" install_softlink="$(TARGET_ENV)/tikcpp/tikcfw/include/adv_api;$(TARGET_ENV)/include/ascendc/include/adv_api;$(TARGET_ENV)/tikcpp/tikcfw/lib;$(TARGET_ENV)/ascendc/include/highlevel_api/lib;$(TARGET_ENV)/include/ascendc/highlevel_api/lib"/>
         <path value="$(TARGET_ENV)/asc/include/adv_api/hccl"/>
         <path value="$(TARGET_ENV)/asc/include/comm_api"/>
+        <path value="$(TARGET_ENV)/asc/include/comm_api/ccu"/>
+        <path value="$(TARGET_ENV)/asc/include/comm_api/ccu/hcomm"/>
         <path value="$(TARGET_ENV)/asc/impl"/>
         <path value="$(TARGET_ENV)/asc/impl/adv_api"/>
         <path value="$(TARGET_ENV)/asc/impl/comm_api"/>
@@ -208,6 +212,14 @@
     </file_info>
     <file_info value="acl_rt"  copy_type="delivery" src_path="lib/host" dst_path="$(TARGET_ENV)/include/acl" install_path="$(TARGET_ENV)/include/acl" install_mod="440">
         <file value="acl_rt_compile.h"/>
+    </file_info>
+
+    <!-- asc-comm 数据面：CCU 动态库与 hcomm 交互头，由 cmake install 落 staging 后经此处声明进 filelist.csv；公共 DSL 头由 comm_api 条目统一收集 -->
+    <file_info value="asccomm_ccu" copy_type="delivery" src_path="lib/host" dst_path="$(TARGET_ENV)/lib64" install_path="$(TARGET_ENV)/lib64" install_type="all" install_mod="440">
+        <file value="libasccomm_ccu_dataplane.so" file_type="shared"/>
+    </file_info>
+    <file_info value="asccomm_hcomm_headers" copy_type="delivery" src_path="lib/host/pkg_inc" dst_path="$(TARGET_ENV)/pkg_inc" install_path="$(TARGET_ENV)/pkg_inc" install_type="all" install_mod="440">
+        <file value="asccomm" entity="true"/>
     </file_info>
 
 </config>
