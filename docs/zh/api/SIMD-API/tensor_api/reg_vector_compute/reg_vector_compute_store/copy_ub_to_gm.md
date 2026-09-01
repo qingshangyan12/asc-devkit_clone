@@ -1,4 +1,4 @@
-# copy（Unified Buffer到Global Memory非对齐数据搬运）
+# copy（Unified Buffer到Global Memory的数据搬运）
 
 > [!NOTE]说明
 > 本接口为试验接口，在后续版本中可能会调整或改进，不保证后续兼容性。请开发者在使用过程中关注后续版本更新。

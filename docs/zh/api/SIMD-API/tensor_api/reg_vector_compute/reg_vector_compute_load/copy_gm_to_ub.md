@@ -1,4 +1,4 @@
-# copy（Global Memory到Unified Buffer高维切分数据搬运）
+# copy（Global Memory到Unified Buffer的数据搬运）
 
 > [!NOTE]说明
 > 本接口为试验接口，在后续版本中可能会调整或改进。请开发者在使用过程中关注后续版本更新。
