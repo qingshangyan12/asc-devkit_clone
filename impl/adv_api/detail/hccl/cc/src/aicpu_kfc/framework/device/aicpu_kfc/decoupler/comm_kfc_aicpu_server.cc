@@ -17,7 +17,6 @@
 #include "hcomm_device_profiling_dl.h"
 #include "log.h"
 #include "common/aicpu_kfc_utils.h"
-#include "profiling_manager_device.h"
 #ifndef MC2_SERVER_ONLY
 #include "hccl_mc2_ex.h"
 #include "framework/aicpu_communicator.h"
@@ -230,11 +229,6 @@ HcclResult BuildOpenDfxOpInfo(
         static_cast<unsigned long long>(dfxOpInfo.outputMemAddr),
         static_cast<unsigned long long>(dfxOpInfo.outputMemSize));
     return HCCL_SUCCESS;
-}
-
-bool IsOpenProfilingEnabled()
-{
-    return dfx::ProfilingManager::GetProfL0State() || dfx::ProfilingManager::GetProfL1State();
 }
 
 u32 ReadAicpuOrderDfxValue(u64 addr)
@@ -664,8 +658,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
 
-    const bool profilingEnabled =
-        execCtx->resourceType == ServerExecResourceType::NEXT_AICPU && IsOpenProfilingEnabled();
+    const bool useHcommProfilingLifecycle = execCtx->resourceType == ServerExecResourceType::NEXT_AICPU;
     bool commAcquired = false;
     std::string acquiredCommName{};
     bool profilingStarted = false;
@@ -721,7 +714,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
                 ret = HcclDfxRegOpInfoByCommId(
                     const_cast<char*>(dfxParam->commName), reinterpret_cast<void*>(&dfxOpInfo));
             }
-            if (ret == HCCL_SUCCESS && profilingEnabled) {
+            if (ret == HCCL_SUCCESS && useHcommProfilingLifecycle) {
                 ret = HcommProfilingReportKernelStartTask(execCtx->mainThread, execCtx->commName.c_str());
                 profilingStarted = (ret == HCCL_SUCCESS);
             }
