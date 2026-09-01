@@ -68,6 +68,7 @@ add_library(${HCCL_CHECKER_SELECTOR_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/selector/reduce_scatter_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoall_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
+    ${HCCL_DEV_BASE}/src/ops/all_reduce/selector/all_reduce_auto_selector.cc
 )
 
 target_include_directories(${HCCL_CHECKER_SELECTOR_TARGET} PRIVATE
@@ -108,6 +109,8 @@ add_library(${HCCL_CHECKER_EXECUTOR_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr.cc
     ${HCCL_DEV_BASE}/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
+
+    ${HCCL_DEV_BASE}/src/ops/all_reduce/executor/ins_v2_all_reduce_parallel_executor.cc
 
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/executor/ins_v2_all_to_all_concurrent_executor.cc
@@ -202,6 +205,7 @@ target_sources(${HCCL_CHECKER_KERNEL_TARGET} PRIVATE
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/selector/reduce_scatter_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoall_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
+    ${HCCL_DEV_BASE}/src/ops/all_reduce/selector/all_reduce_auto_selector.cc
 )
 
 target_include_directories(${HCCL_CHECKER_KERNEL_TARGET} PRIVATE
