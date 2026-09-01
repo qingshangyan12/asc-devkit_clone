@@ -104,10 +104,14 @@ public:
             .Format({ge::FORMAT_ND, ge::FORMAT_ND});
 
         this->SetInferShape(ge::InferShape).SetInferDataType(ge::InferDataType);
-        this->AICore()
-            .SetTiling(optiling::TilingFunc)
-            .SetGenSimplifiedKey(optiling::GenSimplifiedKeyFunc)
-            .AddConfig("ascend910b");
+        auto &aicore = this->AICore();
+        aicore.SetTiling(optiling::TilingFunc);
+#if defined(OP_TILING_LIB)
+        if (&OpAICoreDef::SetGenSimplifiedKey != nullptr) {
+            aicore.SetGenSimplifiedKey(optiling::GenSimplifiedKeyFunc);
+        }
+#endif
+        aicore.AddConfig("ascend910b");
     }
 };
 OP_ADD(AddCustomTemplate);
