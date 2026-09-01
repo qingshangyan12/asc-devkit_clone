@@ -91,6 +91,20 @@ enum class asc_position_quarter_mode {
     DISPERSE_FOURTH_QUARTER
 };
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+enum asc_cast_round_mode : uint8_t {
+    ASC_CAST_RN = 0,
+    ASC_CAST_RNA,
+    ASC_CAST_RD,
+    ASC_CAST_RU,
+    ASC_CAST_RZ,
+    ASC_CAST_RO,
+    ASC_CAST_RH
+};
+
+enum asc_cast_saturation_mode : uint8_t { ASC_CAST_NO_SAT = 0, ASC_CAST_SAT };
+#endif
+
 enum class asc_dual_dst_mode : uint8_t { DUAL_DST_DISABLE = 0, DUAL_DST_SPLIT_M = 1, DUAL_DST_SPLIT_N = 2 };
 
 enum class asc_unit_flag_mode : uint8_t { DISABLE = 0, ENABLE_KEEP = 2, ENABLE_UPDATE = 3 };

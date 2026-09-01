@@ -573,7 +573,7 @@ __aicore__ inline void asc_half2uint8_rz(
 __aicore__ inline void asc_half2uint8_rz(__ubuf__ uint8_t* dst, __ubuf__ half* src, uint32_t count);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-+__simd_callee__ inline void asc_cast(vector_bfloat16_t& dst, vector_float src, vector_bool mask);
+__simd_callee__ inline void asc_cast(vector_bfloat16_t& dst, vector_float src, vector_bool mask);
 __simd_callee__ inline void asc_cast(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask);
 __simd_callee__ inline void asc_cast(vector_bfloat16_t& dst, vector_fp4x2_e2m1_t src, vector_bool mask);
 __simd_callee__ inline void asc_cast(vector_bfloat16_t& dst, vector_half src, vector_bool mask);
@@ -620,12 +620,122 @@ __simd_callee__ inline void asc_cast(vector_uint8_t& dst, vector_int16_t src, ve
 __simd_callee__ inline void asc_cast(vector_uint8_t& dst, vector_int32_t src, vector_bool mask);
 __simd_callee__ inline void asc_cast(vector_uint8_t& dst, vector_uint16_t src, vector_bool mask);
 __simd_callee__ inline void asc_cast(vector_uint8_t& dst, vector_uint32_t src, vector_bool mask);
-__simd_callee__ inline void asc_cast(
-    vector_float& dst, vector_half src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(vector_float& dst, vector_half src, vector_bool mask, asc_position_mode src_pos);
 __simd_callee__ inline void asc_cast(
     vector_int16_t& dst, vector_float src, vector_bool mask, asc_position_mode dst_pos);
 __simd_callee__ inline void asc_cast(
     vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask, asc_position_quarter_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask, asc_position_quarter_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_bfloat16_t& dst, vector_fp4x2_e2m1_t src, vector_bool mask, asc_position_quarter_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_float& dst, vector_bfloat16_t src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask, asc_position_quarter_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_float& dst, vector_hifloat8_t src, vector_bool mask, asc_position_quarter_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_float& dst, vector_int16_t src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_half& dst, vector_hifloat8_t src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(vector_half& dst, vector_int8_t src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(vector_half& dst, vector_uint8_t src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_int16_t& dst, vector_int8_t src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_int32_t& dst, vector_int16_t src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_int32_t& dst, vector_int8_t src, vector_bool mask, asc_position_quarter_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_int64_t& dst, vector_int32_t src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_uint16_t& dst, vector_uint8_t src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_uint32_t& dst, vector_int16_t src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_uint32_t& dst, vector_uint16_t src, vector_bool mask, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_uint32_t& dst, vector_uint8_t src, vector_bool mask, asc_position_quarter_mode src_pos);
+
+__simd_callee__ inline void asc_cast(
+    vector_bfloat16_t& dst, vector_float src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode, asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_bfloat16_t& dst, vector_half src, vector_bool mask, asc_cast_round_mode round_mode);
+__simd_callee__ inline void asc_cast(
+    vector_float& dst, vector_int32_t src, vector_bool mask, asc_cast_round_mode round_mode);
+__simd_callee__ inline void asc_cast(
+    vector_float& dst, vector_int64_t src, vector_bool mask, asc_cast_round_mode round_mode, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask, asc_cast_saturation_mode saturation_mode,
+    asc_position_quarter_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_fp8_e5m2_t& dst, vector_float src, vector_bool mask, asc_cast_saturation_mode saturation_mode,
+    asc_position_quarter_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_half& dst, vector_bfloat16_t src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode);
+__simd_callee__ inline void asc_cast(
+    vector_half& dst, vector_float src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode, asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_hifloat8_t& dst, vector_float src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode, asc_position_quarter_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_hifloat8_t& dst, vector_half src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode, asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_int16_t& dst, vector_float src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode, asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_int16_t& dst, vector_half src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode);
+__simd_callee__ inline void asc_cast(
+    vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_int32_t& dst, vector_float src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode);
+__simd_callee__ inline void asc_cast(
+    vector_int32_t& dst, vector_half src, vector_bool mask, asc_cast_round_mode round_mode, asc_position_mode src_pos);
+__simd_callee__ inline void asc_cast(
+    vector_int64_t& dst, vector_float src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode, asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_int8_t& dst, vector_half src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode, asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_uint8_t& dst, vector_half src, vector_bool mask, asc_cast_round_mode round_mode,
+    asc_cast_saturation_mode saturation_mode, asc_position_mode dst_pos);
+
+__simd_callee__ inline void asc_cast(
+    vector_int16_t& dst, vector_int32_t src, vector_bool mask, asc_cast_saturation_mode saturation_mode,
+    asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_int16_t& dst, vector_uint32_t src, vector_bool mask, asc_cast_saturation_mode saturation_mode,
+    asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_int32_t& dst, vector_int64_t src, vector_bool mask, asc_cast_saturation_mode saturation_mode,
+    asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_uint16_t& dst, vector_int32_t src, vector_bool mask, asc_cast_saturation_mode saturation_mode,
+    asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_uint16_t& dst, vector_uint32_t src, vector_bool mask, asc_cast_saturation_mode saturation_mode,
+    asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_uint8_t& dst, vector_int16_t src, vector_bool mask, asc_cast_saturation_mode saturation_mode,
+    asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_uint8_t& dst, vector_int32_t src, vector_bool mask, asc_cast_saturation_mode saturation_mode,
+    asc_position_quarter_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_uint8_t& dst, vector_uint16_t src, vector_bool mask, asc_cast_saturation_mode saturation_mode,
+    asc_position_mode dst_pos);
+__simd_callee__ inline void asc_cast(
+    vector_uint8_t& dst, vector_uint32_t src, vector_bool mask, asc_cast_saturation_mode saturation_mode,
+    asc_position_quarter_mode dst_pos);
 #endif
 
 #endif
