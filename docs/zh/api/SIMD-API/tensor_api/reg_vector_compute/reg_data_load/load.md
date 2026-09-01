@@ -1,6 +1,6 @@
-# load<a name="ZH-CN_TOPIC_0000002000000032"></a>
+# load
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -24,7 +24,7 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
 头文件路径为：`"tensor_api/experimental/arch/vector/reg_data_load.h"`，命名空间为`asc::te::experimental`。
 
@@ -37,7 +37,7 @@
 
 `deintlv`模式使用双目的操作数重载，其他模式使用返回值重载。
 
-## 函数原型<a name="section620mcpsimp"></a>
+## 函数原型
 
 - 单目的操作数，指定坐标：
 
@@ -80,9 +80,9 @@
                                      reg_tensor<RegDataType>& dst1)
     ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明
 
-**表 1** 模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -91,7 +91,7 @@
 | `Coord` | 源Tensor的坐标类型，由函数实参自动推导。 |
 | `RegDataType` | 双目的操作数重载的寄存器元素类型，由`dst0`和`dst1`自动推导，必须与源Tensor的元素类型一致。 |
 
-**表 2** 参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -102,7 +102,7 @@
 
 <a id="表3-load_sideband_mode参数说明"></a>
 
-**表 3** `load_sideband_mode`参数说明
+**表3** `load_sideband_mode`参数说明
 
 | 取值 | 含义 | 搬入起始地址对齐约束（Byte） |
 | --- | --- | --- |
@@ -113,7 +113,7 @@
 | `load_sideband_mode::unpack4` | 4倍展开模式，从UB读取VL/4数据量，在每个源元素后补三个0，展开为VL数据量。 | min(32, VL/4) |
 | `load_sideband_mode::upsample` | 2倍上采样模式，从UB读取VL/2数据量，每个源元素在目的寄存器中重复两次。 | min(32, VL/2) |
 
-## 数据类型<a name="section630mcpsimp"></a>
+## 数据类型
 
 Tensor元素类型与寄存器元素类型保持一致。不同模式支持的数据类型如下，未列出的类型或模式组合会产生编译期错误。
 
@@ -125,12 +125,12 @@ Tensor元素类型与寄存器元素类型保持一致。不同模式支持的�
 | `unpack` | 8bit、16bit和32bit元素类型，包括对应位宽的整数、浮点和打包4bit类型 |
 | `unpack4` | 8bit元素类型，包括`int8_t`、`uint8_t`、`hifloat8_t`、三种FP8类型和三种打包4bit类型 |
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 返回值说明
 
 - 单目的操作数重载返回`reg_tensor<typename Tensor::data_type>`，其`reg`成员保存搬入结果。
 - 双目的操作数重载无返回值，搬入结果写入`dst0.reg`和`dst1.reg`。
 
-## 约束说明<a name="section650mcpsimp"></a>
+## 约束说明
 
 - 仅支持位于UB的Tensor。
 - 搬入起始地址必须满足[表3](#表3-load_sideband_mode参数说明)中的对齐约束。
@@ -139,7 +139,7 @@ Tensor元素类型与寄存器元素类型保持一致。不同模式支持的�
 - 搬入接口只初始化返回对象或目的对象的`reg`成员，不初始化`mask`成员。将结果用于读取`mask`的寄存器计算或`store`模式前，必须调用`with_mask`绑定有效mask。
 - 寄存器数据搬入应在`__simd_vf__`函数或`__simd_callee__`函数中完成。
 
-## 调用示例<a name="section660mcpsimp"></a>
+## 调用示例
 
 ### 正常搬入
 

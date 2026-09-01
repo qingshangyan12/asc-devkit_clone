@@ -1,6 +1,6 @@
-# reg_pair<a name="ZH-CN_TOPIC_0000002000000018"></a>
+# reg_pair
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -24,13 +24,13 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
 头文件路径为：`"tensor_api/arch/vector/experimental/reg_tensor.h"`，命名空间为`asc::te::experimental`。
 
 保存两个相同元素类型的`reg_tensor`，用于`interleave`、`deinterleave`等双结果接口。
 
-## 定义原型<a name="section620mcpsimp"></a>
+## 定义原型
 
 ```cpp
 template <typename DataType>
@@ -40,20 +40,20 @@ struct reg_pair {
 };
 ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | `DataType` | `reg_tensor<DataType> first`和`reg_tensor<DataType> second`的元素类型。 |
 
-## 成员说明<a name="section630mcpsimp"></a>
+## 成员说明
 
 | 成员名 | 描述 |
 | --- | --- |
 | `first` | 第一个矢量寄存器。 |
 | `second` | 第二个矢量寄存器。 |
 
-## 调用示例<a name="section640mcpsimp"></a>
+## 调用示例
 
 ```cpp
 auto result = asc::te::experimental::interleave<float>(mask0, mask1);

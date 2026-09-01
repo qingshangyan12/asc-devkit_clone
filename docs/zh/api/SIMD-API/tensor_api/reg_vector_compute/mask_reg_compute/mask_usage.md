@@ -1,6 +1,6 @@
-# mask的用法<a name="ZH-CN_TOPIC_0000002000000019"></a>
+# mask的用法
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
 `reg_tensor<DataType>`同时保存数据寄存器`reg`和与数据关联的掩码寄存器`mask`。计算接口根据输入`reg_tensor`的`mask`选择参与计算的有效元素，并将计算所使用的mask传递给返回的`reg_tensor`。`local_tensor::store`的单源`direct`、`pack`和`pack_quarter`模式继续使用源`reg_tensor`中保存的mask控制写回。
 
@@ -8,7 +8,7 @@
 
 当`DataType`为`bool`时，`reg_tensor<bool>`同样包含`reg`和`mask`两个成员。`all_mask`、`make_mask`、`update_mask`及比较接口只保证返回对象的`reg`成员有效，不应直接读取其`mask`成员。
 
-## 初始化mask<a name="section620mcpsimp"></a>
+## 初始化mask
 
 可通过以下接口生成mask，类型为`reg_tensor<bool>`：
 
@@ -20,7 +20,7 @@
 
 `DataType`必须与mask所服务的数据元素类型保持一致。例如，在给`reg_tensor<float>`赋值时应使用`all_mask<float>()`或`update_mask<float>(remain)`，不同元素位宽对应的有效元素数不同。
 
-### 与load链式调用<a name="section621mcpsimp"></a>
+### 与load链式调用
 
 `load`和`load_broadcast`只初始化返回对象的`reg`，不初始化`mask`。推荐通过链式计算`with_mask`或在搬入后立即绑定mask：
 
@@ -43,7 +43,7 @@ src0Reg.with_mask(mask);
 src1Reg.with_mask(mask);
 ```
 
-## 计算接口中的mask传递<a name="section630mcpsimp"></a>
+## 计算接口中的mask传递
 
 常规计算接口使用以下规则：
 
@@ -67,6 +67,6 @@ auto dstReg = src0Reg + src1Reg;
 asc::te::experimental::store(dst, asc::te::make_coord(offset), dstReg);
 ```
 
-## 特殊接口说明<a name="section640mcpsimp"></a>
+## 特殊接口说明
 
 - `interleave`、`deinterleave`等重排接口可能重新生成输出mask，不遵循普通多输入计算的传递规则，具体以对应接口说明为准。

@@ -1,6 +1,6 @@
-# store<a name="ZH-CN_TOPIC_0000002000000034"></a>
+# store
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -24,7 +24,7 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
 头文件路径为：`"tensor_api/experimental/arch/vector/reg_data_store.h"`，命名空间为`asc::te::experimental`。
 
@@ -37,7 +37,7 @@
 
 `intlv`模式使用双源操作数重载，其他模式使用单源操作数重载。
 
-## 函数原型<a name="section620mcpsimp"></a>
+## 函数原型
 
 - 单源操作数，指定坐标：
 
@@ -88,9 +88,9 @@
         const reg_tensor<RegDataType>& src1)
     ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明
 
-**表 1** 模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -99,7 +99,7 @@
 | `Coord` | 目的Tensor的坐标类型，由函数实参自动推导。 |
 | `RegDataType` | 源寄存器元素类型，由函数实参自动推导，必须与目的Tensor的元素类型一致。 |
 
-**表 2** 参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -111,7 +111,7 @@
 
 <a id="表3-store_sideband_mode参数说明"></a>
 
-**表 3** `store_sideband_mode`参数说明
+**表3** `store_sideband_mode`参数说明
 
 | 取值 | 含义 | 搬出起始地址对齐约束（Byte） |
 | --- | --- | --- |
@@ -121,7 +121,7 @@
 | `store_sideband_mode::pack` | 2倍压缩模式，根据`src.mask`筛选有效元素，将每个有效元素的低半部分bit写入压缩后的位置。 | min(32, VL/2) |
 | `store_sideband_mode::pack_quarter` | 4倍压缩模式，根据`src.mask`筛选有效元素，将每个有效32bit元素的低8bit写入压缩后的位置。 | min(32, VL/4) |
 
-## 数据类型<a name="section630mcpsimp"></a>
+## 数据类型
 
 目的Tensor元素类型与源寄存器元素类型必须一致。不同模式支持的数据类型如下，未列出的类型或模式组合会产生编译期错误。
 
@@ -132,11 +132,11 @@
 | `pack` | `int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`half`、`bfloat16_t`、`float` |
 | `pack_quarter` | `int32_t`、`uint32_t`、`float` |
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 返回值说明
 
 无。
 
-## 约束说明<a name="section650mcpsimp"></a>
+## 约束说明
 
 - 仅支持位于UB的Tensor。
 - 目的Tensor元素类型必须与源`reg_tensor`元素类型一致。
@@ -147,7 +147,7 @@
 - 正常模式下，如果目的UB的剩余空间不足一个VL，必须通过`src.mask`关闭越界位置，并保证目的UB至少剩余一个DataBlock（32B）空间。
 - 寄存器数据搬出应在`__simd_vf__`函数或`__simd_callee__`函数中完成。
 
-## 调用示例<a name="section660mcpsimp"></a>
+## 调用示例
 
 ### 正常搬出
 

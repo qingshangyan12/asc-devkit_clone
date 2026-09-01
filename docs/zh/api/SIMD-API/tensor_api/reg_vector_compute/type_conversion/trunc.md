@@ -1,6 +1,6 @@
-# trunc<a name="ZH-CN_TOPIC_0000002000000020"></a>
+# trunc
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -24,7 +24,7 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
 头文件路径：`"tensor_api/arch/vector/experimental/type_conversion.h"`。
 
@@ -47,14 +47,14 @@ src[i] <  0：dst[i] = ceil(src[i])
 
 接口使用`src.mask`筛选参与计算的元素，底层固定采用向0舍入和zeroing模式：mask未选中的返回值数据元素置0。返回值的mask与`src.mask`保持一致，可继续用于后续寄存器计算或`local_tensor::store`写回。
 
-## 函数原型<a name="section620mcpsimp"></a>
+## 函数原型
 
 ```cpp
 template <typename T>
 __simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src)
 ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明
 
 **表1** 模板参数说明
 
@@ -68,7 +68,7 @@ __simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src)
 | --- | --- | --- |
 | `src` | 输入 | 源寄存器，类型为`reg_tensor<T>`。`src.reg`保存待处理数据，`src.mask`指示参与计算的有效元素；调用前必须完成数据和mask初始化。 |
 
-## 数据类型<a name="section630mcpsimp"></a>
+## 数据类型
 
 目的元素类型与源元素类型保持一致，支持的数据类型如下。
 
@@ -80,14 +80,14 @@ __simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src)
 
 该接口不执行浮点与整数类型之间的转换。若需要改变元素类型，请使用[cast](cast.md)接口。
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 返回值说明
 
 返回`reg_tensor<T>`：
 
 - `reg`保存向0取整后的结果，mask未选中的元素置0。
 - `mask`与`src.mask`相同，接口不会重新生成或扩展有效范围。
 
-## 约束说明<a name="section650mcpsimp"></a>
+## 约束说明
 
 - 调用前必须初始化`src.reg`和`src.mask`。`local_tensor::load`只初始化返回对象的`reg`，需通过`with_mask`绑定与元素类型匹配的mask。
 - 舍入模式固定为向0舍入，不支持参考Reg矢量计算`Truncate`接口中的其他舍入模式，也不提供舍入模式模板参数。
@@ -95,7 +95,7 @@ __simd_callee__ inline reg_tensor<T> trunc(reg_tensor<T> src)
 - mask合并模式固定为zeroing，不支持merging模式。mask未选中的返回值数据元素置0；后续使用单源`local_tensor::store`时，写回仍由返回值中传递的mask控制。
 - 寄存器计算应在`__simd_vf__`函数或`__simd_callee__`函数中完成。
 
-## 调用示例<a name="section660mcpsimp"></a>
+## 调用示例
 
 以下示例对UB中的一段浮点数据执行向0取整。[update_mask](../mask_reg_compute/update_mask.md)`<T>(remain)`根据剩余待处理元素数生成当前循环的mask，并通过引用参数自动更新`remain`，因此完整寄存器块和尾块可以使用同一计算流程。
 

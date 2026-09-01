@@ -1,6 +1,6 @@
-# load_broadcast<a name="ZH-CN_TOPIC_0000002000000033"></a>
+# load_broadcast
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -24,7 +24,7 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
 头文件路径为：`"tensor_api/experimental/arch/vector/reg_data_load.h"`，命名空间为`asc::te::experimental`。
 
@@ -32,7 +32,7 @@
 
 传入`coord`时，从`tensor.engine() + tensor.layout()(coord)`对应的元素开始搬入；不传入`coord`时，从`tensor`起始位置开始搬入。
 
-## 函数原型<a name="section620mcpsimp"></a>
+## 函数原型
 
 - 指定坐标：
 
@@ -52,9 +52,9 @@
     __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor)
     ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明
 
-**表 1** 模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -62,7 +62,7 @@
 | `Tensor` | 源Tensor类型，由函数实参自动推导。Tensor必须位于UB。 |
 | `Coord` | 源Tensor的坐标类型，由函数实参自动推导。 |
 
-**表 2** 参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -71,7 +71,7 @@
 
 <a id="表3-broadcast_mode参数说明"></a>
 
-**表 3** `broadcast_mode`参数说明
+**表3** `broadcast_mode`参数说明
 
 | 取值 | 含义 | 搬入起始地址对齐约束（Byte） |
 | --- | --- | --- |
@@ -79,7 +79,7 @@
 | `broadcast_mode::datablock` | 从UB读取一个DataBlock（32B），并将该DataBlock重复广播到整个目的寄存器。 | 32 |
 | `broadcast_mode::elem2datablock` | 依次读取VL/32B个元素，并将每个元素分别广播到目的寄存器的一个DataBlock内。 | 16bit类型为VL/16；32bit类型为VL/8 |
 
-## 数据类型<a name="section630mcpsimp"></a>
+## 数据类型
 
 | `brc_mode` | 支持的数据类型 |
 | --- | --- |
@@ -88,11 +88,11 @@
 
 未列出的类型或模式组合会产生编译期错误。
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 返回值说明
 
 返回`reg_tensor<typename Tensor::data_type>`，其`reg`成员保存广播结果。
 
-## 约束说明<a name="section650mcpsimp"></a>
+## 约束说明
 
 - 仅支持位于UB的Tensor。
 - 搬入起始地址必须满足[表3](#表3-broadcast_mode参数说明)中的对齐约束。
@@ -100,7 +100,7 @@
 - 接口只初始化返回对象的`reg`成员，不初始化`mask`成员。将结果用于读取`mask`的寄存器计算或`store`模式前，必须调用`with_mask`绑定有效mask。
 - 寄存器数据搬入应在`__simd_vf__`函数或`__simd_callee__`函数中完成。
 
-## 调用示例<a name="section660mcpsimp"></a>
+## 调用示例
 
 以下示例从UB读取一个`float`元素，并将其广播到整个寄存器。
 

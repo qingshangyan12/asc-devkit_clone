@@ -1,6 +1,6 @@
-# cast<a name="ZH-CN_TOPIC_0000002000000019"></a>
+# cast
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -24,7 +24,7 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
 头文件路径：`"tensor_api/arch/vector/experimental/type_conversion.h"`。
 
@@ -38,7 +38,7 @@
 
 接口使用`src.mask`筛选源操作数中的有效元素，底层转换采用zeroing模式，mask未选中的目的元素置0。返回值保存转换结果，并原样传递`src.mask`，便于后续计算或`local_tensor::store`写回。
 
-## 函数原型<a name="section620mcpsimp"></a>
+## 函数原型
 
 ```cpp
 template <typename DstType,
@@ -57,7 +57,7 @@ constexpr cast_options default_cast_ops = {
 };
 ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明
 
 **表1** 模板参数说明
 
@@ -84,7 +84,7 @@ constexpr cast_options default_cast_ops = {
 > [!NOTE]  
 > `default_cast_ops`仅表示接口的默认参数，不表示所有类型组合均支持该配置。若默认配置不在对应转换行的支持范围内，必须显式传入`cast_options`。
 
-## 数据类型<a name="section630mcpsimp"></a>
+## 数据类型
 
 下表为当前支持的完整配置范围。每行`layout`、`round`和`sat`列中的取值可以任意组合，未列出的类型或配置组合会产生编译期错误。
 
@@ -103,7 +103,7 @@ constexpr cast_options default_cast_ops = {
 | `half → int4x2_t` | `zero`、`one`、`two`、`three` | `rint`、`round`、`floor`、`ceil`、`trunc` | `not_sat`、`sat` |
 | `half → hifloat8_t` | `zero`、`one` | `round` | `not_sat`、`sat` |
 
-## 关键特性说明<a name="section635mcpsimp"></a>
+## 关键特性说明
 
 ### 饱和与非饱和模式<a name="饱和与非饱和模式"></a>
 
@@ -144,11 +144,11 @@ constexpr cast_options default_cast_ops = {
 
 `int4x2_t`、`fp4x2_e2m1_t`和`fp4x2_e1m2_t`每个存储单元包含两个4 bit元素。它们与16 bit类型转换时，指令按两个元素一组读写；从16 bit类型转换到4 bit打包类型时，每组mask以偶数位为有效控制位。
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 返回值说明
 
 返回`reg_tensor<DstType>`。返回值的`reg`保存转换结果，`mask`与`src.mask`相同。
 
-## 约束说明<a name="section650mcpsimp"></a>
+## 约束说明
 
 - `DstType`和`SrcType`必须不同；相同类型转换会产生编译期错误。
 - 调用前必须初始化`src.reg`和`src.mask`。`cast`根据源操作数类型和数据排布解释mask，不会检查mask是否与源数据匹配。
@@ -156,7 +156,7 @@ constexpr cast_options default_cast_ops = {
 - 接口只支持[数据类型](#数据类型)表中列出的完整配置组合。其他类型或选项组合会产生编译期错误。
 - 寄存器计算应在`__simd_vf__`函数或`__simd_callee__`函数中完成。
 
-## 调用示例<a name="section660mcpsimp"></a>
+## 调用示例
 
 ### 位宽由小变大
 

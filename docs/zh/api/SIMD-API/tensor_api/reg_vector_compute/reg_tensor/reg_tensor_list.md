@@ -1,4 +1,4 @@
-# 寄存器reg_tensor<a name="ZH-CN_TOPIC_0000002000000014"></a>
+# 寄存器reg_tensor
 
 - **[reg_tensor](reg_tensor.md)**
 

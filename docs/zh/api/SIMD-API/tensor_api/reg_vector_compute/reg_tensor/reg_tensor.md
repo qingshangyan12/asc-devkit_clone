@@ -1,6 +1,6 @@
-# reg_tensor<a name="ZH-CN_TOPIC_0000002000000014"></a>
+# reg_tensor
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
 <!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
@@ -24,13 +24,13 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
 头文件路径为：`"tensor_api/arch/vector/experimental/reg_tensor.h"`，命名空间为`asc::te::experimental`。
 
 `reg_tensor<DataType>`是矢量寄存器值的轻量级封装。同时保存矢量数据寄存器`reg`和掩码寄存器`mask`，当`DataType`为`bool`时，`reg_tensor<bool>`的reg和mask均为掩码寄存器。
 
-## 定义原型<a name="section620mcpsimp"></a>
+## 定义原型
 
 ```cpp
 template <typename DataType>
@@ -48,14 +48,14 @@ struct reg_tensor {
 }
 ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | `DataType` | `reg_tensor`的元素类型，支持类型请参考[数据类型](#数据类型)。 |
 | `maskValue` | 掩码寄存器值，带参构造函数将其写入`reg_tensor`对象的`mask`成员。 |
 
-## 成员说明<a name="section630mcpsimp"></a>
+## 成员说明
 
 | 成员名 | 描述 |
 | --- | --- |
@@ -64,7 +64,7 @@ struct reg_tensor {
 | `reg` | 原生寄存器数据；对于`reg_tensor<bool>`，该成员保存谓词寄存器。 |
 | `mask` | 与数据寄存器关联的谓词，供计算和单源`local_tensor::store`使用。 |
 
-## 数据类型<a name="section640mcpsimp"></a>
+## 数据类型
 
 | `DataType` | 对应的原生寄存器类型 |
 | --- | --- |
@@ -78,11 +78,11 @@ struct reg_tensor {
 | `fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t` | 对应的`vector_fp8_*`类型 |
 | `int4x2_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` | 对应的`vector_int4x2_t`或`vector_fp4x2_*`类型 |
 
-## 约束说明<a name="section650mcpsimp"></a>
+## 约束说明
 
 - 默认构造函数不初始化`reg`和`mask`，使用前必须通过搬入、计算、赋值或mask绑定接口完成初始化。
 
-## 成员函数<a name="section660mask"></a>
+## 成员函数
 
 ### with_mask
 
@@ -117,7 +117,7 @@ auto value = asc::te::experimental::load(src, asc::te::make_coord(0))
 asc::te::experimental::store(dst, asc::te::make_coord(0), value);
 ```
 
-## 调用示例<a name="section660mcpsimp"></a>
+## 调用示例
 
 ```cpp
 __simd_vf__ inline void DeclareRegTensor()

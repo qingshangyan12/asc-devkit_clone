@@ -1,4 +1,4 @@
-# mask寄存器计算<a name="ZH-CN_TOPIC_0000002000000013"></a>
+# mask寄存器计算
 
 - **[make_mask](make_mask.md)**
 
