@@ -358,7 +358,10 @@ namespace AscendC {
 constexpr size_t DUMP_UINTSIZE = ONE_CORE_DUMP_SIZE;
 } // namespace AscendC
 
-#ifndef TILING_KEY_VAR
+#ifdef TILING_KEY_VAR
+#undef ASCENDC_TILING_KEY_VAR_IMPL
+#define ASCENDC_TILING_KEY_VAR_IMPL TILING_KEY_VAR
+#else
 #define TILING_KEY_VAR ASCENDC_TILING_KEY_VAR_IMPL
 #endif
 
