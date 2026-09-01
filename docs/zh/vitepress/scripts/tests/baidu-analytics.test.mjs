@@ -14,8 +14,11 @@ import { test } from 'node:test'
 import {
   BAIDU_ANALYTICS_SITE_ID,
   baiduAnalyticsHead,
+  createBaiduAnalyticsHead,
+  DEFAULT_BAIDU_ANALYTICS_SITE_ID,
   getBaiduPageviewPath,
   installBaiduAnalytics,
+  resolveBaiduAnalyticsSiteId,
 } from '../../docs/.vitepress/baidu-analytics.mjs'
 
 test('adds the Baidu analytics loader to every generated page', () => {
@@ -23,6 +26,30 @@ test('adds the Baidu analytics loader to every generated page', () => {
 
   assert.match(script, /https:\/\/hm\.baidu\.com\/hm\.js\?/)
   assert.match(script, new RegExp(BAIDU_ANALYTICS_SITE_ID))
+})
+
+test('uses the production site ID by default', () => {
+  assert.equal(BAIDU_ANALYTICS_SITE_ID, DEFAULT_BAIDU_ANALYTICS_SITE_ID)
+  assert.equal(resolveBaiduAnalyticsSiteId(), DEFAULT_BAIDU_ANALYTICS_SITE_ID)
+})
+
+test('allows the site ID to be overridden during a test build', () => {
+  const testSiteId = 'a'.repeat(32)
+  const resolvedSiteId = resolveBaiduAnalyticsSiteId({
+    BAIDU_ANALYTICS_SITE_ID: `  ${testSiteId}  `,
+  })
+  const script = createBaiduAnalyticsHead(resolvedSiteId)[0][2]
+
+  assert.equal(resolvedSiteId, testSiteId)
+  assert.match(script, new RegExp(`hm\\.js\\?${testSiteId}`))
+  assert.doesNotMatch(script, new RegExp(DEFAULT_BAIDU_ANALYTICS_SITE_ID))
+})
+
+test('rejects an invalid site ID override', () => {
+  assert.throws(
+    () => resolveBaiduAnalyticsSiteId({ BAIDU_ANALYTICS_SITE_ID: 'invalid' }),
+    /32-character hexadecimal value/
+  )
 })
 
 test('does not install browser tracking during server-side rendering', () => {

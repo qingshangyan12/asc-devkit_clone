@@ -8,23 +8,43 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-export const BAIDU_ANALYTICS_SITE_ID = '21ffa0c0dcb3d3e9f19b3eb55aeb97c7'
+export const DEFAULT_BAIDU_ANALYTICS_SITE_ID = '0814059bc7b4d1effb73a5726d6763fb'
+export const BAIDU_ANALYTICS_SITE_ID = DEFAULT_BAIDU_ANALYTICS_SITE_ID
 
-export const baiduAnalyticsHead = [
-  [
-    'script',
-    {},
-    `
+function validateBaiduAnalyticsSiteId(siteId) {
+  if (!/^[0-9a-f]{32}$/i.test(siteId)) {
+    throw new Error('BAIDU_ANALYTICS_SITE_ID must be a 32-character hexadecimal value')
+  }
+  return siteId
+}
+
+export function resolveBaiduAnalyticsSiteId(environment = {}) {
+  const configuredSiteId = String(environment.BAIDU_ANALYTICS_SITE_ID || '').trim()
+  return configuredSiteId
+    ? validateBaiduAnalyticsSiteId(configuredSiteId)
+    : DEFAULT_BAIDU_ANALYTICS_SITE_ID
+}
+
+export function createBaiduAnalyticsHead(siteId = DEFAULT_BAIDU_ANALYTICS_SITE_ID) {
+  const validatedSiteId = validateBaiduAnalyticsSiteId(String(siteId).trim())
+  return [
+    [
+      'script',
+      {},
+      `
       var _hmt = _hmt || [];
       (function () {
         var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?${BAIDU_ANALYTICS_SITE_ID}";
+        hm.src = "https://hm.baidu.com/hm.js?${validatedSiteId}";
         var s = document.getElementsByTagName("script")[0];
         s.parentNode.insertBefore(hm, s);
       })();
     `,
-  ],
-]
+    ],
+  ]
+}
+
+export const baiduAnalyticsHead = createBaiduAnalyticsHead()
 
 export function getBaiduPageviewPath(location) {
   if (!location) return '/'
