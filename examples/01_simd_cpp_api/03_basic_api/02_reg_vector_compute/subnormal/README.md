@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例演示了在Ascend C Reg矢量计算中，Div操作在Subnormal模式开启或关闭情况下的行为差异。通过两种不同的Div精度算法配置（PRECISION_1ULP_FTZ_FALSE和PRECISION_1ULP_FTZ_TRUE），展示是否支持Subnormal浮点数对计算结果的影响。
+本样例演示了在Ascend C Reg矢量计算中，Div操作在Subnormal模式开启或关闭情况下的行为差异。通过DivAlgo::DIFF_COMPENSATION差值补偿算法配合不同--cce-ftz编译选项配置，展示是否支持Subnormal浮点数对计算结果的影响。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -26,7 +26,7 @@ subnormal
 
 - 样例功能：
 
-  样例计算float类型数据，分别使用PRECISION_1ULP_FTZ_FALSE和PRECISION_1ULP_FTZ_TRUE配置DivSpecificMode作为Div操作的精度算法参数，执行除法运算。计算公式如下：
+  样例计算float类型数据，使用DivAlgo::DIFF_COMPENSATION差值补偿算法配置DivSpecificMode作为Div操作的精度算法参数，通过编译选项--cce-ftz控制Subnormal行为，执行除法运算。计算公式如下：
   $$z_i = \frac{x_i}{y_i}$$
 
 - 样例规格
@@ -55,24 +55,24 @@ subnormal
       - FTZ：将Subnormal数强制置为0的模式。虽然简化了硬件设计和提高性能，但会损失数值精度。
 
   - 多场景说明：
-      - 场景1（SCENARIO_NUM=1）：使用PRECISION_1ULP_FTZ_FALSE作为Div的精度算法参数
-          - 实现函数：SubnormalFTZFalseVF<T>
+      - 场景1（SCENARIO_NUM=1）：使用DIFF_COMPENSATION算法，编译选项--cce-ftz=false
+          - 实现函数：SubnormalDivVF<T>
           - 实现：
             ```cpp
-            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, PRECISION_1ULP_FTZ_FALSE};
+            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, DIFF_COMPENSATION};
             AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
             ```
-          - 说明：支持Subnormal数据计算，使用单指令计算得出结果，最大精度误差为1 ulp。除法结果为Subnormal数时，保留该值。
+          - 说明：支持Subnormal数据计算，使用差值补偿算法得出结果，最大精度误差为0ulp。除法结果为Subnormal数时，保留该值。
           - 应用场景：需要精确处理Subnormal浮点数的科学计算、数值模拟、高精度计算等场景。
 
-      - 场景2（SCENARIO_NUM=2）：使用PRECISION_1ULP_FTZ_TRUE作为Div的精度算法参数
-          - 实现函数：SubnormalFTZTrueVF<T>
+      - 场景2（SCENARIO_NUM=2）：使用DIFF_COMPENSATION算法，编译选项--cce-ftz=true（默认）
+          - 实现函数：SubnormalDivVF<T>
           - 实现：
             ```cpp
-            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, PRECISION_1ULP_FTZ_TRUE};
+            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, DIFF_COMPENSATION};
             AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
             ```
-          - 说明：不支持Subnormal数据计算，FTZ模式，使用单指令计算得出结果，最大精度误差为1 ulp。除法结果为Subnormal数时，被强制置为0。
+          - 说明：不支持Subnormal数据计算，FTZ模式，使用差值补偿算法得出结果，最大精度误差为0ulp。除法结果为Subnormal数时，被强制置为0。
           - 应用场景：对Subnormal处理精度要求不高的深度学习、图像处理、实时推理等场景，可简化硬件实现，提高计算性能。
 
     - 计算数据场景对比：
@@ -107,7 +107,7 @@ subnormal
 
   在本样例目录下执行如下命令。
   ```bash
-  # 场景2：使用PRECISION_1ULP_FTZ_TRUE（FTZ模式）
+  # 场景2：使用DIFF_COMPENSATION + --cce-ftz=true（FTZ模式）
   SCENARIO_NUM=2
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake .. -DSCENARIO_NUM=$SCENARIO_NUM; make -j;                           # 编译工程

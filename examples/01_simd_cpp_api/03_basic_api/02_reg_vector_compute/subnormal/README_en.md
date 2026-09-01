@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example demonstrates the behavioral differences of the Div operation in Ascend C Reg vector computation when Subnormal mode is enabled or disabled. Through two different Div precision algorithm configurations (PRECISION_1ULP_FTZ_FALSE and PRECISION_1ULP_FTZ_TRUE), it shows the impact of Subnormal floating-point number support on computation results.
+This example demonstrates the behavioral differences of the Div operation in Ascend C Reg vector computation when Subnormal mode is enabled or disabled. Through the DivAlgo::DIFF_COMPENSATION difference compensation algorithm combined with different --cce-ftz compile options, it shows the impact of Subnormal floating-point number support on computation results.
 
 ## Supported Products and CANN Versions
 
@@ -26,7 +26,7 @@ subnormal
 
 - Example functionality:
 
-  The example computes float type data, using PRECISION_1ULP_FTZ_FALSE and PRECISION_1ULP_FTZ_TRUE to configure DivSpecificMode as the precision algorithm parameter for the Div operation, executing division. The computation formula is as follows:
+  The example computes float type data, using the DivAlgo::DIFF_COMPENSATION difference compensation algorithm to configure DivSpecificMode as the precision algorithm parameter for the Div operation, with Subnormal behavior controlled by the --cce-ftz compile option, executing division. The computation formula is as follows:
   $$z_i = \frac{x_i}{y_i}$$
 
 - Example specifications
@@ -55,24 +55,24 @@ subnormal
       - FTZ: A mode that forces Subnormal numbers to 0. Although it simplifies hardware design and improves performance, it sacrifices numerical precision.
 
   - Multi-scenario description:
-      - Scenario 1 (SCENARIO_NUM=1): Use PRECISION_1ULP_FTZ_FALSE as the precision algorithm parameter for Div
-          - Implementation function: SubnormalFTZFalseVF<T>
+      - Scenario 1 (SCENARIO_NUM=1): Use DIFF_COMPENSATION algorithm with --cce-ftz=false compile option
+          - Implementation function: SubnormalDivVF<T>
           - Implementation:
             ```cpp
-            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, PRECISION_1ULP_FTZ_FALSE};
+            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, DIFF_COMPENSATION};
             AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
             ```
-          - Description: Supports Subnormal data computation, uses a single instruction to compute the result, with a maximum precision error of 1 ulp. When the division result is a Subnormal number, the value is preserved.
+          - Description: Supports Subnormal data computation, uses the difference compensation algorithm to compute the result, with a maximum precision error of 0ulp. When the division result is a Subnormal number, the value is preserved.
           - Application scenarios: Scientific computing, numerical simulation, and high-precision computation scenarios that require precise handling of Subnormal floating-point numbers.
 
-      - Scenario 2 (SCENARIO_NUM=2): Use PRECISION_1ULP_FTZ_TRUE as the precision algorithm parameter for Div
-          - Implementation function: SubnormalFTZTrueVF<T>
+      - Scenario 2 (SCENARIO_NUM=2): Use DIFF_COMPENSATION algorithm with --cce-ftz=true compile option (default)
+          - Implementation function: SubnormalDivVF<T>
           - Implementation:
             ```cpp
-            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, PRECISION_1ULP_FTZ_TRUE};
+            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, DIFF_COMPENSATION};
             AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
             ```
-          - Description: Does not support Subnormal data computation. FTZ mode uses a single instruction to compute the result, with a maximum precision error of 1 ulp. When the division result is a Subnormal number, it is forced to 0.
+          - Description: Does not support Subnormal data computation. FTZ mode uses the difference compensation algorithm to compute the result, with a maximum precision error of 0ulp. When the division result is a Subnormal number, it is forced to 0.
           - Application scenarios: Deep learning, image processing, and real-time inference scenarios where Subnormal precision requirements are not high, simplifying hardware implementation and improving computation performance.
 
     - Computation data scenario comparison:
@@ -107,7 +107,7 @@ subnormal
 
   Run the following commands in the example directory.
   ```bash
-  # Scenario 2: Use PRECISION_1ULP_FTZ_TRUE (FTZ mode)
+  # Scenario 2: Use DIFF_COMPENSATION + --cce-ftz=true (FTZ mode)
   SCENARIO_NUM=2
   mkdir -p build && cd build;                                               # Create and enter the build directory
   cmake .. -DSCENARIO_NUM=$SCENARIO_NUM; make -j;                           # Build the project

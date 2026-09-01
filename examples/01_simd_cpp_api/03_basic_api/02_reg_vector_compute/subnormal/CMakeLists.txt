@@ -19,8 +19,8 @@ set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
 
 # 场景参数（通过命令行传入）
 # SCENARIO_NUM: 场景编号
-#   1 - PRECISION_1ULP_FTZ_TRUE：使用单指令计算得出结果，最大精度误差为1 ulp
-#   2 - PRECISION_1ULP_FTZ_FALSE：支持Subnormal数据计算，使用单指令计算得出结果，最大精度误差为1 ulp
+#   1 - DIFF_COMPENSATION + --cce-ftz=false：差值补偿算法，保留Subnormal，最大精度误差为0ulp
+#   2 - DIFF_COMPENSATION + --cce-ftz=true：差值补偿算法，FTZ模式，最大精度误差为0ulp
 set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-2)")
 if(NOT SCENARIO_NUM MATCHES "^[1-2]$")
     message(FATAL_ERROR "SCENARIO_NUM must be 1 or 2, but got ${SCENARIO_NUM}")
@@ -33,6 +33,12 @@ add_executable(${TARGET_FILENAME}
 )
 
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
+if(SCENARIO_NUM EQUAL 1)
+    set(CCE_FTZ_OPTION "--cce-ftz=false")
+else()
+    set(CCE_FTZ_OPTION "--cce-ftz=true")
+endif()
 target_compile_options(${TARGET_FILENAME} PRIVATE
         $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+        $<$<COMPILE_LANGUAGE:ASC>:${CCE_FTZ_OPTION}>
 )
