@@ -24,7 +24,7 @@
 
 This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B groups. Each group has aligned and non-aligned comparisons; the 4B group covers `alignof=1` and `alignof=2` narrow alignment levels, plus 2 mixed-field struct comparisons with inconsistent field types. During testing, an input array `d_idata` of length `num_elements` is copied entirely to `d_odata`, and transfer efficiency is compared.
 
-### Example Specifications
+- Sample Specifications:
 
   | Name              | Fields                    | sizeof | alignof | num_elements  |
   |------------------|--------------------------|-------|--------|-----------|
