@@ -1075,7 +1075,7 @@
             -   [Reg聚合搬入](SIMD-API/c_api/reg_compute/ub_gather/gather.md)
                 -   [asc_gather](SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md)
                 -   [asc_gather_datablock](SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md)
-            -   [Reg间聚合](SIMD-API/c_api/reg_compute/reg_gather/gather.md)
+            -   [Reg聚合](SIMD-API/c_api/reg_compute/reg_gather/gather.md)
                 -   [asc_gather](SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md)
             -   [Reg间搬运](SIMD-API/c_api/reg_compute/reg_copy/reg_copy.md)
                 -   [asc_copy](SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md)
