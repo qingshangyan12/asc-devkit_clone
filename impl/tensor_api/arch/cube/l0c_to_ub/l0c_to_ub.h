@@ -10,17 +10,17 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning \
-    "impl/tensor_api/arch/cube/l0c_to_ub/copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+    "impl/tensor_api/arch/cube/l0c_to_ub/l0c_to_ub.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
 /*!
- * \file copy.h
+ * \file l0c_to_ub.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_UB_COPY_H
-#define IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_UB_COPY_H
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_UB_H
+#define IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_UB_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/arch/cube/utils/l0c2out_utils.h"
@@ -192,7 +192,7 @@ public:
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_UB_COPY_H
+#endif // IMPL_TENSOR_API_ARCH_CUBE_L0C_TO_UB_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

@@ -207,17 +207,17 @@ struct copy_l0c_to_l1 {
 } // namespace te
 } // namespace asc
 
-#include "impl/tensor_api/arch/cube/gm_to_l1/copy.h"
-#include "impl/tensor_api/arch/cube/l1_to_ub/copy.h"
-#include "impl/tensor_api/arch/cube/l1_to_l0a/copy.h"
-#include "impl/tensor_api/arch/cube/l1_to_l0b/copy.h"
-#include "impl/tensor_api/arch/cube/l1_to_l0scalea/copy.h"
-#include "impl/tensor_api/arch/cube/l1_to_l0scaleb/copy.h"
-#include "impl/tensor_api/arch/cube/l1_to_fb/copy.h"
-#include "impl/tensor_api/arch/cube/l1_to_bt/copy.h"
-#include "impl/tensor_api/arch/cube/l0c_to_gm/copy.h"
-#include "impl/tensor_api/arch/cube/l0c_to_ub/copy.h"
-#include "impl/tensor_api/arch/cube/l0c_to_l1/copy.h"
+#include "impl/tensor_api/arch/cube/gm_to_l1/gm_to_l1.h"
+#include "impl/tensor_api/arch/cube/l1_to_ub/l1_to_ub.h"
+#include "impl/tensor_api/arch/cube/l1_to_l0a/l1_to_l0a.h"
+#include "impl/tensor_api/arch/cube/l1_to_l0b/l1_to_l0b.h"
+#include "impl/tensor_api/arch/cube/l1_to_l0scalea/l1_to_l0scalea.h"
+#include "impl/tensor_api/arch/cube/l1_to_l0scaleb/l1_to_l0scaleb.h"
+#include "impl/tensor_api/arch/cube/l1_to_fb/l1_to_fb.h"
+#include "impl/tensor_api/arch/cube/l1_to_bt/l1_to_bt.h"
+#include "impl/tensor_api/arch/cube/l0c_to_gm/l0c_to_gm.h"
+#include "impl/tensor_api/arch/cube/l0c_to_ub/l0c_to_ub.h"
+#include "impl/tensor_api/arch/cube/l0c_to_l1/l0c_to_l1.h"
 
 #endif // INCLUDE_TENSOR_API_ARCH_CUBE_CUBE_COPY_OP_H
 
