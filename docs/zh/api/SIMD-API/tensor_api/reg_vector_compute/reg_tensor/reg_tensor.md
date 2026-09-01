@@ -39,7 +39,7 @@ struct reg_tensor {
     using reg_type = typename detail::type_get<elem_type>::type;
 
     __simd_callee__ reg_tensor() = default;
-    __simd_callee__ reg_tensor(vector_bool maskValue);
+    __simd_callee__ reg_tensor(const vector_bool& maskValue);
 
     __simd_callee__ inline reg_tensor& with_mask(const reg_tensor<bool>& maskReg);
 
@@ -47,8 +47,6 @@ struct reg_tensor {
     vector_bool mask;
 }
 ```
-
-成员变量mask绑定接口请参考[with_mask](with_mask.md)。
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -83,6 +81,41 @@ struct reg_tensor {
 ## 约束说明<a name="section650mcpsimp"></a>
 
 - 默认构造函数不初始化`reg`和`mask`，使用前必须通过搬入、计算、赋值或mask绑定接口完成初始化。
+
+## 成员函数<a name="section660mask"></a>
+
+### with_mask
+
+将输入`reg_tensor<bool>`寄存器的`maskReg.reg`绑定到当前`reg_tensor<DataType>`的`mask`成员，不修改数据成员`reg`。可与`load`接口链式调用。
+
+#### 函数原型
+
+```cpp
+__simd_callee__ inline reg_tensor& with_mask(
+    const reg_tensor<bool>& maskReg)
+```
+
+#### 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| `maskReg` | 输入 | `reg_tensor<bool>`类型的寄存器，必须保证其`reg`成员已初始化。 |
+
+#### 返回值说明
+
+返回当前`reg_tensor`的引用。
+
+#### 约束说明
+
+`with_mask`只复制掩码寄存器，不校验掩码寄存器与数据元素宽度是否一致。
+
+#### 调用示例
+
+```cpp
+auto value = asc::te::experimental::load(src, asc::te::make_coord(0))
+                .with_mask(asc::te::experimental::all_mask<float>());
+asc::te::experimental::store(dst, asc::te::make_coord(0), value);
+```
 
 ## 调用示例<a name="section660mcpsimp"></a>
 
