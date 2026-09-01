@@ -57,7 +57,7 @@ public:
         });
     }
 
-    __aicore__ __callee__ inline uint32_t GetTotalIter() const { return totalIter_; }
+    __aicore__ inline uint32_t GetTotalIter() const { return totalIter_; }
 
     __aicore__ inline bool OuterNext()
     {
@@ -88,9 +88,9 @@ public:
 
     __aicore__ inline bool IsLastOuterIter() const { return outerIndex_ + 1 >= outerIter_; }
 
-    __aicore__ __callee__ inline uint32_t GetOuterIdx() const { return outerIndex_; }
+    __aicore__ inline uint32_t GetOuterIdx() const { return outerIndex_; }
 
-    __aicore__ __callee__ inline uint32_t GetOuterIter() const { return outerIter_; }
+    __aicore__ inline uint32_t GetOuterIter() const { return outerIter_; }
 
     __aicore__ inline int32_t GetTileShape() const { return tileShape_; }
 
@@ -120,9 +120,9 @@ public:
 
     __aicore__ inline bool InnerEnd() { return innerIndex_ >= innerStartIdx_ + innerIter_; }
 
-    __aicore__ __callee__ inline uint32_t GetInnerIdx() const { return innerIndex_; }
+    __aicore__ inline uint32_t GetInnerIdx() const { return innerIndex_; }
 
-    __aicore__ __callee__ inline uint32_t GetInnerIter() const { return innerIter_; }
+    __aicore__ inline uint32_t GetInnerIter() const { return innerIter_; }
 
     __aicore__ inline int32_t GetBaseShape() const { return baseShape_; }
 
