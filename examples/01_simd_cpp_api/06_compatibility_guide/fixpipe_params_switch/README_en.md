@@ -1,0 +1,117 @@
+# Fixpipe Parameter Structure Switch Compatibility Example
+
+## Overview
+
+This example demonstrates the switch between different parameter structures for the Fixpipe interface across the 2201 and 3510 architectures, isolating different hardware implementations through compile-time macros.
+
+The Fixpipe interface transfers matrix multiplication results from L0C Buffer to GM. The 3510 architecture introduces a new native parameter structure `FixpipeParamsArch3510`, which has key field differences from the `FixpipeParamsV220` used by the 2201 architecture.
+
+- Atlas A2/A3 Training/Inference Series Products: Use the `FixpipeParamsV220` parameter structure.
+- Ascend 950PR/950DT: Use the `FixpipeParamsArch3510` native parameter structure. The 3510 also supports `FixpipeParamsV220` (auto-converted internally), but the native structure is recommended for full capabilities.
+
+### Key Differences Between the Two Parameter Structures
+
+| Comparison Item | FixpipeParamsV220 (2201) | FixpipeParamsArch3510 (3510) |
+|-----------------|-------------------------|------------------------------|
+| NZ2ND parameters | `ndNum`/`srcNdStride`/`dstNdStride` as top-level fields | Enclosed in `params` sub-structure (type selected by `format` template) |
+| dstStride unit (NZ2NZ scenario) | datablock (32 bytes) | element |
+| dstStride unit (NZ2ND scenario) | element | element (same as V220) |
+| Advanced ReLU | Not supported | Supports `preReluMode`/`preClipReluMode`/`reluScalar`/`vectorRelu` |
+| NZ2DN format conversion | Not supported | Supports `CO2Layout::COLUMN_MAJOR` |
+| UB pathway control | Not supported | Supports `dualDstCtl`/`subBlockId` |
+| Quantization modes | Basic quantization modes | Extended FP8/HIF8/BF16 etc. |
+
+> **Migration Note**: In NZ2NZ (non-NZ2ND) scenarios, the dstStride unit changes from datablock to element. Directly reusing V220 values would cause address calculation errors on 3510. This example uses the NZ2ND (CFG_ROW_MAJOR) scenario, where both structures use element as the dstStride unit, allowing unified assignment.
+
+## Supported Products and CANN Versions
+
+| Product | CANN Version |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+
+## Directory Structure
+
+```
+├── fixpipe_params_switch
+│   ├── scripts
+│   │   ├── gen_data.py         // Input data and ground truth generation script
+│   │   └── verify_result.py    // Verify whether output data matches ground truth
+│   ├── CMakeLists.txt          // Build project file
+│   ├── data_utils.h            // Data read/write functions
+│   ├── fixpipe_params_switch.asc // Ascend C example implementation & invocation example
+│   └── README.md               // Example documentation
+```
+
+## Example Specifications
+
+<table>
+<caption>Example Specification Table</caption>
+<tr><td rowspan="1" align="center">Category</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+<tr><td rowspan="2" align="center">Example Input</td>
+<td align="center">x</td><td align="center">[128, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td align="center">y</td><td align="center">[128, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">Example Output</td>
+<td align="center">z</td><td align="center">[128, 256]</td><td align="center">float</td><td align="center">ND</td></tr>
+<tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">fixpipe_params_switch</td></tr>
+</table>
+
+## Example Implementation
+
+Data flow: GM -> L1 Buffer -> L0A/L0B Buffer -> L0C Buffer -> GM.
+
+1. Copy matrices A and B from GM to L1 Buffer (NZ format).
+2. Copy matrix A from L1 to L0A Buffer: 2201 requires NZ→ZZ fractal conversion (legacy `LoadData2DParams` loop), 3510 directly uses NZ (`LoadData2DParamsV2`).
+3. Copy matrix B from L1 to L0B Buffer (`LoadData2DParams` loop).
+4. Call `Mmad` for matrix multiplication, results written to L0C Buffer.
+5. Call `Fixpipe` to transfer results from L0C to GM, using different parameter structures by architecture:
+   - Atlas A2/A3: Use `FixpipeParamsV220`, set `ndNum`/`srcNdStride`/`dstNdStride`.
+   - Ascend 950PR/950DT: Use `FixpipeParamsArch3510<ROW_MAJOR>`, NZ2ND params managed by `params` sub-structure.
+
+## Build and Run
+
+Run the following steps in the root directory of this example to build and run the example.
+
+- Configure environment variables
+
+  Configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
+
+  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+
+- Run the example
+
+  Run the following commands in this example directory.
+  ```bash
+  mkdir -p build && cd build;
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;
+  python3 ../scripts/gen_data.py
+  ./demo
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin
+  ```
+
+  To build for Ascend 950PR/950DT:
+
+  ```bash
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
+  ```
+
+  > **Notice:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory and then re-run cmake.
+
+- Build option description
+
+  | Option | Values | Description |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 for Atlas A2/A3, dav-3510 for Ascend 950PR/950DT |
+
+- Execution results
+
+  The following execution result indicates that the accuracy comparison succeeded:
+
+  ```bash
+  test pass!
+  ```

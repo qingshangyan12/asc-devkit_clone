@@ -2,13 +2,15 @@
 
 本节针对[NPU架构版本3510](../../../programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)的芯片变更对基础API兼容性产生的影响进行说明，并提供基础API的兼容性适配方案。
 
+每个迁移点按照"架构差异说明 → 修改前（2201）代码 → 修改后（3510）代码 → 对应样例"的结构组织，便于大模型和开发者快速定位需要修改的代码。
+
 ## 矢量计算<a name="section7364115741514"></a>
 
 -   **3510架构默认不支持Subnormal功能。**
 
-    **说明**：SubNormal浮点数指的是指数位全为0、尾数不为0的浮点数，用于表示比最小正常数更小的值，避免“下溢为0”。3510版本默认不支持Subnormal，Subnormal浮点数在计算中被视为0。
+    **说明**：SubNormal浮点数指的是指数位全为0、尾数不为0的浮点数，用于表示比最小正常数更小的值，避免"下溢为0"。2201架构硬件默认支持Subnormal；3510架构默认不支持Subnormal，Subnormal浮点数在计算中被视为0（FTZ，Flush To Zero）。
 
-    **兼容方案**：通过设置config模板参数来配置Subnormal计算模式。软件模拟对Subnormal数据的处理，通过精度扩展等处理方式来避免Subnormal浮点数下溢为0。
+    **兼容方案**：通过设置config模板参数将algo配置为`PRECISION_1ULP_FTZ_FALSE`，由软件仿真保留Subnormal计算结果。以Ln接口为例，具体可参考[Subnormal兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/subnormal)。
 
     **表1**  涉及Subnormal的API和config参数说明
 
@@ -31,298 +33,152 @@
     </tbody>
     </table>
 
-    可以参考以下代码片段：
+    **修改前（2201）**：无需额外配置，直接调用Ln接口，硬件默认支持Subnormal。
 
+    ```cpp
+    // 2201：直接调用，硬件默认保留Subnormal
+    AscendC::Ln<half>(dstLocal, srcLocal, count);
     ```
-    // 定义模板参数
-    constexpr AscendC::LnConfig CONFIG = {
-        AscendC::LnAlgo::PRECISION_1ULP_FTZ_FALSE
-    };
-    constexpr uint32_t DATA_COUNT = 1024;
-    constexpr uint32_t xAddr = 0;
-    constexpr uint32_t yAddr = xAddr + DATA_COUNT * sizeof(half);
 
-    // 核函数（Kernel）入口：使用__vector__显式声明Vector核函数（Kernel），搭配C++ Tensor方式编程
-    __vector__ __global__ void ln_custom(__gm__ uint8_t* src, __gm__ uint8_t* dst)
-    {
-        // C++ Tensor需要手动调用InitSocState初始化全局状态寄存器
-        AscendC::InitSocState();
+    **修改后（3510）**：通过LnConfig模板参数配置algo为PRECISION_1ULP_FTZ_FALSE。
 
-        AscendC::GlobalTensor<half> srcGlobal;
-        AscendC::GlobalTensor<half> dstGlobal;
-        srcGlobal.SetGlobalBuffer((__gm__ half*)src, DATA_COUNT);
-        dstGlobal.SetGlobalBuffer((__gm__ half*)dst, DATA_COUNT);
-
-        // 直接构造指定地址和存储位置的LocalTensor（C++ Tensor方式）
-        AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::VECCALC, xAddr, DATA_COUNT);
-        AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::VECCALC, yAddr, DATA_COUNT);
-
-        AscendC::DataCopy(srcLocal, srcGlobal, DATA_COUNT);
-        AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-        AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-
-        // 调用Ln基础API，传入模板参数
-        AscendC::Ln<half, CONFIG>(dstLocal, srcLocal, DATA_COUNT);
-
-        AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-        AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-        AscendC::DataCopy(dstGlobal, dstLocal, DATA_COUNT);
-
-        AscendC::PipeBarrier<PIPE_ALL>();
-    }
+    ```cpp
+    // 3510：配置config参数，软件仿真保留Subnormal
+    // 注意：config为const引用型模板参数，实参必须具备静态存储期，使用static constexpr
+    static constexpr AscendC::LnConfig CONFIG = { AscendC::LnAlgo::PRECISION_1ULP_FTZ_FALSE };
+    AscendC::Ln<half, CONFIG>(dstLocal, srcLocal, count);
     ```
+
+    **跨架构统一写法**：
+
+    ```cpp
+    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+        AscendC::Ln<half>(dstLocal, srcLocal, count);
+    #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+        static constexpr AscendC::LnConfig CONFIG = { AscendC::LnAlgo::PRECISION_1ULP_FTZ_FALSE };
+        AscendC::Ln<half, CONFIG>(dstLocal, srcLocal, count);
+    #endif
+    ```
+
+    **对应样例**：[Subnormal兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/subnormal)
 
 ## 数据搬运<a name="section7530159122210"></a>
 
 -   **DataCopy接口不支持L1 Buffer-\>GM通路。**
 
-    **说明**：硬件删除L1 Buffer到GM的通路，无法将数据从L1 Buffer直接搬运到GM中。现有接口不支持L1 Buffer到GM的直接搬运。
+    **说明**：2201架构支持L1 Buffer到GM的直接搬运（`DataCopy(cGlobal, l1Local, count)`）；3510架构硬件删除了L1 Buffer到GM的通路，无法直接搬运。
 
-    **兼容方案**：对于纯Cube计算场景：在GM多分配一个单位矩阵，通过Mmad矩阵乘法计算输出到L0C Buffer，再从L0C Buffer通过Fixpipe搬运到GM。对于Vector和Cube计算融合场景，可以通过L1 Buffer搬运到Unified Buffer（UB），再搬运到GM。以下以纯Cube计算场景为例进行说明，介绍算子核心流程，具体可参考[L1到GM搬运兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)。
+    **兼容方案**：对于纯Cube计算场景，在GM多分配一个单位矩阵，通过Mmad矩阵乘法计算输出到L0C Buffer，再从L0C Buffer通过Fixpipe搬运到GM。对于Vector和Cube计算融合场景，可以通过L1 Buffer搬运到Unified Buffer（UB），再搬运到GM。以下以纯Cube计算场景为例进行说明，具体可参考[L1到GM搬运兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)。
 
-    1.  将矩阵A从GM搬运到L1 Buffer。
+    **修改前（2201）**：GM → L1 → GM，直接搬运。
 
-        ```
-        __aicore__ inline void CopyGmToL1A(AscendC::LocalTensor<T> a1Local)
-        {
-            AscendC::Nd2NzParams intriParams1{1, M, K, 0, K, M, 1, 0};
-            AscendC::DataCopy(a1Local, aGlobal, intriParams1);
-        }
-        ```
+    ```cpp
+    // 2201：GM -> L1 -> GM，直接搬运
+    AscendC::LocalTensor<T> leftMatrix(AscendC::TPosition::A1, a1Addr, M * K);
+    AscendC::DataCopy(leftMatrix, aGlobal, M * K);
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
+    AscendC::DataCopy(cGlobal, leftMatrix, M * K);  // L1 -> GM，3510不支持
+    ```
 
-    2.  将矩阵B（矩阵B为单位矩阵）从GM搬运到L1 Buffer。
+    **修改后（3510）**：GM → L1 → L0A/L0B → L0C → GM，通过矩阵乘法+Fixpipe搬运。
 
-        ```
-        __aicore__ inline void CopyGmToL1B(AscendC::LocalTensor<U> b1Local)
-        {
-            AscendC::Nd2NzParams intriParams2{1, K, N, 0, N, K, 1, 0};
-            AscendC::DataCopy(b1Local, bGlobal, intriParams2);
-        }
-        ```
+    ```cpp
+    // 3510：GM -> L1(A1/B1) -> L0A/L0B -> L0C -> GM
+    CopyGmToL1A(a1Local);  // GM -> L1A
+    CopyGmToL1B(b1Local);  // GM -> L1B（B为单位矩阵）
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
+    Load2DL1AToL0A(a1Local, a2Local);  // L1A -> L0A
+    Load2DL1BToL0B(b1Local, b2Local);  // L1B -> L0B
+    AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID1);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID1);
+    Compute(co1Local, a2Local, b2Local);  // Mmad矩阵乘，A×单位矩阵=A
+    AscendC::SetFlag<AscendC::HardEvent::M_FIX>(EVENT_ID2);
+    AscendC::WaitFlag<AscendC::HardEvent::M_FIX>(EVENT_ID2);
+    CopyL0CToGm(co1Local);  // L0C -> GM via Fixpipe
+    ```
 
-    3.  将矩阵A从L1 Buffer搬运到L0A Buffer。
-
-        ```
-        __aicore__ inline void Load2DL1AToL0A(AscendC::LocalTensor<T> a1Local, AscendC::LocalTensor<T> a2Local)
-        {
-            AscendC::LoadData2DParamsV2 loadDataParams;
-            ...
-            AscendC::LoadData(a2Local, a1Local, loadDataParams);
-        }
-        ```
-
-    4.  将矩阵B从L1 Buffer搬运到L0B Buffer。
-
-        ```
-        __aicore__ inline void Load2DL1BToL0B(AscendC::LocalTensor<U> b1Local, AscendC::LocalTensor<U> b2Local)
-        {
-            AscendC::LoadData2DParamsV2 loadDataParams;
-            ...
-            AscendC::LoadData(b2Local, b1Local, loadDataParams);
-        }
-        ```
-
-    5.  进行Mmad矩阵计算，结果输出到L0C Buffer。
-
-        ```
-        __aicore__ inline void Compute(
-            AscendC::LocalTensor<S> co1Local, AscendC::LocalTensor<T> a2Local, AscendC::LocalTensor<U> b2Local)
-        {
-            AscendC::MmadParams mmadParams;
-            ...
-            AscendC::Mmad(co1Local, a2Local, b2Local, mmadParams);
-        }
-        ```
-
-    6.  通过FixPipe将矩阵C从L0C Buffer拷贝到GM。
-
-        ```
-        __aicore__ inline void CopyL0CToGm(AscendC::LocalTensor<S> co1Local)
-        {
-            AscendC::FixpipeParamsV220 fixpipeParams;
-            ...
-            AscendC::Fixpipe<S, S, AscendC::CFG_ROW_MAJOR>(cGlobal, co1Local, fixpipeParams);
-        }
-        ```
+    **对应样例**：[L1到GM搬运兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)
 
 -   **不支持SetLoadDataBoundary接口。**
 
-    **说明**：3510架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置LoadData（卷积数据搬运）时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始读取数据。设置为0表示无边界，可以使用整个L1 Buffer。
+    **说明**：2201架构支持通过`SetLoadDataBoundary`设置L1 Buffer的边界值，实现源操作数在L1 Buffer上循环读取（地址超出边界时自动绕回起始地址）。3510架构删除了L1 Buffer的边界值设定相关寄存器，不再支持该接口。
 
-    **兼容方案**：
-
-    -   [NPU架构版本2201](../../../programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)的接口参数boundaryValue设置为0时与3510架构版本等价。
-    -   如果需要在L1 Buffer上循环读取操作数，需要将对应的LoadData（卷积数据搬运）接口手动拆分成多条指令，手动绕回。具体代码可参考[SetLoadDataBoundary兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary)。
+    **兼容方案**：boundaryValue设置为0时与3510等价（无边界）。需要循环读取的场景，将LoadData（卷积数据搬运）接口手动拆分成多条指令，通过设置目的操作数的地址偏移量实现手动绕回。具体代码可参考[SetLoadDataBoundary兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary)。
 
     ![](../../../figures/fig_1_zn.png)
 
-    如上图所示，以L1 Buffer到L0A Buffer的搬运为例。矩阵A为half数据类型，大小为32 \* 32的矩阵，假设边界为512B，可以重复搬运数据到L0A Buffer，在每次搬运时设置目的操作数的地址偏移量。
+    **修改前（2201）**：通过SetLoadDataBoundary设置边界，单次LoadData自动绕回。
 
-    1.  将矩阵A从GM搬运到L1 Buffer。
+    ```cpp
+    // 2201：设置边界值，LoadData自动绕回
+    AscendC::SetLoadDataRepeat({0, 1, 0});
+    AscendC::SetLoadDataBoundary(1024);  // 设置L1边界为1024B
+    AscendC::LoadData(a2, leftMatrix, loadData3dParamsPro);
+    ```
 
-        ```
-        __aicore__ inline void CopyGmToA1Nd2Nz(AscendC::LocalTensor<T>& leftMatrix)
-        {
-            AscendC::Nd2NzParams nd2nzParams;
-            ...
-            AscendC::DataCopy(leftMatrix, aGlobal, nd2nzParams);
-        }
-        ```
+    **修改后（3510）**：删除SetLoadDataBoundary，多次调用LoadData手动绕回。
 
-    2.  将矩阵B从GM搬运到L1 Buffer。
+    ```cpp
+    // 3510：手动拆分多次LoadData，设置不同的目的地址偏移
+    uint16_t dstStride = AscendC::DivCeil(M / 2, 16);
+    AscendC::SetLoadDataRepeatWithStride({0, 1, 0, dstStride});
+    AscendC::LoadData(a2, leftMatrix, loadData3dParamsPro);
+    AscendC::LocalTensor<T> a3 = a2[256];   // 目的地址偏移256
+    AscendC::LoadData(a3, leftMatrix, loadData3dParamsPro);
+    AscendC::LocalTensor<T> a4 = a2[512];   // 目的地址偏移512
+    AscendC::LoadData(a4, leftMatrix, loadData3dParamsPro);
+    AscendC::LocalTensor<T> a5 = a2[768];   // 目的地址偏移768
+    AscendC::LoadData(a5, leftMatrix, loadData3dParamsPro);
+    ```
 
-        ```
-        __aicore__ inline void CopyGmToB1Nd2Nz(AscendC::LocalTensor<U>& rightMatrix)
-        {
-            AscendC::Nd2NzParams nd2nzParams;
-            ...
-            AscendC::DataCopy(rightMatrix, bGlobal, nd2nzParams);
-        }
-        ```
-
-    3.  将矩阵A从L1 Buffer搬运到L0A Buffer。
-
-        ```
-            __aicore__ inline void Load3DA1ToL0A(AscendC::LocalTensor<T>& leftMatrix, AscendC::LocalTensor<T>& a2)
-            {
-                AscendC::LoadData3DParamsV2Pro loadData3dParamsPro;
-                ...
-        #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-                ...
-                AscendC::SetLoadDataRepeat({0, 1, 0});
-                AscendC::SetLoadDataBoundary(1024);
-                AscendC::LoadData(a2, leftMatrix, loadData3dParamsPro);
-        #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-                uint16_t dstStride = AscendC::DivCeil(M / 2, 16);
-                ...
-                AscendC::SetLoadDataRepeatWithStride({0, 1, 0, dstStride});
-                // 多次调用LoadData进行手动绕回
-                AscendC::LoadData(a2, leftMatrix, loadData3dParamsPro);
-                AscendC::LocalTensor<T> a3 = a2[256];
-                AscendC::LoadData(a3, leftMatrix, loadData3dParamsPro);
-                AscendC::LocalTensor<T> a4 = a2[512];
-                AscendC::LoadData(a4, leftMatrix, loadData3dParamsPro);
-                AscendC::LocalTensor<T> a5 = a2[768];
-                AscendC::LoadData(a5, leftMatrix, loadData3dParamsPro);
-        #endif
-            }
-        ```
-
-    4.  将矩阵B从L1 Buffer搬运到L0B Buffer。
-
-        ```
-            __aicore__ inline void Load3DB1ToL0B(AscendC::LocalTensor<U>& rightMatrix, AscendC::LocalTensor<U>& b2)
-            {
-                AscendC::LoadData3DParamsV2<U> loadData3dParams;
-                ...
-                uint8_t padList[AscendC::PAD_SIZE] = {0, 0, 0, 0};
-                static constexpr AscendC::IsResetLoad3dConfig LOAD3D_CONFIG = {false, false};
-                AscendC::SetFmatrix(N, 1, padList, AscendC::FmatrixMode::FMATRIX_LEFT);
-        #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-                AscendC::SetLoadDataRepeat({0, 1, 0});
-                AscendC::SetLoadDataBoundary(0);
-                AscendC::SetLoadDataPaddingValue(0);
-                AscendC::LoadData<U, LOAD3D_CONFIG>(b2, rightMatrix, loadData3dParams);
-        #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-                uint16_t dstStride = AscendC::DivCeil(N, 16);
-                AscendC::SetLoadDataRepeatWithStride({0, 1, 0, dstStride});
-                AscendC::SetLoadDataPaddingValue(0);
-                AscendC::LoadDataWithStride<U, LOAD3D_CONFIG>(b2, rightMatrix, loadData3dParams);
-        #endif
-            }
-        ```
-
-    5.  矩阵计算。
-
-        ```
-        __aicore__ inline void Compute(AscendC::LocalTensor<T>& a2, AscendC::LocalTensor<U>& b2,
-                                    AscendC::LocalTensor<V>& co1Local)
-        {
-            AscendC::MmadParams mmadParams;
-            ...
-            AscendC::Mmad(co1Local, a2, b2, mmadParams);
-        }
-        ```
-
-    6.  将矩阵C从L0C Buffer搬运到GM。
-
-        ```
-        __aicore__ inline void CopyL0CToGm(AscendC::LocalTensor<V>& co1Local, const AscendC::GlobalTensor<S>& gm)
-        {
-            AscendC::FixpipeParamsV220 fixpipeParams(N, static_cast<uint16_t>(M),
-                                            AscendC::DivCeil(M, AscendC::BLOCK_CUBE) * AscendC::BLOCK_CUBE, static_cast<uint16_t>(N), 0);
-            ...
-            AscendC::Fixpipe<S, V, AscendC::CFG_ROW_MAJOR>(gm, co1Local, fixpipeParams);
-        }
-        ```
+    **对应样例**：[SetLoadDataBoundary兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary)
 
 ## 矩阵计算<a name="section17560113713122"></a>
 
 -   **Cube计算单元删除int4b\_t数据类型。**
 
-    **说明**：相较于2201架构版本，3510架构版本的Cube计算单元不支持int4b\_t。相关的基础API有LoadData、Mmad和LoadDataWithTranspose，这些接口不再支持int4b\_t。
+    **说明**：2201架构的Cube计算单元支持int4b\_t数据类型，可直接进行int4矩阵乘计算。3510架构的Cube计算单元不支持int4b\_t，相关的基础API（LoadData、Mmad和LoadDataWithTranspose）不再支持int4b\_t。
 
     **兼容方案**：算子侧通过编写CV融合算子在Vector Core进行int4b\_t到int8\_t的Cast转换，再通过UB搬运到L1后进行Mmad计算。具体代码可参考[int4数据类型下Matmul兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/matmul_s4)。图层面可以在该算子前增加Cast节点进行int4b\_t到int8\_t的转换。
 
-    1.  在Vector Core进行int4b\_t到int8\_t的Cast转换，转换后的数据保存到新的GM空间中。
+    **修改前（2201）**：直接使用int4b\_t进行Matmul计算。
 
-        ```
-        __aicore__ inline void Unzip(AscendC::GlobalTensor<int8_t>& dstGlobalTensor,
-            AscendC::GlobalTensor<int8_t>& srcGlobalTensor, uint32_t count)
-        {
-            constexpr uint32_t oneBlockBytes = 32;
-            uint32_t srcAddr = 0;
-            uint32_t tmpAddr = srcAddr + AscendC::AlignUp(count * sizeof(int8_t), oneBlockBytes);
-            uint32_t dstAddr = tmpAddr + AscendC::AlignUp(count * 2 * sizeof(half), oneBlockBytes);
+    ```cpp
+    // 2201：直接使用int4b_t类型矩阵乘
+    AscendC::Matmul<A_TYPE_S4, B_TYPE_S4, C_TYPE, BIAS_TYPE, CFG_MDL> mm;
+    mm.SetTensorA(gmA, false);  // gmA为int4b_t类型
+    mm.SetTensorB(gmB, false);  // gmB为int4b_t类型
+    mm.IterateAll(gmC);
+    ```
 
-            AscendC::LocalTensor<int8_t> srcLocalTensor(AscendC::TPosition::VECCALC, srcAddr, count);
-            AscendC::LocalTensor<half> tmpTensor(AscendC::TPosition::VECCALC, tmpAddr, count * 2);
-            AscendC::LocalTensor<int8_t> dstLocalTensor(AscendC::TPosition::VECCALC, dstAddr, count * 2);
+    **修改后（3510）**：先在Vector Core将int4b\_t Cast为int8\_t，再进行int8\_t矩阵乘。
 
-            AscendC::DataCopy(srcLocalTensor, srcGlobalTensor, count);
-            AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-            AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+    ```cpp
+    // 3510：Step1 - Vector Core上int4b_t -> int8_t转换
+    AscendC::LocalTensor<AscendC::int4b_t> int4SrcLocalTensor =
+        srcLocalTensor.ReinterpretCast<AscendC::int4b_t>();
+    AscendC::Cast<half, AscendC::int4b_t>(tmpTensor, int4SrcLocalTensor,
+        AscendC::RoundMode::CAST_NONE, count * 2);
+    AscendC::PipeBarrier<PIPE_V>();
+    AscendC::Cast<int8_t, half>(dstLocalTensor, tmpTensor,
+        AscendC::RoundMode::CAST_CEIL, count * 2);
 
-            AscendC::LocalTensor<AscendC::int4b_t> int4SrcLocalTensor =
-                srcLocalTensor.ReinterpretCast<AscendC::int4b_t>();
-            AscendC::Cast<half, AscendC::int4b_t>(tmpTensor, int4SrcLocalTensor, AscendC::RoundMode::CAST_NONE, count * 2);
-            AscendC::PipeBarrier<PIPE_V>();
-            AscendC::Cast<int8_t, half>(dstLocalTensor, tmpTensor, AscendC::RoundMode::CAST_CEIL, count * 2);
+    // 3510：Step2 - int8_t类型矩阵乘
+    AscendC::Matmul<A_TYPE_S8, B_TYPE_S8, C_TYPE, BIAS_TYPE, CFG_MDL> mm;
+    mm.SetTensorA(gmA, false);  // gmA已转换为int8_t类型
+    mm.SetTensorB(gmB, false);  // gmB已转换为int8_t类型
+    mm.IterateAll(gmC);
+    ```
 
-            AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-            AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-            AscendC::DataCopy(dstGlobalTensor, dstLocalTensor, count * 2);
-        }
-        ```
-
-    2.  进行int8\_t数据类型的矩阵计算。
-
-        ```
-        __aicore__ inline void RunMatmul()
-        {
-            ...
-            int offsetA = 0;
-            int offsetB = 0;
-            int offsetC = 0;
-            ...
-            auto gmA = aGlobal[offsetA];
-            auto gmB = bGlobal[offsetB];
-            auto gmC = cGlobal[offsetC];
-
-            AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> mm;
-            mm.SetSubBlockIdx(0);
-            mm.Init(&tiling, pipe);
-            mm.SetTensorA(gmA, false);
-            mm.SetTensorB(gmB, false);
-            mm.IterateAll(gmC);
-        }
-        ```
+    **对应样例**：[int4数据类型下Matmul兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/matmul_s4)
 
 -   **L0A Buffer分形改变，从Zz转换为Nz格式。**
 
     **说明**：涉及的API有LoadData、Mmad和LoadDataWithTranspose。
 
-    -   2201架构版本，参与矩阵乘计算（A \* B = C）时， ABC矩阵的数据排布格式分别为Zz，Zn，Nz。A、B、C矩阵分别位于L0A Buffer、L0B Buffer、L0C Buffer。
+    -   2201架构版本，参与矩阵乘计算（A \* B = C）时，ABC矩阵的数据排布格式分别为Zz，Zn，Nz。A、B、C矩阵分别位于L0A Buffer、L0B Buffer、L0C Buffer。
 
         矩阵A：每个分形矩阵内部是行主序，分形矩阵之间是行主序。分形Shape为16 x \(32B/sizeof\(AType\)\)，大小为512Byte。
 
@@ -332,7 +188,7 @@
 
         ![](../../../figures/fig_2_zn.png)
 
-    -   3510架构版本，参与矩阵乘计算（A \* B = C）时， ABC矩阵的数据排布格式分别为Nz，Zn，Nz。
+    -   3510架构版本，参与矩阵乘计算（A \* B = C）时，ABC矩阵的数据排布格式分别为Nz，Zn，Nz。
 
         矩阵A：每个分形矩阵内部是行主序，分形矩阵之间是列主序。其Shape为16 x \(32B/sizeof\(AType\)\)，大小为512Byte。
 
@@ -348,115 +204,257 @@
 
     ![](../../../figures/fig_4_zn.png)
 
-    分形变化带来的变动主要体现在L1 Buffer到L0A Buffer的搬运过程，以下代码片段进行展示：
+    **修改前（2201）**：L1→L0A需要NZ→ZZ分形转换，使用旧版LoadData2DParams循环搬运。
 
+    ```cpp
+    // 2201：NZ -> ZZ分形转换，循环搬运
+    constexpr uint32_t mBlocks = M / CUBE_BLOCK;
+    constexpr uint32_t kBlocks = K * sizeof(T) / C0_SIZE;
+    int srcOffset = 0;
+    int dstOffset = 0;
+    for (uint32_t i = 0; i < mBlocks; ++i) {
+        AscendC::LoadData2DParams loadDataParams;
+        loadDataParams.repeatTimes = kBlocks;
+        loadDataParams.srcStride = mBlocks;
+        loadDataParams.ifTranspose = false;
+        AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
+        srcOffset += CUBE_BLOCK * CUBE_BLOCK;
+        dstOffset += K * CUBE_BLOCK;
+    }
     ```
-        __aicore__ inline void DataLoadA(AscendC::LocalTensor<T> a1, AscendC::LocalTensor<T> a2)
-        {
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-            constexpr uint32_t mBlocks = M / CUBE_BLOCK;
-            constexpr uint32_t kBlocks = K * sizeof(T) / C0_SIZE;
-            int srcOffset = 0;
-            int dstOffset = 0;
-            for (uint32_t i = 0; i < mBlocks; ++i) {
-                AscendC::LoadData2DParams loadDataParams;
-                loadDataParams.repeatTimes = kBlocks;
-                loadDataParams.srcStride = mBlocks;
-                loadDataParams.ifTranspose = false;
-                AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
-                srcOffset += CUBE_BLOCK * CUBE_BLOCK;
-                dstOffset += K * CUBE_BLOCK;
-            }
-    #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-            AscendC::LoadData2DParamsV2 loadDataParams;
-            loadDataParams.mStartPosition = 0;
-            loadDataParams.kStartPosition = 0;
-            loadDataParams.mStep = AscendC::DivCeil(M, CUBE_BLOCK);
-            loadDataParams.kStep = AscendC::DivCeil(K * sizeof(T), C0_SIZE);
-            loadDataParams.srcStride = AscendC::DivCeil(M, CUBE_BLOCK);
-            loadDataParams.dstStride = AscendC::DivCeil(M, CUBE_BLOCK);
-            loadDataParams.sid = 0;
-            loadDataParams.ifTranspose = false;
-            AscendC::LoadData(a2, a1, loadDataParams);
-    #endif
-        }
+
+    **修改后（3510）**：L1→L0A直接按NZ搬运，无需分形转换，使用LoadData2DParamsV2。
+
+    ```cpp
+    // 3510：直接NZ搬运，无需分形转换
+    AscendC::LoadData2DParamsV2 loadDataParams;
+    loadDataParams.mStartPosition = 0;
+    loadDataParams.kStartPosition = 0;
+    loadDataParams.mStep = AscendC::DivCeil(M, CUBE_BLOCK);
+    loadDataParams.kStep = AscendC::DivCeil(K * sizeof(T), C0_SIZE);
+    loadDataParams.srcStride = AscendC::DivCeil(M, CUBE_BLOCK);
+    loadDataParams.dstStride = AscendC::DivCeil(M, CUBE_BLOCK);
+    loadDataParams.sid = 0;
+    loadDataParams.ifTranspose = false;
+    AscendC::LoadData(a2, a1, loadDataParams);
     ```
+
+    **对应样例**：[pattern_transformation兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/pattern_transformation)
 
 -   **3510架构版本硬件架构删除4：2结构化稀疏功能。**<a name="li69092585134"></a>
 
-    **说明**：LoadDataWithSparse用于将存储在L1 Buffer中的512B稠密权重矩阵搬运到L0B buffer，并同时读取128B的索引矩阵以实现稠密矩阵的稀疏化。由于3510架构版本不支持结构化稀疏功能，因此LoadDataWithSparse在此版本中并不适用。另一方面，MmadWithSparse负责执行矩阵乘加操作，其中右矩阵B为稠密矩阵，需要通过调用LoadDataWithSparse进行载入。由于3510架构不支持LoadDataWithSparse，因此MmadWithSparse也无法在3510架构版本中使用。
+    **说明**：2201架构支持4:2结构化稀疏，通过`LoadDataWithSparse`将L1 Buffer中的512B稠密权重矩阵搬运到L0B Buffer并同时读取128B索引矩阵实现稀疏化，再通过`MmadWithSparse`执行稀疏矩阵乘加。3510架构不支持结构化稀疏功能，`LoadDataWithSparse`和`MmadWithSparse`均不可用。
 
-    **兼容方案**：在算子侧可以不调用LoadDatawithSparse进行矩阵稠密转稀疏操作，然后使用Mmad进行正常的稠密矩阵计算。稀疏矩阵相关算法可参考MmadWithSparse中的介绍。
+    **兼容方案**：不调用`LoadDataWithSparse`进行矩阵稠密转稀疏操作，直接使用`Mmad`进行正常的稠密矩阵计算。稀疏矩阵相关算法可参考MmadWithSparse中的介绍。
+
+    **修改前（2201）**：使用LoadDataWithSparse + MmadWithSparse进行稀疏矩阵乘。
+
+    ```cpp
+    // 2201：稀疏矩阵乘
+    AscendC::LoadDataWithSparse(b2Local, b1Local, loadDataSparseParams);
+    AscendC::MmadWithSparse(co1Local, a2Local, b2Local, mmadSparseParams);
+    ```
+
+    **修改后（3510）**：使用LoadData + Mmad进行稠密矩阵乘。
+
+    ```cpp
+    // 3510：稠密矩阵乘
+    AscendC::LoadData(b2Local, b1Local, loadDataParams);
+    AscendC::Mmad(co1Local, a2Local, b2Local, mmadParams);
+    ```
 
 -   **3510架构版本删除GM-\>L0A Buffer/L0B Buffer通路**
 
-    **说明**：硬件删除GM-\>L0A Buffer/L0B Buffer通路，调用LoadData时，不再支持这些通路。
+    **说明**：2201架构支持GM直接搬运到L0A Buffer/L0B Buffer（通过LoadData直接指定GM为源操作数）。3510架构删除了该通路，LoadData不再支持GM作为源操作数。
 
-    **兼容方案**：实现GM-\>L0A Buffer/L0B Buffer搬运需拆分成两步进行，先从GM搬运到L1 Buffer，再从L1 Buffer搬运到L0A Buffer、L0B Buffer。
+    **兼容方案**：实现GM→L0A Buffer/L0B Buffer搬运需拆分成两步进行，先从GM搬运到L1 Buffer，再从L1 Buffer搬运到L0A Buffer、L0B Buffer。该通路拆分在[data_copy_l1togm样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)和[fill样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fill)的3510分支中均有体现。
 
-     以GM-\>L1 Buffer-\>L0A Buffer通路为例可以参考以下步骤：
+    **修改前（2201）**：GM → L0A，单步LoadData直接搬运。
 
-    1.  将矩阵A从GM搬运到L1 Buffer。
+    ```cpp
+    // 2201：GM -> L0A，直接搬运
+    AscendC::LoadData(a2Local, aGlobal, loadDataParams);  // 源为GM，3510不支持
+    ```
 
-        ```
-        __aicore__ inline void CopyGmToA1(AscendC::LocalTensor<T>& leftMatrix)
-        {
-            AscendC::Nd2NzParams intriParams1{1, 64, 128, 0, 128, 64, 1, 0};
-            AscendC::DataCopy(leftMatrix, aGlobal, intriParams1);
-        }
-        ```
+    **修改后（3510）**：GM → L1 → L0A，两步搬运。
 
-    2.  将矩阵A从L1 Buffer搬运到L0A Buffer。
+    ```cpp
+    // 3510：Step1 - GM -> L1
+    AscendC::Nd2NzParams intriParams{1, M, K, 0, K, M, 1, 0};
+    AscendC::DataCopy(a1Local, aGlobal, intriParams);
 
-        ```
-        __aicore__ inline void Load2DA1ToL0A(AscendC::LocalTensor<T>& a1, AscendC::LocalTensor<T>& a2)
-        {
-            AscendC::LoadData2DParamsV2 loadDataParams;
-            ...
-            AscendC::LoadData(a2, a1, loadDataParams);
-        }
-        ```
+    // 3510：Step2 - L1 -> L0A
+    AscendC::LoadData2DParamsV2 loadDataParams;
+    loadDataParams.mStep = AscendC::DivCeil(M, CUBE_BLOCK);
+    loadDataParams.kStep = AscendC::DivCeil(K * sizeof(T), C0_SIZE);
+    loadDataParams.srcStride = AscendC::DivCeil(M, CUBE_BLOCK);
+    loadDataParams.dstStride = AscendC::DivCeil(M, CUBE_BLOCK);
+    AscendC::LoadData(a2Local, a1Local, loadDataParams);
+    ```
+
+    **对应样例**：[L1到GM搬运兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)（3510分支实现了GM→L1→L0A/L0B通路拆分）
 
 -   **3510架构版本删除L0A Buffer/L0B Buffer初始化的相关硬件指令。**
 
-    **说明**：Fill接口将特定存储位置的LocalTensor初始化为某一具体数值，不支持直接初始化L0A Buffer、L0B Buffer。
+    **说明**：2201架构支持通过`Fill`接口直接初始化L0A Buffer、L0B Buffer。3510架构删除了L0A Buffer/L0B Buffer初始化的相关硬件指令，`Fill`接口不支持直接初始化L0A/L0B。
 
-    **兼容方案**：先通过Fill接口初始化L1 Buffer，再通过LoadData接口将L1 Buffer上的数据搬运到L0A Buffer、L0B Buffer。具体代码可参考[Fill兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fill)。
+    **兼容方案**：先通过`Fill`接口初始化L1 Buffer，再通过`LoadData`接口将L1 Buffer上的数据搬运到L0A Buffer、L0B Buffer。具体代码可参考[Fill兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fill)。
 
-    以GM-\>L1 Buffer-\>L0A Buffer的数据通路为例：
+    **修改前（2201）**：直接Fill初始化L0A/L0B。
 
-    1.  初始化L1 Buffer。
+    ```cpp
+    // 2201：直接Fill初始化L0A
+    AscendC::Fill(a2Local, {1, static_cast<uint16_t>(M * K * sizeof(T) / 512), 0, 1});
+    ```
 
-        ```
-        __aicore__ inline void InitConstA1(AscendC::LocalTensor<T>& a1Local)
-        {
-            AscendC::Fill(a1Local, {1, static_cast<uint16_t>(M * K * sizeof(T) / 32), 0, 1});
-        }
-        ```
+    **修改后（3510）**：Fill初始化L1，再LoadData搬运到L0A。
 
-    2.  调用LoadData接口将L1 Buffer上的数据搬运到L0A Buffer。
+    ```cpp
+    // 3510：Step1 - Fill初始化L1
+    AscendC::Fill(a1Local, {1, static_cast<uint16_t>(M * K * sizeof(T) / 32), 0, 1});
+    AscendC::PipeBarrier<PIPE_MTE1>();
 
-        ```
-        __aicore__ inline void Load2DA1ToA2(AscendC::LocalTensor<T>& a1Local, AscendC::LocalTensor<T>& a2Local)
-        {
-            AscendC::LoadData2DParamsV2 loadDataParams;
-            ...
-            AscendC::LoadData(a2Local, a1Local, loadDataParams);
-        }
-        ```
+    // 3510：Step2 - LoadData从L1搬运到L0A
+    AscendC::LoadData2DParamsV2 loadDataParams;
+    loadDataParams.mStep = AscendC::DivCeil(M, CUBE_BLOCK);
+    loadDataParams.kStep = AscendC::DivCeil(K * sizeof(T), C0_SIZE);
+    loadDataParams.srcStride = AscendC::DivCeil(M, CUBE_BLOCK);
+    loadDataParams.dstStride = AscendC::DivCeil(M, CUBE_BLOCK);
+    AscendC::LoadData(a2Local, a1Local, loadDataParams);
+    ```
+
+    **对应样例**：[Fill兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fill)
+
+-   **Fixpipe接口参数结构体切换。**
+
+    **说明**：2201架构的Fixpipe接口使用`FixpipeParamsV220`参数结构体。3510架构引入了原生的`FixpipeParamsArch3510`参数结构体，同时也兼容`FixpipeParamsV220`（内部通过`TransFixpipeParamsV220ToFixpipeParamsArch3510`自动转换），但推荐使用原生结构体以获得完整能力。
+
+    **两种参数结构体的关键差异**：
+
+    | 对比项 | FixpipeParamsV220（2201） | FixpipeParamsArch3510（3510） |
+    |--------|--------------------------|------------------------------|
+    | NZ2ND参数 | `ndNum`/`srcNdStride`/`dstNdStride`为顶层字段 | 收纳于`params`子结构（由`format`模板选择类型） |
+    | dstStride单位（NZ2NZ场景） | datablock（32字节） | element（元素个数） |
+    | dstStride单位（NZ2ND场景） | element | element（与V220一致） |
+    | 高级ReLU | 不支持 | 支持`preReluMode`/`preClipReluMode`/`reluScalar`/`vectorRelu` |
+    | NZ2DN格式转换 | 不支持 | 支持`CO2Layout::COLUMN_MAJOR` |
+    | UB通路控制 | 不支持 | 支持`dualDstCtl`/`subBlockId` |
+
+    > **迁移注意**：在NZ2NZ（非NZ2ND）场景下，`dstStride`的单位从datablock变为element，直接复用V220的值会导致3510上地址计算错误。在NZ2ND（CFG_ROW_MAJOR）场景下，两种结构体的dstStride单位均为element，可直接统一赋值。
+
+    **兼容方案**：通过`#if __NPU_ARCH__`条件编译，2201使用`FixpipeParamsV220`，3510使用`FixpipeParamsArch3510`。对于NZ2ND场景，公共参数（nSize/mSize/srcStride/dstStride/quantPre）两种结构体字段名一致，可统一赋值。具体可参考[Fixpipe参数结构体切换兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fixpipe_params_switch)。
+
+    **修改前（2201）**：使用FixpipeParamsV220。
+
+    ```cpp
+    // 2201：使用FixpipeParamsV220
+    AscendC::FixpipeParamsV220 fixpipeParams;
+    fixpipeParams.ndNum = 1;
+    fixpipeParams.srcNdStride = 0;
+    fixpipeParams.dstNdStride = 0;
+    fixpipeParams.mSize = baseM;
+    fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
+    fixpipeParams.nSize = baseN;
+    fixpipeParams.dstStride = baseN;
+    fixpipeParams.quantPre = QuantMode_t::NoQuant;
+    AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>(cGM, cL0C, fixpipeParams);
+    ```
+
+    **修改后（3510）**：使用FixpipeParamsArch3510。
+
+    ```cpp
+    // 3510：使用FixpipeParamsArch3510原生结构体
+    AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
+    fixpipeParams.mSize = baseM;
+    fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
+    fixpipeParams.nSize = baseN;
+    fixpipeParams.dstStride = baseN;
+    fixpipeParams.quantPre = QuantMode_t::NoQuant;
+    AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>(cGM, cL0C, fixpipeParams);
+    ```
+
+    **跨架构统一写法**（NZ2ND场景，公共参数统一赋值）：
+
+    ```cpp
+    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+        AscendC::FixpipeParamsV220 fixpipeParams;
+        fixpipeParams.ndNum = 1;
+        fixpipeParams.srcNdStride = 0;
+        fixpipeParams.dstNdStride = 0;
+    #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+        AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
+    #endif
+        // 公共参数统一赋值
+        fixpipeParams.mSize = baseM;
+        fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
+        fixpipeParams.nSize = baseN;
+        fixpipeParams.dstStride = baseN;
+        fixpipeParams.quantPre = QuantMode_t::NoQuant;
+        AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>(cGM, cL0C, fixpipeParams);
+    ```
+
+    **NZ2NZ场景的特殊处理**（dstStride单位不同）：
+
+    ```cpp
+    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+        AscendC::FixpipeParamsV220 fixpipeParams;
+        // NZ2NZ场景，dstStride单位为datablock（32字节）
+        fixpipeParams.dstStride = baseM * c0Size * sizeof(outputType) / AscendC::ONE_BLK_SIZE;
+    #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+        AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::NZ> fixpipeParams;
+        // NZ2NZ场景，dstStride单位为元素个数
+        fixpipeParams.dstStride = baseM * c0Size;
+    #endif
+        fixpipeParams.nSize = CeilAlign(baseN, c0Size);
+        fixpipeParams.mSize = baseM;
+        fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
+        AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_NZ>(cGM, cL0C, fixpipeParams);
+    ```
+
+    **对应样例**：[Fixpipe参数结构体切换兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/fixpipe_params_switch)
 
 ## 系统变量访问<a name="section34615332215"></a>
 
 -   **不支持CheckLocalMemoryIA，3510架构版本相关寄存器删除。**
 
-    **说明**：CheckLocalMemoryIA监视设定范围内的UB读写行为，如果监视到有设定范围的读写行为则会出现EXCEPTION报错，未监视到设定范围的读写行为则不会报错。
+    **说明**：2201架构支持`CheckLocalMemoryIA`接口，用于监视设定范围内的UB读写行为。3510架构版本相关寄存器删除，不再支持该接口。
 
-    **兼容方案**：该接口为调测接口，对功能无影响。
+    **兼容方案**：该接口为调测接口，对功能无影响，直接删除调用即可。
+
+    **修改前（2201）**：调用CheckLocalMemoryIA监视UB读写。
+
+    ```cpp
+    // 2201：调测接口，监视UB读写行为
+    AscendC::CheckLocalMemoryIA(...);
+    ```
+
+    **修改后（3510）**：删除调用。
+
+    ```cpp
+    // 3510：接口删除，直接移除调用
+    ```
 
 ## 调测API<a name="section12611957102116"></a>
 
 -   **L1 Buffer上不支持Tensor信息的打印。**
 
-    **说明**：因芯片删除L1 Buffer-\>GM通路，不支持L1 Buffer-\>GM的功能。
+    **说明**：2201架构支持在L1 Buffer上打印Tensor信息（通过L1→GM通路搬出后打印）。3510架构因删除L1 Buffer→GM通路，不支持该功能。
 
-    **兼容方案**：该接口为调测接口，对功能无影响。
+    **兼容方案**：该接口为调测接口，对功能无影响。如需调试L1 Buffer上的数据，可先将数据搬运到UB再打印。
+
+    **修改前（2201）**：直接打印L1 Buffer上的Tensor。
+
+    ```cpp
+    // 2201：直接打印L1 Buffer上的Tensor
+    AscendC::Print(a1Local);
+    ```
+
+    **修改后（3510）**：先将L1数据搬运到UB，再打印。
+
+    ```cpp
+    // 3510：L1 -> UB -> 打印
+    AscendC::DataCopy(ubLocal, a1Local, count);
+    AscendC::SetFlag<AscendC::HardEvent::MTE1_V>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE1_V>(EVENT_ID0);
+    AscendC::Print(ubLocal);
+    ```
