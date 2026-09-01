@@ -82,9 +82,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ <dtype>* dst,
                                            asc_load_l2_cache_mode l2_cache_mode)
 ```
 
-**dtype取值如下：**`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+### dtype支持数据类型
 
-**典型示例**
+`dtype`取值为：`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+### 函数原型典型示例
 
 ```c
 // 示例：源与目的数据类型为half
@@ -107,13 +109,13 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ half* dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的地址（UB）。 |
-| src | 输入 | 源地址（GM）。 |
-| loop0_size | 输入 | 0维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, 2^20-1]。 |
-| loop1_size | 输入 | 1维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, 2^20-1]。 |
-| loop2_size | 输入 | 2维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, 2^20-1]。 |
-| loop3_size | 输入 | 3维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, 2^20-1]。 |
-| loop4_size | 输入 | 4维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, 2^20-1]。 |
+| dst | 输出 | 目的UB的起始地址，指向padding后数据的起始位置。需要1字节对齐。 |
+| src | 输入 | 源GM的起始地址。需要按dtype字节对齐（b8类型要求1字节对齐、b16类型要求2字节对齐、b32类型要求4字节对齐）。 |
+| loop0_size | 输入 | 0维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, $2^{20}−1$]。 |
+| loop1_size | 输入 | 1维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, $2^{20}−1$]。 |
+| loop2_size | 输入 | 2维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, $2^{20}−1$]。 |
+| loop3_size | 输入 | 3维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, $2^{20}−1$]。 |
+| loop4_size | 输入 | 4维处理的元素个数，不包含Padding元素。<br>单位为元素个数，取值范围为[1, $2^{20}−1$]。 |
 | loop0_lp_count | 输入 | 0维左侧需要补齐的元素个数。<br>单位为元素个数，取值范围为[0, 255]。 |
 | loop0_rp_count | 输入 | 0维右侧需要补齐的元素个数。<br>单位为元素个数，取值范围为[0, 255]。 |
 | padding_mode | 输入 | Padding值的填充方式。<br>&bull; `true`：使用常数填充，所有Padding值均为固定值`pad_value`。<br>&bull; `false`：使用最近值填充，左右Padding值选取当前维度最左侧或最右侧的值。 |
@@ -130,10 +132,13 @@ PIPE_MTE2
 
 ## 约束说明
 
+- 本接口在非AIV上调用直接返回。
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。
-- 如果需要执行多条asc_ndim_copy_gm2ub指令，且asc_ndim_copy_gm2ub指令的目的地址存在重叠，需要插入同步指令，保证多个asc_ndim_copy_gm2ub指令的串行化，防止出现异常数据。
+- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
 - 一条指令所能获取的所有数据的地址范围宽度不能超过40位（1TB），即：源操作数的i维大小为（loopi_lp_size + loopi_size + loopi_rp_size - 1） * loop0_src_stride，目的操作数的i维大小为：（loopi_lp_size + loopi_size + loopi_rp_size - 1） * loop0_dst_stride，所有的维度的大小加起来不超过2^40位。
 - 当每维的loopi_dst_stride为升序序列，则不同循环间的地址空间不能交织或重叠。
+- 各维源/目步长须通过配套接口（[asc_set_ndim_loop_stride](asc_set_ndim_loop_stride.md)）预先配置，单位为元素个数。各维目的步长需保证不发生写覆盖：若某维实际迭代次数大于1，则该维目的步长需大于低维累计写入元素字节数，否则触发写覆盖异常。
+- loop1~loop4维度的左右填充元素数须通过配套接口（[asc_set_ndim_pad_count](asc_set_ndim_pad_count.md)）预先配置，本接口不设置这四个维度的填充。
 
 ## 调用示例
 

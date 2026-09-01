@@ -28,25 +28,26 @@
 
 该接口与`asc_copy_gm2ub_align`配合使用，用于设置连续搬运数据块左右两侧的填充值。
 
-<!-- npu="950" id10 -->
-
+<!-- npu="950" id8 -->
 对于Ascend 950PR/Ascend 950DT产品：
 
 - 该接口仅对`asc_copy_gm2ub_align`接口有效。
 - `fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`类型的数据需转换成`int8_t`类型后再调用本接口。
-<!-- end id10 -->
+<!-- end id8 -->
 
 本接口仅在AIV上生效。
 
-## 函数原型
+## 函数原型（占位符形式）
 
 ```c
 __aicore__ inline void asc_set_copy_pad_val(<dtype> pad_value)
 ```
 
-**dtype取值如下：**`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+### dtype支持数据类型
 
-**典型示例**
+`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+### 函数原型典型示例
 
 ```c
 // 示例：设置float类型的填充值
@@ -71,19 +72,22 @@ PIPE_S
 
 ## 约束说明
 
-无
+- 本接口在非AIV上调用直接返回。
+- 本接口仅设置填充值，须先调用本接口写入配置，再调用对应搬运接口。
+- 本接口设置的填充值仅在`asc_copy_gm2ub_align`接口的参数`enable_constant_pad`设置为`true`时被取用；若`enable_constant_pad`设置为`false`，填充值配置寄存器不被取用，本接口设置不生效。
+- 本接口设置后对后续所有`asc_copy_gm2ub_align`调用生效，直至再次调用本接口覆盖配置；不同搬运任务间若需不同填充值，应在调用搬运接口前重新调用本接口设置。
 
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-<!-- npu="950" id8 -->
+<!-- npu="950" id9 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
-<!-- end id8 -->
+<!-- end id9 -->
 
 ```c
 #include <cstdint>

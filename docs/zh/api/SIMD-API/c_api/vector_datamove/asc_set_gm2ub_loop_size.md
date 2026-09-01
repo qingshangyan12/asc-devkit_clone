@@ -28,6 +28,8 @@
 
 将数据从Global Memory（GM）搬运到Unified Buffer（UB）时，通过调用该接口设置数据搬运流程中的内层和外层循环次数。
 
+需要与[asc_set_gm2ub_loop1_stride](asc_set_gm2ub_loop1_stride.md)、[asc_set_gm2ub_loop2_stride](asc_set_gm2ub_loop2_stride.md)配合使用。
+
 以源操作数搬运场景为例，如下图所示。
 
 ![源操作数搬运场景示例](../figures/source_operand_move_example.png)
@@ -47,8 +49,8 @@ __aicore__ inline void asc_set_gm2ub_loop_size(uint64_t loop1_size,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| loop1_size | 输入 | 内层循环的循环次数，取值范围为[0, 2^21)。 |
-| loop2_size | 输入 | 外层循环的循环次数，取值范围为[0, 2^21)。 |
+| loop1_size | 输入 | 内层循环的循环次数，取值范围为[0, $2^{21}−1$]。 |
+| loop2_size | 输入 | 外层循环的循环次数，取值范围为[0, $2^{22}−1$]。 |
 
 ## 返回值说明
 
@@ -60,7 +62,8 @@ PIPE_S
 
 ## 约束说明
 
-每次设置循环相关参数后，需要进行寄存器的复位（循环次数设置为1），否则会影响下一次搬运的使用。
+- 本接口在非AIV上调用直接返回。
+- 每次设置循环相关参数后，需要进行寄存器的复位（循环次数设置为1），否则会影响下一次搬运的使用。
 
 ## 调用示例
 
