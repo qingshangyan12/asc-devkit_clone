@@ -11,6 +11,7 @@
 #include <future>
 #include <map>
 #include <numeric>
+#include <set>
 #include <string>
 #include <memory>
 #include <cstdlib> // 包含getenv函数
@@ -156,8 +157,14 @@ static HcclResult UpdateCcuCtxTokenOnReuse(
     AlgResourceCtxSerializable tempCtx;
     tempCtx.DeSerialize(seq);
     if (!resCtxHost->kfcServerArgs.empty()) {
+        const std::vector<uint64_t> cachedKfcServerArgs = tempCtx.kfcServerArgs;
         tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
         tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
+        for (size_t offset = 0; offset + KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX < tempCtx.kfcServerArgs.size();
+             offset += KFC_SERVER_ARG_NUM) {
+            tempCtx.kfcServerArgs[offset + KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX] =
+                cachedKfcServerArgs[offset + KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX];
+        }
     }
 
     void* cclBufferAddr = nullptr;
@@ -1393,8 +1400,8 @@ HcclResult HcclAllocAlgResourceCcu(
     uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
     if (resCtxHost->kfcServerArgs.size() < KFC_SERVER_ARG_NUM) {
         HCCL_WARNING(
-            "[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < 6, cannot update token",
-            resCtxHost->kfcServerArgs.size());
+            "[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < %u, cannot update token",
+            resCtxHost->kfcServerArgs.size(), KFC_SERVER_ARG_NUM);
     } else {
         for (size_t offset = 0; offset + KFC_SERVER_TOKEN_ARG_INDEX < resCtxHost->kfcServerArgs.size();
              offset += KFC_SERVER_ARG_NUM) {
@@ -1522,6 +1529,7 @@ static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_EVENT_MS = 160;
 // 即使本算子未在所有 die 上下 kernel，
 // 也需为所有 die 创建 reqDesc，保证后续算子在该 die 上有 kernel 时容量充足。
 static constexpr uint32_t CCU_DEFAULT_DIE_NUM = 2;
+static constexpr uint32_t CCU_TASK_CALL_ABI_VARIABLE_NUM = CCU_TASK_CALL_ARG_MAX + 1U + CCU_TASK_CALL_DEPTH_MAX;
 
 static const std::vector<HcommCcuResType>& GetCcuResTypes()
 {
@@ -1595,7 +1603,7 @@ static bool IsCcuDynamicResApiSupported()
            HcommIsSupportHcommCcuInsResDescSetNum() && HcommIsSupportHcommCcuInsResDescQueryNum() &&
            HcommIsSupportHcommCcuInsCreate() && HcommIsSupportHcommCcuInsDestroy() &&
            HcommIsSupportHcommCcuInsQueryResDesc() && HcommIsSupportHcommCcuQueryRemainResDesc() &&
-           HcommIsSupportHcommCcuKernelQueryResReq() && HcommIsSupportHcclCommAssignCcuIns();
+           HcommIsSupportHcommCcuKernelQueryResReqV2() && HcommIsSupportHcclCommAssignCcuIns();
 }
 
 // 按 dieId 维护资源描述符集合；HcommCcuInsResDescCreate 接口要求每个 desc 必须绑定一个 dieId，
@@ -1615,8 +1623,8 @@ static void DestroyAllDescs(ResDescByDie& descs)
 }
 
 // 查询单个 kernel 的资源需求，按 (dieId, resGroup, resType) 累加到 groupedResMap。
-static HcclResult AccumulateKernelRes(
-    const CcuKernelInfo& kernelInfo,
+static HcclResult AccumulateKernelFuncRes(
+    const CcuKernelInfo& kernelInfo, const char* kernelFuncName, const void* kernelFunc, CcuKernelRole role,
     std::map<uint32_t, std::map<u32, std::map<HcommCcuResType, uint32_t>>>& groupedResMap)
 {
     HcommCcuResDescHandle kernelDesc = 0;
@@ -1630,10 +1638,12 @@ static HcclResult AccumulateKernelRes(
 
     const void* kernelArgs[] = {kernelInfo.kernelArg};
     constexpr uint32_t kernelArgNum = 1;
-    CcuResult queryRet =
-        HcommCcuKernelQueryResReq(reinterpret_cast<void*>(kernelInfo.kernelFunc), kernelArgs, kernelArgNum, kernelDesc);
+    CcuKernelRegisterCfg cfg{};
+    CcuKernelRegisterCfgInit(&cfg);
+    cfg.role = role;
+    CcuResult queryRet = HcommCcuKernelQueryResReqV2(kernelFunc, kernelArgs, kernelArgNum, &cfg, kernelDesc);
     if (queryRet != CCU_SUCCESS) {
-        HCCL_ERROR("[AccumulateKernelRes] HcommCcuKernelQueryResReq failed: ccuRet -> %d", queryRet);
+        HCCL_ERROR("[AccumulateKernelRes] HcommCcuKernelQueryResReqV2 failed: ccuRet -> %d", queryRet);
         HcommCcuInsResDescDestroy(kernelDesc);
         return ConvertCcuToHccl(queryRet);
     }
@@ -1646,12 +1656,31 @@ static HcclResult AccumulateKernelRes(
             HcommCcuInsResDescDestroy(kernelDesc);
             return ConvertCcuToHccl(qRet);
         }
+        if (resType == HCOMM_CCU_RES_TYPE_VARIABLE && role != CCU_KERNEL_ROLE_NORMAL) {
+            resNum -= CCU_TASK_CALL_ABI_VARIABLE_NUM;
+        }
         HCCL_INFO(
             "[AccumulateKernelRes] kernel[%s] dieId[%u] resGroup[%u] resType[%s] resNum[%u].",
-            kernelInfo.kernelFuncName, kernelInfo.dieId, kernelInfo.resGroup, GetCcuResTypeName(resType), resNum);
+            kernelFuncName, kernelInfo.dieId, kernelInfo.resGroup, GetCcuResTypeName(resType), resNum);
         groupedResMap[kernelInfo.dieId][kernelInfo.resGroup][resType] += resNum;
     }
     HcommCcuInsResDescDestroy(kernelDesc);
+    return HCCL_SUCCESS;
+}
+
+static HcclResult AccumulateKernelRes(
+    const CcuKernelInfo& kernelInfo,
+    std::map<uint32_t, std::map<u32, std::map<HcommCcuResType, uint32_t>>>& groupedResMap)
+{
+    const CcuKernelRole kernelRole =
+        kernelInfo.callableTaskFunc == nullptr ? CCU_KERNEL_ROLE_NORMAL : CCU_KERNEL_ROLE_CALLER;
+    CHK_RET(AccumulateKernelFuncRes(
+        kernelInfo, kernelInfo.kernelFuncName, kernelInfo.kernelFunc, kernelRole, groupedResMap));
+    if (kernelInfo.callableTaskFunc != nullptr) {
+        CHK_RET(AccumulateKernelFuncRes(
+            kernelInfo, kernelInfo.callableTaskFuncName, kernelInfo.callableTaskFunc,
+            CCU_KERNEL_ROLE_CALLABLE_TASK, groupedResMap));
+    }
     return HCCL_SUCCESS;
 }
 
@@ -1741,6 +1770,56 @@ static HcclResult RegisterCcuKernels(
 
     for (u32 currentResGroup = 0; currentResGroup <= maxResGroup; currentResGroup++) {
         HCCL_INFO("[RegisterCcuKernels] register resGroup[%u] start, maxResGroup[%u].", currentResGroup, maxResGroup);
+        const bool hasCallableTask = std::any_of(
+            resRequest.ccuKernelInfos.begin(), resRequest.ccuKernelInfos.end(),
+            [currentResGroup](const CcuKernelInfo& kernelInfo) {
+                return kernelInfo.resGroup == currentResGroup && kernelInfo.callableTaskFunc != nullptr;
+            });
+        if (hasCallableTask) {
+            CcuResult taskRegStartRet = HcommCcuKernelRegisterStart(insHandle);
+            CHK_PRT_RET(
+                taskRegStartRet != CCU_SUCCESS,
+                HCCL_ERROR("ccu callable task register start failed: ccuRet -> %d", taskRegStartRet),
+                ConvertCcuToHccl(taskRegStartRet));
+            for (CcuKernelInfo& kernelInfo : resRequest.ccuKernelInfos) {
+                if (kernelInfo.resGroup != currentResGroup || kernelInfo.callableTaskFunc == nullptr) {
+                    continue;
+                }
+                CcuKernelRegisterCfg cfg{};
+                CcuKernelRegisterCfgInit(&cfg);
+                cfg.role = CCU_KERNEL_ROLE_CALLABLE_TASK;
+                CcuKernelHandle callableTaskHandle = 0;
+                const void* kernelArgs[] = {kernelInfo.kernelArg};
+                CcuResult taskRegRet = HcommCcuKernelRegisterV2(
+                    insHandle, kernelInfo.dieId, kernelInfo.callableTaskFuncName, kernelInfo.callableTaskFunc,
+                    kernelArgs, 1, &cfg, &callableTaskHandle);
+                CHK_PRT_RET(
+                    taskRegRet != CCU_SUCCESS,
+                    HCCL_ERROR(
+                        "ccu callable task register failed: ccuRet -> %d, kernel[%s]", taskRegRet,
+                        kernelInfo.callableTaskFuncName),
+                    ConvertCcuToHccl(taskRegRet));
+            }
+            CcuResult taskRegEndRet = HcommCcuKernelRegisterEnd(insHandle);
+            CHK_PRT_RET(
+                taskRegEndRet != CCU_SUCCESS,
+                HCCL_ERROR("ccu callable task register end failed: ccuRet -> %d", taskRegEndRet),
+                ConvertCcuToHccl(taskRegEndRet));
+            for (const CcuKernelInfo& kernelInfo : resRequest.ccuKernelInfos) {
+                if (kernelInfo.resGroup != currentResGroup || kernelInfo.callableTaskFunc == nullptr) {
+                    continue;
+                }
+                uint64_t subKernelPc = 0;
+                CcuResult getFuncRet = HcommCcuFunctionGet(insHandle, kernelInfo.callableTaskFuncName, &subKernelPc);
+                CHK_PRT_RET(
+                    getFuncRet != CCU_SUCCESS,
+                    HCCL_ERROR(
+                        "get callable task PC failed: ccuRet -> %d, kernel[%s]", getFuncRet,
+                        kernelInfo.callableTaskFuncName),
+                    ConvertCcuToHccl(getFuncRet));
+                resCtxHost->kfcServerArgs[kernelInfo.callableTaskPcArgOffset] = subKernelPc;
+            }
+        }
         CcuResult regStartRet = HcommCcuKernelRegisterStart(insHandle);
         CHK_PRT_RET(
             regStartRet != CCU_SUCCESS, HCCL_ERROR("ccu kernel register start failed: ccuRet -> %d", regStartRet),
@@ -1751,13 +1830,14 @@ static HcclResult RegisterCcuKernels(
                 continue;
             CcuKernelHandle kernelHandle;
             const void* kernelArgs[] = {kernelInfo.kernelArg};
-            CcuResult regRet = HcommCcuKernelRegister(
-                insHandle, kernelInfo.dieId, kernelInfo.kernelFuncName, reinterpret_cast<void*>(kernelInfo.kernelFunc),
-                kernelArgs, 1, &kernelHandle);
-            if (regRet == CCU_E_UNAVAIL) {
-                HCCL_WARNING("[RegisterCcuKernels] kernel[%s] unavailable, fallback.", kernelInfo.kernelFuncName);
-                return HCCL_E_UNAVAIL;
+            CcuKernelRegisterCfg cfg{};
+            CcuKernelRegisterCfgInit(&cfg);
+            if (kernelInfo.callableTaskFunc != nullptr) {
+                cfg.role = CCU_KERNEL_ROLE_CALLER;
             }
+            CcuResult regRet = HcommCcuKernelRegisterV2(
+                insHandle, kernelInfo.dieId, kernelInfo.kernelFuncName, reinterpret_cast<void*>(kernelInfo.kernelFunc),
+                kernelArgs, 1, &cfg, &kernelHandle);
             CHK_PRT_RET(
                 regRet != CCU_SUCCESS,
                 HCCL_ERROR("ccu kernel register failed: ccuRet -> %d, kernel[%s]", regRet, kernelInfo.kernelFuncName),
@@ -1816,8 +1896,16 @@ static HcclResult BuildAggregatedResReq(AlgResourceRequest& resRequest, ResDescB
 
     // 按 (dieId, resGroup, resType) 聚合所有 kernel 的资源需求
     std::map<uint32_t, std::map<u32, std::map<HcommCcuResType, uint32_t>>> groupedResMap;
+    std::set<std::pair<uint32_t, u32>> taskCallAbiGroups;
     for (u32 i = 0; i < totalKernelNum; i++) {
-        CHK_RET(AccumulateKernelRes(resRequest.ccuKernelInfos[i], groupedResMap));
+        const CcuKernelInfo& kernelInfo = resRequest.ccuKernelInfos[i];
+        CHK_RET(AccumulateKernelRes(kernelInfo, groupedResMap));
+        if (kernelInfo.callableTaskFunc != nullptr) {
+            taskCallAbiGroups.emplace(kernelInfo.dieId, kernelInfo.resGroup);
+        }
+    }
+    for (const auto& group : taskCallAbiGroups) {
+        groupedResMap[group.first][group.second][HCOMM_CCU_RES_TYPE_VARIABLE] += CCU_TASK_CALL_ABI_VARIABLE_NUM;
     }
 
     // 补齐缺失的 die。区分两类 die：

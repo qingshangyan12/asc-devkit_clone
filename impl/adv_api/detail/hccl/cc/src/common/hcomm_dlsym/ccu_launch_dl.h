@@ -23,10 +23,18 @@ DECL_WEAK_FUNC(CcuResult, HcommCcuKernelRegisterStart, CcuInsHandle insHandle);
 DECL_WEAK_FUNC(
     CcuResult, HcommCcuKernelRegister, CcuInsHandle insHandle, uint32_t dieId, const char* kernelFuncName,
     const void* kernelFunc, const void** kernelArgs, uint32_t argNum, CcuKernelHandle* kernelHandle);
+DECL_WEAK_FUNC(
+    CcuResult, HcommCcuKernelRegisterV2, CcuInsHandle insHandle, uint32_t dieId, const char* kernelFuncName,
+    const void* kernelFunc, const void** kernelArgs, uint32_t argNum, const CcuKernelRegisterCfg* cfg,
+    CcuKernelHandle* kernelHandle);
 DECL_WEAK_FUNC(CcuResult, HcommCcuKernelRegisterEnd, CcuInsHandle insHandle);
+DECL_WEAK_FUNC(CcuResult, HcommCcuFunctionGet, CcuInsHandle insHandle, const char* kernelFuncName, uint64_t* pc);
 DECL_WEAK_FUNC(
     CcuResult, HcommCcuKernelLaunch, ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void* taskArgs,
     uint32_t argSize);
+
+DECL_SUPPORT_FLAG(HcommCcuKernelRegisterV2);
+DECL_SUPPORT_FLAG(HcommCcuFunctionGet);
 
 void CcuLaunchDlInit(void* libHcommHandle);
 
