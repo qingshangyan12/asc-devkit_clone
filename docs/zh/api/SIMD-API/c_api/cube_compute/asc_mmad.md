@@ -70,6 +70,7 @@ $$
 **占位符形式：**
 
 ```c
+// 不显式传入Bias起始地址，通过参数控制C矩阵初始化方式
 __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 __ca__ <a_dtype>* a_matrix,
                                 __cb__ <b_dtype>* b_matrix,
@@ -80,6 +81,17 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 bool disable_gemv,
                                 bool c_matrix_source,
                                 bool c_matrix_init_val)
+
+// 显式传入Bias起始地址，C矩阵使用Bias矩阵初始化
+__aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
+                                __ca__ <a_dtype>* a_matrix,
+                                __cb__ <b_dtype>* b_matrix,
+                                uint64_t bias,
+                                uint16_t m,
+                                uint16_t k,
+                                uint16_t n,
+                                asc_unit_flag_mode unit_flag_mode,
+                                bool disable_gemv)
 ```
 
 **dtype支持的数据类型：**
@@ -103,6 +115,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 **典型示例：**
 
 ```c
+// 不显式传入Bias起始地址
 __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
                                 __ca__ bfloat16_t* a_matrix,
                                 __cb__ bfloat16_t* b_matrix,
@@ -113,6 +126,17 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
                                 bool disable_gemv,
                                 bool c_matrix_source,
                                 bool c_matrix_init_val)
+
+// 显式传入Bias起始地址
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix,
+                                __ca__ bfloat16_t* a_matrix,
+                                __cb__ bfloat16_t* b_matrix,
+                                uint64_t bias,
+                                uint16_t m,
+                                uint16_t k,
+                                uint16_t n,
+                                asc_unit_flag_mode unit_flag_mode,
+                                bool disable_gemv)
 ```
 <!-- end id12 -->
 
@@ -155,13 +179,14 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 | c_matrix | 输出 | 目的操作数，结果矩阵C在L0C Buffer中的起始地址，需按照1024字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
 | a_matrix | 输入 | 源操作数，左矩阵A在L0A Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
 | b_matrix | 输入 | 源操作数，右矩阵B在L0B Buffer中的起始地址，需按照512字节对齐。数据类型由接口重载决定，具体请参见[支持的数据类型组合](#asc_mmad_data_type)。 |
+| bias | 输入 | Bias矩阵在BiasTable Buffer中的起始地址，需按照64字节对齐，可以为非零地址，仅显式传入Bias起始地址的接口包含该参数。<br>Bias的数据类型需与C矩阵的数据类型保持一致，调用本接口前，需将Bias数据通过[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)接口搬运到该地址，Bias占用长度为`n * sizeof(c_dtype)`向上补齐到64字节。 |
 | m | 输入 | 左矩阵A和结果矩阵C的M维大小，单位为元素，取值范围为[0, 4095]。 |
 | k | 输入 | 左矩阵A和右矩阵B的K维大小，单位为元素，取值范围为[0, 4095]。 |
 | n | 输入 | 右矩阵B和结果矩阵C的N维大小，单位为元素，取值范围为[0, 4095]。 |
 | unit_flag_mode | 输入 | 用于控制矩阵乘加指令与矩阵搬出指令的细粒度并行，开启UnitFlag后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启UnitFlag。<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启UnitFlag，硬件执行完指令后不改变单元标志位。<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启UnitFlag，硬件执行完指令后改变单元标志位。<br>矩阵乘加指令与对应的矩阵搬出指令必须都开启或都不开启UnitFlag，开启后指令之间无需再插入同步指令。 |
 | disable_gemv | 输入 | M为1时，配置是否关闭GEMV模式。<br>&nbsp;&nbsp;&bull; false：开启GEMV模式。<br>&nbsp;&nbsp;&bull; true：关闭GEMV模式。<br>M不为1时，该参数不生效。 |
-| c_matrix_source | 输入 | 当参数`c_matrix_init_val`为false时，配置矩阵C的初始值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初始值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初始值来源于BiasTable Buffer。 |
-| c_matrix_init_val | 输入 | 配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数`c_matrix_source`配置。 |
+| c_matrix_source | 输入 | 仅不显式传入Bias起始地址的重载包含该参数。当参数`c_matrix_init_val`为false时，配置矩阵C的初始值来源。<br>&nbsp;&nbsp;&bull; false：矩阵C的初始值来源于L0C Buffer。<br>&nbsp;&nbsp;&bull; true：矩阵C的初始值来源于BiasTable Buffer，并固定从0地址开始读取。 |
+| c_matrix_init_val | 输入 | 仅不显式传入Bias起始地址的重载包含该参数。配置是否将矩阵C的初始值设置为0。<br>&nbsp;&nbsp;&bull; true：将矩阵C的初始值设置为0，参数`c_matrix_source`不生效。<br>&nbsp;&nbsp;&bull; false：不执行清零操作，矩阵C的初始值由参数`c_matrix_source`配置。 |
 <!-- end id14 -->
 
 <!-- npu="A3,910b" id15 -->
