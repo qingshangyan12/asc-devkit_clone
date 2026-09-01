@@ -14,7 +14,7 @@ The example takes FP4 / FP8 type A / B matrices and fp8_e8m0_t type scaleA / sca
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 

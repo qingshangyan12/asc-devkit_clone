@@ -8,9 +8,9 @@ This example implements per-token quantization group matrix multiplication (Quan
 
 | Products | CANN Software Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 training series products/Atlas A3 inference series products | >= CANN 9.0.0 |
-| Atlas A2 training series products/Atlas A2 inference series products | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Atlas A3 training series products/Atlas A3 inference series products | >= CANN 9.2.0 |
+| Atlas A2 training series products/Atlas A2 inference series products | >= CANN 9.2.0 |
 
 ## Introduction to directory structure
 
