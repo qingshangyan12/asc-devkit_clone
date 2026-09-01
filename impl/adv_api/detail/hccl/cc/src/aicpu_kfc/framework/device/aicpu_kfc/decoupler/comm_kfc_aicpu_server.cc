@@ -666,6 +666,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
 
     const bool profilingEnabled =
         execCtx->resourceType == ServerExecResourceType::NEXT_AICPU && IsOpenProfilingEnabled();
+    bool commAcquired = false;
+    std::string acquiredCommName{};
     bool profilingStarted = false;
     HcclResult executionRet = HCCL_SUCCESS;
     std::vector<uint8_t> runParam{};
@@ -699,16 +701,22 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         }
 
         if (i == 0U && execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) {
-            CHK_PRT_RET(
-                runParam.size() < sizeof(mc2_ops_hccl::OpParam),
+            if (runParam.size() < sizeof(mc2_ops_hccl::OpParam)) {
                 HCCL_ERROR(
                     "Group %u: run op param size %zu is smaller than OpParam size %zu for DFX registration.",
-                    groupIdx_, runParam.size(), sizeof(mc2_ops_hccl::OpParam)),
-                HCCL_E_PARA);
+                    groupIdx_, runParam.size(), sizeof(mc2_ops_hccl::OpParam));
+                executionRet = HCCL_E_PARA;
+                break;
+            }
             const auto* dfxParam = reinterpret_cast<const mc2_ops_hccl::OpParam*>(runParam.data());
             HcclDfxOpInfo dfxOpInfo{};
             ret = BuildOpenDfxOpInfo(
                 *dfxParam, msg, extMsg, rankNum_, repeatCnt, execCtx->mainThread, dfxOpInfo);
+            if (ret == HCCL_SUCCESS) {
+                acquiredCommName = dfxParam->commName;
+                ret = static_cast<HcclResult>(HcommAcquireComm(acquiredCommName.c_str()));
+                commAcquired = (ret == HCCL_SUCCESS);
+            }
             if (ret == HCCL_SUCCESS) {
                 ret = HcclDfxRegOpInfoByCommId(
                     const_cast<char*>(dfxParam->commName), reinterpret_cast<void*>(&dfxOpInfo));
@@ -813,10 +821,21 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             }
         }
     }
+
+    HcclResult releaseRet = HCCL_SUCCESS;
+    if (commAcquired) {
+        releaseRet = static_cast<HcclResult>(HcommReleaseComm(acquiredCommName.c_str()));
+        if (releaseRet != HCCL_SUCCESS) {
+            HCCL_ERROR(
+                "Group %u: failed to release comm context for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
+                acquiredCommName.c_str(), static_cast<unsigned long long>(opParamKey), releaseRet);
+        }
+    }
     if (executionRet != HCCL_SUCCESS) {
         return executionRet;
     }
     CHK_RET(profilingRet);
+    CHK_RET(releaseRet);
     SetMsgPosByHandle(handle, msgPos);
     SetRepeatByHandle(handle, repeatCnt);
     return HCCL_SUCCESS;
