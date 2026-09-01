@@ -89,7 +89,7 @@ SelectorStatus AllGatherAutoSelector::SelectCcuScheduleLevel0Algo(
         return SelectorStatus::NOT_MATCH;
     }
 
-    selectAlgName = "CcuKfcAllGatherMesh1DMem2Mem";
+    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
     HCCL_INFO(
         "[KFC][AllGather][Select] algorithm[%s], dataSize[%llu], level0Topo[%u], level0MeshType[%u]",
         selectAlgName.c_str(), static_cast<unsigned long long>(dataSize), static_cast<uint32_t>(topoInfo->level0Topo),
