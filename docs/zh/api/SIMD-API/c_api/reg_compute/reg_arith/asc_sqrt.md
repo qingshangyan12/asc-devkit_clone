@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: "asc_sqrt"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sqrt.md"
+description: "该接口根据mask，对源操作数src进行按元素求开方操作，将结果写入目的操作数dst。"
+signature:
+  - function: "asc_sqrt(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "half"
+        - "float"
+  - function: "asc_sqrt(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "half"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_sqrt
 
 ## 产品支持情况
@@ -36,6 +66,22 @@ dst_i = \sqrt{src_i}
 $$
 
 ## 函数原型（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_sqrt(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+  - function: "asc_sqrt(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 // 通过引用参数输出结果

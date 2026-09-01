@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_div"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md"
+description: "该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。"
+signature:
+  - function: "asc_div(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_div(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_div(vector_float&,vector_float,vector_float,vector_bool)"
+        snippets:
+          - id: "asc_div"
+            file: "div.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_div
 
 ## 产品支持情况
@@ -35,6 +81,22 @@ dst_i = src0_i \div src1_i
 $$
 
 ## 函数原型（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_div(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+  - function: "asc_div(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 // 通过引用参数输出结果

@@ -1,3 +1,373 @@
+---
+okftype: reference.api.cpp
+title: "asc_bfloat162int32"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162int32.md"
+description: "根据`mask`将`src`中的每个参与计算的`bfloat16_t`类型元素转换为`int32_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据参数`src_pos`选择读取`src`索引为偶数的位置或奇数的位置。"
+signature:
+  - function: "asc_bfloat162int32rd(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rd_sat(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rn(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rn_sat(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rna(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rna_sat(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32ru(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: ""
+  - function: "asc_bfloat162int32ru_sat(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rz(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rz_sat(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rd(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rd_sat(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rn(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rn_sat(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rna(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rna_sat(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32ru(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: ""
+  - function: "asc_bfloat162int32ru_sat(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rz(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rz_sat(vector_int32_t&,vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rd(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rd_sat(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rn(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rn_sat(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rna(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rna_sat(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32ru(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: ""
+  - function: "asc_bfloat162int32ru_sat(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rz(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rz_sat(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rd(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rd_sat(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rn(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rn_sat(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rna(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rna_sat(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32ru(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: ""
+  - function: "asc_bfloat162int32ru_sat(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162int32rz(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: ""
+  - function: "asc_bfloat162int32rz_sat(vector_bfloat16_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: "_sat"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_bfloat162int32
 
 ## 产品支持情况

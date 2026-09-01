@@ -168,49 +168,149 @@ __simd_callee__ inline void asc_sub(
 __simd_callee__ inline void asc_sub(
     vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_subc(vector_bool&,vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_subc(
     vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
     vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_subc(vector_bool&,vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_subc(
     vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool carry_src,
     vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_int8_t,vector_int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int8_t asc_min(vector_int8_t src0, vector_int8_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_int16_t,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int16_t asc_min(vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_int32_t,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int32_t asc_min(vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_uint8_t,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint8_t asc_min(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_uint16_t,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint16_t asc_min(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_uint32_t,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint32_t asc_min(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_half,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_min(vector_half src0, vector_half src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bfloat16_t asc_min(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_float,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_min(vector_float src0, vector_float src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_int8_t&,vector_int8_t,vector_int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_min(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_int16_t&,vector_int16_t,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_min(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_min(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_uint8_t&,vector_uint8_t,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_min(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_uint16_t&,vector_uint16_t,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_min(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_min(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_half&,vector_half,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_min(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_bfloat16_t&,vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_min(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_min(vector_float&,vector_float,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_min(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
 /**
@@ -369,41 +469,131 @@ __simd_callee__ inline void asc_mull(
 __simd_callee__ inline void asc_mull(
     vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_sqrt(vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_sqrt(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_sqrt(vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_sqrt(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_sqrt(vector_half&,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_sqrt(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_sqrt(vector_float&,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_sqrt(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_int16_t,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int16_t asc_mul(vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_uint16_t,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint16_t asc_mul(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_half,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_mul(vector_half src0, vector_half src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bfloat16_t asc_mul(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_int32_t,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int32_t asc_mul(vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_uint32_t,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint32_t asc_mul(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_float,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_mul(vector_float src0, vector_float src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_int16_t&,vector_int16_t,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_mul(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_uint16_t&,vector_uint16_t,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_mul(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_half&,vector_half,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_mul(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_bfloat16_t&,vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_mul(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_mul(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_mul(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_mul(vector_float&,vector_float,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_mul(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
 /**
@@ -633,48 +823,148 @@ __simd_callee__ inline void asc_add(
 __simd_callee__ inline void asc_add(
     vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_addc(vector_bool&,vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_addc(
     vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
     vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_addc(vector_bool&,vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_addc(
     vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool carry_src,
     vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_uint8_t,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint8_t asc_max(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_int8_t,vector_int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int8_t asc_max(vector_int8_t src0, vector_int8_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_uint16_t,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint16_t asc_max(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_int16_t,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int16_t asc_max(vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_int32_t,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int32_t asc_max(vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_uint32_t,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint32_t asc_max(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_float,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_max(vector_float src0, vector_float src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_half,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_max(vector_half src0, vector_half src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bfloat16_t asc_max(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_uint8_t&,vector_uint8_t,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_max(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_int8_t&,vector_int8_t,vector_int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_max(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_uint16_t&,vector_uint16_t,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_max(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_int16_t&,vector_int16_t,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_max(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_max(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_max(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_float&,vector_float,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_max(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_half&,vector_half,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_max(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_max(vector_bfloat16_t&,vector_bfloat16_t,vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_max(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
@@ -742,8 +1032,18 @@ __simd_callee__ inline void asc_min_scalar(vector_half& dst, vector_half src, ha
 __simd_callee__ inline void asc_min_scalar(
     vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_exp(vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_exp(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_exp(vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_exp(vector_float src, vector_bool mask);
 
 /**
@@ -809,8 +1109,18 @@ __simd_callee__ inline vector_half asc_min_scalar(vector_half src, half value, v
  */
 __simd_callee__ inline vector_bfloat16_t asc_min_scalar(vector_bfloat16_t src, bfloat16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_exp(vector_half&,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_exp(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_exp(vector_float&,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_exp(vector_float& dst, vector_float src, vector_bool mask);
 
 /**
@@ -954,16 +1264,46 @@ __simd_callee__ inline void asc_ln(vector_half& dst, vector_half src, vector_boo
  */
 __simd_callee__ inline void asc_ln(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_half,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_div(vector_half src0, vector_half src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_float,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_div(vector_float src0, vector_float src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_int16_t,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int16_t asc_div(vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_uint16_t,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint16_t asc_div(vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_int32_t,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int32_t asc_div(vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_uint32_t,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint32_t asc_div(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
 /**
@@ -980,16 +1320,46 @@ __simd_callee__ inline void asc_log(vector_half& dst, vector_half src, vector_bo
  */
 __simd_callee__ inline void asc_log(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_half&,vector_half,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_div(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_float&,vector_float,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_div(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_int16_t&,vector_int16_t,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_div(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_uint16_t&,vector_uint16_t,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_div(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_int32_t&,vector_int32_t,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_div(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @function asc_div(vector_uint32_t&,vector_uint32_t,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_div(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
 /**

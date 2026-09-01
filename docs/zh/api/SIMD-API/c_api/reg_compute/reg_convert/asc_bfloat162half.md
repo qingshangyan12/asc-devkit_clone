@@ -1,3 +1,193 @@
+---
+okftype: reference.api.cpp
+title: "asc_bfloat162half"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162half.md"
+description: "根据`mask`将`src`中的每个参与计算的`bfloat16_t`类型元素转换为`half`类型，结果写入`dst`。"
+signature:
+  - function: "asc_bfloat162halfrd(vector_half&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: ""
+  - function: "asc_bfloat162halfrd_sat(vector_half&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162halfrn(vector_half&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: ""
+  - function: "asc_bfloat162halfrn_sat(vector_half&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162halfrna(vector_half&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+  - function: "asc_bfloat162halfrna_sat(vector_half&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162halfru(vector_half&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: ""
+  - function: "asc_bfloat162halfru_sat(vector_half&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162halfrz(vector_half&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: ""
+  - function: "asc_bfloat162halfrz_sat(vector_half&,vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162halfrd(vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: ""
+  - function: "asc_bfloat162halfrd_sat(vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162halfrn(vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: ""
+  - function: "asc_bfloat162halfrn_sat(vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162halfrna(vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+  - function: "asc_bfloat162halfrna_sat(vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162halfru(vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: ""
+  - function: "asc_bfloat162halfru_sat(vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: "_sat"
+  - function: "asc_bfloat162halfrz(vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: ""
+  - function: "asc_bfloat162halfrz_sat(vector_bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: "_sat"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_bfloat162half
 
 ## 产品支持情况

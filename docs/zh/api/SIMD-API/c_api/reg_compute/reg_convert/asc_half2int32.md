@@ -1,3 +1,177 @@
+---
+okftype: reference.api.cpp
+title: "asc_half2int32"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md"
+description: "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int32_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据参数`src_pos`选择读取`src`索引为偶数的位置或奇数的位置。"
+signature:
+  - function: "asc_half2int32rd(vector_int32_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+  - function: "asc_half2int32rn(vector_int32_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+  - function: "asc_half2int32rna(vector_int32_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+  - function: "asc_half2int32ru(vector_int32_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+  - function: "asc_half2int32rz(vector_int32_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+  - function: "asc_half2int32rd(vector_int32_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+  - function: "asc_half2int32rn(vector_int32_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+  - function: "asc_half2int32rna(vector_int32_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+  - function: "asc_half2int32ru(vector_int32_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+  - function: "asc_half2int32rz(vector_int32_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+  - function: "asc_half2int32rd(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+  - function: "asc_half2int32rn(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+  - function: "asc_half2int32rna(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+  - function: "asc_half2int32ru(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+  - function: "asc_half2int32rz(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+  - function: "asc_half2int32rd(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+  - function: "asc_half2int32rn(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+  - function: "asc_half2int32rna(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+  - function: "asc_half2int32ru(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+  - function: "asc_half2int32rz(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast"
+    archs:
+      - "3510"
+    signature: []
+timestamp: "2026-09-01"
+---
+
 # asc_half2int32
 
 ## 产品支持情况

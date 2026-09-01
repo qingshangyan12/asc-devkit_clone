@@ -1,3 +1,107 @@
+---
+okftype: reference.api.cpp
+title: "asc_gather"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md"
+description: "根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。"
+signature:
+  - function: "asc_gather(vector_<dtype>&,vector_<dtype>,vector_<index_dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_gather.h"
+    dtype:
+      variants:
+        -
+          dtype: "int8_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "uint8_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "hifloat8_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "fp8_e8m0_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "fp8_e5m2_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "fp8_e4m3fn_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "int16_t"
+          index_dtype: "uint16_t"
+        -
+          dtype: "uint16_t"
+          index_dtype: "uint16_t"
+        -
+          dtype: "half"
+          index_dtype: "uint16_t"
+        -
+          dtype: "bfloat16_t"
+          index_dtype: "uint16_t"
+        -
+          dtype: "int32_t"
+          index_dtype: "uint32_t"
+        -
+          dtype: "uint32_t"
+          index_dtype: "uint32_t"
+        -
+          dtype: "float"
+          index_dtype: "uint32_t"
+  - function: "asc_gather(vector_<dtype>,vector_<index_dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_gather.h"
+    dtype:
+      variants:
+        -
+          dtype: "int8_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "uint8_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "hifloat8_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "fp8_e8m0_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "fp8_e5m2_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "fp8_e4m3fn_t"
+          index_dtype: "uint8_t"
+        -
+          dtype: "int16_t"
+          index_dtype: "uint16_t"
+        -
+          dtype: "uint16_t"
+          index_dtype: "uint16_t"
+        -
+          dtype: "half"
+          index_dtype: "uint16_t"
+        -
+          dtype: "bfloat16_t"
+          index_dtype: "uint16_t"
+        -
+          dtype: "int32_t"
+          index_dtype: "uint32_t"
+        -
+          dtype: "uint32_t"
+          index_dtype: "uint32_t"
+        -
+          dtype: "float"
+          index_dtype: "uint32_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_gather
 
 ## 产品支持情况
@@ -35,6 +139,22 @@
 ![寄存器源收集模式](../../figures/asc_gather_vec.png)
 
 ## 函数原型（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_gather(vector_<dtype>&,vector_<dtype>,vector_<index_dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_gather.h"
+  - function: "asc_gather(vector_<dtype>,vector_<index_dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_gather.h"
+```
+
 
 ```c
 // 通过引用参数输出结果

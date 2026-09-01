@@ -1,3 +1,93 @@
+---
+okftype: reference.api.cpp
+title: "asc_half2bfloat16"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2bfloat16.md"
+description: "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`bfloat16_t`类型，结果写入`dst`。"
+signature:
+  - function: "asc_half2bfloat16rd(vector_bfloat16_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+  - function: "asc_half2bfloat16rn(vector_bfloat16_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+  - function: "asc_half2bfloat16rna(vector_bfloat16_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+  - function: "asc_half2bfloat16ru(vector_bfloat16_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+  - function: "asc_half2bfloat16rz(vector_bfloat16_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+  - function: "asc_half2bfloat16rd(vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+  - function: "asc_half2bfloat16rn(vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+  - function: "asc_half2bfloat16rna(vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+  - function: "asc_half2bfloat16ru(vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+  - function: "asc_half2bfloat16rz(vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_half2bfloat16
 
 ## 产品支持情况
