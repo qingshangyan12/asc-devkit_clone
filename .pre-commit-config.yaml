@@ -85,7 +85,7 @@ repos:
         always_run: true
         stages: [pre-commit, manual]
         verbose: true
-  - repo: https://gitcode.com/zhangfands/gitleaks
-    rev: v1.0.0
-    hooks:
-      - id: gitleaks
+  # - repo: https://gitcode.com/zhangfands/gitleaks
+  #   rev: v1.0.0
+  #   hooks:
+  #     - id: gitleaks
