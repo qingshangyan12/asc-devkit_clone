@@ -14,26 +14,15 @@
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_ASC_SET_GM2L1_NZ_PARA_IMPL_H
-#define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_ASC_SET_GM2L1_NZ_PARA_IMPL_H
+#ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_CUBE_DATAMOVE_IMPL_ASC_SET_L0C2GM_RELU_ALPHA_IMPL_H
+#define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_CUBE_DATAMOVE_IMPL_ASC_SET_L0C2GM_RELU_ALPHA_IMPL_H
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
-__aicore__ inline void asc_set_gm2l1_nz_para_impl(uint64_t config)
+__aicore__ inline void asc_set_l0c2gm_relu_alpha_impl(uint64_t config)
 {
     if ASC_IS_AIC {
-        set_mte2_nz_para(config);
-    }
-}
-
-__aicore__ inline void asc_set_gm2l1_nz_para_impl(
-    uint16_t matrix_num, uint16_t dst_nz_n_stride, uint16_t dst_nz_c0_stride, uint16_t dst_nz_matrix_stride)
-{
-    if ASC_IS_AIC {
-        uint64_t config = (static_cast<uint64_t>(dst_nz_matrix_stride) << 48) |
-                          (static_cast<uint64_t>(dst_nz_c0_stride) << 32) |
-                          (static_cast<uint64_t>(dst_nz_n_stride) << 16) | static_cast<uint64_t>(matrix_num);
-        set_mte2_nz_para(config);
+        set_relu_alpha(config);
     }
 }
 

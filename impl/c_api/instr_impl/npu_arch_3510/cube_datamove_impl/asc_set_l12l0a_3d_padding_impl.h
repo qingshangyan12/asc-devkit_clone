@@ -8,10 +8,12 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_ASC_SET_L12L0A_3D_PADDING_IMPL_H
-#define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_ASC_SET_L12L0A_3D_PADDING_IMPL_H
+#ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_CUBE_DATAMOVE_IMPL_ASC_SET_L12L0A_3D_PADDING_IMPL_H
+#define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_CUBE_DATAMOVE_IMPL_ASC_SET_L12L0A_3D_PADDING_IMPL_H
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
+
+constexpr uint8_t ASC_3D_PADDING_SHIFT_BIT = 8;
 
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(uint64_t config)
 {
@@ -23,11 +25,11 @@ __aicore__ inline void asc_set_l12l0a_3d_padding_impl(uint64_t config)
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(int8_t padding_value)
 {
     uint64_t value = static_cast<uint64_t>(static_cast<uint8_t>(padding_value));
-    asc_set_l12l0a_3d_padding_impl((value << 8) | value);
+    asc_set_l12l0a_3d_padding_impl((value << ASC_3D_PADDING_SHIFT_BIT) | value);
 }
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(uint8_t padding_value)
 {
-    asc_set_l12l0a_3d_padding_impl((static_cast<uint64_t>(padding_value) << 8) | padding_value);
+    asc_set_l12l0a_3d_padding_impl((static_cast<uint64_t>(padding_value) << ASC_3D_PADDING_SHIFT_BIT) | padding_value);
 }
 __aicore__ inline void asc_set_l12l0a_3d_padding_impl(int16_t padding_value)
 {
