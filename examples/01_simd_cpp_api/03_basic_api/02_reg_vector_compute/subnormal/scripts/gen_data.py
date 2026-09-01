@@ -18,25 +18,10 @@ import numpy as np
 
 def gen_golden_data():
     total_length = 1024
-    # 最小正规数：1.1754944e-38（np.power(2, -126)） 最小次正规数: 1.401298464324817e-45（np.power(2, -149)）
-    # 1. N / N = S
-    # 2. N / S = N
-    # 3. S / N = S
-    # 4. S / N = N
-    # 5. S / S = N
-    # 5. S / S = S
-    x_small = np.array(
-        [
-            np.power(2.0, -126),
-            np.power(2.0, -125),
-            np.power(2.0, -130),
-            np.power(2.0, -130),
-            np.power(2.0, -140),
-        ]
-    )
-    y_small = np.array(
-        [4.0, np.power(2.0, -127), 2.0, np.power(2.0, -20), np.power(2.0, -145)]
-    )
+    # normal值除法，结果在float32中无法精确表示，需舍入
+    # DIFF_COMPENSATION（0ulp）输出应与IEEE 754正确舍入结果完全一致
+    x_small = np.array([1.0, 1.0, 2.0, 1.0, 3.0, 5.0, 1.0, 7.0, 1.0, 11.0], dtype=np.float64)
+    y_small = np.array([3.0, 7.0, 3.0, 10.0, 7.0, 7.0, 13.0, 11.0, 17.0, 13.0], dtype=np.float64)
     reps = int(np.ceil(total_length / len(x_small)))
     x = (np.tile(x_small, reps)[:total_length]).astype(np.float32)
     y = (np.tile(y_small, reps)[:total_length]).astype(np.float32)
