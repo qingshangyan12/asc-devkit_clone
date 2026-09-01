@@ -12,6 +12,7 @@
 
 #include "ccu_all_to_all_v.h"
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
+#include "ccu_kernel_kfc_server.h"
 #include "ccu_primitives_stub.h"
 #include "ccu_temp_all_to_all_v_mesh_1D.h"
 
@@ -51,9 +52,32 @@ void* ConvertAllToAllVArg(const void* productArg, uint32_t)
     return config;
 }
 
+void* ConvertKfcAllToAllVArg(const void* productArg, uint32_t)
+{
+    if (productArg == nullptr) {
+        return nullptr;
+    }
+    const auto* source = static_cast<const mc2_ops_hccl::CcuKernelArgKfcServer*>(productArg);
+    if (source->opParam.opType != HcclCMDType::HCCL_CMD_ALLTOALLV || source->subCommRanks.empty()) {
+        return nullptr;
+    }
+    auto* config = new AllToAllVKernelConfig();
+    config->rankId = source->rankId;
+    config->rankSize = static_cast<uint32_t>(source->rankSize);
+    for (uint32_t peer : source->subCommRanks[0]) {
+        if (peer != source->rankId) {
+            config->channels.push_back(MakeChannel(source->rankId, peer));
+        }
+    }
+    return config;
+}
+
 bool g_registered = []() {
     RegisterCaptureFunction(
         "CcuKernelAlltoAllVMesh1D", CaptureAllToAllVMesh1DKernel, ConvertAllToAllVArg,
+        [](void* pointer) { delete static_cast<AllToAllVKernelConfig*>(pointer); });
+    RegisterCaptureFunction(
+        "CcuKernelKfcServer", CaptureAllToAllVMesh1DKernel, ConvertKfcAllToAllVArg,
         [](void* pointer) { delete static_cast<AllToAllVKernelConfig*>(pointer); });
     CcuStAllToAllV::RegisterVariant("CcuSchedAllToAllVSoleMesh", BuildAllToAllVMesh1DScenario);
     return true;
@@ -155,7 +179,7 @@ ScenarioData BuildAllToAllVMesh1DScenario(const CcuStScenario& scenario, const s
             memory.parameter[base] = size;
             memory.parameter[base + 1] = std::numeric_limits<uint64_t>::max() - 1U;
             memory.parameter[base + 2] = sendOffsets[rank][peer];
-            memory.parameter[base + 3] = recvOffsets[peer][rank];
+            memory.parameter[base + 3] = recvOffsets[rank][peer];
             data.srcOffsets[rank][peer] = guard + sendOffsets[rank][peer];
             data.dstOffsets[rank][peer] = guard + recvOffsets[peer][rank];
             for (uint64_t byte = 0; byte < size; ++byte) {

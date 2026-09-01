@@ -8,78 +8,115 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "all_reduce_auto_selector.h"
+
 #include "selector_registry.h"
 
 namespace mc2_ops_hccl {
+namespace {
+constexpr u64 AR_CCU_MESH_1D_MAX_DATA_SIZE = 16 * 1024 * 1024;
+constexpr u64 AR_AICPU_MESH_1D_ONESHOT_MAX_DATA_SIZE = 8 * 1024 * 1024;
 
-constexpr u64 AR_M2M_1D_MAX_DATA_SIZE = 8 * 1024 * 1024;
+bool IsSingleDieMesh1D(const TopoInfoWithNetLayerDetails* topoInfo)
+{
+    return topoInfo->topoLevelNums == 1 && topoInfo->level0Topo == Level0Shape::MESH_1D &&
+           topoInfo->level0MeshType == Level0MeshType::SINGLE_DIE;
+}
+} // namespace
 
-SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
+SelectorStatus AllReduceAutoSelector::SelectCcuMesh1D(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
+{
+    if (!IsSingleDieMesh1D(topoInfo)) {
+        HCCL_DEBUG(
+            "[AllReduceAutoSelector] KFC AllReduce requires single-level, single-die Mesh1D, "
+            "levelNum[%u], level0Topo[%d], meshType[%d].",
+            topoInfo->topoLevelNums, topoInfo->level0Topo, topoInfo->level0MeshType);
+        return SelectorStatus::NOT_MATCH;
+    }
+    if (IsInputOutputOverlap(opParam)) {
+        HCCL_WARNING("[AllReduceAutoSelector] KFC AllReduce does not support overlapping input and output.");
+        return SelectorStatus::NOT_MATCH;
+    }
+    if (opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT8 ||
+        Is64BitDataType(opParam.DataDes.dataType) || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD) {
+        HCCL_DEBUG(
+            "[AllReduceAutoSelector] unsupported KFC dataType[%d] or reduceType[%d].",
+            opParam.DataDes.dataType, opParam.reduceType);
+        return SelectorStatus::NOT_MATCH;
+    }
+    if (topoInfo->userRankSize == 0) {
+        HCCL_WARNING("[AllReduceAutoSelector] userRankSize is zero.");
+        return SelectorStatus::NOT_MATCH;
+    }
+
+    const u64 dataSize = opParam.DataDes.count * DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
+    const double ratio = static_cast<double>(DEFAULT_RANK_SIZE) / topoInfo->userRankSize;
+    if (dataSize * ratio >= AR_CCU_MESH_1D_MAX_DATA_SIZE) {
+        HCCL_DEBUG(
+            "[AllReduceAutoSelector] dataSize[%llu] * ratio[%f] exceeds KFC limit[%llu].", dataSize, ratio,
+            AR_CCU_MESH_1D_MAX_DATA_SIZE);
+        return SelectorStatus::NOT_MATCH;
+    }
+
+    selectAlgName = "CcuAllReduceMesh1DMem2Mem";
+    HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s].", __func__, selectAlgName.c_str());
+    return SelectorStatus::MATCH;
+}
+
+SelectorStatus AllReduceAutoSelector::SelectCcuMsAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
-    (void)topoInfo;
-    (void)opParam;
     (void)configAlgMap;
-    selectAlgName = "AicpuAllReduceSoleMeshOneShot";
-    return SelectorStatus::MATCH;
+    return SelectCcuMesh1D(topoInfo, opParam, selectAlgName);
 }
 
 SelectorStatus AllReduceAutoSelector::SelectCcuScheduleAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
-    HCCL_DEBUG("[AllReduceAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
     (void)configAlgMap;
-    CHK_PRT_RET(
-        opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD,
-        HCCL_WARNING(
-            "[AllReduceAutoSelector] ReduceOp[%d] is not supported yet for ccu schedule mode.", opParam.reduceType),
-        SelectorStatus::NOT_MATCH);
-    CHK_PRT_RET(
-        opParam.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT8,
-        HCCL_WARNING(
-            "[AllReduceAutoSelector] dataType[%d] is not supported by KFC AllReduce.", opParam.DataDes.dataType),
-        SelectorStatus::NOT_MATCH);
-    if (Is64BitDataType(opParam.DataDes.dataType)) {
-        HCCL_WARNING("[AllReduceAutoSelector] KFC AllReduce does not support INT64, UINT64 or FP64.");
-        return SelectorStatus::NOT_MATCH;
-    }
-    if (topoInfo->topoLevelNums != 1 || topoInfo->level0Topo != Level0Shape::MESH_1D ||
-        topoInfo->level0MeshType != Level0MeshType::SINGLE_DIE) {
-        HCCL_WARNING(
-            "[AllReduceAutoSelector] unsupported KFC topology, levelNum[%u], level0Topo[%d], meshType[%d].",
-            topoInfo->topoLevelNums, topoInfo->level0Topo, topoInfo->level0MeshType);
-        return SelectorStatus::NOT_MATCH;
-    }
-    CHK_PRT_RET(
-        IsInputOutputOverlap(opParam),
-        HCCL_WARNING("[Algo][AllReduceAutoSelector] ccu_sched does not support inplace allreduce."),
-        SelectorStatus::NOT_MATCH);
-    return SelectMeshAlgoCcuSchedule(topoInfo, opParam, selectAlgName);
+    return SelectCcuMesh1D(topoInfo, opParam, selectAlgName);
 }
 
-SelectorStatus AllReduceAutoSelector::SelectMeshAlgoCcuSchedule(
-    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
+SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
-    u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
-    u64 dataSize = opParam.DataDes.count * perDataSize;
-    double ratio;
-    if (topoInfo->userRankSize == 0) {
-        HCCL_WARNING("[AllReduceAutoSelector]the selector is not set topoInfo->userRankSize]");
-        ratio = 1;
-    } else {
-        ratio = DEFAULT_RANK_SIZE / topoInfo->userRankSize / topoInfo->userRankSize;
-    }
-    if (dataSize * ratio > AR_M2M_1D_MAX_DATA_SIZE) {
+    (void)configAlgMap;
+    if (!IsSingleDieMesh1D(topoInfo)) {
         HCCL_DEBUG(
-            "[AllReduceAutoSelector] dataSize[%lu] * ratio[%f] > MAX_DATA_SIZE[%lu].", dataSize, ratio,
-            AR_M2M_1D_MAX_DATA_SIZE);
+            "[AllReduceAutoSelector] iteration-1 AICPU AllReduce requires single-level, single-die Mesh1D.");
         return SelectorStatus::NOT_MATCH;
     }
-    selectAlgName = "CcuSchedAllReduceSoleMesh";
-    HCCL_DEBUG("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+
+    const u64 dataSize = opParam.DataDes.count * DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
+    selectAlgName = dataSize <= AR_AICPU_MESH_1D_ONESHOT_MAX_DATA_SIZE ? "AicpuAllReduceSoleMeshOneShot" :
+                                                                          "AicpuAllReduceSoleMeshTwoShot";
+    HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s].", __func__, selectAlgName.c_str());
     return SelectorStatus::MATCH;
+}
+
+SelectorStatus AllReduceAutoSelector::SelectAivAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
+{
+    (void)topoInfo;
+    (void)opParam;
+    (void)configAlgMap;
+    (void)selectAlgName;
+    return SelectorStatus::NOT_MATCH;
+}
+
+SelectorStatus AllReduceAutoSelector::SelectDPUAlgo(
+    const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
+    const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
+{
+    (void)topoInfo;
+    (void)opParam;
+    (void)configAlgMap;
+    (void)selectAlgName;
+    return SelectorStatus::NOT_MATCH;
 }
 
 REGISTER_SELECTOR_BY_OPTYPE(HcclCMDType::HCCL_CMD_ALLREDUCE, 18, AllReduceAutoSelector);

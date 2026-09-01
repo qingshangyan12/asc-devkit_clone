@@ -256,7 +256,7 @@ REGISTER_EXEC_V2(
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, InsV2AllReduceSoleExecutor, TopoMatch1D,
+    HcclCMDType::HCCL_CMD_ALLREDUCE, CcuAllReduceMesh1DMem2Mem, InsV2AllReduceSoleExecutor, TopoMatch1D,
     CcuTempKfcAllReduceMesh1DMem2Mem);
 #endif
 

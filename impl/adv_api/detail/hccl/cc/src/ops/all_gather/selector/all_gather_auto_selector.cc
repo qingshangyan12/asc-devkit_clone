@@ -21,19 +21,11 @@ SelectorStatus AllGatherAutoSelector::SelectCcuMsAlgo(
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
     HCCL_DEBUG("[AllGatherAutoSelector][%s] start, topoInfo topoLevelNums[%u]", __func__, topoInfo->topoLevelNums);
+    (void)opParam;
     (void)configAlgMap;
-    // Temporary KFC convergence: only enable single-level Mesh1D Mem2Mem before other CCU paths are verified.
-    if (topoInfo->topoLevelNums > 1 || topoInfo->level0Topo != Level0Shape::MESH_1D) {
-        HCCL_DEBUG("[AllGatherAutoSelector] only single level MESH_1D is supported for ccu_ms mode.");
-        return SelectorStatus::NOT_MATCH;
-    }
-    if (IsInputOutputOverlap(opParam)) {
-        HCCL_WARNING("[Algo][AllGatherAutoSelector] ccu_ms does not support inplace allgather.");
-        return SelectorStatus::NOT_MATCH;
-    }
-    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
-    HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
-    return SelectorStatus::MATCH;
+    (void)selectAlgName;
+    HCCL_DEBUG("[AllGatherAutoSelector] ccu_ms executor is not available, fallback to ccu schedule mode.");
+    return SelectorStatus::NOT_MATCH;
 }
 
 SelectorStatus AllGatherAutoSelector::SelectMeshAlgo(
@@ -51,7 +43,7 @@ SelectorStatus AllGatherAutoSelector::SelectMeshAlgo(
         HCCL_WARNING("[Algo][AllGatherAutoSelector] ccu_ms does not support inplace allgather.");
         return SelectorStatus::NOT_MATCH;
     }
-    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
+    selectAlgName = "CcuKfcAllGatherMesh1DMem2Mem";
     HCCL_DEBUG("[AllGatherAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
@@ -71,7 +63,7 @@ SelectorStatus AllGatherAutoSelector::SelectCcuScheduleUBXAlgo(
         selectAlgName = KFC_CONCURRENT_ALL_GATHER_ALG_NAME;
         return SelectorStatus::MATCH;
     }
-    selectAlgName = "CcuAllGatherMesh1DMem2Mem";
+    selectAlgName = "CcuKfcAllGatherMesh1DMem2Mem";
     return SelectorStatus::MATCH;
 }
 
@@ -154,7 +146,7 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
         }
     } else {
         if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
-            selectAlgName = "InsAllGatherMesh1D";
+            selectAlgName = "AicpuAllGatherSoleMesh";
         } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
             // PCIE-SW定制机型，Mesh无法链接全卡时，需要跨pcie链路，选择适配算法
             if (topoInfo->level0PcieMix) {
@@ -180,7 +172,7 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
                 if (dataSize > SMALL_COUNT_512KB) {
                     selectAlgName = "AicpuAllGatherConcurMeshNHR";
                 } else {
-                    selectAlgName = "InsAllGatherMesh1D";
+                    selectAlgName = "AicpuAllGatherSoleMesh";
                 }
             } else if (isClosNumMultipleOfMeshNum && dataSize > SMALL_COUNT_512KB) {
                 selectAlgName = "InsAllGatherParallelMesh1DNHRUBX";

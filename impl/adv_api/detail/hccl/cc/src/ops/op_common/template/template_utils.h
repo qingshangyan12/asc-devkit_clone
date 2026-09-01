@@ -361,6 +361,9 @@ u32 GetNHRStepNum(u32 rankSize);
 
 inline u32 CalcChannelsPerRank(const std::vector<HcclChannelDesc>& channels)
 {
+    if (channels.empty()) {
+        return 1;
+    }
     u32 channelsPerRank = 1;
     u32 currentRank = INVALID_VALUE_RANKID;
     u32 currentCount = 0;
@@ -369,11 +372,12 @@ inline u32 CalcChannelsPerRank(const std::vector<HcclChannelDesc>& channels)
         if (channel.remoteRank == currentRank) {
             currentCount++;
         } else {
-            if (currentCount != channelsPerRank && channel.remoteRank != channels[0].remoteRank) {
+            if (currentCount != channelsPerRank && currentRank != channels[0].remoteRank
+                && currentRank != INVALID_VALUE_RANKID) {
                 HCCL_WARNING(
                     "[CalcChannelsPerRank] channel num[%u] of remote rank[%u] is not equal to "
                     "channel num[%u] of previous ranks.",
-                    currentCount, channel.remoteRank, channelsPerRank);
+                    currentCount, currentRank, channelsPerRank);
             }
             if (currentCount > channelsPerRank) {
                 channelsPerRank = currentCount;
@@ -426,6 +430,9 @@ inline u32 CalcChannelsPerRankMin(const std::vector<HcclChannelDesc>& channels)
 
 inline u32 CalcChannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels)
 {
+    if (channels.empty()) {
+        return 1;
+    }
     u32 channelsPerRank = 1;
     for (const auto& channelsByRank : channels) {
         if (channelsByRank.second.size() > channelsPerRank) {

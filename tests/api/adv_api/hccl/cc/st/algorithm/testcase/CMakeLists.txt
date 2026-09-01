@@ -14,6 +14,8 @@ set(src_list
     all_gather_aicpu_testcase.cc
     all_to_all_mesh1d_aicpu_testcase.cc
     mc2_aicpu_task_cache_testcase.cc
+    all_reduce_testcase.cc
+    alltoallv_testcase.cc
 )
 
 add_executable(${HCCL_CHECKER_TARGET} ${src_list})
@@ -66,6 +68,7 @@ set(HCCL_AICPU_ALLOC_CTX_TARGET ascendc_ut_adv_api_hccl_cc_aicpu_alloc_ctx)
 add_executable(${HCCL_AICPU_ALLOC_CTX_TARGET}
     main.cc
     aicpu_alloc_ctx_res_testcase.cc
+    aicpu_alloc_ctx_launch_stub.cc
 )
 
 target_include_directories(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
@@ -91,7 +94,7 @@ target_compile_definitions(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
 # The test must exercise the mc2_client built from the current source tree even
 # when an older CANN installation is present in LD_LIBRARY_PATH.
 set_target_properties(${HCCL_AICPU_ALLOC_CTX_TARGET} PROPERTIES
-    BUILD_RPATH "$<TARGET_FILE_DIR:mc2_client>"
+    BUILD_RPATH "$<TARGET_FILE_DIR:mc2_client>;$<TARGET_FILE_DIR:mc2_compat>"
 )
 target_link_options(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
     -Wl,--disable-new-dtags
@@ -99,7 +102,10 @@ target_link_options(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
 
 target_link_libraries(${HCCL_AICPU_ALLOC_CTX_TARGET} PRIVATE
     intf_llt_pub_basic
+    -Wl,--no-as-needed
     mc2_client
+    mc2_compat
+    -Wl,--as-needed
     -Wl,--whole-archive
     ${HCCL_CHECKER_MODEL_PROXY_TARGET}
     -Wl,--no-whole-archive

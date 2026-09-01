@@ -10,3 +10,7 @@
 add_subdirectory(executor)
 add_subdirectory(selector)
 add_subdirectory(template)
+
+target_sources(mc2_client PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/all_to_all_v_op.cc
+)
