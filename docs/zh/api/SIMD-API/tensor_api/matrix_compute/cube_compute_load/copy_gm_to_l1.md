@@ -11,17 +11,17 @@
 <!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910" id4 -->
+- Atlas 训练系列产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品 AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas 推理系列产品 Vector Core：不支持
 <!-- end id6 -->
-<!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310b" id7 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -80,7 +80,7 @@ Global Memory到L1 Buffer通路使用`copy_gm_to_l1{}`作为`operation`，使用
 
 ## 参数说明
 
-**表1**  模板参数说明
+**表 1**  模板参数说明
 
 | 参数名 | 描述 |
 | :--- | :--- |
@@ -93,7 +93,7 @@ Global Memory到L1 Buffer通路使用`copy_gm_to_l1{}`作为`operation`，使用
 | CopyOperation | 搬运操作对象类型。Global Memory到L1 Buffer搬运取`copy_gm_to_l1`。 |
 | CopyTrait | 搬运trait对象类型。Global Memory到L1 Buffer默认取`gm_to_l1_trait_default`。 |
 
-**表2**  `copy`接口参数说明
+**表 2**  `copy`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -104,7 +104,7 @@ Global Memory到L1 Buffer通路使用`copy_gm_to_l1{}`作为`operation`，使用
 | src_coord | 输入 | 搬运区域在源张量中的起始坐标，也可传入`zero_coord`。 |
 | copy_shape | 输入 | 搬运区域的形状，用于指定搬运区域的大小。 |
 
-**表3**  `make_copy`接口参数说明
+**表 3**  `make_copy`接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
@@ -148,13 +148,13 @@ struct gm_to_l1_trait_default {
 
 | 源操作数数据格式 | 目的操作数数据格式 | 源操作数/目的操作数数据类型 |
 | -- | -- | -- |
-| ND | ND | fp4x2_e2m1_t/fp4x2_e1m2_t/int8_t/uint8_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/int64_t/uint64_t |
-| ND | NZ | fp4x2_e2m1_t/fp4x2_e1m2_t/int8_t/uint8_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float |
-| ND | ZN | int8_t/uint8_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float |
-| DN | NZ | int8_t/uint8_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float |
-| DN | ZN | fp4x2_e2m1_t/fp4x2_e1m2_t/int8_t/uint8_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float |
-| NZ | NZ | fp4x2_e2m1_t/fp4x2_e1m2_t/int8_t/uint8_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/int64_t/uint64_t |
-| ZN | ZN | fp4x2_e2m1_t/fp4x2_e1m2_t/int8_t/uint8_t/hifloat8_t/fp8_e5m2_t/fp8_e4m3fn_t/int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float/int64_t/uint64_t |
+| ND | ND | fp4x2_e2m1_t、fp4x2_e1m2_t、int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t |
+| ND | NZ | fp4x2_e2m1_t、fp4x2_e1m2_t、int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float |
+| ND | ZN | int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float |
+| DN | NZ | int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float |
+| DN | ZN | fp4x2_e2m1_t、fp4x2_e1m2_t、int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float |
+| NZ | NZ | fp4x2_e2m1_t、fp4x2_e1m2_t、int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t |
+| ZN | ZN | fp4x2_e2m1_t、fp4x2_e1m2_t、int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t |
 | ScaleAND | ZZ | fp8_e8m0_t |
 | ScaleADN | ZZ | fp8_e8m0_t |
 | ZZ | ZZ | fp8_e8m0_t |
@@ -171,13 +171,15 @@ struct gm_to_l1_trait_default {
 
 ## 约束说明
 
-- 位于Global Memory的源地址必须1B对齐，位于L1 Buffer的目的地址必须32B对齐。
-- 数据连续搬运场景中，搬运字节数需要32B对齐。若未对齐，搬运量会向下取整到32B对齐。
-- 高维切分搬运场景中，搬运长度、源步长和目的步长均按32B对齐。
-- 当输入数据是b4类型时，按b8类型搬运粒度处理，layout推导参数需要满足对应粒度约束。
-- Batch多矩阵搬入仅支持`ND2ND`、`ND2NZ`、`DN2NZ`、`ND2ZN`、`DN2ZN`、`ScaleAND2ZZ`、`ScaleADN2ZZ`、`ZZ2ZZ`、`ScaleBND2NN`、`ScaleBDN2NN`、`NN2NN`格式转换；Batch数受搬运指令字段范围限制，需不大于4095。
-- `NHWC`或`NCHW`到`NC1HWC0`的卷积特征图搬入当前仅支持N为1。源张量和目的张量的H、W、C需要一致，并保证`C = C1 * C0`。
-- `NC1HWC0`到`NC1HWC0`搬入时，源张量和目的张量的N、C1、H、W、C0需要一致。
+- 源Tensor必须位于`location::gm`，目的Tensor必须位于`location::l1`；位置不匹配时无法路由到本通路。
+- Global Memory源地址需要1B对齐，L1 Buffer目的地址需要32B对齐；连续搬运的总字节数需要满足指令对齐要求。
+- 高维切分搬运时，源/目的块长度和Stride必须满足32B对齐及硬件字段范围要求，且所有块地址不能超出Tensor容量。
+- 当输入数据为b4类型时，按b8搬运粒度处理；源、目的Layout的Shape和Stride必须按对应粒度构造。
+- Batch搬入要求源、目的Layout均包含Batch轴，且Batch数量一致；支持的Batch格式为`ND2ND`、`ND2NZ`、`DN2NZ`、`ND2ZN`、`DN2ZN`、`ScaleAND2ZZ`、`ScaleADN2ZZ`、`ZZ2ZZ`、`ScaleBND2NN`、`ScaleBDN2NN`和`NN2NN`，Batch数不能超过指令字段上限4095。
+- `NHWC`或`NCHW`到`NC1HWC0`的卷积特征图搬入当前仅支持N为1；源和目的Tensor的H、W、C必须一致，并满足`C = C1 * C0`。
+- `NC1HWC0`到`NC1HWC0`搬入时，源和目的Tensor的N、C1、H、W、C0必须一致。
+- 区域搬运时，`src_coord`和`dst_coord`的维度必须分别匹配源、目的Tensor，`copy_shape`不能导致源或目的区域越界。
+- 不支持的Layout组合会在编译期触发路由静态断言；调试构建还会检查Layout、Tensor容量和搬运大小。
 
 ## 关键特性说明
 
