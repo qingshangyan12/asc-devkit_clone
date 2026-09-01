@@ -196,10 +196,32 @@ __aicore__ inline void do_overlow_skip(
 {
     if (writeInfo->bufOffset + minTlvLen >= ringBufLen) {
         ringbuf_skip_directly(writeInfo);
+        return;
     }
     ringbuf_skip_with_info(writeInfo, ringBufAddr, ringBufLen);
 }
 
+#if __NPU_ARCH__ == 3510
+__aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo)
+{
+    constexpr uint32_t maxCounter = 15;
+    uint32_t counter = 0;
+    volatile uint64_t readofst = ld_dev((__gm__ uint64_t*)(&(readInfo->bufOffset)), 0);
+    volatile uint64_t writeofst = ld_dev((__gm__ uint64_t*)(&(writeInfo->bufOffset)), 0);
+    // notice all state which need to wait in function check_ringbuf_space has (w != r) before wait
+    while (readofst != writeofst) {
+        if (counter >= maxCounter) { // max wait 15 * 300ms, rts read gm per 200ms
+            return false;
+        }
+        ringbuf_wait_rts_sync(); // wait 20 * 15 ms
+        ++counter;
+        asc_entire_dcci((__gm__ uint64_t*)readInfo);
+        readofst = ld_dev((__gm__ uint64_t*)(&(readInfo->bufOffset)), 0);
+        writeofst = ld_dev((__gm__ uint64_t*)(&(writeInfo->bufOffset)), 0);
+    }
+    return true;
+}
+#else
 __aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo)
 {
     constexpr uint32_t maxCounter = 15;
@@ -215,6 +237,7 @@ __aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo
     }
     return true;
 }
+#endif
 
 __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo, const uint32_t& tlvLen)
 {
@@ -294,12 +317,19 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 #endif
 }
 
+__aicore__ static __attribute__((noinline)) void AscVFDebugFinish()
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
+    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+    __asc_simd_vf::asc_finish_flag();
+#endif
+}
+
 __aicore__ static __attribute__((noinline)) bool AscVFDebugTransferUb()
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
     __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
     if (g_sysPrintFifoSpace != nullptr) {
-        pipe_barrier(PIPE_ALL);
         return asc_vf_debug_ub2gm();
     }
 #endif

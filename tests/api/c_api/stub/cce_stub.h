@@ -11,9 +11,32 @@
 #define __TESTS_C_API_STUB__
 #include <cstdint>
 #include "stub_fun.h"
+#include "c_api/utils/enum.h"
+
+template <typename C, typename A, typename B>
+inline void mad(
+    __cc__ C* c_matrix, __ca__ A* a_matrix, __cb__ B* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, asc_unit_flag_mode unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, static_cast<uint8_t>(unit_flag), disable_gemv,
+        c_matrix_source, c_matrix_init_val);
+}
+
+template <typename C, typename A, typename B>
+inline void mad_mx(
+    __cc__ C* c_matrix, __ca__ A* a_matrix, __cb__ B* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, asc_unit_flag_mode unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    mad_mx(
+        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, static_cast<uint8_t>(unit_flag), disable_gemv,
+        c_matrix_source, c_matrix_init_val);
+}
 
 // The compiler supports this overload, but it is missing from the CPU debug stub header.
 int64_t ld_dev(__gm__ int64_t* src, int16_t offset);
+
+// The compiler supports this overload, but it is missing from the CPU debug stub header.
+inline void vmadd(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, vector_bool mask, Literal mode) {}
 
 #ifndef ULL
 #define ULL unsigned long long
@@ -27,6 +50,7 @@ static uint16_t src_stride_global = 0;
 static bool NZ2ND_en_global = false;
 static bool NZ2DN_en_global = false;
 static void* gm_addr_global = nullptr;
+static void* l0c_addr_global = nullptr;
 static bool is_mock_copy_matrix_cc_to_ub = false;
 static void* ub_addr_global = nullptr;
 static uint64_t quant_pre_global = 0;
@@ -49,6 +73,9 @@ static uint64_t quant_pre_global = 0;
             EXPECT_EQ(nz2dn_en, NZ2DN_en_global);                                                               \
             if (gm_addr_global != nullptr) {                                                                    \
                 EXPECT_EQ(dst_addr, gm_addr_global);                                                            \
+            }                                                                                                   \
+            if (l0c_addr_global != nullptr) {                                                                   \
+                EXPECT_EQ(src_addr, l0c_addr_global);                                                           \
             }                                                                                                   \
             EXPECT_EQ(quant_pre, quant_pre_global);                                                             \
         }                                                                                                       \

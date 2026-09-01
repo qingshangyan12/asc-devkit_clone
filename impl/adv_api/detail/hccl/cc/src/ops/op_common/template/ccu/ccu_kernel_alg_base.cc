@@ -715,7 +715,7 @@ static void SetupLoopAddress(GroupCopyVar& var, ccu::LocalAddr& src, ccu::LocalA
 
 CcuResult GroupCopy(CcuKernelCtxBase& ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize)
 {
-    GroupCopyVar var;
+    GroupCopyVar& var = ctx.GetGcVar();
     CCU_CHK_RET(CreateMultiOpCopy(ctx, var));
     auto& loops = ctx.loopMap["localcopy"];
 
@@ -775,7 +775,7 @@ CcuResult CreateReduceLoop(
     CcuKernelCtxBase& ctx, GroupLocalReduceVar& var, uint32_t size, HcclDataType dataType, HcclDataType outputDataType,
     HcclReduceOp opType)
 {
-    AllocGoResource(ctx.moConfig, ctx.moRes, ctx.resourceAllocated, 8);
+    AllocGoResource(ctx.moConfig, ctx.moRes, ctx.resourceAllocated, CCU_M2M_LOCAL_COPY_LOOP_COUNT);
 
     std::string loopType = "local_reduce";
     if (ctx.IsLoopEntityRegistered(loopType)) {
@@ -826,7 +826,7 @@ CcuResult GroupLocalReduce(
 {
     const uint32_t size = scratchOrg.size();
 
-    GroupLocalReduceVar var;
+    GroupLocalReduceVar& var = ctx.localReduceVar;
     CCU_CHK_RET(CreateReduceLoop(ctx, var, size, dataType, outputDataType, opType));
     auto& loops = ctx.loopMap["local_reduce"];
 
