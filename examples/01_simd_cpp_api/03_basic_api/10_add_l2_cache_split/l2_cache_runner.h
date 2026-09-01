@@ -21,6 +21,7 @@
 #include "l2_cache_kernel.h"
 #include <cerrno>
 #include <cstdio>
+#include <cstdint>
 #include <cstring>
 #include <sys/stat.h>
 
@@ -28,41 +29,107 @@ namespace AddL2Cache {
 
 using KernelLauncher = void (*)(aclrtStream, uint8_t*);
 
+inline bool CheckAcl(const char* action, aclError ret)
+{
+    if (ret == ACL_SUCCESS) {
+        return true;
+    }
+    std::fprintf(stderr, "[ERROR] %s failed, aclError=%d\n", action, static_cast<int32_t>(ret));
+    return false;
+}
+
+inline uint16_t GetHalfBits(const aclFloat16& value)
+{
+    uint16_t bits = 0;
+    static_assert(sizeof(bits) == sizeof(value), "aclFloat16 must use 16 bits");
+    std::memcpy(&bits, &value, sizeof(bits));
+    return bits;
+}
+
+inline bool VerifyOutput(const uint8_t* inputHost, const uint8_t* outputHost, size_t dataSizeBytes)
+{
+    const aclFloat16* input = reinterpret_cast<const aclFloat16*>(inputHost);
+    const aclFloat16* output = reinterpret_cast<const aclFloat16*>(outputHost);
+    const size_t elementCount = dataSizeBytes / sizeof(aclFloat16);
+
+    for (size_t idx = 0; idx < elementCount; ++idx) {
+        const float inputValue = aclFloat16ToFloat(input[idx]);
+        const aclFloat16 expected = aclFloatToFloat16(inputValue + static_cast<float>(computeRoundCount));
+        if (std::memcmp(&output[idx], &expected, sizeof(aclFloat16)) == 0) {
+            continue;
+        }
+
+        std::fprintf(
+            stderr,
+            "[ERROR] result mismatch at index %zu: input=%f, output=%f(0x%04x), expected=%f(0x%04x)\n",
+            idx, inputValue, aclFloat16ToFloat(output[idx]), GetHalfBits(output[idx]), aclFloat16ToFloat(expected),
+            GetHalfBits(expected));
+        return false;
+    }
+    return true;
+}
+
 inline bool RunKernel(const char* caseName, const char* outputPath, KernelLauncher launchKernel, aclrtStream stream)
 {
-    constexpr size_t dataSizeBytes = static_cast<size_t>(totalElementCount) * sizeof(uint16_t);
+    constexpr size_t dataSizeBytes = static_cast<size_t>(totalElementCount) * sizeof(aclFloat16);
 
     uint8_t* inputHost = nullptr;
     uint8_t* outputHost = nullptr;
     uint8_t* dataDevice = nullptr;
 
-    aclrtMallocHost(reinterpret_cast<void**>(&inputHost), dataSizeBytes);
-    aclrtMallocHost(reinterpret_cast<void**>(&outputHost), dataSizeBytes);
-    aclrtMalloc(reinterpret_cast<void**>(&dataDevice), dataSizeBytes, ACL_MEM_MALLOC_HUGE_FIRST);
+    bool success =
+        CheckAcl("aclrtMallocHost(inputHost)", aclrtMallocHost(reinterpret_cast<void**>(&inputHost), dataSizeBytes));
+    success = success && CheckAcl(
+                             "aclrtMallocHost(outputHost)",
+                             aclrtMallocHost(reinterpret_cast<void**>(&outputHost), dataSizeBytes));
+    success = success && CheckAcl(
+                             "aclrtMalloc(dataDevice)",
+                             aclrtMalloc(reinterpret_cast<void**>(&dataDevice), dataSizeBytes, ACL_MEM_MALLOC_HUGE_FIRST));
 
     size_t fileSize = 0;
-    bool success = ReadFile("./input/input.bin", fileSize, inputHost, dataSizeBytes) && fileSize == dataSizeBytes;
-    if (!success) {
-        std::fprintf(stderr, "[ERROR] invalid input file (expected %zu bytes, got %zu)\n", dataSizeBytes, fileSize);
+    if (success) {
+        success = ReadFile("./input/input.bin", fileSize, inputHost, dataSizeBytes) && fileSize == dataSizeBytes;
+        if (!success) {
+            std::fprintf(stderr, "[ERROR] invalid input file (expected %zu bytes, got %zu)\n", dataSizeBytes, fileSize);
+        }
     }
     if (success && mkdir("./output", 0755) != 0 && errno != EEXIST) {
         std::fprintf(stderr, "[ERROR] failed to create output directory: %s\n", std::strerror(errno));
         success = false;
     }
     if (success) {
-        aclrtMemcpy(dataDevice, dataSizeBytes, inputHost, dataSizeBytes, ACL_MEMCPY_HOST_TO_DEVICE);
+        success = CheckAcl(
+            "aclrtMemcpy(HOST_TO_DEVICE)",
+            aclrtMemcpy(dataDevice, dataSizeBytes, inputHost, dataSizeBytes, ACL_MEMCPY_HOST_TO_DEVICE));
+    }
+    if (success) {
         launchKernel(stream, dataDevice);
-        aclrtSynchronizeStream(stream);
-        aclrtMemcpy(outputHost, dataSizeBytes, dataDevice, dataSizeBytes, ACL_MEMCPY_DEVICE_TO_HOST);
+        success = CheckAcl("aclrtSynchronizeStream", aclrtSynchronizeStream(stream));
+    }
+    if (success) {
+        success = CheckAcl(
+            "aclrtMemcpy(DEVICE_TO_HOST)",
+            aclrtMemcpy(outputHost, dataSizeBytes, dataDevice, dataSizeBytes, ACL_MEMCPY_DEVICE_TO_HOST));
+    }
+    if (success) {
+        success = VerifyOutput(inputHost, outputHost, dataSizeBytes);
+    }
+    if (success) {
         success = WriteFile(outputPath, outputHost, dataSizeBytes);
     }
     if (success) {
         std::printf("%s output: %s\n", caseName, outputPath);
     }
 
-    aclrtFree(dataDevice);
-    aclrtFreeHost(outputHost);
-    aclrtFreeHost(inputHost);
+    if (dataDevice != nullptr) {
+        (void)aclrtFree(dataDevice);
+    }
+    if (outputHost != nullptr) {
+        (void)aclrtFreeHost(outputHost);
+    }
+    if (inputHost != nullptr) {
+        (void)aclrtFreeHost(inputHost);
+    }
     return success;
 }
 
@@ -85,16 +152,21 @@ inline int32_t RunSample(
         L2_TILE_THRESHOLD / bytesPerMiB, activeWorkingSetBytes / bytesPerMiB, logicalGmToUbBytesPerKernel / bytesPerMiB,
         vectorCoreCount, activeBatchCount, computeRoundCount);
 
-    aclInit(nullptr);
+    bool success = CheckAcl("aclInit", aclInit(nullptr));
     constexpr int32_t deviceId = 0;
-    aclrtSetDevice(deviceId);
+    success = success && CheckAcl("aclrtSetDevice", aclrtSetDevice(deviceId));
     aclrtStream stream = nullptr;
-    aclrtCreateStream(&stream);
+    success = success && CheckAcl("aclrtCreateStream", aclrtCreateStream(&stream));
 
-    bool success = RunKernel(caseName, outputPath, launchKernel, stream);
-    aclrtDestroyStream(stream);
-    aclrtResetDevice(deviceId);
-    aclFinalize();
+    if (success) {
+        success = RunKernel(caseName, outputPath, launchKernel, stream);
+    }
+    if (stream != nullptr) {
+        success = CheckAcl("aclrtDestroyStream", aclrtDestroyStream(stream)) && success;
+    }
+    success = CheckAcl("aclrtResetDevice", aclrtResetDevice(deviceId)) && success;
+    success = CheckAcl("aclFinalize", aclFinalize()) && success;
+    std::printf("[%s] %s\n", success ? "PASS" : "FAIL", caseName);
     return success ? 0 : 1;
 }
 
