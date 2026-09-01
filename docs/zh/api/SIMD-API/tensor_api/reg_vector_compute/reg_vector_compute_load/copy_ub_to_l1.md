@@ -49,7 +49,7 @@ template <typename DstTensor, typename SrcTensor, typename DstCoord,
     typename SrcCoord, typename CopyShape>
 __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src,
     const DstCoord& dst_coord, const SrcCoord& src_coord,
-    const CopyShape& copy_shape);
+    const CopyShape& copy_shape)
 
 template <typename CopyOperation>
 __aicore__ inline constexpr auto make_copy(const CopyOperation& operation)
@@ -139,8 +139,6 @@ ND通路按行搬运，DN通路按列搬运。接口根据数据类型计算一�
 ```cpp
 #include "tensor_api/tensor.h"
 
-using namespace asc::te;
-
 constexpr uint32_t M = 8;
 constexpr uint32_t N = 64;
 
@@ -149,12 +147,12 @@ __aicore__ inline void copy_ub_to_l1_example()
     __ubuf__ half ub_buf[M * N];
     __cbuf__ half l1_buf[M * N];
 
-    auto layout = make_frame_layout<nd_ext_layout_ptn,
-        layout_trait_default<half>>(M, N);
-    auto src = make_tensor(make_mem_ptr<location::ub>(ub_buf), layout);
-    auto dst = make_tensor(make_mem_ptr<location::l1>(l1_buf), layout);
+    auto layout = asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn,
+        asc::te::layout_trait_default<half>>(M, N);
+    auto src = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(ub_buf), layout);
+    auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::l1>(l1_buf), layout);
 
-    copy(dst, src);
+    asc::te::copy(dst, src);
 }
 ```
 
@@ -163,9 +161,9 @@ __aicore__ inline void copy_ub_to_l1_example()
 以下示例显式构造搬运原子对象，并搬运局部区域：
 
 ```cpp
-auto atom = make_copy(copy_ub_to_l1{}, ub_to_l1_trait_default{});
-copy(atom, dst, src, make_coord(1, 0), make_coord(2, 0),
-    make_shape(2, 32));
+auto atom = asc::te::make_copy(asc::te::copy_ub_to_l1{}, asc::te::ub_to_l1_trait_default{});
+asc::te::copy(atom, dst, src, asc::te::make_coord(1, 0), asc::te::make_coord(2, 0),
+    asc::te::make_shape(2, 32));
 ```
 
 该区域包含2行，每行搬运32个`half`元素，单块长度为2个DataBlock。源、目的Tensor的行步长均为64个元素，每行有效区域之后均保留32个元素，即2个DataBlock，因此接口推导出`blockCount = 2`、`blockLen = 2`、`srcGap = 2`、`dstGap = 2`。

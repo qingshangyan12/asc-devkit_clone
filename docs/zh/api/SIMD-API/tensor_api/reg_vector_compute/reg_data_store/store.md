@@ -159,32 +159,26 @@
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
-namespace te = asc::te;
-namespace exp = asc::te::experimental;
-
 template <typename T, typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void LoadAndStore(const SrcTensor& src, DstTensor& dst)
 {
-    auto coord = te::make_coord(0);
-    auto value = exp::load(src, coord);
-    value.with_mask(exp::all_mask<T>());
-    exp::store(dst, coord, value);
+    auto coord = asc::te::make_coord(0);
+    auto value = asc::te::experimental::load(src, coord);
+    value.with_mask(asc::te::experimental::all_mask<T>());
+    asc::te::experimental::store(dst, coord, value);
 }
 ```
 
 ### 交织搬出
 
 ```cpp
-namespace te = asc::te;
-namespace exp = asc::te::experimental;
-
 template <typename T, typename DstTensor>
 __simd_vf__ inline void StoreInterleaved(
     DstTensor& dst,
-    const exp::reg_tensor<T>& even,
-    const exp::reg_tensor<T>& odd)
+    const asc::te::experimental::reg_tensor<T>& even,
+    const asc::te::experimental::reg_tensor<T>& odd)
 {
-    exp::store<exp::store_sideband_mode::intlv>(
-        dst, te::make_coord(0), even, odd);
+    asc::te::experimental::store<asc::te::experimental::store_sideband_mode::intlv>(
+        dst, asc::te::make_coord(0), even, odd);
 }
 ```

@@ -25,9 +25,9 @@
 `load`和`load_broadcast`只初始化返回对象的`reg`，不初始化`mask`。推荐通过链式计算`with_mask`或在搬入后立即绑定mask：
 
 ```cpp
-auto mask = asc::te::update_mask<float>(remain);
-auto src0Reg = load(src0, asc::te::make_coord(offset)).with_mask(mask);
-auto src1Reg = load(src1, asc::te::make_coord(offset)).with_mask(mask);
+auto mask = asc::te::experimental::update_mask<float>(remain);
+auto src0Reg = asc::te::experimental::load(src0, asc::te::make_coord(offset)).with_mask(mask);
+auto src1Reg = asc::te::experimental::load(src1, asc::te::make_coord(offset)).with_mask(mask);
 ```
 
 对于双目的`deintlv`搬入模式，接口没有返回值，需分别绑定：
@@ -35,8 +35,8 @@ auto src1Reg = load(src1, asc::te::make_coord(offset)).with_mask(mask);
 ```cpp
 asc::te::experimental::reg_tensor<uint8_t> src0Reg;
 asc::te::experimental::reg_tensor<uint8_t> src1Reg;
-src.load<asc::te::experimental::load_sideband_mode::deintlv>(
-    asc::te::make_coord(offset), src0Reg, src1Reg);
+asc::te::experimental::load<asc::te::experimental::load_sideband_mode::deintlv>(
+    src, asc::te::make_coord(offset), src0Reg, src1Reg);
 
 auto mask = asc::te::experimental::all_mask<uint8_t>();
 src0Reg.with_mask(mask);
@@ -59,12 +59,12 @@ src1Reg.with_mask(mask);
 
 ```cpp
 auto mask = asc::te::experimental::update_mask<float>(remain);
-auto src0Reg = src0.load(asc::te::experimental:::make_coord(offset)).with_mask(mask);
-auto src1Reg = src1.load(asc::te::experimental::make_coord(offset)).with_mask(mask);
+auto src0Reg = asc::te::experimental::load(src0, asc::te::make_coord(offset)).with_mask(mask);
+auto src1Reg = asc::te::experimental::load(src1, asc::te::make_coord(offset)).with_mask(mask);
 
 auto dstReg = src0Reg + src1Reg;
 // dstReg.mask与src0Reg.mask保持一致，可直接用于单源store。
-dst.store(asc::te::experimental::make_coord(offset), dstReg);
+asc::te::experimental::store(dst, asc::te::make_coord(offset), dstReg);
 ```
 
 ## 特殊接口说明<a name="section640mcpsimp"></a>

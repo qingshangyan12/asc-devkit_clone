@@ -56,5 +56,5 @@ __simd_callee__ inline reg_tensor<bool> all_mask()
 
 ```cpp
 auto fullMask = asc::te::experimental::all_mask<half>();
-auto value = src.load(asc::te::make_coord(0)).with_mask(fullMask);
+auto value = asc::te::experimental::load(src, asc::te::make_coord(0)).with_mask(fullMask);
 ```

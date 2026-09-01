@@ -58,5 +58,5 @@ __simd_callee__ inline reg_tensor<bool> make_mask()
 
 ```cpp
 auto mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::every3, float>();
-auto value = src.load(asc::te::make_coord(0)).with_mask(mask);
+auto value = asc::te::experimental::load(src, asc::te::make_coord(0)).with_mask(mask);
 ```

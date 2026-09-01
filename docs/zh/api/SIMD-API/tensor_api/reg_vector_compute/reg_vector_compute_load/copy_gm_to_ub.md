@@ -68,7 +68,7 @@ Tensor API通过`copy`接口统一执行不同通路的数据搬运。该接口�
 
     ```cpp
     template <typename CopyOperation>
-    __aicore__ inline constexpr auto make_copy(const CopyOperation& operation);
+    __aicore__ inline constexpr auto make_copy(const CopyOperation& operation)
 
     template <typename CopyOperation, typename CopyTrait>
     __aicore__ inline constexpr auto make_copy(
@@ -123,9 +123,9 @@ struct gm_to_ub_params {
 通过以下方式绑定运行时搬运参数：
 
 ```cpp
-gm_to_ub_params params{left_padding, right_padding, true};
-auto atom = make_copy(copy_gm_to_ub{}).with(params);
-copy(atom, dst, src);
+asc::te::gm_to_ub_params params{left_padding, right_padding, true};
+auto atom = asc::te::make_copy(asc::te::copy_gm_to_ub{}).with(params);
+asc::te::copy(atom, dst, src);
 ```
 
 ## 数据类型
@@ -191,8 +191,8 @@ __aicore__ inline void copy_gm_to_ub_example(__gm__ half* gm_addr)
 
     auto layout = asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn,
         asc::te::layout_trait_default<half>>(m, n);
-    auto src = asc::te::temake_tensor(asc::te::make_mem_ptr<location::gm>(gm_addr), layout);
-    auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<location::ub>(ub_buf), layout);
+    auto src = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::gm>(gm_addr), layout);
+    auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(ub_buf), layout);
 
     asc::te::copy(dst, src);
 }

@@ -131,8 +131,6 @@ UB源地址按32字节对齐，Global Memory目的端允许1字节对齐。单�
 ```cpp
 #include "tensor_api/tensor.h"
 
-using namespace asc::te;
-
 constexpr uint32_t M = 8;
 constexpr uint32_t N = 64;
 
@@ -140,12 +138,12 @@ __aicore__ inline void copy_ub_to_gm_example(__gm__ half* gm_addr)
 {
     __ubuf__ half ub_buf[M * N];
 
-    auto layout = make_frame_layout<nd_ext_layout_ptn,
-        layout_trait_default<half>>(M, N);
-    auto src = make_tensor(make_mem_ptr<location::ub>(ub_buf), layout);
-    auto dst = make_tensor(make_mem_ptr<location::gm>(gm_addr), layout);
+    auto layout = asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn,
+        asc::te::layout_trait_default<half>>(M, N);
+    auto src = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(ub_buf), layout);
+    auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::gm>(gm_addr), layout);
 
-    copy(dst, src);
+    asc::te::copy(dst, src);
 }
 ```
 
@@ -154,9 +152,9 @@ __aicore__ inline void copy_ub_to_gm_example(__gm__ half* gm_addr)
 以下示例显式构造搬运原子对象，并搬运单块长度非32字节对齐的局部区域：
 
 ```cpp
-auto atom = make_copy(copy_ub_to_gm{}, ub_to_gm_trait_default{});
-copy(atom, dst, src, make_coord(1, 0), make_coord(2, 0),
-    make_shape(2, 23));
+auto atom = asc::te::make_copy(asc::te::copy_ub_to_gm{}, asc::te::ub_to_gm_trait_default{});
+asc::te::copy(atom, dst, src, asc::te::make_coord(1, 0), asc::te::make_coord(2, 0),
+    asc::te::make_shape(2, 23));
 ```
 
 该区域包含2行，每行搬运23个`half`元素，因此接口推导出块数为2、单块长度为46字节。源、目的Tensor的行步长均为128字节，所以源步长和目的步长均为128字节。每块仅有46字节有效数据写入GM，UB侧尾部补齐数据不会写入；GM中相邻有效数据块之间保留82字节间隔。

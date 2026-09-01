@@ -109,15 +109,12 @@
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
 
-namespace te = asc::te;
-namespace exp = asc::te::experimental;
-
 template <typename SrcTensor>
 __simd_vf__ inline void LoadScalarBroadcast(const SrcTensor& src)
 {
-    auto value = exp::load_broadcast<exp::broadcast_mode::elem>(
-        src, te::make_coord(0));
-    value.with_mask(exp::all_mask<float>());
+    auto value = asc::te::experimental::load_broadcast<asc::te::experimental::broadcast_mode::elem>(
+        src, asc::te::make_coord(0));
+    value.with_mask(asc::te::experimental::all_mask<float>());
     // 使用value完成后续寄存器计算。
 }
 ```

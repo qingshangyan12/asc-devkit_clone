@@ -45,7 +45,7 @@
     template <load_sideband_mode sideband_mode = load_sideband_mode::direct,
               typename Tensor,
               typename Coord>
-    __simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord);
+    __simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord)
     ```
 
 - 单目的操作数，从Tensor起始位置搬入：
@@ -53,7 +53,7 @@
     ```cpp
     template <load_sideband_mode sideband_mode = load_sideband_mode::direct,
               typename Tensor>
-    __simd_callee__ inline decltype(auto) load(const Tensor& tensor);
+    __simd_callee__ inline decltype(auto) load(const Tensor& tensor)
     ```
 
 - 双目的操作数，指定坐标：
@@ -66,7 +66,7 @@
     __simd_callee__ inline void load(const Tensor& tensor,
                                      const Coord& coord,
                                      reg_tensor<RegDataType>& dst0,
-                                     reg_tensor<RegDataType>& dst1);
+                                     reg_tensor<RegDataType>& dst1)
     ```
 
 - 双目的操作数，从Tensor起始位置搬入：
@@ -77,7 +77,7 @@
               typename RegDataType>
     __simd_callee__ inline void load(const Tensor& tensor,
                                      reg_tensor<RegDataType>& dst0,
-                                     reg_tensor<RegDataType>& dst1);
+                                     reg_tensor<RegDataType>& dst1)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -148,14 +148,11 @@ Tensor元素类型与寄存器元素类型保持一致。不同模式支持的�
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
 
-namespace te = asc::te;
-namespace exp = asc::te::experimental;
-
 template <typename T, typename SrcTensor>
 __simd_vf__ inline void LoadData(const SrcTensor& src)
 {
-    auto value = exp::load(src, te::make_coord(0));
-    value.with_mask(exp::all_mask<T>());
+    auto value = asc::te::experimental::load(src, asc::te::make_coord(0));
+    value.with_mask(asc::te::experimental::all_mask<T>());
     // 使用value完成后续寄存器计算。
 }
 ```
@@ -163,18 +160,15 @@ __simd_vf__ inline void LoadData(const SrcTensor& src)
 ### 解交织搬入
 
 ```cpp
-namespace te = asc::te;
-namespace exp = asc::te::experimental;
-
 template <typename T, typename SrcTensor>
 __simd_vf__ inline void LoadDeinterleaved(const SrcTensor& src)
 {
-    exp::reg_tensor<T> even;
-    exp::reg_tensor<T> odd;
-    exp::load<exp::load_sideband_mode::deintlv>(
-        src, te::make_coord(0), even, odd);
+    asc::te::experimental::reg_tensor<T> even;
+    asc::te::experimental::reg_tensor<T> odd;
+    asc::te::experimental::load<asc::te::experimental::load_sideband_mode::deintlv>(
+        src, asc::te::make_coord(0), even, odd);
 
-    auto mask = exp::all_mask<T>();
+    auto mask = asc::te::experimental::all_mask<T>();
     even.with_mask(mask);
     odd.with_mask(mask);
     // even和odd分别保存偶数索引和奇数索引的元素。

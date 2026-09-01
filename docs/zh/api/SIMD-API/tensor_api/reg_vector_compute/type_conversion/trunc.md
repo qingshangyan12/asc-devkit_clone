@@ -115,13 +115,13 @@ __simd_vf__ inline void TruncRegLoop(
 
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         const uint32_t offset = i * ONE_REPEAT;
-        const auto coord = asc::te::experimental::make_coord(offset / columnCount, offset % columnCount);
+        const auto coord = asc::te::make_coord(offset / columnCount, offset % columnCount);
 
-        auto srcReg = src.load(coord);
+        auto srcReg = asc::te::experimental::load(src, coord);
         srcReg.with_mask(asc::te::experimental::update_mask<T>(remain));
 
         auto dstReg = asc::te::experimental::trunc(srcReg);
-        dst.store(coord, dstReg);
+        asc::te::experimental::store(dst, coord, dstReg);
     }
 }
 ```

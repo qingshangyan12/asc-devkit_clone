@@ -39,24 +39,24 @@
 
 ```cpp
 template <typename DstTensor, typename SrcTensor>
-__aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src);
+__aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src)
 
 template <typename Atom, typename DstTensor, typename SrcTensor>
 __aicore__ inline void copy(const copy_atom<Atom>& atom,
-    const DstTensor& dst, const SrcTensor& src);
+    const DstTensor& dst, const SrcTensor& src)
 
 template <typename DstTensor, typename SrcTensor, typename DstCoord,
     typename SrcCoord, typename CopyShape>
 __aicore__ inline void copy(const DstTensor& dst, const SrcTensor& src,
     const DstCoord& dst_coord, const SrcCoord& src_coord,
-    const CopyShape& copy_shape);
+    const CopyShape& copy_shape)
 
 template <typename CopyOperation>
-__aicore__ inline constexpr auto make_copy(const CopyOperation& operation);
+__aicore__ inline constexpr auto make_copy(const CopyOperation& operation)
 
 template <typename CopyOperation, typename CopyTrait>
 __aicore__ inline constexpr auto make_copy(
-    const CopyOperation& operation, const CopyTrait& trait);
+    const CopyOperation& operation, const CopyTrait& trait)
 ```
 
 UB到UB通路使用`copy_ub_to_ub{}`作为搬运操作对象，默认trait为`ub_to_ub_trait_default{}`。
@@ -131,12 +131,20 @@ UB到UB通路使用`copy_ub_to_ub{}`作为搬运操作对象，默认trait为`ub
 
 上述参数仅用于说明Layout推导结果，调用`copy`时无需构造或传入`DataCopyParams`。
 
+### ZN2ZN分形搬运
+
+ZN Layout将逻辑二维Shape拆分为`((C0, ceil_div(M, C0)), (16, ceil_div(N, 16)))`。其中，`C0`由元素类型决定。ZN2ZN整Tensor搬运以外层行方向切分数据块：
+
+- `blockCount`为外层行数`ceil_div(M, C0)`。
+- `blockLen`为逻辑总列数乘以内层行数和元素字节数，即`N × C0 × sizeof(T)`字节。
+- `srcGap`和`dstGap`分别为对应Tensor的外层行步长减去`blockLen`，并换算为32字节的DataBlock数。
+
+源Tensor和目的Tensor必须均为ZN Layout，接口只在相同分形格式之间搬运，不改变分形排布。
+
 ## 调用示例
 
 ```cpp
 #include "tensor_api/tensor.h"
-
-using namespace asc::te;
 
 constexpr uint32_t M = 8;
 constexpr uint32_t N = 64;
@@ -146,12 +154,12 @@ __aicore__ inline void copy_ub_to_ub_example()
     __ubuf__ int8_t src_buf[M * N];
     __ubuf__ int8_t dst_buf[M * N];
 
-    auto layout = make_frame_layout<nd_ext_layout_ptn,
-        layout_trait_default<int8_t>>(M, N);
-    auto src = make_tensor(make_mem_ptr<location::ub>(src_buf), layout);
-    auto dst = make_tensor(make_mem_ptr<location::ub>(dst_buf), layout);
+    auto layout = asc::te::make_frame_layout<asc::te::nd_ext_layout_ptn,
+        asc::te::layout_trait_default<int8_t>>(M, N);
+    auto src = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src_buf), layout);
+    auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst_buf), layout);
 
-    copy(dst, src);
+    asc::te::copy(dst, src);
 }
 ```
 
@@ -160,8 +168,32 @@ __aicore__ inline void copy_ub_to_ub_example()
 局部区域搬运示例如下：
 
 ```cpp
-copy(dst, src, make_coord(0, 0), make_coord(2, 0),
-    make_shape(4, 32));
+asc::te::copy(dst, src, asc::te::make_coord(0, 0), asc::te::make_coord(2, 0),
+    asc::te::make_shape(4, 32));
 ```
 
 该区域包含4行，每行搬运32个`int8_t`元素。源、目的Tensor的行步长均为64字节，因此接口推导出`blockCount = 4`、`blockLen = 1`、`srcGap = 1`、`dstGap = 1`。
+
+ZN2ZN分形搬运示例如下：
+
+```cpp
+#include "tensor_api/tensor.h"
+
+constexpr uint32_t ZN_M = 32;
+constexpr uint32_t ZN_N = 32;
+
+__aicore__ inline void copy_ub_to_ub_zn_example()
+{
+    __ubuf__ half src_buf[ZN_M * ZN_N];
+    __ubuf__ half dst_buf[ZN_M * ZN_N];
+
+    auto layout = asc::te::make_frame_layout<asc::te::zn_layout_ptn,
+        asc::te::layout_trait_default<half>>(ZN_M, ZN_N);
+    auto src = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src_buf), layout);
+    auto dst = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst_buf), layout);
+
+    asc::te::copy(dst, src);
+}
+```
+
+对于`half`，`C0`为16。该示例的ZN Layout为`((16, 2), (16, 2))`，接口沿外层行方向生成2个数据块；每个数据块包含32列和16个内层行元素，共1024字节，即32个DataBlock。源、目的Layout均为紧凑排布，因此`srcGap = 0`、`dstGap = 0`。

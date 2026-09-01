@@ -34,7 +34,7 @@
 
 ```cpp
 __simd_callee__ inline reg_tensor& with_mask(
-    const reg_tensor<bool>& maskReg);
+    const reg_tensor<bool>& maskReg)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -54,7 +54,7 @@ __simd_callee__ inline reg_tensor& with_mask(
 ## 调用示例<a name="section650mcpsimp"></a>
 
 ```cpp
-auto value = src.load(asc::te::make_coord(0))
+auto value = asc::te::experimental::load(src, asc::te::make_coord(0))
                 .with_mask(asc::te::experimental::all_mask<float>());
-dst.store(asc::te::make_coord(0), value);
+asc::te::experimental::store(dst, asc::te::make_coord(0), value);
 ```

@@ -56,6 +56,6 @@ __simd_callee__ inline reg_tensor<bool> none_mask()
 ## 调用示例<a name="section660mcpsimp"></a>
 
 ```cpp
-auto disabled = exp::none_mask<uint32_t>();
-auto value = src.load(te::make_coord(0)).with_mask(disabled);
+auto disabled = asc::te::experimental::none_mask<uint32_t>();
+auto value = asc::te::experimental::load(src, asc::te::make_coord(0)).with_mask(disabled);
 ```

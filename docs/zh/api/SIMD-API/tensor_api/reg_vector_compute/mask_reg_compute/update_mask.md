@@ -60,7 +60,7 @@ __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain)
 uint32_t remain = count;
 for (uint32_t offset = 0; offset < count; offset += elementsPerReg) {
     auto tailMask = asc::te::experimental::update_mask<float>(remain);
-    auto value = src.load(asc::te::make_coord(offset)).with_mask(tailMask);
-    dst.store(asc::te::make_coord(offset), value);
+    auto value = asc::te::experimental::load(src, asc::te::make_coord(offset)).with_mask(tailMask);
+    asc::te::experimental::store(dst, asc::te::make_coord(offset), value);
 }
 ```

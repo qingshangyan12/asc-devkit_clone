@@ -172,11 +172,12 @@ constexpr asc::te::experimental::cast_options f16ToS32Options = {
 template <typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void cast_f16_to_s32(const SrcTensor src, DstTensor dst)
 {
-    auto srcReg = src.template load<asc::te::experimental::load_sideband_mode::unpack>(asc::te::experimental::make_coord(0));
+    auto srcReg = asc::te::experimental::load<asc::te::experimental::load_sideband_mode::unpack>(
+        src, asc::te::make_coord(0));
     srcReg.with_mask(asc::te::experimental::all_mask<int32_t>());
 
     auto dstReg = asc::te::experimental::cast<int32_t, f16ToS32Options>(srcReg);
-    dst.store(asc::te::experimental::make_coord(0), dstReg);
+    asc::te::experimental::store(dst, asc::te::make_coord(0), dstReg);
 }
 ```
 
@@ -185,8 +186,6 @@ __simd_vf__ inline void cast_f16_to_s32(const SrcTensor src, DstTensor dst)
 以下示例将`float`转换为`int16_t`，使用向最近偶数舍入和饱和模式。目的类型位宽为源类型的一半，因此使用`pack`模式搬出。
 
 ```cpp
-namespace te = asc::te::experimental;
-
 constexpr asc::te::experimental::cast_options f32ToS16Options = {
     asc::te::experimental::cast_layout::zero,
     asc::te::experimental::cast_round_mode::rint,
@@ -196,10 +195,11 @@ constexpr asc::te::experimental::cast_options f32ToS16Options = {
 template <typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void CastF32ToS16(const SrcTensor src, DstTensor dst)
 {
-    auto srcReg = src.load(asc::te::experimental::make_coord(0));
+    auto srcReg = asc::te::experimental::load(src, asc::te::make_coord(0));
     srcReg.with_mask(asc::te::experimental::all_mask<float>());
 
     auto dstReg = asc::te::experimental::cast<int16_t, f32ToS16Options>(srcReg);
-    dst.template store<asc::te::experimental::store_sideband_mode::pack>(asc::te::experimental::make_coord(0), dstReg);
+    asc::te::experimental::store<asc::te::experimental::store_sideband_mode::pack>(
+        dst, asc::te::make_coord(0), dstReg);
 }
 ```
