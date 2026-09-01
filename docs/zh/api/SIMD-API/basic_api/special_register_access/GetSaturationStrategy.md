@@ -11,8 +11,8 @@
 <!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
 <!-- end id3 -->
-<!-- npu="910" id4 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
@@ -20,8 +20,8 @@
 <!-- npu="310p" id6 -->
 - Atlas 推理系列产品Vector Core：不支持
 <!-- end id6 -->
-<!-- npu="310b" id7 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
 - Kirin X90：不支持
@@ -53,7 +53,7 @@ __aicore__ inline OverrideStrategy GetSaturationStrategy()
 
 返回值类型为`OverrideStrategy`，表示当前使用的饱和模式配置策略。
 
-**表 1**  返回值说明
+**表1**  返回值说明
 
 | 返回值 | 描述 |
 | --- | --- |

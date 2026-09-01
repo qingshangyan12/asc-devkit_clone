@@ -11,8 +11,8 @@
 <!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
 <!-- end id3 -->
-<!-- npu="910" id4 -->
-- Atlas 训练系列产品：不支持
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
@@ -20,8 +20,8 @@
 <!-- npu="310p" id6 -->
 - Atlas 推理系列产品Vector Core：不支持
 <!-- end id6 -->
-<!-- npu="310b" id7 -->
-- Atlas 200I/500 A2 推理产品：不支持
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
 - Kirin X90：不支持
@@ -57,13 +57,13 @@ __aicore__ inline void SetSaturationFlag(bool enableSat)
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | mode | 饱和模式，取值如下：<br>&bull;`SaturationMode::FLOAT`：浮点数计算和浮点数精度转换的饱和模式，系统默认开启。<br>&bull;`SaturationMode::FLOAT8`：浮点数精度转换时，控制FP8类型输出为NAN时是否饱和为0，系统默认开启。该模式仅在精度转换接口处于饱和模式时生效，具体请参考[约束说明](#约束说明)。<br>&bull;`SaturationMode::INT`：整数计算的饱和模式，系统默认关闭。<br>&bull;`SaturationMode::CAST`：浮点数转整数或整数转整数时的精度转换饱和模式，系统默认开启。<br>各模式支持的产品请参考[约束说明](#约束说明)，影响的数据类型请参考[数据类型](#数据类型)。模板参数无默认值，调用本接口时必须显式指定。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -112,7 +112,6 @@ __aicore__ inline void SetSaturationFlag(bool enableSat)
 ## 约束说明
 
 <!-- npu="950" id17 -->
-- 初始化时保留核函数入口处的`SaturationMode::FLOAT`状态。如需确保该模式的开启状态，应调用本接口显式设置。
 - 使用`SaturationMode::FLOAT8`前，需要先处于饱和模式（通过全局`SaturationMode::FLOAT`或单接口`satMode`开启）。
 - 对于FP8类型的精度转换，输出为NAN时是否饱和为0由`SaturationMode::FLOAT8`控制：未开启`SaturationMode::FLOAT8`时，即使处于饱和模式（包括全局`SaturationMode::FLOAT`或单接口`satMode`），NAN仍保留；开启`SaturationMode::FLOAT8`后，在饱和模式生效时NAN饱和为0。
 <!-- end id17 -->
