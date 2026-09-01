@@ -58,7 +58,7 @@ public:
         });
     }
 
-    __aicore__ __callee__ inline int32_t GetTotalIter() const { return nIter_; }
+    __aicore__ inline int32_t GetTotalIter() const { return nIter_; }
 
     __aicore__ inline bool OuterNext()
     {
@@ -110,9 +110,9 @@ public:
     }
 
     // Params Function
-    __aicore__ __callee__ inline int32_t GetOuterIdx() const { return nIdx_; }
+    __aicore__ inline int32_t GetOuterIdx() const { return nIdx_; }
 
-    __aicore__ __callee__ inline int32_t GetInnerIdx() const { return nIdx_; }
+    __aicore__ inline int32_t GetInnerIdx() const { return nIdx_; }
 
     __aicore__ inline int32_t GetTileShape() const { return baseShape_; }
 
