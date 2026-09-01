@@ -434,11 +434,11 @@ uint16_t a_loop_num = AscendC::Std::ceil_division(ka_align_l0, fractal_shape[0] 
 uint32_t dst_offset = 0;
 for (uint16_t loopIdx = 0; loopIdx < a_loop_num; ++loopIdx) {
     asc_copy_l12l0a_transpose(a_l0 + dst_offset, a_l1,
-                              int8_m_step_align * loopIdx, 0,  // m_start_position, k_start_position
-                              int8_m_step_align,                                          // m_step = 2
-                              AscendC::Std::ceil_division(m_align_l0, fractal_shape[1]),  // k_step = 2
-                              AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // src_stride = 6
-                              AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
+                              int8_m_step_align * loopIdx, 0,        // m_start_position, k_start_position
+                              int8_m_step_align,                                             // m_step = 2
+                              AscendC::Std::ceil_division(m_align_l0, fractal_shape[1]),     // k_step = 2
+                              AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]),    // src_stride = 6
+                              AscendC::Std::ceil_division(m_align_l0, fractal_shape[0]));    // dst_stride = 3
     dst_offset += AscendC::Std::ceil_align(m_align_l0, fractal_shape[0]) * fractal_shape[1]; // 1536
 }
 ```

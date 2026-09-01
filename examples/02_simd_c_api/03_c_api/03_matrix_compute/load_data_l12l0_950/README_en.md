@@ -369,15 +369,15 @@ Parameter configuration key points:
 - Call `asc_copy_l12l0a` to perform only the L1 Nz to L0A Nz layout transfer without transpose.
 
 ```cpp
-m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[0]); // 48
+m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[0]);  // 48
 ka_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 96
-m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0]); // 48
+m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0]);  // 48
 ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 96
 asc_copy_l12l0a(a_l0, a_l1, 0, 0,
-    AscendC::Std::ceil_division(m_align_l1, fractal_shape[0]),  // m_step = 3
-    AscendC::Std::ceil_division(ka_align_l1, fractal_shape[1]), // k_step = 3
-    AscendC::Std::ceil_division(m_align_l1, fractal_shape[0]),  // src_stride = 3
-    AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
+                AscendC::Std::ceil_division(m_align_l1, fractal_shape[0]),  // m_step = 3
+                AscendC::Std::ceil_division(ka_align_l1, fractal_shape[1]), // k_step = 3
+                AscendC::Std::ceil_division(m_align_l1, fractal_shape[0]),  // src_stride = 3
+                AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
 ```
 
 #### 5.2. A Matrix L1 -> L0A Transpose
@@ -401,14 +401,14 @@ In this example `m = 40`. During B8 transpose transfer, `m_align_l1 = AscendC::S
 
 ```cpp
 ka_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0] * fractal_num); // 96
-m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1]); // 64
-m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0] * fractal_num); // 64
-ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 96
+m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1]);                // 64
+m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0] * fractal_num);  // 64
+ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]);               // 96
 asc_copy_l12l0a_transpose(a_l0, a_l1, 0, 0,
-    AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]),  // m_step = 6
-    AscendC::Std::ceil_division(m_align_l1, fractal_shape[1]),  // k_step = 2
-    AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]),  // src_stride = 6
-    AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 4
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // m_step = 6
+                          AscendC::Std::ceil_division(m_align_l1, fractal_shape[1]),  // k_step = 2
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // src_stride = 6
+                          AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 4
 ```
 
 **For Loop Call**
@@ -424,20 +424,20 @@ When using for loop, transfer is done in segments along the L1 row direction (A 
 
 ```cpp
 ka_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0] * fractal_num); // 96
-m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1]); // 64
-m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0]); // 48
-ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 96
+m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1]);                // 64
+m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0]);                // 48
+ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]);               // 96
 // Input is int8 type, A matrix [k,m] transposed input, L1 -> L0A requires transpose
 // The loop calls asc_copy_l12l0a_transpose along the k axis, transferring 2 fractals each time.
 uint16_t a_loop_num = AscendC::Std::ceil_division(ka_align_l0, fractal_shape[0] * fractal_num); // 3
 uint32_t dst_offset = 0;
 for (uint16_t loopIdx = 0; loopIdx < a_loop_num; ++loopIdx) {
     asc_copy_l12l0a_transpose(a_l0 + dst_offset, a_l1,
-        int8_m_step_align * loopIdx, 0,           // m_start_position, k_start_position
-        int8_m_step_align,                         // m_step = 2
-        AscendC::Std::ceil_division(m_align_l0, fractal_shape[1]),  // k_step = 2
-        AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // src_stride = 6
-        AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
+                              int8_m_step_align * loopIdx, 0,        // m_start_position, k_start_position
+                              int8_m_step_align,                                             // m_step = 2
+                              AscendC::Std::ceil_division(m_align_l0, fractal_shape[1]),     // k_step = 2
+                              AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]),    // src_stride = 6
+                              AscendC::Std::ceil_division(m_align_l0, fractal_shape[0]));    // dst_stride = 3
     dst_offset += AscendC::Std::ceil_align(m_align_l0, fractal_shape[0]) * fractal_shape[1]; // 1536
 }
 ```
@@ -459,14 +459,14 @@ Parameter configuration key points:
 
 ```cpp
 ka_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0] * fractal_num); // 80
-m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1]); // 48
-m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0] * fractal_num); // 48
-ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 80
+m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1]);                // 48
+m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0] * fractal_num);  // 48
+ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]);               // 80
 asc_copy_l12l0a_transpose(a_l0, a_l1, 0, 0,
-    AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]),  // m_step = 5
-    AscendC::Std::ceil_division(m_align_l1, fractal_shape[1]),  // k_step = 3
-    AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]),  // src_stride = 5
-    AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // m_step = 5
+                          AscendC::Std::ceil_division(m_align_l1, fractal_shape[1]),  // k_step = 3
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // src_stride = 5
+                          AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
 ```
 
 ##### 5.2.3. B32 Input Data Type
@@ -481,15 +481,15 @@ B32 input data type fractal is 16 * 8. During L1 -> L0 transpose, 2 fractals of 
 In this example `m = 40`. B32 transpose transfer requires combining 2 fractals in the col direction into a square, **`k_step` must be a multiple of 2**, so L1 col direction (m direction) reads 1 extra invalid fractal. After writing to L0A, there is 1 extra invalid fractal at the tail of the k direction; since L0A is in Nz layout, configuring `k = matrix_k` in `asc_mmad` ensures only valid k axis data participates in computation.
 
 ```cpp
-ka_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0]); // 80
-m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1] * fractal_num); // 48
-m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0]); // 48
+ka_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0]);               // 80
+m_align_l1 = AscendC::Std::ceil_align(m, fractal_shape[1] * fractal_num);  // 48
+m_align_l0 = AscendC::Std::ceil_align(m, fractal_shape[0]);                // 48
 ka_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1] * fractal_num); // 80
 asc_copy_l12l0a_transpose(a_l0, a_l1, 0, 0,
-    AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]),  // m_step = 5
-    AscendC::Std::ceil_division(m_align_l1, fractal_shape[1]),  // k_step = 6
-    AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]),  // src_stride = 5
-    AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // m_step = 5
+                          AscendC::Std::ceil_division(m_align_l1, fractal_shape[1]),  // k_step = 6
+                          AscendC::Std::ceil_division(ka_align_l1, fractal_shape[0]), // src_stride = 5
+                          AscendC::Std::ceil_division(m_align_l0, fractal_shape[0])); // dst_stride = 3
 ```
 
 #### 5.3. B Matrix L1 -> L0B Non-Transpose
@@ -508,15 +508,15 @@ Parameter configuration key points:
 - Call `asc_copy_l12l0b` to perform only the L1 Nz to L0B Zn layout transfer without transpose.
 
 ```cpp
-n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[0]); // 64
+n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[0]);  // 64
 kb_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 72
 kb_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 72
-n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0]); // 64
+n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0]);  // 64
 asc_copy_l12l0b(b_l0, b_l1, 0, 0,
-    AscendC::Std::ceil_division(n_align_l1, fractal_shape[0]),  // m_step = 4
-    AscendC::Std::ceil_division(kb_align_l1, fractal_shape[1]), // k_step = 9
-    AscendC::Std::ceil_division(n_align_l1, fractal_shape[0]),  // src_stride = 4
-    AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
+                AscendC::Std::ceil_division(n_align_l1, fractal_shape[0]),  // m_step = 4
+                AscendC::Std::ceil_division(kb_align_l1, fractal_shape[1]), // k_step = 9
+                AscendC::Std::ceil_division(n_align_l1, fractal_shape[0]),  // src_stride = 4
+                AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
 ```
 
 #### 5.4. B Matrix L1 -> L0B Transpose
@@ -536,14 +536,14 @@ In this example `k = 70`. B8 transpose transfer requires combining 2 fractals in
 
 ```cpp
 kb_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0] * fractal_num); // 96
-n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[1]); // 64
-kb_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 96
-n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0] * fractal_num); // 64
+n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[1]);                // 64
+kb_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]);               // 96
+n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0] * fractal_num);  // 64
 asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0,
-    AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // m_step = 6
-    AscendC::Std::ceil_division(n_align_l1, fractal_shape[1]),  // k_step = 2
-    AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // src_stride = 6
-    AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // m_step = 6
+                          AscendC::Std::ceil_division(n_align_l1, fractal_shape[1]),  // k_step = 2
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // src_stride = 6
+                          AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
 ```
 
 ##### 5.4.2. B16 Input Data Type
@@ -563,14 +563,14 @@ Parameter configuration key points:
 
 ```cpp
 kb_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0] * fractal_num); // 80
-n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[1]); // 64
-kb_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]); // 80
-n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0] * fractal_num); // 64
+n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[1]);                // 64
+kb_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1]);               // 80
+n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0] * fractal_num);  // 64
 asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0,
-    AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // m_step = 5
-    AscendC::Std::ceil_division(n_align_l1, fractal_shape[1]),  // k_step = 4
-    AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // src_stride = 5
-    AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // m_step = 5
+                          AscendC::Std::ceil_division(n_align_l1, fractal_shape[1]),  // k_step = 4
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // src_stride = 5
+                          AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
 ```
 
 ##### 5.4.3. B32 Input Data Type
@@ -585,15 +585,15 @@ B32 input data type fractal is 16 * 8. During L1 -> L0 transpose, 2 fractals of 
 In this example `n = 50`. B32 transpose transfer requires combining 2 fractals in the col direction into a square, **`k_step` must be a multiple of 2**, so L1 col direction (n direction) reads 1 extra invalid fractal. After writing to L0B, there is 1 extra invalid fractal at the tail of the k direction; since L0B is in Zn layout, configuring `k = matrix_k` in `asc_mmad` ensures only valid k axis data participates in computation.
 
 ```cpp
-kb_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0]); // 80
-n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[1] * fractal_num); // 64
+kb_align_l1 = AscendC::Std::ceil_align(k, fractal_shape[0]);               // 80
+n_align_l1 = AscendC::Std::ceil_align(n, fractal_shape[1] * fractal_num);  // 64
 kb_align_l0 = AscendC::Std::ceil_align(k, fractal_shape[1] * fractal_num); // 80
-n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0]); // 64
+n_align_l0 = AscendC::Std::ceil_align(n, fractal_shape[0]);                // 64
 asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0,
-    AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // m_step = 5
-    AscendC::Std::ceil_division(n_align_l1, fractal_shape[1]),  // k_step = 8
-    AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // src_stride = 5
-    AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // m_step = 5
+                          AscendC::Std::ceil_division(n_align_l1, fractal_shape[1]),  // k_step = 8
+                          AscendC::Std::ceil_division(kb_align_l1, fractal_shape[0]), // src_stride = 5
+                          AscendC::Std::ceil_division(n_align_l0, fractal_shape[0])); // dst_stride = 4
 ```
 
 ## Build and Run
