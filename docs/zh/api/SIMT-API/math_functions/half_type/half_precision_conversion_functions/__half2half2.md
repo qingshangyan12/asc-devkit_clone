@@ -63,6 +63,8 @@ inline half2 __half2half2(const half x)
 - SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __global__ __launch_bounds__(1024) void kernel___half2half2(half2* dst, half* x, uint32_t input_total_length)
     {
         uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -76,6 +78,8 @@ inline half2 __half2half2(const half x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel___half2half2(__gm__ half2* dst, __gm__ half* x, uint32_t input_total_length)
     {
         uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;

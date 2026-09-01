@@ -65,6 +65,8 @@ inline unsigned short int __half2ushort_ru(const half x)
 - SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __global__ __launch_bounds__(1024) void kernel___half2ushort_ru(unsigned short int* dst, half* x, uint32_t input_total_length)
     {
         uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -78,6 +80,8 @@ inline unsigned short int __half2ushort_ru(const half x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel___half2ushort_ru(__gm__ unsigned short int* dst, __gm__ half* x, uint32_t input_total_length)
     {
         uint32_t idx = threadIdx.x + blockIdx.x * blockDim.x;

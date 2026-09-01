@@ -66,6 +66,8 @@ inline half2 h2exp2(half2 x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __global__ __launch_bounds__(1024) void KernelExp2(half2* dst, half2* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -76,6 +78,8 @@ inline half2 h2exp2(half2 x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelExp2(__gm__ half2* dst, __gm__ half2* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

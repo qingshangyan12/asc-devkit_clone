@@ -64,6 +64,8 @@ inline float __half2float(const half x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __global__ __launch_bounds__(1024) void kernel__half2float(float* dst, half* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -74,6 +76,8 @@ inline float __half2float(const half x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel__half2float(__gm__ float* dst, __gm__ half* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

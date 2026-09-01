@@ -89,6 +89,8 @@ half2 __hgtx2(half2 x, half2 y)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     // 使用短向量可提升数据搬运效率
     __global__ __launch_bounds__(1024) void simt_hgtx2(half* x, half* y, half* dst, uint32_t input_total_length)
     {
@@ -107,6 +109,8 @@ half2 __hgtx2(half2 x, half2 y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_hgtx2(__gm__ half2* x, __gm__ half2* y, __gm__ half2* dst, uint32_t input_total_length)
     {

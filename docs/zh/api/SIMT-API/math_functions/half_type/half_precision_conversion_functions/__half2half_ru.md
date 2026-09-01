@@ -64,6 +64,8 @@ inline half __half2half_ru(const half x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __global__ __launch_bounds__(1024) void kernel__half2half_ru(half* dst, half* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -74,6 +76,8 @@ inline half __half2half_ru(const half x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel__half2half_ru(__gm__ half* dst, __gm__ half* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

@@ -63,6 +63,8 @@ half2 __isnanx2(half2 x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     // 使用短向量可提升数据搬运效率
     __global__ __launch_bounds__(1024) void simt_isnanx2(half* x, half* dst, uint32_t input_total_length)
     {
@@ -80,6 +82,8 @@ half2 __isnanx2(half2 x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_isnanx2(__gm__ half2* x, __gm__ half2* dst, uint32_t input_total_length)
     {

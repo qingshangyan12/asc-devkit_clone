@@ -66,6 +66,8 @@ inline half __uint2half_rna(const unsigned int x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __global__ __launch_bounds__(1024) void kernel__uint2half_rna(half* dst, uint32_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -76,6 +78,8 @@ inline half __uint2half_rna(const unsigned int x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel__uint2half_rna(__gm__ half* dst, __gm__ uint32_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

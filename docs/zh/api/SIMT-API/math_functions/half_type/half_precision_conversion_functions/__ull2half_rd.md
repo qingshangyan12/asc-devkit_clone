@@ -67,6 +67,8 @@ inline half __ull2half_rd(const unsigned long long int x)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __global__ __launch_bounds__(1024) void kernel__ull2half_rd(half* dst, uint64_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -77,6 +79,8 @@ inline half __ull2half_rd(const unsigned long long int x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void kernel__ull2half_rd(__gm__ half* dst, __gm__ uint64_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;

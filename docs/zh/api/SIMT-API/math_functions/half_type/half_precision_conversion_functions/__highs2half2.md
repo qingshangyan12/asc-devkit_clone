@@ -67,6 +67,8 @@ inline half2 __highs2half2(const half2 x, const half2 y)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     // 使用短向量可提升数据搬运效率
     __aicore__ void simt_highs2half2(half2* input1, half2* input2, half2* output, uint32_t input_total_length)
     {
@@ -86,6 +88,8 @@ inline half2 __highs2half2(const half2 x, const half2 y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_highs2half2(__gm__ half2* input1, __gm__ half2* input2, __gm__ half2* output, uint32_t input_total_length)
     {

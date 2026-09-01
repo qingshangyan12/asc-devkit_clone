@@ -105,6 +105,8 @@ half __hmul(const half x, const half y)
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __global__ __launch_bounds__(1024) void KernelHmul(half* dst, half* x, half* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -115,6 +117,8 @@ half __hmul(const half x, const half y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     __simt_vf__ __launch_bounds__(1024) inline void KernelHmul(__gm__ half* dst, __gm__ half* x, __gm__ half* y)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
