@@ -109,7 +109,7 @@ Ascend C API文档须遵循以下总体原则：
 
 如下索引文件中，矩阵计算（Tensor_API）和矩阵计算目录下的GEMV节点对应同一个源码文件，会导致URL冲突。
 
-``` text
+``` 
 -   [SIMD API](SIMT-API/SIMT-API.md)
     -   [基础API](SIMT-API/basic_api/basic_api.md)
         -   [矩阵计算](SIMD-API/basic_api/cube_compute/cube_compute.md)
@@ -661,7 +661,7 @@ Gather的功能说明中未给出图示说明，仅通过文字难以理解。
 
 【正例】
 
-```text
+```
 **表1**  模板参数说明
 
 | 参数名 | 描述 |
