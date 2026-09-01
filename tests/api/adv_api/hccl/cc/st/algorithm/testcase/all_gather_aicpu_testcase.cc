@@ -52,6 +52,19 @@ TopoInfoWithNetLayerDetails MakeConcurrentTopo(u32 rankSize = 4U)
     return topo;
 }
 
+TopoInfoWithNetLayerDetails MakeSequenceTopo(u32 level0Size = 4U, u32 level1Size = 2U)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = level0Size * level1Size;
+    topo.serverNum = level1Size;
+    topo.level0Topo = Level0Shape::MESH_1D;
+    topo.topoLevelNums = 2U;
+    topo.level0PcieMix = false;
+    topo.netLayerDetails.localNetInsSizeOfLayer = {level0Size, level1Size};
+    return topo;
+}
+
 } // namespace
 
 class ST_ALL_GATHER_AICPU_TEST : public ::testing::Test {
@@ -73,6 +86,7 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, local_registry_contains_concurrent_algorithm)
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "InsAllGatherMesh1D"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSoleNHR"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherConcurMeshNHR"), nullptr);
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSequenceMeshConcurNHR"), nullptr);
 }
 
 TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_obeys_count_and_rank_boundaries)
@@ -119,6 +133,30 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, concurrent_executor_calculates_resources_with_h
     EXPECT_EQ(request.notifyNumPerThread, std::vector<u32>({1U, 1U, 2U, 2U}));
     ASSERT_EQ(request.channels.size(), 1U);
     EXPECT_EQ(request.channels[0].size(), 6U);
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_selects_sequence_for_large_data_on_two_level_mesh)
+{
+    AllGatherAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeSequenceTopo(4U, 2U);
+    OpParam param = MakeAicpuParam();
+    std::string algName;
+
+    param.DataDes.count = 200U * 1024U * 1024U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllGatherSequenceMeshConcurNHR");
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_keeps_parallel_for_medium_data_on_two_level_mesh)
+{
+    AllGatherAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeSequenceTopo(4U, 2U);
+    OpParam param = MakeAicpuParam();
+    std::string algName;
+
+    param.DataDes.count = 300U * 1024U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "InsAllGatherParallelMesh1DNHR");
 }
 
 } // namespace checker
