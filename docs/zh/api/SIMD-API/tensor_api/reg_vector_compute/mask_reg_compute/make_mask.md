@@ -48,7 +48,6 @@ __simd_callee__ inline reg_tensor<bool> make_mask()
 
 返回`reg_tensor<bool>`，其`reg`成员是类型为vector_bool的掩码寄存器，其对应的元素为有效数据。
 
-
 ## 约束说明<a name="section650mcpsimp"></a>
 
 - 返回对象只保证`reg`成员有效，并不会初始化成员变量`mask`。

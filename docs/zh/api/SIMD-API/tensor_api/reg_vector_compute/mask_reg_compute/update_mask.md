@@ -42,8 +42,7 @@ __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | `DataType` | 输入 | 模板参数，支持的数据类型为b8/b16/b32。 |
-| `remain` | 输入/输出 | 元素个数。调用后自动减去当前向量处理单元的元素个数（b8模式、b16模式、b32模式分别为256、128、64）。
-执行完一次该接口后，remain = (remain< VL_T) ? 0 : (remain - VL_T)，VL_T表示位宽为VL的矢量数据寄存器中，可存放数据类型T的元素个数。 |
+| `remain` | 输入/输出 | 元素个数。调用后自动减去当前向量处理单元的元素个数（b8模式、b16模式、b32模式分别为256、128、64）。<br>执行完一次该接口后，`remain = (remain < VL_T) ? 0 : (remain - VL_T)`，`VL_T`表示位宽为VL的矢量数据寄存器中可存放数据类型T的元素个数。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
