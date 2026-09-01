@@ -83,14 +83,14 @@ struct BmmOffset {
 };
 
 // It is invoked by the matmulV3 operator and cannot be removed at present
-__aicore__ __callee__ inline uint16_t CeilDiv(uint16_t num1, uint16_t num2)
+__aicore__ inline uint16_t CeilDiv(uint16_t num1, uint16_t num2)
 {
     ASSERT(num2 > 0);
     return (num1 + num2 - 1) / num2;
 }
 
 // It is invoked by the matmulV3 operator and cannot be removed at present
-__aicore__ __callee__ inline uint16_t CeilAlign(uint16_t num1, uint16_t num2)
+__aicore__ inline uint16_t CeilAlign(uint16_t num1, uint16_t num2)
 {
     ASSERT(num2 > 0);
     return CeilDiv(num1, num2) * num2;
