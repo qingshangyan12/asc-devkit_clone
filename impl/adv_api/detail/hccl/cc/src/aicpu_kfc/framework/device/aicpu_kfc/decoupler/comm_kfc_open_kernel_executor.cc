@@ -17,6 +17,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "cann_dispatch_bridge.h"
+#include "cann_host_bridge.h"
 #include "hcomm_primitives.h"
 #include "task_cache/mc2_aicpu_task_cache.h"
 #include "task_cache/mc2_aicpu_task_cache_runner.h"
@@ -177,9 +178,7 @@ HcclResult LaunchOpenOpParamDataImpl(
 
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
 
-    const bool useCannBridge =
-        (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV ||
-         param->opType == HCCL_CMD_ALLREDUCE);
+    const bool useCannBridge = (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV);
     if (useCannBridge) {
         HcclResult cannRet = mc2_ops_hccl::RunWithMc2TaskCache(
             *param, resCtx, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
