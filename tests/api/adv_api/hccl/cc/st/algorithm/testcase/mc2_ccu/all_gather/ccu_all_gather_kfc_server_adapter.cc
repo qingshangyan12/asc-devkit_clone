@@ -94,3 +94,63 @@ void FillKfcQueue(
     memory.parameter[HcclKfcProtocol::KFC_CONCURRENT_AG_OP_ID] = 1U;
     memory.parameter[HcclKfcProtocol::KFC_CONCURRENT_AG_MESH_INPUT] = inputAddress;
     memory.parameter[HcclKfcProtocol::KFC_CONCURRENT_AG_MESH_OUTPUT] = outputAddress;
+    memory.parameter[HcclKfcProtocol::KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET] =
+        DESTINATION_BASE_OFFSET + static_cast<uint64_t>(rank) * sliceSize;
+    memory.parameter[HcclKfcProtocol::KFC_CONCURRENT_AG_MESH_SLICE_SIZE] = sliceSize;
+    memory.parameter[HcclKfcProtocol::KFC_CONCURRENT_AG_MESH_CURRENT_RANK_SLICE_INPUT_OFFSET] = 0U;
+    memory.parameter[HcclKfcProtocol::KFC_CONCURRENT_AG_MESH_REPEAT_NUM_INV] =
+        std::numeric_limits<uint64_t>::max() - 1U;
+    memory.parameter[HcclKfcProtocol::KFC_CONCURRENT_AG_MESH_INPUT_REPEAT_STRIDE] = 0U;
+    memory.parameter[HcclKfcProtocol::KFC_CONCURRENT_AG_MESH_OUTPUT_REPEAT_STRIDE] = 0U;
+    memory.parameter[HcclKfcProtocol::KFC_CONCURRENT_AG_MESH_LAST_SLICE_SIZE] = sliceSize;
+    memory.parameter[HcclKfcProtocol::KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL] = 0U;
+
+    // Queue entry 1 terminates the persistent server after one AllGather task.
+    memory.parameter[KFC_QUEUE_PARAM_WORDS] = std::numeric_limits<uint64_t>::max();
+    memory.parameter[KFC_CKE_WORD_OFFSET] = 1U;
+    memory.parameter[KFC_CKE_WORD_OFFSET + 1U] = 1U;
+}
+
+std::vector<uint64_t> PrepareKfcServerTaskArgs(const RankMemory& memory, uint32_t rank)
+{
+    const uint64_t parameterAddress = memory.ParameterAddress();
+    const uint64_t ckeAddress = parameterAddress + static_cast<uint64_t>(KFC_CKE_WORD_OFFSET) * sizeof(uint64_t);
+    return {parameterAddress, ckeAddress, 1U, 1U, 0U, 0x1000U + rank};
+}
+
+} // namespace
+
+ScenarioData BuildAllGatherKfcServerScenario(const CcuStScenario& scenario, const std::vector<KernelHandle>& handles)
+{
+    const uint32_t rankSize = CcuStFixture::CountRanks(scenario.topoMeta);
+    const uint64_t sliceSize = scenario.count * DATATYPE_SIZE_TABLE[scenario.dataType];
+
+    ScenarioData data;
+    data.memories.resize(rankSize);
+    data.launches.resize(rankSize);
+    data.srcOffsets.assign(rankSize, std::vector<uint64_t>(rankSize, SOURCE_BASE_OFFSET));
+    data.dstOffsets.assign(rankSize, std::vector<uint64_t>(rankSize, 0U));
+
+    for (uint32_t source = 0; source < rankSize; ++source) {
+        for (uint32_t destination = 0; destination < rankSize; ++destination) {
+            data.dstOffsets[source][destination] = DESTINATION_BASE_OFFSET + static_cast<uint64_t>(source) * sliceSize;
+        }
+    }
+
+    for (uint32_t rank = 0; rank < rankSize; ++rank) {
+        RankMemory& memory = data.memories[rank];
+        memory.input.assign(SOURCE_BASE_OFFSET + sliceSize + GUARD_SIZE, 0x5a);
+        memory.output.assign(DESTINATION_BASE_OFFSET + rankSize * sliceSize + GUARD_SIZE, 0xa5);
+        for (uint64_t byte = 0; byte < sliceSize; ++byte) {
+            memory.input[SOURCE_BASE_OFFSET + byte] = static_cast<uint8_t>(17U + rank * 41U + byte);
+        }
+
+        FillKfcQueue(
+            memory, rank, sliceSize, memory.InputAddress() + SOURCE_BASE_OFFSET, memory.OutputAddress());
+        data.launches[rank] = RankLaunch{handles[rank], PrepareKfcServerTaskArgs(memory, rank), &memory};
+    }
+    return data;
+}
+
+} // namespace CcuSt
+} // namespace HcclSim
