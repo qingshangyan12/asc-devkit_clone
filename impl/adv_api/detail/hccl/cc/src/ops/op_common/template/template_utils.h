@@ -23,8 +23,6 @@ namespace mc2_ops_hccl {
 
 #define UINT32_MAX (4294967295U)
 constexpr u32 INVALID_U32 = UINT32_MAX;
-constexpr u32 MAX_JETTY_NUM = 4;
-constexpr u32 SMALL_SIZE_512KB = 512 * 1024;
 
 constexpr s32 INVALID_RANKID = INT32_MAX;
 
@@ -364,7 +362,7 @@ u32 GetNHRStepNum(u32 rankSize);
 inline u32 CalcChannelsPerRank(const std::vector<HcclChannelDesc>& channels)
 {
     if (channels.empty()) {
-        return 0;
+        return 1;
     }
     u32 channelsPerRank = 1;
     u32 currentRank = INVALID_VALUE_RANKID;
@@ -433,7 +431,7 @@ inline u32 CalcChannelsPerRankMin(const std::vector<HcclChannelDesc>& channels)
 inline u32 CalcChannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels)
 {
     if (channels.empty()) {
-        return 0;
+        return 1;
     }
     u32 channelsPerRank = 1;
     for (const auto& channelsByRank : channels) {

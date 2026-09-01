@@ -25,6 +25,14 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/ccu_temp_all_to_all_v_mesh_1D.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/ccu/kernel/ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.cc
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.cc
+    ${HCCL_CC_SRC_DIR}/ops/kfc_server/executor/ins_kfc_server_sole_executor.cc
+    ${HCCL_CC_SRC_DIR}/ops/kfc_server/template/ccu/ccu_temp_kfc_server.cc
+    ${HCCL_CC_SRC_DIR}/ops/kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/op_common.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/selector/auto_selector_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/selector/execute_selector.cc
@@ -126,6 +134,7 @@ add_executable(
 target_include_directories(
     ${HCCL_CCU_ST_TARGET}
     PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/host/shim
     ${UTILS_DIR}/hccl_proxy
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}

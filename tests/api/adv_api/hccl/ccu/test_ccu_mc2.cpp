@@ -629,6 +629,8 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
     ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.reduceType = HCCL_REDUCE_SUM;
+    strcpy(ccTiling.algConfig, "CcuAllGatherMesh1DMem2Mem");
+
     OpParam opParam1{};
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "reuse_tag", &ccTiling, opParam1), HCCL_SUCCESS);
 
@@ -665,7 +667,9 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse)
 
     OpParam opParam2{};
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "reuse_tag", &ccTiling, opParam2), HCCL_SUCCESS); // 相同tag
-    ASSERT_EQ(SelectAlgAndPrepareEngine(comm_, opParam2, algName, topoInfo), HCCL_SUCCESS);
+    ASSERT_TRUE(GetForcedAlgName(&ccTiling, algName));
+    ASSERT_EQ(PrepareTopoInfoForOp(comm_, opParam2, topoInfo), HCCL_SUCCESS);
+    ASSERT_EQ(PrepareEngineForAlg(opParam2, algName), HCCL_SUCCESS);
     result = sprintf_s(opParam2.algName, sizeof(opParam2.algName), "%s", algName.c_str());
     ASSERT_GT(result, 0);
     ASSERT_EQ(HandleSingleRankAndCommMode(comm_, opParam2, skipGetRes), HCCL_SUCCESS);

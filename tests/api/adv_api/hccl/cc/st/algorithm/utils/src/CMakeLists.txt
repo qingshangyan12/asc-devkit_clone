@@ -17,10 +17,6 @@ add_subdirectory(hccl_proxy)
 add_subdirectory(common)
 add_subdirectory(aicpu)
 
-target_sources(hccl-model-proxy PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/hccl_depends_stub/ccu_primitives_stub.cc
-)
-
 target_compile_options(hccl-model-proxy PRIVATE
     -std=c++14
     -Werror

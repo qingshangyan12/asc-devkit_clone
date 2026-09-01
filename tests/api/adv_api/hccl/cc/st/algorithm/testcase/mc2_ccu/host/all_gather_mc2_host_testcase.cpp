@@ -39,7 +39,7 @@ extern "C" uint32_t GetCcuKernelLaunchArgSize(uint32_t launchIndex);
 extern "C" uint64_t GetCcuKernelLaunchArg(uint32_t launchIndex, uint32_t argIndex);
 
 constexpr uint32_t TEST_RANK_ID = 0;
-constexpr char ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherSoleMesh";
+constexpr char ALL_GATHER_ALG_NAME[] = "CcuKfcAllGatherMesh1DMem2Mem";
 constexpr char CONCURRENT_ALL_GATHER_ALG_NAME[] = "CcuSchedAllGatherConcurMeshNHRMultiLink";
 
 TopoMeta BuildTopoMeta(uint32_t rankSize)
@@ -286,7 +286,7 @@ TEST_P(AllGatherMc2HostTest, Mc2TilingBuildsSingleKfcServerContext)
     EXPECT_EQ(resCtx->rankId, TEST_RANK_ID);
     EXPECT_EQ(resCtx->rankSize, GetParam());
     EXPECT_EQ(resCtx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
-    EXPECT_EQ(resCtx->algorithmType[0], static_cast<uint32_t>(CcuSchedAllGatherSoleMesh));
+    EXPECT_EQ(resCtx->algorithmType[0], static_cast<uint32_t>(CcuAllGatherMeshMem2Mem1D));
     EXPECT_TRUE(resCtx->isKfc[0]);
     EXPECT_EQ(GetCcuKernelRegisterCount(), 1U);
 

@@ -100,6 +100,7 @@ enum AlgorithmType {
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
+    {"CcuKfcAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
     {"CcuAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
     {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
     {"CcuSchedAllGatherConcurMeshNHRMultiLink", CcuSchedAllGatherConcurMeshNHRMultiLink},

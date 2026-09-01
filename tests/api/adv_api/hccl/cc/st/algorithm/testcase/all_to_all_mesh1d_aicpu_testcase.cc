@@ -75,9 +75,9 @@ protected:
 TEST_F(ST_ALL_TO_ALL_MESH1D_AICPU_TEST, aicpu_collectives_use_expected_cann_bridge_routes)
 {
     for (CommEngine engine : {COMM_ENGINE_AICPU_TS, COMM_ENGINE_AICPU}) {
-        EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, engine)));
-        EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, engine)));
-        EXPECT_TRUE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, engine)));
+        EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALL, engine)));
+        EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLTOALLV, engine)));
+        EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLREDUCE, engine)));
         EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_ALLGATHER, engine)));
         EXPECT_FALSE(UseCannBridge(MakeAicpuParam(HCCL_CMD_REDUCE_SCATTER, engine)));
     }

@@ -66,7 +66,21 @@ HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctx
 InsCollAlgBase::InsCollAlgBase() {}
 InsCollAlgBase::~InsCollAlgBase() {}
 std::string InsCollAlgBase::Describe() const { return "InsCollAlgBase"; }
+HcclResult InsCollAlgBase::CalcAlgHierarchyInfoV2(
+    TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo, const AlgAttrs& algAttrs)
+{
+    (void)topoInfo;
+    (void)algHierarchyInfo;
+    (void)algAttrs;
+    return HCCL_SUCCESS;
+}
 HcclResult InsCollAlgBase::FastLaunch(const OpParam& param, const CcuFastLaunchCtx* resCtx) { return HCCL_SUCCESS; }
+AlgAttrs InsCollAlgBase::GetAlgoMeta(const std::string& algName) const
+{
+    AlgAttrs attrs;
+    attrs.name = algName;
+    return attrs;
+}
 
 class MockInsCollAlgBase : public InsCollAlgBase {
 public:
@@ -170,11 +184,11 @@ ExecuteSelector::ExecuteSelector()
 HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* topoInfo, std::string& algName) const
 {
     static const std::map<HcclCMDType, std::string> ccuAlgMap = {
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuSchedAllGatherSoleMesh"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "CcuReduceScatterMesh1D"},
-        {HcclCMDType::HCCL_CMD_ALLREDUCE, "CcuAllReduceMesh1DMem2Mem"},
-        {HcclCMDType::HCCL_CMD_ALLTOALL, "CcuAlltoAllMesh1D"},
-        {HcclCMDType::HCCL_CMD_ALLTOALLV, "CcuAlltoAllVMesh1D"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuAllGatherMesh1DMem2Mem"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "CcuSchedReduceScatterSoleMesh"},
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "CcuSchedAllReduceSoleMesh"},
+        {HcclCMDType::HCCL_CMD_ALLTOALL, "CcuSchedAllToAllSoleMesh"},
+        {HcclCMDType::HCCL_CMD_ALLTOALLV, "CcuSchedAllToAllVSoleMesh"},
     };
     static const std::map<HcclCMDType, std::string> aicpuAlgMap = {
         {HcclCMDType::HCCL_CMD_ALLGATHER, "InsAllGatherMesh"},

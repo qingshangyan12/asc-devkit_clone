@@ -68,7 +68,7 @@ Mc2CcTilingInner BuildAllToAllVTiling(
     tiling.srcDataType = static_cast<uint8_t>(sendType);
     tiling.dstDataType = static_cast<uint8_t>(recvType);
     strcpy(tiling.groupName, "test_group");
-    strcpy(tiling.algConfig, "CcuAlltoAllVMesh1D");
+    strcpy(tiling.algConfig, "CcuSchedAllToAllVSoleMesh");
     return tiling;
 }
 
@@ -77,7 +77,7 @@ Mc2CcTilingInner BuildAllToAllTiling(
 {
     Mc2CcTilingInner tiling = BuildAllToAllVTiling(sendType, recvType);
     tiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL);
-    strcpy(tiling.algConfig, "CcuAlltoAllMesh1D");
+    strcpy(tiling.algConfig, "CcuSchedAllToAllSoleMesh");
     return tiling;
 }
 
@@ -91,7 +91,7 @@ Mc2CcTilingInner BuildAllReduceTiling(
     tiling.dstDataType = static_cast<uint8_t>(dataType);
     tiling.reduceType = static_cast<uint32_t>(reduceType);
     strcpy(tiling.groupName, "test_group");
-    strcpy(tiling.algConfig, "CcuAllReduceMesh1DMem2Mem");
+    strcpy(tiling.algConfig, "CcuSchedAllReduceSoleMesh");
     return tiling;
 }
 
@@ -177,11 +177,11 @@ TEST_F(CcuMc2AllToAllVTest, SelectsAllToAllVMesh1D)
 
     ASSERT_EQ(CcuSelectAlgForTest(comm_, stream_, tags, tilingList, 1, resCtx), HCCL_SUCCESS);
     EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV));
-    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuAlltoAllVMesh1D));
+    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuSchedAllToAllVSoleMesh));
     EXPECT_EQ(GetCcuKernelRegisterCount(), 1U);
 }
 
-TEST_F(CcuMc2AllToAllVTest, MultipleAllToAllVConfigsShareOneServer)
+TEST_F(CcuMc2AllToAllVTest, MultipleAllToAllVConfigsKeepTypedResourcesSeparate)
 {
     OpResCtx resCtx{};
     ASSERT_EQ(AllocCcuOpResCtx(comm_, "multi_ctx", TEST_RANK_SIZE, TEST_RANK_ID, resCtx), HCCL_SUCCESS);
@@ -191,7 +191,7 @@ TEST_F(CcuMc2AllToAllVTest, MultipleAllToAllVConfigsShareOneServer)
     std::string tags[] = {"alltoallv_fp16", "alltoallv_fp32"};
 
     ASSERT_EQ(CcuSelectAlgForTest(comm_, stream_, tags, tilingList, 2, resCtx), HCCL_SUCCESS);
-    EXPECT_EQ(GetCcuKernelRegisterCount(), 1U);
+    EXPECT_EQ(GetCcuKernelRegisterCount(), 2U);
 
     OpParam first{};
     OpParam second{};
@@ -199,7 +199,7 @@ TEST_F(CcuMc2AllToAllVTest, MultipleAllToAllVConfigsShareOneServer)
         ACL_MEMCPY_DEVICE_TO_HOST), ACL_SUCCESS);
     ASSERT_EQ(aclrtMemcpy(&second, sizeof(second), reinterpret_cast<void*>(resCtx.algInfo[1].opParam), sizeof(second),
         ACL_MEMCPY_DEVICE_TO_HOST), ACL_SUCCESS);
-    EXPECT_EQ(first.resCtx, second.resCtx);
+    EXPECT_NE(first.resCtx, second.resCtx);
     EXPECT_EQ(first.ctxSize, second.ctxSize);
 }
 
@@ -227,7 +227,7 @@ TEST_F(CcuMc2AllToAllVTest, FixedAllToAllSelectsSingleDieKfcAlgorithm)
 
     ASSERT_EQ(CcuSelectAlgForTest(comm_, stream_, tags, tilingList, 1, resCtx), HCCL_SUCCESS);
     EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL));
-    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuAlltoAllMesh1D));
+    EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuSchedAllToAllSoleMesh));
     EXPECT_EQ(GetCcuKernelRegisterCount(), 1U);
 }
 
@@ -262,7 +262,7 @@ TEST_F(CcuMc2AllToAllVTest, ReduceOperationParticipatesInKfcOpId)
     }
 }
 
-TEST_F(CcuMc2AllToAllVTest, MultiConfigCacheDoesNotReuseSingleConfigServer)
+TEST_F(CcuMc2AllToAllVTest, MultiConfigReusesMatchingFirstResource)
 {
     Mc2CcTilingInner fp16 = BuildAllToAllVTiling(HCCL_DATA_TYPE_FP16, HCCL_DATA_TYPE_FP16);
     Mc2CcTilingInner fp32 = BuildAllToAllVTiling(HCCL_DATA_TYPE_FP32, HCCL_DATA_TYPE_FP32);
@@ -286,7 +286,7 @@ TEST_F(CcuMc2AllToAllVTest, MultiConfigCacheDoesNotReuseSingleConfigServer)
         sizeof(singleParam), ACL_MEMCPY_DEVICE_TO_HOST), ACL_SUCCESS);
     ASSERT_EQ(aclrtMemcpy(&multiParam, sizeof(multiParam), reinterpret_cast<void*>(multiCtx.algInfo[0].opParam),
         sizeof(multiParam), ACL_MEMCPY_DEVICE_TO_HOST), ACL_SUCCESS);
-    EXPECT_NE(singleParam.resCtx, multiParam.resCtx);
+    EXPECT_EQ(singleParam.resCtx, multiParam.resCtx);
 }
 
 TEST_F(CcuMc2AllToAllVTest, AllocatesAllToAllVResourceFromTiling)
@@ -297,7 +297,7 @@ TEST_F(CcuMc2AllToAllVTest, AllocatesAllToAllVResourceFromTiling)
     ASSERT_NE(opResCtx, nullptr);
     auto* ctx = static_cast<OpResCtx*>(opResCtx);
     EXPECT_EQ(ctx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV));
-    EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuAlltoAllVMesh1D));
+    EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(CcuSchedAllToAllVSoleMesh));
     EXPECT_EQ(ctx->rankId, TEST_RANK_ID);
     EXPECT_EQ(ctx->rankSize, TEST_RANK_SIZE);
 }
@@ -317,7 +317,7 @@ TEST_F(CcuMc2AllToAllVTest, KfcServerArgsUseAllocatedQueueAndToken)
     std::string algName;
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     ASSERT_EQ(SelectAlgAndPrepareEngine(comm_, opParam, algName, topoInfo), HCCL_SUCCESS);
-    ASSERT_EQ(algName, "CcuAlltoAllVMesh1D");
+    ASSERT_EQ(algName, "CcuSchedAllToAllVSoleMesh");
     ASSERT_GT(sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str()), 0);
 
     bool skipGetRes = false;
@@ -340,15 +340,14 @@ TEST_F(CcuMc2AllToAllVTest, KfcServerArgsUseAllocatedQueueAndToken)
     EXPECT_EQ(resourceCtx.kfcServerArgs[5], reinterpret_cast<uint64_t>(cclBuffer) + 0x1234U);
 }
 
-TEST_F(CcuMc2AllToAllVTest, AcceptsBothCcuTilingEngineValues)
+TEST_F(CcuMc2AllToAllVTest, AcceptsCcuScheduleAndRejectsCcuMs)
 {
     Mc2CcTilingInner tilings[2] = {BuildAllToAllVTiling(), BuildAllToAllVTiling()};
     tilings[0].commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_MS);
     tilings[1].commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_MS);
     const void* list[] = {&tilings[0], &tilings[1]};
     uint8_t engine = 0;
-    EXPECT_EQ(ObtainCommEngine(list, 2, engine), HCCL_SUCCESS);
-    EXPECT_EQ(engine, static_cast<uint8_t>(OpExecuteConfig::CCU_MS));
+    EXPECT_EQ(ObtainCommEngine(list, 2, engine), HCCL_E_NOT_SUPPORT);
 
     tilings[0].commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
     tilings[1].commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
