@@ -452,13 +452,3 @@
 
     使用`uint8_t unit_flag`入参的`asc_mmad_sparse()`接口已废弃，请使用[asc_mmad_sparse](../SIMD-API/c_api/cube_compute/asc_mmad_sparse.md)接口。`asc_mmad_sparse_sync()`接口已废弃，请使用[asc_mmad_sparse](../SIMD-API/c_api/cube_compute/asc_mmad_sparse.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
 <!-- end id10 -->
-
-## Utils API
-
-<!-- npu="950" id11 -->
-### C++标准库
-
-- [CeilDivision](../Utils-API/cpp_stdlib/math_functions/CeilDivision.md)接口
-
-    此接口已废弃，请使用[ceil\_div](../Utils-API/cpp_stdlib/math_functions/ceil_div.md)接口。
-<!-- end id11 -->
