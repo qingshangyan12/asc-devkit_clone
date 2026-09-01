@@ -38,7 +38,7 @@ make_tensor会根据内存指针的物理位置标记，自动推导返回global
 
 ```cpp
 template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto make_tensor(const Iterator& iter, const Args&... args)
+__aicore__ inline auto make_tensor(const Iterator& iter, const Args&... args)
 ```
 
 ## 参数说明
