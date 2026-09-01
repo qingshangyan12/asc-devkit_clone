@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**该接口废弃，请通过[asc_copy_ub2ub](../vector_data_move/asc_copy_ub2ub.md)和同步接口[asc_sync](../sync/asc_sync.md)实现精细化调优，达成最优性能。**
+**该接口废弃，请通过[asc_copy_ub2ub](../vector_datamove/asc_copy_ub2ub.md)和同步接口[asc_sync](../sync/asc_sync.md)实现精细化调优，达成最优性能。**
 
 将数据从Unified Buffer（UB）搬运到UB。
 

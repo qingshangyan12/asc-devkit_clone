@@ -28,9 +28,9 @@
 
 **以下接口已废弃**
 
-**同步搬运接口请使用[asc_copy_ub2gm_align连续数据搬运](../vector_data_move/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md#连续数据搬运)和同步接口[asc_sync](../sync/asc_sync.md)实现精细化调优，达成最优性能。**
+**同步搬运接口请使用[asc_copy_ub2gm_align连续数据搬运](../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md#连续数据搬运)和同步接口[asc_sync](../sync/asc_sync.md)实现精细化调优，达成最优性能。**
 
-**高维切分搬运接口请使用`asc_store_l2_cache_mode`类型枚举值进行L2 Cache管理策略配置，新接口形式请参见[asc_copy_ub2gm_align高维切分数据搬运接口](../vector_data_move/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md#高维切分数据搬运)。**
+**高维切分搬运接口请使用`asc_store_l2_cache_mode`类型枚举值进行L2 Cache管理策略配置，新接口形式请参见[asc_copy_ub2gm_align高维切分数据搬运接口](../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md#高维切分数据搬运)。**
 
 提供数据非对齐搬运的功能，将数据从Unified Buffer (UB)搬运到Global Memory (GM)，并支持8位/16位/32位数据类型搬运。
 
@@ -102,7 +102,7 @@
 | size | 输入 | 搬运数据大小，单位为字节。取值范围：[0, 2097151]。 |
 | n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[0, 4095]。 |
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[0, 2097151]。 |
-| l2_cache_mode | 输入 | L2 Cache管理策略配置。该参数类型为`uint8_t`，建议改用[asc_store_l2_cache_mode](../enum/asc_store_l2_cache_mode.md)类型的枚举值。 |
+| l2_cache_mode | 输入 | L2 Cache管理策略配置。该参数类型为`uint8_t`，建议改用[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)类型的枚举值。 |
 | dst_stride | 输入 | 目的操作数相邻连续数据块的距离（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。<br>只搬运1个数据块，即`n_burst`设置为1时，可以将此参数设置为0。 |
 | src_stride | 输入 | 源操作数相邻连续数据块的距离（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节，用于选择数据搬运模式。<br>&bull; 等于`len_burst`：Compact模式，源数据块在UB中紧密排列，`src_stride`支持字节对齐。<br>&bull; 不等于`len_burst`：Normal模式，`src_stride`需要满足32字节对齐要求。 |
 

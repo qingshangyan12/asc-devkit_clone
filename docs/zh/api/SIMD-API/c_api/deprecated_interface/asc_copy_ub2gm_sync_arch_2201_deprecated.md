@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**该接口废弃，请通过[asc_copy_ub2gm](../vector_data_move/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md)和同步接口[asc_sync](../sync/asc_sync.md)实现精细化调优，达成最优性能。**
+**该接口废弃，请通过[asc_copy_ub2gm](../vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md)和同步接口[asc_sync](../sync/asc_sync.md)实现精细化调优，达成最优性能。**
 
 将数据从Unified Buffer（UB）搬运到Global Memory (GM)。
 
@@ -57,7 +57,7 @@ PIPE_MTE3
 ## 约束说明
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
-- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
 - 同步计算包含同步等待。
 - 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
 

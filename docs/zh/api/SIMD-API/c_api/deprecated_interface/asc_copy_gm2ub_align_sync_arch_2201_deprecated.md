@@ -28,7 +28,7 @@
 
 **以下接口已废弃**
 
-**同步搬运接口请使用[asc_copy_gm2ub_align前n个数据搬运](../vector_data_move/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md#前n个数据搬运)和同步接口[asc_sync](../sync/asc_sync.md)实现精细化调优，达成最优性能。**
+**同步搬运接口请使用[asc_copy_gm2ub_align](../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md)和同步接口[asc_sync](../sync/asc_sync.md)实现精细化调优，达成最优性能。**
 
 提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer（UB），并支持8位/16位/32位数据类型搬运。
 
@@ -36,7 +36,7 @@
 
     若搬运数据长度非32字节对齐，搬运数据会补齐至32字节对齐，支持以下两种填充方式：
 
-    - 手动填充：搬运前调用[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)配置填充值。
+    - 手动填充：搬运前调用[asc_set_copy_pad_val](../vector_datamove/asc_set_copy_pad_val.md)配置填充值。
     - 自动填充：不调用`asc_set_copy_pad_val`时，由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。
 
 
@@ -76,7 +76,7 @@ PIPE_MTE2
 
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 当`size`值为0时，该接口被视为NOP（空操作）。
-- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
 - 同步计算包含同步等待。
 
 ## 调用示例
