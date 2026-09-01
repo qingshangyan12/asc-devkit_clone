@@ -1,3 +1,103 @@
+---
+okftype: reference.api.cpp
+title: "asc_int642float"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md"
+description: "将int64_t类型数据转换为float类型。"
+signature:
+  - function: "asc_int642float_rd(__ubuf__ float*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642float_rn(__ubuf__ float*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642float_rna(__ubuf__ float*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642float_ru(__ubuf__ float*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642float_rz(__ubuf__ float*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642float_rd(__ubuf__ float*,__ubuf__ int64_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642float_rn(__ubuf__ float*,__ubuf__ int64_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642float_rna(__ubuf__ float*,__ubuf__ int64_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642float_ru(__ubuf__ float*,__ubuf__ int64_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642float_rz(__ubuf__ float*,__ubuf__ int64_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int642float_rd_sync(__ubuf__ float*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int642float_rn_sync(__ubuf__ float*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int642float_rna_sync(__ubuf__ float*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int642float_ru_sync(__ubuf__ float*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int642float_rz_sync(__ubuf__ float*,__ubuf__ int64_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int642float
 
 ## 产品支持情况

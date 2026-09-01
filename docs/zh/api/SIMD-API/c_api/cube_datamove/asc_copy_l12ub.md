@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12ub"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md"
+description: "将数据从L1 Buffer搬运到Unified Buffer（UB）中。"
+signature:
+  - function: "asc_copy_l12ub(__ubuf__ void*,__cbuf__ void*,int8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12ub_sync(__ubuf__ void*,__cbuf__ void*,int8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers: []
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_l12ub
 
 ## 产品支持情况

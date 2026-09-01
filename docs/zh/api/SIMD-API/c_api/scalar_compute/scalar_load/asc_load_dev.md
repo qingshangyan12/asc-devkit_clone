@@ -1,3 +1,61 @@
+---
+okftype: reference.api.cpp
+title: "asc_load_dev"
+path: "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md"
+description: "不经过DCache直接从GM地址读取整型数据。 当多核操作GM地址且数据无法对齐到Cache Line时，经过DCache读写可能引入Cache Line粒度的数据覆盖。此时，可使用本接口绕过DCache读取GM数据。"
+signature:
+  - function: "asc_load_dev(__gm__ int8_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ uint8_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ int16_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ uint16_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ int32_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ uint32_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ int64_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ uint64_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_load_dev
 
 ## 产品支持情况
@@ -30,6 +88,58 @@
 当多核操作GM地址且数据无法对齐到Cache Line时，经过DCache读写可能引入Cache Line粒度的数据覆盖。此时，可使用本接口绕过DCache读取GM数据。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_load_dev(__gm__ int8_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ uint8_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ int16_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ uint16_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ int32_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ uint32_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ int64_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+  - function: "asc_load_dev(__gm__ uint64_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/scalar_compute/scalar_load.h"
+        header: "/include/c_api/scalar_compute/scalar_load.h"
+```
+
 
 ```cpp
 __aicore__ inline int8_t asc_load_dev(__gm__ int8_t* addr)

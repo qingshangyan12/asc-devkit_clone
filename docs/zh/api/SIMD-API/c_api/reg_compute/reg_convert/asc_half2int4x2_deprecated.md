@@ -1,3 +1,253 @@
+---
+okftype: reference.api.cpp
+title: "asc_half2int4x2 (废弃)"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2_deprecated.md"
+description: "将half类型数据转为int4x2类型，并支持多种舍入模式，饱和/非饱和模式。"
+signature:
+  - function: "asc_half2int4x2_rd(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_sat(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_sat_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_sat_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_sat_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_sat(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_sat_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_sat_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_sat_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_sat(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_sat_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_sat_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_sat_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_sat(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_sat_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_sat_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_sat_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_sat(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_sat_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_sat_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_sat_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_half2int4x2 (废弃)
 
 ## 产品支持情况
@@ -31,6 +281,250 @@
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_half2int4x2_rd(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_sat(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_sat_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_sat_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rd_sat_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_sat(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_sat_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_sat_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rn_sat_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_sat(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_sat_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_sat_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rna_sat_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_sat(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_sat_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_sat_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_ru_sat_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_sat(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_sat_v2(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_sat_v3(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_half2int4x2_rz_sat_v4(vector_int4x2_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```cpp
 // FLOOR舍入模式，非饱和模式，选取索引0的位置

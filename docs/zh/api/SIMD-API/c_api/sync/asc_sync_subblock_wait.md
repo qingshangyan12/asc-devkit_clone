@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_subblock_wait"
+path: "docs/zh/api/SIMD-API/c_api/sync/asc_sync_subblock_wait.md"
+description: "本接口与[asc_sync_subblock_arrive](asc_sync_subblock_arrive.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1）。"
+signature:
+  - function: "asc_sync_subblock_wait(pipe_t,uint8_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers: []
+  - function: "asc_sync_subblock_wait(pipe_t,int64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/sync/sync.h"
+        header: "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_sync_subblock_wait
 
 ## 产品支持情况
@@ -32,6 +54,22 @@
 - 各AIV（subblock）上配对的`asc_sync_subblock_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_sync_subblock_wait(pipe_t,uint8_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers: []
+  - function: "asc_sync_subblock_wait(pipe_t,int64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/sync/sync.h"
+        header: "/include/c_api/sync/sync.h"
+```
+
 
 ```c
 __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe,

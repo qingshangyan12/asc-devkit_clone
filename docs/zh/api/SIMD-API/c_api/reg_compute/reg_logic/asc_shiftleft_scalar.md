@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: "asc_shiftleft_scalar"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft_scalar.md"
+description: "根据掩码将源操作数矢量数据寄存器中的元素左移，左移位数由标量立即数指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。"
+signature:
+  - function: "asc_shiftleft_scalar(vector_<dtype>,int16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "int32_t"
+        - "uint32_t"
+  - function: "asc_shiftleft_scalar(vector_<dtype>&,vector_<dtype>,int16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "int32_t"
+        - "uint32_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_shiftleft_scalar
 
 ## 产品支持情况
@@ -40,6 +78,22 @@ $$
 本接口仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_shiftleft_scalar(vector_<dtype>,int16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+  - function: "asc_shiftleft_scalar(vector_<dtype>&,vector_<dtype>,int16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

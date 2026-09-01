@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_notify"
+path: "docs/zh/api/SIMD-API/c_api/sync/asc_sync_notify.md"
+description: "如图1所示，与[asc_sync_wait](asc_sync_wait.md)配对使用，用于实现AI Core内部不同流水之间的同步控制。"
+signature:
+  - function: "asc_sync_notify(pipe_t,pipe_t,event_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_sync_notify
 
 ## 产品支持情况
@@ -35,6 +52,17 @@
 ![](../figures/asc_sync_notify.png)
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_sync_notify(pipe_t,pipe_t,event_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/sync/sync.h"
+```
+
 
 ```c
 __aicore__ inline void asc_sync_notify(pipe_t pipe,

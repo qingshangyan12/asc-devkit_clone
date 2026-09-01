@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign_datablock_strided"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md"
+description: "从Unified Buffer（UB）中32字节对齐的起始地址非连续搬入8个`DataBlock`，并通过函数返回值返回保存搬入结果的矢量数据寄存器。每个`DataBlock`的数据量为32字节，支持配置相邻数据块之间的地址步长和本次搬入的起始读取位置。"
+signature:
+  - function: "asc_loadalign_datablock_strided(__ubuf__ <dtype>*,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_loadalign_datablock_strided
 
 ## 产品支持情况
@@ -33,6 +67,16 @@
 本接口仅在AIV上生效，非AIV调用直接返回。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_loadalign_datablock_strided(__ubuf__ <dtype>*,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+```
+
 
 ```c
 __simd_callee__ inline vector_<dtype> asc_loadalign_datablock_strided(__ubuf__ <dtype>* src,

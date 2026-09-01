@@ -27,19 +27,59 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.spr
+ * @function asc_get_ctrl()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_ctrl();
 
+/**
+ * @ingroup simd_c_api.spr
+ * @function asc_set_ctrl(uint64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_ctrl(uint64_t config);
 
+/**
+ * @ingroup simd_c_api.spr
+ * @function asc_get_squeeze_status()
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_get_squeeze_status();
 
 [[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
              "Please use asc_get_squeeze_status instead.")]]
+/**
+ * @ingroup simd_c_api.spr
+ * @function asc_get_ar_spr()
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_get_ar_spr();
 
+/**
+ * @ingroup simd_c_api.spr
+ * @function asc_set_saturation_flag(asc_saturation_mode,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat);
+/**
+ * @ingroup simd_c_api.spr
+ * @function asc_get_saturation_flag(asc_saturation_mode)
+ * @archs 3510
+ */
 __aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode);
+/**
+ * @ingroup simd_c_api.spr
+ * @function asc_set_saturation_strategy(asc_override_strategy)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy);
+/**
+ * @ingroup simd_c_api.spr
+ * @function asc_get_saturation_strategy()
+ * @archs 3510
+ */
 __aicore__ inline asc_override_strategy asc_get_saturation_strategy();
 
 #endif

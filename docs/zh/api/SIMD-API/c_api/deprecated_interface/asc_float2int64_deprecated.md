@@ -1,3 +1,133 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2int64（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int64_deprecated.md"
+description: "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_float2int64](../reg_compute/reg_convert/asc_float2int64.md)的显式位置参数重载替代。"
+signature:
+  - function: "asc_float2int64_rn(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rn_sat(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rn_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rn_sat_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rna(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rna_sat(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rna_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rna_sat_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rd(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rd_sat(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rd_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rd_sat_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_ru(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_ru_sat(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_ru_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_ru_sat_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rz(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rz_sat(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rz_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rz_sat_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_float2int64（废弃）
 
 ## 产品支持情况
@@ -35,6 +165,130 @@
 由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_float2int64_rn(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rn_sat(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rn_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rn_sat_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rna(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rna_sat(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rna_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rna_sat_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rd(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rd_sat(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rd_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rd_sat_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_ru(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_ru_sat(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_ru_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_ru_sat_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rz(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rz_sat(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rz_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2int64_rz_sat_v2(vector_int64_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```cpp
 // RINT舍入模式，非饱和模式，数据读取索引为偶数的位置

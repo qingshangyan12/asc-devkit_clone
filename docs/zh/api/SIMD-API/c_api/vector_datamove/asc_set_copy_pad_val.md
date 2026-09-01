@@ -1,3 +1,76 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_copy_pad_val"
+path: "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md"
+description: "和asc_copy_gm2ub_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。"
+signature:
+  - function: "asc_set_copy_pad_val(int8_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(uint8_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(int16_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(uint16_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(half)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(bfloat16_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(int32_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(uint32_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(float)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_copy_pad_val
 
 ## 产品支持情况
@@ -36,6 +109,73 @@
 <!-- end id10 -->
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_copy_pad_val(int8_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(uint8_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(int16_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(uint16_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(half)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(bfloat16_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(int32_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(uint32_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_set_copy_pad_val(float)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_set_copy_pad_val(int8_t pad_value)

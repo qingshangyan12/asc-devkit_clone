@@ -31,16 +31,46 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_pipe_idle_slot_count_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @function asc_get_pipe_mte2_idle_slot_count()
+ * @archs 3510
+ */
 __aicore__ inline uint8_t asc_get_pipe_mte2_idle_slot_count();
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @function asc_get_pipe_mte3_idle_slot_count()
+ * @archs 3510
+ */
 __aicore__ inline uint8_t asc_get_pipe_mte3_idle_slot_count();
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @function asc_get_pipe_v_idle_slot_count()
+ * @archs 3510
+ */
 __aicore__ inline uint8_t asc_get_pipe_v_idle_slot_count();
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @function asc_get_pipe_m_idle_slot_count()
+ * @archs 3510
+ */
 __aicore__ inline uint8_t asc_get_pipe_m_idle_slot_count();
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @function asc_get_pipe_mte1_idle_slot_count()
+ * @archs 3510
+ */
 __aicore__ inline uint8_t asc_get_pipe_mte1_idle_slot_count();
 
+/**
+ * @ingroup simd_c_api.experimental
+ * @function asc_get_pipe_fix_idle_slot_count()
+ * @archs 3510
+ */
 __aicore__ inline uint8_t asc_get_pipe_fix_idle_slot_count();
 
 #endif

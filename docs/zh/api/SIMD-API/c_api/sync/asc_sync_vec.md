@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_vec"
+path: "docs/zh/api/SIMD-API/c_api/sync/asc_sync_vec.md"
+description: "**无入参函数原型`asc_sync_vec()`接口已废弃，请使用[asc_sync](asc_sync.md)执行针对所有流水线的同步操作。"
+signature:
+  - function: "asc_sync_vec(int)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/sync/sync.h"
+        header: "/include/c_api/sync/sync.h"
+  - function: "asc_sync_vec()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/sync/sync.h"
+        header: "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_sync_vec
 
 ## 产品支持情况
@@ -31,6 +55,24 @@
 针对PIPE_V流水线执行同步操作。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_sync_vec(int)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/sync/sync.h"
+        header: "/include/c_api/sync/sync.h"
+  - function: "asc_sync_vec()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/sync/sync.h"
+        header: "/include/c_api/sync/sync.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_sync_vec(int id)

@@ -28,9 +28,29 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @function asc_float2int32_rd(float)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_float2int32_rd(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @function asc_float2int32_ru(float)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_float2int32_ru(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @function asc_float2int32_rn(float)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_float2int32_rn(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @function asc_float2int32_rna(float)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_float2int32_rna(float value);
 
 #endif

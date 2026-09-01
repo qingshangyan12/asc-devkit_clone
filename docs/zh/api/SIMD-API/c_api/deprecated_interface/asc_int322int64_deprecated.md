@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: "asc_int322int64（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322int64_deprecated.md"
+description: "**该接口通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_int322int64](../reg_compute/reg_convert/asc_int322int64.md)的显式位置参数重载替代。"
+signature:
+  - function: "asc_int322int64(vector_int64_t&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          position_mode: ""
+  - function: "asc_int322int64_v2(vector_int64_t&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          position_mode: "_v2"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int322int64（废弃）
 
 ## 产品支持情况
@@ -72,6 +102,16 @@ __simd_callee__ inline void asc_int322int64<position_mode>(vector_int64_t& dst,
 - `<position_mode>`表示`src`读取的位置，为空时，读取`src`的偶数索引位置元素；取值为`_v2`时，读取`src`的奇数索引位置元素。
 
 ### 函数原型典型示例
+```yaml
+api_signature:
+  - function: "asc_int322int64(vector_int64_t&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```c
 // 数据读取索引为偶数的位置

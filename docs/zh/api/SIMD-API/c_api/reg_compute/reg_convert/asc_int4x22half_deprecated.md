@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_int4x22half (废弃)"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22half_deprecated.md"
+description: "将int4x2类型数据转换为half类型。"
+signature:
+  - function: "asc_int4x22half(vector_half&,vector_int4x2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_int4x22half_v2(vector_half&,vector_int4x2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_int4x22half_v3(vector_half&,vector_int4x2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_int4x22half_v4(vector_half&,vector_int4x2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int4x22half (废弃)
 
 ## 产品支持情况
@@ -29,6 +63,34 @@
 将int4x2类型数据转换为half类型。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_int4x22half(vector_half&,vector_int4x2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_int4x22half_v2(vector_half&,vector_int4x2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_int4x22half_v3(vector_half&,vector_int4x2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_int4x22half_v4(vector_half&,vector_int4x2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```cpp
 // 数据读取索引为0的位置

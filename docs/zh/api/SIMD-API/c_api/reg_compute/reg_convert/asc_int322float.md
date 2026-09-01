@@ -1,3 +1,63 @@
+---
+okftype: reference.api.cpp
+title: "asc_int322float"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322float.md"
+description: "根据`mask`将`src`中的每个`int32_t`类型数据转换成`float`类型，并支持多种舍入模式，结果写入`dst`。"
+signature:
+  - function: "asc_int322float_rd(vector_float&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+  - function: "asc_int322float_rn(vector_float&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+  - function: "asc_int322float_rna(vector_float&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+  - function: "asc_int322float_ru(vector_float&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+  - function: "asc_int322float_rz(vector_float&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int322float
 
 ## 产品支持情况
@@ -50,6 +110,16 @@ __simd_callee__ inline void asc_int322float_<round_mode>(vector_float& dst,
 `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 
 ### 函数原型典型示例
+```yaml
+api_signature:
+  - function: "asc_int322float_rn(vector_float&,vector_int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```c
 // RINT舍入模式

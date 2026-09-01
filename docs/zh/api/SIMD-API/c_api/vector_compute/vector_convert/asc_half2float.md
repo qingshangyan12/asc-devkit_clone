@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_half2float"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md"
+description: "将half类型转化为float类型，无舍入模式。"
+signature:
+  - function: "asc_half2float(__ubuf__ float*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_half2float(__ubuf__ float*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_half2float_sync(__ubuf__ float*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_half2float
 
 ## 产品支持情况
@@ -32,12 +60,32 @@
 
 * 前n个数据计算
   
+```yaml
+api_signature:
+  - function: "asc_half2float(__ubuf__ float*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
   ```cpp
   //在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
   __aicore__ inline void asc_half2float(__ubuf__ float* dst, __ubuf__ half* src, uint32_t count)
   ```
 - 高维切分计算
   
+```yaml
+api_signature:
+  - function: "asc_half2float(__ubuf__ float*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
   ```cpp
   //在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
   __aicore__ inline void asc_half2float(__ubuf__ float* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -45,6 +93,16 @@
 
 - 同步计算
   
+```yaml
+api_signature:
+  - function: "asc_half2float_sync(__ubuf__ float*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+```
+
   ```cpp
   //在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
   __aicore__ inline void asc_half2float_sync(__ubuf__ float* dst, __ubuf__ half* src, uint32_t count)

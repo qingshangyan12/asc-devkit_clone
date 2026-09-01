@@ -1,3 +1,14 @@
+---
+okftype: reference.api.cpp
+title: "asc_store_l2_cache_mode"
+path: "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md"
+description: null
+signature:
+  []
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_store_l2_cache_mode
 
 asc_store_l2_cache_mode用于表示数据从Unified Buffer（UB）搬运到GM时的L2 cache策略，可用于：

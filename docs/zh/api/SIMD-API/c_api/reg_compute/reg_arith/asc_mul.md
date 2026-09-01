@@ -1,3 +1,51 @@
+---
+okftype: reference.api.cpp
+title: "asc_mul"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul.md"
+description: "该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。"
+signature:
+  - function: "asc_mul(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_mul(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mul"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_mul(vector_float&,vector_float,vector_float,vector_bool)"
+        snippets:
+          - id: "asc_mul"
+            file: "mul.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_mul
 
 ## 产品支持情况
@@ -37,6 +85,22 @@ $$
 本接口仅在AIV上生效。
 
 ## 函数原型（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_mul(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+  - function: "asc_mul(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 // 通过引用参数输出结果

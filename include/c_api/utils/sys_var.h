@@ -29,24 +29,99 @@
 #include "c_api/defs/defs.h"
 #include "c_api/spr/spr.h"
 
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_smmu_tag_version()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_smmu_tag_version();
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_phy_stack_base()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_phy_stack_base();
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_status()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_status();
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_sys_virtual_base()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_sys_virtual_base();
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_sub_block_num()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_sub_block_num();
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_sub_block_id()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_sub_block_id();
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_system_cycle()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_system_cycle();
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_ffts_base_addr()
+ * @archs 2201
+ */
 __aicore__ inline int64_t asc_get_ffts_base_addr();
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_core_id()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_core_id();
 __aicore__ inline uint64_t asc_get_overflow_status();
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_phy_buf_addr(uint64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline uint64_t asc_get_phy_buf_addr(uint64_t offset);
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_program_counter()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_program_counter();
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_arch_ver(uint32_t&)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_get_arch_ver(uint32_t& core_version);
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_set_ffts_base_addr(uint64_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
+/**
+ * @ingroup simd_c_api.utils.sys_var
+ * @function asc_get_vf_len()
+ * @archs 3510
+ */
 __aicore__ inline constexpr int64_t asc_get_vf_len();
 
 [[deprecated("NOTICE: asc_get_block_num is deprecated. "
              "Please use block_num instead.")]]
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @function asc_get_block_num()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_block_num();
 
 [[deprecated("NOTICE: asc_get_block_idx is deprecated. "
@@ -54,6 +129,11 @@ __aicore__ inline int64_t asc_get_block_num();
              "For Mix(1, 2), please use block_idx on the Cube core and "
              "block_idx * asc_get_sub_block_num() + asc_get_sub_block_id() "
              "on Vector cores instead.")]]
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @function asc_get_block_idx()
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_get_block_idx();
 #endif
 

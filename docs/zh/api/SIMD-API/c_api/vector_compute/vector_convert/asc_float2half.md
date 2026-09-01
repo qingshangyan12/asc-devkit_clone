@@ -1,3 +1,139 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2half"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md"
+description: "将float类型数据转换为half类型。"
+signature:
+  - function: "asc_float2half(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rn(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rna(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rd(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_ru(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rz(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_ro(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rn(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rna(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rd(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_ru(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rz(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_ro(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_sync(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_float2half_rn_sync(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_float2half_rna_sync(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_float2half_rd_sync(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_float2half_ru_sync(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_float2half_rz_sync(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_float2half_ro_sync(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_float2half
 
 ## 产品支持情况
@@ -38,6 +174,52 @@
 ## 函数原型
 
 - 前n个数据计算
+```yaml
+api_signature:
+  - function: "asc_float2half(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rn(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rna(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rd(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_ru(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rz(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_ro(__ubuf__ half*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
 
   ```cpp
   // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
@@ -57,6 +239,52 @@
   ```
 
 - 高维切分计算
+```yaml
+api_signature:
+  - function: "asc_float2half(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rn(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rna(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rd(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_ru(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_rz(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_float2half_ro(__ubuf__ half*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
 
   ```cpp
   // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入

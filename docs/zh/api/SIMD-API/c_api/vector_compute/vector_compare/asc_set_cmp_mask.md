@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_cmp_mask"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md"
+description: "为[asc_select](../vector_permute_sel/asc_select.md)操作设置作用于选择的Mask掩码。"
+signature:
+  - function: "asc_set_cmp_mask(__ubuf__ void*)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_cmp_mask
 
 ## 产品支持情况
@@ -29,6 +45,16 @@
 为[asc_select](../vector_permute_sel/asc_select.md)操作设置作用于选择的Mask掩码。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_cmp_mask(__ubuf__ void*)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_set_cmp_mask(__ubuf__ void* sel_mask)

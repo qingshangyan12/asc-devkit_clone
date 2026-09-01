@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign_mask"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md"
+description: "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/8长度数据，并通过函数返回值返回掩码寄存器。搬运过程中数据格式和内容保持不变。连续搬入时，需要在每次调用前手动更新源地址。"
+signature:
+  - function: "asc_loadalign_mask(__ubuf__ uint32_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_loadalign_mask
 
 ## 产品支持情况
@@ -33,6 +49,16 @@
 本接口仅在AIV上生效，非AIV调用直接返回。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_loadalign_mask(__ubuf__ uint32_t*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+```
+
 
 ```c
 __simd_callee__ inline vector_bool asc_loadalign_mask(__ubuf__ uint32_t* src)

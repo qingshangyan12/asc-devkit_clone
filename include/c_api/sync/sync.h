@@ -27,48 +27,143 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sync_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_notify(pipe_t,pipe_t,event_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_wait(pipe_t,pipe_t,event_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_wait(pipe_t pipe, pipe_t tpipe, event_t id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_pipe(pipe_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_pipe(pipe_t pipe);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_vec(int)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_vec(int id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_mte3(int)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_mte3(int id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_mte2(int)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_mte2(int id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync();
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_block_arrive(pipe_t,int64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_block_arrive(pipe_t pipe, int64_t flag_id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_subblock_arrive(pipe_t,int64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe, int64_t flag_id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_inter_arrive(pipe_t,int64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe, int64_t flag_id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_data_barrier(mem_dsb_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_data_barrier(mem_dsb_t arg);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_intra_arrive(pipe_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_sync_intra_arrive(pipe_t pipe, uint64_t sync_id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_intra_wait(pipe_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_subblock_wait(pipe_t,int64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe, int64_t flag_id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_inter_wait(pipe_t,int64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_block_wait(pipe_t,int64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_lock(pipe_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id);
 
 __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode);
 
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_unlock(pipe_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id);
 
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode);
 
 [[deprecated("NOTICE: asc_sync_vec() is deprecated. "
              "Please use asc_sync() instead")]]
+/**
+ * @ingroup simd_c_api.sync
+ * @function asc_sync_vec()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_sync_vec();
 
 #endif

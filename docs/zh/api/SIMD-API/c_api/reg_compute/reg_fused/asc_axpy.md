@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: "asc_axpy"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_axpy.md"
+description: "根据`mask`将源操作数`src`中的每个元素与标量`value`求积后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入累加器参与计算，又用于存储最终结果。"
+signature:
+  - function: "asc_axpy(vector_<dtype>&,vector_<dtype>,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+    dtype:
+      values:
+        - "half"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_axpy
 
 ## 产品支持情况
@@ -33,6 +53,16 @@ dst_i = src_i \times value + dst_i
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_axpy(vector_<dtype>&,vector_<dtype>,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_axpy(vector_<dtype>& dst,

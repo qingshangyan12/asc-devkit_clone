@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_atomic_xor"
+path: "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md"
+description: "对Global Memory中`address`指向的单个元素执行原子按位异或操作：读取该地址中的旧值`old_value`，将`old_value`与输入标量值`val`进行按位异或运算，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+signature:
+  - function: "asc_atomic_xor(__gm__ <dtype>*,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/scalar_atomic.h"
+    dtype:
+      values:
+        - "int32_t"
+        - "uint32_t"
+        - "int64_t"
+        - "uint64_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_atomic_xor
 
 ## 产品支持情况
@@ -35,6 +57,16 @@ new\_value = old\_value\ \oplus\ val
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_atomic_xor(__gm__ <dtype>*,<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/scalar_atomic.h"
+```
+
 
 ```c
 __aicore__ inline <dtype> asc_atomic_xor(__gm__ <dtype>* address,

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_l0c2gm_prequant"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_prequant.md"
+description: "数据搬运过程中进行随路量化时，通过调用该接口获取量化操作前矢量的起始地址。"
+signature:
+  - function: "asc_get_l0c2gm_prequant()"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_l0c2gm_prequant
 
 ## 产品支持情况
@@ -29,6 +45,16 @@
 数据搬运过程中进行随路量化时，通过调用该接口获取量化操作前矢量的起始地址。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_l0c2gm_prequant()"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
 
 ```cpp
 __aicore__ inline uint64_t asc_get_l0c2gm_prequant()

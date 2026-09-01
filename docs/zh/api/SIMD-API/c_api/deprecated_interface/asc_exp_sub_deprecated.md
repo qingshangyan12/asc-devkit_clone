@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_exp_sub（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md"
+description: "**输入数据类型为`half`且不带`src_pos`参数的`asc_exp_sub`原型以及`asc_exp_sub_v2`原型已废弃。新接口请参见[asc_exp_sub](../reg_compute/reg_fused/asc_exp_sub.md)。"
+signature:
+  - function: "asc_exp_sub(vector_float&,vector_half,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_fused.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_exp_sub_v2(vector_float&,vector_half,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_fused.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_exp_sub_v2(vector_float&,vector_float,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_fused.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_exp_sub（废弃）
 
 ## 产品支持情况
@@ -41,6 +69,28 @@
 | `asc_exp_sub_v2(dst, vector_float src0, vector_float src1, mask)` | `asc_exp_sub(dst, src0, src1, mask)` |
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_exp_sub(vector_float&,vector_half,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_fused.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_exp_sub_v2(vector_float&,vector_half,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_fused.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_exp_sub_v2(vector_float&,vector_float,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_fused.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_exp_sub(vector_float& dst,

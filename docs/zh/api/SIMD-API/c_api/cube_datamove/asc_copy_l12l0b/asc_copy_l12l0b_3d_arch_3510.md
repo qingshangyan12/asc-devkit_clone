@@ -1,3 +1,53 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12l0b_arch_3510（3D矩阵搬运）"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md"
+description: "3D卷积数据搬运是用于将NC1HWC0格式的Feature Map完成Image to Column展开，按卷积步长、卷积核大小、膨胀系数配置生成img2col二维矩阵，再从展开后的矩阵中选取指定数据块搬运到L0B Buffer，用于3D卷积场景的矩阵计算数据加载。"
+signature:
+  - function: "asc_copy_l12l0b(__cb__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_copy_l12l0b_sync(__cb__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_l12l0b_arch_3510（3D矩阵搬运）
 
 ## 产品支持情况
@@ -35,6 +85,22 @@
 本接口仅在AIC上执行有效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_copy_l12l0b(__cb__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_sync(__cb__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_copy_l12l0b(__cb__ <dtype>* dst,

@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_gather_datablock"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md"
+description: "给定一个输入的矢量和一个地址偏移矢量，根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中。"
+signature:
+  - function: "asc_gather_datablock(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather_datablock(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather_datablock_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_gather_datablock_sync(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_gather_datablock
 
 ## 产品支持情况
@@ -31,6 +65,22 @@
 ## 函数原型
 
 - 高维切分计算
+```yaml
+api_signature:
+  - function: "asc_gather_datablock(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+  - function: "asc_gather_datablock(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_gather.h"
+        header: "/include/c_api/vector_compute/compute/vector_gather.h"
+```
+
 
   ```cpp
   __aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
@@ -38,6 +88,22 @@
   ```
 
 - 同步计算
+```yaml
+api_signature:
+  - function: "asc_gather_datablock_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_gather_datablock_sync(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+```
+
 
   ```cpp
   __aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)

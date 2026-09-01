@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_leakyrelu"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md"
+description: "执行矢量Leaky Relu运算。"
+signature:
+  - function: "asc_leakyrelu(__ubuf__ half*,__ubuf__ half*,half,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_leakyrelu(__ubuf__ float*,__ubuf__ float*,float,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_leakyrelu(__ubuf__ half*,__ubuf__ half*,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_leakyrelu(__ubuf__ float*,__ubuf__ float*,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_leakyrelu_sync(__ubuf__ half*,__ubuf__ half*,half,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_leakyrelu_sync(__ubuf__ float*,__ubuf__ float*,float,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_leakyrelu
 
 ## 产品支持情况

@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_mmad_sparse（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_sparse_deprecated.md"
+description: "**入参`unit_flag`类型为`uint8_t`的`asc_mmad_sparse`接口和`asc_mmad_sparse_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad_sparse](../cube_compute/asc_mmad_sparse.md)接口替代；原`asc_mmad_sparse_sync`接口的同步功能请通过新`asc_mmad_sparse`接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/asc_sync.md)。"
+signature:
+  - function: "asc_mmad_sparse(__cc__ int32_t*,__ca__ int8_t*,__cb__ int8_t*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+  - function: "asc_mmad_sparse_sync(__cc__ int32_t*,__ca__ int8_t*,__cb__ int8_t*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_compute_composite.h"
+        header: "/include/c_api/composite/cube_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_mmad_sparse（废弃）
 
 ## 产品支持情况
@@ -33,6 +55,22 @@
 本接口为矩阵计算接口，仅在AIC上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_mmad_sparse(__cc__ int32_t*,__ca__ int8_t*,__cb__ int8_t*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+  - function: "asc_mmad_sparse_sync(__cc__ int32_t*,__ca__ int8_t*,__cb__ int8_t*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_compute_composite.h"
+        header: "/include/c_api/composite/cube_compute_composite.h"
+```
+
 
 ```c
 __aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c,

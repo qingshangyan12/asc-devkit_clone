@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: "asc_mula"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mula.md"
+description: "根据`mask`对源操作数`src0`、`src1`按元素相乘后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入累加器参与计算，又用于存储最终结果。"
+signature:
+  - function: "asc_mula(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+    dtype:
+      values:
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_mula
 
 ## 产品支持情况
@@ -33,6 +58,16 @@ dst_i = src0_i \times src1_i + dst_i
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_mula(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_mula(vector_<dtype>& dst,

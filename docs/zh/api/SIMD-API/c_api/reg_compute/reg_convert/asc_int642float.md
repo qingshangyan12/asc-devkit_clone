@@ -1,3 +1,113 @@
+---
+okftype: reference.api.cpp
+title: "asc_int642float"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642float.md"
+description: "将`int64_t`类型数据转换为`float`，并支持多种舍入模式。"
+signature:
+  - function: "asc_int642float_rd(vector_float&,vector_int64_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+  - function: "asc_int642float_rn(vector_float&,vector_int64_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+  - function: "asc_int642float_rna(vector_float&,vector_int64_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+  - function: "asc_int642float_ru(vector_float&,vector_int64_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+  - function: "asc_int642float_rz(vector_float&,vector_int64_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+  - function: "asc_int642float_rd(vector_float&,vector_int64_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+  - function: "asc_int642float_rn(vector_float&,vector_int64_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+  - function: "asc_int642float_rna(vector_float&,vector_int64_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+  - function: "asc_int642float_ru(vector_float&,vector_int64_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+  - function: "asc_int642float_rz(vector_float&,vector_int64_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int642float
 
 ## 产品支持情况
@@ -65,6 +175,16 @@ __simd_callee__ inline void asc_int642float_<round_mode>(vector_float& dst,
 - `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 
 ### 函数原型典型示例
+```yaml
+api_signature:
+  - function: "asc_int642float_rn(vector_float&,vector_int64_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```c
 // 示例：向最近且偶数舍入（rn）偶数分块位置主原型，将`int64_t`矢量数据寄存器转换为`float`。

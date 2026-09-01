@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_pack_to_high"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md"
+description: "将源操作数中的元素选取低8位（b16）、低16位（b32）、低32位（b64）写入目的操作数的高半部分。 当源操作数为vector_bool时，其按bit位进行压缩，每2bit将其中的低位bit存储至目的操作数的高半部分。"
+signature:
+  - function: "asc_pack_to_high(vector_uint8_t&,vector_uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_pack_to_high(vector_uint16_t&,vector_uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_pack_to_high(vector_bool&,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_pack_to_high
 
 ## 产品支持情况
@@ -32,6 +60,28 @@
 ![](../../../../figures/pack_high_draft.png)
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_pack_to_high(vector_uint8_t&,vector_uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_pack_to_high(vector_uint16_t&,vector_uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_pack_to_high(vector_bool&,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```cpp
 __simd_callee__ inline void asc_pack_to_high(vector_uint8_t& dst, vector_uint16_t src)

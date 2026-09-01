@@ -1,3 +1,62 @@
+---
+okftype: reference.api.cpp
+title: "asc_storealign_postupdate"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md"
+description: "将矢量数据寄存器或掩码寄存器中的数据连续对齐搬出到Unified Buffer（UB），启用Post Update模式在搬出后自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。当源操作数为矢量数据寄存器时，单次搬出量为VL（256字节），支持配置掩码用于指示参与搬出的元素，掩码为1的元素写入目的地址，掩码为0的元素保留目的地址原数据。当源操作数为掩码寄存器时，单次搬出量为掩码寄存器长度（32字节），不支持配置掩码。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用，目的操作数为UB地址。"
+signature:
+  - function: "asc_storealign_postupdate(__ubuf__ <dtype>*&,vector_<dtype>,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_storealign_postupdate(__ubuf__ <dtype>*&,vector_<dtype>,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_storealign_postupdate(__ubuf__ <dtype>*&,vector_bool,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+    dtype:
+      values:
+        - "uint8_t"
+        - "uint16_t"
+        - "uint32_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_storealign_postupdate
 
 ## 产品支持情况
@@ -42,6 +101,16 @@
 ## 函数原型
 
 ### 矢量数据寄存器立即数偏移搬出模式
+```yaml
+api_signature:
+  - function: "asc_storealign_postupdate(__ubuf__ <dtype>*&,vector_<dtype>,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ <dtype>*& dst_align32b,
@@ -64,6 +133,16 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ int8_t*& dst_alig
 ```
 
 ### 矢量数据寄存器非连续对齐搬出模式
+```yaml
+api_signature:
+  - function: "asc_storealign_postupdate(__ubuf__ <dtype>*&,vector_<dtype>,uint16_t,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ <dtype>*& dst_align32b,
@@ -88,6 +167,16 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ int8_t*& dst_alig
 ```
 
 ### 掩码寄存器立即数偏移搬出模式
+```yaml
+api_signature:
+  - function: "asc_storealign_postupdate(__ubuf__ <dtype>*&,vector_bool,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ <dtype>*& dst,

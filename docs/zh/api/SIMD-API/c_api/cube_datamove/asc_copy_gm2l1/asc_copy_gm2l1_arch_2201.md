@@ -1,3 +1,259 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_gm2l1"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_2201.md"
+description: "将矩阵数据从Global Memory搬运到L1 Buffer中，并支持不同类型的pad模式。"
+signature:
+  - function: "asc_copy_gm2l1(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad1(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad2(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad3(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad4(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad5(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad6(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad7(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad8(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad1(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad2(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad3(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad4(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad5(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad6(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad7(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_pad8(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_sync(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_pad1_sync(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_pad2_sync(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_pad3_sync(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_pad4_sync(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_pad5_sync(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_pad6_sync(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_pad7_sync(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_pad8_sync(__cbuf__ void*,__gm__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1(__cbuf__ bfloat16_t*,__gm__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1(__cbuf__ half*,__gm__ half*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1(__cbuf__ float*,__gm__ float*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1(__cbuf__ int32_t*,__gm__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1(__cbuf__ int8_t*,__gm__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1(__cbuf__ uint32_t*,__gm__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1(__cbuf__ uint8_t*,__gm__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_sync(__cbuf__ bfloat16_t*,__gm__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_sync(__cbuf__ half*,__gm__ half*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_sync(__cbuf__ float*,__gm__ float*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_sync(__cbuf__ int32_t*,__gm__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_sync(__cbuf__ int8_t*,__gm__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_sync(__cbuf__ uint32_t*,__gm__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_gm2l1_sync(__cbuf__ uint8_t*,__gm__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_gm2l1
 
 ## 产品支持情况

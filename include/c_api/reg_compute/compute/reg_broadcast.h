@@ -25,248 +25,848 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_uint8_t&,uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint8_t& dst, uint8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_int8_t&,int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst, int8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_fp8_e4m3fn_t&,fp8_e4m3fn_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e4m3fn_t& dst, fp8_e4m3fn_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_fp8_e5m2_t&,fp8_e5m2_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e5m2_t& dst, fp8_e5m2_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_fp8_e8m0_t&,fp8_e8m0_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e8m0_t& dst, fp8_e8m0_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_uint16_t&,uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint16_t& dst, uint16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_int16_t&,int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int16_t& dst, int16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_half&,half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_half& dst, half value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_bfloat16_t&,bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_bfloat16_t& dst, bfloat16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_uint32_t&,uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint32_t& dst, uint32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_int32_t&,int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int32_t& dst, int32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_float&,float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint8_t asc_duplicate_scalar(uint8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int8_t asc_duplicate_scalar(int8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(fp8_e4m3fn_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_duplicate_scalar(fp8_e4m3fn_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(fp8_e5m2_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_duplicate_scalar(fp8_e5m2_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(fp8_e8m0_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_duplicate_scalar(fp8_e8m0_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint16_t asc_duplicate_scalar(uint16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int16_t asc_duplicate_scalar(int16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_duplicate_scalar(half value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bfloat16_t asc_duplicate_scalar(bfloat16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint32_t asc_duplicate_scalar(uint32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int32_t asc_duplicate_scalar(int32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_duplicate_scalar(float value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_uint8_t&,uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint8_t& dst, uint8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_int8_t&,int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int8_t& dst, int8_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_fp8_e4m3fn_t&,fp8_e4m3fn_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e4m3fn_t& dst, fp8_e4m3fn_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_fp8_e5m2_t&,fp8_e5m2_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e5m2_t& dst, fp8_e5m2_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_fp8_e8m0_t&,fp8_e8m0_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_fp8_e8m0_t& dst, fp8_e8m0_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_uint16_t&,uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint16_t& dst, uint16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_int16_t&,int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int16_t& dst, int16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_half&,half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_half& dst, half value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_bfloat16_t&,bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_bfloat16_t& dst, bfloat16_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_uint32_t&,uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_uint32_t& dst, uint32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_int32_t&,int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int32_t& dst, int32_t value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar_merge(vector_float&,float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_float& dst, float value, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_uint8_t&,uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint8_t& dst, uint8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_int8_t&,int8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int8_t& dst, int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_uint16_t&,uint16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint16_t& dst, uint16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_int16_t&,int16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int16_t& dst, int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_uint32_t&,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_uint32_t& dst, uint32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_int32_t&,int32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_int32_t& dst, int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_half&,half)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_half& dst, half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_float&,float)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_float& dst, float value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_bfloat16_t&,bfloat16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_bfloat16_t& dst, bfloat16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_fp8_e4m3fn_t&,fp8_e4m3fn_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e4m3fn_t& dst, fp8_e4m3fn_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_fp8_e5m2_t&,fp8_e5m2_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e5m2_t& dst, fp8_e5m2_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(vector_fp8_e8m0_t&,fp8_e8m0_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_scalar(vector_fp8_e8m0_t& dst, fp8_e8m0_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint8_t asc_duplicate_scalar(uint8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(int8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int8_t asc_duplicate_scalar(int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(uint16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint16_t asc_duplicate_scalar(uint16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(int16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int16_t asc_duplicate_scalar(int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint32_t asc_duplicate_scalar(uint32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(int32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int32_t asc_duplicate_scalar(int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(half)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_duplicate_scalar(half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(float)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_duplicate_scalar(float value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(bfloat16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bfloat16_t asc_duplicate_scalar(bfloat16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(fp8_e4m3fn_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_duplicate_scalar(fp8_e4m3fn_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(fp8_e5m2_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_duplicate_scalar(fp8_e5m2_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_scalar(fp8_e8m0_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_duplicate_scalar(fp8_e8m0_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_uint8_t&,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_int8_t&,vector_int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_int8_t& dst, vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_fp8_e4m3fn_t&,vector_fp8_e4m3fn_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_fp8_e5m2_t&,vector_fp8_e5m2_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_fp8_e8m0_t&,vector_fp8_e8m0_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_uint16_t&,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_int16_t&,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_half&,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_bfloat16_t&,vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_uint32_t&,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_int32_t&,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_float&,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint8_t asc_duplicate(vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int8_t asc_duplicate(vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_fp8_e4m3fn_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_duplicate(vector_fp8_e4m3fn_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_fp8_e5m2_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_duplicate(vector_fp8_e5m2_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_fp8_e8m0_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_duplicate(vector_fp8_e8m0_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint16_t asc_duplicate(vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int16_t asc_duplicate(vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_duplicate(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bfloat16_t asc_duplicate(vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint32_t asc_duplicate(vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int32_t asc_duplicate(vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate(vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_duplicate(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_uint8_t&,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_int8_t&,vector_int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_int8_t& dst, vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_fp8_e4m3fn_t&,vector_fp8_e4m3fn_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_fp8_e5m2_t&,vector_fp8_e5m2_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_fp8_e8m0_t&,vector_fp8_e8m0_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_uint16_t&,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_int16_t&,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_half&,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_bfloat16_t&,vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_uint32_t&,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_int32_t&,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest(vector_float&,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_uint8_t&,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_int8_t&,vector_int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_int8_t& dst, vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_fp8_e4m3fn_t&,vector_fp8_e4m3fn_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_fp8_e5m2_t&,vector_fp8_e5m2_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_fp8_e8m0_t&,vector_fp8_e8m0_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_uint16_t&,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_int16_t&,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_half&,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_bfloat16_t&,vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_uint32_t&,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_int32_t&,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_merge(vector_float&,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_merge(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_uint8_t&,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_int8_t&,vector_int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_int8_t& dst, vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_fp8_e4m3fn_t&,vector_fp8_e4m3fn_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(
     vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_fp8_e5m2_t&,vector_fp8_e5m2_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(
     vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_fp8_e8m0_t&,vector_fp8_e8m0_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(
     vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_uint16_t&,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_int16_t&,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_half&,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_bfloat16_t&,vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(
     vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_uint32_t&,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_int32_t&,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_broadcast
+ * @function asc_duplicate_highest_merge(vector_float&,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_duplicate_highest_merge(vector_float& dst, vector_float src, vector_bool mask);
 
 #endif

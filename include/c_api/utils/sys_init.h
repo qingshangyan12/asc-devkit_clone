@@ -27,6 +27,11 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/misc_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.utils.sys_init
+ * @function asc_init()
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_init();
 
 #endif

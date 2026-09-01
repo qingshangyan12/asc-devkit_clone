@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_storealign_pack_postupdate_v2（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v4_deprecated.md"
+description: "**该接口已废弃。请使用[asc_storealign_pack_quarter_postupdate](../reg_compute/store/asc_storealign_pack_quarter_postupdate.md)实现此功能。"
+signature:
+  - function: "asc_storealign_pack_postupdate_v2(__ubuf__ int32_t*&,vector_int32_t,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_pack_postupdate_v2(__ubuf__ uint32_t*&,vector_uint32_t,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_pack_postupdate_v2(__ubuf__ float*&,vector_float,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_storealign_pack_postupdate_v2（废弃）
 
 ## 产品支持情况
@@ -31,6 +59,28 @@
 将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。本接口通过`int32_t`类型的`offset`传入偏移量，并启用Post Update模式自动更新目的操作数地址。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_storealign_pack_postupdate_v2(__ubuf__ int32_t*&,vector_int32_t,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_pack_postupdate_v2(__ubuf__ uint32_t*&,vector_uint32_t,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+  - function: "asc_storealign_pack_postupdate_v2(__ubuf__ float*&,vector_float,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storealign.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+```
+
 
 ```cpp
 __simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset, vector_bool mask)

@@ -24,44 +24,144 @@
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange(int8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int8_t asc_arange(int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange(int16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int16_t asc_arange(int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange(int32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int32_t asc_arange(int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange(half)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_arange(half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange(float)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_arange(float value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange_descend(int8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int8_t asc_arange_descend(int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange_descend(int16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int16_t asc_arange_descend(int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange_descend(int32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int32_t asc_arange_descend(int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange_descend(half)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_arange_descend(half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange_descend(float)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_arange_descend(float value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange(vector_int8_t&,int8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_arange(vector_int8_t& dst, int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange(vector_int16_t&,int16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_arange(vector_int16_t& dst, int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange(vector_int32_t&,int32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_arange(vector_int32_t& dst, int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange(vector_half&,half)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_arange(vector_half& dst, half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange(vector_float&,float)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_arange(vector_float& dst, float value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange_descend(vector_int8_t&,int8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_arange_descend(vector_int8_t& dst, int8_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange_descend(vector_int16_t&,int16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_arange_descend(vector_int16_t& dst, int16_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange_descend(vector_int32_t&,int32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_arange_descend(vector_int32_t& dst, int32_t value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange_descend(vector_half&,half)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_arange_descend(vector_half& dst, half value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_index
+ * @function asc_arange_descend(vector_float&,float)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_arange_descend(vector_float& dst, float value);
 
 #endif

@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_ne_scalar"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md"
+description: "src中的每个元素逐个与标量value比较大小，如果某个位置上的元素不等于value，则输出结果dst对应比特位为1，否则为0。"
+signature:
+  - function: "asc_ne_scalar(__ubuf__ uint8_t*dst,__ubuf__ half*src,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_ne_scalar(__ubuf__ uint8_t*dst,__ubuf__ float*src,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_ne_scalar_sync(__ubuf__ uint8_t*dst,__ubuf__ half*src,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_ne_scalar_sync(__ubuf__ uint8_t*dst,__ubuf__ float*src,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_ne_scalar
 
 ## 产品支持情况

@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: "asc_relu"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md"
+description: "根据`mask`对源操作数`src`按元素执行ReLU操作，得到计算结果。"
+signature:
+  - function: "asc_relu(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+    dtype:
+      values:
+        - "half"
+        - "int32_t"
+        - "float"
+  - function: "asc_relu(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+    dtype:
+      values:
+        - "half"
+        - "int32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_relu
 
 ## 产品支持情况
@@ -33,6 +65,22 @@ dst_i = (src_i >= 0) ? src_i : 0
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_relu(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_relu(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

@@ -1,3 +1,85 @@
+---
+okftype: reference.api.cpp
+title: "asc_min_scalar"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min_scalar.md"
+description: "源操作数矢量逐元素与标量相比，如果比标量值大，则取标量值，比标量值小，则取源操作数值。"
+signature:
+  - function: "asc_min_scalar(__ubuf__ half*,__ubuf__ half*,half,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min_scalar(__ubuf__ float*,__ubuf__ float*,float,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min_scalar(__ubuf__ int16_t*,__ubuf__ int16_t*,int16_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min_scalar(__ubuf__ int32_t*,__ubuf__ int32_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min_scalar(__ubuf__ half*,__ubuf__ half*,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min_scalar(__ubuf__ float*,__ubuf__ float*,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min_scalar(__ubuf__ int16_t*,__ubuf__ int16_t*,int16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min_scalar(__ubuf__ int32_t*,__ubuf__ int32_t*,int32_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_min_scalar_sync(__ubuf__ half*,__ubuf__ half*,half,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_min_scalar_sync(__ubuf__ float*,__ubuf__ float*,float,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_min_scalar_sync(__ubuf__ int16_t*,__ubuf__ int16_t*,int16_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_min_scalar_sync(__ubuf__ int32_t*,__ubuf__ int32_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_min_scalar
 
 ## 产品支持情况

@@ -25,78 +25,198 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b32(uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b16(uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b8(uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b32(uint32_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b16(uint32_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b8(uint32_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b32(uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b16(uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b8(uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b32(uint32_t,uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b32(
     uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b16(uint32_t,uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b16(
     uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_update_addr_reg_b8(uint32_t,uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline addr_reg asc_update_addr_reg_b8(
     uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b32 is deprecated. Please use asc_update_addr_reg_b32 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b32(uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b32(uint32_t offset);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b16 is deprecated. Please use asc_update_addr_reg_b16 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b16(uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b16(uint32_t offset);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b8 is deprecated. Please use asc_update_addr_reg_b8 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b8(uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b8(uint32_t offset);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b32 is deprecated. Please use asc_update_addr_reg_b32 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b32(uint32_t,uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b16 is deprecated. Please use asc_update_addr_reg_b16 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b16(uint32_t,uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b8 is deprecated. Please use asc_update_addr_reg_b8 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b8(uint32_t,uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b32 is deprecated. Please use asc_update_addr_reg_b32 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b32(uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b16 is deprecated. Please use asc_update_addr_reg_b16 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b16(uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b8 is deprecated. Please use asc_update_addr_reg_b8 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b8(uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b32 is deprecated. Please use asc_update_addr_reg_b32 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b32(uint32_t,uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b16 is deprecated. Please use asc_update_addr_reg_b16 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b16(uint32_t,uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 
 [[deprecated("NOTICE: asc_create_iter_reg_b8 is deprecated. Please use asc_update_addr_reg_b8 "
+/**
+ * @ingroup simd_c_api.reg_compute.reg_addr_reg
+ * @function asc_create_iter_reg_b8(uint32_t,uint32_t,uint32_t,uint32_t)
+ * @archs 3510
+ */
              "instead.")]] __simd_callee__ inline addr_reg
 asc_create_iter_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3);
 

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_squeeze_and_storeunalign_init"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md"
+description: "对AR特殊寄存器进行清零操作。AR寄存器用于配合[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)及[asc_squeeze_and_storeunalign_finalize](asc_squeeze_and_storeunalign_finalize.md)使用：当调用asc_squeeze_and_storeunalign后，有效元素的总字节数会被存入AR寄存器用于asc_squeeze_and_storeunalign接口内自动地址偏移。在首次调用asc_squeeze_and_storeunalign之前，需调用本接口将AR寄存器清零。"
+signature:
+  - function: "asc_squeeze_and_storeunalign_init()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_squeeze_and_storeunalign_init
 
 ## 产品支持情况
@@ -31,6 +47,16 @@
 本接口仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_squeeze_and_storeunalign_init()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_squeeze_and_storeunalign_init()

@@ -1,3 +1,55 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_atomic_add"
+path: "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md"
+description: "原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。"
+signature:
+  - function: "asc_set_atomic_add_int8()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+  - function: "asc_set_atomic_add_int16()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+  - function: "asc_set_atomic_add_int32()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+  - function: "asc_set_atomic_add_float16()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+  - function: "asc_set_atomic_add_bfloat()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+  - function: "asc_set_atomic_add_float()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_atomic_add
 
 ## 产品支持情况
@@ -31,6 +83,52 @@
 接口可选择不同的函数原型来设定不同的累加数据类型。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_atomic_add_int8()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+  - function: "asc_set_atomic_add_int16()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+  - function: "asc_set_atomic_add_int32()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+  - function: "asc_set_atomic_add_float16()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+  - function: "asc_set_atomic_add_bfloat()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+  - function: "asc_set_atomic_add_float()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/atomic/datamove_atomic.h"
+```
+
 
 ```c
 __aicore__ inline void asc_set_atomic_add_int8()

@@ -1,3 +1,253 @@
+---
+okftype: reference.api.cpp
+title: "asc_half2int8（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2int8_deprecated.md"
+description: "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_half2int8](../reg_compute/reg_convert/asc_half2int8.md)的显式位置参数重载替代。"
+signature:
+  - function: "asc_half2int8_rd(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: ""
+          position_mode: ""
+  - function: "asc_half2int8_rd_v2(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: ""
+          position_mode: "_v2"
+  - function: "asc_half2int8_rd_sat(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: "_sat"
+          position_mode: ""
+  - function: "asc_half2int8_rd_sat_v2(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+          sat_mode: "_sat"
+          position_mode: "_v2"
+  - function: "asc_half2int8_rn(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: ""
+          position_mode: ""
+  - function: "asc_half2int8_rn_v2(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: ""
+          position_mode: "_v2"
+  - function: "asc_half2int8_rn_sat(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: "_sat"
+          position_mode: ""
+  - function: "asc_half2int8_rn_sat_v2(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+          sat_mode: "_sat"
+          position_mode: "_v2"
+  - function: "asc_half2int8_rna(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+          position_mode: ""
+  - function: "asc_half2int8_rna_v2(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+          position_mode: "_v2"
+  - function: "asc_half2int8_rna_sat(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+          position_mode: ""
+  - function: "asc_half2int8_rna_sat_v2(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+          position_mode: "_v2"
+  - function: "asc_half2int8_ru(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: ""
+          position_mode: ""
+  - function: "asc_half2int8_ru_v2(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: ""
+          position_mode: "_v2"
+  - function: "asc_half2int8_ru_sat(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: "_sat"
+          position_mode: ""
+  - function: "asc_half2int8_ru_sat_v2(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+          sat_mode: "_sat"
+          position_mode: "_v2"
+  - function: "asc_half2int8_rz(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: ""
+          position_mode: ""
+  - function: "asc_half2int8_rz_v2(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: ""
+          position_mode: "_v2"
+  - function: "asc_half2int8_rz_sat(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: "_sat"
+          position_mode: ""
+  - function: "asc_half2int8_rz_sat_v2(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rz"
+          sat_mode: "_sat"
+          position_mode: "_v2"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_half2int8（废弃）
 
 ## 产品支持情况
@@ -79,6 +329,16 @@ __simd_callee__ inline void asc_half2int8_<round_mode><sat_mode><position_mode>(
 - `<position_mode>`表示`dst`写入的位置，为空时，结果写入`dst`的偶数索引位置；取值为`_v2`时，结果写入`dst`的奇数索引位置。
 
 ### 函数原型典型示例
+```yaml
+api_signature:
+  - function: "asc_half2int8_rd(vector_int8_t&,vector_half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```c
 // FLOOR舍入模式，非饱和模式，写入dst索引为偶数的位置

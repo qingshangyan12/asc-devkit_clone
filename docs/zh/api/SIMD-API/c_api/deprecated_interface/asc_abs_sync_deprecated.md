@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_abs_sync（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md"
+description: "该接口废弃，请通过[asc_abs](../vector_compute/vector_arith/asc_abs.md)和同步接口[asc_sync](../sync/asc_sync.md)实现精细化调优，达成最优性能。"
+signature:
+  - function: "asc_abs_sync(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_abs_sync(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_abs_sync（废弃）
 
 ## 产品支持情况

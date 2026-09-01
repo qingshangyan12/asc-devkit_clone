@@ -1,3 +1,121 @@
+---
+okftype: reference.api.cpp
+title: "asc_int162half"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md"
+description: "将int16_t类型数据转换为half类型。"
+signature:
+  - function: "asc_int162half(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rn(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rna(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rd(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_ru(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rz(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rn(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rna(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rd(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_ru(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rz(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int162half_rn_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int162half_rna_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int162half_rd_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int162half_ru_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int162half_rz_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int162half
 
 ## 产品支持情况
@@ -37,6 +155,46 @@
 ## 函数原型
 
 - 前n个数据计算
+```yaml
+api_signature:
+  - function: "asc_int162half(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rn(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rna(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rd(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_ru(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rz(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
 
   ```cpp
   // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
@@ -54,6 +212,46 @@
   ```
 
 - 高维切分计算
+```yaml
+api_signature:
+  - function: "asc_int162half(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rn(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rna(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rd(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_ru(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int162half_rz(__ubuf__ half*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
 
   ```cpp
   // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
@@ -71,6 +269,46 @@
   ```
 
 - 同步计算
+```yaml
+api_signature:
+  - function: "asc_int162half_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int162half_rn_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int162half_rna_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int162half_rd_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int162half_ru_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int162half_rz_sync(__ubuf__ half*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+```
+
 
   ```cpp
   // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入

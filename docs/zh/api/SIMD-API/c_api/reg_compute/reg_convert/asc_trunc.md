@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: "asc_trunc"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_trunc.md"
+description: "将`src`中的浮点数元素按照TRUNC（向零方向截断）截断到整数值，结果仍保持原浮点数据类型。接口支持通过函数返回值返回结果，也支持通过引用和参数输出结果：前者直接返回截断结果，后者将截断结果写入`dst`。截断规则等价于C标准库`trunc`语义：向零方向舍入，即丢弃小数部分取整，正数向0方向取整（如1.7 -> 1.0），负数向0方向取整（如-1.7 -> -1.0），整数值保持不变。未被`mask`筛选的元素置零。"
+signature:
+  - function: "asc_trunc(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      values:
+        - "half"
+        - "bfloat16_t"
+        - "float"
+  - function: "asc_trunc(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      values:
+        - "half"
+        - "bfloat16_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_trunc
 
 ## 产品支持情况
@@ -39,6 +71,22 @@ $$
 本接口为Reg矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_trunc(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_trunc(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```cpp
 // 通过函数返回值返回结果

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_vms4_sr"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md"
+description: "此接口用于获取执行[asc_mrgsort4](asc_mrgsort4.md)操作后的4个队列中，每个队列已经理过的Region Proposal个数。使用时，需要将asc_mrgsort4中的if_exhausted_suspension参数配置为true，该配置模式下某条队列耗尽后，MrgSort4指令停止。"
+signature:
+  - function: "asc_get_vms4_sr(uint16_t sorted_num[ASC_C_API_MRGSORT_ELEMENT_LEN])"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_sort.h"
+        header: "/include/c_api/vector_compute/compute/vector_sort.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_vms4_sr
 
 ## 产品支持情况
@@ -29,6 +45,16 @@
 此接口用于获取执行[asc_mrgsort4](asc_mrgsort4.md)操作后的4个队列中，每个队列已经理过的Region Proposal个数。使用时，需要将asc_mrgsort4中的if_exhausted_suspension参数配置为true，该配置模式下某条队列耗尽后，MrgSort4指令停止。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_vms4_sr(uint16_t sorted_num[ASC_C_API_MRGSORT_ELEMENT_LEN])"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_sort.h"
+        header: "/include/c_api/vector_compute/compute/vector_sort.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_get_vms4_sr(uint16_t sorted_num[ASC_C_API_MRGSORT_ELEMENT_LEN])

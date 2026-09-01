@@ -1,3 +1,185 @@
+---
+okftype: reference.api.cpp
+title: "asc_fill_l0a"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md"
+description: "将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化。"
+signature:
+  - function: "asc_fill_l0a(__ca__ int16_t*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ int16_t*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ uint16_t*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ uint16_t*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ half*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ half*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ bfloat16_t*,bfloat16_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ bfloat16_t*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers: []
+  - function: "asc_fill_l0a(__ca__ bfloat16_t*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers: []
+  - function: "asc_fill_l0a(__ca__ int32_t*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ int32_t*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ uint32_t*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ uint32_t*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ float*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a(__ca__ float*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l0a_sync(__ca__ int16_t*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ int16_t*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ uint16_t*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ uint16_t*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ half*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ half*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ bfloat16_t*,bfloat16_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ bfloat16_t*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers: []
+  - function: "asc_fill_l0a_sync(__ca__ bfloat16_t*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers: []
+  - function: "asc_fill_l0a_sync(__ca__ int32_t*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ int32_t*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ uint32_t*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ uint32_t*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ float*,half,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_fill_l0a_sync(__ca__ float*,uint32_t,const asc_fill_value_config&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_fill_l0a
 
 ## 产品支持情况

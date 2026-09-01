@@ -1,3 +1,57 @@
+---
+okftype: reference.api.cpp
+title: "asc_add"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add.md"
+description: "该接口根据`mask`，对源操作数`src0`、`src1`进行按元素求和操作，将结果写入目的操作数`dst`。"
+signature:
+  - function: "asc_add(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_add(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_add(vector_bool&,vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "int32_t"
+        - "uint32_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_add
 
 ## 产品支持情况
@@ -51,6 +105,22 @@ $$
 ## 函数原型
 
 ### 无进位输出加法（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_add(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+  - function: "asc_add(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 // 通过引用参数输出结果
@@ -85,6 +155,16 @@ __simd_callee__ inline vector_float asc_add(vector_float src0,
 ```
 
 ### 带进位输出加法（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_add(vector_bool&,vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_add(vector_bool& carry,

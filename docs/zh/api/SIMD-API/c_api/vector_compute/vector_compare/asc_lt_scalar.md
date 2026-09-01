@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_lt_scalar"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md"
+description: "执行矢量中每个位置和标量比较，如果值小于标量值则为1，否则为0，结果为每个bit位按小端序排布。"
+signature:
+  - function: "asc_lt_scalar(__ubuf__ uint8_t*,__ubuf__ half*,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_lt_scalar(__ubuf__ uint8_t*,__ubuf__ float*,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_lt_scalar_sync(__ubuf__ uint8_t*,__ubuf__ half*,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_lt_scalar_sync(__ubuf__ uint8_t*,__ubuf__ float*,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_lt_scalar
 
 ## 产品支持情况

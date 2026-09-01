@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_ndim_pad_count"
+path: "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md"
+description: "本接口用于配置NDDMA高维切分搬运中`loop1`至`loop4`各维左右两侧的填充元素数。配置结果供后续调用[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)时使用。"
+signature:
+  - function: "asc_set_ndim_pad_count(asc_ndim_pad_count_config&)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_ndim_pad_count
 
 ## 产品支持情况
@@ -33,6 +49,16 @@
 本接口仅在AIV上执行有效，在AIC上调用为空操作。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_ndim_pad_count(asc_ndim_pad_count_config&)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```c
 __aicore__ inline void asc_set_ndim_pad_count(asc_ndim_pad_count_config& config)

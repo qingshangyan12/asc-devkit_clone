@@ -26,10 +26,25 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
+/**
+ * @ingroup simd_c_api.vector_compute.vector_mask_config
+ * @function asc_set_mask_count()
+ * @archs 2201
+ */
 __aicore__ inline void asc_set_mask_count();
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_mask_config
+ * @function asc_set_mask_norm()
+ * @archs 2201
+ */
 __aicore__ inline void asc_set_mask_norm();
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_mask_config
+ * @function asc_set_vector_mask(uint64_t,uint64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_vector_mask(uint64_t mask_high, uint64_t mask_low);
 
 #endif

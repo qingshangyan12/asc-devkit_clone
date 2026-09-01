@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_dci"
+path: "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dci.md"
+description: "数据缓存失效，该指令用于使整个数据缓存无效化，且不会对处于“脏”状态的缓存行执行写回操作。换言之，所有缓存行将被直接标记为无效，其修改过但尚未同步至主存的数据将被丢弃。"
+signature:
+  - function: "asc_dci()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_dci
 
 ## 产品支持情况
@@ -29,6 +45,16 @@
 数据缓存失效，该指令用于使整个数据缓存无效化，且不会对处于“脏”状态的缓存行执行写回操作。换言之，所有缓存行将被直接标记为无效，其修改过但尚未同步至主存的数据将被丢弃。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_dci()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_dci()

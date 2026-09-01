@@ -1,3 +1,47 @@
+---
+okftype: reference.api.cpp
+title: "asc_ge"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ge.md"
+description: "ge表示大于等于（greater than or equal to），该接口用于逐元素比较两个源操作数大小，将比较结果（$src0_i \\geq src1_i$）作为返回值返回或写入目的操作数`dst`对应比特位。如果比较结果为真，则对应比特位为1，否则为0。"
+signature:
+  - function: "asc_ge(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_ge(vector_bool&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_ge
 
 ## 产品支持情况
@@ -37,6 +81,22 @@ $$
 本接口仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_ge(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+  - function: "asc_ge(vector_bool&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

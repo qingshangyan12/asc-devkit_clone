@@ -1,3 +1,61 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2e5m2 (废弃)"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2_deprecated.md"
+description: "将float类型数据转换为fp8_e5m2类型，支持RINT舍入模式，饱和/非饱和模式。"
+signature:
+  - function: "asc_float2e5m2_rn(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_v2(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_v3(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_v4(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_sat(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_sat_v2(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_sat_v3(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_sat_v4(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_float2e5m2 (废弃)
 
 ## 产品支持情况
@@ -31,6 +89,58 @@
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_float2e5m2_rn(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_v2(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_v3(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_v4(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_sat(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_sat_v2(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_sat_v3(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_float2e5m2_rn_sat_v4(vector_fp8_e5m2_t&,vector_float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/reg_convert.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```cpp
 // RINT舍入模式，非饱和模式，数据写入索引为0的位置

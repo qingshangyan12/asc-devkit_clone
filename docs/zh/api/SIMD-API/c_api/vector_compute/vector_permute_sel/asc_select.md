@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_select"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md"
+description: "执行矢量选择操作，给定两个源操作数src0和src1，根据条件选择元素，得到目的操作数dst。此接口配合[asc_set_cmp_mask(sel_mask)](../vector_compare/asc_set_cmp_mask.md)设置，规则为：当sel_mask的比特位是1时，从src0选取；当比特位是0时，从src1选择。"
+signature:
+  - function: "asc_select(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_select(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_select(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_select(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_select_sync(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_select_sync(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_select
 
 ## 产品支持情况

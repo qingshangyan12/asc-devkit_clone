@@ -28,13 +28,53 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_bit
+ * @function asc_sflbits(int64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_sflbits(int64_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_bit
+ * @function asc_ffz(uint64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_ffz(uint64_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_bit
+ * @function asc_ffs(uint64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_ffs(uint64_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_bit
+ * @function asc_popc(uint64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_popc(uint64_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_bit
+ * @function asc_clz(uint64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_clz(uint64_t value_in);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_bit
+ * @function asc_zero_bits_cnt(uint64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline int64_t asc_zero_bits_cnt(uint64_t value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_bit
+ * @function asc_set_nthbit(uint64_t,int64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_bit
+ * @function asc_clear_nthbit(uint64_t,int64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx);
 
 #endif

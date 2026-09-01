@@ -1,3 +1,85 @@
+---
+okftype: reference.api.cpp
+title: "asc_vdeq_int162b8"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md"
+description: "将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。使用该接口前需要调用asc_set_deq_scale设置量化参数。"
+signature:
+  - function: "asc_vdeq_int162b8_h(__ubuf__ int8_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_vdeq_int162b8_h(__ubuf__ uint8_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_vdeq_int162b8_l(__ubuf__ int8_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_vdeq_int162b8_l(__ubuf__ uint8_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_vdeq_int162b8_h(__ubuf__ int8_t*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_vdeq_int162b8_h(__ubuf__ uint8_t*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_vdeq_int162b8_l(__ubuf__ int8_t*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_vdeq_int162b8_l(__ubuf__ uint8_t*,__ubuf__ int16_t*,uint8_t,uint16_t,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_vdeq_int162b8_h_sync(__ubuf__ int8_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_vdeq_int162b8_h_sync(__ubuf__ uint8_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_vdeq_int162b8_l_sync(__ubuf__ int8_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_vdeq_int162b8_l_sync(__ubuf__ uint8_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_vdeq_int162b8
 
 ## 产品支持情况

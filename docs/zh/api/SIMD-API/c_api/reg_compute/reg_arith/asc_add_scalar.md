@@ -1,3 +1,47 @@
+---
+okftype: reference.api.cpp
+title: "asc_add_scalar"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add_scalar.md"
+description: "根据`mask`将源操作数`src`按元素与标量`value`相加，得到计算结果。"
+signature:
+  - function: "asc_add_scalar(vector_<dtype>,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_add_scalar(vector_<dtype>&,vector_<dtype>,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_add_scalar
 
 ## 产品支持情况
@@ -33,6 +77,22 @@ dst_i = src_i + value
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_add_scalar(vector_<dtype>,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+  - function: "asc_add_scalar(vector_<dtype>&,vector_<dtype>,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

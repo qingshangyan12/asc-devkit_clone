@@ -1,3 +1,157 @@
+---
+okftype: reference.api.cpp
+title: "asc_half2hif8"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md"
+description: "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`hifloat8_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据参数`dst_pos`选择写入`dst`索引为偶数的位置或奇数的位置。"
+signature:
+  - function: "asc_half2hif8rna(vector_hifloat8_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+  - function: "asc_half2hif8rna_sat(vector_hifloat8_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+  - function: "asc_half2hif8rh(vector_hifloat8_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rh"
+          sat_mode: ""
+  - function: "asc_half2hif8rh_sat(vector_hifloat8_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rh"
+          sat_mode: "_sat"
+  - function: "asc_half2hif8rna(vector_hifloat8_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+  - function: "asc_half2hif8rna_sat(vector_hifloat8_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+  - function: "asc_half2hif8rh(vector_hifloat8_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rh"
+          sat_mode: ""
+  - function: "asc_half2hif8rh_sat(vector_hifloat8_t&,vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rh"
+          sat_mode: "_sat"
+  - function: "asc_half2hif8rna(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+  - function: "asc_half2hif8rna_sat(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+  - function: "asc_half2hif8rh(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rh"
+          sat_mode: ""
+  - function: "asc_half2hif8rh_sat(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rh"
+          sat_mode: "_sat"
+  - function: "asc_half2hif8rna(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: ""
+  - function: "asc_half2hif8rna_sat(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+          sat_mode: "_sat"
+  - function: "asc_half2hif8rh(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rh"
+          sat_mode: ""
+  - function: "asc_half2hif8rh_sat(vector_half,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers: []
+    dtype:
+      variants:
+        -
+          round_mode: "rh"
+          sat_mode: "_sat"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_half2hif8
 
 ## 产品支持情况

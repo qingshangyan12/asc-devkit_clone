@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_ub2gm"
+path: "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md"
+description: "将数据从Unified Buffer（UB）搬运到Global Memory (GM)。"
+signature:
+  - function: "asc_copy_ub2gm(__gm__ void*,__ubuf__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_ub2gm(__gm__ void*,__ubuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_ub2gm_sync(__gm__ void*,__ubuf__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_ub2gm
 
 ## 产品支持情况
@@ -31,18 +59,48 @@
 ## 函数原型
 
 - 前n个数据搬运
+```yaml
+api_signature:
+  - function: "asc_copy_ub2gm(__gm__ void*,__ubuf__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
 ```
 
 - 高维切分搬运
+```yaml
+api_signature:
+  - function: "asc_copy_ub2gm(__gm__ void*,__ubuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
 ```
 
 - 同步计算
+```yaml
+api_signature:
+  - function: "asc_copy_ub2gm_sync(__gm__ void*,__ubuf__ void*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src, uint32_t size)

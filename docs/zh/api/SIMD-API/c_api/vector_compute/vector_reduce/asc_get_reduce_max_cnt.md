@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_reduce_max_cnt"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md"
+description: "此接口用于获取执行[asc_repeat_reduce_max](asc_repeat_reduce_max.md)操作后的最大值，以及第一个最大值时的索引。"
+signature:
+  - function: "asc_get_reduce_max_cnt(half&,uint32_t&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_get_reduce_max_cnt(float&,uint32_t&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_reduce_max_cnt
 
 ## 产品支持情况
@@ -29,6 +51,22 @@
 此接口用于获取执行[asc_repeat_reduce_max](asc_repeat_reduce_max.md)操作后的最大值，以及第一个最大值时的索引。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_reduce_max_cnt(half&,uint32_t&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_get_reduce_max_cnt(float&,uint32_t&)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_get_reduce_max_cnt(half& val, uint32_t& index)

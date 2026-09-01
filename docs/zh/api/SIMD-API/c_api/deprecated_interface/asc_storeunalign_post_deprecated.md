@@ -1,3 +1,109 @@
+---
+okftype: reference.api.cpp
+title: "asc_storeunalign_post（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md"
+description: "**该接口已废弃。请使用[asc_squeeze_and_storeunalign_finalize](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md)实现此功能。"
+signature:
+  - function: "asc_storeunalign_post(__ubuf__ int8_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ uint8_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ fp4x2_e2m1_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ fp4x2_e1m2_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ int4b_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ fp8_e8m0_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ fp8_e5m2_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ fp8_e4m3fn_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ int16_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ uint16_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ half*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ bfloat16_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ int32_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ uint32_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ float*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ int64_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_storeunalign_post（废弃）
 
 ## 产品支持情况
@@ -42,6 +148,106 @@ store_unalign或store_unalign_postupdate接口执行时，会将主块搬出至U
 本接口执行时，会将尾块从非对齐寄存器搬出至UB。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_storeunalign_post(__ubuf__ int8_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ uint8_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ fp4x2_e2m1_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ fp4x2_e1m2_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ int4b_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ fp8_e8m0_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ fp8_e5m2_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ fp8_e4m3fn_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ int16_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ uint16_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ half*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ bfloat16_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ int32_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ uint32_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ float*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+  - function: "asc_storeunalign_post(__ubuf__ int64_t*,vector_store_unalign)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/store/storeunalign.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
 
 ```cpp
 __simd_callee__ inline void asc_storeunalign_post(__ubuf__ int8_t* dst, vector_store_unalign src)

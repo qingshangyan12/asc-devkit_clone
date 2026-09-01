@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_zero_bits_cnt"
+path: "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_zero_bits_cnt.md"
+description: "获取输入`uint64_t`数据的二进制表示中值为0的位数。"
+signature:
+  - function: "asc_zero_bits_cnt(uint64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_bit.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_zero_bits_cnt
 
 ## 产品支持情况
@@ -29,6 +46,17 @@
 获取输入`uint64_t`数据的二进制表示中值为0的位数。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_zero_bits_cnt(uint64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_bit.h"
+```
+
 
 ```c
 __aicore__ inline int64_t asc_zero_bits_cnt(uint64_t value)

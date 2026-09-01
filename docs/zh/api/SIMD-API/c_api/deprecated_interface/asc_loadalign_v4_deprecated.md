@@ -1,3 +1,205 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign (废弃)"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_loadalign_v4_deprecated.md"
+description: "**该接口已废弃。其中asc_loadalign_brc_postupdate_v2请使用[asc_loadalign_brc_datablock_postupdate](../reg_compute/load/asc_loadalign_brc_datablock_postupdate.md)，asc_loadalign_brc_postupdate_v3请使用[asc_loadalign_brc_elem2datablock_postupdate](../reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md)，asc_loadalign_unpack_postupdate_v2请使用[asc_loadalign_unpack4_postupdate](../reg_compute/load/asc_loadalign_unpack4_postupdate.md)实现此功能。"
+signature:
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_int8_t&,__ubuf__ int8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_uint8_t&,__ubuf__ uint8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_fp4x2_e2m1_t&,__ubuf__ fp4x2_e2m1_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_fp4x2_e1m2_t&,__ubuf__ fp4x2_e1m2_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_fp8_e8m0_t&,__ubuf__ fp8_e8m0_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_fp8_e5m2_t&,__ubuf__ fp8_e5m2_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_fp8_e4m3fn_t&,__ubuf__ fp8_e4m3fn_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_hifloat8_t&,__ubuf__ hifloat8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_int4x2_t&,__ubuf__ int4b_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_int8_t&,__ubuf__ int8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_uint8_t&,__ubuf__ uint8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_fp4x2_e2m1_t&,__ubuf__ fp4x2_e2m1_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_fp4x2_e1m2_t&,__ubuf__ fp4x2_e1m2_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_fp8_e8m0_t&,__ubuf__ fp8_e8m0_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_fp8_e5m2_t&,__ubuf__ fp8_e5m2_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_fp8_e4m3fn_t&,__ubuf__ fp8_e4m3fn_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_hifloat8_t&,__ubuf__ hifloat8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_int16_t&,__ubuf__ int16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_uint16_t&,__ubuf__ uint16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_half&,__ubuf__ half*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_bfloat16_t&,__ubuf__ bfloat16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_int32_t&,__ubuf__ int32_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_uint32_t&,__ubuf__ uint32_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_float&,__ubuf__ float*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_int4x2_t&,__ubuf__ int4b_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_int16_t&,__ubuf__ int16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_uint16_t&,__ubuf__ uint16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_half&,__ubuf__ half*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_bfloat16_t&,__ubuf__ bfloat16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_int32_t&,__ubuf__ int32_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_uint32_t&,__ubuf__ uint32_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_float&,__ubuf__ float*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_loadalign (废弃)
 
 ## 产品支持情况
@@ -35,6 +237,202 @@
 - BRCV3搬入模式：加载（VL/DataBlock）B的数据，并将每个元素（16bit/32bit）广播到一个DataBlock（32B）中。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_int8_t&,__ubuf__ int8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_uint8_t&,__ubuf__ uint8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_fp4x2_e2m1_t&,__ubuf__ fp4x2_e2m1_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_fp4x2_e1m2_t&,__ubuf__ fp4x2_e1m2_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_fp8_e8m0_t&,__ubuf__ fp8_e8m0_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_fp8_e5m2_t&,__ubuf__ fp8_e5m2_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_fp8_e4m3fn_t&,__ubuf__ fp8_e4m3fn_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_hifloat8_t&,__ubuf__ hifloat8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_unpack_postupdate_v2(vector_int4x2_t&,__ubuf__ int4b_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_int8_t&,__ubuf__ int8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_uint8_t&,__ubuf__ uint8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_fp4x2_e2m1_t&,__ubuf__ fp4x2_e2m1_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_fp4x2_e1m2_t&,__ubuf__ fp4x2_e1m2_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_fp8_e8m0_t&,__ubuf__ fp8_e8m0_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_fp8_e5m2_t&,__ubuf__ fp8_e5m2_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_fp8_e4m3fn_t&,__ubuf__ fp8_e4m3fn_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_hifloat8_t&,__ubuf__ hifloat8_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_int16_t&,__ubuf__ int16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_uint16_t&,__ubuf__ uint16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_half&,__ubuf__ half*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_bfloat16_t&,__ubuf__ bfloat16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_int32_t&,__ubuf__ int32_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_uint32_t&,__ubuf__ uint32_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_float&,__ubuf__ float*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v2(vector_int4x2_t&,__ubuf__ int4b_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_int16_t&,__ubuf__ int16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_uint16_t&,__ubuf__ uint16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_half&,__ubuf__ half*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_bfloat16_t&,__ubuf__ bfloat16_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_int32_t&,__ubuf__ int32_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_uint32_t&,__ubuf__ uint32_t*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+  - function: "asc_loadalign_brc_postupdate_v3(vector_float&,__ubuf__ float*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/load/loadalign.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+```
+
 
 ```cpp
 // UNPACKV2搬入模式

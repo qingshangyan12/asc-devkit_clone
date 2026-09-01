@@ -1,3 +1,121 @@
+---
+okftype: reference.api.cpp
+title: "asc_int322float"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322float.md"
+description: "将int32_t类型数据转换为float类型。"
+signature:
+  - function: "asc_int322float(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rn(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rna(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rd(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_ru(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rz(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rn(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rna(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rd(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_ru(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rz(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_sync(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int322float_rn_sync(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int322float_rna_sync(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int322float_rd_sync(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int322float_ru_sync(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_int322float_rz_sync(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int322float
 
 ## 产品支持情况
@@ -37,6 +155,46 @@
 ## 函数原型
 
 - 前n个数据计算
+```yaml
+api_signature:
+  - function: "asc_int322float(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rn(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rna(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rd(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_ru(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rz(__ubuf__ float*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
 
   ```cpp
   // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
@@ -54,6 +212,46 @@
   ```
 
 - 高维切分计算
+```yaml
+api_signature:
+  - function: "asc_int322float(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rn(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rna(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rd(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_ru(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int322float_rz(__ubuf__ float*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+```
+
 
   ```cpp
   // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入

@@ -1,3 +1,53 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_gm2l1_nd2nz_arch_3510"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md"
+description: "将数据从Global Memory搬运到L1 Buffer，并在搬运过程中将源端按N维连续排布的ND格式数据转换为L1 Buffer侧的Nz分形排布，使其满足后续矩阵计算对分形列连续性的要求。该接口也适用于卷积格式NHWC（ND）转换为NC1HWC0格式等转换场景。"
+signature:
+  - function: "asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>*,__gm__ <dtype>*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_copy_gm2l1_nd2nz_sync(__cbuf__ <dtype>*,__gm__ <dtype>*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_gm2l1_nd2nz_arch_3510
 
 ## 产品支持情况
@@ -39,6 +89,22 @@
 ![](../../../../figures/datacopy_gm2l1_nd2nz_copy.png)
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>*,__gm__ <dtype>*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_gm2l1_nd2nz_sync(__cbuf__ <dtype>*,__gm__ <dtype>*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>* dst,
@@ -64,6 +130,16 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ <dtype>* dst,
 dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 函数原型典型示例
+```yaml
+api_signature:
+  - function: "asc_copy_gm2l1_nd2nz_sync(__cbuf__ <dtype>*,__gm__ <dtype>*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+```
+
 
 ```cpp
 // 示例：half类型的ND到Nz格式搬运。

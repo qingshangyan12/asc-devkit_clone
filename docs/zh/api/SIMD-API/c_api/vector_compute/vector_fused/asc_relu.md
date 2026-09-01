@@ -1,3 +1,67 @@
+---
+okftype: reference.api.cpp
+title: "asc_relu"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md"
+description: "按元素做线性整流Relu。"
+signature:
+  - function: "asc_relu(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_relu(__ubuf__ int32_t*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_relu(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_relu(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_relu(__ubuf__ int32_t*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_relu(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_relu_sync(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_relu_sync(__ubuf__ int32_t*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_relu_sync(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_relu
 
 ## 产品支持情况
@@ -34,6 +98,28 @@ $$
 ## 函数原型
 
 - 前n个数据计算
+```yaml
+api_signature:
+  - function: "asc_relu(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_relu(__ubuf__ int32_t*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_relu(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
   ```cpp
   __aicore__ inline void asc_relu(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
   __aicore__ inline void asc_relu(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t count)
@@ -41,6 +127,28 @@ $$
   ```
 
 - 高维切分计算
+```yaml
+api_signature:
+  - function: "asc_relu(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_relu(__ubuf__ int32_t*,__ubuf__ int32_t*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_relu(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+```
+
   ```cpp
   __aicore__ inline void asc_relu(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
   __aicore__ inline void asc_relu(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
@@ -48,6 +156,28 @@ $$
   ```
 
 - 同步计算
+```yaml
+api_signature:
+  - function: "asc_relu_sync(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_relu_sync(__ubuf__ int32_t*,__ubuf__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_relu_sync(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+```
+
   ```cpp
   __aicore__ inline void asc_relu_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
   __aicore__ inline void asc_relu_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, uint32_t count)

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_l0c_copy_nz_para"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md"
+description: "本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND/DN格式功能时，配置格式转换所需的相关参数。"
+signature:
+  - function: "asc_set_l0c_copy_nz_para(uint16_t,uint16_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_l0c_copy_nz_para
 
 ## 产品支持情况
@@ -31,6 +47,16 @@
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_l0c_copy_nz_para(uint16_t,uint16_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+```
+
 
 ```c
 __aicore__ inline void asc_set_l0c_copy_nz_para(uint16_t matrix_num,

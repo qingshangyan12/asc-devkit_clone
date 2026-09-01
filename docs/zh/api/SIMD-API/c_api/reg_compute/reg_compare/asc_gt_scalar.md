@@ -1,3 +1,55 @@
+---
+okftype: reference.api.cpp
+title: "asc_gt_scalar"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_gt_scalar.md"
+description: "根据`mask`将源操作数`src`按元素与标量`value`进行比较，若$src_i > value$，则对应结果位为1，否则为0。每个元素的比较结果占一个比特。"
+signature:
+  - function: "asc_gt_scalar(vector_<dtype>,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_gt_scalar(vector_bool&,vector_<dtype>,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_gt_scalar(vector_bool&,vector_float,float,vector_bool)"
+        snippets:
+          - id: "asc_gt_scalar"
+            file: "compare.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_gt_scalar
 
 ## 产品支持情况
@@ -37,6 +89,22 @@ dst_i =
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_gt_scalar(vector_<dtype>,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+  - function: "asc_gt_scalar(vector_bool&,vector_<dtype>,<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_compare.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

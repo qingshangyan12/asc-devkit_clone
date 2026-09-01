@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_frequency_histogram"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md"
+description: "对输入矢量数据寄存器中的元素进行频率统计，生成直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。支持配置掩码用于指示参与统计的元素，掩码为1的元素参与统计，掩码为0的元素不统计，掩码不影响目的矢量寄存器的写入行为。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。"
+signature:
+  - function: "asc_frequency_histogram_bin0(vector_uint16_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_histogram.h"
+  - function: "asc_frequency_histogram_bin1(vector_uint16_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_histogram.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/histogram"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_frequency_histogram_bin0(vector_uint16_t&,vector_uint8_t,vector_bool)"
+        snippets:
+          - id: "asc_frequency_histogram_bin0"
+            file: "histogram.asc"
+      - function: "asc_frequency_histogram_bin1(vector_uint16_t&,vector_uint8_t,vector_bool)"
+        snippets:
+          - id: "asc_frequency_histogram_bin1"
+            file: "histogram.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_frequency_histogram
 
 ## 产品支持情况
@@ -42,12 +76,32 @@
 ## 函数原型
 
 ### 低位模式
+```yaml
+api_signature:
+  - function: "asc_frequency_histogram_bin0(vector_uint16_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_histogram.h"
+```
+
 
 ```cpp
 __simd_callee__ inline void asc_frequency_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
 ```
 
 ### 高位模式
+```yaml
+api_signature:
+  - function: "asc_frequency_histogram_bin1(vector_uint16_t&,vector_uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_histogram.h"
+```
+
 
 ```cpp
 __simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)

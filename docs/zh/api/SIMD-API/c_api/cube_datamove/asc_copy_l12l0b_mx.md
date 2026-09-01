@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12l0b_mx"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md"
+description: "负责完成MX矩阵计算过程中所需的右矩阵对应的量化系数的搬运，数据通路为L1 Buffer->L0B_MX Buffer。其中右量化系数矩阵以32字节（固定数据类型为`fp8_e8m0_t`、分形大小为2×16的）的数据分形为单位进行搬运。"
+signature:
+  - function: "asc_copy_l12l0b_mx(uint64_t,__cbuf__ fp8_e8m0_t*,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_mx_sync(uint64_t,__cbuf__ fp8_e8m0_t*,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_l12l0b_mx
 
 ## 产品支持情况
@@ -39,6 +61,22 @@ $$
 本接口仅在AIC上执行有效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_copy_l12l0b_mx(uint64_t,__cbuf__ fp8_e8m0_t*,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0b_mx_sync(uint64_t,__cbuf__ fp8_e8m0_t*,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_copy_l12l0b_mx(uint64_t dst,

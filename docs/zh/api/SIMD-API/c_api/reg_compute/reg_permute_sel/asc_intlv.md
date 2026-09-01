@@ -1,3 +1,60 @@
+---
+okftype: reference.api.cpp
+title: "asc_intlv"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md"
+description: "将两个源操作数矢量数据寄存器中的数据交织后分别写入两个目的矢量数据寄存器。"
+signature:
+  - function: "asc_intlv(vector_<dtype>&,vector_<dtype>&,vector_<dtype>,vector_<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_intlv_b8(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_intlv_b16(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_intlv_b32(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_intlv(vector_uint16_t&,vector_uint16_t&,vector_uint16_t,vector_uint16_t)"
+        snippets:
+          - id: "asc_intlv"
+            file: "data_relayout.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_intlv
 
 ## 产品支持情况
@@ -40,6 +97,16 @@
 ## 函数原型
 
 ### 矢量数据寄存器交织模式
+```yaml
+api_signature:
+  - function: "asc_intlv(vector_<dtype>&,vector_<dtype>&,vector_<dtype>,vector_<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_intlv(vector_<dtype>& dst0,
@@ -62,6 +129,28 @@ __simd_callee__ inline void asc_intlv(vector_int8_t& dst0,
 ```
 
 ### 掩码寄存器交织模式
+```yaml
+api_signature:
+  - function: "asc_intlv_b8(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_intlv_b16(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_intlv_b32(vector_bool&,vector_bool&,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_intlv_b8(vector_bool& dst0,

@@ -1,3 +1,14 @@
+---
+okftype: reference.api.cpp
+title: "asc_store_atomic_config"
+path: "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md"
+description: null
+signature:
+  []
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_store_atomic_config
 
 asc_store_atomic_config参数包含原子操作启用位与原子操作类型，用于[asc_get_store_atomic_config](../../atomic/scalar_atomic/asc_get_store_atomic_config.md)接口使用。
