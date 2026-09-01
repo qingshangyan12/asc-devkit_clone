@@ -10,8 +10,8 @@ The example covers A / B matrix transposed and non-transposed input combinations
 
 | Product | CANN Version |
 |---------|-------------|
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
