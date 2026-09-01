@@ -19,7 +19,6 @@ import ApiDownload from './ApiDownload.vue'
 import EditOnGitcode from './EditOnGitcode.vue'
 import PageBreadcrumb from './PageBreadcrumb.vue'
 import DocumentBuildInfo from './DocumentBuildInfo.vue'
-import { installAutomaticTableLayout } from './table_layout.mjs'
 
 let sidebarScrollRequest = 0
 
@@ -55,10 +54,7 @@ function scrollActiveSidebarItem() {
   })
 }
 
-onMounted(() => {
-  installAutomaticTableLayout()
-  scrollActiveSidebarItem()
-})
+onMounted(scrollActiveSidebarItem)
 onContentUpdated(scrollActiveSidebarItem)
 onBeforeUnmount(() => { sidebarScrollRequest += 1 })
 </script>

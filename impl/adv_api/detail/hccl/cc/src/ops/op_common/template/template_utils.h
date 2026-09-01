@@ -26,11 +26,6 @@ constexpr u32 INVALID_U32 = UINT32_MAX;
 
 constexpr s32 INVALID_RANKID = INT32_MAX;
 
-// 单个peer最多申请的jetty(channel)数量，超限只告警不阻断，与HCCL当前行为一致
-constexpr u32 MAX_JETTY_NUM = 4;
-// 小于等于该阈值时关闭CLOS port isolation，走共享口以降低时延
-constexpr u32 SMALL_SIZE_512KB = 512 * 1024;
-
 struct SliceInfo {
     u64 offset{0};
     u64 size{0};
@@ -388,42 +383,6 @@ inline u32 CalcChannelsPerRank(const std::vector<HcclChannelDesc>& channels)
     return channelsPerRank;
 }
 
-inline u32 CalcChannelsPerRankMin(const std::vector<HcclChannelDesc>& channels)
-{
-    u32 channelsPerRank = UINT32_MAX;
-    u32 currentRank = INVALID_VALUE_RANKID;
-    u32 currentCount = 0;
-
-    auto updateChannelsPerRank = [&](u32 rank, u32 count) {
-        if (rank != INVALID_VALUE_RANKID) {
-            if (channelsPerRank != UINT32_MAX && count != channelsPerRank) {
-                HCCL_WARNING(
-                    "[CalcChannelsPerRankMin] channel num[%u] of remote rank[%u] is not equal to "
-                    "channel num[%u] of previous ranks.",
-                    count, rank, channelsPerRank);
-            }
-            if (count < channelsPerRank) {
-                channelsPerRank = count;
-            }
-        }
-    };
-
-    for (const auto& channel : channels) {
-        if (channel.remoteRank == currentRank) {
-            currentCount++;
-        } else {
-            updateChannelsPerRank(currentRank, currentCount);
-            currentRank = channel.remoteRank;
-            currentCount = 1;
-        }
-    }
-    updateChannelsPerRank(currentRank, currentCount);
-    if (channelsPerRank == UINT32_MAX) {
-        channelsPerRank = 1;
-    }
-    return channelsPerRank;
-}
-
 inline u32 CalcChannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels)
 {
     u32 channelsPerRank = 1;
@@ -431,21 +390,6 @@ inline u32 CalcChannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& ch
         if (channelsByRank.second.size() > channelsPerRank) {
             channelsPerRank = static_cast<u32>(channelsByRank.second.size());
         }
-    }
-    return channelsPerRank;
-}
-
-inline u32 CalcChannelsPerRankMin(const std::map<u32, std::vector<ChannelInfo>>& channels)
-{
-    u32 channelsPerRank = UINT32_MAX;
-    for (const auto& channelsByRank : channels) {
-        u32 count = static_cast<u32>(channelsByRank.second.size());
-        if (count < channelsPerRank) {
-            channelsPerRank = count;
-        }
-    }
-    if (channelsPerRank == UINT32_MAX) {
-        channelsPerRank = 1;
     }
     return channelsPerRank;
 }
@@ -485,8 +429,6 @@ HcclResult CalcDataSplitByPortGroupZAxisDetour(
     const u64 totalDataCount, const u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
     std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset,
     const u32 level0ChannelNumPerRank, const u32 level1ChannelNumPerRank, const float level0DataRatio = 0.5f);
-
-bool IsAllConnetedWithTopo(const TopoInfoWithNetLayerDetails* topoInfo, const u32 netLayer, const CommTopo topoType);
 
 } // namespace mc2_ops_hccl
 #endif

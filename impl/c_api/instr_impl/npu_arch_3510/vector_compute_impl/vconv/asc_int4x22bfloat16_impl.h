@@ -46,5 +46,4 @@ __simd_callee__ inline void asc_int4x22bfloat16_v4_impl(vector_bfloat16_t& dst, 
     }
 }
 
-// ASC_RETURN_VALUE_VCONV_IMPL
 #endif

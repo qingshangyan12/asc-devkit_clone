@@ -20,7 +20,7 @@ public:
     ~TopoMatchUBX1d() override;
     std::string Describe() const override
     {
-        return "Topo Match for combined Algorithm: layer 0 Mesh + Clos, layer 3 Clos.";
+        return "Topo Match for combined Algorithm: layer 0 Clos + Mesh, layer 1 Mesh.";
     }
     HcclResult MatchTopo(
         const HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo,
@@ -30,9 +30,9 @@ protected:
     HcclResult TopoForLayer0(
         const HcclComm comm, uint32_t& layer0Size, const uint32_t myRank,
         AlgHierarchyInfoForAllLevel& algHierarchyInfo) const;
-    HcclResult TopoForLayer3(
+    HcclResult TopoForLayer1(
         const HcclComm comm, uint32_t layer0Size, const uint32_t myRank,
-        AlgHierarchyInfoForAllLevel& algHierarchyInfo) const;
+        AlgHierarchyInfoForAllLevel& algHierarchyInfo) const override;
 };
 } // namespace mc2_ops_hccl
 #endif // !TOPO_MATCH_UBX_MESH_1D

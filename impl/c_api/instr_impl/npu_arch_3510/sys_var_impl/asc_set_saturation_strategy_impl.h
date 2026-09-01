@@ -14,7 +14,8 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-
+#warning \
+    "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_set_saturation_strategy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -27,11 +28,8 @@
 __aicore__ inline void asc_set_saturation_strategy_impl(asc_override_strategy strategy)
 {
     // CTRL[60]: 0 => USE_API, 1 => USE_GLOBAL. Aligns with AscendC::SetSaturationStrategy.
-    constexpr int32_t SATURATION_STRATEGY_BIT = 60;
     int64_t ctrl_value = get_ctrl();
-    set_ctrl(
-        strategy == asc_override_strategy::USE_API ? sbitset0(ctrl_value, SATURATION_STRATEGY_BIT) :
-                                                     sbitset1(ctrl_value, SATURATION_STRATEGY_BIT));
+    set_ctrl(strategy == asc_override_strategy::USE_API ? sbitset0(ctrl_value, 60) : sbitset1(ctrl_value, 60));
 }
 
 #endif

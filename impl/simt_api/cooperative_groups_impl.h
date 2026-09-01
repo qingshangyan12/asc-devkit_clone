@@ -23,8 +23,6 @@
 #ifndef IMPL_SIMT_API_COOPERATIVE_GROUPS_IMPL_H
 #define IMPL_SIMT_API_COOPERATIVE_GROUPS_IMPL_H
 
-#include <type_traits>
-
 namespace cooperative_groups {
 
 template <typename T, typename... Args>
@@ -106,7 +104,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void wait_multi_warp_barrier(
 {
     while ((*reinterpret_cast<tile_memory_pointer_t<MemoryType, volatile unsigned int>>(arrived_word) & warp_bit) !=
            0U) {
+#ifndef ASCENDC_CPU_DEBUG
         asc_nop();
+#endif
     }
 }
 
@@ -116,7 +116,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void wait_multi_warp_barrier_arrive(
 {
     while ((*reinterpret_cast<tile_memory_pointer_t<MemoryType, volatile unsigned int>>(arrived_word) & warp_bit) ==
            0U) {
+#ifndef ASCENDC_CPU_DEBUG
         asc_nop();
+#endif
     }
 }
 
@@ -394,7 +396,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void grid_group::sync() const
         uint64_t old_counter = __asc_simt_vf::asc_atomic_add(sync_counter, add_value);
         auto volatile_counter = reinterpret_cast<volatile uint64_t*>(sync_counter);
         while (!details::has_grid_sync_phase_flipped(old_counter, *volatile_counter)) {
+#ifndef ASCENDC_CPU_DEBUG
             asc_nop();
+#endif
         }
     }
     asc_syncthreads();

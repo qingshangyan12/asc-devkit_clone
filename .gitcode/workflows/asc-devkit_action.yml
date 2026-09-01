@@ -41,8 +41,7 @@ stages:
             with:
               repo_name: "asc-devkit"
               target_branch: ${{ env.TARGET_BRANCH }}
-              comment: ${{ atomgit.event.comment.body }}
-              token: ${{ secrets.GIT_TOKEN }}
+              repo_url: ${{ vars.CI_PATH }}
           -
             name: show_output
             run: |

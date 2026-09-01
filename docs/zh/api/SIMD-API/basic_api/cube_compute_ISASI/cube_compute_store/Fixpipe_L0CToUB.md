@@ -29,7 +29,6 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：不支持
 <!-- end id9 -->
-<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB_res.md#id1 -->
 
 ## 功能说明<a name="zh-cn_topic_0000002549846732_section106841136114319"></a>
 
@@ -197,7 +196,6 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
         ```
 
     对于整数类型只有饱和模式。
-    L0C Buffer到UB搬运接口的边界值汇总请见[矩阵计算搬出相关接口边界值汇总](../../../../appendix/matrix_compute_move_out_interface_boundary_value_summary.md)。
 <!-- end id18 -->
 
 <!-- npu="950" id20 -->

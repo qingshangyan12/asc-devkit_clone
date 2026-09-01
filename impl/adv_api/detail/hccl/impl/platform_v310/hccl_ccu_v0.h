@@ -269,11 +269,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             ccuUsedXnNum_ = KFC_CONCURRENT_AG_PARAM_NUM;
             CcuPrepareForConcurrentAllGatherM2M(&handleParamGM_[handleId]);
         } else {
-            ccuUsedXnNum_ = KFC_CONCURRENT_AG_MESH_PARAM_NUM;
+            ccuUsedXnNum_ = 10;
             CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
         }
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
-        ccuUsedXnNum_ = 26;
+        ccuUsedXnNum_ = 15;
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALL) {
         ccuUsedXnNum_ = 11;
@@ -281,17 +281,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
         ccuUsedXnNum_ = 10;
         FlushDataCache(&allToAllVParam_[handleId]);
-        KERNEL_LOG(
-            KERNEL_INFO, "ApiClient CcuPrepareForOp handleId:%u, dataType:%d, dstDataType:%d, count:%llu", handleId,
-            static_cast<int>(handleParamGM_[handleId].dataType), static_cast<int>(handleParamGM_[handleId].dstDataType),
-            (unsigned long long)handleParamGM_[handleId].count);
         CcuPrepareForAllToAllV(&handleParamGM_[handleId], &allToAllVParam_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
         ccuUsedXnNum_ = 9;
         FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
-        ccuUsedXnNum_ = 24;
+        ccuUsedXnNum_ = 13;
         CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
     }
 }
@@ -334,12 +330,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     }
     if (ccTiling != 0) {
         __gm__ Mc2CcTilingInner* tilingPtr = reinterpret_cast<__gm__ Mc2CcTilingInner*>(ccTiling);
-        KERNEL_LOG(
-            KERNEL_INFO,
-            "ApiClient InitCcuParam handleId:%u, prepareType:%d, tiling srcDataType:%d, dstDataType:%d, reduceType:%d",
-            handleId, static_cast<int>(handleParamGM_[handleId].commType.prepareType),
-            static_cast<int>(tilingPtr->srcDataType), static_cast<int>(tilingPtr->dstDataType),
-            static_cast<int>(tilingPtr->reduceType));
         handleParamGM_[handleId].dataType = static_cast<HcclDataType>(tilingPtr->srcDataType);
         handleParamGM_[handleId].dstDataType = static_cast<HcclDataType>(tilingPtr->dstDataType);
         handleParamGM_[handleId].op = static_cast<HcclReduceOp>(tilingPtr->reduceType);
@@ -410,6 +400,7 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         handleParamGM_[handleId].strideCount = commonPrepareParam.strideCount;
         InitCcuParam(handleId);
         FlushDataCache(&handleParamGM_[handleId]);
+
         if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
             for (uint32_t i = 0; i < rankNum; i++) {
                 allToAllVParam_[handleId].sendCounts[i] = commonPrepareParam.paramExt.sendCounts[i];
@@ -461,8 +452,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         KERNEL_INFO,
         "ApiClient CcuSendMsg ccuMsg_.xnAddr, Id0: 0x%llx, Id1: 0x%llx, Id2: 0x%llx, Id3: 0x%llx, Id4: 0x%llx, Id5: "
         "0x%llx, Id6: 0x%llx, Id7: 0x%llx, Id8: 0x%llx, Id9: 0x%llx, Id10: 0x%llx, Id11: 0x%llx, Id12: 0x%llx, Id13: "
-        "0x%llx, Id14: 0x%llx, Id15: 0x%llx, Id16: 0x%llx, Id17: 0x%llx, Id18: 0x%llx, Id19: 0x%llx, Id20: 0x%llx, "
-        "Id21: 0x%llx, Id22: 0x%llx, Id23: 0x%llx, Id24: 0x%llx, Id25: 0x%llx",
+        "0x%llx, Id14: 0x%llx",
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr), *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 8),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 16),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 24),
@@ -476,18 +466,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 88),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 96),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 120),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 128),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 136),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 144),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 152),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 160),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 168),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 176),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 184),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 192),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 200));
+        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112));
 
     const uint8_t missionNum = GetKfcMissionNum(handleId);
     for (uint8_t mission = 0; mission < missionNum; ++mission) {

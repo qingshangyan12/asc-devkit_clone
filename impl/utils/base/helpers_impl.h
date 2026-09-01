@@ -32,15 +32,14 @@ __aicore__ static inline void asc_vf_call_impl(Args&&... args)
     funcPtr(args...);
 
     if constexpr (AscendC::Internal::SimdVfDebugTraits<DebugTag>::enabled) {
-        AscVFDebugFinish();
-        const bool transferFailed = AscVFDebugTransferUb();
+        const bool hasOverflow = AscVFDebugTransferUb();
 #ifdef ASCENDC_INTERNAL_SIMD_VF_OVERFLOW_WARNING_ENABLED
-        if (transferFailed) {
+        if (hasOverflow) {
             __asc_aicore::printf_impl(
-                "[WARNING]: SIMD VF debug record exceeds the 2024-byte limit. The record was dropped.\n");
+                "[WARNING]: SIMD VF debug buffer overflow (max limit is 2KB), output was truncated.\n");
         }
 #else
-        (void)transferFailed;
+        (void)hasOverflow;
 #endif
     }
 }

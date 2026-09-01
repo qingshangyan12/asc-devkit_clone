@@ -9,7 +9,8 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-
+#warning \
+    impl/c_api/instr_impl/npu_arch_3510/atomic_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -21,7 +22,6 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_max_float_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_add_bfloat_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_min_float_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl/asc_disable_dma_atomic_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_none_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl/asc_get_store_atomic_config_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/atomic_impl/asc_set_store_atomic_config_impl.h"
@@ -72,13 +72,7 @@ __aicore__ inline void asc_set_atomic_add_float() { asc_set_atomic_add_float_imp
 __aicore__ inline void asc_set_atomic_max_float16() { asc_set_atomic_max_float16_impl(); }
 
 /// Clears the atomic operation state, disabling any active atomic add/max/min.
-__aicore__ inline void asc_disable_dma_atomic() { asc_disable_dma_atomic_impl(); }
-
-[[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]
-__aicore__ inline void asc_set_atomic_none()
-{
-    asc_disable_dma_atomic();
-}
+__aicore__ inline void asc_set_atomic_none() { asc_set_atomic_none_impl(); }
 
 /// Enables atomic max for data transfer from Unified Buffer/L0C Buffer/L1 Buffer to
 /// Global Memory with bfloat16 precision (bfloat16_t).

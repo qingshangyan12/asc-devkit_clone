@@ -9,10 +9,10 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message( \
-    "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/tensor.h\"\" and use public functions or variables defined in interface headers files.")
+#warning \
+    "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_DATA_COPY_H
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
 /*!
@@ -25,36 +25,27 @@
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/instruction.h"
 
-namespace asc {
-namespace te {
+namespace AscendC {
+namespace Te {
 
-class copy_ub_to_l1_common {
+struct CopyUB2L1Trait {};
+
+class CopyUbufToCbufCommon {
 protected:
-    template <typename DstTensor, typename SrcTensor>
-    __aicore__ inline static void emit_copy(
-        const DstTensor& dst, const SrcTensor& src, uint16_t block_count, uint32_t block_len, int64_t src_gap,
-        int64_t dst_gap)
+    template <typename T, typename U>
+    __aicore__ inline static void EmitCopy(
+        const T& dst, const U& src, uint16_t blockCount, uint32_t blockLen, int64_t srcStride, int64_t dstStride)
     {
-        copy_ub_to_l1_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_gap, dst_gap);
-    }
-
-    template <typename T, typename U, typename DstOffset, typename SrcOffset>
-    __aicore__ inline static void emit_copy(
-        const T& dst, const U& src, const DstOffset& dst_offset, const SrcOffset& src_offset, uint16_t block_count,
-        uint32_t block_len, int64_t src_gap, int64_t dst_gap)
-    {
-        copy_ub_to_l1_instr::data_copy(
-            (dst.data() + dst_offset).get(), (src.data() + src_offset).get(), block_count, block_len, src_gap, dst_gap);
+        CopyUbufToCbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
     }
 };
 
-} // namespace te
-} // namespace asc
+} // namespace Te
+} // namespace AscendC
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_DATA_COPY_H
 
-#if defined( \
-    UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_DATA_COPY_H)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_DATA_COPY_H
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
