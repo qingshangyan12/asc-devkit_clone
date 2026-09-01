@@ -344,6 +344,15 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[15] = tailSize;
     CalcGoSize(chunkSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[16]);
     CalcGoSize(tailSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[20]);
+
+    // Multi-die three-phase params (xnData_[24..27]). Sentinel encoding:
+    // repeatNum = UINT64_MAX - N where N = number of repeat iterations.
+    // Single-die (current): N=1 -> UINT64_MAX-1, all strides=0 (no advancement).
+    // Multi-die: N=rankSizeLevel1_, strides=sliceSize (per-die portion). TODO: wire topology when selector extends.
+    xnData_[24] = UINT64_MAX - 1U; // repeatNum: single-die = 1 iteration
+    xnData_[25] = 0U;              // inputRepeatStride
+    xnData_[26] = 0U;              // outputRepeatStride
+    xnData_[27] = 0U;              // scratchRepeatStride
     KERNEL_LOG(
         KERNEL_INFO, "RS chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n", sliceSize,
         chunkSize, fullChunkCount, xnData_[15], xnData_[14]);

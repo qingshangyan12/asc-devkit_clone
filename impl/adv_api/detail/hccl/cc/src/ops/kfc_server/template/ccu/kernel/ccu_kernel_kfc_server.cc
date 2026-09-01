@@ -33,6 +33,9 @@ static_assert(
 static_assert(
     KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
     "Concurrent AllToAll parameters exceed the KFC server load width");
+static_assert(
+    HcclKfcProtocol::KFC_RS_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
+    "ReduceScatter parameters exceed the KFC server load width");
 static_assert(KFC_MAX_MISSION_NUM == 2U, "KFC server CKE partitioning expects two missions");
 static_assert(KFC_SIGNAL_REGIONS_PER_MISSION == 2U, "Each KFC mission requires commit and done regions");
 
@@ -54,7 +57,7 @@ const uint32_t HBM_PARAM_IDX_14 = 14;
 const uint32_t HBM_PARAM_IDX_15 = 15;
 const uint32_t HBM_PARAM_IDX_16 = 16;
 const uint32_t HBM_PARAM_IDX_17 = 17;
-// KFC reduce_scatter specific parameters (at positions [13..23], not used by homm CCU server template)
+// KFC reduce_scatter specific parameters (at positions [13..27], not used by homm CCU server template)
 const uint32_t HBM_PARAM_IDX_KFC_CHUNK_SIZE = 13;
 const uint32_t HBM_PARAM_IDX_KFC_CHUNK_LOOP_NUM = 14;
 const uint32_t HBM_PARAM_IDX_KFC_TAIL_SIZE = 15;
@@ -66,6 +69,10 @@ const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_ADDR_OFFSET = 20;
 const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_LOOP_PARAM = 21;
 const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_PARALLEL_PARAM = 22;
 const uint32_t HBM_PARAM_IDX_KFC_TAIL_GO_RESIDUAL = 23;
+const uint32_t HBM_PARAM_IDX_KFC_REPEAT_NUM = 24;
+const uint32_t HBM_PARAM_IDX_KFC_INPUT_REPEAT_STRIDE = 25;
+const uint32_t HBM_PARAM_IDX_KFC_OUTPUT_REPEAT_STRIDE = 26;
+const uint32_t HBM_PARAM_IDX_KFC_SCRATCH_REPEAT_STRIDE = 27;
 
 const uint32_t SINGLE_DIE = 1;
 const uint32_t DOUBLE_DIE = 2;
@@ -195,7 +202,9 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             param[HBM_PARAM_IDX_KFC_FULL_GO_LOOP_PARAM], param[HBM_PARAM_IDX_KFC_FULL_GO_PARALLEL_PARAM],
             param[HBM_PARAM_IDX_KFC_FULL_GO_RESIDUAL], param[HBM_PARAM_IDX_KFC_TAIL_GO_ADDR_OFFSET],
             param[HBM_PARAM_IDX_KFC_TAIL_GO_LOOP_PARAM], param[HBM_PARAM_IDX_KFC_TAIL_GO_PARALLEL_PARAM],
-            param[HBM_PARAM_IDX_KFC_TAIL_GO_RESIDUAL], ctx.arg->channels, ctx.arg->channelCount,
+            param[HBM_PARAM_IDX_KFC_TAIL_GO_RESIDUAL], param[HBM_PARAM_IDX_KFC_REPEAT_NUM],
+            param[HBM_PARAM_IDX_KFC_INPUT_REPEAT_STRIDE], param[HBM_PARAM_IDX_KFC_OUTPUT_REPEAT_STRIDE],
+            param[HBM_PARAM_IDX_KFC_SCRATCH_REPEAT_STRIDE], ctx.arg->channels, ctx.arg->channelCount,
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
             ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
     } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLREDUCE) {

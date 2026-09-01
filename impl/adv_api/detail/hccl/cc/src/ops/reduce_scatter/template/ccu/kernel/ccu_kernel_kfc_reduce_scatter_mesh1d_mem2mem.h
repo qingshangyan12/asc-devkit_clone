@@ -26,8 +26,10 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
     ccu::Variable tailSize, ccu::Variable fullGoAddrOffset, ccu::Variable fullGoLoopParam,
     ccu::Variable fullGoParallelParam, ccu::Variable fullGoResidual, ccu::Variable tailGoAddrOffset,
     ccu::Variable tailGoLoopParam, ccu::Variable tailGoParallelParam, ccu::Variable tailGoResidual,
-    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType);
+    ccu::Variable repeatNum, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
+    ccu::Variable scratchRepeatStride, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
+    uint32_t rankId, const HcclDataType& dataType, const HcclDataType& outputType,
+    const HcclReduceOp& reduceType);
 
 } // namespace mc2_ops_hccl
 #endif // HCCL_CCU_KERNEL_KFC_REDUCE_SCATTER_MESH_1D_MEM2MEM_H

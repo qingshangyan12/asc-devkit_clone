@@ -71,6 +71,34 @@ enum KfcConcurrentAllToAllParamIndex : uint32_t {
     KFC_CONCURRENT_A2A_PARAM_NUM = 11,
 };
 
+// ReduceScatter (mesh1d mem2mem) KFC parameter layout at xnData_[0..27].
+// Slots 0-12 are shared with the legacy homm CCU server template; 13-23 carry
+// chunk/tail/goSize params consumed by the kfc kernel; 24-27 carry the
+// multi-die repeat/stride params (sentinel-encoded repeatNum = UINT64_MAX - N).
+enum KfcConcurrentReduceScatterParamIndex : uint32_t {
+    KFC_RS_OP_ID = 0,
+    KFC_RS_INPUT_ADDR = 1,
+    KFC_RS_OUTPUT_ADDR = 2,
+    KFC_RS_SCRATCH = 3,
+    KFC_RS_RANK_SLICE_INPUT_OFFSET = 4,
+    KFC_RS_CHUNK_SIZE = 13,
+    KFC_RS_CHUNK_LOOP_NUM = 14,
+    KFC_RS_TAIL_SIZE = 15,
+    KFC_RS_FULL_GO_ADDR_OFFSET = 16,
+    KFC_RS_FULL_GO_LOOP_PARAM = 17,
+    KFC_RS_FULL_GO_PARALLEL_PARAM = 18,
+    KFC_RS_FULL_GO_RESIDUAL = 19,
+    KFC_RS_TAIL_GO_ADDR_OFFSET = 20,
+    KFC_RS_TAIL_GO_LOOP_PARAM = 21,
+    KFC_RS_TAIL_GO_PARALLEL_PARAM = 22,
+    KFC_RS_TAIL_GO_RESIDUAL = 23,
+    KFC_RS_REPEAT_NUM = 24,
+    KFC_RS_INPUT_REPEAT_STRIDE = 25,
+    KFC_RS_OUTPUT_REPEAT_STRIDE = 26,
+    KFC_RS_SCRATCH_REPEAT_STRIDE = 27,
+    KFC_RS_PARAM_NUM = 28,
+};
+
 } // namespace HcclKfcProtocol
 
 #endif
