@@ -38,6 +38,7 @@
 #include <cstdint>
 #include <iosfwd>
 #include <string>
+#include <csignal>
 #include "stub_def.h"
 #endif
 
@@ -53,17 +54,13 @@ namespace AscendC {
  */
 struct ShapeInfo {
 public:
-    __aicore__ __callee__ inline ShapeInfo() {}
-    __aicore__ inline ShapeInfo(
+    __aicore__ inline constexpr ShapeInfo() {}
+    __aicore__ inline constexpr ShapeInfo(
         const uint8_t inputShapeDim, const uint32_t inputShape[], const uint8_t inputOriginalShapeDim,
         const uint32_t inputOriginalShape[], const DataFormat inputFormat)
         : shapeDim(inputShapeDim), originalShapeDim(inputOriginalShapeDim), dataFormat(inputFormat)
     {
-        ASCENDC_ASSERT((inputShapeDim <= K_MAX_SHAPE_DIM && inputOriginalShapeDim <= K_MAX_SHAPE_DIM), {
-            KERNEL_LOG(
-                KERNEL_ERROR, "inputShapeDim is %d, inputOriginalShapeDim is %d, which should be less than %d both",
-                inputShapeDim, inputOriginalShapeDim, K_MAX_SHAPE_DIM);
-        });
+        ASSERT(inputShapeDim <= K_MAX_SHAPE_DIM && inputOriginalShapeDim <= K_MAX_SHAPE_DIM);
         for (int index = 0; index < shapeDim; ++index) {
             shape[index] = inputShape[index];
         }
@@ -71,36 +68,30 @@ public:
             originalShape[index] = inputOriginalShape[index];
         }
     }
-    __aicore__ inline ShapeInfo(const uint8_t inputShapeDim, const uint32_t inputShape[], const DataFormat inputFormat)
+    __aicore__ inline constexpr ShapeInfo(const uint8_t inputShapeDim, const uint32_t inputShape[], const DataFormat inputFormat)
         : shapeDim(inputShapeDim), originalShapeDim(inputShapeDim), dataFormat(inputFormat)
     {
-        ASCENDC_ASSERT((inputShapeDim <= K_MAX_SHAPE_DIM), {
-            KERNEL_LOG(
-                KERNEL_ERROR, "inputShapeDim is %u, which should be less than %d", inputShapeDim, K_MAX_SHAPE_DIM);
-        });
+    ASSERT(inputShapeDim <= K_MAX_SHAPE_DIM);
         for (int index = 0; index < shapeDim; ++index) {
             shape[index] = inputShape[index];
             originalShape[index] = inputShape[index];
         }
     }
 
-    __aicore__ inline ShapeInfo(const uint8_t inputShapeDim, const uint32_t inputShape[])
+    __aicore__ inline constexpr ShapeInfo(const uint8_t inputShapeDim, const uint32_t inputShape[])
         : shapeDim(inputShapeDim), originalShapeDim(inputShapeDim), dataFormat(DataFormat::ND)
     {
-        ASCENDC_ASSERT((inputShapeDim <= K_MAX_SHAPE_DIM), {
-            KERNEL_LOG(
-                KERNEL_ERROR, "inputShapeDim is %d, which should be less than %d", inputShapeDim, K_MAX_SHAPE_DIM);
-        });
+        ASSERT(inputShapeDim <= K_MAX_SHAPE_DIM);
         for (int index = 0; index < shapeDim; ++index) {
             shape[index] = inputShape[index];
             originalShape[index] = inputShape[index];
         }
     }
-    uint8_t shapeDim;
-    uint8_t originalShapeDim;
-    uint32_t shape[K_MAX_SHAPE_DIM];
-    uint32_t originalShape[K_MAX_SHAPE_DIM];
-    DataFormat dataFormat;
+    uint8_t shapeDim = 0;
+    uint8_t originalShapeDim = 0;
+    uint32_t shape[K_MAX_SHAPE_DIM] = {};
+    uint32_t originalShape[K_MAX_SHAPE_DIM] = {};
+    DataFormat dataFormat{};
 };
 
 /* \brief the ShapeInfoParams of shapeInfo_;
@@ -147,7 +138,7 @@ template <typename T>
 class LocalTensor : public BaseLocalTensor<T>, public BaseTensorTraitTensor<T> {
 public:
     using PrimType = PrimT<T>;
-    __aicore__ __callee__ inline LocalTensor<T>(){};
+    __aicore__ inline constexpr LocalTensor<T>(){};
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ~LocalTensor();
     explicit LocalTensor<T>(TBuffAddr& address);
@@ -176,29 +167,29 @@ public:
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint32_t index) const;
     __aicore__ inline __inout_pipe__(S) __ubuf__ PrimType& operator()(const uint32_t offset) const;
     template <typename U>
-    __aicore__ __callee__ inline LocalTensor<U> ReinterpretCast() const;
+    __aicore__ inline LocalTensor<U> ReinterpretCast() const;
     template <typename S>
     __aicore__ inline __inout_pipe__(S) void SetValue(const uint32_t index, const S value) const;
-    __aicore__ __callee__ inline LocalTensor operator[](const uint32_t offset) const;
+    __aicore__ inline LocalTensor operator[](const uint32_t offset) const;
 
     template <typename S>
     [[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
                  "Please do not use it!")]] __aicore__ inline void
     SetAddrWithOffset(LocalTensor<S>& src, uint32_t offset);
 #endif
-    __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize);
+    __aicore__ inline constexpr LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize);
     template <typename U>
-    __aicore__ inline LocalTensor<T>(uint32_t addr, const U& layout);
-    __aicore__ __callee__ inline LocalTensor<T>(uint32_t addr);
-    __aicore__ __callee__ inline int32_t GetPosition() const;
+    __aicore__ inline constexpr LocalTensor<T>(uint32_t addr, const U& layout);
+    __aicore__ inline constexpr LocalTensor<T>(uint32_t addr);
+    __aicore__ inline int32_t GetPosition() const;
     __aicore__ inline void SetSize(const uint32_t size);
-    __aicore__ __callee__ inline uint32_t GetSize() const;
+    __aicore__ inline uint32_t GetSize() const;
 
     [[deprecated("NOTICE: GetLength has been deprecated and will be removed in the next version. Please do not use "
                  "it!")]] __aicore__ inline uint32_t
     GetLength() const;
 
-    __aicore__ __callee__ inline void SetBufferLen(uint32_t dataLen);
+    __aicore__ inline void SetBufferLen(uint32_t dataLen);
     __aicore__ inline void SetUserTag(const TTagType tag);
     __aicore__ inline TTagType GetUserTag() const;
     // symbol override
@@ -240,7 +231,7 @@ public:
 
 private:
     template <typename S>
-    __aicore__ inline void CreateTensor(TPosition pos, uint32_t addr, uint32_t tileSize);
+    __aicore__ inline constexpr void CreateTensor(TPosition pos, uint32_t addr, uint32_t tileSize);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     inline void PrintTypicalFloat(uint32_t len, uint32_t dataSize);
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
