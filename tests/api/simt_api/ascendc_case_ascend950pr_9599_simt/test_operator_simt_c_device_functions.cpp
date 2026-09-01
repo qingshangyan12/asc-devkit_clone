@@ -10,8 +10,6 @@
 #include <gtest/gtest.h>
 #include <type_traits>
 #include <random>
-#include "simt_compiler_stub.h"
-#include "kernel_operator.h"
 #include "simt_api/device_functions.h"
 
 using namespace std;
@@ -421,6 +419,28 @@ TEST_P(LdStUCharTestSuite, LdStUCharTestCase)
     asc_stwt(&x, x);
 }
 // ================================ Test ldcg/ldca/stcg/stwt unsigned char end ==================================
+
+// ================================ Test stcg/stwt plain char start ================================
+struct StPlainCharTestParam {
+    char x;
+};
+
+class StPlainCharTestSuite : public ::testing::TestWithParam<StPlainCharTestParam> {
+public:
+    void SetUp() override {}
+    void TearDown() override {}
+};
+INSTANTIATE_TEST_CASE_P(StPlainCharTestCase, StPlainCharTestSuite, ::testing::Values(StPlainCharTestParam{'a'}));
+
+TEST_P(StPlainCharTestSuite, StPlainCharTestCase)
+{
+    const auto param = this->GetParam();
+    char x = param.x;
+    asc_stcg(&x, x);
+    asc_stwt(&x, x);
+    EXPECT_EQ(x, param.x);
+}
+// ================================ Test stcg/stwt plain char end ==================================
 
 // ================================ Test ldcg/ldca/stcg/stwt char2 start ================================
 struct LdStChar2TestParam {
