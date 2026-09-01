@@ -47,7 +47,7 @@ __aicore__ inline void asc_sync_pipe(pipe_t pipe)
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| pipe | 输入 | 阻塞的流水类别。支持的取值有PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_ALL，不支持PIPE_S。如果不关注流水类别，希望阻塞所有流水，可以传入PIPE_ALL。各流水类别的含义请参考[流水类型说明](intra_core_sync_overview.md)。 |
+| pipe | 输入 | 阻塞的流水类别。支持的取值有PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_ALL，不支持PIPE_S。如果不关注流水类别，希望阻塞所有流水，可以传入PIPE_ALL。各流水类别及`pipe_t`枚举取值说明请参考[流水类型说明](intra_core_sync_overview.md#pipe_t_enum)。 |
 
 ## 返回值说明
 

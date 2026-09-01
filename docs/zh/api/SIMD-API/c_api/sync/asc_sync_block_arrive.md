@@ -50,7 +50,7 @@ __aicore__ inline void asc_sync_block_arrive(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。|
+| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。取值范围为`pipe_t`枚举，取值说明请参考[流水类型说明](intra_core_sync_overview.md#pipe_t_enum)。|
 | flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0,15]，每个flag ID各自拥有独立的4位计数器。|
 
 ## 返回值说明

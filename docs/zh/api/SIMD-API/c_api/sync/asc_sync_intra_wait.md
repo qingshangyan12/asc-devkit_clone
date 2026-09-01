@@ -50,7 +50,7 @@ __aicore__ inline void asc_sync_intra_wait(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 该指令的执行流水线。 |
+| pipe | 输入 | 该指令的执行流水线。取值范围为`pipe_t`枚举，取值说明请参考[流水类型说明](intra_core_sync_overview.md#pipe_t_enum)。 |
 | sync_id | 输入 | 事件标号。AIC的取值范围为[0, 31]，AIV的取值范围为[0, 15]。|
 
 ## 返回值说明

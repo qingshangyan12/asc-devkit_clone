@@ -52,7 +52,7 @@ __aicore__ inline void asc_sync_intra_arrive(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。|
+| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。取值范围为`pipe_t`枚举，取值说明请参考[流水类型说明](intra_core_sync_overview.md#pipe_t_enum)。|
 | sync_id | 输入 | 核间同步的标记，用于标识同一组同步信号。每个`sync_id`各自拥有独立的4位计数器。<br>一个AI Core由1个AIC与2个AIV构成，AIC侧拥有32个`sync_id`（0~31），每个AIV侧各拥有16个`sync_id`（0~15）。<br>跨核ID映射规则如下：<br>• 第一个AIV的ID 0~15映射到AIC的ID 0~15；第二个AIV的ID 0~15映射到AIC的ID 16~31。<br>• AIC的ID 0~15映射到第一个AIV的ID 0~15；AIC的ID 16~31映射到第二个AIV的ID 0~15。 |
 
 ## 返回值说明

@@ -52,7 +52,7 @@ __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const ascMutexExe
 
 | 参数名 | 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 标识阻塞哪条流水上后续指令，直到所有流水中具有相同mutex_id的Mutex都已经被[asc_unlock](asc_unlock.md)释放。|
+| pipe | 输入 | 标识阻塞哪条流水上后续指令，直到所有流水中具有相同mutex_id的Mutex都已经被[asc_unlock](asc_unlock.md)释放。取值范围为`pipe_t`枚举，取值说明请参考[流水类型说明](intra_core_sync_overview.md#pipe_t_enum)。|
 | mutex_id | 输入 | mutex标号，取值范围为[0, 31]。|
 | mode | 输入 | 可选参数，用于指定是否阻塞流水线，默认值为ASC_LOCK_BLOCK。<br>&bull; ASC_LOCK_BLOCK：阻塞pipe对应流水线的执行，直到代码中位于当前asc_lock之前且mutex_id相同的所有asc_unlock调用均已执行完成。<br>&bull; ASC_LOCK_NON_BLOCK：不阻塞pipe对应流水线的执行。|
 

@@ -55,6 +55,21 @@ AI Core内部并行的指令流水类型和解释如下所示：
 | PIPE_MTE3 | UB-&gt;GM等数据搬运流水 |
 | PIPE_FIX | L0C Buffer-&gt;GM、L0C Buffer-&gt;L1 Buffer等数据搬运流水 |
 
+此外，`PIPE_ALL`表示全部流水线，用于需要等待所有流水线前序指令完成的场景。
+
+同步接口中`pipe_t`枚举类型的取值如下：<a name="pipe_t_enum"></a>
+
+<pre>typedef enum {
+    PIPE_S = 0,
+    PIPE_V = 1,
+    PIPE_M = 2,
+    PIPE_MTE1 = 3,
+    PIPE_MTE2 = 4,
+    PIPE_MTE3 = 5,
+    PIPE_ALL = 6,
+    PIPE_FIX = 10
+} pipe_t;</pre>
+
 ## 核内同步分类
 
 对上述核内并行流水的同步控制：
@@ -70,6 +85,10 @@ AI Core内部并行的指令流水类型和解释如下所示：
         - `asc_unlock`：当前流水的前置指令退出后，根据mutex_id释放对应Mutex。
      - `asc_lock`与`asc_unlock`与`asc_sync_notify`和`asc_sync_wait`相比，该组合内聚性更强、与其它流水线解耦，可简化反向同步逻辑，具体说明请参考[功能说明](asc_lock.md#功能说明)。
      <!-- end id3 -->
+     - 通过[asc_sync_mte2](asc_sync_mte2.md)、[asc_sync_mte3](asc_sync_mte3.md)与[asc_sync_vec](asc_sync_vec.md)等易用性接口进行多流水同步。这些接口内部集成了多对`asc_sync_notify`与`asc_sync_wait`，用于同时阻塞多条目的流水，直到指定源流水的前序指令完成，从而减少手写同步代码量。各接口内部封装的同步关系如下：
+        - `asc_sync_mte2`：等待PIPE_MTE2前序指令完成后，同时放行PIPE_MTE3与PIPE_V两条目的流水的后续指令，等价于分别对PIPE_MTE2->PIPE_MTE3与PIPE_MTE2->PIPE_V各执行一组`asc_sync_notify`与`asc_sync_wait`。
+        - `asc_sync_mte3`：等待PIPE_MTE3前序指令完成后，同时放行PIPE_MTE2与PIPE_V两条目的流水的后续指令，等价于分别对PIPE_MTE3->PIPE_MTE2与PIPE_MTE3->PIPE_V各执行一组`asc_sync_notify`与`asc_sync_wait`。
+        - `asc_sync_vec`：等待PIPE_V前序指令完成后，同时放行PIPE_MTE2、PIPE_MTE3与PIPE_S三条目的流水的后续指令，等价于分别对PIPE_V->PIPE_MTE2、PIPE_V->PIPE_MTE3与PIPE_V->PIPE_S各执行一组`asc_sync_notify`与`asc_sync_wait`。
 - 单流水同步：同一核内具有数据依赖的相同类型流水指令之间的同步。通过[asc_sync_pipe](asc_sync_pipe.md)接口进行相同流水线间的同步控制。同一流水中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。`asc_sync_pipe`指令可以保证前序指令中所有数据读写全部完成，后序指令才开始执行。注意该接口不支持PIPE_S单流水的同步。
 - 通过[asc_sync_data_barrier](asc_sync_data_barrier.md)接口阻塞后续指令的执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。开发者通过`arg`参数指定屏障作用的内存范围，确保屏障前后的内存访问指令按预期顺序完成。
 

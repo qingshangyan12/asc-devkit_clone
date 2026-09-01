@@ -48,8 +48,8 @@ __aicore__ inline void asc_sync_notify(pipe_t pipe,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| pipe | 输入 | 源流水类型，即“等待哪条流水的前序指令完成”。取值范围为`pipe_t`枚举：`PIPE_S`、`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`。 |
-| tpipe | 输入 | 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。 |
+| pipe | 输入 | 源流水类型，即“等待哪条流水的前序指令完成”。取值范围为`pipe_t`枚举，取值说明请参考[流水类型说明](intra_core_sync_overview.md#pipe_t_enum)。 |
+| tpipe | 输入 | 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举，取值说明请参考[流水类型说明](intra_core_sync_overview.md#pipe_t_enum)。 |
 | id | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有0~7共8个独立的同步事件ID。取值范围为`event_t`枚举类型：<pre>typedef enum {<br>    EVENT_ID0 = 0,<br>    EVENT_ID1 = 1,<br>    EVENT_ID2 = 2,<br>    EVENT_ID3 = 3,<br>    EVENT_ID4 = 4,<br>    EVENT_ID5 = 5,<br>    EVENT_ID6 = 6,<br>    EVENT_ID7 = 7<br>} event_t;</pre> |
 
 ## 返回值说明
