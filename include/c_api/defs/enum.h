@@ -92,36 +92,6 @@ enum class asc_position_quarter_mode {
 };
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-enum class asc_cast_data_type : uint8_t {
-    BFLOAT16 = 0,
-    FLOAT,
-    FP8_E4M3FN,
-    FP8_E5M2,
-    HALF,
-    HIFLOAT8,
-    INT8,
-    UINT8,
-    INT16,
-    UINT16,
-    INT32,
-    UINT32,
-    INT64
-};
-
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::BFLOAT16> ASC_CAST_TO_BFLOAT16;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::FLOAT> ASC_CAST_TO_FLOAT;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::FP8_E4M3FN> ASC_CAST_TO_FP8_E4M3FN;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::FP8_E5M2> ASC_CAST_TO_FP8_E5M2;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::HALF> ASC_CAST_TO_HALF;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::HIFLOAT8> ASC_CAST_TO_HIFLOAT8;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::INT8> ASC_CAST_TO_INT8;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::UINT8> ASC_CAST_TO_UINT8;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::INT16> ASC_CAST_TO_INT16;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::UINT16> ASC_CAST_TO_UINT16;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::INT32> ASC_CAST_TO_INT32;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::UINT32> ASC_CAST_TO_UINT32;
-constexpr std::integral_constant<asc_cast_data_type, asc_cast_data_type::INT64> ASC_CAST_TO_INT64;
-
 enum class asc_cast_round_mode : uint8_t { RN = 0, RNA, RD, RU, RZ, RO, RH };
 
 constexpr std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> ASC_CAST_RN;
