@@ -1,3 +1,157 @@
+---
+okftype: reference.api.cpp
+title: "asc_repeat_reduce_max"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md"
+description: "对每个Repeat内所有元素求最大值，以及Repeat内的首个最大值元素在当前Repeat中的索引index。一次Repeat计算256字节。"
+signature:
+  - function: "asc_repeat_reduce_max_index_value(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_index_value(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_value_index(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_value_index(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_only_value(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_only_value(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_only_index(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_only_index(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_index_value(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_index_value(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_value_index(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_value_index(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_only_value(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_only_value(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_only_index(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_only_index(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_repeat_reduce_max_index_value_sync(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_repeat_reduce_max_index_value_sync(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_repeat_reduce_max_value_index_sync(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_repeat_reduce_max_value_index_sync(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_repeat_reduce_max_only_value_sync(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_repeat_reduce_max_only_value_sync(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_repeat_reduce_max_only_index_sync(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_repeat_reduce_max_only_index_sync(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_repeat_reduce_max
 
 ## 产品支持情况

@@ -1,3 +1,139 @@
+---
+okftype: reference.api.cpp
+title: "asc_duplicate"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md"
+description: "执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。"
+signature:
+  - function: "asc_duplicate(__ubuf__ half*,half,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ int16_t*,int16_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ uint16_t*,uint16_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ bfloat16_t*,bfloat16_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ float*,float,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ int32_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ uint32_t*,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ half*,half,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ int16_t*,int16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ uint16_t*,uint16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ bfloat16_t*,bfloat16_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ float*,float,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ int32_t*,int32_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate(__ubuf__ uint32_t*,uint32_t,uint8_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_duplicate_sync(__ubuf__ half*,half,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_duplicate_sync(__ubuf__ int16_t*,int16_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_duplicate_sync(__ubuf__ uint16_t*,uint16_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_duplicate_sync(__ubuf__ bfloat16_t*,bfloat16_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_duplicate_sync(__ubuf__ float*,float,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_duplicate_sync(__ubuf__ int32_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_duplicate_sync(__ubuf__ uint32_t*,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_duplicate
 
 ## 产品支持情况

@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_int82int16"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int16.md"
+description: "将`int8_t`类型数据转换为`int16_t`类型。"
+signature:
+  - function: "asc_int82int16(vector_int16_t&,vector_int8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_int82int16(vector_int16_t&,vector_int8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int82int16
 
 ## 产品支持情况
@@ -44,6 +66,22 @@ def asc_int82int16(dst, src, mask, src_pos):
 本接口为`reg`矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_int82int16(vector_int16_t&,vector_int8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_int82int16(vector_int16_t&,vector_int8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_int82int16(vector_int16_t& dst,

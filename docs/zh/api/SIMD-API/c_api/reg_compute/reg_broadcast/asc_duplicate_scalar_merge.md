@@ -1,3 +1,85 @@
+---
+okftype: reference.api.cpp
+title: "asc_duplicate_scalar_merge"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar_merge.md"
+description: "merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。"
+signature:
+  - function: "asc_duplicate_scalar_merge(vector_int8_t&,int8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_uint8_t&,uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_fp8_e8m0_t&,fp8_e8m0_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_fp8_e5m2_t&,fp8_e5m2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_fp8_e4m3fn_t&,fp8_e4m3fn_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_int16_t&,int16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_uint16_t&,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_half&,half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_bfloat16_t&,bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_int32_t&,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_uint32_t&,uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_float&,float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_duplicate_scalar_merge
 
 ## 产品支持情况
@@ -29,6 +111,82 @@
 merge模式下，将标量值value广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_duplicate_scalar_merge(vector_int8_t&,int8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_uint8_t&,uint8_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_fp8_e8m0_t&,fp8_e8m0_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_fp8_e5m2_t&,fp8_e5m2_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_fp8_e4m3fn_t&,fp8_e4m3fn_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_int16_t&,int16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_uint16_t&,uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_half&,half,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_bfloat16_t&,bfloat16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_int32_t&,int32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_uint32_t&,uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+  - function: "asc_duplicate_scalar_merge(vector_float&,float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+        header: "/include/c_api/reg_compute/compute/reg_broadcast.h"
+```
+
 
 ```cpp
 __simd_callee__ inline void asc_duplicate_scalar_merge(vector_int8_t& dst, int8_t value, vector_bool mask)

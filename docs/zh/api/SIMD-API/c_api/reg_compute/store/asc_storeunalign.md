@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: "asc_storeunalign"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md"
+description: "将矢量数据寄存器中的前`count`个元素连续搬出到非32字节对齐的Unified Buffer（UB）地址。`unalign_reg` 为非对齐寄存器，按引用传入并在本接口调用后被更新为本次搬出尾部数据，供下一次本接口或非对齐搬出收尾接口继续拼接使用。每次调用后，用户需手动更新目的操作数在UB中的地址。本接口在Vector Function（`__simd_vf__` 标记的函数）内使用。"
+signature:
+  - function: "asc_storeunalign(__ubuf__ <dtype>*,vector_store_unalign&,vector_<dtype>,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+        - "int64_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_storeunalign
 
 ## 产品支持情况
@@ -39,6 +74,16 @@
 本接口仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_storeunalign(__ubuf__ <dtype>*,vector_store_unalign&,vector_<dtype>,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storeunalign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_storeunalign(__ubuf__ <dtype>* dst,

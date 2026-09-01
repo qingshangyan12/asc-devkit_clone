@@ -1,3 +1,21 @@
+---
+okftype: reference.api.cpp
+title: "asc_load"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md"
+description: "从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度数据，并通过函数返回值返回或写入目的矢量数据寄存器，搬运过程中数据格式和内容保持不变。连续搬入时，需要在每次调用前手动更新源地址。该接口为易用性接口，对性能有要求时可使用[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)。"
+signature:
+  - function: "asc_load(__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers: []
+  - function: "asc_load(vector_<dtype>&,__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers: []
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_load
 
 ## 产品支持情况
@@ -31,6 +49,18 @@
 本接口仅在AIV上生效，非AIV调用直接返回。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_load(__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers: []
+  - function: "asc_load(vector_<dtype>&,__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers: []
+```
+
 
 ```c
 // 通过函数返回值返回结果。

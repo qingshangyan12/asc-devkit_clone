@@ -1,3 +1,117 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_va_reg"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md"
+description: "用于设置transpose的16个DataBlock地址，将操作数地址序列与地址寄存器关联，接口要求前8个和后8个地址序列与地址寄存器分别关联。"
+signature:
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ int8_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ uint8_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ int16_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ uint16_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ half**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ int32_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ uint32_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ float**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_va_reg
 
 ## 产品支持情况
@@ -29,6 +143,114 @@
 用于设置transpose的16个DataBlock地址，将操作数地址序列与地址寄存器关联，接口要求前8个和后8个地址序列与地址寄存器分别关联。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ int8_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ uint8_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ int16_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ uint16_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ half**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ int32_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ uint32_t**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_set_va_reg(ub_addr8_t,__ubuf__ float**)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array)

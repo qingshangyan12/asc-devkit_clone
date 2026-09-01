@@ -25,56 +25,186 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_int8_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int8_t asc_gather(vector_int8_t src, vector_uint8_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_uint8_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint8_t asc_gather(vector_uint8_t src, vector_uint8_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_int16_t,vector_uint16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int16_t asc_gather(vector_int16_t src, vector_uint16_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_uint16_t,vector_uint16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint16_t asc_gather(vector_uint16_t src, vector_uint16_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_int32_t,vector_uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int32_t asc_gather(vector_int32_t src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_uint32_t,vector_uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint32_t asc_gather(vector_uint32_t src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_float,vector_uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_gather(vector_float src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_half,vector_uint16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_gather(vector_half src, vector_uint16_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_bfloat16_t,vector_uint16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bfloat16_t asc_gather(vector_bfloat16_t src, vector_uint16_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_fp8_e4m3fn_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_gather(vector_fp8_e4m3fn_t src, vector_uint8_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_hifloat8_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_hifloat8_t asc_gather(vector_hifloat8_t src, vector_uint8_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_fp8_e5m2_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_gather(vector_fp8_e5m2_t src, vector_uint8_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_fp8_e8m0_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_gather(vector_fp8_e8m0_t src, vector_uint8_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_int8_t&,vector_int8_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_int8_t& dst, vector_int8_t src, vector_uint8_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_uint8_t&,vector_uint8_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_uint8_t& dst, vector_uint8_t src, vector_uint8_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_int16_t&,vector_int16_t,vector_uint16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_int16_t& dst, vector_int16_t src, vector_uint16_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_uint16_t&,vector_uint16_t,vector_uint16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_uint16_t& dst, vector_uint16_t src, vector_uint16_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_int32_t&,vector_int32_t,vector_uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_int32_t& dst, vector_int32_t src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_uint32_t&,vector_uint32_t,vector_uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_uint32_t& dst, vector_uint32_t src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_float&,vector_float,vector_uint32_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_float& dst, vector_float src, vector_uint32_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_half&,vector_half,vector_uint16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_half& dst, vector_half src, vector_uint16_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_bfloat16_t&,vector_bfloat16_t,vector_uint16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_uint16_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_fp8_e4m3fn_t&,vector_fp8_e4m3fn_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_uint8_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_hifloat8_t&,vector_hifloat8_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_hifloat8_t& dst, vector_hifloat8_t src, vector_uint8_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_fp8_e5m2_t&,vector_fp8_e5m2_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_uint8_t index);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_gather
+ * @function asc_gather(vector_fp8_e8m0_t&,vector_fp8_e8m0_t,vector_uint8_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_gather(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_uint8_t index);
 
 #endif

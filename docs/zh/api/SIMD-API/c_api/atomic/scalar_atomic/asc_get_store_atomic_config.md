@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_store_atomic_config"
+path: "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md"
+description: "获取原子操作启用位与原子操作类型的值，可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](../../deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型的值是否符合预期。"
+signature:
+  - function: "asc_get_store_atomic_config(asc_store_atomic_config&)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/atomic/scalar_atomic.h"
+        header: "/include/c_api/atomic/scalar_atomic.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_store_atomic_config
 
 ## 产品支持情况
@@ -33,6 +50,17 @@
 <!-- end id8 -->
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_store_atomic_config(asc_store_atomic_config&)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/atomic/scalar_atomic.h"
+        header: "/include/c_api/atomic/scalar_atomic.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config)

@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_block_idx（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_get_block_idx_deprecated.md"
+description: "**该接口已废弃，请使用[内置变量block_idx](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#内置变量)结合[asc_get_sub_block_num](../utils/sys_var/asc_get_sub_block_num.md)和[asc_get_sub_block_id](../utils/sys_var/asc_get_sub_block_id.md)接口替代。"
+signature:
+  - function: "asc_get_block_idx()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/utils/sys_var.h"
+        header: "/include/c_api/utils/sys_var.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_block_idx（废弃）
 
 ## 产品支持情况
@@ -42,6 +59,17 @@ __gm__ float* xGm = x + blockIdx * blockLength;
 - 使用前请参考[内置变量说明](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#内置变量)确认适用场景。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_block_idx()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/utils/sys_var.h"
+        header: "/include/c_api/utils/sys_var.h"
+```
+
 
 ```cpp
 __aicore__ inline int64_t asc_get_block_idx()

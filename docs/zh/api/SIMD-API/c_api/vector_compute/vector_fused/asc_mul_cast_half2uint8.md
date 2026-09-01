@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: "asc_mul_cast_half2uint8"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2uint8.md"
+description: "按元素求积，并将结果转换为uint8_t类型。"
+signature:
+  - function: "asc_mul_cast_half2uint8(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_mul_cast_half2uint8(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_fused.h"
+        header: "/include/c_api/vector_compute/compute/vector_fused.h"
+  - function: "asc_mul_cast_half2uint8_sync(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
 
 # asc_mul_cast_half2uint8
 

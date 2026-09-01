@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_and"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md"
+description: "执行矢量与运算。"
+signature:
+  - function: "asc_and(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_and(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_and(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_and(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_and_sync(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_and_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_and
 
 ## 产品支持情况

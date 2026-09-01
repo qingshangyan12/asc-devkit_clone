@@ -1,3 +1,97 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12l0a_trans"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_trans.md"
+description: "该接口实现带转置的2D格式数据从L1 Buffer到L0A Buffer的加载。"
+signature:
+  - function: "asc_copy_l12l0a_trans(__ca__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0a_trans(__ca__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0a_trans(__ca__ half*,__cbuf__ half*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0a_trans(__ca__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0a_trans(__ca__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0a_trans(__ca__ int32_t*,__cbuf__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0a_trans(__ca__ float*,__cbuf__ float*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_datamove/cube_datamove.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0a_trans_sync(__ca__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0a_trans_sync(__ca__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0a_trans_sync(__ca__ half*,__cbuf__ half*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0a_trans_sync(__ca__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0a_trans_sync(__ca__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0a_trans_sync(__ca__ int32_t*,__cbuf__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+  - function: "asc_copy_l12l0a_trans_sync(__ca__ float*,__cbuf__ float*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_datamove_composite.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_l12l0a_trans
 
 ## 产品支持情况

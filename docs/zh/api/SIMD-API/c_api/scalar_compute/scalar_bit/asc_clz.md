@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_clz"
+path: "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clz.md"
+description: "计算一个`uint64_t`类型整数在二进制表示下的前导零个数，即从二进制最高位开始，到第一个出现二进制1为止，中间连续的0的数量。"
+signature:
+  - function: "asc_clz(uint64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_bit.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_clz
 
 ## 产品支持情况
@@ -29,6 +46,17 @@
 计算一个`uint64_t`类型整数在二进制表示下的前导零个数，即从二进制最高位开始，到第一个出现二进制1为止，中间连续的0的数量。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_clz(uint64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_bit.h"
+```
+
 
 ```c
 __aicore__ inline int64_t asc_clz(uint64_t value_in)

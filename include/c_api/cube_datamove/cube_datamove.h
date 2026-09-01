@@ -34,6 +34,11 @@
 
 #include "c_api/composite/cube_datamove_composite.h"
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l13d_rpt(asc_load3d_v2_config&)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config);
 __aicore__ inline void asc_set_l13d_rpt(
     uint16_t repeat_stride, uint8_t repeat_times, asc_l13d_repeat_direction repeat_direction, uint16_t dst_stride_k,
@@ -42,31 +47,96 @@ __aicore__ inline void asc_set_l13d_rpt_b(
     uint16_t repeat_stride, uint8_t repeat_times, asc_l13d_repeat_direction repeat_direction, uint16_t dst_stride_k,
     uint16_t dst_start_pos_m);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l13d_fmatrix(asc_l13d_fmatrix_config&)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config);
 __aicore__ inline void asc_set_l13d_fmatrix(
     uint16_t fmatrix_w, uint16_t fmatrix_h, uint8_t pad_left, uint8_t pad_right, uint8_t pad_top, uint8_t pad_bottom);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l0c2gm_channel_para(uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_l0c2gm_channel_para(uint64_t config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_get_l0c2gm_relu()
+ * @archs 2201
+ */
 __aicore__ inline uint64_t asc_get_l0c2gm_relu();
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_get_l0c2gm_unitflag()
+ * @archs 2201
+ */
 __aicore__ inline uint64_t asc_get_l0c2gm_unitflag();
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_get_l0c2gm_prequant()
+ * @archs 2201
+ */
 __aicore__ inline uint64_t asc_get_l0c2gm_prequant();
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l0c2gm_nz2nd(uint64_t,uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l0c2gm_config(uint64_t,uint64_t,bool)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l0c_copy_channel_para(uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_l0c_copy_channel_para(uint16_t src_nz_fractal_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l3d_rpt_b(uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_l3d_rpt_b(uint64_t config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l13d_padding(uint64_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_l13d_padding(uint64_t config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l13d_padding(half)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_l13d_padding(half config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l13d_padding(int16_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_l13d_padding(int16_t config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l13d_padding(uint16_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_l13d_padding(uint16_t config);
 __aicore__ inline void asc_set_l12l0a_3d_padding(uint64_t config);
 __aicore__ inline void asc_set_l12l0a_3d_padding(int8_t padding_value);
@@ -99,54 +169,154 @@ __aicore__ inline void asc_set_gm2l1_padding(int32_t padding_value);
 __aicore__ inline void asc_set_gm2l1_padding(uint32_t padding_value);
 __aicore__ inline void asc_set_gm2l1_padding(float padding_value);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l12l0_padding_val(uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_l12l0_padding_val(uint64_t config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l0c2gm_quant_post(uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l0c2gm_relu_alpha(uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config);
 __aicore__ inline void asc_set_l0c_copy_relu_alpha(float scalar_relu_pre_alpha);
 __aicore__ inline void asc_set_l0c_copy_lrelu_alpha(float scalar_relu_pre_alpha);
 
 // ==========asc_copy_l12fb==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12fb
+ * @function asc_copy_l12fb(__fbuf__ void*,__cbuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12fb(
     __fbuf__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap_size,
     uint16_t dst_gap_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12fb
+ * @function asc_copy_l12fb(__fbuf__ void*,__cbuf__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size);
 
 //=============asc_copy_l12bt===============
 // void -> uint64_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12bt
+ * @function asc_copy_l12bt(uint64_t,__cbuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12bt(
     uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12bt
+ * @function asc_copy_l12bt(uint64_t,__cbuf__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size);
 
 // ==========asc_fill_l0a(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ half*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ half* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ half*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ half* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ float*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ float* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ float*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ float* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ int16_t*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ int16_t* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ int16_t*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ int32_t*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ int32_t* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ int32_t*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ uint16_t*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ uint16_t* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ uint16_t*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ uint32_t*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ uint32_t* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ uint32_t*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0a(__ca__ bfloat16_t*,bfloat16_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0a(__ca__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
 
 // ==========asc_fill_l1(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
@@ -174,223 +344,558 @@ __aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, half value, const asc
 
 __aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l1(__cbuf__ bfloat16_t*,bfloat16_t,const asc_fill_value_config&)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l1(__cbuf__ bfloat16_t*,half,const asc_fill_value_config&)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l1(__cbuf__ bfloat16_t*,uint32_t,const asc_fill_value_config&)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config&)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config);
 __aicore__ inline void asc_set_l13d_fmatrix_b(
     uint16_t fmatrix_w, uint16_t fmatrix_h, uint8_t pad_left, uint8_t pad_right, uint8_t pad_top, uint8_t pad_bottom);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l0c2gm_lrelu_alpha(half&)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l0c2gm_lrelu_alpha(float&)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config);
 
 // ==========asc_fill_l0b(half/float/int16_t/int32_t/uint16_t/uint32_t/bfloat16_t)==========
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ half*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ half* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ half*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ half* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ float*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ float* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ float*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ float* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ int16_t*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ int16_t* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ int16_t*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ int16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ int32_t*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ int32_t* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ int32_t*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ int32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ uint16_t*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ uint16_t* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ uint16_t*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ uint32_t*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ uint32_t* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ uint32_t*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ bfloat16_t*,bfloat16_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ bfloat16_t*,half,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ bfloat16_t* dst, half value, const asc_fill_value_config& config);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_fill_l0b(__cb__ bfloat16_t*,uint32_t,const asc_fill_value_config&)
+ * @archs 2201
+ */
 __aicore__ inline void asc_fill_l0b(__cb__ bfloat16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
 // ==========asc_copy_gm2l1==========
 // PAD_NONE
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ void*,__gm__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 // PAD_MODE1
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad1(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad1(
     __cbuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad1(__cbuf__ void*,__gm__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad1(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 // PAD_MODE2
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad2(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad2(
     __cbuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad2(__cbuf__ void*,__gm__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad2(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 // PAD_MODE3
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad3(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad3(
     __cbuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad3(__cbuf__ void*,__gm__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad3(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 // PAD_MODE4
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad4(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad4(
     __cbuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad4(__cbuf__ void*,__gm__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad4(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 // PAD_MODE5
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad5(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad5(
     __cbuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad5(__cbuf__ void*,__gm__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad5(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 // PAD_MODE6
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad6(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad6(
     __cbuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad6(__cbuf__ void*,__gm__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad6(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 // PAD_MODE7
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad7(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad7(
     __cbuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad7(__cbuf__ void*,__gm__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad7(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 // PAD_MODE8
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad8(__cbuf__ void*,__gm__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad8(
     __cbuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1_pad8(__cbuf__ void*,__gm__ void*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 // ==========asc_copy_gm2l1==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ bfloat16_t*,__gm__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ half*,__gm__ half*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ float*,__gm__ float*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ int32_t*,__gm__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ int8_t*,__gm__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ uint32_t*,__gm__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ uint8_t*,__gm__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
 // ==========asc_copy_gm2l1_nd2nz b8(int8_t/uint8_t)==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1_nd2nz
+ * @function asc_copy_gm2l1_nd2nz(__cbuf__ int8_t*,__gm__ int8_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1_nd2nz
+ * @function asc_copy_gm2l1_nd2nz(__cbuf__ uint8_t*,__gm__ uint8_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
 // ==========asc_copy_gm2l1_nd2nz b16(bfloat16_t/half/int16_t)==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1_nd2nz
+ * @function asc_copy_gm2l1_nd2nz(__cbuf__ bfloat16_t*,__gm__ bfloat16_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1_nd2nz
+ * @function asc_copy_gm2l1_nd2nz(__cbuf__ half*,__gm__ half*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ half* dst, __gm__ half* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1_nd2nz
+ * @function asc_copy_gm2l1_nd2nz(__cbuf__ int16_t*,__gm__ int16_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
 // ==========asc_copy_gm2l1_nd2nz b32s(float/int32_t/uint32_t)==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1_nd2nz
+ * @function asc_copy_gm2l1_nd2nz(__cbuf__ float*,__gm__ float*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ float* dst, __gm__ float* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1_nd2nz
+ * @function asc_copy_gm2l1_nd2nz(__cbuf__ int32_t*,__gm__ int32_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1_nd2nz
+ * @function asc_copy_gm2l1_nd2nz(__cbuf__ uint32_t*,__gm__ uint32_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l1_nd2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t nd_num, uint16_t n_value, uint16_t d_value,
     uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride,
     uint16_t dst_nz_matrix_stride);
 
 // ==========asc_copy_l12l0b, 2D, int4b_t/uint8_t/int8_t/half/bfloat16_t/uint32_t/int32_t/float==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ int4b_t*,__cbuf__ int4b_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ half*,__cbuf__ half*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ half* dst, __cbuf__ half* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ int32_t*,__cbuf__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ float*,__cbuf__ float*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ float* dst, __cbuf__ float* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
 // ==========asc_copy_l12l0b, 3D, half/bfloat16_t/uint32_t/int32_t/float==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ half*,__cbuf__ half*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ int32_t*,__cbuf__ int32_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ float*,__cbuf__ float*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -398,705 +903,1565 @@ __aicore__ inline void asc_copy_l12l0b(
     bool f_matrix_ctrl, uint16_t channel_size);
 
 // ==========asc_copy_l12l0a, 2D, int4b_t/uint8_t/int8_t/half/bfloat16_t/uint32_t/int32_t/float==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ int4b_t*,__cbuf__ int4b_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ half*,__cbuf__ half*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ half* dst, __cbuf__ half* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ int32_t*,__cbuf__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ float*,__cbuf__ float*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ float* dst, __cbuf__ float* src, uint16_t start_index, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
 // ==========asc_copy_l12l0a, 3D, int4b_t/uint8_t/int8_t/half/bfloat16_t/uint32_t/int32_t/float==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ int4b_t*,__cbuf__ int4b_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ int8_t*,__cbuf__ int8_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ half*,__cbuf__ half*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ int32_t*,__cbuf__ int32_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ float*,__cbuf__ float*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0b_sparse(__cb__ int8_t*,__cbuf__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b_sparse(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, uint16_t start_index, uint8_t repeat);
 
 // ==========asc_copy_l12l0a_trans=========
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0a_trans(__ca__ half*,__cbuf__ half*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a_trans(
     __ca__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     bool enable_addr_decrement, uint16_t dst_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0a_trans(__ca__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a_trans(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0a_trans(__ca__ float*,__cbuf__ float*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a_trans(
     __ca__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     bool enable_addr_decrement, uint16_t dst_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0a_trans(__ca__ int32_t*,__cbuf__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a_trans(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0a_trans(__ca__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a_trans(
     __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     bool enable_addr_decrement, uint16_t dst_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0a_trans(__ca__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a_trans(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0a_trans(__ca__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0a_trans(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
 
 // ==========asc_copy_l12l0b_trans=========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ half*,__cbuf__ half*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     bool enable_addr_decrement, uint16_t dst_frac_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ float*,__cbuf__ float*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     bool enable_addr_decrement, uint16_t dst_frac_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ int32_t*,__cbuf__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     bool enable_addr_decrement, uint16_t dst_frac_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t,bool,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l13d_size(uint64_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_set_l13d_size(uint64_t value);
 // ==========asc_copy_l0c2gm==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ half*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ bfloat16_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ int8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ uint8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ float*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ half*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ int16_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ int8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ int32_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool channel_split,
     bool nz2nd_en);
 
 // ==========asc_load_image_to_cbuf(half/int8_t)==========
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_load_image_to_cbuf(__cbuf__ half*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_load_image_to_cbuf(
     __cbuf__ half* dst, uint16_t hor_size, uint16_t ver_size, uint16_t hor_start_pos, uint16_t ver_start_pos,
     uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size, uint16_t right_pad_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_load_image_to_cbuf(__cbuf__ int8_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_load_image_to_cbuf(
     __cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size, uint16_t hor_start_pos, uint16_t ver_start_pos,
     uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size, uint16_t right_pad_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l0c_copy_prequant(uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l0c_copy_prequant(float,uint16_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_l0c_copy_prequant(float scale, uint16_t offset, bool is_signed);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_l0c_copy_params(uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride);
 // ==========asc_copy_gm2l0b==========
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0b(__cb__ bfloat16_t*,__gm__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0b(
     __cb__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0b(__cb__ half*,__gm__ half*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0b(
     __cb__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0b(__cb__ float*,__gm__ float*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0b(
     __cb__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0b(__cb__ int32_t*,__gm__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0b(
     __cb__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0b(__cb__ int8_t*,__gm__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0b(
     __cb__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0b(__cb__ uint32_t*,__gm__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0b(
     __cb__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0b(__cb__ uint8_t*,__gm__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0b(
     __cb__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0b(__cb__ int4b_t*,__gm__ int4b_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0b(
     __cb__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
 // ==========asc_copy_gm2l0a bfloat16_t/half/float/int32_t/uint8_t/int8_t/uint32_t/int4b_t===========
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0a(__ca__ bfloat16_t*,__gm__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0a(
     __ca__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0a(__ca__ half*,__gm__ half*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0a(
     __ca__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0a(__ca__ float*,__gm__ float*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0a(
     __ca__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0a(__ca__ int32_t*,__gm__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0a(
     __ca__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0a(__ca__ uint8_t*,__gm__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0a(
     __ca__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0a(__ca__ int8_t*,__gm__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0a(
     __ca__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0a(__ca__ uint32_t*,__gm__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0a(
     __ca__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l0a(__ca__ int4b_t*,__gm__ int4b_t*,uint16_t,uint8_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_gm2l0a(
     __ca__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
 // ==========asc_copy_l0c2l1==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ half*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split, bool enable_nz2nd);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ bfloat16_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split,
     bool enable_nz2nd);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ int8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split, bool enable_nz2nd);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ half*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split, bool enable_nz2nd);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ int16_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split,
     bool enable_nz2nd);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ int8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split,
     bool enable_nz2nd);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ uint8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split,
     bool enable_nz2nd);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ void*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ void* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split, bool enable_nz2nd);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ void*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint64_t,uint8_t,bool,bool)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ void* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t unit_flag_mode, uint64_t quant_pre, uint8_t relu_pre, bool enable_channel_split, bool enable_nz2nd);
 
 // ==========asc_copy_l12l0a_mx==========
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0a_mx(uint64_t,__cbuf__ fp8_e8m0_t*,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_mx(
     uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
     uint16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_gm2l1_loop_size(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_gm2l1_loop_size(uint64_t loop1_size, uint64_t loop2_size);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_gm2l1_loop1_stride(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_gm2l1_loop1_stride(uint64_t loop1_src_stride, uint64_t loop1_dst_stride);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_gm2l1_loop2_stride(uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_gm2l1_loop2_stride(uint64_t loop2_src_stride, uint64_t loop2_dst_stride);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_gm2l1_nz_para(uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_gm2l1_nz_para(uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_gm2l1_nz_para(
     uint16_t matrix_num, uint16_t dst_nz_n_stride, uint16_t dst_nz_c0_stride, uint16_t dst_nz_matrix_stride);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_set_gm2l1_pad(uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_set_gm2l1_pad(uint32_t pad_val);
 // ==========asc_copy_l12l0b_mx==========
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0b_mx(uint64_t,__cbuf__ fp8_e8m0_t*,uint16_t,uint16_t,uint8_t,uint8_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_mx(
     uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
     uint16_t src_stride, uint16_t dst_stride);
 
 // ==========asc_copy_l12l0a,
 // uint8_t/int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t/half/bfloat16_t/int16_t/uint16_t/uint32_t/int32_t/float==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ fp8_e4m3fn_t*,__cbuf__ fp8_e4m3fn_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ fp8_e5m2_t*,__cbuf__ fp8_e5m2_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ half*,__cbuf__ half*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ float*,__cbuf__ float*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ hifloat8_t*,__cbuf__ hifloat8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ int16_t*,__cbuf__ int16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ int32_t*,__cbuf__ int32_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ int8_t*,__cbuf__ int8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ uint16_t*,__cbuf__ uint16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ int4b_t*,__cbuf__ int4b_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ fp4x2_e2m1_t*,__cbuf__ fp4x2_e2m1_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ fp4x2_e1m2_t*,__cbuf__ fp4x2_e1m2_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ fp8_e4m3fn_t*,__cbuf__ fp8_e4m3fn_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ fp8_e5m2_t*,__cbuf__ fp8_e5m2_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ half*,__cbuf__ half*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ float*,__cbuf__ float*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ hifloat8_t*,__cbuf__ hifloat8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ int16_t*,__cbuf__ int16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ int32_t*,__cbuf__ int32_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ int8_t*,__cbuf__ int8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ uint16_t*,__cbuf__ uint16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ int4b_t*,__cbuf__ int4b_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ fp4x2_e2m1_t*,__cbuf__ fp4x2_e2m1_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a_transpose(__ca__ fp4x2_e1m2_t*,__cbuf__ fp4x2_e1m2_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a_transpose(
     __ca__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 // ==========asc_copy_l12l0b,
 // uint8_t/int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t/half/bfloat16_t/int16_t/uint16_t/uint32_t/int32_t/float==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ fp8_e4m3fn_t*,__cbuf__ fp8_e4m3fn_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ fp8_e5m2_t*,__cbuf__ fp8_e5m2_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ half*,__cbuf__ half*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ float*,__cbuf__ float*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ hifloat8_t*,__cbuf__ hifloat8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ int16_t*,__cbuf__ int16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ int32_t*,__cbuf__ int32_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ int8_t*,__cbuf__ int8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ uint16_t*,__cbuf__ uint16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ int4b_t*,__cbuf__ int4b_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ fp4x2_e2m1_t*,__cbuf__ fp4x2_e2m1_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ fp4x2_e1m2_t*,__cbuf__ fp4x2_e1m2_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ fp8_e4m3fn_t*,__cbuf__ fp8_e4m3fn_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ fp8_e5m2_t*,__cbuf__ fp8_e5m2_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ half*,__cbuf__ half*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ half* dst, __cbuf__ half* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ float*,__cbuf__ float*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ float* dst, __cbuf__ float* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ hifloat8_t*,__cbuf__ hifloat8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ int16_t*,__cbuf__ int16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ int32_t*,__cbuf__ int32_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ int8_t*,__cbuf__ int8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ uint16_t*,__cbuf__ uint16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ int4b_t*,__cbuf__ int4b_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step,
     uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ fp4x2_e2m1_t*,__cbuf__ fp4x2_e2m1_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b_transpose(__cb__ fp4x2_e1m2_t*,__cbuf__ fp4x2_e1m2_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_transpose(
     __cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t m_start_position, uint16_t k_start_position,
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ fp8_e4m3fn_t*,__cbuf__ fp8_e4m3fn_t*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ fp8_e5m2_t*,__cbuf__ fp8_e5m2_t*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ half*,__cbuf__ half*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ float*,__cbuf__ float*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ hifloat8_t*,__cbuf__ hifloat8_t*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ int32_t*,__cbuf__ int32_t*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ int8_t*,__cbuf__ int8_t*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap,
     uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ fp4x2_e1m2_t*,__cbuf__ fp4x2_e1m2_t*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_e1m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ fp4x2_e2m1_t*,__cbuf__ fp4x2_e2m1_t*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ fp4x2_e2m1_t* dst, __cbuf__ fp4x2_e2m1_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b_trans
+ * @function asc_copy_l12l0b_trans(__cb__ int4b_t*,__cbuf__ int4b_t*,uint16_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b_trans(
     __cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
 // ==========asc_copy_l12gm==========
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12gm(__gm__ void*,__cbuf__ void*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12gm(
     __gm__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
 
 // ==========asc_copy_l12l0c==========
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0c(__cc__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0c(
     __cc__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0c(__cc__ half*,__cbuf__ half*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0c(
     __cc__ half* dst, __cbuf__ half* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0c(__cc__ half*,__cbuf__ float*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0c(
     __cc__ half* dst, __cbuf__ float* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0c(__cc__ bfloat16_t*,__cbuf__ float*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0c(
     __cc__ bfloat16_t* dst, __cbuf__ float* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0c(__cc__ float*,__cbuf__ float*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0c(
     __cc__ float* dst, __cbuf__ float* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0c(__cc__ int32_t*,__cbuf__ int32_t*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0c(
     __cc__ int32_t* dst, __cbuf__ int32_t* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12l0c(__cc__ uint32_t*,__cbuf__ uint32_t*,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_copy_l12l0c(
     __cc__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap,
     uint16_t dst_gap);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ fp8_e4m3fn_t*,__cbuf__ fp8_e4m3fn_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t k_extension, uint16_t m_extension,
     uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ fp8_e5m2_t*,__cbuf__ fp8_e5m2_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ hifloat8_t*,__cbuf__ hifloat8_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ int16_t*,__cbuf__ int16_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0a
+ * @function asc_copy_l12l0a(__ca__ uint16_t*,__cbuf__ uint16_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0a(
     __ca__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ fp8_e4m3fn_t*,__cbuf__ fp8_e4m3fn_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ fp8_e4m3fn_t* dst, __cbuf__ fp8_e4m3fn_t* src, uint16_t k_extension, uint16_t m_extension,
     uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ fp8_e5m2_t*,__cbuf__ fp8_e5m2_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ fp8_e5m2_t* dst, __cbuf__ fp8_e5m2_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ hifloat8_t*,__cbuf__ hifloat8_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ int8_t*,__cbuf__ int8_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ uint8_t*,__cbuf__ uint8_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ int16_t*,__cbuf__ int16_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ int16_t* dst, __cbuf__ int16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
     uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose,
     bool f_matrix_ctrl, uint16_t channel_size);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12l0b
+ * @function asc_copy_l12l0b(__cb__ uint16_t*,__cbuf__ uint16_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12l0b(
     __cb__ uint16_t* dst, __cbuf__ uint16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt,
     uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h,
@@ -1144,51 +2509,101 @@ __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count,
     uint8_t right_padding_count, bool enable_data_select, asc_load_l2_cache_mode l2_cache_mode, uint64_t src_stride,
     uint32_t dst_stride);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_align(__cbuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_align(__cbuf__ half*,__gm__ half*,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ half* dst, __gm__ half* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_align(__cbuf__ float*,__gm__ float*,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ float* dst, __gm__ float* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_align(__cbuf__ hifloat8_t*,__gm__ hifloat8_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_align(__cbuf__ int16_t*,__gm__ int16_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_align(__cbuf__ int32_t*,__gm__ int32_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_align(__cbuf__ int8_t*,__gm__ int8_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_align(__cbuf__ uint16_t*,__gm__ uint16_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_align(__cbuf__ uint32_t*,__gm__ uint32_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
     uint32_t burst_dst_stride);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_align(__cbuf__ uint8_t*,__gm__ uint8_t*,uint32_t,uint32_t,uint8_t,uint8_t,bool,uint8_t,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_align(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
     uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride,
@@ -1231,50 +2646,110 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t src_d_value, asc_load_l2_cache_mode l2_cache_mode,
     uint16_t n_value, uint32_t d_value, uint64_t src_nd_matrix_stride, bool enable_small_c0);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ bfloat16_t*,__gm__ bfloat16_t*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ fp8_e4m3fn_t*,__gm__ fp8_e4m3fn_t*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ fp8_e5m2_t*,__gm__ fp8_e5m2_t*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ half*,__gm__ half*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ half* dst, __gm__ half* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ float*,__gm__ float*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ float* dst, __gm__ float* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ hifloat8_t*,__gm__ hifloat8_t*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ int16_t*,__gm__ int16_t*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ int32_t*,__gm__ int32_t*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ int8_t*,__gm__ int8_t*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ uint16_t*,__gm__ uint16_t*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ uint32_t*,__gm__ uint32_t*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_gm2l1_dn2nz(__cbuf__ uint8_t*,__gm__ uint8_t*,uint64_t,uint8_t,uint16_t,uint32_t,uint64_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1_dn2nz(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value,
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
@@ -1365,6 +2840,11 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
     uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
 // ==========asc_copy_gm2l1==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ void*,__gm__ void*,uint32_t,uint32_t,uint8_t,uint64_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
     uint64_t src_stride, uint32_t dst_stride);
@@ -1375,36 +2855,86 @@ __aicore__ inline void asc_copy_gm2l1(
 
 //=============asc_copy_l12bt===============
 // bfloat16_t -> uint64_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12bt
+ * @function asc_copy_l12bt(uint64_t,__cbuf__ bfloat16_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12bt(
     uint64_t dst, __cbuf__ bfloat16_t* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst,
     uint16_t source_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12bt
+ * @function asc_copy_l12bt(uint64_t,__cbuf__ bfloat16_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size);
 
 // half -> uint64_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12bt
+ * @function asc_copy_l12bt(uint64_t,__cbuf__ half*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12bt(
     uint64_t dst, __cbuf__ half* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap,
     uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12bt
+ * @function asc_copy_l12bt(uint64_t,__cbuf__ half*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint32_t size);
 
 // float -> uint64_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12bt
+ * @function asc_copy_l12bt(uint64_t,__cbuf__ float*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12bt(
     uint64_t dst, __cbuf__ float* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap,
     uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12bt
+ * @function asc_copy_l12bt(uint64_t,__cbuf__ float*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint32_t size);
 
 // int32_t -> uint64_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12bt
+ * @function asc_copy_l12bt(uint64_t,__cbuf__ int32_t*,uint16_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12bt(
     uint64_t dst, __cbuf__ int32_t* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst,
     uint16_t source_gap, uint16_t dst_gap);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l12bt
+ * @function asc_copy_l12bt(uint64_t,__cbuf__ int32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint32_t size);
 
 // =============asc_copy_l12ub===============
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l12ub(__ubuf__ void*,__cbuf__ void*,int8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l12ub(
     __ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t burst_count, uint16_t burst_len,
     uint16_t src_gap, uint16_t dst_gap);
 
 //=============asc_copy_l0c2l1===============
 // half  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ half*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,uint8_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
@@ -1412,6 +2942,11 @@ __aicore__ inline void asc_copy_l0c2l1(
     uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en);
 
 // bfloat16_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ bfloat16_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,uint8_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1419,6 +2954,11 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en);
 
 // int8_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ int8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,uint8_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
@@ -1426,6 +2966,11 @@ __aicore__ inline void asc_copy_l0c2l1(
     uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en);
 
 // uint8_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ uint8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,uint8_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1433,6 +2978,11 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en);
 
 // float  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ float*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,uint8_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
@@ -1440,6 +2990,11 @@ __aicore__ inline void asc_copy_l0c2l1(
     uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en);
 
 // half int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ half*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,uint8_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode, uint8_t relu_pre_mode,
@@ -1447,6 +3002,11 @@ __aicore__ inline void asc_copy_l0c2l1(
     uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en);
 
 // int8_t int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ int8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,uint8_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1454,6 +3014,11 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en);
 
 // uint8_t int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ uint8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,uint8_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1461,6 +3026,11 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en);
 
 // int32_t int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ int32_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,uint8_t,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1468,6 +3038,11 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool clip_relu_post, uint8_t eltwise_op, uint8_t eltwise_antq_en, bool c0_pad_en);
 
 // int4b_t float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ int4b_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1476,6 +3051,11 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_nz2dn);
 
 // int4b_t int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @function asc_copy_l0c2l1(__cbuf__ int4b_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1501,6 +3081,11 @@ __aicore__ inline void asc_copy_l0c2l1(
 
 // ==========asc_copy_l0c2gm===========
 // bfloat16_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ bfloat16_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1509,6 +3094,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // half  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ half*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1517,6 +3107,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // fp8_e4m3fn_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ fp8_e4m3fn_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1525,6 +3120,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // hifloat8_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ hifloat8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1533,6 +3133,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // int8_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ int8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1541,6 +3146,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // uint8_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ uint8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1549,6 +3159,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // float  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ float*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1557,6 +3172,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // bfloat16_t  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ bfloat16_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1565,6 +3185,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // half  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ half*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1573,6 +3198,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // int8_t  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ int8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1581,6 +3211,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // uint8_t  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ uint8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1589,6 +3224,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // int32_t  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ int32_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1597,6 +3237,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // int4b_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ int4b_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode, uint64_t quant_pre_mode,
@@ -1605,6 +3250,11 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn);
 
 // int4b_t  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @function asc_copy_l0c2gm(__gm__ int4b_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t l2_cache_mode, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1614,6 +3264,11 @@ __aicore__ inline void asc_copy_l0c2gm(
 
 // ==========asc_copy_l0c2ub===========
 // bfloat16_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ bfloat16_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1622,6 +3277,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // half  float
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ half*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1630,6 +3290,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // fp8_e4m3fn_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ fp8_e4m3fn_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1638,6 +3303,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // hifloat8_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ hifloat8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1646,6 +3316,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // int8  float
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ int8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1654,6 +3329,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // uint8  float
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ uint8_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1662,6 +3342,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // float  float
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ float*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1670,6 +3355,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // bfloat16_t  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ bfloat16_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1678,6 +3368,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // half  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ half*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1686,6 +3381,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // int8  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ int8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1694,6 +3394,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // uint8  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ uint8_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1702,6 +3407,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // int32_t  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ int32_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1710,6 +3420,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // int4b_t  float
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ int4b_t*,__cc__ float*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1718,6 +3433,11 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // int4b_t  int32_t
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @function asc_copy_l0c2ub(__ubuf__ int4b_t*,__cc__ int32_t*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, uint8_t dual_dst_ctrl, bool sub_blockid, uint8_t enable_clip_relu_pre, uint8_t unit_flag_mode,
@@ -1726,62 +3446,137 @@ __aicore__ inline void asc_copy_l0c2ub(
     bool enable_nz2dn);
 
 // ==========asc_copy_gm2l1===========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ float*,__gm__ float*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ float* dst, __gm__ float* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ fp8_e4m3fn_t*,__gm__ fp8_e4m3fn_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ fp8_e5m2_t*,__gm__ fp8_e5m2_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ half*,__gm__ half*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ half* dst, __gm__ half* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ hifloat8_t*,__gm__ hifloat8_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ int16_t*,__gm__ int16_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ int32_t*,__gm__ int32_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ int8_t*,__gm__ int8_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ uint16_t*,__gm__ uint16_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ uint32_t*,__gm__ uint32_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ uint8_t*,__gm__ uint8_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ fp4x2_e1m2_t*,__gm__ fp4x2_e1m2_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ fp4x2_e2m1_t*,__gm__ fp4x2_e2m1_t*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @function asc_copy_gm2l1(__cbuf__ void*,__gm__ void*,uint32_t,uint32_t,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t)
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ void* dst, __gm__ void* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);

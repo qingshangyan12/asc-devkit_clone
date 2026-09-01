@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_mmad_sparse"
+path: "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md"
+description: "完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。对于矩阵A，在asc_mmad_sparse计算时完成稠密化；对于矩阵B，在计算执行前的输入数据准备时自行完成稠密化（按照下文中介绍的稠密算法进行稠密化）。稠密矩阵B需要通过[asc_copy_l12l0b_sparse](../cube_datamove/asc_copy_l12l0b_sparse.md)载入，同时加载索引矩阵，索引矩阵在矩阵B稠密化的过程中生成，再用于矩阵A的稠密化。"
+signature:
+  - function: "asc_mmad_sparse(__cc__ int32_t*,__ca__ int8_t*,__cb__ int8_t*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_mmad_sparse
 
 ## 产品支持情况
@@ -29,6 +45,16 @@
 完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。对于矩阵A，在asc_mmad_sparse计算时完成稠密化；对于矩阵B，在计算执行前的输入数据准备时自行完成稠密化（按照下文中介绍的稠密算法进行稠密化）。稠密矩阵B需要通过[asc_copy_l12l0b_sparse](../cube_datamove/asc_copy_l12l0b_sparse.md)载入，同时加载索引矩阵，索引矩阵在矩阵B稠密化的过程中生成，再用于矩阵A的稠密化。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_mmad_sparse(__cc__ int32_t*,__ca__ int8_t*,__cb__ int8_t*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool c_matrix_source, bool c_matrix_init_val)

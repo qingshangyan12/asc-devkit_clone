@@ -31,61 +31,306 @@
 #endif
 
 namespace __asc_aicore {
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_add(__gm__ int32_t*,int32_t)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_atomic_add(__gm__ int32_t* address, int32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_add(__gm__ uint32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_atomic_add(__gm__ uint32_t* address, uint32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_add(__gm__ float*,float)
+ * @archs 3510
+ */
 __aicore__ inline float asc_atomic_add(__gm__ float* address, float val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_add(__gm__ int64_t*,int64_t)
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_atomic_add(__gm__ int64_t* address, int64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_add(__gm__ uint64_t*,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_atomic_add(__gm__ uint64_t* address, uint64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_sub(__gm__ int32_t*,int32_t)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_atomic_sub(__gm__ int32_t* address, int32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_sub(__gm__ uint32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_atomic_sub(__gm__ uint32_t* address, uint32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_sub(__gm__ float*,float)
+ * @archs 3510
+ */
 __aicore__ inline float asc_atomic_sub(__gm__ float* address, float val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_sub(__gm__ int64_t*,int64_t)
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_atomic_sub(__gm__ int64_t* address, int64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_sub(__gm__ uint64_t*,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_atomic_sub(__gm__ uint64_t* address, uint64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_exch(__gm__ int32_t*,int32_t)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_atomic_exch(__gm__ int32_t* address, int32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_exch(__gm__ uint32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_atomic_exch(__gm__ uint32_t* address, uint32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_exch(__gm__ float*,float)
+ * @archs 3510
+ */
 __aicore__ inline float asc_atomic_exch(__gm__ float* address, float val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_exch(__gm__ int64_t*,int64_t)
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_atomic_exch(__gm__ int64_t* address, int64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_exch(__gm__ uint64_t*,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_atomic_exch(__gm__ uint64_t* address, uint64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_max(__gm__ int32_t*,int32_t)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_atomic_max(__gm__ int32_t* address, int32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_max(__gm__ uint32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_atomic_max(__gm__ uint32_t* address, uint32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_max(__gm__ float*,float)
+ * @archs 3510
+ */
 __aicore__ inline float asc_atomic_max(__gm__ float* address, float val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_max(__gm__ int64_t*,int64_t)
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_atomic_max(__gm__ int64_t* address, int64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_max(__gm__ uint64_t*,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_atomic_max(__gm__ uint64_t* address, uint64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_min(__gm__ int32_t*,int32_t)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_atomic_min(__gm__ int32_t* address, int32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_min(__gm__ uint32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_atomic_min(__gm__ uint32_t* address, uint32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_min(__gm__ float*,float)
+ * @archs 3510
+ */
 __aicore__ inline float asc_atomic_min(__gm__ float* address, float val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_min(__gm__ int64_t*,int64_t)
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_atomic_min(__gm__ int64_t* address, int64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_min(__gm__ uint64_t*,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_atomic_min(__gm__ uint64_t* address, uint64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_cas(__gm__ int32_t*,int32_t,int32_t)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_atomic_cas(__gm__ int32_t* address, int32_t compare, int32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_cas(__gm__ uint32_t*,uint32_t,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_atomic_cas(__gm__ uint32_t* address, uint32_t compare, uint32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_cas(__gm__ float*,float,float)
+ * @archs 3510
+ */
 __aicore__ inline float asc_atomic_cas(__gm__ float* address, float compare, float val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_cas(__gm__ int64_t*,int64_t,int64_t)
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_atomic_cas(__gm__ int64_t* address, int64_t compare, int64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_cas(__gm__ uint64_t*,uint64_t,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_atomic_cas(__gm__ uint64_t* address, uint64_t compare, uint64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_and(__gm__ int32_t*,int32_t)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_atomic_and(__gm__ int32_t* address, int32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_and(__gm__ uint32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_atomic_and(__gm__ uint32_t* address, uint32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_and(__gm__ int64_t*,int64_t)
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_atomic_and(__gm__ int64_t* address, int64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_and(__gm__ uint64_t*,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_atomic_and(__gm__ uint64_t* address, uint64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_or(__gm__ int32_t*,int32_t)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_atomic_or(__gm__ int32_t* address, int32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_or(__gm__ uint32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_atomic_or(__gm__ uint32_t* address, uint32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_or(__gm__ int64_t*,int64_t)
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_atomic_or(__gm__ int64_t* address, int64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_or(__gm__ uint64_t*,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_atomic_or(__gm__ uint64_t* address, uint64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_xor(__gm__ int32_t*,int32_t)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_atomic_xor(__gm__ int32_t* address, int32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_xor(__gm__ uint32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_atomic_xor(__gm__ uint32_t* address, uint32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_xor(__gm__ int64_t*,int64_t)
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_atomic_xor(__gm__ int64_t* address, int64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_xor(__gm__ uint64_t*,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_atomic_xor(__gm__ uint64_t* address, uint64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_inc(__gm__ uint32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_atomic_inc(__gm__ uint32_t* address, uint32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_inc(__gm__ uint64_t*,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_atomic_inc(__gm__ uint64_t* address, uint64_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_dec(__gm__ uint32_t*,uint32_t)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_atomic_dec(__gm__ uint32_t* address, uint32_t val);
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_atomic_dec(__gm__ uint64_t*,uint64_t)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_atomic_dec(__gm__ uint64_t* address, uint64_t val);
 } // namespace __asc_aicore
 
 [[deprecated("NOTICE: asc_get_store_atomic_config is deprecated."
              "Please use asc_atomic_add instead for atomic add operation.")]]
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_get_store_atomic_config(asc_store_atomic_config&)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
 
+/**
+ * @ingroup simd_c_api.atomic.scalar_atomic
+ * @function asc_set_store_atomic_config_v1(uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op);
 
 [[deprecated("NOTICE: asc_set_store_atomic_config_v2 is deprecated."
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @function asc_set_store_atomic_config_v2(uint16_t,uint16_t)
+ * @archs 3510
+ */
              "Please use asc_atomic_add instead for atomic add operation.")]] __aicore__ inline void
 asc_set_store_atomic_config_v2(uint16_t type, uint16_t op);
 

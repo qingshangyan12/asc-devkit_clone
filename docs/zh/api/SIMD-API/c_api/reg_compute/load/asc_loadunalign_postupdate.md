@@ -1,3 +1,63 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadunalign_postupdate"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md"
+description: "从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度连续数据，并搬入矢量数据寄存器。本接口将[asc_loadunalign_pre](asc_loadunalign_pre.md)中的非对齐寄存器（32字节）中缓存的前置数据与从UB读取的后续数据拼接，得到VL长度数据并搬入矢量数据寄存器。搬入完成后，接口同步更新地址和非对齐寄存器。"
+signature:
+  - function: "asc_loadunalign_postupdate(vector_<dtype>&,vector_load_unalign&,__ubuf__ <dtype>*&,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadunalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+        - "int64_t"
+  - function: "asc_loadunalign_postupdate(vector_<dtype>&,vector_load_unalign&,__ubuf__ <dtype>*,addr_reg&,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadunalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+        - "int64_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_loadunalign_postupdate
 
 ## 产品支持情况
@@ -39,6 +99,16 @@
 ## 函数原型
 
 ### 连续非对齐搬入模式
+```yaml
+api_signature:
+  - function: "asc_loadunalign_postupdate(vector_<dtype>&,vector_load_unalign&,__ubuf__ <dtype>*&,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadunalign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
@@ -62,6 +132,16 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
 ```
 
 ### 地址寄存器偏移搬入模式
+```yaml
+api_signature:
+  - function: "asc_loadunalign_postupdate(vector_<dtype>&,vector_load_unalign&,__ubuf__ <dtype>*,addr_reg&,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadunalign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,

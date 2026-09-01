@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: "asc_abs"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_abs.md"
+description: "按元素取绝对值。"
+signature:
+  - function: "asc_abs(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_abs(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_abs(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+  - function: "asc_abs(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_arith.h"
+        header: "/include/c_api/vector_compute/compute/vector_arith.h"
+examples: []
+timestamp: "2026-09-01"
+---
 
 # asc_abs
 

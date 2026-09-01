@@ -28,13 +28,53 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @function asc_load_dev(__gm__ int8_t*)
+ * @archs 3510
+ */
 __aicore__ inline int8_t asc_load_dev(__gm__ int8_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @function asc_load_dev(__gm__ uint8_t*)
+ * @archs 3510
+ */
 __aicore__ inline uint8_t asc_load_dev(__gm__ uint8_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @function asc_load_dev(__gm__ int16_t*)
+ * @archs 3510
+ */
 __aicore__ inline int16_t asc_load_dev(__gm__ int16_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @function asc_load_dev(__gm__ uint16_t*)
+ * @archs 3510
+ */
 __aicore__ inline uint16_t asc_load_dev(__gm__ uint16_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @function asc_load_dev(__gm__ int32_t*)
+ * @archs 3510
+ */
 __aicore__ inline int32_t asc_load_dev(__gm__ int32_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @function asc_load_dev(__gm__ uint32_t*)
+ * @archs 3510
+ */
 __aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @function asc_load_dev(__gm__ int64_t*)
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_load_dev(__gm__ int64_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @function asc_load_dev(__gm__ uint64_t*)
+ * @archs 3510
+ */
 __aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr);
 
 #endif

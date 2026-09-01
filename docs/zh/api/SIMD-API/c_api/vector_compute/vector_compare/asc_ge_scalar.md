@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_ge_scalar"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md"
+description: "按元素判断src >= value是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。"
+signature:
+  - function: "asc_ge_scalar(__ubuf__ uint8_t*,__ubuf__ half*,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_ge_scalar(__ubuf__ uint8_t*,__ubuf__ float*,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_compare.h"
+        header: "/include/c_api/vector_compute/compute/vector_compare.h"
+  - function: "asc_ge_scalar_sync(__ubuf__ uint8_t*,__ubuf__ half*,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_ge_scalar_sync(__ubuf__ uint8_t*,__ubuf__ float*,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_ge_scalar
 
 ## 产品支持情况

@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_icache_preload"
+path: "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md"
+description: "从指令所在GM地址预加载数据到对应的cacheline中。"
+signature:
+  - function: "asc_icache_preload(const void*,int64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_icache_preload
 
 ## 产品支持情况
@@ -31,6 +48,17 @@
 开发者手动调用该接口，能够从指令所在GM地址预加载指令到ICache中。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_icache_preload(const void*,int64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len)

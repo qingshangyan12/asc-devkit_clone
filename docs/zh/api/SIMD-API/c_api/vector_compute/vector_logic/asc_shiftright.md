@@ -1,3 +1,120 @@
+---
+okftype: reference.api.cpp
+title: "asc_shiftright"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md"
+description: "对src中的每个元素执行右移，右移大小为value。"
+signature:
+  - function: "asc_shiftright(__ubuf__ int16_t*,__ubuf__ int16_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright(__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright(__ubuf__ int32_t*,__ubuf__ int32_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright(__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright_round(__ubuf__ int16_t*,__ubuf__ int16_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright_round(__ubuf__ int32_t*,__ubuf__ int32_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright(__ubuf__ int16_t*,__ubuf__ int16_t*,int32_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright(__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright(__ubuf__ int32_t*,__ubuf__ int32_t*,int32_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright(__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint32_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright_round(__ubuf__ int16_t*,__ubuf__ int16_t*,int32_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright_round(__ubuf__ int32_t*,__ubuf__ int32_t*,int32_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_shiftright_sync(__ubuf__ int16_t*,__ubuf__ int16_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_shiftright_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_shiftright_sync(__ubuf__ int32_t*,__ubuf__ int32_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_shiftright_sync(__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_shiftright_round_sync(__ubuf__ int16_t*,__ubuf__ int16_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_shiftright_round_sync(__ubuf__ int32_t*,__ubuf__ int32_t*,int32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
 
 # asc_shiftright
 

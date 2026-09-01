@@ -84,7 +84,9 @@ __aicore__ inline void s2_split_matrix_a_to_l0a(__ca__ bfloat16_t* dst, __cbuf__
     int16_t src_stride = ceil_div(M, BLOCK_CUBE);
     uint16_t dst_stride = ceil_div(M, BLOCK_CUBE);
 
+    //! [asc_copy_l12l0a]
     asc_copy_l12l0a(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    //! [asc_copy_l12l0a]
 
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
 }
@@ -120,16 +122,20 @@ __aicore__ inline void s2_compute_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t
     bool c_matrix_source = false;
     bool c_matrix_init_val = true;
 
+    //! [asc_mmad.float.bfloat16_t.c_matrix_source_false.c_matrix_init_val_true]
     asc_mmad(
         c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
         c_matrix_init_val);
+    //! [asc_mmad.float.bfloat16_t.c_matrix_source_false.c_matrix_init_val_true]
 
     c_matrix_source = false;
     c_matrix_init_val = false;
 
+    //! [asc_mmad.float.bfloat16_t.c_matrix_source_false.c_matrix_init_val_true]
     asc_mmad(
         c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
         c_matrix_init_val);
+    //! [asc_mmad.float.bfloat16_t.c_matrix_source_false.c_matrix_init_val_true]
 
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
 }

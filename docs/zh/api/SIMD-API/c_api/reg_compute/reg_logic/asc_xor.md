@@ -1,3 +1,53 @@
+---
+okftype: reference.api.cpp
+title: "asc_xor"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_xor.md"
+description: "asc_xor支持两种接口：。"
+signature:
+  - function: "asc_xor(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "int32_t"
+        - "uint32_t"
+  - function: "asc_xor(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "int16_t"
+        - "uint16_t"
+        - "int32_t"
+        - "uint32_t"
+  - function: "asc_xor(vector_bool,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+  - function: "asc_xor(vector_bool&,vector_bool,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_xor
 
 ## 产品支持情况
@@ -46,6 +96,22 @@ def asc_xor(dst, src0, src1, mask):
 ## 函数原型
 
 ### 矢量数据寄存器按位异或
+```yaml
+api_signature:
+  - function: "asc_xor(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+  - function: "asc_xor(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_logic.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果。

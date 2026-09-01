@@ -1,3 +1,113 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l0c2ub"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md"
+description: "将矩阵计算结果从L0C Buffer搬运至Unified Buffer，搬运过程中可同步支持随路量化、随路激活、随路格式转换（Nz2ND/Nz2DN）等能力组合。"
+signature:
+  - function: "asc_copy_l0c2ub(__ubuf__ <dst_dtype>*,__cc__ <src_dtype>*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+    dtype:
+      variants:
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "int4b_t"
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "int8_t"
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "uint8_t"
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "half"
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "bfloat16_t"
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "int32_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "int4b_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "int8_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "uint8_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "hifloat8_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "fp8_e4m3fn_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "half"
+        -
+          src_dtype: "float"
+          dst_dtype: "bfloat16_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "float"
+  - function: "asc_copy_l0c2ub_sync(__ubuf__ <dst_dtype>*,__cc__ <src_dtype>*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+    dtype:
+      variants:
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "int4b_t"
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "int8_t"
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "uint8_t"
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "half"
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "bfloat16_t"
+        -
+          src_dtype: "int32_t"
+          dst_dtype: "int32_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "int4b_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "int8_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "uint8_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "hifloat8_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "fp8_e4m3fn_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "half"
+        -
+          src_dtype: "float"
+          dst_dtype: "bfloat16_t"
+        -
+          src_dtype: "float"
+          dst_dtype: "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_l0c2ub
 
 ## 产品支持情况
@@ -77,6 +187,22 @@
 ## 函数原型
 
 ### 模板原型（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_copy_l0c2ub(__ubuf__ <dst_dtype>*,__cc__ <src_dtype>*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l0c2ub_sync(__ubuf__ <dst_dtype>*,__cc__ <src_dtype>*,uint16_t,uint16_t,uint32_t,uint16_t,uint8_t,bool,uint8_t,uint8_t,uint64_t,uint8_t,bool,bool,uint64_t,uint8_t,bool,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_copy_l0c2ub(__ubuf__ <dst_dtype>* dst,

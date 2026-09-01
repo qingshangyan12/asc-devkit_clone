@@ -1,3 +1,14 @@
+---
+okftype: reference.api.cpp
+title: "asc_override_strategy"
+path: "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md"
+description: null
+signature:
+  []
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_override_strategy
 
 asc_override_strategy用于表示饱和控制策略，在调用[asc_set_saturation_strategy](../../spr/asc_set_saturation_strategy.md)和[asc_get_saturation_strategy](../../spr/asc_get_saturation_strategy.md)时使用。该策略影响CAST类全局饱和配置是否生效。

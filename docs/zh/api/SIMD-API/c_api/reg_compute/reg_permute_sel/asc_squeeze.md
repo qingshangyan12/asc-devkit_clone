@@ -1,3 +1,63 @@
+---
+okftype: reference.api.cpp
+title: "asc_squeeze"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md"
+description: "将`src`中被`mask`选择的有效元素作为返回值返回或依次复制到`dst`中。有效元素在计算结果中从低到高连续排列，剩余位置元素置为0。"
+signature:
+  - function: "asc_squeeze(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_squeeze(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+    dtype:
+      values:
+        - "int8_t"
+        - "uint8_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/squeeze"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_squeeze(vector_float&,vector_float,vector_bool)"
+        snippets:
+          - id: "asc_squeeze"
+            file: "squeeze.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_squeeze
 
 ## 产品支持情况
@@ -33,6 +93,22 @@
 本接口仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_squeeze(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+  - function: "asc_squeeze(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_permute_sel.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_mask_spr"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md"
+description: "从SPR（Special Purpose Register）中读取mask值，并按数据类型格式化后返回。"
+signature:
+  - function: "asc_get_mask_spr_b16()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_mask.h"
+  - function: "asc_get_mask_spr_b32()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_mask.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_mask_spr
 
 ## 产品支持情况
@@ -32,6 +54,22 @@
 - 对于b32数据类型：从SPR读取mask共64bit数据，将每个bit扩展为4bit，拼成256bit掩码寄存器返回。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_mask_spr_b16()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_mask.h"
+  - function: "asc_get_mask_spr_b32()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_mask.h"
+```
+
 
 ```c
 __simd_callee__ inline vector_bool asc_get_mask_spr_b16()

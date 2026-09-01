@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign_brc_elem_postupdate"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md"
+description: "从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素，并将该元素广播到整个矢量数据寄存器。搬运过程中数据格式和内容保持不变。接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+signature:
+  - function: "asc_loadalign_brc_elem_postupdate(vector_<dtype>&,__ubuf__ <dtype>*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_loadalign_brc_elem_postupdate
 
 ## 产品支持情况
@@ -31,6 +65,16 @@
 本接口仅在AIV上生效，非AIV调用直接返回。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_loadalign_brc_elem_postupdate(vector_<dtype>&,__ubuf__ <dtype>*&,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_loadalign_brc_elem_postupdate(vector_<dtype>& dst,

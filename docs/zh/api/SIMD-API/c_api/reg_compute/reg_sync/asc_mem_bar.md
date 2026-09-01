@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_mem_bar"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md"
+description: "Reg矢量计算内不同流水线之间的同步指令。该同步指令指定源流水线和目的流水线，如下图所示，目的流水线将等待源流水线上所有指令完成才进行执行。 读写场景下，当读指令使用的寄存器和写指令使用的寄存器相同时，可以触发寄存器保序，指令将会按照代码顺序执行，不需要插入同步指令，而当使用的寄存器不同时，如果要确保读写指令执行，则需要插入同步指令。写写场景同理。"
+signature:
+  - function: "asc_mem_bar(MEM_TYPE)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_sync.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_mem_bar
 
 ## 产品支持情况
@@ -34,6 +50,16 @@ Reg矢量计算内不同流水线之间的同步指令。该同步指令指定�
 本接口仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_mem_bar(MEM_TYPE)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_sync.h"
+```
+
 
 ```cpp
 __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)

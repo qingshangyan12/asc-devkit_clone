@@ -1,3 +1,67 @@
+---
+okftype: reference.api.cpp
+title: "asc_scatter（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_scatter_deprecated.md"
+description: "**该接口已废弃。请使用[asc_scatter](../reg_compute/scatter/asc_scatter.md)实现此功能。"
+signature:
+  - function: "asc_scatter(vector_int8_t&,__ubuf__ int8_t*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_uint8_t&,__ubuf__ uint8_t*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_int16_t&,__ubuf__ int16_t*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_uint16_t&,__ubuf__ uint16_t*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_int32_t&,__ubuf__ int32_t*,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_uint32_t&,__ubuf__ uint32_t*,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_bfloat16_t&,__ubuf__ bfloat16_t*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_half&,__ubuf__ half*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_float&,__ubuf__ float*,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_scatter（废弃）
 
 ## 产品支持情况
@@ -33,6 +97,64 @@
 ![scatter功能说明](../figures/reg_scatter.png)
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_scatter(vector_int8_t&,__ubuf__ int8_t*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_uint8_t&,__ubuf__ uint8_t*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_int16_t&,__ubuf__ int16_t*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_uint16_t&,__ubuf__ uint16_t*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_int32_t&,__ubuf__ int32_t*,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_uint32_t&,__ubuf__ uint32_t*,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_bfloat16_t&,__ubuf__ bfloat16_t*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_half&,__ubuf__ half*,vector_uint16_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+  - function: "asc_scatter(vector_float&,__ubuf__ float*,vector_uint32_t,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+        header: "/include/c_api/reg_compute/scatter/ub_scatter.h"
+```
+
 
 ```cpp
 __simd_callee__ inline void asc_scatter(vector_int8_t& src, __ubuf__ int8_t* dst, vector_uint16_t index, vector_bool mask)

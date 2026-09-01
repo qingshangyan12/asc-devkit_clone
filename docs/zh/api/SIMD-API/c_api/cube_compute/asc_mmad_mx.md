@@ -1,3 +1,59 @@
+---
+okftype: reference.api.cpp
+title: "asc_mmad_mx"
+path: "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md"
+description: "本接口用于完成带有量化系数的矩阵乘加计算（MmadMx），即左矩阵A和右矩阵B均有对应的量化系数矩阵，左量化系数矩阵ScaleA和右量化系数矩阵ScaleB。"
+signature:
+  - function: "asc_mmad_mx(__cc__ float*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+    dtype:
+      variants:
+        -
+          a_dtype: "fp4x2_e1m2_t"
+          b_dtype: "fp4x2_e1m2_t"
+        -
+          a_dtype: "fp4x2_e1m2_t"
+          b_dtype: "fp4x2_e2m1_t"
+        -
+          a_dtype: "fp4x2_e2m1_t"
+          b_dtype: "fp4x2_e1m2_t"
+        -
+          a_dtype: "fp4x2_e2m1_t"
+          b_dtype: "fp4x2_e2m1_t"
+        -
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e5m2_t"
+        -
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e5m2_t"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_mmad_mx(__cc__ float*,__ca__ <a_matrix_type>*,__cb__ <b_matrix_type>*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool,bool)"
+        snippets:
+          - id: "asc_mmad_mx.fp4x2_e1m2_t.fp4x2_e2m1_t.c_matrix_source_false.c_matrix_init_val_true"
+            file: "mmad_mx.asc"
+          - id: "asc_mmad_mx.fp4x2_e2m1_t.fp4x2_e1m2_t.c_matrix_source_true.c_matrix_init_val_false"
+            file: "mmad_mx.asc"
+          - id: "asc_mmad_mx.fp8_e4m3fn_t.fp8_e5m2_t.c_matrix_source_false.c_matrix_init_val_true"
+            file: "mmad_mx.asc"
+          - id: "asc_mmad_mx.fp8_e4m3fn_t.fp8_e5m2_t.c_matrix_source_false.c_matrix_init_val_false"
+            file: "mmad_mx.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_mmad_mx
 
 ## 产品支持情况
@@ -54,6 +110,16 @@ $$
 ## 函数原型
 
 **占位符形式：**
+```yaml
+api_signature:
+  - function: "asc_mmad_mx(__cc__ float*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,asc_unit_flag_mode,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+```
+
 
 ```c
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,

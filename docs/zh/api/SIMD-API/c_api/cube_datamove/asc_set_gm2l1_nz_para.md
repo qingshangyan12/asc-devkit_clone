@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_gm2l1_nz_para"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md"
+description: "本接口用于配置从Global Memory搬运至L1 Buffer过程中，ND2Nz或DN2Nz格式转换所需的目的地址布局，包括矩阵数量、目的Nz矩阵中相邻行的步长、相邻Z矩阵的步长以及相邻Nz矩阵的步长。配置完成后，由后续调用的[asc_copy_gm2l1_nd2nz](./asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](./asc_copy_gm2l1_dn2nz.md)接口使用。"
+signature:
+  - function: "asc_set_gm2l1_nz_para(uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_set_gm2l1_nz_para(uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_gm2l1_nz_para
 
 ## 产品支持情况
@@ -33,6 +55,22 @@
 本接口为矩阵搬入相关配置接口，仅在AIC上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_gm2l1_nz_para(uint16_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_set_gm2l1_nz_para(uint64_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+```
+
 
 ```c
 __aicore__ inline void asc_set_gm2l1_nz_para(uint16_t matrix_num, uint16_t dst_nz_n_stride, uint16_t dst_nz_c0_stride, uint16_t dst_nz_matrix_stride);

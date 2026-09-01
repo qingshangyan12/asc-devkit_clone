@@ -1,3 +1,82 @@
+---
+okftype: reference.api.cpp
+title: "asc_storealign_intlv"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_intlv.md"
+description: "将两个矢量数据寄存器中的数据按元素顺序交织后连续对齐搬出到Unified Buffer（UB）。单次搬出量为`2 × VL`（共512字节），不支持配置掩码。搬运过程中数据格式与内容保持不变。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。"
+signature:
+  - function: "asc_storealign_intlv(__ubuf__ <dtype>*,vector_<dtype>,vector_<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e1m2_t"
+        - "fp4x2_e2m1_t"
+        - "hifloat8_t"
+        - "fp8_e4m3fn_t"
+        - "fp8_e5m2_t"
+        - "fp8_e8m0_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+  - function: "asc_storealign_intlv(__ubuf__ <dtype>*,vector_<dtype>,vector_<dtype>,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e1m2_t"
+        - "fp4x2_e2m1_t"
+        - "hifloat8_t"
+        - "fp8_e4m3fn_t"
+        - "fp8_e5m2_t"
+        - "fp8_e8m0_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+  - function: "asc_storealign_intlv(__ubuf__ <dtype>*,vector_<dtype>,vector_<dtype>,addr_reg)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e1m2_t"
+        - "fp4x2_e2m1_t"
+        - "hifloat8_t"
+        - "fp8_e4m3fn_t"
+        - "fp8_e5m2_t"
+        - "fp8_e8m0_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_storealign_intlv
 
 ## 产品支持情况
@@ -39,6 +118,16 @@
 ## 函数原型
 
 ### 对齐搬出模式
+```yaml
+api_signature:
+  - function: "asc_storealign_intlv(__ubuf__ <dtype>*,vector_<dtype>,vector_<dtype>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst_align32b,
@@ -59,6 +148,16 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
 ```
 
 ### 立即数偏移搬出模式
+```yaml
+api_signature:
+  - function: "asc_storealign_intlv(__ubuf__ <dtype>*,vector_<dtype>,vector_<dtype>,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst_align32b,
@@ -81,6 +180,16 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst_align32b,
 ```
 
 ### 地址寄存器偏移搬出模式
+```yaml
+api_signature:
+  - function: "asc_storealign_intlv(__ubuf__ <dtype>*,vector_<dtype>,vector_<dtype>,addr_reg)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/store/storealign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_storealign_intlv(__ubuf__ <dtype>* dst_align32b,

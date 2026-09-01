@@ -26,118 +26,258 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_get_cmp_mask(__ubuf__ void*)
+ * @archs 2201
+ */
 __aicore__ inline void asc_get_cmp_mask(__ubuf__ void* dst);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_set_cmp_mask(__ubuf__ void*)
+ * @archs 2201
+ */
 __aicore__ inline void asc_set_cmp_mask(__ubuf__ void* sel_mask);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_eq(__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_eq(
     __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_eq(__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_eq(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_eq(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_eq(
     __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_eq(__ubuf__ uint8_t*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_eq(
     __ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_eq(__ubuf__ uint8_t*,__ubuf__ int32_t*,__ubuf__ int32_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_eq(
     __ubuf__ uint8_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_gt_scalar(__ubuf__ uint8_t*,__ubuf__ half*,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gt_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_gt_scalar(__ubuf__ uint8_t*,__ubuf__ float*,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gt_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_ne(__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_ne(
     __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_ne(__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_ne(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_ne(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_ne(
     __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_ne(__ubuf__ uint8_t*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_ne(
     __ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_ge_scalar(__ubuf__ uint8_t*,__ubuf__ half*,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_ge_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_ge_scalar(__ubuf__ uint8_t*,__ubuf__ float*,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_ge_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_eq_scalar(__ubuf__ uint8_t*,__ubuf__ half*,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_eq_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_eq_scalar(__ubuf__ uint8_t*,__ubuf__ float*,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_eq_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_eq_scalar(__ubuf__ uint8_t*,__ubuf__ int32_t*,int32_t,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_eq_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_lt_scalar(__ubuf__ uint8_t*,__ubuf__ half*,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_lt_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_lt_scalar(__ubuf__ uint8_t*,__ubuf__ float*,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_lt_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_ge(__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_ge(
     __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_ge(__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_ge(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_ge(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_ge(
     __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_ge(__ubuf__ uint8_t*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_ge(
     __ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_lt(__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_lt(
     __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_lt(__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_lt(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_lt(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_lt(
     __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_lt(__ubuf__ uint8_t*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_lt(
     __ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
@@ -151,46 +291,96 @@ __aicore__ inline void asc_ne_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_gt(__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gt(
     __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_gt(__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gt(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_gt(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gt(
     __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_gt(__ubuf__ uint8_t*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gt(
     __ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_le(__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_le(
     __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_le(__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_le(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
     uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_le(__ubuf__ uint8_t*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_le(
     __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_le(__ubuf__ uint8_t*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_le(
     __ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_le_scalar(__ubuf__ uint8_t*,__ubuf__ half*,half,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_le_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_compare
+ * @function asc_le_scalar(__ubuf__ uint8_t*,__ubuf__ float*,float,uint8_t,uint16_t,uint16_t,uint16_t,uint16_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_le_scalar(
     __ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);

@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: "asc_abs_sub"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md"
+description: "根据`mask`对源操作数`src0`、`src1`按元素相减后取绝对值，得到计算结果。"
+signature:
+  - function: "asc_abs_sub(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+    dtype:
+      values:
+        - "half"
+        - "float"
+  - function: "asc_abs_sub(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+    dtype:
+      values:
+        - "half"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_abs_sub
 
 ## 产品支持情况
@@ -33,6 +63,22 @@ dst_i = \lvert src0_i - src1_i \rvert
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_abs_sub(vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_abs_sub(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

@@ -1,3 +1,85 @@
+---
+okftype: reference.api.cpp
+title: "asc_loadalign_deintlv"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md"
+description: "从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。"
+signature:
+  - function: "asc_loadalign_deintlv(vector_<dtype>&,vector_<dtype>&,__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_loadalign_deintlv(vector_<dtype>&,vector_<dtype>&,__ubuf__ <dtype>*,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_loadalign_deintlv(vector_<dtype>&,vector_<dtype>&,__ubuf__ <dtype>*,addr_reg)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e8m0_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_loadalign_deintlv
 
 ## 产品支持情况
@@ -37,6 +119,16 @@
 ## 函数原型
 
 ### 对齐搬入模式
+```yaml
+api_signature:
+  - function: "asc_loadalign_deintlv(vector_<dtype>&,vector_<dtype>&,__ubuf__ <dtype>*)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
@@ -58,6 +150,16 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
 ```
 
 ### 立即数偏移搬入模式
+```yaml
+api_signature:
+  - function: "asc_loadalign_deintlv(vector_<dtype>&,vector_<dtype>&,__ubuf__ <dtype>*,int32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
@@ -81,6 +183,16 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
 ```
 
 ### 地址寄存器偏移搬入模式
+```yaml
+api_signature:
+  - function: "asc_loadalign_deintlv(vector_<dtype>&,vector_<dtype>&,__ubuf__ <dtype>*,addr_reg)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/load/loadalign.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,

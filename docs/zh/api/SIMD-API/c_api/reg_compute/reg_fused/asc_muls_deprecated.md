@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_muls (废弃)"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_muls_deprecated.md"
+description: "对源操作数src和value进行乘法运算再按照数据类型转换的ROUND舍入模式转成half类型，根据mask将结果写入目的操作数dst。"
+signature:
+  - function: "asc_muls(vector_half&,vector_float,float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_fused.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_muls_v2(vector_half&,vector_float,float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_fused.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_muls (废弃)
 
 ## 产品支持情况
@@ -33,6 +55,22 @@ dst_i = round\_to\_half(src_i \times value)
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_muls(vector_half&,vector_float,float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_fused.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+  - function: "asc_muls_v2(vector_half&,vector_float,float,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_fused.h"
+        header: "/include/c_api/reg_compute/compute/reg_fused.h"
+```
+
 
 ```cpp
 // 数据写入索引为偶数的位置

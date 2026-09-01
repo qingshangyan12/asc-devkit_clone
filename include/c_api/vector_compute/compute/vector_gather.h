@@ -26,58 +26,138 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ uint32_t*,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ uint32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint32_t*,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ half*,__ubuf__ half*,__ubuf__ uint32_t*,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ half*,__ubuf__ half*,__ubuf__ uint32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ half* dst, __ubuf__ half* src, __ubuf__ uint32_t* src_offset, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ bfloat16_t*,__ubuf__ bfloat16_t*,__ubuf__ uint32_t*,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ bfloat16_t*,__ubuf__ bfloat16_t*,__ubuf__ uint32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* src, __ubuf__ uint32_t* src_offset, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ int32_t*,__ubuf__ int32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ int32_t*,__ubuf__ int32_t*,__ubuf__ uint32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ float*,__ubuf__ float*,__ubuf__ uint32_t*,uint16_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather(__ubuf__ float*,__ubuf__ float*,__ubuf__ uint32_t*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather(
     __ubuf__ float* dst, __ubuf__ float* src, __ubuf__ uint32_t* src_offset, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather_datablock(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather_datablock(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t dst_block_stride, uint8_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_gather
+ * @function asc_gather_datablock(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_gather_datablock(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride,
     uint8_t dst_block_stride, uint8_t repeat);

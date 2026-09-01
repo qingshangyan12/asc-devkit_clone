@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_sync_subblock_arrive"
+path: "docs/zh/api/SIMD-API/c_api/sync/asc_sync_subblock_arrive.md"
+description: "本接口与[asc_sync_subblock_wait](asc_sync_subblock_wait.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1）。"
+signature:
+  - function: "asc_sync_subblock_arrive(pipe_t,int64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/sync/sync.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_sync_subblock_arrive
 
 ## 产品支持情况
@@ -34,6 +51,17 @@
 核间同步具体使用方法，请参考[调用示例](#调用示例)。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_sync_subblock_arrive(pipe_t,int64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/sync/sync.h"
+```
+
 
 ```c
 __aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe,

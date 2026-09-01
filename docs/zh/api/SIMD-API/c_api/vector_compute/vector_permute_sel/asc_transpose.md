@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: "asc_transpose"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md"
+description: "用于实现16*16的二维矩阵数据块转置。"
+signature:
+  - function: "asc_transpose(__ubuf__ int16_t*,__ubuf__ int16_t*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_transpose(__ubuf__ uint16_t*,__ubuf__ uint16_t*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_transpose_sync(__ubuf__ int16_t*,__ubuf__ int16_t*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_transpose_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_transpose
 
 ## 产品支持情况
@@ -29,6 +67,24 @@
 用于实现16*16的二维矩阵数据块转置。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_transpose(__ubuf__ int16_t*,__ubuf__ int16_t*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+  - function: "asc_transpose(__ubuf__ uint16_t*,__ubuf__ uint16_t*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+        header: "/include/c_api/vector_compute/compute/vector_permute_sel.h"
+```
+
 
   ```cpp
     __aicore__ inline void asc_transpose(__ubuf__ int16_t* dst, __ubuf__ int16_t* src)
@@ -36,6 +92,24 @@
   ```
 
 - 同步计算
+```yaml
+api_signature:
+  - function: "asc_transpose_sync(__ubuf__ int16_t*,__ubuf__ int16_t*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_transpose_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+```
+
   ```cpp
     __aicore__ inline void asc_transpose_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src)
     __aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src)

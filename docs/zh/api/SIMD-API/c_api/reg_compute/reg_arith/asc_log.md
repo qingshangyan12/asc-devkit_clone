@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: "asc_log"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_log.md"
+description: "根据`mask`将源操作数`src`按元素取自然对数，将结果写入目的操作数`dst`。"
+signature:
+  - function: "asc_log(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "half"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_log
 
 ## 产品支持情况
@@ -33,6 +53,16 @@ dst_i = ln(src_i)
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_log(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_log(vector_<dtype>& dst,

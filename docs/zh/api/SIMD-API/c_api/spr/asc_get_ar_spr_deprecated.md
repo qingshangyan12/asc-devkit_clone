@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_ar_spr (废弃)"
+path: "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md"
+description: "**该接口已废弃，请使用[asc_get_squeeze_status](asc_get_squeeze_status.md)实现此功能。"
+signature:
+  - function: "asc_get_ar_spr()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/spr/spr.h"
+        header: "/include/c_api/spr/spr.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_ar_spr (废弃)
 
 ## 产品支持情况
@@ -31,6 +47,16 @@
 读取指定特殊寄存器的值。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_ar_spr()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/spr/spr.h"
+        header: "/include/c_api/spr/spr.h"
+```
+
 
 ```cpp
 __aicore__ inline int64_t asc_get_ar_spr()

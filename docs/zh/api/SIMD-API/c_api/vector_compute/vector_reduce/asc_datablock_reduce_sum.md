@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_datablock_reduce_sum"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md"
+description: "对每个DataBlock内所有元素求和。"
+signature:
+  - function: "asc_datablock_reduce_sum(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_datablock_reduce_sum(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_datablock_reduce_sum(__ubuf__ half*,__ubuf__ half*,uint8_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_datablock_reduce_sum(__ubuf__ float*,__ubuf__ float*,uint8_t,uint16_t,uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_reduce.h"
+        header: "/include/c_api/vector_compute/compute/vector_reduce.h"
+  - function: "asc_datablock_reduce_sum_sync(__ubuf__ half*,__ubuf__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_datablock_reduce_sum_sync(__ubuf__ float*,__ubuf__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_datablock_reduce_sum
 
 ## 产品支持情况

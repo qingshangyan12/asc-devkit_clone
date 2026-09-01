@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: "asc_hif82half"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md"
+description: "`src`中hifloat8_t数据类型的元素转换为half数据类型，并将结果写入dst。"
+signature:
+  - function: "asc_hif82half(vector_half&,vector_hifloat8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_hif82half(vector_half&,vector_hifloat8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_hif82half
 
 ## 产品支持情况
@@ -44,6 +66,22 @@ def asc_hif82half(dst, src, mask, src_pos):
 本接口为`reg`矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_hif82half(vector_half&,vector_hifloat8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::EVEN>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_hif82half(vector_half&,vector_hifloat8_t,vector_bool,std::integral_constant<asc_position_mode,asc_position_mode::ODD>)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```c
 __simd_callee__ inline void asc_hif82half(vector_half& dst,

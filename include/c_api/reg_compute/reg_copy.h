@@ -25,58 +25,188 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_int8_t&,vector_int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_int8_t& dst, vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_uint8_t&,vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_int16_t&,vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_uint16_t&,vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_half&,vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_half& dst, vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_int32_t&,vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_uint32_t&,vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_float&,vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_bfloat16_t&,vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_bool&,vector_bool,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_bool&,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_bool src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_bool&,vector_uint16_t,int16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint16_t src, int16_t part);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_copy(vector_bool&,vector_uint32_t,int16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline void asc_copy(vector_bool& dst, vector_uint32_t src, int16_t part);
 
 // ==========asc_mask return-value overloads(u8/s8/half/u16/s16/float/u32/s32/bf16/bool)==========
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_mask(vector_int8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int8_t asc_mask(vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_mask(vector_uint8_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint8_t asc_mask(vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_mask(vector_int16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int16_t asc_mask(vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_mask(vector_uint16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint16_t asc_mask(vector_uint16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_mask(vector_half,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_half asc_mask(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_mask(vector_int32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_int32_t asc_mask(vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_mask(vector_uint32_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_uint32_t asc_mask(vector_uint32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_mask(vector_float,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_float asc_mask(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_mask(vector_bfloat16_t,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bfloat16_t asc_mask(vector_bfloat16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_mask(vector_bool,vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bool asc_mask(vector_bool src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_mask(vector_bool)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bool asc_mask(vector_bool src);
 
 // ==========asc_extract_mask return-value overloads(u16/u32)==========
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_extract_mask(vector_uint16_t,int16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bool asc_extract_mask(vector_uint16_t src, int16_t part);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_copy
+ * @function asc_extract_mask(vector_uint32_t,int16_t)
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bool asc_extract_mask(vector_uint32_t src, int16_t part);
 
 #endif

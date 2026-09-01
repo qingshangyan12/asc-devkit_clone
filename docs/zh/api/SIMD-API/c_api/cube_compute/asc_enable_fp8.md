@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_enable_fp8"
+path: "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_fp8.md"
+description: "用于设置Mmad计算开启FP8模式。该接口会关闭HiF8模式（与[asc_enable_hif8](asc_enable_hif8.md)相反），开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。"
+signature:
+  - function: "asc_enable_fp8()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_enable_fp8
 
 ## 产品支持情况
@@ -29,6 +45,16 @@
 用于设置Mmad计算开启FP8模式。该接口会关闭HiF8模式（与[asc_enable_hif8](asc_enable_hif8.md)相反），开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_enable_fp8()"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_enable_fp8()

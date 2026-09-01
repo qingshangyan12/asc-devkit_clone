@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_or"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md"
+description: "每对元素按位或运算。"
+signature:
+  - function: "asc_or(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_or(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_or(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_or(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_or_sync(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_or_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_or
 
 ## 产品支持情况
@@ -34,18 +80,66 @@ $$
 ## 函数原型
 
 - 前n个数据计算
+```yaml
+api_signature:
+  - function: "asc_or(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_or(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
   ```cpp
   __aicore__ inline void asc_or(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
   __aicore__ inline void asc_or(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
   ```
 
 - 高维切分计算
+```yaml
+api_signature:
+  - function: "asc_or(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+  - function: "asc_or(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_logic.h"
+        header: "/include/c_api/vector_compute/compute/vector_logic.h"
+```
+
   ```cpp
   __aicore__ inline void asc_or(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
   __aicore__ inline void asc_or(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride)
   ```
 
 - 同步计算
+```yaml
+api_signature:
+  - function: "asc_or_sync(__ubuf__ int16_t*,__ubuf__ int16_t*,__ubuf__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_or_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+```
+
   ```cpp
   __aicore__ inline void asc_or_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count)
   __aicore__ inline void asc_or_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)

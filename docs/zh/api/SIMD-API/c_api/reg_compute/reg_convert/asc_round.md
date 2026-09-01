@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: "asc_round"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_round.md"
+description: "将`src`中的浮点数元素按照ROUND（四舍五入）舍入模式舍入到整数值，结果仍保持原浮点数据类型。接口支持通过函数返回值返回结果，也支持通过引用和参数输出结果：前者直接返回舍入结果，后者将舍入结果写入`dst`。舍入规则等价于C标准库`round`语义：舍入到最接近的整数；当输入值恰好位于两个整数中间时，向远离0的方向舍入（如1.4 -> 1.0、1.5 -> 2.0、-1.5 -> -2.0），整数值保持不变。未被`mask`筛选的元素置零。"
+signature:
+  - function: "asc_round(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      values:
+        - "half"
+        - "bfloat16_t"
+        - "float"
+  - function: "asc_round(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+    dtype:
+      values:
+        - "half"
+        - "bfloat16_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_round
 
 ## 产品支持情况
@@ -31,6 +63,22 @@
 关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_round(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+  - function: "asc_round(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/reg_convert.h"
+```
+
 
 ```cpp
 // 通过函数返回值返回结果

@@ -1,3 +1,141 @@
+---
+okftype: reference.api.cpp
+title: "asc_mmad（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_deprecated.md"
+description: "**入参`unit_flag`类型为`uint8_t`的`asc_mmad`接口以及`asc_mmad_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad](../cube_compute/asc_mmad.md)接口替代；原同步功能请通过新接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/asc_sync.md)。"
+signature:
+  - function: "asc_mmad(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+    dtype:
+      variants:
+        -
+          c_dtype: "int32_t"
+          a_dtype: "int8_t"
+          b_dtype: "int8_t"
+        -
+          c_dtype: "float"
+          a_dtype: "hifloat8_t"
+          b_dtype: "hifloat8_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e5m2_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e5m2_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          c_dtype: "float"
+          a_dtype: "half"
+          b_dtype: "half"
+        -
+          c_dtype: "float"
+          a_dtype: "bfloat16_t"
+          b_dtype: "bfloat16_t"
+        -
+          c_dtype: "float"
+          a_dtype: "float"
+          b_dtype: "float"
+  - function: "asc_mmad_sync(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/composite/cube_compute_composite.h"
+        header: "/include/c_api/composite/cube_compute_composite.h"
+    dtype:
+      variants:
+        -
+          c_dtype: "int32_t"
+          a_dtype: "int8_t"
+          b_dtype: "int8_t"
+        -
+          c_dtype: "float"
+          a_dtype: "hifloat8_t"
+          b_dtype: "hifloat8_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e5m2_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e5m2_t"
+        -
+          c_dtype: "float"
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          c_dtype: "float"
+          a_dtype: "half"
+          b_dtype: "half"
+        -
+          c_dtype: "float"
+          a_dtype: "bfloat16_t"
+          b_dtype: "bfloat16_t"
+        -
+          c_dtype: "float"
+          a_dtype: "float"
+          b_dtype: "float"
+  - function: "asc_mmad(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers: []
+  - function: "asc_mmad(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers: []
+  - function: "asc_mmad_sync(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers: []
+  - function: "asc_mmad_sync(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers: []
+  - function: "asc_mmad_s4(__cc__ int32_t*,__ca__ int4b_t*,__cb__ int4b_t*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+  - function: "asc_mmad_s4(__cc__ int32_t*,__ca__ int4b_t*,__cb__ int4b_t*,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+  - function: "asc_mmad_s4_sync(__cc__ int32_t*,__ca__ int4b_t*,__cb__ int4b_t*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_compute_composite.h"
+        header: "/include/c_api/composite/cube_compute_composite.h"
+  - function: "asc_mmad_s4_sync(__cc__ int32_t*,__ca__ int4b_t*,__cb__ int4b_t*,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_compute_composite.h"
+        header: "/include/c_api/composite/cube_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_mmad（废弃）
 
 ## 产品支持情况
@@ -83,6 +221,22 @@ K0的取值为`32B / sizeof(dtype)`，`dtype`为矩阵的数据类型。当数�
 ### 函数原型（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 **占位符形式：**
+```yaml
+api_signature:
+  - function: "asc_mmad(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+  - function: "asc_mmad_sync(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/composite/cube_compute_composite.h"
+        header: "/include/c_api/composite/cube_compute_composite.h"
+```
+
 
 ```c
 __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
@@ -146,6 +300,26 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 ### 函数原型（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 - `asc_mmad`及`asc_mmad_sync`：
+```yaml
+api_signature:
+  - function: "asc_mmad(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers: []
+  - function: "asc_mmad(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers: []
+  - function: "asc_mmad_sync(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers: []
+  - function: "asc_mmad_sync(__cc__ <c_dtype>*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers: []
+```
+
 
   ```c
   __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
@@ -157,6 +331,34 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
   `c_dtype`、`a_dtype`、`b_dtype`支持以下组合：`float/bfloat16_t/bfloat16_t`、`float/half/half`、`float/float/float`和`int32_t/int8_t/int8_t`。
 
 - `asc_mmad_s4`及`asc_mmad_s4_sync`：
+```yaml
+api_signature:
+  - function: "asc_mmad_s4(__cc__ int32_t*,__ca__ int4b_t*,__cb__ int4b_t*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+  - function: "asc_mmad_s4(__cc__ int32_t*,__ca__ int4b_t*,__cb__ int4b_t*,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+  - function: "asc_mmad_s4_sync(__cc__ int32_t*,__ca__ int4b_t*,__cb__ int4b_t*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_compute_composite.h"
+        header: "/include/c_api/composite/cube_compute_composite.h"
+  - function: "asc_mmad_s4_sync(__cc__ int32_t*,__ca__ int4b_t*,__cb__ int4b_t*,uint16_t,uint16_t,uint16_t,uint8_t,uint8_t,uint8_t,bool,bool,bool,bool)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/cube_compute_composite.h"
+        header: "/include/c_api/composite/cube_compute_composite.h"
+```
+
 
   ```c
   __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)

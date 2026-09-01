@@ -1,3 +1,117 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_l12l0a_arch_3510（2D矩阵搬运）"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md"
+description: "负责完成矩阵计算所需的2D格式数据的搬运，搬运粒度为大小为512字节的数据分形，支持非转置与转置矩阵从L1 Buffer到L0A Buffer的数据搬运。"
+signature:
+  - function: "asc_copy_l12l0a(__ca__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_copy_l12l0a_sync(__ca__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_copy_l12l0a_transpose(__ca__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_copy_l12l0a_transpose_sync(__ca__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+    dtype:
+      values:
+        - "int4b_t"
+        - "int8_t"
+        - "uint8_t"
+        - "fp4x2_e2m1_t"
+        - "fp4x2_e1m2_t"
+        - "hifloat8_t"
+        - "fp8_e5m2_t"
+        - "fp8_e4m3fn_t"
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "bfloat16_t"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_copy_l12l0a(__ca__ int8_t*,__cbuf__ int8_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)"
+        snippets:
+          - id: "asc_copy_l12l0a"
+            file: "mmad_s1.h"
+      - function: "asc_copy_l12l0a(__ca__ bfloat16_t*,__cbuf__ bfloat16_t*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)"
+        snippets:
+          - id: "asc_copy_l12l0a"
+            file: "mmad_s2.h"
+timestamp: "2026-09-01"
+---
+
 # asc_copy_l12l0a_arch_3510（2D矩阵搬运）
 
 ## 产品支持情况
@@ -40,6 +154,22 @@
 ## 函数原型
 
 ### 2D搬运模式
+```yaml
+api_signature:
+  - function: "asc_copy_l12l0a(__ca__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0a_sync(__ca__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_copy_l12l0a(__ca__ <dtype>* dst,
@@ -79,6 +209,22 @@ __aicore__ inline void asc_copy_l12l0a(__ca__ half* dst,
 ```
 
 ### 2D转置搬运模式
+```yaml
+api_signature:
+  - function: "asc_copy_l12l0a_transpose(__ca__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_copy_l12l0a_transpose_sync(__ca__ <dtype>*,__cbuf__ <dtype>*,uint16_t,uint16_t,uint8_t,uint8_t,int16_t,uint16_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ <dtype>* dst,

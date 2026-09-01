@@ -42,29 +42,69 @@ __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_a
 
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_array);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_permute_sel
+ * @function asc_transpose(__ubuf__ int16_t*,__ubuf__ int16_t*)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_transpose(__ubuf__ int16_t* dst, __ubuf__ int16_t* src);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_permute_sel
+ * @function asc_transpose(__ubuf__ uint16_t*,__ubuf__ uint16_t*)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_transpose(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_permute_sel
+ * @function asc_select(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_select(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_permute_sel
+ * @function asc_select(__ubuf__ half*,__ubuf__ half*,__ubuf__ half*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_select(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_permute_sel
+ * @function asc_select(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint32_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_select(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_permute_sel
+ * @function asc_select(__ubuf__ float*,__ubuf__ float*,__ubuf__ float*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_select(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_permute_sel
+ * @function asc_squeeze(__ubuf__ uint16_t*,__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_squeeze(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,
     uint8_t src1_repeat_stride);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_permute_sel
+ * @function asc_squeeze(__ubuf__ uint32_t*,__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t,uint8_t)
+ * @archs 2201
+ */
 __aicore__ inline void asc_squeeze(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint8_t repeat, uint8_t dst_block_stride,
     uint8_t src0_block_stride, uint8_t src1_block_stride, uint8_t dst_repeat_stride, uint8_t src0_repeat_stride,

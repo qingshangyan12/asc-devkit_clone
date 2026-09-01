@@ -1,3 +1,85 @@
+---
+okftype: reference.api.cpp
+title: "asc_update_addr_reg"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md"
+description: "更新地址寄存器（[addr_reg](../../defs/type/data_type_definition.md#地址寄存器)），用于迭代寻址。"
+signature:
+  - function: "asc_update_addr_reg_b8(uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_update_addr_reg_b16(uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_update_addr_reg_b32(uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_update_addr_reg_b8(uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_update_addr_reg_b16(uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_update_addr_reg_b32(uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_update_addr_reg_b8(uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_update_addr_reg_b16(uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_update_addr_reg_b32(uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_update_addr_reg_b8(uint32_t,uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_update_addr_reg_b16(uint32_t,uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+  - function: "asc_update_addr_reg_b32(uint32_t,uint32_t,uint32_t,uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+        header: "/include/c_api/reg_compute/compute/reg_addr_reg.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_update_addr_reg
 
 ## 产品支持情况

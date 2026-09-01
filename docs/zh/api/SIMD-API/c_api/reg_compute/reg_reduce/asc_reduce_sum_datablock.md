@@ -1,3 +1,73 @@
+---
+okftype: reference.api.cpp
+title: "asc_reduce_sum_datablock"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum_datablock.md"
+description: "根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。"
+signature:
+  - function: "asc_reduce_sum_datablock(vector_<src_dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+    dtype:
+      variants:
+        -
+          dst_dtype: "int32_t"
+          src_dtype: "int16_t"
+        -
+          dst_dtype: "uint32_t"
+          src_dtype: "uint16_t"
+        -
+          dst_dtype: "half"
+          src_dtype: "half"
+        -
+          dst_dtype: "int32_t"
+          src_dtype: "int32_t"
+        -
+          dst_dtype: "uint32_t"
+          src_dtype: "uint32_t"
+        -
+          dst_dtype: "float"
+          src_dtype: "float"
+  - function: "asc_reduce_sum_datablock(vector_<dst_dtype>&,vector_<src_dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+    dtype:
+      variants:
+        -
+          dst_dtype: "int32_t"
+          src_dtype: "int16_t"
+        -
+          dst_dtype: "uint32_t"
+          src_dtype: "uint16_t"
+        -
+          dst_dtype: "half"
+          src_dtype: "half"
+        -
+          dst_dtype: "int32_t"
+          src_dtype: "int32_t"
+        -
+          dst_dtype: "uint32_t"
+          src_dtype: "uint32_t"
+        -
+          dst_dtype: "float"
+          src_dtype: "float"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_block"
+    archs:
+      - "3510"
+    signature:
+      - function: "asc_reduce_sum_datablock(vector_float&,vector_float,vector_bool)"
+        snippets:
+          - id: "asc_reduce_sum_datablock"
+            file: "reduce_block.asc"
+timestamp: "2026-09-01"
+---
+
 # asc_reduce_sum_datablock
 
 ## 产品支持情况
@@ -46,6 +116,22 @@ def asc_reduce_sum_datablock(dst, src, mask):
 ```
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_reduce_sum_datablock(vector_<src_dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+  - function: "asc_reduce_sum_datablock(vector_<dst_dtype>&,vector_<src_dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果

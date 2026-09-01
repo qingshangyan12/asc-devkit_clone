@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_store_atomic_config_v1"
+path: "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md"
+description: "设置原子操作启用位与原子操作类型的值。"
+signature:
+  - function: "asc_set_store_atomic_config_v1(uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/atomic/scalar_atomic.h"
+        header: "/include/c_api/atomic/scalar_atomic.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_store_atomic_config_v1
 
 ## 产品支持情况
@@ -29,6 +45,16 @@
 设置原子操作启用位与原子操作类型的值。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_set_store_atomic_config_v1(uint16_t,uint16_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/atomic/scalar_atomic.h"
+        header: "/include/c_api/atomic/scalar_atomic.h"
+```
+
 
 ```c
 __aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op)

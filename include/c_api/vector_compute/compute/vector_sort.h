@@ -28,15 +28,35 @@
 #endif
 __aicore__ inline void asc_get_vms4_sr(uint16_t sorted_num[4]);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_sort
+ * @function asc_bitsort(__ubuf__ half*,__ubuf__ half*,__ubuf__ uint32_t*,int32_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_sort
+ * @function asc_bitsort(__ubuf__ float*,__ubuf__ float*,__ubuf__ uint32_t*,int32_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ uint32_t* src1, int32_t repeat);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_sort
+ * @function asc_mrgsort4(__ubuf__ half*,__ubuf__ half*src[ASC_C_API_MRGSORT_ELEMENT_LEN],uint8_t,uint16_t,uint16_t,uint16_t,uint16_t,bool,uint8_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_mrgsort4(
     __ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,
     uint8_t valid_bit);
 
+/**
+ * @ingroup simd_c_api.vector_compute.vector_sort
+ * @function asc_mrgsort4(__ubuf__ float*,__ubuf__ float*src[ASC_C_API_MRGSORT_ELEMENT_LEN],uint8_t,uint16_t,uint16_t,uint16_t,uint16_t,bool,uint8_t)
+ * @archs 3510 2201
+ */
 __aicore__ inline void asc_mrgsort4(
     __ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0,
     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension,

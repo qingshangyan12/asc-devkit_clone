@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: "asc_fill_l1"
+path: "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md"
+description: "将一个标量填充值写入L1 Buffer的目的地址，并将填充值广播到多个32字节分形块中，可用于L1 Buffer的内存初始化。需要通过[asc_fill_value_config](../defs/union/asc_fill_value_config.md)配置的重复次数、单次分形块数、相邻重复之间的间隔。"
+signature:
+  - function: "asc_fill_l1(__cbuf__ <dst_dtype>*,<value_dtype>,const asc_fill_value_config&)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+    dtype:
+      variants:
+        -
+          dst_dtype: "bfloat16_t"
+          value_dtype: "half"
+        -
+          dst_dtype: "bfloat16_t"
+          value_dtype: "bfloat16_t"
+        -
+          dst_dtype: "bfloat16_t"
+          value_dtype: "uint32_t"
+  - function: "asc_fill_l1_sync(__cbuf__ <dst_dtype>*,<value_dtype>,const asc_fill_value_config&)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+    dtype:
+      variants:
+        -
+          dst_dtype: "bfloat16_t"
+          value_dtype: "half"
+        -
+          dst_dtype: "bfloat16_t"
+          value_dtype: "bfloat16_t"
+        -
+          dst_dtype: "bfloat16_t"
+          value_dtype: "uint32_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_fill_l1
 
 ## 产品支持情况
@@ -31,6 +77,24 @@
 本接口仅在AIC上执行有效。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_fill_l1(__cbuf__ <dst_dtype>*,<value_dtype>,const asc_fill_value_config&)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/cube_datamove/cube_datamove.h"
+  - function: "asc_fill_l1_sync(__cbuf__ <dst_dtype>*,<value_dtype>,const asc_fill_value_config&)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/composite/cube_datamove_composite.h"
+```
+
 
 ```cpp
 __aicore__ inline void asc_fill_l1(__cbuf__ <dst_dtype>* dst,

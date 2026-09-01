@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_block_num（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_get_block_num_deprecated.md"
+description: "**该接口已废弃，请使用[内置变量block_num](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#内置变量)替代。"
+signature:
+  - function: "asc_get_block_num()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/utils/sys_var.h"
+        header: "/include/c_api/utils/sys_var.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_block_num（废弃）
 
 ## 产品支持情况
@@ -39,6 +56,17 @@ uint32_t blockLength = C_API_TOTAL_LENGTH / block_num;  // 替代 asc_get_block_
 内置变量`block_num`的值为当前任务配置的核数，与原接口返回值一致，替代时直接使用即可。使用前请参考[内置变量说明](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#内置变量)确认适用场景。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_block_num()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/utils/sys_var.h"
+        header: "/include/c_api/utils/sys_var.h"
+```
+
 
 ```cpp
 __aicore__ inline int64_t asc_get_block_num()

@@ -1,3 +1,20 @@
+---
+okftype: reference.api.cpp
+title: "asc_popc"
+path: "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_popc.md"
+description: "获取输入`uint64_t`数据的二进制表示中值为1的位数。"
+signature:
+  - function: "asc_popc(uint64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_bit.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_popc
 
 ## 产品支持情况
@@ -29,6 +46,17 @@
 获取输入`uint64_t`数据的二进制表示中值为1的位数。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_popc(uint64_t)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_bit.h"
+```
+
 
 ```c
 __aicore__ inline int64_t asc_popc(uint64_t value)

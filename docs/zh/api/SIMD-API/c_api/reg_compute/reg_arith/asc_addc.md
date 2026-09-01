@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: "asc_addc"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md"
+description: "该接口根据mask，对源操作数src0、src1及输入进位carry_src进行按元素求和操作，将结果写入目的操作数dst，同时将每个元素的进位结果写入carry（存放进位标志的掩码寄存器）。"
+signature:
+  - function: "asc_addc(vector_bool&,vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    dtype:
+      values:
+        - "int32_t"
+        - "uint32_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_addc
 
 ## 产品支持情况
@@ -41,6 +61,16 @@ $$
 本接口仅在AIV上生效。
 
 ## 函数原型（占位符形式）
+```yaml
+api_signature:
+  - function: "asc_addc(vector_bool&,vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```cpp
 __simd_callee__ inline void asc_addc(vector_bool& carry,

@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: "asc_brcb"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md"
+description: "给定一个输入矢量，每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去，每个数对应一个datablock。"
+signature:
+  - function: "asc_brcb(__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint16_t,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_brcb(__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+        header: "/include/c_api/vector_compute/compute/vector_broadcast.h"
+  - function: "asc_brcb_sync(__ubuf__ uint16_t*,__ubuf__ uint16_t*,uint16_t,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_brcb_sync(__ubuf__ uint32_t*,__ubuf__ uint32_t*,uint16_t,uint16_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_brcb
 
 ## 产品支持情况

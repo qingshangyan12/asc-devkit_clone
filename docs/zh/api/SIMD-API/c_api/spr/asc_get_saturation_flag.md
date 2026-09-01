@@ -1,3 +1,23 @@
+---
+okftype: reference.api.cpp
+title: "asc_get_saturation_flag"
+path: "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md"
+description: "按饱和模式类型读取当前是否开启饱和，并返回布尔类型的结果。"
+signature:
+  - function: "asc_get_saturation_flag(asc_saturation_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/spr/spr.h"
+        header: "/include/c_api/spr/spr.h"
+examples:
+  - path: "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast"
+    archs:
+      - "3510"
+    signature: []
+timestamp: "2026-09-01"
+---
+
 # asc_get_saturation_flag
 
 ## 产品支持情况
@@ -29,6 +49,16 @@
 按饱和模式类型读取当前是否开启饱和，并返回布尔类型的结果。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_get_saturation_flag(asc_saturation_mode)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/spr/spr.h"
+        header: "/include/c_api/spr/spr.h"
+```
+
 
 ```c
 __aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode)

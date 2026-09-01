@@ -1,3 +1,14 @@
+---
+okftype: reference.api.cpp
+title: "Reg数据类型定义"
+path: "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md"
+description: null
+signature:
+  []
+examples: []
+timestamp: "2026-09-01"
+---
+
 # Reg数据类型定义
 
 ## 产品支持情况

@@ -1,3 +1,19 @@
+---
+okftype: reference.api.cpp
+title: "asc_set_gm2ub_pad（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_pad_deprecated.md"
+description: "**此接口已废弃，源数据从GM非对齐搬运到Unified Buffer（UB）设置填补数据值请使用[asc_set_copy_pad_val](asc_set_copy_pad_val.md)进行设置。"
+signature:
+  - function: "asc_set_gm2ub_pad(uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_set_gm2ub_pad（废弃）
 
 ## 产品支持情况 
@@ -30,7 +46,17 @@
 
 将数据从Global Memory (GM) 非对齐搬运到 UB时，通过调用该接口设置连续搬运数据块左右两侧需要填补的数据值。
 
-## 函数原型 
+## 函数原型 ```yaml
+api_signature:
+  - function: "asc_set_gm2ub_pad(uint32_t)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+```
+
+
 
 ```cpp 
 __aicore__ inline void asc_set_gm2ub_pad(uint32_t pad_val)

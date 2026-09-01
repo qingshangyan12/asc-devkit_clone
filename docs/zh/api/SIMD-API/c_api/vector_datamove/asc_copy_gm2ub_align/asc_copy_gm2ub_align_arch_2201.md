@@ -1,3 +1,175 @@
+---
+okftype: reference.api.cpp
+title: "asc_copy_gm2ub_align"
+path: "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md"
+description: "提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer（UB），并支持8位/16位/32位数据类型搬运。"
+signature:
+  - function: "asc_copy_gm2ub_align(__ubuf__ int8_t*,__gm__ int8_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ uint8_t*,__gm__ uint8_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ int16_t*,__gm__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ uint16_t*,__gm__ uint16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ half*,__gm__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ int32_t*,__gm__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ uint32_t*,__gm__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ float*,__gm__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ int8_t*,__gm__ int8_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ uint8_t*,__gm__ uint8_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ int16_t*,__gm__ int16_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ uint16_t*,__gm__ uint16_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ half*,__gm__ half*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ int32_t*,__gm__ int32_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ uint32_t*,__gm__ uint32_t*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align(__ubuf__ float*,__gm__ float*,uint16_t,uint32_t,uint8_t,uint8_t,uint32_t,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_datamove/vector_datamove.h"
+        header: "/include/c_api/vector_datamove/vector_datamove.h"
+  - function: "asc_copy_gm2ub_align_sync(__ubuf__ int8_t*,__gm__ int8_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_copy_gm2ub_align_sync(__ubuf__ uint8_t*,__gm__ uint8_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_copy_gm2ub_align_sync(__ubuf__ int16_t*,__gm__ int16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_copy_gm2ub_align_sync(__ubuf__ uint16_t*,__gm__ uint16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_copy_gm2ub_align_sync(__ubuf__ half*,__gm__ half*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_copy_gm2ub_align_sync(__ubuf__ bfloat16_t*,__gm__ bfloat16_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_copy_gm2ub_align_sync(__ubuf__ int32_t*,__gm__ int32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_copy_gm2ub_align_sync(__ubuf__ uint32_t*,__gm__ uint32_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+  - function: "asc_copy_gm2ub_align_sync(__ubuf__ float*,__gm__ float*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_copy_gm2ub_align
 
 ## 产品支持情况

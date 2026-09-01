@@ -1,3 +1,53 @@
+---
+okftype: reference.api.cpp
+title: "asc_float2int32"
+path: "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2int32.md"
+description: "将`float`类型的标量转换为`int32_t`类型并返回。"
+signature:
+  - function: "asc_float2int32_rd(float)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rd"
+  - function: "asc_float2int32_rn(float)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rn"
+  - function: "asc_float2int32_rna(float)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "rna"
+  - function: "asc_float2int32_ru(float)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_convert.h"
+    dtype:
+      variants:
+        -
+          round_mode: "ru"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_float2int32
 
 ## 产品支持情况
@@ -39,6 +89,16 @@ __aicore__ inline int32_t asc_float2int32_<round_mode>(float value)
 `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）和`ru`（CEIL）。
 
 ### 函数原型典型示例
+```yaml
+api_signature:
+  - function: "asc_float2int32_rn(float)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/scalar_compute/compute/scalar_convert.h"
+```
+
 
 ```c
 __aicore__ inline int32_t asc_float2int32_rn(

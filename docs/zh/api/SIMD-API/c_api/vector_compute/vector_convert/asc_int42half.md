@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: "asc_int42half"
+path: "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md"
+description: "将int4_t类型数据转换为half类型。"
+signature:
+  - function: "asc_int42half(__ubuf__ half*,__ubuf__ int4b_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int42half(__ubuf__ half*,__ubuf__ int4b_t*,uint8_t,uint16_t,uint16_t,uint8_t,uint8_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/vector_compute/compute/vector_convert.h"
+        header: "/include/c_api/vector_compute/compute/vector_convert.h"
+  - function: "asc_int42half_sync(__ubuf__ half*,__ubuf__ int4b_t*,uint32_t)"
+    archs:
+      - "2201"
+    headers:
+      - scope: "/include/c_api/composite/vector_compute_composite.h"
+        header: "/include/c_api/composite/vector_compute_composite.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_int42half
 
 ## 产品支持情况

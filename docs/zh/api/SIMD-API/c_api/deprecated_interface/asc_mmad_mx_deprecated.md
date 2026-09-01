@@ -1,3 +1,77 @@
+---
+okftype: reference.api.cpp
+title: "asc_mmad_mx（废弃）"
+path: "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_mx_deprecated.md"
+description: "**入参`unit_flag`类型为`uint8_t`的`asc_mmad_mx`接口和`asc_mmad_mx_sync`接口已废弃。请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad_mx](../cube_compute/asc_mmad_mx.md)接口替代；原`asc_mmad_mx_sync`接口的同步功能请通过新`asc_mmad_mx`接口和`asc_sync()`实现，具体请参见[asc_sync](../sync/asc_sync.md)。"
+signature:
+  - function: "asc_mmad_mx(__cc__ float*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+    dtype:
+      variants:
+        -
+          a_dtype: "fp4x2_e1m2_t"
+          b_dtype: "fp4x2_e1m2_t"
+        -
+          a_dtype: "fp4x2_e1m2_t"
+          b_dtype: "fp4x2_e2m1_t"
+        -
+          a_dtype: "fp4x2_e2m1_t"
+          b_dtype: "fp4x2_e1m2_t"
+        -
+          a_dtype: "fp4x2_e2m1_t"
+          b_dtype: "fp4x2_e2m1_t"
+        -
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e5m2_t"
+        -
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e5m2_t"
+  - function: "asc_mmad_mx_sync(__cc__ float*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/composite/cube_compute_composite.h"
+        header: "/include/c_api/composite/cube_compute_composite.h"
+    dtype:
+      variants:
+        -
+          a_dtype: "fp4x2_e1m2_t"
+          b_dtype: "fp4x2_e1m2_t"
+        -
+          a_dtype: "fp4x2_e1m2_t"
+          b_dtype: "fp4x2_e2m1_t"
+        -
+          a_dtype: "fp4x2_e2m1_t"
+          b_dtype: "fp4x2_e1m2_t"
+        -
+          a_dtype: "fp4x2_e2m1_t"
+          b_dtype: "fp4x2_e2m1_t"
+        -
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          a_dtype: "fp8_e4m3fn_t"
+          b_dtype: "fp8_e5m2_t"
+        -
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e4m3fn_t"
+        -
+          a_dtype: "fp8_e5m2_t"
+          b_dtype: "fp8_e5m2_t"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_mmad_mx（废弃）
 
 ## 产品支持情况
@@ -56,6 +130,22 @@ $$
 ## 函数原型
 
 **占位符形式：**
+```yaml
+api_signature:
+  - function: "asc_mmad_mx(__cc__ float*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/cube_compute/cube_compute.h"
+        header: "/include/c_api/cube_compute/cube_compute.h"
+  - function: "asc_mmad_mx_sync(__cc__ float*,__ca__ <a_dtype>*,__cb__ <b_dtype>*,uint16_t,uint16_t,uint16_t,uint8_t,bool,bool,bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/composite/cube_compute_composite.h"
+        header: "/include/c_api/composite/cube_compute_composite.h"
+```
+
 
 ```c
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,

@@ -1,3 +1,55 @@
+---
+okftype: reference.api.cpp
+title: "asc_dcci"
+path: "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md"
+description: "在AI Core内部，Scalar单元和DMA单元都可能对Global Memory进行访问。"
+signature:
+  - function: "asc_dcci_single(__gm__ void*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - function: "asc_ub_dcci_single(__ubuf__ void*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - function: "asc_dcci_entire_all()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - function: "asc_dcci_entire_ub()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - function: "asc_dcci_entire_out()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - function: "asc_dcci_entire_atomic()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_dcci
 
 ## 产品支持情况
@@ -46,6 +98,52 @@ Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../spr/asc_se
 <!-- end id8 -->
 
 ## 函数原型
+
+```yaml
+api_signature:
+  - function: "asc_dcci_single(__gm__ void*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - function: "asc_ub_dcci_single(__ubuf__ void*)"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - function: "asc_dcci_entire_all()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - function: "asc_dcci_entire_ub()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - function: "asc_dcci_entire_out()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+  - function: "asc_dcci_entire_atomic()"
+    archs:
+      - "3510"
+      - "2201"
+    headers:
+      - scope: "/include/c_api/cache_ctrl/cache_ctrl.h"
+        header: "/include/c_api/cache_ctrl/cache_ctrl.h"
+```
 
    ```cpp
    // 刷新传入地址所在的单个Cache Line

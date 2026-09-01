@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: "asc_reduce_min_datablock"
+path: "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min_datablock.md"
+description: "根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。"
+signature:
+  - function: "asc_reduce_min_datablock(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+    dtype:
+      values:
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+  - function: "asc_reduce_min_datablock(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+    dtype:
+      values:
+        - "int16_t"
+        - "uint16_t"
+        - "half"
+        - "int32_t"
+        - "uint32_t"
+        - "float"
+examples: []
+timestamp: "2026-09-01"
+---
+
 # asc_reduce_min_datablock
 
 ## 产品支持情况
@@ -35,6 +73,22 @@ $$
 其中，$k$表示`DataBlock`的索引，$B$为一个`DataBlock`内的元素个数。
 
 ## 函数原型
+```yaml
+api_signature:
+  - function: "asc_reduce_min_datablock(vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+  - function: "asc_reduce_min_datablock(vector_<dtype>&,vector_<dtype>,vector_bool)"
+    archs:
+      - "3510"
+    headers:
+      - scope: "/include/c_api/asc_simd.h"
+        header: "/include/c_api/reg_compute/compute/reg_reduce.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果
