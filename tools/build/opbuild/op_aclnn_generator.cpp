@@ -2563,7 +2563,7 @@ void AclnnOpGenerator::AclnnOpGenCodeRunForWorkspaceVersionImpl(
     AclnnGenCodeDecImpl(decName, outfile);
     outfile << "#include \"" << decFile + "_v" + to_string(maxVersion) << ".h\"\n\n";
     outfile << "#define ACLNN_SUCCESS  0\n\n";
-    const char* str = "\n#ifdef __cplusplus\n"
+    const char* str = "#ifdef __cplusplus\n"
                       "extern \"C\" {\n"
                       "#endif\n\n";
     outfile << str;
