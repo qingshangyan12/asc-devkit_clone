@@ -55,7 +55,7 @@ __simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T
 
 ## 数据类型
 
-支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+支持的数据类型为：int8_t、uint8_t、hifloat8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 
 ## 返回值说明
 
