@@ -16,6 +16,8 @@ constexpr u64 AG_2D_SMALL_DATA_SIZE = 1024 * 1024;
 constexpr u32 MAX_RANK_NUM_FOR_CONCURRENT_ALGO = 4;
 constexpr u32 PCIE_BASIC_RS_MAX_DATA_SIZE = 4 * 1024 * 1024;
 constexpr u64 OMNI_UBX_AG_DATA_SIZE = 16 * 1024 * 1024;
+constexpr u64 AG_AICPU_SMALL_DATA_SIZE = 1 * 1024 * 1024;
+constexpr u64 AG_AICPU_SEQUENCE_DATA_SIZE = 4ULL * 1024 * 1024 * 1024;
 
 SelectorStatus AllGatherAutoSelector::SelectCcuMsAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
@@ -161,7 +163,12 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
         } else if (topoInfo->netLayerDetails.localNetInsSizeOfLayer[0] == 1) {
             selectAlgName = "AicpuAllGatherSoleNHR";
         } else if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
-            selectAlgName = "InsAllGatherParallelMesh1DNHR";
+            if (dataSize > AG_AICPU_SMALL_DATA_SIZE &&
+                dataSize * topoInfo->userRankSize > AG_AICPU_SEQUENCE_DATA_SIZE) {
+                selectAlgName = "AicpuAllGatherSequenceMeshConcurNHR";
+            } else {
+                selectAlgName = "InsAllGatherParallelMesh1DNHR";
+            }
         } else {
             HCCL_ERROR("[AllGatherAutoSelector] topo not match");
             return SelectorStatus::NOT_MATCH;
