@@ -194,25 +194,6 @@ __simd_vf__ inline void LoadUnAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, 
     }
     ```
 
-    当RegTensor模板参数regTrait为RegTraitNumTwo时，普通搬运接口的示例如下。postUpdateStride需要设置为`2*VL/sizeof(T)`。
-
-    ```cpp
-    template <typename T>
-    __simd_vf__ inline void LoadUnAlignTraitTwoVF(
-        __ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t postUpdateStride, uint16_t repeatTimes)
-    {
-        AscendC::Reg::RegTensor<T, AscendC::Reg::RegTraitNumTwo> srcReg;
-        AscendC::Reg::UnalignRegForLoad ureg0;
-        AscendC::Reg::UnalignRegForStore ureg1;
-        AscendC::Reg::LoadUnAlignPre(ureg0, srcAddr);
-        for (uint16_t i = 0; i < repeatTimes; ++i) {
-            AscendC::Reg::LoadUnAlign(srcReg, ureg0, srcAddr + i * postUpdateStride);
-            AscendC::Reg::StoreUnAlign(dstAddr, srcReg, ureg1, postUpdateStride);
-        }
-        AscendC::Reg::StoreUnAlignPost(dstAddr, ureg1, 0);
-    }
-    ```
-
 - PostUpdate扩展搬运接口
 
     ```cpp
