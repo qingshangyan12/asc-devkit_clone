@@ -151,12 +151,20 @@ inline int32_t RunSample(
         caseName, totalElementCount, totalByteSize / bytesPerMiB, enableL2Split ? "enabled" : "disabled",
         L2_TILE_THRESHOLD / bytesPerMiB, activeWorkingSetBytes / bytesPerMiB, logicalGmToUbBytesPerKernel / bytesPerMiB,
         vectorCoreCount, activeBatchCount, computeRoundCount);
+    std::fflush(stdout);
 
-    bool success = CheckAcl("aclInit", aclInit(nullptr));
+    bool aclInitialized = CheckAcl("aclInit", aclInit(nullptr));
+    bool success = aclInitialized;
     constexpr int32_t deviceId = 0;
-    success = success && CheckAcl("aclrtSetDevice", aclrtSetDevice(deviceId));
+    bool deviceSet = false;
+    if (success) {
+        deviceSet = CheckAcl("aclrtSetDevice", aclrtSetDevice(deviceId));
+        success = deviceSet;
+    }
     aclrtStream stream = nullptr;
-    success = success && CheckAcl("aclrtCreateStream", aclrtCreateStream(&stream));
+    if (success) {
+        success = CheckAcl("aclrtCreateStream", aclrtCreateStream(&stream));
+    }
 
     if (success) {
         success = RunKernel(caseName, outputPath, launchKernel, stream);
@@ -164,9 +172,13 @@ inline int32_t RunSample(
     if (stream != nullptr) {
         success = CheckAcl("aclrtDestroyStream", aclrtDestroyStream(stream)) && success;
     }
-    success = CheckAcl("aclrtResetDevice", aclrtResetDevice(deviceId)) && success;
-    success = CheckAcl("aclFinalize", aclFinalize()) && success;
-    std::printf("[%s] %s\n", success ? "PASS" : "FAIL", caseName);
+    if (deviceSet) {
+        success = CheckAcl("aclrtResetDevice", aclrtResetDevice(deviceId)) && success;
+    }
+    if (aclInitialized) {
+        success = CheckAcl("aclFinalize", aclFinalize()) && success;
+    }
+    std::printf("test %s!\n", success ? "pass" : "failed");
     return success ? 0 : 1;
 }
 

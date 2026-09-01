@@ -134,7 +134,7 @@ output/no_split.bin
 output/l2_split.bin
 ```
 
-At runtime, the program prints the case name, total data size, L2 Cache split state, active working-set size, logical GM-to-UB traffic, Vector core count, L2 batch count, and compute round count. Each case verifies its output after execution: `[PASS]` is printed on success, while `[FAIL]` is printed on failure together with the first mismatched element index, input value, actual output value, and expected output value. The two output files should be byte-identical, and every `half` element should equal `input + 2`.
+At runtime, the program prints the case name, total data size, L2 Cache split state, active working-set size, logical GM-to-UB traffic, Vector core count, L2 batch count, and compute round count. Each case verifies its output after execution: `test pass!` is printed on success, while `test failed!` is printed on failure together with the first mismatched element index, input value, actual output value, and expected output value. The two output files should be byte-identical, and every `half` element should equal `input + 2`.
 
 ## Profile Collection And Analysis
 
