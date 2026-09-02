@@ -9,8 +9,7 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/vconv/asc_float2int32_rna_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -33,6 +32,7 @@ __simd_callee__ inline void asc_float2int32_rna_impl(vector_int32_t& dst, vector
         vcvt(dst, src, mask, ROUND_A, RS_DISABLE, MODE_ZEROING);
     }
 }
+// ASC_RETURN_VALUE_VCONV_IMPL
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
