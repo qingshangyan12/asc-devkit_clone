@@ -97,6 +97,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2log2(half2 x)
     return __cvt_half2<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(res_fp32);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half hsqrt(half x) { return __sqrtf(x); }
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2sqrt(half2 x) { return __sqrtf(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hrcp(half x) { return static_cast<half>(1.0) / x; }
@@ -1299,8 +1301,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hlog10(half x)
     half temp =
         __cvt_half<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(result_fp32);
     // Six inputs need a one-step correction to match the expected half-precision rounding:
-    // 0.2362060546875 (0x3395), 0.2490234375 (0x33f8), 3.0703125 (0x4223),
-    // 126.0625 (0x57e2), 11496.0 (0x7178), and 2976.0 (0x69d0).
+    // 0.2362060546875 (0x338F), 0.2490234375 (0x33F8), 3.0703125 (0x4224),
+    // 126.0625 (0x57E1), 11496.0 (0x719D), and 2976.0 (0x69D0).
     if (x == static_cast<half>(0.2362060546875f)) {
         temp = static_cast<half>(-0.62646484375f);
     }
