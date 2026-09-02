@@ -39,11 +39,15 @@ __aicore__ inline bool HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
             curVersion_ != HcclTilingVersion::INVALID_TILING_VERSION && tiling == 0UL, { return false; },
             "Failed to prepare for type %u, ensure Init has been called", static_cast<uint32_t>(commType));
     }
-    ASCENDC_HCCL_API_ASSERT(
-        param.sendBuf != nullptr && param.recvBuf != nullptr, { return false; },
-        "Call Prepare[%d] failed, the param sendBuf/recvBuf is nullptr, "
-        "which is an invalid parameter.",
-        static_cast<int32_t>(commType));
+    if (commType != HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        // AlltoAllV allows a rank not to send or not to receive at all, its buffers are checked against
+        // sendCounts/recvCounts below.
+        ASCENDC_HCCL_API_ASSERT(
+            param.sendBuf != nullptr && param.recvBuf != nullptr, { return false; },
+            "Call Prepare[%d] failed, the param sendBuf/recvBuf is nullptr, "
+            "which is an invalid parameter.",
+            static_cast<int32_t>(commType));
+    }
     ASCENDC_HCCL_API_ASSERT(
         commType == HcclCMDType::HCCL_CMD_BATCH_WRITE ||
             (param.dataType >= HCCL_DATA_TYPE_INT8 && param.dataType < HCCL_DATA_TYPE_RESERVED),
@@ -56,6 +60,23 @@ __aicore__ inline bool HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, config>:
             { return false; },
             "Call AlltoAllV failed, "
             "param sendCounts/recvCounts/sdispls/rdispls is nullptr, invalid.");
+        const uint32_t rankDim = GetRankDim();
+        ASCENDC_HCCL_API_ASSERT(
+            rankDim != 0U && rankDim <= HCCL_MAX_RANK_NUM_V2, { return false; },
+            "Call AlltoAllV failed, rank dim is %u, invalid.", rankDim);
+        uint64_t totalSendCount = 0UL;
+        uint64_t totalRecvCount = 0UL;
+        for (uint32_t i = 0U; i < rankDim; ++i) {
+            totalSendCount += param.paramExt.sendCounts[i];
+            totalRecvCount += param.paramExt.recvCounts[i];
+        }
+        // A rank that sends nothing/receives nothing may legally pass a nullptr for the unused buffer.
+        ASCENDC_HCCL_API_ASSERT(
+            totalSendCount == 0UL || param.sendBuf != nullptr, { return false; },
+            "Call AlltoAllV failed, param sendBuf is nullptr while sendCounts is not all zero, invalid.");
+        ASCENDC_HCCL_API_ASSERT(
+            totalRecvCount == 0UL || param.recvBuf != nullptr, { return false; },
+            "Call AlltoAllV failed, param recvBuf is nullptr while recvCounts is not all zero, invalid.");
     } else {
         ASCENDC_HCCL_API_ASSERT(
             param.count != 0, { return false; }, "Call Prepare[%d] failed, param sendCount/recvCount is 0, invalid.",
