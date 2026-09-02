@@ -132,6 +132,10 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     u32 templateScratchMultiplier =
         algTemplate.CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
     maxTmpMemSize_ = tempAlgParams.buffInfo.hcclBuff.size;
+    // 运行时校准实际使用的Channel数，NHR不走多Channel路径
+    if (param.engine == COMM_ENGINE_AICPU_TS && std::string(param.algName) != "AicpuAllGatherSoleNHR") {
+        CHK_RET(algTemplate.SetchannelsPerRank(templateAlgRes.channels));
+    }
     // 中转内存单次最多能够接受的output count，注意是count不是size
     u64 transportBoundDataSize = UB_MAX_DATA_SIZE;
     u64 maxDataSizePerLoop = 0;
@@ -142,8 +146,10 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     } else {
         maxDataSizePerLoop = transportBoundDataSize;
     }
-    if (param.supportSymmetricMemory) {
+    // 对称内存只由InsAllGatherMesh1D显式使能，避免共享Executor的其他模板误进入该路径
+    if (param.supportSymmetricMemory && std::string(param.algName) == "InsAllGatherMesh1D") {
         maxDataSizePerLoop = dataSize_;
+        tempAlgParams.supportSymmetricMemory = true;
     }
     u64 maxCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
     // 计算loopTimes
