@@ -11,7 +11,6 @@
 #define HCCL_RES_H
 
 #include <stdint.h>
-#include "acl/acl_rt.h"
 #include "hccl_types.h"
 #include "../hcomm_res_defs.h"
 
