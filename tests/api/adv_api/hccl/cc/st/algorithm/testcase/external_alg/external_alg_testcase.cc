@@ -154,7 +154,7 @@ TEST(ExtAlgV2Registry, EnumerateRegisteredTags)
     auto& registry = CollAlgExecRegistryV2::Instance();
     const std::vector<std::string> agTags = registry.GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLGATHER);
     // 本目标全量编译（-DMC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE 守卫裁剪），AG 应为 13 条：
-    // 9 条 AICPU 注册（含 omnipipe）+ 4 条 CCU 注册（CcuSchedAllGatherSoleMesh /
+    // 10 条 AICPU 注册（含 omnipipe）+ 4 条 CCU 注册（CcuSchedAllGatherSoleMesh /
     // CcuSchedAllGatherSoleNHR / CcuSchedAllGatherParallelMeshNHRMultiLink /
     // CcuSchedAllGatherConcurMeshNHRMultiLink）；
     // 此断言同时防止枚举接口漏实现
@@ -221,7 +221,7 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
 
 // 不变量：注册行 externalName 字面量必须自身就是规范形（"与 parser 产出同构"的机器契约）。
 // 手写字面量若带空格/词表外词/非规范拼写，将静默变死行——用户输入经 canonical() 规范化后永不相等，
-// 46 计数与 registeredName 满射断言均无法发现。往返自检：parse(字面量) 成功且 canonical() == 字面量。
+// 48 计数与 registeredName 满射断言均无法发现。往返自检：parse(字面量) 成功且 canonical() == 字面量。
 TEST(ExtAlgSurjectivity, ExternalNameLiteralsAreCanonical)
 {
     const std::vector<AlgMetaRow> rows = AlgMetaRegistry::Instance().GetAll();
@@ -577,10 +577,12 @@ TEST(ExtAlgResolver, VariantPairDisambiguation)
     EXPECT_EQ(ResolveExternalAlg(arSum, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
     EXPECT_EQ(algName, "AicpuAllReduceSoleNHR");
 
-    // AICPU 引擎下 DPU-only 外部名 -> 候选为空 -> ERROR_INVALID
+    // AG sequence[mesh,nhr] 引擎消歧：AICPU 命中 AicpuAllGatherSequenceMeshConcurNHR（多层 Mesh1D），
+    // DPU 行仅 CPU 引擎命中（CPU -> InsAllGatherMeshNhrDPU 由 GoldenAllEngines 覆盖）
     ASSERT_TRUE(ParseExternalAlg("sequence[mesh,nhr]", spec, errMsg));
     OpParam aicpu = MakeResolveParam(HcclCMDType::HCCL_CMD_ALLGATHER, CommEngine::COMM_ENGINE_AICPU_TS);
-    EXPECT_EQ(ResolveExternalAlg(aicpu, &multi, spec, algName, errMsg), ResolveStatus::ERROR_INVALID);
+    EXPECT_EQ(ResolveExternalAlg(aicpu, &multi, spec, algName, errMsg), ResolveStatus::RESOLVED);
+    EXPECT_EQ(algName, "AicpuAllGatherSequenceMeshConcurNHR");
 }
 
 TEST(ExtAlgResolver, ErrorCasesCarryThreeElements)
