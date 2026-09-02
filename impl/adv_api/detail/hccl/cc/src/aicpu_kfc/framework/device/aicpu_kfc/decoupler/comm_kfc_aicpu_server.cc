@@ -662,7 +662,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     bool commAcquired = false;
     std::string acquiredCommName{};
     bool profilingStarted = false;
+    bool profilingEndAttempted = false;
     HcclResult executionRet = HCCL_SUCCESS;
+    HcclResult profilingRet = HCCL_SUCCESS;
     std::vector<uint8_t> runParam{};
     for (u32 i = 0U; i < repeatCnt; ++i) {
         const u32 turnIdx = i + 1U;
@@ -714,13 +716,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
                 ret = HcclDfxRegOpInfoByCommId(
                     const_cast<char*>(dfxParam->commName), reinterpret_cast<void*>(&dfxOpInfo));
             }
-            if (ret == HCCL_SUCCESS && useHcommProfilingLifecycle) {
-                ret = HcommProfilingReportKernelStartTask(execCtx->mainThread, execCtx->commName.c_str());
-                profilingStarted = (ret == HCCL_SUCCESS);
-            }
             if (ret != HCCL_SUCCESS) {
                 HCCL_ERROR(
-                    "Group %u: failed to start DFX reporting for commName[%s], opParamKey %#llx, ret[%d].",
+                    "Group %u: failed to register DFX context for commName[%s], opParamKey %#llx, ret[%d].",
                     groupIdx_, execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
                 executionRet = ret;
                 break;
@@ -747,6 +745,18 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             break;
         }
 
+        if (i == 0U && useHcommProfilingLifecycle) {
+            ret = HcommProfilingReportKernelStartTask(execCtx->mainThread, execCtx->commName.c_str());
+            if (ret != HCCL_SUCCESS) {
+                HCCL_ERROR(
+                    "Group %u: failed to report DFX head for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
+                    execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
+                executionRet = ret;
+                break;
+            }
+            profilingStarted = true;
+        }
+
         UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "BeforeKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -765,6 +775,17 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         if (ret != HCCL_SUCCESS) {
             executionRet = ret;
             break;
+        }
+
+        if (turnIdx == repeatCnt && profilingStarted) {
+            profilingEndAttempted = true;
+            ret = HcommProfilingReportKernelEndTask(execCtx->mainThread, execCtx->commName.c_str());
+            if (ret != HCCL_SUCCESS) {
+                HCCL_ERROR(
+                    "Group %u: failed to report DFX tail for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
+                    execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
+                profilingRet = ret;
+            }
         }
 
         UpdateProgress("BeforePost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
@@ -795,8 +816,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             "[MC2_OPEN_DIAG][LoopEnd] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i, turnIdx);
     }
 
-    HcclResult profilingRet = HCCL_SUCCESS;
-    if (profilingStarted) {
+    if (profilingStarted && !profilingEndAttempted) {
+        profilingEndAttempted = true;
         HcclResult ret = HcommProfilingReportKernelEndTask(execCtx->mainThread, execCtx->commName.c_str());
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR(
@@ -804,7 +825,10 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
                 execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
             profilingRet = ret;
         }
-        ret = HcommProfilingReportDeviceOp(execCtx->commName.c_str());
+    }
+
+    if (profilingStarted) {
+        HcclResult ret = HcommProfilingReportDeviceOp(execCtx->commName.c_str());
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR(
                 "Group %u: failed to report DFX tasks for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
