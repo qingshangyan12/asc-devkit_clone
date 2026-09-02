@@ -23,8 +23,8 @@ namespace te {
 namespace experimental {
 
 template <typename T, typename scalar_type>
-__simd_callee__ inline reg_tensor<T> axpy(
-    const reg_tensor<T>& dst, const reg_tensor<T>& src, const scalar_type& scalar);
+__simd_callee__ inline reg_tensor<T> axpy(const reg_tensor<T>& dst, const reg_tensor<T>& src,
+                                          const scalar_type& scalar);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -32,9 +32,13 @@ __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const r
 template <typename T>
 __simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
+template <typename position_type>
+__simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<half>& src0, const reg_tensor<half>& src1,
+                                                  position_type src_pos);
+
 template <typename T>
-__simd_callee__ inline reg_tensor<T> fma(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2);
+__simd_callee__ inline reg_tensor<T> fma(const reg_tensor<T>& src0, const reg_tensor<T>& src1,
+                                         const reg_tensor<T>& src2);
 
 __simd_callee__ inline reg_tensor<half> muls_cast(const reg_tensor<float>& src, const float& scalar);
 
