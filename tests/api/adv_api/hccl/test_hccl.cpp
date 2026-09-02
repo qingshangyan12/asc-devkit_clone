@@ -1153,6 +1153,63 @@ TEST_F(HcclAbnormalTestSuite, AlltoAllV_InputParamInvalid_ReturnInvalidHandleId)
     EXPECT_EQ(handleId, INVALID_HANDLE_ID);
 }
 
+// Test content: a rank that sends or receives nothing may pass nullptr for the unused buffer
+TEST_F(HcclAbnormalTestSuite, AlltoAllV_NullBufWithAllZeroCounts_ReturnValidHandleId)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024);
+    HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
+
+    Hccl hccl;
+    hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
+    std::vector<uint64_t> zeroCounts(kRankNum, 0);
+    std::vector<uint64_t> nonZeroCounts(kRankNum, 10);
+    std::vector<uint64_t> sendOffsets(kRankNum, 12);
+    std::vector<uint64_t> recvOffsets(kRankNum, 13);
+
+    // This rank sends nothing, so sendBuf is allowed to be nullptr
+    HcclHandle handleId = hccl.AlltoAllV(
+        nullptr, zeroCounts.data(), sendOffsets.data(), HcclDataType::HCCL_DATA_TYPE_INT8,
+        reinterpret_cast<__gm__ uint8_t*>(0x11), nonZeroCounts.data(), recvOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, 1);
+    EXPECT_NE(handleId, INVALID_HANDLE_ID);
+
+    // This rank receives nothing, so recvBuf is allowed to be nullptr
+    handleId = hccl.AlltoAllV(
+        reinterpret_cast<__gm__ uint8_t*>(0x11), nonZeroCounts.data(), sendOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, nullptr, zeroCounts.data(), recvOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, 1);
+    EXPECT_NE(handleId, INVALID_HANDLE_ID);
+}
+
+// Test content: counts that would overflow a uint64_t sum must not slip a nullptr buffer past the check
+TEST_F(HcclAbnormalTestSuite, AlltoAllV_NullBufWithOverflowingCounts_ReturnInvalidHandleId)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024);
+    HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
+
+    Hccl hccl;
+    hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
+    // These two entries sum to exactly 2^64, i.e. wrap around to 0
+    std::vector<uint64_t> wrappingCounts(kRankNum, 0);
+    wrappingCounts[0] = 1ULL << 63U;
+    wrappingCounts[1] = 1ULL << 63U;
+    std::vector<uint64_t> nonZeroCounts(kRankNum, 10);
+    std::vector<uint64_t> sendOffsets(kRankNum, 12);
+    std::vector<uint64_t> recvOffsets(kRankNum, 13);
+
+    HcclHandle handleId = hccl.AlltoAllV(
+        nullptr, wrappingCounts.data(), sendOffsets.data(), HcclDataType::HCCL_DATA_TYPE_INT8,
+        reinterpret_cast<__gm__ uint8_t*>(0x11), nonZeroCounts.data(), recvOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, 1);
+    EXPECT_EQ(handleId, INVALID_HANDLE_ID);
+
+    handleId = hccl.AlltoAllV(
+        reinterpret_cast<__gm__ uint8_t*>(0x11), nonZeroCounts.data(), sendOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, nullptr, wrappingCounts.data(), recvOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, 1);
+    EXPECT_EQ(handleId, INVALID_HANDLE_ID);
+}
+
 // Combined test: Use 3 threads to simulate cores with different blockIdx,
 // only core 0 can write, and all cores can read the message area
 TEST_F(HcclCombineTestSuite, AlltoAllV_3CoresWork_OnlyCore0Write)
