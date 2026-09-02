@@ -66,9 +66,12 @@ __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src_reg)
 template <typename T>
 __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src_reg)
 {
-    auto natural_log = log(src_reg);
+    static_assert(detail::supports_float_math_v<T>, "log2 does not support this element type");
+    constexpr float ln2_reciprocal = 1.4426950408889634;
+    reg_tensor<T> natural_log;
+    asc_ln(natural_log.reg, src_reg.reg, src_reg.mask);
     reg_tensor<T> dst;
-    asc_mul_scalar(dst.reg, natural_log.reg, static_cast<T>(1.4426950408889634), src_reg.mask);
+    asc_mul_scalar(dst.reg, natural_log.reg, static_cast<T>(ln2_reciprocal), src_reg.mask);
     dst.mask = src_reg.mask;
     return dst;
 }
@@ -76,9 +79,12 @@ __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src_reg)
 template <typename T>
 __simd_callee__ inline reg_tensor<T> log10(const reg_tensor<T>& src_reg)
 {
-    auto natural_log = log(src_reg);
+    static_assert(detail::supports_float_math_v<T>, "log10 does not support this element type");
+    constexpr float ln10_reciprocal = 0.43429448190325176;
+    reg_tensor<T> natural_log;
+    asc_ln(natural_log.reg, src_reg.reg, src_reg.mask);
     reg_tensor<T> dst;
-    asc_mul_scalar(dst.reg, natural_log.reg, static_cast<T>(0.4342944819032518), src_reg.mask);
+    asc_mul_scalar(dst.reg, natural_log.reg, static_cast<T>(ln10_reciprocal), src_reg.mask);
     dst.mask = src_reg.mask;
     return dst;
 }
@@ -113,15 +119,12 @@ __simd_callee__ inline reg_tensor<T> prelu(const reg_tensor<T>& src_reg, const r
     return dst;
 }
 
-template <typename T, typename scalar_type>
-__simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src_reg, const scalar_type& slope)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src_reg, const T& slope)
 {
     static_assert(detail::supports_float_math_v<T>, "leaky_relu does not support this element type");
-    static_assert(!is_reg_tensor_v<scalar_type>
-                      && ::AscendC::Std::is_convertible_v<::AscendC::Std::remove_cvref_t<scalar_type>, T>,
-                  "leaky_relu requires a scalar convertible to the reg_tensor element type");
     reg_tensor<T> dst;
-    asc_leakyrelu(dst.reg, src_reg.reg, static_cast<T>(slope), src_reg.mask);
+    asc_leakyrelu(dst.reg, src_reg.reg, slope, src_reg.mask);
     dst.mask = src_reg.mask;
     return dst;
 }
@@ -179,19 +182,13 @@ __simd_callee__ inline reg_tensor<T> addc(reg_tensor<bool>& carry, const reg_ten
     return dst;
 }
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator-(const T& a, const U& b)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    using elem_type = detail::binary_elem_t<T, U>;
-    detail::check_binary_reg_types<T, U>();
-    static_assert(detail::supports_add_sub_v<elem_type>, "operator- does not support this element type");
-
-    vector_bool mask = detail::binary_mask(a, b);
-    auto left = detail::make_reg_operand<elem_type>(a, mask);
-    auto right = detail::make_reg_operand<elem_type>(b, mask);
-    reg_tensor<elem_type> dst;
-    asc_sub(dst.reg, left.reg, right.reg, mask);
-    dst.mask = mask;
+    static_assert(detail::supports_add_sub_v<T>, "operator- does not support this element type");
+    reg_tensor<T> dst;
+    asc_sub(dst.reg, src0.reg, src1.reg, src0.mask);
+    dst.mask = src0.mask;
     return dst;
 }
 
@@ -218,27 +215,33 @@ __simd_callee__ inline reg_tensor<T> subc(reg_tensor<bool>& carry, const reg_ten
     return dst;
 }
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator*(const T& a, const U& b)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    using elem_type = detail::binary_elem_t<T, U>;
-    detail::check_binary_reg_types<T, U>();
-    if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
-        static_assert(detail::supports_mul_v<elem_type>, "operator* does not support this element type");
-    } else {
-        static_assert(detail::supports_mul_scalar_v<elem_type>, "scalar operator* does not support this element type");
-    }
+    static_assert(detail::supports_mul_v<T>, "operator* does not support this element type");
+    reg_tensor<T> dst;
+    asc_mul(dst.reg, src0.reg, src1.reg, src0.mask);
+    dst.mask = src0.mask;
+    return dst;
+}
 
-    reg_tensor<elem_type> dst;
-    vector_bool mask = detail::binary_mask(a, b);
-    if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
-        asc_mul(dst.reg, a.reg, b.reg, mask);
-    } else if constexpr (is_reg_tensor_v<T>) {
-        asc_mul_scalar(dst.reg, a.reg, static_cast<elem_type>(b), mask);
-    } else {
-        asc_mul_scalar(dst.reg, b.reg, static_cast<elem_type>(a), mask);
-    }
-    dst.mask = mask;
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src, const T& scalar)
+{
+    static_assert(detail::supports_mul_scalar_v<T>, "scalar operator* does not support this element type");
+    reg_tensor<T> dst;
+    asc_mul_scalar(dst.reg, src.reg, scalar, src.mask);
+    dst.mask = src.mask;
+    return dst;
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator*(const T& scalar, const reg_tensor<T>& src)
+{
+    static_assert(detail::supports_mul_scalar_v<T>, "scalar operator* does not support this element type");
+    reg_tensor<T> dst;
+    asc_mul_scalar(dst.reg, src.reg, scalar, src.mask);
+    dst.mask = src.mask;
     return dst;
 }
 
@@ -263,23 +266,33 @@ __simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const 
     return dst;
 }
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) max(const T& a, const U& b)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
-    using elem_type = detail::binary_elem_t<T, U>;
-    detail::check_binary_reg_types<T, U>();
-    static_assert(detail::supports_min_max_v<elem_type>, "max does not support this element type");
+    static_assert(detail::supports_min_max_v<T>, "max does not support this element type");
+    reg_tensor<T> dst;
+    asc_max(dst.reg, src0.reg, src1.reg, src0.mask);
+    dst.mask = src0.mask;
+    return dst;
+}
 
-    reg_tensor<elem_type> dst;
-    vector_bool mask = detail::binary_mask(a, b);
-    if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
-        asc_max(dst.reg, a.reg, b.reg, mask);
-    } else if constexpr (is_reg_tensor_v<T>) {
-        asc_max_scalar(dst.reg, a.reg, static_cast<elem_type>(b), mask);
-    } else {
-        asc_max_scalar(dst.reg, b.reg, static_cast<elem_type>(a), mask);
-    }
-    dst.mask = mask;
+template <typename T>
+__simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src, const T& scalar)
+{
+    static_assert(detail::supports_min_max_v<T>, "max does not support this element type");
+    reg_tensor<T> dst;
+    asc_max_scalar(dst.reg, src.reg, scalar, src.mask);
+    dst.mask = src.mask;
+    return dst;
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> max(const T& scalar, const reg_tensor<T>& src)
+{
+    static_assert(detail::supports_min_max_v<T>, "max does not support this element type");
+    reg_tensor<T> dst;
+    asc_max_scalar(dst.reg, src.reg, scalar, src.mask);
+    dst.mask = src.mask;
     return dst;
 }
 
@@ -306,7 +319,11 @@ __simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src, const T& scal
 template <typename T>
 __simd_callee__ inline reg_tensor<T> min(const T& scalar, const reg_tensor<T>& src)
 {
-    return min(src, scalar);
+    static_assert(detail::supports_min_max_v<T>, "min does not support this element type");
+    reg_tensor<T> dst;
+    asc_min_scalar(dst.reg, src.reg, scalar, src.mask);
+    dst.mask = src.mask;
+    return dst;
 }
 
 } // namespace experimental

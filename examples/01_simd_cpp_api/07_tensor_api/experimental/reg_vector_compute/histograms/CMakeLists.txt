@@ -30,8 +30,7 @@ add_executable(demo
     histograms.asc
 )
 
-target_link_libraries(demo PRIVATE
-)
+target_link_libraries(demo PRIVATE)
 
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>

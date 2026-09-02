@@ -40,9 +40,9 @@ $$
 ## 函数原型
 
 ```cpp
-template <typename T, typename scalar_type>
+template <typename T>
 __simd_callee__ inline reg_tensor<T> leaky_relu(
-    const reg_tensor<T>& src_reg, const scalar_type& slope)
+    const reg_tensor<T>& src_reg, const T& slope)
 ```
 
 ## 参数说明
@@ -52,14 +52,13 @@ __simd_callee__ inline reg_tensor<T> leaky_relu(
 | 参数名 | 描述 |
 | --- | --- |
 | T | reg_tensor元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
-| scalar_type | 标量斜率的数据类型，需能够转换为T，且不能为reg_tensor类型。 |
 
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | src_reg | 输入 | 源操作数，类型为reg_tensor&lt;T&gt;。其中，src_reg.reg保存矢量数据，src_reg.mask用于控制各元素是否参与计算。src_reg.mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
-| slope | 输入 | src_reg中对应元素小于或等于0时使用的标量斜率。 |
+| slope | 输入 | src_reg中对应元素小于或等于0时使用的标量斜率，数据类型与T相同。 |
 
 ## 数据类型
 

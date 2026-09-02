@@ -1,8 +1,12 @@
-# Shift Left Tensor API 样例
+# operator<<接口样例
 
 ## 概述
 
-本样例基于Tensor API实现`operator<<`接口，对64个`uint32_t`元素和对应的`int32_t`移位量执行逐元素左移。
+本样例介绍如何使用实验性 Tensor API `asc::te::experimental::operator<<`，按照 `int32_t` 移位量对64个 `uint32_t` 元素执行逐元素左移。
+
+```text
+dst[i] = src[i] << shift[i]
+```
 
 ## 支持的产品
 
@@ -10,44 +14,30 @@
 
 ## 目录结构介绍
 
-```plain
-├── shift_left
-│   ├── scripts
-│   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py     // 输出结果校验脚本
-│   ├── CMakeLists.txt           // 编译工程文件
-│   ├── data_utils.h             // 数据读写工具
-│   ├── README.md
-│   ├── README_en.md
-│   └── shift_left.asc  // Ascend C算子实现与调用样例
+```text
+├── CMakeLists.txt                 // 编译工程
+├── README.md                      // 样例说明
+└── shift_left.asc                 // operator<<接口样例实现
 ```
 
 ## 样例描述
 
 - 样例功能：
-  对输入Tensor中的每个元素使用对应的移位量执行左移计算，计算公式如下：
 
-  ```text
-  output_i = input_i << shifts_i
-  ```
-
-- 样例规格：
-  <table>
-  <tr><td align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
-  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">input</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
-  <tr><td align="center">shifts</td><td align="center">[64]</td><td align="center">int32_t</td></tr>
-  <tr><td align="center">样例输出</td><td align="center">output</td><td align="center">[64]</td><td align="center">uint32_t</td></tr>
-  <tr><td align="center">核函数名</td><td colspan="3" align="center">shift_left</td></tr>
-  </table>
+  样例将输入数据和移位量从 GM 搬运到 UB，通过 `load` 加载到寄存器，调用 `operator<<` 完成逐元素左移，再将结果写回 UB 和 GM。Host 侧直接生成输入并校验输出。
 
 - 样例实现：
 
-  1. 为GM和UB数据搬运创建ND Tensor视图，并为UB寄存器计算创建一维Tensor视图。
-  2. 使用`asc::te::copy`将数据和移位量从GM搬运到UB。
-  3. 使用一维坐标`make_coord(offset)`分别加载为`reg_tensor<uint32_t>`和`reg_tensor<int32_t>`。
-  4. 导入`operator<<`并执行`src << shift`，将结果写回UB并搬运到GM。
-  5. Host侧使用内核调用符`<<<>>>`调用核函数，并通过校验脚本比较输出与真值。
+  核心计算代码如下：
+
+  ```cpp
+  const auto coord = asc::te::make_coord(0);
+  auto mask = asc::te::experimental::all_mask<uint32_t>();
+  auto src = asc::te::experimental::load(src_tensor, coord).with_mask(mask);
+  auto shift = asc::te::experimental::load(shift_tensor, coord).with_mask(mask);
+  auto dst = src << shift;
+  asc::te::experimental::store(dst_tensor, coord, dst);
+  ```
 
 ## 编译运行
 
@@ -55,11 +45,13 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md)，配置环境变量。
+  配置 CANN 软件包环境变量，详细操作请参考[环境变量配置](../../../../../../docs/zh/quick_start.md#prepare&install)。
 
   ```bash
-  source ${install_path}/cann/set_env.sh
+  source ${install_path}/set_env.sh
   ```
+
+  `${install_path}` 为 CANN 软件包安装目录，请根据实际安装路径替换。
 
 - 样例执行
 
@@ -67,28 +59,15 @@
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
-  python3 ../scripts/gen_data.py
   ./demo
-  python3 ../scripts/verify_result.py
   ```
 
-  使用NPU仿真模式时，在CMake命令中添加`-DCMAKE_ASC_RUN_MODE=sim`参数。
-
-  > **注意：** 切换编译模式前需清理CMake缓存，可在`build`目录下删除`CMakeCache.txt`后重新执行CMake命令。
-
-- 编译选项说明
-
-  | 选项 | 可选值 | 说明 |
-  |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：`dav-3510`对应Ascend 950PR/Ascend 950DT |
-  | `CANN_ASC_USE_EXPERIMENTAL` | `ON`（本样例必选）、`OFF`（默认） | 开启实验性ASC接口 |
+  使用 NPU 仿真模式时，在 CMake 命令中增加 `-DCMAKE_ASC_RUN_MODE=sim`。切换运行模式或芯片型号时，建议清除 `build` 目录中的 CMake 缓存后重新配置。
 
 - 执行结果
 
-  执行成功时输出如下：
+  验证成功时输出：
 
   ```text
-  shift_left executed successfully.
-  test pass! verified uint32 register shift-left.
+  test pass!
   ```

@@ -22,9 +22,8 @@ namespace asc {
 namespace te {
 namespace experimental {
 
-template <typename T, typename scalar_type>
-__simd_callee__ inline reg_tensor<T> axpy(const reg_tensor<T>& dst, const reg_tensor<T>& src,
-                                          const scalar_type& scalar);
+template <typename T>
+__simd_callee__ inline reg_tensor<T> axpy(const reg_tensor<T>& dst, const reg_tensor<T>& src, const T& scalar);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);

@@ -37,11 +37,11 @@ $$
 ## 函数原型
 
 ```cpp
-template <typename T, typename scalar_type>
+template <typename T>
 __simd_callee__ inline reg_tensor<T> axpy(
     const reg_tensor<T>& dst,
     const reg_tensor<T>& src,
-    const scalar_type& scalar)
+    const T& scalar)
 ```
 
 ## 参数说明
@@ -51,7 +51,6 @@ __simd_callee__ inline reg_tensor<T> axpy(
 | 参数名 | 描述 |
 | --- | --- |
 | T | reg_tensor元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
-| scalar_type | 标量类型，必须与T相同。 |
 
 **表2**  参数说明
 

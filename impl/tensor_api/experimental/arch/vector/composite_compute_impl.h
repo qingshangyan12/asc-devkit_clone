@@ -23,12 +23,10 @@ namespace asc {
 namespace te {
 namespace experimental {
 
-template <typename T, typename scalar_type>
-__simd_callee__ inline reg_tensor<T> axpy(const reg_tensor<T>& dst, const reg_tensor<T>& src, const scalar_type& scalar)
+template <typename T>
+__simd_callee__ inline reg_tensor<T> axpy(const reg_tensor<T>& dst, const reg_tensor<T>& src, const T& scalar)
 {
     static_assert(detail::supports_axpy_v<T>, "axpy does not support this element type");
-    static_assert(::AscendC::Std::is_same_v<::AscendC::Std::remove_cvref_t<scalar_type>, T>,
-                  "axpy requires the scalar and reg_tensor element types to match");
     reg_tensor<T> result = dst;
     asc_axpy(result.reg, src.reg, scalar, dst.mask);
     return result;

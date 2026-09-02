@@ -1,8 +1,12 @@
-# Fma Tensor API 样例
+# fma接口样例
 
 ## 概述
 
-本样例基于Tensor API实现`fma`接口，对三组各64个`float`元素执行融合乘加计算。
+本样例介绍如何使用实验性 Tensor API `asc::te::experimental::fma` 对三组 shape 为 `[64]` 的一维 `float` Tensor 执行逐元素融合乘加计算。
+
+```text
+dst[i] = src0[i] * src1[i] + src2[i]
+```
 
 ## 支持的产品
 
@@ -10,45 +14,39 @@
 
 ## 目录结构介绍
 
-```plain
-├── fma
-│   ├── scripts
-│   │   ├── gen_data.py          // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py     // 输出结果校验脚本
-│   ├── CMakeLists.txt           // 编译工程文件
-│   ├── data_utils.h             // 数据读写工具
-│   ├── README.md
-│   ├── README_en.md
-│   └── fma.asc  // Ascend C算子实现与调用样例
+```text
+├── CMakeLists.txt                 // 编译工程
+├── README.md                      // 样例说明
+└── fma.asc                        // fma接口样例实现
 ```
 
 ## 样例描述
 
 - 样例功能：
-  对三组输入Tensor执行融合乘加计算，计算公式如下：
 
-  ```text
-  output_i = input_a_i * input_b_i + input_c_i
-  ```
-
-- 样例规格：
-  <table>
-  <tr><td align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
-  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
-  <tr><td align="center">input_a</td><td align="center">[64]</td><td align="center">float</td></tr>
-  <tr><td align="center">input_b</td><td align="center">[64]</td><td align="center">float</td></tr>
-  <tr><td align="center">input_c</td><td align="center">[64]</td><td align="center">float</td></tr>
-  <tr><td align="center">样例输出</td><td align="center">output</td><td align="center">[64]</td><td align="center">float</td></tr>
-  <tr><td align="center">核函数名</td><td colspan="3" align="center">fma</td></tr>
-  </table>
+  样例将三组输入 Tensor 从 GM 搬运到 UB，通过 `load` 加载到寄存器，调用 `fma` 完成逐元素融合乘加，再通过 `store` 将结果写回 UB 和 GM。Host 侧直接生成输入并校验输出。
 
 - 样例实现：
 
-  1. 为GM和UB数据搬运创建ND Tensor视图，并为UB寄存器计算创建一维Tensor视图。
-  2. 使用`asc::te::copy`将三组输入从GM搬运到UB。
-  3. 使用一维坐标`make_coord(offset)`将三组输入加载为`reg_tensor<float>`，并指定64个元素参与计算。
-  4. 调用`fma(input_a, input_b, input_c)`执行融合乘加计算，将结果写回UB并搬运到GM。
-  5. Host侧使用内核调用符`<<<>>>`调用核函数，并通过校验脚本比较输出与真值。
+  - Kernel关键步骤
+
+    1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_frame_layout` 构造 GM、UB 上的一维 Tensor。
+    2. 使用 `asc::te::copy` 将三组输入从 GM 搬运到 UB。
+    3. 使用 `all_mask` 和 `load` 将 UB 数据加载为 Reg Tensor。
+    4. 调用 `fma` 完成逐元素融合乘加。
+    5. 使用 `store` 和 `asc::te::copy` 将结果写回 UB 和 GM。
+
+  核心计算代码如下：
+
+  ```cpp
+  const auto coord = asc::te::make_coord(0);
+  auto mask = asc::te::experimental::all_mask<float>();
+  auto src0 = asc::te::experimental::load(src0_tensor, coord).with_mask(mask);
+  auto src1 = asc::te::experimental::load(src1_tensor, coord).with_mask(mask);
+  auto src2 = asc::te::experimental::load(src2_tensor, coord).with_mask(mask);
+  auto dst = asc::te::experimental::fma(src0, src1, src2);
+  asc::te::experimental::store(dst_tensor, coord, dst);
+  ```
 
 ## 编译运行
 
@@ -56,11 +54,13 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md)，配置环境变量。
+  配置 CANN 软件包环境变量，详细操作请参考[环境变量配置](../../../../../../docs/zh/quick_start.md#prepare&install)。
 
   ```bash
-  source ${install_path}/cann/set_env.sh
+  source ${install_path}/set_env.sh
   ```
+
+  `${install_path}` 为 CANN 软件包安装目录，请根据实际安装路径替换。
 
 - 样例执行
 
@@ -68,28 +68,15 @@
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
-  python3 ../scripts/gen_data.py
   ./demo
-  python3 ../scripts/verify_result.py
   ```
 
-  使用NPU仿真模式时，在CMake命令中添加`-DCMAKE_ASC_RUN_MODE=sim`参数。
-
-  > **注意：** 切换编译模式前需清理CMake缓存，可在`build`目录下删除`CMakeCache.txt`后重新执行CMake命令。
-
-- 编译选项说明
-
-  | 选项 | 可选值 | 说明 |
-  |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：`dav-3510`对应Ascend 950PR/Ascend 950DT |
-  | `CANN_ASC_USE_EXPERIMENTAL` | `ON`（本样例必选）、`OFF`（默认） | 开启实验性ASC接口 |
+  使用 NPU 仿真模式时，在 CMake 命令中增加 `-DCMAKE_ASC_RUN_MODE=sim`。切换运行模式或芯片型号时，建议清除 `build` 目录中的 CMake 缓存后重新配置。
 
 - 执行结果
 
-  执行成功时输出如下：
+  验证成功时输出：
 
   ```text
-  fma executed successfully.
-  test pass! verified float fma.
+  test pass!
   ```

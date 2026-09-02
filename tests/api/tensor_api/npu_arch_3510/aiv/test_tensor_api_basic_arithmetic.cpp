@@ -32,6 +32,13 @@ void check_unary_arithmetic()
 template <typename T>
 void check_float_math()
 {
+    reg_type<T> src{};
+    src.mask = asc::te::experimental::all_mask<T>().reg;
+    auto log2_dst = asc::te::experimental::log2(src);
+    auto log10_dst = asc::te::experimental::log10(src);
+    EXPECT_EQ(log2_dst.mask, src.mask);
+    EXPECT_EQ(log10_dst.mask, src.mask);
+
     static_assert(
         AscendC::Std::is_same_v<decltype(asc::te::experimental::exp(AscendC::Std::declval<const reg_type<T>&>())),
                                 reg_type<T>>);
@@ -80,12 +87,6 @@ void check_add_sub()
     static_assert(AscendC::Std::is_same_v<decltype(AscendC::Std::declval<const reg_type<T>&>()
                                                    - AscendC::Std::declval<const reg_type<T>&>()),
                                           reg_type<T>>);
-    static_assert(
-        AscendC::Std::is_same_v<
-            decltype(AscendC::Std::declval<const reg_type<T>&>() - AscendC::Std::declval<const T&>()), reg_type<T>>);
-    static_assert(
-        AscendC::Std::is_same_v<
-            decltype(AscendC::Std::declval<const T&>() - AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
 }
 
 template <typename T>
