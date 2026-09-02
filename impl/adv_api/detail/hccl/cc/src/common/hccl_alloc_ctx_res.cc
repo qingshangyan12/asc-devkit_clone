@@ -768,12 +768,6 @@ static HcclResult AcquireAlgResources(
 {
     HCCL_INFO("[AcquireAlgResources]start AcquireAlgResources!");
     bool isResourceReused = false;
-    ThreadHandle cpuTsThread{0};
-    ThreadHandle exportedAicpuTsThread{0};
-    if ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU)) {
-        CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
-        CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
-    }
     if (opParam.engine == COMM_ENGINE_CCU) {
         const uint32_t missionNum = GetKfcServerMissionNum(opParam.algName);
         resCtxHost->kfcServerArgs.clear();
@@ -823,12 +817,6 @@ HcclResult GetOpParamResCtx(
         static_cast<int>(resCtxHost->isHcommBatchTransferOnThreadSupported));
     bool isResourceReused = false;
 
-    ThreadHandle cpuTsThread{0};
-    ThreadHandle exportedAicpuTsThread{0};
-    if ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU)) {
-        CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
-        CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
-    }
     CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
     CHK_PTR_NULL(*resCtxOut);
     opParam.cacheValid = isResourceReused;
