@@ -1,114 +1,126 @@
-# MMAD Direction C API Sample
+# Mmad Computation Direction Optimization Sample
 
 ## Overview
 
-This sample shows how to select the MMAD result-fractal production direction according to the Fixpipe output order when UnitFlag is enabled on Ascend 950PR/Ascend 950DT. It provides a recommended example and a counterexample that changes only the direction for each workload:
+This sample demonstrates how the Mmad computation direction affects performance when UnitFlag is enabled. Better performance can be achieved when the result-fractal production order matches the output order of the data movement instruction.
 
-1. float Nz output without ChannelMerge: use `asc_set_mmad_direction_m()`;
-2. B4 quantized Nz output with automatic ChannelMerge: use `asc_set_mmad_direction_n()`;
-3. float Nz2ND on-the-fly format conversion: use `asc_set_mmad_direction_n()`.
+The sample contains three groups of scenarios. Each group provides a recommended example and a counterexample that changes only the Mmad computation direction:
 
-The direction APIs do not change the matrix multiplication, numerical result, or output format. They change only the production order of 16 x 16 result fractals in L0C Buffer. Matching this order to the Fixpipe read order reduces pipeline stalls when UnitFlag overlaps MMAD and Fixpipe.
+1. float result with Nz2Nz output: `asc_set_mmad_direction_m()` is recommended;
+2. B4 quantization with Nz2Nz output, where hardware automatically enables ChannelMerge: `asc_set_mmad_direction_n()` is recommended;
+3. float result with Nz2ND on-the-fly format conversion: `asc_set_mmad_direction_n()` is recommended.
+
+`asc_set_mmad_direction_m()` and `asc_set_mmad_direction_n()` do not change the matrix multiplication workload, computation result, or output format. They change only the production order of 16 x 16 result fractals in L0C Buffer.
 
 ## Supported Products and CANN Versions
 
-| Product | NPU Architecture | CANN Version |
-| --- | --- | --- |
-| Ascend 950PR/Ascend 950DT | `dav-3510` | CANN version matching the current asc-devkit repository |
+**Table 1** Supported products and CANN versions
 
-The sample supports NPU and NPU simulation modes and does not support CPU debugging. API availability follows the current asc-devkit repository. Upgrade an older installed CANN package before building this sample.
+| Product | CANN Version |
+| --- | --- |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
 ```text
 01_mmad_direction
-├── performance
-│   ├── 3510_sample_raw.csv       # 42 records from the historical performance test
-│   └── 3510_sample_summary.csv   # Historical means and standard deviations
 ├── scripts
-│   ├── gen_data.py               # Generates random inputs and golden data
-│   └── verify_result.py          # Verifies float or packed B4 output
-├── CMakeLists.txt
-├── data_utils.h
-├── mmad_direction.asc
+│   ├── gen_data.py         // Generates random input and golden data
+│   └── verify_result.py    // Verifies output results
+├── CMakeLists.txt          // Build configuration
+├── data_utils.h            // Binary data read/write functions
+├── mmad_direction.asc    // Kernel and Host implementation
 ├── README.md
 └── README_en.md
 ```
 
 ## Sample Description
 
-The sample computes `C = A x B`. A and B are half and the L0C accumulator is float. `gen_data.py` uses a fixed seed to generate sparse signed values from `-1`, `0`, and `1`. B is transposed before it is written so K is contiguous in GM. The non-constant inputs validate matrix computation, Nz fractal ordering, B4 signs, saturation, and two-element packing.
+The sample computes `C = A x B`. A and B are half, and C is float in L0C Buffer.
 
-| Data | I/O | Type | Logical Shape | File and GM Layout |
+**Table 2** Input and output specifications
+
+| Data | Input/Output | Data Type | Dimensions | Data Layout |
 | --- | --- | --- | --- | --- |
-| A | Input | half | `[M, K]` | ND stored as `[M, K]` |
-| B | Input | half | `[K, N]` | Transposed ND stored as `[N, K]` |
-| C, scenarios 1/2 | Output | float | `[M, N]` | Nz stored as `[N/16, M/16, 16, 16]` |
-| C, scenarios 3/4 | Output | int4b_t | `[M, N]` | Nz stored as `[N/64, M/16, 16, 64]`, two signed B4 values per byte |
-| C, scenarios 5/6 | Output | float | `[M, N]` | ND stored as `[M, N]` |
+| A | Input | half | `[M, K]` | ND |
+| B | Input | half | `[N, K]` | ND |
+| C, scenarios 1/2 | Output | float | `[M, N]` | Nz |
+| C, scenarios 3/4 | Output | int4b_t | `[M, N]` | Nz |
+| C, scenarios 5/6 | Output | float | `[M, N]` | ND |
 
-The Kernel executes in this order:
+The Kernel executes in the following order:
 
-1. copy A and B from GM to L1 Buffer and convert ND to Nz;
-2. load A and B from L1 Buffer to L0A Buffer and L0B Buffer;
-3. preset scalar quantization or Nz2ND parameters when required;
-4. configure the MMAD direction immediately before `asc_mmad`;
-5. execute one `asc_mmad` and one `asc_copy_l0c2gm` with matching UnitFlag update modes.
+1. Call `asc_set_gm2l1_nz_para` and `asc_copy_gm2l1_nd2nz` to move A and B from GM to L1 Buffer and convert them to Nz;
+2. call `asc_copy_l12l0a` and `asc_copy_l12l0b` to load A and B from L1 Buffer to L0A Buffer and L0B Buffer;
+3. preset `asc_set_l0c_copy_prequant` or `asc_set_l0c_copy_nz_para` according to the output scenario;
+4. call the direction configuration API before `asc_mmad` and use `asc_unit_flag_mode::ENABLE_UPDATE` to enable UnitFlag;
+5. call `asc_mmad` once to complete the matrix multiplication, then call `asc_copy_l0c2gm` once with `asc_unit_flag_mode::ENABLE_UPDATE` to enable UnitFlag and move out the result.
 
-## Scenarios
+### Scenario Configuration
 
-Each pair uses identical input, shape, MMAD parameters, quantization parameters, and output parameters. Only the direction differs.
+The `SCENARIO_NUM` build parameter selects a recommended example or counterexample. Within each pair, all configurations except the Mmad computation direction are identical.
 
-| `SCENARIO_NUM` | Role | Output Workload | `[M, N, K]` | MMAD Direction |
-| ---: | --- | --- | --- | --- |
-| 1 | Recommended | float Nz + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_m()` |
-| 2 | Counterexample | float Nz + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_n()` |
-| 3 | Recommended | B4 ChannelMerge + UnitFlag | `[192, 64, 128]` | `asc_set_mmad_direction_n()` |
-| 4 | Counterexample | B4 ChannelMerge + UnitFlag | `[192, 64, 128]` | `asc_set_mmad_direction_m()` |
-| 5 | Recommended | float Nz2ND + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_n()` |
-| 6 | Counterexample | float Nz2ND + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_m()` |
+**Table 3** Six build scenarios
 
-### Float Nz Output
+| `SCENARIO_NUM` | Type | Output Scenario | `[M, N, K]` | MMAD Direction | Description |
+| ---: | --- | --- | --- | --- | --- |
+| 1 | Recommended | float Nz2Nz + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_m()` | Normal Nz output reads in the M direction. |
+| 2 | Counterexample | float Nz2Nz + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_n()` | The production order does not match the output order. |
+| 3 | Recommended | B4 ChannelMerge + UnitFlag | `[192, 64, 128]` | `asc_set_mmad_direction_n()` | ChannelMerge reads in the N direction. |
+| 4 | Counterexample | B4 ChannelMerge + UnitFlag | `[192, 64, 128]` | `asc_set_mmad_direction_m()` | The production order does not match the output order. |
+| 5 | Recommended | float Nz2ND + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_n()` | Nz2ND reads in the N direction. |
+| 6 | Counterexample | float Nz2ND + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_m()` | The production order does not match the output order. |
 
-Scenarios 1 and 2 use float output, `NoQuant`, and no Nz2ND/Nz2DN conversion. The output remains Nz and ChannelMerge is not enabled. Normal Nz output reads L0C in the M direction, so scenario 1 uses `asc_set_mmad_direction_m()`.
+### Scenarios 1/2: float Nz Output
 
-### B4 ChannelMerge
+The destination type in scenarios 1 and 2 is float, the quantization mode is `NoQuant`, and neither Nz2ND nor Nz2DN is enabled. Therefore, the result remains in Nz layout and ChannelMerge is not enabled. Normal Nz output reads L0C Buffer in the M direction, so scenario 1 uses `asc_set_mmad_direction_m()` and scenario 2 uses the N direction as a counterexample.
 
-Scenarios 3 and 4 convert float L0C data to `int4b_t` with `QF322S4_PRE` scalar quantization and keep Nz2NZ output. Under these conditions, hardware automatically merges four adjacent 16 x 16 fractals along N into one 16 x 64 fractal. ChannelMerge reads in the N direction, so scenario 3 uses `asc_set_mmad_direction_n()`. Enabling Nz2ND would no longer test this ChannelMerge workload.
+### Scenarios 3/4: B4 ChannelMerge
 
-### Float Nz2ND
+Scenarios 3 and 4 meet all of the following conditions:
 
-Scenarios 5 and 6 use float output without B8/B4 quantization. `asc_set_l0c_copy_nz_para` configures the on-the-fly conversion, and `asc_copy_l0c2gm` enables Nz2ND. Nz2ND reads L0C in the N direction, so scenario 5 uses `asc_set_mmad_direction_n()`.
+- the L0C source data type is float and the GM destination data type is `int4b_t`;
+- the quantization mode is `QF322S4_PRE`, with scalar quantization parameters configured by `asc_set_l0c_copy_prequant`;
+- neither Nz2ND nor Nz2DN is enabled, so the output remains Nz2NZ;
+- both MMAD and Fixpipe use UnitFlag update mode.
 
-### UnitFlag
+Hardware automatically enables ChannelMerge and merges four consecutive 16 x 16 fractals along the N direction into one 16 x 64 fractal. ChannelMerge reads L0C Buffer in the N direction, so scenario 3 uses `asc_set_mmad_direction_n()` and scenario 4 uses the M direction as a counterexample.
 
-Both `asc_mmad` and `asc_copy_l0c2gm` use `asc_unit_flag_mode::ENABLE_UPDATE`. The producer and consumer must use matching UnitFlag modes. The Fixpipe scalar parameters are preset before MMAD starts, and the direction API is called immediately before the corresponding MMAD.
+### Scenarios 5/6: float Nz2ND
 
-## API Version Selection
-
-The source uses the newest APIs in the current asc-devkit repository: the strongly typed `asc_mmad` UnitFlag overload, `asc_set_l0c_copy_prequant(float, uint16_t, bool)`, `asc_set_l0c_copy_nz_para`, and the `asc_copy_l0c2gm` overload whose control parameters use the strongly typed cache, UnitFlag, quantization, and ReLU enums.
-
-The installed CANN 9.2.0 package in this environment predates those declarations. Earlier device validation temporarily mapped them to older signatures with identical hardware settings. No legacy compatibility code remains in the delivered sample.
+Scenarios 5 and 6 configure on-the-fly format conversion parameters with `asc_set_l0c_copy_nz_para` and enable Nz2ND in `asc_copy_l0c2gm`. Nz2ND reads L0C Buffer in the N direction, so scenario 5 uses `asc_set_mmad_direction_n()` and scenario 6 uses the M direction as a counterexample.
 
 ## Performance Comparison
 
-### Historical Results
+**Table 4** Test configuration
 
-The historical measurement revision repeated the same MMAD/Fixpipe sequence 47 times inside one Kernel to amplify steady-state throughput differences. Those numbers are retained as research evidence but do not represent single-MMAD latency. The current `mmad_direction.asc` executes one MMAD and one Fixpipe operation.
+| Configuration | Value |
+| --- | --- |
+| Block count | 1 |
+| Kernel pipeline repetitions | 50 |
+| Performance improvement | `(counterexample mean - recommended mean) / counterexample mean x 100%` |
 
-| Workload | Recommended Mean (us) | Counterexample Mean (us) | Reduction | Result |
-| --- | ---: | ---: | ---: | --- |
-| float Nz + UnitFlag, 256 x 256 x 128 | 61.295 ± 0.084 | 61.948 ± 0.141 | **1.055%** | M-first is faster |
-| B4 ChannelMerge + UnitFlag, 192 x 64 x 128 | 13.154 ± 0.053 | 15.149 ± 0.043 | **13.172%** | N-first is substantially faster |
-| float Nz2ND + UnitFlag, 256 x 256 x 128 | 61.935 ± 0.113 | 112.891 ± 0.056 | **45.137%** | N-first is substantially faster |
+**Table 5** Multiple-run means for recommended examples and counterexamples
 
-Each direction has seven AB/BA-alternated samples. Each sample used two warmups and twelve timed launches, and all 42 records passed correctness verification. See [`performance/3510_sample_raw.csv`](performance/3510_sample_raw.csv) and [`performance/3510_sample_summary.csv`](performance/3510_sample_summary.csv).
+| Scenario | Recommended Mean (us) | Counterexample Mean (us) | Performance Improvement |
+| --- | ---: | ---: | ---: |
+| float Nz2Nz + UnitFlag | 61.295 ± 0.084 | 61.948 ± 0.141 | **1.055%** |
+| B4 ChannelMerge + UnitFlag | 13.154 ± 0.053 | 15.149 ± 0.043 | **13.172%** |
+| float Nz2ND + UnitFlag | 61.935 ± 0.113 | 112.891 ± 0.056 | **45.137%** |
 
-The percentages are shape-dependent and must not be extrapolated directly to other tilings or complete operators.
+Performance gains depend on the data volume, shape, partitioning strategy, and complete operator pipeline. The percentages in Table 5 must not be directly extrapolated to other scenarios and are provided only to demonstrate the relationship between computation direction and performance optimization.
 
-### Measuring the Current Source
+### Performance Test Method
 
-The current Kernel and Host do not contain benchmark loops. Use msOpProf to measure one normal Kernel execution and repeat the executable externally:
+### msOpProf Tool
+
+msOpProf collects single-operator performance data on real NPUs or in simulation. After the command completes, it generates an `OPPROF_{timestamp}_*` directory containing:
+
+- `OpBasicInfo.csv`, which records basic Task information and end-to-end execution time;
+- `PipeUtilization.csv`, which records the duration and utilization of the Cube, Scalar, MTE, and Fixpipe pipelines;
+- `Memory.csv` and `MemoryL0.csv`, which record memory access metrics at different levels.
+
+Use the following commands to collect Kernel performance data for this sample:
 
 ```bash
 SCENARIO_NUM=1
@@ -122,14 +134,19 @@ python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM \
     output/output.bin output/golden.bin
 ```
 
-Collect each recommended/counterexample pair at least five times in AB/BA order. Use `Task Duration(us)` from `OpBasicInfo.csv` for end-to-end comparison. Cube and Fixpipe metrics in `PipeUtilization.csv` explain stalls but must not be summed.
-
-The msOpProf profiling channel previously failed in this container, so invalid `0.000000` records were not used to replace the historical table. Recollect the current one-operation source when a matching CANN package and profiling channel are available.
+Simulation results are suitable for analyzing pipeline behavior. Final performance conclusions must be obtained from a real 3510 device.
 
 ## Build and Run
 
+Configure the CANN environment:
+
 ```bash
 source $INSTALL_PATH/cann/set_env.sh
+```
+
+`$INSTALL_PATH` is the CANN installation directory. Build and run a selected scenario from the sample directory:
+
+```bash
 SCENARIO_NUM=1
 mkdir -p build && cd build
 cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..
@@ -140,17 +157,18 @@ python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM \
     output/output.bin output/golden.bin
 ```
 
-Set `SCENARIO_NUM` from 1 through 6 to run all cases. Clear the CMake cache before changing scenarios. A successful verification prints:
+Clear the CMake cache in the `build` directory before switching scenarios.
+
+**Table 6** Build options
+
+| Build Option | Values | Description |
+| --- | --- | --- |
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture. |
+| `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | NPU execution or NPU simulation; CPU debugging is not supported. |
+| `SCENARIO_NUM` | `1` to `6`, default `1` | Selects a scenario from Table 3. |
+
+Successful verification prints:
 
 ```text
 test pass!
 ```
-
-## Constraints
-
-- Configure the direction before the first corresponding `asc_mmad` or `asc_mmad_mx` and do not depend on state left by another Kernel.
-- Use M-first for normal Nz and other M-direction Fixpipe workloads.
-- Use N-first for Nz2ND and B8/B4 Nz2NZ output that automatically enables ChannelMerge.
-- ChannelMerge requires a B8/B4 destination and Nz2NZ output; Nz2ND and Nz2DN are not ChannelMerge workloads.
-- A B4 destination fractal is 16 x 64, with two signed 4-bit elements per byte.
-- CPU debugging is unsupported. Final performance conclusions must come from a real 3510 device.
