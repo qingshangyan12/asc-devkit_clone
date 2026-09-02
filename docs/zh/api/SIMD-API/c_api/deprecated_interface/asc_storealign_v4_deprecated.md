@@ -33,9 +33,9 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset, vector_bool mask)
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ uint32_t*& dst_align32b, vector_uint32_t src, int32_t offset, vector_bool mask)
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ float*& dst_align32b, vector_float src, int32_t offset, vector_bool mask)
+__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ int32_t*& dst, vector_int32_t src, int32_t offset, vector_bool mask)
+__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ uint32_t*& dst, vector_uint32_t src, int32_t offset, vector_bool mask)
+__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ float*& dst, vector_float src, int32_t offset, vector_bool mask)
 ```
 
 ## 参数说明
@@ -44,7 +44,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ float*& d
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst_align32b | 输入/输出 | 目的操作数的起始地址，按指针引用传入，起始地址需32字节对齐。搬出完成后，该指针由硬件自动更新。 |
+| dst | 输入/输出 | 目的操作数的起始地址，按指针引用传入，起始地址需32字节对齐。搬出完成后，该指针由硬件自动更新。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。支持的数据类型为`int32_t`、`uint32_t`、`float`。 |
 | offset | 输入 | 目的地址更新量，类型为`int32_t`，单位为元素。接口执行后，目的地址累加`offset × sizeof(dtype)`字节。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示参与搬出的元素。对应位置为1时参与搬出，为0时不参与搬出。 |
@@ -61,16 +61,16 @@ PIPE_V
 
 ## 约束说明
 
-- `dst_align32b`起始地址需32字节对齐。
-- Post Update后的`dst_align32b`新地址仍需32字节对齐。
+- `dst`起始地址需32字节对齐。
+- Post Update后的`dst`新地址仍需32字节对齐。
 - `mask`需通过掩码设置接口预先赋值后再传入。
 
 ## 调用示例
 
 ```cpp
-__ubuf__ int32_t* dst_align32b = (__ubuf__ int32_t*)asc_get_phy_buf_addr(0);
+__ubuf__ int32_t* dst = (__ubuf__ int32_t*)asc_get_phy_buf_addr(0);
 vector_int32_t src;
 int32_t offset = 64;
 vector_bool mask = asc_create_mask_b32(PAT_ALL);
-asc_storealign_pack_postupdate_v2(dst_align32b, src, offset, mask);
+asc_storealign_pack_postupdate_v2(dst, src, offset, mask);
 ```
