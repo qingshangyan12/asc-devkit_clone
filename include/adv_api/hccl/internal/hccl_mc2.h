@@ -95,7 +95,7 @@ extern HcclResult HcclCreateOpResCtx(HcclComm comm, uint8_t opType, void* opArgs
 extern HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx);
 
-extern CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx);
+extern CcuResult CcuKernelLaunch(const HcclComm comm, void* opResCtx);
 
 #ifdef __cplusplus
 }
