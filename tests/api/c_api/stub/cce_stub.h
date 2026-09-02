@@ -12,6 +12,7 @@
 #include <cstdint>
 #include "stub_fun.h"
 #include "c_api/utils/enum.h"
+#include "c_api/defs/type.h"
 
 template <typename C, typename A, typename B>
 inline void mad(
@@ -37,6 +38,12 @@ int64_t ld_dev(__gm__ int64_t* src, int16_t offset);
 
 // The compiler supports this overload, but it is missing from the CPU debug stub header.
 inline void vmadd(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, vector_bool mask, Literal mode) {}
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+inline void vcvt_f162s4(
+    vector_int4x2_t& dst, vector_half src, vector_bool mask, int32_t rnd, int32_t sat, int32_t part, int32_t mode)
+{}
+#endif
 
 #ifndef ULL
 #define ULL unsigned long long

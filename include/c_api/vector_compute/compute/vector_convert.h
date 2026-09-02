@@ -25,6 +25,8 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/vector_compute_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/instr_impl/npu_arch_9201/vector_compute_impl.h"
 #endif
 __aicore__ inline void asc_bfloat162float(
     __ubuf__ float* dst, __ubuf__ bfloat16_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
@@ -235,6 +237,24 @@ __aicore__ inline void asc_half2int4(
     uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
 __aicore__ inline void asc_half2int4(__ubuf__ int4b_t* dst, __ubuf__ half* src, uint32_t count);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+__simd_callee__ inline void asc_half2int4x2_rd_m(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_half2int4x2_rd_sat_m(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_half2int4x2_rd_v2_m(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_half2int4x2_rd_sat_v2_m(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_half2int4x2_rd_v3_m(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_half2int4x2_rd_sat_v3_m(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_half2int4x2_rd_v4_m(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_half2int4x2_rd_sat_v4_m(vector_int4x2_t& dst, vector_half src, vector_bool mask);
+#endif
 
 __aicore__ inline void asc_half2int4_rna(
     __ubuf__ int4b_t* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride,
