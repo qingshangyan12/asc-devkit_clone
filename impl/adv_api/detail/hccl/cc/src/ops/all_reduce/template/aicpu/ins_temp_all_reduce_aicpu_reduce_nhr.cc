@@ -55,9 +55,15 @@ HcclResult InsTempAllReduceAicpuReduceNHR::CalcRes(
 
 u64 InsTempAllReduceAicpuReduceNHR::GetThreadNum() const { return 1; }
 
-void InsTempAllReduceAicpuReduceNHR::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub) {}
+void InsTempAllReduceAicpuReduceNHR::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub)
+{
+    (void)notifyIdxMainToSub;
+}
 
-void InsTempAllReduceAicpuReduceNHR::GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain) {}
+void InsTempAllReduceAicpuReduceNHR::GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain)
+{
+    (void)notifyIdxSubToMain;
+}
 
 HcclResult InsTempAllReduceAicpuReduceNHR::KernelRun(
     const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
