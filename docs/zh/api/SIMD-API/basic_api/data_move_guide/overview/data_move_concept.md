@@ -16,11 +16,11 @@
 
 ## 高维切分数据搬运（DataCopy高维切分）
 
-当源或目的操作数在内存中存在固定间隔的非连续分布时，需要使用高维切分模式。该模式通过DataCopyParams参数结构体描述数据块数量、数据块长度及相邻数据块之间的间隔：
+当源或目的操作数在内存中存在固定间隔的非连续分布时，需要使用高维切分模式。该模式引入DataCopyParams（或DataCopyExtParams）参数结构体，通过以下核心参数描述搬运的“分块-重复”模式：
 
-- **blockLen**：每个数据块的长度，单位为DataBlock（32字节）。DataBlock是Ascend C数据搬运的基本寻址粒度。例如，搬运128个half类型元素（每个2字节，共256字节，即8个DataBlock），则blockLen = 8。
-- **blockCount**：需要搬运的数据块个数。
-- **srcGap/dstGap**：源/目的操作数相邻数据块之间的间隔，即前一个数据块结束地址与后一个数据块起始地址的差值，单位为DataBlock。srcGap/dstGap为0时，数据块连续存放；大于0时，数据块之间存在间隔，实现非连续搬运。srcStride/dstStride是这两个字段的待废弃别名。
+- **blockLen**：每个数据块的长度，以DataBlock（32字节）为单位。DataBlock是Ascend C数据搬运的最小寻址粒度。例如，搬运128个half类型元素（每个2字节，共256字节 = 8个DataBlock），则blockLen = 8。
+- **blockCount**：需要搬运的数据块个数。每轮搬运将依次取出blockCount个连续的数据块。
+- **srcStride/dstStride（srcGap/dstGap）**：相邻数据块之间的地址间隔（以DataBlock为单位）。当stride = blockLen时，数据在内存中实际是连续的；当stride\>blockLen时，表示每个数据块之间存在跳跃，实现了非连续（跨步）搬运。
 
 **适用场景**：Conv、Matmul等算子中常见的分块（Tiling）数据搬运，数据按固定步长在源或目的端非连续分布。参考[DataCopy（GM与UB高维切分数据搬运）](../GM_UB_data_move.md#ZH-CN_TOPIC_00000023829080211)、[DataCopy（GM与L1高维切分数据搬运）](../GM_L1_or_L0_data_move.md#ZH-CN_TOPIC_0000002543262916)等章节。
 
