@@ -299,7 +299,7 @@ HcclResult AllocComResourceByTilingCcu(
     CHK_RET(AllocCcuOpResCtx(comm, ctxTag, rankSize, userRank, resCtx));
     HCCL_INFO("[AllocComResourceByTilingCcu]AllocCcuOpResCtx successfully!");
     HCCL_INFO(
-        "[AllocComResourceByTilingCcu]allocated: workspace[%p], size[%llu]", (void*)resCtx.workSpace,
+        "[AllocComResourceByTilingCcu]allocated: workspace[%p], size[%llu]", reinterpret_cast<void*>(resCtx.workSpace),
         resCtx.workSpaceSize);
 
     // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
@@ -547,7 +547,7 @@ void LogKernelLaunchArgs(
 }
 } // namespace
 
-CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx)
+CcuResult CcuKernelLaunch(const HcclComm comm, void* opResCtx)
 {
     CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
     CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
