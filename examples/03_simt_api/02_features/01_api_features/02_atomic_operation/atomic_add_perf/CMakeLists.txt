@@ -10,6 +10,7 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_ENABLE_SIMT ON)
 find_package(ASC REQUIRED)
 
 project(atomic_add_perf LANGUAGES ASC CXX)
@@ -32,7 +33,7 @@ target_compile_definitions(atomic_add_perf PRIVATE
 )
 
 target_compile_options(atomic_add_perf PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
 
 target_link_libraries(atomic_add_perf PRIVATE

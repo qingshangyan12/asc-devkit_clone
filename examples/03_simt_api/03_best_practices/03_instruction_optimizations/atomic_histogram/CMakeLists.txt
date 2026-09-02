@@ -10,6 +10,7 @@
 # ----------------------------------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_ENABLE_SIMT ON)
 find_package(ASC REQUIRED)
 
 project(histogram LANGUAGES ASC CXX)
@@ -29,7 +30,7 @@ option(SKIP_VALIDATION "Skip result validation for replay-based profiling tools"
 #   - 需根据实际部署的NPU硬件架构选择对应的`npu-arch`参数。
 # ======================================================================================
 target_compile_options(histogram PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
 
 target_compile_definitions(histogram PRIVATE

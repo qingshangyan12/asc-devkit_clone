@@ -11,6 +11,7 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_ENABLE_SIMT ON)
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
@@ -27,5 +28,5 @@ target_compile_definitions(grid_config PRIVATE
 )
 
 target_compile_options(grid_config PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
