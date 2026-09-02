@@ -53,7 +53,7 @@ __aicore__ inline void ValidateUbL1Address(uint64_t absUbAddr, uint64_t absL1Add
 // Note: dst stride in normal mode is in unit of 32Bytes, in compact mode is in unit of is 1Byte
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void CopyGmToUbufAlignV2(
-    __ubuf__ T* dst, __gm__ T* src, const uint16_t blockCount, const uint32_t blockLen, const uint8_t leftPaddingCount,
+    __ubuf__ T* dst, __gm__ T* src, const uint32_t blockCount, const uint32_t blockLen, const uint8_t leftPaddingCount,
     const uint8_t rightPaddingCount, const int64_t srcStride, const int64_t dstStride, const bool isDataCopyPad,
     const uint8_t cacheMode = 0, const bool isPad = true)
 {
@@ -96,7 +96,7 @@ __aicore__ inline void CopyGmToUbufAlignV2(
 // UB -> GM: copy_ubuf_to_gm_align_v2
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void CopyUbufToGmAlignV2(
-    __gm__ T* dst, __ubuf__ T* src, const uint16_t blockCount, const uint32_t blockLen, const int64_t srcStride,
+    __gm__ T* dst, __ubuf__ T* src, const uint32_t blockCount, const uint32_t blockLen, const int64_t srcStride,
     const int64_t dstStride, const bool isDataCopyPad, const uint8_t cacheMode = 0)
 {
     // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte / 32bytes
