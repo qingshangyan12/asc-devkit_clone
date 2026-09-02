@@ -99,9 +99,9 @@ static CcuResult DoPeerOnlyReduceScatter(KfcReduceScatterMesh1DMem2MemPeerOnlyCo
     output.addr = ctx.output;
     output.token = ctx.token[ctx.rankId];
 
-    ccu::Variable chunkSize;
+    ccu::Variable chunkSize{};
     chunkSize = UB_MAX_TRANS_SIZE;
-    ccu::Variable chunkLoopNumAdd;
+    ccu::Variable chunkLoopNumAdd{};
     chunkLoopNumAdd = 1;
     CCU_WHILE(ctx.chunkLoopNum != UINT64_MAX)
     {
