@@ -11,9 +11,17 @@
 #define HCCL_CCU_TEMP_KFC_ALL_REDUCE_MESH_1D_MEM2MEM_H
 
 #include "utils.h"
+#include "alg_param.h"
 #include "ccu_temp_kfc_mesh_1D_mem2mem_base.h"
 
 namespace mc2_ops_hccl {
+
+struct CcuKernelArgAllReduceKfc : CcuKernelArgBase {
+    uint64_t rankSize;
+    uint32_t rankId;
+    OpParam opParam;
+    std::vector<std::vector<uint32_t>> subCommRanks;
+};
 
 class CcuTempKfcAllReduceMesh1DMem2Mem : public CcuTempKfcMesh1DMem2MemBase {
 public:
