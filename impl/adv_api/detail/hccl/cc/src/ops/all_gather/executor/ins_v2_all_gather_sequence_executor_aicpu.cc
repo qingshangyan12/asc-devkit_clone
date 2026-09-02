@@ -55,9 +55,13 @@ HcclResult InsV2AllGatherSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
     const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
     InitCommInfo(comm, param, topoInfo, algHierarchyInfo);
-    if (algHierarchyInfo.infos.size() != SEQUENCE_EXECUTOR_LEVEL_NUM) {
+    if (algHierarchyInfo.infos.size() != SEQUENCE_EXECUTOR_LEVEL_NUM || algHierarchyInfo.infos[0].empty()
+        || algHierarchyInfo.infos[0][0].empty() || algHierarchyInfo.infos[1].empty()
+        || algHierarchyInfo.infos[1][0].empty()) {
         HCCL_ERROR(
-            "[InsV2AllGatherSequenceExecutorAicpu] algHierarchyInfo size should be %u", SEQUENCE_EXECUTOR_LEVEL_NUM);
+            "[InsV2AllGatherSequenceExecutorAicpu] invalid algHierarchyInfo, requires 2-level topology but "
+            "topoLevelNums[%u], infos size[%zu]",
+            topoInfo->topoLevelNums, algHierarchyInfo.infos.size());
         return HCCL_E_INTERNAL;
     }
     InsAlgTemplate1 interTempAlg(param, myRank_, algHierarchyInfo.infos[1]);
