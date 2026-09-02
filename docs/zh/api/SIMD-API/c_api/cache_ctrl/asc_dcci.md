@@ -83,6 +83,14 @@ PIPE_S
 
 使用`asc_dcci_entire_ub`刷新UB对应的DCache后，必须调用`asc_sync_data_barrier(mem_dsb_t::DSB_UB)`，再执行依赖刷新结果的Scalar读操作。
 
+`volatile`不是DCCI接口的调用要求。调用DCCI并执行Data Sync Barrier后，仅当后续读取依赖DCCI结果，并且通过普通GM或UB指针对此前读取过的同一对象再次执行Scalar Load时，才应使用指向`volatile`限定对象的指针执行该读取，避免编译器复用DCCI前的读取结果。对于UB地址，该约束仅适用于`CTRL[49]`设置为`1'b1`，Scalar Load经过DCache的场景。
+
+`volatile`仅约束编译器优化，不能使DCache条目失效，也不能保证硬件访存顺序，因此不能替代DCCI和[Data Sync Barrier](../sync/asc_sync_data_barrier.md)。刷新UB对应的DCache后，应使用`DSB_UB`；刷新GM对应的DCache后，通常使用`DSB_DDR`，如果还需要同时等待其他存储位置的访问完成，则使用范围更大的`DSB_ALL`。
+
+<!-- npu="950" id9 -->
+- Ascend 950PR/Ascend 950DT：对于无需经过DCache的GM读取场景，可以使用[asc_load_dev](../scalar_compute/asc_load_dev.md)代替普通GM指针读取。该接口绕过DCache，因此当前读取不需要通过读端DCCI使本核DCache旧副本失效，但写端仍须将数据写回GM并完成所需同步。跨核场景中，写端应在数据写入GM完成后发布同步标志，读端应在观察到同步标志后再读取数据；Data Sync Barrier本身不提供跨核通知。该接口不适用于UB地址。
+<!-- end id9 -->
+
 ## 调用示例
 
 ```cpp
