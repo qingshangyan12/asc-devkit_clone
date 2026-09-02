@@ -24,6 +24,7 @@
 
 #include "simt_api/device_types.h"
 #include "simt_api/math_constants.h"
+#include "impl/simt_api/device_functions_impl.h"
 #include "impl/simt_api/internal_functions_impl.h"
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
