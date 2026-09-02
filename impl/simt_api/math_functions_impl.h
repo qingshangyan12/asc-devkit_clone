@@ -204,8 +204,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_log2f_positive_finite(floa
 
     const uint32_t reduction_bits = (log_input_bits - sqrt_half_bits) & log_reduction_mask;
     const float mantissa = __uint_as_float(log_input_bits - reduction_bits);
-    const float exponent_part = fmaf(__int2float_rn(static_cast<int32_t>(reduction_bits)), log_exponent_scale,
-        exponent_base);
+    const float exponent_part =
+        fmaf(__int2float_rn(static_cast<int32_t>(reduction_bits)), log_exponent_scale, exponent_base);
 
     const float mantissa_minus_one = mantissa - 1.0f;
     const float reciprocal = 1.0f / (mantissa + 1.0f);
@@ -569,12 +569,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_remquof_impl(float x, f
     return remainder;
 }
 
-#define __INTERNAL_REMQUOF(x, y, quo)                      \
-    do {                                                   \
-        int32_t tmp_quo = 0;                               \
+#define __INTERNAL_REMQUOF(x, y, quo)                           \
+    do {                                                        \
+        int32_t tmp_quo = 0;                                    \
         float tmp_res = __asc_remquof_impl((x), (y), &tmp_quo); \
-        *(quo) = tmp_quo;                                  \
-        return tmp_res;                                    \
+        *(quo) = tmp_quo;                                       \
+        return tmp_res;                                         \
     } while (0)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, int* quo) { __INTERNAL_REMQUOF(x, y, quo); }
@@ -701,10 +701,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_with_sign_bit(float value
     return __uint_as_float(value_bits | sign_bits);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float copysignf(float x, float y)
-{
-    return __internal_with_sign_bit(x, y);
-}
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float copysignf(float x, float y) { return __internal_with_sign_bit(x, y); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_asin_acos_reduced_arg(float abs_x)
 {
@@ -791,10 +788,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_scalbnf_clamped(float x, 
     return result;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float scalbnf(float x, int32_t n)
-{
-    return __internal_scalbnf_clamped(x, n);
-}
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float scalbnf(float x, int32_t n) { return __internal_scalbnf_clamped(x, n); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float scalblnf(float x, int64_t n)
 {
@@ -1493,10 +1487,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sinpif_core(float x)
     return result;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x)
-{
-    return __internal_sinpif_core(x);
-}
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x) { return __internal_sinpif_core(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
 {
@@ -1642,19 +1633,16 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_sincospif_core(float x, fl
     *cos_result = selected_cos;
 }
 
-#define __INTERNAL_SINCOSPIF(x, s, c)                    \
-    do {                                                 \
-        float sin_result = 0.0f;                         \
-        float cos_result = 0.0f;                         \
+#define __INTERNAL_SINCOSPIF(x, s, c)                             \
+    do {                                                          \
+        float sin_result = 0.0f;                                  \
+        float cos_result = 0.0f;                                  \
         __internal_sincospif_core((x), &sin_result, &cos_result); \
-        *(s) = sin_result;                               \
-        *(c) = cos_result;                               \
+        *(s) = sin_result;                                        \
+        *(c) = cos_result;                                        \
     } while (0)
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, float* s, float* c)
-{
-    __INTERNAL_SINCOSPIF(x, s, c);
-}
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, float* s, float* c) { __INTERNAL_SINCOSPIF(x, s, c); }
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifdef __NPU_ARCH__
@@ -1722,8 +1710,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_exp2f_reconstruct(float x
     const bool rounded_x_is_positive = rounded_x > 0.0f;
     const uint32_t scale_hi_bits = rounded_x_is_positive ? 0x7F000000U : 0x02000000U;
     const uint32_t scale_adjust = rounded_x_is_positive ? 0U : 0x83000000U;
-    const uint32_t scale_lo_bits =
-        (static_cast<uint32_t>(exp2_exponent) << fp32_exponent_shift) - scale_adjust;
+    const uint32_t scale_lo_bits = (static_cast<uint32_t>(exp2_exponent) << fp32_exponent_shift) - scale_adjust;
     float output = exp_poly * __uint_as_float(scale_hi_bits);
     output = output * __uint_as_float(scale_lo_bits);
 
@@ -1738,64 +1725,67 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_exp2f_finite(float x)
     return __internal_exp2f_reconstruct(x, 0.0f);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __internal_is_odd_integer_f32(float value)
+{
+    const float half_trunc = truncf(value * 0.5f);
+    const float remainder = value - (half_trunc + half_trunc);
+    return fabsf(remainder) == 1.0f;
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y)
 {
     const float abs_x = fabsf(x);
     const float abs_y = fabsf(y);
 
-    // These two cases have priority over NaN propagation in powf semantics.
+    float output = ASCRT_NAN_F;
+
+    if (!isnan(x) && !isnan(y) && abs_x != 0.0f && abs_x != ASCRT_INF_F && abs_y != ASCRT_INF_F) {
+        float log2_hi = 0.0f;
+        float log2_lo = 0.0f;
+        __internal_log2f_positive_finite(abs_x, log2_hi, log2_lo);
+
+        const float log2_abs_x = log2_hi + log2_lo;
+        const float product_hi = log2_abs_x * y;
+        float product_lo = fmaf(log2_abs_x, y, -product_hi);
+        product_lo = fmaf(log2_lo - (log2_abs_x - log2_hi), y, product_lo);
+
+        output = __internal_exp2f_reconstruct(product_hi, product_lo);
+
+        if (x < 0.0f) {
+            if (floorf(y) != y) {
+                output = ASCRT_NAN_F;
+            } else if (__internal_is_odd_integer_f32(y)) {
+                output = -output;
+            }
+        }
+    }
+
     if (y == 0.0f || x == 1.0f) {
-        return 1.0f;
-    }
-
-    // Match the SASS tail path: unordered operands fall back to x + y to propagate NaN.
-    if (isnan(x) || isnan(y)) {
-        return x + y;
-    }
-
-    // The zero/inf path only needs the sign of y and whether y is an odd integer.
-    const float half_y_trunc = truncf(y * 0.5f);
-    const float odd_remainder = y - (half_y_trunc + half_y_trunc);
-    const bool exponent_is_odd_integer = fabsf(odd_remainder) == 1.0f;
-    if (x == 0.0f || abs_x == ASCRT_INF_F) {
-        float special_output = x + x;
-        if (y < 0.0f) {
-            special_output = abs_x == ASCRT_INF_F ? 0.0f : ASCRT_INF_F;
-            special_output = __internal_with_sign_bit(special_output, x);
+        output = 1.0f;
+    } else if (x == 0.0f || abs_x == ASCRT_INF_F) {
+        if (isnan(y)) {
+            output = x + y;
+        } else {
+            float special_output = x + x;
+            if (y < 0.0f) {
+                special_output = __internal_with_sign_bit(abs_x == ASCRT_INF_F ? 0.0f : ASCRT_INF_F, x);
+            }
+            output = __internal_is_odd_integer_f32(y) ? special_output : fabsf(special_output);
         }
-        return exponent_is_odd_integer ? special_output : fabsf(special_output);
-    }
-
-    // For |y| == inf and finite nonzero x, the result depends only on whether |x| is below or above 1.
-    if (abs_y == ASCRT_INF_F) {
-        if (x == -1.0f) {
-            return 1.0f;
+    } else if (abs_y == ASCRT_INF_F) {
+        if (isnan(x)) {
+            output = x + y;
+        } else if (x == -1.0f) {
+            output = 1.0f;
+        } else {
+            const bool result_is_inf = (abs_x > 1.0f && y > 0.0f) || (abs_x < 1.0f && y < 0.0f);
+            output = result_is_inf ? ASCRT_INF_F : 0.0f;
         }
-        const bool result_is_inf = (abs_x > 1.0f && y > 0.0f) || (abs_x < 1.0f && y < 0.0f);
-        return result_is_inf ? ASCRT_INF_F : 0.0f;
+    } else if (isnan(x) || isnan(y)) {
+        output = x + y;
     }
 
-    bool output_is_negative = false;
-    if (x < 0.0f) {
-        const float y_floor = floorf(y);
-        if (y_floor != y) {
-            return ASCRT_INF_F / ASCRT_INF_F;
-        }
-        output_is_negative = exponent_is_odd_integer;
-    }
-
-    float log2_hi = 0.0f;
-    float log2_lo = 0.0f;
-    __internal_log2f_positive_finite(abs_x, log2_hi, log2_lo);
-    const float log2_abs_x = log2_hi + log2_lo;
-
-    // Compute exp2(y * log2(|x|)): keep a residual term so the exp2 polynomial sees a small fraction.
-    const float product_hi = log2_abs_x * y;
-    float product_lo = fmaf(log2_abs_x, y, -product_hi);
-    product_lo = fmaf(log2_lo - (log2_abs_x - log2_hi), y, product_lo);
-
-    float output = __internal_exp2f_reconstruct(product_hi, product_lo);
-    return output_is_negative ? -output : output;
+    return output;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x)
@@ -2930,8 +2920,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_stirling_and_euler_reflec
         } else {
             sinpi_poly = fmaf(reduced_pi_arg_square, -0.59248024225234985352f, 2.550144195556640625f);
             sinpi_poly = fmaf(reduced_pi_arg_square, sinpi_poly, -5.1677198410034179688f);
-            sinpi_poly = fmaf(sinpi_poly, reduced_pi_arg * reduced_pi_arg_square,
-                reduced_pi_arg * 3.1415927410125732422f);
+            sinpi_poly =
+                fmaf(sinpi_poly, reduced_pi_arg * reduced_pi_arg_square, reduced_pi_arg * 3.1415927410125732422f);
         }
         float sinpi = ((sinpi_quadrant & 2) != 0) ? -sinpi_poly : sinpi_poly;
 
@@ -2960,8 +2950,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tgammaf(float x)
         return 1.0f / x;
     }
 
-    float result = fabsf(x) < 1.5f ? __internal_euler_gamma_function(x) :
-        __internal_stirling_and_euler_reflection(x);
+    float result = fabsf(x) < 1.5f ? __internal_euler_gamma_function(x) : __internal_stirling_and_euler_reflection(x);
 
     const float truncated_x = truncf(x);
     if (truncated_x == x) {
