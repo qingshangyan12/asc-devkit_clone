@@ -15,6 +15,7 @@
 #include "../../../../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
 #include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
+#include "../../../../all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
 #include "ccu_kernel_kfc_server.h"
 #include "ccu_variable_dl.hpp"
 #include "ccu_func_dl.hpp"
@@ -29,6 +30,9 @@ using namespace std;
 static_assert(
     KFC_CONCURRENT_AG_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
     "Concurrent AllGather parameters exceed the KFC server load width");
+static_assert(
+    KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_PARAM_NUM_PER_DIE,
+    "Concurrent AllToAll parameters exceed the KFC server load width");
 static_assert(KFC_MAX_MISSION_NUM == 2U, "KFC server CKE partitioning expects two missions");
 static_assert(KFC_SIGNAL_REGIONS_PER_MISSION == 2U, "Each KFC mission requires commit and done regions");
 
@@ -50,6 +54,14 @@ const uint32_t HBM_PARAM_IDX_14 = 14;
 const uint32_t HBM_PARAM_IDX_15 = 15;
 const uint32_t HBM_PARAM_IDX_16 = 16;
 const uint32_t HBM_PARAM_IDX_17 = 17;
+const uint32_t HBM_PARAM_IDX_18 = 18;
+const uint32_t HBM_PARAM_IDX_19 = 19;
+const uint32_t HBM_PARAM_IDX_20 = 20;
+const uint32_t HBM_PARAM_IDX_21 = 21;
+const uint32_t HBM_PARAM_IDX_22 = 22;
+const uint32_t HBM_PARAM_IDX_23 = 23;
+const uint32_t HBM_PARAM_IDX_24 = 24;
+const uint32_t HBM_PARAM_IDX_25 = 25;
 // KFC reduce_scatter specific parameters (at positions [13..23], not used by homm CCU server template)
 const uint32_t HBM_PARAM_IDX_KFC_CHUNK_SIZE = 13;
 const uint32_t HBM_PARAM_IDX_KFC_CHUNK_LOOP_NUM = 14;
@@ -183,8 +195,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 param[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL], ctx.arg->channels, ctx.arg->channelCount,
                 static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
         }
-    }
-    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+    } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
         CcuReduceScatterMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_KFC_CHUNK_SIZE], param[HBM_PARAM_IDX_KFC_CHUNK_LOOP_NUM],
@@ -195,30 +206,39 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             param[HBM_PARAM_IDX_KFC_TAIL_GO_RESIDUAL], ctx.arg->channels, ctx.arg->channelCount,
             static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
             ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
-    }
-    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
+    } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
         CcuKfcAllReduceMesh1DMem2MemKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
             param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], param[HBM_PARAM_IDX_12],
             param[HBM_PARAM_IDX_13], param[HBM_PARAM_IDX_14], param[HBM_PARAM_IDX_15], param[HBM_PARAM_IDX_16],
-            param[HBM_PARAM_IDX_17], ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
+            param[HBM_PARAM_IDX_17], param[HBM_PARAM_IDX_18], param[HBM_PARAM_IDX_19], param[HBM_PARAM_IDX_20],
+            param[HBM_PARAM_IDX_21], param[HBM_PARAM_IDX_22], param[HBM_PARAM_IDX_23], param[HBM_PARAM_IDX_24],
+            param[HBM_PARAM_IDX_25], ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
             ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType, ctx.arg->opParam.DataDes.outputType,
             ctx.arg->opParam.reduceType);
-    }
-    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+    } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
         CcuAlltoAllVMesh1DKernel(
             param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
             param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
             param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize),
             ctx.arg->rankId);
-    }
-    if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
-        CcuAlltoAllMesh1DKernel(
-            param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4],
-            param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
-            param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], ctx.arg->channels, ctx.arg->channelCount,
-            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->loadFromMem);
+    } else if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
+        if (ctx.arg->role == KfcServerRole::ALL_TO_ALL_MULTI_JETTY) {
+            CcuKfcAllToAllMesh1DMultiJettyKernel(
+                param[KFC_CONCURRENT_A2A_INPUT], param[KFC_CONCURRENT_A2A_OUTPUT], ctx.token,
+                param[KFC_CONCURRENT_A2A_SLICE_SIZE], param[KFC_CONCURRENT_A2A_SRC_STRIDE],
+                param[KFC_CONCURRENT_A2A_SRC_OFFSET], param[KFC_CONCURRENT_A2A_DST_OFFSET],
+                param[KFC_CONCURRENT_A2A_GO_SIZE_0], param[KFC_CONCURRENT_A2A_GO_SIZE_1],
+                param[KFC_CONCURRENT_A2A_GO_SIZE_2], param[KFC_CONCURRENT_A2A_GO_SIZE_3], ctx.arg->channels,
+                ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+        } else {
+            CcuAlltoAllMesh1DKernel(
+                param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_3],
+                param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7],
+                param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10], ctx.arg->channels,
+                ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->loadFromMem);
+        }
     }
 }
 
