@@ -176,9 +176,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_log2f_positive_finite(float x, float& log2_hi, float& log2_lo)
 {
-    constexpr float fp32_min_normal = 1.175494350822287508e-38f; // Minimum positive normal fp32 value.
-    constexpr float subnormal_scale = 16777216.0f;               // 2^24, used to lift subnormals into the normal range.
-    constexpr float subnormal_exponent_fix = -24.0f;             // Exponent offset that compensates the 2^24 rescale.
+    constexpr float subnormal_scale = 16777216.0f;   // 2^24, used to lift subnormals into the normal range.
+    constexpr float subnormal_exponent_fix = -24.0f; // Exponent offset that compensates the 2^24 rescale.
     constexpr float log_exponent_scale =
         1.1920928955078125e-07f;                         // 2^-23, converts biased exponent bits to a float scale.
     constexpr uint32_t log_reduction_mask = 0xFF800000U; // Mask that keeps the exponent field for log reduction.
@@ -187,7 +186,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_log2f_positive_finite(floa
     constexpr float log2e_hi = 1.4426950216293334961f;     // High part of log2(e).
     constexpr float log2e_lo = 1.9251366722983220825e-08f; // Low tail of log2(e) for compensation.
 
-    const bool is_normal_x = x >= fp32_min_normal;
+    const bool is_normal_x = x >= __internal_subnormal_boundary;
     const float log_input = is_normal_x ? x : x * subnormal_scale;
     const float exponent_base = is_normal_x ? 0.0f : subnormal_exponent_fix;
     const uint32_t log_input_bits = __float_as_uint(log_input);
