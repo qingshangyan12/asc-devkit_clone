@@ -81,6 +81,9 @@ std::vector<OmniPipeSplitSliceInfo> OmniPipeSplitSliceInfoListAssign(
 void CalAllgather2DOffset(
     u64* xAGOffset, u64* yAGOffset, u64 stepNum, u64 xRankSize, u64 yRankSize, u64* xAGDataSize, u64* yAGDataSize)
 {
+    (void)xRankSize;
+    (void)yRankSize;
+
     HCCL_INFO("[CalAllgather2DOffset] start");
     xAGOffset[0] = 0; // 第一步发同轴，偏移为0
     yAGOffset[0] = 0; // 第一步发同轴，偏移为0
@@ -111,6 +114,9 @@ void CalReducescatter2DOffset(
     u64* xRSOffset, u64* yRSOffset, u64 stepNum, u64 xRankSize, u64 yRankSize, const u64* xRSDataSize,
     const u64* yRSDataSize)
 {
+    (void)xRankSize;
+    (void)yRankSize;
+
     HCCL_INFO("[CalReducescatter2DOffset] start");
     xRSOffset[0] = 0; // 第一步发斜对角，偏移为0
     yRSOffset[0] = 0;
@@ -172,7 +178,7 @@ u64 CalAllgatherDataSizeRatio2D(
         // 计算通信步数,计算固定max步
         step = maxStep;
         if (xRankSize - bandwidthRatio > 0) {
-            if (omniPipeRatio == 1) {
+            if (static_cast<int>(omniPipeRatio) == 1) {
                 // 等比为1时需要单独算步数
                 step = bandwidthRatio + 1;
             } else {
@@ -261,7 +267,7 @@ u64 CalAllgatherDataSize2D(
         // 计算通信步数,计算固定max步
         step = maxStep;
         if (xRankSize - bandwidthRatio > 0) {
-            if (omniPipeRatio == 1) {
+            if (static_cast<int>(omniPipeRatio) == 1) {
                 // 等比为1时需要单独算步数
                 step = bandwidthRatio + 1;
             } else {
@@ -357,7 +363,7 @@ u64 CalReducescatterDataSize2D(
         // 计算通信步数,计算固定5步
         step = maxStep;
         if (xRankSize - bandwidthRatio > 0) {
-            if (omniPipeRatio == 1) {
+            if (static_cast<int>(omniPipeRatio) == 1) {
                 // 等比为1时需要单独算步数，最后一步拆成两步，所以加2
                 step = bandwidthRatio + 2;
             } else {
@@ -871,6 +877,7 @@ std::vector<std::vector<u64>> CalRSDataSizeStep(
 
 std::vector<u64> OmniPipeSplitData(u64 rankSize, u64 count, u64 dataTypeSize)
 {
+    (void)dataTypeSize;
     std::vector<u64> omniPipeSplitSliceInfoList;
     u64 sliceCount = RoundUp(count, rankSize);
 
@@ -891,6 +898,8 @@ std::vector<u64> OmniPipeSplitData(u64 rankSize, u64 count, u64 dataTypeSize)
 std::vector<std::vector<u64>> OmniPipeSplitRankDataLoop(
     std::vector<u64> omniPipeSplitSliceInfoList, u64 maxDataCountPerLoop, u64 loopCount, u64 dataTypeSize)
 {
+    (void)dataTypeSize;
+
     std::vector<std::vector<u64>> omniPipeSplitRankDataLoop;
     u64 sliceNum = omniPipeSplitSliceInfoList.size();
 
@@ -962,10 +971,10 @@ OmniPipeSliceInfo CalcAGOmniPipeSliceInfo(OmniPipeSliceParam& omniPipeSliceParam
     std::vector<OmniPipeSplitSliceInfo> omniPipeSplitSliceInfoListTotal =
         OmniPipeSplitSliceInfoListAssign(dataSize, rankSize, dataTypeSize);
 
-    u64 zAGDataSize[rankSize][maxStepNum]; // 存数据片大小
-    u64 xyAGDataSize[rankSize][maxStepNum];
-    u64 xAGDataSize[rankSize][maxStepNum][maxStepNum];
-    u64 yAGDataSize[rankSize][maxStepNum][maxStepNum];
+    u64 zAGDataSize[rankSize][maxStepNum]{}; // 存数据片大小
+    u64 xyAGDataSize[rankSize][maxStepNum]{};
+    u64 xAGDataSize[rankSize][maxStepNum][maxStepNum]{};
+    u64 yAGDataSize[rankSize][maxStepNum][maxStepNum]{};
     u64 outerStepNum = 0;                            // 机内机间步数
     u64 innerStepNum = 0;                            // 机内两轴步数
     u64 zAGOffset[rankSize][maxStepNum];             // z轴偏移
