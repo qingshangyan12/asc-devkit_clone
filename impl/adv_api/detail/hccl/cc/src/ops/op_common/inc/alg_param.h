@@ -17,8 +17,6 @@
 #include <unordered_set>
 #include <memory>
 #include <functional>
-#include <functional>
-#include <memory>
 #include "ccu_datatype_v1.h"
 #include "hccl_comm.h"
 #include "hccl_common.h"
