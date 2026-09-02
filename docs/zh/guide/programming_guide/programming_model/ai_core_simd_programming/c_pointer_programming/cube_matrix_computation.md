@@ -195,7 +195,7 @@ int16_t dst_stride = 3;
 asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
 ```
 
-搬运到`L0B Buffer`采用`asc_copy_l12l0b`实现，接口参数及实现功能同L12L0A，可参考[cube_data_move](../../../../../api/SIMD-API/c_api/cube_data_move/cube_data_move.md)查看更多内容。
+搬运到`L0B Buffer`采用`asc_copy_l12l0b`实现，接口参数及实现功能同L12L0A，可参考[矩阵计算搬运](../../../../../api/SIMD-API/c_api/cube_datamove/cube_datamove.md)查看更多内容。
 
 当输入A矩阵（Global Memory）是转置排布(K × M)时，搬入到`L1 Buffer`为(K × N)排布的Nz分形。要使`L0A Buffer`存放(M × K)的Zz或Nz格式（[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)），需要在L12L0A时进行转置，调用`asc_copy_l12l0a_transpose`接口。
 
@@ -251,14 +251,14 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_str
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 ```
 
-详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/c_api/cube_data_move/asc_copy_l0c2gm)。
+详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md)。
 
 
 ## 矩阵计算能力说明
 
 `asc_mmad`是Ascend C封装NPU硬件能力的核心矩阵乘加接口，广泛应用于全连接、卷积等算子，实现C = A × B + C运算。计算输入取自L0A Buffer、L0B Buffer，结果写入L0C Buffer。不同产品对应的缓存分形格式前文已说明。
 
-![[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md) `asc_mmad`计算](../../../../figures/mmad_950.png)
+![950矩阵计算分形格式示意图](../../../../figures/mmad_950.png)
 
 表 矩阵计算矩阵A、B、C解释说明([NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md))
 | 矩阵计算逻辑 | 矩阵计算物理位置 | 维度 | 输入/输出数据格式 | 数据类型 |

@@ -30,6 +30,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 {
     const uint64_t dataSize = GetHcclDataTypeSize(commParam->dataType);
     xnData_[0] = GetOpId(commParam); // ccu xn0
+    KERNEL_LOG(
+        KERNEL_INFO, "ApiClient CcuPrepareForAllToAllV count:%llu, sendBuf:0x%llx, recvBuf:0x%llx, dataType:%d",
+        (unsigned long long)commParam->count, (unsigned long long)(uint64_t)commParam->sendBuf,
+        (unsigned long long)(uint64_t)commParam->recvBuf, static_cast<int>(commParam->dataType));
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
     xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
@@ -43,6 +47,12 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     auto dataSlice = ((allToAllVParam->sendCounts[ccuParam_.rankId]) * dataSize) % CCU_MAX_COMM_DATA;
     CalcGoSize(dataSlice, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
     xnData_[9] = reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt) + CCU_MSG_EXT_RANK_OFFSET * ccuParam_.alltoallvCnt;
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "ApiClient CcuPrepareForAllToAllV xn0(opId):0x%llx, xn1(sendBuf+off):0x%llx, xn2(recvBuf+off):0x%llx, "
+        "xn5(goSize):0x%llx, xn9(msgExt):0x%llx",
+        (unsigned long long)xnData_[0], (unsigned long long)xnData_[1], (unsigned long long)xnData_[2],
+        (unsigned long long)xnData_[5], (unsigned long long)xnData_[9]);
     return;
 }
 
@@ -198,26 +208,52 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     } else {
         CalcGoSize(normalSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11]);
     }
+
+    constexpr uint64_t arScratchSize = 16 * 1024 * 1024;
+    constexpr uint64_t minSliceAlign = 128;
+    uint64_t chunkSize = arScratchSize / ccuParam_.rankNum / minSliceAlign * minSliceAlign;
+    uint64_t mySliceSize = xnData_[8];
+    uint64_t fullChunkCount = mySliceSize == 0 ? 0 : (mySliceSize - 1) / chunkSize;
+    uint64_t tailSize = mySliceSize - fullChunkCount * chunkSize;
+    uint64_t chunkCount = mySliceSize == 0 ? 0 : fullChunkCount + 1;
+    xnData_[15] = chunkSize;
+    xnData_[16] = tailSize;
+    xnData_[17] = UINT64_MAX - chunkCount;
+    CalcGoSize(chunkSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[18]);
+    CalcGoSize(tailSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[22]);
+    KERNEL_LOG(
+        KERNEL_INFO, "AR chunk debug: mySlice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n",
+        mySliceSize, chunkSize, fullChunkCount, tailSize, xnData_[17]);
 }
 
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllGatherM2M(
     __gm__ CommonPrepareParamCcu* commParam)
 {
-    xnData_[0] = GetOpId(commParam); // ccu xn0
+    xnData_[KFC_CONCURRENT_AG_OP_ID] = GetOpId(commParam);
     auto dataSize = GetHcclDataTypeSize(commParam->dataType);
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
-    xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
-    xnData_[2] = (uint64_t)commParam->recvBuf + offset; // ccu xn2
+    xnData_[KFC_CONCURRENT_AG_MESH_INPUT] = (uint64_t)commParam->sendBuf + offset;
+    xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT] = (uint64_t)commParam->recvBuf + offset;
 
     uint64_t loopCount = CCU_LOOP_COUNT_M2M_AG;
     uint64_t sliceCount = commParam->count;
     uint64_t sliceSize = sliceCount * dataSize;
 
-    xnData_[3] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
-    xnData_[4] = sliceSize;
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
-    xnData_[9] = (xnData_[1] == xnData_[2] + xnData_[3]) ? 1U : 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET] =
+        ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
+    xnData_[KFC_CONCURRENT_AG_MESH_SLICE_SIZE] = sliceSize;
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[KFC_CONCURRENT_AG_MESH_GO_SIZE_0]);
+    xnData_[KFC_CONCURRENT_AG_MESH_CURRENT_RANK_SLICE_INPUT_OFFSET] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_REPEAT_NUM_INV] = UINT64_MAX - 1U;
+    xnData_[KFC_CONCURRENT_AG_MESH_INPUT_REPEAT_STRIDE] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_REPEAT_STRIDE] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_LAST_SLICE_SIZE] = sliceSize;
+    xnData_[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL] =
+        (xnData_[KFC_CONCURRENT_AG_MESH_INPUT] ==
+         xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT] + xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET]) ?
+            1U :
+            0U;
 }
 
 template <const auto& config>
@@ -245,6 +281,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET] = outputStride * ccuParam_.rankId;
     xnData_[KFC_CONCURRENT_AG_MESH_SLICE_SIZE] = meshSize;
     CalcGoSize(meshSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_AG_MESH_GO_SIZE_0]);
+    xnData_[KFC_CONCURRENT_AG_MESH_CURRENT_RANK_SLICE_INPUT_OFFSET] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_REPEAT_NUM_INV] = UINT64_MAX - 1U;
+    xnData_[KFC_CONCURRENT_AG_MESH_INPUT_REPEAT_STRIDE] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_REPEAT_STRIDE] = 0U;
+    xnData_[KFC_CONCURRENT_AG_MESH_LAST_SLICE_SIZE] = meshSize;
     xnData_[KFC_CONCURRENT_AG_MESH_INPUT_OUTPUT_EQUAL] =
         (inputBase == outputBase + xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET]) ? 1U : 0U;
 
@@ -289,18 +330,24 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[4] = rankSliceOffset;
     xnData_[5] = 0;
     xnData_[6] = 0;
-    // XN7/XN8 carry the tail size and inverse total chunk count.
+    xnData_[7] = sliceSize;
+    xnData_[8] = UINT64_MAX - 1;
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+    // KFC-specific parameters at [13..23] (homm template ignores these, uses templateDataParams).
     constexpr uint64_t scratchSize = 16 * 1024 * 1024;
     constexpr uint64_t minSliceAlign = 128;
     uint64_t chunkSize = scratchSize / ccuParam_.rankNum / minSliceAlign * minSliceAlign;
     uint64_t fullChunkCount = sliceSize == 0 ? 0 : (sliceSize - 1) / chunkSize;
     uint64_t chunkCount = sliceSize == 0 ? 0 : fullChunkCount + 1;
-    xnData_[7] = sliceSize - fullChunkCount * chunkSize;
-    xnData_[8] = UINT64_MAX - chunkCount;
+    uint64_t tailSize = sliceSize - fullChunkCount * chunkSize;
+    xnData_[13] = chunkSize;
+    xnData_[14] = UINT64_MAX - chunkCount;
+    xnData_[15] = tailSize;
+    CalcGoSize(chunkSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[16]);
+    CalcGoSize(tailSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[20]);
     KERNEL_LOG(
         KERNEL_INFO, "RS chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n", sliceSize,
-        chunkSize, fullChunkCount, xnData_[7], xnData_[8]);
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+        chunkSize, fullChunkCount, xnData_[15], xnData_[14]);
 }
 } // namespace AscendC
 
