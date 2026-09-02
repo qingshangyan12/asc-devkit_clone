@@ -771,11 +771,10 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_store_atomic_config_v2（废弃）](deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)|设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。|`c_api/atomic/scalar_atomic.h`|
 |[asc_squeeze_v2 (废弃)](reg_compute/reg_permute_sel/asc_squeeze_deprecated.md)|将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。|`c_api/reg_compute/compute/reg_permute_sel.h`|
 |[asc_squeeze_with_status（废弃）](reg_compute/reg_permute_sel/asc_squeeze_with_status_deprecated.md)|将src中被mask选择的有效元素依次复制到dst，并将有效数据大小保存至AR寄存器。请使用[asc_squeeze_and_storeunalign](reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)替换。|`c_api/reg_compute/compute/reg_permute_sel.h`|
-|[asc_storealign (废弃)](deprecated_interface/asc_storealign_v1_deprecated.md)|reg计算数据搬运接口，支持从矢量数据寄存器或掩码寄存器连续对齐搬出到UB，目的操作数地址由用户更新。|`c_api/reg_compute/store/storealign.h`|
-|[asc_storealign (废弃)](deprecated_interface/asc_storealign_v2_deprecated.md)|reg计算数据搬运接口，通过地址寄存器传入偏移，用户可选择更新偏移或目的操作数地址。|`c_api/reg_compute/store/storealign.h`|
-|[asc_storealign (废弃)](deprecated_interface/asc_storealign_v3_deprecated.md)|reg计算数据搬运接口，通过int32_t传入偏移，用户可选择更新偏移或目的操作数地址。|`c_api/reg_compute/store/storealign.h`|
-|[asc_storealign (废弃)](deprecated_interface/asc_storealign_v4_deprecated.md)|reg计算数据搬运接口，通过int32_t传入偏移并由硬件自动执行Post Update。|`c_api/reg_compute/store/storealign.h`|
-|[asc_storealign (废弃)](reg_compute/store/asc_storealign_v5_deprecated.md)|reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB，使用repeat stride模式。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_pack_v2（废弃）](deprecated_interface/asc_storealign_v1_deprecated.md)|将有效32bit元素的低8bit数据压缩搬出到UB，不传入偏移量。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_pack_v2（废弃）](deprecated_interface/asc_storealign_v2_deprecated.md)|将有效32bit元素的低8bit数据压缩搬出到UB，通过地址寄存器传入偏移量。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_pack_v2（废弃）](deprecated_interface/asc_storealign_v3_deprecated.md)|将有效32bit元素的低8bit数据压缩搬出到UB，通过`int32_t`传入偏移量。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_pack_postupdate_v2（废弃）](deprecated_interface/asc_storealign_v4_deprecated.md)|将有效32bit元素的低8bit数据压缩搬出到UB，并自动更新目的操作数地址。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storeunalign_postupdate（废弃）](deprecated_interface/asc_storeunalign_postupdate_deprecated.md)|reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续非32B对齐的起始地址连续搬出到UB的场景。|`c_api/reg_compute/store/storeunalign.h`|
 |[asc_storeunalign_post（废弃）](deprecated_interface/asc_storeunalign_post_deprecated.md)|reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的尾块场景。|`c_api/reg_compute/store/storeunalign.h`|
 |[asc_uint322uint8 (废弃)](reg_compute/reg_convert/asc_uint322uint8_deprecated.md)|将uint32_t类型转换为uint8_t类型。|`c_api/reg_compute/reg_convert.h`|
