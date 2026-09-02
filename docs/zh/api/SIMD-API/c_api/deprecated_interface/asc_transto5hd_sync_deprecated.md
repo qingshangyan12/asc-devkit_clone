@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+**`asc_transto5hd_b8_sync`、`asc_transto5hd_b16_sync`和`asc_transto5hd_b32_sync`接口已废弃。请使用[asc_transto5hd](../vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../sync/asc_sync.md)接口替代。**
+
 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。本接口单次Repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置（比如数据类型为half时，单次Repeat可完成16*16大小的矩阵转置），同时还可以支持多次Repeat操作。
 
 单次repeat内转换规则如下：
@@ -44,10 +46,16 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 
 - 同步计算
 ```cpp
+[[deprecated("NOTICE: asc_transto5hd_b32_sync is deprecated. "
+             "Please use asc_transto5hd_b32 and asc_sync instead.")]]
 __aicore__ inline void asc_transto5hd_b32_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride)
+[[deprecated("NOTICE: asc_transto5hd_b16_sync is deprecated. "
+             "Please use asc_transto5hd_b16 and asc_sync instead.")]]
 __aicore__ inline void asc_transto5hd_b16_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride)
+[[deprecated("NOTICE: asc_transto5hd_b8_sync is deprecated. "
+             "Please use asc_transto5hd_b8 and asc_sync instead.")]]
 __aicore__ inline void asc_transto5hd_b8_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
 ```
