@@ -16,6 +16,10 @@
 #include <utility>
 #include <vector>
 
+#if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510)
+#include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
+#endif
+
 namespace tensor_api_print_test {
 
 struct print_record {
@@ -29,10 +33,7 @@ inline std::vector<print_record>& records()
     return value;
 }
 
-inline void reset_records()
-{
-    records().clear();
-}
+inline void reset_records() { records().clear(); }
 
 template <typename... Args>
 inline std::string format(const char* fmt, Args&&... args)
@@ -74,7 +75,8 @@ enum class DumpType {
 template <typename... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
-    tensor_api_print_test::append_record("[AIC Block 0/1] ", fmt, static_cast<Args&&>(args)...);
+    const char* head = tensor_api_print_test::records().empty() ? "[AIC Block 0/1] " : "";
+    tensor_api_print_test::append_record(head, fmt, static_cast<Args&&>(args)...);
 }
 
 template <typename... Args>
@@ -84,8 +86,7 @@ __aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args
 }
 
 template <typename... Args>
-__aicore__ inline void scalar_printf_impl(
-    DumpType, __gm__ const char* fmt, __gm__ const char* dumphead, Args&&... args)
+__aicore__ inline void scalar_printf_impl(DumpType, __gm__ const char* fmt, __gm__ const char* dumphead, Args&&... args)
 {
     tensor_api_print_test::append_record(dumphead, fmt, static_cast<Args&&>(args)...);
 }

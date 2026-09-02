@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/utils/print_value_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/utils/print.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_PRINT_VALUE_IMPL_H
@@ -88,8 +88,7 @@ __aicore__ static __attribute__((noinline)) void print_fragment(print_session& s
 }
 
 template <typename Arg>
-__aicore__ static __attribute__((noinline)) void print_fragment(print_session& session, __gm__ const char* fmt,
-                                                                Arg arg)
+__aicore__ static __attribute__((noinline)) void print_fragment(print_session& session, __gm__ const char* fmt, Arg arg)
 {
 #if !(defined(ASCENDC_DUMP) && (ASCENDC_DUMP == 0))
     if (session.first_fragment) {
@@ -194,16 +193,15 @@ __aicore__ inline void emit_value(print_session& session, const T& value)
 template <typename Value, typename T>
 __aicore__ inline void emit_element_as(print_session& session, const T& value)
 {
-    if constexpr (Std::is_same_v<Value, float> || Std::is_same_v<Value, half>
-                  || Std::is_same_v<Value, bfloat16_t>) {
+    if constexpr (Std::is_same_v<Value, float> || Std::is_same_v<Value, half> || Std::is_same_v<Value, bfloat16_t>) {
         print_fragment(session, (__gm__ const char*)"%f  ", static_cast<float>(value));
-    } else if constexpr (Std::is_same_v<Value, int8_t> || Std::is_same_v<Value, int16_t>
-                         || Std::is_same_v<Value, int32_t>) {
+    } else if constexpr (
+        Std::is_same_v<Value, int8_t> || Std::is_same_v<Value, int16_t> || Std::is_same_v<Value, int32_t>) {
         print_fragment(session, (__gm__ const char*)"%d  ", static_cast<int32_t>(value));
     } else if constexpr (Std::is_same_v<Value, int64_t>) {
         print_fragment(session, (__gm__ const char*)"%lld  ", static_cast<long long>(value));
-    } else if constexpr (Std::is_same_v<Value, uint8_t> || Std::is_same_v<Value, uint16_t>
-                         || Std::is_same_v<Value, uint32_t>) {
+    } else if constexpr (
+        Std::is_same_v<Value, uint8_t> || Std::is_same_v<Value, uint16_t> || Std::is_same_v<Value, uint32_t>) {
         print_fragment(session, (__gm__ const char*)"%u  ", static_cast<uint32_t>(value));
     } else if constexpr (Std::is_same_v<Value, uint64_t>) {
         print_fragment(session, (__gm__ const char*)"%llu  ", static_cast<unsigned long long>(value));

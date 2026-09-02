@@ -24,10 +24,7 @@ using tensor_api_print_test::reset_records;
 
 class TensorApiPrintTest : public testing::Test {
 protected:
-    void SetUp() override
-    {
-        reset_records();
-    }
+    void SetUp() override { reset_records(); }
 };
 
 void expect_single_head()
@@ -98,13 +95,14 @@ TEST_F(TensorApiPrintTest, PrintLayoutSeparatesDescriptionFromIndexTable)
 
     reset_records();
     print_layout(layout);
-    EXPECT_EQ(output(), "[AIC Block 0/1] layout(shape=(2, 3), stride=(3, 1))\n"
-                        "      0   1   2 \n"
-                        "    +---+---+---+\n"
-                        " 0  | 0 | 1 | 2 |\n"
-                        "    +---+---+---+\n"
-                        " 1  | 3 | 4 | 5 |\n"
-                        "    +---+---+---+\n");
+    EXPECT_EQ(
+        output(), "[AIC Block 0/1] layout(shape=(2, 3), stride=(3, 1))\n"
+                  "      0   1   2 \n"
+                  "    +---+---+---+\n"
+                  " 0  | 0 | 1 | 2 |\n"
+                  "    +---+---+---+\n"
+                  " 1  | 3 | 4 | 5 |\n"
+                  "    +---+---+---+\n");
     expect_single_head();
 }
 
@@ -137,10 +135,10 @@ TEST_F(TensorApiPrintTest, PrintTensorPrintsRankOneAndTwoElements)
     __gm__ int32_t rank_one_data[2] = {1, 2};
     auto rank_one = make_tensor(make_mem_ptr(rank_one_data), make_layout(make_shape(2)));
     print_tensor(rank_one);
-    std::string rank_one_expected = "[AIC Block 0/1] ptr[32b](" + format("%p", rank_one_data)
-                                    + ") o layout(shape=(2), stride=(1)):\n"
-                                      "1  \n"
-                                      "2  \n";
+    std::string rank_one_expected = "[AIC Block 0/1] ptr[32b](" + format("%p", rank_one_data) +
+                                    ") o layout(shape=(2), stride=(1)):\n"
+                                    "1  \n"
+                                    "2  \n";
     EXPECT_EQ(output(), rank_one_expected);
     expect_single_head();
 
@@ -148,10 +146,10 @@ TEST_F(TensorApiPrintTest, PrintTensorPrintsRankOneAndTwoElements)
     __gm__ int32_t rank_two_data[4] = {1, 2, 3, 4};
     auto rank_two = make_tensor(make_mem_ptr(rank_two_data), make_layout(make_shape(2, 2)));
     print_tensor(rank_two);
-    std::string rank_two_expected = "[AIC Block 0/1] ptr[32b](" + format("%p", rank_two_data)
-                                    + ") o layout(shape=(2, 2), stride=(2, 1)):\n"
-                                      "1  2  \n"
-                                      "3  4  \n";
+    std::string rank_two_expected = "[AIC Block 0/1] ptr[32b](" + format("%p", rank_two_data) +
+                                    ") o layout(shape=(2, 2), stride=(2, 1)):\n"
+                                    "1  2  \n"
+                                    "3  4  \n";
     EXPECT_EQ(output(), rank_two_expected);
     expect_single_head();
 
@@ -169,10 +167,10 @@ TEST_F(TensorApiPrintTest, PrintTensorPrintsUbElements)
     auto tensor = make_tensor(make_mem_ptr<location::ub>(data), make_layout(make_shape(2, 2)));
     print_tensor(tensor);
 
-    std::string expected = "[AIC Block 0/1] ptr[32b](" + format("%p", data)
-                           + ") o layout(shape=(2, 2), stride=(2, 1)):\n"
-                             "1  2  \n"
-                             "3  4  \n";
+    std::string expected = "[AIC Block 0/1] ptr[32b](" + format("%p", data) +
+                           ") o layout(shape=(2, 2), stride=(2, 1)):\n"
+                           "1  2  \n"
+                           "3  4  \n";
     EXPECT_EQ(output(), expected);
     expect_single_head();
 }
@@ -187,8 +185,9 @@ TEST_F(TensorApiPrintTest, PrintTensorRejectsOrdinaryLocalMemory)
 
     print_tensor(tensor, false);
 
-    EXPECT_EQ(output(), "[AIC Block 0/1] [print_tensor] tensor elements cannot be printed from ordinary local memory; "
-                        "only GM and UB are supported.\n");
+    EXPECT_EQ(
+        output(), "[AIC Block 0/1] [print_tensor] tensor elements cannot be printed from ordinary local memory; "
+                  "only GM and UB are supported.\n");
     expect_single_head();
 }
 
@@ -212,8 +211,9 @@ TEST_F(TensorApiPrintTest, PrintTensorExplainsUnsupportedMemoryLocations)
     const auto expect_unsupported = [](const auto& tensor, const char* location_name) {
         reset_records();
         print_tensor(tensor, false);
-        EXPECT_EQ(output(), std::string("[AIC Block 0/1] [print_tensor] tensor elements cannot be printed from ")
-                                + location_name + "; only GM and UB are supported.\n");
+        EXPECT_EQ(
+            output(), std::string("[AIC Block 0/1] [print_tensor] tensor elements cannot be printed from ") +
+                          location_name + "; only GM and UB are supported.\n");
         expect_single_head();
     };
 
@@ -236,11 +236,11 @@ TEST_F(TensorApiPrintTest, PrintTensorPrintsRankThreeAndFourSliceSeparators)
     __gm__ int32_t rank_three_data[4] = {1, 2, 3, 4};
     auto rank_three = make_tensor(make_mem_ptr(rank_three_data), make_layout(make_shape(1, 2, 2)));
     print_tensor(rank_three);
-    std::string rank_three_expected = "[AIC Block 0/1] ptr[32b](" + format("%p", rank_three_data)
-                                      + ") o layout(shape=(1, 2, 2), stride=(4, 2, 1)):\n"
-                                        "1  3  \n"
-                                        "----------\n"
-                                        "2  4  \n";
+    std::string rank_three_expected = "[AIC Block 0/1] ptr[32b](" + format("%p", rank_three_data) +
+                                      ") o layout(shape=(1, 2, 2), stride=(4, 2, 1)):\n"
+                                      "1  3  \n"
+                                      "----------\n"
+                                      "2  4  \n";
     EXPECT_EQ(output(), rank_three_expected);
     expect_single_head();
 
@@ -248,15 +248,15 @@ TEST_F(TensorApiPrintTest, PrintTensorPrintsRankThreeAndFourSliceSeparators)
     __gm__ int32_t rank_four_data[4] = {1, 2, 3, 4};
     auto rank_four = make_tensor(make_mem_ptr(rank_four_data), make_layout(make_shape(1, 1, 2, 2)));
     print_tensor(rank_four);
-    std::string rank_four_expected = "[AIC Block 0/1] ptr[32b](" + format("%p", rank_four_data)
-                                     + ") o layout(shape=(1, 1, 2, 2), stride=(4, 4, 2, 1)):\n"
-                                       "1  \n"
-                                       "-----\n"
-                                       "3  \n"
-                                       "=====\n"
-                                       "2  \n"
-                                       "-----\n"
-                                       "4  \n";
+    std::string rank_four_expected = "[AIC Block 0/1] ptr[32b](" + format("%p", rank_four_data) +
+                                     ") o layout(shape=(1, 1, 2, 2), stride=(4, 4, 2, 1)):\n"
+                                     "1  \n"
+                                     "-----\n"
+                                     "3  \n"
+                                     "=====\n"
+                                     "2  \n"
+                                     "-----\n"
+                                     "4  \n";
     EXPECT_EQ(output(), rank_four_expected);
     expect_single_head();
 }

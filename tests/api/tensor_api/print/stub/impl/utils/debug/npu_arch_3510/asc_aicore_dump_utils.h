@@ -127,10 +127,7 @@ __aicore__ inline constexpr uint32_t get_debug_bus_local_addr_shift()
     return HardwareType == AscendC::Hardware::L1 ? 5U : 0U;
 }
 
-__aicore__ inline uint64_t get_debug_bus_addr_impl()
-{
-    return tensor_api_print_debug_bus_test::debug_bus_address;
-}
+__aicore__ inline uint64_t get_debug_bus_addr_impl() { return tensor_api_print_debug_bus_test::debug_bus_address; }
 
 __aicore__ inline void debug_bus_write_reg(uint64_t, uint16_t offset, uint32_t value)
 {

@@ -9,7 +9,7 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning                                                                                                               \
+#warning \
     "impl/tensor_api/utils/print_tensor_debug_bus_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/utils/print.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_PRINT_TENSOR_DEBUG_BUS_IMPL_H
@@ -24,10 +24,6 @@
 
 #include "impl/tensor_api/utils/print_value_impl.h"
 
-#if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510)
-#include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
-#endif
-
 namespace asc {
 namespace te {
 namespace detail {
@@ -36,6 +32,32 @@ namespace detail {
 constexpr uint32_t DEBUG_BUS_MAX_WAIT_COUNT = 5U;
 constexpr uint32_t DEBUG_BUS_READY_MASK = 0x80000000U;
 constexpr uint64_t DEBUG_BUS_WAIT_CYCLES = 100U;
+constexpr uint32_t DEBUG_BUS_UNLOCK_OFFSET = 0x078U;
+constexpr uint32_t DEBUG_BUS_CTRL_OFFSET = 0x100U;
+constexpr uint32_t DEBUG_BUS_ADDR_LOW_OFFSET = 0x108U;
+constexpr uint32_t DEBUG_BUS_MODEL_BASE_OFFSET = 0x10CU;
+constexpr uint32_t DEBUG_BUS_DATA_OFFSET = 0x110U;
+constexpr uint32_t DEBUG_BUS_BUSY_OFFSET = 0x130U;
+constexpr uint32_t DEBUG_BUS_UNLOCK_VALUE = 0x19101920U;
+constexpr uint32_t DEBUG_BUS_READ_MASK = 0x2U;
+
+template <AscendC::Hardware Hardware>
+__aicore__ inline constexpr uint32_t get_debug_bus_model_base()
+{
+    if constexpr (Hardware == AscendC::Hardware::L1) {
+        return 0x620000U;
+    } else if constexpr (Hardware == AscendC::Hardware::L0A) {
+        return 0x410000U;
+    } else if constexpr (Hardware == AscendC::Hardware::L0B) {
+        return 0x420000U;
+    } else if constexpr (Hardware == AscendC::Hardware::L0C) {
+        return 0x430000U;
+    } else if constexpr (Hardware == AscendC::Hardware::BIAS || Hardware == AscendC::Hardware::FIXBUF) {
+        return 0x480000U;
+    } else {
+        return 0U;
+    }
+}
 
 struct debug_bus_chunk {
     uint32_t word0 = 0U;
@@ -50,22 +72,22 @@ struct debug_bus_chunk {
     __aicore__ inline uint32_t word(uint32_t index) const
     {
         switch (index) {
-        case 0:
-            return word0;
-        case 1:
-            return word1;
-        case 2:
-            return word2;
-        case 3:
-            return word3;
-        case 4:
-            return word4;
-        case 5:
-            return word5;
-        case 6:
-            return word6;
-        default:
-            return word7;
+            case 0:
+                return word0;
+            case 1:
+                return word1;
+            case 2:
+                return word2;
+            case 3:
+                return word3;
+            case 4:
+                return word4;
+            case 5:
+                return word5;
+            case 6:
+                return word6;
+            default:
+                return word7;
         }
     }
 
@@ -79,8 +101,8 @@ struct debug_bus_chunk {
             uint32_t byte_value = (word(byte_index >> 2) >> ((byte_index & 3U) << 3)) & 0xFFU;
             value |= static_cast<uint64_t>(byte_value) << (i << 3);
         }
-        return (value >> (bit_offset & 7U))
-               & (bit_count == 64U ? ~0ULL : ((static_cast<uint64_t>(1U) << bit_count) - 1U));
+        return (value >> (bit_offset & 7U)) &
+               (bit_count == 64U ? ~0ULL : ((static_cast<uint64_t>(1U) << bit_count) - 1U));
     }
 };
 
@@ -104,6 +126,39 @@ __aicore__ inline constexpr uint32_t get_debug_bus_local_addr_shift()
     }
 }
 
+__aicore__ inline void tensor_api_debug_bus_write_reg(uint64_t debug_bus_address, uint16_t offset, uint32_t value)
+{
+#if defined(UT_TEST)
+    __asc_aicore::debug_bus_write_reg(debug_bus_address, offset, value);
+#else
+    dsb((mem_dsb_t)0U);
+    st_dev(value, (__gm__ uint32_t*)(debug_bus_address + offset), 0);
+    dsb((mem_dsb_t)0U);
+#endif
+}
+
+__aicore__ inline volatile uint32_t tensor_api_debug_bus_read_reg(uint64_t debug_bus_address, uint16_t offset)
+{
+#if defined(UT_TEST)
+    return __asc_aicore::debug_bus_read_reg(debug_bus_address, offset);
+#else
+    dsb((mem_dsb_t)0U);
+    volatile uint32_t value = ld_dev((__gm__ uint32_t*)(debug_bus_address + offset), 0);
+    dsb((mem_dsb_t)0U);
+    return value;
+#endif
+}
+
+__aicore__ inline uint64_t tensor_api_get_debug_bus_addr()
+{
+#if defined(UT_TEST)
+    return __asc_aicore::get_debug_bus_addr_impl();
+#else
+    auto* block_info = __asc_aicore::get_block_info();
+    return block_info == nullptr ? 0U : block_info->debugBusAddr;
+#endif
+}
+
 template <AscendC::Hardware Hardware>
 __aicore__ inline uint32_t get_debug_bus_local_offset(uint64_t local_address)
 {
@@ -114,40 +169,33 @@ template <AscendC::Hardware Hardware>
 __aicore__ inline void configure_debug_bus_read(uint64_t debug_bus_address, uint64_t local_address)
 {
     __asc_aicore::sync_all();
-    __asc_aicore::debug_bus_write_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_UNLOCK_OFFSET,
-                                      __asc_aicore::ASC_DEBUG_BUS_UNLOCK_VALUE);
-    __asc_aicore::debug_bus_write_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_ADDR_LOW_OFFSET,
-                                      get_debug_bus_local_offset<Hardware>(local_address));
-    __asc_aicore::debug_bus_write_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_MODEL_BASE_OFFSET,
-                                      __asc_aicore::get_debug_bus_model_base<Hardware>());
-    __asc_aicore::debug_bus_write_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_CTRL_OFFSET,
-                                      __asc_aicore::ASC_DEBUG_BUS_READ_MASK);
+    tensor_api_debug_bus_write_reg(debug_bus_address, DEBUG_BUS_UNLOCK_OFFSET, DEBUG_BUS_UNLOCK_VALUE);
+    tensor_api_debug_bus_write_reg(
+        debug_bus_address, DEBUG_BUS_ADDR_LOW_OFFSET, get_debug_bus_local_offset<Hardware>(local_address));
+    tensor_api_debug_bus_write_reg(
+        debug_bus_address, DEBUG_BUS_MODEL_BASE_OFFSET, get_debug_bus_model_base<Hardware>());
+    tensor_api_debug_bus_write_reg(debug_bus_address, DEBUG_BUS_CTRL_OFFSET, DEBUG_BUS_READ_MASK);
 }
 
 template <AscendC::Hardware Hardware>
 __aicore__ inline void read_debug_bus_data(uint64_t debug_bus_address, debug_bus_chunk& chunk)
 {
-    chunk.word0 = __asc_aicore::debug_bus_read_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_DATA_OFFSET);
-    chunk.word1 = __asc_aicore::debug_bus_read_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_DATA_OFFSET + 4U);
+    chunk.word0 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET);
+    chunk.word1 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 4U);
     if constexpr (get_debug_bus_loop_steplen<Hardware>() == 32U) {
-        chunk.word2 = __asc_aicore::debug_bus_read_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_DATA_OFFSET + 8U);
-        chunk.word3 =
-            __asc_aicore::debug_bus_read_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_DATA_OFFSET + 12U);
-        chunk.word4 =
-            __asc_aicore::debug_bus_read_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_DATA_OFFSET + 16U);
-        chunk.word5 =
-            __asc_aicore::debug_bus_read_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_DATA_OFFSET + 20U);
-        chunk.word6 =
-            __asc_aicore::debug_bus_read_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_DATA_OFFSET + 24U);
-        chunk.word7 =
-            __asc_aicore::debug_bus_read_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_DATA_OFFSET + 28U);
+        chunk.word2 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 8U);
+        chunk.word3 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 12U);
+        chunk.word4 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 16U);
+        chunk.word5 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 20U);
+        chunk.word6 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 24U);
+        chunk.word7 = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_DATA_OFFSET + 28U);
     }
 }
 
 template <AscendC::Hardware Hardware>
 __aicore__ inline bool read_debug_bus_chunk(uint64_t local_address, debug_bus_chunk& chunk)
 {
-    uint64_t debug_bus_address = __asc_aicore::get_debug_bus_addr_impl();
+    uint64_t debug_bus_address = tensor_api_get_debug_bus_addr();
     if (debug_bus_address == 0U) {
         return false;
     }
@@ -158,7 +206,7 @@ __aicore__ inline bool read_debug_bus_chunk(uint64_t local_address, debug_bus_ch
     for (uint32_t counter = 0U; counter <= DEBUG_BUS_MAX_WAIT_COUNT; ++counter) {
         __asc_aicore::ringbuf_wait_rts_sync();
         __asc_aicore::sync_all();
-        debug_status = __asc_aicore::debug_bus_read_reg(debug_bus_address, __asc_aicore::ASC_DEBUG_BUS_BUSY_OFFSET);
+        debug_status = tensor_api_debug_bus_read_reg(debug_bus_address, DEBUG_BUS_BUSY_OFFSET);
         if ((debug_status & DEBUG_BUS_READY_MASK) != 0U) {
             break;
         }

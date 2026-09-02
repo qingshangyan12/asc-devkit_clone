@@ -55,10 +55,7 @@ protected:
         AscendC::SetGCoreType(1);
     }
 
-    void TearDown() override
-    {
-        AscendC::SetGCoreType(0);
-    }
+    void TearDown() override { AscendC::SetGCoreType(0); }
 };
 
 void expect_single_head()
@@ -201,9 +198,9 @@ TEST_F(TensorApiPrintCubeTest, PrintTensorExplainsUnsupportedCubeMemoryLocations
     const auto expect_unsupported = [](const auto& tensor, const char* location_name) {
         reset_records();
         print_tensor(tensor, false);
-        EXPECT_EQ(output(), std::string("[AIC Block 0/1] [print_tensor] tensor elements cannot be printed from ")
-                                + location_name
-                                + "; only GM, UB, L1, L0C, and BiasTable are supported.\n");
+        EXPECT_EQ(
+            output(), std::string("[AIC Block 0/1] [print_tensor] tensor elements cannot be printed from ") +
+                          location_name + "; only GM, UB, L1, L0C, and BiasTable are supported.\n");
         expect_single_head();
     };
 
