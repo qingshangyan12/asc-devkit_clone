@@ -3428,15 +3428,15 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinhf(float x)
     poly *= x2;
 
     // Split the exponent for the large-argument exp2 reconstruction.
-    float n = truncf(abs_x * __internal_fp32_log2e);
-    if (fabsf(n) > __internal_fp32_max_exp) {
-        n = __internal_with_sign_bit(__internal_fp32_max_exp, n);
+    float n = truncf(abs_x * 1.4426950216293334961f);
+    if (fabsf(n) > 126.0f) {
+        n = __internal_with_sign_bit(126.0f, n);
     }
 
     // Reconstruct the exponential tail with hi/lo corrections.
-    float r = fmaf(n, -__internal_fp32_ln2_hi, abs_x);
-    r = fmaf(n, __internal_fp32_ln2_tail, r);
-    const float exp2_residual = exp2f(r * __internal_fp32_log2e);
+    float r = fmaf(n, -0.69314718246459960938f, abs_x);
+    r = fmaf(n, 1.9046542121259335545e-09f, r);
+    const float exp2_residual = exp2f(r * 1.4426950216293334961f);
 
     const float exponent_base = n + 12583037.0f;
     const uint32_t exponent_base_bits = __float_as_uint(exponent_base);
