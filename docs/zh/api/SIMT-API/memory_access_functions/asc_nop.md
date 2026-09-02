@@ -49,6 +49,8 @@ inline void asc_nop()
 
 ## 调用示例
 
+在生产者-消费者同步场景中，消费者通过轮询标记位来判断生成者是否完成数据的写入，`asc_nop`接口可用于降低轮询GM的频率，从而减少带宽压力。
+
 -   SIMT编程场景：
 
     ```cpp
@@ -57,7 +59,10 @@ inline void asc_nop()
     __global__ __launch_bounds__(1024) void kernel_nop(...)
     {
         ...
-        asc_nop(); // 15个cycle不执行任何操作
+        while (asc_ldcg(flag) != 0) { // 轮询标记位
+            asc_nop(); // 15个cycle后再发送下一个load指令
+        }
+        uint32_t x = *data; // 读取数据
         ...
     }
     ```
@@ -70,7 +75,10 @@ inline void asc_nop()
     __simt_vf__ __launch_bounds__(1024) inline void kernel_nop(...)
     {
         ...
-        asc_nop(); // 15个cycle不执行任何操作
+        while (asc_ldcg(flag) != 0) { // 轮询标记位
+            asc_nop(); // 15个cycle后再发送下一个load指令
+        }
+        uint32_t x = *data; // 读取数据
         ...
     }
     ```
