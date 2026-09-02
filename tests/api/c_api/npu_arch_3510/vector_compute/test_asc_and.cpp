@@ -14,6 +14,9 @@
 #include "tests/api/c_api/npu_arch_3510/utils/test_binary_instr_utils.h"
 #include "include/c_api/asc_simd.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 TEST_VECTOR_COMPUTE_BINARY_INSTR(Vand, asc_and, vand, vector_uint8_t);
 TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR(Vand, asc_and, vand, vector_uint8_t);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(Vand, asc_and, vand, vector_int8_t);
@@ -86,3 +89,5 @@ TEST_VECTOR_COMPUTE_BINARY_INSTR(Vand, asc_and, vand, vector_float);
 
 TEST_VECTOR_COMPUTE_PAND_INSTR(Pand, asc_and, pand, vector_bool);
 TEST_VECTOR_COMPUTE_PAND_INSTR_RETURN(Pand, asc_and, pand, vector_bool);
+
+#pragma GCC diagnostic pop
