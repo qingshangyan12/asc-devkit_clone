@@ -25,6 +25,7 @@
 #include "simt_api/device_types.h"
 #include "simt_api/math_constants.h"
 #include "impl/simt_api/internal_functions_impl.h"
+#include "impl/simt_api/device_functions_impl.h"
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 
@@ -3504,8 +3505,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x)
     const float normalized_x = __uint_as_float(normalized_x_bits);
     const float range_scale = __uint_as_float(range_scale_bits);
     const float reduced = fmaf(0.25f, range_scale, -1.0f) + normalized_x;
-    const float exponent =
-        static_cast<float>(static_cast<int32_t>(reduction_bits)) * __internal_fp32_log_exponent_scale;
+    const float exponent = static_cast<float>(static_cast<int32_t>(reduction_bits)) * 1.1920928955078125e-07f;
 
     // Polynomial approximation for log1p(reduced).
     float poly = fmaf(-poly_first_coeff, reduced, 0.10546888411045074463f);
@@ -3520,7 +3520,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x)
     const float reduced_poly = reduced * poly;
     float output = fmaf(reduced_poly, reduced, reduced);
     // Add the separate exponent contribution back as ln(2) * exponent.
-    output = fmaf(exponent, __internal_fp32_ln2_hi, output);
+    output = fmaf(exponent, 0.69314718246459960938f, output);
 
     return output;
 }
