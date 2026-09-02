@@ -30,6 +30,11 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl.h"
 
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+
+#include "impl/c_api/instr_impl/npu_arch_9201/cube_datamove_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/sys_var_impl.h"
+
 #endif
 
 #include "c_api/composite/cube_datamove_composite.h"
