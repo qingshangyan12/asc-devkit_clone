@@ -24,9 +24,11 @@ B4_QUANT_SCALE = 1.0
 
 def convert_nd_to_nz(matrix, block_n):
     matrix_m, matrix_n = matrix.shape
-    return matrix.reshape(
-        matrix_m // 16, 16, matrix_n // block_n, block_n
-    ).transpose(2, 0, 1, 3).reshape(-1)
+    return (
+        matrix.reshape(matrix_m // 16, 16, matrix_n // block_n, block_n)
+        .transpose(2, 0, 1, 3)
+        .reshape(-1)
+    )
 
 
 def pack_signed_int4(data):
@@ -42,8 +44,12 @@ def generate_data(scenario_num):
     # 使用稀疏有符号随机值，使量化前结果保持整数并避开舍入边界。
     values = np.array([-1.0, 0.0, 1.0], dtype=np.float16)
     probabilities = np.array([0.18, 0.64, 0.18])
-    a = rng.choice(values, size=(matrix_m, MATRIX_K), p=probabilities).astype(np.float16)
-    b = rng.choice(values, size=(MATRIX_K, matrix_n), p=probabilities).astype(np.float16)
+    a = rng.choice(values, size=(matrix_m, MATRIX_K), p=probabilities).astype(
+        np.float16
+    )
+    b = rng.choice(values, size=(MATRIX_K, matrix_n), p=probabilities).astype(
+        np.float16
+    )
     golden_nd = np.matmul(a.astype(np.float32), b.astype(np.float32))
 
     os.makedirs("input", exist_ok=True)
