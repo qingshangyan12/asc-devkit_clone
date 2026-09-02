@@ -32,9 +32,7 @@ HcclResult ExecuteSelector::Run(
         return SelectViaCann(opParam, topoInfo, selectAlgName);
     }
 
-    std::map<u32, AutoSelectorBase*> selectors = SelectorRegistry::Global()->GetAllSelectors();
-
-    selectors = SelectorRegistry::Global()->GetSelectorsByOpType(opParam.opType);
+    std::map<u32, AutoSelectorBase*> selectors = SelectorRegistry::Global()->GetSelectorsByOpType(opParam.opType);
     HCCL_INFO(
         "[asc][AlgoSelect][ExecuteSelector::Run] selectorNum[%zu] for opType[%d].", selectors.size(), opParam.opType);
     for (auto iter : selectors) {
