@@ -262,4 +262,47 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_keeps_parallel_for_medium_data_o
     EXPECT_EQ(algName, "InsAllGatherParallelMesh1DNHR");
 }
 
+TEST_F(ST_ALL_GATHER_AICPU_TEST, sequence_executor_calculates_two_level_resources)
+{
+    OpParam param = MakeAicpuParam();
+    ASSERT_GT(std::snprintf(param.algName, sizeof(param.algName), "%s", "AicpuAllGatherSequenceMeshConcurNHR"), 0);
+
+    TopoInfoWithNetLayerDetails topo = MakeSequenceTopo(4U, 2U);
+    AlgHierarchyInfoForAllLevel hierarchy;
+    hierarchy.infos = {{{0U, 1U, 2U, 3U}}, {{0U, 4U}}};
+    std::unique_ptr<InsCollAlgBase> executor =
+        CollAlgExecRegistryV2::Instance().GetAlgExec(HCCL_CMD_ALLGATHER, param.algName);
+    ASSERT_NE(executor, nullptr);
+
+    AlgResourceRequest request;
+    ASSERT_EQ(executor->CalcRes(nullptr, param, &topo, hierarchy, request), HCCL_SUCCESS);
+    ASSERT_EQ(request.channels.size(), 2U);
+    EXPECT_EQ(request.channels[0].size(), 6U);
+    EXPECT_EQ(request.channels[1].size(), 1U);
+    EXPECT_EQ(request.slaveThreadNum, 5U);
+    EXPECT_EQ(request.notifyNumOnMainThread, 5U);
+    EXPECT_EQ(request.notifyNumPerThread, std::vector<u32>({2U, 1U, 1U, 1U, 1U}));
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, sequence_executor_rejects_invalid_hierarchy)
+{
+    OpParam param = MakeAicpuParam();
+    ASSERT_GT(std::snprintf(param.algName, sizeof(param.algName), "%s", "AicpuAllGatherSequenceMeshConcurNHR"), 0);
+
+    TopoInfoWithNetLayerDetails topo = MakeSequenceTopo(4U, 2U);
+    std::unique_ptr<InsCollAlgBase> executor =
+        CollAlgExecRegistryV2::Instance().GetAlgExec(HCCL_CMD_ALLGATHER, param.algName);
+    ASSERT_NE(executor, nullptr);
+
+    AlgHierarchyInfoForAllLevel singleLevel;
+    singleLevel.infos = {{{0U, 1U, 2U, 3U}}};
+    AlgResourceRequest request;
+    EXPECT_NE(executor->CalcRes(nullptr, param, &topo, singleLevel, request), HCCL_SUCCESS);
+
+    AlgHierarchyInfoForAllLevel emptyLevel1;
+    emptyLevel1.infos = {{{0U, 1U, 2U, 3U}}, {}};
+    AlgResourceRequest requestEmptyLevel;
+    EXPECT_NE(executor->CalcRes(nullptr, param, &topo, emptyLevel1, requestEmptyLevel), HCCL_SUCCESS);
+}
+
 } // namespace checker
