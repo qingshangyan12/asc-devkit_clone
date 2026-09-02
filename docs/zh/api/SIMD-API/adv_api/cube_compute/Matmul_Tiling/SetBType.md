@@ -29,6 +29,8 @@ int32_t SetBType(TPosition pos, CubeFormat type, DataType dataType, bool isTrans
 
 无
 
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetBType_res.md#id1 -->
+
 ## 调用示例
 
 ```

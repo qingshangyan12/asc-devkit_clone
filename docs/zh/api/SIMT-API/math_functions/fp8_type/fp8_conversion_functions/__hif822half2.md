@@ -21,10 +21,11 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/fp8_type/fp8_conversion_functions/__hif822half2_res.md#id1 -->
 
 ## 功能说明
 
-将hifloat8x2\_t类型数据的两个分量转换为半精度浮点数，返回转换后的half2类型数据。
+将hifloat8x2_t类型数据的两个分量转换为半精度浮点数，返回转换后的half2类型数据。
 
 ## 函数原型
 
@@ -57,7 +58,7 @@ SIMT编程场景当前不支持使用该接口。
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/asc\_fp8.h"头文件。
+使用该接口需要包含`simt_api/asc_fp8.h`头文件。
 
 ```cpp
 #include "simt_api/asc_fp8.h"

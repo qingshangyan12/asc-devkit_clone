@@ -29,6 +29,7 @@
 >
 >该API不支持Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，如果需要在上述AI处理器实现数据离散功能，建议参考[Scatter兼容样例](../../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/scatter)进行适配。
 <!-- end id8 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/scatter_gather/Scatter_ISASI_res.md#id1 -->
 
 ## 功能说明<a name="section17600329101418"></a>
 
@@ -105,7 +106,7 @@ Atlas 推理系列产品AI Core，支持的数据类型为：uint16_t、half、u
 - dstOffset的取值要求如下：
   - 偏移地址不能有相同值，如果存在2个或者多个偏移重复的情况，行为是不可预期的。 
   - 取值应保证dst元素类型位宽对齐。
-  - 偏移地址后不能超出UB大小数据的范围。
+  - 偏移地址后不能超出Unified Buffer（UB）大小数据的范围。
   <!-- npu="950,310b" id12 -->
   - 针对以下型号，地址偏移的取值范围：当操作数为8位时，取值范围为[0, 2^16-1]；当操作数为16位时，取值范围为[0, 2^17-1]，当操作数为32位或者64位时，不能超出uint32_t的范围。
     <!-- npu="950" id13 -->

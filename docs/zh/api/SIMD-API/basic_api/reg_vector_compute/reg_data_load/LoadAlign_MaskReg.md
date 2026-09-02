@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_MaskReg_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -110,7 +111,7 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../regist
 
 ## 约束说明<a name="section11585101304320"></a>
 
-- 位于Unified Buffer的地址约束、offset的对齐约束、AddrReg寄存器中存储的偏移量 \* sizeof(T)的对齐约束与分布模式MaskDist有关，具体地址约束请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。
+- 位于UB的地址约束、offset的对齐约束、AddrReg寄存器中存储的偏移量 \* sizeof(T)的对齐约束与分布模式MaskDist有关，具体地址约束请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。
 - MaskReg模板参数regTrait只支持RegTraitNumOne。
 
 ## 调用示例<a name="section642mcpsimp"></a>

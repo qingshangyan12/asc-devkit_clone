@@ -29,12 +29,13 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/debug_interface/exception_detection/Trap_res.md#id1 -->
 
 ## 功能说明<a name="section259105813316"></a>
 
 头文件路径为：`"basic_api/kernel_operator_sys_var_intf.h"`。
 
-在Kernel侧调用，NPU模式下会中断AI Core的运行，CPU模式下等同于assert。可用于Kernel侧异常场景的调试。
+在核函数（Kernel）侧调用，NPU模式下会中断AI Core的运行，CPU模式下等同于assert。可用于核函数（Kernel）侧异常场景的调试。
 
 ## 函数原型<a name="section2067518173415"></a>
 

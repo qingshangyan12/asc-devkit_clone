@@ -16,11 +16,13 @@ set(ACLRTC_TEST_HEADERS_FILES
 
 file(GLOB ACLRTC_SRC_FILES
     ${ASCENDC_DIR}/tools/aclrtc/*.cpp
+    ${ASCENDC_DIR}/tools/aclrtc/specialization/*.cpp
 )
 
-set(ACLRTC_RESOURCE_REGISTRY_SRC_FILES
-    ${ASCENDC_DIR}/tools/aclrtc/specialization/resource_registry.cpp
+set(ACLRTC_COMMON_DEPENDENCY_SRC_FILES
     ${ASCENDC_DIR}/tools/build/common/file_utils.cpp
+    ${ASCENDC_DIR}/tools/build/common/process_executor.cpp
+    ${ASCENDC_DIR}/tools/build/common/directory_cleanup_guard.cpp
 )
 
 file(GLOB TEST_ACLRTC_SRC_FILES
@@ -31,7 +33,7 @@ file(GLOB TEST_ACLRTC_SRC_FILES
 
 add_executable(ascendc_ut_aclrtc
     ${ACLRTC_SRC_FILES}
-    ${ACLRTC_RESOURCE_REGISTRY_SRC_FILES}
+    ${ACLRTC_COMMON_DEPENDENCY_SRC_FILES}
     ${TEST_ACLRTC_SRC_FILES}
 )
 
@@ -42,6 +44,7 @@ target_compile_definitions(ascendc_ut_aclrtc PRIVATE
 
 target_include_directories(ascendc_ut_aclrtc PRIVATE
     ${ACLRTC_TEST_HEADERS_FILES}
+    ${ASCENDC_DIR}/tools/aclrtc
     ${ASCENDC_DIR}/tools/aclrtc/specialization
     ${ASCENDC_DIR}/tools/build/common
     ${ASCEND_CANN_PACKAGE_PATH}/include

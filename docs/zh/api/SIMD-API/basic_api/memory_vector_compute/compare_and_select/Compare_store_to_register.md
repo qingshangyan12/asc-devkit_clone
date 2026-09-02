@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/compare_and_select/Compare_store_to_register_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -95,7 +96,7 @@
 - 本接口将结果写入128bit的CmpMask寄存器中，可以用[GetCmpMask](GetCmpMask_ISASI.md)接口获取寄存器保存的数据。
 
 <!-- npu="950" id8 -->
-- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT，该接口占用8KB Unified Buffer临时空间。
+- 对Unified Buffer（UB）空间的占用说明。针对Ascend 950PR/Ascend 950DT，该接口占用8KB UB临时空间。
 <!-- end id8 -->
 
 <!-- npu="A3,910b" id9 -->

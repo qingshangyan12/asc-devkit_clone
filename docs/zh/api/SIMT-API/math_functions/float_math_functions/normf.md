@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/float_math_functions/normf_res.md#id1 -->
 
 ## 功能说明
 
@@ -41,7 +42,7 @@ inline float normf(int n, float* a)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | n | 输入 | 源操作数。输入数据a中连续计算的元素个数。 |
-| a | 输入 | 源操作数。Unified Buffer、Global Memory或栈空间的地址。 |
+| a | 输入 | 源操作数。UB、Global Memory或栈空间的地址。 |
 
 ## 返回值说明
 
@@ -62,7 +63,7 @@ a\[0\]^2 + a\[1\]^2 + ...+ a\[n-1\]^2的平方根。
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/math\_functions.h"头文件。
+使用该接口需要包含`simt_api/math_functions.h`头文件。
 
 ```cpp
 #include "simt_api/math_functions.h"

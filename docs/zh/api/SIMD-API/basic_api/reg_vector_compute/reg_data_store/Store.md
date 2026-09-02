@@ -23,12 +23,13 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/Store_res.md#id1 -->
 
 ## 功能说明
 
 头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_datacopy_intf.h"`。
 
-Reg矢量计算数据搬运接口，支持从RegTensor搬出至非32字节对齐的UB地址dstAddr。连续搬运时，用户需手动更新dstAddr地址。
+Reg矢量计算数据搬运接口，支持从RegTensor搬出至非32字节对齐的Unified Buffer（UB）地址dstAddr。连续搬运时，用户需手动更新dstAddr地址。
 
 该接口封装了[StoreUnAlign和StoreUnAlignPost](StoreUnAlign_continuous.md)。
 

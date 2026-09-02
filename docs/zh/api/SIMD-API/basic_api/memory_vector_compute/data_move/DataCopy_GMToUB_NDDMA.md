@@ -23,6 +23,7 @@
 <!-- npu="910" id15 -->
 - Atlas 训练系列产品：不支持
 <!-- end id15 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMToUB_NDDMA_res.md#id1 -->
 
 ## 功能说明<a name="section474617392321"></a>
 
@@ -32,12 +33,12 @@
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../aux_data_structures/TPosition.md)表示）：
 
-- Global Memory -> Unified Buffer
+- Global Memory -> UB
     - GM -> VECIN
 
 ## 函数原型<a name="section1954364615315"></a>
 
-- Global Memory -> Unified Buffer，支持多维度搬运
+- Global Memory -> UB，支持多维度搬运
 
     ```cpp
     template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>

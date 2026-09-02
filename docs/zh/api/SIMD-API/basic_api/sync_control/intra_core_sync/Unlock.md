@@ -23,12 +23,13 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/Unlock_res.md#id1 -->
 
 ## 功能说明<a name="section54681522111017"></a>
 
 头文件路径为：`"basic_api/kernel_common.h"`。
 
-直到当前流水的前序指令执行完成后，根据MutexID释放对应Mutex。
+指定流水的前序指令执行完成后，根据MutexID释放对应Mutex。
 
 > [!NOTE]说明
 > Unlock接口需与[Lock](Lock.md)接口配合使用，对同一个MutexID，Lock和Unlock必须严格成对出现。详细约束请参考[Lock约束说明](Lock.md#section184751024101111)。

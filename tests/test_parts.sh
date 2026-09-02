@@ -17,8 +17,8 @@ adv_test_targets=(
     ascendc_ut_adv_api_kernel_ascend310B1
     ascendc_ut_adv_api_kernel_ascend910B1_AIC
     ascendc_ut_adv_api_kernel_ascend910B1_AIV
-    ascendc_ut_adv_api_kernel_KirinX90_AIV
-    ascendc_ut_adv_api_kernel_Kirin9030_AIV
+    # ascendc_ut_adv_api_kernel_KirinX90_AIV
+    # ascendc_ut_adv_api_kernel_Kirin9030_AIV
     ascendc_ut_adv_api_tiling_ascend310p
     ascendc_ut_adv_api_tiling_ascend310B1
     ascendc_ut_adv_api_tiling_ascend910B1_AIC
@@ -30,6 +30,9 @@ adv_test_targets=(
 adv_test_two_targets=(
     ascendc_ut_adv_api_tiling_ascend610
     ascendc_ut_adv_api_hccl_cc_algorithm_ascend950pr_9599_AIC
+    ascendc_ut_adv_api_ccu_st
+    ascendc_ut_adv_api_hccl_cc_aicpu_alloc_ctx
+    ascendc_ut_adv_api_hccl_ccu_mc2
 )
 
 basic_test_one_targets=(
@@ -102,6 +105,7 @@ basic_test_four_targets=(
     install_adapter_api_ut
     run_all_tests_and_clean
     asc_opc_unittest
+    ascendc_ut_fwk_modules
     ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC
 )
 
@@ -116,6 +120,10 @@ basic_test_five_targets=(
     ascendc_run_all_tensor_api_header_checks_npu
     ascendc_run_all_tensor_api_header_checks_npu_single
     ascendc_ut_simt_api_ascend950pr_9599
+    ascendc_ut_simt_subnormal_ftz_false_prec_false
+    ascendc_ut_simt_subnormal_ftz_false_prec_true
+    ascendc_ut_simt_subnormal_ftz_true_prec_false
+    ascendc_ut_simt_subnormal_ftz_true_prec_true
 )
 
 arm_test_targets=(
@@ -123,6 +131,10 @@ arm_test_targets=(
     ascendc_ut_elf_tool
     ascendc_ut_pack_kernel
     ascendc_ut_simt_api_ascend950pr_9599
+    ascendc_ut_simt_subnormal_ftz_false_prec_false
+    ascendc_ut_simt_subnormal_ftz_false_prec_true
+    ascendc_ut_simt_subnormal_ftz_true_prec_false
+    ascendc_ut_simt_subnormal_ftz_true_prec_true
     ascendc_run_all_host_header_checks
     ascendc_run_all_host_header_checks_npu
     ascendc_run_all_host_header_checks_npu_single

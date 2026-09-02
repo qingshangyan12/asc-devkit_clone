@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/float_math_functions/rhypotf_res.md#id1 -->
 
 ## 功能说明
 
@@ -48,7 +49,7 @@ inline float rhypotf(float x, float y)
 x^2 + y^2的平方根的倒数。
 
 -   若x^2 + y^2的平方根超出float最大范围，返回值为0。
--   若x^2 + y^2平方根的倒数超出float最大范围，返回值为inf。
+-   若x^2 + y^2的平方根的倒数超出float最大范围，返回值为inf。
 -   若x和y都为0，返回值为inf。
 -   若x，y任意一个为±inf，返回值为0。
 -   若x，y任意一个为nan，另一个不为±inf，返回值为nan。
@@ -61,7 +62,7 @@ x^2 + y^2的平方根的倒数。
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/math\_functions.h"头文件。
+使用该接口需要包含`simt_api/math_functions.h`头文件。
 
 ```cpp
 #include "simt_api/math_functions.h"

@@ -23,6 +23,7 @@
 <!-- npu="910" id14 -->
 - Atlas 训练系列产品：不支持
 <!-- end id14 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/ResetLoopModePara_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -32,9 +33,9 @@
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../aux_data_structures/TPosition.md)表示）：
 
-- Global Memory -> Unified Buffer
+- Global Memory -> UB
     - GM -> VECIN
-- Unified Buffer -> Global Memory
+- UB -> Global Memory
     - VECOUT -> GM
 
 ## 函数原型<a name="section620mcpsimp"></a>

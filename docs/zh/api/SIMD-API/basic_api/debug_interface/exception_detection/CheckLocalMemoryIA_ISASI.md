@@ -23,11 +23,12 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/debug_interface/exception_detection/CheckLocalMemoryIA_ISASI_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
-check设定范围内的UB读写行为，如果有设定范围的读写行为则会出现EXCEPTION报错，无设定范围的读写行为则不会报错。
+check设定范围内的Unified Buffer（UB）读写行为，如果有设定范围的读写行为则会出现EXCEPTION报错，无设定范围的读写行为则不会报错。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/DataSyncBarrier_ISASI_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -51,7 +52,7 @@ __aicore__ inline void DataSyncBarrier()
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-等待的内存位置取值为ALL时，只能等待GM和UB的访问指令，不包括其他内存位置，例如L0C Buffer、L1 Buffer。
+等待的内存位置取值为ALL时，只能等待GM和Unified Buffer（UB）的访问指令，不包括其他内存位置，例如L0C Buffer、L1 Buffer。
 
 ## 调用示例<a name="section837496171220"></a>
 

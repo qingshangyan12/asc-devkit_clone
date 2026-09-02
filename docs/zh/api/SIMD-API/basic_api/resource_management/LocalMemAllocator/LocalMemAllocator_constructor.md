@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/resource_management/LocalMemAllocator/LocalMemAllocator_constructor_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -50,10 +51,10 @@ __aicore__ inline LocalMemAllocator<hard>::LocalMemAllocator()
 </thead>
 <tbody><tr id="row18835145716587"><td class="cellrowborder" valign="top" width="27.839999999999996%" headers="mcps1.2.3.1.1 "><p id="p1383515717581"><a name="p1383515717581"></a><a name="p1383515717581"></a>hard</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.16%" headers="mcps1.2.3.1.2 "><p id="p823866165711"><a name="p823866165711"></a><a name="p823866165711"></a><span id="ph184621011705"><a name="ph184621011705"></a><a name="ph184621011705"></a><span id="ph969812395911"><a name="ph969812395911"></a><a name="ph969812395911"></a>用于表示数据的物理位置，Hardware枚举类型，定义如下，合法位置为：UB、L1、L0A、L0B、L0C、BIAS、FIXBUF。</span></span></p>
+<td class="cellrowborder" valign="top" width="72.16%" headers="mcps1.2.3.1.2 "><p id="p823866165711"><a name="p823866165711"></a><a name="p823866165711"></a><span id="ph184621011705"><a name="ph184621011705"></a><a name="ph184621011705"></a><span id="ph969812395911"><a name="ph969812395911"></a><a name="ph969812395911"></a>用于表示数据的物理位置，Hardware枚举类型，定义如下，合法位置为：Unified Buffer（UB）、L1、L0A、L0B、L0C、BIAS、FIXBUF。</span></span></p>
 <a name="screen21992320439"></a><a name="screen21992320439"></a><pre class="screen" codetype="Cpp" id="screen21992320439">enum class Hardware : uint8_t { 
 GM,     // Global Memory
-UB,     // Unified Buffer
+UB,     // UB
 L1,     // L1 Buffer
 L0A,    // L0A Buffer
 L0B,    // L0B Buffer

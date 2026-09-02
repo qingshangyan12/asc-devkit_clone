@@ -25,6 +25,7 @@
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
 <!-- end id8 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/scatter_gather/Gatherb_ISASI_res.md#id1 -->
 
 ## 功能说明<a name="section17600329101418"></a>
 
@@ -118,7 +119,7 @@ Atlas 200I/500 A2 推理产品，支持的数据类型为：int8_t、uint8_t、i
 - offset的取值要求如下：
   - 取值应保证src元素类型位宽对齐。
   - 偏移地址后需要32字节对齐。
-  - 偏移地址后不能超出UB大小数据的范围。
+  - 偏移地址后不能超出Unified Buffer（UB）大小数据的范围。
   - 地址偏移的取值范围：不能超出uint32_t的范围。
 - repeatTime取值范围：repeatTime∈[0,255]。
 

@@ -21,10 +21,11 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/float_math_functions/hypotf_res.md#id1 -->
 
 ## 功能说明
 
-获取输入数据x、y的平方和x^2 + y^2的平方根。
+获取输入数据x、y的平方和（即x^2 + y^2）的平方根。
 
 ![](../../../figures/zh-cn_formulaimage_0000002516816363.png)
 
@@ -59,7 +60,7 @@ x^2 + y^2的平方根。
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/math\_functions.h"头文件。
+使用该接口需要包含`simt_api/math_functions.h`头文件。
 
 ```cpp
 #include "simt_api/math_functions.h"

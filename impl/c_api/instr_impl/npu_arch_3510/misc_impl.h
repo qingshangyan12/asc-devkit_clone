@@ -9,8 +9,7 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    impl/c_api/instr_impl/npu_arch_3510/misc_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.
+
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -19,8 +18,13 @@
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_MISC_IMPL_H
 
 #include "impl/c_api/instr_impl/npu_arch_3510/misc_impl/init_soc_state_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/misc_impl/asc_nop_impl.h"
 
 __aicore__ inline void asc_init() { asc_init_soc_state_impl(); }
+
+namespace __asc_aicore {
+__aicore__ inline void asc_nop() { asc_nop_impl(); }
+} // namespace __asc_aicore
 
 #endif
 

@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetSubBlockNum_ISASI_res.md#id1 -->
 
 ## 功能说明
 
@@ -61,11 +62,11 @@ __aicore__ inline int64_t GetSubBlockNum()
 | Mix算子 | \_\_mix\_\_(1, 1) | 1 | 1 |
 | Mix算子 | \_\_mix\_\_(1, 2) | 1 | 2 |
 
-在自定义算子工程和Kernel直调工程场景下，不同Kernel类型（通过[设置Kernel类型](../../Kernel-Tiling/set_Kernel_type.md)设置）在AIC和AIV上调用该接口的返回值如下：
+在自定义算子工程和核函数（Kernel）直调工程场景下，不同核函数（Kernel）类型（通过[设置核函数（Kernel）类型](../../Kernel-Tiling/set_Kernel_type.md)设置）在AIC和AIV上调用该接口的返回值如下：
 
-**表2** 自定义算子工程和Kernel直调工程场景返回值列表
+**表2** 自定义算子工程和核函数（Kernel）直调工程场景返回值列表
 
-| Kernel类型 | KERNEL_TYPE_AIV_ONLY | KERNEL_TYPE_AIC_ONLY | KERNEL_TYPE_MIX_AIC_1_2 | KERNEL_TYPE_MIX_AIC_1_1 | KERNEL_TYPE_MIX_AIC_1_0 | KERNEL_TYPE_MIX_AIV_1_0 |
+| 核函数（Kernel）类型 | KERNEL_TYPE_AIV_ONLY | KERNEL_TYPE_AIC_ONLY | KERNEL_TYPE_MIX_AIC_1_2 | KERNEL_TYPE_MIX_AIC_1_1 | KERNEL_TYPE_MIX_AIC_1_0 | KERNEL_TYPE_MIX_AIV_1_0 |
 | --- | --- | --- | --- | --- | --- | --- |
 | AIV | 1 | - | 2 | 1 | - | 1 |
 | AIC | - | 1 | 1 | 1 | 1 | - |

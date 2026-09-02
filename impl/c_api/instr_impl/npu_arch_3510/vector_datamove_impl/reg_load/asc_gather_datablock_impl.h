@@ -14,8 +14,7 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl/reg_load/asc_gather_datablock_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -118,8 +117,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* src_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(src);
-        vgatherb(dst, src_tmp, index, mask);
+        vgatherb(dst, src, index, mask);
     }
 }
 
@@ -136,8 +134,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
-        vgatherb(dst, src_tmp, index, mask);
+        vgatherb(dst, src, index, mask);
     }
 }
 
@@ -145,8 +142,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float4_e2m1x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e2m1x2_t*>(src);
-        vgatherb(dst, src_tmp, index, mask);
+        vgatherb(dst, src, index, mask);
     }
 }
 
@@ -154,8 +150,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
-        vgatherb(dst, src_tmp, index, mask);
+        vgatherb(dst, src, index, mask);
     }
 }
 
@@ -172,8 +167,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e8m0_t* src_tmp = reinterpret_cast<__ubuf__ float8_e8m0_t*>(src);
-        vgatherb(dst, src_tmp, index, mask);
+        vgatherb(dst, src, index, mask);
     }
 }
 // ==========无mask参数=========
@@ -262,8 +256,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* src_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(src);
-        vgatherb(dst, src_tmp, index);
+        vgatherb(dst, src, index);
     }
 }
 
@@ -279,8 +272,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
-        vgatherb(dst, src_tmp, index);
+        vgatherb(dst, src, index);
     }
 }
 
@@ -288,8 +280,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
-        __ubuf__ float4_e2m1x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e2m1x2_t*>(src);
-        vgatherb(dst, src_tmp, index);
+        vgatherb(dst, src, index);
     }
 }
 
@@ -297,8 +288,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
-        __ubuf__ float4_e1m2x2_t* src_tmp = reinterpret_cast<__ubuf__ float4_e1m2x2_t*>(src);
-        vgatherb(dst, src_tmp, index);
+        vgatherb(dst, src, index);
     }
 }
 
@@ -315,8 +305,7 @@ __simd_callee__ inline void asc_gather_datablock_impl(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e8m0_t* src_tmp = reinterpret_cast<__ubuf__ float8_e8m0_t*>(src);
-        vgatherb(dst, src_tmp, index);
+        vgatherb(dst, src, index);
     }
 }
 

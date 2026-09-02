@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ_res.md#id1 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002566538879_section106841136114319"></a>
 
@@ -150,7 +151,7 @@ Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、hal
     | dstNzMatrixStride | [0, 16384] |
 
 <!-- npu="310p" id18 -->
-- 针对Atlas 推理系列产品AI Core，使用Global Memory -\> Local Memory通路的ND2NZ搬运接口时，需要预留8K的UB空间，作为接口的临时数据存放区。
+- 针对Atlas 推理系列产品AI Core，使用Global Memory -\> Local Memory通路的ND2NZ搬运接口时，需要预留8K的Unified Buffer（UB）空间，作为接口的临时数据存放区。
 <!-- end id18 -->
 
 ## 关键特性说明

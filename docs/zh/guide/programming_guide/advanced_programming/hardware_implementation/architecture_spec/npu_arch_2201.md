@@ -23,7 +23,7 @@
 
 **Vector计算单元**
 
--   Vector计算单元的数据来自于Unified Buffer，要求32字节对齐。
+-   Vector计算单元的数据来自于Unified Buffer（UB），要求32字节对齐。
 
 **Cube计算单元**
 
@@ -39,10 +39,10 @@
 
 <a name="table12348145512210"></a>
 
-| 存储单元名称 | 存储空间大小 | 对齐要求 | Kernel侧常量名称及大小（单位：字节） |
+| 存储单元名称 | 存储空间大小 | 对齐要求 | 核函数（Kernel）侧常量名称及大小（单位：字节） |
 | --- | --- | --- | --- |
 | Global Memory  | - | 1Byte对齐 | - |
-| Unified Buffer | 192KB | 32Byte对齐 | ASC_UB_SIZE = 192 * 1024 - 256 |
+| UB | 192KB | 32Byte对齐 | ASC_UB_SIZE = 192 * 1024 - 256 |
 | L1 Buffer | 512KB | 32Byte对齐 | ASC_L1_SIZE = 512 * 1024 - 256 |
 | L0A Buffer | 64KB | 512Byte对齐 | ASC_L0A_SIZE = 64 * 1024 |
 | L0B Buffer | 64KB | 512Byte对齐 | ASC_L0B_SIZE = 64 * 1024 |
@@ -78,17 +78,17 @@
     这些格式针对矩阵乘法等计算密集型任务进行优化，可显著提升计算效率。
 
 -   L1 Buffer缓存推荐使用FRACTAL\_NZ格式。当L1 Buffer采用NZ格式时，数据搬运到L0A/L0B Buffer（需分别转换为ZZ和ZN格式）时，可降低格式转换开销。
--   Unified Buffer对数据格式没有要求。
+-   UB对数据格式没有要求。
 
 **解决存储单元的访问冲突，提升读写性能**
 
-当多个操作尝试同时访问Unified Buffer同一个bank或者bank group时，可能会发生bank冲突，包括读写冲突、写写冲突、读读冲突，这种冲突会导致访问排队，降低性能。可以通过优化bank分配的方式来提升读写性能，具体信息请参考[避免UB的bank冲突](../../../../operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/avoid_ub_bank_conflict.md)章节。
+当多个操作尝试同时访问UB同一个bank或者bank group时，可能会发生bank冲突，包括读写冲突、写写冲突、读读冲突，这种冲突会导致访问排队，降低性能。可以通过优化bank分配的方式来提升读写性能，具体信息请参考[避免UB的bank冲突](../../../../operator_practice/simd_operator_optimization/memory_access/avoid_ub_bank_conflict/avoid_ub_bank_conflict.md)章节。
 
 ## 搬运单元<a name="section1073952984611"></a>
 
 **搬运时的对齐要求**
 
-由于搬运后的数据用于参与数据计算，因此对搬运数据大小有要求，搬运到Unified Buffer的数据大小需要按照DataBlock对齐，其余存储单元的数据搬运必须按[分形要求](../../../../technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md)进行搬运。例如，数据从L1 Buffer搬运到L0A Buffer时，数据格式需要从NZ转换为ZZ格式，搬运数据的大小要按分形大小对齐，如果L1 Buffer的剩余大小不足1个分形，则硬件执行中会出现异常。
+由于搬运后的数据用于参与数据计算，因此对搬运数据大小有要求，搬运到UB的数据大小需要按照DataBlock对齐，其余存储单元的数据搬运必须按[分形要求](../../../../technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md)进行搬运。例如，数据从L1 Buffer搬运到L0A Buffer时，数据格式需要从NZ转换为ZZ格式，搬运数据的大小要按分形大小对齐，如果L1 Buffer的剩余大小不足1个分形，则硬件执行中会出现异常。
 
 **支持跨卡数据搬运（Hccs物理链路）**
 
@@ -151,7 +151,7 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
 -   核内同步
 
-    由于AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行的方式运行，在读写Local Memory（如Unified Buffer）时可能存在数据依赖关系。为确保数据一致性及计算正确性，需通过同步控制协调操作时序。
+    由于AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行的方式运行，在读写Local Memory（如UB）时可能存在数据依赖关系。为确保数据一致性及计算正确性，需通过同步控制协调操作时序。
 
     以MTE2从GM搬运数据至UB，进行Vector计算单元的Abs计算，再搬运回GM的流程为例，需满足以下同步条件：
 
@@ -192,7 +192,7 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
     ![](../../../../figures/aicore.png)
 
-    例如，在AIC中将L0C的计算结果搬运到GM后，AIV需要将GM的数据搬运到UB。此时，可以使用CrossCoreSetFlag和CrossCoreWaitFlag命令，确保数据从L0C成功搬运到GM后，再从GM搬运到UB，流程如下图所示。
+    下面以模式2为例说明AIC与同一AI Core内AIV之间的同步过程：AIC将L0C的计算结果搬运到GM后，调用`CrossCoreSetFlag<0x2, PIPE_FIX>(ID1)`；两个AIV通过`CrossCoreWaitFlag<0x2>(ID1)`确保数据从L0C成功搬运到GM后，再将GM的数据搬运到UB。其中，`0x2`表示模式2，`PIPE_FIX`表示流水类型，`ID1`为同步标记ID。CrossCoreWaitFlag只显式传入modeId，未传入pipe模板参数。CrossCoreSetFlag之前PIPE_FIX流水的指令完成后，CrossCoreWaitFlag后续全部流水的指令才能执行，具体原因请参考[“默认值”](#cross_core_wait_flag_default_values)。
 
     ![](../../../../figures/inter_sync_1.png)
 
@@ -200,13 +200,13 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
     需要注意以下几点：
 
-    -   **成对使用**
+    -   **成对使用与一致性要求**
 
-        CrossCoreSetFlag和CrossCoreWaitFlag必须成对使用，否则可能导致算子超时问题。
+        CrossCoreSetFlag和CrossCoreWaitFlag必须成对使用，否则可能导致算子超时问题。两个接口的参数一致性要求如下：
 
-    -   **一致性要求**
-
-        CrossCoreSetFlag的模板参数和flagId必须与CrossCoreWaitFlag完全一致，否则视为不同的flagId。例如，CrossCoreSetFlag<0x0, PIPE\_MTE3\>\(0x8\)和CrossCoreSetFlag<0x2, PIPE\_FIX\>\(0x8\)设置的不是同一个flagId。
+        - modeId：本架构版本的硬件指令不使用CrossCoreWaitFlag的modeId，但建议显式配置与CrossCoreSetFlag相同的modeId，以便确认两个接口的同步模式匹配。
+        - pipe：CrossCoreWaitFlag的pipe不生效，无需与CrossCoreSetFlag的pipe保持一致。
+        - flagId：CrossCoreSetFlag与CrossCoreWaitFlag必须使用相同的flagId。
 
     -   **避免连续设置**
 
@@ -220,6 +220,9 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
         同一flagId的计数器最多可以设置15次。
 
-    -   **默认流水类型**
+    <a id="cross_core_wait_flag_default_values"></a>
 
-        CrossCoreWaitFlag不需要显式设置指令所在的流水类型，默认使用PIPE\_S。
+    -   **默认值**
+
+        - modeId：默认值为0。建议显式配置与CrossCoreSetFlag相同的modeId。
+        - pipe：默认值为PIPE\_S。CrossCoreWaitFlag接口提供pipe模板参数，但本架构版本的硬件指令不区分等待的流水，因此pipe取值不影响实际执行效果，CrossCoreWaitFlag会阻塞全部流水的后续指令。

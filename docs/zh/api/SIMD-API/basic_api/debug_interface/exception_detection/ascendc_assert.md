@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/debug_interface/exception_detection/ascendc_assert_res.md#id1 -->
 
 ## 功能说明<a name="section259105813316"></a>
 
@@ -30,7 +31,7 @@
 
 ascendc_assert提供了一种在CPU/NPU域实现断言功能的接口。当断言条件不满足时，系统会输出断言信息并格式化打印在屏幕上。
 
-在算子Kernel侧实现代码中需要增加断言的地方使用ascendc_assert检查代码，并格式化输出一些调测信息。
+在算子核函数（Kernel）侧实现代码中需要增加断言的地方使用ascendc_assert检查代码，并格式化输出一些调测信息。
 
 > [!CAUTION]注意
 > 该接口主要用于调试分析，开启后会对算子性能产生一定影响，通常在调试阶段使用，生产环境建议关闭。<br>

@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/math_compute/Round_interface/Round_res.md#id1 -->
 
 ## 功能说明
 
@@ -103,5 +104,5 @@ AscendC::Round(dstLocal, srcLocal, sharedTmpBuffer, 512);
 输入数据(srcLocal):
 [ 6.6   -4.3   -8.6   ...   8.8   -8.3   6.5 ]
 输出数据(dstLocal):
-[ 7.0   -4.0   -9.0   ...   9.0   -8.0   7.0 ]
+[ 7.0   -4.0   -9.0   ...   9.0   -8.0   6.0 ]
 ```

@@ -29,6 +29,7 @@
 <!-- npu="9030" id2 -->
 - Kirin 9030：支持
 <!-- end id2 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Init_res.md#id2 -->
 
 ### Tiling参数传入GM地址的接口
 
@@ -57,6 +58,7 @@
 <!-- npu="9030" id4 -->
 - Kirin 9030：支持
 <!-- end id4 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Init_res.md#id1 -->
 
 ## 功能说明
 

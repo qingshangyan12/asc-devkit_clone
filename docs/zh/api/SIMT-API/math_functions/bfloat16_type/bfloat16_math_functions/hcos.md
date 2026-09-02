@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/bfloat16_type/bfloat16_math_functions/hcos_res.md#id1 -->
 
 ## 功能说明
 
@@ -56,7 +57,7 @@ inline bfloat16_t hcos(bfloat16_t x)
 
 ## 需要包含的头文件
 
-使用bfloat16\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
+使用bfloat16\_t类型接口需要包含`simt_api/asc_bf16.h`头文件。
 
 ```cpp
 #include "simt_api/asc_bf16.h"
@@ -70,7 +71,7 @@ inline bfloat16_t hcos(bfloat16_t x)
     __global__ __launch_bounds__(1024) void KernelCos(bfloat16_t* dst, bfloat16_t* x)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = hcos(x[idx]); // 对src源地址的第idx个元素取三角函数余弦值
+        dst[idx] = hcos(x[idx]); // 对入参x的第idx个元素取三角函数余弦值
     }
     ```
 

@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -105,7 +106,7 @@ MaskReg
 
 ### Mask设置方式
 
-在Mask设置中，Reg矢量计算支持多种灵活配置方式，可根据实际计算场景选择固定Mask模式、从UB搬运或从RegTensor搬运等策略，以满足不同计算场景的需求。具体设置方式如下表所示：
+在Mask设置中，Reg矢量计算支持多种灵活配置方式，可根据实际计算场景选择固定Mask模式、从Unified Buffer（UB）搬运或从RegTensor搬运等策略，以满足不同计算场景的需求。具体设置方式如下表所示：
 
 **表3**  Mask设置方式
 

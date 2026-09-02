@@ -29,10 +29,11 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：不支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopyL1ToUB_res.md#id1 -->
 
 ## 功能说明
 
-提供从L1 Buffer搬运数据到Unified Buffer的基础能力，数据在传输过程中保持原始格式和内容不变，支持连续和非连续的数据搬运。
+提供从L1 Buffer搬运数据到Unified Buffer（UB）的基础能力，数据在传输过程中保持原始格式和内容不变，支持连续和非连续的数据搬运。
 
 ## 函数原型
 

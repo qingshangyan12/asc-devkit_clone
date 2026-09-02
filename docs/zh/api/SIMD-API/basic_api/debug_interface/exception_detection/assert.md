@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/debug_interface/exception_detection/assert_res.md#id1 -->
 
 ## 功能说明<a name="section259105813316"></a>
 
@@ -36,7 +37,7 @@
 
 该接口实现CPU/NPU域assert断言功能。算子执行中，如果assert内部条件判断不为真，则输出assert条件并将输入的信息格式化打印在屏幕上。
 
-在算子Kernel侧实现代码中需要增加断言的地方使用assert检查代码，并格式化输出一些调测信息。示例如下：
+在算子核函数（Kernel）侧实现代码中需要增加断言的地方使用assert检查代码，并格式化输出一些调测信息。示例如下：
 
 ```cpp
 int assertFlag = 10;

@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reduction_compute/PairReduceElem_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -73,7 +74,7 @@ __simd_callee__ inline void PairReduceElem(U& dstReg, U srcReg, MaskReg mask)
   - 若连续两个元素a、b仅元素a参与计算，目的操作数结果为a。
   - 若连续两个元素a、b仅元素b参与计算，目的操作数结果为b。
 
-- 求和后，dst中仅前一半元素为有效数据，后一半填充为0。搬出至UB时需要避免数据踩踏。
+- 求和后，dst中仅前一半元素为有效数据，后一半填充为0。搬出至Unified Buffer（UB）时需要避免数据踩踏。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

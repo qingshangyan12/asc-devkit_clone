@@ -23,6 +23,7 @@
 <!-- npu="910" id19 -->
 - Atlas 训练系列产品：支持
 <!-- end id19 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/atomic_operations/SetAtomicAdd_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -117,7 +118,7 @@ AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
 AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
 AscendC::SyncAll();
 
-// 开启原子累加，将UB数据原子累加到GM
+// 开启原子累加，将Unified Buffer（UB）数据原子累加到GM
 AscendC::SetAtomicAdd<T>();
 AscendC::DataCopy(dstGlobal, srcLocal, SIZE);
 

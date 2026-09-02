@@ -23,11 +23,14 @@
     };                                                                                                              \
                                                                                                                     \
     namespace {                                                                                                     \
+    const void* expected_dst_##data_type = nullptr;                                                                 \
+                                                                                                                    \
     void sprclr_##data_type##_Stub(Literal spr_id) { EXPECT_EQ(spr_id, SPR_AR); }                                   \
                                                                                                                     \
     void vsqz_##data_type##_Stub(squeeze_vector_type& dst, squeeze_vector_type src, vector_bool mask, Literal mode) \
     {                                                                                                               \
         EXPECT_EQ(mode, MODE_STORED);                                                                               \
+        EXPECT_EQ(static_cast<const void*>(&dst), expected_dst_##data_type);                                        \
     }                                                                                                               \
                                                                                                                     \
     void vstur_##data_type##_Stub(                                                                                  \
@@ -46,6 +49,7 @@
         vector_store_unalign src0;                                                                                  \
         api_vector_type src1;                                                                                       \
         vector_bool squeeze_mask;                                                                                   \
+        expected_dst_##data_type = static_cast<const void*>(&dst);                                                  \
                                                                                                                     \
         MOCKER_CPP(sprclr, void(Literal)).times(1).will(invoke(sprclr_##data_type##_Stub));                         \
         MOCKER_CPP(vsqz, void(squeeze_vector_type&, squeeze_vector_type, vector_bool, Literal))                     \
@@ -76,7 +80,7 @@ TEST_SQUEEZE_AND_STOREUNALIGN(bfloat16_t, vector_bfloat16_t, vector_bfloat16_t, 
 TEST_SQUEEZE_AND_STOREUNALIGN(
     fp8_e4m3fn_t, vector_fp8_e4m3fn_t, vector_fp8_e4m3fn_t, vector_fp8_e4m3fn_t, float8_e4m3_t);
 TEST_SQUEEZE_AND_STOREUNALIGN(fp8_e5m2_t, vector_fp8_e5m2_t, vector_fp8_e5m2_t, vector_fp8_e5m2_t, float8_e5m2_t);
-TEST_SQUEEZE_AND_STOREUNALIGN(fp8_e8m0_t, vector_fp8_e8m0_t, vector_fp8_e8m0_t, vector_fp8_e8m0_t, float8_e8m0_t);
+TEST_SQUEEZE_AND_STOREUNALIGN(fp8_e8m0_t, vector_fp8_e8m0_t, vector_fp8_e8m0_t, vector_fp8_e8m0_t, fp8_e8m0_t);
 TEST_SQUEEZE_AND_STOREUNALIGN(fp4x2_e2m1_t, vector_fp4x2_e2m1_t, vector_int8_t, vector_fp4x2_e2m1_t, float4_e2m1x2_t);
 TEST_SQUEEZE_AND_STOREUNALIGN(fp4x2_e1m2_t, vector_fp4x2_e1m2_t, vector_int8_t, vector_fp4x2_e1m2_t, float4_e1m2x2_t);
 TEST_SQUEEZE_AND_STOREUNALIGN(int4b_t, vector_int4x2_t, vector_int8_t, vector_fp4x2_e1m2_t, float4_e1m2x2_t);

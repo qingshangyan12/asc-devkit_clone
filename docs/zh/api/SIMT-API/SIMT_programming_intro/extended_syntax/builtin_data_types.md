@@ -35,7 +35,7 @@ SIMT编程提供了一系列适用于Device侧的数据类型，包括标量、�
 
     对齐要求：遵循自然对齐原则，提升访问效率。
 
-    跨线程共享：可存储在Unified Buffer中供线程块内共享。
+    跨线程共享：可存储在Unified Buffer（UB）中供线程块内共享。
 
     直接内存访问：支持直接从Global Memory加载和存储。
 
@@ -73,7 +73,7 @@ SIMT编程提供了一系列适用于Device侧的数据类型，包括标量、�
 | 浮点型，1符号位，1指数位，2尾数位 | float4_e1m2x2_t | - |
 | 浮点型，1符号位，4指数位，3尾数位 | float8_e4m3x2_t | - |
 | 浮点型，1符号位，5指数位，2尾数位 | float8_e5m2x2_t | - |
-| 浮点型hif8 | hifloat8x2_t | - |
+| 浮点型hifloat8 | hifloat8x2_t | - |
 | 浮点型，1符号位，5指数位，10尾数位 | half2 | - |
 | 浮点型，1符号位，8指数位，7尾数位 | bfloat16x2_t | - |
 | 浮点型，1符号位，8指数位，23尾数位 | float2 | float4 |
@@ -246,7 +246,7 @@ SIMT编程提供了用于构造短向量的函数。这些构造函数可以将�
     inline bfloat16x2_t make_bfloat162(bfloat16_t x, bfloat16_t y)
     ```
 
-使用短向量构造函数需要包含simt\_api/vector\_functions.h，调用示例如下：
+使用短向量构造函数需要包含`simt_api/vector_functions.h`，调用示例如下：
 
 ```cpp
 #include "simt_api/vector_functions.h"

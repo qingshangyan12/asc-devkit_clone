@@ -21,10 +21,11 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/address_space_conversion_functions/__cvta_ubuf_to_generic_res.md#id1 -->
 
 ## 功能说明
 
-将Unified Buffer内存空间的地址值转换为对应的指针并返回。
+将Unified Buffer（UB）内存空间的地址值转换为对应的指针并返回。
 
 ## 函数原型
 
@@ -42,12 +43,12 @@ void* __cvta_ubuf_to_generic(size_t rawbits)
 
 ## 返回值说明
 
-指向Unified Buffer内存空间的指针。该接口不校验输入是否为有效Unified Buffer地址。异常场景示例说明如下：
+指向UB内存空间的指针。该接口不校验输入是否为有效UB地址。异常场景示例说明如下：
 
 | 输入场景 | 返回值 |
 | --- | --- |
-| `rawbits`为`0`或`1` | 返回指针使用`__isUbuf`判断为1，但该指针不一定是可安全访问的Unified Buffer地址。 |
-| `rawbits`为全1 | 返回指针使用`__isGlobal`、`__isUbuf`、`__isLocal`均判断为0。 |
+| rawbits为0或1 | 返回指针使用__isUbuf()判断为1，但该指针不一定是可安全访问的UB地址。 |
+| rawbits为全1 | 返回指针使用__isGlobal()、__isUbuf()、__isLocal()均判断为0。 |
 
 ## 约束说明
 
@@ -55,7 +56,7 @@ SIMD与SIMT混合编程场景不支持使用该接口。
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/device\_functions.h"头文件。
+使用该接口需要包含`simt_api/device_functions.h`头文件。
 
 ```cpp
 #include "simt_api/device_functions.h"

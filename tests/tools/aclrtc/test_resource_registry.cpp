@@ -12,12 +12,15 @@
 #include <mockcpp/mockcpp.hpp>
 
 #include <cstdlib>
+#include <csignal>
 #include <dlfcn.h>
 #include <fstream>
 #include <iterator>
 #include <memory>
 #include <set>
 #include <string>
+#include <sys/resource.h>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -42,12 +45,19 @@ constexpr uint64_t TEST_MAX_EXTENSION_COUNT = 4096U;
 constexpr uint64_t TEST_MAX_FILE_COUNT = 65536U;
 constexpr uint64_t TEST_MAX_REGISTRY_FILE_COUNT = 131072U;
 
+static_assert(
+    std::is_same<std::underlying_type_t<ResourceStatus>, uint32_t>::value, "ResourceStatus must have a stable width");
+static_assert(
+    std::is_same<std::underlying_type_t<ResourceSourceType>, uint32_t>::value,
+    "ResourceSourceType must have a stable width");
+
 const AcCompileResourceBundleHeader* gBundleHeader = nullptr;
 uint32_t gDlopenCalls = 0U;
 uint32_t gDlsymCalls = 0U;
 uint32_t gDlcloseCalls = 0U;
 bool gDlsymReportsError = false;
 uint32_t gDlerrorCalls = 0U;
+std::string gDlopenFailurePath;
 
 const AcCompileResourceBundleHeader* TestBundleGetter() { return gBundleHeader; }
 
@@ -61,6 +71,15 @@ void* DlopenFailure(const char*, int)
 {
     ++gDlopenCalls;
     return nullptr;
+}
+
+void* DlopenConfigured(const char* path, int)
+{
+    ++gDlopenCalls;
+    if (path != nullptr && gDlopenFailurePath == path) {
+        return nullptr;
+    }
+    return reinterpret_cast<void*>(static_cast<uintptr_t>(0x1234U));
 }
 
 void* DlsymBundle(void*, const char*)
@@ -240,6 +259,7 @@ protected:
         gDlcloseCalls = 0U;
         gDlsymReportsError = false;
         gDlerrorCalls = 0U;
+        gDlopenFailurePath.clear();
     }
 
     void MockSuccessfulLoader()
@@ -262,16 +282,32 @@ TEST_F(ResourceRegistryTest, AutomaticSearchRootsParsesCustomVendorAndBuiltInPat
         opp / "vendors/config.ini",
         "ignored=value\n load_priority = vendor_a, ../escape, vendor_b, vendor_a, , /absolute\n");
     SetEnvironment("ASCEND_CUSTOM_OPP_PATH", "  /custom/one:/custom/two:/custom/one::  ");
-    SetEnvironment("ASCEND_OPP_PATH", opp.string());
+    SetEnvironment("ASCEND_OPP_PATH", (opp / ".." / opp.filename()).string());
 
     const AutomaticRoots roots = ResourceRegistry::AutomaticSearchRoots();
+    const fs::path canonicalOpp = fs::canonical(opp);
     ASSERT_EQ(roots.custom.size(), 4U);
     EXPECT_EQ(roots.custom[0], "/custom/one/op_impl/ai_core/tbe/kernel/jit");
     EXPECT_EQ(roots.custom[1], "/custom/two/op_impl/ai_core/tbe/kernel/jit");
-    EXPECT_EQ(roots.custom[2], (opp / "vendors/vendor_a/op_impl/ai_core/tbe/kernel/jit").string());
-    EXPECT_EQ(roots.custom[3], (opp / "vendors/vendor_b/op_impl/ai_core/tbe/kernel/jit").string());
+    EXPECT_EQ(roots.custom[2], (canonicalOpp / "vendors/vendor_a/op_impl/ai_core/tbe/kernel/jit").string());
+    EXPECT_EQ(roots.custom[3], (canonicalOpp / "vendors/vendor_b/op_impl/ai_core/tbe/kernel/jit").string());
     ASSERT_EQ(roots.builtIn.size(), 1U);
-    EXPECT_EQ(roots.builtIn[0], (opp / "built-in/op_impl/ai_core/tbe/kernel/jit").string());
+    EXPECT_EQ(roots.builtIn[0], (canonicalOpp / "built-in/op_impl/ai_core/tbe/kernel/jit").string());
+
+    SetEnvironment("ASCEND_OPP_PATH", Path("missing-opp").string());
+    const AutomaticRoots missingOpp = ResourceRegistry::AutomaticSearchRoots();
+    EXPECT_EQ(missingOpp.custom.size(), 2U);
+    EXPECT_TRUE(missingOpp.builtIn.empty());
+
+    const fs::path oppWithoutVendorConfig = Path("opp-without-vendor-config");
+    MakeDirectory(oppWithoutVendorConfig);
+    SetEnvironment("ASCEND_OPP_PATH", oppWithoutVendorConfig.string());
+    const AutomaticRoots missingVendorConfig = ResourceRegistry::AutomaticSearchRoots();
+    EXPECT_EQ(missingVendorConfig.custom.size(), 2U);
+    ASSERT_EQ(missingVendorConfig.builtIn.size(), 1U);
+    EXPECT_EQ(
+        missingVendorConfig.builtIn[0],
+        (fs::canonical(oppWithoutVendorConfig) / "built-in/op_impl/ai_core/tbe/kernel/jit").string());
 
     UnsetEnvironment("ASCEND_OPP_PATH");
     const AutomaticRoots noOpp = ResourceRegistry::AutomaticSearchRoots();
@@ -332,14 +368,15 @@ TEST_F(ResourceRegistryTest, CollectAndDiscoverLibrariesHandleExplicitAndAutomat
     EXPECT_EQ(libraries[0].sourceType, ResourceSourceType::External);
 
     libraries.clear();
-    EXPECT_EQ(ResourceRegistry::DiscoverLibraries(explicitRoot.string().c_str(), libraries), ResourceStatus::Success);
-    ASSERT_EQ(libraries.size(), 1U);
-    EXPECT_EQ(libraries[0].path, fs::canonical(top).string());
+    EXPECT_EQ(
+        ResourceRegistry::DiscoverLibraries(explicitRoot.string().c_str(), libraries), ResourceStatus::InvalidResource);
+    EXPECT_TRUE(libraries.empty());
 
     const fs::path empty = Path("empty");
     MakeDirectory(empty);
     libraries.clear();
-    EXPECT_EQ(ResourceRegistry::DiscoverLibraries(empty.string().c_str(), libraries), ResourceStatus::NotFound);
+    EXPECT_EQ(ResourceRegistry::DiscoverLibraries(empty.string().c_str(), libraries), ResourceStatus::InvalidResource);
+    EXPECT_TRUE(libraries.empty());
     EXPECT_EQ(
         ResourceRegistry::DiscoverLibraries(Path("absent").string().c_str(), libraries),
         ResourceStatus::InvalidResource);
@@ -716,6 +753,8 @@ TEST_F(ResourceRegistryTest, LoadManifestValidatesJsonOwnershipSourceAndDuplicat
     EXPECT_EQ(loadText("[]"), ResourceStatus::InvalidResource);
     EXPECT_EQ(loadText(R"({"source_file":"source.cpp"})"), ResourceStatus::InvalidResource);
     EXPECT_EQ(loadText(R"({"resource_id":1,"source_file":"source.cpp"})"), ResourceStatus::InvalidResource);
+    EXPECT_EQ(loadText(R"({"resource_id":""})"), ResourceStatus::InvalidResource);
+    EXPECT_EQ(stage.external.resources.find(""), stage.external.resources.end());
     EXPECT_EQ(loadText(R"({"resource_id":"metadata-only"})"), ResourceStatus::Success);
     EXPECT_TRUE(stage.external.resources.at("metadata-only")->data.sourceFilePath.empty());
     EXPECT_EQ(loadText(R"({"resource_id":"resource","source_file":1})"), ResourceStatus::InvalidResource);
@@ -774,23 +813,37 @@ TEST_F(ResourceRegistryTest, LibraryDeleterHandlesCloseFailure)
 
 TEST_F(ResourceRegistryTest, LoadLibraryReportsOpenFailure)
 {
+    const fs::path so = Path("open-failure.so");
+    WriteFile(so);
     MOCKER(dlopen).expects(once()).will(invoke(DlopenFailure));
     MOCKER(dlerror).stubs().will(invoke(DlerrorFailure));
     StageState stage;
     EXPECT_EQ(
-        ResourceRegistry::LoadLibrary({"missing.so", ResourceSourceType::External}, stage), ResourceStatus::LoadError);
+        ResourceRegistry::LoadLibrary({so.string(), ResourceSourceType::External}, stage), ResourceStatus::LoadError);
     EXPECT_EQ(gDlopenCalls, 1U);
+}
+
+TEST_F(ResourceRegistryTest, LoadLibraryRejectsUnresolvablePathBeforeDlopen)
+{
+    MOCKER(dlopen).stubs().will(invoke(DlopenFailure));
+    StageState stage;
+    EXPECT_EQ(
+        ResourceRegistry::LoadLibrary({Path("missing.so").string(), ResourceSourceType::External}, stage),
+        ResourceStatus::InvalidResource);
+    EXPECT_EQ(gDlopenCalls, 0U);
 }
 
 TEST_F(ResourceRegistryTest, LoadLibraryReportsBundleFailureAndClosesHandle)
 {
+    const fs::path so = Path("bundle-failure.so");
+    WriteFile(so);
     MOCKER(dlopen).expects(once()).will(invoke(DlopenSuccess));
     MOCKER(dlsym).stubs().will(invoke(DlsymMissing));
     MOCKER(dlerror).stubs().will(invoke(DlerrorControlled));
     MOCKER(dlclose).expects(once()).will(invoke(DlcloseSuccess));
     StageState stage;
     EXPECT_EQ(
-        ResourceRegistry::LoadLibrary({"invalid.so", ResourceSourceType::Custom}, stage), ResourceStatus::LoadError);
+        ResourceRegistry::LoadLibrary({so.string(), ResourceSourceType::Custom}, stage), ResourceStatus::LoadError);
     EXPECT_EQ(gDlcloseCalls, 1U);
 }
 
@@ -811,6 +864,9 @@ TEST_F(ResourceRegistryTest, LoadLibraryReportsManifestFailure)
 TEST_F(ResourceRegistryTest, LoadLibraryLoadsValidManifest)
 {
     const SourceLayout layout = CreateLayout("load-library-success");
+    const fs::path soPath(layout.soPath);
+    const std::string nonCanonicalPath =
+        (soPath.parent_path() / ".." / soPath.parent_path().filename() / soPath.filename()).string();
     const std::string json = R"({"resource_id":"loaded","source_file":"source.cpp"})";
     AcCompileResourceManifest manifest{StringView(json), nullptr, 0U};
     AcCompileResourceBundle bundle = MakeBundle(&manifest, 1U);
@@ -818,24 +874,133 @@ TEST_F(ResourceRegistryTest, LoadLibraryLoadsValidManifest)
     MockSuccessfulLoader();
     StageState stage;
     EXPECT_EQ(
-        ResourceRegistry::LoadLibrary({layout.soPath, ResourceSourceType::Custom}, stage), ResourceStatus::Success);
-    EXPECT_EQ(stage.custom.resources.size(), 1U);
+        ResourceRegistry::LoadLibrary({nonCanonicalPath, ResourceSourceType::Custom}, stage), ResourceStatus::Success);
+    ASSERT_EQ(stage.custom.resources.size(), 1U);
+    EXPECT_EQ(stage.custom.resources.at("loaded")->sourceSoPath, fs::canonical(soPath).string());
     EXPECT_EQ(gDlcloseCalls, 1U);
 }
 
-TEST_F(ResourceRegistryTest, LoadLibrariesStopsAtFirstFailureAndMarksDiscoveredCategory)
+TEST_F(ResourceRegistryTest, LoadLibrariesContinuesAfterAllFailuresAndReturnsFirstFailure)
 {
+    const fs::path first = Path("first.so");
+    const fs::path second = Path("second.so");
+    WriteFile(first);
+    WriteFile(second);
     MOCKER(dlopen).stubs().will(invoke(DlopenFailure));
     MOCKER(dlerror).stubs().will(invoke(DlerrorFailure));
     StageState stage;
     const std::vector<LibrarySpec> libraries = {
-        {"first.so", ResourceSourceType::External},
-        {"second.so", ResourceSourceType::BuiltIn},
+        {first.string(), ResourceSourceType::External},
+        {second.string(), ResourceSourceType::BuiltIn},
     };
     EXPECT_EQ(ResourceRegistry::LoadLibraries(libraries, stage), ResourceStatus::LoadError);
+    EXPECT_EQ(gDlopenCalls, 2U);
+    EXPECT_TRUE(stage.external.discovered);
+    EXPECT_TRUE(stage.builtIn.discovered);
+    EXPECT_TRUE(stage.external.resources.empty());
+    EXPECT_TRUE(stage.builtIn.resources.empty());
+}
+
+TEST_F(ResourceRegistryTest, LoadLibrariesSkipsFailedSoAndKeepsSuccessfulSo)
+{
+    const std::string json = R"({"resource_id":"continued"})";
+    AcCompileResourceManifest manifest{StringView(json), nullptr, 0U};
+    AcCompileResourceBundle bundle = MakeBundle(&manifest, 1U);
+    gBundleHeader = &bundle.header;
+    const fs::path first = Path("first.so");
+    const fs::path second = Path("second.so");
+    WriteFile(first);
+    WriteFile(second);
+    gDlopenFailurePath = first.string();
+    MOCKER(dlopen).stubs().will(invoke(DlopenConfigured));
+    MOCKER(dlsym).stubs().will(invoke(DlsymBundle));
+    MOCKER(dlerror).stubs().will(invoke(DlerrorControlled));
+    MOCKER(dlclose).stubs().will(invoke(DlcloseSuccess));
+
+    StageState stage;
+    const std::vector<LibrarySpec> libraries = {
+        {gDlopenFailurePath, ResourceSourceType::External},
+        {second.string(), ResourceSourceType::BuiltIn},
+    };
+    EXPECT_EQ(ResourceRegistry::LoadLibraries(libraries, stage), ResourceStatus::Success);
+    EXPECT_EQ(gDlopenCalls, 2U);
+    EXPECT_EQ(gDlcloseCalls, 1U);
+    EXPECT_TRUE(stage.external.discovered);
+    EXPECT_TRUE(stage.external.resources.empty());
+    EXPECT_TRUE(stage.builtIn.discovered);
+    EXPECT_EQ(stage.builtIn.resources.count("continued"), 1U);
+}
+
+TEST_F(ResourceRegistryTest, LoadLibrariesDiscardsPartialManifestsFromFailedSo)
+{
+    const std::string validJson = R"({"resource_id":"partial"})";
+    const std::string invalidJson = "{";
+    AcCompileResourceManifest manifests[] = {
+        {StringView(validJson), nullptr, 0U},
+        {StringView(invalidJson), nullptr, 0U},
+    };
+    AcCompileResourceBundle bundle = MakeBundle(manifests, 2U);
+    gBundleHeader = &bundle.header;
+    MockSuccessfulLoader();
+    const fs::path so = Path("partial.so");
+    WriteFile(so);
+
+    StageState stage;
+    EXPECT_EQ(
+        ResourceRegistry::LoadLibraries({{so.string(), ResourceSourceType::External}}, stage),
+        ResourceStatus::InvalidResource);
+    EXPECT_TRUE(stage.external.discovered);
+    EXPECT_TRUE(stage.external.resources.empty());
+    EXPECT_EQ(stage.external.bytes, 0U);
+    EXPECT_EQ(stage.external.files, 0U);
+}
+
+TEST_F(ResourceRegistryTest, LoadLibrariesSkipsResourcesConflictingWithAnEarlierSo)
+{
+    const std::string json = R"({"resource_id":"conflict"})";
+    AcCompileResourceManifest manifest{StringView(json), nullptr, 0U};
+    AcCompileResourceBundle bundle = MakeBundle(&manifest, 1U);
+    gBundleHeader = &bundle.header;
+    MockSuccessfulLoader();
+    const fs::path first = Path("conflict-first.so");
+    const fs::path second = Path("conflict-second.so");
+    WriteFile(first);
+    WriteFile(second);
+
+    StageState stage;
+    EXPECT_EQ(
+        ResourceRegistry::LoadLibraries(
+            {{first.string(), ResourceSourceType::External}, {second.string(), ResourceSourceType::External}}, stage),
+        ResourceStatus::Success);
+    EXPECT_EQ(gDlopenCalls, 2U);
+    ASSERT_EQ(stage.external.resources.size(), 1U);
+    EXPECT_EQ(stage.external.resources.at("conflict")->sourceSoPath, fs::canonical(first).string());
+}
+
+TEST_F(ResourceRegistryTest, LoadLibrariesSkipsResourcesThatExceedCumulativeLimits)
+{
+    const std::string json = R"({"resource_id":"limited"})";
+    const std::string name = "payload.bin";
+    const std::string path = "payload.bin";
+    const std::vector<uint8_t> payload = {1U};
+    AcCompileResourceFile file{StringView(name), StringView(path), payload.data(), payload.size()};
+    AcCompileResourceManifest manifest{StringView(json), &file, 1U};
+    AcCompileResourceBundle bundle = MakeBundle(&manifest, 1U);
+    gBundleHeader = &bundle.header;
+    MockSuccessfulLoader();
+    const fs::path so = Path("limit.so");
+    WriteFile(so);
+
+    StageState stage;
+    stage.external.bytes = TEST_MAX_REGISTRY_RESOURCE_SIZE;
+    EXPECT_EQ(
+        ResourceRegistry::LoadLibraries({{so.string(), ResourceSourceType::External}}, stage),
+        ResourceStatus::InvalidResource);
     EXPECT_EQ(gDlopenCalls, 1U);
     EXPECT_TRUE(stage.external.discovered);
-    EXPECT_FALSE(stage.builtIn.discovered);
+    EXPECT_TRUE(stage.external.resources.empty());
+    EXPECT_EQ(stage.external.bytes, TEST_MAX_REGISTRY_RESOURCE_SIZE);
+    EXPECT_EQ(stage.external.files, 0U);
 }
 
 TEST_F(ResourceRegistryTest, LoadLibrariesLoadsValidList)
@@ -931,9 +1096,21 @@ TEST_F(ResourceRegistryTest, WriteMaterializedFilesWritesNestedAndEmptyPayloadsA
         {"empty.bin", "empty.bin", {}},
     };
     const fs::path output = Path("materialized");
-    EXPECT_EQ(ResourceRegistry::WriteMaterializedFiles(files, output.string()), ResourceStatus::Success);
+    const std::string nonCanonicalOutput = (output / ".." / output.filename()).string();
+    EXPECT_EQ(ResourceRegistry::WriteMaterializedFiles(files, nonCanonicalOutput), ResourceStatus::Success);
     EXPECT_EQ(ReadFile(output / "nested/data.bin"), std::string("\1\2\3", 3U));
     EXPECT_TRUE(ReadFile(output / "empty.bin").empty());
+
+    const fs::path redirectedRoot = Path("redirected-root");
+    const fs::path redirectedTarget = Path("redirected-target");
+    MakeDirectory(redirectedRoot);
+    MakeDirectory(redirectedTarget);
+    boost::system::error_code error;
+    fs::create_directory_symlink(redirectedTarget, redirectedRoot / "redirect", error);
+    ASSERT_FALSE(error);
+    const std::vector<ResourceFileData> redirected = {{"data.bin", "redirect/data.bin", {1U}}};
+    EXPECT_EQ(ResourceRegistry::WriteMaterializedFiles(redirected, redirectedRoot.string()), ResourceStatus::IoError);
+    EXPECT_FALSE(fs::exists(redirectedTarget / "data.bin"));
 
     const fs::path blockedRoot = Path("blocked-root");
     WriteFile(blockedRoot, "file");
@@ -943,6 +1120,30 @@ TEST_F(ResourceRegistryTest, WriteMaterializedFilesWritesNestedAndEmptyPayloadsA
     MakeDirectory(directoryTarget / "data.bin");
     const std::vector<ResourceFileData> direct = {{"data.bin", "data.bin", {1U}}};
     EXPECT_EQ(ResourceRegistry::WriteMaterializedFiles(direct, directoryTarget.string()), ResourceStatus::IoError);
+}
+
+TEST_F(ResourceRegistryTest, ReportsMaterializedFileFinalizeFailure)
+{
+    struct rlimit originalFileSizeLimit {};
+    ASSERT_EQ(getrlimit(RLIMIT_FSIZE, &originalFileSizeLimit), 0);
+    struct sigaction ignoreFileSizeSignal {};
+    struct sigaction originalFileSizeSignal {};
+    ignoreFileSizeSignal.sa_handler = SIG_IGN;
+    ASSERT_EQ(sigemptyset(&ignoreFileSizeSignal.sa_mask), 0);
+    ASSERT_EQ(sigaction(SIGXFSZ, &ignoreFileSizeSignal, &originalFileSizeSignal), 0);
+    struct rlimit zeroFileSizeLimit = originalFileSizeLimit;
+    zeroFileSizeLimit.rlim_cur = 0U;
+    ASSERT_EQ(setrlimit(RLIMIT_FSIZE, &zeroFileSizeLimit), 0);
+
+    const fs::path output = Path("materialized-finalize-failure");
+    const std::vector<ResourceFileData> files = {{"data.bin", "data.bin", {1U}}};
+    const ResourceStatus writeStatus = ResourceRegistry::WriteMaterializedFiles(files, output.string());
+
+    const int restoreLimitResult = setrlimit(RLIMIT_FSIZE, &originalFileSizeLimit);
+    const int restoreSignalResult = sigaction(SIGXFSZ, &originalFileSizeSignal, nullptr);
+    ASSERT_EQ(restoreLimitResult, 0);
+    ASSERT_EQ(restoreSignalResult, 0);
+    EXPECT_EQ(writeStatus, ResourceStatus::IoError);
 }
 
 TEST_F(ResourceRegistryTest, LookupValidatesInputsAndReturnsIndependentMaterializations)
@@ -1003,8 +1204,8 @@ TEST_F(ResourceRegistryTest, LookupReportsTemporaryRootAndMaterializationFailure
     EXPECT_EQ(registry_->Lookup("bad-temp", output), ResourceStatus::IoError);
     EXPECT_TRUE(output.resourceDir.empty());
 
-    registry_->temporaryRoot_ = Path("forced-materialize").string();
-    WriteFile(fs::path(registry_->temporaryRoot_) / "external", "blocking file");
+    ASSERT_TRUE(registry_->ownedMaterializationRoot_.RegisterDirectoryForCleanup(Path("forced-materialize").string()));
+    WriteFile(fs::path(registry_->ownedMaterializationRoot_.GetDirectoryPath()) / "external", "blocking file");
     output.resourceDir = "stale";
     EXPECT_EQ(registry_->Lookup("bad-temp", output), ResourceStatus::IoError);
     EXPECT_TRUE(output.resourceDir.empty());
@@ -1017,7 +1218,7 @@ TEST_F(ResourceRegistryTest, DestructorHonorsSaveKernelMetaAtTemporaryRootCreati
     registry_->externalResources_.emplace("keep-temp", MakeEntry(ResourceSourceType::External));
     ResourceData output;
     EXPECT_EQ(registry_->Lookup("keep-temp", output), ResourceStatus::Success);
-    const std::string retainedRoot = registry_->temporaryRoot_;
+    const std::string retainedRoot = registry_->ownedMaterializationRoot_.GetDirectoryPath();
     ASSERT_TRUE(fs::is_directory(retainedRoot));
     registry_.reset();
     EXPECT_TRUE(fs::is_directory(retainedRoot));
@@ -1026,7 +1227,7 @@ TEST_F(ResourceRegistryTest, DestructorHonorsSaveKernelMetaAtTemporaryRootCreati
     SetEnvironment("ASCEND_OP_COMPILE_SAVE_KERNEL_META", "true");
     registry_->externalResources_.emplace("remove-temp", MakeEntry(ResourceSourceType::External));
     EXPECT_EQ(registry_->Lookup("remove-temp", output), ResourceStatus::Success);
-    const std::string removedRoot = registry_->temporaryRoot_;
+    const std::string removedRoot = registry_->ownedMaterializationRoot_.GetDirectoryPath();
     ASSERT_TRUE(fs::is_directory(removedRoot));
     registry_.reset();
     EXPECT_FALSE(fs::exists(removedRoot));
@@ -1042,8 +1243,8 @@ TEST_F(ResourceRegistryTest, SaveKernelMetaTrimsWhitespaceAndKeepsFailedMaterial
     ResourceData output;
     EXPECT_EQ(registry_->Lookup("failed-materialization", output), ResourceStatus::IoError);
     EXPECT_TRUE(output.resourceDir.empty());
-    EXPECT_TRUE(registry_->keepTemporaryRoot_);
-    const fs::path retainedRoot(registry_->temporaryRoot_);
+    EXPECT_TRUE(registry_->retainMaterializedDirectories_);
+    const fs::path retainedRoot(registry_->ownedMaterializationRoot_.GetDirectoryPath());
     const fs::path categoryParent = retainedRoot / "external";
     std::vector<fs::path> retainedCategories;
     for (fs::directory_iterator current(categoryParent), end; current != end; ++current) {
@@ -1082,7 +1283,7 @@ TEST_F(ResourceRegistryTest, LoadReportsDiscoveryAndDynamicLoaderFailures)
     const fs::path empty = Path("load-empty");
     MakeDirectory(empty);
     EXPECT_EQ(registry_->Load(Path("load-missing").string().c_str()), ResourceStatus::InvalidResource);
-    EXPECT_EQ(registry_->Load(empty.string().c_str()), ResourceStatus::NotFound);
+    EXPECT_EQ(registry_->Load(empty.string().c_str()), ResourceStatus::InvalidResource);
 
     const fs::path so = Path("load/libresource_compile_database.so");
     WriteFile(so);
@@ -1102,6 +1303,31 @@ TEST_F(ResourceRegistryTest, LoadReportsManifestFailure)
 
     EXPECT_EQ(registry_->Load(layout.soPath.c_str()), ResourceStatus::InvalidResource);
     EXPECT_EQ(registry_->FindResource("public-invalid-manifest"), nullptr);
+}
+
+TEST_F(ResourceRegistryTest, LoadRejectsEmptyResourceIdAndDoesNotCommitPartialBundle)
+{
+    const SourceLayout layout = CreateLayout("public-empty-resource-id");
+    const std::string validJson = R"({"resource_id":"valid-resource"})";
+    const std::string emptyJson = R"({"resource_id":""})";
+    AcCompileResourceManifest invalidManifests[] = {
+        {StringView(validJson), nullptr, 0U},
+        {StringView(emptyJson), nullptr, 0U},
+    };
+    AcCompileResourceBundle invalidBundle = MakeBundle(invalidManifests, 2U);
+    gBundleHeader = &invalidBundle.header;
+    MockSuccessfulLoader();
+
+    EXPECT_EQ(registry_->Load(layout.soPath.c_str()), ResourceStatus::InvalidResource);
+    EXPECT_EQ(registry_->FindResource(""), nullptr);
+    EXPECT_EQ(registry_->FindResource("valid-resource"), nullptr);
+
+    AcCompileResourceManifest validManifest{StringView(validJson), nullptr, 0U};
+    AcCompileResourceBundle validBundle = MakeBundle(&validManifest, 1U);
+    gBundleHeader = &validBundle.header;
+    EXPECT_EQ(registry_->Load(layout.soPath.c_str()), ResourceStatus::Success);
+    ResourceData output;
+    EXPECT_EQ(registry_->Lookup("valid-resource", output), ResourceStatus::Success);
 }
 
 TEST_F(ResourceRegistryTest, LoadAutomaticCachesFirstStatus)

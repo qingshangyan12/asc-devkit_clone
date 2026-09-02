@@ -21,6 +21,7 @@
 #include "sal.h"
 #include "hcomm/hccl/hccl_res.h"
 #include "hcomm/pkg_inc/hcomm/ccu/ccu_assist_pub.h"
+#include "acl/acl_rt.h"
 #include <memory>
 #include <string>
 #include <chrono>
@@ -41,10 +42,35 @@ namespace mc2_ops_hccl {
 
 bool g_stubCcuAlgorithmRegistered = true;
 
+HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
+{
+    uint64_t actualSize = ctxSize;
+    if (HcclEngineCtxGet(comm, tag.c_str(), COMM_ENGINE_AIV, ctx, &actualSize) == HCCL_SUCCESS) {
+        return actualSize >= ctxSize ? HCCL_SUCCESS : HCCL_E_INTERNAL;
+    }
+
+    CHK_RET(HcclEngineCtxCreate(comm, tag.c_str(), COMM_ENGINE_AIV, ctxSize, ctx));
+    return aclrtMemset(*ctx, ctxSize, 0, ctxSize) == ACL_SUCCESS ? HCCL_SUCCESS : HCCL_E_RUNTIME;
+}
+
 InsCollAlgBase::InsCollAlgBase() {}
 InsCollAlgBase::~InsCollAlgBase() {}
 std::string InsCollAlgBase::Describe() const { return "InsCollAlgBase"; }
+HcclResult InsCollAlgBase::CalcAlgHierarchyInfoV2(
+    TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo, const AlgAttrs& algAttrs)
+{
+    (void)topoInfo;
+    (void)algHierarchyInfo;
+    (void)algAttrs;
+    return HCCL_SUCCESS;
+}
 HcclResult InsCollAlgBase::FastLaunch(const OpParam& param, const CcuFastLaunchCtx* resCtx) { return HCCL_SUCCESS; }
+AlgAttrs InsCollAlgBase::GetAlgoMeta(const std::string& algName) const
+{
+    AlgAttrs attrs;
+    attrs.name = algName;
+    return attrs;
+}
 
 class MockInsCollAlgBase : public InsCollAlgBase {
 public:
@@ -125,8 +151,7 @@ HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* top
         {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuAllGatherMesh1D"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "CcuReduceScatterMesh1D"},
         {HcclCMDType::HCCL_CMD_ALLREDUCE, "CcuAllReduceMesh1D"},
-        {HcclCMDType::HCCL_CMD_ALLTOALL, "CcuAlltoAllMesh1D"},
-        {HcclCMDType::HCCL_CMD_ALLTOALLV, "CcuAlltoAllVMesh1D"},
+        {HcclCMDType::HCCL_CMD_ALLTOALLV, "CcuSchedAllToAllVSoleMesh"},
     };
     static const std::map<HcclCMDType, std::string> aicpuAlgMap = {
         {HcclCMDType::HCCL_CMD_ALLGATHER, "InsAllGatherMesh"},

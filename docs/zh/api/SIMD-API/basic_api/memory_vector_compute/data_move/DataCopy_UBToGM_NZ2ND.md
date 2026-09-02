@@ -23,16 +23,17 @@
 <!-- npu="910" id19 -->
 - Atlas 训练系列产品：不支持
 <!-- end id19 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_UBToGM_NZ2ND_res.md#id1 -->
 
 ## 功能说明<a name="section12840195813362"></a>
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-该接口为软仿接口，从易用性角度出发进行设计，支持在从Unified Buffer到Global Memory的数据搬运过程中进行NZ到ND格式的转换。
+该接口为软仿接口，从易用性角度出发进行设计，支持在从Unified Buffer（UB）到Global Memory的数据搬运过程中进行NZ到ND格式的转换。
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../aux_data_structures/TPosition.md)表示）：
 
-- Unified Buffer -> Global Memory
+- UB -> Global Memory
     - VECOUT -> GM
     <!-- npu="310p" id1 -->
     - CO2 -> GM（仅Atlas 推理系列产品AI Core支持）

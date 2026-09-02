@@ -42,8 +42,8 @@ const std::map<HcclCMDType, std::string> OP_TYPE_TO_CCU_1D_ALG_MAP = {
     {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "CcuReduceScatterMesh1D"},
     {HcclCMDType::HCCL_CMD_ALLREDUCE, "CcuAllReduceMesh1D"},
     {HcclCMDType::HCCL_CMD_REDUCE, "CcuReduceMesh1D"},
-    {HcclCMDType::HCCL_CMD_ALLTOALL, "CcuAlltoAllMesh1D"},
-    {HcclCMDType::HCCL_CMD_ALLTOALLV, "CcuAlltoAllVMesh1D"},
+    {HcclCMDType::HCCL_CMD_ALLTOALL, "CcuSchedAllToAllSoleMesh"},
+    {HcclCMDType::HCCL_CMD_ALLTOALLV, "CcuSchedAllToAllVSoleMesh"},
     {HcclCMDType::HCCL_CMD_HALF_ALLTOALLV, "CcuHalfAll2AllVMesh1D"},
 };
 
@@ -69,6 +69,8 @@ const std::unordered_map<std::string, std::string> RES_RESUSE_ALG = {
 
 class AutoSelectorBase {
 public:
+    virtual ~AutoSelectorBase() = default;
+
     SelectorStatus Select(OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, std::string& selectAlgName) const;
     bool IsDefaultAlg(const HcclAlgoType algoType) const;
     bool IsSmallData(const u64 dataSize) const;

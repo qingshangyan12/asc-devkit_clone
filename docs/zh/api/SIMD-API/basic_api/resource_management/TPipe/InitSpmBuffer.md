@@ -29,12 +29,13 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/InitSpmBuffer_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径为：`"basic_api/kernel_tpipe.h"`。
 
-初始化SPM Buffer。SPM Buffer是一块在GM上的空间，当UB空间不足时可以将溢出数据存放在SPM Buffer上。
+初始化SPM Buffer。SPM Buffer是一块在GM上的空间，当Unified Buffer（UB）空间不足时可以将溢出数据存放在SPM Buffer上。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

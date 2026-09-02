@@ -31,7 +31,10 @@ namespace AscendC {
 namespace {
 
 static const std::set<std::string> REGISTERED_CCU_ALGORITHMS = {
-    "CcuAllGatherMesh1DMem2Mem", "CcuKfcReduceScatterMesh1DMem2Mem"};
+    "CcuAllGatherMesh1DMem2Mem",     "CcuSchedAllGatherConcurMeshNHRMultiLink",
+    "CcuSchedReduceScatterSoleMesh", "CcuSchedAllToAllSoleMesh",
+    "CcuSchedAllToAllVSoleMesh",     "CcuSchedAllReduceSoleMesh",
+    "CcuSchedAllGatherMesh1DMem2Mem"};
 
 bool IsCcuAlgorithmRegistered(const std::string& algConfig, uint8_t commEngine)
 {
@@ -76,6 +79,7 @@ void PrintMc2CcTiling(const Mc2CcTilingInner& tiling)
 
 uint32_t SetDevType(Mc2InitTilingInner* tilingInner)
 {
+    ASCENDC_HOST_ASSERT(tilingInner != nullptr, return EXIT_FAILURE, "tilingInner must not be nullptr.");
     const char* homePath = std::getenv("ASCEND_HOME_PATH");
     ASCENDC_HOST_ASSERT(
         (homePath != nullptr && homePath[0] != '\0'), return EXIT_FAILURE, "ASCEND_HOME_PATH is not set or empty.");
@@ -98,6 +102,7 @@ uint32_t SetDevType(Mc2InitTilingInner* tilingInner)
 uint32_t UpdateMc2InitTiling(uint64_t initTilingAddr, uint64_t ccTilingAddr)
 {
     Mc2InitTilingInner* tilingInner = reinterpret_cast<Mc2InitTilingInner*>(static_cast<uintptr_t>(initTilingAddr));
+    ASCENDC_HOST_ASSERT(tilingInner != nullptr, return EXIT_FAILURE, "tilingInner must not be nullptr.");
     uint32_t& cnt = tilingInner->mc2HcommCnt;
     ASCENDC_HOST_ASSERT(
         cnt < MAX_CC_TILING_NUM, return EXIT_FAILURE, "mc2HcommCnt(%u) must be less than or equal %u.", cnt + 1U,

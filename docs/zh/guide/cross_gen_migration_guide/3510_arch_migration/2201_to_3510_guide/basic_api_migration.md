@@ -2,13 +2,13 @@
 
 本节针对[NPU架构版本3510](../../../programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)的芯片变更对基础API兼容性产生的影响进行说明，并提供基础API的兼容性适配方案。
 
-## 矢量计算<a name="section7364115741514"></a>
+## 矢量计算<a id="vector-compute"></a>
 
 -   **3510架构默认不支持Subnormal功能。**
 
-    **说明**：SubNormal浮点数指的是指数位全为0、尾数不为0的浮点数，用于表示比最小正常数更小的值，避免“下溢为0”。3510版本默认不支持Subnormal，Subnormal浮点数在计算中被视为0。
+    **说明**：Subnormal浮点数指的是指数位全为0、尾数不为0的浮点数，用于表示比最小正常数更小的值，避免“下溢为0”。3510版本默认不支持Subnormal，Subnormal浮点数在计算中被视为0。
 
-    **兼容方案**：通过设置config模板参数来配置Subnormal计算模式。软件模拟对Subnormal数据的处理，通过精度扩展等处理方式来避免Subnormal浮点数下溢为0。
+    **兼容方案**：对于支持config参数的基础API，可以通过设置config模板参数来配置Subnormal计算模式。对于不传入config参数的部分基础API及高阶API，可通过编译选项`--cce-ftz`配置Subnormal处理方式，该选项默认为`true`。`--cce-ftz=false`时保留Subnormal，`--cce-ftz=true`时采用FTZ（Flush-To-Zero）模式。软件模拟通过精度扩展等方式处理Subnormal数据，避免其下溢为0。
 
     **表1**  涉及Subnormal的API和config参数说明
 
@@ -23,7 +23,7 @@
     </td>
     <td class="cellrowborder" align="left" valign="top" width="73%" headers="mcps1.2.3.1.2 "><p id="p1055013361204"><a name="p1055013361204"></a><a name="p1055013361204"></a>以Ln接口为例来进行说明。</p>
     <p id="p151399151208"><a name="p151399151208"></a><a name="p151399151208"></a>通过LnConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：</p>
-    <a name="ul118851253124216"></a><a name="ul118851253124216"></a><ul id="ul118851253124216"><li>LnAlgo::INTRINSIC、LnAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。</li><li>LnAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。</li></ul>
+    <a name="ul118851253124216"></a><a name="ul118851253124216"></a><ul id="ul118851253124216"><li>LnAlgo::INTRINSIC，Subnormal处理方式受编译选项--cce-ftz控制，该选项默认为true。</li><li>LnAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，采用FTZ模式。</li><li>LnAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。</li></ul>
     <p id="p9885135319427"><a name="p9885135319427"></a><a name="p9885135319427"></a>该参数默认值DEFAULT_LN_CONFIG的取值如下：</p>
     <a name="screen18681133513203"></a><a name="screen18681133513203"></a><pre class="screen" codetype="Cpp" id="screen18681133513203">constexpr LnConfig DEFAULT_LN_CONFIG = { LnAlgo::INTRINSIC };</pre>
     </td>
@@ -42,7 +42,7 @@
     constexpr uint32_t xAddr = 0;
     constexpr uint32_t yAddr = xAddr + DATA_COUNT * sizeof(half);
 
-    // 核函数入口：使用__vector__显式声明Vector核函数，搭配C++ Tensor方式编程
+    // 核函数（Kernel）入口：使用__vector__显式声明Vector核函数（Kernel），搭配C++ Tensor方式编程
     __vector__ __global__ void ln_custom(__gm__ uint8_t* src, __gm__ uint8_t* dst)
     {
         // C++ Tensor需要手动调用InitSocState初始化全局状态寄存器
@@ -72,13 +72,15 @@
     }
     ```
 
+    在3510架构下，部分基础API和高阶API在未传入config参数时，其Subnormal处理方式受编译选项`--cce-ftz`影响，该选项默认为`true`。基础API包括Exp、Ln、Reciprocal、Sqrt、Rsqrt和Div；高阶API包括Gelu、Sigmoid、Silu、SoftMax、SoftmaxFlash、SoftmaxFlashV2、SoftmaxFlashV3、Swish、Digamma、Erf、Lgamma、Power、Tanh、BatchNorm和RmsNorm等。关于该编译选项的适用范围及产品限制，请参考[AI-Core算子编译基本用法](../../../programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md)。
+
 ## 数据搬运<a name="section7530159122210"></a>
 
 -   **DataCopy接口不支持L1 Buffer-\>GM通路。**
 
     **说明**：硬件删除L1 Buffer到GM的通路，无法将数据从L1 Buffer直接搬运到GM中。现有接口不支持L1 Buffer到GM的直接搬运。
 
-    **兼容方案**：对于纯Cube计算场景：在GM多分配一个单位矩阵，通过Mmad矩阵乘法计算输出到L0C Buffer，再从L0C Buffer通过Fixpipe搬运到GM。对于Vector和Cube计算融合场景，可以通过L1 Buffer搬运到UB，再搬运到GM。以下以纯Cube计算场景为例进行说明，介绍算子核心流程，具体可参考[L1到GM搬运兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)。
+    **兼容方案**：对于纯Cube计算场景：在GM多分配一个单位矩阵，通过Mmad矩阵乘法计算输出到L0C Buffer，再从L0C Buffer通过Fixpipe搬运到GM。对于Vector和Cube计算融合场景，可以通过L1 Buffer搬运到Unified Buffer（UB），再搬运到GM。以下以纯Cube计算场景为例进行说明，介绍算子核心流程，具体可参考[L1到GM搬运兼容性样例](../../../../../../examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)。
 
     1.  将矩阵A从GM搬运到L1 Buffer。
 
@@ -318,7 +320,7 @@
         }
         ```
 
--   **L0A Buffer分形改变，从ZZ转换为ZN格式。**
+-   **L0A Buffer分形改变，从Zz转换为Nz格式。**
 
     **说明**：涉及的API有LoadData、Mmad和LoadDataWithTranspose。
 

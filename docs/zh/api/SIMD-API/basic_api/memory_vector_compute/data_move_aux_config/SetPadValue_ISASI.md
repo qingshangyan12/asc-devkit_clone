@@ -23,16 +23,17 @@
 <!-- npu="910" id17 -->
 - Atlas 训练系列产品：不支持
 <!-- end id17 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/SetPadValue_ISASI_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-[DataCopyPad（GMToUB非对齐数据搬运）](../data_move/DataCopyPad_GMToUB.md)从Global Memory将数据非对齐搬运至Unified Buffer时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。
+[DataCopyPad（GMToUB非对齐数据搬运）](../data_move/DataCopyPad_GMToUB.md)从Global Memory将数据非对齐搬运至Unified Buffer（UB）时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../aux_data_structures/TPosition.md)表示）：
 
-- Global Memory -> Unified Buffer
+- Global Memory -> UB
     - GM -> VECIN
     - GM -> VECOUT
 

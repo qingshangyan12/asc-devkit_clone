@@ -29,6 +29,7 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/reduction_compute/ReduceSum_res.md#id1 -->
 
 ## 功能说明
 
@@ -143,7 +144,7 @@
   <!-- end id22 -->
 <!-- end id18 -->
 
-- `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
+- `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合Unified Buffer（UB）的实际大小避免出现越界。
 
 <!-- npu="950,910,310p,310b,x90,9030" id23 -->
 - 针对以下型号，模板参数`isSetMask`参数不生效，保持默认值即可：

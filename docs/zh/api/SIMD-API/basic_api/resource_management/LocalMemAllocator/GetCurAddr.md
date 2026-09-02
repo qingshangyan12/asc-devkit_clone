@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/resource_management/LocalMemAllocator/GetCurAddr_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -53,6 +54,6 @@ __aicore__ inline uint32_t LocalMemAllocator<hard>::GetCurAddr() const
 
 ```cpp
 LocalMemAllocator allocator;
-// 默认的物理位置为UB，由于从0地址开始分配，下面的打印结果为0
+// 默认的物理位置为Unified Buffer（UB），由于从0地址开始分配，下面的打印结果为0
 AscendC::printf("current addr is %u\n", allocator.GetCurAddr());
 ```

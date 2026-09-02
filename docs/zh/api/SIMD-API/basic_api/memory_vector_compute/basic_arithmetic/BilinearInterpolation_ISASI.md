@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/BilinearInterpolation_ISASI_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -215,7 +216,7 @@ hRepeat = 2；vRepeat = 2；mask = 128；vROffset = 128。
 - 参数src0Offset的取值要求如下：
     - 取值应保证src0元素类型位宽对齐。
     - 偏移地址后需要32字节对齐。
-    - 偏移地址后不能超出UB大小数据的范围。
+    - 偏移地址后不能超出Unified Buffer（UB）大小数据的范围。
     - 地址偏移的取值范围：不能超出uint32\_t的范围。
 - 当参数repeatMode配置为true时，需确保src1的有效数据长度*16 ≥ src0的数据长度。
 

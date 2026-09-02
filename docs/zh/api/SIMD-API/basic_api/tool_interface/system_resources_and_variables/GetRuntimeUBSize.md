@@ -23,12 +23,13 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetRuntimeUBSize_res.md#id1 -->
 
 ## 功能说明
 
 头文件路径为：`"basic_api/kernel_operator_sys_var_intf.h"`。
 
-获取运行时UB空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。
+获取运行时Unified Buffer（UB）空间的大小，单位为Byte。开发者根据UB的大小来计算循环次数等参数值。
 
 ## 函数原型
 

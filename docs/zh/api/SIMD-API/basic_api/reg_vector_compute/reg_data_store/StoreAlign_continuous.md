@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_continuous_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -121,10 +122,10 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 | DIST_FIRST_ELEMENT_B8 | 忽略mask，向dst中搬运src第一个元素，数据类型为b8。 | 1 |
 | DIST_FIRST_ELEMENT_B16 | 忽略mask，向dst中搬运src第一个元素，数据类型为b16。可参考[图1 数据搬出分布模式图示](#fig-storealign-dist)。 | 2 |
 | DIST_FIRST_ELEMENT_B32 | 忽略mask，向dst中搬运src第一个元素，数据类型为b32。 | 4 |
-| DIST_PACK_B16 | 压缩模式，数据类型为b16，根据mask，将src中有效元素的低半部分bit数据连续存储于dst中。<br>例：数据类型为uint16_t：<br>src: [0x3210, 0x7654, 0xBA98, 0xFEDC, ..., 0xFEDC, 0xBA98, 0x7654, 0x3210]。<br>dst: [0x5410, 0xDC98, ... 0x98DC, 0x1054]。 | min(32, VL/2) |
-| DIST_PACK_B32 | 压缩模式，数据类型为b32，根据mask，将src中有效元素的低半部分bit数据连续存储于dst中。可参考[图1 数据搬出分布模式图示](#fig-storealign-dist)。 | min(32, VL/2) |
-| DIST_PACK_B64 | 压缩模式，数据类型为b64，根据mask，将src中有效元素的低半部分bit数据连续存储于dst中。 | min(32, VL/2) |
-| DIST_PACK4_B32 | 压缩模式，数据类型为b32，根据mask，将src中有效元素的低8bit（四分之一）数据连续存储于dst中。 | min(32, VL/4) |
+| DIST_PACK_B16 | 压缩模式，数据类型为b16，根据mask，将src中有效元素的低半部分bit数据写入dst中对应的压缩后的位置。<br>例：数据类型为uint16_t：<br>src: [0x3210, 0x7654, 0xBA98, 0xFEDC, ..., 0xFEDC, 0xBA98, 0x7654, 0x3210]。<br>dst: [0x5410, 0xDC98, ... 0x98DC, 0x1054]。 | min(32, VL/2) |
+| DIST_PACK_B32 | 压缩模式，数据类型为b32，根据mask，将src中有效元素的低半部分bit数据写入dst中对应的压缩后的位置。可参考[图1 数据搬出分布模式图示](#fig-storealign-dist)。 | min(32, VL/2) |
+| DIST_PACK_B64 | 压缩模式，数据类型为b64，根据mask，将src中有效元素的低半部分bit数据写入dst中对应的压缩后的位置。 | min(32, VL/2) |
+| DIST_PACK4_B32 | 压缩模式，数据类型为b32，根据mask，将src中有效元素的低8bit（四分之一）数据写入dst中对应的压缩后的位置。 | min(32, VL/4) |
 | DIST_NORM | 正常模式，搬运VL数据，支持数据类型b8/b16/b32，系统会根据模板参数T自动选择DIST_NORM_B8、DIST_NORM_B16、DIST_NORM_B32。可参考[图1 数据搬出分布模式图示](#fig-storealign-dist)。 | 32 |
 
 **表 4**  模板参数说明（双搬出模式）
@@ -166,7 +167,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 ## 约束说明<a name="section587915597213"></a>
 
-- 位于Unified Buffer的地址约束、postUpdateStride * sizeof(T)的对齐约束、AddrReg寄存器中存储的偏移量 \* sizeof(T)的对齐约束与分布模式StoreDist有关，具体地址约束请参考[表3 StoreDist参数说明（单搬出模式）](#表3-StoreDist参数说明（单搬出模式）)、[表6 StoreDist参数说明（双搬出模式）](#表6-StoreDist参数说明（双搬出模式）)。
+- 位于UB的地址约束、postUpdateStride * sizeof(T)的对齐约束、AddrReg寄存器中存储的偏移量 \* sizeof(T)的对齐约束与分布模式StoreDist有关，具体地址约束请参考[表3 StoreDist参数说明（单搬出模式）](#表3-StoreDist参数说明（单搬出模式）)、[表6 StoreDist参数说明（双搬出模式）](#表6-StoreDist参数说明（双搬出模式）)。
 - 当RegTrait为RegTraitNumOne时，单搬出正常模式（DIST_NORM）下，若目的UB的剩余空间不足256B，需要配置mask，保证搬出的有效元素数据量不大于UB剩余空间，且UB剩余空间不得小于32B。
 - 单搬出模式：b64数据类型只支持StoreDist中的DIST_NORM和DIST_PACK_B64模式。
 - 当RegTensor模板参数RegTrait为RegTraitNumOne和RegTraitNumTwo时，支持情况如下：

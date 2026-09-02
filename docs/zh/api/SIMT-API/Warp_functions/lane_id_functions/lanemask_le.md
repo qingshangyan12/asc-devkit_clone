@@ -21,14 +21,15 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/Warp_functions/lane_id_functions/lanemask_le_res.md#id1 -->
 
 ## 功能说明
 
 获取当前线程的一个32位掩码，在当前线程所属的Warp中，将“Lane ID小于等于当前线程”的线程的对应位设为1，其余位为0。
 
-如Lane ID为0的线程，调用本接口获取到32位掩码：0000 0000 0000 0000 0000 0000 0000 0001。
+如Lane ID为0的线程，调用本接口获取到32位掩码：`0000 0000 0000 0000 0000 0000 0000 0001`。
 
-如Lane ID为31的线程，调用本接口获取到32位掩码：1111 1111 1111 1111 1111 1111 1111 1111。
+如Lane ID为31的线程，调用本接口获取到32位掩码：`1111 1111 1111 1111 1111 1111 1111 1111`。
 
 **图1**  lanemask\_le示意图
 
@@ -54,7 +55,7 @@ int32_t lanemask_le()
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/device\_functions.h"头文件。 
+使用该接口需要包含`simt_api/device_functions.h`头文件。
 
 ```cpp
 #include "simt_api/device_functions.h" 
@@ -62,7 +63,7 @@ int32_t lanemask_le()
 
 ## 调用示例
 
-下面示例使用`lanemask_le`统计当前Lane及其之前的线程数，并据此判断当前线程位于Warp的上半区还是下半区，再通过`asc_shfl`分别广播上下半Warp中指定Lane的数据。示例中使用[asc_shfl](../Warp_shfl_functions/asc_shfl.md)，需另外包含"simt_api/device_warp_functions.h"头文件，其中`srcLane`的取值范围为[0, 15]。
+下面示例使用`lanemask_le()`统计当前Lane及其之前的线程数，并据此判断当前线程位于Warp的上半区还是下半区，再通过`asc_shfl()`分别广播上下半Warp中指定Lane的数据。示例中使用[asc_shfl](../Warp_shfl_functions/asc_shfl.md)，需另外包含`simt_api/device_warp_functions.h`头文件，其中`srcLane`的取值范围为[0, 15]。
 
 -   SIMT编程场景：
 

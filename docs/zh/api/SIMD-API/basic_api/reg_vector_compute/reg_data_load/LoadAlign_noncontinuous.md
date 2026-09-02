@@ -23,6 +23,7 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_noncontinuous_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -87,7 +88,7 @@ LoadAlign能够实现数据从Unified Buffer（UB）非连续搬运至[RegTensor
 
 ## 约束说明<a name="section11585101304320"></a>
 
-- 位于Unified Buffer的地址必须32字节对齐。
+- 位于UB的地址必须32字节对齐。
 - RegTensor模板参数regTrait只支持RegTraitNumOne。
 - repeatStride * 32B / sizeof(T)需要32字节对齐。
 

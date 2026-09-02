@@ -23,13 +23,14 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopyPad_UBToL1_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
 > [!NOTE]说明
 > 本接口为软件仿真实现，是在Matmul高阶API的基础上，利用Matmul高阶API中的workspace GM空间作为数据中转空间，数据先搬入GM，再搬入L1 Buffer。因此，在使用本接口时，需要先使用REGISTER_MATMUL注册高阶API。
 
-该接口提供从Unified Buffer到L1 Buffer的数据非对齐搬运功能。
+该接口提供从Unified Buffer（UB）到L1 Buffer的数据非对齐搬运功能。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

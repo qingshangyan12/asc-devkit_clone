@@ -23,12 +23,13 @@
 <!-- npu="910" id7 -->
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Divs_flexible_scalar_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
 头文件路径为：`"basic_api/kernel_operator_vec_binary_scalar_intf.h"`。
 
-Divs属于双目标量类计算接口，矢量内每个元素和标量间取较小值，支持标量在前和标量在后两种场景。其中标量输入支持配置LocalTensor单点元素，计算公式如下：
+Divs属于双目标量类计算接口，用于将矢量中的每个元素与标量相除，支持标量作为被除数或除数两种场景。其中标量输入支持配置LocalTensor单点元素，计算公式如下：
 
 $dst_i = src_i \div scalar$
 
@@ -106,10 +107,13 @@ $dst_i = scalar \div src_i$
 
 <!-- npu="950" id9 -->
 - 针对Ascend 950PR/Ascend 950DT：该接口通过VF调用[Reg矢量计算API](../../reg_vector_compute/reg_vector_compute.md)实现兼容，当参数count或repeatTime取值为0时，软仿行为不保证该接口被视为NOP（空操作）。
-- 对UB空间的占用说明。针对Ascend 950PR/Ascend 950DT：
-  - tensor高维切分计算占用8KB Unified Buffer。
-  - tensor前n个数据连续计算不涉及8KB Unified Buffer的占用。
+- 对Unified Buffer（UB）空间的占用说明。针对Ascend 950PR/Ascend 950DT：
+  - tensor高维切分计算占用8KB UB。
+  - tensor前n个数据连续计算不涉及8KB UB的占用。
 - 针对Ascend 950PR/Ascend 950DT，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。
+- 针对Ascend 950PR/Ascend 950DT，仅half和float类型的计算受Subnormal影响，其处理方式受编译选项--cce-ftz控制（默认值为true）：
+    - --cce-ftz=false时，计算过程中保留Subnormal，并按照其实际数值参与后续计算。
+    - --cce-ftz=true时，启用FTZ（Flush-To-Zero）模式，计算过程中产生或参与运算的Subnormal将按0处理，可能导致计算结果与保留Subnormal时存在精度差异。
 <!-- end id9 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

@@ -21,6 +21,7 @@
 <!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
 <!-- end id6 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/float_math_functions/sincosf_res.md#id1 -->
 
 ## 功能说明
 
@@ -41,8 +42,8 @@ inline void sincosf(float x, float *s, float *c)
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | x | 输入 | 源操作数。 |
-| s | 输出 | Unified Buffer、Global Memory或栈空间的地址，用于存储输入数据的三角函数正弦值。 |
-| c | 输出 | Unified Buffer、Global Memory或栈空间的地址，用于存储输入数据的三角函数余弦值。 |
+| s | 输出 | UB、Global Memory或栈空间的地址，用于存储输入数据的三角函数正弦值。 |
+| c | 输出 | UB、Global Memory或栈空间的地址，用于存储输入数据的三角函数余弦值。 |
 
 ## 返回值说明
 
@@ -54,7 +55,7 @@ inline void sincosf(float x, float *s, float *c)
 
 ## 需要包含的头文件
 
-使用该接口需要包含"simt\_api/math\_functions.h"头文件。
+使用该接口需要包含`simt_api/math_functions.h`头文件。
 
 ```cpp
 #include "simt_api/math_functions.h"
