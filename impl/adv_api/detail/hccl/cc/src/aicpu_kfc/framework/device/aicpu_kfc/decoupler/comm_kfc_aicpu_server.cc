@@ -755,6 +755,10 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
                 break;
             }
             profilingStarted = true;
+            HCCL_INFO(
+                "[MC2_OPEN_DIAG][ProfHead] group %u, msgPos %u, repeatIdx %u, turnIdx %u, repeatCnt %u, "
+                "opParamKey %#llx.",
+                groupIdx_, msgPos, i, turnIdx, repeatCnt, static_cast<unsigned long long>(opParamKey));
         }
 
         UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
@@ -785,6 +789,11 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
                     "Group %u: failed to report DFX tail for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
                     execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
                 profilingRet = ret;
+            } else {
+                HCCL_INFO(
+                    "[MC2_OPEN_DIAG][ProfTail] group %u, msgPos %u, repeatIdx %u, turnIdx %u, repeatCnt %u, "
+                    "opParamKey %#llx.",
+                    groupIdx_, msgPos, i, turnIdx, repeatCnt, static_cast<unsigned long long>(opParamKey));
             }
         }
 
@@ -824,6 +833,11 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
                 "Group %u: failed to report DFX tail for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
                 execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
             profilingRet = ret;
+        } else {
+            HCCL_INFO(
+                "[MC2_OPEN_DIAG][ProfTailFallback] group %u, msgPos %u, repeatCnt %u, opParamKey %#llx, "
+                "executionRet %d. Tail reported after loop exit, boundary may not be the last algorithm task.",
+                groupIdx_, msgPos, repeatCnt, static_cast<unsigned long long>(opParamKey), executionRet);
         }
     }
 
