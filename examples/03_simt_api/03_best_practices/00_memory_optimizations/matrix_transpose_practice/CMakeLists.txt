@@ -11,6 +11,7 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_ENABLE_SIMT ON)
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
@@ -33,5 +34,5 @@ target_compile_definitions(matrix_transpose PRIVATE
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
 target_compile_options(matrix_transpose PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt --cce-res-usage>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --cce-res-usage>
 )

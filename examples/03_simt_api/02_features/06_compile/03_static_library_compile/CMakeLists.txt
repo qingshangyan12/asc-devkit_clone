@@ -12,6 +12,7 @@ cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 
+set(CMAKE_ASC_ENABLE_SIMT ON)
 find_package(ASC REQUIRED)
 
 project(static_library_compile LANGUAGES ASC CXX)
@@ -35,7 +36,7 @@ set_target_properties(demo PROPERTIES
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
 target_compile_options(gather_kernel PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
 
 target_include_directories(demo PRIVATE
