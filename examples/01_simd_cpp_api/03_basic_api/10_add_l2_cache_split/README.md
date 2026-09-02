@@ -71,7 +71,7 @@
 - 样例实现：
 
   - Kernel实现
-    公共Device逻辑按32字节DataBlock切分数据范围，并分配给20个Vector Core。每个核内部按UB Tile循环执行`DataCopy`、`Adds`和写回。
+    公共Device逻辑按32字节数据块切分数据范围，并分配给20个Vector Core。每个核内部按UB Tile循环执行`DataCopy`、`Adds`和写回。
 
     反例每轮处理完整`data[0, 384MB)`范围：
 
@@ -102,7 +102,7 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -139,7 +139,7 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 工程配置模式：NPU运行、CPU调试、NPU仿真。其中`sim`模式支持完整执行验证，但384MB负载仿真耗时较长，仿真耗时不作为L2 Cache性能收益评估依据 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201对应Atlas A2训练系列产品/Atlas A2推理系列产品和Atlas A3训练系列产品/Atlas A3推理系列产品，dav-3510对应Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201对应Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510对应Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=不做L2 Cache切分，2=开启L2 Cache切分 |
 
 - 执行结果

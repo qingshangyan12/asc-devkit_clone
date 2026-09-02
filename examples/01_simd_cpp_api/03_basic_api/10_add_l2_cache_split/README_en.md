@@ -71,7 +71,7 @@ The sample uses one 384MB GM data buffer and runs two rounds of `data = data + 1
 - Sample implementation:
 
   - Kernel implementation
-    The shared device logic splits the data range by 32-byte DataBlocks and assigns them to 20 Vector Cores. Inside each core, the workload is processed by UB tiles with `DataCopy`, `Adds`, and writeback.
+    The shared device logic splits the data range by 32-byte data blocks and assigns them to 20 Vector Cores. Inside each core, the workload is processed by UB tiles with `DataCopy`, `Adds`, and writes data back to GM.
 
     Scenario 1 processes the whole `data[0, 384MB)` range in each round:
 
@@ -102,7 +102,7 @@ The sample uses one 384MB GM data buffer and runs two rounds of `data = data + 1
 Run the following steps from the sample root directory.
 
 - Configure environment variables
-  Configure environment variables according to the [CANN installation guide](../../../../../docs/zh/quick_start.md#prepare&install).
+  Configure environment variables according to the [CANN installation guide](../../../../docs/zh/quick_start.md#prepare&install).
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -137,7 +137,7 @@ Run the following steps from the sample root directory.
   | Option | Value | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Project mode: NPU run, CPU debug, or NPU simulation. The `sim` mode supports full execution verification, but the 384MB workload takes a long time to simulate and simulation time is not used to evaluate L2 Cache performance benefits. |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture. `dav-2201` maps to Atlas A2/A3 training and inference series products, and `dav-3510` maps to Ascend 950PR/Ascend 950DT. |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture. `dav-2201` maps to Atlas A2 training series products/Atlas A2 inference series products and Atlas A3 training series products/Atlas A3 inference series products, and `dav-3510` maps to Ascend 950PR/Ascend 950DT. |
   | `SCENARIO_NUM` | `1`, `2` | Scenario number: 1=no L2 Cache split, 2=L2 Cache split enabled. |
 
 - Execution result

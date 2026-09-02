@@ -60,9 +60,8 @@ inline bool VerifyOutput(const uint8_t* inputHost, const uint8_t* outputHost, si
         }
 
         std::fprintf(
-            stderr,
-            "[ERROR] result mismatch at index %zu: input=%f, output=%f(0x%04x), expected=%f(0x%04x)\n",
-            idx, inputValue, aclFloat16ToFloat(output[idx]), GetHalfBits(output[idx]), aclFloat16ToFloat(expected),
+            stderr, "[ERROR] result mismatch at index %zu: input=%f, output=%f(0x%04x), expected=%f(0x%04x)\n", idx,
+            inputValue, aclFloat16ToFloat(output[idx]), GetHalfBits(output[idx]), aclFloat16ToFloat(expected),
             GetHalfBits(expected));
         return false;
     }
@@ -79,12 +78,13 @@ inline bool RunKernel(const char* caseName, const char* outputPath, KernelLaunch
 
     bool success =
         CheckAcl("aclrtMallocHost(inputHost)", aclrtMallocHost(reinterpret_cast<void**>(&inputHost), dataSizeBytes));
-    success = success && CheckAcl(
-                             "aclrtMallocHost(outputHost)",
-                             aclrtMallocHost(reinterpret_cast<void**>(&outputHost), dataSizeBytes));
-    success = success && CheckAcl(
-                             "aclrtMalloc(dataDevice)",
-                             aclrtMalloc(reinterpret_cast<void**>(&dataDevice), dataSizeBytes, ACL_MEM_MALLOC_HUGE_FIRST));
+    success =
+        success &&
+        CheckAcl("aclrtMallocHost(outputHost)", aclrtMallocHost(reinterpret_cast<void**>(&outputHost), dataSizeBytes));
+    success =
+        success && CheckAcl(
+                       "aclrtMalloc(dataDevice)",
+                       aclrtMalloc(reinterpret_cast<void**>(&dataDevice), dataSizeBytes, ACL_MEM_MALLOC_HUGE_FIRST));
 
     size_t fileSize = 0;
     if (success) {
