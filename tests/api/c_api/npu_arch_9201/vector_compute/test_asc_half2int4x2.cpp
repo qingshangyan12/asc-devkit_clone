@@ -10,14 +10,14 @@
 
 #include "tests/api/c_api/npu_arch_3510/utils/test_vcvt_instr_utils.h"
 
-TEST_VECTOR_COMPUTE_VCVT_INSTR_5(vcvt_rd_m, asc_half2int4x2_rd_m, vcvt_f162s4, vector_int4x2_t, vector_half, 0);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_5(vcvt_rd_sat_m, asc_half2int4x2_rd_sat_m, vcvt_f162s4, vector_int4x2_t, vector_half, 1);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_5(vcvt_rd_v2_m, asc_half2int4x2_rd_v2_m, vcvt_f162s4, vector_int4x2_t, vector_half, 2);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_5(
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(vcvt_rd_m, asc_half2int4x2_rd_m, vcvt_f162s4, vector_int4x2_t, vector_half, 0);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(vcvt_rd_sat_m, asc_half2int4x2_rd_sat_m, vcvt_f162s4, vector_int4x2_t, vector_half, 1);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(vcvt_rd_v2_m, asc_half2int4x2_rd_v2_m, vcvt_f162s4, vector_int4x2_t, vector_half, 2);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(
     vcvt_rd_sat_v2_m, asc_half2int4x2_rd_sat_v2_m, vcvt_f162s4, vector_int4x2_t, vector_half, 3);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_5(vcvt_rd_v3_m, asc_half2int4x2_rd_v3_m, vcvt_f162s4, vector_int4x2_t, vector_half, 4);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_5(
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(vcvt_rd_v3_m, asc_half2int4x2_rd_v3_m, vcvt_f162s4, vector_int4x2_t, vector_half, 4);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(
     vcvt_rd_sat_v3_m, asc_half2int4x2_rd_sat_v3_m, vcvt_f162s4, vector_int4x2_t, vector_half, 5);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_5(vcvt_rd_v4_m, asc_half2int4x2_rd_v4_m, vcvt_f162s4, vector_int4x2_t, vector_half, 6);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_5(
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(vcvt_rd_v4_m, asc_half2int4x2_rd_v4_m, vcvt_f162s4, vector_int4x2_t, vector_half, 6);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_1(
     vcvt_rd_sat_v4_m, asc_half2int4x2_rd_sat_v4_m, vcvt_f162s4, vector_int4x2_t, vector_half, 7);
