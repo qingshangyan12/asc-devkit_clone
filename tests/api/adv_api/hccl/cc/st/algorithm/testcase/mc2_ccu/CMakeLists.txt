@@ -94,6 +94,7 @@ target_include_directories(
     ${UTILS_DIR}/ccu_scenario
     ${HCCL_CC_SRC_DIR}
     ${HCCL_CC_SRC_DIR}/common
+    ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/ccu
     ${HCCL_CC_SRC_DIR}/ops/all_gather/selector
     ${HCCL_CC_SRC_DIR}/ops/all_gather/executor
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu
