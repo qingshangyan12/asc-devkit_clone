@@ -142,7 +142,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     } else {
         maxDataSizePerLoop = transportBoundDataSize;
     }
-    if (param.supportSymmetricMemory) {
+    if (param.supportSymmetricMemory && std::string(param.algName) == "InsAllGatherMesh1D") {
         maxDataSizePerLoop = dataSize_;
     }
     u64 maxCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
