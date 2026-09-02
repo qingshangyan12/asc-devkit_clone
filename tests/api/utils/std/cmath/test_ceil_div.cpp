@@ -11,25 +11,25 @@
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
 
-using namespace AscendC;
+using AscendC::Std::ceil_div;
 
-static_assert(Std::ceil_div(8192U, 2048U) == 4U);
-static_assert(Std::ceil_div(8193U, 2048U) == 5U);
-static_assert(Std::ceil_div(0U, 2048U) == 0U);
-static_assert(Std::ceil_div(8192, 0) == 0);
+static_assert(ceil_div(8192U, 2048U) == 4U);
+static_assert(ceil_div(8193U, 2048U) == 5U);
+static_assert(ceil_div(0U, 2048U) == 0U);
+static_assert(ceil_div(8192, 0) == 0);
 
 class TEST_CEIL_DIV : public testing::Test {};
 
 TEST_F(TEST_CEIL_DIV, UINT32_CASE)
 {
-    EXPECT_EQ(Std::ceil_div(8192U, 2048U), 4U);
-    EXPECT_EQ(Std::ceil_div(8193U, 2048U), 5U);
-    EXPECT_EQ(Std::ceil_div(0U, 2048U), 0U);
+    EXPECT_EQ(ceil_div(8192U, 2048U), 4U);
+    EXPECT_EQ(ceil_div(8193U, 2048U), 5U);
+    EXPECT_EQ(ceil_div(0U, 2048U), 0U);
 }
 
 TEST_F(TEST_CEIL_DIV, SIGNED_CASE)
 {
-    EXPECT_EQ(Std::ceil_div(33, 16), 3);
-    EXPECT_EQ(Std::ceil_div(32, 16), 2);
-    EXPECT_EQ(Std::ceil_div(1, 0), 0);
+    EXPECT_EQ(ceil_div(33, 16), 3);
+    EXPECT_EQ(ceil_div(32, 16), 2);
+    EXPECT_EQ(ceil_div(1, 0), 0);
 }
