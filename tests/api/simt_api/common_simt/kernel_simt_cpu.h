@@ -19,6 +19,7 @@
 #include <chrono>
 
 #include "stub_def.h"
+#include "basic_api/kernel_common.h"
 
 namespace cce {
 struct dim3 {
@@ -156,10 +157,6 @@ uint32_t GetWarpId();
 void Sync();
 } // namespace Simt
 } // namespace AscendC
-
-uint64_t __cce_simt_get_para_base_imp();
-
-void __nop(void);
 
 #endif
 #endif // KERNEL_SIMT_CPU_DEBUG

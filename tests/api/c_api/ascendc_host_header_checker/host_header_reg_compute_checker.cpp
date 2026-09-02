@@ -547,19 +547,14 @@ static void test_host_c_api_reg_compute_15()
     using ::asc_loadalign_brc_postupdate_v3;
     using ::asc_loadalign_brc_v2;
     using ::asc_loadalign_brc_v3;
-    using ::asc_loadalign_datablock_strided;
     using ::asc_loadalign_deintlv;
     using ::asc_loadalign_deintlv_postupdate;
     using ::asc_loadalign_downsample;
     using ::asc_loadalign_downsample_postupdate;
-    using ::asc_loadalign_mask;
-    using ::asc_loadalign_mask_downsample;
-    using ::asc_loadalign_mask_upsample;
     using ::asc_loadalign_postupdate;
     using ::asc_loadalign_unpack;
     using ::asc_loadalign_unpack4;
     using ::asc_loadalign_unpack4_postupdate;
-    using ::asc_log;
 }
 
 static void test_host_c_api_reg_compute_16()
@@ -581,7 +576,6 @@ static void test_host_c_api_reg_compute_16()
     using ::asc_min_scalar;
     using ::asc_mul;
     using ::asc_mul_scalar;
-    using ::asc_mul_scalar_float2half_rn;
     using ::asc_mula;
     using ::asc_mull;
     using ::asc_muls;

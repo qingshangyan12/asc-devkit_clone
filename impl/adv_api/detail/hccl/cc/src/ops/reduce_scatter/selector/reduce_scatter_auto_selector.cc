@@ -153,7 +153,7 @@ SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoCcuSchedule(
                 RS_M2M_1D_MAX_DATA_SIZE);
             return SelectorStatus::NOT_MATCH;
         }
-        selectAlgName = "CcuSchedReduceScatterSoleMesh";
+        selectAlgName = "CcuKfcReduceScatterMesh1DMem2Mem";
     } else {
         HCCL_DEBUG("[ReduceScatterAutoSelector] only single-die MESH_1D matches the KFC path.");
         return SelectorStatus::NOT_MATCH;

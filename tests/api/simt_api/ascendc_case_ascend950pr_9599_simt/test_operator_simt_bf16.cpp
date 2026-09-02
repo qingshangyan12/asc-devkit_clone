@@ -10,6 +10,8 @@
 #include <gtest/gtest.h>
 #include <type_traits>
 #include <random>
+#include "simt_compiler_stub.h"
+#include "kernel_operator.h"
 #include "simt_api/asc_bf16.h"
 
 using namespace std;

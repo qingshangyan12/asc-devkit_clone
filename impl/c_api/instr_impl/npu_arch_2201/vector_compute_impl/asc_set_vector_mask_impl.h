@@ -18,10 +18,10 @@
 #ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_2201_VECTOR_COMPUTE_IMPL_ASC_SET_VECTOR_MASK_IMPL_H
 #define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_2201_VECTOR_COMPUTE_IMPL_ASC_SET_VECTOR_MASK_IMPL_H
 
-__aicore__ inline void asc_set_vector_mask_impl(uint64_t mask_high, uint64_t mask_low)
+__aicore__ inline void asc_set_vector_mask_impl(uint64_t mask1, uint64_t mask0)
 {
     if ASC_IS_AIV {
-        set_vector_mask(mask_high, mask_low);
+        set_vector_mask(mask1, mask0);
     }
 }
 

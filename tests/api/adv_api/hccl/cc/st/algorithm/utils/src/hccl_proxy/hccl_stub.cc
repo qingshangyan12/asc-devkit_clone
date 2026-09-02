@@ -195,11 +195,7 @@ HcclResult HcclRankGraphGetEndpointInfo(
     void* info)
 {
     uint32_t* intInfo = static_cast<uint32_t*>(info);
-    if (endpointAttr == EndpointAttr::ENDPOINT_ATTR_DIE_ID) {
-        *intInfo = (endpointDesc->loc.device.devPhyId >= 4) ? 1 : 0;
-    } else {
-        *intInfo = 0;
-    }
+    *intInfo = 0;
     return HCCL_SUCCESS;
 }
 

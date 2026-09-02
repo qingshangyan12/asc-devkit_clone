@@ -29,7 +29,6 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030：支持
 <!-- end id9 -->
-<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cache_control/DataCacheCleanAndInvalid_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -108,9 +107,7 @@ DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可�
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 当`entireType`为`SINGLE_CACHE_LINE`时，`dst`生效，`dcciDst`不生效。
-- 当`entireType`为`ENTIRE_DATA_CACHE`时，`dst`不生效，`dcciDst`生效。
-- `dst`为`LocalTensor`类型的函数原型仅支持在AIV中调用。
+无
 
 ## 调用示例<a name="section837496171220"></a>
 

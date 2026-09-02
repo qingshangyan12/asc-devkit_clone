@@ -32,5 +32,4 @@ __simd_callee__ inline void asc_bfloat162half_ru_sat_impl(vector_half& dst, vect
     }
 }
 
-// ASC_RETURN_VALUE_VCONV_IMPL
 #endif

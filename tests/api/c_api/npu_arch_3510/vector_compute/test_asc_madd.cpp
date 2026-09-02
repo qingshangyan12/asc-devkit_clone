@@ -12,4 +12,3 @@
 
 TEST_VECTOR_COMPUTE_BINARY_INSTR(VMadd, asc_madd, vmadd, vector_half);
 TEST_VECTOR_COMPUTE_BINARY_INSTR(VMadd, asc_madd, vmadd, vector_float);
-TEST_VECTOR_COMPUTE_BINARY_INSTR(VMadd, asc_madd, vmadd, vector_bfloat16_t);
