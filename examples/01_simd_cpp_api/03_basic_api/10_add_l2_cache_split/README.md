@@ -22,10 +22,10 @@
 ```text
 ├── 10_add_l2_cache_split
 │   ├── scripts
-│   │   └── gen_data.py               // 输入数据生成脚本
+│   │   ├── gen_data.py               // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py          // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── add_l2cache_nosplit.asc       // 反例Kernel入口和Host main
 │   ├── add_l2cache_split.asc         // 正例Kernel入口和Host main
-│   ├── add_l2cache_split_test.asc    // ACL初始化测试占位文件，未纳入CMake构建目标
 │   ├── CMakeLists.txt                // 编译工程文件
 │   ├── data_utils.h                  // 数据读入写出函数
 │   ├── l2_cache_kernel.h             // 固定负载参数和公共Device处理逻辑
@@ -37,7 +37,7 @@
 ## 样例描述
 
 - 样例功能：
-  本样例对输入`data`执行两轮原地加法计算，每轮对每个`half`元素加1，最终结果为`input + 2`。样例提供不切分和L2 Cache切分两个可执行程序，用于对比相同计算量下不同访问顺序的性能差异。
+  本样例对输入`data`执行两轮原地加法计算，每轮对每个`half`元素加1，最终结果为`input + 2`。样例通过`SCENARIO_NUM`区分不切分和L2 Cache切分两个编译场景，用于对比相同计算量下不同访问顺序的性能差异。
 
 - 样例规格：
 
@@ -60,6 +60,13 @@
   | `l2BatchSizeBytes` | 96MB | 正例单个L2 Batch大小 |
   | `vectorCoreCount` | 20 | Vector Core数量 |
   | `computeRoundCount` | 2 | 计算轮数 |
+
+- 样例场景：
+
+  | `SCENARIO_NUM` | 场景 | 源文件 | Kernel入口 | 输出文件 |
+  |------|------|------|------|------|
+  | `1` | 不做L2 Cache切分 | `add_l2cache_nosplit.asc` | `l2_cache_nosplit` | `output/output.bin` |
+  | `2` | 开启L2 Cache切分 | `add_l2cache_split.asc` | `l2_cache_split` | `output/output.bin` |
 
 - 样例实现：
 
@@ -88,7 +95,7 @@
     反例每处理完一轮完整数据后调用`AscendC::SyncAll()`。正例每个L2 Batch与Round组合结束后调用`AscendC::SyncAll()`，确保所有核完成当前阶段的UB->GM搬运后，再进入下一阶段。
 
   - 调用实现
-    使用内核调用符`<<<>>>`调用核函数。`demo_nosplit`和`demo_split`是两个独立进程，分别启动`l2_cache_nosplit`和`l2_cache_split`。
+    使用内核调用符`<<<>>>`调用核函数。编译时通过`SCENARIO_NUM`选择源文件，生成的可执行程序统一为`demo`。
 
 ## 编译运行
 
@@ -108,46 +115,48 @@
   在本样例目录下执行如下命令。
 
   ```bash
-  python3 scripts/gen_data.py                                              # 生成测试输入数据
-  cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-2201                  # 配置工程，默认npu模式
-  cmake --build build -j                                                   # 编译工程
-  ./build/demo_nosplit                                                     # 执行不切分反例
-  ./build/demo_split                                                       # 执行L2 Cache切分正例
+  SCENARIO_NUM=1
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认NPU模式
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据和真值数据
+  ./demo                           # 执行样例
+  python3 ../scripts/verify_result.py output/output.bin ./output/golden.bin -scenarioNum=$SCENARIO_NUM  # 验证输出结果
   ```
 
-  本样例主要面向NPU模式运行和性能采集。需要排查编译问题时，可添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数进行对应模式的工程配置。
+  本样例主要面向NPU模式运行和性能采集。需要排查编译或功能问题时，可添加`-DCMAKE_ASC_RUN_MODE=cpu`或`-DCMAKE_ASC_RUN_MODE=sim`参数进行对应模式的工程配置和运行验证。
 
   示例如下：
 
   ```bash
-  cmake -S . -B build -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 # CPU调试模式配置
-  cmake -S . -B build -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 # NPU仿真模式配置
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # CPU调试模式配置
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式配置
   ```
 
-  > **注意：** 切换编译模式或架构前需清理CMake缓存，可删除`build/CMakeCache.txt`后重新执行CMake配置。
+  > **注意：** 切换编译模式、架构或场景前需清理CMake缓存，可在`build`目录下执行`rm CMakeCache.txt`后重新执行CMake配置。
 
 - 编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 工程配置模式：NPU运行、CPU调试、NPU仿真。其中`sim`模式已完成编译验证，384MB负载的完整仿真运行不作为本文验证路径 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 工程配置模式：NPU运行、CPU调试、NPU仿真。其中`sim`模式支持完整执行验证，但384MB负载仿真耗时较长，仿真耗时不作为L2 Cache性能收益评估依据 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201对应Atlas A2训练系列产品/Atlas A2推理系列产品和Atlas A3训练系列产品/Atlas A3推理系列产品，dav-3510对应Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=不做L2 Cache切分，2=开启L2 Cache切分 |
 
 - 执行结果
 
-  每个可执行程序会在运行结束后校验输出结果。执行结果如下，说明精度对比成功。
+  执行结果如下，说明精度对比成功。
 
   ```bash
   test pass!
   ```
 
-  校验失败时会打印`test failed!`，并输出首个错误元素的索引、输入值、实际输出值和期望输出值。
+  程序运行阶段校验失败时会打印`test failed!`，并输出首个错误元素的索引、输入值、实际输出值和期望输出值。`verify_result.py`验证失败时会打印首个错误元素的索引、实际输出值和期望输出值。
 
   运行后输出文件如下：
 
   ```text
-  output/no_split.bin
-  output/l2_split.bin
+  output/output.bin
+  output/golden.bin
   ```
 
 ## 性能采集与分析
@@ -155,8 +164,7 @@
 本样例用于观察L2 Cache切分对数据搬入路径的影响。建议分别启动独立进程采集正反例，避免同一进程中前一个Kernel残留的Cache状态影响后一个Kernel。
 
 ```bash
-msopprof --output=./prof_384m_inplace_no_split_1 ./build/demo_nosplit
-msopprof --output=./prof_384m_inplace_l2_split_1 ./build/demo_split
+msopprof ./demo
 ```
 
 分析时，先确认`Memory.csv`中的`GM_to_UB_datas(KB)`总量接近，保证正反例逻辑搬运量公平；再结合`L2Cache.csv`中的L2 Cache读命中率、`PipeUtilization.csv`中的MTE2耗时和`OpBasicInfo.csv`中的`Task Duration(us)`进行判断。

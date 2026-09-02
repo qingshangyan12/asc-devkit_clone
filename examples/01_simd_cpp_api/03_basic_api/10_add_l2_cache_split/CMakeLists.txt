@@ -13,34 +13,41 @@ cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
+set(SCENARIO_NUM "1" CACHE STRING "Scenario number: 1=no split, 2=L2 Cache split")
 
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
-
-add_executable(demo_nosplit
-    add_l2cache_nosplit.asc
-)
-
-add_executable(demo_split
-    add_l2cache_split.asc
-)
 
 if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201" AND
    NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
     message(FATAL_ERROR "Unsupported CMAKE_ASC_ARCHITECTURES=${CMAKE_ASC_ARCHITECTURES}")
 endif()
 
-foreach(target IN ITEMS demo_nosplit demo_split)
-    target_compile_options(${target} PRIVATE
-        $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-    )
+if(SCENARIO_NUM STREQUAL "1")
+    set(SAMPLE_SOURCE add_l2cache_nosplit.asc)
+elseif(SCENARIO_NUM STREQUAL "2")
+    set(SAMPLE_SOURCE add_l2cache_split.asc)
+else()
+    message(FATAL_ERROR "Unsupported SCENARIO_NUM=${SCENARIO_NUM}. Use 1 for no split or 2 for L2 Cache split.")
+endif()
 
-    target_link_libraries(${target} PRIVATE
-        tiling_api
-        register
-        platform
-        m
-        dl
-    )
-endforeach()
+add_executable(demo
+    ${SAMPLE_SOURCE}
+)
+
+target_compile_options(demo PRIVATE
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+)
+
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
+)
+
+target_link_libraries(demo PRIVATE
+    tiling_api
+    register
+    platform
+    m
+    dl
+)
