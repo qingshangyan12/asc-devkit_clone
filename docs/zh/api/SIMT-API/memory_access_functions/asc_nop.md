@@ -56,7 +56,7 @@ inline void asc_nop()
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernel_nop(...)
+    __global__ __launch_bounds__(1024) void kernel_nop(uint32_t *data, uint32_t* flag)
     {
         ...
         while (asc_ldcg(flag) != 0) { // 轮询标记位
@@ -72,7 +72,7 @@ inline void asc_nop()
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel_nop(...)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_nop(__gm__ uint32_t *data, __gm__ uint32_t* flag)
     {
         ...
         while (asc_ldcg(flag) != 0) { // 轮询标记位
