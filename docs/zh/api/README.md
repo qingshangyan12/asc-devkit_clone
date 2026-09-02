@@ -1502,6 +1502,7 @@
             -   [维度保留标记](SIMD-API/tensor_api/utils/dimension_keep_mark.md)
             -   [get_layout_pattern](SIMD-API/tensor_api/utils/get_layout_pattern.md)
             -   [类型判断与提取工具](SIMD-API/tensor_api/utils/type_traits.md)
+            -   [print、print_layout和print_tensor](SIMD-API/tensor_api/utils/print.md)
         -   [废弃接口](SIMD-API/tensor_api/deprecated_interface/deprecated_interface.md)
             -   [layout::Capacity（废弃）](SIMD-API/tensor_api/deprecated_interface/layout_capacity_deprecated.md)
             -   [layout::Shape（废弃）](SIMD-API/tensor_api/deprecated_interface/layout_shape_deprecated.md)
