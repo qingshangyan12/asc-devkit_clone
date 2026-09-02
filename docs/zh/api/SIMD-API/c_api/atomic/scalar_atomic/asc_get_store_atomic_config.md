@@ -61,9 +61,73 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-uint16_t atomic_type = 1; // 开启原子操作,进行原子操作的数据类型为float，值为1
-uint16_t atomic_op = 0; // 求和操作,值为0
-asc_set_store_atomic_config_v1(atomic_type, atomic_op);
-asc_store_atomic_config get_config;    // 用于获取原子操作启用位和原子操作类型的值
-asc_get_store_atomic_config(get_config);    // get_config.atomic_type = 1; get_config.atomic_op = 0;
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr uint32_t ELEMENTS = 64;
+constexpr uint32_t BYTES = ELEMENTS * sizeof(int32_t);
+
+template <typename T>
+void PrintData(const char* label, const std::vector<T>& data)
+{
+    std::cout << label << ":";
+    const size_t count = data.size() < 8 ? data.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +data[i];
+    if (data.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+__global__ __vector__ void AscGetStoreAtomicConfigKernel(__gm__ int32_t* output, __gm__ int32_t* input,
+    __gm__ uint64_t* raw_config)
+{
+    asc_init();
+    // Encode atomic type=1 and data type=2, then read the raw register back.
+    asc_set_store_atomic_config_v1(1, 2);
+    asc_store_atomic_config config;
+    // Read the current store-atomic register into config.config.
+    asc_get_store_atomic_config(config);
+    raw_config[0] = config.config;
+    asc_set_atomic_none();
+}
+
+} // namespace
+
+int main()
+{
+    std::vector<int32_t> input(ELEMENTS), output(ELEMENTS, 10), golden(ELEMENTS);
+    for (uint32_t i = 0; i < ELEMENTS; ++i) {
+        input[i] = static_cast<int32_t>(i % 8 + 1);
+        golden[i] = 10;
+    }
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    int32_t *input_device = nullptr, *output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    uint64_t* config_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&config_device), sizeof(uint64_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, BYTES, input.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(output_device, BYTES, output.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    AscGetStoreAtomicConfigKernel<<<1, 0>>>(output_device, input_device, config_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), BYTES, output_device, BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    std::vector<uint64_t> raw_config(1);
+    aclrtMemcpy(raw_config.data(), sizeof(uint64_t), config_device, sizeof(uint64_t), ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Input", input);
+    PrintData("Output", output);
+    PrintData("Golden", golden);
+    PrintData("Raw atomic config", raw_config);
+    aclrtFree(config_device);
+    bool passed = output == golden && (raw_config[0] == 33);
+    std::cout << (passed ? "[Success] asc_get_store_atomic_config passed." : "[Failed] asc_get_store_atomic_config failed.") << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
