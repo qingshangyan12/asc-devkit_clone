@@ -18,6 +18,7 @@ namespace mc2_ops_hccl {
 namespace {
 constexpr u32 NET_LAYER0 = 0;
 constexpr u32 NET_LAYER1 = 1;
+constexpr u32 NATLAYER_ROCE = 3;
 
 std::vector<u32> MakeAllRankIds(u32 rankSize)
 {
@@ -215,28 +216,28 @@ HcclResult TopoMatchUBX::TopoForLayer0(
     return HCCL_SUCCESS;
 }
 
-HcclResult TopoMatchUBX::TopoForLayer1(
+HcclResult TopoMatchUBX::TopoForLayer3(
     const HcclComm comm, uint32_t layer0Size, const uint32_t myRank,
     AlgHierarchyInfoForAllLevel& algHierarchyInfo) const
 {
     uint32_t* topoInsts = nullptr;
     uint32_t topoInstNum = 0;
-    CHK_RET(HcclRankGraphGetTopoInstsByLayer(comm, NET_LAYER1, &topoInsts, &topoInstNum));
+    CHK_RET(HcclRankGraphGetTopoInstsByLayer(comm, NATLAYER_ROCE, &topoInsts, &topoInstNum));
     CHK_PRT_RET(
-        topoInstNum != NET_INST_NUM_1, HCCL_ERROR("[TopoMatchUBX][UT] invalid layer1 topoInstNum [%u].", topoInstNum),
+        topoInstNum != NET_INST_NUM_1, HCCL_ERROR("[TopoMatchUBX][UT] invalid layer3 topoInstNum [%u].", topoInstNum),
         HCCL_E_PARA);
 
     uint32_t* ranks = nullptr;
     uint32_t rankNum = 0;
-    CHK_RET(HcclRankGraphGetRanksByTopoInst(comm, NET_LAYER1, topoInsts[0], &ranks, &rankNum));
-    std::vector<uint32_t> layer1Ranks;
+    CHK_RET(HcclRankGraphGetRanksByTopoInst(comm, NATLAYER_ROCE, topoInsts[0], &ranks, &rankNum));
+    std::vector<uint32_t> layer3Ranks;
     for (uint32_t i = 0; i < rankNum; ++i) {
         const uint32_t rankId = ranks[i];
         if (rankId == myRank || (layer0Size != 0 && rankId % layer0Size == myRank % layer0Size)) {
-            layer1Ranks.push_back(rankId);
+            layer3Ranks.push_back(rankId);
         }
     }
-    algHierarchyInfo.infos[1].push_back(std::move(layer1Ranks));
+    algHierarchyInfo.infos[1].push_back(std::move(layer3Ranks));
     return HCCL_SUCCESS;
 }
 
@@ -259,7 +260,7 @@ HcclResult TopoMatchUBX::MatchTopo(
     uint32_t layerNum = 0;
     CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &layerNum));
     if (layerNum >= COMM_LAYER_SIZE_2) {
-        CHK_RET(TopoForLayer1(comm, layer0Size, myRank, algHierarchyInfo));
+        CHK_RET(TopoForLayer3(comm, layer0Size, myRank, algHierarchyInfo));
     }
     return HCCL_SUCCESS;
 }
