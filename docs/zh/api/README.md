@@ -1361,14 +1361,14 @@
             -   [asc_half2int32（废弃）](SIMD-API/c_api/deprecated_interface/asc_half2int32_deprecated.md)
             -   [asc_half2int8（废弃）](SIMD-API/c_api/deprecated_interface/asc_half2int8_deprecated.md)
             -   [asc_half2uint8（废弃）](SIMD-API/c_api/deprecated_interface/asc_half2uint8_deprecated.md)
-            -   [asc_loadalign_v1（废弃）](SIMD-API/c_api/deprecated_interface/asc_loadalign_v1_deprecated.md)
-            -   [asc_loadalign_v2（废弃）](SIMD-API/c_api/deprecated_interface/asc_loadalign_v2_deprecated.md)
-            -   [asc_loadalign_v3（废弃）](SIMD-API/c_api/deprecated_interface/asc_loadalign_v3_deprecated.md)
-            -   [asc_loadalign_v4（废弃）](SIMD-API/c_api/deprecated_interface/asc_loadalign_v4_deprecated.md)
-            -   [asc_storealign_v1（废弃）](SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md)
-            -   [asc_storealign_v2（废弃）](SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md)
-            -   [asc_storealign_v3（废弃）](SIMD-API/c_api/deprecated_interface/asc_storealign_v3_deprecated.md)
-            -   [asc_storealign_v4（废弃）](SIMD-API/c_api/deprecated_interface/asc_storealign_v4_deprecated.md)
+            -   [asc_loadalign (废弃)](SIMD-API/c_api/deprecated_interface/asc_loadalign_v1_deprecated.md)（BRCV2、BRCV3和UNPACKV2无偏移量原型）
+            -   [asc_loadalign (废弃)](SIMD-API/c_api/deprecated_interface/asc_loadalign_v2_deprecated.md)（BRCV2、BRCV3和UNPACKV2的`addr_reg`偏移原型）
+            -   [asc_loadalign (废弃)](SIMD-API/c_api/deprecated_interface/asc_loadalign_v3_deprecated.md)（BRCV2、BRCV3和UNPACKV2的`int32_t`偏移原型）
+            -   [asc_loadalign (废弃)](SIMD-API/c_api/deprecated_interface/asc_loadalign_v4_deprecated.md)（BRCV2、BRCV3和UNPACKV2的`int32_t`偏移Post Update原型）
+            -   [asc_storealign_pack_v2（废弃）](SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md)（无偏移量原型）
+            -   [asc_storealign_pack_v2（废弃）](SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md)（`addr_reg`偏移原型）
+            -   [asc_storealign_pack_v2（废弃）](SIMD-API/c_api/deprecated_interface/asc_storealign_v3_deprecated.md)（`int32_t`偏移原型）
+            -   [asc_storealign_pack_postupdate_v2（废弃）](SIMD-API/c_api/deprecated_interface/asc_storealign_v4_deprecated.md)（`int32_t`偏移Post Update原型）
             -   [asc_scatter（废弃）](SIMD-API/c_api/deprecated_interface/asc_scatter_deprecated.md)
             -   [asc_storeunalign_post（废弃）](SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md)
             -   [asc_storeunalign_postupdate（废弃）](SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md)
