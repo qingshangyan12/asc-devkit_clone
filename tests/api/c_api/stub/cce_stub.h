@@ -38,6 +38,12 @@ int64_t ld_dev(__gm__ int64_t* src, int16_t offset);
 // The compiler supports this overload, but it is missing from the CPU debug stub header.
 inline void vmadd(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, vector_bool mask, Literal mode) {}
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+inline void vcvt_f162s4(
+    vector_int4x2_t& dst, vector_half src, vector_bool mask, Literal rnd, Literal sat, Literal part, Literal mode)
+{}
+#endif
+
 #ifndef ULL
 #define ULL unsigned long long
 #endif
