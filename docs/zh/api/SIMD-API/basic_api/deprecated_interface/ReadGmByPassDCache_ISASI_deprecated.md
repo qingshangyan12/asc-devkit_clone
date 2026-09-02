@@ -1,4 +1,4 @@
-# ReadGmByPassDCache\(ISASI\)<a name="ZH-CN_TOPIC_0000002327311338"></a>
+# ReadGmByPassDCache\(ISASI\)（废弃）
 
 ## 产品支持情况
 
@@ -24,20 +24,22 @@
 - Atlas 训练系列产品：不支持
 <!-- end id7 -->
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
+
+**该接口已废弃，请使用[ReadGmBypassDCache\(ISASI\)](../scalar_compute/ReadGmBypassDCache_ISASI.md)接口替代。**
 
 头文件路径为：`"basic_api/kernel_operator_scalar_intf.h"`。
 
 不经过DCache从GM地址上读数据。
 
-## 函数原型<a name="section620mcpsimp"></a>
+## 函数原型
 
 ```cpp
 template <typename T>
 __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr)
 ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明
 
 **表1**  模板参数说明
 
@@ -55,15 +57,15 @@ __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr)
 
 支持的数据类型为int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 返回值说明
 
 源GM地址上的数据。
 
-## 约束说明<a name="section633mcpsimp"></a>
+## 约束说明
 
 无
 
-## 调用示例<a name="section6191129670"></a>
+## 调用示例
 
 ```cpp
 if (blockIdx == 0) {
