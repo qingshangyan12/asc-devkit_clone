@@ -55,7 +55,7 @@ inline bfloat16_t hexp10(bfloat16_t x)
 | -inf | 0 | 0 |
 | nan | nan | 0（nan被饱和为0） |
 | 38 | 接近bfloat16_t最大有限值 | 接近bfloat16_t最大有限值 |
-| >40 | inf | ASCRT_MAX_NORMAL_BF16 |
+| >38.5 | inf | ASCRT_MAX_NORMAL_BF16 |
 
 ## 约束说明
 
@@ -65,26 +65,32 @@ inline bfloat16_t hexp10(bfloat16_t x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __global__ __launch_bounds__(1024) void KernelExp10(bfloat16_t* dst, bfloat16_t* x)
+    __global__ __launch_bounds__(1024) void kernel_exp10(bfloat16_t* dst, bfloat16_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = hexp10(x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelExp10(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_exp10(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = hexp10(x[idx]);
     }
     ```

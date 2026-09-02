@@ -118,7 +118,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 | --cce-disable-vf-stack-reserved-ubuf | 否 | 禁用SIMD VF栈预留的UB空间。开启后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用。针对 [NPU架构版本2201](../../language_extension/simd_builtin_keywords.md#npu-arch)，此编译选项无实际效果；针对 [NPU架构版本3510](../../language_extension/simd_builtin_keywords.md#npu-arch)，此编译选项生效，当用户使用此编译选项后，编译器将无法使用预留的UB空间进行寄存器溢出的缓存，需要用户保证寄存器不溢出。 |
 | --cce-auto-sync | 否 | 开启毕昇编译器自动同步。AI Core内部的执行单元是异步并行的，Tensor的读写可能存在数据依赖，开启后可由毕昇编译器自动插入部分同步。详细内容请参考[关键特性说明](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/key_features.md)。 |
 | --cce-auto-sync-log=&lt;file&gt; | 否 | 输出毕昇编译器自动同步插入信息到&lt;file&gt;文件中。 |
-| --cce-ftz=false/true | 否 | 控制非规格化数（极小数）的处理方式。 true表示将非规格化数直接刷新为0，可提升性能；false表示保留，精度更高但可能更慢，默认true。当前只支持SIMT。 |
+| --cce-ftz=false/true | 否 | 控制非规格化数（极小数）的处理方式。true表示将非规格化数直接刷新为0，可提升性能；false表示保留非规格化数，精度更高但性能可能较低，默认值为true。当前支持SIMD和SIMT，其中SIMD仅支持NPU架构版本3510。 |
 | --cce-prec-div=false/true | 否 | 是否使用精确的除法计算，默认为false。当前只支持SIMT。 |
 | --cce-prec-sqrt=false/true | 否 | 是否使用精确的平方根函数，默认false。当前只支持SIMT。 |
 | --cce-use-fast-math=false/true | 否 | 是否开启快速计算模式，开启时相当于--cce-ftz=true --cce-prec-div=false --cce-prec-sqrt=false（若有冲突，以--cce-ftz，--cce-prec-div，--cce-prec-sqrt设置的为准）。当前只支持SIMT。 |
@@ -306,6 +306,14 @@ add_executable(demo
  -   **NO\_OVERLAP\_IN\_MULTI\_REPEAT**
   该编译选项用于在没有地址重叠的情况下移除不必要的内存同步指令，以提升性能。针对Ascend 950PR/Ascend 950DT，使用基础API的高维切分计算API时，默认会插入内存同步指令以确保在地址重叠等复杂场景下的数据正确性，但这些同步指令会带来性能开销。在追求极致性能的场景下，如果您可以确定代码在任何情况下都不会发生内存重叠，可以使用此选项。
  <!-- end id12 -->
+
+ <!-- npu="950" id20 -->
+ -   **ASCENDC\_USE\_LEGACY\_PRECISION** 用于控制SIMT API的实现版本，默认开关关闭。针对Ascend 950PR/Ascend 950DT，CANN 9.2.0版本对部分SIMT API的实现做了精度提升。如果您的算子对精度不敏感且发现性能发生劣化，可以开启此宏，让相关SIMT API回退到旧版本实现，以恢复原有性能水平，示例如下：
+     ```shell
+     bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -DASCENDC_USE_LEGACY_PRECISION
+     ```
+     仅在Ascend 950PR/Ascend 950DT支持该选项。
+ <!-- end id20 -->
 
 
 ### 内置链接库<a name="section57020345148"></a>
