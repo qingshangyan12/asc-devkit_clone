@@ -13,6 +13,8 @@
 #include "ins_temp_all_gather_nhr.h"
 #include "alg_data_trans_wrapper.h"
 #include "coll_alg_v2_exec_registry.h"
+#include "alg_meta_registry.h"
+#include "external_alg_rules.h"
 
 namespace mc2_ops_hccl {
 
@@ -54,10 +56,14 @@ HcclResult InsV2AllGatherSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
-    InitCommInfo(comm, param, topoInfo, algHierarchyInfo);
-    if (algHierarchyInfo.infos.size() != SEQUENCE_EXECUTOR_LEVEL_NUM) {
+    CHK_RET(InitCommInfo(comm, param, topoInfo, algHierarchyInfo));
+    if (algHierarchyInfo.infos.size() != SEQUENCE_EXECUTOR_LEVEL_NUM || algHierarchyInfo.infos[0].empty() ||
+        algHierarchyInfo.infos[0][0].empty() || algHierarchyInfo.infos[1].empty() ||
+        algHierarchyInfo.infos[1][0].empty()) {
         HCCL_ERROR(
-            "[InsV2AllGatherSequenceExecutorAicpu] algHierarchyInfo size should be %u", SEQUENCE_EXECUTOR_LEVEL_NUM);
+            "[InsV2AllGatherSequenceExecutorAicpu] invalid algHierarchyInfo, requires 2-level topology but "
+            "topoLevelNums[%u], infos size[%zu]",
+            topoInfo->topoLevelNums, algHierarchyInfo.infos.size());
         return HCCL_E_INTERNAL;
     }
     InsAlgTemplate1 interTempAlg(param, myRank_, algHierarchyInfo.infos[1]);
@@ -84,6 +90,13 @@ HcclResult InsV2AllGatherSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
     resourceRequest.notifyNumOnMainThread =
         std::max(resReqIntra.notifyNumOnMainThread, resReqInter.notifyNumOnMainThread);
 
+    if (resReqIntra.channels.empty() || resReqInter.channels.empty()) {
+        HCCL_ERROR(
+            "[InsV2AllGatherSequenceExecutorAicpu][CalcRes] template channels is empty, intra channel level "
+            "size[%zu], inter channel level size[%zu]",
+            resReqIntra.channels.size(), resReqInter.channels.size());
+        return HCCL_E_INTERNAL;
+    }
     resourceRequest.channels = {resReqIntra.channels[0], resReqInter.channels[0]};
     return HCCL_SUCCESS;
 }
@@ -198,7 +211,7 @@ HcclResult InsV2AllGatherSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
     TemplateResource& tempReousrce) const
 {
     AlgResourceRequest req;
-    algTemplate.GetRes(req);
+    CHK_RET(algTemplate.GetRes(req));
     if (channelLevelIdx >= remoteRankToChannelInfo_.size()) {
         HCCL_ERROR(
             "[InsV2AllGatherSequenceExecutorAicpu][GenTempResource] channelLevelIdx[%u] should be lower"
@@ -207,6 +220,13 @@ HcclResult InsV2AllGatherSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
         return HCCL_E_INTERNAL;
     }
     tempReousrce.channels = remoteRankToChannelInfo_[channelLevelIdx];
+    if (resCtx.threads.size() < static_cast<size_t>(req.slaveThreadNum) + 1) {
+        HCCL_ERROR(
+            "[InsV2AllGatherSequenceExecutorAicpu][GenTempResource] threads size[%zu] is less than required "
+            "slave thread num[%u] plus main thread",
+            resCtx.threads.size(), req.slaveThreadNum);
+        return HCCL_E_INTERNAL;
+    }
     tempReousrce.threads.assign(resCtx.threads.begin(), resCtx.threads.begin() + 1 + req.slaveThreadNum);
     return HCCL_SUCCESS;
 }
@@ -217,6 +237,13 @@ HcclResult InsV2AllGatherSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
     InsAlgTemplate1& interTempAlg)
 {
     HCCL_INFO("[InsV2AllGatherSequenceExecutorAicpu][OrchestrateLoop] Start");
+    if (remoteRankToChannelInfo_.size() < SEQUENCE_EXECUTOR_LEVEL_NUM) {
+        HCCL_ERROR(
+            "[InsV2AllGatherSequenceExecutorAicpu][OrchestrateLoop] remoteRankToChannelInfo_ size[%zu] is less "
+            "than required level num[%u]",
+            remoteRankToChannelInfo_.size(), SEQUENCE_EXECUTOR_LEVEL_NUM);
+        return HCCL_E_INTERNAL;
+    }
 
     TemplateDataParams interTempDataParams;
     interTempDataParams.buffInfo.inputPtr = param.inputPtr;
@@ -252,6 +279,14 @@ HcclResult InsV2AllGatherSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
     }
     u64 maxCountPerLoop = interTempDataParams.buffInfo.hcclBuff.size / templateScratchMultiplier /
                           HCCL_MIN_SLICE_ALIGN * HCCL_MIN_SLICE_ALIGN / dataTypeSize_;
+    if (maxCountPerLoop == 0) {
+        HCCL_ERROR(
+            "[%s] maxCountPerLoop is 0, dataTypeSize[%llu], hcclBuffSize[%llu], templateScratchMultiplier[%u], "
+            "division by zero.",
+            __func__, dataTypeSize_, static_cast<unsigned long long>(interTempDataParams.buffInfo.hcclBuff.size),
+            templateScratchMultiplier);
+        return HCCL_E_INTERNAL;
+    }
     u64 loopTimes = dataCount_ / maxCountPerLoop + static_cast<u64>(dataCount_ % maxCountPerLoop != 0);
     u64 processedDataCount = 0;
 
@@ -296,5 +331,8 @@ HcclResult InsV2AllGatherSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSequenceMeshConcurNHR, InsV2AllGatherSequenceExecutorAicpu,
     TopoMatchMultilevel, InsTempAllGatherMesh1D1DZAxisDetour, InsTempAllGatherNHR);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSequenceMeshConcurNHR, AlgEngine::AICPU, "sequence[mesh,nhr]",
+    COND_NONE, FLAG_MULTI_LEVEL, 0);
 
 } // namespace mc2_ops_hccl

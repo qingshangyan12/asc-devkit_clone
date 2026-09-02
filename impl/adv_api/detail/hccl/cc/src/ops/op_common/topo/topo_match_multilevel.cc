@@ -238,7 +238,6 @@ HcclResult TopoMatchMultilevel::MatchTopo(
     }
 
     // 4. 计算layer1的topo
-    uint32_t algLayer1NetLayer = 1;
     if (topoInfo->topoLevelNums > 1) {
         CHK_PRT_RET(
             layerNum < COMM_LAYER_SIZE_2,
@@ -247,14 +246,14 @@ HcclResult TopoMatchMultilevel::MatchTopo(
                 "topoLevelNums[%u].",
                 myRank, layerNum, topoInfo->topoLevelNums),
             HcclResult::HCCL_E_INTERNAL);
-        algLayer1NetLayer = netLayerList[1];
+        uint32_t algLayer1NetLayer = netLayerList[1];
+        bool hostDPUOnly = false;
+        if ((CheckHostDPUOnly(comm, topoInfo, hostDPUOnly) == HcclResult::HCCL_SUCCESS) && hostDPUOnly) {
+            // host dpu场景使用最高层的链路
+            algLayer1NetLayer = netLayerList.back();
+        }
+        CHK_RET(TopoForLayer1(comm, algLayer1NetLayer, layer0Size, myRank, algHierarchyInfo));
     }
-    bool hostDPUOnly = false;
-    if ((CheckHostDPUOnly(comm, topoInfo, hostDPUOnly) == HcclResult::HCCL_SUCCESS) && hostDPUOnly) {
-        // host dpu场景使用最高层的链路
-        algLayer1NetLayer = netLayerList.back();
-    }
-    CHK_RET(TopoForLayer1(comm, algLayer1NetLayer, layer0Size, myRank, algHierarchyInfo));
 #endif
     return HcclResult::HCCL_SUCCESS;
 }
