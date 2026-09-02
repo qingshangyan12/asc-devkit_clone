@@ -31,6 +31,7 @@
 #include "binary_stream.h"
 #include "hccl_ccu_res_dl.h"
 #include "ccu_types.h"
+#include "acl_base_rt.h"
 
 namespace mc2_ops_hccl {
 
@@ -264,14 +265,14 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     }
 
     template <typename Ar>
-    static void VisitTopoInstDetails(Ar& ar, TopoInstDetails& details)
+    static void VisitTopoInstDetails(Ar& ar, const TopoInstDetails& details)
     {
         ar & details.topoInstNum & details.sizeOfTopo & details.typeOfTopo & details.ranksInTopo;
         ar & details.rankNumForTopoType;
     }
 
     template <typename Ar>
-    static void VisitPhysicalLevel(Ar& ar, PhysicalLevelInfo& level)
+    static void VisitPhysicalLevel(Ar& ar, const PhysicalLevelInfo& level)
     {
         ar & level.localRanks & level.view & level.instSizeListByLayer;
         ar & level.ref.netLayer & level.ref.topoInstId & level.hasTopoInst & level.topoType;
