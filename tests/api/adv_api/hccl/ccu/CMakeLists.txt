@@ -15,6 +15,7 @@ set(HCCL_CC_SRC_DIR ${HCCL_CC_DIR}/src)
 set(HCCL_CC_INCLUDE_DIR ${ASCENDC_DIR}/include/adv_api/hccl/internal)
 set(HCCL_LOCAL_PKG_INC ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc)
 set(HCCL_ST_PROXY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stub/hccl_proxy)
+set(ASC_COMM_INCLUDE_DIR ${ASCENDC_DIR}/../asc-comm/include)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
     set(HCCL_CANN_ARCH_DIR ${ASCEND_CANN_PACKAGE_PATH}/x86_64-linux)
@@ -35,7 +36,9 @@ set(CCU_INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}/hcomm/types
     ${HCCL_LOCAL_PKG_INC}/hcomm/ccu
     ${ASCEND_CANN_PACKAGE_PATH}/include
+    ${ASCEND_CANN_PACKAGE_PATH}/include/ccu
     ${ASCEND_CANN_PACKAGE_PATH}/include/acl
+    ${ASC_COMM_INCLUDE_DIR}
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime
@@ -142,6 +145,7 @@ target_compile_options(${CCU_UT_TARGET} PRIVATE
 target_compile_definitions(${CCU_UT_TARGET} PRIVATE
     -DUT_TEST
     -DAICPU_COMPILE
+    __ccu_host__=
 )
 
 target_link_libraries(${CCU_UT_TARGET} PRIVATE
