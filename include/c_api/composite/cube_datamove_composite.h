@@ -25,8 +25,6 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_datamove_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-#include "impl/c_api/instr_impl/npu_arch_9201/cube_datamove_impl.h"
 #endif
 __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size);
 
