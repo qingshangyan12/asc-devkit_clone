@@ -34,7 +34,8 @@ enum class AlgorithmType : uint8_t {
     CcuSchedAllToAllSoleMesh,
     CcuSchedAllToAllVSoleMesh,
     CcuHalfAll2AllVMesh1D,
-    CcuSchedAllGatherSoleMesh
+    CcuSchedAllGatherSoleMesh,
+    CcuSchedAllToAllSoleMeshConcurrent
 };
 
 template <const auto& config>
