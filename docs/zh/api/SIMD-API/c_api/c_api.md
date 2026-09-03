@@ -126,20 +126,14 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_l0c_copy_nz_para](cube_datamove/asc_set_l0c_copy_nz_para.md)|数据搬运过程中进行随路格式转换（NZ格式转换为ND格式）时，设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_channel_para](cube_datamove/asc_set_l0c_copy_channel_para.md)|配置Nz2DN格式转换时源Nz矩阵中相邻行的地址偏移。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_quant_post](cube_datamove/asc_set_l0c2gm_quant_post.md)|设置QUANT_POST寄存器的值。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c_copy_config](cube_datamove/asc_set_l0c_copy_config.md)|配置L0C搬出过程的ReLU、量化和unit flag参数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c_copy_lrelu_alpha](cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)|设置L0C搬出随路Leaky ReLU预处理的alpha值。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c_copy_relu_alpha](cube_datamove/asc_set_l0c_copy_relu_alpha.md)|设置L0C搬出随路ReLU预处理的alpha值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_params](cube_datamove/asc_set_l0c_copy_params.md)|DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_prequant](cube_datamove/asc_set_l0c_copy_prequant.md)|数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l12l0a_3d_padding](cube_datamove/asc_set_l12l0a_3d_padding.md)|设置L1到L0A 3D搬运的填充值。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l12l0b_3d_padding](cube_datamove/asc_set_l12l0b_3d_padding.md)|设置L1到L0B 3D搬运的填充值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_fmatrix](cube_datamove/asc_set_l13d_fmatrix.md)|设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从左矩阵获取FeatureMap的属性时使用该接口。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_fmatrix_b](cube_datamove/asc_set_l13d_fmatrix_b.md)|设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从右矩阵获取FeatureMap的属性时使用该接口。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l12l0a_3d_padding](cube_datamove/asc_set_l12l0a_3d_padding.md)|设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_padding](cube_datamove/asc_set_l13d_padding.md)|设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_rpt](cube_datamove/asc_set_l13d_rpt.md)|用于设置Load3Dv2接口的repeat参数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l13d_rpt_b](cube_datamove/asc_set_l13d_rpt_b.md)|配置右矩阵3D搬运的repeat参数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_gm2l1_padding](cube_datamove/asc_set_gm2l1_padding.md)|设置GM到L1 3D搬运的填充值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md)|设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l3d_rpt_b](cube_datamove/asc_set_l3d_rpt_b.md)|用于设置接口asc_copy_l12l0a、asc_copy_l12l0b的2D格式搬运的repeat参数。|`c_api/cube_datamove/cube_datamove.h`|
 
@@ -713,11 +707,11 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_enable_hf32_trans（废弃）](deprecated_interface/asc_enable_hf32_trans_deprecated.md)|暂无替代接口。|`c_api/cube_compute/cube_compute.h`|
 |[asc_set_l0c2gm_nz2nd（废弃）](deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md)|请使用`asc_set_l0c_copy_nz_para`。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_channel_para（废弃）](deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md)|请使用`asc_set_l0c_copy_channel_para`。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_config（废弃）](deprecated_interface/asc_set_l0c2gm_config_deprecated.md)|请使用`asc_set_l0c_copy_config`。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l12l0_padding_val（废弃）](deprecated_interface/asc_set_l12l0_padding_val_deprecated.md)|请使用`asc_set_l12l0b_3d_padding`。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l13d_padding（废弃）](deprecated_interface/asc_set_l13d_padding_deprecated.md)|仅`uint64_t`重载已废弃。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_relu_alpha（废弃）](deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md)|请使用`asc_set_l0c_copy_relu_alpha`。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_lrelu_alpha（废弃）](deprecated_interface/asc_set_l0c2gm_lrelu_alpha_deprecated.md)|请使用`asc_set_l0c_copy_lrelu_alpha`。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_l0c2gm_config（废弃）](deprecated_interface/asc_set_l0c2gm_config_deprecated.md)|请使用`asc_set_l0c_copy_config`。TODO：替代接口文档待补齐。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_l12l0_padding_val（废弃）](deprecated_interface/asc_set_l12l0_padding_val_deprecated.md)|请使用`asc_set_l12l0b_3d_padding`。TODO：替代接口文档待补齐。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_l13d_padding（废弃）](deprecated_interface/asc_set_l13d_padding_deprecated.md)|仅`uint64_t`重载已废弃。请使用`asc_set_gm2l1_padding`或`asc_set_l12l0a_3d_padding`。TODO：替代接口文档待补齐。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_l0c2gm_relu_alpha（废弃）](deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md)|请使用`asc_set_l0c_copy_relu_alpha`。TODO：替代接口文档待补齐。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_l0c2gm_lrelu_alpha（废弃）](deprecated_interface/asc_set_l0c2gm_lrelu_alpha_deprecated.md)|请使用`asc_set_l0c_copy_lrelu_alpha`。TODO：替代接口文档待补齐。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_gm2l1_align（废弃）](deprecated_interface/asc_copy_gm2l1_align_deprecated.md)|旧重载及`_sync`已废弃，请使用类型化L2 Cache参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_gm2l1_dn2nz（废弃）](deprecated_interface/asc_copy_gm2l1_dn2nz_deprecated.md)|旧重载及`_sync`已废弃，请使用类型化L2 Cache参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_gm2l1_nd2nz（废弃）](deprecated_interface/asc_copy_gm2l1_nd2nz_deprecated.md)|旧重载及`_sync`已废弃，请使用类型化L2 Cache参数。|`c_api/cube_datamove/cube_datamove.h`|
