@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <algorithm>
+#include <cmath>
 #include "template_utils.h"
 namespace mc2_ops_hccl {
 
@@ -154,5 +155,88 @@ bool IsAllConnetedWithTopo(const TopoInfoWithNetLayerDetails* topoInfo, const u3
         }
     }
     return false;
+}
+
+namespace {
+bool GetPortGroupSize(const std::map<u32, std::vector<ChannelInfo>>& channels, uint64_t& portGroupSize)
+{
+    portGroupSize = 0;
+    for (const auto& entry : channels) {
+        if (entry.second.empty()) {
+            continue;
+        }
+        for (const auto& channel : entry.second) {
+            portGroupSize += channel.portGroupSize;
+        }
+        return portGroupSize != 0;
+    }
+    return false;
+}
+
+double NormalizeSplitFallback(double fallbackRatio)
+{
+    return std::isfinite(fallbackRatio) ? std::max(0.0, std::min(fallbackRatio, 1.0)) : 0.5;
+}
+
+double QuantizeSplitRatio(double ratio)
+{
+    constexpr double RATIO_STEP = 1.0 / 8.0;
+    const double ratioIndex = std::max(1.0, std::min(std::round(ratio / RATIO_STEP), 7.0));
+    return ratioIndex * RATIO_STEP;
+}
+} // namespace
+
+double CalcParallelDataSplitRatio(
+    uint64_t intraRankSize, uint64_t interRankSize, const std::map<u32, std::vector<ChannelInfo>>& intraChannels,
+    const std::map<u32, std::vector<ChannelInfo>>& interChannels, ParallelDataSplitType splitType,
+    double fallbackRatio)
+{
+    const double fallback = NormalizeSplitFallback(fallbackRatio);
+    uint64_t intraPortGroupSize = 0;
+    uint64_t interPortGroupSize = 0;
+    if (intraRankSize == 0 || interRankSize == 0 ||
+        !GetPortGroupSize(intraChannels, intraPortGroupSize) ||
+        !GetPortGroupSize(interChannels, interPortGroupSize)) {
+        return fallback;
+    }
+
+    // A POD inter group has two links on different dies but half the effective bandwidth per link.
+    bool isPod = false;
+    for (const auto& entry : interChannels) {
+        if (entry.second.empty()) {
+            continue;
+        }
+        isPod = entry.second.size() == 2 && entry.second[0].dieId != INVALID_VALUE_RANKID &&
+                entry.second[1].dieId != INVALID_VALUE_RANKID && entry.second[0].dieId != entry.second[1].dieId;
+        break;
+    }
+
+    intraPortGroupSize *= intraRankSize - 1;
+    const double effectiveInterPortGroupSize =
+        static_cast<double>(interPortGroupSize) / (isPod ? 2.0 : 1.0);
+    if (intraPortGroupSize == 0 || effectiveInterPortGroupSize <= 0.0 || !std::isfinite(effectiveInterPortGroupSize)) {
+        return fallback;
+    }
+
+    double meshTime = 0.0;
+    double closTime = 0.0;
+    switch (splitType) {
+        case ParallelDataSplitType::ALL_GATHER:
+            meshTime = static_cast<double>(intraRankSize) * (interRankSize - 1) / effectiveInterPortGroupSize;
+            closTime = static_cast<double>(interRankSize) * (intraRankSize - 1) /
+                       static_cast<double>(intraPortGroupSize);
+            break;
+        case ParallelDataSplitType::REDUCE_SCATTER_WITH_LOCAL_REDUCE:
+        case ParallelDataSplitType::SCATTER:
+            return fallback;
+        default:
+            return fallback;
+    }
+
+    const double denominator = meshTime + closTime;
+    if (denominator <= 0.0 || !std::isfinite(denominator)) {
+        return fallback;
+    }
+    return QuantizeSplitRatio(closTime / denominator);
 }
 } // namespace mc2_ops_hccl

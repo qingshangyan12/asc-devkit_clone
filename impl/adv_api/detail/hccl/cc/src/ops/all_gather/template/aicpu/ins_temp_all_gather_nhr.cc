@@ -75,6 +75,17 @@ HcclResult InsTempAllGatherNHR::GetRes(AlgResourceRequest& resourceRequest) cons
 }
 u64 InsTempAllGatherNHR::GetThreadNum() const { return maxChannelsPerRank_ * 2; }
 
+HcclResult InsTempAllGatherNHR::SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels)
+{
+    CHK_PRT_RET(channels.empty(), HCCL_ERROR("[SetchannelsPerRank] channels is empty."), HCCL_E_INTERNAL);
+    channelsPerRank_ = CalcChannelsPerRankMin(channels);
+    maxChannelsPerRank_ = CalcChannelsPerRank(channels);
+    HCCL_INFO(
+        "[InsTempAllGatherNHR][SetchannelsPerRank] channelsPerRank_[%u], maxChannelsPerRank_[%u]", channelsPerRank_,
+        maxChannelsPerRank_);
+    return HCCL_SUCCESS;
+}
+
 u64 InsTempAllGatherNHR::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType)
 {
     (void)inBuffType;
@@ -345,7 +356,7 @@ HcclResult InsTempAllGatherNHR::RunStepNHR(
         "[InsTempAllGatherNHR] rank[%d] rankSize[%u] recvFrom[%u] sendTo[%u] step[%u] nSteps[%u] nSlices[%u]", myRank_,
         templateRankSize_, stepInfo.fromRank, stepInfo.toRank, step, nSteps, stepInfo.nSlices);
 
-    const bool readLastStepToOutput = readLastStepToOutput_ && step == nSteps - 1 && stepInfo.nSlices > 1;
+    const bool readLastStepToOutput = readLastStepToOutput_ && step == nSteps - 1;
     if (readLastStepToOutput) {
         CHK_RET(RunLastStepReadToOutput(
             threads, channelSend, channelRecv, stepInfo, channelIdx, step, postLocalCopyLaunched));
