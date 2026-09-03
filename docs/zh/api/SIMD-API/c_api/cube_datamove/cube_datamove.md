@@ -24,6 +24,7 @@
 - **[asc_set_gm2l1_loop_size](asc_set_gm2l1_loop_size.md)**
 - **[asc_set_gm2l1_nz_para](asc_set_gm2l1_nz_para.md)**
 - **[asc_set_gm2l1_pad](asc_set_gm2l1_pad.md)**
+- **[asc_set_gm2l1_padding](asc_set_gm2l1_padding.md)**
 - **[asc_set_l0c_copy_nz_para](asc_set_l0c_copy_nz_para.md)**
 - **[asc_set_l0c_copy_channel_para](asc_set_l0c_copy_channel_para.md)**
 - **[asc_set_l0c_copy_config](./asc_set_l0c_copy_config.md)**

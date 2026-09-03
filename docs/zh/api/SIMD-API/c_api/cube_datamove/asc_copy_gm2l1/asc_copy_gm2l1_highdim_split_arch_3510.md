@@ -52,7 +52,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint
 | src | 输入 | 源操作数，存储位置为GM。起始地址需要按照1字节对齐。 |
 | n_burst | 输入 | 搬运的数据块的个数。取值范围：[1, $2^{17}-1$]。 |
 | len_burst | 输入 | 搬运的每个数据块长度，单位32字节。取值范围：[1, $2^{17}-1$]。 |
-| pad_mode | 输入 | 使用`asc_channel_pad_mode`枚举值指示通道padding模式。 |
+| pad_mode | 输入 | 使用[asc_channel_pad_mode](../../defs/enum/asc_channel_pad_mode.md)枚举值指示通道padding模式。 |
 | src_stride | 输入 | 源操作数相邻数据块之间的间隔（即前一个数据块起始地址与后一个数据块起始地址的差值），取值范围：[0, $2^{36}-1$]，单位32字节。<br>&nbsp;&nbsp;&bull; n_burst = 1时，`src_stride`无意义，设置为0即可。 |
 | dst_stride | 输入 | 目的操作数相邻数据块之间的间隔（即前一个数据块起始地址与后一个数据块起始地址的差值），取值范围：[0, $2^{17}-1$]，单位32字节。<br>&nbsp;&nbsp;&bull; n_burst = 1时，`dst_stride`无意义，设置为0即可。 |
 
