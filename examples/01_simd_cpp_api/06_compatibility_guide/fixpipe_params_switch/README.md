@@ -71,7 +71,7 @@ Fixpipe接口用于将矩阵乘结果从L0C Buffer搬运到GM。3510架构引入
 3. 将矩阵B从L1搬运到L0B Buffer（`LoadData2DParams`循环搬运）。
 4. 调用`Mmad`接口进行矩阵乘计算，结果写入L0C Buffer。
 5. 调用`Fixpipe`接口将结果从L0C搬运到GM，根据场景和架构选用不同参数结构体：
-   - **场景1（NZ2ND）**：2201使用`FixpipeParamsV220`（设置`ndNum`/`srcNdStride`/`dstNdStride`），3510使用`FixpipeParamsArch3510<ROW_MAJOR>`。公共参数字段名一致，dstStride单位均为element，可直接统一赋值。
+   - **场景1（NZ2ND）**：2201使用`FixpipeParamsV220`（设置顶层字段`ndNum`/`srcNdStride`/`dstNdStride`），3510使用`FixpipeParamsArch3510<ROW_MAJOR>`（设置`params.ndNum`/`params.srcNdStride`/`params.dstNdStride`）。公共参数字段名一致，dstStride单位均为element，可直接统一赋值。
    - **场景2（NZ2NZ）**：2201使用`FixpipeParamsV220`，dstStride单位为datablock（32字节）；3510使用`FixpipeParamsArch3510<NZ>`，dstStride单位为element。dstStride需分别计算赋值。
 
 ## 编译运行

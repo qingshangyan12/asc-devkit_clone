@@ -70,7 +70,7 @@ Data flow: GM -> L1 Buffer -> L0A/L0B Buffer -> L0C Buffer -> GM.
 3. Copy matrix B from L1 to L0B Buffer (`LoadData2DParams` loop).
 4. Call `Mmad` for matrix multiplication, results written to L0C Buffer.
 5. Call `Fixpipe` to transfer results from L0C to GM, using different parameter structures by scenario and architecture:
-   - **Scenario 1 (NZ2ND)**: 2201 uses `FixpipeParamsV220` (set `ndNum`/`srcNdStride`/`dstNdStride`), 3510 uses `FixpipeParamsArch3510<ROW_MAJOR>`. Common params have identical field names, dstStride unit is element for both, can be unified.
+   - **Scenario 1 (NZ2ND)**: 2201 uses `FixpipeParamsV220` (set top-level `ndNum`/`srcNdStride`/`dstNdStride`), while 3510 uses `FixpipeParamsArch3510<ROW_MAJOR>` (set `params.ndNum`/`params.srcNdStride`/`params.dstNdStride`). Common params have identical field names, dstStride unit is element for both, and can be unified.
    - **Scenario 2 (NZ2NZ)**: 2201 uses `FixpipeParamsV220` with dstStride unit=datablock(32B); 3510 uses `FixpipeParamsArch3510<NZ>` with dstStride unit=element. dstStride must be calculated separately.
 
 ## Build and Run
