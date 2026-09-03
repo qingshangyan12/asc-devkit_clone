@@ -499,7 +499,7 @@
 - [asc_copy_gm2l1_nd2nz（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_nd2nz_deprecated.md)接口：旧常规重载及`asc_copy_gm2l1_nd2nz_sync`已废弃。
 - [asc_copy_gm2l1（高维切分旧形式，废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_highdim_deprecated.md)接口：请使用`asc_channel_pad_mode`参数。
 - [asc_copy_gm2l1（2D矩阵搬运旧形式，废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_2d_deprecated.md)接口：请使用`asc_load_l2_cache_mode`参数。
-- [asc_copy_l12ub_sync（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_l12ub_sync_deprecated.md)接口：旧`bool sub_blockid`同步接口已废弃。
+- [asc_copy_l12ub_sync（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_l12ub_sync_deprecated.md)接口：请使用`asc_copy_l12ub`接口和`asc_sync`接口替代。
 
 - [asc_mmad（废弃）](../SIMD-API/c_api/deprecated_interface/asc_mmad_deprecated.md)接口
 
