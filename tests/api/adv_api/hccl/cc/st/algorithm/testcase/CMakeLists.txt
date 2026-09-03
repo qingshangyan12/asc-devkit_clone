@@ -13,7 +13,6 @@ set(src_list
     all_gather_nhr_testcase.cc
     all_gather_aicpu_testcase.cc
     all_to_all_mesh1d_aicpu_testcase.cc
-    all_reduce_aicpu_reduce_nhr_testcase.cc
     mc2_aicpu_task_cache_testcase.cc
 )
 

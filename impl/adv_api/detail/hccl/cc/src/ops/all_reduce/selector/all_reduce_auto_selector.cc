@@ -18,17 +18,9 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam,
     const std::map<HcclCMDType, std::vector<HcclAlgoType>>& configAlgMap, std::string& selectAlgName) const
 {
+    (void)topoInfo;
+    (void)opParam;
     (void)configAlgMap;
-    CHK_PRT_RET(
-        topoInfo == nullptr, HCCL_ERROR("[AllReduceAutoSelector] topoInfo is nullptr."), SelectorStatus::NOT_MATCH);
-    const bool specialDataOrReduce =
-        Is64BitDataType(opParam.DataDes.dataType) || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
-    if (specialDataOrReduce && topoInfo->level0Topo != Level0Shape::MESH_1D) {
-        // 64bit/PROD 在非 MESH_1D 拓扑下由 AICPU 数值规约模板处理（mesh 模板自身支持 special 类型）
-        selectAlgName = "AicpuAllReduceSoleNHRAicpuReduce";
-        HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
-        return SelectorStatus::MATCH;
-    }
     selectAlgName = "AicpuAllReduceSoleMeshOneShot";
     return SelectorStatus::MATCH;
 }

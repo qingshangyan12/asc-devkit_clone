@@ -79,9 +79,6 @@ set(HCCL_CHECKER_COMMON_INCLUDE_LIST
     ${HCCL_CC_SRC_DIR}/ops/all_gather
     ${HCCL_CC_SRC_DIR}/ops/all_gather/executor
     ${HCCL_CC_SRC_DIR}/ops/all_gather/selector
-    ${HCCL_CC_SRC_DIR}/ops/all_reduce/executor
-    ${HCCL_CC_SRC_DIR}/ops/all_reduce/selector
-    ${HCCL_CC_SRC_DIR}/ops/all_reduce/template/aicpu
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/aicpu
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/aiv
