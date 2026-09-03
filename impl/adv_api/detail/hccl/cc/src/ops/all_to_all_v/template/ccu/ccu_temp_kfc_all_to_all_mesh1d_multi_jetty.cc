@@ -34,8 +34,15 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::CalcRes(
     resourceRequest.ccuKernelNum.push_back(1U);
 
     std::vector<HcclChannelDesc> channelDescs;
-    CHK_RET(CalcChannelRequestMeshClosMultiJetty(comm, param, topoInfo, subCommRanks_, channelDescs));
+    CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(
+        comm, param, topoInfo, subCommRanks_, channelDescs, CommTopo::COMM_TOPO_1DMESH));
 
+    return CalcResByChannelDescsImpl(param, channelDescs, resourceRequest);
+}
+
+HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::CalcResByChannelDescsImpl(
+    const OpParam& param, const std::vector<HcclChannelDesc>& channelDescs, AlgResourceRequest& resourceRequest)
+{
     auto kernelArg = std::make_shared<CcuKernelArgKfcAllToAllMesh1DMultiJetty>();
     kernelArg->rankSize = tempRankSize_;
     kernelArg->rankId = mySubCommRank_;
