@@ -17,8 +17,11 @@
 #include "op_common.h"
 #include "ccu_assist_pub.h"
 #include "hccl_ccu_res.h"
+#include "ccu/ccu_host_launch.h"
 #include "adapter_acl.h"
 #include "kfc_server_protocol.h"
+#include <numeric>
+#include <new>
 
 using namespace mc2_ops_hccl;
 
@@ -43,6 +46,12 @@ const char* GetMc2OpTypeName(HcclCMDType opType)
 } // namespace
 
 constexpr uint32_t ALG_CONFIG_SIZE = 128;
+constexpr uint32_t MC2_CCU_LAUNCH_NUM_BLOCKS = 1U;
+constexpr uint32_t MC2_CCU_LAUNCH_DEFAULT_DIE_MASK = 0x1U;
+constexpr uint32_t MC2_CCU_LAUNCH_VERSION = 1U;
+constexpr uint8_t MC2_CC_TYPE_ALLGATHER = 0U;
+constexpr uint8_t MC2_CC_TYPE_ALLREDUCE = 1U;
+
 struct HcclOpArgs {
     HcclDataType srcDataType;
     HcclDataType dstDataType;
@@ -60,6 +69,219 @@ struct HcclOpArgs {
         count = 0;
     }
 };
+
+struct Mc2CcuArgs {
+    uint32_t version = MC2_CCU_LAUNCH_VERSION;
+    uint8_t commEngine = static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED);
+    HcclDataType srcDataType = HCCL_DATA_TYPE_FP16;
+    HcclDataType dstDataType = HCCL_DATA_TYPE_FP16;
+    HcclReduceOp reduceType = HCCL_REDUCE_SUM;
+    std::string algConfig;
+};
+
+struct Mc2CcuBuiltinCtx {
+    HcclComm comm = nullptr;
+    uint8_t ccType = 0;
+    Mc2CcuArgs ccArgs;
+    OpParam opParam{};
+    std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo;
+    std::unique_ptr<asccomm_ccu_schd> schd;
+    std::string algName;
+    AlgHierarchyInfoForAllLevel algHierarchyInfo;
+    AlgResourceRequest resRequest;
+};
+
+HcclCMDType ResolveMc2OpType(uint8_t ccType)
+{
+    switch (ccType) {
+        case MC2_CC_TYPE_ALLGATHER:
+            return HcclCMDType::HCCL_CMD_ALLGATHER;
+        case MC2_CC_TYPE_ALLREDUCE:
+            return HcclCMDType::HCCL_CMD_ALLREDUCE;
+        case static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLGATHER):
+            return HcclCMDType::HCCL_CMD_ALLGATHER;
+        case static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLREDUCE):
+            return HcclCMDType::HCCL_CMD_ALLREDUCE;
+        case static_cast<uint8_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER):
+        case static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALLV):
+        case static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALL):
+            return static_cast<HcclCMDType>(ccType);
+        default:
+            return HcclCMDType::HCCL_CMD_INVALID;
+    }
+}
+
+bool IsSupportedMc2OpType(HcclCMDType opType)
+{
+    return opType == HcclCMDType::HCCL_CMD_ALLGATHER || opType == HcclCMDType::HCCL_CMD_ALLREDUCE ||
+           opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER || opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
+           opType == HcclCMDType::HCCL_CMD_ALLTOALL;
+}
+
+std::string BuildMc2Tag(HcclComm comm, HcclCMDType opType, const std::string& algConfig)
+{
+    char commName[COMM_INDENTIFIER_MAX_LENGTH] = {0};
+    if (HcclGetCommName(comm, commName) != HCCL_SUCCESS) {
+        (void)strcpy_s(commName, sizeof(commName), "mc2_ccu");
+    }
+    std::string tag = std::string(commName) + "_" + GetMc2OpTypeName(opType);
+    if (!algConfig.empty()) {
+        tag += "_" + algConfig;
+    }
+    return tag;
+}
+
+HcclResult PrepareMc2OpParam(
+    HcclComm comm, uint8_t ccType, const Mc2CcuArgs& ccArgs, Mc2CcTilingInner& ccTiling, OpParam& opParam)
+{
+    const HcclCMDType opType = ResolveMc2OpType(ccType);
+    CHK_PRT_RET(
+        !IsSupportedMc2OpType(opType), HCCL_ERROR("[PrepareMc2OpParam] unsupported ccType[%u]", ccType),
+        HCCL_E_NOT_SUPPORT);
+
+    const std::string tag = BuildMc2Tag(comm, opType, ccArgs.algConfig);
+    CHK_RET(PrepareOpsCommParam(tag, opParam));
+    opParam.hcclComm = comm;
+    opParam.opExecuteConfig = static_cast<OpExecuteConfig>(ccArgs.commEngine);
+
+    CHK_SAFETY_FUNC_RET(strcpy_s(ccTiling.groupName, sizeof(ccTiling.groupName), tag.c_str()));
+    CHK_SAFETY_FUNC_RET(strcpy_s(ccTiling.algConfig, sizeof(ccTiling.algConfig), ccArgs.algConfig.c_str()));
+    ccTiling.commEngine = ccArgs.commEngine;
+    ccTiling.srcDataType = static_cast<uint8_t>(ccArgs.srcDataType);
+    ccTiling.dstDataType = static_cast<uint8_t>(ccArgs.dstDataType);
+    ccTiling.opType = static_cast<uint32_t>(opType);
+    ccTiling.reduceType = static_cast<uint32_t>(ccArgs.reduceType);
+
+    if (opType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
+        CHK_RET(PrepareParamForAllReduce(comm, tag, &ccTiling, opParam));
+    } else if (opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
+        CHK_RET(PrepareParamForAllGather(comm, tag, &ccTiling, opParam));
+        opParam.DataDes.outputType = static_cast<HcclDataType>(ccArgs.dstDataType);
+    } else if (opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+        CHK_RET(PrepareParamForReduceScatter(comm, tag, &ccTiling, opParam));
+    } else if (opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
+        CHK_RET(PrepareParamForAlltoAll(comm, tag, &ccTiling, opParam));
+    } else if (opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+        CHK_RET(PrepareParamForAlltoAllV(comm, tag, &ccTiling, opParam));
+    } else {
+        CHK_RET(HCCL_E_NOT_SUPPORT);
+    }
+    opParam.opExecuteConfig = static_cast<OpExecuteConfig>(ccArgs.commEngine);
+    opParam.isMc2 = true;
+    opParam.isKfc = true;
+    return HCCL_SUCCESS;
+}
+
+HcclResult ResolveMc2Alg(
+    HcclComm comm, const Mc2CcuArgs& ccArgs, OpParam& opParam, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo,
+    std::string& algName)
+{
+    CHK_PTR_NULL(topoInfo);
+    CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
+
+    if (!ccArgs.algConfig.empty() && ccArgs.algConfig.find('=') == std::string::npos) {
+        HcclResult ret = PrepareEngineForAlg(opParam, ccArgs.algConfig);
+        CHK_RET(ret);
+        ret = CheckForcedAlgResource(comm, opParam, topoInfo.get(), ccArgs.algConfig);
+        if (ret == HCCL_SUCCESS) {
+            algName = ccArgs.algConfig;
+            return HCCL_SUCCESS;
+        }
+        HCCL_WARNING("[ResolveMc2Alg] forced alg[%s] is not accepted, fallback to selector.", ccArgs.algConfig.c_str());
+    }
+
+    std::shared_ptr<ExecuteSelector> collAlgSelector = std::make_shared<ExecuteSelector>(ExecuteSelector());
+    CHK_RET(collAlgSelector->Run(opParam, topoInfo.get(), algName));
+    CHK_PRT_RET(algName.empty(), HCCL_ERROR("[ResolveMc2Alg] select algname fail!"), HCCL_E_PTR);
+    CHK_RET(PrepareEngineForAlg(opParam, algName));
+    return HCCL_SUCCESS;
+}
+
+HcclResult BuildMc2BuiltinCtx(
+    HcclComm comm, uint8_t ccType, const Mc2CcuArgs& ccArgs, std::unique_ptr<Mc2CcuBuiltinCtx>& builtinCtx)
+{
+    CHK_PRT_RET(
+        builtinCtx != nullptr, HCCL_ERROR("[BuildMc2BuiltinCtx] builtinCtx must be null before build"), HCCL_E_PARA);
+    builtinCtx = std::make_unique<Mc2CcuBuiltinCtx>();
+    builtinCtx->comm = comm;
+    builtinCtx->ccType = ccType;
+    builtinCtx->ccArgs = ccArgs;
+
+    Mc2CcTilingInner ccTiling{};
+    HcclResult ret = PrepareMc2OpParam(comm, ccType, ccArgs, ccTiling, builtinCtx->opParam);
+    CHK_RET(ret);
+
+    builtinCtx->topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    ret = ResolveMc2Alg(comm, ccArgs, builtinCtx->opParam, builtinCtx->topoInfo, builtinCtx->algName);
+    CHK_RET(ret);
+    CHK_RET(FillOpParamAlgName(builtinCtx->opParam, builtinCtx->algName));
+
+    bool skipGetRes = false;
+    CHK_RET(HandleSingleRankAndCommMode(comm, builtinCtx->opParam, skipGetRes));
+    if (skipGetRes) {
+        builtinCtx->schd = std::make_unique<asccomm_ccu_schd>();
+        builtinCtx->schd->num_blocks = MC2_CCU_LAUNCH_NUM_BLOCKS;
+        builtinCtx->schd->reserved = 0U;
+        builtinCtx->schd->phy_die_mask = MC2_CCU_LAUNCH_DEFAULT_DIE_MASK;
+        builtinCtx->schd->binary_cache_tag = 0U;
+        return HCCL_SUCCESS;
+    }
+
+    auto executor = GetAlgExecutorForOp(builtinCtx->opParam, builtinCtx->algName);
+    CHK_PRT_RET(
+        executor == nullptr,
+        HCCL_ERROR("[BuildMc2BuiltinCtx] fail to find executor for algName[%s]", builtinCtx->algName.c_str()),
+        HCCL_E_PARA);
+
+    CHK_RET(executor->CalcAlgHierarchyInfo(comm, builtinCtx->topoInfo.get(), builtinCtx->algHierarchyInfo));
+    CHK_RET(executor->CalcRes(
+        comm, builtinCtx->opParam, builtinCtx->topoInfo.get(), builtinCtx->algHierarchyInfo, builtinCtx->resRequest));
+
+    // The MC2 CCU path runs the communication algorithm as a KFC server.
+    // First create the operation kernel description, then let the KFC server
+    // executor replace it with CcuKfcServerKernel and inherit its channels.
+    if (builtinCtx->opParam.isKfc && builtinCtx->opParam.engine == COMM_ENGINE_CCU) {
+        std::unique_ptr<InsCollAlgBase> ccuKfcExecutor =
+            CollAlgExecRegistryV2::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_KFC_SERVER, "CcuKfcServer");
+        CHK_PRT_RET(
+            ccuKfcExecutor == nullptr,
+            HCCL_ERROR("[BuildMc2BuiltinCtx] fail to find CcuKfcServer executor"), HCCL_E_PARA);
+        CHK_RET(ccuKfcExecutor->CalcRes(
+            comm, builtinCtx->opParam, builtinCtx->topoInfo.get(), builtinCtx->algHierarchyInfo,
+            builtinCtx->resRequest));
+    }
+
+    // Resolve requested channel descriptors to handles before the CCU server
+    // program is generated by Mc2CcuCcKernel.
+    CHK_RET(HcclGetChannelForCcu(comm, builtinCtx->opParam, builtinCtx->resRequest));
+
+    builtinCtx->schd = std::make_unique<asccomm_ccu_schd>();
+    builtinCtx->schd->num_blocks = MC2_CCU_LAUNCH_NUM_BLOCKS;
+    builtinCtx->schd->reserved = 0U;
+    builtinCtx->schd->phy_die_mask = MC2_CCU_LAUNCH_DEFAULT_DIE_MASK;
+    builtinCtx->schd->binary_cache_tag = 0U;
+
+    if (!builtinCtx->resRequest.ccuKernelInfos.empty()) {
+        uint32_t dieMask = 0;
+        for (const auto& kernelInfo : builtinCtx->resRequest.ccuKernelInfos) {
+            CHK_PRT_RET(
+                kernelInfo.dieId > 1U, HCCL_ERROR("[BuildMc2BuiltinCtx] invalid dieId[%u]", kernelInfo.dieId),
+                HCCL_E_PARA);
+            dieMask |= (1U << kernelInfo.dieId);
+        }
+        CHK_PRT_RET(
+            dieMask == 0U || (dieMask & (dieMask - 1U)) != 0U,
+            HCCL_ERROR("[BuildMc2BuiltinCtx] only single die is supported, dieMask[0x%x]", dieMask),
+            HCCL_E_NOT_SUPPORT);
+        builtinCtx->schd->phy_die_mask = dieMask;
+    }
+    return HCCL_SUCCESS;
+}
+
+uint32_t GetMc2TotalKernelNum(const AlgResourceRequest& resRequest)
+{
+    return std::accumulate(resRequest.ccuKernelNum.begin(), resRequest.ccuKernelNum.end(), 0U);
+}
 
 HcclResult HcclKfcAllocOpArgs(void** opArgs)
 {
@@ -591,3 +813,169 @@ CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx)
     }
     return CCU_SUCCESS;
 }
+
+namespace AscendC {
+uint32_t __attribute__((visibility("default"))) Mc2GetCcArgsCcu(void** ccArgs)
+{
+    CHK_PTR_NULL(ccArgs);
+    auto* args = new (std::nothrow) Mc2CcuArgs();
+    CHK_PRT_RET(args == nullptr, HCCL_ERROR("[Mc2GetCcArgsCcu] allocate args failed"), HCCL_E_INTERNAL);
+    *ccArgs = args;
+    return HCCL_SUCCESS;
+}
+
+uint32_t __attribute__((visibility("default"))) Mc2FreeCcArgsCcu(void* ccArgs)
+{
+    CHK_PTR_NULL(ccArgs);
+    delete static_cast<Mc2CcuArgs*>(ccArgs);
+    return HCCL_SUCCESS;
+}
+
+uint32_t __attribute__((visibility("default"))) Mc2FreeCcResCtxCcu(void* ccResCtx)
+{
+    CHK_PTR_NULL(ccResCtx);
+    delete static_cast<Mc2CcuBuiltinCtx*>(ccResCtx);
+    return HCCL_SUCCESS;
+}
+
+uint32_t __attribute__((visibility("default"))) Mc2SetCcCommEngineCcu(void* ccArgs, uint8_t commEngine)
+{
+    CHK_PTR_NULL(ccArgs);
+    if (commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_MS) &&
+        commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+        HCCL_ERROR("[Mc2SetCcCommEngineCcu] unsupported commEngine[%u]", commEngine);
+        return HCCL_E_NOT_SUPPORT;
+    }
+    auto* args = static_cast<Mc2CcuArgs*>(ccArgs);
+    args->commEngine = commEngine;
+    return HCCL_SUCCESS;
+}
+
+uint32_t __attribute__((visibility("default"))) Mc2SetCcAlgConfigCcu(void* ccArgs, char* algConfig)
+{
+    CHK_PTR_NULL(ccArgs);
+    CHK_PTR_NULL(algConfig);
+    auto* args = static_cast<Mc2CcuArgs*>(ccArgs);
+    args->algConfig = algConfig;
+    return HCCL_SUCCESS;
+}
+
+uint32_t __attribute__((visibility("default"))) Mc2SetCcSrcDataTypeCcu(void* ccArgs, uint8_t srcDataType)
+{
+    CHK_PTR_NULL(ccArgs);
+    CHK_RET(HcomCheckDataType(static_cast<HcclDataType>(srcDataType)));
+    auto* args = static_cast<Mc2CcuArgs*>(ccArgs);
+    args->srcDataType = static_cast<HcclDataType>(srcDataType);
+    return HCCL_SUCCESS;
+}
+
+uint32_t __attribute__((visibility("default"))) Mc2SetCcDstDataTypeCcu(void* ccArgs, uint8_t dstDataType)
+{
+    CHK_PTR_NULL(ccArgs);
+    CHK_RET(HcomCheckDataType(static_cast<HcclDataType>(dstDataType)));
+    auto* args = static_cast<Mc2CcuArgs*>(ccArgs);
+    args->dstDataType = static_cast<HcclDataType>(dstDataType);
+    return HCCL_SUCCESS;
+}
+
+uint32_t __attribute__((visibility("default"))) Mc2SetCcReduceTypeCcu(void* ccArgs, uint8_t reduceDataType)
+{
+    CHK_PTR_NULL(ccArgs);
+    CHK_RET(HcomCheckReductionOp(static_cast<HcclReduceOp>(reduceDataType)));
+    auto* args = static_cast<Mc2CcuArgs*>(ccArgs);
+    args->reduceType = static_cast<HcclReduceOp>(reduceDataType);
+    return HCCL_SUCCESS;
+}
+
+uint32_t __attribute__((visibility("default"))) Mc2AcquireCcResCtxCcu(
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx, uint32_t* ccResCtxSize, void** schd)
+{
+    CHK_PTR_NULL(comm);
+    CHK_PTR_NULL(ccArgs);
+    CHK_PTR_NULL(ccResCtx);
+    CHK_PTR_NULL(ccResCtxSize);
+    CHK_PTR_NULL(schd);
+    *ccResCtx = nullptr;
+    *ccResCtxSize = 0U;
+    *schd = nullptr;
+
+    auto* args = static_cast<Mc2CcuArgs*>(ccArgs);
+    HCCL_INFO(
+        "[Mc2AcquireCcResCtxCcu] start, comm[%p], ccType[%u], args[%p], version[%u], commEngine[%u], "
+        "srcDataType[%u], dstDataType[%u], reduceType[%u], algConfig[%s].",
+        comm, ccType, ccArgs, args->version, args->commEngine, static_cast<uint32_t>(args->srcDataType),
+        static_cast<uint32_t>(args->dstDataType), static_cast<uint32_t>(args->reduceType), args->algConfig.c_str());
+    if (args->version != MC2_CCU_LAUNCH_VERSION) {
+        HCCL_ERROR("[Mc2AcquireCcResCtxCcu] unsupported args version[%u]", args->version);
+        return HCCL_E_NOT_SUPPORT;
+    }
+
+    std::unique_ptr<Mc2CcuBuiltinCtx> builtinCtx;
+    CHK_RET(BuildMc2BuiltinCtx(comm, ccType, *args, builtinCtx));
+
+    if (builtinCtx != nullptr) {
+        const TopoInfoWithNetLayerDetails* topoInfo = builtinCtx->topoInfo.get();
+        HCCL_INFO(
+            "[Mc2AcquireCcResCtxCcu] built ctx, algName[%s], opType[%u], opExecuteConfig[%u], engine[%u], "
+            "isMc2[%u], isKfc[%u], reduceType[%u], inputSize[%llu], outputSize[%llu], count[%llu], "
+            "strideCount[%llu], tag[%s], algTag[%s], commName[%s], topoInfo[%p], rank[%u/%u], "
+            "level0Topo[%u], level0MeshType[%u], ccResCtxSize[%u].",
+            builtinCtx->algName.c_str(), static_cast<uint32_t>(builtinCtx->opParam.opType),
+            static_cast<uint32_t>(builtinCtx->opParam.opExecuteConfig), static_cast<uint32_t>(builtinCtx->opParam.engine),
+            static_cast<uint32_t>(builtinCtx->opParam.isMc2), static_cast<uint32_t>(builtinCtx->opParam.isKfc),
+            static_cast<uint32_t>(builtinCtx->opParam.reduceType),
+            static_cast<unsigned long long>(builtinCtx->opParam.inputSize),
+            static_cast<unsigned long long>(builtinCtx->opParam.outputSize),
+            static_cast<unsigned long long>(builtinCtx->opParam.DataDes.count),
+            static_cast<unsigned long long>(builtinCtx->opParam.DataDes.strideCount), builtinCtx->opParam.tag,
+            builtinCtx->opParam.algTag, builtinCtx->opParam.commName, topoInfo,
+            topoInfo == nullptr ? 0U : topoInfo->userRank, topoInfo == nullptr ? 0U : topoInfo->userRankSize,
+            topoInfo == nullptr ? 0U : static_cast<uint32_t>(topoInfo->level0Topo),
+            topoInfo == nullptr ? 0U : static_cast<uint32_t>(topoInfo->level0MeshType),
+            static_cast<uint32_t>(sizeof(Mc2CcuBuiltinCtx)));
+    }
+
+    *ccResCtxSize = static_cast<uint32_t>(sizeof(Mc2CcuBuiltinCtx));
+    *schd = static_cast<void*>(builtinCtx->schd.get());
+    *ccResCtx = static_cast<void*>(builtinCtx.release());
+    HCCL_INFO(
+        "[Mc2AcquireCcResCtxCcu] end, ccResCtx[%p], ccResCtxSize[%u], schd[%p].", *ccResCtx, *ccResCtxSize, *schd);
+    return HCCL_SUCCESS;
+}
+
+__ccu_host__ void Mc2CcuCcKernel(void* ccResCtx)
+{
+    if (ccResCtx == nullptr) {
+        HCCL_ERROR("[Mc2CcuCcKernel] ccResCtx is nullptr.");
+        return;
+    }
+    auto* builtinCtx = static_cast<Mc2CcuBuiltinCtx*>(ccResCtx);
+    const uint32_t totalKernelNum = GetMc2TotalKernelNum(builtinCtx->resRequest);
+    if (!builtinCtx->resRequest.ccuKernelNum.empty()) {
+        if (totalKernelNum != builtinCtx->resRequest.ccuKernelInfos.size()) {
+            HCCL_ERROR(
+                "[Mc2CcuCcKernel] kernel num mismatch, totalKernelNum[%u], kernelInfos[%zu].", totalKernelNum,
+                builtinCtx->resRequest.ccuKernelInfos.size());
+            return;
+        }
+    }
+    HCCL_INFO(
+        "[Mc2CcuCcKernel] start, algName[%s], ccType[%u], totalKernelNum[%u], numBlocks[%u], dieMask[0x%x].",
+        builtinCtx->algName.c_str(), builtinCtx->ccType, totalKernelNum,
+        builtinCtx->schd == nullptr ? 0U : builtinCtx->schd->num_blocks,
+        builtinCtx->schd == nullptr ? 0U : builtinCtx->schd->phy_die_mask);
+
+    for (const auto& kernelInfo : builtinCtx->resRequest.ccuKernelInfos) {
+        if (kernelInfo.kernelFunc == nullptr || kernelInfo.kernelArg == nullptr) {
+            HCCL_ERROR("[Mc2CcuCcKernel] invalid kernel info, kernel[%s].", kernelInfo.kernelFuncName);
+            return;
+        }
+        auto kernelFunc = reinterpret_cast<CcuResult (*)(CcuKernelArg)>(kernelInfo.kernelFunc);
+        CcuResult ret = kernelFunc(static_cast<CcuKernelArg>(kernelInfo.kernelArg));
+        if (ret != CCU_SUCCESS) {
+            HCCL_ERROR("[Mc2CcuCcKernel] kernel[%s] launch failed, ret[%d].", kernelInfo.kernelFuncName, ret);
+            return;
+        }
+    }
+}
+} // namespace AscendC

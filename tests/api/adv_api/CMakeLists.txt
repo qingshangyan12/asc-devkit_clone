@@ -24,7 +24,9 @@ list(REMOVE_ITEM TILING_PRODUCT_TYPE_LIST KirinX90_AIV Kirin9030_AIV)
 
 set(ASCENDC_DEP_HEADER_DIR
     ${ASCEND_CANN_PACKAGE_PATH}/include
+    ${ASCEND_CANN_PACKAGE_PATH}/include/ccu
     ${ASCEND_CANN_PACKAGE_PATH}/include/base
+    ${ASCEND_CANN_PACKAGE_PATH}/asc/include/comm_api/ccu
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
     ${CMAKE_BINARY_DIR}
     ${ASCENDC_UTILS_INCLUDE}
@@ -576,6 +578,7 @@ foreach(product_type ${TILING_PRODUCT_TYPE_LIST})
 
     target_compile_definitions(ascendc_ut_adv_api_tiling_${product_type} PRIVATE
         UT_TEST
+        __ccu_host__=
         $<$<STREQUAL:${product_type},ascend310p>:__NPU_ARCH__=2002>
         $<$<STREQUAL:${product_type},ascend610>:__NPU_ARCH__=2002>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:__NPU_ARCH__=2201>
