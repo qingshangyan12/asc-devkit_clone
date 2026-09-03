@@ -471,83 +471,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_cal_remquo(
     *quo = n;
 }
 
-#define __INTERNAL_REMQUOF(x, y, quo)                                                                            \
-    do {                                                                                                         \
-        bool is_x_pos = (x) >= 0;                                                                                \
-        float abs_x = fabsf(x);                                                                                  \
-        float abs_y = fabsf(y);                                                                                  \
-        bool is_x_inf = abs_x > ASCRT_INF_F || isnan(x);                                                         \
-        bool is_y_inf = abs_y > ASCRT_INF_F || isnan(y);                                                         \
-        *(quo) = 0;                                                                                              \
-        int32_t tmp_quo = 0;                                                                                     \
-        int32_t n_sign = (((x) <= 0 && (y) <= 0) || ((x) >= 0 && (y) >= 0)) ? 1 : -1;                            \
-        float res = (x) + (y);                                                                                   \
-        if (is_x_inf | is_y_inf) {                                                                               \
-            return res;                                                                                          \
-        }                                                                                                        \
-                                                                                                                 \
-        res = ASCRT_INF_F / ASCRT_INF_F;                                                                         \
-        if ((abs_x == ASCRT_INF_F) || (abs_y == 0)) {                                                            \
-            return res;                                                                                          \
-        }                                                                                                        \
-                                                                                                                 \
-        float tmp_val = 0.0;                                                                                     \
-        uint32_t sign_flag = 0;                                                                                  \
-        if (abs_x < abs_y) {                                                                                     \
-            res = (x);                                                                                           \
-            float result = __internal_x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, &tmp_quo, n_sign); \
-            *(quo) = tmp_quo;                                                                                    \
-            return result;                                                                                       \
-        }                                                                                                        \
-                                                                                                                 \
-        uint32_t* u_abs_y = reinterpret_cast<uint32_t*>(&abs_y);                                                 \
-        uint32_t u_y = (*u_abs_y) & ASCRT_MAN_BIT_FLOAT_U;                                                       \
-        uint32_t* u_abs_x = reinterpret_cast<uint32_t*>(&abs_x);                                                 \
-        uint32_t u_x = (*u_abs_x) & ASCRT_EXP_BIT_FLOAT_U;                                                       \
-        float x_y_val = 0.0;                                                                                     \
-        uint32_t* uf26 = reinterpret_cast<uint32_t*>(&x_y_val);                                                  \
-        *uf26 = u_y | u_x;                                                                                       \
-        bool is_gt_abs_x = x_y_val > abs_x && !isnan(x_y_val);                                                   \
-        res = 0.0;                                                                                               \
-        float n_x_y_val = (is_gt_abs_x) ? (x_y_val * 0.5f) : x_y_val;                                            \
-        if (abs_x == n_x_y_val && !isnan(n_x_y_val)) {                                                           \
-            return res;                                                                                          \
-        }                                                                                                        \
-                                                                                                                 \
-        tmp_val = 0.0;                                                                                           \
-        res = abs_x;                                                                                             \
-        *(quo) = 0;                                                                                              \
-        if (n_x_y_val < abs_y || isnan(n_x_y_val)) {                                                             \
-            float result = __internal_x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, &tmp_quo, n_sign); \
-            *(quo) = tmp_quo;                                                                                    \
-            return result;                                                                                       \
-        }                                                                                                        \
-        __internal_cal_remquo(abs_x, n_x_y_val, sign_flag, abs_y, tmp_val, &tmp_quo);                            \
-        res = abs_x;                                                                                             \
-                                                                                                                 \
-        float result = __internal_x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, &tmp_quo, n_sign);     \
-        *(quo) = tmp_quo;                                                                                        \
-        return result;                                                                                           \
-    } while (0)
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, int* quo) { __INTERNAL_REMQUOF(x, y, quo); }
-
-#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
-#ifdef __NPU_ARCH__
-#ifndef ASCENDC_CPU_DEBUG
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, __ubuf__ int* quo)
-{
-    __INTERNAL_REMQUOF(x, y, quo);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, __gm__ int* quo)
-{
-    __INTERNAL_REMQUOF(x, y, quo);
-}
-#endif
-#endif
-#endif
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_set_res_mod_neg(float mod_res)
 {
     uint32_t* u_mod_res = reinterpret_cast<uint32_t*>(&mod_res);
@@ -609,12 +532,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
         return __internal_set_res_mod_neg(mod_res);
     }
     return mod_res;
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remainderf(float x, float y)
-{
-    int32_t quo = -1;
-    return remquof(x, y, &quo);
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float copysignf(float x, float y) { return (y >= 0) ? fabsf(x) : -fabsf(x); }
@@ -1338,8 +1255,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float hypotf(float x, float y)
     return a * sqrtf(fmaf(r, r, 1.0f));
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rhypotf(float x, float y) { return 1.0f / hypotf(x, y); }
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm3df(float a, float b, float c)
 {
     if (isinf(a) || isinf(b) || isinf(c)) {
@@ -1359,8 +1274,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm3df(float a, float b, float c)
     r = fmaf((c / m), (c / m), r);
     return m * sqrtf(r);
 }
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm3df(float a, float b, float c) { return 1.0f / norm3df(a, b, c); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm4df(float a, float b, float c, float d)
 {
@@ -1382,11 +1295,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm4df(float a, float b, float c, f
     r = fmaf((c / m), (c / m), r);
     r = fmaf((d / m), (d / m), r);
     return m * sqrtf(r);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, float d)
-{
-    return 1.0f / norm4df(a, b, c, d);
 }
 
 #define __INTERNAL_NORMF(n, a)                                          \
@@ -1563,44 +1471,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float cbrtf(float x)
     y_bits = (y_bits & 0x807FFFFF) | ((yexp_bits & 0xFF) << 23) | // 23:the number of bits to shift left
              (x_bits & 0x80000000);
     return *reinterpret_cast<float*>(&y_bits);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rcbrtf(float x)
-{
-    if (x == 0.0f) {
-        return ASCRT_INF_F;
-    }
-    if (isnan(x)) {
-        return x;
-    }
-    if (isinf(x)) {
-        return 0.0f;
-    }
-
-    // get the exponent part of x
-    uint32_t x_bits = *reinterpret_cast<uint32_t*>(&x);
-    int32_t exp_bits = (x_bits >> 23) & 0xFF;
-
-    // Depending on the computer's float number storage structure
-    // The exponent bits of x is E = (x >> 23) && 0xFF
-    // The exponent value is e = E - 127
-    // The exponent value of rcbrt(x) is e' = -e/3
-    // The exponent bits of rcbrt(x) is E' = round(127 + e') = 127 - e/3 = (3*127 - e)/3 = (508 - E) / 3
-    // Assume that the initial value of the Newton's iteration method is y, the exponent bits of y is E'
-    int32_t yexp_bits = (508 - exp_bits) / 3;
-    uint32_t y_bits = (x_bits & 0x80000000) | (yexp_bits << 23);
-    float y = *reinterpret_cast<float*>(&y_bits);
-
-    // The Newton's iteration method, f(x) = x^(-3) - b;
-    // x_i+1 = x_i - f(x_i)/f'(x_i)
-    // x_i+1 = x_i - (x_i^(-3) - b)/(-3*x_i^(-4))
-    // x_i+1 = x_i*(4 - b * x_i^3) / 3
-    y = y * (4.0f - x * y * y * y) / 3.0f;
-    y = y * (4.0f - x * y * y * y) / 3.0f;
-    y = y * (4.0f - x * y * y * y) / 3.0f;
-    y = y * (4.0f - x * y * y * y) / 3.0f;
-    y = y * (4.0f - x * y * y * y) / 3.0f;
-    return y;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erff(float x)
@@ -2351,28 +2221,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float cyl_bessel_i1f(float x)
         y = fmaf(y, square_x, 0.5f);           // 0.5f               : 1/2
         return y * x;
     }
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdff(float x)
-{
-    if (fabsf(x) > 14.5f) {
-        x = copysignf(14.5f, x);
-    }
-
-    float one_over_sqrt2_high = -0.707106769f; // -0.707106769f: -1/sqrt(2) high
-    float x_over_sqrt2_high = x * one_over_sqrt2_high;
-    float compensate_value = fmaf(x, one_over_sqrt2_high, -x_over_sqrt2_high);
-
-    float one_over_sqrt2_low = -1.21016175e-8f; // -1.21016175e-8f: -1/sqrt(2) low
-    float x_over_sqrt2_low = fmaf(x, one_over_sqrt2_low, compensate_value);
-    float x_over_sqrt2 = x_over_sqrt2_high + x_over_sqrt2_low;
-
-    float erfc_value = erfcf(x_over_sqrt2);
-    if (x <= -1.0f) {
-        erfc_value =
-            fmaf(-2.0f * x_over_sqrt2 * erfc_value, x_over_sqrt2_high - x_over_sqrt2 + x_over_sqrt2_low, erfc_value);
-    }
-    return 0.5f * erfc_value;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_trig_red_slowpath_f_fast_mode(float a, int* quadrant)
@@ -3133,6 +2981,827 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline unsigned long long int min(unsigned long l
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y) { return x / y; }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int signbit(float x) { return signbitf(x); }
+
+#if defined(ASCENDC_USE_LEGACY_PRECISION)
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdff(float x)
+{
+    if (fabsf(x) > 14.5f) {
+        x = copysignf(14.5f, x);
+    }
+
+    float one_over_sqrt2_high = -0.707106769f; // -0.707106769f: -1/sqrt(2) high
+    float x_over_sqrt2_high = x * one_over_sqrt2_high;
+    float compensate_value = fmaf(x, one_over_sqrt2_high, -x_over_sqrt2_high);
+
+    float one_over_sqrt2_low = -1.21016175e-8f; // -1.21016175e-8f: -1/sqrt(2) low
+    float x_over_sqrt2_low = fmaf(x, one_over_sqrt2_low, compensate_value);
+    float x_over_sqrt2 = x_over_sqrt2_high + x_over_sqrt2_low;
+
+    float erfc_value = erfcf(x_over_sqrt2);
+    if (x <= -1.0f) {
+        erfc_value =
+            fmaf(-2.0f * x_over_sqrt2 * erfc_value, x_over_sqrt2_high - x_over_sqrt2 + x_over_sqrt2_low, erfc_value);
+    }
+    return 0.5f * erfc_value;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rcbrtf(float x)
+{
+    if (x == 0.0f) {
+        return ASCRT_INF_F;
+    }
+    if (isnan(x)) {
+        return x;
+    }
+    if (isinf(x)) {
+        return 0.0f;
+    }
+
+    // get the exponent part of x
+    uint32_t x_bits = *reinterpret_cast<uint32_t*>(&x);
+    int32_t exp_bits = (x_bits >> 23) & 0xFF;
+
+    // Depending on the computer's float number storage structure
+    // The exponent bits of x is E = (x >> 23) && 0xFF
+    // The exponent value is e = E - 127
+    // The exponent value of rcbrt(x) is e' = -e/3
+    // The exponent bits of rcbrt(x) is E' = round(127 + e') = 127 - e/3 = (3*127 - e)/3 = (508 - E) / 3
+    // Assume that the initial value of the Newton's iteration method is y, the exponent bits of y is E'
+    int32_t yexp_bits = (508 - exp_bits) / 3;
+    uint32_t y_bits = (x_bits & 0x80000000) | (yexp_bits << 23);
+    float y = *reinterpret_cast<float*>(&y_bits);
+
+    // The Newton's iteration method, f(x) = x^(-3) - b;
+    // x_i+1 = x_i - f(x_i)/f'(x_i)
+    // x_i+1 = x_i - (x_i^(-3) - b)/(-3*x_i^(-4))
+    // x_i+1 = x_i*(4 - b * x_i^3) / 3
+    y = y * (4.0f - x * y * y * y) / 3.0f;
+    y = y * (4.0f - x * y * y * y) / 3.0f;
+    y = y * (4.0f - x * y * y * y) / 3.0f;
+    y = y * (4.0f - x * y * y * y) / 3.0f;
+    y = y * (4.0f - x * y * y * y) / 3.0f;
+    return y;
+}
+
+#define __INTERNAL_REMQUOF(x, y, quo)                                                                            \
+    do {                                                                                                         \
+        bool is_x_pos = (x) >= 0;                                                                                \
+        float abs_x = fabsf(x);                                                                                  \
+        float abs_y = fabsf(y);                                                                                  \
+        bool is_x_inf = abs_x > ASCRT_INF_F || isnan(x);                                                         \
+        bool is_y_inf = abs_y > ASCRT_INF_F || isnan(y);                                                         \
+        *(quo) = 0;                                                                                              \
+        int32_t tmp_quo = 0;                                                                                     \
+        int32_t n_sign = (((x) <= 0 && (y) <= 0) || ((x) >= 0 && (y) >= 0)) ? 1 : -1;                            \
+        float res = (x) + (y);                                                                                   \
+        if (is_x_inf | is_y_inf) {                                                                               \
+            return res;                                                                                          \
+        }                                                                                                        \
+                                                                                                                 \
+        res = ASCRT_INF_F / ASCRT_INF_F;                                                                         \
+        if ((abs_x == ASCRT_INF_F) || (abs_y == 0)) {                                                            \
+            return res;                                                                                          \
+        }                                                                                                        \
+                                                                                                                 \
+        float tmp_val = 0.0;                                                                                     \
+        uint32_t sign_flag = 0;                                                                                  \
+        if (abs_x < abs_y) {                                                                                     \
+            res = (x);                                                                                           \
+            float result = __internal_x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, &tmp_quo, n_sign); \
+            *(quo) = tmp_quo;                                                                                    \
+            return result;                                                                                       \
+        }                                                                                                        \
+                                                                                                                 \
+        uint32_t* u_abs_y = reinterpret_cast<uint32_t*>(&abs_y);                                                 \
+        uint32_t u_y = (*u_abs_y) & ASCRT_MAN_BIT_FLOAT_U;                                                       \
+        uint32_t* u_abs_x = reinterpret_cast<uint32_t*>(&abs_x);                                                 \
+        uint32_t u_x = (*u_abs_x) & ASCRT_EXP_BIT_FLOAT_U;                                                       \
+        float x_y_val = 0.0;                                                                                     \
+        uint32_t* uf26 = reinterpret_cast<uint32_t*>(&x_y_val);                                                  \
+        *uf26 = u_y | u_x;                                                                                       \
+        bool is_gt_abs_x = x_y_val > abs_x && !isnan(x_y_val);                                                   \
+        res = 0.0;                                                                                               \
+        float n_x_y_val = (is_gt_abs_x) ? (x_y_val * 0.5f) : x_y_val;                                            \
+        if (abs_x == n_x_y_val && !isnan(n_x_y_val)) {                                                           \
+            return res;                                                                                          \
+        }                                                                                                        \
+                                                                                                                 \
+        tmp_val = 0.0;                                                                                           \
+        res = abs_x;                                                                                             \
+        *(quo) = 0;                                                                                              \
+        if (n_x_y_val < abs_y || isnan(n_x_y_val)) {                                                             \
+            float result = __internal_x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, &tmp_quo, n_sign); \
+            *(quo) = tmp_quo;                                                                                    \
+            return result;                                                                                       \
+        }                                                                                                        \
+        __internal_cal_remquo(abs_x, n_x_y_val, sign_flag, abs_y, tmp_val, &tmp_quo);                            \
+        res = abs_x;                                                                                             \
+                                                                                                                 \
+        float result = __internal_x_le_y(abs_x, tmp_val, abs_y, is_x_pos, sign_flag, res, &tmp_quo, n_sign);     \
+        *(quo) = tmp_quo;                                                                                        \
+        return result;                                                                                           \
+    } while (0)
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, int* quo) { __INTERNAL_REMQUOF(x, y, quo); }
+
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifdef __NPU_ARCH__
+#ifndef ASCENDC_CPU_DEBUG
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, __ubuf__ int* quo)
+{
+    __INTERNAL_REMQUOF(x, y, quo);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, __gm__ int* quo)
+{
+    __INTERNAL_REMQUOF(x, y, quo);
+}
+#endif
+#endif
+#endif
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remainderf(float x, float y)
+{
+    int32_t quo = -1;
+    return remquof(x, y, &quo);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rhypotf(float x, float y) { return 1.0f / hypotf(x, y); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm3df(float a, float b, float c) { return 1.0f / norm3df(a, b, c); }
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, float d)
+{
+    return 1.0f / norm4df(a, b, c, d);
+}
+
+#else
+
+/**
+ * Computes the standard normal cumulative distribution function for float inputs.
+ *
+ * The implementation first handles special values with fixed IEEE-style semantics:
+ * NaN propagates, CDF(-inf) = 0, and CDF(+inf) = 1.
+ *
+ * For finite inputs, it evaluates the CDF through the complementary error function:
+ *   normcdff(x) = 0.5 * erfc(-x / sqrt(2))
+ *
+ * The argument is reduced with a high/low split of -1/sqrt(2):
+ *   z = x * (-1/sqrt(2)) ~= z_hi + z_lo
+ *
+ * The tail is then approximated with a rational/polynomial form in:
+ *   q = (|z| - 4) / (|z| + 4)
+ *
+ * The exponential factor is reconstructed with an exp2-based split path to keep
+ * the tail stable:
+ *   exp(-z^2) ~= exp_scale * exp2_residual
+ *
+ * Finally, the erfc tail is assembled, mirrored for negative x, and scaled by 1/2.
+ *
+ * @param x The input value.
+ * @return The computed normcdff(x) value.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdff(float x)
+{
+    // NaN propagates directly.
+    if (isnan(x)) {
+        return x;
+    }
+    // CDF(-inf) = 0.
+    if (x == -ASCRT_INF_F) {
+        return 0.0f;
+    }
+    // CDF(+inf) = 1.
+    if (x == ASCRT_INF_F) {
+        return 1.0f;
+    }
+
+    // Clamp the input range used by the approximation to avoid overflow in the tail path.
+    constexpr float clamp_bound = 14.5f;                     // Input clamp used to keep the tail approximation stable.
+    constexpr float inv_sqrt2_hi = -0.70710676908493041992f; // High part of -1/sqrt(2).
+    constexpr float inv_sqrt2_lo =
+        -1.2101617485882343317e-08f;               // Low part of -1/sqrt(2) for split-constant compensation.
+    constexpr float log2e = __internal_fp32_log2e; // log2(e), used to convert the exponent from ln to exp2 domain.
+    constexpr float neg_ln2_hi = -__internal_fp32_ln2_hi; // High part of -ln(2).
+    constexpr float ln2_tail = __internal_fp32_ln2_tail;  // Low tail of -ln(2) for residual correction.
+
+    // Reduce x to z = -x/sqrt(2) with a hi/lo split for better precision.
+    const float abs_x = fabsf(x);
+    float clamped_x = abs_x > clamp_bound ? __internal_with_sign_bit(clamp_bound, x) : x;
+    const bool ge_neg_one = !(clamped_x < -1.0f);
+
+    float z_hi = clamped_x * inv_sqrt2_hi;
+    float z_comp = fmaf(clamped_x, inv_sqrt2_hi, -z_hi);
+    float z_lo = fmaf(clamped_x, inv_sqrt2_lo, z_comp);
+    float z = z_hi + z_lo;
+    const float abs_z = fabsf(z);
+    const bool z_nonnegative = !(z < 0.0f);
+
+    // Build q = (|z| - 4) / (|z| + 4) with a residual compensation term.
+    const float rcp_abs_z_plus_4 = 1.0f / (abs_z + 4.0f);
+    float q = (abs_z - 4.0f) * rcp_abs_z_plus_4;
+    float q_residual = fmaf(q + 1.0f, -4.0f, abs_z);
+    q_residual = fmaf(abs_z, -q, q_residual);
+    q = fmaf(rcp_abs_z_plus_4, q_residual, q);
+
+    // Approximate exp(-z^2) using exp2 with split hi/lo reconstruction.
+    float exp_k = truncf((z * z) * -log2e);
+    const bool exp_k_out_of_range = fabsf(exp_k) > __internal_fp32_max_exp;
+    float exp_k_limited = exp_k_out_of_range ? __internal_with_sign_bit(__internal_fp32_max_exp, exp_k) : exp_k;
+    float exp_residual = fmaf(exp_k_limited, neg_ln2_hi, -(z * z));
+    exp_residual = fmaf(exp_k_limited, ln2_tail, exp_residual);
+    float exp2_residual = exp2f(exp_residual * log2e);
+    const uint32_t exp_scale_bits = static_cast<uint32_t>(__float2int_rz(exp_k_limited + 12583039.0f))
+                                    << __internal_fp32_exponent_shift;
+    float exp_scale = __uint_as_float(exp_scale_bits);
+    float square_residual = fmaf(-abs_z, abs_z, z * z);
+    float exp_term = fmaf(exp_scale, square_residual, exp_scale) * exp2_residual;
+
+    // Polynomial approximation for the erfc rational core.
+    float poly = fmaf(q, 0.0008912170887924731f, 0.0070457882247865200043f);
+    poly = fmaf(q, poly, -0.015866896137595176697f);
+    poly = fmaf(q, poly, 0.036429625004529953003f);
+    poly = fmaf(q, poly, -0.066643431782722473145f);
+    poly = fmaf(q, poly, 0.093814529478549957275f);
+    poly = fmaf(q, poly, -0.10099056363105773926f);
+    poly = fmaf(q, poly, 0.06809400022029876709f);
+    poly = fmaf(q, poly, 0.015377387404441833496f);
+    poly = fmaf(q, poly, -0.1396210789680480957f);
+    poly = fmaf(q, poly, 1.232995152473449707f);
+
+    // Rational reconstruction for the erfc tail.
+    const float rcp_two_abs_z_plus_1 = 1.0f / fmaf(abs_z, 2.0f, 1.0f);
+    float rational = poly * rcp_two_abs_z_plus_1;
+    float rational_err = fmaf(abs_z, rational * -2.0f, poly);
+    rational_err = -rational + rational_err;
+    rational = fmaf(rcp_two_abs_z_plus_1, rational_err, rational);
+
+    // Combine rational core with exponential tail.
+    float erfc_value = rational * exp_term;
+    if (abs_z > 10.05500030517578125f) {
+        erfc_value = 0.0f;
+    }
+    // For negative inputs, use erfc(-z) = 2 - erfc(z).
+    if (!z_nonnegative) {
+        erfc_value = 2.0f - erfc_value;
+    }
+    // Restore the original x sign after clamping, correcting the reduced input path.
+    if (!ge_neg_one) {
+        const float correction_scale = z * -2.0f * erfc_value;
+        erfc_value = fmaf(z_hi - z + z_lo, correction_scale, erfc_value);
+    }
+    return erfc_value * 0.5f;
+}
+
+/**
+ * Computes the reciprocal cube root for float inputs.
+ *
+ * The implementation first handles special values with fixed IEEE-style semantics:
+ * NaN propagates, rcbrtf(0) = signed infinity, and rcbrtf(inf) = signed zero.
+ *
+ * For finite nonzero inputs, it uses the identity:
+ *   rcbrtf(x) = exp2(-log2(|x|) / 3)
+ *
+ * Subnormal magnitudes are scaled into the normal range before taking log2:
+ *   |x| * 2^24
+ * and the exponent correction is applied back as -24.
+ *
+ * A Newton-style refinement then corrects the initial exp2 estimate:
+ *   y <- y + (1 - |x| * y^3) * (y / 3)
+ *
+ * For negative x, the magnitude is computed from |x| and the sign is restored
+ * at the end.
+ *
+ * @param x The input value.
+ * @return The computed rcbrtf(x) value.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rcbrtf(float x)
+{
+    // NaN propagates directly.
+    if (isnan(x)) {
+        return x;
+    }
+    // rcbrtf(0) = signed infinity.
+    if (x == 0.0f) {
+        return __internal_with_sign_bit(ASCRT_INF_F, x);
+    }
+    // rcbrtf(inf) = signed zero.
+    if (isinf(x)) {
+        return __internal_with_sign_bit(0.0f, x);
+    }
+
+    // Subnormal magnitudes are scaled into the normal range before taking log2.
+
+    constexpr float one_third = 0.3333333432674407959f; // 1/3, used in the reciprocal cube-root exponent.
+
+    // Compute an initial magnitude estimate from rcbrtf(x) = exp2(-log2(|x|)/3).
+    const float abs_x = fabsf(x);
+    const bool is_normal_or_larger = abs_x >= __internal_subnormal_boundary;
+    float log_input = is_normal_or_larger ? abs_x : abs_x * __internal_fp32_scale_2p24;
+    float exponent = log2f(log_input);
+    if (!is_normal_or_larger) {
+        exponent = exponent + __internal_fp32_subnormal_exponent_fix;
+    }
+
+    // Reconstruct the magnitude and apply one Newton-style correction step.
+    float y = exp2f(exponent * -one_third);
+    const float y_square = y * y;
+    const float abs_x_times_y = abs_x * y;
+    const float correction = fmaf(y_square, -abs_x_times_y, 1.0f);
+    y = fmaf(correction, y * one_third, y);
+    // Restore the sign for negative inputs.
+    if (x < 0.0f) {
+        y = -y;
+    }
+    return y;
+}
+
+/**
+ * Extracts the mantissa bits from the absolute-value bit pattern of a float.
+ *
+ * For normal inputs, the hidden leading 1 is restored into the mantissa field.
+ * For subnormal inputs, the raw mantissa bits are returned unchanged.
+ *
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline uint32_t __asc_float_mantissa_bits_from_abs_bits(uint32_t bits)
+{
+    const uint32_t exponent_bits = bits & ASCRT_EXP_BIT_FLOAT_U;
+    const uint32_t mantissa_bits = bits & ASCRT_MAN_BIT_FLOAT_U;
+    return exponent_bits == 0U ? mantissa_bits : (mantissa_bits | 0x00800000U);
+}
+
+/**
+ * Returns the effective binary exponent for a float bit pattern.
+ *
+ * Subnormal inputs are treated as having exponent -149, while normal inputs
+ * are converted from biased exponent bits to the corresponding unbiased value.
+ *
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline int32_t __asc_float_mantissa_exponent_from_abs_bits(uint32_t bits)
+{
+    const uint32_t exponent_bits = bits & ASCRT_EXP_BIT_FLOAT_U;
+    return exponent_bits == 0U ? -__internal_fp32_subnormal_bias :
+                                 (static_cast<int32_t>(exponent_bits >> __internal_fp32_exponent_shift) - 150);
+}
+
+/**
+ * Computes floor(log2(x)) for an unsigned integer by repeated shifting.
+ *
+ * This helper is used to locate the highest set bit in a mantissa-like value,
+ * which in turn determines how to normalize the reconstructed remainder.
+ *
+ * @param x Input unsigned integer.
+ * @return The floor of log2(x), or 0 for x == 0.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline int32_t __asc_uint_floor_log2(uint32_t x)
+{
+    int32_t shift = 0;
+    while ((x >> 1U) != 0U) {
+        x >>= 1U;
+        ++shift;
+    }
+    return shift;
+}
+
+/**
+ * Reconstructs a float from a mantissa integer and an exponent.
+ *
+ * The mantissa is normalized when possible, with separate handling for:
+ * - zero mantissa,
+ * - overflow to infinity,
+ * - underflow to zero,
+ * - normal-range results,
+ * - subnormal results.
+ *
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_make_float_from_mantissa(uint32_t mantissa, int32_t exponent)
+{
+    if (mantissa == 0U) {
+        return 0.0f;
+    }
+
+    const int32_t mantissa_log2 = __asc_uint_floor_log2(mantissa);
+    const int32_t result_exponent = exponent + mantissa_log2;
+    if (result_exponent > 127) {
+        return ASCRT_INF_F;
+    }
+    if (result_exponent < -__internal_fp32_subnormal_bias) {
+        return 0.0f;
+    }
+    if (result_exponent >= -126) {
+        const uint32_t normalized_mantissa = mantissa << static_cast<uint32_t>(23 - mantissa_log2);
+        const uint32_t bits = (static_cast<uint32_t>(result_exponent + 127) << __internal_fp32_exponent_shift) |
+                              (normalized_mantissa & ASCRT_MAN_BIT_FLOAT_U);
+        return __uint_as_float(bits);
+    }
+
+    const uint32_t subnormal_shift = static_cast<uint32_t>(exponent + __internal_fp32_subnormal_bias);
+    return __uint_as_float(mantissa << subnormal_shift);
+}
+
+/**
+ * Adjusts a float absolute-value bit pattern for one extra exponent step.
+ *
+ * The helper is used by the remquo core when the remainder mantissa must be
+ * advanced to the next representable absolute float during quotient tracking.
+ *
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline uint32_t __asc_double_abs_float_bits(uint32_t abs_bits)
+{
+    if (abs_bits >= ASCRT_INF_U) {
+        return abs_bits;
+    }
+    const uint32_t exponent_bits = abs_bits & ASCRT_EXP_BIT_FLOAT_U;
+    if (exponent_bits == 0U) {
+        return (abs_bits & ASCRT_MAN_BIT_FLOAT_U) << 1U;
+    }
+    if (exponent_bits == 0x7F000000U) {
+        return ASCRT_INF_U;
+    }
+    return abs_bits + 0x00800000U;
+}
+
+/**
+ * Computes the unsigned-magnitude remainder for remquo and tracks low quotient bits.
+ *
+ * The routine compares the absolute-value bit patterns of x and y, reconstructs
+ * mantissa/exponent pairs, and performs a bitwise long-division style reduction
+ * to obtain:
+ *   remainder ~= abs(x) mod abs(y)
+ * along with the low quotient bits needed by remquo.
+ *
+ * @param abs_x_bits Absolute bit pattern of |x|.
+ * @param abs_y_bits Absolute bit pattern of |y|.
+ * @param quo_abs_low Output low bits of the unsigned quotient magnitude.
+ * @return The unsigned remainder as a float.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_remquo_core(
+    uint32_t abs_x_bits, uint32_t abs_y_bits, uint32_t* quo_abs_low)
+{
+    uint32_t quotient_low = 0U;
+    if (abs_x_bits < abs_y_bits) {
+        *quo_abs_low = 0U;
+        return __uint_as_float(abs_x_bits);
+    }
+
+    // Reconstruct mantissa and exponent information for both inputs.
+    uint32_t remainder_mantissa = __asc_float_mantissa_bits_from_abs_bits(abs_x_bits);
+    const uint32_t y_mantissa = __asc_float_mantissa_bits_from_abs_bits(abs_y_bits);
+    const int32_t x_exponent = __asc_float_mantissa_exponent_from_abs_bits(abs_x_bits);
+    const int32_t y_exponent = __asc_float_mantissa_exponent_from_abs_bits(abs_y_bits);
+    const int32_t exponent_diff = x_exponent - y_exponent;
+
+    // Use a bit-serial division path when x is at least as large as y in exponent.
+    if (exponent_diff >= 0 && y_mantissa != 0U) {
+        uint32_t remainder_bits = 0U;
+        const int32_t x_mantissa_log2 = __asc_uint_floor_log2(remainder_mantissa);
+        for (int32_t bit = x_mantissa_log2; bit >= 0; --bit) {
+            remainder_bits = (remainder_bits << 1U) | ((remainder_mantissa >> static_cast<uint32_t>(bit)) & 1U);
+            quotient_low = (quotient_low << 1U) & ASCRT_REMQUO_MASK_F;
+            if (remainder_bits >= y_mantissa) {
+                remainder_bits -= y_mantissa;
+                quotient_low |= 1U;
+            }
+        }
+        for (int32_t bit = 0; bit < exponent_diff; ++bit) {
+            remainder_bits <<= 1U;
+            quotient_low = (quotient_low << 1U) & ASCRT_REMQUO_MASK_F;
+            if (remainder_bits >= y_mantissa) {
+                remainder_bits -= y_mantissa;
+                quotient_low |= 1U;
+            }
+        }
+        remainder_mantissa = static_cast<uint32_t>(remainder_bits);
+    }
+
+    *quo_abs_low = quotient_low;
+    return __asc_make_float_from_mantissa(remainder_mantissa, y_exponent);
+}
+
+/**
+ * Applies the final remquo tail adjustment to the provisional remainder.
+ *
+ * If 2 * remainder exceeds |y|, or exactly ties with an odd low quotient bit,
+ * the remainder is nudged by one divisor step and the quotient low bits are
+ * incremented accordingly.
+ *
+ * @param abs_y_bits Absolute bit pattern of |y|.
+ * @param remainder Provisional remainder, updated in place.
+ * @param quotient_low Low quotient bits, updated in place.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline void __asc_remquo_tail(
+    uint32_t abs_y_bits, float* remainder, uint32_t* quotient_low)
+{
+    const float abs_y = __uint_as_float(abs_y_bits);
+    const float double_remainder = *remainder + *remainder;
+    if (double_remainder > abs_y || (double_remainder == abs_y && ((*quotient_low & 1U) != 0U))) {
+        *remainder = *remainder - abs_y;
+        *quotient_low = (*quotient_low + 1U) & ASCRT_REMQUO_MASK_F;
+    }
+}
+
+/**
+ * Computes remquo(x, y) for float inputs using absolute-value reduction and
+ * quotient-sign reconstruction.
+ *
+ * The implementation first handles special values, then reduces |x| by |y|
+ * with a bitwise quotient tracker, applies the remquo tail correction, restores
+ * the sign of the remainder, and finally folds the quotient sign into the low bits.
+ *
+ * @param x Dividend.
+ * @param y Divisor.
+ * @param quo Output quotient pointer.
+ * @return The computed remainder value.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_remquof_impl(float x, float y, int32_t* quo)
+{
+    constexpr uint32_t abs_mask = 0x7FFFFFFFU;
+    const uint32_t x_bits = __float_as_uint(x);
+    const uint32_t y_bits = __float_as_uint(y);
+    const uint32_t abs_x_bits = x_bits & abs_mask;
+    const uint32_t abs_y_bits = y_bits & abs_mask;
+    *quo = 0;
+
+    // NaN, infinity, and zero-divisor cases follow IEEE-style propagation rules.
+    if (abs_x_bits > ASCRT_INF_U || abs_y_bits > ASCRT_INF_U) {
+        return x + y;
+    }
+    if (abs_x_bits == ASCRT_INF_U || abs_y_bits == 0U) {
+        return ASCRT_INF_F / ASCRT_INF_F;
+    }
+    if (abs_y_bits == ASCRT_INF_U) {
+        return x;
+    }
+
+    uint32_t quotient_low = 0U;
+    float remainder = __asc_remquo_core(abs_x_bits, abs_y_bits, &quotient_low);
+    __asc_remquo_tail(abs_y_bits, &remainder, &quotient_low);
+
+    // Restore the sign of the remainder to match the sign of x.
+    if ((x_bits & ASCRT_NEG_SIGN_BIT_U) != 0U) {
+        const float abs_remainder = fabsf(remainder);
+        if (abs_remainder <= ASCRT_INF_F) {
+            remainder = -remainder;
+        }
+    }
+
+    // Fold the sign of the quotient into the low quotient bits.
+    const bool quotient_is_negative = ((x_bits ^ y_bits) & ASCRT_NEG_SIGN_BIT_U) != 0U;
+    const int32_t sign_mask = quotient_is_negative ? -1 : 0;
+    *quo = (static_cast<int32_t>(quotient_low) ^ sign_mask) - sign_mask;
+    if (fabsf(remainder) > ASCRT_INF_F) {
+        *quo = 0;
+    }
+    return remainder;
+}
+
+#define __INTERNAL_REMQUOF(x, y, quo)                           \
+    do {                                                        \
+        int32_t tmp_quo = 0;                                    \
+        float tmp_res = __asc_remquof_impl((x), (y), &tmp_quo); \
+        *(quo) = tmp_quo;                                       \
+        return tmp_res;                                         \
+    } while (0)
+
+/**
+ * Computes remquof(x, y) and stores the quotient in quo.
+ *
+ * This is a thin wrapper around the internal remquo implementation used by
+ * the SIMT math library.
+ *
+ * @param x Dividend.
+ * @param y Divisor.
+ * @param quo Output quotient pointer.
+ * @return The computed remainder value.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, int* quo) { __INTERNAL_REMQUOF(x, y, quo); }
+
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifdef __NPU_ARCH__
+#ifndef ASCENDC_CPU_DEBUG
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, __ubuf__ int* quo)
+{
+    __INTERNAL_REMQUOF(x, y, quo);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, __gm__ int* quo)
+{
+    __INTERNAL_REMQUOF(x, y, quo);
+}
+#endif
+#endif
+#endif
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float remainderf(float x, float y)
+{
+    int32_t quo = -1;
+    return remquof(x, y, &quo);
+}
+
+/**
+ * Computes the reciprocal hypotenuse for float inputs.
+ *
+ * The implementation first reduces the input pair to absolute values and
+ * chooses the smaller/larger magnitude for stable scaling.  The larger value
+ * determines a shared power-of-two scale factor so that the squared sum stays
+ * in a numerically safe range.
+ *
+ * With the scaled values, the core formula is:
+ *   rhypotf(x, y) = 1 / sqrt(x^2 + y^2)
+ *
+ * rewritten as:
+ *   scale = 2^k
+ *   square_sum = (scaled_max)^2 + (scaled_min)^2
+ *   result = rsqrt(square_sum) * scale
+ *
+ * This keeps the intermediate square sum well-conditioned while preserving
+ * the final magnitude after rescaling.
+ *
+ * @param x The first input value.
+ * @param y The second input value.
+ * @return The computed rhypotf(x, y) value.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rhypotf(float x, float y)
+{
+    // Shared scaling constants used to keep the squared sum in range.
+    constexpr uint32_t scale_base = 0x7E800000U;
+    constexpr uint32_t scale_mask = 0xFE000000U;
+
+    // Work with absolute values, then pick the smaller and larger magnitudes.
+    const float abs_x = fabsf(x);
+    const float abs_y = fabsf(y);
+    const uint32_t abs_x_bits = __float_as_uint(abs_x);
+    const uint32_t abs_y_bits = __float_as_uint(abs_y);
+    const uint32_t min_bits = abs_x_bits < abs_y_bits ? abs_x_bits : abs_y_bits;
+    const uint32_t max_bits = abs_x_bits > abs_y_bits ? abs_x_bits : abs_y_bits;
+    const float min_abs = __uint_as_float(min_bits);
+    const float max_abs = __uint_as_float(max_bits);
+
+    // Build a power-of-two scale from the larger magnitude so the sum of squares remains stable.
+    const float scale = __uint_as_float(scale_base - (max_bits & scale_mask));
+    const float scaled_min = min_abs * scale;
+    const float scaled_max = max_abs * scale;
+    // Evaluate the scaled square sum and take the reciprocal square root.
+    const float square_sum = fmaf(scaled_max, scaled_max, scaled_min * scaled_min);
+    const float result = rsqrtf(square_sum) * scale;
+
+    // If the smaller magnitude is infinite, the reciprocal hypotenuse collapses to zero.
+    return min_abs == ASCRT_INF_F ? 0.0f : result;
+}
+
+/**
+ * Computes the reciprocal Euclidean norm for three float inputs.
+ *
+ * The implementation first validates special values: any infinity collapses
+ * the reciprocal norm to 0, and any NaN propagates as NaN.
+ *
+ * For finite inputs, it scales the largest magnitude into a safe range and
+ * evaluates:
+ *   rnorm3df(a, b, c) = 1 / sqrt(a^2 + b^2 + c^2)
+ *
+ * The squared sum is accumulated on scaled magnitudes to avoid overflow:
+ *   scale = 2^k
+ *   square_sum = (scaled_a)^2 + (scaled_b)^2 + (scaled_c)^2
+ *
+ * If the squared sum becomes subnormal, it is temporarily scaled up before
+ * the reciprocal square root and scaled back after the Newton correction.
+ *
+ * @param a The first input value.
+ * @param b The second input value.
+ * @param c The third input value.
+ * @return The computed reciprocal 3D norm.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm3df(float a, float b, float c)
+{
+    // Shared scaling constants used to keep the squared sum numerically safe.
+    constexpr uint32_t scale_base = 0x7E800000U; // fp32 scale anchor used to build a power-of-two rescaling factor.
+    constexpr uint32_t scale_mask = 0xFE000000U; // Mask that keeps the sign/exponent region and clears mantissa bits.
+
+    constexpr float rsqrt_subnormal_scale = 4096.0f; // 2^12, compensates the temporary scaling after rsqrt refinement.
+
+    // Work with absolute values so the norm depends only on magnitudes.
+    const float abs_a = fabsf(a);
+    const float abs_b = fabsf(b);
+    const float abs_c = fabsf(c);
+    if (isinf(abs_a) || isinf(abs_b) || isinf(abs_c)) {
+        return 0.0f;
+    }
+    if (isnan(abs_a) || isnan(abs_b) || isnan(abs_c)) {
+        return ASCRT_INF_F / ASCRT_INF_F;
+    }
+
+    // Sort magnitudes so the largest term determines the scaling exponent.
+    const float max_ab = fmaxf(abs_a, abs_b);
+    const float min_ab = fminf(abs_a, abs_b);
+    const float max_abs = fmaxf(abs_c, max_ab);
+    const float mid_abs = fminf(abs_c, max_ab);
+    const uint32_t max_bits = __float_as_uint(max_abs);
+    const float scale = __uint_as_float(scale_base - (max_bits & scale_mask));
+
+    // Accumulate the scaled sum of squares in magnitude order.
+    const float scaled_min = min_ab * scale;
+    const float scaled_mid = mid_abs * scale;
+    const float scaled_max = max_abs * scale;
+    float square_sum = scaled_mid * scaled_mid;
+    square_sum = fmaf(scaled_min, scaled_min, square_sum);
+    square_sum = fmaf(scaled_max, scaled_max, square_sum);
+
+    // Subnormal squared sums are temporarily lifted before rsqrtf.
+    const bool is_subnormal_square_sum = fabsf(square_sum) < __internal_subnormal_boundary;
+    if (is_subnormal_square_sum) {
+        square_sum *= __internal_fp32_scale_2p24;
+    }
+    // Zero norm means the reciprocal norm is infinite.
+    if (square_sum == 0.0f) {
+        return ASCRT_INF_F;
+    }
+
+    // Compute an approximate reciprocal norm and refine it with one Newton step.
+    float inv_norm = rsqrtf(square_sum);
+    inv_norm = inv_norm * fmaf(-0.5f * square_sum, inv_norm * inv_norm, 1.5f);
+    if (is_subnormal_square_sum) {
+        inv_norm *= rsqrt_subnormal_scale;
+    }
+    // Restore the outer scale factor.
+    return scale * inv_norm;
+}
+
+/**
+ * Computes the reciprocal Euclidean norm for four float inputs.
+ *
+ * The implementation follows the same structure as rnorm3df:
+ * special-value handling, magnitude scaling, squared-sum accumulation,
+ * subnormal lifting, reciprocal square root, Newton refinement, and final
+ * scale restoration.
+ *
+ * @param a The first input value.
+ * @param b The second input value.
+ * @param c The third input value.
+ * @param d The fourth input value.
+ * @return The computed reciprocal 4D norm.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, float d)
+{
+    // Shared scaling constants used to keep the squared sum numerically safe.
+    constexpr uint32_t scale_base = 0x7E800000U; // fp32 scale anchor used to build a power-of-two rescaling factor.
+    constexpr uint32_t scale_mask = 0xFE000000U; // Mask that keeps the sign/exponent region and clears mantissa bits.
+
+    constexpr float rsqrt_subnormal_scale = 4096.0f; // 2^12, compensates the temporary scaling after rsqrt refinement.
+
+    // Work with absolute values so the norm depends only on magnitudes.
+    const float abs_a = fabsf(a);
+    const float abs_b = fabsf(b);
+    const float abs_c = fabsf(c);
+    const float abs_d = fabsf(d);
+    if (isinf(abs_a) || isinf(abs_b) || isinf(abs_c) || isinf(abs_d)) {
+        return 0.0f;
+    }
+    if (isnan(abs_a) || isnan(abs_b) || isnan(abs_c) || isnan(abs_d)) {
+        return ASCRT_INF_F / ASCRT_INF_F;
+    }
+
+    // Sort magnitudes so the largest term determines the scaling exponent.
+    const float max_ab = fmaxf(abs_a, abs_b);
+    const float min_ab = fminf(abs_a, abs_b);
+    const float max_abc = fmaxf(abs_c, max_ab);
+    const float max_abs = fmaxf(abs_d, max_abc);
+    const float second_abs = fminf(abs_d, max_abc);
+    const float third_abs = fminf(abs_c, max_ab);
+    const uint32_t max_bits = __float_as_uint(max_abs);
+    const float scale = __uint_as_float(scale_base - (max_bits & scale_mask));
+
+    // Accumulate the scaled sum of squares in magnitude order.
+    const float scaled_min = min_ab * scale;
+    const float scaled_second = second_abs * scale;
+    const float scaled_third = third_abs * scale;
+    const float scaled_max = max_abs * scale;
+    float square_sum = scaled_second * scaled_second;
+    square_sum = fmaf(scaled_third, scaled_third, square_sum);
+    square_sum = fmaf(scaled_min, scaled_min, square_sum);
+    square_sum = fmaf(scaled_max, scaled_max, square_sum);
+
+    // Subnormal squared sums are temporarily lifted before rsqrtf.
+    const bool is_subnormal_square_sum = fabsf(square_sum) < __internal_subnormal_boundary;
+    if (is_subnormal_square_sum) {
+        square_sum *= __internal_fp32_scale_2p24;
+    }
+    // Zero norm means the reciprocal norm is infinite.
+    if (square_sum == 0.0f) {
+        return ASCRT_INF_F;
+    }
+
+    // Compute an approximate reciprocal norm and refine it with one Newton step.
+    float inv_norm = rsqrtf(square_sum);
+    inv_norm = inv_norm * fmaf(-0.5f * square_sum, inv_norm * inv_norm, 1.5f);
+    if (is_subnormal_square_sum) {
+        inv_norm *= rsqrt_subnormal_scale;
+    }
+    // Restore the outer scale factor.
+    return scale * inv_norm;
+}
+
+#endif // ASCENDC_USE_LEGACY_PRECISION
 
 #endif
 #endif // IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
