@@ -8,16 +8,20 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <cstdio>
+#include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "alg_env_config.h"
 #include "all_gather_auto_selector.h"
 #include "cann_host_bridge.h"
+#include "channel.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "executor_v2_base.h"
 #include "gtest/gtest.h"
+#include "ins_temp_all_gather_nhr.h"
 
 using namespace mc2_ops_hccl;
 
@@ -52,6 +56,34 @@ TopoInfoWithNetLayerDetails MakeConcurrentTopo(u32 rankSize = 4U)
     return topo;
 }
 
+TopoInfoWithNetLayerDetails MakeMultiJettyTopo()
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = 16U;
+    topo.serverNum = 1U;
+    topo.level0Topo = Level0Shape::MESH_1D_CLOS;
+    topo.topoLevelNums = 1U;
+    topo.level0PcieMix = false;
+    topo.netLayerDetails.localNetInsSizeOfLayer = {8U};
+    topo.topoInstDetailsOfLayer.resize(1U);
+    topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_1DMESH] = {8U};
+    topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_CLOS] = {16U};
+    return topo;
+}
+
+std::map<u32, std::vector<ChannelInfo>> MakeChannelMap(const std::vector<std::pair<u32, u32>>& rankAndCounts)
+{
+    std::map<u32, std::vector<ChannelInfo>> channels;
+    for (const auto& item : rankAndCounts) {
+        channels[item.first] = std::vector<ChannelInfo>(item.second);
+        for (ChannelInfo& channel : channels[item.first]) {
+            channel.portGroupSize = 1U;
+        }
+    }
+    return channels;
+}
+
 } // namespace
 
 class ST_ALL_GATHER_AICPU_TEST : public ::testing::Test {
@@ -67,12 +99,14 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_all_gather_does_not_use_cann_bridge)
     EXPECT_FALSE(UseCannBridge(MakeAicpuParam(COMM_ENGINE_CPU)));
 }
 
-TEST_F(ST_ALL_GATHER_AICPU_TEST, local_registry_contains_concurrent_algorithm)
+TEST_F(ST_ALL_GATHER_AICPU_TEST, local_registry_contains_all_gather_algorithms)
 {
     CollAlgExecRegistryV2& registry = CollAlgExecRegistryV2::Instance();
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "InsAllGatherMesh1D"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSoleNHR"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherConcurMeshNHR"), nullptr);
+    EXPECT_NE(
+        registry.GetAlgExec(HCCL_CMD_ALLGATHER, "InsAllGatherParallelMesh1DNHRMultiJetty"), nullptr);
 }
 
 TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_obeys_count_and_rank_boundaries)
@@ -119,6 +153,34 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, concurrent_executor_calculates_resources_with_h
     EXPECT_EQ(request.notifyNumPerThread, std::vector<u32>({1U, 1U, 2U, 2U}));
     ASSERT_EQ(request.channels.size(), 1U);
     EXPECT_EQ(request.channels[0].size(), 6U);
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, multijetty_selector_uses_algorithm_for_uneven_mesh_clos_topology)
+{
+    AllGatherAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeMultiJettyTopo();
+    OpParam param = MakeAicpuParam();
+    param.DataDes.count = SMALL_COUNT_512KB / sizeof(float) + 1U;
+    std::string algName;
+
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "InsAllGatherParallelMesh1DNHRMultiJetty");
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, multijetty_template_uses_runtime_channel_counts)
+{
+    InsTempAllGatherNHR nhr(MakeAicpuParam(), 0U, {{0U, 1U, 2U, 3U}});
+    const auto channels = MakeChannelMap({{1U, 4U}, {2U, 2U}});
+
+    ASSERT_EQ(nhr.SetchannelsPerRank(channels), HCCL_SUCCESS);
+    EXPECT_EQ(nhr.GetThreadNum(), 8U);
+
+    std::vector<u64> elemCount;
+    std::vector<u64> sizeOut;
+    std::vector<u64> elemOffset;
+    ASSERT_EQ(
+        nhr.CalcDataSplitByPortGroup(1024U, 4U, channels.at(1U), elemCount, sizeOut, elemOffset), HCCL_SUCCESS);
+    EXPECT_EQ(sizeOut.size(), 2U);
 }
 
 } // namespace checker

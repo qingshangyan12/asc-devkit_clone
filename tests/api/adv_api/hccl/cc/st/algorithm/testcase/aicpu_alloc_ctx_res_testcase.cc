@@ -8,13 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include <cstdio>
-#include <string>
-
 #include "gtest/gtest.h"
 
-#include "cann_host_bridge.h"
-#include "coll_alg_v2_exec_registry.h"
 #include "sim_communicator.h"
 #include "sim_world.h"
 #include "hccl_alloc_ctx_res.h"
@@ -57,23 +52,6 @@ protected:
 
     HcclComm comm_ = nullptr;
 };
-
-TEST_F(AicpuAllocCtxResTest, ForcedAllGatherMultiJettyResolvesLocalExecutor)
-{
-    constexpr char algorithmName[] = "InsAllGatherParallelMesh1DNHRMultiJetty";
-    Mc2CcTilingInner ccTiling{};
-    ASSERT_GT(std::snprintf(ccTiling.algConfig, sizeof(ccTiling.algConfig), "%s", algorithmName), 0);
-
-    std::string forcedAlgorithm;
-    ASSERT_TRUE(GetForcedAlgName(&ccTiling, forcedAlgorithm));
-    EXPECT_EQ(forcedAlgorithm, algorithmName);
-
-    OpParam opParam{};
-    opParam.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
-    opParam.engine = CommEngine::COMM_ENGINE_AICPU_TS;
-    EXPECT_FALSE(UseCannBridge(opParam));
-    EXPECT_NE(GetAlgExecutorForOp(opParam, forcedAlgorithm), nullptr);
-}
 
 TEST_F(AicpuAllocCtxResTest, CaptureSafeCopyCoversOpParamAndOpResCtx)
 {

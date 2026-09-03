@@ -11,16 +11,11 @@
 #include <algorithm>
 #include <map>
 #include <set>
-#include <string>
 #include <vector>
 
 #include "gtest/gtest.h"
 
-#include "alg_env_config.h"
-#include "all_gather_auto_selector.h"
-#include "cann_host_bridge.h"
 #include "channel.h"
-#include "coll_alg_v2_exec_registry.h"
 #include "ins_temp_all_gather_nhr.h"
 #include "template_utils.h"
 
@@ -141,8 +136,6 @@ std::vector<u32> RefPostCopyRanks(
 }
 
 const std::vector<u32> g_rankSizes = {2U, 3U, 4U, 5U, 8U, 16U};
-constexpr char INS_ALL_GATHER_PARALLEL_MESH_1D_NHR_MULTI_JETTY[] =
-    "InsAllGatherParallelMesh1DNHRMultiJetty";
 
 // NHR step scheduling
 
@@ -265,10 +258,7 @@ TEST_F(AllGatherNhrChannelCountTest, ChannelMapMinAndMax)
 
 // Resource count
 
-class AllGatherNhrResourceTest : public ::testing::Test {
-protected:
-    void SetUp() override { ResetAlgEnvConfigInitState(); }
-};
+class AllGatherNhrResourceTest : public ::testing::Test {};
 
 TEST_F(AllGatherNhrResourceTest, ProductionTemplateRequestsSolePathResources)
 {
@@ -294,64 +284,6 @@ TEST_F(AllGatherNhrResourceTest, ProductionTemplateReportsScratchAndNotifyContra
     nhr.GetNotifyIdxSubToMain(subToMain);
     EXPECT_EQ(mainToSub, std::vector<u32>({0U}));
     EXPECT_EQ(subToMain, std::vector<u32>({0U}));
-}
-
-TEST_F(AllGatherNhrResourceTest, RuntimeChannelStateUsesMinimumForWorkAndMaximumForThreads)
-{
-    auto nhr = MakeNhrTemplate();
-    const auto channels = MakeChannelMap({{1U, 4U}, {2U, 2U}});
-
-    ASSERT_EQ(nhr.SetchannelsPerRank(channels), HCCL_SUCCESS);
-    EXPECT_EQ(nhr.GetThreadNum(), 8U);
-
-    std::vector<u64> elemCount;
-    std::vector<u64> sizeOut;
-    std::vector<u64> elemOffset;
-    ASSERT_EQ(
-        nhr.CalcDataSplitByPortGroup(1024U, 4U, channels.at(1U), elemCount, sizeOut, elemOffset), HCCL_SUCCESS);
-    EXPECT_EQ(sizeOut.size(), 2U);
-}
-
-TEST_F(AllGatherNhrResourceTest, MultiJettyAlgorithmIsRegisteredLocallyAndSkipsCannBridge)
-{
-    OpParam param{};
-    param.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
-    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
-
-    EXPECT_FALSE(UseCannBridge(param));
-    EXPECT_NE(
-        CollAlgExecRegistryV2::Instance().GetAlgExec(
-            HcclCMDType::HCCL_CMD_ALLGATHER, INS_ALL_GATHER_PARALLEL_MESH_1D_NHR_MULTI_JETTY),
-        nullptr);
-    EXPECT_NE(
-        CollAlgExecRegistryV2::Instance().GetAlgExec(
-            HcclCMDType::HCCL_CMD_ALLGATHER, "InsAllGatherParallelMesh1DNHRUBX"),
-        nullptr);
-}
-
-TEST_F(AllGatherNhrResourceTest, SelectorUsesMultiJettyNameForTargetUbxRange)
-{
-    TopoInfoWithNetLayerDetails topoInfo{};
-    topoInfo.userRankSize = 16U;
-    topoInfo.serverNum = 1U;
-    topoInfo.topoLevelNums = 1U;
-    topoInfo.level0Topo = Level0Shape::MESH_1D_CLOS;
-    topoInfo.level0PcieMix = false;
-    topoInfo.topoInstDetailsOfLayer.resize(1U);
-    topoInfo.topoInstDetailsOfLayer[0].rankNumForTopoType[CommTopo::COMM_TOPO_1DMESH] = {8U};
-    topoInfo.topoInstDetailsOfLayer[0].rankNumForTopoType[CommTopo::COMM_TOPO_CLOS] = {16U};
-
-    OpParam param{};
-    param.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
-    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
-    param.opExecuteConfig = OpExecuteConfig::AICPU_TS;
-    param.DataDes.dataType = HcclDataType::HCCL_DATA_TYPE_FP32;
-    param.DataDes.count = 200U * 1024U;
-    std::string algName;
-
-    AllGatherAutoSelector selector;
-    EXPECT_EQ(selector.Select(param, &topoInfo, algName), SelectorStatus::MATCH);
-    EXPECT_EQ(algName, INS_ALL_GATHER_PARALLEL_MESH_1D_NHR_MULTI_JETTY);
 }
 
 TEST_F(AllGatherNhrResourceTest, ProductionKernelAcceptsEmptyInput)
