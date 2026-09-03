@@ -33,6 +33,8 @@
 
 ```cpp
 __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config)
+__aicore__ inline void asc_set_l13d_fmatrix_b(uint16_t fmatrix_w, uint16_t fmatrix_h,
+    uint8_t pad_left, uint8_t pad_right, uint8_t pad_top, uint8_t pad_bottom)
 ```
 
 ## 参数说明

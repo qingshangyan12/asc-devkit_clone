@@ -50,6 +50,7 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c2gm_config_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_compute_impl/asc_get_l0c2gm_config_impl.h"
 
+[[deprecated("NOTICE: asc_set_l0c2gm_config is deprecated. Please use asc_set_l0c_copy_config instead.")]]
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
 {
     asc_set_l0c2gm_config_impl(relu_pre, quant_pre, enable_unit_flag);
@@ -2410,9 +2411,17 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 
 __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config) { asc_set_l13d_fmatrix_b_impl(config); }
 
-__aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config) { asc_set_l0c2gm_lrelu_alpha_impl(config); }
+[[deprecated("NOTICE: asc_set_l0c2gm_lrelu_alpha is deprecated. Please use asc_set_l0c_copy_lrelu_alpha instead.")]]
+__aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config)
+{
+    asc_set_l0c2gm_lrelu_alpha_impl(config);
+}
 
-__aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config) { asc_set_l0c2gm_lrelu_alpha_impl(config); }
+[[deprecated("NOTICE: asc_set_l0c2gm_lrelu_alpha is deprecated. Please use asc_set_l0c_copy_lrelu_alpha instead.")]]
+__aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config)
+{
+    asc_set_l0c2gm_lrelu_alpha_impl(config);
+}
 
 #endif
 
