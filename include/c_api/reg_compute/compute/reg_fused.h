@@ -14,7 +14,7 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_COMPUTE_REG_FUSED_H
 #endif
 
 #ifndef INCLUDE_C_API_REG_COMPUTE_COMPUTE_REG_FUSED_H
@@ -31,9 +31,19 @@ __simd_callee__ inline void asc_relu(vector_int32_t& dst, vector_int32_t src, ve
 
 __simd_callee__ inline void asc_relu(vector_float& dst, vector_float src, vector_bool mask);
 
+__simd_callee__ inline vector_half asc_relu(vector_half src, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_relu(vector_int32_t src, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_relu(vector_float src, vector_bool mask);
+
 __simd_callee__ inline void asc_abs_sub(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
 __simd_callee__ inline void asc_abs_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_abs_sub(vector_half src0, vector_half src1, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_abs_sub(vector_float src0, vector_float src1, vector_bool mask);
 
 __simd_callee__ inline void asc_axpy(vector_half& dst, vector_half src, half value, vector_bool mask);
 
@@ -43,13 +53,36 @@ __simd_callee__ inline void asc_muls(vector_half& dst, vector_float src, float v
 
 __simd_callee__ inline void asc_muls_v2(vector_half& dst, vector_float src, float value, vector_bool mask);
 
+__simd_callee__ inline void asc_mul_scalar_float2half_rn(
+    vector_half& dst, vector_float src, float value, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_mul_scalar_float2half_rn(
+    vector_half& dst, vector_float src, float value, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(
+    vector_float src, float value, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline vector_half asc_mul_scalar_float2half_rn(
+    vector_float src, float value, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
 __simd_callee__ inline void asc_madd(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
 
 __simd_callee__ inline void asc_madd(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
-__simd_callee__ inline void asc_leakyrelu(vector_float& dst, vector_float src, float value, vector_bool mask);
+__simd_callee__ inline void asc_madd(
+    vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask);
 
-__simd_callee__ inline void asc_leakyrelu(vector_half& dst, vector_half src, half value, vector_bool mask);
+__simd_callee__ inline void asc_leakyrelu(vector_float& dst, vector_float src, float alpha, vector_bool mask);
+
+__simd_callee__ inline void asc_leakyrelu(vector_half& dst, vector_half src, half alpha, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_leakyrelu(vector_float src, float alpha, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_leakyrelu(vector_half src, half alpha, vector_bool mask);
 
 __simd_callee__ inline void asc_exp_sub(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
@@ -61,9 +94,26 @@ __simd_callee__ inline void asc_exp_sub_half2float(
     vector_float& dst, vector_half src0, vector_half src1, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos);
 
-__simd_callee__ inline void asc_prelu(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+__simd_callee__ inline vector_float asc_exp_sub(vector_float src0, vector_float src1, vector_bool mask);
 
-__simd_callee__ inline void asc_prelu(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask);
+__simd_callee__ inline vector_float asc_exp_sub_half2float(
+    vector_half src0, vector_half src1, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos);
+
+__simd_callee__ inline vector_float asc_exp_sub_half2float(
+    vector_half src0, vector_half src1, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos);
+
+#endif
+
+__simd_callee__ inline void asc_prelu(vector_float& dst, vector_float src0, vector_float alpha, vector_bool mask);
+
+__simd_callee__ inline void asc_prelu(vector_half& dst, vector_half src0, vector_half alpha, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_prelu(vector_float src0, vector_float alpha, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_prelu(vector_half src0, vector_half alpha, vector_bool mask);
 
 //=================asc_mula==================
 __simd_callee__ inline void asc_mula(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask);
@@ -105,7 +155,7 @@ asc_exp_sub_v2(vector_float& dst, vector_float src0, vector_float src1, vector_b
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_COMPUTE_REG_FUSED_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_COMPUTE_REG_FUSED_H
 #endif

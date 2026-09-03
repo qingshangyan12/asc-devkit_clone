@@ -9,8 +9,10 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_hf32_round_mode](defs/enum/asc_hf32_round_mode.md)|表示Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略。|`c_api/defs/enum.h`|
-|[asc_load_l2_cache_mode](defs/enum/asc_load_l2_cache_mode.md)|表示数据从GM搬运到UB时的L2 cache策略。|`c_api/defs/enum.h`|
-|[asc_store_l2_cache_mode](defs/enum/asc_store_l2_cache_mode.md)|表示数据从UB搬运到GM时的L2 cache策略。|`c_api/defs/enum.h`|
+|[asc_load_l2_cache_mode](defs/enum/asc_load_l2_cache_mode.md)|表示数据从GM搬运到UB时的L2 cache策略，也可用于标量load策略配置。|`c_api/defs/enum.h`|
+|[asc_override_strategy](defs/enum/asc_override_strategy.md)|表示饱和控制策略。|`c_api/defs/enum.h`|
+|[asc_saturation_mode](defs/enum/asc_saturation_mode.md)|表示饱和控制模式。|`c_api/defs/enum.h`|
+|[asc_store_l2_cache_mode](defs/enum/asc_store_l2_cache_mode.md)|表示数据从UB搬运到GM时的L2 cache策略，也可用于标量store策略配置。|`c_api/defs/enum.h`|
 
 ### 联合体
 
@@ -77,6 +79,8 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_enable_hf32](cube_compute/asc_enable_hf32.md)|用于设置Mmad计算开启HF32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32。|`c_api/cube_compute/cube_compute.h`|
 |[asc_enable_hf32_trans](cube_compute/asc_enable_hf32_trans.md)|设置HF32模式取整方式，需要先使用asc_enable_hf32开启HF32取整模式。|`c_api/cube_compute/cube_compute.h`|
 |[asc_enable_hif8](cube_compute/asc_enable_hif8.md)|用于设置Mmad计算开启HiF8模式，开启该模式后L0A Buffer/L0B Buffer中的8bit数据将在参与矩阵乘法运算前被转化为hifloat8_t类型数据。|`c_api/cube_compute/cube_compute.h`|
+|[asc_disable_hif8](cube_compute/asc_disable_hif8.md)|用于设置Mmad计算关闭HiF8模式，设置该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。|`c_api/cube_compute/cube_compute.h`|
+|[asc_disable_hf32](cube_compute/asc_disable_hf32.md)|用于设置Mmad计算关闭HF32模式，设置该模式后L0A Buffer/L0B Buffer中的FP32数据在参与Mmad计算之前不做舍入处理。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad](cube_compute/asc_mmad.md)|完成矩阵乘加操作。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad_mx](cube_compute/asc_mmad_mx.md)|完成包含放缩功能的矩阵乘加操作。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad_sparse](cube_compute/asc_mmad_sparse.md)|完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。|`c_api/cube_compute/cube_compute.h`|
@@ -122,6 +126,8 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_gm2l1_loop_size](cube_datamove/asc_set_gm2l1_loop_size.md)|将数据从GM搬运到L1 Buffer时，设置数据搬运流程中的循环次数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_gm2l1_nz_para](cube_datamove/asc_set_gm2l1_nz_para.md)|设置MTE2_NZ_PARA寄存器的值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_gm2l1_pad](cube_datamove/asc_set_gm2l1_pad.md)|将数据从GM非对齐搬运到L1 Buffer时，设置连续搬运数据块左右两侧的填充值。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_l0c_copy_nz_para](cube_datamove/asc_set_l0c_copy_nz_para.md)|数据搬运过程中进行随路格式转换（NZ格式转换为ND格式）时，设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_l0c_copy_channel_para](cube_datamove/asc_set_l0c_copy_channel_para.md)|配置Nz2DN格式转换时源Nz矩阵中相邻行的地址偏移。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_channel_para](cube_datamove/asc_set_l0c2gm_channel_para.md)|对通道步长参数的专用寄存器的比特位进行设置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_config](cube_datamove/asc_set_l0c2gm_config.md)|数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_lrelu_alpha](cube_datamove/asc_set_l0c2gm_lrelu_alpha.md)|用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值。该值只支持half和float两种数据类型。|`c_api/cube_datamove/cube_datamove.h`|
@@ -133,6 +139,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_l12l0_padding_val](cube_datamove/asc_set_l12l0_padding_val.md)|设置PADDING_B寄存器的值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_fmatrix](cube_datamove/asc_set_l13d_fmatrix.md)|设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从左矩阵获取FeatureMap的属性时使用该接口。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_fmatrix_b](cube_datamove/asc_set_l13d_fmatrix_b.md)|设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从右矩阵获取FeatureMap的属性时使用该接口。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_l12l0a_3d_padding](cube_datamove/asc_set_l12l0a_3d_padding.md)|设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_padding](cube_datamove/asc_set_l13d_padding.md)|设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_rpt](cube_datamove/asc_set_l13d_rpt.md)|用于设置Load3Dv2接口的repeat参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md)|设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。|`c_api/cube_datamove/cube_datamove.h`|
@@ -325,6 +332,8 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_loadalign](reg_compute/load/asc_loadalign.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，NORM搬入模式。|`c_api/reg_compute/load/loadalign.h`|
+|[asc_loadalign_datablock_strided](reg_compute/load/asc_loadalign_datablock_strided.md)|对齐数据搬运接口，从UB非连续对齐搬入8个DataBlock，通过函数返回值返回矢量数据寄存器。|`c_api/reg_compute/load/loadalign.h`|
+|[asc_loadalign_mask](reg_compute/load/asc_loadalign_mask.md)|对齐数据搬运接口，从UB连续对齐搬入掩码数据，通过函数返回值返回掩码寄存器。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_brc_datablock](reg_compute/load/asc_loadalign_brc_datablock.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，读取一个DataBlock并广播到VL。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_brc_datablock_postupdate](reg_compute/load/asc_loadalign_brc_datablock_postupdate.md)|对齐数据搬运接口，读取一个DataBlock并广播到VL，启用Post Update。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_brc_elem](reg_compute/load/asc_loadalign_brc_elem.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，搬运一个元素并广播到VL。|`c_api/reg_compute/load/loadalign.h`|
@@ -334,6 +343,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_loadalign_deintlv](reg_compute/load/asc_loadalign_deintlv.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，随路完成deinterleave操作。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_deintlv_postupdate](reg_compute/load/asc_loadalign_deintlv_postupdate.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，随路完成deinterleave操作，启用postupdate模式，自动更新UB地址参数。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_downsample](reg_compute/load/asc_loadalign_downsample.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，2倍下采样模式。|`c_api/reg_compute/load/loadalign.h`|
+|[asc_loadalign_mask_downsample](reg_compute/load/asc_loadalign_mask_downsample.md)|对齐数据搬运接口，从UB连续对齐搬入掩码数据，2倍下采样模式，通过函数返回值返回掩码寄存器。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_downsample_postupdate](reg_compute/load/asc_loadalign_downsample_postupdate.md)|对齐数据搬运接口，2倍下采样模式，启用Post Update。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_postupdate](reg_compute/load/asc_loadalign_postupdate.md)|将数据从UB搬入MaskReg，使能post mod。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_unpack](reg_compute/load/asc_loadalign_unpack.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，解压缩模式。|`c_api/reg_compute/load/loadalign.h`|
@@ -341,6 +351,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_loadalign_unpack4_postupdate](reg_compute/load/asc_loadalign_unpack4_postupdate.md)|对齐数据搬运接口，解压缩模式，启用Post Update。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_unpack_postupdate](reg_compute/load/asc_loadalign_unpack_postupdate.md)|对齐数据搬运接口，解压缩模式，启用Post Update。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_upsample](reg_compute/load/asc_loadalign_upsample.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，2倍上采样模式。|`c_api/reg_compute/load/loadalign.h`|
+|[asc_loadalign_mask_upsample](reg_compute/load/asc_loadalign_mask_upsample.md)|对齐数据搬运接口，从UB连续对齐搬入掩码数据，2倍上采样模式，通过函数返回值返回掩码寄存器。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_upsample_postupdate](reg_compute/load/asc_loadalign_upsample_postupdate.md)|对齐数据搬运接口，2倍上采样模式，启用Post Update。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_load](reg_compute/load/asc_load.md)|reg计算数据搬运接口，支持从UB非32字节对齐的源地址src搬运至矢量数据寄存器，搬运量为VL。|`c_api/composite/loadunalign_composite.h`|
 |[asc_loadunalign](reg_compute/load/asc_loadunalign.md)|reg计算数据搬运接口，适用于从UB非32B对齐的起始地址连续搬入矢量数据寄存器的场景。|`c_api/reg_compute/load/loadunalign.h`|
@@ -376,14 +387,22 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
-|[asc_gather](reg_compute/gather/asc_gather.md)|根据索引位置index将源操作数src按元素收集到目的操作数dst中。|`c_api/reg_compute/gather/ub_gather.h`|
-|[asc_gather_datablock](reg_compute/gather/asc_gather_datablock.md)|给定源操作数在UB中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。|`c_api/reg_compute/gather/ub_gather.h`|
+|[asc_gather](reg_compute/ub_gather/asc_gather.md)|根据索引位置index将源操作数src按元素收集到目的操作数dst中（UB源收集模式）。|`c_api/reg_compute/gather/ub_gather.h`|
+|[asc_gather_datablock](reg_compute/ub_gather/asc_gather_datablock.md)|给定源操作数在UB中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。|`c_api/reg_compute/gather/ub_gather.h`|
+
+### Reg聚合
+
+|API名称|说明|最细粒度公共头文件|
+|---|---|---|
+|[asc_gather](reg_compute/reg_gather/asc_gather.md)|根据索引位置index将源操作数src按元素收集到目的操作数dst中（寄存器源收集模式）。|`c_api/reg_compute/compute/reg_gather.h`|
 
 ### Reg间搬运
 
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_copy](reg_compute/reg_copy/asc_copy.md)|完成数据在寄存器内的搬运。|`c_api/reg_compute/reg_copy.h`|
+|[asc_extract_mask](reg_compute/reg_copy/asc_extract_mask.md)|从矢量数据寄存器中提取掩码寄存器，通过函数返回值返回结果。|`c_api/reg_compute/reg_copy.h`|
+|[asc_mask](reg_compute/reg_copy/asc_mask.md)|通过函数返回值返回矢量数据寄存器或掩码寄存器的掩码复制结果。|`c_api/reg_compute/reg_copy.h`|
 
 ### 同步控制
 
@@ -426,6 +445,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |---|---|---|
 |[asc_abs_sub](reg_compute/reg_fused/asc_abs_sub.md)|逐元素计算差的绝对值。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_axpy](reg_compute/reg_fused/asc_axpy.md)|根据mask对源操作数src、value进行按元素做乘加操作，将结果写入目的操作数dst。|`c_api/reg_compute/compute/reg_fused.h`|
+|[asc_exp_sub](reg_compute/reg_fused/asc_exp_sub.md)|根据mask将src0与src1按元素相减，并计算以差值为指数的自然指数函数。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_fma](reg_compute/reg_fused/asc_fma.md)|逐元素乘加运算。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_leakyrelu](reg_compute/reg_fused/asc_leakyrelu.md)|按元素执行Leaky ReLU（Leaky Rectified Linear Unit）操作。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_madd](reg_compute/reg_fused/asc_madd.md)|madd（multiply-add），对源操作数执行逐元素乘法和加法。|`c_api/reg_compute/compute/reg_fused.h`|
@@ -610,7 +630,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_atomic_add](atomic/datamove_atomic/asc_set_atomic_add.md)|设置对后续的从UB/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int16_t。|`c_api/atomic/datamove_atomic.h`|
 |[asc_set_atomic_max](atomic/datamove_atomic/asc_set_atomic_max.md)|设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int16_t数据与GM中已有数据进行逐元素比较，并将最大值写入GM。|`c_api/atomic/datamove_atomic.h`|
 |[asc_set_atomic_min](atomic/datamove_atomic/asc_set_atomic_min.md)|设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int16_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。|`c_api/atomic/datamove_atomic.h`|
-|[asc_set_atomic_none](atomic/datamove_atomic/asc_set_atomic_none.md)|清空原子操作的状态。|`c_api/atomic/datamove_atomic.h`|
+|[asc_disable_dma_atomic](atomic/datamove_atomic/asc_disable_dma_atomic.md)|清空原子操作的状态。|`c_api/atomic/datamove_atomic.h`|
 
 ### 标量原子操作
 
@@ -638,7 +658,10 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_dcci](cache_ctrl/asc_dcci.md)|用于刷新Cache，保证Cache的一致性。|`c_api/cache_ctrl/cache_ctrl.h`|
 |[asc_dci](cache_ctrl/asc_dci.md)|数据缓存失效，使整个数据缓存无效化。|`c_api/cache_ctrl/cache_ctrl.h`|
 |[asc_get_icache_preload_status](cache_ctrl/asc_get_icache_preload_status.md)|获取ICache的Preload的状态。|`c_api/cache_ctrl/cache_ctrl.h`|
+|[asc_get_scalar_load_cache_mode](cache_ctrl/asc_get_scalar_load_cache_mode.md)|获取标量load路径的L2 Cache管理策略。|`c_api/cache_ctrl/cache_ctrl.h`|
+|[asc_get_scalar_store_cache_mode](cache_ctrl/asc_get_scalar_store_cache_mode.md)|获取标量store路径的L2 Cache管理策略。|`c_api/cache_ctrl/cache_ctrl.h`|
 |[asc_icache_preload](cache_ctrl/asc_icache_preload.md)|从指令所在GM地址预加载数据到对应的cacheline中。|`c_api/cache_ctrl/cache_ctrl.h`|
+|[asc_set_scalar_cache_mode](cache_ctrl/asc_set_scalar_cache_mode.md)|配置标量单元访问Global Memory时的L2 Cache管理策略。|`c_api/cache_ctrl/cache_ctrl.h`|
 
 ## 同步控制
 
@@ -674,8 +697,12 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_get_ctrl](spr/asc_get_ctrl.md)|读取CTRL寄存器（控制寄存器）的值。|`c_api/spr/spr.h`|
+|[asc_get_saturation_flag](spr/asc_get_saturation_flag.md)|读取指定饱和模式的开关状态。|`c_api/spr/spr.h`|
+|[asc_get_saturation_strategy](spr/asc_get_saturation_strategy.md)|读取饱和控制策略。|`c_api/spr/spr.h`|
 |[asc_get_squeeze_status](spr/asc_get_squeeze_status.md)|读取squeeze操作后保存至AR特殊寄存器的有效数据长度值。|`c_api/spr/spr.h`|
 |[asc_set_ctrl](spr/asc_set_ctrl.md)|设置CTRL寄存器（控制寄存器）的值。|`c_api/spr/spr.h`|
+|[asc_set_saturation_flag](spr/asc_set_saturation_flag.md)|设置指定饱和模式的开关状态。|`c_api/spr/spr.h`|
+|[asc_set_saturation_strategy](spr/asc_set_saturation_strategy.md)|设置饱和控制策略。|`c_api/spr/spr.h`|
 
 ## 废弃接口
 
@@ -686,22 +713,37 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_abs_sync（废弃）](deprecated_interface/asc_abs_sync_deprecated.md)|按元素取绝对值同步接口。|`c_api/composite/vector_compute_composite.h`|
 |[asc_bfloat162e1m2x2 (废弃)](reg_compute/reg_convert/asc_bfloat162e1m2x2_deprecated.md)|将bfloat16_t类型转换为fp4x2_e1m2_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_bfloat162e2m1x2 (废弃)](reg_compute/reg_convert/asc_bfloat162e2m1x2_deprecated.md)|将bfloat16_t类型转换为fp4x2_e2m1_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
+|[asc_bfloat162float（废弃）](deprecated_interface/asc_bfloat162float_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_bfloat162int32（废弃）](deprecated_interface/asc_bfloat162int32_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_clear_ar_spr（废弃）](reg_compute/reg_permute_sel/asc_clear_ar_spr_deprecated.md)|对AR寄存器进行清理。请使用[asc_squeeze_and_storeunalign_init](reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md)替换。|`c_api/reg_compute/compute/reg_permute_sel.h`|
 |[asc_create_iter_reg (废弃)](reg_compute/reg_addr_reg/asc_create_iter_reg_deprecated.md)|该接口已废弃，请使用asc_update_addr_reg实现此功能。|`c_api/reg_compute/compute/reg_addr_reg.h`|
 |[asc_e1m2x22bfloat16 (废弃)](reg_compute/reg_convert/asc_e1m2x22bfloat16_deprecated.md)|将fp4x2_e1m2_t类型转换为bfloat16_t类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_e2m1x22bfloat16 (废弃)](reg_compute/reg_convert/asc_e2m1x22bfloat16_deprecated.md)|将fp4x2_e2m1_t类型转换为bfloat16_t类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_e4m32float (废弃)](reg_compute/reg_convert/asc_e4m32float_deprecated.md)|将fp8_e4m3fn_t类型转换为float类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_e5m22float (废弃)](reg_compute/reg_convert/asc_e5m22float_deprecated.md)|将vector_fp8_e5m2_t类型的源操作数以256B为单位分为四部分，读取其中一部分元素，将其转换成vector_float类型并写入目的操作数。|`c_api/reg_compute/reg_convert.h`|
-|[asc_exp_sub (废弃)](reg_compute/reg_fused/asc_exp_sub_deprecated.md)|将src0与src1相减，差值作为e的指数计算。|`c_api/reg_compute/compute/reg_fused.h`|
+|[asc_exp_sub（废弃）](deprecated_interface/asc_exp_sub_deprecated.md)|`half`输入且不带`src_pos`参数的`asc_exp_sub`原型以及`asc_exp_sub_v2`原型已废弃，`half`输入请使用`asc_exp_sub_half2float`原型（显式传入`src_pos`参数）。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_float2bfloat16（废弃）](deprecated_interface/asc_float2bfloat16_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2e4m3 (废弃)](reg_compute/reg_convert/asc_float2e4m3_deprecated.md)|将float类型转换为fp8_e4m3fn_t类型，支持RINT舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2e5m2 (废弃)](reg_compute/reg_convert/asc_float2e5m2_deprecated.md)|将float类型数据转换为fp8_e5m2类型。|`c_api/reg_compute/reg_convert.h`|
+|[asc_float2half（废弃）](deprecated_interface/asc_float2half_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2hif8 (废弃)](reg_compute/reg_convert/asc_float2hif8_deprecated.md)|将float类型转换为hifloat8_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
+|[asc_float2int16（废弃）](deprecated_interface/asc_float2int16_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_float2int64（废弃）](deprecated_interface/asc_float2int64_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_get_ar_spr (废弃)](spr/asc_get_ar_spr_deprecated.md)|读取指定特殊寄存器的值。|`c_api/spr/spr.h`|
 |[asc_get_block_idx（废弃）](deprecated_interface/asc_get_block_idx_deprecated.md)|获取当前运行核的索引。|`c_api/utils/sys_var.h`|
 |[asc_get_block_num（废弃）](deprecated_interface/asc_get_block_num_deprecated.md)|获取AI核数。|`c_api/utils/sys_var.h`|
+|[asc_half2float（废弃）](deprecated_interface/asc_half2float_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_half2hif8（废弃）](deprecated_interface/asc_half2hif8_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_half2int32（废弃）](deprecated_interface/asc_half2int32_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_half2int4x2 (废弃)](reg_compute/reg_convert/asc_half2int4x2_deprecated.md)|将half类型数据转换为int4x2_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
+|[asc_half2int8（废弃）](deprecated_interface/asc_half2int8_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_half2uint8（废弃）](deprecated_interface/asc_half2uint8_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_hif82float (废弃)](reg_compute/reg_convert/asc_hif82float_deprecated.md)|将hifloat8_t类型数据转换为float类型。|`c_api/reg_compute/reg_convert.h`|
+|[asc_hif82half（废弃）](deprecated_interface/asc_hif82half_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_int162float（废弃）](deprecated_interface/asc_int162float_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_int162int32（废弃）](deprecated_interface/asc_int162int32_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_int162uint32（废弃）](deprecated_interface/asc_int162uint32_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_int162uint8（废弃）](deprecated_interface/asc_int162uint8_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_int322int16（废弃）](deprecated_interface/asc_int322int16_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_int322int64（废弃）](deprecated_interface/asc_int322int64_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_int322uint16（废弃）](deprecated_interface/asc_int322uint16_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
@@ -709,28 +751,40 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_int4x22bfloat16 (废弃)](reg_compute/reg_convert/asc_int4x22bfloat16_deprecated.md)|将int4x2_t类型转换为bfloat16_t类型，无舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_int4x22half (废弃)](reg_compute/reg_convert/asc_int4x22half_deprecated.md)|将int4x2_t类型数据转换为half类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_int4x22int16 (废弃)](reg_compute/reg_convert/asc_int4x22int16_deprecated.md)|将int4x2_t类型转换为int16_t类型。|`c_api/reg_compute/reg_convert.h`|
+|[asc_int642float（废弃）](deprecated_interface/asc_int642float_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_int642int32（废弃）](deprecated_interface/asc_int642int32_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_int82half（废弃）](deprecated_interface/asc_int82half_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_int82int16（废弃）](deprecated_interface/asc_int82int16_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_int82int32 (废弃)](reg_compute/reg_convert/asc_int82int32_deprecated.md)|将int8_t类型转换为int32_t类型。|`c_api/reg_compute/reg_convert.h`|
-|[asc_loadalign (废弃)](deprecated_interface/asc_loadalign_v1_deprecated.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式，源操作数地址由用户更新。|`c_api/reg_compute/load/loadalign.h`|
-|[asc_loadalign (废弃)](deprecated_interface/asc_loadalign_v2_deprecated.md)|对齐数据搬运接口，通过地址寄存器传入偏移，用户可选择更新偏移或源操作数地址。|`c_api/reg_compute/load/loadalign.h`|
-|[asc_loadalign (废弃)](deprecated_interface/asc_loadalign_v3_deprecated.md)|对齐数据搬运接口，通过int32_t传入偏移，用户可选择更新偏移或源操作数地址。|`c_api/reg_compute/load/loadalign.h`|
-|[asc_loadalign (废弃)](deprecated_interface/asc_loadalign_v4_deprecated.md)|对齐数据搬运接口，通过int32_t传入偏移并由硬件自动执行Post Update。|`c_api/reg_compute/load/loadalign.h`|
+|[asc_loadalign_v1（废弃）](deprecated_interface/asc_loadalign_v1_deprecated.md)|不传入偏移的BRCV2、BRCV3和UNPACKV2搬入接口。|`c_api/reg_compute/load/loadalign.h`|
+|[asc_loadalign_v2（废弃）](deprecated_interface/asc_loadalign_v2_deprecated.md)|通过地址寄存器传入偏移的BRCV2、BRCV3和UNPACKV2搬入接口。|`c_api/reg_compute/load/loadalign.h`|
+|[asc_loadalign_v3（废弃）](deprecated_interface/asc_loadalign_v3_deprecated.md)|通过int32_t传入偏移的BRCV2、BRCV3和UNPACKV2搬入接口。|`c_api/reg_compute/load/loadalign.h`|
+|[asc_loadalign_v4（废弃）](deprecated_interface/asc_loadalign_v4_deprecated.md)|通过int32_t传入偏移并启用Post Update的BRCV2、BRCV3和UNPACKV2搬入接口。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_muls (废弃)](reg_compute/reg_fused/asc_muls_deprecated.md)|对源操作数src和value进行乘法运算再按照数据类型转换的ROUND舍入模式转成half类型，根据mask将结果写入目的操作数dst。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_pack (废弃)](reg_compute/reg_permute_sel/asc_pack_deprecated.md)|将源操作数中的元素选取低8位（b16）、低16位（b32）、低32位（b64）写入目的操作数的低半部分或高半部分。|`c_api/reg_compute/compute/reg_permute_sel.h`|
 |[asc_scatter（废弃）](deprecated_interface/asc_scatter_deprecated.md)|根据索引值index将源操作数src中的元素分散到目的操作数dst中。|`c_api/reg_compute/scatter/ub_scatter.h`|
 |[asc_set_atomic_add_int（废弃）](deprecated_interface/asc_set_atomic_add_int_deprecated.md)|设置对后续的从UB/L0C Buffer/L1 Buffer到Global Memory的数据传输开启原子累加。累加的数据类型为int32_t。|`c_api/atomic/datamove_atomic.h`|
-|[asc_set_atomic_max_int（废弃）](atomic/datamove_atomic/asc_set_atomic_max_int_deprecated.md)|设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最大值写入GM。|`c_api/atomic/datamove_atomic.h`|
-|[asc_set_atomic_min_int（废弃）](atomic/datamove_atomic/asc_set_atomic_min_int_deprecated.md)|设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。|`c_api/atomic/datamove_atomic.h`|
+|[asc_set_atomic_max_int（废弃）](deprecated_interface/asc_set_atomic_max_int_deprecated.md)|设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最大值写入GM。|`c_api/atomic/datamove_atomic.h`|
+|[asc_set_atomic_min_int（废弃）](deprecated_interface/asc_set_atomic_min_int_deprecated.md)|设置计算结果以原子比较的方式传输到GM。在拷贝前，将待传输的int32_t数据与GM中已有数据进行逐元素比较，并将最小值写入GM。|`c_api/atomic/datamove_atomic.h`|
+|[asc_set_atomic_none（废弃）](deprecated_interface/asc_set_atomic_none_deprecated.md)|清空原子操作的状态。|`c_api/atomic/datamove_atomic.h`|
 |[asc_set_gm2ub_pad（废弃）](vector_datamove/asc_set_gm2ub_pad_deprecated.md)|使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到UB且源操作数非对齐时，设置连续搬运数据块左右两侧需要填补的数据值。|`c_api/vector_datamove/vector_datamove.h`|
-|[asc_set_store_atomic_config_v2（废弃）](atomic/scalar_atomic/asc_set_store_atomic_config_v2_deprecated.md)|设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。|`c_api/atomic/scalar_atomic.h`|
+|[asc_set_store_atomic_config_v2（废弃）](deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)|设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。|`c_api/atomic/scalar_atomic.h`|
 |[asc_squeeze_v2 (废弃)](reg_compute/reg_permute_sel/asc_squeeze_deprecated.md)|将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。|`c_api/reg_compute/compute/reg_permute_sel.h`|
 |[asc_squeeze_with_status（废弃）](reg_compute/reg_permute_sel/asc_squeeze_with_status_deprecated.md)|将src中被mask选择的有效元素依次复制到dst，并将有效数据大小保存至AR寄存器。请使用[asc_squeeze_and_storeunalign](reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)替换。|`c_api/reg_compute/compute/reg_permute_sel.h`|
-|[asc_storealign (废弃)](deprecated_interface/asc_storealign_v1_deprecated.md)|reg计算数据搬运接口，支持从矢量数据寄存器或掩码寄存器连续对齐搬出到UB，目的操作数地址由用户更新。|`c_api/reg_compute/store/storealign.h`|
-|[asc_storealign (废弃)](deprecated_interface/asc_storealign_v2_deprecated.md)|reg计算数据搬运接口，通过地址寄存器传入偏移，用户可选择更新偏移或目的操作数地址。|`c_api/reg_compute/store/storealign.h`|
-|[asc_storealign (废弃)](deprecated_interface/asc_storealign_v3_deprecated.md)|reg计算数据搬运接口，通过int32_t传入偏移，用户可选择更新偏移或目的操作数地址。|`c_api/reg_compute/store/storealign.h`|
-|[asc_storealign (废弃)](deprecated_interface/asc_storealign_v4_deprecated.md)|reg计算数据搬运接口，通过int32_t传入偏移并由硬件自动执行Post Update。|`c_api/reg_compute/store/storealign.h`|
-|[asc_storealign (废弃)](reg_compute/store/asc_storealign_v5_deprecated.md)|reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB，使用repeat stride模式。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_pack_v2（废弃）](deprecated_interface/asc_storealign_v1_deprecated.md)|将有效32bit元素的低8bit数据压缩搬出到UB，不传入偏移量。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_pack_v2（废弃）](deprecated_interface/asc_storealign_v2_deprecated.md)|将有效32bit元素的低8bit数据压缩搬出到UB，通过地址寄存器传入偏移量。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_pack_v2（废弃）](deprecated_interface/asc_storealign_v3_deprecated.md)|将有效32bit元素的低8bit数据压缩搬出到UB，通过`int32_t`传入偏移量。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_pack_postupdate_v2（废弃）](deprecated_interface/asc_storealign_v4_deprecated.md)|将有效32bit元素的低8bit数据压缩搬出到UB，并自动更新目的操作数地址。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storeunalign_postupdate（废弃）](deprecated_interface/asc_storeunalign_postupdate_deprecated.md)|reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续非32B对齐的起始地址连续搬出到UB的场景。|`c_api/reg_compute/store/storeunalign.h`|
 |[asc_storeunalign_post（废弃）](deprecated_interface/asc_storeunalign_post_deprecated.md)|reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的尾块场景。|`c_api/reg_compute/store/storeunalign.h`|
 |[asc_uint322uint8 (废弃)](reg_compute/reg_convert/asc_uint322uint8_deprecated.md)|将uint32_t类型转换为uint8_t类型。|`c_api/reg_compute/reg_convert.h`|
-|[asc_uint82uint16（废弃）](deprecated_interface/asc_uint82uint16_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_uint162uint32（废弃）](deprecated_interface/asc_uint162uint32_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_uint162uint8（废弃）](deprecated_interface/asc_uint162uint8_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_uint322int16（废弃）](deprecated_interface/asc_uint322int16_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_uint322uint16（废弃）](deprecated_interface/asc_uint322uint16_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_uint82half（废弃）](deprecated_interface/asc_uint82half_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_uint82uint16（废弃）](deprecated_interface/asc_uint82uint16_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_uint82uint32 (废弃)](reg_compute/reg_convert/asc_uint82uint32_deprecated.md)|将uint8_t类型转换为uint32_t类型。|`c_api/reg_compute/reg_convert.h`|
+|[asc_mmad(废弃)](deprecated_interface/asc_mmad_deprecated.md)|矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|
+|[asc_mmad_mx(废弃)](deprecated_interface/asc_mmad_mx_deprecated.md)|带有量化系数的矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|
+|[asc_mmad_sparse(废弃)](deprecated_interface/asc_mmad_sparse_deprecated.md)|稀疏矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|

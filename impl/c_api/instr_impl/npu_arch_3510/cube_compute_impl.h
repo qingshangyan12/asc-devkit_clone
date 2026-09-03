@@ -9,8 +9,8 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.
+#pragma message( \
+    "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.")
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -18,6 +18,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CUBE_COMPUTE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CUBE_COMPUTE_IMPL_H
 
+#include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_l0c_copy_config_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_l0c_copy_nz_para_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_mmad_mx_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_mmad_impl.h"
@@ -32,12 +33,90 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_mmad_direction_m_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_mmad_direction_n_impl.h"
 
-__aicore__ inline void asc_set_l0c_copy_nz_para(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride)
+__aicore__ inline void asc_set_l0c_copy_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool is_clean_unit_flag)
 {
-    asc_set_l0c_copy_nz_para_impl(nd_num, src_nd_stride, dst_nd_stride);
+    asc_set_l0c_copy_config_impl(relu_pre_addr, quant_pre_addr, is_clean_unit_flag);
+}
+
+__aicore__ inline void asc_set_l0c_copy_nz_para(
+    uint16_t matrix_num, uint16_t src_nz_matrix_stride, uint32_t dst_matrix_stride)
+{
+    asc_set_l0c_copy_nz_para_impl(matrix_num, src_nz_matrix_stride, dst_matrix_stride);
 }
 
 // ==========mmad_mx(e1m2/e1m2, e4m3/e5m2)==========
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_mx_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_mx_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_mx_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_mx_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_mx_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_mx_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_mx_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_mx_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
 __aicore__ inline void asc_mmad_mx(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -200,6 +279,87 @@ __aicore__ inline void asc_mmad_mx_sync(
 
 // ==========mmad==========
 __aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ half* b_matrix, uint16_t m, uint16_t k, uint16_t n,
+    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t m, uint16_t k, uint16_t n,
+    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t m, uint16_t k, uint16_t n,
+    asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    asc_mmad_impl(
+        c_matrix, a_matrix, b_matrix, m, k, n, static_cast<uint8_t>(unit_flag_mode), disable_gemv, c_matrix_source,
+        c_matrix_init_val);
+}
+
+__aicore__ inline void asc_mmad(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
     bool c_matrix_init_val)
@@ -371,6 +531,127 @@ __aicore__ inline void asc_mmad_sync(
     asc_mmad_sync_impl(
         c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
         c_matrix_init_val);
+}
+
+// ==========mmad with bias==========
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ half* b_matrix, uint64_t bias, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint64_t bias, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint64_t bias, uint16_t m, uint16_t k,
+    uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad(
+    __cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+// ==========mmad_mx with bias==========
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_mx_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_mx_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_mx_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_mx_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_mx_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_mx_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_mx_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
+}
+
+__aicore__ inline void asc_mmad_mx(
+    __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint64_t bias, uint16_t m,
+    uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool disable_gemv)
+{
+    asc_mmad_mx_impl(c_matrix, a_matrix, b_matrix, bias, m, k, n, unit_flag_mode, disable_gemv);
 }
 
 __aicore__ inline void asc_enable_hf32() { asc_enable_hf32_impl(); }

@@ -65,13 +65,19 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/selector
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu/kernel
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aicpu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu/kernel
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/selector
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/aicpu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/ccu/kernel
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/executor
@@ -187,6 +193,7 @@ if(PRODUCT_SIDE STREQUAL "device")
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/executor/ins_v2_all_reduce_sole_executor.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_one_shot.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/aicpu/ins_temp_all_reduce_mesh_1D_two_shot_mesh_chunk.cc
 
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/registry/alg_v2_template_register.cc
     )

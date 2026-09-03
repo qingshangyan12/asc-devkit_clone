@@ -14,7 +14,7 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ATOMIC_DATAMOVE_ATOMIC_H
 #endif
 
 #ifndef INCLUDE_C_API_ATOMIC_DATAMOVE_ATOMIC_H
@@ -32,6 +32,8 @@ __aicore__ inline void asc_set_atomic_add_float();
 __aicore__ inline void asc_set_atomic_add_int8();
 __aicore__ inline void asc_set_atomic_add_int16();
 __aicore__ inline void asc_set_atomic_add_int32();
+__aicore__ inline void asc_disable_dma_atomic();
+[[deprecated("NOTICE: asc_set_atomic_none is deprecated. Please use asc_disable_dma_atomic instead.")]]
 __aicore__ inline void asc_set_atomic_none();
 __aicore__ inline void asc_set_atomic_add_bfloat();
 __aicore__ inline void asc_set_atomic_add_float16();
@@ -59,7 +61,7 @@ __aicore__ inline void asc_set_atomic_min_int();
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ATOMIC_DATAMOVE_ATOMIC_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ATOMIC_DATAMOVE_ATOMIC_H
 #endif

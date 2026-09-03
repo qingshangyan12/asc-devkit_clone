@@ -38,30 +38,33 @@
     此接口的原函数原型已废弃，请使用[asc_load_l2_cache_mode](../SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md)类型枚举值进行L2 Cache管理策略配置。
 <!-- end id4 -->
 
-<!-- npu="950" id5 -->
+
 ### 原子操作
 
-- [asc_set_store_atomic_config_v2](../SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v2_deprecated.md)接口
+<!-- npu="950" id5 -->
+- [asc_set_store_atomic_config_v2](../SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_atomic_add](../SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md)接口。
 
 - [asc_get_store_atomic_config](../SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md)接口（仅Ascend 950PR/Ascend 950DT）
 
     Ascend 950PR/Ascend 950DT上该接口已废弃，请使用[asc_atomic_add](../SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md)接口。
+<!-- end id5 -->
 
+- [asc_set_atomic_none](../SIMD-API/c_api/deprecated_interface/asc_set_atomic_none_deprecated.md)接口
+
+    此接口后续版本会废弃，请使用[asc_disable_dma_atomic](../SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md)接口。
 - [asc_set_atomic_add_int](../SIMD-API/c_api/deprecated_interface/asc_set_atomic_add_int_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_set_atomic_add_int32](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md)接口。
 
-- [asc_set_atomic_max_int](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max_int_deprecated.md)接口
+- [asc_set_atomic_max_int](../SIMD-API/c_api/deprecated_interface/asc_set_atomic_max_int_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_set_atomic_max_int32](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md)接口。
 
-- [asc_set_atomic_min_int](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min_int_deprecated.md)接口
+- [asc_set_atomic_min_int](../SIMD-API/c_api/deprecated_interface/asc_set_atomic_min_int_deprecated.md)接口
 
     此接口后续版本会废弃，请使用[asc_set_atomic_min_int32](../SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md)接口。
-
-<!-- end id5 -->
 
 <!-- npu="950" id6 -->
 ### 系统变量
@@ -187,14 +190,6 @@
 
     此接口后续版本会废弃，请使用[asc_storealign_pack_quarter_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md)接口。
 
-- [asc_storealign (repeat stride)](../SIMD-API/c_api/reg_compute/store/asc_storealign_v5_deprecated.md)接口
-
-    此接口后续版本会废弃，请使用[asc_storealign_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md)接口。
-
-- [asc_storealign_postupdate (repeat stride)](../SIMD-API/c_api/reg_compute/store/asc_storealign_v5_deprecated.md)接口
-
-    此接口后续版本会废弃，请使用[asc_storealign_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md)接口。
-
 - [asc_storealign (多模式重载)](../SIMD-API/c_api/reg_compute/store/asc_storealign.md)接口
 
     原 `asc_storealign(dst, src, mask)` 通过函数名重载实现NORM/FIRST/PACK/PACKV2/INTLV等多种搬出模式，现收窄为仅NORM模式，其他模式拆分到独立函数。请使用[asc_storealign](../SIMD-API/c_api/reg_compute/store/asc_storealign.md)的新版本。
@@ -231,6 +226,10 @@
 
     此接口后续版本会废弃，请使用[asc_squeeze_and_storeunalign](../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)接口。
 
+- [asc_storeunalign_postupdate](../SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md)接口（掩码寄存器搬出模式的b8数据类型原型）
+
+    此接口后续版本会废弃，请使用b16或b32数据类型原型。
+
 <!-- end id7 -->
 
 <!-- npu="950" id8 -->
@@ -255,6 +254,106 @@
 - [asc_uint82uint16](../SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
 
     旧原型已废弃，请使用[asc_uint82uint16](../SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md)的显式位置参数重载。
+
+- [asc_uint82uint16](../SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_uint82uint16](../SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md)的显式位置参数重载。
+
+- [asc_float2half](../SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_float2half](../SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md)的显式位置参数重载。
+
+- [asc_float2int16](../SIMD-API/c_api/deprecated_interface/asc_float2int16_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_float2int16](../SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md)的显式位置参数重载。
+
+- [asc_float2int64](../SIMD-API/c_api/deprecated_interface/asc_float2int64_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_float2int64](../SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md)的显式位置参数重载。
+
+- [asc_hif82half](../SIMD-API/c_api/deprecated_interface/asc_hif82half_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_hif82half](../SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md)的显式位置参数重载。
+
+- [asc_int162float](../SIMD-API/c_api/deprecated_interface/asc_int162float_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_int162float](../SIMD-API/c_api/reg_compute/reg_convert/asc_int162float.md)的显式位置参数重载。
+
+- [asc_int162int32](../SIMD-API/c_api/deprecated_interface/asc_int162int32_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_int162int32](../SIMD-API/c_api/reg_compute/reg_convert/asc_int162int32.md)的显式位置参数重载。
+
+- [asc_int162uint32](../SIMD-API/c_api/deprecated_interface/asc_int162uint32_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_int162uint32](../SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint32.md)的显式位置参数重载。
+
+- [asc_int162uint8](../SIMD-API/c_api/deprecated_interface/asc_int162uint8_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_int162uint8](../SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint8.md)的显式位置参数重载。
+
+- [asc_int642float](../SIMD-API/c_api/deprecated_interface/asc_int642float_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_int642float](../SIMD-API/c_api/reg_compute/reg_convert/asc_int642float.md)的显式位置参数重载。
+
+- [asc_int642int32](../SIMD-API/c_api/deprecated_interface/asc_int642int32_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_int642int32](../SIMD-API/c_api/reg_compute/reg_convert/asc_int642int32.md)的显式位置参数重载。
+
+- [asc_int82half](../SIMD-API/c_api/deprecated_interface/asc_int82half_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_int82half](../SIMD-API/c_api/reg_compute/reg_convert/asc_int82half.md)的显式位置参数重载。
+
+- [asc_int82int16](../SIMD-API/c_api/deprecated_interface/asc_int82int16_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_int82int16](../SIMD-API/c_api/reg_compute/reg_convert/asc_int82int16.md)的显式位置参数重载。
+
+- [asc_uint162uint32](../SIMD-API/c_api/deprecated_interface/asc_uint162uint32_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_uint162uint32](../SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint32.md)的显式位置参数重载。
+
+- [asc_uint162uint8](../SIMD-API/c_api/deprecated_interface/asc_uint162uint8_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_uint162uint8](../SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint8.md)的显式位置参数重载。
+
+- [asc_uint322int16](../SIMD-API/c_api/deprecated_interface/asc_uint322int16_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_uint322int16](../SIMD-API/c_api/reg_compute/reg_convert/asc_uint322int16.md)的显式位置参数重载。
+
+- [asc_uint322uint16](../SIMD-API/c_api/deprecated_interface/asc_uint322uint16_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_uint322uint16](../SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint16.md)的显式位置参数重载。
+
+- [asc_uint82half](../SIMD-API/c_api/deprecated_interface/asc_uint82half_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_uint82half](../SIMD-API/c_api/reg_compute/reg_convert/asc_uint82half.md)的显式位置参数重载。
+
+- [asc_bfloat162float](../SIMD-API/c_api/deprecated_interface/asc_bfloat162float_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_bfloat162float](../SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162float.md)的显式位置参数重载。
+
+- [asc_bfloat162int32](../SIMD-API/c_api/deprecated_interface/asc_bfloat162int32_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_bfloat162int32](../SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162int32.md)的显式位置参数重载。
+
+- [asc_half2float](../SIMD-API/c_api/deprecated_interface/asc_half2float_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_half2float](../SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md)的显式位置参数重载。
+
+- [asc_half2hif8](../SIMD-API/c_api/deprecated_interface/asc_half2hif8_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_half2hif8](../SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md)的显式位置参数重载。
+
+- [asc_half2int32](../SIMD-API/c_api/deprecated_interface/asc_half2int32_deprecated.md)接口（通过接口后缀来控制源操作数读取位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_half2int32](../SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md)的显式位置参数重载。
+
+- [asc_half2int8](../SIMD-API/c_api/deprecated_interface/asc_half2int8_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_half2int8](../SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md)的显式位置参数重载。
+
+- [asc_half2uint8](../SIMD-API/c_api/deprecated_interface/asc_half2uint8_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
+
+    旧原型已废弃，请使用[asc_half2uint8](../SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md)的显式位置参数重载。
 
 - [asc_squeeze_v2](../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_deprecated.md)接口
 
@@ -344,9 +443,9 @@
 
     此接口后续版本会废弃。
 
-- [asc_exp_sub](../SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub_deprecated.md)接口
+- [asc_exp_sub](../SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md)接口
 
-    此接口后续版本会废弃。
+    `half`输入且不带`src_pos`参数的`asc_exp_sub`原型以及`asc_exp_sub_v2`原型已废弃。`float`输入请使用`asc_exp_sub`原型，`half`输入请使用带显式`src_pos`参数的`asc_exp_sub_half2float`原型。
 
 - [asc_pack](../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_deprecated.md)接口
 
@@ -369,3 +468,21 @@
 - [asc_abs_sync](../SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md)接口
 
     `asc_abs_sync()`接口已废弃。请使用[asc_abs](../SIMD-API/c_api/vector_compute/vector_arith/asc_abs.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
+
+### 矩阵计算
+
+- [asc_mmad（废弃）](../SIMD-API/c_api/deprecated_interface/asc_mmad_deprecated.md)接口
+
+    使用`uint8_t unit_flag`或`uint8_t feat_offset`入参的`asc_mmad()`和`asc_mmad_s4()`接口已废弃，请使用[asc_mmad](../SIMD-API/c_api/cube_compute/asc_mmad.md)接口。`asc_mmad_sync()`和`asc_mmad_s4_sync()`接口已废弃，请使用[asc_mmad](../SIMD-API/c_api/cube_compute/asc_mmad.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
+
+<!-- npu="950" id9 -->
+- [asc_mmad_mx（废弃）](../SIMD-API/c_api/deprecated_interface/asc_mmad_mx_deprecated.md)接口
+
+    使用`uint8_t unit_flag`入参的`asc_mmad_mx()`接口已废弃，请使用[asc_mmad_mx](../SIMD-API/c_api/cube_compute/asc_mmad_mx.md)接口。`asc_mmad_mx_sync()`接口已废弃，请使用[asc_mmad_mx](../SIMD-API/c_api/cube_compute/asc_mmad_mx.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
+<!-- end id9 -->
+
+<!-- npu="A3,910b" id10 -->
+- [asc_mmad_sparse（废弃）](../SIMD-API/c_api/deprecated_interface/asc_mmad_sparse_deprecated.md)接口
+
+    使用`uint8_t unit_flag`入参的`asc_mmad_sparse()`接口已废弃，请使用[asc_mmad_sparse](../SIMD-API/c_api/cube_compute/asc_mmad_sparse.md)接口。`asc_mmad_sparse_sync()`接口已废弃，请使用[asc_mmad_sparse](../SIMD-API/c_api/cube_compute/asc_mmad_sparse.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
+<!-- end id10 -->

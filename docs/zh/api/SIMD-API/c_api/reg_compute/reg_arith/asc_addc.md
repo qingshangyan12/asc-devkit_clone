@@ -43,10 +43,26 @@ $$
 ## 函数原型
 
 ```cpp
+// 占位符形式
 __simd_callee__ inline void asc_addc(vector_bool& carry,
-                                     vector_uint32_t& dst,
-                                     vector_uint32_t src0,
-                                     vector_uint32_t src1,
+                                     vector_<dtype>& dst,
+                                     vector_<dtype> src0,
+                                     vector_<dtype> src1,
+                                     vector_bool carry_src,
+                                     vector_bool mask)
+```
+
+### dtype支持数据类型
+
+`dtype`取值为：`int32_t`、`uint32_t`。
+
+### 函数原型典型示例
+
+```cpp
+__simd_callee__ inline void asc_addc(vector_bool& carry,
+                                     vector_int32_t& dst,
+                                     vector_int32_t src0,
+                                     vector_int32_t src1,
                                      vector_bool carry_src,
                                      vector_bool mask)
 ```

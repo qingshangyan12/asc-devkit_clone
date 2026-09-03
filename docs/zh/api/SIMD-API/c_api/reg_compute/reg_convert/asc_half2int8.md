@@ -30,18 +30,28 @@
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。
 
-## 函数原型（占位符形式）
+## 函数原型
 
 ```c
-inline void asc_half2int8<round_mode><sat_mode>(vector_int8_t& dst,
-                                                vector_half src,
-                                                vector_bool mask,
-                                                std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+// 通过引用参数输出结果（占位符形式）
+__simd_callee__ inline void asc_half2int8<round_mode><sat_mode>(vector_int8_t& dst,
+                                                                vector_half src,
+                                                                vector_bool mask,
+                                                                std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
-inline void asc_half2int8<round_mode><sat_mode>(vector_int8_t& dst,
-                                                vector_half src,
-                                                vector_bool mask,
-                                                std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+__simd_callee__ inline void asc_half2int8<round_mode><sat_mode>(vector_int8_t& dst,
+                                                                vector_half src,
+                                                                vector_bool mask,
+                                                                std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_int8_t asc_half2int8<round_mode><sat_mode>(vector_half src,
+                                                                         vector_bool mask,
+                                                                         std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+
+__simd_callee__ inline vector_int8_t asc_half2int8<round_mode><sat_mode>(vector_half src,
+                                                                         vector_bool mask,
+                                                                         std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
 **占位符说明如下：**
@@ -51,10 +61,16 @@ inline void asc_half2int8<round_mode><sat_mode>(vector_int8_t& dst,
 ### 函数原型典型示例
 
 ```c
-inline void asc_half2int8_rn(vector_int8_t& dst,
-                             vector_half src,
-                             vector_bool mask,
-                             std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+// 通过引用参数输出结果
+__simd_callee__ inline void asc_half2int8_rn(vector_int8_t& dst,
+                                             vector_half src,
+                                             vector_bool mask,
+                                             std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline vector_int8_t asc_half2int8_rn(vector_half src,
+                                                      vector_bool mask,
+                                                      std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 ```
 
 ## 参数说明
@@ -72,11 +88,13 @@ inline void asc_half2int8_rn(vector_int8_t& dst,
 
 ## 返回值说明
 
-无
+- 通过引用参数输出结果的函数原型无返回值。
+- 通过函数返回值输出结果的函数原型返回计算结果，返回值类型与对应引用输出函数原型中`dst`参数的类型一致（去除引用）。
 
 ## 约束说明
 
-- 本接口在非AIV上调用直接返回。
+- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
+- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
 - mask需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 - 当数据写入目的操作数索引为奇数的位置，索引为偶数位置的数值置零。反之亦然。

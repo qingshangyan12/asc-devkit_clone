@@ -24,6 +24,8 @@
 - **[asc_set_gm2l1_loop_size](asc_set_gm2l1_loop_size.md)**
 - **[asc_set_gm2l1_nz_para](asc_set_gm2l1_nz_para.md)**
 - **[asc_set_gm2l1_pad](asc_set_gm2l1_pad.md)**
+- **[asc_set_l0c_copy_nz_para](asc_set_l0c_copy_nz_para.md)**
+- **[asc_set_l0c_copy_channel_para](asc_set_l0c_copy_channel_para.md)**
 - **[asc_set_l0c2gm_channel_para](asc_set_l0c2gm_channel_para.md)**
 - **[asc_set_l0c2gm_config](asc_set_l0c2gm_config.md)**
 - **[asc_set_l0c2gm_lrelu_alpha](asc_set_l0c2gm_lrelu_alpha.md)**
@@ -36,12 +38,14 @@
 - **[asc_set_l13d_fmatrix](asc_set_l13d_fmatrix.md)**
 - **[asc_set_l13d_fmatrix_b](asc_set_l13d_fmatrix_b.md)**
 - **[asc_set_l13d_padding](asc_set_l13d_padding.md)**
+- **[asc_set_l12l0a_3d_padding](asc_set_l12l0a_3d_padding.md)**
 - **[asc_set_l13d_rpt](asc_set_l13d_rpt.md)**
 - **[asc_set_l13d_size](asc_set_l13d_size.md)**
 - **[asc_set_l3d_rpt_b](asc_set_l3d_rpt_b.md)**
 - **[asc_copy_gm2l1](asc_copy_gm2l1/asc_copy_gm2l1.md)**
 - **[asc_copy_gm2l1_arch_2201](asc_copy_gm2l1/asc_copy_gm2l1_arch_2201.md)**
-- **[asc_copy_gm2l1_arch_3510](asc_copy_gm2l1/asc_copy_gm2l1_arch_3510.md)**
+- **[asc_copy_gm2l1_highdim_split_arch_3510](asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)**
+- **[asc_copy_gm2l1_2d_arch_3510](asc_copy_gm2l1/asc_copy_gm2l1_2d_arch_3510.md)**
 - **[asc_copy_gm2l1_nd2nz](asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md)**
 - **[asc_copy_gm2l1_nd2nz_arch_2201](asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_2201.md)**
 - **[asc_copy_gm2l1_nd2nz_arch_3510](asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)**
