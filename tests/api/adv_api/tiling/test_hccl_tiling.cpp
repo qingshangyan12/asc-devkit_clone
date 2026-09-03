@@ -80,7 +80,7 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_failed1)
     string algConfig = "fullmesh";
     uint32_t reduceType = 1;
     Mc2CcTilingConfig ccTilingConfig(groupName, opType, algConfig, reduceType);
-    EXPECT_NE(ccTilingConfig.SetOpType(static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL)), EXIT_SUCCESS);
+    EXPECT_NE(ccTilingConfig.SetOpType(static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_ALL)), EXIT_SUCCESS);
     string value129 = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345"
                       "678901234567890123456789012345678";
     string value128 = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345"
@@ -89,7 +89,7 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_failed1)
     EXPECT_EQ(ccTilingConfig.SetGroupName(value128), EXIT_SUCCESS);
     EXPECT_NE(ccTilingConfig.SetAlgConfig(value129), EXIT_SUCCESS);
     EXPECT_EQ(ccTilingConfig.SetAlgConfig(value128), EXIT_SUCCESS);
-    EXPECT_NE(ccTilingConfig.SetReduceType(HCCL_REDUCE_RESERVED), EXIT_SUCCESS);
+    EXPECT_NE(ccTilingConfig.SetReduceType(AscendC::HCCL_REDUCE_RESERVED), EXIT_SUCCESS);
     EXPECT_NE(ccTilingConfig.SetSkipLocalRankCopy(2), EXIT_SUCCESS);
     EXPECT_NE(ccTilingConfig.SetSkipBufferWindowCopy(3), EXIT_SUCCESS);
     EXPECT_NE(ccTilingConfig.GetTiling(ccTilingInner), EXIT_SUCCESS);
@@ -100,15 +100,15 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_failed2)
     // when opType is of the reduce type, reduceType must comply with the range validation cases
     ::Mc2InitTiling initTilingInner;
     string groupName = "test";
-    uint32_t opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE);
+    uint32_t opType = static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_ALLREDUCE);
     string algConfig = "fullmesh";
-    uint32_t reduceType = HCCL_REDUCE_RESERVED;
+    uint32_t reduceType = AscendC::HCCL_REDUCE_RESERVED;
     Mc2CcTilingConfig ccTilingConfig(groupName, opType, algConfig, reduceType);
     uint32_t ret = ccTilingConfig.GetTiling(initTilingInner);
     EXPECT_NE(ret, EXIT_SUCCESS);
 
     // when opType is not of the reduce type, there are not range requirements for reduceType
-    EXPECT_EQ(ccTilingConfig.SetOpType(static_cast<uint32_t>(HcclCMDType::HCCL_CMD_SEND)), EXIT_SUCCESS);
+    EXPECT_EQ(ccTilingConfig.SetOpType(static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_SEND)), EXIT_SUCCESS);
     ret = ccTilingConfig.GetTiling(initTilingInner);
     EXPECT_EQ(ret, EXIT_SUCCESS);
 }
@@ -129,36 +129,36 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_failed3)
 TEST_F(TestHcclTiling, Mc2CcTilingConfig_SetReduceType_ReduceOp)
 {
     const char* groupName = "testGroup";
-    uint32_t opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
+    uint32_t opType = static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_REDUCE_SCATTER);
     std::string algConfig = "ReduceScatter=level0:doublering";
-    uint32_t reduceType = static_cast<uint32_t>(HcclReduceOp::HCCL_REDUCE_RESERVED);
-    uint8_t srcDataType = static_cast<uint32_t>(HcclDataType::HCCL_DATA_TYPE_FP16);
-    uint8_t dstDataType = static_cast<uint32_t>(HcclDataType::HCCL_DATA_TYPE_FP16);
+    uint32_t reduceType = static_cast<uint32_t>(AscendC::HcclReduceOp::HCCL_REDUCE_RESERVED);
+    uint8_t srcDataType = static_cast<uint32_t>(AscendC::HcclDataType::HCCL_DATA_TYPE_FP16);
+    uint8_t dstDataType = static_cast<uint32_t>(AscendC::HcclDataType::HCCL_DATA_TYPE_FP16);
 
     Mc2CcTilingConfig mc2CcTilingConfig(groupName, opType, algConfig, reduceType, srcDataType, dstDataType);
-    EXPECT_EQ(mc2CcTilingConfig.SetReduceType(HcclReduceOp::HCCL_REDUCE_SUM, srcDataType, dstDataType), EXIT_SUCCESS);
+    EXPECT_EQ(mc2CcTilingConfig.SetReduceType(AscendC::HcclReduceOp::HCCL_REDUCE_SUM, srcDataType, dstDataType), EXIT_SUCCESS);
 
     // invalid dstDataType
     dstDataType = -1;
-    EXPECT_EQ(mc2CcTilingConfig.SetReduceType(HcclReduceOp::HCCL_REDUCE_SUM, srcDataType, dstDataType), EXIT_FAILURE);
+    EXPECT_EQ(mc2CcTilingConfig.SetReduceType(AscendC::HcclReduceOp::HCCL_REDUCE_SUM, srcDataType, dstDataType), EXIT_FAILURE);
 
     // invalid srcDataType
-    dstDataType = static_cast<uint32_t>(HcclDataType::HCCL_DATA_TYPE_FP16);
+    dstDataType = static_cast<uint32_t>(AscendC::HcclDataType::HCCL_DATA_TYPE_FP16);
     srcDataType = -1;
-    EXPECT_EQ(mc2CcTilingConfig.SetReduceType(HcclReduceOp::HCCL_REDUCE_SUM, srcDataType, dstDataType), EXIT_FAILURE);
+    EXPECT_EQ(mc2CcTilingConfig.SetReduceType(AscendC::HcclReduceOp::HCCL_REDUCE_SUM, srcDataType, dstDataType), EXIT_FAILURE);
 }
 
 TEST_F(TestHcclTiling, Mc2CcTilingConfig_SetReduceType_NotReduceOp)
 {
     const char* groupName = "testGroup";
-    uint32_t opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
+    uint32_t opType = static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_ALLGATHER);
     std::string algConfig = "AllGather=level0:doublering";
-    uint32_t reduceType = static_cast<uint32_t>(HcclReduceOp::HCCL_REDUCE_RESERVED);
-    uint8_t srcDataType = static_cast<uint32_t>(HcclDataType::HCCL_DATA_TYPE_FP16);
-    uint8_t dstDataType = static_cast<uint32_t>(HcclDataType::HCCL_DATA_TYPE_FP16);
+    uint32_t reduceType = static_cast<uint32_t>(AscendC::HcclReduceOp::HCCL_REDUCE_RESERVED);
+    uint8_t srcDataType = static_cast<uint32_t>(AscendC::HcclDataType::HCCL_DATA_TYPE_FP16);
+    uint8_t dstDataType = static_cast<uint32_t>(AscendC::HcclDataType::HCCL_DATA_TYPE_FP16);
 
     Mc2CcTilingConfig mc2CcTilingConfig(groupName, opType, algConfig, reduceType, srcDataType, dstDataType);
-    EXPECT_EQ(mc2CcTilingConfig.SetReduceType(HcclReduceOp::HCCL_REDUCE_SUM, srcDataType, dstDataType), EXIT_SUCCESS);
+    EXPECT_EQ(mc2CcTilingConfig.SetReduceType(AscendC::HcclReduceOp::HCCL_REDUCE_SUM, srcDataType, dstDataType), EXIT_SUCCESS);
 }
 
 TEST_F(TestHcclTiling, Mc2CcTilingConfig_multiTiling)
@@ -190,61 +190,65 @@ protected:
 TEST_F(TestHcclTilingCcuKfc, AllToAllVCcuSchedUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuSchedAllToAllVSoleMesh", 6U,
+        static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_ALLTOALLV), "CcuSchedAllToAllVSoleMesh", 6U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, AllToAllCcuSchedUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllSoleMesh", 6U,
+        static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_ALLTOALL), "CcuSchedAllToAllSoleMesh", 6U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, UnsupportedCommEngineUsesDefaultVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1DMem2Mem", 4U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1DMem2Mem", 4U,
+        INIT_TILING_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, UnregisteredAlgorithmUsesDefaultVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuUnregisteredAlgorithm", 6U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_ALLGATHER), "CcuUnregisteredAlgorithm", 6U,
+        INIT_TILING_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, AllGatherCcuMsUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1DMem2Mem", 5U,
+        static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1DMem2Mem", 5U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, AllGatherCcuSchedUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1DMem2Mem", 6U,
+        static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_ALLGATHER), "CcuAllGatherMesh1DMem2Mem", 6U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, KfcAllGatherCcuSchedUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherMesh1DMem2Mem", 6U,
+        static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherMesh1DMem2Mem", 6U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuMsUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh", 5U,
+        static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh",
+        5U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuSchedUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh", 6U,
+        static_cast<uint32_t>(AscendC::HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh",
+        6U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 
