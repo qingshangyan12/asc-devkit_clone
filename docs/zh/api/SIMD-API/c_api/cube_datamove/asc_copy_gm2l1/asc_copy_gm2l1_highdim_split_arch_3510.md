@@ -36,11 +36,8 @@
 
 ```cpp
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst,
-                                      uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride,
-                                      uint32_t dst_stride)
-__aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst,
-                                           uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride,
-                                           uint32_t dst_stride)
+                                       uint32_t len_burst, asc_channel_pad_mode pad_mode, uint64_t src_stride,
+                                       uint32_t dst_stride)
 ```
 
 ## 参数说明
@@ -55,7 +52,7 @@ __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src,
 | src | 输入 | 源操作数，存储位置为GM。起始地址需要按照1字节对齐。 |
 | n_burst | 输入 | 搬运的数据块的个数。取值范围：[1, $2^{17}-1$]。 |
 | len_burst | 输入 | 搬运的每个数据块长度，单位32字节。取值范围：[1, $2^{17}-1$]。 |
-| pad_func_mode | 输入 | 4 bit值，指示通道上的padding功能，在32字节数据中插入padding值，或从每个32字节的读取数据中移除padding值。取值范围 [0, 8]：<br>&nbsp;&nbsp;&bull; `0`：不做padding；<br>&nbsp;&nbsp;&bull; `1`：每有1个字节的数据，插入31个padding值；<br>&nbsp;&nbsp;&bull; `2`：每有2个字节的数据，插入15个padding值；<br>&nbsp;&nbsp;&bull; `3`：每有4个字节的数据，插入14个padding值；<br>&nbsp;&nbsp;&bull; `4`：每有8个字节的数据，插入12个padding值；<br>&nbsp;&nbsp;&bull; `5`：每有16个字节的数据，插入8个padding值；<br>&nbsp;&nbsp;&bull; `6`：每有32个字节的数据，移除28个最高有效位数据，只保留4个最低有效位元素；<br>&nbsp;&nbsp;&bull; `7`：每有32个字节的数据，移除24个最高有效位数据，只保留8个最低有效位元素；<br>&nbsp;&nbsp;&bull; `8`：每有32个字节的数据，移除16个最高有效位数据，只保留16个最低有效位元素。 |
+| pad_mode | 输入 | 使用`asc_channel_pad_mode`枚举值指示通道padding模式。 |
 | src_stride | 输入 | 源操作数相邻数据块之间的间隔（即前一个数据块起始地址与后一个数据块起始地址的差值），取值范围：[0, $2^{36}-1$]，单位32字节。<br>&nbsp;&nbsp;&bull; n_burst = 1时，`src_stride`无意义，设置为0即可。 |
 | dst_stride | 输入 | 目的操作数相邻数据块之间的间隔（即前一个数据块起始地址与后一个数据块起始地址的差值），取值范围：[0, $2^{17}-1$]，单位32字节。<br>&nbsp;&nbsp;&bull; n_burst = 1时，`dst_stride`无意义，设置为0即可。 |
 
@@ -83,7 +80,7 @@ PIPE_MTE2
 - `len_burst`取值范围为[1, $2^{17}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
 - `src_stride`取值范围为[0, $2^{36}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
 - `dst_stride`取值范围为[0, $2^{17}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
-- `pad_func_mode`取值范围为[0, 8]，未定义值会导致搬运结果异常，`pad_func_mode`中使用的padding值需要通过[asc_set_gm2l1_pad](../asc_set_gm2l1_pad.md)设置。
+- `pad_mode`使用`asc_channel_pad_mode`的有效枚举值；padding值需要通过[asc_set_gm2l1_pad](../asc_set_gm2l1_pad.md)设置。
 - 对于插入padding值的场景：
   - `len_burst`的单位为32个字节的指的是写入L1 Buffer的实际数据数，它必须设置为`1`，此时一次仅从GM里读取1/2/4/8/16个字节的数据。
   - 每一次burst都是从GM中连续读取，`src_stride`设置为`0`即可。
@@ -144,7 +141,7 @@ __global__ __cube__ void AscCopyGm2l1HighdimBiasKernel(
 
     // Bias的1 x 128数据被切分为两个256字节块，由GM搬运至L1 Buffer, 也可以1次连续搬运512字节块。
     asc_copy_gm2l1(reinterpret_cast<__cbuf__ void*>(bias_l1), reinterpret_cast<__gm__ void*>(bias), BIAS_BLOCKS,
-        BIAS_BLOCK_LEN, 0, BIAS_BLOCK_LEN, BIAS_BLOCK_LEN);
+        BIAS_BLOCK_LEN, asc_channel_pad_mode::NONE, BIAS_BLOCK_LEN, BIAS_BLOCK_LEN);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
 

@@ -28,8 +28,6 @@
 
 将数据从Global Memory搬运到L1 Buffer，并在搬运过程中将源端按N维连续排布的ND格式数据转换为L1 Buffer侧的Nz分形排布，使其满足后续矩阵计算对分形列连续性的要求。该接口也适用于卷积格式NHWC（ND）转换为NC1HWC0格式等转换场景。
 
-进行ND2Nz格式搬运前，需先通过[asc_set_gm2l1_nz_para](../asc_set_gm2l1_nz_para.md)接口配置ND2Nz搬运的目的Nz矩阵的stride与ND矩阵搬运个数。
-
 本接口仅在AIC上执行有效。
 
 如[图1](#nd2nz_equivalent_conversion)所示，ND到Nz的格式转换也等价于DN到Zn的格式转换，如果要进行DN到Zn的格式转换可采用此指令。
@@ -43,25 +41,19 @@
 ```cpp
 __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>* dst,
                                             __gm__ <dtype>* src,
-                                            uint64_t loop1_src_stride,
-                                            uint8_t l2_cache_ctl,
-                                            uint16_t n_value,
-                                            uint32_t d_value,
-                                            uint64_t loop4_src_stride,
-                                            bool enable_small_c0)
-__aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ <dtype>* dst,
-                                            __gm__ <dtype>* src,
-                                            uint64_t loop1_src_stride,
-                                            uint8_t l2_cache_ctl,
-                                            uint16_t n_value,
-                                            uint32_t d_value,
-                                            uint64_t loop4_src_stride,
-                                            bool enable_small_c0)
+                                             uint16_t nd_num,
+                                             uint16_t n_value,
+                                             uint16_t d_value,
+                                             uint16_t src_nd_matrix_stride,
+                                             uint16_t src_d_value,
+                                             uint16_t dst_nz_c0_stride,
+                                             uint16_t dst_nz_n_stride,
+                                             uint16_t dst_nz_matrix_stride)
 ```
 
 ### dtype支持的数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+dtype支持的数据类型为`int8_t`、`uint8_t`、`bfloat16_t`、`half`、`int16_t`、`float`、`int32_t`和`uint32_t`。
 
 ### 函数原型典型示例
 
@@ -69,20 +61,14 @@ dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`�
 // 示例：half类型的ND到Nz格式搬运。
 __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ half* dst,
                                             __gm__ half* src,
-                                            uint64_t loop1_src_stride,
-                                            uint8_t l2_cache_ctl,
-                                            uint16_t n_value,
-                                            uint32_t d_value,
-                                            uint64_t loop4_src_stride,
-                                            bool enable_small_c0)
-__aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ <dtype>* dst,
-                                                 __gm__ <dtype>* src,
-                                                 uint64_t loop1_src_stride,
-                                                 uint8_t l2_cache_ctl,
-                                                 uint16_t n_value,
-                                                 uint32_t d_value,
-                                                 uint64_t loop4_src_stride,
-                                                 bool smallc0_en)
+                                             uint16_t nd_num,
+                                             uint16_t n_value,
+                                             uint16_t d_value,
+                                             uint16_t src_nd_matrix_stride,
+                                             uint16_t src_d_value,
+                                             uint16_t dst_nz_c0_stride,
+                                             uint16_t dst_nz_n_stride,
+                                             uint16_t dst_nz_matrix_stride)
 ```
 
 ## 参数说明
@@ -93,21 +79,14 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ <dtype>* dst,
 |---|---|---|
 | dst | 输出 | 目的操作数，存储位置为L1 Buffer。起始地址需要按照32字节对齐。 |
 | src | 输入 | 源操作数，存储位置为GM。起始地址需要按照1字节对齐。 |
-| loop1_src_stride | 输入 | 源矩阵相邻行起始地址之间的偏移，单位为字节。取值范围：[0, $2^{40}-1$]。 |
-| l2_cache_ctl | 输入 | 配置输入的GM数据在L2 Cache中的管理策略。取值需为已定义的策略（0/1/2/4之一），其他值触发L2 Cache策略异常。取值说明见[表2](#l2_cache_ctl_values)。 |
+| nd_num | 输入 | 待搬运的ND矩阵个数。 |
 | n_value | 输入 | 源矩阵中ND矩阵的行数，单位为元素，取值范围：[1, 65535]。 |
-| d_value | 输入 | 源矩阵中ND矩阵的列数，单位为元素，取值范围：[1, $2^{21}-1$]。搬运过程中，当$d\_value \times \mathrm{sizeof}(\mathrm{dtype})$不满足32字节对齐时，硬件在目的矩阵中自动补0至32字节对齐。 |
-| loop4_src_stride | 输入 | 源矩阵相邻ND矩阵起始地址间的偏移，单位为字节。取值范围：[0, $2^{40}-1$]。<br>&nbsp;&nbsp;&bull; 源矩阵ND矩阵个数为1时，此参数无意义，设置为0即可。<br>&nbsp;&nbsp;&bull; 源矩阵ND矩阵个数大于1时，当`loop4_src_stride = 0`时，表示重复搬出源矩阵的第一个ND矩阵。 |
-| smallc0_en | 输入 | SmallC0模式开关，仅当$d\_value \le 4$时可开启，否则导致搬运异常。<br>&nbsp;&nbsp;&bull; `false`：不开启SmallC0模式，按标准Nz格式的C0（32字节）排布搬运；<br>&nbsp;&nbsp;&bull; `true`：开启SmallC0模式，搬运过程中搬运的数据量不满足$4 \times \mathrm{sizeof}(\mathrm{dtype})$字节对齐时，硬件在目的矩阵中自动补0至$4 \times \mathrm{sizeof}(\mathrm{dtype})$字节对齐。 |
-
-**表2** `l2_cache_ctl`取值说明 <a id="l2_cache_ctl_values"></a>
-
-| 取值 | 模式 | 含义 |
-|------|------|------|
-| 0 | Normal模式 | 启用L2 Cache，并将分配的Cache Line标记为高替换优先级。 |
-| 1 | Last模式 | &bull; 启用L2 Cache，并将分配的Cache Line标记为低替换优先级。<br>&bull; **Last模式暂不支持。**|
-| 2 | Persistent模式 | &bull; 启用L2 Cache。已存入L2 Cache中的数据可能被替换，若需确保特定GM的数据始终保留在L2 Cache中，可采用驻留模式。<br>&bull; 被标记为驻留模式的Cache Line只能被其他同样标记为驻留模式的Cache Line替换。<br>&bull; **Persistent模式暂不支持。**|
-| 4 | Disable模式 | 不启用L2 Cache，每次都直接从GM中读取，并保持已有Cache Line的状态不变。 |
+| d_value | 输入 | 源矩阵中ND矩阵的列数，单位为元素。 |
+| src_nd_matrix_stride | 输入 | 源矩阵相邻ND矩阵的起始地址间隔。 |
+| src_d_value | 输入 | 源矩阵D维长度。 |
+| dst_nz_c0_stride | 输入 | 目的Nz矩阵C0方向步长。 |
+| dst_nz_n_stride | 输入 | 目的Nz矩阵N方向步长。 |
+| dst_nz_matrix_stride | 输入 | 目的Nz矩阵之间的步长。 |
 
 ND到Nz的格式转换如[图2](#nd2nz_conversion)所示。
 
@@ -135,12 +114,8 @@ PIPE_MTE2
 
 ### ND2Nz搬运约束
 
-- 调用本指令前，需要先调用[asc_set_gm2l1_nz_para](../asc_set_gm2l1_nz_para.md)接口配置ND2Nz搬运的目的Nz矩阵步长与ND矩阵搬运个数。
-- `loop1_src_stride`取值范围为[0, $2^{40}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
 - `n_value`取值范围为[1, 65535]，超出取值范围的值会被截断，导致搬运结果不符合预期。
-- `d_value`取值范围为[1, $2^{21}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
-- `loop4_src_stride`取值范围为[0, $2^{40}-1$]，超出取值范围的值会被截断，导致搬运结果不符合预期。
-- `smallc0_en`设置为`true`时，$d\_value \le 4$，否则导致搬运异常。
+- 所有控制参数均为`uint16_t`，传入值应满足其类型取值范围。
 
 ## 调用示例
 
@@ -181,10 +156,8 @@ __global__ __cube__ void AscCopyGm2l1Nd2nzKernel(__gm__ int8_t* a, __gm__ int8_t
     __cc__ int32_t c_l0[ELEMENTS];
 
     // 将两个128 x 128的ND矩阵从GM搬入L1并转换为Nz格式。
-    asc_set_gm2l1_nz_para(1, 1, 128, 0);
-    asc_copy_gm2l1_nd2nz(a_l1, a, K, 0, M, K, 0, false);
-    asc_set_gm2l1_nz_para(1, 1, 128, 0);
-    asc_copy_gm2l1_nd2nz(b_l1, b, K, 0, N, K, 0, false);
+    asc_copy_gm2l1_nd2nz(a_l1, a, 1, M, K, M * K, K, 1, 1, M * K);
+    asc_copy_gm2l1_nd2nz(b_l1, b, 1, N, K, N * K, K, 1, 1, N * K);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
 
