@@ -15494,7 +15494,6 @@ __simd_callee__ inline vector_float asc_int642float_rna(
     return dst;
 }
 
-
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

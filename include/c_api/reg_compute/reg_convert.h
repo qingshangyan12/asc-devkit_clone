@@ -390,7 +390,8 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8_sat(
         dst_quarter_pos);
 
 __simd_callee__ inline vector_half asc_hif82half(
-    vector_hifloat8_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos);
+    vector_hifloat8_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos);
 
 __simd_callee__ inline vector_half asc_hif82half(
     vector_hifloat8_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos);
