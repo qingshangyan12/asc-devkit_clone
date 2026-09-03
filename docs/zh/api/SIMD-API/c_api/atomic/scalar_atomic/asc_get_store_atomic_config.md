@@ -60,6 +60,12 @@ PIPE_S
 
 ## 调用示例
 
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-2201 && ./main
+```
+
 ```cpp
 #include <cstdint>
 #include <iostream>
