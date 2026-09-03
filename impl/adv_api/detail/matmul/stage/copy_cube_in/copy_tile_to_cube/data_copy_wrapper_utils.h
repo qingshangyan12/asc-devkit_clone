@@ -338,8 +338,8 @@ __aicore__ inline void CopyNZ2NZImpl(
     if (srcStride >= UINT16_MAX) {
         for (int32_t i = 0; i < Ceil(width, c0Size_); ++i) {
             DataCopy(
-                dst[(int64_t)i * (int64_t)alignHeight * (int64_t)c0Size_],
-                src[srcOffset + (int64_t)i * (int64_t)gRow * (int64_t)c0Size_],
+                dst[static_cast<int64_t>(i) * static_cast<int64_t>(alignHeight) * static_cast<int64_t>(c0Size_)],
+                src[srcOffset + static_cast<int64_t>(i) * static_cast<int64_t>(gRow) * static_cast<int64_t>(c0Size_)],
                 {1, static_cast<uint16_t>(blockLen), 0, 0});
         }
     } else {
