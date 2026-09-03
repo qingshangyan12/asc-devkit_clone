@@ -74,7 +74,7 @@ HcclResult LaunchCacheEvictKernel(HcclComm comm)
     return result;
 }
 
-HcclResult Mc2TaskCacheCommStateCallback(HcclComm comm, int32_t state, const void* args)
+HcclResult Mc2TaskCacheCommStateCallback(HcclComm comm, int32_t state, void* args)
 {
     (void)args;
     if (state != COMM_STATE_DESTROY_POST && state != COMM_STATE_RESUME_POST) {
