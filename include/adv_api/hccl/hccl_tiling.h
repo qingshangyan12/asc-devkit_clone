@@ -19,6 +19,10 @@
 #include "kernel_tiling/kernel_tiling.h"
 #include "../../../impl/adv_api/tiling/hccl/hccl_tiling_impl_def.h"
 
+#ifndef HCCL_TYPES_H_
+typedef void* HcclComm;
+#endif
+
 namespace AscendC {
 
 class Mc2CcTilingConfig {
@@ -48,6 +52,27 @@ public:
 private:
     HcclTilingImpl impl_;
 };
+
+
+using Mc2Result = uint32_t;
+
+Mc2Result Mc2GetCcArgsCcu(void** ccArgs);
+Mc2Result Mc2FreeCcArgsCcu(void* ccArgs);
+Mc2Result Mc2FreeCcResCtxCcu(void* ccResCtx);
+
+Mc2Result Mc2SetCcCommEngineCcu(void* ccArgs, uint8_t commEngine);
+Mc2Result Mc2SetCcAlgConfigCcu(void* ccArgs, char* algConfig);
+Mc2Result Mc2SetCcSrcDataTypeCcu(void* ccArgs, uint8_t srcDataType);
+Mc2Result Mc2SetCcDstDataTypeCcu(void* ccArgs, uint8_t dstDataType);
+Mc2Result Mc2SetCcReduceTypeCcu(void* ccArgs, uint8_t reduceDataType);
+
+// 本接口功能 和 HcclAllocComResourceByTiling 类似，根据comm ccargs获取 ccResCtx
+Mc2Result Mc2AcquireCcResCtxCcu(
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx, uint32_t* ccResCtxSize, void** schd);
+
+
+extern __ccu_host__ void Mc2CcuCcKernel(void* ccResCtx, uint32_t ccResCtxSize);
+
 } // namespace AscendC
 #endif
 
