@@ -92,8 +92,10 @@
 }
 
 .vp-doc table.vp-table-mixed-layout {
-  width: 100%;
-  table-layout: fixed;
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+  table-layout: auto;
 }
 
 .vp-doc table.vp-table-mixed-layout col.vp-table-compact-column {
