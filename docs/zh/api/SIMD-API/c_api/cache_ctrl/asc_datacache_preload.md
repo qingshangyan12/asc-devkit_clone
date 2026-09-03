@@ -26,11 +26,15 @@
 
 ## 功能说明
 
-从源地址所在的特定GM地址预加载数据到Data Cache中，每次调用只能预加载一个Cache Line大小的数据。
+从Global Memory的指定地址预加载一个Cache Line（64字节）的数据到DCache中，为后续Scalar单元对该地址的读取操作提前填充缓存，降低首次访问延迟。
+
+预取地址由`address`与`offset`相加得到，单位为字节。
+
+本接口需配合后续通过Scalar单元读取Global Memory的指令使用，预取才能带来命中收益。
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset)
 ```
 
@@ -38,10 +42,10 @@ __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t o
 
 **表1** 参数说明
 
-|参数名|输入/输出|描述|
-|------------|------------|-----------|
-| address     | 输入     | 源操作数的起始地址。   |
-| offset     | 输入     | 在源操作数上偏移offset大小开始加载数据，单位为Bytes。|
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| address | 输入 | 源操作数在Global Memory中地址，单位为字节。 |
+| offset | 输入 | 相对`address`的有符号字节偏移，预取起始地址 = `address` + `offset`，单位为字节。 |
 
 ## 返回值说明
 
@@ -53,7 +57,7 @@ PIPE_S
 
 ## 约束说明
 
-频繁调用此接口可能会导致保留栈拥塞，此时，该接口将被视为NOP指令，阻塞Scalar流水。因此不建议频繁调用此接口。
+频繁调用此接口可能导致保留站（Reservation Station，用于暂存待执行指令的硬件队列）发生拥塞。在此情况下，该指令将被视为NOP指令，进而阻塞Scalar流水线。因此，建议连续调用此接口的次数不要超过4次。
 
 ## 调用示例
 

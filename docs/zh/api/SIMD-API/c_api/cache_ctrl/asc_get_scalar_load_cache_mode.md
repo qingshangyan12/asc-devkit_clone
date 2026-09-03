@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-读取当前标量读（load）路径的L2 Cache管理策略，并返回[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值。
+读取当前标量读（load）路径的L2 Cache管理策略，并返回[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值。该值可通过[asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md)接口设置，关于策略的详细说明请参考该接口。
 
 常用于临时切换策略前保存原配置，或在设置后做回读校验。
 
@@ -50,7 +50,7 @@ PIPE_S
 
 ## 约束说明
 
-- 本接口仅反映标量load侧策略，与标量store侧以及向量搬运接口参数中的`l2_cache_mode`无关。
+本接口仅反映标量load侧策略，与标量store侧以及向量搬运接口参数中的`l2_cache_mode`无关。
 
 ## 调用示例
 

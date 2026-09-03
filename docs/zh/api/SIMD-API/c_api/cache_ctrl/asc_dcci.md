@@ -26,40 +26,54 @@
 
 ## 功能说明
 
-在AI Core内部，Scalar单元和DMA单元都可能对Global Memory进行访问。
+如图1所示，在AI Core内部，访问Global Memory（GM）与Unified Buffer（UB）的方式分为以下两种：
 
-![](../figures/dcci.png "DataCache内存层次示意图") \\
+- DMA搬运单元读写GM，数据通过[asc_copy_ub2gm](../vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md)和[asc_copy_gm2ub](../vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md)等接口在Unified Buffer（UB）等Local Memory和GM间交互，不经过DCache，因此不需要考虑Cache一致性问题。
+- Scalar单元访问GM，若经过Dcache，首先会访问每个核内的DCache，因此存在DCache与GM的Cache一致性问题，具体原因请参考[缓存一致性](../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md)。
 
-如上图所示：
+**图1**  DataCache内存层次示意图<a name="zh-cn_topic_dcci_fig1"></a>
 
-DMA搬运单元读写Global Memory，数据通过[asc_copy_ub2gm](../vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md)和[asc_copy_gm2ub](../vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md)等接口在Unified Buffer（UB）等Local Memory和Global Memory间交互，没有Cache一致性问题；
-Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因此存在Data Cache与Global Memory的Cache一致性问题。
-该接口用来刷新Cache，保证Cache的一致性，使用场景如下：
+![](../figures/dcci.png "DataCache内存层次示意图")
 
-读取Global Memory的数据，但该数据可能在外部被其余核修改，此时需要使用asc_dcci接口，直接访问Global Memory，获取最新数据；
-用户通过Scalar单元写Global Memory的数据，希望立刻写出，也需要使用asc_dcci接口。
+asc_dcci接口用于解决上述一致性问题，其功能可以拆解为两部分：
 
-Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../spr/asc_set_ctrl.md)接口使用，将CTRL[49]设置为1'b1，开启datacache模式。
+- Clean：将缓存中被修改过的数据（脏数据，Dirty Data）写回到GM中，避免数据丢失。
+- Invalid：
+    - 将指定地址范围的Cache Line标记为“无效”，使其从缓存中移除。
+    - 保证下一次访问这些内存地址时，会从GM重新加载数据，而不是使用可能过期的缓存数据。
 
-<!-- npu="950" id8 -->
-针对Ascend 950PR/Ascend 950DT，不支持asc_dcci_entire_ub接口。
-<!-- end id8 -->
+该接口的典型使用场景如下（以读写GM为例）：
+
+- 读取GM的数据，但该数据可能在外部被其余核修改，此时需要使用asc_dcci接口，直接访问GM，获取最新数据。
+- 用户通过Scalar单元写GM的数据，希望立刻写出，也需要使用asc_dcci接口。
+
+>[!NOTE]说明
+>- 标量单元读写GM时，若调用的是[asc_load_dev](../scalar_compute/scalar_load/asc_load_dev.md)和[asc_store_dev](../scalar_compute/scalar_store/asc_store_dev.md)这一对接口，则读写数据不经过DCache，无需调用asc_dcci接口。
+>- Scalar单元读写UB时是否经过DCache，由[asc_set_ctrl](../spr/asc_set_ctrl.md)接口配置的CTRL[49]位控制，该bit位默认值为1'b0，即默认不经过DCache。CTRL[49]的详细说明请参考[asc_set_ctrl](../spr/asc_set_ctrl.md#ctrl_bit_desc)的常用CTRL寄存器比特位说明。
 
 ## 函数原型
 
-   ```cpp
-   // 刷新传入地址所在的单个Cache Line
-   __aicore__ inline void asc_dcci_single(__gm__ void* dst)
+```c
+// 刷新传入GM地址所在的单个Cache Line
+__aicore__ inline void asc_dcci_single(__gm__ void* dst)
 
-   // 刷新传入的UB地址空间地址所在的单个Cache Line
-   __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst)
+// 刷新传入的UB地址所在的单个Cache Line
+__aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst)
 
-   // 刷新所有Cache Line
-   __aicore__ inline void asc_dcci_entire_all()
-   __aicore__ inline void asc_dcci_entire_ub()
-   __aicore__ inline void asc_dcci_entire_out()
-   __aicore__ inline void asc_dcci_entire_atomic()
-   ```
+// 根据目标域刷新DCache中所有valid的Cache Line，目标域有以下四种取值：
+
+// 刷新整个DCache中所有valid的Cache Line
+__aicore__ inline void asc_dcci_entire_all()
+
+// 刷新整个DCache中包含UB地址的所有valid的Cache Line
+__aicore__ inline void asc_dcci_entire_ub()
+
+// 刷新整个DCache中包含GM地址的所有valid的Cache Line
+__aicore__ inline void asc_dcci_entire_out()
+
+// 刷新整个DCache中包含与标量原子操作相关的GM地址的所有valid的Cache Line
+__aicore__ inline void asc_dcci_entire_atomic()
+```
 
 ## 参数说明
 
@@ -67,7 +81,7 @@ Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../spr/asc_se
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| dst | 输入 | 需要刷新缓存的向量的起始地址。 |
+| dst | 输入 | 待清理与失效的Cache Line所在地址。<br>硬件按Cache Line边界对齐定位目标行，传入地址无需满足Cache Line对齐。 |
 
 ## 返回值说明
 
@@ -79,7 +93,10 @@ PIPE_S
 
 ## 约束说明
 
-无
+<!-- npu="950" id8 -->
+- 针对Ascend 950PR/Ascend 950DT，不支持asc_dcci_entire_ub接口。
+<!-- end id8 -->
+- `dst`为`__ubuf__ void*`类型的函数原型仅支持在AIV中调用。
 
 ## 调用示例
 

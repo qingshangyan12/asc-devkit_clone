@@ -26,11 +26,11 @@
 
 ## 功能说明
 
-获取物理堆栈基地址。
+获取物理堆栈基地址。常用于调试时定位当前核的堆栈在物理内存中的位置。
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline int64_t asc_get_phy_stack_base()
 ```
 
@@ -52,7 +52,81 @@ PIPE_S
 
 ## 调用示例
 
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
+
 ```cpp
-int64_t phy_stack_base = asc_get_phy_stack_base();
-printf("phy stack base is %x", phy_stack_base);// 需用%x将其打印成十六进制的数
+// 示例功能：演示 asc_get_phy_stack_base 接口的用法，读取当前核物理栈的基地址。
+//
+// 运行步骤：
+//   1. 连续两次调用 asc_get_phy_stack_base()，分别写入 output[0] 与 output[1]；
+//   2. 校验两次读到的栈基地址一致（说明该地址在核内是稳定的）。
+//
+// 开发者帮助评估：帮助程度较低。示例仅重复调用接口两次并比较结果是否一致，未展示
+// 栈基地址的实际用途、布局或与栈溢检测等场景的结合。开发者通过该示例只能确认接口的
+// 基本调用形式与返回值稳定性，参考价值有限，建议结合物理栈相关的文档或调试场景使用。
+
+#include <cstdint>
+#include <iomanip>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr uint32_t ELEMENTS = 16;
+constexpr uint32_t BYTES = ELEMENTS * sizeof(uint64_t);
+
+void PrintData(const char* label, const std::vector<uint64_t>& data)
+{
+    std::cout << label << ":";
+    for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
+    std::cout << " ..." << std::endl;
+}
+
+void PrintHex(const char* label, const std::vector<uint64_t>& data)
+{
+    std::cout << label << ":" << std::hex;
+    for (uint32_t i = 0; i < 4; ++i) std::cout << " 0x" << data[i];
+    std::cout << std::dec << std::endl;
+}
+
+__global__ __vector__ void AscGetPhyStackBaseKernel(__gm__ uint64_t* output)
+{
+    asc_init();
+    output[0] = static_cast<uint64_t>(asc_get_phy_stack_base());
+    output[1] = static_cast<uint64_t>(asc_get_phy_stack_base());
+    printf("phy stack base is %x", phy_stack_base);
+    asc_dcci_single(output);
+}
+
+} // namespace
+
+int main()
+{
+    std::vector<uint64_t> output(ELEMENTS, ~0ULL);
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint64_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(output_device, BYTES, output.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    AscGetPhyStackBaseKernel<<<1, 0>>>(output_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), BYTES, output_device, BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintData("Observed", output);
+    PrintHex("Observed hex", output);
+    const bool passed = output[0] == output[1];
+    std::cout << (passed ? "[Success] asc_get_phy_stack_base passed." : "[Failed] asc_get_phy_stack_base failed.") << std::endl;
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

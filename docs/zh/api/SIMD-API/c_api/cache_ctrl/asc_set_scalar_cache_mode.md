@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-配置标量单元访问Global Memory时的L2 Cache管理策略。接口通过修改CTRL寄存器对应比特域生效：
+配置标量单元访问Global Memory时的L2 Cache管理策略：
 
 - 传入[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)时，设置标量读（load）策略。
 - 传入[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)时，设置标量写（store）策略。
@@ -36,7 +36,9 @@
 ## 函数原型
 
 ```c
+// 配置标量load接口的L2 Cache管理策略
 __aicore__ inline void asc_set_scalar_cache_mode(asc_load_l2_cache_mode l2_cache_mode)
+// 配置标量store接口的L2 Cache管理策略
 __aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode l2_cache_mode)
 ```
 
@@ -46,7 +48,7 @@ __aicore__ inline void asc_set_scalar_cache_mode(asc_store_l2_cache_mode l2_cach
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| l2_cache_mode | 输入 | L2 Cache管理策略。load重载传入[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值；store重载传入[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)枚举值。 |
+| l2_cache_mode | 输入 | L2 Cache管理策略：<br>&bull; 配置标量load接口的L2 Cache管理策略重载传入[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值。<br>&bull; 配置标量store接口的L2 Cache管理策略重载传入[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)枚举值。 |
 
 ## 返回值说明
 
@@ -58,8 +60,16 @@ PIPE_S
 
 ## 约束说明
 
-- 本接口仅影响**标量访存路径**的L2 Cache默认策略，不会修改向量搬运类接口（如[asc_copy_gm2ub_align](../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)、[asc_copy_ub2gm_align](../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)、[asc_ndim_copy_gm2ub](../vector_datamove/asc_ndim_copy_gm2ub.md)等）参数中的`l2_cache_mode`；二者相互独立。大块tile数据的L2 Cache优化应通过向量搬运入参配置，参见[L2 Cache Mode最佳实践样例](../../../../../../examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode)。
-- load与store策略分属CTRL不同比特域，设置其一不会覆盖另一侧已配置的值。
+- 本接口的两个函数原型分别作用于标量load与标量store路径，其各自影响的标量相关操作接口如下：
+    - 对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口有：
+        - [asc_load_dev](../scalar_compute/scalar_load/asc_load_dev.md)
+        - [asc_datacache_preload](asc_datacache_preload.md)
+        - [asc_icache_preload](asc_icache_preload.md)
+    - 对于配置标量store接口的L2 Cache管理策略重载，作用范围内的接口有：
+        - [asc_store_dev](../scalar_compute/scalar_store/asc_store_dev.md)
+        - [asc_set_store_atomic_config_v1](../atomic/scalar_atomic/asc_set_store_atomic_config_v1.md)
+        - [标量原子操作](../atomic/scalar_atomic/scalar_atomic.md)
+- 本接口仅作用于**标量访存路径**的L2 Cache默认策略，不会改变向量搬运类接口（如[asc_copy_gm2ub_align](../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)、[asc_copy_ub2gm_align](../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)、[asc_ndim_copy_gm2ub](../vector_datamove/asc_ndim_copy_gm2ub.md)等）入参中的`l2_cache_mode`，二者相互独立。针对大块tile数据的L2 Cache优化，建议通过向量搬运类接口的入参配置，具体可参见[L2 Cache Mode最佳实践样例](../../../../../../examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode)。
 
 ## 调用示例
 
