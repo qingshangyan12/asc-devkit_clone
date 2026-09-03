@@ -1,0 +1,23 @@
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.228.957 [task_recycle_cqrpt_base.cc:70]25626 PrintTaskErrorMsg:Task run failed, stream_id=363, pos=1, task_sn=3, sqe_type=1(aiv), errType=0x1(task exception), sqSwStatus=0.
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.232.165 [device_error_proc_c.cc:606]25626 ProcessCoreErrorClass:comm_flag=8
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.740.183 [device_error_proc_c.cc:462]25626 AiCoreUnknownErrProc:unknown aicore error, stream_id=363, task_id=1.
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.740.215 [device_error_proc_c.cc:670]25626 AddExceptionRegInfo:add error register: core_id=0, stream_id=363, task_sn=3
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.740.243 [device_error_proc_c.cc:731]25626 ProcessDavidStarsCoreErrorInfo:The error from device(chipId:0, dieId:0), serial number is 1564, there is an aivec error exception, core id is 0, error code = 256, dump info: pc start: 0x120041001000, current: 0x800000010, sc error info: 0xffffffffffff, su error info: 0x307c0000,0x18000008, mte error info: 0x100002040b, vec error info: 0x5448d0a000392942, cube error info: 0, l1 error info: 0, aic error mask: 0x395856, para base: 0x120000200000, mte error: 0, aic cond: 0.
+The extend info: errcode:(256) errorStr: The address of instruction is illegal when the AIcore reads instructions from GM.Possible cause: The application unloads the operator binary in advance or stack corruption occurs. subErrType: 0x4.
+For details, see the troubleshooting document on the Ascend official website. Search for the keyword "AI Core Error".
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.740.305 [davinci_kernel_task_v200_base.cc:252]25626 SetStarsResultByErrorType:Vector Core kernel execution failed, retCode=0x31.
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.740.316 [davinci_kernel_task.cc:944]25626 PreCheckTaskErr:An error occurred in the kernel task, retCode=0x31, [vector core exception].
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.740.489 [davinci_kernel_task.cc:757]25626 GetArgsInfo:[AIC_INFO] args(0 to 1) after execute:0x120000018000, 0x80.
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.740.500 [davinci_kernel_task.cc:763]25626 GetArgsInfo:tilingKey = 0, print 1 Times totalLen=(2*8), argsSize=16, schemMode=0, blockDim=1
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.740.522 [davinci_kernel_task.cc:851]25626 PrintErrorInfoForDavinciTask:[AIC_INFO] after execute:args print end
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.743.709 [davinci_kernel_task.cc:888]25626 PrintErrorInfoForDavinciTask:[DFX_INFO]AI Core kernel execution failed, device_id=0, stream_id=363, report_stream_id=363, task_id=1, flip_num=0, fault kernel_name=unrelated_probe, fault kernel info ext=none, program id=1, hash=13802813021125921029.
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.743.824 [stream.cc:1869]25562 GetError:Stream Synchronize failed, stream_id=363, retCode=0x31, [vector core exception].
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.743.833 [stream.cc:1872]25562 GetError:Vector Core kernel execution failed, retCode=0x31.
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.743.851 [stream.cc:1872]25562 GetError:[AIC_INFO] after execute:args print end
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.743.859 [stream.cc:1872]25562 GetError:[DFX_INFO]AI Core kernel execution failed, device_id=0, stream_id=363, report_stream_id=363, task_id=1, flip_num=0, fault kernel_name=unrelated_probe, fault kernel info ext=none, program id=1, hash=13802813021125921029.
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.743.878 [api_error.cc:1440]25562 StreamSynchronize:Stream synchronize failed, stream_id=363, timeout=-1ms.
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.743.894 [api_c_stream.cc:162]25562 rtStreamSynchronize:ErrCode=507035, desc=[vector core exception], InnerCode=0x715005e
+[ERROR] RUNTIME(25562,demo):2026-09-03-15:50:40.743.901 [error_message_manage.cc:69]25562 FuncErrorReason:rtStreamSynchronize execution failed, reason=vector core exception
+[ERROR] DRV(25562,demo):2026-09-03-15:50:40.780.909 [svm_urma_seg_mng.c:127][ascend][curpid:25562,25562][drv][devmm][_svm_urma_erase_client_seg]<errno:22, 8> Seg node is null.
+[ERROR] DRV(25562,demo):2026-09-03-15:50:40.780.920 [svm_urma_seg_mng.c:127][ascend][curpid:25562,25562][drv][devmm][_svm_urma_erase_client_seg]<errno:22, 8> Seg node is null.
+[ERROR] DRV(25562,demo):2026-09-03-15:50:40.780.938 [svm_urma_seg_mng.c:127][ascend][curpid:25562,25562][drv][devmm][_svm_urma_erase_client_seg]<errno:22, 8> Seg node is null.
