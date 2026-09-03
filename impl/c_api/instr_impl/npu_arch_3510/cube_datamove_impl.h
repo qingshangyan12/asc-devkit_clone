@@ -150,26 +150,22 @@ __aicore__ inline void asc_set_gm2l1_nz_para(
     asc_set_gm2l1_nz_para_impl(matrix_num, dst_nz_n_stride, dst_nz_c0_stride, dst_nz_matrix_stride);
 }
 
-[[deprecated("NOTICE: asc_set_l13d_padding is deprecated. Please use asc_set_gm2l1_padding and "
-              "asc_set_l12l0a_3d_padding instead.")]]
+[[deprecated("NOTICE: asc_set_l13d_padding is deprecated. Please use asc_set_l12l0a_3d_padding instead.")]]
 __aicore__ inline void asc_set_l13d_padding(uint64_t config)
 {
     asc_set_l13d_padding_impl(config);
 }
-[[deprecated("NOTICE: asc_set_l13d_padding is deprecated. Please use asc_set_gm2l1_padding and "
-             "asc_set_l12l0a_3d_padding instead.")]]
+[[deprecated("NOTICE: asc_set_l13d_padding is deprecated. Please use asc_set_l12l0a_3d_padding instead.")]]
 __aicore__ inline void asc_set_l13d_padding(half config)
 {
     asc_set_l13d_padding_impl(config);
 }
-[[deprecated("NOTICE: asc_set_l13d_padding is deprecated. Please use asc_set_gm2l1_padding and "
-             "asc_set_l12l0a_3d_padding instead.")]]
+[[deprecated("NOTICE: asc_set_l13d_padding is deprecated. Please use asc_set_l12l0a_3d_padding instead.")]]
 __aicore__ inline void asc_set_l13d_padding(int16_t config)
 {
     asc_set_l13d_padding_impl(config);
 }
-[[deprecated("NOTICE: asc_set_l13d_padding is deprecated. Please use asc_set_gm2l1_padding and "
-             "asc_set_l12l0a_3d_padding instead.")]]
+[[deprecated("NOTICE: asc_set_l13d_padding is deprecated. Please use asc_set_l12l0a_3d_padding instead.")]]
 __aicore__ inline void asc_set_l13d_padding(uint16_t config)
 {
     asc_set_l13d_padding_impl(config);
