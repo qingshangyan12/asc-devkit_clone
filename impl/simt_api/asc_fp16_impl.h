@@ -1329,8 +1329,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2log10(half2 x)
     return {tmp1, tmp2};
 }
 
-#else
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hcos(half x)
 {
     float tmp = __cvt_float<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
