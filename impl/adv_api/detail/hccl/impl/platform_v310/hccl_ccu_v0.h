@@ -138,7 +138,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     } else {
         hcclContext_ = (__gm__ HcclCombineOpParam*)context;
     }
-
+    // AscendC::printf("[AIV][InitInner] version=%u\n", version);
     constexpr uint64_t workspaceAlignMask = 0x1ffU;
     constexpr uint64_t layoutSize =
         MAX_DCCI_CNT + sizeof(CommonPrepareParamCcu) * static_cast<uint64_t>(HCCL_MAX_HANDLE_ID) +
@@ -151,6 +151,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     const uint64_t workspaceSize = newCcuFlag_ ? hcclNewContext_->workspaceSize : hcclContext_->workSpaceSize;
     const uint64_t alignPadding = (workspaceAlignMask + 1U - (workspaceAddr & workspaceAlignMask)) & workspaceAlignMask;
     const uint64_t requiredSize = alignPadding + layoutSize;
+    AscendC::printf("[AIV][InitInner] requiredSize=%u\n", requiredSize);
+    AscendC::printf("[AIV][InitInner] workspaceSize=%u\n", workspaceSize);
     if (unlikely(workspaceAddr > UINT64_MAX - alignPadding || workspaceSize < requiredSize)) {
         return;
     }
@@ -212,6 +214,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitV2(
     GM_ADDR context, const void* initTiling)
 {
+    newCcuFlag_ = false;
     HcclTilingVersion version =
         (initTiling != nullptr ? HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION :
                                  HcclTilingVersion::DEPRECATED_TILING_VERSION);
@@ -220,7 +223,15 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         if (tilingInner->version == INIT_TILING_CCU_NEW_VERSION) {
             newCcuFlag_ = true;
         }
+    } else if (context != nullptr) {
+        __gm__ const HcclApi::OpResCtx* opResCtx = reinterpret_cast<__gm__ const HcclApi::OpResCtx*>(context);
+        if (opResCtx->version == HcclApi::MC2_CCU_LAUNCH_VERSION) {
+            newCcuFlag_ = true;
+        }
     }
+    AscendC::printf("[AIV][InitV2] version=%u\n", version);
+    AscendC::printf("[AIV][InitV2] newCcuFlag_=%u\n", static_cast<uint32_t>(newCcuFlag_));
+
     InitInner(context, version);
     tilingBaseAddr_ = reinterpret_cast<uint64_t>(initTiling);
 }
@@ -247,6 +258,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
 template <const auto& config>
 __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::SetCcTilingV2(uint64_t offset)
 {
+    AscendC::printf("[AIV][SetCcTilingV2] curVersion_=%u\n", curVersion_);
     ASCENDC_HCCL_API_ASSERT(
         curVersion_ == HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION, { return HCCL_FAILED; },
         "Call SetCcTiling failed, ensure Hccl::InitV2 func has been called successfully!");
