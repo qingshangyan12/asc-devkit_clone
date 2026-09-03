@@ -130,7 +130,7 @@ HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], ui
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx);
 
 HcclResult HcclAllocOpResCtx(
-    HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, void* mc2Tiling,
+    const HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, const void* mc2Tiling,
     const void* ccTilingList[], void** opResCtxPtr);
 
 // AllToAll适配AllToAllV

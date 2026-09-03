@@ -81,9 +81,9 @@ public:
             *this, that, detail::CcuArithmeticOperatorType::ADDITION);
     }
 
-    CondExpr operator==(uint64_t immediate) { return CondExpr{this, immediate, CCU_CONDITION_EQ}; }
+    CondExpr operator==(uint64_t immediate) const { return CondExpr{this, immediate, CCU_CONDITION_EQ}; }
 
-    CondExpr operator!=(uint64_t immediate) { return CondExpr{this, immediate, CCU_CONDITION_NE}; }
+    CondExpr operator!=(uint64_t immediate) const { return CondExpr{this, immediate, CCU_CONDITION_NE}; }
 
     CcuVariableHandle handle{0};
 
