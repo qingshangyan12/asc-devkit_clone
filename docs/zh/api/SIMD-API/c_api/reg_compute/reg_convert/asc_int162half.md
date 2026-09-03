@@ -43,32 +43,10 @@ def asc_int162half_rn(dst, src, mask):
 
 ## 函数原型
 
-```cpp
-// 向负无穷方向舍入（rd）
-__simd_callee__ inline void asc_int162half_rd(vector_half& dst, vector_int16_t src, vector_bool mask)
-// 四舍六入五成双舍入（rn）
-__simd_callee__ inline void asc_int162half_rn(vector_half& dst, vector_int16_t src, vector_bool mask)
-// 四舍五入舍入（rna）
-__simd_callee__ inline void asc_int162half_rna(vector_half& dst, vector_int16_t src, vector_bool mask)
-// 向正无穷方向舍入（ru）
-__simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t src, vector_bool mask)
-// 向零方向舍入（rz）
-__simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t src, vector_bool mask)
-```
-
 ```c
 __simd_callee__ inline void asc_int162half_<round_mode>(vector_half& dst,
                                                          vector_int16_t src,
                                                          vector_bool mask)
-```
-
-### 函数原型典型示例
-
-```c
-// 示例：四舍六入五成双舍入（rn）。
-__simd_callee__ inline void asc_int162half_rn(vector_half& dst,
-                                                vector_int16_t src,
-                                                vector_bool mask)
 ```
 
 ## 参数说明
