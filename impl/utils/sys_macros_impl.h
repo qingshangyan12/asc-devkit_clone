@@ -9,7 +9,7 @@
  */
 
 /*!
- * \file sys_macros.h
+ * \file sys_macros_impl.h
  * \brief
  */
 #ifndef IMPL_UTILS_SYS_MACROS_H
