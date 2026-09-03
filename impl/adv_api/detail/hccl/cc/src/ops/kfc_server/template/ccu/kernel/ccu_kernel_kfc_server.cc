@@ -142,7 +142,7 @@ CcuResult WaitTurnStartSig(const ccu::Variable& hbmSigAddr, ccu::Variable& turnS
 
 CcuResult SetTurnEndSig(const ccu::Variable& hbmSigAddr, const ccu::Variable& turnEndSig, KfcServerContext& ctx)
 {
-    const uint32_t getDieId = 1; // TODO GetDieId()
+    const uint32_t getDieId = 1;
     CCU_CHK_RET(ccu::Store(hbmSigAddr, turnEndSig));
     return CCU_SUCCESS;
 }
