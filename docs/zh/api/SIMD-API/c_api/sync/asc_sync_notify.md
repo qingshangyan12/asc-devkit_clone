@@ -52,7 +52,7 @@ __aicore__ inline void asc_sync_notify(pipe_t pipe,
 | tpipe | 输入 | 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。 |
 | id | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。取值范围为`event_t`枚举类型。 |
 
-`event_t`枚举定义如下：<a name="event_t_enum"></a>
+`event_t`枚举定义如下：<a id="event_t_enum"></a>
 
 ```c
 typedef enum {
