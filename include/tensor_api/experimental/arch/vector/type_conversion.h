@@ -10,7 +10,7 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_TYPE_CONVERSION_H__
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_TYPE_CONVERSION_H
 #endif
 
 /*!
@@ -30,8 +30,7 @@ namespace experimental {
 /**
  * @brief Defines the default register cast options with zero layout, rint rounding, and no saturation.
  */
-constexpr cast_options default_cast_ops = {
-    cast_layout::zero, cast_round_mode::rint, cast_sat_mode::not_sat};
+constexpr cast_options default_cast_ops = {cast_layout::zero, cast_round_mode::rint, cast_sat_mode::not_sat};
 
 /**
  * @brief Converts the active elements of a register tensor to another element type.
@@ -61,7 +60,7 @@ __simd_callee__ inline reg_tensor<T> trunc(const reg_tensor<T>& src);
 
 #endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_TYPE_CONVERSION_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_TYPE_CONVERSION_H__)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_TYPE_CONVERSION_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_TYPE_CONVERSION_H__
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_PUBLIC_TYPE_CONVERSION_H
 #endif

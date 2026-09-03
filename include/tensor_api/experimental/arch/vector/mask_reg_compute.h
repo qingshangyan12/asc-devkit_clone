@@ -30,7 +30,7 @@ namespace experimental {
 /**
  * @brief Creates a register mask with the specified pattern for an element type.
  * @return A register mask containing the selected pattern.
- * @note Supported element widths are 8, 16, and 32 bits.
+ * @note Supported element widths are b8, b16 and b32.
  */
 template <mask_pattern Pattern = mask_pattern::all, typename DataType>
 __simd_callee__ inline reg_tensor<bool> make_mask();
@@ -38,7 +38,7 @@ __simd_callee__ inline reg_tensor<bool> make_mask();
 /**
  * @brief Creates a register mask with all lanes enabled for an element type.
  * @return A register mask with all lanes enabled.
- * @note Supported element widths are 8, 16, and 32 bits.
+ * @note Supported element widths are b8, b16 and b32.
  */
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> all_mask();
@@ -46,7 +46,7 @@ __simd_callee__ inline reg_tensor<bool> all_mask();
 /**
  * @brief Creates a register mask with all lanes disabled for an element type.
  * @return A register mask with all lanes disabled.
- * @note Supported element widths are 8, 16, and 32 bits.
+ * @note Supported element widths are b8, b16 and b32.
  */
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> none_mask();
@@ -55,7 +55,7 @@ __simd_callee__ inline reg_tensor<bool> none_mask();
  * @brief Creates a mask for a vector iteration and updates the remaining element count.
  * @param remain Element count used to create the mask and updated for the subsequent call.
  * @return A register mask enabling the elements processed by the current iteration.
- * @note Supported element widths are 8, 16, and 32 bits.
+ * @note Supported element widths are b8, b16 and b32.
  */
 template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
@@ -67,7 +67,7 @@ __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
  * @param src1 Second source register mask.
  * @return A register-mask pair containing the interleaved sequence. The first and second halves of the sequence
  *         are stored in the first and second members, respectively.
- * @note Supported element widths are 8, 16, and 32 bits.
+ * @note Supported element widths are b8, b16 and b32.
  */
 template <typename DataType>
 __simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
@@ -79,7 +79,7 @@ __simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tens
  * @param src1 Second half of the interleaved register-mask sequence.
  * @return A register-mask pair containing the deinterleaved sequence. The first member contains the even lanes,
  *         and the second member contains the odd lanes.
- * @note Supported element widths are 8, 16, and 32 bits.
+ * @note Supported element widths are b8, b16 and b32.
  */
 template <typename DataType>
 __simd_callee__ inline reg_pair<bool> deinterleave(reg_tensor<bool> src0, reg_tensor<bool> src1);

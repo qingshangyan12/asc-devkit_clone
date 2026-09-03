@@ -9,8 +9,6 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    "impl/tensor_api/experimental/arch/vector/reg_data_load_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use tensor_api/experimental/arch/vector/reg_data_load.h instead."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_DATA_LOAD_IMPL_H
 #endif
@@ -101,19 +99,20 @@ struct load_from_ptr_impl<load_sideband_mode::upsample> {
 
 template <>
 struct load_from_ptr_impl<load_sideband_mode::deintlv> {
-    template <typename Pointer, typename RegDataType>
-    __simd_callee__ static inline void run(Pointer src, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
+    template <typename DataType, typename Pointer>
+    __simd_callee__ static inline reg_pair<DataType> run(Pointer src)
     {
         static_assert(
-            is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> || is_b16_type_v<RegDataType> ||
-                is_b32_type_v<RegDataType>,
+            is_b4_type_v<DataType> || is_b8_type_v<DataType> || is_b16_type_v<DataType> || is_b32_type_v<DataType>,
             "load deintlv supports b4, b8, b16, and b32 element types only");
-        asc_loadalign_deintlv(dst0.reg, dst1.reg, src);
+        reg_pair<DataType> dst;
+        asc_loadalign_deintlv(dst.first.reg, dst.second.reg, src);
+        return dst;
     }
 };
 
 template <load_sideband_mode sideband_mode, typename DataType, typename Pointer>
-__simd_callee__ inline reg_tensor<DataType> load_from_ptr(Pointer src)
+__simd_callee__ inline decltype(auto) load_from_ptr(Pointer src)
 {
     return load_from_ptr_impl<sideband_mode>::template run<DataType>(src);
 }
@@ -121,7 +120,12 @@ __simd_callee__ inline reg_tensor<DataType> load_from_ptr(Pointer src)
 template <load_sideband_mode sideband_mode, typename Pointer, typename RegDataType>
 __simd_callee__ inline void load_from_ptr(Pointer src, reg_tensor<RegDataType>& dst0, reg_tensor<RegDataType>& dst1)
 {
-    load_from_ptr_impl<sideband_mode>::run(src, dst0, dst1);
+    static_assert(sideband_mode == load_sideband_mode::deintlv,
+        "two-output load only supports load_sideband_mode::deintlv");
+    static_assert(
+        is_b4_type_v<RegDataType> || is_b8_type_v<RegDataType> || is_b16_type_v<RegDataType> || is_b32_type_v<RegDataType>,
+        "load deintlv supports b4, b8, b16, and b32 element types only");
+    asc_loadalign_deintlv(dst0.reg, dst1.reg, src);
 }
 
 template <broadcast_mode brc_mode>
