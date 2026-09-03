@@ -2198,7 +2198,7 @@ static HcclResult CreateAndAssignNewCcuIns(
     return RegisterCcuKernels(newInsHandle, resRequest, resCtxHost);
 }
 
-// CCU kernel 动态资源申请主流程：1.聚合资源需求 -> 2.查询可复用 CcuIns
+// CCU kernel 动态资源申请主流程：1.查询可复用 CcuIns -> 2.聚合资源需求
 // -> 3a.容量充足则复用并注册 / 3b.新建实例并绑定 comm 后注册。接口返回 CCU_E_UNAVAIL 时触发回退。
 static HcclResult HcclGetCcuKernelDynamic(
     HcclComm comm, OpExecuteConfig opMode, AlgResourceRequest& resRequest,
@@ -2208,17 +2208,7 @@ static HcclResult HcclGetCcuKernelDynamic(
         "[HcclGetCcuKernelDynamic] start, opMode[%u], kernelNum[%zu].", static_cast<uint32_t>(opMode),
         resRequest.ccuKernelInfos.size());
 
-    // 步骤1：聚合资源需求，按 dieId 分组
-    ResDescByDie reqDescs;
-    HcclResult buildRet = BuildAggregatedResReq(resRequest, reqDescs);
-    if (buildRet != HCCL_SUCCESS) {
-        // 防御性清理：BuildAggregatedResReq 失败时契约上已清理，这里再清理一次防止内部契约被破坏
-        DestroyAllDescs(reqDescs);
-        return buildRet;
-    }
-
-    // 步骤2：查询当前 comm 是否已绑定 CcuIns 实例
-    // 接口语义：未绑定 CcuIns 时返回 HCCL_E_UNAVAIL（不是 insNum=0），需走新建路径
+    // 步骤1：查询当前 comm 的 CcuIns，同时确保 CCU 在 kernel 资源查询前已初始化
     CcuInsHandle insHandle = 0;
     uint32_t insNum = 0;
     HcclResult queryRet = HcclCommQueryCcuIns(comm, &insHandle, &insNum);
@@ -2229,11 +2219,20 @@ static HcclResult HcclGetCcuKernelDynamic(
             "[HcclGetCcuKernelDynamic] HcclCommQueryCcuIns success, insHandle[%p] insNum[%u].", insHandle, insNum);
     } else if (queryRet == HCCL_E_UNAVAIL) {
         HCCL_INFO(
-            "[HcclGetCcuKernelDynamic] HcclCommQueryCcuIns returns UNAVAIL, no reusable CcuIns, will create new.");
+            "[HcclGetCcuKernelDynamic] HcclCommQueryCcuIns returns UNAVAIL, fallback from dynamic flow.");
+        return queryRet;
     } else {
         HCCL_ERROR("[HcclGetCcuKernelDynamic] HcclCommQueryCcuIns failed: ret -> %d", queryRet);
-        DestroyAllDescs(reqDescs);
         return queryRet;
+    }
+
+    // 步骤2：聚合资源需求，按 dieId 分组
+    ResDescByDie reqDescs;
+    HcclResult buildRet = BuildAggregatedResReq(resRequest, reqDescs);
+    if (buildRet != HCCL_SUCCESS) {
+        // 防御性清理：BuildAggregatedResReq 失败时契约上已清理，这里再清理一次防止内部契约被破坏
+        DestroyAllDescs(reqDescs);
+        return buildRet;
     }
 
     // 步骤3：有可复用实例走复用路径，否则新建；reqDescs 所有权转移给子函数
