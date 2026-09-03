@@ -491,7 +491,7 @@
 - [asc_set_l0c2gm_channel_para（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md)接口：请使用`asc_set_l0c_copy_channel_para`。
 - [asc_set_l0c2gm_config（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_config_deprecated.md)接口：请使用`asc_set_l0c_copy_config`。TODO：替代接口文档待补齐。
 - [asc_set_l12l0_padding_val（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l12l0_padding_val_deprecated.md)接口：请使用`asc_set_l12l0b_3d_padding`。TODO：替代接口文档待补齐。
-- [asc_set_l13d_padding（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l13d_padding_deprecated.md)接口：请使用`asc_set_gm2l1_padding`或`asc_set_l12l0a_3d_padding`。
+- [asc_set_l13d_padding（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l13d_padding_deprecated.md)接口：请使用[asc_set_l12l0a_3d_padding](../SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md)接口。
 - [asc_set_l0c2gm_relu_alpha（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md)接口：请使用`asc_set_l0c_copy_relu_alpha`。TODO：替代接口文档待补齐。
 - [asc_set_l0c2gm_lrelu_alpha（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_lrelu_alpha_deprecated.md)接口：请使用`asc_set_l0c_copy_lrelu_alpha`。TODO：替代接口文档待补齐。
 - [asc_copy_gm2l1_align（废弃）](../SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_align_deprecated.md)接口：旧常规重载及`asc_copy_gm2l1_align_sync`已废弃。
