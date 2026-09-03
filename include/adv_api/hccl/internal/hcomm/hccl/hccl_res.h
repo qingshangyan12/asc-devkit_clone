@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include "hccl_types.h"
 #include "../hcomm_res_defs.h"
+#include "acl_base_rt.h"
 
 #ifdef __cplusplus
 extern "C" {

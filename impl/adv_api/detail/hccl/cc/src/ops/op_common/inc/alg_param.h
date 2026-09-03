@@ -265,14 +265,14 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     }
 
     template <typename Ar>
-    static void VisitTopoInstDetails(Ar& ar, const TopoInstDetails& details)
+    static void VisitTopoInstDetails(Ar& ar, TopoInstDetails& details)
     {
         ar & details.topoInstNum & details.sizeOfTopo & details.typeOfTopo & details.ranksInTopo;
         ar & details.rankNumForTopoType;
     }
 
     template <typename Ar>
-    static void VisitPhysicalLevel(Ar& ar, const PhysicalLevelInfo& level)
+    static void VisitPhysicalLevel(Ar& ar, PhysicalLevelInfo& level)
     {
         ar & level.localRanks & level.view & level.instSizeListByLayer;
         ar & level.ref.netLayer & level.ref.topoInstId & level.hasTopoInst & level.topoType;
