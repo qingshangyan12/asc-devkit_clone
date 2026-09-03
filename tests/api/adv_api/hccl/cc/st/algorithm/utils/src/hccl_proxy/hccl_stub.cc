@@ -468,6 +468,14 @@ HcclResult HcclCommDestroy(HcclComm comm)
 
 int32_t HcommThreadNotifyWaitOnThread(ThreadHandle thread, uint32_t notifyIdx, uint32_t timeout)
 {
+    auto& taskCacheState = GetMc2TaskCacheTestStubState();
+    if (taskCacheState.interceptNotifyCalls) {
+        ++taskCacheState.notifyWaitCalls;
+        taskCacheState.waitThread = thread;
+        taskCacheState.waitNotifyIdx = notifyIdx;
+        taskCacheState.events.emplace_back("notify_wait");
+        return taskCacheState.notifyWaitRet;
+    }
     // timeout 暂时未使用
     static_cast<void>(timeout);
 
@@ -489,6 +497,15 @@ int32_t HcommThreadNotifyWaitOnThread(ThreadHandle thread, uint32_t notifyIdx, u
 
 int32_t HcommThreadNotifyRecordOnThread(ThreadHandle thread, ThreadHandle dstThread, uint32_t dstNotifyIdx)
 {
+    auto& taskCacheState = GetMc2TaskCacheTestStubState();
+    if (taskCacheState.interceptNotifyCalls) {
+        ++taskCacheState.notifyRecordCalls;
+        taskCacheState.recordThread = thread;
+        taskCacheState.recordDstThread = dstThread;
+        taskCacheState.recordNotifyIdx = dstNotifyIdx;
+        taskCacheState.events.emplace_back("notify_record");
+        return taskCacheState.notifyRecordRet;
+    }
     // 1.获取当前rankId,NpuPos和stream
     uint32_t curRank = reinterpret_cast<HcclSim::SimHcclThread*>(thread)->GetCurRank();
     NpuPos pos = HcclSim::SimWorld::Global()->GetNpuPosByRankId(curRank);
@@ -845,6 +862,7 @@ int32_t HcommBatchModeStart(const char* batchTag)
     (void)batchTag;
     auto& state = GetMc2TaskCacheTestStubState();
     ++state.batchStartCalls;
+    state.events.emplace_back("batch_start");
     return state.batchStartRet;
 }
 
@@ -853,6 +871,7 @@ int32_t HcommBatchModeEnd(const char* batchTag)
     (void)batchTag;
     auto& state = GetMc2TaskCacheTestStubState();
     ++state.batchEndCalls;
+    state.events.emplace_back("batch_end");
     return state.batchEndRet;
 }
 

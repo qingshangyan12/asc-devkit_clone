@@ -8,11 +8,15 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <cstring>
+
 #include "gtest/gtest.h"
 
 #include "sim_communicator.h"
+#include "sim_thread.h"
 #include "sim_world.h"
 #include "hccl_alloc_ctx_res.h"
+#include "op_common.h"
 
 namespace mc2_ops_hccl {
 extern bool g_rejectDirectAclrtMemcpy;
@@ -85,6 +89,56 @@ TEST_F(AicpuAllocCtxResTest, CaptureSafeCopyCoversOpParamAndOpResCtx)
 
     const auto* copiedOpParam = reinterpret_cast<const OpParam*>(opResCtx->algInfo[0].opParam);
     EXPECT_EQ(copiedOpParam->opType, HcclCMDType::HCCL_CMD_ALLGATHER);
+}
+
+TEST_F(AicpuAllocCtxResTest, AllReduceReplayGateReservesASecondFrameworkNotify)
+{
+    OpParam param{};
+    param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
+    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+    param.deviceOrderThread = static_cast<ThreadHandle>(0xdeadU);
+    std::strncpy(param.algTag, "allreduce-replay-gate-ut", sizeof(param.algTag) - 1U);
+
+    AlgResourceRequest request;
+    request.notifyNumOnMainThread = 2U;
+    request.slaveThreadNum = 2U;
+    request.notifyNumPerThread = {4U, 3U};
+    auto resCtx = std::make_unique<AlgResourceCtxSerializable>();
+    ASSERT_EQ(HcclGetThread(comm_, param, request, resCtx), HCCL_SUCCESS);
+    ASSERT_EQ(resCtx->threads.size(), 3U);
+    for (ThreadHandle thread : resCtx->threads) {
+        auto* simThread = reinterpret_cast<SimHcclThread*>(thread);
+        ASSERT_NE(simThread, nullptr);
+        EXPECT_EQ(simThread->GetNotifyNum(), 6U);
+    }
+
+    ThreadHandle savedMainThread = 0;
+    uint32_t savedNotifyNum = 0U;
+    ASSERT_EQ(GetMainThreadInfo(comm_, param, savedMainThread, savedNotifyNum), HCCL_SUCCESS);
+    EXPECT_EQ(savedMainThread, resCtx->threads.front());
+    EXPECT_EQ(savedNotifyNum, 5U);
+}
+
+TEST_F(AicpuAllocCtxResTest, NonAllReduceKeepsOneFrameworkNotify)
+{
+    OpParam param{};
+    param.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+    param.deviceOrderThread = static_cast<ThreadHandle>(0xdeadU);
+    std::strncpy(param.algTag, "allgather-notify-ut", sizeof(param.algTag) - 1U);
+
+    AlgResourceRequest request;
+    request.notifyNumOnMainThread = 2U;
+    request.slaveThreadNum = 1U;
+    request.notifyNumPerThread = {4U};
+    auto resCtx = std::make_unique<AlgResourceCtxSerializable>();
+    ASSERT_EQ(HcclGetThread(comm_, param, request, resCtx), HCCL_SUCCESS);
+    ASSERT_EQ(resCtx->threads.size(), 2U);
+    for (ThreadHandle thread : resCtx->threads) {
+        auto* simThread = reinterpret_cast<SimHcclThread*>(thread);
+        ASSERT_NE(simThread, nullptr);
+        EXPECT_EQ(simThread->GetNotifyNum(), 5U);
+    }
 }
 
 } // namespace
