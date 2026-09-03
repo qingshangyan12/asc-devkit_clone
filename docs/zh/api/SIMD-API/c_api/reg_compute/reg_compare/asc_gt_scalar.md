@@ -102,6 +102,7 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```cpp
 #include <cstdint>
@@ -192,5 +193,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->
