@@ -64,6 +64,7 @@ TopoInfoWithNetLayerDetails MakeMultiJettyTopo()
     topo.level0Topo = Level0Shape::MESH_1D_CLOS;
     topo.topoLevelNums = 1U;
     topo.level0PcieMix = false;
+    topo.netLayerDetails.localNetInsSizeOfLayer = {8U};
     topo.topoInstDetailsOfLayer.resize(1U);
     topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_1DMESH] = {8U};
     topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_CLOS] = {16U};
