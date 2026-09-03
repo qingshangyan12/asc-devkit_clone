@@ -20,7 +20,6 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/alg_v2_template_base.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/aiv_alg_template_base.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/template_utils.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/aiv_alg_template_base.cc
 )
 
 if(MC2_CLIENT_ENABLE_CCU)

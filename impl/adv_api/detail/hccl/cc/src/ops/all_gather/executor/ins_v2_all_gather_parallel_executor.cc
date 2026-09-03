@@ -13,7 +13,6 @@
 #include "ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
 #include "topo_match_pcie_mix.h"
-#include "alg_data_trans_wrapper.h"
 
 #include "topo_match_multilevel.h"
 #include "topo_match_ubx.h"
