@@ -17,6 +17,7 @@
 #include "sim_world.h"
 #include "hccl_alloc_ctx_res.h"
 #include "op_common.h"
+#include "task_cache_test_stub.h"
 
 namespace mc2_ops_hccl {
 extern bool g_rejectDirectAclrtMemcpy;
@@ -40,6 +41,7 @@ protected:
         g_rejectDirectAclrtMemcpy = false;
         g_aclrtMemcpyCallCount = 0U;
         g_hcclEngineCtxCopyCallCount = 0U;
+        ResetMc2TaskCacheTestStubState();
     }
 
     void TearDown() override
@@ -47,6 +49,7 @@ protected:
         g_rejectDirectAclrtMemcpy = false;
         g_aclrtMemcpyCallCount = 0U;
         g_hcclEngineCtxCopyCallCount = 0U;
+        ResetMc2TaskCacheTestStubState();
         if (comm_ != nullptr) {
             EXPECT_EQ(HcclCommDestroy(comm_), HCCL_SUCCESS);
             comm_ = nullptr;
@@ -96,8 +99,13 @@ TEST_F(AicpuAllocCtxResTest, AllReduceReplayGateReservesASecondFrameworkNotify)
     OpParam param{};
     param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
     param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
-    param.deviceOrderThread = static_cast<ThreadHandle>(0xdeadU);
     std::strncpy(param.algTag, "allreduce-replay-gate-ut", sizeof(param.algTag) - 1U);
+
+    ASSERT_EQ(PrepareMc2AllReduceReplayGate(comm_, param), HCCL_SUCCESS);
+    const auto& state = GetMc2TaskCacheTestStubState();
+    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 1U);
+    EXPECT_EQ(state.dedicatedThreadNotifyNum, 1U);
+    EXPECT_EQ(param.deviceOrderThread, state.dedicatedThread);
 
     AlgResourceRequest request;
     request.notifyNumOnMainThread = 2U;
@@ -117,6 +125,48 @@ TEST_F(AicpuAllocCtxResTest, AllReduceReplayGateReservesASecondFrameworkNotify)
     ASSERT_EQ(GetMainThreadInfo(comm_, param, savedMainThread, savedNotifyNum), HCCL_SUCCESS);
     EXPECT_EQ(savedMainThread, resCtx->threads.front());
     EXPECT_EQ(savedNotifyNum, 5U);
+    for (ThreadHandle thread : resCtx->threads) {
+        EXPECT_NE(thread, param.deviceOrderThread);
+    }
+}
+
+TEST_F(AicpuAllocCtxResTest, AllReduceReplayGateFallsBackWhenDedicatedThreadIsUnsupported)
+{
+    auto& state = GetMc2TaskCacheTestStubState();
+    state.dedicatedThreadAcquireSupported = false;
+    OpParam param{};
+    param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
+    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+
+    EXPECT_EQ(PrepareMc2AllReduceReplayGate(comm_, param), HCCL_SUCCESS);
+    EXPECT_EQ(param.deviceOrderThread, 0U);
+    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 0U);
+}
+
+TEST_F(AicpuAllocCtxResTest, AllReduceReplayGatePropagatesDedicatedThreadAcquireFailure)
+{
+    auto& state = GetMc2TaskCacheTestStubState();
+    state.dedicatedThreadAcquireRet = HCCL_E_INTERNAL;
+    OpParam param{};
+    param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
+    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+
+    EXPECT_EQ(PrepareMc2AllReduceReplayGate(comm_, param), HCCL_E_INTERNAL);
+    EXPECT_EQ(param.deviceOrderThread, 0U);
+    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 1U);
+}
+
+TEST_F(AicpuAllocCtxResTest, AllReduceReplayGateFallsBackWhenDeviceOrderLaunchIsDisabled)
+{
+    auto& state = GetMc2TaskCacheTestStubState();
+    state.dedicatedThread = 0U;
+    OpParam param{};
+    param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
+    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+
+    EXPECT_EQ(PrepareMc2AllReduceReplayGate(comm_, param), HCCL_SUCCESS);
+    EXPECT_EQ(param.deviceOrderThread, 0U);
+    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 1U);
 }
 
 TEST_F(AicpuAllocCtxResTest, NonAllReduceKeepsOneFrameworkNotify)

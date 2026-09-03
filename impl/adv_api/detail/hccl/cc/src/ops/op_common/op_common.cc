@@ -8,10 +8,10 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <algorithm>
+#include <atomic>
 #include <future>
 #include <limits>
 #include <map>
-#include <mutex>
 #include <numeric>
 #include <string>
 #include <memory>
@@ -41,6 +41,7 @@
 #include "dpu/kernel_launch.h"
 #include "hcomm_host_profiling_dl.h"
 #include "hcomm_primitives_dl.h"
+#include "hccl_res_dl.h"
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
@@ -784,14 +785,16 @@ void CompReqChannelWithExistChannel(
 }
 
 namespace {
-constexpr u32 MC2_REPLAY_GATE_RELEASE_THREAD_NOTIFY_NUM = 0U;
-constexpr char MC2_REPLAY_GATE_RELEASE_THREAD_CTX_TAG[] = "mc2_allreduce_replay_gate_thread";
-std::mutex g_mc2ReplayGateThreadMutex;
+constexpr u32 MC2_REPLAY_GATE_RELEASE_THREAD_NOTIFY_NUM = 1U;
+std::atomic_flag g_mc2ReplayGateUnsupportedWarned = ATOMIC_FLAG_INIT;
+std::atomic_flag g_mc2ReplayGateDisabledWarned = ATOMIC_FLAG_INIT;
 
 bool IsMc2AllReduceReplayGateRequested(const OpParam& param)
 {
     return param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE && param.engine == CommEngine::COMM_ENGINE_AICPU_TS;
 }
+
+} // namespace
 
 HcclResult PrepareMc2AllReduceReplayGate(HcclComm comm, OpParam& param)
 {
@@ -800,58 +803,32 @@ HcclResult PrepareMc2AllReduceReplayGate(HcclComm comm, OpParam& param)
         return HCCL_SUCCESS;
     }
 
-    auto loadCachedThread = [comm, &param](void** cachedCtx) -> HcclResult {
-        uint64_t size = sizeof(ThreadHandle);
-        *cachedCtx = nullptr;
-        if (HcclEngineCtxGet(
-                comm, MC2_REPLAY_GATE_RELEASE_THREAD_CTX_TAG, CommEngine::COMM_ENGINE_CPU_TS, cachedCtx, &size) !=
-            HCCL_SUCCESS) {
-            *cachedCtx = nullptr;
-            return HCCL_SUCCESS;
+    if (!HcommIsSupportHcclDedicatedThreadAcquire()) {
+        if (!g_mc2ReplayGateUnsupportedWarned.test_and_set()) {
+            HCCL_WARNING(
+                "[MC2_REPLAY_GATE][Host] HcclDedicatedThreadAcquire is unavailable; replay gate is disabled.");
         }
-        CHK_PRT_RET(
-            *cachedCtx == nullptr || size != sizeof(ThreadHandle),
-            HCCL_ERROR(
-                "[MC2_REPLAY_GATE][Host] invalid cached release thread context, ctx[%p], size[%llu].", *cachedCtx,
-                static_cast<unsigned long long>(size)),
-            HCCL_E_INTERNAL);
-        param.deviceOrderThread = *static_cast<ThreadHandle*>(*cachedCtx);
         return HCCL_SUCCESS;
-    };
-
-    void* ctx = nullptr;
-    CHK_RET(loadCachedThread(&ctx));
-    if (param.deviceOrderThread != 0) {
-        return HCCL_SUCCESS;
-    }
-
-    std::lock_guard<std::mutex> lock(g_mc2ReplayGateThreadMutex);
-    CHK_RET(loadCachedThread(&ctx));
-    if (param.deviceOrderThread != 0) {
-        return HCCL_SUCCESS;
-    }
-
-    if (ctx == nullptr) {
-        CHK_RET(HcclEngineCtxCreate(
-            comm, MC2_REPLAY_GATE_RELEASE_THREAD_CTX_TAG, CommEngine::COMM_ENGINE_CPU_TS, sizeof(ThreadHandle),
-            &ctx));
-        CHK_PTR_NULL(ctx);
-        *static_cast<ThreadHandle*>(ctx) = 0;
     }
 
     ThreadHandle releaseThread = 0;
-    CHK_RET(HcclThreadAcquire(
-        comm, CommEngine::COMM_ENGINE_AICPU_TS, 1U, MC2_REPLAY_GATE_RELEASE_THREAD_NOTIFY_NUM, &releaseThread));
+    HcclResult ret = HcommAcquireDeviceOrderLaunchThread(
+        comm, MC2_REPLAY_GATE_RELEASE_THREAD_NOTIFY_NUM, &releaseThread);
     CHK_PRT_RET(
-        releaseThread == 0, HCCL_ERROR("[MC2_REPLAY_GATE][Host] failed to acquire release thread."),
-        HCCL_E_INTERNAL);
+        ret != HCCL_SUCCESS,
+        HCCL_ERROR("[MC2_REPLAY_GATE][Host] failed to acquire dedicated release thread, ret[%d].", ret), ret);
+    if (releaseThread == 0) {
+        if (!g_mc2ReplayGateDisabledWarned.test_and_set()) {
+            HCCL_WARNING(
+                "[MC2_REPLAY_GATE][Host] device order launch is disabled; replay gate is disabled.");
+        }
+        return HCCL_SUCCESS;
+    }
 
-    *static_cast<ThreadHandle*>(ctx) = releaseThread;
     param.deviceOrderThread = releaseThread;
-    HCCL_DEBUG("[MC2_REPLAY_GATE][Host] created releaseThread[0x%llx].", releaseThread);
+    HCCL_DEBUG("[MC2_REPLAY_GATE][Host] acquired dedicated releaseThread[0x%llx].", releaseThread);
     return HCCL_SUCCESS;
 }
-} // namespace
 
 HcclResult HcclGetAlgRes(
     HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor, TopoInfoWithNetLayerDetails* topoInfo,

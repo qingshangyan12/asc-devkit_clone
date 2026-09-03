@@ -415,6 +415,26 @@ HcclResult HcclThreadAcquire(
     return simComm->independentOpThreadMgr_->HcclThreadAcquire(engine, threadNum, notifyNumPerThread, threads);
 }
 
+bool HcommIsSupportHcclDedicatedThreadAcquire(void)
+{
+    return GetMc2TaskCacheTestStubState().dedicatedThreadAcquireSupported;
+}
+
+HcclResult HcommAcquireDeviceOrderLaunchThread(
+    HcclComm comm, uint32_t notifyNumPerThread, ThreadHandle* thread)
+{
+    auto& state = GetMc2TaskCacheTestStubState();
+    ++state.dedicatedThreadAcquireCalls;
+    state.dedicatedThreadNotifyNum = notifyNumPerThread;
+    if (state.dedicatedThreadAcquireRet != HCCL_SUCCESS) {
+        return state.dedicatedThreadAcquireRet;
+    }
+    CHK_PTR_NULL(comm);
+    CHK_PTR_NULL(thread);
+    *thread = state.dedicatedThread;
+    return HCCL_SUCCESS;
+}
+
 HcclResult HcclThreadAcquireWithStream(
     HcclComm comm, CommEngine engine, aclrtStream stream, uint32_t notifyNum, ThreadHandle* thread)
 {
