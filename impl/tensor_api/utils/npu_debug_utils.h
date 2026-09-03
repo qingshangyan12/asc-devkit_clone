@@ -191,6 +191,96 @@ TENSOR_API_DETAIL_DEFINE_FLAT_TUPLE_FORMAT(6);
 template <typename... ValueTypes>
 constexpr bool are_debug_scalar_values_v = (... && !Std::is_tuple_v<Std::remove_cvref_t<ValueTypes>>);
 
+template <size_t Size>
+struct debug_format_string {
+    char data[Size]{};
+};
+
+template <typename CharType, size_t Size>
+__aicore__ inline constexpr auto debug_make_format_string(const CharType (&value)[Size])
+{
+    debug_format_string<Size> result{};
+    for (size_t index = 0; index < Size; ++index) {
+        result.data[index] = value[index];
+    }
+    return result;
+}
+
+template <size_t LeftSize, size_t RightSize>
+__aicore__ inline constexpr auto debug_concat_format_string(
+    const debug_format_string<LeftSize>& left, const debug_format_string<RightSize>& right)
+{
+    debug_format_string<LeftSize + RightSize - 1> result{};
+    for (size_t index = 0; index + 1 < LeftSize; ++index) {
+        result.data[index] = left.data[index];
+    }
+    for (size_t index = 0; index < RightSize; ++index) {
+        result.data[LeftSize - 1 + index] = right.data[index];
+    }
+    return result;
+}
+
+template <typename ValueType>
+__aicore__ inline constexpr auto debug_build_tuple_format();
+
+template <typename TupleType, size_t Index>
+__aicore__ inline constexpr auto debug_build_tuple_body()
+{
+    constexpr size_t tuple_size = Std::tuple_size_v<TupleType>;
+    if constexpr (Index == tuple_size) {
+        return debug_make_format_string("");
+    } else {
+        using element_type = typename Std::tuple_element<Index, TupleType>::type;
+        auto element_format = debug_build_tuple_format<element_type>();
+        if constexpr (Index + 1 == tuple_size) {
+            return element_format;
+        } else {
+            return debug_concat_format_string(
+                debug_concat_format_string(element_format, debug_make_format_string(", ")),
+                debug_build_tuple_body<TupleType, Index + 1>());
+        }
+    }
+}
+
+template <typename ValueType>
+__aicore__ inline constexpr auto debug_build_tuple_format()
+{
+    using value_type = Std::remove_cvref_t<ValueType>;
+    if constexpr (Std::is_tuple_v<value_type>) {
+        return debug_concat_format_string(
+            debug_make_format_string("("),
+            debug_concat_format_string(debug_build_tuple_body<value_type, 0>(), debug_make_format_string(")")));
+    } else {
+        return debug_make_format_string("%lld");
+    }
+}
+
+template <typename ValueType>
+struct debug_tuple_format_storage {
+    inline static constexpr auto value = debug_build_tuple_format<ValueType>();
+};
+
+template <typename ValueType>
+__aicore__ inline constexpr auto debug_tuple_format_with_batch()
+{
+    return debug_concat_format_string(
+        debug_make_format_string("(%lld, "),
+        debug_concat_format_string(debug_tuple_format_storage<ValueType>::value, debug_make_format_string(")")));
+}
+
+template <typename ValueType, bool HasBatch>
+struct debug_optional_batch_format;
+
+template <typename ValueType>
+struct debug_optional_batch_format<ValueType, false> {
+    inline static constexpr auto value = debug_tuple_format_storage<ValueType>::value;
+};
+
+template <typename ValueType>
+struct debug_optional_batch_format<ValueType, true> {
+    inline static constexpr auto value = debug_tuple_format_with_batch<ValueType>();
+};
+
 template <typename ValueType>
 struct debug_tuple_format {
     using type = debug_tuple_unsupported;

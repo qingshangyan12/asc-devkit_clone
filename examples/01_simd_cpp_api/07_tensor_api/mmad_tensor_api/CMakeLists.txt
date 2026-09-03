@@ -28,6 +28,10 @@ add_executable(demo
     mmad_tensor_api.asc
 )
 
+target_compile_definitions(demo PRIVATE
+    ASCENDC_DEBUG=1
+)
+
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )

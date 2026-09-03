@@ -43,6 +43,14 @@ __aicore__ inline void tensor_api_debug_assert_fail(__gm__ const char* full_form
     trap();
 }
 
+template <size_t Size, typename... ArgTypes>
+__aicore__ inline void tensor_api_debug_assert_fail_dynamic(
+    const tensor_api_assert_context& context, const debug_format_string<Size>& body_format, ArgTypes&&... args)
+{
+    tensor_api_debug_assert_fail(
+        body_format.data, context.file, context.line, context.function, static_cast<ArgTypes&&>(args)...);
+}
+
 } // namespace te
 } // namespace asc
 
@@ -105,6 +113,37 @@ namespace te {
     } while (0)
 
 template <tensor_layout_error_kind kind, typename LayoutType, typename ValueType, size_t... indices>
+__aicore__ inline void report_tensor_layout_error_dynamic(
+    const tensor_api_assert_context& context, const LayoutType& layout, const ValueType& value,
+    __gm__ const char* tensor_name, __gm__ const char* api_name, Std::index_sequence<indices...>)
+{
+    using view_type = debug_layout_view<LayoutType>;
+    using traits_type = tensor_layout_error_traits<kind>;
+    constexpr auto prefix = debug_make_format_string(
+        "[ASSERT] %s:%u: %s: Failed to check %s tensor %s in %s, current %sLayoutPtn=%s, %s%s=");
+    constexpr auto suffix = debug_make_format_string("; all %s tensor %s must be %s.\n");
+    constexpr auto value_format = debug_tuple_format_storage<ValueType>::value;
+    if constexpr (view_type::has_batch) {
+        constexpr auto batch_value_format = debug_concat_format_string(
+            debug_make_format_string("(%lld, "),
+            debug_concat_format_string(value_format, debug_make_format_string(")")));
+        constexpr auto format =
+            debug_concat_format_string(prefix, debug_concat_format_string(batch_value_format, suffix));
+        tensor_api_debug_assert_fail_dynamic(
+            context, format, tensor_name, traits_type::value_name(), api_name, tensor_name, view_type::pattern_name(),
+            tensor_name, traits_type::field_name(), static_cast<long long>(traits_type::batch(layout)),
+            static_cast<long long>(get_debug_tuple_leaf<indices>(value))..., tensor_name,
+            traits_type::value_description(), traits_type::requirement());
+    } else {
+        constexpr auto format = debug_concat_format_string(prefix, debug_concat_format_string(value_format, suffix));
+        tensor_api_debug_assert_fail_dynamic(
+            context, format, tensor_name, traits_type::value_name(), api_name, tensor_name, view_type::pattern_name(),
+            tensor_name, traits_type::field_name(), static_cast<long long>(get_debug_tuple_leaf<indices>(value))...,
+            tensor_name, traits_type::value_description(), traits_type::requirement());
+    }
+}
+
+template <tensor_layout_error_kind kind, typename LayoutType, typename ValueType, size_t... indices>
 __aicore__ inline void report_tensor_layout_error_impl(
     const tensor_api_assert_context& context, const LayoutType& layout, const ValueType& value,
     __gm__ const char* tensor_name, __gm__ const char* api_name, Std::index_sequence<indices...>)
@@ -133,24 +172,9 @@ __aicore__ inline void report_tensor_layout_error_impl(
     } else if constexpr (Std::is_same_v<format_type, debug_tuple_leading_scalar_nested_2x2>) {
         TENSOR_API_DETAIL_REPORT_LAYOUT_FORMATS(
             "(%lld, ((%lld, %lld), (%lld, %lld)))", "(%lld, %lld, ((%lld, %lld), (%lld, %lld)))");
-    } else if constexpr (view_type::has_batch) {
-        TENSOR_API_DETAIL_ASSERT_FAIL(
-            context,
-            "Failed to check %s tensor %s in %s, current %sLayoutPtn=%s, %s%s=(%lld, <unsupported tuple structure>), "
-            "%s%sLeafCount=%u; all %s tensor %s must be %s.",
-            tensor_name, traits_type::value_name(), api_name, tensor_name, view_type::pattern_name(), tensor_name,
-            traits_type::field_name(), static_cast<long long>(traits_type::batch(layout)), tensor_name,
-            traits_type::field_name(), static_cast<unsigned int>(nesting_depth_v<ValueType> + 1), tensor_name,
-            traits_type::value_description(), traits_type::requirement());
     } else {
-        TENSOR_API_DETAIL_ASSERT_FAIL(
-            context,
-            "Failed to check %s tensor %s in %s, current %sLayoutPtn=%s, %s%s=<unsupported tuple structure>, "
-            "%s%sLeafCount=%u; all %s tensor %s must be %s.",
-            tensor_name, traits_type::value_name(), api_name, tensor_name, view_type::pattern_name(), tensor_name,
-            traits_type::field_name(), tensor_name, traits_type::field_name(),
-            static_cast<unsigned int>(nesting_depth_v<ValueType>), tensor_name, traits_type::value_description(),
-            traits_type::requirement());
+        report_tensor_layout_error_dynamic<kind>(
+            context, layout, value, tensor_name, api_name, Std::make_index_sequence<nesting_depth_v<ValueType>>{});
     }
 }
 
@@ -257,6 +281,47 @@ __aicore__ inline void report_tensor_layout_error(
         }                                                                                                        \
     } while (0)
 
+template <
+    size_t Size, typename SrcTensorType, typename DstTensorType, typename SrcShapeType, typename DstShapeType,
+    size_t... src_indices, size_t... dst_indices>
+__aicore__ inline void report_copy_size_unsupported_dynamic(
+    const tensor_api_assert_context& context, const debug_format_string<Size>& body, __gm__ const char* api_name,
+    const SrcTensorType& src, const DstTensorType& dst, const SrcShapeType& src_shape, const DstShapeType& dst_shape,
+    Std::index_sequence<src_indices...>, Std::index_sequence<dst_indices...>)
+{
+    using src_view_type = debug_layout_view<decltype(src.layout())>;
+    using dst_view_type = debug_layout_view<decltype(dst.layout())>;
+    if constexpr (src_view_type::has_batch && dst_view_type::has_batch) {
+        tensor_api_debug_assert_fail_dynamic(
+            context, body, api_name, src_view_type::pattern_name(),
+            static_cast<long long>(src_view_type::batch(src.layout())),
+            static_cast<long long>(get_debug_tuple_leaf<src_indices>(src_shape))..., static_cast<long long>(src.size()),
+            dst_view_type::pattern_name(), static_cast<long long>(dst_view_type::batch(dst.layout())),
+            static_cast<long long>(get_debug_tuple_leaf<dst_indices>(dst_shape))...,
+            static_cast<long long>(dst.size()));
+    } else if constexpr (src_view_type::has_batch) {
+        tensor_api_debug_assert_fail_dynamic(
+            context, body, api_name, src_view_type::pattern_name(),
+            static_cast<long long>(src_view_type::batch(src.layout())),
+            static_cast<long long>(get_debug_tuple_leaf<src_indices>(src_shape))..., static_cast<long long>(src.size()),
+            dst_view_type::pattern_name(), static_cast<long long>(get_debug_tuple_leaf<dst_indices>(dst_shape))...,
+            static_cast<long long>(dst.size()));
+    } else if constexpr (dst_view_type::has_batch) {
+        tensor_api_debug_assert_fail_dynamic(
+            context, body, api_name, src_view_type::pattern_name(),
+            static_cast<long long>(get_debug_tuple_leaf<src_indices>(src_shape))..., static_cast<long long>(src.size()),
+            dst_view_type::pattern_name(), static_cast<long long>(dst_view_type::batch(dst.layout())),
+            static_cast<long long>(get_debug_tuple_leaf<dst_indices>(dst_shape))...,
+            static_cast<long long>(dst.size()));
+    } else {
+        tensor_api_debug_assert_fail_dynamic(
+            context, body, api_name, src_view_type::pattern_name(),
+            static_cast<long long>(get_debug_tuple_leaf<src_indices>(src_shape))..., static_cast<long long>(src.size()),
+            dst_view_type::pattern_name(), static_cast<long long>(get_debug_tuple_leaf<dst_indices>(dst_shape))...,
+            static_cast<long long>(dst.size()));
+    }
+}
+
 template <typename SrcTensorType, typename DstTensorType>
 __aicore__ inline void report_copy_size_unsupported(
     const tensor_api_assert_context& context, const SrcTensorType& src, const DstTensorType& dst,
@@ -264,32 +329,24 @@ __aicore__ inline void report_copy_size_unsupported(
 {
     using src_view_type = debug_layout_view<decltype(src.layout())>;
     using dst_view_type = debug_layout_view<decltype(dst.layout())>;
-    if constexpr (src_view_type::has_batch && dst_view_type::has_batch) {
-        TENSOR_API_DETAIL_COPY_SIZE_FAIL(
-            "srcLayoutPtn=%s, srcShape=(%lld, <unsupported tuple structure>), copyDataSize=%lld, "
-            "dstLayoutPtn=%s, dstShape=(%lld, <unsupported tuple structure>), dstTensorSize=%lld",
-            src_view_type::pattern_name(), static_cast<long long>(src_view_type::batch(src.layout())),
-            static_cast<long long>(src.size()), dst_view_type::pattern_name(),
-            static_cast<long long>(dst_view_type::batch(dst.layout())), static_cast<long long>(dst.size()));
-    } else if constexpr (src_view_type::has_batch) {
-        TENSOR_API_DETAIL_COPY_SIZE_FAIL(
-            "srcLayoutPtn=%s, srcShape=(%lld, <unsupported tuple structure>), copyDataSize=%lld, "
-            "dstLayoutPtn=%s, dstShape=<unsupported tuple structure>, dstTensorSize=%lld",
-            src_view_type::pattern_name(), static_cast<long long>(src_view_type::batch(src.layout())),
-            static_cast<long long>(src.size()), dst_view_type::pattern_name(), static_cast<long long>(dst.size()));
-    } else if constexpr (dst_view_type::has_batch) {
-        TENSOR_API_DETAIL_COPY_SIZE_FAIL(
-            "srcLayoutPtn=%s, srcShape=<unsupported tuple structure>, copyDataSize=%lld, "
-            "dstLayoutPtn=%s, dstShape=(%lld, <unsupported tuple structure>), dstTensorSize=%lld",
-            src_view_type::pattern_name(), static_cast<long long>(src.size()), dst_view_type::pattern_name(),
-            static_cast<long long>(dst_view_type::batch(dst.layout())), static_cast<long long>(dst.size()));
-    } else {
-        TENSOR_API_DETAIL_COPY_SIZE_FAIL(
-            "srcLayoutPtn=%s, srcShape=<unsupported tuple structure>, copyDataSize=%lld, "
-            "dstLayoutPtn=%s, dstShape=<unsupported tuple structure>, dstTensorSize=%lld",
-            src_view_type::pattern_name(), static_cast<long long>(src.size()), dst_view_type::pattern_name(),
-            static_cast<long long>(dst.size()));
-    }
+    auto src_shape = src_view_type::shape(src.layout());
+    auto dst_shape = dst_view_type::shape(dst.layout());
+    constexpr auto src_format = debug_optional_batch_format<decltype(src_shape), src_view_type::has_batch>::value;
+    constexpr auto dst_format = debug_optional_batch_format<decltype(dst_shape), dst_view_type::has_batch>::value;
+    constexpr auto body = debug_concat_format_string(
+        debug_make_format_string(
+            "[ASSERT] %s:%u: %s: Failed to check copy data size in %s, srcLayoutPtn=%s, srcShape="),
+        debug_concat_format_string(
+            src_format, debug_concat_format_string(
+                            debug_make_format_string(", copyDataSize=%lld, dstLayoutPtn=%s, dstShape="),
+                            debug_concat_format_string(
+                                dst_format, debug_make_format_string(
+                                                ", dstTensorSize=%lld; the amount of data to copy must not exceed the "
+                                                "destination tensor size.\n")))));
+    report_copy_size_unsupported_dynamic(
+        context, body, api_name, src, dst, src_shape, dst_shape,
+        Std::make_index_sequence<nesting_depth_v<decltype(src_shape)>>{},
+        Std::make_index_sequence<nesting_depth_v<decltype(dst_shape)>>{});
 }
 
 template <
@@ -436,76 +493,104 @@ __aicore__ inline void report_copy_size_error(
     TENSOR_API_DETAIL_REPORT_SLICE_WITH_FORMATS(                                     \
         tuple_format, batch_tuple_format, tuple_format, tuple_format, batch_tuple_format)
 
-template <
-    slice_error_kind kind, typename LayoutType, typename CoordType, typename InfoType, typename SourceShapeType,
-    typename SliceShapeType>
-__aicore__ inline void report_slice_unsupported_source_batch(
-    const tensor_api_assert_context& context, const LayoutType& layout, const CoordType&, const InfoType& info,
-    const SourceShapeType&, const SliceShapeType&)
-{
-    using view_type = debug_layout_view<LayoutType>;
-    using slice_view_type = debug_slice_info_view<InfoType>;
-    if constexpr (slice_view_type::has_layout && slice_view_type::has_batch) {
-        TENSOR_API_DETAIL_SLICE_FAIL(
-            "sourceLayoutPtn=%s, sourceShape=(%lld, <unsupported tuple combination>), "
-            "sourceShapeLeafCount=%u, coordLeafCount=%u, sliceLayoutPtn=%s, "
-            "sliceShape=(%lld, <unsupported tuple combination>), sliceShapeLeafCount=%u",
-            view_type::pattern_name(), static_cast<long long>(view_type::batch(layout)),
-            static_cast<unsigned int>(nesting_depth_v<SourceShapeType> + 1),
-            static_cast<unsigned int>(nesting_depth_v<CoordType>), slice_view_type::pattern_name(),
-            static_cast<long long>(slice_view_type::batch(info)),
-            static_cast<unsigned int>(nesting_depth_v<SliceShapeType> + 1));
-    } else if constexpr (slice_view_type::has_layout) {
-        TENSOR_API_DETAIL_SLICE_FAIL(
-            "sourceLayoutPtn=%s, sourceShape=(%lld, <unsupported tuple combination>), "
-            "sourceShapeLeafCount=%u, coordLeafCount=%u, sliceLayoutPtn=%s, sliceShapeLeafCount=%u",
-            view_type::pattern_name(), static_cast<long long>(view_type::batch(layout)),
-            static_cast<unsigned int>(nesting_depth_v<SourceShapeType> + 1),
-            static_cast<unsigned int>(nesting_depth_v<CoordType>), slice_view_type::pattern_name(),
-            static_cast<unsigned int>(nesting_depth_v<SliceShapeType>));
-    } else {
-        TENSOR_API_DETAIL_SLICE_FAIL(
-            "sourceLayoutPtn=%s, sourceShape=(%lld, <unsupported tuple combination>), "
-            "sourceShapeLeafCount=%u, coordLeafCount=%u, sliceShapeLeafCount=%u",
-            view_type::pattern_name(), static_cast<long long>(view_type::batch(layout)),
-            static_cast<unsigned int>(nesting_depth_v<SourceShapeType> + 1),
-            static_cast<unsigned int>(nesting_depth_v<CoordType>),
-            static_cast<unsigned int>(nesting_depth_v<SliceShapeType>));
-    }
-}
+template <slice_error_kind kind>
+struct debug_slice_error_suffix;
+
+template <>
+struct debug_slice_error_suffix<slice_error_kind::source_shape> {
+    inline static constexpr auto value = debug_make_format_string("; sourceShape must be greater than 0.\n");
+};
+
+template <>
+struct debug_slice_error_suffix<slice_error_kind::slice_shape> {
+    inline static constexpr auto value = debug_make_format_string("; sliceShape must be greater than 0.\n");
+};
+
+template <>
+struct debug_slice_error_suffix<slice_error_kind::coord> {
+    inline static constexpr auto value = debug_make_format_string("; coord must be within shape.\n");
+};
 
 template <
     slice_error_kind kind, typename LayoutType, typename CoordType, typename InfoType, typename SourceShapeType,
-    typename SliceShapeType>
-__aicore__ inline void report_slice_unsupported_no_source_batch(
-    const tensor_api_assert_context& context, const LayoutType&, const CoordType&, const InfoType& info,
-    const SourceShapeType&, const SliceShapeType&)
+    typename SliceShapeType, size_t... source_indices, size_t... coord_indices, size_t... slice_indices>
+__aicore__ inline void report_slice_unsupported_dynamic_impl(
+    const tensor_api_assert_context& context, const LayoutType& layout, const CoordType& coord, const InfoType& info,
+    const SourceShapeType& source_shape, const SliceShapeType& slice_shape, Std::index_sequence<source_indices...>,
+    Std::index_sequence<coord_indices...>, Std::index_sequence<slice_indices...>)
 {
     using view_type = debug_layout_view<LayoutType>;
     using slice_view_type = debug_slice_info_view<InfoType>;
-    if constexpr (slice_view_type::has_layout && slice_view_type::has_batch) {
-        TENSOR_API_DETAIL_SLICE_FAIL(
-            "sourceLayoutPtn=%s, sourceShape=<unsupported tuple combination>, sourceShapeLeafCount=%u, "
-            "coordLeafCount=%u, sliceLayoutPtn=%s, sliceShape=(%lld, <unsupported tuple combination>), "
-            "sliceShapeLeafCount=%u",
-            view_type::pattern_name(), static_cast<unsigned int>(nesting_depth_v<SourceShapeType>),
-            static_cast<unsigned int>(nesting_depth_v<CoordType>), slice_view_type::pattern_name(),
-            static_cast<long long>(slice_view_type::batch(info)),
-            static_cast<unsigned int>(nesting_depth_v<SliceShapeType> + 1));
-    } else if constexpr (slice_view_type::has_layout) {
-        TENSOR_API_DETAIL_SLICE_FAIL(
-            "sourceLayoutPtn=%s, sourceShape=<unsupported tuple combination>, sourceShapeLeafCount=%u, "
-            "coordLeafCount=%u, sliceLayoutPtn=%s, sliceShapeLeafCount=%u",
-            view_type::pattern_name(), static_cast<unsigned int>(nesting_depth_v<SourceShapeType>),
-            static_cast<unsigned int>(nesting_depth_v<CoordType>), slice_view_type::pattern_name(),
-            static_cast<unsigned int>(nesting_depth_v<SliceShapeType>));
+    constexpr auto source_format = debug_optional_batch_format<SourceShapeType, view_type::has_batch>::value;
+    constexpr auto coord_format = debug_tuple_format_storage<CoordType>::value;
+    constexpr auto slice_format = debug_optional_batch_format<SliceShapeType, slice_view_type::has_batch>::value;
+    constexpr auto source_prefix =
+        debug_make_format_string("[ASSERT] %s:%u: %s: Failed to check slice, sourceLayoutPtn=%s, sourceShape=");
+    constexpr auto coord_prefix = debug_make_format_string(", coord=");
+    if constexpr (slice_view_type::has_layout) {
+        constexpr auto slice_prefix = debug_make_format_string(", sliceLayoutPtn=%s, sliceShape=");
+        constexpr auto body = debug_concat_format_string(
+            source_prefix,
+            debug_concat_format_string(
+                source_format,
+                debug_concat_format_string(
+                    coord_prefix,
+                    debug_concat_format_string(
+                        coord_format, debug_concat_format_string(
+                                          slice_prefix, debug_concat_format_string(
+                                                            slice_format, debug_slice_error_suffix<kind>::value))))));
+        if constexpr (view_type::has_batch && slice_view_type::has_batch) {
+            tensor_api_debug_assert_fail_dynamic(
+                context, body, view_type::pattern_name(), static_cast<long long>(view_type::batch(layout)),
+                static_cast<long long>(get_debug_tuple_leaf<source_indices>(source_shape))...,
+                static_cast<long long>(get_debug_tuple_leaf<coord_indices>(coord))..., slice_view_type::pattern_name(),
+                static_cast<long long>(slice_view_type::batch(info)),
+                static_cast<long long>(get_debug_tuple_leaf<slice_indices>(slice_shape))...);
+        } else if constexpr (view_type::has_batch) {
+            tensor_api_debug_assert_fail_dynamic(
+                context, body, view_type::pattern_name(), static_cast<long long>(view_type::batch(layout)),
+                static_cast<long long>(get_debug_tuple_leaf<source_indices>(source_shape))...,
+                static_cast<long long>(get_debug_tuple_leaf<coord_indices>(coord))..., slice_view_type::pattern_name(),
+                static_cast<long long>(get_debug_tuple_leaf<slice_indices>(slice_shape))...);
+        } else if constexpr (slice_view_type::has_batch) {
+            tensor_api_debug_assert_fail_dynamic(
+                context, body, view_type::pattern_name(),
+                static_cast<long long>(get_debug_tuple_leaf<source_indices>(source_shape))...,
+                static_cast<long long>(get_debug_tuple_leaf<coord_indices>(coord))..., slice_view_type::pattern_name(),
+                static_cast<long long>(slice_view_type::batch(info)),
+                static_cast<long long>(get_debug_tuple_leaf<slice_indices>(slice_shape))...);
+        } else {
+            tensor_api_debug_assert_fail_dynamic(
+                context, body, view_type::pattern_name(),
+                static_cast<long long>(get_debug_tuple_leaf<source_indices>(source_shape))...,
+                static_cast<long long>(get_debug_tuple_leaf<coord_indices>(coord))..., slice_view_type::pattern_name(),
+                static_cast<long long>(get_debug_tuple_leaf<slice_indices>(slice_shape))...);
+        }
     } else {
-        TENSOR_API_DETAIL_SLICE_FAIL(
-            "sourceLayoutPtn=%s, sourceShape=<unsupported tuple combination>, sourceShapeLeafCount=%u, "
-            "coordLeafCount=%u, sliceShapeLeafCount=%u",
-            view_type::pattern_name(), static_cast<unsigned int>(nesting_depth_v<SourceShapeType>),
-            static_cast<unsigned int>(nesting_depth_v<CoordType>),
-            static_cast<unsigned int>(nesting_depth_v<SliceShapeType>));
+        constexpr auto slice_prefix = debug_make_format_string(", sliceShape=");
+        constexpr auto body = debug_concat_format_string(
+            source_prefix,
+            debug_concat_format_string(
+                source_format,
+                debug_concat_format_string(
+                    coord_prefix,
+                    debug_concat_format_string(
+                        coord_format, debug_concat_format_string(
+                                          slice_prefix, debug_concat_format_string(
+                                                            slice_format, debug_slice_error_suffix<kind>::value))))));
+        if constexpr (view_type::has_batch) {
+            tensor_api_debug_assert_fail_dynamic(
+                context, body, view_type::pattern_name(), static_cast<long long>(view_type::batch(layout)),
+                static_cast<long long>(get_debug_tuple_leaf<source_indices>(source_shape))...,
+                static_cast<long long>(get_debug_tuple_leaf<coord_indices>(coord))...,
+                static_cast<long long>(get_debug_tuple_leaf<slice_indices>(slice_shape))...);
+        } else {
+            tensor_api_debug_assert_fail_dynamic(
+                context, body, view_type::pattern_name(),
+                static_cast<long long>(get_debug_tuple_leaf<source_indices>(source_shape))...,
+                static_cast<long long>(get_debug_tuple_leaf<coord_indices>(coord))...,
+                static_cast<long long>(get_debug_tuple_leaf<slice_indices>(slice_shape))...);
+        }
     }
 }
 
@@ -516,12 +601,11 @@ __aicore__ inline void report_slice_unsupported(
     const tensor_api_assert_context& context, const LayoutType& layout, const CoordType& coord, const InfoType& info,
     const SourceShapeType& source_shape, const SliceShapeType& slice_shape)
 {
-    using view_type = debug_layout_view<LayoutType>;
-    if constexpr (view_type::has_batch) {
-        report_slice_unsupported_source_batch<kind>(context, layout, coord, info, source_shape, slice_shape);
-    } else {
-        report_slice_unsupported_no_source_batch<kind>(context, layout, coord, info, source_shape, slice_shape);
-    }
+    report_slice_unsupported_dynamic_impl<kind>(
+        context, layout, coord, info, source_shape, slice_shape,
+        Std::make_index_sequence<nesting_depth_v<SourceShapeType>>{},
+        Std::make_index_sequence<nesting_depth_v<CoordType>>{},
+        Std::make_index_sequence<nesting_depth_v<SliceShapeType>>{});
 }
 
 } // namespace te
