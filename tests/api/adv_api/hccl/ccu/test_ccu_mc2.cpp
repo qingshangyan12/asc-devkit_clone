@@ -490,9 +490,10 @@ TEST_F(CcuMc2TestSuite, AlgorithmType_EnumValues)
     EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuAllReduceMesh2DOneShot), 102U);
     EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMesh), 150U);
     EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllVSoleMesh), 151U);
-    EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleMesh), 152U);
-    EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink), 153U);
+    EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleMesh), 153U);
     EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink), 154U);
+    EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent), 155U);
+    EXPECT_EQ(static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink), 156U);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
