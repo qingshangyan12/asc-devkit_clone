@@ -2106,7 +2106,6 @@ static HcclResult HcclGetCcuKernelDynamic(
     // opMode 透传下去：新建路径需要根据模式取不同的默认阈值（MS 模式 LOOP/CCU_BUF 阈值更大）
     HcclResult finalRet = hasReusableIns ? ReuseExistingCcuIns(insHandle, reqDescs, resRequest, resCtxHost) :
                                            CreateAndAssignNewCcuIns(comm, opMode, reqDescs, resRequest, resCtxHost);
-
     // 资源不足导致回退时记一条 run info，便于运维统计动态资源申请的回退频率
     if (finalRet == HCCL_E_UNAVAIL) {
         HCCL_RUN_INFO(
