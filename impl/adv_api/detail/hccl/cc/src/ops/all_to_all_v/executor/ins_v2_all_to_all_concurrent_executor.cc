@@ -46,10 +46,10 @@ template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTempla
 HcclResult InsV2AllToAllConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::ValidateParam(
     const OpParam& param, u32 rankSize, u32 myRank) const
 {
-    CHK_PRT_RET(
-        !IsAicpuEngine(param.engine),
-        HCCL_ERROR("[InsV2AllToAllConcurrentExecutor] unsupported engine[%u].", static_cast<u32>(param.engine)),
-        HCCL_E_NOT_SUPPORT);
+    // CHK_PRT_RET(
+    //     !IsAicpuEngine(param.engine),
+    //     HCCL_ERROR("[InsV2AllToAllConcurrentExecutor] unsupported engine[%u].", static_cast<u32>(param.engine)),
+    //     HCCL_E_NOT_SUPPORT);
     CHK_PRT_RET(
         rankSize <= 1U || rankSize > 4U,
         HCCL_ERROR("[InsV2AllToAllConcurrentExecutor] unsupported rankSize[%u].", rankSize), HCCL_E_NOT_SUPPORT);
