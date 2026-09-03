@@ -41,37 +41,55 @@
 
 ## 函数原型
 
-- 1维偏移
+1维偏移
 
-    ```cpp
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset)
-    ```
+```c
+__simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset)
+__simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset)
+__simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset)
+```
 
-- 2维偏移
+2维偏移
 
-    ```cpp
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1)
-    ```
+```c
+__simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0,
+                                                       uint32_t offset1)
+__simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0,
+                                                        uint32_t offset1)
+__simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0,
+                                                        uint32_t offset1)
+```
 
-- 3维偏移
+3维偏移
 
-    ```cpp
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2)
-    ```
+```c
+__simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0,
+                                                       uint32_t offset1,
+                                                       uint32_t offset2)
+__simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0,
+                                                        uint32_t offset1,
+                                                        uint32_t offset2)
+__simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0,
+                                                        uint32_t offset1,
+                                                        uint32_t offset2)
+```
 
-- 4维偏移
+4维偏移
 
-    ```cpp
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
-    __simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
-    ```
+```c
+__simd_callee__ inline addr_reg asc_update_addr_reg_b8(uint32_t offset0,
+                                                       uint32_t offset1,
+                                                       uint32_t offset2,
+                                                       uint32_t offset3)
+__simd_callee__ inline addr_reg asc_update_addr_reg_b16(uint32_t offset0,
+                                                        uint32_t offset1,
+                                                        uint32_t offset2,
+                                                        uint32_t offset3)
+__simd_callee__ inline addr_reg asc_update_addr_reg_b32(uint32_t offset0,
+                                                        uint32_t offset1,
+                                                        uint32_t offset2,
+                                                        uint32_t offset3)
+```
 
 ## 参数说明
 
@@ -99,16 +117,112 @@
 
 ## 调用示例
 
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+
 ```cpp
-__simd_vf__ inline void update_addr_reg_vf(__ubuf__ half* dst_addr, __ubuf__ half* src_addr, uint16_t one_repeat_size, uint16_t repeat_time)
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+template <typename T>
+void print_data(const char* label, const std::vector<T>& values)
 {
-    vector_half data;
-    vector_bool mask = asc_create_mask_b16(PAT_ALL);
-    addr_reg offset;
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        offset = asc_update_addr_reg_b16(one_repeat_size);
-        asc_loadalign(data, src_addr, offset);
-        asc_storealign(dst_addr, data, offset, mask);
+    std::cout << label << ":";
+    const size_t count = values.size() < 8 ? values.size() : 8;
+    for (size_t i = 0; i < count; ++i) std::cout << ' ' << +values[i];
+    if (values.size() > count) std::cout << " ...";
+    std::cout << std::endl;
+}
+
+template <typename T>
+bool compare_data(const std::vector<T>& actual, const std::vector<T>& expected, double tolerance = 0.0)
+{
+    if (actual.size() != expected.size()) return false;
+    for (size_t i = 0; i < actual.size(); ++i) {
+        if (actual[i] == expected[i]) continue;
+        const double diff = static_cast<double>(actual[i]) - static_cast<double>(expected[i]);
+        if (diff > tolerance || diff < -tolerance) return false;
     }
+    return true;
+}
+
+constexpr uint32_t BUFFER_BYTES = 768;
+
+__simd_vf__ inline void exercise(__ubuf__ uint8_t* output, __ubuf__ uint8_t* input)
+{
+    vector_bool mask8 = asc_create_mask_b8(PAT_ALL);
+    vector_bool mask16 = asc_create_mask_b16(PAT_ALL);
+    vector_bool mask32 = asc_create_mask_b32(PAT_ALL);
+    vector_uint8_t value8;
+    vector_uint16_t value16;
+    vector_uint32_t value32;
+    addr_reg offset8 = asc_update_addr_reg_b8(0);
+    addr_reg offset16 = asc_update_addr_reg_b16(0);
+    addr_reg offset32 = asc_update_addr_reg_b32(0);
+    asc_loadalign(value8, input, offset8);
+    asc_loadalign(value16, reinterpret_cast<__ubuf__ uint16_t*>(input + 256), offset16);
+    asc_loadalign(value32, reinterpret_cast<__ubuf__ uint32_t*>(input + 512), offset32);
+    asc_storealign(output, value8, mask8);
+    asc_storealign(reinterpret_cast<__ubuf__ uint16_t*>(output + 256), value16, mask16);
+    asc_storealign(reinterpret_cast<__ubuf__ uint32_t*>(output + 512), value32, mask32);
+}
+
+__global__ __vector__ void asc_update_addr_reg_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
+{
+    asc_init();
+    __ubuf__ uint8_t output_local[BUFFER_BYTES];
+    __ubuf__ uint8_t input_local[BUFFER_BYTES];
+    asc_copy_gm2ub_align(input_local, input, BUFFER_BYTES);
+    asc_copy_gm2ub_align(output_local, input, BUFFER_BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    exercise(output_local, input_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, output_local, BUFFER_BYTES);
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint8_t> input(BUFFER_BYTES), output(BUFFER_BYTES, 0xff), golden(BUFFER_BYTES);
+    for (uint32_t i = 0; i < BUFFER_BYTES; ++i) input[i] = static_cast<uint8_t>(i % 251);
+    golden = input;
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t* input_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), (BUFFER_BYTES) * sizeof(uint8_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    uint8_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), (BUFFER_BYTES) * sizeof(uint8_t),
+        ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, input.size() * sizeof(uint8_t), input.data(), input.size() * sizeof(uint8_t),
+        ACL_MEMCPY_HOST_TO_DEVICE);
+    asc_update_addr_reg_kernel<<<1, 0>>>(output_device, input_device);
+    aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(uint8_t), output_device, output.size() * sizeof(uint8_t),
+        ACL_MEMCPY_DEVICE_TO_HOST);
+    print_data("Input bytes", input);
+    print_data("Output bytes", output);
+    print_data("Golden bytes", golden);
+    const bool passed = compare_data(output, golden);
+    std::cout << (passed ? "[Success] asc_update_addr_reg_b8/asc_update_addr_reg_b16/asc_update_addr_reg_b32 passed." : "[Failed] asc_update_addr_reg_b8/asc_update_addr_reg_b16/asc_update_addr_reg_b32 failed.") << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
 }
 ```
+<!-- end id8 -->
