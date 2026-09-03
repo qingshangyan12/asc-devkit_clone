@@ -1,4 +1,4 @@
-# asc_hif82float (废弃)
+# asc_hif82float（废弃）
 
 ## 产品支持情况
 
@@ -25,6 +25,8 @@
 <!-- end id7 -->
 
 ## 功能说明
+
+**该接口的无显式位置参数原型已废弃，请使用[asc_hif82float](../reg_compute/reg_convert/asc_hif82float.md)的显式位置参数重载替代。**
 
 将hifloat8_t类型数据转换为float类型。
 
@@ -53,7 +55,7 @@ __simd_callee__ inline void asc_hif82float_v4(vector_float& dst, vector_hifloat8
 | src        | 输入    | 源操作数（矢量数据寄存器）。 |
 | mask       | 输入    | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
