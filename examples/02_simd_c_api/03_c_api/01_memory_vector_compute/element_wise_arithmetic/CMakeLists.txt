@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.16)
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201")
+set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
+find_package(ASC REQUIRED)
+project(memory_vector_element_wise LANGUAGES ASC CXX)
+add_executable(demo element_wise_arithmetic.asc)
+target_compile_options(demo PRIVATE $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>)
