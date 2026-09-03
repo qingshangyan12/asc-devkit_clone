@@ -10,7 +10,8 @@
 
 /* !
  * \file data_utils.h
- * \brief ELU样例的输入输出数据读写辅助工具，提供文件读取、写入功能（与同目录其它算子样例保持一致）
+ * \brief I/O helper for the ELU sample, providing file read/write utilities (consistent with other samples in the same
+ * directory)
  */
 
 #ifndef DATA_UTILS_H
@@ -58,7 +59,6 @@ bool read_file(const std::string& file_path, size_t& file_size, void* buffer, si
         file.close();
         return false;
     }
-    // 要求文件大小与调用方期望的 buffer_size 完全一致，避免截短后使用未初始化/补零尾部继续测试
     if (size != buffer_size) {
         error_log("file size (%zu) does not match expected buffer size (%zu)", size, buffer_size);
         file.close();
@@ -93,15 +93,13 @@ bool write_file(const std::string& file_path, const void* buffer, size_t size)
         return false;
     }
 
-    // 循环写入直至累计 size 字节：write 可能只写入部分字节，且被信号打断（EINTR）时需重试。
-    // 用 ssize_t 接收返回值（write 返回 -1 或已写字节数，不能用无符号类型接收）。
     const char* p = static_cast<const char*>(buffer);
     size_t written = 0;
     while (written < size) {
         ssize_t write_size = write(fd, p + written, size - written);
         if (write_size < 0) {
             if (errno == EINTR) {
-                continue; // 被信号打断，重试本次写入
+                continue;
             }
             (void)close(fd);
             error_log("Write file failed. path = %s", file_path.c_str());

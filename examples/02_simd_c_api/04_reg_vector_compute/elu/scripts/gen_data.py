@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
@@ -13,6 +12,7 @@
 
 
 import os
+
 import numpy as np
 
 
@@ -29,34 +29,42 @@ def gen_elu_golden(x, alpha, scale, input_scale):
     return golden
 
 
-def gen_golden_data_simple():
-    total_length = 256
-    # 生成一个 [1, total_length] 向量，数据范围 [-100, 100]，覆盖正负区间
-    x = np.random.uniform(-100, 100, [1, total_length]).astype(np.float32)
+SHAPES = [
+    1,
+    31,
+    32,
+    100,
+    1023,
+    1024,
+    2047,
+    2048,
+    8191,
+    8195,
+    8 * 2048,
+    8 * 8192,
+    100000,
+    1048575,
+]
+
+
+def gen_golden_data():
     alpha = 1.0
     scale = 1.0
     input_scale = 1.0
-    golden = gen_elu_golden(x, alpha, scale, input_scale)
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
-    x.tofile("./input/input_x.bin")
-    golden.tofile("./output/golden.bin")
-
-
-def gen_golden_data_fp16():
-    total_length = 256
-    # fp16 输入：先按 float 生成，再转 fp16（验证 fp16 算子分支）
-    x = np.random.uniform(-100, 100, [1, total_length]).astype(np.float16)
-    alpha = 1.0
-    scale = 1.0
-    input_scale = 1.0
-    golden = gen_elu_golden(x, alpha, scale, input_scale).astype(np.float16)
-    os.makedirs("input", exist_ok=True)
-    os.makedirs("output", exist_ok=True)
-    x.tofile("./input/input_x_fp16.bin")
-    golden.tofile("./output/golden_fp16.bin")
+    for total_length in SHAPES:
+        x = np.random.uniform(-100, 100, [1, total_length]).astype(np.float32)
+        golden = gen_elu_golden(x, alpha, scale, input_scale)
+        x.tofile(f"./input/input_x_{total_length}.bin")
+        golden.tofile(f"./output/golden_{total_length}.bin")
+        x_half = x.astype(np.float16)
+        golden_half = gen_elu_golden(x_half, alpha, scale, input_scale).astype(
+            np.float16
+        )
+        x_half.tofile(f"./input/input_x_fp16_{total_length}.bin")
+        golden_half.tofile(f"./output/golden_fp16_{total_length}.bin")
 
 
 if __name__ == "__main__":
-    gen_golden_data_simple()
-    gen_golden_data_fp16()
+    gen_golden_data()

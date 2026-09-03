@@ -1,7 +1,8 @@
 # ELU Example
 
 ## Overview
-This example implements the ELU (Exponential Linear Unit) activation operator using the C API, mainly calling the [asc_exp](../../../../../docs/zh/api/SIMD-API/c_api/reg/arithmetic_compute/asc_exp.md), [asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/c_api/reg/arithmetic_compute/asc_mul_scalar.md) and [asc_select](../../../../../docs/zh/api/SIMD-API/c_api/reg/compare_and_select/asc_select.md) APIs.
+
+This example implements the ELU (Exponential Linear Unit) activation operator using the C API.
 
 ## Supported Products and CANN Versions
 
@@ -10,7 +11,8 @@ This example implements the ELU (Exponential Linear Unit) activation operator us
 | Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+
+```text
 ├── elu
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script
@@ -22,8 +24,11 @@ This example implements the ELU (Exponential Linear Unit) activation operator us
 ```
 
 ## Example Description
-- Example functionality:  
+
+- Example functionality:
+
   Computes the element-wise ELU activation of the input. The formula is:
+
   $$
   ELU(x)=
   \begin{cases}
@@ -46,23 +51,31 @@ This example implements the ELU (Exponential Linear Unit) activation operator us
   </table>
 
 - Example implementation:
-  It uses segment-based dynamic tiling to copy the input into UB in segments, computes the ELU in the register domain (`vector_float`), then copies it out to GM; fp16 is computed in the fp32 domain and written back as half.
+
+  It uses dynamic tiling to copy the input into UB in segments, calls C API functions to compute the ELU, then copies the result back to GM; fp16 input is converted to float for computation and written back as fp16.
+
   - Invocation
+
     The kernel is invoked with the `<<<>>>` kernel invocation operator.
 
 ## Build and Run
+
 Execute the following steps in the example root directory.
-- Configure the environment variables  
-  Configure the environment variables according to the [installation](../../../../../docs/en/quick_start.md#prepare&install) of the CANN toolkit on your environment.
+
+- Configure the environment variables:
+
+  Configure the environment variables according to the [installation](../../../../docs/en/quick_start.md#prepare&install) of the CANN toolkit on your environment.
+
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN installation directory; if not specified, it defaults to `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN installation directory; the default is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 
 - Build and run
 
   Run the following commands in the example directory.
+
   ```bash
   mkdir -p build && cd build;                                                    # create and enter the build directory
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                           # build the project (npu mode by default)
@@ -71,20 +84,19 @@ Execute the following steps in the example root directory.
   ```
 
   To use NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=sim`:
+
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU simulation mode
   ```
 
   > **Note:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory, then re-run cmake.
 
-- Sample execution output  
+- Sample execution output
+
   The output below indicates that the precision comparison passed.
+
   ```bash
   [Success] File mode verification passed.
   ```
 
-  Built-in comprehensive self-test (validates correctness across various shapes):
-  ```bash
-  ./demo --selftest
-  ```
-  It outputs `[Success] All cases verification passed.` and returns exit code 0.
+  The program returns exit code 0.
