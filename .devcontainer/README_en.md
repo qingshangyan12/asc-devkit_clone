@@ -1,9 +1,9 @@
 # Dev Container
 
+English | [简体中文](./README.md)
+
 [![Docker Version](https://img.shields.io/badge/docker-%3E%3D23.0.0-blue.svg)](https://docs.docker.com/)
 [![Docker Buildx](https://img.shields.io/badge/docker%20buildx-required-orange.svg)](https://docs.docker.com/reference/cli/docker/buildx/)
-
-[中文版](./README.md) | [English](./README_en.md)
 
 Ubuntu 24.04 containerized development environment for AscendC NPU kernel development.
 
