@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses int8_t and bfloat16 as two input data types to demonstrate how to implement matrix multiplication (C = A x B + Bias) through the C API. The pipeline functions for each scenario are split into separate header files (`mmad_s1.h` / `mmad_s2.h`), and the main file `mmad.asc` dispatches by scenario at the kernel function entry through `if constexpr (scenario_num)`.
+This example uses int8_t, bfloat16, and float input data types to demonstrate how to implement matrix multiplication (C = A x B + Bias) through the C API. The pipeline functions for each scenario are split into separate header files (`mmad_s1.h` / `mmad_s2.h` / `mmad_s3.h`), and the main file `mmad.asc` dispatches by scenario at the kernel function entry through `if constexpr (scenario_num)`.
 
 ## Supported Products and CANN Versions
 
@@ -23,6 +23,7 @@ This example uses int8_t and bfloat16 as two input data types to demonstrate how
 │   ├── data_utils.h                // Data read/write functions
 │   ├── mmad_s1.h                   // Constants and complete pipeline function for Scenario 1
 │   ├── mmad_s2.h                   // Constants and complete pipeline function for Scenario 2
+│   ├── mmad_s3.h                   // Constants and complete pipeline function for Scenario 3
 │   ├── mmad.asc                    // Example main file (common constants, kernel function entry, Host-side main function)
 │   ├── README_en.md                // English example documentation
 │   └── README.md                   // Example documentation
@@ -66,7 +67,7 @@ A complete matrix multiplication involves the following data transfer process: G
   </tr>
 </table>
 
-The matrix multiplication formula: C = A x B + Bias, where A, B, Bias, C matrices must satisfy shapes [M, K], [K, N], [N] and [M, N] respectively. Bias is only enabled in Scenario 1, and its data type correspondence with the C matrix is shown in the table below.
+The matrix multiplication formula: C = A x B + Bias, where A, B, Bias, C matrices must satisfy shapes [M, K], [K, N], [N] and [M, N] respectively. Bias is enabled in Scenarios 1 and 3, and its data type correspondence with the C matrix is shown in the table below.
 
 <a name="table2"></a>
 <table border="2" align="center">
@@ -125,6 +126,14 @@ The scenarios corresponding to different values of the compilation parameter `SC
     <td>Transposed</td>
     <td>Without Bias, C matrix initial value from CO1 (accumulated from two Mmad operations)</td>
   </tr>
+  <tr>
+    <td>3</td>
+    <td>float</td>
+    <td>float</td>
+    <td>Transposed</td>
+    <td>Transposed</td>
+    <td>With Bias, explicitly passing the Bias address in BT</td>
+  </tr>
 </table>
 
 ### Scenario Details
@@ -163,19 +172,39 @@ Figure 1: int8_t type, B not transposed, N axis actual alignment requirement dif
   3. `asc_mmad`: Called twice. The first call with `c_matrix_init_val = true` initializes C to 0 and computes A x B; the second call with `c_matrix_init_val = false` and `c_matrix_source = false` uses CO1 as initial value to accumulate the second A x B;
   4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`: Transfer result from L0C to GM;
 
+**Scenario 3: float input, float output, A/B transposed, explicitly passing the Bias address**
+
+- Input:
+  - A transposed [70, 30] float, ND format;
+  - B transposed [40, 70] float, ND format;
+  - Bias [1, 40] float;
+- Output: C [30, 40] float, ND format;
+- Implementation (see `mmad_s3.h` for details):
+  1. `asc_copy_gm2l1_nd2nz` + `asc_set_gm2l1_nz_para`: Transfer transposed A, B, and Bias from GM to L1;
+  2. `asc_copy_l12l0a_transpose`: Transpose A from L1 to L0A; `asc_copy_l12l0b`: Transfer B from L1 to L0B; `asc_copy_l12bt`: Transfer Bias from L1 to BT address 0;
+  3. `asc_mmad`: Explicitly pass BT address 0 as the Bias address and set `disable_gemv = false` to perform matrix multiplication and addition;
+  4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`: Transfer result from L0C to GM (Nz -> ND);
+- Description: The source scenario sets `mmadParams.kDirectionAlign = true` in its common code. On the `dav-3510` architecture supported by this example, the Basic API actually passes `mmadParams.disableGemv`, not `kDirectionAlign`, to the Mmad instruction. The C API therefore uses the corresponding `dav-3510` overload with an explicit Bias address and preserves the source setting `disableGemv = false`. When A is transferred to L0A, K is still aligned to `CeilAlign(K, 16)` as in the source scenario.
+<p align="center">
+  <img src="figures/mmad_f32_L0A_转置.png" width="1100">
+</p>
+<p align="center">
+Figure 2: float type, transposed A, K-axis alignment differs from the default Mmad requirement
+</p>
+
 ### Matrix Multiplication (Mmad)
 
 The following describes how to configure the parameters of the `asc_mmad` instruction. The specific meaning of each parameter is not repeated here.
 
 Note that when executing the `asc_mmad` instruction, the matrix computation unit continuously reads multiple fractals from L0A/L0B to participate in matrix multiplication computation. The number of fractals read is determined by the values of `left_height`, `n_dim`, `right_width`, and the alignment requirements of the `asc_mmad` instruction for A and B matrix axes on L0A/L0B.
 
-As shown in Figure 2, taking b16 input type as an example, the `asc_mmad` instruction reads data continuously according to A matrix fractal [16, 16] and B matrix fractal [16, 16]. At this point, the total number of fractals read by the matrix computation unit from L0A/L0B are 2 x 5 = 10 and 5 x 3 = 15 respectively, and the total number of fractals written to L0C is 2 x 3 = 6.
+As shown in Figure 3, taking b16 input type as an example, the `asc_mmad` instruction reads data continuously according to A matrix fractal [16, 16] and B matrix fractal [16, 16]. At this point, the total number of fractals read by the matrix computation unit from L0A/L0B are 2 x 5 = 10 and 5 x 3 = 15 respectively, and the total number of fractals written to L0C is 2 x 3 = 6.
 
 <p align="center">
   <img src="figures/mmad_f16_A5.png" width="900">
 </p>
 <p align="center">
-Figure 2: bfloat16 type, Nz layout on L0A, Mmad data layout diagram
+Figure 3: bfloat16 type, Nz layout on L0A, Mmad data layout diagram
 </p>
 
 The Mmad computation includes padded invalid data, which needs to be excluded during the L0C to GM transfer process by the Fixpipe instruction, eliminating the invalid data filled during Mmad computation.
@@ -216,7 +245,7 @@ Run the following steps in the root directory of this example to build and execu
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` (default) | NPU architecture, corresponds to Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1` (default), `2` | Scenario number, corresponding to int8_t and bfloat16 input data types respectively |
+  | `SCENARIO_NUM` | `1` (default), `2`, `3` | Scenario number, corresponding to int8_t, bfloat16, and float input data types respectively |
 
 - Execution result
 
