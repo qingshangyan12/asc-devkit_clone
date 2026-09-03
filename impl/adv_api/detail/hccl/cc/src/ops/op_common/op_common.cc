@@ -1736,7 +1736,7 @@ static HcclResult AccumulateKernelRes(
     CHK_RET(GetKfcCallableTask(kernelInfo, callableTaskFuncName, callableTaskFunc));
     CHK_RET(AccumulateKernelFuncRes(
         kernelInfo, callableTaskFuncName, reinterpret_cast<const void*>(callableTaskFunc),
-        CCU_KERNEL_ROLE_CALLABLE_TASK, groupedResMap));
+        CCU_KERNEL_ROLE_NORMAL, groupedResMap));
     return HCCL_SUCCESS;
 }
 
@@ -1842,7 +1842,7 @@ static HcclResult RegisterCcuKernels(
                 CHK_RET(GetKfcCallableTask(kernelInfo, callableTaskFuncName, callableTaskFunc));
                 CcuKernelRegisterCfg cfg{};
                 CcuKernelRegisterCfgInit(&cfg);
-                cfg.role = CCU_KERNEL_ROLE_CALLABLE_TASK;
+                cfg.role = CCU_KERNEL_ROLE_NORMAL;
                 CcuKernelHandle callableTaskHandle = 0;
                 const void* kernelArgs[] = {kernelInfo.kernelArg};
                 CcuResult taskRegRet = HcommCcuKernelRegisterV2(
