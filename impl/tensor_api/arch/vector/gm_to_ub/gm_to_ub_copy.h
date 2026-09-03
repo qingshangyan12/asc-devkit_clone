@@ -10,17 +10,17 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #pragma message( \
-    "impl/tensor_api/arch/vector/gm_to_ub/gm_to_ub.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/tensor.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/tensor_api/arch/vector/gm_to_ub/gm_to_ub_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/tensor.h\"\" and use public functions or variables defined in interface headers files.")
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_H
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_H
 #endif
 
 /*!
- * \file gm_to_ub.h
+ * \file gm_to_ub_copy.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_H
-#define IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_H
+#ifndef IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_H
+#define IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/arch/vector/gm_to_ub/routing.h"
@@ -90,9 +90,9 @@ public:
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_H
+#endif // IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_H)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_H
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_GM_TO_UB_COPY_H
 #endif

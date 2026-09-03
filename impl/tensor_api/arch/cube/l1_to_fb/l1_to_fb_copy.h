@@ -10,17 +10,17 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning \
-    "impl/tensor_api/arch/cube/l1_to_fb/l1_to_fb.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+    "impl/tensor_api/arch/cube/l1_to_fb/l1_to_fb_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
 /*!
- * \file l1_to_fb.h
+ * \file l1_to_fb_copy.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_H
-#define IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_H
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_COPY_H
+#define IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_COPY_H
 
 #include "impl/tensor_api/arch/cube/l1_to_fb/routing.h"
 
@@ -81,7 +81,7 @@ __aicore__ inline void copy_l1_to_fixbuf::data_copy_impl(
 } // namespace te
 } // namespace asc
 
-#endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_H
+#endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_FB_COPY_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS

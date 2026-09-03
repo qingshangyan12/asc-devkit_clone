@@ -96,10 +96,10 @@ private:
 } // namespace te
 } // namespace asc
 
-#include "impl/tensor_api/arch/vector/gm_to_ub/gm_to_ub.h"
-#include "impl/tensor_api/arch/vector/ub_to_l1/ub_to_l1.h"
-#include "impl/tensor_api/arch/vector/ub_to_gm/ub_to_gm.h"
-#include "impl/tensor_api/arch/vector/ub_to_ub/ub_to_ub.h"
+#include "impl/tensor_api/arch/vector/gm_to_ub/gm_to_ub_copy.h"
+#include "impl/tensor_api/arch/vector/ub_to_l1/ub_to_l1_copy.h"
+#include "impl/tensor_api/arch/vector/ub_to_gm/ub_to_gm_copy.h"
+#include "impl/tensor_api/arch/vector/ub_to_ub/ub_to_ub_copy.h"
 
 #endif // INCLUDE_TENSOR_API_ARCH_VECTOR_VECTOR_COPY_OP_H
 
