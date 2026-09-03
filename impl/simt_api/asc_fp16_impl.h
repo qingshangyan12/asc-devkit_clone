@@ -1305,20 +1305,15 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hlog10(half x)
     // 126.0625 (0x57E1), 11496.0 (0x719D), and 2976.0 (0x69D0).
     if (x == static_cast<half>(0.2362060546875f)) {
         temp = static_cast<half>(-0.62646484375f);
-    }
-    if (x == static_cast<half>(0.2490234375f)) {
+    } else if (x == static_cast<half>(0.2490234375f)) {
         temp = static_cast<half>(-0.60400390625f);
-    }
-    if (x == static_cast<half>(3.0703125f)) {
+    } else if (x == static_cast<half>(3.0703125f)) {
         temp = static_cast<half>(0.487060546875f);
-    }
-    if (x == static_cast<half>(126.0625f)) {
+    } else if (x == static_cast<half>(126.0625f)) {
         temp = static_cast<half>(2.099609375f);
-    }
-    if (x == static_cast<half>(11496.0f)) {
+    } else if (x == static_cast<half>(11496.0f)) {
         temp = static_cast<half>(4.05859375f);
-    }
-    if (x == static_cast<half>(2976.0f)) {
+    } else if (x == static_cast<half>(2976.0f)) {
         temp = static_cast<half>(3.474609375f);
     }
     return temp;
