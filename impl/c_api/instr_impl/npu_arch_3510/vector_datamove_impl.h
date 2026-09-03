@@ -9,7 +9,8 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-
+#pragma message( \
+    "impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.")
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -1477,6 +1478,8 @@ __simd_callee__ inline void asc_storeunalign_postupdate(
     asc_storeunalign_postupdate_impl(dst, src0, src1, count);
 }
 
+[[deprecated("NOTICE: asc_storeunalign_postupdate with a b8 destination and vector_bool source is deprecated. "
+             "Please use the b16 or b32 overload instead.")]]
 __simd_callee__ inline void asc_storeunalign_postupdate(
     __ubuf__ uint8_t*& dst, vector_store_unalign& src0, vector_bool src1)
 {

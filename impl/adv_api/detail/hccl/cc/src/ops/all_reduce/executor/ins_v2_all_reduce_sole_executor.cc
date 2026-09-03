@@ -15,6 +15,7 @@
 #include "ccu_temp_kfc_all_reduce_mesh_1D_mem2mem.h"
 #endif
 #include "ins_temp_all_reduce_aicpu_reduce_nhr.h"
+#include "ins_temp_all_reduce_mesh_1D_two_shot_mesh_chunk.h"
 
 namespace mc2_ops_hccl {
 
@@ -264,4 +265,8 @@ REGISTER_EXEC_V2(
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleNHRAicpuReduce, InsV2AllReduceSoleExecutor, TopoMatch1D,
     InsTempAllReduceAicpuReduceNHR);
+
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceSoleMeshChunkTwoShot, InsV2AllReduceSoleExecutor, TopoMatch1D,
+    InsTempAllReduceMesh1DTwoShotMeshChunk);
 } // namespace mc2_ops_hccl

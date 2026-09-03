@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/math_functions.h"`。
+
 获取以2为底，输入数据的对数。
 
 ![](../../../figures/zh-cn_formulaimage_0000002484776380.png)
@@ -47,27 +49,23 @@ inline float log2f(float x)
 
 以2为底的x的对数。
 
--   当x为inf时，返回值为inf。
--   当x为-inf时，返回值为nan。
--   当x为nan时，返回值为nan。
+- 当x为inf时，返回值为inf。
+- 当x为-inf时，返回值为nan。
+- 当x为nan时，返回值为nan。
+- 当x为0时，返回值为-inf。
+- 当x为其他负数时，返回值为nan。
 
 ## 约束说明
 
 无
-
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/math_functions.h`头文件。
-
-```cpp
-#include "simt_api/math_functions.h"
-```
 
 ## 调用示例
 
 - SIMT编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __global__ __launch_bounds__(256) void compute_log2f(float *result, const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -81,6 +79,8 @@ inline float log2f(float x)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/math_functions.h"
+
     __simt_vf__ __launch_bounds__(256) inline void compute_log2f_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;

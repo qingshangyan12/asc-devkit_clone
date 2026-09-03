@@ -511,8 +511,6 @@
 | [DumpTensor](debug_interface/onboard_print/DumpTensor.md) | 该接口可以打印Tensor的内容，同时支持打印自定义的标签（仅支持uint32_t数据类型的信息），比如打印当前行号等。 |
 | [DumpAccChkPoint](debug_interface/onboard_print/DumpAccChkPoint.md) | 该接口Dump指定Tensor的内容。同时支持打印自定义的标签（仅支持uint32_t数据类型的信息），比如打印当前行号等。区别于DumpTensor，使用该接口可以支持指定偏移位置的Tensor打印。 |
 | [PrintTimeStamp](debug_interface/onboard_print/PrintTimeStamp.md) | 提供时间戳打点功能，用于在算子核函数（Kernel）代码中标记关键执行点。 |
-| [ascendc_assert](debug_interface/exception_detection/ascendc_assert.md) | ascendc_assert提供了一种在CPU/NPU域实现断言功能的接口。当断言条件不满足时，系统会输出断言信息并格式化打印在屏幕上。 |
-| [assert](debug_interface/exception_detection/assert.md) | 该接口实现CPU/NPU域assert断言功能。算子执行中，如果assert内部条件判断不为真，则输出assert条件并将输入的信息格式化打印在屏幕上。 |
 | [Trap](debug_interface/exception_detection/Trap.md) | 在核函数（Kernel）侧调用，NPU模式下会中断AI Core的运行，CPU模式下等同于assert。可用于核函数（Kernel）侧异常场景的调试。 |
 | [CheckLocalMemoryIA(ISASI)](debug_interface/exception_detection/CheckLocalMemoryIA_ISASI.md) | check设定范围内的UB读写行为，如果有设定范围的读写行为则会出现EXCEPTION报错，无设定范围的读写行为则不会报错。 |
 | [GmAlloc](debug_interface/cpu_twin_debug/GmAlloc.md) | 进行核函数（Kernel）的CPU侧运行验证时，用于创建共享内存：在/tmp目录下创建一个共享文件，并返回该文件的映射指针。 |
@@ -590,5 +588,7 @@
 | [SetCtrlSpr(ISASI)](special_register_access/SetCtrlSpr_ISASI.md) | 对CTRL寄存器（控制寄存器）的特定比特位进行设置。 |
 | [GetCtrlSpr(ISASI)](special_register_access/GetCtrlSpr_ISASI.md) | 读取CTRL寄存器（控制寄存器）特定比特位上的值。 |
 | [ResetCtrlSpr(ISASI)](special_register_access/ResetCtrlSpr_ISASI.md) | 重置CTRL寄存器（控制寄存器）的特定比特位。 |
-| [GetSaturationFlag(ISASI)](special_register_access/GetSaturationFlag_ISASI.md) | 获取计算/精度转换时饱和模式的开启状态。 |
-| [SetSaturationFlag(ISASI)](special_register_access/SetSaturationFlag_ISASI.md) | 设置饱和开关的标志位，以控制计算/精度转换时饱和模式的开启与关闭。 |
+| [GetSaturationFlag(ISASI)](special_register_access/GetSaturationFlag_ISASI.md) | 获取计算或精度转换时指定饱和模式的开启状态。 |
+| [SetSaturationFlag(ISASI)](special_register_access/SetSaturationFlag_ISASI.md) | 设置计算或精度转换时指定饱和模式的开启状态。 |
+| [GetSaturationStrategy](special_register_access/GetSaturationStrategy.md) | 获取当前使用的饱和模式配置策略。 |
+| [SetSaturationStrategy](special_register_access/SetSaturationStrategy.md) | 设置饱和模式配置策略，选择使用具体计算接口自身的饱和配置，或使用SetSaturationFlag设置的饱和模式。 |

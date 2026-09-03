@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 计算两个bfloat16类型数据相除的结果，并遵循CAST\_RINT模式对结果进行舍入。
 
 ## 函数原型
@@ -60,7 +62,7 @@ bfloat16_t __hdiv(const bfloat16_t x, const bfloat16_t y)
 | >0 | -0 | -inf | -ASCRT_MAX_NORMAL_BF16 |
 | <0 | -0 | inf | ASCRT_MAX_NORMAL_BF16 |
 | ±0 | 非0 | 符号由x和y的符号异或决定，值为0 | 符号由x和y的符号异或决定，值为0 |
-| x，y任意一个为nan | nan | 0 |  |
+| x，y任意一个为nan | — | nan | 0 |
 
 ## 约束说明
 
@@ -68,32 +70,34 @@ bfloat16_t __hdiv(const bfloat16_t x, const bfloat16_t y)
 针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
 <!-- end id7 -->
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_bf16.h`头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelHdiv(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y)
+    #include "simt_api/asc_bf16.h"
+
+    __global__ __launch_bounds__(1024) void kernel_hdiv(bfloat16_t* dst, bfloat16_t* x, bfloat16_t* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hdiv(x[idx], y[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelHdiv(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y)
+    #include "simt_api/asc_bf16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_hdiv(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hdiv(x[idx], y[idx]);
     }
     ```
