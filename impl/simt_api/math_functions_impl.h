@@ -3202,14 +3202,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanhf(float x)
     if (ax >= 9.010913848876953125f) {
         y_large = 1.0f;
     }
-    // tanh is odd: the large branch works on |x|, so restore the sign of the input.
-    if (x < 0.0f) {
-        y_large = -y_large;
-    }
 
     // 0.60000002384185791016 is the float nearest 0.6, the switch point between the two branches.
     float yf = ax >= 0.60000002384185791016f ? y_large : y_small;
-    return yf;
+    return copysignf(yf, x);
+    ;
 }
 
 /**
@@ -3228,15 +3225,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanhf(float x)
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x)
 {
-    // NaN propagates directly.
-    if (isnan(x)) {
-        return x;
-    }
-    // Infinities map to signed pi/2.
-    if (isinf(x)) {
-        return __internal_with_sign_bit(ASCRT_PIO2_F, x);
-    }
-
     // Use reciprocal reduction for large magnitudes.
     const float abs_x = fabsf(x);
     const bool use_reciprocal = abs_x > 1.0f;
@@ -3260,7 +3248,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x)
         result = fmaf(0.93318945169448852539f, 1.6832555532455444336f, -result);
     }
 
-    return __internal_with_sign_bit(result, x);
+    if (!(abs_x > ASCRT_INF_F)) {
+        result = __internal_with_sign_bit(result, x);
+    }
+
+    return result;
 }
 
 /**
@@ -3286,15 +3278,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinf(float x)
     constexpr float half_pi_hi = 1.6832555532455444336f;
     constexpr float half_pi_lo_scale = 0.93318945169448852539f;
 
-    // NaN propagates directly.
-    if (isnan(x)) {
-        return x;
-    }
-    // Out-of-domain inputs return NaN.
-    if (fabsf(x) > 1.0f) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-
     // Reduce the argument into the polynomial training range.
     const float abs_x = fabsf(x);
     float reduced = __internal_asin_acos_reduced_arg(abs_x);
@@ -3313,7 +3296,11 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinf(float x)
         result = fmaf(half_pi_hi, half_pi_lo_scale, -2.0f * result);
     }
 
-    return __internal_with_sign_bit(result, x);
+    if (!(result > ASCRT_INF_F)) {
+        result = __internal_with_sign_bit(result, x);
+    }
+
+    return result;
 }
 
 /**
@@ -3338,15 +3325,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acosf(float x)
     constexpr float threshold = 0.56000000238418579102f;
     constexpr float half_pi_hi = 1.6832555532455444336f;
     constexpr float half_pi_lo_scale = 0.93318945169448852539f;
-
-    // NaN propagates directly.
-    if (isnan(x)) {
-        return x;
-    }
-    // Out-of-domain inputs return NaN.
-    if (fabsf(x) > 1.0f) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
 
     // Reuse the asin reduction with sign handling folded into the reduced argument.
     const float abs_x = fabsf(x);
@@ -3393,14 +3371,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acosf(float x)
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinhf(float x)
 {
-    // NaN and infinities propagate directly.
-    if (isnan(x)) {
-        return x;
-    }
-    if (isinf(x)) {
-        return x;
-    }
-
     // Use absolute value for the large-argument exponential reconstruction.
     const float abs_x = fabsf(x);
     const float x2 = x * x;
@@ -3454,28 +3424,14 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinhf(float x)
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x)
 {
-    // Special values follow the standard log1p semantics.
-    if (x == 0.0f) {
-        return x;
-    }
-    if (x == -1.0f) {
-        return -ASCRT_INF_F;
-    }
-    if (x < -1.0f) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-    if (x == ASCRT_INF_F) {
-        return ASCRT_INF_F;
-    }
-    if (isnan(x)) {
-        return x;
-    }
-
     // Reduction constants for the log1p polynomial path.
     constexpr uint32_t log1p_reduction_mask = 0xFF800000U;
     constexpr uint32_t fp32_one_half_bits = 0x3F400000U;
     constexpr uint32_t fp32_four_bits = 0x40800000U;
     constexpr float poly_first_coeff = 0.04534861445426940918f;
+    constexpr uint32_t fp32_positive_inf_bits = 0x7F800000U;
+    constexpr uint32_t fp32_sign_bit = 0x80000000U;
+    constexpr uint32_t log1p_lower_bound_bits = 0xBF800001U;
 
     // Build the reduced mantissa and exponent contribution from 1 + x.
     const float one_add_x = 1.0f + x;
@@ -3505,6 +3461,18 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x)
     // Add the separate exponent contribution back as ln(2) * exponent.
     output = fmaf(exponent, 0.69314718246459960938f, output);
 
+    // Positive infinity/NaN and all negative inputs enter the tail correction.
+    if (x_bits >= fp32_positive_inf_bits) {
+        // x is +inf/NaN or x < -1: generate the result via x * +inf + +inf.
+        // x == -1 keeps the -inf produced by the reduction and polynomial path above.
+        if (!(x_bits >= fp32_sign_bit && x_bits < log1p_lower_bound_bits)) {
+            output = fmaf(x, ASCRT_INF_F, ASCRT_INF_F);
+        }
+        // Inputs comparing equal to 0 select -0 so the sign of zero is preserved.
+        if (x == 0.0f) {
+            output = ASCRT_NEG_ZERO_F;
+        }
+    }
     return output;
 }
 
@@ -3524,25 +3492,15 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x)
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanhf(float x)
 {
-    // NaN propagates directly.
-    if (isnan(x)) {
-        return x;
-    }
-    // Saturate the poles at +/-1 to signed infinity.
-    if (x == 1.0f) {
-        return ASCRT_INF_F;
-    }
-    if (x == -1.0f) {
-        return -ASCRT_INF_F;
-    }
-    if (fabsf(x) > 1.0f) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
+    constexpr float overflow_guard = 8.50705917302346158658e+37f;
 
     // Use the log1p identity on the absolute value and restore sign at the end.
     const float abs_x = fabsf(x);
     float log_arg = (2.0f / (1.0f - abs_x)) * abs_x;
 
+    if (abs_x > overflow_guard) {
+        log_arg = -2.0f;
+    }
     return __internal_with_sign_bit(0.5f, x) * log1pf(log_arg);
 }
 
