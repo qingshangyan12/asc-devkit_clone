@@ -140,7 +140,20 @@ TEST_F(AicpuAllocCtxResTest, AllReduceReplayGateFallsBackWhenDedicatedThreadIsUn
 
     EXPECT_EQ(PrepareMc2AllReduceReplayGate(comm_, param), HCCL_SUCCESS);
     EXPECT_EQ(param.deviceOrderThread, 0U);
-    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 0U);
+    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 1U);
+}
+
+TEST_F(AicpuAllocCtxResTest, AllReduceReplayGatePropagatesDedicatedThreadResolverFailure)
+{
+    auto& state = GetMc2TaskCacheTestStubState();
+    state.dedicatedThreadResolveRet = HCCL_E_INTERNAL;
+    OpParam param{};
+    param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
+    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+
+    EXPECT_EQ(PrepareMc2AllReduceReplayGate(comm_, param), HCCL_E_INTERNAL);
+    EXPECT_EQ(param.deviceOrderThread, 0U);
+    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 1U);
 }
 
 TEST_F(AicpuAllocCtxResTest, AllReduceReplayGatePropagatesDedicatedThreadAcquireFailure)

@@ -25,6 +25,7 @@ struct Mc2TaskCacheTestStubState {
     HcclResult clearRet = HCCL_SUCCESS;
     HcclResult notifyWaitRet = HCCL_SUCCESS;
     HcclResult notifyRecordRet = HCCL_SUCCESS;
+    HcclResult dedicatedThreadResolveRet = HCCL_SUCCESS;
     HcclResult dedicatedThreadAcquireRet = HCCL_SUCCESS;
     bool lookupHit = false;
     bool interceptNotifyCalls = false;

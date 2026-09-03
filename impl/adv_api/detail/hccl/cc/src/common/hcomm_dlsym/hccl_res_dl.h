@@ -19,9 +19,8 @@ extern "C" {
 #endif
 
 DECL_SUPPORT_FLAG(HcclThreadExportToCommEngine);
-bool HcommIsSupportHcclDedicatedThreadAcquire(void);
-HcclResult HcommAcquireDeviceOrderLaunchThread(
-    HcclComm comm, uint32_t notifyNumPerThread, ThreadHandle* thread);
+HcclResult Mc2HcommAcquireDeviceOrderLaunchThread(
+    HcclComm comm, uint32_t notifyNumPerThread, ThreadHandle* thread, bool* supported);
 // 动态库管理接口（大驼峰命名）
 void HcclResDlInit(void* libHcommHandle);
 

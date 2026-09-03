@@ -803,7 +803,14 @@ HcclResult PrepareMc2AllReduceReplayGate(HcclComm comm, OpParam& param)
         return HCCL_SUCCESS;
     }
 
-    if (!HcommIsSupportHcclDedicatedThreadAcquire()) {
+    ThreadHandle releaseThread = 0;
+    bool dedicatedThreadAcquireSupported = false;
+    HcclResult ret = Mc2HcommAcquireDeviceOrderLaunchThread(
+        comm, MC2_REPLAY_GATE_RELEASE_THREAD_NOTIFY_NUM, &releaseThread, &dedicatedThreadAcquireSupported);
+    CHK_PRT_RET(
+        ret != HCCL_SUCCESS,
+        HCCL_ERROR("[MC2_REPLAY_GATE][Host] failed to acquire dedicated release thread, ret[%d].", ret), ret);
+    if (!dedicatedThreadAcquireSupported) {
         if (!g_mc2ReplayGateUnsupportedWarned.test_and_set()) {
             HCCL_WARNING(
                 "[MC2_REPLAY_GATE][Host] HcclDedicatedThreadAcquire is unavailable; replay gate is disabled.");
@@ -811,12 +818,6 @@ HcclResult PrepareMc2AllReduceReplayGate(HcclComm comm, OpParam& param)
         return HCCL_SUCCESS;
     }
 
-    ThreadHandle releaseThread = 0;
-    HcclResult ret = HcommAcquireDeviceOrderLaunchThread(
-        comm, MC2_REPLAY_GATE_RELEASE_THREAD_NOTIFY_NUM, &releaseThread);
-    CHK_PRT_RET(
-        ret != HCCL_SUCCESS,
-        HCCL_ERROR("[MC2_REPLAY_GATE][Host] failed to acquire dedicated release thread, ret[%d].", ret), ret);
     if (releaseThread == 0) {
         if (!g_mc2ReplayGateDisabledWarned.test_and_set()) {
             HCCL_WARNING(
