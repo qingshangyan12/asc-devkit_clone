@@ -347,7 +347,7 @@ HcclResult AllocAndCopyOpResCtx(
 } // namespace
 
 HcclResult HcclAllocOpResCtx(
-    HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, void* mc2Tiling,
+    const HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, const void* mc2Tiling,
     const void* ccTilingList[], void** opResCtxPtr)
 {
     CHK_PTR_NULL(opResCtxPtr);
@@ -931,6 +931,8 @@ HcclResult GetOpParam(
 
 HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex)
 {
+    (void)ccTiling;
+    (void)tilingIndex;
     HCCL_DEBUG("[CcuSelectAlgCheck] Default function.");
     return HCCL_SUCCESS;
 }

@@ -416,7 +416,7 @@ extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourc
 }
 
 namespace {
-CcuResult CopyOpResCtxToHost(void* opResCtx, OpResCtx& opResHost)
+CcuResult CopyOpResCtxToHost(const void* opResCtx, OpResCtx& opResHost)
 {
     HCCL_INFO("[CcuKernelLaunch]Obtain OpResCtx.");
     aclError aclRet = aclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx), ACL_MEMCPY_DEVICE_TO_HOST);
@@ -547,7 +547,7 @@ void LogKernelLaunchArgs(
 }
 } // namespace
 
-CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx)
+CcuResult CcuKernelLaunch(const HcclComm comm, const void* opResCtx)
 {
     CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
     CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
