@@ -658,11 +658,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     LogAicpuOrderDfxCounter(
         "ServerMsg", groupIdx_, msgArea_, msgPos, 0U, 0U, opParamKey, waitAddr, recordAddr, turnNumsAddr_, execCtx);
 
-    const bool useHcommProfilingLifecycle = execCtx->resourceType == ServerExecResourceType::NEXT_AICPU;
     bool commAcquired = false;
     std::string acquiredCommName{};
-    bool profilingStarted = false;
-    bool profilingEndAttempted = false;
+    bool dfxRegistered = false;
     HcclResult executionRet = HCCL_SUCCESS;
     HcclResult profilingRet = HCCL_SUCCESS;
     std::vector<uint8_t> runParam{};
@@ -723,6 +721,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
                 executionRet = ret;
                 break;
             }
+            dfxRegistered = true;
         }
 
         UpdateProgress("BeforeWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
@@ -745,22 +744,6 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             break;
         }
 
-        if (i == 0U && useHcommProfilingLifecycle) {
-            ret = HcommProfilingReportKernelStartTask(execCtx->mainThread, execCtx->commName.c_str());
-            if (ret != HCCL_SUCCESS) {
-                HCCL_ERROR(
-                    "Group %u: failed to report DFX head for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
-                    execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
-                executionRet = ret;
-                break;
-            }
-            profilingStarted = true;
-            HCCL_INFO(
-                "[MC2_OPEN_DIAG][ProfHead] group %u, msgPos %u, repeatIdx %u, turnIdx %u, repeatCnt %u, "
-                "opParamKey %#llx.",
-                groupIdx_, msgPos, i, turnIdx, repeatCnt, static_cast<unsigned long long>(opParamKey));
-        }
-
         UpdateProgress("BeforeKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "BeforeKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -779,22 +762,6 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         if (ret != HCCL_SUCCESS) {
             executionRet = ret;
             break;
-        }
-
-        if (turnIdx == repeatCnt && profilingStarted) {
-            profilingEndAttempted = true;
-            ret = HcommProfilingReportKernelEndTask(execCtx->mainThread, execCtx->commName.c_str());
-            if (ret != HCCL_SUCCESS) {
-                HCCL_ERROR(
-                    "Group %u: failed to report DFX tail for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
-                    execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
-                profilingRet = ret;
-            } else {
-                HCCL_INFO(
-                    "[MC2_OPEN_DIAG][ProfTail] group %u, msgPos %u, repeatIdx %u, turnIdx %u, repeatCnt %u, "
-                    "opParamKey %#llx.",
-                    groupIdx_, msgPos, i, turnIdx, repeatCnt, static_cast<unsigned long long>(opParamKey));
-            }
         }
 
         UpdateProgress("BeforePost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
@@ -825,23 +792,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             "[MC2_OPEN_DIAG][LoopEnd] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i, turnIdx);
     }
 
-    if (profilingStarted && !profilingEndAttempted) {
-        profilingEndAttempted = true;
-        HcclResult ret = HcommProfilingReportKernelEndTask(execCtx->mainThread, execCtx->commName.c_str());
-        if (ret != HCCL_SUCCESS) {
-            HCCL_ERROR(
-                "Group %u: failed to report DFX tail for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
-                execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
-            profilingRet = ret;
-        } else {
-            HCCL_INFO(
-                "[MC2_OPEN_DIAG][ProfTailFallback] group %u, msgPos %u, repeatCnt %u, opParamKey %#llx, "
-                "executionRet %d. Tail reported after loop exit, boundary may not be the last algorithm task.",
-                groupIdx_, msgPos, repeatCnt, static_cast<unsigned long long>(opParamKey), executionRet);
-        }
-    }
-
-    if (profilingStarted) {
+    if (dfxRegistered) {
         HcclResult ret = HcommProfilingReportDeviceOp(execCtx->commName.c_str());
         if (ret != HCCL_SUCCESS) {
             HCCL_ERROR(
