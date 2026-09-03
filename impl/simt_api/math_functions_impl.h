@@ -203,8 +203,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_log2f_positive_finite(floa
     const float reduced_hi = reciprocal * (mantissa_minus_one + mantissa_minus_one);
     const float reduced_square = reduced_hi * reduced_hi;
 
-    // Polynomial correction for log(mantissa), translated from the CUDA-style FFMA chain and evaluated in
-    // Horner form.  The final multiply by reduced_square accounts for the higher-order terms.
+    // Polynomial correction for log(mantissa).The final multiply by reduced_square accounts
+    // for the higher-order terms.
     float log_poly = fmaf(reduced_square, 0.0006568862590938807f, 0.0032181653659790754318f);
     log_poly = fmaf(reduced_square, log_poly, 0.018033718690276145935f);
     log_poly = fmaf(reduced_square, log_poly, 0.12022458761930465698f);
@@ -238,8 +238,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_exp2f_reconstruct(float x
     const float exp2_fraction = (x_hi - rounded_x) + x_lo;
     const int32_t exp2_exponent = __float2int_rz(rounded_x);
 
-    // Approximate 2^fraction as exp(fraction * ln2) on a small interval around zero.  The coefficients are
-    // evaluated in the same FFMA order as the CUDA-derived implementation.
+    // Approximate 2^fraction as exp(fraction * ln2) on a small interval around zero.
     float exp_poly = fmaf(exp2_fraction, 0.00015239251661114395f, 0.0013391353422775864601f);
     exp_poly = fmaf(exp2_fraction, exp_poly, 0.0096188392490148544312f);
     exp_poly = fmaf(exp2_fraction, exp_poly, 0.055503588169813156128f);
@@ -281,8 +280,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logf(float x)
     }
     return __logf(x);
 }
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sqrtf(float x) { return __internal_sqrtf(x); }
 
@@ -1284,10 +1281,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, __gm__ float* s, _
 #endif
 #endif
 #endif
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y);
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x) { return powf(10.0f, x); }
 
@@ -3250,6 +3243,27 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __internal_is_odd_integer_f32(float v
     return fabsf(remainder) == 1.0f;
 }
 
+/**
+ * Computes x raised to the power y for float inputs.
+ *
+ * The implementation uses a split log2/exp2 reconstruction path for finite
+ * positive inputs:
+ *   powf(x, y) = exp2(y * log2(|x|))
+ *
+ * The logarithm is split into hi/lo parts and the product residual is preserved
+ * so the final exp2 reconstruction stays stable across a wide input range.
+ *
+ * Special-value handling follows IEEE-style pow semantics:
+ * - y == 0 or x == 1 returns 1
+ * - NaN propagates through x + y where required
+ * - x == 0 or |x| == inf follows sign and odd-integer rules
+ * - |y| == inf collapses to 0 or inf depending on |x| relative to 1
+ * - Negative bases require integer exponents; odd integers keep the sign
+ *
+ * @param x The base value.
+ * @param y The exponent value.
+ * @return The computed powf(x, y) value.
+ */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y)
 {
     const float abs_x = fabsf(x);
@@ -3257,49 +3271,56 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y)
 
     float output = ASCRT_NAN_F;
 
-    if (!isnan(x) && !isnan(y) && abs_x != 0.0f && abs_x != ASCRT_INF_F && abs_y != ASCRT_INF_F) {
-        float log2_hi = 0.0f;
-        float log2_lo = 0.0f;
-        __internal_log2f_positive_finite(abs_x, log2_hi, log2_lo);
+    // Main path: powf(x, y) = exp2(y * log2(|x|)).
+    // The logarithm is split into hi/lo parts to reduce multiplication error.
+    float log2_hi = 0.0f;
+    float log2_lo = 0.0f;
+    __internal_log2f_positive_finite(abs_x, log2_hi, log2_lo);
 
-        const float log2_abs_x = log2_hi + log2_lo;
-        const float product_hi = log2_abs_x * y;
-        float product_lo = fmaf(log2_abs_x, y, -product_hi);
-        product_lo = fmaf(log2_lo - (log2_abs_x - log2_hi), y, product_lo);
+    // Preserve the product residual so exp2 reconstruction sees a tighter input.
+    const float log2_abs_x = log2_hi + log2_lo;
+    const float product_hi = log2_abs_x * y;
+    float product_lo = fmaf(log2_abs_x, y, -product_hi);
+    product_lo = fmaf(log2_lo - (log2_abs_x - log2_hi), y, product_lo);
 
-        output = __internal_exp2f_reconstruct(product_hi, product_lo);
+    // Rebuild the final value from the split exponent parts.
+    output = __internal_exp2f_reconstruct(product_hi, product_lo);
 
-        if (x < 0.0f) {
-            if (floorf(y) != y) {
-                output = ASCRT_NAN_F;
-            } else if (__internal_is_odd_integer_f32(y)) {
-                output = -output;
-            }
+    // Negative bases are only valid for integer exponents.
+    if (x < 0.0f) {
+        if (floorf(y) != y) {
+            output = ASCRT_NAN_F;
+        } else if (__internal_is_odd_integer_f32(y)) {
+            output = -output;
         }
     }
 
+    const bool x_is_zero_or_inf = (x == 0.0f || abs_x == ASCRT_INF_F);
+    const bool y_is_inf = (abs_y == ASCRT_INF_F);
+    const bool x_or_y_nan = (isnan(x) || isnan(y));
+    const bool y_is_odd_int = __internal_is_odd_integer_f32(y);
+
+    // Special values override the main-path result.
     if (y == 0.0f || x == 1.0f) {
         output = 1.0f;
-    } else if (x == 0.0f || abs_x == ASCRT_INF_F) {
-        if (isnan(y)) {
-            output = x + y;
-        } else {
-            float special_output = x + x;
-            if (y < 0.0f) {
-                special_output = __internal_with_sign_bit(abs_x == ASCRT_INF_F ? 0.0f : ASCRT_INF_F, x);
-            }
-            output = __internal_is_odd_integer_f32(y) ? special_output : fabsf(special_output);
+    } else if (x_is_zero_or_inf && isnan(y)) {
+        output = x + y;
+    } else if (x_is_zero_or_inf) {
+        // Zero and infinity follow sign/oddness rules for power semantics.
+        float special_output = x + x;
+        if (y < 0.0f) {
+            special_output = __internal_with_sign_bit(abs_x == ASCRT_INF_F ? 0.0f : ASCRT_INF_F, x);
         }
-    } else if (abs_y == ASCRT_INF_F) {
-        if (isnan(x)) {
-            output = x + y;
-        } else if (x == -1.0f) {
-            output = 1.0f;
-        } else {
-            const bool result_is_inf = (abs_x > 1.0f && y > 0.0f) || (abs_x < 1.0f && y < 0.0f);
-            output = result_is_inf ? ASCRT_INF_F : 0.0f;
-        }
-    } else if (isnan(x) || isnan(y)) {
+        output = y_is_odd_int ? special_output : fabsf(special_output);
+    } else if (y_is_inf && isnan(x)) {
+        output = x + y;
+    } else if (y_is_inf && x == -1.0f) {
+        output = 1.0f;
+    } else if (y_is_inf) {
+        // Infinite exponents collapse to 0 or inf depending on |x| relative to 1.
+        const bool result_is_inf = (abs_x > 1.0f && y > 0.0f) || (abs_x < 1.0f && y < 0.0f);
+        output = result_is_inf ? ASCRT_INF_F : 0.0f;
+    } else if (x_or_y_nan) {
         output = x + y;
     }
 
@@ -3323,16 +3344,17 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y)
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x)
 {
+    float res = __internal_exp2f_reconstruct(x, 0.0f);
     if (isnan(x)) {
-        return x;
+        res = x;
     }
     if (x == ASCRT_INF_F) {
-        return ASCRT_INF_F;
+        res = ASCRT_INF_F;
     }
     if (x == -ASCRT_INF_F) {
-        return 0.0f;
+        res = 0.0f;
     }
-    return __internal_exp2f_reconstruct(x, 0.0f);
+    return res;
 }
 
 /**
@@ -3354,23 +3376,23 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x)
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x)
 {
-    if (isnan(x)) {
-        return x;
-    }
-    if (x == ASCRT_INF_F) {
-        return ASCRT_INF_F;
-    }
-    if (x == 0.0f) {
-        return -ASCRT_INF_F;
-    }
-    if (x < 0.0f) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-
     float log2_hi = 0.0f;
     float log2_lo = 0.0f;
     __internal_log2f_positive_finite(x, log2_hi, log2_lo);
-    return log2_hi + log2_lo;
+    float res = log2_hi + log2_lo;
+    if (isnan(x)) {
+        res = x;
+    }
+    if (x == ASCRT_INF_F) {
+        res = ASCRT_INF_F;
+    }
+    if (x == 0.0f) {
+        res = -ASCRT_INF_F;
+    }
+    if (x < 0.0f) {
+        res = ASCRT_INF_F / ASCRT_INF_F;
+    }
+    return res;
 }
 
 /**
