@@ -180,6 +180,9 @@ HcclResult CcuTempKfcServer::CalcRes(
         } else if (isAllReduce) {
             kernelInfo.callableTaskFunc = reinterpret_cast<void*>(
                 static_cast<CcuCallableKernelFunc>(CcuKfcAllReduceMesh1DMem2MemKernel));
+        } else if (isAlltoAllKfcMultiJetty) {
+            kernelInfo.callableTaskFunc =
+                reinterpret_cast<void*>(static_cast<CcuCallableKernelFunc>(CcuKfcAllToAllMesh1DMultiJettyKernel));
         } else if (isAlltoAll) {
             kernelInfo.callableTaskFunc =
                 reinterpret_cast<void*>(static_cast<CcuCallableKernelFunc>(CcuAlltoAllMesh1DKernel));
