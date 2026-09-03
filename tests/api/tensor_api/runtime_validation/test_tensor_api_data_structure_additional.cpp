@@ -342,4 +342,53 @@ TEST_F(TensorApiDataStructureAdditionalValidation, TensorVariadicSubTensorReject
     EXPECT_THROW((void)tensor(2, matrix_coord), TrapException);
 }
 
+TEST_F(TensorApiDataStructureAdditionalValidation, MakeTensorRejectsCustomNestedShape)
+{
+    using namespace asc::te;
+
+    alignas(512) __gm__ int32_t data[64] = {};
+    auto shape = make_shape(0, make_shape(16, 16), make_shape(16, 16));
+    auto stride = make_stride(512, make_stride(16, 1), make_stride(16, 1));
+
+    EXPECT_THROW((void)make_tensor(make_mem_ptr<location::gm>(data), shape, stride), TrapException);
+}
+
+TEST_F(TensorApiDataStructureAdditionalValidation, Crd2IdxRejectsCustomNestedCoordinate)
+{
+    using namespace asc::te;
+
+    auto shape = make_shape(2, make_shape(16, 16), make_shape(16, 16));
+    auto stride = make_stride(512, make_stride(16, 1), make_stride(16, 1));
+    auto coord = make_coord(2, make_coord(0, 0), make_coord(0, 0));
+
+    EXPECT_THROW((void)crd2idx(coord, shape, stride), TrapException);
+}
+
+TEST_F(TensorApiDataStructureAdditionalValidation, TensorElementAccessRejectsCustomNestedCoordinate)
+{
+    using namespace asc::te;
+
+    alignas(512) __gm__ int32_t data[2 * 16 * 16 * 2] = {};
+    auto shape = make_shape(2, make_shape(16, 16), make_shape(16, 16));
+    auto stride = make_stride(512, make_stride(16, 1), make_stride(16, 1));
+    auto tensor = make_tensor(make_mem_ptr<location::gm>(data), shape, stride);
+    auto coord = make_coord(2, make_coord(0, 0), make_coord(0, 0));
+
+    EXPECT_THROW((void)tensor[coord], TrapException);
+}
+
+TEST_F(TensorApiDataStructureAdditionalValidation, SliceRejectsCustomNestedCoordinate)
+{
+    using namespace asc::te;
+
+    alignas(512) __gm__ int32_t data[2 * 16 * 16 * 2] = {};
+    auto shape = make_shape(2, make_shape(16, 16), make_shape(16, 16));
+    auto stride = make_stride(512, make_stride(16, 1), make_stride(16, 1));
+    auto tensor = make_tensor(make_mem_ptr<location::gm>(data), shape, stride);
+    auto coord = make_coord(2, make_coord(0, 0), make_coord(0, 0));
+    auto slice_shape = make_shape(1, make_shape(1, 1), make_shape(1, 1));
+
+    EXPECT_THROW((void)slice(tensor, coord, slice_shape), TrapException);
+}
+
 } // namespace

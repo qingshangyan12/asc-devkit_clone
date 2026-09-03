@@ -96,34 +96,71 @@ struct debug_coord_pruned_format_tag {};
         }                                                                                                         \
     } while (0)
 
-template <typename ReportTag, typename SourceType, typename ShapeType, typename CoordType>
-__aicore__ inline void report_coord_unsupported(
-    ReportTag, const tensor_api_assert_context& context, const SourceType& source, const ShapeType&, const CoordType&,
-    __gm__ const char* api_name)
+template <
+    typename ReportTag, typename SourceType, typename ShapeType, typename CoordType, size_t... shape_indices,
+    size_t... coord_indices>
+__aicore__ inline void report_coord_unsupported_impl(
+    ReportTag, const tensor_api_assert_context& context, const SourceType& source, const ShapeType& shape,
+    const CoordType& coord, __gm__ const char* api_name, Std::index_sequence<shape_indices...>,
+    Std::index_sequence<coord_indices...>)
 {
+    constexpr auto prefix = debug_make_format_string("[ASSERT] %s:%u: %s: Failed to check coord in %s, ");
+    constexpr auto suffix = debug_make_format_string("; coord must be within shape.\n");
+    constexpr auto shape_format = debug_tuple_format_storage<ShapeType>::value;
+    constexpr auto coord_format = debug_tuple_format_storage<CoordType>::value;
     if constexpr (Std::is_same_v<ReportTag, debug_coord_layout_report_tag>) {
         using view_type = debug_layout_view<SourceType>;
         if constexpr (view_type::has_batch) {
-            TENSOR_API_DETAIL_COORD_FAIL(
-                "layoutPtn=%s, values=(%lld, <unsupported shape/coord tuple combination>), shapeLeafCount=%u, "
-                "coordLeafCount=%u",
-                view_type::pattern_name(), static_cast<long long>(view_type::batch(source)),
-                static_cast<unsigned int>(nesting_depth_v<ShapeType> + 1),
-                static_cast<unsigned int>(nesting_depth_v<CoordType>));
+            constexpr auto shape_with_batch = debug_concat_format_string(
+                debug_make_format_string("(%lld, "),
+                debug_concat_format_string(shape_format, debug_make_format_string(")")));
+            constexpr auto body = debug_concat_format_string(
+                prefix, debug_concat_format_string(
+                            debug_make_format_string("layoutPtn=%s, shape="),
+                            debug_concat_format_string(
+                                shape_with_batch, debug_concat_format_string(
+                                                      debug_make_format_string(", coord="),
+                                                      debug_concat_format_string(coord_format, suffix)))));
+            tensor_api_debug_assert_fail_dynamic(
+                context, body, api_name, view_type::pattern_name(), static_cast<long long>(view_type::batch(source)),
+                static_cast<long long>(get_debug_tuple_leaf<shape_indices>(shape))...,
+                static_cast<long long>(get_debug_tuple_leaf<coord_indices>(coord))...);
         } else {
-            TENSOR_API_DETAIL_COORD_FAIL(
-                "layoutPtn=%s, values=<unsupported shape/coord tuple combination>, shapeLeafCount=%u, "
-                "coordLeafCount=%u",
-                view_type::pattern_name(), static_cast<unsigned int>(nesting_depth_v<ShapeType>),
-                static_cast<unsigned int>(nesting_depth_v<CoordType>));
+            constexpr auto body = debug_concat_format_string(
+                prefix, debug_concat_format_string(
+                            debug_make_format_string("layoutPtn=%s, shape="),
+                            debug_concat_format_string(
+                                shape_format, debug_concat_format_string(
+                                                  debug_make_format_string(", coord="),
+                                                  debug_concat_format_string(coord_format, suffix)))));
+            tensor_api_debug_assert_fail_dynamic(
+                context, body, api_name, view_type::pattern_name(),
+                static_cast<long long>(get_debug_tuple_leaf<shape_indices>(shape))...,
+                static_cast<long long>(get_debug_tuple_leaf<coord_indices>(coord))...);
         }
     } else {
         static_assert(Std::is_same_v<ReportTag, debug_coord_shape_report_tag>, "Unsupported coord report source.");
-        TENSOR_API_DETAIL_COORD_FAIL(
-            "values=<unsupported shape/coord tuple combination>, shapeLeafCount=%u, coordLeafCount=%u",
-            static_cast<unsigned int>(nesting_depth_v<ShapeType>),
-            static_cast<unsigned int>(nesting_depth_v<CoordType>));
+        constexpr auto body = debug_concat_format_string(
+            prefix, debug_concat_format_string(
+                        debug_make_format_string("shape="),
+                        debug_concat_format_string(
+                            shape_format, debug_concat_format_string(
+                                              debug_make_format_string(", coord="),
+                                              debug_concat_format_string(coord_format, suffix)))));
+        tensor_api_debug_assert_fail_dynamic(
+            context, body, api_name, static_cast<long long>(get_debug_tuple_leaf<shape_indices>(shape))...,
+            static_cast<long long>(get_debug_tuple_leaf<coord_indices>(coord))...);
     }
+}
+
+template <typename ReportTag, typename SourceType, typename ShapeType, typename CoordType>
+__aicore__ inline void report_coord_unsupported(
+    ReportTag report_tag, const tensor_api_assert_context& context, const SourceType& source, const ShapeType& shape,
+    const CoordType& coord, __gm__ const char* api_name)
+{
+    report_coord_unsupported_impl(
+        report_tag, context, source, shape, coord, api_name, Std::make_index_sequence<nesting_depth_v<ShapeType>>{},
+        Std::make_index_sequence<nesting_depth_v<CoordType>>{});
 }
 
 template <
