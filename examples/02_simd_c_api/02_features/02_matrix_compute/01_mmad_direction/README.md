@@ -80,8 +80,8 @@ Kernel按照以下顺序执行：
 | 6 | 反例 | float Nz2ND + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_m()` | 生成顺序与搬出顺序不一致。 |
 | 7 | 正例 | float Nz2DN + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_m()` | Nz2DN按M方向读取。 |
 | 8 | 反例 | float Nz2DN + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_n()` | 生成顺序与搬出顺序不一致。 |
-| 9 | 正例 | B8 ChannelMerge + UnitFlag | `[256, 64, 128]` | `asc_set_mmad_direction_n()` | ChannelMerge按N方向读取。 |
-| 10 | 反例 | B8 ChannelMerge + UnitFlag | `[256, 64, 128]` | `asc_set_mmad_direction_m()` | 生成顺序与搬出顺序不一致。 |
+| 9 | 正例 | B8 ChannelMerge + UnitFlag | `[256, 256, 64]` | `asc_set_mmad_direction_n()` | ChannelMerge按N方向读取。 |
+| 10 | 反例 | B8 ChannelMerge + UnitFlag | `[256, 256, 64]` | `asc_set_mmad_direction_m()` | 生成顺序与搬出顺序不一致。 |
 
 ### 场景1/2：float Nz输出
 
@@ -122,7 +122,7 @@ Kernel按照以下顺序执行：
 | B4 ChannelMerge + UnitFlag | 13.154 ± 0.053 | 15.149 ± 0.043 | **13.172%** |
 | float Nz2ND + UnitFlag | 61.935 ± 0.113 | 112.891 ± 0.056 | **45.137%** |
 | float Nz2DN + UnitFlag | 60.937 ± 0.170 | 61.653 ± 0.191 | **1.162%** |
-| B8 ChannelMerge + UnitFlag | 60.963 ± 0.140 | 60.962 ± 0.061 | 统计等价（-0.002%） |
+| B8 ChannelMerge + UnitFlag | 60.909 ± 0.157 | 61.174 ± 0.112 | **0.435%** |
 
 注意性能收益与数据量、Shape、切分方式和完整算子流水相关，表5中的百分比不能直接外推到其他场景，仅用于展示计算方向与性能优化的关系。
 

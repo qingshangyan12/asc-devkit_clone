@@ -18,7 +18,6 @@ import numpy as np
 
 
 RANDOM_SEED = 20260902
-MATRIX_K = 128
 QUANT_SCALE = 1.0
 
 
@@ -38,15 +37,16 @@ def pack_signed_int4(data):
 
 def generate_data(scenario_num):
     matrix_m = 192 if scenario_num in (3, 4) else 256
-    matrix_n = 64 if scenario_num in (3, 4, 9, 10) else 256
+    matrix_n = 64 if scenario_num in (3, 4) else 256
+    matrix_k = 64 if scenario_num in (9, 10) else 128
     rng = np.random.default_rng(RANDOM_SEED)
 
     values = np.array([-1.0, 0.0, 1.0], dtype=np.float16)
     probabilities = np.array([0.18, 0.64, 0.18])
-    a = rng.choice(values, size=(matrix_m, MATRIX_K), p=probabilities).astype(
+    a = rng.choice(values, size=(matrix_m, matrix_k), p=probabilities).astype(
         np.float16
     )
-    b = rng.choice(values, size=(MATRIX_K, matrix_n), p=probabilities).astype(
+    b = rng.choice(values, size=(matrix_k, matrix_n), p=probabilities).astype(
         np.float16
     )
     golden_nd = np.matmul(a.astype(np.float32), b.astype(np.float32))
