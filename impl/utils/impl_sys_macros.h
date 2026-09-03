@@ -9,11 +9,11 @@
  */
 
 /*!
- * \file sys_macros.h
+ * \file impl_sys_macros.h
  * \brief
  */
-#ifndef IMPL_UTILS_SYS_MACROS_H
-#define IMPL_UTILS_SYS_MACROS_H
+#ifndef IMPL_UTILS_IMPL_SYS_MACROS_H
+#define IMPL_UTILS_IMPL_SYS_MACROS_H
 
 #include <cstdint>
 #include "utils/base/sys_constants.h"
