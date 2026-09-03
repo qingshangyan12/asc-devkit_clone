@@ -109,7 +109,7 @@ For example, `3.75` produces `3.0`, and `-3.75` produces `-3.0`.
 Run the following steps in the sample root directory to build and execute the operator.
 
 - Configure environment variables
-  Configure environment variables based on the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
+  Configure environment variables based on the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/en/quick_start.md) of the CANN development kit on the current environment. **Currently only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
 
   ```bash
   source ${install_path}/set_env.sh
