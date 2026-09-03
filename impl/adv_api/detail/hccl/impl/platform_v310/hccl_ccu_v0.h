@@ -524,7 +524,8 @@ __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         }
     }
     uint8_t missionNum = 1U;
-    if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink)) {
+    if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink) ||
+        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent)) {
         missionNum = KFC_MAX_MISSION_NUM;
     }
     return missionNum;
