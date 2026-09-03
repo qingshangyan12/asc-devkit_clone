@@ -31,7 +31,6 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_l13d_padding(uint64_t config)
 __aicore__ inline void asc_set_l13d_padding(half config)
 __aicore__ inline void asc_set_l13d_padding(int16_t config)
 __aicore__ inline void asc_set_l13d_padding(uint16_t config)
@@ -43,7 +42,7 @@ __aicore__ inline void asc_set_l13d_padding(uint16_t config)
 
 |参数名|输入/输出|描述|
 |------------|------------|-----------|
-| config | 输入     | Pad填充值的数值。|
+| config | 输入     | Pad填充值的数值。支持`half`、`int16_t`和`uint16_t`。|
 
 ## 返回值说明
 
@@ -60,6 +59,6 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-constexpr uint64_t config = 0;
+constexpr int16_t config = 0;
 asc_set_l13d_padding(config);
 ```
