@@ -3134,6 +3134,22 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fdividef(float x, float y) { return 
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int signbit(float x) { return signbitf(x); }
 
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_uintdiv(uint32_t dividend, uint32_t magic, uint32_t shift)
+{
+    uint32_t q = __umulhi(dividend, magic);
+    uint32_t sum = dividend + q;
+    return sum >> shift;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_uintdiv(uint64_t dividend, uint64_t magic, uint64_t shift)
+{
+    uint64_t q = __umul64hi(dividend, magic);
+    uint64_t sum = dividend + q;
+    return sum >> shift;
+}
+#endif
+
 #endif
 #endif // IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
 
