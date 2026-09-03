@@ -157,5 +157,9 @@ void Sync();
 } // namespace Simt
 } // namespace AscendC
 
+uint64_t __cce_simt_get_para_base_imp();
+
+void __nop(void);
+
 #endif
 #endif // KERNEL_SIMT_CPU_DEBUG
