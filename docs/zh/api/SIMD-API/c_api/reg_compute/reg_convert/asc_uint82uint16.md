@@ -92,6 +92,7 @@ __simd_callee__ inline void asc_uint82uint16(vector_uint16_t& dst,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 
 ```c
@@ -196,5 +197,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->

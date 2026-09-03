@@ -105,6 +105,7 @@ u代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```c
 #include <cstdint>
@@ -202,5 +203,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->
