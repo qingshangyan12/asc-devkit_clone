@@ -204,13 +204,15 @@ TEST_F(TestHcclTilingCcuKfc, AllToAllCcuSchedUsesCcuNewVersion)
 TEST_F(TestHcclTilingCcuKfc, UnsupportedCommEngineUsesDefaultVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 4U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuSchedAllGatherSoleMesh", 4U,
+        INIT_TILING_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, UnregisteredAlgorithmUsesDefaultVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuUnregisteredAlgorithm", 6U, INIT_TILING_VERSION);
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "CcuUnregisteredAlgorithm", 6U,
+        INIT_TILING_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, AllGatherCcuMsUsesCcuNewVersion)
@@ -237,14 +239,16 @@ TEST_F(TestHcclTilingCcuKfc, KfcAllGatherCcuSchedUsesCcuNewVersion)
 TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuMsUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh", 5U,
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh",
+        5U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 
 TEST_F(TestHcclTilingCcuKfc, ReduceScatterCcuSchedUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
-        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh", 6U,
+        static_cast<uint32_t>(HcclCMDType::HCCL_CMD_REDUCE_SCATTER), "CcuSchedReduceScatterSoleMesh",
+        6U,
         INIT_TILING_CCU_NEW_VERSION);
 }
 

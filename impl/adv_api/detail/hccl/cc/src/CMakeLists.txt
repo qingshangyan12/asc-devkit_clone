@@ -222,6 +222,7 @@ if(PRODUCT_SIDE STREQUAL "device")
 
     target_compile_definitions(mc2_server PRIVATE
         -DAICPU_COMPILE
+        __ccu_host__=
         MC2_SERVER_ONLY
     )
 
@@ -268,6 +269,7 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
 
     target_compile_definitions(mc2_client PRIVATE
         -DHOST_COMPILE
+        __ccu_host__=
         MC2_CLIENT_ENABLE_CCU=$<BOOL:${MC2_CLIENT_ENABLE_CCU}>
     )
 

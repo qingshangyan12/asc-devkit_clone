@@ -574,7 +574,7 @@ foreach(product_type ${TILING_PRODUCT_TYPE_LIST})
         ${ASCENDC_TILING_TEST_SRC_FILES}
     )
 
-    target_compile_definitions(ascendc_ut_adv_api_tiling_${product_type} PRIVATE
+target_compile_definitions(ascendc_ut_adv_api_tiling_${product_type} PRIVATE
         UT_TEST
         $<$<STREQUAL:${product_type},ascend310p>:__NPU_ARCH__=2002>
         $<$<STREQUAL:${product_type},ascend610>:__NPU_ARCH__=2002>

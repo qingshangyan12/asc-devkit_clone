@@ -177,6 +177,7 @@ target_compile_options(
 
 target_compile_definitions(
   tiling_api PRIVATE
+  __ccu_host__=
   $<$<STREQUAL:${PRODUCT_SIDE},device>:_FORTIFY_SOURCE=2>
   $<$<STREQUAL:${PRODUCT_SIDE},device>:ASCENDC_DEVICE_REG_STATIC>
 )
