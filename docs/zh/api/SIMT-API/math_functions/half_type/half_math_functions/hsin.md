@@ -63,26 +63,32 @@ inline half hsin(half x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __global__ __launch_bounds__(1024) void KernelSin(half* dst, half* x)
+    __global__ __launch_bounds__(1024) void kernel_sin(half* dst, half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = hsin(x[idx]); // 对src源地址的第idx个元素取三角函数正弦值
+        if (idx >= total_length) {
+            return;
+        }
+        dst[idx] = hsin(x[idx]); // 对x的第idx个元素取三角函数正弦值
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     #include "simt_api/asc_fp16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelSin(__gm__ half* dst, __gm__ half* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_sin(__gm__ half* dst, __gm__ half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = hsin(x[idx]); // 对src源地址的第idx个元素取三角函数正弦值
+        if (idx >= total_length) {
+            return;
+        }
+        dst[idx] = hsin(x[idx]); // 对x源地址的第idx个元素取三角函数正弦值
     }
     ```
