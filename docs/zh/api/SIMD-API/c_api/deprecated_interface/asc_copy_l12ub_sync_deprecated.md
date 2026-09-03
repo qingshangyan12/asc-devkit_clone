@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**`asc_copy_l12ub_sync`使用`bool sub_blockid`的旧接口已废弃。请使用[asc_copy_l12ub](../cube_datamove/asc_copy_l12ub.md)接口的`int8_t sub_blockid`重载，并按需调用`asc_sync`。**
+**`asc_copy_l12ub_sync`接口已废弃。请使用[asc_copy_l12ub](../cube_datamove/asc_copy_l12ub.md)接口和`asc_sync`接口替代。**
 
 将数据从L1 Buffer搬运到Unified Buffer（UB）中。
 

@@ -715,7 +715,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_copy_gm2l1_nd2nz（废弃）](deprecated_interface/asc_copy_gm2l1_nd2nz_deprecated.md)|旧重载及`_sync`已废弃，请使用类型化L2 Cache参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_gm2l1（高维切分旧形式，废弃）](deprecated_interface/asc_copy_gm2l1_highdim_deprecated.md)|请使用`asc_channel_pad_mode`参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_copy_gm2l1（2D矩阵搬运旧形式，废弃）](deprecated_interface/asc_copy_gm2l1_2d_deprecated.md)|请使用`asc_load_l2_cache_mode`参数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_l12ub_sync（废弃）](deprecated_interface/asc_copy_l12ub_sync_deprecated.md)|旧`bool sub_blockid`同步接口已废弃。|`c_api/composite/cube_datamove_composite.h`|
+|[asc_copy_l12ub_sync（废弃）](deprecated_interface/asc_copy_l12ub_sync_deprecated.md)|请使用`asc_copy_l12ub`接口和`asc_sync`接口替代。|`c_api/composite/cube_datamove_composite.h`|
 |[asc_abs_sync（废弃）](deprecated_interface/asc_abs_sync_deprecated.md)|按元素取绝对值同步接口。|`c_api/composite/vector_compute_composite.h`|
 |[asc_bfloat162e1m2x2 (废弃)](reg_compute/reg_convert/asc_bfloat162e1m2x2_deprecated.md)|将bfloat16_t类型转换为fp4x2_e1m2_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_bfloat162e2m1x2 (废弃)](reg_compute/reg_convert/asc_bfloat162e2m1x2_deprecated.md)|将bfloat16_t类型转换为fp4x2_e2m1_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
