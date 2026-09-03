@@ -157,7 +157,16 @@ __aicore__ inline void report_slice_error_by_format(
     const SliceShapeType& slice_shape, Std::index_sequence<source_indices...>, Std::index_sequence<coord_indices...>,
     Std::index_sequence<slice_indices...>)
 {
-    report_slice_unsupported<kind>(context, layout, coord, info, source_shape, slice_shape);
+    using view_type = debug_layout_view<LayoutType>;
+    using slice_view_type = debug_slice_info_view<InfoType>;
+    if constexpr (
+        is_debug_leading_scalar_two_flat_v<SourceShapeType> && is_debug_leading_scalar_two_flat_v<CoordType> &&
+        is_debug_leading_scalar_two_flat_v<SliceShapeType>) {
+        TENSOR_API_DETAIL_REPORT_SLICE_SAME_FORMAT(
+            "(%lld, (%lld, %lld), (%lld, %lld))", "(%lld, (%lld, %lld), (%lld, %lld))");
+    } else {
+        report_slice_unsupported<kind>(context, layout, coord, info, source_shape, slice_shape);
+    }
 }
 
 template <

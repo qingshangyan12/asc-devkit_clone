@@ -192,6 +192,18 @@ template <typename... ValueTypes>
 constexpr bool are_debug_scalar_values_v = (... && !Std::is_tuple_v<Std::remove_cvref_t<ValueTypes>>);
 
 template <typename ValueType>
+struct is_debug_leading_scalar_two_flat : Std::false_type {};
+
+template <typename LeadingType, typename Value00Type, typename Value01Type, typename Value10Type, typename Value11Type>
+struct is_debug_leading_scalar_two_flat<
+    Std::tuple<LeadingType, Std::tuple<Value00Type, Value01Type>, Std::tuple<Value10Type, Value11Type>>>
+    : Std::bool_constant<are_debug_scalar_values_v<LeadingType, Value00Type, Value01Type, Value10Type, Value11Type>> {};
+
+template <typename ValueType>
+constexpr bool is_debug_leading_scalar_two_flat_v =
+    is_debug_leading_scalar_two_flat<Std::remove_cvref_t<ValueType>>::value;
+
+template <typename ValueType>
 struct debug_tuple_format {
     using type = debug_tuple_unsupported;
 };

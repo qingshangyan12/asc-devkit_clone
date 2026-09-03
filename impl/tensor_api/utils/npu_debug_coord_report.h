@@ -272,7 +272,13 @@ __aicore__ inline void report_coord_error_by_format(
     const SourceType& source, const ShapeType& shape, const CoordType& coord, __gm__ const char* api_name,
     Std::index_sequence<shape_indices...>, Std::index_sequence<coord_indices...>)
 {
-    report_coord_unsupported(report_tag, context, source, shape, coord, api_name);
+    if constexpr (is_debug_leading_scalar_two_flat_v<ShapeType> && is_debug_leading_scalar_two_flat_v<CoordType>) {
+        TENSOR_API_DETAIL_REPORT_COORD_WITH_FORMATS(
+            "(%lld, (%lld, %lld), (%lld, %lld))", "(%lld, (%lld, %lld), (%lld, %lld))",
+            "(%lld, (%lld, %lld), (%lld, %lld))");
+    } else {
+        report_coord_unsupported(report_tag, context, source, shape, coord, api_name);
+    }
 }
 
 template <
@@ -310,6 +316,9 @@ __aicore__ inline void report_scalar_coord_error(
     } else if constexpr (Std::is_same_v<shape_format_type, debug_tuple_leading_scalar_nested_2x2>) {
         TENSOR_API_DETAIL_REPORT_COORD_WITH_FORMATS(
             "(%lld, ((%lld, %lld), (%lld, %lld)))", "(%lld, %lld, ((%lld, %lld), (%lld, %lld)))", "%lld");
+    } else if constexpr (is_debug_leading_scalar_two_flat_v<ShapeType>) {
+        TENSOR_API_DETAIL_REPORT_COORD_WITH_FORMATS(
+            "(%lld, (%lld, %lld), (%lld, %lld))", "(%lld, (%lld, %lld), (%lld, %lld))", "%lld");
     } else {
         report_coord_unsupported(report_tag, context, source, shape, coord, api_name);
     }
