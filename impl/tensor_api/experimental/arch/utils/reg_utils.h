@@ -66,22 +66,10 @@ template <typename T>
 inline constexpr bool supports_relu_v = ::AscendC::Std::is_one_of_v<T, half, int32_t, float>;
 
 template <typename T>
-inline constexpr bool supports_add_sub_v =
-    ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
-
-template <typename T>
 inline constexpr bool supports_carry_v = ::AscendC::Std::is_same_v<T, uint32_t>;
 
 template <typename T>
 inline constexpr bool supports_mull_v = ::AscendC::Std::is_one_of_v<T, int32_t, uint32_t>;
-
-template <typename T>
-inline constexpr bool supports_mul_v =
-    ::AscendC::Std::is_one_of_v<T, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
-
-template <typename T>
-inline constexpr bool supports_mul_scalar_v =
-    ::AscendC::Std::is_one_of_v<T, int16_t, uint16_t, half, int32_t, uint32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_div_v =

@@ -32,9 +32,6 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> sqrt(const reg_tensor<T>& src_reg);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src_reg);
-
-template <typename T>
 __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src_reg);
 
 template <typename T>
@@ -53,24 +50,12 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src_reg, const T& slope);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src, const T& scalar);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor<T>& src);
-
-template <typename T>
 __simd_callee__ inline reg_tensor<T> addc(reg_tensor<bool>& carry, const reg_tensor<T>& src0,
                                           const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> addc(reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
                                           const reg_tensor<bool>& carry_src);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> subc(reg_tensor<bool>& carry, const reg_tensor<T>& src0,
@@ -81,28 +66,10 @@ __simd_callee__ inline reg_tensor<T> subc(reg_tensor<bool>& carry, const reg_ten
                                           const reg_tensor<bool>& carry_src);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src, const T& scalar);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> operator*(const T& scalar, const reg_tensor<T>& src);
-
-template <typename T>
 __simd_callee__ inline reg_pair<T> mull(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src, const T& scalar);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> max(const T& scalar, const reg_tensor<T>& src);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src0, const reg_tensor<T>& src1);

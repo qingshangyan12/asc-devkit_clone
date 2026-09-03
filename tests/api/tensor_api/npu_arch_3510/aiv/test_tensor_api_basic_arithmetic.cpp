@@ -46,9 +46,6 @@ void check_float_math()
         AscendC::Std::is_same_v<decltype(asc::te::experimental::sqrt(AscendC::Std::declval<const reg_type<T>&>())),
                                 reg_type<T>>);
     static_assert(
-        AscendC::Std::is_same_v<decltype(asc::te::experimental::log(AscendC::Std::declval<const reg_type<T>&>())),
-                                reg_type<T>>);
-    static_assert(
         AscendC::Std::is_same_v<decltype(asc::te::experimental::log2(AscendC::Std::declval<const reg_type<T>&>())),
                                 reg_type<T>>);
     static_assert(
@@ -73,59 +70,16 @@ void check_relu()
 }
 
 template <typename T>
-void check_add_sub()
+void check_register_div()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(AscendC::Std::declval<const reg_type<T>&>()
-                                                   + AscendC::Std::declval<const reg_type<T>&>()),
-                                          reg_type<T>>);
-    static_assert(
-        AscendC::Std::is_same_v<
-            decltype(AscendC::Std::declval<const reg_type<T>&>() + AscendC::Std::declval<const T&>()), reg_type<T>>);
-    static_assert(
-        AscendC::Std::is_same_v<
-            decltype(AscendC::Std::declval<const T&>() + AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(AscendC::Std::declval<const reg_type<T>&>()
-                                                   - AscendC::Std::declval<const reg_type<T>&>()),
-                                          reg_type<T>>);
-}
-
-template <typename T>
-void check_register_mul()
-{
-    static_assert(AscendC::Std::is_same_v<decltype(AscendC::Std::declval<const reg_type<T>&>()
-                                                   * AscendC::Std::declval<const reg_type<T>&>()),
-                                          reg_type<T>>);
-}
-
-template <typename T>
-void check_scalar_mul_and_register_div()
-{
-    static_assert(
-        AscendC::Std::is_same_v<
-            decltype(AscendC::Std::declval<const reg_type<T>&>() * AscendC::Std::declval<const T&>()), reg_type<T>>);
-    static_assert(
-        AscendC::Std::is_same_v<
-            decltype(AscendC::Std::declval<const T&>() * AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
     static_assert(AscendC::Std::is_same_v<decltype(AscendC::Std::declval<const reg_type<T>&>()
                                                    / AscendC::Std::declval<const reg_type<T>&>()),
                                           reg_type<T>>);
 }
 
 template <typename T>
-void check_min_max()
+void check_min()
 {
-    static_assert(
-        AscendC::Std::is_same_v<decltype(asc::te::experimental::max(AscendC::Std::declval<const reg_type<T>&>(),
-                                                                    AscendC::Std::declval<const reg_type<T>&>())),
-                                reg_type<T>>);
-    static_assert(
-        AscendC::Std::is_same_v<decltype(asc::te::experimental::max(AscendC::Std::declval<const reg_type<T>&>(),
-                                                                    AscendC::Std::declval<const T&>())),
-                                reg_type<T>>);
-    static_assert(
-        AscendC::Std::is_same_v<decltype(asc::te::experimental::max(AscendC::Std::declval<const T&>(),
-                                                                    AscendC::Std::declval<const reg_type<T>&>())),
-                                reg_type<T>>);
     static_assert(
         AscendC::Std::is_same_v<decltype(asc::te::experimental::min(AscendC::Std::declval<const reg_type<T>&>(),
                                                                     AscendC::Std::declval<const reg_type<T>&>())),
@@ -189,40 +143,22 @@ TEST(test_tensor_api_basic_arithmetic, compile_public_apis_and_supported_types)
     check_relu<int32_t>();
     check_relu<float>();
 
-    check_add_sub<int8_t>();
-    check_add_sub<uint8_t>();
-    check_add_sub<int16_t>();
-    check_add_sub<uint16_t>();
-    check_add_sub<half>();
-    check_add_sub<bfloat16_t>();
-    check_add_sub<int32_t>();
-    check_add_sub<uint32_t>();
-    check_add_sub<float>();
+    check_register_div<int16_t>();
+    check_register_div<uint16_t>();
+    check_register_div<half>();
+    check_register_div<int32_t>();
+    check_register_div<uint32_t>();
+    check_register_div<float>();
 
-    check_register_mul<int16_t>();
-    check_register_mul<uint16_t>();
-    check_register_mul<half>();
-    check_register_mul<bfloat16_t>();
-    check_register_mul<int32_t>();
-    check_register_mul<uint32_t>();
-    check_register_mul<float>();
-
-    check_scalar_mul_and_register_div<int16_t>();
-    check_scalar_mul_and_register_div<uint16_t>();
-    check_scalar_mul_and_register_div<half>();
-    check_scalar_mul_and_register_div<int32_t>();
-    check_scalar_mul_and_register_div<uint32_t>();
-    check_scalar_mul_and_register_div<float>();
-
-    check_min_max<int8_t>();
-    check_min_max<uint8_t>();
-    check_min_max<int16_t>();
-    check_min_max<uint16_t>();
-    check_min_max<half>();
-    check_min_max<bfloat16_t>();
-    check_min_max<int32_t>();
-    check_min_max<uint32_t>();
-    check_min_max<float>();
+    check_min<int8_t>();
+    check_min<uint8_t>();
+    check_min<int16_t>();
+    check_min<uint16_t>();
+    check_min<half>();
+    check_min<bfloat16_t>();
+    check_min<int32_t>();
+    check_min<uint32_t>();
+    check_min<float>();
     check_carry<uint32_t>();
     check_mull<int32_t>();
     check_mull<uint32_t>();
