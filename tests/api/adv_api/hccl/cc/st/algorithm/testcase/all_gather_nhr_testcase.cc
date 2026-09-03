@@ -354,6 +354,16 @@ TEST_F(AllGatherNhrResourceTest, SelectorUsesMultiJettyNameForTargetUbxRange)
     EXPECT_EQ(algName, INS_ALL_GATHER_PARALLEL_MESH_1D_NHR_MULTI_JETTY);
 }
 
+TEST_F(AllGatherNhrResourceTest, BuiltinParallelSplitRatioUsesAllGatherTopology)
+{
+    const auto intraChannels = MakeChannelMap({{1U, 4U}});
+    const auto interChannels = MakeChannelMap({{1U, 4U}});
+
+    EXPECT_DOUBLE_EQ(
+        CalcParallelDataSplitRatio(4U, 4U, intraChannels, interChannels, ParallelDataSplitType::ALL_GATHER, 0.5),
+        0.25);
+}
+
 TEST_F(AllGatherNhrResourceTest, ProductionKernelAcceptsEmptyInput)
 {
     auto nhr = MakeNhrTemplate();
