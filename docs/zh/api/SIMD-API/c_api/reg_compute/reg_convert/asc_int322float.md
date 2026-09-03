@@ -94,6 +94,7 @@ __simd_callee__ inline void asc_int322float_rn(vector_float& dst,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```c
 #include <cstdint>
@@ -186,5 +187,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->

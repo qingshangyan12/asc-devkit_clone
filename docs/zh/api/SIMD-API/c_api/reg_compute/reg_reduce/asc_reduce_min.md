@@ -105,6 +105,7 @@ __simd_callee__ inline void asc_reduce_min(vector_half& dst,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```cpp
 // 本例使用half类型演示归约结果"值+索引"的分别提取，
@@ -170,5 +171,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->
