@@ -15,7 +15,7 @@
 #ifndef INCLUDE_TENSOR_API_UTILS_UTILS_H
 #define INCLUDE_TENSOR_API_UTILS_UTILS_H
 
-#include "utils/base/sys_macros.h"
+#include "impl/utils/sys_macros_impl.h"
 #include "utils/base/sys_constants.h"
 #include "utils/common_types.h"
 #include "utils/std/type_traits.h"
