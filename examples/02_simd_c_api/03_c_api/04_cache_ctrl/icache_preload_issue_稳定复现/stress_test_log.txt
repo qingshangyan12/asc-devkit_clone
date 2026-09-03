@@ -1,0 +1,1304 @@
+===== Run 1/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 2/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 3/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 4/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 5/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 50%] Built target unrelated_probe_kernel
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 6/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 7/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target icache_probe_kernel
+[ 66%] Built target unrelated_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 8/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 9/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 10/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 11/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 12/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 13/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libicache_probe_kernel.so
+[ 50%] Built target icache_probe_kernel
+[ 66%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 14/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 15/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 16/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target icache_probe_kernel
+[ 66%] Built target unrelated_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 17/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 50%] Built target unrelated_probe_kernel
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 18/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 50%] Built target unrelated_probe_kernel
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 19/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 20/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 21/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 22/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 23/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 24/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 25/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 50%] Built target unrelated_probe_kernel
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 26/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 27/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 28/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 29/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 30/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 31/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 32/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 33/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 34/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 35/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 36/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target icache_probe_kernel
+[ 66%] Built target unrelated_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 37/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 38/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 39/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 50%] Built target unrelated_probe_kernel
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 40/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 41/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 42/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 43/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 44/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 45/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Run 46/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 47/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 48/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 50%] Built target unrelated_probe_kernel
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 49/50 (exit=1) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Built target icache_probe_kernel
+[ 66%] Built target unrelated_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+Result: REPRODUCED
+===== Run 50/50 (exit=0) =====
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
+Result: NOT_REPRODUCED
+===== Summary =====
+Total runs: 50
+Reproduced (FIRST_SYNC_OK + PROBE_FAIL acl_error=507035): 37
+Not reproduced: 13

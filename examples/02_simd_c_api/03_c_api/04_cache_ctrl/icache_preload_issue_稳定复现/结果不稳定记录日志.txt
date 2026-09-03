@@ -1,0 +1,50 @@
+root@15ba1e62761f:/home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现# bash test.sh
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target unrelated_probe_kernel
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_FAIL acl_error=507035
+root@15ba1e62761f:/home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现# bash test.sh
+-- System processor: x86_64
+-- CMAKE_ASC_COMPILER: /usr/local/Ascend/cann-9.2.0-beta.1/bin/bisheng
+-- ASCEND_CANN_PACKAGE_LINUX_PATH: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux
+-- CMAKE_ASC_LLD_LINKER: /usr/local/Ascend/cann-9.2.0-beta.1/x86_64-linux/ccec_compiler/bin/ld.lld
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/g00954335/asc-devkit_GRJ/examples/02_simd_c_api/03_c_api/04_cache_ctrl/icache_preload_issue_稳定复现/build
+[ 16%] Building ASC object CMakeFiles/unrelated_probe_kernel.dir/unrelated_probe_kernel.asc.o
+[ 33%] Building ASC object CMakeFiles/icache_probe_kernel.dir/icache_probe_kernel.asc.o
+[ 50%] Linking ASC shared library libunrelated_probe_kernel.so
+[ 50%] Built target unrelated_probe_kernel
+[ 66%] Linking ASC shared library libicache_probe_kernel.so
+[ 66%] Built target icache_probe_kernel
+[ 83%] Building CXX object CMakeFiles/demo.dir/main.cpp.o
+[100%] Linking ASC executable demo
+[100%] Built target demo
+FIRST_SYNC_OK
+PROBE_OK
