@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 比较两个bfloat16x2\_t类型数据的两个分量是否不相等，当两个分量均不相等时返回true。若任一输入的分量为nan，该分量的比较结果为true。
 
 ## 函数原型
@@ -46,8 +48,8 @@ bool __hbneux2(bfloat16x2_t x, bfloat16x2_t y)
 
 比较输入数据各分量是否均不相等的结果。
 
--   true：输入数据各分量均不相等。
--   false：输入数据任一分量相等。
+- true：输入数据各分量均不相等。
+- false：输入数据任一分量相等。
 
 特殊值如下：
 
@@ -82,7 +84,7 @@ bool __hbneux2(bfloat16x2_t x, bfloat16x2_t y)
     </tr>
     <tr>
       <td colspan="2">任一分量含nan</td>
-      <td>true（任一输入分量为nan时，该分量≠比较结果为true）</td>
+      <td>该分量的比较结果为true（整体结果取决于两个分量的比较结果）</td>
     </tr>
   </tbody>
 </table>
@@ -91,19 +93,13 @@ bool __hbneux2(bfloat16x2_t x, bfloat16x2_t y)
 
 无
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_bf16.h`头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
-
 ## 调用示例
 
 -   SIMT编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     // 使用短向量可提升数据搬运效率
     __global__ __launch_bounds__(1024) void simt_hbneux2(bfloat16_t* x, bfloat16_t* y, bool* dst, uint32_t input_total_length)
     {
@@ -121,6 +117,8 @@ bool __hbneux2(bfloat16x2_t x, bfloat16x2_t y)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_bf16.h"
+
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_hbneux2(__gm__ bfloat16x2_t* x, __gm__ bfloat16x2_t* y, __gm__ bool* dst, uint32_t input_total_length)
     {

@@ -45,7 +45,7 @@ inline unsigned int __float_as_uint(const float x)
 
 ## 返回值说明
 
-与输入浮点数最接近的整数值。特殊值如下：
+输入的浮点数中的位重新解释成的无符号整数。特殊值如下：
 
 | x值 | 返回值 |
 |---|---|
@@ -61,26 +61,32 @@ inline unsigned int __float_as_uint(const float x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernel__float_as_uint(uint32_t* dst, float* x)
+    __global__ __launch_bounds__(1024) void kernel__float_as_uint(uint32_t* dst, float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float_as_uint(x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__float_as_uint(__gm__ uint32_t* dst, __gm__ float* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__float_as_uint(__gm__ uint32_t* dst, __gm__ float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float_as_uint(x[idx]);
     }
     ```
