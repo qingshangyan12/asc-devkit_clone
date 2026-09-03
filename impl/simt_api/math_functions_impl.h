@@ -3243,102 +3243,67 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
 
 #else
 
-/**
- * Computes x raised to the power y for float inputs.
- *
- * The implementation first handles powf special cases whose result is fixed
- * by IEEE-style semantics, such as y == 0, x == 1, NaN inputs, signed zero,
- * signed infinity, and negative bases with non-integer exponents.
- *
- * For finite nonzero magnitudes, the main calculation uses:
- *   powf(x, y) = exp2(y * log2(abs(x)))
- *
- * log2(abs(x)) is split into high and low parts:
- *   log2(abs(x)) ~= log2_hi + log2_lo
- *
- * The split preserves the residual when multiplying by y:
- *   product_hi = (log2_hi + log2_lo) * y
- *   product_lo = fma(log2_abs_x, y, -product_hi) + correction
- *
- * The final magnitude is reconstructed by the exp2 helper:
- *   output = exp2(product_hi + product_lo)
- *
- * For negative x, the magnitude is computed from abs(x). The sign is applied
- * only when y is an odd integer; negative bases with non-integer y return NaN.
- *
- * @param x The base value.
- * @param y The exponent value.
- * @return The computed x^y value.
- */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __internal_is_odd_integer_f32(float value)
+{
+    const float half_trunc = truncf(value * 0.5f);
+    const float remainder = value - (half_trunc + half_trunc);
+    return fabsf(remainder) == 1.0f;
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y)
 {
     const float abs_x = fabsf(x);
     const float abs_y = fabsf(y);
 
-    // pow(x, 0) and pow(1, y) are exactly 1.  These cases have priority over NaN propagation by the
-    // documented powf semantics.
+    float output = ASCRT_NAN_F;
+
+    if (!isnan(x) && !isnan(y) && abs_x != 0.0f && abs_x != ASCRT_INF_F && abs_y != ASCRT_INF_F) {
+        float log2_hi = 0.0f;
+        float log2_lo = 0.0f;
+        __internal_log2f_positive_finite(abs_x, log2_hi, log2_lo);
+
+        const float log2_abs_x = log2_hi + log2_lo;
+        const float product_hi = log2_abs_x * y;
+        float product_lo = fmaf(log2_abs_x, y, -product_hi);
+        product_lo = fmaf(log2_lo - (log2_abs_x - log2_hi), y, product_lo);
+
+        output = __internal_exp2f_reconstruct(product_hi, product_lo);
+
+        if (x < 0.0f) {
+            if (floorf(y) != y) {
+                output = ASCRT_NAN_F;
+            } else if (__internal_is_odd_integer_f32(y)) {
+                output = -output;
+            }
+        }
+    }
+
     if (y == 0.0f || x == 1.0f) {
-        return 1.0f;
-    }
-
-    // Propagate NaN after the identity cases above.  x + y keeps the NaN payload behavior close to hardware
-    // arithmetic.
-    if (isnan(x) || isnan(y)) {
-        return ASCRT_NAN_F;
-    }
-
-    // For signed zero and signed infinity, magnitude is determined only by the sign of y; the output sign is
-    // kept only when y is an odd integer.
-    const float half_y_trunc = truncf(y * 0.5f);
-    const float odd_remainder = y - (half_y_trunc + half_y_trunc);
-    const bool exponent_is_odd_integer = fabsf(odd_remainder) == 1.0f;
-    if (x == 0.0f || abs_x == ASCRT_INF_F) {
-        float special_output = x;
-        if (y < 0.0f) {
-            special_output = abs_x == ASCRT_INF_F ? 0.0f : ASCRT_INF_F;
-            // Preserve the sign of x for odd powers such as pow(-0, -3) and pow(-inf, -3).
-            special_output = __internal_with_sign_bit(special_output, x);
+        output = 1.0f;
+    } else if (x == 0.0f || abs_x == ASCRT_INF_F) {
+        if (isnan(y)) {
+            output = x + y;
+        } else {
+            float special_output = x + x;
+            if (y < 0.0f) {
+                special_output = __internal_with_sign_bit(abs_x == ASCRT_INF_F ? 0.0f : ASCRT_INF_F, x);
+            }
+            output = __internal_is_odd_integer_f32(y) ? special_output : fabsf(special_output);
         }
-        return exponent_is_odd_integer ? special_output : fabsf(special_output);
-    }
-
-    // For |y| == inf and finite nonzero x, the result depends only on whether |x| is below or above 1.
-    if (abs_y == ASCRT_INF_F) {
-        if (x == -1.0f) {
-            return 1.0f;
+    } else if (abs_y == ASCRT_INF_F) {
+        if (isnan(x)) {
+            output = x + y;
+        } else if (x == -1.0f) {
+            output = 1.0f;
+        } else {
+            const bool result_is_inf = (abs_x > 1.0f && y > 0.0f) || (abs_x < 1.0f && y < 0.0f);
+            output = result_is_inf ? ASCRT_INF_F : 0.0f;
         }
-        const bool result_is_inf = (abs_x > 1.0f && y > 0.0f) || (abs_x < 1.0f && y < 0.0f);
-        return result_is_inf ? ASCRT_INF_F : 0.0f;
+    } else if (isnan(x) || isnan(y)) {
+        output = x + y;
     }
 
-    bool output_is_negative = false;
-    if (x < 0.0f) {
-        // Negative bases are only valid for integer exponents in the real-valued powf result.
-        const float y_floor = floorf(y);
-        if (y_floor != y) {
-            return ASCRT_INF_F / ASCRT_INF_F;
-        }
-        // The main path computes pow(abs(x), y); apply the sign at the end for odd integer exponents.
-        output_is_negative = exponent_is_odd_integer;
-    }
-
-    // Main finite path:
-    //   pow(x, y) = exp2(y * log2(abs(x))).
-    // log2 is returned as high/low parts so the multiplication by y can preserve the low-order residual.
-    float log2_hi = 0.0f;
-    float log2_lo = 0.0f;
-    __internal_log2f_positive_finite(abs_x, log2_hi, log2_lo);
-    const float log2_abs_x = log2_hi + log2_lo;
-
-    // Multiply y by the high/low log2 value.  product_hi is the rounded main product; product_lo restores the
-    // FMA residual and the low part of log2(abs_x), improving accuracy before exp2 reconstruction.
-    const float product_hi = log2_abs_x * y;
-    float product_lo = fmaf(log2_abs_x, y, -product_hi);
-    product_lo = fmaf(log2_lo - (log2_abs_x - log2_hi), y, product_lo);
-
-    // Reconstruct exp2(product_hi + product_lo), then attach the sign required by negative odd-integer bases.
-    float output = __internal_exp2f_reconstruct(product_hi, product_lo);
-    return output_is_negative ? -output : output;
+    return output;
 }
 
 /**
