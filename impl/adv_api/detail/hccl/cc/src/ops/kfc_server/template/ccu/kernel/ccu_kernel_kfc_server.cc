@@ -142,7 +142,7 @@ CcuResult WaitTurnStartSig(const ccu::Variable& hbmSigAddr, ccu::Variable& turnS
 
 CcuResult SetTurnEndSig(const ccu::Variable& hbmSigAddr, const ccu::Variable& turnEndSig, KfcServerContext& ctx)
 {
-    const uint32_t getDieId = 1; // TODO GetDieId()
+    const uint32_t getDieId = 1;
     CCU_CHK_RET(ccu::Store(hbmSigAddr, turnEndSig));
     return CCU_SUCCESS;
 }
@@ -150,10 +150,8 @@ CcuResult SetTurnEndSig(const ccu::Variable& hbmSigAddr, const ccu::Variable& tu
 CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
     // 双Die场景Die1需要读后32个参数，其他场景都是读取前32个参数
-    ccu::Variable doubleDie;
-    doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
-    ccu::Variable addr;
-    addr = paramAddr;
+    ccu::Variable doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
+    ccu::Variable addr = paramAddr;
 
     // 一次性读取本轮32个参数
     CCU_CHK_RET(ccu::Load(addr, param, CCU_PARAM_NUM_PER_DIE));
@@ -246,25 +244,17 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
 {
     HCCL_INFO("[KfcServerGenCircularQueue] KfcServerGenCircularQueue start");
 
-    ccu::Variable repeatCond; // 存放《控制repeat循环执行的条件》的寄存器
-    repeatCond = 0;
-    ccu::Variable turnStartSig; // 存放《轮次执行开始信号》的寄存器
-    turnStartSig = 0;
-    ccu::Variable turnEndSig; // 存放《轮次执行完成信号》的寄存器，在循环中固定为1
-    turnEndSig = 1;
+    ccu::Variable repeatCond = 0;   // 存放《控制repeat循环执行的条件》的寄存器
+    ccu::Variable turnStartSig = 0; // 存放《轮次执行开始信号》的寄存器
+    ccu::Variable turnEndSig = 1;   // 存放《轮次执行完成信号》的寄存器，在循环中固定为1
 
     // 使用独立XN保存队列游标，避免Variable拷贝构造与context基址共享handle。
-    ccu::Variable waitAddr;
-    ccu::Variable recordAddr;
-    ccu::Variable paramAddr;
-    waitAddr = ctx.waitAddr;
-    recordAddr = ctx.recordAddr;
-    paramAddr = ctx.xnAddr;
+    ccu::Variable waitAddr = ctx.waitAddr;
+    ccu::Variable recordAddr = ctx.recordAddr;
+    ccu::Variable paramAddr = ctx.xnAddr;
 
-    ccu::Variable ckeSize; // 其他寄存器
-    ckeSize = CCU_ONE_PARAM_SIZE;
-    ccu::Variable paramSize;
-    paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
+    ccu::Variable ckeSize = CCU_ONE_PARAM_SIZE; // 其他寄存器
+    ccu::Variable paramSize = CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE;
 
     ccu::Variable queueIdx;
     ccu::Variable queueEnd;
@@ -307,11 +297,9 @@ CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
 {
     ccu::Variable signature; // 算子签名
 
-    ccu::Variable repeatCond; // 存放《控制repeat循环执行的条件》的寄存器
-    repeatCond = 0;
+    ccu::Variable repeatCond = 0; // 存放《控制repeat循环执行的条件》的寄存器
 
-    ccu::Variable paramAddr;
-    paramAddr = ctx.xnAddr;
+    ccu::Variable paramAddr = ctx.xnAddr;
 
     ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE); // 存放<每轮算子参数>的寄存器
 

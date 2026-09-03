@@ -172,8 +172,7 @@ CcuResult RunStep(KfcAllGatherNhrContext& ctx, const KfcNhrStepInfo& stepInfo)
 
 CcuResult RunNhr(KfcAllGatherNhrContext& ctx)
 {
-    ccu::Variable sliceOffset;
-    sliceOffset = 0;
+    ccu::Variable sliceOffset = 0;
     ctx.myRankInputSliceOffset = 0;
     for (uint32_t rank = 0; rank < ctx.rankId; ++rank) {
         ctx.myRankInputSliceOffset += ctx.inputSliceStride;

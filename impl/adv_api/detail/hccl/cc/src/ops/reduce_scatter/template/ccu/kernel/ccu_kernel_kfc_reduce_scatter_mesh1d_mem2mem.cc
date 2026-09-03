@@ -249,8 +249,7 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
 // 设本 chunk 的基址(myInput/remoteInput/scratchMem 从当前 input/scratch 派生)
 static void InitReduceScatterAddr(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
-    ccu::Variable scratchOffset;
-    scratchOffset = 0;
+    ccu::Variable scratchOffset = 0;
 
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
         if (rankIdx == ctx.rankId) {
@@ -273,8 +272,7 @@ static void InitReduceScatterAddr(KfcReduceScatterMesh1DMem2MemContext& ctx)
 // Phase3 前复位:myInput/scratchMem 回本 chunk 基址
 static void ResetReduceScatterAddr(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
-    ccu::Variable scratchOffset;
-    scratchOffset = 0;
+    ccu::Variable scratchOffset = 0;
     ctx.myInput.addr = ctx.input[ctx.rankId];
     ctx.myInput.addr += ctx.currentRankSliceInputOffset;
     for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; rankIdx++) {
@@ -362,8 +360,7 @@ static CcuResult DoReduceScatterThreePhase(KfcReduceScatterMesh1DMem2MemContext&
 // 推进 ctx.input/output 替代 executor 的逐 launch 推进,使 Init/Reset 可逐字搬运。
 static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
-    ccu::Variable repeatNumAdd;
-    repeatNumAdd = 1;
+    ccu::Variable repeatNumAdd = 1;
 
     CCU_WHILE(ctx.chunkLoopNum != UINT64_MAX)
     {
