@@ -232,23 +232,23 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_log2f_positive_finite(floa
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x)
 {
-    if (isnan(x)) {
-        return x + x;
-    }
-    if (x == ASCRT_INF_F) {
-        return ASCRT_INF_F;
-    }
-    if (x == 0.0f) {
-        return -ASCRT_INF_F;
-    }
-    if (x < 0.0f) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-
     float log2_hi = 0.0f;
     float log2_lo = 0.0f;
     __internal_log2f_positive_finite(x, log2_hi, log2_lo);
-    return log2_hi + log2_lo;
+    float res = log2_hi + log2_lo;
+    if (isnan(x)) {
+        res = x;
+    }
+    if (x == ASCRT_INF_F) {
+        res = ASCRT_INF_F;
+    }
+    if (x == 0.0f) {
+        res = -ASCRT_INF_F;
+    }
+    if (x < 0.0f) {
+        res = ASCRT_INF_F / ASCRT_INF_F;
+    }
+    return res;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rsqrtf(float x) { return 1.0f / sqrtf(x); }
@@ -1720,11 +1720,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_exp2f_reconstruct(float x
     return output;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_exp2f_finite(float x)
-{
-    return __internal_exp2f_reconstruct(x, 0.0f);
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline bool __internal_is_odd_integer_f32(float value)
 {
     const float half_trunc = truncf(value * 0.5f);
@@ -1739,67 +1734,66 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y)
 
     float output = ASCRT_NAN_F;
 
-    if (!isnan(x) && !isnan(y) && abs_x != 0.0f && abs_x != ASCRT_INF_F && abs_y != ASCRT_INF_F) {
-        float log2_hi = 0.0f;
-        float log2_lo = 0.0f;
-        __internal_log2f_positive_finite(abs_x, log2_hi, log2_lo);
+    float log2_hi = 0.0f;
+    float log2_lo = 0.0f;
+    __internal_log2f_positive_finite(abs_x, log2_hi, log2_lo);
 
-        const float log2_abs_x = log2_hi + log2_lo;
-        const float product_hi = log2_abs_x * y;
-        float product_lo = fmaf(log2_abs_x, y, -product_hi);
-        product_lo = fmaf(log2_lo - (log2_abs_x - log2_hi), y, product_lo);
+    const float log2_abs_x = log2_hi + log2_lo;
+    const float product_hi = log2_abs_x * y;
+    float product_lo = fmaf(log2_abs_x, y, -product_hi);
+    product_lo = fmaf(log2_lo - (log2_abs_x - log2_hi), y, product_lo);
 
-        output = __internal_exp2f_reconstruct(product_hi, product_lo);
+    output = __internal_exp2f_reconstruct(product_hi, product_lo);
 
-        if (x < 0.0f) {
-            if (floorf(y) != y) {
-                output = ASCRT_NAN_F;
-            } else if (__internal_is_odd_integer_f32(y)) {
-                output = -output;
-            }
+    if (x < 0.0f) {
+        if (floorf(y) != y) {
+            output = ASCRT_NAN_F;
+        } else if (__internal_is_odd_integer_f32(y)) {
+            output = -output;
         }
     }
 
+    const bool x_is_zero_or_inf = (x == 0.0f || abs_x == ASCRT_INF_F);
+    const bool y_is_inf = (abs_y == ASCRT_INF_F);
+    const bool x_or_y_nan = (isnan(x) || isnan(y));
+    const bool y_is_odd_int = __internal_is_odd_integer_f32(y);
+
     if (y == 0.0f || x == 1.0f) {
         output = 1.0f;
-    } else if (x == 0.0f || abs_x == ASCRT_INF_F) {
-        if (isnan(y)) {
-            output = x + y;
-        } else {
-            float special_output = x + x;
-            if (y < 0.0f) {
-                special_output = __internal_with_sign_bit(abs_x == ASCRT_INF_F ? 0.0f : ASCRT_INF_F, x);
-            }
-            output = __internal_is_odd_integer_f32(y) ? special_output : fabsf(special_output);
+    } else if (x_is_zero_or_inf && isnan(y)) {
+        output = x + y;
+    } else if (x_is_zero_or_inf) {
+        float special_output = x + x;
+        if (y < 0.0f) {
+            special_output = __internal_with_sign_bit(abs_x == ASCRT_INF_F ? 0.0f : ASCRT_INF_F, x);
         }
-    } else if (abs_y == ASCRT_INF_F) {
-        if (isnan(x)) {
-            output = x + y;
-        } else if (x == -1.0f) {
-            output = 1.0f;
-        } else {
-            const bool result_is_inf = (abs_x > 1.0f && y > 0.0f) || (abs_x < 1.0f && y < 0.0f);
-            output = result_is_inf ? ASCRT_INF_F : 0.0f;
-        }
-    } else if (isnan(x) || isnan(y)) {
+        output = y_is_odd_int ? special_output : fabsf(special_output);
+    } else if (y_is_inf && isnan(x)) {
+        output = x + y;
+    } else if (y_is_inf && x == -1.0f) {
+        output = 1.0f;
+    } else if (y_is_inf) {
+        const bool result_is_inf = (abs_x > 1.0f && y > 0.0f) || (abs_x < 1.0f && y < 0.0f);
+        output = result_is_inf ? ASCRT_INF_F : 0.0f;
+    } else if (x_or_y_nan) {
         output = x + y;
     }
 
     return output;
 }
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x)
 {
+    float res = __internal_exp2f_reconstruct(x, 0.0f);
     if (isnan(x)) {
-        return x + x;
+        res = x;
     }
     if (x == ASCRT_INF_F) {
-        return ASCRT_INF_F;
+        res = ASCRT_INF_F;
     }
     if (x == -ASCRT_INF_F) {
-        return 0.0f;
+        res = 0.0f;
     }
-    return __internal_exp2f_finite(x);
+    return res;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x)
