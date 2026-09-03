@@ -86,6 +86,7 @@ __simd_callee__ inline void asc_ln(vector_half& dst,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 -lm && ./main
 ```
+<!-- end id8 -->
 
 ```cpp
 #include <algorithm>
@@ -175,5 +176,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->

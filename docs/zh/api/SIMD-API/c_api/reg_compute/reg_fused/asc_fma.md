@@ -88,6 +88,7 @@ __simd_callee__ inline vector_float asc_fma(vector_float src0,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```cpp
 #include <cmath>
@@ -196,5 +197,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->

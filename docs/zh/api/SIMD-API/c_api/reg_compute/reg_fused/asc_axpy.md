@@ -88,6 +88,7 @@ __simd_callee__ inline void asc_axpy(vector_float& dst,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```cpp
 #include <cmath>
@@ -180,5 +181,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->
