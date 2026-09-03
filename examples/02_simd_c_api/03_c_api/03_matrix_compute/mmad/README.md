@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以 int8_t 和 bfloat16 两种输入数据类型为例，演示如何通过C API实现矩阵乘法（C = A × B + Bias）。每个场景的流水线函数拆分到独立的头文件中（`mmad_s1.h` / `mmad_s2.h`），主文件 `mmad.asc` 通过 `if constexpr (scenario_num)` 在核函数入口处按场景分发。
+本样例以 int8_t、bfloat16 和 float 三种输入数据类型为例，演示如何通过 C API 实现矩阵乘法（C = A × B + Bias）。每个场景的流水线函数拆分到独立的头文件中（`mmad_s1.h` / `mmad_s2.h` / `mmad_s3.h`），主文件 `mmad.asc` 通过 `if constexpr (scenario_num)` 在核函数入口处按场景分发。
 
 ## 支持的产品及CANN软件版本
 
@@ -23,6 +23,7 @@
 │   ├── data_utils.h                // 数据读写函数
 │   ├── mmad_s1.h                   // 场景1的常量与完整流水线函数
 │   ├── mmad_s2.h                   // 场景2的常量与完整流水线函数
+│   ├── mmad_s3.h                   // 场景3的常量与完整流水线函数
 │   ├── mmad.asc                    // 样例主文件（公共常量、核函数入口、Host侧main函数）
 │   ├── README_en.md                // 英文样例说明文档
 │   └── README.md                   // 样例说明文档
@@ -66,7 +67,7 @@
   </tr>
 </table>
 
-矩阵乘法计算公式：C = A × B + Bias，其中 A、B、Bias、C 矩阵需满足的 shape 分别为 [M, K]、[K, N]、[N] 和 [M, N]。Bias 仅在场景 1 中启用，其数据类型与 C 矩阵的对应关系如下表所示。
+矩阵乘法计算公式：C = A × B + Bias，其中 A、B、Bias、C 矩阵需满足的 shape 分别为 [M, K]、[K, N]、[N] 和 [M, N]。Bias 在场景 1 和场景 3 中启用，其数据类型与 C 矩阵的对应关系如下表所示。
 
 <a name="表2"></a>
 <table border="2" align="center">
@@ -125,6 +126,14 @@
     <td>转置</td>
     <td>不带 Bias，C 矩阵初始值来源于 CO1（两次 Mmad 累加）</td>
   </tr>
+  <tr>
+    <td>3</td>
+    <td>float</td>
+    <td>float</td>
+    <td>转置</td>
+    <td>转置</td>
+    <td>带 Bias，显式传入 BT 中的 Bias 地址</td>
+  </tr>
 </table>
 
 ### 场景详细说明
@@ -163,6 +172,26 @@
   3. `asc_mmad`：两次调用。首次 `c_matrix_init_val = true` 将 C 初始化为 0 并计算 A×B；第二次 `c_matrix_init_val = false`、`c_matrix_source = false` 以 CO1 为初值累加第二次 A×B；
   4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`：结果从 L0C 搬运至 GM；
 
+**场景 3：float 输入，float 输出，A/B 转置，显式传入 Bias 地址**
+
+- 输入：
+  - A 转置 [70, 30] float，ND 格式；
+  - B 转置 [40, 70] float，ND 格式；
+  - Bias [1, 40] float；
+- 输出：C [30, 40] float，ND 格式；
+- 实现（详见 `mmad_s3.h`）：
+  1. `asc_copy_gm2l1_nd2nz` + `asc_set_gm2l1_nz_para`：将转置后的 A、B 及 Bias 从 GM 搬运至 L1；
+  2. `asc_copy_l12l0a_transpose`：将 A 从 L1 转置搬运至 L0A；`asc_copy_l12l0b`：将 B 从 L1 搬运至 L0B；`asc_copy_l12bt`：将 Bias 从 L1 搬运至 BT 的 0 地址；
+  3. `asc_mmad`：显式传入 BT 的 0 地址作为 Bias 地址，并设置 `disable_gemv = false`，完成矩阵乘加；
+  4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`：将结果从 L0C 搬运至 GM（Nz -> ND）；
+- 说明：源场景统一设置 `mmadParams.kDirectionAlign = true`。在本样例支持的 `dav-3510` 架构上，基础 API 实际下沉给 Mmad 指令的对应参数为 `mmadParams.disableGemv`，不下沉 `kDirectionAlign`；C API 因此使用 `dav-3510` 对应的显式 Bias 地址重载，并保持源场景的 `disableGemv = false`。A 搬入 L0A 时仍按源场景将 K 方向对齐至 `CeilAlign(K, 16)`。
+<p align="center">
+  <img src="figures/mmad_f32_L0A_转置.png" width="1100">
+</p>
+<p align="center">
+图2：float 类型、A 转置时，K 轴实际对齐与 Mmad 默认要求不同
+</p>
+
 ### 矩阵乘法（Mmad）
 
 下面将介绍如何配置
@@ -170,13 +199,13 @@
 
 需要注意的是，执行`asc_mmad`指令时，矩阵计算单元会从L0A/L0B连续读入多个分形参与矩阵乘计算。读入分形的数量由`left_height`、`n_dim`、`right_width`的取值，以及`asc_mmad`指令对L0A/L0B上A矩阵、B矩阵各轴的对齐要求共同决定。
 
-如图2所示，以b16输入类型为例，`asc_mmad`指令会按照A矩阵分形[16, 16]、B矩阵分形[16, 16]连续读入数据。此时，矩阵计算单元从L0A/L0B读入的分形总数分别为2 x 5 = 10和5 x 3 = 15，写入L0C的分形总数为2 x 3 = 6。
+如图3所示，以b16输入类型为例，`asc_mmad`指令会按照A矩阵分形[16, 16]、B矩阵分形[16, 16]连续读入数据。此时，矩阵计算单元从L0A/L0B读入的分形总数分别为2 x 5 = 10和5 x 3 = 15，写入L0C的分形总数为2 x 3 = 6。
 
 <p align="center">
   <img src="figures/mmad_f16_A5.png" width="900">
 </p>
 <p align="center">
-图2：bfloat16类型，L0A上Nz排布，Mmad数据排布示意图
+图3：bfloat16类型，L0A上Nz排布，Mmad数据排布示意图
 </p>
 
 Mmad计算中包含了补齐的无效数据，需要配合Fixpipe指令在L0C搬出到GM过程中，排除参数Mmad计算过程中填充的无效数据。
@@ -217,7 +246,7 @@ Mmad计算中包含了补齐的无效数据，需要配合Fixpipe指令在L0C搬
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU 仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU 架构，对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`（默认）、`2` | 场景编号，分别对应int8_t 、 bfloat16输入数据类型 |
+  | `SCENARIO_NUM` | `1`（默认）、`2`、`3` | 场景编号，分别对应int8_t、bfloat16、float输入数据类型 |
 
 - 执行结果
 
