@@ -107,6 +107,7 @@ target_compile_options(
 )
 
 target_compile_definitions(${HCCL_CCU_ST_TARGET} PRIVATE -DUT_TEST -DMC2_CLIENT_ENABLE_CCU=1)
+target_compile_definitions(${HCCL_CCU_ST_TARGET} PRIVATE __ccu_host__=)
 
 target_link_libraries(
     ${HCCL_CCU_ST_TARGET}
