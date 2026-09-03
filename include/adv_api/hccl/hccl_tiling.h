@@ -19,6 +19,10 @@
 #include "kernel_tiling/kernel_tiling.h"
 #include "../../../impl/adv_api/tiling/hccl/hccl_tiling_impl_def.h"
 
+#ifndef HCCL_TYPES_H_
+typedef void* HcclComm;
+#endif
+
 namespace AscendC {
 
 class Mc2CcTilingConfig {
