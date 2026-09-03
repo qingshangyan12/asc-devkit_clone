@@ -25,7 +25,7 @@
 
 ## 功能说明
 
-头文件路径为：`"simt_api/device_functions.h"`（除half、half2、bfloat16_t、bfloat16x2_t类型之外的接口）、`"simt_api/asc_fp16.h"`（half和half2类型接口）、`"simt_api/asc_bf16.h"`（bfloat16_t和bfloat16x2_t类型接口）。
+头文件路径为：`"simt_api/device_functions.h"`（除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口）、`"simt_api/asc_fp16.h"`（half和half2类型接口）、`"simt_api/asc_bf16.h"`（bfloat16\_t和bfloat16x2\_t类型接口）。
 
 将指定数据存储到Global Memory的地址`address`中，并缓存至Data Cache和L2 Cache。
 
