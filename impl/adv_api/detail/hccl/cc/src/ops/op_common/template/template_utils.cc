@@ -160,10 +160,7 @@ bool IsAllConnetedWithTopo(const TopoInfoWithNetLayerDetails* topoInfo, const u3
 namespace {
 constexpr double POD_PORT_GROUP_DIVISOR = 2.0; // Pod场景下端口组对半分
 constexpr double PARALLEL_FLOAT_COMPARE_EPSILON = 1e-12;
-bool IsDoubleEqual(double a, double b)
-{
-    return std::abs(a - b) < PARALLEL_FLOAT_COMPARE_EPSILON;
-}
+bool IsDoubleEqual(double a, double b) { return std::abs(a - b) < PARALLEL_FLOAT_COMPARE_EPSILON; }
 } // namespace
 
 bool GetPortGroupSize(const std::map<u32, std::vector<ChannelInfo>>& channels, uint64_t& portGroupSize)
@@ -278,14 +275,14 @@ static bool PrepareParallelPortInfo(
 
     portInfo.intraPortGroupSize *= intraRankSize - 1;
     portInfo.isPod = IsPodInterChannelGroup(interChannels);
-    portInfo.effectiveInterPortGroupSize
-        = static_cast<double>(portInfo.interPortGroupSize) / (portInfo.isPod ? POD_PORT_GROUP_DIVISOR : 1.0);
+    portInfo.effectiveInterPortGroupSize =
+        static_cast<double>(portInfo.interPortGroupSize) / (portInfo.isPod ? POD_PORT_GROUP_DIVISOR : 1.0);
     if (portInfo.intraPortGroupSize == 0) {
         failureReason = "scaled intraPortGroupSize is 0";
         return false;
     }
-    if (IsDoubleEqual(portInfo.effectiveInterPortGroupSize, 0.0)
-        || !std::isfinite(portInfo.effectiveInterPortGroupSize)) {
+    if (IsDoubleEqual(portInfo.effectiveInterPortGroupSize, 0.0) ||
+        !std::isfinite(portInfo.effectiveInterPortGroupSize)) {
         failureReason = "effectiveInterPortGroupSize is 0 or not finite";
         return false;
     }
@@ -300,26 +297,26 @@ static bool CalcParallelTimeCoeff(
 {
     switch (splitType) {
         case ParallelDataSplitType::REDUCE_SCATTER_WITH_LOCAL_REDUCE:
-            timeCoeff.mesh = 21.0 * static_cast<double>(intraRankSize - 1)
-                             / (20.0 * static_cast<double>(intraRankSize) * portInfo.intraPortGroupSize);
-            timeCoeff.clos = static_cast<double>(interRankSize - 1)
-                             / (static_cast<double>(interRankSize) * portInfo.effectiveInterPortGroupSize);
+            timeCoeff.mesh = 21.0 * static_cast<double>(intraRankSize - 1) /
+                             (20.0 * static_cast<double>(intraRankSize) * portInfo.intraPortGroupSize);
+            timeCoeff.clos = static_cast<double>(interRankSize - 1) /
+                             (static_cast<double>(interRankSize) * portInfo.effectiveInterPortGroupSize);
             return true;
         case ParallelDataSplitType::SCATTER:
-            timeCoeff.mesh = static_cast<double>(intraRankSize - 1)
-                             / (static_cast<double>(intraRankSize) * portInfo.intraPortGroupSize);
-            timeCoeff.clos = static_cast<double>(interRankSize - 1)
-                             / (static_cast<double>(interRankSize) * portInfo.effectiveInterPortGroupSize);
+            timeCoeff.mesh = static_cast<double>(intraRankSize - 1) /
+                             (static_cast<double>(intraRankSize) * portInfo.intraPortGroupSize);
+            timeCoeff.clos = static_cast<double>(interRankSize - 1) /
+                             (static_cast<double>(interRankSize) * portInfo.effectiveInterPortGroupSize);
             return true;
         case ParallelDataSplitType::ALL_GATHER:
             // AllGather的数据逐级放大，第二阶段的通信量分别是第一阶段的intraRankSize和interRankSize倍，
             // 第二阶段为耗时主导项，因此按第二阶段配平：
             // 先Mesh后Clos的数据片在第二阶段走Server间链路，通信量放大intraRankSize倍；
             // 先Clos后Mesh的数据片在第二阶段走机内Mesh链路，通信量放大interRankSize倍。
-            timeCoeff.mesh = static_cast<double>(intraRankSize) * static_cast<double>(interRankSize - 1)
-                             / portInfo.effectiveInterPortGroupSize;
-            timeCoeff.clos = static_cast<double>(interRankSize) * static_cast<double>(intraRankSize - 1)
-                             / static_cast<double>(portInfo.intraPortGroupSize);
+            timeCoeff.mesh = static_cast<double>(intraRankSize) * static_cast<double>(interRankSize - 1) /
+                             portInfo.effectiveInterPortGroupSize;
+            timeCoeff.clos = static_cast<double>(interRankSize) * static_cast<double>(intraRankSize - 1) /
+                             static_cast<double>(portInfo.intraPortGroupSize);
             return true;
         default:
             return false;
