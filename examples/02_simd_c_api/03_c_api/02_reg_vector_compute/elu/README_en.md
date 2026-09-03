@@ -1,7 +1,7 @@
 # ELU Example
 
 ## Overview
-This example implements the ELU (Exponential Linear Unit) activation operator using the C API, mainly calling the [asc_exp](../../../../../docs/zh/api/SIMD-API/c_api/reg/arithmetic_compute/asc_exp.md), [asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/c_api/reg/arithmetic_compute/asc_mul_scalar.md) and [asc_select](../../../../../docs/zh/api/SIMD-API/c_api/reg/compare_and_select/asc_select.md) APIs.
+This example implements the ELU (Exponential Linear Unit) activation operator using the C API, mainly calling the [asc_exp](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_exp.md), [asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_mul_scalar.md) and [asc_select](../../../../../docs/zh/api/SIMD-API/C-API/reg/compare_and_select/asc_select.md) APIs.
 
 ## Supported Products and CANN Versions
 

@@ -1,7 +1,7 @@
 # ELU样例
 
 ## 概述
-本样例基于C API编程接口实现ELU（Exponential Linear Unit）激活运算，主要调用[asc_exp](../../../../../docs/zh/api/SIMD-API/c_api/reg/arithmetic_compute/asc_exp.md)、[asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/c_api/reg/arithmetic_compute/asc_mul_scalar.md)、[asc_select](../../../../../docs/zh/api/SIMD-API/c_api/reg/compare_and_select/asc_select.md)接口。
+本样例基于C API编程接口实现ELU（Exponential Linear Unit）激活运算，主要调用[asc_exp](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_exp.md)、[asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_mul_scalar.md)、[asc_select](../../../../../docs/zh/api/SIMD-API/C-API/reg/compare_and_select/asc_select.md)接口。
 
 ## 本样例支持的产品及CANN软件版本
 
