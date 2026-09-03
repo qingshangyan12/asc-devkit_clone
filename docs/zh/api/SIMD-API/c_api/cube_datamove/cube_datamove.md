@@ -30,9 +30,9 @@
 - **[asc_set_l0c_copy_params](asc_set_l0c_copy_params.md)**
 - **[asc_set_l0c_copy_prequant](asc_set_l0c_copy_prequant.md)**
 - **[asc_set_l12l0a_3d_padding](asc_set_l12l0a_3d_padding.md)**
+- **[asc_set_l12l0b_3d_padding](asc_set_l12l0b_3d_padding.md)**
 - **[asc_set_l13d_fmatrix](asc_set_l13d_fmatrix.md)**
 - **[asc_set_l13d_fmatrix_b](asc_set_l13d_fmatrix_b.md)**
-- **[asc_set_l13d_padding](asc_set_l13d_padding.md)**
 - **[asc_set_l13d_rpt](asc_set_l13d_rpt.md)**
 - **[asc_set_l13d_size](asc_set_l13d_size.md)**
 - **[asc_set_l3d_rpt_b](asc_set_l3d_rpt_b.md)**
