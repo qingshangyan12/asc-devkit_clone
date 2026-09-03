@@ -1220,7 +1220,7 @@ The asc_get_ar_spr interface documentation example is as follows:
 
 ## Function Description
 
-Header file path: `"c_api/sys_var/sys_var.h"`.
+Header file path: `"c_api/utils/sys_var.h"`.
 
 **This interface has been deprecated. Use [asc_get_squeeze_status](asc_get_squeeze_status.md) to implement this function.**
 ```
