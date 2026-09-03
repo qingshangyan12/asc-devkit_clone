@@ -19,6 +19,9 @@
 #include "topo_match_ubx.h"
 
 namespace mc2_ops_hccl {
+namespace {
+constexpr u32 REQUIRED_HIERARCHY_INFO_NUM = 2;
+} // namespace
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
 InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::InsV2AllGatherParallelExecutor()
@@ -44,7 +47,7 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     std::vector<std::vector<u32>> interHierarchyInfo;
     if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
         CHK_PRT_RET(
-            algHierarchyInfo.infos.empty() || algHierarchyInfo.infos[0].size() < 2,
+            algHierarchyInfo.infos.empty() || algHierarchyInfo.infos[0].size() < REQUIRED_HIERARCHY_INFO_NUM,
             HCCL_ERROR("[%s] algHierarchyInfo.infos[0] is invalid (empty or size < 2).", __func__), HCCL_E_PARA);
         intraHierarchyInfo = {algHierarchyInfo.infos[0][0]};
         std::vector<u32> closRanks;
@@ -56,9 +59,8 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
         }
         interHierarchyInfo = {closRanks};
     } else {
-        constexpr u32 TOPO_NUM = 2;
         CHK_PRT_RET(
-            algHierarchyInfo.infos.size() < TOPO_NUM || algHierarchyInfo.infos[0].empty()
+            algHierarchyInfo.infos.size() < REQUIRED_HIERARCHY_INFO_NUM || algHierarchyInfo.infos[0].empty()
                 || algHierarchyInfo.infos[1].empty(),
             HCCL_ERROR("[InsAllGatherParallelExecutor][CalcRes] Invalid topoInfo"), HcclResult::HCCL_E_INTERNAL);
         intraHierarchyInfo = algHierarchyInfo.infos[0];
@@ -287,7 +289,8 @@ template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTempla
 HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::Orchestrate(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
-    if (resCtx.algHierarchyInfo.infos.empty() || resCtx.algHierarchyInfo.infos.size() < 2) {
+    if (resCtx.algHierarchyInfo.infos.empty()
+        || resCtx.algHierarchyInfo.infos.size() < REQUIRED_HIERARCHY_INFO_NUM) {
         HCCL_ERROR("[%s] algHierarchyInfo.infos is invalid (empty or size < 2).", __func__);
         return HCCL_E_PARA;
     }
@@ -311,8 +314,11 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
 
     if (resCtx.topoInfo.level0Topo == Level0Shape::MESH_1D_CLOS && !resCtx.topoInfo.level0PcieMix) {
         CHK_PRT_RET(
-            resCtx.algHierarchyInfo.infos[0].size() < 2,
-            HCCL_ERROR("[%s] algHierarchyInfo.infos[0] size[%zu] is less than 2.", __func__, resCtx.algHierarchyInfo.infos[0].size()), HCCL_E_PARA);
+            resCtx.algHierarchyInfo.infos[0].size() < REQUIRED_HIERARCHY_INFO_NUM,
+            HCCL_ERROR(
+                "[%s] algHierarchyInfo.infos[0] size[%zu] is less than 2.", __func__,
+                resCtx.algHierarchyInfo.infos[0].size()),
+            HCCL_E_PARA);
         intraHierarchyInfo_ = {resCtx.algHierarchyInfo.infos[0][0]};
         std::vector<u32> closRanks;
         u32 meshSize = resCtx.algHierarchyInfo.infos[0][0].size();
