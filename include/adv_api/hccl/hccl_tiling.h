@@ -15,6 +15,9 @@
 #ifndef LIB_HCCL_HCCL_TILING_H
 #define LIB_HCCL_HCCL_TILING_H
 
+#include "internal/hcomm/hccl/hccl_types.h"
+#include "internal/hcomm/ccu/ccu_types.h"
+
 #include "hccl_tilingdata.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "../../../impl/adv_api/tiling/hccl/hccl_tiling_impl_def.h"
@@ -48,6 +51,39 @@ public:
 private:
     HcclTilingImpl impl_;
 };
+
+// 获取相关资源：
+
+// enum class CcType : uint8_t {
+//     CC_TYPE_ALLGATHER = 0,
+//     CC_TYPE_ALLREDUCE = 1,
+// };
+
+using Mc2Result = HcclResult;
+
+Mc2Result Mc2GetCcArgsCcu(void** ccArgs);
+Mc2Result Mc2FreeCcArgsCcu(void* ccArgs);
+Mc2Result Mc2FreeCcResCtxCcu(void* ccResCtx);
+Mc2Result Mc2SetCcCommEngineCcu(void* ccArgs, uint8_t commEngine);
+Mc2Result Mc2SetCcAlgConfigCcu(void* ccArgs, char* algConfig);
+Mc2Result Mc2SetCcSrcDataTypeCcu(void* ccArgs, uint8_t srcDataType);
+Mc2Result Mc2SetCcDstDataTypeCcu(void* ccArgs, uint8_t dstDataType);
+Mc2Result Mc2SetCcReduceTypeCcu(void* ccArgs, uint8_t reduceDataType);
+
+// 本接口功能 和 HcclAllocComResourceByTiling 类似，根据comm ccargs获取 ccResCtx
+Mc2Result Mc2AcquireCcResCtxCcu(
+    HcclComm comm, uint8_t ccType, void* ccArgs, void** ccResCtx, uint32_t* ccResCtxSize, void** schd);
+
+// ccu侧 的算子接口
+// #ifndef __ccu_host__
+// #define __ccu_host__
+// #endif
+
+extern __ccu_host__ void Mc2CcuCcKernel(void* ccResCtx);
+// #else
+// extern void Mc2CcuCcKernel(void* ccResCtx);
+// #endif
+
 } // namespace AscendC
 #endif
 
