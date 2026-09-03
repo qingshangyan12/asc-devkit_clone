@@ -32,8 +32,8 @@ dst[i] = src0[i] + src1[i]
 
   - Key kernel steps
 
-    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct two-dimensional copy Tensors with shapes `[1, 128]` in GM and `[1, 64]` in UB.
-    2. Iterate twice. Use `asc_lock/asc_unlock` around the MTE2 pipeline and `asc::te::copy` with coordinates and `copy_shape(1, 64)` to move the regions at GM coordinates `(0, 0)` and `(0, 64)` to UB.
+    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct two-dimensional copy Tensors with shapes `[2, 64]` in GM and `[1, 64]` in UB.
+    2. Iterate twice. Use `asc_lock/asc_unlock` around the MTE2 pipeline and `asc::te::copy` with coordinates and `copy_shape(1, 64)` to move the complete rows at GM coordinates `(0, 0)` and `(1, 0)` to UB.
     3. Use `all_mask` and `load` to load the UB data into Reg Tensors.
     4. Call the experimental `operator+` to perform element-wise addition.
     5. Use `store` and `asc::te::copy` to write each result block back to the corresponding two-dimensional GM region.

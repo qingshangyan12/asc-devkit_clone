@@ -32,8 +32,8 @@ dst[i] = src0[i] + src1[i]
 
   - Kernel关键步骤
 
-    1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_frame_layout` 构造 GM 上 shape 为 `[1, 128]`、UB 上 shape 为 `[1, 64]` 的二维搬运 Tensor。
-    2. 循环两次，使用 `asc_lock/asc_unlock` 包围 MTE2 流水，并通过 `asc::te::copy` 的坐标和 `copy_shape(1, 64)` 参数，将 GM 中坐标为 `(0, 0)`、`(0, 64)` 的区域依次搬运到 UB。
+    1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_frame_layout` 构造 GM 上 shape 为 `[2, 64]`、UB 上 shape 为 `[1, 64]` 的二维搬运 Tensor。
+    2. 循环两次，使用 `asc_lock/asc_unlock` 包围 MTE2 流水，并通过 `asc::te::copy` 的坐标和 `copy_shape(1, 64)` 参数，将 GM 中坐标为 `(0, 0)`、`(1, 0)` 的整行区域依次搬运到 UB。
     3. 使用 `all_mask` 和 `load` 将 UB 数据加载为 Reg Tensor。
     4. 调用实验性 `operator+` 完成逐元素加法。
     5. 使用 `store` 和 `asc::te::copy`，将每块结果写回 GM 中对应的二维区域。
