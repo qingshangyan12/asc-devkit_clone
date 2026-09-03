@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates how to use the experimental Tensor API `asc::te::experimental::operator+` to perform element-wise addition of two `float` vectors. Inputs `src0` and `src1` are one-dimensional Tensors with shape `[64]`. Output `dst` has shape `[64]`. All three Tensors use the `float` data type, and each output element is the sum of the corresponding input elements.
+This sample demonstrates how to use the experimental Tensor API `asc::te::experimental::operator+` to perform element-wise addition of two `float` vectors. Inputs `src0` and `src1` are one-dimensional Tensors with shape `[128]`. Output `dst` has shape `[128]`. All three Tensors use the `float` data type, and each output element is the sum of the corresponding input elements.
 
 The computation is as follows:
 
@@ -26,17 +26,17 @@ dst[i] = src0[i] + src1[i]
 
 - Sample function:
 
-  The sample moves two input Tensors from GM to UB, loads them into registers using `load`, performs element-wise addition using the experimental Tensor API Reg Tensor `operator+`, and writes the result back to UB and GM using `store`.
+  The sample processes the two input Tensors in blocks of 64 elements. Each block is moved from GM to UB, loaded into registers using `load`, added with the experimental Tensor API Reg Tensor `operator+`, and written back to UB and GM using `store`.
 
 - Sample implementation:
 
   - Key kernel steps
 
-    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct one-dimensional Tensors in GM and UB.
-    2. Use `asc_lock/asc_unlock` around the MTE2 pipeline and `asc::te::copy` to move both inputs from GM to UB.
+    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct two-dimensional copy Tensors with shapes `[1, 128]` in GM and `[1, 64]` in UB.
+    2. Iterate twice. Use `asc_lock/asc_unlock` around the MTE2 pipeline and `asc::te::copy` with coordinates and `copy_shape(1, 64)` to move the regions at GM coordinates `(0, 0)` and `(0, 64)` to UB.
     3. Use `all_mask` and `load` to load the UB data into Reg Tensors.
     4. Call the experimental `operator+` to perform element-wise addition.
-    5. Use `store` and `asc::te::copy` to write the result back to UB and GM.
+    5. Use `store` and `asc::te::copy` to write each result block back to the corresponding two-dimensional GM region.
 
   The core computation is as follows:
 
