@@ -21,9 +21,7 @@
 #define INCLUDE_C_API_ASC_REG_VECTOR_H
 
 #if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
-#if defined(ASCENDC_HAS_UTILS_BASE_HELPERS)
 #include "utils/base/helpers.h"
-#endif
 #include "c_api/defs/defs.h"
 #include "c_api/atomic/atomic.h"
 #include "c_api/cache_ctrl/cache_ctrl.h"
