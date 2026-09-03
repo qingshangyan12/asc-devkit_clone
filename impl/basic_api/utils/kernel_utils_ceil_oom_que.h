@@ -160,6 +160,147 @@ __aicore__ static inline void OOMCheckAddrRange(__gm__ T* gmAddr, const uint64_t
 #endif
 }
 
+__aicore__ static inline bool OOMHasStorageShapeHeader(__gm__ uint8_t* cursor)
+{
+#if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
+    const uint8_t magicAndVersion = cursor[0];
+    const uint8_t magic = magicAndVersion & g_oomNibbleMask;
+    const uint8_t version = (magicAndVersion >> g_oomNibbleShift) & g_oomNibbleMask;
+    return magic == g_oomStorageShapeMagic && version == g_oomStorageShapeVersion;
+#else
+    (void)cursor;
+    return false;
+#endif
+}
+
+template <typename T>
+__aicore__ static inline T OOMReadPackedValue(__gm__ uint8_t* address)
+{
+#if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
+    T value = 0;
+    for (uint32_t index = 0; index < sizeof(T); ++index) {
+        value |= static_cast<T>(static_cast<T>(address[index]) << (index * 8));
+    }
+    return value;
+#else
+    (void)address;
+    return 0;
+#endif
+}
+
+__aicore__ static inline bool OOMGetTensorViewStorageSize(
+    __gm__ uint8_t* view, const uint64_t available, const uint64_t elementSize, uint64_t& viewSize,
+    uint64_t& storageSize)
+{
+#if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
+    if (available < g_oomTensorViewDescriptorSize) {
+        return false;
+    }
+    const uint8_t versionAndReserved = OOMReadPackedValue<uint8_t>(view);
+    const uint8_t version = versionAndReserved & g_oomNibbleMask;
+    const uint64_t storageShapeSize = OOMReadPackedValue<uint64_t>(view + sizeof(uint8_t));
+    if (version != g_oomTensorViewVersion || storageShapeSize == 0 || elementSize == 0 ||
+        storageShapeSize > (~static_cast<uint64_t>(0)) / elementSize) {
+        return false;
+    }
+    viewSize = g_oomTensorViewDescriptorSize;
+    storageSize = storageShapeSize * elementSize;
+    return true;
+#else
+    (void)view;
+    (void)available;
+    (void)elementSize;
+    (void)viewSize;
+    (void)storageSize;
+    return false;
+#endif
+}
+
+__aicore__ static inline bool OOMTryRegisterTensorWithStorageShape(
+    __gm__ uint8_t*& cursor, __gm__ uint8_t* tensorAddr, const uint64_t elementSize)
+{
+#if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
+    const uint64_t blockSize = OOMReadPackedValue<uint64_t>(cursor);
+    if (blockSize != g_oomTensorDescriptorHeaderSize + g_oomTensorViewDescriptorSize ||
+        OOMReadPackedValue<uint8_t>(cursor + sizeof(uint64_t)) != g_oomDescriptorTypeTensor) {
+        return false;
+    }
+    uint64_t viewSize = 0;
+    uint64_t storageSize = 0;
+    if (!OOMGetTensorViewStorageSize(cursor + g_oomTensorDescriptorHeaderSize,
+        blockSize - g_oomTensorDescriptorHeaderSize, elementSize, viewSize, storageSize) ||
+        viewSize != blockSize - g_oomTensorDescriptorHeaderSize) {
+        return false;
+    }
+    OOMCheckAddrRange(tensorAddr, storageSize);
+    cursor += blockSize;
+    return true;
+#else
+    (void)cursor;
+    (void)tensorAddr;
+    (void)elementSize;
+    return false;
+#endif
+}
+
+__aicore__ static inline bool OOMTryRegisterTensorListWithStorageShape(
+    __gm__ uint8_t*& cursor, __gm__ uint8_t* tensorListAddr, const uint64_t packedElementSize)
+{
+#if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
+    const uint64_t blockSize = OOMReadPackedValue<uint64_t>(cursor);
+    if (blockSize < g_oomTensorListDescriptorHeaderSize ||
+        OOMReadPackedValue<uint8_t>(cursor + sizeof(uint64_t)) != g_oomDescriptorTypeTensorList) {
+        return false;
+    }
+    const uint8_t flag = OOMReadPackedValue<uint8_t>(cursor + sizeof(uint64_t) + sizeof(uint8_t));
+    const uint16_t count = OOMReadPackedValue<uint16_t>(cursor + sizeof(uint64_t) + 2 * sizeof(uint8_t));
+    const uint64_t expectedBlockSize = g_oomTensorListDescriptorHeaderSize +
+        static_cast<uint64_t>(count) * g_oomTensorViewDescriptorSize;
+    if (blockSize != expectedBlockSize) {
+        return false;
+    }
+    (void)flag;
+    __gm__ uint8_t* view = cursor + g_oomTensorListDescriptorHeaderSize;
+    uint64_t remaining = blockSize - g_oomTensorListDescriptorHeaderSize;
+    __gm__ uint64_t* dynamicPtr = reinterpret_cast<__gm__ uint64_t*>(tensorListAddr);
+    const uint64_t dynamicOffset = *dynamicPtr / sizeof(uint64_t);
+    __gm__ uint64_t* addresses = dynamicPtr + dynamicOffset;
+    const uint64_t elementSize = packedElementSize & 0xffff;
+    const uint64_t scale = (packedElementSize >> 16) & 0xffff;
+    const uint64_t scaleValue = scale == 0 ? 1 : scale;
+    if (elementSize == 0 || dynamicOffset == 0 || count > dynamicOffset - 1) {
+        return false;
+    }
+    for (uint16_t index = 0; index < count; ++index) {
+        uint64_t viewSize = 0;
+        uint64_t storageSize = 0;
+        if (!OOMGetTensorViewStorageSize(view, remaining, elementSize, viewSize, storageSize) ||
+            storageSize % scaleValue != 0) {
+            return false;
+        }
+        view += viewSize;
+        remaining -= viewSize;
+    }
+    if (remaining != 0) {
+        return false;
+    }
+    view = cursor + g_oomTensorListDescriptorHeaderSize;
+    for (uint16_t index = 0; index < count; ++index) {
+        const uint64_t storageShapeSize = OOMReadPackedValue<uint64_t>(view + sizeof(uint8_t));
+        const uint64_t storageSize = storageShapeSize * elementSize;
+        OOMCheckAddrRange(reinterpret_cast<__gm__ uint8_t*>(addresses[index]), storageSize / scaleValue);
+        view += g_oomTensorViewDescriptorSize;
+    }
+    cursor += blockSize;
+    return true;
+#else
+    (void)cursor;
+    (void)tensorListAddr;
+    (void)packedElementSize;
+    return false;
+#endif
+}
+
 template <typename T>
 __aicore__ static inline void OOMAddAddrForL2Cache(__gm__ T* gmAddr, __gm__ T* oriAddr)
 {
