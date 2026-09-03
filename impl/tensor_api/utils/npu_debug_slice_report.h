@@ -157,6 +157,8 @@ __aicore__ inline void report_slice_error_by_format(
     const SliceShapeType& slice_shape, Std::index_sequence<source_indices...>, Std::index_sequence<coord_indices...>,
     Std::index_sequence<slice_indices...>)
 {
+    using view_type = debug_layout_view<LayoutType>;
+    using slice_view_type = debug_slice_info_view<InfoType>;
     report_slice_unsupported<kind>(context, layout, coord, info, source_shape, slice_shape);
 }
 
