@@ -12,6 +12,7 @@
 
 #include "hcomm_primitives.h"
 #include "log.h"
+#include "mc2_aicpu_replay_gate.h"
 #include "mc2_aicpu_task_cache.h"
 
 namespace mc2_ops_hccl {
@@ -37,6 +38,37 @@ inline void ClearMc2TaskCacheBestEffort(
 }
 
 template <typename Func>
+HcclResult RunMc2ExecutorBatch(const OpParam& param, Func func, const Mc2AicpuReplayGate& replayGate)
+{
+    const HcclResult armRet = ArmMc2AicpuReplayGate(replayGate);
+    HcclResult execRet = HCCL_SUCCESS;
+    if (armRet == HCCL_SUCCESS) {
+        execRet = func();
+    }
+
+    // BatchModeEnd can publish the gate and a partial executor graph even when the executor returned an error.
+    const bool mayBePublished = replayGate.enabled && armRet == HCCL_SUCCESS;
+    const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+    const HcclResult releaseRet = mayBePublished ? ReleaseMc2AicpuReplayGate(replayGate) : HCCL_SUCCESS;
+    if (releaseRet != HCCL_SUCCESS) {
+        HCCL_ERROR(
+            "[MC2_REPLAY_GATE][Release] executor fallback failed, algTag[%s], ret[%d].", param.algTag,
+            static_cast<int>(releaseRet));
+    }
+
+    if (armRet != HCCL_SUCCESS) {
+        return armRet;
+    }
+    if (execRet != HCCL_SUCCESS) {
+        return execRet;
+    }
+    if (endRet != HCCL_SUCCESS) {
+        return endRet;
+    }
+    return releaseRet;
+}
+
+template <typename Func>
 HcclResult RunWithMc2TaskCache(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx, Func func,
     Mc2AicpuTaskCacheManager& manager = Mc2AicpuTaskCacheManager::Instance())
@@ -44,6 +76,9 @@ HcclResult RunWithMc2TaskCache(
     if (!IsMc2TaskCacheOp(param.opType)) {
         return func();
     }
+
+    Mc2AicpuReplayGate replayGate;
+    CHK_RET(BuildMc2AicpuReplayGate(param, resCtx, replayGate));
 
     HCCL_DEBUG(
         "[MC2_BATCH][Start] opType[%u], algName[%s], algTag[%s].", static_cast<u32>(param.opType), param.algName,
@@ -63,22 +98,12 @@ HcclResult RunWithMc2TaskCache(
         if (policyRet != HCCL_SUCCESS) {
             HCCL_WARNING("[MC2_TASK_CACHE][Policy] failed and fallback to executor, ret[%d].", policyRet);
         }
-        HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-        if (execRet != HCCL_SUCCESS) {
-            return execRet;
-        }
-        return endRet;
+        return RunMc2ExecutorBatch(param, func, replayGate);
     }
 
     const Mc2TaskCacheReserveResult reserveResult = manager.TryReserve(plan.comm, plan.tag);
     if (reserveResult == Mc2TaskCacheReserveResult::FULL) {
-        HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-        if (execRet != HCCL_SUCCESS) {
-            return execRet;
-        }
-        return endRet;
+        return RunMc2ExecutorBatch(param, func, replayGate);
     }
 
     bool isHit = false;
@@ -87,19 +112,17 @@ HcclResult RunWithMc2TaskCache(
         HCCL_WARNING(
             "[MC2_TASK_CACHE][Lookup] failed and fallback to executor, tag[%s], ret[%d].", plan.tag.c_str(), lookupRet);
         ClearMc2TaskCacheBestEffort(plan, "lookup", manager);
-        HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-        if (execRet != HCCL_SUCCESS) {
-            return execRet;
-        }
-        return endRet;
+        return RunMc2ExecutorBatch(param, func, replayGate);
     }
 
     if (isHit) {
+        // A cache hit replays the gate wait captured on the miss path. Do not enqueue a second wait.
         const HcclResult executeRet = Mc2AicpuTaskCacheExecute(plan);
         const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        const HcclResult releaseRet = ReleaseMc2AicpuReplayGate(replayGate);
         HCCL_INFO(
-            "[MC2_TASK_CACHE][Hit] tag[%s], executeRet[%d], batchEndRet[%d].", plan.tag.c_str(), executeRet, endRet);
+            "[MC2_TASK_CACHE][Hit] tag[%s], executeRet[%d], batchEndRet[%d], releaseRet[%d].", plan.tag.c_str(),
+            executeRet, endRet, releaseRet);
         if (executeRet != HCCL_SUCCESS) {
             ClearMc2TaskCacheBestEffort(plan, "execute", manager);
             return executeRet;
@@ -107,6 +130,10 @@ HcclResult RunWithMc2TaskCache(
         if (endRet != HCCL_SUCCESS) {
             ClearMc2TaskCacheBestEffort(plan, "hit batch end", manager);
             return endRet;
+        }
+        if (releaseRet != HCCL_SUCCESS) {
+            ClearMc2TaskCacheBestEffort(plan, "hit release", manager);
+            return releaseRet;
         }
         return HCCL_SUCCESS;
     }
@@ -117,15 +144,14 @@ HcclResult RunWithMc2TaskCache(
             "[MC2_TASK_CACHE][Start] failed and fallback to executor, tag[%s], ret[%d].", plan.tag.c_str(),
             cacheStartRet);
         ClearMc2TaskCacheBestEffort(plan, "start", manager);
-        HcclResult execRet = func();
-        HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
-        if (execRet != HCCL_SUCCESS) {
-            return execRet;
-        }
-        return endRet;
+        return RunMc2ExecutorBatch(param, func, replayGate);
     }
 
-    HcclResult execRet = func();
+    const HcclResult armRet = ArmMc2AicpuReplayGate(replayGate);
+    HcclResult execRet = HCCL_SUCCESS;
+    if (armRet == HCCL_SUCCESS) {
+        execRet = func();
+    }
 
     HcclResult flushRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
     batchActive = false;
@@ -136,7 +162,8 @@ HcclResult RunWithMc2TaskCache(
     }
 
     HcclResult cacheEndRet = HCCL_SUCCESS;
-    if (execRet == HCCL_SUCCESS && flushRet == HCCL_SUCCESS && restartRet == HCCL_SUCCESS) {
+    if (armRet == HCCL_SUCCESS && execRet == HCCL_SUCCESS && flushRet == HCCL_SUCCESS &&
+        restartRet == HCCL_SUCCESS) {
         cacheEndRet = Mc2AicpuTaskCacheEnd(plan);
         if (cacheEndRet != HCCL_SUCCESS) {
             ClearMc2TaskCacheBestEffort(plan, "cache end", manager);
@@ -152,13 +179,26 @@ HcclResult RunWithMc2TaskCache(
             ClearMc2TaskCacheBestEffort(plan, "final batch end", manager);
         }
     }
+    // Once the first BatchModeEnd has been attempted, the wait and a partial graph may already be visible to
+    // hardware. Always release that wait after the final cache bookkeeping batch has been closed.
+    const bool mayBePublished = replayGate.enabled && armRet == HCCL_SUCCESS;
+    const HcclResult releaseRet = mayBePublished ? ReleaseMc2AicpuReplayGate(replayGate) : HCCL_SUCCESS;
+    if (releaseRet != HCCL_SUCCESS) {
+        HCCL_ERROR(
+            "[MC2_REPLAY_GATE][Release] capture failed, algTag[%s], ret[%d].", param.algTag,
+            static_cast<int>(releaseRet));
+        ClearMc2TaskCacheBestEffort(plan, "capture release", manager);
+    }
     HCCL_DEBUG(
-        "[MC2_BATCH][End] opType[%u], algName[%s], algTag[%s], execRet[%d], flushRet[%d], restartRet[%d], "
-        "cacheEndRet[%d], endRet[%d].",
-        static_cast<u32>(param.opType), param.algName, param.algTag, static_cast<int>(execRet),
-        static_cast<int>(flushRet), static_cast<int>(restartRet), static_cast<int>(cacheEndRet),
-        static_cast<int>(endRet));
+        "[MC2_BATCH][End] opType[%u], algName[%s], algTag[%s], armRet[%d], execRet[%d], flushRet[%d], "
+        "restartRet[%d], cacheEndRet[%d], endRet[%d], releaseRet[%d].",
+        static_cast<u32>(param.opType), param.algName, param.algTag, static_cast<int>(armRet),
+        static_cast<int>(execRet), static_cast<int>(flushRet), static_cast<int>(restartRet),
+        static_cast<int>(cacheEndRet), static_cast<int>(endRet), static_cast<int>(releaseRet));
 
+    if (armRet != HCCL_SUCCESS) {
+        return armRet;
+    }
     if (execRet != HCCL_SUCCESS) {
         return execRet;
     }
@@ -173,6 +213,9 @@ HcclResult RunWithMc2TaskCache(
     }
     if (endRet != HCCL_SUCCESS) {
         return endRet;
+    }
+    if (releaseRet != HCCL_SUCCESS) {
+        return releaseRet;
     }
     HCCL_INFO("[MC2_TASK_CACHE][Capture] tag[%s] published.", plan.tag.c_str());
     return HCCL_SUCCESS;

@@ -9,7 +9,9 @@
  */
 #include <algorithm>
 #include <future>
+#include <limits>
 #include <map>
+#include <mutex>
 #include <numeric>
 #include <string>
 #include <memory>
@@ -781,6 +783,76 @@ void CompReqChannelWithExistChannel(
     return;
 }
 
+namespace {
+constexpr u32 MC2_REPLAY_GATE_RELEASE_THREAD_NOTIFY_NUM = 0U;
+constexpr char MC2_REPLAY_GATE_RELEASE_THREAD_CTX_TAG[] = "mc2_allreduce_replay_gate_thread";
+std::mutex g_mc2ReplayGateThreadMutex;
+
+bool IsMc2AllReduceReplayGateRequested(const OpParam& param)
+{
+    return param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE && param.engine == CommEngine::COMM_ENGINE_AICPU_TS;
+}
+
+HcclResult PrepareMc2AllReduceReplayGate(HcclComm comm, OpParam& param)
+{
+    param.deviceOrderThread = 0;
+    if (!IsMc2AllReduceReplayGateRequested(param)) {
+        return HCCL_SUCCESS;
+    }
+
+    auto loadCachedThread = [comm, &param](void** cachedCtx) -> HcclResult {
+        uint64_t size = sizeof(ThreadHandle);
+        *cachedCtx = nullptr;
+        if (HcclEngineCtxGet(
+                comm, MC2_REPLAY_GATE_RELEASE_THREAD_CTX_TAG, CommEngine::COMM_ENGINE_CPU_TS, cachedCtx, &size) !=
+            HCCL_SUCCESS) {
+            *cachedCtx = nullptr;
+            return HCCL_SUCCESS;
+        }
+        CHK_PRT_RET(
+            *cachedCtx == nullptr || size != sizeof(ThreadHandle),
+            HCCL_ERROR(
+                "[MC2_REPLAY_GATE][Host] invalid cached release thread context, ctx[%p], size[%llu].", *cachedCtx,
+                static_cast<unsigned long long>(size)),
+            HCCL_E_INTERNAL);
+        param.deviceOrderThread = *static_cast<ThreadHandle*>(*cachedCtx);
+        return HCCL_SUCCESS;
+    };
+
+    void* ctx = nullptr;
+    CHK_RET(loadCachedThread(&ctx));
+    if (param.deviceOrderThread != 0) {
+        return HCCL_SUCCESS;
+    }
+
+    std::lock_guard<std::mutex> lock(g_mc2ReplayGateThreadMutex);
+    CHK_RET(loadCachedThread(&ctx));
+    if (param.deviceOrderThread != 0) {
+        return HCCL_SUCCESS;
+    }
+
+    if (ctx == nullptr) {
+        CHK_RET(HcclEngineCtxCreate(
+            comm, MC2_REPLAY_GATE_RELEASE_THREAD_CTX_TAG, CommEngine::COMM_ENGINE_CPU_TS, sizeof(ThreadHandle),
+            &ctx));
+        CHK_PTR_NULL(ctx);
+        *static_cast<ThreadHandle*>(ctx) = 0;
+    }
+
+    ThreadHandle releaseThread = 0;
+    CHK_RET(HcclThreadAcquire(
+        comm, CommEngine::COMM_ENGINE_AICPU_TS, 1U, MC2_REPLAY_GATE_RELEASE_THREAD_NOTIFY_NUM, &releaseThread));
+    CHK_PRT_RET(
+        releaseThread == 0, HCCL_ERROR("[MC2_REPLAY_GATE][Host] failed to acquire release thread."),
+        HCCL_E_INTERNAL);
+
+    *static_cast<ThreadHandle*>(ctx) = releaseThread;
+    param.deviceOrderThread = releaseThread;
+    HCCL_DEBUG("[MC2_REPLAY_GATE][Host] created releaseThread[0x%llx].", releaseThread);
+    return HCCL_SUCCESS;
+}
+} // namespace
+
 HcclResult HcclGetAlgRes(
     HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor, TopoInfoWithNetLayerDetails* topoInfo,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxSequence, bool& isResourceReused)
@@ -791,6 +863,7 @@ HcclResult HcclGetAlgRes(
     HCCL_INFO(
         "[asc][AlgoResource][HcclGetAlgRes] start, opType[%d], algTag[%s], engine[%d], opMode[%d].", param.opType,
         param.algTag, param.engine, param.opMode);
+    CHK_RET(PrepareMc2AllReduceReplayGate(comm, param));
 
     void* ctx = nullptr;
     bool increCreateChannelFlag = false;
@@ -1047,8 +1120,18 @@ HcclResult HcclGetThread(
         }
         u32 threadNum = resRequest.slaveThreadNum + 1;
         std::vector<ThreadHandle> threads(threadNum);
-        // maxNotifyNum需要再增加一个用于host-device同步
-        CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, maxNotifyNum + 1, threads.data()));
+        // One framework notify is reserved for host-device synchronization. AllReduce replay gating reserves
+        // one more notify so the main thread cannot run before all cached stream arrays have been published.
+        const bool replayGateEnabled = IsMc2AllReduceReplayGateRequested(param) && param.deviceOrderThread != 0;
+        const u32 extraNotifyNum = replayGateEnabled ? 2U : 1U;
+        CHK_PRT_RET(
+            maxNotifyNum > std::numeric_limits<u32>::max() - extraNotifyNum,
+            HCCL_ERROR(
+                "[MC2_REPLAY_GATE][Host] notify count overflow, maxNotifyNum[%u], extraNotifyNum[%u].",
+                maxNotifyNum, extraNotifyNum),
+            HCCL_E_PARA);
+        CHK_RET(
+            HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, maxNotifyNum + extraNotifyNum, threads.data()));
         CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 1));
         // 申请展开流对应的Thread
         CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_CPU, 1, 0, &resCtxHost->unfoldThread));
@@ -1056,6 +1139,12 @@ HcclResult HcclGetThread(
         HCCL_INFO("[HcclGetThread] unfoldThread [%lu]", resCtxHost->unfoldThread);
         HCCL_DEBUG("threads ptr is %p\n", threads.data());
         for (u32 i = 0; i < threadNum; i++) {
+            CHK_PRT_RET(
+                replayGateEnabled && threads[i] == param.deviceOrderThread,
+                HCCL_ERROR(
+                    "[MC2_REPLAY_GATE][Host] releaseThread[0x%llx] aliases algorithm thread[%u].",
+                    param.deviceOrderThread, i),
+                HCCL_E_INTERNAL);
             resCtxHost->threads.push_back(threads[i]);
         }
     } else {
