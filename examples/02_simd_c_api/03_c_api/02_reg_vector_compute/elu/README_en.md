@@ -1,6 +1,7 @@
 # ELU Example
 
 ## Overview
+
 This example implements the ELU (Exponential Linear Unit) activation operator using the C API, mainly calling the [asc_exp](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_exp.md), [asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_mul_scalar.md) and [asc_select](../../../../../docs/zh/api/SIMD-API/C-API/reg/compare_and_select/asc_select.md) APIs.
 
 ## Supported Products and CANN Versions
@@ -10,7 +11,8 @@ This example implements the ELU (Exponential Linear Unit) activation operator us
 | Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
 
 ## Directory Structure
-```
+
+```text
 ├── elu
 │   ├── scripts
 │   │   ├── gen_data.py                // Input data and ground truth generation script
@@ -22,6 +24,7 @@ This example implements the ELU (Exponential Linear Unit) activation operator us
 ```
 
 ## Example Description
+
 - Example functionality:  
   Computes the element-wise ELU activation of the input. The formula is:
   $$
@@ -51,9 +54,12 @@ This example implements the ELU (Exponential Linear Unit) activation operator us
     The kernel is invoked with the `<<<>>>` kernel invocation operator.
 
 ## Build and Run
+
 Execute the following steps in the example root directory.
+
 - Configure the environment variables  
   Configure the environment variables according to the [installation](../../../../../docs/en/quick_start.md#prepare&install) of the CANN toolkit on your environment.
+
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -63,6 +69,7 @@ Execute the following steps in the example root directory.
 - Build and run
 
   Run the following commands in the example directory.
+
   ```bash
   mkdir -p build && cd build;                                                    # create and enter the build directory
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                           # build the project (npu mode by default)
@@ -71,6 +78,7 @@ Execute the following steps in the example root directory.
   ```
 
   To use NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=sim`:
+
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU simulation mode
   ```
@@ -79,12 +87,15 @@ Execute the following steps in the example root directory.
 
 - Sample execution output  
   The output below indicates that the precision comparison passed.
+
   ```bash
   [Success] File mode verification passed.
   ```
 
   Built-in comprehensive self-test (validates correctness across various shapes):
+
   ```bash
   ./demo --selftest
   ```
+
   It outputs `[Success] All cases verification passed.` and returns exit code 0.

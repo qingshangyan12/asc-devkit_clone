@@ -1,6 +1,7 @@
 # ELU样例
 
 ## 概述
+
 本样例基于C API编程接口实现ELU（Exponential Linear Unit）激活运算，主要调用[asc_exp](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_exp.md)、[asc_mul_scalar](../../../../../docs/zh/api/SIMD-API/C-API/reg/arithmetic_compute/asc_mul_scalar.md)、[asc_select](../../../../../docs/zh/api/SIMD-API/C-API/reg/compare_and_select/asc_select.md)接口。
 
 ## 本样例支持的产品及CANN软件版本
@@ -10,7 +11,8 @@
 | Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
 
 ## 目录结构介绍
-```
+
+```text
 ├── elu
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
@@ -22,6 +24,7 @@
 ```
 
 ## 样例描述
+
 - 样例功能：  
   对输入做逐元素的ELU激活运算。数学表达式为：
   $$
@@ -51,9 +54,12 @@
     使用内核调用符`<<<>>>`调用核函数。
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行样例。
+
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
+
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -63,6 +69,7 @@
 - 样例执行
 
   在本样例目录下执行如下命令。
+
   ```bash
   mkdir -p build && cd build;                                                    # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                           # 编译工程（默认npu模式）
@@ -73,6 +80,7 @@
   使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
 
   示例如下：
+
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
@@ -88,12 +96,15 @@
 
 - 执行结果  
   执行结果如下，说明精度对比成功。
+
   ```bash
   [Success] File mode verification passed.
   ```
 
   内置全量自测（验证算子在不同 shape 下的正确性）：
+
   ```bash
   ./demo --selftest
   ```
+
   输出 `[Success] All cases verification passed.`，程序返回 0。
