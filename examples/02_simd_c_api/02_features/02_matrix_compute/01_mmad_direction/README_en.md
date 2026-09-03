@@ -2,15 +2,21 @@
 
 ## Overview
 
-This sample demonstrates how the Mmad computation direction affects performance when UnitFlag is enabled. Better performance can be achieved when the result-fractal production order matches the output order of the data movement instruction.
+This sample shows how to select the Mmad computation direction from the Fixpipe L0C Buffer read order when UnitFlag is enabled. `asc_set_mmad_direction_m()` and `asc_set_mmad_direction_n()` change only the production order of 16 x 16 result fractals in L0C Buffer, not the matrix multiplication workload, result, or output format.
 
-The sample contains three groups of scenarios. Each group provides a recommended example and a counterexample that changes only the Mmad computation direction:
+UnitFlag maintains a flag for every 512-byte L0C Buffer memory block. This sample uses `asc_unit_flag_mode::ENABLE_UPDATE` for both Mmad and Fixpipe: Mmad waits for flag 0 before writing and changes it to 1 after writing; Fixpipe waits for flag 1 before reading and changes it to 0 after reading. Fixpipe can therefore move out a produced fractal without a manual full-pipeline synchronization.
 
-1. float result with Nz2Nz output: `asc_set_mmad_direction_m()` is recommended;
-2. B4 quantization with Nz2Nz output, where hardware automatically enables ChannelMerge: `asc_set_mmad_direction_n()` is recommended;
-3. float result with Nz2ND on-the-fly format conversion: `asc_set_mmad_direction_n()` is recommended.
+With matching production and read orders, the fractals read first by Fixpipe are also produced first, so Mmad and Fixpipe overlap at fractal granularity. A mismatched order can make Fixpipe wait for a later-produced fractal. Normal Nz2NZ and Nz2DN read in the M direction; Nz2ND and B8/B4 ChannelMerge that remains Nz2NZ read in the N direction. ChannelMerge is automatically enabled only for B8/B4 destinations with neither Nz2ND nor Nz2DN enabled.
 
-`asc_set_mmad_direction_m()` and `asc_set_mmad_direction_n()` do not change the matrix multiplication workload, computation result, or output format. They change only the production order of 16 x 16 result fractals in L0C Buffer.
+![Mmad and Fixpipe both write and read in the M direction](figures/mmad_unitflag.png)
+
+The sample contains five scenario pairs. Each pair includes a recommended example and a counterexample that changes only the Mmad direction:
+
+1. float Nz2Nz: use `asc_set_mmad_direction_m()`;
+2. B4 ChannelMerge: use `asc_set_mmad_direction_n()`;
+3. float Nz2ND: use `asc_set_mmad_direction_n()`;
+4. float Nz2DN: use `asc_set_mmad_direction_m()`;
+5. B8 ChannelMerge: use `asc_set_mmad_direction_n()`.
 
 ## Supported Products and CANN Versions
 
@@ -24,6 +30,11 @@ The sample contains three groups of scenarios. Each group provides a recommended
 
 ```text
 01_mmad_direction
+├── figures
+│   └── mmad_unitflag.png   // UnitFlag synchronization diagram
+├── performance
+│   ├── 3510_sample_raw.csv       // Historical 3510 raw measurements
+│   └── 3510_sample_summary.csv   // Historical 3510 summary
 ├── scripts
 │   ├── gen_data.py         // Generates random input and golden data
 │   └── verify_result.py    // Verifies output results
@@ -47,6 +58,8 @@ The sample computes `C = A x B`. A and B are half, and C is float in L0C Buffer.
 | C, scenarios 1/2 | Output | float | `[M, N]` | Nz |
 | C, scenarios 3/4 | Output | int4b_t | `[M, N]` | Nz |
 | C, scenarios 5/6 | Output | float | `[M, N]` | ND |
+| C, scenarios 7/8 | Output | float | `[M, N]` | DN |
+| C, scenarios 9/10 | Output | int8_t | `[M, N]` | Nz |
 
 The Kernel executes in the following order:
 
@@ -60,7 +73,7 @@ The Kernel executes in the following order:
 
 The `SCENARIO_NUM` build parameter selects a recommended example or counterexample. Within each pair, all configurations except the Mmad computation direction are identical.
 
-**Table 3** Six build scenarios
+**Table 3** Ten build scenarios
 
 | `SCENARIO_NUM` | Type | Output Scenario | `[M, N, K]` | MMAD Direction | Description |
 | ---: | --- | --- | --- | --- | --- |
@@ -70,6 +83,10 @@ The `SCENARIO_NUM` build parameter selects a recommended example or counterexamp
 | 4 | Counterexample | B4 ChannelMerge + UnitFlag | `[192, 64, 128]` | `asc_set_mmad_direction_m()` | The production order does not match the output order. |
 | 5 | Recommended | float Nz2ND + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_n()` | Nz2ND reads in the N direction. |
 | 6 | Counterexample | float Nz2ND + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_m()` | The production order does not match the output order. |
+| 7 | Recommended | float Nz2DN + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_m()` | Nz2DN reads in the M direction. |
+| 8 | Counterexample | float Nz2DN + UnitFlag | `[256, 256, 128]` | `asc_set_mmad_direction_n()` | The production order does not match the output order. |
+| 9 | Recommended | B8 ChannelMerge + UnitFlag | `[256, 64, 128]` | `asc_set_mmad_direction_n()` | ChannelMerge reads in the N direction. |
+| 10 | Counterexample | B8 ChannelMerge + UnitFlag | `[256, 64, 128]` | `asc_set_mmad_direction_m()` | The production order does not match the output order. |
 
 ### Scenarios 1/2: float Nz Output
 
@@ -90,6 +107,14 @@ Hardware automatically enables ChannelMerge and merges four consecutive 16 x 16 
 
 Scenarios 5 and 6 configure on-the-fly format conversion parameters with `asc_set_l0c_copy_nz_para` and enable Nz2ND in `asc_copy_l0c2gm`. Nz2ND reads L0C Buffer in the N direction, so scenario 5 uses `asc_set_mmad_direction_n()` and scenario 6 uses the M direction as a counterexample.
 
+### Scenarios 7/8: float Nz2DN
+
+Scenarios 7 and 8 enable Nz2DN in `asc_copy_l0c2gm` and preset the format-conversion parameters before Mmad with `asc_set_l0c_copy_nz_para(1, 0, 0)` and `asc_set_l0c_copy_channel_para(1)`. DN stores data in N, M order and Fixpipe reads L0C Buffer in the M direction, so scenario 7 uses `asc_set_mmad_direction_m()`. With UnitFlag enabled, `src_nz_fractal_stride` must be 1.
+
+### Scenarios 9/10: B8 ChannelMerge
+
+Scenarios 9 and 10 use `QF322B8_PRE` to quantize float to signed `int8_t` and keep Nz2NZ. Hardware automatically merges two adjacent 16 x 16 fractals along N into one 16 x 32 fractal, so the layout rule selects `asc_set_mmad_direction_n()`. For this Shape, the measured difference is within noise; scenario 10 remains as a direction-only counterexample.
+
 ## Performance Comparison
 
 **Table 4** Test configuration
@@ -97,7 +122,8 @@ Scenarios 5 and 6 configure on-the-fly format conversion parameters with `asc_se
 | Configuration | Value |
 | --- | --- |
 | Block count | 1 |
-| Kernel pipeline repetitions | 50 |
+| Historical kernel pipeline repetitions | 47 for Nz, B4, Nz2ND, and Nz2DN; 190 for B8. The current sample has no performance loop. |
+| Mean source | Seven valid samples per direction; each sample is `mean_us` for 12 consecutive Kernel submissions; AB/BA execution order alternates. |
 | Performance improvement | `(counterexample mean - recommended mean) / counterexample mean x 100%` |
 
 **Table 5** Multiple-run means for recommended examples and counterexamples
@@ -107,8 +133,10 @@ Scenarios 5 and 6 configure on-the-fly format conversion parameters with `asc_se
 | float Nz2Nz + UnitFlag | 61.295 ± 0.084 | 61.948 ± 0.141 | **1.055%** |
 | B4 ChannelMerge + UnitFlag | 13.154 ± 0.053 | 15.149 ± 0.043 | **13.172%** |
 | float Nz2ND + UnitFlag | 61.935 ± 0.113 | 112.891 ± 0.056 | **45.137%** |
+| float Nz2DN + UnitFlag | 60.937 ± 0.170 | 61.653 ± 0.191 | **1.162%** |
+| B8 ChannelMerge + UnitFlag | 60.963 ± 0.140 | 60.962 ± 0.061 | Statistically equivalent (-0.002%) |
 
-Performance gains depend on the data volume, shape, partitioning strategy, and complete operator pipeline. The percentages in Table 5 must not be directly extrapolated to other scenarios and are provided only to demonstrate the relationship between computation direction and performance optimization.
+The raw records for Table 5 are in [`performance/3510_sample_raw.csv`](performance/3510_sample_raw.csv), and the summary is in [`performance/3510_sample_summary.csv`](performance/3510_sample_summary.csv). Gains depend on data volume, shape, partitioning strategy, and the complete operator pipeline. The B8 row demonstrates that the layout rule should be followed, but statistically equivalent results must not be reported as a gain.
 
 ### Performance Test Method
 
@@ -133,6 +161,8 @@ msopprof ./c_api_mmad_direction_example
 python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM \
     output/output.bin output/golden.bin
 ```
+
+Repeat this flow seven times for each side of a pair, alternating recommended/counterexample and counterexample/recommended. Record `Task Duration(us)` from `OpBasicInfo.csv` for every run, calculate the arithmetic mean and sample standard deviation from the seven valid values for each direction, then calculate the improvement with the Table 4 formula. A record with `Task Duration(us)=0` or a Profiling channel startup failure is invalid and must not be included.
 
 Simulation results are suitable for analyzing pipeline behavior. Final performance conclusions must be obtained from a real 3510 device.
 
@@ -165,7 +195,7 @@ Clear the CMake cache in the `build` directory before switching scenarios.
 | --- | --- | --- |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture. |
 | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | NPU execution or NPU simulation; CPU debugging is not supported. |
-| `SCENARIO_NUM` | `1` to `6`, default `1` | Selects a scenario from Table 3. |
+| `SCENARIO_NUM` | `1` to `10`, default `1` | Selects a scenario from Table 3. |
 
 Successful verification prints:
 

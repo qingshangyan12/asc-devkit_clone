@@ -18,7 +18,7 @@ import numpy as np
 
 
 def verify_result(scenario_num, output_path, golden_path):
-    output_type = np.uint8 if scenario_num in (3, 4) else np.float32
+    output_type = np.uint8 if scenario_num in (3, 4, 9, 10) else np.float32
     output = np.fromfile(output_path, dtype=output_type)
     golden = np.fromfile(golden_path, dtype=output_type)
     if output.shape != golden.shape:
@@ -45,7 +45,7 @@ def verify_result(scenario_num, output_path, golden_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 7))
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 11))
     parser.add_argument("output", type=str)
     parser.add_argument("golden", type=str)
     args = parser.parse_args()
