@@ -556,4 +556,4 @@ asc::te::copy(atom, global_c, l0c_tensor, quant_scalar);
 
 ### 基于扩展Tensor的矩阵计算示例
 
-结合上述矩阵计算的搬运与计算能力，开发者可基于C++ Tensor编程实现矩阵类算子。具体开发实践可参考[matmul实现样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/matmul_tensor_api/README.md)。
+结合上述矩阵计算的搬运与计算能力，开发者可基于C++ Tensor编程实现矩阵类算子。具体开发实践可参考[matmul实现样例](../../../../../../../examples/01_simd_cpp_api/07_tensor_api/matrix_compute/matmul/README.md)。
