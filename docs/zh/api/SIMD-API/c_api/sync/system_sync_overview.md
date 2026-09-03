@@ -24,7 +24,7 @@ AI Core的同步，总共分成2类：[核内同步](intra_core_sync_overview.md
 - 模式2：AI Core内部，AIC与AIV之间的同步控制。在AIC核执行`asc_sync_block_arrive`之后，两个AIV上`asc_sync_block_wait`后续的指令才会继续执行；两个AIV都执行`asc_sync_block_arrive`后，AIC上`asc_sync_block_wait`后续的指令才能执行。
 - 模式4：AI Core内部，AIC与单个AIV之间的同步控制。在单个AIV核执行`asc_sync_intra_arrive`之后，AIC上`asc_sync_intra_wait`后续的指令才会继续执行；AIC执行`asc_sync_intra_arrive`后，单个AIV上`asc_sync_intra_wait`后续的指令才能执行。AIV0与AIV1可单独触发AIC等待。
 
-**图1**  四种核间同步控制模式示意图<a name="fig_sync_control_mode"></a>    
+**图1**  四种核间同步控制模式示意图<a id="fig_sync_control_mode"></a>    
 ![](../../../figures/3510_sync_control_mode_diagram.png)
 
 **表2**  核间同步接口

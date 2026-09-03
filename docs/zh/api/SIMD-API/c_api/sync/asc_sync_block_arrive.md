@@ -64,11 +64,11 @@ __aicore__ inline void asc_sync_block_arrive(pipe_t pipe,
 ## 约束说明
 
 - 针对`asc_sync_block_arrive`接口，传入的`pipe`参数在不同NPU架构中**均生效**；针对`asc_sync_block_wait`接口，传入的`pipe`参数**是否生效与NPU架构有关**，具体请参考[asc_sync_block_wait](asc_sync_block_wait.md#约束说明)的约束说明。
-- 不同NPU架构中AIC和AIV支持的`pipe`取值存在差异，具体情况如下：<a name="supported_pipe_combinations"></a>
+- 不同NPU架构中AIC和AIV支持的`pipe`取值存在差异，具体情况如下：<a id="supported_pipe_combinations"></a>
     <!-- npu="950" id9 -->
     - 针对[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe_3510)所示。
 
-        **表2**  NPU架构3510中AIC和AIV支持的`pipe`取值<a name="aic_aiv_supported_pipe_3510"></a>
+        **表2**  NPU架构3510中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_3510"></a>
 
         | 核类型 | 支持的pipe取值 |
         | :--- | :--- |
@@ -79,7 +79,7 @@ __aicore__ inline void asc_sync_block_arrive(pipe_t pipe,
     <!-- npu="A3,910b" id10 -->
     - 针对[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，AIC和AIV支持的`pipe`取值如[表3](#aic_aiv_supported_pipe_2201)所示。
 
-        **表3**  NPU架构2201中AIC和AIV支持的`pipe`取值<a name="aic_aiv_supported_pipe_2201"></a>
+        **表3**  NPU架构2201中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_2201"></a>
 
         | 核类型 | 支持的pipe取值 |
         | :--- | :--- |
@@ -110,7 +110,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <cstdint>
 #include <iostream>
 #include <vector>
-#include "c_api/asc_simd.h"
+#include "c_api/sync/sync.h"
 #include "acl/acl.h"
 
 namespace {

@@ -57,9 +57,10 @@ AI Core内部并行的指令流水类型和解释如下所示：
 
 此外，`PIPE_ALL`表示全部流水线，用于需要等待所有流水线前序指令完成的场景。
 
-同步接口中`pipe_t`枚举类型的取值如下：<a name="硬件流水类型"></a>
+同步接口中`pipe_t`枚举类型的取值如下：<a id="硬件流水类型"></a>
 
-<pre>typedef enum {
+```c
+typedef enum {
     PIPE_S = 0,
     PIPE_V = 1,
     PIPE_M = 2,
@@ -68,7 +69,9 @@ AI Core内部并行的指令流水类型和解释如下所示：
     PIPE_MTE3 = 5,
     PIPE_ALL = 6,
     PIPE_FIX = 10
-} pipe_t;</pre>
+} pipe_t;
+```
+
 
 ## 核内同步分类
 
@@ -97,7 +100,7 @@ AI Core内部并行的指令流水类型和解释如下所示：
 <!-- npu="A3,910b" id4 -->
 以[NPU架构2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)为例，该硬件架构下所有合法的核内同步组合如[表2](#aic_intra_core_sync_combinations)和[表3](#aiv_intra_core_sync_combinations)所示。其中，“不涉及”表示硬件层面不存在此种同步组合，“暂无应用场景”表示存在此种同步组合，但在实际开发场景中暂不需要使用。
 
-<a name="aic_intra_core_sync_combinations"></a>
+<a id="aic_intra_core_sync_combinations"></a>
 
 **表2**  AIC中所有合法的核内同步组合
 
@@ -110,7 +113,7 @@ AI Core内部并行的指令流水类型和解释如下所示：
 | `PIPE_MTE3` | 不涉及 | 不涉及 | `asc_sync_notify(PIPE_MTE3, PIPE_MTE1, EVENT_ID0)`<br>`asc_sync_wait(PIPE_MTE3, PIPE_MTE1, EVENT_ID0)` | `asc_sync_notify(PIPE_MTE3, PIPE_MTE2, EVENT_ID0)`<br>`asc_sync_wait(PIPE_MTE3, PIPE_MTE2, EVENT_ID0)` | `asc_sync_pipe(PIPE_MTE3)` | 暂无应用场景 |
 | `PIPE_FIX` | 不涉及 | `asc_sync_notify(PIPE_FIX, PIPE_M, EVENT_ID0)`<br>`asc_sync_wait(PIPE_FIX, PIPE_M, EVENT_ID0)` | `asc_sync_notify(PIPE_FIX, PIPE_MTE1, EVENT_ID0)`<br>`asc_sync_wait(PIPE_FIX, PIPE_MTE1, EVENT_ID0)` | 暂无应用场景 | 暂无应用场景 | `asc_sync_pipe(PIPE_FIX)` |
 
-<a name="aiv_intra_core_sync_combinations"></a>
+<a id="aiv_intra_core_sync_combinations"></a>
 
 **表3**  AIV中所有合法的核内同步组合
 

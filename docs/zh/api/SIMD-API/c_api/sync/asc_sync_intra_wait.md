@@ -61,9 +61,9 @@ __aicore__ inline void asc_sync_intra_wait(pipe_t pipe,
 
 ## 约束说明
 
-- 针对`asc_sync_intra_arrive`接口，传入的`pipe`参数**生效**，AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe)所示。<a name="supported_pipe_combinations"></a>
+- 针对`asc_sync_intra_arrive`接口，传入的`pipe`参数**生效**，AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe)所示。<a id="supported_pipe_combinations"></a>
 
-  **表2**  AIC和AIV支持的`pipe`取值<a name="aic_aiv_supported_pipe"></a>
+  **表2**  AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe"></a>
 
   | 核类型 | 支持的pipe取值 |
   | :--- | :--- |
@@ -71,7 +71,7 @@ __aicore__ inline void asc_sync_intra_wait(pipe_t pipe,
   | AIV | `PIPE_S`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_V` |
 
 - 调用本接口的核函数必须使用`__mix__(1, 2)`修饰。
-- 与其它核间同步模式不同，本接口与`asc_sync_intra_arrive`配对使用时，**不要求**`arrive`与`wait`传入的`sync_id`相同，而是要求二者符合如下跨核ID映射关系，否则会出现未定义行为。<a name="sync_id_mapping"></a>
+- 与其它核间同步模式不同，本接口与`asc_sync_intra_arrive`配对使用时，**不要求**`arrive`与`wait`传入的`sync_id`相同，而是要求二者符合如下跨核ID映射关系，否则会出现未定义行为。<a id="sync_id_mapping"></a>
     - AIV0中调用的`asc_sync_intra_arrive`接口的`sync_id`取值为0~15，分别与AIC中调用的`asc_sync_intra_wait`接口的`sync_id`取值0~15对应。
     - AIV1中调用的`asc_sync_intra_arrive`接口的`sync_id`取值为0~15，分别与AIC中调用的`asc_sync_intra_wait`接口的`sync_id`取值16~31对应。
     - AIC中调用的`asc_sync_intra_arrive`接口的`sync_id`取值为0~15，分别与AIV0中调用的`asc_sync_intra_wait`接口的`sync_id`取值0~15对应。
