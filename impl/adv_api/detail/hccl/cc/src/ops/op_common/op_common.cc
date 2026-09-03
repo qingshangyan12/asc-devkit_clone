@@ -2640,8 +2640,8 @@ static HcclResult GetCommMultipleDimensionSplitRatio(HcclComm comm, double& rati
     isConfigured = false;
     double commRatio = 0.0;
     const uint32_t infoLen = sizeof(commRatio);
-    HcclResult ret = HcclConfigGetInfo(
-        comm, HcclConfigType::HCCL_CONFIG_TYPE_MULTIPLE_DIMENSION_SPLIT_RATIO, infoLen, &commRatio);
+    HcclResult ret =
+        HcclConfigGetInfo(comm, HcclConfigType::HCCL_CONFIG_TYPE_MULTIPLE_DIMENSION_SPLIT_RATIO, infoLen, &commRatio);
     if (ret == HCCL_E_NOT_SUPPORT) {
         HCCL_INFO("[GetCommMultipleDimensionSplitRatio] comm config not set or not supported, ret[%d].", ret);
         return HCCL_SUCCESS;
@@ -2651,7 +2651,8 @@ static HcclResult GetCommMultipleDimensionSplitRatio(HcclComm comm, double& rati
         return ret;
     }
     if (!std::isfinite(commRatio) || commRatio < 0.0 || commRatio > 1.0) {
-        HCCL_ERROR("[GetCommMultipleDimensionSplitRatio] comm ratio[%f] is not finite or out of range[0, 1].", commRatio);
+        HCCL_ERROR(
+            "[GetCommMultipleDimensionSplitRatio] comm ratio[%f] is not finite or out of range[0, 1].", commRatio);
         return HCCL_E_PARA;
     }
     if (commRatio == 0.0) {
