@@ -105,30 +105,27 @@ static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext& ctx)
     return CCU_SUCCESS;
 }
 
-static CcuResult LoadArgs(
-    KfcReduceScatterMesh1DMem2MemContext& ctx, ccu::Variable inputAddr, ccu::Variable outputAddr,
-    ccu::Variable tokenInfo, ccu::Variable scratch, ccu::Variable currentRankSliceInputOffset, ccu::Variable chunkSize,
-    ccu::Variable chunkLoopNum, ccu::Variable tailSize, ccu::Variable fullGoAddrOffset, ccu::Variable fullGoLoopParam,
-    ccu::Variable fullGoParallelParam, ccu::Variable fullGoResidual, ccu::Variable tailGoAddrOffset,
-    ccu::Variable tailGoLoopParam, ccu::Variable tailGoParallelParam, ccu::Variable tailGoResidual)
+static CcuResult LoadArgs(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
-    ctx.input[ctx.rankId] = inputAddr;
-    ctx.output = outputAddr;
-    ctx.token[ctx.rankId] = tokenInfo;
-    ctx.scratch[ctx.rankId] = scratch;
-    ctx.currentRankSliceInputOffset = currentRankSliceInputOffset;
+    uint32_t argId = 0;
+    CCU_CHK_RET(ccu::LoadArg(ctx.input[ctx.rankId], argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.output, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.token[ctx.rankId], argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.scratch[ctx.rankId], argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.currentRankSliceInputOffset, argId++));
     ctx.currentRankSliceOutputOffset = 0;
-    ctx.chunkSize = chunkSize;
-    ctx.chunkLoopNum = chunkLoopNum;
-    ctx.tailSize = tailSize;
-    ctx.fullGoSize.addrOffset = fullGoAddrOffset;
-    ctx.fullGoSize.loopParam = fullGoLoopParam;
-    ctx.fullGoSize.parallelParam = fullGoParallelParam;
-    ctx.fullGoSize.residual = fullGoResidual;
-    ctx.tailGoSize.addrOffset = tailGoAddrOffset;
-    ctx.tailGoSize.loopParam = tailGoLoopParam;
-    ctx.tailGoSize.parallelParam = tailGoParallelParam;
-    ctx.tailGoSize.residual = tailGoResidual;
+    argId = 13;
+    CCU_CHK_RET(ccu::LoadArg(ctx.chunkSize, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.chunkLoopNum, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.tailSize, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.fullGoSize.addrOffset, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.fullGoSize.loopParam, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.fullGoSize.parallelParam, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.fullGoSize.residual, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.tailGoSize.addrOffset, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.tailGoSize.loopParam, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.tailGoSize.parallelParam, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.tailGoSize.residual, argId++));
     return CCU_SUCCESS;
 }
 
@@ -403,26 +400,20 @@ static CcuResult DoRepeatReduceScatter(KfcReduceScatterMesh1DMem2MemContext& ctx
     return CCU_SUCCESS;
 }
 
-CcuResult CcuReduceScatterMesh1DMem2MemKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
-    ccu::Variable currentRankSliceInputOffset, ccu::Variable chunkSize, ccu::Variable chunkLoopNum,
-    ccu::Variable tailSize, ccu::Variable fullGoAddrOffset, ccu::Variable fullGoLoopParam,
-    ccu::Variable fullGoParallelParam, ccu::Variable fullGoResidual, ccu::Variable tailGoAddrOffset,
-    ccu::Variable tailGoLoopParam, ccu::Variable tailGoParallelParam, ccu::Variable tailGoResidual,
-    const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType)
+CcuResult CcuReduceScatterMesh1DMem2MemKernel(CcuKernelArg arg)
 {
+    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
     KfcReduceScatterMesh1DMem2MemContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSize;
-    ctx.rankId = rankId;
-    ctx.dataType = dataType;
-    ctx.outputDataType = outputType;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.dataType = kernelArg->opParam.DataDes.dataType;
+    ctx.outputDataType = kernelArg->opParam.DataDes.outputType;
     if (ctx.outputDataType == HcclDataType::HCCL_DATA_TYPE_RESERVED) {
-        ctx.outputDataType = dataType;
+        ctx.outputDataType = ctx.dataType;
     }
-    ctx.reduceOp = reduceType;
+    ctx.reduceOp = kernelArg->opParam.reduceType;
     HCCL_INFO(
         "[CcuKernelReduceScatterMesh1DMem2Mem] Init, KernelArgs are rankId[%u], rankSize_[%u], dataType[%d], "
         "outputDataType[%d], reduceOp[%d]",
@@ -440,28 +431,12 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(
 
     HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem run");
     CCU_CHK_RET(InitResource(ctx));
-    CCU_CHK_RET(LoadArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, scratch, currentRankSliceInputOffset, chunkSize, chunkLoopNum, tailSize,
-        fullGoAddrOffset, fullGoLoopParam, fullGoParallelParam, fullGoResidual, tailGoAddrOffset, tailGoLoopParam,
-        tailGoParallelParam, tailGoResidual));
+    CCU_CHK_RET(LoadArgs(ctx));
     CCU_CHK_RET(PreSync(ctx));
     CCU_CHK_RET(DoRepeatReduceScatter(ctx));
     CCU_CHK_RET(PostSync(ctx));
     HCCL_INFO("[CcuKernelReduceScatterMesh1DMem2Mem] ReduceScatterMesh1DMem2Mem end");
 
     return CCU_SUCCESS;
-}
-
-CcuResult CcuReduceScatterMesh1DMem2MemKernel(CcuKernelArg arg)
-{
-    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
-    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
-    ccu::Variable token;
-    CCU_CHK_RET(LoadKfcCallArgs(param, token));
-    return CcuReduceScatterMesh1DMem2MemKernel(
-        param[1], param[2], token, param[3], param[4], param[13], param[14], param[15], param[16], param[17],
-        param[18], param[19], param[20], param[21], param[22], param[23], kernelArg->channels,
-        kernelArg->channelCount, static_cast<uint32_t>(kernelArg->rankSize), kernelArg->rankId,
-        kernelArg->opParam.DataDes.dataType, kernelArg->opParam.DataDes.outputType, kernelArg->opParam.reduceType);
 }
 } // namespace mc2_ops_hccl

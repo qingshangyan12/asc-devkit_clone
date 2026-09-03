@@ -70,6 +70,29 @@ CcuResult InitResource(KfcAllGatherNhrContext& ctx)
     return CCU_SUCCESS;
 }
 
+CcuResult LoadArgs(KfcAllGatherNhrContext& ctx)
+{
+    const uint32_t localIdx = ctx.channelCount;
+    CCU_CHK_RET(ccu::LoadArg(ctx.token[localIdx], 2));
+    uint32_t argId = KFC_CONCURRENT_AG_NHR_INPUT;
+    CCU_CHK_RET(ccu::LoadArg(ctx.input, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.output[localIdx], argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.sliceSize, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.sliceSizePerJetty, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.lastSliceSizePerJetty, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.repeatNumInv, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.inputSliceStride, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.outputSliceStride, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.inputRepeatStride, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.outputRepeatStride, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.isInputOutputEqual, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.addrOffset, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.loopParam, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.parallelParam, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.goSize.residual, argId++));
+    return CCU_SUCCESS;
+}
+
 CcuResult PreSync(KfcAllGatherNhrContext& ctx)
 {
     const uint32_t localIdx = ctx.channelCount;
@@ -220,68 +243,26 @@ CcuResult RunNhr(KfcAllGatherNhrContext& ctx)
 }
 } // namespace
 
-CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
-    ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable sliceSize,
-    ccu::Variable sliceSizePerJetty, ccu::Variable lastSliceSizePerJetty, ccu::Variable repeatNumInv,
-    ccu::Variable inputSliceStride, ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride,
-    ccu::Variable outputRepeatStride, ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1,
-    ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
-    uint32_t rankSize, uint32_t rankId, uint32_t jettyNum, const std::vector<KfcNhrStepInfo>& stepInfoVector,
-    const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
+CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
 {
+    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
     KfcAllGatherNhrContext ctx;
-    ctx.channels = channels;
-    ctx.channelCount = channelCount;
-    ctx.rankSize = rankSize;
-    ctx.rankId = rankId;
-    ctx.jettyNum = jettyNum;
-    ctx.stepInfoVector = &stepInfoVector;
-    ctx.rank2ChannelIdx = &rank2ChannelIdx;
+    ctx.channels = kernelArg->channels;
+    ctx.channelCount = kernelArg->channelCount;
+    ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
+    ctx.rankId = kernelArg->rankId;
+    ctx.jettyNum = kernelArg->jettyNum;
+    ctx.stepInfoVector = &kernelArg->nhrStepInfoVector;
+    ctx.rank2ChannelIdx = &kernelArg->nhrRank2ChannelIdx;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
-
-    const uint32_t localIdx = channelCount;
-    ctx.input = inputAddr;
-    ctx.output[localIdx] = outputAddr;
-    ctx.token[localIdx] = tokenInfo;
-    ctx.sliceSize = sliceSize;
-    ctx.sliceSizePerJetty = sliceSizePerJetty;
-    ctx.lastSliceSizePerJetty = lastSliceSizePerJetty;
-    ctx.repeatNumInv = repeatNumInv;
-    ctx.inputSliceStride = inputSliceStride;
-    ctx.outputSliceStride = outputSliceStride;
-    ctx.inputRepeatStride = inputRepeatStride;
-    ctx.outputRepeatStride = outputRepeatStride;
-    ctx.isInputOutputEqual = isInputOutputEqual;
-    ctx.goSize.addrOffset = goSize0;
-    ctx.goSize.loopParam = goSize1;
-    ctx.goSize.parallelParam = goSize2;
-    ctx.goSize.residual = goSize3;
+    CCU_CHK_RET(LoadArgs(ctx));
     ctx.constVar1 = 1U;
 
     CCU_CHK_RET(PreSync(ctx));
     CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(RunNhr(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
-}
-
-CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
-{
-    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
-    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
-    ccu::Variable token;
-    CCU_CHK_RET(LoadKfcCallArgs(param, token));
-    return CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
-        param[KFC_CONCURRENT_AG_NHR_INPUT], param[KFC_CONCURRENT_AG_NHR_OUTPUT], token,
-        param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE], param[KFC_CONCURRENT_AG_NHR_SLICE_SIZE_PER_JETTY],
-        param[KFC_CONCURRENT_AG_NHR_LAST_SLICE_SIZE_PER_JETTY], param[KFC_CONCURRENT_AG_NHR_REPEAT_NUM_INV],
-        param[KFC_CONCURRENT_AG_NHR_INPUT_SLICE_STRIDE], param[KFC_CONCURRENT_AG_NHR_OUTPUT_SLICE_STRIDE],
-        param[KFC_CONCURRENT_AG_NHR_INPUT_REPEAT_STRIDE], param[KFC_CONCURRENT_AG_NHR_OUTPUT_REPEAT_STRIDE],
-        param[KFC_CONCURRENT_AG_NHR_INPUT_OUTPUT_EQUAL], param[KFC_CONCURRENT_AG_NHR_GO_SIZE_0],
-        param[KFC_CONCURRENT_AG_NHR_GO_SIZE_1], param[KFC_CONCURRENT_AG_NHR_GO_SIZE_2],
-        param[KFC_CONCURRENT_AG_NHR_GO_SIZE_3], kernelArg->channels, kernelArg->channelCount,
-        static_cast<uint32_t>(kernelArg->rankSize), kernelArg->rankId, kernelArg->jettyNum,
-        kernelArg->nhrStepInfoVector, kernelArg->nhrRank2ChannelIdx);
 }
 
 } // namespace mc2_ops_hccl

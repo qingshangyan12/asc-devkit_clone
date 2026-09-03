@@ -95,7 +95,6 @@ public:
 };
 
 CcuResult CcuKfcServerKernel(CcuKernelArg arg);
-CcuResult LoadKfcCallArgs(ccu::Array<ccu::Variable>& param, ccu::Variable& token);
 
 } // namespace mc2_ops_hccl
 

@@ -161,18 +161,6 @@ CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Vari
     return CCU_SUCCESS;
 }
 
-CcuResult LoadKfcCallArgs(ccu::Array<ccu::Variable>& param, ccu::Variable& token)
-{
-    uint32_t argId = 0;
-    CCU_CHK_RET(ccu::LoadArg(param[HBM_PARAM_IDX_1], argId++));
-    CCU_CHK_RET(ccu::LoadArg(param[HBM_PARAM_IDX_2], argId++));
-    CCU_CHK_RET(ccu::LoadArg(token, argId++));
-    for (uint32_t paramIdx = HBM_PARAM_IDX_3; paramIdx < CCU_PARAM_NUM_PER_DIE; ++paramIdx) {
-        CCU_CHK_RET(ccu::LoadArg(param[paramIdx], argId++));
-    }
-    return CCU_SUCCESS;
-}
-
 template <std::size_t... Is>
 static CcuResult CallKfcSubKernel(
     ccu::Array<ccu::Variable>& param, KfcServerContext& ctx, std::index_sequence<Is...>)
