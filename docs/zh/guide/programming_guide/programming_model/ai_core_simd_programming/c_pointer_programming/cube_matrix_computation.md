@@ -243,13 +243,13 @@ __aicore__ inline void asc_copy_l0c2gm(
 另外，对于`unit_flag_mode`、`enable_nz2nd`参数的设置，需配置相应寄存器参数以启用不同功能。对应的接口和处理能力如下：
 ```c
 // 1.0 When performing inline quantization during data movement, call this interface to set vector quantization parameters in the quantization flow.
-__aicore__ inline void asc_set_l0c_copy_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool is_clean_unit_flag);
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool enable_unit_flag);
 
 // 2.0 When performing inline format conversion (NZ to ND) during data movement, call this interface to set format conversion configuration.
-__aicore__ inline void asc_set_l0c_copy_nz_para(uint16_t matrix_num, uint16_t src_nz_matrix_stride, uint32_t dst_matrix_stride);
+__aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride);
 
 // 3.0 Set the value in RELU_ALPHA register. This is a 64-bit register storing the alpha value used in Scalar ReLU during fixpipe or cube instructions.
-__aicore__ inline void asc_set_l0c_copy_lrelu_alpha(float scalar_relu_pre_alpha);
+__aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 ```
 
 详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md)。
