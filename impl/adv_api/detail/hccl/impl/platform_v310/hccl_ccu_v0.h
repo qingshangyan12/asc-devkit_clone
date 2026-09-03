@@ -492,7 +492,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const uint8_t missionNum = GetKfcMissionNum(handleId);
     for (uint8_t mission = 0; mission < missionNum; ++mission) {
         ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId, mission);
-        WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
+        ccuMsg_.waitCKEAddr = GetWaitCkeAddr(resourceId, mission);
+        WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.waitCKEAddr), CCU_MSG_CKE_SET_VALUE);
+        // WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
     }
 }
 
@@ -665,12 +667,12 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
     if (workingFlag_) {
         HcclHandle handleId = curHandleId_ - 1;
 
-        while (handleFinishCnt_[handleId] < handleCommitCnt_[handleId]) {
-            Wait(handleId);
-        }
+        // while (handleFinishCnt_[handleId] < handleCommitCnt_[handleId]) {
+        //     Wait(handleId);
+        // }
 
         KERNEL_LOG(KERNEL_INFO, "ApiClient Finalize handleId:%d, globalCurWaitId_:%d", handleId, globalCurWaitId_);
-
+        globalCurWaitId_ = 0;
         GM_ADDR xnAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr) : hcclContext_->xnOffset;
         ccuMsg_.xnAddr = xnAddr + CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE * globalCurWaitId_;
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr) = 0xffffffffffffffff;
