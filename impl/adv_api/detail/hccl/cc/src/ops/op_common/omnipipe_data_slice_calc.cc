@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "omnipipe_data_slice_calc.h"
+#include <cmath>
 
 namespace mc2_ops_hccl {
 constexpr double BANDWIDTH_RATIO_BOUND = 10;
@@ -971,10 +972,10 @@ OmniPipeSliceInfo CalcAGOmniPipeSliceInfo(OmniPipeSliceParam& omniPipeSliceParam
     std::vector<OmniPipeSplitSliceInfo> omniPipeSplitSliceInfoListTotal =
         OmniPipeSplitSliceInfoListAssign(dataSize, rankSize, dataTypeSize);
 
-    u64 zAGDataSize[rankSize][maxStepNum]{}; // 存数据片大小
-    u64 xyAGDataSize[rankSize][maxStepNum]{};
-    u64 xAGDataSize[rankSize][maxStepNum][maxStepNum]{};
-    u64 yAGDataSize[rankSize][maxStepNum][maxStepNum]{};
+    u64 zAGDataSize[rankSize][maxStepNum]; // 存数据片大小
+    u64 xyAGDataSize[rankSize][maxStepNum];
+    u64 xAGDataSize[rankSize][maxStepNum][maxStepNum];
+    u64 yAGDataSize[rankSize][maxStepNum][maxStepNum];
     u64 outerStepNum = 0;                            // 机内机间步数
     u64 innerStepNum = 0;                            // 机内两轴步数
     u64 zAGOffset[rankSize][maxStepNum];             // z轴偏移
