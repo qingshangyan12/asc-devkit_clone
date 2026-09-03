@@ -49,13 +49,18 @@ bool ReadFile(const std::string& filePath, size_t& fileSize, void* buffer, size_
         file.close();
         return false;
     }
-    if (size > bufferSize) {
-        ERROR_LOG("file size is larger than buffer size");
+    if (size != bufferSize) {
+        ERROR_LOG("File size does not match buffer size. path = %s", filePath.c_str());
         file.close();
         return false;
     }
     buf->pubseekpos(0, std::ios::in);
-    buf->sgetn(static_cast<char*>(buffer), size);
+    std::streamsize readSize = buf->sgetn(static_cast<char*>(buffer), size);
+    if (readSize != static_cast<std::streamsize>(size)) {
+        ERROR_LOG("Read file failed. path = %s", filePath.c_str());
+        file.close();
+        return false;
+    }
     fileSize = size;
     file.close();
     return true;
