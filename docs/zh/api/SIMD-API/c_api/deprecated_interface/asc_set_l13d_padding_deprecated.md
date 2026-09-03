@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-**`asc_set_l13d_padding(uint64_t)`重载已废弃。请使用`asc_set_gm2l1_padding`或`asc_set_l12l0a_3d_padding`接口替代。TODO：替代接口文档待补齐。**
+**`asc_set_l13d_padding`接口已废弃。请使用`asc_set_gm2l1_padding`或`asc_set_l12l0a_3d_padding`接口替代。**
 
 设置Pad属性描述，用于在调用[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)接口时配置填充数值。
 
@@ -34,6 +34,9 @@
 
 ```cpp
 __aicore__ inline void asc_set_l13d_padding(uint64_t config)
+__aicore__ inline void asc_set_l13d_padding(half config)
+__aicore__ inline void asc_set_l13d_padding(int16_t config)
+__aicore__ inline void asc_set_l13d_padding(uint16_t config)
 ```
 
 ## 参数说明
