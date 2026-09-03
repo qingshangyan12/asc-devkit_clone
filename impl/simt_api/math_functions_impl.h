@@ -3184,49 +3184,32 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_asin_acos_reduced_arg(flo
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanhf(float x)
 {
-    // Polynomial and threshold constants for the small and large magnitude paths.
-    constexpr float poly_first_coeff = 0.01573968306183815002f;
-    constexpr float small_threshold = 0.60000002384185791016f;
-    constexpr float saturation_threshold = 9.010913848876953125f;
-    constexpr uint32_t sign_mask = 0x80000000U;
+    float ax = x < 0.0f ? -x : x;
 
-    // NaN propagates directly.
-    if (isnan(x)) {
-        return x;
+    // |x| < 0.6 branch: tanh(x) = x * (1 + z * p(z)) with z = x^2, p a 4-term minimax polynomial
+    // evaluated by Horner from the highest term down. The low-order coefficients approximate the
+    // -1/3 and 2/15 terms of the tanh Taylor series.
+    float z = x * x;
+    float p = __fma(0.015739683061838150024f, z, -0.052303962409496307373f);
+    p = __fma(p, z, 0.1331529766321182251f);
+    p = __fma(p, z, -0.33332768082618713379f);
+    float y_small = __fma(p * z, x, x);
+
+    // |x| >= 0.6 branch: tanh|x| = 1 - 2 / (e^(2|x|) + 1). Using |x| keeps the exponent from
+    // overflowing on the negative side.
+    float y_large = 1.0f - 2.0f / (__expf(2.0f * ax) + 1.0f);
+    // From |x| >= 9.010913848876953125 the result is exactly 1.0, so saturate before e^(2|x|) hits inf.
+    if (ax >= 9.010913848876953125f) {
+        y_large = 1.0f;
     }
-    // Infinities saturate to signed one.
-    if (isinf(x)) {
-        return __internal_with_sign_bit(1.0f, x);
+    // tanh is odd: the large branch works on |x|, so restore the sign of the input.
+    if (x < 0.0f) {
+        y_large = -y_large;
     }
 
-    // Use the absolute value for the large-argument exp2 reconstruction.
-    const float abs_x = fabsf(x);
-
-    // Large-argument path based on the exponential identity for tanh.
-    const float exp2_arg = abs_x * 2.8853900432586669922f;
-    const float exp2_value = __powf(2.0f, exp2_arg);
-
-    // Small-argument odd polynomial around zero.
-    const float x2 = x * x;
-    float poly = fmaf(x2, poly_first_coeff, -0.052303962409496307373f);
-    poly = fmaf(x2, poly, 0.13315297663211822510f);
-    poly = fmaf(x2, poly, -0.33332768082618713379f);
-    poly = fmaf(x2, poly, 0.0f);
-
-    // Reconstruct 1 - 2 / (exp(2|x|) + 1) and clamp to signed one in saturation range.
-    float large_result = fmaf(1.0f / (exp2_value + 1.0f), -2.0f, 1.0f);
-    if (abs_x >= saturation_threshold) {
-        large_result = 1.0f;
-    }
-    const uint32_t sign_bit = __float_as_uint(x) & sign_mask;
-    const uint32_t large_result_bits = __float_as_uint(large_result) | sign_bit;
-    float result = __uint_as_float(large_result_bits);
-
-    // Near zero, switch to the polynomial branch.
-    if (abs_x < small_threshold) {
-        result = fmaf(poly, x, x);
-    }
-    return result;
+    // 0.60000002384185791016 is the float nearest 0.6, the switch point between the two branches.
+    float yf = ax >= 0.60000002384185791016f ? y_large : y_small;
+    return yf;
 }
 
 /**
