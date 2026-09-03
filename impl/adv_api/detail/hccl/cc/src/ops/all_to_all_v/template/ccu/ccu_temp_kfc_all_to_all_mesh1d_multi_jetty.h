@@ -13,6 +13,7 @@
 
 #include "ccu_alg_template_base.h"
 #include "kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
+#include "utils.h"
 
 namespace mc2_ops_hccl {
 
