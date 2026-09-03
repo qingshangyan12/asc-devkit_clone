@@ -772,6 +772,7 @@
                 -   [asc_store_atomic_config](SIMD-API/c_api/defs/union/asc_store_atomic_config.md)
             -   [枚举](SIMD-API/c_api/defs/enum/enum.md)
                 -   [asc_hf32_round_mode](SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md)
+                -   [asc_channel_pad_mode](SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md)
                 -   [asc_load_l2_cache_mode](SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md)
                 -   [asc_override_strategy](SIMD-API/c_api/defs/enum/asc_override_strategy.md)
                 -   [asc_saturation_mode](SIMD-API/c_api/defs/enum/asc_saturation_mode.md)
@@ -837,15 +838,21 @@
             -   [asc_set_gm2l1_loop_size](SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md)
             -   [asc_set_gm2l1_nz_para](SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md)
             -   [asc_set_gm2l1_pad](SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md)
+            -   asc_set_gm2l1_padding（TODO：接口文档待补齐）
             -   [asc_set_l0c2gm_quant_post](SIMD-API/c_api/cube_datamove/asc_set_l0c2gm_quant_post.md)
             -   [asc_set_l0c_copy_nz_para](SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md)
             -   [asc_set_l0c_copy_channel_para](SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md)
+            -   asc_set_l0c_copy_config（TODO：接口文档待补齐）
+            -   asc_set_l0c_copy_lrelu_alpha（TODO：接口文档待补齐）
             -   [asc_set_l0c_copy_params](SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_params.md)
             -   [asc_set_l0c_copy_prequant](SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md)
+            -   asc_set_l0c_copy_relu_alpha（TODO：接口文档待补齐）
             -   [asc_set_l13d_fmatrix](SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix.md)
             -   [asc_set_l13d_fmatrix_b](SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix_b.md)
             -   [asc_set_l12l0a_3d_padding](SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md)
+            -   asc_set_l12l0b_3d_padding（TODO：接口文档待补齐）
             -   [asc_set_l13d_rpt](SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md)
+            -   asc_set_l13d_rpt_b（TODO：接口文档待补齐）
             -   [asc_set_l13d_size](SIMD-API/c_api/cube_datamove/asc_set_l13d_size.md)
             -   [asc_set_l3d_rpt_b](SIMD-API/c_api/cube_datamove/asc_set_l3d_rpt_b.md)
             -   [asc_copy_gm2l1](SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1.md)

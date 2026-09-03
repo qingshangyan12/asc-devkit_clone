@@ -82,22 +82,11 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(__cbuf__ half* dst,
 | dst | 输出 | 目的操作数，存储位置为L1 Buffer。目的地址需32字节对齐。 |
 | src | 输入 | 源操作数，存储位置为GM。起始地址需要按照1字节对齐。 |
 | src_d_value | 输入 | 源操作数同一DN矩阵的相邻行起始地址间的偏移，单位字节。取值范围：[0, $2^{40}-1$]。 |
-| l2_cache_mode | 输入 | 使用`asc_load_l2_cache_mode`枚举值配置输入GM数据在L2 Cache中的管理策略。 |
+| l2_cache_mode | 输入 | 使用[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值配置输入GM数据在L2 Cache中的管理策略。 |
 | n_value | 输入 | 源矩阵中DN矩阵的列数，单位为元素。取值范围：[1, 65535]。 |
 | d_value | 输入 | 源矩阵中DN矩阵的行数，单位为元素。取值范围：[1, $2^{21}-1$]。 |
-| src_nd_matrix_stride | 输入 | 源矩阵相邻DN矩阵起始地址间的偏移，单位为字节。取值范围：[0, $2^{40}-1$]。 |
-| enable_small_c0 | 输入 | SmallC0模式开关，仅当$d\_value \le 4$时可开启，否则导致搬运异常。 |
-
-**表2** `asc_load_l2_cache_mode`枚举值说明
-
-| 枚举值 | 数值 | 含义 |
-|------|------|------|
-| `asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM` | 0 | 启用L2 Cache，并将分配的Cache Line标记为高替换优先级。 |
-| `asc_load_l2_cache_mode::NORMAL_LAST_VICTIM` | 1 | 启用L2 Cache，并将分配的Cache Line标记为低替换优先级。 |
-| `asc_load_l2_cache_mode::NORMAL_PERSISTENT` | 2 | 启用L2 Cache，并将分配的Cache Line标记为驻留模式。 |
-| `asc_load_l2_cache_mode::NOTALLOC_KEEP` | 4 | 不分配L2 Cache Line，并保持已有Cache Line状态不变。 |
-| `asc_load_l2_cache_mode::NOTALLOC_CLEAN` | 5 | 不分配L2 Cache Line，并清除已有Cache Line。 |
-| `asc_load_l2_cache_mode::NOTALLOC_DROP` | 6 | 不分配L2 Cache Line，并丢弃已有Cache Line。 |
+| src_nd_matrix_stride | 输入 | 源矩阵相邻DN矩阵起始地址间的偏移，单位为字节。取值范围：[0, $2^{40}-1$]。<br>&nbsp;&nbsp;&bull; 源矩阵DN矩阵个数为1时，此参数无意义，设置为0即可。<br>&nbsp;&nbsp;&bull; 源矩阵DN矩阵个数大于1时，当`src_nd_matrix_stride = 0`时，表示重复搬出源矩阵的第一个DN矩阵。 |
+| enable_small_c0 | 输入 | SmallC0模式开关，仅当$d\_value \le 4$时可开启，否则导致搬运异常。<br>&nbsp;&nbsp;&bull; `false`：不开启SmallC0模式，按标准Nz格式的C0（32字节）排布搬运；<br>&nbsp;&nbsp;&bull; `true`：开启SmallC0模式，搬运过程中搬运的数据量不满足$4 \times \mathrm{sizeof}(\mathrm{dtype})$字节对齐时，硬件在目的矩阵中自动补0至$4 \times \mathrm{sizeof}(\mathrm{dtype})$字节对齐。 |
 
 ## 返回值说明
 

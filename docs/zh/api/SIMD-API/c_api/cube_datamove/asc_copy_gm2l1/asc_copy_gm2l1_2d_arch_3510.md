@@ -78,18 +78,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ bfloat16_t* dst,
 | dst_stride | 输入 | 目的矩阵列方向前一个分形起始地址与后一个分形起始地址的间隔，单位512字节。取值范围：[0, 4095]。 |
 | m_step | 输入 | 源矩阵行方向分形步长，即搬运的分形行数，单位为16个元素。取值范围：[1, 4095]。 |
 | k_step | 输入 | 源矩阵列方向分形步长，即搬运的分形列数，单位32字节。取值范围：[1, 4095]。 |
-| l2_cache_mode | 输入 | 使用`asc_load_l2_cache_mode`枚举值配置数据在L2 Cache中的管理策略。 |
-
-**表2** `asc_load_l2_cache_mode`枚举值说明 <a id="table2"></a>
-
-| 枚举值 | 数值 | 含义 |
-|------|------|------|
-| `asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM` | 0 | 启用L2 Cache，并将分配的Cache Line标记为高替换优先级。 |
-| `asc_load_l2_cache_mode::NORMAL_LAST_VICTIM` | 1 | 启用L2 Cache，并将分配的Cache Line标记为低替换优先级。 |
-| `asc_load_l2_cache_mode::NORMAL_PERSISTENT` | 2 | 启用L2 Cache，并将分配的Cache Line标记为驻留模式。 |
-| `asc_load_l2_cache_mode::NOTALLOC_KEEP` | 4 | 不分配L2 Cache Line，并保持已有Cache Line状态不变。 |
-| `asc_load_l2_cache_mode::NOTALLOC_CLEAN` | 5 | 不分配L2 Cache Line，并清除已有Cache Line。 |
-| `asc_load_l2_cache_mode::NOTALLOC_DROP` | 6 | 不分配L2 Cache Line，并丢弃已有Cache Line。 |
+| l2_cache_mode | 输入 | 使用[asc_load_l2_cache_mode](../../defs/enum/asc_load_l2_cache_mode.md)枚举值配置数据在L2 Cache中的管理策略。 |
 
 ## 返回值说明
 
