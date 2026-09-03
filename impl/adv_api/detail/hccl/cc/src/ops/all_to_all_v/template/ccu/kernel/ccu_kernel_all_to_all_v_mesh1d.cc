@@ -72,8 +72,7 @@ CcuResult CcuAlltoAllVMesh1DKernel(
         if (peerId == rankId) {
             continue;
         }
-        ccu::Variable peerRecvBase;
-        peerRecvBase = outputAddr + extArgs[peerId * A2AV_EXT_FIELD_NUM + A2AV_RECV_OFFSET_IDX];
+        ccu::Variable peerRecvBase = outputAddr + extArgs[peerId * A2AV_EXT_FIELD_NUM + A2AV_RECV_OFFSET_IDX];
         ccu::WriteVariableWithNotify(
             channels[channelIdx], peerRecvBase, A2AV_OUTPUT_XN_ID, A2AV_PRE_SYNC_CKE_IDX, A2AV_OUTPUT_BIT);
         ccu::WriteVariableWithNotify(

@@ -59,8 +59,7 @@ struct KfcServerContext : CcuKernelCtxBase {
     const char* exportDieSig;
     const char* importDieSig;
 
-    // TODO：当前missionNum_=1，missionIndex_=0---
-    // 用于Mission间同步信号
+    // 当前missionNum_=1，missionIndex_=0，用于Mission间同步信号
     std::vector<const char*> exportMissoinSig;
     std::vector<const char*> importMissionSig;
     // 用于Mission间同步变量
