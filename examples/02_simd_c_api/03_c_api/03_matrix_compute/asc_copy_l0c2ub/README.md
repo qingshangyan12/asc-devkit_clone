@@ -1,4 +1,4 @@
-# fixpipe_l0c2ub样例
+# asc_copy_l0c2ub样例
 
 ## 概述
 
@@ -8,25 +8,25 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
 ```
-├── fixpipe_l0c2ub
+├── asc_copy_l0c2ub
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py           // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
 │   ├── figures                        // 图示
-│   ├── fixpipe_l0c2ub.asc             // SIMD C API样例实现及调用样例
+│   ├── asc_copy_l0c2ub.asc             // SIMD C API样例实现及调用样例
 │   └── README.md                      // 样例说明文档
 ```
 
 ## 场景详细说明
 
-本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `fixpipe_l0c2ub`。
+本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `asc_copy_l0c2ub`。
 
 <a name="表1"></a>
 <table border="2" align="center">
@@ -57,7 +57,7 @@
 - 实现：调用`asc_copy_l0c2ub`时设置`dual_dst_mode = asc_dual_dst_mode::DUAL_DST_SPLIT_M`和`enable_nz2nd = true`，M必须为2的倍数
 - 说明：使用双目标模式将数据拆分输出到UB，按M维度拆分的两个核各处理一半数据
 <p align="center">
-  <img src="figures/fixpipe_l0c2ub_split_m.png" width="500">
+  <img src="figures/asc_copy_l0c2ub_split_m.png" width="500">
 </p>
 
 **场景4：输出格式ND，输出数据类型float，使能双目标模式，按N维度拆分，同时写入两个子块（SUB BLOCK）的UB中**
@@ -66,7 +66,7 @@
 - 实现：调用`asc_copy_l0c2ub`时设置`dual_dst_mode = asc_dual_dst_mode::DUAL_DST_SPLIT_N`和`enable_nz2nd = true`，N必须为32的倍数
 - 说明：使用双目标模式将数据拆分输出到UB，按N维度拆分的两个核各处理一半数据
 <p align="center">
-  <img src="figures/fixpipe_l0c2ub_split_n.png" width="500">
+  <img src="figures/asc_copy_l0c2ub_split_n.png" width="500">
 </p>
 
 ## 编译运行

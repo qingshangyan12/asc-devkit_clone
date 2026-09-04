@@ -1,4 +1,4 @@
-# fixpipe_l0c2ub Example
+# asc_copy_l0c2ub Example
 
 ## Overview
 
@@ -8,25 +8,25 @@ This example demonstrates how to use the SIMD C API `asc_copy_l0c2ub` to transfe
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
 ```
-├── fixpipe_l0c2ub
+├── asc_copy_l0c2ub
 │   ├── scripts
 │   │   ├── gen_data.py                // Script for generating input data and ground truth data
 │   │   └── verify_result.py           // Script for verifying whether output data matches ground truth data
 │   ├── CMakeLists.txt                 // Build project file
 │   ├── data_utils.h                   // Data read/write functions
 │   ├── figures                        // Illustrations
-│   ├── fixpipe_l0c2ub.asc             // SIMD C API implementation and invocation
+│   ├── asc_copy_l0c2ub.asc             // SIMD C API implementation and invocation
 │   └── README.md                      // Example documentation
 ```
 
 ## Scenario Description
 
-This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different SCENARIO_NUM values are shown in the table below. All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 256, 128], with kernel function name `fixpipe_l0c2ub`.
+This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different SCENARIO_NUM values are shown in the table below. All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 256, 128], with kernel function name `asc_copy_l0c2ub`.
 
 <a name="table1"></a>
 <table border="2" align="center">
@@ -57,7 +57,7 @@ This example selects different output scenarios through the compilation paramete
 - Implementation: Call `asc_copy_l0c2ub` with `dual_dst_mode = asc_dual_dst_mode::DUAL_DST_SPLIT_M` and `enable_nz2nd = true`; M must be a multiple of 2
 - Description: Use dual-target mode to split data output to UB, two cores split by M dimension each process half the data
 <p align="center">
-  <img src="figures/fixpipe_l0c2ub_split_m.png" width="500">
+  <img src="figures/asc_copy_l0c2ub_split_m.png" width="500">
 </p>
 
 **Scenario 4: Output format ND, output data type float, dual-target mode enabled, split by N dimension, writing to two sub-blocks (SUB BLOCK) UB simultaneously**
@@ -66,7 +66,7 @@ This example selects different output scenarios through the compilation paramete
 - Implementation: Call `asc_copy_l0c2ub` with `dual_dst_mode = asc_dual_dst_mode::DUAL_DST_SPLIT_N` and `enable_nz2nd = true`; N must be a multiple of 32
 - Description: Use dual-target mode to split data output to UB, two cores split by N dimension each process half the data
 <p align="center">
-  <img src="figures/fixpipe_l0c2ub_split_n.png" width="500">
+  <img src="figures/asc_copy_l0c2ub_split_n.png" width="500">
 </p>
 
 ## Build and Run

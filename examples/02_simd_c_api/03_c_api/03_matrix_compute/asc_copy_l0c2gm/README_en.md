@@ -1,4 +1,4 @@
-# fixpipe_l0c2gm Example
+# asc_copy_l0c2gm Example
 
 ## Overview
 
@@ -8,19 +8,19 @@ This example demonstrates how to use the SIMD C API `asc_copy_l0c2gm` to transfe
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
 ```
-├── fixpipe_l0c2gm
+├── asc_copy_l0c2gm
 │   ├── figures                        // Illustrations
 │   ├── scripts
 │   │   ├── gen_data.py                // Script for generating input data and ground truth data
 │   │   └── verify_result.py           // Script for verifying whether output data matches ground truth data
 │   ├── CMakeLists.txt                 // Build project file
 │   ├── data_utils.h                   // Data read/write functions
-│   ├── fixpipe_l0c2gm.asc             // SIMD C API implementation and invocation
+│   ├── asc_copy_l0c2gm.asc             // SIMD C API implementation and invocation
 │   └── README.md                      // Example documentation
 ```
 
@@ -48,7 +48,7 @@ This `dav-3510` example describes each transfer through the addresses, shape, st
 
 ## Scenario Description
 
-This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different SCENARIO_NUM values are shown in the table below. All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 256, 128], with kernel function name `fixpipe_l0c2gm`.
+This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different SCENARIO_NUM values are shown in the table below. All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 256, 128], with kernel function name `asc_copy_l0c2gm`.
 
 <a name="table2"></a>
 <table border="2" align="center">
@@ -70,7 +70,7 @@ This example selects different output scenarios through the compilation paramete
 - Implementation: Call `asc_copy_l0c2gm` with Nz2ND, Nz2DN, quantization, ReLU, and ChannelSplit disabled to write Nz directly
 - Description: L0C data in Nz format directly output to GM in Nz format, data remains unchanged
 <p align="center">
-  <img src="figures/fixpipe_l0c2gm_NZ2NZ.png" width="800">
+  <img src="figures/asc_copy_l0c2gm_NZ2NZ.png" width="800">
 </p>
 
 **Scenario 2: Output format ND, output data type float**
@@ -79,7 +79,7 @@ This example selects different output scenarios through the compilation paramete
 - Implementation: Call `asc_set_l0c_copy_nz_para(1, 0, 0)` for a single matrix, then call `asc_copy_l0c2gm` with `enable_nz2nd = true`
 - Description: Convert Nz format data in CO1 to ND format output to GM. ND format has no alignment requirements like Nz format; parameters should be configured based on actual size during output
 <p align="center">
-  <img src="figures/fixpipe_l0c2gm_NZ2ND.png" width="800">
+  <img src="figures/asc_copy_l0c2gm_NZ2ND.png" width="800">
 </p>
 
 **Scenario 3: Output format DN, output data type float (only supported on Ascend 950PR/Ascend 950DT)**
@@ -88,7 +88,7 @@ This example selects different output scenarios through the compilation paramete
 - Implementation: Call `asc_set_l0c_copy_channel_para(1)` and `asc_set_l0c_copy_nz_para(1, 0, 0)`, then call `asc_copy_l0c2gm` with `enable_nz2dn = true`
 - Description: Convert Nz format data in CO1 to DN format output to GM
 <p align="center">
-  <img src="figures/fixpipe_l0c2gm_NZ2DN.png" width="800">
+  <img src="figures/asc_copy_l0c2gm_NZ2DN.png" width="800">
 </p>
 
 **Scenario 4: Output format ND, output data type int8_t, Scalar quantization enabled**
