@@ -97,17 +97,17 @@ enum AlgorithmType {
     CcuAllReduceMesh2DOneShot,
     CcuSchedAllToAllSoleMesh = 150,
     CcuSchedAllToAllVSoleMesh,
+    CcuSchedAllGatherSoleMesh,
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
-    {"CcuAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D},
     {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
     {"CcuSchedAllGatherConcurMeshNHRMultiLink", CcuSchedAllGatherConcurMeshNHRMultiLink},
     {"CcuSchedReduceScatterSoleMesh", CcuReduceScatterMeshMem2Mem1D},
     {"CcuSchedAllToAllSoleMesh", CcuSchedAllToAllSoleMesh},
     {"CcuSchedAllToAllVSoleMesh", CcuSchedAllToAllVSoleMesh},
     {"CcuSchedAllReduceSoleMesh", CcuAllReduceMeshMem2Mem1D},
-    {"CcuSchedAllGatherMesh1DMem2Mem", CcuAllGatherMeshMem2Mem1D}};
+    {"CcuSchedAllGatherSoleMesh", CcuSchedAllGatherSoleMesh}};
 
 typedef HcclResult (*OpParamPrepareFunc)(
     HcclComm comm, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& param);
@@ -198,8 +198,9 @@ HcclResult GetOpParam(
 HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex);
 
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
+// checkOnly为true时逐算子走真实资源链探测资源是否充足（UNAVAIL统一映射为HCCL_E_RES_NOT_SUFFICIENT）
 HcclResult CcuSelectAlg(
     HcclComm comm, void* stream, const std::string topoTag[], const void* ccTilingList[], uint32_t tilingNum,
-    void* mc2Tiling, OpResCtx& opResCtx);
+    void* mc2Tiling, OpResCtx& opResCtx, bool checkOnly = false);
 
 #endif

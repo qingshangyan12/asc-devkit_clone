@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 将输入的指针转换为其指向的Unified Buffer（UB）内存空间的地址值并返回。
 
 ## 函数原型
@@ -56,29 +58,22 @@ size_t __cvta_generic_to_ubuf(const void* ptr)
 
 SIMD与SIMT混合编程场景不支持使用该接口。
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
-
 ## 调用示例
 
 SIMT编程场景：
 
 ```cpp
-__global__ __launch_bounds__(1024) void kernel__cvta_generic_to_ubuf(uint32_t* src)
+#include "simt_api/device_functions.h"
+
+__global__ __launch_bounds__(1024) void kernel__cvta_generic_to_ubuf(uint32_t* src, uint32_t total_length)
 {
     __ubuf__ uint32_t ubuf_data[1024];
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    if (idx >= total_length) {
+        return;
+    }
     ubuf_data[threadIdx.x] = src[idx];
     size_t addr_val = __cvta_generic_to_ubuf(ubuf_data + threadIdx.x);
-    if (addr_val > (256-32) * 1024) { // 256:UB总容量，32:Dcache容量
-        printf("UB(ubuf_data)溢出，偏移量为：%lu\n", addr_val);
-    } else {
-        printf("UB(ubuf_data)的偏移量为：%lu\n", addr_val);
-    }
+    printf("UB(ubuf_data)的地址值为：%lu\n", addr_val);
 }
 ```
