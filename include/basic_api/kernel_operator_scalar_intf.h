@@ -90,11 +90,11 @@ __aicore__ constexpr inline float Cast(const T& bVal);
 #endif
 
 template <typename T>
-[[deprecated("Deprecated since 9.1.0, will be removed after 2027/12/30, Use WriteGmBypassDCache instead.")]]
+[[deprecated("Deprecated since 9.2.0, will be removed after 2027/12/30, Use WriteGmBypassDCache instead.")]]
 __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value);
 
 template <typename T>
-[[deprecated("Deprecated since 9.1.0, will be removed after 2027/12/30, Use ReadGmBypassDCache instead.")]]
+[[deprecated("Deprecated since 9.2.0, will be removed after 2027/12/30, Use ReadGmBypassDCache instead.")]]
 __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr);
 
 template <typename T>
