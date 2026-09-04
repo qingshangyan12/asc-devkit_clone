@@ -3256,41 +3256,56 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float scalblnf(float x, int64_t n)
     return __internal_scalbnf_clamped(x, clamped_n);
 }
 
+/**
+ * Computes sin(pi * x) and cos(pi * x) with a shared reduced-argument path.
+ *
+ * The implementation first classifies special values, but keeps the main
+ * reduction and polynomial evaluation running on a safe substitute input.
+ * It then reduces x around the nearest half-integer multiple, evaluates the
+ * sine and cosine polynomials on the reduced argument, and selects the final
+ * branch by quadrant.
+ *
+ * Special values and very large finite inputs are overridden at the end:
+ *   - NaN/inf produce NaN results for both outputs
+ *   - |x| > 2^24 maps to sin(pi*x) = 0 and cos(pi*x) = 1
+ *
+ * @param x The input value.
+ * @param sin_result Output location for sin(pi * x).
+ * @param cos_result Output location for cos(pi * x).
+ */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_sincospif_core(float x, float* sin_result, float* cos_result)
 {
-    constexpr float large_input_bound = 16777216.0f;
-    constexpr float pi_hi = 3.1415927410125732422f;
+    constexpr float large_input_bound = __internal_fp32_scale_2p24;
+    constexpr float pi_hi = 3.1415927410125732422f; // High-precision single-precision pi constant.
 
-    if (isnan(x) || isinf(x)) {
-        const float nan_result = x - x;
-        *sin_result = nan_result;
-        *cos_result = nan_result;
-        return;
-    }
+    // Classify inputs first, but keep the main reduction path running on a safe value.
+    const bool is_nan = isnan(x);
+    const bool is_inf = isinf(x);
+    const bool is_special = is_nan || is_inf;
+    const bool is_large_input = !is_special && fabsf(x) > large_input_bound;
+    const float safe_x = is_special ? 0.0f : x;
 
-    if (fabsf(x) > large_input_bound) {
-        *sin_result = 0.0f * x;
-        *cos_result = 1.0f;
-        return;
-    }
-
-    const float two_x = x + x;
+    // Reduce x to a small remainder around the nearest half-integer multiple.
+    const float two_x = safe_x + safe_x;
     const int32_t quadrant = __float2int_rn(two_x);
     const float rounded_two_x = __int2float_rn(quadrant);
-    const bool is_integer = (truncf(x) == x);
-    const float reduced = fmaf(-rounded_two_x, 0.5f, x);
+    const bool is_integer = !is_special && (truncf(x) == x);
+    const float reduced = fmaf(-rounded_two_x, 0.5f, safe_x);
     const float reduced2 = reduced * reduced;
 
+    // sin(pi*r) polynomial on the reduced argument.
     float sin_poly = fmaf(reduced2, -0.59248024225234985352f, 2.550144195556640625f);
     sin_poly = fmaf(reduced2, sin_poly, -5.1677198410034179688f);
     const float reduced3 = reduced * reduced2;
     float sin_value = fmaf(sin_poly, reduced3, reduced * pi_hi);
 
+    // cos(pi*r) polynomial on the same reduced argument.
     float cos_value = fmaf(reduced2, 0.22686031460762023926f, -1.334560394287109375f);
     cos_value = fmaf(reduced2, cos_value, 4.0586924552917480469f);
     cos_value = fmaf(reduced2, cos_value, -4.9348020553588867188f);
     cos_value = fmaf(reduced2, cos_value, 1.0f);
 
+    // Select sin/cos branches and restore the correct signs for the quadrant.
     float selected_sin = ((quadrant & 1) != 0) ? cos_value : sin_value;
     float selected_cos = ((quadrant & 1) != 0) ? sin_value : cos_value;
     if ((quadrant & 2) != 0) {
@@ -3300,11 +3315,23 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_sincospif_core(float x, fl
         selected_cos = -selected_cos;
     }
     if (is_integer) {
-        selected_sin = 0.0f * x;
+        selected_sin = 0.0f * safe_x;
     }
 
-    *sin_result = selected_sin;
-    *cos_result = selected_cos;
+    // Override the finite-path result for special and very large inputs.
+    float final_sin = selected_sin;
+    float final_cos = selected_cos;
+    if (is_special) {
+        const float nan_result = x - x;
+        final_sin = nan_result;
+        final_cos = nan_result;
+    } else if (is_large_input) {
+        final_sin = 0.0f * x;
+        final_cos = 1.0f;
+    }
+
+    *sin_result = final_sin;
+    *cos_result = final_cos;
 }
 
 #define __INTERNAL_SINCOSPIF(x, s, c)                             \
@@ -3389,16 +3416,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x)
     constexpr float large_input_bound = __internal_fp32_scale_2p24;
     constexpr float pi_hi = 3.1415927410125732422f; // High-precision single-precision pi constant.
 
-    // NaN and infinity propagate to NaN.
-    if (isnan(x) || isinf(x)) {
-        return ASCRT_NAN_F;
-    }
-
-    // Very large magnitudes are treated as zero after range reduction.
-    if (fabsf(x) > large_input_bound) {
-        return 0.0f * x;
-    }
-
     // Keep a truncated copy so exact integers can be forced to signed zero later.
     const float truncated_x = truncf(x);
 
@@ -3432,7 +3449,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x)
         result = -result;
     }
     // Exact integers map to signed zero.
-    if (truncated_x == x) {
+    if (truncated_x == x || fabsf(x) > large_input_bound) {
         result = 0.0f * x;
     }
 
@@ -3442,8 +3459,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_tanpif_small(float x)
 {
     // Split pi into hi/lo parts so the argument reduction stays accurate.
-    constexpr float pi_hi = 3.1415927410125732422f;
-    constexpr float pi_lo = -8.7422776573475857731e-08f;
+    constexpr float pi_hi = 3.1415927410125732422f;      // High-precision single-precision pi constant.
+    constexpr float pi_lo = -8.7422776573475857731e-08f; // Low-precision single-precision pi constant.
     const float arg = fmaf(x, pi_hi, x * pi_lo);
     return tanf(arg);
 }
@@ -3477,16 +3494,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanpif(float x)
 {
     // Very large magnitudes are treated as zero after range reduction.
     constexpr float large_input_bound = __internal_fp32_scale_2p24;
-
-    // NaN and infinity propagate to NaN.
-    if (isnan(x) || isinf(x)) {
-        return ASCRT_NAN_F;
-    }
-    // Large inputs collapse to signed zero.
-    if (fabsf(x) >= large_input_bound) {
-        return 0.0f * x;
-    }
-
+    float result;
     // Reduce x by the nearest integer and work on the fractional part.
     const int32_t nearest_integer = __float2int_rn(x);
     const float rounded_integer = __int2float_rn(nearest_integer);
@@ -3494,23 +3502,22 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanpif(float x)
     const float abs_reduced = fabsf(reduced);
 
     // Exact integers map to signed zero.
-    if (reduced == 0.0f) {
-        return 0.0f * x;
+    if (reduced == 0.0f || fabsf(x) >= large_input_bound) {
+        result = 0.0f * x;
+    } else if (abs_reduced == 0.5f) {
+        // Exact half-integers map to signed infinity.
+        result = __internal_with_sign_bit(ASCRT_INF_F, reduced);
+    } else if (abs_reduced <= 0.25f) {
+        // Small reduced arguments use the direct tangent polynomial path.
+        result = __internal_tanpif_small(reduced);
+    } else {
+        // Near half-integers, use tan(pi*x) = 1 / tan(pi*(0.5 - |r|)).
+        const float distance_to_half = 0.5f - abs_reduced;
+        const float cot_base = __internal_tanpif_small(distance_to_half);
+        const float r_cot_base = 1.0f / cot_base;
+        result = __internal_with_sign_bit(r_cot_base, reduced);
     }
-    // Exact half-integers map to signed infinity.
-    if (abs_reduced == 0.5f) {
-        return __internal_with_sign_bit(ASCRT_INF_F, reduced);
-    }
-    // Small reduced arguments use the direct tangent polynomial path.
-    if (abs_reduced <= 0.25f) {
-        return __internal_tanpif_small(reduced);
-    }
-
-    // Near half-integers, use tan(pi*x) = 1 / tan(pi*(0.5 - |r|)).
-    const float distance_to_half = 0.5f - abs_reduced;
-    const float cot_base = __internal_tanpif_small(distance_to_half);
-    const float result = 1.0f / cot_base;
-    return __internal_with_sign_bit(result, reduced);
+    return result;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_euler_gamma_function(float x)
@@ -3556,17 +3563,18 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cal_abs_x(float x)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_stirling_and_euler_reflection(float x)
 {
     // Constants used by the log/exp split, Stirling reconstruction, and tail handling.
-    constexpr float log2e_hi = __internal_fp32_log2e;
-    constexpr float log2e_lo = 1.925963033500011079e-08f;
-    constexpr float sqrt_two_pi = 2.5066282749176025391f;
-    constexpr float subnormal_scale = __internal_fp32_scale_2p24;
-    constexpr float subnormal_exponent_fix = __internal_fp32_subnormal_exponent_fix;
-    constexpr float log_exponent_scale = __internal_fp32_log_exponent_scale;
-    constexpr uint32_t log_reduction_mask = 0xFF800000U;
-    constexpr uint32_t sqrt_half_bits = 0x3F3504F3U;
-    constexpr float large_reflection_bound = 33.0f;
-    constexpr float negative_exponent_offset = 48.0f;
-    constexpr float exp2_overflow_abs_bound = 152.0f;
+    constexpr float log2e_hi = __internal_fp32_log2e;     // High part of log2(e).
+    constexpr float log2e_lo = 1.925963033500011079e-08f; // Low part of log2(e); log2(e) ~= log2e_hi + log2e_lo.
+    constexpr float sqrt_two_pi = 2.5066282749176025391f; // sqrt(2*pi); leading constant of the Stirling main term.
+    constexpr float subnormal_scale = __internal_fp32_scale_2p24; // 2^24; lifts subnormal |x| into the normal range.
+    constexpr float subnormal_exponent_fix = __internal_fp32_subnormal_exponent_fix; // -24.0f; undoes the 2^24 scaling.
+    constexpr float log_exponent_scale =
+        __internal_fp32_log_exponent_scale;              // 2^-23; converts exponent bits to log2 domain.
+    constexpr uint32_t log_reduction_mask = 0xFF800000U; // Keeps sign+exponent bits, clears mantissa.
+    constexpr uint32_t sqrt_half_bits = 0x3F3504F3U;     // Bit pattern of sqrt(0.5); centers reduced mantissa near 1.
+    constexpr float large_reflection_bound = 33.0f;   // |x| threshold for pre-scaling the negative reflection branch.
+    constexpr float negative_exponent_offset = 48.0f; // Exponent offset injected to avoid intermediate underflow.
+    constexpr float exp2_overflow_abs_bound = 152.0f; // |exponent| beyond which 2^exponent overflows/underflows fp32.
 
     // Clamp the Stirling input range and keep only the absolute magnitude.
     const float abs_x = __internal_cal_abs_x(x);
@@ -3729,27 +3737,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tgammaf(float x)
 {
     constexpr float tgamma_stirling_bound = 41.09999847412109375f;
 
-    // Special values follow IEEE-style gamma semantics.
-    if (isnan(x)) {
-        return x;
-    }
-    if (x == ASCRT_INF_F) {
-        return ASCRT_INF_F;
-    }
-    if (x == -ASCRT_INF_F) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-    if (x == 0.0f) {
-        return 1.0f / x;
-    }
-
     // Small magnitudes use the Euler gamma correction path; larger ones use Stirling/reflection.
     float result = fabsf(x) < 1.5f ? __internal_euler_gamma_function(x) : __internal_stirling_and_euler_reflection(x);
 
     // Integer inputs on the negative side are poles of gamma.
     const float truncated_x = truncf(x);
     if (truncated_x == x) {
-        return x < 0.0f ? ASCRT_INF_F / ASCRT_INF_F : result;
+        result = x < 0.0f ? ASCRT_INF_F / ASCRT_INF_F : result;
     }
 
     // For large negative non-integers, odd integer truncations force a sign correction to zero.
@@ -3759,6 +3753,21 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tgammaf(float x)
             result = 0.0f;
         }
     }
+
+    // Special values follow IEEE-style gamma semantics.
+    if (isnan(x)) {
+        result = x;
+    }
+    if (x == ASCRT_INF_F) {
+        result = ASCRT_INF_F;
+    }
+    if (x == -ASCRT_INF_F) {
+        result = ASCRT_INF_F / ASCRT_INF_F;
+    }
+    if (x == 0.0f) {
+        result = 1.0f / x;
+    }
+
     return result;
 }
 
