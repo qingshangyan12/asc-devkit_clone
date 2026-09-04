@@ -394,7 +394,7 @@ class OpCompilation:
 
             self.__compile_res = True
         except Exception as e:
-            logger.error("Exception occured, %s", str(e))
+            logger.error("Exception occurred, %s", str(e))
             self.record_compile_error_info(op_info, idx, op, str(e))
             self.__compile_res = False
         finally:
