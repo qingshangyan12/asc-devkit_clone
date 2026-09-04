@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <algorithm>
 #include <array>
 #include <cstring>
 #include <limits>
@@ -28,6 +29,7 @@ int32_t TaskCacheLookupStub(const char*, bool* isHit)
 {
     auto& state = GetMc2TaskCacheTestStubState();
     ++state.lookupCalls;
+    state.events.emplace_back("cache_lookup");
     *isHit = state.lookupHit;
     return state.lookupRet;
 }
@@ -36,6 +38,7 @@ int32_t TaskCacheStartStub(const char*, void**, uint64_t*, uint64_t)
 {
     auto& state = GetMc2TaskCacheTestStubState();
     ++state.cacheStartCalls;
+    state.events.emplace_back("cache_start");
     return state.cacheStartRet;
 }
 
@@ -43,6 +46,7 @@ int32_t TaskCacheEndStub(const char*)
 {
     auto& state = GetMc2TaskCacheTestStubState();
     ++state.cacheEndCalls;
+    state.events.emplace_back("cache_end");
     return state.cacheEndRet;
 }
 
@@ -50,6 +54,7 @@ int32_t TaskCacheExecuteStub(const char*, void**, uint64_t*, uint64_t)
 {
     auto& state = GetMc2TaskCacheTestStubState();
     ++state.executeCalls;
+    state.events.emplace_back("cache_execute");
     return state.executeRet;
 }
 
@@ -57,6 +62,7 @@ int32_t TaskCacheClearStub(const char*)
 {
     auto& state = GetMc2TaskCacheTestStubState();
     ++state.clearCalls;
+    state.events.emplace_back("cache_clear");
     return state.clearRet;
 }
 
@@ -108,6 +114,12 @@ TaskCacheInputs MakeTaskCacheInputs(HcclCMDType opType)
     channel.remoteCclMem.size = 1024U * 1024U;
     inputs.resCtx.channels = {{channel}};
 
+    if (opType == HCCL_CMD_ALLREDUCE) {
+        inputs.param.deviceOrderThread = static_cast<ThreadHandle>(9U);
+        inputs.resCtx.notifyNumOnMainThread = 2U;
+        inputs.resCtx.notifyNumPerThread = {4U, 3U};
+    }
+
     if (opType == HCCL_CMD_ALLTOALL || opType == HCCL_CMD_ALLTOALLV) {
         for (uint32_t rank = 0U; rank < inputs.resCtx.topoInfo.userRankSize; ++rank) {
             inputs.sendCounts[rank] = rank + 1U;
@@ -128,6 +140,7 @@ protected:
     {
         ResetAlgEnvConfigInitState();
         ResetMc2TaskCacheTestStubState();
+        GetMc2TaskCacheTestStubState().interceptNotifyCalls = true;
         Mc2HcommAicpuTsTaskCacheSetTestFunctions(
             TaskCacheLookupStub, TaskCacheStartStub, TaskCacheEndStub, TaskCacheExecuteStub, TaskCacheClearStub);
     }
@@ -174,7 +187,7 @@ TEST_F(Mc2AicpuTaskCacheTest, BuildsPlansForAllSupportedOperations)
         Mc2AicpuTaskCachePlan plan;
         ASSERT_EQ(BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, plan), HCCL_SUCCESS);
         EXPECT_TRUE(plan.enabled);
-        EXPECT_EQ(plan.tag.find("mc2tc:v1:"), 0U);
+        EXPECT_EQ(plan.tag.find("mc2tc:v2:"), 0U);
     }
 }
 
@@ -193,6 +206,22 @@ TEST_F(Mc2AicpuTaskCacheTest, ShapeAndAllToAllVArraysChangeTheTag)
     ASSERT_EQ(BuildMc2AicpuTaskCachePlan(allToAllV.param, allToAllV.resCtx, first), HCCL_SUCCESS);
     allToAllV.recvCounts[3] += 1U;
     ASSERT_EQ(BuildMc2AicpuTaskCachePlan(allToAllV.param, allToAllV.resCtx, second), HCCL_SUCCESS);
+    EXPECT_NE(first.tag, second.tag);
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, AllReduceReplayGateResourcesChangeTheTag)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLREDUCE);
+    Mc2AicpuTaskCachePlan first;
+    Mc2AicpuTaskCachePlan second;
+    ASSERT_EQ(BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, first), HCCL_SUCCESS);
+    inputs.param.deviceOrderThread += 1U;
+    ASSERT_EQ(BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, second), HCCL_SUCCESS);
+    EXPECT_NE(first.tag, second.tag);
+
+    inputs.param.deviceOrderThread -= 1U;
+    inputs.resCtx.threads.front() += 1U;
+    ASSERT_EQ(BuildMc2AicpuTaskCachePlan(inputs.param, inputs.resCtx, second), HCCL_SUCCESS);
     EXPECT_NE(first.tag, second.tag);
 }
 
@@ -427,6 +456,163 @@ TEST_F(Mc2AicpuTaskCacheTest, CacheEndFailureClearsAndReturnsError)
     EXPECT_EQ(executorCalls, 1U);
     EXPECT_EQ(state.cacheEndCalls, 1U);
     EXPECT_EQ(state.clearCalls, 1U);
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, AllReduceCacheMissReleasesOnlyAfterAllBatchesArePublished)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLREDUCE);
+    Mc2AicpuTaskCacheManager manager(2U, 1024U);
+    auto& state = GetMc2TaskCacheTestStubState();
+    uint32_t executorCalls = 0U;
+    ASSERT_EQ(
+        RunWithMc2TaskCache(
+            inputs.param, inputs.resCtx,
+            [&executorCalls, &state]() {
+                ++executorCalls;
+                state.events.emplace_back("executor");
+                return HCCL_SUCCESS;
+            },
+            manager),
+        HCCL_SUCCESS);
+
+    const std::vector<std::string> expectedEvents = {
+        "batch_start", "cache_lookup", "cache_start", "notify_wait", "executor",
+        "batch_end", "batch_start", "cache_end", "batch_end", "notify_record"};
+    EXPECT_EQ(state.events, expectedEvents);
+    EXPECT_EQ(executorCalls, 1U);
+    EXPECT_EQ(state.notifyWaitCalls, 1U);
+    EXPECT_EQ(state.notifyRecordCalls, 1U);
+    EXPECT_EQ(state.waitThread, static_cast<ThreadHandle>(1U));
+    EXPECT_EQ(state.recordThread, static_cast<ThreadHandle>(9U));
+    EXPECT_EQ(state.recordDstThread, static_cast<ThreadHandle>(1U));
+    EXPECT_EQ(state.waitNotifyIdx, 5U);
+    EXPECT_EQ(state.recordNotifyIdx, 5U);
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, AllReduceCacheHitUsesCapturedWaitAndReleasesAfterReplay)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLREDUCE);
+    Mc2AicpuTaskCacheManager manager(2U, 1024U);
+    auto& state = GetMc2TaskCacheTestStubState();
+    state.lookupHit = true;
+    uint32_t executorCalls = 0U;
+    ASSERT_EQ(
+        RunWithMc2TaskCache(
+            inputs.param, inputs.resCtx,
+            [&executorCalls]() {
+                ++executorCalls;
+                return HCCL_SUCCESS;
+            },
+            manager),
+        HCCL_SUCCESS);
+
+    const std::vector<std::string> expectedEvents = {
+        "batch_start", "cache_lookup", "cache_execute", "batch_end", "notify_record"};
+    EXPECT_EQ(state.events, expectedEvents);
+    EXPECT_EQ(executorCalls, 0U);
+    EXPECT_EQ(state.notifyWaitCalls, 0U);
+    EXPECT_EQ(state.notifyRecordCalls, 1U);
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, AllReduceCapacityBypassStillUsesReplayGate)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLREDUCE);
+    Mc2AicpuTaskCacheManager manager(1U, 1024U);
+    ASSERT_EQ(manager.TryReserve(reinterpret_cast<void*>(0x2000U), "existing"), Mc2TaskCacheReserveResult::RESERVED);
+    auto& state = GetMc2TaskCacheTestStubState();
+    ASSERT_EQ(
+        RunWithMc2TaskCache(
+            inputs.param, inputs.resCtx,
+            [&state]() {
+                state.events.emplace_back("executor");
+                return HCCL_SUCCESS;
+            },
+            manager),
+        HCCL_SUCCESS);
+
+    const std::vector<std::string> expectedEvents = {
+        "batch_start", "notify_wait", "executor", "batch_end", "notify_record"};
+    EXPECT_EQ(state.events, expectedEvents);
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, AllReduceReleaseFailureInvalidatesCacheWithoutExecutorRetry)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLREDUCE);
+    Mc2AicpuTaskCacheManager manager(2U, 1024U);
+    auto& state = GetMc2TaskCacheTestStubState();
+    state.lookupHit = true;
+    state.notifyRecordRet = HCCL_E_PARA;
+    uint32_t executorCalls = 0U;
+    EXPECT_EQ(
+        RunWithMc2TaskCache(
+            inputs.param, inputs.resCtx,
+            [&executorCalls]() {
+                ++executorCalls;
+                return HCCL_SUCCESS;
+            },
+            manager),
+        HCCL_E_PARA);
+    EXPECT_EQ(executorCalls, 0U);
+    EXPECT_EQ(state.notifyRecordCalls, 1U);
+    EXPECT_EQ(state.clearCalls, 1U);
+    EXPECT_EQ(state.events.back(), "cache_clear");
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, AllReduceExecuteFailureStillReleasesAndKeepsOriginalError)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLREDUCE);
+    Mc2AicpuTaskCacheManager manager(2U, 1024U);
+    auto& state = GetMc2TaskCacheTestStubState();
+    state.lookupHit = true;
+    state.executeRet = HCCL_E_INTERNAL;
+    state.notifyRecordRet = HCCL_E_PARA;
+    uint32_t executorCalls = 0U;
+    EXPECT_EQ(
+        RunWithMc2TaskCache(
+            inputs.param, inputs.resCtx,
+            [&executorCalls]() {
+                ++executorCalls;
+                return HCCL_SUCCESS;
+            },
+            manager),
+        HCCL_E_INTERNAL);
+    EXPECT_EQ(executorCalls, 0U);
+    EXPECT_EQ(state.notifyRecordCalls, 1U);
+    EXPECT_EQ(state.clearCalls, 1U);
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, AllReduceExecutorFailurePublishesAndReleasesWithoutRetry)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLREDUCE);
+    Mc2AicpuTaskCacheManager manager(2U, 1024U);
+    auto& state = GetMc2TaskCacheTestStubState();
+    uint32_t executorCalls = 0U;
+    EXPECT_EQ(
+        RunWithMc2TaskCache(
+            inputs.param, inputs.resCtx,
+            [&executorCalls, &state]() {
+                ++executorCalls;
+                state.events.emplace_back("executor");
+                return HCCL_E_INTERNAL;
+            },
+            manager),
+        HCCL_E_INTERNAL);
+    EXPECT_EQ(executorCalls, 1U);
+    EXPECT_EQ(state.notifyWaitCalls, 1U);
+    EXPECT_EQ(state.notifyRecordCalls, 1U);
+    EXPECT_EQ(state.cacheEndCalls, 0U);
+    EXPECT_EQ(state.events.back(), "notify_record");
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, OtherCollectivesDoNotUseAllReduceReplayGate)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
+    Mc2AicpuTaskCacheManager manager(2U, 1024U);
+    ASSERT_EQ(
+        RunWithMc2TaskCache(inputs.param, inputs.resCtx, []() { return HCCL_SUCCESS; }, manager), HCCL_SUCCESS);
+    const auto& state = GetMc2TaskCacheTestStubState();
+    EXPECT_EQ(state.notifyWaitCalls, 0U);
+    EXPECT_EQ(state.notifyRecordCalls, 0U);
 }
 
 } // namespace

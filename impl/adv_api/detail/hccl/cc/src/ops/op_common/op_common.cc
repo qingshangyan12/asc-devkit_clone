@@ -9,6 +9,7 @@
  */
 #include <algorithm>
 #include <future>
+#include <limits>
 #include <map>
 #include <numeric>
 #include <string>
@@ -36,9 +37,11 @@
 #include "alg_param.h"
 #include "alg_type.h"
 #include "op_common.h"
+#include "mc2_replay_gate_host.h"
 #include "dpu/kernel_launch.h"
 #include "hcomm_host_profiling_dl.h"
 #include "hcomm_primitives_dl.h"
+#include "hccl_res_dl.h"
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
@@ -791,6 +794,7 @@ HcclResult HcclGetAlgRes(
     HCCL_INFO(
         "[asc][AlgoResource][HcclGetAlgRes] start, opType[%d], algTag[%s], engine[%d], opMode[%d].", param.opType,
         param.algTag, param.engine, param.opMode);
+    param.deviceOrderThread = 0;
 
     void* ctx = nullptr;
     bool increCreateChannelFlag = false;
@@ -812,6 +816,7 @@ HcclResult HcclGetAlgRes(
             ctxEngine = COMM_ENGINE_AIV;
         }
         if (HcclEngineCtxGet(comm, param.algTag, ctxEngine, &ctx, &size) == HCCL_SUCCESS) {
+            CHK_RET(RestoreMc2ReplayGateHostContext(comm, param, ctx, size));
             HCCL_DEBUG("Already have context, skip create, ctxSize is %u", param.ctxSize);
             isResourceReused = true;
             *resCtxSequence = ctx;
@@ -918,7 +923,7 @@ HcclResult HcclGetAlgRes(
 }
 
 HcclResult GetAlgResAICPU(
-    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
+    HcclComm comm, OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, TopoInfoWithNetLayerDetails* topoInfo,
     AlgHierarchyInfoForAllLevel& algHierarchyInfo, void** resCtxSequence, uint64_t& ctxSize,
     bool increCreateChannelFlag)
@@ -955,6 +960,7 @@ HcclResult GetAlgResAICPU(
             "ctxSize[%llu], resCtxSequence[%p].",
             ret, ctxSize, *resCtxSequence);
         CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("failed to memcpy hostCtx to device."), ret);
+        CHK_RET(PublishMc2ReplayGateHostContext(comm, param, *resCtxHost, *resCtxSequence, ctxSize));
         // 如果是增量建链模式，转移hostCtx的所有权
         if (increCreateChannelFlag) {
             g_hostCtx[tagStr] = std::move(resCtxHost);
@@ -1016,7 +1022,7 @@ HcclResult HcclMemcpyCtxHostToDevice(
 }
 
 HcclResult HcclAllocAlgResourceAICPU(
-    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
+    HcclComm comm, OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
     HCCL_INFO("Start to execute AllocAlgResource.");
@@ -1029,34 +1035,71 @@ HcclResult HcclAllocAlgResourceAICPU(
     resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
-    CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
+    CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost, &param.deviceOrderThread));
     CHK_RET(HcclGetChannel(comm, param, resRequest, resCtxHost));
     return HCCL_SUCCESS;
 }
 
 HcclResult HcclGetThread(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, ThreadHandle* replayReleaseThread)
 {
+    if (replayReleaseThread != nullptr) {
+        *replayReleaseThread = 0;
+    }
     if ((param.engine == COMM_ENGINE_AICPU_TS) || (param.engine == COMM_ENGINE_CPU)) {
+        const bool replayGateEnabled = IsMc2AllReduceReplayGateRequested(param);
+        CHK_PRT_RET(
+            replayGateEnabled && replayReleaseThread == nullptr,
+            HCCL_ERROR("[MC2_REPLAY_GATE][Host] release thread output is missing."), HCCL_E_PARA);
         u32 maxNotifyNum = resRequest.notifyNumOnMainThread;
         for (u32 i = 0; i < resRequest.notifyNumPerThread.size(); i++) {
             if (resRequest.notifyNumPerThread[i] > maxNotifyNum) {
                 maxNotifyNum = resRequest.notifyNumPerThread[i];
             }
         }
-        u32 threadNum = resRequest.slaveThreadNum + 1;
-        std::vector<ThreadHandle> threads(threadNum);
-        // maxNotifyNum需要再增加一个用于host-device同步
-        CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, maxNotifyNum + 1, threads.data()));
-        CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 1));
+        const u32 extraThreadNum = replayGateEnabled ? 2U : 1U;
+        CHK_PRT_RET(
+            resRequest.slaveThreadNum > std::numeric_limits<u32>::max() - extraThreadNum,
+            HCCL_ERROR("[MC2_REPLAY_GATE][Host] thread count overflow."), HCCL_E_PARA);
+        const u32 threadNum = resRequest.slaveThreadNum + 1U;
+        const u32 acquiredThreadNum = resRequest.slaveThreadNum + extraThreadNum;
+        // One framework notify is reserved for host-device synchronization. AllReduce replay gating reserves
+        // one more notify so the main thread cannot run before all cached stream arrays have been published.
+        const u32 extraNotifyNum = replayGateEnabled ? 2U : 1U;
+        CHK_PRT_RET(
+            maxNotifyNum > std::numeric_limits<u32>::max() - extraNotifyNum,
+            HCCL_ERROR(
+                "[MC2_REPLAY_GATE][Host] notify count overflow, maxNotifyNum[%u], extraNotifyNum[%u].",
+                maxNotifyNum, extraNotifyNum),
+            HCCL_E_PARA);
+        std::vector<ThreadHandle> threads(acquiredThreadNum);
+        // One pooled-prefix request: a separate one-thread request would return threads[0] again.
+        CHK_RET(HcclThreadAcquire(
+            comm, COMM_ENGINE_AICPU_TS, acquiredThreadNum, maxNotifyNum + extraNotifyNum, threads.data()));
+        if (replayGateEnabled) {
+            std::set<ThreadHandle> uniqueThreads;
+            for (ThreadHandle thread : threads) {
+                CHK_PRT_RET(
+                    thread == 0 || !uniqueThreads.insert(thread).second,
+                    HCCL_ERROR("[MC2_REPLAY_GATE][Host] null or duplicate acquired thread."), HCCL_E_INTERNAL);
+            }
+        }
         // 申请展开流对应的Thread
         CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_CPU, 1, 0, &resCtxHost->unfoldThread));
+        CHK_PRT_RET(
+            replayGateEnabled && (resCtxHost->unfoldThread == 0 ||
+                std::find(threads.begin(), threads.end(), resCtxHost->unfoldThread) != threads.end()),
+            HCCL_ERROR("[MC2_REPLAY_GATE][Host] invalid unfold thread relation."), HCCL_E_INTERNAL);
+        CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 1));
         CHK_RET(SaveUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread));
         HCCL_INFO("[HcclGetThread] unfoldThread [%lu]", resCtxHost->unfoldThread);
         HCCL_DEBUG("threads ptr is %p\n", threads.data());
         for (u32 i = 0; i < threadNum; i++) {
             resCtxHost->threads.push_back(threads[i]);
+        }
+        if (replayGateEnabled) {
+            *replayReleaseThread = threads.back();
         }
     } else {
         u32 maxNotifyNum = 0;
@@ -2156,7 +2199,7 @@ HcclResult HcclGetCcuKernel(
 }
 
 HcclResult GetAlgResDPU(
-    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
+    HcclComm comm, OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, TopoInfoWithNetLayerDetails* topoInfo,
     AlgHierarchyInfoForAllLevel& algHierarchyInfo, void** resCtxSequence, uint64_t& ctxSize,
     bool increCreateChannelFlag)

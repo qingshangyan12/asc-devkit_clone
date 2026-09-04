@@ -412,6 +412,32 @@ HcclResult HcclThreadAcquire(
 {
     auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
     CHK_PTR_NULL(simComm);
+    auto& state = GetMc2TaskCacheTestStubState();
+    if (state.emulatePooledThreads && engine == COMM_ENGINE_AICPU_TS) {
+        ++state.aicpuThreadAcquireCalls;
+        state.lastThreadNum = threadNum;
+        state.lastThreadNotifyNum = notifyNumPerThread;
+        CHK_RET(state.threadAcquireRet);
+        if (state.pooledThreads.size() < threadNum) {
+            const size_t oldSize = state.pooledThreads.size();
+            state.pooledThreads.resize(threadNum);
+            CHK_RET(simComm->independentOpThreadMgr_->HcclThreadAcquire(engine,
+                threadNum - oldSize, notifyNumPerThread, state.pooledThreads.data() + oldSize));
+        }
+        std::copy_n(state.pooledThreads.begin(), threadNum, threads);
+        if (state.returnNullThread) {
+            threads[threadNum - 1U] = 0;
+        }
+        if (state.returnDuplicateThread && threadNum > 1U) {
+            threads[threadNum - 1U] = threads[0];
+        }
+        return HCCL_SUCCESS;
+    }
+    if (state.emulatePooledThreads && state.aliasUnfoldThread && engine == COMM_ENGINE_CPU &&
+        !state.pooledThreads.empty()) {
+        threads[0] = state.pooledThreads.back();
+        return HCCL_SUCCESS;
+    }
     return simComm->independentOpThreadMgr_->HcclThreadAcquire(engine, threadNum, notifyNumPerThread, threads);
 }
 
@@ -434,8 +460,9 @@ HcclResult HcclEngineCtxCopy(
     HcclComm comm, CommEngine engine, const char* ctxTag, const void* srcCtx, uint64_t size, uint64_t dstCtxOffset)
 {
     ++mc2_ops_hccl::g_hcclEngineCtxCopyCallCount;
-    // HOST场景下srcCtx就是创建的EngineCtx内存地址，无需拷贝
-    if (engine == CommEngine::COMM_ENGINE_AICPU_TS || engine == CommEngine::COMM_ENGINE_AICPU) {
+    // Match HcommEngineCtxCopy: host contexts must copy too (the source may be a POD snapshot).
+    if (engine == COMM_ENGINE_AICPU_TS || engine == COMM_ENGINE_AICPU || engine == COMM_ENGINE_CPU_TS ||
+        engine == COMM_ENGINE_CPU || engine == COMM_ENGINE_CCU || engine == COMM_ENGINE_AIV) {
         uint64_t ctxSize = 0;
         void* ctx = nullptr;
         auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
@@ -468,6 +495,14 @@ HcclResult HcclCommDestroy(HcclComm comm)
 
 int32_t HcommThreadNotifyWaitOnThread(ThreadHandle thread, uint32_t notifyIdx, uint32_t timeout)
 {
+    auto& taskCacheState = GetMc2TaskCacheTestStubState();
+    if (taskCacheState.interceptNotifyCalls) {
+        ++taskCacheState.notifyWaitCalls;
+        taskCacheState.waitThread = thread;
+        taskCacheState.waitNotifyIdx = notifyIdx;
+        taskCacheState.events.emplace_back("notify_wait");
+        return taskCacheState.notifyWaitRet;
+    }
     // timeout 暂时未使用
     static_cast<void>(timeout);
 
@@ -489,6 +524,15 @@ int32_t HcommThreadNotifyWaitOnThread(ThreadHandle thread, uint32_t notifyIdx, u
 
 int32_t HcommThreadNotifyRecordOnThread(ThreadHandle thread, ThreadHandle dstThread, uint32_t dstNotifyIdx)
 {
+    auto& taskCacheState = GetMc2TaskCacheTestStubState();
+    if (taskCacheState.interceptNotifyCalls) {
+        ++taskCacheState.notifyRecordCalls;
+        taskCacheState.recordThread = thread;
+        taskCacheState.recordDstThread = dstThread;
+        taskCacheState.recordNotifyIdx = dstNotifyIdx;
+        taskCacheState.events.emplace_back("notify_record");
+        return taskCacheState.notifyRecordRet;
+    }
     // 1.获取当前rankId,NpuPos和stream
     uint32_t curRank = reinterpret_cast<HcclSim::SimHcclThread*>(thread)->GetCurRank();
     NpuPos pos = HcclSim::SimWorld::Global()->GetNpuPosByRankId(curRank);
@@ -845,6 +889,7 @@ int32_t HcommBatchModeStart(const char* batchTag)
     (void)batchTag;
     auto& state = GetMc2TaskCacheTestStubState();
     ++state.batchStartCalls;
+    state.events.emplace_back("batch_start");
     return state.batchStartRet;
 }
 
@@ -853,6 +898,7 @@ int32_t HcommBatchModeEnd(const char* batchTag)
     (void)batchTag;
     auto& state = GetMc2TaskCacheTestStubState();
     ++state.batchEndCalls;
+    state.events.emplace_back("batch_end");
     return state.batchEndRet;
 }
 

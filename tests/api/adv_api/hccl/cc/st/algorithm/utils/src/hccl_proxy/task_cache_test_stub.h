@@ -10,6 +10,9 @@
 #ifndef TASK_CACHE_TEST_STUB_H
 #define TASK_CACHE_TEST_STUB_H
 
+#include <string>
+#include <vector>
+
 #include "hccl_types.h"
 
 struct Mc2TaskCacheTestStubState {
@@ -20,7 +23,15 @@ struct Mc2TaskCacheTestStubState {
     HcclResult cacheEndRet = HCCL_SUCCESS;
     HcclResult executeRet = HCCL_SUCCESS;
     HcclResult clearRet = HCCL_SUCCESS;
+    HcclResult notifyWaitRet = HCCL_SUCCESS;
+    HcclResult notifyRecordRet = HCCL_SUCCESS;
+    HcclResult threadAcquireRet = HCCL_SUCCESS;
     bool lookupHit = false;
+    bool interceptNotifyCalls = false;
+    bool emulatePooledThreads = false;
+    bool returnNullThread = false;
+    bool returnDuplicateThread = false;
+    bool aliasUnfoldThread = false;
     uint32_t batchStartCalls = 0U;
     uint32_t batchEndCalls = 0U;
     uint32_t lookupCalls = 0U;
@@ -28,6 +39,18 @@ struct Mc2TaskCacheTestStubState {
     uint32_t cacheEndCalls = 0U;
     uint32_t executeCalls = 0U;
     uint32_t clearCalls = 0U;
+    uint32_t notifyWaitCalls = 0U;
+    uint32_t notifyRecordCalls = 0U;
+    uint32_t aicpuThreadAcquireCalls = 0U;
+    uint32_t lastThreadNum = 0U;
+    uint32_t lastThreadNotifyNum = 0U;
+    ThreadHandle waitThread = 0;
+    ThreadHandle recordThread = 0;
+    ThreadHandle recordDstThread = 0;
+    uint32_t waitNotifyIdx = 0U;
+    uint32_t recordNotifyIdx = 0U;
+    std::vector<ThreadHandle> pooledThreads;
+    std::vector<std::string> events;
 };
 
 Mc2TaskCacheTestStubState& GetMc2TaskCacheTestStubState();

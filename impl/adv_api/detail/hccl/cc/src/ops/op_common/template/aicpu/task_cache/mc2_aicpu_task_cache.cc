@@ -18,12 +18,13 @@
 #include "alg_env_config.h"
 #include "hcomm_primitives_dl.h"
 #include "log.h"
+#include "mc2_aicpu_replay_gate.h"
 
 namespace mc2_ops_hccl {
 namespace {
 
 constexpr uint64_t CACHE_ADDR_COUNT = 2U;
-constexpr char CACHE_TAG_PREFIX[] = "mc2tc:v1";
+constexpr char CACHE_TAG_PREFIX[] = "mc2tc:v2";
 
 class Digest128Builder {
 public:
@@ -368,6 +369,10 @@ void AddShapeFields(const OpParam& param, uint64_t inputSpan, uint64_t outputSpa
 
 bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& resCtx, Digest128Builder& resource)
 {
+    Mc2AicpuReplayGate replayGate;
+    if (BuildMc2AicpuReplayGate(param, resCtx, replayGate) != HCCL_SUCCESS) {
+        return false;
+    }
     resource.AddPointer(param.hcclComm);
     resource.AddString(param.commName, COMM_INDENTIFIER_MAX_LENGTH);
     resource.AddString(param.algTag, ALG_TAG_LENGTH);
@@ -398,6 +403,10 @@ bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& r
     resource.AddPointer(resCtx.npu2DpuShmemPtr);
     resource.AddPointer(resCtx.dpu2NpuShmemPtr);
     resource.AddU64(static_cast<uint64_t>(param.opThread));
+    resource.AddBool(replayGate.enabled);
+    resource.AddU64(static_cast<uint64_t>(replayGate.mainThread));
+    resource.AddU64(static_cast<uint64_t>(replayGate.releaseThread));
+    resource.AddU32(replayGate.notifyIdx);
     AddHcclMem(resource, param.hcclBuff);
 
     const auto& topo = resCtx.topoInfo;
