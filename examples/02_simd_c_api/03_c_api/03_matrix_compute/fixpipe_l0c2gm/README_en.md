@@ -8,7 +8,7 @@ This example demonstrates how to use the SIMD C API `asc_copy_l0c2gm` to transfe
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
