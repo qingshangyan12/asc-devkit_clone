@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates how to use the experimental Tensor API `asc::te::experimental::operator<<` to shift 64 `uint32_t` elements left by the corresponding `int32_t` shift values.
+This sample demonstrates how to use the experimental Tensor API `asc::te::experimental::operator<<` to shift `uint32_t` elements left by the corresponding `int32_t` shift values.
 
 ```text
 dst[i] = src[i] << shift[i]
@@ -25,6 +25,13 @@ dst[i] = src[i] << shift[i]
 - Sample function:
 
   The sample moves the source data and shift values from GM to UB, loads them into registers using `load`, performs element-wise left shifts using `operator<<`, and writes the result back to UB and GM. The host generates the inputs and verifies the output directly.
+
+- Sample scenarios:
+
+  | SCENARIO_NUM | Tensor Layout | Description |
+  | --- | --- | --- |
+  | 1 | One-dimensional, shape `[128]` | Loads and stores register blocks by one-dimensional offsets. |
+  | 2 | Two-dimensional, shape `[2, 64]` | Loads and stores each row by two-dimensional coordinates. |
 
 - Sample implementation:
 
@@ -56,13 +63,14 @@ Perform the following steps in the sample root directory to build and run the sa
 - Run the sample
 
   ```bash
+  SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
   ./demo
   ```
 
-  For NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=sim` to the CMake command. When changing the run mode or chip model, clear the CMake cache in the `build` directory before configuring the project again.
+  For NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=sim` to the CMake command. When changing the run mode, chip model, or scenario, clear the CMake cache in the `build` directory before configuring the project again.
 
 - Result
 

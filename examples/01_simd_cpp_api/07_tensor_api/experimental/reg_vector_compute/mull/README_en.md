@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates how to use the experimental Tensor API `asc::te::experimental::mull` to multiply two one-dimensional `uint32_t` Tensors with shape `[64]` and output the low and high 32 bits of each product separately.
+This sample demonstrates how to use the experimental Tensor API `asc::te::experimental::mull` to multiply two `uint32_t` Tensors and output the low and high 32 bits of each product separately.
 
 ## Supported Products
 
@@ -21,6 +21,13 @@ This sample demonstrates how to use the experimental Tensor API `asc::te::experi
 - Sample function:
 
   The sample moves two input Tensors from GM to UB, loads them into registers using `load`, computes the full-width product using `mull`, and writes the low and high 32-bit results back to UB and GM. The host generates the inputs and verifies both outputs directly.
+
+- Sample scenarios:
+
+  | SCENARIO_NUM | Tensor Layout | Description |
+  | --- | --- | --- |
+  | 1 | One-dimensional, shape `[128]` | Loads and stores register blocks by one-dimensional offsets. |
+  | 2 | Two-dimensional, shape `[2, 64]` | Loads and stores each row by two-dimensional coordinates. |
 
 - Sample implementation:
 
@@ -53,13 +60,14 @@ Perform the following steps in the sample root directory to build and run the sa
 - Run the sample
 
   ```bash
+  SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
   ./demo
   ```
 
-  For NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=sim` to the CMake command. When changing the run mode or chip model, clear the CMake cache in the `build` directory before configuring the project again.
+  For NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=sim` to the CMake command. When changing the run mode, chip model, or scenario, clear the CMake cache in the `build` directory before configuring the project again.
 
 - Result
 

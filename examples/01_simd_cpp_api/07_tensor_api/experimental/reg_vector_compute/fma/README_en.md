@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates how to use the experimental Tensor API `asc::te::experimental::fma` to perform element-wise fused multiply-add on three one-dimensional `float` Tensors with shape `[64]`.
+This sample demonstrates how to use the experimental Tensor API `asc::te::experimental::fma` to perform element-wise fused multiply-add on three `float` Tensors.
 
 ```text
 dst[i] = src0[i] * src1[i] + src2[i]
@@ -26,15 +26,20 @@ dst[i] = src0[i] * src1[i] + src2[i]
 
   The sample moves three input Tensors from GM to UB, loads them into registers using `load`, performs element-wise fused multiply-add using `fma`, and writes the result back to UB and GM using `store`. The host generates the inputs and verifies the output directly.
 
+- Sample scenarios:
+
+  | SCENARIO_NUM | Tensor Layout | Description |
+  | --- | --- | --- |
+  | 1 | One-dimensional, shape `[128]` | Loads and stores register blocks by one-dimensional offsets. |
+  | 2 | Two-dimensional, shape `[2, 64]` | Loads and stores each row by two-dimensional coordinates. |
+
 - Sample implementation:
 
   - Key kernel steps
 
-    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_layout` to construct one-dimensional Tensors in GM and UB.
-    2. Use `asc::te::copy` to move the three inputs from GM to UB.
-    3. Use `all_mask` and `load` to load the UB data into Reg Tensors.
-    4. Call `fma` to perform element-wise fused multiply-add.
-    5. Use `store` and `asc::te::copy` to write the result back to UB and GM.
+    1. Construct one-dimensional or two-dimensional GM and UB Tensors according to `SCENARIO_NUM`.
+    2. Move complete data in the one-dimensional scenario, or move rows using coordinates and `copy_shape(1, 64)` in the two-dimensional scenario.
+    3. Use `all_mask`, `load`, `fma`, and `store` to perform element-wise fused multiply-add.
 
   The core computation is as follows:
 
@@ -65,13 +70,14 @@ Perform the following steps in the sample root directory to build and run the sa
 - Run the sample
 
   ```bash
+  SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
   ./demo
   ```
 
-  For NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=sim` to the CMake command. When changing the run mode or chip model, clear the CMake cache in the `build` directory before configuring the project again.
+  For NPU simulation mode, add `-DCMAKE_ASC_RUN_MODE=sim` to the CMake command. When changing the run mode, chip model, or scenario, clear the CMake cache in the `build` directory before configuring the project again.
 
 - Result
 

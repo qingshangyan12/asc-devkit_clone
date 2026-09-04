@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍如何使用实验性 Tensor API `asc::te::experimental::operator<<`，按照 `int32_t` 移位量对64个 `uint32_t` 元素执行逐元素左移。
+本样例介绍如何使用实验性 Tensor API `asc::te::experimental::operator<<`，按照 `int32_t` 移位量对 `uint32_t` 元素执行逐元素左移。
 
 ```text
 dst[i] = src[i] << shift[i]
@@ -25,6 +25,13 @@ dst[i] = src[i] << shift[i]
 - 样例功能：
 
   样例将输入数据和移位量从 GM 搬运到 UB，通过 `load` 加载到寄存器，调用 `operator<<` 完成逐元素左移，再将结果写回 UB 和 GM。Host 侧直接生成输入并校验输出。
+
+- 样例场景：
+
+  | SCENARIO_NUM | Tensor Layout | 说明 |
+  | --- | --- | --- |
+  | 1 | 一维，shape 为 `[128]` | 按一维偏移加载和存储寄存器块。 |
+  | 2 | 二维，shape 为 `[2, 64]` | 按二维坐标加载和存储每一行。 |
 
 - 样例实现：
 
@@ -56,13 +63,14 @@ dst[i] = src[i] << shift[i]
 - 样例执行
 
   ```bash
+  SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
   ./demo
   ```
 
-  使用 NPU 仿真模式时，在 CMake 命令中增加 `-DCMAKE_ASC_RUN_MODE=sim`。切换运行模式或芯片型号时，建议清除 `build` 目录中的 CMake 缓存后重新配置。
+  使用 NPU 仿真模式时，在 CMake 命令中增加 `-DCMAKE_ASC_RUN_MODE=sim`。切换运行模式、芯片型号或场景时，建议清除 `build` 目录中的 CMake 缓存后重新配置。
 
 - 执行结果
 

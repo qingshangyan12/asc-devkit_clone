@@ -22,6 +22,13 @@
 
   样例将输入 Tensor 从 GM 搬运到 UB，通过 `load` 加载到寄存器，调用高半区累计模式的 `histograms`，再将结果写回 UB 和 GM。Host 侧直接生成输入并校验输出。
 
+- 样例场景：
+
+  | SCENARIO_NUM | 输入和输出 Tensor Layout | 说明 |
+  | --- | --- | --- |
+  | 1 | 一维，shape 分别为 `[256]` 和 `[128]` | 按一维坐标处理完整输入和输出。 |
+  | 2 | 二维，shape 分别为 `[1, 256]` 和 `[1, 128]` | 使用二维坐标处理完整输入和输出。 |
+
 - 样例实现：
 
   核心计算代码如下：
@@ -54,13 +61,14 @@
 - 样例执行
 
   ```bash
+  SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
   ./demo
   ```
 
-  使用 NPU 仿真模式时，在 CMake 命令中增加 `-DCMAKE_ASC_RUN_MODE=sim`。切换运行模式或芯片型号时，建议清除 `build` 目录中的 CMake 缓存后重新配置。
+  使用 NPU 仿真模式时，在 CMake 命令中增加 `-DCMAKE_ASC_RUN_MODE=sim`。切换运行模式、芯片型号或场景时，建议清除 `build` 目录中的 CMake 缓存后重新配置。
 
 - 执行结果
 

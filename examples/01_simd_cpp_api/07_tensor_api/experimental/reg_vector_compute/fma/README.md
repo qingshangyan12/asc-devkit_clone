@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍如何使用实验性 Tensor API `asc::te::experimental::fma` 对三组 shape 为 `[64]` 的一维 `float` Tensor 执行逐元素融合乘加计算。
+本样例介绍如何使用实验性 Tensor API `asc::te::experimental::fma` 对三组 `float` Tensor 执行逐元素融合乘加计算。
 
 ```text
 dst[i] = src0[i] * src1[i] + src2[i]
@@ -26,15 +26,20 @@ dst[i] = src0[i] * src1[i] + src2[i]
 
   样例将三组输入 Tensor 从 GM 搬运到 UB，通过 `load` 加载到寄存器，调用 `fma` 完成逐元素融合乘加，再通过 `store` 将结果写回 UB 和 GM。Host 侧直接生成输入并校验输出。
 
+- 样例场景：
+
+  | SCENARIO_NUM | Tensor Layout | 说明 |
+  | --- | --- | --- |
+  | 1 | 一维，shape 为 `[128]` | 按一维偏移加载和存储寄存器块。 |
+  | 2 | 二维，shape 为 `[2, 64]` | 按二维坐标加载和存储每一行。 |
+
 - 样例实现：
 
   - Kernel关键步骤
 
-    1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_layout` 构造 GM、UB 上的一维 Tensor。
-    2. 使用 `asc::te::copy` 将三组输入从 GM 搬运到 UB。
-    3. 使用 `all_mask` 和 `load` 将 UB 数据加载为 Reg Tensor。
-    4. 调用 `fma` 完成逐元素融合乘加。
-    5. 使用 `store` 和 `asc::te::copy` 将结果写回 UB 和 GM。
+    1. 根据 `SCENARIO_NUM` 构造一维或二维 GM、UB Tensor。
+    2. 一维场景整体搬运数据；二维场景使用坐标和 `copy_shape(1, 64)` 按行搬运数据。
+    3. 使用 `all_mask`、`load`、`fma` 和 `store` 完成逐元素融合乘加。
 
   核心计算代码如下：
 
@@ -65,13 +70,14 @@ dst[i] = src0[i] * src1[i] + src2[i]
 - 样例执行
 
   ```bash
+  SCENARIO_NUM=1
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
   ./demo
   ```
 
-  使用 NPU 仿真模式时，在 CMake 命令中增加 `-DCMAKE_ASC_RUN_MODE=sim`。切换运行模式或芯片型号时，建议清除 `build` 目录中的 CMake 缓存后重新配置。
+  使用 NPU 仿真模式时，在 CMake 命令中增加 `-DCMAKE_ASC_RUN_MODE=sim`。切换运行模式、芯片型号或场景时，建议清除 `build` 目录中的 CMake 缓存后重新配置。
 
 - 执行结果
 
