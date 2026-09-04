@@ -29,7 +29,7 @@ Execute the following steps in the root directory of this example to compile and
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, it is installed to `/usr/local/Ascend` by default.
+  > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, it defaults to `/usr/local/Ascend`.
 
 - Example Execution
 
@@ -39,11 +39,21 @@ Execute the following steps in the root directory of this example to compile and
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # Compile the project
   ./demo                        # Execute the example
   ```
-  
+
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Before switching build modes, clean the cmake cache by executing `rm CMakeCache.txt` in the build directory and then re-run cmake.
+
   Compilation Options
 
   | Option | Available Values | Description |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: This example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
 - Execution Result

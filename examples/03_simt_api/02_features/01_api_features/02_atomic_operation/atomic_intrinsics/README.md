@@ -90,7 +90,7 @@ __global__ void atomic_intrinsics_kernel(int* output_data)
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}`为CANN包安装目录，未指定安装目录时默认安装至`/usr/local/Ascend`下。
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
   在本样例目录下执行如下命令。
@@ -100,10 +100,20 @@ __global__ void atomic_intrinsics_kernel(int* output_data)
   ./atomic_intrinsics                                   # 执行样例
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
 - 编译选项说明
 
   | 选项                      | 可选值     | 说明                                                       |
   | ------------------------- | ---------- | ---------------------------------------------------------- |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
 
   执行结果如下，说明原子操作校验成功。

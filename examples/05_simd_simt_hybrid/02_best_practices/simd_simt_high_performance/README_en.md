@@ -396,7 +396,7 @@ Run the following steps in the root directory of this example to build and run t
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, it defaults to `/usr/local/Ascend`.
 
 - Run the example
 
@@ -411,6 +411,13 @@ Run the following steps in the root directory of this example to build and run t
   ```
 
   To use the NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. -DSCENARIO_NUM=$SCENARIO_NUM; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Before switching build modes, clean the cmake cache by executing `rm CMakeCache.txt` in the build directory and then re-run cmake.
 
 - Build option description
 

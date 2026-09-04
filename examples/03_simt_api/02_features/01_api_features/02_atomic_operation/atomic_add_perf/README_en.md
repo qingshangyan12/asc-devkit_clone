@@ -416,7 +416,7 @@ Execute the following steps in the sample root directory to build and run the sa
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN installation directory. When no installation directory is specified, it is installed under `/usr/local/Ascend` by default.
+  > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, it defaults to `/usr/local/Ascend`.
 
 - Run the sample
 
@@ -429,10 +429,20 @@ Execute the following steps in the sample root directory to build and run the sa
   ./atomic_add_perf
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. -DSCENARIO_NUM=$SCENARIO_NUM; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Before switching build modes, clean the cmake cache by executing `rm CMakeCache.txt` in the build directory and then re-run cmake.
+
   Build options:
 
   | Option | Values | Description |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this sample supports only dav-3510 (Ascend 950PR/Ascend 950DT) |
   | `SCENARIO_NUM` | `1`-`16` | Scenario number to test. The scale (Block×Thread), data type, whether the return value is used, `target_count`, `threads_per_target`, and `target_stride` for each scenario are configured centrally by `get_scenario_config()` in the source |
   | `SKIP_VALIDATION` | `ON`/`OFF` | Whether to skip result validation; default `OFF`. The UB-only scenarios of Case 1/3 have no GM result and automatically skip validation; recommended to set to `ON` when profiling GM-writeback scenarios with `msopprof` |

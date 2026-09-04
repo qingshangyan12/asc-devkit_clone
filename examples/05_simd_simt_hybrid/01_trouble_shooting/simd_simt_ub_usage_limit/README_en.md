@@ -601,7 +601,7 @@ Run the following steps in the sample root directory to build and execute the sa
     source ${install_path}/cann/set_env.sh
     ```
 
-  > **Note**: `${install_path}` is the CANN package installation directory. If no installation directory is specified, the default path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, it defaults to `/usr/local/Ascend`.
 
 - Build and run the sample.
 
@@ -614,10 +614,20 @@ Run the following steps in the sample root directory to build and execute the sa
     ./ub_usage_limit                            # Run the sample
     ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 .. -DSCENARIO_NUM=$SCENARIO_NUM; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Before switching build modes, clean the cmake cache by executing `rm CMakeCache.txt` in the build directory and then re-run cmake.
+
 **Build options**:
 
 | Option | Valid Value | Description |
 | --- | --- | --- |
+| `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture. This sample supports only dav-3510 (Ascend 950PR/Ascend 950DT) |
 | `SCENARIO_NUM` | `0`-`14` | Scenario number. The default value is `3`. CMake compiles only the Ascend C file of the selected Case |
 | `CMAKE_ASC_FLAGS` | ASC compiler options | In Case 1, add `--cce-disable-vf-stack-reserved-ubuf` to disable the 6 KB VF reserve, and add `--cce-disable-asc-reserved-ubuf` to disable the 2 KB Ascend C API reserve |

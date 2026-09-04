@@ -296,7 +296,7 @@ In the sample root directory, perform the following steps to compile and run the
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Description:** `${install_path}` is the installation directory of the CANN package. If no installation directory is specified, the default installation directory is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, it defaults to `/usr/local/Ascend`.
 
 - Run the sample.
 
@@ -317,10 +317,20 @@ In the sample root directory, perform the following steps to compile and run the
   ./scripts/run.sh
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Before switching build modes, clean the cmake cache by executing `rm CMakeCache.txt` in the build directory and then re-run cmake.
+
 - Compilation options
 
   | Option | Value | Description |
   |:---|:---|:---|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture, which corresponds to Ascend 950PR/Ascend 950DT. |
   | `SCENARIO_NUM` | `0`, `1` | Case number: 0 = direct value writes by a SIMT Warp; 1 = value movement by an MTE task queue. |
 

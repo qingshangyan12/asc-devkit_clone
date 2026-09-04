@@ -296,7 +296,7 @@ __aicore__ inline void run_task() const
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}`为CANN包安装目录，未指定安装目录时默认安装至`/usr/local/Ascend`下。
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
@@ -317,10 +317,20 @@ __aicore__ inline void run_task() const
   ./scripts/run.sh
   ```
 
+  使用NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
 - 编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |:---|:---|:---|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0`、`1` | Case编号：0=SIMT Warp直接写value，1=MTE task queue搬运value |
 
