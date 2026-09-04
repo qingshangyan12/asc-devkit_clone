@@ -72,6 +72,7 @@ __simd_vf__ inline void SqueezeVF(__ubuf__ T* xAddr, __ubuf__ T* yAddr, uint32_t
     AscendC::Reg::RegTensor<T> xReg;
     AscendC::Reg::RegTensor<T> yReg;
     AscendC::Reg::UnalignRegForStore ureg;
+    // Squeeze在STORE_REG模式下会将有效元素的总字节数累加到AR寄存器，需先清零以初始化搬出偏移量。
     AscendC::Reg::ClearSpr<AscendC::SpecialPurposeReg::AR>();
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         AscendC::Reg::LoadAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(xReg, xAddr, oneRepeatSize);
