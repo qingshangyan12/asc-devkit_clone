@@ -1827,12 +1827,11 @@ static HcclResult RegisterCcuKernels(
 
     for (u32 currentResGroup = 0; currentResGroup <= maxResGroup; currentResGroup++) {
         HCCL_INFO("[RegisterCcuKernels] register resGroup[%u] start, maxResGroup[%u].", currentResGroup, maxResGroup);
+        CcuResult regStartRet = HcommCcuKernelRegisterStart(insHandle);
+        CHK_PRT_RET(
+            regStartRet != CCU_SUCCESS, HCCL_ERROR("ccu kernel register start failed: ccuRet -> %d", regStartRet),
+            ConvertCcuToHccl(regStartRet));
         if (isKfc) {
-            CcuResult taskRegStartRet = HcommCcuKernelRegisterStart(insHandle);
-            CHK_PRT_RET(
-                taskRegStartRet != CCU_SUCCESS,
-                HCCL_ERROR("ccu callable task register start failed: ccuRet -> %d", taskRegStartRet),
-                ConvertCcuToHccl(taskRegStartRet));
             for (const CcuKernelInfo& kernelInfo : resRequest.ccuKernelInfos) {
                 if (kernelInfo.resGroup != currentResGroup) {
                     continue;
@@ -1855,34 +1854,7 @@ static HcclResult RegisterCcuKernels(
                         callableTaskFuncName),
                     ConvertCcuToHccl(taskRegRet));
             }
-            CcuResult taskRegEndRet = HcommCcuKernelRegisterEnd(insHandle);
-            CHK_PRT_RET(
-                taskRegEndRet != CCU_SUCCESS,
-                HCCL_ERROR("ccu callable task register end failed: ccuRet -> %d", taskRegEndRet),
-                ConvertCcuToHccl(taskRegEndRet));
-            for (const CcuKernelInfo& kernelInfo : resRequest.ccuKernelInfos) {
-                if (kernelInfo.resGroup != currentResGroup) {
-                    continue;
-                }
-                const char* callableTaskFuncName;
-                CcuCallableKernelFunc callableTaskFunc;
-                CHK_RET(GetKfcCallableTask(kernelInfo, callableTaskFuncName, callableTaskFunc));
-                uint64_t subKernelPc = 0;
-                CcuResult getFuncRet = HcommCcuFunctionGet(insHandle, callableTaskFuncName, &subKernelPc);
-                CHK_PRT_RET(
-                    getFuncRet != CCU_SUCCESS,
-                    HCCL_ERROR(
-                        "get callable task PC failed: ccuRet -> %d, kernel[%s]", getFuncRet, callableTaskFuncName),
-                    ConvertCcuToHccl(getFuncRet));
-                const auto* kfcArg = static_cast<const CcuKernelArgKfcServer*>(kernelInfo.kernelArg);
-                resCtxHost->kfcServerArgs
-                    [kfcArg->missionIndex * KFC_SERVER_ARG_NUM + KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX] = subKernelPc;
-            }
         }
-        CcuResult regStartRet = HcommCcuKernelRegisterStart(insHandle);
-        CHK_PRT_RET(
-            regStartRet != CCU_SUCCESS, HCCL_ERROR("ccu kernel register start failed: ccuRet -> %d", regStartRet),
-            ConvertCcuToHccl(regStartRet));
         for (u32 i = 0; i < totalKernelNum; i++) {
             CcuKernelInfo& kernelInfo = resRequest.ccuKernelInfos[i];
             if (kernelInfo.resGroup != currentResGroup)
@@ -1905,6 +1877,26 @@ static HcclResult RegisterCcuKernels(
         CHK_PRT_RET(
             regEndRet != CCU_SUCCESS, HCCL_ERROR("ccu kernel register end failed: ccuRet -> %d", regEndRet),
             ConvertCcuToHccl(regEndRet));
+        if (isKfc) {
+            for (const CcuKernelInfo& kernelInfo : resRequest.ccuKernelInfos) {
+                if (kernelInfo.resGroup != currentResGroup) {
+                    continue;
+                }
+                const char* callableTaskFuncName;
+                CcuCallableKernelFunc callableTaskFunc;
+                CHK_RET(GetKfcCallableTask(kernelInfo, callableTaskFuncName, callableTaskFunc));
+                uint64_t subKernelPc = 0;
+                CcuResult getFuncRet = HcommCcuFunctionGet(insHandle, callableTaskFuncName, &subKernelPc);
+                CHK_PRT_RET(
+                    getFuncRet != CCU_SUCCESS,
+                    HCCL_ERROR(
+                        "get callable task PC failed: ccuRet -> %d, kernel[%s]", getFuncRet, callableTaskFuncName),
+                    ConvertCcuToHccl(getFuncRet));
+                const auto* kfcArg = static_cast<const CcuKernelArgKfcServer*>(kernelInfo.kernelArg);
+                resCtxHost->kfcServerArgs
+                    [kfcArg->missionIndex * KFC_SERVER_ARG_NUM + KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX] = subKernelPc;
+            }
+        }
         HCCL_INFO("[RegisterCcuKernels] register resGroup[%u] finish.", currentResGroup);
     }
     resCtxHost->ccuKernelNum = resRequest.ccuKernelNum;
