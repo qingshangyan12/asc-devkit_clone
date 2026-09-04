@@ -25,7 +25,7 @@
 
 #if defined(__NPU_ARCH__) &&                                                                           \
     (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || \
-     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 namespace AscendC {
 namespace {
 constexpr float f05 = 0.5;
@@ -105,7 +105,7 @@ struct LGammaParams {
     uint32_t splitSize;
 };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
                               __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 namespace LgammaInternal {
 constexpr Reg::CastTrait LGAMMA_CAST_TRAIT_F162F32 = {

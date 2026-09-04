@@ -430,7 +430,7 @@ bool TopKTilingFunc(
             SetTopkNSmallVal200(inner, outter, k, dataTypeSize, topKTiling);
         }
     } else if (
-        npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
+        npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 || npuArch == NpuArch::DAV_5162 ||
         npuArch == NpuArch::DAV_3003) {
         topKTiling.set_allDataSize(inner * outter);
         if (mode == TopKMode::TOPK_NORMAL) {
@@ -501,7 +501,7 @@ bool GetTopKMaxMinTmpSize(
     if (npuArch == NpuArch::DAV_2002) {
         GetTopKMaxMinTmpSize200(inner, outter, mode, maxValue, minValue, dataTypeSize);
     } else if (
-        npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 ||
+        npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 || npuArch == NpuArch::DAV_5162 ||
         npuArch == NpuArch::DAV_3003) {
         GetTopKMaxMinTmpSize310(inner, outter, isInitIndex, mode, maxValue, minValue);
     } else {
@@ -520,7 +520,7 @@ bool GetTopKMaxMinTmpSize(
 
     auto npuArch = platform->GetCurNpuArch();
     ASCENDC_HOST_ASSERT(
-        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102), return false,
+        (npuArch == NpuArch::DAV_3510 || npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_5102 || npuArch == NpuArch::DAV_5162), return false,
         "Unsupported NpuArch of Topk radix select API.");
 
     ASCENDC_HOST_ASSERT((inner % 32 == 0), return false, "The value of inner must be an integer multiple of 32.");
