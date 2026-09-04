@@ -2,6 +2,8 @@
 
 协作组（cooperative groups）是Ascend C SIMT编程模型的一种扩展，用于组织协作线程组。通过协作组能够更细粒度地管理线程，从而实现更高效的线程并行协作。
 
+头文件路径为：`"simt_api/cooperative_groups.h"`。
+
 当前提供的协作组类型有：
 
 - [thread_block](thread_block/thread_block_intro.md)：对线程块的抽象，提供统一的线程管理接口。
@@ -17,12 +19,6 @@
 基于以上协作组类型，提供以下通用操作：
 
 - [sync](sync.md)：同步指定协作组内的所有线程，功能等价于调用该协作组对象的成员函数`sync()`。
-
-## 需包含的头文件
-
-```cpp
-#include "simt_api/cooperative_groups.h"
-```
 
 > [!NOTE]说明 
 > 所有协作组API均在`cooperative_groups`命名空间下，调用时需添加命名空间。  
