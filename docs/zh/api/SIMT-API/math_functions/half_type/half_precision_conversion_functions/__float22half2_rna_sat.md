@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 将float2类型数据的两个分量遵循CAST\_ROUND模式转换为半精度浮点数，返回转换后的half2类型数据。
 
 ## 函数原型
@@ -47,7 +49,7 @@ inline half2 __float22half2_rna_sat(const float2 x)
 
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
-| ±0 | 0 | 0 |
+| 0 | 0 | 0 |
 | -0 | -0 | -0 |
 | nan | nan | 0 |
 | inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
@@ -61,19 +63,13 @@ inline half2 __float22half2_rna_sat(const float2 x)
 
 SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生效。
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
-
 ## 调用示例
 
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/asc_fp16.h"
+
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_float22half2_rna_sat(__gm__ float2* input, __gm__ half2* output, uint32_t input_total_length)
     {

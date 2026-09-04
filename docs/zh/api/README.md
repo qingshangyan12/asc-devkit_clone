@@ -1252,6 +1252,7 @@
                 -   [asc_sflbits](SIMD-API/c_api/scalar_compute/scalar_bit/asc_sflbits.md)
                 -   [asc_zero_bits_cnt](SIMD-API/c_api/scalar_compute/scalar_bit/asc_zero_bits_cnt.md)
             -   [类型转换](SIMD-API/c_api/scalar_compute/scalar_convert/scalar_convert.md)
+                -   [asc_float2half](SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2half.md)
                 -   [asc_float2int32](SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2int32.md)
             -   [数据搬入](SIMD-API/c_api/scalar_compute/scalar_load/scalar_load.md)
                 -   [asc_load_dev](SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md)
@@ -1374,6 +1375,7 @@
             -   [asc_mmad（废弃）](SIMD-API/c_api/deprecated_interface/asc_mmad_deprecated.md)
             -   [asc_mmad_mx（废弃）](SIMD-API/c_api/deprecated_interface/asc_mmad_mx_deprecated.md)
             -   [asc_mmad_sparse（废弃）](SIMD-API/c_api/deprecated_interface/asc_mmad_sparse_deprecated.md)
+            -   [asc_transto5hd_sync（废弃）](SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md)
 
     -   [Tensor API](SIMD-API/tensor_api/tensor_api.md)
         -   [Tensor API列表](SIMD-API/tensor_api/tensor_api_list.md)

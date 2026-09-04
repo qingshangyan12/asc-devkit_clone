@@ -180,14 +180,6 @@
 
     此接口后续版本会废弃，请使用[asc_storealign_pack_quarter_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md)接口。
 
-- [asc_storealign (repeat stride)](../SIMD-API/c_api/reg_compute/store/asc_storealign_v5_deprecated.md)接口
-
-    此接口后续版本会废弃，请使用[asc_storealign_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md)接口。
-
-- [asc_storealign_postupdate (repeat stride)](../SIMD-API/c_api/reg_compute/store/asc_storealign_v5_deprecated.md)接口
-
-    此接口后续版本会废弃，请使用[asc_storealign_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md)接口。
-
 - [asc_storealign (多模式重载)](../SIMD-API/c_api/reg_compute/store/asc_storealign.md)接口
 
     原 `asc_storealign(dst, src, mask)` 通过函数名重载实现NORM/FIRST/PACK/PACKV2/INTLV等多种搬出模式，现收窄为仅NORM模式，其他模式拆分到独立函数。请使用[asc_storealign](../SIMD-API/c_api/reg_compute/store/asc_storealign.md)的新版本。
@@ -223,6 +215,10 @@
 - [asc_storeunalign_postupdate](../SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md)接口（不指定存储偏移量原型）
 
     此接口后续版本会废弃，请使用[asc_squeeze_and_storeunalign](../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)接口。
+
+- [asc_storeunalign_postupdate](../SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md)接口（掩码寄存器搬出模式的b8数据类型原型）
+
+    此接口后续版本会废弃，请使用b16或b32数据类型原型。
 
 <!-- end id7 -->
 
@@ -480,3 +476,6 @@
 
     使用`uint8_t unit_flag`入参的`asc_mmad_sparse()`接口已废弃，请使用[asc_mmad_sparse](../SIMD-API/c_api/cube_compute/asc_mmad_sparse.md)接口。`asc_mmad_sparse_sync()`接口已废弃，请使用[asc_mmad_sparse](../SIMD-API/c_api/cube_compute/asc_mmad_sparse.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
 <!-- end id10 -->
+- [asc_transto5hd_sync（废弃）](../SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md)接口
+
+    此接口已废弃。请使用[asc_transto5hd](../SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
