@@ -33,9 +33,12 @@
 
 本接口为`reg`矢量计算接口，仅在AIV上生效。
 
-## 函数原型（占位符形式）
+## 函数原型
 
 ```c
+// 占位符形式：
+// <sat_mode>：为空时表示非饱和模式，取值为_sat时表示饱和模式。
+// <quarter_pos>：支持ASC_DISPERSE_FIRST_QUARTER、ASC_DISPERSE_SECOND_QUARTER、ASC_DISPERSE_THIRD_QUARTER和ASC_DISPERSE_FOURTH_QUARTER。
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_float2e4m3_rn<sat_mode>(vector_fp8_e4m3fn_t& dst,
                                      vector_float src,
@@ -47,10 +50,6 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn<sat_mode>(vector_fl
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
-
-- `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
-
-- `<quarter_pos>`支持`asc_position_quarter_mode::DISPERSE_FIRST_QUARTER`、`asc_position_quarter_mode::DISPERSE_SECOND_QUARTER`、`asc_position_quarter_mode::DISPERSE_THIRD_QUARTER`和`asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER`，调用时依次使用`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
 
 ## 参数说明
 
