@@ -16,26 +16,27 @@
 #pragma once
 
 #ifndef ceil_div
-#define ceil_div(a, b) (((a) + (b) - 1) / (b))
-#define ceil_align(a, b) (ceil_div(a, b) * (b))
+#define ceil_div(value, alignment) (((value) + (alignment) - 1) / (alignment))
 #endif
+
+constexpr uint32_t s2_ceil_align(uint32_t value, uint32_t alignment) { return ceil_div(value, alignment) * alignment; }
 
 // ========== 场景2 常量 ==========
 constexpr uint32_t S2_C0_SIZE = 16;
 constexpr uint32_t S2_FRACTAL_NUM = 1;
 constexpr uint32_t S2_FRACTAL_SIZE = BLOCK_CUBE * S2_C0_SIZE; // 256
 
-constexpr uint32_t S2_A_L1_SIZE = ceil_align(M, BLOCK_CUBE) * ceil_align(K, S2_C0_SIZE); // 32 Ã 80 = 2560
-constexpr uint32_t S2_A_L0_SIZE = ceil_align(M, BLOCK_CUBE) * ceil_align(K, S2_C0_SIZE);
-constexpr uint32_t S2_B_L1_SIZE = ceil_align(N, BLOCK_CUBE) * ceil_align(K, S2_C0_SIZE); // 48 Ã 80 = 3840
-constexpr uint32_t S2_B_L0_SIZE = ceil_align(K, S2_C0_SIZE) * ceil_align(N, BLOCK_CUBE); // 80 Ã 48 = 3840
-constexpr uint32_t S2_C_L0_SIZE = ceil_align(M, BLOCK_CUBE) * ceil_align(N, BLOCK_CUBE); // 32 Ã 48 = 1536
+constexpr uint32_t S2_A_L1_SIZE = s2_ceil_align(M, BLOCK_CUBE) * s2_ceil_align(K, S2_C0_SIZE); // 32 Ã 80 = 2560
+constexpr uint32_t S2_A_L0_SIZE = s2_ceil_align(M, BLOCK_CUBE) * s2_ceil_align(K, S2_C0_SIZE);
+constexpr uint32_t S2_B_L1_SIZE = s2_ceil_align(N, BLOCK_CUBE) * s2_ceil_align(K, S2_C0_SIZE); // 48 Ã 80 = 3840
+constexpr uint32_t S2_B_L0_SIZE = s2_ceil_align(K, S2_C0_SIZE) * s2_ceil_align(N, BLOCK_CUBE); // 80 Ã 48 = 3840
+constexpr uint32_t S2_C_L0_SIZE = s2_ceil_align(M, BLOCK_CUBE) * s2_ceil_align(N, BLOCK_CUBE); // 32 Ã 48 = 1536
 
 // ========== 阶段1：GM → L1 ==========
 
 __aicore__ inline void s2_copy_matrix_a_to_l1(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src)
 {
-    uint64_t config = (static_cast<uint64_t>(0) << 48) | (static_cast<uint64_t>(ceil_align(M, BLOCK_CUBE)) << 32) |
+    uint64_t config = (static_cast<uint64_t>(0) << 48) | (static_cast<uint64_t>(s2_ceil_align(M, BLOCK_CUBE)) << 32) |
                       (static_cast<uint64_t>(1) << 16) | (static_cast<uint64_t>(1));
 
     asc_set_gm2l1_nz_para(config);
@@ -54,7 +55,7 @@ __aicore__ inline void s2_copy_matrix_a_to_l1(__cbuf__ bfloat16_t* dst, __gm__ b
 
 __aicore__ inline void s2_copy_matrix_b_to_l1(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src)
 {
-    uint64_t config = (static_cast<uint64_t>(0) << 48) | (static_cast<uint64_t>(ceil_align(N, BLOCK_CUBE)) << 32) |
+    uint64_t config = (static_cast<uint64_t>(0) << 48) | (static_cast<uint64_t>(s2_ceil_align(N, BLOCK_CUBE)) << 32) |
                       (static_cast<uint64_t>(1) << 16) | (static_cast<uint64_t>(1));
 
     asc_set_gm2l1_nz_para(config);
@@ -115,20 +116,22 @@ __aicore__ inline void s2_compute_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t
     uint16_t left_height = M;
     uint16_t n_dim = K;
     uint16_t right_width = N;
-    uint8_t unit_flag = 0;
+    asc_unit_flag_mode unit_flag_mode = asc_unit_flag_mode::DISABLE;
     bool disable_gemv = true;
     bool c_matrix_source = false;
     bool c_matrix_init_val = true;
 
     asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag_mode, disable_gemv, c_matrix_source,
         c_matrix_init_val);
+
+    asc_sync_pipe(PIPE_M);
 
     c_matrix_source = false;
     c_matrix_init_val = false;
 
     asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag_mode, disable_gemv, c_matrix_source,
         c_matrix_init_val);
 
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
@@ -149,7 +152,7 @@ __aicore__ inline void s2_copy_result_to_gm(__gm__ float* dst, __cc__ float* src
     uint16_t n_size = N;
     uint16_t m_size = M;
     uint32_t loop_dst_stride = N;
-    uint16_t loop_src_stride = ceil_align(M, BLOCK_CUBE);
+    uint16_t loop_src_stride = s2_ceil_align(M, BLOCK_CUBE);
     uint8_t l2_cache_ctl = 0;
     uint8_t clip_relu_pre = 0;
     uint8_t unit_flag_ctl = 0;

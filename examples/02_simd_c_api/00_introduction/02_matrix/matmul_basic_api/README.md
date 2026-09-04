@@ -8,7 +8,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -55,7 +55,7 @@
 
   - Kernel侧详细流程
     - 核函数参数`a`、`b`、`c`为[GM（Global Memory，全局内存）](../../../../../docs/zh/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)中的A、B、C矩阵地址，在Kernel侧分别转换为`__gm__ half*`类型的`aGM`、`bGM`、`cGM`。
-    - 通过`asc_get_block_idx`获取当前核号，并计算`mIterIdx`。本样例只沿M轴切分任务，因此每个核只需要处理A矩阵和C矩阵中属于自己的M轴分片。
+    - 通过内置变量`block_idx`获取当前核号，并计算`mIterIdx`。本样例只沿M轴切分任务，因此每个核只需要处理A矩阵和C矩阵中属于自己的M轴分片。
     - 设置GM地址偏移：
       - `aGM`偏移`mIterIdx * singleCoreM * K`，使当前核读取自己负责的A矩阵行块。
       - `bGM`不偏移，因为每个核都需要读取完整B矩阵。
@@ -69,9 +69,9 @@
     - 调用[`asc_set_gm2l1_nz_para`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md)配置目的Nz排布，再调用[`asc_copy_gm2l1_nd2nz`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)将A、B矩阵从GM搬运到L1，在搬运过程中将输入的[ND](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md)格式数据转换为Cube计算需要的[Nz](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md)格式。
     - 调用[`asc_sync_notify`](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_sync_notify.md)和[`asc_sync_wait`](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_sync_wait.md)进行同步。`asc_copy_gm2l1_nd2nz`属于MTE2流水，后续L1到L0的搬运属于[MTE1](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md)流水，MTE1必须等待MTE2完成，避免读取到尚未搬运完成的L1数据。
     - 调用[`asc_copy_l12l0a`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md)将A矩阵从L1搬运到L0A，调用[`asc_copy_l12l0b_transpose`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md)将B矩阵从L1转置搬运到L0B。L0A和L0B是Cube矩阵计算单元直接读取的输入缓存。
-    - 调用`asc_sync_notify`和`asc_sync_wait`进行同步。L1到L0的搬运属于MTE1流水，后续`asc_mmad`属于M流水，M流水必须等待MTE1完成，避免读取到尚未搬运完成的L0A/L0B数据。
+    - 调用`asc_sync_notify`和`asc_sync_wait`进行同步。L1到L0的搬运属于MTE1流水，后续`asc_mmad`属于PIPE_M流水，PIPE_M流水必须等待MTE1完成，避免读取到尚未搬运完成的L0A/L0B数据。
     - 调用[`asc_mmad`](../../../../../docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md)`(cLocal, a2Local, b2Local, baseM, baseK, baseN, asc_unit_flag_mode::DISABLE, false, false, true)`执行矩阵乘。这里`baseM = 128`、`baseN = 256`、`baseK = 64`，对应单个核一次计算的矩阵块大小。
-    - 调用`asc_sync_notify`和`asc_sync_wait`进行同步。`asc_mmad`属于M流水，后续[`asc_copy_l0c2gm`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)属于FIX流水，FIX流水必须等待M流水完成，避免读取到尚未计算完成的L0C结果。
+    - 调用`asc_sync_notify`和`asc_sync_wait`进行同步。`asc_mmad`属于PIPE_M流水，后续[`asc_copy_l0c2gm`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)属于FIX流水，FIX流水必须等待PIPE_M流水完成，避免读取到尚未计算完成的L0C结果。
     - 调用[`asc_set_l0c_copy_nz_para`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md)配置Nz到ND的单矩阵搬运，再调用`asc_copy_l0c2gm`将L0C中的`float`累加结果转换为`half`并搬运回GM中的C矩阵输出位置。
     - 最后调用[`asc_sync_pipe`](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_sync_pipe.md)`(PIPE_ALL)`，确保当前核内相关流水任务完成。
 
@@ -209,7 +209,7 @@
 示例如下：
 
 ```cpp
-printf("matmul blockIdx=%u\n", asc_get_block_idx());
+printf("matmul blockIdx=%u\n", static_cast<uint32_t>(block_idx));
 ```
 
 > [!CAUTION]注意 
@@ -218,33 +218,3 @@ printf("matmul blockIdx=%u\n", asc_get_block_idx());
 ### DumpTensor
 
 基础API的`DumpTensor`以`LocalTensor`为输入。SIMD C API使用带地址空间限定符的数组，不提供以这些数组为输入的等价`asc_*`接口，因此本样例不能直接迁移`DumpTensor(cLocal, baseM * baseN)`调用。需要检查中间数据时，可在调测阶段使用printf输出必要信息，或结合仿真和性能调试工具进行定位。
-
-## 性能调试
-
-### msOpProf工具介绍
-msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
-
-- 上板性能采集
-
-    通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
-
-    基于可执行文件demo通过msopprof执行算子调优：
-    ```
-    msopprof ./demo
-    ```
-
-    - 性能数据说明  
-      命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
-
-      ```bash
-      ├──dump                       # 原始的性能数据，用户无需关注
-      ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
-      ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
-      ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
-      ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
-      ├──OpBasicInfo.csv            # 算子基础信息
-      ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
-      ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
-      └──visualize_data.bin         # MindStudio Insight呈现文件
-      ```
