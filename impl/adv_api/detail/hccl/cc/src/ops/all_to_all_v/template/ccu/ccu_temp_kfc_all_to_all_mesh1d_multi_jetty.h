@@ -41,7 +41,7 @@ public:
         AlgResourceRequest& resourceRequest) override;
     HcclResult CalcResByChannelDescs(
         const OpParam& param, const std::vector<HcclChannelDesc>& channelDescs,
-        const AlgResourceRequest& resourceRequest) const
+        AlgResourceRequest& resourceRequest) const
     {
         CHK_RET(GetRes(resourceRequest));
         resourceRequest.ccuKernelNum.push_back(1U);
