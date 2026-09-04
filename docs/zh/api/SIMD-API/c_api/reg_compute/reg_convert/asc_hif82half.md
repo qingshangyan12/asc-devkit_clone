@@ -78,7 +78,7 @@ __simd_callee__ inline vector_half asc_hif82half(vector_hifloat8_t src,
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。`mask`未筛选的元素在输出中置零。 |
-| src_pos | 输入 | 位置选择标签（编译器标签类型），取值如下：<br>&bull; `ASC_POSITION_EVEN`：选择读取源操作数索引为偶数的位置<br>&bull; `ASC_POSITION_ODD`：选择读取源操作数索引为奇数的位置。 |
+| src_pos | 输入 | 位置选择标签（编译期标签分发，通过编译期重载选择对应实现），取值如下：<br>&bull; `ASC_POSITION_EVEN`：选择读取源操作数索引为偶数的位置<br>&bull; `ASC_POSITION_ODD`：选择读取源操作数索引为奇数的位置。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
@@ -88,6 +88,8 @@ __simd_callee__ inline vector_half asc_hif82half(vector_hifloat8_t src,
 - 通过函数返回值输出结果的函数原型返回计算结果，返回值类型与对应引用输出函数原型中`dst`参数的类型一致（去除引用）。
 
 ## 约束说明
+
+- 位置选择标签参数仅能使用编译期常量，编译器据此在编译期分发至对应的重载。
 
 - 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
 - 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。

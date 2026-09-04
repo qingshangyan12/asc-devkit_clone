@@ -638,7 +638,9 @@ else:
         if not changed:
             changed = staged_changes
 
-        if not ci_mod_filelist_exists:
+        # Pre-commit passes the changed Markdown paths explicitly. Do not expand
+        # that focused check to every historical branch change.
+        if not ci_mod_filelist_exists and not input_paths:
             base_changes, base_reverse_targets = base_markdown_changes()
             changed.extend(path for path in base_changes if path not in changed)
             reverse_targets.update(base_reverse_targets)
