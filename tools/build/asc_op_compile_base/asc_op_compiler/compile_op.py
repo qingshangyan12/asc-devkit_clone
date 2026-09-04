@@ -111,6 +111,7 @@ from .ascendc_compile_utils import check_custom_dcci_end_false, check_if_gen_pla
 from .ascendc_compile_dispatch import (  # noqa: F401
     _compile_ascendc_cce,
     _compile_ascendc_cce_m510,
+    _compile_ascendc_cce_516r2,
     _compile_ascendc_cce_regbase,
     _compile_ascendc_cce_v200_with_kernel_type,
     _compile_ascendc_cce_v220,
@@ -317,6 +318,10 @@ def compile_kernel_and_meta(
         compile_info.code_channel = CORE_TYPE_CUBE
         compile_info.hard_sync = False
         _compile_ascendc_cce_m510(compile_info, compile_option_tuple, tiling_info)
+    elif CommonUtility.is_516r2():
+        compile_info.code_channel = CORE_TYPE_CUBE
+        compile_info.hard_sync = False
+        _compile_ascendc_cce_516r2(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_regbase():
         _compile_ascendc_cce_regbase(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_v200() and compile_info.no_set_kernel_type is False:
@@ -942,7 +947,7 @@ def compile_op(
         [] if compile_options is None else compile_options, []
     )
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_m510())
+        (CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2())
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
@@ -1050,7 +1055,7 @@ def compile_op_with_customized_config(
         [] if compile_options is None else compile_options, []
     )
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_m510())
+        (CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2())
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
