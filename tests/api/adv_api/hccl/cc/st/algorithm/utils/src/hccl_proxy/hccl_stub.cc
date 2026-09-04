@@ -412,33 +412,33 @@ HcclResult HcclThreadAcquire(
 {
     auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
     CHK_PTR_NULL(simComm);
-    return simComm->independentOpThreadMgr_->HcclThreadAcquire(engine, threadNum, notifyNumPerThread, threads);
-}
-
-HcclResult Mc2HcommAcquireDeviceOrderLaunchThread(
-    HcclComm comm, uint32_t notifyNumPerThread, ThreadHandle* thread, bool* supported)
-{
     auto& state = GetMc2TaskCacheTestStubState();
-    ++state.dedicatedThreadAcquireCalls;
-    state.dedicatedThreadNotifyNum = notifyNumPerThread;
-    CHK_PTR_NULL(thread);
-    CHK_PTR_NULL(supported);
-    *thread = 0;
-    *supported = false;
-    if (state.dedicatedThreadResolveRet != HCCL_SUCCESS) {
-        return state.dedicatedThreadResolveRet;
-    }
-    if (!state.dedicatedThreadAcquireSupported) {
+    if (state.emulatePooledThreads && engine == COMM_ENGINE_AICPU_TS) {
+        ++state.aicpuThreadAcquireCalls;
+        state.lastThreadNum = threadNum;
+        state.lastThreadNotifyNum = notifyNumPerThread;
+        CHK_RET(state.threadAcquireRet);
+        if (state.pooledThreads.size() < threadNum) {
+            const size_t oldSize = state.pooledThreads.size();
+            state.pooledThreads.resize(threadNum);
+            CHK_RET(simComm->independentOpThreadMgr_->HcclThreadAcquire(engine,
+                threadNum - oldSize, notifyNumPerThread, state.pooledThreads.data() + oldSize));
+        }
+        std::copy_n(state.pooledThreads.begin(), threadNum, threads);
+        if (state.returnNullThread) {
+            threads[threadNum - 1U] = 0;
+        }
+        if (state.returnDuplicateThread && threadNum > 1U) {
+            threads[threadNum - 1U] = threads[0];
+        }
         return HCCL_SUCCESS;
     }
-    *supported = true;
-    if (state.dedicatedThreadAcquireRet != HCCL_SUCCESS) {
-        return state.dedicatedThreadAcquireRet;
+    if (state.emulatePooledThreads && state.aliasUnfoldThread && engine == COMM_ENGINE_CPU &&
+        !state.pooledThreads.empty()) {
+        threads[0] = state.pooledThreads.back();
+        return HCCL_SUCCESS;
     }
-    CHK_PTR_NULL(comm);
-    CHK_PTR_NULL(thread);
-    *thread = state.dedicatedThread;
-    return HCCL_SUCCESS;
+    return simComm->independentOpThreadMgr_->HcclThreadAcquire(engine, threadNum, notifyNumPerThread, threads);
 }
 
 HcclResult HcclThreadAcquireWithStream(
@@ -460,8 +460,9 @@ HcclResult HcclEngineCtxCopy(
     HcclComm comm, CommEngine engine, const char* ctxTag, const void* srcCtx, uint64_t size, uint64_t dstCtxOffset)
 {
     ++mc2_ops_hccl::g_hcclEngineCtxCopyCallCount;
-    // HOST场景下srcCtx就是创建的EngineCtx内存地址，无需拷贝
-    if (engine == CommEngine::COMM_ENGINE_AICPU_TS || engine == CommEngine::COMM_ENGINE_AICPU) {
+    // Match HcommEngineCtxCopy: host contexts must copy too (the source may be a POD snapshot).
+    if (engine == COMM_ENGINE_AICPU_TS || engine == COMM_ENGINE_AICPU || engine == COMM_ENGINE_CPU_TS ||
+        engine == COMM_ENGINE_CPU || engine == COMM_ENGINE_CCU || engine == COMM_ENGINE_AIV) {
         uint64_t ctxSize = 0;
         void* ctx = nullptr;
         auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);

@@ -38,25 +38,24 @@ HcclResult HcclExecOp(
 
 HcclResult HcclCalcTopoInfo(HcclComm comm, OpParam& param, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo);
 
-HcclResult PrepareMc2AllReduceReplayGate(HcclComm comm, OpParam& param);
 
 HcclResult HcclGetAlgRes(
     HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor, TopoInfoWithNetLayerDetails* topoInfo,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxSequence, bool& isResourceReused);
 
 HcclResult GetAlgResAICPU(
-    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
+    HcclComm comm, OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, TopoInfoWithNetLayerDetails* topoInfo,
     AlgHierarchyInfoForAllLevel& algHierarchyInfo, void** resCtxSequence, uint64_t& ctxSize,
     bool increCreateChannelFlag);
 
 HcclResult HcclAllocAlgResourceAICPU(
-    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
+    HcclComm comm, OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);
 
 HcclResult HcclGetThread(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost);
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, ThreadHandle* replayReleaseThread = nullptr);
 
 HcclResult HcclGetChannel(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
@@ -91,7 +90,7 @@ bool ShouldGoCcuFastLaunch(HcclComm comm, OpParam& param, CcuFastLaunchCtx** ccu
 HcclResult HcclExecOpCcuFastLaunch(HcclComm comm, OpParam& param, const CcuFastLaunchCtx* ccuFastLaunchCtx);
 
 HcclResult GetAlgResDPU(
-    HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
+    HcclComm comm, OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, TopoInfoWithNetLayerDetails* topoInfo,
     AlgHierarchyInfoForAllLevel& algHierarchyInfo, void** resCtxSequence, uint64_t& ctxSize,
     bool increCreateChannelFlag);

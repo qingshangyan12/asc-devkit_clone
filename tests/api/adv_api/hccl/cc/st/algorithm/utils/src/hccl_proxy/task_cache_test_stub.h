@@ -25,11 +25,13 @@ struct Mc2TaskCacheTestStubState {
     HcclResult clearRet = HCCL_SUCCESS;
     HcclResult notifyWaitRet = HCCL_SUCCESS;
     HcclResult notifyRecordRet = HCCL_SUCCESS;
-    HcclResult dedicatedThreadResolveRet = HCCL_SUCCESS;
-    HcclResult dedicatedThreadAcquireRet = HCCL_SUCCESS;
+    HcclResult threadAcquireRet = HCCL_SUCCESS;
     bool lookupHit = false;
     bool interceptNotifyCalls = false;
-    bool dedicatedThreadAcquireSupported = true;
+    bool emulatePooledThreads = false;
+    bool returnNullThread = false;
+    bool returnDuplicateThread = false;
+    bool aliasUnfoldThread = false;
     uint32_t batchStartCalls = 0U;
     uint32_t batchEndCalls = 0U;
     uint32_t lookupCalls = 0U;
@@ -39,14 +41,15 @@ struct Mc2TaskCacheTestStubState {
     uint32_t clearCalls = 0U;
     uint32_t notifyWaitCalls = 0U;
     uint32_t notifyRecordCalls = 0U;
-    uint32_t dedicatedThreadAcquireCalls = 0U;
-    uint32_t dedicatedThreadNotifyNum = 0U;
+    uint32_t aicpuThreadAcquireCalls = 0U;
+    uint32_t lastThreadNum = 0U;
+    uint32_t lastThreadNotifyNum = 0U;
     ThreadHandle waitThread = 0;
     ThreadHandle recordThread = 0;
     ThreadHandle recordDstThread = 0;
     uint32_t waitNotifyIdx = 0U;
     uint32_t recordNotifyIdx = 0U;
-    ThreadHandle dedicatedThread = static_cast<ThreadHandle>(0xdeadU);
+    std::vector<ThreadHandle> pooledThreads;
     std::vector<std::string> events;
 };
 

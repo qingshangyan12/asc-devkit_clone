@@ -9,6 +9,8 @@
  */
 
 #include <cstring>
+#include <limits>
+#include "mc2_replay_gate_host.h"
 
 #include "gtest/gtest.h"
 
@@ -42,6 +44,7 @@ protected:
         g_aclrtMemcpyCallCount = 0U;
         g_hcclEngineCtxCopyCallCount = 0U;
         ResetMc2TaskCacheTestStubState();
+        GetMc2TaskCacheTestStubState().emulatePooledThreads = true;
     }
 
     void TearDown() override
@@ -94,92 +97,189 @@ TEST_F(AicpuAllocCtxResTest, CaptureSafeCopyCoversOpParamAndOpResCtx)
     EXPECT_EQ(copiedOpParam->opType, HcclCMDType::HCCL_CMD_ALLGATHER);
 }
 
-TEST_F(AicpuAllocCtxResTest, AllReduceReplayGateReservesASecondFrameworkNotify)
+
+OpParam GateParam(const char* tag = "allreduce-pooled-gate-ut")
 {
     OpParam param{};
-    param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
-    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
-    std::strncpy(param.algTag, "allreduce-replay-gate-ut", sizeof(param.algTag) - 1U);
+    param.opType = HCCL_CMD_ALLREDUCE;
+    param.engine = COMM_ENGINE_AICPU_TS;
+    param.opMode = OpMode::OPBASE;
+    std::strncpy(param.algTag, tag, sizeof(param.algTag) - 1U);
+    return param;
+}
 
-    ASSERT_EQ(PrepareMc2AllReduceReplayGate(comm_, param), HCCL_SUCCESS);
-    const auto& state = GetMc2TaskCacheTestStubState();
-    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 1U);
-    EXPECT_EQ(state.dedicatedThreadNotifyNum, 1U);
-    EXPECT_EQ(param.deviceOrderThread, state.dedicatedThread);
-
+AlgResourceRequest GateRequest()
+{
     AlgResourceRequest request;
     request.notifyNumOnMainThread = 2U;
     request.slaveThreadNum = 2U;
     request.notifyNumPerThread = {4U, 3U};
-    auto resCtx = std::make_unique<AlgResourceCtxSerializable>();
-    ASSERT_EQ(HcclGetThread(comm_, param, request, resCtx), HCCL_SUCCESS);
-    ASSERT_EQ(resCtx->threads.size(), 3U);
-    for (ThreadHandle thread : resCtx->threads) {
-        auto* simThread = reinterpret_cast<SimHcclThread*>(thread);
-        ASSERT_NE(simThread, nullptr);
-        EXPECT_EQ(simThread->GetNotifyNum(), 6U);
-    }
+    return request;
+}
 
-    ThreadHandle savedMainThread = 0;
-    uint32_t savedNotifyNum = 0U;
-    ASSERT_EQ(GetMainThreadInfo(comm_, param, savedMainThread, savedNotifyNum), HCCL_SUCCESS);
-    EXPECT_EQ(savedMainThread, resCtx->threads.front());
-    EXPECT_EQ(savedNotifyNum, 5U);
+HcclResult AcquireGate(HcclComm comm, OpParam& param, AlgResourceRequest& request,
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtx)
+{
+    resCtx->notifyNumOnMainThread = request.notifyNumOnMainThread;
+    resCtx->notifyNumPerThread = request.notifyNumPerThread;
+    resCtx->slaveThreadNum = request.slaveThreadNum;
+    return HcclGetThread(comm, param, request, resCtx, &param.deviceOrderThread);
+}
+
+TEST_F(AicpuAllocCtxResTest, AllReduceUsesOnePooledPrefixAndReservesGateNotify)
+{
+    auto param = GateParam();
+    auto request = GateRequest();
+    auto resCtx = std::make_unique<AlgResourceCtxSerializable>();
+    ASSERT_EQ(AcquireGate(comm_, param, request, resCtx), HCCL_SUCCESS);
+    const auto& state = GetMc2TaskCacheTestStubState();
+    EXPECT_EQ(state.aicpuThreadAcquireCalls, 1U);
+    EXPECT_EQ(state.lastThreadNum, 4U);
+    EXPECT_EQ(state.lastThreadNotifyNum, 6U);
+    ASSERT_EQ(resCtx->threads.size(), 3U);
+    EXPECT_EQ(param.deviceOrderThread, state.pooledThreads[3]);
+    EXPECT_NE(param.deviceOrderThread, resCtx->unfoldThread);
     for (ThreadHandle thread : resCtx->threads) {
         EXPECT_NE(thread, param.deviceOrderThread);
+        EXPECT_EQ(reinterpret_cast<SimHcclThread*>(thread)->GetNotifyNum(), 6U);
+    }
+    ThreadHandle main = 0;
+    uint32_t notifyNum = 0;
+    ASSERT_EQ(GetMainThreadInfo(comm_, param, main, notifyNum), HCCL_SUCCESS);
+    EXPECT_EQ(main, resCtx->threads.front());
+    EXPECT_EQ(notifyNum, 5U);
+}
+
+TEST_F(AicpuAllocCtxResTest, DifferentAlgorithmsReusePoolWithoutWithinOperationAliasing)
+{
+    auto first = GateParam("small-alg");
+    auto request = GateRequest();
+    auto firstCtx = std::make_unique<AlgResourceCtxSerializable>();
+    ASSERT_EQ(AcquireGate(comm_, first, request, firstCtx), HCCL_SUCCESS);
+    auto second = GateParam("large-alg");
+    request.slaveThreadNum = 4;
+    request.notifyNumPerThread = {4, 4, 4, 4};
+    auto secondCtx = std::make_unique<AlgResourceCtxSerializable>();
+    ASSERT_EQ(AcquireGate(comm_, second, request, secondCtx), HCCL_SUCCESS);
+    EXPECT_EQ(secondCtx->threads[0], firstCtx->threads[0]);
+    EXPECT_EQ(secondCtx->threads[3], first.deviceOrderThread);
+    EXPECT_NE(second.deviceOrderThread, first.deviceOrderThread);
+    EXPECT_EQ(second.deviceOrderThread, GetMc2TaskCacheTestStubState().pooledThreads[5]);
+    for (auto thread : secondCtx->threads) {
+        EXPECT_NE(thread, second.deviceOrderThread);
     }
 }
 
-TEST_F(AicpuAllocCtxResTest, AllReduceReplayGateFallsBackWhenDedicatedThreadIsUnsupported)
+TEST_F(AicpuAllocCtxResTest, ReuseRestoresGateBeforeHcclGetAlgResEarlyReturn)
 {
-    auto& state = GetMc2TaskCacheTestStubState();
-    state.dedicatedThreadAcquireSupported = false;
-    OpParam param{};
-    param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
-    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
-
-    EXPECT_EQ(PrepareMc2AllReduceReplayGate(comm_, param), HCCL_SUCCESS);
-    EXPECT_EQ(param.deviceOrderThread, 0U);
-    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 1U);
+    auto param = GateParam();
+    auto request = GateRequest();
+    auto resCtx = std::make_unique<AlgResourceCtxSerializable>();
+    ASSERT_EQ(AcquireGate(comm_, param, request, resCtx), HCCL_SUCCESS);
+    void* resource = nullptr;
+    ASSERT_EQ(HcclEngineCtxCreate(comm_, param.algTag, COMM_ENGINE_AICPU_TS, 64, &resource), HCCL_SUCCESS);
+    ASSERT_EQ(PublishMc2ReplayGateHostContext(comm_, param, *resCtx, resource, 64), HCCL_SUCCESS);
+    const auto release = param.deviceOrderThread;
+    param.deviceOrderThread = 0;
+    std::unique_ptr<InsCollAlgBase> executor;
+    TopoInfoWithNetLayerDetails topo{};
+    bool reused = false;
+    void* restoredResource = nullptr;
+    ASSERT_EQ(HcclGetAlgRes(comm_, param, executor, &topo, resCtx, &restoredResource, reused), HCCL_SUCCESS);
+    EXPECT_TRUE(reused);
+    EXPECT_EQ(restoredResource, resource);
+    EXPECT_EQ(param.deviceOrderThread, release);
+    EXPECT_EQ(GetMc2TaskCacheTestStubState().aicpuThreadAcquireCalls, 1U);
 }
 
-TEST_F(AicpuAllocCtxResTest, AllReduceReplayGatePropagatesDedicatedThreadResolverFailure)
+TEST_F(AicpuAllocCtxResTest, MissingSidecarRejectsResourceReuse)
 {
-    auto& state = GetMc2TaskCacheTestStubState();
-    state.dedicatedThreadResolveRet = HCCL_E_INTERNAL;
-    OpParam param{};
-    param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
-    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
-
-    EXPECT_EQ(PrepareMc2AllReduceReplayGate(comm_, param), HCCL_E_INTERNAL);
+    auto param = GateParam();
+    void* resource = nullptr;
+    ASSERT_EQ(HcclEngineCtxCreate(comm_, param.algTag, COMM_ENGINE_AICPU_TS, 64, &resource), HCCL_SUCCESS);
+    auto resCtx = std::make_unique<AlgResourceCtxSerializable>();
+    std::unique_ptr<InsCollAlgBase> executor;
+    TopoInfoWithNetLayerDetails topo{};
+    bool reused = false;
+    void* restored = nullptr;
+    EXPECT_EQ(HcclGetAlgRes(comm_, param, executor, &topo, resCtx, &restored, reused), HCCL_E_INTERNAL);
+    EXPECT_FALSE(reused);
     EXPECT_EQ(param.deviceOrderThread, 0U);
-    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 1U);
 }
 
-TEST_F(AicpuAllocCtxResTest, AllReduceReplayGatePropagatesDedicatedThreadAcquireFailure)
+TEST_F(AicpuAllocCtxResTest, InvalidSidecarRejectsReuse)
 {
-    auto& state = GetMc2TaskCacheTestStubState();
-    state.dedicatedThreadAcquireRet = HCCL_E_INTERNAL;
-    OpParam param{};
-    param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
-    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
-
-    EXPECT_EQ(PrepareMc2AllReduceReplayGate(comm_, param), HCCL_E_INTERNAL);
-    EXPECT_EQ(param.deviceOrderThread, 0U);
-    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 1U);
+    auto param = GateParam();
+    auto request = GateRequest();
+    auto resCtx = std::make_unique<AlgResourceCtxSerializable>();
+    ASSERT_EQ(AcquireGate(comm_, param, request, resCtx), HCCL_SUCCESS);
+    void* resource = nullptr;
+    ASSERT_EQ(HcclEngineCtxCreate(comm_, param.algTag, COMM_ENGINE_AICPU_TS, 64, &resource), HCCL_SUCCESS);
+    ASSERT_EQ(PublishMc2ReplayGateHostContext(comm_, param, *resCtx, resource, 64), HCCL_SUCCESS);
+    std::string tag;
+    ASSERT_EQ(Mc2ReplayGateContextTag(param, tag), HCCL_SUCCESS);
+    void* storage = nullptr;
+    uint64_t size = 0;
+    ASSERT_EQ(HcclEngineCtxGet(comm_, tag.c_str(), COMM_ENGINE_CPU_TS, &storage, &size), HCCL_SUCCESS);
+    auto* record = static_cast<Mc2ReplayGateHostContext*>(storage);
+    const auto original = *record;
+    for (unsigned fault = 0; fault < 7; ++fault) {
+        *record = original;
+        switch (fault) {
+            case 0: record->version++; break;
+            case 1: record->valid = 0; break;
+            case 2: record->releaseThread = 0; break;
+            case 3: record->resourceAddress++; break;
+            case 4: record->resourceSize++; break;
+            case 5: record->mainThread++; break;
+            case 6: record->notifyIdx++; break;
+        }
+        EXPECT_EQ(RestoreMc2ReplayGateHostContext(comm_, param, resource, 64), HCCL_E_INTERNAL);
+        EXPECT_EQ(param.deviceOrderThread, 0U);
+    }
+    *record = original;
+    EXPECT_EQ(RestoreMc2ReplayGateHostContext(comm_, param, resource, 64), HCCL_SUCCESS);
+    EXPECT_EQ(param.deviceOrderThread, original.releaseThread);
 }
 
-TEST_F(AicpuAllocCtxResTest, AllReduceReplayGateFallsBackWhenDeviceOrderLaunchIsDisabled)
+TEST_F(AicpuAllocCtxResTest, AcquisitionFailureDoesNotDisableGateSilently)
 {
-    auto& state = GetMc2TaskCacheTestStubState();
-    state.dedicatedThread = 0U;
-    OpParam param{};
-    param.opType = HcclCMDType::HCCL_CMD_ALLREDUCE;
-    param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
-
-    EXPECT_EQ(PrepareMc2AllReduceReplayGate(comm_, param), HCCL_SUCCESS);
+    auto param = GateParam();
+    auto request = GateRequest();
+    auto resCtx = std::make_unique<AlgResourceCtxSerializable>();
+    GetMc2TaskCacheTestStubState().threadAcquireRet = HCCL_E_UNAVAIL;
+    EXPECT_EQ(AcquireGate(comm_, param, request, resCtx), HCCL_E_UNAVAIL);
     EXPECT_EQ(param.deviceOrderThread, 0U);
-    EXPECT_EQ(state.dedicatedThreadAcquireCalls, 1U);
+    EXPECT_TRUE(resCtx->threads.empty());
+}
+
+TEST_F(AicpuAllocCtxResTest, InvalidHandlesAreRejectedBeforePublication)
+{
+    for (unsigned fault = 0; fault < 3; ++fault) {
+        auto& state = GetMc2TaskCacheTestStubState();
+        state.returnNullThread = fault == 0;
+        state.returnDuplicateThread = fault == 1;
+        state.aliasUnfoldThread = fault == 2;
+        auto param = GateParam();
+        auto request = GateRequest();
+        auto resCtx = std::make_unique<AlgResourceCtxSerializable>();
+        EXPECT_EQ(AcquireGate(comm_, param, request, resCtx), HCCL_E_INTERNAL);
+        EXPECT_EQ(param.deviceOrderThread, 0U);
+        EXPECT_TRUE(resCtx->threads.empty());
+    }
+}
+
+TEST_F(AicpuAllocCtxResTest, OverflowIsRejectedBeforeAnyThreadAllocation)
+{
+    auto param = GateParam();
+    auto request = GateRequest();
+    auto resCtx = std::make_unique<AlgResourceCtxSerializable>();
+    request.slaveThreadNum = std::numeric_limits<uint32_t>::max() - 1U;
+    EXPECT_EQ(AcquireGate(comm_, param, request, resCtx), HCCL_E_PARA);
+    request = GateRequest();
+    request.notifyNumOnMainThread = std::numeric_limits<uint32_t>::max() - 1U;
+    EXPECT_EQ(AcquireGate(comm_, param, request, resCtx), HCCL_E_PARA);
+    EXPECT_EQ(GetMc2TaskCacheTestStubState().aicpuThreadAcquireCalls, 0U);
 }
 
 TEST_F(AicpuAllocCtxResTest, NonAllReduceKeepsOneFrameworkNotify)
