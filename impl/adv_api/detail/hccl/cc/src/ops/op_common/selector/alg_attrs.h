@@ -16,6 +16,11 @@ namespace mc2_ops_hccl {
 
 struct AlgAttrs {
     std::string name;
+    HcclCMDType opType = HcclCMDType::HCCL_CMD_INVALID;
+    OpExecuteConfig engine = OpExecuteConfig::DEFAULT;
+    std::vector<AlgoType> algoTypes;
+    TopoAttrs topo;
+    OpAttrs op;
 };
 
 } // namespace mc2_ops_hccl
