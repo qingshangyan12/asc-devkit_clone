@@ -105,8 +105,7 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, local_registry_contains_all_gather_algorithms)
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "InsAllGatherMesh1D"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSoleNHR"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherConcurMeshNHR"), nullptr);
-    EXPECT_NE(
-        registry.GetAlgExec(HCCL_CMD_ALLGATHER, "InsAllGatherParallelMesh1DNHRMultiJetty"), nullptr);
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "InsAllGatherParallelMesh1DNHRMultiJetty"), nullptr);
 }
 
 TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_obeys_count_and_rank_boundaries)
@@ -178,8 +177,7 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, multijetty_template_uses_runtime_channel_counts
     std::vector<u64> elemCount;
     std::vector<u64> sizeOut;
     std::vector<u64> elemOffset;
-    ASSERT_EQ(
-        nhr.CalcDataSplitByPortGroup(1024U, 4U, channels.at(1U), elemCount, sizeOut, elemOffset), HCCL_SUCCESS);
+    ASSERT_EQ(nhr.CalcDataSplitByPortGroup(1024U, 4U, channels.at(1U), elemCount, sizeOut, elemOffset), HCCL_SUCCESS);
     EXPECT_EQ(sizeOut.size(), 2U);
 }
 

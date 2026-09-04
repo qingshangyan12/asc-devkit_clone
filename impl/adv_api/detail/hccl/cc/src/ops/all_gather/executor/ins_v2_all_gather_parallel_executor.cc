@@ -60,8 +60,8 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
         interHierarchyInfo = {closRanks};
     } else {
         CHK_PRT_RET(
-            algHierarchyInfo.infos.size() < REQUIRED_HIERARCHY_INFO_NUM || algHierarchyInfo.infos[0].empty()
-                || algHierarchyInfo.infos[1].empty(),
+            algHierarchyInfo.infos.size() < REQUIRED_HIERARCHY_INFO_NUM || algHierarchyInfo.infos[0].empty() ||
+                algHierarchyInfo.infos[1].empty(),
             HCCL_ERROR("[InsAllGatherParallelExecutor][CalcRes] Invalid topoInfo"), HcclResult::HCCL_E_INTERNAL);
         intraHierarchyInfo = algHierarchyInfo.infos[0];
         interHierarchyInfo = algHierarchyInfo.infos[1];
@@ -289,8 +289,7 @@ template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTempla
 HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::Orchestrate(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
-    if (resCtx.algHierarchyInfo.infos.empty()
-        || resCtx.algHierarchyInfo.infos.size() < REQUIRED_HIERARCHY_INFO_NUM) {
+    if (resCtx.algHierarchyInfo.infos.empty() || resCtx.algHierarchyInfo.infos.size() < REQUIRED_HIERARCHY_INFO_NUM) {
         HCCL_ERROR("[%s] algHierarchyInfo.infos is invalid (empty or size < 2).", __func__);
         return HCCL_E_PARA;
     }
