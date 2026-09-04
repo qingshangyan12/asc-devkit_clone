@@ -56,6 +56,16 @@ HcclResult RunWithMc2TaskCache(
             static_cast<u32>(param.opType), param.algName, param.algTag),
         startRet);
 
+    // Temporary BatchMode-only A/B policy. Keep the cache implementation for a source-level rollback.
+    // Bypass before plan construction or reservation; do not capture or replay any communication tasks.
+    constexpr bool enableTaskCacheForAbTest = false;
+    if (!enableTaskCacheForAbTest) {
+        HCCL_DEBUG("[MC2_TASK_CACHE][BypassAB] task_cache=off batch_mode=on");
+        const HcclResult execRet = func();
+        const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
+        return execRet != HCCL_SUCCESS ? execRet : endRet;
+    }
+
     bool batchActive = true;
     Mc2AicpuTaskCachePlan plan;
     HcclResult policyRet = BuildMc2AicpuTaskCachePlan(param, resCtx, plan);

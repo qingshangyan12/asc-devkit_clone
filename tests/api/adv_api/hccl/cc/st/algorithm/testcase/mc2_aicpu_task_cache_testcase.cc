@@ -263,59 +263,9 @@ TEST_F(Mc2AicpuTaskCacheTest, EvictRetainsTagsUntilClearSucceeds)
     EXPECT_EQ(manager.TryReserve(comm, "tag0"), Mc2TaskCacheReserveResult::RESERVED);
 }
 
-TEST_F(Mc2AicpuTaskCacheTest, CacheMissCapturesAndCacheHitSkipsExecutor)
+void ExpectNoCacheCalls()
 {
-    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
-    Mc2AicpuTaskCacheManager manager(4U, 1024U);
-    uint32_t executorCalls = 0U;
-    EXPECT_EQ(
-        RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx,
-            [&executorCalls]() {
-                ++executorCalls;
-                return HCCL_SUCCESS;
-            },
-            manager),
-        HCCL_SUCCESS);
-    auto& state = GetMc2TaskCacheTestStubState();
-    EXPECT_EQ(executorCalls, 1U);
-    EXPECT_EQ(state.lookupCalls, 1U);
-    EXPECT_EQ(state.cacheStartCalls, 1U);
-    EXPECT_EQ(state.cacheEndCalls, 1U);
-
-    ResetMc2TaskCacheTestStubState();
-    state.lookupHit = true;
-    EXPECT_EQ(
-        RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx,
-            [&executorCalls]() {
-                ++executorCalls;
-                return HCCL_SUCCESS;
-            },
-            manager),
-        HCCL_SUCCESS);
-    EXPECT_EQ(executorCalls, 1U);
-    EXPECT_EQ(state.executeCalls, 1U);
-    EXPECT_EQ(state.cacheStartCalls, 0U);
-}
-
-TEST_F(Mc2AicpuTaskCacheTest, CapacityFullBypassesAllHcommCacheCalls)
-{
-    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
-    Mc2AicpuTaskCacheManager manager(1U, 1024U);
-    ASSERT_EQ(manager.TryReserve(reinterpret_cast<void*>(0x2000U), "existing"), Mc2TaskCacheReserveResult::RESERVED);
-    uint32_t executorCalls = 0U;
-    EXPECT_EQ(
-        RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx,
-            [&executorCalls]() {
-                ++executorCalls;
-                return HCCL_SUCCESS;
-            },
-            manager),
-        HCCL_SUCCESS);
     const auto& state = GetMc2TaskCacheTestStubState();
-    EXPECT_EQ(executorCalls, 1U);
     EXPECT_EQ(state.lookupCalls, 0U);
     EXPECT_EQ(state.cacheStartCalls, 0U);
     EXPECT_EQ(state.cacheEndCalls, 0U);
@@ -323,110 +273,141 @@ TEST_F(Mc2AicpuTaskCacheTest, CapacityFullBypassesAllHcommCacheCalls)
     EXPECT_EQ(state.clearCalls, 0U);
 }
 
-TEST_F(Mc2AicpuTaskCacheTest, ExecuteFailureClearsWithoutFallingBack)
+TEST_F(Mc2AicpuTaskCacheTest, BatchOnlyRebuildsAllFiveOperationsOnEveryCall)
 {
-    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
-    Mc2AicpuTaskCacheManager manager(2U, 1024U);
+    const HcclCMDType opTypes[] = {
+        HCCL_CMD_ALLGATHER, HCCL_CMD_REDUCE_SCATTER, HCCL_CMD_ALLREDUCE, HCCL_CMD_ALLTOALL, HCCL_CMD_ALLTOALLV};
+    for (HcclCMDType opType : opTypes) {
+        SCOPED_TRACE(static_cast<int>(opType));
+        ResetMc2TaskCacheTestStubState();
+        auto inputs = MakeTaskCacheInputs(opType);
+        if (opType == HCCL_CMD_ALLTOALL || opType == HCCL_CMD_ALLTOALLV) {
+            inputs.RefreshAllToAllPointers();
+        }
+        Mc2AicpuTaskCacheManager manager(1U, 1024U);
+        auto& state = GetMc2TaskCacheTestStubState();
+        uint32_t executorCalls = 0U;
+        for (uint32_t turn = 0; turn < 3U; ++turn) {
+            // Even a would-be hit must execute the complete algorithm again.
+            state.lookupHit = turn != 0;
+            ASSERT_EQ(RunWithMc2TaskCache(inputs.param, inputs.resCtx, [&]() {
+                EXPECT_EQ(state.batchStartCalls, turn + 1U);
+                EXPECT_EQ(state.batchEndCalls, turn);
+                ++executorCalls;
+                return HCCL_SUCCESS;
+            }, manager), HCCL_SUCCESS);
+            EXPECT_EQ(state.batchEndCalls, turn + 1U);
+            ExpectNoCacheCalls();
+        }
+        EXPECT_EQ(executorCalls, 3U);
+        // No hidden reservation is allowed on the bypass path.
+        EXPECT_EQ(manager.TryReserve(inputs.param.hcclComm, "unused"), Mc2TaskCacheReserveResult::RESERVED);
+    }
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, BatchOnlyIgnoresCacheErrorsAndFullCapacity)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLREDUCE);
+    Mc2AicpuTaskCacheManager manager(1U, 1024U);
+    ASSERT_EQ(manager.TryReserve(inputs.param.hcclComm, "occupied"), Mc2TaskCacheReserveResult::RESERVED);
     auto& state = GetMc2TaskCacheTestStubState();
+    state.lookupRet = state.cacheStartRet = state.cacheEndRet = state.executeRet = state.clearRet = HCCL_E_PARA;
     state.lookupHit = true;
-    state.executeRet = HCCL_E_PARA;
     uint32_t executorCalls = 0U;
-    EXPECT_EQ(
-        RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx,
-            [&executorCalls]() {
-                ++executorCalls;
-                return HCCL_SUCCESS;
-            },
-            manager),
-        HCCL_E_PARA);
+    EXPECT_EQ(RunWithMc2TaskCache(inputs.param, inputs.resCtx, [&]() {
+        ++executorCalls;
+        return HCCL_SUCCESS;
+    }, manager), HCCL_SUCCESS);
+    EXPECT_EQ(executorCalls, 1U);
+    EXPECT_EQ(state.batchStartCalls, 1U);
+    EXPECT_EQ(state.batchEndCalls, 1U);
+    ExpectNoCacheCalls();
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, BatchOnlyDoesNotRequireCacheSymbolsOrValidCachePlan)
+{
+    Mc2HcommAicpuTsTaskCacheResetTestFunctions();
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
+    // The runner must not validate or hash cache-only address ranges.
+    inputs.param.outputPtr = inputs.param.inputPtr;
+    Mc2AicpuTaskCacheManager manager(1U, 1024U);
+    uint32_t executorCalls = 0U;
+    EXPECT_EQ(RunWithMc2TaskCache(inputs.param, inputs.resCtx, [&]() {
+        ++executorCalls;
+        return HCCL_SUCCESS;
+    }, manager), HCCL_SUCCESS);
+    EXPECT_EQ(executorCalls, 1U);
+    EXPECT_EQ(GetMc2TaskCacheTestStubState().batchEndCalls, 1U);
+    ExpectNoCacheCalls();
+}
+
+TEST_F(Mc2AicpuTaskCacheTest, BatchStartFailureDoesNotExecuteOrEnd)
+{
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
+    Mc2AicpuTaskCacheManager manager(1U, 1024U);
+    auto& state = GetMc2TaskCacheTestStubState();
+    state.batchStartRet = HCCL_E_PARA;
+    uint32_t executorCalls = 0U;
+    EXPECT_EQ(RunWithMc2TaskCache(inputs.param, inputs.resCtx, [&]() {
+        ++executorCalls;
+        return HCCL_SUCCESS;
+    }, manager), HCCL_E_PARA);
     EXPECT_EQ(executorCalls, 0U);
-    EXPECT_EQ(state.executeCalls, 1U);
-    EXPECT_EQ(state.clearCalls, 1U);
+    EXPECT_EQ(state.batchStartCalls, 1U);
+    EXPECT_EQ(state.batchEndCalls, 0U);
+    ExpectNoCacheCalls();
 }
 
-TEST_F(Mc2AicpuTaskCacheTest, LookupFailureClearsThenFallsBack)
+TEST_F(Mc2AicpuTaskCacheTest, ExecutorFailureStillEndsBatchAndPreservesFirstError)
 {
-    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
-    Mc2AicpuTaskCacheManager manager(2U, 1024U);
-    GetMc2TaskCacheTestStubState().lookupRet = HCCL_E_PARA;
-    uint32_t executorCalls = 0U;
-    EXPECT_EQ(
-        RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx,
-            [&executorCalls]() {
-                ++executorCalls;
-                return HCCL_SUCCESS;
-            },
-            manager),
-        HCCL_SUCCESS);
-    const auto& state = GetMc2TaskCacheTestStubState();
-    EXPECT_EQ(executorCalls, 1U);
-    EXPECT_EQ(state.clearCalls, 1U);
-    EXPECT_EQ(manager.TryReserve(inputs.param.hcclComm, "replacement"), Mc2TaskCacheReserveResult::RESERVED);
+    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLREDUCE);
+    Mc2AicpuTaskCacheManager manager(1U, 1024U);
+    auto& state = GetMc2TaskCacheTestStubState();
+    for (HcclResult endRet : {HCCL_SUCCESS, HCCL_E_INTERNAL}) {
+        ResetMc2TaskCacheTestStubState();
+        state.batchEndRet = endRet;
+        uint32_t executorCalls = 0U;
+        EXPECT_EQ(RunWithMc2TaskCache(inputs.param, inputs.resCtx, [&]() {
+            ++executorCalls;
+            return HCCL_E_PARA;
+        }, manager), HCCL_E_PARA);
+        EXPECT_EQ(executorCalls, 1U);
+        EXPECT_EQ(state.batchStartCalls, 1U);
+        EXPECT_EQ(state.batchEndCalls, 1U);
+        ExpectNoCacheCalls();
+    }
 }
 
-TEST_F(Mc2AicpuTaskCacheTest, StartFailureClearsThenFallsBack)
+TEST_F(Mc2AicpuTaskCacheTest, BatchEndFailureReturnsErrorWithoutRetry)
 {
     auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
-    Mc2AicpuTaskCacheManager manager(2U, 1024U);
-    GetMc2TaskCacheTestStubState().cacheStartRet = HCCL_E_PARA;
+    Mc2AicpuTaskCacheManager manager(1U, 1024U);
+    auto& state = GetMc2TaskCacheTestStubState();
+    state.batchEndRet = HCCL_E_INTERNAL;
     uint32_t executorCalls = 0U;
-    EXPECT_EQ(
-        RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx,
-            [&executorCalls]() {
-                ++executorCalls;
-                return HCCL_SUCCESS;
-            },
-            manager),
-        HCCL_SUCCESS);
-    const auto& state = GetMc2TaskCacheTestStubState();
+    EXPECT_EQ(RunWithMc2TaskCache(inputs.param, inputs.resCtx, [&]() {
+        ++executorCalls;
+        return HCCL_SUCCESS;
+    }, manager), HCCL_E_INTERNAL);
     EXPECT_EQ(executorCalls, 1U);
-    EXPECT_EQ(state.cacheStartCalls, 1U);
-    EXPECT_EQ(state.clearCalls, 1U);
+    EXPECT_EQ(state.batchEndCalls, 1U);
+    ExpectNoCacheCalls();
 }
 
-TEST_F(Mc2AicpuTaskCacheTest, ExecutorFailureClearsOnceAndReturnsError)
+TEST_F(Mc2AicpuTaskCacheTest, OtherOperationsRemainOutsideBatchOnlyPolicy)
 {
     auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
-    Mc2AicpuTaskCacheManager manager(2U, 1024U);
+    inputs.param.opType = HCCL_CMD_BROADCAST;
+    Mc2AicpuTaskCacheManager manager(1U, 1024U);
     uint32_t executorCalls = 0U;
-    EXPECT_EQ(
-        RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx,
-            [&executorCalls]() {
-                ++executorCalls;
-                return HCCL_E_PARA;
-            },
-            manager),
-        HCCL_E_PARA);
-    const auto& state = GetMc2TaskCacheTestStubState();
+    EXPECT_EQ(RunWithMc2TaskCache(inputs.param, inputs.resCtx, [&]() {
+        ++executorCalls;
+        return HCCL_SUCCESS;
+    }, manager), HCCL_SUCCESS);
     EXPECT_EQ(executorCalls, 1U);
-    EXPECT_EQ(state.cacheStartCalls, 1U);
-    EXPECT_EQ(state.cacheEndCalls, 0U);
-    EXPECT_EQ(state.clearCalls, 1U);
-}
-
-TEST_F(Mc2AicpuTaskCacheTest, CacheEndFailureClearsAndReturnsError)
-{
-    auto inputs = MakeTaskCacheInputs(HCCL_CMD_ALLGATHER);
-    Mc2AicpuTaskCacheManager manager(2U, 1024U);
-    GetMc2TaskCacheTestStubState().cacheEndRet = HCCL_E_PARA;
-    uint32_t executorCalls = 0U;
-    EXPECT_EQ(
-        RunWithMc2TaskCache(
-            inputs.param, inputs.resCtx,
-            [&executorCalls]() {
-                ++executorCalls;
-                return HCCL_SUCCESS;
-            },
-            manager),
-        HCCL_E_PARA);
-    const auto& state = GetMc2TaskCacheTestStubState();
-    EXPECT_EQ(executorCalls, 1U);
-    EXPECT_EQ(state.cacheEndCalls, 1U);
-    EXPECT_EQ(state.clearCalls, 1U);
+    EXPECT_EQ(GetMc2TaskCacheTestStubState().batchStartCalls, 0U);
+    EXPECT_EQ(GetMc2TaskCacheTestStubState().batchEndCalls, 0U);
+    ExpectNoCacheCalls();
 }
 
 } // namespace
