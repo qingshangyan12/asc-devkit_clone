@@ -2,6 +2,7 @@
 
 - **[asc_clear_nthbit](asc_clear_nthbit.md)**
 - **[asc_clz](asc_clz.md)**
+- **[asc_get_uintdiv_magic_and_shift](asc_get_uintdiv_magic_and_shift.md)**
 - **[asc_ffs](asc_ffs.md)**
 - **[asc_ffz](asc_ffz.md)**
 - **[asc_popc](asc_popc.md)**
