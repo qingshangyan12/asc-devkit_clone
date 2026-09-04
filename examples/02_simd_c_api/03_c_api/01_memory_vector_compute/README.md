@@ -1,0 +1,14 @@
+# Memory矢量计算C API样例介绍
+
+## 概述
+
+本路径下包含了与Memory矢量计算相关的多个C API样例。每个样例均基于Ascend C的`<<<>>>`直调方法，支持main函数和kernel函数在同一个asc文件中实现。
+
+## 算子开发样例
+
+| 目录名称 | 功能描述 |
+| --- | --- |
+| [cast](./cast) | 本样例基于Memory矢量计算C API实现half到打包int4或int32的类型转换，主要调用`asc_half2int4`和`asc_half2int32`接口 |
+| [compare](./compare) | 本样例基于Memory矢量计算C API实现向量和标量比较，主要调用`asc_lt`、`asc_lt_scalar`、`asc_gt_scalar`和`asc_get_cmp_mask`接口 |
+| [element_wise_arithmetic](./element_wise_arithmetic) | 本样例基于Memory矢量计算C API实现Leaky ReLU，主要调用`asc_leakyrelu`接口 |
+| [reduce](./reduce) | 本样例基于Memory矢量计算C API实现向量求和归约，主要调用`asc_repeat_reduce_sum`接口 |
