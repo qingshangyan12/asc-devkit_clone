@@ -47,7 +47,7 @@ data_reorder
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量，**当前仅支持使用[CANN master](../../../../../../docs/zh/quick_start.md#cann-install)**。
+  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/zn/quick_start.md)，配置环境变量，**当前仅支持使用[CANN master](https://gitcode.com/cann/asc-devkit/blob/master/docs/zn/quick_start.md)**。
 
   > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
