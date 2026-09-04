@@ -1,0 +1,63 @@
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
+set(LEGACY_LINK_STAGE_DIR "@CMAKE_CURRENT_BINARY_DIR@/legacy_header_link_stage")
+set(LEGACY_LINK_INSTALL_PREFIX "@CMAKE_INSTALL_PREFIX@")
+set(LEGACY_LINK_INSTALL_LIBRARY_DIR "@INSTALL_LIBRARY_DIR@")
+set(LEGACY_LINK_C_API_INSTALL_SCRIPT "@CMAKE_BINARY_DIR@/impl/c_api/cmake_install.cmake")
+set(LEGACY_LINK_TENSOR_API_INSTALL_SCRIPT "@CMAKE_BINARY_DIR@/impl/tensor_api/cmake_install.cmake")
+
+file(REMOVE_RECURSE "${LEGACY_LINK_STAGE_DIR}")
+
+foreach(install_script IN ITEMS
+    "${LEGACY_LINK_C_API_INSTALL_SCRIPT}"
+    "${LEGACY_LINK_TENSOR_API_INSTALL_SCRIPT}")
+    execute_process(
+        COMMAND "@CMAKE_COMMAND@" -E env "DESTDIR=${LEGACY_LINK_STAGE_DIR}"
+            "@CMAKE_COMMAND@"
+            "-DCMAKE_INSTALL_COMPONENT=asc-devkit"
+            "-DCMAKE_INSTALL_PREFIX=${LEGACY_LINK_INSTALL_PREFIX}"
+            -P "${install_script}"
+        RESULT_VARIABLE install_result
+        OUTPUT_QUIET
+        ERROR_VARIABLE install_error
+    )
+    if(NOT install_result EQUAL 0)
+        message(FATAL_ERROR
+            "Failed to install legacy header links with ${install_script}: ${install_result}\n${install_error}")
+    endif()
+endforeach()
+
+set(LEGACY_LINK_INCLUDE_DIR
+    "${LEGACY_LINK_STAGE_DIR}${LEGACY_LINK_INSTALL_PREFIX}/${LEGACY_LINK_INSTALL_LIBRARY_DIR}/asc/include")
+set(LEGACY_LINK_SPECS
+    "c_api/utils/enum.h|../defs/enum.h"
+    "c_api/sys_var/sys_var.h|../utils/sys_var.h"
+    "tensor_api/arch/cube/copy_op.h|cube_copy_op.h"
+    "tensor_api/arch/vector/copy_op.h|vector_copy_op.h"
+)
+
+foreach(link_spec IN LISTS LEGACY_LINK_SPECS)
+    string(REPLACE "|" ";" link_fields "${link_spec}")
+    list(GET link_fields 0 link_path)
+    list(GET link_fields 1 expected_target)
+    set(link_file "${LEGACY_LINK_INCLUDE_DIR}/${link_path}")
+
+    if(NOT IS_SYMLINK "${link_file}")
+        message(FATAL_ERROR "Legacy header is not a symbolic link: ${link_path}")
+    endif()
+    file(READ_SYMLINK "${link_file}" actual_target)
+    if(NOT actual_target STREQUAL expected_target)
+        message(FATAL_ERROR "Unexpected link target for ${link_path}: ${actual_target}")
+    endif()
+    if(NOT EXISTS "${link_file}")
+        message(FATAL_ERROR "Legacy header link does not resolve: ${link_path}")
+    endif()
+endforeach()

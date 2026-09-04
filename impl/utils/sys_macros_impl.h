@@ -12,8 +12,8 @@
  * \file sys_macros_impl.h
  * \brief
  */
-#ifndef IMPL_UTILS_SYS_MACROS_H
-#define IMPL_UTILS_SYS_MACROS_H
+#ifndef IMPL_UTILS_SYS_MACROS_IMPL_H
+#define IMPL_UTILS_SYS_MACROS_IMPL_H
 
 #include <cstdint>
 #include "utils/base/sys_constants.h"

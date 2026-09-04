@@ -25,6 +25,17 @@ add_custom_target(ascendc_ut_fwk_modules ALL
     COMMENT "Run framework CMake module tests"
 )
 
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/legacy_header_link_check.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/legacy_header_link_check.cmake
+    @ONLY
+)
+add_custom_target(ascendc_legacy_header_link_check
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/legacy_header_link_check.cmake
+    COMMENT "Check legacy public header links in the install staging directory"
+)
+add_dependencies(ascendc_ut_fwk_modules ascendc_legacy_header_link_check)
+
 add_subdirectory(api)
 add_subdirectory(tools)
 add_subdirectory(python)

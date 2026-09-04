@@ -19,18 +19,5 @@ install(DIRECTORY ${ASCENDC_IMPL_DIR}/c_api
 
 # Keep legacy installed include paths available during the compatibility period.
 install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/c_api/sys_var\")" COMPONENT asc-devkit)
-install(CODE "
-execute_process(
-  COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"../defs/enum.h\" \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/c_api/utils/enum.h\"
-  RESULT_VARIABLE enum_link_result
-)
-if(NOT enum_link_result EQUAL 0)
-  message(FATAL_ERROR \"Failed to create legacy enum.h symlink: \${enum_link_result}\")
-endif()
-execute_process(
-  COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"../utils/sys_var.h\" \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/c_api/sys_var/sys_var.h\"
-  RESULT_VARIABLE sys_var_link_result
-)
-if(NOT sys_var_link_result EQUAL 0)
-  message(FATAL_ERROR \"Failed to create legacy sys_var.h symlink: \${sys_var_link_result}\")
-endif()" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../defs/enum.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/c_api/utils/enum.h SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../utils/sys_var.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/c_api/sys_var/sys_var.h SYMBOLIC)" COMPONENT asc-devkit)
