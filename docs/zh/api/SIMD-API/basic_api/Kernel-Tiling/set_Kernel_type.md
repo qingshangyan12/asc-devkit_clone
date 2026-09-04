@@ -44,6 +44,8 @@
 
 -   设置某一个具体的tiling key对应的kernel type。
 
+    头文件路径为：`"utils/base/sys_macros.h"`。
+
     当前仅支持在自定义算子工程中使用。
 
     ```
