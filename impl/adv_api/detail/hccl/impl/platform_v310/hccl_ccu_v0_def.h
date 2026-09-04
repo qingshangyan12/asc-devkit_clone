@@ -31,7 +31,7 @@ enum class AlgorithmType : uint8_t {
     CcuAllReduceMesh2DOneShot,
     CcuReduceMesh1D,
     CcuReduceMesh2D,
-    CcuSchedAllToAllSoleMesh,
+    CcuSchedAllToAllSoleMesh = 150,
     CcuSchedAllToAllVSoleMesh,
     CcuHalfAll2AllVMesh1D,
     CcuSchedAllGatherSoleMesh,
@@ -130,6 +130,7 @@ private:
     __aicore__ inline void CcuPrepareForAllReduceM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForConcurrentAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForConcurrentAllToAll(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterPeerOnlyM2M(__gm__ CommonPrepareParamCcu* commParam);
 
