@@ -100,7 +100,7 @@ __aicore__ inline constexpr decltype(auto) resolve_copy_coord(
 
 template <
     typename LayoutType, typename SliceShape, typename Coord,
-    Std::enable_if_t<!Std::is_same_v<Std::remove_cvref_t<Coord>, zero_coord_type>, int> = 0>
+    Std::enable_if_t<!Std::is_same_v<Std::remove_cvref_t<Coord>, zero_coord_type>, int>>
 __aicore__ inline constexpr const Coord& resolve_copy_coord(const LayoutType&, const SliceShape&, const Coord& coord)
 {
     return coord;
@@ -188,7 +188,7 @@ __aicore__ inline decltype(auto) make_flat_slice_shape(
     return make_flat_slice_impl(coord, layout, slice_shape, Std::make_index_sequence<batch_num>{});
 }
 
-template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!is_layout_v<SliceShape>, int> = 0>
+template <typename Coord, typename LayoutType, typename SliceShape, Std::enable_if_t<!is_layout_v<SliceShape>, int>>
 __aicore__ inline decltype(auto) make_slice_shape(
     const Coord& coord, const LayoutType& layout, const SliceShape& slice_shape)
 {
