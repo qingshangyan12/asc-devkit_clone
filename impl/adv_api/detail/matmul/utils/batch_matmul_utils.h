@@ -25,6 +25,7 @@
 
 #include "matmul_config_utils.h"
 #include "matmul_type_def.h"
+#include "utils/base/sys_math.h"
 
 namespace AscendC {
 
@@ -86,7 +87,7 @@ struct BmmOffset {
 __aicore__ inline uint16_t CeilDiv(uint16_t num1, uint16_t num2)
 {
     ASSERT(num2 > 0);
-    return (num1 + num2 - 1) / num2;
+    return static_cast<uint16_t>(AscendC::CeilDiv<uint16_t, uint16_t>(num1, num2));
 }
 
 // It is invoked by the matmulV3 operator and cannot be removed at present

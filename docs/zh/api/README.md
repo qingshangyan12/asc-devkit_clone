@@ -3023,6 +3023,7 @@
         -   [数学函数](Utils-API/cpp_stdlib/math_functions/math_functions.md)
             -   [abs](Utils-API/cpp_stdlib/math_functions/abs.md)
             -   [sqrt](Utils-API/cpp_stdlib/math_functions/sqrt.md)
+            -   [CeilDiv](Utils-API/cpp_stdlib/math_functions/CeilDiv.md)
             -   [ceil\_div](Utils-API/cpp_stdlib/math_functions/ceil_div.md)
             -   [CeilDivision](Utils-API/cpp_stdlib/math_functions/CeilDivision.md)
 
