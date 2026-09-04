@@ -37,7 +37,7 @@
 
 连续对齐搬入模式中，通过函数返回值返回掩码寄存器时，请使用[asc_loadalign_mask](asc_loadalign_mask.md)。非连续对齐搬入模式中，通过函数返回值返回矢量数据寄存器时，请使用[asc_loadalign_datablock_strided](asc_loadalign_datablock_strided.md)。
 
-**图1**&nbsp;&nbsp;连续搬入矢量数据寄存器
+**图1** 连续搬入矢量数据寄存器
 
 ![](../../figures/capi_loadalign_norm.png)
 
