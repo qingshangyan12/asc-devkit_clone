@@ -1,4 +1,4 @@
-# fixpipe_l0c2l1样例
+# asc_copy_l0c2l1样例
 
 ## 概述
 
@@ -10,18 +10,18 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
 ```
-├── fixpipe_l0c2l1
+├── asc_copy_l0c2l1
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py           // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
-│   ├── fixpipe_l0c2l1.asc             // SIMD C API样例实现及调用样例
+│   ├── asc_copy_l0c2l1.asc             // SIMD C API样例实现及调用样例
 │   └── README.md                      // 样例说明文档
 ```
 
@@ -47,7 +47,7 @@
 ## 场景详细说明
 
 本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，`SCENARIO_NUM` 不同取值对应的含义如下表所示。
-所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 128, 128]，核函数名为 `fixpipe_l0c2l1`。
+所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 128, 128]，核函数名为 `asc_copy_l0c2l1`。
 
 <a name="表2"></a>
 <table border="2" align="center">
