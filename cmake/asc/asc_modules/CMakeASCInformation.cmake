@@ -90,6 +90,7 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "sim")
         "dav-2002" "dav_2002"
         "dav-2201" "dav_2201"
         "dav-3510" "dav_3510"
+        "dav-9201" "dav_9201"
     )
     list(FIND _ARCH_TO_DIR_MAP "${CMAKE_ASC_ARCHITECTURES}" _index)
     if(_index GREATER -1)
@@ -110,6 +111,7 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
         "dav-2002" "2002" "Ascend310P1"
         "dav-2201" "2201" "Ascend910B1"
         "dav-3510" "3510" "Ascend950PR_9599"
+        "dav-9201" "9201" "Ascend960DT_968B7"
     )
     list(FIND _ARCH_TO_SOC_DIR_MAP "${CMAKE_ASC_ARCHITECTURES}" _index)
     math(EXPR _remainder "${_index} % 3")
@@ -150,7 +152,7 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
             -Wl,-Bdynamic,--no-as-needed
             ascendc_acl_stub
             $<$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-2002>:_pvmodel>
-            $<$<OR:$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-2201>,$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-3510>>:pem_davinci>
+            $<$<OR:$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-2201>,$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-3510>,$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-9201>>:pem_davinci>
             $<$<STREQUAL:${CMAKE_ASC_ARCHITECTURES},dav-3510>:-pthread>
             cpudebug_cceprint
             cpudebug_npuchk
@@ -170,6 +172,6 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
         )
         
     else()
-        message(FATAL_ERROR "Unsupported ASC architecture for CPU mode: ${CMAKE_ASC_ARCHITECTURES}, should be dav-2002, dav-2201, dav-3510")
+        message(FATAL_ERROR "Unsupported ASC architecture for CPU mode: ${CMAKE_ASC_ARCHITECTURES}, should be dav-2002, dav-2201, dav-3510, dav-9201")
     endif()
 endif()

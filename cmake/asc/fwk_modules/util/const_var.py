@@ -25,7 +25,8 @@ SOC_MAP_EXT = {'ascend310p': 'Ascend310P3', 'ascend310b': 'Ascend310B1',
                'ascend910': 'Ascend910A', 'ascend910b': 'Ascend910B1',
                'ascend910_93': 'Ascend910_9391', 'ascend610lite': 'Ascend610Lite',
                'ascend950': 'Ascend950PR_9599', 'kirinx90': 'KirinX90', 'kirin9030': 'Kirin9030',
-               'mc62cm12a': 'MC62CM12AA', 'mc32dm11a': 'MC32DM11AA'}
+               'mc62cm12a': 'MC62CM12AA', 'mc32dm11a': 'MC32DM11AA', 'ascend910_96': 'Ascend910_9691',
+               'ascend9601': 'Ascend960DT_968B7', 'ascend9602': 'Ascend960_9689'}
 BIN_CMD = 'opc $1 --main_func={fun} --input_param={param} --soc_version={soc} \
 --output=$2 --impl_mode={impl} --simplified_key_mode=0 --op_mode=dynamic\n'
 SET_PLOG_LEVEL_ERROR = "export ASCEND_GLOBAL_LOG_LEVEL=3\n"

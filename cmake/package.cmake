@@ -29,7 +29,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/third_party/makeself-fetch.cmake)
 
 set(script_prefix ${CMAKE_SOURCE_DIR}/scripts/package/scripts/)
 install(DIRECTORY ${script_prefix}/
-    DESTINATION asc-devkit/script
+    DESTINATION share/info/asc-devkit/script
     FILE_PERMISSIONS
     OWNER_READ OWNER_WRITE OWNER_EXECUTE  # 文件权限
     GROUP_READ GROUP_EXECUTE
@@ -50,7 +50,7 @@ set(SCRIPTS_FILES
 )
 
 install(FILES ${SCRIPTS_FILES}
-    DESTINATION asc-devkit/script
+    DESTINATION share/info/asc-devkit/script
 )
 
 set(COMMON_FILES
@@ -76,19 +76,17 @@ set(CONF_FILES
     ${CMAKE_SOURCE_DIR}/scripts/package/common/cfg/path.cfg
 )
 install(FILES ${CONF_FILES}
-    DESTINATION asc-devkit/conf
+    DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/conf
 )
 install(FILES ${PACKAGE_FILES}
-   DESTINATION asc-devkit/script
-)
-install(FILES ${LATEST_MANGER_FILES}
-    DESTINATION latest_manager
-)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts/package/latest_manager/scripts/
-    DESTINATION latest_manager
+   DESTINATION share/info/asc-devkit/script
 )
 install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
-    DESTINATION asc-devkit
+    DESTINATION share/info/asc-devkit
+    RENAME version.info
+)
+install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
+    DESTINATION .
     RENAME version.info
 )
 install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info

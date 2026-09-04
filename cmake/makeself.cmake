@@ -38,6 +38,29 @@ if(NOT INSTALL_RESULT EQUAL 0)
     message(FATAL_ERROR "Installation to staging directory failed: ${INSTALL_RESULT}")
 endif()
 
+# The copied HCCL/HCOMM project keeps its own package install rules. asc-devkit
+# only delivers MC2 client/server assets, so remove non-MC2 HCCL/HCOMM staging
+# artifacts before filelist generation and copy_all packaging.
+file(REMOVE_RECURSE
+    "${STAGING_DIR}/share/info/hccl"
+    "${STAGING_DIR}/opp/built-in/op_impl/dpu"
+)
+file(REMOVE
+    "${STAGING_DIR}/opp/built-in/op_impl/aicpu/config/ccl_kernel.json"
+    "${STAGING_DIR}/opp/built-in/op_impl/aicpu/config/asc_ccl_kernel.json"
+    "${STAGING_DIR}/opp/built-in/op_impl/aicpu/config/libaicpu_custom.json"
+    "${STAGING_DIR}/opp/built-in/op_impl/aicpu/config/libccl_dpu.json"
+    "${STAGING_DIR}/opp/built-in/op_impl/aicpu/config/libmc2_server.so"
+    "${STAGING_DIR}/opp/built-in/op_impl/aicpu/config/libaicpu_custom.so"
+    "${STAGING_DIR}/opp/built-in/op_impl/aicpu/config/libasc_aicpu_custom.so"
+    "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/lib64/libccl_kernel.so"
+    "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/lib64/libccl_kernel_plf.so"
+    "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/lib64/libccl_kernel_plf.a"
+    "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/lib64/libasc_ccl_kernel.so"
+    "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/lib64/libasc_ccl_kernel_plf.so"
+    "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/lib64/libasc_ccl_kernel_plf.a"
+)
+
 # 生成安装配置文件
 set(CSV_OUTPUT ${STAGING_DIR}/filelist.csv)
 execute_process(
@@ -60,25 +83,49 @@ else ()
 endif ()
 
 set(OUT_PUT_FILELIST_DIR
-    ${STAGING_DIR}/asc-devkit/script
+    ${STAGING_DIR}/share/info/asc-devkit/script
 )
 configure_file(
     ${CSV_OUTPUT}
     ${OUT_PUT_FILELIST_DIR}
     COPYONLY
 )
+file(REMOVE ${CSV_OUTPUT})
 
 set(OUT_PUT_SCENE
-    ${CPACK_CMAKE_BINARY_DIR}/scene.info
+    ${CPACK_CMAKE_BINARY_DIR}/share/info/asc-devkit/scene.info
 )
 set(OUT_PUT_SCENE_DIR
-    ${STAGING_DIR}/asc-devkit
+    ${STAGING_DIR}/share/info/asc-devkit
 )
 configure_file(
     ${OUT_PUT_SCENE}
     ${OUT_PUT_SCENE_DIR}
     COPYONLY
 )
+
+# 统一修正文件权限
+if(EXISTS "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/conf/path.cfg")
+    execute_process(COMMAND chmod 440 "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/conf/path.cfg")
+endif()
+if(EXISTS "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/bin")
+    execute_process(COMMAND find "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/bin" -type f -exec chmod 550 {} +)
+endif()
+if(EXISTS "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/lib64")
+    execute_process(COMMAND find "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/lib64" -type f -exec chmod 440 {} +)
+endif()
+if(EXISTS "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/devlib")
+    execute_process(COMMAND find "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/devlib" -type f -exec chmod 440 {} +)
+endif()
+if(EXISTS "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/include")
+    execute_process(COMMAND find "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/include" -type f -exec chmod 440 {} +)
+endif()
+if(EXISTS "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/pkg_inc")
+    execute_process(COMMAND find "${STAGING_DIR}/${CMAKE_SYSTEM_PROCESSOR}-linux/pkg_inc" -type f -exec chmod 440 {} +)
+endif()
+if(EXISTS "${STAGING_DIR}/opp/built-in/op_impl")
+    execute_process(COMMAND find "${STAGING_DIR}/opp/built-in/op_impl" -type f -exec chmod 440 {} +)
+endif()
 
 # makeself打包
 file(STRINGS ${CPACK_CMAKE_BINARY_DIR}/makeself.txt script_output)
@@ -93,8 +140,8 @@ message(STATUS "makeself: ${makeself_param_string}")
 
 execute_process(COMMAND bash ${MAKESELF_EXE}
         --header ${MAKESELF_HEADER_EXE}
-        --help-header asc-devkit/script/help.info
-        ${makeself_param_string} asc-devkit/script/install.sh
+        --help-header share/info/asc-devkit/script/help.info
+        ${makeself_param_string} share/info/asc-devkit/script/install.sh
         WORKING_DIRECTORY ${STAGING_DIR}
         RESULT_VARIABLE EXEC_RESULT
         ERROR_VARIABLE  EXEC_ERROR

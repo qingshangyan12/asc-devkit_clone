@@ -15,9 +15,11 @@ set(ascend950_list   ascend950pr_9599 ascend950pr_958a ascend950pr_9589 ascend95
     ascend950pr_950z ascend950dt_950x ascend950dt_950y ascend950dt_95a1 ascend950dt_95a2 ascend950dt_9591 ascend950dt_9592  ascend950dt_9595 ascend950dt_9596
     ascend950dt_9581 ascend950dt_9582 ascend950dt_9583 ascend950dt_9584 ascend950dt_9585 ascend950dt_9586 ascend950dt_9587 ascend950dt_9588 ascend950dt_9571 
     ascend950dt_9572 ascend950dt_9573 ascend950dt_9574 ascend950dt_9575 ascend950dt_9576 ascend950dt_9577 ascend950dt_9578)
+set(ascend910_96_list ascend910_9690 ascend910_9691 ascend910_9692 ascend910_9693 ascend910_9694 ascend910_9695 ascend910_9698 ascend910_9699
+    ascend960dt_969b5 ascend960dt_969b6 ascend960dt_968b7 ascend960dt_966b7 ascend960dt_966b8 ascend960dt_966b8z ascend960dt_961by ascend960dt_961bz)
 set(kirinx90_list kirinx90)
 set(kirin9030_list kirin9030)
-set(all_product ${ascend910b_list} ${ascend910_list} ${ascend310p_list} ${ascend950_list} ${kirinx90_list} ${kirin9030_list})
+set(all_product ${ascend910b_list} ${ascend910_list} ${ascend310p_list} ${ascend950_list} ${ascend910_96_list} ${kirinx90_list} ${kirin9030_list})
 
 if(NOT DEFINED SOC_VERSION)
     message(FATAL_ERROR "SOC_VERSION value not set.")
@@ -31,6 +33,9 @@ if(_LOWER_SOC_VERSION IN_LIST ascend950_list)
 elseif(_LOWER_SOC_VERSION IN_LIST ascend910b_list)
     set(DYNAMIC_MODE ON)
     set(BUILD_MODE   c220)
+elseif(_LOWER_SOC_VERSION IN_LIST ascend910_96_list)
+    set(DYNAMIC_MODE ON)
+    set(BUILD_MODE   310r6)
 elseif(_LOWER_SOC_VERSION IN_LIST ascend910_list)
     set(BUILD_MODE   c100)
 elseif(_LOWER_SOC_VERSION IN_LIST ascend310p_list)
