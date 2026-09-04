@@ -82,7 +82,11 @@
 ### SIMT编程（辅助补充，仅限Ascend 950PR/Ascend 950DT）
 - **能力范围**：仅支持向量计算，不支持矩阵运算或向量与矩阵的融合计算，功能范围相对有限；
 - **适用场景**：离散数据访问、复杂分支控制的向量算子，同时适合熟悉SIMT模型的开发者快速上手Ascend C；
-- **限制**：当前仅支持Ascend 950PR/Ascend 950DT芯片架构；
+- **限制**：当前支持如下产品：
+  <!-- npu="950" id3 -->
+  - Ascend 950PR/Ascend 950DT
+  <!-- end id3 -->
+  <!-- @ref: asc-devkit/res/docs/zh/guide/programming_guide/programming_model/programming_model_overview_res.md#id1 -->
 - **学习路径**：详见[AI Core SIMT编程](./ai_core_simt_programming/overview.md)；算子开发参见[SIMT算子实现](../../operator_practice/simt_operator_impl/simt_operator_impl.md)。
 <!-- end id2 -->
 
