@@ -11,14 +11,14 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
-
 # D/H/W of grad/argmax, all three the same. Change this value to reproduce the performance comparison tables in the README.
 set(GRAD_DHW "8" CACHE STRING "D/H/W of grad/argmax, one of 1/2/4/8/16")
 
 if(NOT GRAD_DHW MATCHES "^(1|2|4|8|16)$")
     message(FATAL_ERROR "GRAD_DHW must be one of 1, 2, 4, 8, 16.")
 endif()
+
+set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
 
 find_package(ASC REQUIRED)
 project(adaptive_max_pool3d_grad_simd_simt_hybrid LANGUAGES ASC)

@@ -11,11 +11,11 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
+
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
-
-set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
 
 set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-16)")
 
@@ -25,8 +25,4 @@ add_executable(grid_config
 
 target_compile_definitions(grid_config PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
-)
-
-target_compile_options(grid_config PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
