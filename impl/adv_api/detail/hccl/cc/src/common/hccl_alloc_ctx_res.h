@@ -84,7 +84,7 @@ struct OpResCtx {
     bool isKfc[Hccl::MC2_MAX_OP_NUM]; // 用于标记是否走kfcServer
 };
 
-enum AlgorithmType {
+enum class AlgorithmType {
     CcuAllGatherMesh1D = 0,
     CcuAllGatherMeshMem2Mem1D,
     CcuAllGatherMesh2D,
@@ -130,7 +130,7 @@ HcclResult CheckCcuKfcFlow(const void* mc2Tiling, const void* ccTilingList[], ui
 HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx);
 
 HcclResult HcclAllocOpResCtx(
-    HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, void* mc2Tiling,
+    HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, const void* mc2Tiling,
     const void* ccTilingList[], void** opResCtxPtr);
 
 // AllToAll适配AllToAllV

@@ -81,6 +81,8 @@ std::vector<OmniPipeSplitSliceInfo> OmniPipeSplitSliceInfoListAssign(
 void CalAllgather2DOffset(
     u64* xAGOffset, u64* yAGOffset, u64 stepNum, u64 xRankSize, u64 yRankSize, u64* xAGDataSize, u64* yAGDataSize)
 {
+    void(xRankSize);
+    void(yRankSize);
     HCCL_INFO("[CalAllgather2DOffset] start");
     xAGOffset[0] = 0; // 第一步发同轴，偏移为0
     yAGOffset[0] = 0; // 第一步发同轴，偏移为0
@@ -172,7 +174,7 @@ u64 CalAllgatherDataSizeRatio2D(
         // 计算通信步数,计算固定max步
         step = maxStep;
         if (xRankSize - bandwidthRatio > 0) {
-            if (omniPipeRatio == 1) {
+            if (omniPipeRatio == 1.0) {
                 // 等比为1时需要单独算步数
                 step = bandwidthRatio + 1;
             } else {
@@ -261,7 +263,7 @@ u64 CalAllgatherDataSize2D(
         // 计算通信步数,计算固定max步
         step = maxStep;
         if (xRankSize - bandwidthRatio > 0) {
-            if (omniPipeRatio == 1) {
+            if (omniPipeRatio == 1.0) {
                 // 等比为1时需要单独算步数
                 step = bandwidthRatio + 1;
             } else {
@@ -319,7 +321,7 @@ u64 CalAllgatherDataSize2D(
     for (int i = 0; i < step; i++) {
         HCCL_INFO(
             "[CalAllgatherDataSize2D] "
-            "xStepP2pDataSize[%d]=[%llu],yStepP2pDataSize[%d]=[%llu],",
+            "xStepP2pDatxaSize[%d]=[%llu],yStepP2pDataSize[%d]=[%llu],",
             i, xStepP2pDataSize[i], i, yStepP2pDataSize[i]);
     }
     HCCL_INFO("[CalAllgatherDataSize2D] end");
@@ -357,7 +359,7 @@ u64 CalReducescatterDataSize2D(
         // 计算通信步数,计算固定5步
         step = maxStep;
         if (xRankSize - bandwidthRatio > 0) {
-            if (omniPipeRatio == 1) {
+            if (omniPipeRatio == 1.0) {
                 // 等比为1时需要单独算步数，最后一步拆成两步，所以加2
                 step = bandwidthRatio + 2;
             } else {
@@ -871,6 +873,7 @@ std::vector<std::vector<u64>> CalRSDataSizeStep(
 
 std::vector<u64> OmniPipeSplitData(u64 rankSize, u64 count, u64 dataTypeSize)
 {
+    void(dataTypeSize);
     std::vector<u64> omniPipeSplitSliceInfoList;
     u64 sliceCount = RoundUp(count, rankSize);
 
@@ -891,6 +894,7 @@ std::vector<u64> OmniPipeSplitData(u64 rankSize, u64 count, u64 dataTypeSize)
 std::vector<std::vector<u64>> OmniPipeSplitRankDataLoop(
     std::vector<u64> omniPipeSplitSliceInfoList, u64 maxDataCountPerLoop, u64 loopCount, u64 dataTypeSize)
 {
+    void(dataTypeSize);
     std::vector<std::vector<u64>> omniPipeSplitRankDataLoop;
     u64 sliceNum = omniPipeSplitSliceInfoList.size();
 

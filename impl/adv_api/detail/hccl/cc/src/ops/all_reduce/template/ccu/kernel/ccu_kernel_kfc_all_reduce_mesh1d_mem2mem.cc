@@ -103,6 +103,7 @@ static CcuResult PairwiseLocalReduce(
     KfcAllReduceMesh1DMem2MemContext& ctx, ccu::LocalAddr myOutput, std::vector<ccu::LocalAddr>& inputVec,
     ccu::Variable sliceSize, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType)
 {
+    void(outputDataType);
     ccu::Variable len;
 
     uint32_t remainPieces = ctx.rankSize;

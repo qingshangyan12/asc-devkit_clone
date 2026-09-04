@@ -39,7 +39,7 @@ public:
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         AlgResourceRequest& resourceRequest) override;
     HcclResult CalcResByChannelDescs(
-        const OpParam& param, const std::vector<HcclChannelDesc>& channelDescs, AlgResourceRequest& resourceRequest)
+        const OpParam& param, const std::vector<HcclChannelDesc>& channelDescs, const AlgResourceRequest& resourceRequest) const
     {
         (void)param;
         (void)channelDescs;

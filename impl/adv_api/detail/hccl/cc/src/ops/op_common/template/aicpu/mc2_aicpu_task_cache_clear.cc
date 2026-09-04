@@ -39,7 +39,7 @@ HcclResult LaunchCacheEvictKernel(HcclComm comm)
     CHK_PRT_RET(
         ret != ACL_SUCCESS, HCCL_ERROR("[MC2_TASK_CACHE][Evict] args init failed, ret[%d].", ret), HCCL_E_RUNTIME);
     aclrtParamHandle paramHandle = nullptr;
-    ret = aclrtKernelArgsAppend(argsHandle, &comm, sizeof(comm), &paramHandle);
+    ret = aclrtKernelArgsAppend(argsHandle, &comm, sizeof(HcclComm), &paramHandle);
     CHK_PRT_RET(
         ret != ACL_SUCCESS, HCCL_ERROR("[MC2_TASK_CACHE][Evict] args append failed, ret[%d].", ret), HCCL_E_RUNTIME);
     ret = aclrtKernelArgsFinalize(argsHandle);
@@ -74,7 +74,7 @@ HcclResult LaunchCacheEvictKernel(HcclComm comm)
     return result;
 }
 
-HcclResult Mc2TaskCacheCommStateCallback(HcclComm comm, int32_t state, void* args)
+HcclResult Mc2TaskCacheCommStateCallback(const HcclComm comm, int32_t state, void* args)
 {
     (void)args;
     if (state != COMM_STATE_DESTROY_POST && state != COMM_STATE_RESUME_POST) {
