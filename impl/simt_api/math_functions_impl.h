@@ -23,6 +23,7 @@
 #define IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H
 
 #include "simt_api/device_types.h"
+#include "simt_api/device_functions.h"
 #include "simt_api/math_constants.h"
 #include "impl/simt_api/device_functions_impl.h"
 #include "impl/simt_api/internal_functions_impl.h"
@@ -5931,6 +5932,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm4df(float a, float b, float c, f
 }
 
 #endif // ASCENDC_USE_LEGACY_PRECISION
+
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_uintdiv(uint32_t dividend, uint32_t magic, uint32_t shift)
 {
