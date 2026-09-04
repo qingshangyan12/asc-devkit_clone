@@ -30,7 +30,7 @@ dst[i] = src0[i] * src1[i] + src2[i]
 
   - Key kernel steps
 
-    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_frame_layout` to construct one-dimensional Tensors in GM and UB.
+    1. Use `asc::te::make_tensor`, `asc::te::make_mem_ptr`, and `asc::te::make_layout` to construct one-dimensional Tensors in GM and UB.
     2. Use `asc::te::copy` to move the three inputs from GM to UB.
     3. Use `all_mask` and `load` to load the UB data into Reg Tensors.
     4. Call `fma` to perform element-wise fused multiply-add.

@@ -30,7 +30,7 @@ dst[i] = src0[i] * src1[i] + src2[i]
 
   - Kernel关键步骤
 
-    1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_frame_layout` 构造 GM、UB 上的一维 Tensor。
+    1. 使用 `asc::te::make_tensor`、`asc::te::make_mem_ptr` 和 `asc::te::make_layout` 构造 GM、UB 上的一维 Tensor。
     2. 使用 `asc::te::copy` 将三组输入从 GM 搬运到 UB。
     3. 使用 `all_mask` 和 `load` 将 UB 数据加载为 Reg Tensor。
     4. 调用 `fma` 完成逐元素融合乘加。
