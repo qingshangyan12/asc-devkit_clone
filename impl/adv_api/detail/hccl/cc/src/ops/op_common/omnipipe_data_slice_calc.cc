@@ -172,7 +172,7 @@ u64 CalAllgatherDataSizeRatio2D(
         // 计算通信步数,计算固定max步
         step = maxStep;
         if (xRankSize - bandwidthRatio > 0) {
-            if (omniPipeRatio == 1) {
+            if (omniPipeRatio == 1.0) {
                 // 等比为1时需要单独算步数
                 step = bandwidthRatio + 1;
             } else {
@@ -261,7 +261,7 @@ u64 CalAllgatherDataSize2D(
         // 计算通信步数,计算固定max步
         step = maxStep;
         if (xRankSize - bandwidthRatio > 0) {
-            if (omniPipeRatio == 1) {
+            if (omniPipeRatio == 1.0) {
                 // 等比为1时需要单独算步数
                 step = bandwidthRatio + 1;
             } else {
@@ -319,7 +319,7 @@ u64 CalAllgatherDataSize2D(
     for (int i = 0; i < step; i++) {
         HCCL_INFO(
             "[CalAllgatherDataSize2D] "
-            "xStepP2pDataSize[%d]=[%llu],yStepP2pDataSize[%d]=[%llu],",
+            "xStepP2pDatxaSize[%d]=[%llu],yStepP2pDataSize[%d]=[%llu],",
             i, xStepP2pDataSize[i], i, yStepP2pDataSize[i]);
     }
     HCCL_INFO("[CalAllgatherDataSize2D] end");
@@ -357,7 +357,7 @@ u64 CalReducescatterDataSize2D(
         // 计算通信步数,计算固定5步
         step = maxStep;
         if (xRankSize - bandwidthRatio > 0) {
-            if (omniPipeRatio == 1) {
+            if (omniPipeRatio == 1.0) {
                 // 等比为1时需要单独算步数，最后一步拆成两步，所以加2
                 step = bandwidthRatio + 2;
             } else {

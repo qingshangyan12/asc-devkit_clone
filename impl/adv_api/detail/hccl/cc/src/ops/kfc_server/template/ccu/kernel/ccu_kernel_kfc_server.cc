@@ -82,13 +82,13 @@ const uint32_t DIE1_ID = 1;
 constexpr const char* DIE1_START_SIG = "Die1StartSig";
 constexpr const char* DIE1_END_SIG = "Die1EndSig";
 
-static CcuResult ParseKernelArg(KfcServerContext& ctx, CcuKernelArgKfcServer* kernelArg)
+static CcuResult ParseKernelArg(KfcServerContext& ctx, const CcuKernelArgKfcServer* kernelArg)
 {
     ctx.arg = kernelArg;
     return CCU_SUCCESS;
 }
 
-static CcuResult InitResource(KfcServerContext& ctx) { return CCU_SUCCESS; }
+static CcuResult InitResource(const KfcServerContext& ctx) { return CCU_SUCCESS; }
 
 static CcuResult LoadArgs(KfcServerContext& ctx)
 {
@@ -119,15 +119,15 @@ static CcuResult CompArgs(KfcServerContext& ctx)
     return CCU_SUCCESS;
 }
 
-void MissionPreSync(ccu::Variable& func, KfcServerContext& ctx)
+void MissionPreSync(const ccu::Variable& func, const KfcServerContext& ctx)
 {
     (void)func;
     (void)ctx;
 }
 
-void MissionPostSync(KfcServerContext& ctx) { (void)ctx; }
+void MissionPostSync(const KfcServerContext& ctx) { (void)ctx; }
 
-CcuResult WaitTurnStartSig(const ccu::Variable& hbmSigAddr, ccu::Variable& turnStartSig, KfcServerContext& ctx)
+CcuResult WaitTurnStartSig(const ccu::Variable& hbmSigAddr, ccu::Variable& turnStartSig, const KfcServerContext& ctx)
 {
     const uint32_t getDieId = 1;
     // 单Die场景：等待HBM中的信号
@@ -140,14 +140,14 @@ CcuResult WaitTurnStartSig(const ccu::Variable& hbmSigAddr, ccu::Variable& turnS
     return CCU_SUCCESS;
 }
 
-CcuResult SetTurnEndSig(const ccu::Variable& hbmSigAddr, const ccu::Variable& turnEndSig, KfcServerContext& ctx)
+CcuResult SetTurnEndSig(const ccu::Variable& hbmSigAddr, const ccu::Variable& turnEndSig, const KfcServerContext& ctx)
 {
     const uint32_t getDieId = 1; // TODO GetDieId()
     CCU_CHK_RET(ccu::Store(hbmSigAddr, turnEndSig));
     return CCU_SUCCESS;
 }
 
-CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
+CcuResult LoadFuncParamFromMemory(ccu::Variable& paramAddr, ccu::Array<ccu::Variable>& param, const KfcServerContext& ctx)
 {
     // 双Die场景Die1需要读后32个参数，其他场景都是读取前32个参数
     ccu::Variable doubleDie;
