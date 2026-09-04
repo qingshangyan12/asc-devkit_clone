@@ -25,12 +25,26 @@
 #include "simt_api/device_types.h"
 #include "simt_api/math_constants.h"
 #include "impl/simt_api/internal_functions_impl.h"
+#include "impl/simt_api/device_functions_impl.h"
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 
 #define ASCRT_FOUR_BYTE_LEN_U 32U
 constexpr float __internal_subnormal_boundary =
-    1.17549435e-38f; // 1.17549435e-38f: subnormal floating-point number boundary
+    1.17549435e-38f;                                      // 1.17549435e-38f: subnormal floating-point number boundary
+constexpr float __internal_fp32_scale_2p24 = 16777216.0f; // 2^24, used to lift subnormal inputs into the normal range.
+constexpr float __internal_fp32_log2e = 1.4426950216293334961f; // log2(e), used for ln-to-exp2 conversion.
+constexpr float __internal_fp32_ln2_hi =
+    0.69314718246459960938f; // High part of ln(2) for split residual reconstruction.
+constexpr float __internal_fp32_ln2_tail =
+    1.9046542121259335545e-09f; // Low tail of ln(2) for split residual reconstruction.
+constexpr float __internal_fp32_subnormal_exponent_fix =
+    -24.0f; // Exponent correction after scaling subnormals by 2^24.
+constexpr float __internal_fp32_log_exponent_scale =
+    1.1920928955078125e-07f;                             // 2^-23, converts exponent bits into log2 units.
+constexpr uint32_t __internal_fp32_exponent_shift = 23U; // Bit offset of the fp32 exponent field.
+constexpr float __internal_fp32_max_exp = 126.0f;        // Largest finite fp32 exponent used by the clamped paths.
+constexpr int32_t __internal_fp32_subnormal_bias = 149;  // Subnormal exponent/reference bias for fp32 reconstruction.
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lroundf(float x)
 {
@@ -172,7 +186,14 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_sqrtf(float x)
 }
 #endif
 #endif
-
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_with_sign_bit(float value, float sign_source)
+{
+    constexpr uint32_t sign_mask = 0x80000000U;
+    constexpr uint32_t value_mask = 0x7FFFFFFFU;
+    const uint32_t value_bits = __float_as_uint(value) & value_mask;
+    const uint32_t sign_bits = __float_as_uint(sign_source) & sign_mask;
+    return __uint_as_float(value_bits | sign_bits);
+}
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float expf(float x) { return __internal_expf(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logf(float x)
@@ -3164,19 +3185,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, 
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdff(float x)
 {
-    // NaN propagates directly.
-    if (isnan(x)) {
-        return x;
-    }
-    // CDF(-inf) = 0.
-    if (x == -ASCRT_INF_F) {
-        return 0.0f;
-    }
-    // CDF(+inf) = 1.
-    if (x == ASCRT_INF_F) {
-        return 1.0f;
-    }
-
     // Clamp the input range used by the approximation to avoid overflow in the tail path.
     constexpr float clamp_bound = 14.5f;                     // Input clamp used to keep the tail approximation stable.
     constexpr float inv_sqrt2_hi = -0.70710676908493041992f; // High part of -1/sqrt(2).
@@ -3255,107 +3263,86 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdff(float x)
 }
 
 /**
- * Computes the reciprocal cube root for float inputs.
+ * Computes the reciprocal cube root of a float input.
  *
- * The implementation first handles special values with fixed IEEE-style semantics:
- * NaN propagates, rcbrtf(0) = signed infinity, and rcbrtf(inf) = signed zero.
+ * The implementation follows a log/exp based approximation path:
+ *   rcbrtf(x) = sign(x) * |x|^(-1/3)
  *
- * For finite nonzero inputs, it uses the identity:
- *   rcbrtf(x) = exp2(-log2(|x|) / 3)
+ * Subnormal magnitudes are first scaled by 2^24 so log2f can operate on a
+ * normal-range value, then the exponent is corrected by -24.
  *
- * Subnormal magnitudes are scaled into the normal range before taking log2:
- *   |x| * 2^24
- * and the exponent correction is applied back as -24.
+ * A single Newton refinement step is applied to improve the initial estimate:
+ *   y <- y + (1 - |x| * y^3) * y / 3
  *
- * A Newton-style refinement then corrects the initial exp2 estimate:
- *   y <- y + (1 - |x| * y^3) * (y / 3)
- *
- * For negative x, the magnitude is computed from |x| and the sign is restored
- * at the end.
+ * Special values are handled at the end with bitwise selection:
+ *   - NaN preserves payload
+ *   - ±inf becomes ±0
+ *   - ±0 becomes ±inf
  *
  * @param x The input value.
- * @return The computed rcbrtf(x) value.
+ * @return The computed reciprocal cube root.
  */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rcbrtf(float x)
 {
-    // NaN propagates directly.
-    if (isnan(x)) {
-        return x;
-    }
-    // rcbrtf(0) = signed infinity.
-    if (x == 0.0f) {
-        return __internal_with_sign_bit(ASCRT_INF_F, x);
-    }
-    // rcbrtf(inf) = signed zero.
-    if (isinf(x)) {
-        return __internal_with_sign_bit(0.0f, x);
-    }
+    // Shared constants for normal/subnormal handling and Newton refinement.
+    constexpr float one_third = 0.3333333432674407959f; // nearest fp32 to 1/3
+    constexpr uint32_t fp32_inf_bits = 0x7F800000U;     // +inf bit pattern
 
-    // Subnormal magnitudes are scaled into the normal range before taking log2.
-
-    constexpr float one_third = 0.3333333432674407959f; // 1/3, used in the reciprocal cube-root exponent.
-
-    // Compute an initial magnitude estimate from rcbrtf(x) = exp2(-log2(|x|)/3).
+    const uint32_t x_bits = __float_as_uint(x);
+    const uint32_t abs_x_bits = x_bits & 0x7FFFFFFFU; // clear the sign bit
+    const uint32_t sign_bits = x_bits & 0x80000000U;  // keep only the sign bit
     const float abs_x = fabsf(x);
-    const bool is_normal_or_larger = abs_x >= __internal_subnormal_boundary;
-    float log_input = is_normal_or_larger ? abs_x : abs_x * __internal_fp32_scale_2p24;
-    float exponent = log2f(log_input);
-    if (!is_normal_or_larger) {
-        exponent = exponent + __internal_fp32_subnormal_exponent_fix;
+    // Check whether |x| is normal; subnormals are temporarily scaled by 2^24.
+    const bool p0 = abs_x >= __internal_subnormal_boundary;
+    const float log_input = p0 ? abs_x : abs_x * __internal_fp32_scale_2p24;
+    // Compute log2(|x|), then reconstruct |x|^(-1/3) with exp2.
+    float log2_abs_x = log2f(log_input);
+    if (!p0) {
+        log2_abs_x = log2_abs_x + __internal_fp32_subnormal_exponent_fix;
     }
 
-    // Reconstruct the magnitude and apply one Newton-style correction step.
-    float y = exp2f(exponent * -one_third);
+    // Apply one Newton refinement step to improve the initial estimate.
+    float y = exp2f(log2_abs_x * -one_third);
     const float y_square = y * y;
     const float abs_x_times_y = abs_x * y;
     const float correction = fmaf(y_square, -abs_x_times_y, 1.0f);
     y = fmaf(correction, y * one_third, y);
-    // Restore the sign for negative inputs.
     if (x < 0.0f) {
         y = -y;
     }
-    return y;
+
+    // Select final special-value results with bit masks.
+    uint32_t result_bits = __float_as_uint(y);
+    const uint32_t nan_mask = abs_x_bits > fp32_inf_bits ? 0xFFFFFFFFU : 0U;  // exponent all 1s, mantissa != 0
+    const uint32_t inf_mask = abs_x_bits == fp32_inf_bits ? 0xFFFFFFFFU : 0U; // ±inf
+    const uint32_t zero_mask = abs_x_bits == 0U ? 0xFFFFFFFFU : 0U;           // ±0
+
+    result_bits = (result_bits & ~nan_mask) | (x_bits & nan_mask);
+    result_bits = (result_bits & ~inf_mask) | (sign_bits & inf_mask);
+    result_bits = (result_bits & ~zero_mask) | ((sign_bits | fp32_inf_bits) & zero_mask);
+    return __uint_as_float(result_bits);
 }
 
-/**
- * Extracts the mantissa bits from the absolute-value bit pattern of a float.
- *
- * For normal inputs, the hidden leading 1 is restored into the mantissa field.
- * For subnormal inputs, the raw mantissa bits are returned unchanged.
- *
- */
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline uint32_t __asc_float_mantissa_bits_from_abs_bits(uint32_t bits)
 {
+    // Convert an absolute-value float bit pattern into a normalized mantissa integer.
+    // Normal numbers get the implicit leading 1 restored; subnormals keep the raw mantissa.
     const uint32_t exponent_bits = bits & ASCRT_EXP_BIT_FLOAT_U;
     const uint32_t mantissa_bits = bits & ASCRT_MAN_BIT_FLOAT_U;
     return exponent_bits == 0U ? mantissa_bits : (mantissa_bits | 0x00800000U);
 }
 
-/**
- * Returns the effective binary exponent for a float bit pattern.
- *
- * Subnormal inputs are treated as having exponent -149, while normal inputs
- * are converted from biased exponent bits to the corresponding unbiased value.
- *
- */
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline int32_t __asc_float_mantissa_exponent_from_abs_bits(uint32_t bits)
 {
+    // Return the exponent aligned to the mantissa integer returned above.
+    // Subnormals are treated as exponent -149, normals as unbiased exponent minus 23.
     const uint32_t exponent_bits = bits & ASCRT_EXP_BIT_FLOAT_U;
-    return exponent_bits == 0U ? -__internal_fp32_subnormal_bias :
-                                 (static_cast<int32_t>(exponent_bits >> __internal_fp32_exponent_shift) - 150);
+    return exponent_bits == 0U ? -149 : (static_cast<int32_t>(exponent_bits >> 23U) - 150);
 }
 
-/**
- * Computes floor(log2(x)) for an unsigned integer by repeated shifting.
- *
- * This helper is used to locate the highest set bit in a mantissa-like value,
- * which in turn determines how to normalize the reconstructed remainder.
- *
- * @param x Input unsigned integer.
- * @return The floor of log2(x), or 0 for x == 0.
- */
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline int32_t __asc_uint_floor_log2(uint32_t x)
 {
+    // Compute floor(log2(x)) for a nonzero integer mantissa.
     int32_t shift = 0;
     while ((x >> 1U) != 0U) {
         x >>= 1U;
@@ -3364,95 +3351,71 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline int32_t __asc_uint_floor_log2(uint3
     return shift;
 }
 
-/**
- * Reconstructs a float from a mantissa integer and an exponent.
- *
- * The mantissa is normalized when possible, with separate handling for:
- * - zero mantissa,
- * - overflow to infinity,
- * - underflow to zero,
- * - normal-range results,
- * - subnormal results.
- *
- */
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_make_float_from_mantissa(uint32_t mantissa, int32_t exponent)
 {
-    if (mantissa == 0U) {
-        return 0.0f;
+    // Rebuild a float from an integer mantissa and an exponent aligned to that mantissa.
+    float result = 0.0f;
+    if (mantissa != 0U) {
+        const int32_t mantissa_log2 = __asc_uint_floor_log2(mantissa);
+        const int32_t result_exponent = exponent + mantissa_log2;
+        // Clamp to fp32 range before reconstructing the final bit pattern.
+        if (result_exponent > 127) {
+            result = ASCRT_INF_F;
+        } else if (result_exponent < -149) {
+            result = 0.0f;
+        } else if (result_exponent >= -126) {
+            // Normal result: normalize mantissa and pack signless fp32 bits.
+            const uint32_t normalized_mantissa = mantissa << static_cast<uint32_t>(23 - mantissa_log2);
+            const uint32_t bits =
+                (static_cast<uint32_t>(result_exponent + 127) << 23U) | (normalized_mantissa & ASCRT_MAN_BIT_FLOAT_U);
+            result = __uint_as_float(bits);
+        } else {
+            // Subnormal result: shift mantissa directly into the denormal field.
+            const uint32_t subnormal_shift = static_cast<uint32_t>(exponent + 149);
+            result = __uint_as_float(mantissa << subnormal_shift);
+        }
     }
-
-    const int32_t mantissa_log2 = __asc_uint_floor_log2(mantissa);
-    const int32_t result_exponent = exponent + mantissa_log2;
-    if (result_exponent > 127) {
-        return ASCRT_INF_F;
-    }
-    if (result_exponent < -__internal_fp32_subnormal_bias) {
-        return 0.0f;
-    }
-    if (result_exponent >= -126) {
-        const uint32_t normalized_mantissa = mantissa << static_cast<uint32_t>(23 - mantissa_log2);
-        const uint32_t bits = (static_cast<uint32_t>(result_exponent + 127) << __internal_fp32_exponent_shift) |
-                              (normalized_mantissa & ASCRT_MAN_BIT_FLOAT_U);
-        return __uint_as_float(bits);
-    }
-
-    const uint32_t subnormal_shift = static_cast<uint32_t>(exponent + __internal_fp32_subnormal_bias);
-    return __uint_as_float(mantissa << subnormal_shift);
+    return result;
 }
 
-/**
- * Adjusts a float absolute-value bit pattern for one extra exponent step.
- *
- * The helper is used by the remquo core when the remainder mantissa must be
- * advanced to the next representable absolute float during quotient tracking.
- *
- */
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline uint32_t __asc_double_abs_float_bits(uint32_t abs_bits)
 {
-    if (abs_bits >= ASCRT_INF_U) {
-        return abs_bits;
+    // Double the magnitude encoded by an absolute-value fp32 bit pattern.
+    uint32_t result = abs_bits;
+    if (abs_bits < ASCRT_INF_U) {
+        const uint32_t exponent_bits = abs_bits & ASCRT_EXP_BIT_FLOAT_U;
+        if (exponent_bits == 0U) {
+            // Subnormal: shift mantissa left by one.
+            result = (abs_bits & ASCRT_MAN_BIT_FLOAT_U) << 1U;
+        } else if (exponent_bits == 0x7F000000U) {
+            // Doubling a value at the top of the normal range overflows to inf.
+            result = ASCRT_INF_U;
+        } else {
+            // Normal finite value: increment the exponent by one.
+            result = abs_bits + 0x00800000U;
+        }
     }
-    const uint32_t exponent_bits = abs_bits & ASCRT_EXP_BIT_FLOAT_U;
-    if (exponent_bits == 0U) {
-        return (abs_bits & ASCRT_MAN_BIT_FLOAT_U) << 1U;
-    }
-    if (exponent_bits == 0x7F000000U) {
-        return ASCRT_INF_U;
-    }
-    return abs_bits + 0x00800000U;
+    return result;
 }
 
-/**
- * Computes the unsigned-magnitude remainder for remquo and tracks low quotient bits.
- *
- * The routine compares the absolute-value bit patterns of x and y, reconstructs
- * mantissa/exponent pairs, and performs a bitwise long-division style reduction
- * to obtain:
- *   remainder ~= abs(x) mod abs(y)
- * along with the low quotient bits needed by remquo.
- *
- * @param abs_x_bits Absolute bit pattern of |x|.
- * @param abs_y_bits Absolute bit pattern of |y|.
- * @param quo_abs_low Output low bits of the unsigned quotient magnitude.
- * @return The unsigned remainder as a float.
- */
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_remquo_core(
     uint32_t abs_x_bits, uint32_t abs_y_bits, uint32_t* quo_abs_low)
 {
-    uint32_t quotient_low = 0U;
+    // Short path when |x| < |y|: quotient is zero and the remainder is x.
     if (abs_x_bits < abs_y_bits) {
         *quo_abs_low = 0U;
         return __uint_as_float(abs_x_bits);
     }
 
-    // Reconstruct mantissa and exponent information for both inputs.
+    // Split both operands into integer mantissas and aligned exponents.
+    uint32_t quotient_low = 0U;
     uint32_t remainder_mantissa = __asc_float_mantissa_bits_from_abs_bits(abs_x_bits);
     const uint32_t y_mantissa = __asc_float_mantissa_bits_from_abs_bits(abs_y_bits);
     const int32_t x_exponent = __asc_float_mantissa_exponent_from_abs_bits(abs_x_bits);
     const int32_t y_exponent = __asc_float_mantissa_exponent_from_abs_bits(abs_y_bits);
     const int32_t exponent_diff = x_exponent - y_exponent;
 
-    // Use a bit-serial division path when x is at least as large as y in exponent.
+    // Bit-by-bit long division over the mantissa domain.
     if (exponent_diff >= 0 && y_mantissa != 0U) {
         uint32_t remainder_bits = 0U;
         const int32_t x_mantissa_log2 = __asc_uint_floor_log2(remainder_mantissa);
@@ -3472,27 +3435,18 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_remquo_core(
                 quotient_low |= 1U;
             }
         }
-        remainder_mantissa = static_cast<uint32_t>(remainder_bits);
+        remainder_mantissa = remainder_bits;
     }
 
+    // Reassemble the provisional remainder on y's exponent scale.
     *quo_abs_low = quotient_low;
     return __asc_make_float_from_mantissa(remainder_mantissa, y_exponent);
 }
 
-/**
- * Applies the final remquo tail adjustment to the provisional remainder.
- *
- * If 2 * remainder exceeds |y|, or exactly ties with an odd low quotient bit,
- * the remainder is nudged by one divisor step and the quotient low bits are
- * incremented accordingly.
- *
- * @param abs_y_bits Absolute bit pattern of |y|.
- * @param remainder Provisional remainder, updated in place.
- * @param quotient_low Low quotient bits, updated in place.
- */
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline void __asc_remquo_tail(
     uint32_t abs_y_bits, float* remainder, uint32_t* quotient_low)
 {
+    // Final tie-to-even correction on the provisional remainder.
     const float abs_y = __uint_as_float(abs_y_bits);
     const float double_remainder = *remainder + *remainder;
     if (double_remainder > abs_y || (double_remainder == abs_y && ((*quotient_low & 1U) != 0U))) {
@@ -3501,59 +3455,52 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline void __asc_remquo_tail(
     }
 }
 
-/**
- * Computes remquo(x, y) for float inputs using absolute-value reduction and
- * quotient-sign reconstruction.
- *
- * The implementation first handles special values, then reduces |x| by |y|
- * with a bitwise quotient tracker, applies the remquo tail correction, restores
- * the sign of the remainder, and finally folds the quotient sign into the low bits.
- *
- * @param x Dividend.
- * @param y Divisor.
- * @param quo Output quotient pointer.
- * @return The computed remainder value.
- */
 __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_remquof_impl(float x, float y, int32_t* quo)
 {
-    constexpr uint32_t abs_mask = 0x7FFFFFFFU;
+    // Decompose the raw bits first so the main path can stay branch-light.
     const uint32_t x_bits = __float_as_uint(x);
     const uint32_t y_bits = __float_as_uint(y);
-    const uint32_t abs_x_bits = x_bits & abs_mask;
-    const uint32_t abs_y_bits = y_bits & abs_mask;
+    const uint32_t abs_x_bits = x_bits & 0x7FFFFFFFU;
+    const uint32_t abs_y_bits = y_bits & 0x7FFFFFFFU;
     *quo = 0;
 
-    // NaN, infinity, and zero-divisor cases follow IEEE-style propagation rules.
-    if (abs_x_bits > ASCRT_INF_U || abs_y_bits > ASCRT_INF_U) {
-        return x + y;
-    }
-    if (abs_x_bits == ASCRT_INF_U || abs_y_bits == 0U) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
-    if (abs_y_bits == ASCRT_INF_U) {
-        return x;
-    }
-
     uint32_t quotient_low = 0U;
-    float remainder = __asc_remquo_core(abs_x_bits, abs_y_bits, &quotient_low);
-    __asc_remquo_tail(abs_y_bits, &remainder, &quotient_low);
+    // Classify special values, but defer result selection until the end.
+    const bool is_nan = (abs_x_bits > ASCRT_INF_U) || (abs_y_bits > ASCRT_INF_U);
+    const bool is_zero_div = (abs_x_bits == ASCRT_INF_U) || (abs_y_bits == 0U);
+    const bool is_inf_y = (abs_y_bits == ASCRT_INF_U);
+    const bool is_finite = !(is_nan || is_zero_div || is_inf_y);
 
-    // Restore the sign of the remainder to match the sign of x.
-    if ((x_bits & ASCRT_NEG_SIGN_BIT_U) != 0U) {
-        const float abs_remainder = fabsf(remainder);
-        if (abs_remainder <= ASCRT_INF_F) {
+    // Default result placeholder; overwritten by the finite path when applicable.
+    float remainder = x + y;
+    if (is_finite) {
+        remainder = __asc_remquo_core(abs_x_bits, abs_y_bits, &quotient_low);
+        __asc_remquo_tail(abs_y_bits, &remainder, &quotient_low);
+        // Restore the sign of the remainder from x.
+        if ((x_bits & ASCRT_NEG_SIGN_BIT_U) != 0U) {
             remainder = -remainder;
         }
     }
 
-    // Fold the sign of the quotient into the low quotient bits.
+    // Restore the sign of the quotient bits from x/y.
     const bool quotient_is_negative = ((x_bits ^ y_bits) & ASCRT_NEG_SIGN_BIT_U) != 0U;
     const int32_t sign_mask = quotient_is_negative ? -1 : 0;
-    *quo = (static_cast<int32_t>(quotient_low) ^ sign_mask) - sign_mask;
-    if (fabsf(remainder) > ASCRT_INF_F) {
-        *quo = 0;
+    int32_t signed_quo = (static_cast<int32_t>(quotient_low) ^ sign_mask) - sign_mask;
+
+    // Override the finite-path result with IEEE special cases when needed.
+    float result = remainder;
+    int32_t quo_result = signed_quo;
+    if (is_nan || is_zero_div) {
+        result = ASCRT_NAN_F;
+        quo_result = 0;
+    } else if (is_inf_y) {
+        result = x;
+        quo_result = 0;
     }
-    return remainder;
+
+    *quo = quo_result;
+    const uint32_t result_bits = __float_as_uint(result);
+    return __uint_as_float(result_bits);
 }
 
 #define __INTERNAL_REMQUOF(x, y, quo)                           \
