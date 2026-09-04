@@ -12,16 +12,12 @@ cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 
-if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
-    message(FATAL_ERROR "fixpipe_l0c2ub only supports dav-3510, but got ${CMAKE_ASC_ARCHITECTURES}")
-endif()
-
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    fixpipe_l0c2ub.asc
+    asc_copy_l0c2gm.asc
 )
 
 target_link_libraries(demo PRIVATE)
@@ -30,11 +26,14 @@ target_link_libraries(demo PRIVATE)
 # SCENARIO_NUM: 场景编号
 #   1 - 输出格式NZ，输出数据类型float
 #   2 - 输出格式ND，输出数据类型float
-#   3 - 输出格式ND，输出数据类型float，使能双目标模式，按M维度拆分
-#   4 - 输出格式ND，输出数据类型float，使能双目标模式，按N维度拆分
-set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-4)")
-if(NOT SCENARIO_NUM MATCHES "^[1-4]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3 or 4, but got ${SCENARIO_NUM}")
+#   3 - 输出格式DN，输出数据类型float
+#   4 - 输出格式ND，输出数据类型int8_t，使能Scalar量化
+#   5 - 输出格式ND，输出数据类型int8_t，使能Vector量化
+#   6 - 输出格式ND，输出数据类型float，使能relu
+#   7 - 输出格式NZ，输出数据类型float，使能channel split
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-7)")
+if(NOT SCENARIO_NUM MATCHES "^[1-7]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3, 4, 5, 6 or 7, but got ${SCENARIO_NUM}")
 endif()
 
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
