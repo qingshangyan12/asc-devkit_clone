@@ -28,6 +28,7 @@ HcclResult InheritKfcServerKernelArg(
     auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
 
     kfcArg->role = GetKfcServerRole(param.algName, missionIndex);
+    kfcArg->missionIndex = missionIndex;
     const bool isAllGather =
         srcName == "CcuKernelAllGatherMesh1DMem2Mem" && param.opType == HcclCMDType::HCCL_CMD_ALLGATHER;
     const bool isAllGatherKfc =

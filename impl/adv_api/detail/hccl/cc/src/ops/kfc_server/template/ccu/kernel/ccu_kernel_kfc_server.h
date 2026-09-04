@@ -18,7 +18,6 @@
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
 #include "kfc_server_protocol.h"
-#include "../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
 
 namespace mc2_ops_hccl {
 constexpr uint64_t INVALID_U64 = UINT64_MAX;
@@ -33,6 +32,7 @@ struct CcuKernelArgKfcServer : CcuKernelArgBase {
     uint32_t rankId = 0;
     bool loadFromMem = false;
     KfcServerRole role = KfcServerRole::DEFAULT;
+    uint32_t missionIndex = 0;
     uint32_t jettyNum = 4;
     OpParam opParam;
     std::vector<std::vector<uint32_t>> subCommRanks;
@@ -54,6 +54,7 @@ struct KfcServerContext : CcuKernelCtxBase {
 
     ccu::Variable missionNum;
     ccu::Variable missionIndex;
+    ccu::Variable subKernelPc;
 
     // 用于Die间同步信号[missionId=0]
     const char* exportDieSig;
