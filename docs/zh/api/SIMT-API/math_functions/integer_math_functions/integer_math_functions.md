@@ -24,6 +24,8 @@
 
 -   **[\_\_umul64hi](__umul64hi.md)**
 
+-   **[asc_uintdiv](asc_uintdiv.md)**
+
 -   **[\_\_mul\_i32toi64](__mul_i32toi64.md)**
 
 -   **[\_\_brev](__brev.md)**
@@ -55,4 +57,3 @@
 -   **[max](max.md)**
 
 -   **[min](min.md)**
-
