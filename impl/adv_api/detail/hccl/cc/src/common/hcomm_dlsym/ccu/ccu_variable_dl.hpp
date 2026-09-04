@@ -15,8 +15,8 @@
 #include "ccu_variable.hpp"
 #else
 #include <cstdint>
-#include <type_traits>
 #include "ccu_types_dl.h"
+#include "hcomm_primitives.h"
 #include "ccu_utils_dl.hpp"
 #include "ccu_primitives_impl_dl.h"
 
@@ -81,9 +81,9 @@ public:
             *this, that, detail::CcuArithmeticOperatorType::ADDITION);
     }
 
-    CondExpr operator==(uint64_t immediate) { return CondExpr{this, immediate, CCU_CONDITION_EQ}; }
+    CondExpr operator==(uint64_t immediate) const { return CondExpr{this, immediate, CCU_CONDITION_EQ}; }
 
-    CondExpr operator!=(uint64_t immediate) { return CondExpr{this, immediate, CCU_CONDITION_NE}; }
+    CondExpr operator!=(uint64_t immediate) const { return CondExpr{this, immediate, CCU_CONDITION_NE}; }
 
     CcuVariableHandle handle{0};
 
