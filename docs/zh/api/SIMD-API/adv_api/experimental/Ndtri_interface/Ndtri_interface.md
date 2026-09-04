@@ -1,3 +1,3 @@
 # Ndtri接口
 
--   **[Ndtri](Ndtri.md)**
+- **[Ndtri](Ndtri.md)**
