@@ -59,7 +59,7 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| parent | 输入 | 被划分的父组，类型只能是`thread_block`或`coalesced_group`。 |
+| parent | 输入 | 被划分的父组，类型只能是`thread_block`或`thread_group`或`coalesced_group`。 |
 | tilesz | 输入 | 指定划分出的子组大小。 |
 
 ## 返回值说明
