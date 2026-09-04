@@ -113,7 +113,7 @@ AlgHierarchyInfoForAllLevel MakeMultiJettyHierarchy(u32 userRank)
         closRanks.push_back(rank);
     }
     AlgHierarchyInfoForAllLevel hierarchy;
-    hierarchy.infos = {{meshRanks, closRanks}};
+    hierarchy.infos = {{meshRanks, closRanks}, {}};
     return hierarchy;
 }
 
@@ -314,6 +314,7 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, multijetty_executor_orchestrates_multiround_str
     for (u32 rank = 0U; rank < MULTI_JETTY_RANK_SIZE; ++rank) {
         auto& execution = executions[rank];
         execution.param = MakeAicpuParam();
+        execution.param.opMode = OpMode::OPBASE;
         execution.param.userRank = rank;
         execution.param.DataDes.count = MULTI_JETTY_DATA_COUNT;
         execution.param.DataDes.strideCount = MULTI_JETTY_STRIDE_COUNT;
@@ -341,6 +342,23 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, multijetty_executor_orchestrates_multiround_str
     for (u32 rank = 0U; rank < MULTI_JETTY_RANK_SIZE; ++rank) {
         auto& execution = executions[rank];
         execution.resCtx = std::make_unique<AlgResourceCtxSerializable>();
+        void* cclBufferAddr = nullptr;
+        u64 cclBufferSize = 0U;
+        threadResults[rank] = HcclGetHcclBuffer(execution.comm, &cclBufferAddr, &cclBufferSize);
+        if (threadResults[rank] != HCCL_SUCCESS) {
+            continue;
+        }
+        execution.resCtx->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
+        execution.resCtx->notifyNumOnMainThread = execution.request.notifyNumOnMainThread;
+        execution.resCtx->slaveThreadNum = execution.request.slaveThreadNum;
+        execution.resCtx->notifyNumPerThread = execution.request.notifyNumPerThread;
+        execution.resCtx->algHierarchyInfo = execution.hierarchy;
+        execution.resCtx->topoInfo = execution.topo;
+        HcclSim::SimNpu& npu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(rank);
+        execution.param.inputPtr =
+            reinterpret_cast<void*>(npu.AllocMemory(HcclSim::BufferType::INPUT, execution.param.inputSize));
+        execution.param.outputPtr =
+            reinterpret_cast<void*>(npu.AllocMemory(HcclSim::BufferType::OUTPUT, execution.param.outputSize));
         threadResults[rank] = HcclGetThread(execution.comm, execution.param, execution.request, execution.resCtx);
     }
 
@@ -366,13 +384,6 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, multijetty_executor_orchestrates_multiround_str
         ASSERT_EQ(executions[rank].resCtx->channels.size(), MULTI_JETTY_AXIS_NUM);
         EXPECT_EQ(executions[rank].resCtx->channels[0].size(), MULTI_JETTY_MESH_SIZE - 1U);
         EXPECT_EQ(executions[rank].resCtx->channels[1].size(), MULTI_JETTY_CHANNEL_NUM);
-        executions[rank].resCtx->algHierarchyInfo = executions[rank].hierarchy;
-        executions[rank].resCtx->topoInfo = executions[rank].topo;
-        HcclSim::SimNpu& npu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(rank);
-        executions[rank].param.inputPtr =
-            reinterpret_cast<void*>(npu.AllocMemory(HcclSim::BufferType::INPUT, executions[rank].param.inputSize));
-        executions[rank].param.outputPtr =
-            reinterpret_cast<void*>(npu.AllocMemory(HcclSim::BufferType::OUTPUT, executions[rank].param.outputSize));
     }
 
     const u64 singleLoopCapacity =
@@ -382,7 +393,7 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, multijetty_executor_orchestrates_multiround_str
     EXPECT_GT(MULTI_JETTY_STRIDE_COUNT, MULTI_JETTY_DATA_COUNT);
 
     for (u32 rank = 0U; rank < MULTI_JETTY_RANK_SIZE; ++rank) {
-        EXPECT_EQ(
+        ASSERT_EQ(
             executions[rank].executor->Orchestrate(executions[rank].param, *executions[rank].resCtx), HCCL_SUCCESS);
     }
 
