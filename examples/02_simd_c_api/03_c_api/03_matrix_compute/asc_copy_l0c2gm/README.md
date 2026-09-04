@@ -1,4 +1,4 @@
-# fixpipe_l0c2gm样例
+# asc_copy_l0c2gm样例
 
 ## 概述
 
@@ -8,19 +8,19 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
 ```
-├── fixpipe_l0c2gm
+├── asc_copy_l0c2gm
 │   ├── figures                        // 图示
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py           // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
-│   ├── fixpipe_l0c2gm.asc             // SIMD C API样例实现及调用样例
+│   ├── asc_copy_l0c2gm.asc             // SIMD C API样例实现及调用样例
 │   └── README.md                      // 样例说明文档
 ```
 
@@ -48,7 +48,7 @@
 
 ## 场景详细说明
 
-本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `fixpipe_l0c2gm`。
+本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `asc_copy_l0c2gm`。
 
 <a name="表2"></a>
 <table border="2" align="center">
@@ -70,7 +70,7 @@
 - 实现：调用`asc_copy_l0c2gm`，关闭Nz2ND、Nz2DN、量化、ReLU和ChannelSplit，直接输出Nz格式
 - 说明：L0C数据为Nz格式直接输出到GM的Nz格式，数据保持原格式不变
 <p align="center">
-  <img src="figures/fixpipe_l0c2gm_NZ2NZ.png" width="800">
+  <img src="figures/asc_copy_l0c2gm_NZ2NZ.png" width="800">
 </p>
 
 **场景2：输出格式ND，输出数据类型float**
@@ -79,7 +79,7 @@
 - 实现：先调用`asc_set_l0c_copy_nz_para(1, 0, 0)`配置单矩阵搬出，再调用`asc_copy_l0c2gm`并设置`enable_nz2nd = true`
 - 说明：将CO1中的Nz格式数据转换为ND格式输出到GM，ND格式没有Nz格式的对齐要求，输出时需要按实际大小配置参数
 <p align="center">
-  <img src="figures/fixpipe_l0c2gm_NZ2ND.png" width="800">
+  <img src="figures/asc_copy_l0c2gm_NZ2ND.png" width="800">
 </p>
 
 **场景3：输出格式DN，输出数据类型float（仅Ascend 950PR/Ascend 950DT支持）**
@@ -88,7 +88,7 @@
 - 实现：调用`asc_set_l0c_copy_channel_para(1)`和`asc_set_l0c_copy_nz_para(1, 0, 0)`，再调用`asc_copy_l0c2gm`并设置`enable_nz2dn = true`
 - 说明：将CO1中的Nz格式数据转换为DN格式输出到GM
 <p align="center">
-  <img src="figures/fixpipe_l0c2gm_NZ2DN.png" width="800">
+  <img src="figures/asc_copy_l0c2gm_NZ2DN.png" width="800">
 </p>
 
 **场景4：输出格式ND，输出数据类型int8_t，使能Scalar量化**

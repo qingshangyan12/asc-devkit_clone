@@ -1,4 +1,4 @@
-# fixpipe_l0c2l1 Example
+# asc_copy_l0c2l1 Example
 
 ## Overview
 
@@ -10,18 +10,18 @@ Note: Ascend 950PR/Ascend 950DT does not support direct L1-to-GM transfer. To ve
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
 ```
-├── fixpipe_l0c2l1
+├── asc_copy_l0c2l1
 │   ├── scripts
 │   │   ├── gen_data.py                // Script for generating input data and ground truth data
 │   │   └── verify_result.py           // Script for verifying whether output data matches ground truth data
 │   ├── CMakeLists.txt                 // Build project file
 │   ├── data_utils.h                   // Data read/write functions
-│   ├── fixpipe_l0c2l1.asc             // SIMD C API implementation and invocation
+│   ├── asc_copy_l0c2l1.asc             // SIMD C API implementation and invocation
 │   └── README.md                      // Example documentation
 ```
 
@@ -47,7 +47,7 @@ This `dav-3510` example describes each L0C-to-L1 transfer through the addresses,
 ## Scenario Description
 
 This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different `SCENARIO_NUM` values are shown in the table below.
-All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 128, 128], with kernel function name `fixpipe_l0c2l1`.
+All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 128, 128], with kernel function name `asc_copy_l0c2l1`.
 
 <a name="table2"></a>
 <table border="2" align="center">
