@@ -8,7 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <algorithm>
-#include <cmath>
 #include <future>
 #include <map>
 #include <numeric>
@@ -225,7 +224,6 @@ HcclResult Selector(
         CHK_RET(LoadAICPUKernel()); // 该函数内部有防止重复加载的逻辑
     }
     CHK_RET(SetOpParamAlgTag(param, algName));
-    CHK_RET(SetMultipleDimensionSplitRatio(comm, param));
     HCCL_INFO(
         "[asc][AlgoSelect][Selector] end, opType[%d], algName[%s], algTag[%s], engine[%d], "
         "opExecuteConfig[%d].",
@@ -2631,74 +2629,6 @@ HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetai
         HCCL_INFO("Using host dpu trans.");
         hostDPUOnly = true;
     }
-    return HCCL_SUCCESS;
-}
-
-static HcclResult GetCommMultipleDimensionSplitRatio(HcclComm comm, double& ratio, bool& isConfigured)
-{
-    ratio = 0.0;
-    isConfigured = false;
-    double commRatio = 0.0;
-    const uint32_t infoLen = sizeof(commRatio);
-    HcclResult ret =
-        HcclConfigGetInfo(comm, HcclConfigType::HCCL_CONFIG_TYPE_MULTIPLE_DIMENSION_SPLIT_RATIO, infoLen, &commRatio);
-    if (ret == HCCL_E_NOT_SUPPORT) {
-        HCCL_INFO("[GetCommMultipleDimensionSplitRatio] comm config not set or not supported, ret[%d].", ret);
-        return HCCL_SUCCESS;
-    }
-    if (ret != HCCL_SUCCESS) {
-        HCCL_ERROR("[GetCommMultipleDimensionSplitRatio] HcclConfigGetInfo failed, ret[%d].", ret);
-        return ret;
-    }
-    if (!std::isfinite(commRatio) || commRatio < 0.0 || commRatio > 1.0) {
-        HCCL_ERROR(
-            "[GetCommMultipleDimensionSplitRatio] comm ratio[%f] is not finite or out of range[0, 1].", commRatio);
-        return HCCL_E_PARA;
-    }
-    if (commRatio == 0.0) {
-        HCCL_INFO("[GetCommMultipleDimensionSplitRatio] comm split ratio is not configured.");
-        return HCCL_SUCCESS;
-    }
-    ratio = commRatio;
-    isConfigured = true;
-    HCCL_INFO("[GetCommMultipleDimensionSplitRatio] comm ratio[%f] is configured.", commRatio);
-    return HCCL_SUCCESS;
-}
-
-HcclResult SetMultipleDimensionSplitRatio(HcclComm comm, OpParam& param)
-{
-    constexpr double defaultRatio = 0.5;
-
-    double commRatio = 0.0;
-    bool isCommConfigured = false;
-    HcclResult ret = GetCommMultipleDimensionSplitRatio(comm, commRatio, isCommConfigured);
-    if (ret != HCCL_SUCCESS) {
-        return ret;
-    }
-    if (isCommConfigured) {
-        param.opConfig.multipleDimensionSplitRatio = commRatio;
-        param.opConfig.multipleDimensionSplitRatioSource = MultipleDimensionSplitRatioSource::COMM_CONFIG;
-        HCCL_INFO("[SetMultipleDimensionSplitRatio] ratioSource[COMM_CONFIG], configuredRatio[%f]", commRatio);
-        return HCCL_SUCCESS;
-    }
-
-    double envRatio = 0.0;
-    if (GetExternalInputMultipleDimensionSplitRatio(envRatio)) {
-        if (!std::isfinite(envRatio) || envRatio < 0.0 || envRatio > 1.0) {
-            HCCL_WARNING(
-                "[SetMultipleDimensionSplitRatio] env ratio[%f] is out of range, use default ratio[%f]", envRatio,
-                defaultRatio);
-            envRatio = defaultRatio;
-        }
-        param.opConfig.multipleDimensionSplitRatio = envRatio;
-        param.opConfig.multipleDimensionSplitRatioSource = MultipleDimensionSplitRatioSource::ENV_CONFIG;
-        HCCL_INFO("[SetMultipleDimensionSplitRatio] ratioSource[ENV_CONFIG], configuredRatio[%f]", envRatio);
-        return HCCL_SUCCESS;
-    }
-
-    param.opConfig.multipleDimensionSplitRatio = defaultRatio;
-    param.opConfig.multipleDimensionSplitRatioSource = MultipleDimensionSplitRatioSource::BUILTIN_FORMULA;
-    HCCL_INFO("[SetMultipleDimensionSplitRatio] ratioSource[BUILTIN_FORMULA], configuredRatio[%f]", defaultRatio);
     return HCCL_SUCCESS;
 }
 } // namespace mc2_ops_hccl

@@ -63,9 +63,6 @@ private:
     uint64_t GetRankSize(const std::vector<std::vector<u32>>& subCommRanks) const;
 
     uint64_t rankSizeLevel0_{0};
-    double multipleDimensionSplitRatio_{0.5};
-    MultipleDimensionSplitRatioSource multipleDimensionSplitRatioSource_{
-        MultipleDimensionSplitRatioSource::BUILTIN_FORMULA};
     uint64_t rankSizeLevel1_{0};
 
     uint64_t rankIdxLevel0_{0};

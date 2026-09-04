@@ -48,8 +48,6 @@ struct AlgEnvConfig {
     bool enableFfts;
     bool execTimeOutSet;
     double execTimeout;
-    bool multipleDimensionSplitRatioSet;
-    double multipleDimensionSplitRatio;
     bool hcclRetryConfig[HCCL_RETRY_ENABLE_LEVEL_NUM];
     std::map<HcclCMDType, std::vector<HcclAlgoType>> hcclAlgoConfig;
 
@@ -67,8 +65,6 @@ struct AlgEnvConfig {
         aicpuCacheEnable = 1; // 默认开启aicpu cache (只有当aicpuUnfold为true时才生效)
         aivOnlyMode = false;
         execTimeOutSet = false;
-        multipleDimensionSplitRatioSet = false;
-        multipleDimensionSplitRatio = 0;
         execTimeout = 0;
         // 环境变量参数
         for (u32 opType = 0; opType < static_cast<u32>(HcclCMDType::HCCL_CMD_MAX); opType++) {
@@ -129,7 +125,6 @@ HcclResult ParseInterLinkType();
 HcclResult ParseOpExpansion();
 
 HcclResult ParseExecTimeout();
-HcclResult ParseMultipleDimensionSplitRatio();
 
 HcclResult SplitHcclRetryEnable(const std::string& retryConfig, std::vector<std::string>& retryEnables);
 
@@ -164,7 +159,6 @@ const bool& GetExternalInputHcclEnableEntryLog();
 const std::map<HcclCMDType, std::vector<HcclAlgoType>> GetExternalInputHcclAlgoConfigAllType();
 
 bool GetExternalInputExecTimeout(double& execTimeOut);
-bool GetExternalInputMultipleDimensionSplitRatio(double& multipleDimensionSplitRatio);
 
 bool RunIndependentOpExpansion(DevType deviceType);
 } // namespace mc2_ops_hccl
