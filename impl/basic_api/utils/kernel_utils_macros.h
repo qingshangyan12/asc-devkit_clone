@@ -336,12 +336,6 @@ struct SknlKernelMap {
 
 #define ENABLE_DETERMINISTIC() ENABLE_FEATURE_FOR_COMPILE(deterministic, 1)
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
-#define KERNEL_TASK_TYPE(key, value)
-#else
-#define KERNEL_TASK_TYPE(key, value) ENABLE_FEATURE_FOR_COMPILE(key, value)
-#endif
-
 #ifndef ONE_CORE_DUMP_SIZE
 #define ONE_CORE_DUMP_SIZE (1024 * 1024)
 #endif

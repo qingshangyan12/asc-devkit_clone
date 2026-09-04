@@ -14,14 +14,15 @@
 #include "utils/base/sys_macros.h"
 #endif
 
-#if !defined(likely) || !defined(unlikely) || !defined(PRELOAD) || !defined(KERNEL_TASK_TYPE_DEFAULT) || \
+#if !defined(likely) || !defined(unlikely) || !defined(PRELOAD) || !defined(KERNEL_TASK_TYPE) || \
+    !defined(KERNEL_TASK_TYPE_DEFAULT) || \
     !defined(REGISTER_TILING_DEFAULT) || !defined(REGISTER_TILING_FOR_TILINGKEY) || \
     !defined(REGISTER_NONE_TILING) || !defined(TILING_KEY_IS) || !defined(TILING_KEY_LIST)
 #error "the public sys_macros header must provide the reviewed macro set"
 #endif
 
 #ifdef VERIFY_SINGLE_HEADER
-#if defined(KERNEL_TASK_TYPE) || defined(ENABLE_FEATURE_FOR_TILING) || defined(TILING_KEY_LIST_INOUT)
+#if defined(ENABLE_FEATURE_FOR_TILING) || defined(TILING_KEY_LIST_INOUT)
 #error "the public sys_macros header must not expose unreviewed companion macros"
 #endif
 #endif
@@ -45,9 +46,7 @@ extern "C" __global__ __aicore__ void KernelTestPublicMacros()
         return;
     }
 
-#ifndef VERIFY_SINGLE_HEADER
     KERNEL_TASK_TYPE(1, KERNEL_TYPE_AIC_ONLY);
-#endif
     REGISTER_NONE_TILING;
     if (TILING_KEY_LIST(1, 2)) {
         return;
