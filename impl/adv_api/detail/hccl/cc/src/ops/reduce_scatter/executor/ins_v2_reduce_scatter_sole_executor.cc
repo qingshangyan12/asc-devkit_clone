@@ -19,6 +19,7 @@
 #endif
 
 namespace mc2_ops_hccl {
+constexpr u64 TMP_MEM_RESERVE_SIZE = 1 * 1024 * 1024;
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2ReduceScatterSoleExecutor()
@@ -63,6 +64,10 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
     strideCount_ = param.DataDes.strideCount;
     dataType_ = param.DataDes.dataType;
     dataTypeSize_ = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
+    // 对dataTypeSize是否为0进行校验
+    CHK_PRT_RET(
+        dataTypeSize_ == 0, HCCL_ERROR("[InsV2ReduceScatterSoleExecutor][Orchestrate] dataTypeSize is 0"),
+        HCCL_E_INTERNAL);
     dataSize_ = dataCount_ * dataTypeSize_;
 
     HcclResult ret = OrchestrateLoop(param, resCtx);
@@ -109,7 +114,10 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
     // 计算最小传输大小
     u64 maxDataSizePerLoop = 0;
     maxTmpMemSize_ = tempAlgParams.buffInfo.hcclBuff.size;
-    u64 transportBoundDataSize = UB_MAX_DATA_SIZE;
+    if (param.engine != COMM_ENGINE_AIV) {
+        maxTmpMemSize_ = maxTmpMemSize_ - TMP_MEM_RESERVE_SIZE;
+    }
+    u64 transportBoundDataSize = (param.engine == CommEngine::COMM_ENGINE_AICPU_TS) ? maxTmpMemSize_ : UB_MAX_DATA_SIZE;
     HCCL_INFO("[InsV2ReduceScatterSoleExecutor]maxTmpMemSize_ [%u]", maxTmpMemSize_);
     if (templateScratchMultiplier != 0) {
         u64 scratchBoundDataSize =
@@ -244,7 +252,7 @@ REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1D, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     InsTempReduceScatterMesh1D);
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1DMeshChunk, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterSoleMeshChunk, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     InsTempReduceScatterMesh1DMeshChunk);
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterNHR, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
