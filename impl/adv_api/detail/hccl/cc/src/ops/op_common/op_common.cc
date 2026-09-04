@@ -830,11 +830,22 @@ HcclResult HcclGetAlgRes(
     HCCL_INFO(
         "[asc][AlgoResource][HcclGetAlgRes] before CalcAlgHierarchyInfo, opType[%d], algTag[%s].", param.opType,
         param.algTag);
-    HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfo(comm, topoInfo, algHierarchyInfo);
-    HCCL_INFO(
-        "[asc][AlgoResource][HcclGetAlgRes] after CalcAlgHierarchyInfo, ret[%d], levelNum[%zu].", calcHierarchyRet,
-        algHierarchyInfo.infos.size());
-    CHK_RET(calcHierarchyRet);
+    const bool useCannBridge =
+        (param.opType == HCCL_CMD_ALLTOALL || param.opType == HCCL_CMD_ALLTOALLV || param.opType == HCCL_CMD_ALLREDUCE);
+    if (useCannBridge) {
+        AlgAttrs algAttrs = executor->GetAlgoMeta(std::string(param.algName));
+        HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfoV2(topoInfo, algHierarchyInfo, algAttrs);
+        HCCL_INFO(
+            "[asc][AlgoResource][HcclGetAlgRes] after CalcAlgHierarchyInfoV2, ret[%d], levelNum[%zu].",
+            calcHierarchyRet, algHierarchyInfo.infos.size());
+        CHK_RET(calcHierarchyRet);
+    } else {
+        HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfo(comm, topoInfo, algHierarchyInfo);
+        HCCL_INFO(
+            "[asc][AlgoResource][HcclGetAlgRes] after CalcAlgHierarchyInfo, ret[%d], levelNum[%zu].", calcHierarchyRet,
+            algHierarchyInfo.infos.size());
+        CHK_RET(calcHierarchyRet);
+    }
     // 资源计算
     AlgResourceRequest resRequest;
     HCCL_INFO(
