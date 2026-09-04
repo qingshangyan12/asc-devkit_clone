@@ -276,8 +276,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         ccuUsedXnNum_ = 26;
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALL) {
-        ccuUsedXnNum_ = 11;
-        CcuPrepareForAllToAll(&handleParamGM_[handleId]);
+        if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+            ccuUsedXnNum_ = KFC_CONCURRENT_A2A_PARAM_NUM;
+            CcuPrepareForConcurrentAllToAll(&handleParamGM_[handleId]);
+        } else {
+            ccuUsedXnNum_ = 11;
+            CcuPrepareForAllToAll(&handleParamGM_[handleId]);
+        }
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
         ccuUsedXnNum_ = 10;
         FlushDataCache(&allToAllVParam_[handleId]);
