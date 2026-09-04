@@ -10593,6 +10593,11 @@ asc_set_gm2ub_pad(uint32_t pad_val)
     asc_set_gm2ub_pad_impl(pad_val);
 }
 
+__simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst)
+{
+    asc_storealign_squeeze_status_impl(dst);
+}
+
 __simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst, int32_t offset)
 {
     asc_storealign_squeeze_status_impl(dst, offset);

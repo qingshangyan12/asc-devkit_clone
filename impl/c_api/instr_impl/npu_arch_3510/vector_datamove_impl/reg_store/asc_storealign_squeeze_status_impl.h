@@ -20,6 +20,11 @@ __simd_callee__ inline void asc_storealign_squeeze_status_impl(__ubuf__ uint32_t
     }
 }
 
+__simd_callee__ inline void asc_storealign_squeeze_status_impl(__ubuf__ uint32_t* dst)
+{
+    asc_storealign_squeeze_status_impl(dst, 0);
+}
+
 __simd_callee__ inline void asc_storealign_squeeze_status_postupdate_impl(__ubuf__ uint32_t*& dst, int32_t offset)
 {
     if ASC_IS_AIV {
