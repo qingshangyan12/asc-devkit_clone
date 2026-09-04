@@ -31,6 +31,9 @@
 头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_gather_mask_intf.h"`。
 
 该接口用于对指定的特殊目的寄存器（SpecialPurposeReg）进行清零操作。通过模板参数spr指定目标特殊寄存器，调用后该寄存器的值被置为0，当前支持的特殊寄存器见[表 SpecialPurposeReg模板参数说明](#table2)。
+
+使用指定特殊寄存器前，如需将其初始值设为0，可调用本接口进行清零。
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
@@ -72,6 +75,7 @@ __simd_vf__ inline void SqueezeVF(__ubuf__ T* xAddr, __ubuf__ T* yAddr, uint32_t
     AscendC::Reg::RegTensor<T> xReg;
     AscendC::Reg::RegTensor<T> yReg;
     AscendC::Reg::UnalignRegForStore ureg;
+    // Squeeze在STORE_REG模式下会将有效元素的总字节数累加到AR寄存器，需先清零以初始化搬出偏移量。
     AscendC::Reg::ClearSpr<AscendC::SpecialPurposeReg::AR>();
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         AscendC::Reg::LoadAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(xReg, xAddr, oneRepeatSize);
