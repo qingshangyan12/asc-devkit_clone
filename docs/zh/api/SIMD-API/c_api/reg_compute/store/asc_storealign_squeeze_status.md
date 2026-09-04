@@ -54,7 +54,7 @@ __simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst
 
 - 非AIV调用直接返回。
 - 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- `dst`和`offset`确定的实际目的地址需32字节对齐，且不得超出实际可用UB范围。
+- `dst`和`offset`确定的实际目的地址需4字节对齐，且不得超出实际可用UB范围。
 - 调用本接口前，需使用[asc_squeeze_and_storeunalign](../reg_permute_sel/asc_squeeze_and_storeunalign.md)完成squeeze操作；写入的值是其当前累计的有效数据字节数。
 - 如果本接口与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化。
 
