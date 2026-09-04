@@ -42,11 +42,6 @@
       1. per_tensor：对整个Tensor进行量化/反量化，Tensor具有唯一的缩放因子。这种方法可以降低模型的存储和计算成本，但会降低模型的精度。
       2. per_channel：对Tensor的每个通道单独进行量化/反量化，同一通道内共享同一缩放因子，通道间缩放因子则各不相同。这种方法可以更好地保留模型的精度，但会增加模型的存储和计算成本。
 
-  3. ENABLE_UNITFLAG
-
-     样例通过`ENABLE_UNITFLAG`模板参数控制unitFlag功能的开关，默认值为true。
-     unitFlag具体介绍可见[mmad unitFlag特性样例](../../03_basic_api/03_matrix_compute/mmad_unitflag/README.md)
-
 - 样例规格：
 
   在核函数直调样例中，样例默认支持的shape为：M = 1024, N = 1024, K = 256。
@@ -93,7 +88,7 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](../../../../docs/zh/quick_start.md#cann-install)**。
+  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md)，配置环境变量。**当前仅支持使用[CANN master](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md)**。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

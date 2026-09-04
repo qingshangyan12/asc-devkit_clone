@@ -138,7 +138,7 @@ copy(copyL0C2GMAtom,
 Run the following steps in the root directory of this example to build and run the example.
 
 - Configure environment variables
-  Configure environment variables according to the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables according to the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/en/quick_start.md) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh

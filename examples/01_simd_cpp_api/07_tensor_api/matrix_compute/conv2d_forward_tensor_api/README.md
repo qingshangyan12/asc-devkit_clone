@@ -102,7 +102,7 @@ $$
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

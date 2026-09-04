@@ -42,11 +42,6 @@ This example implements dynamic Shape matrix multiplication and inline quantizat
       1. per_tensor: Quantize/dequantize the entire Tensor, with the Tensor having a unique scaling factor. This approach can reduce model storage and computation costs but decreases model accuracy.
       2. per_channel: Quantize/dequantize each channel of the Tensor individually, with the same scaling factor shared within a channel and different scaling factors between channels. This approach better preserves model accuracy but increases model storage and computation costs.
 
-  3. ENABLE_UNITFLAG
-
-     The example controls the unitFlag feature switch through the `ENABLE_UNITFLAG` template parameter, with default value true.
-     For detailed unitFlag description, see [mmad unitFlag Feature Example](../../03_basic_api/03_matrix_compute/mmad_unitflag/README_en.md)
-
 - Example specifications:
 
   In the kernel function direct invocation example, the default supported shape is: M = 1024, N = 1024, K = 256.
@@ -93,7 +88,7 @@ This example implements dynamic Shape matrix multiplication and inline quantizat
 Run the following steps in the root directory of this example to build and run the example.
 
 - Configure environment variables
-  Configure environment variables according to the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment. **Currently only [CANN master](../../../../docs/en/quick_start.md#cann-install) is supported**.
+  Configure environment variables according to the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/en/quick_start.md) of the CANN development kit in the current environment. **Currently only [CANN master](https://gitcode.com/cann/asc-devkit/blob/master/docs/en/quick_start.md) is supported**.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
