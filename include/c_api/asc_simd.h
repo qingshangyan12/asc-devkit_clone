@@ -22,10 +22,6 @@
 
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-#if defined(ASCENDC_HAS_UTILS_BASE_HELPERS)
-#include "utils/base/helpers.h"
-#endif
-
 #include "c_api/atomic/atomic.h"
 #include "c_api/cache_ctrl/cache_ctrl.h"
 #include "c_api/cube_compute/cube_compute.h"
