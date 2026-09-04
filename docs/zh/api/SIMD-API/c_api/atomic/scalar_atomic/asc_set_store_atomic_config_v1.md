@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/atomic/scalar_atomic.h"`。
+
 设置原子操作启用位与原子操作类型的值。
 
 ## 函数原型
@@ -68,7 +70,10 @@ bisheng example.asc -o main --npu-arch=dav-2201 && ./main
 #include <cstdint>
 #include <iostream>
 #include <vector>
-#include "c_api/asc_simd.h"
+#include "c_api/atomic/scalar_atomic.h"
+#include "c_api/cache_ctrl/cache_ctrl.h"
+#include "c_api/sync/sync.h"
+#include "c_api/utils/sys_init.h"
 #include "acl/acl.h"
 
 namespace {

@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/atomic/scalar_atomic.h"`。
+
 对Global Memory中`address`指向的一个`uint32_t`或`uint64_t`元素执行原子递增操作。读取该元素的旧值`old_value`，按照以下公式计算并写回新值`new_value`：
 
 $$
@@ -92,7 +94,10 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <cstdint>
 #include <iostream>
 #include <vector>
-#include "c_api/asc_simd.h"
+#include "c_api/atomic/scalar_atomic.h"
+#include "c_api/cache_ctrl/cache_ctrl.h"
+#include "c_api/sync/sync.h"
+#include "c_api/utils/sys_init.h"
 #include "acl/acl.h"
 
 namespace {

@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/atomic/scalar_atomic.h"`。
+
 对Global Memory中`address`指向的单个元素执行原子按位异或操作：读取该地址中的旧值`old_value`，将`old_value`与输入标量值`val`进行按位异或运算，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。
 
 计算公式如下：
@@ -91,7 +93,10 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <iostream>
 #include <vector>
 
-#include "c_api/asc_simd.h"
+#include "c_api/atomic/scalar_atomic.h"
+#include "c_api/cache_ctrl/cache_ctrl.h"
+#include "c_api/sync/sync.h"
+#include "c_api/utils/sys_init.h"
 #include "acl/acl.h"
 
 namespace {

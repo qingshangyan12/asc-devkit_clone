@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/atomic/datamove_atomic.h"`。
+
 将待搬运到GM的数据和GM上已有数据进行比较，然后将两者中的最小值写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子比较取小，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。
 
 接口可选择不同的函数原型来设定不同的比较取小数据类型。
@@ -103,7 +105,10 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <cstdint>
 #include <iostream>
 #include <vector>
-#include "c_api/asc_simd.h"
+#include "c_api/atomic/datamove_atomic.h"
+#include "c_api/sync/sync.h"
+#include "c_api/utils/sys_init.h"
+#include "c_api/vector_datamove/vector_datamove.h"
 #include "acl/acl.h"
 
 namespace {
