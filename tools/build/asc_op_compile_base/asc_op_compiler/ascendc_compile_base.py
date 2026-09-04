@@ -310,14 +310,14 @@ def _ignore_parallel_job_self_set():
     if ascend_self_par_job is not None:
         CommonUtility.print_compile_log(
             "",
-            "Detected that the TILINGKEY_PAR_COMPILE enviroment variable has been set, \
+            "Detected that the TILINGKEY_PAR_COMPILE environment variable has been set, \
 ignoring TILINGKEY_PARALLEL_JOB.",
             AscendCLogLevel.LOG_WARNING,
         )
     elif ascend_self_par_job_compatible is not None:
         CommonUtility.print_compile_log(
             "",
-            "Detected that the TILINGKEY_PAR_COMPILE enviroment variable has been set, \
+            "Detected that the TILINGKEY_PAR_COMPILE environment variable has been set, \
 ignoring ASCENDC_PAR_COMPILE_JOB.",
             AscendCLogLevel.LOG_WARNING,
         )
@@ -328,7 +328,7 @@ def _get_parallel_job_without_op_project(tilingkey_num: int = 1):
     if ascend_self_par_job_compatible is not None:
         CommonUtility.print_compile_log(
             "",
-            "ASCENDC_PAR_COMPILE_JOB enviroment variable is deprecated, \
+            "ASCENDC_PAR_COMPILE_JOB environment variable is deprecated, \
 please use TILINGKEY_PARALLEL_JOB instead!",
             AscendCLogLevel.LOG_WARNING,
         )
