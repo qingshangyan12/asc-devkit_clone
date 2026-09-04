@@ -219,6 +219,7 @@ extern uint64_t g_tilingKey;
 #endif
 #endif
 
+#define ASCENDC_KERNEL_TASK_TYPE_IMPL(key, value) ASCENDC_ENABLE_FEATURE_FOR_COMPILE_IMPL(key, value)
 #define ASCENDC_KERNEL_TASK_TYPE_DEFAULT_IMPL(value) ASCENDC_ENABLE_FEATURE_FOR_COMPILE_IMPL(default, value)
 #define ASCENDC_REGISTER_TILING_DEFAULT_IMPL(tiling_struct) \
     ASCENDC_ENABLE_FEATURE_FOR_TILING_IMPL(default, tiling_struct)
