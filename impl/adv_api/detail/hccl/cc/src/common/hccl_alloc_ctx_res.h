@@ -95,8 +95,11 @@ enum class AlgorithmType {
     CcuAllReduceMesh1D = 100,
     CcuAllReduceMeshMem2Mem1D,
     CcuAllReduceMesh2DOneShot,
+    CcuReduceMesh1D,
+    CcuReduceMesh2D,
     CcuSchedAllToAllSoleMesh = 150,
     CcuSchedAllToAllVSoleMesh,
+    CcuHalfAll2AllVMesh1D,
     CcuSchedAllGatherSoleMesh,
     CcuSchedAllToAllSoleMeshConcurrent,
 };
