@@ -60,22 +60,110 @@ __simd_callee__ inline void asc_storealign_squeeze_status_postupdate(
 
 ## 调用示例
 
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
+
 ```cpp
-__simd_vf__ inline void StoreSqueezeStatus(
+#include <cstdint>
+#include <iostream>
+#include <vector>
+#include "acl/acl.h"
+#include "c_api/asc_simd.h"
+
+namespace {
+constexpr uint32_t ELEMENT_COUNT = 64;
+constexpr uint32_t STATUS_WORD_COUNT = 128;
+constexpr int32_t POST_UPDATE_OFFSET = 32;
+constexpr uint32_t SQUEEZE_STATUS_BYTES = ELEMENT_COUNT * sizeof(float);
+
+__simd_vf__ inline void store_squeeze_status(
     __ubuf__ uint32_t* status, __ubuf__ float* packed, __ubuf__ float* input)
 {
     vector_float src;
-    vector_float dst;
+    vector_float squeezed;
     vector_store_unalign unalign_reg;
-    vector_bool mask = asc_create_mask_b32(PAT_ALL);
-    asc_loadalign(src, input);
-    // 执行squeeze操作，使AR记录有效数据总字节数。
+    vector_bool full_mask = asc_create_mask_b32(PAT_ALL);
+
+    asc_loadalign(src, input); // 将输入数据加载到矢量数据寄存器。
     asc_squeeze_and_storeunalign_init();
-    asc_squeeze_and_storeunalign(packed, dst, unalign_reg, src, mask);
+    asc_squeeze_and_storeunalign(packed, squeezed, unalign_reg, src, full_mask);
     asc_squeeze_and_storeunalign_finalize(packed, unalign_reg);
 
-    __ubuf__ uint32_t* status_ptr = status + 16;
-    // 写入状态后，status_ptr自动增加32字节。
-    asc_storealign_squeeze_status_postupdate(status_ptr, 32);
+    // 每次写入状态后，status自动增加POST_UPDATE_OFFSET字节。
+    asc_storealign_squeeze_status_postupdate(status, POST_UPDATE_OFFSET);
+    asc_storealign_squeeze_status_postupdate(status, POST_UPDATE_OFFSET);
+}
+
+__global__ __vector__ void store_squeeze_status_kernel(__gm__ uint32_t* output, __gm__ float* input)
+{
+    asc_init();
+    __ubuf__ float input_local[ELEMENT_COUNT];
+    __ubuf__ float packed_local[ELEMENT_COUNT];
+    __ubuf__ uint32_t status_local[STATUS_WORD_COUNT];
+    asc_copy_gm2ub_align(input_local, input, sizeof(input_local));
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    store_squeeze_status(status_local, packed_local, input_local);
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(output, status_local, sizeof(status_local));
+    asc_sync();
+}
+} // namespace
+
+int main()
+{
+    std::vector<float> input(ELEMENT_COUNT);
+    std::vector<uint32_t> output(STATUS_WORD_COUNT, 0U);
+    for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
+        input[i] = static_cast<float>(i);
+    }
+
+    if (aclInit(nullptr) != ACL_SUCCESS || aclrtSetDevice(0) != ACL_SUCCESS) {
+        return 1;
+    }
+    float* input_device = nullptr;
+    uint32_t* output_device = nullptr;
+    bool success =
+        aclrtMalloc(reinterpret_cast<void**>(&input_device), input.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST) ==
+            ACL_SUCCESS &&
+        aclrtMalloc(
+            reinterpret_cast<void**>(&output_device), output.size() * sizeof(uint32_t), ACL_MEM_MALLOC_HUGE_FIRST) ==
+            ACL_SUCCESS;
+    if (success) {
+        success = aclrtMemcpy(
+                      input_device, input.size() * sizeof(float), input.data(), input.size() * sizeof(float),
+                      ACL_MEMCPY_HOST_TO_DEVICE) == ACL_SUCCESS;
+    }
+    if (success) {
+        store_squeeze_status_kernel<<<1, 0>>>(output_device, input_device);
+        success = aclrtSynchronizeDevice() == ACL_SUCCESS;
+    }
+    if (success) {
+        success = aclrtMemcpy(
+                      output.data(), output.size() * sizeof(uint32_t), output_device, output.size() * sizeof(uint32_t),
+                      ACL_MEMCPY_DEVICE_TO_HOST) == ACL_SUCCESS;
+    }
+    if (input_device != nullptr) {
+        aclrtFree(input_device);
+    }
+    if (output_device != nullptr) {
+        aclrtFree(output_device);
+    }
+    aclrtResetDevice(0);
+    aclFinalize();
+    if (!success) {
+        return 1;
+    }
+    success = success && output[0] == SQUEEZE_STATUS_BYTES && output[8] == SQUEEZE_STATUS_BYTES;
+    std::cout << (success ? "PASS" : "FAIL") << '\n';
+    return success ? 0 : 1;
 }
 ```
