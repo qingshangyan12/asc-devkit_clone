@@ -267,6 +267,92 @@ def _gen_compile_cmd_m510(
     return compile_cmd
 
 
+def _gen_compile_cmd_516r2(
+    src_file: str,
+    dst_file: str,
+    compile_option_tuple,
+    tiling_file: str,
+    with_tiling_file: bool = True,
+):
+    """
+    Generate the compile command for the 516r2 compiler.
+    :param src_file: the source file
+    :param dst_file: the destination file
+    :param extra_options: the extra options
+    :param with_tiling_file: whether with the tiling file
+    :return: the compile command
+    """
+    """
+    Generate the compile command for the 516r2 compiler.
+    :param src_file: the source file
+    :param dst_file: the destination file
+    :param extra_options: the extra options
+    :param with_tiling_file: whether with the tiling file
+    :return: the compile command
+    """
+    if global_var_storage.get_variable("ascendc_enable_ccache") == True:
+        compile_cmd = [
+            os.environ.get("ASCENDC_CCACHE_EXECUTABLE"),
+            global_var_storage.get_variable("ascendc_compiler_path"),
+            "-c",
+            "-O3",
+        ]
+    else:
+        compile_cmd = [
+            global_var_storage.get_variable("ascendc_compiler_path"),
+            "-c",
+            "-O3",
+        ]
+
+    for option in compile_option_tuple.compile_options:
+        compile_cmd += [option]
+    # fix: need dav-516r2
+    compile_cmd += [
+        src_file,
+        "--cce-aicore-arch=dav-516r2",
+        "--cce-aicore-only",
+        "-o",
+        dst_file,
+        "-mllvm",
+        "-cce-aicore-stack-size=0x4000",
+        "-mllvm",
+        "-cce-aicore-record-overflow=false",
+        "-mllvm",
+        "-cce-aicore-addr-transform",
+        "-mllvm",
+        "--cce-aicore-jump-expand=true",
+        "-mllvm",
+        "-cce-aicore-dcci-insert-for-scalar=false",
+        "-mllvm",
+        "-cce-aicore-dcci-befor-kernel-end=false",
+        "-Xclang",
+        "-fcce-vf-vl=32",
+        "--cce-auto-sync=off",
+        "-mllvm",
+        "-instcombine-code-sinking=false",
+        "-mllvm",
+        "-cce-aicore-mask-opt=false",
+        "cce-simd-vf-fusion=true"
+    ]
+    if global_var_storage.get_variable("ascendc_enable_sanitizer"):
+        compile_cmd += ["--cce-enable-sanitizer", "-gline-tables-only"]
+        compile_cmd += [
+            "-mllvm",
+            "-cce-aicore-long-call",
+            "-mllvm",
+            "-cce-aicore-jump-expand=true",
+        ]
+
+    for opt in compile_option_tuple.mllvm_options:
+        compile_cmd += [opt]
+
+    if with_tiling_file and tiling_file != "":
+        compile_cmd += ["-include", tiling_file]
+    compile_cmd += ["-std=c++17"]
+    if "oom" in get_current_build_config("tir.op_debug_config"):
+        compile_cmd += [f"-D{ASCENDC_OOM}={1}"]
+    return compile_cmd
+
 def gen_compile_cmd_v220(
     src_file: str,
     dst_file: str,
@@ -294,6 +380,10 @@ def gen_compile_cmd_v220(
         )
     elif CommonUtility.is_m510():
         return _gen_compile_cmd_m510(
+            src_file, dst_file, compile_option_tuple, tiling_file, with_tiling_file
+        )
+    elif CommonUtility.is_516r2():
+        return _gen_compile_cmd_516r2(
             src_file, dst_file, compile_option_tuple, tiling_file, with_tiling_file
         )
     else:
@@ -597,7 +687,7 @@ def compile_single_tiling_v220(param: SingleTilingKeyCompileParams):
         get_compile_target_options(
             param.compile_info,
             param.tiling_key,
-            CommonUtility.is_c310() or CommonUtility.is_m510(),
+            CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2(),
         )
     )
     compile_cmd += [
@@ -666,7 +756,7 @@ def get_compile_cmd_for_kernel_name(
         ]
     if code_channel == CORE_TYPE_MIX:
         compile_cmd += [f"-D{MIX_CORE_MACRO}={1}"]
-    if CommonUtility.is_c310() or CommonUtility.is_m510():
+    if CommonUtility.is_c310() or CommonUtility.is_m510() or CommonUtility.is_516r2():
         if code_channel == CORE_TYPE_MIX:
             compile_cmd += ["-D__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__"]
         raw_kernel_type = compile_info.raw_tiling_key_kernel_type.get(
