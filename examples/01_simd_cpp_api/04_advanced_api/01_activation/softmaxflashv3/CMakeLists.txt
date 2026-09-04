@@ -22,6 +22,10 @@ add_executable(demo
     softmaxflashv3.asc
 )
 
+target_compile_definitions(demo PRIVATE
+    $<$<STREQUAL:${CMAKE_ASC_RUN_MODE},cpu>:SOFTMAXFLASHV3_CPU_DEBUG=1>
+)
+
 target_link_libraries(demo PRIVATE
     tiling_api
     register
