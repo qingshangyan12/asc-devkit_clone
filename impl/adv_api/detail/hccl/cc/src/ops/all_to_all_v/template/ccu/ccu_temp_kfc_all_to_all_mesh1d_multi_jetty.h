@@ -41,7 +41,7 @@ public:
         AlgResourceRequest& resourceRequest) override;
     HcclResult CalcResByChannelDescs(
         const OpParam& param, const std::vector<HcclChannelDesc>& channelDescs,
-        const AlgResourceRequest& resourceRequest) const
+        AlgResourceRequest& resourceRequest) const
     {
         CHK_RET(GetRes(resourceRequest));
         resourceRequest.ccuKernelNum.push_back(1U);
@@ -56,7 +56,7 @@ public:
 
 private:
     HcclResult CalcResByChannelDescsImpl(
-        const OpParam& param, const std::vector<HcclChannelDesc>& channelDescs, AlgResourceRequest& resourceRequest);
+        const OpParam& param, const std::vector<HcclChannelDesc>& channelDescs, AlgResourceRequest& resourceRequest) const;
     uint32_t mySubCommRank_ = 0;
     uint32_t tempRankSize_ = 0;
 };

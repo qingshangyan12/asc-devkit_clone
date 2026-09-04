@@ -62,13 +62,15 @@ enum class KfcServerRole : uint32_t {
     ALL_GATHER_MESH = 1,
     ALL_GATHER_NHR = 2,
     ALL_TO_ALL_MULTI_JETTY = 3,
+    ALL_TO_ALL_MESH = 4,
+    ALL_TO_ALL_CLOS = 5,
 };
 
 inline KfcServerRole GetKfcServerRole(const char* algName, uint32_t missionIndex)
 {
     if (GetKfcServerMissionNum(algName) == KFC_MAX_MISSION_NUM) {
         if (std::strcmp(algName, KFC_CONCURRENT_ALL_TO_ALL_ALG_NAME) == 0) {
-            return KfcServerRole::ALL_TO_ALL_MULTI_JETTY;
+            return missionIndex == 0U ? KfcServerRole::ALL_TO_ALL_MESH : KfcServerRole::ALL_TO_ALL_CLOS;
         }
         if (missionIndex == 0U) {
             return KfcServerRole::ALL_GATHER_MESH;
