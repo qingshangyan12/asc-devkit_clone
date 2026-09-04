@@ -41,7 +41,7 @@
 
 对齐搬入模式中，通过函数返回值返回掩码寄存器时，请使用[asc_loadalign_mask_downsample](asc_loadalign_mask_downsample.md)。
 
-**图1**  下采样搬入掩码寄存器
+**图1**&nbsp;&nbsp;下采样搬入掩码寄存器
 
 ![](../../figures/capi_loadalign_mask_downsample.png)
 

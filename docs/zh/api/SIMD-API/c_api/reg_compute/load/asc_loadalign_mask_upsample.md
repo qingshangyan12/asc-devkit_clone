@@ -32,7 +32,7 @@
 
 本接口与[asc_loadalign_upsample](asc_loadalign_upsample.md)对齐搬入模式中目的操作数为掩码寄存器的原型功能相同，区别在于本接口通过函数返回值返回结果。
 
-**图1**  上采样搬入掩码寄存器
+**图1**&nbsp;&nbsp;上采样搬入掩码寄存器
 
 ![](../../figures/capi_loadalign_mask_upsample.png)
 
