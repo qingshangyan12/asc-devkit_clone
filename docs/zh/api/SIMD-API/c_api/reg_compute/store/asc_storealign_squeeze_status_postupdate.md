@@ -33,8 +33,8 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_storealign_squeeze_status_postupdate(
-    __ubuf__ uint32_t*& dst, int32_t offset)
+__simd_callee__ inline void asc_storealign_squeeze_status_postupdate(__ubuf__ uint32_t*& dst,
+                                                                     int32_t offset)
 ```
 
 ## 参数说明
@@ -43,7 +43,7 @@ __simd_callee__ inline void asc_storealign_squeeze_status_postupdate(
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
-| dst | 输入、输出 | 目的操作数在UB上的基地址，类型为`__ubuf__ uint32_t*&`。接口执行前将当前AR值写入该地址，执行后将指针增加`offset`字节。 |
+| dst | 输入、输出 | 目的操作数在UB上的基地址，类型为`__ubuf__ uint32_t*&`。接口执行时将当前AR值写入该地址，执行后将指针增加`offset`字节。 |
 | offset | 输入 | 目的地址更新量，类型为`int32_t`，单位为字节。 |
 
 ## 返回值说明

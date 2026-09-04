@@ -33,7 +33,8 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst, int32_t offset)
+__simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst,
+                                                          int32_t offset)
 ```
 
 ## 参数说明
