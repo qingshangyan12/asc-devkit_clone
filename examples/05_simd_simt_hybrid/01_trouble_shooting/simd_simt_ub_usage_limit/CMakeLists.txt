@@ -11,11 +11,10 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-find_package(ASC REQUIRED)
-
-project(kernel_samples LANGUAGES ASC CXX)
-
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
+
+find_package(ASC REQUIRED)
+project(kernel_samples LANGUAGES ASC CXX)
 
 set(SCENARIO_NUM "3" CACHE STRING "Scenario number (0-14)")
 if(NOT SCENARIO_NUM MATCHES "^([0-9]|1[0-4])$")
@@ -39,9 +38,6 @@ add_executable(ub_usage_limit
     ${CASE_SOURCE}
 )
 
-target_compile_options(ub_usage_limit PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-)
 target_compile_definitions(ub_usage_limit PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
 )
