@@ -78,7 +78,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include "acl/acl.h"
 #include "c_api/scalar_compute/scalar_load.h"
 #include "c_api/scalar_compute/scalar_store.h"
-#include "c_api/sync/sync.h"
+#include "c_api/asc_simd.h"
 #include "c_api/utils/sys_init.h"
 
 namespace {
