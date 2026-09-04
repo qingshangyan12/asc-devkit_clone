@@ -14,6 +14,7 @@ static void test_host_c_api_scalar_compute_0()
 {
     using ::asc_clear_nthbit;
     using ::asc_clz;
+    using ::asc_get_uintdiv_magic_and_shift;
     using ::asc_ffs;
     using ::asc_ffz;
     using ::asc_float2int32_rd;
