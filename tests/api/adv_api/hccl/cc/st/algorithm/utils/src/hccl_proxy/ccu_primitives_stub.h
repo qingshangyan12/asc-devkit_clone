@@ -236,7 +236,7 @@ template <typename T>
 T GetResByChannel(ChannelHandle channel, uint32_t index) = delete;
 
 template <>
-Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t index);
+Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t varIndex);
 Result LoadArg(Variable variable, uint32_t argId);
 Result Load(Variable address, Variable destination);
 Result Load(Variable address, Array<Variable>& destinations, uint32_t count);
