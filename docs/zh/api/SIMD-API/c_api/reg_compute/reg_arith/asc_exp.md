@@ -1,3 +1,58 @@
+---
+okftype: reference.api.cpp
+title: asc_exp
+path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_exp.md
+description: 该接口根据mask，对源操作数src进行按元素求自然指数操作，将结果写入目的操作数dst。
+tag:
+  api_surfaces:
+  - c_api
+  roles: []
+  families:
+  - arithmetic
+  operations:
+  - exponential
+  objects:
+  - mask
+  - vector
+  execution_models:
+  - register_vector
+  source_locations:
+  - vector_register
+  destination_locations:
+  - vector_register
+  traits:
+  - masked
+usage_dependencies:
+  status: unconfirmed
+signature:
+- function: asc_exp(vector_<dtype>&,vector_<dtype>,vector_bool)
+  archs:
+  - '3510'
+  headers:
+  - scope: /include/c_api/reg_compute/compute/reg_arith.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  - scope: /include/c_api/asc_simd.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  dtype:
+    values:
+    - half
+    - float
+- function: asc_exp(vector_<dtype>,vector_bool)
+  archs:
+  - '3510'
+  headers:
+  - scope: /include/c_api/reg_compute/compute/reg_arith.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  - scope: /include/c_api/asc_simd.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  dtype:
+    values:
+    - half
+    - float
+examples: []
+timestamp: '2026-09-04'
+---
+
 # asc_exp
 
 ## 产品支持情况
@@ -36,12 +91,40 @@ dst_i = e^{src_i}
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  function: "asc_exp(vector_<dtype>&,vector_<dtype>,vector_bool)"
+  archs:
+    - "3510"
+  headers:
+    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - scope: "/include/c_api/asc_simd.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_exp(vector_<dtype>& dst,
                                     vector_<dtype> src,
                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  function: "asc_exp(vector_<dtype>,vector_bool)"
+  archs:
+    - "3510"
+  headers:
+    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - scope: "/include/c_api/asc_simd.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
+
+```c
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_exp(vector_<dtype> src,

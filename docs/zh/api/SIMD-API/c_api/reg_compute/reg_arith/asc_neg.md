@@ -1,3 +1,64 @@
+---
+okftype: reference.api.cpp
+title: asc_neg
+path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_neg.md
+description: 根据`mask`对源操作数`src`按元素取相反数，并将结果作为返回值返回或写入目的操作数`dst`。
+tag:
+  api_surfaces:
+  - c_api
+  roles: []
+  families:
+  - arithmetic
+  operations:
+  - negate
+  objects:
+  - mask
+  - vector
+  execution_models:
+  - register_vector
+  source_locations:
+  - vector_register
+  destination_locations:
+  - vector_register
+  traits:
+  - masked
+usage_dependencies:
+  status: unconfirmed
+signature:
+- function: asc_neg(vector_<dtype>,vector_bool)
+  archs:
+  - '3510'
+  headers:
+  - scope: /include/c_api/reg_compute/compute/reg_arith.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  - scope: /include/c_api/asc_simd.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  dtype:
+    values:
+    - int8_t
+    - int16_t
+    - half
+    - int32_t
+    - float
+- function: asc_neg(vector_<dtype>&,vector_<dtype>,vector_bool)
+  archs:
+  - '3510'
+  headers:
+  - scope: /include/c_api/reg_compute/compute/reg_arith.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  - scope: /include/c_api/asc_simd.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  dtype:
+    values:
+    - int8_t
+    - int16_t
+    - half
+    - int32_t
+    - float
+examples: []
+timestamp: '2026-09-04'
+---
+
 # asc_neg
 
 ## 产品支持情况
@@ -39,11 +100,39 @@ $$
 本接口仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  function: "asc_neg(vector_<dtype>,vector_bool)"
+  archs:
+    - "3510"
+  headers:
+    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - scope: "/include/c_api/asc_simd.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_neg(vector_<dtype> src,
                                               vector_bool mask)
+```
+
+```yaml
+api_signature:
+  function: "asc_neg(vector_<dtype>&,vector_<dtype>,vector_bool)"
+  archs:
+    - "3510"
+  headers:
+    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - scope: "/include/c_api/asc_simd.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_neg(vector_<dtype>& dst,

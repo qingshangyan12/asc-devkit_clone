@@ -1,3 +1,72 @@
+---
+okftype: reference.api.cpp
+title: asc_abs
+path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md
+description: 根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。
+tag:
+  api_surfaces:
+  - c_api
+  roles: []
+  families:
+  - arithmetic
+  operations:
+  - absolute
+  objects:
+  - mask
+  - vector
+  execution_models:
+  - register_vector
+  source_locations:
+  - vector_register
+  destination_locations:
+  - vector_register
+  traits:
+  - masked
+usage_dependencies:
+  status: unconfirmed
+signature:
+- function: asc_abs(vector_<dtype>,vector_bool)
+  archs:
+  - '3510'
+  headers:
+  - scope: /include/c_api/reg_compute/compute/reg_arith.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  - scope: /include/c_api/asc_simd.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  dtype:
+    values:
+    - int8_t
+    - int16_t
+    - half
+    - int32_t
+    - float
+- function: asc_abs(vector_<dtype>&,vector_<dtype>,vector_bool)
+  archs:
+  - '3510'
+  headers:
+  - scope: /include/c_api/reg_compute/compute/reg_arith.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  - scope: /include/c_api/asc_simd.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  dtype:
+    values:
+    - int8_t
+    - int16_t
+    - half
+    - int32_t
+    - float
+examples:
+- path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs
+  archs:
+  - '3510'
+  signature:
+  - function: asc_abs(vector_float&,vector_float,vector_bool)
+    snippets:
+    - id: asc_abs
+      file: abs.asc
+timestamp: '2026-09-04'
+---
+
 # asc_abs
 
 ## 产品支持情况
@@ -35,11 +104,39 @@ dst_i = \lvert src_i \rvert
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  function: "asc_abs(vector_<dtype>,vector_bool)"
+  archs:
+    - "3510"
+  headers:
+    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - scope: "/include/c_api/asc_simd.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_abs(vector_<dtype> src,
                                                vector_bool mask)
+```
+
+```yaml
+api_signature:
+  function: "asc_abs(vector_<dtype>&,vector_<dtype>,vector_bool)"
+  archs:
+    - "3510"
+  headers:
+    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - scope: "/include/c_api/asc_simd.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
+
+```c
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_abs(vector_<dtype>& dst,

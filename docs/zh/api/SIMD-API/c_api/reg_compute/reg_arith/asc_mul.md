@@ -1,3 +1,76 @@
+---
+okftype: reference.api.cpp
+title: asc_mul
+path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul.md
+description: 该接口根据`mask`，对源操作数`src0`、`src1`按元素进行乘法运算，将结果写入目的操作数`dst`。
+tag:
+  api_surfaces:
+  - c_api
+  roles: []
+  families:
+  - arithmetic
+  operations:
+  - multiply
+  objects:
+  - mask
+  - vector
+  execution_models:
+  - register_vector
+  source_locations:
+  - vector_register
+  destination_locations:
+  - vector_register
+  traits:
+  - masked
+usage_dependencies:
+  status: unconfirmed
+signature:
+- function: asc_mul(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)
+  archs:
+  - '3510'
+  headers:
+  - scope: /include/c_api/reg_compute/compute/reg_arith.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  - scope: /include/c_api/asc_simd.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  dtype:
+    values:
+    - int16_t
+    - uint16_t
+    - half
+    - bfloat16_t
+    - int32_t
+    - uint32_t
+    - float
+- function: asc_mul(vector_<dtype>,vector_<dtype>,vector_bool)
+  archs:
+  - '3510'
+  headers:
+  - scope: /include/c_api/reg_compute/compute/reg_arith.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  - scope: /include/c_api/asc_simd.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  dtype:
+    values:
+    - int16_t
+    - uint16_t
+    - half
+    - bfloat16_t
+    - int32_t
+    - uint32_t
+    - float
+examples:
+- path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mul
+  archs:
+  - '3510'
+  signature:
+  - function: asc_mul(vector_float&,vector_float,vector_float,vector_bool)
+    snippets:
+    - id: asc_mul
+      file: mul.asc
+timestamp: '2026-09-04'
+---
+
 # asc_mul
 
 ## 产品支持情况
@@ -39,6 +112,18 @@ $$
 本接口仅在AIV上生效。
 
 ## 函数原型
+```yaml
+api_signature:
+  function: "asc_mul(vector_<dtype>&,vector_<dtype>,vector_<dtype>,vector_bool)"
+  archs:
+    - "3510"
+  headers:
+    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - scope: "/include/c_api/asc_simd.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 // 通过引用参数输出结果（占位符形式）
@@ -46,6 +131,22 @@ __simd_callee__ inline void asc_mul(vector_<dtype>& dst,
                                     vector_<dtype> src0,
                                     vector_<dtype> src1,
                                     vector_bool mask)
+```
+
+```yaml
+api_signature:
+  function: "asc_mul(vector_<dtype>,vector_<dtype>,vector_bool)"
+  archs:
+    - "3510"
+  headers:
+    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - scope: "/include/c_api/asc_simd.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
+
+```c
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_mul(vector_<dtype> src0,

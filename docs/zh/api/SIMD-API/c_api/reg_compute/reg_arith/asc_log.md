@@ -1,3 +1,46 @@
+---
+okftype: reference.api.cpp
+title: asc_log
+path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_log.md
+description: 根据`mask`将源操作数`src`按元素取自然对数，将结果写入目的操作数`dst`。
+tag:
+  api_surfaces:
+  - c_api
+  roles: []
+  families:
+  - arithmetic
+  operations:
+  - natural_log
+  objects:
+  - mask
+  - vector
+  execution_models:
+  - register_vector
+  source_locations:
+  - vector_register
+  destination_locations:
+  - vector_register
+  traits:
+  - masked
+usage_dependencies:
+  status: unconfirmed
+signature:
+- function: asc_log(vector_<dtype>&,vector_<dtype>,vector_bool)
+  archs:
+  - '3510'
+  headers:
+  - scope: /include/c_api/reg_compute/compute/reg_arith.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  - scope: /include/c_api/asc_simd.h
+    header: /include/c_api/reg_compute/compute/reg_arith.h
+  dtype:
+    values:
+    - half
+    - float
+examples: []
+timestamp: '2026-09-04'
+---
+
 # asc_log
 
 ## 产品支持情况
@@ -35,6 +78,18 @@ dst_i = ln(src_i)
 $$
 
 ## 函数原型
+```yaml
+api_signature:
+  function: "asc_log(vector_<dtype>&,vector_<dtype>,vector_bool)"
+  archs:
+    - "3510"
+  headers:
+    - scope: "/include/c_api/reg_compute/compute/reg_arith.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+    - scope: "/include/c_api/asc_simd.h"
+      header: "/include/c_api/reg_compute/compute/reg_arith.h"
+```
+
 
 ```c
 // 占位符形式
