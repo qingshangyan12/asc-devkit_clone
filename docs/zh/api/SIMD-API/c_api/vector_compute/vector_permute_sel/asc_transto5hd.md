@@ -54,16 +54,6 @@ __aicore__ inline void asc_transto5hd_b8(ub_addr8_t dst, ub_addr8_t src, uint8_t
     uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
 ```
 
-- 同步计算
-```cpp
-__aicore__ inline void asc_transto5hd_b32_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
-    uint16_t dst_stride, uint16_t src_stride)
-__aicore__ inline void asc_transto5hd_b16_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
-    uint16_t dst_stride, uint16_t src_stride)
-__aicore__ inline void asc_transto5hd_b8_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
-    uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
-```
-
 ## 参数说明
 
 **表1** 参数说明
@@ -90,6 +80,8 @@ PIPE_V
 
 - 操作数地址对齐约束请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
+- `dst`和`src`不能传入相同的地址寄存器起始位置，即目的地址寄存器对和源地址寄存器对不能重叠。
+- 为获得更优性能，建议`dst`、`src`、`dst_high_half`和`src_high_half`传入编译期常量，例如直接传入VA0、VA2、true或false，或传入由这些常量初始化的局部变量。`dst`和`src`仅支持VA0、VA2、VA4、VA6，且不能相同，配置方式请参考[asc_set_va_reg](./asc_set_va_reg.md)；每个地址寄存器存储8个地址，接口会将传入的起始寄存器与相邻寄存器组成一组，处理16个地址。传入运行时变量时，编译器会保留地址寄存器或布尔参数的分支判断，影响性能。
 - 进行NCHW格式到NC1HWC0格式的转换时，一般用法是将src/dst中的每个元素配置为每个HW平面的起点。
 - 为了性能更优，数据类型位宽为8位时建议先固定dst_high_half/src_high_half，再HW方向Repeat后，再改变dst_high_half/src_high_half。
 
