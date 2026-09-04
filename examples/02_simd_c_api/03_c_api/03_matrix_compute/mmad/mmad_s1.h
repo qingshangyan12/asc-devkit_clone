@@ -162,13 +162,13 @@ __aicore__ inline void s1_compute_mmad(__cc__ int32_t* c_matrix, __ca__ int8_t* 
     uint16_t left_height = M;
     uint16_t n_dim = K;
     uint16_t right_width = ceil_align(N, BLOCK_CUBE * S1_FRACTAL_NUM);
-    uint8_t unit_flag = 0;
+    asc_unit_flag_mode unit_flag_mode = asc_unit_flag_mode::DISABLE;
     bool disable_gemv = true;
     bool c_matrix_source = true;
     bool c_matrix_init_val = false;
 
     asc_mmad(
-        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag, disable_gemv, c_matrix_source,
+        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag_mode, disable_gemv, c_matrix_source,
         c_matrix_init_val);
 
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);

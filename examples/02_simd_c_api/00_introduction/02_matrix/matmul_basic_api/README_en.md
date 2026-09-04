@@ -8,7 +8,7 @@ This sample implements multi-core matrix multiplication computation based on the
 
 | Product | CANN Software Version |
 |---------|-----------------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -55,7 +55,7 @@ This sample implements multi-core matrix multiplication computation based on the
 
   - Kernel-side Detailed Process
     - The kernel arguments `a`, `b`, and `c` are addresses of matrices A, B, and C in [GM (Global Memory)](../../../../../docs/zh/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md). On the kernel side, they are converted to `__gm__ half*` variables `aGM`, `bGM`, and `cGM`, respectively.
-    - Obtain the current core ID through `asc_get_block_idx` and calculate `mIterIdx`. This sample only splits tasks along the M axis, so each core only needs to process its own M-axis slice of matrix A and matrix C.
+    - Obtain the current core ID through the built-in variable `block_idx` and calculate `mIterIdx`. This sample only splits tasks along the M axis, so each core only needs to process its own M-axis slice of matrix A and matrix C.
     - Set GM address offsets:
       - Offset `aGM` by `mIterIdx * singleCoreM * K`, enabling the current core to read its assigned row block of matrix A.
       - Do not offset `bGM`, as each core needs to read the complete matrix B.
@@ -69,9 +69,9 @@ This sample implements multi-core matrix multiplication computation based on the
     - Call [`asc_set_gm2l1_nz_para`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md) to configure the destination Nz layout, and then call [`asc_copy_gm2l1_nd2nz`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md) to transfer matrices A and B from GM to L1. During the transfer, the input data is converted from [ND](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md) format to the [Nz](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md) format required by Cube computation.
     - Call [`asc_sync_notify`](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_sync_notify.md) and [`asc_sync_wait`](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_sync_wait.md) for synchronization. `asc_copy_gm2l1_nd2nz` belongs to the MTE2 pipeline, and the subsequent L1-to-L0 transfer belongs to the [MTE1](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md) pipeline. MTE1 must wait for MTE2 to complete, to avoid reading L1 data that has not finished transferring.
     - Call [`asc_copy_l12l0a`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md) to transfer matrix A from L1 to L0A, and call [`asc_copy_l12l0b_transpose`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md) to transfer and transpose matrix B from L1 to L0B. L0A and L0B are input buffers read directly by the Cube matrix computation unit.
-    - Call `asc_sync_notify` and `asc_sync_wait` for synchronization. The L1-to-L0 transfers belong to the MTE1 pipeline, and the subsequent `asc_mmad` belongs to the M pipeline. The M pipeline must wait for MTE1 to complete, to avoid reading L0A/L0B data that has not finished transferring.
+    - Call `asc_sync_notify` and `asc_sync_wait` for synchronization. The L1-to-L0 transfers belong to the MTE1 pipeline, and the subsequent `asc_mmad` belongs to the `PIPE_M` pipeline. `PIPE_M` must wait for MTE1 to complete, to avoid reading L0A/L0B data that has not finished transferring.
     - Call [`asc_mmad`](../../../../../docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md)`(cLocal, a2Local, b2Local, baseM, baseK, baseN, asc_unit_flag_mode::DISABLE, false, false, true)` to execute matrix multiplication. Here `baseM = 128`, `baseN = 256`, and `baseK = 64`, corresponding to the matrix block size computed by a single core at one time.
-    - Call `asc_sync_notify` and `asc_sync_wait` for synchronization. `asc_mmad` belongs to the M pipeline, and the subsequent [`asc_copy_l0c2gm`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md) belongs to the FIX pipeline. The FIX pipeline must wait for the M pipeline to complete, to avoid reading L0C results that have not finished computing.
+    - Call `asc_sync_notify` and `asc_sync_wait` for synchronization. `asc_mmad` belongs to the `PIPE_M` pipeline, and the subsequent [`asc_copy_l0c2gm`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md) belongs to the FIX pipeline. The FIX pipeline must wait for `PIPE_M` to complete, to avoid reading L0C results that have not finished computing.
     - Call [`asc_set_l0c_copy_nz_para`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md) to configure a single-matrix Nz-to-ND transfer, and then call `asc_copy_l0c2gm` to convert the `float` accumulation result in L0C to `half` and transfer it back to the matrix C output location in GM.
     - Finally, call [`asc_sync_pipe`](../../../../../docs/zh/api/SIMD-API/c_api/sync/asc_sync_pipe.md)`(PIPE_ALL)` to ensure that related pipeline tasks within the current core complete.
 
@@ -209,7 +209,7 @@ Call the [printf](../../../../../docs/zh/api/Utils-API/tuning_interface/printf.m
 Example:
 
 ```cpp
-printf("matmul blockIdx=%u\n", asc_get_block_idx());
+printf("matmul blockIdx=%u\n", static_cast<uint32_t>(block_idx));
 ```
 
 > [!CAUTION]
@@ -218,34 +218,3 @@ printf("matmul blockIdx=%u\n", asc_get_block_idx());
 ### DumpTensor
 
 The basic API `DumpTensor` interface takes a `LocalTensor` as input. The SIMD C API uses arrays with address-space qualifiers and does not provide an equivalent `asc_*` interface that accepts these arrays. Therefore, this sample cannot directly migrate the `DumpTensor(cLocal, baseM * baseN)` call. To inspect intermediate data, print the required information with `printf` during debugging, or use simulation and performance debugging tools.
-
-## Performance Debugging
-
-### Introduction to the msOpProf Tool
-
-msOpProf is a single-operator performance analysis tool with two usage modes: `msopprof` and `msopprof simulator`. It helps users identify anomalies in operator memory, code, and instructions for comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and file types (executables or operator binary `.o` files).
-
-- On-device performance collection
-
-    On-device performance collection directly measures the operator's execution time on the Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
-
-    Run msopprof on the `demo` executable for operator tuning:
-    ```
-    msopprof ./demo
-    ```
-
-    - Performance data description  
-      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
-
-      ```bash
-      ├──dump                       # Raw performance data; users do not need to inspect it
-      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
-      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
-      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
-      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
-      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
-      ├──OpBasicInfo.csv            # Basic operator information
-      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
-      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
-      └──visualize_data.bin         # MindStudio Insight presentation file
-      ```
