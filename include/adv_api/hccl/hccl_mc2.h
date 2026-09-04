@@ -110,7 +110,7 @@ extern HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByT
 extern HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(
     HcclComm comm, void* stream, void* mc2Tiling);
 
-extern CcuResult CcuKernelLaunch(HcclComm comm, void* opResCtx);
+extern CcuResult CcuKernelLaunch(const HcclComm comm, const void* opResCtx);
 
 #ifdef __cplusplus
 }
