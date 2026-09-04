@@ -33,9 +33,12 @@
 
 本接口为`reg`矢量计算接口，仅在AIV上生效。
 
-## 函数原型（占位符形式）
+## 函数原型
 
 ```c
+// 占位符形式：
+// <round_mode>：支持rd（FLOOR）、rn（RINT）、rna（ROUND）、ru（CEIL）和rz（TRUNC）。
+// <quarter_pos>：支持ASC_DISPERSE_FIRST_QUARTER、ASC_DISPERSE_SECOND_QUARTER、ASC_DISPERSE_THIRD_QUARTER和ASC_DISPERSE_FOURTH_QUARTER。
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_bfloat162e1m2x2_<round_mode>(vector_fp4x2_e1m2_t& dst,
                                      vector_bfloat16_t src,
@@ -47,10 +50,6 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_bfloat162e1m2x2_<round_mode>(vect
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
-
-- `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
-
-- `<quarter_pos>`支持`asc_position_quarter_mode::DISPERSE_FIRST_QUARTER`、`asc_position_quarter_mode::DISPERSE_SECOND_QUARTER`、`asc_position_quarter_mode::DISPERSE_THIRD_QUARTER`和`asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER`，调用时依次使用`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
 
 ## 参数说明
 
