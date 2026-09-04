@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/sync/sync.h"`。
+
 **无入参函数原型`asc_sync_vec()`接口已废弃，请使用[asc_sync](asc_sync.md)执行针对所有流水线的同步操作。**
 
 针对PIPE_V流水线执行同步操作。其作用是保证PIPE_V流水线中前序指令（如矢量计算）全部完成后，PIPE_MTE2、PIPE_MTE3与PIPE_S流水线的后续指令才能开始执行。

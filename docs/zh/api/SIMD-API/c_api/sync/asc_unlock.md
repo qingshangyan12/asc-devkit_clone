@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/sync/sync.h"`。
+
 与[asc_lock](asc_lock.md)配对使用，用于实现核内异步流水指令之间的同步处理，`asc_lock`和`asc_unlock`各自的功能如下：
 
 - `asc_lock`：根据mutex_id获取Mutex，若Mutex已被锁定，将阻塞指定流水上后续指令的执行，直到所有流水中具有相同mutex_id的Mutex都已经被[asc_unlock](asc_unlock.md)释放。
