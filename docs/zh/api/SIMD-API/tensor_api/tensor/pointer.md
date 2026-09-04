@@ -23,11 +23,11 @@ __cbuf__ float l1_data[size];
 __ca__ float l0a_data[size];
 
 // 创建Unified Buffer（UB）指针
-auto ub_ptr = asc::te::make_mem_ptr(ub_data);
+auto ub_ptr = asc::te::make_mem_ptr<location::ub>(ub_data);
 
 // 创建L1 Buffer指针
-auto l1_ptr = asc::te::make_mem_ptr(l1_data);
+auto l1_ptr = asc::te::make_mem_ptr<location::l1>(l1_data);
 
 // 创建L0A Buffer指针
-auto ca_ptr = asc::te::make_mem_ptr(l0a_data);
+auto ca_ptr = asc::te::make_mem_ptr<location::l0a>(l0a_data);
 ```
