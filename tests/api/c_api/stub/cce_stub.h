@@ -638,6 +638,29 @@ inline void copy_gm_to_cbuf_v2(
     __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
     uint8_t l2_cache_ctl, uint64_t src_stride, uint32_t dst_stride)
 {}
+inline void copy_gm_to_cbuf_v2(
+    __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
+    uint8_t l2_cache_ctl, uint64_t src_stride, uint32_t dst_stride, bool enable_pre_load_ignore_sync)
+{}
+
+template <typename T>
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ T* dst, __gm__ T* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t left_padding_count,
+    uint8_t right_padding_count, bool data_select_bit, bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl,
+    uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+
+template <typename T>
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ T* dst, __gm__ T* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool enable_pre_load_ignore_sync)
+{}
+
+template <typename T>
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ T* dst, __gm__ T* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool enable_pre_load_ignore_sync)
+{}
 inline void img2colv2_cbuf_to_ca(
     __ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
     uint8_t stride_w, uint8_t stride_h, uint8_t w_k, uint8_t h_k, uint8_t dilation_w, uint8_t dilation_h, bool filter_w,
