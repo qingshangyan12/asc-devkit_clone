@@ -14,10 +14,10 @@
 #include "utils/base/sys_macros.h"
 #endif
 
-#if !defined(likely) || !defined(unlikely) || !defined(PRELOAD) || !defined(KERNEL_TASK_TYPE) || \
-    !defined(KERNEL_TASK_TYPE_DEFAULT) || \
-    !defined(REGISTER_TILING_DEFAULT) || !defined(REGISTER_TILING_FOR_TILINGKEY) || \
-    !defined(REGISTER_NONE_TILING) || !defined(TILING_KEY_IS) || !defined(TILING_KEY_LIST)
+#if !defined(likely) || !defined(unlikely) || !defined(PRELOAD) || !defined(KERNEL_TASK_TYPE) ||            \
+    !defined(KERNEL_TASK_TYPE_DEFAULT) || !defined(REGISTER_TILING_DEFAULT) ||                              \
+    !defined(REGISTER_TILING_FOR_TILINGKEY) || !defined(REGISTER_NONE_TILING) || !defined(TILING_KEY_IS) || \
+    !defined(TILING_KEY_LIST)
 #error "the public sys_macros header must provide the reviewed macro set"
 #endif
 

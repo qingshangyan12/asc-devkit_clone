@@ -187,8 +187,7 @@ enum KernelMetaType : uint8_t {
 #define ASCENDC_TILING_STRUCT_SECTION_INIT_BASE_IMPL(counter, val)                                                    \
     static const uint64_t __ascendc_tiling_struct_##counter __attribute__((used, section(".ascendc_tiling." #val))) = \
         sizeof(val)
-#define ASCENDC_TILING_STRUCT_SECTION_INIT_IMPL(counter, val) \
-    ASCENDC_TILING_STRUCT_SECTION_INIT_BASE_IMPL(counter, val)
+#define ASCENDC_TILING_STRUCT_SECTION_INIT_IMPL(counter, val) ASCENDC_TILING_STRUCT_SECTION_INIT_BASE_IMPL(counter, val)
 
 #ifdef __CHECK_FEATURE_AT_PRECOMPILE
 #define ASCENDC_ENABLE_FEATURE_FOR_COMPILE_IMPL(f, val) auto __enable_feature_for_compile_##f = val
@@ -228,9 +227,9 @@ extern uint64_t g_tilingKey;
 #define ASCENDC_TILING_KEY_IS_IMPL(k) (ASCENDC_TILING_KEY_VAR_IMPL == (k))
 
 #define ASCENDC_TILING_KEY_LIST_INOUT_IMPL(...) ASCENDC_TILING_KEY_LIST_INOUT_BASE_IMPL(__VA_ARGS__)
-#define ASCENDC_TILING_KEY_LIST_INOUT_BASE_IMPL(...)                                                    \
-    ASCENDC_TILING_KEY_ARGS_CONCAT_IMPL(ASCENDC_TILING_KEY_INDEX_INOUT_,                               \
-        ASCENDC_TILING_KEY_ARG_COUNT_IMPL(__VA_ARGS__)(__VA_ARGS__))
+#define ASCENDC_TILING_KEY_LIST_INOUT_BASE_IMPL(...) \
+    ASCENDC_TILING_KEY_ARGS_CONCAT_IMPL(             \
+        ASCENDC_TILING_KEY_INDEX_INOUT_, ASCENDC_TILING_KEY_ARG_COUNT_IMPL(__VA_ARGS__)(__VA_ARGS__))
 
 #define ASCENDC_TILING_KEY_INDEX_INOUT_1(a) ASCENDC_TILING_KEY_VAR_IMPL == (a)
 #define ASCENDC_TILING_KEY_INDEX_INOUT_2(a, ...) \
@@ -256,8 +255,7 @@ extern uint64_t g_tilingKey;
 #define ASCENDC_TILING_KEY_ARGS_CONCAT_BASE_IMPL(a, b) a##b
 
 #ifdef __CHECK_FEATURE_AT_PRECOMPILE
-#define ASCENDC_TILING_KEY_LIST_IMPL(...) \
-    (ASCENDC_TILING_KEY_LIST_INOUT_IMPL(__VA_ARGS__)) "TILING_KEY_LIST"
+#define ASCENDC_TILING_KEY_LIST_IMPL(...) (ASCENDC_TILING_KEY_LIST_INOUT_IMPL(__VA_ARGS__)) "TILING_KEY_LIST"
 #else
 #define ASCENDC_TILING_KEY_LIST_IMPL(...) (ASCENDC_TILING_KEY_LIST_INOUT_IMPL(__VA_ARGS__))
 #endif
