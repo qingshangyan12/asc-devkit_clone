@@ -121,7 +121,7 @@ template <typename T>
 struct CeilDivIntegerTraits<const volatile T> : CeilDivIntegerTraits<T> {};
 
 template <typename T, typename U>
-__host__ __aicore__ inline constexpr auto CeilDivGeneric(const T& a, const U& b)
+__host__ __aicore__ inline constexpr auto CeilDivGeneric(T a, U b)
 {
     static_assert(CeilDivIntegerTraits<T>::is_integral, "AscendC::CeilDiv: T must be an integral type");
     static_assert(CeilDivIntegerTraits<U>::is_integral, "AscendC::CeilDiv: U must be an integral type");
@@ -140,7 +140,7 @@ __host__ __aicore__ inline constexpr auto CeilDivGeneric(const T& a, const U& b)
 } // namespace detail
 
 template <typename T, typename U>
-__host__ __aicore__ inline constexpr auto CeilDiv(const T& a, const U& b)
+__host__ __aicore__ inline constexpr auto CeilDiv(T a, U b)
 {
     using ReturnType = decltype(detail::CeilDivGeneric(a, b));
     if (b == 0) {

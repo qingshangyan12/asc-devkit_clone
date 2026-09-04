@@ -34,7 +34,7 @@
 
 ```cpp
 template <typename T, typename U>
-__host__ __aicore__ inline constexpr auto CeilDiv(const T& a, const U& b);
+__host__ __aicore__ inline constexpr auto CeilDiv(T a, U b);
 ```
 
 ## 参数说明
