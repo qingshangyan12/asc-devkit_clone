@@ -113,6 +113,7 @@ def check_is_regbase_v2():
     from .platform.platform_info import BS9SX2A
     from .platform.platform_info import MC61AM21A
     from .platform.platform_info import ASCEND_950
+    from .platform.platform_info import ASCEND_5162
     from .platform.platform_info import KIRIN_X90
     from .platform.platform_info import KIRIN_9030
     from .platform.platform_info import KIRIN_DEV_0000
@@ -296,6 +297,9 @@ def _build_aicore_compile_cmd(
             cmd += ["-mllvm", "-cce-aicore-weight-for-reg-operand-remat=higher"]
     elif get_soc_spec("SHORT_SOC_VERSION") == ASCEND_910:
         cmd += ["-mllvm", "-cce-aicore-function-stack-size=16000"]
+        cmd = _set_cce_overflow(cmd)
+    elif get_soc_spec("SHORT_SOC_VERSION") == ASCEND_5162:
+        cmd += ["-mllvm", "-cce-aicore-function-stack-size=4000"]
         cmd = _set_cce_overflow(cmd)
     elif get_soc_spec("SOC_VERSION") in [HI3796CV300ES, HI3796CV300CS, SD3403]:
         cmd += ["-mllvm", "-cce-aicore-sk-transform"]
