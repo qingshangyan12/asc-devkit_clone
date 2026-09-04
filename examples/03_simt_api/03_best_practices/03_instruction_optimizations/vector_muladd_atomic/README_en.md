@@ -131,9 +131,9 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
 **Analysis**:
 
 - **Loop body instruction count is reduced.** Case 0's loop body contains 3 reads and 1 write; Case 1 eliminates the read instruction for `a[i]`, containing 2 reads and 1 write.
-- **Latency is reduced by 8.1%**, from 51.70μs to 47.72μs.
+- **Latency is reduced by 7.7%**, from 51.70μs to 47.72μs.
 
-**Conclusion**: By handing the accumulation off to atomic add, threads save the read instruction that reads the old value of `a[i]`, reducing latency by 8.1%. The gain comes from threads issuing one fewer read instruction.
+**Conclusion**: By handing the accumulation off to atomic add, threads save the read instruction that reads the old value of `a[i]`, reducing latency by 7.7%. The gain comes from threads issuing one fewer read instruction.
 
 ---
 
@@ -144,7 +144,7 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
 | 0 | a[i] += b[i] * c[i] | 3 | 51.70 | 1× |
 | 1 | asc_atomic_add | 2 | 47.72 | **1.08×** |
 
-The latency reduction is 8.1%. The number of thread reads drops from 3 to 2, which might seem like a 33% reduction, but the actual reduction is only 8.1%. The reason is as follows:
+The latency reduction is 7.7%. The number of thread reads drops from 3 to 2, which might seem like a 33% reduction, but the actual reduction is only 7.7%. The reason is as follows:
 
 - **The dominant cost of reading GM is the data round-trip latency, which cannot be saved.** Issuing a read instruction only consumes a short issue time; afterward, most of the time is spent waiting for data to return from GM. The waits for the two read instructions overlap. Removing one leaves the other's wait time unchanged, so only the issue time of the removed instruction is saved; the data round-trip latency still has to be waited out.
 
