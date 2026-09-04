@@ -31,7 +31,7 @@
 #include "../../../impl/adv_api/detail/reduce/reduce_mean/reduce_mean_v220_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_any/reduce_any_v220_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_all/reduce_all_v220_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || \
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
                                 __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/reduce/reduce_max/reduce_max_3510_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_min/reduce_min_3510_impl.h"
@@ -72,7 +72,7 @@ __aicore__ inline void ReduceMean(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     Internal::ReduceMeanImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -98,7 +98,7 @@ __aicore__ inline void ReduceMean(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
@@ -130,7 +130,7 @@ __aicore__ inline void ReduceMax(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     Internal::ReduceMaxImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -156,7 +156,7 @@ __aicore__ inline void ReduceMax(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
@@ -188,7 +188,7 @@ __aicore__ inline void ReduceMin(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     Internal::ReduceMinImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -214,7 +214,7 @@ __aicore__ inline void ReduceMin(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
@@ -246,7 +246,7 @@ __aicore__ inline void ReduceSum(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     Internal::ReduceSumImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -272,7 +272,7 @@ __aicore__ inline void ReduceSum(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
@@ -304,7 +304,7 @@ __aicore__ inline void ReduceProd(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     Internal::ReduceProdImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -330,7 +330,7 @@ __aicore__ inline void ReduceProd(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
@@ -362,7 +362,7 @@ __aicore__ inline void ReduceAny(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     Internal::ReduceAnyImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -388,7 +388,7 @@ __aicore__ inline void ReduceAny(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
@@ -420,7 +420,7 @@ __aicore__ inline void ReduceAll(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     Internal::ReduceAllImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -446,7 +446,7 @@ __aicore__ inline void ReduceAll(
         return;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
