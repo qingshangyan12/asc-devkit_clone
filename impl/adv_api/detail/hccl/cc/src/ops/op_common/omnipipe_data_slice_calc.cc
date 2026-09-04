@@ -9,6 +9,8 @@
  */
 #include "omnipipe_data_slice_calc.h"
 
+#include <cmath>
+
 namespace mc2_ops_hccl {
 constexpr double BANDWIDTH_RATIO_BOUND = 10;
 constexpr double LOOP_SCALING_FACTOR = 0.9;
@@ -81,6 +83,8 @@ std::vector<OmniPipeSplitSliceInfo> OmniPipeSplitSliceInfoListAssign(
 void CalAllgather2DOffset(
     u64* xAGOffset, u64* yAGOffset, u64 stepNum, u64 xRankSize, u64 yRankSize, u64* xAGDataSize, u64* yAGDataSize)
 {
+    (void)xRankSize;
+    (void)yRankSize;
     HCCL_INFO("[CalAllgather2DOffset] start");
     xAGOffset[0] = 0; // 第一步发同轴，偏移为0
     yAGOffset[0] = 0; // 第一步发同轴，偏移为0
@@ -111,6 +115,8 @@ void CalReducescatter2DOffset(
     u64* xRSOffset, u64* yRSOffset, u64 stepNum, u64 xRankSize, u64 yRankSize, const u64* xRSDataSize,
     const u64* yRSDataSize)
 {
+    (void)xRankSize;
+    (void)yRankSize;
     HCCL_INFO("[CalReducescatter2DOffset] start");
     xRSOffset[0] = 0; // 第一步发斜对角，偏移为0
     yRSOffset[0] = 0;
@@ -871,6 +877,7 @@ std::vector<std::vector<u64>> CalRSDataSizeStep(
 
 std::vector<u64> OmniPipeSplitData(u64 rankSize, u64 count, u64 dataTypeSize)
 {
+    (void)dataTypeSize;
     std::vector<u64> omniPipeSplitSliceInfoList;
     u64 sliceCount = RoundUp(count, rankSize);
 
@@ -891,6 +898,7 @@ std::vector<u64> OmniPipeSplitData(u64 rankSize, u64 count, u64 dataTypeSize)
 std::vector<std::vector<u64>> OmniPipeSplitRankDataLoop(
     std::vector<u64> omniPipeSplitSliceInfoList, u64 maxDataCountPerLoop, u64 loopCount, u64 dataTypeSize)
 {
+    (void)dataTypeSize;
     std::vector<std::vector<u64>> omniPipeSplitRankDataLoop;
     u64 sliceNum = omniPipeSplitSliceInfoList.size();
 

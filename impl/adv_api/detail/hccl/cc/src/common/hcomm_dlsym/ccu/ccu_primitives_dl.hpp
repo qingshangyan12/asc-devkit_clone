@@ -14,6 +14,7 @@
 #if CANN_VERSION_NUM >= 90100000
 #include "ccu_primitives.hpp"
 #else
+#include <cstdint>
 #include "ccu_primitives_impl_dl.h"
 #include "ccu_control_flow_macro_dl.h"
 #include "ccu_variable_dl.hpp"
@@ -43,10 +44,10 @@ inline T GetResByChannel(ChannelHandle /*channel*/, uint32_t /*index*/)
                         "currently supported: Variable.");
 }
 template <>
-inline Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t varIndex)
+inline Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t index)
 {
     Variable v{detail::NoAllocTag{}};
-    CCU_THROW_IF_FAILED(CcuVariableCreateByChannel(channel, varIndex, &v.handle), "CcuVariableCreateByChannel: failed");
+    CCU_THROW_IF_FAILED(CcuVariableCreateByChannel(channel, index, &v.handle), "CcuVariableCreateByChannel: failed");
     return v;
 }
 
