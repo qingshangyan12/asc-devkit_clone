@@ -10,11 +10,12 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 set(SCENARIO_NUM "0" CACHE STRING "Scenario: 0=SIMT-GroupInsertOrAssign, 1=MTE-TaskQueue")
 if (NOT SCENARIO_NUM MATCHES "^[0-1]$")
     message(FATAL_ERROR "SCENARIO_NUM must be 0 or 1")
 endif()
+
+set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
 
 find_package(ASC REQUIRED)
 
@@ -28,8 +29,4 @@ message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM} (0=SIMT-GroupInsertOrAssi
 
 target_compile_definitions(hash_table_mte_queue PRIVATE
     SCENARIO_NUM=${SCENARIO_NUM}
-)
-
-target_compile_options(hash_table_mte_queue PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )
