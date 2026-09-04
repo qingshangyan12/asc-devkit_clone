@@ -311,7 +311,7 @@ class CommonUtility:
             Command to be run.
 
         cmd_type : str
-            Comand type uesd in running.
+            Command type used in running.
 
         Return
         ------
@@ -342,7 +342,7 @@ class CommonUtility:
             Command to be run.
 
         cmd_type : str
-            Comand type uesd in running.
+            Command type used in running.
 
         Return
         ------
@@ -385,7 +385,7 @@ class CommonUtility:
             Command to be run.
 
         cmd_type : str
-            Comand type uesd in running.
+            Command type used in running.
 
         Return
         ------
@@ -1015,7 +1015,7 @@ def add_compile_options(tiling_so_path, compile_options: list):
     if not os.path.exists(tiling_so_path):
         CommonUtility.print_compile_log(
             "",
-            "Not found tiling so file, use default api soc verison",
+            "Not found tiling so file, use default api soc version",
             AscendCLogLevel.LOG_WARNING,
         )
         compile_options.append("-DASCENDC_API_VERSION=20250330")
@@ -1048,7 +1048,7 @@ def add_compile_options(tiling_so_path, compile_options: list):
             compile_options.append("-DASCENDC_API_VERSION=20250330")
             CommonUtility.print_compile_log(
                 "",
-                "not found api version, use default api soc verison",
+                "not found api version, use default api soc version",
                 AscendCLogLevel.LOG_INFO,
             )
             return
@@ -1058,13 +1058,13 @@ def add_compile_options(tiling_so_path, compile_options: list):
         dec_data = struct.unpack(">Q", bytes_data)[0]
         compile_options.append(f"-DASCENDC_API_VERSION={dec_data}")
         CommonUtility.print_compile_log(
-            "", f"set api soc verison: {dec_data}", AscendCLogLevel.LOG_INFO
+            "", f"set api soc version: {dec_data}", AscendCLogLevel.LOG_INFO
         )
     else:
         compile_options.append("-DASCENDC_API_VERSION=20250330")
         CommonUtility.print_compile_log(
             "",
-            "not found api version, use default api soc verison",
+            "not found api version, use default api soc version",
             AscendCLogLevel.LOG_INFO,
         )
 
@@ -1073,7 +1073,7 @@ def process_ascendc_api_version(cce_file: str, compile_options: list, extend_opt
     for sub_option in compile_options:
         if "-DASCENDC_API_VERSION" in sub_option:
             CommonUtility.print_compile_log(
-                "", "Api soc verison has been set", AscendCLogLevel.LOG_INFO
+                "", "Api soc version has been set", AscendCLogLevel.LOG_INFO
             )
             return
 

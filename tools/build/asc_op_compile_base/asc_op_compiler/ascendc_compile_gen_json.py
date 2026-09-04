@@ -83,7 +83,7 @@ def _get_kernel_type_dict(compile_info: CompileInfo, tiling_key: int):
         tiling_key_dict["kernelType"] = "MIX_VECTOR_CORE"
         tiling_key_dict["taskRation"] = "1:1"
     else:
-        raise Exception(f"current kernel type is not suport {kernel_type}")
+        raise Exception(f"current kernel type is not support {kernel_type}")
     return tiling_key_dict
 
 
