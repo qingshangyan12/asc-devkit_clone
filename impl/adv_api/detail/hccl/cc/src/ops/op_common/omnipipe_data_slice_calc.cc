@@ -329,7 +329,7 @@ u64 CalAllgatherDataSize2D(
     for (int i = 0; i < step; i++) {
         HCCL_INFO(
             "[CalAllgatherDataSize2D] "
-            "xStepP2pDataSize[%d]=[%llu],yStepP2pDataSize[%d]=[%llu],",
+            "xStepP2pDatxaSize[%d]=[%llu],yStepP2pDataSize[%d]=[%llu],",
             i, xStepP2pDataSize[i], i, yStepP2pDataSize[i]);
     }
     HCCL_INFO("[CalAllgatherDataSize2D] end");
