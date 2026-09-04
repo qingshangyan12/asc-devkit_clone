@@ -24,11 +24,17 @@
 
 #include "impl/utils/debug/asc_printf_simt_impl.h"
 
+#ifdef ASCENDC_CPU_DEBUG
+#include <cstdlib>
+#endif
+
 namespace __asc_simt_vf {
 #ifdef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap()
 {
-#ifndef ASCENDC_CPU_DEBUG
+#ifdef ASCENDC_CPU_DEBUG
+    std::abort();
+#else
     *((uint8_t*)-1) = 0;
 #endif
 }
@@ -53,7 +59,9 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void __assert_fa
 #else
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap()
 {
-#ifndef ASCENDC_CPU_DEBUG
+#ifdef ASCENDC_CPU_DEBUG
+    std::abort();
+#else
     *((uint8_t __gm__*)-1) = 0;
 #endif
 }

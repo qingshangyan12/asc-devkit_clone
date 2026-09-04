@@ -24,6 +24,10 @@
 
 #include "impl/utils/sys_macros.h"
 
+#ifdef ASCENDC_CPU_DEBUG
+#include <cstdio>
+#endif
+
 #ifndef __SIMT_DEVICE_FUNCTIONS_DECL__
 #if defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__)
 #define __SIMT_DEVICE_FUNCTIONS_DECL__ __aicore__
@@ -490,7 +494,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void simt_printf_impl_assert_msg(
     __simt_gm__ const char* assertion, __simt_gm__ const char* file, unsigned int line,
     __simt_gm__ const char* function, __simt_gm__ const char* fmt, Args&&... args)
 {
-#ifndef ASCENDC_CPU_DEBUG
+#ifdef ASCENDC_CPU_DEBUG
+    std::printf("[ASSERT] %s:%u: %s: Assertion `%s' failed. ", file, line, function, assertion);
+    std::printf(fmt, args...);
+#else
     enable_printf();
     if (g_sysSimtPrintFifoSpace == nullptr) {
         return;
