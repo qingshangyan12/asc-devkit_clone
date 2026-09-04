@@ -78,9 +78,6 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> log10(const reg_tensor<T>& src);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src);
-
-template <typename T>
 __simd_callee__ inline reg_tensor<T> relu(const reg_tensor<T>& src);
 
 template <typename T>
