@@ -37,11 +37,10 @@ __aicore__ inline void CheckApiDtypeValid()
         SupportType<
             Tuple<SrcT, ScaleT, DstT>
 #if !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
-            , 
-            Tuple<half, half, fp8_e4m3fn_t>, Tuple<half, half, fp8_e5m2_t>,
-            Tuple<bfloat16_t, bfloat16_t, fp8_e4m3fn_t>, Tuple<bfloat16_t, bfloat16_t, fp8_e5m2_t>,
-            Tuple<float, float, fp8_e4m3fn_t>, Tuple<float, float, fp8_e5m2_t>, Tuple<half, float, fp8_e4m3fn_t>,
-            Tuple<half, float, fp8_e5m2_t>,
+            ,
+            Tuple<half, half, fp8_e4m3fn_t>, Tuple<half, half, fp8_e5m2_t>, Tuple<bfloat16_t, bfloat16_t, fp8_e4m3fn_t>,
+            Tuple<bfloat16_t, bfloat16_t, fp8_e5m2_t>, Tuple<float, float, fp8_e4m3fn_t>,
+            Tuple<float, float, fp8_e5m2_t>, Tuple<half, float, fp8_e4m3fn_t>, Tuple<half, float, fp8_e5m2_t>,
             Tuple<bfloat16_t, float, fp8_e4m3fn_t>, Tuple<bfloat16_t, float, fp8_e5m2_t>, Tuple<half, half, hifloat8_t>,
             Tuple<bfloat16_t, bfloat16_t, hifloat8_t>, Tuple<bfloat16_t, bfloat16_t, int8_t>,
             Tuple<float, float, hifloat8_t>, Tuple<half, float, hifloat8_t>, Tuple<bfloat16_t, float, hifloat8_t>,
@@ -54,8 +53,8 @@ __aicore__ inline void CheckApiDtypeValid()
             Tuple<half, half, fp4x2_e1m2_t>, Tuple<half, half, fp4x2_e2m1_t>,
             Tuple<bfloat16_t, bfloat16_t, fp4x2_e1m2_t>, Tuple<bfloat16_t, bfloat16_t, fp4x2_e2m1_t>,
             Tuple<float, float, fp4x2_e1m2_t>, Tuple<float, float, fp4x2_e2m1_t>, Tuple<half, float, fp4x2_e1m2_t>,
-            Tuple<half, float, fp4x2_e2m1_t>,
-            Tuple<bfloat16_t, float, fp4x2_e1m2_t>, Tuple<bfloat16_t, float, fp4x2_e2m1_t>
+            Tuple<half, float, fp4x2_e2m1_t>, Tuple<bfloat16_t, float, fp4x2_e1m2_t>,
+            Tuple<bfloat16_t, float, fp4x2_e2m1_t>
 #endif
             >(),
         "Failed to check data type for Quantize");
@@ -1025,8 +1024,7 @@ __aicore__ inline void QuantizeImpl(
             SupportType<DstT, int8_t, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t>(),
             "Quantize PerTensor only support int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t output dtype");
 #else
-            SupportType<DstT, int8_t>(),
-            "Quantize PerTensor only support int8_t output dtype");
+            SupportType<DstT, int8_t>(), "Quantize PerTensor only support int8_t output dtype");
 #endif
         QuantizePerTensor<config, DstT, SrcT, ScaleT, OffsetT>(dstTensor, srcTensor, scale, offset, params);
     } else if constexpr (config.policy == QuantizePolicy::PER_CHANNEL) {
@@ -1035,8 +1033,7 @@ __aicore__ inline void QuantizeImpl(
             SupportType<DstT, int8_t, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t>(),
             "Quantize PerChannel only support int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t output dtype");
 #else
-            SupportType<DstT, int8_t>(),
-            "Quantize PerChannel only support int8_t output dtype");
+            SupportType<DstT, int8_t>(), "Quantize PerChannel only support int8_t output dtype");
 #endif
         QuantizePerChannel<config, DstT, SrcT, ScaleT, OffsetT>(dstTensor, srcTensor, scale, offset, params);
     } else if constexpr (config.policy == QuantizePolicy::PER_TOKEN) {
@@ -1045,8 +1042,7 @@ __aicore__ inline void QuantizeImpl(
             SupportType<DstT, int8_t, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t>(),
             "Quantize PerToken only support int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t output dtype");
 #else
-            SupportType<DstT, int8_t>(),
-            "Quantize PerToken only support int8_t output dtype");
+            SupportType<DstT, int8_t>(), "Quantize PerToken only support int8_t output dtype");
 #endif
         QuantizePerToken<config, DstT, SrcT, ScaleT, OffsetT>(dstTensor, srcTensor, scale, offset, params);
     } else if constexpr (config.policy == QuantizePolicy::PER_GROUP) {
@@ -1056,8 +1052,7 @@ __aicore__ inline void QuantizeImpl(
             "Quantize PerGroup only support "
             "int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t/fp4x2_e2m1_t/fp4x2_e1m2_t output dtype");
 #else
-            SupportType<DstT, int8_t>(),
-            "Quantize PerGroup only support int8_t output dtype");
+            SupportType<DstT, int8_t>(), "Quantize PerGroup only support int8_t output dtype");
 #endif
         static_assert(((config.kDim == 1) || (config.kDim == 0)), "Quantize PerGroup only support K is axis 0/1!");
         ASCENDC_ASSERT((params.groupSize > 0 && params.groupSize % 32 == 0), {
