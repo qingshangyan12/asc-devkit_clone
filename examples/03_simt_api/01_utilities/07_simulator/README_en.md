@@ -70,6 +70,8 @@ Run the following steps in the root directory of this example to build and execu
   python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin
   ```
 
+
+  > **Note:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory, then run cmake again.
   Select the corresponding `CMAKE_ASC_ARCHITECTURES` parameter based on the NPU hardware architecture being tested.
 
   | Option | Description |

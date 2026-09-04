@@ -70,8 +70,6 @@
   python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin
   ```
 
-  请根据实际测试的NPU硬件架构选择对应的`CMAKE_ASC_ARCHITECTURES`参数。
-
   | 选项 | 说明 |
   |------|------|
   | `CMAKE_ASC_RUN_MODE` | 指定为`sim`，开启NPU仿真模式 |

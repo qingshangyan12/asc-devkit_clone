@@ -403,6 +403,7 @@ In the sample root directory, perform the following steps to build and run the s
 
   | Option | Value | Description |
   | ------ | ----- | ----------- |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture. This sample supports only dav-3510 (Ascend 950PR/Ascend 950DT). |
   | `SCENARIO_NUM` | `0`-`4` | Sample type. The default value is 4. |
 
@@ -462,6 +463,8 @@ In the sample root directory, perform the following steps to build and run the s
   msopprof simulator --soc-version=<soc_version> ./matrix_transpose
   ```
 
+
+  > **Note:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory, then run cmake again.
   > Before using simulation tuning, add the `-g` compilation option to `CMakeLists.txt` to generate debug information. This allows the simulator to collect instruction pipeline diagrams. For how to obtain `soc_version` and for more simulation tuning information, see the [simulator sample](../../../01_simd_cpp_api/01_utilities/08_simulator/README_en.md).
   >
 

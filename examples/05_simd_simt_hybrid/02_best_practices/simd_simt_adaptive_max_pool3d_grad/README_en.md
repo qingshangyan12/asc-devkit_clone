@@ -301,6 +301,16 @@ Run the following steps in the root directory of this sample to build and execut
   ./adaptive_max_pool3d_grad hybrid_ub                 # Run the sample with the hybrid_ub kernel implementation.
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory, then run cmake again.
+
+
   The commands above use the default `grad/argmax` shape [1,4096,8,8,8]. The `GRAD_DHW` option changes the D/H/W of `grad/argmax`, which lets you reproduce the other rows of the performance tables above. For example, to collect the row that scatters 4096 gradients per `NC` plane:
 
   ```bash
@@ -313,6 +323,7 @@ Run the following steps in the root directory of this sample to build and execut
 
   | Option | Value | Description |
   | ---------------- | ----------- | ----------------- |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture. This sample supports only dav-3510 (Ascend 950PR/Ascend 950DT). |
   | `GRAD_DHW` | `1`, `2`, `4`, `8`, `16` | D/H/W of `grad/argmax`, using the same value for all three. Defaults to `8`. The number of gradients scattered per `NC` plane is the D×H×W of `grad/argmax`. Use it to reproduce each row of the performance comparison tables. |
 

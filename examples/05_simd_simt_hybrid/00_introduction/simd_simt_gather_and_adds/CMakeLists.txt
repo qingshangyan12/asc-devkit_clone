@@ -29,21 +29,3 @@ endif()
 add_executable(demo
     ${ASC_SRC_FILE}
 )
-
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-    $<BUILD_INTERFACE:$<$<STREQUAL:${CMAKE_ASC_RUN_MODE},sim>:-g -O0>>
-    $<BUILD_INTERFACE:$<$<STREQUAL:${CMAKE_ASC_RUN_MODE},cpu>:-x c++>>
-    $<BUILD_INTERFACE:$<$<STREQUAL:${CMAKE_ASC_RUN_MODE},cpu>:-g -O2 -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=0 -Wall -Werror>>
-)
-
-target_link_directories(demo PRIVATE
-    $<BUILD_INTERFACE:$<$<STREQUAL:${CMAKE_ASC_RUN_MODE},sim>:$ENV{ASCEND_HOME_PATH}/tools/simulator/${SOC_VERSION}/lib>>
-)
-
-target_link_libraries(demo PRIVATE
-    $<BUILD_INTERFACE:$<$<STREQUAL:${CMAKE_ASC_RUN_MODE},sim>:runtime_camodel>>
-    $<BUILD_INTERFACE:$<$<STREQUAL:${CMAKE_ASC_RUN_MODE},sim>:npu_drv>>
-    $<BUILD_INTERFACE:$<$<STREQUAL:${CMAKE_ASC_RUN_MODE},cpu>:cpudebug_acl_stub>>
-    $<BUILD_INTERFACE:$<$<STREQUAL:${CMAKE_ASC_RUN_MODE},cpu>:tikicpulib::ascend950pr_9599>>
-)

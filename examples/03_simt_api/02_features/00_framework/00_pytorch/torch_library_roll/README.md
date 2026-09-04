@@ -127,7 +127,6 @@
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                # 编译工程
   python3 ../roll_custom_test.py   # 执行样例
   ```
-
 - 编译选项说明
 
   | 选项　　　　　 | 可选值　　　　　　　　　　　 | 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |

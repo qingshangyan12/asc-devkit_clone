@@ -428,6 +428,8 @@ Run the following steps in the root directory of this example to build and run t
   test pass!
   ```
 
+
+  > **Note:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory, then run cmake again.
 ### Performance Analysis
 
 ### Introduction to the msOpProf Tool
