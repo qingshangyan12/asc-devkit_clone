@@ -13,68 +13,49 @@
 - 正例将384MB数据切分成B0至B3四个L2 Batch，每批包含96MB的数据量，每一批进行两轮加1计算。
 - 完整实现方法请参考[add_l2_cache_split样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/10_add_l2_cache_split)。
 
+两个场景的数据处理方式如下图所示。
+
+**图 1**  未开启L2 Cache切分<a name="fig_l2_cache_no_split"></a>
+
+![](../../../figures/no_l2_cache_split.png "未开启L2-Cache切分")
+
+**图 2**  开启L2 Cache切分<a name="fig_l2_cache_split"></a>
+
+![](../../../figures/l2_cache_split.png "开启L2-Cache切分")
+
 ## 反例：不做L2 Cache切分
 
 反例中不做数据切分，直接处理384MB数据整体。L2 Cache对用户不可见，用户可感知数据从GM搬运到UB的过程：384MB总数据由20个核均分，平均每个核搬运约19.2MB。
 
-**图 1**  未开启L2 Cache切分<a name="fig126831114552"></a>
+**【用户视角】**
 
-![](../../../figures/no_l2_cache_split.png "未开启L2-Cache切分")
+只感知GM->UB搬运过程，384MB总数据均分20个核搬运，每个核搬运19.2MB。
 
-**【用户视角】**：只感知GM->UB搬运过程
+**【实际数据路径】**
 
-```text
-GM data[0, 384MB) -------------------------------> UB
-384MB总数据 / 20核 = 19.2MB/核
-```
+输入数据会先从GM填充L2 Cache，再到UB
 
-**【实际数据路径】**：输入数据会先从GM填充L2 Cache，再到UB
+**图 3**  GM搬运到UB路径<a name="fig_l2_cache_gm_to_ub"></a>
 
-```text
-GM ----------------------> L2 Cache ----------------------> UB
-                           硬件自动管理，对用户不可见
+![](../../../figures/l2cache_to_UB.png "GM搬运到UB路径")
+
+**【搬运填充过程】**
 
 假设20个核处理的数据按核序逐段搬入L2 Cache：
-
 L2 Cache有效数据阈值 = 100MB
 约可容纳5个核的数据量：5 * 19.2MB = 96MB
 
-先搬入L2 Cache并可能驻留的数据：
+**图 4**  数据搬运填充L2 Cache过程<a name="fig_l2_cache_fill_process"></a>
 
-        核0      核1      核2      核3      核4
-L2   | 19.2MB | 19.2MB | 19.2MB | 19.2MB | 19.2MB |
-     |------------------- 约96MB，接近100MB有效阈值 -------------------|
+![](../../../figures/l2cache_fill_process.png "数据搬运填充L2 Cache过程")
 
-后续继续搬入L2 Cache的新数据：
+后续新数据填充L2 Cache时，可能替换核0~核4早期Cache Line。
 
-        核5      核6              ...       核19
-L2   | 19.2MB | 19.2MB |        ...      | 19.2MB |
-        |
-        +-- 新数据继续填充L2 Cache时，可能替换核0至核4对应的早期Cache Line。
-```
+**【不切分反例的执行时序】**
 
-**【不切分反例的执行时间线】**
+**图 5**  未开启L2 Cache切分反例<a name="fig_l2_cache_no_split_example"></a>
 
-```text
-循环层级：Round -> Whole Data
-
-时间 --------------------------------------------------------------->
-
-R0：首轮处理完整384MB
-    data[0, 384MB)
-    |----------- 20核并发扫描完整GM范围，合计数据量384MB -----------|
-    |-- 核0至核4约96MB，接近100MB有效阈值 --|
-                                        |-- 核5至核19继续搬入新地址，
-                                            早期Cache Line可能被替换 --|
-
-R1：再次处理完整384MB
-    data[0, 384MB)
-    |-- 重新访问起始地址范围 --|------ 继续扫描到384MB末尾 ------|
-       ^
-       |
-       如果R0中核0至核4对应的早期数据已被替换，
-       R1再次访问这些地址时更可能发生Cache Miss，并从GM重新填充L2 Cache。
-```
+![](../../../figures/l2cache_no_split_example.png "未开启L2 Cache切分反例")
 
 R0从起始地址到384MB末尾的过程中，后续核搬入可能替换先前核搬入的数据。由于R0是首轮访问，仅比较一轮搬运计算不能稳定体现L2 Cache命中收益；R1重新访问起始地址范围时，先前数据更可能已经不在L2 Cache中，因此更可能从GM重新搬运。
 
@@ -82,10 +63,6 @@ R0从起始地址到384MB末尾的过程中，后续核搬入可能替换先前�
 
 正例把384MB数据根据阈值100MB进行切分，分成4个Batch，每份96MB。每轮20核共处理96MB数据，每轮数据复用，这样每次计算前读取的数据能够命中L2 Cache，提升算子性能。
 正例的循环层级为`L2 Batch -> Round`。同一批连续完成全部轮次后，再切换到下一批：
-
-**图 2**  开启L2 Cache切分<a name="fig1623673819553"></a>
-
-![](../../../figures/l2_cache_split.png "开启L2-Cache切分")
 
 ```text
 L2 Batch数       = ceil(总数据量 / L2 Cache有效数据阈值)
@@ -103,35 +80,13 @@ for (uint32_t l2BatchIdx = 0; l2BatchIdx < L2_BATCH_NUM; ++l2BatchIdx) {
 }
 ```
 
-**【L2 Cache切分正例的执行时间线】**
+**【L2 Cache切分正例的执行时序】**
 
-```text
-循环层级：L2 Batch -> Round
+**图 6**  开启切分正例<a name="fig_l2_cache_split_example"></a>
 
-整体顺序：
-B0/R0 -> SyncAll -> B0/R1 -> B1/R0 -> SyncAll -> B1/R1
-      -> B2/R0 -> SyncAll -> B2/R1 -> B3/R0 -> SyncAll -> B3/R1
+![](../../../figures/l2cache_split_example.png "开启切分正例")
 
-B0阶段：
-  B0/R0  首次访问data[0MB, 96MB)，全核合计数据量96MB <= 100MB
-  B0/R1  立即再次访问data[0MB, 96MB)，复用B0/R0刚访问的数据
-
-B1阶段：
-  B1/R0  首次访问data[96MB, 192MB)，全核合计数据量96MB <= 100MB
-  B1/R1  立即再次访问data[96MB, 192MB)，复用B1/R0刚访问的数据
-
-B2阶段：
-  B2/R0  首次访问data[192MB, 288MB)，全核合计数据量96MB <= 100MB
-  B2/R1  立即再次访问data[192MB, 288MB)，复用B2/R0刚访问的数据
-
-B3阶段：
-  B3/R0  首次访问data[288MB, 384MB)，全核合计数据量96MB <= 100MB
-  B3/R1  立即再次访问data[288MB, 384MB)，复用B3/R0刚访问的数据
-
-同一Batch的两轮访问之间，没有插入其他超过100MB有效阈值的大数据范围，
-因此第2轮更有机会命中第1轮留在L2 Cache中的数据。
-```
-
+同一Batch的两轮访问之间，没有插入其他超过100MB有效阈值的大数据，因此第2轮更有机会命中第1轮留在L2 Cache中的数据。<br>
 B0的数据量为96MB，不超过100MB阈值；B0在两次访问之间也没有其他大数据插入更新L2 Cache，因此R1更有机会从L2 Cache读取R0的结果。B0处理完毕后再依次处理B1至B3，原理相同。
 
 **【性能观察重点】**
