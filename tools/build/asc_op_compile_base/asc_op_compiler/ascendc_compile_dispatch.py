@@ -1028,6 +1028,33 @@ def _compile_ascendc_cce_m510(
         )
 
 
+def _compile_ascendc_cce_516r2(
+    compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo
+):
+    """call cce-c to compile a AscendC.cce file, generate a binary file and a json file
+
+    Args:
+        compile_info (CompileInfo): compile info for generate .o and .json
+        compile_options (list): compile options for bisheng
+        tiling_info (TilingInfo): tiling info
+    """
+    sub_core_type = "AIC"
+    optional_core = "AiCore"
+    arch = None
+    set_soc_spec(optional_core)
+    tiling_key_list = call_bisheng_v220(
+        compile_info, compile_option_tuple, tiling_info, arch, compile_info.code_channel
+    )
+    _gen_non_mix_sub_json(compile_info, tiling_info, sub_core_type)
+    if not tiling_info.static_shape_flag:
+        _dynamic_kernel_list_to_json(
+            compile_info.kernel_name,
+            tiling_key_list,
+            compile_info.enable_deterministic,
+            compile_info.tiling_key_deterministic,
+        )
+
+
 def _get_sub_compile_info(compile_info: CompileInfo, core_type: int):
     sub_compile_info = copy.deepcopy(compile_info)
     core_type_marker = "_mix_aic" if core_type == CORE_TYPE_CUBE else "_mix_aiv"
