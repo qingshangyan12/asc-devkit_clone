@@ -77,7 +77,7 @@ __aicore__ inline void DropOutImpl(
     CHECK_FUNC_HIGHLEVEL_API(
         DropOut, (T, isInitBitMode, dropOutMode), (dstLocal, srcLocal, maskLocal, sharedTmpBuffer, keepProb, info));
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || (__NPU_ARCH__ == 5162) || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CheckTensorPos<T>(dstLocal, Hardware::UB, "dstLocal", "VECIN/VECCALC/VECOUT", "DropOut");
     CheckTensorPos<T>(srcLocal, Hardware::UB, "srcLocal", "VECIN/VECCALC/VECOUT", "DropOut");
     CheckTensorPos<uint8_t>(maskLocal, Hardware::UB, "maskLocal", "VECIN/VECCALC/VECOUT", "DropOut");
