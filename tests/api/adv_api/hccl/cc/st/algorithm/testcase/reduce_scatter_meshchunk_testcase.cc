@@ -186,3 +186,253 @@ TEST_F(MeshChunkTest, OldInterfaceFallbackAndBatchErrorNeverResubmit)
     EXPECT_EQ(Count(Kind::REDUCE, 0), 0U);
     EXPECT_EQ(Count(Kind::CHANNEL_RECORD, NOTIFY_IDX_DATA_SIGNAL), 0U);
 }
+
+namespace {
+// Integer-valued FP16/BF16 samples are exact; memcpy also exercises unaligned user addresses.
+float ReadValue(const void* ptr, HcclDataType dtype)
+{
+    if (dtype == HCCL_DATA_TYPE_INT8) {
+        return *static_cast<const int8_t*>(ptr);
+    }
+    uint32_t bits = 0;
+    if (dtype == HCCL_DATA_TYPE_FP32) {
+        float value;
+        std::memcpy(&value, ptr, sizeof(value));
+        return value;
+    }
+    uint16_t half;
+    std::memcpy(&half, ptr, sizeof(half));
+    if (dtype == HCCL_DATA_TYPE_BFP16) {
+        bits = static_cast<uint32_t>(half) << 16;
+    } else if (half != 0) {
+        bits = ((half & 0x8000U) << 16) | (((half >> 10) & 31U) + 112U) << 23 | (half & 1023U) << 13;
+    }
+    float value;
+    std::memcpy(&value, &bits, sizeof(value));
+    return value;
+}
+
+void WriteValue(void* ptr, HcclDataType dtype, float value)
+{
+    if (dtype == HCCL_DATA_TYPE_INT8) {
+        *static_cast<int8_t*>(ptr) = static_cast<int8_t>(value);
+        return;
+    }
+    if (dtype == HCCL_DATA_TYPE_FP32) {
+        std::memcpy(ptr, &value, sizeof(value));
+        return;
+    }
+    uint32_t bits;
+    std::memcpy(&bits, &value, sizeof(bits));
+    uint16_t half = dtype == HCCL_DATA_TYPE_BFP16 ? bits >> 16 :
+        (value == 0 ? 0 : ((bits >> 16) & 0x8000U) | ((((bits >> 23) & 255U) - 112U) << 10) |
+            ((bits >> 13) & 1023U));
+    std::memcpy(ptr, &half, sizeof(half));
+}
+
+struct Scenario {
+    u32 ranks;
+    u64 count;
+    u64 stride;
+    HcclDataType dtype;
+    u64 elementSize;
+    std::vector<std::vector<uint8_t>> inputs, outputs, scratch;
+    std::vector<u32> rankList;
+
+    Scenario(u32 n, u64 c, u64 s, HcclDataType d) :
+        ranks(n), count(c), stride(s == 0 ? c : s), dtype(d), elementSize(DATATYPE_SIZE_TABLE[d]),
+        inputs(n, std::vector<uint8_t>((n * stride) * elementSize + 34, 0xD7)),
+        outputs(n, std::vector<uint8_t>(c * elementSize + 34, 0xD7)),
+        scratch(n, std::vector<uint8_t>(c * elementSize + 34, 0xD7)), rankList(n)
+    {
+        std::iota(rankList.begin(), rankList.end(), 0);
+        for (u32 src = 0; src < n; ++src) {
+            for (u32 dst = 0; dst < n; ++dst) {
+                for (u64 i = 0; i < c; ++i) {
+                    WriteValue(In(src) + (dst * stride + i) * elementSize, d, src + 1 + dst % 3 + i % 3);
+                }
+            }
+        }
+    }
+    uint8_t* In(u32 r) { return inputs[r].data() + 17; }
+    uint8_t* Out(u32 r) { return outputs[r].data() + 17; }
+    uint8_t* Tmp(u32 r) { return scratch[r].data() + 17; }
+    OpParam Param() const
+    {
+        OpParam p{};
+        p.opType = HCCL_CMD_REDUCE_SCATTER;
+        p.engine = COMM_ENGINE_AICPU_TS;
+        p.reduceType = HCCL_REDUCE_SUM;
+        p.DataDes.count = count;
+        p.DataDes.strideCount = stride;
+        p.DataDes.dataType = dtype;
+        return p;
+    }
+    TemplateResource Resources(u32 r)
+    {
+        TemplateResource res{};
+        for (u32 i = 0; i < ranks - 1; ++i) {
+            res.threads.push_back(1 + r * 16 + i);
+        }
+        for (u32 peer = 0; peer < ranks; ++peer) {
+            if (peer == r) { continue; }
+            ChannelInfo c{};
+            c.handle = 1 + r * 64 + peer;
+            c.remoteRank = peer;
+            c.remoteCclMem.addr = Tmp(peer);
+            c.remoteCclMem.size = count * elementSize;
+            res.channels[peer] = {c};
+        }
+        return res;
+    }
+    TemplateDataParams Data(u32 r, u64 processed, u64 current)
+    {
+        TemplateDataParams p{};
+        p.buffInfo.inputPtr = In(r);
+        p.buffInfo.outputPtr = Out(r);
+        p.buffInfo.hcclBuff.addr = Tmp(r);
+        p.buffInfo.hcclBuff.size = count * elementSize;
+        p.buffInfo.inBuffBaseOff = p.buffInfo.outBuffBaseOff = processed * elementSize;
+        p.inputSliceStride = stride * elementSize; // Full rank block stride, NOT this loop's size.
+        p.sliceSize = p.tailSize = current * elementSize;
+        p.count = current;
+        p.repeatNum = 1; // MC2 repeat is multiple ordered KernelRun/Orchestrate turns.
+        return p;
+    }
+    void Expand(u64 loopCount)
+    {
+        for (u32 r = 0; r < ranks; ++r) {
+            auto param = Param();
+            InsTempReduceScatterMesh1DMeshChunk alg(param, r, {rankList});
+            for (u64 processed = 0; processed < count; processed += loopCount) {
+                ASSERT_EQ(alg.KernelRun(param, Data(r, processed, std::min(loopCount, count - processed)), Resources(r)),
+                    HCCL_SUCCESS);
+            }
+        }
+    }
+    void VerifyAddresses(u64 loopCount)
+    {
+        for (const auto& t : tasks) {
+            if (t.kind != Kind::REDUCE) { continue; }
+            const u32 srcRank = (t.thread - 1) / 16;
+            const u32 dstRank = (t.target - 1) % 64;
+            const auto srcOffset = static_cast<const uint8_t*>(t.src) - In(srcRank);
+            const auto dstOffset = static_cast<uint8_t*>(t.dst) - Tmp(dstRank);
+            ASSERT_GE(srcOffset, 0);
+            ASSERT_GE(dstOffset, 0);
+            const u64 localOffset = srcOffset - dstRank * stride * elementSize;
+            ASSERT_LT(localOffset, count * elementSize);
+            EXPECT_LE(localOffset + t.count * elementSize, count * elementSize);
+            EXPECT_EQ(localOffset % (loopCount * elementSize), static_cast<u64>(dstOffset));
+            EXPECT_LE(dstOffset + t.count * elementSize, loopCount * elementSize);
+        }
+    }
+    void ExecuteAndCheck()
+    {
+        std::map<ThreadHandle, std::vector<Task>> queues;
+        for (const auto& t : tasks) { queues[t.thread].push_back(t); }
+        std::map<ThreadHandle, size_t> positions;
+        // Separate namespaces for local-thread and directed-channel notifications.
+        std::map<std::pair<uint64_t, uint32_t>, bool> channelSignals, threadSignals;
+        size_t remaining = tasks.size();
+        while (remaining != 0) {
+            bool progress = false;
+            for (auto& entry : queues) {
+                auto& pos = positions[entry.first];
+                if (pos == entry.second.size()) { continue; }
+                const auto& t = entry.second[pos];
+                auto& signals = (t.kind == Kind::CHANNEL_WAIT || t.kind == Kind::CHANNEL_RECORD) ?
+                    channelSignals : threadSignals;
+                auto key = std::make_pair(t.target, t.notify);
+                if (t.kind == Kind::CHANNEL_WAIT || t.kind == Kind::THREAD_WAIT) {
+                    if (!signals[key]) { continue; }
+                    signals[key] = false;
+                } else if (t.kind == Kind::THREAD_RECORD || t.kind == Kind::CHANNEL_RECORD) {
+                    if (t.kind == Kind::CHANNEL_RECORD) {
+                        const auto from = (t.target - 1) / 64;
+                        const auto to = (t.target - 1) % 64;
+                        key.first = 1 + to * 64 + from;
+                    }
+                    ASSERT_FALSE(signals[key]) << "Notify overwritten before wait";
+                    signals[key] = true;
+                } else if (t.kind == Kind::COPY) {
+                    std::memcpy(t.dst, t.src, t.count);
+                } else {
+                    for (u64 i = 0; i < t.count; ++i) {
+                        auto* dst = static_cast<uint8_t*>(t.dst) + i * elementSize;
+                        const auto* src = static_cast<const uint8_t*>(t.src) + i * elementSize;
+                        WriteValue(dst, dtype, ReadValue(dst, dtype) + ReadValue(src, dtype));
+                    }
+                }
+                ++pos;
+                --remaining;
+                progress = true;
+            }
+            ASSERT_TRUE(progress) << "Task dependency deadlock; remaining=" << remaining;
+        }
+        for (u32 dst = 0; dst < ranks; ++dst) {
+            for (u64 i = 0; i < count; ++i) {
+                float reference = 0;
+                for (u32 src = 0; src < ranks; ++src) {
+                    reference += ReadValue(In(src) + (dst * stride + i) * elementSize, dtype);
+                }
+                ASSERT_EQ(ReadValue(Out(dst) + i * elementSize, dtype), reference) << "rank=" << dst << " i=" << i;
+            }
+            for (u64 i = 0; i < 17; ++i) {
+                EXPECT_EQ(outputs[dst][i], 0xD7);
+                EXPECT_EQ(outputs[dst][outputs[dst].size() - 1 - i], 0xD7);
+                EXPECT_EQ(scratch[dst][i], 0xD7);
+                EXPECT_EQ(scratch[dst][scratch[dst].size() - 1 - i], 0xD7);
+            }
+        }
+    }
+};
+} // namespace
+
+TEST_F(MeshChunkTest, ChunkBoundariesConserveDataAndPreserveStridedMultiLoopAddresses)
+{
+    for (auto dtype : {HCCL_DATA_TYPE_INT8, HCCL_DATA_TYPE_FP16, HCCL_DATA_TYPE_BFP16, HCCL_DATA_TYPE_FP32}) {
+        for (u32 ranks : {2U, 4U, 8U}) {
+            const u64 e = DATATYPE_SIZE_TABLE[dtype];
+            const u64 boundary = (ranks - 1) * 4096 / e;
+            for (u64 count : {u64{3}, boundary - 1, boundary, boundary + 11}) {
+                for (u64 stride : {u64{0}, count, count + 3}) {
+                    tasks.clear();
+                    descriptors.clear();
+                    Scenario s(ranks, count * 2 + 1, stride == 0 ? 0 : count * 2 + 1 + stride - count, dtype);
+                    s.Expand(count);
+                    s.VerifyAddresses(count);
+                    // Every sender/peer covers each loop exactly once, without rank padding.
+                    std::map<std::pair<u32, u32>, u64> sent;
+                    for (const auto& t : tasks) {
+                        if (t.kind == Kind::REDUCE) {
+                            sent[{(t.thread - 1) / 16, (t.target - 1) % 64}] += t.count;
+                        }
+                    }
+                    for (const auto& pair : sent) { EXPECT_EQ(pair.second, s.count); }
+                }
+            }
+        }
+    }
+}
+
+TEST_F(MeshChunkTest, InvalidLayoutAndPreCopyFailureSubmitNoCommunication)
+{
+    Scenario s(8, 16000, 16003, HCCL_DATA_TYPE_FP16);
+    auto param = s.Param();
+    auto data = s.Data(0, 0, s.count);
+    auto res = s.Resources(0);
+    InsTempReduceScatterMesh1DMeshChunk alg(param, 0, {s.rankList});
+    data.inputSliceStride = UINT64_MAX;
+    EXPECT_EQ(alg.KernelRun(param, data, res), HCCL_E_PARA);
+    EXPECT_TRUE(tasks.empty());
+    data = s.Data(0, 0, s.count);
+    res.channels.erase(1);
+    EXPECT_EQ(alg.KernelRun(param, data, res), HCCL_E_PARA);
+    EXPECT_TRUE(tasks.empty());
+    res = s.Resources(0);
+    copyResult = HCCL_E_RUNTIME;
+    EXPECT_EQ(alg.KernelRun(param, data, res), HCCL_E_RUNTIME);
+    EXPECT_TRUE(tasks.empty());
+    EXPECT_EQ(batchCalls, 0U);
+}
