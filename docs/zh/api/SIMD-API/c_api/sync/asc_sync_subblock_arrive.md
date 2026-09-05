@@ -57,7 +57,7 @@ __aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe,
 
 ## 流水类型
 
-`PIPE_S`
+PIPE_S
 
 ## 约束说明
 

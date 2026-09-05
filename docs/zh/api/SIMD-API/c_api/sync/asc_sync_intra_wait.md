@@ -59,7 +59,7 @@ __aicore__ inline void asc_sync_intra_wait(pipe_t pipe,
 
 ## 流水类型
 
-`PIPE_S`
+PIPE_S
 
 ## 约束说明
 

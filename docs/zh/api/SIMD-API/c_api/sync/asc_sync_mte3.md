@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/sync/sync.h"`。
 
-针对PIPE_MTE3流水线执行同步操作。其作用是保证PIPE_MTE3流水线中前序指令（如UB到GM的数据搬运）全部完成后，PIPE_MTE2与PIPE_V流水线的后续指令才能开始执行。
+针对`PIPE_MTE3`执行同步操作。其作用是保证`PIPE_MTE3`中前序指令（如UB到GM的数据搬运）全部完成后，`PIPE_MTE2`与`PIPE_V`的后续指令才能开始执行。
 
 本接口为易用性接口，用于简化手工同步的编码。
 
@@ -61,7 +61,7 @@ PIPE_S
 
 ## 调用示例
 
-本示例展示`asc_sync_mte3`作为易用性接口的价值：每次迭代中，UB->GM搬出计算结果`dst0`与直接搬入的数据`dst1`后，下一轮迭代的PIPE_MTE2搬入（重新占用缓冲区）与PIPE_V计算都需要依赖该次搬出。对比代码中PIPE_MTE2到PIPE_V的同步：若手工同步，需对每条流水线分别编写`asc_sync_notify`与`asc_sync_wait`；而使用`asc_sync_mte3`一次调用即可同时完成对PIPE_MTE2与PIPE_V两条流水线的同步，减少手写代码量。
+本示例展示`asc_sync_mte3`作为易用性接口的价值：每次迭代中，UB->GM搬出计算结果`dst0`与直接搬入的数据`dst1`后，下一轮迭代的`PIPE_MTE2`搬入（重新占用缓冲区）与`PIPE_V`计算都需要依赖该次搬出。对比代码中`PIPE_MTE2`到`PIPE_V`的同步：若手工同步，需对每条流水分别编写`asc_sync_notify`与`asc_sync_wait`；而使用`asc_sync_mte3`一次调用即可同时完成对`PIPE_MTE2`与`PIPE_V`的同步，减少手写代码量。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
@@ -109,7 +109,7 @@ __global__ __vector__ void asc_sync_mte3_kernel(__gm__ float* dst0, __gm__ float
         asc_copy_gm2ub_align(y, src1 + iter * ELEMENTS, BYTES);
         asc_copy_gm2ub_align(w, src2 + iter * ELEMENTS, BYTES);
 
-        // PIPE_MTE2到PIPE_V的同步，需分别对两条流水线编写notify与wait。
+        // PIPE_MTE2到PIPE_V的同步，需分别分别编写notify与wait。
         asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
         asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
@@ -125,7 +125,7 @@ __global__ __vector__ void asc_sync_mte3_kernel(__gm__ float* dst0, __gm__ float
         asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
         asc_copy_ub2gm_align(dst0 + iter * ELEMENTS, z, BYTES);
 
-        // 一次asc_sync_mte3同时完成对PIPE_MTE2与PIPE_V两条流水线的同步，
+        // 一次asc_sync_mte3同时完成对PIPE_MTE2与PIPE_V的同步，
         // 保证本轮搬出完成后才进入下一轮迭代的搬入与计算。
         // 最后一次迭代之后不再进入下一轮，无需同步。
         if (iter != ITERATIONS - 1) {
