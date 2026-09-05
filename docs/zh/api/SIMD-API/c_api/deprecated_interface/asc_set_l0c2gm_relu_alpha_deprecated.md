@@ -1,4 +1,4 @@
-# asc_set_l0c2gm_relu_alpha
+# asc_set_l0c2gm_relu_alpha（废弃）
 
 ## 产品支持情况
 
@@ -27,6 +27,8 @@
 ## 功能说明
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
+
+**该接口已废弃，请使用[asc_set_l0c_copy_relu_alpha](../cube_datamove/asc_set_l0c_copy_relu_alpha.md)替代。**
 
 对RELU_ALPHA寄存器中的值进行设置。这是一个64bit的寄存器，存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值。
 

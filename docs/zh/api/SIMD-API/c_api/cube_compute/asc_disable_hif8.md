@@ -28,13 +28,13 @@
 
 头文件路径为：`"c_api/cube_compute/cube_compute.h"`。
 
-本接口用于设置Mmad计算关闭HiF8模式（与[asc_enable_hif8](./asc_enable_hif8.md)相反），调用此接口后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。
+本接口用于设置Mmad计算关闭HiF8模式，其作用与[asc_enable_hif8](./asc_enable_hif8.md)相反，两个接口不同时生效。关闭HiF8模式后，当矩阵乘加指令的左矩阵A和右矩阵B均以`fp8_e4m3fn_t`作为输入数据类型时，L0A Buffer和L0B Buffer中的数据在参与矩阵乘法运算前不会转换为`hifloat8_t`，而是直接以`fp8_e4m3fn_t`类型参与计算。
 
 本接口为矩阵计算相关配置接口，仅在AIC上生效。
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_disable_hif8()
 ```
 
@@ -52,9 +52,9 @@ PIPE_S
 
 ## 约束说明
 
-- 本接口非AIC调用直接返回。
-- 需在[asc_mmad](./asc_mmad.md)执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
-- 与[asc_enable_hif8](./asc_enable_hif8.md)作用相反，二者不同时生效。
+- 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)、[asc_mmad_mx](./asc_mmad_mx.md)）执行前调用，确保模式配置在矩阵乘加结果生成前生效。
+- HiF8模式关闭后会持续生效，后续矩阵乘加指令若不显式重新配置，将沿用当前模式。如需开启HiF8模式，请重新调用[asc_enable_hif8](./asc_enable_hif8.md)接口。
+- 本接口仅对矩阵乘加输入数据类型为`fp8_e4m3fn_t`×`fp8_e4m3fn_t`的场景生效，其他FP8数据类型组合（`fp8_e4m3fn_t`×`fp8_e5m2_t`、`fp8_e5m2_t`×`fp8_e4m3fn_t`、`fp8_e5m2_t`×`fp8_e5m2_t`）不支持HiF8模式选择，调用本接口不产生实际作用。
 
 <!-- npu="950" id8 -->
 ## 调用示例

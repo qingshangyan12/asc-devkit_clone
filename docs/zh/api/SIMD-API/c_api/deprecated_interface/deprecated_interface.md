@@ -5,6 +5,18 @@
 - **[asc_mmad（废弃）](asc_mmad_deprecated.md)**
 - **[asc_mmad_mx（废弃）](asc_mmad_mx_deprecated.md)**
 - **[asc_mmad_sparse（废弃）](asc_mmad_sparse_deprecated.md)**
+- **[asc_enable_fp8（废弃）](asc_enable_fp8_deprecated.md)**
+- **[asc_enable_hf32_trans（废弃）](asc_enable_hf32_trans_deprecated.md)**
+- **[asc_enable_hf32_trans（废弃）](asc_enable_hf32_trans_deprecated.md)**
+
+## 矩阵计算搬运
+
+- **[asc_set_l0c2gm_config（废弃）](asc_set_l0c2gm_config_deprecated.md)**
+- **[asc_set_l0c2gm_nz2nd（废弃）](asc_set_l0c2gm_nz2nd_deprecated.md)**
+- **[asc_set_l0c2gm_relu_alpha（废弃）](./asc_set_l0c2gm_relu_alpha_deprecated.md)**
+- **[asc_set_l0c2gm_lrelu_alpha（废弃）](./asc_set_l0c2gm_lrelu_alpha_deprecated.md)**
+- **[asc_set_l0c2gm_quant_post（废弃）](asc_set_l0c2gm_quant_post_deprecated.md)**
+- **[asc_set_l0c2gm_channel_para（废弃）](asc_set_l0c2gm_channel_para_deprecated.md)**
 
 ## Memory矢量计算
 
