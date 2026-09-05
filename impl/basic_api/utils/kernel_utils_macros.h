@@ -478,6 +478,15 @@ const uint64_t KEEP_FP16 = 0;
 #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
 constexpr bool g_gm_overflow_check = true;
 constexpr uint64_t g_oomAddrRangeMaxSize = 128;
+constexpr uint64_t g_oomStorageShapeMagic = 1UL;
+constexpr uint32_t g_oomStorageShapeVersion = 1U;
+constexpr uint32_t g_oomTensorViewVersion = 1U;
+constexpr uint32_t g_oomDescriptorKindTensor = 1U;
+constexpr uint32_t g_oomDescriptorKindTensorList = 2U;
+constexpr uint64_t g_oomStorageShapeHeaderSize = 16UL;
+constexpr uint64_t g_oomTensorDescriptorHeaderSize = 16UL;
+constexpr uint64_t g_oomTensorListDescriptorHeaderSize = 24UL;
+constexpr uint64_t g_oomTensorViewDescriptorHeaderSize = 8UL;
 struct OomAddrRange {
     uintptr_t addr[g_oomAddrRangeMaxSize];
     uint64_t len[g_oomAddrRangeMaxSize];

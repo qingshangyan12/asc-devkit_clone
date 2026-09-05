@@ -86,3 +86,78 @@ TEST_F(TestDMAOom, TestOOMCheckTensorListRange)
     AscendC::GmFree((void*)argsGm1);
     AscendC::GmFree((void*)argsGm2);
 }
+
+TEST_F(TestDMAOom, TestOOMStorageShapeTensorDescriptor)
+{
+    uint8_t* metadata = static_cast<uint8_t*>(AscendC::GmAlloc(64));
+    uint8_t* tensor = static_cast<uint8_t*>(AscendC::GmAlloc(128));
+    *reinterpret_cast<uint64_t*>(metadata) = g_oomStorageShapeMagic;
+    *reinterpret_cast<uint32_t*>(metadata + 8) = g_oomStorageShapeVersion;
+    uint8_t* cursor = metadata + g_oomStorageShapeHeaderSize;
+    *reinterpret_cast<uint64_t*>(cursor) = 40;
+    *reinterpret_cast<uint32_t*>(cursor + 8) = g_oomDescriptorKindTensor;
+    *reinterpret_cast<uint32_t*>(cursor + 16) = g_oomTensorViewVersion;
+    *reinterpret_cast<uint32_t*>(cursor + 20) = 2;
+    *reinterpret_cast<uint64_t*>(cursor + 24) = 2;
+    *reinterpret_cast<uint64_t*>(cursor + 32) = 8;
+
+    OOMInit();
+    EXPECT_TRUE(OOMHasStorageShapeHeader(metadata));
+    EXPECT_TRUE(OOMTryRegisterTensorWithStorageShape(cursor, tensor, 4));
+    EXPECT_EQ(cursor, metadata + 56);
+    EXPECT_EQ(g_oomAddrArange.count, 1);
+    EXPECT_EQ(g_oomAddrArange.len[0], 64);
+
+    OOMInit();
+    uint8_t* noMagicCursor = metadata;
+    *reinterpret_cast<uint64_t*>(metadata) = 0;
+    EXPECT_FALSE(OOMHasStorageShapeHeader(noMagicCursor));
+    EXPECT_EQ(g_oomAddrArange.count, 0);
+    AscendC::GmFree(metadata);
+    AscendC::GmFree(tensor);
+}
+
+TEST_F(TestDMAOom, TestOOMStorageShapeTensorListDescriptor)
+{
+    uint8_t* tensorList = static_cast<uint8_t*>(AscendC::GmAlloc(128));
+    uint8_t* tensor0 = static_cast<uint8_t*>(AscendC::GmAlloc(128));
+    uint8_t* tensor1 = static_cast<uint8_t*>(AscendC::GmAlloc(128));
+    auto dynamicPtr = reinterpret_cast<uint64_t*>(tensorList);
+    dynamicPtr[0] = 40;
+    dynamicPtr[5] = reinterpret_cast<uint64_t>(tensor0);
+    dynamicPtr[6] = reinterpret_cast<uint64_t>(tensor1);
+
+    uint8_t* metadata = static_cast<uint8_t*>(AscendC::GmAlloc(128));
+    uint8_t* cursor = metadata;
+    *reinterpret_cast<uint64_t*>(cursor) = 72;
+    *reinterpret_cast<uint32_t*>(cursor + 8) = g_oomDescriptorKindTensorList;
+    *reinterpret_cast<uint32_t*>(cursor + 12) = 0;  // U mode
+    *reinterpret_cast<uint64_t*>(cursor + 16) = 2;
+    *reinterpret_cast<uint32_t*>(cursor + 24) = g_oomTensorViewVersion;
+    *reinterpret_cast<uint32_t*>(cursor + 28) = 2;
+    *reinterpret_cast<uint64_t*>(cursor + 32) = 2;
+    *reinterpret_cast<uint64_t*>(cursor + 40) = 8;
+    *reinterpret_cast<uint32_t*>(cursor + 48) = g_oomTensorViewVersion;
+    *reinterpret_cast<uint32_t*>(cursor + 52) = 2;
+    *reinterpret_cast<uint64_t*>(cursor + 56) = 3;
+    *reinterpret_cast<uint64_t*>(cursor + 64) = 4;
+
+    OOMInit();
+    EXPECT_TRUE(OOMTryRegisterTensorListWithStorageShape(cursor, tensorList, 4));
+    EXPECT_EQ(g_oomAddrArange.count, 2);
+    EXPECT_EQ(g_oomAddrArange.len[0], 64);
+    EXPECT_EQ(g_oomAddrArange.len[1], 48);
+
+    OOMInit();
+    cursor = metadata;
+    *reinterpret_cast<uint32_t*>(cursor + 12) = 1;  // F mode
+    EXPECT_TRUE(OOMTryRegisterTensorListWithStorageShape(cursor, tensorList, 4));
+    EXPECT_EQ(g_oomAddrArange.count, 2);
+    EXPECT_EQ(g_oomAddrArange.len[0], 64);
+    EXPECT_EQ(g_oomAddrArange.len[1], 48);
+
+    AscendC::GmFree(metadata);
+    AscendC::GmFree(tensorList);
+    AscendC::GmFree(tensor0);
+    AscendC::GmFree(tensor1);
+}

@@ -473,7 +473,9 @@ the superkernel cannot be integrated with the operator.",
             ((max_tiling_size + 7) // 8) * 8
             + 8
             + 8 * DFXSectionGenerator().param_placeholder_num
+            + 16  # Optional OOM storage-shape extension header.
         )
+        js["oom"] = {"version": 1, "tensor_version": 1}
     else:
         op_param_size = max_tiling_size + 8
 
