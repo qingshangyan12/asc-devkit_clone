@@ -60,9 +60,10 @@ PIPE_S
 
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，编译运行命令如下：
+将以下代码保存为`example.asc`后，执行如下编译运行命令：
 
 ```bash
+# Atlas A3训练系列产品/Atlas A3推理系列产品/Atlas A2训练系列产品/Atlas A2推理系列产品，对应NPU架构为`dav-2201`。
 bisheng example.asc -o main --npu-arch=dav-2201 && ./main
 ```
 
