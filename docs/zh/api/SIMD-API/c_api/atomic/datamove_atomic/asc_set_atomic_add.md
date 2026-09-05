@@ -105,10 +105,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 #include <cstdint>
 #include <iostream>
 #include <vector>
-#include "c_api/atomic/datamove_atomic.h"
-#include "c_api/sync/sync.h"
-#include "c_api/utils/sys_init.h"
-#include "c_api/vector_datamove/vector_datamove.h"
+#include "c_api/asc_simd.h"
 #include "acl/acl.h"
 
 namespace {
