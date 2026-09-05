@@ -24,7 +24,29 @@ MAKE_ENUM(
 
 class ExceptionInfo {
 public:
-    static std::string GetErrorMsg(const ExceptionType& type);
+    __attribute__((visibility("hidden")))
+    static std::string GetErrorMsg(const ExceptionType& type)
+    {
+        // Keep exception construction independent of HCOMM's private message symbols.
+        static const std::map<ExceptionType, std::string> errorMessages{
+            {ExceptionType::NULL_PTR_EXCEPTION, "Null pointer exception: "},
+            {ExceptionType::INVALID_PARAMS_EXCEPTION, "Invalid params exception: "},
+            {ExceptionType::TIMEOUT_EXCEPTION, "Time out exception: "},
+            {ExceptionType::DRV_API_EXCEPTION, "Drv api exception: "},
+            {ExceptionType::NETWORK_API_EXCEPTION, "Network api exception: "},
+            {ExceptionType::RUNTIME_API_EXCEPTION, "Runtime api exception: "},
+            {ExceptionType::RESOURCES_NOT_EXIST_EXCEPTION, "Resources not exist exception: "},
+            {ExceptionType::NOT_SUPPORT_EXCEPTION, "Not support exception: "},
+            {ExceptionType::INTERNAL_EXCEPTION, "Internal exception: "},
+            {ExceptionType::RMA_CONN_EXCEPTION, "RMA connection exception: "},
+            {ExceptionType::SOCKET_EXCEPTION, "Socket exception: "},
+            {ExceptionType::RES_UNPACKAGE_EXCEPTION, "Resource unpackage exception:"},
+            {ExceptionType::HOST_IP_NOT_FOUND_EXCEPTION, "environment variable exception: "},
+            {ExceptionType::TRACE_API_EXCEPTION, "Trace api exception: "},
+            {ExceptionType::CCU_API_EXCEPTION, "Ccu api exception: "},
+            {ExceptionType::SUSPENDING_EXCEPTION, "Suspending exception: "}};
+        return errorMessages.at(type);
+    }
 
     static HcclResult GetErrorCode(const ExceptionType& type);
 
