@@ -18,6 +18,23 @@
 #include <cstddef>
 namespace mc2_ops_hccl {
 
+namespace {
+template <typename InsAlgTemplate>
+auto SetChannelsPerRankIfSupported(
+    InsAlgTemplate& algTemplate, const std::map<u32, std::vector<ChannelInfo>>& channels, int)
+    -> decltype(algTemplate.SetchannelsPerRank(channels))
+{
+    return algTemplate.SetchannelsPerRank(channels);
+}
+
+template <typename InsAlgTemplate>
+HcclResult SetChannelsPerRankIfSupported(
+    InsAlgTemplate&, const std::map<u32, std::vector<ChannelInfo>>&, long)
+{
+    return HCCL_SUCCESS;
+}
+} // namespace
+
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2AllGatherSoleExecutor()
 {}
@@ -129,6 +146,10 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         templateAlgRes.channels.size(), templateAlgRes.threads.size());
     // 构建template
     InsAlgTemplate algTemplate(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
+    if (param.engine == CommEngine::COMM_ENGINE_AICPU_TS &&
+        std::string(param.algName) == "AicpuAllGatherSoleMesh" && !templateAlgRes.channels.empty()) {
+        CHK_RET(SetChannelsPerRankIfSupported(algTemplate, templateAlgRes.channels, 0));
+    }
     u32 templateScratchMultiplier =
         algTemplate.CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
     maxTmpMemSize_ = tempAlgParams.buffInfo.hcclBuff.size;
@@ -142,7 +163,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     } else {
         maxDataSizePerLoop = transportBoundDataSize;
     }
-    if (param.supportSymmetricMemory) {
+    if (param.supportSymmetricMemory && std::string(param.algName) == "AicpuAllGatherSoleMesh") {
         maxDataSizePerLoop = dataSize_;
     }
     u64 maxCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
@@ -190,7 +211,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
 }
 
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleMesh, InsV2AllGatherSoleExecutor, TopoMatch1D,
     InsTempAllGatherMesh1D);
 
 REGISTER_EXEC_V2(
