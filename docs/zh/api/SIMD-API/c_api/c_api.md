@@ -316,6 +316,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_copy_ub2l1](vector_datamove/asc_copy_ub2l1.md)|将数据从UB搬运到L1 Buffer。|`c_api/vector_datamove/vector_datamove.h`|
 |[asc_copy_ub2ub](vector_datamove/asc_copy_ub2ub.md)|将数据从UB搬运到UB。|`c_api/vector_datamove/vector_datamove.h`|
 |[asc_ndim_copy_gm2ub](vector_datamove/asc_ndim_copy_gm2ub.md)|多维数据搬运接口，将数据从Global Memory (GM)搬运到UB。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_ndim_copy_dci](vector_datamove/asc_ndim_copy_dci.md)|执行N维搬运场景所需的数据缓存失效（Data Cache Invalidate，DCI）操作。|`c_api/vector_datamove/vector_datamove.h`|
 |[asc_set_copy_pad_val](vector_datamove/asc_set_copy_pad_val.md)|和asc_copy_gm2ub_align或asc_copy_ub2gm_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。|`c_api/vector_datamove/vector_datamove.h`|
 |[asc_set_gm2ub_loop1_stride](vector_datamove/asc_set_gm2ub_loop1_stride.md)|使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到UB时，设置内层循环中相邻迭代数据块间的间隔。|`c_api/vector_datamove/vector_datamove.h`|
 |[asc_set_gm2ub_loop2_stride](vector_datamove/asc_set_gm2ub_loop2_stride.md)|使用[asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)将数据从Global Memory (GM)搬运到UB时，设置外层循环中相邻迭代数据块间的间隔。|`c_api/vector_datamove/vector_datamove.h`|
@@ -793,4 +794,15 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_mmad(废弃)](deprecated_interface/asc_mmad_deprecated.md)|矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad_mx(废弃)](deprecated_interface/asc_mmad_mx_deprecated.md)|带有量化系数的矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad_sparse(废弃)](deprecated_interface/asc_mmad_sparse_deprecated.md)|稀疏矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|
+|[asc_copy_gm2ub_align_arch_3510（废弃）](deprecated_interface/asc_copy_gm2ub_align_arch_3510_deprecated.md)|提供数据非对齐搬运的功能，将数据从Global Memory搬运到Unified Buffer，并支持8位/16位/32位数据类型搬运。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_copy_gm2ub_align_sync_arch_2201（废弃）](deprecated_interface/asc_copy_gm2ub_align_sync_arch_2201_deprecated.md)|提供数据非对齐搬运的功能，将数据从Global Memory搬运到Unified Buffer，并支持8位/16位/32位数据类型搬运。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_copy_gm2ub_sync_arch_2201（废弃）](deprecated_interface/asc_copy_gm2ub_sync_arch_2201_deprecated.md)|将数据从Global Memory (GM)搬运到Unified Buffer (UB)。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_copy_gm2ub_sync_arch_3510（废弃）](deprecated_interface/asc_copy_gm2ub_sync_arch_3510_deprecated.md)|将数据从Global Memory (GM)搬运到Unified Buffer (UB)。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_copy_ub2gm_align_arch_3510（废弃）](deprecated_interface/asc_copy_ub2gm_align_arch_3510_deprecated.md)|提供数据非对齐搬运的功能，将数据从Unified Buffer (UB)搬运到Global Memory (GM)，并支持8位/16位/32位数据类型搬运。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_copy_ub2gm_align_sync_arch_2201（废弃）](deprecated_interface/asc_copy_ub2gm_align_sync_arch_2201_deprecated.md)|提供数据非对齐搬运的功能，将数据从Unified Buffer (UB)搬运到Global Memory (GM)，并支持8位/16位/32位数据类型搬运。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_copy_ub2gm_sync_arch_2201（废弃）](deprecated_interface/asc_copy_ub2gm_sync_arch_2201_deprecated.md)|将数据从Unified Buffer (UB)搬运到Global Memory (GM)。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_copy_ub2gm_sync_arch_3510（废弃）](deprecated_interface/asc_copy_ub2gm_sync_arch_3510_deprecated.md)|将数据从Unified Buffer (UB)搬运到Global Memory (GM)。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_copy_ub2l1_sync（废弃）](deprecated_interface/asc_copy_ub2l1_deprecated.md)|将数据从Unified Buffer (UB)搬运到L1 Buffer。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_copy_ub2ub_sync（废弃）](deprecated_interface/asc_copy_ub2ub_deprecated.md)|将数据从Unified Buffer (UB)搬运到UB。|`c_api/vector_datamove/vector_datamove.h`|
+|[asc_ndim_copy_gm2ub（废弃）](deprecated_interface/asc_ndim_copy_gm2ub_deprecated.md)|多维数据搬运接口，将数据从Global Memory (GM)搬运到Unified Buffer (UB)。|`c_api/vector_datamove/vector_datamove.h`|
 | [asc_transto5hd_sync（废弃）](deprecated_interface/asc_transto5hd_sync_deprecated.md) | 数据格式转换接口。 |
