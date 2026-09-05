@@ -47,6 +47,8 @@ This example introduces the usage of the asc_dump series APIs on the simd_vf sid
   - `desc`: Print control descriptor
   - `dump_size`: Number of data elements per single dump
 
+  > **Note:** A Reg dump is limited to one VL (256 bytes) per call. Requests larger than one VL are truncated to the register capacity. For example, `float` can dump at most 64 elements, so `dump_size=128` is truncated to 64.
+
 - Invocation implementation
 
   Use `asc_vf_call<FuncName>()` inside the `__global__ __vector__` kernel function to call simd_vf functions for dump printing, then perform computation through `AscendC::Adds` and write results back to GM. The host side reads and writes binary data through `ReadFile`/`WriteFile`.
