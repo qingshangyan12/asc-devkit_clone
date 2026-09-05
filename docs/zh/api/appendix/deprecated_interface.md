@@ -1,5 +1,15 @@
 # 废弃接口<a name="ZH-CN_TOPIC_0000001724165365"></a>
 
+## 基础API
+
+- [WriteGmByPassDCache\(ISASI\)](../SIMD-API/basic_api/deprecated_interface/WriteGmByPassDCache_ISASI_deprecated.md)接口
+
+    此接口后续版本会废弃，请使用[WriteGmBypassDCache\(ISASI\)](../SIMD-API/basic_api/scalar_compute/WriteGmBypassDCache_ISASI.md)接口。
+
+- [ReadGmByPassDCache\(ISASI\)](../SIMD-API/basic_api/deprecated_interface/ReadGmByPassDCache_ISASI_deprecated.md)接口
+
+    此接口后续版本会废弃，请使用[ReadGmBypassDCache\(ISASI\)](../SIMD-API/basic_api/scalar_compute/ReadGmBypassDCache_ISASI.md)接口。
+
 ## C API
 
 ### 数据搬运
@@ -180,14 +190,6 @@
 
     此接口后续版本会废弃，请使用[asc_storealign_pack_quarter_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md)接口。
 
-- [asc_storealign (repeat stride)](../SIMD-API/c_api/reg_compute/store/asc_storealign_v5_deprecated.md)接口
-
-    此接口后续版本会废弃，请使用[asc_storealign_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md)接口。
-
-- [asc_storealign_postupdate (repeat stride)](../SIMD-API/c_api/reg_compute/store/asc_storealign_v5_deprecated.md)接口
-
-    此接口后续版本会废弃，请使用[asc_storealign_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md)接口。
-
 - [asc_storealign (多模式重载)](../SIMD-API/c_api/reg_compute/store/asc_storealign.md)接口
 
     原 `asc_storealign(dst, src, mask)` 通过函数名重载实现NORM/FIRST/PACK/PACKV2/INTLV等多种搬出模式，现收窄为仅NORM模式，其他模式拆分到独立函数。请使用[asc_storealign](../SIMD-API/c_api/reg_compute/store/asc_storealign.md)的新版本。
@@ -224,10 +226,22 @@
 
     此接口后续版本会废弃，请使用[asc_squeeze_and_storeunalign](../SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)接口。
 
+- [asc_storeunalign_postupdate](../SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md)接口（掩码寄存器搬出模式的b8数据类型原型）
+
+    此接口后续版本会废弃，请使用b16或b32数据类型原型。
+
 <!-- end id7 -->
 
 <!-- npu="950" id8 -->
 ### Reg矢量计算
+
+- [asc_and](../SIMD-API/c_api/deprecated_interface/asc_and_deprecated.md)接口（浮点类型重载）
+
+    `asc_and`的浮点类型重载已废弃，请按位宽选择对应整数重载替代，详情请参见[asc_and](../SIMD-API/c_api/reg_compute/reg_logic/asc_and.md)。
+
+- [asc_or](../SIMD-API/c_api/deprecated_interface/asc_or_deprecated.md)接口（浮点类型重载）
+
+    `asc_or`的浮点类型重载已废弃，请按位宽选择对应整数重载替代，详情请参见[asc_or](../SIMD-API/c_api/reg_compute/reg_logic/asc_or.md)。
 
 - [asc_float2bfloat16](../SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md)接口（通过接口后缀来控制目的操作数写入位置的三参数原型）
 
@@ -480,3 +494,6 @@
 
     使用`uint8_t unit_flag`入参的`asc_mmad_sparse()`接口已废弃，请使用[asc_mmad_sparse](../SIMD-API/c_api/cube_compute/asc_mmad_sparse.md)接口。`asc_mmad_sparse_sync()`接口已废弃，请使用[asc_mmad_sparse](../SIMD-API/c_api/cube_compute/asc_mmad_sparse.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
 <!-- end id10 -->
+- [asc_transto5hd_sync（废弃）](../SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md)接口
+
+    此接口已废弃。请使用[asc_transto5hd](../SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../SIMD-API/c_api/sync/asc_sync.md)接口。
