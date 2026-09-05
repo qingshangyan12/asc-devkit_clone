@@ -19,6 +19,8 @@
 #include "data_type.h"
 #include "reduce_in.h"
 #include "not_support_exception.h"
+#include "drv_api_exception.h"
+#include "exception_util.h"
 #include "ub_jetty_lite.h"
 
 #include "ascend_hal.h"
@@ -176,7 +178,23 @@ public:
         MACRO_THROW(NotSupportException, StringFormat("not supported."));
     }
 
-    u32 QuerySqHead() const;
+    inline u32 QuerySqHead() const
+    {
+        // Keep live SQ diagnostics independent of HCOMM's private C++ exports.
+        halSqCqQueryInfo queryInfo{};
+        queryInfo.tsId = 0;
+        queryInfo.sqId = sqId_;
+        queryInfo.cqId = 0;
+        queryInfo.type = DRV_NORMAL_TYPE;
+        queryInfo.prop = DRV_SQCQ_PROP_SQ_HEAD;
+        drvError_t ret = halSqCqQuery(localDevId_, &queryInfo);
+        if (ret != DRV_ERROR_NONE) {
+            THROW<DrvApiException>(StringFormat(
+                "RtsqBase::%s call halSqCqQuery failed, localDevId %u, sqId %u, ret %d", __func__, localDevId_,
+                sqId_, ret));
+        }
+        return queryInfo.value[0];
+    }
     u32 QuerySqTail() const;
 
     virtual bool IsRtsqQueueSpaceSufficient() { return true; }
