@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/utils/sys_var.h"`。
+
 获取系统内存管理单元（System Memory Management Unit，SMMU）版本信息。常用于在运行时判断当前SMMU的版本或发布日期，以便进行版本相关的处理。
 
 ## 函数原型

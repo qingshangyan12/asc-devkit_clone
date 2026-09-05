@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/utils/sys_var.h"`。
+
 获取当前AI Core的编号。一个AI Core中包含1个AIC和若干个AIV，[内置变量](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#section199434523343)中的`block_idx`、`sub_block_idx`用于获取的是一个AI Core内部AIC或AIV的索引，而本接口获取的是一个AI Core相对其余AI Core的索引，二者层级不同。
 
 该接口常用于按核编号对任务进行划分，使不同的AI Core处理不同的数据分片，以实现多核并行。

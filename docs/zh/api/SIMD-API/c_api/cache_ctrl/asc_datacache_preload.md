@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/cache_ctrl/cache_ctrl.h"`。
+
 从Global Memory的指定地址预加载一个Cache Line（64字节）的数据到DCache中，为后续Scalar单元对该地址的读取操作提前填充缓存，降低首次访问延迟。
 
 预取地址由`address`与`offset`相加得到，单位为字节。

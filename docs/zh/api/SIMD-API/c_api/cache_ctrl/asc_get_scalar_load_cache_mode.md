@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/cache_ctrl/cache_ctrl.h"`。
+
 读取当前标量读（load）路径的L2 Cache管理策略，并返回[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值。该值可通过[asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md)接口设置，关于策略的详细说明请参考该接口。
 
 常用于临时切换策略前保存原配置，或在设置后做回读校验。
