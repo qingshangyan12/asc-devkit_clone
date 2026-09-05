@@ -113,7 +113,7 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 
 #### 通过接口立即数偏移搬出
 
-调用`asc_storealign`的立即数偏移搬出模式。每个`offset`均相对`dst`基地址，单位为元素；本样例中的8个固定偏移覆盖1024个`half`元素。
+调用`asc_storealign`的立即数偏移搬出模式。`offset`相对`dst`基地址，单位为元素；本样例通过`i * 128`计算8次搬出的偏移，覆盖1024个`half`元素。
 
 ```cpp
 vector_half src0_reg;
@@ -125,32 +125,7 @@ for (uint16_t i = 0; i < REPEAT_TIMES; ++i) {
     asc_loadalign(src0_reg, src0 + i * one_repeat_size);
     asc_loadalign(src1_reg, src1 + i * one_repeat_size);
     asc_add(dst_reg, src0_reg, src1_reg, mask);
-    switch (i) {
-        case 0:
-            asc_storealign(dst, dst_reg, 0, mask);
-            break;
-        case 1:
-            asc_storealign(dst, dst_reg, 128, mask);
-            break;
-        case 2:
-            asc_storealign(dst, dst_reg, 256, mask);
-            break;
-        case 3:
-            asc_storealign(dst, dst_reg, 384, mask);
-            break;
-        case 4:
-            asc_storealign(dst, dst_reg, 512, mask);
-            break;
-        case 5:
-            asc_storealign(dst, dst_reg, 640, mask);
-            break;
-        case 6:
-            asc_storealign(dst, dst_reg, 768, mask);
-            break;
-        default:
-            asc_storealign(dst, dst_reg, 896, mask);
-            break;
-    }
+    asc_storealign(dst, dst_reg, i * 128, mask);
 }
 ```
 
