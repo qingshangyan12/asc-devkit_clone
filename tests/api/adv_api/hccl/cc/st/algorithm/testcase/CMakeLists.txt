@@ -111,3 +111,19 @@ add_custom_command(
 )
 
 add_subdirectory(mc2_ccu)
+
+# Isolate primitive interception from the existing simulator and production libraries.
+set(MESHCHUNK_TEST_TARGET ascendc_ut_adv_api_hccl_cc_meshchunk)
+add_executable(${MESHCHUNK_TEST_TARGET} main.cc reduce_scatter_meshchunk_testcase.cc)
+target_include_directories(${MESHCHUNK_TEST_TARGET} PRIVATE ${HCCL_CHECKER_COMMON_INCLUDE_LIST})
+target_compile_options(${MESHCHUNK_TEST_TARGET} PRIVATE -std=c++14 -Werror -O0 -g -D_GLIBCXX_USE_CXX11_ABI=0)
+target_compile_definitions(${MESHCHUNK_TEST_TARGET} PRIVATE UT_TEST AICPU_COMPILE)
+get_target_property(MESHCHUNK_TEST_LIBS ${HCCL_CHECKER_TARGET} LINK_LIBRARIES)
+target_link_libraries(${MESHCHUNK_TEST_TARGET} PRIVATE ${MESHCHUNK_TEST_LIBS})
+foreach(primitive HcommIsSupportHcommBatchTransferOnThread HcclHcommBatchTransferOnThread
+        HcommChannelNotifyRecordOnThread HcommChannelNotifyWaitOnThread HcommWriteReduceOnThread
+        HcommThreadNotifyRecordOnThread HcommThreadNotifyWaitOnThread HcommLocalCopyOnThread)
+    target_link_options(${MESHCHUNK_TEST_TARGET} PRIVATE "-Wl,--wrap=${primitive}")
+endforeach()
+run_llt_test(TARGET ${MESHCHUNK_TEST_TARGET} TASK_NUM 1)
+add_dependencies(${HCCL_CHECKER_TARGET} ${MESHCHUNK_TEST_TARGET})
