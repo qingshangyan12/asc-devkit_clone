@@ -15,28 +15,28 @@ Reg数据搬出接口用于将矢量数据寄存器、掩码寄存器或非对�
 | 接口名称 | 模式 | 功能简述 | 目的地址对齐要求 |
 | --- | --- | --- | --- |
 | [asc_storealign](asc_storealign.md) | 连续对齐搬出 | 按`mask`将一个VL（256字节）矢量数据寄存器的数据连续写入UB。 | 32字节对齐。 |
-| [asc_storealign](asc_storealign.md) | 立即数偏移搬出 | 按`mask`将一个VL的数据写入`dst_align32b + offset`，`offset`单位为元素。 | 32字节对齐。 |
+| [asc_storealign](asc_storealign.md) | 立即数偏移搬出 | 按`mask`将一个VL的数据写入`dst + offset`，`offset`单位为元素。 | 32字节对齐。 |
 | [asc_storealign](asc_storealign.md) | 地址寄存器偏移搬出 | 按`mask`将一个VL的数据写入由`addr_reg`指定的偏移地址。 | 32字节对齐。 |
 | [asc_storealign](asc_storealign.md) | 非连续对齐搬出 | 按`block_stride`和`repeat_stride`配置8个DataBlock的写入位置。 | 32字节对齐。 |
 | [asc_storealign_postupdate](asc_storealign_postupdate.md) | 立即数偏移Post Update搬出 | 按`mask`连续搬出一个VL，并按元素偏移自动更新目的地址指针。 | 32字节对齐。 |
 | [asc_storealign_postupdate](asc_storealign_postupdate.md) | 非连续对齐Post Update搬出 | 按步长配置8个DataBlock的写入位置，并按32字节单位自动更新目的地址指针。 | 32字节对齐。 |
-| [asc_store](asc_store.md) | 连续搬出 | 将整个矢量数据寄存器搬出，单次搬出量为一个VL。 | `dtype`对齐。 |
-| [asc_store](asc_store.md) | 带搬出数量搬出 | 将矢量数据寄存器前`count`个元素搬出。 | `dtype`对齐。 |
 | [asc_storealign_1st](asc_storealign_1st.md) | 首元素搬出 | 将矢量数据寄存器的首个元素写入UB。 | `dtype`对齐。 |
-| [asc_storealign_1st](asc_storealign_1st.md) | 首元素立即数偏移搬出 | 将首个元素写入`dst_align32b + offset`，`offset`单位为元素。 | `dtype`对齐。 |
+| [asc_storealign_1st](asc_storealign_1st.md) | 首元素立即数偏移搬出 | 将首个元素写入`dst + offset`，`offset`单位为元素。 | `dtype`对齐。 |
 | [asc_storealign_1st](asc_storealign_1st.md) | 首元素地址寄存器偏移搬出 | 将首个元素写入由`addr_reg`指定的偏移地址。 | `dtype`对齐。 |
 | [asc_storealign_1st_postupdate](asc_storealign_1st_postupdate.md) | 首元素Post Update搬出 | 搬出首个元素后，按元素偏移自动更新目的地址指针。 | `dtype`对齐。 |
 | [asc_storealign_intlv](asc_storealign_intlv.md) | 交织连续搬出 | 将两个矢量数据寄存器按元素交织后搬出，单次搬出量为`2 x VL`（512字节）。 | 32字节对齐。 |
-| [asc_storealign_intlv](asc_storealign_intlv.md) | 交织立即数偏移搬出 | 将两个寄存器交织后写入`dst_align32b + offset`，`offset`单位为元素。 | 32字节对齐。 |
+| [asc_storealign_intlv](asc_storealign_intlv.md) | 交织立即数偏移搬出 | 将两个寄存器交织后写入`dst + offset`，`offset`单位为元素。 | 32字节对齐。 |
 | [asc_storealign_intlv](asc_storealign_intlv.md) | 交织地址寄存器偏移搬出 | 将两个寄存器交织后写入由`addr_reg`指定的偏移地址。 | 32字节对齐。 |
 | [asc_storealign_pack](asc_storealign_pack.md) | 压缩连续搬出 | 按`mask`将有效元素的低半部分bit压缩后写入UB。 | 32字节对齐。 |
-| [asc_storealign_pack](asc_storealign_pack.md) | 压缩立即数偏移搬出 | 将压缩结果写入`dst_align32b + offset`，`offset`单位为元素。 | 32字节对齐。 |
+| [asc_storealign_pack](asc_storealign_pack.md) | 压缩立即数偏移搬出 | 将压缩结果写入`dst + offset`，`offset`单位为元素。 | 32字节对齐。 |
 | [asc_storealign_pack](asc_storealign_pack.md) | 压缩地址寄存器偏移搬出 | 将压缩结果写入由`addr_reg`指定的偏移地址。 | 32字节对齐。 |
 | [asc_storealign_pack_postupdate](asc_storealign_pack_postupdate.md) | 压缩Post Update搬出 | 压缩搬出后，按元素偏移自动更新目的地址指针。 | 32字节对齐。 |
 | [asc_storealign_pack_quarter](asc_storealign_pack_quarter.md) | Quarter Pack连续搬出 | 按`mask`将有效32位元素的低8bit压缩后写入UB。 | 32字节对齐。 |
-| [asc_storealign_pack_quarter](asc_storealign_pack_quarter.md) | Quarter Pack立即数偏移搬出 | 将Quarter Pack压缩结果写入`dst_align32b + offset`，`offset`单位为元素。 | 32字节对齐。 |
+| [asc_storealign_pack_quarter](asc_storealign_pack_quarter.md) | Quarter Pack立即数偏移搬出 | 将Quarter Pack压缩结果写入`dst + offset`，`offset`单位为元素。 | 32字节对齐。 |
 | [asc_storealign_pack_quarter](asc_storealign_pack_quarter.md) | Quarter Pack地址寄存器偏移搬出 | 将Quarter Pack压缩结果写入由`addr_reg`指定的偏移地址。 | 32字节对齐。 |
 | [asc_storealign_pack_quarter_postupdate](asc_storealign_pack_quarter_postupdate.md) | Quarter Pack Post Update搬出 | Quarter Pack压缩搬出后，按元素偏移自动更新目的地址指针。 | 32字节对齐。 |
+| [asc_store](asc_store.md) | 连续搬出 | 将整个矢量数据寄存器搬出，单次搬出量为一个VL。32字节对齐场景建议使用`asc_storealign`，非32字节对齐场景建议使用`asc_storeunalign`。 | `dtype`对齐。 |
+| [asc_store](asc_store.md) | 带搬出数量搬出 | 将矢量数据寄存器前`count`个元素搬出。32字节对齐场景建议使用`asc_storealign`，非32字节对齐场景建议使用`asc_storeunalign`。 | `dtype`对齐。 |
 
 #### 非对齐搬出
 
@@ -48,7 +48,7 @@ Reg数据搬出接口用于将矢量数据寄存器、掩码寄存器或非对�
 | --- | --- | --- | --- | --- |
 | [asc_storeunalign](asc_storeunalign.md) | 带搬出数量搬出 | 将前`count`个元素搬出；主块写入UB，尾块暂存至非对齐寄存器。目的地址由用户手动更新。 | `dtype`对齐，无需32字节对齐。 | [asc_storeunalign_post](asc_storeunalign_post.md)的立即数偏移搬出模式。 |
 | [asc_storeunalign_postupdate](asc_storeunalign_postupdate.md) | 立即数偏移Post Update搬出 | 将前`count`个元素搬出，并自动将目的地址指针更新`count`个元素；尾块暂存至非对齐寄存器。 | `dtype`对齐，无需32字节对齐。 | [asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)。 |
-| [asc_storeunalign_postupdate](asc_storeunalign_postupdate.md) | 地址寄存器偏移Post Update搬出 | 固定搬出一个VL，使用并自动更新`addr_reg`偏移；尾块暂存至非对齐寄存器。 | `dtype`对齐，无需32字节对齐。 | [asc_storeunalign_post](asc_storeunalign_post.md)的地址寄存器偏移搬出模式。 |
+| [asc_storeunalign_postupdate](asc_storeunalign_postupdate.md) | 地址寄存器偏移Post Update搬出 | 固定搬出一个VL，使用并自动更新`addr_reg& count`表示的目的地址偏移；尾块暂存至非对齐寄存器。 | `dtype`对齐，无需32字节对齐。 | [asc_storeunalign_post](asc_storeunalign_post.md)的地址寄存器偏移搬出模式。 |
 | [asc_storeunalign_post](asc_storeunalign_post.md) | 立即数偏移后处理 | 将非对齐寄存器中的尾块写入UB。 | `dtype`对齐，无需32字节对齐。 | 用于`asc_storeunalign`，以及`asc_storeunalign_postupdate`的掩码寄存器搬出模式收尾。 |
 | [asc_storeunalign_post](asc_storeunalign_post.md) | 地址寄存器偏移后处理 | 通过`addr_reg`指定尾块写入位置。 | `dtype`对齐，无需32字节对齐。 | 用于`asc_storeunalign_postupdate`的地址寄存器偏移搬出模式收尾。 |
 | [asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md) | Post Update后处理 | 将非对齐寄存器中的尾块写入UB，并按元素偏移自动更新目的地址指针。 | `dtype`对齐，无需32字节对齐。 | 用于`asc_storeunalign_postupdate`的立即数偏移搬出模式收尾。 |
