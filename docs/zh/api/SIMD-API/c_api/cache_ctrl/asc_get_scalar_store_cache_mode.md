@@ -54,19 +54,4 @@ PIPE_S
 
 ## 调用示例
 
-场景：与[asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md)场景B一致。多核算子通过[asc_atomic_add](../atomic/scalar_atomic/asc_atomic_add.md)向GM统计counter做标量原子累加；进入累加前查询并保存当前store策略，临时切换为`NOTALLOC_CLEAN`避免不必要的L2分配，累加结束后恢复原策略。
-
-```cpp
-__gm__ int32_t* counter_gm;  // GM上的多核共享计数器
-
-// 查询并保存当前标量store策略
-asc_store_l2_cache_mode old_mode = asc_get_scalar_store_cache_mode();
-// 标量原子写GM控制字段，避免额外L2分配
-asc_set_scalar_cache_mode(asc_store_l2_cache_mode::NOTALLOC_CLEAN);
-
-asc_dcci_entire_all();  // 标量原子操作前保证DCache一致性
-asc_atomic_add(counter_gm, 1);
-
-// 恢复进入本段逻辑前的标量store策略
-asc_set_scalar_cache_mode(old_mode);
-```
+本接口用于保存标量store路径当前策略，完整调用示例请参考[asc_set_scalar_cache_mode的场景B](asc_set_scalar_cache_mode.md#asc_set_scalar_cache_mode_scenario_b)。

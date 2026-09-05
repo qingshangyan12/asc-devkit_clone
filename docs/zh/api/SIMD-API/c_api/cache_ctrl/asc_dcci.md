@@ -100,13 +100,90 @@ PIPE_S
 
 ## 调用示例
 
+将以下代码保存为`example.asc`后，执行对应的编译运行命令。
+
+<!-- npu="950" id9 -->
+
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id9 -->
+
 ```cpp
-// 示例：SINGLE_CACHE_LINE模式（x_gm 64B对齐场景）
-// 假设x为外部传入的地址，每个核计算16个数据，block_idx为内置变量，通过block_idx计算偏移实现多核间数据隔离
-__gm__ float* x_gm = x + block_idx * 16;
-for (int i = 0; i < 16; i++) {
-    x_gm[i] = static_cast<float>(i + block_idx);
+// 本示例验证asc_dcci_entire_out对GM脏数据的回写效果。GM中的数据初始值为11，
+// Scalar先在两个不同Cache Line中写入101，此时101仅保存在DCache中。随后通过asc_load_dev
+// 绕过DCache读取GM，得到刷新前的11；调用asc_dcci_entire_out后再次读取，应得到回写后的101。
+#include <array>
+#include <cstdint>
+#include <iostream>
+
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr int32_t GM_VALUE = 11;
+constexpr int32_t DIRTY_VALUE = 101;
+constexpr uint32_t SECOND_LINE_OFFSET = 32;
+constexpr uint32_t DATA_COUNT = 64;
+constexpr uint32_t OUTPUT_COUNT = 4;
+
+__global__ __vector__ void AscDcciEntireOutKernel(__gm__ int32_t* data, __gm__ int32_t* output)
+{
+    asc_init();
+    volatile __gm__ int32_t* data_gm = data;
+    // 两个元素相隔128B，位于不同Cache Line。普通Scalar写GM会经过DCache。
+    data_gm[0] = DIRTY_VALUE;
+    data_gm[SECOND_LINE_OFFSET] = DIRTY_VALUE;
+
+    // asc_load_dev绕过DCache，读取尚未被回写的GM初始值。
+    const int32_t before_first = asc_load_dev(data);
+    const int32_t before_second = asc_load_dev(data + SECOND_LINE_OFFSET);
+
+    // 刷新DCache中包含GM地址的Cache Line，并等待脏数据写回GM。
+    asc_dcci_entire_out();
+    asc_sync_data_barrier(mem_dsb_t::DSB_DDR);
+
+    const int32_t after_first = asc_load_dev(data);
+    const int32_t after_second = asc_load_dev(data + SECOND_LINE_OFFSET);
+    asc_store_dev(output, before_first);
+    asc_store_dev(output + 1, before_second);
+    asc_store_dev(output + 2, after_first);
+    asc_store_dev(output + 3, after_second);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
 }
-// 由于首地址64B对齐，调用asc_dcci_single指令后，数据会立刻刷新到Global Memory
-asc_dcci_single(reinterpret_cast<__gm__ uint64_t*>(x_gm));
+
+bool CheckResult(const std::array<int32_t, OUTPUT_COUNT>& output)
+{
+    return output[0] == GM_VALUE && output[1] == GM_VALUE &&
+           output[2] == DIRTY_VALUE && output[3] == DIRTY_VALUE;
+}
+} // namespace
+
+int main()
+{
+    std::array<int32_t, DATA_COUNT> input{};
+    std::array<int32_t, OUTPUT_COUNT> output{};
+    input.fill(GM_VALUE);
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+
+    int32_t* input_device = nullptr;
+    int32_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), input.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, input.size() * sizeof(int32_t), input.data(), input.size() * sizeof(int32_t), ACL_MEMCPY_HOST_TO_DEVICE);
+    AscDcciEntireOutKernel<<<1, 0>>>(input_device, output_device);
+    const aclError ret = aclrtSynchronizeDevice();
+    aclrtMemcpy(output.data(), output.size() * sizeof(int32_t), output_device, output.size() * sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
+
+    const bool passed = ret == ACL_SUCCESS && CheckResult(output);
+    std::cout << (passed ? "[Success] asc_dcci passed." : "[Failed] asc_dcci failed.") << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

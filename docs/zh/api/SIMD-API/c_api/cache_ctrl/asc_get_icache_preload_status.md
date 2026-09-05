@@ -58,6 +58,4 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
-int64_t status = asc_get_icache_preload_status();
-```
+本接口需在调用[asc_icache_preload](./asc_icache_preload.md)后使用，完整调用示例请参考[asc_icache_preload的调用示例](./asc_icache_preload.md#调用示例)。

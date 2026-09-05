@@ -61,9 +61,94 @@ PIPE_S
 
 ## 调用示例
 
+将以下代码保存为`example.asc`后，执行对应的编译运行命令。
+
+<!-- npu="950" id8 -->
+
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
+
 ```cpp
-// 假设x为外部传入的地址，每个核计算16个数据，block_idx为内置变量，通过block_idx计算偏移实现多核间数据隔离
-__gm__ float* x_gm = x + block_idx * 16;
-int64_t cacheOffset = 0;
-asc_datacache_preload(reinterpret_cast<__gm__ uint64_t*>(x_gm), cacheOffset);
+// 本示例用于功能验证，不代表实际算子实现。
+// 它模拟Scalar单元通过间接索引读取GM中的分散数据，并提前将下一次访问的Cache Line预取到DCache，
+// 以减少后续Scalar读取的访存等待。
+#include <cstdint>
+#include <iostream>
+#include <vector>
+
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr uint32_t DATA_SIZE = 256;
+constexpr uint32_t INDEX_COUNT = 4;
+constexpr uint32_t DATA_BYTES = DATA_SIZE * sizeof(uint8_t);
+constexpr uint32_t INDEX_BYTES = INDEX_COUNT * sizeof(uint32_t);
+
+__global__ __vector__ void AscDatacachePreloadKernel(__gm__ uint8_t* data, __gm__ uint32_t* indices,
+    __gm__ uint32_t* result, uint32_t count)
+{
+    asc_init();
+    if (count == 0) {
+        result[0] = 0;
+        return;
+    }
+
+    // indices保存待访问数据的字节偏移。本例先预取首个索引所在的64B Cache Line，
+    // 再在读取当前数据时预取下一索引所在的Cache Line。这样可让下一轮Scalar读取
+    // 更可能命中DCache；偏移向下按64B对齐，保证预取范围覆盖目标数据。
+    uint32_t current_index = indices[0];
+    int64_t cache_offset = static_cast<int64_t>(current_index & ~63ULL);
+    // 首轮预取当前索引所在的Cache Line，后续循环提前预取下一轮要读取的数据。
+    asc_datacache_preload(reinterpret_cast<__gm__ uint64_t*>(data), cache_offset);
+
+    uint32_t sum = 0;
+    for (uint32_t i = 0; i < count; ++i) {
+        sum += data[current_index];
+        if (i + 1 < count) {
+            current_index = indices[i + 1];
+            cache_offset = static_cast<int64_t>(current_index & ~63ULL);
+            asc_datacache_preload(reinterpret_cast<__gm__ uint64_t*>(data), cache_offset);
+        }
+    }
+    result[0] = sum;
+}
+} // namespace
+
+int main()
+{
+    std::vector<uint8_t> data(DATA_SIZE);
+    for (uint32_t i = 0; i < DATA_SIZE; ++i) {
+        data[i] = static_cast<uint8_t>(i);
+    }
+    std::vector<uint32_t> indices = {0, 64, 128, 192};
+    uint32_t result = 0;
+    constexpr uint32_t GOLDEN = 384;
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    uint8_t* data_device = nullptr;
+    uint32_t* indices_device = nullptr;
+    uint32_t* result_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&data_device), DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&indices_device), INDEX_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&result_device), sizeof(uint32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(data_device, DATA_BYTES, data.data(), DATA_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(indices_device, INDEX_BYTES, indices.data(), INDEX_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    AscDatacachePreloadKernel<<<1, 0>>>(data_device, indices_device, result_device, INDEX_COUNT);
+    const aclError ret = aclrtSynchronizeDevice();
+    aclrtMemcpy(&result, sizeof(uint32_t), result_device, sizeof(uint32_t), ACL_MEMCPY_DEVICE_TO_HOST);
+    const bool passed = ret == ACL_SUCCESS && result == GOLDEN;
+    std::cout << (passed ? "[Success] asc_datacache_preload passed."
+                         : "[Failed] asc_datacache_preload failed.") << std::endl;
+    aclrtFree(data_device);
+    aclrtFree(indices_device);
+    aclrtFree(result_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

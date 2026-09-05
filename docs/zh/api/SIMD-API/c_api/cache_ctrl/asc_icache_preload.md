@@ -69,8 +69,147 @@ PIPE_S
     ```
 ## 调用示例
 
+将以下代码保存为`example.asc`后，执行对应的编译运行命令。
+
+<!-- npu="950" id8 -->
+
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
+
 ```cpp
-int64_t prefetch_length = 7;
-int64_t pc = asc_get_program_counter() & 0xFFFFFFFFFFFF;
-asc_icache_preload(reinterpret_cast<void *>(pc), prefetch_length);
+// 本示例仅用于演示asc_icache_preload接口功能，不代表实际算子场景。
+// 本示例展示在`__mix__(1, 2)`修饰的融合算子中，AIC完成矩阵乘法并将float结果写入GM后，两个AIV分别将结果转换为bfloat16_t的场景。
+// 当AIV中ICache miss性能时，在AIV等待AIC期间通过asc_icache_preload接口预取指令，可以减少AIV中ICache miss，进而提升性能。
+#include <cstdint>
+#include <iostream>
+#include <vector>
+
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr uint32_t MATRIX_DIM = 16;
+constexpr uint32_t MATRIX_ELEMENTS = MATRIX_DIM * MATRIX_DIM;
+constexpr uint32_t ELEMENTS_PER_AIV = MATRIX_ELEMENTS / 2;
+constexpr uint32_t INPUT_BYTES = MATRIX_ELEMENTS * sizeof(half);
+constexpr uint32_t FP32_RESULT_BYTES = MATRIX_ELEMENTS * sizeof(float);
+constexpr uint32_t BF16_OUTPUT_BYTES = MATRIX_ELEMENTS * sizeof(bfloat16_t);
+constexpr uint32_t FP32_BYTES_PER_AIV = ELEMENTS_PER_AIV * sizeof(float);
+constexpr uint32_t BF16_BYTES_PER_AIV = ELEMENTS_PER_AIV * sizeof(bfloat16_t);
+constexpr uint32_t DATA_BLOCK_BYTES = 32;
+constexpr uint16_t BF16_VALUE_16 = 0x4180;
+constexpr int64_t OUTPUT_READY_FLAG_ID = 0;
+
+// 需要根据AIV中的指令总量、ICache容量等多方面因素选取合适的预期长度（单位为2KB）。
+constexpr int64_t PREFETCH_LENGTH = 2;
+constexpr int64_t PC_ADDRESS_MASK = 0xFFFFFFFFFFFF;
+
+__global__ __mix__(1, 2) void MatmulCastKernel(
+    __gm__ half* input, __gm__ float* matmul_result, __gm__ bfloat16_t* output, __gm__ int64_t* preload_status)
+{
+    asc_init();
+    __cbuf__ half matrix_a_l1[MATRIX_ELEMENTS];
+    __cbuf__ half matrix_b_l1[MATRIX_ELEMENTS];
+    __ca__ half matrix_a_l0[MATRIX_ELEMENTS];
+    __cb__ half matrix_b_l0[MATRIX_ELEMENTS];
+    __cc__ float matmul_result_l0[MATRIX_ELEMENTS];
+
+    if ASC_IS_AIC {
+        // AIC直接将两个输入矩阵从GM搬入L1 Buffer。
+        asc_copy_gm2l1(matrix_a_l1, input, 1, INPUT_BYTES / DATA_BLOCK_BYTES, 0, 0, 0);
+        asc_copy_gm2l1(matrix_b_l1, input, 1, INPUT_BYTES / DATA_BLOCK_BYTES, 0, 0, 0);
+        asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
+        asc_copy_l12l0a(matrix_a_l0, matrix_a_l1, 0, 0, 1, 1, 1, 1);
+        asc_copy_l12l0b_transpose(matrix_b_l0, matrix_b_l1, 0, 0, 1, 1, 1, 1);
+        asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
+        asc_mmad(
+            matmul_result_l0, matrix_a_l0, matrix_b_l0, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, 0, false, false, true);
+        asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
+        asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
+        asc_set_l0c_copy_params(1, 1, 1);
+        asc_copy_l0c2gm(matmul_result, matmul_result_l0, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, MATRIX_DIM, 0, 0, 0,
+            static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
+            static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+        asc_sync_block_arrive(PIPE_FIX, OUTPUT_READY_FLAG_ID);
+    }
+
+    if ASC_IS_AIV {
+        // AIV即将等待AIC写出矩阵乘法结果，在等待前预取后续转换所需的指令。
+        const int64_t pc = asc_get_program_counter() & PC_ADDRESS_MASK;
+        asc_icache_preload(reinterpret_cast<void*>(pc), PREFETCH_LENGTH);
+        // 预取状态仅用于调试，查询结果为0表示完成，为1表示仍在进行。
+        asc_store_dev(preload_status + asc_get_sub_block_id(), asc_get_icache_preload_status());
+
+        // 等待AIC完成矩阵乘法结果的写出。
+        asc_sync_block_wait(PIPE_MTE2, OUTPUT_READY_FLAG_ID);
+
+        const uint32_t aiv_index = asc_get_sub_block_id();
+        __ubuf__ float result_ub[ELEMENTS_PER_AIV];
+        __ubuf__ bfloat16_t output_ub[ELEMENTS_PER_AIV];
+        asc_copy_gm2ub_align(result_ub, matmul_result + aiv_index * ELEMENTS_PER_AIV, FP32_BYTES_PER_AIV);
+        asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+        asc_float2bfloat16_rn(output_ub, result_ub, ELEMENTS_PER_AIV);
+        asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+        asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+        asc_copy_ub2gm_align(output + aiv_index * ELEMENTS_PER_AIV, output_ub, BF16_BYTES_PER_AIV);
+    }
+
+    asc_sync_pipe(PIPE_ALL);
+}
+
+bool CheckResult(const std::vector<float>& matmul_result, const std::vector<uint16_t>& output)
+{
+    for (uint32_t i = 0; i < MATRIX_ELEMENTS; ++i) {
+        if (matmul_result[i] != static_cast<float>(MATRIX_DIM) ||
+            output[i] != BF16_VALUE_16) {
+            return false;
+        }
+    }
+    return true;
+}
+} // namespace
+
+int main()
+{
+    std::vector<half> input(MATRIX_ELEMENTS, static_cast<half>(1.0F));
+    std::vector<float> matmul_result(MATRIX_ELEMENTS, 0.0F);
+    std::vector<uint16_t> output(MATRIX_ELEMENTS, 0);
+    half* input_device = nullptr;
+    float* matmul_result_device = nullptr;
+    bfloat16_t* output_device = nullptr;
+    int64_t* preload_status_device = nullptr;
+    std::vector<int64_t> preload_status(2, -1);
+
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), INPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&matmul_result_device), FP32_RESULT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), BF16_OUTPUT_BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&preload_status_device), preload_status.size() * sizeof(int64_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, INPUT_BYTES, input.data(), INPUT_BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+    MatmulCastKernel<<<1, 0>>>(input_device, matmul_result_device, output_device, preload_status_device);
+    const aclError ret = aclrtSynchronizeDevice();
+    aclrtMemcpy(matmul_result.data(), FP32_RESULT_BYTES, matmul_result_device, FP32_RESULT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    aclrtMemcpy(output.data(), BF16_OUTPUT_BYTES, output_device, BF16_OUTPUT_BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+    aclrtMemcpy(preload_status.data(), preload_status.size() * sizeof(int64_t), preload_status_device,
+        preload_status.size() * sizeof(int64_t), ACL_MEMCPY_DEVICE_TO_HOST);
+
+    const bool passed = ret == ACL_SUCCESS && CheckResult(matmul_result, output);
+    std::cout << "ICache preload status: " << preload_status[0] << ", " << preload_status[1] << std::endl;
+    std::cout << (passed ? "[Success] asc_icache_preload passed." : "[Failed] asc_icache_preload failed.") << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(matmul_result_device);
+    aclrtFree(output_device);
+    aclrtFree(preload_status_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```

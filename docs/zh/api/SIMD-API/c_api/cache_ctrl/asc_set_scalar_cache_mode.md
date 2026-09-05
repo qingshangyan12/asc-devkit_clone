@@ -73,36 +73,132 @@ PIPE_S
 
 ## 调用示例
 
-- 场景A：标量load — `NORMAL_FIRST_VICTIM`+循环内重复读GM tiling表
+将以下任一场景的代码保存为`example.asc`后，执行对应的编译运行命令。
 
-动态tiling存放在GM上：`tiling_gm[0]`为`tile_count`，后续依次为各tile的`length`与`offset`。循环内每个tile都会标量读取tiling字段，同一tiling区域会被多次访问，适合启用L2复用。若tiling字段只读一次、后续不再访问，应改用`NOTALLOC_KEEP`或无需调用本接口。
+<!-- npu="950" id8 -->
 
-```cpp
-__gm__ int32_t* tiling_gm;   // [tile_count, len[0..n-1], off[0..n-1]]
-__gm__ half* src_gm;
-__ubuf__ half* dst_ub;
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
-// SIMD_VF外：tiling表将在循环内被多次标量读取
-asc_set_scalar_cache_mode(asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
-
-int32_t tile_count = tiling_gm[0];
-for (int32_t tile = 0; tile < tile_count; ++tile) {
-    int32_t tile_len = tiling_gm[1 + tile];              // 每tile标量读GM
-    int32_t tile_off = tiling_gm[1 + tile_count + tile]; // 每tile标量读GM
-    asc_copy_gm2ub_align(dst_ub, src_gm + tile_off, tile_len * sizeof(half));
-    // 向量搬运的l2_cache_mode由asc_copy_gm2ub_align单独配置，见set_l2_cache_mode样例
-    // ... 向量计算 ...
-}
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 
-- 场景B：标量store — `NOTALLOC_CLEAN`+标量写GM
+<!-- end id8 -->
 
-多核算子向GM统计counter做标量原子累加时，临时关闭标量写路径的L2分配，避免对控制字段产生不必要的Cache Line分配。
+- 场景A：标量load使用`NORMAL_FIRST_VICTIM`读取GM tiling表。<a id="asc_set_scalar_cache_mode_scenario_a"></a>
 
-```cpp
-__gm__ int32_t* counter_gm;  // GM上的多核共享计数器
+  动态tiling存放在GM上：`tiling_gm[0]`为`tile_count`，后续依次为各tile的`length`与`offset`。循环内会重复读取同一tiling区域，适合启用L2复用。
 
-asc_set_scalar_cache_mode(asc_store_l2_cache_mode::NOTALLOC_CLEAN);
-asc_dcci_entire_all();       // 标量原子操作前保证DCache一致性
-asc_atomic_add(counter_gm, 1);
-```
+    ```cpp
+    #include <array>
+    #include <cstdint>
+    #include <iostream>
+
+    #include "c_api/asc_simd.h"
+    #include "acl/acl.h"
+
+    namespace {
+    constexpr uint32_t TILE_COUNT = 3;
+    constexpr uint32_t TILING_ELEMENTS = 1 + 2 * TILE_COUNT;
+    constexpr uint32_t READ_PASSES = 2;
+
+    __global__ __vector__ void ScalarLoadCacheModeKernel(__gm__ int32_t* tiling, __gm__ int32_t* output)
+    {
+        asc_init();
+        const asc_load_l2_cache_mode old_mode = asc_get_scalar_load_cache_mode();
+        asc_set_scalar_cache_mode(asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM);
+
+        // 重复读取GM中的tiling表，标量load策略在此生效。
+        const int32_t tile_count = asc_load_dev(tiling);
+        int32_t sum = 0;
+        for (uint32_t pass = 0; pass < READ_PASSES; ++pass) {
+            for (int32_t tile = 0; tile < tile_count; ++tile) {
+                const int32_t length = asc_load_dev(tiling + 1 + tile);
+                const int32_t offset = asc_load_dev(tiling + 1 + tile_count + tile);
+                sum += length + offset;
+            }
+        }
+
+        asc_set_scalar_cache_mode(old_mode);
+        asc_store_dev(output, sum);
+        asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    }
+    } // namespace
+
+    int main()
+    {
+        const std::array<int32_t, TILING_ELEMENTS> tiling = {3, 1, 2, 3, 0, 16, 32};
+        constexpr int32_t expected = 108;
+        int32_t output = 0;
+        int32_t* tiling_device = nullptr;
+        int32_t* output_device = nullptr;
+
+        aclInit(nullptr);
+        aclrtSetDevice(0);
+        aclrtMalloc(reinterpret_cast<void**>(&tiling_device), tiling.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+        aclrtMalloc(reinterpret_cast<void**>(&output_device), sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+        aclrtMemcpy(tiling_device, tiling.size() * sizeof(int32_t), tiling.data(), tiling.size() * sizeof(int32_t), ACL_MEMCPY_HOST_TO_DEVICE);
+        ScalarLoadCacheModeKernel<<<1, 0>>>(tiling_device, output_device);
+        const aclError ret = aclrtSynchronizeDevice();
+        aclrtMemcpy(&output, sizeof(int32_t), output_device, sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
+
+        const bool passed = ret == ACL_SUCCESS && output == expected;
+        std::cout << (passed ? "[Success] scalar load cache mode passed." : "[Failed] scalar load cache mode failed.") << std::endl;
+        aclrtFree(tiling_device);
+        aclrtFree(output_device);
+        aclrtResetDevice(0);
+        aclFinalize();
+        return passed ? 0 : 1;
+    }
+    ```
+
+- 场景B：标量store使用`NOTALLOC_CLEAN`更新GM共享计数器。<a id="asc_set_scalar_cache_mode_scenario_b"></a>
+
+  多个核通过标量原子加更新同一GM计数器，临时关闭标量写路径的L2分配，避免对控制字段产生不必要的Cache Line分配。
+
+    ```cpp
+    #include <cstdint>
+    #include <iostream>
+
+    #include "c_api/asc_simd.h"
+    #include "acl/acl.h"
+
+    namespace {
+    constexpr uint32_t BLOCK_COUNT = 4;
+
+    __global__ __vector__ void ScalarStoreCacheModeKernel(__gm__ uint32_t* counter)
+    {
+        asc_init();
+        const asc_store_l2_cache_mode old_mode = asc_get_scalar_store_cache_mode();
+        asc_set_scalar_cache_mode(asc_store_l2_cache_mode::NOTALLOC_CLEAN);
+
+        // 原子写GM前刷新DCache，避免脏数据影响共享计数器。
+        asc_dcci_entire_all();
+        asc_atomic_add(counter, 1U);
+
+        asc_set_scalar_cache_mode(old_mode);
+        asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    }
+    } // namespace
+
+    int main()
+    {
+        uint32_t counter = 0;
+        uint32_t* counter_device = nullptr;
+
+        aclInit(nullptr);
+        aclrtSetDevice(0);
+        aclrtMalloc(reinterpret_cast<void**>(&counter_device), sizeof(uint32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+        aclrtMemcpy(counter_device, sizeof(uint32_t), &counter, sizeof(uint32_t), ACL_MEMCPY_HOST_TO_DEVICE);
+        ScalarStoreCacheModeKernel<<<BLOCK_COUNT, 0>>>(counter_device);
+        const aclError ret = aclrtSynchronizeDevice();
+        aclrtMemcpy(&counter, sizeof(uint32_t), counter_device, sizeof(uint32_t), ACL_MEMCPY_DEVICE_TO_HOST);
+
+        const bool passed = ret == ACL_SUCCESS && counter == BLOCK_COUNT;
+        std::cout << (passed ? "[Success] scalar store cache mode passed." : "[Failed] scalar store cache mode failed.") << std::endl;
+        aclrtFree(counter_device);
+        aclrtResetDevice(0);
+        aclFinalize();
+        return passed ? 0 : 1;
+    }
+    ```

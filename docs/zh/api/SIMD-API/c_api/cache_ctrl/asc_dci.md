@@ -59,7 +59,76 @@ asc_dci();
 
 ## 调用示例
 
+将以下代码保存为`example.asc`后，执行对应的编译运行命令。
+
+<!-- npu="950" id8 -->
+
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+<!-- end id8 -->
+
 ```cpp
-asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
-asc_dci();
+#include <array>
+#include <cstdint>
+#include <iostream>
+
+#include "c_api/asc_simd.h"
+#include "acl/acl.h"
+
+namespace {
+constexpr int32_t GM_VALUE = 11;
+constexpr int32_t DIRTY_VALUE = 101;
+constexpr uint32_t DATA_COUNT = 16;
+
+__global__ __vector__ void AscDciKernel(__gm__ int32_t* data, __gm__ int32_t* output)
+{
+    asc_init();
+    // 本示例用于验证asc_dci不会将DCache中的脏数据回写到GM。Scalar先将GM地址写为脏值，
+    // 失效后再次通过Scalar读取该地址，应从GM重新加载初始值，而非得到脏值。
+    volatile __gm__ int32_t* data_gm = data;
+    data_gm[0] = DIRTY_VALUE;
+
+    // 等待前序访存完成后，使整个DCache失效，直接丢弃其中的脏数据。
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+    asc_dci();
+
+    const int32_t value_after_dci = data_gm[0];
+    asc_store_dev(output, value_after_dci);
+    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
+}
+
+bool CheckResult(int32_t output)
+{
+    return output == GM_VALUE;
+}
+} // namespace
+
+int main()
+{
+    std::array<int32_t, DATA_COUNT> input{};
+    input.fill(GM_VALUE);
+    int32_t output = 0;
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+
+    int32_t* input_device = nullptr;
+    int32_t* output_device = nullptr;
+    aclrtMalloc(reinterpret_cast<void**>(&input_device), input.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(input_device, input.size() * sizeof(int32_t), input.data(), input.size() * sizeof(int32_t), ACL_MEMCPY_HOST_TO_DEVICE);
+    AscDciKernel<<<1, 0>>>(input_device, output_device);
+    const aclError ret = aclrtSynchronizeDevice();
+    aclrtMemcpy(&output, sizeof(int32_t), output_device, sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
+
+    const bool passed = ret == ACL_SUCCESS && CheckResult(output);
+    std::cout << (passed ? "[Success] asc_dci passed." : "[Failed] asc_dci failed.") << std::endl;
+    aclrtFree(input_device);
+    aclrtFree(output_device);
+    aclrtResetDevice(0);
+    aclFinalize();
+    return passed ? 0 : 1;
+}
 ```
