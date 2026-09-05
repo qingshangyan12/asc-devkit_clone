@@ -534,8 +534,11 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_bfloat162half](reg_compute/reg_convert/asc_bfloat162half.md)|将bfloat16_t类型转换为half类型，并支持多种舍入模式和饱和/非饱和模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_bfloat162int32](reg_compute/reg_convert/asc_bfloat162int32.md)|将bfloat16_t类型数据转换为int32_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_ceil](reg_compute/reg_convert/asc_ceil.md)|将源操作数中的浮点数元素按照CEIL（向正无穷方向舍入）模式舍入到整数值，结果保持原浮点数据类型。|`c_api/reg_compute/reg_convert.h`|
+|[asc_e4m32float](reg_compute/reg_convert/asc_e4m32float.md)|将fp8_e4m3fn_t类型转换为float类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2bfloat16](reg_compute/reg_convert/asc_float2bfloat16.md)|将float类型转换为bfloat16_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
+|[asc_float2e4m3](reg_compute/reg_convert/asc_float2e4m3.md)|将float类型转换为fp8_e4m3fn_t类型，支持RINT舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2half](reg_compute/reg_convert/asc_float2half.md)|将float类型转换为half类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
+|[asc_float2hif8](reg_compute/reg_convert/asc_float2hif8.md)|将float类型转换为hifloat8_t类型，并支持ROUND和HYBRID舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2int16](reg_compute/reg_convert/asc_float2int16.md)|将float类型转换为int16_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2int32](reg_compute/reg_convert/asc_float2int32.md)|将float类型转换为int32_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2int64](reg_compute/reg_convert/asc_float2int64.md)|将float类型转换为int64_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
@@ -723,15 +726,11 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_clear_ar_spr（废弃）](reg_compute/reg_permute_sel/asc_clear_ar_spr_deprecated.md)|对AR寄存器进行清理。请使用[asc_squeeze_and_storeunalign_init](reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md)替换。|`c_api/reg_compute/compute/reg_permute_sel.h`|
 |[asc_create_iter_reg (废弃)](reg_compute/reg_addr_reg/asc_create_iter_reg_deprecated.md)|该接口已废弃，请使用asc_update_addr_reg实现此功能。|`c_api/reg_compute/compute/reg_addr_reg.h`|
 |[asc_e1m2x22bfloat16 (废弃)](reg_compute/reg_convert/asc_e1m2x22bfloat16_deprecated.md)|将fp4x2_e1m2_t类型转换为bfloat16_t类型。|`c_api/reg_compute/reg_convert.h`|
-|[asc_e2m1x22bfloat16 (废弃)](reg_compute/reg_convert/asc_e2m1x22bfloat16_deprecated.md)|将fp4x2_e2m1_t类型转换为bfloat16_t类型。|`c_api/reg_compute/reg_convert.h`|
-|[asc_e4m32float (废弃)](reg_compute/reg_convert/asc_e4m32float_deprecated.md)|将fp8_e4m3fn_t类型转换为float类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_e5m22float (废弃)](reg_compute/reg_convert/asc_e5m22float_deprecated.md)|将vector_fp8_e5m2_t类型的源操作数以256B为单位分为四部分，读取其中一部分元素，将其转换成vector_float类型并写入目的操作数。|`c_api/reg_compute/reg_convert.h`|
 |[asc_exp_sub（废弃）](deprecated_interface/asc_exp_sub_deprecated.md)|`half`输入且不带`src_pos`参数的`asc_exp_sub`原型以及`asc_exp_sub_v2`原型已废弃，`half`输入请使用`asc_exp_sub_half2float`原型（显式传入`src_pos`参数）。|`c_api/reg_compute/compute/reg_fused.h`|
 |[asc_float2bfloat16（废弃）](deprecated_interface/asc_float2bfloat16_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
-|[asc_float2e4m3 (废弃)](reg_compute/reg_convert/asc_float2e4m3_deprecated.md)|将float类型转换为fp8_e4m3fn_t类型，支持RINT舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2e5m2 (废弃)](reg_compute/reg_convert/asc_float2e5m2_deprecated.md)|将float类型数据转换为fp8_e5m2类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2half（废弃）](deprecated_interface/asc_float2half_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
-|[asc_float2hif8 (废弃)](reg_compute/reg_convert/asc_float2hif8_deprecated.md)|将float类型转换为hifloat8_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2int16（废弃）](deprecated_interface/asc_float2int16_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2int64（废弃）](deprecated_interface/asc_float2int64_deprecated.md)|通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_get_ar_spr (废弃)](spr/asc_get_ar_spr_deprecated.md)|读取指定特殊寄存器的值。|`c_api/spr/spr.h`|

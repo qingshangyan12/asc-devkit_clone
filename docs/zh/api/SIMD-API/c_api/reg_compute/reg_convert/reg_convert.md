@@ -4,8 +4,11 @@
 - **[asc_bfloat162half](asc_bfloat162half.md)**
 - **[asc_bfloat162int32](asc_bfloat162int32.md)**
 - **[asc_ceil](asc_ceil.md)**
+- **[asc_e4m32float](asc_e4m32float.md)**
 - **[asc_float2bfloat16](asc_float2bfloat16.md)**
+- **[asc_float2e4m3](asc_float2e4m3.md)**
 - **[asc_float2half](asc_float2half.md)**
+- **[asc_float2hif8](asc_float2hif8.md)**
 - **[asc_float2int16](asc_float2int16.md)**
 - **[asc_float2int32](asc_float2int32.md)**
 - **[asc_float2int64](asc_float2int64.md)**
@@ -45,12 +48,11 @@
 - **[asc_bfloat162e2m1x2 (废弃)](asc_bfloat162e2m1x2_deprecated.md)**
 - **[asc_e1m2x22bfloat16 (废弃)](asc_e1m2x22bfloat16_deprecated.md)**
 - **[asc_e2m1x22bfloat16 (废弃)](asc_e2m1x22bfloat16_deprecated.md)**
-- **[asc_e4m32float (废弃)](asc_e4m32float_deprecated.md)**
 - **[asc_e5m22float (废弃)](asc_e5m22float_deprecated.md)**
 - **[asc_float2bfloat16（废弃）](../../deprecated_interface/asc_float2bfloat16_deprecated.md)**
-- **[asc_float2e4m3 (废弃)](asc_float2e4m3_deprecated.md)**
+- **[asc_float2e4m3 (废弃)](../../deprecated_interface/asc_float2e4m3_deprecated.md)**
 - **[asc_float2e5m2 (废弃)](asc_float2e5m2_deprecated.md)**
-- **[asc_float2hif8 (废弃)](asc_float2hif8_deprecated.md)**
+- **[asc_float2hif8 (废弃)](../../deprecated_interface/asc_float2hif8_deprecated.md)**
 - **[asc_half2int4x2 (废弃)](asc_half2int4x2_deprecated.md)**
 - **[asc_hif82float (废弃)](asc_hif82float_deprecated.md)**
 - **[asc_int322int16（废弃）](../../deprecated_interface/asc_int322int16_deprecated.md)**

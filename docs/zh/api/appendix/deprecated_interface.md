@@ -399,15 +399,15 @@
 
     此接口后续版本会废弃。
 
-- [asc_float2e4m3](../SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3_deprecated.md)接口
+- [asc_float2e4m3](../SIMD-API/c_api/deprecated_interface/asc_float2e4m3_deprecated.md)接口
 
     此接口后续版本会废弃。
 
-- [asc_e4m32float](../SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float_deprecated.md)接口
+- [asc_e4m32float](../SIMD-API/c_api/deprecated_interface/asc_e4m32float_deprecated.md)接口
 
     此接口后续版本会废弃。
 
-- [asc_float2hif8](../SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8_deprecated.md)接口
+- [asc_float2hif8](../SIMD-API/c_api/deprecated_interface/asc_float2hif8_deprecated.md)接口
 
     此接口后续版本会废弃。
 
