@@ -89,14 +89,16 @@ __simd_callee__ inline uint32_t reserve_dump_tlv(__ubuf__ BlockVFBufInfo* block_
                                                ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE - sizeof(DumpTensorTlv) :
                                                0;
     if (dump_size > max_dump_data_len / sizeof(T)) {
-        block_info->flag = 1;
         return 0;
     }
 
     const uint32_t align_dump_len = align_up(dump_size * sizeof(T), data_block_size);
     const uint32_t tlv_len = sizeof(DumpTensorTlv) + align_dump_len;
     uint32_t write_len = block_info->writeLen;
-    if (tlv_len > block_info->length || write_len > block_info->length) {
+    if (tlv_len > block_info->length) {
+        return 0;
+    }
+    if (write_len > block_info->length) {
         block_info->flag = 1;
         return 0;
     }

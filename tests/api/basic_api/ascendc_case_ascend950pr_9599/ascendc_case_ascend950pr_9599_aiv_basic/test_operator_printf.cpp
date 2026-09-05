@@ -12,6 +12,7 @@
 #include <mockcpp/mockcpp.hpp>
 #include <vector>
 #include "kernel_operator.h"
+#include "utils/debug/asc_dump.h"
 #include "utils/debug/asc_printf.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -28,6 +29,17 @@ __aicore__ inline uint32_t asc_debug_get_core_idx()
 using namespace AscendC;
 
 enum class PrintfCaseEnum : uint32_t { VALUE = 9 };
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+namespace {
+constexpr uint16_t TEST_SIMD_VF_PRINTF_BLOCK_IDX = 5;
+
+void InitSimdVfPrintfBuffer(BlockVFBufInfo& blockInfo)
+{
+    __asc_simd_vf::get_printf_ubuf_addr(reinterpret_cast<uint64_t>(&blockInfo), TEST_SIMD_VF_PRINTF_BLOCK_IDX);
+}
+} // namespace
+#endif
 
 class TestPrintfSuite : public testing::Test {
 protected:
@@ -130,3 +142,26 @@ TEST_F(TestPrintfSuite, DumpBlockIdxAndSysVarCase)
     sub_block_idx = subBlockIdxTmp;
     g_taskRation = taskRationTmp;
 }
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+TEST_F(TestPrintfSuite, OversizeSimdVfPrintfDoesNotBlockFollowingPrintf)
+{
+    BlockVFBufInfo blockInfo;
+    InitSimdVfPrintfBuffer(blockInfo);
+    char oversizedFmt[ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE + 2] = {};
+    for (uint32_t i = 0; i < ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE + 1; ++i) {
+        oversizedFmt[i] = 'x';
+    }
+
+    __asc_simd_vf::printf(reinterpret_cast<__ubuf__ const char*>(oversizedFmt));
+    EXPECT_EQ(blockInfo.flag, 0U);
+    EXPECT_EQ(blockInfo.writeLen, 0U);
+
+    __asc_simd_vf::printf("after oversize");
+
+    auto* printTlv = reinterpret_cast<__asc_simd_vf::PrintTlv*>(blockInfo.buffer);
+    EXPECT_EQ(blockInfo.flag, 0U);
+    EXPECT_EQ(printTlv->type, static_cast<uint32_t>(__asc_simd_vf::DumpType::DUMP_SCALAR));
+    EXPECT_EQ(printTlv->blockIdx, TEST_SIMD_VF_PRINTF_BLOCK_IDX);
+}
+#endif

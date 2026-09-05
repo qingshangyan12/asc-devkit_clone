@@ -40,11 +40,19 @@ int32_t RaiseStubForDumpTensor(int32_t input);
 namespace {
 constexpr uint16_t TEST_SIMD_VF_BLOCK_IDX = 3;
 constexpr uint32_t TEST_SIMD_VF_DUMP_DESC = 630;
+constexpr uint32_t TEST_SIMD_VF_DUMP_DESC_AFTER_OVERSIZE = 631;
 constexpr uint32_t TEST_SIMD_VF_DUMP_SIZE = 1;
+constexpr uint32_t TEST_SIMD_VF_OVERSIZE_DUMP_SIZE =
+    (ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE - sizeof(__asc_simd_vf::DumpTensorTlv)) / sizeof(uint32_t) + 1;
+
+void InitSimdVfDumpBuffer(BlockVFBufInfo& blockInfo)
+{
+    __asc_simd_vf::get_printf_ubuf_addr(reinterpret_cast<uint64_t>(&blockInfo), TEST_SIMD_VF_BLOCK_IDX);
+}
 
 __asc_simd_vf::DumpTensorTlv* GetSimdVfDumpTlv(BlockVFBufInfo& blockInfo)
 {
-    __asc_simd_vf::get_printf_ubuf_addr(reinterpret_cast<uint64_t>(&blockInfo), TEST_SIMD_VF_BLOCK_IDX);
+    InitSimdVfDumpBuffer(blockInfo);
     return reinterpret_cast<__asc_simd_vf::DumpTensorTlv*>(blockInfo.buffer);
 }
 } // namespace
@@ -272,6 +280,46 @@ TEST_F(TestDumpTensorSuite, AscDumpRegWritesRegPosition)
 
     EXPECT_EQ(dumpTlv->position, static_cast<uint16_t>(__asc_simd_vf::DumpTensorPosition::REG));
     EXPECT_EQ(dumpTlv->desc, TEST_SIMD_VF_DUMP_DESC);
+    EXPECT_EQ(dumpTlv->blockIdx, TEST_SIMD_VF_BLOCK_IDX);
+}
+
+TEST_F(TestDumpTensorSuite, OversizeUbufDumpDoesNotBlockFollowingDump)
+{
+    BlockVFBufInfo blockInfo;
+    InitSimdVfDumpBuffer(blockInfo);
+    uint32_t input[TEST_SIMD_VF_DUMP_SIZE] = {0};
+
+    __asc_simd_vf::asc_dump_ubuf<uint32_t>(
+        reinterpret_cast<__ubuf__ uint32_t*>(input), TEST_SIMD_VF_DUMP_DESC, TEST_SIMD_VF_OVERSIZE_DUMP_SIZE);
+    EXPECT_EQ(blockInfo.flag, 0U);
+    EXPECT_EQ(blockInfo.writeLen, 0U);
+
+    __asc_simd_vf::asc_dump_ubuf<uint32_t>(
+        reinterpret_cast<__ubuf__ uint32_t*>(input), TEST_SIMD_VF_DUMP_DESC_AFTER_OVERSIZE, TEST_SIMD_VF_DUMP_SIZE);
+
+    auto* dumpTlv = reinterpret_cast<__asc_simd_vf::DumpTensorTlv*>(blockInfo.buffer);
+    EXPECT_EQ(blockInfo.flag, 0U);
+    EXPECT_EQ(dumpTlv->position, static_cast<uint16_t>(__asc_simd_vf::DumpTensorPosition::UB));
+    EXPECT_EQ(dumpTlv->desc, TEST_SIMD_VF_DUMP_DESC_AFTER_OVERSIZE);
+    EXPECT_EQ(dumpTlv->blockIdx, TEST_SIMD_VF_BLOCK_IDX);
+}
+
+TEST_F(TestDumpTensorSuite, OversizeRegDumpDoesNotBlockFollowingDump)
+{
+    BlockVFBufInfo blockInfo;
+    InitSimdVfDumpBuffer(blockInfo);
+    vector_u32 input = {};
+
+    __asc_simd_vf::asc_dump<uint32_t>(input, TEST_SIMD_VF_DUMP_DESC, TEST_SIMD_VF_OVERSIZE_DUMP_SIZE);
+    EXPECT_EQ(blockInfo.flag, 0U);
+    EXPECT_EQ(blockInfo.writeLen, 0U);
+
+    __asc_simd_vf::asc_dump<uint32_t>(input, TEST_SIMD_VF_DUMP_DESC_AFTER_OVERSIZE, TEST_SIMD_VF_DUMP_SIZE);
+
+    auto* dumpTlv = reinterpret_cast<__asc_simd_vf::DumpTensorTlv*>(blockInfo.buffer);
+    EXPECT_EQ(blockInfo.flag, 0U);
+    EXPECT_EQ(dumpTlv->position, static_cast<uint16_t>(__asc_simd_vf::DumpTensorPosition::REG));
+    EXPECT_EQ(dumpTlv->desc, TEST_SIMD_VF_DUMP_DESC_AFTER_OVERSIZE);
     EXPECT_EQ(dumpTlv->blockIdx, TEST_SIMD_VF_BLOCK_IDX);
 }
 #endif
