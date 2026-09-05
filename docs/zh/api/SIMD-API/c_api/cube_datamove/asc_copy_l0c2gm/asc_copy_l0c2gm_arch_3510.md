@@ -30,7 +30,7 @@
 
 将矩阵计算结果从L0C Buffer搬运至Global Memory，搬运过程中可同步支持随路量化、随路激活、随路格式转换（Nz2ND/Nz2DN）等能力组合。
 
-下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为Cast，其余为随路scalar/tensor量化模式。
+下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径，通过连线颜色区分支持的场景组合。下图中的F32-\>F16与F32-\>BF16为Cast，其余为随路scalar/tensor量化模式。
 
 **图1** asc_copy_l0c2gm随路功能组合
 
@@ -78,7 +78,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_copy_l0c2gm(__gm__ <dst_dtype>* dst,
                                        __cc__ <src_dtype>* src,
                                        uint16_t n_size,
@@ -132,7 +132,7 @@ src dtype与dst dtype支持以下组合：
 
 ### 函数原型典型示例
 
-```cpp
+```c
 // 示例：将float类型数据转换为bfloat16_t类型后搬运。
 __aicore__ inline void asc_copy_l0c2gm(__gm__ bfloat16_t* dst,
                                        __cc__ float* src,
