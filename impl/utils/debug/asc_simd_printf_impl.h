@@ -199,7 +199,10 @@ __simd_callee__ inline void scalar_printf_impl(
     const uint32_t tlv_len = get_print_tlv_len_simd(args_num, fmt, dump_head, args...);
     uint32_t write_len = block_info->writeLen;
 
-    if (tlv_len > block_info->length || write_len > block_info->length) {
+    if (tlv_len > block_info->length) {
+        return;
+    }
+    if (write_len > block_info->length) {
         block_info->flag = 1;
         return;
     }
