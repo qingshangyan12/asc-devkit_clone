@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_gather.h"`。
+
 根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。
 
 **寄存器源收集模式**：源操作数与目的操作数均为矢量数据寄存器。按 `index` 矢量寄存器中保存的逐元素索引，从`src`矢量数据寄存器中选择对应位置的元素写入`dst`对应位置，不使用掩码。
@@ -34,15 +36,15 @@
 
 ![寄存器源收集模式](../../figures/asc_gather_vec.png)
 
-## 函数原型（占位符形式）
+## 函数原型
 
 ```c
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_gather(vector_<dtype>& dst,
                                        vector_<dtype> src,
                                        vector_<index_dtype> index)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_gather(vector_<dtype> src,
                                                  vector_<index_dtype> index)
 ```

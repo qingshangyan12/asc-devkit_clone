@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
+
 将`int64_t`类型数据转换为`float`，并支持多种舍入模式。
 
 关于舍入模式的详细说明，请参见[舍入模式](rounding_mode.md)。
@@ -49,11 +51,13 @@ def asc_int642float_rn(dst, src, mask, dst_pos):
 ## 函数原型
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_int642float_<round_mode>(vector_float& dst,
                                                          vector_int64_t src,
                                                          vector_bool mask,
                                                          std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
+// 占位符形式
 __simd_callee__ inline void asc_int642float_<round_mode>(vector_float& dst,
                                                          vector_int64_t src,
                                                          vector_bool mask,

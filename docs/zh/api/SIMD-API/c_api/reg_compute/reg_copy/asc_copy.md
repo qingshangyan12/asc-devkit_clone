@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/reg_copy.h"`。
+
 完成数据在寄存器间的搬运，支持以下三种模式：
 
 - 矢量数据寄存器复制到矢量数据寄存器：将src中被mask筛选的有效元素复制到dst对应位置，未被mask筛选的位置保持dst原值。
@@ -47,6 +49,7 @@
 ### 矢量数据寄存器复制到矢量数据寄存器
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_copy(vector_<dtype>& dst,
                                      vector_<dtype> src,
                                      vector_bool mask)
