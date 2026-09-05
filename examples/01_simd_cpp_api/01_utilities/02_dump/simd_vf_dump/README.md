@@ -48,6 +48,8 @@
   - `desc`：打印控制描述符
   - `dump_size`：单次dump的数据元素个数
 
+  > **说明：** 对Reg寄存器进行dump时，`dump_size`超过寄存器容量会自动截断，只打印可容纳的数据。
+
 - 调用实现
 
   在`__global__ __vector__`核函数内使用`asc_vf_call<FuncName>()`调用simd_vf函数完成dump打印，随后通过`AscendC::Adds`执行计算并将结果写回GM。Host侧通过`ReadFile`/`WriteFile`完成二进制数据的读写。
