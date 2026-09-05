@@ -2,9 +2,9 @@
   <title id="title">Compact padding layout</title>
   <desc id="desc">Three contiguous 48-byte data bursts followed by one 16-byte padding region. The destination stride is 48 bytes.</desc>
   <style>
-    .title { font: 20px 'FZLanTingHeiS', 'Huawei Sans', sans-serif; fill: #000000; }
-    .label { font: 16px 'FZLanTingHeiS', 'Huawei Sans', sans-serif; fill: #000000; }
-    .small { font: 14px 'FZLanTingHeiS', 'Huawei Sans', sans-serif; fill: #000000; }
+    .title { font: 20px 'FZLanTingHeiS', sans-serif; fill: #000000; }
+    .label { font: 16px 'FZLanTingHeiS', sans-serif; fill: #000000; }
+    .small { font: 14px 'FZLanTingHeiS', sans-serif; fill: #000000; }
     .data { fill: #C2D5FE; stroke: #686D75; stroke-width: 0.75; }
     .pad { fill: #FEE2BA; stroke: #686D75; stroke-width: 0.75; }
     .line { stroke: #686D75; stroke-width: 0.75; }

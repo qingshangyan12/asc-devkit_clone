@@ -1,0 +1,4 @@
+interface:
+  display_name: "Asc API Doc Index"
+  short_description: "Register Ascend C API documents and figures"
+  default_prompt: "Use $asc-api-doc-index to register an Ascend C API page, add compliant PNG figures, and validate all documentation links."
