@@ -154,12 +154,12 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
         }
     } else {
         if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
-            selectAlgName = "InsAllGatherMesh1D";
+            selectAlgName = "AicpuAllGatherSoleMesh";
         } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
             // PCIE-SW定制机型，Mesh无法链接全卡时，需要跨pcie链路，选择适配算法
             if (topoInfo->level0PcieMix) {
                 if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
-                    selectAlgName = "InsAllGatherMesh1D";
+                    selectAlgName = "AicpuAllGatherSoleMesh";
                 } else {
                     selectAlgName = (dataSize < PCIE_BASIC_RS_MAX_DATA_SIZE) ? "InsAllGatherParallelMesh1DNHRPcie" :
                                                                                "AicpuAllGatherPipeLinePcie";
@@ -180,7 +180,7 @@ SelectorStatus AllGatherAutoSelector::SelectAicpuAlgo(
                 if (dataSize > SMALL_COUNT_512KB) {
                     selectAlgName = "AicpuAllGatherConcurMeshNHR";
                 } else {
-                    selectAlgName = "InsAllGatherMesh1D";
+                    selectAlgName = "AicpuAllGatherSoleMesh";
                 }
             } else if (isClosNumMultipleOfMeshNum && dataSize > SMALL_COUNT_512KB) {
                 selectAlgName = "InsAllGatherParallelMesh1DNHRUBX";

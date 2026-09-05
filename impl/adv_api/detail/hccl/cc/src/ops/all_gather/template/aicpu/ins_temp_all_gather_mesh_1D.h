@@ -37,18 +37,21 @@ public:
     HcclResult CalcRes(
         HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
         AlgResourceRequest& resourceRequest) override;
-    virtual HcclResult GetRes(AlgResourceRequest& resourceRequest) const;
+    HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
 
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
-    virtual u64 GetThreadNum() const;
-    virtual HcclResult CalcDataSplitByPortGroup(
+    u64 GetThreadNum() const override;
+    HcclResult CalcDataSplitByPortGroup(
         const u64 totalDataCount, const u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
-        std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset);
-    virtual HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels);
+        std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset) override;
+    HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels) override;
     void GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMianToSub) override;
     void GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain) override;
 
 protected:
+    HcclResult RunAllGatherMeshOnChannel(
+        const ThreadHandle& thread, const ChannelInfo& linkRemote, const u32 connectedRank,
+        const u32 connectedAlgRank, const u32 channelIdx, void* remoteOut);
     virtual HcclResult RunAllGatherMesh(
         const std::vector<ThreadHandle>& threads, const std::map<u32, std::vector<ChannelInfo>>& channels);
     virtual HcclResult LocalDataCopy(const std::vector<ThreadHandle>& threads);
@@ -58,7 +61,11 @@ protected:
     u64 outputOffset_{0};
     void* inputSymWindow_{nullptr};
     void* outputSymWindow_{nullptr};
+    std::vector<u64> elemCountOut_;
+    std::vector<u64> sizeOut_;
+    std::vector<u64> elemOffset_;
     u32 channelsPerRank_{1};
+    u32 maxChannelsPerRank_{1};
 };
 
 } // namespace mc2_ops_hccl
