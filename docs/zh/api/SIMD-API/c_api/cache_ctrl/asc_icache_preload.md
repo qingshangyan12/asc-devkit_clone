@@ -30,7 +30,7 @@
 
 开发者手动调用本接口，从调用本接口所在的Global Memory地址预加载指令到ICache（指令缓存）中，避免后续取指时出现ICache未命中。ICache用于缓存Scalar单元最近使用或频繁使用的指令，通过本接口预取后，Scalar单元读取GM指令时优先从ICache中读取。
 
-预加载地址通常通过[asc_get_program_counter](../sys_var/asc_get_program_counter.md)接口获取。
+预加载地址通常通过[asc_get_program_counter](../utils/sys_var/asc_get_program_counter.md)接口获取。
 
 ## 函数原型
 
