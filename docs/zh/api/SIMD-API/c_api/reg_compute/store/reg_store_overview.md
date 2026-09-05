@@ -40,7 +40,7 @@ Reg数据搬出接口用于将矢量数据寄存器、掩码寄存器或非对�
 
 #### 非对齐搬出
 
-`asc_storeunalign*`接口通过非对齐寄存器`vector_store_unalign`暂存尾块。连续调用时必须复用同一个非对齐寄存器；后处理接口也必须与前序主搬出接口复用该寄存器。
+`asc_storeunalign*`接口通过非对齐寄存器`vector_store_unalign`暂存尾块，通过后处理接口搬出暂存的尾块。连续调用时必须复用同一个非对齐寄存器；后处理接口也必须与前序主搬出接口复用该寄存器。
 
 **表2**  矢量数据寄存器非对齐搬出接口
 
@@ -49,9 +49,6 @@ Reg数据搬出接口用于将矢量数据寄存器、掩码寄存器或非对�
 | [asc_storeunalign](asc_storeunalign.md) | 带搬出数量搬出 | 将前`count`个元素搬出；主块写入UB，尾块暂存至非对齐寄存器。目的地址由用户手动更新。 | `dtype`对齐，无需32字节对齐。 | [asc_storeunalign_post](asc_storeunalign_post.md)的立即数偏移搬出模式。 |
 | [asc_storeunalign_postupdate](asc_storeunalign_postupdate.md) | 立即数偏移Post Update搬出 | 将前`count`个元素搬出，并自动将目的地址指针更新`count`个元素；尾块暂存至非对齐寄存器。 | `dtype`对齐，无需32字节对齐。 | [asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)。 |
 | [asc_storeunalign_postupdate](asc_storeunalign_postupdate.md) | 地址寄存器偏移Post Update搬出 | 固定搬出一个VL，使用并自动更新`addr_reg& count`表示的目的地址偏移；尾块暂存至非对齐寄存器。 | `dtype`对齐，无需32字节对齐。 | [asc_storeunalign_post](asc_storeunalign_post.md)的地址寄存器偏移搬出模式。 |
-| [asc_storeunalign_post](asc_storeunalign_post.md) | 立即数偏移后处理 | 将非对齐寄存器中的尾块写入UB。 | `dtype`对齐，无需32字节对齐。 | 用于`asc_storeunalign`，以及`asc_storeunalign_postupdate`的掩码寄存器搬出模式收尾。 |
-| [asc_storeunalign_post](asc_storeunalign_post.md) | 地址寄存器偏移后处理 | 通过`addr_reg`指定尾块写入位置。 | `dtype`对齐，无需32字节对齐。 | 用于`asc_storeunalign_postupdate`的地址寄存器偏移搬出模式收尾。 |
-| [asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md) | Post Update后处理 | 将非对齐寄存器中的尾块写入UB，并按元素偏移自动更新目的地址指针。 | `dtype`对齐，无需32字节对齐。 | 用于`asc_storeunalign_postupdate`的立即数偏移搬出模式收尾。 |
 
 ### 掩码寄存器搬出
 
@@ -74,31 +71,28 @@ Reg数据搬出接口用于将矢量数据寄存器、掩码寄存器或非对�
 
 #### 非对齐搬出
 
-掩码寄存器非对齐搬出也需要`vector_store_unalign`辅助保存尾块，并在后处理时复用该寄存器。
+掩码寄存器非对齐搬出也需要`vector_store_unalign`辅助保存尾块，通过后处理接口搬出暂存的尾块，并在后处理时复用该寄存器。
 
 **表4**  掩码寄存器非对齐搬出接口
 
 | 接口名称 | 模式 | 功能简述 | 目的地址对齐要求 | 配套使用的后处理接口 |
 | --- | --- | --- | --- | --- |
 | [asc_storeunalign_postupdate](asc_storeunalign_postupdate.md) | 掩码寄存器Post Update搬出 | `uint16_t`目的地址时，每2bit提取LSB并打包为16字节；`uint32_t`目的地址时，每4bit提取LSB并打包为8字节。搬出后自动更新目的地址指针，尾块暂存至非对齐寄存器。 | `uint16_t`目的地址16字节对齐；`uint32_t`目的地址8字节对齐。 | [asc_storeunalign_post](asc_storeunalign_post.md)的立即数偏移搬出模式。 |
-| [asc_storeunalign_post](asc_storeunalign_post.md) | 立即数偏移后处理 | 将掩码寄存器非对齐搬出暂存的尾块写入UB。 | `dtype`对齐，无需32字节对齐。 | 用于`asc_storeunalign_postupdate`的掩码寄存器Post Update搬出模式收尾。 |
 
 ## 关键特性
 
-### 对齐连续搬出寻址方式对比
+### 对齐连续搬出方式对比
 
-以下代码片段节选自[reg_load_store_align完整样例](../../../../../../../examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align)。四种方式均对两个长度为1024、数据类型为`half`的输入进行逐元素相加，并将结果连续写入UB。单次迭代处理128个元素，共迭代8次，最终结果均为`dst[i] = src0[i] + src1[i]`。
+以下提供四种地址偏移方式，每种方式均以两个长度为1024、数据类型为`half`的输入进行逐元素相加，并将结果连续写入UB的计算过程为例。单次迭代处理128个元素，共迭代8次，最终结果均为`dst[i] = src0[i] + src1[i]`。
 
-完整样例包含GM与UB之间的数据搬运、流水同步、核函数启动和结果校验；本节仅展示VF函数中的主要计算和搬出代码。样例的场景1、2、3和7已在Ascend 950PR（`dav-3510`，CANN 9.2.0）上通过golden校验，四个场景的输出结果逐字节一致。
-
-**表5**  对齐连续搬出寻址方式对比
+**表5**  对齐连续搬出方式对比
 
 | 场景 | 搬出方式 | 目的地址维护方式 | 适用场景 |
 | --- | --- | --- | --- |
 | 场景1 | 用户手动偏移地址搬出 | 调用方通过指针运算计算每次搬出的目的地址。 | 目的地址偏移规则简单，且需要由用户显式控制地址。 |
-| 场景7 | 通过接口立即数偏移搬出 | 将相对目的基地址的固定元素偏移作为`int32_t`参数传入。 | 偏移量在编译期确定，且无需修改目的地址指针。 |
+| 场景2 | 通过接口立即数偏移搬出 | 将相对目的基地址的固定元素偏移作为`int32_t`参数传入。 | 偏移量在编译期确定，且无需修改目的地址指针。 |
 | 场景3 | 地址寄存器偏移搬出 | 通过[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)生成`addr_reg`，由硬件在迭代中更新偏移。 | Hardware Loop内偏移随迭代变化。 |
-| 场景2 | Post Update搬出 | `asc_storealign_postupdate`在每次搬出后自动更新目的地址指针。 | 连续搬出且无需用户手动维护目的地址。 |
+| 场景4 | Post Update搬出 | `asc_storealign_postupdate`在每次搬出后自动更新目的地址指针。 | 连续搬出且无需用户手动维护目的地址。 |
 
 #### 用户手动偏移地址搬出
 
