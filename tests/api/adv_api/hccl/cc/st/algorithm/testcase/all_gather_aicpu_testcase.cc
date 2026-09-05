@@ -70,7 +70,7 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_all_gather_does_not_use_cann_bridge)
 TEST_F(ST_ALL_GATHER_AICPU_TEST, local_registry_contains_concurrent_algorithm)
 {
     CollAlgExecRegistryV2& registry = CollAlgExecRegistryV2::Instance();
-    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "InsAllGatherMesh1D"), nullptr);
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSoleMesh"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSoleNHR"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherConcurMeshNHR"), nullptr);
 }
@@ -85,7 +85,7 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_obeys_count_and_rank_boundaries)
 
     param.DataDes.count = countAtLimit;
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
-    EXPECT_EQ(algName, "InsAllGatherMesh1D");
+    EXPECT_EQ(algName, "AicpuAllGatherSoleMesh");
 
     param = MakeAicpuParam();
     param.DataDes.count = countAtLimit + 1U;
