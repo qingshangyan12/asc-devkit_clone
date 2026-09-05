@@ -106,3 +106,5 @@ UB是同一线程块内所有线程均可访问的内存空间，位于每个AIV
     ```
 
     若DataCache小于32KB，会出现校验报错。
+
+更多UB内存的排布、复用、对齐等规则，详见[SIMD与SIMT混合编程场景的UB内存划分](../../../guide/programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/memory_hierarchy.md#ub划分)。
