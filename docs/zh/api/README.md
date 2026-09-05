@@ -1046,6 +1046,7 @@
                 -   [asc_loadunalign_postupdate](SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md)
                 -   [asc_loadunalign_pre](SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md)
             -   [Reg数据搬出](SIMD-API/c_api/reg_compute/store/store.md)
+                -   [Reg数据搬出概述](SIMD-API/c_api/reg_compute/store/reg_store_overview.md)
                 -   [asc_storealign](SIMD-API/c_api/reg_compute/store/asc_storealign.md)
                 -   [asc_storealign_1st](SIMD-API/c_api/reg_compute/store/asc_storealign_1st.md)
                 -   [asc_storealign_1st_postupdate](SIMD-API/c_api/reg_compute/store/asc_storealign_1st_postupdate.md)
