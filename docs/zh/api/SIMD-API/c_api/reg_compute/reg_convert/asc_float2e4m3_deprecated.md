@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+**该接口原型已废弃，请使用[asc_float2e4m3](./asc_float2e4m3.md)替代。**
+
 头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
 
 将float类型转化为fp8_e4m3fn_t类型，支持RINT舍入模式，饱和/非饱和模式。
@@ -33,6 +35,19 @@
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。
 
 由于源操作数与目的操作数类型位宽比为4:1，写入数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。
+
+本接口通过后缀选择写入位置的原型已废弃，请使用[asc_float2e4m3](./asc_float2e4m3.md)的显式位置参数重载替代，替换关系如下：
+
+| 废弃接口 | 替代接口 |
+| --- | --- |
+| `asc_float2e4m3_rn(dst, src, mask)` | `asc_float2e4m3_rn(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER)` |
+| `asc_float2e4m3_rn_sat(dst, src, mask)` | `asc_float2e4m3_rn_sat(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER)` |
+| `asc_float2e4m3_rn_v2(dst, src, mask)` | `asc_float2e4m3_rn(dst, src, mask, ASC_DISPERSE_SECOND_QUARTER)` |
+| `asc_float2e4m3_rn_sat_v2(dst, src, mask)` | `asc_float2e4m3_rn_sat(dst, src, mask, ASC_DISPERSE_SECOND_QUARTER)` |
+| `asc_float2e4m3_rn_v3(dst, src, mask)` | `asc_float2e4m3_rn(dst, src, mask, ASC_DISPERSE_THIRD_QUARTER)` |
+| `asc_float2e4m3_rn_sat_v3(dst, src, mask)` | `asc_float2e4m3_rn_sat(dst, src, mask, ASC_DISPERSE_THIRD_QUARTER)` |
+| `asc_float2e4m3_rn_v4(dst, src, mask)` | `asc_float2e4m3_rn(dst, src, mask, ASC_DISPERSE_FOURTH_QUARTER)` |
+| `asc_float2e4m3_rn_sat_v4(dst, src, mask)` | `asc_float2e4m3_rn_sat(dst, src, mask, ASC_DISPERSE_FOURTH_QUARTER)` |
 
 ## 函数原型
 
