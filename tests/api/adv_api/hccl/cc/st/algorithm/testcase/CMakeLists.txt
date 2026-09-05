@@ -125,5 +125,7 @@ foreach(primitive HcommIsSupportHcommBatchTransferOnThread HcclHcommBatchTransfe
         HcommThreadNotifyRecordOnThread HcommThreadNotifyWaitOnThread HcommLocalCopyOnThread)
     target_link_options(${MESHCHUNK_TEST_TARGET} PRIVATE "-Wl,--wrap=${primitive}")
 endforeach()
-run_llt_test(TARGET ${MESHCHUNK_TEST_TARGET} TASK_NUM 1)
+add_custom_command(TARGET ${MESHCHUNK_TEST_TARGET} POST_BUILD
+    COMMAND $<TARGET_FILE:${MESHCHUNK_TEST_TARGET}>
+    COMMENT "Run isolated MeshChunk primitive and data-semantics tests")
 add_dependencies(${HCCL_CHECKER_TARGET} ${MESHCHUNK_TEST_TARGET})

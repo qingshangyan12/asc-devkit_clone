@@ -18,6 +18,8 @@
 #include "alg_data_trans_wrapper.h"
 #include "hcomm_primitives_dl.h"
 #include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
+#include "coll_alg_v2_exec_registry.h"
+#include "executor_v2_base.h"
 
 using namespace mc2_ops_hccl;
 
@@ -39,6 +41,8 @@ bool batchSupported = true;
 int32_t batchResult = HCCL_SUCCESS;
 int32_t copyResult = HCCL_SUCCESS;
 size_t batchCalls = 0;
+size_t copyCalls = 0;
+size_t failCopyAt = std::numeric_limits<size_t>::max();
 
 class MeshChunkTest : public ::testing::Test {
 protected:
@@ -50,6 +54,8 @@ protected:
         batchResult = HCCL_SUCCESS;
         copyResult = HCCL_SUCCESS;
         batchCalls = 0;
+        copyCalls = 0;
+        failCopyAt = std::numeric_limits<size_t>::max();
         ASSERT_EQ(InitHcommBatchTransferOnThreadSupported(true), HCCL_SUCCESS);
     }
 };
@@ -99,6 +105,9 @@ extern "C" int32_t __wrap_HcommThreadNotifyWaitOnThread(ThreadHandle t, uint32_t
 }
 extern "C" int32_t __wrap_HcommLocalCopyOnThread(ThreadHandle t, void* dst, const void* src, uint64_t len)
 {
+    if (++copyCalls == failCopyAt) {
+        return HCCL_E_RUNTIME;
+    }
     if (copyResult != HCCL_SUCCESS) {
         return copyResult;
     }
@@ -327,6 +336,31 @@ struct Scenario {
             EXPECT_LE(dstOffset + t.count * elementSize, loopCount * elementSize);
         }
     }
+    void ExpandExecutor(u64 loopCount, bool defaultStride)
+    {
+        for (u32 r = 0; r < ranks; ++r) {
+            auto param = Param();
+            param.DataDes.strideCount = defaultStride ? 0 : stride;
+            param.inputPtr = In(r);
+            param.outputPtr = Out(r);
+            AlgResourceCtxSerializable ctx{};
+            ctx.topoInfo.userRank = r;
+            ctx.topoInfo.userRankSize = ranks;
+            ctx.algHierarchyInfo.infos = {{rankList}};
+            auto resources = Resources(r);
+            ctx.threads = resources.threads;
+            ctx.cclMem.addr = Tmp(r);
+            ctx.cclMem.size = loopCount * elementSize * (ranks - 1);
+            ctx.channels.resize(1);
+            for (const auto& peer : resources.channels) {
+                ctx.channels[0].push_back(peer.second[0]);
+            }
+            auto exec = CollAlgExecRegistryV2::Instance().GetAlgExec(
+                HCCL_CMD_REDUCE_SCATTER, "InsReduceScatterMesh1DMeshChunk");
+            ASSERT_NE(exec, nullptr);
+            ASSERT_EQ(exec->Orchestrate(param, ctx), HCCL_SUCCESS);
+        }
+    }
     void ExecuteAndCheck()
     {
         std::map<ThreadHandle, std::vector<Task>> queues;
@@ -435,4 +469,109 @@ TEST_F(MeshChunkTest, InvalidLayoutAndPreCopyFailureSubmitNoCommunication)
     EXPECT_EQ(alg.KernelRun(param, data, res), HCCL_E_RUNTIME);
     EXPECT_TRUE(tasks.empty());
     EXPECT_EQ(batchCalls, 0U);
+}
+
+TEST_F(MeshChunkTest, CpuReferenceForPaddedInputsMultipleLoopsAndOrderedTurns)
+{
+    for (auto dtype : {HCCL_DATA_TYPE_INT8, HCCL_DATA_TYPE_FP16, HCCL_DATA_TYPE_BFP16, HCCL_DATA_TYPE_FP32}) {
+        for (u32 ranks : {2U, 4U, 8U}) {
+            const u64 loopCount = (ranks - 1) * 4096 / DATATYPE_SIZE_TABLE[dtype];
+            const u64 count = loopCount * 2 + 11;
+            for (u64 stride : {u64{0}, count, count + 3}) {
+                Scenario s(ranks, count, stride, dtype);
+                const auto originalInputs = s.inputs;
+                for (u32 turn = 0; turn < 2; ++turn) {
+                    tasks.clear();
+                    descriptors.clear();
+                    s.ExpandExecutor(loopCount, stride == 0);
+                    s.VerifyAddresses(loopCount);
+                    s.ExecuteAndCheck();
+                    EXPECT_EQ(s.inputs, originalInputs); // padding is never written or included in reduction.
+                }
+            }
+        }
+    }
+}
+
+TEST_F(MeshChunkTest, EveryIntermediateStepJoinsBeforeReleaseAndUsesOnlyAlgorithmNotifySlots)
+{
+    for (u32 ranks : {2U, 4U, 8U}) {
+        tasks.clear();
+        Scenario s(ranks, 20000, 20003, HCCL_DATA_TYPE_FP16);
+        s.Expand(s.count);
+        const u32 slaves = ranks - 2;
+        for (const auto& t : tasks) {
+            if (t.kind == Kind::THREAD_WAIT || t.kind == Kind::THREAD_RECORD) {
+                const u32 targetSlot = (t.target - 1) % 16;
+                EXPECT_LT(t.notify, targetSlot == 0 ? 2 * slaves : 2U);
+            }
+        }
+        for (u32 r = 0; r < ranks; ++r) {
+            std::vector<Task> main;
+            for (const auto& t : tasks) { if (t.thread == 1 + r * 16) { main.push_back(t); } }
+            u32 step = 0;
+            for (size_t pos = 0; pos < main.size(); ++pos) {
+                if (main[pos].kind != Kind::CHANNEL_WAIT || main[pos].notify != NOTIFY_IDX_DATA_SIGNAL) { continue; }
+                const bool intermediate = step++ < ranks - 2;
+                for (u32 i = 0; i < slaves; ++i) {
+                    ASSERT_LT(pos + 1 + i, main.size());
+                    EXPECT_EQ(main[pos + 1 + i].kind, Kind::THREAD_WAIT);
+                    EXPECT_EQ(main[pos + 1 + i].notify, intermediate ? i + slaves : i);
+                }
+                if (intermediate) {
+                    for (u32 i = 0; i < slaves; ++i) {
+                        ASSERT_LT(pos + 1 + slaves + i, main.size());
+                        EXPECT_EQ(main[pos + 1 + slaves + i].kind, Kind::THREAD_RECORD);
+                        EXPECT_EQ(main[pos + 1 + slaves + i].notify, 1U);
+                    }
+                }
+            }
+            EXPECT_EQ(step, ranks - 1);
+        }
+        s.ExecuteAndCheck();
+    }
+}
+
+TEST_F(MeshChunkTest, TemplatePropagatesRemoteFailureWithoutPostCopy)
+{
+    Scenario s(8, 15000, 15003, HCCL_DATA_TYPE_FP16);
+    auto p = s.Param();
+    InsTempReduceScatterMesh1DMeshChunk alg(p, 0, {s.rankList});
+    batchResult = HCCL_E_RUNTIME;
+    EXPECT_EQ(alg.KernelRun(p, s.Data(0, 0, s.count), s.Resources(0)), HCCL_E_RUNTIME);
+    EXPECT_EQ(batchCalls, 1U);
+    EXPECT_EQ(Count(Kind::COPY, 0), 1U); // PreCopy only; no output task after the failure.
+}
+
+TEST_F(MeshChunkTest, AlignedChunksRoundDownAndLeaveExactTail)
+{
+    Scenario s(8, (7 * 4096 + 4) / 2, 15003, HCCL_DATA_TYPE_FP16);
+    auto p = s.Param();
+    InsTempReduceScatterMesh1DMeshChunk alg(p, 0, {s.rankList});
+    ASSERT_EQ(alg.KernelRun(p, s.Data(0, 0, s.count), s.Resources(0)), HCCL_SUCCESS);
+    ASSERT_EQ(descriptors.size(), 49U);
+    for (size_t i = 0; i < descriptors.size(); ++i) {
+        const auto& r = descriptors[i].transferInfo.writeReduceWithNotify;
+        EXPECT_EQ(r.count * 2, i % 7 == 6 ? 4100U : 4096U);
+        const auto peer = static_cast<const uint8_t*>(r.src) - s.In(0);
+        EXPECT_EQ(static_cast<u64>(peer) % (s.stride * 2), (i % 7) * 4096);
+    }
+}
+
+TEST_F(MeshChunkTest, PostCopyAndInvalidRankOrDatatypeErrorsAreNotSwallowed)
+{
+    Scenario s(4, 8193, 8196, HCCL_DATA_TYPE_FP32);
+    auto p = s.Param();
+    InsTempReduceScatterMesh1DMeshChunk empty(p, 0, {});
+    RankSliceInfo slices;
+    EXPECT_EQ(empty.CalcSliceInfoVec(1, slices), HCCL_E_PARA);
+    InsTempReduceScatterMesh1DMeshChunk alg(p, 0, {s.rankList});
+    p.DataDes.dataType = HCCL_DATA_TYPE_RESERVED;
+    EXPECT_EQ(alg.KernelRun(p, s.Data(0, 0, s.count), s.Resources(0)), HCCL_E_PARA);
+    EXPECT_TRUE(tasks.empty());
+    p = s.Param();
+    failCopyAt = 2; // The first copy is input -> scratch; the second is scratch -> output.
+    EXPECT_EQ(alg.KernelRun(p, s.Data(0, 0, s.count), s.Resources(0)), HCCL_E_RUNTIME);
+    EXPECT_EQ(copyCalls, 2U);
+    EXPECT_EQ(batchCalls, 9U); // Already submitted work must not be retried.
 }
