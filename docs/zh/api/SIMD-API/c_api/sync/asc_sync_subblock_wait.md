@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/sync/sync.h"`。
 
-本接口与[asc_sync_subblock_arrive](asc_sync_subblock_arrive.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下：
+本接口与[`asc_sync_subblock_arrive`](asc_sync_subblock_arrive.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下：
 
 - 同一AI Core内所有AIV（subblock）都执行`asc_sync_subblock_arrive`后向调度模块发送通知，接着调度模块将各AIV（subblock）对应`flag_id`的计数器增加1。
 - 各AIV（subblock）上配对的`asc_sync_subblock_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
@@ -55,7 +55,7 @@ __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe,
 
 ## 流水类型
 
-`PIPE_S`
+PIPE_S
 
 ## 约束说明
 
@@ -74,4 +74,4 @@ __aicore__ inline void asc_sync_subblock_wait(pipe_t pipe,
 
 ## 调用示例
 
-`asc_sync_subblock_wait`需与`asc_sync_subblock_arrive`配对使用，具体调用示例请参考[asc_sync_subblock_arrive调用示例](asc_sync_subblock_arrive.md#调用示例)。
+`asc_sync_subblock_wait`需与`asc_sync_subblock_arrive`配对使用，具体调用示例请参考[`asc_sync_subblock_arrive`调用示例](asc_sync_subblock_arrive.md#调用示例)。

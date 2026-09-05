@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/sync/sync.h"`。
 
-本接口与[asc_sync_subblock_wait](asc_sync_subblock_wait.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下：
+本接口与[`asc_sync_subblock_wait`](asc_sync_subblock_wait.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下：
 
 - 同一AI Core内所有AIV（subblock）都执行`asc_sync_subblock_arrive`后向调度模块发送通知，接着调度模块将各AIV（subblock）对应`flag_id`的计数器增加1。
 - 各AIV（subblock）上配对的`asc_sync_subblock_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。
@@ -57,11 +57,11 @@ __aicore__ inline void asc_sync_subblock_arrive(pipe_t pipe,
 
 ## 流水类型
 
-`PIPE_S`
+PIPE_S
 
 ## 约束说明
 
-- 针对`asc_sync_subblock_arrive`接口，传入的`pipe`参数在不同NPU架构中**均生效**；针对`asc_sync_subblock_wait`接口，传入的`pipe`参数**是否生效与NPU架构有关**，具体请参考[asc_sync_subblock_wait](asc_sync_subblock_wait.md#约束说明)的约束说明。
+- 针对`asc_sync_subblock_arrive`接口，传入的`pipe`参数在不同NPU架构中**均生效**；针对`asc_sync_subblock_wait`接口，传入的`pipe`参数**是否生效与NPU架构有关**，具体请参考[`asc_sync_subblock_wait`](asc_sync_subblock_wait.md#约束说明)的约束说明。
 - 本接口仅支持AIV调用，AIV支持的`pipe`取值如下：`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_V`。
 - 用户需要确保配套使用（`flag_id`必须完全一致）`asc_sync_subblock_arrive`和`asc_sync_subblock_wait`，否则会出现未定义行为。
 - 每个计数器最多连续累加15次（此时计数器的值为15），必须保证计数器的值不超过15，否则触发异常。

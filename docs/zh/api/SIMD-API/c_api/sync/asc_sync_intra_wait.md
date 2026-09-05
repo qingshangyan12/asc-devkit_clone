@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/sync/sync.h"`。
 
-本接口与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式4），核间同步实现的原理如下：
+本接口与[`asc_sync_intra_arrive`](asc_sync_intra_arrive.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式4），核间同步实现的原理如下：
 
 - 单个AIV等待AIC的场景：
   - 单AI Core内AIC执行`asc_sync_intra_arrive`后向调度模块发送通知，接着调度模块将该AI Core内单个AIV对应`sync_id`的计数器增加1。
@@ -59,7 +59,7 @@ __aicore__ inline void asc_sync_intra_wait(pipe_t pipe,
 
 ## 流水类型
 
-`PIPE_S`
+PIPE_S
 
 ## 约束说明
 
@@ -85,4 +85,4 @@ __aicore__ inline void asc_sync_intra_wait(pipe_t pipe,
 
 ## 调用示例
 
-`asc_sync_intra_wait`需与`asc_sync_intra_arrive`配对使用，具体调用示例请参考[asc_sync_intra_arrive调用示例](asc_sync_intra_arrive.md#调用示例)。
+`asc_sync_intra_wait`需与`asc_sync_intra_arrive`配对使用，具体调用示例请参考[`asc_sync_intra_arrive`调用示例](asc_sync_intra_arrive.md#调用示例)。

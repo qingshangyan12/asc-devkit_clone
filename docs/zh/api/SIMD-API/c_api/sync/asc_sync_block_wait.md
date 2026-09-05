@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/sync/sync.h"`。
 
-本接口与[asc_sync_block_arrive](asc_sync_block_arrive.md)配对使用，实现单AI Core内AIC与全部AIV之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式2），核间同步实现的原理如下：
+本接口与[`asc_sync_block_arrive`](asc_sync_block_arrive.md)配对使用，实现单AI Core内AIC与全部AIV之间的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式2），核间同步实现的原理如下：
 
 - 全部AIV等待单个AIC的场景：
   - 单AI Core内AIC执行`asc_sync_block_arrive`后向调度模块发送通知，接着调度模块将该AI Core内M个AIV各自对应`flag_id`的计数器增加1。
@@ -59,13 +59,13 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe,
 
 ## 流水类型
 
-`PIPE_S`
+PIPE_S
 
 ## 约束说明
 
 - 针对`asc_sync_block_arrive`接口，传入的`pipe`参数在不同NPU架构中**均生效**；针对`asc_sync_block_wait`接口，传入的`pipe`参数**是否生效与NPU架构有关**，具体情况如下：
     <!-- npu="950" id8 -->
-    - 针对[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，硬件支持配置核间同步模式和流水类型，输入参数`pipe`**生效**，此时`asc_sync_block_wait`会阻塞由**pipe指定的流水**的后续指令。AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe_3510)所示。
+    - 针对[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，硬件支持配置核间同步模式和流水类型，输入参数`pipe`**生效**，此时`asc_sync_block_wait`会阻塞由**`pipe`指定的流水**的后续指令。AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe_3510)所示。
 
         **表2**  NPU架构3510中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_3510"></a>
 
@@ -83,4 +83,4 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe,
 
 ## 调用示例
 
-`asc_sync_block_wait`需与`asc_sync_block_arrive`配对使用，具体调用示例请参考[asc_sync_block_arrive调用示例](asc_sync_block_arrive.md#调用示例)。
+`asc_sync_block_wait`需与`asc_sync_block_arrive`配对使用，具体调用示例请参考[`asc_sync_block_arrive`调用示例](asc_sync_block_arrive.md#调用示例)。

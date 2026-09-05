@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/sync/sync.h"`。
 
-本接口与[asc_sync_inter_wait](asc_sync_inter_wait.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式0），核间同步实现的原理如下：
+本接口与[`asc_sync_inter_wait`](asc_sync_inter_wait.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](system_sync_overview.md#fig_sync_control_mode)中的模式0），核间同步实现的原理如下：
 
 - 全部AIC之间的同步场景：
   - 所有参与同步的AIC都执行`asc_sync_inter_arrive`后向调度模块发送通知，接着调度模块将各AIC对应`flag_id`的计数器增加1。
@@ -61,11 +61,11 @@ __aicore__ inline void asc_sync_inter_arrive(pipe_t pipe,
 
 ## 流水类型
 
-`PIPE_S`
+PIPE_S
 
 ## 约束说明
 
-- 针对`asc_sync_inter_arrive`接口，传入的`pipe`参数在不同NPU架构中**均生效**；针对`asc_sync_inter_wait`接口，传入的`pipe`参数**是否生效与NPU架构有关**，具体请参考[asc_sync_inter_wait](asc_sync_inter_wait.md#约束说明)的约束说明。
+- 针对`asc_sync_inter_arrive`接口，传入的`pipe`参数在不同NPU架构中**均生效**；针对`asc_sync_inter_wait`接口，传入的`pipe`参数**是否生效与NPU架构有关**，具体请参考[`asc_sync_inter_wait`](asc_sync_inter_wait.md#约束说明)的约束说明。
 - 不同NPU架构中AIC和AIV支持的`pipe`取值存在差异，具体情况如下：<a id="supported_pipe_combinations"></a>
     <!-- npu="950" id9 -->
     - 针对[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe_3510)所示。
