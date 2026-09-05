@@ -59,13 +59,13 @@ __aicore__ inline void asc_sync_block_wait(pipe_t pipe,
 
 ## 流水类型
 
-`PIPE_S`
+PIPE_S
 
 ## 约束说明
 
 - 针对`asc_sync_block_arrive`接口，传入的`pipe`参数在不同NPU架构中**均生效**；针对`asc_sync_block_wait`接口，传入的`pipe`参数**是否生效与NPU架构有关**，具体情况如下：
     <!-- npu="950" id8 -->
-    - 针对[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，硬件支持配置核间同步模式和流水类型，输入参数`pipe`**生效**，此时`asc_sync_block_wait`会阻塞由**pipe指定的流水**的后续指令。AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe_3510)所示。
+    - 针对[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，硬件支持配置核间同步模式和流水类型，输入参数`pipe`**生效**，此时`asc_sync_block_wait`会阻塞由**`pipe`指定的流水**的后续指令。AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe_3510)所示。
 
         **表2**  NPU架构3510中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_3510"></a>
 

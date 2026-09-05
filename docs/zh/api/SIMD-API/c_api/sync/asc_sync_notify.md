@@ -75,7 +75,7 @@ typedef enum {
 
 ## 流水类型
 
-`PIPE_S`
+PIPE_S
 
 ## 约束说明
 
