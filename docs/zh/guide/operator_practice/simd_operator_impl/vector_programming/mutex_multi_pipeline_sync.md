@@ -1,6 +1,8 @@
 # 基于Mutex实现多流水同步
 
-在Ascend 950PR/Ascend 950DT上，矢量算子可通过Mutex管理AI Core内多条异步流水之间的依赖。本文以使用双缓冲的Add算子为例，说明如何使用`AscendC::Mutex::Lock`和`AscendC::Mutex::Unlock`串联数据搬入、矢量计算和数据搬出，并在Buffer复用时建立反向同步。`Lock`只需指定当前需要阻塞的流水；对于相同MutexID，当前流水会等待此前所有流水完成对应`Unlock`后再继续执行。
+在Ascend 950PR/Ascend 950DT上，矢量算子可通过Mutex管理AI Core内多条异步流水之间的依赖。本文以使用双缓冲的Add算子为例，说明如何使用`AscendC::Mutex::Lock`和`AscendC::Mutex::Unlock`串联数据搬入、矢量计算和数据搬出，并在Buffer复用时建立反向同步。
+
+`Lock<当前pipe>(mutexId)`只指定需要阻塞的当前流水。其解除阻塞的条件是：此前所有流水中使用相同MutexID的Mutex均已执行`Unlock`。因此，开发者不需要判断或传入前序流水类型；无论前序阶段是`PIPE_MTE2`、`PIPE_V`还是`PIPE_MTE3`，均由同一MutexID统一约束。
 
 ## 前置说明
 
@@ -12,7 +14,7 @@
 
 一个典型的矢量算子会将每个数据块分为数据搬入、计算和数据搬出三个阶段：`PIPE_MTE2 -> PIPE_V -> PIPE_MTE3`。当数据量超过单个Unified Buffer（UB）可容纳范围时，算子通常按tile循环处理；采用双缓冲后，当前tile的计算可以与相邻tile的搬运重叠执行。
 
-对于同一个Buffer，下一次搬入前必须等待上一次搬出完成，否则`PIPE_MTE2`可能覆盖仍被`PIPE_MTE3`读取的数据。MutexID可以表示一个Buffer的完整生命周期：同一Buffer上的MTE2、V、MTE3阶段使用同一个MutexID；两个Buffer使用不同的MutexID。调用`Lock<当前pipe>(mutexId)`时，开发者无需指定该流水依赖哪一条前序流水；Lock会等待此前所有流水上相同MutexID的Unlock完成。
+对于同一个Buffer，下一次搬入前必须等待上一次搬出完成，否则`PIPE_MTE2`可能覆盖仍被`PIPE_MTE3`读取的数据。MutexID可以表示一个Buffer的完整生命周期：同一Buffer上的MTE2、V、MTE3阶段使用同一个MutexID；两个Buffer使用不同的MutexID。调用`Lock<当前pipe>(mutexId)`时，当前流水会等待此前所有流水中相同MutexID的`Unlock`全部完成。开发者无需指定该流水依赖哪一条前序流水，也无需判断前序流水类型。
 
 ```mermaid
 sequenceDiagram
@@ -42,7 +44,7 @@ MutexID应与其管理的Buffer或资源生命周期一一对应。不同编程�
 
 ### MutexID与Buffer对应关系
 
-双缓冲使用两个Buffer和两个MutexID。循环第`i`轮选择`bufferIndex = i % 2`，使同一个MutexID只管理其对应Buffer的依赖。第`i+2`轮再次选择相同的Buffer和MutexID，因此其`PIPE_MTE2`上的Lock会等待第`i`轮`PIPE_MTE3`的Unlock完成后再继续，保证Buffer能够安全复用。
+双缓冲使用两个Buffer和两个MutexID。循环第`i`轮选择`bufferIndex = i % 2`，使同一个MutexID只管理其对应Buffer的依赖。第`i + 2`轮再次选择相同的Buffer和MutexID，其`PIPE_MTE2`上的Lock会等待此前所有使用该MutexID的流水均已Unlock；其中包括第`i`轮`PIPE_MTE3`的Unlock。由此保证Buffer能够安全复用。
 
 | 轮次 | Buffer | MutexID | 关键约束 |
 | --- | --- | --- | --- |
@@ -86,17 +88,18 @@ AscendC::ReleaseMutexID(mutexId0);
 AscendC::ReleaseMutexID(mutexId1);
 ```
 
-在每条流水上，`Lock<当前pipe>`后的指令会等待此前所有流水中相同MutexID的`Unlock`释放。MTE2、V和MTE3使用同一MutexID时，代码顺序即表达了当前tile的正向依赖；再次使用该MutexID的MTE2则表达了Buffer复用前的反向依赖。
+在每条流水上，`Lock<当前pipe>`后的指令会等待此前所有流水中相同MutexID的`Unlock`全部完成。MTE2、V和MTE3使用同一MutexID时，代码顺序即表达了当前tile的正向依赖；再次使用该MutexID的MTE2时，会同时检查该MutexID此前全部阶段的完成状态，从而自然表达Buffer复用前的反向依赖。
 
 完整的可编译示例请参考仓内[Mutex核内流水线同步样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/mutex)。
 
 ## 与SetFlag/WaitFlag的选择
 
-`SetFlag/WaitFlag`和Mutex都可以建立核内多流水依赖。对于双缓冲算子中按Buffer生命周期组织的依赖，Mutex能将同步状态聚合到对应的MutexID：开发者在当前阶段只需调用`Lock<当前pipe>(mutexId)`和`Unlock<当前pipe>(mutexId)`，无需关心或传入前序生产者流水。Lock会阻塞当前流水，直到此前所有流水中相同MutexID的Unlock完成；因此，不需要像SetFlag/WaitFlag一样传入或维护源流水、目的流水组合及其事件ID。
+`SetFlag/WaitFlag`和Mutex都可以建立核内多流水依赖。对于双缓冲算子中按Buffer生命周期组织的依赖，Mutex能将同步状态聚合到对应的MutexID：开发者在当前阶段只需调用`Lock<当前pipe>(mutexId)`和`Unlock<当前pipe>(mutexId)`，无需关心或传入前序生产者流水。Lock阻塞当前流水，直至此前所有流水中相同MutexID的Mutex均已Unlock；它等待的是该资源此前所有阶段的完成状态，而不是某一条指定源流水。因此，不需要像SetFlag/WaitFlag一样传入或维护源流水、目的流水组合及其事件ID。
 
 | 对比项 | Mutex Lock/Unlock | SetFlag/WaitFlag |
 | --- | --- | --- |
 | 依赖表达 | 调用`Lock<当前pipe>(mutexId)`即可等待此前所有流水对该MutexID的Unlock，以MutexID关联同一Buffer生命周期内的多个阶段。 | 以源流水、目标流水和事件ID明确配对。 |
+| 解除阻塞条件 | 此前所有流水中相同MutexID的Mutex均已Unlock，不需要识别前序流水类型。 | 指定源流水已通过对应事件通知指定目标流水。 |
 | 反向同步 | 后续复用Buffer时再次Lock同一MutexID即可等待前序使用者释放，无需在当前调用中指定MTE3到下一轮MTE2的流水组合。 | 需要为反向依赖额外设置与等待相应的事件。 |
 | 同步信号量 | MutexID可用数量更多，适合管理多个并发Buffer。 | 事件ID数量受限，需要规划复用时机。 |
 | 架构相关配置 | 不依赖HardEvent，不需要根据源、目的流水组合选择事件类型。 | HardEvent的取值随硬件架构变化，需要根据目标架构支持的事件选择源、目的流水组合。 |
@@ -138,7 +141,9 @@ for (uint32_t i = 0; i < loopCount; ++i) {
 }
 ```
 
-使用Mutex时，`mutexId`与Buffer绑定。每个阶段只锁定当前流水；`Lock<PIPE_MTE2>(mutexId)`会自动等待此前MTE2、V、MTE3等所有流水对同一MutexID的Unlock。第`i + 2`轮复用Buffer时，MTE2上的Lock自然等待第`i`轮MTE3上的Unlock，无需额外表达`MTE3 -> MTE2`的源、目的流水组合，也无需根据循环次数为反向同步增加首轮等待或末轮通知分支。
+使用Mutex时，`mutexId`与Buffer绑定，MutexID记录的是该Buffer此前所有阶段的完成状态，而非某个指定生产者的完成状态。每个阶段只锁定当前流水；`Lock<PIPE_MTE2>(mutexId)`会阻塞`PIPE_MTE2`后续指令，直至此前`PIPE_MTE2`、`PIPE_V`、`PIPE_MTE3`等所有流水中同一MutexID的Mutex均已Unlock。因此，第`i + 2`轮复用Buffer时，MTE2上的Lock自然包含对第`i`轮MTE3的等待，而无需额外表达`PIPE_MTE3 -> PIPE_MTE2`的源、目的流水组合。
+
+这正是Mutex能够简化反向同步的原因：第`i + 2`轮的MTE2不需要知道前一次使用该Buffer的是哪一条流水，也不需要为反向依赖维护专用事件。只要所有访问该Buffer的阶段复用同一MutexID，Lock便会统一等待其此前全部阶段完成。相较之下，WaitFlag只能等待指定源流水发出的事件，开发者需要显式维护`PIPE_MTE3 -> PIPE_MTE2`组合，并根据循环次数增加首轮跳过等待、末轮跳过通知等边界分支。
 
 ```cpp
 // Mutex：只指定当前流水，MutexID表达整个Buffer生命周期。
