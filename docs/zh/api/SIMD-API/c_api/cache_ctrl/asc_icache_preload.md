@@ -69,6 +69,7 @@ PIPE_S
     int64_t pc = asc_get_program_counter() & 0xFFFFFFFFFFFF;
     asc_icache_preload(reinterpret_cast<void *>(pc), prefetch_length);
     ```
+
 ## 调用示例
 
 将以下代码保存为`example.asc`后，执行对应的编译运行命令。
