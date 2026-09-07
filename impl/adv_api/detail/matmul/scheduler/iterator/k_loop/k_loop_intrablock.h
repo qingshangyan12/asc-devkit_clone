@@ -32,8 +32,8 @@ namespace Detail {
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
     KLoop is only for internal usage, does not support extension or customized specialization!
 */
-template <typename IMPL, typename TRANS_T, class A_TYPE, const auto& MM_CFG>
-class KLoop<IMPL, TRANS_T, A_TYPE, MM_CFG, enable_if_t<IsIntrablock<MM_CFG>>> {
+template <typename IMPL, typename TRANS_T, class A_TYPE, class B_TYPE, const auto& MM_CFG>
+class KLoop<IMPL, TRANS_T, A_TYPE, B_TYPE, MM_CFG, enable_if_t<IsIntrablock<MM_CFG>>> {
     MATMUL_USE_MODULE(MatmulShapeTiling);
     MATMUL_USE_MODULE(MatmulSubBlockInfo);
 
@@ -114,7 +114,7 @@ public:
         return GetOuterIdx<IS_INTRA_BLOCK>() + 1 == GetOuterIter<IS_INTRA_BLOCK>();
     }
 
-    __aicore__ inline void InnerStart(){};
+    __aicore__ inline void InnerStart() {};
 
     __aicore__ inline bool InnerNext() { return false; }
 
