@@ -64,9 +64,12 @@ inline bfloat16_t hfloor(bfloat16_t x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __global__ __launch_bounds__(1024) void KernelFloor(bfloat16_t* dst, bfloat16_t* x)
+    __global__ __launch_bounds__(1024) void KernelFloor(bfloat16_t* dst, bfloat16_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = hfloor(x[idx]);
     }
     ```
@@ -76,9 +79,12 @@ inline bfloat16_t hfloor(bfloat16_t x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelFloor(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelFloor(__gm__ bfloat16_t* dst, __gm__ bfloat16_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = hfloor(x[idx]);
     }
     ```

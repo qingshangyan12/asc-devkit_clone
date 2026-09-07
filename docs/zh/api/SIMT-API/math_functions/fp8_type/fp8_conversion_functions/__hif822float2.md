@@ -70,7 +70,7 @@ SIMT编程场景当前不支持使用该接口。
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个hifloat8x2_t类型的数据，即2个hifloat8_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length /2) {
+        if (idx >= input_total_length /2) {
             return;
         }
         output[idx] = __hif822float2(input[idx]);

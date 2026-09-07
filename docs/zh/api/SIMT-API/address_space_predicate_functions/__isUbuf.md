@@ -73,10 +73,13 @@ SIMT编程场景：
 #include "simt_api/device_functions.h"
 
 __global__ __launch_bounds__(1024) void kernel__isUbuf(uint32_t* dst,
-uint32_t* src)
+uint32_t* src, uint32_t input_total_length)
 {
     __ubuf__ uint32_t ptr[10];
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    if (idx >= input_total_length) {
+        return;
+    }
     if(__isUbuf(ptr) == 1) {
        dst[idx] = 1;
     } else {

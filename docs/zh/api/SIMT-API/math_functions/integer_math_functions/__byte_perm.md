@@ -81,9 +81,12 @@ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void KernelByte_perm(unsigned int* dst, unsigned int* x, unsigned int* y, unsigned int* s)
+    __global__ __launch_bounds__(1024) void KernelByte_perm(unsigned int* dst, unsigned int* x, unsigned int* y, unsigned int* s, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __byte_perm(x[idx], y[idx], s[idx]);
     }
     ```
@@ -93,9 +96,12 @@ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelByte_perm(__gm__ unsigned int* dst, __gm__ unsigned int* x, __gm__ unsigned int* y, __gm__ unsigned int* s)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelByte_perm(__gm__ unsigned int* dst, __gm__ unsigned int* x, __gm__ unsigned int* y, __gm__ unsigned int* s, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __byte_perm(x[idx], y[idx], s[idx]);
     }
     ```

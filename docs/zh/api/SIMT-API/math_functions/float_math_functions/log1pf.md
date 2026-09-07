@@ -56,7 +56,9 @@ inline float log1pf(float x)
 
 ## 约束说明
 
-无
+<!-- npu="950" id7 -->
+针对Ascend 950PR/Ascend 950DT，本接口不支持输入为Subnormal的场景：当输入x处于Subnormal范围内时，返回值为0。
+<!-- end id7 -->
 
 ## 调用示例
 

@@ -55,7 +55,7 @@ inline bfloat16_t __ull2bfloat16_rd(const unsigned long long int x)
 | 513 | 512 |
 | 1025 | 1024 |
 | 65537 | 65536 |
-| 18446744073709551615（ULLONG_MAX） | 1.84467e+19 |
+| 18446744073709551615（ULLONG_MAX） | 1.83747e+19 |
 
 ## 约束说明
 
@@ -68,9 +68,12 @@ inline bfloat16_t __ull2bfloat16_rd(const unsigned long long int x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __global__ __launch_bounds__(1024) void kernel__ull2bfloat16_rd(bfloat16_t* dst, uint64_t* x)
+    __global__ __launch_bounds__(1024) void kernel__ull2bfloat16_rd(bfloat16_t* dst, uint64_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __ull2bfloat16_rd(x[idx]);
     }
     ```
@@ -80,9 +83,12 @@ inline bfloat16_t __ull2bfloat16_rd(const unsigned long long int x)
     ```cpp
     #include "simt_api/asc_bf16.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__ull2bfloat16_rd(__gm__ bfloat16_t* dst, __gm__ uint64_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__ull2bfloat16_rd(__gm__ bfloat16_t* dst, __gm__ uint64_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __ull2bfloat16_rd(x[idx]);
     }
     ```
