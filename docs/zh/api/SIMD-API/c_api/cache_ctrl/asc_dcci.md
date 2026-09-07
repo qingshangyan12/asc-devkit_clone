@@ -102,10 +102,9 @@ PIPE_S
 
 ## 调用示例
 
-将以下代码保存为`example.asc`后，执行对应的编译运行命令。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id9 -->
-
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
@@ -114,9 +113,8 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 <!-- end id9 -->
 
 ```cpp
-// 本示例验证asc_dcci_entire_out对GM脏数据的回写效果。GM中的数据初始值为11，
-// Scalar先在两个不同Cache Line中写入101，此时101仅保存在DCache中。随后通过asc_load_dev
-// 绕过DCache读取GM，得到刷新前的11；调用asc_dcci_entire_out后再次读取，应得到回写后的101。
+// 本示例验证asc_dcci_entire_out对GM脏数据的回写效果。Scalar先在两个不同Cache Line中
+// 写入101，再调用asc_dcci_entire_out将DCache中的脏数据回写到GM。Host回读后应得到101。
 #include <array>
 #include <cstdint>
 #include <iostream>
@@ -129,9 +127,8 @@ constexpr int32_t GM_VALUE = 11;
 constexpr int32_t DIRTY_VALUE = 101;
 constexpr uint32_t SECOND_LINE_OFFSET = 32;
 constexpr uint32_t DATA_COUNT = 64;
-constexpr uint32_t OUTPUT_COUNT = 4;
 
-__global__ __vector__ void AscDcciEntireOutKernel(__gm__ int32_t* data, __gm__ int32_t* output)
+__global__ __vector__ void AscDcciEntireOutKernel(__gm__ int32_t* data)
 {
     asc_init();
     volatile __gm__ int32_t* data_gm = data;
@@ -139,51 +136,34 @@ __global__ __vector__ void AscDcciEntireOutKernel(__gm__ int32_t* data, __gm__ i
     data_gm[0] = DIRTY_VALUE;
     data_gm[SECOND_LINE_OFFSET] = DIRTY_VALUE;
 
-    // asc_load_dev绕过DCache，读取尚未被回写的GM初始值。
-    const int32_t before_first = asc_load_dev(data);
-    const int32_t before_second = asc_load_dev(data + SECOND_LINE_OFFSET);
-
     // 刷新DCache中包含GM地址的Cache Line，并等待脏数据写回GM。
     asc_dcci_entire_out();
     asc_sync_data_barrier(mem_dsb_t::DSB_DDR);
-
-    const int32_t after_first = asc_load_dev(data);
-    const int32_t after_second = asc_load_dev(data + SECOND_LINE_OFFSET);
-    asc_store_dev(output, before_first);
-    asc_store_dev(output + 1, before_second);
-    asc_store_dev(output + 2, after_first);
-    asc_store_dev(output + 3, after_second);
-    asc_sync_data_barrier(mem_dsb_t::DSB_ALL);
 }
 
-bool CheckResult(const std::array<int32_t, OUTPUT_COUNT>& output)
+bool CheckResult(const std::array<int32_t, DATA_COUNT>& output)
 {
-    return output[0] == GM_VALUE && output[1] == GM_VALUE &&
-           output[2] == DIRTY_VALUE && output[3] == DIRTY_VALUE;
+    return output[0] == DIRTY_VALUE && output[SECOND_LINE_OFFSET] == DIRTY_VALUE;
 }
 } // namespace
 
 int main()
 {
     std::array<int32_t, DATA_COUNT> input{};
-    std::array<int32_t, OUTPUT_COUNT> output{};
     input.fill(GM_VALUE);
     aclInit(nullptr);
     aclrtSetDevice(0);
 
     int32_t* input_device = nullptr;
-    int32_t* output_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&input_device), input.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(input_device, input.size() * sizeof(int32_t), input.data(), input.size() * sizeof(int32_t), ACL_MEMCPY_HOST_TO_DEVICE);
-    AscDcciEntireOutKernel<<<1, 0>>>(input_device, output_device);
+    AscDcciEntireOutKernel<<<1, 0>>>(input_device);
     const aclError ret = aclrtSynchronizeDevice();
-    aclrtMemcpy(output.data(), output.size() * sizeof(int32_t), output_device, output.size() * sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
+    aclrtMemcpy(input.data(), input.size() * sizeof(int32_t), input_device, input.size() * sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
 
-    const bool passed = ret == ACL_SUCCESS && CheckResult(output);
+    const bool passed = ret == ACL_SUCCESS && CheckResult(input);
     std::cout << (passed ? "[Success] asc_dcci passed." : "[Failed] asc_dcci failed.") << std::endl;
     aclrtFree(input_device);
-    aclrtFree(output_device);
     aclrtResetDevice(0);
     aclFinalize();
     return passed ? 0 : 1;

@@ -54,7 +54,7 @@ PIPE_S
 
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -103,9 +103,9 @@ void PrintHex(const char* label, const std::vector<uint64_t>& data)
 __global__ __vector__ void AscGetPhyStackBaseKernel(__gm__ uint64_t* output)
 {
     asc_init();
-    output[0] = static_cast<uint64_t>(asc_get_phy_stack_base());
+    const uint64_t phy_stack_base = static_cast<uint64_t>(asc_get_phy_stack_base());
+    output[0] = phy_stack_base;
     output[1] = static_cast<uint64_t>(asc_get_phy_stack_base());
-    printf("phy stack base is %x", phy_stack_base);
     asc_dcci_single(output);
 }
 

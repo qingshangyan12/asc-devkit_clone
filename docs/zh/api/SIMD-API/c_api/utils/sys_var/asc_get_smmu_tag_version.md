@@ -67,7 +67,7 @@ PIPE_S
 
 本示例模拟运行环境兼容性诊断场景：Kernel读取SMMU标签版本并写入GM，Host侧按照返回值说明解析年、月、日和同日子版本字段。部分设备可能返回0，示例仅检查Kernel是否完成写回，不把非零值作为成功条件。
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行。产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -76,22 +76,6 @@ PIPE_S
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
-
-<!-- npu="A3" id9 -->
-以Atlas A3 训练系列产品/Atlas A3 推理系列产品（对应NPU架构为`dav-2201`）为例，编译运行命令如下：
-
-```bash
-bisheng example.asc -o main --npu-arch=dav-2201 && ./main
-```
-<!-- end id9 -->
-
-<!-- npu="910b" id10 -->
-以Atlas A2 训练系列产品/Atlas A2 推理系列产品（对应NPU架构为`dav-2201`）为例，编译运行命令如下：
-
-```bash
-bisheng example.asc -o main --npu-arch=dav-2201 && ./main
-```
-<!-- end id10 -->
 
 ```cpp
 #include <cstdint>
