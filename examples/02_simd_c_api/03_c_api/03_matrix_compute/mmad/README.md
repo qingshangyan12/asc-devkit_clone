@@ -184,12 +184,12 @@
   2. `asc_copy_l12l0a_transpose`：将 A 从 L1 转置搬运至 L0A；`asc_copy_l12l0b`：将 B 从 L1 搬运至 L0B；`asc_copy_l12bt`：将 Bias 从 L1 搬运至 BT 的 0 地址；
   3. `asc_mmad`：显式传入 BT 的 0 地址作为 Bias 地址，并设置 `disable_gemv = false`，完成矩阵乘加；
   4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`：将结果从 L0C 搬运至 GM（Nz -> ND）；
-- 说明：源场景统一设置 `mmadParams.kDirectionAlign = true`。在本样例支持的 `dav-3510` 架构上，基础 API 实际下沉给 Mmad 指令的对应参数为 `mmadParams.disableGemv`，不下沉 `kDirectionAlign`；C API 因此使用 `dav-3510` 对应的显式 Bias 地址重载，并保持源场景的 `disableGemv = false`。A 搬入 L0A 时仍按源场景将 K 方向对齐至 `CeilAlign(K, 16)`。
+- 说明：A 矩阵通过 `asc_copy_l12l0a_transpose` 从 L1 转置搬运至 L0A。L0A 中 M、K 方向的存储长度分别按照 `ceil_align(M, BLOCK_CUBE)` 和 `ceil_align(K, S3_C0_SIZE * S3_FRACTAL_NUM)` 计算；当前规格下，M 方向由 30 对齐至 32，K 方向由 70 对齐至 80。场景 3 使用 `dav-3510` 对应的显式 Bias 地址重载；由于 M 不为 1，`disable_gemv` 参数在本场景中不生效。
 <p align="center">
   <img src="figures/mmad_f32_L0A_转置.png" width="1100">
 </p>
 <p align="center">
-图2：float 类型、A 转置时，K 轴实际对齐与 Mmad 默认要求不同
+图2：float 类型 A 矩阵转置搬运后的 L0A 数据布局
 </p>
 
 ### 矩阵乘法（Mmad）

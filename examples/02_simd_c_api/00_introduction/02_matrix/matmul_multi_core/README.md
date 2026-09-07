@@ -1,4 +1,4 @@
-# 基于SIMD C API实现Matmul计算
+# 基于SIMD C API实现多核Matmul计算
 
 ## 概述
 
@@ -13,13 +13,13 @@
 ## 目录结构介绍
 
 ```
-├── matmul_basic_api
+├── matmul_multi_core
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   ├── matmul_basic_api.asc    // SIMD C API样例实现 & 调用样例
+│   ├── matmul_multi_core.asc   // SIMD C API样例实现 & 调用样例
 │   └── README.md               // 样例说明文档
 ```
 
@@ -44,12 +44,12 @@
   <tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mmad_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_multi_core_custom</td></tr>
   </table>
 
 - 样例实现：
   - Kernel侧整体思路
-    - `mmad_custom`是一个[`__global__`](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md) [`__cube__`](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md)核函数，表示该函数运行在[AI Core](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md)的[Cube](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md)计算单元上，主要用于矩阵计算。
+    - `matmul_multi_core_custom`是一个[`__global__`](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md) [`__cube__`](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md)核函数，表示该函数运行在[AI Core](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md)的[Cube](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md)计算单元上，主要用于矩阵计算。
     - 样例使用SIMD C API编程方式，通过`__gm__`、`__cbuf__`、`__ca__`、`__cb__`和`__cc__`地址空间限定符声明GM、L1、L0A、L0B和L0C上的数据。
     - `CUBE_BLOCK = 16`表示half数据类型分形为`16 x 16`，代码中按`16 x 16`的分形为单位调用`asc_copy_l12l0a`和`asc_copy_l12l0b_transpose`进行搬运。
 
@@ -164,7 +164,7 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}` 为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为`${HOME}/Ascend`。
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -197,24 +197,3 @@
   ```bash
   test pass!
   ```
-
-## 功能调试
-
-### printf
-
-该接口提供CPU域或NPU域调试场景下的格式化输出功能。
-
-在算子kernel侧实现代码中需要输出日志信息的地方调用 [printf](../../../../../docs/zh/api/Utils-API/tuning_interface/printf.md)接口打印相关内容。
-
-示例如下：
-
-```cpp
-printf("matmul blockIdx=%u\n", static_cast<uint32_t>(block_idx));
-```
-
-> [!CAUTION]注意 
->printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC\_DUMP=0的方式关闭打印功能。
-
-### DumpTensor
-
-基础API的`DumpTensor`以`LocalTensor`为输入。SIMD C API使用带地址空间限定符的数组，不提供以这些数组为输入的等价`asc_*`接口，因此本样例不能直接迁移`DumpTensor(cLocal, baseM * baseN)`调用。需要检查中间数据时，可在调测阶段使用printf输出必要信息，或结合仿真和性能调试工具进行定位。

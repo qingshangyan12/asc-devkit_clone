@@ -184,12 +184,12 @@ Figure 1: int8_t type, B not transposed, N axis actual alignment requirement dif
   2. `asc_copy_l12l0a_transpose`: Transpose A from L1 to L0A; `asc_copy_l12l0b`: Transfer B from L1 to L0B; `asc_copy_l12bt`: Transfer Bias from L1 to BT address 0;
   3. `asc_mmad`: Explicitly pass BT address 0 as the Bias address and set `disable_gemv = false` to perform matrix multiplication and addition;
   4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`: Transfer result from L0C to GM (Nz -> ND);
-- Description: The source scenario sets `mmadParams.kDirectionAlign = true` in its common code. On the `dav-3510` architecture supported by this example, the Basic API actually passes `mmadParams.disableGemv`, not `kDirectionAlign`, to the Mmad instruction. The C API therefore uses the corresponding `dav-3510` overload with an explicit Bias address and preserves the source setting `disableGemv = false`. When A is transferred to L0A, K is still aligned to `CeilAlign(K, 16)` as in the source scenario.
+- Description: Matrix A is transposed and transferred from L1 to L0A by `asc_copy_l12l0a_transpose`. The storage lengths in the M and K directions of L0A are calculated by `ceil_align(M, BLOCK_CUBE)` and `ceil_align(K, S3_C0_SIZE * S3_FRACTAL_NUM)`, respectively. For the current specifications, M is aligned from 30 to 32, and K is aligned from 70 to 80. Scenario 3 uses the explicit Bias address overload for `dav-3510`. Because M is not 1, `disable_gemv` does not take effect in this scenario.
 <p align="center">
   <img src="figures/mmad_f32_L0A_转置.png" width="1100">
 </p>
 <p align="center">
-Figure 2: float type, transposed A, K-axis alignment differs from the default Mmad requirement
+Figure 2: L0A data layout after transposed transfer of the float matrix A
 </p>
 
 ### Matrix Multiplication (Mmad)

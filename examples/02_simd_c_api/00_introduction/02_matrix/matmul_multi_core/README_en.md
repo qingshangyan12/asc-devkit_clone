@@ -1,4 +1,4 @@
-# Matmul Basic API Computation Based on the SIMD C API
+# Multi-Core Matmul Computation Based on the SIMD C API
 
 ## Overview
 
@@ -13,13 +13,13 @@ This sample implements multi-core matrix multiplication computation based on the
 ## Directory Structure
 
 ```
-├── matmul_basic_api
+├── matmul_multi_core
 │   ├── scripts
 │   │   ├── gen_data.py         // Script for generating input data and golden data
 │   │   └── verify_result.py    // Golden value comparison file
 │   ├── CMakeLists.txt          // Build project file
 │   ├── data_utils.h            // Data read and write functions
-│   ├── matmul_basic_api.asc    // SIMD C API sample implementation & invocation sample
+│   ├── matmul_multi_core.asc   // SIMD C API sample implementation & invocation sample
 │   └── README.md               // Sample documentation
 ```
 
@@ -44,12 +44,12 @@ This sample implements multi-core matrix multiplication computation based on the
   <tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Sample Output</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">mmad_custom</td></tr>
+  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">matmul_multi_core_custom</td></tr>
   </table>
 
 - Sample Implementation:
   - Kernel-side Overall Approach
-    - `mmad_custom` is a [`__global__`](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md) [`__cube__`](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md) kernel function, which indicates that this function runs on the [Cube](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md) computation unit of [AI Core](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md), primarily used for matrix computation.
+    - `matmul_multi_core_custom` is a [`__global__`](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md) [`__cube__`](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md) kernel function, which indicates that this function runs on the [Cube](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md) computation unit of [AI Core](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/glossary.md), primarily used for matrix computation.
     - The sample uses the SIMD C API programming method and declares data in GM, L1, L0A, L0B, and L0C through the `__gm__`, `__cbuf__`, `__ca__`, `__cb__`, and `__cc__` address-space qualifiers.
     - `CUBE_BLOCK = 16` indicates that the half data type fractal is `16 x 16`, and the code calls `asc_copy_l12l0a` and `asc_copy_l12l0b_transpose` to transfer data in units of `16 x 16` fractals.
 
@@ -164,7 +164,7 @@ Execute the following steps in the root directory of this sample to compile and 
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, it is installed to `/usr/local/Ascend` by default.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default installation path is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 - Sample Execution
 
   Execute the following commands in this sample directory.
@@ -197,24 +197,3 @@ Execute the following steps in the root directory of this sample to compile and 
   ```bash
   test pass!
   ```
-
-## Functional Debugging
-
-### printf
-
-This interface provides formatted output functionality for CPU domain or NPU domain debugging scenarios.
-
-Call the [printf](../../../../../docs/zh/api/Utils-API/tuning_interface/printf.md) interface in the operator kernel-side implementation code where log information needs to be output to print relevant content.
-
-Example:
-
-```cpp
-printf("matmul blockIdx=%u\n", static_cast<uint32_t>(block_idx));
-```
-
-> [!CAUTION]
-> The printf (PRINTF) interface printing functionality has a certain impact on the actual running performance of the operator and is typically used during the debugging phase. Developers can disable the printing functionality by setting ASCENDC_DUMP=0 as needed.
-
-### DumpTensor
-
-The basic API `DumpTensor` interface takes a `LocalTensor` as input. The SIMD C API uses arrays with address-space qualifiers and does not provide an equivalent `asc_*` interface that accepts these arrays. Therefore, this sample cannot directly migrate the `DumpTensor(cLocal, baseM * baseN)` call. To inspect intermediate data, print the required information with `printf` during debugging, or use simulation and performance debugging tools.
