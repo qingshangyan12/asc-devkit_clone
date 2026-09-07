@@ -77,8 +77,12 @@ public:
             }
         } else {
             if constexpr (IS_TRANS) {
-                return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKa<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR) *
-                       MX_EVEN_FACTOR;
+                if (IsSameTypeV<TransT, AscendC::hif4_scale>) {
+                    return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKa<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR);
+                } else {
+                    return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKa<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR) *
+                           MX_EVEN_FACTOR;
+                }
             } else {
                 return MATMUL_MODULE(MatmulShapeInfo)->template GetOrgM<IS_INTRA_BLOCK>();
             }
@@ -98,8 +102,12 @@ public:
             if constexpr (IS_TRANS) {
                 return MATMUL_MODULE(MatmulShapeInfo)->template GetOrgM<IS_INTRA_BLOCK>();
             } else {
-                return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKa<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR) *
-                       MX_EVEN_FACTOR;
+                if (IsSameTypeV<TransT, AscendC::hif4_scale>) {
+                    return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKa<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR);
+                } else {
+                    return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKa<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR) *
+                           MX_EVEN_FACTOR;
+                }
             }
         }
     }
@@ -110,10 +118,16 @@ public:
         // Constantized scenario
         // You can set IS_BASIC to false, if you don't need to use constantized parameters
         if constexpr (IS_TRANS) {
-            return Ceil(
-                       MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
-                       MX_BASEK_FACTOR) *
-                   MX_EVEN_FACTOR;
+            if (IsSameTypeV<TransT, AscendC::hif4_scale>) {
+                return Ceil(
+                    MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
+                    MX_BASEK_FACTOR);
+            } else {
+                return Ceil(
+                           MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
+                           MX_BASEK_FACTOR) *
+                       MX_EVEN_FACTOR;
+            }
         } else {
             return MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreM<IS_INTRA_BLOCK, IS_BASIC>();
         }
@@ -127,10 +141,16 @@ public:
         if constexpr (IS_TRANS) {
             return MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreM<IS_INTRA_BLOCK, IS_BASIC>();
         } else {
-            return Ceil(
-                       MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
-                       MX_BASEK_FACTOR) *
-                   MX_EVEN_FACTOR;
+            if (IsSameTypeV<TransT, AscendC::hif4_scale>) {
+                return Ceil(
+                    MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
+                    MX_BASEK_FACTOR);
+            } else {
+                return Ceil(
+                           MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
+                           MX_BASEK_FACTOR) *
+                       MX_EVEN_FACTOR;
+            }
         }
     }
 
@@ -138,7 +158,7 @@ public:
     __aicore__ inline int32_t GetBaseHeight() const
     {
         if constexpr (IS_TRANS) {
-            return Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(), MX_K_FACTOR);
+            return Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(), GetMxKfactor<TransT>());
         } else {
             return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM();
         }
@@ -150,7 +170,7 @@ public:
         if constexpr (IS_TRANS) {
             return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM();
         } else {
-            return Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(), MX_K_FACTOR);
+            return Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(), GetMxKfactor<TransT>());
         }
     }
 
@@ -233,8 +253,12 @@ public:
             }
         } else {
             if constexpr (IS_TRANS) {
-                return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKb<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR) *
-                       MX_EVEN_FACTOR;
+                if (IsSameTypeV<TransT, AscendC::hif4_scale>) {
+                    return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKb<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR);
+                } else {
+                    return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKb<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR) *
+                           MX_EVEN_FACTOR;
+                }
             } else {
                 return MATMUL_MODULE(MatmulShapeInfo)->template GetOrgN<IS_INTRA_BLOCK>();
             }
@@ -254,8 +278,12 @@ public:
             if constexpr (IS_TRANS) {
                 return MATMUL_MODULE(MatmulShapeInfo)->template GetOrgN<IS_INTRA_BLOCK>();
             } else {
-                return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKb<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR) *
-                       MX_EVEN_FACTOR;
+                if (IsSameTypeV<TransT, AscendC::hif4_scale>) {
+                    return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKb<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR);
+                } else {
+                    return Ceil(MATMUL_MODULE(MatmulShapeInfo)->template GetOrgKb<IS_INTRA_BLOCK>(), MX_BASEK_FACTOR) *
+                           MX_EVEN_FACTOR;
+                }
             }
         }
     }
@@ -267,10 +295,16 @@ public:
         if constexpr (IS_TRANS) {
             return MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreN<IS_INTRA_BLOCK, IS_BASIC>();
         } else {
-            return Ceil(
-                       MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
-                       MX_BASEK_FACTOR) *
-                   MX_EVEN_FACTOR;
+            if (IsSameTypeV<TransT, AscendC::hif4_scale>) {
+                return Ceil(
+                    MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
+                    MX_BASEK_FACTOR);
+            } else {
+                return Ceil(
+                           MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
+                           MX_BASEK_FACTOR) *
+                       MX_EVEN_FACTOR;
+            }
         }
     }
 
@@ -280,7 +314,7 @@ public:
         if constexpr (IS_TRANS) {
             return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
         } else {
-            return Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(), MX_K_FACTOR);
+            return Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(), GetMxKfactor<TransT>());
         }
     }
 
@@ -288,10 +322,16 @@ public:
     __aicore__ inline int32_t GetSingleWidth() const
     {
         if constexpr (IS_TRANS) {
-            return Ceil(
-                       MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
-                       MX_BASEK_FACTOR) *
-                   MX_EVEN_FACTOR;
+            if (IsSameTypeV<TransT, AscendC::hif4_scale>) {
+                return Ceil(
+                    MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
+                    MX_BASEK_FACTOR);
+            } else {
+                return Ceil(
+                           MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK, IS_BASIC>(),
+                           MX_BASEK_FACTOR) *
+                       MX_EVEN_FACTOR;
+            }
         } else {
             return MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreN<IS_INTRA_BLOCK, IS_BASIC>();
         }
@@ -301,7 +341,7 @@ public:
     __aicore__ inline int32_t GetBaseWidth() const
     {
         if constexpr (IS_TRANS) {
-            return Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(), MX_K_FACTOR);
+            return Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(), GetMxKfactor<TransT>());
         } else {
             return MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
         }
