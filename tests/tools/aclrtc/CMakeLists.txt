@@ -21,6 +21,7 @@ file(GLOB ACLRTC_SRC_FILES
 
 set(ACLRTC_COMMON_DEPENDENCY_SRC_FILES
     ${ASCENDC_DIR}/tools/build/common/file_utils.cpp
+    ${ASCENDC_DIR}/tools/build/common/manifest_constant.cpp
     ${ASCENDC_DIR}/tools/build/common/process_executor.cpp
     ${ASCENDC_DIR}/tools/build/common/directory_cleanup_guard.cpp
 )
@@ -32,6 +33,7 @@ file(GLOB TEST_ACLRTC_SRC_FILES
 )
 
 add_executable(ascendc_ut_aclrtc
+    ${ASCENDC_DIR}/tests/tools/utils/common/test_manifest_constant.cpp
     ${ACLRTC_SRC_FILES}
     ${ACLRTC_COMMON_DEPENDENCY_SRC_FILES}
     ${TEST_ACLRTC_SRC_FILES}

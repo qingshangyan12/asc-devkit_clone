@@ -30,7 +30,7 @@ bool ReadNonnegativeInteger(const Json& value, uint64_t maximum, uint64_t& resul
     return result <= maximum;
 }
 
-aclError ParseConstants(const Json& kernel, std::vector<ConstantSpec>& constants)
+aclError ParseConstants(const Json& kernel, std::vector<ManifestConstant>& constants)
 {
     const auto infos = kernel.find("constant_infos");
     if (infos == kernel.end() || !infos->is_array() || infos->empty()) {
@@ -39,35 +39,10 @@ aclError ParseConstants(const Json& kernel, std::vector<ConstantSpec>& constants
     }
     for (size_t index = 0; index < infos->size(); ++index) {
         const Json& info = infos->at(index);
-        ConstantSpec spec;
-        if (!ReadNonnegativeInteger(
-                info.at("parameter_index"), std::numeric_limits<uint64_t>::max(), spec.parameterIndex)) {
-            ASCENDLOGE("constant_infos[%zu].parameter_index must be a nonnegative integer", index);
-            return ACLRTC_ERROR_FAILURE;
-        }
-        const std::string type = info.value("arg_type", "struct");
-        if (type == "pointer") {
-            uint64_t byteSize = 0U;
-            if (!ReadNonnegativeInteger(info.at("byte_size"), std::numeric_limits<uint64_t>::max(), byteSize) ||
-                byteSize == 0U) {
-                ASCENDLOGE("constant_infos[%zu].byte_size must be a positive integer for pointer constants", index);
-                return ACLRTC_ERROR_FAILURE;
-            }
-            spec.argumentKind = ConstantArgumentKind::Pointer;
-            spec.byteSize = byteSize;
-        } else if (type == "struct") {
-            if (info.contains("byte_size")) {
-                ASCENDLOGE("constant_infos[%zu] is struct and must not contain byte_size", index);
-                return ACLRTC_ERROR_FAILURE;
-            }
-        } else {
-            ASCENDLOGE("constant_infos[%zu].arg_type must be pointer or struct", index);
-            return ACLRTC_ERROR_FAILURE;
-        }
-        spec.targetFile = {info.at("file").get<std::string>(), "constant_infos[" + std::to_string(index) + "].file"};
-        spec.templateText = info.at("template").get<std::string>();
-        if (spec.targetFile.text.empty() || spec.templateText.empty()) {
-            ASCENDLOGE("constant_infos[%zu] requires nonempty file and template fields", index);
+        ManifestConstant spec;
+        std::string error;
+        if (!ParseManifestConstant(info, spec, error)) {
+            ASCENDLOGE("constant_infos[%zu]: %s", index, error.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
         constants.emplace_back(std::move(spec));

@@ -150,6 +150,14 @@ TEST_F(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
     EXPECT_TRUE(Validate(defaultStructConstant));
 }
 
+TEST_F(ResourceManifestValidatorTest, AcceptsNonnegativeSignedConstantIntegers)
+{
+    Json manifest = MakeValidManifest();
+    Constant(manifest)["parameter_index"] = int64_t{0};
+    Constant(manifest)["byte_size"] = int64_t{4};
+    EXPECT_TRUE(Validate(manifest));
+}
+
 TEST_F(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
 {
     ExpectInvalid("manifest is not an object", [](Json& manifest) { manifest = Json::array(); });

@@ -18,6 +18,7 @@
 
 #include "ascendc_tool_log.h"
 #include "file_utils.h"
+#include "manifest_constant.h"
 #include "nlohmann/json.hpp"
 
 namespace ascendc {
@@ -31,8 +32,6 @@ constexpr const char* OPTIONS_MARKER_PREFIX = "${options:";
 
 constexpr const char* RESOURCE_ROOT_MARKER = "${resource}";
 constexpr const char* SOURCE_FILE_PATH_MARKER = "${source_file_path}";
-constexpr const char* POINTER_ARGUMENT_TYPE = "pointer";
-constexpr const char* STRUCT_ARGUMENT_TYPE = "struct";
 
 enum class MarkerRequirement { None, SourceFile };
 
@@ -315,78 +314,20 @@ bool ResourceManifestValidator::ValidateOptionArray(const std::string& name)
 
 bool ResourceManifestValidator::ValidateConstant(const Json& constant, std::set<std::string>& constantNames)
 {
-    if (!CheckAndLog(constant.is_object(), __LINE__, "invalid constant: expected an object") ||
-        !CheckAndLog(constant.contains("name"), __LINE__, "missing required constant field: name") ||
-        !CheckAndLog(
-            constant.contains("parameter_index"), __LINE__, "missing required constant field: parameter_index") ||
-        !CheckAndLog(constant.contains("file"), __LINE__, "missing required constant field: file") ||
-        !CheckAndLog(constant.contains("template"), __LINE__, "missing required constant field: template") ||
-        !CheckAndLog(constant.at("name").is_string(), __LINE__, "invalid constant name: expected a string") ||
-        !CheckAndLog(
-            !constant.at("name").get_ref<const std::string&>().empty(), __LINE__,
-            "invalid constant name: expected a nonempty string") ||
-        !CheckAndLog(
-            constant.at("parameter_index").is_number_unsigned(), __LINE__,
-            "invalid parameter_index: expected an unsigned integer") ||
-        !CheckAndLog(constant.at("file").is_string(), __LINE__, "invalid constant file: expected a string") ||
-        !CheckAndLog(constant.at("template").is_string(), __LINE__, "invalid constant template: expected a string") ||
-        !CheckAndLog(
-            !constant.at("template").get_ref<const std::string&>().empty(), __LINE__,
-            "invalid constant template: expected a nonempty string")) {
+    ManifestConstant parsed;
+    std::string error;
+    if (!ParseManifestConstant(constant, parsed, error)) {
+        ASCENDLOGE("Invalid constant: %s", error.c_str());
         return false;
     }
-
-    const bool hasArgumentType = constant.contains("arg_type");
-    if (hasArgumentType &&
-        !CheckAndLog(constant.at("arg_type").is_string(), __LINE__, "invalid arg_type: expected a string")) {
-        return false;
-    }
-    const std::string argumentType =
-        hasArgumentType ? constant.at("arg_type").get_ref<const std::string&>() : STRUCT_ARGUMENT_TYPE;
     if (!CheckAndLog(
-            argumentType == POINTER_ARGUMENT_TYPE || argumentType == STRUCT_ARGUMENT_TYPE, __LINE__,
-            "invalid arg_type: expected pointer or struct")) {
-        return false;
-    }
-
-    const bool hasByteSize = constant.contains("byte_size");
-    if (argumentType == POINTER_ARGUMENT_TYPE) {
-        if (!CheckAndLog(hasByteSize, __LINE__, "missing required pointer constant field: byte_size") ||
-            !CheckAndLog(
-                constant.at("byte_size").is_number_unsigned(), __LINE__,
-                "invalid byte_size: expected an unsigned integer") ||
-            !CheckAndLog(
-                constant.at("byte_size").get<Json::number_unsigned_t>() != 0U, __LINE__,
-                "invalid byte_size: expected a nonzero value")) {
-            return false;
-        }
-    } else if (!CheckAndLog(
-                   !hasByteSize, __LINE__,
-                   "invalid struct constant: byte_size must be omitted; size comes from argsBytes")) {
-        return false;
-    }
-    constexpr size_t requiredConstantFieldCount = 4U;
-    const size_t expectedFieldCount =
-        requiredConstantFieldCount + (hasArgumentType ? 1U : 0U) + (hasByteSize ? 1U : 0U);
-    if (!CheckAndLog(constant.size() == expectedFieldCount, __LINE__, "invalid constant: unexpected extra fields")) {
-        return false;
-    }
-
-    const std::string name = constant.at("name").get_ref<const std::string&>();
-    const std::string file = constant.at("file").get_ref<const std::string&>();
-    if (!CheckAndLog(
-            file.rfind(std::string(RESOURCE_ROOT_MARKER) + "/", 0U) == 0U, __LINE__,
+            parsed.targetFile.rfind(std::string(RESOURCE_ROOT_MARKER) + "/", 0U) == 0U, __LINE__,
             "invalid constant file: expected ${resource}/<relative-path>") ||
-        !ValidateResourceReference(file) ||
-        !CheckAndLog(constantNames.insert(name).second, __LINE__, "duplicate constant name: name=" + name)) {
+        !ValidateResourceReference(parsed.targetFile) ||
+        !CheckAndLog(
+            constantNames.insert(parsed.name).second, __LINE__, "duplicate constant name: name=" + parsed.name)) {
         return false;
     }
-
-    ASCENDLOGD(
-        "Validated constant: name=%s parameter_index=%llu arg_type=%s byte_size=%llu", name.c_str(),
-        static_cast<unsigned long long>(constant.at("parameter_index").get<Json::number_unsigned_t>()),
-        argumentType.c_str(),
-        static_cast<unsigned long long>(hasByteSize ? constant.at("byte_size").get<Json::number_unsigned_t>() : 0U));
     return true;
 }
 

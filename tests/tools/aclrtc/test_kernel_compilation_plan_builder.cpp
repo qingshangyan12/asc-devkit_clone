@@ -124,7 +124,8 @@ Json CreateManifest()
              {{{"kernel_name", "other_kernel"}, {"unsupported_future_field", Json::object()}},
               {{"kernel_name", "add_custom_100000"},
                {"constant_infos", Json::array(
-                                      {{{"parameter_index", 0},
+                                      {{{"name", "tiling"},
+                                        {"parameter_index", 0},
                                         {"arg_type", "pointer"},
                                         {"byte_size", 2},
                                         {"file", "${resource}/resources/include/constants.h"},
@@ -185,8 +186,8 @@ TEST(KernelManifestParserTest, OwnsSelectedFieldsWithoutResolvingRuntimeEnvironm
         ascendc::aclrtc::ACLRTC_SUCCESS);
     manifest.clear();
     ASSERT_EQ(spec.constants.size(), 1U);
-    EXPECT_EQ(spec.constants[0].argumentKind, ascendc::aclrtc::ConstantArgumentKind::Pointer);
-    EXPECT_EQ(spec.constants[0].byteSize, 2U);
+    EXPECT_FALSE(spec.constants[0].sizeRule.UsesArgumentSize());
+    EXPECT_EQ(spec.constants[0].sizeRule.ResolveByteCount(99U), 2U);
     ASSERT_EQ(spec.commands.size(), 1U);
     EXPECT_EQ(spec.commands[0].executable.text, "${env:ACLRTC_TEST_TOOLCHAIN}/bin/bisheng");
     ASSERT_GE(spec.commands[0].arguments.size(), 3U);
@@ -217,6 +218,25 @@ TEST(KernelManifestParserTest, RejectsInvalidConstantContractsWithoutChangingOut
             ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
         ASSERT_EQ(spec.linkOptions.size(), 1U);
         EXPECT_EQ(spec.linkOptions[0].text, "unchanged");
+    }
+}
+
+TEST(KernelManifestParserTest, RejectsMissingAndUnexpectedConstantFields)
+{
+    for (const std::string& field : {"name", "parameter_index", "file", "template", "extra"}) {
+        SCOPED_TRACE(field);
+        Json manifest = CreateManifest();
+        auto& constant = manifest["kernels"][1]["constant_infos"][0];
+        if (field == "extra") {
+            constant[field] = true;
+        } else {
+            constant.erase(field);
+        }
+        ascendc::aclrtc::KernelManifestSpec spec;
+        EXPECT_EQ(
+            ascendc::aclrtc::ParseSelectedKernelManifest(
+                manifest, "add_custom_100000", KernelCompilationVariant::Basic, spec),
+            ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
     }
 }
 

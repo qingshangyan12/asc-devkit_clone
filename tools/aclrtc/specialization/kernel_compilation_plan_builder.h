@@ -14,10 +14,13 @@
 #include "kernel_specialization_types.h"
 
 #include <boost/filesystem/path.hpp>
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 namespace ascendc {
 namespace aclrtc {
+
+struct KernelManifestSpec;
+struct CommandSpec;
 
 class KernelCompilationPlanBuilder final {
 public:
@@ -28,10 +31,19 @@ public:
     aclError BuildCompilationPlan(KernelCompilationPlan& compilationPlan) const;
 
 private:
+    struct BoundConstantSource;
+
+    aclError CheckResourceWorktreeDirectory() const;
+    bool ExpandManifestText(const std::string& text, const std::string& location, std::string& resolvedText) const;
+    aclError BindConstantSources(const KernelManifestSpec& manifest, std::vector<BoundConstantSource>& constants) const;
+    aclError BindManifestCommand(const CommandSpec& spec, CompilationCommand& command) const;
+    aclError BindLinkCommand(const KernelManifestSpec& manifest, KernelCompilationPlan& plan) const;
+
     const NormalizedKernelSpecializationRequest& specializationRequest_;
     const nlohmann::json& resourceManifest_;
     boost::filesystem::path resourceWorktreePath_;
     boost::filesystem::path externalSourceDirectoryPath_;
+    boost::filesystem::path outputDirectoryPath_;
 };
 
 } // namespace aclrtc

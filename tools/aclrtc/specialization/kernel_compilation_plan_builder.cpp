@@ -27,33 +27,6 @@ namespace {
 namespace fs = boost::filesystem;
 constexpr char ENVIRONMENT_REFERENCE_PREFIX[] = "${env:";
 
-struct ManifestExpansionContext {
-    const fs::path& resourceWorktreePath;
-    const fs::path& outputDirectoryPath;
-    const fs::path& externalSourceDirectoryPath;
-};
-
-struct BoundConstantSource {
-    const void* borrowedData;
-    uint64_t byteCount;
-    fs::path targetFilePath;
-    std::string templateText;
-};
-
-struct BoundManifestCommand {
-    CompilationCommand command;
-    ManifestObjectKind objectKind;
-    size_t outputOptionPosition{0U};
-};
-
-struct BoundCompilationInputs {
-    std::vector<BoundConstantSource> constants;
-    std::vector<BoundManifestCommand> commands;
-    CompilationCommand linkCommand;
-    std::set<fs::path> requiredOutputDirectories;
-    fs::path linkedKernelElfPath;
-};
-
 void ReplaceAllLiteralOccurrences(std::string& text, const std::string& literalText, const std::string& replacementText)
 {
     size_t occurrencePosition = 0U;
@@ -106,18 +79,6 @@ bool ExpandEnvironmentVariablePlaceholders(
     return true;
 }
 
-bool ExpandPathAndEnvironmentPlaceholders(
-    const std::string& manifestText, const std::string& manifestValueLocation,
-    const ManifestExpansionContext& expansionContext, std::string& resolvedText)
-{
-    std::string pathResolvedText = manifestText;
-    ReplaceAllLiteralOccurrences(pathResolvedText, "${resource}", expansionContext.resourceWorktreePath.string());
-    ReplaceAllLiteralOccurrences(pathResolvedText, "${output}", expansionContext.outputDirectoryPath.string());
-    ReplaceAllLiteralOccurrences(
-        pathResolvedText, "${source_file_path}", expansionContext.externalSourceDirectoryPath.string());
-    return ExpandEnvironmentVariablePlaceholders(pathResolvedText, manifestValueLocation, resolvedText);
-}
-
 bool IsAbsoluteExecutableRegularFile(const fs::path& executablePath)
 {
     boost::system::error_code fileError;
@@ -163,28 +124,46 @@ std::string FormatBytesAsCppInitializerList(const void* constantAddress, uint64_
     return encodedBytes.str();
 }
 
-aclError BindConstantSources(
-    const std::vector<ConstantSpec>& constantSpecs, const NormalizedKernelSpecializationRequest& specializationRequest,
-    const ManifestExpansionContext& expansionContext, std::vector<BoundConstantSource>& constants)
+} // namespace
+
+struct KernelCompilationPlanBuilder::BoundConstantSource {
+    const void* borrowedData;
+    uint64_t byteCount;
+    fs::path targetFilePath;
+    std::string templateText;
+};
+
+bool KernelCompilationPlanBuilder::ExpandManifestText(
+    const std::string& text, const std::string& location, std::string& resolvedText) const
 {
-    for (const ConstantSpec& spec : constantSpecs) {
+    std::string pathResolvedText = text;
+    ReplaceAllLiteralOccurrences(pathResolvedText, "${resource}", resourceWorktreePath_.string());
+    ReplaceAllLiteralOccurrences(pathResolvedText, "${output}", outputDirectoryPath_.string());
+    ReplaceAllLiteralOccurrences(pathResolvedText, "${source_file_path}", externalSourceDirectoryPath_.string());
+    return ExpandEnvironmentVariablePlaceholders(pathResolvedText, location, resolvedText);
+}
+
+aclError KernelCompilationPlanBuilder::BindConstantSources(
+    const KernelManifestSpec& manifest, std::vector<BoundConstantSource>& constants) const
+{
+    for (const ManifestConstant& spec : manifest.constants) {
         const uint64_t constantArgumentIndex = spec.parameterIndex;
-        if (specializationRequest.borrowedKernelArgumentDataPointers == nullptr) {
+        if (specializationRequest_.borrowedKernelArgumentDataPointers == nullptr) {
             ASCENDLOGE(
                 "constant parameter_index %llu requires argsAddr; set it with at least argsCount entries",
                 static_cast<unsigned long long>(constantArgumentIndex));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
-        if (constantArgumentIndex >= specializationRequest.kernelArgumentCount) {
+        if (constantArgumentIndex >= specializationRequest_.kernelArgumentCount) {
             ASCENDLOGE(
                 "constant parameter_index %llu is outside argsCount %llu; set argsCount greater than %llu and "
                 "provide a matching argsAddr entry and an argsBytes entry for struct constants",
                 static_cast<unsigned long long>(constantArgumentIndex),
-                static_cast<unsigned long long>(specializationRequest.kernelArgumentCount),
+                static_cast<unsigned long long>(specializationRequest_.kernelArgumentCount),
                 static_cast<unsigned long long>(constantArgumentIndex));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
-        if (specializationRequest.borrowedKernelArgumentDataPointers[constantArgumentIndex] == nullptr) {
+        if (specializationRequest_.borrowedKernelArgumentDataPointers[constantArgumentIndex] == nullptr) {
             ASCENDLOGE(
                 "argsAddr[%llu] must not be null for a static constant; set it to the constant data buffer",
                 static_cast<unsigned long long>(constantArgumentIndex));
@@ -192,16 +171,14 @@ aclError BindConstantSources(
         }
 
         uint64_t constantByteCount = 0U;
-        if (spec.argumentKind == ConstantArgumentKind::Pointer) {
-            constantByteCount = *spec.byteSize;
-        } else {
-            if (specializationRequest.borrowedKernelArgumentByteCounts == nullptr) {
+        if (spec.sizeRule.UsesArgumentSize()) {
+            if (specializationRequest_.borrowedKernelArgumentByteCounts == nullptr) {
                 ASCENDLOGE(
                     "struct constant parameter_index %llu requires argsBytes; set it with at least argsCount entries",
                     static_cast<unsigned long long>(constantArgumentIndex));
                 return ACLRTC_ERROR_INVALID_INPUT;
             }
-            constantByteCount = specializationRequest.borrowedKernelArgumentByteCounts[constantArgumentIndex];
+            constantByteCount = specializationRequest_.borrowedKernelArgumentByteCounts[constantArgumentIndex];
             if (constantByteCount == 0U) {
                 ASCENDLOGE(
                     "argsBytes[%llu] must be nonzero for a struct constant",
@@ -210,29 +187,26 @@ aclError BindConstantSources(
             }
         }
 
+        constantByteCount = spec.sizeRule.ResolveByteCount(constantByteCount);
         std::string resolvedTargetFilePath;
-        if (!ExpandPathAndEnvironmentPlaceholders(
-                spec.targetFile.text, spec.targetFile.location, expansionContext, resolvedTargetFilePath)) {
+        if (!ExpandManifestText(spec.targetFile, "constant '" + spec.name + "'.file", resolvedTargetFilePath)) {
             return ACLRTC_ERROR_FAILURE;
         }
         constants.push_back(
-            {specializationRequest.borrowedKernelArgumentDataPointers[constantArgumentIndex], constantByteCount,
+            {specializationRequest_.borrowedKernelArgumentDataPointers[constantArgumentIndex], constantByteCount,
              resolvedTargetFilePath, spec.templateText});
     }
     return ACLRTC_SUCCESS;
 }
 
-aclError BindManifestCommand(
-    const CommandSpec& spec, const ManifestExpansionContext& expansionContext, BoundManifestCommand& boundCommand)
+aclError KernelCompilationPlanBuilder::BindManifestCommand(
+    const CommandSpec& spec, CompilationCommand& compilationCommand) const
 {
-    CompilationCommand& compilationCommand = boundCommand.command;
-    boundCommand.objectKind = spec.objectKind;
     compilationCommand.commandKind = spec.commandKind;
     compilationCommand.parallelStage = spec.parallelStage;
     compilationCommand.diagnosticLabel = spec.diagnosticLabel;
     std::string executable;
-    if (!ExpandPathAndEnvironmentPlaceholders(
-            spec.executable.text, spec.executable.location, expansionContext, executable)) {
+    if (!ExpandManifestText(spec.executable.text, spec.executable.location, executable)) {
         return ACLRTC_ERROR_FAILURE;
     }
     compilationCommand.executablePath = std::move(executable);
@@ -246,58 +220,62 @@ aclError BindManifestCommand(
 
     for (const ManifestTextSpec& argument : spec.arguments) {
         std::string resolvedArgument;
-        if (!ExpandPathAndEnvironmentPlaceholders(
-                argument.text, argument.location, expansionContext, resolvedArgument)) {
+        if (!ExpandManifestText(argument.text, argument.location, resolvedArgument)) {
             return ACLRTC_ERROR_FAILURE;
         }
         compilationCommand.commandArguments.emplace_back(std::move(resolvedArgument));
     }
 
     if (compilationCommand.commandKind == CompilationCommandKind::Compile) {
-        if (!FindSeparatedCompilerOutputOptionPosition(
-                compilationCommand.commandArguments, boundCommand.outputOptionPosition)) {
+        size_t outputOptionPosition = 0U;
+        if (!FindSeparatedCompilerOutputOptionPosition(compilationCommand.commandArguments, outputOptionPosition)) {
             ASCENDLOGE(
                 "Manifest compile command %s must contain a valid separated '-o' output option and a non-empty "
                 "output path; regenerate the JIT resource with '-o' followed by its output path",
                 compilationCommand.diagnosticLabel.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
+        const auto& options = spec.objectKind == ManifestObjectKind::Basic ?
+                                  specializationRequest_.compilerOptions.basicOptions :
+                                  specializationRequest_.compilerOptions.superKernelOptions;
+        compilationCommand.commandArguments.insert(
+            compilationCommand.commandArguments.begin() + static_cast<std::ptrdiff_t>(outputOptionPosition),
+            options.begin(), options.end());
     }
     return ACLRTC_SUCCESS;
 }
 
-aclError BindLinkCommand(
-    const KernelManifestSpec& spec, const ManifestExpansionContext& expansionContext, CompilationCommand& linkCommand,
-    std::set<fs::path>& requiredOutputDirectories, fs::path& linkedKernelElfPath)
+aclError KernelCompilationPlanBuilder::BindLinkCommand(
+    const KernelManifestSpec& spec, KernelCompilationPlan& plan) const
 {
+    CompilationCommand linkCommand;
+    std::set<fs::path> requiredOutputDirectories{outputDirectoryPath_};
     linkCommand.commandKind = CompilationCommandKind::Link;
     linkCommand.diagnosticLabel = "link";
     std::string linkerPath;
-    if (!ExpandPathAndEnvironmentPlaceholders(
-            "${env:ASCEND_HOME_PATH}/bin/ld.lld", "internal linker executable", expansionContext, linkerPath)) {
+    if (!ExpandManifestText("${env:ASCEND_HOME_PATH}/bin/ld.lld", "internal linker executable", linkerPath)) {
         return ACLRTC_ERROR_FAILURE;
     }
     linkCommand.executablePath = linkerPath;
 
     for (const ManifestTextSpec& option : spec.linkOptions) {
         std::string resolvedOption;
-        if (!ExpandPathAndEnvironmentPlaceholders(option.text, option.location, expansionContext, resolvedOption)) {
+        if (!ExpandManifestText(option.text, option.location, resolvedOption)) {
             return ACLRTC_ERROR_FAILURE;
         }
         linkCommand.commandArguments.emplace_back(std::move(resolvedOption));
     }
     for (const ManifestTextSpec& input : spec.linkInputs) {
         std::string resolvedInput;
-        if (!ExpandPathAndEnvironmentPlaceholders(input.text, input.location, expansionContext, resolvedInput)) {
+        if (!ExpandManifestText(input.text, input.location, resolvedInput)) {
             return ACLRTC_ERROR_FAILURE;
         }
         requiredOutputDirectories.emplace(fs::path(resolvedInput).parent_path());
         linkCommand.commandArguments.emplace_back(std::move(resolvedInput));
     }
-    linkedKernelElfPath = expansionContext.outputDirectoryPath / "linked_kernel.elf";
-    requiredOutputDirectories.emplace(linkedKernelElfPath.parent_path());
+    plan.linkedKernelElfPath = outputDirectoryPath_ / "linked_kernel.elf";
     linkCommand.commandArguments.emplace_back("-o");
-    linkCommand.commandArguments.emplace_back(linkedKernelElfPath.string());
+    linkCommand.commandArguments.emplace_back(plan.linkedKernelElfPath.string());
     if (!IsAbsoluteExecutableRegularFile(linkCommand.executablePath)) {
         ASCENDLOGE(
             "Linker requires an absolute path to an existing executable regular file: path=%s; verify "
@@ -305,88 +283,36 @@ aclError BindLinkCommand(
             linkCommand.executablePath.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
+    plan.compilationCommands.emplace_back(std::move(linkCommand));
+    plan.requiredOutputDirectoryPaths.assign(requiredOutputDirectories.begin(), requiredOutputDirectories.end());
     return ACLRTC_SUCCESS;
 }
 
-aclError BindCompilationInputs(
-    const NormalizedKernelSpecializationRequest& specializationRequest, const KernelManifestSpec& spec,
-    const fs::path& resourceWorktreePath, const fs::path& externalSourceDirectoryPath,
-    BoundCompilationInputs& boundInputs)
+aclError KernelCompilationPlanBuilder::CheckResourceWorktreeDirectory() const
 {
-    if (!resourceWorktreePath.is_absolute()) {
+    if (!resourceWorktreePath_.is_absolute()) {
         ASCENDLOGE(
             "ResourceRegistry returned a non-absolute worktree path: %s; fix the registry integration",
-            resourceWorktreePath.c_str());
+            resourceWorktreePath_.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
     boost::system::error_code worktreeError;
-    const bool worktreeIsDirectory = fs::is_directory(resourceWorktreePath, worktreeError);
+    const bool worktreeIsDirectory = fs::is_directory(resourceWorktreePath_, worktreeError);
     if (worktreeError && !IsMissingPathError(worktreeError)) {
         ASCENDLOGE(
             "Failed to inspect resource worktree: path=%s error=%d message=%s; fix the registry "
             "integration",
-            resourceWorktreePath.c_str(), worktreeError.value(), worktreeError.message().c_str());
+            resourceWorktreePath_.c_str(), worktreeError.value(), worktreeError.message().c_str());
         return ACLRTC_ERROR_FAILURE;
     }
     if (!worktreeIsDirectory) {
         ASCENDLOGE(
             "Resource worktree must be an existing directory: path=%s; fix the registry integration",
-            resourceWorktreePath.c_str());
+            resourceWorktreePath_.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
-    const fs::path outputDirectoryPath =
-        resourceWorktreePath / (".aclrtc_" + specializationRequest.specializationSessionId) / "outputs";
-    const ManifestExpansionContext expansionContext{
-        resourceWorktreePath, outputDirectoryPath, externalSourceDirectoryPath};
-    aclError result =
-        BindConstantSources(spec.constants, specializationRequest, expansionContext, boundInputs.constants);
-    if (result != ACLRTC_SUCCESS) {
-        return result;
-    }
-
-    for (const CommandSpec& commandSpec : spec.commands) {
-        BoundManifestCommand command;
-        result = BindManifestCommand(commandSpec, expansionContext, command);
-        if (result != ACLRTC_SUCCESS) {
-            return result;
-        }
-        boundInputs.commands.emplace_back(std::move(command));
-    }
-
-    boundInputs.requiredOutputDirectories.emplace(outputDirectoryPath);
-    return BindLinkCommand(
-        spec, expansionContext, boundInputs.linkCommand, boundInputs.requiredOutputDirectories,
-        boundInputs.linkedKernelElfPath);
+    return ACLRTC_SUCCESS;
 }
-
-KernelCompilationPlan AssembleCompilationPlan(
-    BoundCompilationInputs boundInputs, const KernelCompilerOptions& compilerOptions)
-{
-    KernelCompilationPlan plan;
-    for (const BoundConstantSource& constant : boundInputs.constants) {
-        plan.sourcePatches.push_back(
-            {constant.targetFilePath, constant.templateText,
-             FormatBytesAsCppInitializerList(constant.borrowedData, constant.byteCount)});
-    }
-    for (BoundManifestCommand& boundCommand : boundInputs.commands) {
-        CompilationCommand& command = boundCommand.command;
-        if (command.commandKind == CompilationCommandKind::Compile) {
-            const auto& userOptions = boundCommand.objectKind == ManifestObjectKind::Basic ?
-                                          compilerOptions.basicOptions :
-                                          compilerOptions.superKernelOptions;
-            command.commandArguments.insert(
-                command.commandArguments.begin() + static_cast<std::ptrdiff_t>(boundCommand.outputOptionPosition),
-                userOptions.begin(), userOptions.end());
-        }
-        plan.compilationCommands.emplace_back(std::move(command));
-    }
-    plan.compilationCommands.emplace_back(std::move(boundInputs.linkCommand));
-    plan.requiredOutputDirectoryPaths.assign(
-        boundInputs.requiredOutputDirectories.begin(), boundInputs.requiredOutputDirectories.end());
-    plan.linkedKernelElfPath = std::move(boundInputs.linkedKernelElfPath);
-    return plan;
-}
-} // namespace
 
 KernelCompilationPlanBuilder::KernelCompilationPlanBuilder(
     const NormalizedKernelSpecializationRequest& specializationRequest, const nlohmann::json& resourceManifest,
@@ -394,7 +320,9 @@ KernelCompilationPlanBuilder::KernelCompilationPlanBuilder(
     : specializationRequest_(specializationRequest),
       resourceManifest_(resourceManifest),
       resourceWorktreePath_(std::move(resourceWorktreePath)),
-      externalSourceDirectoryPath_(std::move(externalSourceDirectoryPath))
+      externalSourceDirectoryPath_(std::move(externalSourceDirectoryPath)),
+      outputDirectoryPath_(
+          resourceWorktreePath_ / (".aclrtc_" + specializationRequest_.specializationSessionId) / "outputs")
 {}
 
 aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPlan& compilationPlan) const
@@ -405,14 +333,35 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
-    BoundCompilationInputs boundInputs;
-    result = BindCompilationInputs(
-        specializationRequest_, manifestSpec, resourceWorktreePath_, externalSourceDirectoryPath_, boundInputs);
+    result = CheckResourceWorktreeDirectory();
+    if (result != ACLRTC_SUCCESS) {
+        return result;
+    }
+    std::vector<BoundConstantSource> constants;
+    result = BindConstantSources(manifestSpec, constants);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
+    }
+    KernelCompilationPlan plan;
+    for (const CommandSpec& spec : manifestSpec.commands) {
+        CompilationCommand command;
+        result = BindManifestCommand(spec, command);
+        if (result != ACLRTC_SUCCESS) {
+            return result;
+        }
+        plan.compilationCommands.emplace_back(std::move(command));
+    }
+    result = BindLinkCommand(manifestSpec, plan);
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
     // Read constant bytes only after all selected manifest fields and runtime inputs are resolved.
-    compilationPlan = AssembleCompilationPlan(std::move(boundInputs), specializationRequest_.compilerOptions);
+    for (const BoundConstantSource& constant : constants) {
+        plan.sourcePatches.push_back(
+            {constant.targetFilePath, constant.templateText,
+             FormatBytesAsCppInitializerList(constant.borrowedData, constant.byteCount)});
+    }
+    compilationPlan = std::move(plan);
     return ACLRTC_SUCCESS;
 }
 

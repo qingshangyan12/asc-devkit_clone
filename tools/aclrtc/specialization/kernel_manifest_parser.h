@@ -12,26 +12,18 @@
 #define ASCENDC_ACLRTC_KERNEL_MANIFEST_PARSER_H
 
 #include "kernel_specialization_types.h"
+#include "manifest_constant.h"
 
 #include <nlohmann/json_fwd.hpp>
 
 namespace ascendc {
 namespace aclrtc {
 
-enum class ConstantArgumentKind { Pointer, Struct };
 enum class ManifestObjectKind { Basic, SuperKernel };
 
 struct ManifestTextSpec {
     std::string text;
     std::string location;
-};
-
-struct ConstantSpec {
-    uint64_t parameterIndex{0U};
-    ConstantArgumentKind argumentKind{ConstantArgumentKind::Struct};
-    std::optional<uint64_t> byteSize;
-    ManifestTextSpec targetFile;
-    std::string templateText;
 };
 
 struct CommandSpec {
@@ -45,7 +37,7 @@ struct CommandSpec {
 
 // Owns the selected manifest fields; no JSON nodes or request buffers are borrowed.
 struct KernelManifestSpec {
-    std::vector<ConstantSpec> constants;
+    std::vector<ManifestConstant> constants;
     std::vector<CommandSpec> commands;
     std::vector<ManifestTextSpec> linkOptions;
     std::vector<ManifestTextSpec> linkInputs;
