@@ -128,6 +128,11 @@ basic_test_five_targets=(
     ascendc_ut_simt_subnormal_ftz_true_prec_true
 )
 
+c_api_test_9201_targets=(
+    ascendc_ut_c_api_ascend960_AIC
+    ascendc_ut_c_api_ascend960_AIV
+)
+
 arm_test_targets=(
     ascendc_ut_aclrtc
     ascendc_ut_elf_tool
