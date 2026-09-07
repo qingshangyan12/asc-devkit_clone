@@ -69,7 +69,6 @@ PIPE_S
         - [asc_icache_preload](asc_icache_preload.md)
     - 对于配置标量store接口的L2 Cache管理策略重载，作用范围内的接口有：
         - [asc_store_dev](../scalar_compute/scalar_store/asc_store_dev.md)
-        - [asc_set_store_atomic_config_v1](../atomic/scalar_atomic/asc_set_store_atomic_config_v1.md)
         - [标量原子操作](../atomic/scalar_atomic/scalar_atomic.md)
 - 本接口仅作用于**标量访存路径**的L2 Cache默认策略，不会改变向量搬运类接口（如[asc_copy_gm2ub_align](../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)、[asc_copy_ub2gm_align](../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)、[asc_ndim_copy_gm2ub](../vector_datamove/asc_ndim_copy_gm2ub.md)等）入参中的`l2_cache_mode`，二者相互独立。针对大块tile数据的L2 Cache优化，建议通过向量搬运类接口的入参配置，具体可参见[L2 Cache Mode最佳实践样例](../../../../../../examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode)。
 
