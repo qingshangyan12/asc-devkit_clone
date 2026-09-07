@@ -56,16 +56,20 @@ PIPE_S
 
 ## 约束说明
 
-该指令执行前不会对GM的数据做清零操作，开发者需在需要时手动添加清零操作。
+- 使用完成后，建议通过[asc_disable_dma_atomic](../datamove_atomic/asc_disable_dma_atomic.md)清空原子操作的状态，以免影响后续相关指令功能。
+- 该指令执行前不会对GM的数据做清零操作，开发者需在需要时手动添加清零操作。
 
 ## 调用示例
 
 将以下代码保存为`example.asc`后，执行如下编译运行命令：
 
+<!-- npu="A3,910b" id9 -->
+以[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)为例，编译运行命令如下：
+
 ```bash
-# Atlas A3训练系列产品/Atlas A3推理系列产品/Atlas A2训练系列产品/Atlas A2推理系列产品，对应NPU架构为`dav-2201`。
 bisheng example.asc -o main --npu-arch=dav-2201 && ./main
 ```
+<!-- end id9 -->
 
 ```cpp
 #include <cstdint>
@@ -92,13 +96,14 @@ __global__ __vector__ void AscGetStoreAtomicConfigKernel(__gm__ int32_t* output,
     __gm__ uint64_t* raw_config)
 {
     asc_init();
-    // Encode atomic type=1 and data type=2, then read the raw register back.
-    asc_set_store_atomic_config_v1(1, 2);
+    // 开启float类型的原子求和操作，再读取原子配置寄存器的原始值。
+    asc_set_store_atomic_config_v1(1, 0);
     asc_store_atomic_config config;
-    // Read the current store-atomic register into config.config.
     asc_get_store_atomic_config(config);
     raw_config[0] = config.config;
-    asc_set_atomic_none();
+    asc_dcci_single(raw_config);
+    asc_sync_data_barrier(mem_dsb_t::DSB_DDR);
+    asc_disable_dma_atomic();
 }
 
 } // namespace
@@ -129,7 +134,7 @@ int main()
     PrintData("Golden", golden);
     PrintData("Raw atomic config", raw_config);
     aclrtFree(config_device);
-    bool passed = output == golden && (raw_config[0] == 33);
+    bool passed = output == golden && (raw_config[0] == 1);
     std::cout << (passed ? "[Success] asc_get_store_atomic_config passed." : "[Failed] asc_get_store_atomic_config failed.") << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);
