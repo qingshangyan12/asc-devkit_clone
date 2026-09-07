@@ -79,3 +79,34 @@ TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(int8_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(uint16_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(uint32_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(uint8_t);
+
+·TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_ENABLE_PRE_LOAD_IGNORE_SYNC)
+{
+    MOCKER_CPP(
+        copy_gm_to_cbuf_align_v2,
+        void(__cbuf__ bfloat16_t*, __gm__ bfloat16_t*, uint8_t, uint32_t, uint32_t, uint8_t, uint8_t, bool, bool,
+            uint8_t, uint64_t, uint32_t))
+        .times(1)
+        .will(invoke([](__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint8_t sid, uint32_t n_burst,
+                         uint32_t len_burst, uint8_t left_padding_count, uint8_t right_padding_count,
+                         bool data_select_bit, bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl,
+                         uint64_t burst_src_stride, uint32_t burst_dst_stride) {
+            EXPECT_EQ(dst, reinterpret_cast<__cbuf__ bfloat16_t*>(11));
+            EXPECT_EQ(src, reinterpret_cast<__gm__ bfloat16_t*>(22));
+            EXPECT_EQ(sid, static_cast<uint8_t>(0));
+            EXPECT_EQ(n_burst, static_cast<uint32_t>(33));
+            EXPECT_EQ(len_burst, static_cast<uint32_t>(44));
+            EXPECT_EQ(left_padding_count, static_cast<uint8_t>(55));
+            EXPECT_EQ(right_padding_count, static_cast<uint8_t>(66));
+            EXPECT_FALSE(data_select_bit);
+            EXPECT_TRUE(enable_pre_load_ignore_sync);
+            EXPECT_EQ(l2_cache_ctl, static_cast<uint8_t>(4));
+            EXPECT_EQ(burst_src_stride, static_cast<uint64_t>(88));
+            EXPECT_EQ(burst_dst_stride, static_cast<uint32_t>(99));
+        }));
+
+    __cbuf__ bfloat16_t* dst = reinterpret_cast<__cbuf__ bfloat16_t*>(11);
+    __gm__ bfloat16_t* src = reinterpret_cast<__gm__ bfloat16_t*>(22);
+    asc_copy_gm2l1_align(dst, src, 33, 44, 55, 66, false, true, 4, 88, 99);
+    GlobalMockObject::verify();
+}
