@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/cube_compute/cube_compute.h"`。
+
 本接口用于启用矩阵乘加（Mmad）计算的HiF8模式。启用HiF8模式后，当矩阵乘加指令的左矩阵A和右矩阵B均以`fp8_e4m3fn_t`作为输入数据类型时，L0A Buffer和L0B Buffer中的数据在参与矩阵乘法运算前将转换为`hifloat8_t`类型参与计算。
 
 ## 函数原型

@@ -37,7 +37,7 @@
 ```cpp
 // 逐参数形式
 __aicore__ inline void asc_set_l13d_fmatrix_b(uint16_t fmatrix_w,
-                                              uint16_t fmatrix_h
+                                              uint16_t fmatrix_h,
                                               uint8_t pad_left,
                                               uint8_t pad_right,
                                               uint8_t pad_top,
@@ -68,6 +68,12 @@ __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config)
 ## 流水类型
 
 PIPE_S
+
+## 约束说明
+
+- 本接口仅在AIC上生效，非AIC调用直接返回。
+- 本接口必须在对应的3D搬运接口之前调用，3D搬运接口的参数`f_matrix_ctrl`取值为`true`时配置才会生效。
+- 调用后配置会持续生效，直至再次调用本接口覆盖，不同3D搬运任务使用的配置不同时，需在对应搬运接口执行前重新配置。
 
 <!-- npu="950" id8 -->
 ## 调用示例
