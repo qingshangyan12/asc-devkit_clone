@@ -46,6 +46,7 @@
 #include "ccu_launch_dl.h"
 #include "ccu_res_dl.h"
 #include "hccl_ccu_res_dl.h"
+#include "hccl_res_dl.h"
 #include "ccu_log.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
 #include "kfc_server_protocol.h"
@@ -1400,6 +1401,29 @@ HcclResult GetAlgResCcu(
 #endif
 }
 
+// 释放本次HcclChannelAcquire新建（非复用）的通道，避免checkRes探测/申请失败路径下通道挂在通信域上无法回收
+static HcclResult ReleaseCcuAcquiredChannels(HcclComm comm, AlgResourceRequest& resRequest)
+{
+    if (!HcommIsSupportHcclChannelDestroy()) {
+        // 旧版libhcomm无销毁能力，探测通道留在通信域等待后续真实执行复用，属预期降级而非故障
+        HCCL_DEBUG("[ReleaseCcuAcquiredChannels] HcclChannelDestroy not supported, skip release.");
+        return HCCL_SUCCESS;
+    }
+    if (resRequest.acquiredChannels.empty()) {
+        return HCCL_SUCCESS;
+    }
+    HcclResult ret = HcclChannelDestroy(comm, resRequest.acquiredChannels.data(), resRequest.acquiredChannels.size());
+    if (ret != HCCL_SUCCESS) {
+        HCCL_ERROR(
+            "[ReleaseCcuAcquiredChannels] HcclChannelDestroy failed, ret[%d], channelNum[%zu].", ret,
+            resRequest.acquiredChannels.size());
+        return ret;
+    }
+    HCCL_INFO("[ReleaseCcuAcquiredChannels] release [%zu] channels.", resRequest.acquiredChannels.size());
+    resRequest.acquiredChannels.clear();
+    return HCCL_SUCCESS;
+}
+
 HcclResult HcclAllocAlgResourceCcu(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
@@ -1442,9 +1466,17 @@ HcclResult HcclAllocAlgResourceCcu(
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
     if (!param.checkRes) {
         CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
+        CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
+        CHK_RET(HcclGetCcuKernel(comm, param, resRequest, resCtxHost));
+        return HCCL_SUCCESS;
     }
-    CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
-    CHK_RET(HcclGetCcuKernel(comm, param, resRequest, resCtxHost));
+    // checkRes探测路径：探测后无论成败释放本次新建的channel（真实执行路径不释放，通道留在通信域供HcclChannelQuery复用）
+    HcclResult ret = HcclGetChannelForCcu(comm, param, resRequest);
+    if (ret == HCCL_SUCCESS) {
+        ret = HcclGetCcuKernel(comm, param, resRequest, resCtxHost);
+    }
+    HcclResult releaseRet = ReleaseCcuAcquiredChannels(comm, resRequest);
+    CHK_RET(ret == HCCL_SUCCESS ? releaseRet : ret);
     return HCCL_SUCCESS;
 #endif
 }
@@ -1470,15 +1502,36 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
         kernelChannels.resize(channelNum);
 
         if (channelNum > 0) {
+            // checkRes探测路径：查询已存在的通道，existingChannels[i]非0表示通道已存在可复用，为0表示需新建；
+            // Query不支持时existingChannels保持为空，不记录，避免误删已复用通道
+            std::vector<ChannelHandle> existingChannels;
+            if (param.checkRes && HcommIsSupportHcclChannelQuery()) {
+                existingChannels.assign(channelNum, 0);
+                auto queryRet =
+                    HcclChannelQuery(comm, param.engine, kernelChannelRequest.data(), channelNum, existingChannels.data());
+                if (queryRet != HCCL_SUCCESS) {
+                    HCCL_WARNING("[HcclChannelQuery] failed, ret[%d], treat all as new channels.", queryRet);
+                }
+            }
+
             // 需要资源回退。返回资源不够
-            auto ret =
-                HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(), channelNum, kernelChannels.data());
+            auto ret = HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(), channelNum, kernelChannels.data());
             if (ret == HCCL_E_UNAVAIL) {
                 HCCL_WARNING("[HcclChannelAcquire] channel unavailable, channel num[%u].", channelNum);
                 return HCCL_E_UNAVAIL;
             } else {
                 CHK_RET(ret);
             }
+
+            if (param.checkRes) {
+                // 记录新增通道（existingChannels[i]为0表示该通道是本次HcclChannelAcquire新建的）
+                for (u32 i = 0; i < existingChannels.size(); ++i) {
+                    if (existingChannels[i] == 0) {
+                        resRequest.acquiredChannels.push_back(kernelChannels[i]);
+                    }
+                }
+            }
+
             // 从首条channel获取dieId，作为kernel所属dieId保存（同一kernel的所有channel在同一die上）
             EndpointDesc localEndpoint = kernelChannelRequest[0].localEndpoint;
             using DieIdType = uint32_t;
