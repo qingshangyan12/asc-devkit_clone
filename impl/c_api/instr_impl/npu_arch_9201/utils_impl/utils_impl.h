@@ -13,10 +13,6 @@
 
 #include "utils/base/sys_constants.h"
 
-constexpr uint32_t C_API_AIC_TYPE = AscendC::AIC;
-constexpr uint32_t C_API_AIV_TYPE = AscendC::AIV;
-constexpr uint32_t C_API_MIX_TYPE = AscendC::MIX;
-
 #define ASC_IS_AIV ASCEND_IS_AIV
 #define ASC_IS_AIC ASCEND_IS_AIC
 
