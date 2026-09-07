@@ -1041,7 +1041,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm3df(float a, float b, float c)
         return ASCRT_INF_F;
     }
     if (isnan(a) || isnan(b) || isnan(c)) {
-        return ASCRT_INF_F / ASCRT_INF_F;
+        return ASCRT_NAN_F;
     }
     float m = fmaxf(fabsf(a), fabsf(b));
     m = fmaxf(m, fabsf(c));
@@ -1061,7 +1061,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm4df(float a, float b, float c, f
         return ASCRT_INF_F;
     }
     if (isnan(a) || isnan(b) || isnan(c) || isnan(d)) {
-        return ASCRT_INF_F / ASCRT_INF_F;
+        return ASCRT_NAN_F;
     }
     float m = fmaxf(fabsf(a), fabsf(b));
     m = fmaxf(m, fabsf(c));
