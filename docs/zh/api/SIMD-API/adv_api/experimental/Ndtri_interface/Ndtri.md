@@ -1,12 +1,5 @@
 # Ndtri
 
-Ndtri 当前属于实验性接口。使用前需要定义 `CANN_ASC_USE_EXPERIMENTAL`，并显式包含头文件：
-
-```cpp
-#define CANN_ASC_USE_EXPERIMENTAL
-#include "adv_api/experimental/ndtri.h"
-```
-
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
@@ -31,6 +24,13 @@ Ndtri 当前属于实验性接口。使用前需要定义 `CANN_ASC_USE_EXPERIME
 
 ## 功能说明
 
+Ndtri当前属于实验性接口。使用前需要定义`CANN_ASC_USE_EXPERIMENTAL`，并显式包含头文件：
+
+```cpp
+#define CANN_ASC_USE_EXPERIMENTAL
+#include "adv_api/experimental/ndtri.h"
+```
+
 按元素计算标准正态分布累积分布函数的反函数。对于输入概率p，输出x满足：
 
 $$\Phi(x)=p$$
@@ -46,7 +46,7 @@ $$\Phi(x)=p$$
 
 ## 函数原型
 
-- 指定参与计算的元素个数。
+- 指定参与计算的元素个数
 
     ```cpp
     template <typename T, bool isReuseSource = false>
@@ -54,7 +54,7 @@ $$\Phi(x)=p$$
         const uint32_t calCount)
     ```
 
-- 计算整个源Tensor。
+- 计算整个源Tensor
 
     ```cpp
     template <typename T, bool isReuseSource = false>
