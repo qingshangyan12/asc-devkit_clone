@@ -47,7 +47,7 @@
 ## 场景详细说明
 
 本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，`SCENARIO_NUM` 不同取值对应的含义如下表所示。
-所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 128, 128]，核函数名为 `asc_copy_l0c2l1`。
+所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 128, 128]，核函数名为 `asc_copy_l0c2l1_custom`。
 
 <a name="表2"></a>
 <table border="2" align="center">
@@ -63,25 +63,25 @@
 **场景1：输出格式Nz，输出到L1数据类型为half**
 - 输入：A [128, 128] half类型，ND格式；B [128, 128] half类型，ND格式
 - 输出：C [128, 128] half类型，Nz格式
-- 实现：以`QuantMode_t::F322F16`调用`asc_copy_l0c2l1`，将float累加结果转换为half并输出Nz格式
+- 实现：以`asc_quant_mode::F322F16`调用`asc_copy_l0c2l1`，将float累加结果转换为half并输出Nz格式
 - 说明：L0C数据为Nz格式直接输出到L1的Nz格式，数据保持原格式不变
 
 **场景2：输出格式Nz，输出到L1数据类型为int8_t，使能Scalar量化**
 - 输入：A [128, 128] half类型，ND格式；B [128, 128] half类型，ND格式
 - 输出：C [128, 128] int8_t类型，Nz格式
-- 实现：调用`asc_set_l0c_copy_prequant(2.0F, 0, true)`配置Scalar量化参数，再以`QuantMode_t::QF322B8_PRE`调用`asc_copy_l0c2l1`
+- 实现：调用`asc_set_l0c_copy_prequant(2.0F, 0, true)`配置Scalar量化参数，再以`asc_quant_mode::QF322B8_PRE`调用`asc_copy_l0c2l1`
 - 说明：将float类型数据量化为int8_t类型，整个C矩阵使用一个量化参数
 
 **场景3：输出格式Nz，输出到L1数据类型为int8_t，使能Vector量化**
 - 输入：A [128, 128] half类型，ND格式；B [128, 128] half类型，ND格式
 - 输出：C [128, 128] int8_t类型，Nz格式
-- 实现：通过`asc_copy_gm2l1`和`asc_copy_l12fb`将每列量化参数搬到Fixpipe Buffer，调用`asc_set_l0c_copy_config`配置参数地址，再以`QuantMode_t::VQF322B8_PRE`调用`asc_copy_l0c2l1`
-- 说明：将float类型数据量化为int8_t类型，C矩阵的每一列对应一个量化参数，使用的量化参数需要从GM拷贝量化参数到L1
+- 实现：通过`asc_copy_gm2l1`和`asc_copy_l12fb`将每列量化参数搬到Fixpipe Buffer，调用`asc_set_l0c_copy_config`配置参数地址，再以`asc_quant_mode::VQF322B8_PRE`调用`asc_copy_l0c2l1`
+- 说明：将float类型数据量化为int8_t类型，C矩阵的每一列对应一个量化参数，使用的量化参数需要从GM拷贝到L1
 
 **场景4：输出格式Nz，输出到L1数据类型为half，使能ReLU**
 - 输入：A [128, 128] half类型，ND格式；B [128, 128] half类型，ND格式
 - 输出：C [128, 128] half类型，Nz格式
-- 实现：以`QuantMode_t::F322F16`调用`asc_copy_l0c2l1`，并设置`relu_pre_mode = asc_relu_pre_mode::NORMAL`
+- 实现：以`asc_quant_mode::F322F16`调用`asc_copy_l0c2l1`，并设置`relu_pre_mode = asc_relu_pre_mode::NORMAL`
 - 说明：在数据从L0C搬出到L1的过程中执行ReLU操作，即将负值置为0
 
 以上每个场景在完成L0C到L1搬运后，都会调用`asc_copy_l12l0a`将L1结果送入L0A，将同类型单位矩阵送入L0B，再调用`asc_mmad`保持数值不变，最后通过`asc_copy_l0c2gm`生成ND格式的`output.bin`用于精度校验。场景1、4的校验文件为float类型，场景2、3为int32_t类型。
@@ -95,7 +95,8 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}` 为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为 `${HOME}/Ascend`。
+
 - 样例执行
 
   在本样例目录下执行如下命令。
