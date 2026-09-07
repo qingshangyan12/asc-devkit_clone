@@ -164,7 +164,7 @@ Execute the following steps in the root directory of this sample to compile and 
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, it is installed to `/usr/local/Ascend` by default.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default installation path is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 - Sample Execution
 
   Execute the following commands in this sample directory.
@@ -197,24 +197,3 @@ Execute the following steps in the root directory of this sample to compile and 
   ```bash
   test pass!
   ```
-
-## Functional Debugging
-
-### printf
-
-This interface provides formatted output functionality for CPU domain or NPU domain debugging scenarios.
-
-Call the [printf](../../../../../docs/zh/api/Utils-API/tuning_interface/printf.md) interface in the operator kernel-side implementation code where log information needs to be output to print relevant content.
-
-Example:
-
-```cpp
-printf("matmul blockIdx=%u\n", static_cast<uint32_t>(block_idx));
-```
-
-> [!CAUTION]
-> The printf (PRINTF) interface printing functionality has a certain impact on the actual running performance of the operator and is typically used during the debugging phase. Developers can disable the printing functionality by setting ASCENDC_DUMP=0 as needed.
-
-### DumpTensor
-
-The basic API `DumpTensor` interface takes a `LocalTensor` as input. The SIMD C API uses arrays with address-space qualifiers and does not provide an equivalent `asc_*` interface that accepts these arrays. Therefore, this sample cannot directly migrate the `DumpTensor(cLocal, baseM * baseN)` call. To inspect intermediate data, print the required information with `printf` during debugging, or use simulation and performance debugging tools.
