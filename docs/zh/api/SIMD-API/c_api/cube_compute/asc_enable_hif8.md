@@ -49,7 +49,7 @@ PIPE_S
 ## 约束说明
 
 - 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)、[asc_mmad_mx](./asc_mmad_mx.md)）执行前调用，确保模式配置在矩阵乘加结果生成前生效。
-- HiF8模式启用后会持续生效，不会自动关闭。后续矩阵乘加指令若不显式重新配置，将沿用当前模式。如需切换为FP8模式，请重新调用[asc_enable_fp8](./asc_enable_fp8.md)接口。
+- HiF8模式启用后会持续生效，不会自动关闭。后续矩阵乘加指令若不显式重新配置，将沿用当前模式。如需切换为FP8模式，请重新调用[asc_disable_hif8](./asc_disable_hif8.md)接口。
 - 本接口仅对矩阵乘加输入数据类型为`fp8_e4m3fn_t`×`fp8_e4m3fn_t`的场景生效，其他FP8数据类型组合（`fp8_e4m3fn_t`×`fp8_e5m2_t`、`fp8_e5m2_t`×`fp8_e4m3fn_t`、`fp8_e5m2_t`×`fp8_e5m2_t`）不支持FP8与HiF8模式选择，调用本接口不产生实际作用。
 
 <!-- npu="950" id8 -->

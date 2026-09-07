@@ -1,4 +1,4 @@
-# asc_set_l0c2gm_config
+# asc_set_l0c_copy_config
 
 ## 产品支持情况
 
