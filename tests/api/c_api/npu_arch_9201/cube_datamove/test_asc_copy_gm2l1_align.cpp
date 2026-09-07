@@ -58,13 +58,13 @@ protected:
         uint8_t left_padding_count = 55;                                                                        \
         uint8_t right_padding_count = 66;                                                                       \
         bool data_select_bit = false;                                                                           \
-        uint8_t l2_cache_ctl = 4;                                                                               \
+        asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP;                           \
         uint64_t burst_src_stride = 88;                                                                         \
         uint32_t burst_dst_stride = 99;                                                                         \
                                                                                                                 \
         asc_copy_gm2l1_align(                                                                                   \
             dst, src, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit,            \
-            l2_cache_ctl, burst_src_stride, burst_dst_stride);                                                  \
+            l2_cache_mode, burst_src_stride, burst_dst_stride);                                                 \
         GlobalMockObject::verify();                                                                             \
     }
 
@@ -80,7 +80,7 @@ TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(uint16_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(uint32_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(uint8_t);
 
-·TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_ENABLE_PRE_LOAD_IGNORE_SYNC)
+TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_ENABLE_PRE_LOAD_IGNORE_SYNC)
 {
     MOCKER_CPP(
         copy_gm_to_cbuf_align_v2,
@@ -107,6 +107,7 @@ TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(uint8_t);
 
     __cbuf__ bfloat16_t* dst = reinterpret_cast<__cbuf__ bfloat16_t*>(11);
     __gm__ bfloat16_t* src = reinterpret_cast<__gm__ bfloat16_t*>(22);
-    asc_copy_gm2l1_align(dst, src, 33, 44, 55, 66, false, true, 4, 88, 99);
+    asc_copy_gm2l1_align(
+        dst, src, 33, 44, 55, 66, false, true, asc_load_l2_cache_mode::NOTALLOC_KEEP, 88, 99);
     GlobalMockObject::verify();
 }

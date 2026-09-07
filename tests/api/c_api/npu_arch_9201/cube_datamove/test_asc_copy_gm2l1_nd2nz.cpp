@@ -13,7 +13,7 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-template <typename DTYPE>
+template <typename DTYPE, bool EXPECT_ENABLE>
 __aicore__ inline void copy_gm_to_cbuf_multi_nd2nz_stub(
     __cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
     uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool enable_pre_load_ignore_sync)
@@ -27,7 +27,7 @@ __aicore__ inline void copy_gm_to_cbuf_multi_nd2nz_stub(
     EXPECT_EQ(d_value, static_cast<uint32_t>(66));
     EXPECT_EQ(loop4_src_stride, static_cast<uint64_t>(77));
     EXPECT_EQ(smallc0_en, static_cast<bool>(true));
-    EXPECT_FALSE(enable_pre_load_ignore_sync);
+    EXPECT_EQ(enable_pre_load_ignore_sync, EXPECT_ENABLE);
 }
 
 class TEST_COPY_GM_TO_L1_ND2NZ : public testing::Test {
@@ -45,20 +45,31 @@ protected:
             void(__cbuf__ dtype*, __gm__ dtype*, uint8_t, uint64_t, uint8_t, uint16_t, uint32_t, uint64_t, bool,    \
                  bool))                                                                                               \
             .times(1)                                                                                               \
-            .will(invoke(copy_gm_to_cbuf_multi_nd2nz_stub<dtype>));                                                 \
+            .will(invoke(copy_gm_to_cbuf_multi_nd2nz_stub<dtype, false>));                                          \
                                                                                                                     \
         __cbuf__ dtype* dst = reinterpret_cast<__cbuf__ dtype*>(11);                                                \
         __gm__ dtype* src = reinterpret_cast<__gm__ dtype*>(22);                                                    \
                                                                                                                     \
         uint64_t loop1_src_stride = static_cast<uint64_t>(33);                                                       \
-        uint8_t l2_cache_ctl = static_cast<uint8_t>(4);                                                              \
+        asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP;                               \
         uint16_t n_value = static_cast<uint16_t>(55);                                                               \
         uint32_t d_value = static_cast<uint32_t>(66);                                                               \
         uint64_t loop4_src_stride = static_cast<uint64_t>(77);                                                      \
         bool smallc0_en = static_cast<bool>(true);                                                                  \
                                                                                                                     \
         asc_copy_gm2l1_nd2nz(                                                                                        \
-            dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);             \
+            dst, src, loop1_src_stride, l2_cache_mode, n_value, d_value, loop4_src_stride, smallc0_en);            \
+        GlobalMockObject::verify();                                                                                 \
+                                                                                                                    \
+        MOCKER_CPP(                                                                                                 \
+            copy_gm_to_cbuf_multi_nd2nz,                                                                            \
+            void(__cbuf__ dtype*, __gm__ dtype*, uint8_t, uint64_t, uint8_t, uint16_t, uint32_t, uint64_t, bool,    \
+                 bool))                                                                                              \
+            .times(1)                                                                                               \
+            .will(invoke(copy_gm_to_cbuf_multi_nd2nz_stub<dtype, true>));                                           \
+                                                                                                                    \
+        asc_copy_gm2l1_nd2nz(dst, src, loop1_src_stride, l2_cache_mode, n_value, d_value, loop4_src_stride,         \
+            smallc0_en, true);                                                                                      \
         GlobalMockObject::verify();                                                                                 \
     }
 
