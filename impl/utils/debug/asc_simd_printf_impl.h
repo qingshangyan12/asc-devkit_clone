@@ -15,7 +15,7 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_SIMD_PRINTF_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_SIMD_PRINTF_IMPL_H
 
-#include "impl/utils/sys_macros.h"
+#include "impl/utils/sys_macros_impl.h"
 
 #ifndef ASCENDC_CPU_DEBUG
 #include "impl/utils/debug/asc_debug_utils.h"
@@ -248,7 +248,7 @@ __simd_callee__ inline void printf_impl_assert_msg(
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_assert();
     scalar_printf_impl(
-        DumpType::DUMP_ASSERT, fmt, "[ASSERT] %s:%u: %s: Assertion `%s' failed. ", file, line, function, assertion,
+        DumpType::DUMP_ASSERT, fmt, "[ASSERT] %s:%u: %s: Assertion '%s' failed. ", file, line, function, assertion,
         args...);
 #endif
 }

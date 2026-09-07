@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/gather/ub_gather.h"`。
+
 给定源操作数在Unified Buffer（UB）中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。每个DataBlock长度为32B。
 
 ![](../../figures/asc_gather_datablock.png)
@@ -34,16 +36,16 @@
 
 ## 函数原型
 
-### 支持掩码控制（占位符形式）
+### 支持掩码控制
 
 ```c
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_gather_datablock(vector_<dst_dtype>& dst,
                                                  __ubuf__ <src_dtype>* src,
                                                  vector_uint32_t index,
                                                  vector_bool mask)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dtype>* src,
                                                                vector_uint32_t index,
                                                                vector_bool mask)

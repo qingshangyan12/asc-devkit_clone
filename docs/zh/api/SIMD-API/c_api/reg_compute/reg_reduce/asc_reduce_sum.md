@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_reduce.h"`。
+
 根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。参考伪代码：
 
 ```python
@@ -42,11 +44,11 @@ def asc_reduce_sum(dst, src, mask):
 ## 函数原型
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dst_dtype> asc_reduce_sum(vector_<src_dtype> src,
                                                           vector_bool mask)
 
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_reduce_sum(vector_<dst_dtype>& dst,
                                            vector_<src_dtype> src,
                                            vector_bool mask)

@@ -26,7 +26,9 @@
 
 ## 功能说明
 
-用于同一核内所有流水线之间的全流水同步，功能等价于[asc_sync_pipe(PIPE_ALL)](asc_sync_pipe.md)。阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。
+头文件路径为：`"c_api/sync/sync.h"`。
+
+用于同一核内所有流水之间的全部流水同步，功能等价于[asc_sync_pipe(PIPE_ALL)](asc_sync_pipe.md)。阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。
 
 本接口适用于需要等待核内所有并行执行单元同时到达一个一致状态后再继续执行的场景。
 
@@ -46,11 +48,11 @@ __aicore__ inline void asc_sync()
 
 ## 流水类型
 
-`PIPE_S`
+PIPE_S
 
 ## 约束说明
 
-`asc_sync`会等待所有流水线中所有先前提交的接口完成，这会对性能产生影响。若仅需阻塞单条流水线，应避免随意调用`asc_sync`，可使用[asc_sync_pipe](asc_sync_pipe.md)接口指定某个流水的阻塞。
+`asc_sync`会等待所有流水中所有先前提交的接口完成，这会对性能产生影响。若仅需阻塞单条流水，应避免随意调用`asc_sync`，可使用[asc_sync_pipe](asc_sync_pipe.md)接口指定某个流水的阻塞。
 
 ## 调用示例
 
@@ -77,6 +79,19 @@ namespace {
 constexpr uint32_t ELEMENTS = 64;
 constexpr uint32_t BYTES = ELEMENTS * sizeof(float);
 
+__simd_vf__ inline void add_vf(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1)
+{
+    vector_float dst_reg;
+    vector_float src0_reg;
+    vector_float src1_reg;
+    uint32_t count = ELEMENTS;
+    vector_bool mask = asc_update_mask_b32(count);
+    asc_loadalign(src0_reg, src0);
+    asc_loadalign(src1_reg, src1);
+    asc_add(dst_reg, src0_reg, src1_reg, mask);
+    asc_storealign(dst, dst_reg, mask);
+}
+
 void print_data(const char* label, const std::vector<float>& data)
 {
     std::cout << label << ":";
@@ -91,7 +106,7 @@ __global__ __vector__ void asc_sync_kernel(__gm__ float* output, __gm__ float* s
     asc_copy_gm2ub_align(x, src0, BYTES);
     asc_copy_gm2ub_align(y, src1, BYTES);
     asc_sync();
-    asc_add(z, x, y, ELEMENTS);
+    add_vf(z, x, y);
     asc_sync();
     asc_copy_ub2gm_align(output, z, BYTES);
     asc_sync();

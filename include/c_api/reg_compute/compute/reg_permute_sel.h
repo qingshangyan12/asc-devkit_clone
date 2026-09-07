@@ -14,7 +14,7 @@
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_COMPUTE_REG_PERMUTE_SEL_H
 #endif
 
 #ifndef INCLUDE_C_API_REG_COMPUTE_COMPUTE_REG_PERMUTE_SEL_H
@@ -416,22 +416,6 @@ __simd_callee__ inline vector_bool asc_unpack_upper(vector_bool src);
 
 __simd_callee__ inline vector_bool asc_unpack_lower(vector_bool src);
 
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint8_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int16_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint16_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ half** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int32_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ uint32_t** src_array);
-
-__aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ float** src_array);
-
 [[deprecated("NOTICE: asc_squeeze_with_status is deprecated. "
              "Please use asc_squeeze_and_storeunalign instead.")]] __simd_callee__ inline void
 asc_squeeze_with_status(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
@@ -571,7 +555,7 @@ __simd_callee__ inline void asc_clear_ar_spr();
 
 #endif
 
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_COMPUTE_REG_PERMUTE_SEL_H)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_COMPUTE_REG_PERMUTE_SEL_H
 #endif

@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 将输入的指针转换为其指向的栈空间的地址值并返回。
 
 ## 函数原型
@@ -45,6 +47,7 @@ size_t __cvta_generic_to_local(const void* ptr)
 
 输入指针指向栈空间的地址值。
 该接口不校验输入地址是否为可安全访问的有效地址。只有当`ptr`实际指向栈空间时，返回值才是有效的栈空间地址值，特殊场景说明如下：
+
 | 输入场景 | 返回值 |
 | --- | --- |
 | `ptr`为Global Memory指针 | 未定义行为，返回值不是有效栈空间地址。 |
@@ -55,19 +58,13 @@ size_t __cvta_generic_to_local(const void* ptr)
 
 SIMD与SIMT混合编程场景不支持使用该接口。
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
-
 ## 调用示例
 
 SIMT编程场景：
 
 ```cpp
+#include "simt_api/device_functions.h"
+
 __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_local(uint32_t* src)
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;

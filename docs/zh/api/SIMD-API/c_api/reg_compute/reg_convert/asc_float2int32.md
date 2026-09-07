@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
+
 将`float`类型数据转换为`int32_t`类型，并支持多种舍入模式与饱和/非饱和模式。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
@@ -43,9 +45,10 @@ def asc_float2int32_rn(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型（占位符形式）
+### 模板原型
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_float2int32_<round_mode><sat_mode>(vector_int32_t& dst,
                                                                    vector_float src,
                                                                    vector_bool mask)

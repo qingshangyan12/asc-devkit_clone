@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_broadcast.h"`。
+
 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置。mask仅用于筛选dst中的元素位置，不影响从src中读取的元素；dst中未被mask筛选的位置置零。
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
@@ -33,11 +35,11 @@
 ## 函数原型
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_duplicate(vector_<dtype> src,
                                                     vector_bool mask)
 
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_duplicate(vector_<dtype>& dst,
                                           vector_<dtype> src,
                                           vector_bool mask)
