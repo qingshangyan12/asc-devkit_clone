@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
+
 根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`uint8_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据参数`dst_pos`选择写入`dst`索引为偶数的位置或奇数的位置。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。
@@ -149,7 +151,7 @@ __simd_vf__ inline void convert_vf(__ubuf__ uint8_t* output, __ubuf__ uint8_t* i
     vector_half src;
     asc_loadalign(dst, reinterpret_cast<__ubuf__ uint8_t*>(output));
     asc_loadalign(src, reinterpret_cast<__ubuf__ half*>(input));
-    asc_half2uint8_rd(dst, src, mask);
+    asc_half2uint8_rd(dst, src, mask, ASC_POSITION_EVEN);
     asc_storealign(reinterpret_cast<__ubuf__ uint8_t*>(output), dst, mask);
 }
 
