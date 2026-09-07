@@ -1542,7 +1542,7 @@ static HcclResult GetKfcCallableTask(
     const CcuKernelInfo& kernelInfo, const char*& callableTaskFuncName, CcuCallableKernelFunc& callableTaskFunc)
 {
     const auto* kfcArg = static_cast<const CcuKernelArgKfcServer*>(kernelInfo.kernelArg);
-    switch (kfcArg->opParam.opType) {
+    switch (kfcArg->opType) {
         case HcclCMDType::HCCL_CMD_ALLGATHER:
             if (kfcArg->role == KfcServerRole::ALL_GATHER_NHR) {
                 callableTaskFuncName = "CcuKernelAllGatherNHR1DMultiJettyMem2Mem";
@@ -1575,7 +1575,7 @@ static HcclResult GetKfcCallableTask(
             break;
         default:
             HCCL_ERROR(
-                "[GetKfcCallableTask] unsupported opType[%u]", static_cast<uint32_t>(kfcArg->opParam.opType));
+                "[GetKfcCallableTask] unsupported opType[%u]", static_cast<uint32_t>(kfcArg->opType));
             return HCCL_E_NOT_SUPPORT;
     }
     return HCCL_SUCCESS;
@@ -1770,8 +1770,10 @@ static HcclResult AccumulateKernelRes(
     CHK_RET(AccumulateKernelFuncRes(
         kernelInfo, kernelInfo.kernelFuncName, kernelInfo.kernelFunc, CCU_KERNEL_ROLE_CALLER, groupedResMap));
     CHK_RET(GetKfcCallableTask(kernelInfo, callableTaskFuncName, callableTaskFunc));
+    CcuKernelInfo callableTaskInfo = kernelInfo;
+    callableTaskInfo.kernelArg = kernelInfo.subKernelArg;
     CHK_RET(AccumulateKernelFuncRes(
-        kernelInfo, callableTaskFuncName, reinterpret_cast<const void*>(callableTaskFunc),
+        callableTaskInfo, callableTaskFuncName, reinterpret_cast<const void*>(callableTaskFunc),
         CCU_KERNEL_ROLE_CALLABLE_TASK, groupedResMap));
     return HCCL_SUCCESS;
 }
@@ -1879,7 +1881,7 @@ static HcclResult RegisterCcuKernels(
                 CcuKernelRegisterCfgInit(&cfg);
                 cfg.role = CCU_KERNEL_ROLE_CALLABLE_TASK;
                 CcuKernelHandle callableTaskHandle = 0;
-                const void* kernelArgs[] = {kernelInfo.kernelArg};
+                const void* kernelArgs[] = {kernelInfo.subKernelArg};
                 CcuResult taskRegRet = HcommCcuKernelRegisterV2(
                     insHandle, kernelInfo.dieId, callableTaskFuncName, reinterpret_cast<void*>(callableTaskFunc),
                     kernelArgs, 1, &cfg, &callableTaskHandle);

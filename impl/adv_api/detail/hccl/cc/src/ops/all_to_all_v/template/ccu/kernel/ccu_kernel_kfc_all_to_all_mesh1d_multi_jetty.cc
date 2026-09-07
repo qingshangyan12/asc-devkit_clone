@@ -9,7 +9,6 @@
  */
 
 #include "ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
-#include "../../../../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -156,7 +155,7 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
 
 CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg)
 {
-    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllToAllMesh1DMultiJetty*>(arg);
     KfcAllToAllContext ctx;
     ctx.channels = kernelArg->channels;
     ctx.channelCount = kernelArg->channelCount;
