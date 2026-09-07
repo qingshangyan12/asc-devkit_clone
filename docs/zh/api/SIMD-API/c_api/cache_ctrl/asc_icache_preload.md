@@ -44,8 +44,8 @@ __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| `addr` | 输入 | 预取指令的Global Memory起始地址。 |
-| `prefetch_len` | 输入 | 预加载数据的长度，单位为2K Byte。 |
+| addr | 输入 | 预取指令的Global Memory起始地址。 |
+| prefetch_len | 输入 | 预加载数据的长度，单位为2K Byte。 |
 
 ## 返回值说明
 
@@ -58,7 +58,7 @@ PIPE_S
 ## 约束说明
 
 - `addr`预取地址硬件按128B对齐取有效位，调用方传入非128B对齐地址不会报错，但实际预取起始Cache Line由对齐结果决定。
-- `prefetch_len`的取值范围为[0, 16]（AIC，对应32KB ICache）或[0, 8]（AIV，对应16KB ICache）。
+- `prefetch_len`的取值范围为[0, 15]（AIC，对应32KB ICache）或[0, 7]（AIV，对应16KB ICache）。
 - 调用本接口时的预加载地址需通过[asc_get_program_counter](../utils/sys_var/asc_get_program_counter.md)接口获取当前程序计数器（PC）值，获取后必须通过掩码`0xFFFFFFFFFFFF`（低48位全1）将高位无效位清零，以得到当前指令在GM中的有效48位地址。这是预加载地址的固定获取流程，示例代码如下：
 
     ```cpp
