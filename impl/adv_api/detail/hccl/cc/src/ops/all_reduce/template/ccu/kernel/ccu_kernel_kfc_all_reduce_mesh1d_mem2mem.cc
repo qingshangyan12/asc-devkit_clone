@@ -7,6 +7,8 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include <array>
+
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.h"
 #include "kfc_callable_task_registry.h"
@@ -14,7 +16,7 @@
 namespace mc2_ops_hccl {
 using namespace hcomm;
 
-#define MAX_LOOP_NUM 2
+constexpr uint32_t GROUP_REDUCE_LOOP_NUM = 2U;
 constexpr int INPUT_XN_ID = 0;
 constexpr int OUTPUT_XN_ID = 1;
 constexpr int TOKEN_XN_ID = 2;
@@ -22,6 +24,14 @@ constexpr int POST_SYNC_ID = 3;
 constexpr int CKE_IDX_0 = 0;
 constexpr uint16_t BIT_NUM_PER_CKE = 16;
 constexpr uint16_t GROUP_REDUCE_MAX_PIECE_CNT = 8;
+
+struct GroupReduceMem2MemVar {
+    ccu::LocalAddr loopDst[GROUP_REDUCE_LOOP_NUM];
+    ccu::LocalAddr loopSrc[GROUP_REDUCE_LOOP_NUM];
+    std::array<std::vector<ccu::LocalAddr>, GROUP_REDUCE_LOOP_NUM> loopScratch;
+    ccu::Variable loopLen[GROUP_REDUCE_LOOP_NUM];
+    ccu::Variable loopLenExp[GROUP_REDUCE_LOOP_NUM];
+};
 
 static CcuResult InitResource(KfcAllReduceMesh1DMem2MemContext& ctx)
 {
@@ -95,7 +105,7 @@ static CcuResult CreateReduceLoopV1(
     uint32_t expansionNum = GetReduceExpansionNum(opType, dataType, outputDataType);
     uint32_t usedBufNum = size > expansionNum ? size : expansionNum;
 
-    for (int32_t index = 0; index < MAX_LOOP_NUM; index++) { // 需要实例化2个Loop
+    for (uint32_t index = 0; index < GROUP_REDUCE_LOOP_NUM; index++) { // 需要实例化2个Loop
         var.loopScratch[index].resize(size);
         uint32_t bufBase = index * ctx.moConfig.msInterleave;
         ccu::Event e = ctx.moRes.completedEvent[index];
