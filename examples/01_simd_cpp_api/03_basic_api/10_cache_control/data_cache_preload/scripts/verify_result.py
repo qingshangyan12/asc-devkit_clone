@@ -36,8 +36,9 @@ def verify_result(output, golden):
         golden_data = golden[real_index]
         output_data = output[real_index]
         print(
-            "data index: %06d, expected: %d, actual: %d" %
-            (real_index, golden_data, output_data))
+            "data index: %06d, expected: %d, actual: %d"
+            % (real_index, golden_data, output_data)
+        )
         if index == 100:
             break
     error_ratio = float(diff.size) / golden.size
@@ -45,7 +46,7 @@ def verify_result(output, golden):
     return diff.size == 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         res = verify_result(sys.argv[1], sys.argv[2])
         if not res:
