@@ -36,6 +36,11 @@ __aicore__ inline void asc_dcci_entire_all_impl()
     dcci((__gm__ int64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_ALL);
 }
 
+__aicore__ inline void asc_dcci_entire_ub_impl()
+{
+    dcci((__ubuf__ int64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_UB);
+}
+
 __aicore__ inline void asc_dcci_entire_out_impl()
 {
     dcci((__gm__ int64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
