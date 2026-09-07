@@ -75,8 +75,7 @@ HcclResult InsTempReduceScatterMesh1DMeshChunk::KernelRun(
     count_ = tempAlgParams.count;
     dataType_ = param.DataDes.dataType;
     CHK_PRT_RET(
-        static_cast<u32>(dataType_) >= HCCL_DATA_TYPE_RESERVED,
-        HCCL_ERROR("Invalid MeshChunk datatype"), HCCL_E_PARA);
+        static_cast<u32>(dataType_) >= HCCL_DATA_TYPE_RESERVED, HCCL_ERROR("Invalid MeshChunk datatype"), HCCL_E_PARA);
     dataTypeSize_ = DATATYPE_SIZE_TABLE[dataType_];
     CHK_RET(PrepareSlicesAndValidate(tempAlgParams, templateResource));
     CHK_RET(GetAlgRank(myRank_, subCommRanks_[0], rankIdx_));
@@ -125,8 +124,9 @@ HcclResult InsTempReduceScatterMesh1DMeshChunk::PrepareSlicesAndValidate(
     }
     u64 total = 0;
     for (auto size : chunkSizes_) {
-        CHK_PRT_RET(size % dataTypeSize_ != 0 || size > processSize_ - total,
-            HCCL_ERROR("Invalid MeshChunk chunk size"), HCCL_E_PARA);
+        CHK_PRT_RET(
+            size % dataTypeSize_ != 0 || size > processSize_ - total, HCCL_ERROR("Invalid MeshChunk chunk size"),
+            HCCL_E_PARA);
         total += size;
     }
     CHK_PRT_RET(total != processSize_, HCCL_ERROR("MeshChunk length is not conserved"), HCCL_E_PARA);
@@ -140,15 +140,16 @@ HcclResult InsTempReduceScatterMesh1DMeshChunk::PrepareSlicesAndValidate(
         return steps == 0 || stride <= (UINT64_MAX - address - offset - size) / steps;
     };
     CHK_PRT_RET(
-        !checkSpan(params.buffInfo.inputPtr, params.buffInfo.inBuffBaseOff,
-            params.inputSliceStride, chunkNum, processSize_) ||
-        !checkSpan(params.buffInfo.outputPtr, params.buffInfo.outBuffBaseOff, 0, 0, processSize_) ||
-        !checkSpan(params.buffInfo.hcclBuff.addr, params.buffInfo.hcclBuffBaseOff, 0, 0, processSize_),
+        !checkSpan(
+            params.buffInfo.inputPtr, params.buffInfo.inBuffBaseOff, params.inputSliceStride, chunkNum, processSize_) ||
+            !checkSpan(params.buffInfo.outputPtr, params.buffInfo.outBuffBaseOff, 0, 0, processSize_) ||
+            !checkSpan(params.buffInfo.hcclBuff.addr, params.buffInfo.hcclBuffBaseOff, 0, 0, processSize_),
         HCCL_ERROR("MeshChunk buffer offset overflow"), HCCL_E_PARA);
     const u64 lastInputOffset = params.buffInfo.inBuffBaseOff + chunkNum * params.inputSliceStride;
     CHK_PRT_RET(
-        !checkSpan(params.buffInfo.inputPtr, lastInputOffset, params.inputRepeatStride,
-            params.repeatNum - 1, processSize_), HCCL_ERROR("MeshChunk repeat offset overflow"), HCCL_E_PARA);
+        !checkSpan(
+            params.buffInfo.inputPtr, lastInputOffset, params.inputRepeatStride, params.repeatNum - 1, processSize_),
+        HCCL_ERROR("MeshChunk repeat offset overflow"), HCCL_E_PARA);
     for (auto rank : subCommRanks_[0]) {
         if (rank == myRank_) {
             continue;
@@ -156,7 +157,7 @@ HcclResult InsTempReduceScatterMesh1DMeshChunk::PrepareSlicesAndValidate(
         auto it = resources.channels.find(rank);
         CHK_PRT_RET(
             it == resources.channels.end() || it->second.empty() || it->second[0].handle == 0 ||
-            !checkSpan(it->second[0].remoteCclMem.addr, params.buffInfo.hcclBuffBaseOff, 0, 0, processSize_),
+                !checkSpan(it->second[0].remoteCclMem.addr, params.buffInfo.hcclBuffBaseOff, 0, 0, processSize_),
             HCCL_ERROR("Missing or invalid MeshChunk peer channel"), HCCL_E_PARA);
     }
     return HCCL_SUCCESS;

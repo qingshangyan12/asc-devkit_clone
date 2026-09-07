@@ -81,9 +81,8 @@ SendRecvReduceInfo MakeTransfer(const std::vector<uint64_t>& counts)
 
 size_t Count(Kind kind, uint32_t notify)
 {
-    return std::count_if(tasks.begin(), tasks.end(), [=](const Task& t) {
-        return t.kind == kind && t.notify == notify;
-    });
+    return std::count_if(
+        tasks.begin(), tasks.end(), [=](const Task& t) { return t.kind == kind && t.notify == notify; });
 }
 } // namespace
 
@@ -245,9 +244,11 @@ void WriteValue(void* ptr, HcclDataType dtype, float value)
     }
     uint32_t bits;
     std::memcpy(&bits, &value, sizeof(bits));
-    uint16_t half = dtype == HCCL_DATA_TYPE_BFP16 ? bits >> 16 :
-        (value == 0 ? 0 : ((bits >> 16) & 0x8000U) | ((((bits >> 23) & 255U) - 112U) << 10) |
-            ((bits >> 13) & 1023U));
+    uint16_t half =
+        dtype == HCCL_DATA_TYPE_BFP16 ?
+            bits >> 16 :
+            (value == 0 ? 0 :
+                          ((bits >> 16) & 0x8000U) | ((((bits >> 23) & 255U) - 112U) << 10) | ((bits >> 13) & 1023U));
     std::memcpy(ptr, &half, sizeof(half));
 }
 
@@ -260,11 +261,16 @@ struct Scenario {
     std::vector<std::vector<uint8_t>> inputs, outputs, scratch;
     std::vector<u32> rankList;
 
-    Scenario(u32 n, u64 c, u64 s, HcclDataType d) :
-        ranks(n), count(c), stride(s == 0 ? c : s), dtype(d), elementSize(DATATYPE_SIZE_TABLE[d]),
-        inputs(n, std::vector<uint8_t>((n * stride) * elementSize + 34, 0xD7)),
-        outputs(n, std::vector<uint8_t>(c * elementSize + 34, 0xD7)),
-        scratch(n, std::vector<uint8_t>(c * elementSize + 34, 0xD7)), rankList(n)
+    Scenario(u32 n, u64 c, u64 s, HcclDataType d)
+        : ranks(n),
+          count(c),
+          stride(s == 0 ? c : s),
+          dtype(d),
+          elementSize(DATATYPE_SIZE_TABLE[d]),
+          inputs(n, std::vector<uint8_t>((n * stride) * elementSize + 34, 0xD7)),
+          outputs(n, std::vector<uint8_t>(c * elementSize + 34, 0xD7)),
+          scratch(n, std::vector<uint8_t>(c * elementSize + 34, 0xD7)),
+          rankList(n)
     {
         std::iota(rankList.begin(), rankList.end(), 0);
         for (u32 src = 0; src < n; ++src) {
@@ -296,7 +302,9 @@ struct Scenario {
             res.threads.push_back(1 + r * 16 + i);
         }
         for (u32 peer = 0; peer < ranks; ++peer) {
-            if (peer == r) { continue; }
+            if (peer == r) {
+                continue;
+            }
             ChannelInfo c{};
             c.handle = 1 + r * 64 + peer;
             c.remoteRank = peer;
@@ -326,7 +334,8 @@ struct Scenario {
             auto param = Param();
             InsTempReduceScatterMesh1DMeshChunk alg(param, r, {rankList});
             for (u64 processed = 0; processed < count; processed += loopCount) {
-                ASSERT_EQ(alg.KernelRun(param, Data(r, processed, std::min(loopCount, count - processed)), Resources(r)),
+                ASSERT_EQ(
+                    alg.KernelRun(param, Data(r, processed, std::min(loopCount, count - processed)), Resources(r)),
                     HCCL_SUCCESS);
             }
         }
@@ -334,7 +343,9 @@ struct Scenario {
     void VerifyAddresses(u64 loopCount)
     {
         for (const auto& t : tasks) {
-            if (t.kind != Kind::REDUCE) { continue; }
+            if (t.kind != Kind::REDUCE) {
+                continue;
+            }
             const u32 srcRank = (t.thread - 1) / 16;
             const u32 dstRank = (t.target - 1) % 64;
             const auto srcOffset = static_cast<const uint8_t*>(t.src) - In(srcRank);
@@ -376,7 +387,9 @@ struct Scenario {
     void ExecuteAndCheck()
     {
         std::map<ThreadHandle, std::vector<Task>> queues;
-        for (const auto& t : tasks) { queues[t.thread].push_back(t); }
+        for (const auto& t : tasks) {
+            queues[t.thread].push_back(t);
+        }
         std::map<ThreadHandle, size_t> positions;
         // Separate namespaces for local-thread and directed-channel notifications.
         std::map<std::pair<uint64_t, uint32_t>, bool> channelSignals, threadSignals;
@@ -385,13 +398,17 @@ struct Scenario {
             bool progress = false;
             for (auto& entry : queues) {
                 auto& pos = positions[entry.first];
-                if (pos == entry.second.size()) { continue; }
+                if (pos == entry.second.size()) {
+                    continue;
+                }
                 const auto& t = entry.second[pos];
-                auto& signals = (t.kind == Kind::CHANNEL_WAIT || t.kind == Kind::CHANNEL_RECORD) ?
-                    channelSignals : threadSignals;
+                auto& signals =
+                    (t.kind == Kind::CHANNEL_WAIT || t.kind == Kind::CHANNEL_RECORD) ? channelSignals : threadSignals;
                 auto key = std::make_pair(t.target, t.notify);
                 if (t.kind == Kind::CHANNEL_WAIT || t.kind == Kind::THREAD_WAIT) {
-                    if (!signals[key]) { continue; }
+                    if (!signals[key]) {
+                        continue;
+                    }
                     signals[key] = false;
                 } else if (t.kind == Kind::THREAD_RECORD || t.kind == Kind::CHANNEL_RECORD) {
                     if (t.kind == Kind::CHANNEL_RECORD) {
@@ -455,7 +472,9 @@ TEST_F(MeshChunkTest, ChunkBoundariesConserveDataAndPreserveStridedMultiLoopAddr
                             sent[{(t.thread - 1) / 16, (t.target - 1) % 64}] += t.count;
                         }
                     }
-                    for (const auto& pair : sent) { EXPECT_EQ(pair.second, s.count); }
+                    for (const auto& pair : sent) {
+                        EXPECT_EQ(pair.second, s.count);
+                    }
                 }
             }
         }
@@ -520,10 +539,16 @@ TEST_F(MeshChunkTest, EveryIntermediateStepJoinsBeforeReleaseAndUsesOnlyAlgorith
         }
         for (u32 r = 0; r < ranks; ++r) {
             std::vector<Task> main;
-            for (const auto& t : tasks) { if (t.thread == 1 + r * 16) { main.push_back(t); } }
+            for (const auto& t : tasks) {
+                if (t.thread == 1 + r * 16) {
+                    main.push_back(t);
+                }
+            }
             u32 step = 0;
             for (size_t pos = 0; pos < main.size(); ++pos) {
-                if (main[pos].kind != Kind::CHANNEL_WAIT || main[pos].notify != NOTIFY_IDX_DATA_SIGNAL) { continue; }
+                if (main[pos].kind != Kind::CHANNEL_WAIT || main[pos].notify != NOTIFY_IDX_DATA_SIGNAL) {
+                    continue;
+                }
                 const bool intermediate = step++ < ranks - 2;
                 for (u32 i = 0; i < slaves; ++i) {
                     ASSERT_LT(pos + 1 + i, main.size());
@@ -630,15 +655,19 @@ struct NhrScenario : Scenario {
             auto param = Param();
             InsTempReduceScatterNHR alg(param, r, {rankList});
             for (u64 processed = 0; processed < count; processed += loopCount) {
-                ASSERT_EQ(alg.KernelRun(param,
-                    NhrData(r, processed, std::min(loopCount, count - processed)), NhrResources(r)), HCCL_SUCCESS);
+                ASSERT_EQ(
+                    alg.KernelRun(
+                        param, NhrData(r, processed, std::min(loopCount, count - processed)), NhrResources(r)),
+                    HCCL_SUCCESS);
             }
         }
     }
     void CheckTransfers()
     {
         for (const auto& task : tasks) {
-            if (task.kind != Kind::REDUCE) { continue; }
+            if (task.kind != Kind::REDUCE) {
+                continue;
+            }
             const u32 srcRank = (task.thread - 1) / 16;
             const u32 dstRank = (task.target - 1) % 64;
             const auto src = reinterpret_cast<uintptr_t>(task.src);
@@ -707,7 +736,9 @@ TEST_F(MeshChunkTest, NhrFusesRealTemplateForSoleAndInterServerRanksWithStridedL
 TEST_F(MeshChunkTest, NhrBatchesParallelRepeatsAndSkipsEmptyTemplate)
 {
     NhrScenario s(2, 40, 43, HCCL_DATA_TYPE_FP32);
-    for (auto& input : s.inputs) { input.resize(16 * s.stride * s.elementSize + 34, 0xD7); }
+    for (auto& input : s.inputs) {
+        input.resize(16 * s.stride * s.elementSize + 34, 0xD7);
+    }
     auto param = s.Param();
     InsTempReduceScatterNHR alg(param, 0, {s.rankList});
     auto data = s.NhrData(0, 0, 0);
@@ -726,13 +757,16 @@ TEST_F(MeshChunkTest, NhrBatchesParallelRepeatsAndSkipsEmptyTemplate)
     ASSERT_EQ(descriptors.size(), 8U);
     for (size_t i = 0; i < descriptors.size(); ++i) {
         const auto& d = descriptors[i];
-        const auto src = i + 1 == descriptors.size() ? d.transferInfo.writeReduceWithNotify.src : d.transferInfo.reduce.src;
-        const auto dst = i + 1 == descriptors.size() ? d.transferInfo.writeReduceWithNotify.dst : d.transferInfo.reduce.dst;
+        const auto src =
+            i + 1 == descriptors.size() ? d.transferInfo.writeReduceWithNotify.src : d.transferInfo.reduce.src;
+        const auto dst =
+            i + 1 == descriptors.size() ? d.transferInfo.writeReduceWithNotify.dst : d.transferInfo.reduce.dst;
         // Rank 0 sends the other rank's block in step zero; compare exact stride/repeat offsets.
         EXPECT_EQ(src, s.In(0) + data.inputSliceStride + i * data.inputRepeatStride);
         EXPECT_EQ(dst, s.Tmp(1) + data.sliceSize + i * data.outputRepeatStride);
-        EXPECT_EQ(d.transType, i + 1 == descriptors.size() ? HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE_WITH_NOTIFY :
-            HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE);
+        EXPECT_EQ(
+            d.transType, i + 1 == descriptors.size() ? HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE_WITH_NOTIFY :
+                                                       HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE);
     }
     EXPECT_EQ(Count(Kind::CHANNEL_RECORD, NOTIFY_IDX_DATA_SIGNAL), 1U);
     EXPECT_EQ(Count(Kind::CHANNEL_WAIT, NOTIFY_IDX_DATA_SIGNAL), 1U);
@@ -755,7 +789,9 @@ TEST_F(MeshChunkTest, NhrOldInterfaceAndFailedBatchNeverReplayCommunication)
     EXPECT_EQ(Count(Kind::REDUCE, 0), 0U);
     EXPECT_EQ(Count(Kind::CHANNEL_RECORD, NOTIFY_IDX_DATA_SIGNAL), 0U);
     for (const auto& task : tasks) {
-        if (task.kind == Kind::COPY) { EXPECT_NE(task.dst, s.Out(0)); }
+        if (task.kind == Kind::COPY) {
+            EXPECT_NE(task.dst, s.Out(0));
+        }
     }
 }
 
@@ -764,7 +800,9 @@ TEST_F(MeshChunkTest, NhrPcieReadReduceDoesNotUseWriteFusion)
     NhrScenario s(2, 7, 10, HCCL_DATA_TYPE_FP32);
     auto param = s.Param();
     auto resources = s.NhrResources(0);
-    for (auto& peer : resources.channels) { peer.second[0].protocol = CommProtocol::COMM_PROTOCOL_PCIE; }
+    for (auto& peer : resources.channels) {
+        peer.second[0].protocol = CommProtocol::COMM_PROTOCOL_PCIE;
+    }
     InsTempReduceScatterNHR alg(param, 0, {s.rankList});
     ASSERT_EQ(alg.KernelRun(param, s.NhrData(0, 0, s.count), resources), HCCL_SUCCESS);
     EXPECT_EQ(readReduceCalls, 1U);
