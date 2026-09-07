@@ -48,7 +48,7 @@
 
 ## 场景详细说明
 
-本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `asc_copy_l0c2gm`。
+本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `asc_copy_l0c2gm_custom`。
 
 <a name="表2"></a>
 <table border="2" align="center">
@@ -94,13 +94,13 @@
 **场景4：输出格式ND，输出数据类型int8_t，使能Scalar量化**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 256] int8_t类型，ND格式
-- 实现：调用`asc_set_l0c_copy_prequant(2.0F, 0, true)`配置Scalar量化参数，再以`QuantMode_t::QF322B8_PRE`调用`asc_copy_l0c2gm`
+- 实现：调用`asc_set_l0c_copy_prequant(2.0F, 0, true)`配置Scalar量化参数，再以`asc_quant_mode::QF322B8_PRE`调用`asc_copy_l0c2gm`
 - 说明：将float类型数据量化为int8_t类型，整个C矩阵使用一个量化参数
 
 **场景5：输出格式ND，输出数据类型int8_t，使能Vector量化**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 256] int8_t类型，ND格式
-- 实现：通过`asc_copy_gm2l1`和`asc_copy_l12fb`将每列量化参数从GM经L1搬到Fixpipe Buffer，调用`asc_set_l0c_copy_config`配置参数地址，再以`QuantMode_t::VQF322B8_PRE`调用`asc_copy_l0c2gm`
+- 实现：通过`asc_copy_gm2l1`和`asc_copy_l12fb`将每列量化参数从GM经L1搬到Fixpipe Buffer，调用`asc_set_l0c_copy_config`配置参数地址，再以`asc_quant_mode::VQF322B8_PRE`调用`asc_copy_l0c2gm`
 - 说明：将float类型数据量化为int8_t类型，C矩阵的每一列对应一个量化参数，使用的量化参数需要从GM拷贝量化参数到L1
 
 **场景6：输出格式ND，输出数据类型float，使能ReLU**
@@ -124,7 +124,7 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}` 为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为`${HOME}/Ascend`。
 - 样例执行
 
   在本样例目录下执行如下命令。

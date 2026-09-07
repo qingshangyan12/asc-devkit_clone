@@ -47,7 +47,7 @@ This `dav-3510` example describes each L0C-to-L1 transfer through the addresses,
 ## Scenario Description
 
 This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different `SCENARIO_NUM` values are shown in the table below.
-All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 128, 128], with kernel function name `asc_copy_l0c2l1`.
+All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 128, 128], with kernel function name `asc_copy_l0c2l1_custom`.
 
 <a name="table2"></a>
 <table border="2" align="center">
@@ -63,25 +63,25 @@ All scenarios are based on the same matrix multiplication specification: [M, N, 
 **Scenario 1: Output format Nz, output to L1 data type half**
 - Input: A [128, 128] half type, ND format; B [128, 128] half type, ND format
 - Output: C [128, 128] half type, Nz format
-- Implementation: Call `asc_copy_l0c2l1` with `QuantMode_t::F322F16` to convert the float accumulation result to half Nz
+- Implementation: Call `asc_copy_l0c2l1` with `asc_quant_mode::F322F16` to convert the float accumulation result to half Nz
 - Description: L0C data in Nz format directly output to L1 in Nz format, data remains unchanged
 
 **Scenario 2: Output format Nz, output to L1 data type int8_t, Scalar quantization enabled**
 - Input: A [128, 128] half type, ND format; B [128, 128] half type, ND format
 - Output: C [128, 128] int8_t type, Nz format
-- Implementation: Call `asc_set_l0c_copy_prequant(2.0F, 0, true)`, then call `asc_copy_l0c2l1` with `QuantMode_t::QF322B8_PRE`
+- Implementation: Call `asc_set_l0c_copy_prequant(2.0F, 0, true)`, then call `asc_copy_l0c2l1` with `asc_quant_mode::QF322B8_PRE`
 - Description: Quantize float type data to int8_t type, entire C matrix uses one quantization parameter
 
 **Scenario 3: Output format Nz, output to L1 data type int8_t, Vector quantization enabled**
 - Input: A [128, 128] half type, ND format; B [128, 128] half type, ND format
 - Output: C [128, 128] int8_t type, Nz format
-- Implementation: Use `asc_copy_gm2l1` and `asc_copy_l12fb` to transfer per-column quantization values to Fixpipe Buffer, configure the address with `asc_set_l0c_copy_config`, then call `asc_copy_l0c2l1` with `QuantMode_t::VQF322B8_PRE`
+- Implementation: Use `asc_copy_gm2l1` and `asc_copy_l12fb` to transfer per-column quantization values to Fixpipe Buffer, configure the address with `asc_set_l0c_copy_config`, then call `asc_copy_l0c2l1` with `asc_quant_mode::VQF322B8_PRE`
 - Description: Quantize float type data to int8_t type, each column of C matrix corresponds to one quantization parameter, quantization parameters need to be copied from GM to L1
 
 **Scenario 4: Output format Nz, output to L1 data type half, ReLU enabled**
 - Input: A [128, 128] half type, ND format; B [128, 128] half type, ND format
 - Output: C [128, 128] half type, Nz format
-- Implementation: Call `asc_copy_l0c2l1` with `QuantMode_t::F322F16` and `relu_pre_mode = asc_relu_pre_mode::NORMAL`
+- Implementation: Call `asc_copy_l0c2l1` with `asc_quant_mode::F322F16` and `relu_pre_mode = asc_relu_pre_mode::NORMAL`
 - Description: Perform ReLU operation during data transfer from L0C to L1, setting negative values to 0
 
 After each L0C-to-L1 transfer, the example calls `asc_copy_l12l0a` to feed the L1 result into L0A, loads an identity matrix of the same type into L0B, and calls `asc_mmad` without changing the values. It then uses `asc_copy_l0c2gm` to generate ND-format `output.bin` for verification. Scenarios 1 and 4 produce float verification files; Scenarios 2 and 3 produce int32_t files.
@@ -95,7 +95,7 @@ Run the following steps in the root directory of this example to build and run t
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default installation path is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 - Run the example
 
   Run the following commands in the example directory.

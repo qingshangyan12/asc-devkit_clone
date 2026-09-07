@@ -164,7 +164,7 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}` 为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为`${HOME}/Ascend`。
 - 样例执行
 
   在本样例目录下执行如下命令。
@@ -197,24 +197,3 @@
   ```bash
   test pass!
   ```
-
-## 功能调试
-
-### printf
-
-该接口提供CPU域或NPU域调试场景下的格式化输出功能。
-
-在算子kernel侧实现代码中需要输出日志信息的地方调用 [printf](../../../../../docs/zh/api/Utils-API/tuning_interface/printf.md)接口打印相关内容。
-
-示例如下：
-
-```cpp
-printf("matmul blockIdx=%u\n", static_cast<uint32_t>(block_idx));
-```
-
-> [!CAUTION]注意 
->printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC\_DUMP=0的方式关闭打印功能。
-
-### DumpTensor
-
-基础API的`DumpTensor`以`LocalTensor`为输入。SIMD C API使用带地址空间限定符的数组，不提供以这些数组为输入的等价`asc_*`接口，因此本样例不能直接迁移`DumpTensor(cLocal, baseM * baseN)`调用。需要检查中间数据时，可在调测阶段使用printf输出必要信息，或结合仿真和性能调试工具进行定位。
