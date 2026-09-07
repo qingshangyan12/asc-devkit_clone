@@ -16,6 +16,7 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_H
 
+#include "tensor_api/tensor/tensor.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
 
 namespace asc {
@@ -23,31 +24,67 @@ namespace te {
 namespace experimental {
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> exp(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sqrt(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src, const T& scalar);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor<T>& src);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> log10(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src, const T& scalar);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> relu(const reg_tensor<T>& src_reg);
+__simd_callee__ inline reg_tensor<T> operator-(const T& scalar, const reg_tensor<T>& src);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> prelu(const reg_tensor<T>& src_reg, const reg_tensor<T>& slope);
+__simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src_reg, const T& slope);
+__simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src, const T& scalar);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator*(const T& scalar, const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src, const T& scalar);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> max(const T& scalar, const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> exp(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> sqrt(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> log10(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> relu(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> prelu(const reg_tensor<T>& src, const reg_tensor<T>& slope);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src, const T& slope);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> addc(reg_tensor<bool>& carry, const reg_tensor<T>& src0,
