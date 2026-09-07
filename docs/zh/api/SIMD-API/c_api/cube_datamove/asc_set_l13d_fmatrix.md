@@ -127,7 +127,7 @@ constexpr uint32_t OUTPUT_BATCH_SIZE = HOUT * WOUT * COUT;
 constexpr uint32_t FRACTAL_ELEMENTS = 512 / sizeof(half);
 constexpr uint32_t LOAD3D_K_EXTENSION = K_ALIGN;
 
-__global__ __cube__ void Conv2dForwardCapi(
+__global__ __cube__ void conv2d_forward_c_api(
     __gm__ half* fmap, __gm__ half* weight, __gm__ half* output)
 {
     asc_init();
@@ -144,10 +144,12 @@ __global__ __cube__ void Conv2dForwardCapi(
 
     asc_set_gm2l1_nz_para(1, 1, H * W, 0);
     asc_copy_gm2l1_nd2nz(
-        fmap_l1, fmap + batch_idx * FMAP_BATCH_SIZE, CIN * sizeof(half), 0, H * W, CIN, 0, false);
+        fmap_l1, fmap + batch_idx * FMAP_BATCH_SIZE, CIN * sizeof(half),
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, H * W, CIN, 0, false);
 
     asc_set_gm2l1_nz_para(1, 1, K_ALIGN, 0);
-    asc_copy_gm2l1_nd2nz(weight_l1, weight, COUT * sizeof(half), 0, K, COUT, 0, false);
+    asc_copy_gm2l1_nd2nz(weight_l1, weight, COUT * sizeof(half),
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, K, COUT, 0, false);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
 
@@ -167,29 +169,30 @@ __global__ __cube__ void Conv2dForwardCapi(
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
 
-    asc_mmad(output_l0, fmap_l0, weight_l0, M, K_ALIGN, N, 0, false, false, true);
+    asc_mmad(output_l0, fmap_l0, weight_l0, M, K_ALIGN, N,
+        asc_unit_flag_mode::DISABLE, false, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
 
     asc_set_l0c_copy_nz_para(1, 0, 0);
-    asc_copy_l0c2gm(
-        output + batch_idx * OUTPUT_BATCH_SIZE, output_l0, N, M, N, M_ALIGN, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::F322F16), 0, false, true, 0, 0, false, 0, false, false, false, false);
+    asc_copy_l0c2gm(output + batch_idx * OUTPUT_BATCH_SIZE, output_l0, N, M, N, M_ALIGN,
+        asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE, asc_quant_mode::F322F16,
+        asc_relu_pre_mode::NONE, false, true, false, false);
     asc_sync_pipe(PIPE_FIX);
 }
 
-size_t FmapIndex(uint32_t n, uint32_t h, uint32_t w, uint32_t c)
+size_t fmap_index(uint32_t n, uint32_t h, uint32_t w, uint32_t c)
 {
     return ((n * H + h) * W + w) * CIN + c;
 }
 
-size_t WeightIndex(uint32_t c1, uint32_t kh, uint32_t kw, uint32_t c0, uint32_t co)
+size_t weight_index(uint32_t c1, uint32_t kh, uint32_t kw, uint32_t c0, uint32_t co)
 {
     const uint32_t k = ((c1 * KH + kh) * KW + kw) * C0 + c0;
     return k * COUT + co;
 }
 
-std::vector<half> MakeGolden(const std::vector<half>& fmap, const std::vector<half>& weight)
+std::vector<half> make_golden(const std::vector<half>& fmap, const std::vector<half>& weight)
 {
     std::vector<half> golden(BATCH * OUTPUT_BATCH_SIZE);
     for (uint32_t n = 0; n < BATCH; ++n) {
@@ -207,8 +210,8 @@ std::vector<half> MakeGolden(const std::vector<half>& fmap, const std::vector<ha
                                     const float x = hi < 0 || hi >= static_cast<int32_t>(H) || wi < 0 ||
                                             wi >= static_cast<int32_t>(W)
                                         ? static_cast<float>(PAD_VALUE)
-                                        : static_cast<float>(fmap[FmapIndex(n, hi, wi, ci)]);
-                                    acc += x * static_cast<float>(weight[WeightIndex(c1, kh, kw, c0, co)]);
+                                        : static_cast<float>(fmap[fmap_index(n, hi, wi, ci)]);
+                                    acc += x * static_cast<float>(weight[weight_index(c1, kh, kw, c0, co)]);
                                 }
                             }
                         }
@@ -235,14 +238,14 @@ int main()
             for (uint32_t kw = 0; kw < KW; ++kw) {
                 for (uint32_t c0 = 0; c0 < C0; ++c0) {
                     for (uint32_t co = 0; co < COUT; ++co) {
-                        weight[WeightIndex(c1, kh, kw, c0, co)] =
+                        weight[weight_index(c1, kh, kw, c0, co)] =
                             static_cast<half>(static_cast<int32_t>((c1 + kh + 2 * kw + c0 + co) % 3) - 1);
                     }
                 }
             }
         }
     }
-    const std::vector<half> golden = MakeGolden(fmap, weight);
+    const std::vector<half> golden = make_golden(fmap, weight);
 
     half *fmap_device = nullptr, *weight_device = nullptr, *output_device = nullptr;
     aclInit(nullptr);
@@ -252,7 +255,7 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(half), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(fmap_device, fmap.size() * sizeof(half), fmap.data(), fmap.size() * sizeof(half), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(weight_device, weight.size() * sizeof(half), weight.data(), weight.size() * sizeof(half), ACL_MEMCPY_HOST_TO_DEVICE);
-    Conv2dForwardCapi<<<BATCH, 0>>>(fmap_device, weight_device, output_device);
+    conv2d_forward_c_api<<<BATCH, 0>>>(fmap_device, weight_device, output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(half), output_device, output.size() * sizeof(half), ACL_MEMCPY_DEVICE_TO_HOST);
 

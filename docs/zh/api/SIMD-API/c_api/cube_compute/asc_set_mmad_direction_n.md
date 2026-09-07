@@ -81,7 +81,8 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 constexpr uint32_t M = 16, K = 32, N = 16;
 
-__global__ __cube__ void AscSetMmadDirectionNKernel(__gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
+__global__ __cube__ void asc_set_mmad_direction_n_kernel(
+    __gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
 {
     asc_init();
     __cbuf__ int8_t a_l1[M * K], b_l1[K * N];
@@ -89,9 +90,11 @@ __global__ __cube__ void AscSetMmadDirectionNKernel(__gm__ int8_t* a, __gm__ int
     __cb__ int8_t b_l0[K * N];
     __cc__ int32_t c_l0[M * N];
     asc_set_gm2l1_nz_para(1, 1, 32, 0);
-    asc_copy_gm2l1_nd2nz(a_l1, a, K, 0, M, K, 0, false);
+    asc_copy_gm2l1_nd2nz(
+        a_l1, a, K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, M, K, 0, false);
     asc_set_gm2l1_nz_para(1, 1, 32, 0);
-    asc_copy_gm2l1_nd2nz(b_l1, b, N, 0, K, N, 0, false);
+    asc_copy_gm2l1_nd2nz(
+        b_l1, b, N, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, K, N, 0, false);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);
@@ -100,17 +103,17 @@ __global__ __cube__ void AscSetMmadDirectionNKernel(__gm__ int8_t* a, __gm__ int
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_set_mmad_direction_n();
-    asc_mmad(c_l0, a_l0, b_l0, M, K, N, 0, true, false, true);
+    asc_mmad(c_l0, a_l0, b_l0, M, K, N, asc_unit_flag_mode::DISABLE, true, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_set_l0c_copy_nz_para(1, 0, 0);
-    asc_copy_l0c2gm(output, c_l0, N, M, N, M, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    asc_copy_l0c2gm(output, c_l0, N, M, N, M,
+        asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE, asc_quant_mode::NoQuant,
+        asc_relu_pre_mode::NONE, false, true, false, false);
     asc_sync_pipe(PIPE_ALL);
 }
 
-void PrintRow(const char* label, const std::vector<int32_t>& data)
+void print_row(const char* label, const std::vector<int32_t>& data)
 {
     std::cout << label << ':';
     for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
@@ -137,12 +140,12 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(a_device, a.size(), a.data(), a.size(), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, b.size(), b.data(), b.size(), ACL_MEMCPY_HOST_TO_DEVICE);
-    AscSetMmadDirectionNKernel<<<1, 0>>>(a_device, b_device, output_device);
+    asc_set_mmad_direction_n_kernel<<<1, 0>>>(a_device, b_device, output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(int32_t), output_device,
         output.size() * sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
-    PrintRow("N-first output row 0", output);
-    PrintRow("Golden row 0", golden);
+    print_row("N-first output row 0", output);
+    print_row("Golden row 0", golden);
     const bool passed = output == golden;
     std::cout << (passed ? "[Success] asc_set_mmad_direction_n preserves MMAD values."
                          : "[Failed] asc_set_mmad_direction_n result mismatch.") << std::endl;

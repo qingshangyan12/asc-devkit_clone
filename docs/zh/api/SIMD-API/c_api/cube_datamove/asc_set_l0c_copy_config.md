@@ -104,7 +104,7 @@ constexpr uint32_t DIM = 16, ELEMENTS = DIM * DIM;
 constexpr uint16_t HALF_ONE = 0x3c00, HALF_THREE = 0x4200;
 constexpr uint64_t SIGNED_SCALE_TWO = 0x40000000ULL | (1ULL << 46);
 
-__global__ __cube__ void AscSetL0cCopyConfigKernel(
+__global__ __cube__ void asc_set_l0c_copy_config_kernel(
     __gm__ uint16_t* a, __gm__ uint16_t* b, __gm__ uint64_t* scales, __gm__ int8_t* output)
 {
     asc_init();
@@ -115,17 +115,20 @@ __global__ __cube__ void AscSetL0cCopyConfigKernel(
     __cb__ half b_l0[ELEMENTS];
     __cc__ float c_l0[ELEMENTS];
     asc_set_gm2l1_nz_para(1, 1, 16, 0);
-    asc_copy_gm2l1_nd2nz(a_l1, reinterpret_cast<__gm__ half*>(a), DIM * sizeof(half), 0, DIM, DIM, 0, false);
+    asc_copy_gm2l1_nd2nz(a_l1, reinterpret_cast<__gm__ half*>(a), DIM * sizeof(half),
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, DIM, DIM, 0, false);
     asc_set_gm2l1_nz_para(1, 1, 16, 0);
-    asc_copy_gm2l1_nd2nz(b_l1, reinterpret_cast<__gm__ half*>(b), DIM * sizeof(half), 0, DIM, DIM, 0, false);
-    asc_copy_gm2l1(reinterpret_cast<__cbuf__ void*>(scale_l1), reinterpret_cast<__gm__ void*>(scales), 1, 4, 0, 0, 0);
+    asc_copy_gm2l1_nd2nz(b_l1, reinterpret_cast<__gm__ half*>(b), DIM * sizeof(half),
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, DIM, DIM, 0, false);
+    asc_copy_gm2l1(reinterpret_cast<__cbuf__ void*>(scale_l1), reinterpret_cast<__gm__ void*>(scales), 1, 4,
+        asc_channel_pad_mode::NONE, 0, 0);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_copy_l12l0a(a_l0, a_l1, 0, 0, 1, 1, 1, 1);
     asc_copy_l12l0b_transpose(b_l0, b_l1, 0, 0, 1, 1, 1, 1);
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
-    asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, 0, true, false, true);
+    asc_mmad(c_l0, a_l0, b_l0, DIM, DIM, DIM, asc_unit_flag_mode::DISABLE, true, false, true);
     asc_sync_notify(PIPE_MTE2, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_FIX, EVENT_ID0);
     asc_copy_l12fb(reinterpret_cast<__fbuf__ void*>(scale_fb), reinterpret_cast<__cbuf__ void*>(scale_l1), 1, 2, 0, 0);
@@ -135,13 +138,13 @@ __global__ __cube__ void AscSetL0cCopyConfigKernel(
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_set_l0c_copy_nz_para(1, 0, 0);
-    asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
-        static_cast<uint64_t>(QuantMode_t::VQF322B8_PRE), 0, false, true,
-        static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
+    asc_copy_l0c2gm(output, c_l0, DIM, DIM, DIM, DIM,
+        asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE,
+        asc_quant_mode::VQF322B8_PRE, asc_relu_pre_mode::NONE, false, true, false, false);
     asc_sync_pipe(PIPE_ALL);
 }
 
-void PrintRow(const char* label, const std::vector<int8_t>& data)
+void print_row(const char* label, const std::vector<int8_t>& data)
 {
     std::cout << label << ':';
     for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << +data[i];
@@ -172,11 +175,11 @@ int main()
     aclrtMemcpy(b_device, b.size() * sizeof(uint16_t), b.data(), b.size() * sizeof(uint16_t), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(scales_device, scales.size() * sizeof(uint64_t), scales.data(), scales.size() * sizeof(uint64_t),
         ACL_MEMCPY_HOST_TO_DEVICE);
-    AscSetL0cCopyConfigKernel<<<1, 0>>>(a_device, b_device, scales_device, output_device);
+    asc_set_l0c_copy_config_kernel<<<1, 0>>>(a_device, b_device, scales_device, output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size(), output_device, output.size(), ACL_MEMCPY_DEVICE_TO_HOST);
-    PrintRow("Quantized output row 0", output);
-    PrintRow("Golden row 0", golden);
+    print_row("Quantized output row 0", output);
+    print_row("Golden row 0", golden);
     const bool passed = output == golden;
     std::cout << (passed ? "[Success] asc_set_l0c_copy_config applied tensor quantization scale 2."
                          : "[Failed] asc_set_l0c_copy_config result mismatch.") << std::endl;

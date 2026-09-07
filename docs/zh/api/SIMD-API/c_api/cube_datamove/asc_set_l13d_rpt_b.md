@@ -108,7 +108,7 @@ constexpr uint32_t FMAP_ELEMENTS = H * W * CIN;
 constexpr uint32_t WEIGHT_ELEMENTS = COUT * K;
 constexpr uint32_t OUTPUT_ELEMENTS = COUT * M;
 
-__global__ __cube__ void AscSetL13dRptBKernel(
+__global__ __cube__ void asc_set_l13d_rpt_b_kernel(
     __gm__ half* fmap, __gm__ half* weight, __gm__ half* output)
 {
     asc_init();
@@ -119,9 +119,11 @@ __global__ __cube__ void AscSetL13dRptBKernel(
     __cc__ float output_l0[COUT * M_ALIGN];
 
     asc_set_gm2l1_nz_para(1, 1, H * W, 0);
-    asc_copy_gm2l1_nd2nz(fmap_l1, fmap, CIN * sizeof(half), 0, H * W, CIN, 0, false);
+    asc_copy_gm2l1_nd2nz(fmap_l1, fmap, CIN * sizeof(half),
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, H * W, CIN, 0, false);
     asc_set_gm2l1_nz_para(1, 1, K_ALIGN, 0);
-    asc_copy_gm2l1_nd2nz(weight_l1, weight, K * sizeof(half), 0, COUT, K, 0, false);
+    asc_copy_gm2l1_nd2nz(weight_l1, weight, K * sizeof(half),
+        asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, COUT, K, 0, false);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
 
@@ -137,13 +139,14 @@ __global__ __cube__ void AscSetL13dRptBKernel(
 
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
-    asc_mmad(output_l0, weight_l0, fmap_l0, COUT, K_ALIGN, M, 0, false, false, true);
+    asc_mmad(output_l0, weight_l0, fmap_l0, COUT, K_ALIGN, M,
+        asc_unit_flag_mode::DISABLE, false, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_set_l0c_copy_nz_para(1, 0, 0);
-    asc_copy_l0c2gm(
-        output, output_l0, M, COUT, M, COUT, 0, 0, 0, static_cast<uint64_t>(QuantMode_t::F322F16), 0, false,
-        true, 0, 0, false, 0, false, false, false, false);
+    asc_copy_l0c2gm(output, output_l0, M, COUT, M, COUT,
+        asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE, asc_quant_mode::F322F16,
+        asc_relu_pre_mode::NONE, false, true, false, false);
     asc_sync_pipe(PIPE_ALL);
 }
 
@@ -166,7 +169,7 @@ int main()
     }
     aclrtMemcpy(fmap_device, fmap.size() * sizeof(half), fmap.data(), fmap.size() * sizeof(half), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(weight_device, weight.size() * sizeof(half), weight.data(), weight.size() * sizeof(half), ACL_MEMCPY_HOST_TO_DEVICE);
-    AscSetL13dRptBKernel<<<1, 0>>>(fmap_device, weight_device, output_device);
+    asc_set_l13d_rpt_b_kernel<<<1, 0>>>(fmap_device, weight_device, output_device);
     const bool runtime_ok = aclrtSynchronizeDevice() == ACL_SUCCESS &&
         aclrtMemcpy(output.data(), output.size() * sizeof(half), output_device, output.size() * sizeof(half), ACL_MEMCPY_DEVICE_TO_HOST) == ACL_SUCCESS;
     uint32_t match_count = 0;
