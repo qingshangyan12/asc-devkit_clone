@@ -244,22 +244,9 @@ HcclResult ProcessLinkForProtocol(
     const std::string& funcName)
 {
     protocolFound = false;
-    // A peer can expose multiple links for the same protocol on one die.
-    // Keep one channel per die, matching the current HCCL channel policy.
-    std::set<uint32_t> seenDie;
     for (auto expectedProtocol : expectedProtocols) {
         for (u32 idx = 0; idx < linkList.size(); idx++) {
-            if (linkList[idx].linkAttr.linkProtocol != expectedProtocol) {
-                continue;
-            }
-            EndpointAttrDieId dieId = 0;
-            HcclResult dieRet = HcclRankGraphGetEndpointInfo(
-                comm, myRank, &linkList[idx].srcEndpointDesc, ENDPOINT_ATTR_DIE_ID, sizeof(dieId), &dieId);
-            bool shouldAdd = true;
-            if (dieRet == HCCL_SUCCESS) {
-                shouldAdd = seenDie.insert(dieId).second;
-            }
-            if (shouldAdd) {
+            if (linkList[idx].linkAttr.linkProtocol == expectedProtocol) {
                 CHK_RET(
                     CreateChannelFromLink(comm, myRank, remoteRank, netLayer, idx, linkList[idx], funcName, channels));
                 protocolFound = true;
