@@ -2,14 +2,14 @@
 
 ## 概述
 
-本样例为SIMT编程入门样例，通过使用<<<>>>内核调用符来完成样例核函数在NPU侧运行验证的基础流程，核函数内通过printf打印输出结果。
+本样例为SIMT编程入门样例，通过使用`<<<>>>`内核调用符来完成样例核函数在NPU侧运行验证的基础流程，核函数内通过`printf()`打印输出结果。
 
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
 
 ## 支持的CANN软件版本
-- \> CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## 目录结构介绍
 
@@ -24,7 +24,7 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -58,4 +58,4 @@
   [blockIdx (1/2)][threadIdx (0/32)]: Hello World!
   ```
 
-  输出共6行，每行对应一个线程的打印结果。`[blockIdx (X/2)]` 表示当前为第X个线程块（共2个线程块），`[threadIdx (Y/32)]` 表示线程块内第Y个线程，说明核函数已成功在AIV Core上成功执行。
+  输出共6行，每行对应一个线程的打印结果。`[blockIdx (X/2)]` 表示当前为第X个线程块（共2个线程块），`[threadIdx (Y/32)]` 表示线程块内第Y个线程，说明核函数已成功在AIV Core上执行。

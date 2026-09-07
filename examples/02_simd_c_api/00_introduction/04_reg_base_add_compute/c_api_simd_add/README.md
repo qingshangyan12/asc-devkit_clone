@@ -13,7 +13,7 @@
 ```
 ├── c_api_simd_add
 │   ├── CMakeLists.txt          // 编译工程文件
-│   ├── c_api_add.asc          // Ascend C 算子实现 & 调用样例
+│   ├── c_api_add.asc           // Ascend C 算子实现 & 调用样例
 │   └── README.md
 ```
 
@@ -48,15 +48,15 @@
 
     Add算子的实现流程分为3个步骤：
 
-    第一步将 Global Memory 上的输入 x 和 y 搬运到 Local Memory，分别存储在 xLocal、yLocal。
+    第一步将Global Memory上的输入x和y搬运到Local Memory，分别存储在xLocal、yLocal。
 
-    第二步从 Unified Buffer 加载数据到寄存器 reg_src0 和 reg_src1，使用 `asc_add` 对寄存器数据执行加法操作，结果存储在寄存器reg_dst 中，计算完成后将结果搬回zLocal。
+    第二步从Unified Buffer加载数据到寄存器src0和src1，使用`asc_add`对寄存器数据执行加法操作，结果存储在寄存器dst中，计算完成后将结果搬回zLocal。
 
     第三步将输出数据从zLocal搬运至Global Memory上的输出z中。
 
   - 向量计算中的mask控制
 
-    在向量计算指令中，mask用于控制向量寄存器的哪些通道参与计算。本样例通过asc_update_mask_b32函数设置32位的向量掩码，控制256位向量寄存器中每个通道的有效性。
+    在向量计算指令中，mask用于控制向量寄存器的哪些通道参与计算。本样例通过`asc_update_mask_b32`函数设置32位的向量掩码，控制256位向量寄存器中每个通道的有效性。
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
@@ -66,7 +66,7 @@
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
 
     ```bash

@@ -25,6 +25,7 @@ file(GLOB ASCENDC_UT_ascend910B1_CASE_SRC
 
 file(GLOB ASCENDC_UT_ascend950pr_9599_CASE_SRC
     cmath/test_abs.cpp
+    cmath/test_ceil_div.cpp
     cmath/test_sqrt.cpp
     type_traits/*.cpp
 )
@@ -51,6 +52,7 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1>:__NPU_ARCH__=2201>
         $<$<STREQUAL:${product_type},ascend950pr_9599>:__NPU_ARCH__=3510>
         __disable_kernel_type_autoinfer__=
+        __callee__=
     )
 
     target_compile_options(ascendc_ut_std_api_${product_type} PRIVATE

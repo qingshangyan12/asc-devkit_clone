@@ -3,7 +3,7 @@
 [![Docker Version](https://img.shields.io/badge/docker-%3E%3D23.0.0-blue.svg)](https://docs.docker.com/)
 [![Docker Buildx](https://img.shields.io/badge/docker%20buildx-required-orange.svg)](https://docs.docker.com/reference/cli/docker/buildx/)
 
-[中文版](./README.md) | [English](./README_en.md)
+English | [简体中文](./README.md)
 
 Ubuntu 24.04 containerized development environment for AscendC NPU kernel development.
 
@@ -117,11 +117,11 @@ The Dev Containers extension will automatically build the image and start the co
 
 ### Step 6: Install CANN inside the container
 
-After the container starts, in the container terminal refer to the [📥 Download and Install CANN Packages](../docs/quick_start.md#cann-install) section to download and install the toolkit and ops packages.
+After the container starts, in the container terminal refer to the [📥 Download and Install CANN Packages](../docs/zh/quick_start.md#cann-install) section to download and install the toolkit and ops packages.
 
 ### Step 7: Verify environment
 
-In the container terminal, refer to the [✅ Environment Verification](../docs/quick_start.md#cann-verify) section to confirm NPU device and CANN package status, then follow [⚙️ Environment Variable Configuration](../docs/quick_start.md#cann-env-setup) to load the environment variables. You can then begin kernel development.
+In the container terminal, refer to the [✅ Environment Verification](../docs/zh/quick_start.md#cann-verify) section to confirm NPU device and CANN package status, then follow [⚙️ Environment Variable Configuration](../docs/zh/quick_start.md#cann-env-setup) to load the environment variables. You can then begin kernel development.
 
 ## 🤖 Quick Start (AI Agent)<a name="quick-start-ai-agent"></a>
 
@@ -180,7 +180,7 @@ docker run -itd --name ascendc_container ascendc:ubuntu24.04
 > [!IMPORTANT]
 >
 > - If the user needs to mount data directories, append each as `-v /host/path:/container/path`.
-> - After the container starts, CANN toolkit and ops packages must be installed manually inside the container. Ask the user for the CANN package paths or installer commands, or refer to the [📥 Download and Install CANN Packages](../docs/quick_start.md#cann-install) section.
+> - After the container starts, CANN toolkit and ops packages must be installed manually inside the container. Ask the user for the CANN package paths or installer commands, or refer to the [📥 Download and Install CANN Packages](../docs/zh/quick_start.md#cann-install) section.
 
 ## 🐍 Python Environment<a name="python-env"></a>
 

@@ -21,7 +21,10 @@ InsAlgTemplateBase::InsAlgTemplateBase(
       reduceOp_(param.reduceType),
       enableDetour_(param.enableDetour)
 {
-    if (subCommRanks.size() > 1) {
+    if (subCommRanks.empty()) {
+        HCCL_ERROR("[InsAlgTemplateBase] subCommRanks is empty, myRank[%u].", myRank_);
+        templateRankSize_ = 0;
+    } else if (subCommRanks.size() > 1) {
         templateRankSize_ = subCommRanks[0].size() * subCommRanks[1].size();
     } else {
         templateRankSize_ = subCommRanks[0].size();
@@ -93,6 +96,22 @@ bool InsAlgTemplateBase::IsPcieProtocol(const std::map<u32, std::vector<ChannelI
     }
     HCCL_DEBUG("[IsPcieProtocol] the protocol of channel is Non-PCIE");
     return false;
+}
+
+HcclResult InsAlgTemplateBase::CalcDataSplitByPortGroup(
+    const u64 totalDataCount, const u64 dataTypeSize, const std::vector<ChannelInfo>& channels,
+    std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset)
+{
+    CalcDataSplitByPortGroupCommon(
+        totalDataCount, dataTypeSize, channels, elemCountOut, sizeOut, elemOffset, channelsPerRank_);
+    return HcclResult::HCCL_SUCCESS;
+}
+
+HcclResult InsAlgTemplateBase::SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels)
+{
+    CHK_PRT_RET(channels.empty(), HCCL_ERROR("[SetchannelsPerRank] channels is empty."), HcclResult::HCCL_E_INTERNAL);
+    channelsPerRank_ = CalcChannelsPerRank(channels);
+    return HcclResult::HCCL_SUCCESS;
 }
 
 } // namespace mc2_ops_hccl

@@ -9,10 +9,10 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    "impl/tensor_api/atom/vector/copy_ub2gm.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#pragma message( \
+    "impl/tensor_api/atom/vector/copy_ub2gm.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/tensor.h\"\" and use public functions or variables defined in interface headers files.")
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ATOM_VECTOR_COPY_UB2GM_H
 #endif
 
 /*!
@@ -23,24 +23,24 @@
 #define IMPL_TENSOR_API_ATOM_VECTOR_COPY_UB2GM_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
-#include "impl/tensor_api/arch/vector/ub_to_gm/copy.h"
+#include "impl/tensor_api/arch/vector/ub_to_gm/ub_to_gm_copy.h"
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename Traits>
-struct CopyTraits<CopyUB2GM, Traits> : public CopyTraits<CopyUB2GM, Traits, CopyUB2GM, Traits> {};
+struct copy_traits<copy_ub_to_gm, Traits> : public copy_traits<copy_ub_to_gm, Traits, copy_ub_to_gm, Traits> {};
 
 template <>
-struct CopyTraits<CopyUB2GM> : public CopyTraits<CopyUB2GM, CopyUB2GMTraitDefault> {};
+struct copy_traits<copy_ub_to_gm> : public copy_traits<copy_ub_to_gm, ub_to_gm_trait_default> {};
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ATOM_VECTOR_COPY_UB2GM_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ATOM_VECTOR_COPY_UB2GM_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ATOM_VECTOR_COPY_UB2GM_H
 #endif

@@ -64,6 +64,10 @@ constexpr const char* OP_ACLNN_SOC_INFO = "enum SocType {\n"
                                           "    SOC_VERSION_KIRINX90 = 14,\n"
                                           "    SOC_VERSION_KIRIN9030 = 15,\n"
                                           "    SOC_VERSION_ASCEND350 = 16,\n"
+                                          "    SOC_VERSION_KIRINDEV0000 = 17,\n"
+                                          "    SOC_VERSION_KIRINDEV0001 = 18,\n"
+                                          "    SOC_VERSION_KIRINDEV0002 = 19,\n"
+                                          "    SOC_VERSION_KIRINDEV0003 = 20,\n"
                                           "    SOC_VERSION_INVALID = 99\n"
                                           "};\n";
 constexpr const char* OP_ACLNN_SOC_MATCH_HELPER =
@@ -160,6 +164,10 @@ const std::map<std::string, std::string> SOC_SUPPORT_MAP = {
     {"ascend910_96", "SOC_VERSION_ASCEND910_96"},
     {"kirinx90", "SOC_VERSION_KIRINX90"},
     {"kirin9030", "SOC_VERSION_KIRIN9030"},
+    {"kirindev0000", "SOC_VERSION_KIRINDEV0000"},
+    {"kirindev0001", "SOC_VERSION_KIRINDEV0001"},
+    {"kirindev0002", "SOC_VERSION_KIRINDEV0002"},
+    {"kirindev0003", "SOC_VERSION_KIRINDEV0003"},
     {"ascend350", "SOC_VERSION_ASCEND350"}};
 
 const std::map<int, std::string> DTYPE_SUPPORT_MAP = {
@@ -342,7 +350,7 @@ ofstream AclnnOpGenerator::AclnnOpGenHeaderFileStart(string& fileName, string& m
 {
     ofstream outfile(fileName);
     chmod(fileName.c_str(), S_IRUSR | S_IWUSR);
-    outfile << "\n/*\n * calution: this file was generated automaticlly donot change it.\n*/\n\n";
+    outfile << "\n/*\n * calution: this file was generated automatically do not change it.\n*/\n\n";
     std::string name = GenerateMacros(macroNmae);
     if (version != 0U) {
         string decName = name + "_V" + std::to_string(version) + "_H_\n";
@@ -1070,7 +1078,7 @@ void AclnnOpGenerator::AclnnOpGenCodeFunAttrComment(
 void AclnnOpGenerator::AclnnOpGenCodeRunForWSFunComment(
     OpDef& opDef, OpDefName& opdefName, ofstream& outfile, uint32_t version) const
 {
-    outfile << "/* funtion: " << opdefName.prefixName << "GetWorkspaceSize\n * parameters :\n";
+    outfile << "/* function: " << opdefName.prefixName << "GetWorkspaceSize\n * parameters :\n";
     AclnnOpGenCodeFunInputComment(opDef.GetInputs(), opDef.GetOutputs(), opdefName, outfile, version);
     AclnnOpGenCodeFunAttrComment(opDef.GetAttrs(), opdefName.attrsName, outfile, version);
     AclnnOpGenCodeFunOutputComment(
@@ -1081,7 +1089,7 @@ void AclnnOpGenerator::AclnnOpGenCodeRunForWSFunComment(
 
 void AclnnOpGenerator::AclnnOpGenCodeRunWithWSFunComment(string& prefixName, ofstream& outfile) const
 {
-    outfile << "/* funtion: " << prefixName << "\n * parameters :\n";
+    outfile << "/* function: " << prefixName << "\n * parameters :\n";
     outfile << " * workspace : workspace memory addr(input).\n";
     outfile << " * workspaceSize : size of workspace(input).\n";
     outfile << " * executor : executor context(input).\n";
@@ -2554,7 +2562,8 @@ void AclnnOpGenerator::AclnnOpGenCodeRunForWorkspaceVersionImpl(
     }
     AclnnGenCodeDecImpl(decName, outfile);
     outfile << "#include \"" << decFile + "_v" + to_string(maxVersion) << ".h\"\n\n";
-    const char* str = "\n#ifdef __cplusplus\n"
+    outfile << "#define ACLNN_SUCCESS  0\n\n";
+    const char* str = "#ifdef __cplusplus\n"
                       "extern \"C\" {\n"
                       "#endif\n\n";
     outfile << str;
@@ -2569,7 +2578,10 @@ void AclnnOpGenerator::AclnnOpGenCodeRunForWorkspaceVersionImpl(
     AclnnOpGenIoParam(opDef.GetOutputs(), opdefName.outputsName, version, false, outfile);
     outfile << "        workspaceSize,\n";
     outfile << "        executor);\n";
-    outfile << "    if (NnopbaseDisableOptionalInput != NULL) {\n";
+    outfile << "    if (ret != ACLNN_SUCCESS) {\n";
+    outfile << "        return ret;\n";
+    outfile << "    }\n";
+    outfile << "    if (NnopbaseDisableOptionalInput != NULL && executor != nullptr) {\n";
     AclnnAddDisableInputIndex(opDef, version, outfile);
     outfile << "    }\n";
     outfile << "    return ret;\n";

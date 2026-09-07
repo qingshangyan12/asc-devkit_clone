@@ -33,6 +33,7 @@ SOC_TO_SHORT_SOC_MAP = {
     "ascend910_9392": "ascend910_93",
     "ascend910_9382": "ascend910_93",
     "ascend910_9362": "ascend910_93",
+    "ascend910_9363": "ascend910_93",
     "ascend310p1": "ascend310p",
     "ascend310p3": "ascend310p",
     "ascend310p5": "ascend310p",
@@ -374,6 +375,14 @@ def _trans_soc_ver_to_short(soc_ver: str):
             f"Please verify with `npu-smi info` and ensure correct version string."
         )
     return SOC_TO_SHORT_SOC_MAP[low_soc_ver]
+
+
+def _trans_short_soc_to_soc_version(short_soc_ver: str):
+    low_short_soc_ver = short_soc_ver.lower()
+    for soc_ver, mapped_short_soc_ver in SOC_TO_SHORT_SOC_MAP.items():
+        if mapped_short_soc_ver == low_short_soc_ver:
+            return soc_ver
+    return short_soc_ver
 
 
 def get_impl_mode(options_list: list):

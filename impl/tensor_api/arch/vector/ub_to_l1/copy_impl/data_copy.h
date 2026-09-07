@@ -9,10 +9,10 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#pragma message( \
+    "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/data_copy.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/tensor.h\"\" and use public functions or variables defined in interface headers files.")
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_DATA_COPY_H
 #endif
 
 /*!
@@ -25,95 +25,36 @@
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/arch/vector/ub_to_l1/copy_impl/instruction.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-struct CopyUB2L1Trait {};
-
-class DataCopyUB2L1 {
-public:
-    template <const CopyUB2L1Trait& trait, typename T, typename U>
-    __aicore__ inline static void Run(const T& dst, const U& src)
+class copy_ub_to_l1_common {
+protected:
+    template <typename DstTensor, typename SrcTensor>
+    __aicore__ inline static void emit_copy(
+        const DstTensor& dst, const SrcTensor& src, uint16_t block_count, uint32_t block_len, int64_t src_gap,
+        int64_t dst_gap)
     {
-        Execute<trait>(dst, src);
+        copy_ub_to_l1_instr::data_copy(dst.data().get(), src.data().get(), block_count, block_len, src_gap, dst_gap);
     }
 
-private:
-    template <const CopyUB2L1Trait& trait, typename T, typename U>
-    __aicore__ inline static void Execute(const T& dst, const U& src)
+    template <typename T, typename U, typename DstOffset, typename SrcOffset>
+    __aicore__ inline static void emit_copy(
+        const T& dst, const U& src, const DstOffset& dst_offset, const SrcOffset& src_offset, uint16_t block_count,
+        uint32_t block_len, int64_t src_gap, int64_t dst_gap)
     {
-        using SRC_TYPE = typename U::elementType;
-        using DST_TYPE = typename T::elementType;
-
-        auto dstLayout = dst.Layout();
-        auto srcLayout = src.Layout();
-
-        uint16_t blockCount = 0;
-        uint32_t blockLen = 0;
-        int64_t srcStride = 0;
-        int64_t dstStride = 0;
-
-        if constexpr (IsSatisfiedPtnFormatV<U, NDExtLayoutPtn> && IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>) {
-            blockCount = GetTotalRowShape(srcLayout);
-            // Next three parameters are in unit of 32B
-            blockLen = Std::ceil_division(GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
-
-            srcStride = Std::ceil_division(
-                GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) - GetTotalColumnShape(srcLayout),
-                C0_ELEMENT<SRC_TYPE>);
-            dstStride = Std::ceil_division(
-                GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) - GetTotalColumnShape(srcLayout),
-                C0_ELEMENT<DST_TYPE>);
-
-        } else if constexpr (IsSatisfiedPtnFormatV<U, DNExtLayoutPtn> && IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>) {
-            blockCount = GetTotalColumnShape(srcLayout);
-            // Next three parameters are in unit of 32B
-            blockLen = Std::ceil_division(GetTotalRowShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
-
-            srcStride = Std::ceil_division(
-                (GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) - GetTotalRowShape(srcLayout)),
-                C0_ELEMENT<SRC_TYPE>);
-            dstStride = Std::ceil_division(
-                (GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) - GetTotalRowShape(srcLayout)),
-                C0_ELEMENT<DST_TYPE>);
-
-        } else if constexpr (IsSatisfiedPtnFormatV<U, NZLayoutPtn> && IsSatisfiedPtnFormatV<T, NZLayoutPtn>) {
-            blockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-            // Next three parameters are in unit of 32B
-            // note: C0_Byte_Size == 32B
-            blockLen = GetTotalRowShape(srcLayout);
-
-            srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / C0_ELEMENT<SRC_TYPE> - blockLen;
-            dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / C0_ELEMENT<DST_TYPE> - blockLen;
-
-        } else if constexpr (IsSatisfiedPtnFormatV<U, ZNLayoutPtn> && IsSatisfiedPtnFormatV<T, ZNLayoutPtn>) {
-            blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
-            // Next three parameters are in unit of 32B
-            // note: C0_Byte_Size == 32B
-            blockLen = GetTotalColumnShape(srcLayout);
-
-            srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / C0_ELEMENT<SRC_TYPE> - blockLen;
-            dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) / C0_ELEMENT<DST_TYPE> - blockLen;
-
-        } else {
-            static_assert(
-                (IsSatisfiedPtnFormatV<U, NDExtLayoutPtn> && IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>) ||
-                    (IsSatisfiedPtnFormatV<U, DNExtLayoutPtn> && IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>) ||
-                    (IsSatisfiedPtnFormatV<U, NZLayoutPtn> && IsSatisfiedPtnFormatV<T, NZLayoutPtn>) ||
-                    (IsSatisfiedPtnFormatV<U, ZNLayoutPtn> && IsSatisfiedPtnFormatV<T, ZNLayoutPtn>),
-                "Unsupported layout type combination for DataCopyUB2L1");
-        }
-        CopyUbufToCbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
-        // ND和DN场景，需要保证UB和L1上申请的空间和tensor的stride满足32字节对齐，否则CopyUbufToCbuf会有问题，无法正确加载数据，导致数据错误
+        copy_ub_to_l1_instr::data_copy(
+            (dst.data() + dst_offset).get(), (src.data() + src_offset).get(), block_count, block_len, src_gap, dst_gap);
     }
 };
 
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_DATA_COPY_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#if defined( \
+    UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_DATA_COPY_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ARCH_VECTOR_UB_TO_L1_COPY_IMPL_DATA_COPY_H
 #endif

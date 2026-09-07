@@ -223,15 +223,18 @@ typedef struct {
  */
 static inline HcommResult EndpointDescInit(EndpointDesc* endpoint, uint32_t num)
 {
-    const HcommResult hcommEPointer = (HcommResult)2; // 对齐HCCL_E_PTR
+    const HcommResult hcommEPointer = static_cast<HcommResult>(2);  // 对齐HCCL_E_PTR
+    const HcommResult hcommEInternal = static_cast<HcommResult>(4); // 对齐HCCL_E_INTERNAL
 
     for (uint32_t idx = 0; idx < num; ++idx) {
-        if (endpoint == NULL) {
+        if (endpoint == nullptr) {
             return hcommEPointer;
         }
 
         // 用0xFF填充整个结构体
-        (void)memset_s(endpoint, sizeof(EndpointDesc), 0xFF, sizeof(EndpointDesc));
+        if (memset_s(endpoint, sizeof(EndpointDesc), 0xFF, sizeof(EndpointDesc)) != EOK) {
+            return hcommEInternal;
+        }
 
         // 显式设置关键字段为无效值
         endpoint->protocol = COMM_PROTOCOL_RESERVED;
@@ -256,20 +259,22 @@ static inline HcommResult HcommChannelDescInit(HcommChannelDesc* channelDesc, ui
     const HcommResult hcommEInternal = (HcommResult)4; // 对齐HCCL_E_INTERNAL
 
     for (uint32_t idx = 0; idx < descNum; ++idx) {
-        if (channelDesc == NULL) {
+        if (channelDesc == nullptr) {
             return hcommEPointer;
         }
 
-        (void)memset_s(channelDesc, sizeof(HcommChannelDesc), 0xFF, sizeof(HcommChannelDesc));
+        if (memset_s(channelDesc, sizeof(HcommChannelDesc), 0xFF, sizeof(HcommChannelDesc)) != EOK) {
+            return hcommEInternal;
+        }
         channelDesc->header.version = HCOMM_CHANNEL_VERSION;
         channelDesc->header.magicWord = HCOMM_CHANNEL_MAGIC_WORD;
         channelDesc->header.size = sizeof(HcommChannelDesc);
         channelDesc->header.reserved = 0;
         channelDesc->notifyNum = 0;
         channelDesc->exchangeAllMems = false;
-        channelDesc->memHandles = NULL;
+        channelDesc->memHandles = nullptr;
         channelDesc->memHandleNum = 0;
-        channelDesc->socket = NULL;
+        channelDesc->socket = nullptr;
         channelDesc->role = HCOMM_SOCKET_ROLE_RESERVED;
         channelDesc->port = 0;
         if (EndpointDescInit(&channelDesc->remoteEndpoint, 1) != 0) {

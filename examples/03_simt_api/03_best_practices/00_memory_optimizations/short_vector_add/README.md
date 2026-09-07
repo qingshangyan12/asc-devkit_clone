@@ -16,7 +16,7 @@
 
 ## 支持的CANN软件版本
 
-- \> CANN 9.0.0
+- \>= CANN 9.1.0
 
 ## 目录结构介绍
 
@@ -134,16 +134,19 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
     const U* y2 = reinterpret_cast<const U*>(y);
     U* z2 = reinterpret_cast<U*>(z);
 
-    uint64_t vectorSize = size / 2;
+    // 此处用除法一次性算出for循环的边界值
+    uint64_t vector_size = size / 2;
     int32_t stride = gridDim.x * blockDim.x;
-    // 短向量循环处理偶数对（步长同样是总线程数）
-    for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < vectorSize; idx += stride) {
+
+    // 向量化循环处理偶数对（步长同样是总线程数）
+    for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < vector_size; idx += stride) {
         z2[idx] = x2[idx] + y2[idx];
     }
+
     // 最后一个奇数元素处理（如果size是奇数，由全局第0号线程在最后处理）
     if (blockIdx.x == 0 && threadIdx.x == 0 && (size % 2 != 0)) {
-        uint64_t lastIdx = size - 1;
-        z[lastIdx] = x[lastIdx] + y[lastIdx];
+        uint64_t last_idx = size - 1;
+        z[last_idx] = x[last_idx] + y[last_idx];
     }
 }
 ```
@@ -167,11 +170,11 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 - 写Cache命中率：**89.1%**
 - 读写带宽：**14.51(GB/s) | 7.25(GB/s)**
 
-**原理说明**：  
+**原理说明**：
 SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 
-- Case 1（标量half）：无法填满整行导致RMW写放大  
-  使用标量half（2B）。单个Warp（32线程）同时发射指令时，在空间上连续拼出的总宽度为：  
+- Case 1（标量half）：无法填满整行导致RMW写放大
+  使用标量half（2B）。单个Warp（32线程）同时发射指令时，在空间上连续拼出的总宽度为：
   $$
   32 * 2B = 64B
   $$
@@ -196,7 +199,7 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 
 | 优化手段 | 核心原理              | 适用场景                                                                                                                                                                                                                                                                                                                                               |
 |:-----|:------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 短向量  | 底层指令支持一次完成两个数据的计算 | 1、half/bfloat16_t类型元素进行[基本运算](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符)，更多短向量类型参见[完整类型列表](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMT编程简介/扩展语法/内置数据类型-139.md#短向量类型) |
+| 短向量  | 底层指令支持一次完成两个数据的计算 | 1、half/bfloat16_t类型元素进行[基本运算](../../../../../docs/zh/guide/programming_guide/language_extension/simt_builtin_keywords.md#运算符)，更多短向量类型参见[完整类型列表](../../../../../docs/zh/api/SIMT-API/SIMT_programming_intro/extended_syntax/builtin_data_types.md#短向量类型) |
 
 ---
 
@@ -204,7 +207,7 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -242,7 +245,7 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
   | `CMAKE_ASC_RUN_MODE`      | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真                                 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`      | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
 
-- 执行结果  
+- 执行结果
   执行结果如下，说明精度对比成功。
 
   ```bash
@@ -251,10 +254,10 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 
 ## 性能数据获取
 
-使用 `msprof` 工具获取单个组件上的性能数据：
+使用 `msOpProf` 工具获取单个组件上的性能数据：
 
 ```bash
-msprof op ./demo   # 分析case的性能
+msopprof ./demo   # 分析case的性能
 ```
 
 命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹，性能数据文件夹结构示例如下：

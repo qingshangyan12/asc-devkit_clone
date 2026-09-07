@@ -40,4 +40,86 @@ __simd_callee__ inline void asc_int82int32_v4_impl(vector_int32_t& dst, vector_i
         vcvt(dst, src, mask, PART_P3, MODE_ZEROING);
     }
 }
+
+__simd_callee__ inline void asc_int82int32_impl(
+    vector_int32_t& dst, vector_int8_t src, vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
+        src_quarter_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, PART_P0, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_int82int32_impl(
+    vector_int32_t& dst, vector_int8_t src, vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER>
+        src_quarter_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, PART_P1, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_int82int32_impl(
+    vector_int32_t& dst, vector_int8_t src, vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER>
+        src_quarter_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, PART_P2, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_int82int32_impl(
+    vector_int32_t& dst, vector_int8_t src, vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
+        src_quarter_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, PART_P3, MODE_ZEROING);
+    }
+}
+
+// ASC_RETURN_VALUE_VCONV_IMPL
+__simd_callee__ inline vector_int32_t asc_int82int32_impl(
+    vector_int8_t src, vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
+        src_quarter_pos)
+{
+    vector_int32_t dst;
+    asc_int82int32_impl(dst, src, mask, src_quarter_pos);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_int82int32_impl(
+    vector_int8_t src, vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER>
+        src_quarter_pos)
+{
+    vector_int32_t dst;
+    asc_int82int32_impl(dst, src, mask, src_quarter_pos);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_int82int32_impl(
+    vector_int8_t src, vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER>
+        src_quarter_pos)
+{
+    vector_int32_t dst;
+    asc_int82int32_impl(dst, src, mask, src_quarter_pos);
+    return dst;
+}
+
+__simd_callee__ inline vector_int32_t asc_int82int32_impl(
+    vector_int8_t src, vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
+        src_quarter_pos)
+{
+    vector_int32_t dst;
+    asc_int82int32_impl(dst, src, mask, src_quarter_pos);
+    return dst;
+}
+
 #endif

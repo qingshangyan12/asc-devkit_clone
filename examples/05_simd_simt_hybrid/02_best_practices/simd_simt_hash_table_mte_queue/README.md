@@ -19,7 +19,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -38,6 +38,8 @@
 **样例功能**：
 
 样例实现一个固定容量HashTable，支持与C++17`std::unordered_map::insert_or_assign`类似的插入或更新语义：key已存在时更新value，key不存在时插入key/value。Hash冲突通过线性探测处理。
+
+需要注意的是，本样例当前面向单批次唯一key插入场景做实现与性能对比，不支持对同一批输入中的重复key做去重或顺序语义保证。若同一批次中出现重复key，最终结果不在本样例约束范围内。
 
 HashTable由两段GM存储组成：`table[bucket_count]`保存bucket元数据，其中每个bucket只保存key和状态；`table_values[bucket_count, dim]`保存value数据，其中第`bucket_idx`行保存`table[bucket_idx]`对应key的value向量。key和value不在同一结构体内连续存放，而是通过相同的`bucket_idx`关联；每条value向量长度为`dim`，`dim`为运行时参数。
 
@@ -74,6 +76,8 @@ $$
 <tr><td align="center">SCENARIO_NUM=1</td><td colspan="3" align="center"><code>insert_or_assign_mte_task_queue_kernel</code></td></tr>
 </table>
 
+> **说明：** `keys`输入默认要求同一批次内互不重复。样例支持不同key落入同一初始hash bucket的冲突场景，但不支持同一批次重复key的去重。
+
 样例参数如下：
 
 | 参数 | 值 |
@@ -85,7 +89,6 @@ $$
 | `BLOCK_DIM` | 64 |
 | `THREAD_COUNT` | 512 |
 | `WARP_SIZE` | 32 |
-| `PROFILE_REPEAT_TIMES` | 默认30，`run.sh`采集性能时设置为1 |
 
 ## 样例实现
 
@@ -93,36 +96,46 @@ $$
 
 ### Case 0：SIMT Warp直接写value
 
-**实现方式**：参考`insert_or_assign_warp_store_vf()`函数实现。
+**实现方式**：参考`try_lock_bucket_for_key_case0()`和`insert_or_assign_warp_store_vf()`函数实现。
 
-该实现中，每个Warp处理一条key。lane 0执行hash、线性探测和CAS锁定bucket，Warp内线程通过`asc_shfl`获取目标bucket index，并按`WARP_SIZE`分片写入value向量。value搬运由SIMT线程直接访问GM完成。
+该实现中，每个Warp处理一条key。lane 0执行hash、线性探测和CAS锁定bucket，Warp内线程通过`asc_shfl`获取目标bucket index，并按`WARP_SIZE`分片写入value向量。对于探测到的临时`LOCKED_KEY`槽位，Case 0的lane 0会在当前槽位上持续重试，而不是直接跳过到下一个槽位，以避免同一个key在并发插入时跳过瞬时锁定槽位并产生重复可见项。value搬运由SIMT线程直接访问GM完成。
 
 写入顺序为：CAS锁定目标bucket，Warp内线程写value，执行`asc_threadfence()`，最后由lane 0发布真实key。
 
 **关键代码**：
 
 ```cpp
-__simt_vf__ inline void insert_or_assign_warp_store_vf(__gm__ Bucket* table,
-    __gm__ float* table_values, __gm__ const int64_t* keys, __gm__ const float* values, uint32_t key_num,
-    uint32_t capacity, uint32_t dim, uint32_t block_index, uint32_t num_blocks)
+__simt_callee__ inline bool try_lock_bucket_for_key_case0(__gm__ int64_t* key_addr, int64_t key)
 {
-    const uint32_t lane_id = static_cast<uint32_t>(threadIdx.x) % WARP_SIZE;
-    ...
-    if (lane_id == 0) {
-        int64_t old_key = asc_atomic_cas(key_addr, EMPTY_KEY, LOCKED_KEY);
-        if (old_key == LOCKED_KEY) {
-            old_key = wait_until_unlocked(key_addr);
+    while (true) {
+        int64_t current_key = *reinterpret_cast<__gm__ volatile int64_t*>(key_addr);
+        if (current_key == LOCKED_KEY) {
+            continue;
         }
         ...
     }
+}
+
+__simt_vf__ inline void insert_or_assign_warp_store_vf(
+    __gm__ Bucket* table, __gm__ float* table_values, __gm__ const int64_t* keys, __gm__ const float* values,
+    uint32_t key_num, uint32_t capacity, uint32_t dim, uint32_t block_index, uint32_t num_blocks)
+{
     ...
-    for (uint32_t j = lane_id; j < dim; j += WARP_SIZE) {
-        table_values[dst_base + j] = values[src_base + j];
-    }
-    asc_threadfence();
-    if (lane_id == 0) {
-        (void)asc_atomic_exch(&table[bucket_idx].key, key);
-    }
+        success = asc_shfl(success, 0, WARP_SIZE);
+        bucket_idx = asc_shfl(bucket_idx, 0, WARP_SIZE);
+        if (success == 1) {
+            uint32_t dst_base = bucket_idx * dim;
+            uint32_t src_base = idx * dim;
+            for (uint32_t j = lane_id; j < dim; j += WARP_SIZE) {
+                table_values[dst_base + j] = values[src_base + j];
+            }
+            // Publish the key only after the value vector is visible.
+            asc_threadfence();
+            if (lane_id == 0) {
+                *reinterpret_cast<__gm__ volatile int64_t*>(&table[bucket_idx].key) = key;
+            }
+        }
+    ...
 }
 ```
 
@@ -130,11 +143,11 @@ __simt_vf__ inline void insert_or_assign_warp_store_vf(__gm__ Bucket* table,
 
 | Case | 实现方式 | dim | 核数 | Task Duration(μs) |
 |:---|:---|---:|:---:|---:|
-| 0 | SIMT Warp直接写value | 16 | 64 | 218.724 |
-| 0 | SIMT Warp直接写value | 32 | 64 | 209.406 |
-| 0 | SIMT Warp直接写value | 64 | 64 | 259.107 |
-| 0 | SIMT Warp直接写value | 128 | 64 | 364.805 |
-| 0 | SIMT Warp直接写value | 256 | 64 | 555.497 |
+| 0 | SIMT Warp直接写value | 16 | 64 | 217.916 |
+| 0 | SIMT Warp直接写value | 32 | 64 | 218.686 |
+| 0 | SIMT Warp直接写value | 64 | 64 | 271.254 |
+| 0 | SIMT Warp直接写value | 128 | 64 | 376.517 |
+| 0 | SIMT Warp直接写value | 256 | 64 | 585.892 |
 
 **性能数据分析**：
 
@@ -163,58 +176,79 @@ Case 1保留SIMT处理hash/probe/CAS的职责，只把连续value搬运拆给MTE
 **关键代码**：
 
 ```cpp
-class mte_task_queue {
-public:
-    __simt_callee__ inline void assign_warp_task(
-        uint64_t src_addr, uint64_t dst_addr, int64_t key, uint64_t key_addr, bool need_assign)
-    {
-        uint32_t write_mask = asc_ballot(need_assign ? 1 : 0);
-        uint32_t warp_write_count = __popc(write_mask);
-        uint32_t task_start_id = (laneid() == 0) ? apply_id(warp_write_count) : 0;
-        task_start_id = asc_shfl(task_start_id, 0);
-        drain(task_start_id + warp_write_count);
-        if (need_assign) {
-            uint32_t lane_offset = __popc(write_mask & lanemask_lt());
-            fill_task_info(task_start_id + lane_offset, src_addr, dst_addr, key, key_addr);
+__simt_callee__ inline void fill_task_info(
+    uint32_t task_id, uint64_t src_addr, uint64_t dst_addr, int64_t key, uint64_t key_addr) const
+{
+    uint32_t slot = task_id & MTE_TASK_RING_MASK;
+    reinterpret_cast<__ubuf__ volatile uint64_t*>(src_addrs_)[slot] = src_addr;
+    reinterpret_cast<__ubuf__ volatile uint64_t*>(dst_addrs_)[slot] = dst_addr;
+    reinterpret_cast<__ubuf__ volatile int64_t*>(task_keys_)[slot] = key;
+    reinterpret_cast<__ubuf__ volatile uint64_t*>(key_addrs_)[slot] = key_addr;
+}
+
+...
+
+template <bool drain_all = false>
+__simt_callee__ inline void drain(uint32_t new_task_end_id) const
+{
+    while (true) {
+        ...
+        if (lane_id < publish_count) {
+            uint32_t slot = (key_assign_id + lane_id) & MTE_TASK_RING_MASK;
+            int64_t key = reinterpret_cast<__ubuf__ volatile int64_t*>(task_keys_)[slot];
+            uint64_t key_addr = reinterpret_cast<__ubuf__ volatile uint64_t*>(key_addrs_)[slot];
+            // The slot is still owned by this insert task, so a release store is enough to publish the key.
+            *reinterpret_cast<__gm__ volatile int64_t*>(key_addr) = key;
         }
         asc_threadfence();
-        if (laneid() == 0) {
-            assign_task(task_start_id, task_start_id + warp_write_count);
-        }
+        ...
     }
+}
 
-    __aicore__ inline void run_task() const
-    {
-        while (true) {
-            uint32_t simt_assign_id = *reinterpret_cast<__ubuf__ volatile uint32_t*>(simt_assign_id_);
-            uint32_t proc_count = min(max_proc_batch, simt_assign_id - mte_finish_id);
+...
+
+__aicore__ inline void run_task() const
+{
+    ...
+    while (true) {
+        ...
+        uint32_t available = simt_assign_id - mte_finish_id;
+        uint32_t proc_count = (available < max_proc_batch) ? available : max_proc_batch;
+        for (uint32_t i = 0; i < proc_count; ++i) {
             ...
-            asc_copy_gm2ub_align(value_local_, src_addr, 1, value_bytes, 0, 0, true, values_cache_mode_, 0, 0);
-            asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            asc_copy_ub2gm_align(dst_addr, value_local_, 1, value_bytes, table_values_cache_mode, 0, 0);
-            asc_sync_notify(PIPE_MTE3, PIPE_S, EVENT_ID0);
-            asc_sync_wait(PIPE_MTE3, PIPE_S, EVENT_ID0);
-            *reinterpret_cast<__ubuf__ volatile uint32_t*>(mte_finish_id_) = mte_finish_id + proc_count;
+            asc_copy_gm2ub_align(
+                value_local_ + i * value_elems_aligned, reinterpret_cast<__gm__ float*>(src_addr), 1, value_bytes,
+                0, 0, true, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
         }
+        ...
+        for (uint32_t i = 0; i < proc_count; ++i) {
+            ...
+            asc_copy_ub2gm_align(
+                reinterpret_cast<__gm__ float*>(dst_addr), value_local_ + i * value_elems_aligned, 1, value_bytes,
+                asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
+        }
+        ...
+        mte_finish_id += proc_count;
+        *reinterpret_cast<__ubuf__ volatile uint32_t*>(mte_finish_id_) = mte_finish_id;
     }
-};
+}
+
 ```
 
 **性能数据**：
 
 | Case | 实现方式 | dim | 核数 | Task Duration(μs) |
 |:---|:---|---:|:---:|---:|
-| 1 | MTE task queue搬运value | 16 | 64 | 129.149 |
-| 1 | MTE task queue搬运value | 32 | 64 | 112.526 |
-| 1 | MTE task queue搬运value | 64 | 64 | 111.761 |
-| 1 | MTE task queue搬运value | 128 | 64 | 130.760 |
-| 1 | MTE task queue搬运value | 256 | 64 | 201.567 |
+| 1 | MTE task queue搬运value | 16 | 64 | 127.638 |
+| 1 | MTE task queue搬运value | 32 | 64 | 110.601 |
+| 1 | MTE task queue搬运value | 64 | 64 | 113.900 |
+| 1 | MTE task queue搬运value | 128 | 64 | 131.696 |
+| 1 | MTE task queue搬运value | 256 | 64 | 204.030 |
 
 **性能数据分析**：
 
 - Case 1把长度为`dim`的value向量搬运从SIMT线程中拆出，在单kernel内由SIMT producer和MTE consumer并行推进。
-- 相比Case 0，Case 1在五组dim上均取得加速；`dim=128`时加速比最高，约2.79x。
+- 相比Case 0，Case 1在五组dim上均取得加速；`dim=256`时加速比最高，约2.87x。
 
 ## 性能对比总结
 
@@ -224,11 +258,11 @@ public:
 
 | dim | Case 0 SIMT Warp直接写value(μs) | Case 1 MTE task queue(μs) | Case 1加速比 |
 |---:|---:|---:|---:|
-| 16 | 218.724 | 129.149 | 1.69x |
-| 32 | 209.406 | 112.526 | 1.86x |
-| 64 | 259.107 | 111.761 | 2.32x |
-| 128 | 364.805 | 130.760 | 2.79x |
-| 256 | 555.497 | 201.567 | 2.76x |
+| 16 | 217.916 | 127.638 | 1.71x |
+| 32 | 218.686 | 110.601 | 1.98x |
+| 64 | 271.254 | 113.900 | 2.38x |
+| 128 | 376.517 | 131.696 | 2.86x |
+| 256 | 585.892 | 204.030 | 2.87x |
 
 ### 优化要点总结
 
@@ -257,7 +291,7 @@ public:
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -290,7 +324,6 @@ public:
   |:---|:---|:---|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0`、`1` | Case编号：0=SIMT Warp直接写value，1=MTE task queue搬运value |
-  | `PROFILE_REPEAT_TIMES` | 正整数 | 单次进程中重复执行`insert_or_assign`的次数。对比脚本设置为1，使msOpProf采集一次完整insert路径。 |
 
 - 执行结果
 
@@ -302,24 +335,24 @@ public:
 
 ### 性能分析
 
-使用msOpProf获取性能数据。对比脚本会先执行一次样例并检查`Verification PASSED`，确认结果正确后再通过`msprof op`命令采集目标kernel性能数据。
+使用msOpProf获取性能数据。对比脚本会先执行一次样例并检查`Verification PASSED`，确认结果正确后再通过`msopprof`命令采集目标kernel性能数据。
 
 Case 0测试方式如下：
 
 ```bash
-cmake -DSCENARIO_NUM=0 -DPROFILE_REPEAT_TIMES=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+cmake -DSCENARIO_NUM=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
 make -j
 ./hash_table_mte_queue 128
-msprof op ./hash_table_mte_queue 128
+msopprof ./hash_table_mte_queue 128
 ```
 
 Case 1测试方式如下：
 
 ```bash
-cmake -DSCENARIO_NUM=1 -DPROFILE_REPEAT_TIMES=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
 make -j
 ./hash_table_mte_queue 128
-msprof op ./hash_table_mte_queue 128
+msopprof ./hash_table_mte_queue 128
 ```
 
 当前目录下会生成`OPPROF_`前缀的文件夹，保存当前kernel的性能分析数据。

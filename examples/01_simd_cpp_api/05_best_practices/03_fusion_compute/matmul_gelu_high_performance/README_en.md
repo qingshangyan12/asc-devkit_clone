@@ -2,15 +2,15 @@
 
 ## Overview
 
-This example demonstrates Cube-Vector (CV) fusion implementation based on the static Tensor programming paradigm, fusing Matmul matrix multiplication with GELU activation function to execute in parallel within the same AI Core. The AIC side completes Matmul computation and outputs results to GM or UB through Fixpipe, while the AIV side reads data from GM or UB to complete GELU vector computation. The Matmul optimization details refer to the [Matmul Basic API Best Practice Example](../../01_matrix_compute/matmul_basic_api_high_performance/README.md), and the GELU optimization details refer to the [Gelu Performance Tuning Example](../../02_reg_compute/gelu_high_performance/README_en.md).
+This example demonstrates Cube-Vector (CV) fusion implementation based on the static Tensor programming paradigm, fusing Matmul matrix multiplication with GELU activation function to execute in parallel within the same AI Core. The AIC side completes Matmul computation and outputs results to GM or UB through Fixpipe, while the AIV side reads data from GM or UB to complete GELU vector computation. The Matmul optimization details refer to the [Matmul Basic API Best Practice Example](../../01_matrix_compute/matmul_basic_api_high_performance/README_en.md), and the GELU optimization details refer to the [Gelu Performance Tuning Example](../../02_reg_compute/gelu_high_performance/README_en.md).
 
 ## Supported Products and CANN Versions
 
 | Product | CANN Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -99,15 +99,15 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 
 ### Intermediate Performance Optimization
 
-The Matmul part of this example uses the same optimization methods as the [Matmul Basic API Best Practice Example](../../01_matrix_compute/matmul_basic_api_high_performance/README.md) (L1/L0 double buffering, large packet transfer, fine-grained pipeline synchronization, UnitFlag, etc.). The GELU part uses RegBase method on Ascend 950PR architecture and MemBase method on A2/A3 architecture. For detailed GELU formula simplification, RegBase API and VF fusion optimization analysis, please refer to the [Gelu Performance Tuning Example](../../02_reg_compute/gelu_high_performance/README_en.md).
+The Matmul part of this example uses the same optimization methods as the [Matmul Basic API Best Practice Example](../../01_matrix_compute/matmul_basic_api_high_performance/README_en.md) (L1/L0 double buffering, large packet transfer, fine-grained pipeline synchronization, UnitFlag, etc.). The GELU part uses RegBase method on Ascend 950PR architecture and MemBase method on A2/A3 architecture. For detailed GELU formula simplification, RegBase API and VF fusion optimization analysis, please refer to the [Gelu Performance Tuning Example](../../02_reg_compute/gelu_high_performance/README_en.md).
 
 #### Matmul Optimization Methods
 
 | Case | Optimization Method | Description |
 |------|---------|------|
 | [Case 1](../../01_matrix_compute/matmul_high_performance/README_en.md#case-1-single-core-tiling-optimization-single_core_tiling) | Single-core Tiling optimization | Optimize base block parameters, reduce memory-to-computation ratio |
-| [Case 2](../../01_matrix_compute/matmul_high_performance/README_en.md#case-2-multi-core-splitting-2x12-multi_core_split_2_12) | Multi-core splitting 2x12 | Introduce multi-core parallel computation, balanced load distribution |
-| [Case 3](../../01_matrix_compute/matmul_high_performance/README_en.md#case-3-multi-core-splitting-4x6-multi_core_split_4_6) | Multi-core splitting 4x6 | Optimize multi-core splitting strategy, 512B address alignment, reduce same-address access |
+| [Case 2](../../01_matrix_compute/matmul_high_performance/README_en.md#case-2-multi-core-split-2x12-multi_core_split_2_12) | Multi-core splitting 2x12 | Introduce multi-core parallel computation, balanced load distribution |
+| [Case 3](../../01_matrix_compute/matmul_high_performance/README_en.md#case-3-multi-core-split-4x6-multi_core_split_4_6) | Multi-core splitting 4x6 | Optimize multi-core splitting strategy, 512B address alignment, reduce same-address access |
 | [Case 4](../../01_matrix_compute/matmul_high_performance/README_en.md#case-4-multi-core-using-mdl-template-multi_core_mdl) | Multi-core using MDL template | Enable L1 multi-block cache, large packet transfer, reduce MTE2 loop transfer count |
 
 #### Gelu Optimization Methods
@@ -189,7 +189,7 @@ After the AIC side completes Fixpipe output of one (baseM × baseN) sub-block, i
 AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // Notify AIV data ready
 
 // AIV side GeluAndCopyOutAivSeparate() / GeluAndCopyOutAiv():
-AscendC::CrossCoreWaitFlag(0x8);  // Wait for AIC side Fixpipe completion
+AscendC::CrossCoreWaitFlag<0x2>(0x8);  // Wait for AIC side Fixpipe completion
 ```
 
 #### 3. Multi-Core Splitting in `__mix__(1,2)` Mode
@@ -283,7 +283,7 @@ AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
 
 **Performance Data**
 
-> The following data is based on msprof tool measurement, taking the median of 5 runs. Matrix specifications M=4096, K=1024, N=1536(A2)/N=1024(950PR), input data type float16, output data type float32.
+> The following data is based on msOpProf tool measurement, taking the median of 5 runs. Matrix specifications M=8192, K=8192, N=8192, input data type float16, output data type float32.
 
 ##### Atlas A2 Training Series Chip
 
@@ -317,6 +317,8 @@ The figure below shows the pipeline parallel execution process of AIC and AIV in
 
 ![Scenario1 CV Fusion-GM Relay Pipeline Parallelism](figures/CVParallell_L0C_GM_UB.png)
 
+>  The msOpProf tool requires the CANN commercial or community edition. For details, see the [msOpProf Tool Installation Guide](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md). The pipeline diagram was collected on device with `msopprof --aic-metrics=PipeTimeline ./demo`.
+
 **Reason for Significant MTE2 Time Reduction:**
 
 Comparing data reveals:
@@ -344,7 +346,7 @@ Fixpipe L0C → UB (Enable dual destination mode through `dualDstCtl=0b01`, spli
 
 ```cpp
 AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-fixpipeParams.mSize = DivCeil(curM, 2) * 2;
+fixpipeParams.mSize = AscendC::Std::ceil_div(curM, 2) * 2;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = curN;
@@ -370,7 +372,7 @@ AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + loca
 
 **Performance Data**
 
-> The following data is based on msprof tool measurement, taking the median of 5 runs. Matrix specifications M=4096, K=1024, N=1024, input data type float16, output data type float32.
+> The following data is based on msOpProf tool measurement, taking the median of 5 runs. Matrix specifications M=8192, K=8192, N=8192, input data type float16, output data type float32.
 
 ##### Ascend 950PR Chip
 
@@ -404,7 +406,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](https://gitcode.com/cann/asc-devkit/blob/master/docs/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -465,7 +467,7 @@ AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 
 ### DumpTensor
 
-For operators developed based on operator projects, this interface can be used to dump the content of specified LocalTensors. It also supports printing custom additional information (only uint32\_t data type information is supported), such as printing the current line number.
+For operators developed based on operator projects, this interface can be used to dump the content of a specified [LocalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md). It also supports printing custom additional information (only uint32\_t data type information is supported), such as printing the current line number.
 
 Call the DumpTensor interface in the operator kernel implementation code where Tensor data needs to be printed. Example:
 
@@ -475,31 +477,42 @@ AscendC::Div(yLocal, xLocal, yLocal, n);
 AscendC::DumpTensor(yLocal, 1, 16);
 ```
 
-> **Notice:** The DumpTensor interface printing functionality will impact actual operator running performance and is typically used during the debugging phase. Developers can disable printing by setting ASCENDC_DUMP=0 as needed.
+> **Notice:** The [DumpTensor](../../../../../docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md) interface printing functionality will impact actual operator running performance and is typically used during the debugging phase. Developers can disable printing by setting ASCENDC_DUMP=0 as needed.
 
 ## Performance Debugging
 
-Use the `msprof` tool to obtain detailed performance data:
+### Introduction to the msOpProf Tool
 
-```bash
-msprof ./demo   # Analyze example performance
-```
+`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
-A PROF_ prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory stores Host and Device performance data summaries. Performance data analysis is recommended to view files in this directory:
+- On-device performance collection
 
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # Stores Host and Device performance data summaries
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
+    On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+
+    Run operator tuning on the executable demo with `msopprof`:
+
+    ```
+    msopprof ./demo
+    ```
+
+    - Performance data description
+      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+
+      ```bash
+      ├──dump                       # Raw performance data; users do not need to inspect it
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+      ├──OpBasicInfo.csv            # Basic operator information
+      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+      └──visualize_data.bin         # MindStudio Insight presentation file
+      ```
 
 View the specific performance analysis results:
-```
+```bash
 # View Task Duration and various data
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

@@ -92,16 +92,16 @@ __global__ __vector__ void empty_kernel(...)
 
 | SCENARIO_NUM | Thread Block Count | Task Duration(μs) |
 | :----------: | :-------: | :---------------: |
-| 1 | 1 | 3.933 |
-| 2 | 32 | 4.413 |
-| 3 | 64 | 4.602 |
-| 4 | 128 | 5.269 |
-| 5 | 1024 | 13.687 |
+| 1 | 1 | 1.455 |
+| 2 | 32 | 1.589 |
+| 3 | 64 | 2.160 |
+| 4 | 128 | 3.373 |
+| 5 | 1024 | 15.996 |
 
 **Analysis**:
 
-- 1→32→64→128: Task Duration increases from 3.933μs to 5.269μs, with scheduling overhead growing progressively
-- 128→1024: Task Duration jumps from 5.269μs to 13.687μs, with scheduling overhead increasing significantly as thread block count grows
+- 1→32→64→128: Task Duration increases from 1.455μs to 3.373μs, with scheduling overhead growing progressively
+- 128→1024: Task Duration jumps from 3.373μs to 15.996μs, with scheduling overhead increasing significantly as thread block count grows
 
 **Conclusion**:
 
@@ -124,17 +124,17 @@ Building on Case 0, compare the impact of 1 versus 2 VF calls on Task Duration t
 
 | SCENARIO_NUM | Thread Block Count | VF Call Count | Task Duration(μs) |
 | :----------: | :-------: | :--------: | :---------------: |
-| 6 | 32 | 2 | 4.503 |
-| 7 | 64 | 2 | 4.869 |
-| 8 | 1024 | 2 | 14.982 |
+| 6 | 32 | 2 | 1.780 |
+| 7 | 64 | 2 | 2.327 |
+| 8 | 1024 | 2 | 16.598 |
 
 **Comparison with Case 0**:
 
 | Comparison | Thread Block Count | VF Count Change | Task Duration Change | Increase |
 | ---- | :-------: | :--------: | :---------------: | :--: |
-| SCENARIO_NUM=2→6 | 32 | 1→2 | 4.413 → 4.503 | +2.0% |
-| SCENARIO_NUM=3→7 | 64 | 1→2 | 4.602 → 4.869 | +5.8% |
-| SCENARIO_NUM=5→8 | 1024 | 1→2 | 13.687 → 14.982 | +9.5% |
+| SCENARIO_NUM=2→6 | 32 | 1→2 | 1.589 → 1.780 | +12.0% |
+| SCENARIO_NUM=3→7 | 64 | 1→2 | 2.160 → 2.327 | +7.7% |
+| SCENARIO_NUM=5→8 | 1024 | 1→2 | 15.996 → 16.598 | +3.8% |
 
 The performance data is shown in the following figure:
 
@@ -142,8 +142,8 @@ The performance data is shown in the following figure:
 
 **Analysis**:
 
-- With 32 and 64 thread blocks, increasing from 1 to 2 VF calls increases latency by approximately 2.0% and 5.8%, a relatively small increase
-- With 1024 thread blocks, increasing from 1 to 2 VF calls increases latency by approximately 9.5%, a relatively large increase
+- With 32, 64, and 1024 thread blocks, increasing from 1 to 2 VF calls increases Task Duration in all three configurations, indicating additional VF call scheduling overhead
+- With 1024 thread blocks, the absolute latency increase is 0.602μs, higher than the 0.191μs and 0.167μs increases with 32 and 64 thread blocks
 
 **Conclusion**:
 
@@ -212,9 +212,9 @@ The relationship between the two affects scheduling overhead: when the logical c
 
 | SCENARIO_NUM | Thread Block Count | Elements per Core | Elements per Thread | Task Duration(μs) |
 | :----------: | :-------: | :-------: | :-------: | :---------------: |
-| 9 | 1024 | 2048 | 1 | 78.533 |
-| **10** | **64** | **32768** | **16** | **62.649** |
-| 11 | 32 | 65536 | 32 | 113.609 |
+| 9 | 1024 | 2048 | 1 | 78.921 |
+| **10** | **64** | **32768** | **16** | **59.109** |
+| 11 | 32 | 65536 | 32 | 110.540 |
 
 The performance data is shown in the following figure:
 
@@ -222,13 +222,13 @@ The performance data is shown in the following figure:
 
 **Analysis**:
 
-- **`Thread block count=64` compared to `thread block count=1024`: Task Duration decreases from 78.533μs to 62.649μs, a latency reduction of approximately 20.2% and a performance improvement of approximately 26%**. Reducing the thread block count from 1024 to 64 significantly reduces the number of thread blocks launched and scheduled, greatly lowering scheduling overhead
-- **`Thread block count=64` compared to `thread block count=32`: Task Duration decreases from 113.609μs to 62.649μs, a latency reduction of approximately 44.8% and a performance improvement of approximately 82%**. With the same grid-stride loop implementation, `thread block count=64` provides higher parallelism; although more thread blocks increase launch and scheduling overhead, this overhead is smaller than the benefit from improved parallelism, resulting in lower overall latency
-- Due to hardware resource limitations, the number of physical cores that can execute in parallel has an upper bound. Since one physical core can only host and execute one thread block at a time, when `thread block count=1024`, thread blocks exceeding the physical core count must wait for preceding thread blocks to complete before being scheduled, and the additional fixed launch and scheduling overhead increases significantly; when `thread block count=32`, only half of the physical cores are used, leaving many idle physical cores with insufficient parallelism and doubled per-thread-block workload
+- **Compared with a thread block count of 1024, a thread block count of 64 reduces Task Duration from 78.921μs to 59.109μs, a latency reduction of approximately 25.1% and a performance improvement of approximately 34%**. Reducing the thread block count from 1024 to 64 significantly reduces the number of thread blocks launched and scheduled, greatly lowering scheduling overhead
+- **Compared with a thread block count of 32, a thread block count of 64 reduces Task Duration from 110.540μs to 59.109μs, a latency reduction of approximately 46.5% and a performance improvement of approximately 87%**. With the same grid-stride loop implementation, a thread block count of 64 provides higher parallelism; although more thread blocks increase launch and scheduling overhead, this overhead is smaller than the benefit from improved parallelism, resulting in lower overall latency
+- Due to hardware resource limitations, the number of physical cores that can execute in parallel has an upper bound. Since one physical core can only host and execute one thread block at a time, when the thread block count is 1024, thread blocks exceeding the physical core count must wait for preceding thread blocks to complete before being scheduled, and the additional fixed launch and scheduling overhead increases significantly; when the thread block count is 32, only half of the physical cores are used, leaving many idle physical cores with insufficient parallelism and doubled per-thread-block workload
 
 **Conclusion**:
 
-For large shapes, prioritize matching the thread block count to the actual physical core count. In this example, `thread block count=64` avoids both the large thread block scheduling overhead of `thread block count=1024` and the insufficient parallelism of `thread block count=32`, making it the optimal configuration in Case 2.
+For large shapes, prioritize matching the thread block count to the actual physical core count. In this example, a thread block count of 64 avoids both the large scheduling overhead from a thread block count of 1024 and the insufficient parallelism from a thread block count of 32, making it the optimal configuration in Case 2.
 
 ---
 
@@ -248,11 +248,11 @@ Compare performance differences when executing Gather computation with the same 
 
 | SCENARIO_NUM | Thread Block Count | Thread Count | Elements per Core | Elements per Thread | Task Duration(μs) |
 | :----------: | :-------: | :-------: | :-------: | :-------: | :---------------: |
-| 12 | 4 | 2048 | 4096 | 2 | 9.989 |
-| 13 | 8 | 2048 | 2048 | 1 | 8.755 |
-| **14** | **16** | **1024** | **1024** | **1** | **7.832** |
-| 15 | 32 | 512 | 512 | 1 | 7.959 |
-| 16 | 64 | 256 | 256 | 1 | 8.820 |
+| 12 | 4 | 2048 | 4096 | 2 | 10.760 |
+| 13 | 8 | 2048 | 2048 | 1 | 6.741 |
+| 14 | 16 | 1024 | 1024 | 1 | 4.514 |
+| **15** | **32** | **512** | **512** | **1** | **3.866** |
+| 16 | 64 | 256 | 256 | 1 | 4.115 |
 
 The performance data is shown in the following figure:
 
@@ -260,11 +260,10 @@ The performance data is shown in the following figure:
 
 **Analysis**:
 
-- The curve shows a valley shape that decreases first then rises, with the **optimal thread block count = 16 (1/4 of physical cores)**, not filling all 64 cores
-- As thread block count increases from 4 to 8 to 16, Task Duration continues to decrease (9.989 → 8.755 → 7.832), with parallelism benefits continuing to improve
-- 16→32: Thread block count doubles, Task Duration increases from 7.832μs to 7.959μs, **latency increases by approximately 1.6%**. At this point, per-core workload is already small, and the scheduling overhead from additional cores begins to approach the parallelism benefit
-- 32→64 (physical cores): Thread block count continues to increase, Task Duration increases from 7.959μs to 8.820μs, **latency increases by approximately 10.8%**. For small shapes, per-core task volume is small (256/512 elements), and the scheduling overhead from additional thread blocks exceeds the parallelism benefit
-- Compared with Case 2: with the same kernel, when the shape is small enough, the optimal thread block count drops from 64 to 16, indicating that the "optimal thread block count" changes as the shape shrinks and must be measured empirically
+- The curve shows a valley shape that decreases first then rises, with an **optimal thread block count of 32 (1/2 of physical cores)**, not filling all 64 cores
+- As thread block count increases from 4 to 8 to 16 to 32, Task Duration continues to decrease (10.760 → 6.741 → 4.514 → 3.866), with parallelism benefits continuing to improve
+- 32→64 (physical cores): Thread block count doubles, Task Duration increases from 3.866μs to 4.115μs, **latency increases by approximately 6.4%**. For small shapes, per-core task volume is small (256/512 elements), and the scheduling overhead from additional thread blocks exceeds the parallelism benefit
+- Compared with Case 2: with the same kernel, when the shape is small enough, the optimal thread block count drops from 64 to 32, indicating that the "optimal thread block count" changes as the shape shrinks and must be measured empirically
 
 **Conclusion**:
 
@@ -280,11 +279,11 @@ For small shapes, the experience of "using all physical cores" cannot be directl
 
 | SCENARIO_NUM | Thread Block Count | Task Duration(μs) |
 | ------------ | --------- | ----------------- |
-| 1 | 1 | 3.933 |
-| 2 | 32 | 4.413 |
-| 3 | 64 | 4.602 |
-| 4 | 128 | 5.269 |
-| 5 | 1024 | 13.687 |
+| 1 | 1 | 1.455 |
+| 2 | 32 | 1.589 |
+| 3 | 64 | 2.160 |
+| 4 | 128 | 3.373 |
+| 5 | 1024 | 15.996 |
 
 - Scheduling overhead increases with thread block count
 
@@ -292,9 +291,9 @@ For small shapes, the experience of "using all physical cores" cannot be directl
 
 | Comparison | Thread Block Count | VF Count | Task Duration(μs) | Increase |
 | ---- | --------- | ------ | ----------------- | ---- |
-| SCENARIO_NUM=2→6 | 32 | 1→2 | 4.413 → 4.503 | +2.0% |
-| SCENARIO_NUM=3→7 | 64 | 1→2 | 4.602 → 4.869 | +5.8% |
-| SCENARIO_NUM=5→8 | 1024 | 1→2 | 13.687 → 14.982 | +9.5% |
+| SCENARIO_NUM=2→6 | 32 | 1→2 | 1.589 → 1.780 | +12.0% |
+| SCENARIO_NUM=3→7 | 64 | 1→2 | 2.160 → 2.327 | +7.7% |
+| SCENARIO_NUM=5→8 | 1024 | 1→2 | 15.996 → 16.598 | +3.8% |
 
 - VF calls also incur scheduling overhead
 
@@ -302,23 +301,23 @@ For small shapes, the experience of "using all physical cores" cannot be directl
 
 | SCENARIO_NUM | Thread Block Count | Elements per Core | Task Duration(μs) |
 | :----------: | :-------: | :-------: | :---------------: |
-| 9 | 1024 | 2048 | 78.533 |
-| **10** | **64** | **32768** | **62.649** |
-| 11 | 32 | 65536 | 113.609 |
+| 9 | 1024 | 2048 | 78.921 |
+| **10** | **64** | **32768** | **59.109** |
+| 11 | 32 | 65536 | 110.540 |
 
-- The optimal thread block count is **64** (equal to the physical core count); `thread block count=64` avoids both the large thread block scheduling overhead of `thread block count=1024` and the insufficient parallelism of `thread block count=32`
+- The optimal thread block count is **64** (equal to the physical core count); a thread block count of 64 avoids both the large scheduling overhead from a thread block count of 1024 and the insufficient parallelism from a thread block count of 32
 
 **Optimal thread block count for small shapes (Case 3)**:
 
 | SCENARIO_NUM | Thread Block Count | Thread Count | Elements per Core | Task Duration(μs) |
 | :----------: | :-------: | :-------: | :-------: | :---------------: |
-| 12 | 4 | 2048 | 4096 | 9.989 |
-| 13 | 8 | 2048 | 2048 | 8.755 |
-| **14** | **16** | **1024** | **1024** | **7.832** |
-| 15 | 32 | 512 | 512 | 7.959 |
-| 16 | 64 | 256 | 256 | 8.820 |
+| 12 | 4 | 2048 | 4096 | 10.760 |
+| 13 | 8 | 2048 | 2048 | 6.741 |
+| 14 | 16 | 1024 | 1024 | 4.514 |
+| **15** | **32** | **512** | **512** | **3.866** |
+| 16 | 64 | 256 | 256 | 4.115 |
 
-- The optimal thread block count is **16** (1/4 of physical cores), not the full 64 cores; latency continues to increase from 14→15→16
+- The optimal thread block count is **32** (1/2 of physical cores), not the full 64 cores; latency increases after the thread block count grows from 32 to 64
 
 ## Tuning Recommendations
 
@@ -330,7 +329,7 @@ For small shapes, the experience of "using all physical cores" cannot be directl
 Run the following steps in the root directory of this example to build and run the example.
 
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../docs/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -364,28 +363,39 @@ Run the following steps in the root directory of this example to build and run t
 
 ## Performance Analysis
 
-Use the `msprof` tool to obtain detailed performance data:
+### Introduction to the msOpProf Tool
 
-```bash
-msprof ./grid_config   # Analyze performance
-```
+`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
-A PROF_-prefixed folder is generated in the current directory. The `mindstudio_profiler_output` directory contains the performance data summary for the Host and each Device. For performance data analysis, it is recommended to view the files in this directory.
+- On-device performance collection
 
-```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-├── host
-├── mindstudio_profiler_log
-└── mindstudio_profiler_output    # Performance data summary for Host and each Device
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
-```
+    On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+
+    Use the `msOpProf` tool to obtain detailed performance data:
+
+    ```bash
+    msopprof ./grid_config   # Analyze performance
+    ```
+
+    - Performance data description  
+      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+
+      ```bash
+      ├──dump                       # Raw performance data; users do not need to inspect it
+      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+      ├──OpBasicInfo.csv            # Basic operator information
+      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+      └──visualize_data.bin         # MindStudio Insight presentation file
+      ```
 
 View the specific performance analysis results:
 
 ```bash
 # View Task Duration and various metrics
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+cat ./OPPROF_*/PipeUtilization.csv
 ```

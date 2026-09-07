@@ -177,6 +177,59 @@ private:
     int64_t blockIdxBak_;
 };
 
+TEST_F(HcclCommonTestSuite, ResetPrimitiveIdStateInControlMsg)
+{
+    ControlHcclMsg controlMsg{};
+    controlMsg.reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX] = 1U;
+    controlMsg.reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_RESET_IDX] = 1U;
+
+    ResetPrimitiveIdStateInControlMsg(&controlMsg);
+    EXPECT_EQ(controlMsg.reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX], 0U);
+    EXPECT_EQ(controlMsg.reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_RESET_IDX], 0U);
+
+    controlMsg.reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX] = 1U;
+    ResetPrimitiveIdOnceInControlMsg(&controlMsg);
+    EXPECT_EQ(controlMsg.reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX], 0U);
+    EXPECT_EQ(controlMsg.reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_RESET_IDX], 1U);
+
+    controlMsg.reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX] = 1U;
+    ResetPrimitiveIdOnceInControlMsg(&controlMsg);
+    EXPECT_EQ(controlMsg.reserved[HCCL_CONTROL_RESERVED_PRIMITIVE_ID_IDX], 1U);
+}
+
+TEST_F(HcclAbnormalTestSuite, UpdateControlMsgCount_InvalidMsgType)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024);
+    HcclMsgArea* hcclMsgArea = GetHcclMsgArea(workSpace.data());
+
+    UpdateControlMsgCount(hcclMsgArea, static_cast<ControlMsgType>(0U));
+    UpdateControlMsgCount(hcclMsgArea, ControlMsgType::HCCL_CMD_MAX);
+    for (uint32_t i = 0U; i < HCCL_MSG_TYPE_CNT; ++i) {
+        EXPECT_EQ(hcclMsgArea->apiStats.msgStats[i].cnt, 0U);
+    }
+}
+
+// An invalid rank num is rejected while the prepare params are checked, so neither the message
+// nor its extended part is written.
+TEST_F(HcclAbnormalTestSuite, AlltoAllV_InvalidRankNum)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024);
+    HcclMsgArea* hcclMsgArea = GetHcclMsgArea(workSpace.data());
+    HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
+    hcclCombineOpParam.rankNum = HCCL_MAX_RANK_NUM_V2 + 1U;
+    std::vector<uint64_t> counts(hcclCombineOpParam.rankNum, 0U);
+
+    Hccl hccl;
+    hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
+    HcclHandle handleId = hccl.AlltoAllV(
+        reinterpret_cast<__gm__ uint8_t*>(0x11), counts.data(), counts.data(), HcclDataType::HCCL_DATA_TYPE_INT8,
+        reinterpret_cast<__gm__ uint8_t*>(0x11), counts.data(), counts.data(), HcclDataType::HCCL_DATA_TYPE_INT8);
+
+    EXPECT_EQ(handleId, INVALID_HANDLE_ID);
+    EXPECT_NE(hcclMsgArea->commMsg.singleMsg.sendMsgs[0].addMsg.v0Msg.valid, HCCL_MSG_VALID_MASK);
+    EXPECT_NE(hcclMsgArea->commMsg.singleMsg.paramExtMsgList[0].valid, HCCL_MSG_VALID_MASK);
+}
+
 // Prepare 1 time (AllReduce interface, repeat=1) + Commit 1 time, verify the content of the message area
 TEST_F(HcclCommonTestSuite, AllReduce_Repeat1)
 {
@@ -1098,6 +1151,63 @@ TEST_F(HcclAbnormalTestSuite, AlltoAllV_InputParamInvalid_ReturnInvalidHandleId)
     handleId = hccl.AlltoAllV(
         reinterpret_cast<__gm__ uint8_t*>(0x11), sendCounts.data(), sendOffsets.data(),
         HcclDataType::HCCL_DATA_TYPE_INT8, reinterpret_cast<__gm__ uint8_t*>(0x11), nullptr, recvOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, 1);
+    EXPECT_EQ(handleId, INVALID_HANDLE_ID);
+}
+
+// Test content: a rank that sends or receives nothing may pass nullptr for the unused buffer
+TEST_F(HcclAbnormalTestSuite, AlltoAllV_NullBufWithAllZeroCounts_ReturnValidHandleId)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024);
+    HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
+
+    Hccl hccl;
+    hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
+    std::vector<uint64_t> zeroCounts(kRankNum, 0);
+    std::vector<uint64_t> nonZeroCounts(kRankNum, 10);
+    std::vector<uint64_t> sendOffsets(kRankNum, 12);
+    std::vector<uint64_t> recvOffsets(kRankNum, 13);
+
+    // This rank sends nothing, so sendBuf is allowed to be nullptr
+    HcclHandle handleId = hccl.AlltoAllV(
+        nullptr, zeroCounts.data(), sendOffsets.data(), HcclDataType::HCCL_DATA_TYPE_INT8,
+        reinterpret_cast<__gm__ uint8_t*>(0x11), nonZeroCounts.data(), recvOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, 1);
+    EXPECT_NE(handleId, INVALID_HANDLE_ID);
+
+    // This rank receives nothing, so recvBuf is allowed to be nullptr
+    handleId = hccl.AlltoAllV(
+        reinterpret_cast<__gm__ uint8_t*>(0x11), nonZeroCounts.data(), sendOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, nullptr, zeroCounts.data(), recvOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, 1);
+    EXPECT_NE(handleId, INVALID_HANDLE_ID);
+}
+
+// Test content: counts that would overflow a uint64_t sum must not slip a nullptr buffer past the check
+TEST_F(HcclAbnormalTestSuite, AlltoAllV_NullBufWithOverflowingCounts_ReturnInvalidHandleId)
+{
+    std::vector<uint8_t> workSpace(workSpaceSize + 1024);
+    HcclCombineOpParam hcclCombineOpParam = GetHcclCombineOpParam(workSpace);
+
+    Hccl hccl;
+    hccl.Init(reinterpret_cast<GM_ADDR>(&hcclCombineOpParam));
+    // These two entries sum to exactly 2^64, i.e. wrap around to 0
+    std::vector<uint64_t> wrappingCounts(kRankNum, 0);
+    wrappingCounts[0] = 1ULL << 63U;
+    wrappingCounts[1] = 1ULL << 63U;
+    std::vector<uint64_t> nonZeroCounts(kRankNum, 10);
+    std::vector<uint64_t> sendOffsets(kRankNum, 12);
+    std::vector<uint64_t> recvOffsets(kRankNum, 13);
+
+    HcclHandle handleId = hccl.AlltoAllV(
+        nullptr, wrappingCounts.data(), sendOffsets.data(), HcclDataType::HCCL_DATA_TYPE_INT8,
+        reinterpret_cast<__gm__ uint8_t*>(0x11), nonZeroCounts.data(), recvOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, 1);
+    EXPECT_EQ(handleId, INVALID_HANDLE_ID);
+
+    handleId = hccl.AlltoAllV(
+        reinterpret_cast<__gm__ uint8_t*>(0x11), nonZeroCounts.data(), sendOffsets.data(),
+        HcclDataType::HCCL_DATA_TYPE_INT8, nullptr, wrappingCounts.data(), recvOffsets.data(),
         HcclDataType::HCCL_DATA_TYPE_INT8, 1);
     EXPECT_EQ(handleId, INVALID_HANDLE_ID);
 }

@@ -1,4 +1,5 @@
 # AI CPU算子Tiling下沉样例介绍
+
 ## 概述
 
 本样例介绍使用AI CPU算子进行tiling下沉计算。
@@ -29,7 +30,7 @@
 ## 编译运行
 在本样例根目录下执行如下步骤。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

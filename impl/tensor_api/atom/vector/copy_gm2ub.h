@@ -9,10 +9,10 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    "impl/tensor_api/atom/vector/copy_gm2ub.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#pragma message( \
+    "impl/tensor_api/atom/vector/copy_gm2ub.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"tensor_api/tensor.h\"\" and use public functions or variables defined in interface headers files.")
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ATOM_VECTOR_COPY_GM2UB_H
 #endif
 
 /*!
@@ -23,24 +23,38 @@
 #define IMPL_TENSOR_API_ATOM_VECTOR_COPY_GM2UB_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
-#include "impl/tensor_api/arch/vector/gm_to_ub/copy.h"
+#include "impl/tensor_api/arch/vector/gm_to_ub/gm_to_ub_copy.h"
 #include "impl/tensor_api/atom/copy_traits_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
 template <typename Traits>
-struct CopyTraits<CopyGM2UB, Traits> : public CopyTraits<CopyGM2UB, Traits, CopyGM2UB, Traits> {};
+struct copy_traits<copy_gm_to_ub, Traits> : public copy_traits<copy_gm_to_ub, Traits, copy_gm_to_ub_with, Traits> {};
 
 template <>
-struct CopyTraits<CopyGM2UB> : public CopyTraits<CopyGM2UB, CopyGM2UBTraitDefault> {};
+struct copy_traits<copy_gm_to_ub> : public copy_traits<copy_gm_to_ub, gm_to_ub_trait_default> {};
 
-} // namespace Te
-} // namespace AscendC
+template <typename TraitStruct>
+struct copy_traits<copy_gm_to_ub_with, TraitStruct> {
+    using trait_type = get_trait_member_type_t<TraitStruct>;
+    static constexpr const trait_type default_trait = TraitStruct::value;
+
+    template <const trait_type& trait = default_trait, typename... Args>
+    __aicore__ inline void copy_unpack(const Args&... args) const
+    {
+        copy_gm_to_ub_with::template copy<trait_type, trait, Args...>(args..., params);
+    }
+
+    gm_to_ub_params params{};
+};
+
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ATOM_VECTOR_COPY_GM2UB_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ATOM_VECTOR_COPY_GM2UB_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_IMPL_TENSOR_API_ATOM_VECTOR_COPY_GM2UB_H
 #endif

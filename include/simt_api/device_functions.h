@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #ifndef INCLUDE_SIMT_API_DEVICE_FUNCTIONS_H
 #define INCLUDE_SIMT_API_DEVICE_FUNCTIONS_H
@@ -281,6 +281,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(__gm__ signed char* address,
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(__gm__ unsigned char* address, unsigned char val);
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(__gm__ char* address, char val);
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(__gm__ char2* address, char2 val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(__gm__ uchar2* address, uchar2 val);
@@ -346,6 +348,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ ulonglong4* address, 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ signed char* address, signed char val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ unsigned char* address, unsigned char val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ char* address, char val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(__gm__ char2* address, char2 val);
 
@@ -563,6 +567,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(signed char* address, signed
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(unsigned char* address, unsigned char val);
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(char* address, char val);
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(char2* address, char2 val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stcg(uchar2* address, uchar2 val);
@@ -628,6 +634,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(ulonglong4* address, ulonglo
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(signed char* address, signed char val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(unsigned char* address, unsigned char val);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(char* address, char val);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_stwt(char2* address, char2 val);
 
@@ -757,7 +765,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_dcci_single(__gm__ void* dst);
 #else
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_dcci_single(void* dst);
 #endif
-}
+} // namespace __asc_simt_vf
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_nop();
 
@@ -768,4 +776,4 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void asc_nop();
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DEVICE_FUNCTIONS_H__
 #endif
 
-#endif  // INCLUDE_SIMT_API_DEVICE_FUNCTIONS_H
+#endif // INCLUDE_SIMT_API_DEVICE_FUNCTIONS_H

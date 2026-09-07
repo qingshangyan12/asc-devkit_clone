@@ -53,7 +53,7 @@
   gather算子的实现流程为从输入input（Global Memory）中获取指定索引的数据。基于上述数据切分，首先计算线程应处理数据的索引，然后通过赋值操作将一行数据存储到Global Memory上。由于计算过程相对简单，设置核函数的最大线程数限制为2048。
 
 - 调用实现：   
-  使用内核调用符<<<>>>调用核函数。
+  使用内核调用符`<<<>>>`调用核函数。
 
 ### 2. gather_v2算子
 
@@ -116,6 +116,7 @@
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">output</td><td align="center">[128,2048,512]</td><td align="center">float</td><td align="center">ND</td><td align="center">收集后的输出张量</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">gather_custom_v2</td></tr>
   </table>
+
 - 约束说明：
   * indices：indices的前batch_dims维必须与input的前batch_dims维相同，即indices.shape[0:batch_dims] = input.shape[0:batch_dims]
   * axis：收集维度axis不能小于batch_dims，且必须小于input的维度数，即batch_dims <= axis < input.rank
@@ -133,19 +134,19 @@
 - 算子实现：   
   gather_v2算子的实现流程为从多维输入张量input中按照指定维度axis收集数据。基于上述数据切分策略，每个线程会动态处理一部分数据，对每个输出索引进行分解，将输出的一维索引转换为逻辑坐标，从而根据indices找到对应的收集位置，最后计算input的线性索引并完成数据搬运。
 - 调用实现：   
-  使用内核调用符<<<>>>调用核函数。
+  使用内核调用符`<<<>>>`调用核函数。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}`为CANN包安装目录，未指定安装目录时默认安装至`/usr/local/Ascend`下。
 
 - 样例执行
 

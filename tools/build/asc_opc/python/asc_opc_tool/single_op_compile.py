@@ -93,6 +93,27 @@ class SingleOpCompile:
                     "[asc_opc] extra_params is {}".format(context_op_info.extra_params)
                 )
 
+    def set_kernel_spec_for_context(self, context):
+        """Forward Kernel Spec settings to the AscendC compile context."""
+
+        kernel_spec_mode = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC, "None")
+        kernel_spec_dir = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC_DIR)
+        context.add_addition("kernel_spec_mode", kernel_spec_mode)
+        context.add_addition("kernel_spec_dir", kernel_spec_dir)
+        if kernel_spec_mode == "SK":
+            context.add_addition("super_kernel_sub_combine", True)
+            if context.get_addition("super_kernel_sub_info") is None:
+                context.add_addition(
+                    "super_kernel_sub_info",
+                    {
+                        "enable_super_kernel": True,
+                        "super_kernel_options": self.__opc_compile_args.get(
+                            OpcOptions.SPK_OPT, ""
+                        ),
+                        "super_kernel_sub_loc": "middle",
+                    },
+                )
+
     def __get_single_check_impl_mode(self, op_info, impl_mode):
         op_func = op_info.get(OpcOptions.OP_FUNC_ATTR)
         impl_mode_default = inspect.signature(op_func).parameters.get(
@@ -219,6 +240,7 @@ class SingleOpCompile:
                 self.set_extra_settings_for_context(
                     extra_settings, context, context_op_info
                 )
+                self.set_kernel_spec_for_context(context)
                 context.add_op_info(context_op_info)
                 context.add_addition(OpcOptions.OPTIONAL_INPUT_MODE, opt_input_mode)
                 context.add_addition(OpcOptions.OPTIONAL_OUTPUT_MODE, opt_output_mode)
@@ -252,6 +274,7 @@ class SingleOpCompile:
                 self.set_extra_settings_for_context(
                     extra_settings, context, context_op_info
                 )
+                self.set_kernel_spec_for_context(context)
                 context.add_op_info(context_op_info)
                 context.add_addition(OpcOptions.OPTIONAL_OUTPUT_MODE, opt_output_mode)
                 context.add_addition(OpcOptions.OPTIONAL_INPUT_MODE, opt_input_mode)
@@ -283,6 +306,7 @@ class SingleOpCompile:
                 self.set_extra_settings_for_context(
                     extra_settings, context, context_op_info
                 )
+                self.set_kernel_spec_for_context(context)
                 context.add_op_info(context_op_info)
                 context.add_addition(OpcOptions.OPTIONAL_OUTPUT_MODE, opt_output_mode)
                 context.add_addition(OpcOptions.OPTIONAL_INPUT_MODE, opt_input_mode)
@@ -341,32 +365,42 @@ class SingleOpCompile:
         enable_vector_core = self.__op_info.get(CompileParam.ENABLE_VECTOR_CORE)
         enable_vector_core = False if enable_vector_core is None else enable_vector_core
         deterministic = self.__op_info.get(OpcOptions.DETERMINISTIC) == "true"
+        deterministic_level = self.__op_info.get(OpcOptions.DETERMINISTIC_LEVEL, "")
         jit_compile_mode = self.__op_info.get(OpcOptions.JIT_COMPILE_MODE)
         op_relocatable_bin = self.__opc_compile_args.get(
             OpcOptions.RELOCATABLE_BIN, False
         )
+        kernel_spec_mode = self.__opc_compile_args.get(OpcOptions.KERNEL_SPEC, "None")
+        # Explicit SK enables the existing dynamic SK preparation path.
+        enable_super_kernel = op_relocatable_bin or (kernel_spec_mode == "SK")
         logger.debug(
             "debug_config {}, enable_super_kernel {}.".format(
-                debug_config, op_relocatable_bin
+                debug_config, enable_super_kernel
             )
         )
 
-        with build_config(
-            tbe_debug_level=tbe_debug_level_value,
-            op_debug_config=debug_config,
-            kernel_meta_parent_dir=self.__op_info.get(
+        build_config_kwargs = {
+            "tbe_debug_level": tbe_debug_level_value,
+            "op_debug_config": debug_config,
+            "kernel_meta_parent_dir": self.__op_info.get(
                 OpcOptions.KERNEL_META_PATH, "./"
             ),
-            compatible=True,
-            enable_op_prebuild=False,
-            save_temp_cce_file=dump_cce_switch,
-            random_cce_file_location=False,
-            status_check=status_check,
-            enable_deterministic_mode=deterministic,
-            jit_compile_mode=jit_compile_mode,
-            enable_vector_core=enable_vector_core,
-            enable_super_kernel=op_relocatable_bin,
-        ):
+            "compatible": True,
+            "enable_op_prebuild": False,
+            "save_temp_cce_file": dump_cce_switch,
+            "random_cce_file_location": False,
+            "status_check": status_check,
+            "enable_deterministic_mode": deterministic,
+            "jit_compile_mode": jit_compile_mode,
+            "enable_vector_core": enable_vector_core,
+            "enable_super_kernel": enable_super_kernel,
+        }
+
+        if deterministic_level != "":
+            build_config_kwargs["deterministic_level"] = deterministic_level
+            logger.debug("deterministic_level is {}".format(deterministic_level))
+
+        with build_config(**build_config_kwargs):
             json_file_path = self.__call_op()
 
             return json_file_path

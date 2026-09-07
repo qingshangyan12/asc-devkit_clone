@@ -39,8 +39,8 @@ __simd_vf__ inline void SiluComputeVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t
     for (uint16_t i = 0; i < repeatTimes; ++i) {
         mask = Reg::UpdateMask<T>(count);
         Reg::LoadAlign(srcVreg, src + i * oneRepElm);
-        Reg::Muls(tmpReg0, srcVreg, -1.0f, mask);
-        Reg::Exp(tmpReg0, tmpReg0, mask);
+        Reg::Muls(dstVreg, srcVreg, -1.0f, mask);
+        Reg::Exp(tmpReg0, dstVreg, mask);
         Reg::Adds(tmpReg0, tmpReg0, 1.0f, mask);
         Reg::Div(dstVreg, srcVreg, tmpReg0, mask);
         Reg::StoreAlign(dst + i * oneRepElm, dstVreg, mask);
@@ -56,8 +56,8 @@ __aicore__ inline void SiluCompute(const LocalTensor<T>& dstLocal, const LocalTe
         return;
     }
     static_assert(SupportType<T, half, float>(), "Silu only support half/float data type on current device!");
-    CheckTensorPosition(dstLocal, "dstLocal", "VECIN, VECOUT, VECCALC");
-    CheckTensorPosition(srcLocal, "srcLocal", "VECIN, VECOUT, VECCALC");
+    CheckTensorPosition(dstLocal, "dstLocal", "VECIN/VECOUT/VECCALC");
+    CheckTensorPosition(srcLocal, "srcLocal", "VECIN/VECOUT/VECCALC");
     CheckCalCount(count, "count", dstLocal, "dstLocal", "Silu");
     CheckCalCount(count, "count", srcLocal, "srcLocal", "Silu");
 

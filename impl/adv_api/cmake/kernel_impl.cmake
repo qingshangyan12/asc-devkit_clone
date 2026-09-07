@@ -9,7 +9,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 set(ASCENDC_API_PATH @INSTALL_LIBRARY_DIR@)
-set(ASCENDC_INSTALL_BASE_PATH ${CMAKE_INSTALL_PREFIX}/${ASCENDC_API_PATH})
+set(ASCENDC_INSTALL_BASE_PATH $ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${ASCENDC_API_PATH})
 
 file(MAKE_DIRECTORY ${ASCENDC_INSTALL_BASE_PATH}/asc/impl/adv_api/detail)
 file(
@@ -35,6 +35,6 @@ file(
     ${ASCENDC_INSTALL_BASE_PATH}/asc/impl/basic_api/utils/sys_constants.h
     SYMBOLIC)
 file(
-    CREATE_LINK ../../utils/sys_macros.h
-    ${ASCENDC_INSTALL_BASE_PATH}/asc/impl/basic_api/utils/sys_macros.h
+    CREATE_LINK ../../utils/sys_macros_impl.h
+    ${ASCENDC_INSTALL_BASE_PATH}/asc/impl/basic_api/utils/sys_macros_impl.h
     SYMBOLIC)

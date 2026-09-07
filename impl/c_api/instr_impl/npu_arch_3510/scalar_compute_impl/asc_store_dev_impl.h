@@ -9,8 +9,8 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_store_dev_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#pragma message( \
+    "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_store_dev_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use \"#include \"c_api/asc_simd.h\"\" and use public functions or variables defined in interface headers files.")
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -20,46 +20,46 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/utils_impl.h"
 
-constexpr int16_t ASC_C_API_DEFAULIT_OFFSET = 0;
+constexpr int16_t ASC_C_API_DEFAULT_OFFSET = 0;
 
 __aicore__ inline void asc_store_dev_impl(__gm__ int8_t* addr, int8_t value)
 {
-    st_dev(*(reinterpret_cast<uint8_t*>(&value)), reinterpret_cast<__gm__ uint8_t*>(addr), ASC_C_API_DEFAULIT_OFFSET);
+    st_dev(*(reinterpret_cast<uint8_t*>(&value)), reinterpret_cast<__gm__ uint8_t*>(addr), ASC_C_API_DEFAULT_OFFSET);
 }
 
 __aicore__ inline void asc_store_dev_impl(__gm__ uint8_t* addr, uint8_t value)
 {
-    st_dev(value, addr, ASC_C_API_DEFAULIT_OFFSET);
+    st_dev(value, addr, ASC_C_API_DEFAULT_OFFSET);
 }
 
 __aicore__ inline void asc_store_dev_impl(__gm__ int16_t* addr, int16_t value)
 {
-    st_dev(*(reinterpret_cast<uint16_t*>(&value)), reinterpret_cast<__gm__ uint16_t*>(addr), ASC_C_API_DEFAULIT_OFFSET);
+    st_dev(*(reinterpret_cast<uint16_t*>(&value)), reinterpret_cast<__gm__ uint16_t*>(addr), ASC_C_API_DEFAULT_OFFSET);
 }
 
 __aicore__ inline void asc_store_dev_impl(__gm__ uint16_t* addr, uint16_t value)
 {
-    st_dev(value, addr, ASC_C_API_DEFAULIT_OFFSET);
+    st_dev(value, addr, ASC_C_API_DEFAULT_OFFSET);
 }
 
 __aicore__ inline void asc_store_dev_impl(__gm__ int32_t* addr, int32_t value)
 {
-    st_dev(*(reinterpret_cast<uint32_t*>(&value)), reinterpret_cast<__gm__ uint32_t*>(addr), ASC_C_API_DEFAULIT_OFFSET);
+    st_dev(*(reinterpret_cast<uint32_t*>(&value)), reinterpret_cast<__gm__ uint32_t*>(addr), ASC_C_API_DEFAULT_OFFSET);
 }
 
 __aicore__ inline void asc_store_dev_impl(__gm__ uint32_t* addr, uint32_t value)
 {
-    st_dev(value, addr, ASC_C_API_DEFAULIT_OFFSET);
+    st_dev(value, addr, ASC_C_API_DEFAULT_OFFSET);
 }
 
 __aicore__ inline void asc_store_dev_impl(__gm__ int64_t* addr, int64_t value)
 {
-    st_dev(*(reinterpret_cast<uint64_t*>(&value)), reinterpret_cast<__gm__ uint64_t*>(addr), ASC_C_API_DEFAULIT_OFFSET);
+    st_dev(*(reinterpret_cast<uint64_t*>(&value)), reinterpret_cast<__gm__ uint64_t*>(addr), ASC_C_API_DEFAULT_OFFSET);
 }
 
 __aicore__ inline void asc_store_dev_impl(__gm__ uint64_t* addr, uint64_t value)
 {
-    st_dev(value, addr, ASC_C_API_DEFAULIT_OFFSET);
+    st_dev(value, addr, ASC_C_API_DEFAULT_OFFSET);
 }
 #endif
 

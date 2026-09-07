@@ -15,7 +15,8 @@
 #ifndef IMPL_UTILS_DEBUG_NPU_ARCH_3510_ASC_DEBUG_UTILS_H
 #define IMPL_UTILS_DEBUG_NPU_ARCH_3510_ASC_DEBUG_UTILS_H
 
-#include "impl/utils/sys_macros.h"
+#include "impl/utils/sys_macros_impl.h"
+#include "impl/utils/debug/asc_simd_vf_utils.h"
 
 namespace __asc_simd_vf {
 template <typename T, typename U, typename... Args>
@@ -46,6 +47,26 @@ __simd_callee__ constexpr inline uint32_t div_ceil(uint32_t a, uint32_t b)
 
 __simd_callee__ constexpr inline uint32_t align_up(uint32_t a, uint32_t b) { return div_ceil(a, b) * b; }
 
+__simd_callee__ inline void wait_vf_debug_buffer_drained(__ubuf__ BlockVFBufInfo* block_info)
+{
+    // flag != 0: the consumer stopped draining, readLen will never catch up.
+    while (block_info->readLen != block_info->writeLen && block_info->flag == 0) {
+        __asm__ __volatile__("");
+    }
+}
+
+__simd_callee__ inline void reset_vf_debug_buffer(__ubuf__ BlockVFBufInfo* block_info)
+{
+    block_info->writeLen = 0;
+    block_info->readLen = 0;
+}
+
+__simd_callee__ inline void wait_vf_debug_buffer_drained_and_reset(__ubuf__ BlockVFBufInfo* block_info)
+{
+    wait_vf_debug_buffer_drained(block_info);
+    reset_vf_debug_buffer(block_info);
+}
+
 template <typename T>
 __simd_callee__ constexpr inline DumpTensorDataType get_dump_datatype_impl();
 
@@ -62,28 +83,74 @@ __simd_callee__ inline void enable_asc_diagnostics()
 #endif
 }
 
-__simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr(uint64_t addr, uint16_t blockIdx = 0)
+__simd_callee__ inline void enable_asc_assert()
 {
-#if defined(ASCENDC_SIMD_VF_DEBUG)
-    constexpr uint32_t safeStaticLen = 32;
-    static __ubuf__ uint64_t info[safeStaticLen];
-    if (addr != 0) {
-        info[0] = addr;
-        // clear data workspace when initializing
-        auto* bufInfo = reinterpret_cast<__ubuf__ BlockVFBufInfo*>(addr);
-        bufInfo->writeLen = 0;
-        bufInfo->pidx = 0;
-        bufInfo->blockIdx = blockIdx;
-    }
-    return reinterpret_cast<__ubuf__ BlockVFBufInfo*>(info[0]);
-#else
-    return reinterpret_cast<__ubuf__ BlockVFBufInfo*>(0);
+#if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
+    static const struct AscTlv __asc_assert_meta_section__ __attribute__((used, section(".ascend.meta"))) = {4, 4, 5};
 #endif
 }
 
-__simd_callee__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
+__simd_callee__ constexpr inline uint32_t get_vf_debug_reserved_ub_size()
 {
-    __cce_scalar::copy_ubuf_to_gm_align_v2(dst, src, 1, size, 0, 0, 0, 0);
+    constexpr uint32_t ascendcReservedUbSize = 2 * 1024;
+    constexpr uint32_t vfStackReservedUbSize = 6 * 1024;
+
+#if defined(__ASC_DISABLE_VF_STACK_RESERVED__)
+    return ascendcReservedUbSize;
+#else
+    return ascendcReservedUbSize + vfStackReservedUbSize;
+#endif
+}
+
+__simd_callee__ inline uint64_t get_vf_debug_reserved_ub_addr()
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
+    return static_cast<uint64_t>(get_shmem_sz()) - get_vf_debug_reserved_ub_size();
+#else
+    return 0;
+#endif
+}
+
+__simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr(uint64_t addr, uint16_t blockIdx = 0)
+{
+    uint64_t blockInfoAddr = addr;
+    if (blockInfoAddr == 0) {
+        blockInfoAddr = get_vf_debug_reserved_ub_addr();
+    }
+    auto* bufInfo = reinterpret_cast<__ubuf__ BlockVFBufInfo*>(blockInfoAddr);
+    if (addr != 0) {
+        init_debug_buffer(bufInfo, blockIdx);
+    }
+    return bufInfo;
+}
+
+__simd_callee__ inline void wait_vf_assert_handshake()
+{
+    __ubuf__ BlockVFBufInfo* block_info = get_printf_ubuf_addr(0);
+    wait_vf_debug_buffer_drained(block_info);
+    // Nobody left to acknowledge the handshake; drop the message but still let the caller trap.
+    if (block_info->flag != 0) {
+        return;
+    }
+    __ubuf__ volatile BlockVFBufInfo::AssertState* assertFlag = &block_info->assertFlag;
+    *assertFlag = BlockVFBufInfo::AssertState::RAISED;
+    while (*assertFlag != BlockVFBufInfo::AssertState::DRAINED) {
+        if (block_info->flag != 0) {
+            break;
+        }
+        __asm__ __volatile__("");
+    }
+}
+
+__simd_callee__ __ubuf__ inline BlockVFBufInfo* init_printf_ubuf_addr(uint16_t blockIdx = 0)
+{
+    return get_printf_ubuf_addr(get_vf_debug_reserved_ub_addr(), blockIdx);
+}
+
+__no_simd_vf_fusion__ __simd_vf__ static inline void asc_finish_flag()
+{
+    __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr(0);
+    blockInfo->finish = 1;
 }
 
 __simd_callee__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint32_t size)
@@ -93,17 +160,14 @@ __simd_callee__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* sr
 } // namespace __asc_simd_vf
 
 namespace __asc_aicore {
+__aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo, const uint32_t& tlvLen);
+
 __aicore__ inline void asc_entire_dcci_impl(__gm__ uint64_t* ptr)
 {
     dcci(ptr, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
 }
 
-__aicore__ inline uint64_t asc_debug_get_system_cycle_impl()
-{
-    uint64_t sysCnt = 0;
-    asm volatile("MOV %0, SYS_CNT\n" : "+l"(sysCnt));
-    return sysCnt;
-}
+__aicore__ inline uint64_t asc_debug_get_system_cycle_impl() { return get_sys_cnt(); }
 
 template <uint64_t timeoutCycle>
 __aicore__ inline void ringbuf_wait_rts_sync_impl()
@@ -189,6 +253,11 @@ __aicore__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr_aicore(uint64_t 
     return __asc_simd_vf::get_printf_ubuf_addr(addr, blockIdx);
 }
 
+__aicore__ __ubuf__ inline BlockVFBufInfo* init_printf_ubuf_addr_aicore(uint16_t blockIdx = 0)
+{
+    return __asc_simd_vf::init_printf_ubuf_addr(blockIdx);
+}
+
 __aicore__ __gm__ inline BlockRingBufInfo* get_block_ring_buf_info()
 {
     const uint32_t blockIdx = asc_debug_get_core_idx_impl();
@@ -225,29 +294,117 @@ __aicore__ inline void update_write_info(
     asc_entire_dcci_impl(reinterpret_cast<__gm__ uint64_t*>(writeInfo));
 }
 
-__aicore__ inline void asc_vf_debug_ub2gm()
+__aicore__ static bool count_vf_tlv_packages(__ubuf__ uint8_t* tlv, uint32_t tlvLen, uint32_t& packageNum)
 {
-    __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr_aicore(0);
-    __ubuf__ uint8_t* tlv = reinterpret_cast<__ubuf__ uint8_t*>(blockInfo->buffer);
+    constexpr uint32_t tlvHeadLen = 2 * sizeof(uint32_t);
+
+    uint32_t offset = 0;
+
+    while (offset + tlvHeadLen <= tlvLen) {
+        __ubuf__ uint32_t* head = reinterpret_cast<__ubuf__ uint32_t*>(tlv + offset);
+        uint32_t payloadLen = head[1];
+
+        if (payloadLen > tlvLen - offset - tlvHeadLen) {
+            return false;
+        }
+
+        offset += tlvHeadLen + payloadLen;
+        packageNum += 1;
+    }
+
+    return packageNum != 0 && offset == tlvLen;
+}
+
+__aicore__ inline void asc_vf_debug_publish(
+    __ubuf__ BlockVFBufInfo* blockInfo, uint32_t curWriteLen, uint32_t curReadLen)
+{
+    const uint32_t tlvLen = curWriteLen - curReadLen;
+    __ubuf__ uint8_t* tlv = reinterpret_cast<__ubuf__ uint8_t*>(blockInfo->buffer) + curReadLen;
+
+    uint32_t packageNum = 0;
+    if (!count_vf_tlv_packages(tlv, tlvLen, packageNum)) {
+        blockInfo->flag = 1;
+        return;
+    }
 
     __gm__ BlockRingBufInfo* blockRingBufInfo = get_block_ring_buf_info();
+    auto* debugBlockInfo = reinterpret_cast<__gm__ DebugBlockHeadInfo*>(blockRingBufInfo);
+    // A batch larger than the ring buffer can never be published; retrying would spin forever and hang the kernel.
+    // Drop it: advance readLen to release the producer, raise flag to stop the transfer loop.
+    if (tlvLen > blockRingBufInfo->ringBufLen || sizeof(SkipTlv) >= blockRingBufInfo->ringBufLen) {
+        blockInfo->readLen = curWriteLen;
+        blockInfo->flag = 1;
+        return;
+    }
+    // Remaining failures are transient (RTS lagging); keep retrying.
+    if (!check_ringbuf_space(debugBlockInfo, tlvLen)) {
+        return;
+    }
     __gm__ uint8_t* dstTlv = reinterpret_cast<__gm__ uint8_t*>(call_get_ring_buf_tlv(blockRingBufInfo));
-    const uint32_t tlvLen = blockInfo->writeLen;
 
-    sync_all_impl();
     constexpr uint32_t sizeU32 = sizeof(uint32_t);
-    const uint32_t totalWords = (tlvLen + sizeU32 - 1) / sizeU32;
+    const uint32_t totalWords = tlvLen / sizeU32;
     auto* dstWords = reinterpret_cast<__gm__ uint32_t*>(dstTlv);
     auto* srcWords = reinterpret_cast<__ubuf__ uint32_t*>(tlv);
     for (uint32_t i = 0; i < totalWords; ++i) {
         dstWords[i] = srcWords[i];
     }
-    sync_all_impl();
-
+    for (uint32_t i = totalWords * sizeU32; i < tlvLen; ++i) {
+        dstTlv[i] = tlv[i];
+    }
     asc_entire_dcci_impl(reinterpret_cast<__gm__ uint64_t*>(dstTlv));
 
     __gm__ RingBufWriteInfo* writeInfo = get_ring_buf_write_info(blockRingBufInfo);
-    update_write_info(writeInfo, tlvLen, blockInfo->pidx);
+    update_write_info(writeInfo, tlvLen, packageNum);
+    blockInfo->readLen = curWriteLen;
+}
+
+__aicore__ inline bool asc_vf_debug_ub2gm()
+{
+    __ubuf__ BlockVFBufInfo* blockInfo = get_printf_ubuf_addr_aicore(0);
+    // The VF unit updates these concurrently; without volatile the loads are hoisted and the loop
+    // works off a stale snapshot (finish == 1 while writeLen still reads 0), dropping every record.
+    __ubuf__ volatile BlockVFBufInfo* vInfo = blockInfo;
+    for (;;) {
+        uint32_t curReadLen = vInfo->readLen;
+        uint32_t curWriteLen = vInfo->writeLen;
+
+        const bool isValidHeader = vInfo->magic == ASCENDC_SIMD_VF_MAGIC_NUMBER &&
+                                   vInfo->length <= ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE &&
+                                   curWriteLen <= vInfo->length;
+        if (!isValidHeader) {
+            blockInfo->flag = 1;
+            break;
+        }
+        // The producer clears writeLen before readLen when resetting a drained UB buffer.
+        if (curReadLen > curWriteLen) {
+            continue;
+        }
+
+        if (curReadLen < curWriteLen) {
+            asc_vf_debug_publish(blockInfo, curWriteLen, curReadLen);
+            if (blockInfo->flag != 0) {
+                break;
+            }
+            continue;
+        }
+
+        if (vInfo->assertFlag == BlockVFBufInfo::AssertState::RAISED) {
+            vInfo->assertFlag = BlockVFBufInfo::AssertState::DRAINED;
+            break;
+        }
+
+        if (vInfo->finish == 1) {
+            // finish is set on the scalar unit; the VF writes may not be visible yet. Sync and re-check
+            // before concluding the buffer is empty, otherwise a pending record is silently dropped.
+            pipe_barrier(PIPE_ALL);
+            if (vInfo->readLen < vInfo->writeLen) {
+                continue;
+            }
+            break;
+        }
+    }
+    return blockInfo->flag != 0;
 }
 } // namespace __asc_aicore
 

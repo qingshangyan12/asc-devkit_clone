@@ -14,8 +14,8 @@
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning \
-    "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_min_scalar_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+#pragma message( \
+    "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_min_scalar_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use \"#include \"c_api/asc_simd.h\"\" and use public functions or variables defined in interface headers files.")
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -88,6 +88,15 @@ __simd_callee__ inline void asc_min_scalar_impl(vector_float& dst, vector_float 
 
 // asc_min_scalar half
 __simd_callee__ inline void asc_min_scalar_impl(vector_half& dst, vector_half src, half value, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vmins(dst, src, value, mask, MODE_ZEROING);
+    }
+}
+
+// asc_min_scalar bfloat16_t
+__simd_callee__ inline void asc_min_scalar_impl(
+    vector_bfloat16_t& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
 {
     if ASC_IS_AIV {
         vmins(dst, src, value, mask, MODE_ZEROING);

@@ -11,9 +11,9 @@
 #define HCCL_RES_H
 
 #include <stdint.h>
-#include "acl/acl_rt.h"
 #include "hccl_types.h"
 #include "../hcomm_res_defs.h"
+#include "acl_base_rt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,7 +74,9 @@ static inline HcclResult HcclChannelDescInit(HcclChannelDesc* channelDesc, uint3
     for (uint32_t idx = 0; idx < descNum; idx++) {
         if (channelDesc != nullptr) {
             // 先用0xFF填充整个结构体
-            (void)memset_s(channelDesc, sizeof(HcclChannelDesc), 0xFF, sizeof(HcclChannelDesc));
+            if (UNLIKELY(memset_s(channelDesc, sizeof(HcclChannelDesc), 0xFF, sizeof(HcclChannelDesc)) != EOK)) {
+                return HCCL_E_INTERNAL;
+            }
 
             // 初始化ABI头信息
             channelDesc->header.version = HCCL_CHANNEL_VERSION;

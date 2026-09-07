@@ -23,7 +23,7 @@
 │   ├── set_atomic_add_multi_aiv.h                // 多AIV核同步实现
 │   ├── set_atomic_add_single_aiv.h               // 单AIV核同步实现
 │   ├── set_atomic_deterministic_computation.asc  // Ascend C样例实现 & 调用样例
-│   └── README.md                                    // 样例说明文档
+│   └── README.md                                 // 样例说明文档
 ```
 
 ## 1. 确定性计算
@@ -217,7 +217,7 @@ Scalar单元访问GM上的信号量，存在两种访问方式：
    使用 GlobalTensor的成员函数GetValue 和 SetValue 进行操作。这种情况下，开发者需要手动调用[DataCacheCleanAndInvalid](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0177.html)接口，以确保多核间数据的一致性。
 
 2. **不通过DCache 访问**
-   使用[WriteGmByPassDCache](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_00089.html) 和 ReadGmByPassDCache。这种方式无需额外操作即可保证多核间数据的一致性。
+   使用[WriteGmBypassDCache](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_00089.html) 和 ReadGmBypassDCache。这种方式无需额外操作即可保证多核间数据的一致性。
 
 两种方案在性能上的差异：不经过DCache，性能会较差，但是如果读写GM数据较少，可以考虑使用不经过DCache的方法。
 核间同步方案中也需要与核内同步配合使用，现将三处核内同步作用说明如下：
@@ -313,7 +313,7 @@ $$
 ## 编译运行  
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

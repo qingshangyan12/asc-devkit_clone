@@ -1,5 +1,6 @@
 # DataCopy 最佳实践样例
 
+
 ## 概述
 
 本样例展示 Global Memory 到 UB、Global Memory 到 L1 的数据搬运实践。样例不包含计算逻辑，重点用于观察 MTE2 搬运行为，以及分块粒度、非对齐数据搬运、L2Cache 复用、同地址访问冲突规避对数据搬运性能的影响，对比 DataCopy/DataCopyPad 在不同搬运模式下的性能表现。
@@ -212,7 +213,7 @@ Ascend 950 系列按 GM 带宽约 1.6TB/s 估算，理论耗时约 188.74μs。�
 
 ### 优化点3：重复搬运与 L2Cache 复用
 
-**实现方式**：重复搬运场景在同一数据规模下执行多轮 GM 读取，使用 `msprof --ai-core=on --aic-metrics=L2Cache` 采集 L2Cache 读命中和 miss allocate 数据。
+**实现方式**：重复搬运场景在同一数据规模下执行多轮 GM 读取，使用 `msopprof --ai-core=on --aic-metrics=L2Cache` 采集 L2Cache 读命中和 miss allocate 数据。
 
 整块重复搬运时，`RepeatCopy(0, n, 4)` 表示 `nStart=0`、`nCount=N`、`repeatTimes=4`，每轮都按完整 N 方向读取同一块数据。A2/A3 的 L2Cache 大小为 192MB，950PR 的 L2Cache 大小为 128MB。本样例单个 `M * N` 矩阵大小约为 301.99MB，整块重复搬运时单轮工作集大于 L2Cache 容量，容易发生写替换，导致 L2Cache 命中率较低。
 
@@ -398,7 +399,7 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
 
 - 配置环境变量
 
-  请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/zh/quick_start.md#prepare&install)，配置环境变量。
 
 
   ```bash
@@ -414,7 +415,7 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
   SCENARIO_NUM=1 ASC_ARCH=dav-2201
   COPY_DST=UB
   mkdir -p build && cd build
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH ..;make -j; 
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH ..;make -j;
   python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM -copyDst $COPY_DST -arch $ASC_ARCH
   ./demo
   ```
@@ -441,29 +442,32 @@ for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
 
 - 性能采集
 
-  使用 `msprof` 工具获取详细性能数据：
+  使用 `msOpProf` 工具获取详细性能数据：
 
   ```bash
-  msprof ./demo
-  msprof --ai-core=on --aic-metrics=L2Cache ./demo    # L2Cache 相关场景使用
+  msopprof ./demo
+  msopprof --ai-core=on --aic-metrics=L2Cache ./demo    # L2Cache 相关场景使用
   ```
 
-  采集后会在当前目录生成 `PROF_` 前缀目录，性能汇总文件位于 `mindstudio_profiler_output` 目录下。
+    - 性能数据说明
+      命令完成后，会在默认目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹,性能数据文件夹结构示例如下：
 
-  ```txt
-  PROF_xxxx_XXXXXX
-  ├── device_{id}
-  ├── host
-  ├── mindstudio_profiler_log
-  └── mindstudio_profiler_output
-      ├── msprof_*.json
-      ├── op_summary_*.csv
-      └── README.txt
-  ```
+      ```bash
+      ├──dump                       # 原始的性能数据，用户无需关注
+      ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+      ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+      ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+      ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+      ├──OpBasicInfo.csv            # 算子基础信息
+      ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+      ├──ResourceConflictRatio.csv  # UB上的 bank group、bank conflict和资源冲突率在所有指令中的占比
+      └──visualize_data.bin         # MindStudio Insight呈现文件
+      ```
 
   查看具体的性能分析结果：
 
   ```bash
   # 查看 Task Duration 以及各项数据
-  cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+  cat ./OPPROF_*/PipeUtilization.csv
   ```

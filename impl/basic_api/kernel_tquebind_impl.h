@@ -174,17 +174,22 @@ __aicore__ inline __sync_alias__ bool TQueBind<src, dst, depth, mask>::EnQue(TBu
     static_assert(
         ((srcUserPos == TPosition::GM) || (srcUserPos == TPosition::VECIN) || (srcUserPos == TPosition::VECOUT) ||
          (srcUserPos == TPosition::VECCALC)) &&
-        "enque only support src position GM/VECIN/VECOUT/VECCALC currently.");
+        "enque only support src position GM/UB(VECIN/VECOUT/VECCALC) currently.");
     static_assert(
         ((dstUserPos == TPosition::GM) || (dstUserPos == TPosition::VECIN) || (dstUserPos == TPosition::VECOUT) ||
          (dstUserPos == TPosition::VECCALC)) &&
-        "enque only support dst position GM/VECIN/VECOUT/VECCALC currently.");
+        "enque only support dst position GM/UB(VECIN/VECOUT/VECCALC) currently.");
     static_assert(
         !((srcUserPos == TPosition::GM) && (dstUserPos == TPosition::GM)) &&
         "enque src and dst position cannot be GM at the same time.");
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+    static constexpr HardEvent enQueUserEvt = GetQueEvt(srcUserPos, dstUserPos, true);
+#else
     constexpr Hardware srcUserHardType = GetPhyType(srcUserPos);
     constexpr Hardware dstUserHardType = GetPhyType(dstUserPos);
     constexpr HardEvent enQueUserEvt = GetQueEvt(srcUserHardType, dstUserHardType, true, false, false);
+#endif
 
     ASCENDC_DEBUG_ASSERT(
         (this->usedCount < depth),
@@ -433,17 +438,22 @@ __aicore__ inline __sync_alias__ TBufHandle TQueBind<src, dst, depth, mask>::DeQ
     static_assert(
         ((srcUserPos == TPosition::GM) || (srcUserPos == TPosition::VECIN) || (srcUserPos == TPosition::VECOUT) ||
          (srcUserPos == TPosition::VECCALC)) &&
-        "DeQue only support src position GM/VECIN/VECOUT/VECCALC currently.");
+        "DeQue only support src position GM/UB(VECIN/VECOUT/VECCALC) currently.");
     static_assert(
         ((dstUserPos == TPosition::GM) || (dstUserPos == TPosition::VECIN) || (dstUserPos == TPosition::VECOUT) ||
          (dstUserPos == TPosition::VECCALC)) &&
-        "DeQue only support dst position GM/VECIN/VECOUT/VECCALC currently.");
+        "DeQue only support dst position GM/UB(VECIN/VECOUT/VECCALC) currently.");
     static_assert(
         !((srcUserPos == TPosition::GM) && (dstUserPos == TPosition::GM)) &&
         "DeQue src and dst position cannot be GM at the same time.");
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+    static constexpr HardEvent deQueUserEvt = GetQueEvt(srcUserPos, dstUserPos, true);
+#else
     constexpr Hardware srcUserHardType = GetPhyType(srcUserPos);
     constexpr Hardware dstUserHardType = GetPhyType(dstUserPos);
     constexpr HardEvent deQueUserEvt = GetQueEvt(srcUserHardType, dstUserHardType, true, false, false);
+#endif
 
     TBufHandle buf;
     if constexpr (depth == 1) {

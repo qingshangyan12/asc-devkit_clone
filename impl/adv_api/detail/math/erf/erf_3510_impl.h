@@ -147,9 +147,9 @@ __simd_callee__ inline void ErfSpecialCaseCompute(
     Reg::Duplicate(tmpF32Reg, LOG2_VALUE, mask);
     Reg::Log(tmpF32Reg, tmpF32Reg, mask);
     Reg::Mul(tmpF32Reg, tmpReg, tmpF32Reg, mask);
-    Reg::Exp(tmpF32Reg, tmpF32Reg, mask); // tmpF32Reg: f23
+    Reg::Exp(tmpF32Reg1, tmpF32Reg, mask); // tmpF32Reg1: f23
     Reg::Duplicate(tmpU32Reg, ERF_R1, mask);
-    Reg::Sub(tmpF32Reg1, (Reg::RegTensor<float>&)tmpU32Reg, tmpF32Reg, mask); // tmpF32Reg1: f25
+    Reg::Sub(tmpF32Reg1, (Reg::RegTensor<float>&)tmpU32Reg, tmpF32Reg1, mask); // tmpF32Reg1: f25
 
     Reg::Duplicate(tmpU32Reg, ERF_R2, mask);
     Reg::And(tmpU32Reg, (Reg::RegTensor<uint32_t>&)srcReg, tmpU32Reg, mask);
@@ -283,9 +283,9 @@ __aicore__ inline void ErfCheckParams(
     const uint32_t calCount)
 {
     static_assert(SupportType<T, half, float>(), "current data type is not supported on current device!");
-    CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN / VECCALC / VECOUT", "Erf");
-    CheckTensorPos<T>(srcTensor, Hardware::UB, "srcTensor", "VECIN / VECCALC / VECOUT", "Erf");
-    CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN / VECCALC / VECOUT", "Erf");
+    CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN/VECCALC/VECOUT", "Erf");
+    CheckTensorPos<T>(srcTensor, Hardware::UB, "srcTensor", "VECIN/VECCALC/VECOUT", "Erf");
+    CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN/VECCALC/VECOUT", "Erf");
     CheckCalCount(calCount, "calCount", srcTensor, "srcTensor", "Erf");
     CheckCalCount(calCount, "calCount", dstTensor, "dstTensor", "Erf");
 }

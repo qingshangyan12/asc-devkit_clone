@@ -8,6 +8,13 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#pragma message( \
+    "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please include c_api/asc_simd.h and use public functions or variables defined in interface header files.")
+#define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_SCALAR_COMPUTE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_SCALAR_COMPUTE_IMPL_H
 
@@ -16,6 +23,8 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_zero_bits_cnt_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_ffs_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_store_dev_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_load_dev_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_float2half_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_float2int32_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_sflbits_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_ffz_impl.h"
@@ -57,6 +66,25 @@ __aicore__ inline void asc_store_dev(__gm__ uint32_t* addr, uint32_t value) { as
 __aicore__ inline void asc_store_dev(__gm__ int64_t* addr, int64_t value) { asc_store_dev_impl(addr, value); }
 
 __aicore__ inline void asc_store_dev(__gm__ uint64_t* addr, uint64_t value) { asc_store_dev_impl(addr, value); }
+
+__aicore__ inline int8_t asc_load_dev(__gm__ int8_t* addr) { return asc_load_dev_impl(addr); }
+
+__aicore__ inline uint8_t asc_load_dev(__gm__ uint8_t* addr) { return asc_load_dev_impl(addr); }
+
+__aicore__ inline int16_t asc_load_dev(__gm__ int16_t* addr) { return asc_load_dev_impl(addr); }
+
+__aicore__ inline uint16_t asc_load_dev(__gm__ uint16_t* addr) { return asc_load_dev_impl(addr); }
+
+__aicore__ inline int32_t asc_load_dev(__gm__ int32_t* addr) { return asc_load_dev_impl(addr); }
+
+__aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr) { return asc_load_dev_impl(addr); }
+
+__aicore__ inline int64_t asc_load_dev(__gm__ int64_t* addr) { return asc_load_dev_impl(addr); }
+
+__aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr) { return asc_load_dev_impl(addr); }
+
+// ==========asc_float2half (ro)==========
+__aicore__ inline half asc_float2half_ro(float value) { return asc_float2half_ro_impl(value); }
 
 // ==========asc_float2int32 (rd/ru/rn/rna)==========
 __aicore__ inline int32_t asc_float2int32_rd(float value) { return asc_float2int32_rd_impl(value); }
@@ -307,4 +335,9 @@ __aicore__ inline uint64_t asc_atomic_dec(__gm__ uint64_t* address, uint64_t val
 }
 } // namespace __asc_aicore
 
+#endif
+
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
