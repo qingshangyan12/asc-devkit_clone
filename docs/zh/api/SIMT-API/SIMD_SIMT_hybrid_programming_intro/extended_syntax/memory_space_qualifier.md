@@ -17,7 +17,7 @@ __gm__ foo_t *info; // info points to an array of foo_t elements
 
 ## \_\_ubuf\_\_
 
-在SIMD与SIMT混合编程中使用地址空间限定符`__ubuf__`来表示动、静态内存，静态内存的大小在编译期是确定的，动态内存的大小在核函数（Kernel）执行时确定。
+在SIMD与SIMT混合编程中使用地址空间限定符`__ubuf__`来表示动、静态内存，静态内存的大小在编译期是确定的，动态内存的大小在核函数（Kernel）启动时确定。
 
 -   静态内存通过数组分配：
 
