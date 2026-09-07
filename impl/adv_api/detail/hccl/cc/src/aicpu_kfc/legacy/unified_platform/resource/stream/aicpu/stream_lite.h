@@ -30,11 +30,7 @@ public:
 
     inline u32 GetDevPhyId() const { return devPhyId; }
 
-    __attribute__((visibility("hidden")))
-    RtsqBase* GetRtsq() const
-    {
-        return rtsq.get();
-    }
+    RtsqBase* GetRtsq() const;
 
     std::string Describe() const;
 
