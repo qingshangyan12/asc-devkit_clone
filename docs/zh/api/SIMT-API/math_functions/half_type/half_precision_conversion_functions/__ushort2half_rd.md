@@ -52,8 +52,8 @@ inline half __ushort2half_rd(const unsigned short int x)
 | 0 | 0 |
 | 2049 | 2048 |
 | 4097 | 4096 |
-| 65505 | 65500 |
-| 65535（unsigned short int最大值） | 65500 |
+| 65505 | 65504 |
+| 65535（unsigned short int最大值） | 65504 |
 
 ## 约束说明
 

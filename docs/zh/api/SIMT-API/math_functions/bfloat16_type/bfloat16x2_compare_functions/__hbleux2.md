@@ -63,8 +63,12 @@ bool __hbleux2(bfloat16x2_t x, bfloat16x2_t y)
   </thead>
   <tbody>
     <tr>
-      <td colspan="2">任一分量含nan</td>
+      <td colspan="2">任一分量含nan，且另一分量满足x≤y</td>
       <td>true</td>
+    </tr>
+    <tr>
+      <td colspan="2">任一分量含nan，且另一分量不满足x≤y</td>
+      <td>false</td>
     </tr>
     <tr>
       <td>±0</td>

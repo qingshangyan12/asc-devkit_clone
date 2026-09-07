@@ -66,9 +66,12 @@ inline float __float2float_ru(const float x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernel__float2float_ru(float* dst, float* x)
+    __global__ __launch_bounds__(1024) void kernel__float2float_ru(float* dst, float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2float_ru(x[idx]);
     }
     ```
@@ -78,9 +81,12 @@ inline float __float2float_ru(const float x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2float_ru(__gm__ float* dst, __gm__ float* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__float2float_ru(__gm__ float* dst, __gm__ float* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __float2float_ru(x[idx]);
     }
     ```

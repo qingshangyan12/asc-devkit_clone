@@ -82,4 +82,9 @@ bool __hltu(half x, half y)
         }
         dst[idx] = __hltu(x[idx], y[idx]);
     }
+
+    __global__ __vector__ void run_kernel_hltu(__gm__ bool* dst, __gm__ half* x, __gm__ half* y, uint32_t total_length)
+    {
+        asc_vf_call<kernel_hltu>(dim3(1024), dst, x, y, total_length);
+    }
     ```
