@@ -23,6 +23,16 @@ struct CcuKernelArgAlltoAllVMesh1D : CcuKernelArgBase {
     std::vector<std::vector<uint32_t>> subCommRanks;
 };
 
+struct AlltoAllVMesh1DContext : CcuKernelCtxBase {
+    ccu::Variable inputAddr;
+    ccu::Variable outputAddr;
+    ccu::Variable tokenInfo;
+    ccu::Variable srcOffset;
+    ccu::Variable dstOffset;
+    ccu::Variable extAddr;
+    GroupOpSizeVars goSize;
+};
+
 CcuResult CcuAlltoAllVMesh1DKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl

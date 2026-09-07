@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
+#include "kfc_callable_task_registry.h"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -18,36 +19,6 @@ constexpr uint16_t NHR_POST_SYNC_BIT = 1U << 3U;
 constexpr uint16_t NHR_STEP_PRE_SYNC_BIT = 1U << 4U;
 constexpr uint16_t NHR_STEP_POST_SYNC_BIT = 1U << 5U;
 constexpr uint16_t NHR_CKE_IDX = 0U;
-
-struct KfcAllGatherNhrContext : CcuKernelCtxBase {
-    const ChannelHandle* channels = nullptr;
-    uint32_t channelCount = 0;
-    uint32_t rankSize = 0;
-    uint32_t rankId = 0;
-    uint32_t jettyNum = 1;
-    const std::vector<KfcNhrStepInfo>* stepInfoVector = nullptr;
-    const std::map<uint32_t, uint32_t>* rank2ChannelIdx = nullptr;
-
-    ccu::Variable input;
-    std::vector<ccu::Variable> output;
-    std::vector<ccu::Variable> token;
-    ccu::Variable sliceSize;
-    ccu::Variable sliceSizePerJetty;
-    ccu::Variable lastSliceSizePerJetty;
-    ccu::Variable repeatNumInv;
-    ccu::Variable inputSliceStride;
-    ccu::Variable outputSliceStride;
-    ccu::Variable inputRepeatStride;
-    ccu::Variable outputRepeatStride;
-    ccu::Variable isInputOutputEqual;
-    GroupOpSizeVars goSize;
-    std::vector<ccu::Variable> outputSliceOffset;
-    ccu::Variable myRankInputSliceOffset;
-    ccu::Variable repeatFlag;
-    ccu::Variable repeatNum;
-    ccu::Variable constVar1;
-    ccu::Event event;
-};
 
 CcuResult InitResource(KfcAllGatherNhrContext& ctx)
 {
@@ -263,5 +234,9 @@ CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
+
+REGISTER_KFC_CALLABLE_TASK(
+    HcclCMDType::HCCL_CMD_ALLGATHER, KfcServerRole::ALL_GATHER_NHR,
+    CcuKernelAllGatherNHR1DMultiJettyMem2Mem, CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel);
 
 } // namespace mc2_ops_hccl

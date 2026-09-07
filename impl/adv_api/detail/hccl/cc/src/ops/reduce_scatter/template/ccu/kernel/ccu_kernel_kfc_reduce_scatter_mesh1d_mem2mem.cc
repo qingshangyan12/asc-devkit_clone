@@ -9,6 +9,7 @@
  */
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
+#include "kfc_callable_task_registry.h"
 #include "mc2_type.h"
 
 namespace mc2_ops_hccl {
@@ -28,50 +29,6 @@ constexpr uint32_t RS_UNROLL_NUM = 16;   // 最多支持 8 * 16 = 128 个 rank
 // 以及 hccl_inner_def.h 中 CCU_LOOP_COUNT_M2M_RE 保持一致(当前均为 16),否则 goSize 与 LoopGroup 步进错位。
 // 本 TU 未 include hccl_inner_def.h,故在此本地定义;若后续该头进入 include 路径,改为引用它即可。
 constexpr uint64_t CCU_LOOP_COUNT_M2M_RE = 16;
-
-struct KfcReduceScatterMesh1DMem2MemContext : CcuKernelCtxBase {
-    const ChannelHandle* channels{nullptr};
-    uint32_t channelCount{0};
-    uint32_t rankSize{0};
-    uint32_t rankId{0};
-
-    HcclDataType dataType;
-    HcclDataType outputDataType;
-    HcclReduceOp reduceOp;
-
-    std::vector<ccu::Variable> input;
-    ccu::Variable output;
-    std::vector<ccu::Variable> scratch;
-    std::vector<ccu::Variable> token;
-    ccu::Variable currentRankSliceInputOffset;
-    ccu::Variable currentRankSliceOutputOffset;
-    ccu::Variable chunkSize;
-    ccu::Variable chunkLoopNum;
-    ccu::Variable currentSliceSize;
-    ccu::Variable tailSize;
-    GroupOpSizeVars fullGoSize;
-    GroupOpSizeVars tailGoSize;
-    GroupOpSizeVars goSize; // 当前 chunk 选中的 goSize(full 或 tail)
-
-    // 三阶段设计字段(从 hccl ReduceScatterMesh1DMem2MemContext 移植)
-    ccu::Variable normalSliceSize;
-    ccu::Variable lastSliceSize;
-    ccu::Variable inputRepeatStride;
-    ccu::Variable outputRepeatStride;
-    ccu::Variable scratchRepeatStride;
-    ccu::Variable repeatNum;
-    ccu::Variable flag;
-    ccu::Variable constVar1;
-    ccu::Variable sliceSize;
-    ccu::Variable readRepeatNum;
-    ccu::Variable waitRepeatNum;
-    std::vector<ccu::Event> events;
-
-    ccu::LocalAddr myInput;
-    std::vector<ccu::RemoteAddr> remoteInput;
-    std::vector<ccu::LocalAddr> scratchMem;
-    ccu::Event event;
-};
 
 static CcuResult InitResource(KfcReduceScatterMesh1DMem2MemContext& ctx)
 {
@@ -447,4 +404,9 @@ CcuResult CcuReduceScatterMesh1DMem2MemKernel(CcuKernelArg arg)
 
     return CCU_SUCCESS;
 }
+
+REGISTER_KFC_CALLABLE_TASK(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, KfcServerRole::DEFAULT,
+    CcuKernelKfcReduceScatterMesh1DMem2Mem, CcuReduceScatterMesh1DMem2MemKernel);
+
 } // namespace mc2_ops_hccl

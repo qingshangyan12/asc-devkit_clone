@@ -10,6 +10,7 @@
 
 #include "ccu_kernel_all_to_all_mesh1d.h"
 #include "ccu_kernel_alg_base.h"
+#include "kfc_callable_task_registry.h"
 
 namespace mc2_ops_hccl {
 
@@ -180,5 +181,9 @@ CcuResult CcuAlltoAllMesh1DKernel(CcuKernelArg arg)
 
     return CCU_SUCCESS;
 }
+
+REGISTER_KFC_CALLABLE_TASK(
+    HcclCMDType::HCCL_CMD_ALLTOALL, KfcServerRole::DEFAULT, CcuKernelAlltoAllMesh1D,
+    CcuAlltoAllMesh1DKernel);
 
 } // namespace mc2_ops_hccl

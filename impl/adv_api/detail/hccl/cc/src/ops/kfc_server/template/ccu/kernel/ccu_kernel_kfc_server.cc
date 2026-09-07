@@ -85,7 +85,7 @@ static CcuResult ParseKernelArg(KfcServerContext& ctx, CcuKernelArgKfcServer* ke
 
 static CcuResult InitResource(KfcServerContext& ctx) { return CCU_SUCCESS; }
 
-static CcuResult LoadTaskArgs(KfcServerContext& ctx)
+static CcuResult LoadArgs(KfcServerContext& ctx)
 {
     uint32_t argId = 0;
 
@@ -96,14 +96,9 @@ static CcuResult LoadTaskArgs(KfcServerContext& ctx)
     CCU_CHK_RET(ccu::LoadArg(ctx.missionNum, argId++));
     CCU_CHK_RET(ccu::LoadArg(ctx.missionIndex, argId++));
     CCU_CHK_RET(ccu::LoadArg(ctx.token, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.subKernelPc, argId++));
 
     return CCU_SUCCESS;
-}
-
-static CcuResult LoadCallerArgs(KfcServerContext& ctx)
-{
-    CCU_CHK_RET(LoadTaskArgs(ctx));
-    return ccu::LoadArg(ctx.subKernelPc, KFC_SERVER_SUB_KERNEL_PC_ARG_INDEX);
 }
 
 static CcuResult CompArgs(KfcServerContext& ctx)
@@ -270,7 +265,7 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
     KfcServerContext ctx;
     CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
     CCU_CHK_RET(InitResource(ctx));
-    CCU_CHK_RET(LoadCallerArgs(ctx));
+    CCU_CHK_RET(LoadArgs(ctx));
     CCU_CHK_RET(CompArgs(ctx));
     CCU_IF(ctx.missionIndex == 0) { CCU_CHK_RET(KfcServerGenCircularQueue(ctx)); }
     CCU_ELSE { CCU_CHK_RET(SlaveKfcServerGenCircularQueue(ctx)); }

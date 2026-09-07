@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
+#include "kfc_callable_task_registry.h"
 
 namespace mc2_ops_hccl {
 
@@ -29,16 +30,6 @@ constexpr uint32_t A2AV_BITS_PER_EVENT = 16;
 constexpr uint64_t A2AV_MAX_TRANSPORT_SIZE = 256ULL * 1024ULL * 1024ULL;
 constexpr uint64_t A2AV_GROUP_MEMSLICE_SIZE = 32ULL * 1024ULL;
 constexpr uint64_t A2AV_GROUP_LOOP_COUNT = 8ULL;
-
-struct AlltoAllVMesh1DContext : CcuKernelCtxBase {
-    ccu::Variable inputAddr;
-    ccu::Variable outputAddr;
-    ccu::Variable tokenInfo;
-    ccu::Variable srcOffset;
-    ccu::Variable dstOffset;
-    ccu::Variable extAddr;
-    GroupOpSizeVars goSize;
-};
 
 static CcuResult LoadArgs(AlltoAllVMesh1DContext& ctx)
 {
@@ -217,5 +208,9 @@ CcuResult CcuAlltoAllVMesh1DKernel(CcuKernelArg arg)
     }
     return CCU_SUCCESS;
 }
+
+REGISTER_KFC_CALLABLE_TASK(
+    HcclCMDType::HCCL_CMD_ALLTOALLV, KfcServerRole::DEFAULT, CcuKernelAlltoAllVMesh1D,
+    CcuAlltoAllVMesh1DKernel);
 
 } // namespace mc2_ops_hccl

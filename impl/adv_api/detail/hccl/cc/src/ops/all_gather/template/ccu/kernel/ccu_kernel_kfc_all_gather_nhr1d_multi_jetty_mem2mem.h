@@ -28,6 +28,36 @@ struct CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem : CcuKernelArgBase {
     std::vector<std::vector<uint32_t>> subCommRanks;
 };
 
+struct KfcAllGatherNhrContext : CcuKernelCtxBase {
+    const ChannelHandle* channels = nullptr;
+    uint32_t channelCount = 0;
+    uint32_t rankSize = 0;
+    uint32_t rankId = 0;
+    uint32_t jettyNum = 1;
+    const std::vector<KfcNhrStepInfo>* stepInfoVector = nullptr;
+    const std::map<uint32_t, uint32_t>* rank2ChannelIdx = nullptr;
+
+    ccu::Variable input;
+    std::vector<ccu::Variable> output;
+    std::vector<ccu::Variable> token;
+    ccu::Variable sliceSize;
+    ccu::Variable sliceSizePerJetty;
+    ccu::Variable lastSliceSizePerJetty;
+    ccu::Variable repeatNumInv;
+    ccu::Variable inputSliceStride;
+    ccu::Variable outputSliceStride;
+    ccu::Variable inputRepeatStride;
+    ccu::Variable outputRepeatStride;
+    ccu::Variable isInputOutputEqual;
+    GroupOpSizeVars goSize;
+    std::vector<ccu::Variable> outputSliceOffset;
+    ccu::Variable myRankInputSliceOffset;
+    ccu::Variable repeatFlag;
+    ccu::Variable repeatNum;
+    ccu::Variable constVar1;
+    ccu::Event event;
+};
+
 CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl

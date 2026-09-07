@@ -50,17 +50,14 @@
 #include "ccu_log.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
 #include "kfc_server_protocol.h"
-#include "../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
-#include "../all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
-#include "../all_reduce/template/ccu/kernel/ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.h"
-#include "../reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.h"
-#include "../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
-#include "../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_v_mesh1d.h"
-#include "../all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
-#include "../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 
 #ifndef MC2_CLIENT_ENABLE_CCU
 #define MC2_CLIENT_ENABLE_CCU 0
+#endif
+
+#if MC2_CLIENT_ENABLE_CCU
+#include "kfc_callable_task_registry.h"
+#include "../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 #endif
 
 #ifdef __cplusplus
@@ -1504,7 +1501,7 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
             kernelInfo.dieId = dieId;
         }
         auto* kernelArgBase = static_cast<CcuKernelArgBase*>(kernelInfo.kernelArg);
-        if (kernelArgBase == nullptr) {
+        if (!kernelArgBase) {
             HCCL_ERROR("[HcclGetChannelForCcu] kernelArg ptr is err.");
             return HCCL_E_INTERNAL;
         }
@@ -1513,9 +1510,6 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
         }
         kernelArgBase->channelCount = channelNum;
 
-        // KFC caller and callable task use different kernel arguments. The channel request belongs to the
-        // original algorithm task, so keep its base channel fields in sync with the caller argument populated
-        // above. Both resource query and callable-task registration consume subKernelArg.
         auto* subKernelArgBase = static_cast<CcuKernelArgBase*>(kernelInfo.subKernelArg);
         if (subKernelArgBase != nullptr && subKernelArgBase != kernelArgBase) {
             for (u32 i = 0; i < channelNum; ++i) {
@@ -1547,48 +1541,19 @@ HcclResult ValidateCcuKernelRequest(const AlgResourceRequest& resRequest, u32& t
     return HCCL_SUCCESS;
 }
 
-using CcuCallableKernelFunc = CcuResult (*)(CcuKernelArg);
-
 static HcclResult GetKfcCallableTask(
-    const CcuKernelInfo& kernelInfo, const char*& callableTaskFuncName, CcuCallableKernelFunc& callableTaskFunc)
+    const CcuKernelInfo& kernelInfo, const char*& callableTaskFuncName, KfcCallableTaskFunc& callableTaskFunc)
 {
     const auto* kfcArg = static_cast<const CcuKernelArgKfcServer*>(kernelInfo.kernelArg);
-    switch (kfcArg->opType) {
-        case HcclCMDType::HCCL_CMD_ALLGATHER:
-            if (kfcArg->role == KfcServerRole::ALL_GATHER_NHR) {
-                callableTaskFuncName = "CcuKernelAllGatherNHR1DMultiJettyMem2Mem";
-                callableTaskFunc = CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel;
-            } else {
-                callableTaskFuncName = "CcuKernelAllGatherMesh1DMem2Mem";
-                callableTaskFunc = CcuKfcAllGatherMesh1DMem2MemKernel;
-            }
-            break;
-        case HcclCMDType::HCCL_CMD_REDUCE_SCATTER:
-            callableTaskFuncName = "CcuKernelKfcReduceScatterMesh1DMem2Mem";
-            callableTaskFunc = CcuReduceScatterMesh1DMem2MemKernel;
-            break;
-        case HcclCMDType::HCCL_CMD_ALLREDUCE:
-            callableTaskFuncName = "CcuKernelAllReduceMesh1DMem2Mem";
-            callableTaskFunc = CcuKfcAllReduceMesh1DMem2MemKernel;
-            break;
-        case HcclCMDType::HCCL_CMD_ALLTOALL:
-            if (kfcArg->role == KfcServerRole::ALL_TO_ALL_MULTI_JETTY) {
-                callableTaskFuncName = "CcuKernelKfcAllToAllMesh1DMultiJetty";
-                callableTaskFunc = CcuKfcAllToAllMesh1DMultiJettyKernel;
-            } else {
-                callableTaskFuncName = "CcuKernelAlltoAllMesh1D";
-                callableTaskFunc = CcuAlltoAllMesh1DKernel;
-            }
-            break;
-        case HcclCMDType::HCCL_CMD_ALLTOALLV:
-            callableTaskFuncName = "CcuKernelAlltoAllVMesh1D";
-            callableTaskFunc = CcuAlltoAllVMesh1DKernel;
-            break;
-        default:
-            HCCL_ERROR(
-                "[GetKfcCallableTask] unsupported opType[%u]", static_cast<uint32_t>(kfcArg->opType));
-            return HCCL_E_NOT_SUPPORT;
+    KfcCallableTask task;
+    if (!KfcCallableTaskRegistry::Instance().Get(kfcArg->opType, kfcArg->role, task)) {
+        HCCL_ERROR(
+            "[GetKfcCallableTask] task is not registered, opType[%u], role[%u]",
+            static_cast<uint32_t>(kfcArg->opType), static_cast<uint32_t>(kfcArg->role));
+        return HCCL_E_NOT_SUPPORT;
     }
+    callableTaskFuncName = task.funcName;
+    callableTaskFunc = task.func;
     return HCCL_SUCCESS;
 }
 
@@ -1777,7 +1742,7 @@ static HcclResult AccumulateKernelRes(
             kernelInfo, kernelInfo.kernelFuncName, kernelInfo.kernelFunc, CCU_KERNEL_ROLE_NORMAL, groupedResMap);
     }
     const char* callableTaskFuncName;
-    CcuCallableKernelFunc callableTaskFunc;
+    KfcCallableTaskFunc callableTaskFunc;
     CHK_RET(AccumulateKernelFuncRes(
         kernelInfo, kernelInfo.kernelFuncName, kernelInfo.kernelFunc, CCU_KERNEL_ROLE_CALLER, groupedResMap));
     CHK_RET(GetKfcCallableTask(kernelInfo, callableTaskFuncName, callableTaskFunc));
@@ -1886,7 +1851,7 @@ static HcclResult RegisterCcuKernels(
                     continue;
                 }
                 const char* callableTaskFuncName;
-                CcuCallableKernelFunc callableTaskFunc;
+                KfcCallableTaskFunc callableTaskFunc;
                 CHK_RET(GetKfcCallableTask(kernelInfo, callableTaskFuncName, callableTaskFunc));
                 CcuKernelRegisterCfg cfg{};
                 CcuKernelRegisterCfgInit(&cfg);
@@ -1932,7 +1897,7 @@ static HcclResult RegisterCcuKernels(
                     continue;
                 }
                 const char* callableTaskFuncName;
-                CcuCallableKernelFunc callableTaskFunc;
+                KfcCallableTaskFunc callableTaskFunc;
                 CHK_RET(GetKfcCallableTask(kernelInfo, callableTaskFuncName, callableTaskFunc));
                 uint64_t subKernelPc = 0;
                 CcuResult getFuncRet = HcommCcuFunctionGet(insHandle, callableTaskFuncName, &subKernelPc);

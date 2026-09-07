@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
+#include "kfc_callable_task_registry.h"
 
 namespace mc2_ops_hccl {
 
@@ -17,41 +18,6 @@ constexpr int AG_M2M_CKE_IDX = 0;
 constexpr int AG_M2M_POST_SYNC_ID = 3;
 constexpr uint32_t AG_M2M_BITS_PER_EVENT = 16;
 constexpr uint16_t AG_M2M_FULL_EVENT_MASK = static_cast<uint16_t>(0xFFFFU);
-
-struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
-    const ChannelHandle* channels{nullptr};
-    uint32_t channelCount{0};
-    uint32_t rankSize{0};
-    uint32_t rankId{0};
-
-    ccu::Variable input;
-    std::vector<ccu::Variable> output;
-    std::vector<ccu::Variable> token;
-    ccu::Variable currentRankSliceInputOffset;
-    ccu::Variable currentRankSliceOutputOffset;
-    ccu::Variable tmpRepeatNum;
-    ccu::Variable inputRepeatStride;
-    ccu::Variable outputRepeatStride;
-    ccu::Variable normalSliceSize;
-    ccu::Variable lastSliceSize;
-    ccu::Variable isInputOutputEqual;
-    // Kept to consume queue payload slots [5..8].  The KFC path must not
-    // create a GroupCopy/LoopGroup from inside the server's persistent loop.
-    GroupOpSizeVars goSize;
-    ccu::LocalAddr srcLocCopy;
-    ccu::LocalAddr localDst;
-    std::vector<ccu::Event> events;
-    ccu::Event localCopyEvent;
-
-    ccu::Variable constVar1;
-    ccu::Variable repeatTimeFlag;
-    ccu::Variable remoteRepeatTimeFlag;
-    ccu::Variable waitRepeatNum;
-    ccu::Variable localCopyRepeatNum;
-    ccu::Variable sliceSize;
-    ccu::LocalAddr src;
-    std::vector<ccu::RemoteAddr> dst;
-};
 
 static CcuResult InitResource(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
@@ -294,5 +260,12 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(CcuKernelArg arg)
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
+
+REGISTER_KFC_CALLABLE_TASK(
+    HcclCMDType::HCCL_CMD_ALLGATHER, KfcServerRole::DEFAULT, CcuKernelAllGatherMesh1DMem2Mem,
+    CcuKfcAllGatherMesh1DMem2MemKernel);
+REGISTER_KFC_CALLABLE_TASK(
+    HcclCMDType::HCCL_CMD_ALLGATHER, KfcServerRole::ALL_GATHER_MESH, CcuKernelAllGatherMesh1DMem2Mem,
+    CcuKfcAllGatherMesh1DMem2MemKernel);
 
 } // namespace mc2_ops_hccl

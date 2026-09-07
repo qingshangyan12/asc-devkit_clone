@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.h"
+#include "kfc_callable_task_registry.h"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -16,25 +17,6 @@ constexpr uint16_t A2A_OUTPUT_XN_ID = 1U;
 constexpr uint16_t A2A_TOKEN_XN_ID = 2U;
 constexpr uint16_t A2A_POST_SYNC_BIT = 1U << 5U;
 constexpr uint16_t A2A_CKE_IDX = 0U;
-
-struct KfcAllToAllContext : CcuKernelCtxBase {
-    const ChannelHandle* channels = nullptr;
-    uint32_t channelCount = 0;
-    uint32_t rankSize = 0;
-    uint32_t rankId = 0;
-
-    ccu::Variable input;
-    ccu::Variable output;
-    ccu::Variable token;
-    std::vector<ccu::Variable> peerOutput;
-    std::vector<ccu::Variable> peerToken;
-    ccu::Variable sliceSize;
-    ccu::Variable srcStride;
-    ccu::Variable srcOffset;
-    ccu::Variable dstOffset;
-    GroupOpSizeVars goSize;
-    ccu::Event event;
-};
 
 CcuResult InitResource(KfcAllToAllContext& ctx)
 {
@@ -170,5 +152,9 @@ CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg)
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
+
+REGISTER_KFC_CALLABLE_TASK(
+    HcclCMDType::HCCL_CMD_ALLTOALL, KfcServerRole::ALL_TO_ALL_MULTI_JETTY,
+    CcuKernelKfcAllToAllMesh1DMultiJetty, CcuKfcAllToAllMesh1DMultiJettyKernel);
 
 } // namespace mc2_ops_hccl

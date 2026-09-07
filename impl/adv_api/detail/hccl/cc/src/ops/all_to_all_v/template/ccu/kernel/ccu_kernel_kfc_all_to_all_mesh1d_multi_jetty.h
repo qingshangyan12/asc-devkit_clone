@@ -23,6 +23,25 @@ struct CcuKernelArgKfcAllToAllMesh1DMultiJetty : CcuKernelArgBase {
     std::vector<std::vector<uint32_t>> subCommRanks;
 };
 
+struct KfcAllToAllContext : CcuKernelCtxBase {
+    const ChannelHandle* channels = nullptr;
+    uint32_t channelCount = 0;
+    uint32_t rankSize = 0;
+    uint32_t rankId = 0;
+
+    ccu::Variable input;
+    ccu::Variable output;
+    ccu::Variable token;
+    std::vector<ccu::Variable> peerOutput;
+    std::vector<ccu::Variable> peerToken;
+    ccu::Variable sliceSize;
+    ccu::Variable srcStride;
+    ccu::Variable srcOffset;
+    ccu::Variable dstOffset;
+    GroupOpSizeVars goSize;
+    ccu::Event event;
+};
+
 CcuResult CcuKfcAllToAllMesh1DMultiJettyKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl
