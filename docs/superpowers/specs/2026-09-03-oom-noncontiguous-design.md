@@ -39,21 +39,27 @@ The extension is appended after the established layout:
 [OOM descriptor block]...
 ```
 
-All integers use the existing runtime ABI byte order and natural 8-byte offsets
-for `u64` values. `size` includes the complete descriptor block, including its
-own `size` field.
+All integers use the existing runtime ABI byte order. Descriptor blocks are
+packed exactly as specified below and contain no implicit alignment padding.
+`size` includes the complete descriptor block, including its own `size` field.
 
 ### Single Tensor Descriptor
 
 ```text
-[u64 size][u32 kind = 1][u32 reserved][TensorViewDesc]
+offset 0:  u64 size = 26
+offset 8:  u8 type = 1
+offset 9:  u8 reserved
+offset 10: TensorViewDesc
 ```
 
 ### TensorList Descriptor
 
 ```text
-[u64 size][u32 kind = 2][u32 flag][u64 count]
-[TensorViewDesc] * count
+offset 0:  u64 size = 12 + count * 16
+offset 8:  u8 type = 2
+offset 9:  u8 flag
+offset 10: u16 count
+offset 12: TensorViewDesc[count]
 ```
 
 `flag` identifies TensorList U/F mode. This extension is independent of and
@@ -62,13 +68,15 @@ does not alter the existing dynamic TensorList second-level-pointer layout.
 ### TensorViewDesc
 
 ```text
-[u32 version = 1][u32 nDim][u64 storage_shape] * nDim
+offset 0: u32 version = 1
+offset 4: u32 reserved
+offset 8: u64 storageShapeSize
 ```
 
-The byte length for one view is the product of `storage_shape` dimensions and
-the tensor element size. The implementation validates descriptor version,
-minimum block size, `nDim`, dimension values, multiplication overflow, count,
-and block bounds before using a descriptor.
+`storageShapeSize` is the storage shape's element count. The byte length for
+one view is `storageShapeSize * elementSize`. The implementation validates the
+descriptor version, exact block size, count, nonzero element count and size
+multiplication overflow before using a descriptor.
 
 ## Mapping and Runtime Selection
 
@@ -81,11 +89,12 @@ At runtime, use storage-shape parsing only when both conditions are true:
 1. The loaded JSON declares `oom.version = 1`.
 2. The trailing extension begins with `magic = 1` and has supported version 1.
 
-For each ordinary tensor, the parsed storage-shape byte length replaces the
-legacy view/logical-shape-derived length. TensorList descriptors are parsed
-from their own `kind = 2` blocks, while the legacy second-level-pointer block is
-left untouched. A missing magic, missing capability JSON, or unsupported
-extension version selects the existing OOM argument interpretation.
+For each ordinary tensor, the byte length calculated from the parsed storage
+shape element count replaces the legacy view/logical-shape-derived length.
+TensorList descriptors are parsed from their own `type = 2` blocks, while the
+legacy second-level-pointer block is left untouched. A missing magic, missing
+capability JSON, or unsupported extension version selects the existing OOM
+argument interpretation.
 
 Malformed metadata after a valid magic is an invalid OOM extension and must not
 be interpreted as legacy data; parsing must fail safely before range use.
@@ -104,10 +113,10 @@ be interpreted as legacy data; parsing must fail safely before range use.
 
 - Existing static and dynamic ordinary-tensor OOM tests remain unchanged.
 - Existing TensorList U and F tests remain unchanged with no extension.
-- Add extension tests for a padded storage shape, rank 0/1/max-rank values, and
-  several TensorList entries.
+- Add extension tests for a larger storage shape element count and several
+  TensorList entries in both U and F modes.
 - Add negative tests for bad magic, unsupported version, undersized `size`,
-  invalid `kind`, truncated block, invalid count, invalid dimension, and size
-  multiplication overflow.
+  invalid `type`, truncated block, invalid count, zero storage shape size, and
+  size multiplication overflow.
 - Verify JSON output with and without OOM capability and loader acceptance of
   both forms.
