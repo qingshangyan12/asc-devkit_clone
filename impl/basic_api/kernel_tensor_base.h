@@ -271,7 +271,8 @@ protected:
         if (address_ == nullptr || oriAddress_ == nullptr) {
             __asc_aicore::printf_impl_assert(
                 "[ASSERT] GlobalTensor::%s requires a non-null GM buffer. "
-                "Call SetGlobalBuffer before accessing the tensor.\n", apiName);
+                "Call SetGlobalBuffer before accessing the tensor.\n",
+                apiName);
             // Keep the guard effective even when diagnostic printing is disabled.
             trap();
         }
