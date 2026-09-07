@@ -172,6 +172,10 @@ private:
     __aicore__ inline void CopyDeqTensorToL1(
         const LocalTensor<uint64_t>& dst, const GlobalTensor<uint64_t>& src, int32_t calNSize)
     {
+        bool preAllocation = false;
+        if constexpr ((ToMatmulConfig(MM_CFG).preAllocationMode & PreallocationMode::PREALLOCATION_ENABLE_QUANT) != 0) {
+            preAllocation = true;
+        }
         event_t eventIDFixToMte2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::FIX_MTE2));
         SetFlag<HardEvent::FIX_MTE2>(eventIDFixToMte2);
         WaitFlag<HardEvent::FIX_MTE2>(eventIDFixToMte2);
@@ -184,10 +188,18 @@ private:
             Nd2NzParams intriParams{1, 1, dValue, 0, dValue, 1, 1, 0};
             GlobalTensor<uint32_t> srcTmp;
             srcTmp.SetGlobalBuffer((__gm__ uint32_t*)src.GetPhyAddr(), src.GetSize());
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+            DataCopy(dst.ReinterpretCast<uint32_t>(), srcTmp, intriParams, preAllocation);
+#else
             DataCopy(dst.ReinterpretCast<uint32_t>(), srcTmp, intriParams);
+#endif
         } else {
             DataCopyParams intriParams{1, static_cast<uint16_t>(deqDataSize / ONE_BLK_SIZE), 0, 0};
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+            DataCopy(dst, src, intriParams, preAllocation);
+#else
             DataCopy(dst, src, intriParams);
+#endif
         }
         event_t eventIDMte2ToFix = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_FIX));
         SetFlag<HardEvent::MTE2_FIX>(eventIDMte2ToFix);
