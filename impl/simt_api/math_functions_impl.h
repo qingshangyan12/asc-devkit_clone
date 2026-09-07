@@ -918,8 +918,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_sign(float& dst, float& sr
     dst = dst / denominator;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x);
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cos_poly(float x)
 {
     x = x * x;
