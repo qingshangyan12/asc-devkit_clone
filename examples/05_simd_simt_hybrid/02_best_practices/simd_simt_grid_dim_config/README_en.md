@@ -194,7 +194,7 @@ When launching a SIMT kernel function, the first parameter in the kernel invocat
 These logical cores must ultimately be mapped to the actual Vector Cores available on the hardware, so two concepts need to be introduced:
 
 - **Logical cores**: The number of thread blocks launched, representing the number of parallel tasks the software side wants to launch
-- **Physical cores**: The actual number of Vector Cores available on the hardware, which must be queried at runtime via [aclrtGetDeviceInfo](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/runtimeapi/aclcppdevg_03_1867.html) (64 in this example environment). The code example is as follows:
+- **Physical cores**: The actual number of Vector Cores available on the hardware, which must be queried at runtime via [aclrtGetDeviceInfo](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/API/runtimeapi/aclcppdevg_03_1867.html) (64 in this example environment). The code example is as follows:
   ```cpp
   // Query the number of physical Vector Cores (AIV) at runtime; return AIV_CORE_NUM on query failure
   uint32_t query_aiv_core_num(int32_t device_id)
