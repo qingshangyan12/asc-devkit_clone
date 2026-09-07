@@ -1,7 +1,7 @@
 # DataCachePreload Indirect Index Preload Sample
 
 ## Overview
-**This sample is for testing and validation only, not for actual operator usage.** This sample demonstrates how to use [DataCachePreload](../../../../../docs/api/SIMD-API/基础API/缓存控制/DataCachePreload.md) in an indirect index (random-hopping) access scenario: when the Scalar unit reads scattered data from GM, DataCachePreload is used to proactively load upcoming Cache Lines into DCache, reducing Scalar memory access wait time and improving performance.
+**This sample is for testing and validation only, not for actual operator usage.** This sample demonstrates how to use [DataCachePreload](../../../../../docs/zh/api/SIMD-API/basic_api/cache_control/DataCachePreload.md) in an indirect index (random-hopping) access scenario: when the Scalar unit reads scattered data from GM, DataCachePreload is used to proactively load upcoming Cache Lines into DCache, reducing Scalar memory access wait time and improving performance.
 
 ## Supported Products and CANN Software Versions
 
@@ -13,7 +13,7 @@
 
 ## Directory Structure
 
-```
+```text
 ├── data_cache_preload
 │   ├── scripts
 │   │   ├── gen_data.py             // Input data and ground truth generation script
@@ -41,92 +41,103 @@ $$
 result = \sum_{i=0}^{255} data\_gm[indices[i]]
 $$
 
-- data_gm is a 64KB random uint8_t data buffer
-- indices contains 256 random offsets, each pointing to a different Cache-Line-aligned position
-- Since indices are randomly scattered across 64KB, the vast majority of Scalar reads trigger a DCache miss
-- DataCachePreload asynchronously pre-fetches the next Cache Line while reading current data, forming a pipeline between Scalar reads and GM to DCache data movement
+- `data_gm` is a 64KB random `uint8_t` data buffer.
+- `indices` contains 256 random offsets, each pointing to a different Cache-Line-aligned position.
+- Since `indices` are randomly scattered across 64KB, the vast majority of Scalar reads trigger a DCache miss.
+- `DataCachePreload` asynchronously pre-fetches the next Cache Line while reading current data, forming a pipeline between Scalar reads and GM to DCache data movement.
 
 #### SCENARIO_NUM=1 (Indirect Index Accumulation, without DataCachePreload)
-- Sample Specifications:
-  <table border="1" align="center">
-  <tr><td rowspan="1" align="center">Sample Type(OpType)</td><td colspan="4" align="center">DataCachePreloadNoPreload</td></tr>
-  <tr><td rowspan="2" align="center">Sample Input</td><td align="center">name</td><td align="center">size</td><td align="center">data type</td><td align="center">Description</td></tr>
-  <tr><td align="center">data_gm</td><td align="center">[65536]</td><td align="center">uint8_t</td><td align="center">64KB random data buffer (1024 Cache Lines)</td></tr>
-  <tr><td align="center"></td><td align="center">indices</td><td align="center">[256]</td><td align="center">uint32_t</td><td align="center">Random indices, Cache-Line-aligned</td></tr>
-  <tr><td rowspan="1" align="center">Sample Output</td><td align="center">result</td><td align="center">[1]</td><td align="center">uint32_t</td><td align="center">Accumulated sum</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Name</td><td colspan="4" align="center">kernel_no_preload</td></tr>
-  </table>
+
+Sample Type (OpType): DataCachePreloadNoPreload
+
+| name | size | data type | Description |
+|------|------|-----------|-------------|
+| data_gm | [65536] | uint8_t | 64KB random data buffer (1024 Cache Lines) |
+| indices | [256] | uint32_t | Random indices, Cache-Line-aligned |
+| result | [1] | uint32_t | Accumulated sum (sample output) |
+
+Kernel Name: kernel_no_preload
 
 #### SCENARIO_NUM=2 (Indirect Index Accumulation, with DataCachePreload)
-- Sample Specifications:
-  <table border="1" align="center">
-  <tr><td rowspan="1" align="center">Sample Type(OpType)</td><td colspan="4" align="center">DataCachePreloadWithPreload</td></tr>
-  <tr><td rowspan="2" align="center">Sample Input</td><td align="center">name</td><td align="center">size</td><td align="center">data type</td><td align="center">Description</td></tr>
-  <tr><td align="center">data_gm</td><td align="center">[65536]</td><td align="center">uint8_t</td><td align="center">64KB random data buffer (1024 Cache Lines)</td></tr>
-  <tr><td align="center"></td><td align="center">indices</td><td align="center">[256]</td><td align="center">uint32_t</td><td align="center">Random indices, Cache-Line-aligned</td></tr>
-  <tr><td rowspan="1" align="center">Sample Output</td><td align="center">result</td><td align="center">[1]</td><td align="center">uint32_t</td><td align="center">Accumulated sum</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Name</td><td colspan="4" align="center">kernel_with_preload</td></tr>
-  </table>
+
+Sample Type (OpType): DataCachePreloadWithPreload
+
+| name | size | data type | Description |
+|------|------|-----------|-------------|
+| data_gm | [65536] | uint8_t | 64KB random data buffer (1024 Cache Lines) |
+| indices | [256] | uint32_t | Random indices, Cache-Line-aligned |
+| result | [1] | uint32_t | Accumulated sum (sample output) |
+
+Kernel Name: kernel_with_preload
 
 ## Sample Implementation
 
 ### SCENARIO_NUM=1 (Without DataCachePreload)
 
 `kernel_no_preload` implementation:
+
 1. Create a `GlobalTensor<uint64_t>` bound to data_gm and copy GM data to UB via `DataCopy`:
-   ```cpp
-   AscendC::GlobalTensor<uint64_t> dataGlobal;
-   dataGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(data_gm),
-                              bufferSize / sizeof(uint64_t));
-   AscendC::LocalTensor<uint64_t> xLocal = ubAllocator.Alloc<uint64_t, dataLen / 8>();
-   AscendC::DataCopy(xLocal, dataGlobal, dataLen / 8);
-   ```
+
+    ```cpp
+    AscendC::GlobalTensor<uint64_t> dataGlobal;
+    dataGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint64_t*>(data_gm),
+                               bufferSize / sizeof(uint64_t));
+    AscendC::LocalTensor<uint64_t> xLocal = ubAllocator.Alloc<uint64_t, dataLen / 8>();
+    AscendC::DataCopy(xLocal, dataGlobal, dataLen / 8);
+    ```
+
 2. Directly read `data_gm[indices[i]]` via Scalar in the loop and accumulate:
-   ```cpp
-   for (uint32_t i = 0; i < count; i++) {
-       uint32_t idx = indices[i];
-       sum += data_gm[idx];
-   }
-   ```
-3. Since indices are randomly scattered across 64KB, most Scalar reads trigger DCache misses, making memory access latency the main bottleneck
+
+    ```cpp
+    for (uint32_t i = 0; i < count; i++) {
+        uint32_t idx = indices[i];
+        sum += data_gm[idx];
+    }
+    ```
+
+3. Since indices are randomly scattered across 64KB, most Scalar reads trigger DCache misses, making memory access latency the main bottleneck.
 
 ### SCENARIO_NUM=2 (With DataCachePreload)
 
 `kernel_with_preload` implementation:
-1. Create a `GlobalTensor<uint64_t>` bound to data_gm and copy GM data to UB via `DataCopy` (same as Scenario 1)
-2. Compute Cache-Line-aligned offset: `cacheOffset = idx & ~63ULL` (align to 64B boundary)
-3. Preload the first index's Cache Line before the loop via `DataCachePreload(dataGlobal, cacheOffset)`
+
+1. Create a `GlobalTensor<uint64_t>` bound to data_gm and copy GM data to UB via `DataCopy` (same as Scenario 1).
+2. Compute Cache-Line-aligned offset: `cacheOffset = idx & ~63ULL` (align to 64B boundary).
+3. Preload the first index's Cache Line before the loop via `DataCachePreload(dataGlobal, cacheOffset)`.
 4. In the loop: read current data → preload the next Cache Line, forming a pipeline:
-   ```cpp
-   // First preload
-   uint32_t idxCurr = indices[0];
-   int64_t cacheOffset = (int64_t)(idxCurr & ~63ULL);
-   AscendC::DataCachePreload(dataGlobal, cacheOffset);
 
-   for (uint32_t i = 0; i < count; i++) {
-       // Read current (preloaded in previous iteration, likely DCache hit)
-       uint8_t val = data_gm[idxCurr];
-       sum += val;
-       // Preload next
-       if (i + 1 < count) {
-           uint32_t idxNext = indices[i + 1];
-           int64_t offsetNext = (int64_t)(idxNext & ~63ULL);
-           AscendC::DataCachePreload(dataGlobal, offsetNext);
-           idxCurr = idxNext;
-       }
-   }
-   ```
+    ```cpp
+    // First preload
+    uint32_t idxCurr = indices[0];
+    int64_t cacheOffset = (int64_t)(idxCurr & ~63ULL);
+    AscendC::DataCachePreload(dataGlobal, cacheOffset);
 
-- DataCachePreload Constraints
-  - Each call preloads exactly 1 Cache Line (64B)
-  - Consecutive calls should not exceed 4, otherwise the Reservation Station may stall
-  - Preload is an async instruction that can overlap with subsequent computation/memory access
+    for (uint32_t i = 0; i < count; i++) {
+        // Read current (preloaded in previous iteration, likely DCache hit)
+        uint8_t val = data_gm[idxCurr];
+        sum += val;
+        // Preload next
+        if (i + 1 < count) {
+            uint32_t idxNext = indices[i + 1];
+            int64_t offsetNext = (int64_t)(idxNext & ~63ULL);
+            AscendC::DataCachePreload(dataGlobal, offsetNext);
+            idxCurr = idxNext;
+        }
+    }
+    ```
+
+DataCachePreload Constraints:
+
+- Each call preloads exactly 1 Cache Line (64B).
+- Consecutive calls should not exceed 4, otherwise the Reservation Station may stall.
+- Preload is an async instruction that can overlap with subsequent computation/memory access.
 
 ## Performance Data and Analysis
 
 When profiling with `msprof`, compare the execution time of the two kernels:
-- `kernel_no_preload`: High DCache miss rate, large Scalar read latency
-- `kernel_with_preload`: Preloads the next round's data in advance, significantly improving DCache hit rate
+
+- `kernel_no_preload`: High DCache miss rate, large Scalar read latency.
+- `kernel_with_preload`: Preloads the next round's data in advance, significantly improving DCache hit rate.
 
 ### Performance Comparison
 
@@ -146,9 +157,9 @@ The following performance data is the average of 5 independent runs to eliminate
 | **Task Duration (us)** | 31.018 | 20.445 | **1.52x speedup** |
 | **aiv_scalar_time (us)** | 28.344 | 17.910 | **Reduced by 36.8%** |
 
-> **Metric Descriptions:**
-> - **Task Duration**: End-to-end kernel execution time, the most direct performance indicator
-> - **aiv_scalar_time**: Scalar unit execution time; in indirect index scenarios, Scalar memory access is the main bottleneck
+Metric descriptions:
+**Task Duration**: End-to-end kernel execution time, the most direct performance indicator.
+**aiv_scalar_time**: Scalar unit execution time; in indirect index scenarios, Scalar memory access is the main bottleneck.
 
 #### Detailed Data from 5 Independent Runs (Atlas A2 Training Series)
 
@@ -181,7 +192,7 @@ The following performance data is the average of 5 independent runs to eliminate
 Execute the following steps in this sample's root directory.
 
 - Configure Environment Variables
-  Please refer to the [installation guide](../../../../../docs/quick_start.md#prepare&install) to configure environment variables based on your CANN installation.
+  Please refer to the [installation guide](../../../../../docs/zh/quick_start.md#prepare&install) to configure environment variables based on your CANN installation.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -216,7 +227,7 @@ Execute the following steps in this sample's root directory.
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU, CPU debug, or NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | dav-2201 for Atlas A2/A3 series, dav-3510 for Ascend 950 series |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | dav-2201 for Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 for Ascend 950 series |
   | `SCENARIO_NUM` | `1` (default), `2` | Scenario: 1 (no preload), 2 (with preload) |
 
 - Result
