@@ -154,8 +154,9 @@ HcclResult GetProtocolByEngine(const OpParam& param, std::vector<CommProtocol>& 
         case CommEngine::COMM_ENGINE_AICPU:
         case CommEngine::COMM_ENGINE_AICPU_TS:
             protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
-            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_TP);
             protocols.push_back(CommProtocol::COMM_PROTOCOL_PCIE);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBOE);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UB_RTP);
             break;
         case CommEngine::COMM_ENGINE_CCU:
             protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
@@ -487,15 +488,6 @@ HcclResult CalcChannelRequestNhr(
         std::vector<uint32_t> netLayersVector(netLayers, netLayers + netLayerNum);
 
         for (auto netLayer : netLayersVector) {
-            // For multi-level NHR, use the upper-level links. Level0 links
-            // are only valid for the single-server PCIe-SW exception.
-            const bool isNeedLevel0NhrChannel
-                = ((topoInfo->level0Topo == Level0Shape::CLOS
-                    || topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS)
-                   && topoInfo->level0PcieMix && topoInfo->serverNum == 1);
-            if (netLayerNum > 1 && netLayer == 0 && !isNeedLevel0NhrChannel) {
-                continue;
-            }
             CommLink* linkList = nullptr;
             u32 listSize;
             CHK_RET(HcclRankGraphGetLinks(comm, netLayer, myRank, subcommInfo[0][rankIdx], &linkList, &listSize));
