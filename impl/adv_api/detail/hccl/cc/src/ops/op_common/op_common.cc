@@ -1504,7 +1504,7 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
             kernelInfo.dieId = dieId;
         }
         auto* kernelArgBase = static_cast<CcuKernelArgBase*>(kernelInfo.kernelArg);
-        if (!kernelArgBase) {
+        if (kernelArgBase == nullptr) {
             HCCL_ERROR("[HcclGetChannelForCcu] kernelArg ptr is err.");
             return HCCL_E_INTERNAL;
         }
@@ -1512,6 +1512,17 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
             kernelArgBase->channels[i] = kernelChannels[i];
         }
         kernelArgBase->channelCount = channelNum;
+
+        // KFC caller and callable task use different kernel arguments. The channel request belongs to the
+        // original algorithm task, so keep its base channel fields in sync with the caller argument populated
+        // above. Both resource query and callable-task registration consume subKernelArg.
+        auto* subKernelArgBase = static_cast<CcuKernelArgBase*>(kernelInfo.subKernelArg);
+        if (subKernelArgBase != nullptr && subKernelArgBase != kernelArgBase) {
+            for (u32 i = 0; i < channelNum; ++i) {
+                subKernelArgBase->channels[i] = kernelChannels[i];
+            }
+            subKernelArgBase->channelCount = channelNum;
+        }
         HCCL_INFO("[HcclGetChannelForCcu] Get [%lu] channels, dieId[%u]", channelNum, kernelInfo.dieId);
     }
     return HCCL_SUCCESS;
