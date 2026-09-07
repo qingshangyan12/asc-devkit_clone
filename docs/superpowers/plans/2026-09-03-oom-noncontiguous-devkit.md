@@ -167,7 +167,7 @@ __gm__ uint8_t* oomStorageShapeCursor =
     (__gm__ uint8_t*)tiling + tmpTilingSizeForOOM + 8;
 bool hasOomStorageShape = AscendC::OOMHasStorageShapeHeader(oomStorageShapeCursor);
 if (hasOomStorageShape) {
-    oomStorageShapeCursor += 16;
+    oomStorageShapeCursor += 2;
 }
 ```
 
@@ -236,7 +236,7 @@ In the same branch that extends `opParaSize`, add:
 js["oom"] = {"version": 1, "tensor_version": 1}
 ```
 
-Increase OOM `opParaSize` by the fixed 16-byte extension header. This makes the
+Increase OOM `opParaSize` by the fixed 2-byte extension header. This makes the
 magic/version probe safe for a new binary invoked by a legacy runtime. Runtime
 owns any additional descriptor bytes and must extend its allocation by their
 actual total size. The existing bytes and their ordering remain unchanged.
@@ -307,4 +307,4 @@ git commit -m "test: verify OOM storage-shape compatibility"
 
 ## External Integration Contract
 
-The external runtime must treat the JSON `oom` property as optional, preserve all existing args bytes, and append the approved header and descriptor blocks after the existing OOM payload. It must allocate at least the JSON `opParaSize`, which includes the 16-byte extension header, and add the actual descriptor size when emitting the extension. This runtime implementation is not part of the devkit-only change.
+The external runtime must treat the JSON `oom` property as optional, preserve all existing args bytes, and append the approved header and descriptor blocks after the existing OOM payload. It must allocate at least the JSON `opParaSize`, which includes the 2-byte extension header, and add the actual descriptor size when emitting the extension. This runtime implementation is not part of the devkit-only change.

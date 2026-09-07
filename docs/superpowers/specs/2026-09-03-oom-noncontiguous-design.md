@@ -35,18 +35,19 @@ The extension is appended after the established layout:
 
 ```text
 [TilingData ... IN_DYN ... OUT_0 ... OUTSHAPE ... WS]
-[u64 magic = 1][u32 version = 1][u32 reserved]
+[u4 magic = 1][u4 version = 1][u8 reserved]
 [OOM descriptor block]...
 ```
 
-All integers use the existing runtime ABI byte order. Descriptor blocks are
-packed exactly as specified below and contain no implicit alignment padding.
+The first byte stores `magic` in bits 3:0 and `version` in bits 7:4; the second
+byte stores `reserved`. All multi-byte integers use the existing runtime ABI
+byte order. Descriptor blocks are packed exactly as specified below and contain no implicit alignment padding.
 `size` includes the complete descriptor block, including its own `size` field.
 
 ### Single Tensor Descriptor
 
 ```text
-offset 0:  u64 size = 26
+offset 0:  u64 size = 19
 offset 8:  u8 type = 1
 offset 9:  u8 reserved
 offset 10: TensorViewDesc
@@ -55,7 +56,7 @@ offset 10: TensorViewDesc
 ### TensorList Descriptor
 
 ```text
-offset 0:  u64 size = 12 + count * 16
+offset 0:  u64 size = 12 + count * 9
 offset 8:  u8 type = 2
 offset 9:  u8 flag
 offset 10: u16 count
@@ -68,9 +69,9 @@ does not alter the existing dynamic TensorList second-level-pointer layout.
 ### TensorViewDesc
 
 ```text
-offset 0: u32 version = 1
-offset 4: u32 reserved
-offset 8: u64 storageShapeSize
+offset 0, bits 3:0: u4 version = 1
+offset 0, bits 7:4: u4 reserved
+offset 1: u64 storageShapeSize
 ```
 
 `storageShapeSize` is the storage shape's element count. The byte length for

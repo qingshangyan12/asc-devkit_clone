@@ -177,8 +177,10 @@ __aicore__ static inline void OOMCheckAddrRange(__gm__ T* gmAddr, const uint64_t
 __aicore__ static inline bool OOMHasStorageShapeHeader(__gm__ uint8_t* cursor)
 {
 #if defined(ASCENDC_OOM) && ASCENDC_OOM == 1
-    return *reinterpret_cast<__gm__ uint64_t*>(cursor) == g_oomStorageShapeMagic &&
-           *reinterpret_cast<__gm__ uint32_t*>(cursor + sizeof(uint64_t)) == g_oomStorageShapeVersion;
+    const uint8_t magicAndVersion = cursor[0];
+    const uint8_t magic = magicAndVersion & g_oomNibbleMask;
+    const uint8_t version = (magicAndVersion >> g_oomNibbleShift) & g_oomNibbleMask;
+    return magic == g_oomStorageShapeMagic && version == g_oomStorageShapeVersion;
 #else
     (void)cursor;
     return false;
@@ -208,8 +210,9 @@ __aicore__ static inline bool OOMGetTensorViewStorageSize(
     if (available < g_oomTensorViewDescriptorSize) {
         return false;
     }
-    const uint32_t version = OOMReadPackedValue<uint32_t>(view);
-    const uint64_t storageShapeSize = OOMReadPackedValue<uint64_t>(view + 2 * sizeof(uint32_t));
+    const uint8_t versionAndReserved = OOMReadPackedValue<uint8_t>(view);
+    const uint8_t version = versionAndReserved & g_oomNibbleMask;
+    const uint64_t storageShapeSize = OOMReadPackedValue<uint64_t>(view + sizeof(uint8_t));
     if (version != g_oomTensorViewVersion || storageShapeSize == 0 || elementSize == 0 ||
         storageShapeSize > (~static_cast<uint64_t>(0)) / elementSize) {
         return false;
@@ -297,7 +300,7 @@ __aicore__ static inline bool OOMTryRegisterTensorListWithStorageShape(
     }
     view = cursor + g_oomTensorListDescriptorHeaderSize;
     for (uint16_t index = 0; index < count; ++index) {
-        const uint64_t storageShapeSize = OOMReadPackedValue<uint64_t>(view + 2 * sizeof(uint32_t));
+        const uint64_t storageShapeSize = OOMReadPackedValue<uint64_t>(view + sizeof(uint8_t));
         const uint64_t storageSize = storageShapeSize * elementSize;
         OOMCheckAddrRange(reinterpret_cast<__gm__ uint8_t*>(addresses[index]), storageSize / scaleValue);
         view += g_oomTensorViewDescriptorSize;

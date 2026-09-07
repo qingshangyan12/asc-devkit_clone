@@ -371,7 +371,7 @@ def add_op_param_to_workspace(
             "AscendC::OOMHasStorageShapeHeader(oomStorageShapeCursor);\n"
         )
         source += "    if (hasOomStorageShape) {\n"
-        source += "        oomStorageShapeCursor += 16;\n"
+        source += "        oomStorageShapeCursor += 2;\n"
         source += "    }\n"
 
     for io_index, op_param in enumerate(input_output_info):

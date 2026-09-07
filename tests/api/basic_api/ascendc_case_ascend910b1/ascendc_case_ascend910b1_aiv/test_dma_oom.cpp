@@ -98,26 +98,26 @@ TEST_F(TestDMAOom, TestOOMStorageShapeTensorDescriptor)
 {
     uint8_t* metadata = static_cast<uint8_t*>(AscendC::GmAlloc(64));
     uint8_t* tensor = static_cast<uint8_t*>(AscendC::GmAlloc(128));
-    *reinterpret_cast<uint64_t*>(metadata) = g_oomStorageShapeMagic;
-    *reinterpret_cast<uint32_t*>(metadata + 8) = g_oomStorageShapeVersion;
+    WritePacked<uint8_t>(metadata,
+        static_cast<uint8_t>(g_oomStorageShapeMagic | (g_oomStorageShapeVersion << 4)));
+    WritePacked<uint8_t>(metadata + 1, 0);
     uint8_t* cursor = metadata + g_oomStorageShapeHeaderSize;
-    WritePacked<uint64_t>(cursor, 26);
+    WritePacked<uint64_t>(cursor, 19);
     WritePacked<uint8_t>(cursor + 8, g_oomDescriptorTypeTensor);
     WritePacked<uint8_t>(cursor + 9, 0);
-    WritePacked<uint32_t>(cursor + 10, g_oomTensorViewVersion);
-    WritePacked<uint32_t>(cursor + 14, 0);
-    WritePacked<uint64_t>(cursor + 18, 16);
+    WritePacked<uint8_t>(cursor + 10, g_oomTensorViewVersion);
+    WritePacked<uint64_t>(cursor + 11, 16);
 
     OOMInit();
     EXPECT_TRUE(OOMHasStorageShapeHeader(metadata));
     EXPECT_TRUE(OOMTryRegisterTensorWithStorageShape(cursor, tensor, 4));
-    EXPECT_EQ(cursor, metadata + 42);
+    EXPECT_EQ(cursor, metadata + 21);
     EXPECT_EQ(g_oomAddrArange.count, 1);
     EXPECT_EQ(g_oomAddrArange.len[0], 64);
 
     OOMInit();
     uint8_t* noMagicCursor = metadata;
-    *reinterpret_cast<uint64_t*>(metadata) = 0;
+    WritePacked<uint8_t>(metadata, 0);
     EXPECT_FALSE(OOMHasStorageShapeHeader(noMagicCursor));
     EXPECT_EQ(g_oomAddrArange.count, 0);
     AscendC::GmFree(metadata);
@@ -136,20 +136,18 @@ TEST_F(TestDMAOom, TestOOMStorageShapeTensorListDescriptor)
 
     uint8_t* metadata = static_cast<uint8_t*>(AscendC::GmAlloc(128));
     uint8_t* cursor = metadata;
-    WritePacked<uint64_t>(cursor, 44);
+    WritePacked<uint64_t>(cursor, 30);
     WritePacked<uint8_t>(cursor + 8, g_oomDescriptorTypeTensorList);
     WritePacked<uint8_t>(cursor + 9, 0);  // U mode
     WritePacked<uint16_t>(cursor + 10, 2);
-    WritePacked<uint32_t>(cursor + 12, g_oomTensorViewVersion);
-    WritePacked<uint32_t>(cursor + 16, 0);
-    WritePacked<uint64_t>(cursor + 20, 16);
-    WritePacked<uint32_t>(cursor + 28, g_oomTensorViewVersion);
-    WritePacked<uint32_t>(cursor + 32, 0);
-    WritePacked<uint64_t>(cursor + 36, 12);
+    WritePacked<uint8_t>(cursor + 12, g_oomTensorViewVersion);
+    WritePacked<uint64_t>(cursor + 13, 16);
+    WritePacked<uint8_t>(cursor + 21, g_oomTensorViewVersion);
+    WritePacked<uint64_t>(cursor + 22, 12);
 
     OOMInit();
     EXPECT_TRUE(OOMTryRegisterTensorListWithStorageShape(cursor, tensorList, 4));
-    EXPECT_EQ(cursor, metadata + 44);
+    EXPECT_EQ(cursor, metadata + 30);
     EXPECT_EQ(g_oomAddrArange.count, 2);
     EXPECT_EQ(g_oomAddrArange.len[0], 64);
     EXPECT_EQ(g_oomAddrArange.len[1], 48);
@@ -158,7 +156,7 @@ TEST_F(TestDMAOom, TestOOMStorageShapeTensorListDescriptor)
     cursor = metadata;
     WritePacked<uint8_t>(cursor + 9, 1);  // F mode
     EXPECT_TRUE(OOMTryRegisterTensorListWithStorageShape(cursor, tensorList, 4));
-    EXPECT_EQ(cursor, metadata + 44);
+    EXPECT_EQ(cursor, metadata + 30);
     EXPECT_EQ(g_oomAddrArange.count, 2);
     EXPECT_EQ(g_oomAddrArange.len[0], 64);
     EXPECT_EQ(g_oomAddrArange.len[1], 48);
