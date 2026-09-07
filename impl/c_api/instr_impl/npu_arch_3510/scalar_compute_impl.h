@@ -20,6 +20,7 @@
 
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_popc_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_clz_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_get_uintdiv_magic_and_shift_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_zero_bits_cnt_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_ffs_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_store_dev_impl.h"
@@ -44,6 +45,16 @@
 
 // ==========asc_clz==========
 __aicore__ inline int64_t asc_clz(uint64_t value_in) { return asc_clz_impl(value_in); }
+
+__aicore__ inline void asc_get_uintdiv_magic_and_shift(uint32_t* magic, uint32_t* shift, uint32_t divisor)
+{
+    asc_get_uintdiv_magic_and_shift_impl(magic, shift, divisor);
+}
+
+__aicore__ inline void asc_get_uintdiv_magic_and_shift(uint64_t* magic, uint64_t* shift, uint64_t divisor)
+{
+    asc_get_uintdiv_magic_and_shift_impl(magic, shift, divisor);
+}
 
 __aicore__ inline int64_t asc_zero_bits_cnt(uint64_t value) { return asc_zero_bits_cnt_impl(value); }
 
