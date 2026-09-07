@@ -8,6 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <algorithm>
+#include <cmath>
+#include <limits>
 #include "template_utils.h"
 namespace mc2_ops_hccl {
 
@@ -154,5 +156,116 @@ bool IsAllConnetedWithTopo(const TopoInfoWithNetLayerDetails* topoInfo, const u3
         }
     }
     return false;
+}
+
+namespace {
+constexpr double POD_PORT_GROUP_DIVISOR = 2.0;
+constexpr u32 POD_CHANNEL_NUM = 2;
+constexpr double FLOAT_COMPARE_EPSILON = 1e-6;
+
+bool IsDoubleEqual(const double lhs, const double rhs)
+{
+    return std::abs(lhs - rhs) < FLOAT_COMPARE_EPSILON;
+}
+
+bool IsPodInterChannelGroup(const std::map<u32, std::vector<ChannelInfo>>& channels)
+{
+    for (const auto& entry : channels) {
+        const auto& channelGroup = entry.second;
+        if (channelGroup.empty()) {
+            continue;
+        }
+        if (channelGroup.size() != POD_CHANNEL_NUM) {
+            return false;
+        }
+        return channelGroup[0].dieId != INVALID_VALUE_RANKID && channelGroup[1].dieId != INVALID_VALUE_RANKID &&
+               channelGroup[0].dieId != channelGroup[1].dieId;
+    }
+    return false;
+}
+
+double NormalizeParallelFallbackRatio(const double fallbackRatio)
+{
+    return std::isfinite(fallbackRatio) ? std::max(0.0, std::min(fallbackRatio, 1.0)) : 0.5;
+}
+} // namespace
+
+bool GetPortGroupSize(const std::map<u32, std::vector<ChannelInfo>>& channels, uint64_t& portGroupSize)
+{
+    portGroupSize = 0;
+    for (const auto& entry : channels) {
+        if (!entry.second.empty()) {
+            for (const auto& channel : entry.second) {
+                portGroupSize += channel.portGroupSize;
+            }
+            return portGroupSize != 0;
+        }
+    }
+    return false;
+}
+
+double CalcParallelDataSplitRatio(
+    const uint64_t intraRankSize, const uint64_t interRankSize,
+    const std::map<u32, std::vector<ChannelInfo>>& intraChannels,
+    const std::map<u32, std::vector<ChannelInfo>>& interChannels, const ParallelDataSplitType splitType,
+    const double fallbackRatio)
+{
+    const double validFallback = NormalizeParallelFallbackRatio(fallbackRatio);
+    uint64_t intraPortGroupSize = 0;
+    uint64_t interPortGroupSize = 0;
+    if (intraRankSize == 0 || interRankSize == 0 ||
+        !GetPortGroupSize(intraChannels, intraPortGroupSize) ||
+        !GetPortGroupSize(interChannels, interPortGroupSize)) {
+        return validFallback;
+    }
+    if (intraRankSize - 1 > std::numeric_limits<uint64_t>::max() / intraPortGroupSize) {
+        return validFallback;
+    }
+
+    intraPortGroupSize *= intraRankSize - 1;
+    const bool isPod = IsPodInterChannelGroup(interChannels);
+    const double effectiveInterPortGroupSize =
+        static_cast<double>(interPortGroupSize) / (isPod ? POD_PORT_GROUP_DIVISOR : 1.0);
+    if (intraPortGroupSize == 0 || IsDoubleEqual(effectiveInterPortGroupSize, 0.0) ||
+        !std::isfinite(effectiveInterPortGroupSize)) {
+        return validFallback;
+    }
+
+    double mesh = 0.0;
+    double clos = 0.0;
+    switch (splitType) {
+        case ParallelDataSplitType::REDUCE_SCATTER_WITH_LOCAL_REDUCE:
+            mesh = 21.0 * static_cast<double>(intraRankSize - 1) /
+                   (20.0 * static_cast<double>(intraRankSize) * intraPortGroupSize);
+            clos = static_cast<double>(interRankSize - 1) /
+                   (static_cast<double>(interRankSize) * effectiveInterPortGroupSize);
+            break;
+        case ParallelDataSplitType::SCATTER:
+            mesh = static_cast<double>(intraRankSize - 1) /
+                   (static_cast<double>(intraRankSize) * intraPortGroupSize);
+            clos = static_cast<double>(interRankSize - 1) /
+                   (static_cast<double>(interRankSize) * effectiveInterPortGroupSize);
+            break;
+        case ParallelDataSplitType::ALL_GATHER:
+            mesh = static_cast<double>(intraRankSize) * static_cast<double>(interRankSize - 1) /
+                   effectiveInterPortGroupSize;
+            clos = static_cast<double>(interRankSize) * static_cast<double>(intraRankSize - 1) /
+                   static_cast<double>(intraPortGroupSize);
+            break;
+        default:
+            return validFallback;
+    }
+
+    const double denominator = mesh + clos;
+    if (IsDoubleEqual(denominator, 0.0) || !std::isfinite(denominator)) {
+        return validFallback;
+    }
+    const double ratio = clos / denominator;
+    if (!std::isfinite(ratio) || ratio < 0.0 || ratio > 1.0) {
+        return validFallback;
+    }
+    constexpr double ratioStep = 1.0 / 8.0;
+    const double ratioIndex = std::max(1.0, std::min(std::round(ratio / ratioStep), 7.0));
+    return ratioIndex * ratioStep;
 }
 } // namespace mc2_ops_hccl

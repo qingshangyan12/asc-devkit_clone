@@ -488,5 +488,14 @@ HcclResult CalcDataSplitByPortGroupZAxisDetour(
 
 bool IsAllConnetedWithTopo(const TopoInfoWithNetLayerDetails* topoInfo, const u32 netLayer, const CommTopo topoType);
 
+enum class ParallelDataSplitType { REDUCE_SCATTER_WITH_LOCAL_REDUCE = 0, ALL_GATHER = 1, SCATTER = 2 };
+
+bool GetPortGroupSize(const std::map<u32, std::vector<ChannelInfo>>& channels, uint64_t& portGroupSize);
+
+double CalcParallelDataSplitRatio(
+    uint64_t intraRankSize, uint64_t interRankSize, const std::map<u32, std::vector<ChannelInfo>>& intraChannels,
+    const std::map<u32, std::vector<ChannelInfo>>& interChannels, ParallelDataSplitType splitType,
+    double fallbackRatio);
+
 } // namespace mc2_ops_hccl
 #endif
