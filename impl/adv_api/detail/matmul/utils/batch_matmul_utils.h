@@ -25,7 +25,6 @@
 
 #include "matmul_config_utils.h"
 #include "matmul_type_def.h"
-#include "utils/base/sys_math.h"
 
 namespace AscendC {
 
@@ -37,14 +36,14 @@ constexpr bool IsBmmEnableScheduler =
      (A_TYPE::layout == LayoutMode::NORMAL && ToMatmulConfig(MM_CFG).batchMode == BatchMode::SINGLE_LARGE_THAN_L1));
 
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool IsBmmBatchScheduler =
-    DoMatmulNorm(MM_CFG) &&
-    ((A_TYPE::layout != LayoutMode::NONE && ToMatmulConfig(MM_CFG).batchMode != BatchMode::SINGLE_LARGE_THAN_L1));
+constexpr bool IsBmmBatchScheduler = DoMatmulNorm(MM_CFG) &&
+                                     ((A_TYPE::layout != LayoutMode::NONE &&
+                                       ToMatmulConfig(MM_CFG).batchMode != BatchMode::SINGLE_LARGE_THAN_L1));
 
 template <typename A_TYPE, const auto& MM_CFG>
-constexpr bool IsBmmSingleScheduler =
-    DoMatmulNorm(MM_CFG) &&
-    (A_TYPE::layout == LayoutMode::NORMAL && ToMatmulConfig(MM_CFG).batchMode == BatchMode::SINGLE_LARGE_THAN_L1);
+constexpr bool IsBmmSingleScheduler = DoMatmulNorm(MM_CFG) &&
+                                      (A_TYPE::layout == LayoutMode::NORMAL &&
+                                       ToMatmulConfig(MM_CFG).batchMode == BatchMode::SINGLE_LARGE_THAN_L1);
 
 struct BatchOffsetInfo {
     int32_t modA;
@@ -87,7 +86,7 @@ struct BmmOffset {
 __aicore__ inline uint16_t CeilDiv(uint16_t num1, uint16_t num2)
 {
     ASSERT(num2 > 0);
-    return static_cast<uint16_t>(AscendC::CeilDiv<uint16_t, uint16_t>(num1, num2));
+    return (num1 + num2 - 1) / num2;
 }
 
 // It is invoked by the matmulV3 operator and cannot be removed at present

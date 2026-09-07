@@ -7,7 +7,6 @@
 | [max](cpp_stdlib/algorithms/max.md) | 比较相同数据类型的两个数中的最大值。 |
 | [min](cpp_stdlib/algorithms/min.md) | 比较相同数据类型的两个数中的最小值。 |
 | [abs](cpp_stdlib/math_functions/abs.md) | 获取输入数据的绝对值。 |
-| [CeilDiv](cpp_stdlib/math_functions/CeilDiv.md) | 计算两个整数a和b相除后向上取整的结果。 |
 | [ceil\_div](cpp_stdlib/math_functions/ceil_div.md) | 计算两个整数a和b相除后向上取整的结果。 |
 | [CeilDivision](cpp_stdlib/math_functions/CeilDivision.md) | 计算两个整数num1和num2相除后向上取整的结果。 |
 | [sqrt](cpp_stdlib/math_functions/sqrt.md) | 计算输入数据的平方根。 |

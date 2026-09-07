@@ -21,15 +21,14 @@
 #ifndef ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
 #define ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
 #include "kernel_utils_macros.h"
-#include "utils/base/sys_math.h"
 namespace AscendC {
-__aicore__ constexpr inline uint32_t DivCeil(uint32_t a, uint32_t b) { return CeilDiv(a, b); }
+__aicore__ constexpr inline uint32_t DivCeil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
 
 __aicore__ constexpr inline uint32_t AlignUp(uint32_t a, uint32_t b) { return DivCeil(a, b) * b; }
 
-__aicore__ constexpr inline uint32_t ConstCeil(uint32_t a, uint32_t b) { return CeilDiv(a, b); }
+__aicore__ constexpr inline uint32_t ConstCeil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
 
-__aicore__ constexpr inline uint32_t Ceil(uint32_t a, uint32_t b) { return CeilDiv(a, b); }
+__aicore__ constexpr inline uint32_t Ceil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
 
 #if defined(__NPU_ARCH__) &&                                                                                      \
         ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) ||  \
@@ -41,7 +40,7 @@ __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
         return 0;
     }
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1 || !defined(SPLIT_CORE_VEC)
-    return CeilDiv(num1, num2);
+    return (num1 + num2 - 1) / num2;
 #else
     return get_repeat_ceiling(num1, num2);
 #endif
@@ -52,7 +51,7 @@ __aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
     if (num2 == 0) {
         return 0;
     }
-    return CeilDiv(num1, num2);
+    return (num1 + num2 - 1) / num2;
 }
 #endif
 
