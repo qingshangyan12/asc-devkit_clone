@@ -97,6 +97,23 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2log2(half2 x)
     return __cvt_half2<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(res_fp32);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half htanh(half x)
+{
+    float tmp = __cvt_float<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
+    tmp = tanhf(tmp);
+    return __cvt_half<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(tmp);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2tanh(half2 x)
+{
+    float2 x_fp32 =
+        __cvt_float2<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
+    float2 res_fp32;
+    res_fp32.x = tanhf(x_fp32.x);
+    res_fp32.y = tanhf(x_fp32.y);
+    return __cvt_half2<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(res_fp32);
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hsqrt(half x) { return __sqrtf(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2sqrt(half2 x) { return __sqrtf(x); }
@@ -1205,23 +1222,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2sin(half2 x)
     return __cvt_half2<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(res_fp32);
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half htanh(half x)
-{
-    float tmp = __cvt_float<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
-    tmp = tanhf(tmp);
-    return __cvt_half<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(tmp);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2tanh(half2 x)
-{
-    float2 x_fp32 =
-        __cvt_float2<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
-    float2 res_fp32;
-    res_fp32.x = tanhf(x_fp32.x);
-    res_fp32.y = tanhf(x_fp32.y);
-    return __cvt_half2<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(res_fp32);
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half hexp(half x) { return __expf(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2exp(half2 x) { return __expf(x); }
@@ -1376,48 +1376,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2sin(half2 x)
 {
     half htmp1 = hsin(x.x);
     half htmp2 = hsin(x.y);
-    x = {htmp1, htmp2};
-    return x;
-}
-
-// Piecewise: an odd polynomial on the small interval, 1 - 2 / (e^(2|x|) + 1) on the large one.
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half htanh(half x)
-{
-    float xf = __cvt_float<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(x);
-    float ax = xf < 0.0f ? -xf : xf;
-
-    // |x| < 0.6 branch: tanh(x) = x * (1 + z * p(z)) with z = x^2, p a 4-term minimax polynomial
-    // evaluated by Horner from the highest term down. The low-order coefficients approximate the
-    // -1/3 and 2/15 terms of the tanh Taylor series.
-    float z = xf * xf;
-    float p = __fma(0.015739683061838150024f, z, -0.052303962409496307373f);
-    p = __fma(p, z, 0.1331529766321182251f);
-    p = __fma(p, z, -0.33332768082618713379f);
-    float y_small = __fma(p * z, xf, xf);
-
-    // |x| >= 0.6 branch: tanh|x| = 1 - 2 / (e^(2|x|) + 1). Using |x| keeps the exponent from
-    // overflowing on the negative side.
-    float y_large = 1.0f - 2.0f / (__expf(2.0f * ax) + 1.0f);
-    // From |x| >= 9.010913848876953125 the result is exactly 1.0, so saturate before e^(2|x|) hits inf.
-    if (ax >= 9.010913848876953125f) {
-        y_large = 1.0f;
-    }
-    // tanh is odd: the large branch works on |x|, so restore the sign of the input.
-    if (xf < 0.0f) {
-        y_large = -y_large;
-    }
-
-    // 0.60000002384185791016 is the float nearest 0.6, the switch point between the two branches.
-    float yf = ax >= 0.60000002384185791016f ? y_large : y_small;
-    return x == static_cast<half>(0.0f) ?
-               x :
-               __cvt_half<__internal_get_round<__RoundMode::CAST_RINT>(), RoundingSaturation::RS_DISABLE_VALUE>(yf);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline half2 h2tanh(half2 x)
-{
-    half htmp1 = htanh(x.x);
-    half htmp2 = htanh(x.y);
     x = {htmp1, htmp2};
     return x;
 }
