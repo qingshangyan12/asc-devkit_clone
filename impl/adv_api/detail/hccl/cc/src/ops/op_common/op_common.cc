@@ -46,6 +46,7 @@
 #include "ccu_launch_dl.h"
 #include "ccu_res_dl.h"
 #include "hccl_ccu_res_dl.h"
+#include "hccl_res_dl.h"
 #include "ccu_log.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
 #include "kfc_server_protocol.h"
@@ -1400,6 +1401,77 @@ HcclResult GetAlgResCcu(
 #endif
 }
 
+// 释放本次HcclChannelAcquire新建（非复用）的通道，避免checkRes探测/申请失败路径下通道挂在通信域上无法回收
+static HcclResult ReleaseCcuAcquiredChannels(HcclComm comm, AlgResourceRequest& resRequest)
+{
+    if (!HcommIsSupportHcclChannelDestroy() || resRequest.acquiredChannels.empty()) {
+        return HCCL_SUCCESS;
+    }
+    HcclResult ret = HcclChannelDestroy(comm, resRequest.acquiredChannels.data(), resRequest.acquiredChannels.size());
+    if (ret != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[ReleaseCcuAcquiredChannels] HcclChannelDestroy failed, ret[%d], channelNum[%zu].", ret,
+            resRequest.acquiredChannels.size());
+    }
+    HCCL_INFO("[ReleaseCcuAcquiredChannels] release [%zu] channels.", resRequest.acquiredChannels.size());
+    resRequest.acquiredChannels.clear();
+    return HCCL_SUCCESS;
+}
+
+// 以kernel为粒度申请channel：先Query识别可复用通道，再Acquire真实建链，仅将新建通道记入acquiredChannels
+static HcclResult CcuAcquireKernelChannels(
+    HcclComm comm, const OpParam& param, u32 userRank, CcuKernelInfo& kernelInfo, AlgResourceRequest& resRequest,
+    std::vector<ChannelHandle>& kernelChannels)
+{
+    std::vector<HcclChannelDesc>& kernelChannelRequest = kernelInfo.channels;
+
+    u32 channelNum = kernelChannelRequest.size();
+    kernelChannels.resize(channelNum);
+    if (channelNum == 0) {
+        return HCCL_SUCCESS;
+    }
+
+    // 查询已存在的通道，existingChannels[i]非0表示通道已存在可复用，为0表示需新建；
+    // Query不支持时existingChannels保持为空，不记录，避免误删已复用通道
+    std::vector<ChannelHandle> existingChannels;
+    if (HcommIsSupportHcclChannelQuery()) {
+        existingChannels.assign(channelNum, 0);
+        auto queryRet =
+            HcclChannelQuery(comm, param.engine, kernelChannelRequest.data(), channelNum, existingChannels.data());
+        if (queryRet != HCCL_SUCCESS) {
+            HCCL_WARNING("[HcclChannelQuery] failed, ret[%d], treat all as new channels.", queryRet);
+        }
+    }
+
+    auto ret = HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(), channelNum, kernelChannels.data());
+    // 需要资源回退。返回资源不够
+    if (ret == HCCL_E_UNAVAIL) {
+        HCCL_WARNING("[HcclChannelAcquire] channel unavailable, channel num[%u].", channelNum);
+        // 释放当前kernel之前已申请的新增通道
+        ReleaseCcuAcquiredChannels(comm, resRequest);
+        return HCCL_E_UNAVAIL;
+    } else {
+        CHK_RET(ret);
+    }
+
+    // 记录新增通道（existingChannels[i]为0表示该通道是本次HcclChannelAcquire新建的）
+    for (u32 i = 0; i < existingChannels.size(); ++i) {
+        if (existingChannels[i] == 0) {
+            resRequest.acquiredChannels.push_back(kernelChannels[i]);
+        }
+    }
+
+    // 从首条channel获取dieId，作为kernel所属dieId保存（同一kernel的所有channel在同一die上）
+    EndpointDesc localEndpoint = kernelChannelRequest[0].localEndpoint;
+    using DieIdType = uint32_t;
+    const uint32_t dieIdTypeSize = sizeof(DieIdType);
+    DieIdType dieId = 0;
+    CHK_RET(HcclRankGraphGetEndpointInfo(
+        comm, userRank, &localEndpoint, ENDPOINT_ATTR_DIE_ID, dieIdTypeSize, static_cast<void*>(&dieId)));
+    kernelInfo.dieId = dieId;
+    return HCCL_SUCCESS;
+}
+
 HcclResult HcclAllocAlgResourceCcu(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
@@ -1443,8 +1515,16 @@ HcclResult HcclAllocAlgResourceCcu(
     if (!param.checkRes) {
         CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
     }
-    CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
-    CHK_RET(HcclGetCcuKernel(comm, param, resRequest, resCtxHost));
+    HcclResult ret = HcclGetChannelForCcu(comm, param, resRequest);
+    if (ret == HCCL_SUCCESS) {
+        ret = HcclGetCcuKernel(comm, param, resRequest, resCtxHost);
+    }
+    if (param.checkRes || ret != HCCL_SUCCESS) {
+        // checkRes探测完毕（或失败路径）：ctx不持久化，释放本次新建的channel，避免资源泄漏；
+        // 真实执行成功路径保留通道，供后续HcclChannelQuery复用
+        ReleaseCcuAcquiredChannels(comm, resRequest);
+    }
+    CHK_RET(ret);
     return HCCL_SUCCESS;
 #endif
 }
@@ -1463,31 +1543,10 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
 
     // 以kernel为粒度申请channel
     for (CcuKernelInfo& kernelInfo : resRequest.ccuKernelInfos) {
-        std::vector<HcclChannelDesc>& kernelChannelRequest = kernelInfo.channels;
-
-        u32 channelNum = kernelChannelRequest.size();
         std::vector<ChannelHandle> kernelChannels;
-        kernelChannels.resize(channelNum);
+        CHK_RET(CcuAcquireKernelChannels(comm, param, userRank, kernelInfo, resRequest, kernelChannels));
 
-        if (channelNum > 0) {
-            // 需要资源回退。返回资源不够
-            auto ret =
-                HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(), channelNum, kernelChannels.data());
-            if (ret == HCCL_E_UNAVAIL) {
-                HCCL_WARNING("[HcclChannelAcquire] channel unavailable, channel num[%u].", channelNum);
-                return HCCL_E_UNAVAIL;
-            } else {
-                CHK_RET(ret);
-            }
-            // 从首条channel获取dieId，作为kernel所属dieId保存（同一kernel的所有channel在同一die上）
-            EndpointDesc localEndpoint = kernelChannelRequest[0].localEndpoint;
-            using DieIdType = uint32_t;
-            const uint32_t dieIdTypeSize = sizeof(DieIdType);
-            DieIdType dieId = 0;
-            CHK_RET(HcclRankGraphGetEndpointInfo(
-                comm, userRank, &localEndpoint, ENDPOINT_ATTR_DIE_ID, dieIdTypeSize, static_cast<void*>(&dieId)));
-            kernelInfo.dieId = dieId;
-        }
+        u32 channelNum = kernelInfo.channels.size();
         auto* kernelArgBase = static_cast<CcuKernelArgBase*>(kernelInfo.kernelArg);
         if (!kernelArgBase) {
             HCCL_ERROR("[HcclGetChannelForCcu] kernelArg ptr is err.");
