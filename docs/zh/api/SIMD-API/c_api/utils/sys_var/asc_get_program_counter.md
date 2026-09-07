@@ -63,9 +63,4 @@ asc_icache_preload(reinterpret_cast<void *>(pc), prefetch_length);
 
 ## 调用示例
 
-```cpp
-// 通过asc_get_program_counter获取当前程序计数器（PC）值。
-// PC为64位返回值，有效地址位为0~47位，通过掩码0xFFFFFFFFFFFF（低48位全1）将高位无效位清零，
-// 得到当前指令在GM中的有效48位地址。
-int64_t pc = asc_get_program_counter() & 0xFFFFFFFFFFFF;
-```
+获取PC后，可将其作为指令预加载起始地址，完整的预加载调用方式请参考[asc_icache_preload调用示例](../../cache_ctrl/asc_icache_preload.md#调用示例)。
