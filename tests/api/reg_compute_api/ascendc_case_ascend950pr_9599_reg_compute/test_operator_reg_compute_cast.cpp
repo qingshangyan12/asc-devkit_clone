@@ -78,6 +78,7 @@ private:
             RegTensor<fp8_e5m2_t> f8e5m2TmpReg;
             RegTensor<fp4x2_e2m1_t> f4e2m1TmpReg;
             RegTensor<fp4x2_e1m2_t> f4e1m2TmpReg;
+            RegTensor<int4x2_t> int4TmpReg;
             RegTensor<fp8_e8m0_t> f8e8m0TmpReg;
             uint32_t sreg = static_cast<uint32_t>(mask);
             MaskReg maskReg;
@@ -89,6 +90,7 @@ private:
 
             for (uint16_t i = 0; i < static_cast<uint16_t>(rep); i++) {
                 Reg::DataCopy(vSrcReg, srcPtr + i * srcRepSize);
+                Reg::DataCopy(vDstReg, dstPtr + i * dstRepSize);
 
                 if constexpr (mD == 4) {
                     if constexpr (std::is_same<ScrT, int32_t>::value && std::is_same<DstT, int32_t>::value) {
@@ -128,9 +130,11 @@ private:
                 } else if constexpr (mD == 17) {
                     Cast<DstT, ScrT, castTrait>(vDstReg, vSrcReg, maskReg);
                 } else if constexpr (mD == 18) {
+                    DataCopy(f4e2m1TmpReg, (__ubuf__ fp4x2_e2m1_t*)dstPtr + i * dstRepSize);
                     Cast<fp4x2_e2m1_t, ScrT, castTrait>(f4e2m1TmpReg, vSrcReg, maskReg);
                     DataCopy((__ubuf__ fp4x2_e2m1_t*)dstPtr + i * dstRepSize, f4e2m1TmpReg, dstMaskReg);
                 } else if constexpr (mD == 19) {
+                    DataCopy(f4e1m2TmpReg, (__ubuf__ fp4x2_e1m2_t*)dstPtr + i * dstRepSize);
                     Cast<fp4x2_e1m2_t, ScrT, castTrait>(f4e1m2TmpReg, vSrcReg, maskReg);
                     DataCopy((__ubuf__ fp4x2_e1m2_t*)dstPtr + i * dstRepSize, f4e1m2TmpReg, dstMaskReg);
                 } else if constexpr (mD == 20) {
@@ -152,6 +156,10 @@ private:
                 } else if constexpr (mD == 23) {
                     Cast<DstT, int4x2_t, castTrait>(vDstReg, (RegTensor<int4x2_t>&)vSrcReg, f8Mask);
                     DataCopy(dstPtr + i * dstRepSize, vDstReg, dstMaskReg);
+                } else if constexpr (mD == 24) {
+                    DataCopy(int4TmpReg, (__ubuf__ int4x2_t*)dstPtr + i * dstRepSize);
+                    Cast<int4x2_t, ScrT, castTrait>(int4TmpReg, vSrcReg, maskReg);
+                    DataCopy((__ubuf__ int4x2_t*)dstPtr + i * dstRepSize, int4TmpReg, dstMaskReg);
                 }
                 if constexpr (mD < 18) {
                     DataCopy(dstPtr + i * dstRepSize, vDstReg, dstMaskReg);
@@ -311,7 +319,65 @@ INSTANTIATE_TEST_CASE_P(
         MicroCastParams{MicroCastCase<
             int4x2_t, bfloat16_t, 23, MaskMergeMode::ZEROING, RegLayout::ZERO, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
         MicroCastParams{MicroCastCase<
-            int4x2_t, int16_t, 23, MaskMergeMode::ZEROING, RegLayout::ZERO, SatMode::UNKNOWN, RoundMode::UNKNOWN>}));
+            int4x2_t, int16_t, 23, MaskMergeMode::ZEROING, RegLayout::ZERO, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int32_t, uint8_t, 7, MaskMergeMode::MERGING, RegLayout::ZERO, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int32_t, uint8_t, 7, MaskMergeMode::MERGING, RegLayout::ONE, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int32_t, uint8_t, 7, MaskMergeMode::MERGING, RegLayout::TWO, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int32_t, uint8_t, 7, MaskMergeMode::MERGING, RegLayout::THREE, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int32_t, int16_t, 5, MaskMergeMode::MERGING, RegLayout::ZERO, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int32_t, int16_t, 5, MaskMergeMode::MERGING, RegLayout::ONE, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int16_t, uint8_t, 5, MaskMergeMode::MERGING, RegLayout::ZERO, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int16_t, uint8_t, 5, MaskMergeMode::MERGING, RegLayout::ONE, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int16_t, uint8_t, 24, MaskMergeMode::MERGING, RegLayout::ZERO, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int16_t, uint8_t, 24, MaskMergeMode::MERGING, RegLayout::ONE, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int16_t, uint8_t, 24, MaskMergeMode::MERGING, RegLayout::TWO, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int16_t, uint8_t, 24, MaskMergeMode::MERGING, RegLayout::THREE, SatMode::NO_SAT, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int4x2_t, int16_t, 23, MaskMergeMode::MERGING, RegLayout::ZERO, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int4x2_t, int16_t, 23, MaskMergeMode::MERGING, RegLayout::ONE, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int4x2_t, int16_t, 23, MaskMergeMode::MERGING, RegLayout::TWO, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int4x2_t, int16_t, 23, MaskMergeMode::MERGING, RegLayout::THREE, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int8_t, int32_t, 6, MaskMergeMode::MERGING, RegLayout::ZERO, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int8_t, int32_t, 6, MaskMergeMode::MERGING, RegLayout::ONE, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int8_t, int32_t, 6, MaskMergeMode::MERGING, RegLayout::TWO, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int8_t, int32_t, 6, MaskMergeMode::MERGING, RegLayout::THREE, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int8_t, int16_t, 4, MaskMergeMode::MERGING, RegLayout::ZERO, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int8_t, int16_t, 4, MaskMergeMode::MERGING, RegLayout::ONE, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int16_t, int32_t, 4, MaskMergeMode::MERGING, RegLayout::ZERO, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int16_t, int32_t, 4, MaskMergeMode::MERGING, RegLayout::ONE, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            bfloat16_t, uint8_t, 18, MaskMergeMode::MERGING, RegLayout::ZERO, SatMode::UNKNOWN, RoundMode::CAST_RINT>},
+        MicroCastParams{MicroCastCase<
+            bfloat16_t, uint8_t, 19, MaskMergeMode::MERGING, RegLayout::ONE, SatMode::UNKNOWN, RoundMode::CAST_RINT>},
+        MicroCastParams{MicroCastCase<
+            uint8_t, bfloat16_t, 20, MaskMergeMode::MERGING, RegLayout::TWO, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            uint8_t, bfloat16_t, 21, MaskMergeMode::MERGING, RegLayout::THREE, SatMode::UNKNOWN, RoundMode::UNKNOWN>},
+        MicroCastParams{MicroCastCase<
+            int32_t, int32_t, 4, MaskMergeMode::MERGING, RegLayout::ZERO, SatMode::UNKNOWN, RoundMode::UNKNOWN>}));
 
 TEST_P(MicroCastTestsuite, MicroCastTestCase)
 {
