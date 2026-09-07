@@ -3276,7 +3276,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float scalblnf(float x, int64_t n)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_sincospif_core(float x, float* sin_result, float* cos_result)
 {
     constexpr float large_input_bound = __internal_fp32_scale_2p24;
-    constexpr float pi_hi = 3.1415927410125732422f; // High-precision single-precision pi constant.
+    constexpr float pi_hi = ASCRT_PI_F; // High-precision single-precision pi constant.
 
     // Classify inputs first, but keep the main reduction path running on a safe value.
     const bool is_nan = isnan(x);
@@ -3414,7 +3414,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x)
 {
     // Large inputs are reduced to signed zero to avoid loss of significance.
     constexpr float large_input_bound = __internal_fp32_scale_2p24;
-    constexpr float pi_hi = 3.1415927410125732422f; // High-precision single-precision pi constant.
+    constexpr float pi_hi = ASCRT_PI_F; // High-precision single-precision pi constant.
 
     // Keep a truncated copy so exact integers can be forced to signed zero later.
     const float truncated_x = truncf(x);
@@ -3459,7 +3459,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinpif(float x)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_tanpif_small(float x)
 {
     // Split pi into hi/lo parts so the argument reduction stays accurate.
-    constexpr float pi_hi = 3.1415927410125732422f;      // High-precision single-precision pi constant.
+    constexpr float pi_hi = ASCRT_PI_F;                  // High-precision single-precision pi constant.
     constexpr float pi_lo = -8.7422776573475857731e-08f; // Low-precision single-precision pi constant.
     const float arg = fmaf(x, pi_hi, x * pi_lo);
     return tanf(arg);
@@ -3647,7 +3647,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_stirling_and_euler_reflec
     const float rounded_exponent = roundf(exponent_hi);
     float exp2_fraction = exponent_hi - rounded_exponent;
     exp2_fraction = exp2_fraction + exponent_lo;
-    const uint32_t exp2_exponent = __float2uint_rz(rounded_exponent);
+    const int32_t exp2_exponent = __float2int_rz(rounded_exponent);
 
     // Evaluate the exp2 polynomial on the fractional part.
     float exp2_poly = fmaf(exp2_fraction, 0.00015239251661114395f, 0.0013391353422775864601f);
@@ -3660,7 +3660,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_stirling_and_euler_reflec
     const bool exponent_is_positive = rounded_exponent > 0.0f;
     const uint32_t scale_hi_bits = exponent_is_positive ? 0x7F000000U : 0x02000000U;
     const uint32_t scale_adjust = exponent_is_positive ? 0U : 0x83000000U;
-    const uint32_t scale_lo_bits = (exp2_exponent << __internal_fp32_exponent_shift) - scale_adjust;
+    const uint32_t scale_lo_bits =
+        (static_cast<uint32_t>(exp2_exponent) << __internal_fp32_exponent_shift) - scale_adjust;
     float exp2_value = exp2_poly * __uint_as_float(scale_hi_bits);
     exp2_value = exp2_value * __uint_as_float(scale_lo_bits);
     // Clamp exp2 overflow in the Stirling branch.
@@ -3696,8 +3697,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_stirling_and_euler_reflec
         } else {
             sinpi_poly = fmaf(reduced_pi_arg_square, -0.59248024225234985352f, 2.550144195556640625f);
             sinpi_poly = fmaf(reduced_pi_arg_square, sinpi_poly, -5.1677198410034179688f);
-            sinpi_poly =
-                fmaf(sinpi_poly, reduced_pi_arg * reduced_pi_arg_square, reduced_pi_arg * 3.1415927410125732422f);
+            sinpi_poly = fmaf(sinpi_poly, reduced_pi_arg * reduced_pi_arg_square, reduced_pi_arg * ASCRT_PI_F);
         }
         float sinpi = ((sinpi_quadrant & 2) != 0) ? -sinpi_poly : sinpi_poly;
 
