@@ -310,7 +310,7 @@ __aicore__ inline void CopyNZ2NZImplByLoadData(
 }
 #endif
 
-template <typename SrcT, typename TransT, bool HasScalePos = false>
+template <typename SrcT, typename TransT, bool HasScalePos = false, bool preAllocation = false>
 __aicore__ inline void CopyNZ2NZImpl(
     const LocalTensor<TransT>& dst, const GlobalTensor<SrcT>& src, const int32_t row, const int32_t col,
     const int32_t height, const int32_t width, const int32_t gRow, const bool kAlignToC0Size = false)
@@ -337,10 +337,17 @@ __aicore__ inline void CopyNZ2NZImpl(
     }
     if (srcStride >= UINT16_MAX) {
         for (int32_t i = 0; i < Ceil(width, c0Size_); ++i) {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+            DataCopy(
+                dst[static_cast<int64_t>(i) * static_cast<int64_t>(alignHeight) * static_cast<int64_t>(c0Size_)],
+                src[srcOffset + static_cast<int64_t>(i) * static_cast<int64_t>(gRow) * static_cast<int64_t>(c0Size_)],
+                {1, static_cast<uint16_t>(blockLen), 0, 0}, preAllocation);
+#else
             DataCopy(
                 dst[static_cast<int64_t>(i) * static_cast<int64_t>(alignHeight) * static_cast<int64_t>(c0Size_)],
                 src[srcOffset + static_cast<int64_t>(i) * static_cast<int64_t>(gRow) * static_cast<int64_t>(c0Size_)],
                 {1, static_cast<uint16_t>(blockLen), 0, 0});
+#endif
         }
     } else {
         uint16_t nburst = Ceil(width, c0Size_);
@@ -354,10 +361,18 @@ __aicore__ inline void CopyNZ2NZImpl(
                 }
             }
         }
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+        DataCopy(
+            dst, src[srcOffset],
+            {nburst, static_cast<uint16_t>(blockLen), static_cast<uint16_t>(srcStride),
+             static_cast<uint16_t>(dstStride)},
+            preAllocation);
+#else
         DataCopy(
             dst, src[srcOffset],
             {nburst, static_cast<uint16_t>(blockLen), static_cast<uint16_t>(srcStride),
              static_cast<uint16_t>(dstStride)});
+#endif
     }
 #endif
 }
