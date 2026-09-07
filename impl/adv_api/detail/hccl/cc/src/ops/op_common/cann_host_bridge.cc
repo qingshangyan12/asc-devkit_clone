@@ -141,6 +141,10 @@ const CannSyms& LoadCannSyms()
 
 bool UseCannBridge(const OpParam& param)
 {
+    // 仅迁移后的 PCIe 专用算法走 asc-devkit 本地 registry；其他 AllReduce 保持 CANN 兜底。
+    if (IsAicpuAllReduceParallelMeshNhrPcie(param)) {
+        return false;
+    }
     return (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
            (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
             param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);

@@ -179,6 +179,7 @@ HcclResult LaunchOpenOpParamDataImpl(
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
 
     const bool useCannBridge =
+        !mc2_ops_hccl::IsAicpuAllReduceParallelMeshNhrPcie(*param) &&
         (param->opType == HCCL_CMD_ALLTOALL || param->opType == HCCL_CMD_ALLTOALLV ||
          param->opType == HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {

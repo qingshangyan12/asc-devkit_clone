@@ -21,6 +21,15 @@ namespace mc2_ops_hccl {
 class InsCollAlgBase;
 struct AlgResourceCtxSerializable;
 
+// 本次迁移的 PCIe 专用 AllReduce 名称。保持大小写与用户指定的 algName 一致。
+constexpr char AICPU_ALLREDUCE_PARALLEL_MESH_NHR_PCIE_ALG_NAME[] = "AicpuAllreduceParallelMeshNHRPcie";
+
+inline bool IsAicpuAllReduceParallelMeshNhrPcie(const OpParam& param)
+{
+    return param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE &&
+           std::string(param.algName) == AICPU_ALLREDUCE_PARALLEL_MESH_NHR_PCIE_ALG_NAME;
+}
+
 // 判断该 op 是否需要走 CANN 桥接路径(选路/取执行器/资源准备)。
 // 条件: engine 为 AICPU/AICPU_TS 且 opType 为 ALLTOALL/ALLTOALLV/ALLREDUCE。
 bool UseCannBridge(const OpParam& param);
