@@ -72,27 +72,29 @@ enum class DataType : int32_t {
     DT_FLOAT4_E2M1 = 37,    // fp4_e2m1 type
     DT_FLOAT8_E8M0 = 38,    // fp8_e8m0 type
     DT_FLOAT4_E1M2 = 39,    // fp4_e1m2 type
-    DT_MAX = 40,            // Mark the boundaries of data types
+    DT_HIFLOAT4 = 40,       // hif4 type
+    DT_HIFLOAT4_SCALE = 41, // hif4_scale type
+    DT_MAX = 42,            // Mark the boundaries of data types
 };
 
 #if !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)
 const std::map<DataType, uint32_t> DTYPE_BYTE_TAB = {
-    {DataType::DT_FLOAT, 4},      {DataType::DT_FLOAT16, 2},       {DataType::DT_INT8, 1},
-    {DataType::DT_INT16, 2},      {DataType::DT_UINT16, 2},        {DataType::DT_UINT8, 1},
-    {DataType::DT_INT32, 4},      {DataType::DT_INT64, 8},         {DataType::DT_UINT32, 4},
-    {DataType::DT_UINT64, 8},     {DataType::DT_BF16, 2},          {DataType::DT_BFLOAT16, 2},
-    {DataType::DT_INT4, 1},       {DataType::DT_FLOAT4_E2M1, 1},   {DataType::DT_FLOAT4_E1M2, 1},
-    {DataType::DT_HIFLOAT8, 1},   {DataType::DT_FLOAT8_E4M3FN, 1}, {DataType::DT_FLOAT8_E5M2, 1},
-    {DataType::DT_FLOAT8_E8M0, 1}};
+    {DataType::DT_FLOAT, 4},       {DataType::DT_FLOAT16, 2},       {DataType::DT_INT8, 1},
+    {DataType::DT_INT16, 2},       {DataType::DT_UINT16, 2},        {DataType::DT_UINT8, 1},
+    {DataType::DT_INT32, 4},       {DataType::DT_INT64, 8},         {DataType::DT_UINT32, 4},
+    {DataType::DT_UINT64, 8},      {DataType::DT_BF16, 2},          {DataType::DT_BFLOAT16, 2},
+    {DataType::DT_INT4, 1},        {DataType::DT_FLOAT4_E2M1, 1},   {DataType::DT_FLOAT4_E1M2, 1},
+    {DataType::DT_HIFLOAT8, 1},    {DataType::DT_FLOAT8_E4M3FN, 1}, {DataType::DT_FLOAT8_E5M2, 1},
+    {DataType::DT_FLOAT8_E8M0, 1}, {DataType::DT_HIFLOAT4, 1},      {DataType::DT_HIFLOAT4_SCALE, 4}};
 
 const std::map<DataType, uint32_t> DTYPE_BIT_TAB = {
-    {DataType::DT_FLOAT, 32},     {DataType::DT_FLOAT16, 16},      {DataType::DT_INT8, 8},
-    {DataType::DT_INT16, 16},     {DataType::DT_UINT16, 16},       {DataType::DT_UINT8, 8},
-    {DataType::DT_INT32, 32},     {DataType::DT_INT64, 64},        {DataType::DT_UINT32, 32},
-    {DataType::DT_UINT64, 64},    {DataType::DT_BF16, 16},         {DataType::DT_BFLOAT16, 16},
-    {DataType::DT_INT4, 4},       {DataType::DT_FLOAT4_E2M1, 4},   {DataType::DT_FLOAT4_E1M2, 4},
-    {DataType::DT_HIFLOAT8, 8},   {DataType::DT_FLOAT8_E4M3FN, 8}, {DataType::DT_FLOAT8_E5M2, 8},
-    {DataType::DT_FLOAT8_E8M0, 8}};
+    {DataType::DT_FLOAT, 32},      {DataType::DT_FLOAT16, 16},      {DataType::DT_INT8, 8},
+    {DataType::DT_INT16, 16},      {DataType::DT_UINT16, 16},       {DataType::DT_UINT8, 8},
+    {DataType::DT_INT32, 32},      {DataType::DT_INT64, 64},        {DataType::DT_UINT32, 32},
+    {DataType::DT_UINT64, 64},     {DataType::DT_BF16, 16},         {DataType::DT_BFLOAT16, 16},
+    {DataType::DT_INT4, 4},        {DataType::DT_FLOAT4_E2M1, 4},   {DataType::DT_FLOAT4_E1M2, 4},
+    {DataType::DT_HIFLOAT8, 8},    {DataType::DT_FLOAT8_E4M3FN, 8}, {DataType::DT_FLOAT8_E5M2, 8},
+    {DataType::DT_FLOAT8_E8M0, 8}, {DataType::DT_HIFLOAT4, 4},      {DataType::DT_HIFLOAT4_SCALE, 4}};
 #endif // !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)
 /**
  * @enum class TPosition
