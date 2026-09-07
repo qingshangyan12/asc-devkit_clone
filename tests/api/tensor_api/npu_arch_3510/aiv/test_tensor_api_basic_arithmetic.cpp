@@ -234,6 +234,7 @@ TEST(test_tensor_api_basic_arithmetic, compile_public_apis_and_supported_types)
     check_min_max<int32_t>();
     check_min_max<uint32_t>();
     check_min_max<float>();
+    check_carry<int32_t>();
     check_carry<uint32_t>();
     check_mull<int32_t>();
     check_mull<uint32_t>();
