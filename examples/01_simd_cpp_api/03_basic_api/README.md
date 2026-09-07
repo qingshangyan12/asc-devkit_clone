@@ -17,5 +17,4 @@
 | [06_atomic](./06_atomic) | 本路径下包含了与原子操作相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
 | [07_tpipe_tque](./07_tpipe_tque) | 本路径下包含了与tpipe和tque相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
 | [09_utils](./09_utils) | 本路径下包含了与工具相关API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
-| [10_cache_control](./10_cache_control) | 本路径下包含了与缓存控制相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
-| [10_add_l2_cache_split](./10_add_l2_cache_split) | 本样例通过384MB原地Add固定负载，对比不切分和按96MB L2 Batch切分两种访问顺序，展示跨轮复用数据场景下提升L2 Cache命中率的方法。|
+| [10_cache_control](./10_cache_control) | 本路径下包含了与缓存控制相关的样例，介绍了DataCachePreload、L2 Cache切分等缓存控制接口的使用，展示如何通过预加载数据、调整数据访问顺序等方式提升缓存命中率、降低访存延迟。|
