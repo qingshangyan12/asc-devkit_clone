@@ -26,14 +26,16 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
+
 根据`mask`将`src`中的每个参与计算的`bfloat16_t`类型元素转换为`int32_t`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据参数`src_pos`选择读取`src`索引为偶数的位置或奇数的位置。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。
 
-## 函数原型（占位符形式）
+## 函数原型
 
 ```c
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_bfloat162int32<round_mode><sat_mode>(vector_int32_t& dst,
                                                                      vector_bfloat16_t src,
                                                                      vector_bool mask,
@@ -44,7 +46,7 @@ __simd_callee__ inline void asc_bfloat162int32<round_mode><sat_mode>(vector_int3
                                                                      vector_bool mask,
                                                                      std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_int32_t asc_bfloat162int32<round_mode><sat_mode>(vector_bfloat16_t src,
                                                                                vector_bool mask,
                                                                                std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)

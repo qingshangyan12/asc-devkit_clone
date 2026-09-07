@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_reduce.h"`。
+
 根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。参考伪代码：
 
 ```python
@@ -48,11 +50,11 @@ def asc_reduce_sum_datablock(dst, src, mask):
 ## 函数原型
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dst_dtype> asc_reduce_sum_datablock(vector_<src_dtype> src,
                                                                    vector_bool mask)
 
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_reduce_sum_datablock(vector_<dst_dtype>& dst,
                                                       vector_<src_dtype> src,
                                                       vector_bool mask)

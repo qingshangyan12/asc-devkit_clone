@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
+
 将`uint16_t`类型数据转换为`uint8_t`类型，无舍入模式，支持饱和/非饱和模式。
 
 关于饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
@@ -47,11 +49,13 @@ def asc_uint162uint8(dst, src, mask, dst_pos):
 ## 函数原型
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_uint162uint8<sat_mode>(vector_uint8_t& dst,
                                                        vector_uint16_t src,
                                                        vector_bool mask,
                                                        std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
+// 占位符形式
 __simd_callee__ inline void asc_uint162uint8<sat_mode>(vector_uint8_t& dst,
                                                        vector_uint16_t src,
                                                        vector_bool mask,

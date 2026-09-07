@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
+
 根据`mask`将`src`中的每个`int32_t`类型元素转换为`uint16_t`类型，并支持不同的饱和模式，结果写入`dst`。由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据位置参数选择数据写入索引为奇数的位置或偶数的位置。参考伪代码：
 
 ```python
@@ -45,11 +47,13 @@ def asc_int322uint16(dst, src, mask, dst_pos):
 ## 函数原型
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_int322uint16<sat_mode>(vector_uint16_t& dst,
                                                        vector_int32_t src,
                                                        vector_bool mask,
                                                        std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
+// 占位符形式
 __simd_callee__ inline void asc_int322uint16<sat_mode>(vector_uint16_t& dst,
                                                        vector_int32_t src,
                                                        vector_bool mask,

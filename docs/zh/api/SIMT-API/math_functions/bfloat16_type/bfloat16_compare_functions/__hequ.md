@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_bf16.h"`。
+
 比较两个bfloat16类型数据是否相等，相等时返回true。若任一输入为nan，返回true。
 
 ## 函数原型
@@ -46,40 +48,41 @@ bool __hequ(bfloat16_t x, bfloat16_t y)
 
 比较输入数据是否相等的结果。
 
--   true：输入数据相等，或者任一输入为nan。
--   false：输入数据不相等。
+- true：输入数据相等，或者任一输入为nan。
+- false：输入数据不相等，且两个输入均不为nan。
 
--
 ## 约束说明
 
 无
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_bf16.h`头文件。
-
-```cpp
-#include "simt_api/asc_bf16.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void KernelHequ(bool* dst, bfloat16_t* x, bfloat16_t* y)
+    #include "simt_api/asc_bf16.h"
+
+    __global__ __launch_bounds__(1024) void kernel_hequ(bool* dst, bfloat16_t* x, bfloat16_t* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hequ(x[idx], y[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void KernelHequ(__gm__ bool* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y)
+    #include "simt_api/asc_bf16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel_hequ(__gm__ bool* dst, __gm__ bfloat16_t* x, __gm__ bfloat16_t* y, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __hequ(x[idx], y[idx]);
     }
     ```

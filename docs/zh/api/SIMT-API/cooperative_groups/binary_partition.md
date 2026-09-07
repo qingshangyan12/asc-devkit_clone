@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/cooperative_groups.h"`。
+
 `binary_partition` API用于根据一个标签（0或1）将父组划分为两个子组，标签相同的线程会被分配到同一组中。
 
 ## 函数原型
@@ -49,17 +51,19 @@ coalesced_group binary_partition(const thread_block_tile<Size, ParentT>& g, bool
 
 ## 返回值说明
 
-返回划分出的子组`coalesced_group`对象。
+返回包含当前调用线程的子组。当前线程及所有与其具有相同`pred`标签的线程会被划分到同一子组。返回类型为`coalesced_group`。
 
 ## 约束说明
 
-- 当`g`为`thread_block_tile<Size, ParentT>`类型时，`g`必须满足`Size`小于等于32，否则编译报错。
+- 组内所有线程必须共同调用该接口，否则行为未定义。
 
 ## 调用示例
 
 - SIMT编程场景：
 
     ```cpp
+    #include "simt_api/cooperative_groups.h"
+
     using namespace cooperative_groups;
     __global__ void simt_kernel(int *inputArr, ...)
     {
@@ -77,6 +81,8 @@ coalesced_group binary_partition(const thread_block_tile<Size, ParentT>& g, bool
 - SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/cooperative_groups.h"
+
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(__gm__ int *inputArr, ...)
     {

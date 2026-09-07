@@ -25,6 +25,8 @@
 <!-- end id7 -->
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_permute_sel.h"`。
+
 根据`mask`从源操作数`src0`、`src1`中选择元素，得到计算结果。选择的规则为：当`mask`的比特位为1时，从`src0`中选取对应位置的数；当`mask`的比特位为0时，从`src1`中选取对应位置的数。计算公式如下：
 
 $$
@@ -38,12 +40,12 @@ $$
 ## 函数原型
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_select(vector_<dtype> src0,
                                                  vector_<dtype> src1,
                                                  vector_bool mask)
 
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_select(vector_<dtype>& dst,
                                        vector_<dtype> src0,
                                        vector_<dtype> src1,

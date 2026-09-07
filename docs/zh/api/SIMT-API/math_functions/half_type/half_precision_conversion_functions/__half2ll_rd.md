@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 遵循CAST\_FLOOR模式，将half类型数据转换为long long类型数据，返回转换后的值。
 
 ## 函数原型
@@ -51,8 +53,8 @@ inline long long int __half2ll_rd(const half x)
 | nan | 0 |
 | inf | 9223372036854775807（long long最大值） |
 | -inf | -9223372036854775808（long long最小值） |
-| ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
-| -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
+| ASCRT\_MAX\_NORMAL\_FP16 | 65504 |
+| -ASCRT\_MAX\_NORMAL\_FP16 | -65504 |
 | 1.5 | 1 |
 | -1.5 | -2 |
 
@@ -60,22 +62,19 @@ inline long long int __half2ll_rd(const half x)
 
 无
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
-
 ## 调用示例
 
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__half2ll_rd(int64_t* dst, half* x)
+    #include "simt_api/asc_fp16.h"
+
+    __global__ __launch_bounds__(1024) void kernel__half2ll_rd(int64_t* dst, half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __half2ll_rd(x[idx]);
     }
     ```
@@ -83,9 +82,14 @@ inline long long int __half2ll_rd(const half x)
 -   SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__half2ll_rd(__gm__ int64_t* dst, __gm__ half* x)
+    #include "simt_api/asc_fp16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__half2ll_rd(__gm__ int64_t* dst, __gm__ half* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __half2ll_rd(x[idx]);
     }
     ```

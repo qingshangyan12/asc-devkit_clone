@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/cooperative_groups.h"`。
+
 `thread_block_tile`不提供默认构造函数，可通过`tiled_partition()`接口从另一个协作组中划分得到。
 
 ## 函数原型
@@ -51,13 +53,15 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 
 - `Size`必须是$2^n$，当前可选值范围：1、2、4、8、16、32、64、128、256、512、1024、2048。
 - 当`Size`大于32时，即`Size`为64、128、256、512、1024、2048的跨Warp协作场景，必须使用[block_tile_memory](../thread_block/thread_block_constructor.md#block_tile_memory说明)创建父`thread_block`。并且用于创建父`thread_block`的`block_tile_memory`对象必须位于Global Memory或Unified Buffer（UB），不能是在栈空间中创建的对象。使用位于UB的对象性能优于位于Global Memory的。
-- 对于模板版本的接口，父组中的线程数必须能被`Size`整除。并且`Size`必须小于父组大小。
+- 对于模板版本的接口，父组中的线程数必须能被`Size`整除。并且如果父组是`thread_block_tile`，则`Size`必须小于父组大小。
 
 ## 调用示例
 
 - SIMT编程场景：
 
     ```cpp
+    #include "simt_api/cooperative_groups.h"
+
     using namespace cooperative_groups;
     constexpr int THREAD_NUM = 1024;
     __global__ void simt_kernel(...)
@@ -87,6 +91,8 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 - SIMD与SIMT混合编程场景：
 
     ```cpp
+    #include "simt_api/cooperative_groups.h"
+
     constexpr int THREAD_NUM = 1024;
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
@@ -99,7 +105,7 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
         thread_block_tile<4, thread_block> tile4 = tiled_partition<4>(block);   // 按照4个线程为一组划分thread_block，对象类型中保留父组信息
 
         // 创建Size>32的thread_block_tile
-        __ubuf__ block_tile_memory<THREAD_NUM> scratch;
+        __ubuf__ block_tile_memory<THREAD_NUM> scratch = {};                    // 混合编程场景下需使用此方式在UB创建对象
         thread_block block_with_memory = this_thread_block(scratch);
         auto tile64 = tiled_partition<64>(block_with_memory);                   // 使用UB临时存储划分thread_block
         ...

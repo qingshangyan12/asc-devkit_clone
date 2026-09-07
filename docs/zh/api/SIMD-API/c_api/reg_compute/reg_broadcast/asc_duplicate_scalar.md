@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_broadcast.h"`。
+
 将标量值广播到目的操作数中。支持带输出参数和带返回值两种接口形式，每种形式均支持以下两类重载：
 
 - 带mask：将标量值写入dst中被mask筛选的位置，未被mask筛选的位置置零。
@@ -35,13 +37,13 @@
 
 ## 函数原型
 
-### 带mask（占位符形式）
+### 带mask
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_duplicate_scalar(<dtype> value,
                                                            vector_bool mask)
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_duplicate_scalar(vector_<dtype>& dst,
                                                  <dtype> value,
                                                  vector_bool mask)

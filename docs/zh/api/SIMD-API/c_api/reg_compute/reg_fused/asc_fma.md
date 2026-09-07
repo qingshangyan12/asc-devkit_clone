@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_fused.h"`。
+
 根据`mask`对源操作数`src0`、`src1`按元素相乘后，与源操作数`src2`中的对应元素相加，将计算结果作为返回值返回。计算公式如下：
 
 $$
@@ -35,6 +37,7 @@ $$
 ## 函数原型
 
 ```c
+// 占位符形式
 __simd_callee__ inline vector_<dtype> asc_fma(vector_<dtype> src0,
                                               vector_<dtype> src1,
                                               vector_<dtype> src2,

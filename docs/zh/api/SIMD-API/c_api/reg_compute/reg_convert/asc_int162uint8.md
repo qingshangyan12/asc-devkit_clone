@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
+
 `src`中int16_t类型的元素转换为uint8_t类型，并将结果写入dst。支持非饱和与饱和两种模式。
 
 由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。
@@ -47,11 +49,13 @@ def asc_int162uint8(dst, src, mask, dst_pos):
 ## 函数原型
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_int162uint8<sat_mode>(vector_uint8_t& dst,
                                                       vector_int16_t src,
                                                       vector_bool mask,
                                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
+// 占位符形式
 __simd_callee__ inline void asc_int162uint8<sat_mode>(vector_uint8_t& dst,
                                                       vector_int16_t src,
                                                       vector_bool mask,
