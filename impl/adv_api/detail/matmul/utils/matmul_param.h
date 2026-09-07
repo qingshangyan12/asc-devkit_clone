@@ -257,6 +257,26 @@ struct MatmulParams<
     using PARAMS = MatmulParamsMDLSparse<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG>;
 };
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+// MX_CFG_NORM
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG>
+struct MatmulParams<
+    A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, GetMatmulMode(CFG_NORM),
+    enable_if_t<DoMatmulNorm(MM_CFG) && !HasScalePosition<A_TYPE>::value && HasScalePosition<B_TYPE>::value>> {
+    __aicore__ inline MatmulParams(){};
+    using PARAMS = MatmulParamsMxNorm<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG>;
+};
+
+// MX_CFG_MDL
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG>
+struct MatmulParams<
+    A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, GetMatmulMode(CFG_MDL),
+    enable_if_t<!HasScalePosition<A_TYPE>::value && HasScalePosition<B_TYPE>::value>> {
+    __aicore__ inline MatmulParams(){};
+    using PARAMS = MatmulParamsMxMDL<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG>;
+};
+#endif
+
 // MX_CFG_NORM
 template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE, const auto& MM_CFG>
 struct MatmulParams<
