@@ -118,8 +118,9 @@ u64 SafeMultiplyForDfx(u64 lhs, u64 rhs)
         return 0U;
     }
     if (lhs > std::numeric_limits<u64>::max() / rhs) {
-        HCCL_WARNING("[%s] DFX value overflow, lhs[%llu], rhs[%llu].", __func__,
-            static_cast<unsigned long long>(lhs), static_cast<unsigned long long>(rhs));
+        HCCL_WARNING(
+            "[%s] DFX value overflow, lhs[%llu], rhs[%llu].", __func__, static_cast<unsigned long long>(lhs),
+            static_cast<unsigned long long>(rhs));
         return 0U;
     }
     return lhs * rhs;
@@ -172,10 +173,9 @@ HcclResult BuildOpenDfxOpInfo(
 {
     const bool isAllToAll = param.opType == HCCL_CMD_ALLTOALL || param.opType == HCCL_CMD_ALLTOALLV;
     const HcclDataType inputType = isAllToAll ? param.all2AllVDataDes.sendType : param.DataDes.dataType;
-    const HcclDataType outputType = isAllToAll
-                                        ? param.all2AllVDataDes.recvType
-                                        : (param.DataDes.outputType == HCCL_DATA_TYPE_RESERVED ? inputType
-                                                                                              : param.DataDes.outputType);
+    const HcclDataType outputType =
+        isAllToAll ? param.all2AllVDataDes.recvType :
+                     (param.DataDes.outputType == HCCL_DATA_TYPE_RESERVED ? inputType : param.DataDes.outputType);
     const u64 repeat = static_cast<u64>(repeatCnt);
     u64 inputCount = SafeMultiplyForDfx(msg.dataCnt, repeat);
     u64 outputCount = inputCount;
@@ -208,23 +208,20 @@ HcclResult BuildOpenDfxOpInfo(
     dfxOpInfo.cpuTsThread = mainThread;
     dfxOpInfo.cpuWaitAicpuNotifyIdx = param.aicpuRecordCpuIdx;
     dfxOpInfo.inputMemAddr = reinterpret_cast<u64>(param.inputPtr);
-    dfxOpInfo.inputMemSize = param.inputSize == 0U ? SafeMultiplyForDfx(inputCount, GetDfxDataTypeSize(inputType)) :
-                                                    param.inputSize;
+    dfxOpInfo.inputMemSize =
+        param.inputSize == 0U ? SafeMultiplyForDfx(inputCount, GetDfxDataTypeSize(inputType)) : param.inputSize;
     dfxOpInfo.outputMemAddr = reinterpret_cast<u64>(param.outputPtr);
-    dfxOpInfo.outputMemSize = param.outputSize == 0U ? SafeMultiplyForDfx(outputCount, GetDfxDataTypeSize(outputType)) :
-                                                      param.outputSize;
-    const s32 sRet = strncpy_s(
-        dfxOpInfo.algTag, sizeof(dfxOpInfo.algTag), param.algTag, sizeof(dfxOpInfo.algTag) - 1U);
+    dfxOpInfo.outputMemSize =
+        param.outputSize == 0U ? SafeMultiplyForDfx(outputCount, GetDfxDataTypeSize(outputType)) : param.outputSize;
+    const s32 sRet = strncpy_s(dfxOpInfo.algTag, sizeof(dfxOpInfo.algTag), param.algTag, sizeof(dfxOpInfo.algTag) - 1U);
     CHK_PRT_RET(
-        sRet != EOK, HCCL_ERROR("[%s] copy algTag[%s] failed, ret[%d].", __func__, param.algTag, sRet),
-        HCCL_E_MEMORY);
+        sRet != EOK, HCCL_ERROR("[%s] copy algTag[%s] failed, ret[%d].", __func__, param.algTag, sRet), HCCL_E_MEMORY);
     HCCL_INFO(
         "[%s] commName[%s], algTag[%s], opType[%u], dataType[%u], outputType[%u], dataCount[%llu], "
         "mainControlThread[%#llx], notifyIdx[%u], input[%#llx, %llu], output[%#llx, %llu].",
         __func__, param.commName, dfxOpInfo.algTag, dfxOpInfo.opType, dfxOpInfo.dataType, dfxOpInfo.outputType,
-        static_cast<unsigned long long>(dfxOpInfo.dataCount),
-        static_cast<unsigned long long>(dfxOpInfo.cpuTsThread), dfxOpInfo.cpuWaitAicpuNotifyIdx,
-        static_cast<unsigned long long>(dfxOpInfo.inputMemAddr),
+        static_cast<unsigned long long>(dfxOpInfo.dataCount), static_cast<unsigned long long>(dfxOpInfo.cpuTsThread),
+        dfxOpInfo.cpuWaitAicpuNotifyIdx, static_cast<unsigned long long>(dfxOpInfo.inputMemAddr),
         static_cast<unsigned long long>(dfxOpInfo.inputMemSize),
         static_cast<unsigned long long>(dfxOpInfo.outputMemAddr),
         static_cast<unsigned long long>(dfxOpInfo.outputMemSize));
@@ -696,15 +693,14 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         if (i == 0U && execCtx->resourceType == ServerExecResourceType::NEXT_AICPU) {
             if (runParam.size() < sizeof(mc2_ops_hccl::OpParam)) {
                 HCCL_ERROR(
-                    "Group %u: run op param size %zu is smaller than OpParam size %zu for DFX registration.",
-                    groupIdx_, runParam.size(), sizeof(mc2_ops_hccl::OpParam));
+                    "Group %u: run op param size %zu is smaller than OpParam size %zu for DFX registration.", groupIdx_,
+                    runParam.size(), sizeof(mc2_ops_hccl::OpParam));
                 executionRet = HCCL_E_PARA;
                 break;
             }
             const auto* dfxParam = reinterpret_cast<const mc2_ops_hccl::OpParam*>(runParam.data());
             HcclDfxOpInfo dfxOpInfo{};
-            ret = BuildOpenDfxOpInfo(
-                *dfxParam, msg, extMsg, rankNum_, repeatCnt, execCtx->mainThread, dfxOpInfo);
+            ret = BuildOpenDfxOpInfo(*dfxParam, msg, extMsg, rankNum_, repeatCnt, execCtx->mainThread, dfxOpInfo);
             if (ret == HCCL_SUCCESS) {
                 acquiredCommName = dfxParam->commName;
                 ret = static_cast<HcclResult>(HcommAcquireComm(acquiredCommName.c_str()));
@@ -716,8 +712,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             }
             if (ret != HCCL_SUCCESS) {
                 HCCL_ERROR(
-                    "Group %u: failed to register DFX context for commName[%s], opParamKey %#llx, ret[%d].",
-                    groupIdx_, execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
+                    "Group %u: failed to register DFX context for commName[%s], opParamKey %#llx, ret[%d].", groupIdx_,
+                    execCtx->commName.c_str(), static_cast<unsigned long long>(opParamKey), ret);
                 executionRet = ret;
                 break;
             }
