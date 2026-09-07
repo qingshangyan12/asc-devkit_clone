@@ -47,7 +47,7 @@ This `dav-3510` example describes each L0C-to-L1 transfer through the addresses,
 ## Scenario Description
 
 This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different `SCENARIO_NUM` values are shown in the table below.
-All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 128, 128], with kernel function name `asc_copy_l0c2l1`.
+All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 128, 128], with kernel function name `asc_copy_l0c2l1_custom`.
 
 <a name="table2"></a>
 <table border="2" align="center">
@@ -95,7 +95,7 @@ Run the following steps in the root directory of this example to build and run t
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default installation path is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 - Run the example
 
   Run the following commands in the example directory.
