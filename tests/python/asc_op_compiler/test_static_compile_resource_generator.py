@@ -676,12 +676,16 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 {
                     "name": "tiling_data",
                     "parameter_index": 4,
+                    "arg_type": "pointer",
+                    "byte_size": 8,
                     "file": "${resource}/resources/include/add_custom_tiling_data.h",
                     "template": "@@STATIC_VALUE_tiling_data@@",
                 },
                 {
                     "name": "block_dim",
                     "parameter_index": 5,
+                    "arg_type": "pointer",
+                    "byte_size": 4,
                     "file": "${resource}/resources/include/add_custom_tiling_data.h",
                     "template": block_dim_template,
                 },

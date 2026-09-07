@@ -34,8 +34,6 @@ constexpr const char* SOURCE_FILE_PATH_MARKER = "${source_file_path}";
 constexpr const char* POINTER_ARGUMENT_TYPE = "pointer";
 constexpr const char* STRUCT_ARGUMENT_TYPE = "struct";
 
-const std::set<std::string> CONSTANT_FIELDS = {"name", "parameter_index", "arg_type", "byte_size", "file", "template"};
-
 enum class MarkerRequirement { None, SourceFile };
 
 const std::map<std::string, MarkerRequirement> GENERIC_MARKER_REQUIREMENTS = {
@@ -317,18 +315,8 @@ bool ResourceManifestValidator::ValidateOptionArray(const std::string& name)
 
 bool ResourceManifestValidator::ValidateConstant(const Json& constant, std::set<std::string>& constantNames)
 {
-    if (!CheckAndLog(constant.is_object(), __LINE__, "invalid constant: expected an object")) {
-        return false;
-    }
-    for (const auto& field : constant.items()) {
-        if (!CheckAndLog(
-                CONSTANT_FIELDS.count(field.key()) != 0U, __LINE__,
-                "invalid constant: unsupported field=" + field.key())) {
-            return false;
-        }
-    }
-
-    if (!CheckAndLog(constant.contains("name"), __LINE__, "missing required constant field: name") ||
+    if (!CheckAndLog(constant.is_object(), __LINE__, "invalid constant: expected an object") ||
+        !CheckAndLog(constant.contains("name"), __LINE__, "missing required constant field: name") ||
         !CheckAndLog(
             constant.contains("parameter_index"), __LINE__, "missing required constant field: parameter_index") ||
         !CheckAndLog(constant.contains("file"), __LINE__, "missing required constant field: file") ||
@@ -362,22 +350,24 @@ bool ResourceManifestValidator::ValidateConstant(const Json& constant, std::set<
     }
 
     const bool hasByteSize = constant.contains("byte_size");
-    if (!CheckAndLog(
-            argumentType != STRUCT_ARGUMENT_TYPE || !hasByteSize, __LINE__,
-            "invalid struct constant: byte_size must be omitted; size comes from argsBytes")) {
+    if (argumentType == POINTER_ARGUMENT_TYPE) {
+        if (!CheckAndLog(hasByteSize, __LINE__, "missing required pointer constant field: byte_size") ||
+            !CheckAndLog(
+                constant.at("byte_size").is_number_unsigned(), __LINE__,
+                "invalid byte_size: expected an unsigned integer") ||
+            !CheckAndLog(
+                constant.at("byte_size").get<Json::number_unsigned_t>() != 0U, __LINE__,
+                "invalid byte_size: expected a nonzero value")) {
+            return false;
+        }
+    } else if (!CheckAndLog(
+                   !hasByteSize, __LINE__,
+                   "invalid struct constant: byte_size must be omitted; size comes from argsBytes")) {
         return false;
     }
-    if (!CheckAndLog(
-            argumentType != POINTER_ARGUMENT_TYPE || hasByteSize, __LINE__,
-            "missing required pointer constant field: byte_size")) {
-        return false;
-    }
-    if (hasByteSize && (!CheckAndLog(
-                            constant.at("byte_size").is_number_unsigned(), __LINE__,
-                            "invalid byte_size: expected an unsigned integer") ||
-                        !CheckAndLog(
-                            constant.at("byte_size").get<Json::number_unsigned_t>() != 0U, __LINE__,
-                            "invalid byte_size: expected a nonzero value"))) {
+    constexpr size_t requiredConstantFieldCount = 4U;
+    const size_t expectedFieldCount = requiredConstantFieldCount + hasArgumentType + hasByteSize;
+    if (!CheckAndLog(constant.size() == expectedFieldCount, __LINE__, "invalid constant: unexpected extra fields")) {
         return false;
     }
 

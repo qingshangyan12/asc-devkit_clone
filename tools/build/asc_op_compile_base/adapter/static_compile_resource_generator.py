@@ -77,7 +77,6 @@ class ConstantInfoRecord:
     byte_size: int
     template_path: str
     template: str
-    arg_type: str = "struct"
 
 
 @dataclass(frozen=True)
@@ -565,7 +564,6 @@ class ManifestPackageWriter:
                 byte_size=manifest_tiling_size,
                 template_path=tiling_info.tiling_data_file_path,
                 template=_TILING_DATA_TEMPLATE,
-                arg_type="pointer",
             ),
         )
         constant_info_sizes = snapshot.constant_info_size_by_tiling_key or {
@@ -738,14 +736,8 @@ class ManifestPackageWriter:
                         {
                             "name": constant_info.name,
                             "parameter_index": constant_info.parameter_index,
-                            **(
-                                {
-                                    "arg_type": constant_info.arg_type,
-                                    "byte_size": constant_info.byte_size,
-                                }
-                                if constant_info.arg_type != "struct"
-                                else {}
-                            ),
+                            "arg_type": "pointer",
+                            "byte_size": constant_info.byte_size,
                             "file": _resource_placeholder(
                                 self._resource_path,
                                 self._constant_info_logicals[
