@@ -15,11 +15,6 @@
 
 #pragma once
 
-#ifndef ceil_div
-#define ceil_div(a, b) (((a) + (b) - 1) / (b))
-#define ceil_align(a, b) (ceil_div(a, b) * (b))
-#endif
-
 // ========== 场景2 常量 ==========
 constexpr uint32_t S2_C0_SIZE = 16;
 constexpr uint32_t S2_FRACTAL_NUM = 1;
@@ -79,10 +74,10 @@ __aicore__ inline void s2_split_matrix_a_to_l0a(__ca__ bfloat16_t* dst, __cbuf__
 
     uint16_t m_start_position = 0;
     uint16_t k_start_position = 0;
-    uint8_t m_step = ceil_div(M, BLOCK_CUBE);
-    uint8_t k_step = ceil_div(K, S2_C0_SIZE);
-    int16_t src_stride = ceil_div(M, BLOCK_CUBE);
-    uint16_t dst_stride = ceil_div(M, BLOCK_CUBE);
+    uint8_t m_step = AscendC::Std::ceil_div(M, BLOCK_CUBE);
+    uint8_t k_step = AscendC::Std::ceil_div(K, S2_C0_SIZE);
+    int16_t src_stride = AscendC::Std::ceil_div(M, BLOCK_CUBE);
+    uint16_t dst_stride = AscendC::Std::ceil_div(M, BLOCK_CUBE);
 
     asc_copy_l12l0a(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
 
@@ -95,10 +90,10 @@ __aicore__ inline void s2_split_matrix_b_to_l0b(__cb__ bfloat16_t* dst, __cbuf__
 
     uint16_t m_start_position = 0;
     uint16_t k_start_position = 0;
-    uint8_t m_step = ceil_div(N, BLOCK_CUBE);
-    uint8_t k_step = ceil_div(K, S2_C0_SIZE);
-    int16_t src_stride = ceil_div(N, BLOCK_CUBE);
-    uint16_t dst_stride = ceil_div(N, BLOCK_CUBE);
+    uint8_t m_step = AscendC::Std::ceil_div(N, BLOCK_CUBE);
+    uint8_t k_step = AscendC::Std::ceil_div(K, S2_C0_SIZE);
+    int16_t src_stride = AscendC::Std::ceil_div(N, BLOCK_CUBE);
+    uint16_t dst_stride = AscendC::Std::ceil_div(N, BLOCK_CUBE);
 
     asc_copy_l12l0b(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
 

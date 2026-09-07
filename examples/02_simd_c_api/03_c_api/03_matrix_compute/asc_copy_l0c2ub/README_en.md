@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example demonstrates how to use the SIMD C API `asc_copy_l0c2ub` to transfer matrix multiplication results from L0C Buffer to UB (Unified Buffer), supporting multiple output formats (Nz and ND) and dual-target mode (splitting along the M or N dimension). This API efficiently transfers matrix multiplication results from L0C to unified buffer and supports various data format conversions and splitting capabilities.
+This example demonstrates how to use the SIMD C API `asc_copy_l0c2ub` to transfer matrix multiplication results from L0C Buffer to UB (Unified Buffer), supporting multiple output formats (Nz and ND) and dual-target mode (splitting along the M or N dimension). This API efficiently transfers matrix multiplication results from L0C Buffer to unified buffer and supports various data format conversions and splitting capabilities.
 
 ## Supported Products and CANN Versions
 
@@ -26,13 +26,13 @@ This example demonstrates how to use the SIMD C API `asc_copy_l0c2ub` to transfe
 
 ## Scenario Description
 
-This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different SCENARIO_NUM values are shown in the table below. All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 256, 128], with kernel function name `asc_copy_l0c2ub`.
+This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different SCENARIO_NUM values are shown in the table below. All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 256, 128], with kernel function name `asc_copy_l0c2ub_custom`.
 
 <a name="table1"></a>
 <table border="2" align="center">
 <caption style="font-weight: normal;">
     <span style="font-weight: bold; font-size: 1.2em;">Table 1: Meaning of Different scenarioNum Values</span></caption>
-<tr><td rowspan="1" align="center">scenarioNum</td><td align="center">L0C Data Type</td><td align="center">Output Data Type</td><td align="center">Output Format</td><td align="center">Dual-Target Mode</td><td align="center">Split Dimension</td></tr>
+<tr><td rowspan="1" align="center">scenarioNum</td><td align="center">L0C Buffer Data Type</td><td align="center">Output Data Type</td><td align="center">Output Format</td><td align="center">Dual-Target Mode</td><td align="center">Split Dimension</td></tr>
 <tr><td align="center">1</td><td align="center">float</td><td align="center">float</td><td align="center">Nz</td><td align="center">No</td><td align="center">-</td></tr>
 <tr><td align="center">2</td><td align="center">float</td><td align="center">float</td><td align="center">ND</td><td align="center">No</td><td align="center">-</td></tr>
 <tr><td align="center">3</td><td align="center">float</td><td align="center">float</td><td align="center">ND</td><td align="center">Yes</td><td align="center">M dimension</td></tr>
@@ -43,7 +43,7 @@ This example selects different output scenarios through the compilation paramete
 - Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
 - Output: C [128, 256] float type, Nz format
 - Implementation: Call `asc_copy_l0c2ub` with `dual_dst_mode = DUAL_DST_DISABLE` and Nz2ND disabled to write Nz directly
-- Description: L0C data in Nz format directly output to UB in Nz format, data remains unchanged
+- Description: L0C Buffer data in Nz format directly output to UB in Nz format, data remains unchanged
 
 **Scenario 2: Output format ND, output data type float**
 - Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
@@ -78,7 +78,7 @@ Run the following steps in the root directory of this example to build and run t
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default installation path is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 - Run the example
 
   Run the following commands in the example directory.

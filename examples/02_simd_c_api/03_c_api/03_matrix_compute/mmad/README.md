@@ -31,7 +31,7 @@
 
 ## 样例描述
 
-一次完整的矩阵乘法涉及的数据搬运过程包括：Global Memory -> L1 Buffer、L1 Buffer -> L0A / L0B Buffer、L1 Buffer -> BiasTable Buffer、L0C Buffer -> Global Memory。不同存储单元的数据排布格式如下表所示。
+一次完整的矩阵乘法涉及的数据搬运过程包括：Global Memory -> L1 Buffer、L1 Buffer -> L0A Buffer / L0B Buffer、L1 Buffer -> BiasTable Buffer、L0C Buffer -> Global Memory。不同存储单元的数据排布格式如下表所示。
 
 <a name="表1"></a>
 <table border="2" align="center">
@@ -46,15 +46,15 @@
     <td>输入 A、B 矩阵和输出 C 矩阵为 ND 排列。</td>
   </tr>
   <tr>
-    <td>L1 Buffer（L1）</td>
+    <td>L1 Buffer</td>
     <td>A、B 矩阵为 Nz 排列。</td>
   </tr>
   <tr>
-    <td>L0A Buffer（L0A）</td>
+    <td>L0A Buffer</td>
     <td>A 矩阵为 Nz 排列。</td>
   </tr>
   <tr>
-    <td>L0B Buffer（L0B）</td>
+    <td>L0B Buffer</td>
     <td>B 矩阵为 Zn 排列。</td>
   </tr>
   <tr>
@@ -62,7 +62,7 @@
     <td>Bias 是 shape 为 [N] 的一维 Tensor。</td>
   </tr>
   <tr>
-    <td>L0C Buffer（L0C）</td>
+    <td>L0C Buffer</td>
     <td>C 矩阵为 Nz 排列。</td>
   </tr>
 </table>
@@ -72,11 +72,11 @@
 <a name="表2"></a>
 <table border="2" align="center">
 <caption style="font-weight: normal;">
-    <span style="font-weight: bold; font-size: 1.2em;">📌 表2：L0C 与输入 Bias 的数据类型对应关系</span></caption>
+    <span style="font-weight: bold; font-size: 1.2em;">📌 表2：L0C Buffer与输入 Bias 的数据类型对应关系</span></caption>
   <tr>
-    <td>Bias在GM/L1上的数据类型</td>
+    <td>Bias在GM/L1 Buffer上的数据类型</td>
     <td>Bias在BT（BiasTable Buffer）上的数据类型</td>
-    <td>矩阵计算输出到L0C上的数据类型</td>
+    <td>矩阵计算输出到L0C Buffer上的数据类型</td>
   </tr>
   <tr>
     <td>int32_t</td>
@@ -148,10 +148,10 @@
   - Bias [1, 40] int32_t；
 - 输出：C [30, 40] int32_t，ND 格式；
 - 实现（详见 `mmad_s1.h`）：
-  1. `asc_copy_gm2l1_nd2nz` + `asc_set_gm2l1_nz_para`：A、B、Bias 从 GM 搬运至 L1（ND → Nz）；
-  2. `asc_copy_l12l0a`：A 从 L1 搬运至 L0A；`asc_copy_l12l0b_trans`：B 从 L1 转置搬运至 L0B；`asc_copy_l12bt`：Bias 从 L1 搬运至 BT；
+  1. `asc_copy_gm2l1_nd2nz` + `asc_set_gm2l1_nz_para`：A、B、Bias 从 GM 搬运至 L1 Buffer（ND → Nz）；
+  2. `asc_copy_l12l0a`：A 从 L1 Buffer搬运至 L0A Buffer；`asc_copy_l12l0b_trans`：B 从 L1 Buffer转置搬运至 L0B Buffer；`asc_copy_l12bt`：Bias 从 L1 Buffer搬运至 BT；
   3. `asc_mmad`：矩阵乘加，C 矩阵初始值来源于 BT；
-  4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`：结果从 L0C 搬运至 GM（Nz → ND）；
+  4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`：结果从 L0C Buffer搬运至 GM（Nz → ND）；
 - 说明：int8_t类型输入，B矩阵不转置场景下，N轴向2 * 16对齐，填充了全部是无效数据的32 * 16的分形。如下图1所示，如果设置`right_width = N`，就会导致读入编号为3、7的分形，同时又没能将包含有效数据的编号为9、10的分形读入。因此需要设置：`right_width = CeilAlign(N, BLOCK_CUBE * fractalNum)`，此时会读入全部分形，虽然矩阵计算结果中包含了无效数据参与计算的结果，但是在`asc_copy_l0c2gm`指令搬出数据时通过设置`n_size = N`来保证无效数据参与计算的结果不会被搬出。
 <p align="center">
   <img src="figures/mmad_s8_L0B_转置.png" width="700">
@@ -167,10 +167,10 @@
   - B 转置 [40, 70] bfloat16_t，ND 格式；
 - 输出：C [30, 40] float，ND 格式；
 - 实现（详见 `mmad_s2.h`）：
-  1. `asc_copy_gm2l1_nd2nz` + `asc_set_gm2l1_nz_para`：A、B 从 GM 搬运至 L1（B 以转置后的 ND 排布存放于 GM）；
-  2. `asc_copy_l12l0a`：A 从 L1 搬运至 L0A；`asc_copy_l12l0b`：B 从 L1 直接搬运至 L0B（B 已在 L1 中转置为 Nz 排布）；
+  1. `asc_copy_gm2l1_nd2nz` + `asc_set_gm2l1_nz_para`：A、B 从 GM 搬运至 L1 Buffer（B 以转置后的 ND 排布存放于 GM）；
+  2. `asc_copy_l12l0a`：A 从 L1 Buffer搬运至 L0A Buffer；`asc_copy_l12l0b`：B 从 L1 Buffer直接搬运至 L0B Buffer（B 已在 L1 Buffer中转置为 Nz 排布）；
   3. `asc_mmad`：两次调用。首次 `c_matrix_init_val = true` 将 C 初始化为 0 并计算 A×B；第二次 `c_matrix_init_val = false`、`c_matrix_source = false` 以 CO1 为初值累加第二次 A×B；
-  4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`：结果从 L0C 搬运至 GM；
+  4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`：结果从 L0C Buffer搬运至 GM；
 
 **场景 3：float 输入，float 输出，A/B 转置，显式传入 Bias 地址**
 
@@ -180,16 +180,16 @@
   - Bias [1, 40] float；
 - 输出：C [30, 40] float，ND 格式；
 - 实现（详见 `mmad_s3.h`）：
-  1. `asc_copy_gm2l1_nd2nz` + `asc_set_gm2l1_nz_para`：将转置后的 A、B 及 Bias 从 GM 搬运至 L1；
-  2. `asc_copy_l12l0a_transpose`：将 A 从 L1 转置搬运至 L0A；`asc_copy_l12l0b`：将 B 从 L1 搬运至 L0B；`asc_copy_l12bt`：将 Bias 从 L1 搬运至 BT 的 0 地址；
+  1. `asc_copy_gm2l1_nd2nz` + `asc_set_gm2l1_nz_para`：将转置后的 A、B 及 Bias 从 GM 搬运至 L1 Buffer；
+  2. `asc_copy_l12l0a_transpose`：将 A 从 L1 Buffer转置搬运至 L0A Buffer；`asc_copy_l12l0b`：将 B 从 L1 Buffer搬运至 L0B Buffer；`asc_copy_l12bt`：将 Bias 从 L1 Buffer搬运至 BT 的 0 地址；
   3. `asc_mmad`：显式传入 BT 的 0 地址作为 Bias 地址，并设置 `disable_gemv = false`，完成矩阵乘加；
-  4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`：将结果从 L0C 搬运至 GM（Nz -> ND）；
-- 说明：源场景统一设置 `mmadParams.kDirectionAlign = true`。在本样例支持的 `dav-3510` 架构上，基础 API 实际下沉给 Mmad 指令的对应参数为 `mmadParams.disableGemv`，不下沉 `kDirectionAlign`；C API 因此使用 `dav-3510` 对应的显式 Bias 地址重载，并保持源场景的 `disableGemv = false`。A 搬入 L0A 时仍按源场景将 K 方向对齐至 `CeilAlign(K, 16)`。
+  4. `asc_copy_l0c2gm` + `asc_set_l0c2gm_nz2nd`：将结果从 L0C Buffer搬运至 GM（Nz -> ND）；
+- 说明：A 矩阵通过 `asc_copy_l12l0a_transpose` 从 L1 Buffer转置搬运至 L0A Buffer。L0A Buffer中 M、K 方向的存储长度分别按照 `ceil_align(M, BLOCK_CUBE)` 和 `ceil_align(K, S3_C0_SIZE * S3_FRACTAL_NUM)` 计算；当前规格下，M 方向由 30 对齐至 32，K 方向由 70 对齐至 80。场景 3 使用 `dav-3510` 对应的显式 Bias 地址重载；由于 M 不为 1，`disable_gemv` 参数在本场景中不生效。
 <p align="center">
   <img src="figures/mmad_f32_L0A_转置.png" width="1100">
 </p>
 <p align="center">
-图2：float 类型、A 转置时，K 轴实际对齐与 Mmad 默认要求不同
+图2：float 类型 A 矩阵转置搬运后的 L0A Buffer数据布局
 </p>
 
 ### 矩阵乘法（Mmad）
@@ -197,18 +197,18 @@
 下面将介绍如何配置
 `asc_mmad`指令的入参，入参的具体含义这里不再赘述。
 
-需要注意的是，执行`asc_mmad`指令时，矩阵计算单元会从L0A/L0B连续读入多个分形参与矩阵乘计算。读入分形的数量由`left_height`、`n_dim`、`right_width`的取值，以及`asc_mmad`指令对L0A/L0B上A矩阵、B矩阵各轴的对齐要求共同决定。
+需要注意的是，执行`asc_mmad`指令时，矩阵计算单元会从L0A Buffer/L0B Buffer连续读入多个分形参与矩阵乘计算。读入分形的数量由`left_height`、`n_dim`、`right_width`的取值，以及`asc_mmad`指令对L0A Buffer/L0B Buffer上A矩阵、B矩阵各轴的对齐要求共同决定。
 
-如图3所示，以b16输入类型为例，`asc_mmad`指令会按照A矩阵分形[16, 16]、B矩阵分形[16, 16]连续读入数据。此时，矩阵计算单元从L0A/L0B读入的分形总数分别为2 x 5 = 10和5 x 3 = 15，写入L0C的分形总数为2 x 3 = 6。
+如图3所示，以b16输入类型为例，`asc_mmad`指令会按照A矩阵分形[16, 16]、B矩阵分形[16, 16]连续读入数据。此时，矩阵计算单元从L0A Buffer/L0B Buffer读入的分形总数分别为2 x 5 = 10和5 x 3 = 15，写入L0C Buffer的分形总数为2 x 3 = 6。
 
 <p align="center">
   <img src="figures/mmad_f16_A5.png" width="900">
 </p>
 <p align="center">
-图3：bfloat16类型，L0A上Nz排布，Mmad数据排布示意图
+图3：bfloat16类型，L0A Buffer上Nz排布，Mmad数据排布示意图
 </p>
 
-Mmad计算中包含了补齐的无效数据，需要配合Fixpipe指令在L0C搬出到GM过程中，排除参数Mmad计算过程中填充的无效数据。
+Mmad计算中包含了补齐的无效数据，需要配合Fixpipe指令在L0C Buffer搬出到GM过程中，排除参数Mmad计算过程中填充的无效数据。
 
 ## 编译运行
 
