@@ -9,6 +9,7 @@
  */
 #include "hccl_alloc_ctx_res.h"
 #include "kfc_server_protocol.h"
+#include "mc2_profiling_binding.h"
 
 #include <limits>
 
@@ -839,6 +840,11 @@ HcclResult GetOpParamResCtx(
     CHK_PTR_NULL(*resCtxOut);
     opParam.cacheValid = isResourceReused;
     opParam.resCtx = *resCtxOut;
+    const HcclResult profilingRet = resCtxHost != nullptr ?
+        SaveMc2AlgorithmThreads(comm, opParam, resCtxHost->threads) : HCCL_E_NOT_FOUND;
+    if (profilingRet != HCCL_SUCCESS) {
+        HCCL_WARNING("[MC2_PROF_BIND] cannot snapshot algorithm Threads, ret[%d]", profilingRet);
+    }
     return HCCL_SUCCESS;
 }
 

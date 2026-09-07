@@ -9,6 +9,7 @@
  */
 
 #include "hccl/hccl_types.h"
+#include "mc2_profiling_binding_protocol.h"
 #include "hccl/base.h"
 #include "hccl_res.h"
 #include "dtype_common.h"
@@ -37,6 +38,8 @@ using namespace HcclSim;
 
 namespace mc2_ops_hccl {
 uint32_t g_hcclEngineCtxCopyCallCount = 0;
+bool g_ackMc2Binding = false;
+uint32_t g_mc2BindingRequests = 0;
 }
 
 namespace {
@@ -435,7 +438,8 @@ HcclResult HcclEngineCtxCopy(
 {
     ++mc2_ops_hccl::g_hcclEngineCtxCopyCallCount;
     // HOST场景下srcCtx就是创建的EngineCtx内存地址，无需拷贝
-    if (engine == CommEngine::COMM_ENGINE_AICPU_TS || engine == CommEngine::COMM_ENGINE_AICPU) {
+    if (engine == CommEngine::COMM_ENGINE_AICPU_TS || engine == CommEngine::COMM_ENGINE_AICPU ||
+        engine == CommEngine::COMM_ENGINE_CPU) {
         uint64_t ctxSize = 0;
         void* ctx = nullptr;
         auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
@@ -448,6 +452,15 @@ HcclResult HcclEngineCtxCopy(
                 srcCtx, ctxSize, size, dstCtxOffset),
             HCCL_E_PARA);
         memcpy(static_cast<uint8_t*>(ctx) + dstCtxOffset, srcCtx, size);
+        if (Mc2ProfilingBinding::IsBindingTag(ctxTag)) {
+            ++mc2_ops_hccl::g_mc2BindingRequests;
+            auto* header = static_cast<Mc2ProfilingBinding::Header*>(ctx);
+            if (mc2_ops_hccl::g_ackMc2Binding &&
+                Mc2ProfilingBinding::Validate(*header, size, ctxTag)) {
+                header->ackRequestId = header->requestId;
+                header->ackStatus = HCCL_SUCCESS;
+            }
+        }
     }
     return HCCL_SUCCESS;
 }
