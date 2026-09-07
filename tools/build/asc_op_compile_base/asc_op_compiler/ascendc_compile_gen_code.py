@@ -356,7 +356,9 @@ def add_op_param_to_workspace(
 
     has_storage_shape = not tiling_info.static_shape_flag
     if has_storage_shape:
-        legacy_len_count = len([item for item in input_output_info if item is not None]) + 1
+        legacy_len_count = (
+            len([item for item in input_output_info if item is not None]) + 1
+        )
         if (
             opinfo.output_shape_depend_on_compute is not None
             and len(opinfo.output_shape_depend_on_compute) > 0
@@ -383,8 +385,10 @@ def add_op_param_to_workspace(
                     source += "    if (!hasOomStorageShape || !AscendC::OOMTryRegisterTensorListWithStorageShape(oomStorageShapeCursor, {}, {})) {{\n".format(
                         op_param.get("param_name"), dtype_int[io_index]
                     )
-                    source += "        AscendC::OOMCheckTensorListRange({}, {});\n".format(
-                        op_param.get("param_name"), dtype_int[io_index]
+                    source += (
+                        "        AscendC::OOMCheckTensorListRange({}, {});\n".format(
+                            op_param.get("param_name"), dtype_int[io_index]
+                        )
                     )
                     source += "    }\n"
                 else:
