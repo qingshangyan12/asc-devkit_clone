@@ -32,9 +32,9 @@ namespace Detail {
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
     KLoop is only for internal usage, does not support extension or customized specialization!
 */
-template <typename IMPL, typename TRANS_T, class A_TYPE, const auto& MM_CFG>
+template <typename IMPL, typename TRANS_T, class A_TYPE, class B_TYPE, const auto& MM_CFG>
 class KLoop<
-    IMPL, TRANS_T, A_TYPE, MM_CFG,
+    IMPL, TRANS_T, A_TYPE, B_TYPE, MM_CFG,
     enable_if_t<
         isNormEnableScheduler<A_TYPE, MM_CFG> || IsBmmEnableScheduler<A_TYPE, MM_CFG> || IsBasicBlockEnable<MM_CFG> ||
         DoMatmulIBShareNorm(MM_CFG)>> {
@@ -110,7 +110,7 @@ public:
 
     __aicore__ inline bool LastOuterIter() const { return outerIdx_ + 1 == kIter_; }
 
-    __aicore__ inline void InnerStart(){};
+    __aicore__ inline void InnerStart() {};
 
     __aicore__ inline bool InnerNext() { return false; }
 

@@ -28,7 +28,7 @@
 namespace AscendC {
 namespace Impl {
 namespace Detail {
-template <typename IMPL, typename A_TYPE, const auto& MM_CFG>
+template <typename IMPL, typename A_TYPE, typename B_TYPE, const auto& MM_CFG>
 class MatmulShapeInfoBase {
     using L0cT = typename GetMmDstType<typename A_TYPE::T>::Type;
     using SrcT = typename A_TYPE::T;
@@ -227,26 +227,26 @@ protected:
     int singleCoreK_;
 };
 
-template <typename IMPL, typename A_TYPE, const auto& MM_CFG, typename = void>
-class MatmulShapeInfo : public MatmulShapeInfoBase<IMPL, A_TYPE, MM_CFG> {
+template <typename IMPL, typename A_TYPE, typename B_TYPE, const auto& MM_CFG, typename = void>
+class MatmulShapeInfo : public MatmulShapeInfoBase<IMPL, A_TYPE, B_TYPE, MM_CFG> {
     using L0cT = typename GetMmDstType<typename A_TYPE::T>::Type;
     using SrcT = typename A_TYPE::T;
     MATMUL_USE_MODULE(MatmulShapeTiling);
 
 public:
-    using BASE_MODULE = MatmulShapeInfoBase<IMPL, A_TYPE, MM_CFG>;
+    using BASE_MODULE = MatmulShapeInfoBase<IMPL, A_TYPE, B_TYPE, MM_CFG>;
 };
 
-template <typename IMPL, typename A_TYPE, const auto& MM_CFG>
-class MatmulShapeInfo<IMPL, A_TYPE, MM_CFG, enable_if_t<IsIntrablock<MM_CFG>>>
-    : public MatmulShapeInfoBase<IMPL, A_TYPE, MM_CFG> {
+template <typename IMPL, typename A_TYPE, typename B_TYPE, const auto& MM_CFG>
+class MatmulShapeInfo<IMPL, A_TYPE, B_TYPE, MM_CFG, enable_if_t<IsIntrablock<MM_CFG>>>
+    : public MatmulShapeInfoBase<IMPL, A_TYPE, B_TYPE, MM_CFG> {
     using L0cT = typename GetMmDstType<typename A_TYPE::T>::Type;
     using SrcT = typename A_TYPE::T;
     MATMUL_USE_MODULE(MatmulShapeTiling);
     MATMUL_USE_MODULE(MatmulSubBlockInfo);
 
 public:
-    using BASE_MODULE = MatmulShapeInfoBase<IMPL, A_TYPE, MM_CFG>;
+    using BASE_MODULE = MatmulShapeInfoBase<IMPL, A_TYPE, B_TYPE, MM_CFG>;
 
     __aicore__ inline MatmulShapeInfo() = default;
     __aicore__ inline ~MatmulShapeInfo() = default;
@@ -428,15 +428,16 @@ private:
     IntraBlock intraBlock;
 };
 
-template <typename IMPL, typename A_TYPE, const auto& MM_CFG>
-class MatmulShapeInfo<IMPL, A_TYPE, MM_CFG, enable_if_t<HasScalePosition<A_TYPE>::value>>
-    : public MatmulShapeInfoBase<IMPL, A_TYPE, MM_CFG> {
+template <typename IMPL, typename A_TYPE, typename B_TYPE, const auto& MM_CFG>
+class MatmulShapeInfo<
+    IMPL, A_TYPE, B_TYPE, MM_CFG, enable_if_t<HasScalePosition<A_TYPE>::value || HasScalePosition<B_TYPE>::value>>
+    : public MatmulShapeInfoBase<IMPL, A_TYPE, B_TYPE, MM_CFG> {
     using L0cT = typename GetMmDstType<typename A_TYPE::T>::Type;
     using SrcT = typename A_TYPE::T;
     MATMUL_USE_MODULE(MatmulShapeTiling);
 
 public:
-    using BASE_MODULE = MatmulShapeInfoBase<IMPL, A_TYPE, MM_CFG>;
+    using BASE_MODULE = MatmulShapeInfoBase<IMPL, A_TYPE, B_TYPE, MM_CFG>;
 
     __aicore__ inline MatmulShapeInfo() = default;
     __aicore__ inline ~MatmulShapeInfo() = default;
