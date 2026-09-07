@@ -130,51 +130,59 @@ __simd_callee__ inline void Mula(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mas
     MulAddDstImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
 }
 
-// template <typename T = DefaultType, typename U>
-// __simd_callee__ inline void AddCarryOut(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     AddCarryOutImpl<T, U>(carry, dstReg, srcReg0, srcReg1, mask);
-// }
 template <typename T, typename U>
 __simd_callee__ inline void Add(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
     AddCarryOutImpl<T, U>(carry, dstReg, srcReg0, srcReg1, mask);
 }
 
-// template <typename T = DefaultType, typename U>
-// __simd_callee__ inline void SubCarryOut(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
-// {
-//     SubCarryOutImpl<T, U>(carry, dstReg, srcReg0, srcReg1, mask);
-// }
 template <typename T, typename U>
 __simd_callee__ inline void Sub(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
     SubCarryOutImpl<T, U>(carry, dstReg, srcReg0, srcReg1, mask);
 }
 
-// template <typename T = DefaultType, typename U>
-// __simd_callee__ inline void AddCarryOuts(
-//     MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& carrySrc, MaskReg& mask)
-// {
-//     AddCarryOutsImpl<T, U>(carry, dstReg, srcReg0, srcReg1, carrySrc, mask);
-// }
 template <typename T, typename U>
 __simd_callee__ inline void AddC(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& carrySrc, MaskReg& mask)
 {
     AddCarryOutsImpl<T, U>(carry, dstReg, srcReg0, srcReg1, carrySrc, mask);
 }
 
-// template <typename T = DefaultType, typename U>
-// __simd_callee__ inline void SubCarryOuts(
-//     MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& carrySrc, MaskReg& mask)
-// {
-//     SubCarryOutsImpl<T, U>(carry, dstReg, srcReg0, srcReg1, carrySrc, mask);
-// }
 template <typename T, typename U>
 __simd_callee__ inline void SubC(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& carrySrc, MaskReg& mask)
 {
     SubCarryOutsImpl<T, U>(carry, dstReg, srcReg0, srcReg1, carrySrc, mask);
 }
+
+#if !(                       \
+    defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void AddCarryOut(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
+{
+    AddCarryOutImpl<T, U>(carry, dstReg, srcReg0, srcReg1, mask);
+}
+
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void SubCarryOut(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
+{
+    SubCarryOutImpl<T, U>(carry, dstReg, srcReg0, srcReg1, mask);
+}
+
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void AddCarryOuts(
+    MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& carrySrc, MaskReg& mask)
+{
+    AddCarryOutsImpl<T, U>(carry, dstReg, srcReg0, srcReg1, carrySrc, mask);
+}
+
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void SubCarryOuts(
+    MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& carrySrc, MaskReg& mask)
+{
+    SubCarryOutsImpl<T, U>(carry, dstReg, srcReg0, srcReg1, carrySrc, mask);
+}
+#endif
 } // namespace Reg
 } // namespace AscendC
 
