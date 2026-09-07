@@ -170,9 +170,9 @@ __simd_vf__ inline void VecBinaryVFImpl(
         maskRegSrc = maskReg;
         maskRegDst = maskReg;
         if constexpr (sizeof(U) == 2 * sizeof(T)) {
-            Reg::MaskPack(maskRegDst, maskReg);
+            Reg::Pack(maskRegDst, maskReg);
         } else if constexpr (sizeof(T) == 2 * sizeof(U)) {
-            Reg::MaskPack(maskRegSrc, maskReg);
+            Reg::Pack(maskRegSrc, maskReg);
         }
     }
     constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
@@ -183,9 +183,9 @@ __simd_vf__ inline void VecBinaryVFImpl(
             maskRegSrc = maskReg;
             maskRegDst = maskReg;
             if constexpr (sizeof(U) == 2 * sizeof(T)) {
-                Reg::MaskPack(maskRegDst, maskReg);
+                Reg::Pack(maskRegDst, maskReg);
             } else if constexpr (sizeof(T) == 2 * sizeof(U)) {
-                Reg::MaskPack(maskRegSrc, maskReg);
+                Reg::Pack(maskRegSrc, maskReg);
             }
         }
         Reg::RegTensor<T> dstVreg;
