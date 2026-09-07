@@ -23,6 +23,8 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_l12bt.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_set_l13d_rpt_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_set_l13d_padding_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_set_gm2l1_padding_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_set_l12l0a_3d_padding_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_set_l0c_copy_params_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_set_l0c_copy_prequant_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_l12l0b_trans_impl.h"
@@ -48,6 +50,7 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_copy_gm2l0b_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_set_l13d_fmatrix_b_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_set_l0c2gm_lrelu_alpha_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_2201/cube_datamove_impl/asc_set_l0c_copy_lrelu_alpha_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c2gm_config_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_compute_impl/asc_get_l0c2gm_config_impl.h"
 
@@ -76,6 +79,13 @@ __aicore__ inline void asc_copy_l12l0b_sparse_sync(
 }
 
 __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config) { asc_set_l13d_rpt_impl(config); }
+
+__aicore__ inline void asc_set_l13d_rpt(
+    uint16_t repeat_stride, uint8_t repeat_times, asc_l13d_repeat_direction repeat_direction, uint16_t dst_stride_k,
+    uint16_t dst_start_pos_m)
+{
+    asc_set_l13d_rpt_impl(repeat_stride, repeat_times, repeat_direction, dst_stride_k, dst_start_pos_m);
+}
 
 // ==========asc_copy_l12l0b, 2D, int4b_t/int8_t/uint8_t/half/bfloat16_t/int32_t/uint32_t/float==========
 __aicore__ inline void asc_copy_l12l0b(
@@ -1765,6 +1775,49 @@ __aicore__ inline void asc_set_l13d_padding(int16_t config) { asc_set_l13d_paddi
 
 __aicore__ inline void asc_set_l13d_padding(uint16_t config) { asc_set_l13d_padding_impl(config); }
 
+__aicore__ inline void asc_set_l12l0a_3d_padding(uint64_t config) { asc_set_l12l0a_3d_padding_impl(config); }
+__aicore__ inline void asc_set_l12l0a_3d_padding(int8_t padding_value)
+{
+    asc_set_l12l0a_3d_padding_impl(padding_value);
+}
+__aicore__ inline void asc_set_l12l0a_3d_padding(uint8_t padding_value)
+{
+    asc_set_l12l0a_3d_padding_impl(padding_value);
+}
+__aicore__ inline void asc_set_l12l0a_3d_padding(int16_t padding_value)
+{
+    asc_set_l12l0a_3d_padding_impl(padding_value);
+}
+__aicore__ inline void asc_set_l12l0a_3d_padding(uint16_t padding_value)
+{
+    asc_set_l12l0a_3d_padding_impl(padding_value);
+}
+__aicore__ inline void asc_set_l12l0a_3d_padding(half padding_value) { asc_set_l12l0a_3d_padding_impl(padding_value); }
+__aicore__ inline void asc_set_l12l0a_3d_padding(bfloat16_t padding_value)
+{
+    asc_set_l12l0a_3d_padding_impl(padding_value);
+}
+__aicore__ inline void asc_set_l12l0a_3d_padding(int32_t padding_value)
+{
+    asc_set_l12l0a_3d_padding_impl(padding_value);
+}
+__aicore__ inline void asc_set_l12l0a_3d_padding(uint32_t padding_value)
+{
+    asc_set_l12l0a_3d_padding_impl(padding_value);
+}
+__aicore__ inline void asc_set_l12l0a_3d_padding(float padding_value) { asc_set_l12l0a_3d_padding_impl(padding_value); }
+
+__aicore__ inline void asc_set_gm2l1_padding(uint64_t config) { asc_set_gm2l1_padding_impl(config); }
+__aicore__ inline void asc_set_gm2l1_padding(int8_t padding_value) { asc_set_gm2l1_padding_impl(padding_value); }
+__aicore__ inline void asc_set_gm2l1_padding(uint8_t padding_value) { asc_set_gm2l1_padding_impl(padding_value); }
+__aicore__ inline void asc_set_gm2l1_padding(int16_t padding_value) { asc_set_gm2l1_padding_impl(padding_value); }
+__aicore__ inline void asc_set_gm2l1_padding(uint16_t padding_value) { asc_set_gm2l1_padding_impl(padding_value); }
+__aicore__ inline void asc_set_gm2l1_padding(half padding_value) { asc_set_gm2l1_padding_impl(padding_value); }
+__aicore__ inline void asc_set_gm2l1_padding(bfloat16_t padding_value) { asc_set_gm2l1_padding_impl(padding_value); }
+__aicore__ inline void asc_set_gm2l1_padding(int32_t padding_value) { asc_set_gm2l1_padding_impl(padding_value); }
+__aicore__ inline void asc_set_gm2l1_padding(uint32_t padding_value) { asc_set_gm2l1_padding_impl(padding_value); }
+__aicore__ inline void asc_set_gm2l1_padding(float padding_value) { asc_set_gm2l1_padding_impl(padding_value); }
+
 // ==========asc_copy_l0c2gm==========
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride_dst_d,
@@ -2135,6 +2188,12 @@ __aicore__ inline void asc_copy_l0c2l1_sync(
 }
 
 __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config) { asc_set_l13d_fmatrix_impl(config); }
+
+__aicore__ inline void asc_set_l13d_fmatrix(
+    uint16_t fmatrix_w, uint16_t fmatrix_h, uint8_t pad_left, uint8_t pad_right, uint8_t pad_top, uint8_t pad_bottom)
+{
+    asc_set_l13d_fmatrix_impl(fmatrix_w, fmatrix_h, pad_left, pad_right, pad_top, pad_bottom);
+}
 
 // ==========asc_copy_gm2l0a  bfloat16_t/half/float/int32_t/uint8_t/int8_t/uint32_t/===========
 __aicore__ inline void asc_copy_gm2l0a(
@@ -2570,9 +2629,20 @@ __aicore__ inline void asc_copy_gm2l1_sync(
 
 __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config) { asc_set_l13d_fmatrix_b_impl(config); }
 
+__aicore__ inline void asc_set_l13d_fmatrix_b(
+    uint16_t fmatrix_w, uint16_t fmatrix_h, uint8_t pad_left, uint8_t pad_right, uint8_t pad_top, uint8_t pad_bottom)
+{
+    asc_set_l13d_fmatrix_b_impl(fmatrix_w, fmatrix_h, pad_left, pad_right, pad_top, pad_bottom);
+}
+
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config) { asc_set_l0c2gm_lrelu_alpha_impl(config); }
 
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config) { asc_set_l0c2gm_lrelu_alpha_impl(config); }
+
+__aicore__ inline void asc_set_l0c_copy_lrelu_alpha(float scalar_relu_pre_alpha)
+{
+    asc_set_l0c_copy_lrelu_alpha_impl(scalar_relu_pre_alpha);
+}
 
 #endif
 
