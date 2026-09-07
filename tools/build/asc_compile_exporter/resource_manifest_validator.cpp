@@ -366,7 +366,8 @@ bool ResourceManifestValidator::ValidateConstant(const Json& constant, std::set<
         return false;
     }
     constexpr size_t requiredConstantFieldCount = 4U;
-    const size_t expectedFieldCount = requiredConstantFieldCount + hasArgumentType + hasByteSize;
+    const size_t expectedFieldCount =
+        requiredConstantFieldCount + (hasArgumentType ? 1U : 0U) + (hasByteSize ? 1U : 0U);
     if (!CheckAndLog(constant.size() == expectedFieldCount, __LINE__, "invalid constant: unexpected extra fields")) {
         return false;
     }
