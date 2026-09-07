@@ -79,7 +79,7 @@ install(FILES ${CONF_FILES}
     DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/conf
 )
 install(FILES ${PACKAGE_FILES}
-   DESTINATION share/info/asc-devkit/script
+    DESTINATION share/info/asc-devkit/script
 )
 install(FILES ${CMAKE_BINARY_DIR}/version.asc-devkit.info
     DESTINATION share/info/asc-devkit
