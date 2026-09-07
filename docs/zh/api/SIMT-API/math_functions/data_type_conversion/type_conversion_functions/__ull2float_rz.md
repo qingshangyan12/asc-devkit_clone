@@ -52,7 +52,7 @@ inline float __ull2float_rz(const unsigned long long int x)
 | 0 | 0 |
 | 16777217（2^24+1） | 16777216.0 |
 | 16777219（2^24+3） | 16777218.0 |
-| 18446744073709551615（UINT64_MAX） | 1.8446744e+19 |
+| 18446744073709551615（UINT64_MAX） | 1.8446743e+19 |
 
 ## 约束说明
 
@@ -65,9 +65,12 @@ inline float __ull2float_rz(const unsigned long long int x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernel__ull2float_rz(float* dst, uint64_t* x)
+    __global__ __launch_bounds__(1024) void kernel__ull2float_rz(float* dst, uint64_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __ull2float_rz(x[idx]);
     }
     ```
@@ -77,9 +80,12 @@ inline float __ull2float_rz(const unsigned long long int x)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__ull2float_rz(__gm__ float* dst, __gm__ uint64_t* x)
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__ull2float_rz(__gm__ float* dst, __gm__ uint64_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __ull2float_rz(x[idx]);
     }
     ```

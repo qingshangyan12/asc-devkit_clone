@@ -64,7 +64,7 @@ bool __hbequx2(bfloat16x2_t x, bfloat16x2_t y)
   <tbody>
     <tr>
       <td colspan="2">任意分量含nan</td>
-      <td>true</td>
+      <td>该分量的比较结果为true（整体结果取决于两个分量的比较结果）</td>
     </tr>
     <tr>
       <td>0</td>

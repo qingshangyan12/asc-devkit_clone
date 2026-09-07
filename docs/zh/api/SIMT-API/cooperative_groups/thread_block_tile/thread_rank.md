@@ -32,7 +32,7 @@
 ## 函数原型
 
 ```cpp
-unsigned int thread_rank() const
+static unsigned int thread_rank()
 ```
 
 ## 参数说明
