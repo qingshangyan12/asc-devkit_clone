@@ -29,8 +29,7 @@ public:
     }
 
 private:
-    friend bool ParseManifestConstant(
-        const nlohmann::json& constant, ManifestConstant& parsedConstant, std::string& error);
+    friend bool ParseManifestConstant(const nlohmann::json& constant, ManifestConstant& parsedConstant);
     explicit ConstantSizeRule(uint64_t fixedByteCount) : fixedByteCount_(fixedByteCount) {}
     // Zero denotes argument-derived size; only the parser can set a positive fixed size.
     uint64_t fixedByteCount_{0U};
@@ -45,7 +44,7 @@ struct ManifestConstant {
 };
 
 // Parses field contracts only; resource existence and argument binding belong to callers.
-bool ParseManifestConstant(const nlohmann::json& constant, ManifestConstant& parsedConstant, std::string& error);
+bool ParseManifestConstant(const nlohmann::json& constant, ManifestConstant& parsedConstant);
 
 } // namespace ascendc
 

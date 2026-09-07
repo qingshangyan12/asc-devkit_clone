@@ -33,9 +33,7 @@ TEST(ManifestConstantTest, ResolvesDefaultAndExplicitStructSizes)
             input["arg_type"] = "struct";
         }
         ManifestConstant constant;
-        std::string error = "previous failure";
-        ASSERT_TRUE(ParseManifestConstant(input, constant, error)) << error;
-        EXPECT_TRUE(error.empty());
+        ASSERT_TRUE(ParseManifestConstant(input, constant));
         input.clear();
         EXPECT_EQ(constant.name, "tiling");
         EXPECT_EQ(constant.parameterIndex, 2U);
@@ -54,8 +52,7 @@ TEST(ManifestConstantTest, PreservesSignedAndUnsignedPointerSizeBoundaries)
         input["byte_size"] = size;
         input["parameter_index"] = std::numeric_limits<uint64_t>::max();
         ManifestConstant constant;
-        std::string error;
-        ASSERT_TRUE(ParseManifestConstant(input, constant, error)) << error;
+        ASSERT_TRUE(ParseManifestConstant(input, constant));
         EXPECT_EQ(constant.parameterIndex, std::numeric_limits<uint64_t>::max());
         EXPECT_FALSE(constant.sizeRule.UsesArgumentSize());
         EXPECT_EQ(constant.sizeRule.ResolveByteCount(0U), size.get<uint64_t>());
@@ -98,14 +95,12 @@ TEST(ManifestConstantTest, RejectsInvalidFieldsWithoutChangingParsedConstant)
         inputs.push_back(input);
     }
     ManifestConstant constant;
-    std::string error;
     Json valid = MakeConstant();
     valid.update({{"arg_type", "pointer"}, {"byte_size", 7}});
-    ASSERT_TRUE(ParseManifestConstant(valid, constant, error));
+    ASSERT_TRUE(ParseManifestConstant(valid, constant));
     for (const Json& input : inputs) {
         SCOPED_TRACE(input.dump());
-        EXPECT_FALSE(ParseManifestConstant(input, constant, error));
-        EXPECT_FALSE(error.empty());
+        EXPECT_FALSE(ParseManifestConstant(input, constant));
         EXPECT_EQ(constant.name, "tiling");
         EXPECT_EQ(constant.parameterIndex, 2U);
         EXPECT_EQ(constant.targetFile, "${resource}/tiling.h");

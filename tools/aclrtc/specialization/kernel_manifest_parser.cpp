@@ -40,9 +40,7 @@ aclError ParseConstants(const Json& kernel, std::vector<ManifestConstant>& const
     for (size_t index = 0; index < infos->size(); ++index) {
         const Json& info = infos->at(index);
         ManifestConstant spec;
-        std::string error;
-        if (!ParseManifestConstant(info, spec, error)) {
-            ASCENDLOGE("constant_infos[%zu]: %s", index, error.c_str());
+        if (!ParseManifestConstant(info, spec)) {
             return ACLRTC_ERROR_FAILURE;
         }
         constants.emplace_back(std::move(spec));

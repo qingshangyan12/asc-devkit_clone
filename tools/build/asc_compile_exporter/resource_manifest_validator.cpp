@@ -315,9 +315,7 @@ bool ResourceManifestValidator::ValidateOptionArray(const std::string& name)
 bool ResourceManifestValidator::ValidateConstant(const Json& constant, std::set<std::string>& constantNames)
 {
     ManifestConstant parsed;
-    std::string error;
-    if (!ParseManifestConstant(constant, parsed, error)) {
-        ASCENDLOGE("Invalid constant: %s", error.c_str());
+    if (!ParseManifestConstant(constant, parsed)) {
         return false;
     }
     if (!CheckAndLog(

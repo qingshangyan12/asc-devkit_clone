@@ -10,6 +10,8 @@
 
 #include "manifest_constant.h"
 
+#include "ascendc_tool_log.h"
+
 #include <nlohmann/json.hpp>
 #include <utility>
 
@@ -27,33 +29,32 @@ bool ReadNonnegativeInteger(const Json& value, uint64_t& result)
 }
 } // namespace
 
-bool ParseManifestConstant(const Json& constant, ManifestConstant& parsedConstant, std::string& error)
+bool ParseManifestConstant(const Json& constant, ManifestConstant& parsedConstant)
 {
-    error.clear();
     if (!constant.is_object()) {
-        error = "constant must be an object";
+        ASCENDLOGE("constant must be an object");
         return false;
     }
     for (const char* field : {"name", "parameter_index", "file", "template"}) {
         if (!constant.contains(field)) {
-            error = std::string("missing required constant field: ") + field;
+            ASCENDLOGE("Missing required constant field: %s", field);
             return false;
         }
     }
     for (const char* field : {"name", "file", "template"}) {
         if (!constant.at(field).is_string() || constant.at(field).get_ref<const std::string&>().empty()) {
-            error = std::string("constant field must be a nonempty string: ") + field;
+            ASCENDLOGE("Constant field must be a nonempty string: %s", field);
             return false;
         }
     }
     ManifestConstant result;
     if (!ReadNonnegativeInteger(constant.at("parameter_index"), result.parameterIndex)) {
-        error = "parameter_index must be a nonnegative integer";
+        ASCENDLOGE("parameter_index must be a nonnegative integer");
         return false;
     }
     const bool hasArgumentType = constant.contains("arg_type");
     if (hasArgumentType && !constant.at("arg_type").is_string()) {
-        error = "arg_type must be a string";
+        ASCENDLOGE("arg_type must be a string");
         return false;
     }
     const std::string argumentType = hasArgumentType ? constant.at("arg_type").get<std::string>() : "struct";
@@ -61,23 +62,23 @@ bool ParseManifestConstant(const Json& constant, ManifestConstant& parsedConstan
     if (argumentType == "pointer") {
         uint64_t byteCount = 0U;
         if (!hasByteSize || !ReadNonnegativeInteger(constant.at("byte_size"), byteCount) || byteCount == 0U) {
-            error = "pointer constant requires a positive integer byte_size";
+            ASCENDLOGE("pointer constant requires a positive integer byte_size");
             return false;
         }
         result.sizeRule = ConstantSizeRule(byteCount);
     } else if (argumentType == "struct") {
         if (hasByteSize) {
-            error = "struct constant must omit byte_size; size comes from argsBytes";
+            ASCENDLOGE("struct constant must omit byte_size; size comes from argsBytes");
             return false;
         }
     } else {
-        error = "arg_type must be pointer or struct";
+        ASCENDLOGE("arg_type must be pointer or struct");
         return false;
     }
     constexpr size_t requiredFieldCount = 4U;
     const size_t expectedFieldCount = requiredFieldCount + (hasArgumentType ? 1U : 0U) + (hasByteSize ? 1U : 0U);
     if (constant.size() != expectedFieldCount) {
-        error = "constant contains unexpected fields";
+        ASCENDLOGE("constant contains unexpected fields");
         return false;
     }
     result.name = constant.at("name").get<std::string>();
