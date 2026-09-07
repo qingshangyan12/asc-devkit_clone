@@ -44,7 +44,8 @@ class MatmulScheduler<
     enable_if_t<
         (DoMatmulIBShareNorm(MM_CFG) || isNormEnableScheduler<A_TYPE, MM_CFG> || isSingleLargeBMM<A_TYPE, MM_CFG> ||
          IsBasicBlockEnable<MM_CFG>) &&
-        !MatmulFeatureTrait<MM_CFG>().IsSupportMNL0DB() && !isMxMatmul<A_TYPE, B_TYPE>>>
+        !MatmulFeatureTrait<MM_CFG>().IsSupportMNL0DB() && !isMxMatmul<A_TYPE, B_TYPE> &&
+        !isOnlyScaleBMxMatmul<A_TYPE, B_TYPE>>>
     : public MatmulNormSchedulerBase<IMPL, A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, POLICY_TYPE> {
     MATMUL_USE_MODULE(MLoop);
     MATMUL_USE_MODULE(NLoop);

@@ -190,6 +190,15 @@ public:
      */
     __aicore__ inline void SetTensorA(const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA = false) {}
     /**
+     * @brief Copy data from UB to GM and then input as A matrix
+     * @param [in] gm: A matrix in GlobalTensor
+     * @param [in] leftMatrix: A matrix in LocalTensor
+     * @param [in] isTransposeA: whether A matrix needs to be transposed
+     */
+    __aicore__ inline void SetTensorAWithCopy(
+        const GlobalTensor<SrcAT>& gm, const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA = false)
+    {}
+    /**
      * @brief Set B matrix
      * @param [in] rightMatrix: B matrix in LocalTensor
      * @param [in] isTransposeB: whether B matrix needs to be transposed
@@ -207,6 +216,15 @@ public:
      * @note scalar data will be expanded into a tensor of shape [1, K]
      */
     __aicore__ inline void SetTensorB(SrcBT bScalar) {}
+    /**
+     * @brief Copy data from UB to GM and then input as B matrix
+     * @param [in] gm: B matrix in GlobalTensor
+     * @param [in] rightMatrix: B matrix in LocalTensor
+     * @param [in] isTransposeB: whether B matrix needs to be transposed
+     */
+    __aicore__ inline void SetTensorBWithCopy(
+        const GlobalTensor<SrcBT>& gm, const LocalTensor<SrcBT>& rightMatrix, bool isTransposeB = false)
+    {}
     /**
      * @brief Set bias matrix
      * @param [in] inputBias: bias matrix in LocalTensor
