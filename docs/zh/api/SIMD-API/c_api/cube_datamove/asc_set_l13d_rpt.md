@@ -76,7 +76,7 @@ PIPE_S
 <!-- npu="950" id8 -->
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
@@ -130,7 +130,7 @@ __global__ __cube__ void Conv2dForwardCapi(
     __gm__ half* fmap, __gm__ half* weight, __gm__ half* output)
 {
     asc_init();
-    const uint32_t batch_idx = static_cast<uint32_t>(asc_get_block_idx());
+    const uint32_t batch_idx = static_cast<uint32_t>(block_idx);
     if (batch_idx >= BATCH) {
         return;
     }
@@ -150,26 +150,12 @@ __global__ __cube__ void Conv2dForwardCapi(
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
 
-    asc_l13d_fmatrix_config fmatrix_config;
-    fmatrix_config.l1_width = W;
-    fmatrix_config.l1_height = H;
-    fmatrix_config.padding_left_size = PAD_LEFT;
-    fmatrix_config.padding_right_size = PAD_RIGHT;
-    fmatrix_config.padding_top_size = PAD_TOP;
-    fmatrix_config.padding_bottom_size = PAD_BOTTOM;
-    asc_set_l13d_fmatrix(fmatrix_config);
+    asc_set_l13d_fmatrix(W, H, PAD_LEFT, PAD_RIGHT, PAD_TOP, PAD_BOTTOM);
     asc_set_l12l0a_3d_padding(static_cast<half>(PAD_VALUE));
     constexpr uint16_t repeat_stride = 0;
     constexpr uint8_t repeat_time = 1;
-    constexpr uint8_t repeat_mode = 0;
     constexpr uint16_t dst_stride = M_ALIGN / CUBE_BLOCK;
-    asc_load3d_v2_config repeat_config;
-    // SetLoadDataRepeatWithStride encodes dstStride in bits [47:32].
-    repeat_config.config = static_cast<uint64_t>(repeat_stride) |
-        (static_cast<uint64_t>(repeat_time) << 16) |
-        (static_cast<uint64_t>(repeat_mode) << 24) |
-        (static_cast<uint64_t>(dst_stride) << 32);
-    asc_set_l13d_rpt(repeat_config);
+    asc_set_l13d_rpt(repeat_stride, repeat_time, asc_l13d_repeat_direction::M_DIRECTION, dst_stride, 0);
     asc_copy_l12l0a(
         fmap_l0, fmap_l1, LOAD3D_K_EXTENSION, M, 0, 0, STRIDE_W, STRIDE_H, KW, KH, DILATION_W, DILATION_H,
         false, false, false, false, CIN);

@@ -87,7 +87,7 @@ constexpr uint8_t FP8_E4M3_18 = 0x59;
 constexpr float FP8_RESULT = 324.0f;
 constexpr float HIF8_RESULT = 25.0f / 65536.0f;
 
-__global__ __cube__ void asc_disable_hif8_kernel(
+__global__ __cube__ void AscDisableHif8Kernel(
     __gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ float* hif8_output, __gm__ float* fp8_output)
 {
     asc_init();
@@ -127,7 +127,7 @@ __global__ __cube__ void asc_disable_hif8_kernel(
     asc_sync_pipe(PIPE_ALL);
 }
 
-void print_row(const char* label, const std::vector<float>& data)
+void PrintRow(const char* label, const std::vector<float>& data)
 {
     std::cout << label << ':';
     for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
@@ -156,16 +156,16 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&fp8_device), fp8.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(a_device, a.size(), a.data(), a.size(), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, b.size(), b.data(), b.size(), ACL_MEMCPY_HOST_TO_DEVICE);
-    asc_disable_hif8_kernel<<<1, 0>>>(a_device, b_device, hif8_device, fp8_device);
+    AscDisableHif8Kernel<<<1, 0>>>(a_device, b_device, hif8_device, fp8_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(hif8.data(), hif8.size() * sizeof(float), hif8_device, hif8.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
     aclrtMemcpy(fp8.data(), fp8.size() * sizeof(float), fp8_device, fp8.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
-    print_row("HiF8 output row 0", hif8);
-    print_row("Restored FP8 output row 0", fp8);
-    print_row("HiF8 golden row 0", hif8_golden);
-    print_row("FP8 golden row 0", fp8_golden);
+    PrintRow("HiF8 output row 0", hif8);
+    PrintRow("Restored FP8 output row 0", fp8);
+    PrintRow("HiF8 golden row 0", hif8_golden);
+    PrintRow("FP8 golden row 0", fp8_golden);
     const bool passed = hif8 == hif8_golden && fp8 == fp8_golden;
     std::cout << (passed ? "[Success] asc_disable_hif8 restores FP8 MMAD."
                          : "[Failed] asc_disable_hif8 result mismatch.") << std::endl;

@@ -80,7 +80,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 constexpr uint32_t DIM = 16, ELEMENTS = DIM * DIM;
 
-__global__ __cube__ void asc_disable_hf32_kernel(
+__global__ __cube__ void AscDisableHf32Kernel(
     __gm__ float* a, __gm__ float* b, __gm__ float* hf32_output, __gm__ float* fp32_output)
 {
     asc_init();
@@ -118,7 +118,7 @@ __global__ __cube__ void asc_disable_hf32_kernel(
     asc_sync_pipe(PIPE_ALL);
 }
 
-void print_row(const char* label, const std::vector<float>& data)
+void PrintRow(const char* label, const std::vector<float>& data)
 {
     std::cout << label << ':';
     for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
@@ -142,15 +142,15 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&fp32_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(a_device, ELEMENTS * sizeof(float), a.data(), ELEMENTS * sizeof(float), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, ELEMENTS * sizeof(float), b.data(), ELEMENTS * sizeof(float), ACL_MEMCPY_HOST_TO_DEVICE);
-    asc_disable_hf32_kernel<<<1, 0>>>(a_device, b_device, hf32_device, fp32_device);
+    AscDisableHf32Kernel<<<1, 0>>>(a_device, b_device, hf32_device, fp32_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(hf32.data(), ELEMENTS * sizeof(float), hf32_device, ELEMENTS * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
     aclrtMemcpy(fp32.data(), ELEMENTS * sizeof(float), fp32_device, ELEMENTS * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
-    print_row("Input A row 0", a);
-    print_row("HF32 output row 0", hf32);
-    print_row("Restored FP32 output row 0", fp32);
-    print_row("FP32 golden row 0", golden);
-    bool passed = fp32 == golden && std::fabs(hf32[0] - fp32[0]) > 1e-5f;
+    PrintRow("Input A row 0", a);
+    PrintRow("HF32 output row 0", hf32);
+    PrintRow("Restored FP32 output row 0", fp32);
+    PrintRow("FP32 golden row 0", golden);
+    const bool passed = fp32 == golden && std::fabs(hf32[0] - fp32[0]) > 1e-5f;
     std::cout << (passed ? "[Success] asc_disable_hf32 restores full-precision MMAD."
                          : "[Failed] asc_disable_hf32 result mismatch.") << std::endl;
     aclrtFree(a_device); aclrtFree(b_device); aclrtFree(hf32_device); aclrtFree(fp32_device);

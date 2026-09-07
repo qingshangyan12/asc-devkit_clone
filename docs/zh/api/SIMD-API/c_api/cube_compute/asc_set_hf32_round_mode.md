@@ -80,7 +80,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 constexpr uint32_t DIM = 16, ELEMENTS = DIM * DIM;
 
-__global__ __cube__ void asc_set_hf32_round_mode_kernel(
+__global__ __cube__ void AscSetHf32RoundModeKernel(
     __gm__ float* a, __gm__ float* b, __gm__ float* output, uint32_t nearest_away)
 {
     asc_init();
@@ -111,7 +111,7 @@ __global__ __cube__ void asc_set_hf32_round_mode_kernel(
     asc_sync_pipe(PIPE_ALL);
 }
 
-void print_row(const char* label, const std::vector<float>& data)
+void PrintRow(const char* label, const std::vector<float>& data)
 {
     std::cout << label << ':';
     for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
@@ -139,15 +139,15 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&even_device), ELEMENTS * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(a_device, ELEMENTS * sizeof(float), a.data(), ELEMENTS * sizeof(float), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, ELEMENTS * sizeof(float), b.data(), ELEMENTS * sizeof(float), ACL_MEMCPY_HOST_TO_DEVICE);
-    asc_set_hf32_round_mode_kernel<<<1, 0>>>(a_device, b_device, away_device, 1);
+    AscSetHf32RoundModeKernel<<<1, 0>>>(a_device, b_device, away_device, 1);
     aclrtSynchronizeDevice();
-    asc_set_hf32_round_mode_kernel<<<1, 0>>>(a_device, b_device, even_device, 0);
+    AscSetHf32RoundModeKernel<<<1, 0>>>(a_device, b_device, even_device, 0);
     aclrtSynchronizeDevice();
     aclrtMemcpy(nearest_away.data(), ELEMENTS * sizeof(float), away_device, ELEMENTS * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
     aclrtMemcpy(nearest_even.data(), ELEMENTS * sizeof(float), even_device, ELEMENTS * sizeof(float), ACL_MEMCPY_DEVICE_TO_HOST);
-    print_row("Input tie row 0", a);
-    print_row("NEAREST_AWAY row 0", nearest_away);
-    print_row("NEAREST_EVEN row 0", nearest_even);
+    PrintRow("Input tie row 0", a);
+    PrintRow("NEAREST_AWAY row 0", nearest_away);
+    PrintRow("NEAREST_EVEN row 0", nearest_even);
     const bool passed = nearest_away == away_golden && nearest_even == even_golden;
     std::cout << (passed ? "[Success] asc_set_hf32_round_mode selects tie rounding."
                          : "[Failed] asc_set_hf32_round_mode result mismatch.") << std::endl;

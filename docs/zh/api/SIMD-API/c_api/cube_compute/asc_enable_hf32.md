@@ -139,7 +139,7 @@ namespace {
 constexpr uint32_t DIM = 16;
 constexpr uint32_t ELEMENTS = DIM * DIM;
 
-__global__ __cube__ void asc_enable_hf32_kernel(
+__global__ __cube__ void AscEnableHf32Kernel(
     __gm__ float* a, __gm__ float* b, __gm__ float* fp32_output, __gm__ float* hf32_output)
 {
     asc_init();
@@ -180,7 +180,7 @@ __global__ __cube__ void asc_enable_hf32_kernel(
     asc_sync_pipe(PIPE_ALL);
 }
 
-void print_row(const char* label, const std::vector<float>& data)
+void PrintRow(const char* label, const std::vector<float>& data)
 {
     std::cout << label << ':';
     for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
@@ -207,17 +207,17 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&hf32_device), hf32.size() * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(a_device, a.size() * sizeof(float), a.data(), a.size() * sizeof(float), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, b.size() * sizeof(float), b.data(), b.size() * sizeof(float), ACL_MEMCPY_HOST_TO_DEVICE);
-    asc_enable_hf32_kernel<<<1, 0>>>(a_device, b_device, fp32_device, hf32_device);
+    AscEnableHf32Kernel<<<1, 0>>>(a_device, b_device, fp32_device, hf32_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(fp32.data(), fp32.size() * sizeof(float), fp32_device, fp32.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
     aclrtMemcpy(hf32.data(), hf32.size() * sizeof(float), hf32_device, hf32.size() * sizeof(float),
         ACL_MEMCPY_DEVICE_TO_HOST);
 
-    print_row("Input A row 0", a);
-    print_row("FP32 output row 0", fp32);
-    print_row("HF32 output row 0", hf32);
-    print_row("FP32 golden row 0", golden);
+    PrintRow("Input A row 0", a);
+    PrintRow("FP32 output row 0", fp32);
+    PrintRow("HF32 output row 0", hf32);
+    PrintRow("FP32 golden row 0", golden);
     bool passed = true;
     for (uint32_t i = 0; i < ELEMENTS; ++i) passed &= std::fabs(fp32[i] - golden[i]) < 1e-6f;
     passed &= std::fabs(hf32[0] - fp32[0]) > 1e-5f;

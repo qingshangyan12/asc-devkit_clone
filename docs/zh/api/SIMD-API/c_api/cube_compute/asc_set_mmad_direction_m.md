@@ -73,7 +73,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
 
 ```cpp
-#include <chrono>
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -83,8 +82,8 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 constexpr uint32_t M = 16, K = 32, N = 16;
 
-__global__ __cube__ void asc_set_mmad_direction_m_kernel(
-    __gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output, uint32_t n_first)
+__global__ __cube__ void AscSetMmadDirectionMKernel(
+    __gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
 {
     asc_init();
     __cbuf__ int8_t a_l1[M * K], b_l1[K * N];
@@ -102,8 +101,7 @@ __global__ __cube__ void asc_set_mmad_direction_m_kernel(
         static_cast<uint16_t>(2), static_cast<uint16_t>(1), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
-    if (n_first) asc_set_mmad_direction_n();
-    else asc_set_mmad_direction_m();
+    asc_set_mmad_direction_m();
     asc_mmad(c_l0, a_l0, b_l0, M, K, N, 0, true, false, true);
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
@@ -114,7 +112,7 @@ __global__ __cube__ void asc_set_mmad_direction_m_kernel(
     asc_sync_pipe(PIPE_ALL);
 }
 
-void print_row(const char* label, const std::vector<int32_t>& data)
+void PrintRow(const char* label, const std::vector<int32_t>& data)
 {
     std::cout << label << ':';
     for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
@@ -125,7 +123,7 @@ void print_row(const char* label, const std::vector<int32_t>& data)
 int main()
 {
     std::vector<int8_t> a(M * K), b(K * N);
-    std::vector<int32_t> m_first(M * N), n_first(M * N), golden(M * N);
+    std::vector<int32_t> output(M * N), golden(M * N);
     for (uint32_t row = 0; row < M; ++row) for (uint32_t k = 0; k < K; ++k)
         a[row * K + k] = static_cast<int8_t>((row + k) % 5 - 2);
     for (uint32_t k = 0; k < K; ++k) for (uint32_t col = 0; col < N; ++col)
@@ -135,34 +133,22 @@ int main()
     aclInit(nullptr);
     aclrtSetDevice(0);
     int8_t *a_device = nullptr, *b_device = nullptr;
-    int32_t *m_device = nullptr, *n_device = nullptr;
+    int32_t* output_device = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&a_device), a.size(), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&b_device), b.size(), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&m_device), m_first.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc(reinterpret_cast<void**>(&n_device), n_first.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(a_device, a.size(), a.data(), a.size(), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, b.size(), b.data(), b.size(), ACL_MEMCPY_HOST_TO_DEVICE);
-    auto start = std::chrono::steady_clock::now();
-    asc_set_mmad_direction_m_kernel<<<1, 0>>>(a_device, b_device, m_device, 0);
+    AscSetMmadDirectionMKernel<<<1, 0>>>(a_device, b_device, output_device);
     aclrtSynchronizeDevice();
-    auto middle = std::chrono::steady_clock::now();
-    asc_set_mmad_direction_m_kernel<<<1, 0>>>(a_device, b_device, n_device, 1);
-    aclrtSynchronizeDevice();
-    auto finish = std::chrono::steady_clock::now();
-    aclrtMemcpy(m_first.data(), m_first.size() * sizeof(int32_t), m_device,
-        m_first.size() * sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
-    aclrtMemcpy(n_first.data(), n_first.size() * sizeof(int32_t), n_device,
-        n_first.size() * sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
-    print_row("M-first output row 0", m_first);
-    print_row("N-first output row 0", n_first);
-    print_row("Golden row 0", golden);
-    std::cout << "M-first us: " << std::chrono::duration_cast<std::chrono::microseconds>(middle - start).count()
-              << ", N-first us: " << std::chrono::duration_cast<std::chrono::microseconds>(finish - middle).count()
-              << std::endl;
-    const bool passed = m_first == golden && n_first == golden;
+    aclrtMemcpy(output.data(), output.size() * sizeof(int32_t), output_device,
+        output.size() * sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
+    PrintRow("M-first output row 0", output);
+    PrintRow("Golden row 0", golden);
+    const bool passed = output == golden;
     std::cout << (passed ? "[Success] asc_set_mmad_direction_m preserves MMAD values."
                          : "[Failed] asc_set_mmad_direction_m result mismatch.") << std::endl;
-    aclrtFree(a_device); aclrtFree(b_device); aclrtFree(m_device); aclrtFree(n_device);
+    aclrtFree(a_device); aclrtFree(b_device); aclrtFree(output_device);
     aclrtResetDevice(0);
     aclFinalize();
     return passed ? 0 : 1;

@@ -72,7 +72,7 @@ PIPE_S
 <!-- npu="950" id8 -->
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
@@ -107,7 +107,7 @@ constexpr uint32_t FMAP_ELEMENTS = H * W * CIN;
 constexpr uint32_t WEIGHT_ELEMENTS = COUT * K;
 constexpr uint32_t OUTPUT_ELEMENTS = COUT * M;
 
-__global__ __cube__ void asc_copy_l12l0b_3d_bside_kernel(
+__global__ __cube__ void AscSetL13dFmatrixBKernel(
     __gm__ half* fmap, __gm__ half* weight, __gm__ half* output)
 {
     asc_init();
@@ -126,15 +126,8 @@ __global__ __cube__ void asc_copy_l12l0b_3d_bside_kernel(
 
     asc_copy_l12l0a(weight_l0, weight_l1, 0, 0, COUT / 16, K_ALIGN / 16, COUT / 16, COUT / 16);
 
-    asc_l13d_fmatrix_config fmatrix_config;
-    fmatrix_config.l1_width = W;
-    fmatrix_config.l1_height = H;
-    fmatrix_config.padding_left_size = PAD;
-    fmatrix_config.padding_right_size = PAD;
-    fmatrix_config.padding_top_size = PAD;
-    fmatrix_config.padding_bottom_size = PAD;
     // f_matrix_ctrl=true时，3D搬运从B侧寄存器组读取Feature Map描述和padding值。
-    asc_set_l13d_fmatrix_b(fmatrix_config);
+    asc_set_l13d_fmatrix_b(W, H, PAD, PAD, PAD, PAD);
     asc_set_l12l0b_3d_padding(PAD_VALUE);
     asc_set_l13d_rpt_b(0, 1, asc_l13d_repeat_direction::M_DIRECTION, M_ALIGN / 16, 0);
     // 目的地址为L0B Buffer；f_matrix_ctrl=true，选择上面配置的B侧寄存器组。
@@ -172,7 +165,7 @@ int main()
     }
     aclrtMemcpy(fmap_device, fmap.size() * sizeof(half), fmap.data(), fmap.size() * sizeof(half), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(weight_device, weight.size() * sizeof(half), weight.data(), weight.size() * sizeof(half), ACL_MEMCPY_HOST_TO_DEVICE);
-    asc_copy_l12l0b_3d_bside_kernel<<<1, 0>>>(fmap_device, weight_device, output_device);
+    AscSetL13dFmatrixBKernel<<<1, 0>>>(fmap_device, weight_device, output_device);
     const bool runtime_ok = aclrtSynchronizeDevice() == ACL_SUCCESS &&
         aclrtMemcpy(output.data(), output.size() * sizeof(half), output_device, output.size() * sizeof(half), ACL_MEMCPY_DEVICE_TO_HOST) == ACL_SUCCESS;
     uint32_t match_count = 0;

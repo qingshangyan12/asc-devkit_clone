@@ -72,7 +72,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 以下调用示例代码仅Ascend 950PR/Ascend 950DT产品支持。
 
 ```cpp
-#include <chrono>
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -82,7 +81,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 namespace {
 constexpr uint32_t M = 16, K = 32, N = 16;
 
-__global__ __cube__ void asc_set_mmad_direction_n_kernel(__gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
+__global__ __cube__ void AscSetMmadDirectionNKernel(__gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
 {
     asc_init();
     __cbuf__ int8_t a_l1[M * K], b_l1[K * N];
@@ -111,7 +110,7 @@ __global__ __cube__ void asc_set_mmad_direction_n_kernel(__gm__ int8_t* a, __gm_
     asc_sync_pipe(PIPE_ALL);
 }
 
-void print_row(const char* label, const std::vector<int32_t>& data)
+void PrintRow(const char* label, const std::vector<int32_t>& data)
 {
     std::cout << label << ':';
     for (uint32_t i = 0; i < 8; ++i) std::cout << ' ' << data[i];
@@ -138,16 +137,12 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(a_device, a.size(), a.data(), a.size(), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, b.size(), b.data(), b.size(), ACL_MEMCPY_HOST_TO_DEVICE);
-    auto start = std::chrono::steady_clock::now();
-    asc_set_mmad_direction_n_kernel<<<1, 0>>>(a_device, b_device, output_device);
+    AscSetMmadDirectionNKernel<<<1, 0>>>(a_device, b_device, output_device);
     aclrtSynchronizeDevice();
-    auto finish = std::chrono::steady_clock::now();
     aclrtMemcpy(output.data(), output.size() * sizeof(int32_t), output_device,
         output.size() * sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
-    print_row("N-first output row 0", output);
-    print_row("Golden row 0", golden);
-    std::cout << "N-first us: " << std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count()
-              << std::endl;
+    PrintRow("N-first output row 0", output);
+    PrintRow("Golden row 0", golden);
     const bool passed = output == golden;
     std::cout << (passed ? "[Success] asc_set_mmad_direction_n preserves MMAD values."
                          : "[Failed] asc_set_mmad_direction_n result mismatch.") << std::endl;

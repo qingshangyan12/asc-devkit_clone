@@ -87,7 +87,7 @@ constexpr uint16_t HALF_ONE = 0x3c00;
 constexpr uint16_t HALF_NEG_ONE = 0xbc00;
 constexpr uint16_t HALF_NEG_HALF = 0xb800;
 
-__global__ __cube__ void AscSetL0c2gmReluAlphaKernel(
+__global__ __cube__ void AscSetL0cCopyReluAlphaKernel(
     __gm__ uint16_t* a, __gm__ uint16_t* b, __gm__ uint16_t* output)
 {
     asc_init();
@@ -96,11 +96,9 @@ __global__ __cube__ void AscSetL0c2gmReluAlphaKernel(
     __ca__ half a_l0[ELEMENTS];
     __cb__ half b_l0[ELEMENTS];
     __cc__ float c_l0[ELEMENTS];
-    constexpr uint64_t nz_config = (16ULL << 32) | (1ULL << 16) | 1ULL;
-
-    asc_set_gm2l1_nz_para(nz_config);
+    asc_set_gm2l1_nz_para(1, 1, 16, 0);
     asc_copy_gm2l1_nd2nz(a_l1, reinterpret_cast<__gm__ half*>(a), DIM * sizeof(half), 0, DIM, DIM, 0, false);
-    asc_set_gm2l1_nz_para(nz_config);
+    asc_set_gm2l1_nz_para(1, 1, 16, 0);
     asc_copy_gm2l1_nd2nz(b_l1, reinterpret_cast<__gm__ half*>(b), DIM * sizeof(half), 0, DIM, DIM, 0, false);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
@@ -112,10 +110,8 @@ __global__ __cube__ void AscSetL0c2gmReluAlphaKernel(
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
     asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
 
-    // Scalar ReLU uses the 19-bit mini-float in RELU_ALPHA[31:13].
-    constexpr uint64_t alpha_half = static_cast<uint64_t>(126U << 10) << 13;
-    asc_set_l0c2gm_relu_alpha(alpha_half);
-    asc_set_l0c2gm_nz2nd(1, 0, 0);
+    asc_set_l0c_copy_relu_alpha(0.5f);
+    asc_set_l0c_copy_nz_para(1, 0, 0);
     asc_copy_l0c2gm(reinterpret_cast<__gm__ half*>(output), c_l0, DIM, DIM, DIM, DIM, 0, 0, 0,
         static_cast<uint64_t>(QuantMode_t::F322F16), 2, false, true,
         static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, 0, false, false, false, false);
@@ -150,7 +146,7 @@ int main()
     aclrtMalloc(reinterpret_cast<void**>(&output_device), output.size() * sizeof(uint16_t), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(a_device, a.size() * sizeof(uint16_t), a.data(), a.size() * sizeof(uint16_t), ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(b_device, b.size() * sizeof(uint16_t), b.data(), b.size() * sizeof(uint16_t), ACL_MEMCPY_HOST_TO_DEVICE);
-    AscSetL0c2gmReluAlphaKernel<<<1, 0>>>(a_device, b_device, output_device);
+    AscSetL0cCopyReluAlphaKernel<<<1, 0>>>(a_device, b_device, output_device);
     aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(uint16_t), output_device, output.size() * sizeof(uint16_t),
         ACL_MEMCPY_DEVICE_TO_HOST);
@@ -158,8 +154,8 @@ int main()
     PrintRow("Output row 0 (FP16 bits)", output);
     PrintRow("Golden row 0 (FP16 bits)", golden);
     const bool passed = output == golden;
-    std::cout << (passed ? "[Success] asc_set_l0c2gm_relu_alpha passed."
-                         : "[Failed] asc_set_l0c2gm_relu_alpha failed.") << std::endl;
+    std::cout << (passed ? "[Success] asc_set_l0c_copy_relu_alpha applied alpha 0.5 to -1.0."
+                         : "[Failed] asc_set_l0c_copy_relu_alpha result mismatch.") << std::endl;
     aclrtFree(a_device);
     aclrtFree(b_device);
     aclrtFree(output_device);
