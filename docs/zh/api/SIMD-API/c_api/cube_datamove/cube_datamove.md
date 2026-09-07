@@ -37,6 +37,7 @@
 - **[asc_set_l13d_padding](asc_set_l13d_padding.md)**
 - **[asc_set_l12l0a_3d_padding](asc_set_l12l0a_3d_padding.md)**
 - **[asc_set_l13d_rpt](asc_set_l13d_rpt.md)**
+- **[asc_set_l13d_rpt_b](asc_set_l13d_rpt_b.md)**
 - **[asc_set_l13d_size](asc_set_l13d_size.md)**
 - **[asc_set_l3d_rpt_b](asc_set_l3d_rpt_b.md)**
 - **[asc_copy_gm2l1](asc_copy_gm2l1/asc_copy_gm2l1.md)**
