@@ -48,7 +48,7 @@ This `dav-3510` example describes each transfer through the addresses, shape, st
 
 ## Scenario Description
 
-This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different SCENARIO_NUM values are shown in the table below. All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 256, 128], with kernel function name `asc_copy_l0c2gm`.
+This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different SCENARIO_NUM values are shown in the table below. All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 256, 128], with kernel function name `asc_copy_l0c2gm_custom`.
 
 <a name="table2"></a>
 <table border="2" align="center">
@@ -94,13 +94,13 @@ This example selects different output scenarios through the compilation paramete
 **Scenario 4: Output format ND, output data type int8_t, Scalar quantization enabled**
 - Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
 - Output: C [128, 256] int8_t type, ND format
-- Implementation: Call `asc_set_l0c_copy_prequant(2.0F, 0, true)` to configure scalar quantization, then call `asc_copy_l0c2gm` with `QuantMode_t::QF322B8_PRE`
+- Implementation: Call `asc_set_l0c_copy_prequant(2.0F, 0, true)` to configure scalar quantization, then call `asc_copy_l0c2gm` with `asc_quant_mode::QF322B8_PRE`
 - Description: Quantize float type data to int8_t type, entire C matrix uses one quantization parameter
 
 **Scenario 5: Output format ND, output data type int8_t, Vector quantization enabled**
 - Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
 - Output: C [128, 256] int8_t type, ND format
-- Implementation: Use `asc_copy_gm2l1` and `asc_copy_l12fb` to transfer per-column quantization values from GM through L1 to Fixpipe Buffer, configure the address with `asc_set_l0c_copy_config`, then call `asc_copy_l0c2gm` with `QuantMode_t::VQF322B8_PRE`
+- Implementation: Use `asc_copy_gm2l1` and `asc_copy_l12fb` to transfer per-column quantization values from GM through L1 to Fixpipe Buffer, configure the address with `asc_set_l0c_copy_config`, then call `asc_copy_l0c2gm` with `asc_quant_mode::VQF322B8_PRE`
 - Description: Quantize float type data to int8_t type, each column of C matrix corresponds to one quantization parameter, quantization parameters need to be copied from GM to L1
 
 **Scenario 6: Output format ND, output data type float, ReLU enabled**
@@ -124,7 +124,7 @@ Run the following steps in the root directory of this example to build and run t
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default installation path is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 - Run the example
 
   Run the following commands in the example directory.
