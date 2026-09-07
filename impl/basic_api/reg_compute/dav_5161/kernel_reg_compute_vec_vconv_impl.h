@@ -375,7 +375,7 @@ __simd_callee__ inline void CastOperator(S& dstReg, V& srcReg, MaskReg& mask)
     MaskReg maskFull = CreateMask<int32_t, MaskPattern::ALL>();
     MaskReg lowMask, highMask;
     Duplicate(zeroReg, 0, maskFull);
-    MaskInterleave<int32_t>(lowMask, highMask, mask, mask);
+    Interleave<int32_t>(lowMask, highMask, mask, mask);
     Interleave(tmpReg0, tmpReg1, srcReg, zeroReg);
     CastImpl<ActualT, ActualU, RegLayout::ZERO, mode>((RegTensor<int64_t>&)tmpReg0, tmpReg0, lowMask);
     CastImpl<ActualT, ActualU, RegLayout::ZERO, mode>((RegTensor<int64_t>&)tmpReg1, tmpReg1, highMask);
@@ -415,7 +415,7 @@ __simd_callee__ inline void CastOperator(S& dstReg, V& srcReg, MaskReg& mask)
     RegTensor<int32_t> tmpReg0;
     RegTensor<int32_t> tmpReg1;
     MaskReg lowMask, highMask;
-    MaskInterleave<int32_t>(lowMask, highMask, mask, mask);
+    Interleave<int32_t>(lowMask, highMask, mask, mask);
     Interleave(tmpReg0, tmpReg1, (RegTensor<int32_t>&)srcReg.reg[0], (RegTensor<int32_t>&)srcReg.reg[1]);
     CastImpl<ActualT, ActualU, satMode, RegLayout::ZERO, mode>(tmpReg0, (RegTensor<int64_t>&)tmpReg0, lowMask);
     CastImpl<ActualT, ActualU, satMode, RegLayout::ZERO, mode>(tmpReg1, (RegTensor<int64_t>&)tmpReg1, highMask);
@@ -455,7 +455,7 @@ __simd_callee__ inline void CastOperator(S& dstReg, V& srcReg, MaskReg& mask)
     MaskReg maskFull = CreateMask<int32_t, MaskPattern::ALL>();
     Duplicate(zeroReg, 0, maskFull);
     MaskReg lowMask, highMask;
-    MaskInterleave<int32_t>(lowMask, highMask, mask, mask);
+    Interleave<int32_t>(lowMask, highMask, mask, mask);
     Interleave(tmpReg0, tmpReg1, srcReg, (RegTensor<float>&)zeroReg);
     CastImpl<ActualT, ActualU, roundMode, satMode, RegLayout::ZERO, mode>(
         (RegTensor<int64_t>&)tmpReg0, tmpReg0, lowMask);
@@ -497,7 +497,7 @@ __simd_callee__ inline void CastOperator(S& dstReg, V& srcReg, MaskReg& mask)
     RegTensor<float> tmpReg0;
     RegTensor<float> tmpReg1;
     MaskReg lowMask, highMask;
-    MaskInterleave<int32_t>(lowMask, highMask, mask, mask);
+    Interleave<int32_t>(lowMask, highMask, mask, mask);
     Interleave(tmpReg0, tmpReg1, (RegTensor<float>&)srcReg.reg[0], (RegTensor<float>&)srcReg.reg[1]);
     CastImpl<ActualT, ActualU, roundMode, RegLayout::ZERO, mode>(tmpReg0, (RegTensor<int64_t>&)tmpReg0, lowMask);
     CastImpl<ActualT, ActualU, roundMode, RegLayout::ZERO, mode>(tmpReg1, (RegTensor<int64_t>&)tmpReg1, highMask);

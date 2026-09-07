@@ -122,7 +122,7 @@ __simd_callee__ inline void DuplicateImpl(S& dstReg, U scalarValue, MaskReg& mas
     } else {
         if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             if constexpr (mode == MaskMergeMode::MERGING) {
                 RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
                 B64TraitOneToTraitTwo(traitTwoDstReg, dstReg);
@@ -180,7 +180,7 @@ __simd_callee__ inline void DuplicateImpl(U& dstReg, U& srcReg, MaskReg& mask)
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
             if constexpr (mode == MaskMergeMode::MERGING) {

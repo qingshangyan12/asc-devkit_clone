@@ -149,13 +149,13 @@ __simd_callee__ inline void CompareImpl(MaskReg& dst, U& srcReg0, U& srcReg1, Ma
     } else if constexpr (sizeof(ActualT) == 8) {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg1;
             B64TraitOneToTraitTwo(traitTwoSrcReg0, srcReg0);
             B64TraitOneToTraitTwo(traitTwoSrcReg1, srcReg1);
             CompareB64Impl<mode>(dst, traitTwoSrcReg0, traitTwoSrcReg1, maskTrait2);
-            MaskUnPack(dst, dst);
+            UnPack(dst, dst);
         } else if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
             CompareB64Impl<mode>(dst, srcReg0, srcReg1, mask);
         }
@@ -210,7 +210,7 @@ __simd_callee__ inline void SelectImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskRe
     } else if constexpr (sizeof(ActualT) == 8) {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg1;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;

@@ -57,7 +57,7 @@ __simd_callee__ inline void PackImpl(S& dstReg, V& srcReg)
                 DeInterleave((RegTensor<uint32_t>&)dstReg, dumpReg, zeroReg, (RegTensor<uint32_t>&)srcReg);
             }
         } else if constexpr (CheckRegTrait<V, RegTraitNumTwo>()) {
-            Copy((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg.reg[0]);
+            Move((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg.reg[0]);
         }
     }
 }
@@ -94,8 +94,8 @@ __simd_callee__ inline void UnPackImpl(S& dstReg, V& srcReg)
                 Interleave(dumpReg, (RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, padReg);
             }
         } else if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-            Copy((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg);
-            Copy((RegTensor<uint32_t>&)dstReg.reg[1], padReg);
+            Move((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg);
+            Move((RegTensor<uint32_t>&)dstReg.reg[1], padReg);
         }
     }
 }

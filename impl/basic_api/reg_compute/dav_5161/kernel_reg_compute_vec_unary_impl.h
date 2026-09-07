@@ -124,7 +124,7 @@ __simd_callee__ inline void AbsImpl(U& dstReg, U& srcReg, MaskReg& mask)
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             B64TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
@@ -163,7 +163,7 @@ __simd_callee__ inline void ReluImpl(U& dstReg, U& srcReg, MaskReg& mask)
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             B64TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
@@ -652,7 +652,7 @@ __simd_callee__ inline void NegImpl(U& dstReg, U& srcReg, MaskReg& mask)
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             B64TraitOneToTraitTwo(traitTwoSrcReg, srcReg);
@@ -691,7 +691,7 @@ __simd_callee__ inline void NotImpl(U& dstReg, U& srcReg, MaskReg& mask)
     } else {
         if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             B64TraitOneToTraitTwo(traitTwoSrcReg, srcReg);

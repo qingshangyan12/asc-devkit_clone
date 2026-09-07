@@ -49,7 +49,7 @@ __simd_callee__ inline MaskReg CreateMask()
     return CreateMaskImpl<T, mode, regTrait>();
 }
 
-__simd_callee__ inline void MaskNot(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskNotImpl(dst, src, mask); }
+// __simd_callee__ inline void MaskNot(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskNotImpl(dst, src, mask); }
 __simd_callee__ inline void Not(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskNotImpl(dst, src, mask); }
 
 template <typename T, int16_t offset, typename U>
@@ -58,86 +58,86 @@ __simd_callee__ inline void MaskGenWithRegTensor(MaskReg& dst, U& srcReg)
     MaskGenWithRegTensorImpl<T, offset, U>(dst, srcReg);
 }
 
-__simd_callee__ inline void MaskAnd(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    MaskAndImpl(dst, src0, src1, mask);
-}
+// __simd_callee__ inline void MaskAnd(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
+// {
+//     MaskAndImpl(dst, src0, src1, mask);
+// }
 __simd_callee__ inline void And(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
 {
     MaskAndImpl(dst, src0, src1, mask);
 }
 
-__simd_callee__ inline void MaskOr(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    MaskOrImpl(dst, src0, src1, mask);
-}
+// __simd_callee__ inline void MaskOr(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
+// {
+//     MaskOrImpl(dst, src0, src1, mask);
+// }
 __simd_callee__ inline void Or(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
 {
     MaskOrImpl(dst, src0, src1, mask);
 }
 
-__simd_callee__ inline void MaskXor(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    MaskXorImpl(dst, src0, src1, mask);
-}
+// __simd_callee__ inline void MaskXor(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
+// {
+//     MaskXorImpl(dst, src0, src1, mask);
+// }
 __simd_callee__ inline void Xor(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
 {
     MaskXorImpl(dst, src0, src1, mask);
 }
 
-__simd_callee__ inline void MaskMov(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskMovImpl(dst, src, mask); }
+// __simd_callee__ inline void MaskMov(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskMovImpl(dst, src, mask); }
 __simd_callee__ inline void Move(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskMovImpl(dst, src, mask); }
 
-__simd_callee__ inline void MaskMov(MaskReg& dst, MaskReg& src) { MaskMovImpl(dst, src); }
+// __simd_callee__ inline void MaskMov(MaskReg& dst, MaskReg& src) { MaskMovImpl(dst, src); }
 __simd_callee__ inline void Move(MaskReg& dst, MaskReg& src) { MaskMovImpl(dst, src); }
 
-template <typename T>
-__simd_callee__ inline void MaskInterleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
-{
-    MaskInterleaveImpl<T>(dst0, dst1, src0, src1);
-}
+// template <typename T>
+// __simd_callee__ inline void MaskInterleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
+// {
+//     MaskInterleaveImpl<T>(dst0, dst1, src0, src1);
+// }
 template <typename T>
 __simd_callee__ inline void Interleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
 {
     MaskInterleaveImpl<T>(dst0, dst1, src0, src1);
 }
 
-template <typename T>
-__simd_callee__ inline void MaskDeInterleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
-{
-    MaskDeInterleaveImpl<T>(dst0, dst1, src0, src1);
-}
+// template <typename T>
+// __simd_callee__ inline void MaskDeInterleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
+// {
+//     MaskDeInterleaveImpl<T>(dst0, dst1, src0, src1);
+// }
 template <typename T>
 __simd_callee__ inline void DeInterleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
 {
     MaskDeInterleaveImpl<T>(dst0, dst1, src0, src1);
 }
 
-__simd_callee__ inline void MaskSel(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    MaskSelImpl(dst, src0, src1, mask);
-}
+// __simd_callee__ inline void MaskSel(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
+// {
+//     MaskSelImpl(dst, src0, src1, mask);
+// }
 __simd_callee__ inline void Select(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
 {
     MaskSelImpl(dst, src0, src1, mask);
 }
 
-template <HighLowPart part = HighLowPart::LOWEST>
-__simd_callee__ inline void MaskPack(MaskReg& dst, MaskReg& src)
-{
-    MaskPackImpl<part>(dst, src);
-}
+// template <HighLowPart part = HighLowPart::LOWEST>
+// __simd_callee__ inline void MaskPack(MaskReg& dst, MaskReg& src)
+// {
+//     MaskPackImpl<part>(dst, src);
+// }
 template <HighLowPart part>
 __simd_callee__ inline void Pack(MaskReg& dst, MaskReg& src)
 {
     MaskPackImpl<part>(dst, src);
 }
 
-template <HighLowPart part = HighLowPart::LOWEST>
-__simd_callee__ inline void MaskUnPack(MaskReg& dst, MaskReg& src)
-{
-    MaskUnPackImpl<part>(dst, src);
-}
+// template <HighLowPart part = HighLowPart::LOWEST>
+// __simd_callee__ inline void MaskUnPack(MaskReg& dst, MaskReg& src)
+// {
+//     MaskUnPackImpl<part>(dst, src);
+// }
 template <HighLowPart part>
 __simd_callee__ inline void UnPack(MaskReg& dst, MaskReg& src)
 {

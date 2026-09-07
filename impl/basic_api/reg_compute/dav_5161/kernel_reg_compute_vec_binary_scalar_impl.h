@@ -187,7 +187,7 @@ __simd_callee__ inline void ShiftLeftsImpl(S& dstReg, S& srcReg, U scalarValue, 
             dstReg = dstTemp;
         } else if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             B64TraitOneToTraitTwo(traitTwoSrcReg0, srcReg);
@@ -250,7 +250,7 @@ __simd_callee__ inline void ShiftRightsImpl(S& dstReg, S& srcReg, U scalarValue,
             dstReg = dstTemp;
         } else if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             B64TraitOneToTraitTwo(traitTwoSrcReg0, srcReg);

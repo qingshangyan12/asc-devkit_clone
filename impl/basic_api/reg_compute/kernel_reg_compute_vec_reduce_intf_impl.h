@@ -37,25 +37,25 @@
 
 namespace AscendC {
 namespace Reg {
-template <
-    typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S,
-    typename V>
-__simd_callee__ inline void ReduceSum(S& dstReg, V srcReg, MaskReg mask)
-{
-    ReduceSumImpl<T, U, mode, S, V>(dstReg, srcReg, mask);
-}
+// template <
+//     typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S,
+//     typename V>
+// __simd_callee__ inline void ReduceSum(S& dstReg, V srcReg, MaskReg mask)
+// {
+//     ReduceSumImpl<T, U, mode, S, V>(dstReg, srcReg, mask);
+// }
 
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void ReduceMax(U& dstReg, U srcReg, MaskReg mask)
-{
-    ReduceMaxImpl<T, mode, U>(dstReg, srcReg, mask);
-}
+// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+// __simd_callee__ inline void ReduceMax(U& dstReg, U srcReg, MaskReg mask)
+// {
+//     ReduceMaxImpl<T, mode, U>(dstReg, srcReg, mask);
+// }
 
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void ReduceMin(U& dstReg, U srcReg, MaskReg mask)
-{
-    ReduceMinImpl<T, mode, U>(dstReg, srcReg, mask);
-}
+// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+// __simd_callee__ inline void ReduceMin(U& dstReg, U srcReg, MaskReg mask)
+// {
+//     ReduceMinImpl<T, mode, U>(dstReg, srcReg, mask);
+// }
 
 template <ReduceType type, typename T, typename U, MaskMergeMode mode, typename S, typename V>
 __simd_callee__ inline void Reduce(S& dstReg, V srcReg, MaskReg mask)
@@ -69,23 +69,23 @@ __simd_callee__ inline void Reduce(S& dstReg, V srcReg, MaskReg mask)
     }
 }
 
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void ReduceSumWithDataBlock(U& dstReg, U srcReg, MaskReg mask)
-{
-    ReduceSumWithDataBlockImpl<T, mode, U>(dstReg, srcReg, mask);
-}
+// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+// __simd_callee__ inline void ReduceSumWithDataBlock(U& dstReg, U srcReg, MaskReg mask)
+// {
+//     ReduceSumWithDataBlockImpl<T, mode, U>(dstReg, srcReg, mask);
+// }
 
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void ReduceMaxWithDataBlock(U& dstReg, U srcReg, MaskReg mask)
-{
-    ReduceMaxWithDataBlockImpl<T, mode, U>(dstReg, srcReg, mask);
-}
+// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+// __simd_callee__ inline void ReduceMaxWithDataBlock(U& dstReg, U srcReg, MaskReg mask)
+// {
+//     ReduceMaxWithDataBlockImpl<T, mode, U>(dstReg, srcReg, mask);
+// }
 
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void ReduceMinWithDataBlock(U& dstReg, U srcReg, MaskReg mask)
-{
-    ReduceMinWithDataBlockImpl<T, mode, U>(dstReg, srcReg, mask);
-}
+// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+// __simd_callee__ inline void ReduceMinWithDataBlock(U& dstReg, U srcReg, MaskReg mask)
+// {
+//     ReduceMinWithDataBlockImpl<T, mode, U>(dstReg, srcReg, mask);
+// }
 
 template <ReduceType type, typename T, MaskMergeMode mode, typename U>
 __simd_callee__ inline void ReduceDataBlock(U& dstReg, U srcReg, MaskReg mask)
@@ -115,11 +115,11 @@ __simd_callee__ inline void ReduceDataBlock(S& dstReg, V srcReg, MaskReg mask)
     }
 }
 
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void PairReduceSum(U& dstReg, U srcReg, MaskReg mask)
-{
-    PairReduceSumImpl<T, mode, U>(dstReg, srcReg, mask);
-}
+// template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+// __simd_callee__ inline void PairReduceSum(U& dstReg, U srcReg, MaskReg mask)
+// {
+//     PairReduceSumImpl<T, mode, U>(dstReg, srcReg, mask);
+// }
 
 template <PairReduce type, typename T, MaskMergeMode mode, typename U>
 __simd_callee__ inline void PairReduceElem(U& dstReg, U srcReg, MaskReg mask)

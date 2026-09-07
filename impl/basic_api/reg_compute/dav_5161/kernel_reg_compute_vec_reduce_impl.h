@@ -59,7 +59,7 @@ __simd_callee__ inline void ReduceSumImpl(S& dstReg, V srcReg, MaskReg mask)
             dstReg = dstTemp;
         } else if constexpr (CheckRegTrait<V, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualSrcRegT, RegTraitNumTwo> traitTwoSrcReg0;
             RegTensor<ActualDstRegT, RegTraitNumTwo> traitTwoDstReg;
             B64TraitOneToTraitTwo(traitTwoSrcReg0, srcReg);
@@ -123,7 +123,7 @@ __simd_callee__ inline void ReduceMaxImpl(U& dstReg, U srcReg, MaskReg mask)
             dstReg = dstTemp;
         } else if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             DeInterleave(
@@ -154,8 +154,8 @@ __simd_callee__ inline void ReduceMaxB64Impl(T& dstReg, T srcReg, MaskReg mask)
         Reduce<ReduceType::MAX, DefaultType, DefaultType, mode>(tmpReg2, (RegTensor<uint32_t>&)srcReg.reg[0], mask1);
         mask0 = CreateMask<uint32_t, MaskPattern::VL1>();
         And(tmpReg1, tmpReg0, tmpReg0, mask0);
-        Copy((RegTensor<uint32_t>&)dstReg.reg[1], tmpReg1);
-        Copy((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)tmpReg2);
+        Move((RegTensor<uint32_t>&)dstReg.reg[1], tmpReg1);
+        Move((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)tmpReg2);
     } else if constexpr (SupportType<ActualT, int64_t>()) {
         RegTensor<int32_t> tmpReg0;
         RegTensor<int32_t> tmpReg1;
@@ -168,8 +168,8 @@ __simd_callee__ inline void ReduceMaxB64Impl(T& dstReg, T srcReg, MaskReg mask)
         Reduce<ReduceType::MAX, DefaultType, DefaultType, mode>(tmpReg2, (RegTensor<uint32_t>&)srcReg.reg[0], mask1);
         mask0 = CreateMask<uint32_t, MaskPattern::VL1>();
         And(tmpReg1, tmpReg0, tmpReg0, mask0);
-        Copy((RegTensor<int32_t>&)dstReg.reg[1], tmpReg1);
-        Copy((RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)tmpReg2);
+        Move((RegTensor<int32_t>&)dstReg.reg[1], tmpReg1);
+        Move((RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)tmpReg2);
     }
 }
 
@@ -194,7 +194,7 @@ __simd_callee__ inline void ReduceMinImpl(U& dstReg, U srcReg, MaskReg mask)
             dstReg = dstTemp;
         } else if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
             MaskReg maskTrait2;
-            MaskPack(maskTrait2, mask);
+            Pack(maskTrait2, mask);
             RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
             RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
             DeInterleave(
@@ -225,8 +225,8 @@ __simd_callee__ inline void ReduceMinB64Impl(T& dstReg, T srcReg, MaskReg mask)
         Reduce<ReduceType::MIN, DefaultType, DefaultType, mode>(tmpReg2, (RegTensor<uint32_t>&)srcReg.reg[0], mask1);
         mask0 = CreateMask<uint32_t, MaskPattern::VL1>();
         And(tmpReg1, tmpReg0, tmpReg0, mask0);
-        Copy((RegTensor<uint32_t>&)dstReg.reg[1], tmpReg1);
-        Copy((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)tmpReg2);
+        Move((RegTensor<uint32_t>&)dstReg.reg[1], tmpReg1);
+        Move((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)tmpReg2);
     } else if constexpr (SupportType<ActualT, int64_t>()) {
         RegTensor<int32_t> tmpReg0;
         RegTensor<int32_t> tmpReg1;
@@ -239,8 +239,8 @@ __simd_callee__ inline void ReduceMinB64Impl(T& dstReg, T srcReg, MaskReg mask)
         Reduce<ReduceType::MIN, DefaultType, DefaultType, mode>(tmpReg2, (RegTensor<uint32_t>&)srcReg.reg[0], mask1);
         mask0 = CreateMask<uint32_t, MaskPattern::VL1>();
         And(tmpReg1, tmpReg0, tmpReg0, mask0);
-        Copy((RegTensor<int32_t>&)dstReg.reg[1], tmpReg1);
-        Copy((RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)tmpReg2);
+        Move((RegTensor<int32_t>&)dstReg.reg[1], tmpReg1);
+        Move((RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)tmpReg2);
     }
 }
 

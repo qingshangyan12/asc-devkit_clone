@@ -164,7 +164,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg, AddrReg
             // using b32 vst to simulate b64 vst
             MaskReg tmpMask;
             MaskReg emptyMask;
-            MaskPack(tmpMask, mask);
+            Pack(tmpMask, mask);
             pintlv_b32(tmpMask, emptyMask, tmpMask, tmpMask);
             vst((RegTensor<int32_t>&)srcReg, (__ubuf__ int32_t*)dstAddr, offset, distValue, tmpMask);
         } else {
@@ -204,7 +204,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg0, U& src
             // using b32 vst to simulate b64 vst
             MaskReg tmpMask;
             MaskReg emptyMask;
-            MaskPack(tmpMask, mask);
+            Pack(tmpMask, mask);
             pintlv_b32(tmpMask, emptyMask, tmpMask, tmpMask);
             vsts(
                 (RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1, (__ubuf__ int32_t*)dstAddr, 0, distValue,
@@ -243,7 +243,7 @@ __simd_callee__ inline void DataCopyImpl(__ubuf__ T* dstAddr, U& srcReg0, U& src
             // using b32 vst to simulate b64 vst
             MaskReg tmpMask;
             MaskReg emptyMask;
-            MaskPack(tmpMask, mask);
+            Pack(tmpMask, mask);
             pintlv_b32(tmpMask, emptyMask, tmpMask, tmpMask);
             vst((RegTensor<int32_t>&)srcReg0, (RegTensor<int32_t>&)srcReg1, (__ubuf__ int32_t*)dstAddr, offset,
                 distValue, tmpMask);
