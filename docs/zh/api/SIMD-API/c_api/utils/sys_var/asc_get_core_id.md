@@ -69,14 +69,10 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```cpp
 // 运行步骤：
 //   1. 启动 2 个 block（<<<2, 0>>>）；
-//   2. 每个 block 调用 asc_get_block_idx() 获取索引，并调用 asc_get_core_id() 获取
+//   2. 每个 block 通过内建变量 block_idx 获取索引，并调用 asc_get_core_id() 获取
 //      物理核编号；
 //   3. 各 block 将核编号写入自身索引对应的位置；
 //   4. 校验每个 block 都成功写入了非哨兵值的有效核编号。
-//
-// 开发者帮助评估：帮助程度中等。示例演示了 asc_get_core_id 的基本调用与结果回传方式，
-// 但未对核编号的具体含义、与 block 索引的对应关系做进一步说明或校验，信息量相对有限。
-// 适合作为快速了解“如何读取当前核编号”的入门参考。
 
 #include <cstdint>
 #include <iomanip>
@@ -106,7 +102,7 @@ void PrintHex(const char* label, const std::vector<uint64_t>& data)
 __global__ __vector__ void AscGetCoreIdKernel(__gm__ uint64_t* output)
 {
     asc_init();
-    const uint64_t index = static_cast<uint64_t>(asc_get_block_idx());
+    const uint64_t index = static_cast<uint64_t>(block_idx);
     output[index * 8] = static_cast<uint64_t>(asc_get_core_id());
     asc_dcci_single(output + index * 8);
 }

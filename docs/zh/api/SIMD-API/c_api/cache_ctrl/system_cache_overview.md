@@ -43,7 +43,7 @@ Cache（缓存）的主要作用是在搬运单元或Scalar单元与外部存储
 | Invalid | &bull;将指定地址范围的Cache Line（缓存的最小操作单元）标记为"无效"，使其从缓存中移除。<br>&bull;保证下一次访问这些内存地址时，会从GM重新加载数据，而不是使用可能过期的缓存数据。<br>&bull;注意：Invalid操作不检查缓存行是否为"脏"（dirty，表示该数据已被修改但尚未写回到GM），若存在脏数据将被直接丢弃。 |
 | Clean | 将缓存中被修改过的数据（脏数据）写回到GM中，避免数据丢失。Clean操作不将缓存行标记为"无效"，缓存行仍保持有效状态。 |
 
-## Cache写策略与Cache一致性问题<a name="section_cache_consistency"></a>
+## Cache写策略与Cache一致性问题
 
 当向GM写入数据，并且启用Cache时，存在以下两种Cache写策略：延迟写回（Write-Back）和直写（Write-Through）。
 

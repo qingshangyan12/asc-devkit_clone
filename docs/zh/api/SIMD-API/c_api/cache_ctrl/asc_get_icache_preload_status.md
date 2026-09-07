@@ -28,9 +28,9 @@
 
 头文件路径为：`"c_api/cache_ctrl/cache_ctrl.h"`。
 
-该接口为调试接口，在[asc_icache_preload](./asc_icache_preload.md)后调用，用于获取ICache的PreLoad的状态:
+该接口为调试接口，在[asc_icache_preload](./asc_icache_preload.md)后调用，用于获取ICache的PreLoad的状态：
 
-- 当返回值为0时，说明ICache的PreLoad已完成
+- 当返回值为0时，说明ICache的PreLoad已完成。
 - 当返回值为1时，说明ICache的PreLoad未完成。
 
 ## 函数原型
