@@ -49,6 +49,27 @@ struct ManifestExpansionContext {
     const fs::path& externalSourceDirectoryPath;
 };
 
+struct PreparedConstantSource {
+    const void* borrowedData;
+    uint64_t byteCount;
+    fs::path targetFilePath;
+    std::string templateText;
+};
+
+struct PreparedManifestCommand {
+    CompilationCommand command;
+    ManifestObjectKind objectKind;
+    size_t outputOptionPosition{0U};
+};
+
+struct PreparedCompilationInputs {
+    std::vector<PreparedConstantSource> constants;
+    std::vector<PreparedManifestCommand> commands;
+    CompilationCommand linkCommand;
+    std::set<fs::path> requiredOutputDirectories;
+    fs::path linkedKernelElfPath;
+};
+
 void ReplaceAllLiteralOccurrences(std::string& text, const std::string& literalText, const std::string& replacementText)
 {
     size_t occurrencePosition = 0U;
@@ -206,9 +227,9 @@ std::string FormatBytesAsCppInitializerList(const void* constantAddress, uint64_
     return encodedBytes.str();
 }
 
-aclError BuildConstantSourcePatches(
+aclError PrepareConstantSources(
     const Json& selectedKernel, const NormalizedKernelSpecializationRequest& specializationRequest,
-    const ManifestExpansionContext& expansionContext, std::vector<KernelSourcePatch>& sourcePatches)
+    const ManifestExpansionContext& expansionContext, std::vector<PreparedConstantSource>& constants)
 {
     const auto constantInfos = selectedKernel.find("constant_infos");
     if (constantInfos == selectedKernel.end() || constantInfos->empty()) {
@@ -282,19 +303,19 @@ aclError BuildConstantSourcePatches(
                 resolvedTargetFilePath)) {
             return ACLRTC_ERROR_FAILURE;
         }
-        sourcePatches.push_back(
-            {resolvedTargetFilePath, constantInfo.at("template").get<std::string>(),
-             FormatBytesAsCppInitializerList(
-                 specializationRequest.borrowedKernelArgumentDataPointers[constantArgumentIndex], constantByteCount)});
+        constants.push_back(
+            {specializationRequest.borrowedKernelArgumentDataPointers[constantArgumentIndex], constantByteCount,
+             resolvedTargetFilePath, constantInfo.at("template").get<std::string>()});
     }
     return ACLRTC_SUCCESS;
 }
 
-aclError BuildManifestCommand(
+aclError PrepareManifestCommand(
     const Json& manifestCommand, const SelectedManifestObject& selectedObject, size_t commandIndex,
-    const NormalizedKernelSpecializationRequest& specializationRequest,
-    const ManifestExpansionContext& expansionContext, CompilationCommand& compilationCommand)
+    const ManifestExpansionContext& expansionContext, PreparedManifestCommand& preparedCommand)
 {
+    CompilationCommand& compilationCommand = preparedCommand.command;
+    preparedCommand.objectKind = selectedObject.objectKind;
     const std::string manifestObjectName = selectedObject.manifestObject->at("object_name").get<std::string>();
     const std::string commandType = manifestCommand.at("type").get<std::string>();
     if (commandType == "compile") {
@@ -356,20 +377,14 @@ aclError BuildManifestCommand(
     }
 
     if (compilationCommand.commandKind == CompilationCommandKind::Compile) {
-        size_t outputOptionPosition = 0U;
-        if (!FindSeparatedCompilerOutputOptionPosition(compilationCommand.commandArguments, outputOptionPosition)) {
+        if (!FindSeparatedCompilerOutputOptionPosition(
+                compilationCommand.commandArguments, preparedCommand.outputOptionPosition)) {
             ASCENDLOGE(
                 "Manifest compile command %s must contain a valid separated '-o' output option and a non-empty "
                 "output path; regenerate the JIT resource with '-o' followed by its output path",
                 compilationCommand.diagnosticLabel.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
-        const std::vector<std::string>& userOptions = selectedObject.objectKind == ManifestObjectKind::Basic ?
-                                                          specializationRequest.compilerOptions.basicOptions :
-                                                          specializationRequest.compilerOptions.superKernelOptions;
-        compilationCommand.commandArguments.insert(
-            compilationCommand.commandArguments.begin() + static_cast<std::ptrdiff_t>(outputOptionPosition),
-            userOptions.begin(), userOptions.end());
     }
     return ACLRTC_SUCCESS;
 }
@@ -404,7 +419,7 @@ aclError SelectManifestObjectsForCompilation(
     return ACLRTC_SUCCESS;
 }
 
-aclError BuildLinkCommand(
+aclError PrepareLinkCommand(
     const Json& selectedKernel, const std::vector<SelectedManifestObject>& selectedObjects,
     const ManifestExpansionContext& expansionContext, CompilationCommand& linkCommand,
     std::set<fs::path>& requiredOutputDirectories, fs::path& linkedKernelElfPath)
@@ -459,6 +474,119 @@ aclError BuildLinkCommand(
     }
     return ACLRTC_SUCCESS;
 }
+
+aclError PrepareCompilationInputs(
+    const NormalizedKernelSpecializationRequest& specializationRequest, const Json& resourceManifest,
+    const fs::path& resourceWorktreePath, const fs::path& externalSourceDirectoryPath,
+    PreparedCompilationInputs& preparedInputs)
+{
+    if (!resourceWorktreePath.is_absolute()) {
+        ASCENDLOGE(
+            "ResourceRegistry returned a non-absolute worktree path: %s; fix the registry integration",
+            resourceWorktreePath.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+    boost::system::error_code worktreeError;
+    const bool worktreeIsDirectory = fs::is_directory(resourceWorktreePath, worktreeError);
+    if (worktreeError && !IsMissingPathError(worktreeError)) {
+        ASCENDLOGE(
+            "Failed to inspect resource worktree: path=%s error=%d message=%s; fix the registry "
+            "integration",
+            resourceWorktreePath.c_str(), worktreeError.value(), worktreeError.message().c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+    if (!worktreeIsDirectory) {
+        ASCENDLOGE(
+            "Resource worktree must be an existing directory: path=%s; fix the registry integration",
+            resourceWorktreePath.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+    const std::string schemaVersion = resourceManifest.at("schema_version").get<std::string>();
+    if (schemaVersion != SUPPORTED_MANIFEST_SCHEMA_VERSION) {
+        ASCENDLOGE(
+            "Unsupported Manifest schema_version '%s'; expected '%s'. Regenerate the JIT resource with a "
+            "compatible pack tool",
+            schemaVersion.c_str(), SUPPORTED_MANIFEST_SCHEMA_VERSION);
+        return ACLRTC_ERROR_FAILURE;
+    }
+
+    const Json* selectedKernel = nullptr;
+    for (const Json& kernel : resourceManifest.at("kernels")) {
+        if (kernel.at("kernel_name").get<std::string>() == specializationRequest.kernelName) {
+            selectedKernel = &kernel;
+            break;
+        }
+    }
+    if (selectedKernel == nullptr) {
+        ASCENDLOGE(
+            "Kernel entry '%s' is not present in JIT resource '%s'; correct kernelEntry or resourceId",
+            specializationRequest.kernelName.c_str(), specializationRequest.resourceId.c_str());
+        return ACLRTC_ERROR_FAILURE;
+    }
+
+    const fs::path outputDirectoryPath =
+        resourceWorktreePath / (".aclrtc_" + specializationRequest.specializationSessionId) / "outputs";
+    const ManifestExpansionContext expansionContext{
+        resourceManifest, resourceWorktreePath, outputDirectoryPath, externalSourceDirectoryPath};
+    aclError result =
+        PrepareConstantSources(*selectedKernel, specializationRequest, expansionContext, preparedInputs.constants);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
+    }
+
+    std::vector<SelectedManifestObject> selectedObjects;
+    result =
+        SelectManifestObjectsForCompilation(*selectedKernel, specializationRequest.compilationVariant, selectedObjects);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
+    }
+
+    for (const SelectedManifestObject& selectedObject : selectedObjects) {
+        const Json& commands = selectedObject.manifestObject->at("commands");
+        for (size_t commandIndex = 0U; commandIndex < commands.size(); ++commandIndex) {
+            PreparedManifestCommand command;
+            result = PrepareManifestCommand(
+                commands.at(commandIndex), selectedObject, commandIndex, expansionContext, command);
+            if (result != ACLRTC_SUCCESS) {
+                return result;
+            }
+            preparedInputs.commands.emplace_back(std::move(command));
+        }
+    }
+
+    preparedInputs.requiredOutputDirectories.emplace(outputDirectoryPath);
+    return PrepareLinkCommand(
+        *selectedKernel, selectedObjects, expansionContext, preparedInputs.linkCommand,
+        preparedInputs.requiredOutputDirectories, preparedInputs.linkedKernelElfPath);
+}
+
+KernelCompilationPlan AssembleCompilationPlan(
+    PreparedCompilationInputs preparedInputs, const KernelCompilerOptions& compilerOptions)
+{
+    KernelCompilationPlan plan;
+    for (const PreparedConstantSource& constant : preparedInputs.constants) {
+        plan.sourcePatches.push_back(
+            {constant.targetFilePath, constant.templateText,
+             FormatBytesAsCppInitializerList(constant.borrowedData, constant.byteCount)});
+    }
+    for (PreparedManifestCommand& preparedCommand : preparedInputs.commands) {
+        CompilationCommand& command = preparedCommand.command;
+        if (command.commandKind == CompilationCommandKind::Compile) {
+            const auto& userOptions = preparedCommand.objectKind == ManifestObjectKind::Basic ?
+                                          compilerOptions.basicOptions :
+                                          compilerOptions.superKernelOptions;
+            command.commandArguments.insert(
+                command.commandArguments.begin() + static_cast<std::ptrdiff_t>(preparedCommand.outputOptionPosition),
+                userOptions.begin(), userOptions.end());
+        }
+        plan.compilationCommands.emplace_back(std::move(command));
+    }
+    plan.compilationCommands.emplace_back(std::move(preparedInputs.linkCommand));
+    plan.requiredOutputDirectoryPaths.assign(
+        preparedInputs.requiredOutputDirectories.begin(), preparedInputs.requiredOutputDirectories.end());
+    plan.linkedKernelElfPath = std::move(preparedInputs.linkedKernelElfPath);
+    return plan;
+}
 } // namespace
 
 KernelCompilationPlanBuilder::KernelCompilationPlanBuilder(
@@ -473,94 +601,15 @@ KernelCompilationPlanBuilder::KernelCompilationPlanBuilder(
 aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPlan& compilationPlan) const
 {
     try {
-        if (!resourceWorktreePath_.is_absolute()) {
-            ASCENDLOGE(
-                "ResourceRegistry returned a non-absolute worktree path: %s; fix the registry integration",
-                resourceWorktreePath_.c_str());
-            return ACLRTC_ERROR_FAILURE;
-        }
-        boost::system::error_code worktreeError;
-        const bool worktreeIsDirectory = fs::is_directory(resourceWorktreePath_, worktreeError);
-        if (worktreeError && !IsMissingPathError(worktreeError)) {
-            ASCENDLOGE(
-                "Failed to inspect resource worktree: path=%s error=%d message=%s; fix the registry "
-                "integration",
-                resourceWorktreePath_.c_str(), worktreeError.value(), worktreeError.message().c_str());
-            return ACLRTC_ERROR_FAILURE;
-        }
-        if (!worktreeIsDirectory) {
-            ASCENDLOGE(
-                "Resource worktree must be an existing directory: path=%s; fix the registry integration",
-                resourceWorktreePath_.c_str());
-            return ACLRTC_ERROR_FAILURE;
-        }
-        const std::string schemaVersion = resourceManifest_.at("schema_version").get<std::string>();
-        if (schemaVersion != SUPPORTED_MANIFEST_SCHEMA_VERSION) {
-            ASCENDLOGE(
-                "Unsupported Manifest schema_version '%s'; expected '%s'. Regenerate the JIT resource with a "
-                "compatible pack tool",
-                schemaVersion.c_str(), SUPPORTED_MANIFEST_SCHEMA_VERSION);
-            return ACLRTC_ERROR_FAILURE;
-        }
-
-        const Json* selectedKernel = nullptr;
-        for (const Json& kernel : resourceManifest_.at("kernels")) {
-            if (kernel.at("kernel_name").get<std::string>() == specializationRequest_.kernelName) {
-                selectedKernel = &kernel;
-                break;
-            }
-        }
-        if (selectedKernel == nullptr) {
-            ASCENDLOGE(
-                "Kernel entry '%s' is not present in JIT resource '%s'; correct kernelEntry or resourceId",
-                specializationRequest_.kernelName.c_str(), specializationRequest_.resourceId.c_str());
-            return ACLRTC_ERROR_FAILURE;
-        }
-
-        KernelCompilationPlan builtPlan;
-        const fs::path outputDirectoryPath =
-            resourceWorktreePath_ / (".aclrtc_" + specializationRequest_.specializationSessionId) / "outputs";
-        const ManifestExpansionContext expansionContext{
-            resourceManifest_, resourceWorktreePath_, outputDirectoryPath, externalSourceDirectoryPath_};
-        aclError result = BuildConstantSourcePatches(
-            *selectedKernel, specializationRequest_, expansionContext, builtPlan.sourcePatches);
+        PreparedCompilationInputs preparedInputs;
+        const aclError result = PrepareCompilationInputs(
+            specializationRequest_, resourceManifest_, resourceWorktreePath_, externalSourceDirectoryPath_,
+            preparedInputs);
         if (result != ACLRTC_SUCCESS) {
             return result;
         }
-
-        std::vector<SelectedManifestObject> selectedObjects;
-        result = SelectManifestObjectsForCompilation(
-            *selectedKernel, specializationRequest_.compilationVariant, selectedObjects);
-        if (result != ACLRTC_SUCCESS) {
-            return result;
-        }
-
-        for (const SelectedManifestObject& selectedObject : selectedObjects) {
-            const Json& commands = selectedObject.manifestObject->at("commands");
-            for (size_t commandIndex = 0U; commandIndex < commands.size(); ++commandIndex) {
-                CompilationCommand command;
-                result = BuildManifestCommand(
-                    commands.at(commandIndex), selectedObject, commandIndex, specializationRequest_, expansionContext,
-                    command);
-                if (result != ACLRTC_SUCCESS) {
-                    return result;
-                }
-                builtPlan.compilationCommands.emplace_back(std::move(command));
-            }
-        }
-
-        std::set<fs::path> requiredOutputDirectories{outputDirectoryPath};
-        CompilationCommand linkCommand;
-        result = BuildLinkCommand(
-            *selectedKernel, selectedObjects, expansionContext, linkCommand, requiredOutputDirectories,
-            builtPlan.linkedKernelElfPath);
-        if (result != ACLRTC_SUCCESS) {
-            return result;
-        }
-        builtPlan.compilationCommands.emplace_back(std::move(linkCommand));
-        builtPlan.requiredOutputDirectoryPaths.assign(
-            requiredOutputDirectories.begin(), requiredOutputDirectories.end());
-        compilationPlan = std::move(builtPlan);
+        // No constant bytes are read until all selected inputs have passed preparation.
+        compilationPlan = AssembleCompilationPlan(std::move(preparedInputs), specializationRequest_.compilerOptions);
         return ACLRTC_SUCCESS;
     } catch (const nlohmann::json::exception& exception) {
         ASCENDLOGE(

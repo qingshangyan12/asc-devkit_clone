@@ -20,6 +20,7 @@
 #include <fstream>
 #include <string>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include <unistd.h>
 
 namespace {
@@ -629,6 +630,80 @@ TEST(KernelCompilationPlanBuilderTest, RejectsZeroByteStructConstant)
         KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
             .BuildCompilationPlan(plan),
         ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
+}
+
+TEST(KernelCompilationPlanBuilderTest, RejectsInvalidInputsBeforeReadingAnyConstantBytes)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    for (int invalidInputKind : {0, 1, 2}) {
+        // A protected buffer detects reads before the remaining inputs have been checked.
+        ASSERT_EXIT(
+            {
+                const size_t pageSize = static_cast<size_t>(sysconf(_SC_PAGESIZE));
+                void* unreadable = mmap(nullptr, pageSize, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+                if (unreadable == MAP_FAILED) {
+                    _exit(2);
+                }
+                const void* addresses[] = {unreadable};
+                const uint64_t sizes[] = {2U};
+                auto request = CreateRequest(workspace, addresses, sizes);
+                Json manifest = CreateManifest();
+                auto& kernel = manifest["kernels"][1];
+                if (invalidInputKind == 0) {
+                    Json constant = kernel["constant_infos"][0];
+                    constant["parameter_index"] = 1U;
+                    kernel["constant_infos"].push_back(constant);
+                } else if (invalidInputKind == 1) {
+                    kernel["objects"][0]["commands"][0]["cmd"] = Json::array();
+                } else {
+                    kernel["link_options"] = Json::array({1});
+                }
+                KernelCompilationPlan plan;
+                plan.linkedKernelElfPath = "unchanged.elf";
+                const auto status = KernelCompilationPlanBuilder(
+                                        request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+                                        .BuildCompilationPlan(plan);
+                const auto expected = invalidInputKind == 0 ? ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT :
+                                                              ascendc::aclrtc::ACLRTC_ERROR_FAILURE;
+                munmap(unreadable, pageSize);
+                _exit(status == expected && plan.linkedKernelElfPath == "unchanged.elf" ? 0 : 1);
+            },
+            ::testing::ExitedWithCode(0), "");
+    }
+}
+
+TEST(KernelCompilationPlanBuilderTest, BuildsMixedConstantsUsingEachParameterIndexAndSizeSource)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t pointerBytes[] = {0x01, 0x02, 0x03};
+    const uint8_t structBytes[] = {0xfe, 0xff, 0x04};
+    const void* addresses[] = {nullptr, pointerBytes, structBytes};
+    const uint64_t sizes[] = {0U, sizeof(void*), sizeof(structBytes)};
+    auto request = CreateRequest(workspace, addresses, sizes);
+    request.kernelArgumentCount = 3U;
+    Json manifest = CreateManifest();
+    auto& constants = manifest["kernels"][1]["constant_infos"];
+    constants[0]["parameter_index"] = 1U;
+    Json structConstant = constants[0];
+    structConstant["parameter_index"] = 2U;
+    structConstant["arg_type"] = "struct";
+    structConstant.erase("byte_size");
+    structConstant["template"] = "@@STRUCT@@";
+    constants.push_back(structConstant);
+
+    KernelCompilationPlan plan;
+    ASSERT_EQ(
+        KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+    ASSERT_EQ(plan.sourcePatches.size(), 2U);
+    EXPECT_EQ(plan.sourcePatches[0].replacementText, "{0x01, 0x02}");
+    EXPECT_EQ(plan.sourcePatches[1].replacementText, "{0xfe, 0xff, 0x04}");
+    EXPECT_EQ(plan.sourcePatches[1].templateText, "@@STRUCT@@");
 }
 
 TEST(KernelCompilationPlanBuilderTest, RejectsMissingResourceWorktree)
