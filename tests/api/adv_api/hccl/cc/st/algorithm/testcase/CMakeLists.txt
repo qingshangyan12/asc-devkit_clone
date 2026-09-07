@@ -121,7 +121,7 @@ target_compile_definitions(${MESHCHUNK_TEST_TARGET} PRIVATE UT_TEST AICPU_COMPIL
 get_target_property(MESHCHUNK_TEST_LIBS ${HCCL_CHECKER_TARGET} LINK_LIBRARIES)
 target_link_libraries(${MESHCHUNK_TEST_TARGET} PRIVATE ${MESHCHUNK_TEST_LIBS})
 foreach(primitive HcommIsSupportHcommBatchTransferOnThread HcclHcommBatchTransferOnThread
-        HcommChannelNotifyRecordOnThread HcommChannelNotifyWaitOnThread HcommWriteReduceOnThread
+        HcommChannelNotifyRecordOnThread HcommChannelNotifyWaitOnThread HcommWriteReduceOnThread HcommReadReduceOnThread
         HcommThreadNotifyRecordOnThread HcommThreadNotifyWaitOnThread HcommLocalCopyOnThread)
     target_link_options(${MESHCHUNK_TEST_TARGET} PRIVATE "-Wl,--wrap=${primitive}")
 endforeach()

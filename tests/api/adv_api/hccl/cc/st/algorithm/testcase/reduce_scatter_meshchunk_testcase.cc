@@ -18,6 +18,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "hcomm_primitives_dl.h"
 #include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
+#include "ins_temp_reduce_scatter_nhr.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "executor_v2_base.h"
 
@@ -37,10 +38,12 @@ struct Task {
 };
 std::vector<Task> tasks;
 std::vector<HcclHcommBatchTransferDesc> descriptors;
+std::vector<size_t> batchEnds;
 bool batchSupported = true;
 int32_t batchResult = HCCL_SUCCESS;
 int32_t copyResult = HCCL_SUCCESS;
 size_t batchCalls = 0;
+size_t readReduceCalls = 0;
 size_t copyCalls = 0;
 size_t failCopyAt = std::numeric_limits<size_t>::max();
 
@@ -50,10 +53,12 @@ protected:
     {
         tasks.clear();
         descriptors.clear();
+        batchEnds.clear();
         batchSupported = true;
         batchResult = HCCL_SUCCESS;
         copyResult = HCCL_SUCCESS;
         batchCalls = 0;
+        readReduceCalls = 0;
         copyCalls = 0;
         failCopyAt = std::numeric_limits<size_t>::max();
         ASSERT_EQ(InitHcommBatchTransferOnThreadSupported(true), HCCL_SUCCESS);
@@ -120,11 +125,18 @@ extern "C" int32_t __wrap_HcommWriteReduceOnThread(
     tasks.push_back({Kind::REDUCE, t, c, 0, dst, src, count, dtype});
     return HCCL_SUCCESS;
 }
+extern "C" int32_t __wrap_HcommReadReduceOnThread(
+    ThreadHandle, ChannelHandle, void*, const void*, uint64_t, HcommDataType, HcommReduceOp)
+{
+    ++readReduceCalls;
+    return HCCL_SUCCESS;
+}
 extern "C" int32_t __wrap_HcclHcommBatchTransferOnThread(
     ThreadHandle t, ChannelHandle c, const HcclHcommBatchTransferDesc* desc, uint32_t num)
 {
     ++batchCalls;
     descriptors.insert(descriptors.end(), desc, desc + num);
+    batchEnds.push_back(descriptors.size());
     if (batchResult != HCCL_SUCCESS) {
         return batchResult;
     }
@@ -574,4 +586,188 @@ TEST_F(MeshChunkTest, PostCopyAndInvalidRankOrDatatypeErrorsAreNotSwallowed)
     EXPECT_EQ(alg.KernelRun(p, s.Data(0, 0, s.count), s.Resources(0)), HCCL_E_RUNTIME);
     EXPECT_EQ(copyCalls, 2U);
     EXPECT_EQ(batchCalls, 9U); // Already submitted work must not be retried.
+}
+
+namespace {
+// Exercise the real NHR template using the same ordered primitive simulator as MeshChunk.
+struct NhrScenario : Scenario {
+    NhrScenario(u32 n, u64 c, u64 s, HcclDataType d) : Scenario(n, c, s, d)
+    {
+        for (u32 r = 0; r < ranks; ++r) {
+            scratch[r].resize(ranks * count * elementSize + 34, 0xD7);
+            for (u32 dst = 0; dst < ranks; ++dst) {
+                for (u64 i = 0; i < count; ++i) {
+                    // Keep 16-rank INT8 SUM in range.
+                    WriteValue(In(r) + (dst * stride + i) * elementSize, dtype, 1 + (r + dst + i) % 3);
+                }
+            }
+        }
+    }
+    TemplateResource NhrResources(u32 r)
+    {
+        auto res = Resources(r);
+        res.threads.resize(1);
+        for (auto& peer : res.channels) {
+            peer.second[0].portGroupSize = 1;
+            peer.second[0].protocol = CommProtocol::COMM_PROTOCOL_UBC_CTP;
+            peer.second[0].remoteCclMem.size = ranks * count * elementSize;
+        }
+        return res;
+    }
+    TemplateDataParams NhrData(u32 r, u64 processed, u64 current)
+    {
+        auto data = Data(r, processed, current);
+        data.buffInfo.inBuffType = BufferType::INPUT;
+        data.buffInfo.outBuffType = BufferType::OUTPUT;
+        data.buffInfo.hcclBuffType = BufferType::HCCL_BUFFER;
+        data.buffInfo.hcclBuff.size = ranks * count * elementSize;
+        data.outputSliceStride = 0;
+        return data;
+    }
+    void ExpandNhr(u64 loopCount)
+    {
+        for (u32 r = 0; r < ranks; ++r) {
+            auto param = Param();
+            InsTempReduceScatterNHR alg(param, r, {rankList});
+            for (u64 processed = 0; processed < count; processed += loopCount) {
+                ASSERT_EQ(alg.KernelRun(param,
+                    NhrData(r, processed, std::min(loopCount, count - processed)), NhrResources(r)), HCCL_SUCCESS);
+            }
+        }
+    }
+    void CheckTransfers()
+    {
+        for (const auto& task : tasks) {
+            if (task.kind != Kind::REDUCE) { continue; }
+            const u32 srcRank = (task.thread - 1) / 16;
+            const u32 dstRank = (task.target - 1) % 64;
+            const auto src = reinterpret_cast<uintptr_t>(task.src);
+            const auto dst = reinterpret_cast<uintptr_t>(task.dst);
+            const auto input = reinterpret_cast<uintptr_t>(In(srcRank));
+            const auto tmp = reinterpret_cast<uintptr_t>(Tmp(srcRank));
+            const auto remote = reinterpret_cast<uintptr_t>(Tmp(dstRank));
+            const auto bytes = task.count * elementSize;
+            ASSERT_EQ(task.dtype, static_cast<HcommDataType>(dtype));
+            ASSERT_GE(dst, remote);
+            ASSERT_LE(dst - remote + bytes, ranks * count * elementSize);
+            if (src >= input && src < input + ranks * stride * elementSize) {
+                // Step zero reads user data directly; no padding may be reduced.
+                ASSERT_LE((src - input) % (stride * elementSize) + bytes, count * elementSize);
+            } else {
+                ASSERT_GE(src, tmp);
+                ASSERT_LE(src - tmp + bytes, ranks * count * elementSize);
+            }
+        }
+        size_t begin = 0;
+        for (auto end : batchEnds) {
+            ASSERT_GT(end, begin);
+            for (size_t i = begin; i + 1 < end; ++i) {
+                EXPECT_EQ(descriptors[i].transType, HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE);
+                EXPECT_EQ(descriptors[i].transferInfo.reduce.reduceOp, static_cast<HcommReduceOp>(HCCL_REDUCE_SUM));
+            }
+            const auto& last = descriptors[end - 1];
+            ASSERT_EQ(last.transType, HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE_WITH_NOTIFY);
+            EXPECT_EQ(last.transferInfo.writeReduceWithNotify.notifyIdx, NOTIFY_IDX_DATA_SIGNAL);
+            EXPECT_EQ(last.transferInfo.writeReduceWithNotify.reduceOp, static_cast<HcommReduceOp>(HCCL_REDUCE_SUM));
+            begin = end;
+        }
+        // The stub expands each fused descriptor as payload then notification.
+        // A redundant standalone DATA_SIGNAL would make this count exceed the batch count.
+        EXPECT_EQ(Count(Kind::CHANNEL_RECORD, NOTIFY_IDX_DATA_SIGNAL), batchEnds.size());
+        EXPECT_EQ(Count(Kind::CHANNEL_WAIT, NOTIFY_IDX_DATA_SIGNAL), batchEnds.size());
+        EXPECT_EQ(Count(Kind::CHANNEL_RECORD, NOTIFY_IDX_ACK), batchEnds.size());
+        EXPECT_EQ(Count(Kind::CHANNEL_WAIT, NOTIFY_IDX_ACK), batchEnds.size());
+    }
+};
+} // namespace
+
+TEST_F(MeshChunkTest, NhrFusesRealTemplateForSoleAndInterServerRanksWithStridedLoopsAndTurns)
+{
+    for (auto dtype : {HCCL_DATA_TYPE_INT8, HCCL_DATA_TYPE_FP16, HCCL_DATA_TYPE_BFP16, HCCL_DATA_TYPE_FP32}) {
+        for (u32 ranks : {2U, 16U}) {
+            for (u64 stride : {u64{0}, u64{43}, u64{46}}) {
+                NhrScenario s(ranks, 43, stride, dtype);
+                const auto original = s.inputs;
+                for (u32 turn = 0; turn < 2; ++turn) {
+                    tasks.clear();
+                    descriptors.clear();
+                    batchEnds.clear();
+                    s.ExpandNhr(17); // Three loops, including a short final loop.
+                    const u32 steps = ranks == 2 ? 1 : 4;
+                    ASSERT_EQ(batchEnds.size(), ranks * steps * 3U);
+                    s.CheckTransfers();
+                    s.ExecuteAndCheck(); // Checks dependency ordering and actual reduction values.
+                    EXPECT_EQ(s.inputs, original);
+                }
+            }
+        }
+    }
+}
+
+TEST_F(MeshChunkTest, NhrBatchesParallelRepeatsAndSkipsEmptyTemplate)
+{
+    NhrScenario s(2, 40, 43, HCCL_DATA_TYPE_FP32);
+    for (auto& input : s.inputs) { input.resize(16 * s.stride * s.elementSize + 34, 0xD7); }
+    auto param = s.Param();
+    InsTempReduceScatterNHR alg(param, 0, {s.rankList});
+    auto data = s.NhrData(0, 0, 0);
+    ASSERT_EQ(alg.KernelRun(param, data, s.NhrResources(0)), HCCL_SUCCESS);
+    EXPECT_TRUE(tasks.empty());
+    data = s.NhrData(0, 0, 5);
+    data.repeatNum = 8; // ParallelMeshNHR inter-server stage batches eight local-rank slices.
+    data.inputSliceStride = 8 * s.stride * s.elementSize;
+    data.inputRepeatStride = s.stride * s.elementSize;
+    data.outputRepeatStride = 2 * data.sliceSize;
+    data.buffInfo.outputPtr = s.Tmp(0);
+    data.buffInfo.outBuffType = BufferType::HCCL_BUFFER;
+    data.outputSliceStride = data.sliceSize;
+    ASSERT_EQ(alg.KernelRun(param, data, s.NhrResources(0)), HCCL_SUCCESS);
+    ASSERT_EQ(batchCalls, 1U);
+    ASSERT_EQ(descriptors.size(), 8U);
+    for (size_t i = 0; i < descriptors.size(); ++i) {
+        const auto& d = descriptors[i];
+        const auto src = i + 1 == descriptors.size() ? d.transferInfo.writeReduceWithNotify.src : d.transferInfo.reduce.src;
+        const auto dst = i + 1 == descriptors.size() ? d.transferInfo.writeReduceWithNotify.dst : d.transferInfo.reduce.dst;
+        // Rank 0 sends the other rank's block in step zero; compare exact stride/repeat offsets.
+        EXPECT_EQ(src, s.In(0) + data.inputSliceStride + i * data.inputRepeatStride);
+        EXPECT_EQ(dst, s.Tmp(1) + data.sliceSize + i * data.outputRepeatStride);
+        EXPECT_EQ(d.transType, i + 1 == descriptors.size() ? HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE_WITH_NOTIFY :
+            HCCL_HCOMM_TRANSFER_TYPE_WRITE_REDUCE);
+    }
+    EXPECT_EQ(Count(Kind::CHANNEL_RECORD, NOTIFY_IDX_DATA_SIGNAL), 1U);
+    EXPECT_EQ(Count(Kind::CHANNEL_WAIT, NOTIFY_IDX_DATA_SIGNAL), 1U);
+}
+
+TEST_F(MeshChunkTest, NhrOldInterfaceAndFailedBatchNeverReplayCommunication)
+{
+    NhrScenario s(16, 7, 10, HCCL_DATA_TYPE_FP32);
+    auto param = s.Param();
+    InsTempReduceScatterNHR alg(param, 0, {s.rankList});
+    batchSupported = false;
+    ASSERT_EQ(alg.KernelRun(param, s.NhrData(0, 0, s.count), s.NhrResources(0)), HCCL_SUCCESS);
+    EXPECT_EQ(batchCalls, 0U);
+    EXPECT_EQ(Count(Kind::CHANNEL_RECORD, NOTIFY_IDX_DATA_SIGNAL), 4U);
+    tasks.clear();
+    batchSupported = true;
+    batchResult = HCCL_E_RUNTIME;
+    EXPECT_EQ(alg.KernelRun(param, s.NhrData(0, 0, s.count), s.NhrResources(0)), HCCL_E_INTERNAL);
+    EXPECT_EQ(batchCalls, 1U);
+    EXPECT_EQ(Count(Kind::REDUCE, 0), 0U);
+    EXPECT_EQ(Count(Kind::CHANNEL_RECORD, NOTIFY_IDX_DATA_SIGNAL), 0U);
+    for (const auto& task : tasks) {
+        if (task.kind == Kind::COPY) { EXPECT_NE(task.dst, s.Out(0)); }
+    }
+}
+
+TEST_F(MeshChunkTest, NhrPcieReadReduceDoesNotUseWriteFusion)
+{
+    NhrScenario s(2, 7, 10, HCCL_DATA_TYPE_FP32);
+    auto param = s.Param();
+    auto resources = s.NhrResources(0);
+    for (auto& peer : resources.channels) { peer.second[0].protocol = CommProtocol::COMM_PROTOCOL_PCIE; }
+    InsTempReduceScatterNHR alg(param, 0, {s.rankList});
+    ASSERT_EQ(alg.KernelRun(param, s.NhrData(0, 0, s.count), resources), HCCL_SUCCESS);
+    EXPECT_EQ(readReduceCalls, 1U);
+    EXPECT_EQ(batchCalls, 0U);
+    EXPECT_TRUE(descriptors.empty());
 }
