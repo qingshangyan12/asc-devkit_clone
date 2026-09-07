@@ -281,6 +281,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logf(float x)
     return __logf(x);
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x);
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sqrtf(float x) { return __internal_sqrtf(x); }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rsqrtf(float x) { return 1.0f / sqrtf(x); }
@@ -1281,6 +1283,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void sincospif(float x, __gm__ float* s, _
 #endif
 #endif
 #endif
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float powf(float x, float y);
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp2f(float x);
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x) { return powf(10.0f, x); }
 
@@ -3390,7 +3396,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log2f(float x)
         res = -ASCRT_INF_F;
     }
     if (x < 0.0f) {
-        res = ASCRT_INF_F / ASCRT_INF_F;
+        res = ASCRT_NAN_F;
     }
     return res;
 }
