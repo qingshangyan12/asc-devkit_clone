@@ -482,7 +482,6 @@ constexpr uint8_t g_oomStorageShapeMagic = 1U;
 constexpr uint8_t g_oomStorageShapeVersion = 1U;
 constexpr uint8_t g_oomTensorViewVersion = 1U;
 constexpr uint8_t g_oomNibbleMask = 0x0fU;
-constexpr uint8_t g_oomNibbleShift = 4U;
 constexpr uint8_t g_oomDescriptorTypeTensor = 1U;
 constexpr uint8_t g_oomDescriptorTypeTensorList = 2U;
 constexpr uint64_t g_oomStorageShapeHeaderSize = 2UL;

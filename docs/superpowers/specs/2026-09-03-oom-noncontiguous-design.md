@@ -35,12 +35,12 @@ The extension is appended after the established layout:
 
 ```text
 [TilingData ... IN_DYN ... OUT_0 ... OUTSHAPE ... WS]
-[u4 magic = 1][u4 version = 1][u8 reserved]
+[u8 magic = 1][u4 version = 1][u4 reserved]
 [OOM descriptor block]...
 ```
 
-The first byte stores `magic` in bits 3:0 and `version` in bits 7:4; the second
-byte stores `reserved`. All multi-byte integers use the existing runtime ABI
+The first byte stores `magic`. In the second byte, bits 3:0 store `version` and
+bits 7:4 store `reserved`. All multi-byte integers use the existing runtime ABI
 byte order. Descriptor blocks are packed exactly as specified below and contain no implicit alignment padding.
 `size` includes the complete descriptor block, including its own `size` field.
 

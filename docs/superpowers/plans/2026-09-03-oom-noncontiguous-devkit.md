@@ -86,12 +86,12 @@ git commit -m "test: cover OOM storage-shape generation"
 Construct this synthetic GM buffer:
 
 ```text
-[u64 magic=1][u32 version=1][u32 reserved]
-[u64 size=40][u32 kind=1][u32 reserved]
-[u32 tensor_version=1][u32 nDim=2][u64 2][u64 8]
+[u8 magic=1][u4 version=1][u4 reserved]
+[u64 size=19][u8 type=1][u8 reserved]
+[u4 tensor_version=1][u4 reserved][u64 storageShapeSize=16]
 ```
 
-Parse it for a float32 Tensor and assert one range of `2 * 8 * 4` bytes is registered. Test a buffer without magic and assert parsing returns false without changing `g_oomAddrArange`.
+Parse it for a float32 Tensor and assert one range of `16 * 4` bytes is registered. Test a buffer without magic and assert parsing returns false without changing `g_oomAddrArange`.
 
 - [ ] **Step 2: Add failing TensorList U/F tests**
 

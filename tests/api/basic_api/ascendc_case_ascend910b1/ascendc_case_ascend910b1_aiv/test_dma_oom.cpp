@@ -98,9 +98,8 @@ TEST_F(TestDMAOom, TestOOMStorageShapeTensorDescriptor)
 {
     uint8_t* metadata = static_cast<uint8_t*>(AscendC::GmAlloc(64));
     uint8_t* tensor = static_cast<uint8_t*>(AscendC::GmAlloc(128));
-    WritePacked<uint8_t>(metadata,
-        static_cast<uint8_t>(g_oomStorageShapeMagic | (g_oomStorageShapeVersion << 4)));
-    WritePacked<uint8_t>(metadata + 1, 0);
+    WritePacked<uint8_t>(metadata, g_oomStorageShapeMagic);
+    WritePacked<uint8_t>(metadata + 1, g_oomStorageShapeVersion);
     uint8_t* cursor = metadata + g_oomStorageShapeHeaderSize;
     WritePacked<uint64_t>(cursor, 19);
     WritePacked<uint8_t>(cursor + 8, g_oomDescriptorTypeTensor);

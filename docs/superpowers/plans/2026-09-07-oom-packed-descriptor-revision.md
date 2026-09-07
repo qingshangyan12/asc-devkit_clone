@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the version-1 OOM extension with the confirmed nibble-width header and TensorViewDesc layouts.
+**Goal:** Replace the version-1 OOM extension with the confirmed packed header and TensorViewDesc layouts.
 
-**Architecture:** Keep the capability JSON and legacy fallback unchanged. Encode the extension header in 2 bytes and each TensorViewDesc in 9 bytes, using explicit masks and shifts instead of compiler bit-fields. Tensor and TensorList block headers remain 10 and 12 bytes respectively.
+**Architecture:** Keep the capability JSON and legacy fallback unchanged. Encode the extension header as an 8-bit magic followed by 4-bit version and reserved fields, and encode each TensorViewDesc in 9 bytes. Use explicit masks instead of compiler bit-fields. Tensor and TensorList block headers remain 10 and 12 bytes respectively.
 
 **Tech Stack:** C++17 AscendC device helpers, gtest, Python code-generation checks.
 
