@@ -33,3 +33,11 @@ TEST_F(TestCubeComputeSetL0c2gmConfig, set_l0c2gm_config_Succ)
     asc_set_l0c2gm_config(relu_pre, quant_pre, enable_unit_flag);
     GlobalMockObject::verify();
 }
+
+TEST_F(TestCubeComputeSetL0c2gmConfig, set_l0c_copy_config_Succ)
+{
+    MOCKER(set_fpc, void(uint64_t)).times(1).will(invoke(set_set_l0c2gm_config_Stub));
+
+    asc_set_l0c_copy_config(1, 2, true);
+    GlobalMockObject::verify();
+}
