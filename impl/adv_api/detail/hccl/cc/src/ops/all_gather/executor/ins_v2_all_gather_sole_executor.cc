@@ -18,6 +18,24 @@
 #include <cstddef>
 namespace mc2_ops_hccl {
 
+namespace {
+// CCU模板(CcuTempKfcAllGatherMesh1DMem2Mem)不提供SetchannelsPerRank，用重载探测
+// 在编译期选择可用实现；CCU引擎本身也不会进入该调用(见engine门禁)。
+template <typename InsAlgTemplate>
+auto SetChannelsPerRankIfSupported(
+    InsAlgTemplate& algTemplate, const std::map<u32, std::vector<ChannelInfo>>& channels, int)
+    -> decltype(algTemplate.SetchannelsPerRank(channels))
+{
+    return algTemplate.SetchannelsPerRank(channels);
+}
+
+template <typename InsAlgTemplate>
+HcclResult SetChannelsPerRankIfSupported(InsAlgTemplate&, const std::map<u32, std::vector<ChannelInfo>>&, long)
+{
+    return HCCL_SUCCESS;
+}
+} // namespace
+
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2AllGatherSoleExecutor()
 {}
@@ -132,6 +150,9 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     u32 templateScratchMultiplier =
         algTemplate.CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
     maxTmpMemSize_ = tempAlgParams.buffInfo.hcclBuff.size;
+    if (param.engine == COMM_ENGINE_AICPU_TS && std::string(param.algName) != "AicpuAllGatherSoleNHR") {
+        CHK_RET(SetChannelsPerRankIfSupported(algTemplate, templateAlgRes.channels, 0));
+    }
     // 中转内存单次最多能够接受的output count，注意是count不是size
     u64 transportBoundDataSize = UB_MAX_DATA_SIZE;
     u64 maxDataSizePerLoop = 0;
@@ -142,8 +163,10 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     } else {
         maxDataSizePerLoop = transportBoundDataSize;
     }
-    if (param.supportSymmetricMemory) {
+    // 如果是对称内存，且算法是AicpuAllGatherSoleMesh，每次传输的大小不受cclbuffer和UB_MAX_DATA_SIZE的限制
+    if (param.supportSymmetricMemory && std::string(param.algName) == "AicpuAllGatherSoleMesh") {
         maxDataSizePerLoop = dataSize_;
+        tempAlgParams.supportSymmetricMemory = true;
     }
     u64 maxCountPerLoop = maxDataSizePerLoop / dataTypeSize_;
     // 计算loopTimes
@@ -190,7 +213,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
 }
 
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleMesh, InsV2AllGatherSoleExecutor, TopoMatch1D,
     InsTempAllGatherMesh1D);
 
 REGISTER_EXEC_V2(
