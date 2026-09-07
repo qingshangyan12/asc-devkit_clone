@@ -26,13 +26,15 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
+
 用于调用[asc_copy_l12l0a_arch_3510（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。`asc_copy_l12l0a`接口中的`f_matrix_ctrl`参数设置为`false`时，3D格式分形矩阵搬运（im2col展开）场景会使用本接口设置的值做为填充值。
 
 本接口为矩阵3D格式搬入相关配置接口，仅在AIC上生效。
 
 ## 函数原型
 
-```cpp
+```c
 __aicore__ inline void asc_set_l12l0a_3d_padding(<dtype> padding_value)
 __aicore__ inline void asc_set_l12l0a_3d_padding(uint64_t config)
 ```
@@ -43,7 +45,7 @@ dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`ha
 
 ### 函数原型典型示例
 
-```cpp
+```c
 // 示例：配置half类型的padding值。
 __aicore__ inline void asc_set_l12l0a_3d_padding(half padding_value)
 ```
@@ -67,9 +69,8 @@ PIPE_S
 
 ## 约束说明
 
-### 填充值取用约束
-
 - 本接口非AIC调用直接返回。
+- 当前接口底层使用的寄存器与[asc_set_gm2l1_padding](asc_set_gm2l1_padding.md)为相同的寄存器，因此本设置的值也是[asc_copy_gm2l1_arch_3510（高维切分数据搬运）](asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)搬运时使用的填充值。
 
 ## 调用示例
 
