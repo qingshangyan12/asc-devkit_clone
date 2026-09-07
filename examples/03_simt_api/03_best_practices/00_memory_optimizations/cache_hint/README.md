@@ -110,6 +110,17 @@
 
 ```cpp
 float x = input[idx];
+float sign = 1.0f;
+if (x < 0.0f) {
+    sign = -1.0f;
+    x = -x;
+}
+float two_pi = 2.0f * PI;
+x = fmodf(x, two_pi);
+if (x >= PI) {
+    x = two_pi - x;
+    sign = -sign;
+}
 float index_float = x * static_cast<float>(table_length) / PI;
 uint32_t n = static_cast<uint32_t>(floorf(index_float));
 float frac = index_float - static_cast<float>(n);
@@ -154,6 +165,17 @@ Case 0的场景中，加载input，output时会把数据缓存在DCache上，替
 
 ```cpp
 float x = asc_ldcg(&input[idx]);
+float sign = 1.0f;
+if (x < 0.0f) {
+    sign = -1.0f;
+    x = -x;
+}
+float two_pi = 2.0f * PI;
+x = fmodf(x, two_pi);
+if (x >= PI) {
+    x = two_pi - x;
+    sign = -sign;
+}
 float index_float = x * static_cast<float>(table_length) / PI;
 uint32_t n = static_cast<uint32_t>(floorf(index_float));
 float frac = index_float - static_cast<float>(n);

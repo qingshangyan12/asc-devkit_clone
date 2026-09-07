@@ -27,7 +27,7 @@ Thread Block是Grid的组成单元，由若干线程组成（最大2048个线程
 
 Grid是SIMT线程层次结构的最顶层，由多个Thread Block组成。使用内置变量[gridDim](extended_syntax/builtin_variables.md#griddim)来表示Grid中启用的线程块数量。在SIMT编程场景，Grid有以下特征：
 
--   Grid的维度配置由用户设置启动的AIV核数决定，核函数（Kernel）执行期间不可更改；
+-   Grid的维度配置由用户的执行配置决定，核函数（Kernel）执行期间不可更改；
 -   Grid中的所有线程块具有相同的尺寸和维度配置；
 -   同一Grid中的线程块相互独立，按任意顺序执行；
 
