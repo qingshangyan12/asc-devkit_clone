@@ -9,6 +9,7 @@
  */
 
 #include "specialization/kernel_compilation_plan_builder.h"
+#include "specialization/kernel_manifest_parser.h"
 
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
@@ -170,6 +171,53 @@ NormalizedKernelSpecializationRequest CreateRequest(
     request.borrowedKernelArgumentDataPointers = argumentAddresses;
     request.borrowedKernelArgumentByteCounts = argumentByteCounts;
     return request;
+}
+
+TEST(KernelManifestParserTest, OwnsSelectedFieldsWithoutResolvingRuntimeEnvironment)
+{
+    Json manifest = CreateManifest();
+    manifest["kernels"][1]["objects"][1].erase("commands");
+    manifest["options"]["unused"] = 7;
+    ascendc::aclrtc::KernelManifestSpec spec;
+    ASSERT_EQ(
+        ascendc::aclrtc::ParseSelectedKernelManifest(
+            manifest, "add_custom_100000", KernelCompilationVariant::Basic, spec),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+    manifest.clear();
+    ASSERT_EQ(spec.constants.size(), 1U);
+    EXPECT_EQ(spec.constants[0].argumentKind, ascendc::aclrtc::ConstantArgumentKind::Pointer);
+    EXPECT_EQ(spec.constants[0].byteSize, 2U);
+    ASSERT_EQ(spec.commands.size(), 1U);
+    EXPECT_EQ(spec.commands[0].executable.text, "${env:ACLRTC_TEST_TOOLCHAIN}/bin/bisheng");
+    ASSERT_GE(spec.commands[0].arguments.size(), 3U);
+    EXPECT_EQ(spec.commands[0].arguments[2].text, "-I${env:ACLRTC_TEST_TOOLCHAIN}/include");
+    EXPECT_EQ(spec.commands[0].arguments[2].location, "options['common_compile'][2]");
+}
+
+TEST(KernelManifestParserTest, RejectsInvalidConstantContractsWithoutChangingOutput)
+{
+    for (const Json& fields : std::vector<Json>{
+             {{"arg_type", "struct"}, {"byte_size", 2}},
+             {{"arg_type", "pointer"}},
+             {{"arg_type", "pointer"}, {"byte_size", 0}},
+             {{"arg_type", "pointer"}, {"byte_size", -1}},
+             {{"arg_type", "pointer"}, {"byte_size", "2"}},
+             {{"arg_type", "unknown"}},
+             {{"arg_type", 2}}}) {
+        Json manifest = CreateManifest();
+        auto& constant = manifest["kernels"][1]["constant_infos"][0];
+        constant.erase("arg_type");
+        constant.erase("byte_size");
+        constant.update(fields);
+        ascendc::aclrtc::KernelManifestSpec spec;
+        spec.linkOptions.push_back({"unchanged", "original"});
+        EXPECT_EQ(
+            ascendc::aclrtc::ParseSelectedKernelManifest(
+                manifest, "add_custom_100000", KernelCompilationVariant::Basic, spec),
+            ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+        ASSERT_EQ(spec.linkOptions.size(), 1U);
+        EXPECT_EQ(spec.linkOptions[0].text, "unchanged");
+    }
 }
 
 TEST(KernelCompilationPlanBuilderTest, BuildsBasicPlanFromOnlySelectedManifestFields)
