@@ -18,6 +18,7 @@ constexpr u64 AR_AICPU_1D_SMALL_DATA_SIZE = 8 * 1024 * 1024;
 constexpr u64 AR_AICPU_1D_MAX_DATA_SIZE = 32 * 1024 * 1024;
 constexpr u64 AR_AICPU_1D_64DATATYPE_DATA_SIZE = 8 * 1024 * 1024;
 constexpr u64 AR_AICPU_SEQUENCE_DATA_SIZE = 4ULL * 1024 * 1024 * 1024;
+constexpr u64 AR_AICPU_1D_CROSS_SMALL_DATA_SIZE = 32 * 1024 * 1024;
 constexpr u64 AR_2P_DETOUR_DATA_SIZE = 8 * 1024 * 1024;
 } // namespace
 
@@ -39,6 +40,26 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
     const bool overMaxDataSize = dataSize * rankRatio > AR_AICPU_1D_MAX_DATA_SIZE;
     const bool overSequenceDataSize = dataSize > AR_AICPU_SEQUENCE_DATA_SIZE;
     if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
+        // Only the requested two-level Mesh/NHR range is locally migrated.
+        // Other two-level cases keep returning NOT_MATCH until their source fallbacks are migrated.
+        if (topoInfo->topoLevelNums == 2) {
+            const bool level0AndLevel1Symmetric = topoInfo->level0Symmetric && topoInfo->level1Symmetric;
+            const bool usesUnmigratedFallback =
+                specialDataOrReduce || topoInfo->Level1Nhr || overSequenceDataSize ||
+                topoInfo->netLayerDetails.localNetInsSizeOfLayer.empty() ||
+                topoInfo->netLayerDetails.localNetInsSizeOfLayer[0] == 1 ||
+                (level0AndLevel1Symmetric && topoInfo->deviceNumPerModule == 8 && topoInfo->topLevelUboe) ||
+                dataSize <= AR_AICPU_1D_CROSS_SMALL_DATA_SIZE;
+            if (!usesUnmigratedFallback) {
+                selectAlgName = "AicpuAllReduceParallelMeshNHR";
+                HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+                return SelectorStatus::MATCH;
+            }
+            HCCL_WARNING(
+                "[AllReduceAutoSelector] two-level AllReduce fallback is not registered locally, dataSize[%llu].",
+                dataSize);
+            return SelectorStatus::NOT_MATCH;
+        }
         const bool twoLevel = IsTwoLevelNetLayer(topoInfo);
         const bool matchChunkTwoShot = overMaxDataSize && !(twoLevel && overSequenceDataSize) &&
                                        !(twoLevel && topoInfo->userRankSize == 2 && dataSize >= AR_2P_DETOUR_DATA_SIZE);
