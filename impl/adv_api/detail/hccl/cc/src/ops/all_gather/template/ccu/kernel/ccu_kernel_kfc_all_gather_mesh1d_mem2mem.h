@@ -14,6 +14,11 @@
 
 namespace mc2_ops_hccl {
 
+struct CcuKernelArgKfcAllGatherMesh1DMem2Mem : CcuKernelArgBase {
+    uint64_t rankSize = 0;
+    uint32_t rankId = 0;
+};
+
 // 每个 repeat 批次最多展开 16 次 Write/LocalCopy/Wait 三阶段流水。
 constexpr uint32_t AG_M2M_UNROLL_NUM = 1;
 

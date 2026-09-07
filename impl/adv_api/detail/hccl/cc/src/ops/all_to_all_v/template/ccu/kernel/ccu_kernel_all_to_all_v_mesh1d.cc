@@ -9,7 +9,6 @@
  */
 
 #include "ccu_kernel_all_to_all_v_mesh1d.h"
-#include "../../../../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 
 namespace mc2_ops_hccl {
 
@@ -59,7 +58,7 @@ static CcuResult LoadArgs(AlltoAllVMesh1DContext& ctx)
 
 CcuResult CcuAlltoAllVMesh1DKernel(CcuKernelArg arg)
 {
-    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
+    const auto* kernelArg = static_cast<CcuKernelArgAlltoAllVMesh1D*>(arg);
     AlltoAllVMesh1DContext ctx;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(LoadArgs(ctx));

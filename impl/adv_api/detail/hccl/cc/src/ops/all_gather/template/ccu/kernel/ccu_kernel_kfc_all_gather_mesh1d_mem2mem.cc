@@ -8,7 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
-#include "../../../../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 
 namespace mc2_ops_hccl {
 
@@ -274,7 +273,7 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
 
 CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(CcuKernelArg arg)
 {
-    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllGatherMesh1DMem2Mem*>(arg);
     KfcAllGatherMesh1DMem2MemContext ctx;
     ctx.channels = kernelArg->channels;
     ctx.channelCount = kernelArg->channelCount;
