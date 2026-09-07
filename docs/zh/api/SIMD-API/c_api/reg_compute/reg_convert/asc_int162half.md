@@ -44,12 +44,14 @@ def asc_int162half_rn(dst, src, mask):
 ## 函数原型
 
 ```c
-// 占位符形式：
-// <round_mode>：支持rd（FLOOR）、rn（RINT）、rna（ROUND）、ru（CEIL）和rz（TRUNC）。
+// 占位符形式
 __simd_callee__ inline void asc_int162half_<round_mode>(vector_half& dst,
                                                          vector_int16_t src,
                                                          vector_bool mask)
 ```
+
+**占位符说明如下：**
+- `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
 
 ## 参数说明
 
