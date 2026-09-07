@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "kernel_manifest_parser.h"
+#include "compilation_manifest_parser.h"
 
 #include "ascendc_tool_log.h"
 #include <nlohmann/json.hpp>
@@ -30,7 +30,9 @@ bool ReadNonnegativeInteger(const Json& value, uint64_t maximum, uint64_t& resul
     return result <= maximum;
 }
 
-aclError ParseConstants(const Json& kernel, std::vector<ManifestConstant>& constants)
+} // namespace
+
+aclError CompilationManifestParser::ParseConstants(const Json& kernel, std::vector<ManifestConstant>& constants) const
 {
     const auto infos = kernel.find("constant_infos");
     if (infos == kernel.end() || !infos->is_array() || infos->empty()) {
@@ -40,7 +42,7 @@ aclError ParseConstants(const Json& kernel, std::vector<ManifestConstant>& const
     for (size_t index = 0; index < infos->size(); ++index) {
         const Json& info = infos->at(index);
         ManifestConstant spec;
-        if (!ParseManifestConstant(info, spec)) {
+        if (!spec.ParseDefinition(info)) {
             return ACLRTC_ERROR_FAILURE;
         }
         constants.emplace_back(std::move(spec));
@@ -48,31 +50,28 @@ aclError ParseConstants(const Json& kernel, std::vector<ManifestConstant>& const
     return ACLRTC_SUCCESS;
 }
 
-aclError ParseArgument(
-    const Json& manifest, const std::string& argument, const std::string& location,
-    std::vector<ManifestTextSpec>& arguments)
+aclError CompilationManifestParser::ParseArgument(
+    const std::string& argument, const std::string& location, std::vector<std::string>& arguments) const
 {
     if (argument.compare(0, sizeof(OPTIONS_PREFIX) - 1U, OPTIONS_PREFIX) != 0 ||
         argument.size() <= sizeof(OPTIONS_PREFIX) || argument.back() != '}') {
-        arguments.push_back({argument, location});
+        arguments.push_back(argument);
         return ACLRTC_SUCCESS;
     }
     const std::string name = argument.substr(sizeof(OPTIONS_PREFIX) - 1U, argument.size() - sizeof(OPTIONS_PREFIX));
-    const auto options = manifest.find("options");
-    if (options == manifest.end() || !options->is_object() || !options->contains(name)) {
+    const auto options = borrowedManifest_.find("options");
+    if (options == borrowedManifest_.end() || !options->is_object() || !options->contains(name)) {
         ASCENDLOGE("Manifest value %s references undefined options key '%s'", location.c_str(), name.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
     const auto values = options->at(name).get<std::vector<std::string>>();
-    for (size_t index = 0; index < values.size(); ++index) {
-        arguments.push_back({values[index], "options['" + name + "'][" + std::to_string(index) + "]"});
-    }
+    arguments.insert(arguments.end(), values.begin(), values.end());
     return ACLRTC_SUCCESS;
 }
 
-aclError ParseCommand(
-    const Json& manifest, const Json& command, const std::string& objectName, ManifestObjectKind objectKind,
-    size_t index, CommandSpec& spec)
+aclError CompilationManifestParser::ParseCommand(
+    const Json& command, const std::string& objectName, ManifestObjectKind objectKind, size_t index,
+    ManifestCommand& spec) const
 {
     const std::string type = command.at("type").get<std::string>();
     if (type == "compile") {
@@ -99,8 +98,8 @@ aclError ParseCommand(
         ASCENDLOGE("Manifest command %s has an empty cmd array", spec.diagnosticLabel.c_str());
         return ACLRTC_ERROR_FAILURE;
     }
-    std::vector<ManifestTextSpec> executable;
-    aclError result = ParseArgument(manifest, argv.front(), spec.diagnosticLabel + ".cmd[0]", executable);
+    std::vector<std::string> executable;
+    aclError result = ParseArgument(argv.front(), spec.diagnosticLabel + ".cmd[0]", executable);
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
@@ -111,8 +110,7 @@ aclError ParseCommand(
     spec.executable = std::move(executable.front());
     for (size_t argumentIndex = 1U; argumentIndex < argv.size(); ++argumentIndex) {
         result = ParseArgument(
-            manifest, argv[argumentIndex], spec.diagnosticLabel + ".cmd[" + std::to_string(argumentIndex) + "]",
-            spec.arguments);
+            argv[argumentIndex], spec.diagnosticLabel + ".cmd[" + std::to_string(argumentIndex) + "]", spec.arguments);
         if (result != ACLRTC_SUCCESS) {
             return result;
         }
@@ -120,8 +118,8 @@ aclError ParseCommand(
     return ACLRTC_SUCCESS;
 }
 
-aclError ParseObjects(
-    const Json& manifest, const Json& kernel, KernelCompilationVariant variant, KernelManifestSpec& spec)
+aclError CompilationManifestParser::ParseObjects(
+    const Json& kernel, KernelCompilationVariant variant, CompilationManifest& spec) const
 {
     bool foundBasic = false;
     bool foundSuperKernel = false;
@@ -152,17 +150,15 @@ aclError ParseObjects(
             return ACLRTC_ERROR_FAILURE;
         }
         for (size_t index = 0; index < commands.size(); ++index) {
-            CommandSpec command;
-            const aclError result = ParseCommand(manifest, commands.at(index), name, kind, index, command);
+            ManifestCommand command;
+            const aclError result = ParseCommand(commands.at(index), name, kind, index, command);
             if (result != ACLRTC_SUCCESS) {
                 return result;
             }
             spec.commands.emplace_back(std::move(command));
         }
         const auto outputs = object.at("outputs").get<std::vector<std::string>>();
-        for (size_t index = 0; index < outputs.size(); ++index) {
-            spec.linkInputs.push_back({outputs[index], name + ".outputs[" + std::to_string(index) + "]"});
-        }
+        spec.linkInputs.insert(spec.linkInputs.end(), outputs.begin(), outputs.end());
     }
     if (!foundBasic || (variant == KernelCompilationVariant::BasicWithSuperKernel && !foundSuperKernel)) {
         ASCENDLOGE("Selected kernel is missing a required basic or sk object");
@@ -170,18 +166,16 @@ aclError ParseObjects(
     }
     return ACLRTC_SUCCESS;
 }
-} // namespace
 
-aclError ParseSelectedKernelManifest(
-    const nlohmann::json& manifest, const std::string& kernelName, KernelCompilationVariant variant,
-    KernelManifestSpec& parsedManifest)
+aclError CompilationManifestParser::ParseSelected(
+    const std::string& kernelName, KernelCompilationVariant variant, CompilationManifest& parsedManifest) const
 {
     try {
-        if (manifest.at("schema_version").get<std::string>() != SCHEMA_VERSION) {
+        if (borrowedManifest_.at("schema_version").get<std::string>() != SCHEMA_VERSION) {
             ASCENDLOGE("Unsupported manifest schema_version; expected %s", SCHEMA_VERSION);
             return ACLRTC_ERROR_FAILURE;
         }
-        const auto& kernels = manifest.at("kernels");
+        const auto& kernels = borrowedManifest_.at("kernels");
         if (!kernels.is_array()) {
             ASCENDLOGE("Manifest kernels must be an array");
             return ACLRTC_ERROR_FAILURE;
@@ -197,20 +191,17 @@ aclError ParseSelectedKernelManifest(
             ASCENDLOGE("Kernel entry '%s' is not present in the manifest", kernelName.c_str());
             return ACLRTC_ERROR_FAILURE;
         }
-        KernelManifestSpec spec;
+        CompilationManifest spec;
         aclError result = ParseConstants(*selectedKernel, spec.constants);
         if (result != ACLRTC_SUCCESS) {
             return result;
         }
-        result = ParseObjects(manifest, *selectedKernel, variant, spec);
+        result = ParseObjects(*selectedKernel, variant, spec);
         if (result != ACLRTC_SUCCESS) {
             return result;
         }
         if (selectedKernel->contains("link_options")) {
-            const auto options = selectedKernel->at("link_options").get<std::vector<std::string>>();
-            for (size_t index = 0; index < options.size(); ++index) {
-                spec.linkOptions.push_back({options[index], "link_options[" + std::to_string(index) + "]"});
-            }
+            spec.linkOptions = selectedKernel->at("link_options").get<std::vector<std::string>>();
         }
         parsedManifest = std::move(spec);
         return ACLRTC_SUCCESS;

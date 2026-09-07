@@ -18,7 +18,6 @@
 namespace {
 using Json = nlohmann::json;
 using ascendc::ManifestConstant;
-using ascendc::ParseManifestConstant;
 
 Json MakeConstant()
 {
@@ -33,14 +32,18 @@ TEST(ManifestConstantTest, ResolvesDefaultAndExplicitStructSizes)
             input["arg_type"] = "struct";
         }
         ManifestConstant constant;
-        ASSERT_TRUE(ParseManifestConstant(input, constant));
+        ASSERT_TRUE(constant.ParseDefinition(input));
         input.clear();
-        EXPECT_EQ(constant.name, "tiling");
-        EXPECT_EQ(constant.parameterIndex, 2U);
-        EXPECT_EQ(constant.targetFile, "${resource}/tiling.h");
-        EXPECT_EQ(constant.templateText, "@@TILING@@");
-        EXPECT_TRUE(constant.sizeRule.UsesArgumentSize());
-        EXPECT_EQ(constant.sizeRule.ResolveByteCount(17U), 17U);
+        EXPECT_EQ(constant.GetName(), "tiling");
+        EXPECT_EQ(constant.GetParameterIndex(), 2U);
+        EXPECT_EQ(constant.GetTargetFile(), "${resource}/tiling.h");
+        EXPECT_EQ(constant.GetTemplateText(), "@@TILING@@");
+        uint8_t byte = 0;
+        const void* addresses[] = {nullptr, nullptr, &byte};
+        const uint64_t sizes[] = {0U, 0U, 17U};
+        ASSERT_TRUE(constant.BindArgument(3U, addresses, sizes));
+        EXPECT_EQ(constant.GetBoundData(), &byte);
+        EXPECT_EQ(constant.GetBoundByteSize(), 17U);
     }
 }
 
@@ -52,11 +55,14 @@ TEST(ManifestConstantTest, PreservesSignedAndUnsignedPointerSizeBoundaries)
         input["byte_size"] = size;
         input["parameter_index"] = std::numeric_limits<uint64_t>::max();
         ManifestConstant constant;
-        ASSERT_TRUE(ParseManifestConstant(input, constant));
-        EXPECT_EQ(constant.parameterIndex, std::numeric_limits<uint64_t>::max());
-        EXPECT_FALSE(constant.sizeRule.UsesArgumentSize());
-        EXPECT_EQ(constant.sizeRule.ResolveByteCount(0U), size.get<uint64_t>());
-        EXPECT_EQ(constant.sizeRule.ResolveByteCount(999U), size.get<uint64_t>());
+        ASSERT_TRUE(constant.ParseDefinition(input));
+        EXPECT_EQ(constant.GetParameterIndex(), std::numeric_limits<uint64_t>::max());
+        input["parameter_index"] = 0;
+        ASSERT_TRUE(constant.ParseDefinition(input));
+        uint8_t byte = 0;
+        const void* addresses[] = {&byte};
+        ASSERT_TRUE(constant.BindArgument(1U, addresses, nullptr));
+        EXPECT_EQ(constant.GetBoundByteSize(), size.get<uint64_t>());
     }
 }
 
@@ -97,16 +103,61 @@ TEST(ManifestConstantTest, RejectsInvalidFieldsWithoutChangingParsedConstant)
     ManifestConstant constant;
     Json valid = MakeConstant();
     valid.update({{"arg_type", "pointer"}, {"byte_size", 7}});
-    ASSERT_TRUE(ParseManifestConstant(valid, constant));
+    ASSERT_TRUE(constant.ParseDefinition(valid));
+    uint8_t byte = 0;
+    const void* addresses[] = {nullptr, nullptr, &byte};
+    ASSERT_TRUE(constant.BindArgument(3U, addresses, nullptr));
     for (const Json& input : inputs) {
         SCOPED_TRACE(input.dump());
-        EXPECT_FALSE(ParseManifestConstant(input, constant));
-        EXPECT_EQ(constant.name, "tiling");
-        EXPECT_EQ(constant.parameterIndex, 2U);
-        EXPECT_EQ(constant.targetFile, "${resource}/tiling.h");
-        EXPECT_EQ(constant.templateText, "@@TILING@@");
-        EXPECT_FALSE(constant.sizeRule.UsesArgumentSize());
-        EXPECT_EQ(constant.sizeRule.ResolveByteCount(99U), 7U);
+        EXPECT_FALSE(constant.ParseDefinition(input));
+        EXPECT_EQ(constant.GetName(), "tiling");
+        EXPECT_EQ(constant.GetParameterIndex(), 2U);
+        EXPECT_EQ(constant.GetTargetFile(), "${resource}/tiling.h");
+        EXPECT_EQ(constant.GetTemplateText(), "@@TILING@@");
+        EXPECT_EQ(constant.GetBoundData(), &byte);
+        EXPECT_EQ(constant.GetBoundByteSize(), 7U);
     }
+}
+TEST(ManifestConstantTest, RejectsBindingBeforeParsingAndResetsBindingAfterSuccessfulParse)
+{
+    ManifestConstant constant;
+    uint8_t first = 1;
+    uint8_t second = 2;
+    const void* addresses[] = {nullptr, nullptr, &first};
+    uint64_t sizes[] = {0U, 0U, 1U};
+    EXPECT_FALSE(constant.BindArgument(3U, addresses, sizes));
+    EXPECT_EQ(constant.GetBoundData(), nullptr);
+    EXPECT_EQ(constant.GetBoundByteSize(), 0U);
+    EXPECT_FALSE(constant.ParseDefinition(Json::object()));
+    ASSERT_TRUE(constant.ParseDefinition(MakeConstant()));
+    ASSERT_TRUE(constant.BindArgument(3U, addresses, sizes));
+    addresses[2] = &second;
+    sizes[2] = 2U;
+    ASSERT_TRUE(constant.BindArgument(3U, addresses, sizes));
+    EXPECT_EQ(constant.GetBoundData(), &second);
+    EXPECT_EQ(constant.GetBoundByteSize(), 2U);
+    ASSERT_TRUE(constant.ParseDefinition(MakeConstant()));
+    EXPECT_EQ(constant.GetBoundData(), nullptr);
+    EXPECT_EQ(constant.GetBoundByteSize(), 0U);
+    ASSERT_TRUE(constant.BindArgument(3U, addresses, sizes));
+}
+
+TEST(ManifestConstantTest, RejectsInvalidArgumentsWithoutChangingBinding)
+{
+    ManifestConstant constant;
+    ASSERT_TRUE(constant.ParseDefinition(MakeConstant()));
+    uint8_t byte = 0;
+    const void* addresses[] = {nullptr, nullptr, &byte};
+    const void* nullAddresses[] = {nullptr, nullptr, nullptr};
+    const uint64_t sizes[] = {0U, 0U, 1U};
+    const uint64_t zeroSizes[] = {0U, 0U, 0U};
+    ASSERT_TRUE(constant.BindArgument(3U, addresses, sizes));
+    EXPECT_FALSE(constant.BindArgument(3U, nullptr, sizes));
+    EXPECT_FALSE(constant.BindArgument(2U, addresses, sizes));
+    EXPECT_FALSE(constant.BindArgument(3U, nullAddresses, sizes));
+    EXPECT_FALSE(constant.BindArgument(3U, addresses, nullptr));
+    EXPECT_FALSE(constant.BindArgument(3U, addresses, zeroSizes));
+    EXPECT_EQ(constant.GetBoundData(), &byte);
+    EXPECT_EQ(constant.GetBoundByteSize(), 1U);
 }
 } // namespace

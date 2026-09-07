@@ -150,14 +150,6 @@ TEST_F(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
     EXPECT_TRUE(Validate(defaultStructConstant));
 }
 
-TEST_F(ResourceManifestValidatorTest, AcceptsNonnegativeSignedConstantIntegers)
-{
-    Json manifest = MakeValidManifest();
-    Constant(manifest)["parameter_index"] = int64_t{0};
-    Constant(manifest)["byte_size"] = int64_t{4};
-    EXPECT_TRUE(Validate(manifest));
-}
-
 TEST_F(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
 {
     ExpectInvalid("manifest is not an object", [](Json& manifest) { manifest = Json::array(); });
@@ -248,30 +240,6 @@ TEST_F(ResourceManifestValidatorTest, ValidatesConstants)
 {
     ExpectInvalid(
         "struct must not contain byte_size", [](Json& manifest) { Constant(manifest)["arg_type"] = "struct"; });
-    ExpectInvalid(
-        "default struct must not contain byte_size", [](Json& manifest) { Constant(manifest).erase("arg_type"); });
-    ExpectInvalid(
-        "constant is not an object", [](Json& manifest) { Kernel(manifest)["constant_infos"][0U] = "weight"; });
-    ExpectInvalid("constant has extra field", [](Json& manifest) { Constant(manifest)["extra"] = true; });
-    ExpectInvalid("constant name is missing", [](Json& manifest) {
-        Constant(manifest).erase("name");
-        Constant(manifest)["extra"] = true;
-    });
-    ExpectInvalid("constant name has wrong type", [](Json& manifest) { Constant(manifest)["name"] = 1U; });
-    ExpectInvalid("constant name is empty", [](Json& manifest) { Constant(manifest)["name"] = ""; });
-    ExpectInvalid("parameter_index has wrong type", [](Json& manifest) { Constant(manifest)["parameter_index"] = -1; });
-    ExpectInvalid("arg_type has wrong type", [](Json& manifest) { Constant(manifest)["arg_type"] = 1U; });
-    ExpectInvalid("arg_type is unsupported", [](Json& manifest) { Constant(manifest)["arg_type"] = "array"; });
-    ExpectInvalid("pointer byte_size is missing", [](Json& manifest) {
-        Constant(manifest)["arg_type"] = "pointer";
-        Constant(manifest).erase("byte_size");
-    });
-    ExpectInvalid("byte_size has wrong type", [](Json& manifest) { Constant(manifest)["byte_size"] = "4"; });
-    ExpectInvalid(
-        "byte_size is zero", [](Json& manifest) { Constant(manifest)["byte_size"] = Json::number_unsigned_t(0U); });
-    ExpectInvalid("constant file has wrong type", [](Json& manifest) { Constant(manifest)["file"] = 1U; });
-    ExpectInvalid("constant template has wrong type", [](Json& manifest) { Constant(manifest)["template"] = 1U; });
-    ExpectInvalid("constant template is empty", [](Json& manifest) { Constant(manifest)["template"] = ""; });
     ExpectInvalid(
         "constant file lacks resource prefix", [](Json& manifest) { Constant(manifest)["file"] = "resources/x"; });
     ExpectInvalid("constant file is outside resource_path", [](Json& manifest) {

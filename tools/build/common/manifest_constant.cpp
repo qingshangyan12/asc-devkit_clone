@@ -29,7 +29,7 @@ bool ReadNonnegativeInteger(const Json& value, uint64_t& result)
 }
 } // namespace
 
-bool ParseManifestConstant(const Json& constant, ManifestConstant& parsedConstant)
+bool ManifestConstant::ParseDefinition(const Json& constant)
 {
     if (!constant.is_object()) {
         ASCENDLOGE("constant must be an object");
@@ -48,7 +48,7 @@ bool ParseManifestConstant(const Json& constant, ManifestConstant& parsedConstan
         }
     }
     ManifestConstant result;
-    if (!ReadNonnegativeInteger(constant.at("parameter_index"), result.parameterIndex)) {
+    if (!ReadNonnegativeInteger(constant.at("parameter_index"), result.parameterIndex_)) {
         ASCENDLOGE("parameter_index must be a nonnegative integer");
         return false;
     }
@@ -65,7 +65,7 @@ bool ParseManifestConstant(const Json& constant, ManifestConstant& parsedConstan
             ASCENDLOGE("pointer constant requires a positive integer byte_size");
             return false;
         }
-        result.sizeRule = ConstantSizeRule(byteCount);
+        result.manifestByteSize_ = byteCount;
     } else if (argumentType == "struct") {
         if (hasByteSize) {
             ASCENDLOGE("struct constant must omit byte_size; size comes from argsBytes");
@@ -81,10 +81,45 @@ bool ParseManifestConstant(const Json& constant, ManifestConstant& parsedConstan
         ASCENDLOGE("constant contains unexpected fields");
         return false;
     }
-    result.name = constant.at("name").get<std::string>();
-    result.targetFile = constant.at("file").get<std::string>();
-    result.templateText = constant.at("template").get<std::string>();
-    parsedConstant = std::move(result);
+    result.name_ = constant.at("name").get<std::string>();
+    result.targetFile_ = constant.at("file").get<std::string>();
+    result.templateText_ = constant.at("template").get<std::string>();
+    result.state_ = State::Parsed;
+    *this = std::move(result);
+    return true;
+}
+
+bool ManifestConstant::BindArgument(uint64_t argsCount, const void* const* argsAddr, const uint64_t* argsBytes)
+{
+    if (state_ == State::Unparsed) {
+        ASCENDLOGE("Constant definition must be parsed before binding an argument");
+        return false;
+    }
+    if (parameterIndex_ >= argsCount) {
+        ASCENDLOGE(
+            "Constant %s parameter_index %llu is outside argsCount %llu", name_.c_str(),
+            static_cast<unsigned long long>(parameterIndex_), static_cast<unsigned long long>(argsCount));
+        return false;
+    }
+    if (argsAddr == nullptr || argsAddr[parameterIndex_] == nullptr) {
+        ASCENDLOGE(
+            "Constant %s requires a nonnull argsAddr[%llu]", name_.c_str(),
+            static_cast<unsigned long long>(parameterIndex_));
+        return false;
+    }
+    uint64_t byteSize = manifestByteSize_;
+    if (byteSize == 0U) {
+        if (argsBytes == nullptr || argsBytes[parameterIndex_] == 0U) {
+            ASCENDLOGE(
+                "Constant %s requires nonzero argsBytes[%llu]", name_.c_str(),
+                static_cast<unsigned long long>(parameterIndex_));
+            return false;
+        }
+        byteSize = argsBytes[parameterIndex_];
+    }
+    borrowedData_ = argsAddr[parameterIndex_];
+    boundByteSize_ = byteSize;
+    state_ = State::Bound;
     return true;
 }
 

@@ -11,36 +11,30 @@
 #ifndef ASCENDC_ACLRTC_KERNEL_COMPILATION_PLAN_BUILDER_H
 #define ASCENDC_ACLRTC_KERNEL_COMPILATION_PLAN_BUILDER_H
 
-#include "kernel_specialization_types.h"
+#include "compilation_manifest.h"
 
 #include <boost/filesystem/path.hpp>
-#include <nlohmann/json_fwd.hpp>
 
 namespace ascendc {
 namespace aclrtc {
 
-struct KernelManifestSpec;
-struct CommandSpec;
-
 class KernelCompilationPlanBuilder final {
 public:
     KernelCompilationPlanBuilder(
-        const NormalizedKernelSpecializationRequest& specializationRequest, const nlohmann::json& resourceManifest,
+        const NormalizedKernelSpecializationRequest& specializationRequest, const CompilationManifest& manifest,
         boost::filesystem::path resourceWorktreePath, boost::filesystem::path externalSourceDirectoryPath);
 
     aclError BuildCompilationPlan(KernelCompilationPlan& compilationPlan) const;
 
 private:
-    struct BoundConstantSource;
-
     aclError CheckResourceWorktreeDirectory() const;
     bool ExpandManifestText(const std::string& text, const std::string& location, std::string& resolvedText) const;
-    aclError BindConstantSources(const KernelManifestSpec& manifest, std::vector<BoundConstantSource>& constants) const;
-    aclError BindManifestCommand(const CommandSpec& spec, CompilationCommand& command) const;
-    aclError BindLinkCommand(const KernelManifestSpec& manifest, KernelCompilationPlan& plan) const;
+    aclError BindConstantSources(std::vector<ManifestConstant>& constants, KernelCompilationPlan& plan) const;
+    aclError BindManifestCommand(const ManifestCommand& spec, CompilationCommand& command) const;
+    aclError BindLinkCommand(const CompilationManifest& manifest, KernelCompilationPlan& plan) const;
 
     const NormalizedKernelSpecializationRequest& specializationRequest_;
-    const nlohmann::json& resourceManifest_;
+    const CompilationManifest& borrowedManifest_;
     boost::filesystem::path resourceWorktreePath_;
     boost::filesystem::path externalSourceDirectoryPath_;
     boost::filesystem::path outputDirectoryPath_;

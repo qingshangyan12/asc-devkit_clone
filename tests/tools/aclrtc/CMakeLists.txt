@@ -33,7 +33,6 @@ file(GLOB TEST_ACLRTC_SRC_FILES
 )
 
 add_executable(ascendc_ut_aclrtc
-    ${ASCENDC_DIR}/tests/tools/utils/common/test_manifest_constant.cpp
     ${ACLRTC_SRC_FILES}
     ${ACLRTC_COMMON_DEPENDENCY_SRC_FILES}
     ${TEST_ACLRTC_SRC_FILES}

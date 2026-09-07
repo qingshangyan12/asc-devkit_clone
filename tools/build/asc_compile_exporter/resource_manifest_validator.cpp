@@ -315,15 +315,16 @@ bool ResourceManifestValidator::ValidateOptionArray(const std::string& name)
 bool ResourceManifestValidator::ValidateConstant(const Json& constant, std::set<std::string>& constantNames)
 {
     ManifestConstant parsed;
-    if (!ParseManifestConstant(constant, parsed)) {
+    if (!parsed.ParseDefinition(constant)) {
         return false;
     }
     if (!CheckAndLog(
-            parsed.targetFile.rfind(std::string(RESOURCE_ROOT_MARKER) + "/", 0U) == 0U, __LINE__,
+            parsed.GetTargetFile().rfind(std::string(RESOURCE_ROOT_MARKER) + "/", 0U) == 0U, __LINE__,
             "invalid constant file: expected ${resource}/<relative-path>") ||
-        !ValidateResourceReference(parsed.targetFile) ||
+        !ValidateResourceReference(parsed.GetTargetFile()) ||
         !CheckAndLog(
-            constantNames.insert(parsed.name).second, __LINE__, "duplicate constant name: name=" + parsed.name)) {
+            constantNames.insert(parsed.GetName()).second, __LINE__,
+            "duplicate constant name: name=" + parsed.GetName())) {
         return false;
     }
     return true;

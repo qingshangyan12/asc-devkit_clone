@@ -11,7 +11,6 @@
 #include "kernel_compilation_plan_builder.h"
 
 #include "ascendc_tool_log.h"
-#include "kernel_manifest_parser.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
@@ -126,13 +125,6 @@ std::string FormatBytesAsCppInitializerList(const void* constantAddress, uint64_
 
 } // namespace
 
-struct KernelCompilationPlanBuilder::BoundConstantSource {
-    const void* borrowedData;
-    uint64_t byteCount;
-    fs::path targetFilePath;
-    std::string templateText;
-};
-
 bool KernelCompilationPlanBuilder::ExpandManifestText(
     const std::string& text, const std::string& location, std::string& resolvedText) const
 {
@@ -144,69 +136,31 @@ bool KernelCompilationPlanBuilder::ExpandManifestText(
 }
 
 aclError KernelCompilationPlanBuilder::BindConstantSources(
-    const KernelManifestSpec& manifest, std::vector<BoundConstantSource>& constants) const
+    std::vector<ManifestConstant>& constants, KernelCompilationPlan& plan) const
 {
-    for (const ManifestConstant& spec : manifest.constants) {
-        const uint64_t constantArgumentIndex = spec.parameterIndex;
-        if (specializationRequest_.borrowedKernelArgumentDataPointers == nullptr) {
-            ASCENDLOGE(
-                "constant parameter_index %llu requires argsAddr; set it with at least argsCount entries",
-                static_cast<unsigned long long>(constantArgumentIndex));
+    for (ManifestConstant& constant : constants) {
+        if (!constant.BindArgument(
+                specializationRequest_.kernelArgumentCount, specializationRequest_.borrowedKernelArgumentDataPointers,
+                specializationRequest_.borrowedKernelArgumentByteCounts)) {
             return ACLRTC_ERROR_INVALID_INPUT;
         }
-        if (constantArgumentIndex >= specializationRequest_.kernelArgumentCount) {
-            ASCENDLOGE(
-                "constant parameter_index %llu is outside argsCount %llu; set argsCount greater than %llu and "
-                "provide a matching argsAddr entry and an argsBytes entry for struct constants",
-                static_cast<unsigned long long>(constantArgumentIndex),
-                static_cast<unsigned long long>(specializationRequest_.kernelArgumentCount),
-                static_cast<unsigned long long>(constantArgumentIndex));
-            return ACLRTC_ERROR_INVALID_INPUT;
-        }
-        if (specializationRequest_.borrowedKernelArgumentDataPointers[constantArgumentIndex] == nullptr) {
-            ASCENDLOGE(
-                "argsAddr[%llu] must not be null for a static constant; set it to the constant data buffer",
-                static_cast<unsigned long long>(constantArgumentIndex));
-            return ACLRTC_ERROR_INVALID_INPUT;
-        }
-
-        uint64_t constantByteCount = 0U;
-        if (spec.sizeRule.UsesArgumentSize()) {
-            if (specializationRequest_.borrowedKernelArgumentByteCounts == nullptr) {
-                ASCENDLOGE(
-                    "struct constant parameter_index %llu requires argsBytes; set it with at least argsCount entries",
-                    static_cast<unsigned long long>(constantArgumentIndex));
-                return ACLRTC_ERROR_INVALID_INPUT;
-            }
-            constantByteCount = specializationRequest_.borrowedKernelArgumentByteCounts[constantArgumentIndex];
-            if (constantByteCount == 0U) {
-                ASCENDLOGE(
-                    "argsBytes[%llu] must be nonzero for a struct constant",
-                    static_cast<unsigned long long>(constantArgumentIndex));
-                return ACLRTC_ERROR_INVALID_INPUT;
-            }
-        }
-
-        constantByteCount = spec.sizeRule.ResolveByteCount(constantByteCount);
-        std::string resolvedTargetFilePath;
-        if (!ExpandManifestText(spec.targetFile, "constant '" + spec.name + "'.file", resolvedTargetFilePath)) {
+        std::string targetFile;
+        if (!ExpandManifestText(constant.GetTargetFile(), constant.GetName(), targetFile)) {
             return ACLRTC_ERROR_FAILURE;
         }
-        constants.push_back(
-            {specializationRequest_.borrowedKernelArgumentDataPointers[constantArgumentIndex], constantByteCount,
-             resolvedTargetFilePath, spec.templateText});
+        plan.sourcePatches.push_back({targetFile, constant.GetTemplateText(), {}});
     }
     return ACLRTC_SUCCESS;
 }
 
 aclError KernelCompilationPlanBuilder::BindManifestCommand(
-    const CommandSpec& spec, CompilationCommand& compilationCommand) const
+    const ManifestCommand& spec, CompilationCommand& compilationCommand) const
 {
     compilationCommand.commandKind = spec.commandKind;
     compilationCommand.parallelStage = spec.parallelStage;
     compilationCommand.diagnosticLabel = spec.diagnosticLabel;
     std::string executable;
-    if (!ExpandManifestText(spec.executable.text, spec.executable.location, executable)) {
+    if (!ExpandManifestText(spec.executable, spec.diagnosticLabel, executable)) {
         return ACLRTC_ERROR_FAILURE;
     }
     compilationCommand.executablePath = std::move(executable);
@@ -218,9 +172,9 @@ aclError KernelCompilationPlanBuilder::BindManifestCommand(
         return ACLRTC_ERROR_FAILURE;
     }
 
-    for (const ManifestTextSpec& argument : spec.arguments) {
+    for (const std::string& argument : spec.arguments) {
         std::string resolvedArgument;
-        if (!ExpandManifestText(argument.text, argument.location, resolvedArgument)) {
+        if (!ExpandManifestText(argument, spec.diagnosticLabel, resolvedArgument)) {
             return ACLRTC_ERROR_FAILURE;
         }
         compilationCommand.commandArguments.emplace_back(std::move(resolvedArgument));
@@ -246,7 +200,7 @@ aclError KernelCompilationPlanBuilder::BindManifestCommand(
 }
 
 aclError KernelCompilationPlanBuilder::BindLinkCommand(
-    const KernelManifestSpec& spec, KernelCompilationPlan& plan) const
+    const CompilationManifest& spec, KernelCompilationPlan& plan) const
 {
     CompilationCommand linkCommand;
     std::set<fs::path> requiredOutputDirectories{outputDirectoryPath_};
@@ -258,16 +212,16 @@ aclError KernelCompilationPlanBuilder::BindLinkCommand(
     }
     linkCommand.executablePath = linkerPath;
 
-    for (const ManifestTextSpec& option : spec.linkOptions) {
+    for (const std::string& option : spec.linkOptions) {
         std::string resolvedOption;
-        if (!ExpandManifestText(option.text, option.location, resolvedOption)) {
+        if (!ExpandManifestText(option, "link_options", resolvedOption)) {
             return ACLRTC_ERROR_FAILURE;
         }
         linkCommand.commandArguments.emplace_back(std::move(resolvedOption));
     }
-    for (const ManifestTextSpec& input : spec.linkInputs) {
+    for (const std::string& input : spec.linkInputs) {
         std::string resolvedInput;
-        if (!ExpandManifestText(input.text, input.location, resolvedInput)) {
+        if (!ExpandManifestText(input, "link_inputs", resolvedInput)) {
             return ACLRTC_ERROR_FAILURE;
         }
         requiredOutputDirectories.emplace(fs::path(resolvedInput).parent_path());
@@ -315,10 +269,10 @@ aclError KernelCompilationPlanBuilder::CheckResourceWorktreeDirectory() const
 }
 
 KernelCompilationPlanBuilder::KernelCompilationPlanBuilder(
-    const NormalizedKernelSpecializationRequest& specializationRequest, const nlohmann::json& resourceManifest,
+    const NormalizedKernelSpecializationRequest& specializationRequest, const CompilationManifest& manifest,
     fs::path resourceWorktreePath, fs::path externalSourceDirectoryPath)
     : specializationRequest_(specializationRequest),
-      resourceManifest_(resourceManifest),
+      borrowedManifest_(manifest),
       resourceWorktreePath_(std::move(resourceWorktreePath)),
       externalSourceDirectoryPath_(std::move(externalSourceDirectoryPath)),
       outputDirectoryPath_(
@@ -327,23 +281,17 @@ KernelCompilationPlanBuilder::KernelCompilationPlanBuilder(
 
 aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPlan& compilationPlan) const
 {
-    KernelManifestSpec manifestSpec;
-    aclError result = ParseSelectedKernelManifest(
-        resourceManifest_, specializationRequest_.kernelName, specializationRequest_.compilationVariant, manifestSpec);
+    aclError result = CheckResourceWorktreeDirectory();
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
-    result = CheckResourceWorktreeDirectory();
-    if (result != ACLRTC_SUCCESS) {
-        return result;
-    }
-    std::vector<BoundConstantSource> constants;
-    result = BindConstantSources(manifestSpec, constants);
-    if (result != ACLRTC_SUCCESS) {
-        return result;
-    }
+    auto constants = borrowedManifest_.constants;
     KernelCompilationPlan plan;
-    for (const CommandSpec& spec : manifestSpec.commands) {
+    result = BindConstantSources(constants, plan);
+    if (result != ACLRTC_SUCCESS) {
+        return result;
+    }
+    for (const ManifestCommand& spec : borrowedManifest_.commands) {
         CompilationCommand command;
         result = BindManifestCommand(spec, command);
         if (result != ACLRTC_SUCCESS) {
@@ -351,15 +299,14 @@ aclError KernelCompilationPlanBuilder::BuildCompilationPlan(KernelCompilationPla
         }
         plan.compilationCommands.emplace_back(std::move(command));
     }
-    result = BindLinkCommand(manifestSpec, plan);
+    result = BindLinkCommand(borrowedManifest_, plan);
     if (result != ACLRTC_SUCCESS) {
         return result;
     }
     // Read constant bytes only after all selected manifest fields and runtime inputs are resolved.
-    for (const BoundConstantSource& constant : constants) {
-        plan.sourcePatches.push_back(
-            {constant.targetFilePath, constant.templateText,
-             FormatBytesAsCppInitializerList(constant.borrowedData, constant.byteCount)});
+    for (size_t index = 0; index < constants.size(); ++index) {
+        plan.sourcePatches[index].replacementText =
+            FormatBytesAsCppInitializerList(constants[index].GetBoundData(), constants[index].GetBoundByteSize());
     }
     compilationPlan = std::move(plan);
     return ACLRTC_SUCCESS;

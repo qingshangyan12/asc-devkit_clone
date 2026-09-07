@@ -17,34 +17,30 @@
 
 namespace ascendc {
 
-struct ManifestConstant;
-
-class ConstantSizeRule final {
+class ManifestConstant final {
 public:
-    ConstantSizeRule() = default;
-    bool UsesArgumentSize() const { return fixedByteCount_ == 0U; }
-    uint64_t ResolveByteCount(uint64_t argumentByteCount) const
-    {
-        return UsesArgumentSize() ? argumentByteCount : fixedByteCount_;
-    }
+    bool ParseDefinition(const nlohmann::json& constantJson);
+    bool BindArgument(uint64_t argsCount, const void* const* argsAddr, const uint64_t* argsBytes);
+
+    const std::string& GetName() const { return name_; }
+    uint64_t GetParameterIndex() const { return parameterIndex_; }
+    const std::string& GetTargetFile() const { return targetFile_; }
+    const std::string& GetTemplateText() const { return templateText_; }
+    const void* GetBoundData() const { return borrowedData_; }
+    uint64_t GetBoundByteSize() const { return boundByteSize_; }
 
 private:
-    friend bool ParseManifestConstant(const nlohmann::json& constant, ManifestConstant& parsedConstant);
-    explicit ConstantSizeRule(uint64_t fixedByteCount) : fixedByteCount_(fixedByteCount) {}
-    // Zero denotes argument-derived size; only the parser can set a positive fixed size.
-    uint64_t fixedByteCount_{0U};
+    enum class State { Unparsed, Parsed, Bound };
+    State state_{State::Unparsed};
+    std::string name_;
+    uint64_t parameterIndex_{0U};
+    // Zero means the byte size must be obtained from the bound argument.
+    uint64_t manifestByteSize_{0U};
+    std::string targetFile_;
+    std::string templateText_;
+    const void* borrowedData_{nullptr};
+    uint64_t boundByteSize_{0U};
 };
-
-struct ManifestConstant {
-    std::string name;
-    uint64_t parameterIndex{0U};
-    ConstantSizeRule sizeRule;
-    std::string targetFile;
-    std::string templateText;
-};
-
-// Parses field contracts only; resource existence and argument binding belong to callers.
-bool ParseManifestConstant(const nlohmann::json& constant, ManifestConstant& parsedConstant);
 
 } // namespace ascendc
 
