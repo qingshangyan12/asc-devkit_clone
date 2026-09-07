@@ -32,7 +32,7 @@ namespace Detail {
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
     KLoopMDLBase is only for internal usage, does not support extension or customized specialization!
 */
-template <typename IMPL, typename TRANS_T, class A_TYPE, const auto& MM_CFG>
+template <typename IMPL, typename TRANS_T, class A_TYPE, class B_TYPE, const auto& MM_CFG>
 class KLoopMDLBase {
     MATMUL_USE_MODULE(MatmulShapeTiling);
 
