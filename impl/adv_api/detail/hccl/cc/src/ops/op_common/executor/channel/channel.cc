@@ -150,38 +150,6 @@ HcclResult CalcLevel2ChannelRequest(
 HcclResult GetProtocolByEngine(const OpParam& param, std::vector<CommProtocol>& protocols)
 {
     protocols.clear();
-#if CANN_VERSION_NUM >= 90100000
-    // CANN 9.1+ no longer selects the legacy UBC_TP protocol.
-    switch (param.engine) {
-        case CommEngine::COMM_ENGINE_AICPU:
-        case CommEngine::COMM_ENGINE_AICPU_TS:
-            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
-            protocols.push_back(CommProtocol::COMM_PROTOCOL_PCIE);
-            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBOE);
-#if CANN_VERSION_NUM >= 90200000
-            protocols.push_back(CommProtocol::COMM_PROTOCOL_UB_RTP);
-#endif
-            break;
-        case CommEngine::COMM_ENGINE_CCU:
-            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
-            break;
-        case CommEngine::COMM_ENGINE_AIV:
-            protocols.push_back(CommProtocol::COMM_PROTOCOL_UB_MEM);
-            protocols.push_back(CommProtocol::COMM_PROTOCOL_PCIE);
-            break;
-        case CommEngine::COMM_ENGINE_CPU:
-            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
-            protocols.push_back(CommProtocol::COMM_PROTOCOL_ROCE);
-            break;
-        case CommEngine::COMM_ENGINE_CPU_TS:
-            protocols.push_back(CommProtocol::COMM_PROTOCOL_ROCE);
-            break;
-        default:
-            HCCL_WARNING(
-                "[GetProtocolByEngine] Unknown engine[%d], set protocol to RESERVED", static_cast<int>(param.engine));
-            break;
-    }
-#else
     switch (param.engine) {
         case CommEngine::COMM_ENGINE_AICPU:
         case CommEngine::COMM_ENGINE_AICPU_TS:
@@ -207,7 +175,6 @@ HcclResult GetProtocolByEngine(const OpParam& param, std::vector<CommProtocol>& 
                 "[GetProtocolByEngine] Unknown engine[%d], set protocol to RESERVED", static_cast<int>(param.engine));
             break;
     }
-#endif
     return HCCL_SUCCESS;
 }
 
