@@ -18,6 +18,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_SYNC_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_SYNC_IMPL_H
 
+#include "c_api/defs/macro.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_sync_notify_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_sync_wait_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_sync_pipe_impl.h"
@@ -33,12 +34,8 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_sync_intra_wait_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_sync_intra_arrive_impl.h"
 
-[[deprecated("NOTICE: asc_sync_vec() is deprecated. "
-             "Please use asc_sync() instead")]]
-__aicore__ inline void asc_sync_vec()
-{
-    asc_sync_vec_impl();
-}
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_sync)
+__aicore__ inline void asc_sync_vec() { asc_sync_vec_impl(); }
 
 __aicore__ inline void asc_sync_vec(int id) { asc_sync_vec_impl(id); }
 

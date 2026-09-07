@@ -33,8 +33,7 @@ __aicore__ inline void asc_set_ctrl(uint64_t config);
 
 __aicore__ inline int64_t asc_get_squeeze_status();
 
-[[deprecated("NOTICE: asc_get_ar_spr is deprecated. "
-             "Please use asc_get_squeeze_status instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_get_squeeze_status)
 __aicore__ inline int64_t asc_get_ar_spr();
 
 __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat);

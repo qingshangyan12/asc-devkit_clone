@@ -18,6 +18,7 @@
 #ifndef IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_SYS_VAR_C_API_IMPL_H
 #define IMPL_C_API_C_API_INSTR_IMPL_SYS_VAR_C_API_IMPL_SYS_VAR_C_API_IMPL_H
 
+#include "c_api/defs/macro.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_core_id_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_ctrl_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/sys_var_impl/asc_get_phy_buf_addr_impl.h"
@@ -39,22 +40,11 @@
 
 __aicore__ inline int64_t asc_get_core_id() { return asc_get_core_id_impl(); }
 
-[[deprecated("NOTICE: asc_get_block_idx is deprecated. "
-             "Please use block_idx for pure Vector, pure Cube, and Mix(1, 1). "
-             "For Mix(1, 2), please use block_idx on the Cube core and "
-             "block_idx * asc_get_sub_block_num() + asc_get_sub_block_id() "
-             "on Vector cores instead.")]]
-__aicore__ inline int64_t asc_get_block_idx()
-{
-    return asc_get_block_idx_impl();
-}
+ASC_DEPRECATED(9.2.0, "2027/09/07", block_idx and asc_get_sub_block_num and asc_get_sub_block_id)
+__aicore__ inline int64_t asc_get_block_idx() { return asc_get_block_idx_impl(); }
 
-[[deprecated("NOTICE: asc_get_block_num is deprecated. "
-             "Please use block_num instead.")]]
-__aicore__ inline int64_t asc_get_block_num()
-{
-    return asc_get_block_num_impl();
-}
+ASC_DEPRECATED(9.2.0, "2027/09/07", block_num)
+__aicore__ inline int64_t asc_get_block_num() { return asc_get_block_num_impl(); }
 
 __aicore__ inline int64_t asc_get_ctrl() { return asc_get_ctrl_impl(); }
 

@@ -107,15 +107,15 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ float* dst, vector_floa
 
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ bfloat16_t* dst, vector_bfloat16_t src, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. Please use asc_storealign_pack_quarter instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter)
 __simd_callee__ inline void asc_storealign_pack_v2(
     __ubuf__ int32_t* dst_align32b, vector_int32_t src, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. Please use asc_storealign_pack_quarter instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter)
 __simd_callee__ inline void asc_storealign_pack_v2(
     __ubuf__ uint32_t* dst_align32b, vector_uint32_t src, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. Please use asc_storealign_pack_quarter instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter)
 __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ float* dst_align32b, vector_float src, vector_bool mask);
 
 __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst, vector_int8_t src0, vector_int8_t src1);
@@ -255,15 +255,15 @@ __simd_callee__ inline void asc_storealign_pack(
 __simd_callee__ inline void asc_storealign_pack(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src, int32_t offset, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. Please use asc_storealign_pack_quarter instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter)
 __simd_callee__ inline void asc_storealign_pack_v2(
     __ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. Please use asc_storealign_pack_quarter instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter)
 __simd_callee__ inline void asc_storealign_pack_v2(
     __ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. Please use asc_storealign_pack_quarter instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter)
 __simd_callee__ inline void asc_storealign_pack_v2(
     __ubuf__ float* dst_align32b, vector_float src, int32_t offset, vector_bool mask);
 
@@ -385,18 +385,15 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(
 __simd_callee__ inline void asc_storealign_pack_postupdate(
     __ubuf__ bfloat16_t*& dst, vector_bfloat16_t src, int32_t offset, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_postupdate_v2 is deprecated. Please use "
-             "asc_storealign_pack_quarter_postupdate instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter_postupdate)
 __simd_callee__ inline void asc_storealign_pack_postupdate_v2(
     __ubuf__ int32_t*& dst_align32b, vector_int32_t src, int32_t offset, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_postupdate_v2 is deprecated. Please use "
-             "asc_storealign_pack_quarter_postupdate instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter_postupdate)
 __simd_callee__ inline void asc_storealign_pack_postupdate_v2(
     __ubuf__ uint32_t*& dst_align32b, vector_uint32_t src, int32_t offset, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_postupdate_v2 is deprecated. Please use "
-             "asc_storealign_pack_quarter_postupdate instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter_postupdate)
 __simd_callee__ inline void asc_storealign_pack_postupdate_v2(
     __ubuf__ float*& dst_align32b, vector_float src, int32_t offset, vector_bool mask);
 
@@ -503,15 +500,15 @@ __simd_callee__ inline void asc_storealign_pack(
 __simd_callee__ inline void asc_storealign_pack(
     __ubuf__ bfloat16_t* dst, vector_bfloat16_t src, addr_reg offset, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. Please use asc_storealign_pack_quarter instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter)
 __simd_callee__ inline void asc_storealign_pack_v2(
     __ubuf__ int32_t* dst_align32b, vector_int32_t src, addr_reg offset, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. Please use asc_storealign_pack_quarter instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter)
 __simd_callee__ inline void asc_storealign_pack_v2(
     __ubuf__ uint32_t* dst_align32b, vector_uint32_t src, addr_reg offset, vector_bool mask);
 
-[[deprecated("NOTICE: asc_storealign_pack_v2 is deprecated. Please use asc_storealign_pack_quarter instead.")]]
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_storealign_pack_quarter)
 __simd_callee__ inline void asc_storealign_pack_v2(
     __ubuf__ float* dst_align32b, vector_float src, addr_reg offset, vector_bool mask);
 
