@@ -26,7 +26,7 @@ When developing custom operators based on SIMD and SIMT hybrid programming, refe
 
 | Sample Name | Sample Description | Remarks |
 | ------------------------------------------------------------ | ---------------------------------------------------- | --- |
-| profiling | Demonstrates how to use Profiling to collect operator execution data and analyze the time ratio of SIMD computation, SIMT VF calls, and data movement in hybrid programming. Sample link: [profiling](../01_simd_cpp_api/01_utilities/04_profiling). | - |
+| profiling | Demonstrates how to use Profiling to collect operator execution data in hybrid programming. Sample link: [profiling](../01_simd_cpp_api/01_utilities/04_profiling). | - |
 | sanitizer | Demonstrates how to use Sanitizer to locate issues such as memory out-of-bounds access and illegal access. It is applicable to issue diagnosis during the hybrid programming debugging phase. Sample link: [sanitizer](../01_simd_cpp_api/01_utilities/05_sanitizer). | - |
 | simulator | Demonstrates how to use Simulator for functional debugging and basic performance data collection in simulation mode. Sample link: [simulator](../01_simd_cpp_api/01_utilities/08_simulator). | - |
 | printf (Kernel Entry) | Demonstrates how to use `AscendC::printf` in the kernel entry of a SIMD programming sample to print debugging information. Sample link: [printf (Kernel Entry)](../01_simd_cpp_api/01_utilities/00_printf/simple_printf). | - |
