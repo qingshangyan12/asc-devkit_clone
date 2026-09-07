@@ -52,6 +52,7 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/physical_level_normalize.cc
     ${HCCL_CC_SRC_DIR}/common/hccl_alloc_ctx_res.cc
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
+    ${HCCL_CC_SRC_DIR}/common/mc2_profiling_binding.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/ccu_log.cc
     ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/ccu_res_dl.cc
     ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/hccl_ccu_res_dl.cc

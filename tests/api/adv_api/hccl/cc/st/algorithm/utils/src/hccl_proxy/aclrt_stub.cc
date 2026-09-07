@@ -74,9 +74,12 @@ aclError aclrtMalloc(void** devPtr, size_t size, aclrtMemMallocPolicy policy)
     return ACL_SUCCESS;
 }
 
-aclError aclrtStreamGetId(aclrtStream stream, int32_t* streamId_)
+aclError aclrtStreamGetId(aclrtStream stream, int32_t* streamId)
 {
-    HCCL_WARNING("[%s] not support.", __func__);
+    if (stream == nullptr || streamId == nullptr) {
+        return ACL_ERROR_INVALID_PARAM;
+    }
+    *streamId = static_cast<int32_t>(reinterpret_cast<uintptr_t>(stream));
     return ACL_SUCCESS;
 }
 
