@@ -411,6 +411,7 @@ struct AlgResourceRequest {
     std::vector<std::vector<HcclChannelDesc>> channels;
     std::vector<CcuKernelInfo> ccuKernelInfos;
     std::vector<u32> ccuKernelNum;
+    std::vector<ChannelHandle> acquiredChannels;
 };
 
 struct SubCommInfo {
