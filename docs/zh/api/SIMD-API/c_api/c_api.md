@@ -134,12 +134,14 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_l0c2gm_nz2nd](cube_datamove/asc_set_l0c2gm_nz2nd.md)|数据搬运过程中进行随路格式转换（NZ格式转换为ND格式）时，设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_quant_post](cube_datamove/asc_set_l0c2gm_quant_post.md)|设置QUANT_POST寄存器的值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_relu_alpha](cube_datamove/asc_set_l0c2gm_relu_alpha.md)|设置RELU_ALPHA寄存器的值。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_gm2l1_padding](cube_datamove/asc_set_gm2l1_padding.md)|设置[asc_copy_gm2l1_arch_3510（高维切分数据搬运）](cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)的填充值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_params](cube_datamove/asc_set_l0c_copy_params.md)|DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_prequant](cube_datamove/asc_set_l0c_copy_prequant.md)|数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l12l0_padding_val](cube_datamove/asc_set_l12l0_padding_val.md)|设置PADDING_B寄存器的值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_fmatrix](cube_datamove/asc_set_l13d_fmatrix.md)|设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从左矩阵获取FeatureMap的属性时使用该接口。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_fmatrix_b](cube_datamove/asc_set_l13d_fmatrix_b.md)|设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从右矩阵获取FeatureMap的属性时使用该接口。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l12l0a_3d_padding](cube_datamove/asc_set_l12l0a_3d_padding.md)|设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_l12l0a_3d_padding](cube_datamove/asc_set_l12l0a_3d_padding.md)|设置3D左矩阵搬运填充值。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_l12l0b_3d_padding](cube_datamove/asc_set_l12l0b_3d_padding.md)|设置3D右矩阵搬运填充值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_padding](cube_datamove/asc_set_l13d_padding.md)|设置Pad属性描述，用于在调用asc_copy_l12l0a接口时配置填充数值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_rpt](cube_datamove/asc_set_l13d_rpt.md)|用于设置Load3Dv2接口的repeat参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_size](cube_datamove/asc_set_l13d_size.md)|设置[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。|`c_api/cube_datamove/cube_datamove.h`|
@@ -371,6 +373,8 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_storealign_pack_quarter](reg_compute/store/asc_storealign_pack_quarter.md)|reg计算数据搬运接口，根据mask将src中有效元素的低8bits数据连续存储于dst中。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storealign_pack_quarter_postupdate](reg_compute/store/asc_storealign_pack_quarter_postupdate.md)|reg计算数据搬运接口，根据mask将src中有效元素的低8bits数据连续存储于dst中，启用Post Update。|`c_api/reg_compute/store/storealign.h`|
 |[asc_storealign_postupdate](reg_compute/store/asc_storealign_postupdate.md)|reg计算数据搬运接口，从矢量数据寄存器连续对齐搬出到UB，NORM搬出模式，启用Post Update。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_squeeze_status](reg_compute/store/asc_storealign_squeeze_status.md)|将squeeze操作后保存在AR特殊寄存器中的有效数据长度写入UB。|`c_api/reg_compute/store/storealign.h`|
+|[asc_storealign_squeeze_status_postupdate](reg_compute/store/asc_storealign_squeeze_status_postupdate.md)|将squeeze操作后保存在AR特殊寄存器中的有效数据长度写入UB，并自动更新目的地址。|`c_api/reg_compute/store/storealign.h`|
 |[asc_store](reg_compute/store/asc_store.md)|reg计算数据搬运接口，适用于从矢量数据寄存器搬出到UB的场景，不区分是否对齐，在追求极致性能时，应尽量避免使用该接口。|`c_api/composite/storeunalign_composite.h`|
 |[asc_storeunalign](reg_compute/store/asc_storeunalign.md)|reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。|`c_api/reg_compute/store/storeunalign.h`|
 |[asc_storeunalign_post](reg_compute/store/asc_storeunalign_post.md)|reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址搬出到UB的尾块场景。|`c_api/reg_compute/store/storeunalign.h`|
@@ -712,6 +716,8 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
 |[asc_abs_sync（废弃）](deprecated_interface/asc_abs_sync_deprecated.md)|按元素取绝对值同步接口。|`c_api/composite/vector_compute_composite.h`|
+|[asc_and（废弃）](deprecated_interface/asc_and_deprecated.md)|`asc_and`的浮点类型重载已废弃，请使用同位宽的整数重载替代。|`c_api/reg_compute/compute/reg_logic.h`|
+|[asc_or（废弃）](deprecated_interface/asc_or_deprecated.md)|`asc_or`的浮点类型重载已废弃，请使用同位宽的整数重载替代。|`c_api/reg_compute/compute/reg_logic.h`|
 |[asc_bfloat162e1m2x2 (废弃)](reg_compute/reg_convert/asc_bfloat162e1m2x2_deprecated.md)|将bfloat16_t类型转换为fp4x2_e1m2_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_bfloat162e2m1x2 (废弃)](reg_compute/reg_convert/asc_bfloat162e2m1x2_deprecated.md)|将bfloat16_t类型转换为fp4x2_e2m1_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_bfloat162float（废弃）](deprecated_interface/asc_bfloat162float_deprecated.md)|通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用显式位置参数重载。|`c_api/reg_compute/reg_convert.h`|
@@ -789,3 +795,4 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_mmad(废弃)](deprecated_interface/asc_mmad_deprecated.md)|矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad_mx(废弃)](deprecated_interface/asc_mmad_mx_deprecated.md)|带有量化系数的矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|
 |[asc_mmad_sparse(废弃)](deprecated_interface/asc_mmad_sparse_deprecated.md)|稀疏矩阵乘加计算接口。|`c_api/cube_compute/cube_compute.h`|
+| [asc_transto5hd_sync（废弃）](deprecated_interface/asc_transto5hd_sync_deprecated.md) | 数据格式转换接口。 |

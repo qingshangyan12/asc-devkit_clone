@@ -108,13 +108,7 @@
             -   [矩阵计算分形介绍](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_fractal_intro/cube_compute_fractal_intro.md)
                 -   [背景与核心概念](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_fractal_intro/background_and_core_concepts.md)
                 -   [关键分形格式详解](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_fractal_intro/key_fractal_format_details.md)
-
-                <cann-filter npu-type="910b,A3,A5">
-
                 -   [辅助矩阵分形格式详解](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_fractal_intro/aux_cube_fractal_format_details.md)
-
-                </cann-filter>
-
             -   [矩阵计算的搬入](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/cube_compute_load.md)
                 -   [总体说明](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/overall_description.md)
                 -   [矩阵计算输入搬运约束](SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/cube_compute_input_move_constraint.md)
@@ -164,19 +158,9 @@
                 -   [Gemm（废弃）](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Gemm_deprecated.md)
             -   [Mmad计算关键特性说明](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/mmad_compute_key_features.md)
                 -   [GEMV](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/GEMV.md)
-
-                <cann-filter npu-type="950,910b,A3,310b">
-
                 -   [HF32](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/HF32.md)
                 -   [UnitFlag](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/UnitFlag.md)
-
-                </cann-filter>
-
-                <cann-filter npu-type="910b,A3,x90,9030">
-
                 -   [K方向对齐约束](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_key_features/k_direction_alignment_constraint.md)
-
-                </cann-filter>
             -   [Mmad计算辅助配置接口](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_aux_config/mmad_compute_aux_config.md)
                 -   [SetMMColumnMajor/SetMMRowMajor](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_aux_config/SetMMColumnMajor-SetMMRowMajor.md)
                 -   [SetHF32Mode](SIMD-API/basic_api/cube_compute_ISASI/mmad_compute_aux_config/SetHF32Mode.md)
@@ -363,6 +347,9 @@
             -   [数据重排（ISASI）](SIMD-API/basic_api/memory_vector_compute/data_rearrange_ISASI/data_rearrange_ISASI.md)
                 -   [Interleave](SIMD-API/basic_api/memory_vector_compute/data_rearrange_ISASI/Interleave.md)
                 -   [DeInterleave](SIMD-API/basic_api/memory_vector_compute/data_rearrange_ISASI/DeInterleave.md)
+            -   [废弃接口](SIMD-API/basic_api/deprecated_interface/deprecated_interface.md)
+                -   [WriteGmByPassDCache\(ISASI\)（废弃）](SIMD-API/basic_api/deprecated_interface/WriteGmByPassDCache_ISASI_deprecated.md)
+                -   [ReadGmByPassDCache\(ISASI\)（废弃）](SIMD-API/basic_api/deprecated_interface/ReadGmByPassDCache_ISASI_deprecated.md)
 
         -   [Reg矢量计算](SIMD-API/basic_api/reg_vector_compute/reg_vector_compute.md)
             -   [概述](SIMD-API/basic_api/reg_vector_compute/overview.md)
@@ -510,8 +497,8 @@
             -   [Cast（float转bfloat16\_t）](SIMD-API/basic_api/scalar_compute/Cast_float_to_bfloat16.md)
             -   [Cast（多类型转float）](SIMD-API/basic_api/scalar_compute/Cast_multi_type_to_float.md)
             -   [Nop](SIMD-API/basic_api/scalar_compute/Nop.md)
-            -   [WriteGmByPassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/WriteGmByPassDCache_ISASI.md)
-            -   [ReadGmByPassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/ReadGmByPassDCache_ISASI.md)
+            -   [WriteGmBypassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/WriteGmBypassDCache_ISASI.md)
+            -   [ReadGmBypassDCache\(ISASI\)](SIMD-API/basic_api/scalar_compute/ReadGmBypassDCache_ISASI.md)
 
         -   [资源管理](SIMD-API/basic_api/resource_management/resource_management.md)
             -   [TPipe](SIMD-API/basic_api/resource_management/TPipe/TPipe.md)
@@ -840,6 +827,7 @@
             -   [asc_set_gm2l1_loop_size](SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md)
             -   [asc_set_gm2l1_nz_para](SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md)
             -   [asc_set_gm2l1_pad](SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md)
+            -   [asc_set_gm2l1_padding](SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md)
             -   [asc_set_l0c2gm_channel_para](SIMD-API/c_api/cube_datamove/asc_set_l0c2gm_channel_para.md)
             -   [asc_set_l0c2gm_config](SIMD-API/c_api/cube_datamove/asc_set_l0c2gm_config.md)
             -   [asc_set_l0c2gm_lrelu_alpha](SIMD-API/c_api/cube_datamove/asc_set_l0c2gm_lrelu_alpha.md)
@@ -854,6 +842,7 @@
             -   [asc_set_l13d_fmatrix](SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix.md)
             -   [asc_set_l13d_fmatrix_b](SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix_b.md)
             -   [asc_set_l12l0a_3d_padding](SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md)
+            -   [asc_set_l12l0b_3d_padding](SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md)
             -   [asc_set_l13d_padding](SIMD-API/c_api/cube_datamove/asc_set_l13d_padding.md)
             -   [asc_set_l13d_rpt](SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md)
             -   [asc_set_l13d_size](SIMD-API/c_api/cube_datamove/asc_set_l13d_size.md)
@@ -1066,6 +1055,8 @@
                 -   [asc_storealign_pack_quarter](SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md)
                 -   [asc_storealign_pack_quarter_postupdate](SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md)
                 -   [asc_storealign_postupdate](SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md)
+                -   [asc_storealign_squeeze_status](SIMD-API/c_api/reg_compute/store/asc_storealign_squeeze_status.md)
+                -   [asc_storealign_squeeze_status_postupdate](SIMD-API/c_api/reg_compute/store/asc_storealign_squeeze_status_postupdate.md)
                 -   [asc_store](SIMD-API/c_api/reg_compute/store/asc_store.md)
                 -   [asc_storeunalign](SIMD-API/c_api/reg_compute/store/asc_storeunalign.md)
                 -   [asc_storeunalign_post](SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md)
@@ -1323,6 +1314,8 @@
             -   [asc_set_saturation_strategy](SIMD-API/c_api/spr/asc_set_saturation_strategy.md)
             -   [asc_get_ar_spr (废弃)](SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md)
         -   [废弃接口](SIMD-API/c_api/deprecated_interface/deprecated_interface.md)
+            -   [asc_and（废弃）](SIMD-API/c_api/deprecated_interface/asc_and_deprecated.md)
+            -   [asc_or（废弃）](SIMD-API/c_api/deprecated_interface/asc_or_deprecated.md)
             -   [asc_get_block_idx（废弃）](SIMD-API/c_api/deprecated_interface/asc_get_block_idx_deprecated.md)
             -   [asc_get_block_num（废弃）](SIMD-API/c_api/deprecated_interface/asc_get_block_num_deprecated.md)
             -   [asc_set_atomic_add_int（废弃）](SIMD-API/c_api/deprecated_interface/asc_set_atomic_add_int_deprecated.md)
@@ -1375,6 +1368,7 @@
             -   [asc_mmad（废弃）](SIMD-API/c_api/deprecated_interface/asc_mmad_deprecated.md)
             -   [asc_mmad_mx（废弃）](SIMD-API/c_api/deprecated_interface/asc_mmad_mx_deprecated.md)
             -   [asc_mmad_sparse（废弃）](SIMD-API/c_api/deprecated_interface/asc_mmad_sparse_deprecated.md)
+            -   [asc_transto5hd_sync（废弃）](SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md)
 
     -   [Tensor API](SIMD-API/tensor_api/tensor_api.md)
         -   [Tensor API列表](SIMD-API/tensor_api/tensor_api_list.md)
@@ -3269,6 +3263,7 @@
     -   [原子操作类接口边界值汇总](appendix/atomic_operations_interface_boundary_value_summary.md)
     -   [SIMT接口软仿情况汇总](appendix/SIMT_interface_soft_simulation_summary.md)
     -   [SIMT接口精度标准汇总](appendix/SIMT_interface_precision_standard_summary.md)
+    -   [SIMT指令理论性能汇总](appendix/SIMT_instruction_theoretical_perf_summary.md)
     -   [废弃接口](appendix/deprecated_interface.md)
     -   [接口变更说明](appendix/interface_change_description.md)
     -   [Release Notes](appendix/Release_Notes/release_notes.md)

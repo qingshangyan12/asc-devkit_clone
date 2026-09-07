@@ -1130,12 +1130,16 @@ __simd_callee__ inline vector_int8_t asc_and(vector_int8_t src0, vector_int8_t s
     return dst;
 }
 
+[[deprecated("NOTICE: asc_and floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
+             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
 __simd_callee__ inline void asc_and(
     vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1, vector_bool mask)
 {
     asc_and_impl(dst, src0, src1, mask);
 }
 
+[[deprecated("NOTICE: asc_and floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
+             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
 __simd_callee__ inline void asc_and(
     vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1, vector_bool mask)
 {
@@ -1166,11 +1170,15 @@ __simd_callee__ inline vector_int16_t asc_and(vector_int16_t src0, vector_int16_
     return dst;
 }
 
+[[deprecated("NOTICE: asc_and floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
+             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
 __simd_callee__ inline void asc_and(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     asc_and_impl(dst, src0, src1, mask);
 }
 
+[[deprecated("NOTICE: asc_and floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
+             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
 __simd_callee__ inline void asc_and(
     vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
 {
@@ -1201,6 +1209,8 @@ __simd_callee__ inline vector_int32_t asc_and(vector_int32_t src0, vector_int32_
     return dst;
 }
 
+[[deprecated("NOTICE: asc_and floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
+             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
 __simd_callee__ inline void asc_and(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     asc_and_impl(dst, src0, src1, mask);
@@ -6293,6 +6303,8 @@ __simd_callee__ inline vector_uint16_t asc_or(vector_uint16_t src0, vector_uint1
     return dst;
 }
 
+[[deprecated("NOTICE: asc_or floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
+             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
 __simd_callee__ inline void asc_or(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
 {
     asc_or_impl(dst, src0, src1, mask);
@@ -6322,6 +6334,8 @@ __simd_callee__ inline vector_uint32_t asc_or(vector_uint32_t src0, vector_uint3
     return dst;
 }
 
+[[deprecated("NOTICE: asc_or floating-point overloads are deprecated since 9.2.0. Floating-point data types are not "
+             "supported; use the same-width integer overload only when bitwise interpretation is intended.")]]
 __simd_callee__ inline void asc_or(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
 {
     asc_or_impl(dst, src0, src1, mask);
@@ -9910,35 +9924,50 @@ __aicore__ inline void asc_transpose_sync(__ubuf__ uint16_t* dst, __ubuf__ uint1
     asc_transpose_sync_impl(dst, src);
 }
 
-// __aicore__ inline void asc_transto5hd_b8(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride,
-// uint16_t src_stride, bool dst_high_half, bool src_high_half)
-#define asc_transto5hd_b8(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half) \
-    asc_transto5hd_b8_impl((dst), (src), (repeat), (dst_stride), (src_stride), (dst_high_half), (src_high_half))
+// ==========asc_transto5hd(b8/b16/b32)==========
+__aicore__ inline void asc_transto5hd_b8(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half,
+    bool src_high_half)
+{
+    asc_transto5hd_b8_impl(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+}
 
-// __aicore__ inline void asc_transto5hd_b8_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride,
-// uint16_t src_stride, bool dst_high_half, bool src_high_half)
-#define asc_transto5hd_b8_sync(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half) \
-    asc_transto5hd_b8_sync_impl((dst), (src), (repeat), (dst_stride), (src_stride), (dst_high_half), (src_high_half))
+[[deprecated("NOTICE: asc_transto5hd_b8_sync is deprecated. "
+             "Please use asc_transto5hd_b8 and asc_sync instead.")]]
+__aicore__ inline void asc_transto5hd_b8_sync(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride, bool dst_high_half,
+    bool src_high_half)
+{
+    asc_transto5hd_b8_sync_impl(dst, src, repeat, dst_stride, src_stride, dst_high_half, src_high_half);
+}
 
-// __aicore__ inline void asc_transto5hd_b16(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride,
-// uint16_t src_stride)
-#define asc_transto5hd_b16(dst, src, repeat, dst_stride, src_stride) \
-    asc_transto5hd_b16_impl((dst), (src), (repeat), (dst_stride), (src_stride))
+__aicore__ inline void asc_transto5hd_b16(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
+{
+    asc_transto5hd_b16_impl(dst, src, repeat, dst_stride, src_stride);
+}
 
-// __aicore__ inline void asc_transto5hd_b16_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride,
-// uint16_t src_stride)
-#define asc_transto5hd_b16_sync(dst, src, repeat, dst_stride, src_stride) \
-    asc_transto5hd_b16_sync_impl((dst), (src), (repeat), (dst_stride), (src_stride))
+[[deprecated("NOTICE: asc_transto5hd_b16_sync is deprecated. "
+             "Please use asc_transto5hd_b16 and asc_sync instead.")]]
+__aicore__ inline void asc_transto5hd_b16_sync(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
+{
+    asc_transto5hd_b16_sync_impl(dst, src, repeat, dst_stride, src_stride);
+}
 
-// __aicore__ inline void asc_transto5hd_b32(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride,
-// uint16_t src_stride)
-#define asc_transto5hd_b32(dst, src, repeat, dst_stride, src_stride) \
-    asc_transto5hd_b32_impl((dst), (src), (repeat), (dst_stride), (src_stride))
+__aicore__ inline void asc_transto5hd_b32(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
+{
+    asc_transto5hd_b32_impl(dst, src, repeat, dst_stride, src_stride);
+}
 
-// __aicore__ inline void asc_transto5hd_b32_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride,
-// uint16_t src_stride)
-#define asc_transto5hd_b32_sync(dst, src, repeat, dst_stride, src_stride) \
-    asc_transto5hd_b32_sync_impl((dst), (src), (repeat), (dst_stride), (src_stride))
+[[deprecated("NOTICE: asc_transto5hd_b32_sync is deprecated. "
+             "Please use asc_transto5hd_b32 and asc_sync instead.")]]
+__aicore__ inline void asc_transto5hd_b32_sync(
+    ub_addr8_t dst, ub_addr8_t src, uint8_t repeat, uint16_t dst_stride, uint16_t src_stride)
+{
+    asc_transto5hd_b32_sync_impl(dst, src, repeat, dst_stride, src_stride);
+}
 
 // ===================asc_set_va_reg=====================
 __aicore__ inline void asc_set_va_reg(ub_addr8_t addr, __ubuf__ int8_t** src_array)
