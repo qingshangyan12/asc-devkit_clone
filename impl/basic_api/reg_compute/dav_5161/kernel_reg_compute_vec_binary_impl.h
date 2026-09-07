@@ -981,6 +981,17 @@ __simd_callee__ inline void DivImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
                 vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
             }
         }
+    } else if constexpr (SupportType<ActualT, uint32_t>() || SupportType<ActualT, int32_t>()) {
+        constexpr auto modeValue = GetMaskMergeMode<mode>();
+        constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
+        RegTensor<float> dstReg0;
+        RegTensor<float> dstReg1;
+        vcvt(dstReg0, (RegTensor<int32_t>&)srcReg0, mask, roundModeValue, modeValue);
+        vcvt(dstReg1, (RegTensor<int32_t>&)srcReg1, mask, roundModeValue, modeValue);
+        vdiv((RegTensor<float>&)dstReg, dstReg0, dstReg1, mask, modeValue);
+        constexpr auto satModeValue =
+            std::integral_constant<::RoundingSaturation, static_cast<::RoundingSaturation>(SatMode::SAT)>();
+        vcvt((RegTensor<int32_t>&)dstReg, (RegTensor<float>&)dstReg, mask, roundModeValue, satModeValue, modeValue);
     } else {
         vdiv(dstReg, srcReg0, srcReg1, mask, modeValue);
     }
