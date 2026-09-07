@@ -3587,8 +3587,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_stirling_and_euler_reflec
     // Split the logarithm reduction around sqrt(0.5) to keep the mantissa near 1.
     const uint32_t reduction_bits = (log_input_bits - sqrt_half_bits) & log_reduction_mask;
     const float mantissa = __uint_as_float(log_input_bits - reduction_bits);
-    const float exponent_part =
-        fmaf(__int2float_rn(static_cast<int32_t>(reduction_bits)), log_exponent_scale, exponent_base);
+    const float exponent_part = fmaf(__uint2float_rn(reduction_bits), log_exponent_scale, exponent_base);
 
     // Evaluate the log polynomial and its high/low residual corrections.
     const float mantissa_minus_one = mantissa - 1.0f;
@@ -3648,7 +3647,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_stirling_and_euler_reflec
     const float rounded_exponent = roundf(exponent_hi);
     float exp2_fraction = exponent_hi - rounded_exponent;
     exp2_fraction = exp2_fraction + exponent_lo;
-    const int32_t exp2_exponent = __float2int_rz(rounded_exponent);
+    const uint32_t exp2_exponent = __float2uint_rz(rounded_exponent);
 
     // Evaluate the exp2 polynomial on the fractional part.
     float exp2_poly = fmaf(exp2_fraction, 0.00015239251661114395f, 0.0013391353422775864601f);
@@ -3661,8 +3660,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_stirling_and_euler_reflec
     const bool exponent_is_positive = rounded_exponent > 0.0f;
     const uint32_t scale_hi_bits = exponent_is_positive ? 0x7F000000U : 0x02000000U;
     const uint32_t scale_adjust = exponent_is_positive ? 0U : 0x83000000U;
-    const uint32_t scale_lo_bits =
-        (static_cast<uint32_t>(exp2_exponent) << __internal_fp32_exponent_shift) - scale_adjust;
+    const uint32_t scale_lo_bits = (exp2_exponent << __internal_fp32_exponent_shift) - scale_adjust;
     float exp2_value = exp2_poly * __uint_as_float(scale_hi_bits);
     exp2_value = exp2_value * __uint_as_float(scale_lo_bits);
     // Clamp exp2 overflow in the Stirling branch.
