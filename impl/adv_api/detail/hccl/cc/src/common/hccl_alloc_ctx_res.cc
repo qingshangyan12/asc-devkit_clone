@@ -185,7 +185,7 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSi
 {
     // 1. 分配workspace、scratch、comParam（XN）、comSync（CKE）
     constexpr uint32_t comSyncNum = KFC_SERVER_SIGNAL_REGION_NUM;
-    constexpr uint64_t scratchSize = Hccl::MC2_WORKSPACE_SIZE;
+    constexpr uint64_t scratchSize = 4 * Hccl::MC2_WORKSPACE_SIZE; // 调试: 16MB->64MB，与AIV侧对齐
     uint64_t comParamBufSize = Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_PARAM_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
     uint64_t comSyncBufSize = Hccl::CCU_TASK_NUM_MAX * comSyncNum * Hccl::CCU_ONE_PARAM_SIZE;
 
@@ -347,7 +347,7 @@ HcclResult AllocAndCopyOpResCtx(
 } // namespace
 
 HcclResult HcclAllocOpResCtx(
-    HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, void* mc2Tiling,
+    HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, const void* mc2Tiling,
     const void* ccTilingList[], void** opResCtxPtr)
 {
     CHK_PTR_NULL(opResCtxPtr);
@@ -851,7 +851,8 @@ HcclResult GetCcuOpParamResCtx(
     *resCtxOut = nullptr;
     HCCL_INFO("[GetCcuOpParamResCtx]start GetCcuOpParamResCtx!");
     HCCL_INFO(
-        "[GetCcuOpParamResCtx]received: workspace[%p], size[%llu]", (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
+        "[GetCcuOpParamResCtx]received: workspace[%p], size[%llu]", reinterpret_cast<void*>(opResCtx.workSpace),
+        opResCtx.workSpaceSize);
     std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
     HCCL_INFO("[GetCcuOpParamResCtx]Generate executor successfully!");
     CHK_PRT_RET(
@@ -938,6 +939,8 @@ HcclResult GetOpParam(
 
 HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex)
 {
+    (void)ccTiling;
+    (void)tilingIndex;
     HCCL_DEBUG("[CcuSelectAlgCheck] Default function.");
     return HCCL_SUCCESS;
 }
@@ -1020,7 +1023,7 @@ void FillCcuAlgorithmInfo(
     OpParam& opParam, OpResCtx& opResCtx)
 {
     opResCtx.opType[tilingIndex] = ccTiling->opType;
-    opResCtx.algorithmType[tilingIndex] = algorithmType;
+    opResCtx.algorithmType[tilingIndex] = static_cast<uint32_t>(algorithmType);
     opResCtx.isKfc[tilingIndex] = true;
     opParam.isKfc = true;
 
@@ -1117,7 +1120,9 @@ HcclResult CcuSelectAlg(
     void* mc2Tiling, OpResCtx& opResCtx, bool checkOnly)
 {
     HCCL_INFO("[CcuSelectAlg]start CcuSelectAlg!");
-    HCCL_INFO("[CcuSelectAlg]received: workspace[%p], size[%llu]", (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
+    HCCL_INFO(
+        "[CcuSelectAlg]received: workspace[%p], size[%llu]", reinterpret_cast<void*>(opResCtx.workSpace),
+        opResCtx.workSpaceSize);
     Mc2InitTilingInner* initTiling = static_cast<Mc2InitTilingInner*>(mc2Tiling);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
