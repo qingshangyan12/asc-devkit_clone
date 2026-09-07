@@ -27,7 +27,7 @@
 
 头文件路径为：`"simt_api/device_functions.h"`。
 
-将浮点数按CAST\_RINT模式取整，四舍五入到最接近的偶数。
+将浮点数按CAST\_RINT模式取整，向最接近的偶数舍入。
 
 ## 函数原型
 
