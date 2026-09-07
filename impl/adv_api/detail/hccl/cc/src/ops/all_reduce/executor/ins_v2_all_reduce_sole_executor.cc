@@ -114,6 +114,10 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     // 构建template
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
+    if (param.engine == CommEngine::COMM_ENGINE_AICPU_TS && resCtx.topoInfo.isPod &&
+        !templateAlgRes.channels.empty()) {
+        CHK_RET(algTemplate->SetchannelsPerRank(templateAlgRes.channels));
+    }
     u32 templateScratchMultiplier =
         algTemplate->CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
 
@@ -145,6 +149,10 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     u64 loopTimes = dataCount_ / maxDataCountPerLoop + static_cast<u64>(dataCount_ % maxDataCountPerLoop != 0);
     // count已经处理的数据
     u64 processedDataCount = 0;
+    if (param.supportSymmetricMemory) {
+        loopTimes = 1;
+        HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] %s: symmetric memory enabled", param.algName);
+    }
     for (u64 loop = 0; loop < loopTimes; loop++) {
         // dataCount_实际总数据量 和 maxDataCountPerLoop 一次搬运数据量之间不一定是整除关系，需要对尾块进行处理
         u64 currDataCount = (loop == loopTimes - 1) ? dataCount_ - processedDataCount : maxDataCountPerLoop;

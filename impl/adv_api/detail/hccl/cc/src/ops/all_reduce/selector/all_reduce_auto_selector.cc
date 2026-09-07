@@ -38,6 +38,28 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
         topoInfo->userRankSize == 0 ? 1.0 : DEFAULT_RANK_SIZE / topoInfo->userRankSize / topoInfo->userRankSize;
     const bool overMaxDataSize = dataSize * rankRatio > AR_AICPU_1D_MAX_DATA_SIZE;
     const bool overSequenceDataSize = dataSize > AR_AICPU_SEQUENCE_DATA_SIZE;
+    if (topoInfo->topoLevelNums > 1) {
+        if (topoInfo->topoLevelNums > 2) {
+            HCCL_WARNING(
+                "[AllReduceAutoSelector] local AICPU AllReduce supports at most two topology levels, got[%u].",
+                topoInfo->topoLevelNums);
+            return SelectorStatus::NOT_MATCH;
+        }
+        if (specialDataOrReduce) {
+            selectAlgName = "AicpuAllReduceSoleNHRAicpuReduce";
+        } else if (
+            topoInfo->Level1Nhr || topoInfo->Level0Nhr || topoInfo->level0Topo == Level0Shape::CLOS ||
+            (topoInfo->level0Topo == Level0Shape::MESH_1D &&
+             !topoInfo->netLayerDetails.localNetInsSizeOfLayer.empty() &&
+             topoInfo->netLayerDetails.localNetInsSizeOfLayer[0] == 1)) {
+            selectAlgName = "AicpuAllReduceSoleNHR";
+        } else {
+            HCCL_WARNING("[AllReduceAutoSelector] multi-level topology is not supported by local AICPU AllReduce.");
+            return SelectorStatus::NOT_MATCH;
+        }
+        HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
     if (topoInfo->level0Topo == Level0Shape::MESH_1D) {
         const bool twoLevel = IsTwoLevelNetLayer(topoInfo);
         const bool matchChunkTwoShot = overMaxDataSize && !(twoLevel && overSequenceDataSize) &&
@@ -67,6 +89,16 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
         } else {
             selectAlgName = "AicpuAllReduceSoleMeshTwoShot";
         }
+        HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
+    if (topoInfo->level0Topo == Level0Shape::CLOS) {
+        selectAlgName = specialDataOrReduce ? "AicpuAllReduceSoleNHRAicpuReduce" : "AicpuAllReduceSoleNHR";
+        HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+        return SelectorStatus::MATCH;
+    }
+    if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
+        selectAlgName = specialDataOrReduce ? "AicpuAllReduceSoleNHRAicpuReduce" : "AicpuAllReduceSoleNHR";
         HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
         return SelectorStatus::MATCH;
     }

@@ -31,10 +31,30 @@ HcclResult InsTempAllReduceNHR::CalcRes(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     AlgResourceRequest& resourceRequest)
 {
+    CHK_PTR_NULL(topoInfo);
     std::vector<HcclChannelDesc> level1Channels;
-    CHK_RET(CalcChannelRequestNhr(comm, param, topoInfo, subCommRanks_, level1Channels));
+    const bool isUbx = topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix;
+    if (isUbx) {
+        std::vector<HcclChannelDesc> channelDescs;
+        CHK_RET(CalcChannelRequestNhrMultiJetty(comm, param, topoInfo, subCommRanks_, channelDescs));
+        for (const auto& channel : channelDescs) {
+            if (channel.channelProtocol == COMM_PROTOCOL_UBC_CTP) {
+                level1Channels.push_back(channel);
+            }
+        }
+    } else {
+        CHK_RET(CalcChannelRequestNhr(comm, param, topoInfo, subCommRanks_, level1Channels));
+    }
+    CHK_PRT_RET(
+        level1Channels.empty(), HCCL_ERROR("[InsTempAllReduceNHR][CalcRes] level1Channels is empty."),
+        HcclResult::HCCL_E_INTERNAL);
     resourceRequest.channels.push_back(level1Channels);
     channelsPerRank_ = CalcChannelsPerRank(level1Channels);
+    if (isUbx && channelsPerRank_ > MAX_JETTY_NUM) {
+        HCCL_ERROR(
+            "[InsTempAllReduceNHR][CalcRes] channelsPerRank_[%u] is greater than MAX_JETTY_NUM[%u]",
+            channelsPerRank_, MAX_JETTY_NUM);
+    }
     CHK_RET(GetRes(resourceRequest));
 
     HCCL_INFO("[InsTempAllReduceNHR] Calculate resource finished.");
@@ -120,9 +140,11 @@ HcclResult InsTempAllReduceNHR::KernelRun(
     dataType_ = param.DataDes.dataType;
     dataTypeSize_ = DATATYPE_SIZE_TABLE[dataType_];
     tempAlgParams_ = tempAlgParams;
-
-    isDmaRead_ = IsPcieProtocol(templateResource.channels);
-    HCCL_DEBUG("[InsTempAllReduceNHR] Use Dma Read[%d]", isDmaRead_);
+    supportSymmetricMemory_ = param.supportSymmetricMemory;
+    inputOffset_ = param.inputOffset;
+    outputOffset_ = param.outputOffset;
+    inputSymWindow_ = param.inputSymWindow;
+    outputSymWindow_ = param.outputSymWindow;
 
     if (count_ == 0) {
         HCCL_WARNING("[InsTempAllReduceNHR][KernelRun] data count is 0.");
@@ -141,6 +163,12 @@ HcclResult InsTempAllReduceNHR::KernelRun(
         return HcclResult::HCCL_SUCCESS;
     }
 
+    CHK_PRT_RET(
+        templateResource.channels.empty(), HCCL_ERROR("[InsTempAllReduceNHR][KernelRun] channels is empty."),
+        HcclResult::HCCL_E_INTERNAL);
+    isDmaRead_ = IsPcieProtocol(templateResource.channels);
+    HCCL_DEBUG("[InsTempAllReduceNHR] Use Dma Read[%d]", isDmaRead_);
+
     sliceSize_ = (count_ / templateRankSize_) * dataTypeSize_;
     tailSize_ = count_ * dataTypeSize_ - sliceSize_ * (templateRankSize_ - 1);
 
@@ -153,7 +181,9 @@ HcclResult InsTempAllReduceNHR::KernelRun(
             templateResource.threads.size()),
         HcclResult::HCCL_E_INTERNAL);
 
-    CHK_RET(PreCopy(tempAlgParams, templateResource.threads));
+    if (!supportSymmetricMemory_) {
+        CHK_RET(PreCopy(tempAlgParams, templateResource.threads));
+    }
     if (threadNum_ > 1) {
         std::vector<ThreadHandle> subThreads(
             templateResource.threads.begin() + 1, templateResource.threads.begin() + threadNum_);
@@ -162,6 +192,19 @@ HcclResult InsTempAllReduceNHR::KernelRun(
     }
     for (u32 channelIdx = 0; channelIdx < channelsPerRank_; channelIdx++) {
         CHK_RET(RunReduceScatter(tempAlgParams, templateResource.channels, templateResource.threads, channelIdx));
+    }
+    if (supportSymmetricMemory_) {
+        const u64 mySliceSize = (myRankIdx_ == templateRankSize_ - 1) ? tailSize_ : sliceSize_;
+        const u64 mySliceOffset = myRankIdx_ * sliceSize_;
+        DataSlice copySrcSlice(
+            tempAlgParams.buffInfo.inputPtr, tempAlgParams.buffInfo.inBuffBaseOff + mySliceOffset, mySliceSize,
+            mySliceSize / dataTypeSize_);
+        DataSlice copyDstSlice(
+            tempAlgParams.buffInfo.outputPtr, tempAlgParams.buffInfo.outBuffBaseOff + mySliceOffset, mySliceSize,
+            mySliceSize / dataTypeSize_);
+        CHK_RET(LocalCopy(templateResource.threads[0], copySrcSlice, copyDstSlice));
+    }
+    for (u32 channelIdx = 0; channelIdx < channelsPerRank_; channelIdx++) {
         CHK_RET(RunAllGather(tempAlgParams, templateResource.channels, templateResource.threads, channelIdx));
     }
     if (threadNum_ > 1) {
@@ -170,7 +213,9 @@ HcclResult InsTempAllReduceNHR::KernelRun(
         GetNotifyIdxSubToMain(notifyIdxSubToMain_);
         CHK_RET(PostSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxSubToMain_));
     }
-    CHK_RET(PostCopy(tempAlgParams, templateResource.threads));
+    if (!supportSymmetricMemory_) {
+        CHK_RET(PostCopy(tempAlgParams, templateResource.threads));
+    }
 
     HCCL_INFO("[InsTempAllReduceNHR] KernelRun finished.");
     return HcclResult::HCCL_SUCCESS;
@@ -194,8 +239,10 @@ HcclResult InsTempAllReduceNHR::RunReduceScatter(
     const TemplateDataParams& tempAlgParams, const std::map<u32, std::vector<ChannelInfo>>& channels,
     const std::vector<ThreadHandle>& threads, u32 channelIdx)
 {
-    void* localHcclBuffPtr = tempAlgParams.buffInfo.hcclBuff.addr;
-    u64 hcclBuffBaseOffset = tempAlgParams.buffInfo.hcclBuffBaseOff;
+    void* localHcclBuffPtr =
+        supportSymmetricMemory_ ? tempAlgParams.buffInfo.inputPtr : tempAlgParams.buffInfo.hcclBuff.addr;
+    u64 hcclBuffBaseOffset =
+        supportSymmetricMemory_ ? tempAlgParams.buffInfo.inBuffBaseOff : tempAlgParams.buffInfo.hcclBuffBaseOff;
 
     std::vector<NHRStepInfo> stepInfoList;
     CHK_RET(GetReduceScatterStepInfoList(stepInfoList));
@@ -213,6 +260,11 @@ HcclResult InsTempAllReduceNHR::RunReduceScatter(
                 "[InsTempAllReduceNHR][RunReduceScatter] remoteRank[%u] is not in channels.",
                 rankList_.at(stepInfo.toRank)),
             HcclResult::HCCL_E_INTERNAL);
+        CHK_PRT_RET(
+            channelIdx >= channels.at(rankList_.at(stepInfo.fromRank)).size() ||
+                channelIdx >= channels.at(rankList_.at(stepInfo.toRank)).size(),
+            HCCL_ERROR("[InsTempAllReduceNHR][RunReduceScatter] channelIdx[%u] is out of range.", channelIdx),
+            HcclResult::HCCL_E_INTERNAL);
 
         const ChannelInfo& recvChannel = channels.at(rankList_.at(stepInfo.fromRank)).at(channelIdx);
         const ChannelInfo& sendChannel = channels.at(rankList_.at(stepInfo.toRank)).at(channelIdx);
@@ -223,6 +275,24 @@ HcclResult InsTempAllReduceNHR::RunReduceScatter(
 
         void* sendRemoteHcclBuffPtr = sendChannel.remoteCclMem.addr;
         void* recvRemoteHcclBuffPtr = recvChannel.remoteCclMem.addr;
+        if (supportSymmetricMemory_) {
+            HcclResult ret = HcclSymWinGetPeerPointer(
+                inputSymWindow_, inputOffset_, sendChannel.remoteRank, &sendRemoteHcclBuffPtr);
+            CHK_PRT_RET(
+                ret != HCCL_SUCCESS || sendRemoteHcclBuffPtr == nullptr,
+                HCCL_ERROR(
+                    "[InsTempAllReduceNHR][RunReduceScatter] get remote input for rank[%u] failed, ret[%d].",
+                    sendChannel.remoteRank, ret),
+                HcclResult::HCCL_E_INTERNAL);
+            ret = HcclSymWinGetPeerPointer(
+                inputSymWindow_, inputOffset_, recvChannel.remoteRank, &recvRemoteHcclBuffPtr);
+            CHK_PRT_RET(
+                ret != HCCL_SUCCESS || recvRemoteHcclBuffPtr == nullptr,
+                HCCL_ERROR(
+                    "[InsTempAllReduceNHR][RunReduceScatter] get remote input for rank[%u] failed, ret[%d].",
+                    recvChannel.remoteRank, ret),
+                HcclResult::HCCL_E_INTERNAL);
+        }
 
         for (u32 idx = 0; idx < stepInfo.nSlices; ++idx) {
             u32 txIdx = stepInfo.txSliceIdxs.at(idx);
@@ -246,7 +316,12 @@ HcclResult InsTempAllReduceNHR::RunReduceScatter(
             {sendChannel, recvChannel},
             {{sendSrcSlicesList, sendDstSlicesList}, {recvSrcSlicesList, recvDstSlicesList}}, dataType_, reduceOp_};
 
-        if (isDmaRead_) {
+        if (supportSymmetricMemory_) {
+            CHK_PRT_RET(
+                SendRecvBatchReadReduce(sendRecvReduceInfo, threads.at(channelIdx)),
+                HCCL_ERROR("[InsTempAllReduceNHR] RunReduceScatter SendRecvBatchReadReduce failed"),
+                HcclResult::HCCL_E_INTERNAL);
+        } else if (isDmaRead_) {
             CHK_PRT_RET(
                 SendRecvReadReduce(sendRecvReduceInfo, threads.at(channelIdx)),
                 HCCL_ERROR("[InsTempAllReduceNHR] RunReduceScatter SendRecvReduce failed"),
@@ -266,8 +341,10 @@ HcclResult InsTempAllReduceNHR::RunAllGather(
     const TemplateDataParams& tempAlgParams, const std::map<u32, std::vector<ChannelInfo>>& channels,
     const std::vector<ThreadHandle>& threads, u32 channelIdx)
 {
-    void* localHcclBuffPtr = tempAlgParams.buffInfo.hcclBuff.addr;
-    u64 hcclBuffBaseOffset = tempAlgParams.buffInfo.hcclBuffBaseOff;
+    void* localHcclBuffPtr =
+        supportSymmetricMemory_ ? tempAlgParams.buffInfo.outputPtr : tempAlgParams.buffInfo.hcclBuff.addr;
+    u64 hcclBuffBaseOffset =
+        supportSymmetricMemory_ ? tempAlgParams.buffInfo.outBuffBaseOff : tempAlgParams.buffInfo.hcclBuffBaseOff;
 
     std::vector<NHRStepInfo> stepInfoList;
     CHK_RET(GetAllGatherStepInfoList(stepInfoList));
@@ -285,6 +362,11 @@ HcclResult InsTempAllReduceNHR::RunAllGather(
                 "[InsTempAllReduceNHR][RunAllGather] remoteRank[%u] is not in channels.",
                 rankList_.at(stepInfo.toRank)),
             HcclResult::HCCL_E_INTERNAL);
+        CHK_PRT_RET(
+            channelIdx >= channels.at(rankList_.at(stepInfo.fromRank)).size() ||
+                channelIdx >= channels.at(rankList_.at(stepInfo.toRank)).size(),
+            HCCL_ERROR("[InsTempAllReduceNHR][RunAllGather] channelIdx[%u] is out of range.", channelIdx),
+            HcclResult::HCCL_E_INTERNAL);
 
         const ChannelInfo& recvChannel = channels.at(rankList_.at(stepInfo.fromRank)).at(channelIdx);
         const ChannelInfo& sendChannel = channels.at(rankList_.at(stepInfo.toRank)).at(channelIdx);
@@ -295,6 +377,24 @@ HcclResult InsTempAllReduceNHR::RunAllGather(
 
         void* sendRemoteHcclBuffPtr = sendChannel.remoteCclMem.addr;
         void* recvRemoteHcclBuffPtr = recvChannel.remoteCclMem.addr;
+        if (supportSymmetricMemory_) {
+            HcclResult ret = HcclSymWinGetPeerPointer(
+                outputSymWindow_, outputOffset_, sendChannel.remoteRank, &sendRemoteHcclBuffPtr);
+            CHK_PRT_RET(
+                ret != HCCL_SUCCESS || sendRemoteHcclBuffPtr == nullptr,
+                HCCL_ERROR(
+                    "[InsTempAllReduceNHR][RunAllGather] get remote output for rank[%u] failed, ret[%d].",
+                    sendChannel.remoteRank, ret),
+                HcclResult::HCCL_E_INTERNAL);
+            ret = HcclSymWinGetPeerPointer(
+                outputSymWindow_, outputOffset_, recvChannel.remoteRank, &recvRemoteHcclBuffPtr);
+            CHK_PRT_RET(
+                ret != HCCL_SUCCESS || recvRemoteHcclBuffPtr == nullptr,
+                HCCL_ERROR(
+                    "[InsTempAllReduceNHR][RunAllGather] get remote output for rank[%u] failed, ret[%d].",
+                    recvChannel.remoteRank, ret),
+                HcclResult::HCCL_E_INTERNAL);
+        }
 
         for (u32 idx = 0; idx < stepInfo.nSlices; ++idx) {
             u32 txIdx = stepInfo.txSliceIdxs.at(idx);
@@ -318,7 +418,12 @@ HcclResult InsTempAllReduceNHR::RunAllGather(
             {sendChannel, recvChannel},
             {{sendSrcSlicesList, sendDstSlicesList}, {recvSrcSlicesList, recvDstSlicesList}}, dataType_};
 
-        if (isDmaRead_) {
+        if (supportSymmetricMemory_) {
+            CHK_PRT_RET(
+                SendRecvBatchRead(sendRecvInfo, threads.at(channelIdx)),
+                HCCL_ERROR("[InsTempAllReduceNHR] RunAllGather SendRecvBatchRead failed"),
+                HcclResult::HCCL_E_INTERNAL);
+        } else if (isDmaRead_) {
             CHK_PRT_RET(
                 SendRecvRead(sendRecvInfo, threads.at(channelIdx)),
                 HCCL_ERROR("[InsTempAllReduceNHR] RunAllGather SendRecv failed"), HcclResult::HCCL_E_INTERNAL);
