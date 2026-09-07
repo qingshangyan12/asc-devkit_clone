@@ -10,7 +10,6 @@
 
 #include "ccu_kernel_all_to_all_mesh1d.h"
 #include "ccu_kernel_alg_base.h"
-#include "../../../../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 
 namespace mc2_ops_hccl {
 
@@ -159,7 +158,7 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext& ctx)
 // ============================================================================
 CcuResult CcuAlltoAllMesh1DKernel(CcuKernelArg arg)
 {
-    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
+    const auto* kernelArg = static_cast<CcuKernelArgAlltoAllMesh1D*>(arg);
     AlltoAllMesh1DContext ctx;
     ctx.channels = kernelArg->channels;
     ctx.channelCount = kernelArg->channelCount;

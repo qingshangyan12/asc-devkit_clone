@@ -9,7 +9,6 @@
  */
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_all_reduce_mesh1d_mem2mem.h"
-#include "../../../../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 
 namespace mc2_ops_hccl {
 using namespace hcomm;
@@ -613,7 +612,7 @@ static CcuResult DoRepeatAllReduceChunking(KfcAllReduceMesh1DMem2MemContext& ctx
 
 CcuResult CcuKfcAllReduceMesh1DMem2MemKernel(CcuKernelArg arg)
 {
-    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllReduceMesh1DMem2Mem*>(arg);
     KfcAllReduceMesh1DMem2MemContext ctx;
     ctx.channels = kernelArg->channels;
     ctx.channelCount = kernelArg->channelCount;

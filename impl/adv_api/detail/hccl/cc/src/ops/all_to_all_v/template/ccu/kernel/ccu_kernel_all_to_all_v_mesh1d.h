@@ -15,6 +15,14 @@
 
 namespace mc2_ops_hccl {
 
+struct CcuKernelArgAlltoAllVMesh1D : CcuKernelArgBase {
+    uint64_t rankSize;
+    uint32_t rankId;
+    bool loadFromMem;
+    OpParam opParam;
+    std::vector<std::vector<uint32_t>> subCommRanks;
+};
+
 CcuResult CcuAlltoAllVMesh1DKernel(CcuKernelArg arg);
 
 } // namespace mc2_ops_hccl

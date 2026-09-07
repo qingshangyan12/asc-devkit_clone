@@ -9,7 +9,6 @@
  */
 
 #include "ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
-#include "../../../../kfc_server/template/ccu/kernel/ccu_kernel_kfc_server.h"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -245,15 +244,15 @@ CcuResult RunNhr(KfcAllGatherNhrContext& ctx)
 
 CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(CcuKernelArg arg)
 {
-    const auto* kernelArg = static_cast<CcuKernelArgKfcServer*>(arg);
+    const auto* kernelArg = static_cast<CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem*>(arg);
     KfcAllGatherNhrContext ctx;
     ctx.channels = kernelArg->channels;
     ctx.channelCount = kernelArg->channelCount;
     ctx.rankSize = static_cast<uint32_t>(kernelArg->rankSize);
     ctx.rankId = kernelArg->rankId;
     ctx.jettyNum = kernelArg->jettyNum;
-    ctx.stepInfoVector = &kernelArg->nhrStepInfoVector;
-    ctx.rank2ChannelIdx = &kernelArg->nhrRank2ChannelIdx;
+    ctx.stepInfoVector = &kernelArg->stepInfoVector;
+    ctx.rank2ChannelIdx = &kernelArg->rank2ChannelIdx;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
     CCU_CHK_RET(LoadArgs(ctx));
