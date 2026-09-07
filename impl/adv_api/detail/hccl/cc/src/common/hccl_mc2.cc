@@ -19,6 +19,7 @@
 #include "hccl_ccu_res.h"
 #include "adapter_acl.h"
 #include "kfc_server_protocol.h"
+#include "mc2_profiling_binding.h"
 
 using namespace mc2_ops_hccl;
 
@@ -265,6 +266,10 @@ HcclResult AllocComResourceByTilingAicpu(
     }
 
     CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));
+    const HcclResult profilingRet = SaveMc2ProfilingResource(comm, *opResCtx, opParamVec);
+    if (profilingRet != HCCL_SUCCESS) {
+        HCCL_WARNING("[MC2_PROF_BIND] cannot snapshot MC2 resource, ret[%d]", profilingRet);
+    }
 
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);

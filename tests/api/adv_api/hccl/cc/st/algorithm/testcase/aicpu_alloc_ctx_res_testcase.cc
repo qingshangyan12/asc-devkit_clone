@@ -13,11 +13,16 @@
 #include "sim_communicator.h"
 #include "sim_world.h"
 #include "hccl_alloc_ctx_res.h"
+#include "mc2_profiling_binding.h"
+
+extern "C" int32_t HcclMc2BindProfilingStream(void*, const void*, void*);
 
 namespace mc2_ops_hccl {
 extern bool g_rejectDirectAclrtMemcpy;
 extern uint32_t g_aclrtMemcpyCallCount;
 extern uint32_t g_hcclEngineCtxCopyCallCount;
+extern bool g_ackMc2Binding;
+extern uint32_t g_mc2BindingRequests;
 } // namespace mc2_ops_hccl
 
 namespace checker {
@@ -36,6 +41,8 @@ protected:
         g_rejectDirectAclrtMemcpy = false;
         g_aclrtMemcpyCallCount = 0U;
         g_hcclEngineCtxCopyCallCount = 0U;
+        g_ackMc2Binding = false;
+        g_mc2BindingRequests = 0U;
     }
 
     void TearDown() override
@@ -85,6 +92,79 @@ TEST_F(AicpuAllocCtxResTest, CaptureSafeCopyCoversOpParamAndOpResCtx)
 
     const auto* copiedOpParam = reinterpret_cast<const OpParam*>(opResCtx->algInfo[0].opParam);
     EXPECT_EQ(copiedOpParam->opType, HcclCMDType::HCCL_CMD_ALLGATHER);
+}
+
+TEST_F(AicpuAllocCtxResTest, ExplicitResourceBindingRetriesOldPackageAndTracksGeneration)
+{
+    OpParam param{};
+    param.resCtx = reinterpret_cast<void*>(0x100);
+    param.cacheValid = false;
+    const void* resource = reinterpret_cast<void*>(0x200);
+    ASSERT_EQ(SaveMc2AlgorithmThreads(comm_, param, {7, 8, 7}), HCCL_SUCCESS);
+    ASSERT_EQ(SaveMc2ProfilingResource(comm_, resource, {param}), HCCL_SUCCESS);
+    void* streamA = reinterpret_cast<void*>(59);
+    void* streamB = reinterpret_cast<void*>(27);
+    EXPECT_EQ(HcclMc2BindProfilingStream(comm_, resource, streamA), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(g_mc2BindingRequests, 1U);
+    g_ackMc2Binding = true;
+    ASSERT_EQ(HcclMc2BindProfilingStream(comm_, resource, streamA), HCCL_SUCCESS);
+    ASSERT_EQ(HcclMc2BindProfilingStream(comm_, resource, streamA), HCCL_SUCCESS);
+    EXPECT_EQ(g_mc2BindingRequests, 2U);
+    param.cacheValid = true;
+    param.DataDes.count = 128;
+    param.DataDes.dataType = HCCL_DATA_TYPE_FP32;
+    ASSERT_EQ(SaveMc2AlgorithmThreads(comm_, param, {}), HCCL_SUCCESS);
+    ASSERT_EQ(SaveMc2ProfilingResource(comm_, resource, {param}), HCCL_SUCCESS);
+    ASSERT_EQ(HcclMc2BindProfilingStream(comm_, resource, streamA), HCCL_SUCCESS);
+    EXPECT_EQ(g_mc2BindingRequests, 2U);
+    ASSERT_EQ(HcclMc2BindProfilingStream(comm_, resource, streamB), HCCL_SUCCESS);
+    ASSERT_EQ(HcclMc2BindProfilingStream(comm_, resource, streamA), HCCL_SUCCESS);
+    EXPECT_EQ(g_mc2BindingRequests, 4U);
+    param.cacheValid = false;
+    ASSERT_EQ(SaveMc2AlgorithmThreads(comm_, param, {9, 10}), HCCL_SUCCESS);
+    ASSERT_EQ(SaveMc2ProfilingResource(comm_, resource, {param}), HCCL_SUCCESS);
+    ASSERT_EQ(HcclMc2BindProfilingStream(comm_, resource, streamA), HCCL_SUCCESS);
+    EXPECT_EQ(g_mc2BindingRequests, 5U);
+    const void* otherResource = reinterpret_cast<void*>(0x300);
+    ASSERT_EQ(SaveMc2ProfilingResource(comm_, otherResource, {param}), HCCL_SUCCESS);
+    ASSERT_EQ(HcclMc2BindProfilingStream(comm_, otherResource, streamB), HCCL_SUCCESS);
+    ASSERT_EQ(HcclMc2BindProfilingStream(comm_, resource, streamA), HCCL_SUCCESS);
+    EXPECT_EQ(g_mc2BindingRequests, 6U);
+}
+
+TEST_F(AicpuAllocCtxResTest, MissingSnapshotRecoversSerializedThreadsOnlyOnce)
+{
+    AlgResourceCtxSerializable restored{};
+    restored.threads = {7, 8};
+    auto serialized = restored.Serialize();
+    OpParam param{};
+    param.resCtx = serialized.data();
+    param.ctxSize = serialized.size();
+    param.cacheValid = true;
+    const void* resource = reinterpret_cast<void*>(0x400);
+    g_ackMc2Binding = true;
+    ASSERT_EQ(SaveMc2ProfilingResource(comm_, resource, {param}), HCCL_SUCCESS);
+    EXPECT_EQ(g_aclrtMemcpyCallCount, 1U);
+    ASSERT_EQ(HcclMc2BindProfilingStream(comm_, resource, reinterpret_cast<void*>(59)), HCCL_SUCCESS);
+    g_rejectDirectAclrtMemcpy = true;
+    ASSERT_EQ(SaveMc2ProfilingResource(comm_, resource, {param}), HCCL_SUCCESS);
+    ASSERT_EQ(HcclMc2BindProfilingStream(comm_, resource, reinterpret_cast<void*>(59)), HCCL_SUCCESS);
+    EXPECT_EQ(g_aclrtMemcpyCallCount, 1U);
+    EXPECT_EQ(g_mc2BindingRequests, 1U);
+}
+
+TEST_F(AicpuAllocCtxResTest, FailedResourceRebuildCannotReusePreviousBinding)
+{
+    OpParam param{};
+    param.resCtx = reinterpret_cast<void*>(0x500);
+    const void* resource = reinterpret_cast<void*>(0x600);
+    g_ackMc2Binding = true;
+    ASSERT_EQ(SaveMc2AlgorithmThreads(comm_, param, {7}), HCCL_SUCCESS);
+    ASSERT_EQ(SaveMc2ProfilingResource(comm_, resource, {param}), HCCL_SUCCESS);
+    ASSERT_EQ(HcclMc2BindProfilingStream(comm_, resource, reinterpret_cast<void*>(59)), HCCL_SUCCESS);
+    EXPECT_EQ(SaveMc2ProfilingResource(comm_, resource, {}), HCCL_E_PARA);
+    EXPECT_EQ(HcclMc2BindProfilingStream(comm_, resource, reinterpret_cast<void*>(59)), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(g_mc2BindingRequests, 1U);
 }
 
 } // namespace
