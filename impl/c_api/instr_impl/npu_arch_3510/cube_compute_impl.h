@@ -18,8 +18,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CUBE_COMPUTE_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_CUBE_COMPUTE_IMPL_H
 
-#include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_l0c_copy_config_impl.h"
-#include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_l0c_copy_nz_para_impl.h"
+#include "c_api/defs/macro.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_mmad_mx_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_mmad_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_enable_hf32_impl.h"
@@ -32,17 +31,6 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_disable_hif8_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_mmad_direction_m_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/cube_compute_impl/asc_set_mmad_direction_n_impl.h"
-
-__aicore__ inline void asc_set_l0c_copy_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool is_clean_unit_flag)
-{
-    asc_set_l0c_copy_config_impl(relu_pre_addr, quant_pre_addr, is_clean_unit_flag);
-}
-
-__aicore__ inline void asc_set_l0c_copy_nz_para(
-    uint16_t matrix_num, uint16_t src_nz_matrix_stride, uint32_t dst_matrix_stride)
-{
-    asc_set_l0c_copy_nz_para_impl(matrix_num, src_nz_matrix_stride, dst_matrix_stride);
-}
 
 // ==========mmad_mx(e1m2/e1m2, e4m3/e5m2)==========
 __aicore__ inline void asc_mmad_mx(
@@ -127,6 +115,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -147,6 +136,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp4x2_e1m2_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -167,6 +157,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e1m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -187,6 +178,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp4x2_e2m1_t* a_matrix, __cb__ fp4x2_e2m1_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -207,6 +199,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -227,6 +220,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -247,6 +241,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -267,6 +262,7 @@ __aicore__ inline void asc_mmad_mx(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad_mx and asc_sync)
 __aicore__ inline void asc_mmad_mx_sync(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -369,6 +365,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -389,6 +386,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -409,6 +407,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ fp8_e4m3fn_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -429,6 +428,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -449,6 +449,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ fp8_e5m2_t* a_matrix, __cb__ fp8_e5m2_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
@@ -468,6 +469,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ half* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
@@ -486,6 +488,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ float* a_matrix, __cb__ float* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
@@ -504,6 +507,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
     __cc__ int32_t* c_matrix, __ca__ int8_t* a_matrix, __cb__ int8_t* b_matrix, uint16_t left_height, uint16_t n_dim,
     uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
@@ -523,6 +527,7 @@ __aicore__ inline void asc_mmad(
         c_matrix_init_val);
 }
 
+ASC_DEPRECATED(9.2.0, "2028/09/03", asc_mmad and asc_sync)
 __aicore__ inline void asc_mmad_sync(
     __cc__ float* c_matrix, __ca__ hifloat8_t* a_matrix, __cb__ hifloat8_t* b_matrix, uint16_t left_height,
     uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source,
