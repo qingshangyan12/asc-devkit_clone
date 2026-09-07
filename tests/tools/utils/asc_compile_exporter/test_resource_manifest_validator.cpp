@@ -33,6 +33,7 @@ Json MakeValidManifest()
 {
     Json constant = {
         {"name", "weight"},
+        {"arg_type", "pointer"},
         {"parameter_index", Json::number_unsigned_t(0U)},
         {"byte_size", Json::number_unsigned_t(4U)},
         {"file", "${resource}/resources/weight.bin"},
@@ -133,6 +134,20 @@ TEST_F(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
     Command(namedOptions)["cmd"][0U] = "${options:custom_compile}";
     Command(namedOptions)["cmd"].insert(Command(namedOptions)["cmd"].begin() + 1U, "${options:custom_compile}");
     EXPECT_TRUE(Validate(namedOptions));
+
+    Json pointerConstant = MakeValidManifest();
+    Constant(pointerConstant)["arg_type"] = "pointer";
+    EXPECT_TRUE(Validate(pointerConstant));
+
+    Json explicitStructConstant = MakeValidManifest();
+    Constant(explicitStructConstant)["arg_type"] = "struct";
+    Constant(explicitStructConstant).erase("byte_size");
+    EXPECT_TRUE(Validate(explicitStructConstant));
+
+    Json defaultStructConstant = MakeValidManifest();
+    Constant(defaultStructConstant).erase("arg_type");
+    Constant(defaultStructConstant).erase("byte_size");
+    EXPECT_TRUE(Validate(defaultStructConstant));
 }
 
 TEST_F(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
@@ -224,6 +239,10 @@ TEST_F(ResourceManifestValidatorTest, ValidatesMarkersAndReferencedPaths)
 TEST_F(ResourceManifestValidatorTest, ValidatesConstants)
 {
     ExpectInvalid(
+        "struct must not contain byte_size", [](Json& manifest) { Constant(manifest)["arg_type"] = "struct"; });
+    ExpectInvalid(
+        "default struct must not contain byte_size", [](Json& manifest) { Constant(manifest).erase("arg_type"); });
+    ExpectInvalid(
         "constant is not an object", [](Json& manifest) { Kernel(manifest)["constant_infos"][0U] = "weight"; });
     ExpectInvalid("constant has extra field", [](Json& manifest) { Constant(manifest)["extra"] = true; });
     ExpectInvalid("constant name is missing", [](Json& manifest) {
@@ -233,6 +252,12 @@ TEST_F(ResourceManifestValidatorTest, ValidatesConstants)
     ExpectInvalid("constant name has wrong type", [](Json& manifest) { Constant(manifest)["name"] = 1U; });
     ExpectInvalid("constant name is empty", [](Json& manifest) { Constant(manifest)["name"] = ""; });
     ExpectInvalid("parameter_index has wrong type", [](Json& manifest) { Constant(manifest)["parameter_index"] = -1; });
+    ExpectInvalid("arg_type has wrong type", [](Json& manifest) { Constant(manifest)["arg_type"] = 1U; });
+    ExpectInvalid("arg_type is unsupported", [](Json& manifest) { Constant(manifest)["arg_type"] = "array"; });
+    ExpectInvalid("pointer byte_size is missing", [](Json& manifest) {
+        Constant(manifest)["arg_type"] = "pointer";
+        Constant(manifest).erase("byte_size");
+    });
     ExpectInvalid("byte_size has wrong type", [](Json& manifest) { Constant(manifest)["byte_size"] = "4"; });
     ExpectInvalid(
         "byte_size is zero", [](Json& manifest) { Constant(manifest)["byte_size"] = Json::number_unsigned_t(0U); });

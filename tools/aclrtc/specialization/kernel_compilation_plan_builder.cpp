@@ -29,6 +29,8 @@ using Json = nlohmann::json;
 constexpr char SUPPORTED_MANIFEST_SCHEMA_VERSION[] = "1.0";
 constexpr char OPTIONS_REFERENCE_PREFIX[] = "${options:";
 constexpr char ENVIRONMENT_REFERENCE_PREFIX[] = "${env:";
+constexpr char POINTER_ARGUMENT_TYPE[] = "pointer";
+constexpr char STRUCT_ARGUMENT_TYPE[] = "struct";
 
 enum class ManifestObjectKind : uint32_t {
     Basic,
@@ -217,19 +219,31 @@ aclError BuildConstantSourcePatches(
     for (size_t constantIndex = 0U; constantIndex < constantInfos->size(); ++constantIndex) {
         const Json& constantInfo = constantInfos->at(constantIndex);
         const uint64_t constantArgumentIndex = constantInfo.at("parameter_index").get<uint64_t>();
-        const uint64_t requiredConstantByteCount = constantInfo.at("byte_size").get<uint64_t>();
-        if (specializationRequest.borrowedKernelArgumentDataPointers == nullptr ||
-            specializationRequest.borrowedKernelArgumentByteCounts == nullptr) {
+        const std::string argumentType = constantInfo.value("arg_type", STRUCT_ARGUMENT_TYPE);
+        if (argumentType != POINTER_ARGUMENT_TYPE && argumentType != STRUCT_ARGUMENT_TYPE) {
             ASCENDLOGE(
-                "constant parameter_index %llu requires argsAddr and argsBytes; set both request arrays with at "
-                "least argsCount entries",
+                "constant parameter_index %llu has unsupported arg_type '%s'; regenerate the JIT resource with "
+                "arg_type pointer or struct",
+                static_cast<unsigned long long>(constantArgumentIndex), argumentType.c_str());
+            return ACLRTC_ERROR_FAILURE;
+        }
+        if (argumentType == STRUCT_ARGUMENT_TYPE && constantInfo.contains("byte_size")) {
+            ASCENDLOGE(
+                "struct constant parameter_index %llu must not contain byte_size; remove it from the manifest "
+                "and supply the size in argsBytes",
+                static_cast<unsigned long long>(constantArgumentIndex));
+            return ACLRTC_ERROR_FAILURE;
+        }
+        if (specializationRequest.borrowedKernelArgumentDataPointers == nullptr) {
+            ASCENDLOGE(
+                "constant parameter_index %llu requires argsAddr; set it with at least argsCount entries",
                 static_cast<unsigned long long>(constantArgumentIndex));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
         if (constantArgumentIndex >= specializationRequest.kernelArgumentCount) {
             ASCENDLOGE(
                 "constant parameter_index %llu is outside argsCount %llu; set argsCount greater than %llu and "
-                "provide matching argsAddr and argsBytes entries",
+                "provide a matching argsAddr entry and an argsBytes entry for struct constants",
                 static_cast<unsigned long long>(constantArgumentIndex),
                 static_cast<unsigned long long>(specializationRequest.kernelArgumentCount),
                 static_cast<unsigned long long>(constantArgumentIndex));
@@ -241,17 +255,24 @@ aclError BuildConstantSourcePatches(
                 static_cast<unsigned long long>(constantArgumentIndex));
             return ACLRTC_ERROR_INVALID_INPUT;
         }
-        const uint64_t suppliedConstantByteCount =
-            specializationRequest.borrowedKernelArgumentByteCounts[constantArgumentIndex];
-        if (suppliedConstantByteCount != requiredConstantByteCount) {
-            ASCENDLOGE(
-                "argsBytes[%llu]=%llu does not match required byte_size %llu; set argsBytes[%llu] to %llu",
-                static_cast<unsigned long long>(constantArgumentIndex),
-                static_cast<unsigned long long>(suppliedConstantByteCount),
-                static_cast<unsigned long long>(requiredConstantByteCount),
-                static_cast<unsigned long long>(constantArgumentIndex),
-                static_cast<unsigned long long>(requiredConstantByteCount));
-            return ACLRTC_ERROR_INVALID_INPUT;
+
+        uint64_t constantByteCount = 0U;
+        if (argumentType == POINTER_ARGUMENT_TYPE) {
+            constantByteCount = constantInfo.at("byte_size").get<uint64_t>();
+        } else {
+            if (specializationRequest.borrowedKernelArgumentByteCounts == nullptr) {
+                ASCENDLOGE(
+                    "struct constant parameter_index %llu requires argsBytes; set it with at least argsCount entries",
+                    static_cast<unsigned long long>(constantArgumentIndex));
+                return ACLRTC_ERROR_INVALID_INPUT;
+            }
+            constantByteCount = specializationRequest.borrowedKernelArgumentByteCounts[constantArgumentIndex];
+            if (constantByteCount == 0U) {
+                ASCENDLOGE(
+                    "argsBytes[%llu] must be nonzero for a struct constant",
+                    static_cast<unsigned long long>(constantArgumentIndex));
+                return ACLRTC_ERROR_INVALID_INPUT;
+            }
         }
 
         std::string resolvedTargetFilePath;
@@ -264,8 +285,7 @@ aclError BuildConstantSourcePatches(
         sourcePatches.push_back(
             {resolvedTargetFilePath, constantInfo.at("template").get<std::string>(),
              FormatBytesAsCppInitializerList(
-                 specializationRequest.borrowedKernelArgumentDataPointers[constantArgumentIndex],
-                 requiredConstantByteCount)});
+                 specializationRequest.borrowedKernelArgumentDataPointers[constantArgumentIndex], constantByteCount)});
     }
     return ACLRTC_SUCCESS;
 }

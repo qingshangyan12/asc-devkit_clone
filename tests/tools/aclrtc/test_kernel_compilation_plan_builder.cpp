@@ -123,6 +123,7 @@ Json CreateManifest()
               {{"kernel_name", "add_custom_100000"},
                {"constant_infos", Json::array(
                                       {{{"parameter_index", 0},
+                                        {"arg_type", "pointer"},
                                         {"byte_size", 2},
                                         {"file", "${resource}/resources/include/constants.h"},
                                         {"template", "@@STATIC_TILING@@"}}})},
@@ -544,20 +545,88 @@ TEST(KernelCompilationPlanBuilderTest, RejectsMissingRuntimeConstantBuffer)
         ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
 }
 
-TEST(KernelCompilationPlanBuilderTest, RejectsMismatchedRuntimeConstantByteCount)
+TEST(KernelCompilationPlanBuilderTest, PointerConstantUsesManifestByteSize)
 {
     KernelPlanTestWorkspace workspace;
     ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
     ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
-    const uint8_t oversizedTilingBytes[] = {0x01, 0x02, 0x03};
-    const void* argumentDataPointers[] = {oversizedTilingBytes};
-    const uint64_t argumentByteCounts[] = {sizeof(oversizedTilingBytes)};
-    NormalizedKernelSpecializationRequest request = CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+    const uint8_t tilingBytes[] = {0x01, 0x02, 0x03};
+    const void* argumentDataPointers[] = {tilingBytes};
+    NormalizedKernelSpecializationRequest request = CreateRequest(workspace, argumentDataPointers, nullptr);
 
     KernelCompilationPlan plan;
     EXPECT_EQ(
         KernelCompilationPlanBuilder(
             request, CreateManifest(), workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+    ASSERT_EQ(plan.sourcePatches.size(), 1U);
+    EXPECT_EQ(plan.sourcePatches[0].replacementText, "{0x01, 0x02}");
+}
+
+TEST(KernelCompilationPlanBuilderTest, DefaultStructConstantUsesArgumentByteSize)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t tilingBytes[] = {0x01, 0x02, 0x03};
+    const void* argumentDataPointers[] = {tilingBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(tilingBytes)};
+    NormalizedKernelSpecializationRequest request = CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+    Json manifest = CreateManifest();
+    manifest["kernels"][1]["constant_infos"][0].erase("arg_type");
+    manifest["kernels"][1]["constant_infos"][0].erase("byte_size");
+
+    KernelCompilationPlan plan;
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_SUCCESS);
+    ASSERT_EQ(plan.sourcePatches.size(), 1U);
+    EXPECT_EQ(plan.sourcePatches[0].replacementText, "{0x01, 0x02, 0x03}");
+}
+
+TEST(KernelCompilationPlanBuilderTest, RejectsStructConstantWithManifestByteSize)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t tilingBytes[] = {0x01, 0x02, 0x03};
+    const void* argumentDataPointers[] = {tilingBytes};
+    const uint64_t argumentByteCounts[] = {sizeof(tilingBytes)};
+    NormalizedKernelSpecializationRequest request = CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+    Json manifest = CreateManifest();
+    manifest["kernels"][1]["constant_infos"][0]["arg_type"] = "struct";
+
+    KernelCompilationPlan plan;
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    manifest["kernels"][1]["constant_infos"][0].erase("arg_type");
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
+            .BuildCompilationPlan(plan),
+        ascendc::aclrtc::ACLRTC_ERROR_FAILURE);
+    EXPECT_TRUE(plan.sourcePatches.empty());
+}
+
+TEST(KernelCompilationPlanBuilderTest, RejectsZeroByteStructConstant)
+{
+    KernelPlanTestWorkspace workspace;
+    ScopedEnvironmentVariable toolchainEnvironment("ACLRTC_TEST_TOOLCHAIN", workspace.ToolchainPath().string());
+    ScopedEnvironmentVariable ascendHomeEnvironment("ASCEND_HOME_PATH", workspace.ToolchainPath().string());
+    const uint8_t tilingBytes[] = {0x01};
+    const void* argumentDataPointers[] = {tilingBytes};
+    const uint64_t argumentByteCounts[] = {0U};
+    NormalizedKernelSpecializationRequest request = CreateRequest(workspace, argumentDataPointers, argumentByteCounts);
+    Json manifest = CreateManifest();
+    manifest["kernels"][1]["constant_infos"][0].erase("arg_type");
+    manifest["kernels"][1]["constant_infos"][0].erase("byte_size");
+
+    KernelCompilationPlan plan;
+    EXPECT_EQ(
+        KernelCompilationPlanBuilder(request, manifest, workspace.ResourcePath(), workspace.SourceDirectoryPath())
             .BuildCompilationPlan(plan),
         ascendc::aclrtc::ACLRTC_ERROR_INVALID_INPUT);
 }

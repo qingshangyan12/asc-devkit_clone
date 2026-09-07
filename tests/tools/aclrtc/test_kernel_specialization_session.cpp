@@ -162,6 +162,7 @@ private:
                             {{{"kernel_name", "add_custom_100000"},
                               {"constant_infos", Json::array(
                                                      {{{"parameter_index", 0},
+                                                       {"arg_type", "pointer"},
                                                        {"byte_size", 2},
                                                        {"file", "${resource}/resources/include/constants.h"},
                                                        {"template", "@@STATIC_TILING@@"}}})},

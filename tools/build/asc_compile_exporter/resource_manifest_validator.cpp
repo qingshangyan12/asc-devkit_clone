@@ -31,6 +31,10 @@ constexpr const char* OPTIONS_MARKER_PREFIX = "${options:";
 
 constexpr const char* RESOURCE_ROOT_MARKER = "${resource}";
 constexpr const char* SOURCE_FILE_PATH_MARKER = "${source_file_path}";
+constexpr const char* POINTER_ARGUMENT_TYPE = "pointer";
+constexpr const char* STRUCT_ARGUMENT_TYPE = "struct";
+
+const std::set<std::string> CONSTANT_FIELDS = {"name", "parameter_index", "arg_type", "byte_size", "file", "template"};
 
 enum class MarkerRequirement { None, SourceFile };
 
@@ -313,14 +317,22 @@ bool ResourceManifestValidator::ValidateOptionArray(const std::string& name)
 
 bool ResourceManifestValidator::ValidateConstant(const Json& constant, std::set<std::string>& constantNames)
 {
-    if (!CheckAndLog(constant.is_object(), __LINE__, "invalid constant: expected an object") ||
-        !CheckAndLog(constant.contains("name"), __LINE__, "missing required constant field: name") ||
+    if (!CheckAndLog(constant.is_object(), __LINE__, "invalid constant: expected an object")) {
+        return false;
+    }
+    for (const auto& field : constant.items()) {
+        if (!CheckAndLog(
+                CONSTANT_FIELDS.count(field.key()) != 0U, __LINE__,
+                "invalid constant: unsupported field=" + field.key())) {
+            return false;
+        }
+    }
+
+    if (!CheckAndLog(constant.contains("name"), __LINE__, "missing required constant field: name") ||
         !CheckAndLog(
             constant.contains("parameter_index"), __LINE__, "missing required constant field: parameter_index") ||
-        !CheckAndLog(constant.contains("byte_size"), __LINE__, "missing required constant field: byte_size") ||
         !CheckAndLog(constant.contains("file"), __LINE__, "missing required constant field: file") ||
         !CheckAndLog(constant.contains("template"), __LINE__, "missing required constant field: template") ||
-        !CheckAndLog(constant.size() == 5U, __LINE__, "invalid constant: expected exactly five fields") ||
         !CheckAndLog(constant.at("name").is_string(), __LINE__, "invalid constant name: expected a string") ||
         !CheckAndLog(
             !constant.at("name").get_ref<const std::string&>().empty(), __LINE__,
@@ -328,17 +340,44 @@ bool ResourceManifestValidator::ValidateConstant(const Json& constant, std::set<
         !CheckAndLog(
             constant.at("parameter_index").is_number_unsigned(), __LINE__,
             "invalid parameter_index: expected an unsigned integer") ||
-        !CheckAndLog(
-            constant.at("byte_size").is_number_unsigned(), __LINE__,
-            "invalid byte_size: expected an unsigned integer") ||
-        !CheckAndLog(
-            constant.at("byte_size").get<Json::number_unsigned_t>() != 0U, __LINE__,
-            "invalid byte_size: expected a nonzero value") ||
         !CheckAndLog(constant.at("file").is_string(), __LINE__, "invalid constant file: expected a string") ||
         !CheckAndLog(constant.at("template").is_string(), __LINE__, "invalid constant template: expected a string") ||
         !CheckAndLog(
             !constant.at("template").get_ref<const std::string&>().empty(), __LINE__,
             "invalid constant template: expected a nonempty string")) {
+        return false;
+    }
+
+    const bool hasArgumentType = constant.contains("arg_type");
+    if (hasArgumentType &&
+        !CheckAndLog(constant.at("arg_type").is_string(), __LINE__, "invalid arg_type: expected a string")) {
+        return false;
+    }
+    const std::string argumentType =
+        hasArgumentType ? constant.at("arg_type").get_ref<const std::string&>() : STRUCT_ARGUMENT_TYPE;
+    if (!CheckAndLog(
+            argumentType == POINTER_ARGUMENT_TYPE || argumentType == STRUCT_ARGUMENT_TYPE, __LINE__,
+            "invalid arg_type: expected pointer or struct")) {
+        return false;
+    }
+
+    const bool hasByteSize = constant.contains("byte_size");
+    if (!CheckAndLog(
+            argumentType != STRUCT_ARGUMENT_TYPE || !hasByteSize, __LINE__,
+            "invalid struct constant: byte_size must be omitted; size comes from argsBytes")) {
+        return false;
+    }
+    if (!CheckAndLog(
+            argumentType != POINTER_ARGUMENT_TYPE || hasByteSize, __LINE__,
+            "missing required pointer constant field: byte_size")) {
+        return false;
+    }
+    if (hasByteSize && (!CheckAndLog(
+                            constant.at("byte_size").is_number_unsigned(), __LINE__,
+                            "invalid byte_size: expected an unsigned integer") ||
+                        !CheckAndLog(
+                            constant.at("byte_size").get<Json::number_unsigned_t>() != 0U, __LINE__,
+                            "invalid byte_size: expected a nonzero value"))) {
         return false;
     }
 
@@ -353,9 +392,10 @@ bool ResourceManifestValidator::ValidateConstant(const Json& constant, std::set<
     }
 
     ASCENDLOGD(
-        "Validated constant: name=%s parameter_index=%llu byte_size=%llu", name.c_str(),
+        "Validated constant: name=%s parameter_index=%llu arg_type=%s byte_size=%llu", name.c_str(),
         static_cast<unsigned long long>(constant.at("parameter_index").get<Json::number_unsigned_t>()),
-        static_cast<unsigned long long>(constant.at("byte_size").get<Json::number_unsigned_t>()));
+        argumentType.c_str(),
+        static_cast<unsigned long long>(hasByteSize ? constant.at("byte_size").get<Json::number_unsigned_t>() : 0U));
     return true;
 }
 
