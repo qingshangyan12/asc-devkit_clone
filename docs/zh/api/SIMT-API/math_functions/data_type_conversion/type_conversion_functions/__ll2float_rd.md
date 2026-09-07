@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/device_functions.h"`。
+
 遵循CAST\_FLOOR模式，将int64类型数据转换为浮点数，返回转换后的值。
 
 ## 函数原型
@@ -47,7 +49,7 @@ inline float __ll2float_rd(const long long int x)
 
 | x值 | 返回值 |
 |---|---|
-| 9223372036854775807（INT64_MAX）| 9.223372e+18 |
+| 9223372036854775807（INT64_MAX） | 9.223371e+18（2^63减2^40） |
 | -9223372036854775808（INT64_MIN） | -9.223372e+18 |
 | 16777217（2^24+1 ） | ASCRT_TWO_TO_24_F |
 | -16777217（-2^24-1） | -1.67772e+07 |
@@ -58,32 +60,34 @@ inline float __ll2float_rd(const long long int x)
 
 无
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/device_functions.h`头文件。
-
-```cpp
-#include "simt_api/device_functions.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__ll2float_rd(float* dst, int64_t* x)
+    #include "simt_api/device_functions.h"
+
+    __global__ __launch_bounds__(1024) void kernel__ll2float_rd(float* dst, int64_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __ll2float_rd(x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__ll2float_rd(__gm__ float* dst, __gm__ int64_t* x)
+    #include "simt_api/device_functions.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__ll2float_rd(__gm__ float* dst, __gm__ int64_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __ll2float_rd(x[idx]);
     }
     ```

@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/sync/sync.h"`。
+
 完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序：
 
 - 传入`PIPE_ALL`时等待所有流水线的前序指令全部完成后才会对后序指令解除阻塞，此时功能等价于[asc_sync](asc_sync.md)。
@@ -92,6 +94,19 @@ namespace {
 constexpr uint32_t ELEMENTS = 64;
 constexpr uint32_t BYTES = ELEMENTS * sizeof(float);
 
+__simd_vf__ inline void add_vf(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1)
+{
+    vector_float dst_reg;
+    vector_float src0_reg;
+    vector_float src1_reg;
+    uint32_t count = ELEMENTS;
+    vector_bool mask = asc_update_mask_b32(count);
+    asc_loadalign(src0_reg, src0);
+    asc_loadalign(src1_reg, src1);
+    asc_add(dst_reg, src0_reg, src1_reg, mask);
+    asc_storealign(dst, dst_reg, mask);
+}
+
 void print_data(const char* label, const std::vector<float>& data)
 {
     std::cout << label << ":";
@@ -106,7 +121,7 @@ __global__ __vector__ void asc_sync_pipe_kernel(__gm__ float* output, __gm__ flo
     asc_copy_gm2ub_align(x, src0, BYTES);
     asc_copy_gm2ub_align(y, src1, BYTES);
     asc_sync_pipe(PIPE_ALL);
-    asc_add(z, x, y, ELEMENTS);
+    add_vf(z, x, y);
     asc_sync_pipe(PIPE_ALL);
     asc_copy_ub2gm_align(output, z, BYTES);
     asc_sync_pipe(PIPE_ALL);

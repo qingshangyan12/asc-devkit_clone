@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_permute_sel.h"`。
+
 将src中低半部分或高半部分的元素以扩充位宽的方式写入dst或通过函数返回值返回，支持：
 
 - asc_unpack_lower：取src的低半部分（LOWER），每个元素高位填0扩充位宽后写入dst或通过函数返回值返回。
@@ -56,15 +58,15 @@
 ### 矢量数据寄存器解压缩
 
 ```c
-// 解压缩低位，通过函数返回值返回结果。
+// 解压缩低位，通过函数返回值返回结果（占位符形式）。
 __simd_callee__ inline vector_<dtype_dst> asc_unpack_lower(vector_<dtype_src> src)
-// 解压缩高位，通过函数返回值返回结果。
+// 解压缩高位，通过函数返回值返回结果（占位符形式）。
 __simd_callee__ inline vector_<dtype_dst> asc_unpack_upper(vector_<dtype_src> src)
 
-// 解压缩低位，通过引用参数输出结果。
+// 解压缩低位，通过引用参数输出结果（占位符形式）。
 __simd_callee__ inline void asc_unpack_lower(vector_<dtype_dst>& dst,
                                              vector_<dtype_src> src)
-// 解压缩高位，通过引用参数输出结果。
+// 解压缩高位，通过引用参数输出结果（占位符形式）。
 __simd_callee__ inline void asc_unpack_upper(vector_<dtype_dst>& dst,
                                              vector_<dtype_src> src)
 ```

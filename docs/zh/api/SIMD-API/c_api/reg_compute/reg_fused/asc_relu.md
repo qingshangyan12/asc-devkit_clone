@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_fused.h"`。
+
 根据`mask`对源操作数`src`按元素执行ReLU操作，得到计算结果。计算公式如下：
 
 $$
@@ -35,11 +37,11 @@ $$
 ## 函数原型
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_relu(vector_<dtype> src,
                                                vector_bool mask)
 
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_relu(vector_<dtype>& dst,
                                      vector_<dtype> src,
                                      vector_bool mask)

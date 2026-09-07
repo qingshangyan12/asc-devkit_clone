@@ -25,6 +25,8 @@
 
 ## 功能说明
 
+头文件路径为：`"simt_api/asc_fp16.h"`。
+
 遵循CAST\_CEIL模式，将int64类型数据转换为half类型数据，返回转换后的值。
 
 ## 函数原型
@@ -49,7 +51,8 @@ inline half __ll2half_ru(const long long int x)
 | --- | --- | --- |
 | x>9223372036854775807（long long最大值） | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | x<-9223372036854775808（long long最小值） | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
-| -9223372036854775808~9223372036854775807 | -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
+| 2049 | 2050 | 2050 |
+| 2051 | 2052 | 2052 |
 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 | ASCRT\_MAX\_NORMAL\_FP16 |
 | -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 | -ASCRT\_MAX\_NORMAL\_FP16 |
 | 9223372036854775807 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
@@ -59,32 +62,34 @@ inline half __ll2half_ru(const long long int x)
 
 无
 
-## 需要包含的头文件
-
-使用该接口需要包含`simt_api/asc_fp16.h`头文件。
-
-```cpp
-#include "simt_api/asc_fp16.h"
-```
-
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(1024) void kernel__ll2half_ru(half* dst, int64_t* x)
+    #include "simt_api/asc_fp16.h"
+
+    __global__ __launch_bounds__(1024) void kernel__ll2half_ru(half* dst, int64_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __ll2half_ru(x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void kernel__ll2half_ru(__gm__ half* dst, __gm__ int64_t* x)
+    #include "simt_api/asc_fp16.h"
+
+    __simt_vf__ __launch_bounds__(1024) inline void kernel__ll2half_ru(__gm__ half* dst, __gm__ int64_t* x, uint32_t total_length)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+        if (idx >= total_length) {
+            return;
+        }
         dst[idx] = __ll2half_ru(x[idx]);
     }
     ```

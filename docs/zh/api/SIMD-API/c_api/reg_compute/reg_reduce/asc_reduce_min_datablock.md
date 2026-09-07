@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/compute/reg_reduce.h"`。
+
 根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。计算公式如下：
 
 $$
@@ -37,11 +39,11 @@ $$
 ## 函数原型
 
 ```c
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_reduce_min_datablock(vector_<dtype> src,
                                                                vector_bool mask)
 
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_reduce_min_datablock(vector_<dtype>& dst,
                                                       vector_<dtype> src,
                                                       vector_bool mask)
