@@ -39,6 +39,8 @@
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "base/scheduler_mdl_mx.h"
 #include "base/scheduler_norm_mx.h"
+#include "base/scheduler_mdl_mx_only_scaleb.h"
+#include "base/scheduler_norm_mx_only_scaleb.h"
 #endif
 
 #endif
