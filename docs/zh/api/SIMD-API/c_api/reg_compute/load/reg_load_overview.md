@@ -184,39 +184,6 @@ __simd_vf__ inline void load_align_post_update_vf(__ubuf__ half* dst, __ubuf__ h
 }
 ```
 
-### b64数据类型
-
-以下接口支持b64数据类型。
-
-**表5**  支持b64数据类型的接口
-
-| 支持的数据类型 | 接口 |
-| --- | --- |
-| `int64_t`、`uint64_t` | [asc_loadalign](asc_loadalign.md)<br>[asc_loadalign_postupdate](asc_loadalign_postupdate.md) |
-| `int64_t` | [asc_load](asc_load.md)<br>[asc_loadunalign_pre](asc_loadunalign_pre.md)<br>[asc_loadunalign](asc_loadunalign.md)<br>[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md) |
-
-当`asc_loadalign`、`asc_loadunalign_pre`或`asc_loadunalign_postupdate`通过地址寄存器访问b64数据时，地址寄存器更新接口不支持b64模式，应使用[asc_update_addr_reg_b32](../reg_addr_reg/asc_update_addr_reg.md)生成地址寄存器。一个b64元素占用两个b32寻址单元，因此各维偏移量以及`asc_loadunalign_postupdate`的`inc`应设置为期望b64元素偏移量的2倍。
-
-`asc_loadalign`和`asc_loadalign_postupdate`的非连续对齐搬入模式中，处理`int64_t`数据时，掩码创建接口不支持b64模式。应先使用[asc_create_mask_b32](../reg_mask/asc_create_mask.md)创建b32掩码，再使用[asc_unpack_lower](../reg_permute_sel/asc_unpack.md)将其展开为b64数据对应的掩码。展开后的掩码以连续8个bit为一组，仅每组最低位的bit有效，用于控制一个b64元素。
-
-以下示例以`asc_loadalign`为例，展示b64掩码的构造方式以及地址寄存器偏移量的换算方法。
-
-```cpp
-vector_int64_t src_reg;
-vector_bool mask_b32 = asc_create_mask_b32(PAT_ALL);
-vector_bool mask_b64;
-asc_unpack_lower(mask_b64, mask_b32);
-addr_reg load_offset;
-addr_reg store_offset;
-for (uint16_t i = 0; i < repeatTimes; ++i) {
-    load_offset = asc_update_addr_reg_b32(elements_vl * 2);
-    // 搬出到UB后数据类型为B32，偏移不需要*2
-    store_offset = asc_update_addr_reg_b32(elements_vl);
-    asc_loadalign(src_reg, input, load_offset);
-    asc_storealign_pack(output, src_reg, store_offset, mask_b64);
-}
-```
-
 ### 非对齐搬运特性
 
 非对齐搬运用于有效起始地址满足dtype对齐、但不满足32字节对齐的连续数据搬入或搬出场景。搬入和搬出均通过[非对齐寄存器](../../defs/type/data_type_definition.md#非对齐寄存器)保存跨32字节边界的数据，以保证连续数据的完整性。
@@ -236,7 +203,7 @@ for (uint16_t i = 0; i < repeatTimes; ++i) {
 
 实际访问会覆盖向低地址方向对齐后的32字节范围，因此除有效起始地址满足dtype对齐外，对齐后的读取范围也必须位于UB地址空间内。
 
-**表6**  非对齐搬入接口的配合关系
+**表5**  非对齐搬入接口的配合关系
 
 | 搬入方式 | 调用顺序与缓存复用规则 | 接口 |
 | --- | --- | --- |
@@ -262,7 +229,7 @@ for (uint16_t i = 0; i < repeatTimes; ++i) {
 
 后续连续搬出时，主搬出接口将非对齐寄存器中的前序尾块与本次矢量数据寄存器的主块数据拼接后写入UB，再将本次尾块更新至非对齐寄存器。连续搬出结束后，调用后处理接口写入最后一次缓存的尾块。
 
-**表7**  非对齐搬出接口的配合关系
+**表6**  非对齐搬出接口的配合关系
 
 | 主搬出方式 | 配套后处理接口 | 说明 |
 | --- | --- | --- |
@@ -306,3 +273,36 @@ __simd_vf__ inline void load_store_unalign_vf(__ubuf__ uint32_t* dst, __ubuf__ u
 6. 图中⑥：循环结束后，`asc_storeunalign_post_postupdate`将`ureg1`中最后缓存的尾块写入UB，完成连续非对齐搬出。
 
 示例中`count`为每次搬运的元素个数。`src`和`dst`分别由搬入、搬出接口自动更新，循环内需要复用各自的非对齐寄存器。`count`不超过单个矢量数据寄存器可容纳的元素个数，且搬入、搬出地址范围必须位于实际可用UB空间内。
+
+### b64数据类型
+
+以下接口支持b64数据类型。
+
+**表7**  支持b64数据类型的接口
+
+| 支持的数据类型 | 接口 |
+| --- | --- |
+| `int64_t`、`uint64_t` | [asc_loadalign](asc_loadalign.md)<br>[asc_loadalign_postupdate](asc_loadalign_postupdate.md) |
+| `int64_t` | [asc_load](asc_load.md)<br>[asc_loadunalign_pre](asc_loadunalign_pre.md)<br>[asc_loadunalign](asc_loadunalign.md)<br>[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md) |
+
+当`asc_loadalign`、`asc_loadunalign_pre`或`asc_loadunalign_postupdate`通过地址寄存器访问b64数据时，地址寄存器更新接口不支持b64模式，应使用[asc_update_addr_reg_b32](../reg_addr_reg/asc_update_addr_reg.md)生成地址寄存器。一个b64元素占用两个b32寻址单元，因此各维偏移量以及`asc_loadunalign_postupdate`的`inc`应设置为期望b64元素偏移量的2倍。
+
+`asc_loadalign`和`asc_loadalign_postupdate`的非连续对齐搬入模式中，处理`int64_t`数据时，掩码创建接口不支持b64模式。应先使用[asc_create_mask_b32](../reg_mask/asc_create_mask.md)创建b32掩码，再使用[asc_unpack_lower](../reg_permute_sel/asc_unpack.md)将其展开为b64数据对应的掩码。展开后的掩码以连续8个bit为一组，仅每组最低位的bit有效，用于控制一个b64元素。
+
+以下示例以`asc_loadalign`为例，展示b64掩码的构造方式以及地址寄存器偏移量的换算方法。
+
+```cpp
+vector_int64_t src_reg;
+vector_bool mask_b32 = asc_create_mask_b32(PAT_ALL);
+vector_bool mask_b64;
+asc_unpack_lower(mask_b64, mask_b32);
+addr_reg load_offset;
+addr_reg store_offset;
+for (uint16_t i = 0; i < repeatTimes; ++i) {
+    load_offset = asc_update_addr_reg_b32(elements_vl * 2);
+    // 搬出到UB后数据类型为B32，偏移不需要*2
+    store_offset = asc_update_addr_reg_b32(elements_vl);
+    asc_loadalign(src_reg, input, load_offset);
+    asc_storealign_pack(output, src_reg, store_offset, mask_b64);
+}
+```
