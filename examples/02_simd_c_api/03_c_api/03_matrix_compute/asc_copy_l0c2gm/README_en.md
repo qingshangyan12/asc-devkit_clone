@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example demonstrates how to use the SIMD C API `asc_copy_l0c2gm` to transfer matrix multiplication results from L0C Buffer to GM (Global Memory), supporting multiple output formats (Nz, ND, and DN), data type conversion, inline quantization, ReLU, and ChannelSplit. This API efficiently transfers matrix multiplication results from L0C to global memory and supports various data format conversions and preprocessing capabilities.
+This example demonstrates how to use the SIMD C API `asc_copy_l0c2gm` to transfer matrix multiplication results from L0C Buffer to GM (Global Memory), supporting multiple output formats (Nz, ND, and DN), data type conversion, inline quantization, ReLU, and ChannelSplit. This API efficiently transfers matrix multiplication results from L0C Buffer to global memory and supports various data format conversions and preprocessing capabilities.
 
 ## Supported Products and CANN Versions
 
@@ -48,13 +48,13 @@ This `dav-3510` example describes each transfer through the addresses, shape, st
 
 ## Scenario Description
 
-This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different SCENARIO_NUM values are shown in the table below. All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 256, 128], with kernel function name `asc_copy_l0c2gm`.
+This example selects different output scenarios through the compilation parameter `SCENARIO_NUM`. The meanings of different SCENARIO_NUM values are shown in the table below. All scenarios are based on the same matrix multiplication specification: [M, N, K] = [128, 256, 128], with kernel function name `asc_copy_l0c2gm_custom`.
 
 <a name="table2"></a>
 <table border="2" align="center">
 <caption style="font-weight: normal;">
     <span style="font-weight: bold; font-size: 1.2em;">Table 2: Meaning of Different scenarioNum Values</span></caption>
-<tr><td rowspan="1" align="center">scenarioNum</td><td align="center">L0C Data Type</td><td align="center">Output Data Type</td><td align="center">Output Format</td><td align="center">Quantization Enabled</td><td align="center">ReLU Enabled</td><td align="center">ChannelSplit Enabled</td></tr>
+<tr><td rowspan="1" align="center">scenarioNum</td><td align="center">L0C Buffer Data Type</td><td align="center">Output Data Type</td><td align="center">Output Format</td><td align="center">Quantization Enabled</td><td align="center">ReLU Enabled</td><td align="center">ChannelSplit Enabled</td></tr>
 <tr><td align="center">1</td><td align="center">float</td><td align="center">float</td><td align="center">Nz</td><td align="center">No</td><td align="center">No</td><td align="center">No</td></tr>
 <tr><td align="center">2</td><td align="center">float</td><td align="center">float</td><td align="center">ND</td><td align="center">No</td><td align="center">No</td><td align="center">No</td></tr>
 <tr><td align="center">3</td><td align="center">float</td><td align="center">float</td><td align="center">DN</td><td align="center">No</td><td align="center">No</td><td align="center">No</td></tr>
@@ -68,7 +68,7 @@ This example selects different output scenarios through the compilation paramete
 - Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
 - Output: C [128, 256] float type, Nz format
 - Implementation: Call `asc_copy_l0c2gm` with Nz2ND, Nz2DN, quantization, ReLU, and ChannelSplit disabled to write Nz directly
-- Description: L0C data in Nz format directly output to GM in Nz format, data remains unchanged
+- Description: L0C Buffer data in Nz format directly output to GM in Nz format, data remains unchanged
 <p align="center">
   <img src="figures/asc_copy_l0c2gm_NZ2NZ.png" width="800">
 </p>
@@ -94,26 +94,26 @@ This example selects different output scenarios through the compilation paramete
 **Scenario 4: Output format ND, output data type int8_t, Scalar quantization enabled**
 - Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
 - Output: C [128, 256] int8_t type, ND format
-- Implementation: Call `asc_set_l0c_copy_prequant(2.0F, 0, true)` to configure scalar quantization, then call `asc_copy_l0c2gm` with `QuantMode_t::QF322B8_PRE`
+- Implementation: Call `asc_set_l0c_copy_prequant(2.0F, 0, true)` to configure scalar quantization, then call `asc_copy_l0c2gm` with `asc_quant_mode::QF322B8_PRE`
 - Description: Quantize float type data to int8_t type, entire C matrix uses one quantization parameter
 
 **Scenario 5: Output format ND, output data type int8_t, Vector quantization enabled**
 - Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
 - Output: C [128, 256] int8_t type, ND format
-- Implementation: Use `asc_copy_gm2l1` and `asc_copy_l12fb` to transfer per-column quantization values from GM through L1 to Fixpipe Buffer, configure the address with `asc_set_l0c_copy_config`, then call `asc_copy_l0c2gm` with `QuantMode_t::VQF322B8_PRE`
-- Description: Quantize float type data to int8_t type, each column of C matrix corresponds to one quantization parameter, quantization parameters need to be copied from GM to L1
+- Implementation: Use `asc_copy_gm2l1` and `asc_copy_l12fb` to transfer per-column quantization values from GM through L1 Buffer to Fixpipe Buffer, configure the address with `asc_set_l0c_copy_config`, then call `asc_copy_l0c2gm` with `asc_quant_mode::VQF322B8_PRE`
+- Description: Quantize float type data to int8_t type, each column of C matrix corresponds to one quantization parameter, quantization parameters need to be copied from GM to L1 Buffer
 
 **Scenario 6: Output format ND, output data type float, ReLU enabled**
 - Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
 - Output: C [128, 256] float type, ND format
 - Implementation: Call `asc_copy_l0c2gm` with `relu_pre_mode = asc_relu_pre_mode::NORMAL`
-- Description: Perform ReLU operation during data transfer from L0C to GM, setting negative values to 0
+- Description: Perform ReLU operation during data transfer from L0C Buffer to GM, setting negative values to 0
 
 **Scenario 7: Output format Nz, output data type float, ChannelSplit enabled**
 - Input: A [128, 128] half type, ND format; B [128, 256] half type, ND format
 - Output: C [128, 512] float type, Nz format (channel split enabled)
 - Implementation: Call `asc_copy_l0c2gm` with `enable_channel_split = true`, while layout conversion, quantization, and ReLU remain disabled
-- Description: Enable channel split during L0C-to-GM transfer, splitting each 16x16 small-z fractal into two independent 16x8 small-z fractals. The `asc_copy_l0c2gm` input and output must both be float, and only Nz output is supported
+- Description: Enable channel split during L0C Buffer-to-GM transfer, splitting each 16x16 small-z fractal into two independent 16x8 small-z fractals. The `asc_copy_l0c2gm` input and output must both be float, and only Nz output is supported
 
 ## Build and Run
 
@@ -124,7 +124,7 @@ Run the following steps in the root directory of this example to build and run t
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, the default installation path is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. The default installation path is `/usr/local/Ascend` for the root user and `${HOME}/Ascend` for non-root users.
 - Run the example
 
   Run the following commands in the example directory.

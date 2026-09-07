@@ -18,7 +18,7 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
-    matmul_basic_api.asc
+    matmul_multi_core.asc
 )
 
 target_compile_options(demo PRIVATE

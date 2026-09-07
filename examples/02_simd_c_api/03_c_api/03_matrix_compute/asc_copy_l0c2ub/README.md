@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍如何使用SIMD C API `asc_copy_l0c2ub`将矩阵乘的结果从L0C Buffer搬出到UB（Unified Buffer），支持多种输出格式（Nz、ND）以及双目标模式（按M维度或N维度拆分）等功能。该接口用于将L0C中的矩阵乘计算结果高效地传输到统一缓存区，并支持各种数据格式转换和拆分能力。
+本样例介绍如何使用SIMD C API `asc_copy_l0c2ub`将矩阵乘的结果从L0C Buffer搬出到UB（Unified Buffer），支持多种输出格式（Nz、ND）以及双目标模式（按M维度或N维度拆分）等功能。该接口用于将L0C Buffer中的矩阵乘计算结果高效地传输到统一缓存区，并支持各种数据格式转换和拆分能力。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -26,13 +26,13 @@
 
 ## 场景详细说明
 
-本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `asc_copy_l0c2ub`。
+本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `asc_copy_l0c2ub_custom`。
 
 <a name="表1"></a>
 <table border="2" align="center">
 <caption style="font-weight: normal;">
     <span style="font-weight: bold; font-size: 1.2em;">📌 表1：scenarioNum不同取值的含义</span></caption>
-<tr><td rowspan="1" align="center">scenarioNum</td><td align="center">L0C数据类型</td><td align="center">输出数据类型</td><td align="center">输出格式</td><td align="center">双目标模式</td><td align="center">拆分维度</td></tr>
+<tr><td rowspan="1" align="center">scenarioNum</td><td align="center">L0C Buffer数据类型</td><td align="center">输出数据类型</td><td align="center">输出格式</td><td align="center">双目标模式</td><td align="center">拆分维度</td></tr>
 <tr><td align="center">1</td><td align="center">float</td><td align="center">float</td><td align="center">Nz</td><td align="center">否</td><td align="center">-</td></tr>
 <tr><td align="center">2</td><td align="center">float</td><td align="center">float</td><td align="center">ND</td><td align="center">否</td><td align="center">-</td></tr>
 <tr><td align="center">3</td><td align="center">float</td><td align="center">float</td><td align="center">ND</td><td align="center">是</td><td align="center">M维度</td></tr>
@@ -43,7 +43,7 @@
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 256] float类型，Nz格式
 - 实现：调用`asc_copy_l0c2ub`，设置`dual_dst_mode = DUAL_DST_DISABLE`且关闭Nz2ND，直接输出Nz格式
-- 说明：L0C数据为Nz格式直接输出到UB的Nz格式，数据保持原格式不变
+- 说明：L0C Buffer数据为Nz格式直接输出到UB的Nz格式，数据保持原格式不变
 
 **场景2：输出格式ND，输出数据类型float**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
@@ -78,7 +78,7 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}` 为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为`${HOME}/Ascend`。
 - 样例执行
 
   在本样例目录下执行如下命令。

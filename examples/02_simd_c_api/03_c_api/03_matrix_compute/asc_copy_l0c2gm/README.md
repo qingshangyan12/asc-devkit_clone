@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍如何使用SIMD C API `asc_copy_l0c2gm`将矩阵乘的结果从L0C Buffer搬出到GM（Global Memory），支持多种输出格式（Nz、ND、DN）、数据类型转换、随路量化、ReLU以及ChannelSplit等功能。该接口用于将L0C中的矩阵乘计算结果高效地传输到全局内存，并支持各种数据格式转换和预处理能力。
+本样例介绍如何使用SIMD C API `asc_copy_l0c2gm`将矩阵乘的结果从L0C Buffer搬出到GM（Global Memory），支持多种输出格式（Nz、ND、DN）、数据类型转换、随路量化、ReLU以及ChannelSplit等功能。该接口用于将L0C Buffer中的矩阵乘计算结果高效地传输到全局内存，并支持各种数据格式转换和预处理能力。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -48,13 +48,13 @@
 
 ## 场景详细说明
 
-本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `asc_copy_l0c2gm`。
+本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `asc_copy_l0c2gm_custom`。
 
 <a name="表2"></a>
 <table border="2" align="center">
 <caption style="font-weight: normal;">
     <span style="font-weight: bold; font-size: 1.2em;">📌 表2：scenarioNum不同取值的含义</span></caption>
-<tr><td rowspan="1" align="center">scenarioNum</td><td align="center">L0C数据类型</td><td align="center">输出数据类型</td><td align="center">输出格式</td><td align="center">是否使能量化</td><td align="center">是否使能ReLU</td><td align="center">是否使能ChannelSplit</td></tr>
+<tr><td rowspan="1" align="center">scenarioNum</td><td align="center">L0C Buffer数据类型</td><td align="center">输出数据类型</td><td align="center">输出格式</td><td align="center">是否使能量化</td><td align="center">是否使能ReLU</td><td align="center">是否使能ChannelSplit</td></tr>
 <tr><td align="center">1</td><td align="center">float</td><td align="center">float</td><td align="center">Nz</td><td align="center">否</td><td align="center">否</td><td align="center">否</td></tr>
 <tr><td align="center">2</td><td align="center">float</td><td align="center">float</td><td align="center">ND</td><td align="center">否</td><td align="center">否</td><td align="center">否</td></tr>
 <tr><td align="center">3</td><td align="center">float</td><td align="center">float</td><td align="center">DN</td><td align="center">否</td><td align="center">否</td><td align="center">否</td></tr>
@@ -68,7 +68,7 @@
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 256] float类型，Nz格式
 - 实现：调用`asc_copy_l0c2gm`，关闭Nz2ND、Nz2DN、量化、ReLU和ChannelSplit，直接输出Nz格式
-- 说明：L0C数据为Nz格式直接输出到GM的Nz格式，数据保持原格式不变
+- 说明：L0C Buffer数据为Nz格式直接输出到GM的Nz格式，数据保持原格式不变
 <p align="center">
   <img src="figures/asc_copy_l0c2gm_NZ2NZ.png" width="800">
 </p>
@@ -94,26 +94,26 @@
 **场景4：输出格式ND，输出数据类型int8_t，使能Scalar量化**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 256] int8_t类型，ND格式
-- 实现：调用`asc_set_l0c_copy_prequant(2.0F, 0, true)`配置Scalar量化参数，再以`QuantMode_t::QF322B8_PRE`调用`asc_copy_l0c2gm`
+- 实现：调用`asc_set_l0c_copy_prequant(2.0F, 0, true)`配置Scalar量化参数，再以`asc_quant_mode::QF322B8_PRE`调用`asc_copy_l0c2gm`
 - 说明：将float类型数据量化为int8_t类型，整个C矩阵使用一个量化参数
 
 **场景5：输出格式ND，输出数据类型int8_t，使能Vector量化**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 256] int8_t类型，ND格式
-- 实现：通过`asc_copy_gm2l1`和`asc_copy_l12fb`将每列量化参数从GM经L1搬到Fixpipe Buffer，调用`asc_set_l0c_copy_config`配置参数地址，再以`QuantMode_t::VQF322B8_PRE`调用`asc_copy_l0c2gm`
-- 说明：将float类型数据量化为int8_t类型，C矩阵的每一列对应一个量化参数，使用的量化参数需要从GM拷贝量化参数到L1
+- 实现：通过`asc_copy_gm2l1`和`asc_copy_l12fb`将每列量化参数从GM经L1 Buffer搬到Fixpipe Buffer，调用`asc_set_l0c_copy_config`配置参数地址，再以`asc_quant_mode::VQF322B8_PRE`调用`asc_copy_l0c2gm`
+- 说明：将float类型数据量化为int8_t类型，C矩阵的每一列对应一个量化参数，使用的量化参数需要从GM拷贝量化参数到L1 Buffer
 
 **场景6：输出格式ND，输出数据类型float，使能ReLU**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 256] float类型，ND格式
 - 实现：调用`asc_copy_l0c2gm`时设置`relu_pre_mode = asc_relu_pre_mode::NORMAL`
-- 说明：在数据从L0C搬出到GM的过程中执行ReLU操作，即将负值置为0
+- 说明：在数据从L0C Buffer搬出到GM的过程中执行ReLU操作，即将负值置为0
 
 **场景7：输出格式Nz，输出数据类型float，使能ChannelSplit**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 512] float类型，Nz格式（使能通道拆分）
 - 实现：调用`asc_copy_l0c2gm`时设置`enable_channel_split = true`，并关闭格式转换、量化和ReLU
-- 说明：在数据从L0C搬出到GM的过程中开启通道拆分功能，即将16x16小z分形矩阵拆分成两个独立的16x8小z分形矩阵输出到GM；`asc_copy_l0c2gm`的输入输出必须均为float类型，且仅支持Nz格式
+- 说明：在数据从L0C Buffer搬出到GM的过程中开启通道拆分功能，即将16x16小z分形矩阵拆分成两个独立的16x8小z分形矩阵输出到GM；`asc_copy_l0c2gm`的输入输出必须均为float类型，且仅支持Nz格式
 
 ## 编译运行
 
@@ -124,7 +124,7 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}` 为CANN包安装目录；root用户默认为`/usr/local/Ascend`，非root用户默认为`${HOME}/Ascend`。
 - 样例执行
 
   在本样例目录下执行如下命令。
