@@ -68,10 +68,10 @@ bisheng gather_compute.o gather_kernel.o main.o -o demo
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
 
 # 2、find_package(ASC)是CMake中用于查找和配置Ascend C编译工具链的命令
-find_package(ASC)
+find_package(ASC REQUIRED)
 
 # 3、指定项目支持的语言包括ASC和CXX
-project(kernel LANGUAGES ASC CXX)
+project(separate_compile LANGUAGES ASC CXX)
 
 # 4、使用CMake接口编译可执行文件
 add_executable(demo
