@@ -150,6 +150,38 @@ HcclResult CalcLevel2ChannelRequest(
 HcclResult GetProtocolByEngine(const OpParam& param, std::vector<CommProtocol>& protocols)
 {
     protocols.clear();
+#if CANN_VERSION_NUM >= 90100000
+    // CANN 9.1+ no longer selects the legacy UBC_TP protocol.
+    switch (param.engine) {
+        case CommEngine::COMM_ENGINE_AICPU:
+        case CommEngine::COMM_ENGINE_AICPU_TS:
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_PCIE);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBOE);
+#if CANN_VERSION_NUM >= 90200000
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UB_RTP);
+#endif
+            break;
+        case CommEngine::COMM_ENGINE_CCU:
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
+            break;
+        case CommEngine::COMM_ENGINE_AIV:
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UB_MEM);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_PCIE);
+            break;
+        case CommEngine::COMM_ENGINE_CPU:
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_ROCE);
+            break;
+        case CommEngine::COMM_ENGINE_CPU_TS:
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_ROCE);
+            break;
+        default:
+            HCCL_WARNING(
+                "[GetProtocolByEngine] Unknown engine[%d], set protocol to RESERVED", static_cast<int>(param.engine));
+            break;
+    }
+#else
     switch (param.engine) {
         case CommEngine::COMM_ENGINE_AICPU:
         case CommEngine::COMM_ENGINE_AICPU_TS:
@@ -175,6 +207,7 @@ HcclResult GetProtocolByEngine(const OpParam& param, std::vector<CommProtocol>& 
                 "[GetProtocolByEngine] Unknown engine[%d], set protocol to RESERVED", static_cast<int>(param.engine));
             break;
     }
+#endif
     return HCCL_SUCCESS;
 }
 
@@ -211,9 +244,22 @@ HcclResult ProcessLinkForProtocol(
     const std::string& funcName)
 {
     protocolFound = false;
+    // A peer can expose multiple links for the same protocol on one die.
+    // Keep one channel per die, matching the current HCCL channel policy.
+    std::set<uint32_t> seenDie;
     for (auto expectedProtocol : expectedProtocols) {
         for (u32 idx = 0; idx < linkList.size(); idx++) {
-            if (linkList[idx].linkAttr.linkProtocol == expectedProtocol) {
+            if (linkList[idx].linkAttr.linkProtocol != expectedProtocol) {
+                continue;
+            }
+            EndpointAttrDieId dieId = 0;
+            HcclResult dieRet = HcclRankGraphGetEndpointInfo(
+                comm, myRank, &linkList[idx].srcEndpointDesc, ENDPOINT_ATTR_DIE_ID, sizeof(dieId), &dieId);
+            bool shouldAdd = true;
+            if (dieRet == HCCL_SUCCESS) {
+                shouldAdd = seenDie.insert(dieId).second;
+            }
+            if (shouldAdd) {
                 CHK_RET(
                     CreateChannelFromLink(comm, myRank, remoteRank, netLayer, idx, linkList[idx], funcName, channels));
                 protocolFound = true;
@@ -487,6 +533,15 @@ HcclResult CalcChannelRequestNhr(
         std::vector<uint32_t> netLayersVector(netLayers, netLayers + netLayerNum);
 
         for (auto netLayer : netLayersVector) {
+            // For multi-level NHR, use the upper-level links. Level0 links
+            // are only valid for the single-server PCIe-SW exception.
+            const bool isNeedLevel0NhrChannel
+                = ((topoInfo->level0Topo == Level0Shape::CLOS
+                    || topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS)
+                   && topoInfo->level0PcieMix && topoInfo->serverNum == 1);
+            if (netLayerNum > 1 && netLayer == 0 && !isNeedLevel0NhrChannel) {
+                continue;
+            }
             CommLink* linkList = nullptr;
             u32 listSize;
             CHK_RET(HcclRankGraphGetLinks(comm, netLayer, myRank, subcommInfo[0][rankIdx], &linkList, &listSize));
