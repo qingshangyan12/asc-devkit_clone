@@ -436,8 +436,8 @@ __simd_callee__ inline void CopyMergingImpl(RegT& dstReg, RegT& srcReg, MaskReg&
         if constexpr (CheckRegTrait<RegT, RegTraitNumOne>()) {
             vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, adjustedMask, modeValue);
         } else if constexpr (CheckRegTrait<RegT, RegTraitNumTwo>()) {
-            vmov((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], adjustedMask, modeValue);
-            vmov((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], adjustedMask, modeValue);
+            vmov((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], mask, modeValue);
+            vmov((RegTensor<uint32_t>&)dstReg.reg[1], (RegTensor<uint32_t>&)srcReg.reg[1], mask, modeValue);
         }
     }
 }
