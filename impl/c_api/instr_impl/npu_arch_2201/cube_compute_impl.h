@@ -35,6 +35,7 @@ __aicore__ inline void asc_set_hf32_round_mode(asc_hf32_round_mode hf32_round_mo
     asc_set_hf32_round_mode_impl(hf32_round_mode);
 }
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_hf32_round_mode)
 __aicore__ inline void asc_enable_hf32_trans(uint32_t mode) { asc_enable_hf32_trans_impl(mode); }
 
 __aicore__ inline void asc_mmad_sparse(

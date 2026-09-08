@@ -246,7 +246,8 @@ __aicore__ inline void asc_copy_l0c2gm(
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool enable_unit_flag);
 
 // 2.0 When performing inline format conversion (NZ to ND) during data movement, call this interface to set format conversion configuration.
-__aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride);
+__aicore__ inline void asc_set_l0c_copy_nz_para(
+    uint16_t matrix_num, uint16_t src_nz_matrix_stride, uint32_t dst_matrix_stride);
 
 // 3.0 Set the value in RELU_ALPHA register. This is a 64-bit register storing the alpha value used in Scalar ReLU during fixpipe or cube instructions.
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);

@@ -51,6 +51,7 @@
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_compute_impl/asc_set_l0c2gm_config_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/cube_compute_impl/asc_get_l0c2gm_config_impl.h"
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l0c_copy_config)
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
 {
     asc_set_l0c2gm_config_impl(relu_pre, quant_pre, enable_unit_flag);
@@ -900,12 +901,16 @@ __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, ui
 
 __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config) { asc_set_l0c_copy_prequant_impl(config); }
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l12l0a_3d_padding)
 __aicore__ inline void asc_set_l13d_padding(uint64_t config) { asc_set_l13d_padding_impl(config); }
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l12l0a_3d_padding)
 __aicore__ inline void asc_set_l13d_padding(half config) { asc_set_l13d_padding_impl(config); }
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l12l0a_3d_padding)
 __aicore__ inline void asc_set_l13d_padding(int16_t config) { asc_set_l13d_padding_impl(config); }
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l12l0a_3d_padding)
 __aicore__ inline void asc_set_l13d_padding(uint16_t config) { asc_set_l13d_padding_impl(config); }
 
 // ==========asc_copy_l0c2gm==========
@@ -1292,8 +1297,10 @@ __aicore__ inline void asc_copy_gm2l1(
 
 __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config) { asc_set_l13d_fmatrix_b_impl(config); }
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l0c_copy_lrelu_alpha)
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config) { asc_set_l0c2gm_lrelu_alpha_impl(config); }
 
+ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_l0c_copy_lrelu_alpha)
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config) { asc_set_l0c2gm_lrelu_alpha_impl(config); }
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_copy_l12l0b_sparse and asc_sync)
