@@ -148,7 +148,7 @@ The latency reduction is 7.7%. Although the thread read count drops from 3 to 2 
 
 **Prefer atomic add for accumulation-type scenarios**: When the old value of the target address is used only for accumulation and does not participate in other computations, switching to atomic add saves the instruction that reads the old value, reducing the instruction count.
 
-**Note the applicability precondition**: The gain of this optimization comes from threads issuing one fewer instruction, not from atomicity, nor from reducing the amount of data transferred. If the accessed addresses contend, atomic operations on the same address can only execute serially, which instead causes significant performance loss (see the [atomic_histogram sample](../atomic_histogram/README_en.md) and the [atomic_add_perf sample](../../../02_features/01_api_features/02_atomic_operation/atomic_add_perf/README_en.md) for details). Before use, confirm that the addresses each thread writes to `a` do not overlap.
+**Note the applicability precondition**: The gain of this optimization comes from threads issuing one fewer instruction, not from atomicity, nor from reducing the amount of data transferred. If the accessed addresses contend, atomic operations on the same address can only execute serially, which instead causes significant performance loss (see the [atomic_histogram sample](../atomic_histogram/README_en.md) and the [atomic_add_perf sample](../../../02_features/01_api_features/02_atomic_operation/atomic_add_perf/README_en.md) for details). Before use, confirm that the target addresses of each thread's atomic operations do not overlap.
 
 ## Build and Run
 
