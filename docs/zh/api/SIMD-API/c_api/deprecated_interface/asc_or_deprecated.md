@@ -26,7 +26,9 @@
 
 ## 功能说明
 
-**该接口的浮点类型重载已废弃，请根据数据类型使用等位宽的[asc_or](../reg_compute/reg_logic/asc_or.md)整数重载替代。**
+头文件路径为：`"c_api/reg_compute/compute/reg_logic.h"`。
+
+**该接口的浮点类型重载已废弃，请使用[asc_or](../reg_compute/reg_logic/asc_or.md)的等位宽整数重载替代。**
 
 根据`mask`对源操作数`src0`、`src1`执行按位或（|）操作，将结果写入目的操作数`dst`。
 

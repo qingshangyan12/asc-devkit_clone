@@ -14,5 +14,3 @@
 - **[asc_get_system_cycle](asc_get_system_cycle.md)**
 - **[asc_get_vf_len](asc_get_vf_len.md)**
 - **[asc_set_ffts_base_addr](asc_set_ffts_base_addr.md)**
-- **[asc_get_block_idx（废弃）](../../deprecated_interface/asc_get_block_idx_deprecated.md)**
-- **[asc_get_block_num（废弃）](../../deprecated_interface/asc_get_block_num_deprecated.md)**

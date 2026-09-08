@@ -174,3 +174,13 @@ PIPE_M
   - 设置为1时使用非饱和模式，inf/nan保持原输出。
 
   注意，应避免nan输入，否则可能会产生执行报错。
+
+## 调用示例
+
+```cpp
+__ca__ fp8_e4m3fn_t a[128];
+__cb__ fp8_e5m2_t b[128];
+__cc__ float c[128];
+asc_mmad_mx(c, a, b, 2, 64, 1, asc_unit_flag_mode::DISABLE, true, false, true);
+asc_sync();
+```

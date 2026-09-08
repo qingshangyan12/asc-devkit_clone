@@ -85,6 +85,23 @@ __simd_callee__ inline void asc_half2int32_rd(vector_int32_t& dst,
                                               vector_bool mask)
 ```
 
+<!-- deprecated-overload-list-start -->
+### 废弃接口清单
+
+下列接口名均指本页函数原型章节所述的三参数旧原型：
+
+- `asc_half2int32_rd`
+- `asc_half2int32_rd_v2`
+- `asc_half2int32_rn`
+- `asc_half2int32_rn_v2`
+- `asc_half2int32_rna`
+- `asc_half2int32_rna_v2`
+- `asc_half2int32_ru`
+- `asc_half2int32_ru_v2`
+- `asc_half2int32_rz`
+- `asc_half2int32_rz_v2`
+<!-- deprecated-overload-list-end -->
+
 ## 参数说明
 
 **表2** 参数说明

@@ -1,4 +1,4 @@
-# asc_loadalign (废弃)
+# asc_loadalign_v4（废弃）
 
 ## 产品支持情况
 
