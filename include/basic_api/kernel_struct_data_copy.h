@@ -211,23 +211,21 @@ struct DataCopyExtParams {
     __aicore__ DataCopyExtParams(
         const uint16_t count, const uint32_t len, const int64_t srcStrideIn, const int64_t dstStrideIn,
         const uint32_t rsvIn)
+#else
+    __aicore__ DataCopyExtParams(
+        const uint16_t count, const uint32_t len, const uint32_t srcStrideIn, const uint32_t dstStrideIn,
+        const uint32_t rsvIn)
+#endif
         : blockCount(count), blockLen(len), srcStride(srcStrideIn), dstStride(dstStrideIn), rsv(rsvIn)
     {}
 
     uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
     uint32_t blockLen = 0;
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
     int64_t srcStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);
     int64_t dstStride = static_cast<int64_t>(DEFAULT_DATA_COPY_STRIDE);
 #else
-    __aicore__ DataCopyExtParams(
-        const uint16_t count, const uint32_t len, const uint32_t srcStrideIn, const uint32_t dstStrideIn,
-        const uint32_t rsvIn)
-        : blockCount(count), blockLen(len), srcStride(srcStrideIn), dstStride(dstStrideIn), rsv(rsvIn)
-    {
-    }
-
-    uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
-    uint32_t blockLen = 0;
     uint32_t srcStride = DEFAULT_DATA_COPY_STRIDE;
     uint32_t dstStride = DEFAULT_DATA_COPY_STRIDE;
 #endif
