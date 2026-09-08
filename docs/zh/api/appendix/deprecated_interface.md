@@ -487,6 +487,10 @@
 
     此接口已废弃。
 
+- [asc_set_l0c2gm_quant_post（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_quant_post_deprecated.md)接口
+
+    此接口已废弃，暂无替代接口。
+
 - [asc_set_l0c2gm_nz2nd（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md)接口：请使用`asc_set_l0c_copy_nz_para`。
 - [asc_set_l0c2gm_channel_para（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md)接口：请使用`asc_set_l0c_copy_channel_para`。
 - [asc_set_l0c2gm_config（废弃）](../SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_config_deprecated.md)接口：请使用`asc_set_l0c_copy_config`。TODO：替代接口文档待补齐。

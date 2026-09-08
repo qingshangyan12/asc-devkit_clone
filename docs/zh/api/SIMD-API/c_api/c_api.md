@@ -126,7 +126,6 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_gm2l1_pad](cube_datamove/asc_set_gm2l1_pad.md)|将数据从GM非对齐搬运到L1 Buffer时，设置连续搬运数据块左右两侧的填充值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_nz_para](cube_datamove/asc_set_l0c_copy_nz_para.md)|数据搬运过程中进行随路格式转换（NZ格式转换为ND格式）时，设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_channel_para](cube_datamove/asc_set_l0c_copy_channel_para.md)|配置Nz2DN格式转换时源Nz矩阵中相邻行的地址偏移。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_quant_post](cube_datamove/asc_set_l0c2gm_quant_post.md)|设置QUANT_POST寄存器的值。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_params](cube_datamove/asc_set_l0c_copy_params.md)|DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_prequant](cube_datamove/asc_set_l0c_copy_prequant.md)|数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_fmatrix](cube_datamove/asc_set_l13d_fmatrix.md)|设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从左矩阵获取FeatureMap的属性时使用该接口。|`c_api/cube_datamove/cube_datamove.h`|
@@ -704,6 +703,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_enable_fp8（废弃）](deprecated_interface/asc_enable_fp8_deprecated.md)|请使用`asc_disable_hif8`。|`c_api/cube_compute/cube_compute.h`|
 |[asc_set_fp32_mode（废弃）](deprecated_interface/asc_set_fp32_mode_deprecated.md)|请使用`asc_disable_hf32`。|`c_api/cube_compute/cube_compute.h`|
 |[asc_enable_hf32_trans（废弃）](deprecated_interface/asc_enable_hf32_trans_deprecated.md)|暂无替代接口。|`c_api/cube_compute/cube_compute.h`|
+|[asc_set_l0c2gm_quant_post（废弃）](deprecated_interface/asc_set_l0c2gm_quant_post_deprecated.md)|暂无替代接口。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_nz2nd（废弃）](deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md)|请使用`asc_set_l0c_copy_nz_para`。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_channel_para（废弃）](deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md)|请使用`asc_set_l0c_copy_channel_para`。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c2gm_config（废弃）](deprecated_interface/asc_set_l0c2gm_config_deprecated.md)|请使用`asc_set_l0c_copy_config`。TODO：替代接口文档待补齐。|`c_api/cube_datamove/cube_datamove.h`|

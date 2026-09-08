@@ -247,6 +247,7 @@ __aicore__ inline void asc_set_gm2l1_padding(uint32_t padding_value) { asc_set_g
 __aicore__ inline void asc_set_gm2l1_padding(float padding_value) { asc_set_gm2l1_padding_impl(padding_value); }
 
 __aicore__ inline void asc_set_l12l0_padding_val(uint64_t config) { asc_set_l12l0_padding_val_impl(config); }
+[[deprecated("NOTICE: asc_set_l0c2gm_quant_post is deprecated. There is no replacement.")]]
 __aicore__ inline void asc_set_l0c2gm_quant_post(uint64_t config) { asc_set_l0c2gm_quant_post_impl(config); }
 __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config) { asc_set_l0c2gm_relu_alpha_impl(config); }
 __aicore__ inline void asc_set_l0c_copy_relu_alpha(float scalar_relu_pre_alpha)

@@ -26,7 +26,6 @@
 - **[asc_set_gm2l1_pad](asc_set_gm2l1_pad.md)**
 - **[asc_set_l0c_copy_nz_para](asc_set_l0c_copy_nz_para.md)**
 - **[asc_set_l0c_copy_channel_para](asc_set_l0c_copy_channel_para.md)**
-- **[asc_set_l0c2gm_quant_post](asc_set_l0c2gm_quant_post.md)**
 - **[asc_set_l0c_copy_params](asc_set_l0c_copy_params.md)**
 - **[asc_set_l0c_copy_prequant](asc_set_l0c_copy_prequant.md)**
 - **[asc_set_l12l0a_3d_padding](asc_set_l12l0a_3d_padding.md)**
