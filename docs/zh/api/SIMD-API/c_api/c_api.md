@@ -697,25 +697,3 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_ctrl](spr/asc_set_ctrl.md)|设置CTRL寄存器（控制寄存器）的值。|`c_api/spr/spr.h`|
 |[asc_set_saturation_flag](spr/asc_set_saturation_flag.md)|设置指定饱和模式的开关状态。|`c_api/spr/spr.h`|
 |[asc_set_saturation_strategy](spr/asc_set_saturation_strategy.md)|设置饱和控制策略。|`c_api/spr/spr.h`|
-
-## 废弃接口
-
-|API名称|说明|最细粒度公共头文件|
-|---|---|---|
-|[asc_enable_fp8（废弃）](deprecated_interface/asc_enable_fp8_deprecated.md)|请使用`asc_disable_hif8`。|`c_api/cube_compute/cube_compute.h`|
-|[asc_set_fp32_mode（废弃）](deprecated_interface/asc_set_fp32_mode_deprecated.md)|请使用`asc_disable_hf32`。|`c_api/cube_compute/cube_compute.h`|
-|[asc_enable_hf32_trans（废弃）](deprecated_interface/asc_enable_hf32_trans_deprecated.md)|暂无替代接口。|`c_api/cube_compute/cube_compute.h`|
-|[asc_set_l0c2gm_quant_post（废弃）](deprecated_interface/asc_set_l0c2gm_quant_post_deprecated.md)|暂无替代接口。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_nz2nd（废弃）](deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md)|请使用[asc_set_l0c_copy_nz_para](cube_datamove/asc_set_l0c_copy_nz_para.md)。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_channel_para（废弃）](deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md)|请使用[asc_set_l0c_copy_channel_para](cube_datamove/asc_set_l0c_copy_channel_para.md)。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_config（废弃）](deprecated_interface/asc_set_l0c2gm_config_deprecated.md)|请使用[asc_set_l0c_copy_config](cube_datamove/asc_set_l0c_copy_config.md)。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l12l0_padding_val（废弃）](deprecated_interface/asc_set_l12l0_padding_val_deprecated.md)|请使用[asc_set_l12l0b_3d_padding](cube_datamove/asc_set_l12l0b_3d_padding.md)。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l13d_padding（废弃）](deprecated_interface/asc_set_l13d_padding_deprecated.md)|请使用[asc_set_l12l0a_3d_padding](cube_datamove/asc_set_l12l0a_3d_padding.md)。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_relu_alpha（废弃）](deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md)|请使用[asc_set_l0c_copy_relu_alpha](cube_datamove/asc_set_l0c_copy_relu_alpha.md)。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c2gm_lrelu_alpha（废弃）](deprecated_interface/asc_set_l0c2gm_lrelu_alpha_deprecated.md)|请使用[asc_set_l0c_copy_lrelu_alpha](cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_gm2l1_align（废弃）](deprecated_interface/asc_copy_gm2l1_align_deprecated.md)|旧重载及`_sync`已废弃，请使用类型化L2 Cache参数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_gm2l1_dn2nz（废弃）](deprecated_interface/asc_copy_gm2l1_dn2nz_deprecated.md)|旧重载及`_sync`已废弃，请使用类型化L2 Cache参数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_gm2l1_nd2nz（废弃）](deprecated_interface/asc_copy_gm2l1_nd2nz_deprecated.md)|旧重载及`_sync`已废弃，请使用类型化L2 Cache参数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_gm2l1（高维切分旧形式，废弃）](deprecated_interface/asc_copy_gm2l1_highdim_deprecated.md)|请使用`asc_channel_pad_mode`参数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_gm2l1（2D矩阵搬运旧形式，废弃）](deprecated_interface/asc_copy_gm2l1_2d_deprecated.md)|请使用`asc_load_l2_cache_mode`参数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_copy_l12ub_sync（废弃）](deprecated_interface/asc_copy_l12ub_sync_deprecated.md)|请使用`asc_copy_l12ub`接口和`asc_sync`接口替代。|`c_api/composite/cube_datamove_composite.h`|
