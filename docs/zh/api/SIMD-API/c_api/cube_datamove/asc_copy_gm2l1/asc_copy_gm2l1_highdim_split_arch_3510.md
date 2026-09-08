@@ -38,8 +38,8 @@
 
 ```c
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst,
-                                      uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride,
-                                      uint32_t dst_stride)
+                                       uint32_t len_burst, asc_channel_pad_mode pad_mode, uint64_t src_stride,
+                                       uint32_t dst_stride)
 ```
 
 ## 参数说明
@@ -54,7 +54,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint
 | src | 输入 | 源操作数，存储位置为GM。起始地址需要按照1字节对齐。 |
 | n_burst | 输入 | 搬运的数据块的个数。取值范围：[1, $2^{17}-1$]。 |
 | len_burst | 输入 | 搬运的每个数据块长度，单位32字节。取值范围：[1, $2^{17}-1$]。 |
-| pad_func_mode | 输入 | 搬运过程中的填充或删除数据模式，取值范围：[0, 8]。填充模式是指在目的的数据中插入padding值，padding值需要通过[asc_set_gm2l1_padding](../asc_set_gm2l1_padding.md)设置。删除模式是指在从搬运的每个32字节中移除部分数据。<br>&nbsp;&nbsp;&bull; `0`：不做padding；<br>&nbsp;&nbsp;&bull; `1`：每有1个字节的数据，插入31个padding值，其中插入的每个padding的位宽为b8；<br>&nbsp;&nbsp;&bull; `2`：每有2个字节的数据，插入15个padding值，其中插入的每个padding的位宽为b16；<br>&nbsp;&nbsp;&bull; `3`：每有4个字节的数据，插入14个padding值，其中插入的每个padding的位宽为b16；<br>&nbsp;&nbsp;&bull; `4`：每有8个字节的数据，插入12个padding值，其中插入的每个padding的位宽为b16； <br>&nbsp;&nbsp;&bull; `5`：每有16个字节的数据，插入8个padding值，其中插入的每个padding的位宽为b16；<br>&nbsp;&nbsp;&bull; `6`：每有32个字节的数据，移除28个最高有效位数据，只保留4个最低有效位字节；<br>&nbsp;&nbsp;&bull; `7`：每有32个字节的数据，移除24个最高有效位数据，只保留8个最低有效位字节；<br>&nbsp;&nbsp;&bull; `8`：每有32个字节的数据，移除16个最高有效位数据，只保留16个最低有效位字节。 |
+| pad_mode | 输入 | 使用[asc_channel_pad_mode](../../defs/enum/asc_channel_pad_mode.md)枚举值指示通道padding模式。 |
 | src_stride | 输入 | 源操作数相邻数据块之间的间隔（即前一个数据块起始地址与后一个数据块起始地址的差值），取值范围：[0, $2^{36}-1$]，单位32字节。<br>&nbsp;&nbsp;&bull; n_burst = 1时，`src_stride`无意义，设置为0即可。 |
 | dst_stride | 输入 | 目的操作数相邻数据块之间的间隔（即前一个数据块起始地址与后一个数据块起始地址的差值），取值范围：[0, $2^{17}-1$]，单位32字节。<br>&nbsp;&nbsp;&bull; n_burst = 1时，`dst_stride`无意义，设置为0即可。 |
 
@@ -144,7 +144,7 @@ __global__ __cube__ void AscCopyGm2l1HighdimBiasKernel(
 
     // Bias的1 x 128数据被切分为两个256字节块，由GM搬运至L1 Buffer, 也可以1次连续搬运512字节块。
     asc_copy_gm2l1(reinterpret_cast<__cbuf__ void*>(bias_l1), reinterpret_cast<__gm__ void*>(bias), BIAS_BLOCKS,
-        BIAS_BLOCK_LEN, 0, BIAS_BLOCK_LEN, BIAS_BLOCK_LEN);
+        BIAS_BLOCK_LEN, asc_channel_pad_mode::NONE, BIAS_BLOCK_LEN, BIAS_BLOCK_LEN);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
 
