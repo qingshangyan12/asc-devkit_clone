@@ -35,13 +35,10 @@ struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::Variable normalSliceSize;
     ccu::Variable lastSliceSize;
     ccu::Variable isInputOutputEqual;
-    // Kept to consume queue payload slots [5..8].  The KFC path must not
-    // create a GroupCopy/LoopGroup from inside the server's persistent loop.
     GroupOpSizeVars goSize;
     ccu::LocalAddr srcLocCopy;
     ccu::LocalAddr localDst;
     std::vector<ccu::Event> events;
-    ccu::Event localCopyEvent;
 
     ccu::Variable constVar1;
     ccu::Variable repeatTimeFlag;
@@ -209,15 +206,11 @@ static CcuResult DoAllGatherLocalCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
                     ctx.localDst.addr += ctx.outputRepeatStride;
                     ctx.srcLocCopy.addr += ctx.inputRepeatStride;
                 }
-                // The KFC subkernel is emitted inside the server's persistent
-                // CCU_WHILE. GroupCopy creates a two-loop LoopGroup there,
-                // which the KFC server runtime rejects when adding the second
-                // loop.
-                // Use the direct mem-to-mem primitive already used by other
-                // KFC kernels, and wait before reusing its event in the next
-                // repeat.
-                CCU_CHK_RET(ccu::LocalCopy(ctx.localDst, ctx.srcLocCopy, ctx.sliceSize, ctx.localCopyEvent, 1));
-                CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));
+                // Keep the local path on the same MS-buffered GroupCopy
+                // pipeline as the pre-KFC Mesh implementation. GroupCopy is
+                // also used by the KFC NHR and AllToAll sub-kernels, so it is
+                // valid inside the server's persistent loop.
+                CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcLocCopy, ctx.goSize));
                 ctx.repeatTimeFlag = 1;
             }
         }
@@ -253,7 +246,7 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
                     }
                 }
                 ctx.tmpRepeatNum += ctx.constVar1;
-                CCU_CHK_RET(DoAllGatherWrite(ctx, ctx.src, ctx.dst, ctx.normalSliceSize, unrollIdx));
+                CCU_CHK_RET(DoAllGatherWrite(ctx, ctx.src, ctx.dst, ctx.sliceSize, unrollIdx));
                 ctx.remoteRepeatTimeFlag = 1;
             }
         }
@@ -296,7 +289,7 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
         isInputOutputEqual));
     HCCL_INFO(
         "[KFC][AllGather][Kernel] rankId[%u], rankSize[%u], channelCount[%u], repeatBatch[%u], "
-        "localCopy[direct]",
+        "localCopy[group]",
         rankId, rankSize, channelCount, AG_M2M_UNROLL_NUM);
 
     CCU_CHK_RET(PreSync(ctx));

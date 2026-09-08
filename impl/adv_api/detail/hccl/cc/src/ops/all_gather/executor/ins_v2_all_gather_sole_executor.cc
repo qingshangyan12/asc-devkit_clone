@@ -13,10 +13,28 @@
 #include "ins_temp_all_gather_nhr.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
+#include "kfc_server_protocol.h"
 #endif
 #include "topo_match_ubx.h"
+#include <algorithm>
 #include <cstddef>
 namespace mc2_ops_hccl {
+
+namespace {
+
+template <typename InsAlgTemplate>
+struct AllGatherRepeatBatch {
+    static u64 MaxRepeatNum() { return 1U; }
+};
+
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+template <>
+struct AllGatherRepeatBatch<CcuTempKfcAllGatherMesh1DMem2Mem> {
+    static u64 MaxRepeatNum() { return HcclKfcProtocol::KFC_ALL_GATHER_MESH_MAX_REPEAT; }
+};
+#endif
+
+} // namespace
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2AllGatherSoleExecutor()
@@ -118,7 +136,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     tempAlgParams.buffInfo.inputSize = param.inputSize;
     tempAlgParams.buffInfo.outputSize = param.outputSize;
     tempAlgParams.enableRemoteMemAccess = param.opMode == OpMode::OFFLOAD;
-    // 不需要重复
+    // 默认不需要重复；KFC Mesh 会将连续的等长分片合并为一个 repeat batch。
     tempAlgParams.repeatNum = 1;
     tempAlgParams.inputRepeatStride = 0;
     tempAlgParams.outputRepeatStride = 0;
@@ -153,8 +171,14 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         "[InsV2AllGatherSoleExecutor][OrchestrateLoop] myRank[%u], templateScratchMultiplier[%u] "
         "maxCountPerLoop[%llu], loopTimes[%llu]",
         myRank_, templateScratchMultiplier, maxCountPerLoop, loopTimes);
-    for (u64 loop = 0; loop < loopTimes; loop++) {
-        u64 currDataCount = (loop == loopTimes - 1) ? dataCount_ - processedDataCount : maxCountPerLoop;
+    const u64 maxRepeatNum = AllGatherRepeatBatch<InsAlgTemplate>::MaxRepeatNum();
+    for (u64 loop = 0; loop < loopTimes;) {
+        const u64 currDataCount = (loop == loopTimes - 1) ? dataCount_ - processedDataCount : maxCountPerLoop;
+        u64 repeatNum = 1U;
+        if (currDataCount == maxCountPerLoop && maxRepeatNum > 1U) {
+            const u64 remainingFullChunks = (dataCount_ - processedDataCount) / maxCountPerLoop;
+            repeatNum = std::min(maxRepeatNum, remainingFullChunks);
+        }
         tempAlgParams.buffInfo.inBuffBaseOff = processedDataCount * dataTypeSize_;
         tempAlgParams.buffInfo.outBuffBaseOff = processedDataCount * dataTypeSize_;
         tempAlgParams.buffInfo.hcclBuffBaseOff = 0;
@@ -164,6 +188,9 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         tempAlgParams.tailSize = tempAlgParams.sliceSize;
         tempAlgParams.inputSliceStride = 0;
         tempAlgParams.outputSliceStride = (strideCount_ == 0) ? dataSize_ : strideCount_ * dataTypeSize_;
+        tempAlgParams.repeatNum = repeatNum;
+        tempAlgParams.inputRepeatStride = (repeatNum == 1U) ? 0U : tempAlgParams.sliceSize;
+        tempAlgParams.outputRepeatStride = (repeatNum == 1U) ? 0U : tempAlgParams.sliceSize;
 
         HCCL_DEBUG(
             "[InsV2AllGatherSoleExecutor] myRank[%u], loop [%u] tempAlgParams.inputSliceStride [%u],"
@@ -177,13 +204,16 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         HCCL_INFO(
             "[KFCAG_DEBUG][OrchestrateLoop] rank[%u] loop[%llu] dataCount[%llu] dataTypeSize[%llu] "
             "strideCount[%llu] dataSize[%llu] currDataCount[%llu] sliceSize[%llu] outputSliceStride[%llu] "
-            "inBuffBaseOff[%llu] outBuffBaseOff[%llu] repeatNum[%llu]",
+            "inBuffBaseOff[%llu] outBuffBaseOff[%llu] repeatNum[%llu] inputRepeatStride[%llu] "
+            "outputRepeatStride[%llu]",
             myRank_, loop, dataCount_, dataTypeSize_, strideCount_, dataSize_, currDataCount, tempAlgParams.sliceSize,
             tempAlgParams.outputSliceStride, tempAlgParams.buffInfo.inBuffBaseOff,
-            tempAlgParams.buffInfo.outBuffBaseOff, tempAlgParams.repeatNum);
+            tempAlgParams.buffInfo.outBuffBaseOff, tempAlgParams.repeatNum, tempAlgParams.inputRepeatStride,
+            tempAlgParams.outputRepeatStride);
 
         CHK_RET(algTemplate.KernelRun(param, tempAlgParams, templateAlgRes));
-        processedDataCount += currDataCount;
+        processedDataCount += currDataCount * repeatNum;
+        loop += repeatNum;
     }
     HCCL_INFO("[InsV2AllGatherSoleExecutor][OrchestrateLoop] End.");
     return HCCL_SUCCESS;
