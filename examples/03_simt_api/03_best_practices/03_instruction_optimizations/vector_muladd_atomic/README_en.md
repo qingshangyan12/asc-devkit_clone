@@ -140,9 +140,9 @@ __global__ __launch_bounds__(THREADS_PER_BLOCK) void vector_muladd_atomic(
 | 0 | a[i] += b[i] * c[i] | 3 | 51.70 | 1× |
 | 1 | asc_atomic_add | 2 | 47.72 | **0.92×** |
 
-The latency reduction is 7.7%. Although the thread read count drops from 3 to 2 (a 33% reduction), the actual latency reduction is only 7.7%. The reason is as follows:
+The latency reduction is 7.7%. Although the thread read count drops from 3 to 2 (a 33% reduction), the actual latency reduction is only 7.7%.
 
-- **The latency reduction is far smaller than the read-count reduction because:** the dominant cost of reading GM is the data round-trip latency, not instruction issue time. Issuing a read instruction only consumes a short issue time; afterward, most of the time is spent waiting for data to return from GM. The waits for the two read instructions overlap, so removing one saves only the issue time of that instruction; the data round-trip latency still has to be waited out.
+- **The latency reduction is far smaller than the read-count reduction because the dominant cost of reading GM is the data round-trip latency, not instruction issue time.** Issuing a read instruction only consumes a short issue time; afterward, most of the time is spent waiting for data to return from GM. The waits for the two read instructions overlap, so removing one saves only the issue time of that instruction; the data round-trip latency still has to be waited out.
 
 ## Tuning Recommendations
 
