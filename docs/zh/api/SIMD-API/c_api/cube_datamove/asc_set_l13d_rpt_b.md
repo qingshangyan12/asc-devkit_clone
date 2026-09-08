@@ -48,11 +48,11 @@ __aicore__ inline void asc_set_l13d_rpt_b(uint16_t repeat_stride,
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `repeat_stride` | 输入 | 相邻两次迭代起始位置的距离，取值范围：[0, 65535]。当`repeat_direction`为`asc_l13d_repeat_direction::M_DIRECTION`时，单位为16个元素；为`asc_l13d_repeat_direction::K_DIRECTION`时，单位为`32 / sizeof(data_type)`个元素，`data_type`为源操作数的数据类型。 |
-| `repeat_times` | 输入 | M或K方向的迭代次数，取值范围：[0, 255]。`0`表示不执行搬运，3D搬运接口被视为NOP（空操作）。 |
-| `repeat_direction` | 输入 | [asc_l13d_repeat_direction](../defs/enum/asc_l13d_repeat_direction.md)类型枚举值，表示repeat方向。<br>&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::M_DIRECTION`：沿height（M）方向迭代；<br>&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::K_DIRECTION`：沿width（K）方向迭代。 |
-| `dst_stride_k` | 输入 | 目的矩阵K方向的步长，取值范围：[0, 65535]，单位为512字节的分形。 |
-| `dst_start_pos_m` | 输入 | 目的矩阵M方向的起始位置，取值范围：[0, 65535]，单位为512字节的分形。 |
+| repeat_stride | 输入 | 相邻两次迭代起始位置的距离，取值范围：[0, 65535]。当`repeat_direction`为`asc_l13d_repeat_direction::M_DIRECTION`时，单位为16个元素；为`asc_l13d_repeat_direction::K_DIRECTION`时，单位为`32 / sizeof(data_type)`个元素，`data_type`为源操作数的数据类型。 |
+| repeat_times | 输入 | M或K方向的迭代次数，取值范围：[0, 255]。`0`表示不执行搬运，3D搬运接口被视为NOP（空操作）。 |
+| repeat_direction | 输入 | [asc_l13d_repeat_direction](../defs/enum/asc_l13d_repeat_direction.md)类型枚举值，表示repeat方向。<br>&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::M_DIRECTION`：沿height（M）方向迭代；<br>&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::K_DIRECTION`：沿width（K）方向迭代。 |
+| dst_stride_k | 输入 | 目的矩阵K方向的步长，取值范围：[0, 65535]，单位为512字节的分形。 |
+| dst_start_pos_m | 输入 | 目的矩阵M方向的起始位置，取值范围：[0, 65535]，单位为512字节的分形。 |
 
 ## 返回值说明
 

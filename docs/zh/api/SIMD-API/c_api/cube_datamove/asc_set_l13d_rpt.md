@@ -52,12 +52,12 @@ __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `repeat_stride` | 输入 | 相邻两次迭代起始位置的距离，取值范围：[0, 65535]。当`repeat_direction`为`M_DIRECTION`时，单位为16个元素；为`K_DIRECTION`时，单位为`32 / sizeof(data_type)`个元素，`data_type`为源操作数的数据类型。 |
-| `repeat_times` | 输入 | M或K方向的迭代次数，取值范围：[0, 255]。`0`表示不执行搬运，3D搬运接口被视为NOP（空操作）。 |
-| `repeat_direction` | 输入 | [asc_l13d_repeat_direction](../defs/enum/asc_l13d_repeat_direction.md)类型枚举值，表示repeat方向。<br>&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::M_DIRECTION`：沿height（M）方向迭代；<br>&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::K_DIRECTION`：沿width（K）方向迭代。 |
-| `dst_stride_k` | 输入 | 目的矩阵K方向的步长，取值范围：[0, 65535]，单位为512字节的分形。 |
-| `dst_start_pos_m` | 输入 | 目的矩阵M方向的起始位置，取值范围：[0, 65535]，单位为512字节的分形。 |
-| `config` | 输入 | repeat配置，仅传入config位域类型参数的接口使用，位域结构体配置说明请参考[asc_load3d_v2_config](../defs/union/asc_load3d_v2_config.md)。 |
+| repeat_stride | 输入 | 相邻两次迭代起始位置的距离，取值范围：[0, 65535]。当`repeat_direction`为`M_DIRECTION`时，单位为16个元素；为`K_DIRECTION`时，单位为`32 / sizeof(data_type)`个元素，`data_type`为源操作数的数据类型。 |
+| repeat_times | 输入 | M或K方向的迭代次数，取值范围：[0, 255]。`0`表示不执行搬运，3D搬运接口被视为NOP（空操作）。 |
+| repeat_direction | 输入 | [asc_l13d_repeat_direction](../defs/enum/asc_l13d_repeat_direction.md)类型枚举值，表示repeat方向。<br>&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::M_DIRECTION`：沿height（M）方向迭代；<br>&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::K_DIRECTION`：沿width（K）方向迭代。 |
+| dst_stride_k | 输入 | 目的矩阵K方向的步长，取值范围：[0, 65535]，单位为512字节的分形。 |
+| dst_start_pos_m | 输入 | 目的矩阵M方向的起始位置，取值范围：[0, 65535]，单位为512字节的分形。 |
+| config | 输入 | repeat配置，仅传入config位域类型参数的接口使用，位域结构体配置说明请参考[asc_load3d_v2_config](../defs/union/asc_load3d_v2_config.md)。 |
 
 ## 返回值说明
 
@@ -177,7 +177,7 @@ __global__ __cube__ void conv2d_forward_c_api(
     asc_copy_l0c2gm(output + batch_idx * OUTPUT_BATCH_SIZE, output_l0, N, M, N, M_ALIGN,
         asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, asc_unit_flag_mode::DISABLE, asc_quant_mode::F322F16,
         asc_relu_pre_mode::NONE, false, true, false, false);
-    asc_sync_pipe(PIPE_FIX);
+    asc_sync_pipe(PIPE_ALL);
 }
 
 size_t fmap_index(uint32_t n, uint32_t h, uint32_t w, uint32_t c)

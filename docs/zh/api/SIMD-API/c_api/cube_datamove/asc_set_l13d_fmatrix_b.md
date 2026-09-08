@@ -53,13 +53,13 @@ __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config)
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `fmatrix_w` | 输入 | Feature Map的width，取值范围：[1, 32767]。 |
-| `fmatrix_h` | 输入 | Feature Map的height，取值范围：[1, 32767]。 |
-| `pad_left` | 输入 | 左侧padding大小，取值范围：[0, 255]。 |
-| `pad_right` | 输入 | 右侧padding大小，取值范围：[0, 255]。 |
-| `pad_top` | 输入 | 上侧padding大小，取值范围：[0, 255]。 |
-| `pad_bottom` | 输入 | 下侧padding大小，取值范围：[0, 255]。 |
-| `config` | 输入 | Feature Map属性配置，仅传入config位域类型参数的接口使用，详细说明请参见[asc_l13d_fmatrix_config](../defs/union/asc_l13d_fmatrix_config.md)。 |
+| fmatrix_w | 输入 | Feature Map的width，取值范围：[1, 32767]。 |
+| fmatrix_h | 输入 | Feature Map的height，取值范围：[1, 32767]。 |
+| pad_left | 输入 | 左侧padding大小，取值范围：[0, 255]。 |
+| pad_right | 输入 | 右侧padding大小，取值范围：[0, 255]。 |
+| pad_top | 输入 | 上侧padding大小，取值范围：[0, 255]。 |
+| pad_bottom | 输入 | 下侧padding大小，取值范围：[0, 255]。 |
+| config | 输入 | Feature Map属性配置，仅传入config位域类型参数的接口使用，详细说明请参见[asc_l13d_fmatrix_config](../defs/union/asc_l13d_fmatrix_config.md)。 |
 
 ## 返回值说明
 
