@@ -12,7 +12,8 @@
 #define IMPL_C_API_MEMORY_BASE_IMPL_COMPOSITE_INTF_IMPL_H
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message("impl/c_api/memory_base_impl/composite_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
+#pragma message( \
+    "impl/c_api/memory_base_impl/composite_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define ASCENDC_C_API_INTERNAL_IMPL_C_API_MEMORY_BASE_IMPL_COMPOSITE_INTF_IMPL_H
 #endif

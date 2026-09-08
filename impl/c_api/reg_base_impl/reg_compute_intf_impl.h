@@ -12,7 +12,8 @@
 #define IMPL_C_API_REG_BASE_IMPL_REG_COMPUTE_INTF_IMPL_H
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#pragma message("impl/c_api/reg_base_impl/reg_compute_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
+#pragma message( \
+    "impl/c_api/reg_base_impl/reg_compute_intf_impl.h is an internal header. Please include c_api/asc_simd.h instead.")
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define ASCENDC_C_API_INTERNAL_IMPL_C_API_REG_BASE_IMPL_REG_COMPUTE_INTF_IMPL_H
 #endif
@@ -41,7 +42,7 @@ __simd_callee__ inline void asc_relu_impl(vector_float& dst, vector_float src, v
     }
 }
 
-#define ASC_DEFINE_UPDATE_ADDR_REG_IMPL(bxx)                                                                    \
+#define ASC_DEFINE_UPDATE_ADDR_REG_IMPL(bxx)                                                             \
     __simd_callee__ inline addr_reg asc_update_addr_reg_##bxx##_impl(uint32_t offset)                    \
     {                                                                                                    \
         if ASC_IS_AIV {                                                                                  \
